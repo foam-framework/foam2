@@ -160,11 +160,11 @@
 var EventPublisher = {
 
 //   properties: [
-    subs_ = null, // inited to {} when first used
+    subs_: null, // inited to {} when first used
 //   ],
 
 //   methods: [
-    function hasListeners(opt_topic) {
+    hasListeners: function(opt_topic) {
       if ( ! opt_topic ) return !! this.subs_;
 
       console.log('TODO: haslisteners');
@@ -427,4 +427,8 @@ var EventPublisher = {
 // //     }
 //   }
 // });
+
+
+exports.EventPublisher = EventPublisher;
+
 
