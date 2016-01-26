@@ -7,6 +7,7 @@ describe('EventPublisher', function() {
 
   it('reports hasListeners correctly for no listeners, ever', function() {
     var ep = Object.create(EventPublisher);
+    expect(ep.subs_).toBeNull();
     expect(ep.hasListeners()).toBe(false);
   });
 
