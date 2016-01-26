@@ -1,5 +1,6 @@
 var GLOBAL = global || this;
-var Alpha = require('../../src/Alpha').Alpha;
+require('../../src/Alpha');
+var Alpha = GLOBAL.Alpha;
 describe('Alpha', function() {
   it('Truthy truth', function() {
     var alpha = new Alpha(true);

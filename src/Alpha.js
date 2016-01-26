@@ -1,3 +1,4 @@
+var GLOBAL = global || this;
 function Alpha(a) {
   if (a) {
     this.truthy = true;
@@ -5,5 +6,4 @@ function Alpha(a) {
     this.truthy = false;
   }
 }
-exports.Alpha = Alpha;
-global.foo = 'foo';
+GLOBAL.Alpha = Alpha;
