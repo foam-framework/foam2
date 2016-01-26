@@ -70,4 +70,9 @@ describe('EventPublisher', function() {
     expect(ep.hasListeners([EventService.WILDCARD])).toBe(true);
   });
 
+  it('reports hasListeners correctly for a given topic but no listeners', function() {
+    var ep = Object.create(EventPublisher);
+    expect(ep.hasListeners([EventService.WILDCARD])).toBe(false);
+  });
+
 });

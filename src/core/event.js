@@ -168,7 +168,6 @@ var EventPublisher = {
 //   methods: [
     /** Internal. Returns true if any listeners are present in the given subs_ object. */
     hasAnyListeners_: function(map) {
-      if ( ! map ) return false;
       for ( var key in map ) {
         subMap = map[key];
         if ( subMap[null] && subMap[null].length ) return true;
