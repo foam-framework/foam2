@@ -48,6 +48,11 @@ describe('EventPublisher.hasListeners()', function() {
     expect(ep.hasListeners(['the','cake','is'])).toBe(true);
   });
 
+  it('reports correctly for a multi-level topic with a partial-match listener', function() {
+    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: [] },  } }, null: ['myFakeListener'] };
+    expect(ep.hasListeners(['the','cake'])).toBe(true);
+  });
+
   it('reports correctly for a multi-level topic with no listener', function() {
     ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
     expect(ep.hasListeners(['the','cake'])).toBe(false);
@@ -73,3 +78,39 @@ describe('EventPublisher.hasListeners()', function() {
   });
 
 });
+
+describe('EventPublisher.subscribe()/.sub_()', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener = function(topic, unsub) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+    }
+  });
+  afterEach(function() {
+    ep = null;
+    listener = null;
+  });
+
+  it('subscribes for a single topic', function() {
+    ep.subscribe(['simple'], listener);
+    expect(ep.hasListeners(['simple'])).toBe(true);
+  });
+  it('subscribes for a nested topics', function() {
+    ep.subscribe(['nested', 'topics'], listener);
+    expect(ep.hasListeners(['nested'])).toBe(false);
+    expect(ep.hasListeners(['nested', 'topics'])).toBe(true);
+  });
+//   it('subscribes with a wildcard', function() {
+//     ep.subscribe([EventService.WILDCARD], listener);
+//     expect(ep.hasListeners()).toBe(true);
+//   });
+});
+
+
+
+

@@ -188,6 +188,7 @@ var EventPublisher = {
         // check that each level of the topic exists, and there's a listener array at the end
         var hasWildcard = opt_topic[opt_topic.length - 1] == EventService.WILDCARD;
         var map = this.subs_;
+        // TODO: change to loop, return true when the first direct listeners are found
         return opt_topic.every(function(topic) {
           if ( topic == EventService.WILDCARD ) {
             // if a wildcard is specified, find any listener at all
@@ -247,14 +248,14 @@ var EventPublisher = {
 //       return 0;
 //     },
 
-//     /** Subscribe to notifications for the specified topic. **/
-//     // TODO: Return subscription
-//     function subscribe(topic, listener) {
-//       if ( ! this.subs_ ) this.subs_ = {};
-//       //console.log("Sub: ",this, listener);
+    /** Subscribe to notifications for the specified topic. **/
+    // TODO: Return subscription
+    subscribe: function(topic, listener) {
+      if ( ! this.subs_ ) this.subs_ = {};
+      //console.log("Sub: ",this, listener);
 
-//       this.sub_(this.subs_, 0, topic, listener);
-//     },
+      this.sub_(this.subs_, 0, topic, listener);
+    },
 
 //     /** Unsubscribe a listener from the specified topic. **/
 //     function unsubscribe(topic, listener) {
@@ -298,18 +299,18 @@ var EventPublisher = {
 //       return count;
 //     },
 
-//     function sub_(map, topicIndex, topic, listener) {
-//       if ( topicIndex == topic.length ) {
-//         if ( ! map[null] ) map[null] = [];
-//         map[null].push(listener);
-//       } else {
-//         var key = topic[topicIndex];
+    sub_: function(map, topicIndex, topic, listener) {
+      if ( topicIndex == topic.length ) {
+        if ( ! map[null] ) map[null] = [];
+        map[null].push(listener);
+      } else {
+        var key = topic[topicIndex];
 
-//         if ( ! map[key] ) map[key] = {};
+        if ( ! map[key] ) map[key] = {};
 
-//         this.sub_(map[key], topicIndex+1, topic, listener);
-//       }
-//     },
+        this.sub_(map[key], topicIndex+1, topic, listener);
+      }
+    },
 
 //     function unsub_(map, topicIndex, topic, listener) {
 //       /**
