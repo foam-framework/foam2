@@ -19,10 +19,11 @@
 
 // MODEL({
 //   name: 'EventService',
+var EventService = {
 
 //   constants: {
 //     /** Used as topic suffix to specify broadcast to all sub-topics. **/
-//     WILDCARD: '*'
+     WILDCARD: '*',
 //   },
 
 //   methods: [
@@ -154,6 +155,7 @@
 //     },
 //   ]
 // });
+}
 
 // MODEL({
 //   name: 'EventPublisher',
@@ -164,12 +166,36 @@ var EventPublisher = {
 //   ],
 
 //   methods: [
+    /** Internal. Returns true if any listeners are present in the given subs_ object. */
+    hasAnyListeners_: function(map) {
+      if ( ! map ) return false;
+      for ( var key in map ) {
+        subMap = map[key];
+        if ( subMap[null] && subMap[null].length ) return true;
+        return this.hasAnyListeners_(subMap);
+      }
+    },
+    /** Returns true if any listener exists for the given topic, or if no
+     *  topic is specified returns true if a listener exists for the entire object.
+     */
     hasListeners: function(opt_topic) {
-      if ( ! opt_topic ) return !! this.subs_;
-
-      console.log('TODO: haslisteners');
-      // TODO:
-      return true;
+      if ( ! opt_topic ) {
+        // we have a subs_ object, and it has at least one entry
+        return ( !! this.subs_ ) && ( !! ( this.subs_[null] && this.subs_[null].length ) );
+      } else if ( this.subs_ ) {
+        // check that each level of the topic exists, and there's a listener array at the end
+        var hasWildcard = opt_topic[opt_topic.length - 1] == EventService.WILDCARD;
+        var map = this.subs_;
+        return opt_topic.every(function(topic) {
+          if ( topic == EventService.WILDCARD ) {
+            // if a wildcard is specified, find any listener at all
+            return this.hasAnyListeners_(map);
+          }
+          map = map[topic];
+          return !! map;
+        }.bind(this)) && ( hasWildcard || ( !! ( map[null] && map[null].length ) ) ); // the final topic should have a listeners array
+      }
+      return false;
     },
 
 //     /**
@@ -430,5 +456,6 @@ var EventPublisher = {
 
 
 exports.EventPublisher = EventPublisher;
+exports.EventService = EventService;
 
 
