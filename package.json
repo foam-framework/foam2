@@ -1,0 +1,12 @@
+{
+  "name": "vjlofvhjfgm",
+  "version": "0.0.1",
+  "devDependencies": {
+    "istanbul": "^0.4.2",
+    "jasmine": "^2.4.1"
+  },
+  "scripts": {
+    "test": "JASMINE_CONFIG_PATH=jasmine.json jasmine",
+    "coverage": "JASMINE_CONFIG_PATH=jasmine.json istanbul cover --include-all-sources -- jasmine"
+  }
+}
