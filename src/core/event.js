@@ -170,9 +170,12 @@ var EventPublisher = {
     hasAnyListeners_: function(map) {
       for ( var key in map ) {
         subMap = map[key];
-        if ( subMap[null] && subMap[null].length ) return true;
-        return this.hasAnyListeners_(subMap);
+        return this.hasDirectListeners_(subMap) || this.hasAnyListeners_(subMap);
       }
+    },
+    /** Internal. Returns true if the given subs_ has direct listeners in its null key. */
+    hasDirectListeners_: function(map) {
+      return !! ( map[null] && map[null].length );
     },
     /** Returns true if any listener exists for the given topic, or if no
      *  topic is specified returns true if a listener exists for the entire object.
@@ -180,7 +183,7 @@ var EventPublisher = {
     hasListeners: function(opt_topic) {
       if ( ! opt_topic ) {
         // we have a subs_ object, and it has at least one entry
-        return ( !! this.subs_ ) && ( !! ( this.subs_[null] && this.subs_[null].length ) );
+        return ( !! this.subs_ ) && ( this.hasDirectListeners_(this.subs_) );
       } else if ( this.subs_ ) {
         // check that each level of the topic exists, and there's a listener array at the end
         var hasWildcard = opt_topic[opt_topic.length - 1] == EventService.WILDCARD;
@@ -190,9 +193,10 @@ var EventPublisher = {
             // if a wildcard is specified, find any listener at all
             return this.hasAnyListeners_(map);
           }
-          map = map[topic];
-          return !! map;
-        }.bind(this)) && ( hasWildcard || ( !! ( map[null] && map[null].length ) ) ); // the final topic should have a listeners array
+          map = map[topic]; // try to move down a level
+          return !! map; // abort if not found
+          // the final topic is either a wildcard or should have a listeners array:
+        }.bind(this)) && ( hasWildcard || ( this.hasDirectListeners_(map) ) );
       }
       return false;
     },
