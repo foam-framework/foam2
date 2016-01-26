@@ -30,8 +30,8 @@
 // //    function oneTime(listener) {
 // //      return function() {
 // //        listener.apply(this, argsToArray(arguments));
-// // // TODO: unsub object is now an argument
-// //        //throw EventService.UNSUBSCRIBE_EXCEPTION;
+// //        var unsub = arguments[1];
+// //        unsub();
 // //      };
 // //    },
 
@@ -64,7 +64,7 @@
 //         var f = function() {
 //           lastArgs = arguments;
 
-//           //TODO: unsub fix //if ( unsubscribed ) throw EventService.UNSUBSCRIBE_EXCEPTION;
+//           if ( unsubscribed ) arguments[1]();
 
 //           if ( ! triggered ) {
 //             triggered = true;
@@ -74,15 +74,15 @@
 //                   triggered = false;
 //                   var args = argsToArray(lastArgs);
 //                   lastArgs = null;
-//                   try {
-//                     listener.apply(this, args);
-//                   } catch (x) {
-//                     //TODO: unsub fix //if ( x === EventService.UNSUBSCRIBE_EXCEPTION ) unsubscribed = true;
-//                   }
+//                    var unsub = function unsubscribe() {
+//                      unsubscribed = true;
+//                    }
+//                    args[1] = unsub;
+//                    listener.apply(this, args);
 //                 }, delay);
 //             } catch(e) {
 //               // TODO: Clean this up when we move EventService into the context.
-//               //TODO: unsub fix //throw EventService.UNSUBSCRIBE_EXCEPTION;
+//               arguments[1]();
 //             }
 //           }
 //         };
@@ -157,15 +157,20 @@
 
 // MODEL({
 //   name: 'EventPublisher',
+var EventPublisher = {
+
+//   properties: [
+    subs_ = null, // inited to {} when first used
+//   ],
 
 //   methods: [
-//     function hasListeners(opt_topic) {
-//       if ( ! opt_topic ) return !! this.subs_;
+    function hasListeners(opt_topic) {
+      if ( ! opt_topic ) return !! this.subs_;
 
-//       console.log('TODO: haslisteners');
-//       // TODO:
-//       return true;
-//     },
+      console.log('TODO: haslisteners');
+      // TODO:
+      return true;
+    },
 
 //     /**
 //      * Publish a notification to the specified topic.
@@ -178,7 +183,7 @@
 //           this.subs_,
 //           0,
 //           topic,
-//           this.appendArguments([this, topic], arguments, 1)) :
+//           this.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
 //         0;
 //     },
 
@@ -306,20 +311,12 @@
 
 //     /** @return true if the message was delivered without error. **/
 //     function notifyListener_(topic, listener, msg) {
-//       try {
-//         listener.apply(null, msg);
-//       } catch ( err ) {
-//         if ( err !== this.UNSUBSCRIBE_EXCEPTION ) {
-//           console.error('Error delivering event (removing listener): ', topic.join('.'), err);
-//           if ( DEBUG ) console.error(err.stack);
-//         } else {
-//           // console.warn('Unsubscribing listener: ', topic.join('.'));
-//         }
-
-//         return false;
-//       }
-
-//       return true;
+//          var unsub = function unsubscribe() {
+//            this.unsubscribe(topic, listener);
+//          }.bind(this);
+//          msg[1] = unsub;
+//          listener.apply(null, msg);
+//          msg[1] = null; // TODO: maybe not the best way to communicate the unsub
 //     },
 
 //     /** @return number of listeners notified **/
@@ -330,9 +327,7 @@
 //         for ( var i = 0 ; i < listeners.length ; i++ ) {
 //           var listener = listeners[i];
 
-//           if ( ! this.notifyListener_(topic, listener, msg) ) {
-//             this.unsubscribe(topic, listener);
-//           }
+//           this.notifyListener_(topic, listener, msg) )
 //         }
 
 //         return listeners.length;
@@ -353,6 +348,7 @@
 //     }
 //   }
 // });
+}
 
 
 // /** Extend EventPublisher with support for dealing with property-change notification. **/
