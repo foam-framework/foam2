@@ -4,6 +4,188 @@ var EventPublisher = _events.EventPublisher;
 var EventService = _events.EventService;
 var PropertyChangePublisher = _events.PropertyChangePublisher;
 
+
+describe('EventService.oneTime', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener = function(publisher, topic, unsub) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+      listener.count += 1;
+    }
+    listener.count = 0;
+  });
+  afterEach(function() {
+    ep = null;
+    listener = null;
+  });
+
+  it('removes itself after one invokation', function() {
+    var one = EventService.oneTime(listener);
+
+    ep.subscribe(['simple'], one);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(1);
+
+    // listener should be gone now
+    expect(ep.hasListeners(['simple'])).toBe(false);
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(1);
+  });
+
+});
+
+describe('EventService.consoleLog', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener = function(publisher, topic, unsub) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+      listener.count += 1;
+    }
+    listener.count = 0;
+  });
+  afterEach(function() {
+    ep = null;
+    listener = null;
+  });
+
+  it('logs ok', function() {
+    var logger = EventService.consoleLog(listener);
+
+    ep.subscribe(['simple'], logger);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(1);
+
+  });
+
+});
+
+
+describe('EventService.merged', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener = function(publisher, topic, unsub) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+      listener.count += 1;
+    }
+    listener.count = 0;
+    jasmine.clock().install();
+  });
+  afterEach(function() {
+    ep = null;
+    listener = null;
+    jasmine.clock().uninstall();
+  });
+
+  it('merges with default parameters', function() {
+    var merged = EventService.merged(listener);
+
+    ep.subscribe(['simple'], merged);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(17);
+
+    expect(listener.count).toEqual(1);
+
+  });
+
+  it('merges with delay specified', function() {
+    var merged = EventService.merged(listener, 1300);
+
+    ep.subscribe(['simple'], merged);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(17);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(1300);
+    expect(listener.count).toEqual(1);
+  });
+
+  it('merges with opt_X specified', function() {
+    var X = { setTimeout: setTimeout };
+    var merged = EventService.merged(listener, 1300, X);
+
+    ep.subscribe(['simple'], merged);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(1300);
+    expect(listener.count).toEqual(1);
+  });
+
+
+  it('unsubscribes when requested', function() {
+    var merged = EventService.merged(EventService.oneTime(listener));
+
+    ep.subscribe(['simple'], merged);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(17);
+    expect(listener.count).toEqual(1);
+    expect(ep.hasListeners(['simple'])).toBe(false);
+    // and unsub happens due to the oneTime
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(1);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(1);
+
+    jasmine.clock().tick(17); // should be unsubbed,
+    expect(listener.count).toEqual(1); // so no change
+
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 describe('EventPublisher.hasListeners()', function() {
   var ep;
 

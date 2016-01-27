@@ -28,72 +28,58 @@ var EventService = {
 
 //   methods: [
 //     /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
-// //    function oneTime(listener) {
-// //      return function() {
-// //        listener.apply(this, this.argsToArray(arguments));
-// //        arguments[2](); // the unsubscribe fn
-// //      };
-// //    },
+    oneTime: function(listener) {
+      return function() {
+        listener.apply(this, EventService.argsToArray(arguments));
+        arguments[2](); // the unsubscribe fn
+      };
+    },
 
-//     /** Log all listener invocations to console. **/
-//     function consoleLog(listener) {
-//       return function() {
-//         var args = this.argsToArray(arguments);
-//         console.log(args);
+    /** Log all listener invocations to console. **/
+    consoleLog: function(listener) {
+      return function() {
+        var args = EventService.argsToArray(arguments);
+        console.log(args);
 
-//         listener.apply(this, args);
-//       };
-//     },
+        listener.apply(this, args);
+      };
+    },
 
-//     /**
-//      * Merge all notifications occuring in the specified time window into a single notification.
-//      * Only the last notification is delivered.
-//      *
-//      * @param opt_delay time in milliseconds of time-window, defaults to 16ms, which is
-//      *        the smallest delay that humans aren't able to perceive.
-//      **/
-//     function merged(listener, opt_delay, opt_X) {
-//       var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
-//       var delay = opt_delay || 16;
+    /**
+     * Merge all notifications occuring in the specified time window into a single notification.
+     * Only the last notification is delivered.
+     *
+     * @param opt_delay time in milliseconds of time-window, defaults to 16ms, which is
+     *        the smallest delay that humans aren't able to perceive.
+     **/
+    merged: function(listener, opt_delay, opt_X) {
+      var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
+      var delay = opt_delay || 16;
 
-//       return function() {
-//         var triggered    = false;
-//         var unsubscribed = false;
-//         var lastArgs     = null;
+      return function() {
+        var triggered    = false;
+        var lastArgs     = null;
 
-//         var f = function() {
-//           lastArgs = arguments;
+        var f = function() {
+          lastArgs = arguments;
 
-//           if ( unsubscribed ) arguments[2]();
-
-//           if ( ! triggered ) {
-//             triggered = true;
-//             try {
-//               setTimeoutX(
-//                 function() {
-//                   triggered = false;
-//                   var args = this.argsToArray(lastArgs);
-//                   lastArgs = null;
-//                    var unsub = function unsubscribe() {
-//                      unsubscribed = true;
-//                    }
-//                    args[2] = unsub;
-//                    listener.apply(this, args);
-//                 }, delay);
-//             } catch(e) {
-//               // TODO: Clean this up when we move EventService into the context.
-//               arguments[2]();
-//             }
-//           }
-//         };
-
+          if ( ! triggered ) {
+            triggered = true;
+            setTimeoutX(function() {
+              triggered = false;
+              var args = EventService.argsToArray(lastArgs);
+              lastArgs = null;
+              listener.apply(this, args);
+            }, delay);
+          }
+        };
 //         if ( DEBUG ) f.toString = function() {
 //           return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
 //         };
 
-//         return f;
-//       }();
-//     },
+        return f;
+      }();
+    },
 
 //     /**
 //      * Merge all notifications occuring until the next animation frame.
@@ -119,7 +105,7 @@ var EventService = {
 //             requestAnimationFrameX(
 //               function() {
 //                 triggered = false;
-//                 var args = this.argsToArray(lastArgs);
+//                 var args = EventService.argsToArray(lastArgs);
 //                 lastArgs = null;
 //                 try {
 //                   listener.apply(this, args);
@@ -146,13 +132,24 @@ var EventService = {
 //     function delay(delay, listener, opt_X) {
 //       opt_X = opt_X || this.X;
 //       return function() {
-//         var args = this.argsToArray(arguments);
+//         var args = EventService.argsToArray(arguments);
 
 //         // Is there a better way of doing this?
 //         (opt_X && opt_X.setTimeout ? opt_X.setTimeout : setTimeout)( function() { listener.apply(this, args); }, delay );
 //       };
 //     },
 //   ]
+
+    /** convenience method to append 'arguments' onto a real array */
+    appendArguments: function(a, args, start) {
+      for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
+      return a;
+    },
+    /** convenience method to turn 'arguments' into a real array */
+    argsToArray: function(args) {
+      return EventService.appendArguments([], args, 0);
+    },
+
 // });
 }
 
@@ -200,13 +197,13 @@ var EventPublisher = {
           this.subs_,
           0,
           topic,
-          this.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
+          EventService.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
         0;
     },
 
     /** Publish asynchronously. **/
     publishAsync: function(topic) {
-      var args = this.argsToArray(arguments);
+      var args = EventService.argsToArray(arguments);
       var self = this;
       setTimeout( function() { self.publish.apply(self, args); }, 0);
     },
@@ -277,7 +274,7 @@ var EventPublisher = {
         }
         if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
       }
-      count += this.notifyListeners_(topic, map[null], msg, topic.slice(0, topicIndex-1));
+      count += this.notifyListeners_(topic, map[null], msg, topic);
       return count;
     },
 
@@ -368,15 +365,6 @@ var EventPublisher = {
       return !! ( map[null] && map[null].length );
     },
 
-    /** convenience method to append 'arguments' onto a real array */
-    appendArguments: function(a, args, start) {
-      for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
-      return a;
-    },
-    /** convenience method to turn 'arguments' into a real array */
-    argsToArray: function(args) {
-      return this.appendArguments([], args, 0);
-    },
 
 //});
 }
