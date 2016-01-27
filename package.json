@@ -9,6 +9,6 @@
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover --include-all-sources -- jasmine",
-    "checkCoverage": "nodejs checkCoverage.js"
+    "checkCoverage": "node checkCoverage.js"
   }
 }
