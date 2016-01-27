@@ -166,7 +166,7 @@ describe('EventPublisher.publish()/.pub_()', function() {
     expect(listener2.last_topic).toEqual(['*']);
   });
   it('publishes a specific nested topic', function() {
-    ep.subscribe(['something'], listener1);
+    ep.subscribe([], listener1);
     ep.subscribe(['something','else'], listener2);
     expect(ep.publish(['something','else'], 'arg')).toEqual(2);
     expect(listener1.last_topic).toEqual(['something','else']);
@@ -194,7 +194,132 @@ describe('EventPublisher.publish()/.pub_()', function() {
 });
 
 
+describe('EventPublisher unsubscribe()/unsub_()', function() {
+  var ep;
+  var listener1;
+  var listener2;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener1 = function(publisher, topic, unsub) {
+      listener1.last_publisher = publisher;
+      listener1.last_topic = topic;
+      listener1.last_unsub = unsub;
+      listener1.last_args = arguments;
+    }
+    listener2 = function(publisher, topic, unsub) {
+      listener2.last_publisher = publisher;
+      listener2.last_topic = topic;
+      listener2.last_unsub = unsub;
+      listener2.last_args = arguments;
+    }
+  });
+  afterEach(function() {
+    ep = null;
+    listener1 = null;
+    listener2 = null;
+  });
 
 
+  it('unsubs broadcast messages', function() {
+    ep.subscribe([], listener1);
+    ep.subscribe(['something','else'], listener2);
+    expect(ep.publish(['*'], 'phase1')).toEqual(2);
+    expect(listener1.last_args[3]).toEqual('phase1');
+    expect(listener2.last_args[3]).toEqual('phase1');
+
+    ep.unsubscribe([], listener1);
+    expect(ep.publish(['*'], 'phase2')).toEqual(1);
+    expect(listener1.last_args[3]).toEqual('phase1');
+    expect(listener2.last_args[3]).toEqual('phase2');
+  });
+  it('unsubs nothing', function() {
+    ep.unsubscribe(['hello'], listener1);
+  });
+  it('unsubs a phantom (double)unsubscribe', function() {
+    ep.subscribe(['something','else'], listener2);
+    ep.subscribe(['something','else'], listener1);
+    ep.unsubscribe(['something','else'], listener2);
+    ep.unsubscribe(['something','else'], listener2);
+
+    ep.publish(['something','else'], 'arg');
+  });
+  it('cleans up after complete unsub', function() {
+    ep.subscribe(['something','else'], listener2);
+    ep.subscribe(['something','else'], listener1);
+
+    ep.unsubscribe(['something','else'], listener1);
+    ep.unsubscribe(['something','else'], listener2);
+
+    expect(ep.subs_).toEqual({});
+  });
+  it('unsubs with a key with no listeners', function() {
+    ep.subscribe(['something','else'], listener1);
+    ep.unsubscribe(['something'], listener2);
+  });
+  it('unsubs with a key that does not exist', function() {
+    ep.subscribe(['something','else'], listener1);
+    ep.unsubscribe(['what'], listener2);
+  });
+
+});
+
+
+describe('EventPublisher listener unsubscribe', function() {
+  var ep;
+  var listener1;
+  var listener2;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener1 = function(publisher, topic, unsub) {
+      listener1.last_publisher = publisher;
+      listener1.last_topic = topic;
+      listener1.last_unsub = unsub;
+      listener1.last_args = arguments;
+    }
+    listener2 = function(publisher, topic, unsub) {
+      listener2.last_publisher = publisher;
+      listener2.last_topic = topic;
+      listener2.last_unsub = unsub;
+      listener2.last_args = arguments;
+      // unsubscribe
+      unsub();
+    }
+  });
+  afterEach(function() {
+    ep = null;
+    listener1 = null;
+    listener2 = null;
+  });
+
+
+  it('unsubs listener', function() {
+    // listener2 is set up to unsubscribe itself
+    ep.subscribe([], listener1);
+    ep.subscribe(['something','else'], listener2);
+    expect(ep.publish(['something','else'], 'phase1')).toEqual(2); // both listeners fired
+    expect(listener1.last_args[3]).toEqual('phase1');
+    expect(listener2.last_args[3]).toEqual('phase1');
+
+    expect(ep.publish(['something','else'], 'phase2')).toEqual(1); // only one left after unsub
+    expect(listener1.last_args[3]).toEqual('phase2');
+    expect(listener2.last_args[3]).toEqual('phase1');
+  });
+
+  it('unsubs listener published with wildcard', function() {
+    ep.subscribe([], listener1);
+    ep.subscribe(['something','else'], listener2);
+
+    expect(ep.publish(['*'], 'phase1')).toEqual(2); // wildcard hits a different code path
+    expect(listener1.last_args[3]).toEqual('phase1');
+    expect(listener2.last_args[3]).toEqual('phase1');
+
+    expect(ep.publish(['*'], 'phase2')).toEqual(1);
+    expect(listener1.last_args[3]).toEqual('phase2');
+    expect(listener2.last_args[3]).toEqual('phase1');
+  });
+
+});
 
 

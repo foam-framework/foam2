@@ -256,12 +256,11 @@ var EventPublisher = {
       this.sub_(this.subs_, 0, topic, listener);
     },
 
-//     /** Unsubscribe a listener from the specified topic. **/
-//     function unsubscribe(topic, listener) {
-//       if ( ! this.subs_ ) return;
-
-//       this.unsub_(this.subs_, 0, topic, listener);
-//     },
+    /** Unsubscribe a listener from the specified topic. **/
+    unsubscribe: function(topic, listener) {
+      if ( ! this.subs_ ) return;
+      this.unsub_(this.subs_, 0, topic, listener);
+    },
 
 //     /** Unsubscribe all listeners from this service. **/
 //     function unsubscribeAll() {
@@ -288,13 +287,11 @@ var EventPublisher = {
 
         // wildcard publish, so notify all sub-topics, instead of just one
         if ( t == EventService.WILDCARD ) {
-          return this.notifyListeners_(topic, map, msg);
+          return this.notifyListeners_(topic, map, msg, topic.slice(0, topicIndex-1));
         }
         if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
       }
-
-      count += this.notifyListeners_(topic, map[null], msg);
-
+      count += this.notifyListeners_(topic, map[null], msg, topic.slice(0, topicIndex-1));
       return count;
     },
 
@@ -311,59 +308,63 @@ var EventPublisher = {
       }
     },
 
-//     function unsub_(map, topicIndex, topic, listener) {
-//       /**
-//         map: topicMap, topicIndex: index into 'topic', topic: array of topic path
-//         return: true iff there are no subscritions for this topic left
-//       **/
-//       if ( topicIndex == topic.length ) {
-//         if ( ! map[null] ) return true;
+    unsub_: function(map, topicIndex, topic, listener) {
+      /**
+        map: topicMap, topicIndex: index into 'topic', topic: array of topic path
+        return: true iff there are no subscritions for this topic left
+      **/
+      if ( topicIndex == topic.length ) {
+        if ( ! map[null] ) return true;
 
-//         var i = map[null].indexOf(listener);
-//         if ( i == -1 ) {
-//           // console.warn('phantom unsubscribe, size: ', map[null].length);
-//         } else {
-//           map[null] = map[null].spliceF(i, 1);
-//         }
+        var i = map[null].indexOf(listener);
+        if ( i == -1 ) {
+          // console.warn('phantom unsubscribe, size: ', map[null].length);
+        } else {
+          map[null].splice(i, 1); // TODO: was spliceF
+        }
 
-//         if ( ! map[null].length ) delete map[null];
-//       } else {
-//         var key = topic[topicIndex];
+        if ( ! map[null].length ) delete map[null];
+      } else {
+        var key = topic[topicIndex];
 
-//         if ( ! map[key] ) return false;
+        if ( ! map[key] ) return false;
 
-//         if ( this.unsub_(map[key], topicIndex+1, topic, listener) )
-//           delete map[key];
-//       }
-//       return Object.keys(map).length == 0;
-//     },
-
-    /** @return true if the message was delivered without error. **/
-    notifyListener_: function(topic, listener, msg) {
-         var unsub = function unsubscribe() {
-           this.unsubscribe(topic, listener);
-         }.bind(this);
-         msg[2] = unsub;
-         listener.apply(null, msg);
-         msg[2] = null; // TODO: maybe not the best way to communicate the unsub
+        if ( this.unsub_(map[key], topicIndex+1, topic, listener) )
+          delete map[key];
+      }
+      return Object.keys(map).length == 0;
     },
 
-    /** @return number of listeners notified **/
-    notifyListeners_: function(topic, listeners, msg) {
+    /** @return true if the message was delivered without error. **/
+    notifyListener_: function(topic, listener, msg, pathToListener) {
+      var unsub = function unsubscribe() {
+        this.unsubscribe(pathToListener, listener);
+      }.bind(this);
+      msg[2] = unsub;
+      listener.apply(null, msg);
+      msg[2] = null; // TODO: maybe not the best way to communicate the unsub
+    },
+
+    /** @return number of listeners notified.
+        @param pathToListener provides the topic the listener was originally
+        subscribed to, in order to find it. **/
+    notifyListeners_: function(topic, listeners, msg, pathToListener) {
       if ( listeners == null ) return 0;
       if ( Array.isArray(listeners) ) {
+        var originalLength = listeners.length;
         for ( var i = 0 ; i < listeners.length ; i++ ) {
           var listener = listeners[i];
 
-          this.notifyListener_(topic, listener, msg);
+          this.notifyListener_(topic, listener, msg, pathToListener);
         }
-
-        return listeners.length;
+        return originalLength;
       }
 
       var count = 0;
       for ( var key in listeners ) {
-        count += this.notifyListeners_(topic, listeners[key], msg);
+        var newPath = pathToListener.slice();
+        newPath.push(key);
+        count += this.notifyListeners_(topic, listeners[key], msg, newPath);
       }
       return count;
     },
