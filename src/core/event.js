@@ -31,8 +31,7 @@ var EventService = {
 // //    function oneTime(listener) {
 // //      return function() {
 // //        listener.apply(this, this.argsToArray(arguments));
-// //        var unsub = arguments[1];
-// //        unsub();
+// //        arguments[2](); // the unsubscribe fn
 // //      };
 // //    },
 
@@ -65,7 +64,7 @@ var EventService = {
 //         var f = function() {
 //           lastArgs = arguments;
 
-//           if ( unsubscribed ) arguments[1]();
+//           if ( unsubscribed ) arguments[2]();
 
 //           if ( ! triggered ) {
 //             triggered = true;
@@ -78,12 +77,12 @@ var EventService = {
 //                    var unsub = function unsubscribe() {
 //                      unsubscribed = true;
 //                    }
-//                    args[1] = unsub;
+//                    args[2] = unsub;
 //                    listener.apply(this, args);
 //                 }, delay);
 //             } catch(e) {
 //               // TODO: Clean this up when we move EventService into the context.
-//               arguments[1]();
+//               arguments[2]();
 //             }
 //           }
 //         };
