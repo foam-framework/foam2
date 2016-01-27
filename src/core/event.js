@@ -30,7 +30,7 @@ var EventService = {
 //     /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
 // //    function oneTime(listener) {
 // //      return function() {
-// //        listener.apply(this, argsToArray(arguments));
+// //        listener.apply(this, this.argsToArray(arguments));
 // //        var unsub = arguments[1];
 // //        unsub();
 // //      };
@@ -39,7 +39,7 @@ var EventService = {
 //     /** Log all listener invocations to console. **/
 //     function consoleLog(listener) {
 //       return function() {
-//         var args = argsToArray(arguments);
+//         var args = this.argsToArray(arguments);
 //         console.log(args);
 
 //         listener.apply(this, args);
@@ -73,7 +73,7 @@ var EventService = {
 //               setTimeoutX(
 //                 function() {
 //                   triggered = false;
-//                   var args = argsToArray(lastArgs);
+//                   var args = this.argsToArray(lastArgs);
 //                   lastArgs = null;
 //                    var unsub = function unsubscribe() {
 //                      unsubscribed = true;
@@ -120,7 +120,7 @@ var EventService = {
 //             requestAnimationFrameX(
 //               function() {
 //                 triggered = false;
-//                 var args = argsToArray(lastArgs);
+//                 var args = this.argsToArray(lastArgs);
 //                 lastArgs = null;
 //                 try {
 //                   listener.apply(this, args);
@@ -147,7 +147,7 @@ var EventService = {
 //     function delay(delay, listener, opt_X) {
 //       opt_X = opt_X || this.X;
 //       return function() {
-//         var args = argsToArray(arguments);
+//         var args = this.argsToArray(arguments);
 
 //         // Is there a better way of doing this?
 //         (opt_X && opt_X.setTimeout ? opt_X.setTimeout : setTimeout)( function() { listener.apply(this, args); }, delay );
@@ -166,17 +166,6 @@ var EventPublisher = {
 //   ],
 
 //   methods: [
-    /** Internal. Returns true if any listeners are present in the given subs_ object. */
-    hasAnyListeners_: function(map) {
-      for ( var key in map ) {
-        subMap = map[key];
-        return this.hasDirectListeners_(subMap) || this.hasAnyListeners_(subMap);
-      }
-    },
-    /** Internal. Returns true if the given subs_ has direct listeners in its null key. */
-    hasDirectListeners_: function(map) {
-      return !! ( map[null] && map[null].length );
-    },
     /** Returns true if any listener exists for the given topic, or if no
      *  topic is specified returns true if a listener exists for the entire object.
      */
@@ -216,43 +205,41 @@ var EventPublisher = {
         0;
     },
 
-//     /** Publish asynchronously. **/
-//     function publishAsync(topic) {
-//       var args = argsToArray(arguments);
-//       var me   = this;
+    /** Publish asynchronously. **/
+    publishAsync: function(topic) {
+      var args = this.argsToArray(arguments);
+      var self = this;
+      setTimeout( function() { self.publish.apply(self, args); }, 0);
+    },
 
-//       setTimeout( function() { me.publish.apply(me, args); }, 0);
-//     },
+    /**
+     * Publishes a message to this object and all of its children.
+     * Objects/Protos which have children should override the
+     * standard definition, which is the same as just calling publish().
+     **/
+    deepPublish: function(topic) {
+      return this.publish.apply(this, arguments);
+    },
 
-//     /**
-//      * Publishes a message to this object and all of its children.
-//      * Objects/Protos which have children should override the
-//      * standard definition, which is the same as just calling publish().
-//      **/
-//     function deepPublish(topic) {
-//       return this.publish.apply(this, arguments);
-//     },
-
-//     /**
-//      * Publish a message supplied by a factory function.
-//      *
-//      * This is useful if the message is expensive to generate and you
-//      * don't want to waste the effort if there are no listeners.
-//      *
-//      * arg function fn which returns array
-//      **/
-//     function lazyPublish(topic, fn) {
-//       if ( this.hasListeners(topic) ) return this.publish.apply(this, fn());
-
-//       return 0;
-//     },
+    /**
+     * Publish a message supplied by a factory function.
+     *
+     * This is useful if the message is expensive to generate and you
+     * don't want to waste the effort if there are no listeners.
+     *
+     * arg function fn which returns array, including the topic first.
+     * TODO: why require the function to supply the topic again? We
+     * already have it.
+     **/
+    lazyPublish: function(topic, fn) {
+      if ( this.hasListeners(topic) ) return this.publish.apply(this, fn());
+      return 0;
+    },
 
     /** Subscribe to notifications for the specified topic. **/
     // TODO: Return subscription
     subscribe: function(topic, listener) {
       if ( ! this.subs_ ) this.subs_ = {};
-      //console.log("Sub: ",this, listener);
-
       this.sub_(this.subs_, 0, topic, listener);
     },
 
@@ -262,10 +249,10 @@ var EventPublisher = {
       this.unsub_(this.subs_, 0, topic, listener);
     },
 
-//     /** Unsubscribe all listeners from this service. **/
-//     function unsubscribeAll() {
-//       this.sub_ = {};
-//     },
+    /** Unsubscribe all listeners from this service. **/
+    unsubscribeAll: function() {
+      this.subs_ = {};
+    },
 
 
 //     ///////////////////////////////////////////////////////
@@ -369,11 +356,28 @@ var EventPublisher = {
       return count;
     },
 
-    // convenience method to turn 'arguments' into a real array
+    /** Internal. Returns true if any listeners are present in the given subs_ object. */
+    hasAnyListeners_: function(map) {
+      for ( var key in map ) {
+        subMap = map[key];
+        return this.hasDirectListeners_(subMap) || this.hasAnyListeners_(subMap);
+      }
+    },
+
+    /** Internal. Returns true if the given subs_ has direct listeners in its null key. */
+    hasDirectListeners_: function(map) {
+      return !! ( map[null] && map[null].length );
+    },
+
+    /** convenience method to append 'arguments' onto a real array */
     appendArguments: function(a, args, start) {
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
-    }
+    },
+    /** convenience method to turn 'arguments' into a real array */
+    argsToArray: function(args) {
+      return this.appendArguments([], args, 0);
+    },
 
 //});
 }

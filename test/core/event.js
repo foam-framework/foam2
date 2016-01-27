@@ -190,11 +190,51 @@ describe('EventPublisher.publish()/.pub_()', function() {
     expect(listener2.last_topic).not.toEqual(['something','']);
   });
 
+  it('coverage for deepPublish(), which passes though to publish', function() {
+    expect(ep.deepPublish(['*'])).toEqual(0);
+  });
 
 });
 
+describe('EventPublisher.lazyPublish()', function() {
+  var ep;
+  var listener1;
+  var argFn;
 
-describe('EventPublisher unsubscribe()/unsub_()', function() {
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener1 = function(publisher, topic, unsub) {
+      listener1.last_publisher = publisher;
+      listener1.last_topic = topic;
+      listener1.last_unsub = unsub;
+      listener1.last_args = arguments;
+    }
+    argFn = function() {
+      argFn.wasHit = true;
+      return [['something'], 'arg'];
+    }
+    argFn.wasHit = false;
+  });
+  afterEach(function() {
+    ep = null;
+    listener1 = null;
+    argFn = null;
+  });
+
+  it('triggers the argument function when a listener is present', function() {
+    ep.subscribe(['something'], listener1);
+    ep.lazyPublish(['something'], argFn);
+    expect(argFn.wasHit).toBe(true);
+    expect(listener1.last_args[3]).toEqual('arg');
+  });
+  it('does not trigger the argument function when no listener is present', function() {
+    ep.subscribe(['nothing'], listener1);
+    ep.lazyPublish(['something'], argFn);
+    expect(argFn.wasHit).toBe(false);
+  });
+});
+
+describe('EventPublisher.unsubscribe()/unsub_()', function() {
   var ep;
   var listener1;
   var listener2;
@@ -261,11 +301,19 @@ describe('EventPublisher unsubscribe()/unsub_()', function() {
     ep.subscribe(['something','else'], listener1);
     ep.unsubscribe(['what'], listener2);
   });
+  it('cleans up after unsubscribe all', function() {
+    ep.subscribe(['something','else'], listener2);
+    ep.subscribe(['something','else'], listener1);
+
+    ep.unsubscribeAll();
+
+    expect(ep.subs_).toEqual({});
+  });
 
 });
 
 
-describe('EventPublisher listener unsubscribe', function() {
+describe('EventPublisher listener-unsubscribe', function() {
   var ep;
   var listener1;
   var listener2;
@@ -320,6 +368,49 @@ describe('EventPublisher listener unsubscribe', function() {
     expect(listener2.last_args[3]).toEqual('phase1');
   });
 
+
 });
 
+describe('EventPublisher async-publish', function() {
+  var ep;
+  var listener1;
+  var listener2;
 
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener1 = function(publisher, topic, unsub) {
+      listener1.last_publisher = publisher;
+      listener1.last_topic = topic;
+      listener1.last_unsub = unsub;
+      listener1.last_args = arguments;
+    }
+    listener2 = function(publisher, topic, unsub) {
+      listener2.last_publisher = publisher;
+      listener2.last_topic = topic;
+      listener2.last_unsub = unsub;
+      listener2.last_args = arguments;
+      // unsubscribe
+      unsub();
+    }
+    jasmine.clock().install();
+  });
+  afterEach(function() {
+    ep = null;
+    listener1 = null;
+    listener2 = null;
+    jasmine.clock().uninstall();
+  });
+
+  it("calls publish only after a tick", function() {
+
+    ep.subscribe(['later'], listener1);
+    ep.publishAsync(['later']);
+
+    expect(listener1.last_topic).toBeUndefined();
+
+    jasmine.clock().tick(1);
+
+    expect(listener1.last_topic).toEqual(['later']);
+
+  });
+});
