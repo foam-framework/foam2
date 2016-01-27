@@ -86,7 +86,7 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
 
   beforeEach(function() {
     ep = Object.create(EventPublisher);
-    listener = function(topic, unsub) {
+    listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
       listener.last_args = arguments;
@@ -413,7 +413,7 @@ describe('PropertyChangePublisher.add/removePropertyListener()', function() {
 
   beforeEach(function() {
     pcp = Object.create(PropertyChangePublisher);
-    listener = function(topic, unsub) {
+    listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
       listener.last_args = arguments;
@@ -449,7 +449,81 @@ describe('PropertyChangePublisher.add/removePropertyListener()', function() {
 
 });
 
+describe('PropertyChangePublisher.globalChange()', function() {
+  var ep;
+  var listener;
 
+  beforeEach(function() {
+    pcp = Object.create(PropertyChangePublisher);
+    listener = function(publisher, topic, unsub) {
+      listener.count += 1;
+    }
+    listener.count = 0;
+  });
+  afterEach(function() {
+    pcp = null;
+    listener = null;
+  });
+
+  it('triggers all property listeners', function() {
+    pcp.addPropertyListener('myProp', listener);
+    pcp.addListener(listener);
+    pcp.addPropertyListener('anotherprop', listener);
+
+    pcp.globalChange();
+    expect(listener.count).toEqual(3);
+  });
+
+
+});
+
+
+
+describe('PropertyChangePublisher.propertyChange()', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    pcp = Object.create(PropertyChangePublisher);
+    listener = function(publisher, topic, unsub, old, nu) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+      listener.last_old = old;
+      listener.last_nu = nu;
+    }
+  });
+  afterEach(function() {
+    pcp = null;
+    listener = null;
+  });
+
+  it('covers no listeners', function() {
+    pcp.propertyChange('myProp', 1, 3);
+  });
+
+  it('triggers listeners when old/nu value differs', function() {
+    pcp.addPropertyListener('myProp', listener);
+
+    pcp.propertyChange('myProp', 1, 3);
+    expect(listener.last_old).toEqual(1);
+    expect(listener.last_nu).toEqual(3);
+
+    pcp.propertyChange('myProp', 3, 7);
+    expect(listener.last_old).toEqual(3);
+    expect(listener.last_nu).toEqual(7);
+
+    pcp.propertyChange('myProp', 3, 3);
+    expect(listener.last_old).toEqual(3);
+    expect(listener.last_nu).toEqual(7);
+
+    pcp.propertyChange('myProp', NaN, NaN); // special equality check case
+    expect(listener.last_old).toEqual(3);
+    expect(listener.last_nu).toEqual(7);
+  });
+
+
+});
 
 
 

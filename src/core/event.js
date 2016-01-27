@@ -402,34 +402,31 @@ var PropertyChangePublisher = {
       return property ? [ this.PROPERTY_TOPIC, property ] : [ this.PROPERTY_TOPIC ];
     }/*)*/,
 
-//     /** Indicate that a specific property has changed. **/
-//     function propertyChange (property, oldValue, newValue) {
-//       // don't bother firing event if there are no listeners
-//       if ( ! this.subs_ ) return;
+    /** Indicate that a specific property has changed.
+        @param property the name of the property that has changed.
+        @param oldValue the previous value
+        @param newValue the new (current) value */
+    propertyChange: function(property, oldValue, newValue) {
+      this.propertyChange_(this.propertyTopic(property), oldValue, newValue);
+    },
 
-//       // don't fire event if value didn't change
-//       if ( property != null && (
-//         oldValue === newValue ||
-//           (/*NaN check*/(oldValue !== oldValue) && (newValue !== newValue)) )
-//          ) return;
+    /** Internal. Indicate that a specific property has changed.
+        @pararm propertyTopic the topic array for the property. */
+    propertyChange_: function(propertyTopic, oldValue, newValue) {
+      // don't bother firing event if there are no listeners
+      if ( ! this.subs_ ) return;
 
-//       this.publish(this.propertyTopic(property), oldValue, newValue);
-//     },
+      // don't fire event if value didn't change
+      if ( oldValue === newValue ||
+           ((oldValue !== oldValue) && (newValue !== newValue)) /*NaN check*/
+         ) return;
+      this.publish(propertyTopic, oldValue, newValue);
+    },
 
-//     function propertyChange_ (propertyTopic, oldValue, newValue) {
-//       // don't bother firing event if there are no listeners
-//       if ( ! this.subs_ ) return;
-
-//       // don't fire event if value didn't change
-//       if ( oldValue === newValue || (/*NaN check*/(oldValue !== oldValue) && (newValue !== newValue)) ) return;
-
-//       this.publish(propertyTopic, oldValue, newValue);
-//     },
-
-//     /** Indicates that one or more unspecified properties have changed. **/
-//     function globalChange () {
-//       this.publish(this.propertyTopic(this.WILDCARD), null, null);
-//     },
+    /** Indicates that one or more unspecified properties have changed. **/
+    globalChange: function() {
+      this.publish(this.propertyTopic(EventService.WILDCARD), null, null);
+    },
 
     /** Adds a listener for all property changes. **/
     addListener: function(listener) {
