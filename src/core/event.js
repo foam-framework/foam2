@@ -201,20 +201,20 @@ var EventPublisher = {
       return false;
     },
 
-//     /**
-//      * Publish a notification to the specified topic.
-//      *
-//      * @return number of subscriptions notified
-//      **/
-//     function publish(topic) {
-//       return this.subs_ ?
-//         this.pub_(
-//           this.subs_,
-//           0,
-//           topic,
-//           this.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
-//         0;
-//     },
+    /**
+     * Publish a notification to the specified topic.
+     *
+     * @return number of subscriptions notified
+     **/
+    publish: function(topic) {
+      return this.subs_ ?
+        this.pub_(
+          this.subs_,
+          0,
+          topic,
+          this.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
+        0;
+    },
 
 //     /** Publish asynchronously. **/
 //     function publishAsync(topic) {
@@ -273,30 +273,30 @@ var EventPublisher = {
 //     //                                            Internal
 //     /////////////////////////////////////////////////////
 
-//     function pub_(map, topicIndex, topic, msg) {
-//       /**
-//         map: topicMap, topicIndex: index into 'topic', topic: array of topic path
-//         return: number of listeners published to
-//        **/
-//       var count = 0;
+    pub_: function(map, topicIndex, topic, msg) {
+      /**
+        map: topicMap, topicIndex: index into 'topic', topic: array of topic path
+        return: number of listeners published to
+       **/
+      var count = 0;
 
-//       // There are no subscribers, so nothing to do
-//       if ( map == null ) return 0;
+      // There are no subscribers, so nothing to do
+      if ( map == null ) return 0;
 
-//       if ( topicIndex < topic.length ) {
-//         var t = topic[topicIndex];
+      if ( topicIndex < topic.length ) {
+        var t = topic[topicIndex];
 
-//         // wildcard publish, so notify all sub-topics, instead of just one
-//         if ( t == this.WILDCARD )
-//           return this.notifyListeners_(topic, map, msg);
+        // wildcard publish, so notify all sub-topics, instead of just one
+        if ( t == EventService.WILDCARD ) {
+          return this.notifyListeners_(topic, map, msg);
+        }
+        if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
+      }
 
-//         if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
-//       }
+      count += this.notifyListeners_(topic, map[null], msg);
 
-//       count += this.notifyListeners_(topic, map[null], msg);
-
-//       return count;
-//     },
+      return count;
+    },
 
     sub_: function(map, topicIndex, topic, listener) {
       if ( topicIndex == topic.length ) {
@@ -338,45 +338,43 @@ var EventPublisher = {
 //       return Object.keys(map).length == 0;
 //     },
 
-//     /** @return true if the message was delivered without error. **/
-//     function notifyListener_(topic, listener, msg) {
-//          var unsub = function unsubscribe() {
-//            this.unsubscribe(topic, listener);
-//          }.bind(this);
-//          msg[1] = unsub;
-//          listener.apply(null, msg);
-//          msg[1] = null; // TODO: maybe not the best way to communicate the unsub
-//     },
+    /** @return true if the message was delivered without error. **/
+    notifyListener_: function(topic, listener, msg) {
+         var unsub = function unsubscribe() {
+           this.unsubscribe(topic, listener);
+         }.bind(this);
+         msg[2] = unsub;
+         listener.apply(null, msg);
+         msg[2] = null; // TODO: maybe not the best way to communicate the unsub
+    },
 
-//     /** @return number of listeners notified **/
-//     function notifyListeners_(topic, listeners, msg) {
-//       if ( listeners == null ) return 0;
+    /** @return number of listeners notified **/
+    notifyListeners_: function(topic, listeners, msg) {
+      if ( listeners == null ) return 0;
+      if ( Array.isArray(listeners) ) {
+        for ( var i = 0 ; i < listeners.length ; i++ ) {
+          var listener = listeners[i];
 
-//       if ( Array.isArray(listeners) ) {
-//         for ( var i = 0 ; i < listeners.length ; i++ ) {
-//           var listener = listeners[i];
+          this.notifyListener_(topic, listener, msg);
+        }
 
-//           this.notifyListener_(topic, listener, msg) )
-//         }
+        return listeners.length;
+      }
 
-//         return listeners.length;
-//       }
+      var count = 0;
+      for ( var key in listeners ) {
+        count += this.notifyListeners_(topic, listeners[key], msg);
+      }
+      return count;
+    },
 
-//       var count = 0;
-//       for ( var key in listeners ) {
-//         count += this.notifyListeners_(topic, listeners[key], msg);
-//       }
-//       return count;
-//     },
+    // convenience method to turn 'arguments' into a real array
+    appendArguments: function(a, args, start) {
+      for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
+      return a;
+    }
 
-//     // convenience method to turn 'arguments' into a real array
-//     function appendArguments (a, args, start) {
-//       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
-
-//       return a;
-//     }
-//   }
-// });
+//});
 }
 
 

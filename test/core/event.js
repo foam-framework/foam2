@@ -105,11 +105,95 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
     expect(ep.hasListeners(['nested'])).toBe(false);
     expect(ep.hasListeners(['nested', 'topics'])).toBe(true);
   });
-//   it('subscribes with a wildcard', function() {  // not valid TODO
+  it('subscribes to two different topics', function() {
+    ep.subscribe(['one'], listener);
+    ep.subscribe(['two'], listener);
+    expect(ep.hasListeners(['one'])).toBe(true);
+    expect(ep.hasListeners(['two'])).toBe(true);
+  });
+  it('subscribes to two different topics with multiple listeners', function() {
+    ep.subscribe(['one'], listener);
+    ep.subscribe(['two'], listener);
+    ep.subscribe(['one'], 'fake-o-listener1');
+    ep.subscribe(['two'], 'fake-o-listener2');
+    expect(ep.hasListeners(['one'])).toBe(true);
+    expect(ep.hasListeners(['two'])).toBe(true);
+  });
+
+//   it('subscribes with a wildcard', function() {  // not valid case TODO
 //     ep.subscribe([EventService.WILDCARD], listener);
 //     expect(ep.hasListeners()).toBe(true);
 //   });
 });
+
+describe('EventPublisher.publish()/.pub_()', function() {
+  var ep;
+  var listener1;
+  var listener2;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener1 = function(publisher, topic, unsub) {
+      listener1.last_publisher = publisher;
+      listener1.last_topic = topic;
+      listener1.last_unsub = unsub;
+      listener1.last_args = arguments;
+    }
+    listener2 = function(publisher, topic, unsub) {
+      listener2.last_publisher = publisher;
+      listener2.last_topic = topic;
+      listener2.last_unsub = unsub;
+      listener2.last_args = arguments;
+    }
+  });
+  afterEach(function() {
+    ep = null;
+    listener1 = null;
+    listener2 = null;
+  });
+
+  it('publishes with no subscribers', function() {
+    expect(ep.publish(['*'])).toEqual(0);
+  });
+  it('covers internal sanity case of no subscribers', function() {
+    expect(ep.pub_(null, 0, ['no'], [])).toEqual(0);
+  });
+  it('publishes broadcast messages', function() {
+    ep.subscribe([], listener1);
+    ep.subscribe(['something','else'], listener2);
+    expect(ep.publish(['*'])).toEqual(2);
+    expect(listener1.last_topic).toEqual(['*']);
+    expect(listener2.last_topic).toEqual(['*']);
+  });
+  it('publishes a specific nested topic', function() {
+    ep.subscribe(['something'], listener1);
+    ep.subscribe(['something','else'], listener2);
+    expect(ep.publish(['something','else'], 'arg')).toEqual(2);
+    expect(listener1.last_topic).toEqual(['something','else']);
+    expect(listener1.last_args[3]).toEqual('arg');
+    expect(listener2.last_topic).toEqual(['something','else']);
+  });
+  it('publishes a specific nested wildcard', function() {
+    ep.subscribe(['something'], listener1);
+    ep.subscribe(['something','else'], listener2);
+    expect(ep.publish(['something','*'], 'arg')).toEqual(2);
+    expect(listener1.last_topic).toEqual(['something','*']);
+    expect(listener1.last_args[3]).toEqual('arg');
+    expect(listener2.last_topic).toEqual(['something','*']);
+  });
+  it('publishes a specific nested topic ending in empty string', function() {
+    ep.subscribe(['something'], listener1);
+    ep.subscribe(['something','else'], listener2);
+    expect(ep.publish(['something',''], 'arg')).toEqual(1);
+    expect(listener1.last_topic).toEqual(['something','']);
+    expect(listener1.last_args[3]).toEqual('arg');
+    expect(listener2.last_topic).not.toEqual(['something','']);
+  });
+
+
+});
+
+
 
 
 
