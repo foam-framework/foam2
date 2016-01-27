@@ -2,6 +2,7 @@ var GLOBAL = global || this;
 var _events = require('../../src/core/event.js');
 var EventPublisher = _events.EventPublisher;
 var EventService = _events.EventService;
+var PropertyChangePublisher = _events.PropertyChangePublisher;
 
 describe('EventPublisher.hasListeners()', function() {
   var ep;
@@ -374,7 +375,6 @@ describe('EventPublisher listener-unsubscribe', function() {
 describe('EventPublisher async-publish', function() {
   var ep;
   var listener1;
-  var listener2;
 
   beforeEach(function() {
     ep = Object.create(EventPublisher);
@@ -384,20 +384,11 @@ describe('EventPublisher async-publish', function() {
       listener1.last_unsub = unsub;
       listener1.last_args = arguments;
     }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-      // unsubscribe
-      unsub();
-    }
     jasmine.clock().install();
   });
   afterEach(function() {
     ep = null;
     listener1 = null;
-    listener2 = null;
     jasmine.clock().uninstall();
   });
 
@@ -414,3 +405,56 @@ describe('EventPublisher async-publish', function() {
 
   });
 });
+
+
+describe('PropertyChangePublisher.add/removePropertyListener()', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    pcp = Object.create(PropertyChangePublisher);
+    listener = function(topic, unsub) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+    }
+  });
+  afterEach(function() {
+    pcp = null;
+    listener = null;
+  });
+
+  it('adds/removes a listener for a property', function() {
+    pcp.addPropertyListener('myProp', listener);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC, 'myProp'])).toBe(true);
+
+    pcp.removePropertyListener('myProp', listener);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC, 'myProp'])).toBe(false);
+  });
+  it('adds/removes a listener for all property changes', function() {
+    pcp.addPropertyListener(null, listener);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(true);
+
+    pcp.removePropertyListener(null, listener);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(false);
+  });
+  it('adds/removes a listener for all property changes with addListener/removeListener shortcuts', function() {
+    pcp.addListener(listener);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(true);
+
+    pcp.removeListener(listener);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(false);
+  });
+
+
+});
+
+
+
+
+
+
+
+
+
+

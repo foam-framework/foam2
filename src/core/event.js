@@ -386,19 +386,21 @@ var EventPublisher = {
 // /** Extend EventPublisher with support for dealing with property-change notification. **/
 // MODEL({
 //   name: 'PropertyChangePublisher',
-
+var PropertyChangePublisher = {
 //   extends: 'EventPublisher',
+  __proto__: EventPublisher,
 
 //   constants: {
 //     /** Root for property topics. **/
-//     PROPERTY_TOPIC: 'property'
+  PROPERTY_TOPIC: 'property',
 //   },
 
 //   methods: {
-//     /** Create a topic for the specified property name. **/
-//     propertyTopic: memoize1(function (property) {
-//       return [ this.PROPERTY_TOPIC, property ];
-//     }),
+    /** Create a topic for the specified property name.
+      TODO: re-add memoize1 when available */
+    propertyTopic: /*memoize1(*/function (property) {
+      return property ? [ this.PROPERTY_TOPIC, property ] : [ this.PROPERTY_TOPIC ];
+    }/*)*/,
 
 //     /** Indicate that a specific property has changed. **/
 //     function propertyChange (property, oldValue, newValue) {
@@ -429,24 +431,29 @@ var EventPublisher = {
 //       this.publish(this.propertyTopic(this.WILDCARD), null, null);
 //     },
 
-//     function addListener(listener) {
-//       console.assert(listener, 'Listener cannot be null.');
-//       // this.addPropertyListener([ this.PROPERTY_TOPIC ], listener);
-//       this.addPropertyListener(null, listener);
-//     },
+    /** Adds a listener for all property changes. **/
+    addListener: function(listener) {
+      // TODO: throw exception?
+      console.assert(listener, 'Listener cannot be null.');
+      this.addPropertyListener(null, listener);
+    },
 
-//     function removeListener(listener) {
-//       this.removePropertyListener(null, listener);
-//     },
+    /** Removes a listener for all property changes. **/
+    removeListener: function(listener) {
+      this.removePropertyListener(null, listener);
+    },
 
-//     /** @arg property the name of the property to listen to or 'null' to listen to all properties. **/
-//     function addPropertyListener(property, listener) {
-//       this.subscribe(this.propertyTopic(property), listener);
-//     },
+    /** @param property the name of the property to listen to or 'null'
+        to listen to all properties. **/
+    addPropertyListener: function(property, listener) {
+      this.subscribe(this.propertyTopic(property), listener);
+    },
 
-//     function removePropertyListener(property, listener) {
-//       this.unsubscribe(this.propertyTopic(property), listener);
-//     },
+    /** @param property the name of the property listened to or 'null'
+        to remove an all-properties listener. **/
+    removePropertyListener: function(property, listener) {
+      this.unsubscribe(this.propertyTopic(property), listener);
+    },
 
 // // TODO: needed? where to put it...
 // //     /** Create a Value for the specified property. **/
@@ -459,9 +466,9 @@ var EventPublisher = {
 // //     }
 //   }
 // });
-
+}
 
 exports.EventPublisher = EventPublisher;
 exports.EventService = EventService;
-
+exports.PropertyChangePublisher = PropertyChangePublisher;
 
