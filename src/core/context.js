@@ -1,4 +1,5 @@
 var GLOBAL = global || this;
+
 /**
  * The global conteXt object.
  */

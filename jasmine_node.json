@@ -1,8 +1,8 @@
 {
   "spec_dir": "test",
   "spec_files": [
-    "js/**/*.js",
-    "node/**/*.js"
+    "node/**/*.js",
+    "js/**/*.js"
   ],
   "helpers": [
     "helpers/**/*.js"
