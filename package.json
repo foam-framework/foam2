@@ -3,11 +3,12 @@
   "version": "0.0.1",
   "devDependencies": {
     "istanbul": "^0.4.2",
-    "jasmine": "^2.4.1"
+    "jasmine": "^2.4.1",
+    "jsdom": "^3.1.2"
   },
   "scripts": {
-    "test": "JASMINE_CONFIG_PATH=jasmine.json jasmine",
-    "coverage": "JASMINE_CONFIG_PATH=jasmine.json istanbul cover --include-all-sources -- jasmine",
+    "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
+    "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover --include-all-sources -- jasmine",
     "checkCoverage": "nodejs checkCoverage.js"
   }
 }
