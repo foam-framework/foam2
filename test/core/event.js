@@ -105,7 +105,7 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
     expect(ep.hasListeners(['nested'])).toBe(false);
     expect(ep.hasListeners(['nested', 'topics'])).toBe(true);
   });
-//   it('subscribes with a wildcard', function() {
+//   it('subscribes with a wildcard', function() {  // not valid TODO
 //     ep.subscribe([EventService.WILDCARD], listener);
 //     expect(ep.hasListeners()).toBe(true);
 //   });

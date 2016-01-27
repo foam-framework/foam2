@@ -186,18 +186,17 @@ var EventPublisher = {
         return ( !! this.subs_ ) && ( this.hasDirectListeners_(this.subs_) );
       } else if ( this.subs_ ) {
         // check that each level of the topic exists, and there's a listener array at the end
-        var hasWildcard = opt_topic[opt_topic.length - 1] == EventService.WILDCARD;
         var map = this.subs_;
-        // TODO: change to loop, return true when the first direct listeners are found
-        return opt_topic.every(function(topic) {
+        for (var t = 0; t <= opt_topic.length; ++t) {
+          if ( ! map ) return false; // if nothing to check, fail
+          if ( this.hasDirectListeners_(map) ) return true; // if any listeners at this level, we're good
+          var topic = opt_topic[t];
           if ( topic == EventService.WILDCARD ) {
             // if a wildcard is specified, find any listener at all
             return this.hasAnyListeners_(map);
           }
           map = map[topic]; // try to move down a level
-          return !! map; // abort if not found
-          // the final topic is either a wildcard or should have a listeners array:
-        }.bind(this)) && ( hasWildcard || ( this.hasDirectListeners_(map) ) );
+        }
       }
       return false;
     },
