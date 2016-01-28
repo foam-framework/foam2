@@ -45,4 +45,120 @@ describe('ConteXt object', function() {
     expect(Y[hiddenKey]).toBeUndefined();
     expect(Y[newKey]).toBe(newValue);
   });
+
+  it('Expect set() to place value on context object', function() {
+    var X = GLOBAL.X.sub();
+    var value = {};
+    X.set('value', value);
+    expect(X.value).toBe(value);
+  });
+
+  it('Expect multi-part path set() to place value on context object',
+     function() {
+       var X = GLOBAL.X.sub();
+       var value = {};
+       X.set('v.a.l.u.e', value);
+       expect(X.v.a.l.u.e).toBe(value);
+     });
+
+  it('Expect multi-part path set() to place value on correct object',
+     function() {
+       var X = GLOBAL.X.sub();
+       var base = {};
+       var xtn = {};
+       X.set('base', base);
+       X.set('base.xtn', xtn);
+       expect(X.base).toBe(base);
+       expect(base.xtn).toBe(xtn);
+     });
+
+  it('Expect bad set() to throw exception', function() {
+    var X = GLOBAL.X.sub();
+    var value = {};
+
+    var caught = false;
+    try {
+      X.set('', value);
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.set('.', value);
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.set('foo..bar', value);
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.set('.foo', value);
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.set('foo.', value);
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+  });
+
+  it('Expect lookup() to find value', function() {
+    var X = GLOBAL.X.sub();
+    var value = {};
+    X.set('value', value);
+    expect(X.lookup('value')).toBe(value);
+  });
+
+  it('Expect multi-part path lookup() find value', function() {
+    var X = GLOBAL.X.sub();
+    var value = {};
+    X.set('v.a.l.u.e', value);
+    expect(X.lookup('v.a.l.u.e')).toBe(value);
+  });
+
+  it('Expect failed lookup() to return undefined', function() {
+    var X = GLOBAL.X.sub();
+    expect(X.value).toBeUndefined();
+    expect(X.val).toBeUndefined();
+    expect(X.lookup('value')).toBeUndefined();
+    expect(X.lookup('val.ue')).toBeUndefined();
+  });
+
+  it('Expect invalid path failed lookup() to throw exception', function() {
+    var X = GLOBAL.X.sub();
+    var caught = false;
+    try {
+      X.lookup('');
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.lookup('.');
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.lookup('.foo');
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.lookup('foo.');
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+
+    caught = false;
+    try {
+      X.lookup('foo..bar');
+    } catch (e) { caught = true; }
+    expect(caught).toBe(true);
+  });
 });

@@ -16,3 +16,44 @@ GLOBAL.X.sub = function(opt_args) {
   }
   return Y;
 };
+
+GLOBAL.X.verifyPackagePath_ = function(pathParts) {
+  var i;
+  for (i = 0; i < pathParts.length; i++) {
+    if (!pathParts[i])
+      throw new Error('Invalid package path: "' + pathParts.join('.') + '"');
+  }
+};
+
+/**
+ * Set a package-path value on the context.
+ */
+GLOBAL.X.set = function(path, value) {
+  var parts = path.split('.');
+  var obj = this;
+
+  this.verifyPackagePath_(parts);
+
+  // Set path, initializing objects as needed.
+  for (var i = 0; i < parts.length - 1; i++) {
+    if (!obj[parts[i]]) obj[parts[i]] = {};
+    obj = obj[parts[i]];
+  }
+  return (obj[parts[parts.length - 1]] = value);
+};
+
+/**
+ * Lookup a package-path value on the context.
+ */
+GLOBAL.X.lookup = function(path) {
+  var parts = path.split('.');
+
+  this.verifyPackagePath_(parts);
+
+  var obj = this;
+  for (var i = 0; i < parts.length; i++) {
+    if (!obj) return obj;
+    obj = obj[parts[i]];
+  }
+  return obj;
+};
