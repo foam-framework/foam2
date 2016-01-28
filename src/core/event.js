@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
+var GLOBAL = global || this;
+var X = GLOBAL.X;
+
 /** Publish and Subscribe Event Notification Service. **/
 
 // MODEL({
 //   name: 'EventService',
-var EventService = {
+  X.EventService = {
 
 //   constants: {
 //     /** Used as topic suffix to specify broadcast to all sub-topics. **/
@@ -30,7 +33,7 @@ var EventService = {
 //     /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
     oneTime: function(listener) {
       return function() {
-        listener.apply(this, EventService.argsToArray(arguments));
+        listener.apply(this, X.EventService.argsToArray(arguments));
         arguments[2](); // the unsubscribe fn
       };
     },
@@ -38,7 +41,7 @@ var EventService = {
     /** Log all listener invocations to console. **/
     consoleLog: function(listener) {
       return function() {
-        var args = EventService.argsToArray(arguments);
+        var args = X.EventService.argsToArray(arguments);
         console.log(args);
 
         listener.apply(this, args);
@@ -53,7 +56,8 @@ var EventService = {
      *        the smallest delay that humans aren't able to perceive.
      **/
     merged: function(listener, opt_delay, opt_X) {
-      var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
+      var X = opt_X || GLOBAL.X;
+      var setTimeoutX = X.setTimeout;
       var delay = opt_delay || 16;
 
       return function() {
@@ -67,7 +71,7 @@ var EventService = {
             triggered = true;
             setTimeoutX(function() {
               triggered = false;
-              var args = EventService.argsToArray(lastArgs);
+              var args = X.EventService.argsToArray(lastArgs);
               lastArgs = null;
               listener.apply(this, args);
             }, delay);
@@ -147,7 +151,7 @@ var EventService = {
     },
     /** convenience method to turn 'arguments' into a real array */
     argsToArray: function(args) {
-      return EventService.appendArguments([], args, 0);
+      return GLOBAL.X.EventService.appendArguments([], args, 0);
     },
 
 // });
@@ -155,7 +159,7 @@ var EventService = {
 
 // MODEL({
 //   name: 'EventPublisher',
-var EventPublisher = {
+X.EventPublisher = {
 
 //   properties: [
     subs_: null, // inited to {} when first used
@@ -176,7 +180,7 @@ var EventPublisher = {
           if ( ! map ) return false; // if nothing to check, fail
           if ( this.hasDirectListeners_(map) ) return true; // if any listeners at this level, we're good
           var topic = opt_topic[t];
-          if ( topic == EventService.WILDCARD ) {
+          if ( topic == X.EventService.WILDCARD ) {
             // if a wildcard is specified, find any listener at all
             return this.hasAnyListeners_(map);
           }
@@ -197,13 +201,13 @@ var EventPublisher = {
           this.subs_,
           0,
           topic,
-          EventService.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
+          X.EventService.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
         0;
     },
 
     /** Publish asynchronously. **/
     publishAsync: function(topic) {
-      var args = EventService.argsToArray(arguments);
+      var args = X.EventService.argsToArray(arguments);
       var self = this;
       setTimeout( function() { self.publish.apply(self, args); }, 0);
     },
@@ -269,7 +273,7 @@ var EventPublisher = {
         var t = topic[topicIndex];
 
         // wildcard publish, so notify all sub-topics, instead of just one
-        if ( t == EventService.WILDCARD ) {
+        if ( t == X.EventService.WILDCARD ) {
           return this.notifyListeners_(topic, map, msg, topic.slice(0, topicIndex-1));
         }
         if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
@@ -367,15 +371,15 @@ var EventPublisher = {
 
 
 //});
-}
+};
 
 
 // /** Extend EventPublisher with support for dealing with property-change notification. **/
 // MODEL({
 //   name: 'PropertyChangePublisher',
-var PropertyChangePublisher = {
+X.PropertyChangePublisher = {
 //   extends: 'EventPublisher',
-  __proto__: EventPublisher,
+  __proto__: X.EventPublisher,
 
 //   constants: {
 //     /** Root for property topics. **/
@@ -412,7 +416,7 @@ var PropertyChangePublisher = {
 
     /** Indicates that one or more unspecified properties have changed. **/
     globalChange: function() {
-      this.publish(this.propertyTopic(EventService.WILDCARD), null, null);
+      this.publish(this.propertyTopic(X.EventService.WILDCARD), null, null);
     },
 
     /** Adds a listener for all property changes. **/
@@ -450,9 +454,4 @@ var PropertyChangePublisher = {
 // //     }
 //   }
 // });
-}
-
-exports.EventPublisher = EventPublisher;
-exports.EventService = EventService;
-exports.PropertyChangePublisher = PropertyChangePublisher;
-
+};

@@ -1,3 +1,5 @@
 [
-  "core/context.js"
+  "core/context.js",
+  "core/event.js",
+  "core/dynamic.js"
 ]
