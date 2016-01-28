@@ -278,6 +278,8 @@ describe('EventService.framed', function() {
   });
 
   it('coverage that will not work without Node requestAnimationFrame support', function() {
+    // TODO: fix this 'polyfill' as we shouldn't change the global object.
+    // This should be a browser test, most likely.
     requestAnimationFrame = function(fn) {
         setTimeout(fn, 1);
     };
