@@ -47,52 +47,54 @@ X.Slot = {
         Override to provide alternate value storage. */
     get: function() {
       return this.hasOwnProperty('value_') ? this.value_ : undefined;
-    }
+    },
     /** Sets the value stored in this Slot.
         Override to provide alternate value storage. */
     set: function(val) {
       this.value_ = val;
-    }
+      this.globalChange();
+    },
 
-//     /** Have the dstSlot listen to changes in this Slot and update
-//         its value to be the same. **/
-//     function addFollower(dstSlot) {
-//       if ( ! this.followers_ ) this.followers_ = {};
-//       if ( ! dstSlot ) return;
-//       this.recordListener(dstSlot, function () {
-//         var sv = this.get();
-//         var dv = dstSlot.get();
+    /** Have the dstSlot listen to changes in this Slot and update
+        its value to be the same.
+        @param dstSlot the slot to push updates into. **/
+    addFollower: function(dstSlot) {
+      if ( ! this.followers_ ) this.followers_ = {};
+      if ( ! dstSlot ) return;
+      var self = this;
+      this.recordListener_(dstSlot, function () {
+        var sv = self.get();
+        var dv = dstSlot.get();
 
-//         if ( ! this.equals(sv, dv) ) dstSlot.set(sv);
-//       });
-//     },
+        if ( ! self.equals(sv, dv) ) dstSlot.set(sv);
+      });
+    },
 
+    /** Have the dstSlot stop listening for changes to the srcSlot. **/
+    removeFollower: function(dst) {
+      if ( ! this.followers_ ) this.followers_ = {};
+      if ( ! dst ) return;
+      var listener = this.followers_[dst];
+      if ( listener ) {
+        delete this.followers_[dst];
+        this.removeListener(listener);
+      }
+    },
 
-//     /** Have the dstSlot stop listening for changes to the srcSlot. **/
-//     function removeFollower(dst) {
-//       if ( ! this.followers_ ) this.followers_ = {};
-//       if ( ! dst ) return;
-//       var listener = this.followers_[dst];
-//       if ( listener ) {
-//         delete this.followers_[dst];
-//         this.removeListener(listener);
-//       }
-//     },
+    /**
+     * Maps Slots from one model to another.
+     * @param f maps Slots from srcSlot to dstSlot
+     */
+    map: function(dstSlot, f) {
+      if ( ! dstSlot ) return;
+      var self = this;
+      this.recordListener_(dstSlot, function () {
+        var s = f(self.get());
+        var d = dstSlot.get();
 
-
-//     /**
-//      * Maps Slots from one model to another.
-//      * @param f maps Slots from srcSlot to dstSlot
-//      */
-//     function map(dstSlot, f) {
-//       if ( ! dstSlot ) return;
-//       this.recordListener(dstSlot, function () {
-//         var s = f(this.get());
-//         var d = dstSlot.get();
-
-//         if ( ! equals(s, d) ) dstSlot.set(s);
-//       });
-//     },
+        if ( ! self.equals(s, d) ) dstSlot.set(s);
+      });
+    },
 
 
 //     /**

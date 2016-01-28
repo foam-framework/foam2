@@ -90,8 +90,106 @@ describe('Slot.recordListener', function() {
     expect(lister).toThrow();
   });
 
+});
+
+describe('Slot.addFollower', function() {
+  var slotA;
+  var slotB;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+  });
+
+  it('adds follower and updates propagate', function() {
+    slotA.addFollower(); // should be ignored
+    slotA.addFollower(slotB);
+    slotA.set('hello');
+    expect(slotB.get()).toEqual('hello');
+    slotB.set(4); // B isn't following A
+    expect(slotA.get()).toEqual('hello');
+  });
+
+  it('adds reciprocal followers and updates propagate but do not feed back', function() {
+    slotA.addFollower(slotB);
+    slotB.addFollower(slotA);
+    slotA.set('hello');
+    expect(slotB.get()).toEqual('hello');
+    slotB.set(4);
+    expect(slotA.get()).toEqual(4);
+  });
+
+});
+
+describe('Slot.removeFollower', function() {
+  var slotA;
+  var slotB;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+  });
+
+  it('removes follower and stops propagation', function() {
+    slotA.addFollower(slotB);
+    slotA.set('hello');
+    expect(slotB.get()).toEqual('hello');
+
+    slotA.removeFollower(slotB);
+    slotA.set('goodbye');
+    expect(slotB.get()).toEqual('hello');
+  });
+
+  it('remove ignores non-existent follower', function() {
+    slotA.removeFollower();
+    slotA.removeFollower(slotB);
+    slotA.set('hello');
+    expect(slotB.get()).toBeUndefined();
+  });
+
+});
+
+
+describe('Slot.map', function() {
+   var slotA;
+  var slotB;
+  var listener;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+    listener = function(val) {
+      listener.count += 1;
+      return val+1;
+    }
+    listener.count = 0;
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+    listener = null;
+  });
+
+  it('propagates value through the function', function() {
+    slotA.map(); // ignored
+    slotA.map(slotB, listener);
+    slotA.set(5);
+    expect(slotB.get()).toEqual(6);
+    expect(listener.count).toEqual(2); // invoked by recordListener_(), then set()
+    slotA.set(5);
+    //TODO: listen to B, should be no change
+  });
 
 
 });
+
 
 
