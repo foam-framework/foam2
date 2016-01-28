@@ -1,7 +1,9 @@
 var GLOBAL = global || this;
-require('../../../src/core/context');
+
+var corePromise = GLOBAL.loadCoreTo('core/context.js');
 
 describe('ConteXt object', function() {
+  beforeEach(function(done) { corePromise.then(done); });
 
   it('Expect global context to exist', function() {
     expect(GLOBAL.X).toBeTruthy();
