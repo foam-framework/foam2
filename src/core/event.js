@@ -85,64 +85,52 @@ var X = GLOBAL.X;
       }();
     },
 
-//     /**
-//      * Merge all notifications occuring until the next animation frame.
-//      * Only the last notification is delivered.
-//      **/
-//     // TODO: execute immediately from within a requestAnimationFrame
-//     function framed(listener, opt_X) {
-//       opt_X = opt_X || this.X;
-//       var requestAnimationFrameX = ( opt_X && opt_X.requestAnimationFrame ) || requestAnimationFrame;
+    /**
+     * Merge all notifications occuring until the next animation frame.
+     * Only the last notification is delivered.
+     **/
+    // TODO: execute immediately from within a requestAnimationFrame
+    framed: function(listener, opt_X) {
+      var requestAnimationFrameX = ( opt_X && opt_X.requestAnimationFrame ) || requestAnimationFrame;
 
-//       return function() {
-//         var triggered    = false;
-//         var unsubscribed = false;
-//         var lastArgs     = null;
+      return function() {
+        var triggered    = false;
+        var lastArgs     = null;
 
-//         var f = function() {
-//           lastArgs = arguments;
+        var f = function() {
+          lastArgs = arguments;
 
-//           //TODO: unsub fix //if ( unsubscribed ) throw EventService.UNSUBSCRIBE_EXCEPTION;
-
-//           if ( ! triggered ) {
-//             triggered = true;
-//             requestAnimationFrameX(
-//               function() {
-//                 triggered = false;
-//                 var args = EventService.argsToArray(lastArgs);
-//                 lastArgs = null;
-//                 try {
-//                   listener.apply(this, args);
-//                 } catch (x) {
-//                   //TODO: unsub fix //if ( x === EventService.UNSUBSCRIBE_EXCEPTION ) unsubscribed = true;
-//                 }
-//               });
-//           }
-//         };
-
+          if ( ! triggered ) {
+            triggered = true;
+            requestAnimationFrameX(function() {
+              triggered = false;
+              var args = EventService.argsToArray(lastArgs);
+              lastArgs = null;
+              listener.apply(this, args);
+            });
+          }
+        };
 //         if ( DEBUG ) f.toString = function() {
 //           return 'ANIMATE(' + listener.$UID + ', ' + listener + ')';
 //         };
+        return f;
+      }();
+    },
 
-//         return f;
-//       }();
-//     },
+    /** Decorate a listener so that the event is delivered asynchronously. **/
+    async: function(listener, opt_X) {
+      return this.delay(0, listener, opt_X);
+    },
 
-//     /** Decroate a listener so that the event is delivered asynchronously. **/
-//     function async(listener, opt_X) {
-//       return this.delay(0, listener, opt_X);
-//     },
-
-//     function delay(delay, listener, opt_X) {
-//       opt_X = opt_X || this.X;
-//       return function() {
-//         var args = EventService.argsToArray(arguments);
-
-//         // Is there a better way of doing this?
-//         (opt_X && opt_X.setTimeout ? opt_X.setTimeout : setTimeout)( function() { listener.apply(this, args); }, delay );
-//       };
-//     },
-//   ]
+    /** Decorate a listener so that the event is delivered after a delay.
+        @param delay the delay in ms **/
+    delay: function(delay, listener, opt_X) {
+      var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
+      return function() {
+        var args = EventService.argsToArray(arguments);
+        setTimeoutX( function() { listener.apply(null, args); }, delay );
+      };
+    },
 
     /** convenience method to append 'arguments' onto a real array */
     appendArguments: function(a, args, start) {

@@ -179,10 +179,120 @@ describe('EventService.merged', function() {
   });
 });
 
+describe('EventService.async', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener = function(publisher, topic, unsub) {
+      listener.last_topic = topic;
+      listener.last_unsub = unsub;
+      listener.last_args = arguments;
+      listener.count += 1;
+    }
+    listener.count = 0;
+    jasmine.clock().install();
+  });
+  afterEach(function() {
+    ep = null;
+    listener = null;
+    jasmine.clock().uninstall();
+  });
+
+  it('async invokes each listener', function() {
+    var delayed = EventService.async(listener);
+
+    ep.subscribe(['simple'], delayed);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(1);
+
+    expect(listener.count).toEqual(2);
+  });
+
+  it('async with opt_X specified', function() {
+    var X = { setTimeout: setTimeout };
+    var delayed = EventService.async(listener, X);
+
+    ep.subscribe(['simple'], delayed);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener.count).toEqual(0);
+
+    jasmine.clock().tick(1);
+    expect(listener.count).toEqual(2);
+  });
 
 
+});
 
 
+describe('EventService.framed', function() {
+  var ep;
+  var listener;
+
+  beforeEach(function() {
+    ep = Object.create(EventPublisher);
+    listener1 = function(publisher, topic, unsub) {
+      listener1.count += 1;
+    }
+    listener1.count = 0;
+    listener2 = function(publisher, topic, unsub) {
+      listener2.count += 1;
+    }
+    listener2.count = 0;
+    jasmine.clock().install();
+  });
+  afterEach(function() {
+    ep = null;
+    listener1 = null;
+    listener2 = null;
+    jasmine.clock().uninstall();
+  });
+
+  it('framed listeners accumulate', function() {
+    var X = {
+      requestAnimationFrame: function(fn) {
+        setTimeout(fn, 1);
+      }
+    };
+    var delayed1 = EventService.framed(listener1, X);
+    var delayed2 = EventService.framed(listener2, X);
+    ep.subscribe(['simple'], delayed1);
+    ep.subscribe(['simple'], delayed2);
+
+    ep.publish(['simple']);
+    expect(listener1.count).toEqual(0);
+    expect(listener2.count).toEqual(0);
+
+    ep.publish(['simple']);
+    expect(listener1.count).toEqual(0);
+    expect(listener2.count).toEqual(0);
+
+    jasmine.clock().tick(1);
+    expect(listener1.count).toEqual(1);
+    expect(listener2.count).toEqual(1);
+  });
+
+  it('coverage that will not work without Node requestAnimationFrame support', function() {
+    // TODO: fix this 'polyfill' as we shouldn't change the global object.
+    // This should be a browser test, most likely.
+    requestAnimationFrame = function(fn) {
+        setTimeout(fn, 1);
+    };
+    EventService.framed(listener1);
+  });
+
+});
 
 
 
