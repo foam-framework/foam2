@@ -15,27 +15,37 @@
  * limitations under the License.
  */
 
-var Slot = {
+var GLOBAL = global || this;
+var X = GLOBAL.X;
+//GLOBAL.console && GLOBAL.console.log("slot global", GLOBAL.X);
+
+
+X.Slot = {
+  __proto__: GLOBAL.X.PropertyChangePublisher,
 
   //properties:
-  followers_: {}, // maps destinationObj -> listenerFn
+  //followers_: {}, // maps destinationObj -> listenerFn
 
-  /** Check equality and interpret NaN to equal NaN, for proper change detection.
-      TODO: replace with stdlib version. */
-  equals: function(a, b) {
-    return (a === b) || (a == b) || ((a !== a) && (b !== b));
-  }
+    /** Check equality and interpret NaN to equal NaN, for proper change detection.
+        TODO: replace with stdlib version. */
+    equals: function(a, b) {
+      return (a === b) || (a == b) || ((a !== a) && (b !== b));
+    },
 
-//     function recordListener(dst, listener, opt_dontCallListener) {
-//       console.assert( ! this.followers_[dst], 'recordListener: duplicate follow');
-//       this.followers_[dst] = listener;
-//       this.addListener(listener);
-//       if ( ! opt_dontCallListener ) listener();
-//     },
+    /** Internal. Manages follower list. By default triggers the listener.
+        @param opt_dontCallListener if true, does not trigger the listener. **/
+    recordListener_: function(dst, listener, opt_dontCallListener) {
+      if ( ! this.followers_ ) this.followers_ = {};
+      console.assert( ! this.followers_[dst], 'recordListener: duplicate follow');
+      this.followers_[dst] = listener;
+      this.addListener(listener);
+      if ( ! opt_dontCallListener ) listener();
+    },
 
 //     /** Have the dstSlot listen to changes in this Slot and update
 //         its value to be the same. **/
 //     function addFollower(dstSlot) {
+//       if ( ! this.followers_ ) this.followers_ = {};
 //       if ( ! dstSlot ) return;
 //       this.recordListener(dstSlot, function () {
 //         var sv = this.get();
@@ -48,6 +58,7 @@ var Slot = {
 
 //     /** Have the dstSlot stop listening for changes to the srcSlot. **/
 //     function removeFollower(dst) {
+//       if ( ! this.followers_ ) this.followers_ = {};
 //       if ( ! dst ) return;
 //       var listener = this.followers_[dst];
 //       if ( listener ) {
@@ -123,6 +134,7 @@ var Slot = {
 //     /** Cleans up any remaining followers.
 //         TODO: is this how the object lifecycle should be implemented? */
 //     function destroy() {
+//       if ( ! this.followers_ ) return;
 //       for(var key in this.followers_) {
 //         this.removeListener(this.followers_[dst]);
 //       }
@@ -130,3 +142,4 @@ var Slot = {
 //     }
 
 }
+

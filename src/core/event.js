@@ -104,7 +104,7 @@ var X = GLOBAL.X;
             triggered = true;
             requestAnimationFrameX(function() {
               triggered = false;
-              var args = EventService.argsToArray(lastArgs);
+              var args = GLOBAL.X.EventService.argsToArray(lastArgs);
               lastArgs = null;
               listener.apply(this, args);
             });
@@ -127,7 +127,7 @@ var X = GLOBAL.X;
     delay: function(delay, listener, opt_X) {
       var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
       return function() {
-        var args = EventService.argsToArray(arguments);
+        var args = GLOBAL.X.EventService.argsToArray(arguments);
         setTimeoutX( function() { listener.apply(null, args); }, delay );
       };
     },
@@ -150,7 +150,7 @@ var X = GLOBAL.X;
 X.EventPublisher = {
 
 //   properties: [
-    subs_: null, // inited to {} when first used
+    //subs_: null, // inited to {} when first used
 //   ],
 
 //   methods: [

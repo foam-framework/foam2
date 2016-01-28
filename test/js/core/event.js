@@ -183,8 +183,8 @@ describe('EventService.async', function() {
   var ep;
   var listener;
 
-  beforeEach(function() {
-    ep = Object.create(EventPublisher);
+  beforeEachTest(function() {
+    ep = Object.create(GLOBAL.X.EventPublisher);
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -201,7 +201,7 @@ describe('EventService.async', function() {
   });
 
   it('async invokes each listener', function() {
-    var delayed = EventService.async(listener);
+    var delayed = GLOBAL.X.EventService.async(listener);
 
     ep.subscribe(['simple'], delayed);
 
@@ -217,8 +217,8 @@ describe('EventService.async', function() {
   });
 
   it('async with opt_X specified', function() {
-    var X = { setTimeout: setTimeout };
-    var delayed = EventService.async(listener, X);
+    var X = { setTimeout: GLOBAL.X.setTimeout };
+    var delayed = GLOBAL.X.EventService.async(listener, X);
 
     ep.subscribe(['simple'], delayed);
 
@@ -240,8 +240,8 @@ describe('EventService.framed', function() {
   var ep;
   var listener;
 
-  beforeEach(function() {
-    ep = Object.create(EventPublisher);
+  beforeEachTest(function() {
+    ep = Object.create(GLOBAL.X.EventPublisher);
     listener1 = function(publisher, topic, unsub) {
       listener1.count += 1;
     }
@@ -265,8 +265,8 @@ describe('EventService.framed', function() {
         setTimeout(fn, 1);
       }
     };
-    var delayed1 = EventService.framed(listener1, X);
-    var delayed2 = EventService.framed(listener2, X);
+    var delayed1 = GLOBAL.X.EventService.framed(listener1, X);
+    var delayed2 = GLOBAL.X.EventService.framed(listener2, X);
     ep.subscribe(['simple'], delayed1);
     ep.subscribe(['simple'], delayed2);
 
@@ -289,7 +289,7 @@ describe('EventService.framed', function() {
     requestAnimationFrame = function(fn) {
         setTimeout(fn, 1);
     };
-    EventService.framed(listener1);
+    GLOBAL.X.EventService.framed(listener1);
   });
 
 });
@@ -313,7 +313,7 @@ describe('EventPublisher.hasListeners()', function() {
   });
 
   it('reports correctly for no listeners, ever', function() {
-    expect(ep.subs_).toBeNull();
+    expect(ep.subs_).toBeUndefined();
     expect(ep.hasListeners()).toBe(false);
   });
 
