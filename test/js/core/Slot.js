@@ -10,6 +10,20 @@ var beforeEachTest = function(callback) {
   });
 };
 
+describe('Slot.equals', function() {
+  beforeEachTest(function() {});
+
+  it('compares things', function() {
+    var s = Object.create(GLOBAL.X.Slot);
+    expect(s.equals(1, 1)).toBe(true);
+    expect(s.equals(1, 2)).toBe(false);
+    expect(s.equals(s, s)).toBe(true);
+    expect(s.equals(s, GLOBAL.X.Slot)).toBe(false);
+    expect(s.equals(NaN, NaN)).toBe(true);
+    expect(s.equals(1, NaN)).toBe(false);
+  });
+});
+
 describe('Slot.recordListener', function() {
   var slotA;
   var slotB;
@@ -36,12 +50,23 @@ describe('Slot.recordListener', function() {
     expect(listener.count).toEqual(2);
   });
 
-//   it('asserts on a duplicate follow', function() {
-//     slotA.recordListener_(slotB, listener);
+  it('adds listener without calling it immediately', function() {
+    slotA.recordListener_(slotB, listener, true);
+    expect(listener.count).toEqual(0); // recordListener calls it
+    slotA.globalChange();
+    expect(listener.count).toEqual(1);
 
-//     expect(slotA.recordListener_(slotB, listener);
+  });
 
-//   });
+  it('asserts on a duplicate follow', function() {
+    function lister() {
+      slotA.recordListener_(slotB, listener);
+    }
+    lister();
+    expect(lister).toThrow();
+  });
+
+
 
 });
 
