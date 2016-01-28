@@ -25,6 +25,7 @@ X.Slot = {
 
   //properties:
   //followers_: {}, // maps destinationObj -> listenerFn
+  //value_: null, // default storage
 
     /** Check equality and interpret NaN to equal NaN, for proper change detection.
         TODO: replace with stdlib version. */
@@ -41,6 +42,17 @@ X.Slot = {
       this.addListener(listener);
       if ( ! opt_dontCallListener ) listener();
     },
+
+    /** Returns the value stored in this Slot.
+        Override to provide alternate value storage. */
+    get: function() {
+      return this.hasOwnProperty('value_') ? this.value_ : undefined;
+    }
+    /** Sets the value stored in this Slot.
+        Override to provide alternate value storage. */
+    set: function(val) {
+      this.value_ = val;
+    }
 
 //     /** Have the dstSlot listen to changes in this Slot and update
 //         its value to be the same. **/

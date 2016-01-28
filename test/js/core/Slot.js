@@ -24,6 +24,30 @@ describe('Slot.equals', function() {
   });
 });
 
+describe('Slot.get/set', function() {
+  var slotA;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+  });
+  afterEach(function() {
+    slotA = null;
+  });
+
+  it('returns undefined when nothing is set', function() {
+    expect(slotA.get()).toBeUndefined();
+  });
+
+  it('returns the value set on the slot', function() {
+    slotA.set('hello');
+    expect(slotA.get()).toEqual('hello');
+    slotA.set(34);
+    expect(slotA.get()).toEqual(34);
+  });
+
+});
+
+
 describe('Slot.recordListener', function() {
   var slotA;
   var slotB;
