@@ -24,9 +24,11 @@ var Slot = {
       TODO: replace with stdlib version. */
   equals: function(a, b) {
     return (a === b) || (a == b) || ((a !== a) && (b !== b));
-  }
+  },
 
-//     function recordListener(dst, listener, opt_dontCallListener) {
+//     /** Internal. Manages follower list. By default triggers the listener.
+//         @param opt_dontCallListener if true, does not trigger the listener. **/
+//     function recordListener_(dst, listener, opt_dontCallListener) {
 //       console.assert( ! this.followers_[dst], 'recordListener: duplicate follow');
 //       this.followers_[dst] = listener;
 //       this.addListener(listener);
@@ -130,3 +132,5 @@ var Slot = {
 //     }
 
 }
+
+exports.Slot = Slot;
