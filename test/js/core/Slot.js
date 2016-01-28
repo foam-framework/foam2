@@ -159,7 +159,7 @@ describe('Slot.removeFollower', function() {
 
 
 describe('Slot.map', function() {
-   var slotA;
+  var slotA;
   var slotB;
   var listener;
 
@@ -191,5 +191,180 @@ describe('Slot.map', function() {
 
 });
 
+
+describe('Slot.link', function() {
+  var slotA;
+  var slotB;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+  });
+
+  it('propagates values both directions', function() {
+    slotA.link(); // ignored
+    slotA.link(slotB);
+
+    slotB.set('hello');
+    expect(slotA.get()).toEqual('hello');
+
+    slotA.set('goodbye');
+    expect(slotB.get()).toEqual('goodbye');
+
+  });
+
+
+});
+
+describe('Slot.unlink', function() {
+  var slotA;
+  var slotB;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+  });
+
+  it('unlistens both directions', function() {
+    slotA.unlink(); // ignored
+    slotA.unlink(slotB); // ignored
+
+    slotA.link(slotB);
+
+    slotB.set('hello');
+    expect(slotA.get()).toEqual('hello');
+
+    slotA.set('goodbye');
+    expect(slotB.get()).toEqual('goodbye');
+
+    slotA.unlink(slotB);
+
+    slotB.set('unlinkedB');
+    expect(slotA.get()).toEqual('goodbye'); // no change
+
+    slotA.set('unlinkedA');
+    expect(slotB.get()).toEqual('unlinkedB'); // no change
+
+
+  });
+
+  it('does not care which side of the link it is called from', function() {
+    slotA.unlink(); // ignored
+    slotA.unlink(slotB); // ignored
+
+    slotA.link(slotB);
+
+    slotB.set('hello');
+    expect(slotA.get()).toEqual('hello');
+
+    slotA.set('goodbye');
+    expect(slotB.get()).toEqual('goodbye');
+
+    slotB.unlink(slotA); // reverse of previous test case
+
+    slotB.set('unlinkedB');
+    expect(slotA.get()).toEqual('goodbye'); // no change
+
+    slotA.set('unlinkedA');
+    expect(slotB.get()).toEqual('unlinkedB'); // no change
+
+
+  });
+});
+
+
+describe('Slot.destroy', function() {
+  var slotA;
+  var slotB;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+  });
+
+  it('disconnects all listeners', function() {
+
+    slotA.destroy();// ignored
+
+    slotA.addFollower(slotB);
+    slotA.set('hello');
+    expect(slotB.get()).toEqual('hello');
+
+    slotA.destroy();
+
+    slotA.set('unlinkedA');
+    expect(slotB.get()).toEqual('hello'); // no change
+
+
+  });
+});
+
+
+describe('Slot.relate', function() {
+  var slotA;
+  var slotB;
+  var listener1;
+  var listener2;
+
+  beforeEachTest(function() {
+    slotA = Object.create(GLOBAL.X.Slot);
+    slotB = Object.create(GLOBAL.X.Slot);
+    listener1 = function(val) { // this fn will stop altering the value at 10 to test feedback
+      listener1.count += 1;
+      return (val < 10) ? val+1 : val;
+    }
+    listener1.count = 0;
+    listener2 = function(val) { // this fn will stop altering the value at 10 to test feedback
+      listener2.count += 1;
+      return (val < 10) ? val+2 : val;
+    }
+    listener2.count = 0;
+  });
+  afterEach(function() {
+    slotA = null;
+    slotB = null;
+  });
+
+  it('maps values without a feedback loop', function() {
+    slotA.relate(); // ignored
+
+    slotA.relate(slotB, listener1, listener2, true);
+
+    slotA.set(1);
+    expect(slotB.get()).toEqual(2);
+    expect(slotA.get()).toEqual(1);
+
+    slotB.set(4);
+    expect(slotB.get()).toEqual(4);
+    expect(slotA.get()).toEqual(6);
+  });
+
+  it('maps values with a feedback loop', function() {
+    // these listeners are set up to stop feedback loops at 10
+    slotA.relate(slotB, listener1, listener2);
+
+    slotA.set(1);
+    expect(slotB.get()).toEqual(10);
+    expect(slotA.get()).toEqual(10);
+
+    slotB.set(4);
+    expect(slotB.get()).toEqual(10);
+    expect(slotA.get()).toEqual(10);
+
+
+  });
+});
 
 

@@ -97,63 +97,66 @@ X.Slot = {
     },
 
 
-//     /**
-//      * Link the Slots of two models by having them follow each other.
-//      * Initial Slot is copied from srcSlot to dstSlot.
-//      **/
-//     function link(dstSlot) {
-//       this.addFollower(dstSlot);
-//       dstSlot.addFollower(this);
-//     },
+    /**
+     * Link the Slots of two models by having them follow each other.
+     * Initial Slot is copied from srcSlot to dstSlot.
+     **/
+    link: function(dstSlot) {
+      if ( ! dstSlot ) return;
+      this.addFollower(dstSlot);
+      dstSlot.addFollower(this);
+    },
 
 
-//     /**
-//      * Relate the Slots of two models.
-//      * @param f maps 'this' to dstSlot
-//      * @param fprime maps dstSlot to 'this'
-//      * @param removeFeedback disables feedback
-//      */
-//     function relate(dstSlot, f, fprime, removeFeedback) {
-//       if ( ! dstSlot ) return;
+    /**
+     * Relate the Slots of two models.
+     * @param f maps 'this' to dstSlot
+     * @param fprime maps dstSlot to 'this'
+     * @param removeFeedback disables feedback
+     */
+    relate: function(dstSlot, f, fprime, removeFeedback) {
+      if ( ! dstSlot ) return;
 
-//       var feedback = false;
+      var self = this;
+      var feedback = false;
 
-//       var l = function(sv, dv, f) { return function () {
-//         if ( removeFeedback && feedback ) return;
-//         var s = f(sv.get());
-//         var d = dv.get();
+      var l = function(sv, dv, f) { return function () {
+        if ( removeFeedback && feedback ) return;
+        var s = f(sv.get());
+        var d = dv.get();
 
-//         if ( ! equals(s, d) ) {
-//           feedback = true;
-//           dv.set(s);
-//           feedback = false;
-//         }
-//       }};
+        if ( ! self.equals(s, d) ) {
+          feedback = true;
+          dv.set(s);
+          feedback = false;
+        }
+      }};
 
-//       var l1 = l(this, dstSlot, f);
-//       var l2 = l(dstSlot, this, fprime);
+      var l1 = l(this, dstSlot, f);
+      var l2 = l(dstSlot, this, fprime);
 
-//       this.recordListener(this, dstSlot, l1, true);
-//       this.recordListener(dstSlot, this, l2, true);
+      this.recordListener_(dstSlot, l1, true);
+      dstSlot.recordListener_(this, l2, true);
 
-//       l1();
-//     },
+      l1();
+    },
 
-//     /** Unlink the Slots of two models by having them no longer follow each other. **/
-//     function unlink(dstSlot) {
-//       this.removeFollower(dstSlot);
-//       dstSlot.removeFollower(this);
-//     },
+    /** Unlink the Slots of two models by having them no longer follow each other. **/
+    unlink: function(dstSlot) {
+      if ( ! dstSlot ) return;
+      this.removeFollower(dstSlot);
+      dstSlot.removeFollower(this);
+    },
 
-//     /** Cleans up any remaining followers.
-//         TODO: is this how the object lifecycle should be implemented? */
-//     function destroy() {
-//       if ( ! this.followers_ ) return;
-//       for(var key in this.followers_) {
-//         this.removeListener(this.followers_[dst]);
-//       }
-//       this.followers_ = {};
-//     }
+    /** Cleans up any remaining followers.
+        TODO: is this how the object lifecycle should be implemented? */
+    destroy: function() {
+      if ( ! this.followers_ ) return;
+      for(var key in this.followers_) {
+        this.removeListener(this.followers_[key]);
+      }
+      this.followers_ = {};
+    }
 
 }
 
