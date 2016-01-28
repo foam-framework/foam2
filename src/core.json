@@ -1,5 +1,6 @@
 [
   "core/context.js",
   "core/event.js",
-  "core/dynamic.js"
+  "core/dynamic.js",
+  "core/Slot.js"
 ]
