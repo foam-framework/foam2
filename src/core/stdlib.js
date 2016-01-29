@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-var global = global || this;
-
+var GLOBAL = global || this;
+var X = GLOBAL.X;
 
 // Minimal Stdlib, to be replaced
 
-function memoize1(f) {
+X.memoize1 = function(f) {
   /** Faster version of memoize() when only dealing with one argument. **/
   var cache = {};
   var g = function(arg) {
@@ -30,9 +30,9 @@ function memoize1(f) {
   };
   g.name = f.name;
   return g;
-}
+};
 
-var constantize = memoize1(function(str) {
+X.constantize = X.memoize1(function(str) {
   // switchFromCamelCaseToConstantFormat to SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
   // TODO: add property to specify constantization. For now catch special case to avoid conflict with context this.X and this.Y.
   if ( str === 'x' ) return 'X_';

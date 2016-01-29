@@ -15,14 +15,17 @@
  * limitations under the License.
  */
 
+var GLOBAL = global || this;
+var X = X;
+
 // Bootstrap Support, discarded after use
-var Bootstrap = {
+GLOBAL.Bootstrap = {
 
   // Temporary collection of classes to be updated later.
   classes: [],
 
   start: function() {
-    global.CLASS = Bootstrap.CLASS.bind(Bootstrap);
+    GLOBAL.CLASS = GLOBAL.Bootstrap.CLASS.bind(GLOBAL.Bootstrap);
   },
 
   getClass: (function() {
@@ -49,16 +52,16 @@ var Bootstrap = {
     };
 
     return function() {
-      var cls = global[this.name];
+      var cls = X[this.name];
 
       if ( ! cls ) {
-        var parent = this.extends ? global[this.extends] : AbstractClass ;
+        var parent = this.extends ? X[this.extends] : AbstractClass ;
         cls = Object.create(parent);
         cls.proto = Object.create(parent.proto);
         cls.proto.cls_ = cls;
         cls.name   = this.name;
         cls.model_ = this;
-        global[cls.name] = cls;
+        X[cls.name] = cls;
       }
 
       var proto = cls.proto;
@@ -76,10 +79,10 @@ var Bootstrap = {
       }
 
       // TODO: combine with axioms
-      if ( global.Property && this.properties ) {
+      if ( X.Property && this.properties ) {
         for ( var i = 0 ; i < this.properties.length ; i++ ) {
           var p    = this.properties[i];
-          var type = global[(p.type || '') + 'Property'] || Property;
+          var type = X[(p.type || '') + 'Property'] || X.Property;
           var axiom = type.create(p);
           cls.installAxiom(axiom);
         }
@@ -96,17 +99,18 @@ var Bootstrap = {
   },
 
   end: function() {
-    global.CLASS = function(m) { return Model.create(m).getClass(); };
+    GLOBAL.CLASS = function(m) { return X.Model.create(m).getClass(); };
 
     for ( var i = 0 ; i < this.classes.length ; i++ )
       CLASS(this.classes[i].model_);
 
-    global.Bootstrap = null;
+    GLOBAL.Bootstrap = null;
+    delete GLOBAL.Bootstrap;
   }
 };
 
 
-Bootstrap.start();
+GLOBAL.Bootstrap.start();
 
 CLASS({
   name: 'FObject',
@@ -163,7 +167,7 @@ CLASS({
       subType: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        var cls = this.type ? global[this.type + 'Property'] : Property;
+        var cls = this.type ? X[this.type + 'Property'] : X.Property;
         return cls.create(o);
       }
     },
@@ -179,7 +183,7 @@ CLASS({
       adaptArrayElement: function(e) {
         if ( typeof e === 'function' ) {
           console.assert(e.name, 'Method must be named');
-          return Method.create({name: e.name, code: e});
+          return X.Method.create({name: e.name, code: e});
         }
         return e;
       }
@@ -189,7 +193,7 @@ CLASS({
   methods: [
     {
       name: 'getClass',
-      code: Bootstrap.getClass
+      code: GLOBAL.Bootstrap.getClass
     }
   ]
 });
@@ -229,7 +233,7 @@ CLASS({
   methods: [
     {
       name: 'installInClass',
-      code: function(c) { c[constantize(this.name)] = this;
+      code: function(c) { c[X.constantize(this.name)] = this;
       }
     },
     {
@@ -289,7 +293,7 @@ CLASS({
 
             // TODO: fire property change event
 
-            // TODO: call global setter
+            // TODO: call GLOBAL setter
 
             if ( postSet ) postSet.call(this, oldValue, newValue, prop);
           },
@@ -357,7 +361,7 @@ CLASS({
     {
       name: 'preSet',
       defaultValue: function(_, a, prop) {
-        var cls = global[prop.subType];
+        var cls = X[prop.subType];
         // TODO: loop for performance
         return a.map(function(p) { return cls.create(p); });
       }
@@ -372,14 +376,14 @@ CLASS({
     {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
-        return global[this.subType].create(o);
+        return X[this.subType].create(o);
       }
     }
   ]
 });
 
 
-Bootstrap.end();
+GLOBAL.Bootstrap.end();
 
 
 CLASS({
@@ -411,11 +415,11 @@ CLASS({
   methods: [
     {
       name: 'installInClass',
-      code: function(cls) { cls[constantize(this.name)] = this.value; }
+      code: function(cls) { cls[X.constantize(this.name)] = this.value; }
     },
     {
       name: 'installInProto',
-      code: function(proto) { proto[constantize(this.name)] = this.value; }
+      code: function(proto) { proto[X.constantize(this.name)] = this.value; }
     }
   ]
 });

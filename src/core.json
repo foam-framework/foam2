@@ -1,5 +1,7 @@
 [
   "core/context.js",
+  "core/stdlib.js",
+  "core/fo3.js",
   "core/event.js",
   "core/dynamic.js",
   "core/Slot.js"

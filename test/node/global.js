@@ -127,6 +127,7 @@ describe('Global scope pollution', function() {
           window.close();
 
           if (!isContextReportClean(report)) {
+            console.log(report);
             fail('Core should not pollute the global context; context report:\n' +
                 JSON.stringify(report, null, 2));
           }
