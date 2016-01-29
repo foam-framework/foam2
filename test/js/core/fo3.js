@@ -135,109 +135,153 @@ describe('Property default value', function() {
 
 });
 
-//
-// var ap = ArrayProperty.create({});
-// console.assert(ap.preSet, 'ArrayProperty.preSet missing.');
-//
-// // ArrayProperty Test
-// CLASS({ name: 'A', properties: [ { name: 'a' } ] });
-// CLASS({
-//   name: 'B',
-//   properties: [
-//     {
-//       type: 'Array',
-//       subType: 'A',
-//       name: 'as'
-//     }
-//   ]
-// });
-//
-// var b = B.create({as: [{a: 'abc'}]});
-// console.log(b.as);
-//
-//
-// CLASS({
-//   name: 'ConstantTest',
-//
-//   constants: [
-//     {
-//       name: 'KEY',
-//       value: 'If you can see this, Constants are working!'
-//     }
-//   ]
-// });
-//
-// var t1 = ConstantTest.create({});
-// console.assert(t1.KEY, 'Constants don\'t work.');
-// console.log(t1.KEY);
-//
-//
-// CLASS({
-//   name: 'Person',
-//
-//   constants: [
-//     {
-//       name: 'KEY',
-//       value: 'If you can see this, Constants are working!'
-//     }
-//   ],
-//
-//   properties: [
-//     {
-//       name: 'name'
-//     },
-//     {
-//       name: 'age'
-//     }
-//   ],
-//
-//   methods: [
-//     {
-//       name: 'sayHello',
-//       code: function() { console.log('Hello World!'); }
-//     },
-//     function sayGoodbye() { console.log('Goodbye from ' + this.name); }
-//   ]
-// });
-//
-// var p = Person.create({name: 'Adam', age: 0});
-// console.log(p.name, p.age, p.KEY);
-// p.sayHello();
-// p.sayGoodbye();
-//
-//
-// CLASS({
-//   name: 'Employee',
-//   extends: 'Person',
-//
-//   properties: [
-//     {
-//       name: 'salary'
-//     }
-//   ],
-//
-//   methods: [
-//     function toString() {
-//       return this.cls_.name + '(' + this.name + ', ' + this.age + ', ' + this.salary + ')';
-//     }
-//   ]
-// });
-//
-// var e = Employee.create({name: 'Jane', age: 30, salary: 50000});
-// console.log(e.toString());
-// e.sayGoodbye();
-//
-// /*
-// // 3058ms, Jan 26, 2016, X1 Carbon
-// console.time('b1');
-// for ( var i = 0 ; i < 10000000 ; i++ )
-//   p.age++;
-// console.timeEnd('b1');
-//
-//
-// // 1251ms, Jan 26, 2016, X1 Carbon
-// console.time('b2');
-// for ( var i = 0 ; i < 1000000 ; i++ )
-//   Person.create({name: 'john', age: i});
-// console.timeEnd('b2');
-// */
+
+describe('ArrayProperty', function() {
+  var t;
+  
+  beforeEachTest(function() {
+    CLASS({ name: 'A', properties: [ { name: 'a' } ] });
+    CLASS({
+      name: 'B',
+      properties: [
+        {
+          type: 'Array',
+          subType: 'A',
+          name: 'as'
+        }
+      ]
+    });
+  });
+  afterEach(function() {
+    t = null;
+  });
+
+  it('has a preSet', function() {
+    var ap = X.ArrayProperty.create({});
+    expect(ap.preSet).toBeTruthy();
+  });
+
+  it('defaults to an empty array', function() {
+    var b = X.B.create({});
+    expect(b.as).toEqual([]);
+  });
+  // TODO: enable when MyMdl.create(instanceA) clones correctly
+  // it('accepts an array value of the correct type', function() {
+  //   var b = X.B.create({});
+  //   var a = X.A.create({ a: 'a' });
+  //   var aa = X.A.create({ a: 'aa' });
+  //
+  //   b.as = [a, aa];
+  //   expect(b.as.toString()).toEqual([a, aa].toString());
+  //
+  //   expect(b.as[0]).toEqual(a);
+  //   expect(b.as[1]).toEqual(aa);
+  // });
+
+});
+
+
+
+describe('Constants', function() {
+  var t;
+  
+  beforeEachTest(function() {
+    CLASS({
+      name: 'ConstantTest',
+
+      constants: [
+        {
+          name: 'KEY',
+          value: 'my_value'
+        }
+      ]
+    });
+    t = X.ConstantTest.create({});
+  });
+  afterEach(function() {
+    t = null;
+  });
+
+  it('are available on instances', function() {
+    expect(t.KEY).not.toBeUndefined();
+    expect(t.KEY).toEqual('my_value');
+  });
+
+});
+
+
+describe('Model.extends inheritance', function() {
+  var person;
+  var employee;
+  
+  beforeEachTest(function() {
+    CLASS({
+      name: 'Person',
+
+      constants: [
+        {
+          name: 'KEY',
+          value: 'my_value'
+        }
+      ],
+
+      properties: [
+        {
+          name: 'name'
+        },
+        {
+          name: 'age'
+        },
+        {
+          name: 'result'
+        }
+      ],
+
+      methods: [
+        {
+          name: 'sayHello',
+          code: function() { this.result = 'hello '+this.name; }
+        },
+        function sayGoodbye() { this.result = "bye "+this.name; }
+      ]
+    });
+    person = X.Person.create({name: 'Adam', age: 0});
+    
+    CLASS({
+      name: 'Employee',
+      extends: 'Person',
+
+      properties: [
+        {
+          name: 'salary'
+        }
+      ],
+
+      methods: [
+        function toString() {
+          return this.cls_.name + '(' + this.name + ', ' + this.age + ', ' + this.salary + ')';
+        }
+      ]
+    });
+    employee = X.Employee.create({name: 'Jane', age: 30, salary: 50000});
+  });
+  afterEach(function() {
+    person = null;
+    employee = null;
+  });
+
+  it('inherits methods', function() {
+    person.sayHello();
+    employee.sayHello();
+    expect(person.result).toEqual('hello Adam');
+    expect(employee.result).toEqual('hello Jane');
+    expect(employee.sayGoodbye).not.toBeUndefined();
+  });
+  it('inherits constants', function() {
+    expect(person.KEY).toEqual('my_value');
+    expect(employee.KEY).toEqual('my_value');
+  });
+
+});
+
+

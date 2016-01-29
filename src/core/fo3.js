@@ -385,7 +385,7 @@ CLASS({
       name: 'toString',
       code: function() {
         // Distinguish between prototypes and instances.
-        return this.model_.name + (this.instance_ ? '' : 'Proto')
+        return this.cls_.model_.name + (this.instance_ ? '' : 'Proto')
       }
     }
   ],
