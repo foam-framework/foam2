@@ -21,6 +21,10 @@ var X = GLOBAL.X;
 
 
 X.Slot = {
+
+  // TODO: Slot might be better as a trait or augmenter. Also, it only makes limited use of 
+  // event publishing and could just implement it itself (but then loses out on instrumentation
+  // that might be done to event publishing)
   __proto__: GLOBAL.X.PropertyChangePublisher,
 
   //properties:
