@@ -102,7 +102,7 @@ GLOBAL.Bootstrap = {
     GLOBAL.CLASS = function(m) { return X.Model.create(m).getClass(); };
 
     for ( var i = 0 ; i < this.classes.length ; i++ )
-      CLASS(this.classes[i].model_);
+      GLOBAL.CLASS(this.classes[i].model_);
 
     GLOBAL.Bootstrap = null;
     delete GLOBAL.Bootstrap;
