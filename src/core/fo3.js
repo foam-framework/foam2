@@ -16,7 +16,7 @@
  */
 
 var GLOBAL = global || this;
-var X = X;
+var X = GLOBAL.X;
 
 // Bootstrap Support, discarded after use
 GLOBAL.Bootstrap = {
@@ -114,33 +114,20 @@ GLOBAL.Bootstrap.start();
 
 CLASS({
   name: 'FObject',
-  extends: null,
 
   documentation: 'Base model for model hierarchy.',
 
-  methods: [
+  axioms: [
     {
       name: 'hasOwnProperty',
-      code: function(name) { return this.instance_.hasOwnProperty(name); }
-    },
-    {
-      // TODO: not essential to be in bootstrap, move out
-      name: 'clearProperty',
-      code: function(name) { delete this.instance_[name]; }
-    },
-    {
-      name: 'toString',
-      code: function() {
-        // Distinguish between prototypes and instances.
-        return this.model_.name + (this.instance_ ? '' : 'Proto')
+      installInProto: function(proto) {
+        proto[this.name] = function(name) { return this.instance_.hasOwnProperty(name); }
       }
     }
-  ],
-
-  // TODO: insert core/FObject.js functionality
-
-  // TODO: insert EventService and PropertyChangeSupport here
+  ]
 });
+
+
 
 
 CLASS({
@@ -384,6 +371,29 @@ CLASS({
 
 
 GLOBAL.Bootstrap.end();
+
+CLASS({
+  name: 'FObject',
+
+  methods: [
+    {
+      // TODO: not essential to be in bootstrap, move out
+      name: 'clearProperty',
+      code: function(name) { delete this.instance_[name]; }
+    },
+    {
+      name: 'toString',
+      code: function() {
+        // Distinguish between prototypes and instances.
+        return this.model_.name + (this.instance_ ? '' : 'Proto')
+      }
+    }
+  ],
+
+  // TODO: insert core/FObject.js functionality
+
+  // TODO: insert EventService and PropertyChangeSupport here
+});
 
 
 CLASS({
