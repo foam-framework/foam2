@@ -25,19 +25,19 @@ GLOBAL.Bootstrap = {
   classes: [],
 
   start: function() {
-    GLOBAL.CLASS = GLOBAL.Bootstrap.CLASS.bind(GLOBAL.Bootstrap);
+    GLOBAL.CLASS = GLOBAL.Bootstrap.CLASS.bind(Bootstrap);
   },
 
   getClass: (function() {
     /*
       Create or Update a Prototype from a psedo-Model definition.
-      'this' is a Model.
+      (Model is 'this').
     */
 
     var AbstractClass = {
-      proto: {},
+      prototype: {},
       create: function(args) {
-        var obj = Object.create(this.proto);
+        var obj = Object.create(this.prototype);
         obj.instance_ = {};
 
         // TODO: lookup if valid method names
@@ -45,9 +45,28 @@ GLOBAL.Bootstrap = {
 
         return obj;
       },
+      installModel: function(m) {
+        if ( m.axioms )
+          for ( var i = 0 ; i < m.axioms.length ; i++ )
+            this.installAxiom(m.axioms[i]);
+        
+        if ( m.methods )
+          for ( var i = 0 ; i < m.methods.length ; i++ ) {
+            var meth = m.methods[i];
+            this.prototype[meth.name] = meth.code;
+          }
+        
+        if ( X.Property && m.properties )
+          for ( var i = 0 ; i < m.properties.length ; i++ ) {
+            var p    = m.properties[i];
+            var type = X[(p.type || '') + 'Property'] || X.Property;
+            var axiom = type.create(p);
+            this.installAxiom(axiom);
+          }
+      },
       installAxiom: function(a) {
         a.installInClass && a.installInClass(this);
-        a.installInProto && a.installInProto(this.proto);
+        a.installInProto && a.installInProto(this.prototype);
       }
     };
 
@@ -57,36 +76,16 @@ GLOBAL.Bootstrap = {
       if ( ! cls ) {
         var parent = this.extends ? X[this.extends] : AbstractClass ;
         cls = Object.create(parent);
-        cls.proto = Object.create(parent.proto);
-        cls.proto.cls_ = cls;
+        cls.prototype = Object.create(parent.prototype);
+        cls.prototype.cls_ = cls;
+        cls.ID___  = this.name + 'Class';
+        cls.prototype.ID___  = this.name + 'Prototype';
         cls.name   = this.name;
         cls.model_ = this;
         X[cls.name] = cls;
       }
 
-      var proto = cls.proto;
-
-      if ( this.axioms )
-        for ( var i = 0 ; i < this.axioms.length ; i++ )
-          cls.installAxiom(this.axioms[i]);
-
-      // TODO: combine with axioms
-      if ( this.methods ) {
-        for ( var i = 0 ; i < this.methods.length ; i++ ) {
-          var meth = this.methods[i];
-          proto[meth.name] = meth.code;
-        }
-      }
-
-      // TODO: combine with axioms
-      if ( X.Property && this.properties ) {
-        for ( var i = 0 ; i < this.properties.length ; i++ ) {
-          var p    = this.properties[i];
-          var type = X[(p.type || '') + 'Property'] || X.Property;
-          var axiom = type.create(p);
-          cls.installAxiom(axiom);
-        }
-      }
+      cls.installModel(this);
 
       return cls;
     };
@@ -110,24 +109,20 @@ GLOBAL.Bootstrap = {
 };
 
 
-GLOBAL.Bootstrap.start();
+Bootstrap.start();
 
 CLASS({
   name: 'FObject',
 
   documentation: 'Base model for model hierarchy.',
 
-  axioms: [
+  methods: [
     {
       name: 'hasOwnProperty',
-      installInProto: function(proto) {
-        proto[this.name] = function(name) { return this.instance_.hasOwnProperty(name); }
-      }
+      code: function(name) { return this.instance_.hasOwnProperty(name); }
     }
   ]
 });
-
-
 
 
 CLASS({
@@ -280,7 +275,7 @@ CLASS({
 
             // TODO: fire property change event
 
-            // TODO: call GLOBAL setter
+            // TODO: call global setter
 
             if ( postSet ) postSet.call(this, oldValue, newValue, prop);
           },
@@ -370,7 +365,8 @@ CLASS({
 });
 
 
-GLOBAL.Bootstrap.end();
+Bootstrap.end();
+
 
 CLASS({
   name: 'FObject',
@@ -385,7 +381,7 @@ CLASS({
       name: 'toString',
       code: function() {
         // Distinguish between prototypes and instances.
-        return this.cls_.model_.name + (this.instance_ ? '' : 'Proto')
+        return this.model_.name + (this.instance_ ? '' : 'Proto')
       }
     }
   ],
