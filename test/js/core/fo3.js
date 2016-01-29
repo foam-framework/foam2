@@ -96,24 +96,45 @@ describe('Property Factory', function() {
 
 
 
+describe('Property default value', function() {
+  var t;
+  
+  beforeEachTest(function() {
+    CLASS({
+      name: 'DefaultValue',
+      properties: [
+        {
+          name: 'a',
+          defaultValue: 42
+        }
+      ]
+    });
+    t= X.DefaultValue.create({});
+  });
+  afterEach(function() {
+    t = null;
+  });
 
+  it('provides the value when not set', function() {
+    expect(t.a).toEqual(42);
+  });
 
-//
-// CLASS({
-//   name: 'DefaultValue',
-//   properties: [
-//     {
-//       name: 'a',
-//       defaultValue: 42
-//     }
-//   ]
-// });
-// var dv = DefaultValue.create({});
-// console.assert(dv.a == 42, 'DefaultValues don\'t work.');
-// dv.a = 84;
-// console.assert(dv.a == 84, 'DefaultValues don\'t update.');
-// dv.clearProperty('a');
-// console.assert(dv.a == 42, 'clearProperty doesn\'t work.');
+  it('is overwritten by a set value', function() {
+    expect(t.a).toEqual(42);
+    t.a = 84;
+    expect(t.a).toEqual(84);
+  });
+
+  it('provides the value when cleared', function() {
+    expect(t.a).toEqual(42);
+    t.a = 84;
+    expect(t.a).toEqual(84);
+    t.clearProperty('a');
+    expect(t.a).toEqual(42);    
+  });
+
+});
+
 //
 // var ap = ArrayProperty.create({});
 // console.assert(ap.preSet, 'ArrayProperty.preSet missing.');
