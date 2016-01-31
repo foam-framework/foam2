@@ -120,6 +120,7 @@ describe('Global scope pollution', function() {
           expect(err).toBeFalsy();
 
           var context = vm.createContext(window);
+          context.console = console;
           var whitelistMap = buildWhitelistMap(context, globalWhitelist);
           vm.runInContext('global = undefined;window = this;' + coreScriptContents, context);
           var report = buildContextReport(context, whitelistMap);

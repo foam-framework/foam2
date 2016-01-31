@@ -39,15 +39,18 @@ GLOBAL.Bootstrap = {
       create: function(args) {
         var obj = Object.create(this.prototype);
         obj.instance_ = Object.create(null);
-
+        console.log('------------------------------------');
+        console.log('object create', this.prototype && this.prototype.ID___);
         if ( args ) {
           for ( var key in args )
-            if ( key.indexOf('_') == -1 )
+            if ( args.hasOwnProperty(key) ) { // skips stuff from the proto (when copying an existing instance)
               obj[key] = args[key];
+            }
 
           if ( args.instance_ )
-            for ( var key in args.instance_ )
-              obj[key] = args.instance_[key];
+            for ( var key in args.instance_ ) {
+              obj.instance_[key] = args.instance_[key]; // had to set instance_ directly, setter not ready yet?
+            }
         }
 
         return obj;
@@ -355,6 +358,7 @@ CLASS({
     {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
+        console.log('subtype', this.subType);
         return X[this.subType].create(o);
       }
     }
