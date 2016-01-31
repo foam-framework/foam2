@@ -166,17 +166,19 @@ describe('ArrayProperty', function() {
     expect(b.as).toEqual([]);
   });
   // TODO: enable when MyMdl.create(instanceA) clones correctly
-  // it('accepts an array value of the correct type', function() {
-  //   var b = X.B.create({});
-  //   var a = X.A.create({ a: 'a' });
-  //   var aa = X.A.create({ a: 'aa' });
-  //
-  //   b.as = [a, aa];
-  //   expect(b.as.toString()).toEqual([a, aa].toString());
-  //
-  //   expect(b.as[0]).toEqual(a);
-  //   expect(b.as[1]).toEqual(aa);
-  // });
+  it('accepts an array value of the correct type', function() {
+    var b = X.B.create({});
+    var a = X.A.create({ a: 'a' });
+    var aa = X.A.create({ a: 'aa' });
+
+    b.as = [a, aa];
+    expect(b.as.toString()).toEqual([a, aa].toString());
+
+    console.log('b',b.as[0], 'a', a)
+
+    expect(b.as[0]).toEqual(a);
+    expect(b.as[1]).toEqual(aa);
+  });
 
 });
 

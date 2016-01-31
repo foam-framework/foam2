@@ -38,10 +38,17 @@ GLOBAL.Bootstrap = {
       prototype: {},
       create: function(args) {
         var obj = Object.create(this.prototype);
-        obj.instance_ = {};
+        obj.instance_ = Object.create(null);
 
-        // TODO: lookup if valid method names
-        for ( var key in args ) obj[key] = args[key];
+        if ( args ) {
+          for ( var key in args )
+            if ( key.indexOf('_') == -1 )
+              obj[key] = args[key];
+
+          if ( args.instance_ )
+            for ( var key in args.instance_ )
+              obj[key] = args.instance_[key];
+        }
 
         return obj;
       },
@@ -52,16 +59,18 @@ GLOBAL.Bootstrap = {
         
         if ( m.methods )
           for ( var i = 0 ; i < m.methods.length ; i++ ) {
-            var meth = m.methods[i];
-            this.prototype[meth.name] = meth.code;
+            var a = m.methods[i];
+            if ( typeof a === 'function' )
+              m.methods[i] = a = { name: a.name, code: a };
+            this.prototype[a.name] = a.code;    
           }
         
         if ( X.Property && m.properties )
           for ( var i = 0 ; i < m.properties.length ; i++ ) {
-            var p    = m.properties[i];
-            var type = X[(p.type || '') + 'Property'] || X.Property;
-            var axiom = type.create(p);
-            this.installAxiom(axiom);
+            var a = m.properties[i];
+            if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
+            var type = X[(a.type || '') + 'Property'] || X.Property;
+            this.installAxiom(type.create(a)); 
           }
       },
       installAxiom: function(a) {
@@ -70,7 +79,7 @@ GLOBAL.Bootstrap = {
       }
     };
 
-    return function() {
+    return function getClass() {
       var cls = X[this.name];
 
       if ( ! cls ) {
@@ -117,9 +126,8 @@ CLASS({
   documentation: 'Base model for model hierarchy.',
 
   methods: [
-    {
-      name: 'hasOwnProperty',
-      code: function(name) { return this.instance_.hasOwnProperty(name); }
+    function hasOwnProperty(name) {
+      return Object.hasOwnProperty.call(this.instance_, name);
     }
   ]
 });
@@ -164,7 +172,7 @@ CLASS({
       },
       adaptArrayElement: function(e) {
         if ( typeof e === 'function' ) {
-          console.assert(e.name, 'Method must be named');
+          //GLOBAL.console.assert(e.name, 'Method must be named');
           return X.Method.create({name: e.name, code: e});
         }
         return e;
@@ -173,10 +181,7 @@ CLASS({
   ],
 
   methods: [
-    {
-      name: 'getClass',
-      code: GLOBAL.Bootstrap.getClass
-    }
+    GLOBAL.Bootstrap.getClass
   ]
 });
 
@@ -213,75 +218,70 @@ CLASS({
   ],
 
   methods: [
-    {
-      name: 'installInClass',
-      code: function(c) { c[X.constantize(this.name)] = this;
-      }
-    },
-    {
-      name: 'installInProto',
-      code: function(proto) {
-        /*
-          Install a property onto a prototype from a Property definition.
-          (Property is 'this').
-        */
-        var prop            = this;
-        var name            = this.name;
-        var adapt           = this.adapt
-        var preSet          = this.preSet;
-        var postSet         = this.postSet;
-        var factory         = this.factory;
-        var hasDefaultValue = this.hasOwnProperty('defaultValue');
-        var defaultValue    = this.defaultValue;
+    function installInClass(c) { c[X.constantize(this.name)] = this; },
+    function installInProto(proto) {
+      /*
+        Install a property onto a prototype from a Property definition.
+        (Property is 'this').
+      */
+      var prop            = this;
+      var name            = this.name;
+      var adapt           = this.adapt
+      var name            = this.name;
+      var adapt           = this.adapt
+      var preSet          = this.preSet;
+      var postSet         = this.postSet;
+      var factory         = this.factory;
+      var hasDefaultValue = this.hasOwnProperty('defaultValue');
+      var defaultValue    = this.defaultValue;
 
-        /* Future: needs events and slot support first.
-           var slotName        = name + '$';
-           Object.defineProperty(proto, slotName, {
-           get: function propSlotGetter() {
-           return this.getSlot(name);
-           },
-           set: function propSlotSetter(value) {
-           value.link.link(this.getSlot(name));
-           },
-           configurable: true
-           });
-        */
+      /* Future: needs events and slot support first.
+         var slotName        = name + '$';
+         Object.defineProperty(proto, slotName, {
+         get: function propSlotGetter() {
+         return this.getSlot(name);
+         },
+         set: function propSlotSetter(value) {
+         value.link.link(this.getSlot(name));
+         },
+         configurable: true
+         });
+      */
 
-        // TODO: implement 'expression'
+      // TODO: implement 'expression'
 
-        Object.defineProperty(proto, name, {
-          get: prop.getter || function propGetter() {
-            if ( ( hasDefaultValue || factory ) &&
-                 ! this.instance_.hasOwnProperty(name) )
-            {
-              if ( hasDefaultValue ) return defaultValue;
+      Object.defineProperty(proto, name, {
+        get: prop.getter || function propGetter() {
+          if ( ( hasDefaultValue || factory ) &&
+               ! this.hasOwnProperty(name) )
+          {
+            if ( hasDefaultValue ) return defaultValue;
 
-              var value = factory.call(this);
-              this.instance_[name] = value;
-              return value;
-            }
+            var value = factory.call(this);
+            this.instance_[name] = value;
+            return value;
+          }
 
-            return this.instance_[name];
-          },
-          set: prop.setter || function propSetter(newValue) {
-            // TODO: add logic to not trigger factory
-            var oldValue = this[name];
+          return this.instance_[name];
+        },
+        set: prop.setter || function propSetter(newValue) {
+          // TODO: add logic to not trigger factory
+          var oldValue = this[name];
 
-            if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
+          if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
 
-            if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
+          if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
 
-            this.instance_[name] = newValue;
+          this.instance_[name] = newValue;
 
-            // TODO: fire property change event
+          // TODO: fire property change event
 
-            // TODO: call global setter
+          // TODO: call global setter
 
-            if ( postSet ) postSet.call(this, oldValue, newValue, prop);
-          },
-          configurable: true
-        });
-      }
+          if ( postSet ) postSet.call(this, oldValue, newValue, prop);
+        },
+        configurable: true
+      }); 
     }
   ]
 });
@@ -301,10 +301,7 @@ CLASS({
   ],
 
   methods: [
-    {
-      name: 'installInProto',
-      code: function(proto) { proto[this.name] = this.code; }
-    }
+    function installInProto(proto) { proto[this.name] = this.code; }
   ]
 });
 
@@ -372,17 +369,10 @@ CLASS({
   name: 'FObject',
 
   methods: [
-    {
-      // TODO: not essential to be in bootstrap, move out
-      name: 'clearProperty',
-      code: function(name) { delete this.instance_[name]; }
-    },
-    {
-      name: 'toString',
-      code: function() {
-        // Distinguish between prototypes and instances.
-        return this.model_.name + (this.instance_ ? '' : 'Proto')
-      }
+    function clearProperty(name) { delete this.instance_[name]; },
+    function toString() {
+      // Distinguish between prototypes and instances.
+      return this.cls_.model_.name + (this.instance_ ? '' : 'Proto');
     }
   ],
 
@@ -419,14 +409,8 @@ CLASS({
   ],
 
   methods: [
-    {
-      name: 'installInClass',
-      code: function(cls) { cls[X.constantize(this.name)] = this.value; }
-    },
-    {
-      name: 'installInProto',
-      code: function(proto) { proto[X.constantize(this.name)] = this.value; }
-    }
+    function installInClass(cls) { cls[X.constantize(this.name)] = this.value; },
+    function installInProto(proto) { proto[X.constantize(this.name)] = this.value; }
   ]
 });
 
