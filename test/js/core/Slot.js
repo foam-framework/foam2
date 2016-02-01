@@ -92,7 +92,7 @@ describe('Slot.recordListener', function() {
 
 });
 
-describe('Slot.addFollower', function() {
+describe('Slot.pipe', function() {
   var slotA;
   var slotB;
 
@@ -106,8 +106,8 @@ describe('Slot.addFollower', function() {
   });
 
   it('adds follower and updates propagate', function() {
-    slotA.addFollower(); // should be ignored
-    slotA.addFollower(slotB);
+    slotA.pipe(); // should be ignored
+    slotA.pipe(slotB);
     slotA.set('hello');
     expect(slotB.get()).toEqual('hello');
     slotB.set(4); // B isn't following A
@@ -115,8 +115,8 @@ describe('Slot.addFollower', function() {
   });
 
   it('adds reciprocal followers and updates propagate but do not feed back', function() {
-    slotA.addFollower(slotB);
-    slotB.addFollower(slotA);
+    slotA.pipe(slotB);
+    slotB.pipe(slotA);
     slotA.set('hello');
     expect(slotB.get()).toEqual('hello');
     slotB.set(4);
@@ -125,7 +125,7 @@ describe('Slot.addFollower', function() {
 
 });
 
-describe('Slot.removeFollower', function() {
+describe('Slot.unpipe', function() {
   var slotA;
   var slotB;
 
@@ -139,18 +139,18 @@ describe('Slot.removeFollower', function() {
   });
 
   it('removes follower and stops propagation', function() {
-    slotA.addFollower(slotB);
+    slotA.pipe(slotB);
     slotA.set('hello');
     expect(slotB.get()).toEqual('hello');
 
-    slotA.removeFollower(slotB);
+    slotA.unpipe(slotB);
     slotA.set('goodbye');
     expect(slotB.get()).toEqual('hello');
   });
 
   it('remove ignores non-existent follower', function() {
-    slotA.removeFollower();
-    slotA.removeFollower(slotB);
+    slotA.unpipe();
+    slotA.unpipe(slotB);
     slotA.set('hello');
     expect(slotB.get()).toBeUndefined();
   });
@@ -298,7 +298,7 @@ describe('Slot.destroy', function() {
 
     slotA.destroy();// ignored
 
-    slotA.addFollower(slotB);
+    slotA.pipe(slotB);
     slotA.set('hello');
     expect(slotB.get()).toEqual('hello');
 

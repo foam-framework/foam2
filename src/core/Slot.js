@@ -69,7 +69,7 @@ CLASS({
     /** Have the dstSlot listen to changes in this Slot and update
         its value to be the same.
         @param dstSlot the slot to push updates into. **/
-    function addFollower(dstSlot) {
+    function pipe(dstSlot) {
       if ( ! this.followers_ ) this.followers_ = {};
       if ( ! dstSlot ) return;
       var self = this;
@@ -82,7 +82,7 @@ CLASS({
     },
 
     /** Have the dstSlot stop listening for changes to the srcSlot. **/
-    function removeFollower(dst) {
+    function unpipe(dst) {
       if ( ! this.followers_ ) this.followers_ = {};
       if ( ! dst ) return;
       var listener = this.followers_[dst];
@@ -114,8 +114,8 @@ CLASS({
      **/
     function link(dstSlot) {
       if ( ! dstSlot ) return;
-      this.addFollower(dstSlot);
-      dstSlot.addFollower(this);
+      this.pipe(dstSlot);
+      dstSlot.pipe(this);
     },
 
 
@@ -155,8 +155,8 @@ CLASS({
     /** Unlink the Slots of two models by having them no longer follow each other. **/
     function unlink(dstSlot) {
       if ( ! dstSlot ) return;
-      this.removeFollower(dstSlot);
-      dstSlot.removeFollower(this);
+      this.unpipe(dstSlot);
+      dstSlot.unpipe(this);
     },
 
     /** Cleans up any remaining followers.
