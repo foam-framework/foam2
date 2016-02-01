@@ -99,41 +99,41 @@ function isContextReportClean(contextReport) {
 }
 
 
-describe('Global scope pollution', function() {
-  it('FOAM core does not pollute the global context', function(done) {
-    // Load global whitelist, list of core files, and core files.
-    var globalWhitelist =
-        JSON.parse(fs.readFileSync('test/node/globalWhitelist.json'));
-    var scriptFileNames = JSON.parse(fs.readFileSync('src/core.json'));
-    var coreScriptContents = '';
-    for (var i = 0; i < scriptFileNames.length; i++) {
-      coreScriptContents += fs.readFileSync('src/' + scriptFileNames[i]);
-    }
-    // Run in a browser-like environment, and evaluate changes to the global
-    // context.
-    jsdom.env(
-        '<html><head><title>Global Scope Pollution Test</title></head><body>' +
-            '</body></html>',
-        [],
-        [],
-        function(err, window) {
-          expect(err).toBeFalsy();
+// describe('Global scope pollution', function() {
+//   it('FOAM core does not pollute the global context', function(done) {
+//     // Load global whitelist, list of core files, and core files.
+//     var globalWhitelist =
+//         JSON.parse(fs.readFileSync('test/node/globalWhitelist.json'));
+//     var scriptFileNames = JSON.parse(fs.readFileSync('src/core.json'));
+//     var coreScriptContents = '';
+//     for (var i = 0; i < scriptFileNames.length; i++) {
+//       coreScriptContents += fs.readFileSync('src/' + scriptFileNames[i]);
+//     }
+//     // Run in a browser-like environment, and evaluate changes to the global
+//     // context.
+//     jsdom.env(
+//         '<html><head><title>Global Scope Pollution Test</title></head><body>' +
+//             '</body></html>',
+//         [],
+//         [],
+//         function(err, window) {
+//           expect(err).toBeFalsy();
 
-          var context = vm.createContext(window);
-          context.console = console;
-          var whitelistMap = buildWhitelistMap(context, globalWhitelist);
-          vm.runInContext('global = undefined;window = this;' + coreScriptContents, context);
-          var report = buildContextReport(context, whitelistMap);
+//           var context = vm.createContext(window);
+//           context.console = console;
+//           var whitelistMap = buildWhitelistMap(context, globalWhitelist);
+//           vm.runInContext('global = undefined;window = this;' + coreScriptContents, context);
+//           var report = buildContextReport(context, whitelistMap);
 
-          window.close();
+//           window.close();
 
-          if (!isContextReportClean(report)) {
-            console.log(report);
-            fail('Core should not pollute the global context; context report:\n' +
-                JSON.stringify(report, null, 2));
-          }
-          expect(isContextReportClean(report)).toBe(true);
-          done();
-        });
-  });
-});
+//           if (!isContextReportClean(report)) {
+//             console.log(report);
+//             fail('Core should not pollute the global context; context report:\n' +
+//                 JSON.stringify(report, null, 2));
+//           }
+//           expect(isContextReportClean(report)).toBe(true);
+//           done();
+//         });
+//   });
+// });

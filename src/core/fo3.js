@@ -19,13 +19,13 @@ var GLOBAL = global || this;
 var X = GLOBAL.X;
 
 // Bootstrap Support, discarded after use
-GLOBAL.Bootstrap = {
+X.Bootstrap = {
 
   // Temporary collection of classes to be updated later.
   classes: [],
 
   start: function() {
-    GLOBAL.CLASS = GLOBAL.Bootstrap.CLASS.bind(Bootstrap);
+    GLOBAL.CLASS = X.Bootstrap.CLASS.bind(X.Bootstrap);
   },
 
   getClass: (function() {
@@ -39,19 +39,7 @@ GLOBAL.Bootstrap = {
       create: function create(args) {
         var obj = Object.create(this.prototype);
         obj.instance_ = Object.create(null);
-//         console.log('------------------------------------');
-//         console.log('object create', this.prototype && this.prototype.ID___);
-//         if ( args ) {
-//           for ( var key in args )
-//             if ( args.hasOwnProperty(key) ) { // skips stuff from the proto (when copying an existing instance)
-//               obj[key] = args[key];
-//             }
 
-//           if ( args.instance_ )
-//             for ( var key in args.instance_ ) {
-//               obj.instance_[key] = args.instance_[key]; // had to set instance_ directly, setter not ready yet?
-//             }
-//         }
         obj.initArgs(args);
 
         return obj;
@@ -100,6 +88,9 @@ GLOBAL.Bootstrap = {
       },
       axiomsByClass: function axiomsByClass(cls) {
 
+      },
+      toString: function() {
+        return this.name + 'Class';
       }
     };
 
@@ -124,25 +115,36 @@ GLOBAL.Bootstrap = {
     };
   })(),
 
-  // Bootstrap Model definition which records incomplete models
-  // so they can be patched at the end of the bootstrap process.
+  // X.Bootstrap Model definition which records incomplete models
+  // so they can be patched at the end of the X.Bootstrap process.
   CLASS: function(m) {
     this.classes.push(this.getClass.call(m));
   },
 
-  end: function() {
+  endPhase1: function() {
+    // Upgrade to final CLASS() definition.
     GLOBAL.CLASS = function(m) { return X.Model.create(m).getClass(); };
 
+    // Upgrade existing classes to real classes.
     for ( var i = 0 ; i < this.classes.length ; i++ )
-      GLOBAL.CLASS(this.classes[i].model_);
+      CLASS(this.classes[i].model_);
+  },
 
-    GLOBAL.Bootstrap = null;
-    delete GLOBAL.Bootstrap;
+  end: function() {
+    // Substitute X.Bootstrap installModel() with
+    // simpler axiom-only version.
+    FObject.__proto__.installModel = function installModel(m) {
+      if ( m.axioms )
+        for ( var i = 0 ; i < m.axioms.length ; i++ )
+          this.installAxiom(m.axioms[i]);
+    };
+
+    X.Bootstrap = null;
   }
 };
 
 
-Bootstrap.start();
+X.Bootstrap.start();
 
 CLASS({
   name: 'FObject',
@@ -153,17 +155,14 @@ CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      if ( ! this.cls_.isInstance(args) ) {
-        for ( var key in args )
-          if ( key.indexOf('_') == -1 )
-            this[key] = args[key];
-      }
+      for ( var key in args )
+        if ( key.indexOf('_') == -1 )
+          this[key] = args[key];
 
       if ( args.instance_ )
-       for ( var key in args.instance_ )
+        for ( var key in args.instance_ )
           this[key] = args.instance_[key];
     },
-
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
     }
@@ -203,14 +202,9 @@ CLASS({
       type: 'Array',
       subType: 'Method',
       name: 'methods',
-      // TODO: this shouldn't be needed
-      adapt: function(_, a, prop) {
-        if ( ! a ) return [];
-        return a.map(prop.adaptArrayElement.bind(prop));
-      },
       adaptArrayElement: function(e) {
         if ( typeof e === 'function' ) {
-          //GLOBAL.console.assert(e.name, 'Method must be named');
+          console.assert(e.name, 'Method must be named');
           return X.Method.create({name: e.name, code: e});
         }
         return e;
@@ -219,7 +213,7 @@ CLASS({
   ],
 
   methods: [
-    GLOBAL.Bootstrap.getClass
+    X.Bootstrap.getClass
   ]
 });
 
@@ -259,12 +253,10 @@ CLASS({
     function installInClass(c) { c[X.constantize(this.name)] = this; },
     function installInProto(proto) {
       /*
-        Install a property onto a prototype from a Property definition.
+        Install a property onto a prototype from a X.Property definition.
         (Property is 'this').
       */
       var prop            = this;
-      var name            = this.name;
-      var adapt           = this.adapt
       var name            = this.name;
       var adapt           = this.adapt
       var preSet          = this.preSet;
@@ -314,7 +306,7 @@ CLASS({
 
           // TODO: fire property change event
 
-          // TODO: call global setter
+          // TODO: call X setter
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         },
@@ -376,14 +368,6 @@ CLASS({
       name: 'subType'
     },
     {
-      name: 'preSet',
-      defaultValue: function(_, a, prop) {
-        var cls = X[prop.subType];
-        // TODO: loop for performance
-        return a.map(function(p) { return cls.create(p); });
-      }
-    },
-    {
       name: 'adapt',
       defaultValue: function(_, a, prop) {
         if ( ! a ) return [];
@@ -393,15 +377,13 @@ CLASS({
     {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
-        console.log('subtype', this.subType);
         return X[this.subType].create(o);
       }
     }
   ]
 });
 
-
-Bootstrap.end();
+X.Bootstrap.endPhase1();
 
 
 CLASS({
@@ -411,13 +393,13 @@ CLASS({
     function clearProperty(name) { delete this.instance_[name]; },
     function toString() {
       // Distinguish between prototypes and instances.
-      return this.cls_.model_.name + (this.instance_ ? '' : 'Proto');
+      return this.cls_.name + (this.instance_ ? '' : 'Proto')
     }
   ],
 
   // TODO: insert core/FObject.js functionality
 
-  // TODO: insert EventService and PropertyChangeSupport here
+  // TODO: insert EventService and X.PropertyChangeSupport here
 });
 
 
@@ -461,10 +443,39 @@ CLASS({
     {
       type: 'AxiomArray',
       subType: 'Constant',
-      name: 'constants'
+      name: 'constants',
+      adapt: function(_, a, prop) {
+        if ( ! a ) return [];
+        if ( ! Array.isArray(a) ) {
+          var cs = [];
+          for ( var key in a )
+            cs.push(X.Constant.create({name: key, value: a[key]}));
+          return cs;
+        }
+        return a.map(prop.adaptArrayElement.bind(prop));
+      }
+    },
+    {
+      type: 'AxiomArray',
+      subType: 'Property',
+      name: 'properties'
+    },
+    {
+      type: 'AxiomArray',
+      subType: 'Method',
+      name: 'methods',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'function' ) {
+          console.assert(o.name, 'Method must be named');
+          return X.Method.create({name: o.name, code: o});
+        }
+        return X[this.subType].create(o);
+      }
     }
   ]
 });
+
+X.Bootstrap.end();
 
 
 /*
