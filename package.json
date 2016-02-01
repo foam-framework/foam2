@@ -5,11 +5,13 @@
     "es6-shim": "^0.34.2",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
+    "jsdoc": "^3.4.0",
     "jsdom": "^3.1.2"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover --include-all-sources -- jasmine",
-    "checkCoverage": "node checkCoverage.js"
+    "checkCoverage": "node checkCoverage.js",
+    "doc": "jsdoc -r -d ./doc/ ./src/"
   }
 }
