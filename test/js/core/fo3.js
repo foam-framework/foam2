@@ -186,6 +186,7 @@ describe('ArrayProperty', function() {
 
 describe('Constants', function() {
   var t;
+  var t2;
 
   beforeEachTest(function() {
     CLASS({
@@ -199,14 +200,32 @@ describe('Constants', function() {
       ]
     });
     t = X.ConstantTest.create({});
+    CLASS({
+      name: 'ConstantTest2',
+
+      constants: {
+        KEY: 'my_value',
+        KEY2: 'my_value2',
+      }
+
+    });
+    t2 = X.ConstantTest2.create({});
   });
   afterEach(function() {
     t = null;
+    t2 = null;
   });
 
   it('are available on instances', function() {
     expect(t.KEY).not.toBeUndefined();
     expect(t.KEY).toEqual('my_value');
+  });
+
+  it('accepts short map syntax', function() {
+    expect(t2.KEY).not.toBeUndefined();
+    expect(t2.KEY).toEqual('my_value');
+    expect(t2.KEY2).not.toBeUndefined();
+    expect(t2.KEY2).toEqual('my_value2');
   });
 
 });
