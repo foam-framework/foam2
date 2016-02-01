@@ -14,7 +14,7 @@ var beforeEachTest = function(callback) {
 
 describe('Property Getter and Setter', function() {
   var t;
-  
+
   beforeEachTest(function() {
     // NOTE: globals are not defined until corePromise is run by beforeEachTest()
     CLASS({
@@ -57,7 +57,7 @@ describe('Property Getter and Setter', function() {
 
 describe('Property Factory', function() {
   var t;
-  
+
   beforeEachTest(function() {
     CLASS({
       name: 'FactoryTest',
@@ -98,7 +98,7 @@ describe('Property Factory', function() {
 
 describe('Property default value', function() {
   var t;
-  
+
   beforeEachTest(function() {
     CLASS({
       name: 'DefaultValue',
@@ -130,7 +130,7 @@ describe('Property default value', function() {
     t.a = 84;
     expect(t.a).toEqual(84);
     t.clearProperty('a');
-    expect(t.a).toEqual(42);    
+    expect(t.a).toEqual(42);
   });
 
 });
@@ -138,7 +138,7 @@ describe('Property default value', function() {
 
 describe('ArrayProperty', function() {
   var t;
-  
+
   beforeEachTest(function() {
     CLASS({ name: 'A', properties: [ { name: 'a' } ] });
     CLASS({
@@ -186,7 +186,7 @@ describe('ArrayProperty', function() {
 
 describe('Constants', function() {
   var t;
-  
+
   beforeEachTest(function() {
     CLASS({
       name: 'ConstantTest',
@@ -212,10 +212,10 @@ describe('Constants', function() {
 });
 
 
-describe('Model.extends inheritance', function() {
+describe('Model.extends inheritance, isInstance(), isSubClass()', function() {
   var person;
   var employee;
-  
+
   beforeEachTest(function() {
     CLASS({
       name: 'Person',
@@ -248,7 +248,7 @@ describe('Model.extends inheritance', function() {
       ]
     });
     person = X.Person.create({name: 'Adam', age: 0});
-    
+
     CLASS({
       name: 'Employee',
       extends: 'Person',
@@ -284,6 +284,25 @@ describe('Model.extends inheritance', function() {
     expect(employee.KEY).toEqual('my_value');
   });
 
+  it('reports correct subclass checks', function() {
+    expect(X.Person.isSubClass(X.Employee)).toBe(true);
+    expect(X.Employee.isSubClass(X.Person)).toBe(false);
+
+    CLASS({ name: 'Fake' });
+    expect(X.Person.isSubClass(X.Fake)).toBe(false);
+  });
+
+  it('reports correct subclass checks', function() {
+    expect(X.Person.isInstance(person)).toBe(true);
+    expect(X.Employee.isInstance(person)).toBe(false);
+    expect(X.Person.isInstance(employee)).toBe(true);
+
+    CLASS({ name: 'Fake' });
+    expect(X.Person.isInstance(X.Fake.create({}))).toBe(false);
+  });
 });
+
+
+
 
 
