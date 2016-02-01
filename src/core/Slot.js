@@ -17,29 +17,36 @@
 
 var GLOBAL = global || this;
 var X = GLOBAL.X;
-//GLOBAL.console && GLOBAL.console.log("slot global", GLOBAL.X);
 
+CLASS({
+  name: 'Slot',
+  extends: 'PropertyChangePublisher',
 
-X.Slot = {
-
-  // TODO: Slot might be better as a trait or augmenter. Also, it only makes limited use of 
+  // TODO: Slot might be better as a trait or augmenter. Also, it only makes limited use of
   // event publishing and could just implement it itself (but then loses out on instrumentation
   // that might be done to event publishing)
-  __proto__: GLOBAL.X.PropertyChangePublisher,
 
-  //properties:
-  //followers_: {}, // maps destinationObj -> listenerFn
-  //value_: null, // default storage
+  properties: [
+    {
+      name: 'followers_',
+      factory: function() { return {}; }, // maps destinationObj -> listenerFn
+    },
+    {
+      name: 'value_',
+      defaultValue: null, // default storage
+    },
+  ],
 
+  methods: [
     /** Check equality and interpret NaN to equal NaN, for proper change detection.
         TODO: replace with stdlib version. */
-    equals: function(a, b) {
+    function equals(a, b) {
       return (a === b) || (a == b) || ((a !== a) && (b !== b));
     },
 
     /** Internal. Manages follower list. By default triggers the listener.
         @param opt_dontCallListener if true, does not trigger the listener. **/
-    recordListener_: function(dst, listener, opt_dontCallListener) {
+    function recordListener_(dst, listener, opt_dontCallListener) {
       if ( ! this.followers_ ) this.followers_ = {};
       console.assert( ! this.followers_[dst], 'recordListener: duplicate follow');
       this.followers_[dst] = listener;
@@ -49,12 +56,12 @@ X.Slot = {
 
     /** Returns the value stored in this Slot.
         Override to provide alternate value storage. */
-    get: function() {
+    function get() {
       return this.hasOwnProperty('value_') ? this.value_ : undefined;
     },
     /** Sets the value stored in this Slot.
         Override to provide alternate value storage. */
-    set: function(val) {
+    function set(val) {
       this.value_ = val;
       this.globalChange();
     },
@@ -62,7 +69,7 @@ X.Slot = {
     /** Have the dstSlot listen to changes in this Slot and update
         its value to be the same.
         @param dstSlot the slot to push updates into. **/
-    addFollower: function(dstSlot) {
+    function addFollower(dstSlot) {
       if ( ! this.followers_ ) this.followers_ = {};
       if ( ! dstSlot ) return;
       var self = this;
@@ -75,7 +82,7 @@ X.Slot = {
     },
 
     /** Have the dstSlot stop listening for changes to the srcSlot. **/
-    removeFollower: function(dst) {
+    function removeFollower(dst) {
       if ( ! this.followers_ ) this.followers_ = {};
       if ( ! dst ) return;
       var listener = this.followers_[dst];
@@ -89,7 +96,7 @@ X.Slot = {
      * Maps Slots from one model to another.
      * @param f maps Slots from srcSlot to dstSlot
      */
-    map: function(dstSlot, f) {
+    function map(dstSlot, f) {
       if ( ! dstSlot ) return;
       var self = this;
       this.recordListener_(dstSlot, function () {
@@ -105,7 +112,7 @@ X.Slot = {
      * Link the Slots of two models by having them follow each other.
      * Initial Slot is copied from srcSlot to dstSlot.
      **/
-    link: function(dstSlot) {
+    function link(dstSlot) {
       if ( ! dstSlot ) return;
       this.addFollower(dstSlot);
       dstSlot.addFollower(this);
@@ -118,7 +125,7 @@ X.Slot = {
      * @param fprime maps dstSlot to 'this'
      * @param removeFeedback disables feedback
      */
-    relate: function(dstSlot, f, fprime, removeFeedback) {
+    function relate(dstSlot, f, fprime, removeFeedback) {
       if ( ! dstSlot ) return;
 
       var self = this;
@@ -146,7 +153,7 @@ X.Slot = {
     },
 
     /** Unlink the Slots of two models by having them no longer follow each other. **/
-    unlink: function(dstSlot) {
+    function unlink(dstSlot) {
       if ( ! dstSlot ) return;
       this.removeFollower(dstSlot);
       dstSlot.removeFollower(this);
@@ -154,13 +161,13 @@ X.Slot = {
 
     /** Cleans up any remaining followers.
         TODO: is this how the object lifecycle should be implemented? */
-    destroy: function() {
+    function destroy() {
       if ( ! this.followers_ ) return;
       for(var key in this.followers_) {
         this.removeListener(this.followers_[key]);
       }
       this.followers_ = {};
     }
-
-}
+  ],
+});
 

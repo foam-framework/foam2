@@ -15,7 +15,7 @@ describe('EventService.oneTime', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -50,7 +50,7 @@ describe('EventService.consoleLog', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -82,7 +82,7 @@ describe('EventService.merged', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -184,7 +184,7 @@ describe('EventService.async', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -241,7 +241,7 @@ describe('EventService.framed', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.count += 1;
     }
@@ -306,14 +306,14 @@ describe('EventPublisher.hasListeners()', function() {
   var ep;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
   });
   afterEach(function() {
     ep = null;
   });
 
   it('reports correctly for no listeners, ever', function() {
-    expect(ep.subs_).toBeUndefined();
+    expect(ep.subs_).toBeNull();
     expect(ep.hasListeners()).toBe(false);
   });
 
@@ -383,7 +383,7 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -431,7 +431,7 @@ describe('EventPublisher.publish()/.pub_()', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -501,7 +501,7 @@ describe('EventPublisher.lazyPublish()', function() {
   var argFn;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -539,7 +539,7 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -618,7 +618,7 @@ describe('EventPublisher listener-unsubscribe', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -675,7 +675,7 @@ describe('EventPublisher async-publish', function() {
   var listener1;
 
   beforeEachTest(function() {
-    ep = Object.create(GLOBAL.X.EventPublisher);
+    ep = X.EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -710,7 +710,7 @@ describe('PropertyChangePublisher.add/removePropertyListener()', function() {
   var pcp;
 
   beforeEachTest(function() {
-    pcp = Object.create(GLOBAL.X.PropertyChangePublisher);
+    pcp = X.PropertyChangePublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -752,7 +752,7 @@ describe('PropertyChangePublisher.globalChange()', function() {
   var pcp;
 
   beforeEachTest(function() {
-    pcp = Object.create(GLOBAL.X.PropertyChangePublisher);
+    pcp = X.PropertyChangePublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.count += 1;
     }
@@ -782,7 +782,7 @@ describe('PropertyChangePublisher.propertyChange()', function() {
   var pcp;
 
   beforeEachTest(function() {
-    pcp = Object.create(GLOBAL.X.PropertyChangePublisher);
+    pcp = X.PropertyChangePublisher.create({});
     listener = function(publisher, topic, unsub, old, nu) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;

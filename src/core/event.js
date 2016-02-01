@@ -144,19 +144,21 @@ CLASS({
 // TODO: model static services like this one
 X.EventService = X.EventService_.create({});
 
-// MODEL({
-//   name: 'EventPublisher',
-X.EventPublisher = {
+CLASS({
+  name: 'EventPublisher',
 
-//   properties: [
-    //subs_: null, // inited to {} when first used
-//   ],
+  properties: [
+    {
+      name: 'subs_',
+      defaultValue: null, // inited to {} when first used
+    },
+  ],
 
-//   methods: [
+  methods: [
     /** Returns true if any listener exists for the given topic, or if no
      *  topic is specified returns true if a listener exists for the entire object.
      */
-    hasListeners: function(opt_topic) {
+    function hasListeners(opt_topic) {
       if ( ! opt_topic ) {
         // we have a subs_ object, and it has at least one entry
         return ( !! this.subs_ ) && ( this.hasDirectListeners_(this.subs_) );
@@ -182,7 +184,7 @@ X.EventPublisher = {
      *
      * @return number of subscriptions notified
      **/
-    publish: function(topic) {
+    function publish(topic) {
       return this.subs_ ?
         this.pub_(
           this.subs_,
@@ -193,7 +195,7 @@ X.EventPublisher = {
     },
 
     /** Publish asynchronously. **/
-    publishAsync: function(topic) {
+    function publishAsync(topic) {
       var args = X.EventService.argsToArray(arguments);
       var self = this;
       setTimeout( function() { self.publish.apply(self, args); }, 0);
@@ -204,7 +206,7 @@ X.EventPublisher = {
      * Objects/Protos which have children should override the
      * standard definition, which is the same as just calling publish().
      **/
-    deepPublish: function(topic) {
+    function deepPublish(topic) {
       return this.publish.apply(this, arguments);
     },
 
@@ -218,26 +220,26 @@ X.EventPublisher = {
      * TODO: why require the function to supply the topic again? We
      * already have it.
      **/
-    lazyPublish: function(topic, fn) {
+    function lazyPublish(topic, fn) {
       if ( this.hasListeners(topic) ) return this.publish.apply(this, fn());
       return 0;
     },
 
     /** Subscribe to notifications for the specified topic. **/
     // TODO: Return subscription
-    subscribe: function(topic, listener) {
+    function subscribe(topic, listener) {
       if ( ! this.subs_ ) this.subs_ = {};
       this.sub_(this.subs_, 0, topic, listener);
     },
 
     /** Unsubscribe a listener from the specified topic. **/
-    unsubscribe: function(topic, listener) {
+    function unsubscribe(topic, listener) {
       if ( ! this.subs_ ) return;
       this.unsub_(this.subs_, 0, topic, listener);
     },
 
     /** Unsubscribe all listeners from this service. **/
-    unsubscribeAll: function() {
+    function unsubscribeAll() {
       this.subs_ = {};
     },
 
@@ -246,7 +248,7 @@ X.EventPublisher = {
 //     //                                            Internal
 //     /////////////////////////////////////////////////////
 
-    pub_: function(map, topicIndex, topic, msg) {
+    function pub_(map, topicIndex, topic, msg) {
       /**
         map: topicMap, topicIndex: index into 'topic', topic: array of topic path
         return: number of listeners published to
@@ -269,7 +271,7 @@ X.EventPublisher = {
       return count;
     },
 
-    sub_: function(map, topicIndex, topic, listener) {
+    function sub_(map, topicIndex, topic, listener) {
       if ( topicIndex == topic.length ) {
         if ( ! map[null] ) map[null] = [];
         map[null].push(listener);
@@ -282,7 +284,7 @@ X.EventPublisher = {
       }
     },
 
-    unsub_: function(map, topicIndex, topic, listener) {
+    function unsub_(map, topicIndex, topic, listener) {
       /**
         map: topicMap, topicIndex: index into 'topic', topic: array of topic path
         return: true iff there are no subscritions for this topic left
@@ -310,7 +312,7 @@ X.EventPublisher = {
     },
 
     /** @return true if the message was delivered without error. **/
-    notifyListener_: function(topic, listener, msg, pathToListener) {
+    function notifyListener_(topic, listener, msg, pathToListener) {
       var unsub = function unsubscribe() {
         this.unsubscribe(pathToListener, listener);
       }.bind(this);
@@ -322,7 +324,7 @@ X.EventPublisher = {
     /** @return number of listeners notified.
         @param pathToListener provides the topic the listener was originally
         subscribed to, in order to find it. **/
-    notifyListeners_: function(topic, listeners, msg, pathToListener) {
+    function notifyListeners_(topic, listeners, msg, pathToListener) {
       if ( listeners == null ) return 0;
       if ( Array.isArray(listeners) ) {
         var originalLength = listeners.length;
@@ -344,7 +346,7 @@ X.EventPublisher = {
     },
 
     /** Internal. Returns true if any listeners are present in the given subs_ object. */
-    hasAnyListeners_: function(map) {
+    function hasAnyListeners_(map) {
       for ( var key in map ) {
         subMap = map[key];
         return this.hasDirectListeners_(subMap) || this.hasAnyListeners_(subMap);
@@ -352,31 +354,27 @@ X.EventPublisher = {
     },
 
     /** Internal. Returns true if the given subs_ has direct listeners in its null key. */
-    hasDirectListeners_: function(map) {
+    function hasDirectListeners_(map) {
       return !! ( map[null] && map[null].length );
     },
-
-
-//});
-};
+  ],
+});
 
 
 // /** Extend EventPublisher with support for dealing with property-change notification. **/
-// MODEL({
-//   name: 'PropertyChangePublisher',
-X.PropertyChangePublisher = {
-//   extends: 'EventPublisher',
-  __proto__: X.EventPublisher,
+CLASS({
+  name: 'PropertyChangePublisher',
+  extends: 'EventPublisher',
 
-//   constants: {
-//     /** Root for property topics. **/
-  PROPERTY_TOPIC: 'property',
-//   },
+  constants: [
+    /** Root for property topics. **/
+    { name: 'PROPERTY_TOPIC', value: 'property' },
+  ],
 
-//   methods: {
+  methods: [
     /** Create a topic for the specified property name.
       TODO: re-add memoize1 when available */
-    propertyTopic: /*memoize1(*/function (property) {
+    /*memoize1(*/function propertyTopic(property) {
       return property ? [ this.PROPERTY_TOPIC, property ] : [ this.PROPERTY_TOPIC ];
     }/*)*/,
 
@@ -384,13 +382,13 @@ X.PropertyChangePublisher = {
         @param property the name of the property that has changed.
         @param oldValue the previous value
         @param newValue the new (current) value */
-    propertyChange: function(property, oldValue, newValue) {
+    function propertyChange(property, oldValue, newValue) {
       this.propertyChange_(this.propertyTopic(property), oldValue, newValue);
     },
 
     /** Internal. Indicate that a specific property has changed.
         @pararm propertyTopic the topic array for the property. */
-    propertyChange_: function(propertyTopic, oldValue, newValue) {
+    function propertyChange_(propertyTopic, oldValue, newValue) {
       // don't bother firing event if there are no listeners
       if ( ! this.subs_ ) return;
 
@@ -402,37 +400,37 @@ X.PropertyChangePublisher = {
     },
 
     /** Indicates that one or more unspecified properties have changed. **/
-    globalChange: function() {
+    function globalChange() {
       this.publish(this.propertyTopic(X.EventService.WILDCARD), null, null);
     },
 
     /** Adds a listener for all property changes. **/
-    addListener: function(listener) {
+    function addListener(listener) {
       // TODO: throw exception?
       console.assert(listener, 'Listener cannot be null.');
       this.addPropertyListener(null, listener);
     },
 
     /** Removes a listener for all property changes. **/
-    removeListener: function(listener) {
+    function removeListener(listener) {
       this.removePropertyListener(null, listener);
     },
 
     /** @param property the name of the property to listen to or 'null'
         to listen to all properties. **/
-    addPropertyListener: function(property, listener) {
+    function addPropertyListener(property, listener) {
       this.subscribe(this.propertyTopic(property), listener);
     },
 
     /** @param property the name of the property listened to or 'null'
         to remove an all-properties listener. **/
-    removePropertyListener: function(property, listener) {
+    function removePropertyListener(property, listener) {
       this.unsubscribe(this.propertyTopic(property), listener);
     },
 
 // // TODO: needed? where to put it...
 // //     /** Create a Value for the specified property. **/
-// //     propertyValue: function(prop) {
+// //     function propertyValue(prop) {
 // //       if ( ! prop ) throw 'Property Name required for propertyValue().';
 // //       var props = this.props_ || ( this.props_ = {} );
 // //       return Object.hasOwnProperty.call(props, prop) ?
@@ -440,5 +438,6 @@ X.PropertyChangePublisher = {
 // //         ( props[prop] = PropertyValue.create(this, prop) );
 // //     }
 //   }
-// });
-};
+  ],
+});
+
