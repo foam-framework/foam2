@@ -19,19 +19,17 @@ var GLOBAL = global || this;
 var X = GLOBAL.X;
 
 /** Publish and Subscribe Event Notification Service. **/
+CLASS({
+  name: 'EventService_',
 
-// MODEL({
-//   name: 'EventService',
-  X.EventService = {
+  constants: [
+     /** Used as topic suffix to specify broadcast to all sub-topics. **/
+     { name: 'WILDCARD', value: '*' },
+  ],
 
-//   constants: {
-//     /** Used as topic suffix to specify broadcast to all sub-topics. **/
-     WILDCARD: '*',
-//   },
-
-//   methods: [
-//     /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
-    oneTime: function(listener) {
+  methods: [
+    /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
+    function oneTime(listener) {
       return function() {
         listener.apply(this, X.EventService.argsToArray(arguments));
         arguments[2](); // the unsubscribe fn
@@ -39,7 +37,7 @@ var X = GLOBAL.X;
     },
 
     /** Log all listener invocations to console. **/
-    consoleLog: function(listener) {
+    function consoleLog(listener) {
       return function() {
         var args = X.EventService.argsToArray(arguments);
         console.log(args);
@@ -55,7 +53,7 @@ var X = GLOBAL.X;
      * @param opt_delay time in milliseconds of time-window, defaults to 16ms, which is
      *        the smallest delay that humans aren't able to perceive.
      **/
-    merged: function(listener, opt_delay, opt_X) {
+    function merged(listener, opt_delay, opt_X) {
       var X = opt_X || GLOBAL.X;
       var setTimeoutX = X.setTimeout;
       var delay = opt_delay || 16;
@@ -90,7 +88,7 @@ var X = GLOBAL.X;
      * Only the last notification is delivered.
      **/
     // TODO: execute immediately from within a requestAnimationFrame
-    framed: function(listener, opt_X) {
+    function framed(listener, opt_X) {
       var requestAnimationFrameX = ( opt_X && opt_X.requestAnimationFrame ) || requestAnimationFrame;
 
       return function() {
@@ -118,13 +116,13 @@ var X = GLOBAL.X;
     },
 
     /** Decorate a listener so that the event is delivered asynchronously. **/
-    async: function(listener, opt_X) {
+    function async(listener, opt_X) {
       return this.delay(0, listener, opt_X);
     },
 
     /** Decorate a listener so that the event is delivered after a delay.
         @param delay the delay in ms **/
-    delay: function(delay, listener, opt_X) {
+    function delay(delay, listener, opt_X) {
       var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
       return function() {
         var args = GLOBAL.X.EventService.argsToArray(arguments);
@@ -133,17 +131,18 @@ var X = GLOBAL.X;
     },
 
     /** convenience method to append 'arguments' onto a real array */
-    appendArguments: function(a, args, start) {
+    function appendArguments(a, args, start) {
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
     },
     /** convenience method to turn 'arguments' into a real array */
-    argsToArray: function(args) {
+    function argsToArray(args) {
       return GLOBAL.X.EventService.appendArguments([], args, 0);
     },
-
-// });
-}
+  ],
+});
+// TODO: model static services like this one
+X.EventService = X.EventService_.create({});
 
 // MODEL({
 //   name: 'EventPublisher',
@@ -433,7 +432,7 @@ X.PropertyChangePublisher = {
 
 // // TODO: needed? where to put it...
 // //     /** Create a Value for the specified property. **/
-// //     function propertyValue(prop) {
+// //     propertyValue: function(prop) {
 // //       if ( ! prop ) throw 'Property Name required for propertyValue().';
 // //       var props = this.props_ || ( this.props_ = {} );
 // //       return Object.hasOwnProperty.call(props, prop) ?
