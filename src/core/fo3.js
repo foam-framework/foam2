@@ -36,22 +36,23 @@ GLOBAL.Bootstrap = {
 
     var AbstractClass = {
       prototype: {},
-      create: function(args) {
+      create: function create(args) {
         var obj = Object.create(this.prototype);
         obj.instance_ = Object.create(null);
-        console.log('------------------------------------');
-        console.log('object create', this.prototype && this.prototype.ID___);
-        if ( args ) {
-          for ( var key in args )
-            if ( args.hasOwnProperty(key) ) { // skips stuff from the proto (when copying an existing instance)
-              obj[key] = args[key];
-            }
+//         console.log('------------------------------------');
+//         console.log('object create', this.prototype && this.prototype.ID___);
+//         if ( args ) {
+//           for ( var key in args )
+//             if ( args.hasOwnProperty(key) ) { // skips stuff from the proto (when copying an existing instance)
+//               obj[key] = args[key];
+//             }
 
-          if ( args.instance_ )
-            for ( var key in args.instance_ ) {
-              obj.instance_[key] = args.instance_[key]; // had to set instance_ directly, setter not ready yet?
-            }
-        }
+//           if ( args.instance_ )
+//             for ( var key in args.instance_ ) {
+//               obj.instance_[key] = args.instance_[key]; // had to set instance_ directly, setter not ready yet?
+//             }
+//         }
+        obj.initArgs(args);
 
         return obj;
       },
@@ -59,26 +60,46 @@ GLOBAL.Bootstrap = {
         if ( m.axioms )
           for ( var i = 0 ; i < m.axioms.length ; i++ )
             this.installAxiom(m.axioms[i]);
-        
+
         if ( m.methods )
           for ( var i = 0 ; i < m.methods.length ; i++ ) {
             var a = m.methods[i];
             if ( typeof a === 'function' )
               m.methods[i] = a = { name: a.name, code: a };
-            this.prototype[a.name] = a.code;    
+            this.prototype[a.name] = a.code;
           }
-        
+
         if ( X.Property && m.properties )
           for ( var i = 0 ; i < m.properties.length ; i++ ) {
             var a = m.properties[i];
             if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
             var type = X[(a.type || '') + 'Property'] || X.Property;
-            this.installAxiom(type.create(a)); 
+            this.installAxiom(type.create(a));
           }
       },
       installAxiom: function(a) {
         a.installInClass && a.installInClass(this);
         a.installInProto && a.installInProto(this.prototype);
+      },
+      isInstance: function isInstance(o) {
+        return o.cls_ && this.isSubClass(o.cls_);
+      },
+      isSubClass: function isSubClass(o) {
+        // TODO: switch from 'name' to 'id' when available
+        if ( ! o ) return false;
+        var subClasses_;
+        if ( ! this.hasOwnProperty('subClasses_') ) {
+          this.subClasses_ = subClasses_ = {};
+        } else {
+          subClasses_ = this.subClasses_;
+        }
+        if ( ! subClasses_.hasOwnProperty(o.name) ) {
+          subClasses_[o.name] = ( o === this ) || this.isSubClass(o.__proto__);
+        }
+        return subClasses_[o.name];
+      },
+      axiomsByClass: function axiomsByClass(cls) {
+
       }
     };
 
@@ -129,6 +150,20 @@ CLASS({
   documentation: 'Base model for model hierarchy.',
 
   methods: [
+    function initArgs(args) {
+      if ( ! args ) return;
+
+      if ( ! this.cls_.isInstance(args) ) {
+        for ( var key in args )
+          if ( key.indexOf('_') == -1 )
+            this[key] = args[key];
+      }
+
+      if ( args.instance_ )
+       for ( var key in args.instance_ )
+          this[key] = args.instance_[key];
+    },
+
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
     }
@@ -284,7 +319,7 @@ CLASS({
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         },
         configurable: true
-      }); 
+      });
     }
   ]
 });
