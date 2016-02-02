@@ -16,7 +16,6 @@
  */
 
 var GLOBAL = global || this;
-var X = GLOBAL.X;
 
 /** Publish and Subscribe Event Notification Service. **/
 CLASS({
@@ -31,7 +30,7 @@ CLASS({
     /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
     function oneTime(listener) {
       return function() {
-        listener.apply(this, X.EventService.argsToArray(arguments));
+        listener.apply(this, GLOBAL.EventService.argsToArray(arguments));
         arguments[2](); // the unsubscribe fn
       };
     },
@@ -39,7 +38,7 @@ CLASS({
     /** Log all listener invocations to console. **/
     function consoleLog(listener) {
       return function() {
-        var args = X.EventService.argsToArray(arguments);
+        var args = GLOBAL.EventService.argsToArray(arguments);
         console.log(args);
 
         listener.apply(this, args);
@@ -55,7 +54,7 @@ CLASS({
      **/
     function merged(listener, opt_delay, opt_X) {
       var X = opt_X || GLOBAL.X;
-      var setTimeoutX = X.setTimeout;
+      var setTimeoutX = GLOBAL.setTimeout;
       var delay = opt_delay || 16;
 
       return function() {
@@ -69,7 +68,7 @@ CLASS({
             triggered = true;
             setTimeoutX(function() {
               triggered = false;
-              var args = X.EventService.argsToArray(lastArgs);
+              var args = GLOBAL.EventService.argsToArray(lastArgs);
               lastArgs = null;
               listener.apply(this, args);
             }, delay);
@@ -102,7 +101,7 @@ CLASS({
             triggered = true;
             requestAnimationFrameX(function() {
               triggered = false;
-              var args = GLOBAL.X.EventService.argsToArray(lastArgs);
+              var args = GLOBAL.EventService.argsToArray(lastArgs);
               lastArgs = null;
               listener.apply(this, args);
             });
@@ -125,7 +124,7 @@ CLASS({
     function delay(delay, listener, opt_X) {
       var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
       return function() {
-        var args = GLOBAL.X.EventService.argsToArray(arguments);
+        var args = GLOBAL.EventService.argsToArray(arguments);
         setTimeoutX( function() { listener.apply(null, args); }, delay );
       };
     },
@@ -137,12 +136,12 @@ CLASS({
     },
     /** convenience method to turn 'arguments' into a real array */
     function argsToArray(args) {
-      return GLOBAL.X.EventService.appendArguments([], args, 0);
+      return GLOBAL.EventService.appendArguments([], args, 0);
     },
   ],
 });
 // TODO: model static services like this one
-X.EventService = X.EventService_.create({});
+EventService = GLOBAL.EventService_.create({});
 
 CLASS({
   name: 'EventPublisher',
@@ -169,7 +168,7 @@ CLASS({
           if ( ! map ) return false; // if nothing to check, fail
           if ( this.hasDirectListeners_(map) ) return true; // if any listeners at this level, we're good
           var topic = opt_topic[t];
-          if ( topic == X.EventService.WILDCARD ) {
+          if ( topic == GLOBAL.EventService.WILDCARD ) {
             // if a wildcard is specified, find any listener at all
             return this.hasAnyListeners_(map);
           }
@@ -190,13 +189,13 @@ CLASS({
           this.subs_,
           0,
           topic,
-          X.EventService.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
+          GLOBAL.EventService.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
         0;
     },
 
     /** Publish asynchronously. **/
     function publishAsync(topic) {
-      var args = X.EventService.argsToArray(arguments);
+      var args = GLOBAL.EventService.argsToArray(arguments);
       var self = this;
       setTimeout( function() { self.publish.apply(self, args); }, 0);
     },
@@ -262,7 +261,7 @@ CLASS({
         var t = topic[topicIndex];
 
         // wildcard publish, so notify all sub-topics, instead of just one
-        if ( t == X.EventService.WILDCARD ) {
+        if ( t == GLOBAL.EventService.WILDCARD ) {
           return this.notifyListeners_(topic, map, msg, topic.slice(0, topicIndex-1));
         }
         if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
@@ -401,7 +400,7 @@ CLASS({
 
     /** Indicates that one or more unspecified properties have changed. **/
     function globalChange() {
-      this.publish(this.propertyTopic(X.EventService.WILDCARD), null, null);
+      this.publish(this.propertyTopic(GLOBAL.EventService.WILDCARD), null, null);
     },
 
     /** Adds a listener for all property changes. **/

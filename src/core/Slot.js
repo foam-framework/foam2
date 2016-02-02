@@ -16,7 +16,6 @@
  */
 
 var GLOBAL = global || this;
-var X = GLOBAL.X;
 
 CLASS({
   name: 'Slot',

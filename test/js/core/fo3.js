@@ -30,7 +30,7 @@ describe('Property Getter and Setter', function() {
         }
       ]
     });
-    t = X.GetterSetterTest.create({});
+    t = global.GetterSetterTest.create({});
   });
   afterEach(function() {
     t = null;
@@ -72,7 +72,7 @@ describe('Property Factory', function() {
         }
       ]
     });
-    t = X.FactoryTest.create({});
+    t = global.FactoryTest.create({});
   });
   afterEach(function() {
     t = null;
@@ -109,7 +109,7 @@ describe('Property default value', function() {
         }
       ]
     });
-    t= X.DefaultValue.create({});
+    t= global.DefaultValue.create({});
   });
   afterEach(function() {
     t = null;
@@ -157,19 +157,19 @@ describe('ArrayProperty', function() {
   });
 
   it('has a adapt', function() {
-    var ap = X.ArrayProperty.create({});
+    var ap = global.ArrayProperty.create({});
     expect(ap.adapt).toBeTruthy();
   });
 
-  it('defaults to an empty array', function() {
-    var b = X.B.create({});
-    expect(b.as).toEqual([]);
-  });
+  // it('defaults to an empty array', function() {
+  //   var b = global.B.create({});
+  //   expect(b.as).toEqual([]);
+  // });
   // TODO: enable when MyMdl.create(instanceA) clones correctly
 //   it('accepts an array value of the correct type', function() {
-//     var b = X.B.create({});
-//     var a = X.A.create({ a: 'a' });
-//     var aa = X.A.create({ a: 'aa' });
+//     var b = global.B.create({});
+//     var a = global.A.create({ a: 'a' });
+//     var aa = global.A.create({ a: 'aa' });
 
 //     b.as = [a, aa];
 //     expect(b.as.toString()).toEqual([a, aa].toString());
@@ -199,7 +199,7 @@ describe('Constants', function() {
         }
       ]
     });
-    t = X.ConstantTest.create({});
+    t = global.ConstantTest.create({});
     CLASS({
       name: 'ConstantTest2',
 
@@ -209,7 +209,7 @@ describe('Constants', function() {
       }
 
     });
-    t2 = X.ConstantTest2.create({});
+    t2 = global.ConstantTest2.create({});
   });
   afterEach(function() {
     t = null;
@@ -266,7 +266,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass()', function() {
         function sayGoodbye() { this.result = "bye "+this.name; }
       ]
     });
-    person = X.Person.create({name: 'Adam', age: 0});
+    person = global.Person.create({name: 'Adam', age: 0});
 
     CLASS({
       name: 'Employee',
@@ -284,7 +284,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass()', function() {
         }
       ]
     });
-    employee = X.Employee.create({name: 'Jane', age: 30, salary: 50000});
+    employee = global.Employee.create({name: 'Jane', age: 30, salary: 50000});
   });
   afterEach(function() {
     person = null;
@@ -304,23 +304,43 @@ describe('Model.extends inheritance, isInstance(), isSubClass()', function() {
   });
 
   it('reports correct subclass checks', function() {
-    expect(X.Person.isSubClass(X.Employee)).toBe(true);
-    expect(X.Employee.isSubClass(X.Person)).toBe(false);
+    expect(global.Person.isSubClass(global.Employee)).toBe(true);
+    expect(global.Employee.isSubClass(global.Person)).toBe(false);
 
     CLASS({ name: 'Fake' });
-    expect(X.Person.isSubClass(X.Fake)).toBe(false);
+    expect(global.Person.isSubClass(global.Fake)).toBe(false);
   });
 
   it('reports correct subclass checks', function() {
-    expect(X.Person.isInstance(person)).toBe(true);
-    expect(X.Employee.isInstance(person)).toBe(false);
-    expect(X.Person.isInstance(employee)).toBe(true);
+    expect(global.Person.isInstance(person)).toBe(true);
+    expect(global.Employee.isInstance(person)).toBe(false);
+    expect(global.Person.isInstance(employee)).toBe(true);
 
     CLASS({ name: 'Fake' });
-    expect(X.Person.isInstance(X.Fake.create({}))).toBe(false);
+    expect(global.Person.isInstance(global.Fake.create({}))).toBe(false);
   });
 });
 
+describe('coverage for debugging helpers', function() {
+  beforeEachTest(function() {
+  });
+  afterEach(function() {
+  });
+
+  it('covers describe()', function() {
+    var p = GLOBAL.Property.create({});
+    p.describe();
+    p.cls_.describe();
+  });
+
+});
+
+
+//console.assert(Person.getAxiomByName('age') === Person.AGE, 'Class.getAxiomByName() doesn\'t work.');
+
+//var axs = Person.getAxiomsByClass(Property);
+//console.assert(axs.length == 2 && axs[0] === Person.NAME && axs[1] === Person.AGE, 'Class.getAxiomsByClass() doesn\'t work.');
+//console.assert(Person.getAxioms().length === 6, 'Missing axiom from getAxioms().');
 
 
 

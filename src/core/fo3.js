@@ -15,17 +15,14 @@
  * limitations under the License.
  */
 
-var GLOBAL = global || this;
-var X = GLOBAL.X;
-
-// Bootstrap Support, discarded after use
-X.Bootstrap = {
+// Bootstrap support, discarded after use
+foam.boot = {
 
   // Temporary collection of classes to be updated later.
   classes: [],
 
   start: function() {
-    GLOBAL.CLASS = X.Bootstrap.CLASS.bind(X.Bootstrap);
+    global.CLASS = this.CLASS.bind(this);
   },
 
   getClass: (function() {
@@ -33,9 +30,9 @@ X.Bootstrap = {
       Create or Update a Prototype from a psedo-Model definition.
       (Model is 'this').
     */
-
     var AbstractClass = {
-      prototype: {},
+      prototype: Object.prototype,
+      axiomMap_: null,
       create: function create(args) {
         var obj = Object.create(this.prototype);
         obj.instance_ = Object.create(null);
@@ -57,15 +54,17 @@ X.Bootstrap = {
             this.prototype[a.name] = a.code;
           }
 
-        if ( X.Property && m.properties )
+        if ( global.Property && m.properties )
           for ( var i = 0 ; i < m.properties.length ; i++ ) {
             var a = m.properties[i];
             if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
-            var type = X[(a.type || '') + 'Property'] || X.Property;
+            var type = global[(a.type || '') + 'Property'] || Property;
             this.installAxiom(type.create(a));
           }
       },
       installAxiom: function(a) {
+        this.axiomMap_[a.name] = a;
+        this.axiomCache_ = {};
         a.installInClass && a.installInClass(this);
         a.installInProto && a.installInProto(this.prototype);
       },
@@ -75,19 +74,54 @@ X.Bootstrap = {
       isSubClass: function isSubClass(o) {
         // TODO: switch from 'name' to 'id' when available
         if ( ! o ) return false;
-        var subClasses_;
-        if ( ! this.hasOwnProperty('subClasses_') ) {
-          this.subClasses_ = subClasses_ = {};
-        } else {
-          subClasses_ = this.subClasses_;
-        }
-        if ( ! subClasses_.hasOwnProperty(o.name) ) {
+
+        var subClasses_ = this.hasOwnProperty('subClasses_') ?
+          this.subClasses_ :
+          this.subClasses_ = {} ;
+
+        if ( ! subClasses_.hasOwnProperty(o.name) )
           subClasses_[o.name] = ( o === this ) || this.isSubClass(o.__proto__);
-        }
+
         return subClasses_[o.name];
       },
-      axiomsByClass: function axiomsByClass(cls) {
+      describe: function(opt_name) {
+        console.log('CLASS:        ', this.name);
+        console.log('extends:      ', this.model_.extends);
+        console.log('----------------------------');
+        for ( var key in this.axiomMap_ ) {
+          var a = this.axiomMap_[key];
+          console.log(foam.string.rightPad(a.cls_.name, 14), a.name);
+        }
+      },
+      getAxiomByName: function(name) {
+        return this.axiomMap_[name];
+      },
+      // The Following method will eventually change.
+      // Would like to have efficient support for:
+      //    .where() .orderBy() groupBy
+      getAxiomsByClass: function(cls) {
+        var as = this.axiomCache_[cls.name];
+        if ( ! as ) {
+          as = [];
+          for ( var key in this.axiomMap_ ) {
+            var a = this.axiomMap_[key];
+            if ( cls.isInstance(a) )
+              as.push(a);
+          }
+          this.axiomCache_[cls.name] = as;
+        }
 
+        return as;
+      },
+      getAxioms: function() {
+        var as = this.axiomCache_[''];
+        if ( ! as ) {
+          as = [];
+          for ( var key in this.axiomMap_ )
+            as.push(this.axiomMap_[key]);
+          this.axiomCache_[''] = as;
+        }
+        return as;
       },
       toString: function() {
         return this.name + 'Class';
@@ -95,18 +129,22 @@ X.Bootstrap = {
     };
 
     return function getClass() {
-      var cls = X[this.name];
+      var cls = global[this.name];
 
       if ( ! cls ) {
-        var parent = this.extends ? X[this.extends] : AbstractClass ;
-        cls = Object.create(parent);
-        cls.prototype = Object.create(parent.prototype);
-        cls.prototype.cls_ = cls;
-        cls.ID___  = this.name + 'Class';
-        cls.prototype.ID___  = this.name + 'Prototype';
-        cls.name   = this.name;
-        cls.model_ = this;
-        X[cls.name] = cls;
+        var parent = this.extends ? global[this.extends] : AbstractClass ;
+        // TODO: make some of these values non-innumerable
+        cls                  = Object.create(parent);
+        cls.prototype        = Object.create(parent.prototype);
+        cls.prototype.cls_   = cls;
+        cls.prototype.model_ = this;
+        cls.prototype.ID__   = this.name + 'Prototype';
+        cls.ID__             = this.name + 'Class';
+        cls.axiomMap_        = Object.create(parent.axiomMap_);
+        cls.axiomCache_      = {};
+        cls.name             = this.name;
+        cls.model_           = this;
+        global[cls.name]     = cls;
       }
 
       cls.installModel(this);
@@ -115,15 +153,15 @@ X.Bootstrap = {
     };
   })(),
 
-  // X.Bootstrap Model definition which records incomplete models
-  // so they can be patched at the end of the X.Bootstrap process.
+  // Bootstrap Model definition which records incomplete models
+  // so they can be patched at the end of the bootstrap process.
   CLASS: function(m) {
     this.classes.push(this.getClass.call(m));
   },
 
   endPhase1: function() {
     // Upgrade to final CLASS() definition.
-    GLOBAL.CLASS = function(m) { return X.Model.create(m).getClass(); };
+    global.CLASS = function(m) { return Model.create(m).getClass(); };
 
     // Upgrade existing classes to real classes.
     for ( var i = 0 ; i < this.classes.length ; i++ )
@@ -131,20 +169,18 @@ X.Bootstrap = {
   },
 
   end: function() {
-    // Substitute X.Bootstrap installModel() with
-    // simpler axiom-only version.
+    // Substitute AbstractClass.installModel() with simpler axiom-only version.
     FObject.__proto__.installModel = function installModel(m) {
-      if ( m.axioms )
-        for ( var i = 0 ; i < m.axioms.length ; i++ )
-          this.installAxiom(m.axioms[i]);
+      for ( var i = 0 ; i < m.axioms.length ; i++ )
+        this.installAxiom(m.axioms[i]);
     };
 
-    X.Bootstrap = null;
+    delete foam['boot'];
   }
 };
 
 
-X.Bootstrap.start();
+foam.boot.start();
 
 CLASS({
   name: 'FObject',
@@ -177,9 +213,7 @@ CLASS({
   documentation: 'Class/Prototype description.',
 
   properties: [
-    {
-      name: 'name'
-    },
+    'name',
     {
       name: 'extends',
       defaultValue: 'FObject'
@@ -194,7 +228,7 @@ CLASS({
       subType: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        var cls = this.type ? X[this.type + 'Property'] : X.Property;
+        var cls = this.type ? global[this.type + 'Property'] : Property;
         return cls.create(o);
       }
     },
@@ -205,16 +239,14 @@ CLASS({
       adaptArrayElement: function(e) {
         if ( typeof e === 'function' ) {
           console.assert(e.name, 'Method must be named');
-          return X.Method.create({name: e.name, code: e});
+          return Method.create({name: e.name, code: e});
         }
         return e;
       }
     }
   ],
 
-  methods: [
-    X.Bootstrap.getClass
-  ]
+  methods: [ foam.boot.getClass ]
 });
 
 
@@ -223,37 +255,14 @@ CLASS({
   extends: 'FObject',
 
   properties: [
-    {
-      name: 'name'
-    },
-    {
-      name: 'type'
-    },
-    {
-      name: 'defaultValue'
-    },
-    {
-      name: 'factory'
-    },
-    {
-      name: 'adapt'
-    },
-    {
-      name: 'preSet'
-    },
-    {
-      name: 'postSet'
-    },
-    {
-      name: 'expression'
-    }
+    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression'
   ],
 
   methods: [
-    function installInClass(c) { c[X.constantize(this.name)] = this; },
+    function installInClass(c) { c[foam.string.constantize(this.name)] = this; },
     function installInProto(proto) {
       /*
-        Install a property onto a prototype from a X.Property definition.
+        Install a property onto a prototype from a Property definition.
         (Property is 'this').
       */
       var prop            = this;
@@ -306,7 +315,7 @@ CLASS({
 
           // TODO: fire property change event
 
-          // TODO: call X setter
+          // TODO: call global setter
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         },
@@ -321,14 +330,7 @@ CLASS({
   name: 'Method',
   extends: 'FObject',
 
-  properties: [
-    {
-      name: 'name'
-    },
-    {
-      name: 'code'
-    }
-  ],
+  properties: [ 'name', 'code' ],
 
   methods: [
     function installInProto(proto) { proto[this.name] = this.code; }
@@ -347,9 +349,7 @@ CLASS({
     },
     {
       name: 'preSet',
-      defaultValue: function(_, a) {
-        return a ? a.toString() : '';
-      }
+      defaultValue: function(_, a) { return a ? a.toString() : ''; }
     }
   ]
 });
@@ -360,12 +360,10 @@ CLASS({
   extends: 'Property',
 
   properties: [
+    'subType',
     {
       name: 'factory',
       defaultValue: function() { return []; }
-    },
-    {
-      name: 'subType'
     },
     {
       name: 'adapt',
@@ -377,13 +375,13 @@ CLASS({
     {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
-        return X[this.subType].create(o);
+        return global[this.subType].create(o);
       }
     }
   ]
 });
 
-X.Bootstrap.endPhase1();
+foam.boot.endPhase1();
 
 
 CLASS({
@@ -394,12 +392,21 @@ CLASS({
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.name + (this.instance_ ? '' : 'Proto')
+    },
+    function describe(opt_name) {
+      console.log('Instance of', this.cls_.name);
+      console.log('--------------------------------------------------');
+      var ps = this.cls_.getAxiomsByClass(Property);
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        var p = ps[i];
+        console.log(foam.string.rightPad(p.cls_.name, 20), foam.string.rightPad(p.name, 12), this[p.name]);
+      }
     }
   ],
 
   // TODO: insert core/FObject.js functionality
 
-  // TODO: insert EventService and X.PropertyChangeSupport here
+  // TODO: insert EventService and PropertyChangeSupport here
 });
 
 
@@ -421,17 +428,13 @@ CLASS({
   name: 'Constant',
 
   properties: [
-    {
-      name: 'name'
-    },
-    {
-      name: 'value'
-    }
+    { name: 'name'  },
+    { name: 'value' }
   ],
 
   methods: [
-    function installInClass(cls) { cls[X.constantize(this.name)] = this.value; },
-    function installInProto(proto) { proto[X.constantize(this.name)] = this.value; }
+    function installInClass(cls)   { cls[foam.string.constantize(this.name)]   = this.value; },
+    function installInProto(proto) { proto[foam.string.constantize(this.name)] = this.value; }
   ]
 });
 
@@ -449,7 +452,7 @@ CLASS({
         if ( ! Array.isArray(a) ) {
           var cs = [];
           for ( var key in a )
-            cs.push(X.Constant.create({name: key, value: a[key]}));
+            cs.push(Constant.create({name: key, value: a[key]}));
           return cs;
         }
         return a.map(prop.adaptArrayElement.bind(prop));
@@ -458,7 +461,12 @@ CLASS({
     {
       type: 'AxiomArray',
       subType: 'Property',
-      name: 'properties'
+      name: 'properties',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string'     ?
+          Property.create({name: o})     :
+          global[this.subType].create(o) ;
+      }
     },
     {
       type: 'AxiomArray',
@@ -467,23 +475,52 @@ CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
           console.assert(o.name, 'Method must be named');
-          return X.Method.create({name: o.name, code: o});
+          return Method.create({name: o.name, code: o});
         }
-        return X[this.subType].create(o);
+        return global[this.subType].create(o);
       }
     }
   ]
 });
 
-X.Bootstrap.end();
+CLASS({
+  name: 'FObject',
+  methods: [
+    function initArgs(args) {
+      if ( ! args ) return;
+
+      if ( args.__proto__ === Object.prototype ) {
+        for ( var key in args )
+          this[key] = args[key];
+      } else if ( args.instance_ ) {
+        for ( var key in args.instance_ )
+          this[key] = args.instance_[key];
+      } else {
+        // TODO: should walk through Axioms with initAgents instead
+        console.log("axioms check ---- ", this, this.__proto__);
+        var a = this.getAxiomsByClass(Property);
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          var name = a[i].name;
+          if ( args.hasOwnProperty(name) )
+            this[name] = args[name];
+        }
+      }
+    }
+  ]
+});
+
+foam.boot.end();
 
 
 /*
-  Notes:
-
-  remove create from regular objects
-  acreate or afromJSON
-
   TODO:
-  - property overriding
+  - Implement Property Overriding
+  - replace initArgs() in boot.end()
+  - SUPER support
+  - Axiom query support
+  - Add package and id to Model and Class
+  - Proxy id, name, package, label, plural from Class to Model
+  - Make Properties be adapter functions.
+  - Make Properties be comparator functions.
+  - Have Axioms know which class/model they belong to.
 */
