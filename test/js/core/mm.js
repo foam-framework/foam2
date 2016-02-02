@@ -1,6 +1,6 @@
 var GLOBAL = global || this;
 
-var corePromise = GLOBAL.loadCoreTo('core/fo3.js');
+var corePromise = GLOBAL.loadCoreTo('core/mm.js');
 var beforeEachTest = function(callback) {
   return beforeEach(function(done) {
     corePromise.then(function() {
