@@ -1,6 +1,5 @@
-var GLOBAL = global || this;
 
-var corePromise = GLOBAL.loadCoreTo('core/Slot.js');
+var corePromise = global.loadCoreTo('core/Slot.js');
 var beforeEachTest = function(callback) {
   return beforeEach(function(done) {
     corePromise.then(function() {
@@ -14,11 +13,11 @@ describe('Slot.equals', function() {
   beforeEachTest(function() {});
 
   it('compares things', function() {
-    var s = GLOBAL.Slot.create({});
+    var s = /*X.*/Slot.create({});
     expect(s.equals(1, 1)).toBe(true);
     expect(s.equals(1, 2)).toBe(false);
     expect(s.equals(s, s)).toBe(true);
-    expect(s.equals(s, GLOBAL.Slot)).toBe(false);
+    expect(s.equals(s, /*X.*/Slot)).toBe(false);
     expect(s.equals(NaN, NaN)).toBe(true);
     expect(s.equals(1, NaN)).toBe(false);
   });
@@ -28,7 +27,7 @@ describe('Slot.get/set', function() {
   var slotA;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
   });
   afterEach(function() {
     slotA = null;
@@ -54,8 +53,8 @@ describe('Slot.recordListener', function() {
   var listener;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
     listener = function() {
       listener.count += 1;
     }
@@ -97,8 +96,8 @@ describe('Slot.pipe', function() {
   var slotB;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
   });
   afterEach(function() {
     slotA = null;
@@ -130,8 +129,8 @@ describe('Slot.unpipe', function() {
   var slotB;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
   });
   afterEach(function() {
     slotA = null;
@@ -164,8 +163,8 @@ describe('Slot.map', function() {
   var listener;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
     listener = function(val) {
       listener.count += 1;
       return val+1;
@@ -197,8 +196,8 @@ describe('Slot.link', function() {
   var slotB;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
   });
   afterEach(function() {
     slotA = null;
@@ -225,8 +224,8 @@ describe('Slot.unlink', function() {
   var slotB;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
   });
   afterEach(function() {
     slotA = null;
@@ -286,8 +285,8 @@ describe('Slot.destroy', function() {
   var slotB;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
   });
   afterEach(function() {
     slotA = null;
@@ -319,8 +318,8 @@ describe('Slot.relate', function() {
   var listener2;
 
   beforeEachTest(function() {
-    slotA = GLOBAL.Slot.create({});
-    slotB = GLOBAL.Slot.create({});
+    slotA = /*X.*/Slot.create({});
+    slotB = /*X.*/Slot.create({});
     listener1 = function(val) { // this fn will stop altering the value at 10 to test feedback
       listener1.count += 1;
       return (val < 10) ? val+1 : val;

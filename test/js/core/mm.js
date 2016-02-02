@@ -1,4 +1,3 @@
-var GLOBAL = global || this;
 
 var corePromise = GLOBAL.loadCoreTo('core/mm.js');
 var beforeEachTest = function(callback) {
@@ -30,7 +29,7 @@ describe('Property Getter and Setter', function() {
         }
       ]
     });
-    t = global.GetterSetterTest.create({});
+    t = /*X.*/GetterSetterTest.create({});
   });
   afterEach(function() {
     t = null;
@@ -72,7 +71,7 @@ describe('Property Factory', function() {
         }
       ]
     });
-    t = global.FactoryTest.create({});
+    t = /*X.*/FactoryTest.create({});
   });
   afterEach(function() {
     t = null;
@@ -109,7 +108,7 @@ describe('Property default value', function() {
         }
       ]
     });
-    t= global.DefaultValue.create({});
+    t= /*X.*/DefaultValue.create({});
   });
   afterEach(function() {
     t = null;
@@ -157,19 +156,19 @@ describe('ArrayProperty', function() {
   });
 
   it('has a adapt', function() {
-    var ap = global.ArrayProperty.create({});
+    var ap = /*X.*/ArrayProperty.create({});
     expect(ap.adapt).toBeTruthy();
   });
 
   // it('defaults to an empty array', function() {
-  //   var b = global.B.create({});
+  //   var b = /*X.*/B.create({});
   //   expect(b.as).toEqual([]);
   // });
   // TODO: enable when MyMdl.create(instanceA) clones correctly
 //   it('accepts an array value of the correct type', function() {
-//     var b = global.B.create({});
-//     var a = global.A.create({ a: 'a' });
-//     var aa = global.A.create({ a: 'aa' });
+//     var b = /*X.*/B.create({});
+//     var a = /*X.*/A.create({ a: 'a' });
+//     var aa = /*X.*/A.create({ a: 'aa' });
 
 //     b.as = [a, aa];
 //     expect(b.as.toString()).toEqual([a, aa].toString());
@@ -199,7 +198,7 @@ describe('Constants', function() {
         }
       ]
     });
-    t = global.ConstantTest.create({});
+    t = /*X.*/ConstantTest.create({});
     CLASS({
       name: 'ConstantTest2',
 
@@ -209,7 +208,7 @@ describe('Constants', function() {
       }
 
     });
-    t2 = global.ConstantTest2.create({});
+    t2 = /*X.*/ConstantTest2.create({});
   });
   afterEach(function() {
     t = null;
@@ -266,7 +265,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         function sayGoodbye() { this.result = "bye "+this.name; }
       ]
     });
-    person = global.Person.create({name: 'Adam', age: 0});
+    person = /*X.*/Person.create({name: 'Adam', age: 0});
 
     CLASS({
       name: 'Employee',
@@ -284,7 +283,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         }
       ]
     });
-    employee = global.Employee.create({name: 'Jane', age: 30, salary: 50000});
+    employee = /*X.*/Employee.create({name: 'Jane', age: 30, salary: 50000});
   });
   afterEach(function() {
     person = null;
@@ -304,31 +303,31 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   });
 
   it('reports correct subclass checks', function() {
-    expect(global.Person.isSubClass(global.Employee)).toBe(true);
-    expect(global.Employee.isSubClass(global.Person)).toBe(false);
+    expect(/*X.*/Person.isSubClass(/*X.*/Employee)).toBe(true);
+    expect(/*X.*/Employee.isSubClass(/*X.*/Person)).toBe(false);
 
     CLASS({ name: 'Fake' });
-    expect(global.Person.isSubClass(global.Fake)).toBe(false);
+    expect(/*X.*/Person.isSubClass(/*X.*/Fake)).toBe(false);
   });
 
   it('reports correct subclass checks', function() {
-    expect(global.Person.isInstance(person)).toBe(true);
-    expect(global.Employee.isInstance(person)).toBe(false);
-    expect(global.Person.isInstance(employee)).toBe(true);
+    expect(/*X.*/Person.isInstance(person)).toBe(true);
+    expect(/*X.*/Employee.isInstance(person)).toBe(false);
+    expect(/*X.*/Person.isInstance(employee)).toBe(true);
 
     CLASS({ name: 'Fake' });
-    expect(global.Person.isInstance(global.Fake.create({}))).toBe(false);
+    expect(/*X.*/Person.isInstance(/*X.*/Fake.create({}))).toBe(false);
   });
   
   it('returns axioms correctly', function() {
-    expect(global.Person.getAxiomByName('age')).toBe(global.Person.AGE);
+    expect(/*X.*/Person.getAxiomByName('age')).toBe(/*X.*/Person.AGE);
 
-    var axs = global.Person.getAxiomsByClass(global.Property);
+    var axs = /*X.*/Person.getAxiomsByClass(/*X.*/Property);
     expect(axs.length).toEqual(3); 
-    expect(axs[0]).toBe(global.Person.NAME);
-    expect(axs[1]).toBe(global.Person.AGE);
-    expect(axs[2]).toBe(global.Person.RESULT);
-    expect(global.Person.getAxioms().length).toEqual(7);
+    expect(axs[0]).toBe(/*X.*/Person.NAME);
+    expect(axs[1]).toBe(/*X.*/Person.AGE);
+    expect(axs[2]).toBe(/*X.*/Person.RESULT);
+    expect(/*X.*/Person.getAxioms().length).toEqual(7);
   });
   
 });
@@ -340,7 +339,7 @@ describe('coverage for debugging helpers', function() {
   });
 
   it('covers describe()', function() {
-    var p = GLOBAL.Property.create({});
+    var p = /*X.*/Property.create({});
     p.describe();
     p.cls_.describe();
   });
