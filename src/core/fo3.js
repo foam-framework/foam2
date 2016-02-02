@@ -497,7 +497,6 @@ CLASS({
           this[key] = args.instance_[key];
       } else {
         // TODO: should walk through Axioms with initAgents instead
-        console.log("axioms check ---- ", this, this.__proto__);
         var a = this.getAxiomsByClass(Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;

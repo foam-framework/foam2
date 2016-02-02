@@ -231,7 +231,7 @@ describe('Constants', function() {
 });
 
 
-describe('Model.extends inheritance, isInstance(), isSubClass()', function() {
+describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', function() {
   var person;
   var employee;
 
@@ -319,6 +319,18 @@ describe('Model.extends inheritance, isInstance(), isSubClass()', function() {
     CLASS({ name: 'Fake' });
     expect(global.Person.isInstance(global.Fake.create({}))).toBe(false);
   });
+  
+  it('returns axioms correctly', function() {
+    expect(global.Person.getAxiomByName('age')).toBe(global.Person.AGE);
+
+    var axs = global.Person.getAxiomsByClass(global.Property);
+    expect(axs.length).toEqual(3); 
+    expect(axs[0]).toBe(global.Person.NAME);
+    expect(axs[1]).toBe(global.Person.AGE);
+    expect(axs[2]).toBe(global.Person.RESULT);
+    expect(global.Person.getAxioms().length).toEqual(7);
+  });
+  
 });
 
 describe('coverage for debugging helpers', function() {
@@ -336,11 +348,6 @@ describe('coverage for debugging helpers', function() {
 });
 
 
-//console.assert(Person.getAxiomByName('age') === Person.AGE, 'Class.getAxiomByName() doesn\'t work.');
-
-//var axs = Person.getAxiomsByClass(Property);
-//console.assert(axs.length == 2 && axs[0] === Person.NAME && axs[1] === Person.AGE, 'Class.getAxiomsByClass() doesn\'t work.');
-//console.assert(Person.getAxioms().length === 6, 'Missing axiom from getAxioms().');
 
 
 
