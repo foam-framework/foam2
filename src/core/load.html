@@ -40,8 +40,18 @@
         console.log('a: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
       }, 'a');
 
+      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('a2: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      }, 'a');
+
+      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('a-oneTime: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+        sub.destroy();
+      }, 'a');
+
       t.a = 42;
       t.b = 84;
+      t.a++;
       t.a++;
     </script>
   </body>

@@ -97,12 +97,11 @@ foam.events = {
     },
 
     notifyListeners_: function(node, args) {
-      if ( ! node ) return 0;
       var count = 0;
-      while ( node.next ) {
-        args[0] = node.next.sub;
-        node.next.l.apply(null, args);
+      while ( node && node.next ) {
         node = node.next;
+        args[0] = node.sub;
+        node.l.apply(null, args);
         count++;
       }
       return count;
