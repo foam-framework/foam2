@@ -14,7 +14,7 @@ describe('foam.events.oneTime', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -49,7 +49,7 @@ describe('foam.events.consoleLog', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -75,13 +75,13 @@ describe('foam.events.consoleLog', function() {
 
 });
 
-
+/*
 describe('foam.events.merged', function() {
   var ep;
   var listener;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -181,7 +181,7 @@ describe('foam.events.async', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -214,7 +214,7 @@ describe('foam.events.async', function() {
   });
 
   it('async with opt_X specified', function() {
-    var X = { setTimeout: /*X.*/setTimeout };
+    var X = { setTimeout: setTimeout };
     var delayed = foam.events.async(listener, X);
 
     ep.subscribe(['simple'], delayed);
@@ -238,7 +238,7 @@ describe('foam.events.framed', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.count += 1;
     }
@@ -290,20 +290,20 @@ describe('foam.events.framed', function() {
   });
 
 });
+*/
 
 
 
 
 
 
-
-
+/*
 
 describe('EventPublisher.hasListeners()', function() {
   var ep;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
   });
   afterEach(function() {
     ep = null;
@@ -374,13 +374,15 @@ describe('EventPublisher.hasListeners()', function() {
   });
 
 });
+*/
 
+/*
 describe('EventPublisher.subscribe()/.sub_()', function() {
   var ep;
   var listener;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -421,14 +423,16 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
   //     expect(ep.hasListeners()).toBe(true);
   //   });
 });
+*/
 
+/*
 describe('EventPublisher.publish()/.pub_()', function() {
   var ep;
   var listener1;
   var listener2;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -491,14 +495,15 @@ describe('EventPublisher.publish()/.pub_()', function() {
   });
 
 });
-
+*/
+/*
 describe('EventPublisher.lazyPublish()', function() {
   var ep;
   var listener1;
   var argFn;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -529,14 +534,16 @@ describe('EventPublisher.lazyPublish()', function() {
     expect(argFn.wasHit).toBe(false);
   });
 });
+*/
 
+/*
 describe('EventPublisher.unsubscribe()/unsub_()', function() {
   var ep;
   var listener1;
   var listener2;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -607,15 +614,16 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
   });
 
 });
+*/
 
-
+/*
 describe('EventPublisher listener-unsubscribe', function() {
   var ep;
   var listener1;
   var listener2;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -663,16 +671,16 @@ describe('EventPublisher listener-unsubscribe', function() {
     expect(listener1.last_args[3]).toEqual('phase2');
     expect(listener2.last_args[3]).toEqual('phase1');
   });
-
-
 });
+*/
 
+/*
 describe('EventPublisher async-publish', function() {
   var ep;
   var listener1;
 
   beforeEachTest(function() {
-    ep = /*X.*/EventPublisher.create({});
+    ep = EventPublisher.create({});
     listener1 = function(publisher, topic, unsub) {
       listener1.last_publisher = publisher;
       listener1.last_topic = topic;
@@ -700,14 +708,15 @@ describe('EventPublisher async-publish', function() {
 
   });
 });
+*/
 
-
+/*
 describe('PropertyChangePublisher.add/removePropertyListener()', function() {
   var listener;
   var pcp;
 
   beforeEachTest(function() {
-    pcp = /*X.*/PropertyChangePublisher.create({});
+    pcp = PropertyChangePublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -721,35 +730,35 @@ describe('PropertyChangePublisher.add/removePropertyListener()', function() {
 
   it('adds/removes a listener for a property', function() {
     pcp.addPropertyListener('myProp', listener);
-    expect(pcp.hasListeners([/*X.*/PropertyChangePublisher.PROPERTY_TOPIC, 'myProp'])).toBe(true);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC, 'myProp'])).toBe(true);
 
     pcp.removePropertyListener('myProp', listener);
-    expect(pcp.hasListeners([/*X.*/PropertyChangePublisher.PROPERTY_TOPIC, 'myProp'])).toBe(false);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC, 'myProp'])).toBe(false);
   });
   it('adds/removes a listener for all property changes', function() {
     pcp.addPropertyListener(null, listener);
-    expect(pcp.hasListeners([/*X.*/PropertyChangePublisher.PROPERTY_TOPIC])).toBe(true);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(true);
 
     pcp.removePropertyListener(null, listener);
-    expect(pcp.hasListeners([/*X.*/PropertyChangePublisher.PROPERTY_TOPIC])).toBe(false);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(false);
   });
   it('adds/removes a listener for all property changes with addListener/removeListener shortcuts', function() {
     pcp.addListener(listener);
-    expect(pcp.hasListeners([/*X.*/PropertyChangePublisher.PROPERTY_TOPIC])).toBe(true);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(true);
 
     pcp.removeListener(listener);
-    expect(pcp.hasListeners([/*X.*/PropertyChangePublisher.PROPERTY_TOPIC])).toBe(false);
+    expect(pcp.hasListeners([PropertyChangePublisher.PROPERTY_TOPIC])).toBe(false);
   });
-
-
 });
+*/
 
+/*
 describe('PropertyChangePublisher.globalChange()', function() {
   var listener;
   var pcp;
 
   beforeEachTest(function() {
-    pcp = /*X.*/PropertyChangePublisher.create({});
+    pcp = PropertyChangePublisher.create({});
     listener = function(publisher, topic, unsub) {
       listener.count += 1;
     }
@@ -768,18 +777,16 @@ describe('PropertyChangePublisher.globalChange()', function() {
     pcp.globalChange();
     expect(listener.count).toEqual(3);
   });
-
-
 });
+*/
 
-
-
+/*
 describe('PropertyChangePublisher.propertyChange()', function() {
   var listener;
   var pcp;
 
   beforeEachTest(function() {
-    pcp = /*X.*/PropertyChangePublisher.create({});
+    pcp = PropertyChangePublisher.create({});
     listener = function(publisher, topic, unsub, old, nu) {
       listener.last_topic = topic;
       listener.last_unsub = unsub;
@@ -816,6 +823,5 @@ describe('PropertyChangePublisher.propertyChange()', function() {
     expect(listener.last_old).toEqual(3);
     expect(listener.last_nu).toEqual(7);
   });
-
-
 });
+*/

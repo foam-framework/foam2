@@ -318,18 +318,18 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     CLASS({ name: 'Fake' });
     expect(/*X.*/Person.isInstance(/*X.*/Fake.create({}))).toBe(false);
   });
-  
+
   it('returns axioms correctly', function() {
     expect(/*X.*/Person.getAxiomByName('age')).toBe(/*X.*/Person.AGE);
 
     var axs = /*X.*/Person.getAxiomsByClass(/*X.*/Property);
-    expect(axs.length).toEqual(3); 
+    expect(axs.length).toEqual(3);
     expect(axs[0]).toBe(/*X.*/Person.NAME);
     expect(axs[1]).toBe(/*X.*/Person.AGE);
     expect(axs[2]).toBe(/*X.*/Person.RESULT);
-    expect(/*X.*/Person.getAxioms().length).toEqual(7);
+    expect(/*X.*/Person.getAxioms().length).toEqual(8);
   });
-  
+
 });
 
 describe('coverage for debugging helpers', function() {
@@ -345,9 +345,3 @@ describe('coverage for debugging helpers', function() {
   });
 
 });
-
-
-
-
-
-
