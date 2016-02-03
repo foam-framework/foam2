@@ -2,6 +2,5 @@
   "core/context.js",
   "core/stdlib.js",
   "core/mm.js",
-  "core/event.js",
   "core/Slot.js"
 ]
