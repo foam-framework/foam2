@@ -91,10 +91,6 @@ foam.events = {
   Observable: {
     create: function() { return Object.create(this); },
 
-    notifyListener_: function() {
-
-    },
-
     notifyListeners_: function(node, args) {
       if ( ! node ) return 0;
       var count = 0;
