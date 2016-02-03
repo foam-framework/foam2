@@ -67,19 +67,19 @@ foam.string.pad = function(str, size) {
     (str + new Array(size).join(' ')).substring(0, size) ;
 };
 
+
 foam.events = {
-  WILDCARD: '*', // TODO: remove once new topic publishing is ready
-  
-  /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
+
   oneTime: function oneTime(listener) {
+    /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
     return function() {
       listener.apply(this, foam.fn.argsToArray(arguments));
       arguments[2](); // the unsubscribe fn
     };
   },
 
-  /** Log all listener invocations to console. **/
   consoleLog: function consoleLog(listener) {
+    /** Log all listener invocations to console. **/
     return function() {
       var args = foam.fn.argsToArray(arguments);
       console.log(args);
@@ -88,88 +88,81 @@ foam.events = {
     };
   },
 
-  /**
-   * Merge all notifications occuring in the specified time window into a single notification.
-   * Only the last notification is delivered.
-   *
-   * @param opt_delay time in milliseconds of time-window, defaults to 16ms, which is
-   *        the smallest delay that humans aren't able to perceive.
-   **/
-  merged: function merged(listener, opt_delay, opt_X) {
-    var X = opt_X || /*X.*/X;
-    var setTimeoutX = /*X.*/setTimeout;
-    var delay = opt_delay || 16;
+  Observable: {
+    create: function() { return Object.create(this); },
 
-    return function() {
-      var triggered    = false;
-      var lastArgs     = null;
+    notifyListener_: function() {
 
-      var f = function() {
-        lastArgs = arguments;
+    },
 
-        if ( ! triggered ) {
-          triggered = true;
-          setTimeoutX(function() {
-            triggered = false;
-            var args = foam.fn.argsToArray(lastArgs);
-            lastArgs = null;
-            listener.apply(this, args);
-          }, delay);
+    notifyListeners_: function(node, args) {
+      if ( ! node ) return 0;
+      var count = 0;
+      while ( node.next ) {
+        node.next.l.apply(null, args);
+        node = node.next;
+        count++;
+      }
+      return count;
+    },
+
+    pub: function(opt_topic /*, args */) {
+      /* Return number of listeners notified. */
+      if ( opt_topic ) {
+        if ( ! this.next && ( ! this.topics_ || ! this.topics_[opt_topic] ) ) return 0;
+      } else {
+        if ( ! this.next ) return 0;
+      }
+
+      var args      = [].concat(arguments);
+      var topicSubs = opt_topic && this.topics_ && this.topics_[opt_topic];
+
+      return this.notifyListeners_(topicSubs, args) +
+        this.notifyListeners_(this, args);
+    },
+
+    sub: function(l, opt_topic) {
+      var subs;
+      if ( opt_topic ) {
+        var topics = this.topics_ || ( this.topics_ = {} );
+        subs = topics[opt_topic] || (topics[opt_topic] = {});
+      } else {
+        subs = this;
+      }
+
+      var node = { prev: subs, next: subs.next, l: l };
+      subs.next = node;
+      node.destroy = function() {
+        if ( this.next ) this.next.prev = this.prev;
+        if ( this.prev ) this.prev.next = this.next;
+      }.bind(node);
+      return node.destroy;
+    },
+
+    unsub: function(l, opt_topic) {
+      var subs;
+      if ( opt_topic ) {
+        if ( ! this.topics_ ) return;
+        subs = topics[opt_topic];
+        if ( ! subs ) return;
+      } else {
+        subs = this;
+      }
+
+      while ( subs.next ) {
+        if ( subs.next === l ) {
+          subs.next = subs.next.next;
+          if ( subs.next ) subs.next.prev = subs;
+          return;
         }
-      };
-  //         if ( DEBUG ) f.toString = function() {
-  //           return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
-  //         };
+      }
+    },
 
-      return f;
-    }();
-  },
-
-  /**
-   * Merge all notifications occuring until the next animation frame.
-   * Only the last notification is delivered.
-   **/
-  // TODO: execute immediately from within a requestAnimationFrame
-  framed: function framed(listener, opt_X) {
-    var requestAnimationFrameX = ( opt_X && opt_X.requestAnimationFrame ) || requestAnimationFrame;
-
-    return function() {
-      var triggered    = false;
-      var lastArgs     = null;
-
-      var f = function() {
-        lastArgs = arguments;
-
-        if ( ! triggered ) {
-          triggered = true;
-          requestAnimationFrameX(function() {
-            triggered = false;
-            var args = foam.fn.argsToArray(lastArgs);
-            lastArgs = null;
-            listener.apply(this, args);
-          });
-        }
-      };
-  //         if ( DEBUG ) f.toString = function() {
-  //           return 'ANIMATE(' + listener.$UID + ', ' + listener + ')';
-  //         };
-      return f;
-    }();
-  },
-
-  /** Decorate a listener so that the event is delivered asynchronously. **/
-  async: function async(listener, opt_X) {
-    return this.delay(0, listener, opt_X);
-  },
-
-  /** Decorate a listener so that the event is delivered after a delay.
-      @param delay the delay in ms **/
-  delay: function delay(delay, listener, opt_X) {
-    var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
-    return function() {
-      var args = foam.fn.argsToArray(arguments);
-      setTimeoutX( function() { listener.apply(null, args); }, delay );
-    };
-  },
+    destroy: function() {
+      // TODO: better to walk and disconnect linked-lists in case
+      // external objects have references to subscriptions.
+      this.next = this.topics_ = undefined;
+    }
+  }
 
 };
