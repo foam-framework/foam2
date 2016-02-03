@@ -468,7 +468,7 @@ CLASS({
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
           if ( ! this.hasOwnProperty(name) )
-            this.instance_[name] = foam.events.Observable.create();
+            this.instance_[name] = foam.events.Observable.create(name, this);
 
           return this.instance_[name];
         },

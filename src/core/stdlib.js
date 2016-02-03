@@ -89,12 +89,18 @@ foam.events = {
   },
 
   Observable: {
-    create: function() { return Object.create(this); },
+    create: function(name, src) {
+      var o = Object.create(this);
+      o.name = name;
+      o.src  = src;
+      return o;
+    },
 
     notifyListeners_: function(node, args) {
       if ( ! node ) return 0;
       var count = 0;
       while ( node.next ) {
+        args[0] = node.next.sub;
         node.next.l.apply(null, args);
         node = node.next;
         count++;
@@ -110,8 +116,10 @@ foam.events = {
         if ( ! this.next ) return 0;
       }
 
-      var args      = [].concat(arguments);
+      var args      = [null];
       var topicSubs = opt_topic && this.topics_ && this.topics_[opt_topic];
+
+      args.push.apply(args, arguments);
 
       return this.notifyListeners_(topicSubs, args) +
         this.notifyListeners_(this, args);
@@ -126,13 +134,20 @@ foam.events = {
         subs = this;
       }
 
-      var node = { prev: subs, next: subs.next, l: l };
+      var node = {
+        prev: subs,
+        next: subs.next,
+        l: l,
+        sub: { src: this.src, topic: this }
+      };
       subs.next = node;
-      node.destroy = function() {
+
+      node.sub.destroy = function() {
         if ( this.next ) this.next.prev = this.prev;
         if ( this.prev ) this.prev.next = this.next;
       }.bind(node);
-      return node.destroy;
+
+      return node.sub;
     },
 
     unsub: function(l, opt_topic) {
@@ -158,6 +173,10 @@ foam.events = {
       // TODO: better to walk and disconnect linked-lists in case
       // external objects have references to subscriptions.
       this.next = this.topics_ = undefined;
+    },
+
+    toString: function() {
+      return 'Topic(' + this.name + ')';
     }
   }
 

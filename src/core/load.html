@@ -24,13 +24,21 @@
         topics: [ 'onFoo', 'onBar' ],
         properties: [ 'a', 'b', 'c' ]
       });
+
       var t = PubSubTest.create();
-      t.onFoo.sub(console.log.bind(console, 'onFoo'));
+
+      t.onFoo.sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('onFoo: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      });
       t.onFoo.pub('hello','world');
 
-      t.onPropertyChange.sub(console.log.bind(console, 'onPropertyChange.global'));
-      t.onPropertyChange.sub(console.log.bind(console, 'onPropertyChange.a'), 'a');
-      t.onPropertyChange.sub(console.log.bind(console, 'onPropertyChange.b'), 'b');
+      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('global: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      });
+
+      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('a: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      }, 'a');
 
       t.a = 42;
       t.b = 84;
