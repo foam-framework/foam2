@@ -87,20 +87,6 @@ foam.boot = {
 
         return subClasses_[o.name];
       },
-      // TODO: move to debug extension
-      describe: function(opt_name) {
-        console.log('CLASS:  ', this.name);
-        console.log('extends:', this.model_.extends);
-        console.log('Axiom Type          Source Class   Name');
-        console.log('--------------------------------------------');
-        for ( var key in this.axiomMap_ ) {
-          var a = this.axiomMap_[key];
-          console.log(
-            foam.string.pad(a.cls_.name, 19),
-            foam.string.pad(a.sourceCls_.name, 14),
-            a.name);
-        }
-      },
       getAxiomByName: function(name) {
         return this.axiomMap_[name];
       },
@@ -402,20 +388,6 @@ CLASS({
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.name + (this.instance_ ? '' : 'Proto')
-    },
-    // TODO: move to debug extension
-    function describe(opt_name) {
-      console.log('Instance of', this.cls_.name);
-      console.log('Axiom Type           Name           Value');
-      console.log('----------------------------------------------------');
-      var ps = this.cls_.getAxiomsByClass(Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        console.log(
-          foam.string.pad(p.cls_.name, 20),
-          foam.string.pad(p.name, 14),
-          this[p.name]);
-      }
     }
   ],
 
