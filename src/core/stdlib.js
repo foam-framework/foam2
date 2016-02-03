@@ -142,9 +142,12 @@ foam.events = {
       subs.next = node;
 
       node.sub.destroy = function() {
-        if ( this.next ) this.next.prev = this.prev;
-        if ( this.prev ) this.prev.next = this.next;
-      }.bind(node);
+        if ( node.next ) node.next.prev = node.prev;
+        if ( node.prev ) node.prev.next = node.next;
+
+        // Disconnect so that calling destroy more than once is harmless
+        this.next = this.prev = null;
+      };
 
       return node.sub;
     },
@@ -178,5 +181,4 @@ foam.events = {
       return 'Topic(' + this.name + ')';
     }
   }
-
 };
