@@ -345,3 +345,45 @@ describe('coverage for debugging helpers', function() {
   });
 
 });
+
+
+describe('FObject white box test', function() {
+  beforeEachTest(function() {
+    CLASS({
+      name: 'Person',
+      properties: [
+        {
+          name: 'name'
+        },
+        {
+          name: 'age'
+        },
+      ],
+    });
+  });
+  afterEach(function() {
+  });
+
+  it('inits from null', function() {
+    var o = /*X.*/Person.create();
+    expect(o.name).toBeUndefined();
+  });
+  it('inits from a POJSO', function() {
+    var o = /*X.*/Person.create({ name: 'prop1' });
+
+    expect(o.name).toEqual('prop1');
+  });
+  it('inits from another FObject', function() {
+    var o = /*X.*/Person.create({ name: 'prop1' });
+    var o2 = Person.create(o);
+
+    expect(o2.name).toEqual('prop1');
+  });
+  it('covers init from another FObject with no instance_', function() {
+    var prot = { name: 'prop1' };
+    var o = /*X.*/Person.create(Object.create(prot));
+
+    expect(o.name).toEqual('prop1');
+  });
+
+});
