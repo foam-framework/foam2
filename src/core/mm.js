@@ -321,7 +321,8 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          // TODO: fire property change event
+          if ( this.hasOwnProperty('onPropertyChange') )
+            this.onPropertyChange.pub(name, oldValue, newValue);
 
           // TODO: call global setter
 
@@ -453,6 +454,35 @@ CLASS({
 
 
 CLASS({
+  name: 'Topic',
+
+  properties: [
+    { name: 'name' },
+    { name: 'description' }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      var name = this.name;
+
+      Object.defineProperty(proto, name, {
+        get: function topicGetter() {
+          if ( ! this.hasOwnProperty(name) )
+            this.instance_[name] = foam.events.Observable.create();
+
+          return this.instance_[name];
+        },
+        set: function propSetter(newValue) {
+          this.instance_[name] = newValue;
+        },
+        configurable: true
+      });
+    }
+  ]
+});
+
+
+CLASS({
   name: 'Model',
 
   properties: [
@@ -469,6 +499,16 @@ CLASS({
           return cs;
         }
         return a.map(prop.adaptArrayElement.bind(prop));
+      }
+    },
+    {
+      type: 'AxiomArray',
+      subType: 'Topic',
+      name: 'topics',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          Topic.create({name: o})    :
+          Topic.create(o)            ;
       }
     },
     {
@@ -498,6 +538,9 @@ CLASS({
 
 CLASS({
   name: 'FObject',
+
+  topics: [ 'onPropertyChange' ],
+
   methods: [
     function initArgs(args) {
       if ( ! args ) return;
