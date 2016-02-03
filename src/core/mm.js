@@ -283,13 +283,14 @@ CLASS({
       var defaultValue    = this.defaultValue;
 
       /* Future: needs events and slot support first.
+         Should be deferred until phase2?
          var slotName        = name + '$';
          Object.defineProperty(proto, slotName, {
          get: function propSlotGetter() {
-         return this.getSlot(name);
+         return this.slot(name);
          },
          set: function propSlotSetter(value) {
-         value.link.link(this.getSlot(name));
+         value.link.link(this.slot(name));
          },
          configurable: true
          });
