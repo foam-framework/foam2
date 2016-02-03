@@ -571,12 +571,9 @@ foam.boot.end();
 /*
   TODO:
   - Implement Property Overriding
-  - replace initArgs() in boot.end()
   - SUPER support
-  - Axiom query support
   - Add package and id to Model and Class
   - Proxy id, name, package, label, plural from Class to Model
   - Make Properties be adapter functions.
   - Make Properties be comparator functions.
-  - Have Axioms know which class/model they belong to.
 */
