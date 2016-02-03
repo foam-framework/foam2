@@ -65,6 +65,9 @@ foam.boot = {
       installAxiom: function(a) {
         this.axiomMap_[a.name] = a;
         this.axiomCache_ = {};
+
+        a.sourceCls_ = this;
+
         a.installInClass && a.installInClass(this);
         a.installInProto && a.installInProto(this.prototype);
       },
@@ -85,12 +88,16 @@ foam.boot = {
         return subClasses_[o.name];
       },
       describe: function(opt_name) {
-        console.log('CLASS:        ', this.name);
-        console.log('extends:      ', this.model_.extends);
-        console.log('----------------------------');
+        console.log('CLASS:  ', this.name);
+        console.log('extends:', this.model_.extends);
+        console.log('Axiom Type          Source Class   Name');
+        console.log('--------------------------------------------');
         for ( var key in this.axiomMap_ ) {
           var a = this.axiomMap_[key];
-          console.log(foam.string.rightPad(a.cls_.name, 14), a.name);
+          console.log(
+            foam.string.rightPad(a.cls_.name, 19),
+            foam.string.rightPad(a.sourceCls_.name, 14),
+            a.name);
         }
       },
       getAxiomByName: function(name) {
@@ -395,11 +402,15 @@ CLASS({
     },
     function describe(opt_name) {
       console.log('Instance of', this.cls_.name);
-      console.log('--------------------------------------------------');
+      console.log('Axiom Type           Name           Value');
+      console.log('----------------------------------------------------');
       var ps = this.cls_.getAxiomsByClass(Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
-        console.log(foam.string.rightPad(p.cls_.name, 20), foam.string.rightPad(p.name, 12), this[p.name]);
+        console.log(
+          foam.string.rightPad(p.cls_.name, 20),
+          foam.string.rightPad(p.name, 14),
+          this[p.name]);
       }
     }
   ],
