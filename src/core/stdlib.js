@@ -50,6 +50,9 @@ foam.string.constantize = foam.fn.memoize1(function(str) {
 });
 
 
-foam.string.rightPad = function(str, size) {
-  return (str + new Array(size).join(' ')).substring(0, size);
+foam.string.pad = function(str, size) {
+  // Right pads to size if size > 0, Left pads to -size if size < 0
+  return size < 0 ?
+    (new Array(-size).join(' ') + str).slice(size)       :
+    (str + new Array(size).join(' ')).substring(0, size) ;
 };

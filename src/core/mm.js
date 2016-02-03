@@ -96,8 +96,8 @@ foam.boot = {
         for ( var key in this.axiomMap_ ) {
           var a = this.axiomMap_[key];
           console.log(
-            foam.string.rightPad(a.cls_.name, 19),
-            foam.string.rightPad(a.sourceCls_.name, 14),
+            foam.string.pad(a.cls_.name, 19),
+            foam.string.pad(a.sourceCls_.name, 14),
             a.name);
         }
       },
@@ -410,8 +410,8 @@ CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
         console.log(
-          foam.string.rightPad(p.cls_.name, 20),
-          foam.string.rightPad(p.name, 14),
+          foam.string.pad(p.cls_.name, 20),
+          foam.string.pad(p.name, 14),
           this[p.name]);
       }
     }
