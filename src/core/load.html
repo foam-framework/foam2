@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <script language="javascript" src="stdlib.js"></script>
+    <script>console.time('boot');</script>
+    <script>console.time('loadContext');</script>
+    <script language="javascript" src="context.js"></script>
+    <script>console.timeEnd('loadContext');</script>
+    <script>console.time('loadStdlib');</script>
+    <script language="javascript" src="stdlib.js"></script>
+    <script>console.timeEnd('loadStdlib');</script>
+    <script>console.time('loadMM');</script>
+    <script language="javascript" src="mm.js"></script>
+    <script>console.timeEnd('loadMM');</script>
+    <script>console.time('loadEvent');</script>
+    <script language="javascript" src="event.js"></script>
+    <script>console.timeEnd('loadEvent');</script>
+    <script>console.time('loadDynamic');</script>
+    <script language="javascript" src="dynamic.js"></script>
+    <script>console.timeEnd('loadDynamic');</script>
+    <script>console.time('loadSlot');</script>
+    <script language="javascript" src="Slot.js"></script>
+    <script>console.timeEnd('loadSlot');</script>
+    <script>console.timeEnd('boot');</script>
+    <title>Load FOAM</title>
+  </head>
+</html>
