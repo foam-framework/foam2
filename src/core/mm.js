@@ -456,6 +456,36 @@ CLASS({
 
 
 CLASS({
+  name: 'Listener',
+
+  properties: [
+    { name: 'name' },
+    { name: 'code' }/*,
+    { type: 'Boolean', name: 'isFramed',   defaultValue: false },
+    { type: 'Boolean', name: 'isMerged',   defaultValue: false },
+    { type: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }*/
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      var name = this.name;
+      var code = this.code;
+
+      Object.defineProperty(proto, name, {
+        get: function topicGetter() {
+          if ( ! this.hasOwnProperty(name) )
+            this.instance_[name] = code.bind(this);
+
+          return this.instance_[name];
+        },
+        configurable: true
+      });
+    }
+  ]
+});
+
+
+CLASS({
   name: 'Model',
 
   properties: [
@@ -504,6 +534,18 @@ CLASS({
           return Method.create({name: o.name, code: o});
         }
         return global[this.subType].create(o);
+      }
+    },
+    {
+      type: 'AxiomArray',
+      subType: 'Listener',
+      name: 'listeners',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'function' ) {
+          console.assert(o.name, 'Listener must be named');
+          return Listener.create({name: o.name, code: o});
+        }
+        return Listener.create(o);
       }
     }
   ]

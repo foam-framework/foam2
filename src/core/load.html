@@ -23,12 +23,12 @@
   <body>
     <script>
       CLASS({
-        name: 'PubSubTest',
+        name: 'TopicTest',
         topics: [ 'onFoo', 'onBar' ],
         properties: [ 'a', 'b', 'c' ]
       });
 
-      var t = PubSubTest.create();
+      var t = TopicTest.create();
 
       t.onFoo.sub(function(sub, subTopic, arg1) {
         console.log('onFoo: ', sub, sub.topic.toString(), subTopic, arg1);
@@ -56,6 +56,23 @@
       t.b = 84;
       t.a++;
       t.a++;
+
+      CLASS({
+        name: 'ListenerTest',
+        properties: [ 'a', 'b', 'c' ],
+        listeners: [
+          function foo() { console.log('foo.a:',this.a); },
+          function bar() { console.log('bar.b:',this.b); },
+        ]
+      });
+
+      var t2 = ListenerTest.create({a:42,b:84});
+      t2.foo();
+      t2.bar();
+      var foo = t2.foo, bar = t2.bar;
+      foo();
+      bar();
+
     </script>
   </body>
 </html>
