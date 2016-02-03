@@ -1,4 +1,4 @@
-
+/*
 var corePromise = global.loadCoreTo('core/event.js');
 var beforeEachTest = function(callback) {
   return beforeEach(function(done) {
@@ -74,6 +74,7 @@ describe('foam.events.consoleLog', function() {
   });
 
 });
+*/
 
 /*
 describe('foam.events.merged', function() {
