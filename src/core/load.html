@@ -27,8 +27,8 @@
 
       var t = PubSubTest.create();
 
-      t.onFoo.sub(function(sub, subTopic, oldValue,newValue) {
-        console.log('onFoo: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      t.onFoo.sub(function(sub, subTopic, arg1) {
+        console.log('onFoo: ', sub, sub.topic.toString(), subTopic, arg1);
       });
       t.onFoo.pub('hello','world');
 
