@@ -510,11 +510,12 @@ CLASS({
           this[key] = args.instance_[key];
       } else {
         // TODO: should walk through Axioms with initAgents instead
-        var a = this.getAxiomsByClass(Property);
+        var a = this.cls_.getAxiomsByClass(Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
-          if ( args.hasOwnProperty(name) )
+          if ( typeof args[name] !== 'undefined' ) {
             this[name] = args[name];
+          }
         }
       }
     }
