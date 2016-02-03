@@ -20,4 +20,24 @@
     <script>console.timeEnd('boot');</script>
     <title>Load FOAM</title>
   </head>
+  <body>
+    <script>
+      CLASS({
+        name: 'PubSubTest',
+        topics: [ 'onFoo', 'onBar' ],
+        properties: [ 'a', 'b', 'c' ]
+      });
+      var t = PubSubTest.create();
+      t.onFoo.sub(console.log.bind(console, 'onFoo'));
+      t.onFoo.pub('hello','world');
+
+      t.onPropertyChange.sub(console.log.bind(console, 'onPropertyChange.global'));
+      t.onPropertyChange.sub(console.log.bind(console, 'onPropertyChange.a'), 'a');
+      t.onPropertyChange.sub(console.log.bind(console, 'onPropertyChange.b'), 'b');
+
+      t.a = 42;
+      t.b = 84;
+      t.a++;
+    </script>
+  </body>
 </html>
