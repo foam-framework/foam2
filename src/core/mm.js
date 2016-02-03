@@ -87,6 +87,7 @@ foam.boot = {
 
         return subClasses_[o.name];
       },
+      // TODO: move to debug extension
       describe: function(opt_name) {
         console.log('CLASS:  ', this.name);
         console.log('extends:', this.model_.extends);
@@ -400,6 +401,7 @@ CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.name + (this.instance_ ? '' : 'Proto')
     },
+    // TODO: move to debug extension
     function describe(opt_name) {
       console.log('Instance of', this.cls_.name);
       console.log('Axiom Type           Name           Value');
