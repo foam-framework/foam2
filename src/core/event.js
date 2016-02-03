@@ -15,132 +15,6 @@
  * limitations under the License.
  */
 
-/** Publish and Subscribe Event Notification Service. **/
-CLASS({
-  name: 'EventService_',
-
-  constants: [
-     /** Used as topic suffix to specify broadcast to all sub-topics. **/
-     { name: 'WILDCARD', value: '*' },
-  ],
-
-  methods: [
-    /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
-    function oneTime(listener) {
-      return function() {
-        listener.apply(this, /*X.*/EventService.argsToArray(arguments));
-        arguments[2](); // the unsubscribe fn
-      };
-    },
-
-    /** Log all listener invocations to console. **/
-    function consoleLog(listener) {
-      return function() {
-        var args = /*X.*/EventService.argsToArray(arguments);
-        console.log(args);
-
-        listener.apply(this, args);
-      };
-    },
-
-    /**
-     * Merge all notifications occuring in the specified time window into a single notification.
-     * Only the last notification is delivered.
-     *
-     * @param opt_delay time in milliseconds of time-window, defaults to 16ms, which is
-     *        the smallest delay that humans aren't able to perceive.
-     **/
-    function merged(listener, opt_delay, opt_X) {
-      var X = opt_X || /*X.*/X;
-      var setTimeoutX = /*X.*/setTimeout;
-      var delay = opt_delay || 16;
-
-      return function() {
-        var triggered    = false;
-        var lastArgs     = null;
-
-        var f = function() {
-          lastArgs = arguments;
-
-          if ( ! triggered ) {
-            triggered = true;
-            setTimeoutX(function() {
-              triggered = false;
-              var args = /*X.*/EventService.argsToArray(lastArgs);
-              lastArgs = null;
-              listener.apply(this, args);
-            }, delay);
-          }
-        };
-//         if ( DEBUG ) f.toString = function() {
-//           return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
-//         };
-
-        return f;
-      }();
-    },
-
-    /**
-     * Merge all notifications occuring until the next animation frame.
-     * Only the last notification is delivered.
-     **/
-    // TODO: execute immediately from within a requestAnimationFrame
-    function framed(listener, opt_X) {
-      var requestAnimationFrameX = ( opt_X && opt_X.requestAnimationFrame ) || requestAnimationFrame;
-
-      return function() {
-        var triggered    = false;
-        var lastArgs     = null;
-
-        var f = function() {
-          lastArgs = arguments;
-
-          if ( ! triggered ) {
-            triggered = true;
-            requestAnimationFrameX(function() {
-              triggered = false;
-              var args = /*X.*/EventService.argsToArray(lastArgs);
-              lastArgs = null;
-              listener.apply(this, args);
-            });
-          }
-        };
-//         if ( DEBUG ) f.toString = function() {
-//           return 'ANIMATE(' + listener.$UID + ', ' + listener + ')';
-//         };
-        return f;
-      }();
-    },
-
-    /** Decorate a listener so that the event is delivered asynchronously. **/
-    function async(listener, opt_X) {
-      return this.delay(0, listener, opt_X);
-    },
-
-    /** Decorate a listener so that the event is delivered after a delay.
-        @param delay the delay in ms **/
-    function delay(delay, listener, opt_X) {
-      var setTimeoutX = ( opt_X && opt_X.setTimeout ) || setTimeout;
-      return function() {
-        var args = /*X.*/EventService.argsToArray(arguments);
-        setTimeoutX( function() { listener.apply(null, args); }, delay );
-      };
-    },
-
-    /** convenience method to append 'arguments' onto a real array */
-    function appendArguments(a, args, start) {
-      for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
-      return a;
-    },
-    /** convenience method to turn 'arguments' into a real array */
-    function argsToArray(args) {
-      return /*X.*/EventService.appendArguments([], args, 0);
-    },
-  ],
-});
-// TODO: model static services like this one
-/*X.*/EventService = /*X.*/EventService_.create({});
-
 CLASS({
   name: 'EventPublisher',
 
@@ -166,7 +40,7 @@ CLASS({
           if ( ! map ) return false; // if nothing to check, fail
           if ( this.hasDirectListeners_(map) ) return true; // if any listeners at this level, we're good
           var topic = opt_topic[t];
-          if ( topic == /*X.*/EventService.WILDCARD ) {
+          if ( topic == foam.events.WILDCARD ) {
             // if a wildcard is specified, find any listener at all
             return this.hasAnyListeners_(map);
           }
@@ -187,13 +61,13 @@ CLASS({
           this.subs_,
           0,
           topic,
-          /*X.*/EventService.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
+          foam.fn.appendArguments([this, topic, null], arguments, 1)) : // null: to be replaced with the unsub object
         0;
     },
 
     /** Publish asynchronously. **/
     function publishAsync(topic) {
-      var args = /*X.*/EventService.argsToArray(arguments);
+      var args = foam.fn.argsToArray(arguments);
       var self = this;
       setTimeout( function() { self.publish.apply(self, args); }, 0);
     },
@@ -259,7 +133,7 @@ CLASS({
         var t = topic[topicIndex];
 
         // wildcard publish, so notify all sub-topics, instead of just one
-        if ( t == /*X.*/EventService.WILDCARD ) {
+        if ( t == foam.events.WILDCARD ) {
           return this.notifyListeners_(topic, map, msg, topic.slice(0, topicIndex-1));
         }
         if ( t ) count += this.pub_(map[t], topicIndex+1, topic, msg);
@@ -398,7 +272,7 @@ CLASS({
 
     /** Indicates that one or more unspecified properties have changed. **/
     function globalChange() {
-      this.publish(this.propertyTopic(/*X.*/EventService.WILDCARD), null, null);
+      this.publish(this.propertyTopic(foam.events.WILDCARD), null, null);
     },
 
     /** Adds a listener for all property changes. **/

@@ -419,7 +419,7 @@ CLASS({
 
   // TODO: insert core/FObject.js functionality
 
-  // TODO: insert EventService and PropertyChangeSupport here
+  // TODO: insert foam.events and PropertyChangeSupport here
 });
 
 

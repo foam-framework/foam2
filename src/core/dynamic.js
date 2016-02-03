@@ -92,7 +92,7 @@
 //      */
 //     function dynamicFn(fn, opt_fn, opt_X) {
 //       var fn2 = opt_fn ? function() { opt_fn(fn()); } : fn;
-//       var listener = EventService.framed(fn2, opt_X);
+//       var listener = foam.events.framed(fn2, opt_X);
 //       var propertyValues = [];
 //       fn(); // Call once before capture to pre-latch lazy values
 //       Events.onGet.push(function(obj, name, value) {

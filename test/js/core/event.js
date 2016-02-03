@@ -9,7 +9,7 @@ var beforeEachTest = function(callback) {
   });
 };
 
-describe('EventService.oneTime', function() {
+describe('foam.events.oneTime', function() {
   var ep;
   var listener;
 
@@ -29,7 +29,7 @@ describe('EventService.oneTime', function() {
   });
 
   it('removes itself after one invokation', function() {
-    var one = /*X.*/EventService.oneTime(listener);
+    var one = foam.events.oneTime(listener);
 
     ep.subscribe(['simple'], one);
 
@@ -44,7 +44,7 @@ describe('EventService.oneTime', function() {
 
 });
 
-describe('EventService.consoleLog', function() {
+describe('foam.events.consoleLog', function() {
   var ep;
   var listener;
 
@@ -64,7 +64,7 @@ describe('EventService.consoleLog', function() {
   });
 
   it('logs ok', function() {
-    var logger = /*X.*/EventService.consoleLog(listener);
+    var logger = foam.events.consoleLog(listener);
 
     ep.subscribe(['simple'], logger);
 
@@ -76,7 +76,7 @@ describe('EventService.consoleLog', function() {
 });
 
 
-describe('EventService.merged', function() {
+describe('foam.events.merged', function() {
   var ep;
   var listener;
 
@@ -98,7 +98,7 @@ describe('EventService.merged', function() {
   });
 
   it('merges with default parameters', function() {
-    var merged = /*X.*/EventService.merged(listener);
+    var merged = foam.events.merged(listener);
 
     ep.subscribe(['simple'], merged);
 
@@ -115,7 +115,7 @@ describe('EventService.merged', function() {
   });
 
   it('merges with delay specified', function() {
-    var merged = /*X.*/EventService.merged(listener, 1300);
+    var merged = foam.events.merged(listener, 1300);
 
     ep.subscribe(['simple'], merged);
 
@@ -133,7 +133,7 @@ describe('EventService.merged', function() {
   });
 
   it('merges with opt_X specified', function() {
-    var merged = /*X.*/EventService.merged(listener, 1300, GLOBAL);
+    var merged = foam.events.merged(listener, 1300, GLOBAL);
 
     ep.subscribe(['simple'], merged);
 
@@ -149,7 +149,7 @@ describe('EventService.merged', function() {
 
 
   it('unsubscribes when requested', function() {
-    var merged = /*X.*/EventService.merged(/*X.*/EventService.oneTime(listener));
+    var merged = foam.events.merged(foam.events.oneTime(listener));
 
     ep.subscribe(['simple'], merged);
 
@@ -176,7 +176,7 @@ describe('EventService.merged', function() {
   });
 });
 
-describe('EventService.async', function() {
+describe('foam.events.async', function() {
   var ep;
   var listener;
 
@@ -198,7 +198,7 @@ describe('EventService.async', function() {
   });
 
   it('async invokes each listener', function() {
-    var delayed = /*X.*/EventService.async(listener);
+    var delayed = foam.events.async(listener);
 
     ep.subscribe(['simple'], delayed);
 
@@ -215,7 +215,7 @@ describe('EventService.async', function() {
 
   it('async with opt_X specified', function() {
     var X = { setTimeout: /*X.*/setTimeout };
-    var delayed = /*X.*/EventService.async(listener, X);
+    var delayed = foam.events.async(listener, X);
 
     ep.subscribe(['simple'], delayed);
 
@@ -233,7 +233,7 @@ describe('EventService.async', function() {
 });
 
 
-describe('EventService.framed', function() {
+describe('foam.events.framed', function() {
   var ep;
   var listener;
 
@@ -262,8 +262,8 @@ describe('EventService.framed', function() {
         setTimeout(fn, 1);
       }
     };
-    var delayed1 = /*X.*/EventService.framed(listener1, X);
-    var delayed2 = /*X.*/EventService.framed(listener2, X);
+    var delayed1 = foam.events.framed(listener1, X);
+    var delayed2 = foam.events.framed(listener2, X);
     ep.subscribe(['simple'], delayed1);
     ep.subscribe(['simple'], delayed2);
 
@@ -286,7 +286,7 @@ describe('EventService.framed', function() {
     requestAnimationFrame = function(fn) {
         setTimeout(fn, 1);
     };
-    /*X.*/EventService.framed(listener1);
+    foam.events.framed(listener1);
   });
 
 });
@@ -361,16 +361,16 @@ describe('EventPublisher.hasListeners()', function() {
 
   it('reports correctly for a multi-level topic with a wildcard', function() {
     ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
-    expect(ep.hasListeners(['the', /*X.*/EventService.WILDCARD])).toBe(true);
+    expect(ep.hasListeners(['the', foam.events.WILDCARD])).toBe(true);
   });
 
   it('reports correctly for a root level wildcard', function() {
     ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
-    expect(ep.hasListeners([/*X.*/EventService.WILDCARD])).toBe(true);
+    expect(ep.hasListeners([foam.events.WILDCARD])).toBe(true);
   });
 
   it('reports correctly for a given topic but no listeners', function() {
-    expect(ep.hasListeners([/*X.*/EventService.WILDCARD])).toBe(false);
+    expect(ep.hasListeners([foam.events.WILDCARD])).toBe(false);
   });
 
 });
@@ -417,7 +417,7 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
   });
 
   //   it('subscribes with a wildcard', function() {  // not valid case TODO
-  //     ep.subscribe([EventService.WILDCARD], listener);
+  //     ep.subscribe([foam.events.WILDCARD], listener);
   //     expect(ep.hasListeners()).toBe(true);
   //   });
 });
