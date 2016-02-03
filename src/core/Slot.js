@@ -16,156 +16,155 @@
  */
 
 
-CLASS({
-  name: 'Slot',
-  extends: 'PropertyChangePublisher',
+// CLASS({
+//   name: 'Slot',
+//   extends: null,
 
-  // TODO: Slot might be better as a trait or augmenter. Also, it only makes limited use of
-  // event publishing and could just implement it itself (but then loses out on instrumentation
-  // that might be done to event publishing)
+//   // TODO: Slot might be better as a trait or augmenter. Also, it only makes limited use of
+//   // event publishing and could just implement it itself (but then loses out on instrumentation
+//   // that might be done to event publishing)
 
-  properties: [
-    {
-      name: 'followers_',
-      factory: function() { return {}; }, // maps destinationObj -> listenerFn
-    },
-    {
-      name: 'value_',
-      defaultValue: null, // default storage
-    },
-  ],
+//   properties: [
+//     {
+//       name: 'followers_',
+//       factory: function() { return {}; }, // maps destinationObj -> listenerFn
+//     },
+//     {
+//       name: 'value_',
+//       defaultValue: null, // default storage
+//     },
+//   ],
 
-  methods: [
-    /** Check equality and interpret NaN to equal NaN, for proper change detection.
-        TODO: replace with stdlib version. */
-    function equals(a, b) {
-      return (a === b) || (a == b) || ((a !== a) && (b !== b));
-    },
+//   methods: [
+//     /** Check equality and interpret NaN to equal NaN, for proper change detection.
+//         TODO: replace with stdlib version. */
+//     function equals(a, b) {
+//       return (a === b) || (a == b) || ((a !== a) && (b !== b));
+//     },
 
-    /** Internal. Manages follower list. By default triggers the listener.
-        @param opt_dontCallListener if true, does not trigger the listener. **/
-    function recordListener_(dst, listener, opt_dontCallListener) {
-      if ( ! this.followers_ ) this.followers_ = {};
-      console.assert( ! this.followers_[dst], 'recordListener: duplicate follow');
-      this.followers_[dst] = listener;
-      this.addListener(listener);
-      if ( ! opt_dontCallListener ) listener();
-    },
+//     /** Internal. Manages follower list. By default triggers the listener.
+//         @param opt_dontCallListener if true, does not trigger the listener. **/
+//     function recordListener_(dst, listener, opt_dontCallListener) {
+//       if ( ! this.followers_ ) this.followers_ = {};
+//       console.assert( ! this.followers_[dst], 'recordListener: duplicate follow');
+//       this.followers_[dst] = listener;
+//       this.addListener(listener);
+//       if ( ! opt_dontCallListener ) listener();
+//     },
 
-    /** Returns the value stored in this Slot.
-        Override to provide alternate value storage. */
-    function get() {
-      return this.hasOwnProperty('value_') ? this.value_ : undefined;
-    },
-    /** Sets the value stored in this Slot.
-        Override to provide alternate value storage. */
-    function set(val) {
-      this.value_ = val;
-      this.globalChange();
-    },
+//     /** Returns the value stored in this Slot.
+//         Override to provide alternate value storage. */
+//     function get() {
+//       return this.hasOwnProperty('value_') ? this.value_ : undefined;
+//     },
+//     /** Sets the value stored in this Slot.
+//         Override to provide alternate value storage. */
+//     function set(val) {
+//       this.value_ = val;
+//       this.globalChange();
+//     },
 
-    /** Have the dstSlot listen to changes in this Slot and update
-        its value to be the same.
-        @param dstSlot the slot to push updates into. **/
-    function pipe(dstSlot) {
-      if ( ! this.followers_ ) this.followers_ = {};
-      if ( ! dstSlot ) return;
-      var self = this;
-      this.recordListener_(dstSlot, function () {
-        var sv = self.get();
-        var dv = dstSlot.get();
+//     /** Have the dstSlot listen to changes in this Slot and update
+//         its value to be the same.
+//         @param dstSlot the slot to push updates into. **/
+//     function pipe(dstSlot) {
+//       if ( ! this.followers_ ) this.followers_ = {};
+//       if ( ! dstSlot ) return;
+//       var self = this;
+//       this.recordListener_(dstSlot, function () {
+//         var sv = self.get();
+//         var dv = dstSlot.get();
 
-        if ( ! self.equals(sv, dv) ) dstSlot.set(sv);
-      });
-    },
+//         if ( ! self.equals(sv, dv) ) dstSlot.set(sv);
+//       });
+//     },
 
-    /** Have the dstSlot stop listening for changes to the srcSlot. **/
-    function unpipe(dst) {
-      if ( ! this.followers_ ) this.followers_ = {};
-      if ( ! dst ) return;
-      var listener = this.followers_[dst];
-      if ( listener ) {
-        delete this.followers_[dst];
-        this.removeListener(listener);
-      }
-    },
+//     /** Have the dstSlot stop listening for changes to the srcSlot. **/
+//     function unpipe(dst) {
+//       if ( ! this.followers_ ) this.followers_ = {};
+//       if ( ! dst ) return;
+//       var listener = this.followers_[dst];
+//       if ( listener ) {
+//         delete this.followers_[dst];
+//         this.removeListener(listener);
+//       }
+//     },
 
-    /**
-     * Maps Slots from one model to another.
-     * @param f maps Slots from srcSlot to dstSlot
-     */
-    function map(dstSlot, f) {
-      if ( ! dstSlot ) return;
-      var self = this;
-      this.recordListener_(dstSlot, function () {
-        var s = f(self.get());
-        var d = dstSlot.get();
+//     /**
+//      * Maps Slots from one model to another.
+//      * @param f maps Slots from srcSlot to dstSlot
+//      */
+//     function map(dstSlot, f) {
+//       if ( ! dstSlot ) return;
+//       var self = this;
+//       this.recordListener_(dstSlot, function () {
+//         var s = f(self.get());
+//         var d = dstSlot.get();
 
-        if ( ! self.equals(s, d) ) dstSlot.set(s);
-      });
-    },
-
-
-    /**
-     * Link the Slots of two models by having them follow each other.
-     * Initial Slot is copied from srcSlot to dstSlot.
-     **/
-    function link(dstSlot) {
-      if ( ! dstSlot ) return;
-      this.pipe(dstSlot);
-      dstSlot.pipe(this);
-    },
+//         if ( ! self.equals(s, d) ) dstSlot.set(s);
+//       });
+//     },
 
 
-    /**
-     * Relate the Slots of two models.
-     * @param f maps 'this' to dstSlot
-     * @param fprime maps dstSlot to 'this'
-     * @param removeFeedback disables feedback
-     */
-    function relate(dstSlot, f, fprime, removeFeedback) {
-      if ( ! dstSlot ) return;
+//     /**
+//      * Link the Slots of two models by having them follow each other.
+//      * Initial Slot is copied from srcSlot to dstSlot.
+//      **/
+//     function link(dstSlot) {
+//       if ( ! dstSlot ) return;
+//       this.pipe(dstSlot);
+//       dstSlot.pipe(this);
+//     },
 
-      var self = this;
-      var feedback = false;
 
-      var l = function(sv, dv, f) { return function () {
-        if ( removeFeedback && feedback ) return;
-        var s = f(sv.get());
-        var d = dv.get();
+//     /**
+//      * Relate the Slots of two models.
+//      * @param f maps 'this' to dstSlot
+//      * @param fprime maps dstSlot to 'this'
+//      * @param removeFeedback disables feedback
+//      */
+//     function relate(dstSlot, f, fprime, removeFeedback) {
+//       if ( ! dstSlot ) return;
 
-        if ( ! self.equals(s, d) ) {
-          feedback = true;
-          dv.set(s);
-          feedback = false;
-        }
-      }};
+//       var self = this;
+//       var feedback = false;
 
-      var l1 = l(this, dstSlot, f);
-      var l2 = l(dstSlot, this, fprime);
+//       var l = function(sv, dv, f) { return function () {
+//         if ( removeFeedback && feedback ) return;
+//         var s = f(sv.get());
+//         var d = dv.get();
 
-      this.recordListener_(dstSlot, l1, true);
-      dstSlot.recordListener_(this, l2, true);
+//         if ( ! self.equals(s, d) ) {
+//           feedback = true;
+//           dv.set(s);
+//           feedback = false;
+//         }
+//       }};
 
-      l1();
-    },
+//       var l1 = l(this, dstSlot, f);
+//       var l2 = l(dstSlot, this, fprime);
 
-    /** Unlink the Slots of two models by having them no longer follow each other. **/
-    function unlink(dstSlot) {
-      if ( ! dstSlot ) return;
-      this.unpipe(dstSlot);
-      dstSlot.unpipe(this);
-    },
+//       this.recordListener_(dstSlot, l1, true);
+//       dstSlot.recordListener_(this, l2, true);
 
-    /** Cleans up any remaining followers.
-        TODO: is this how the object lifecycle should be implemented? */
-    function destroy() {
-      if ( ! this.followers_ ) return;
-      for(var key in this.followers_) {
-        this.removeListener(this.followers_[key]);
-      }
-      this.followers_ = {};
-    }
-  ],
-});
+//       l1();
+//     },
 
+//     /** Unlink the Slots of two models by having them no longer follow each other. **/
+//     function unlink(dstSlot) {
+//       if ( ! dstSlot ) return;
+//       this.unpipe(dstSlot);
+//       dstSlot.unpipe(this);
+//     },
+
+//     /** Cleans up any remaining followers.
+//         TODO: is this how the object lifecycle should be implemented? */
+//     function destroy() {
+//       if ( ! this.followers_ ) return;
+//       for(var key in this.followers_) {
+//         this.removeListener(this.followers_[key]);
+//       }
+//       this.followers_ = {};
+//     }
+//   ],
+// });
