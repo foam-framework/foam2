@@ -1,5 +1,5 @@
-/*
-var corePromise = global.loadCoreTo('core/event.js');
+
+var corePromise = global.loadCoreTo('core/mm.js');
 var beforeEachTest = function(callback) {
   return beforeEach(function(done) {
     corePromise.then(function() {
@@ -9,19 +9,38 @@ var beforeEachTest = function(callback) {
   });
 };
 
+function createTestListener(doUnsub) {
+  // also handles property change, split into separate listener if necessary
+  var listener = function(subscription, old, nu) {
+    listener.last_topic = subscription.topic;
+    listener.last_args = arguments;
+    listener.last_old = old;
+    listener.last_nu = nu;
+    if (doUnsub) subscription.destroy();
+    listener.count += 1;
+  };
+  listener.count = 0;
+  return listener;
+}
+
+function modelWithTopic() {
+  CLASS({
+    name: 'TopicModel',
+    topics: [
+      'change',
+      'other'
+    ],
+  });
+  return TopicModel.create({});
+}
+
 describe('foam.events.oneTime', function() {
   var ep;
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    };
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -31,32 +50,26 @@ describe('foam.events.oneTime', function() {
   it('removes itself after one invokation', function() {
     var one = foam.events.oneTime(listener);
 
-    ep.subscribe(['simple'], one);
+    ep.change.sub(one, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(1);
 
     // listener should be gone now
-    expect(ep.hasListeners(['simple'])).toBe(false);
-    ep.publish(['simple']);
+    expect(ep.change.hasListeners_('simple')).toBe(false);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(1);
   });
 
 });
-
+/*
 describe('foam.events.consoleLog', function() {
   var ep;
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    }
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -66,9 +79,9 @@ describe('foam.events.consoleLog', function() {
   it('logs ok', function() {
     var logger = foam.events.consoleLog(listener);
 
-    ep.subscribe(['simple'], logger);
+    ep.change.sub(logger, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(1);
 
   });
@@ -82,14 +95,8 @@ describe('foam.events.merged', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    }
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -101,12 +108,12 @@ describe('foam.events.merged', function() {
   it('merges with default parameters', function() {
     var merged = foam.events.merged(listener);
 
-    ep.subscribe(['simple'], merged);
+    ep.change.sub(merged, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -118,12 +125,12 @@ describe('foam.events.merged', function() {
   it('merges with delay specified', function() {
     var merged = foam.events.merged(listener, 1300);
 
-    ep.subscribe(['simple'], merged);
+    ep.change.sub(merged, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -136,12 +143,12 @@ describe('foam.events.merged', function() {
   it('merges with opt_X specified', function() {
     var merged = foam.events.merged(listener, 1300, GLOBAL);
 
-    ep.subscribe(['simple'], merged);
+    ep.change.sub(merged, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1300);
@@ -152,12 +159,12 @@ describe('foam.events.merged', function() {
   it('unsubscribes when requested', function() {
     var merged = foam.events.merged(foam.events.oneTime(listener));
 
-    ep.subscribe(['simple'], merged);
+    ep.change.sub(merged, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -165,10 +172,10 @@ describe('foam.events.merged', function() {
     expect(ep.hasListeners(['simple'])).toBe(false);
     // and unsub happens due to the oneTime
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(1);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(1);
 
     jasmine.clock().tick(17); // should be unsubbed,
@@ -182,14 +189,8 @@ describe('foam.events.async', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    }
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -201,12 +202,12 @@ describe('foam.events.async', function() {
   it('async invokes each listener', function() {
     var delayed = foam.events.async(listener);
 
-    ep.subscribe(['simple'], delayed);
+    ep.change.sub(delayed, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1);
@@ -218,12 +219,12 @@ describe('foam.events.async', function() {
     var X = { setTimeout: setTimeout };
     var delayed = foam.events.async(listener, X);
 
-    ep.subscribe(['simple'], delayed);
+    ep.change.sub(delayed, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1);
@@ -239,15 +240,9 @@ describe('foam.events.framed', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.count += 1;
-    }
-    listener1.count = 0;
-    listener2 = function(publisher, topic, unsub) {
-      listener2.count += 1;
-    }
-    listener2.count = 0;
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -265,14 +260,14 @@ describe('foam.events.framed', function() {
     };
     var delayed1 = foam.events.framed(listener1, X);
     var delayed2 = foam.events.framed(listener2, X);
-    ep.subscribe(['simple'], delayed1);
-    ep.subscribe(['simple'], delayed2);
+    ep.change.sub(delayed1, 'simple');
+    ep.change.sub(delayed2, 'simple');
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
-    ep.publish(['simple']);
+    ep.change.pub('simple')
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
@@ -304,7 +299,7 @@ describe('EventPublisher.hasListeners()', function() {
   var ep;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
+    ep = modelWithTopic();
   });
   afterEach(function() {
     ep = null;
@@ -383,12 +378,8 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -396,23 +387,23 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
   });
 
   it('subscribes for a single topic', function() {
-    ep.subscribe(['simple'], listener);
+    ep.change.sub(listener, 'simple');
     expect(ep.hasListeners(['simple'])).toBe(true);
   });
   it('subscribes for a nested topics', function() {
-    ep.subscribe(['nested', 'topics'], listener);
+    ep.change.sub(listener, 'topics');
     expect(ep.hasListeners(['nested'])).toBe(false);
     expect(ep.hasListeners(['nested', 'topics'])).toBe(true);
   });
   it('subscribes to two different topics', function() {
-    ep.subscribe(['one'], listener);
-    ep.subscribe(['two'], listener);
+    ep.change.sub(listener, 'one');
+    ep.change.sub(listener, 'two');
     expect(ep.hasListeners(['one'])).toBe(true);
     expect(ep.hasListeners(['two'])).toBe(true);
   });
   it('subscribes to two different topics with multiple listeners', function() {
-    ep.subscribe(['one'], listener);
-    ep.subscribe(['two'], listener);
+    ep.change.sub(listener, 'one');
+    ep.change.sub(listener, 'two');
     ep.subscribe(['one'], 'fake-o-listener1');
     ep.subscribe(['two'], 'fake-o-listener2');
     expect(ep.hasListeners(['one'])).toBe(true);
@@ -433,19 +424,9 @@ describe('EventPublisher.publish()/.pub_()', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -461,30 +442,30 @@ describe('EventPublisher.publish()/.pub_()', function() {
   });
   it('publishes broadcast messages', function() {
     ep.subscribe([], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener2, 'else');
     expect(ep.publish(['*'])).toEqual(2);
     expect(listener1.last_topic).toEqual(['*']);
     expect(listener2.last_topic).toEqual(['*']);
   });
   it('publishes a specific nested topic', function() {
     ep.subscribe([], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener2, 'else');
     expect(ep.publish(['something','else'], 'arg')).toEqual(2);
     expect(listener1.last_topic).toEqual(['something','else']);
     expect(listener1.last_args[3]).toEqual('arg');
     expect(listener2.last_topic).toEqual(['something','else']);
   });
   it('publishes a specific nested wildcard', function() {
-    ep.subscribe(['something'], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener1, 'something');
+    ep.change.sub(listener2, 'else');
     expect(ep.publish(['something','*'], 'arg')).toEqual(2);
     expect(listener1.last_topic).toEqual(['something','*']);
     expect(listener1.last_args[3]).toEqual('arg');
     expect(listener2.last_topic).toEqual(['something','*']);
   });
   it('publishes a specific nested topic ending in empty string', function() {
-    ep.subscribe(['something'], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener1, 'something');
+    ep.change.sub(listener2, 'else');
     expect(ep.publish(['something',''], 'arg')).toEqual(1);
     expect(listener1.last_topic).toEqual(['something','']);
     expect(listener1.last_args[3]).toEqual('arg');
@@ -504,13 +485,8 @@ describe('EventPublisher.lazyPublish()', function() {
   var argFn;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
     argFn = function() {
       argFn.wasHit = true;
       return [['something'], 'arg'];
@@ -524,13 +500,13 @@ describe('EventPublisher.lazyPublish()', function() {
   });
 
   it('triggers the argument function when a listener is present', function() {
-    ep.subscribe(['something'], listener1);
+    ep.change.sub(listener1, 'something');
     ep.lazyPublish(['something'], argFn);
     expect(argFn.wasHit).toBe(true);
     expect(listener1.last_args[3]).toEqual('arg');
   });
   it('does not trigger the argument function when no listener is present', function() {
-    ep.subscribe(['nothing'], listener1);
+    ep.change.sub(listener1, 'nothing');
     ep.lazyPublish(['something'], argFn);
     expect(argFn.wasHit).toBe(false);
   });
@@ -544,19 +520,9 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -567,7 +533,7 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
 
   it('unsubs broadcast messages', function() {
     ep.subscribe([], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener2, 'else');
     expect(ep.publish(['*'], 'phase1')).toEqual(2);
     expect(listener1.last_args[3]).toEqual('phase1');
     expect(listener2.last_args[3]).toEqual('phase1');
@@ -581,16 +547,16 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
     ep.unsubscribe(['hello'], listener1);
   });
   it('unsubs a phantom (double)unsubscribe', function() {
-    ep.subscribe(['something','else'], listener2);
-    ep.subscribe(['something','else'], listener1);
+    ep.change.sub(listener2, 'else');
+    ep.change.sub(listener1, 'else');
     ep.unsubscribe(['something','else'], listener2);
     ep.unsubscribe(['something','else'], listener2);
 
     ep.publish(['something','else'], 'arg');
   });
   it('cleans up after complete unsub', function() {
-    ep.subscribe(['something','else'], listener2);
-    ep.subscribe(['something','else'], listener1);
+    ep.change.sub(listener2, 'else');
+    ep.change.sub(listener1, 'else');
 
     ep.unsubscribe(['something','else'], listener1);
     ep.unsubscribe(['something','else'], listener2);
@@ -598,16 +564,16 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
     expect(ep.subs_).toEqual({});
   });
   it('unsubs with a key with no listeners', function() {
-    ep.subscribe(['something','else'], listener1);
+    ep.change.sub(listener1, 'else');
     ep.unsubscribe(['something'], listener2);
   });
   it('unsubs with a key that does not exist', function() {
-    ep.subscribe(['something','else'], listener1);
+    ep.change.sub(listener1, 'else');
     ep.unsubscribe(['what'], listener2);
   });
   it('cleans up after unsubscribe all', function() {
-    ep.subscribe(['something','else'], listener2);
-    ep.subscribe(['something','else'], listener1);
+    ep.change.sub(listener2, 'else');
+    ep.change.sub(listener1, 'else');
 
     ep.unsubscribeAll();
 
@@ -624,21 +590,9 @@ describe('EventPublisher listener-unsubscribe', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-      // unsubscribe
-      unsub();
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener(true);
   });
   afterEach(function() {
     ep = null;
@@ -650,7 +604,7 @@ describe('EventPublisher listener-unsubscribe', function() {
   it('unsubs listener', function() {
     // listener2 is set up to unsubscribe itself
     ep.subscribe([], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener2, 'else');
     expect(ep.publish(['something','else'], 'phase1')).toEqual(2); // both listeners fired
     expect(listener1.last_args[3]).toEqual('phase1');
     expect(listener2.last_args[3]).toEqual('phase1');
@@ -662,7 +616,7 @@ describe('EventPublisher listener-unsubscribe', function() {
 
   it('unsubs listener published with wildcard', function() {
     ep.subscribe([], listener1);
-    ep.subscribe(['something','else'], listener2);
+    ep.change.sub(listener2, 'else');
 
     expect(ep.publish(['*'], 'phase1')).toEqual(2); // wildcard hits a different code path
     expect(listener1.last_args[3]).toEqual('phase1');
@@ -681,13 +635,8 @@ describe('EventPublisher async-publish', function() {
   var listener1;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -698,7 +647,7 @@ describe('EventPublisher async-publish', function() {
 
   it("calls publish only after a tick", function() {
 
-    ep.subscribe(['later'], listener1);
+    ep.change.sub(listener1, 'later');
     ep.publishAsync(['later']);
 
     expect(listener1.last_topic).toBeUndefined();
@@ -718,11 +667,7 @@ describe('PropertyChangePublisher.add/removePropertyListener()', function() {
 
   beforeEachTest(function() {
     pcp = PropertyChangePublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-    }
+    listener = createTestListener();
   });
   afterEach(function() {
     pcp = null;
@@ -760,10 +705,7 @@ describe('PropertyChangePublisher.globalChange()', function() {
 
   beforeEachTest(function() {
     pcp = PropertyChangePublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.count += 1;
-    }
-    listener.count = 0;
+    listener = createTestListener();
   });
   afterEach(function() {
     pcp = null;
@@ -788,13 +730,7 @@ describe('PropertyChangePublisher.propertyChange()', function() {
 
   beforeEachTest(function() {
     pcp = PropertyChangePublisher.create({});
-    listener = function(publisher, topic, unsub, old, nu) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.last_old = old;
-      listener.last_nu = nu;
-    }
+    listener = createTestListener();
   });
   afterEach(function() {
     pcp = null;
