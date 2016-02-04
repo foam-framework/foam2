@@ -164,18 +164,19 @@ foam.events = {
       var subs;
       if ( opt_topic ) {
         if ( ! this.topics_ ) return;
-        subs = topics[opt_topic];
+        subs = this.topics_[opt_topic];
         if ( ! subs ) return;
       } else {
         subs = this;
       }
 
       while ( subs.next ) {
-        if ( subs.next === l ) {
+        if ( subs.next.l === l ) {
           subs.next = subs.next.next;
           if ( subs.next ) subs.next.prev = subs;
           return;
         }
+        subs = subs.next;
       }
     },
 

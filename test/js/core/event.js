@@ -62,7 +62,7 @@ describe('foam.events.oneTime', function() {
   });
 
 });
-/*
+
 describe('foam.events.consoleLog', function() {
   var ep;
   var listener;
@@ -87,7 +87,7 @@ describe('foam.events.consoleLog', function() {
   });
 
 });
-*/
+
 
 /*
 describe('foam.events.merged', function() {
@@ -169,7 +169,7 @@ describe('foam.events.merged', function() {
 
     jasmine.clock().tick(17);
     expect(listener.count).toEqual(1);
-    expect(ep.hasListeners(['simple'])).toBe(false);
+    expect(ep.change.hasListeners_(['simple'])).toBe(false);
     // and unsub happens due to the oneTime
 
     ep.change.pub('simple')
@@ -290,135 +290,139 @@ describe('foam.events.framed', function() {
 
 
 
-
-
-
-/*
-
-describe('EventPublisher.hasListeners()', function() {
-  var ep;
-
-  beforeEachTest(function() {
-    ep = modelWithTopic();
-  });
-  afterEach(function() {
-    ep = null;
-  });
-
-  it('reports correctly for no listeners, ever', function() {
-    expect(ep.subs_).toBeNull();
-    expect(ep.hasListeners()).toBe(false);
-  });
-
-  it('reports correctly for no listeners after removing them', function() {
-    ep.subs_ = {}; // listeners might have been there, but removed.
-    expect(ep.hasListeners()).toBe(false);
-  });
-
-  it('reports correctly for one listener', function() {
-    ep.subs_ = { null: ['myFakeListener'] };
-    expect(ep.hasListeners()).toBe(true);
-  });
-
-  it('reports correctly for an empty listener list', function() {
-    ep.subs_ = { null: [] };
-    expect(ep.hasListeners()).toBe(false);
-  });
-
-  it('reports correctly for a specific listener', function() {
-    ep.subs_ = { 'cake': { null: ['myFakeListener'] } };
-    expect(ep.hasListeners(['cake'])).toBe(true);
-  });
-
-  it('reports correctly and ignores a specific listener', function() {
-    ep.subs_ = { 'cake': { null: ['myFakeListener'] } };
-    expect(ep.hasListeners(['lie'])).toBe(false);
-  });
-
-  it('reports correctly for a multi-level topic with a listener', function() {
-    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
-    expect(ep.hasListeners(['the','cake','is'])).toBe(true);
-  });
-
-  it('reports correctly for a multi-level topic with a partial-match listener', function() {
-    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: [] } } }, null: ['myFakeListener'] };
-    expect(ep.hasListeners(['the','cake'])).toBe(true);
-  });
-
-  it('reports correctly for a multi-level topic with no listener', function() {
-    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
-    expect(ep.hasListeners(['the','cake'])).toBe(false);
-  });
-
-  it('reports correctly for a multi-level topic that is complete but empty listener list', function() {
-    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: [] } } } };
-    expect(ep.hasListeners(['the','cake', 'is'])).toBe(false);
-  });
-
-  it('reports correctly for a multi-level topic with a wildcard', function() {
-    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
-    expect(ep.hasListeners(['the', foam.events.WILDCARD])).toBe(true);
-  });
-
-  it('reports correctly for a root level wildcard', function() {
-    ep.subs_ = { 'the' : { 'cake': { 'is' : { null: ['myFakeListener'] } } } };
-    expect(ep.hasListeners([foam.events.WILDCARD])).toBe(true);
-  });
-
-  it('reports correctly for a given topic but no listeners', function() {
-    expect(ep.hasListeners([foam.events.WILDCARD])).toBe(false);
-  });
-
-});
-*/
-
-/*
-describe('EventPublisher.subscribe()/.sub_()', function() {
+describe('foam.events.Observable.hasListeners()', function() {
   var ep;
   var listener;
+  var listener2;
+  var listener3;
 
   beforeEachTest(function() {
     ep = modelWithTopic();
     listener = createTestListener();
+    listener2 = createTestListener();
+    listener3 = createTestListener();    
   });
   afterEach(function() {
     ep = null;
     listener = null;
+    listener2 = null;
+    listener3 = null;
   });
+
+  it('reports correctly for no listeners, ever', function() {
+    expect(ep.change.hasListeners_()).toBe(false);
+    expect(ep.change.hasListeners_('')).toBe(false);
+  });
+  it('reports correctly for no listeners after removing one', function() {
+    ep.change.sub(listener);
+    expect(ep.change.hasListeners_()).toBe(true);
+
+    ep.change.unsub(listener);
+    expect(ep.change.hasListeners_()).toBe(false);
+  });
+  it('reports correctly for no listeners after removing one with topic', function() {
+    ep.change.sub(listener, 'flange');
+    expect(ep.change.hasListeners_('flange')).toBe(true);
+    expect(ep.change.hasListeners_()).toBe(false);
+
+    ep.change.unsub(listener, 'flange');
+    expect(ep.change.hasListeners_('flange')).toBe(false);
+  });
+
+  it('reports correctly for no listeners after removing three', function() {
+    ep.change.sub(listener);
+    ep.change.sub(listener2);
+    ep.change.sub(listener3);
+    expect(ep.change.hasListeners_()).toBe(true);
+
+    ep.change.unsub(listener2);
+    ep.change.unsub(listener);
+    ep.change.unsub(listener3);
+    expect(ep.change.hasListeners_()).toBe(false);
+  });
+  it('reports correctly for no listeners after removing three with topic', function() {
+    ep.change.sub(listener, 'arch');
+    ep.change.sub(listener2, 'arch');
+    ep.change.sub(listener3, 'arch');
+    expect(ep.change.hasListeners_('arch')).toBe(true);
+
+    ep.change.unsub(listener2, 'arch');
+    ep.change.unsub(listener, 'arch');
+    ep.change.unsub(listener3, 'arch');
+    expect(ep.change.hasListeners_('arch')).toBe(false);
+  });
+
+
+});
+
+
+/*
+describe('foam.events.Observable.subscribe()/.sub_()', function() {
+  var ep;
+  var listener;
+  var listener2;
+  var listener3;
+
+  beforeEachTest(function() {
+    ep = modelWithTopic();
+    listener = createTestListener();
+    listener2 = createTestListener();
+    listener3 = createTestListener();    
+  });
+  afterEach(function() {
+    ep = null;
+    listener = null;
+    listener2 = null;
+    listener3 = null;
+  });
+
+  it('publishes correctly after removing first of three', function() {
+    ep.change.sub(listener);
+    ep.change.sub(listener2);
+    ep.change.sub(listener3);
+    expect(ep.change.hasListeners_()).toBe(true);
+    
+    ep.change.unsub(listener);
+    ep.change.pub();
+    expect(listener.count).toEqual(0);
+    expect(listener2.count).toEqual(1);
+    expect(listener3.count).toEqual(1);
+  });
+
 
   it('subscribes for a single topic', function() {
     ep.change.sub(listener, 'simple');
-    expect(ep.hasListeners(['simple'])).toBe(true);
+    expect(ep.change.hasListeners_(['simple'])).toBe(true);
   });
   it('subscribes for a nested topics', function() {
     ep.change.sub(listener, 'topics');
-    expect(ep.hasListeners(['nested'])).toBe(false);
-    expect(ep.hasListeners(['nested', 'topics'])).toBe(true);
+    expect(ep.change.hasListeners_(['nested'])).toBe(false);
+    expect(ep.change.hasListeners_(['nested', 'topics'])).toBe(true);
   });
   it('subscribes to two different topics', function() {
     ep.change.sub(listener, 'one');
     ep.change.sub(listener, 'two');
-    expect(ep.hasListeners(['one'])).toBe(true);
-    expect(ep.hasListeners(['two'])).toBe(true);
+    expect(ep.change.hasListeners_(['one'])).toBe(true);
+    expect(ep.change.hasListeners_(['two'])).toBe(true);
   });
   it('subscribes to two different topics with multiple listeners', function() {
     ep.change.sub(listener, 'one');
     ep.change.sub(listener, 'two');
     ep.subscribe(['one'], 'fake-o-listener1');
     ep.subscribe(['two'], 'fake-o-listener2');
-    expect(ep.hasListeners(['one'])).toBe(true);
-    expect(ep.hasListeners(['two'])).toBe(true);
+    expect(ep.change.hasListeners_(['one'])).toBe(true);
+    expect(ep.change.hasListeners_(['two'])).toBe(true);
   });
 
   //   it('subscribes with a wildcard', function() {  // not valid case TODO
   //     ep.subscribe([foam.events.WILDCARD], listener);
-  //     expect(ep.hasListeners()).toBe(true);
+  //     expect(ep.change.hasListeners_()).toBe(true);
   //   });
 });
 */
 
 /*
-describe('EventPublisher.publish()/.pub_()', function() {
+describe('foam.events.Observable.publish()/.pub_()', function() {
   var ep;
   var listener1;
   var listener2;
@@ -479,7 +483,7 @@ describe('EventPublisher.publish()/.pub_()', function() {
 });
 */
 /*
-describe('EventPublisher.lazyPublish()', function() {
+describe('foam.events.Observable.lazyPublish()', function() {
   var ep;
   var listener1;
   var argFn;
@@ -514,7 +518,7 @@ describe('EventPublisher.lazyPublish()', function() {
 */
 
 /*
-describe('EventPublisher.unsubscribe()/unsub_()', function() {
+describe('foam.events.Observable.unsubscribe()/unsub_()', function() {
   var ep;
   var listener1;
   var listener2;
@@ -584,7 +588,7 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
 */
 
 /*
-describe('EventPublisher listener-unsubscribe', function() {
+describe('foam.events.Observable listener-unsubscribe', function() {
   var ep;
   var listener1;
   var listener2;
@@ -630,7 +634,7 @@ describe('EventPublisher listener-unsubscribe', function() {
 */
 
 /*
-describe('EventPublisher async-publish', function() {
+describe('foam.events.Observable async-publish', function() {
   var ep;
   var listener1;
 
