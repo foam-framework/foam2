@@ -73,6 +73,31 @@
       foo();
       bar();
 
+
+      CLASS({
+        name: 'SampleTrait',
+        properties: [ 't1', 't2', 't3' ],
+        methods: [
+          function tfoo() { console.log('ffoo'); },
+          function tbar() { console.log('tbar'); }
+        ]
+      });
+
+      CLASS({
+        name: 'TraitTest',
+        traits: ['SampleTrait'],
+        properties: [ 'p1', 'p2', 'p3' ],
+        methods: [
+          function foo() { console.log('foo'); },
+          function bar() { console.log('bar'); }
+        ]
+      });
+
+      TraitTest.describe();
+      var tt = TraitTest.create({p1:1, t1:2});
+      tt.describe();
+      tt.tfoo();
+      tt.foo();
     </script>
   </body>
 </html>
