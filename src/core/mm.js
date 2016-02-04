@@ -309,7 +309,7 @@ CLASS({
           this.instance_[name] = newValue;
 
           if ( this.hasOwnProperty('onPropertyChange') )
-            this.onPropertyChange.pub(name, oldValue, newValue);
+            this.onPropertyChange.pub_(name, [oldValue, newValue]);
 
           // TODO: call global setter
 

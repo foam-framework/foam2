@@ -115,33 +115,27 @@ foam.events = {
       }
     },
 
-    pub: function(/* string|null */ topic /*, args */) {
-      /* Return number of listeners notified. */
-      if ( topic ) {
-        if ( ! this.next && ( ! this.topics_ || ! this.topics_[topic] ) ) return 0;
-      } else {
-        if ( ! this.next ) return 0;
-      }
+    topic: function(topic) {
+      var self = this;
+      return {
+        pub: function()    { return self.pub_(topic, foam.fn.argsToArray(arguments)); },
+        sub: function(l)   { return self.sub_(topic, l); },
+        unsub: function(l) { return self.unsub_(topic, l); }
+      };
+    },
 
-      var args      = [null];
+    pub: function(/*args */) { return this.pub_(null, foam.fn.argsToArray(arguments)); },
+
+    pub_: function(topic, args) {
+      var args = [null, topic].concat(args);
       var topicSubs = topic && this.topics_ && this.topics_[topic];
-
-      args.push.apply(args, arguments);
-
       return this.notifyListeners_(topicSubs, args) +
         this.notifyListeners_(this, args);
     },
 
-    sub: function(/* topic?, l */) {
-      var topic, l;
-      if ( arguments.length == 1 ) {
-        l = arguments[0];
-      } else if ( arguments.length == 2 ) {
-        topic = arguments[0];
-        l     = arguments[1];
-      } else {
-        throw 'sub() requires 1 or 2 arguments.';
-      }
+    sub: function(l) { return this.sub_(null, l); },
+
+    sub_: function(topic, l) {
       var subs;
       if ( topic ) {
         var topics = this.topics_ || ( this.topics_ = {} );
@@ -169,16 +163,9 @@ foam.events = {
       return node.sub;
     },
 
-    unsub: function(/* topic?, l */) {
-      var topic, l;
-      if ( arguments.length == 1 ) {
-        l = arguments[0];
-      } else if ( arguments.length == 2 ) {
-        topic = arguments[0];
-        l     = arguments[1];
-      } else {
-        throw 'unsub() requires 1 or 2 arguments.';
-      }
+    unsub: function(l) { return this.unsub_(null, l); },
+
+    unsub_: function(topic, l) {
       var subs;
       if ( topic ) {
         if ( ! this.topics_ ) return;
