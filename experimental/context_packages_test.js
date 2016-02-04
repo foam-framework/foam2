@@ -1,13 +1,32 @@
+/**
+ * Experimental support for javascript object-like packages in contexts.
+ * Package objects are read only. Set new values on the context:
+ *   X.set('my.package.value', 3);
+ *   Y = X.sub();
+ *   Y.package.value ==> 3
+ *   Y.set('package.value2', 7);
+ *   Y.package.value2 ==> 7
+ *   X.package.value2 ==> undefined
+ *   X.package.value = 5;
+ *   Y.package.value ==> 5
+ */
 
 Package = {
   
   initObject: function initObject(nameArr, val) {
     console.assert(nameArr.length > 0, "initObject empty name array not allowed");
     var name = nameArr.splice(0,1)[0];
-console.log("initObject for", name, val, nameArr);
-    if ( this.hasOwnProperty(name) ) 
-      return this[name];
-console.log("  creating package");    
+//console.log("initObject for", name, val, nameArr);
+    if ( this.hasOwnProperty(name) ) {
+      if ( nameArr.length > 1 )
+        this[name].initObject(nameArr, val);
+      else if ( nameArr.length == 1 )
+        this[name].set(nameArr[0], val);
+      else
+        this[name] = val;
+      return;
+    }
+//console.log("  creating package");    
     // package_ holds the actual sub-object, captured by closures, 
     // including the property's getter, below.
     var package_ = this.__proto__[name] ? 
@@ -21,7 +40,7 @@ console.log("  creating package");
         parent_: this,
         name_: name,
         set: function set(name, val) {
-          console.log("  setting property on", this.name_, name, val);    
+//console.log("  setting property on", this.name_, name, val);    
           
           this.checkObjectProto(package_); // recursively checks our parents
           // TODO: if there is a package in name, recursively create packages
@@ -51,7 +70,7 @@ console.log("  creating package");
         
     if ( nameArr.length > 1 ) // initial parts are package names
       package_.initObject(nameArr, val);
-    else if ( nameArr.length == 1 ) // the last name part is the property/thing name
+    else if ( nameArr.length == 1 ) // the last name part is the property/thing name (dupe of earlier check?)
       package_.set(nameArr[0], val);
       
   },
@@ -64,12 +83,13 @@ console.log("  creating package");
         Y.set('thing.three')... X.thing > Y.thing > Z.thing (after checkObjectProto)
     */
   checkObjectProto: function checkObjectProto(package_ref) {
-console.log("  checkObjectProto", this.name_, package_ref.name_);
+//console.log("  checkObjectProto", this.name_, package_ref.name_);
     this.parent_ && package_ref.parent_ && this.parent_.checkObjectProto(package_ref.parent_);
-    var name = this.name_;
-    if ( this.__proto__[name] && package_ref.__proto__ !== this.__proto__[name] ) {
+    var name = package_ref.name_;
+    var protoPkg = this.__proto__[name];
+    if ( protoPkg && package_ref.__proto__ !== protoPkg && package_ref !== protoPkg ) {
       // there's a newly set ancestor in between our old object and us
-      package_ref.__proto__ = this.__proto__[name];
+      package_ref.__proto__ = protoPkg;
     }
   },
   
@@ -79,70 +99,36 @@ X = Object.create(Package);
 
 X.set = function set(name, val) {
   var nameArr = name.split('.');
-  if ( ! this.hasOwnProperty(nameArr[0]) && nameArr.length > 1 ) {
+  if ( nameArr.length > 1 ) {
     this.initObject(nameArr, val);
+  } else {
+    this[nameArr[0]] = val;
   }
-  this[nameArr[0]] = val;
 }
-//X = {
-  // set: function set(name, thing) {
-  //   var value_ = thing; // captured in closures to hold the value
-  //   var self = this; // to check if we're set from a subcontext
-  //   Object.defineProperty(this, name, {
-  //     get: function() {
-  //       return value_;
-  //     },
-  //     set: function(val) {
-  //       if ( ! ( this === self ) ) {
-  //         // create a new set of package passthrough objects on this
-  //         this.set(name, val);
-  //       } else {
-  //         value_ = val;
-  //       }
-  //     }
-  //   });
-  //
-  //   var parts = name.split('.');
-  //   if ( parts.length <= 1 ) return;
-  //   // accessors for the package parts
-  //   var pkg = this;
-  //   for (var i = 0; i < parts.length-1; ++i) {
-  //     var part = parts[i];
-  //     if ( ! pkg.hasOwnProperty(part) ) {
-  //       pkg[part] = this.__proto__ ? Object.create(this.__proto__[part]) : {};
-  //     }
-  //     pkg = pkg[part];
-  //   }
-  //   if ( ! pkg[parts[parts.length-1]] ) {
-  //     Object.defineProperty(pkg, parts[parts.length-1], {
-  //       get: function() {
-  //         return value_;
-  //       },
-  //       set: function(val) {
-  //         value_ = val;
-  //       }
-  //     });
-  //   } else {
-  //     console.assert(false, "Duplicate definition of "+name)
-  //   }
-  //
-  // },
-  
-  
-  
+    
 X.sub = function sub() {
   return Object.create(this);
 }
-
-
-X.set('val', 8);
-console.log(X.val);
-
-X.set('package.val', 4);
-console.log(X.package.val);
-X.package.val = 3;
-console.log(X['package.val'], X.package.val);
-
+///////////////////////
+var t = Date.now();
 Y = X.sub();
-Y.package.val = 9;
-console.log(Y.package.val, X.package.val);
+Z = Y.sub();
+
+for (var i=0; i<100; ++i) {
+  var name = "package.Xprop"+i;
+  X.set(name, i);
+}
+
+for (var i=200; i<300; ++i) {
+  var name = "package.Zprop"+i;
+  Z.set(name, i);
+}
+
+for (var i=100; i<200; ++i) {
+  var name = "package.Yprop"+i;
+  Y.set(name, i);
+}
+
+
+console.log("Time(ms): ", Date.now() - t);
+
