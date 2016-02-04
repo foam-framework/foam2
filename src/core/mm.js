@@ -428,6 +428,20 @@ CLASS({
 
 
 CLASS({
+  name: 'Trait',
+
+  properties: [
+    { name: 'name', getter: function() { return 'trait_' + this.path; } },
+    { name: 'path' }
+  ],
+
+  methods: [
+    function installInClass(cls) { cls.installModel(global[this.path].model_); }
+  ]
+});
+
+
+CLASS({
   name: 'Topic',
 
   properties: [
@@ -528,6 +542,16 @@ CLASS({
   name: 'Model',
 
   properties: [
+    {
+      type: 'AxiomArray',
+      subType: 'Trait',
+      name: 'traits',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          Trait.create({path: o})    :
+          Trait.create(o)            ;
+      }
+    },
     {
       type: 'AxiomArray',
       subType: 'Constant',
