@@ -308,9 +308,10 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          if ( this.hasOwnProperty('onPropertyChange') )
-            this.onPropertyChange.pub(name, oldValue, newValue);
-
+          if ( this.hasOwnProperty('onPropertyChange') ) {
+            var t = this.onPropertyChange;
+            if ( t.hasListeners_(name) ) t.pub_(name, [oldValue, newValue]);
+          }
           // TODO: call global setter
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);

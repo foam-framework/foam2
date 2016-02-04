@@ -30,29 +30,29 @@
 
       var t = TopicTest.create();
 
-      t.onFoo.sub(function(sub, subTopic, arg1) {
-        console.log('onFoo: ', sub, sub.topic.toString(), subTopic, arg1);
+      t.onFoo.sub(function(sub, subTopic, arg1, arg2, arg3) {
+        console.log('onFoo: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, 'args: ', arg1, arg2, arg3);
       });
-      t.onFoo.sub('hello', function(sub, subTopic, arg1) {
-        console.log('onFoo.hello: ', sub, sub.topic.toString(), subTopic, arg1);
+      t.onFoo.topic('subTopic').sub(function(sub, subTopic, arg1, arg2, arg3) {
+        console.log('onFoo.subTopic: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, 'args: ', arg1, arg2, arg3);
       });
-      t.onFoo.pub(null,   'hello', 'world');
-      t.onFoo.pub('hello','world');
+      t.onFoo.pub('hello', 'world');
+      t.onFoo.topic('subTopic').pub('hello','world','subTopic');
 
       t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
-        console.log('global: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+        console.log('onPropertyChange.global: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.sub('a', function(sub, subTopic, oldValue,newValue) {
-        console.log('a: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      t.onPropertyChange.topic('a').sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('onPropertyChange.a: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.sub('a', function(sub, subTopic, oldValue,newValue) {
-        console.log('a2: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      t.onPropertyChange.topic('a').sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('onPropertyChange.a2: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.sub('a', function(sub, subTopic, oldValue,newValue) {
-        console.log('a-oneTime: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
+      t.onPropertyChange.topic('a').sub(function(sub, subTopic, oldValue,newValue) {
+        console.log('onPropertyChange.a-oneTime: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
         sub.destroy();
       });
 

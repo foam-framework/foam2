@@ -27,6 +27,7 @@ FObject.__proto__.describe = function(opt_name) {
       foam.string.pad(a.sourceCls_.name, 14),
       a.name);
   }
+  console.log('\n');
 };
 
 
@@ -46,6 +47,7 @@ CLASS({
           foam.string.pad(p.name, 14),
           this[p.name]);
       }
+      console.log('\n');
     }
   ]
 });
