@@ -33,24 +33,28 @@
       t.onFoo.sub(function(sub, subTopic, arg1) {
         console.log('onFoo: ', sub, sub.topic.toString(), subTopic, arg1);
       });
+      t.onFoo.sub('hello', function(sub, subTopic, arg1) {
+        console.log('onFoo.hello: ', sub, sub.topic.toString(), subTopic, arg1);
+      });
+      t.onFoo.pub(null,   'hello', 'world');
       t.onFoo.pub('hello','world');
 
       t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
         console.log('global: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+      t.onPropertyChange.sub('a', function(sub, subTopic, oldValue,newValue) {
         console.log('a: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
-      }, 'a');
+      });
 
-      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+      t.onPropertyChange.sub('a', function(sub, subTopic, oldValue,newValue) {
         console.log('a2: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
-      }, 'a');
+      });
 
-      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
+      t.onPropertyChange.sub('a', function(sub, subTopic, oldValue,newValue) {
         console.log('a-oneTime: ', sub, sub.topic.toString(), subTopic, oldValue, newValue);
         sub.destroy();
-      }, 'a');
+      });
 
       t.a = 42;
       t.b = 84;

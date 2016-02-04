@@ -115,16 +115,16 @@ foam.events = {
       }
     },
 
-    pub: function(opt_topic /*, args */) {
+    pub: function(/* string|null */ topic /*, args */) {
       /* Return number of listeners notified. */
-      if ( opt_topic ) {
-        if ( ! this.next && ( ! this.topics_ || ! this.topics_[opt_topic] ) ) return 0;
+      if ( topic ) {
+        if ( ! this.next && ( ! this.topics_ || ! this.topics_[topic] ) ) return 0;
       } else {
         if ( ! this.next ) return 0;
       }
 
       var args      = [null];
-      var topicSubs = opt_topic && this.topics_ && this.topics_[opt_topic];
+      var topicSubs = topic && this.topics_ && this.topics_[topic];
 
       args.push.apply(args, arguments);
 
@@ -132,11 +132,20 @@ foam.events = {
         this.notifyListeners_(this, args);
     },
 
-    sub: function(l, opt_topic) {
+    sub: function(/* topic?, l */) {
+      var topic, l;
+      if ( arguments.length == 1 ) {
+        l = arguments[0];
+      } else if ( arguments.length == 2 ) {
+        topic = arguments[0];
+        l     = arguments[1];
+      } else {
+        throw 'sub() requires 1 or 2 arguments.';
+      }
       var subs;
-      if ( opt_topic ) {
+      if ( topic ) {
         var topics = this.topics_ || ( this.topics_ = {} );
-        subs = topics[opt_topic] || (topics[opt_topic] = {});
+        subs = topics[topic] || (topics[topic] = {});
       } else {
         subs = this;
       }
@@ -160,11 +169,20 @@ foam.events = {
       return node.sub;
     },
 
-    unsub: function(l, opt_topic) {
+    unsub: function(/* topic?, l */) {
+      var topic, l;
+      if ( arguments.length == 1 ) {
+        l = arguments[0];
+      } else if ( arguments.length == 2 ) {
+        topic = arguments[0];
+        l     = arguments[1];
+      } else {
+        throw 'unsub() requires 1 or 2 arguments.';
+      }
       var subs;
-      if ( opt_topic ) {
+      if ( topic ) {
         if ( ! this.topics_ ) return;
-        subs = this.topics_[opt_topic];
+        subs = this.topics_[topic];
         if ( ! subs ) return;
       } else {
         subs = this;
