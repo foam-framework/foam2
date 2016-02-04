@@ -665,8 +665,8 @@ foam.boot.end();
 
 /*
   TODO:
-  - Implement Property Overriding
   - SUPER support
+  - Lightweight Objects
   - Add package and id to Model and Class
   - Proxy id, name, package, label, plural from Class to Model
   - Make Properties be adapter functions.
