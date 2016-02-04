@@ -43,7 +43,7 @@ Package = {
         set: function set(name, val) {
 //console.log("  setting property on", this.name_, name, val);    
           
-          this.checkObjectProto(package_); // recursively checks our parents
+          this.checkObjectProto(package_, true); // recursively checks our parents
           // TODO: if there is a package in name, recursively create packages
           //create the property
           if ( ! this.hasOwnProperty(name) ) {
@@ -84,10 +84,10 @@ Package = {
         X.set('thing.one'), Z.set('thing.two')... X.thing > Z.thing
         Y.set('thing.three')... X.thing > Y.thing > Z.thing (after checkObjectProto)
     */
-  checkObjectProto: function checkObjectProto(package_ref) {
+  checkObjectProto: function checkObjectProto(package_ref, opt_checkParents) {
 //console.log("  checkObjectProto", this.name_, package_ref.name_);
 protoCheckCount += 1;
-    this.parent_ && package_ref.parent_ && this.parent_.checkObjectProto(package_ref.parent_);
+    opt_checkParents && this.parent_ && package_ref.parent_ && this.parent_.checkObjectProto(package_ref.parent_);
     var name = package_ref.name_;
     var protoPkg = this.__proto__[name];
     if ( protoPkg && package_ref.__proto__ !== protoPkg && package_ref !== protoPkg ) {
