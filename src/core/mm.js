@@ -253,7 +253,18 @@ CLASS({
   ],
 
   methods: [
-    function installInClass(c) { c[foam.string.constantize(this.name)] = this; },
+    function installInClass(c) {
+      var superProp = c.__proto__.getAxiomByName(this.name);
+      if ( superProp ) {
+        var a = this.cls_.getAxiomsByClass(Property);
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          var name = a[i].name;
+          if ( typeof superProp[name] !== 'undefined' && ! this.hasOwnProperty(name) )
+            this[name] = superProp[name];
+        }
+      }
+      c[foam.string.constantize(this.name)] = this;
+    },
     function installInProto(proto) {
       /*
         Install a property onto a prototype from a Property definition.
@@ -632,15 +643,19 @@ CLASS({
         for ( var key in args.instance_ )
           this[key] = args.instance_[key];
       } else {
-        // TODO: should walk through Axioms with initAgents instead
-        var a = this.cls_.getAxiomsByClass(Property);
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          var name = a[i].name;
-          if ( typeof args[name] !== 'undefined' ) {
-            this[name] = args[name];
-          }
+        this.copyFrom(args);
+      }
+    },
+    function copyFrom(o) {
+      // TODO: should walk through Axioms with initAgents instead
+      var a = this.cls_.getAxiomsByClass(Property);
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        var name = a[i].name;
+        if ( typeof args[name] !== 'undefined' ) {
+          this[name] = args[name];
         }
       }
+      return this;
     }
   ]
 });

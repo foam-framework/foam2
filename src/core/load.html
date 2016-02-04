@@ -102,6 +102,34 @@
       tt.describe();
       tt.tfoo();
       tt.foo();
+
+
+      CLASS({
+        name: 'Person',
+        properties: [
+          'name',
+          { name: 'sex', defaultValue: 'M' }
+        ]
+      });
+      CLASS({
+        name: 'Employee',
+        extends: 'Person',
+        properties: [
+          'salary'
+        ]
+      });
+      CLASS({
+        name: 'Nun',
+        extends: 'Person',
+        properties: [
+          { name: 'sex', defaultValue: 'F' }
+        ]
+      });
+
+      var bob     = Person.create({name: 'Bob'});
+      var don     = Person.create({name: 'Don'});
+      var terresa = Nun.create({name: 'Terresa'});
+      console.log(bob.sex, don.sex, terresa.sex);
     </script>
   </body>
 </html>
