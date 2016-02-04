@@ -222,8 +222,9 @@ CLASS({
       subType: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        var cls = this.type ? global[this.type + 'Property'] : Property;
-        return cls.create(o);
+        return typeof o === 'string'     ?
+          Property.create({name: o})     :
+          global[this.subType].create(o) ;
       }
     },
     {
@@ -427,10 +428,7 @@ CLASS({
 CLASS({
   name: 'Constant',
 
-  properties: [
-    { name: 'name'  },
-    { name: 'value' }
-  ],
+  properties: [ 'name', 'value' ],
 
   methods: [
     function installInClass(cls)   { cls[foam.string.constantize(this.name)]   = this.value; },
@@ -444,7 +442,7 @@ CLASS({
 
   properties: [
     { name: 'name', getter: function() { return 'trait_' + this.path; } },
-    { name: 'path' }
+    'path'
   ],
 
   methods: [
@@ -456,10 +454,7 @@ CLASS({
 CLASS({
   name: 'Topic',
 
-  properties: [
-    { name: 'name' },
-    { name: 'description' }
-  ],
+  properties: [ 'name', 'description' ],
 
   methods: [
     function installInProto(proto) {
@@ -504,7 +499,7 @@ CLASS({
   extends: 'Property',
 
   properties: [
-    { name: 'units' },
+    'units',
     {
       name: 'defaultValue',
       defaultValue: 0
@@ -524,8 +519,8 @@ CLASS({
   name: 'Listener',
 
   properties: [
-    { name: 'name' },
-    { name: 'code' },
+    'name',
+    'code',
     { type: 'Boolean', name: 'isFramed',   defaultValue: false },
     { type: 'Boolean', name: 'isMerged',   defaultValue: false },
     { type: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }
