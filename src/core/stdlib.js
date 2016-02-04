@@ -72,9 +72,9 @@ foam.events = {
 
   oneTime: function oneTime(listener) {
     /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
-    return function() {
+    return function(subscription) {
       listener.apply(this, foam.fn.argsToArray(arguments));
-      arguments[2](); // the unsubscribe fn
+      subscription.destroy();
     };
   },
 
@@ -105,6 +105,14 @@ foam.events = {
         count++;
       }
       return count;
+    },
+
+    hasListeners_: function(opt_topic) {
+      if ( ! opt_topic ) {
+        return !! this.next;
+      } else {
+        return !! ( this.topics_ && this.topics_[opt_topic] && this.topics_[opt_topic].next );
+      }
     },
 
     pub: function(opt_topic /*, args */) {
