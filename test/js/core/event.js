@@ -10,10 +10,12 @@ var beforeEachTest = function(callback) {
 };
 
 function createTestListener(doUnsub) {
-  var listener = function(subscription) {
+  // also handles property change, split into separate listener if necessary
+  var listener = function(subscription, old, nu) {
     listener.last_topic = subscription.topic;
-    listener.last_unsub = subscription.unsub;
     listener.last_args = arguments;
+    listener.last_old = old;
+    listener.last_nu = nu;
     if (doUnsub) subscription.destroy();
     listener.count += 1;
   };
@@ -66,14 +68,8 @@ describe('foam.events.consoleLog', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    }
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -99,14 +95,8 @@ describe('foam.events.merged', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    }
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -199,14 +189,8 @@ describe('foam.events.async', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.count += 1;
-    }
-    listener.count = 0;
+    ep = modelWithTopic();
+    listener = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -256,15 +240,9 @@ describe('foam.events.framed', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.count += 1;
-    }
-    listener1.count = 0;
-    listener2 = function(publisher, topic, unsub) {
-      listener2.count += 1;
-    }
-    listener2.count = 0;
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -321,7 +299,7 @@ describe('EventPublisher.hasListeners()', function() {
   var ep;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
+    ep = modelWithTopic();
   });
   afterEach(function() {
     ep = null;
@@ -400,12 +378,8 @@ describe('EventPublisher.subscribe()/.sub_()', function() {
   var listener;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -450,19 +424,9 @@ describe('EventPublisher.publish()/.pub_()', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -521,13 +485,8 @@ describe('EventPublisher.lazyPublish()', function() {
   var argFn;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
     argFn = function() {
       argFn.wasHit = true;
       return [['something'], 'arg'];
@@ -561,19 +520,9 @@ describe('EventPublisher.unsubscribe()/unsub_()', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -641,21 +590,9 @@ describe('EventPublisher listener-unsubscribe', function() {
   var listener2;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
-    listener2 = function(publisher, topic, unsub) {
-      listener2.last_publisher = publisher;
-      listener2.last_topic = topic;
-      listener2.last_unsub = unsub;
-      listener2.last_args = arguments;
-      // unsubscribe
-      unsub();
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
+    listener2 = createTestListener(true);
   });
   afterEach(function() {
     ep = null;
@@ -698,13 +635,8 @@ describe('EventPublisher async-publish', function() {
   var listener1;
 
   beforeEachTest(function() {
-    ep = EventPublisher.create({});
-    listener1 = function(publisher, topic, unsub) {
-      listener1.last_publisher = publisher;
-      listener1.last_topic = topic;
-      listener1.last_unsub = unsub;
-      listener1.last_args = arguments;
-    }
+    ep = modelWithTopic();
+    listener1 = createTestListener();
     jasmine.clock().install();
   });
   afterEach(function() {
@@ -735,11 +667,7 @@ describe('PropertyChangePublisher.add/removePropertyListener()', function() {
 
   beforeEachTest(function() {
     pcp = PropertyChangePublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-    }
+    listener = createTestListener();
   });
   afterEach(function() {
     pcp = null;
@@ -777,10 +705,7 @@ describe('PropertyChangePublisher.globalChange()', function() {
 
   beforeEachTest(function() {
     pcp = PropertyChangePublisher.create({});
-    listener = function(publisher, topic, unsub) {
-      listener.count += 1;
-    }
-    listener.count = 0;
+    listener = createTestListener();
   });
   afterEach(function() {
     pcp = null;
@@ -805,13 +730,7 @@ describe('PropertyChangePublisher.propertyChange()', function() {
 
   beforeEachTest(function() {
     pcp = PropertyChangePublisher.create({});
-    listener = function(publisher, topic, unsub, old, nu) {
-      listener.last_topic = topic;
-      listener.last_unsub = unsub;
-      listener.last_args = arguments;
-      listener.last_old = old;
-      listener.last_nu = nu;
-    }
+    listener = createTestListener();
   });
   afterEach(function() {
     pcp = null;
