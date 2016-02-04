@@ -10,7 +10,7 @@
  *   X.package.value = 5;
  *   Y.package.value ==> 5
  */
-
+protoCheckCount = 0;
 Package = {
   
   initObject: function initObject(nameArr, val) {
@@ -29,6 +29,7 @@ Package = {
 //console.log("  creating package");    
     // package_ holds the actual sub-object, captured by closures, 
     // including the property's getter, below.
+    var self = this;
     var package_ = this.__proto__[name] ? 
       { // extend an ancestor's copy
          __proto__: this.__proto__[name], 
@@ -61,7 +62,8 @@ Package = {
     // the package object's proto at a future point.
     Object.defineProperty(this, name, {
       get: function get() {
-        this.checkObjectProto(package_);
+        // this check is done waaaay too much (in extreme examples, 14 subcontexts each adding a package)
+        self.checkObjectProto(package_);
         return package_;
       },
     });
@@ -84,6 +86,7 @@ Package = {
     */
   checkObjectProto: function checkObjectProto(package_ref) {
 //console.log("  checkObjectProto", this.name_, package_ref.name_);
+protoCheckCount += 1;
     this.parent_ && package_ref.parent_ && this.parent_.checkObjectProto(package_ref.parent_);
     var name = package_ref.name_;
     var protoPkg = this.__proto__[name];
@@ -128,7 +131,26 @@ for (var i=100; i<200; ++i) {
   var name = "package.Yprop"+i;
   Y.set(name, i);
 }
+///////////
+
+var ctxs = [X.sub()];
+for (var i = 1; i < 100; ++i) {
+  ctxs[i] = ctxs[i-1].sub(); 
+}
+
+for (var i = 1; i < 14; ++i) {
+  var pkgName = "";
+  for (var j = 0; j < i; ++j) {
+    pkgName += "pkg"+j+'.';
+  }
+  pkgName += "val";
+  console.log("Setting ", pkgName, i);
+  ctxs[i].set(pkgName, i);
+}
+
+console.log("Time(ms): ", Date.now() - t, " Proto checks:", protoCheckCount);
 
 
-console.log("Time(ms): ", Date.now() - t);
+
+
 
