@@ -107,24 +107,27 @@ foam.events = {
       return count;
     },
 
-    hasListeners_: function(opt_topic) {
-      if ( ! opt_topic ) {
-        return !! this.next;
-      } else {
-        return !! ( this.topics_ && this.topics_[opt_topic] && this.topics_[opt_topic].next );
-      }
+    hasListeners_: function(topic) {
+      if ( ! topic ) return !! this.next;
+      return !! ( this.topics_ && this.topics_[topic] && this.topics_[topic].next );
     },
 
     topic: function(topic) {
       var self = this;
       return {
-        pub: function()    { return self.pub_(topic, foam.fn.argsToArray(arguments)); },
-        sub: function(l)   { return self.sub_(topic, l); },
+        pub: function() {
+          if ( ! self.hasListeners_(topic) ) return 0;
+          return self.pub_(topic, foam.fn.argsToArray(arguments));
+        },
+        sub: function(l) { return self.sub_(topic, l); },
         unsub: function(l) { return self.unsub_(topic, l); }
       };
     },
 
-    pub: function(/*args */) { return this.pub_(null, foam.fn.argsToArray(arguments)); },
+    pub: function(/*args */) {
+      if ( ! this.hasListeners_() ) return 0;
+      return this.pub_(null, foam.fn.argsToArray(arguments));
+    },
 
     pub_: function(topic, args) {
       var args = [null, topic].concat(args);
