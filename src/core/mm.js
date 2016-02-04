@@ -377,6 +377,7 @@ CLASS({
   ]
 });
 
+
 foam.boot.endPhase1();
 
 
@@ -456,14 +457,52 @@ CLASS({
 
 
 CLASS({
+  name: 'BooleanProperty',
+  extends: 'Property',
+
+  properties: [
+    {
+      name: 'defaultValue',
+      defaultValue: false
+    },
+    {
+      name: 'adapt',
+      defaultValue: function(_, v) { return !!v; }
+    }
+  ]
+});
+
+
+CLASS({
+  name: 'IntProperty',
+  extends: 'Property',
+
+  properties: [
+    { name: 'units' },
+    {
+      name: 'defaultValue',
+      defaultValue: 0
+    },
+    {
+      name: 'adapt',
+      defaultValue: function(_, v) {
+        return typeof v === 'number' ?
+          Math.round(v) : v ? parseInt(v) : 0 ;
+      }
+    }
+  ]
+});
+
+
+CLASS({
   name: 'Listener',
 
   properties: [
     { name: 'name' },
-    { name: 'code' }/*,
+    { name: 'code' },
     { type: 'Boolean', name: 'isFramed',   defaultValue: false },
     { type: 'Boolean', name: 'isMerged',   defaultValue: false },
-    { type: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }*/
+    { type: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }
   ],
 
   methods: [
@@ -550,6 +589,7 @@ CLASS({
     }
   ]
 });
+
 
 CLASS({
   name: 'FObject',
