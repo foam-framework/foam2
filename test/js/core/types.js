@@ -16,10 +16,10 @@ function makeTestFn() {
   CLASS({  name: 'package.TypeC' });
   CLASS({  name: 'RetType' });
   return function test(/* TypeA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
-    return true;
+    return RetType.create();
   }  
 }
-function makePrimitiveTestFn() {
+function makePrimitiveTestFn() { // multiline parsing, ha
 return function(/* string */ str, /*boolean*/ bool , 
   /* function*/ func, /*object*/obj, /* number */num ) {
     return true;
@@ -125,6 +125,40 @@ describe('Argument.validate', function() {
   });
 
 });
+
+
+describe('foam.types.typeCheck', function() {
+  var fn;
+
+  beforeEachTest(function() {
+    fn = foam.types.typeCheck(makeTestFn());
+  });
+  afterEach(function() {
+    fn = null;
+  });
+
+  it('allows valid args', function() {
+    expect(function() { fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99); }).not.toThrow();
+  });
+  it('allows extra args', function() {
+    expect(function() { fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99,
+    "extra", 8, 'arg'); }).not.toThrow();
+  });
+  it('fails missing args', function() {
+    expect(function() { fn(TypeA.create(), TypeB.create()); }).toThrow();
+  });
+
+  it('fails bad return type', function() {
+   var rfn = foam.types.typeCheck(function(arg /* object */) { return arg; });
+   expect(function() { rfn({}); }).not.toThrow();
+   expect(function() { rfn(99); }).toThrow();
+  });
+
+});
+
+
+
+
 
 
 

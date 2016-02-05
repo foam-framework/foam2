@@ -140,17 +140,17 @@ foam.types.typeCheck = function typeCheck(fn) {
   // parse out the arguments and their types
   var args = foam.types.getFunctionArgs(fn);
   var ret = function() {
-    // check each incoming argument
-    for (var i = 0; i < arguments.length; ++i) {
-      if ( ! args[i] ) break; // don't validate extra args
+    // check each declared argument, arguments[i] can be undefined for missing optional args,
+    // extra arguments are ok
+    for (var i = 0; i < args.length; ++i) {
       args[i].validate(arguments[i]);
     }
     // If nothing threw an exception, we are free to run the function
     var retVal = fn.apply(this, arguments);
   
     // check the return value
-    if ( args.returnValue ) {
-      args.returnValue.validate(retVal);
+    if ( args.returnType ) {
+      args.returnType.validate(retVal);
     }
     
     return retVal;
