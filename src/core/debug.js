@@ -18,12 +18,12 @@
 FObject.__proto__.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
-  console.log('Axiom Type          Source Class   Name');
-  console.log('--------------------------------------------');
+  console.log('Axiom Type           Source Class   Name');
+      console.log('----------------------------------------------------');
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     console.log(
-      foam.string.pad(a.cls_.name, 19),
+      foam.string.pad(a.cls_.name, 20),
       foam.string.pad(a.sourceCls_.name, 14),
       a.name);
   }
