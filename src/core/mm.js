@@ -646,8 +646,8 @@ CLASS({
       var a = this.cls_.getAxiomsByClass(Property);
       for ( var i = 0 ; i < a.length ; i++ ) {
         var name = a[i].name;
-        if ( typeof args[name] !== 'undefined' ) {
-          this[name] = args[name];
+        if ( typeof o[name] !== 'undefined' ) {
+          this[name] = o[name];
         }
       }
       return this;
