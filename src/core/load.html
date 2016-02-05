@@ -30,35 +30,49 @@
 
       var t = TopicTest.create();
 
-      t.onFoo.sub(function(sub, subTopic, arg1, arg2, arg3) {
-        console.log('onFoo: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, 'args: ', arg1, arg2, arg3);
-      });
-      t.onFoo.topic('subTopic').sub(function(sub, subTopic, arg1, arg2, arg3) {
-        console.log('onFoo.subTopic: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, 'args: ', arg1, arg2, arg3);
-      });
-      t.onFoo.pub('hello', 'world');
-      t.onFoo.topic('subTopic').pub('hello','world','subTopic');
+      var l = function() { console.log('listener: ', arguments); };
+      t.subscribe(l);
+      t.publish('test1');
+      t.unsubscribe(l);
+      t.publish("if you see this, unsubscribe doesn't work");
 
-      t.onPropertyChange.sub(function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.global: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
+      t.subscribe('subtopic', l);
+      t.publish('subtopic', 'test1');
+      t.unsubscribe('subtopic', l);
+      t.publish('subtopic', "if you see this, unsubscribe doesn't work");
+
+      t.subscribe(function() { console.log('global: ', arguments); });
+      t.subscribe('foo', function() { console.log('foo: ', arguments); });
+      t.publish('foo');
+      t.publish('bar');
+      t.publish('foo', 'bar', 'zoom');
+
+      t.onFoo.publish('data to onFoo');
+
+      t.onFoo.subscribe(function(sub, subTopic, arg1, arg2, arg3) {
+        console.log('onFoo: ', sub, 'subTopic: ', subTopic, 'args: ', arg1, arg2, arg3);
+      });
+      t.onFoo.subscribe('subTopic', function(sub, subTopic, arg1, arg2, arg3) {
+        console.log('onFoo.subTopic: ', sub, 'subTopic: ', subTopic, 'args: ', arg1, arg2, arg3);
+      });
+      t.onFoo.publish('hello', 'world');
+      t.onFoo.publish('subTopic', 'hello','world','subTopic');
+
+
+      t.onPropertyChange.subscribe(function(sub, subTopic, oldValue,newValue) {
+        console.log('onPropertyChange.global: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.topic('a').sub(function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.a: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
+      t.onPropertyChange.subscribe('a', function(sub, subTopic, oldValue,newValue) {
+        console.log('onPropertyChange.a: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.topic('a').sub(function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.a2: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
-      });
-
-      t.onPropertyChange.topic('a').sub(function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.a-oneTime: ', sub, sub.topic.toString(), 'subTopic: ', subTopic, oldValue, newValue);
+      t.onPropertyChange.subscribe('a', function(sub, subTopic, oldValue,newValue) {
+        console.log('onPropertyChange.a-oneTime: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
         sub.destroy();
       });
 
       t.a = 42;
-      t.b = 84;
-      t.a++;
       t.a++;
 
       CLASS({

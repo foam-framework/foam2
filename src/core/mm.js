@@ -204,6 +204,7 @@ CLASS({
         });
       }
       this.private_[name] = value;
+      return value;
     },
     function getPrivate_(name) {
       return this.private_ && this.private_[name];
@@ -326,8 +327,10 @@ CLASS({
           return this.instance_[name];
         },
         set: prop.setter || function propSetter(newValue) {
-          // TODO: add logic to not trigger factory
-          var oldValue = this[name];
+          // Get old value but avoid triggering factory if present
+          var oldValue = this.factory ?
+            ( this.hasOwnProperty(name) ? this[name] : undefined ) :
+            this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
 
@@ -335,10 +338,8 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          if ( this.hasOwnProperty('onPropertyChange') ) {
-            var t = this.onPropertyChange;
-            if ( t.hasListeners_(name) ) t.pub_(name, [oldValue, newValue]);
-          }
+          this.publish && this.publish('onPropertyChange', name, oldValue, newValue);
+
           // TODO: call global setter
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
@@ -413,6 +414,85 @@ CLASS({
   name: 'FObject',
 
   methods: [
+    function createListenerList_() {
+      return { next: null, children: [] };
+    },
+
+    function listeners_() {
+      return this.getPrivate_('listeners') ||
+        this.setPrivate_('listeners', this.createListenerList_());
+    },
+
+    function notify_(listeners, args) {
+      var count = 0;
+      while ( listeners ) {
+        args[0] = listeners.sub;
+        listeners.l.apply(null, args);
+        listeners = listeners.next;
+        count++;
+      }
+      return count;
+    },
+
+    function publish(/* args... */) {
+      if ( ! this.hasOwnPrivate_('listeners') ) return 0;
+
+      var listeners = this.listeners_();
+      var args      = Array.prototype.concat.apply([null], arguments);
+      var count     = this.notify_(listeners.next, args);
+
+      for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
+        var listeners = listeners.children[arguments[i]];
+        if ( ! listeners ) break;
+        count += this.notify_(listeners.next, args);
+      }
+
+      return count;
+    },
+    
+    function subscribe(/* args..., l */) {
+      var l         = arguments[arguments.length-1];
+      var listeners = this.listeners_();
+      
+      for ( var i = 0 ; i < arguments.length-1 ; i++ )
+        listeners = listeners.children[arguments[i]] ||
+        ( listeners.children[arguments[i]] = this.createListenerList_() );
+
+      var node = {
+        sub:  { src: this },
+        next: listeners.next,
+        prev: listeners,
+        l: l
+      };
+      node.sub.destroy = function() {
+        if ( node.next ) node.next.prev = node.prev;
+        if ( node.prev ) node.prev.next = node.next;
+
+        // Disconnect so that calling destroy more than once is harmless
+        this.next = this.prev = null;
+      };
+
+      listeners.next = node;
+
+      return node.sub;
+    },
+
+    function unsubscribe(/* args..., l */) {
+      var l         = arguments[arguments.length-1];
+      var listeners = this.getPrivate_('listeners');
+
+      for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ )
+        listeners = listeners.children[arguments[i]];
+
+      var node = listeners && listeners.next;
+      while ( node ) {
+        if ( node.l === l ) {
+          node.sub.destroy();
+          return;
+        }
+      }
+    },
+    
     function clearProperty(name) { delete this.instance_[name]; },
     function toString() {
       // Distinguish between prototypes and instances.
@@ -477,8 +557,17 @@ CLASS({
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
+          var self = this;
           if ( ! this.hasOwnPrivate_(name) )
-            this.setPrivate_(name, foam.events.Observable.create(name, this));
+            this.setPrivate_(
+              name,
+              {
+                publish:     self.publish.bind(self, name),
+                subscribe:   self.subscribe.bind(self, name),
+                unsubscribe: self.unsubscribe.bind(self, name),
+                toString:    function() { return 'Topic(' + name + ')'; }
+              }
+            );
 
           return this.getPrivate_(name);
         },
