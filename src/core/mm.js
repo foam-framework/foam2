@@ -335,7 +335,7 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          if ( this.hasOwnProperty('onPropertyChange') ) {
+          if ( this.onPropertyChange ) {
             var t = this.onPropertyChange;
             if ( t.hasListeners_(name) ) t.pub_(name, [oldValue, newValue]);
           }
