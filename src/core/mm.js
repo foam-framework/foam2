@@ -469,7 +469,7 @@ CLASS({
         if ( node.prev ) node.prev.next = node.next;
 
         // Disconnect so that calling destroy more than once is harmless
-        this.next = this.prev = null;
+        node.next = node.prev = null;
       };
 
       listeners.next = node;
