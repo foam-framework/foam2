@@ -14,12 +14,13 @@ describe('foam.types.getFunctionArgs', function() {
   var fn;
 
   beforeEachTest(function() {
-    fn = function(/* TypeA */ paramA, /*TypeB?*/ paramB, /* package.TypeC*/ paramC, noType /* RetType */) {
+    fn = function test(/* TypeA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
       return true;
     }
     CLASS({  name: 'TypeA' });
     CLASS({  name: 'TypeB' });
     CLASS({  name: 'package.TypeC' });
+    CLASS({  name: 'RetType' });
   });
   afterEach(function() {
     fn = null;
@@ -44,7 +45,7 @@ describe('foam.types.getFunctionArgs', function() {
     expect(params[3].typeName).toBeUndefined();
     expect(params[3].optional).toBe(false);
     
-    expect(params.returnType).toEqual('RetType');
+    expect(params.returnType.typeName).toEqual('RetType');
     
   });
 
