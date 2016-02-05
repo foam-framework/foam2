@@ -15,12 +15,16 @@
  * limitations under the License.
  */
 
+if ( ! foam.types ) foam.types = {};
+
+
 CLASS({
   name: 'Argument',
   properties: [
     { name: 'name' },
     { name: 'typeName' },
     { name: 'type' },
+    { name: 'optional', defaultValue: false }
   ]
 });
 
@@ -29,8 +33,6 @@ CLASS({
   *     accurate.
   * @return An array of Argument objects.
   */
-if ( ! foam.types ) foam.types = {};
-
 foam.types.getFunctionArgs = function getFunctionArgs(fn) {
   
   var args = fn.toString().match(/^function[ _$\w]*\((.*)\)/)[1];
@@ -44,22 +46,24 @@ foam.types.getFunctionArgs = function getFunctionArgs(fn) {
   args.forEach(function(arg) {
     // Optional commented type(incl. dots for packages), argument name, optional commented return type
     // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
-    var typeMatch = arg.match(/^\s*(\/\*\s*([\w\?\.]+)\s*\*\/)?\s*(\w+)\s*(\/\*\s*([\w\.]+)\s*\*\/)?/);
+    var typeMatch = arg.match(/^\s*(\/\*\s*([\w\.]+)(\?)?\s*\*\/)?\s*(\w+)\s*(\/\*\s*([\w\.]+)\s*\*\/)?/);
     if ( typeMatch ) {
       ret.push(/*X.*/Argument.create({
+        name: typeMatch[4],
         typeName: typeMatch[2],
-        name: typeMatch[3],
+        type: global[typeMatch[2]],
+        optional: typeMatch[3] == '?'
       }));
       // TODO: this is only valid on the last arg
-      if ( typeMatch[5] ) ret.returnType = typeMatch[5];
+      if ( typeMatch[6] ) ret.returnType = typeMatch[6];
     } else {
       throw "foam.types.getFunctionArgs argument parsing error: " + typeMatch.toString();
     } 
   });
-  
-  return ret;
 
+  return ret;
 }
+
 
 
 

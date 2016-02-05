@@ -17,6 +17,9 @@ describe('foam.types.getFunctionArgs', function() {
     fn = function(/* TypeA */ paramA, /*TypeB?*/ paramB, /* package.TypeC*/ paramC, noType /* RetType */) {
       return true;
     }
+    CLASS({  name: 'TypeA' });
+    CLASS({  name: 'TypeB' });
+    CLASS({  name: 'package.TypeC' });
   });
   afterEach(function() {
     fn = null;
@@ -27,15 +30,19 @@ describe('foam.types.getFunctionArgs', function() {
     
     expect(params[0].name).toEqual('paramA');
     expect(params[0].typeName).toEqual('TypeA');
+    expect(params[0].optional).toBe(false);
 
     expect(params[1].name).toEqual('paramB');
-    expect(params[1].typeName).toEqual('TypeB?');
+    expect(params[1].typeName).toEqual('TypeB');
+    expect(params[1].optional).toBe(true);
 
     expect(params[2].name).toEqual('paramC');
     expect(params[2].typeName).toEqual('package.TypeC');
+    expect(params[2].optional).toBe(false);
 
     expect(params[3].name).toEqual('noType');
     expect(params[3].typeName).toBeUndefined();
+    expect(params[3].optional).toBe(false);
     
     expect(params.returnType).toEqual('RetType');
     
