@@ -21,7 +21,7 @@ function makeTestFn() {
 }
 function makePrimitiveTestFn() { // multiline parsing, ha
 return function(/* string */ str, /*boolean*/ bool , 
-  /* function*/ func, /*object*/obj, /* number */num ) {
+  /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
     return true;
   }  
 }
@@ -112,6 +112,7 @@ describe('Argument.validate', function() {
     expect(function() { params[2].validate(function() {}); }).not.toThrow();
     expect(function() { params[3].validate({}); }).not.toThrow();
     expect(function() { params[4].validate(86); }).not.toThrow();
+    expect(function() { params[5].validate(['hello']); }).not.toThrow();
   });
   it('rejects wrong primitive types', function() {
     var params = foam.types.getFunctionArgs(makePrimitiveTestFn());
@@ -122,6 +123,7 @@ describe('Argument.validate', function() {
     expect(function() { params[2].validate({}); }).toThrow();
     expect(function() { params[3].validate(function() {}); }).toThrow();
     expect(function() { params[4].validate(false); }).toThrow();
+    expect(function() { params[5].validate({}); }).toThrow();
   });
 
 });

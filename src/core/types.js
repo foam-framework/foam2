@@ -49,7 +49,9 @@ CLASS({
       }
       // type this for non-modelled types (no model, but a type name specified)
       if ( ! this.type ) {
-        if ( this.typeName && typeof arg !== this.typeName ) {
+        if (   this.typeName 
+            && typeof arg !== this.typeName
+            && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
           throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+(typeof arg)+'.');
         } // else no this: no type, no typeName
       } else {
@@ -129,7 +131,9 @@ foam.types.getFunctionArgs = function getFunctionArgs(fn) {
 /** Decorates the given function with a runtime type checker.
   * Types should be denoted before each argument:
   * <code>function(\/\*TypeA\*\/ argA, \/\*string\*\/ argB) { ... }</code>
-  * 
+  * Types are either the names of Models (i.e. declared with CLASS), or
+  * javascript primitives as returned by 'typeof'. In addition, 'array'
+  * is supported as a special case, corresponding to an Array.isArray() check.
   * @fn The function to decorate. The toString() of the function must be
   *     accurate.
   * @return A new function that will throw errors if arguments
