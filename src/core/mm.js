@@ -195,6 +195,21 @@ CLASS({
     },
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
+    },
+    function setPrivate_(name, value) {
+      if ( ! this.private_ ) {
+        Object.defineProperty(this, 'private_', {
+          value: {},
+          ennumerable: false
+        });
+      }
+      this.private_[name] = value;
+    },
+    function getPrivate_(name) {
+      return this.private_ && this.private_[name];
+    },
+    function hasOwnPrivate_(name) {
+      return this.private_ && this.private_.hasOwnProperty(name);
     }
   ]
 });
@@ -462,15 +477,16 @@ CLASS({
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          if ( ! this.hasOwnProperty(name) )
-            this.instance_[name] = foam.events.Observable.create(name, this);
+          if ( ! this.hasOwnPrivate_(name) )
+            this.setPrivate_(name, foam.events.Observable.create(name, this));
 
-          return this.instance_[name];
+          return this.getPrivate_(name);
         },
         set: function propSetter(newValue) {
-          this.instance_[name] = newValue;
+          this.setPrivate_(name, newValue);
         },
-        configurable: true
+        configurable: true,
+        enumerable: false
       });
     }
   ]
@@ -533,12 +549,13 @@ CLASS({
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          if ( ! this.hasOwnProperty(name) )
-            this.instance_[name] = code.bind(this);
+          if ( ! this.hasOwnPrivate_(name) )
+            this.setPrivate_(name, code.bind(this));
 
-          return this.instance_[name];
+          return this.getPrivate_(name);
         },
-        configurable: true
+        configurable: true,
+        enumerable: false
       });
     }
   ]
@@ -636,7 +653,8 @@ CLASS({
           this[key] = args[key];
       } else if ( args.instance_ ) {
         for ( var key in args.instance_ )
-          this[key] = args.instance_[key];
+          if ( this.cls_.getAxiomByName(key) )
+            this[key] = args.instance_[key];
       } else {
         this.copyFrom(args);
       }
