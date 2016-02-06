@@ -123,6 +123,9 @@
         properties: [
           'name',
           { name: 'sex', defaultValue: 'M' }
+        ],
+        methods: [
+          function toString() { return this.name + ' ' + this.sex; }
         ]
       });
       CLASS({
@@ -130,8 +133,10 @@
         extends: 'Person',
         properties: [
           'salary'
-        ]
-      });
+        ],
+        methods: [
+          function toString() { return this.SUPER() + ' ' + this.salary; }
+        ]      });
       CLASS({
         name: 'Nun',
         extends: 'Person',
@@ -141,8 +146,9 @@
       });
 
       var bob     = Person.create({name: 'Bob'});
-      var don     = Person.create({name: 'Don'});
+      var don     = Employee.create({name: 'Don', salary: 30000});
       var terresa = Nun.create({name: 'Terresa'});
+      console.log(bob.toString(), don.toString());
       console.log(bob.sex, don.sex, terresa.sex);
     </script>
   </body>
