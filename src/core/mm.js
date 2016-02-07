@@ -320,8 +320,8 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          if ( this.hasOwnProperty('onPropertyChange') ) {
-            var t = this.onPropertyChange;
+          if ( this.hasOwnProperty('propertyChange') ) {
+            var t = this.propertyChange;
             if ( t.hasListeners_(name) ) t.pub_(name, [oldValue, newValue]);
           }
           // TODO: call global setter
@@ -625,7 +625,7 @@ CLASS({
 CLASS({
   name: 'FObject',
 
-  topics: [ 'onPropertyChange' ],
+  topics: [ 'propertyChange' ],
 
   methods: [
     function initArgs(args) {
