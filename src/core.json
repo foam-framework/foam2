@@ -3,5 +3,6 @@
   "core/stdlib.js",
   "core/mm.js",
   "core/Slot.js",
-  "core/debug.js"
+  "core/debug.js",
+  "core/types.js"
 ]

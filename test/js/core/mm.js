@@ -327,7 +327,6 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     expect(axs[0]).toBe(/*X.*/Person.NAME);
     expect(axs[1]).toBe(/*X.*/Person.AGE);
     expect(axs[2]).toBe(/*X.*/Person.RESULT);
-    expect(/*X.*/Person.getAxioms().length).toEqual(9);
   });
 
 });

@@ -195,6 +195,22 @@ CLASS({
     },
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
+    },
+    function setPrivate_(name, value) {
+      if ( ! this.private_ ) {
+        Object.defineProperty(this, 'private_', {
+          value: {},
+          ennumerable: false
+        });
+      }
+      this.private_[name] = value;
+      return value;
+    },
+    function getPrivate_(name) {
+      return this.private_ && this.private_[name];
+    },
+    function hasOwnPrivate_(name) {
+      return this.private_ && this.private_.hasOwnProperty(name);
     }
   ]
 });
@@ -311,8 +327,10 @@ CLASS({
           return this.instance_[name];
         },
         set: prop.setter || function propSetter(newValue) {
-          // TODO: add logic to not trigger factory
-          var oldValue = this[name];
+          // Get old value but avoid triggering factory if present
+          var oldValue = this.factory ?
+            ( this.hasOwnProperty(name) ? this[name] : undefined ) :
+            this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
 
@@ -320,10 +338,7 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          if ( this.hasOwnProperty('propertyChange') ) {
-            var t = this.propertyChange;
-            if ( t.hasListeners_(name) ) t.pub_(name, [oldValue, newValue]);
-          }
+          this.publish && this.publish('propertyChange', name, oldValue, newValue);
           // TODO: call global setter
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
@@ -342,7 +357,50 @@ CLASS({
   properties: [ 'name', 'code' ],
 
   methods: [
-    function installInProto(proto) { proto[this.name] = this.code; }
+    function override_(proto, method) {
+      /*
+        Decorate a method so that it can call the
+        method it overrides with this.SUPER().
+      */
+      var super_ = proto[this.name];
+
+      // Not overriding, or not using SUPER, so just return original method
+      if ( ! super_ || method.toString().indexOf('SUPER') == -1 ) return method;
+
+      var SUPER = function() { return super_.apply(this, arguments); };
+
+      // This code isn't JIT'ed in V8 because of the try/finally,
+      // so we move it outside of 'f' below so that the rest of
+      // that function is JIT'ed.
+      var slowF = function(OLD_SUPER, args) {
+        try {
+          return method.apply(this, args);
+        } finally {
+          this.SUPER = OLD_SUPER;
+        }
+      };
+
+      var f = function() {
+        var OLD_SUPER = this.SUPER;
+        this.SUPER = SUPER;
+
+        if ( OLD_SUPER ) return slowF.call(this, OLD_SUPER, arguments);
+
+        // Fast-Path when it doesn't matter if we restore SUPER or not
+        var ret = method.apply(this, arguments);
+        this.SUPER = null;
+        return ret;
+      };
+
+      foam.fn.setName(f, this.name);
+      f.toString = function() { return method.toString(); };
+      f.super_ = super_;
+
+      return f;
+    },
+    function installInProto(proto) {
+      proto[this.name] = this.override_(proto, this.code);
+    }
   ]
 });
 
@@ -398,6 +456,85 @@ CLASS({
   name: 'FObject',
 
   methods: [
+    function createListenerList_() {
+      return { next: null, children: [] };
+    },
+
+    function listeners_() {
+      return this.getPrivate_('listeners') ||
+        this.setPrivate_('listeners', this.createListenerList_());
+    },
+
+    function notify_(listeners, args) {
+      var count = 0;
+      while ( listeners ) {
+        args[0] = listeners.sub;
+        listeners.l.apply(null, args);
+        listeners = listeners.next;
+        count++;
+      }
+      return count;
+    },
+
+    function publish(/* args... */) {
+      if ( ! this.hasOwnPrivate_('listeners') ) return 0;
+
+      var listeners = this.listeners_();
+      var args      = Array.prototype.concat.apply([null], arguments);
+      var count     = this.notify_(listeners.next, args);
+
+      for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
+        var listeners = listeners.children[arguments[i]];
+        if ( ! listeners ) break;
+        count += this.notify_(listeners.next, args);
+      }
+
+      return count;
+    },
+
+    function subscribe(/* args..., l */) {
+      var l         = arguments[arguments.length-1];
+      var listeners = this.listeners_();
+
+      for ( var i = 0 ; i < arguments.length-1 ; i++ )
+        listeners = listeners.children[arguments[i]] ||
+        ( listeners.children[arguments[i]] = this.createListenerList_() );
+
+      var node = {
+        sub:  { src: this },
+        next: listeners.next,
+        prev: listeners,
+        l: l
+      };
+      node.sub.destroy = function() {
+        if ( node.next ) node.next.prev = node.prev;
+        if ( node.prev ) node.prev.next = node.next;
+
+        // Disconnect so that calling destroy more than once is harmless
+        node.next = node.prev = null;
+      };
+
+      listeners.next = node;
+
+      return node.sub;
+    },
+
+    function unsubscribe(/* args..., l */) {
+      var l         = arguments[arguments.length-1];
+      var listeners = this.getPrivate_('listeners');
+
+      for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ )
+        listeners = listeners.children[arguments[i]];
+
+      var node = listeners && listeners.next;
+      while ( node ) {
+        if ( node.l === l ) {
+          node.sub.destroy();
+          return;
+        }
+      }
+    },
+
     function clearProperty(name) { delete this.instance_[name]; },
     function toString() {
       // Distinguish between prototypes and instances.
@@ -462,15 +599,25 @@ CLASS({
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          if ( ! this.hasOwnProperty(name) )
-            this.instance_[name] = foam.events.Observable.create(name, this);
+          var self = this;
+          if ( ! this.hasOwnPrivate_(name) )
+            this.setPrivate_(
+              name,
+              {
+                publish:     self.publish.bind(self, name),
+                subscribe:   self.subscribe.bind(self, name),
+                unsubscribe: self.unsubscribe.bind(self, name),
+                toString:    function() { return 'Topic(' + name + ')'; }
+              }
+            );
 
-          return this.instance_[name];
+          return this.getPrivate_(name);
         },
         set: function propSetter(newValue) {
-          this.instance_[name] = newValue;
+          this.setPrivate_(name, newValue);
         },
-        configurable: true
+        configurable: true,
+        enumerable: false
       });
     }
   ]
@@ -533,12 +680,13 @@ CLASS({
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          if ( ! this.hasOwnProperty(name) )
-            this.instance_[name] = code.bind(this);
+          if ( ! this.hasOwnPrivate_(name) )
+            this.setPrivate_(name, code.bind(this));
 
-          return this.instance_[name];
+          return this.getPrivate_(name);
         },
-        configurable: true
+        configurable: true,
+        enumerable: false
       });
     }
   ]
@@ -636,7 +784,8 @@ CLASS({
           this[key] = args[key];
       } else if ( args.instance_ ) {
         for ( var key in args.instance_ )
-          this[key] = args.instance_[key];
+          if ( this.cls_.getAxiomByName(key) )
+            this[key] = args.instance_[key];
       } else {
         this.copyFrom(args);
       }
@@ -646,8 +795,8 @@ CLASS({
       var a = this.cls_.getAxiomsByClass(Property);
       for ( var i = 0 ; i < a.length ; i++ ) {
         var name = a[i].name;
-        if ( typeof args[name] !== 'undefined' ) {
-          this[name] = args[name];
+        if ( typeof o[name] !== 'undefined' ) {
+          this[name] = o[name];
         }
       }
       return this;
