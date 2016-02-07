@@ -339,7 +339,8 @@ CLASS({
           this.instance_[name] = newValue;
 
           this.publish && this.publish('propertyChange', name, oldValue, newValue);
-          // TODO: call global setter
+
+          // TODO: publish to a global topic to support dynamic()
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         },
@@ -660,6 +661,9 @@ CLASS({
     }
   ]
 });
+
+
+// TODO: Add other Property sub-classes here.
 
 
 CLASS({
