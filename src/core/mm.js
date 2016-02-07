@@ -813,7 +813,6 @@ foam.boot.end();
 
 /*
   TODO:
-  - SUPER support
   - Lightweight Objects
   - Add package and id to Model and Class
   - Proxy id, name, package, label, plural from Class to Model
