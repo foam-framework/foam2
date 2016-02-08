@@ -336,6 +336,10 @@ foam.CLASS({
 
   methods: [
     function installInClass(c) {
+      /*
+        Handle overriding of Property definition from parent class by
+        copying undefined values from parent Property, if it exists.
+      */
       var superProp = c.__proto__.getAxiomByName(this.name);
       if ( superProp ) {
         var a = this.cls_.getAxiomsByClass(Property);
@@ -403,7 +407,6 @@ foam.CLASS({
 
           this.instance_[name] = newValue;
 
-          // TODO: should be this.propertyChange.publish?
           // Change detection
           if ( oldValue !== newValue &&
                ! ( (oldValue !== oldValue) && (newValue !== newValue) )/* NaN check */ ) {
@@ -531,12 +534,18 @@ foam.CLASS({
 foam.boot.phase2();
 
 
-// Install Listener Support
 foam.CLASS({
   name: 'FObject',
 
+  documentation: 'Add listener support to FObject.',
+
   methods: [
     function createListenerList_() {
+      /*
+        This structure represents the head of a doubly-linked list of
+        listeners.  It contains 'next', a pointer to the first listener,
+        and 'children', an array of sub-topic chains.
+       */
       return { next: null, children: [] };
     },
 
@@ -546,6 +555,7 @@ foam.CLASS({
     },
 
     function notify_(listeners, args) {
+      /* Returns the number of listeners notified. */
       var count = 0;
       while ( listeners ) {
         args[0] = listeners.sub;
@@ -557,6 +567,7 @@ foam.CLASS({
     },
 
     function publish(/* args... */) {
+      /* Returns the number of listeners notified. */
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
