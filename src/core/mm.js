@@ -43,6 +43,11 @@ foam.boot = {
         return obj;
       },
       installModel: function(m) {
+        /*
+          This is a temporary version of installModel.
+          When the bootstrap is finished, it will be replaced by a version
+          that only knows how to install axioms.
+        */
         if ( m.axioms )
           for ( var i = 0 ; i < m.axioms.length ; i++ )
             this.installAxiom(m.axioms[i]);
@@ -109,6 +114,7 @@ foam.boot = {
         return as;
       },
       getAxioms: function() {
+        // The full axiom list is stored in the regular cache with '' as a key.
         var as = this.axiomCache_[''];
         if ( ! as ) {
           as = [];
@@ -184,6 +190,11 @@ foam.CLASS({
 
   methods: [
     function initArgs(args) {
+      /*
+        This is a temporary version of initArgs.
+        When the bootstrap is finished, it will be replaced by a version
+        that knows about a classes Properties, so it can do a better job.
+       */
       if ( ! args ) return;
 
       for ( var key in args )
@@ -195,6 +206,8 @@ foam.CLASS({
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
     },
+    // Private support is used to store per-object values that are not
+    // instance variables.  Things like listeners and topics.
     function setPrivate_(name, value) {
       if ( ! this.private_ ) {
         Object.defineProperty(this, 'private_', {
@@ -267,6 +280,10 @@ foam.CLASS({
   properties: [
     'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression',
     {
+      // Compare two values taken from this property.
+      // Used by Property.compare().
+      // Is a property rather than a method so that it can be configured
+      // without subclassing.
       name: 'comparePropertyValues',
       defaultValue: function(o1, o2) {
         if ( o1 === o2 ) return 0;
@@ -364,9 +381,11 @@ foam.CLASS({
       });
     },
     function f(o) {
+      // Makes this Property an adapter, suitable for use with mLangs.
       return f[this.name];
     },
     function compare(o1, o2) {
+      // Makes this Property a comparator, suitable for use with mLangs.
       return this.comparePropertyValues(this.f(o1), this.f(o2));
     }
   ]
