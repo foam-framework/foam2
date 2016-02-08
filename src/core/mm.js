@@ -264,7 +264,19 @@ CLASS({
   extends: 'FObject',
 
   properties: [
-    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression'
+    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression',
+    {
+      name: 'comparePropertyValues',
+      defaultValue: function(o1, o2) {
+        if ( o1 === o2 ) return 0;
+        if ( ! o1 && ! o2 ) return 0;
+        if ( ! o1 ) return -1;
+        if ( ! o2 ) return  1;
+        if ( o1.localeCompare ) return o1.localeCompare(o2);
+        if ( o1.compareTo ) return o1.compareTo(o2);
+        return o1.$UID.compareTo(o2.$UID);
+      }
+    }
   ],
 
   methods: [
@@ -344,6 +356,12 @@ CLASS({
         },
         configurable: true
       });
+    },
+    function f(o) {
+      return f[this.name];
+    },
+    function compare(o1, o2) {
+      return this.comparePropertyValues(this.f(o1), this.f(o2));
     }
   ]
 });
