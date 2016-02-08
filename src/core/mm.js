@@ -16,6 +16,7 @@
  */
 
 // Bootstrap support, discarded after use
+// TODO: define with foam.LIB instead
 foam.boot = {
 
   // Temporary collection of classes to be updated later.
@@ -582,8 +583,12 @@ CLASS({
   properties: [ 'name', 'value' ],
 
   methods: [
-    function installInClass(cls)   { cls[foam.string.constantize(this.name)]   = this.value; },
-    function installInProto(proto) { proto[foam.string.constantize(this.name)] = this.value; }
+    function installInClass(cls)   {
+      cls[foam.string.constantize(this.name)] = this.value;
+    },
+    function installInProto(proto) {
+      proto[foam.string.constantize(this.name)] = this.value;
+    }
   ]
 });
 
@@ -832,7 +837,13 @@ foam.boot.end();
 
 /*
   TODO:
+  - package support
+  - imports / exports
+  - slots
+  - listener decorators
   - Lightweight Objects
+  - 'expression' Property property
   - Add package and id to Model and Class
   - Proxy id, name, package, label, plural from Class to Model
+  - ID support
 */
