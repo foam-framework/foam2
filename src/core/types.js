@@ -82,7 +82,9 @@ CLASS({
   */
 foam.types.getFunctionArgs = function getFunctionArgs(fn) {
   // strip newlines and find the function(...) declaration
-  var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/)[2];
+  var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/);
+  if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
+  args = args[2];
   if ( args )
     args = args.split(',').map(function(name) { return name.trim(); });
   else
@@ -105,6 +107,7 @@ foam.types.getFunctionArgs = function getFunctionArgs(fn) {
       }));
       // TODO: this is only valid on the last arg
       if ( typeMatch[6] ) {
+        console.log(typeMatch);
         ret.returnType = /*X.*/ReturnValue.create({
           typeName: typeMatch[6],
           type: global[typeMatch[6]]
@@ -113,13 +116,11 @@ foam.types.getFunctionArgs = function getFunctionArgs(fn) {
     } else {
       // check for bare return type with no args
       typeMatch = arg.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
-      if ( typeMatch) {
-        if ( typeMatch[1] ) {
-          ret.returnType = /*X.*/ReturnValue.create({
-            typeName: typeMatch[1],
-            type: global[typeMatch[1]]
-          });
-        }
+      if ( typeMatch && typeMatch[1] ) {
+        ret.returnType = /*X.*/ReturnValue.create({
+          typeName: typeMatch[1],
+          type: global[typeMatch[1]]
+        });
       } else {
         throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
       }
