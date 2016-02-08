@@ -10,9 +10,64 @@ var beforeEachTest = function(callback) {
 };
 
 
+describe('Untyped Property', function() {
+  var t;
+
+  beforeEachTest(function() {
+    // NOTE: globals are not defined until corePromise is run by beforeEachTest()
+    CLASS({
+      name: 'PropTest',
+      properties: [
+        {
+          name: 'b',
+          type: 'object',
+        },
+      ]
+    });
+    t = /*X.*/PropTest.create({});
+  });
+  afterEach(function() {
+    t = null;
+  });
+
+  it('creates a Property by default', function() {
+    expect(PropTest.B.cls_.name).toEqual('Property');
+  });
+
+});
+
+
+describe('AbstractClass.getAxioms', function() {
+
+  beforeEachTest(function() {
+  });
+  afterEach(function() {
+  });
+
+  it('coverage', function() {
+    /*X.*/Property.getAxioms();
+    /*X.*/Property.getAxioms(); // previous results cached
+  });
+
+});
+
+describe('AbstractClass.toString', function() {
+
+  beforeEachTest(function() {
+  });
+  afterEach(function() {
+  });
+
+  it('coverage', function() {
+    /*X.*/Property.toString();
+  });
+
+});
+
 
 describe('Property Getter and Setter', function() {
   var t;
+  var p;
 
   beforeEachTest(function() {
     // NOTE: globals are not defined until corePromise is run by beforeEachTest()
@@ -20,19 +75,32 @@ describe('Property Getter and Setter', function() {
       name: 'GetterSetterTest',
       properties: [
         {
-          name: 'b'
+          name: 'b',
+          adapt: function(old, nu) {
+            p += 'adapt'+nu;
+            return nu;
+          },
+          preSet: function(old, nu) {
+            p += 'preSet'+nu;
+            return nu;
+          },
+          postSet: function(old, nu) {
+            p += 'postSet'+nu;
+          },
         },
         {
           name: 'a',
-          getter: function()  { console.log('getter'); return this.b; },
-          setter: function(a) { console.log('setter'); this.b = a; }
+          getter: function()  { return this.b; },
+          setter: function(a) { this.b = a; }
         }
       ]
     });
     t = /*X.*/GetterSetterTest.create({});
+    p = "";
   });
   afterEach(function() {
     t = null;
+    p = "";
   });
 
   it('sets a value and gets it back', function() {
@@ -50,7 +118,10 @@ describe('Property Getter and Setter', function() {
   it('gets undefined when not yet set', function() {
     expect(t.a).toBeUndefined();
   });
-
+  it('Hits defined adapt/pre/postSet', function() {
+    t.b = 4;
+    expect(p).toEqual('adapt4preSet4postSet4');
+  });
 });
 
 
@@ -92,6 +163,55 @@ describe('Property Factory', function() {
 
 });
 
+describe('Property default comparators', function() {
+  var c;
+
+  beforeEachTest(function() {
+    c = /*X.*/Property.create().comparePropertyValues;
+  });
+  afterEach(function() {
+    c = null;
+  });
+
+
+//         return o1.$UID.compareTo(o2.$UID);
+
+  it('accepts ===', function() {
+    var s = '';
+    expect(c(s, s)).toEqual(0);
+  });
+  it('accepts double falsey', function() {
+    expect(c(false, false)).toEqual(0);
+    expect(c(NaN, NaN)).toEqual(0);
+    expect(c(0, 0)).toEqual(0);
+    expect(c('', '')).toEqual(0);
+  });
+  it('accepts left falsey', function() {
+    expect(c(false, 6)).toEqual(-1);
+    expect(c(NaN, 6)).toEqual(-1);
+    expect(c(0, 6)).toEqual(-1);
+    expect(c('', 6)).toEqual(-1);
+  });
+  it('accepts right falsey', function() {
+    expect(c(4, false)).toEqual(1);
+    expect(c(4, NaN)).toEqual(1);
+    expect(c(4, 0)).toEqual(1);
+    expect(c(4, '')).toEqual(1);
+  });
+  it('accepts localeCompare', function() {
+    var o1 = { localeCompare: function(arg) { return 6; } };
+    expect(c(o1, 3)).toEqual(6);
+  });
+  it('accepts compareTo', function() {
+    var o1 = { compareTo: function(arg) { return 6; } };
+    expect(c(o1, 3)).toEqual(6);
+  });
+  it('falls back on $UID.compareTo', function() {
+    var o1 = {};
+    var o2 = {};
+    expect(c(o1, o2)).toEqual(-1);
+  });
+});
 
 
 
@@ -247,6 +367,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
       properties: [
         {
+          type: 'String',
           name: 'name'
         },
         {
@@ -339,6 +460,7 @@ describe('FObject white box test', function() {
       name: 'Person',
       properties: [
         {
+          type: 'String',
           name: 'name'
         },
         {
@@ -374,6 +496,60 @@ describe('FObject white box test', function() {
 
 });
 
+
+describe('Method overrides and SUPER', function() {
+  var m;
+  var s;
+
+  beforeEachTest(function() {
+    CLASS({
+      name: 'BaseClass',
+      methods: [
+        function base() {
+          return 5;
+        }
+      ]
+    });
+    CLASS({
+      name: 'SubClass',
+      extends: 'BaseClass',
+      methods: [
+        function base() {
+          return this.SUPER() + 1;
+        }
+      ]
+    });
+    CLASS({
+      name: 'SubSubClass',
+      extends: 'SubClass',
+      methods: [
+        function base() {
+          return this.SUPER() + 2;
+        }
+      ]
+    });
+    m = SubClass.create();
+    s = SubSubClass.create();
+  });
+  afterEach(function() {
+    BaseClass = undefined;
+    SubClass = undefined;
+    SubSubClass = undefined;
+    m = null;
+    s = null;
+  });
+
+  it('SUPER is defined for overriden methods', function() {
+    expect(function() { m.base(); }).not.toThrow();
+    expect(m.base()).toEqual(6);
+    m.base.toString();
+  });
+  it('SUPER slow path works', function() {
+    expect(function() { s.base(); }).not.toThrow();
+    expect(s.base()).toEqual(8);
+  });
+
+});
 
 
 
