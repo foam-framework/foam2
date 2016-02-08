@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-FObject.__proto__.describe = function(opt_name) {
+foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
   console.log('Axiom Type           Source Class   Name');

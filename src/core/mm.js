@@ -15,125 +15,145 @@
  * limitations under the License.
  */
 
-// Bootstrap support, discarded after use
-// TODO: define with foam.LIB instead
-foam.boot = {
+foam.LIB({
+  package: 'foam.internal', // packages not implemented yet
+  name: 'AbstractClass',
 
-  // Temporary collection of classes to be updated later.
-  classes: [],
+  documentation: "Prototype for FObject's class.",
 
-  start: function() {
-    foam.CLASS = this.CLASS.bind(this);
+  constants: {
+    prototype: Object.prototype,
+    axiomMap_: null,
   },
 
-  getClass: (function() {
-    /*
-      Create or Update a Prototype from a psedo-Model definition.
-      (Model is 'this').
-    */
-    var AbstractClass = {
-      prototype: Object.prototype,
-      axiomMap_: null,
-      create: function create(args) {
-        var obj = Object.create(this.prototype);
-        obj.instance_ = Object.create(null);
+  methods: [
+    function create(args) {
+      var obj = Object.create(this.prototype);
+      obj.instance_ = Object.create(null);
+      
+      obj.initArgs(args);
+      
+      return obj;
+    },
 
-        obj.initArgs(args);
-
-        return obj;
-      },
-      installModel: function(m) {
-        /*
-          This is a temporary version of installModel.
-          When the bootstrap is finished, it will be replaced by a version
-          that only knows how to install axioms.
-        */
-        if ( m.axioms )
-          for ( var i = 0 ; i < m.axioms.length ; i++ )
-            this.installAxiom(m.axioms[i]);
-
-        if ( m.methods )
-          for ( var i = 0 ; i < m.methods.length ; i++ ) {
-            var a = m.methods[i];
-            if ( typeof a === 'function' )
-              m.methods[i] = a = { name: a.name, code: a };
-            this.prototype[a.name] = a.code;
-          }
-
-        if ( global.Property && m.properties )
-          for ( var i = 0 ; i < m.properties.length ; i++ ) {
-            var a = m.properties[i];
-            if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
-            var type = global[(a.type || '') + 'Property'] || Property;
-            this.installAxiom(type.create(a));
-          }
-      },
-      installAxiom: function(a) {
-        this.axiomMap_[a.name] = a;
-        this.axiomCache_ = {};
-
-        a.sourceCls_ = this;
-
-        a.installInClass && a.installInClass(this);
-        a.installInProto && a.installInProto(this.prototype);
-      },
-      isInstance: function isInstance(o) {
-        return o.cls_ && this.isSubClass(o.cls_);
-      },
-      isSubClass: function isSubClass(o) {
-        // TODO: switch from 'name' to 'id' when available
-        if ( ! o ) return false;
-
-        var subClasses_ = this.hasOwnProperty('subClasses_') ?
-          this.subClasses_ :
-          this.subClasses_ = {} ;
-
-        if ( ! subClasses_.hasOwnProperty(o.name) )
-          subClasses_[o.name] = ( o === this ) || this.isSubClass(o.__proto__);
-
-        return subClasses_[o.name];
-      },
-      getAxiomByName: function(name) {
-        return this.axiomMap_[name];
-      },
-      // The Following method will eventually change.
-      // Would like to have efficient support for:
-      //    .where() .orderBy() groupBy
-      getAxiomsByClass: function(cls) {
-        var as = this.axiomCache_[cls.name];
-        if ( ! as ) {
-          as = [];
-          for ( var key in this.axiomMap_ ) {
-            var a = this.axiomMap_[key];
-            if ( cls.isInstance(a) )
-              as.push(a);
-          }
-          this.axiomCache_[cls.name] = as;
+    function installModel(m) {
+      /*
+        This is a temporary version of installModel.
+        When the bootstrap is finished, it will be replaced by a version
+        that only knows how to install axioms.
+      */
+      if ( m.axioms )
+        for ( var i = 0 ; i < m.axioms.length ; i++ )
+          this.installAxiom(m.axioms[i]);
+      
+      if ( m.methods )
+        for ( var i = 0 ; i < m.methods.length ; i++ ) {
+          var a = m.methods[i];
+          if ( typeof a === 'function' )
+            m.methods[i] = a = { name: a.name, code: a };
+          this.prototype[a.name] = a.code;
         }
-
-        return as;
-      },
-      getAxioms: function() {
-        // The full axiom list is stored in the regular cache with '' as a key.
-        var as = this.axiomCache_[''];
-        if ( ! as ) {
-          as = [];
-          for ( var key in this.axiomMap_ )
-            as.push(this.axiomMap_[key]);
-          this.axiomCache_[''] = as;
+      
+      if ( global.Property && m.properties )
+        for ( var i = 0 ; i < m.properties.length ; i++ ) {
+          var a = m.properties[i];
+          if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
+          var type = global[(a.type || '') + 'Property'] || Property;
+          this.installAxiom(type.create(a));
         }
-        return as;
-      },
-      toString: function() {
-        return this.name + 'Class';
+    },
+
+    function installAxiom(a) {
+      this.axiomMap_[a.name] = a;
+      this.axiomCache_ = {};
+      
+      a.sourceCls_ = this;
+      
+      a.installInClass && a.installInClass(this);
+      a.installInProto && a.installInProto(this.prototype);
+    },
+
+    function isInstance(o) {
+      return o.cls_ && this.isSubClass(o.cls_);
+    },
+
+    function isSubClass(o) {
+      // TODO: switch from 'name' to 'id' when available
+      if ( ! o ) return false;
+      
+      var subClasses_ = this.hasOwnProperty('subClasses_') ?
+        this.subClasses_ :
+        this.subClasses_ = {} ;
+      
+      if ( ! subClasses_.hasOwnProperty(o.name) )
+        subClasses_[o.name] = ( o === this ) || this.isSubClass(o.__proto__);
+      
+      return subClasses_[o.name];
+    },
+
+    function getAxiomByName(name) {
+      return this.axiomMap_[name];
+    },
+
+    // The Following method will eventually change.
+    // Would like to have efficient support for:
+    //    .where() .orderBy() groupBy
+    function getAxiomsByClass(cls) {
+      var as = this.axiomCache_[cls.name];
+      if ( ! as ) {
+        as = [];
+        for ( var key in this.axiomMap_ ) {
+          var a = this.axiomMap_[key];
+          if ( cls.isInstance(a) )
+            as.push(a);
+        }
+        this.axiomCache_[cls.name] = as;
       }
-    };
+      
+      return as;
+    },
 
-    return function getClass() {
+    function getAxioms() {
+      // The full axiom list is stored in the regular cache with '' as a key.
+      var as = this.axiomCache_[''];
+      if ( ! as ) {
+        as = [];
+        for ( var key in this.axiomMap_ )
+          as.push(this.axiomMap_[key]);
+        this.axiomCache_[''] = as;
+      }
+      return as;
+    },
+
+    function toString() {
+      return this.name + 'Class';
+    }
+  ]
+});
+
+
+foam.LIB({
+  name: 'boot',
+
+  documentation: 'Bootstrap support, discarded after use.',
+
+  // Collection of classes to be repaired/upgraded later.
+  constants: { classes: [] },
+
+  methods: [
+    function start() {
+      foam.CLASS = this.CLASS.bind(this);
+    },
+
+    function getClass() {
+      /*
+        Create or Update a Prototype from a psedo-Model definition.
+        (Model is 'this').
+      */
       var cls = global[this.name];
 
       if ( ! cls ) {
-        var parent = this.extends ? global[this.extends] : AbstractClass ;
+        var parent = this.extends ? global[this.extends] : foam.AbstractClass ;
         // TODO: make some of these values non-innumerable
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
@@ -147,38 +167,38 @@ foam.boot = {
         cls.model_           = this;
         global[cls.name]     = cls;
       }
-
+      
       cls.installModel(this);
-
+      
       return cls;
-    };
-  })(),
+    },
 
-  // Bootstrap Model definition which records incomplete models
-  // so they can be patched at the end of the bootstrap process.
-  CLASS: function(m) {
-    this.classes.push(this.getClass.call(m));
-  },
+    // Bootstrap Model definition which records incomplete models
+    // so they can be patched at the end of the bootstrap process.
+    function CLASS(m) {
+      this.classes.push(this.getClass.call(m));
+    },
 
-  endPhase1: function() {
-    // Upgrade to final CLASS() definition.
-    foam.CLASS = function(m) { return Model.create(m).getClass(); };
+    function phase2() {
+      // Upgrade to final CLASS() definition.
+      foam.CLASS = function(m) { return Model.create(m).getClass(); };
+      
+      // Upgrade existing classes to real classes.
+      for ( var i = 0 ; i < this.classes.length ; i++ )
+        foam.CLASS(this.classes[i].model_);
+    },
 
-    // Upgrade existing classes to real classes.
-    for ( var i = 0 ; i < this.classes.length ; i++ )
-      foam.CLASS(this.classes[i].model_);
-  },
-
-  end: function() {
-    // Substitute AbstractClass.installModel() with simpler axiom-only version.
-    FObject.__proto__.installModel = function installModel(m) {
-      for ( var i = 0 ; i < m.axioms.length ; i++ )
-        this.installAxiom(m.axioms[i]);
-    };
-
-    delete foam['boot'];
-  }
-};
+    function end() {
+      // Substitute AbstractClass.installModel() with simpler axiom-only version.
+      foam.AbstractClass.installModel = function installModel(m) {
+        for ( var i = 0 ; i < m.axioms.length ; i++ )
+          this.installAxiom(m.axioms[i]);
+      };
+      
+      delete foam['boot'];
+    }
+  ]
+});
 
 
 foam.boot.start();
@@ -491,7 +511,7 @@ foam.CLASS({
 });
 
 
-foam.boot.endPhase1();
+foam.boot.phase2();
 
 
 // Install Listener Support
