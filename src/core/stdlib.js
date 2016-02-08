@@ -33,8 +33,6 @@ foam.LIB = function LIB(model) {
   var proto;
 
   function defineProperty(proto, key, map) {
-    console.log('defineProperty: ', key);
-
     if ( ! map.value || proto === Object.prototype || proto === Array.prototype )
       Object.defineProperty.apply(this, arguments);
     else
