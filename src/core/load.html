@@ -59,16 +59,16 @@
       t.onFoo.publish('subTopic', 'hello','world','subTopic');
 
 
-      t.onPropertyChange.subscribe(function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.global: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
+      t.propertyChange.subscribe(function(sub, subTopic, oldValue,newValue) {
+        console.log('propertyChange.global: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.subscribe('a', function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.a: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
+      t.propertyChange.subscribe('a', function(sub, subTopic, oldValue,newValue) {
+        console.log('propertyChange.a: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
       });
 
-      t.onPropertyChange.subscribe('a', function(sub, subTopic, oldValue,newValue) {
-        console.log('onPropertyChange.a-oneTime: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
+      t.propertyChange.subscribe('a', function(sub, subTopic, oldValue,newValue) {
+        console.log('propertyChange.a-oneTime: ', sub, 'subTopic: ', subTopic, oldValue, newValue);
         sub.destroy();
       });
 
