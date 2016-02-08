@@ -21,9 +21,11 @@ var global = global || this;
 
 // Top-Level of foam package
 foam = {
-  Object:   Object.prototype,
+  Array:    Array.prototype,
   Function: Function.prototype,
-  Array:    Array.prototype
+  Number:   Number.prototype,
+  Object:   Object.prototype,
+  String:   String.prototype
 };
 
 
@@ -81,6 +83,24 @@ foam.LIB({
         };
       })()
     }
+  ]
+});
+
+
+foam.LIB({
+  name: 'Number',
+
+  methods: [
+    function compareTo(o) { return ( o == this ) ? 0 : this < o ? -1 : 1; },
+  ]
+});
+
+
+foam.LIB({
+  name: 'String',
+
+  methods: [
+    function compareTo(o) { return ( o == this ) ? 0 : this < o ? -1 : 1; },
   ]
 });
 
