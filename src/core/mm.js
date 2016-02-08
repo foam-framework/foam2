@@ -348,7 +348,12 @@ CLASS({
 
           this.instance_[name] = newValue;
 
-          this.publish && this.publish('propertyChange', name, oldValue, newValue);
+          // TODO: should be this.propertyChange.publish?
+          // Change detection
+          if ( oldValue !== newValue &&
+               ! ( (oldValue !== oldValue) && (newValue !== newValue) )/* NaN check */ ) {
+            this.publish && this.publish('propertyChange', name, oldValue, newValue);
+          }
 
           // TODO: publish to a global topic to support dynamic()
 
@@ -499,8 +504,7 @@ CLASS({
       var listeners = this.listeners_();
       var args      = Array.prototype.concat.apply([null], arguments);
       var count     = this.notify_(listeners.next, args);
-
-      for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
+      for ( var i = 0 ; i < arguments.length; i++ ) {
         var listeners = listeners.children[arguments[i]];
         if ( ! listeners ) break;
         count += this.notify_(listeners.next, args);
@@ -531,6 +535,7 @@ CLASS({
         node.next = node.prev = null;
       };
 
+      if ( listeners.next ) listeners.next.prev = node;
       listeners.next = node;
 
       return node.sub;
@@ -549,6 +554,7 @@ CLASS({
           node.sub.destroy();
           return;
         }
+        node = node.next;
       }
     },
 

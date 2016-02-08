@@ -21,11 +21,11 @@ if ( ! foam.types ) foam.types = {};
 
 CLASS({
   name: 'Argument',
-  
+
   constants: {
     PREFIX: 'Argument',
   },
-  
+
   properties: [
     { name: 'name' },
     { name: 'typeName' },
@@ -33,10 +33,11 @@ CLASS({
     { name: 'optional', defaultValue: false },
     { name: 'index', defaultValue: -1 }
   ],
-  
+
   methods: [
-    /** If any type checks are failed, a TypeError is thrown.
-        @param i optional argument index for error reporting. */
+    /** Validates the given argument against this type information.
+        If any type checks are failed, a TypeError is thrown.
+        @param arg the argument value to validate. */
     function validate(arg) {
       i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
       // optional check
@@ -49,15 +50,15 @@ CLASS({
       }
       // type this for non-modelled types (no model, but a type name specified)
       if ( ! this.type ) {
-        if (   this.typeName 
+        if (   this.typeName
             && typeof arg !== this.typeName
             && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
           throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+(typeof arg)+'.');
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
-        if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?     
-          var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;  
+        if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?
+          var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
           throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+gotType+'.');
         }
       }
@@ -68,7 +69,7 @@ CLASS({
 CLASS({
   name: 'ReturnValue',
   extends: 'Argument',
-  
+
   constants: {
     PREFIX: 'Return',
   }
@@ -86,7 +87,7 @@ foam.types.getFunctionArgs = function getFunctionArgs(fn) {
     args = args.split(',').map(function(name) { return name.trim(); });
   else
     return [];
-  
+
   var ret = [];
   // check each arg for types
   var index = 0;
@@ -122,7 +123,7 @@ foam.types.getFunctionArgs = function getFunctionArgs(fn) {
       } else {
         throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
       }
-    } 
+    }
   });
 
   return ret;
@@ -151,12 +152,12 @@ foam.types.typeCheck = function typeCheck(fn) {
     }
     // If nothing threw an exception, we are free to run the function
     var retVal = fn.apply(this, arguments);
-  
+
     // check the return value
     if ( args.returnType ) {
       args.returnType.validate(retVal);
     }
-    
+
     return retVal;
   }
   // keep the old value of toString (hide the decorator)

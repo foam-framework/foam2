@@ -11,8 +11,8 @@ var beforeEachTest = function(callback) {
 
 function createTestListener(doUnsub) {
   // also handles property change, split into separate listener if necessary
-  var listener = function(subscription, topic, old, nu) {
-    listener.last_topic = subscription.topic;
+  var listener = function(subscription, topic, topic2, old, nu) {
+    listener.last_topic = topic+"."+topic2;
     listener.last_args = arguments;
     listener.last_old = old;
     listener.last_nu = nu;
@@ -60,14 +60,14 @@ describe('foam.events.oneTime', function() {
   it('removes itself after one invokation', function() {
     var one = foam.events.oneTime(listener);
 
-    ep.change.topic('simple').sub(one);
+    ep.change.subscribe('simple', one);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(1);
 
     // listener should be gone now
-    expect(ep.change.hasListeners_('simple')).toBe(false);
-    ep.change.topic('simple').pub()
+    //expect(ep.change.hasListeners_('simple')).toBe(false);
+    ep.change.publish('simple');
     expect(listener.count).toEqual(1);
   });
 
@@ -89,9 +89,9 @@ describe('foam.events.consoleLog', function() {
   it('logs ok', function() {
     var logger = foam.events.consoleLog(listener);
 
-    ep.change.topic('simple').sub(logger);
+    ep.change.subscribe(logger);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish();
     expect(listener.count).toEqual(1);
 
   });
@@ -118,12 +118,12 @@ describe('foam.events.merged', function() {
   it('merges with default parameters', function() {
     var merged = foam.events.merged(listener);
 
-    ep.change.topic('simple').sub(merged);
+    ep.change.subscribe('simple', merged);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -135,12 +135,12 @@ describe('foam.events.merged', function() {
   it('merges with delay specified', function() {
     var merged = foam.events.merged(listener, 1300);
 
-    ep.change.topic('simple').sub(merged);
+    ep.change.subscribe('simple', merged);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -153,12 +153,12 @@ describe('foam.events.merged', function() {
   it('merges with opt_X specified', function() {
     var merged = foam.events.merged(listener, 1300, GLOBAL);
 
-    ep.change.topic('simple').sub(merged);
+    ep.change.subscribe('simple', merged);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1300);
@@ -169,12 +169,12 @@ describe('foam.events.merged', function() {
   it('unsubscribes when requested', function() {
     var merged = foam.events.merged(foam.events.oneTime(listener));
 
-    ep.change.topic('simple').sub(merged);
+    ep.change.subscribe('simple', merged);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -182,10 +182,10 @@ describe('foam.events.merged', function() {
     expect(ep.change.hasListeners_(['simple'])).toBe(false);
     // and unsub happens due to the oneTime
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(1);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(1);
 
     jasmine.clock().tick(17); // should be unsubbed,
@@ -212,12 +212,12 @@ describe('foam.events.async', function() {
   it('async invokes each listener', function() {
     var delayed = foam.events.async(listener);
 
-    ep.change.topic('simple').sub(delayed);
+    ep.change.subscribe('simple', delayed);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1);
@@ -229,12 +229,12 @@ describe('foam.events.async', function() {
     var X = { setTimeout: setTimeout };
     var delayed = foam.events.async(listener, X);
 
-    ep.change.topic('simple').sub(delayed);
+    ep.change.subscribe('simple', delayed);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1);
@@ -270,14 +270,14 @@ describe('foam.events.framed', function() {
     };
     var delayed1 = foam.events.framed(listener1, X);
     var delayed2 = foam.events.framed(listener2, X);
-    ep.change.topic('simple').sub(delayed1);
-    ep.change.topic('simple').sub(delayed2);
+    ep.change.subscribe('simple', delayed1);
+    ep.change.subscribe('simple', delayed2);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
-    ep.change.topic('simple').pub()
+    ep.change.publish('simple');
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
@@ -300,81 +300,81 @@ describe('foam.events.framed', function() {
 
 
 
-describe('foam.events.Observable.hasListeners()', function() {
-  var ep;
-  var listener;
-  var listener2;
-  var listener3;
+// describe('foam.events.Observable.hasListeners()', function() {
+//   var ep;
+//   var listener;
+//   var listener2;
+//   var listener3;
 
-  beforeEachTest(function() {
-    ep = modelWithTopic();
-    listener = createTestListener();
-    listener2 = createTestListener();
-    listener3 = createTestListener();    
-  });
-  afterEach(function() {
-    ep = null;
-    listener = null;
-    listener2 = null;
-    listener3 = null;
-  });
+//   beforeEachTest(function() {
+//     ep = modelWithTopic();
+//     listener = createTestListener();
+//     listener2 = createTestListener();
+//     listener3 = createTestListener();
+//   });
+//   afterEach(function() {
+//     ep = null;
+//     listener = null;
+//     listener2 = null;
+//     listener3 = null;
+//   });
 
-  it('reports correctly for no listeners, ever', function() {
-    expect(ep.change.hasListeners_()).toBe(false);
-    expect(ep.change.hasListeners_('')).toBe(false);
-  });
-  it('reports correctly for no listeners after removing one', function() {
-    ep.change.sub(listener);
-    expect(ep.change.hasListeners_()).toBe(true);
+//   it('reports correctly for no listeners, ever', function() {
+//     expect(ep.change.hasListeners_()).toBe(false);
+//     expect(ep.change.hasListeners_('')).toBe(false);
+//   });
+//   it('reports correctly for no listeners after removing one', function() {
+//     ep.change.subscribe(listener);
+//     expect(ep.change.hasListeners_()).toBe(true);
 
-    ep.change.unsub(listener);
-    expect(ep.change.hasListeners_()).toBe(false);
-  });
-  it('reports correctly for no listeners after removing one with topic', function() {
-    ep.change.topic('flange').sub(listener);
-    expect(ep.change.hasListeners_('flange')).toBe(true);
-    expect(ep.change.hasListeners_()).toBe(false);
+//     ep.change.unsubscribe(listener);
+//     expect(ep.change.hasListeners_()).toBe(false);
+//   });
+//   it('reports correctly for no listeners after removing one with topic', function() {
+//     ep.change.subscribe('flange', listener);
+//     expect(ep.change.hasListeners_('flange')).toBe(true);
+//     expect(ep.change.hasListeners_()).toBe(false);
 
-    ep.change.topic('flange').unsub(listener);
-    expect(ep.change.hasListeners_('flange')).toBe(false);
-  });
+//     ep.change.unsubscribe('flange', listener);
+//     expect(ep.change.hasListeners_('flange')).toBe(false);
+//   });
 
-  it('reports correctly for no listeners after removing three', function() {
-    ep.change.sub(listener);
-    ep.change.sub(listener2);
-    ep.change.sub(listener3);
-    expect(ep.change.hasListeners_()).toBe(true);
+//   it('reports correctly for no listeners after removing three', function() {
+//     ep.change.subscribe(listener);
+//     ep.change.subscribe(listener2);
+//     ep.change.subscribe(listener3);
+//     expect(ep.change.hasListeners_()).toBe(true);
 
-    ep.change.unsub(listener2);
-    ep.change.unsub(listener);
-    ep.change.unsub(listener3);
-    expect(ep.change.hasListeners_()).toBe(false);
-  });
-  it('reports correctly for no listeners after removing three with topic', function() {
-    ep.change.topic('arch').sub(listener);
-    ep.change.topic('arch').sub(listener2);
-    ep.change.topic('arch').sub(listener3);
-    expect(ep.change.hasListeners_('arch')).toBe(true);
+//     ep.change.unsubscribe(listener2);
+//     ep.change.unsubscribe(listener);
+//     ep.change.unsubscribe(listener3);
+//     expect(ep.change.hasListeners_()).toBe(false);
+//   });
+//   it('reports correctly for no listeners after removing three with topic', function() {
+//     ep.change.subscribe('arch', listener);
+//     ep.change.subscribe('arch', listener2);
+//     ep.change.subscribe('arch', listener3);
+//     expect(ep.change.hasListeners_('arch')).toBe(true);
 
-    ep.change.topic('arch').unsub(listener2);
-    ep.change.topic('arch').unsub(listener);
-    ep.change.topic('arch').unsub(listener3);
-    expect(ep.change.hasListeners_('arch')).toBe(false);
-  });
-  it('reports correctly for no listeners after destroying', function() {
-    ep.change.sub(listener);
-    ep.change.sub(listener2);
-    ep.change.topic('arch').sub(listener3);
-    expect(ep.change.hasListeners_()).toBe(true);
-    expect(ep.change.hasListeners_('arch')).toBe(true);
+//     ep.change.unsubscribe('arch', listener2);
+//     ep.change.unsubscribe('arch', listener);
+//     ep.change.unsubscribe('arch', listener3);
+//     expect(ep.change.hasListeners_('arch')).toBe(false);
+//   });
+//   it('reports correctly for no listeners after destroying', function() {
+//     ep.change.subscribe(listener);
+//     ep.change.subscribe(listener2);
+//     ep.change.subscribe('arch', listener3);
+//     expect(ep.change.hasListeners_()).toBe(true);
+//     expect(ep.change.hasListeners_('arch')).toBe(true);
 
-    ep.change.destroy();
-    expect(ep.change.hasListeners_()).toBe(false);
-    expect(ep.change.hasListeners_('arch')).toBe(false);
-  });
+//     ep.change.destroy();
+//     expect(ep.change.hasListeners_()).toBe(false);
+//     expect(ep.change.hasListeners_('arch')).toBe(false);
+//   });
 
 
-});
+// });
 
 
 describe('foam.events.Observable.sub()/.pub()', function() {
@@ -387,7 +387,7 @@ describe('foam.events.Observable.sub()/.pub()', function() {
     ep = modelWithTopic();
     listener = createTestListener();
     listener2 = createTestListener();
-    listener3 = createTestListener();    
+    listener3 = createTestListener();
   });
   afterEach(function() {
     ep = null;
@@ -397,90 +397,45 @@ describe('foam.events.Observable.sub()/.pub()', function() {
   });
 
   it('publishes correctly after removing first of three', function() {
-    ep.change.sub(listener);
-    ep.change.sub(listener2);
-    ep.change.sub(listener3);
-    expect(ep.change.hasListeners_()).toBe(true);
-    
-    ep.change.unsub(listener);
-    ep.change.pub(null);
+    ep.change.subscribe(listener);
+    ep.change.subscribe(listener2);
+    ep.change.subscribe(listener3);
+//    expect(ep.change.hasListeners_()).toBe(true);
+
+    ep.change.unsubscribe(listener);
+    ep.change.publish();
     expect(listener.count).toEqual(0);
     expect(listener2.count).toEqual(1);
     expect(listener3.count).toEqual(1);
   });
-  it('publishes correctly after removing middle of three', function() {
-    ep.change.sub(listener);
-    ep.change.sub(listener2);
-    ep.change.sub(listener3);
-    expect(ep.change.hasListeners_()).toBe(true);
-    
-    ep.change.unsub(listener2);
-    ep.change.pub();
+   it('publishes correctly after removing middle of three', function() {
+    ep.change.subscribe(listener);
+    ep.change.subscribe(listener2);
+    ep.change.subscribe(listener3);
+//    expect(ep.change.hasListeners_()).toBe(true);
+
+    ep.change.unsubscribe(listener2);
+    ep.change.publish();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(0);
     expect(listener3.count).toEqual(1);
   });
   it('publishes correctly after removing last of three', function() {
-    ep.change.sub(listener);
-    ep.change.sub(listener2);
-    ep.change.sub(listener3);
-    expect(ep.change.hasListeners_()).toBe(true);
-    
-    ep.change.unsub(listener3);
-    ep.change.pub();
+    ep.change.subscribe(listener);
+    ep.change.subscribe(listener2);
+    ep.change.subscribe(listener3);
+//    expect(ep.change.hasListeners_()).toBe(true);
+
+    ep.change.unsubscribe(listener3);
+    ep.change.publish();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(1);
     expect(listener3.count).toEqual(0);
   });
 
-
 });
 
-/*
-describe('foam.events.Observable listener-unsubscribe', function() {
-  var ep;
-  var listener1;
-  var listener2;
 
-  beforeEachTest(function() {
-    ep = modelWithTopic();
-    listener1 = createTestListener();
-    listener2 = createTestListener(true);
-  });
-  afterEach(function() {
-    ep = null;
-    listener1 = null;
-    listener2 = null;
-  });
-
-
-  it('unsubs listener', function() {
-    // listener2 is set up to unsubscribe itself
-    ep.subscribe([], listener1);
-    ep.change.topic('else').sub(listener2);
-    expect(ep.publish(['something','else'], 'phase1')).toEqual(2); // both listeners fired
-    expect(listener1.last_args[3]).toEqual('phase1');
-    expect(listener2.last_args[3]).toEqual('phase1');
-
-    expect(ep.publish(['something','else'], 'phase2')).toEqual(1); // only one left after unsub
-    expect(listener1.last_args[3]).toEqual('phase2');
-    expect(listener2.last_args[3]).toEqual('phase1');
-  });
-
-  it('unsubs listener published with wildcard', function() {
-    ep.subscribe([], listener1);
-    ep.change.topic('else').sub(listener2);
-
-    expect(ep.publish(['*'], 'phase1')).toEqual(2); // wildcard hits a different code path
-    expect(listener1.last_args[3]).toEqual('phase1');
-    expect(listener2.last_args[3]).toEqual('phase1');
-
-    expect(ep.publish(['*'], 'phase2')).toEqual(1);
-    expect(listener1.last_args[3]).toEqual('phase2');
-    expect(listener2.last_args[3]).toEqual('phase1');
-  });
-});
-*/
 
 
 describe('PropertyChangePublisher.propertyChange()', function() {
@@ -497,24 +452,25 @@ describe('PropertyChangePublisher.propertyChange()', function() {
   });
 
   it('triggers listeners when old/nu value differs', function() {
-    pcp.onPropertyChange.topic('propA').sub(listener);
+    pcp.propertyChange.subscribe(listener);
 
     pcp.propA = 1;
     pcp.propA = 3;
     expect(listener.last_old).toEqual(1);
     expect(listener.last_nu).toEqual(3);
 
-    // pcp.propertyChange('myProp', 3, 7);
-    // expect(listener.last_old).toEqual(3);
-    // expect(listener.last_nu).toEqual(7);
-    //
-    // pcp.propertyChange('myProp', 3, 3);
-    // expect(listener.last_old).toEqual(3);
-    // expect(listener.last_nu).toEqual(7);
-    //
-    // pcp.propertyChange('myProp', NaN, NaN); // special equality check case
-    // expect(listener.last_old).toEqual(3);
-    // expect(listener.last_nu).toEqual(7);
+    pcp.propA = 7;
+    expect(listener.last_old).toEqual(3);
+    expect(listener.last_nu).toEqual(7);
+
+    pcp.propA = 7;
+    expect(listener.last_old).toEqual(3);
+    expect(listener.last_nu).toEqual(7);
+
+    pcp.propA = NaN;
+    pcp.propA = NaN;
+    expect(listener.last_old).toEqual(7);
+    expect(listener.last_nu).toEqual(NaN);
   });
 });
 
