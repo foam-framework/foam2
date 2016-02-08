@@ -15,7 +15,7 @@ describe('Untyped Property', function() {
 
   beforeEachTest(function() {
     // NOTE: globals are not defined until corePromise is run by beforeEachTest()
-    CLASS({
+    foam.CLASS({
       name: 'PropTest',
       properties: [
         {
@@ -71,7 +71,7 @@ describe('Property Getter and Setter', function() {
 
   beforeEachTest(function() {
     // NOTE: globals are not defined until corePromise is run by beforeEachTest()
-    CLASS({
+    foam.CLASS({
       name: 'GetterSetterTest',
       properties: [
         {
@@ -129,7 +129,7 @@ describe('Property Factory', function() {
   var t;
 
   beforeEachTest(function() {
-    CLASS({
+    foam.CLASS({
       name: 'FactoryTest',
       properties: [
         {
@@ -219,7 +219,7 @@ describe('Property default value', function() {
   var t;
 
   beforeEachTest(function() {
-    CLASS({
+    foam.CLASS({
       name: 'DefaultValue',
       properties: [
         {
@@ -259,8 +259,8 @@ describe('ArrayProperty', function() {
   var t;
 
   beforeEachTest(function() {
-    CLASS({ name: 'A', properties: [ { name: 'a' } ] });
-    CLASS({
+    foam.CLASS({ name: 'A', properties: [ { name: 'a' } ] });
+    foam.CLASS({
       name: 'B',
       properties: [
         {
@@ -308,7 +308,7 @@ describe('Constants', function() {
   var t2;
 
   beforeEachTest(function() {
-    CLASS({
+    foam.CLASS({
       name: 'ConstantTest',
 
       constants: [
@@ -319,7 +319,7 @@ describe('Constants', function() {
       ]
     });
     t = /*X.*/ConstantTest.create({});
-    CLASS({
+    foam.CLASS({
       name: 'ConstantTest2',
 
       constants: {
@@ -355,7 +355,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   var employee;
 
   beforeEachTest(function() {
-    CLASS({
+    foam.CLASS({
       name: 'Person',
 
       constants: [
@@ -388,7 +388,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     });
     person = /*X.*/Person.create({name: 'Adam', age: 0});
 
-    CLASS({
+    foam.CLASS({
       name: 'Employee',
       extends: 'Person',
 
@@ -427,7 +427,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     expect(/*X.*/Person.isSubClass(/*X.*/Employee)).toBe(true);
     expect(/*X.*/Employee.isSubClass(/*X.*/Person)).toBe(false);
 
-    CLASS({ name: 'Fake' });
+    foam.CLASS({ name: 'Fake' });
     expect(/*X.*/Person.isSubClass(/*X.*/Fake)).toBe(false);
   });
 
@@ -436,7 +436,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     expect(/*X.*/Employee.isInstance(person)).toBe(false);
     expect(/*X.*/Person.isInstance(employee)).toBe(true);
 
-    CLASS({ name: 'Fake' });
+    foam.CLASS({ name: 'Fake' });
     expect(/*X.*/Person.isInstance(/*X.*/Fake.create({}))).toBe(false);
   });
 
@@ -456,7 +456,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
 describe('FObject white box test', function() {
   beforeEachTest(function() {
-    CLASS({
+    foam.CLASS({
       name: 'Person',
       properties: [
         {
@@ -502,7 +502,7 @@ describe('Method overrides and SUPER', function() {
   var s;
 
   beforeEachTest(function() {
-    CLASS({
+    foam.CLASS({
       name: 'BaseClass',
       methods: [
         function base() {
@@ -510,7 +510,7 @@ describe('Method overrides and SUPER', function() {
         }
       ]
     });
-    CLASS({
+    foam.CLASS({
       name: 'SubClass',
       extends: 'BaseClass',
       methods: [
@@ -519,7 +519,7 @@ describe('Method overrides and SUPER', function() {
         }
       ]
     });
-    CLASS({
+    foam.CLASS({
       name: 'SubSubClass',
       extends: 'SubClass',
       methods: [

@@ -31,7 +31,7 @@ FObject.__proto__.describe = function(opt_name) {
 };
 
 
-CLASS({
+foam.CLASS({
   name: 'FObject',
 
   methods: [

@@ -24,7 +24,7 @@ function createTestListener(doUnsub) {
 }
 
 function modelWithTopic() {
-  CLASS({
+  foam.CLASS({
     name: 'TopicModel',
     topics: [
       'change',
@@ -34,7 +34,7 @@ function modelWithTopic() {
   return TopicModel.create();
 }
 function modelWithProperty() {
-  CLASS({
+  foam.CLASS({
     name: 'PropModel',
     properties: [
       { name: 'propA' },

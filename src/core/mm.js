@@ -23,7 +23,7 @@ foam.boot = {
   classes: [],
 
   start: function() {
-    global.CLASS = this.CLASS.bind(this);
+    foam.CLASS = this.CLASS.bind(this);
   },
 
   getClass: (function() {
@@ -156,11 +156,11 @@ foam.boot = {
 
   endPhase1: function() {
     // Upgrade to final CLASS() definition.
-    global.CLASS = function(m) { return Model.create(m).getClass(); };
+    foam.CLASS = function(m) { return Model.create(m).getClass(); };
 
     // Upgrade existing classes to real classes.
     for ( var i = 0 ; i < this.classes.length ; i++ )
-      CLASS(this.classes[i].model_);
+      foam.CLASS(this.classes[i].model_);
   },
 
   end: function() {
@@ -177,7 +177,7 @@ foam.boot = {
 
 foam.boot.start();
 
-CLASS({
+foam.CLASS({
   name: 'FObject',
 
   documentation: 'Base model for model hierarchy.',
@@ -215,7 +215,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Model',
   extends: 'FObject', // Isn't the default yet.
 
@@ -260,7 +260,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Property',
   extends: 'FObject',
 
@@ -373,7 +373,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Method',
   extends: 'FObject',
 
@@ -428,7 +428,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'StringProperty',
   extends: 'Property',
 
@@ -445,7 +445,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'ArrayProperty',
   extends: 'Property',
 
@@ -476,7 +476,7 @@ foam.boot.endPhase1();
 
 
 // Install Listener Support
-CLASS({
+foam.CLASS({
   name: 'FObject',
 
   methods: [
@@ -563,7 +563,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'AxiomArrayProperty',
   extends: 'ArrayProperty',
 
@@ -577,7 +577,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Constant',
 
   properties: [ 'name', 'value' ],
@@ -593,7 +593,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Trait',
 
   properties: [
@@ -607,7 +607,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Topic',
 
   properties: [ 'name', 'description' ],
@@ -643,7 +643,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'BooleanProperty',
   extends: 'Property',
 
@@ -660,7 +660,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'IntProperty',
   extends: 'Property',
 
@@ -684,7 +684,7 @@ CLASS({
 // TODO: Add other Property sub-classes here.
 
 
-CLASS({
+foam.CLASS({
   name: 'Listener',
 
   properties: [
@@ -715,7 +715,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'Model',
 
   properties: [
@@ -792,7 +792,7 @@ CLASS({
 });
 
 
-CLASS({
+foam.CLASS({
   name: 'FObject',
 
   topics: [ 'propertyChange' ],
@@ -837,6 +837,8 @@ foam.boot.end();
 
 /*
   TODO:
+  - more docs
+  - distinguish new CLASS from EXTENSION
   - package support
   - imports / exports
   - slots

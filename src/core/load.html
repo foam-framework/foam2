@@ -21,7 +21,7 @@
   </head>
   <body>
     <script>
-      CLASS({
+      foam.CLASS({
         name: 'TopicTest',
         topics: [ 'onFoo', 'onBar' ],
         properties: [ 'a', 'b', 'c' ]
@@ -74,7 +74,7 @@
       t.a = 42;
       t.a++;
 
-      CLASS({
+      foam.CLASS({
         name: 'ListenerTest',
         properties: [ 'a', 'b', 'c' ],
         listeners: [
@@ -91,7 +91,7 @@
       bar();
 
 
-      CLASS({
+      foam.CLASS({
         name: 'SampleTrait',
         properties: [ 't1', 't2', 't3' ],
         methods: [
@@ -100,7 +100,7 @@
         ]
       });
 
-      CLASS({
+      foam.CLASS({
         name: 'TraitTest',
         traits: ['SampleTrait'],
         properties: [ 'p1', 'p2', 'p3' ],
@@ -117,7 +117,7 @@
       tt.foo();
 
 
-      CLASS({
+      foam.CLASS({
         name: 'Person',
         properties: [
           'name',
@@ -127,7 +127,7 @@
           function toString() { return this.name + ' ' + this.sex; }
         ]
       });
-      CLASS({
+      foam.CLASS({
         name: 'Employee',
         extends: 'Person',
         properties: [
@@ -136,7 +136,7 @@
         methods: [
           function toString() { return this.SUPER() + ' ' + this.salary; }
         ]      });
-      CLASS({
+      foam.CLASS({
         name: 'Nun',
         extends: 'Person',
         properties: [
