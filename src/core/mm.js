@@ -474,6 +474,7 @@ CLASS({
 foam.boot.endPhase1();
 
 
+// Install Listener Support
 CLASS({
   name: 'FObject',
 
@@ -556,18 +557,8 @@ CLASS({
         }
         node = node.next;
       }
-    },
-
-    function clearProperty(name) { delete this.instance_[name]; },
-    function toString() {
-      // Distinguish between prototypes and instances.
-      return this.cls_.name + (this.instance_ ? '' : 'Proto')
     }
-  ],
-
-  // TODO: insert core/FObject.js functionality
-
-  // TODO: insert foam.events and PropertyChangeSupport here
+  ]
 });
 
 
@@ -815,16 +806,23 @@ CLASS({
         this.copyFrom(args);
       }
     },
+
     function copyFrom(o) {
       // TODO: should walk through Axioms with initAgents instead
       var a = this.cls_.getAxiomsByClass(Property);
       for ( var i = 0 ; i < a.length ; i++ ) {
         var name = a[i].name;
-        if ( typeof o[name] !== 'undefined' ) {
+        if ( typeof o[name] !== 'undefined' )
           this[name] = o[name];
-        }
       }
       return this;
+    },
+
+    function clearProperty(name) { delete this.instance_[name]; },
+
+    function toString() {
+      // Distinguish between prototypes and instances.
+      return this.cls_.name + (this.instance_ ? '' : 'Proto')
     }
   ]
 });
