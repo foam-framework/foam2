@@ -64,9 +64,18 @@ foam.LIB({
     },
 
     function installAxiom(a) {
+      /*
+        Install an Axiom into the class and prototype.
+        Invalidate the axiom-cache, used by getAxiomsByName().
+        -
+        Installs axioms into the protoype immediately, but in the future
+        we will wait until the first object is created. This will provide
+        better startup performance.
+      */
       this.axiomMap_[a.name] = a;
       this.axiomCache_ = {};
       
+      // Store the destination class in the Axiom.  Used by describe().
       a.sourceCls_ = this;
       
       a.installInClass && a.installInClass(this);
@@ -74,21 +83,26 @@ foam.LIB({
     },
 
     function isInstance(o) {
+      /*
+        Determine if an object is an instance of this class
+        or one of its sub-classes.
+      */
       return o.cls_ && this.isSubClass(o.cls_);
     },
 
-    function isSubClass(o) {
+    function isSubClass(c) {
+      /* Determine if a class is either this class or a sub-class. */
       // TODO: switch from 'name' to 'id' when available
-      if ( ! o ) return false;
+      if ( ! c ) return false;
       
       var subClasses_ = this.hasOwnProperty('subClasses_') ?
         this.subClasses_ :
         this.subClasses_ = {} ;
       
-      if ( ! subClasses_.hasOwnProperty(o.name) )
-        subClasses_[o.name] = ( o === this ) || this.isSubClass(o.__proto__);
+      if ( ! subClasses_.hasOwnProperty(c.name) )
+        subClasses_[c.name] = ( c === this ) || this.isSubClass(c.__proto__);
       
-      return subClasses_[o.name];
+      return subClasses_[c.name];
     },
 
     function getAxiomByName(name) {
@@ -99,6 +113,10 @@ foam.LIB({
     // Would like to have efficient support for:
     //    .where() .orderBy() groupBy
     function getAxiomsByClass(cls) {
+      /*
+        Returns all axioms defined on this class or its parent classes
+        that are instances of the specified class.
+      */
       var as = this.axiomCache_[cls.name];
       if ( ! as ) {
         as = [];
@@ -114,6 +132,7 @@ foam.LIB({
     },
 
     function getAxioms() {
+      /* Returns all axioms defined on this class or its parent classes. */
       // The full axiom list is stored in the regular cache with '' as a key.
       var as = this.axiomCache_[''];
       if ( ! as ) {
@@ -125,9 +144,7 @@ foam.LIB({
       return as;
     },
 
-    function toString() {
-      return this.name + 'Class';
-    }
+    function toString() { return this.name + 'Class'; }
   ]
 });
 
@@ -147,7 +164,7 @@ foam.LIB({
 
     function getClass() {
       /*
-        Create or Update a Prototype from a psedo-Model definition.
+        Create or Update a Prototype from a Model definition.
         (Model is 'this').
       */
       var cls = global[this.name];
