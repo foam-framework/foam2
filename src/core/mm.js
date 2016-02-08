@@ -189,9 +189,7 @@ CLASS({
         if ( key.indexOf('_') == -1 )
           this[key] = args[key];
 
-      if ( args.instance_ )
-        for ( var key in args.instance_ )
-          this[key] = args.instance_[key];
+        Object.assign(this, args.instance_);
     },
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
@@ -784,8 +782,7 @@ CLASS({
       if ( ! args ) return;
 
       if ( args.__proto__ === Object.prototype ) {
-        for ( var key in args )
-          this[key] = args[key];
+        Object.assign(this, args);
       } else if ( args.instance_ ) {
         for ( var key in args.instance_ )
           if ( this.cls_.getAxiomByName(key) )
