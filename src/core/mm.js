@@ -38,7 +38,7 @@
   From the Class we call create() to create new instances of that class.
   New instances extend the classes prototype object, which is store on the class as .prototype.
 
-  instance ---> .cls_   -> Objects Class
+  instance ---> .cls_   -> Object's Class
        |
        +------> .model_ -> Object's Model
  
