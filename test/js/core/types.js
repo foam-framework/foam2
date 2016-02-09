@@ -177,6 +177,15 @@ describe('foam.types.typeCheck', function() {
    expect(function() { rfn({}); }).not.toThrow();
    expect(function() { rfn(99); }).toThrow();
   });
+  it('covers no return type', function() {
+   var rfn = foam.types.typeCheck(function() { return 1; });
+   expect(function() { rfn({}); }).not.toThrow();
+  });
+  it('does not affect the toString() of the function', function() {
+    var f = makeTestFn();
+    var fck = foam.types.typeCheck(f);
+    expect(f.toString()).toEqual(fck.toString());
+  });
 
 });
 

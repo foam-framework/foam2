@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-if ( ! foam.types ) foam.types = {};
+
 
 // TODO: i18n compatible error messages?
 
@@ -80,92 +80,95 @@ foam.CLASS({
   *     accurate.
   * @return An array of Argument objects.
   */
-foam.types.getFunctionArgs = function getFunctionArgs(fn) {
-  // strip newlines and find the function(...) declaration
-  var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/);
-  if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
-  args = args[2];
-  if ( args )
-    args = args.split(',').map(function(name) { return name.trim(); });
-  else
-    return [];
+foam.LIB({
+  name: 'types',
+  
+  methods: [
+    function getFunctionArgs(fn) {
+      // strip newlines and find the function(...) declaration
+      var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/);
+      if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
+      args = args[2];
+      if ( args )
+        args = args.split(',').map(function(name) { return name.trim(); });
+      else
+        return [];
 
-  var ret = [];
-  // check each arg for types
-  var index = 0;
-  args.forEach(function(arg) {
-    // Optional commented type(incl. dots for packages), argument name, optional commented return type
-    // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
-    var typeMatch = arg.match(/^\s*(\/\*\s*([\w._$]+)(\?)?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*/);
-    if ( typeMatch ) {
-      ret.push(/*X.*/Argument.create({
-        name: typeMatch[4],
-        typeName: typeMatch[2],
-        type: global[typeMatch[2]],
-        optional: typeMatch[3] == '?',
-        index: index++,
-      }));
-      // TODO: this is only valid on the last arg
-      if ( typeMatch[6] ) {
-        console.log(typeMatch);
-        ret.returnType = /*X.*/ReturnValue.create({
-          typeName: typeMatch[6],
-          type: global[typeMatch[6]]
-        });
+      var ret = [];
+      // check each arg for types
+      var index = 0;
+      args.forEach(function(arg) {
+        // Optional commented type(incl. dots for packages), argument name, optional commented return type
+        // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
+        var typeMatch = arg.match(/^\s*(\/\*\s*([\w._$]+)(\?)?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*/);
+        if ( typeMatch ) {
+          ret.push(/*X.*/Argument.create({
+            name: typeMatch[4],
+            typeName: typeMatch[2],
+            type: global[typeMatch[2]],
+            optional: typeMatch[3] == '?',
+            index: index++,
+          }));
+          // TODO: this is only valid on the last arg
+          if ( typeMatch[6] ) {
+            ret.returnType = /*X.*/ReturnValue.create({
+              typeName: typeMatch[6],
+              type: global[typeMatch[6]]
+            });
+          }
+        } else {
+          // check for bare return type with no args
+          typeMatch = arg.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
+          if ( typeMatch && typeMatch[1] ) {
+            ret.returnType = /*X.*/ReturnValue.create({
+              typeName: typeMatch[1],
+              type: global[typeMatch[1]]
+            });
+          } else {
+            throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
+          }
+        }
+      });
+
+      return ret;
+    },
+
+    /** Decorates the given function with a runtime type checker.
+      * Types should be denoted before each argument:
+      * <code>function(\/\*TypeA\*\/ argA, \/\*string\*\/ argB) { ... }</code>
+      * Types are either the names of Models (i.e. declared with CLASS), or
+      * javascript primitives as returned by 'typeof'. In addition, 'array'
+      * is supported as a special case, corresponding to an Array.isArray() check.
+      * @fn The function to decorate. The toString() of the function must be
+      *     accurate.
+      * @return A new function that will throw errors if arguments
+      *         doesn't match the declared types, run the original function,
+      *         then type check the returned value.
+      */
+    function typeCheck(fn) {
+      // parse out the arguments and their types
+      var args = foam.types.getFunctionArgs(fn);
+      var ret = function() {
+        // check each declared argument, arguments[i] can be undefined for missing optional args,
+        // extra arguments are ok
+        for (var i = 0; i < args.length; ++i) {
+          args[i].validate(arguments[i]);
+        }
+        // If nothing threw an exception, we are free to run the function
+        var retVal = fn.apply(this, arguments);
+
+        // check the return value
+        if ( args.returnType ) {
+          args.returnType.validate(retVal);
+        }
+
+        return retVal;
       }
-    } else {
-      // check for bare return type with no args
-      typeMatch = arg.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
-      if ( typeMatch && typeMatch[1] ) {
-        ret.returnType = /*X.*/ReturnValue.create({
-          typeName: typeMatch[1],
-          type: global[typeMatch[1]]
-        });
-      } else {
-        throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
-      }
+      // keep the old value of toString (hide the decorator)
+      ret.toString = function() { return fn.toString(); }
+      return ret;
     }
-  });
-
-  return ret;
-}
-
-/** Decorates the given function with a runtime type checker.
-  * Types should be denoted before each argument:
-  * <code>function(\/\*TypeA\*\/ argA, \/\*string\*\/ argB) { ... }</code>
-  * Types are either the names of Models (i.e. declared with CLASS), or
-  * javascript primitives as returned by 'typeof'. In addition, 'array'
-  * is supported as a special case, corresponding to an Array.isArray() check.
-  * @fn The function to decorate. The toString() of the function must be
-  *     accurate.
-  * @return A new function that will throw errors if arguments
-  *         doesn't match the declared types, run the original function,
-  *         then type check the returned value.
-  */
-foam.types.typeCheck = function typeCheck(fn) {
-  // parse out the arguments and their types
-  var args = foam.types.getFunctionArgs(fn);
-  var ret = function() {
-    // check each declared argument, arguments[i] can be undefined for missing optional args,
-    // extra arguments are ok
-    for (var i = 0; i < args.length; ++i) {
-      args[i].validate(arguments[i]);
-    }
-    // If nothing threw an exception, we are free to run the function
-    var retVal = fn.apply(this, arguments);
-
-    // check the return value
-    if ( args.returnType ) {
-      args.returnType.validate(retVal);
-    }
-
-    return retVal;
-  }
-  // keep the old value of toString (hide the decorator)
-  ret.toString = function() { return fn.toString(); }
-  return ret;
-}
-
-
+  ]
+});
 
 
