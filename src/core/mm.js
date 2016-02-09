@@ -522,7 +522,7 @@ foam.CLASS({
 
     function f(o) {
       /* Makes this Property an adapter, suitable for use with mLangs. */
-      return f[this.name];
+      return o[this.name];
     },
 
     function compare(o1, o2) {

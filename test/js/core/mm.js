@@ -553,3 +553,39 @@ describe('Method overrides and SUPER', function() {
 
 
 
+describe('Property Mlang interop', function() {
+  var t;
+
+  beforeEachTest(function() {
+    foam.CLASS({
+      name: 'MTest',
+      properties: [
+        {
+          name: 'a',
+          defaultValue: 45,
+        },
+      ]
+    });
+    t = /*X.*/MTest.create({});
+  });
+  afterEach(function() {
+    t = null;
+  });
+
+  it('predicate support works', function() {
+    expect(/*X.*/MTest.A.f(t)).toEqual(45); // extracts 'a' property of instance t
+  });
+  it('compare support works', function() {
+    var t2 = MTest.create({ a: 45 });
+    expect(/*X.*/MTest.A.compare(t, t2)).toEqual(0);
+    t2.a = 2;
+    expect(/*X.*/MTest.A.compare(t, t2)).toEqual(1);    
+    t.a = 1;
+    expect(/*X.*/MTest.A.compare(t, t2)).toEqual(-1);    
+  });
+
+
+
+});
+
+
