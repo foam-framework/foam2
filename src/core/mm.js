@@ -15,8 +15,86 @@
  * limitations under the License.
  */
 
+/*
+ FOAM Bootstrap
+
+ FOAM uses Models to specify class definitions.
+ The FOAM Model class is itself specified with a FOAM model, meaning
+ that Model is defined in the same language which it defines.
+ This self-modeling system requires some care to bootstrap, but results
+ in a very compact, uniform, and powerful system. 
+ 
+            Abstract Class
+                  ^
+                  |
+ FObject -> FObject Class                     Prototype
+    ^                        +-.prototype---------^
+    |                        |                    |
+  Model  -> getClass()  -> Class -> create() -> instance
+  
+  FObject is the root model/class of all other classes, including Model.
+  Abstract Class is the prototype of FObject's Class, which makes it the root of all Classes.
+  From a Model we call getClass() to create a Class (or the previously created Class) object.
+  From the Class we call create() to create new instances of that class.
+  New instances extend the classes prototype object, which is store on the class as .prototype.
+
+  instance ---> .cls_   -> Objects Class
+       |
+       +------> .model_ -> Object's Model
+ 
+  All descendents of FObject haver references to both their Model and Class.
+    - obj.cls_ refers to an Object's Class
+    - obj.model_ refers to an Object's Model
+
+  Classes also refer to their Model with .model_.
+
+  Model is its own definition:
+    Model.getClass().create(Model) == Model
+    Model.model_ === Model
+
+  Models are defined as a collection of Axioms.
+  It is the responsibility of Axioms to isntall itself onto a Model's Class and/or Prototype.
+
+  Axioms are defined with the following psedo-interface:
+
+    public interface Axiom {
+      optional installInClass(class)
+      optional installInProto(proto)
+    }
+
+  Ex. of a Model with one Axiom:
+ 
+  foam.CLASS({
+    name: 'Sample',
+
+    axioms: [
+      {
+        name: 'axiom1',
+        installInClass: function(cls) { ... },
+        installInProto: function(proto) { ... }
+      }
+    ]
+  });
+
+  Axioms can be added either during the initial creation of a class and prototype,
+  or anytime after.  This allows classes to be extended with new functionality,
+  and this is very important to the bootstrap process because it allows us to
+  start out with very simple definitions of Model and FObject, and then build
+  them up until they're fully bootstrapped.
+
+  However, raw axioms are rarely used directly. Instead we model higher-level
+  axiom types, including:
+
+  Traits     - Implement multiple inheritance  
+  Constants  - Add constants to the prototype and class
+  Topics     - Publish/subscribe topics
+  Properties - High-level instance variable definitions
+  Methods    - Prototype methods
+  Listeners  - Like methods, but with extra features for use as callbacks 
+*/
+
 foam.LIB({
-  package: 'foam.internal', // packages not implemented yet
+  package: 'foam.core',
   name: 'AbstractClass',
 
   documentation: "Root prototype for all classes.",
