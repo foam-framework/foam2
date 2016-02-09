@@ -19,7 +19,7 @@ foam.LIB({
   package: 'foam.internal', // packages not implemented yet
   name: 'AbstractClass',
 
-  documentation: "Prototype for FObject's class.",
+  documentation: "Root prototype for all classes.",
 
   constants: {
     prototype: Object.prototype,
