@@ -832,6 +832,35 @@ foam.CLASS({
 // TODO: Add other Property sub-classes here.
 
 
+/*
+  Listener
+  Listeners are high-level pre-bound event call-backs.
+
+  Ex.
+  foam.CLASS({
+    name: 'Sprinkler',
+    listeners: [
+
+      // short-form
+      function onAlarm() { ... },
+
+      // long-form
+      {
+        name: 'onClear',
+        isFramed: true,
+        code: function() { ... }
+      }
+    ]
+  });
+
+  You might use the above onAlarm listener like this:
+  alarm.ring.subscribe(sprinker.onAlarm);
+
+  Notice, that normally JS methods forget which object they belong
+  to so you would need to do something like:
+    alarm.ring.subscribe(sprinker.onAlarm.bind(sprinkler));
+  But listeners are pre-bound.
+*/
 foam.CLASS({
   name: 'Listener',
 
@@ -865,6 +894,8 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'Model',
+
+  documentation: 'Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
   properties: [
     {
@@ -942,20 +973,32 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'FObject',
+  
+  documentation: 'Upgrade FObject to fully bootstraped form.',
 
   topics: [ 'propertyChange' ],
 
   methods: [
     function initArgs(args) {
+      /*
+        Called to process constructor arguments.
+        Replaces simpler version defined in original FObject definition.
+      */
       if ( ! args ) return;
 
-      if ( args.__proto__ === Object.prototype ) {
+      // If args are just a simple {} map, just copy
+      if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
         Object.assign(this, args);
-      } else if ( args.instance_ ) {
+      }
+      // If an FObject, copy values from instance_ 
+      else if ( args.instance_ ) {
         for ( var key in args.instance_ )
           if ( this.cls_.getAxiomByName(key) )
-            this[key] = args.instance_[key];
-      } else {
+            this[key] = args[key];
+      }
+      // Else call copyFrom(), which is the slowest version because
+      // it is O(# of properties) not O(# of args)
+      else {
         this.copyFrom(args);
       }
     },
