@@ -105,7 +105,7 @@ foam.LIB({
   },
 
   methods: [
-    function create(args) {
+    function create(/*args*/) {
       /*
         Create a new instance of this class.
         Configured from values taken from 'args', if supplifed.
@@ -113,7 +113,7 @@ foam.LIB({
       var obj = Object.create(this.prototype);
       obj.instance_ = Object.create(null);
       
-      obj.initArgs(args);
+      obj.initArgs.apply(obj, arguments);
       
       return obj;
     },
@@ -467,20 +467,17 @@ foam.CLASS({
       var factory         = this.factory;
       var hasDefaultValue = this.hasOwnProperty('defaultValue');
       var defaultValue    = this.defaultValue;
+      var slotName        = name + '$';
 
-      /* Future: needs events and slot support first.
-         Should be deferred until phase2?
-         var slotName        = name + '$';
-         Object.defineProperty(proto, slotName, {
-         get: function propSlotGetter() {
-         return this.slot(name);
-         },
-         set: function propSlotSetter(value) {
-         value.link.link(this.slot(name));
-         },
-         configurable: true
-         });
-      */
+      Object.defineProperty(proto, slotName, {
+        get: function propSlotGetter() {
+          return this.slot(name, slotName, prop);
+        },
+        set: function propSlotSetter(slot) {
+          slot.link.link(this.slot(name, slotName, prop));
+        },
+        configurable: true
+      });
 
       // TODO: implement 'expression'
 
@@ -520,6 +517,17 @@ foam.CLASS({
       });
     },
 
+    function get(o) {
+      /* Flyweight getter for this Property. */
+      return o[this.name];
+    },
+
+    function set(o, value) {
+      /* Flyweight setter for this Property. */
+      o[this.name] = value;
+      return this;
+    },
+    
     function f(o) {
       /* Makes this Property an adapter, suitable for use with mLangs. */
       return o[this.name];
@@ -798,6 +806,16 @@ foam.CLASS({
       /* Publish to this.propertyChange topic if oldValue and newValue are different. */
       if ( ! Object.is(oldValue, newValue) )
         this.publish('propertyChange', name, oldValue, newValue);
+    },
+
+    function slot(name, opt_slotName, opt_prop) {
+      if ( ! opt_slotName ) opt_slotName = name + '$';
+      var slot = this.getPrivate_(opt_slotName);
+      if ( ! slot ) {
+        slot = PropertySlot.create(this, opt_prop || this.cls_.getAxiomByName(name));
+        this.setPrivate_(opt_slotName, slot);
+      }
+      return slot;
     }
   ]
 });
@@ -880,6 +898,49 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) { cls.installModel(global[this.path].model_); }
+  ]
+});
+
+
+// TODO: doc
+foam.CLASS({
+  name: 'Slot',
+  extends: null,
+
+  methods: [
+
+  ]
+});
+
+
+// TODO: doc
+foam.CLASS({
+  name: 'PropertySlot',
+  extends: 'Slot',
+  
+  methods: [
+    function initArgs(obj, prop) {
+      this.obj  = obj;
+      this.prop = prop;
+    },
+    function get() {
+      return this.prop.get(this.obj);
+    },
+    function set(value) {
+      return this.prop.set(this.obj, value);
+    },
+    function subscribe(l) {
+      return this.obj.subscribe('propertyChange', this.prop.name, l);
+    },
+    function unsubscribe(l) {
+      this.obj.unsubscribe('propertyChange', this.prop.name, l);
+    },
+    function isDefined() {
+      return this.obj.hasOwnProperty(this.prop.name);
+    },
+    function clear() {
+      this.obj.clearProperty(this.prop.name);
+    }
   ]
 });
 
@@ -1178,10 +1239,11 @@ foam.boot.end();
 /*
   TODO:
   - more docs
+    - doc Slots
+  - Slot.follow() and other methods
   - distinguish new CLASS from EXTENSION
   - package support
   - imports / exports
-  - slots
   - listener decorators
   - Lightweight Objects
   - 'expression' Property property

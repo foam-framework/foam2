@@ -149,6 +149,11 @@
       var terresa = Nun.create({name: 'Terresa'});
       console.log(bob.toString(), don.toString());
       console.log(bob.sex, don.sex, terresa.sex);
+
+      bob.name$.subscribe(console.log.bind(console, 'name change: '));
+      console.log('get: ', bob.name$.get());
+      bob.name$.set('Bobby');
+      bob.name = 'Bubba';
     </script>
   </body>
 </html>
