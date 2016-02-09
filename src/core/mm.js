@@ -359,6 +359,10 @@ foam.CLASS({
 
     function hasOwnPrivate_(name) {
       return this.private_ && this.private_.hasOwnProperty(name);
+    },
+
+    function publishPropertyChange() {
+      // NOP - to be added later
     }
   ]
 });
@@ -506,11 +510,7 @@ foam.CLASS({
 
           this.instance_[name] = newValue;
 
-          // Change detection
-          if ( oldValue !== newValue &&
-               ! ( (oldValue !== oldValue) && (newValue !== newValue) )/* NaN check */ ) {
-            this.publish && this.publish('propertyChange', name, oldValue, newValue);
-          }
+          this.publishPropertyChange(name, oldValue, newValue);
 
           // TODO: publish to a global topic to support dynamic()
 
@@ -789,6 +789,12 @@ foam.CLASS({
         }
         node = node.next;
       }
+    },
+
+    function publishPropertyChange(name, oldValue, newValue) {
+      /* Publish to this.propertyChange topic if oldValue and newValue are different. */
+      if ( ! Object.is(oldValue, newValue) )
+        this.publish('propertyChange', name, oldValue, newValue);
     }
   ]
 });
