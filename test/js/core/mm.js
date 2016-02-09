@@ -586,9 +586,34 @@ describe('Property Mlang interop', function() {
     t.a = 1;
     expect(/*X.*/MTest.A.compare(t, t2)).toEqual(-1);    
   });
-
-
-
 });
+
+describe('Listeners', function() {
+  var t;
+
+  beforeEachTest(function() {
+    foam.CLASS({
+      name: 'Sprinkler',
+      listeners: [
+        function onAlarm() {  },
+        {
+          name: 'onClear',
+          isFramed: true,
+          code: function() { }
+        }
+      ]
+    });
+    t = /*X.*/Sprinkler.create({});
+  });
+  afterEach(function() {
+    t = null;
+  });
+
+  it('listeners are installed as method-alikes', function() {
+    t.onAlarm();
+    t.onClear();
+  });
+});
+
 
 
