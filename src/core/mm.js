@@ -28,6 +28,10 @@ foam.LIB({
 
   methods: [
     function create(args) {
+      /*
+        Create a new instance of this class.
+        Configured from values taken from 'args', if supplifed.
+      */
       var obj = Object.create(this.prototype);
       obj.instance_ = Object.create(null);
       
@@ -106,6 +110,7 @@ foam.LIB({
     },
 
     function getAxiomByName(name) {
+      /* Find an axiom by the specified name from either this class or an ancestor. */
       return this.axiomMap_[name];
     },
 
@@ -154,11 +159,17 @@ foam.LIB({
 
   documentation: 'Bootstrap support, discarded after use.',
 
-  // Collection of classes to be repaired/upgraded later.
+  /*
+    Collection of classes to be repaired/upgraded later.
+    This is needed because they're built before the full
+    class/model infrastructure is finished, so they're lacking
+    features.
+  */
   constants: { classes: [] },
 
   methods: [
     function start() {
+      /* Start the bootstrap process. */
       foam.CLASS = this.CLASS.bind(this);
     },
 
@@ -190,13 +201,17 @@ foam.LIB({
       return cls;
     },
 
-    // Bootstrap Model definition which records incomplete models
-    // so they can be patched at the end of the bootstrap process.
     function CLASS(m) {
+      /*
+        Bootstrap Model definition which records incomplete models
+        so they can be patched at the end of the bootstrap process.
+      */
       this.classes.push(this.getClass.call(m));
     },
 
     function phase2() {
+      /* Start second phase of bootstrap process. */
+
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) { return Model.create(m).getClass(); };
       
@@ -206,6 +221,8 @@ foam.LIB({
     },
 
     function end() {
+      /* Finish the bootstrap process, deleting foam.boot when done. */
+
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
         for ( var i = 0 ; i < m.axioms.length ; i++ )
@@ -240,9 +257,11 @@ foam.CLASS({
 
         Object.assign(this, args.instance_);
     },
+
     function hasOwnProperty(name) {
       return Object.hasOwnProperty.call(this.instance_, name);
     },
+
     // Private support is used to store per-object values that are not
     // instance variables.  Things like listeners and topics.
     function setPrivate_(name, value) {
@@ -255,9 +274,11 @@ foam.CLASS({
       this.private_[name] = value;
       return value;
     },
+
     function getPrivate_(name) {
       return this.private_ && this.private_[name];
     },
+
     function hasOwnPrivate_(name) {
       return this.private_ && this.private_.hasOwnProperty(name);
     }
@@ -278,7 +299,6 @@ foam.CLASS({
       defaultValue: 'FObject'
     },
     {
-      // type: 'Array',
       name: 'axioms',
       factory: function() { return []; }
     },
@@ -351,6 +371,7 @@ foam.CLASS({
       }
       c[foam.string.constantize(this.name)] = this;
     },
+
     function installInProto(proto) {
       /*
         Install a property onto a prototype from a Property definition.
@@ -420,18 +441,55 @@ foam.CLASS({
         configurable: true
       });
     },
+
     function f(o) {
-      // Makes this Property an adapter, suitable for use with mLangs.
+      /* Makes this Property an adapter, suitable for use with mLangs. */
       return f[this.name];
     },
+
     function compare(o1, o2) {
-      // Makes this Property a comparator, suitable for use with mLangs.
+      /* Makes this Property a comparator, suitable for use with mLangs. */
       return this.comparePropertyValues(this.f(o1), this.f(o2));
     }
   ]
 });
 
 
+/*
+  Method
+  Methods are only installed on the prototype.
+  If the method is overriding a method from a parent
+  class, then SUPER support is added.
+
+  Ex.
+  foam.CLASS({
+    name: 'Parent',
+    methods: [
+      // short-form
+      function sayHello() { console.log('hello'); },
+     
+      // long-form
+      {
+        name: 'sayGoodbye',
+        code: function() { console.log('goodbye');
+      }
+    ]
+  });
+
+  // Create a subclass of Parent and override the 'sayHello' method.
+  // The parent classes 'sayHello' methold is called with 'this.SUPER()' 
+  foam.CLASS({
+    name: 'Child',
+    extends: 'Parent',
+    methods: [
+      function sayHello() { this.SUPER(); console.log('world'); }
+    ]
+  });
+
+  Child.create().sayHello();
+  >> hello
+  >> world
+*/
 foam.CLASS({
   name: 'Method',
   extends: 'FObject',
@@ -491,6 +549,8 @@ foam.CLASS({
   name: 'StringProperty',
   extends: 'Property',
 
+  documentation: 'StringProperties coerce their arguments into Strings.',
+
   properties: [
     {
       name: 'defaultValue',
@@ -507,6 +567,8 @@ foam.CLASS({
 foam.CLASS({
   name: 'ArrayProperty',
   extends: 'Property',
+
+  documentation: "A Property which contains an array of 'subType' objects.",
 
   properties: [
     'subType',
@@ -671,7 +733,7 @@ foam.CLASS({
 
 
 /*
-  Constants.
+  Constant
   Constants are installed on both the prototype and class.
 
   Ex.
@@ -700,7 +762,7 @@ foam.CLASS({
 
 
 /*
-  Traits.
+  Trait
   Traits provide a safe form multiple-inheritance.
 
   Ex.
@@ -736,7 +798,7 @@ foam.CLASS({
 
 
 /*
-  Topics
+  Topic
   Topics delcare the types of events that an object publishes.
 
   Ex.
