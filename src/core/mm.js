@@ -683,9 +683,12 @@ foam.CLASS({
     function createListenerList_() {
       /*
         This structure represents the head of a doubly-linked list of
-        listeners.  It contains 'next', a pointer to the first listener,
+        listeners. It contains 'next', a pointer to the first listener,
         and 'children', an array of sub-topic chains.
-       */
+        Nodes in the list contain 'next' and 'prev' links, which lets
+        removing subscriptions be done quickly by connecting next to prev
+        and prev to next.
+      */
       return { next: null, children: [] };
     },
 
