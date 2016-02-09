@@ -157,8 +157,11 @@ describe('Property Factory', function() {
   it('is overwritten by a set value', function() {
     expect(t.testCount).toEqual(0); // factory not run on init
     t.a = 84;
-    expect(t.testCount).toEqual(1); // factory is run by setter
+    expect(t.testCount).toEqual(0); // factory is not run by setter
     expect(t.a).toEqual(84); // setter overwrites factory value
+    t.a = 96;
+    expect(t.testCount).toEqual(0);
+    expect(t.a).toEqual(96);
   });
 
 });

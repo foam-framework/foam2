@@ -496,7 +496,7 @@ foam.CLASS({
         },
         set: prop.setter || function propSetter(newValue) {
           // Get old value but avoid triggering factory if present
-          var oldValue = this.factory ?
+          var oldValue = prop.factory ?
             ( this.hasOwnProperty(name) ? this[name] : undefined ) :
             this[name] ;
 
