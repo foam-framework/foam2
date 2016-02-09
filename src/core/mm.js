@@ -550,12 +550,16 @@ foam.CLASS({
     },
 
     function listeners_() {
+      /* Return the top-level listener list, creating if necessary. */
       return this.getPrivate_('listeners') ||
         this.setPrivate_('listeners', this.createListenerList_());
     },
 
     function notify_(listeners, args) {
-      /* Returns the number of listeners notified. */
+      /*
+        Notify all of the listeners in a listener list.
+        Returns the number of listeners notified.
+      */
       var count = 0;
       while ( listeners ) {
         args[0] = listeners.sub;
@@ -567,7 +571,10 @@ foam.CLASS({
     },
 
     function publish(/* args... */) {
-      /* Returns the number of listeners notified. */
+      /*
+        Publish a message to all matching subscribed listeners.
+        Returns the number of listeners notified.
+      */
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
@@ -583,6 +590,22 @@ foam.CLASS({
     },
 
     function subscribe(/* args..., l */) {
+      /*
+        Subscribe to published events.
+        args - zero or more values which specify the pattern of published
+               events to match.
+        For example:
+          subscribe('propertyChange', l) will match:
+          publish('propertyChange', 'age', 18, 19), but not:
+          publish('stateChange', 'active');
+        subscribe(l) will match all events.
+        l - the listener to call with notifications.
+          The first argument supplied to the listener is the "subscription",
+          which contains the "src" of the event and a destroy() method for
+          cancelling the subscription.
+        Returns a "subscrition" which can be cancelled by calling
+          its .destroy() method.
+       */
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
@@ -611,6 +634,7 @@ foam.CLASS({
     },
 
     function unsubscribe(/* args..., l */) {
+      /* Unsubscribe a previously subscribed listener. */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
@@ -634,6 +658,8 @@ foam.CLASS({
   name: 'AxiomArrayProperty',
   extends: 'ArrayProperty',
 
+  documentation: 'An ArrayProperty whose elements are Axioms and are added to this.axioms.',
+
   properties: [
     {
       name: 'postSet',
@@ -644,8 +670,21 @@ foam.CLASS({
 });
 
 
+/*
+  Constants.
+  Constants are installed on both the prototype and class.
+
+  Ex.
+  constants: {
+    KEY: 'some value'
+  }
+  
+  this.cls_.KEY === this.KEY === 'some value'
+*/
 foam.CLASS({
   name: 'Constant',
+
+  documentation: 'Constant Axiom',
 
   properties: [ 'name', 'value' ],
 
@@ -660,8 +699,30 @@ foam.CLASS({
 });
 
 
+/*
+  Traits.
+  Traits provide a safe form multiple-inheritance.
+
+  Ex.
+  foam.CLASS({
+    name: 'SalaryTrait',
+    properties: [ 'salary' ]
+  });
+
+  foam.CLASS({
+    name: 'Employee',
+    extends: 'Person',
+    traits: [ 'SalaryTrait' ]
+  });
+  
+  Employee extends Person through regular inheritance, but
+  the axioms from SalaryTrait are also added to the class.
+  Any number of traits can be specified.
+*/
 foam.CLASS({
   name: 'Trait',
+
+  documentation: 'Trait Axiom',
 
   properties: [
     { name: 'name', getter: function() { return 'trait_' + this.path; } },
@@ -674,8 +735,28 @@ foam.CLASS({
 });
 
 
+/*
+  Topics
+  Topics delcare the types of events that an object publishes.
+
+  Ex.
+  foam.CLASS({
+    name: 'Alarm',
+    topics: [ 'ring' ]
+  });
+
+  then doing:
+  alarm.ring.publish();
+  alarm.ring.subscribe(l);
+
+  is the same as:
+  alarm.publish('ring');
+  alarm.subscribe('ring', l);
+*/
 foam.CLASS({
   name: 'Topic',
+
+  documentation: 'Topic Axiom',
 
   properties: [ 'name', 'description' ],
 
