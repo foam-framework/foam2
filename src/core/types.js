@@ -19,7 +19,7 @@ if ( ! foam.types ) foam.types = {};
 
 // TODO: i18n compatible error messages?
 
-CLASS({
+foam.CLASS({
   name: 'Argument',
 
   constants: {
@@ -66,7 +66,7 @@ CLASS({
   ]
 });
 
-CLASS({
+foam.CLASS({
   name: 'ReturnValue',
   extends: 'Argument',
 

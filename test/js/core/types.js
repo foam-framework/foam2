@@ -10,11 +10,11 @@ var beforeEachTest = function(callback) {
 };
 
 function makeTestFn() {
-  CLASS({  name: 'TypeA' });
-  CLASS({  name: 'TypeB' });
-  CLASS({  name: 'TypeBB', extends: 'TypeB' });
-  CLASS({  name: 'package.TypeC' });
-  CLASS({  name: 'RetType' });
+  foam.CLASS({  name: 'TypeA' });
+  foam.CLASS({  name: 'TypeB' });
+  foam.CLASS({  name: 'TypeBB', extends: 'TypeB' });
+  foam.CLASS({  name: 'package.TypeC' });
+  foam.CLASS({  name: 'RetType' });
   return function test(/* TypeA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
     return RetType.create();
   }
