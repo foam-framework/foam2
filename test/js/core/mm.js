@@ -496,6 +496,10 @@ describe('FObject white box test', function() {
 
     expect(o.name).toEqual('prop1');
   });
+  it('toString()s nicely', function() {
+    var o = /*X.*/Person.create();
+    o.toString();
+  });
 
 });
 
