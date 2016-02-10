@@ -22,8 +22,8 @@
  The FOAM Model class is itself specified with a FOAM model, meaning
  that Model is defined in the same language which it defines.
  This self-modeling system requires some care to bootstrap, but results
- in a very compact, uniform, and powerful system. 
- 
+ in a very compact, uniform, and powerful system.
+
             Abstract Class
                   ^
                   |
@@ -31,7 +31,7 @@
     ^                        +-.prototype---------^
     |                        |                    |
   Model  -> getClass()  -> Class -> create() -> instance
-  
+
   FObject is the root model/class of all other classes, including Model.
   Abstract Class is the prototype of FObject's Class, which makes it the root of all Classes.
   From a Model we call getClass() to create a Class (or the previously created Class) object.
@@ -41,7 +41,7 @@
   instance ---> .cls_   -> Object's Class
        |
        +------> .model_ -> Object's Model
- 
+
   All descendents of FObject haver references to both their Model and Class.
     - obj.cls_ refers to an Object's Class
     - obj.model_ refers to an Object's Model
@@ -63,7 +63,7 @@
     }
 
   Ex. of a Model with one Axiom:
- 
+
   foam.CLASS({
     name: 'Sample',
 
@@ -85,12 +85,12 @@
   However, raw axioms are rarely used directly. Instead we model higher-level
   axiom types, including:
 
-  Traits     - Implement multiple inheritance  
+  Traits     - Implement multiple inheritance
   Constants  - Add constants to the prototype and class
   Topics     - Publish/subscribe topics
   Properties - High-level instance variable definitions
   Methods    - Prototype methods
-  Listeners  - Like methods, but with extra features for use as callbacks 
+  Listeners  - Like methods, but with extra features for use as callbacks
 */
 
 foam.LIB({
@@ -112,9 +112,9 @@ foam.LIB({
       */
       var obj = Object.create(this.prototype);
       obj.instance_ = Object.create(null);
-      
+
       obj.initArgs.apply(obj, arguments);
-      
+
       return obj;
     },
 
@@ -127,7 +127,7 @@ foam.LIB({
       if ( m.axioms )
         for ( var i = 0 ; i < m.axioms.length ; i++ )
           this.installAxiom(m.axioms[i]);
-      
+
       if ( m.methods )
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
@@ -135,7 +135,7 @@ foam.LIB({
             m.methods[i] = a = { name: a.name, code: a };
           this.prototype[a.name] = a.code;
         }
-      
+
       if ( global.Property && m.properties )
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
@@ -156,10 +156,10 @@ foam.LIB({
       */
       this.axiomMap_[a.name] = a;
       this.axiomCache_ = {};
-      
+
       // Store the destination class in the Axiom.  Used by describe().
       a.sourceCls_ = this;
-      
+
       a.installInClass && a.installInClass(this);
       a.installInProto && a.installInProto(this.prototype);
     },
@@ -176,14 +176,14 @@ foam.LIB({
       /* Determine if a class is either this class or a sub-class. */
       // TODO: switch from 'name' to 'id' when available
       if ( ! c ) return false;
-      
+
       var subClasses_ = this.hasOwnProperty('subClasses_') ?
         this.subClasses_ :
         this.subClasses_ = {} ;
-      
+
       if ( ! subClasses_.hasOwnProperty(c.name) )
         subClasses_[c.name] = ( c === this ) || this.isSubClass(c.__proto__);
-      
+
       return subClasses_[c.name];
     },
 
@@ -210,7 +210,7 @@ foam.LIB({
         }
         this.axiomCache_[cls.name] = as;
       }
-      
+
       return as;
     },
 
@@ -273,9 +273,9 @@ foam.LIB({
         cls.model_           = this;
         global[cls.name]     = cls;
       }
-      
+
       cls.installModel(this);
-      
+
       return cls;
     },
 
@@ -292,7 +292,7 @@ foam.LIB({
 
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) { return Model.create(m).getClass(); };
-      
+
       // Upgrade existing classes to real classes.
       for ( var i = 0 ; i < this.classes.length ; i++ )
         foam.CLASS(this.classes[i].model_);
@@ -306,7 +306,7 @@ foam.LIB({
         for ( var i = 0 ; i < m.axioms.length ; i++ )
           this.installAxiom(m.axioms[i]);
       };
-      
+
       delete foam['boot'];
     }
   ]
@@ -527,7 +527,7 @@ foam.CLASS({
       o[this.name] = value;
       return this;
     },
-    
+
     function f(o) {
       /* Makes this Property an adapter, suitable for use with mLangs. */
       return o[this.name];
@@ -553,7 +553,7 @@ foam.CLASS({
     methods: [
       // short-form
       function sayHello() { console.log('hello'); },
-     
+
       // long-form
       {
         name: 'sayGoodbye',
@@ -563,7 +563,7 @@ foam.CLASS({
   });
 
   // Create a subclass of Parent and override the 'sayHello' method.
-  // The parent classes 'sayHello' methold is called with 'this.SUPER()' 
+  // The parent classes 'sayHello' methold is called with 'this.SUPER()'
   foam.CLASS({
     name: 'Child',
     extends: 'Parent',
@@ -845,7 +845,7 @@ foam.CLASS({
   constants: {
     KEY: 'some value'
   }
-  
+
   this.cls_.KEY === this.KEY === 'some value'
 */
 foam.CLASS({
@@ -881,7 +881,7 @@ foam.CLASS({
     extends: 'Person',
     traits: [ 'SalaryTrait' ]
   });
-  
+
   Employee extends Person through regular inheritance, but
   the axioms from SalaryTrait are also added to the class.
   Any number of traits can be specified.
@@ -941,7 +941,7 @@ foam.CLASS({
 foam.CLASS({
   name: 'PropertySlot',
   extends: 'Slot',
-  
+
   methods: [
     function initArgs(obj, prop) {
       this.obj  = obj;
@@ -1207,7 +1207,7 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'FObject',
-  
+
   documentation: 'Upgrade FObject to fully bootstraped form.',
 
   topics: [ 'propertyChange' ],
@@ -1224,7 +1224,7 @@ foam.CLASS({
       if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
         Object.assign(this, args);
       }
-      // If an FObject, copy values from instance_ 
+      // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
         for ( var key in args.instance_ )
           if ( this.cls_.getAxiomByName(key) )
@@ -1248,7 +1248,17 @@ foam.CLASS({
       return this;
     },
 
-    function clearProperty(name) { delete this.instance_[name]; },
+    function clearProperty(name) {
+      /*
+        Undefine a Property's value.
+        The value will revert to either the Property's 'defaultValue' or
+        'expression' value, if they're defined or undefined if they aren't.
+        A propertyChange event will be fired, even if the value doesn't change.
+      */
+      var oldValue = this[name];
+      delete this.instance_[name];
+      this.publish('propertyChange', name, oldValue, this[name]);
+    },
 
     function toString() {
       // Distinguish between prototypes and instances.
