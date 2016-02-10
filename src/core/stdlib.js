@@ -196,3 +196,13 @@ foam.LIB({
     }
   ]
 });
+
+
+// What should the root be? 'foam', X, global?
+foam.lookup = foam.fn.memoize1(function (pathStr) {
+  var path = pathStr.split('.');
+  var root = foam;
+  for ( var i = 0 ; i < path.length ; i++ )
+    root = root[path[i]] || ( root[path[i]] = {} );
+  return root;
+});
