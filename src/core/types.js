@@ -43,7 +43,7 @@ foam.CLASS({
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
         if ( ! this.optional ) {
-          throw new TypeError(this.PREFIX + i + this.name+', is not optional, but was undefined in a function call.');
+          throw new TypeError(this.PREFIX + i + this.name+', is not optional, but was undefined in a function call');
         } else {
           return; // value is undefined, but ok with that
         }
@@ -53,13 +53,13 @@ foam.CLASS({
         if (   this.typeName
             && typeof arg !== this.typeName
             && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
-          throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+(typeof arg)+'.');
+          throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+(typeof arg));
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
         if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
-          throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+gotType+'.');
+          throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+gotType);
         }
       }
     }
@@ -82,7 +82,7 @@ foam.CLASS({
   */
 foam.LIB({
   name: 'types',
-  
+
   methods: [
     function getFunctionArgs(fn) {
       // strip newlines and find the function(...) declaration
