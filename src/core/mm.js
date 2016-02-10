@@ -1229,7 +1229,9 @@ foam.CLASS({
 
       // If args are just a simple {} map, just copy
       if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
-        Object.assign(this, args);
+        for ( var key in args )
+          if ( this.cls_.getAxiomByName(key) )
+            this[key] = args[key];
       }
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
