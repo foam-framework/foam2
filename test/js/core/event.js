@@ -28,7 +28,7 @@ function modelWithTopic() {
     name: 'TopicModel',
     topics: [
       'change',
-      'other'
+      { name: 'other' },
     ],
   });
   return TopicModel.create();

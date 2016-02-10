@@ -165,8 +165,10 @@ describe('foam.types.typeCheck', function() {
     expect(function() { fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99); }).not.toThrow();
   });
   it('allows extra args', function() {
-    expect(function() { fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99,
-    "extra", 8, 'arg'); }).not.toThrow();
+    expect(function() {
+        fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99,
+          "extra", 8, 'arg');
+    }).not.toThrow();
   });
   it('fails missing args', function() {
     expect(function() { fn(TypeA.create(), TypeB.create()); }).toThrow();

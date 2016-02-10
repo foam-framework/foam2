@@ -19,6 +19,7 @@
 
 // TODO: i18n compatible error messages?
 
+/** Describes one argument of a function. */
 foam.CLASS({
   name: 'Argument',
 
@@ -66,6 +67,7 @@ foam.CLASS({
   ]
 });
 
+/** Describes a function return type. */
 foam.CLASS({
   name: 'ReturnValue',
   extends: 'Argument',
@@ -75,15 +77,16 @@ foam.CLASS({
   }
 });
 
-/** Extracts the arguments and their types from the given function.
-  * @fn The function to extract from. The toString() of the function must be
-  *     accurate.
-  * @return An array of Argument objects.
-  */
+/** The types library deals with type safety. */
 foam.LIB({
   name: 'types',
 
   methods: [
+    /** Extracts the arguments and their types from the given function.
+      * @fn The function to extract from. The toString() of the function must be
+      *     accurate.
+      * @return An array of Argument objects.
+      */
     function getFunctionArgs(fn) {
       // strip newlines and find the function(...) declaration
       var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/);
