@@ -15,7 +15,15 @@
  * limitations under the License.
  */
 
+/** A test thing */
+thing = {
+  /** with a test prop */
+  name: 'hoo',
 
+  /** with a test method */
+  what: function() { return 'yes';  }
+
+}
 
 // TODO: i18n compatible error messages?
 
@@ -38,7 +46,7 @@ foam.CLASS({
   methods: [
     /** Validates the given argument against this type information.
         If any type checks are failed, a TypeError is thrown.
-        @param arg the argument value to validate. */
+        @param arg the argument value to validate.  */
     function validate(arg) {
       i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
       // optional check

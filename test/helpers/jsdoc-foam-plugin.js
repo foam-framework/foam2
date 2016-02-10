@@ -11,6 +11,12 @@ var getCLASSComment = function getCLASSComment(node) {
   return '';
 }
 
+var getComment = function getComment(node) {
+  if (node.leadingComments) return node.leadingComments[0].raw;
+  return getCLASSComment(node);
+}
+
+
 var getCLASSName = function getCLASSName(node) {
   if ( node.properties ) {
     //console.log("props", node.properties);
@@ -24,29 +30,55 @@ var getCLASSName = function getCLASSName(node) {
   return 'NameNotFound';
 }
 
+var insertIntoComment = function insertIntoComment(comment, tag) {
+  var idx = comment.lastIndexOf('*/');
+  return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
+}
+
 exports.astNodeVisitor = {
-    visitNode: function(node, e, parser, currentSourceName) {
-        //if (node.type == 'ObjectExpression') console.log("*****\n",node, "\nparent:", node.parent);
-        //console.log(node.parent);
+  visitNode: function(node, e, parser, currentSourceName) {
+    //if (node.type == 'ObjectExpression') console.log("*****\n",node, "\nparent:", node.parent);
+    //console.log(node.parent);
 
-        if (node.type === 'ObjectExpression' &&
-            node.parent && node.parent.type === 'CallExpression' &&
-            node.parent.callee && node.parent.callee.property &&
-            node.parent.callee.property.name == 'CLASS') {
-
-            e.id = 'astnode'+Date.now();
-            e.comment = getCLASSComment(node);
-            e.lineno = node.parent.loc.start.line;
-            e.filename = currentSourceName;
-            e.astnode = node;
-            e.code = {
-                name: getCLASSName(node),
-                type: "Model",
-                node: node
-            };
-            e.event = "symbolFound";
-            e.finishers = [parser.addDocletRef];
-
-        }
+    if (node.type === 'ObjectExpression' &&
+      node.parent && node.parent.type === 'CallExpression' &&
+      node.parent.callee && node.parent.callee.property &&
+      node.parent.callee.property.name == 'CLASS'
+    ) {
+      var className = getCLASSName(node);
+      e.id = 'astnode'+Date.now();
+      e.comment = insertIntoComment(getCLASSComment(node), "\n@class "+className + "\n@memberof! foam" );
+      e.lineno = node.parent.loc.start.line;
+      e.filename = currentSourceName;
+      e.astnode = node;
+      e.code = {
+          name: className,
+          type: "class",
+          node: node
+      };
+      e.event = "symbolFound";
+      e.finishers = [parser.addDocletRef];
     }
+    else if (node.type === 'FunctionExpression' &&
+      node.parent.type === 'ArrayExpression' &&
+      node.parent.parent.type === 'Property' &&
+      node.parent.parent.key.name === 'methods'
+    ) {
+      var parentClass = getCLASSName(node.parent.parent.parent);
+      e.id = 'astnode'+Date.now();
+      e.comment = insertIntoComment(getComment(node), "\n@memberof! foam."+parentClass + ".prototype" );
+      e.lineno = node.parent.loc.start.line;
+      e.filename = currentSourceName;
+      e.astnode = node;
+      e.code = {
+          name: parentClass + "#" + (node.id && node.id.name || 'NameError'),
+          type: "Method",
+          node: node
+      };
+      e.event = "symbolFound";
+      e.finishers = [parser.addDocletRef];
+
+      //console.log("found method", e);
+    }
+  }
 };

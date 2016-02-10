@@ -15,11 +15,15 @@
  * limitations under the License.
  */
 
-// Setup nodejs-like 'global' on web
+
+/** Setup nodejs-like 'global' on web */
 var global = global || this;
 
 
-// Top-Level of foam package
+/**
+ * Top-Level of foam package
+ * @namespace foam
+ */
 foam = {
   Array:    Array.prototype,
   Function: Function.prototype,
