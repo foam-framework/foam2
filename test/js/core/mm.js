@@ -19,8 +19,7 @@ describe('Untyped Property', function() {
       name: 'PropTest',
       properties: [
         {
-          name: 'b',
-          type: 'object',
+          name: 'b'
         },
       ]
     });
