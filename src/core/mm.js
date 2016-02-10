@@ -909,12 +909,27 @@ foam.CLASS({
 
   methods: [
     function link(other) {
-      this.follow(other);
-      other.follow(this);
+      /*
+        Link two Slots together, setting both to other's value.
+        Returns a Destroyable which can be used to break the link.
+      */
+      var sub1 = this.follow(other);
+      var sub2 = other.follow(this);
+
+      return {
+        destroy: function() {
+          sub1.destroy();
+          sub2.destroy();
+        }
+      };
     },
 
     function follow(other) {
-      other.subscribe(function() {
+      /*
+        Have this Slot dynamically follow other's value.
+        Returns a Destroyable which can be used to cancel the binding.
+      */
+      return other.subscribe(function() {
         this.set(other.get());
       }.bind(this));
     }
