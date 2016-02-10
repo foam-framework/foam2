@@ -94,7 +94,7 @@
 */
 
 foam.LIB({
-  package: 'foam.core',
+  package: 'core',
   name: 'AbstractClass',
 
   documentation: "Root prototype for all classes.",
@@ -383,6 +383,13 @@ foam.CLASS({
   documentation: 'Class/Prototype description.',
 
   properties: [
+    {
+      name: 'id',
+      getter: function() {
+        return this.package ? this.package + '.' + this.name : this.name; 
+      }
+    },
+    'package',
     'name',
     {
       name: 'extends',
@@ -1286,7 +1293,6 @@ foam.boot.end();
 /*
   TODO:
   - more docs
-    - doc Slots
   - Slot.follow() and other methods
   - distinguish new CLASS from EXTENSION
   - package support

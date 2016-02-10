@@ -15,11 +15,15 @@
  * limitations under the License.
  */
 
-// Setup nodejs-like 'global' on web
+
+/** Setup nodejs-like 'global' on web */
 var global = global || this;
 
 
-// Top-Level of foam package
+/**
+ * Top-Level of foam package
+ * @namespace foam
+ */
 foam = {
   Array:    Array.prototype,
   Function: Function.prototype,
@@ -191,4 +195,14 @@ foam.LIB({
         (str + new Array(size).join(' ')).substring(0, size) ;
     }
   ]
+});
+
+
+// What should the root be? 'foam', X, global?
+foam.lookup = foam.fn.memoize1(function (pathStr) {
+  var path = pathStr.split('.');
+  var root = foam;
+  for ( var i = 0 ; i < path.length ; i++ )
+    root = root[path[i]] || ( root[path[i]] = {} );
+  return root;
 });

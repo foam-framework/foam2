@@ -380,9 +380,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
           type: 'String',
           name: 'name'
         },
-        {
-          name: 'age'
-        },
+        'age',
         {
           name: 'result'
         }

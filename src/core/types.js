@@ -15,10 +15,19 @@
  * limitations under the License.
  */
 
+/** A test thing */
+thing = {
+  /** with a test prop */
+  name: 'hoo',
 
+  /** with a test method */
+  what: function() { return 'yes';  }
+
+}
 
 // TODO: i18n compatible error messages?
 
+/** Describes one argument of a function. */
 foam.CLASS({
   name: 'Argument',
 
@@ -37,7 +46,7 @@ foam.CLASS({
   methods: [
     /** Validates the given argument against this type information.
         If any type checks are failed, a TypeError is thrown.
-        @param arg the argument value to validate. */
+        @param arg the argument value to validate.  */
     function validate(arg) {
       i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
       // optional check
@@ -66,6 +75,7 @@ foam.CLASS({
   ]
 });
 
+/** Describes a function return type. */
 foam.CLASS({
   name: 'ReturnValue',
   extends: 'Argument',
@@ -75,15 +85,16 @@ foam.CLASS({
   }
 });
 
-/** Extracts the arguments and their types from the given function.
-  * @fn The function to extract from. The toString() of the function must be
-  *     accurate.
-  * @return An array of Argument objects.
-  */
+/** The types library deals with type safety. */
 foam.LIB({
   name: 'types',
 
   methods: [
+    /** Extracts the arguments and their types from the given function.
+      * @fn The function to extract from. The toString() of the function must be
+      *     accurate.
+      * @return An array of Argument objects.
+      */
     function getFunctionArgs(fn) {
       // strip newlines and find the function(...) declaration
       var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/);
