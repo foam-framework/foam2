@@ -425,7 +425,7 @@ foam.CLASS({
   extends: 'FObject',
 
   properties: [
-    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression',
+    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression', 'getter', 'setter',
     {
       // Compare two values taken from this property.
       // Used by Property.compare().
