@@ -171,6 +171,16 @@ describe('foam.types.typeCheck', function() {
   it('fails missing args', function() {
     expect(function() { fn(TypeA.create(), TypeB.create()); }).toThrow();
   });
+  it('fails bad primitive args', function() {
+    expect(function() {
+      fn(TypeA.create(), 3, global['package.TypeC'].create(), 99);
+    }).toThrow();
+  });
+  it('fails bad model args', function() {
+    expect(function() {
+      fn(TypeA.create(), TypeB.create(), TypeA.create(), 99);
+    }).toThrow();
+  });
 
   it('fails bad return type', function() {
    var rfn = foam.types.typeCheck(function(arg /* object */) { return arg; });
