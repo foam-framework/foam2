@@ -1183,6 +1183,8 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         return typeof o === 'string'     ?
           Property.create({name: o})     :
+          o.type ?
+          global[o.type + 'Property'].create(o) :
           global[this.subType].create(o) ;
       }
     },
