@@ -4,5 +4,6 @@
   "core/mm.js",
   "core/Slot.js",
   "core/debug.js",
-  "core/types.js"
+  "core/types.js",
+  "core/parse.js"
 ]
