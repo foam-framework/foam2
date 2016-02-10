@@ -339,7 +339,9 @@ foam.CLASS({
         if ( key.indexOf('_') == -1 )
           this[key] = args[key];
 
-        Object.assign(this, args.instance_);
+      if ( args.instance_ )
+        for ( var key in args.instance_ )
+          this[key] = args[key];
     },
 
     function hasOwnProperty(name) {
