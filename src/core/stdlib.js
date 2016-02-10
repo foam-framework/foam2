@@ -15,6 +15,14 @@
  * limitations under the License.
  */
 
+// Polyfill
+if ( ! Object.assign ) Object.assign = function(obj, map) {
+  if ( map )
+    for ( var key in map )
+      obj[key] = map[key];
+}
+
+
 // Setup nodejs-like 'global' on web
 var global = global || this;
 
