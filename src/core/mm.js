@@ -474,7 +474,7 @@ foam.CLASS({
           return this.slot(name, slotName, prop);
         },
         set: function propSlotSetter(slot) {
-          slot.link.link(this.slot(name, slotName, prop));
+          this.slot(name, slotName, prop).link(slot);
         },
         configurable: true
       });
@@ -908,7 +908,16 @@ foam.CLASS({
   extends: null,
 
   methods: [
+    function link(other) {
+      this.follow(other);
+      other.follow(this);
+    },
 
+    function follow(other) {
+      other.subscribe(function() {
+        this.set(other.get());
+      }.bind(this));
+    }
   ]
 });
 

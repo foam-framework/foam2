@@ -154,6 +154,10 @@
       console.log('get: ', bob.name$.get());
       bob.name$.set('Bobby');
       bob.name = 'Bubba';
+      bob.name$ = don.name$;
+      don.name = 'Donald';
+      bob.name = 'Bob';
+      console.log(don.name);
     </script>
   </body>
 </html>
