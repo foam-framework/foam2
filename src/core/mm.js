@@ -260,7 +260,7 @@ foam.LIB({
 
       if ( ! cls ) {
         var parent = this.extends ? global[this.extends] : foam.AbstractClass ;
-        // TODO: make some of these values non-innumerable
+        // TODO: make some of these values non-enumerable
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
