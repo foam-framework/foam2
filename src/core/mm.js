@@ -310,7 +310,7 @@ foam.LIB({
       // Update psedo-Models to real Models
       for ( var i = 0 ; i < this.classes.length ; i++ ) {
         var c = this.classes[i];
-        c.model_ = Model.create(c.model_);
+        c.prototype.model_ = c.model_ = Model.create(c.model_);
       }
 
       delete foam['boot'];

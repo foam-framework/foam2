@@ -707,4 +707,24 @@ describe('Listeners', function() {
 });
 
 
+describe('Bootstrap invariants', function() {
+  var t;
+  it('Check that all recursive relationships are properly set', function() {
+    expect(Model.isInstance(Model.model_)).toBe(true);
+    expect(Model.isInstance(FObject.model_)).toBe(true);
+    expect(Model.isInstance(Property.model_)).toBe(true);
+    expect(Model.isInstance(Method.model_)).toBe(true);
+    expect(Model.isInstance(StringProperty.model_)).toBe(true);
+    expect(Model.isInstance(ArrayProperty.model_)).toBe(true);
+  });
 
+  it('Check that Class.model_ and Class.prototype.model_ are the same object', function() {
+    expect(Model.isInstance(AxiomArrayProperty.model_)).toBe(true);
+    expect(Model.isInstance(Constant.model_)).toBe(true);
+    expect(Model.isInstance(Trait.model_)).toBe(true);
+    expect(Model.isInstance(Slot.model_)).toBe(true);
+    expect(Model.isInstance(PropertySlot.model_)).toBe(true);
+    expect(Model.isInstance(Topic.model_)).toBe(true);
+    expect(Model.isInstance(BooleanProperty.model_)).toBe(true);
+  });
+})
