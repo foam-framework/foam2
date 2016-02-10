@@ -106,6 +106,14 @@ describe('Property Getter and Setter', function() {
     t.a = 42;
     expect(t.a).toEqual(42);
   });
+  it('sets a value via custom setter', function() {
+    t.a = 42;
+    expect(t.b).toEqual(42);
+  })
+  it('reads a value via custom getter', function() {
+    t.b = 42;
+    expect(t.a).toEqual(42);
+  })
   it('sets values repeatedly and gets them back', function() {
     t.a = 42;
     expect(t.a).toEqual(42);
