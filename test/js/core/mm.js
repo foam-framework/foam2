@@ -589,8 +589,9 @@ describe('Property Mlang interop', function() {
 });
 
 
-describe('Property Slots', function() {
+describe('Slots', function() {
   var t;
+  var t2;
 
   beforeEachTest(function() {
     foam.CLASS({
@@ -603,22 +604,74 @@ describe('Property Slots', function() {
       ]
     });
     t = /*X.*/MTest.create();
+    t2 = /*X.*/MTest.create();
   });
   afterEach(function() {
     t = null;
+    t2 = null;
   });
 
   it('creates a slot for a property', function() {
     expect(t.a$).not.toBeUndefined();
+    expect(t.a$.isDefined()).toBe(false);
+    t.a = 4;
+    expect(t.a$.isDefined()).toBe(true);
   });
-
-  it('binds slots', function() {
-    var t2 = /*X.*/MTest.create();
+  it('binds property slots', function() {
     t.a$ = t2.a$; // bind
     t.a = 999;
     expect(t2.a).toEqual(999);
   });
+  it('allows links to be destroyed', function() {
+    var b = t.a$.link(t2.a$);
+    t.a = 999;
 
+    b.destroy();
+
+    t.a = 4;
+    expect(t.a).toEqual(4);
+    expect(t2.a).toEqual(999);
+  });
+  it('allows follows to be destroyed', function() {
+    var b = t2.a$.follow(t.a$);
+    t.a = 999;
+
+    b.destroy();
+
+    t.a = 4;
+    expect(t.a).toEqual(4);
+    expect(t2.a).toEqual(999);
+  });
+//   it('clears the property', function() {
+//     var b = t2.a$.follow(t.a$);
+//     t.a = 999;
+//     expect(t2.a).toEqual(999);
+//     t.a$.clear();
+//     expect(t2.a).toEqual(45);
+//   });
+  it('subscribes manual listeners', function() {
+    var last_args;
+    var l = function() { last_args = Array.prototype.slice.call(arguments); };
+    t.a$.subscribe(l);
+    t.a = 999;
+    expect(last_args).toBeDefined();
+    expect(last_args[2]).toEqual('a');
+    expect(last_args[4]).toEqual(999);
+  });
+  it('unsubscribes manual listeners', function() {
+    var last_args;
+    var l = function() { last_args = Array.prototype.slice.call(arguments); };
+    t.a$.subscribe(l);
+    t.a = 999;
+
+    t.a$.unsubscribe(l);
+    t.a = 49;
+
+    // same as the first time
+    expect(last_args).toBeDefined();
+    expect(last_args[2]).toEqual('a');
+    expect(last_args[4]).toEqual(999);
+  });
 });
 
 
