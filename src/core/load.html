@@ -1,6 +1,6 @@
 <html>
   <head>
-    <script>console.time('boot');</script>
+    <script>console.profile();console.time('boot');</script>
     <script>console.time('loadContext');</script>
     <script language="javascript" src="context.js"></script>
     <script>console.timeEnd('loadContext');</script>
@@ -16,7 +16,7 @@
     <script>console.time('loadDebug');</script>
     <script language="javascript" src="debug.js"></script>
     <script>console.timeEnd('loadDebug');</script>
-    <script>console.timeEnd('boot');</script>
+    <script>console.timeEnd('boot');console.profileEnd();</script>
     <title>Load FOAM</title>
   </head>
   <body>

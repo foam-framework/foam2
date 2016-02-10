@@ -307,6 +307,12 @@ foam.LIB({
           this.installAxiom(m.axioms[i]);
       };
 
+      // Update psedo-Models to real Models
+      for ( var i = 0 ; i < this.classes.length ; i++ ) {
+        var c = this.classes[i];
+        c.model_ = Model.create(c.model_);
+      }
+
       delete foam['boot'];
     }
   ]
@@ -476,7 +482,8 @@ foam.CLASS({
         set: function propSlotSetter(slot) {
           this.slot(name, slotName, prop).link(slot);
         },
-        configurable: true
+        configurable: true,
+        enumerable: false
       });
 
       // TODO: implement 'expression'
