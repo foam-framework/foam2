@@ -19,7 +19,7 @@ foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
   console.log('Axiom Type           Source Class   Name');
-      console.log('----------------------------------------------------');
+  console.log('----------------------------------------------------');
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     console.log(
@@ -53,4 +53,17 @@ foam.CLASS({
 });
 
 
-// TODO: Add describe() to Context
+foam.sub().__proto__.describe = function() {
+  console.log('Context:  ', this.hasOwnProperty('NAME') ? this.NAME : ('unknown ' + this.$UID));
+  console.log('KEY           Type              Value');
+  console.log('----------------------------------------------------');
+  for ( var key in this ) {
+    var value = this[key];
+    var type = FObject.isInstance(value) ? value.cls_.name : typeof value;
+    console.log(
+      foam.string.pad(key,  20),
+      foam.string.pad(type, 14),
+      typeof value === 'string' || typeof value === 'number' ? value : '');
+  }
+  console.log('\n');
+};
