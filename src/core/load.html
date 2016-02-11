@@ -152,6 +152,13 @@
       don.name = 'Donald';
       bob.name = 'Bob';
       console.log(don.name);
+
+      var Y = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
+      var Y2 = Y.sub({key: 'value2'});
+      console.log(Y.key, Y2.key);
+      Y2.fn();
+      Y.describe();
+      Y2.describe();
     </script>
   </body>
 </html>
