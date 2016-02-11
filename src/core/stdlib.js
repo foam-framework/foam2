@@ -43,7 +43,7 @@ foam.LIB = function LIB(model) {
       proto[key] = map.value;
   }
 
-  proto = foam[model.name] || ( foam[model.name] = {} );
+  proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
 
   if ( model.properties ) for ( var i = 0 ; i < model.properties.length ; i++ ) {
     var p = model.properties[i];
@@ -198,11 +198,58 @@ foam.LIB({
 });
 
 
-// What should the root be? 'foam', X, global?
-foam.lookup = foam.fn.memoize1(function (pathStr) {
-  var path = pathStr.split('.');
-  var root = foam;
-  for ( var i = 0 ; i < path.length ; i++ )
-    root = root[path[i]] || ( root[path[i]] = {} );
-  return root;
-});
+(function() {
+
+  /** Update a Context binding. **/
+  function set(X, key, value) {
+    X[key] = value;
+
+    // TODO:
+    //if ( GLOBAL.SimpleReadOnlyValue && key !== '$' && key !== '$$' )
+    // X[key + '$'] = SimpleReadOnlyValue.create({value: value});
+  }
+
+  function setDynamic(X, key, dValue) {
+    Object.defineProperty(
+      X,
+      key,
+      {
+        get: function() { return dValue.get(); },
+        configurable: true
+      }
+    );
+
+    if ( key !== '$' && key !== '$$' ) X[key + '$'] = dValue;
+  }
+
+  var X = {
+    lookup: foam.fn.memoize1(function (pathStr) {
+      var path = pathStr.split('.');
+      var root = X;
+      for ( var i = 0 ; i < path.length ; i++ )
+        root = root[path[i]] || ( root[path[i]] = {} );
+      return root;
+    }),
+
+    sub: function sub(opt_args, opt_name) {
+      var sub = Object.create(this);
+
+      if ( opt_args ) for ( var key in opt_args ) {
+        if ( opt_args.hasOwnProperty(key) ) {
+          var asDyn = key !== '$' && key != '$$' && key.charAt(key.length-1) == '$';
+          if ( asDyn ) {
+            setDynamic(sub, key.substring(0, key.length-1), opt_args[key]);
+          } else {
+            set(sub, key, opt_args[key]);
+          }
+        }
+      }
+
+      if ( opt_name ) sub.NAME = opt_name;
+
+      return sub;
+    }
+  };
+
+  for ( var key in X ) foam[key] = X[key].bind(X);
+})();
