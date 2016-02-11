@@ -1287,8 +1287,14 @@ foam.boot.end();
 
 
 /**  TODO:
+  - support class: instead of type:
+  - "ofClass" instead of "subType"
+  - propertyChange publishes DynamicValue instead of oldValue, newValue
+  - add getOld() to DynamicValue
+  - foam.X root context
+
   - more docs
-  - Slot.follow() and other methods
+  - DynamicValue map() and relate() methods
   - distinguish new CLASS from EXTENSION
   - package support
   - imports / exports
