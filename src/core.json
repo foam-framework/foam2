@@ -2,6 +2,5 @@
   "core/stdlib.js",
   "core/mm.js",
   "core/debug.js",
-  "core/types.js",
-  "core/parse.js"
+  "core/types.js"
 ]
