@@ -108,9 +108,10 @@ foam.LIB({
   },
 
   methods: [
-      /**        Create a new instance of this class.
-        Configured from values taken from 'args', if supplifed.
-      */
+    /**
+      Create a new instance of this class.
+      Configured from values taken from 'args', if supplifed.
+    */
     function create(/*args*/) {
       var obj = Object.create(this.prototype);
       obj.instance_ = Object.create(null);
@@ -120,10 +121,11 @@ foam.LIB({
       return obj;
     },
 
-      /**        This is a temporary version of installModel.
-        When the bootstrap is finished, it will be replaced by a version
-        that only knows how to install axioms.
-      */
+    /**
+      This is a temporary version of installModel.
+      When the bootstrap is finished, it will be replaced by a version
+      that only knows how to install axioms.
+    */
     function installModel(m) {
       if ( m.axioms )
         for ( var i = 0 ; i < m.axioms.length ; i++ )
@@ -165,14 +167,15 @@ foam.LIB({
       a.installInProto && a.installInProto(this.prototype);
     },
 
-      /**        Determine if an object is an instance of this class
-        or one of its sub-classes.
-      */
+    /**
+      Determine if an object is an instance of this class
+      or one of its sub-classes.
+    */
     function isInstance(o) {
       return o && o.cls_ && this.isSubClass(o.cls_);
     },
 
-      /** Determine if a class is either this class or a sub-class. */
+    /** Determine if a class is either this class or a sub-class. */
     function isSubClass(c) {
       // TODO: switch from 'name' to 'id' when available
       if ( ! c ) return false;
@@ -187,14 +190,15 @@ foam.LIB({
       return subClasses_[c.name];
     },
 
-      /** Find an axiom by the specified name from either this class or an ancestor. */
+    /** Find an axiom by the specified name from either this class or an ancestor. */
     function getAxiomByName(name) {
       return this.axiomMap_[name];
     },
 
-      /**        Returns all axioms defined on this class or its parent classes
-        that are instances of the specified class.
-      */
+    /**
+      Returns all axioms defined on this class or its parent classes
+      that are instances of the specified class.
+    */
     function getAxiomsByClass(cls) {
       // This method will eventually change.
       // Would like to have efficient support for:
@@ -213,7 +217,7 @@ foam.LIB({
       return as;
     },
 
-      /** Returns all axioms defined on this class or its parent classes. */
+    /** Returns all axioms defined on this class or its parent classes. */
     function getAxioms() {
       // The full axiom list is stored in the regular cache with '' as a key.
       var as = this.axiomCache_[''];
@@ -250,9 +254,10 @@ foam.LIB({
       foam.CLASS = this.CLASS.bind(this);
     },
 
-      /**        Create or Update a Prototype from a Model definition.
-        (Model is 'this').
-      */
+    /**
+      Create or Update a Prototype from a Model definition.
+      (Model is 'this').
+    */
     function getClass() {
       var cls = global[this.name];
 
@@ -277,14 +282,15 @@ foam.LIB({
       return cls;
     },
 
-      /**        Bootstrap Model definition which records incomplete models
-        so they can be patched at the end of the bootstrap process.
-      */
+    /**
+      Bootstrap Model definition which records incomplete models
+      so they can be patched at the end of the bootstrap process.
+    */
     function CLASS(m) {
       this.classes.push(this.getClass.call(m));
     },
 
-      /** Start second phase of bootstrap process. */
+    /** Start second phase of bootstrap process. */
     function phase2() {
 
       // Upgrade to final CLASS() definition.
@@ -295,7 +301,7 @@ foam.LIB({
         foam.CLASS(this.classes[i].model_);
     },
 
-      /** Finish the bootstrap process, deleting foam.boot when done. */
+    /** Finish the bootstrap process, deleting foam.boot when done. */
     function end() {
 
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
@@ -328,10 +334,11 @@ foam.CLASS({
   documentation: 'Base model for model hierarchy.',
 
   methods: [
-      /**        This is a temporary version of initArgs.
-        When the bootstrap is finished, it will be replaced by a version
-        that knows about a classes Properties, so it can do a better job.
-       */
+    /**
+      This is a temporary version of initArgs.
+      When the bootstrap is finished, it will be replaced by a version
+      that knows about a classes Properties, so it can do a better job.
+     */
     function initArgs(args) {
       if ( ! args ) return;
 
@@ -348,8 +355,10 @@ foam.CLASS({
       return Object.hasOwnProperty.call(this.instance_, name);
     },
 
-    /** Private support is used to store per-object values that are not
-     instance variables.  Things like listeners and topics. */
+    /**
+      Private support is used to store per-object values that are not
+      instance variables.  Things like listeners and topics.
+    */
     function setPrivate_(name, value) {
       if ( ! this.private_ ) {
         Object.defineProperty(this, 'private_', {
@@ -433,11 +442,13 @@ foam.CLASS({
 
   properties: [
     'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression', 'getter', 'setter',
+    /**
+      Compare two values taken from this property.
+      <p>Used by Property.compare().
+      It is a property rather than a method so that it can be configured
+      without subclassing.
+    */
     {
-      // Compare two values taken from this property.
-      // Used by Property.compare().
-      // Is a property rather than a method so that it can be configured
-      // without subclassing.
       name: 'comparePropertyValues',
       defaultValue: function(o1, o2) {
         if ( o1 === o2 ) return 0;
@@ -452,10 +463,11 @@ foam.CLASS({
   ],
 
   methods: [
+    /**
+      Handle overriding of Property definition from parent class by
+      copying undefined values from parent Property, if it exists.
+    */
     function installInClass(c) {
-      /**        Handle overriding of Property definition from parent class by
-        copying undefined values from parent Property, if it exists.
-      */
       var superProp = c.__proto__.getAxiomByName(this.name);
       if ( superProp ) {
         var a = this.cls_.getAxiomsByClass(Property);
@@ -468,10 +480,11 @@ foam.CLASS({
       c[foam.string.constantize(this.name)] = this;
     },
 
+    /**
+      Install a property onto a prototype from a Property definition.
+      (Property is 'this').
+    */
     function installInProto(proto) {
-      /**        Install a property onto a prototype from a Property definition.
-        (Property is 'this').
-      */
       var prop            = this;
       var name            = this.name;
       var adapt           = this.adapt
@@ -531,24 +544,24 @@ foam.CLASS({
       });
     },
 
+    /** Flyweight getter for this Property. */
     function get(o) {
-      /* Flyweight getter for this Property. */
       return o[this.name];
     },
 
+    /** Flyweight setter for this Property. */
     function set(o, value) {
-      /* Flyweight setter for this Property. */
       o[this.name] = value;
       return this;
     },
 
+    /** Makes this Property an adapter, suitable for use with mLangs. */
     function f(o) {
-      /* Makes this Property an adapter, suitable for use with mLangs. */
       return o[this.name];
     },
 
+    /** Makes this Property a comparator, suitable for use with mLangs. */
     function compare(o1, o2) {
-      /* Makes this Property a comparator, suitable for use with mLangs. */
       return this.comparePropertyValues(this.f(o1), this.f(o2));
     }
   ]
@@ -600,9 +613,10 @@ foam.CLASS({
   properties: [ 'name', 'code' ],
 
   methods: [
-      /**        Decorate a method so that it can call the
-        method it overrides with this.SUPER().
-      */
+    /**
+      Decorate a method so that it can call the
+      method it overrides with this.SUPER().
+    */
     function override_(proto, method) {
       var super_ = proto[this.name];
 
@@ -704,27 +718,28 @@ foam.CLASS({
   documentation: 'Add listener support to FObject.',
 
   methods: [
-      /**
-        This structure represents the head of a doubly-linked list of
-        listeners. It contains 'next', a pointer to the first listener,
-        and 'children', an array of sub-topic chains.
-        Nodes in the list contain 'next' and 'prev' links, which lets
-        removing subscriptions be done quickly by connecting next to prev
-        and prev to next.
-      */
+    /**
+      This structure represents the head of a doubly-linked list of
+      listeners. It contains 'next', a pointer to the first listener,
+      and 'children', an array of sub-topic chains.
+      Nodes in the list contain 'next' and 'prev' links, which lets
+      removing subscriptions be done quickly by connecting next to prev
+      and prev to next.
+    */
     function createListenerList_() {
       return { next: null, children: [] };
     },
 
-      /** Return the top-level listener list, creating if necessary. */
+    /** Return the top-level listener list, creating if necessary. */
     function listeners_() {
       return this.getPrivate_('listeners') ||
         this.setPrivate_('listeners', this.createListenerList_());
     },
 
-      /**        Notify all of the listeners in a listener list.
-        Returns the number of listeners notified.
-      */
+    /**
+      Notify all of the listeners in a listener list.
+      Returns the number of listeners notified.
+    */
     function notify_(listeners, args) {
       var count = 0;
       while ( listeners ) {
@@ -736,9 +751,10 @@ foam.CLASS({
       return count;
     },
 
-      /**        Publish a message to all matching subscribed listeners.
-        Returns the number of listeners notified.
-      */
+    /**
+      Publish a message to all matching subscribed listeners.
+      Returns the number of listeners notified.
+    */
     function publish(/* args... */) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
@@ -754,24 +770,24 @@ foam.CLASS({
       return count;
     },
 
-      /**
-        Subscribe to published events.
-        args - zero or more values which specify the pattern of published
-               events to match.
-        <p>For example:
+    /**
+      Subscribe to published events.
+      args - zero or more values which specify the pattern of published
+             events to match.
+      <p>For example:
 <pre>
    subscribe('propertyChange', l) will match:
    publish('propertyChange', 'age', 18, 19), but not:
    publish('stateChange', 'active');
 </pre>
-        <p>subscribe(l) will match all events.
-        l - the listener to call with notifications.
-         <p> The first argument supplied to the listener is the "subscription",
-          which contains the "src" of the event and a destroy() method for
-          cancelling the subscription.
-        <p>Returns a "subscrition" which can be cancelled by calling
-          its .destroy() method.
-       */
+      <p>subscribe(l) will match all events.
+      l - the listener to call with notifications.
+       <p> The first argument supplied to the listener is the "subscription",
+        which contains the "src" of the event and a destroy() method for
+        cancelling the subscription.
+      <p>Returns a "subscrition" which can be cancelled by calling
+        its .destroy() method.
+    */
     function subscribe(/* args..., l */) {
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
@@ -800,7 +816,7 @@ foam.CLASS({
       return node.sub;
     },
 
-      /** Unsubscribe a previously subscribed listener. */
+    /** Unsubscribe a previously subscribed listener. */
     function unsubscribe(/* args..., l */) {
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
@@ -818,15 +834,16 @@ foam.CLASS({
       }
     },
 
-      /** Publish to this.propertyChange topic if oldValue and newValue are different. */
+    /** Publish to this.propertyChange topic if oldValue and newValue are different. */
     function publishPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) )
         this.publish('propertyChange', name, oldValue, newValue);
     },
 
-      /**  Creates a Slot for dynamic bindings to a property.
-        *  @private
-        */
+    /**
+      Creates a Slot for dynamic bindings to a property.
+      @private
+    */
     function slot(name, opt_slotName, opt_prop) {
       if ( ! opt_slotName ) opt_slotName = name + '$';
       var slot = this.getPrivate_(opt_slotName);
@@ -839,7 +856,7 @@ foam.CLASS({
   ]
 });
 
-
+/** An ArrayProperty whose elements are Axioms and are added to this.axioms. */
 foam.CLASS({
   name: 'AxiomArrayProperty',
   extends: 'ArrayProperty',
@@ -856,15 +873,16 @@ foam.CLASS({
 });
 
 
-/**  Constant
+/**
   Constants are installed on both the prototype and class.
-
+<pre>
   Ex.
   constants: {
     KEY: 'some value'
   }
 
   this.cls_.KEY === this.KEY === 'some value'
+</pre>
 */
 foam.CLASS({
   name: 'Constant',
@@ -884,9 +902,9 @@ foam.CLASS({
 });
 
 
-/**  Trait
+/**
   Traits provide a safe form multiple-inheritance.
-
+<pre>
   Ex.
   foam.CLASS({
     name: 'SalaryTrait',
@@ -898,7 +916,7 @@ foam.CLASS({
     extends: 'Person',
     traits: [ 'SalaryTrait' ]
   });
-
+</pre>
   Employee extends Person through regular inheritance, but
   the axioms from SalaryTrait are also added to the class.
   Any number of traits can be specified.
@@ -925,10 +943,11 @@ foam.CLASS({
   extends: null,
 
   methods: [
+    /**
+      Link two Slots together, setting both to other's value.
+      Returns a Destroyable which can be used to break the link.
+    */
     function link(other) {
-      /**        Link two Slots together, setting both to other's value.
-        Returns a Destroyable which can be used to break the link.
-      */
       var sub1 = this.follow(other);
       var sub2 = other.follow(this);
 
@@ -940,10 +959,11 @@ foam.CLASS({
       };
     },
 
+    /**
+      Have this Slot dynamically follow other's value.
+      Returns a Destroyable which can be used to cancel the binding.
+    */
     function follow(other) {
-      /**        Have this Slot dynamically follow other's value.
-        Returns a Destroyable which can be used to cancel the binding.
-      */
       return other.subscribe(function() {
         this.set(other.get());
       }.bind(this));
@@ -984,9 +1004,9 @@ foam.CLASS({
 });
 
 
-/**  Topic
+/**
   Topics delcare the types of events that an object publishes.
-
+<pre>
   Ex.
   foam.CLASS({
     name: 'Alarm',
@@ -1000,6 +1020,7 @@ foam.CLASS({
   is the same as:
   alarm.publish('ring');
   alarm.subscribe('ring', l);
+</pre>
 */
 foam.CLASS({
   name: 'Topic',
@@ -1080,9 +1101,9 @@ foam.CLASS({
 // TODO: Add other Property sub-classes here.
 
 
-/**  Listener
+/**
   Listeners are high-level pre-bound event call-backs.
-
+<pre>
   Ex.
   foam.CLASS({
     name: 'Sprinkler',
@@ -1099,13 +1120,13 @@ foam.CLASS({
       }
     ]
   });
-
+</pre<
   You might use the above onAlarm listener like this:
   alarm.ring.subscribe(sprinker.onAlarm);
-
+<p>
   Notice, that normally JS methods forget which object they belong
   to so you would need to do something like:
-    alarm.ring.subscribe(sprinker.onAlarm.bind(sprinkler));
+    <pre>alarm.ring.subscribe(sprinker.onAlarm.bind(sprinkler));</pre>
   But listeners are pre-bound.
 */
 foam.CLASS({
@@ -1138,7 +1159,7 @@ foam.CLASS({
   ]
 });
 
-
+/** Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   name: 'Model',
 
@@ -1229,10 +1250,11 @@ foam.CLASS({
   topics: [ 'propertyChange' ],
 
   methods: [
+    /**
+      Called to process constructor arguments.
+      Replaces simpler version defined in original FObject definition.
+    */
     function initArgs(args) {
-      /**        Called to process constructor arguments.
-        Replaces simpler version defined in original FObject definition.
-      */
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy
@@ -1265,12 +1287,13 @@ foam.CLASS({
       return this;
     },
 
+    /**
+      Undefine a Property's value.
+      The value will revert to either the Property's 'defaultValue' or
+      'expression' value, if they're defined or undefined if they aren't.
+      A propertyChange event will be fired, even if the value doesn't change.
+    */
     function clearProperty(name) {
-      /**        Undefine a Property's value.
-        The value will revert to either the Property's 'defaultValue' or
-        'expression' value, if they're defined or undefined if they aren't.
-        A propertyChange event will be fired, even if the value doesn't change.
-      */
       var oldValue = this[name];
       delete this.instance_[name];
       this.publish('propertyChange', name, oldValue, this[name]);
@@ -1292,7 +1315,6 @@ foam.boot.end();
   - propertyChange publishes DynamicValue instead of oldValue, newValue
   - add getOld() to DynamicValue
   - foam.X root context
-
   - more docs
   - DynamicValue map() and relate() methods
   - distinguish new CLASS from EXTENSION
