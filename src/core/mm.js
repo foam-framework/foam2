@@ -1,4 +1,4 @@
-/**
+/*
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-/*
+/**
  FOAM Bootstrap
-
+<p>
  FOAM uses Models to specify class definitions.
  The FOAM Model class is itself specified with a FOAM model, meaning
  that Model is defined in the same language which it defines.
  This self-modeling system requires some care to bootstrap, but results
  in a very compact, uniform, and powerful system.
-
+<pre>
             Abstract Class
                   ^
                   |
@@ -31,39 +31,41 @@
     ^                        +-.prototype---------^
     |                        |                    |
   Model  -> getClass()  -> Class -> create() -> instance
-
+</pre>
   FObject is the root model/class of all other classes, including Model.
   Abstract Class is the prototype of FObject's Class, which makes it the root of all Classes.
   From a Model we call getClass() to create a Class (or the previously created Class) object.
   From the Class we call create() to create new instances of that class.
   New instances extend the classes prototype object, which is store on the class as .prototype.
-
+<pre>
   instance ---> .cls_   -> Object's Class
        |
        +------> .model_ -> Object's Model
-
+</pre>
   All descendents of FObject haver references to both their Model and Class.
     - obj.cls_ refers to an Object's Class
     - obj.model_ refers to an Object's Model
 
-  Classes also refer to their Model with .model_.
+<p>  Classes also refer to their Model with .model_.
 
-  Model is its own definition:
+<p>  Model is its own definition:
+<pre>
     Model.getClass().create(Model) == Model
     Model.model_ === Model
-
+</pre>
   Models are defined as a collection of Axioms.
   It is the responsibility of Axioms to isntall itself onto a Model's Class and/or Prototype.
 
+<p>
   Axioms are defined with the following psedo-interface:
-
+<pre>
     public interface Axiom {
       optional installInClass(class)
       optional installInProto(proto)
     }
-
+</pre>
   Ex. of a Model with one Axiom:
-
+<pre>
   foam.CLASS({
     name: 'Sample',
 
@@ -75,22 +77,23 @@
       }
     ]
   });
-
+</pre>
   Axioms can be added either during the initial creation of a class and prototype,
   or anytime after.  This allows classes to be extended with new functionality,
   and this is very important to the bootstrap process because it allows us to
   start out with very simple definitions of Model and FObject, and then build
   them up until they're fully bootstrapped.
-
+<p>
   However, raw axioms are rarely used directly. Instead we model higher-level
   axiom types, including:
-
-  Traits     - Implement multiple inheritance
-  Constants  - Add constants to the prototype and class
-  Topics     - Publish/subscribe topics
-  Properties - High-level instance variable definitions
-  Methods    - Prototype methods
-  Listeners  - Like methods, but with extra features for use as callbacks
+<ul>
+  <li>Traits     - Implement multiple inheritance
+  <li>Constants  - Add constants to the prototype and class
+  <li>Topics     - Publish/subscribe topics
+  <li>Properties - High-level instance variable definitions
+  <li>Methods    - Prototype methods
+  <li>Listeners  - Like methods, but with extra features for use as callbacks
+</ul>
 */
 
 foam.LIB({
@@ -105,11 +108,10 @@ foam.LIB({
   },
 
   methods: [
-    function create(/*args*/) {
-      /*
-        Create a new instance of this class.
+      /**        Create a new instance of this class.
         Configured from values taken from 'args', if supplifed.
       */
+    function create(/*args*/) {
       var obj = Object.create(this.prototype);
       obj.instance_ = Object.create(null);
 
@@ -118,12 +120,11 @@ foam.LIB({
       return obj;
     },
 
-    function installModel(m) {
-      /*
-        This is a temporary version of installModel.
+      /**        This is a temporary version of installModel.
         When the bootstrap is finished, it will be replaced by a version
         that only knows how to install axioms.
       */
+    function installModel(m) {
       if ( m.axioms )
         for ( var i = 0 ; i < m.axioms.length ; i++ )
           this.installAxiom(m.axioms[i]);
@@ -145,15 +146,15 @@ foam.LIB({
         }
     },
 
+    /**
+      Install an Axiom into the class and prototype.
+      Invalidate the axiom-cache, used by getAxiomsByName().
+      -
+      Installs axioms into the protoype immediately, but in the future
+      we will wait until the first object is created. This will provide
+      better startup performance.
+    */
     function installAxiom(a) {
-      /*
-        Install an Axiom into the class and prototype.
-        Invalidate the axiom-cache, used by getAxiomsByName().
-        -
-        Installs axioms into the protoype immediately, but in the future
-        we will wait until the first object is created. This will provide
-        better startup performance.
-      */
       this.axiomMap_[a.name] = a;
       this.axiomCache_ = {};
 
@@ -164,16 +165,15 @@ foam.LIB({
       a.installInProto && a.installInProto(this.prototype);
     },
 
-    function isInstance(o) {
-      /*
-        Determine if an object is an instance of this class
+      /**        Determine if an object is an instance of this class
         or one of its sub-classes.
       */
+    function isInstance(o) {
       return o.cls_ && this.isSubClass(o.cls_);
     },
 
+      /** Determine if a class is either this class or a sub-class. */
     function isSubClass(c) {
-      /* Determine if a class is either this class or a sub-class. */
       // TODO: switch from 'name' to 'id' when available
       if ( ! c ) return false;
 
@@ -187,19 +187,18 @@ foam.LIB({
       return subClasses_[c.name];
     },
 
+      /** Find an axiom by the specified name from either this class or an ancestor. */
     function getAxiomByName(name) {
-      /* Find an axiom by the specified name from either this class or an ancestor. */
       return this.axiomMap_[name];
     },
 
-    // The Following method will eventually change.
-    // Would like to have efficient support for:
-    //    .where() .orderBy() groupBy
-    function getAxiomsByClass(cls) {
-      /*
-        Returns all axioms defined on this class or its parent classes
+      /**        Returns all axioms defined on this class or its parent classes
         that are instances of the specified class.
       */
+    function getAxiomsByClass(cls) {
+      // This method will eventually change.
+      // Would like to have efficient support for:
+      //    .where() .orderBy() groupBy
       var as = this.axiomCache_[cls.name];
       if ( ! as ) {
         as = [];
@@ -214,8 +213,8 @@ foam.LIB({
       return as;
     },
 
+      /** Returns all axioms defined on this class or its parent classes. */
     function getAxioms() {
-      /* Returns all axioms defined on this class or its parent classes. */
       // The full axiom list is stored in the regular cache with '' as a key.
       var as = this.axiomCache_[''];
       if ( ! as ) {
@@ -232,17 +231,17 @@ foam.LIB({
 });
 
 
+/**
+  Collection of classes to be repaired/upgraded later.
+  This is needed because they're built before the full
+  class/model infrastructure is finished, so they're lacking
+  features.
+*/
 foam.LIB({
   name: 'boot',
 
   documentation: 'Bootstrap support, discarded after use.',
 
-  /*
-    Collection of classes to be repaired/upgraded later.
-    This is needed because they're built before the full
-    class/model infrastructure is finished, so they're lacking
-    features.
-  */
   constants: { classes: [] },
 
   methods: [
@@ -251,11 +250,10 @@ foam.LIB({
       foam.CLASS = this.CLASS.bind(this);
     },
 
-    function getClass() {
-      /*
-        Create or Update a Prototype from a Model definition.
+      /**        Create or Update a Prototype from a Model definition.
         (Model is 'this').
       */
+    function getClass() {
       var cls = global[this.name];
 
       if ( ! cls ) {
@@ -279,16 +277,15 @@ foam.LIB({
       return cls;
     },
 
-    function CLASS(m) {
-      /*
-        Bootstrap Model definition which records incomplete models
+      /**        Bootstrap Model definition which records incomplete models
         so they can be patched at the end of the bootstrap process.
       */
+    function CLASS(m) {
       this.classes.push(this.getClass.call(m));
     },
 
+      /** Start second phase of bootstrap process. */
     function phase2() {
-      /* Start second phase of bootstrap process. */
 
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) { return Model.create(m).getClass(); };
@@ -298,8 +295,8 @@ foam.LIB({
         foam.CLASS(this.classes[i].model_);
     },
 
+      /** Finish the bootstrap process, deleting foam.boot when done. */
     function end() {
-      /* Finish the bootstrap process, deleting foam.boot when done. */
 
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
@@ -321,18 +318,21 @@ foam.LIB({
 
 foam.boot.start();
 
+/** The implicit base model for the model heirarchy. If you do not
+ *  explicitly extend another model, FObject is used. Most models will
+ *  extend FObject and inherit its methods.
+ */
 foam.CLASS({
   name: 'FObject',
 
   documentation: 'Base model for model hierarchy.',
 
   methods: [
-    function initArgs(args) {
-      /*
-        This is a temporary version of initArgs.
+      /**        This is a temporary version of initArgs.
         When the bootstrap is finished, it will be replaced by a version
         that knows about a classes Properties, so it can do a better job.
        */
+    function initArgs(args) {
       if ( ! args ) return;
 
       for ( var key in args )
@@ -348,8 +348,8 @@ foam.CLASS({
       return Object.hasOwnProperty.call(this.instance_, name);
     },
 
-    // Private support is used to store per-object values that are not
-    // instance variables.  Things like listeners and topics.
+    /** Private support is used to store per-object values that are not
+     instance variables.  Things like listeners and topics. */
     function setPrivate_(name, value) {
       if ( ! this.private_ ) {
         Object.defineProperty(this, 'private_', {
@@ -386,7 +386,7 @@ foam.CLASS({
     {
       name: 'id',
       getter: function() {
-        return this.package ? this.package + '.' + this.name : this.name; 
+        return this.package ? this.package + '.' + this.name : this.name;
       }
     },
     'package',
@@ -453,8 +453,7 @@ foam.CLASS({
 
   methods: [
     function installInClass(c) {
-      /*
-        Handle overriding of Property definition from parent class by
+      /**        Handle overriding of Property definition from parent class by
         copying undefined values from parent Property, if it exists.
       */
       var superProp = c.__proto__.getAxiomByName(this.name);
@@ -470,8 +469,7 @@ foam.CLASS({
     },
 
     function installInProto(proto) {
-      /*
-        Install a property onto a prototype from a Property definition.
+      /**        Install a property onto a prototype from a Property definition.
         (Property is 'this').
       */
       var prop            = this;
@@ -557,13 +555,15 @@ foam.CLASS({
 });
 
 
-/*
-  Method
+/**
+<p>
   Methods are only installed on the prototype.
   If the method is overriding a method from a parent
   class, then SUPER support is added.
 
+<p>
   Ex.
+<pre>
   foam.CLASS({
     name: 'Parent',
     methods: [
@@ -591,6 +591,7 @@ foam.CLASS({
   Child.create().sayHello();
   >> hello
   >> world
+</pre>
 */
 foam.CLASS({
   name: 'Method',
@@ -599,11 +600,10 @@ foam.CLASS({
   properties: [ 'name', 'code' ],
 
   methods: [
-    function override_(proto, method) {
-      /*
-        Decorate a method so that it can call the
+      /**        Decorate a method so that it can call the
         method it overrides with this.SUPER().
       */
+    function override_(proto, method) {
       var super_ = proto[this.name];
 
       // Not overriding, or not using SUPER, so just return original method
@@ -704,8 +704,7 @@ foam.CLASS({
   documentation: 'Add listener support to FObject.',
 
   methods: [
-    function createListenerList_() {
-      /*
+      /**
         This structure represents the head of a doubly-linked list of
         listeners. It contains 'next', a pointer to the first listener,
         and 'children', an array of sub-topic chains.
@@ -713,20 +712,20 @@ foam.CLASS({
         removing subscriptions be done quickly by connecting next to prev
         and prev to next.
       */
+    function createListenerList_() {
       return { next: null, children: [] };
     },
 
+      /** Return the top-level listener list, creating if necessary. */
     function listeners_() {
-      /* Return the top-level listener list, creating if necessary. */
       return this.getPrivate_('listeners') ||
         this.setPrivate_('listeners', this.createListenerList_());
     },
 
-    function notify_(listeners, args) {
-      /*
-        Notify all of the listeners in a listener list.
+      /**        Notify all of the listeners in a listener list.
         Returns the number of listeners notified.
       */
+    function notify_(listeners, args) {
       var count = 0;
       while ( listeners ) {
         args[0] = listeners.sub;
@@ -737,11 +736,10 @@ foam.CLASS({
       return count;
     },
 
-    function publish(/* args... */) {
-      /*
-        Publish a message to all matching subscribed listeners.
+      /**        Publish a message to all matching subscribed listeners.
         Returns the number of listeners notified.
       */
+    function publish(/* args... */) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
@@ -756,23 +754,25 @@ foam.CLASS({
       return count;
     },
 
-    function subscribe(/* args..., l */) {
-      /*
+      /**
         Subscribe to published events.
         args - zero or more values which specify the pattern of published
                events to match.
-        For example:
-          subscribe('propertyChange', l) will match:
-          publish('propertyChange', 'age', 18, 19), but not:
-          publish('stateChange', 'active');
-        subscribe(l) will match all events.
+        <p>For example:
+<pre>
+   subscribe('propertyChange', l) will match:
+   publish('propertyChange', 'age', 18, 19), but not:
+   publish('stateChange', 'active');
+</pre>
+        <p>subscribe(l) will match all events.
         l - the listener to call with notifications.
-          The first argument supplied to the listener is the "subscription",
+         <p> The first argument supplied to the listener is the "subscription",
           which contains the "src" of the event and a destroy() method for
           cancelling the subscription.
-        Returns a "subscrition" which can be cancelled by calling
+        <p>Returns a "subscrition" which can be cancelled by calling
           its .destroy() method.
        */
+    function subscribe(/* args..., l */) {
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
@@ -800,8 +800,8 @@ foam.CLASS({
       return node.sub;
     },
 
+      /** Unsubscribe a previously subscribed listener. */
     function unsubscribe(/* args..., l */) {
-      /* Unsubscribe a previously subscribed listener. */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
@@ -818,12 +818,15 @@ foam.CLASS({
       }
     },
 
+      /** Publish to this.propertyChange topic if oldValue and newValue are different. */
     function publishPropertyChange(name, oldValue, newValue) {
-      /* Publish to this.propertyChange topic if oldValue and newValue are different. */
       if ( ! Object.is(oldValue, newValue) )
         this.publish('propertyChange', name, oldValue, newValue);
     },
 
+      /**  Creates a Slot for dynamic bindings to a property.
+        *  @private
+        */
     function slot(name, opt_slotName, opt_prop) {
       if ( ! opt_slotName ) opt_slotName = name + '$';
       var slot = this.getPrivate_(opt_slotName);
@@ -853,8 +856,7 @@ foam.CLASS({
 });
 
 
-/*
-  Constant
+/**  Constant
   Constants are installed on both the prototype and class.
 
   Ex.
@@ -882,8 +884,7 @@ foam.CLASS({
 });
 
 
-/*
-  Trait
+/**  Trait
   Traits provide a safe form multiple-inheritance.
 
   Ex.
@@ -925,8 +926,7 @@ foam.CLASS({
 
   methods: [
     function link(other) {
-      /*
-        Link two Slots together, setting both to other's value.
+      /**        Link two Slots together, setting both to other's value.
         Returns a Destroyable which can be used to break the link.
       */
       var sub1 = this.follow(other);
@@ -941,8 +941,7 @@ foam.CLASS({
     },
 
     function follow(other) {
-      /*
-        Have this Slot dynamically follow other's value.
+      /**        Have this Slot dynamically follow other's value.
         Returns a Destroyable which can be used to cancel the binding.
       */
       return other.subscribe(function() {
@@ -985,8 +984,7 @@ foam.CLASS({
 });
 
 
-/*
-  Topic
+/**  Topic
   Topics delcare the types of events that an object publishes.
 
   Ex.
@@ -1082,8 +1080,7 @@ foam.CLASS({
 // TODO: Add other Property sub-classes here.
 
 
-/*
-  Listener
+/**  Listener
   Listeners are high-level pre-bound event call-backs.
 
   Ex.
@@ -1223,6 +1220,7 @@ foam.CLASS({
 });
 
 
+
 foam.CLASS({
   name: 'FObject',
 
@@ -1232,8 +1230,7 @@ foam.CLASS({
 
   methods: [
     function initArgs(args) {
-      /*
-        Called to process constructor arguments.
+      /**        Called to process constructor arguments.
         Replaces simpler version defined in original FObject definition.
       */
       if ( ! args ) return;
@@ -1269,8 +1266,7 @@ foam.CLASS({
     },
 
     function clearProperty(name) {
-      /*
-        Undefine a Property's value.
+      /**        Undefine a Property's value.
         The value will revert to either the Property's 'defaultValue' or
         'expression' value, if they're defined or undefined if they aren't.
         A propertyChange event will be fired, even if the value doesn't change.
@@ -1290,8 +1286,7 @@ foam.CLASS({
 foam.boot.end();
 
 
-/*
-  TODO:
+/**  TODO:
   - more docs
   - Slot.follow() and other methods
   - distinguish new CLASS from EXTENSION
