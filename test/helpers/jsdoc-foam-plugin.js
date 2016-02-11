@@ -43,7 +43,7 @@ exports.astNodeVisitor = {
     if (node.type === 'ObjectExpression' &&
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property &&
-      node.parent.callee.property.name == 'CLASS'
+      ( node.parent.callee.property.name == 'CLASS' || node.parent.callee.property.name == 'LIB' )
     ) {
       var className = getCLASSName(node);
       e.id = 'astnode'+Date.now();

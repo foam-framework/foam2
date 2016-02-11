@@ -16,16 +16,6 @@
  */
 
 
-/** A test thing
-  */
-thing = {
-  /** with a test prop */
-  name: 'hoo',
-
-  /** with a test method */
-  what: function() { return 'yes';  }
-
-}
 
 // TODO: i18n compatible error messages?
 
