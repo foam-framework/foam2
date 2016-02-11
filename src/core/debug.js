@@ -54,8 +54,8 @@ foam.CLASS({
 
 
 foam.sub().__proto__.describe = function() {
-  console.log('Context:  ', this.hasOwnProperty('NAME') ? this.NAME : ('unknown ' + this.$UID));
-  console.log('KEY           Type              Value');
+  console.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
+  console.log('KEY                  Type           Value');
   console.log('----------------------------------------------------');
   for ( var key in this ) {
     var value = this[key];
