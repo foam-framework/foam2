@@ -79,7 +79,7 @@ foam.LIB({
         var id = 1;
         return function() {
           if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
-          this.$UID__ = id;
+          Object.defineProperty(this, '$UID__', {value: id, enumerable: false});
           id++;
           return this.$UID__;
         };
@@ -245,7 +245,8 @@ foam.LIB({
         }
       }
 
-      if ( opt_name ) sub.NAME = opt_name;
+      if ( opt_name )
+        Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
 
       return sub;
     }
