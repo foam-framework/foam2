@@ -1303,4 +1303,5 @@ foam.boot.end();
   - Add package and id to Model and Class
   - Proxy id, name, package, label, plural from Class to Model
   - ID support
+  - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
 */
