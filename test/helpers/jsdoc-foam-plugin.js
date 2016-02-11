@@ -47,7 +47,7 @@ exports.astNodeVisitor = {
     ) {
       var className = getCLASSName(node);
       e.id = 'astnode'+Date.now();
-      e.comment = insertIntoComment(getCLASSComment(node), "\n@class "+className + "\n@memberof! foam" );
+      e.comment = insertIntoComment(getCLASSComment(node), "\n@class \n@memberof! module:foam" );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
       e.astnode = node;
@@ -66,13 +66,16 @@ exports.astNodeVisitor = {
     ) {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
-      e.comment = insertIntoComment(getComment(node), "\n@memberof! foam."+parentClass + ".prototype" );
+      e.comment = insertIntoComment(
+        getComment(node),
+        "\n@function \n@memberof! module:foam."+parentClass + ".prototype"
+      );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
       e.astnode = node;
       e.code = {
-          name: parentClass + "#" + (node.id && node.id.name || 'NameError'),
-          type: "Method",
+          name: (node.id && node.id.name || 'NameError'),
+          type: "function",
           node: node
       };
       e.event = "symbolFound";

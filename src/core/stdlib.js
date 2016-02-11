@@ -22,7 +22,7 @@ var global = global || this;
 
 /**
  * Top-Level of foam package
- * @namespace foam
+ * @exports foam
  */
 foam = {
   Array:    Array.prototype,

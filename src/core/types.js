@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-/** A test thing */
+
+/** A test thing
+  */
 thing = {
   /** with a test prop */
   name: 'hoo',
