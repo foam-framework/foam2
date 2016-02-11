@@ -89,7 +89,7 @@ exports.astNodeVisitor = {
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node),
-        "\n@memberof! module:foam."+parentClass + ".prototype"
+        "\n@method \n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
