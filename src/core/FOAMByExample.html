@@ -51,6 +51,24 @@ log(Test1.getAxiomByName('a'));
 // BUG: bind shouldn't be required
 log(Test1.getAxiomsByClass(Method).map(Method.NAME.f.bind(Method.NAME)));
 
+// Default Value
+foam.CLASS({
+  name: 'DefaultValueTest',
+  properties: [
+    { name: 'a', defaultValue: 42 },
+    { name: 'b', defaultValue: 'foo' }
+  ]
+});
+var o = DefaultValueTest.create();
+log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
+
+o.a = 99;
+o.b = 'bar';
+log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
+
+o.clearProperty('a');
+log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
+
 </script>
 
   <div id='output'></div>
