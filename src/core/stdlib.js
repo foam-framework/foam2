@@ -223,13 +223,11 @@ foam.LIB({
   }
 
   var X = {
-    lookup: foam.fn.memoize1(function (pathStr) {
-      var path = pathStr.split('.');
-      var root = X;
-      for ( var i = 0 ; i < path.length ; i++ )
-        root = root[path[i]] || ( root[path[i]] = {} );
-      return root;
-    }),
+    lookup: function (path) {
+    },
+
+    register: function (cls) {
+    },
 
     sub: function sub(opt_args, opt_name) {
       var sub = Object.create(this);
