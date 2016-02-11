@@ -442,13 +442,13 @@ foam.CLASS({
 
   properties: [
     'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression', 'getter', 'setter',
-    /**
-      Compare two values taken from this property.
-      <p>Used by Property.compare().
-      It is a property rather than a method so that it can be configured
-      without subclassing.
-    */
     {
+      /**
+        Compare two values taken from this property.
+        <p>Used by Property.compare().
+        It is a property rather than a method so that it can be configured
+        without subclassing.
+      */
       name: 'comparePropertyValues',
       defaultValue: function(o1, o2) {
         if ( o1 === o2 ) return 0;

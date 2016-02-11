@@ -1,3 +1,24 @@
+/**
+  This plugin is for JSDocs, to allow FOAM models to be documented.
+
+  Document objects before their declaration as normal.
+
+  Exception:
+  For properties or methods declared with object syntax, put the comment
+  inside the object:
+
+  {
+    / * * Comment goes here! * /
+    name: 'thing'
+  }
+
+
+
+
+
+
+*/
+
 var getCLASSComment = function getCLASSComment(node) {
   if (node.parent) {
     if (node.parent.leadingComments) return node.parent.leadingComments[0].raw;
@@ -29,6 +50,17 @@ var getCLASSName = function getCLASSName(node) {
   }
   return 'NameNotFound';
 }
+var getCLASSExtends = function getCLASSExtends(node) {
+  if ( node.properties ) {
+    for (var i = 0; i < node.properties.length; ++i) {
+      var p = node.properties[i];
+      if ( p.key && p.key.name == 'extends' ) {
+        return ( p.value && p.value.value ) || '';
+      }
+    }
+  }
+  return '';
+}
 
 var insertIntoComment = function insertIntoComment(comment, tag) {
   var idx = comment.lastIndexOf('*/');
@@ -46,8 +78,14 @@ exports.astNodeVisitor = {
       ( node.parent.callee.property.name == 'CLASS' || node.parent.callee.property.name == 'LIB' )
     ) {
       var className = getCLASSName(node);
+      var classExt = getCLASSExtends(node);
       e.id = 'astnode'+Date.now();
-      e.comment = insertIntoComment(getCLASSComment(node), "\n@class \n@memberof! module:foam" );
+      e.comment = insertIntoComment(
+        getCLASSComment(node),
+        "\n@class " +
+        (( classExt ) ? "\n@extends module:foam."+classExt : "") +
+        "\n@memberof! module:foam"
+      );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
       e.astnode = node;
@@ -58,6 +96,8 @@ exports.astNodeVisitor = {
       };
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
+
+
     }
     else if (node.type === 'FunctionExpression' &&
       node.parent.type === 'ArrayExpression' &&
@@ -68,7 +108,7 @@ exports.astNodeVisitor = {
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node),
-        "\n@memberof! module:foam."+parentClass + ".prototype"
+        "\n@method \n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -86,13 +126,15 @@ exports.astNodeVisitor = {
     else if (node.type === 'ObjectExpression' &&
       node.parent.type === 'ArrayExpression' &&
       node.parent.parent.type === 'Property' &&
-      node.parent.parent.key.name === 'properties'
+      ( node.parent.parent.key.name === 'properties' ||
+        node.parent.parent.key.name === 'methods' )
     ) {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
-        getComment(node),
-        "\n@memberof! module:foam."+parentClass + ".prototype"
+        getComment(node.properties[0]) || getComment(node),
+        ( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "" +
+          "\n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -105,7 +147,7 @@ exports.astNodeVisitor = {
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
 
-      //console.log("found prop", e);
+      //console.log("found prop parent", e.code.name, node.parent.elements);
     }
   }
 };

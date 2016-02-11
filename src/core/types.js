@@ -28,11 +28,26 @@ foam.CLASS({
   },
 
   properties: [
-    { name: 'name' },
-    { name: 'typeName' },
-    { name: 'type' },
-    { name: 'optional', defaultValue: false },
-    { name: 'index', defaultValue: -1 }
+    {
+      /** The name of the argument */
+      name: 'name'
+    },
+    {
+      /** The string name of the type (either a model name or javascript typeof name) */
+      name: 'typeName'
+    },
+    {
+      /** If set, this holds the actual Model represented by typeName. */
+      name: 'type'
+    },
+    {
+      /** If true, indicates that this argument is optional. */
+      name: 'optional', defaultValue: false
+    },
+    {
+      /** The index of the argument (the first argument is at index 0). */
+      name: 'index', defaultValue: -1
+    }
   ],
 
   methods: [
