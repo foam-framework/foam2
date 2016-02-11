@@ -34,6 +34,15 @@ foam.CLASS({
 });
 var t1 = Test1.create({a:1, b:'foo'});
 log(t1.a, t1.b, t1.f1(), t1.f2());
+t1.a++;
+t1.b = 'bar';
+log(t1.a, t1.b);
+
+log(Test1.toString());
+
+log(t1.toString());
+
+Test1.describe();
 
 t1.describe();
 
@@ -59,14 +68,14 @@ log(Test1.getAxiomsByClass(Method).map(Method.NAME.f.bind(Method.NAME)));
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
     console.log.json = oldLog.json;
-    var log = function(o) { log_(' <b>&gt;</b> ' + o); }
+    var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
     var s = demo.textContent.split('\n\n');
     for ( var i = 0 ; i < s.length ; i++ ) {
       var l = s[i];
       log_(' <h3>Test ' + (i+1) + '</h3><code>' + l + '</code><br>');
       eval(l);
-      log_('<br>');
+      log_('');
     }
   </script>
 
