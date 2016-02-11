@@ -121,6 +121,9 @@ foam.CLASS({
   ]
 });
 
+function alt() {
+  return Alternate.create({ args: foam.array.argsToArray(arguments) });
+}
 
 foam.CLASS({
   name: 'Sequence',
@@ -143,6 +146,9 @@ foam.CLASS({
   ]
 });
 
+function seq() {
+  return Sequence.create({ args: foam.array.argsToArray(arguments) });
+}
 
 foam.CLASS({
   name: 'PSymbol',
@@ -162,6 +168,10 @@ foam.CLASS({
     }
   ]
 });
+
+function sym(name) {
+  return PSymbol.create({ name: name });
+}
 
 foam.CLASS({
   name: 'Grammar',
@@ -219,20 +229,5 @@ foam.CLASS({
         return Grammar.create(o);
       }
     }
-  ]
-});
-
-foam.LIB({
-  name: 'parse',
-  methods: [
-    function alt() {
-      return Alternate.create({ args: foam.array.argsToArray(arguments) });
-    },
-    function seq() {
-      return Sequence.create({ args: foam.array.argsToArray(arguments) });
-    },
-    function sym(name) {
-      return PSymbol.create({ name: name });
-    },
   ]
 });
