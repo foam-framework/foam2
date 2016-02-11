@@ -169,7 +169,7 @@ foam.LIB({
         or one of its sub-classes.
       */
     function isInstance(o) {
-      return o.cls_ && this.isSubClass(o.cls_);
+      return o && o.cls_ && this.isSubClass(o.cls_);
     },
 
       /** Determine if a class is either this class or a sub-class. */
