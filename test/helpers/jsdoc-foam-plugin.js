@@ -1,3 +1,24 @@
+/**
+  This plugin is for JSDocs, to allow FOAM models to be documented.
+
+  Document objects before their declaration as normal.
+
+  Exception:
+  For properties or methods declared with object syntax, put the comment
+  inside the object:
+
+  {
+    / * * Comment goes here! * /
+    name: 'thing'
+  }
+
+
+
+
+
+
+*/
+
 var getCLASSComment = function getCLASSComment(node) {
   if (node.parent) {
     if (node.parent.leadingComments) return node.parent.leadingComments[0].raw;
@@ -86,12 +107,13 @@ exports.astNodeVisitor = {
     else if (node.type === 'ObjectExpression' &&
       node.parent.type === 'ArrayExpression' &&
       node.parent.parent.type === 'Property' &&
-      node.parent.parent.key.name === 'properties'
+      ( node.parent.parent.key.name === 'properties' ||
+        node.parent.parent.key.name === 'methods' )
     ) {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
-        getComment(node),
+        getComment(node.properties[0]) || getComment(node),
         "\n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
@@ -105,7 +127,7 @@ exports.astNodeVisitor = {
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
 
-      //console.log("found prop", e);
+      //console.log("found prop parent", e.code.name, node.parent.elements);
     }
   }
 };
