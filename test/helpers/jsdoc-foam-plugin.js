@@ -68,7 +68,7 @@ exports.astNodeVisitor = {
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node),
-        "\n@function \n@memberof! module:foam."+parentClass + ".prototype"
+        "\n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -82,6 +82,30 @@ exports.astNodeVisitor = {
       e.finishers = [parser.addDocletRef];
 
       //console.log("found method", e);
+    }
+    else if (node.type === 'ObjectExpression' &&
+      node.parent.type === 'ArrayExpression' &&
+      node.parent.parent.type === 'Property' &&
+      node.parent.parent.key.name === 'properties'
+    ) {
+      var parentClass = getCLASSName(node.parent.parent.parent);
+      e.id = 'astnode'+Date.now();
+      e.comment = insertIntoComment(
+        getComment(node),
+        "\n@memberof! module:foam."+parentClass + ".prototype"
+      );
+      e.lineno = node.parent.loc.start.line;
+      e.filename = currentSourceName;
+      e.astnode = node;
+      e.code = {
+          name: getCLASSName(node),
+          type: "property",
+          node: node
+      };
+      e.event = "symbolFound";
+      e.finishers = [parser.addDocletRef];
+
+      //console.log("found prop", e);
     }
   }
 };
