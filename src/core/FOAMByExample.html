@@ -50,6 +50,9 @@ log(o.a, o.b);
 // Objects have a reference to their class in .cls_
 log(o.cls_.name);
 
+// Test Class membership with Class.isInstance()
+log(Test.isInstance(o), Test.isInstance('foo'));
+
 // Call Methods
 log(o.f1(), o.f2());
 
@@ -186,6 +189,35 @@ var p = Person.create({name: 'John', sex: 'M'});
 log(p.toString());
 var e = Employee.create({name: 'Jane', sex: 'F', salary: 50000});
 log(e.toString());
+
+// Test if one class is a sub-class of another:
+log(Person.isSubClass(Employee), Employee.isSubClass(Person));
+
+// In addition to class-inheritance, FOAM also supports
+// 'Traits', which are a form of multiple-inheritance which
+// copy Axioms from another model.
+foam.CLASS({
+  name: 'SampleTrait',
+  properties: [ 't1', 't2', 't3' ],
+  methods: [
+    function tfoo() { console.log('ffoo'); },
+    function tbar() { console.log('tbar'); }
+  ]
+});
+foam.CLASS({
+  name: 'TraitTest',
+  traits: ['SampleTrait'],
+  properties: [ 'p1', 'p2', 'p3' ],
+  methods: [
+    function foo() { console.log('foo'); },
+    function bar() { console.log('bar'); }
+  ]
+});
+TraitTest.describe();
+var tt = TraitTest.create({p1:1, t1:2});
+tt.describe();
+tt.tfoo(); // From SampleTrait
+tt.foo();
 
 // Objects support publish() for publishing events,
 // and subscribe() for listening for published events.
