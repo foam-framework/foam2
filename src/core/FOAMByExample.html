@@ -105,6 +105,30 @@ log(o.hasOwnProperty('a'), o.a);
 o.clearProperty('a');
 log(o.hasOwnProperty('a'), o.a);
 
+// Classes can be subclassed with 'extends:'.
+// Methods in subclasses can override methods from ancestor classes, as is 
+// done below with toString().  Employee.toString() calls its parent classes
+// toString() method by calling 'this.SUPER()'.
+foam.CLASS({
+  name: 'Person',
+  properties: [ 'name', 'sex' ],
+  methods: [
+    function toString() { return this.name + ' ' + this.sex; }
+  ]
+});
+foam.CLASS({
+  name: 'Employee',
+  extends: 'Person',
+  properties: [ 'salary' ],
+  methods: [
+    function toString() { return this.SUPER() + ' ' + this.salary; }
+  ]
+});
+var p = Person.create({name: 'John', sex: 'M'});
+log(p.toString());
+var e = Employee.create({name: 'Jane', sex: 'F', salary: 50000});
+log(e.toString());
+
 // Objects support publish() for publishing events,
 // and subscribe() for listening for published events.
 foam.CLASS({
