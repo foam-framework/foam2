@@ -1,22 +1,50 @@
 /**
   This plugin is for JSDocs, to allow FOAM models to be documented.
 
-  Document objects before their declaration as normal.
+  Document objects with a 'documentation' property, or put a JSDoc comment
+  before their declaration as normal.
 
-  Exception:
+  ** Exception: **
   For properties or methods declared with object syntax, put the comment
-  inside the object:
-
+  inside the object (or use a documentation property):
   {
-    / * * Comment goes here! * /
+    /** Comment goes here! * /
     name: 'thing'
   }
 
-  This version requires a hack in JSDocs to enable internal 
-  function comments:
-  
-  In astbuilder.js, CommentAttacher.prototype.visit:
-  Comment out canAcceptComment (so that all comments are left in):
+  For any other thing:
+
+  {
+    name: 'thing2',
+    documentation: "Docs inside thing2"
+  }
+
+  or
+
+  /** Comment before * /
+  foam.CLASS({ 
+    name: 'myClass',
+    documentation: "or docs inside",
+  })
+
+  or 
+
+  methods: [
+    /** Comment before * /
+    function aMethod() {}
+  ]
+
+  ** Note on docs inside a function **
+  To enable this:
+    function aMethod() { 
+      /** doc as first comment in function * /
+      func contents...
+    }
+
+  you have to modify JSDocs to enable internal 
+  function comments. In astbuilder.js, 
+  CommentAttacher.prototype.visit, Comment out 
+  canAcceptComment (so that all comments are left in):
   if ( isEligible /*&& canAcceptComment(node)* / ) {
 
 
@@ -67,12 +95,11 @@ var getComment = function getComment(node) {
   // Object expression with documentation property
   var docProp = getNodePropertyNamed(node, 'documentation');
   if ( docProp ) {
-    //console.log("doc: ", docProp);
+    return docProp;
   }
   // function with potential block comment inside
   else if ( node.type === 'FunctionExpression' ) {
     var comment = getFuncBodyComment(node);
-    //console.log("function: ",node,comment);
     if ( comment ) return comment;
   } 
   
@@ -85,15 +112,7 @@ var getCLASSName = function getCLASSName(node) {
   return getNodePropertyNamed(node, 'name');
 }
 var getCLASSExtends = function getCLASSExtends(node) {
-  if ( node.properties ) {
-    for (var i = 0; i < node.properties.length; ++i) {
-      var p = node.properties[i];
-      if ( p.key && p.key.name == 'extends' ) {
-        return ( p.value && p.value.value ) || '';
-      }
-    }
-  }
-  return '';
+  return getNodePropertyNamed(node, 'extends');
 }
 
 var insertIntoComment = function insertIntoComment(comment, tag) {
