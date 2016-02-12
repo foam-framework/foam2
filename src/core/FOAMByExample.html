@@ -133,6 +133,7 @@ foam.CLASS({
   name: 'TopicTest',
   properties: [ 'a', 'b' ]
 });
+o = TopicTest.create();
 // Listen for all propertyChange events:
 o.propertyChange.subscribe(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
 // Listen for only changes to the 'a' Property:
@@ -140,6 +141,38 @@ o.propertyChange.subscribe('a', function(sub, p, name, dyn) { console.log('prope
 o.a = 42;
 o.b = 'bar';
 o.a++;
+
+// There are four ways to unsubscribe a listener
+// 1. Call obj.unsubscribe();
+o = TopicTest.create();
+var l = function() { console.log.apply(console.log, arguments); };
+o.subscribe(l);
+o.publish('fire');
+o.unsubscribe(l);
+o.publish("fire again, but nobody's listenering");
+
+// 2. Call .destroy() on the Destroyable that subscribe() returns
+var sub = o.subscribe(l);
+o.publish('fire');
+sub.destroy();
+o.publish("fire again, but nobody's listenering");
+
+// 3. Destroy the subscription, which is supplied to the listener
+var l = function(sub) {
+  sub.destroy();
+  console.log.apply(console.log, arguments); 
+};
+o.subscribe(l);
+o.publish('fire');
+o.publish("fire again, but nobody's listenering");
+
+// 4. If you only want to receive the first event, decorate your
+// listener with foam.events.oneTime() and it will cancel the subscription
+// when it receives the first event.
+o.subscribe(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
+o.publish('fire');
+o.publish("fire again, but nobody's listenering");
+
 
 </script>
 
@@ -162,9 +195,9 @@ o.a++;
 
     var s = demo.textContent.split('\n\n');
     for ( var i = 0 ; i < s.length ; i++ ) {
-      var l = s[i];
-      log_(' <h3>Test ' + (i+1) + '</h3><code>' + l + '</code><br>');
-      eval(l);
+      var line = s[i];
+      log_(' <h3>Test ' + (i+1) + '</h3><code>' + line + '</code><br>');
+      eval(line);
       log_('');
     }
   </script>
