@@ -480,9 +480,14 @@ foam.CLASS({
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
-      this.f = function f(o) { return o[name]; };
-
+      var f = this.f = function f(o) { return o[name]; };
       c[foam.string.constantize(this.name)] = this;
+      
+      /** Makes this Property a comparator, suitable for use with mLangs. */
+      var comparePropertyValues = this.comparePropertyValues;
+      this.compare = function compare(o1, o2) {
+        return comparePropertyValues(f(o1), f(o2));
+      }
     },
 
     /**
@@ -558,11 +563,6 @@ foam.CLASS({
     function set(o, value) {
       o[this.name] = value;
       return this;
-    },
-
-    /** Makes this Property a comparator, suitable for use with mLangs. */
-    function compare(o1, o2) {
-      return this.comparePropertyValues(this.f(o1), this.f(o2));
     }
   ]
 });
