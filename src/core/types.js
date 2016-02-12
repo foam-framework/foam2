@@ -97,13 +97,14 @@ foam.LIB({
   name: 'types',
 
   methods: [
-    /** Extracts the arguments and their types from the given function.
-      * @fn The function to extract from. The toString() of the function must be
-      *     accurate.
-      * @return An array of Argument objects.
-      */
     function getFunctionArgs(fn) {
+      /** Extracts the arguments and their types from the given function.
+        * @arg fn The function to extract from. The toString() of the function must be
+        *     accurate.
+        * @return An array of Argument objects.
+        */
       // strip newlines and find the function(...) declaration
+      if ( null ) return;
       var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*)\)/);
       if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
       args = args[2];

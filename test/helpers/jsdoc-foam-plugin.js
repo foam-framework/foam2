@@ -12,14 +12,33 @@
     name: 'thing'
   }
 
-
-
-
+  This version requires a hack in JSDocs to enable internal 
+  function comments:
+  
+  In astbuilder.js, CommentAttacher.prototype.visit:
+  Comment out canAcceptComment (so that all comments are left in):
+  if ( isEligible /*&& canAcceptComment(node)* / ) {
 
 
 */
 
-var getCLASSComment = function getCLASSComment(node) {
+
+
+var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
+  if ( node.properties ) {
+    for (var i = 0; i < node.properties.length; ++i) {
+      var p = node.properties[i];
+      if ( p.key && p.key.name == propName ) {
+        return ( p.value && p.value.value ) || '';
+      }
+    }
+  }
+  return '';
+}
+
+
+var getLeadingComment = function getLeadingComment(node) {
+  if (node.leadingComments) return node.leadingComments[0].raw;
   if (node.parent) {
     if (node.parent.leadingComments) return node.parent.leadingComments[0].raw;
     if (node.parent.callee) {
@@ -32,23 +51,38 @@ var getCLASSComment = function getCLASSComment(node) {
   return '';
 }
 
-var getComment = function getComment(node) {
-  if (node.leadingComments) return node.leadingComments[0].raw;
-  return getCLASSComment(node);
+var getFuncBodyComment = function getFuncBodyComment(node) {
+  //console.log(node.body.body[0]);
+  if (  node.body && 
+        node.body.body && 
+        node.body.body[0] && 
+        node.body.body[0].leadingComments ) {    
+    return node.body.body[0].leadingComments[0].raw;
+  }
+  return '';
 }
 
+var getComment = function getComment(node) {
+  // try for FOAM documentation property/in-function comment block
+  // Object expression with documentation property
+  var docProp = getNodePropertyNamed(node, 'documentation');
+  if ( docProp ) {
+    //console.log("doc: ", docProp);
+  }
+  // function with potential block comment inside
+  else if ( node.type === 'FunctionExpression' ) {
+    var comment = getFuncBodyComment(node);
+    //console.log("function: ",node,comment);
+    if ( comment ) return comment;
+  } 
+  
+  // fall back on standard JSDoc leading comment blocks
+  return getLeadingComment(node);
+  
+}
 
 var getCLASSName = function getCLASSName(node) {
-  if ( node.properties ) {
-    //console.log("props", node.properties);
-    for (var i = 0; i < node.properties.length; ++i) {
-      var p = node.properties[i];
-      if ( p.key && p.key.name == 'name' ) {
-        return ( p.value && p.value.value ) || 'NameError';
-      }
-    }
-  }
-  return 'NameNotFound';
+  return getNodePropertyNamed(node, 'name');
 }
 var getCLASSExtends = function getCLASSExtends(node) {
   if ( node.properties ) {
@@ -66,12 +100,15 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
   var idx = comment.lastIndexOf('*/');
   return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
 }
-
+var i = 0;
 exports.astNodeVisitor = {
   visitNode: function(node, e, parser, currentSourceName) {
     //if (node.type == 'ObjectExpression') console.log("*****\n",node, "\nparent:", node.parent);
     //console.log(node.parent);
 
+    //if (20 ==  i++) console.log("parser: ",parser._astBuilder);
+    
+    // CLASS or LIB 
     if (node.type === 'ObjectExpression' &&
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property &&
@@ -81,7 +118,7 @@ exports.astNodeVisitor = {
       var classExt = getCLASSExtends(node);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
-        getCLASSComment(node),
+        getComment(node),
         "\n@class " +
         (( classExt ) ? "\n@extends module:foam."+classExt : "") +
         "\n@memberof! module:foam"
@@ -98,7 +135,7 @@ exports.astNodeVisitor = {
       e.finishers = [parser.addDocletRef];
 
 
-    }
+    } // function in an array (methods, todo: listeners, etc)
     else if (node.type === 'FunctionExpression' &&
       node.parent.type === 'ArrayExpression' &&
       node.parent.parent.type === 'Property' &&
@@ -122,7 +159,7 @@ exports.astNodeVisitor = {
       e.finishers = [parser.addDocletRef];
 
       //console.log("found method", e);
-    }
+    } // objects in an array (properties, methods, todo: others)
     else if (node.type === 'ObjectExpression' &&
       node.parent.type === 'ArrayExpression' &&
       node.parent.parent.type === 'Property' &&
