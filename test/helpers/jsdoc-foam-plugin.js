@@ -95,7 +95,7 @@ var getComment = function getComment(node) {
   // Object expression with documentation property
   var docProp = getNodePropertyNamed(node, 'documentation');
   if ( docProp ) {
-    return docProp;
+    return "/** "+docProp+ " */";
   }
   // function with potential block comment inside
   else if ( node.type === 'FunctionExpression' ) {

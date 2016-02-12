@@ -12,6 +12,6 @@
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover --include-all-sources -- jasmine",
     "checkCoverage": "node checkCoverage.js",
-    "doc": "jsdoc -c jsdoc.conf -r -d ./doc/ ./src/core/types.js"
+    "doc": "jsdoc -c jsdoc.conf -r -d ./doc/ ./src/"
   }
 }
