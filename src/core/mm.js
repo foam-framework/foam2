@@ -477,6 +477,11 @@ foam.CLASS({
             this[name] = superProp[name];
         }
       }
+
+      /** Makes this Property an adapter, suitable for use with mLangs. */
+      var name = this.name;
+      this.f = function f(o) { return o[name]; };
+
       c[foam.string.constantize(this.name)] = this;
     },
 
@@ -553,11 +558,6 @@ foam.CLASS({
     function set(o, value) {
       o[this.name] = value;
       return this;
-    },
-
-    /** Makes this Property an adapter, suitable for use with mLangs. */
-    function f(o) {
-      return o[this.name];
     },
 
     /** Makes this Property a comparator, suitable for use with mLangs. */
