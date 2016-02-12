@@ -106,6 +106,36 @@ o.clearProperty('a');
 log(o.hasOwnProperty('a'), o.a);
 
 // factories
+// Properties can have factory methods which create their initial value
+// when they are first accessed.
+foam.CLASS({
+  name: 'FactoryTest',
+  properties: [
+    {
+      name: 'a',
+      factory: function() { log('creating value'); return 42; }
+    }
+  ]
+});
+var o = FactoryTest.create();
+log(o.a);
+// Factory not called value accessed second time:
+log(o.a);
+
+// Factory not called if value supplied in constructor
+var o = FactoryTest.create({a: 42});
+log(o.a);
+
+// Factory not called if value set before first access
+var o = FactoryTest.create();
+o.a = 42;
+log(o.a);
+
+// Factory called again if clearProperty() called:
+var o = FactoryTest.create();
+log(o.a);
+o.clearProperty('a');
+log(o.a);
 
 // getters and setters
 // Properties can define their own getter and setter functions.
