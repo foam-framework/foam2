@@ -751,6 +751,18 @@ foam.CLASS({
       return count;
     },
 
+    function hasListeners(/* args */) {
+      var listeners = this.getPrivate_('listeners');
+
+      for ( var i = 0 ; listeners ; i++ ) {
+        if ( listeners.next        ) return true;
+        if ( i == arguments.length ) return false;
+        listeners = listeners.children[arguments[i]];
+      }
+
+      return false;
+    },
+
     /**
       Publish a message to all matching subscribed listeners.
       Returns the number of listeners notified.
@@ -836,8 +848,11 @@ foam.CLASS({
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
     function publishPropertyChange(name, oldValue, newValue) {
-      if ( ! Object.is(oldValue, newValue) )
-        this.publish('propertyChange', name, oldValue, newValue);
+      if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
+        var dyn = this.propertyDynamic(name);
+        dyn.setPrev(oldValue);
+        this.publish('propertyChange', name, dyn);
+      }
     },
 
     /**
@@ -1293,6 +1308,12 @@ foam.CLASS({
     },
     function set(value) {
       return this.prop.set(this.obj, value);
+    },
+    function getPrev() {
+      return this.oldValue;
+    },
+    function setPrev(value) {
+      return this.oldValue = value;
     },
     function subscribe(l) {
       return this.obj.subscribe('propertyChange', this.prop.name, l);
