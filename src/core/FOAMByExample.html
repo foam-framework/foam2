@@ -12,8 +12,9 @@
  <body style="font-family:monospace;">
 
 <script id='demo' language="xjavascript">
+// Define a new class with foam.CLASS
 foam.CLASS({
-  name: 'Test1',
+  name: 'Test',
   properties: [
     // short-form
     'a',
@@ -32,24 +33,47 @@ foam.CLASS({
     }
   ]
 });
-var t1 = Test1.create({a:1, b:'foo'});
-log(t1.a, t1.b, t1.f1(), t1.f2());
-t1.a++;
-t1.b = 'bar';
-log(t1.a, t1.b);
+log(Test);
 
-log(Test1.toString());
+// Use class.describe() to learn about the class
+Test.describe();
 
-log(t1.toString());
+// Create an instance of Test
+var o = Test.create();
+log(o);
+log(o.a, o.b);
 
-Test1.describe();
+// Create an instance with a map argument to initialize properties
+var o = Test.create({a:1, b:'foo'});
+log(o.a, o.b);
 
-t1.describe();
+// Call Methods
+log(o.f1(), o.f2());
 
-log(Test1.getAxiomByName('a'));
+// Update Properties
+o.a++;
+o.b = 'bar';
+log(o.a, o.b);
 
-// BUG: bind shouldn't be required
-log(Test1.getAxiomsByClass(Method).map(Method.NAME.f.bind(Method.NAME)));
+// Call toString on an object
+log(o.toString());
+
+// Call describe() on an object to see its Property values
+o.describe();
+
+// Properties and Methods are types of Axioms
+// Find an Axiom for a class using getAxiomByName
+log(Test.getAxiomByName('a'));
+
+// Find all Axioms of a particular class using getAxiomsByClass
+log(Test.getAxiomsByClass(Method));
+
+// Properties are defined on the class as constants
+log(Method.NAME);
+Method.NAME.describe();
+
+// Property constants can be used as map functions
+log(Test.getAxiomsByClass(Method).map(Method.NAME.f));
 
 // Default Value
 foam.CLASS({
