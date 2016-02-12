@@ -11,11 +11,11 @@ var beforeEachTest = function(callback) {
 
 function createTestListener(doUnsub) {
   // also handles property change, split into separate listener if necessary
-  var listener = function(subscription, topic, topic2, old, nu) {
+  var listener = function(subscription, topic, topic2, dyn) {
     listener.last_topic = topic+"."+topic2;
     listener.last_args = arguments;
-    listener.last_old = old;
-    listener.last_nu = nu;
+    listener.last_old = dyn && dyn.getPrev();
+    listener.last_nu = dyn && dyn.get();
     if (doUnsub) subscription.destroy();
     listener.count += 1;
   };
@@ -473,4 +473,3 @@ describe('PropertyChangePublisher.propertyChange()', function() {
     expect(listener.last_nu).toEqual(NaN);
   });
 });
-

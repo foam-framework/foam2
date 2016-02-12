@@ -598,7 +598,7 @@ describe('Property Mlang interop', function() {
 });
 
 
-describe('Slots', function() {
+describe('Dynamics', function() {
   var t;
   var t2;
 
@@ -659,17 +659,23 @@ describe('Slots', function() {
 //     expect(t2.a).toEqual(45);
 //   });
   it('subscribes manual listeners', function() {
-    var last_args;
-    var l = function() { last_args = Array.prototype.slice.call(arguments); };
+    var last_args, last_value;
+    var l = function() {
+      last_args = Array.prototype.slice.call(arguments);
+      last_value = last_args[3].get();
+    };
     t.a$.subscribe(l);
     t.a = 999;
     expect(last_args).toBeDefined();
     expect(last_args[2]).toEqual('a');
-    expect(last_args[4]).toEqual(999);
+    expect(last_value).toEqual(999);
   });
   it('unsubscribes manual listeners', function() {
-    var last_args;
-    var l = function() { last_args = Array.prototype.slice.call(arguments); };
+    var last_args, last_value;
+    var l = function() {
+      last_args = Array.prototype.slice.call(arguments);
+      last_value = last_args[3].get();
+    };
     t.a$.subscribe(l);
     t.a = 999;
 
@@ -679,7 +685,7 @@ describe('Slots', function() {
     // same as the first time
     expect(last_args).toBeDefined();
     expect(last_args[2]).toEqual('a');
-    expect(last_args[4]).toEqual(999);
+    expect(last_value).toEqual(999);
   });
 });
 
@@ -727,8 +733,8 @@ describe('Bootstrap invariants', function() {
     expect(Model.isInstance(AxiomArrayProperty.model_)).toBe(true);
     expect(Model.isInstance(Constant.model_)).toBe(true);
     expect(Model.isInstance(Trait.model_)).toBe(true);
-    expect(Model.isInstance(Slot.model_)).toBe(true);
-    expect(Model.isInstance(PropertySlot.model_)).toBe(true);
+    expect(Model.isInstance(Dynamic.model_)).toBe(true);
+    expect(Model.isInstance(PropertyDynamic.model_)).toBe(true);
     expect(Model.isInstance(Topic.model_)).toBe(true);
     expect(Model.isInstance(BooleanProperty.model_)).toBe(true);
   });
