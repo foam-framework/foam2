@@ -69,6 +69,25 @@ log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
 o.clearProperty('a');
 log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
 
+// Property Change Support
+foam.CLASS({
+  name: 'PubSubTest',
+  properties: [ 'a', 'b' ]
+});
+var o = PubSubTest.create();
+// Install a listener that listens to all events
+o.subscribe(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
+o.subscribe('fire', function() { console.log('fire: ', [].join.call(arguments, ' ')); });
+o.propertyChange.subscribe(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
+o.propertyChange.subscribe('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
+o.publish('fire', 'alarm');
+
+o.a = 42;
+
+o.b = 'bar';
+
+o.a++;
+
 </script>
 
   <div id='output'></div>
