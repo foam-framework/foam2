@@ -47,6 +47,9 @@ log(o.a, o.b);
 var o = Test.create({a:1, b:'foo'});
 log(o.a, o.b);
 
+// Objects have a reference to their class in .cls_
+log(o.cls_.name);
+
 // Call Methods
 log(o.f1(), o.f2());
 
@@ -72,44 +75,70 @@ log(Test.getAxiomsByClass(Method));
 log(Method.NAME);
 Method.NAME.describe();
 
-// Property constants can be used as map functions
+// Property constants contain map functions
 log(Test.getAxiomsByClass(Method).map(Method.NAME.f));
 
-// Default Value
+// Property constants contain comparators
+log(Test.getAxiomsByClass(Method).sort(Method.NAME.compare).map(Method.NAME.f));
+
+// Default Values can be defined for Properties
 foam.CLASS({
   name: 'DefaultValueTest',
   properties: [
     { name: 'a', defaultValue: 42 },
-    { name: 'b', defaultValue: 'foo' }
+    { name: 'b', defaultValue: 'foo' },
+    { name: 'c' }
   ]
 });
 var o = DefaultValueTest.create();
-log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
+log(o.a, o.b, o.c);
 
+// .hasOwnProperty() tells you if a Property has been set
+log(o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
 o.a = 99;
 o.b = 'bar';
-log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
+o.c = 'test';
+log(o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
 
+// .clearProperty() reverts a value back to its defaultValue
+log(o.hasOwnProperty('a'), o.a);
 o.clearProperty('a');
-log(o.hasOwnProperty('a'), o.a, o.hasOwnProperty('b'), o.b);
+log(o.hasOwnProperty('a'), o.a);
 
-// Property Change Support
+// Objects support publish() for publishing events,
+// and subscribe() for listening for published events.
 foam.CLASS({
-  name: 'PubSubTest',
-  properties: [ 'a', 'b' ]
+  name: 'PubSubTest'
 });
 var o = PubSubTest.create();
 // Install a listener that listens to all events
 o.subscribe(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
-o.subscribe('fire', function() { console.log('fire: ', [].join.call(arguments, ' ')); });
+o.subscribe('alarm', function() { console.log('fire: ', [].join.call(arguments, ' ')); });
+o.publish('alarm', 'on');
+o.publish('lifecycle', 'loaded');
+
+// A Class can declare 'Topics' that it publishes events for.
+foam.CLASS({
+  name: 'TopicTest',
+  topics: [ 'alarm' ]
+});
+var o = TopicTest.create();
+o.subscribe('alarm', function(state) { console.log('fire: ', state); });
+// The next line uses the Topic and is slightly shorter than the equivalent above.
+o.alarm.subscribe(function(state) { console.log('fire: ', state); });
+o.publish('on');
+
+// Objects implicitly publish events on the 'propertyChange' topic when
+foam.CLASS({
+  name: 'TopicTest',
+  properties: [ 'a', 'b' ]
+});
+// Listen for all propertyChange events:
 o.propertyChange.subscribe(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
+// Listen for only changes to the 'a' Property:
 o.propertyChange.subscribe('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
-o.publish('fire', 'alarm');
-
 o.a = 42;
-
 o.b = 'bar';
-
 o.a++;
 
 </script>
