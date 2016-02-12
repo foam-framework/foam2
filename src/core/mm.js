@@ -493,14 +493,14 @@ foam.CLASS({
       var factory         = this.factory;
       var hasDefaultValue = this.hasOwnProperty('defaultValue');
       var defaultValue    = this.defaultValue;
-      var slotName        = name + '$';
+      var dynName         = name + '$';
 
-      Object.defineProperty(proto, slotName, {
-        get: function propSlotGetter() {
-          return this.slot(name, slotName, prop);
+      Object.defineProperty(proto, dynName, {
+        get: function propDynGetter() {
+          return this.propertyDynamic(name, dynName, prop);
         },
-        set: function propSlotSetter(slot) {
-          this.slot(name, slotName, prop).link(slot);
+        set: function propDynSetter(dyn) {
+          this.propertyDynamic(name, dynName, prop).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -841,20 +841,21 @@ foam.CLASS({
     },
 
     /**
-      Creates a Slot for dynamic bindings to a property.
+      Creates a Dynamic for a property.
       @private
     */
-    function slot(name, opt_slotName, opt_prop) {
-      if ( ! opt_slotName ) opt_slotName = name + '$';
-      var slot = this.getPrivate_(opt_slotName);
-      if ( ! slot ) {
-        slot = PropertySlot.create(this, opt_prop || this.cls_.getAxiomByName(name));
-        this.setPrivate_(opt_slotName, slot);
+    function propertyDynamic(name, opt_dynName, opt_prop) {
+      if ( ! opt_dynName ) opt_dynName = name + '$';
+      var dyn = this.getPrivate_(opt_dynName);
+      if ( ! dyn ) {
+        dyn = PropertyDynamic.create(this, opt_prop || this.cls_.getAxiomByName(name));
+        this.setPrivate_(opt_dynName, dyn);
       }
-      return slot;
+      return dyn;
     }
   ]
 });
+
 
 /** An ArrayProperty whose elements are Axioms and are added to this.axioms. */
 foam.CLASS({
@@ -933,73 +934,6 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) { cls.installModel(global[this.path].model_); }
-  ]
-});
-
-
-// TODO: doc
-foam.CLASS({
-  name: 'Slot',
-  extends: null,
-
-  methods: [
-    /**
-      Link two Slots together, setting both to other's value.
-      Returns a Destroyable which can be used to break the link.
-    */
-    function link(other) {
-      var sub1 = this.follow(other);
-      var sub2 = other.follow(this);
-
-      return {
-        destroy: function() {
-          sub1.destroy();
-          sub2.destroy();
-        }
-      };
-    },
-
-    /**
-      Have this Slot dynamically follow other's value.
-      Returns a Destroyable which can be used to cancel the binding.
-    */
-    function follow(other) {
-      return other.subscribe(function() {
-        this.set(other.get());
-      }.bind(this));
-    }
-  ]
-});
-
-
-// TODO: doc
-foam.CLASS({
-  name: 'PropertySlot',
-  extends: 'Slot',
-
-  methods: [
-    function initArgs(obj, prop) {
-      this.obj  = obj;
-      this.prop = prop;
-    },
-    function get() {
-      return this.prop.get(this.obj);
-    },
-    function set(value) {
-      return this.prop.set(this.obj, value);
-    },
-    function subscribe(l) {
-      return this.obj.subscribe('propertyChange', this.prop.name, l);
-    },
-    function unsubscribe(l) {
-      this.obj.unsubscribe('propertyChange', this.prop.name, l);
-    },
-    function isDefined() {
-      return this.obj.hasOwnProperty(this.prop.name);
-    },
-    function clear() {
-      this.obj.clearProperty(this.prop.name);
-    }
   ]
 });
 
@@ -1159,6 +1093,7 @@ foam.CLASS({
   ]
 });
 
+
 /** Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   name: 'Model',
@@ -1241,7 +1176,6 @@ foam.CLASS({
 });
 
 
-
 foam.CLASS({
   name: 'FObject',
 
@@ -1307,6 +1241,73 @@ foam.CLASS({
 });
 
 foam.boot.end();
+
+
+// TODO: doc
+foam.CLASS({
+  name: 'Dynamic',
+  extends: null,
+
+  methods: [
+    /**
+      Link two Dynamics together, setting both to other's value.
+      Returns a Destroyable which can be used to break the link.
+    */
+    function link(other) {
+      var sub1 = this.follow(other);
+      var sub2 = other.follow(this);
+
+      return {
+        destroy: function() {
+          sub1.destroy();
+          sub2.destroy();
+        }
+      };
+    },
+
+    /**
+      Have this Dynamic dynamically follow other's value.
+      Returns a Destroyable which can be used to cancel the binding.
+    */
+    function follow(other) {
+      return other.subscribe(function() {
+        this.set(other.get());
+      }.bind(this));
+    }
+  ]
+});
+
+
+// TODO: doc
+foam.CLASS({
+  name: 'PropertyDynamic',
+  extends: 'Dynamic',
+
+  methods: [
+    function initArgs(obj, prop) {
+      this.obj  = obj;
+      this.prop = prop;
+    },
+    function get() {
+      return this.prop.get(this.obj);
+    },
+    function set(value) {
+      return this.prop.set(this.obj, value);
+    },
+    function subscribe(l) {
+      return this.obj.subscribe('propertyChange', this.prop.name, l);
+    },
+    function unsubscribe(l) {
+      this.obj.unsubscribe('propertyChange', this.prop.name, l);
+    },
+    function isDefined() {
+      return this.obj.hasOwnProperty(this.prop.name);
+    },
+    function clear() {
+      this.obj.clearProperty(this.prop.name);
+    }
+  ]
+});
 
 
 /**  TODO:
