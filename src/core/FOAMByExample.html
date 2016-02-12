@@ -105,6 +105,34 @@ log(o.hasOwnProperty('a'), o.a);
 o.clearProperty('a');
 log(o.hasOwnProperty('a'), o.a);
 
+// factories
+
+// getters and setters
+// Properties can define their own getter and setter functions.
+foam.CLASS({
+  name: 'GetterSetter',
+  properties: [
+    'radius',
+    {
+      name: 'diameter',
+      getter: function() { return this.radius * 2; },
+      setter: function(diameter) { this.radius = diameter / 2; }
+    }
+  ]
+});
+var o = GetterSetter.create();
+o.diameter = 10;
+log(o.radius, o.diameter);
+o.radius = 10;
+log(o.radius, o.diameter);
+
+// adapt
+
+// preSet
+
+// postSet
+
+
 // Classes can be subclassed with 'extends:'.
 // Methods in subclasses can override methods from ancestor classes, as is 
 // done below with toString().  Employee.toString() calls its parent classes
