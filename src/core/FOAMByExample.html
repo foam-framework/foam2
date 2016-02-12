@@ -287,6 +287,38 @@ o.subscribe(foam.events.oneTime(function() { console.log.apply(console.log, argu
 o.publish('fire');
 o.publish("fire again, but nobody's listenering");
 
+// DynamicValues are like Object-Oriented pointers.
+// A properties dynamic-value is accessed as 'name'$.
+// get() is used to dereference the value of a dynamic
+var p = Person.create({name: 'Bob'});
+var dyn = p.name$;
+log(dyn.get());
+
+// set() is used to set a dynamic's value:
+dyn.set('John');
+log(p.name, dyn.get());
+
+// Dynamic values can be assigned, causing two values to be
+// bound to the same value.
+var p1 = Person.create(), p2 = Person.create();
+p1.name$ = p2.name$;
+p1.name = 'John';
+log(p1.name, p2.name);
+p2.name = 'Steve';
+log(p1.name, p2.name);
+
+// Another way to link to Dynamics is to call .link() on one of them.
+var p1 = Person.create(), p2 = Person.create();
+var d = p1.name$.link(p2.name$);
+p1.name = 'John';
+log(p1.name, p2.name);
+
+// But this style of link can be broken by calling .destroy()
+// on the object return from .link().
+d.destroy();
+p2.name = 'Steve';
+log(p1.name, p2.name);
+
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
 var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
