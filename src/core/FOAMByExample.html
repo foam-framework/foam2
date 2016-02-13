@@ -61,6 +61,10 @@ o.a++;
 o.b = 'bar';
 log(o.a, o.b);
 
+// Multiple properties can be updated at once using copyFrom().
+o.copyFrom({a: 42, b: 'rosebud'});
+log(o.a, o.b);
+
 // Call toString on an object
 log(o.toString());
 
@@ -234,8 +238,6 @@ log(FObject.isSubClass(Employee), FObject.isSubClass(Person));
 // TODO: mergeDelay
 
 // TODO: isFramed
-
-// TODO: .copyFrom()
 
 // TODO: propertyDynamic
 
