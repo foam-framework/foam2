@@ -213,7 +213,11 @@ log(e.toString());
 // Test if one class is a sub-class of another:
 log(Person.isSubClass(Employee), Employee.isSubClass(Person));
 
-// TODO: FObjects is the root object
+// A Class is considered a sub-class of itself:
+log(Person.isSubClass(Person));
+
+// FObject is the root class of all other classes:
+log(FObject.isSubClass(Employee), FObject.isSubClass(Person));
 
 // TODO: BooleanProperty
 
