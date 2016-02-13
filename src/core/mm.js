@@ -482,7 +482,7 @@ foam.CLASS({
       var name = this.name;
       var f = this.f = function f(o) { return o[name]; };
       c[foam.string.constantize(this.name)] = this;
-      
+
       /** Makes this Property a comparator, suitable for use with mLangs. */
       var comparePropertyValues = this.comparePropertyValues;
       this.compare = function compare(o1, o2) {
@@ -908,11 +908,18 @@ foam.CLASS({
   properties: [ 'name', 'value' ],
 
   methods: [
-    function installInClass(cls)   {
-      cls[foam.string.constantize(this.name)] = this.value;
+    function installInClass(cls) {
+      Object.defineProperty(
+        cls,
+        foam.string.constantize(this.name),
+        {
+          value: this.value,
+          enumerable: false,
+          configurable: false
+        });
     },
     function installInProto(proto) {
-      proto[foam.string.constantize(this.name)] = this.value;
+      this.installInClass(proto);
     }
   ]
 });
