@@ -167,6 +167,24 @@ log(o.radius, o.diameter);
 
 // postSet
 
+// Classes can also define Constnts.
+foam.CLASS({
+  name: 'ConstantTest',
+  constants: {
+    MEANING_OF_LIFE: 42,
+    FAVOURITE_COLOR: 'green'
+  }
+});
+var o = ConstantTest.create();
+log(o.MEANING_OF_LIFE, o.FAVOURITE_COLOR);
+
+// Constants can also be accessed from the Class
+log(ConstantTest.MEANING_OF_LIFE, ConstantTest.FAVOURITE_COLOR);
+log(o.cls_.MEANING_OF_LIFE, o.cls_.FAVOURITE_COLOR);
+
+// Constants are constant
+o.MEANING_OF_LIFE = 43;
+log(o.MEANING_OF_LIFE);
 
 // Classes can be subclassed with 'extends:'.
 // Methods in subclasses can override methods from ancestor classes, as is
@@ -212,8 +230,6 @@ log(Person.isSubClass(Employee), Employee.isSubClass(Person));
 // TODO: mergeDelay
 
 // TODO: isFramed
-
-// TODO: Constants
 
 // TODO: .copyFrom()
 
