@@ -169,7 +169,7 @@ log(o.radius, o.diameter);
 
 
 // Classes can be subclassed with 'extends:'.
-// Methods in subclasses can override methods from ancestor classes, as is 
+// Methods in subclasses can override methods from ancestor classes, as is
 // done below with toString().  Employee.toString() calls its parent classes
 // toString() method by calling 'this.SUPER()'.
 foam.CLASS({
@@ -216,8 +216,6 @@ log(Person.isSubClass(Employee), Employee.isSubClass(Person));
 // TODO: Constants
 
 // TODO: .copyFrom()
-
-// TODO: .follow();
 
 // TODO: propertyDynamic
 
@@ -310,7 +308,7 @@ o.publish("fire again, but nobody's listenering");
 // 3. Destroy the subscription, which is supplied to the listener
 var l = function(sub) {
   sub.destroy();
-  console.log.apply(console.log, arguments); 
+  console.log.apply(console.log, arguments);
 };
 o.subscribe(l);
 o.publish('fire');
@@ -334,6 +332,7 @@ log(dyn.get());
 dyn.set('John');
 log(p.name, dyn.get());
 
+// Two-Way Data-Binding
 // Dynamic values can be assigned, causing two values to be
 // bound to the same value.
 var p1 = Person.create(), p2 = Person.create();
@@ -353,6 +352,16 @@ log(p1.name, p2.name);
 // on the object return from .link().
 d.destroy();
 p2.name = 'Steve';
+log(p1.name, p2.name);
+
+// One-Way Data-Binding
+// Calling .link() creates a two-way data-binding, meaning a change in either
+// value is reflected in the other.  But FOAM supports one-way data-binding as well.
+// To do this, use the .follow() method.
+var d = p1.name$.follow(p2.name$);
+p2.name = 'Ringo'; // Will update p1 and p2
+log(p1.name, p2.name);
+p2.name = 'George'; // Will only update p2
 log(p1.name, p2.name);
 
 // Contexts can be explicitly created with foam.sub()
