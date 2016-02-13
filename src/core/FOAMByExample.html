@@ -400,6 +400,26 @@ console.log(Y2.key, Y2.fn());
 Y1.describe();
 Y2.describe();
 
+// Stdlib
+
+// TODO: $UID
+
+// TODO: foam.array.argsToArray
+
+// TODO: foam.events.consoleLog
+
+// TODO: foam.fn.memoize1
+
+// TODO: foam.string.constantize
+
+// foam.string.pad() pads a string to the specified length.
+var s = foam.string.pad('foobar', 10);
+log(s, s.length);
+
+// foam.string.pad() pads a string to the specified length, right justifying if given a negative number.
+var s = foam.string.pad('foobar', -10);
+log(s, s.length);
+
 </script>
 
   <div id='output'></div>
@@ -419,10 +439,10 @@ Y2.describe();
     console.log.json = oldLog.json;
     var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
-    var s = demo.textContent.split('\n\n');
-    for ( var i = 0 ; i < s.length ; i++ ) {
-      var line = s[i];
-      log_(' <h3>Test ' + (i+1) + '</h3><code>' + line + '</code><br>');
+    var s_ = demo.textContent.split('\n\n');
+    for ( var i = 0 ; i < s_.length ; i++ ) {
+      var line = s_[i];
+      log_(' <h3>Example ' + (i+1) + '</h3><code>' + line + '</code><br>');
       eval(line);
       log_('');
     }
