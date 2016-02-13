@@ -410,7 +410,10 @@ Y2.describe();
 
 // TODO: foam.fn.memoize1
 
-// TODO: foam.string.constantize
+// foam.string.constantize converts strings from camelCase to CONSTANT_FORMAT
+log(foam.string.constantize('foo'));
+log(foam.string.constantize('fooBar'));
+log(foam.string.constantize('fooBar12'));
 
 // foam.string.pad() pads a string to the specified length.
 var s = foam.string.pad('foobar', 10);
