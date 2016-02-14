@@ -464,7 +464,10 @@ Y2.describe();
 
 // Stdlib
 
-// TODO: $UID
+// All Objects have a unique identifier, accessible with the .$UID property.
+var a = {}, b = [], c = Person.create();
+log(a.$UID, b.$UID, c.$UID);
+log(a.$UID, b.$UID, c.$UID);
 
 // TODO: foam.array.argsToArray
 
@@ -518,9 +521,9 @@ log(s, s.length);
     var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
     var s_ = demo.textContent.split('\n\n');
-    for ( var i = 0 ; i < s_.length ; i++ ) {
-      var line = s_[i];
-      log_(' <h3>Example ' + (i+1) + '</h3><code>' + line + '</code><br>');
+    for ( var i_ = 0 ; i_ < s_.length ; i_++ ) {
+      var line = s_[i_];
+      log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
       try {
         eval(line);
       } catch (x) {
