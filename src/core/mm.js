@@ -118,6 +118,8 @@ foam.LIB({
 
       obj.initArgs.apply(obj, arguments);
 
+      obj.init && obj.init();
+
       return obj;
     },
 
@@ -926,6 +928,38 @@ foam.CLASS({
 
 
 /**
+<pre>
+  Ex.
+  constants: {
+    KEY: 'some value'
+  }
+
+  this.cls_.KEY === this.KEY === 'some value'
+</pre>
+*/
+foam.CLASS({
+  name: 'InnerClass',
+
+  documentation: 'Inner-Class Axiom',
+
+  properties: [
+    {
+      name: 'model',
+      adapt: function(_, m) {
+        // TODO: Not needed once we have ObjectProperties
+        return (Model.isInstance(m) ? m : Model.create(m)).getClass();
+      }
+    }
+  ],
+
+  methods: [
+    function installInClass(cls) { cls[this.model.name] = this.model; },
+    function installInProto(proto) { this.installInClass(proto); }
+  ]
+});
+
+
+/**
   Traits provide a safe form multiple-inheritance.
 <pre>
   Ex.
@@ -1131,6 +1165,14 @@ foam.CLASS({
         return typeof o === 'string' ?
           Trait.create({path: o})    :
           Trait.create(o)            ;
+      }
+    },
+    {
+      type: 'AxiomArray',
+      subType: 'InnerClass',
+      name: 'classes',
+      adaptArrayElement: function(o) {
+        return InnerClass.isInstance(o) ? o : InnerClass.create({model: o});
       }
     },
     {
