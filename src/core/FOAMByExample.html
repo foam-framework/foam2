@@ -292,6 +292,30 @@ foam.CLASS({
 });
 TraitTest2.describe();
 
+// Classes can have inner-Classes.
+foam.CLASS({
+  name: 'InnerClassTest',
+  classes: [
+    { name: 'InnerClass1', properties: ['a', 'b'] },
+    { name: 'InnerClass2', properties: ['x', 'y'] }
+  ],
+  methods: [
+    function init() {
+      var ic1 = this.InnerClass1.create({a:1, b:2});
+      var ic2 = this.InnerClass2.create({x:5, y:10});
+      log(ic1.a, ic1.b, ic2.x, ic2.y);
+    }
+  ]
+});
+InnerClassTest.create();
+
+// Inner-classes can also be accessed from the outer-class
+InnerClassTest.InnerClass1.describe();
+
+// Inner-classes do not appear in the global namespace
+// TODO: isn't true yet
+log(! InnerClass1);
+
 // Objects support publish() for publishing events,
 // and subscribe() for listening for published events.
 foam.CLASS({
