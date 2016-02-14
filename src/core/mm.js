@@ -947,13 +947,15 @@ foam.CLASS({
       name: 'model',
       adapt: function(_, m) {
         // TODO: Not needed once we have ObjectProperties
-        return (Model.isInstance(m) ? m : Model.create(m)).getClass();
+        return Model.isInstance(m) ? m : Model.create(m);
       }
     }
   ],
 
   methods: [
-    function installInClass(cls) { cls[this.model.name] = this.model; },
+    function installInClass(cls) {
+      cls[this.model.name] = this.model.getClass();
+    },
     function installInProto(proto) { this.installInClass(proto); }
   ]
 });
