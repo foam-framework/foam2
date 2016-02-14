@@ -276,6 +276,22 @@ tt.describe();
 tt.tfoo(); // From SampleTrait
 tt.foo();
 
+// Unlike regular inheritance with extends:, classes
+// can inherit from multiple traits.
+foam.CLASS({
+  name: 'SampleTrait2',
+  properties: [ 'tb1', 'tb2', 'tb3' ],
+  methods: [
+    function tbfoo() { console.log('ffoo'); },
+    function tbbar() { console.log('tbar'); }
+  ]
+});
+foam.CLASS({
+  name: 'TraitTest2',
+  traits: ['SampleTrait', 'SampleTrait2']
+});
+TraitTest2.describe();
+
 // Objects support publish() for publishing events,
 // and subscribe() for listening for published events.
 foam.CLASS({
@@ -448,7 +464,7 @@ log(s, s.length);
       document.body.insertAdjacentHTML('beforeend', o + '<br/>');
     }
     var oldLog = console.log;
-    console.assert = function(b, e) { if ( ! b ) log('Assertian failed:', e); throw 'assert'; };
+    console.assert = function(b, e) { if ( ! b ) { log('Assertian failed:', e); throw 'assert'; } };
     console.log = function() { log_([].join.call(arguments, ' ')); };
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
@@ -459,7 +475,11 @@ log(s, s.length);
     for ( var i = 0 ; i < s_.length ; i++ ) {
       var line = s_[i];
       log_(' <h3>Example ' + (i+1) + '</h3><code>' + line + '</code><br>');
-      try { eval(line); } catch (x) { }
+      try {
+        eval(line);
+      } catch (x) {
+        log('Exception: ', x);
+      }
       log_('');
     }
   </script>
