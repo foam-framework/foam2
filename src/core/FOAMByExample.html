@@ -240,7 +240,21 @@ log(FObject.isSubClass(Employee), FObject.isSubClass(Person));
 
 // TODO: ArrayProperty
 
-// TODO: Listeners
+// Listeners are pre-bound Methods, suitable for use as callbacks (DOM, or otherwise).
+foam.CLASS({
+  name: 'ListenerTest',
+  properties: [ 'name' ],
+  methods: [ function m1() { console.log('m1', this.name); } ],
+  listeners: [ function l1() { console.log('l1', this.name); } ]
+});
+var o = ListenerTest.create({name: 'Steve'});
+// When called as methods, the same as Methods.
+log(o.m1(), o.l1());
+
+// But when called as functions, the method forgets its 'self' and doesn't work,
+// but the listener does.
+var m = o.m1, l = o.l1;
+log(m(), l());
 
 // TODO: isMerged
 
