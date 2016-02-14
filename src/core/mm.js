@@ -1385,12 +1385,8 @@ foam.CLASS({
 /**  TODO:
   - support class: instead of type:
   - "ofClass" instead of "subType"
-  - propertyChange publishes DynamicValue instead of oldValue, newValue
-  - add getOld() to DynamicValue
-  - foam.X root context
   - more docs
   - DynamicValue map() and relate() methods
-  - distinguish new CLASS from EXTENSION
   - package support
   - imports / exports
   - listener decorators
@@ -1400,4 +1396,26 @@ foam.CLASS({
   - Proxy id, name, package, label, plural from Class to Model
   - ID support
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
+*/
+
+/*
+  - distinguish new CLASS from EXTENSION
+
+foam.EXTENSION({
+  name: 'ProtobufSupport',
+
+  classes: [
+    {
+      name: 'Model',
+
+      ...
+    },
+    {
+      name: 'Property',
+
+      ...
+    }
+  ]
+});
+
 */
