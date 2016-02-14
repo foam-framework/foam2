@@ -91,6 +91,14 @@ log(Test.getAxiomsByClass(Method).map(Method.NAME.f));
 // Property constants contain comparators
 log(Test.getAxiomsByClass(Method).sort(Method.NAME.compare).map(Method.NAME.f));
 
+// If a Class defineds an init() method, itss called
+// when an object is created. 
+foam.CLASS({
+  name: 'InitTest',
+  methods: [ function init() { log('Just Born!'); } ]
+});
+InitTest.create();
+
 // Default Values can be defined for Properties
 foam.CLASS({
   name: 'DefaultValueTest',
