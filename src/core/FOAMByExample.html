@@ -91,6 +91,14 @@ log(Test.getAxiomsByClass(Method).map(Method.NAME.f));
 // Property constants contain comparators
 log(Test.getAxiomsByClass(Method).sort(Method.NAME.compare).map(Method.NAME.f));
 
+// If a Class defineds an init() method, itss called
+// when an object is created. 
+foam.CLASS({
+  name: 'InitTest',
+  methods: [ function init() { log('Just Born!'); } ]
+});
+InitTest.create();
+
 // Default Values can be defined for Properties
 foam.CLASS({
   name: 'DefaultValueTest',
@@ -232,7 +240,21 @@ log(FObject.isSubClass(Employee), FObject.isSubClass(Person));
 
 // TODO: ArrayProperty
 
-// TODO: Listeners
+// Listeners are pre-bound Methods, suitable for use as callbacks (DOM, or otherwise).
+foam.CLASS({
+  name: 'ListenerTest',
+  properties: [ 'name' ],
+  methods: [ function m1() { console.log('m1', this.name); } ],
+  listeners: [ function l1() { console.log('l1', this.name); } ]
+});
+var o = ListenerTest.create({name: 'Steve'});
+// When called as methods, the same as Methods.
+log(o.m1(), o.l1());
+
+// But when called as functions, the method forgets its 'self' and doesn't work,
+// but the listener does.
+var m = o.m1, l = o.l1;
+log(m(), l());
 
 // TODO: isMerged
 
@@ -277,6 +299,46 @@ var tt = TraitTest.create({p1:1, t1:2});
 tt.describe();
 tt.tfoo(); // From SampleTrait
 tt.foo();
+
+// Unlike regular inheritance with extends:, classes
+// can inherit from multiple traits.
+foam.CLASS({
+  name: 'SampleTrait2',
+  properties: [ 'tb1', 'tb2', 'tb3' ],
+  methods: [
+    function tbfoo() { console.log('ffoo'); },
+    function tbbar() { console.log('tbar'); }
+  ]
+});
+foam.CLASS({
+  name: 'TraitTest2',
+  traits: ['SampleTrait', 'SampleTrait2']
+});
+TraitTest2.describe();
+
+// Classes can have inner-Classes.
+foam.CLASS({
+  name: 'InnerClassTest',
+  classes: [
+    { name: 'InnerClass1', properties: ['a', 'b'] },
+    { name: 'InnerClass2', properties: ['x', 'y'] }
+  ],
+  methods: [
+    function init() {
+      var ic1 = this.InnerClass1.create({a:1, b:2});
+      var ic2 = this.InnerClass2.create({x:5, y:10});
+      log(ic1.a, ic1.b, ic2.x, ic2.y);
+    }
+  ]
+});
+InnerClassTest.create();
+
+// Inner-classes can also be accessed from the outer-class
+InnerClassTest.InnerClass1.describe();
+
+// Inner-classes do not appear in the global namespace
+// TODO: isn't true yet
+log(! InnerClass1);
 
 // Objects support publish() for publishing events,
 // and subscribe() for listening for published events.
@@ -404,7 +466,10 @@ Y2.describe();
 
 // Stdlib
 
-// TODO: $UID
+// All Objects have a unique identifier, accessible with the .$UID property.
+var a = {}, b = [], c = Person.create();
+log(a.$UID, b.$UID, c.$UID);
+log(a.$UID, b.$UID, c.$UID);
 
 // TODO: foam.array.argsToArray
 
@@ -450,7 +515,7 @@ log(s, s.length);
       document.body.insertAdjacentHTML('beforeend', o + '<br/>');
     }
     var oldLog = console.log;
-    console.assert = function(b, e) { if ( ! b ) log('Assertian failed:', e); throw 'assert'; };
+    console.assert = function(b, e) { if ( ! b ) { log('Assertian failed:', e); throw 'assert'; } };
     console.log = function() { log_([].join.call(arguments, ' ')); };
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
@@ -458,10 +523,14 @@ log(s, s.length);
     var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
     var s_ = demo.textContent.split('\n\n');
-    for ( var i = 0 ; i < s_.length ; i++ ) {
-      var line = s_[i];
-      log_(' <h3>Example ' + (i+1) + '</h3><code>' + line + '</code><br>');
-      try { eval(line); } catch (x) { }
+    for ( var i_ = 0 ; i_ < s_.length ; i_++ ) {
+      var line = s_[i_];
+      log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
+      try {
+        eval(line);
+      } catch (x) {
+        log('Exception: ', x);
+      }
       log_('');
     }
   </script>
