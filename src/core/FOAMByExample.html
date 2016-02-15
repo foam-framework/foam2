@@ -92,7 +92,7 @@ log(Test.getAxiomsByClass(Method).map(Method.NAME.f));
 log(Test.getAxiomsByClass(Method).sort(Method.NAME.compare).map(Method.NAME.f));
 
 // If a Class defineds an init() method, itss called
-// when an object is created. 
+// when an object is created.
 foam.CLASS({
   name: 'InitTest',
   methods: [ function init() { log('Just Born!'); } ]
@@ -270,10 +270,6 @@ log(m(), l());
 
 // subscribe
 
-// isDefined
-
-// clear()
-
 // In addition to class-inheritance, FOAM also supports
 // 'Traits', which are a form of multiple-inheritance which
 // copy Axioms from another model.
@@ -450,6 +446,20 @@ p2.name = 'Ringo'; // Will update p1 and p2
 log(p1.name, p2.name);
 p2.name = 'George'; // Will only update p2
 log(p1.name, p2.name);
+
+// Dynamic Values also let you check if the value is defined by calling isDefined().
+// Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
+foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', defaultValue: 42 } ]});
+var o = IsDefinedTest.create();
+var dv = o.a$;
+log(dv.isDefined());
+dv.set(99);
+log(dv.isDefined());
+
+// You can reset a Dynamic Value to its default value by calling .clear().
+// Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
+dv.clear();
+log(dv.get(), dv.isDefined());
 
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
