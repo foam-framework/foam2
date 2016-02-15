@@ -174,11 +174,11 @@ log(o.radius, o.diameter);
 o.radius = 10;
 log(o.radius, o.diameter);
 
-// adapt
+// TODO: adapt
 
-// preSet
+// TODO: preSet
 
-// postSet
+// TODO: postSet
 
 // Classes can also define Constnts.
 foam.CLASS({
@@ -266,9 +266,9 @@ log(m(), l());
 
 // TODO: ability to augment an existing Class(es), foam.ENHANCE()
 
-// getPrev
+// TODO: getPrev
 
-// subscribe
+// TODO: subscribe
 
 // In addition to class-inheritance, FOAM also supports
 // 'Traits', which are a form of multiple-inheritance which
@@ -481,7 +481,10 @@ var a = {}, b = [], c = Person.create();
 log(a.$UID, b.$UID, c.$UID);
 log(a.$UID, b.$UID, c.$UID);
 
-// TODO: foam.array.argsToArray
+// foam.array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
+(function() {
+  log(Array.isArray(arguments), Array.isArray(foam.array.argsToArray(arguments)));
+})();
 
 // TODO: foam.events.consoleLog
 
