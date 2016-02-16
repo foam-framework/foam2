@@ -486,7 +486,13 @@ log(a.$UID, b.$UID, c.$UID);
   log(Array.isArray(arguments), Array.isArray(foam.array.argsToArray(arguments)));
 })();
 
-// TODO: foam.events.consoleLog
+// foam.events.consoleLog
+foam.CLASS({name: 'ConsoleLogTest'});
+var o = ConsoleLogTest.create();
+o.subscribe(foam.events.consoleLog());
+o.publish();
+o.publish('foo');
+o.publish('foo','bar');
 
 // foam.fn.memoize1() memozies a one-argument function so that if called again
 // with the same argument, the previously generated value will be returned

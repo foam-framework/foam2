@@ -136,7 +136,7 @@ foam.LIB({
       return function() {
         var args = foam.array.argsToArray(arguments);
         console.log(args);
-        listener.apply(this, args);
+        listener && listener.apply(this, args);
       };
     }
   ]
