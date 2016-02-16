@@ -22,12 +22,12 @@
   or
 
   /** Comment before * /
-  foam.CLASS({ 
+  foam.CLASS({
     name: 'myClass',
     documentation: "or docs inside",
   })
 
-  or 
+  or
 
   methods: [
     /** Comment before * /
@@ -36,21 +36,30 @@
 
   ** Note on docs inside a function **
   To enable this:
-    function aMethod() { 
+    function aMethod() {
       /** doc as first comment in function * /
       func contents...
     }
 
-  you have to modify JSDocs to enable internal 
-  function comments. In astbuilder.js, 
-  CommentAttacher.prototype.visit, Comment out 
+  you have to modify JSDocs to enable internal
+  function comments. In astbuilder.js,
+  CommentAttacher.prototype.visit, Comment out
   canAcceptComment (so that all comments are left in):
   if ( isEligible /*&& canAcceptComment(node)* / ) {
 
 
 */
 
+// arg type extraction uses foam to parse out the types
+var fs = require('fs');
+var foam1 = require('../../src/core/stdlib.js');
+var foam2 = require('../../src/core/mm.js');
+var foam3 = require('../../src/core/types.js');
 
+// var foam;
+// (function() {
+//   var file = fs.readFileSync('../../src/core/mm.js', 'utf-8');
+// })();
 
 var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   if ( node.properties ) {
@@ -58,6 +67,17 @@ var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
       var p = node.properties[i];
       if ( p.key && p.key.name == propName ) {
         return ( p.value && p.value.value ) || '';
+      }
+    }
+  }
+  return '';
+}
+var getNodeNamed = function getNodeNamed(node, propName) {
+  if ( node.properties ) {
+    for (var i = 0; i < node.properties.length; ++i) {
+      var p = node.properties[i];
+      if ( p.key && p.key.name == propName ) {
+        return p.value;
       }
     }
   }
@@ -81,10 +101,10 @@ var getLeadingComment = function getLeadingComment(node) {
 
 var getFuncBodyComment = function getFuncBodyComment(node) {
   //console.log(node.body.body[0]);
-  if (  node.body && 
-        node.body.body && 
-        node.body.body[0] && 
-        node.body.body[0].leadingComments ) {    
+  if (  node.body &&
+        node.body.body &&
+        node.body.body[0] &&
+        node.body.body[0].leadingComments ) {
     return node.body.body[0].leadingComments[0].raw;
   }
   return '';
@@ -101,11 +121,11 @@ var getComment = function getComment(node) {
   else if ( node.type === 'FunctionExpression' ) {
     var comment = getFuncBodyComment(node);
     if ( comment ) return comment;
-  } 
-  
+  }
+
   // fall back on standard JSDoc leading comment blocks
   return getLeadingComment(node);
-  
+
 }
 
 var getCLASSName = function getCLASSName(node) {
@@ -119,15 +139,63 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
   var idx = comment.lastIndexOf('*/');
   return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
 }
+
+var replaceCommentArg = function replaceCommentArg(comment, name, type) {
+  // if the @arg is defined in the comment, add the type, otherwise insert
+  // the @arg directive.
+  var found = false;
+  var ret = comment.replace(
+    new RegExp('(@param|@arg)\\s*({.*?})?\\s*'+name+'\\s', 'gm'),
+    function(match, p1, p2) {
+      found = true;
+      if ( p2 ) return match; // a type was specified, abort
+      return p1 + " {" + type + "} " + name + " ";
+    }
+  );
+
+  if ( found ) return ret;
+  return insertIntoComment(comment, "\n@arg {"+type+"} "+name);
+}
+
+
+var files = {};
+var getSourceString = function getSourceString(filename, start, end) {
+  var file;
+  if ( ! files[filename] ) {
+    files[filename] = fs.readFileSync(filename, 'utf8');
+  }
+  file = files[filename];
+
+  return file.substring(start, end);
+}
+
+var processArgs = function processArgs(e, node) {
+   // extract arg types using FOAM
+  var src = getSourceString(e.filename, node.range[0], node.range[1]);
+  try {
+    var args = foam.types.getFunctionArgs(src);
+    for (var i = 0; i < args.length; ++i) {
+      var arg = args[i];
+      if ( arg.typeName ) {
+        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName);
+      }
+    }
+  } catch(err) {
+    console.log("Args not processed for ", err);
+  }
+}
+
+
+
 var i = 0;
 exports.astNodeVisitor = {
   visitNode: function(node, e, parser, currentSourceName) {
     //if (node.type == 'ObjectExpression') console.log("*****\n",node, "\nparent:", node.parent);
     //console.log(node.parent);
 
-    //if (20 ==  i++) console.log("parser: ",parser._astBuilder);
-    
-    // CLASS or LIB 
+    //if (20 ==  i++) console.log("file: ", getSourceString(currentSourceName, 1, 40));
+
+    // CLASS or LIB
     if (node.type === 'ObjectExpression' &&
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property &&
@@ -153,7 +221,6 @@ exports.astNodeVisitor = {
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
 
-
     } // function in an array (methods, todo: listeners, etc)
     else if (node.type === 'FunctionExpression' &&
       node.parent.type === 'ArrayExpression' &&
@@ -177,7 +244,8 @@ exports.astNodeVisitor = {
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
 
-      //console.log("found method", e);
+      processArgs(e, node);
+
     } // objects in an array (properties, methods, todo: others)
     else if (node.type === 'ObjectExpression' &&
       node.parent.type === 'ArrayExpression' &&
@@ -189,7 +257,7 @@ exports.astNodeVisitor = {
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node.properties[0]) || getComment(node),
-        ( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "" +
+        (( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "") +
           "\n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
@@ -203,7 +271,8 @@ exports.astNodeVisitor = {
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
 
-      //console.log("found prop parent", e.code.name, node.parent.elements);
+      if (node.parent.parent.key.name === 'methods')
+        processArgs(e, getNodeNamed(node, 'code'));
     }
   }
 };
