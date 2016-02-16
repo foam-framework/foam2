@@ -769,7 +769,7 @@ foam.CLASS({
       Publish a message to all matching subscribed listeners.
       Returns the number of listeners notified.
     */
-    function publish(/* args... */) {
+    function publish() { /* args... */
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
@@ -802,7 +802,7 @@ foam.CLASS({
       <p>Returns a "subscrition" which can be cancelled by calling
         its .destroy() method.
     */
-    function subscribe(/* args..., l */) {
+    function subscribe() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
@@ -831,7 +831,7 @@ foam.CLASS({
     },
 
     /** Unsubscribe a previously subscribed listener. */
-    function unsubscribe(/* args..., l */) {
+    function unsubscribe() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
