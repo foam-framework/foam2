@@ -48,7 +48,11 @@ foam.CLASS({
     {
       /** The index of the argument (the first argument is at index 0). */
       name: 'index', defaultValue: -1
-    }
+    },
+//     {
+//       /** The documentation associated with the argument (denoted by a // ) */
+//       name: 'documentation',
+//     }
   ],
 
   methods: [
@@ -98,12 +102,12 @@ foam.LIB({
   name: 'types',
 
   methods: [
-    /** Extracts the arguments and their types from the given function.
-      * @arg fn The function to extract from. The toString() of the function must be
-      *     accurate.
-      * @return An array of Argument objects.
-      */
     function getFunctionArgs(fn) {
+      /** Extracts the arguments and their types from the given function.
+        * @arg fn The function to extract from. The toString() of the function must be
+        *     accurate.
+        * @return An array of Argument objects.
+        */
       // strip newlines and find the function(...) declaration
       if ( null ) return;
       var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
