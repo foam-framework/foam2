@@ -340,8 +340,6 @@ log(m(), l());
 
 // TODO: isFramed
 
-// TODO: propertyDynamic
-
 // TODO: ability to augment an existing Class(es), foam.ENHANCE()
 
 // TODO: getPrev
@@ -492,6 +490,13 @@ log(dyn.get());
 // set() is used to set a dynamic's value:
 dyn.set('John');
 log(p.name, dyn.get());
+
+// Calling obj.propertyDynamcic('name') is the same as obj.name$.
+var p = Person.create({name: 'Bob'});
+var dyn = p.propertyDynamic('name');
+log(dyn.get());
+dyn.set('John');
+log(dyn.get());
 
 // Two-Way Data-Binding
 // Dynamic values can be assigned, causing two values to be
