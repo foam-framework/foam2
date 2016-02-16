@@ -522,22 +522,19 @@ foam.CLASS({
 
       // TODO: implement 'expression'
 
-      var getter = prop.getter ||
+      var getter =
+        prop.getter ? prop.getter :
         hasDefaultValue ? function defaultValueGetter() {
-          return this.instance_[name] || (this.instance_.hasOwnProperty(name) ? this.instance_[name] : defaultValue);
+          return this.hasOwnProperty(name) ?
+            this.instance_[name] :
+            defaultValue ;
         } :
         factory ? function factoryGetter() {
-          if ( ! this.hasOwnProperty(name) ) {
-            var value = factory.call(this);
-            this.instance_[name] = value;
-            return value;
-          }
-
-          return this.instance_[name];
+          return this.hasOwnProperty(name) ?
+            this.instance_[name] :
+            this.instance_[name] = factory.call(this) ;
         } :
-        function simpleGetter() {
-          return this.instance_[name];
-        };
+        function simpleGetter() { return this.instance_[name]; };
 
       Object.defineProperty(proto, name, {
         get: getter,
