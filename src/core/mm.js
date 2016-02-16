@@ -354,7 +354,8 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return Object.hasOwnProperty.call(this.instance_, name);
+      return typeof this.instance_[name] !== 'undefined' ||
+        Object.hasOwnProperty.call(this.instance_, name);
     },
 
     /**
@@ -377,7 +378,8 @@ foam.CLASS({
     },
 
     function hasOwnPrivate_(name) {
-      return this.private_ && this.private_.hasOwnProperty(name);
+      return this.private_ &&
+        ( typeof this.private_[name] !== 'undefined' || this.private_.hasOwnProperty(name) );
     },
 
     function publishPropertyChange() {
