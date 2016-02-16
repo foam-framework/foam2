@@ -174,11 +174,89 @@ log(o.radius, o.diameter);
 o.radius = 10;
 log(o.radius, o.diameter);
 
-// TODO: adapt
+// Properties can specify an 'adapt' function which is called whenever
+// the properties' value is updated. It's the adapt function's responsibility
+// to convert or coerce the type if necessary.
+// Both the previous value of the property and the proposed new value are
+// passed to adapt.  Adapt returns the desired new value, which may be different
+// from the newValue it's provided.
+foam.CLASS({
+  name: 'AdaptTest',
+  properties: [
+    {
+      name: 'flag',
+      adapt: function(oldValue, newValue) {
+        log('adapt ', oldValue, newValue);
+        // adapt to a boolean
+        return !! newValue;
+      }
+    }
+  ]
+});
+var o = AdaptTest.create({flag:true});
+o.flag = null;
+log(o.flag);
 
-// TODO: preSet
+// Properties can specify a 'preSet' function which is called whenever
+// the properties' value is updated, just after 'adpat', if present.
+// Both the previous value of the property and the proposed new value are
+// passed to preSet.  PreSet returns the desired new value, which may be different
+// from the newValue it's provided.
+foam.CLASS({
+  name: 'PreSetTest',
+  properties: [
+    {
+      name: 'a',
+      preSet: function(oldValue, newValue) {
+        log('preSet p1');
+        return 'Mr. ' + newValue;
+      }
+    }
+  ]
+});
+var o = PreSetTest.create({a: 'Smith'});
+o.a = 'Jones';
+log(o.a);
 
-// TODO: postSet
+// Properties can specify a 'postSet' function which is called after
+// the properties' value is updated.  PostSet has no return value.
+foam.CLASS({
+  name: 'PostSetTest',
+  properties: [
+    {
+      name: 'a',
+      postSet: function(oldValue, newValue) {
+        log('postSet', oldValue, newValue);
+      }
+    }
+  ]
+});
+var o = PostSetTest.create({a: 'Smith'});
+o.a = 'Jones';
+o.a = 'Green';
+
+// Properties can define 'adapt', 'preSet', and 'postSet' all at once.
+foam.CLASS({
+  name: 'AdaptPrePostTest',
+  properties: [
+    {
+      name: 'a',
+      adapt: function(oldValue, newValue) {
+        log('adapt: ', oldValue, newValue);
+        return newValue + 1;
+      },
+      preSet: function(oldValue, newValue) {
+        log('preSet: ', oldValue, newValue);
+        return newValue + 1;
+      },
+      postSet: function(oldValue, newValue) {
+        log('postSet: ', oldValue, newValue);
+      }
+    }
+  ]
+});
+var o = AdaptPrePostTest.create();
+o.n = 1;
 
 // Classes can also define Constnts.
 foam.CLASS({
