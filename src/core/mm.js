@@ -114,7 +114,7 @@ foam.LIB({
     */
     function create(/*args*/) {
       var obj = Object.create(this.prototype);
-      obj.instance_ = Object.create(null);
+      obj.instance_ = {};
 
       obj.initArgs.apply(obj, arguments);
 
@@ -522,20 +522,25 @@ foam.CLASS({
 
       // TODO: implement 'expression'
 
-      Object.defineProperty(proto, name, {
-        get: prop.getter || function propGetter() {
-          if ( ( hasDefaultValue || factory ) &&
-               ! this.hasOwnProperty(name) )
-          {
-            if ( hasDefaultValue ) return defaultValue;
-
+      var getter = prop.getter ||
+        hasDefaultValue ? function defaultValueGetter() {
+          return this.instance_[name] || (this.instance_.hasOwnProperty(name) ? this.instance_[name] : defaultValue);
+        } :
+        factory ? function factoryGetter() {
+          if ( ! this.hasOwnProperty(name) ) {
             var value = factory.call(this);
             this.instance_[name] = value;
             return value;
           }
 
           return this.instance_[name];
-        },
+        } :
+        function simpleGetter() {
+          return this.instance_[name];
+        };
+
+      Object.defineProperty(proto, name, {
+        get: getter,
         set: prop.setter || function propSetter(newValue) {
           // Get old value but avoid triggering factory if present
           var oldValue = factory ?
