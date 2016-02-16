@@ -460,6 +460,145 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
 });
 
+describe('Model.traits', function() {
+  var person;
+
+  beforeEachTest(function() {
+    foam.CLASS({
+      name: 'HelloBase',
+
+      methods: [
+        {
+          name: 'sayHello',
+          code: function() { this.result = 'Base hello '; }
+        },
+        {
+          name: 'sayGoodbye',
+          code: function() { this.result = 'Base bye '; }
+        },
+      ]
+    });
+
+
+    foam.CLASS({
+      name: 'SalariedTrait',
+
+      properties: [
+        {
+          name: 'salary',
+          defaultValue: 50000
+        }
+      ],
+
+      methods: [
+        {
+          name: 'sayHello',
+          code: function() { this.result = 'BIG HELLO '+this.name; }
+        },
+        {
+          name: 'sayGoodbye',
+          code: function() { this.result = 'BYE '+this.name; }
+        },
+      ]
+    });
+
+    foam.CLASS({
+      name: 'Person',
+      extends: 'HelloBase',
+      traits: [ 'SalariedTrait' ],
+
+      properties: [
+        {
+          type: 'String',
+          name: 'name'
+        },
+        'age',
+        {
+          name: 'result'
+        }
+      ],
+
+      methods: [
+        {
+          name: 'sayHello',
+          code: function() { this.result = 'hello '+this.name; }
+        },
+      ]
+    });
+    person = Person.create();
+  });
+  afterEach(function() {
+    person = null;
+  });
+
+  it('inherits methods', function() {
+    person.name = "Joe";
+    person.sayHello();
+    expect(person.result).toEqual("hello Joe"); // Person overrides everyone
+    person.sayGoodbye();
+    expect(person.result).toEqual("BYE Joe"); // SalariedTrait overrides HelloBase
+  });
+
+});
+
+describe('Model.classes', function() {
+  var innerSelf;
+
+  beforeEachTest(function() {
+
+    foam.CLASS({
+      name: 'Person',
+
+      classes: [
+        {
+          name: 'InnerSelf',
+          properties: [
+            'me','myself','i'
+          ],
+        }
+      ],
+
+      properties: [
+        {
+          type: 'String',
+          name: 'name'
+        },
+        'age',
+        {
+          name: 'result'
+        }
+      ],
+
+      methods: [
+        {
+          name: 'sayHello',
+          code: function() { this.result = 'hello '+this.name; }
+        },
+      ]
+    });
+
+  });
+  afterEach(function() {
+    innerSelf = null;
+  });
+
+  it('installs models', function() {
+    expect(/*X.*/Person.InnerSelf).not.toBeUndefined();
+  });
+
+  it('processes model properties', function() {
+    innerSelf = /*X.*/Person.InnerSelf.create({
+      me: 43,
+      myself: 'hello',
+      i: ''
+    });
+    expect(innerSelf.me).toEqual(43);
+    expect(innerSelf.myself).toEqual('hello');
+    expect(innerSelf.i).toEqual('');
+
+  });
+
+});
 
 
 describe('FObject white box test', function() {
