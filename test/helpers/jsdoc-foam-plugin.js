@@ -148,7 +148,6 @@ var replaceCommentArg = function replaceCommentArg(comment, name, type) {
     new RegExp('(@param|@arg)\\s*({.*?})?\\s*'+name+'\\s', 'gm'),
     function(match, p1, p2) {
       found = true;
-      console.log("found ", p1, p2);
       if ( p2 ) return match; // a type was specified, abort
       return p1 + " {" + type + "} " + name + " ";
     }
@@ -181,9 +180,8 @@ var processArgs = function processArgs(e, node) {
         e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName);
       }
     }
-    console.log("arg: ", e.comment);
-  } catch(e) {
-    console.log("Args not processed for ", e.node);
+  } catch(err) {
+    console.log("Args not processed for ", err);
   }
 }
 
@@ -275,8 +273,6 @@ exports.astNodeVisitor = {
 
       if (node.parent.parent.key.name === 'methods')
         processArgs(e, getNodeNamed(node, 'code'));
-
-      //console.log("found prop parent", e.code.name, node.parent.elements);
     }
   }
 };

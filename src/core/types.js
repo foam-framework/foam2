@@ -110,7 +110,6 @@ foam.LIB({
       if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
       args = args[2];
       if ( args ) {
-        console.log("Found args: ", args);
         args = args.split(',').map(function(name) { return name.trim(); });
       } else
         return [];
