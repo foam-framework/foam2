@@ -1,22 +1,53 @@
-/*
 
-var GLOBAL = global || this;
+var corePromise = global.loadCoreTo('core/mm.js');
+var beforeEachTest = function(callback) {
+  return beforeEach(function(done) {
+    corePromise.then(function() {
+      callback();
+      done();
+    });
+  });
+};
 
-var corePromise = GLOBAL.loadCoreTo('core/context.js');
 
 describe('ConteXt object', function() {
-  beforeEach(function(done) { corePromise.then(done); });
+  beforeEachTest(function() {
 
-  it('Expect global context to exist', function() {
-    expect(GLOBAL.X).toBeTruthy();
   });
 
-  it('Expect sub() to create empty prototype', function() {
-    var Y = GLOBAL.X.sub();
-    expect(Object.getPrototypeOf(Y)).toBe(GLOBAL.X);
-    expect(Object.getOwnPropertyNames(Y)).toEqual([]);
+  it('exists', function() {
+    expect(foam).toBeTruthy();
+    foam.lookup(); // TODO
+    foam.register(); // TODO
   });
 
+  it('subcontexts', function() {
+    var sub = foam.sub({ hello: 4 }, 'namey');
+    expect(sub.hello).toEqual(4);
+  });
+
+  it('subcontexts with dynamic values', function() {
+    foam.CLASS({ name: 'Tester',
+      properties: [ 'a' ]
+    });
+    var test = /*X.*/Tester.create({ a: 3 });
+    var sub = foam.sub({ hello$: test.a$ });
+
+    expect(sub.hello).toEqual(3);
+    test.a = 99;
+    expect(sub.hello).toEqual(99);
+
+  });
+
+  it('describes', function() {
+    foam.sub().describe();
+
+    foam.sub({ hello: 'thing', wee: /*X.*/Property.create() }, 'namey').describe();
+  });
+
+});
+
+/*
   it('Expect sub(args) to create appropriate context', function() {
     var newKey = '__new__';
     var newValue = {};
