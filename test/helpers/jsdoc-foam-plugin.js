@@ -31,21 +31,12 @@
 
   methods: [
     /** Comment before * /
-    function aMethod() {}
-  ]
-
-  ** Note on docs inside a function **
-  To enable this:
-    function aMethod() {
+    function aMethod() {},
+    function bMethod() {
       /** doc as first comment in function * /
       func contents...
     }
-
-  you have to modify JSDocs to enable internal
-  function comments. In astbuilder.js,
-  CommentAttacher.prototype.visit, Comment out
-  canAcceptComment (so that all comments are left in):
-  if ( isEligible /*&& canAcceptComment(node)* / ) {
+  ]
 
 
 */
