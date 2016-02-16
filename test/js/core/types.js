@@ -16,13 +16,13 @@ function makeTestFn() {
   foam.CLASS({  name: 'package.TypeC' });
   foam.CLASS({  name: 'RetType' });
   return function test(/* TypeA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
-    return RetType.create();
+    return (RetType.create());
   }
 }
 function makePrimitiveTestFn() { // multiline parsing, ha
 return function(/* string */ str, /*boolean*/ bool ,
   /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
-    return true;
+    return (true);
   }
 }
 
@@ -138,6 +138,18 @@ describe('Argument.validate', function() {
   });
   it('rejects wrong primitive types', function() {
     var params = foam.types.getFunctionArgs(makePrimitiveTestFn());
+
+    // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
+    expect(function() { params[0].validate(78); }).toThrow();
+    expect(function() { params[1].validate('nice'); }).toThrow();
+    expect(function() { params[2].validate({}); }).toThrow();
+    expect(function() { params[3].validate(function() {}); }).toThrow();
+    expect(function() { params[4].validate(false); }).toThrow();
+    expect(function() { params[5].validate({}); }).toThrow();
+  });
+
+  it('parses empty args list with tricky function body', function() {
+    var params = foam.types.getFunctionArgs(function() { (3+4); return (1); });
 
     // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
     expect(function() { params[0].validate(78); }).toThrow();
