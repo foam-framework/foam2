@@ -31,21 +31,12 @@
 
   methods: [
     /** Comment before * /
-    function aMethod() {}
-  ]
-
-  ** Note on docs inside a function **
-  To enable this:
-    function aMethod() {
+    function aMethod() {},
+    function bMethod() {
       /** doc as first comment in function * /
       func contents...
     }
-
-  you have to modify JSDocs to enable internal
-  function comments. In astbuilder.js,
-  CommentAttacher.prototype.visit, Comment out
-  canAcceptComment (so that all comments are left in):
-  if ( isEligible /*&& canAcceptComment(node)* / ) {
+  ]
 
 
 */
@@ -99,18 +90,23 @@ var getLeadingComment = function getLeadingComment(node) {
   return '';
 }
 
-var getFuncBodyComment = function getFuncBodyComment(node) {
-  //console.log(node.body.body[0]);
-  if (  node.body &&
-        node.body.body &&
-        node.body.body[0] &&
-        node.body.body[0].leadingComments ) {
-    return node.body.body[0].leadingComments[0].raw;
+var getFuncBodyComment = function getFuncBodyComment(node, filename) {
+  var src = getSourceString(filename, node.range[0], node.range[1]);
+  var matches = src.match(/function[^]*?\([^]*?\)[^]*?\{[^]*?(\/\*\*[^]*?\*\/)/);
+  if (matches && matches[1]) {
+    return matches[1];
+  } else {
+    if (  node.body &&
+          node.body.body &&
+          node.body.body[0] &&
+          node.body.body[0].leadingComments ) {
+      return node.body.body[0].leadingComments[0].raw;
+    }
+    return '';
   }
-  return '';
 }
 
-var getComment = function getComment(node) {
+var getComment = function getComment(node, filename) {
   // try for FOAM documentation property/in-function comment block
   // Object expression with documentation property
   var docProp = getNodePropertyNamed(node, 'documentation');
@@ -119,7 +115,7 @@ var getComment = function getComment(node) {
   }
   // function with potential block comment inside
   else if ( node.type === 'FunctionExpression' ) {
-    var comment = getFuncBodyComment(node);
+    var comment = getFuncBodyComment(node, filename);
     if ( comment ) return comment;
   }
 
@@ -205,7 +201,7 @@ exports.astNodeVisitor = {
       var classExt = getCLASSExtends(node);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
-        getComment(node),
+        getComment(node, currentSourceName),
         "\n@class " +
         (( classExt ) ? "\n@extends module:foam."+classExt : "") +
         "\n@memberof! module:foam"
@@ -230,7 +226,7 @@ exports.astNodeVisitor = {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
-        getComment(node),
+        getComment(node, currentSourceName),
         "\n@method \n@memberof! module:foam."+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
@@ -256,7 +252,7 @@ exports.astNodeVisitor = {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
-        getComment(node.properties[0]) || getComment(node),
+        getComment(node.properties[0], currentSourceName) || getComment(node, currentSourceName),
         (( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "") +
           "\n@memberof! module:foam."+parentClass + ".prototype"
       );
