@@ -524,7 +524,7 @@ log(p1.name, p2.name);
 var d = p1.name$.follow(p2.name$);
 p2.name = 'Ringo'; // Will update p1 and p2
 log(p1.name, p2.name);
-p2.name = 'George'; // Will only update p2
+p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
 
 // Dynamic Values also let you check if the value is defined by calling isDefined().
