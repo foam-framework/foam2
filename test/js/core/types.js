@@ -72,7 +72,6 @@ describe('foam.types.getFunctionArgs', function() {
   });
   it('reports arg parse failures', function() {
     fn = function(/* */ arg){};
-
     expect(function() { foam.types.getFunctionArgs(fn); }).toThrow();
   });
   it('reports return parse failures', function() {

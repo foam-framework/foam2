@@ -49,10 +49,10 @@ foam.CLASS({
       /** The index of the argument (the first argument is at index 0). */
       name: 'index', defaultValue: -1
     },
-//     {
-//       /** The documentation associated with the argument (denoted by a // ) */
-//       name: 'documentation',
-//     }
+    {
+      /** The documentation associated with the argument (denoted by a // ) */
+      name: 'documentation', defaultValue: ''
+    }
   ],
 
   methods: [
@@ -112,46 +112,48 @@ foam.LIB({
       var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
       if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
       args = args[2];
-      if ( args ) {
-        args = args.split(',').map(function(name) { return name.trim(); });
-      } else
-        return [];
+      if ( ! args ) return [];
+      args += ','; /// easier matching
 
       var ret = [];
       // check each arg for types
-      var index = 0;
-      args.forEach(function(arg) {
-        // Optional commented type(incl. dots for packages), argument name, optional commented return type
-        // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
-        var typeMatch = arg.match(/^\s*(\/\*\s*([\w._$]+)(\?)?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*/);
-        if ( typeMatch ) {
-          ret.push(/*X.*/Argument.create({
-            name: typeMatch[4],
-            typeName: typeMatch[2],
-            type: global[typeMatch[2]],
-            optional: typeMatch[3] == '?',
-            index: index++,
-          }));
-          // TODO: this is only valid on the last arg
-          if ( typeMatch[6] ) {
-            ret.returnType = /*X.*/ReturnValue.create({
-              typeName: typeMatch[6],
-              type: global[typeMatch[6]]
-            });
-          }
-        } else {
-          // check for bare return type with no args
-          typeMatch = arg.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
-          if ( typeMatch && typeMatch[1] ) {
-            ret.returnType = /*X.*/ReturnValue.create({
-              typeName: typeMatch[1],
-              type: global[typeMatch[1]]
-            });
-          } else {
-            throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
-          }
+      // Optional commented type(incl. dots for packages), argument name, optional commented return type
+      // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
+      //console.log('-----------------');
+      var argIdx = 0;
+      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
+      var typeMatch;
+      while ((typeMatch = argMatcher.exec(args)) !== null) {
+        // if can't match from start of string, fail
+        if ( argIdx == 0 && typeMatch.index > 0 ) break;
+
+        ret.push(/*X.*/Argument.create({
+          name: typeMatch[4],
+          typeName: typeMatch[2],
+          type: global[typeMatch[2]],
+          optional: typeMatch[3] == '?',
+          argIdx: argIdx++,
+        }));
+        // TODO: this is only valid on the last arg
+        if ( typeMatch[6] ) {
+          ret.returnType = /*X.*/ReturnValue.create({
+            typeName: typeMatch[6],
+            type: global[typeMatch[6]]
+          });
         }
-      });
+      }
+      if ( argIdx == 0 ) {
+        // check for bare return type with no args
+        typeMatch = args.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
+        if ( typeMatch && typeMatch[1] ) {
+          ret.returnType = /*X.*/ReturnValue.create({
+            typeName: typeMatch[1],
+            type: global[typeMatch[1]]
+          });
+        } else {
+          throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
+        }
+      }
 
       return ret;
     },
