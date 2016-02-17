@@ -260,10 +260,17 @@ foam.LIB({
       Create or Update a Prototype from a Model definition.
       (Model is 'this').
     */
+    // TODO: beter name
     function getClass() {
-      var cls = global[this.name];
+      var cls;
 
-      if ( ! cls ) {
+      if ( this.refines ) {
+        cls = global[this.refines];
+        console.assert(cls, 'Unknown refinement class: ' + this.refines);
+      } else {
+//        if ( global[this.name] )
+//          console.warn('Redefinition of class: ' + this.name);
+
         var parent = this.extends ? global[this.extends] : foam.AbstractClass ;
         // TODO: make some of these values non-enumerable
         cls                  = Object.create(parent);
@@ -299,8 +306,13 @@ foam.LIB({
       foam.CLASS = function(m) { return Model.create(m).getClass(); };
 
       // Upgrade existing classes to real classes.
-      for ( var i = 0 ; i < this.classes.length ; i++ )
-        foam.CLASS(this.classes[i].model_);
+      for ( var i = 0 ; i < this.classes.length ; i++ ) {
+        var m = this.classes[i].model_;
+        if ( m.name ) {
+        m.refines = m.name;
+        foam.CLASS(m);
+        } else console.log('skip ', m.refines);
+      }
     },
 
     /** Finish the bootstrap process, deleting foam.boot when done. */
@@ -408,6 +420,7 @@ foam.CLASS({
       name: 'extends',
       defaultValue: 'FObject'
     },
+    'refines',
     {
       name: 'axioms',
       factory: function() { return []; }
@@ -536,9 +549,8 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
-      Object.defineProperty(proto, name, {
-        get: getter,
-        set: prop.setter || function propSetter(newValue) {
+      var setter = prop.setter ||
+        function propSetter(newValue) {
           // Get old value but avoid triggering factory if present
           var oldValue = factory ?
             ( this.hasOwnProperty(name) ? this[name] : undefined ) :
@@ -555,7 +567,11 @@ foam.CLASS({
           // TODO: publish to a global topic to support dynamic()
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
-        },
+        };
+
+      Object.defineProperty(proto, name, {
+        get: getter,
+        set: setter,
         configurable: true
       });
     },
@@ -719,7 +735,7 @@ foam.boot.phase2();
 
 
 foam.CLASS({
-  name: 'FObject',
+  refines: 'FObject',
 
   documentation: 'Add listener support to FObject.',
 
@@ -960,7 +976,9 @@ foam.CLASS({
     function installInClass(cls) {
       cls[this.model.name] = this.model.getClass();
     },
-    function installInProto(proto) { this.installInClass(proto); }
+    function installInProto(proto) {
+      proto[this.model.name] = proto.cls_[this.model.name];
+    }
   ]
 });
 
@@ -1158,7 +1176,7 @@ foam.CLASS({
 
 /** Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
-  name: 'Model',
+  refines: 'Model',
 
   documentation: 'Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
@@ -1247,7 +1265,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  name: 'FObject',
+  refines: 'FObject',
 
   documentation: 'Upgrade FObject to fully bootstraped form.',
 
