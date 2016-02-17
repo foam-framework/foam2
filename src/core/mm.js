@@ -467,7 +467,7 @@ foam.CLASS({
   extends: 'FObject',
 
   properties: [
-    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression', 'getter', 'setter',
+    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression', 'getter', 'setter', 'final',
     {
       /**
         Compare two values taken from this property.
@@ -530,6 +530,7 @@ foam.CLASS({
       var hasDefaultValue = this.hasOwnProperty('defaultValue');
       var defaultValue    = this.defaultValue;
       var dynName         = name + '$';
+      var isFinal = this.final;
 
       Object.defineProperty(proto, dynName, {
         get: function propDynGetter() {
@@ -570,6 +571,13 @@ foam.CLASS({
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
 
           this.instance_[name] = newValue;
+          if ( isFinal ) {
+            Object.defineProperty(this, name, {
+              value: newValue,
+              writable: false,
+              configurable: true
+            });
+          }
 
           this.publishPropertyChange(name, oldValue, newValue);
 
