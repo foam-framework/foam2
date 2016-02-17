@@ -47,10 +47,6 @@ var foam1 = require('../../src/core/stdlib.js');
 var foam2 = require('../../src/core/mm.js');
 var foam3 = require('../../src/core/types.js');
 
-// var foam;
-// (function() {
-//   var file = fs.readFileSync('../../src/core/mm.js', 'utf-8');
-// })();
 
 var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   if ( node.properties ) {
@@ -77,6 +73,7 @@ var getNodeNamed = function getNodeNamed(node, propName) {
 
 
 var getLeadingComment = function getLeadingComment(node) {
+  // climb up the tree and look for a docs comment
   if (node.leadingComments) return node.leadingComments[0].raw;
   if (node.parent) {
     if (node.parent.leadingComments) return node.parent.leadingComments[0].raw;
@@ -91,11 +88,14 @@ var getLeadingComment = function getLeadingComment(node) {
 }
 
 var getFuncBodyComment = function getFuncBodyComment(node, filename) {
+  // try to pull a comment from the function body
   var src = getSourceString(filename, node.range[0], node.range[1]);
   var matches = src.match(/function[^]*?\([^]*?\)[^]*?\{[^]*?(\/\*\*[^]*?\*\/)/);
   if (matches && matches[1]) {
     return matches[1];
   } else {
+    // fallback: there might be a parsed comment left behind if the first statement
+    // of the function is on the JSDocs 'good' list
     if (  node.body &&
           node.body.body &&
           node.body.body[0] &&
@@ -136,9 +136,10 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
   return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
 }
 
-var replaceCommentArg = function replaceCommentArg(comment, name, type) {
+var replaceCommentArg = function replaceCommentArg(comment, name, type, docs) {
   // if the @arg is defined in the comment, add the type, otherwise insert
-  // the @arg directive.
+  // the @arg directive. Documentation (if any) from the argument declaration
+  // is only used if the @arg is not specified in the original comment.
   var found = false;
   var ret = comment.replace(
     new RegExp('(@param|@arg)\\s*({.*?})?\\s*'+name+'\\s', 'gm'),
@@ -150,12 +151,13 @@ var replaceCommentArg = function replaceCommentArg(comment, name, type) {
   );
 
   if ( found ) return ret;
-  return insertIntoComment(comment, "\n@arg {"+type+"} "+name);
+  return insertIntoComment(comment, "\n@arg {"+type+"} "+name+" "+docs);
 }
 
 
 var files = {};
 var getSourceString = function getSourceString(filename, start, end) {
+  // Load the given file and find the original unparsed source
   var file;
   if ( ! files[filename] ) {
     files[filename] = fs.readFileSync(filename, 'utf8');
@@ -173,7 +175,7 @@ var processArgs = function processArgs(e, node) {
     for (var i = 0; i < args.length; ++i) {
       var arg = args[i];
       if ( arg.typeName ) {
-        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName);
+        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName, arg.documentation);
       }
     }
   } catch(err) {
@@ -186,10 +188,9 @@ var processArgs = function processArgs(e, node) {
 var i = 0;
 exports.astNodeVisitor = {
   visitNode: function(node, e, parser, currentSourceName) {
-    //if (node.type == 'ObjectExpression') console.log("*****\n",node, "\nparent:", node.parent);
-    //console.log(node.parent);
-
-    //if (20 ==  i++) console.log("file: ", getSourceString(currentSourceName, 1, 40));
+    // NOTE: JSDocs strips comments it thinks are not useful. We get around this
+    //       by loading the actual source file and pulling strings from it when
+    //       necessary.
 
     // CLASS or LIB
     if (node.type === 'ObjectExpression' &&

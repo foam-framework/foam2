@@ -387,6 +387,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
       ],
 
       methods: [
+        function init() { },
         {
           name: 'sayHello',
           code: function() { this.result = 'hello '+this.name; }
@@ -420,6 +421,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   });
 
   it('inherits methods', function() {
+    console.log(/*X.*/Person.model_.id);
     person.sayHello();
     employee.sayHello();
     expect(person.result).toEqual('hello Adam');
