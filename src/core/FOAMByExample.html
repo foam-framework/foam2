@@ -311,6 +311,30 @@ log(Person.isSubClass(Person));
 // FObject is the root class of all other classes:
 log(FObject.isSubClass(Employee), FObject.isSubClass(Person));
 
+// In addition to being extended, a Class can also be refined.
+// Refinement upgrades the existing class rather than create a
+// new sub-class. In the following example we add 'salary' to
+// the person class, rather than creating a new Employee sub-class.
+foam.CLASS({
+  name: 'Person',
+  properties: [ 'name', 'sex' ],
+  methods: [
+    function toString() { return this.name + ' ' + this.sex; }
+  ]
+});
+var oldPerson = Person.create({name: 'John', sex: 'M'});
+foam.CLASS({
+  refines: 'Person',
+  properties: [ { name: 'salary', defaultValue: 0 } ],
+  methods: [
+    function toString() { return this.SUPER() + ' ' + this.salary; }
+  ]
+});
+Person.describe();
+var e = Person.create({name: 'Jane', sex: 'F', salary: 50000});
+log(e.toString());
+log(oldPerson.toString());
+
 // TODO: BooleanProperty
 
 // TODO: IntProperty
