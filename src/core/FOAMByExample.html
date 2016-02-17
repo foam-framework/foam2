@@ -417,7 +417,7 @@ foam.CLASS({
 var o = PubSubTest.create();
 // Install a listener that listens to all events
 o.subscribe(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
-o.subscribe('alarm', function() { console.log('fire: ', [].join.call(arguments, ' ')); });
+o.subscribe('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' ')); });
 o.publish('alarm', 'on');
 o.publish('lifecycle', 'loaded');
 
@@ -427,17 +427,18 @@ foam.CLASS({
   topics: [ 'alarm' ]
 });
 var o = TopicTest.create();
-o.subscribe('alarm', function(state) { console.log('fire: ', state); });
+o.subscribe('alarm', function(_, _, state) { console.log('alarm: ', state); });
 // The next line uses the Topic and is slightly shorter than the equivalent above.
-o.alarm.subscribe(function(state) { console.log('fire: ', state); });
-o.publish('on');
+o.alarm.subscribe(function(_, _, state) { console.log('alarm (topic): ', state); });
+o.alarm.publish('on');
+o.publish('alarm', 'off');
 
 // Objects implicitly publish events on the 'propertyChange' topic when
 foam.CLASS({
-  name: 'TopicTest',
+  name: 'PropertyChangeTest',
   properties: [ 'a', 'b' ]
 });
-o = TopicTest.create();
+o = PropertyChangeTest.create();
 // Listen for all propertyChange events:
 o.propertyChange.subscribe(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
 // Listen for only changes to the 'a' Property:
