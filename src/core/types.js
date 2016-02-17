@@ -58,8 +58,8 @@ foam.CLASS({
   methods: [
     /** Validates the given argument against this type information.
         If any type checks are failed, a TypeError is thrown.
-        @param arg the argument value to validate.  */
-    function validate(arg) {
+         */
+    function validate(/* any // the argument value to validate. */ arg) {
       i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {

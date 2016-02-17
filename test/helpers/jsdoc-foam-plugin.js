@@ -132,7 +132,7 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
   return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
 }
 
-var replaceCommentArg = function replaceCommentArg(comment, name, type) {
+var replaceCommentArg = function replaceCommentArg(comment, name, type, docs) {
   // if the @arg is defined in the comment, add the type, otherwise insert
   // the @arg directive.
   var found = false;
@@ -146,7 +146,7 @@ var replaceCommentArg = function replaceCommentArg(comment, name, type) {
   );
 
   if ( found ) return ret;
-  return insertIntoComment(comment, "\n@arg {"+type+"} "+name);
+  return insertIntoComment(comment, "\n@arg {"+type+"} "+name+" "+docs);
 }
 
 
@@ -169,7 +169,7 @@ var processArgs = function processArgs(e, node) {
     for (var i = 0; i < args.length; ++i) {
       var arg = args[i];
       if ( arg.typeName ) {
-        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName);
+        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName, arg.documentation);
       }
     }
   } catch(err) {
