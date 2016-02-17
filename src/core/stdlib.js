@@ -25,6 +25,7 @@ var global = global || this;
  * @exports foam
  */
 foam = {
+  _:        {},
   Array:    Array.prototype,
   Function: Function.prototype,
   Number:   Number.prototype,
@@ -223,10 +224,21 @@ foam.LIB({
   }
 
   var X = {
-    lookup: function (path) {
+    lookup: function(id) {
+      var path = id.split('.');
+      var root = foam._;
+      for ( var i = 0 ; root && i < path.length ; i++ )
+        root = root[path[i]];
+      return root;
     },
 
-    register: function (cls) {
+    register: function(cls) {
+      var path = cls.id ? cls.id.split('.') : [cls.name];
+      var root = foam._;
+      for ( var i = 0 ; i < path.length-1 ; i++ ) {
+        root = root[path[i]] || ( root[path[i]] = {} );
+      }
+      root[path[path.length-1]] = cls;
     },
 
     sub: function sub(opt_args, opt_name) {

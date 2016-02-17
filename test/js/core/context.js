@@ -17,8 +17,8 @@ describe('ConteXt object', function() {
 
   it('exists', function() {
     expect(foam).toBeTruthy();
-    foam.lookup(); // TODO
-    foam.register(); // TODO
+    foam.register({id: 'com.acme.Foo'});
+    foam.lookup('com.acme.Foo');
   });
 
   it('subcontexts', function() {

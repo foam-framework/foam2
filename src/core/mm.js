@@ -145,7 +145,7 @@ foam.LIB({
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
           if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
-          var type = global[(a.type || '') + 'Property'] || Property;
+          var type = foam.lookup((a.type || '') + 'Property') || Property;
           this.installAxiom(type.create(a));
         }
     },
@@ -248,8 +248,6 @@ foam.LIB({
 
   documentation: 'Bootstrap support, discarded after use.',
 
-  constants: { classes: [] },
-
   methods: [
     function start() {
       /* Start the bootstrap process. */
@@ -260,18 +258,17 @@ foam.LIB({
       Create or Update a Prototype from a Model definition.
       (Model is 'this').
     */
-    // TODO: beter name
     function getClass() {
       var cls;
 
       if ( this.refines ) {
-        cls = global[this.refines];
+        cls = foam.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
 //        if ( global[this.name] )
 //          console.warn('Redefinition of class: ' + this.name);
 
-        var parent = this.extends ? global[this.extends] : foam.AbstractClass ;
+        var parent = this.extends ? foam.lookup(this.extends) : foam.AbstractClass ;
         // TODO: make some of these values non-enumerable
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
@@ -281,9 +278,15 @@ foam.LIB({
         cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.axiomCache_      = {};
+        cls.id               = this.id;
+        cls.package          = this.package;
         cls.name             = this.name;
         cls.model_           = this;
-        global[cls.name]     = cls;
+
+        // Classes without a package are also registered as globals
+        if ( ! cls.package ) global[cls.name] = cls;
+
+        foam.register(cls);
       }
 
       cls.installModel(this);
@@ -292,11 +295,11 @@ foam.LIB({
     },
 
     /**
-      Bootstrap Model definition which records incomplete models
-      so they can be patched at the end of the bootstrap process.
+      Bootstrap Model definition.
+      Will be replaced in phase2.
     */
     function CLASS(m) {
-      this.classes.push(this.getClass.call(m));
+      this.getClass.call(m);
     },
 
     /** Start second phase of bootstrap process. */
@@ -306,12 +309,10 @@ foam.LIB({
       foam.CLASS = function(m) { return Model.create(m).getClass(); };
 
       // Upgrade existing classes to real classes.
-      for ( var i = 0 ; i < this.classes.length ; i++ ) {
-        var m = this.classes[i].model_;
-        if ( m.name ) {
+      for ( var key in foam._ ) {
+        var m = foam.lookup(key).model_;
         m.refines = m.name;
         foam.CLASS(m);
-        } else console.log('skip ', m.refines);
       }
     },
 
@@ -325,8 +326,8 @@ foam.LIB({
       };
 
       // Update psedo-Models to real Models
-      for ( var i = 0 ; i < this.classes.length ; i++ ) {
-        var c = this.classes[i];
+      for ( var key in foam._ ) {
+        var c = foam.lookup(key);
         c.prototype.model_ = c.model_ = Model.create(c.model_);
       }
 
@@ -432,7 +433,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         return typeof o === 'string'     ?
           Property.create({name: o})     :
-          global[this.subType].create(o) ;
+          foam.lookup(this.subType).create(o) ;
       }
     },
     {
@@ -724,7 +725,7 @@ foam.CLASS({
     {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
-        return global[this.subType].create(o);
+        return foam.lookup(this.subType).create(o);
       }
     }
   ]
@@ -1013,7 +1014,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInClass(cls) { cls.installModel(global[this.path].model_); }
+    function installInClass(cls) { cls.installModel(foam.lookup(this.path).model_); }
   ]
 });
 
@@ -1232,8 +1233,8 @@ foam.CLASS({
         return typeof o === 'string'     ?
           Property.create({name: o})     :
           o.type ?
-          global[o.type + 'Property'].create(o) :
-          global[this.subType].create(o) ;
+          foam.lookup(o.type + 'Property').create(o) :
+          foam.lookup(this.subType).create(o) ;
       }
     },
     {
@@ -1245,7 +1246,7 @@ foam.CLASS({
           console.assert(o.name, 'Method must be named');
           return Method.create({name: o.name, code: o});
         }
-        return global[this.subType].create(o);
+        return foam.lookup(this.subType).create(o);
       }
     },
     {
