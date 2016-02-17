@@ -47,10 +47,6 @@ var foam1 = require('../../src/core/stdlib.js');
 var foam2 = require('../../src/core/mm.js');
 var foam3 = require('../../src/core/types.js');
 
-// var foam;
-// (function() {
-//   var file = fs.readFileSync('../../src/core/mm.js', 'utf-8');
-// })();
 
 var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   if ( node.properties ) {

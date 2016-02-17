@@ -59,7 +59,7 @@ foam.CLASS({
     /** Validates the given argument against this type information.
         If any type checks are failed, a TypeError is thrown.
         @param arg the argument value to validate.  */
-    function validate(/*TypeA*/ arg) {
+    function validate(arg) {
       i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
@@ -109,7 +109,6 @@ foam.LIB({
         * @return An array of Argument objects.
         */
       // strip newlines and find the function(...) declaration
-      if ( null ) return;
       var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
       if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
       args = args[2];
