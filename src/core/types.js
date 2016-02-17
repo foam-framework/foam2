@@ -121,24 +121,25 @@ foam.LIB({
       // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
       //console.log('-----------------');
       var argIdx = 0;
-      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
+      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
       var typeMatch;
       while ((typeMatch = argMatcher.exec(args)) !== null) {
         // if can't match from start of string, fail
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
         ret.push(/*X.*/Argument.create({
-          name: typeMatch[4],
+          name: typeMatch[6],
           typeName: typeMatch[2],
           type: global[typeMatch[2]],
           optional: typeMatch[3] == '?',
           argIdx: argIdx++,
+          documentation: typeMatch[5],
         }));
         // TODO: this is only valid on the last arg
         if ( typeMatch[6] ) {
           ret.returnType = /*X.*/ReturnValue.create({
-            typeName: typeMatch[6],
-            type: global[typeMatch[6]]
+            typeName: typeMatch[8],
+            type: global[typeMatch[8]]
           });
         }
       }

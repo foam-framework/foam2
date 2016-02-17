@@ -15,7 +15,7 @@ function makeTestFn() {
   foam.CLASS({  name: 'TypeBB', extends: 'TypeB' });
   foam.CLASS({  name: 'package.TypeC' });
   foam.CLASS({  name: 'RetType' });
-  return function test(/* TypeA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
+  return function test(/* TypeA // docs for, pA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
     return (RetType.create());
   }
 }
@@ -42,6 +42,7 @@ describe('foam.types.getFunctionArgs', function() {
     expect(params[0].name).toEqual('paramA');
     expect(params[0].typeName).toEqual('TypeA');
     expect(params[0].optional).toBe(false);
+    expect(params[0].documentation).toEqual('docs for, pA');
 
     expect(params[1].name).toEqual('paramB');
     expect(params[1].typeName).toEqual('TypeB');
