@@ -2,7 +2,7 @@
 // environment.
 var fs = require('fs');
 var vm = require('vm');
-var jsdom = require('jsdom');
+//var jsdom = require('jsdom');
 
 // Unique value for whitelisted keys in a property name map.
 var WHITELISTED = {};
