@@ -15,22 +15,24 @@ function createTestListener(doUnsub) {
 function modelWithTopic() {
   foam.CLASS({
     name: 'TopicModel',
+    package: 'test',
     topics: [
       'change',
       { name: 'other' },
     ],
   });
-  return TopicModel.create();
+  return test.TopicModel.create();
 }
 function modelWithProperty() {
   foam.CLASS({
     name: 'PropModel',
+    package: 'test',
     properties: [
       { name: 'propA' },
       { name: 'propB', defaultValue: 4 }
     ],
   });
-  return PropModel.create();
+  return test.PropModel.create();
 }
 
 describe('foam.events.oneTime', function() {

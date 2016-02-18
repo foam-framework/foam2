@@ -7,12 +7,12 @@ describe('internal foam.LIB', function() {
 
   it('applies constants', function() {
     foam.LIB({
-        name: 'test',
+        name: 'testLib',
         constants: {
           CONST: 'val'
         }
     });
-    expect(foam.test.CONST).toEqual('val');
+    expect(foam.testLib.CONST).toEqual('val');
   });
 
 });

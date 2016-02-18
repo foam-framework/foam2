@@ -11,14 +11,16 @@ describe('ConteXt object', function() {
   });
 
   it('subcontexts with dynamic values', function() {
-    foam.CLASS({ name: 'Tester',
+    foam.CLASS({ 
+      name: 'Tester',
+      package: 'test',
       properties: [ 'a' ]
     });
-    var test = /*X.*/Tester.create({ a: 3 });
-    var sub = foam.sub({ hello$: test.a$ });
+    var testa = test.Tester.create({ a: 3 });
+    var sub = foam.sub({ hello$: testa.a$ });
 
     expect(sub.hello).toEqual(3);
-    test.a = 99;
+    testa.a = 99;
     expect(sub.hello).toEqual(99);
 
   });

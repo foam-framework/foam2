@@ -4,20 +4,21 @@ describe('Untyped Property', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'PropTest',
+      package: 'test',
       properties: [
         {
           name: 'b'
         },
       ]
     });
-    t = /*X.*/PropTest.create({});
+    t = test.PropTest.create({});
   });
   afterEach(function() {
     t = null;
   });
 
   it('creates a Property by default', function() {
-    expect(PropTest.B.cls_.name).toEqual('Property');
+    expect(test.PropTest.B.cls_.name).toEqual('Property');
   });
 
 });
@@ -58,6 +59,7 @@ describe('Property Getter and Setter', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'GetterSetterTest',
+      package: 'test',
       properties: [
         {
           name: 'b',
@@ -80,7 +82,7 @@ describe('Property Getter and Setter', function() {
         }
       ]
     });
-    t = /*X.*/GetterSetterTest.create({});
+    t = test.GetterSetterTest.create({});
     p = "";
   });
   afterEach(function() {
@@ -124,6 +126,7 @@ describe('Property Factory', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'FactoryTest',
+      package: 'test',
       properties: [
         {
           name: 'a',
@@ -135,7 +138,7 @@ describe('Property Factory', function() {
         }
       ]
     });
-    t = /*X.*/FactoryTest.create({});
+    t = test.FactoryTest.create({});
   });
   afterEach(function() {
     t = null;
@@ -217,6 +220,7 @@ describe('Property default value', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'DefaultValue',
+      package: 'test',
       properties: [
         {
           name: 'a',
@@ -224,7 +228,7 @@ describe('Property default value', function() {
         }
       ]
     });
-    t= /*X.*/DefaultValue.create({});
+    t= test.DefaultValue.create({});
   });
   afterEach(function() {
     t = null;
@@ -253,6 +257,7 @@ describe('Final property', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'Abc',
+      package: 'test',
       properties: [
         {
           name: 'a',
@@ -263,13 +268,13 @@ describe('Final property', function() {
   });
 
   it('create with final set', function() {
-    var abc = global.Abc.create({ a: 1 });
+    var abc = test.Abc.create({ a: 1 });
     expect(abc.a).toBe(1);
     abc.a = 2;
     expect(abc.a).toBe(1);
   });
   it('create unset and set after', function() {
-    var abc = global.Abc.create();
+    var abc = test.Abc.create();
     abc.a = 1;
     expect(abc.a).toBe(1);
     abc.a = 2;
@@ -281,9 +286,10 @@ describe('ArrayProperty', function() {
   var t;
 
   beforeEach(function() {
-    foam.CLASS({ name: 'A', properties: [ { name: 'a' } ] });
+    foam.CLASS({ name: 'A', package: 'test', properties: [ { name: 'a' } ] });
     foam.CLASS({
       name: 'B',
+      package: 'test',
       properties: [
         {
           type: 'Array',
@@ -303,14 +309,14 @@ describe('ArrayProperty', function() {
   });
 
   // it('defaults to an empty array', function() {
-  //   var b = /*X.*/B.create({});
+  //   var b = test.B.create({});
   //   expect(b.as).toEqual([]);
   // });
   // TODO: enable when MyMdl.create(instanceA) clones correctly
 //   it('accepts an array value of the correct type', function() {
-//     var b = /*X.*/B.create({});
-//     var a = /*X.*/A.create({ a: 'a' });
-//     var aa = /*X.*/A.create({ a: 'aa' });
+//     var b = test.B.create({});
+//     var a = test.A.create({ a: 'a' });
+//     var aa = test.A.create({ a: 'aa' });
 
 //     b.as = [a, aa];
 //     expect(b.as.toString()).toEqual([a, aa].toString());
@@ -332,7 +338,7 @@ describe('Constants', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'ConstantTest',
-
+      package: 'test',
       constants: [
         {
           name: 'KEY',
@@ -340,17 +346,17 @@ describe('Constants', function() {
         }
       ]
     });
-    t = /*X.*/ConstantTest.create({});
+    t = test.ConstantTest.create({});
     foam.CLASS({
       name: 'ConstantTest2',
-
+      package: 'test',
       constants: {
         KEY: 'my_value',
         KEY2: 'my_value2',
       }
 
     });
-    t2 = /*X.*/ConstantTest2.create({});
+    t2 = test.ConstantTest2.create({});
   });
   afterEach(function() {
     t = null;
@@ -379,7 +385,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   beforeEach(function() {
     foam.CLASS({
       name: 'Person',
-
+      package: 'test',
       constants: [
         {
           name: 'KEY',
@@ -407,12 +413,12 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         function sayGoodbye() { this.result = "bye "+this.name; }
       ]
     });
-    person = /*X.*/Person.create({name: 'Adam', age: 0});
+    person = test.Person.create({name: 'Adam', age: 0});
 
     foam.CLASS({
       name: 'Employee',
-      extends: 'Person',
-
+      extends: 'test.Person',
+      package: 'test',
       properties: [
         {
           name: 'salary'
@@ -425,7 +431,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         }
       ]
     });
-    employee = /*X.*/Employee.create({name: 'Jane', age: 30, salary: 50000});
+    employee = test.Employee.create({name: 'Jane', age: 30, salary: 50000});
   });
   afterEach(function() {
     person = null;
@@ -433,7 +439,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   });
 
   it('inherits methods', function() {
-    console.log(/*X.*/Person.model_.id);
+    console.log(test.Person.model_.id);
     person.sayHello();
     employee.sayHello();
     expect(person.result).toEqual('hello Adam');
@@ -446,30 +452,30 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   });
 
   it('reports correct subclass checks', function() {
-    expect(/*X.*/Person.isSubClass(/*X.*/Employee)).toBe(true);
-    expect(/*X.*/Employee.isSubClass(/*X.*/Person)).toBe(false);
+    expect(test.Person.isSubClass(test.Employee)).toBe(true);
+    expect(test.Employee.isSubClass(test.Person)).toBe(false);
 
-    foam.CLASS({ name: 'Fake' });
-    expect(/*X.*/Person.isSubClass(/*X.*/Fake)).toBe(false);
+    foam.CLASS({ name: 'Fake', package: 'test' });
+    expect(test.Person.isSubClass(test.Fake)).toBe(false);
   });
 
   it('reports correct subclass checks', function() {
-    expect(/*X.*/Person.isInstance(person)).toBe(true);
-    expect(/*X.*/Employee.isInstance(person)).toBe(false);
-    expect(/*X.*/Person.isInstance(employee)).toBe(true);
+    expect(test.Person.isInstance(person)).toBe(true);
+    expect(test.Employee.isInstance(person)).toBe(false);
+    expect(test.Person.isInstance(employee)).toBe(true);
 
-    foam.CLASS({ name: 'Fake' });
-    expect(/*X.*/Person.isInstance(/*X.*/Fake.create({}))).toBe(false);
+    foam.CLASS({ name: 'Fake', package: 'test' });
+    expect(test.Person.isInstance(test.Fake.create({}))).toBe(false);
   });
 
   it('returns axioms correctly', function() {
-    expect(/*X.*/Person.getAxiomByName('age')).toBe(/*X.*/Person.AGE);
+    expect(test.Person.getAxiomByName('age')).toBe(test.Person.AGE);
 
-    var axs = /*X.*/Person.getAxiomsByClass(foam.core.Property);
+    var axs = test.Person.getAxiomsByClass(foam.core.Property);
     expect(axs.length).toEqual(3);
-    expect(axs[0]).toBe(/*X.*/Person.NAME);
-    expect(axs[1]).toBe(/*X.*/Person.AGE);
-    expect(axs[2]).toBe(/*X.*/Person.RESULT);
+    expect(axs[0]).toBe(test.Person.NAME);
+    expect(axs[1]).toBe(test.Person.AGE);
+    expect(axs[2]).toBe(test.Person.RESULT);
   });
 
 });
@@ -480,7 +486,7 @@ describe('Model.traits', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'HelloBase',
-
+      package: 'test',
       methods: [
         {
           name: 'sayHello',
@@ -496,7 +502,7 @@ describe('Model.traits', function() {
 
     foam.CLASS({
       name: 'SalariedTrait',
-
+      package: 'test',
       properties: [
         {
           name: 'salary',
@@ -518,9 +524,9 @@ describe('Model.traits', function() {
 
     foam.CLASS({
       name: 'Person',
-      extends: 'HelloBase',
-      traits: [ 'SalariedTrait' ],
-
+      extends: 'test.HelloBase',
+      traits: [ 'test.SalariedTrait' ],
+      package: 'test',
       properties: [
         {
           type: 'String',
@@ -539,7 +545,7 @@ describe('Model.traits', function() {
         },
       ]
     });
-    person = Person.create();
+    person = test.Person.create();
   });
   afterEach(function() {
     person = null;
@@ -562,7 +568,7 @@ describe('Model.classes', function() {
 
     foam.CLASS({
       name: 'Person',
-
+      package: 'test',
       classes: [
         {
           name: 'InnerSelf',
@@ -597,11 +603,11 @@ describe('Model.classes', function() {
   });
 
   it('installs models', function() {
-    expect(/*X.*/Person.InnerSelf).not.toBeUndefined();
+    expect(test.Person.InnerSelf).not.toBeUndefined();
   });
 
   it('processes model properties', function() {
-    innerSelf = /*X.*/Person.InnerSelf.create({
+    innerSelf = test.Person.InnerSelf.create({
       me: 43,
       myself: 'hello',
       i: ''
@@ -619,6 +625,7 @@ describe('FObject white box test', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'Person',
+      package: 'test',
       properties: [
         {
           type: 'String',
@@ -634,28 +641,28 @@ describe('FObject white box test', function() {
   });
 
   it('inits from null', function() {
-    var o = /*X.*/Person.create();
+    var o = test.Person.create();
     expect(o.name).toBeUndefined();
   });
   it('inits from a POJSO', function() {
-    var o = /*X.*/Person.create({ name: 'prop1' });
+    var o = test.Person.create({ name: 'prop1' });
 
     expect(o.name).toEqual('prop1');
   });
   it('inits from another FObject', function() {
-    var o = /*X.*/Person.create({ name: 'prop1' });
-    var o2 = Person.create(o);
+    var o = test.Person.create({ name: 'prop1' });
+    var o2 = test.Person.create(o);
 
     expect(o2.name).toEqual('prop1');
   });
   it('covers init from another FObject with no instance_', function() {
     var prot = { name: 'prop1' };
-    var o = /*X.*/Person.create(Object.create(prot));
+    var o = test.Person.create(Object.create(prot));
 
     expect(o.name).toEqual('prop1');
   });
   it('toString()s nicely', function() {
-    var o = /*X.*/Person.create();
+    var o = test.Person.create();
     o.toString();
   });
 
@@ -669,6 +676,7 @@ describe('Method overrides and SUPER', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'BaseClass',
+      package: 'test',
       methods: [
         function base() {
           return 5;
@@ -677,7 +685,8 @@ describe('Method overrides and SUPER', function() {
     });
     foam.CLASS({
       name: 'SubClass',
-      extends: 'BaseClass',
+      extends: 'test.BaseClass',
+      package: 'test',
       methods: [
         function base() {
           return this.SUPER() + 1;
@@ -686,15 +695,16 @@ describe('Method overrides and SUPER', function() {
     });
     foam.CLASS({
       name: 'SubSubClass',
-      extends: 'SubClass',
+      extends: 'test.SubClass',
+      package: 'test',
       methods: [
         function base() {
           return this.SUPER() + 2;
         }
       ]
     });
-    m = SubClass.create();
-    s = SubSubClass.create();
+    m = test.SubClass.create();
+    s = test.SubSubClass.create();
   });
   afterEach(function() {
     BaseClass = undefined;
@@ -724,6 +734,7 @@ describe('Property Mlang interop', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'MTest',
+      package: 'test',
       properties: [
         {
           name: 'a',
@@ -731,22 +742,22 @@ describe('Property Mlang interop', function() {
         },
       ]
     });
-    t = /*X.*/MTest.create({});
+    t = test.MTest.create({});
   });
   afterEach(function() {
     t = null;
   });
 
   it('predicate support works', function() {
-    expect(/*X.*/MTest.A.f(t)).toEqual(45); // extracts 'a' property of instance t
+    expect(test.MTest.A.f(t)).toEqual(45); // extracts 'a' property of instance t
   });
   it('compare support works', function() {
-    var t2 = MTest.create({ a: 45 });
-    expect(/*X.*/MTest.A.compare(t, t2)).toEqual(0);
+    var t2 = test.MTest.create({ a: 45 });
+    expect(test.MTest.A.compare(t, t2)).toEqual(0);
     t2.a = 2;
-    expect(/*X.*/MTest.A.compare(t, t2)).toEqual(1);
+    expect(test.MTest.A.compare(t, t2)).toEqual(1);
     t.a = 1;
-    expect(/*X.*/MTest.A.compare(t, t2)).toEqual(-1);
+    expect(test.MTest.A.compare(t, t2)).toEqual(-1);
   });
 });
 
@@ -758,6 +769,7 @@ describe('Dynamics', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'MTest',
+      package: 'test',
       properties: [
         {
           name: 'a',
@@ -765,8 +777,8 @@ describe('Dynamics', function() {
         },
       ]
     });
-    t = /*X.*/MTest.create();
-    t2 = /*X.*/MTest.create();
+    t = test.MTest.create();
+    t2 = test.MTest.create();
   });
   afterEach(function() {
     t = null;
@@ -849,6 +861,7 @@ describe('Listeners', function() {
   beforeEach(function() {
     foam.CLASS({
       name: 'Sprinkler',
+      package: 'test',
       listeners: [
         function onAlarm() {  },
         {
@@ -858,7 +871,7 @@ describe('Listeners', function() {
         }
       ]
     });
-    t = /*X.*/Sprinkler.create({});
+    t = test.Sprinkler.create({});
   });
   afterEach(function() {
     t = null;
