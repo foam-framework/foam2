@@ -1,20 +1,7 @@
-
-var corePromise = global.loadCoreTo('core/mm.js');
-var beforeEachTest = function(callback) {
-  return beforeEach(function(done) {
-    corePromise.then(function() {
-      callback();
-      done();
-    });
-  });
-};
-
-
 describe('Untyped Property', function() {
   var t;
 
-  beforeEachTest(function() {
-    // NOTE: globals are not defined until corePromise is run by beforeEachTest()
+  beforeEach(function() {
     foam.CLASS({
       name: 'PropTest',
       properties: [
@@ -38,7 +25,7 @@ describe('Untyped Property', function() {
 
 describe('AbstractClass.getAxioms', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -52,7 +39,7 @@ describe('AbstractClass.getAxioms', function() {
 
 describe('AbstractClass.toString', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -68,8 +55,7 @@ describe('Property Getter and Setter', function() {
   var t;
   var p;
 
-  beforeEachTest(function() {
-    // NOTE: globals are not defined until corePromise is run by beforeEachTest()
+  beforeEach(function() {
     foam.CLASS({
       name: 'GetterSetterTest',
       properties: [
@@ -135,7 +121,7 @@ describe('Property Getter and Setter', function() {
 describe('Property Factory', function() {
   var t;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'FactoryTest',
       properties: [
@@ -176,7 +162,7 @@ describe('Property Factory', function() {
 describe('Property default comparators', function() {
   var c;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     c = foam.core.Property.create().comparePropertyValues;
   });
   afterEach(function() {
@@ -228,7 +214,7 @@ describe('Property default comparators', function() {
 describe('Property default value', function() {
   var t;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'DefaultValue',
       properties: [
@@ -263,12 +249,38 @@ describe('Property default value', function() {
   });
 
 });
+describe('Final property', function() {
+  beforeEach(function() {
+    foam.CLASS({
+      name: 'Abc',
+      properties: [
+        {
+          name: 'a',
+          final: true
+        }
+      ]
+    });
+  });
 
+  it('create with final set', function() {
+    var abc = global.Abc.create({ a: 1 });
+    expect(abc.a).toBe(1);
+    abc.a = 2;
+    expect(abc.a).toBe(1);
+  });
+  it('create unset and set after', function() {
+    var abc = global.Abc.create();
+    abc.a = 1;
+    expect(abc.a).toBe(1);
+    abc.a = 2;
+    expect(abc.a).toBe(1);
+  });
+});
 
 describe('ArrayProperty', function() {
   var t;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({ name: 'A', properties: [ { name: 'a' } ] });
     foam.CLASS({
       name: 'B',
@@ -317,7 +329,7 @@ describe('Constants', function() {
   var t;
   var t2;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'ConstantTest',
 
@@ -364,7 +376,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   var person;
   var employee;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'Person',
 
@@ -465,7 +477,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 describe('Model.traits', function() {
   var person;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'HelloBase',
 
@@ -546,7 +558,7 @@ describe('Model.traits', function() {
 describe('Model.classes', function() {
   var innerSelf;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
 
     foam.CLASS({
       name: 'Person',
@@ -604,7 +616,7 @@ describe('Model.classes', function() {
 
 
 describe('FObject white box test', function() {
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'Person',
       properties: [
@@ -654,7 +666,7 @@ describe('Method overrides and SUPER', function() {
   var m;
   var s;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'BaseClass',
       methods: [
@@ -709,7 +721,7 @@ describe('Method overrides and SUPER', function() {
 describe('Property Mlang interop', function() {
   var t;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'MTest',
       properties: [
@@ -743,7 +755,7 @@ describe('Dynamics', function() {
   var t;
   var t2;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'MTest',
       properties: [
@@ -834,7 +846,7 @@ describe('Dynamics', function() {
 describe('Listeners', function() {
   var t;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     foam.CLASS({
       name: 'Sprinkler',
       listeners: [

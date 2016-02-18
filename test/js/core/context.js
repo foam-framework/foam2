@@ -1,20 +1,6 @@
-
-var corePromise = global.loadCoreTo('core/mm.js');
-var beforeEachTest = function(callback) {
-  return beforeEach(function(done) {
-    corePromise.then(function() {
-      callback();
-      done();
-    });
-  });
-};
-
+require("../../../src/core/node.js");
 
 describe('ConteXt object', function() {
-  beforeEachTest(function() {
-
-  });
-
   it('exists', function() {
     expect(foam).toBeTruthy();
     foam.register({id: 'com.acme.Foo'});

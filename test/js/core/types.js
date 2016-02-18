@@ -1,14 +1,3 @@
-
-var corePromise = global.loadCoreTo('core/types.js');
-var beforeEachTest = function(callback) {
-  return beforeEach(function(done) {
-    corePromise.then(function() {
-      callback();
-      done();
-    });
-  });
-};
-
 function makeTestFn() {
   foam.CLASS({  name: 'TypeA' });
   foam.CLASS({  name: 'TypeB' });
@@ -29,7 +18,7 @@ return function(/* string */ str, /*boolean*/ bool ,
 describe('foam.types.getFunctionArgs', function() {
   var fn;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     fn = makeTestFn();
   });
   afterEach(function() {
@@ -90,7 +79,7 @@ describe('foam.types.getFunctionArgs', function() {
 describe('Argument.validate', function() {
   var fn;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     fn = makeTestFn();
   });
   afterEach(function() {
@@ -166,7 +155,7 @@ describe('Argument.validate', function() {
 describe('foam.types.typeCheck', function() {
   var fn;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     fn = foam.types.typeCheck(makeTestFn());
   });
   afterEach(function() {
@@ -212,12 +201,3 @@ describe('foam.types.typeCheck', function() {
   });
 
 });
-
-
-
-
-
-
-
-
-

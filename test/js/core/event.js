@@ -1,14 +1,3 @@
-
-var corePromise = global.loadCoreTo('core/mm.js');
-var beforeEachTest = function(callback) {
-  return beforeEach(function(done) {
-    corePromise.then(function() {
-      callback();
-      done();
-    });
-  });
-};
-
 function createTestListener(doUnsub) {
   // also handles property change, split into separate listener if necessary
   var listener = function(subscription, topic, topic2, dyn) {
@@ -48,7 +37,7 @@ describe('foam.events.oneTime', function() {
   var ep;
   var listener;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     ep = modelWithTopic();
     listener = createTestListener();
   });
@@ -77,7 +66,7 @@ describe('foam.events.consoleLog', function() {
   var ep;
   var listener;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     ep = modelWithTopic();
     listener = createTestListener();
   });
@@ -104,7 +93,7 @@ describe('foam.events.merged', function() {
   var ep;
   var listener;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     ep = modelWithTopic();
     listener = createTestListener();
     jasmine.clock().install();
@@ -198,7 +187,7 @@ describe('foam.events.async', function() {
   var ep;
   var listener;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     ep = modelWithTopic();
     listener = createTestListener();
     jasmine.clock().install();
@@ -249,7 +238,7 @@ describe('foam.events.framed', function() {
   var ep;
   var listener;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     ep = modelWithTopic();
     listener1 = createTestListener();
     listener2 = createTestListener();
@@ -306,7 +295,7 @@ describe('foam.events.framed', function() {
 //   var listener2;
 //   var listener3;
 
-//   beforeEachTest(function() {
+//   beforeEach(function() {
 //     ep = modelWithTopic();
 //     listener = createTestListener();
 //     listener2 = createTestListener();
@@ -383,7 +372,7 @@ describe('foam.events.Observable.sub()/.pub()', function() {
   var listener2;
   var listener3;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     ep = modelWithTopic();
     listener = createTestListener();
     listener2 = createTestListener();
@@ -442,7 +431,7 @@ describe('PropertyChangePublisher.propertyChange()', function() {
   var listener;
   var pcp;
 
-  beforeEachTest(function() {
+  beforeEach(function() {
     pcp = modelWithProperty();
     listener = createTestListener();
   });

@@ -1,18 +1,6 @@
-
-var corePromise = global.loadCoreTo('core/stdlib.js');
-var beforeEachTest = function(callback) {
-  return beforeEach(function(done) {
-    corePromise.then(function() {
-      callback();
-      done();
-    });
-  });
-};
-
-
 describe('internal foam.LIB', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -31,7 +19,7 @@ describe('internal foam.LIB', function() {
 
 describe('Object.$UID', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -50,7 +38,7 @@ describe('Object.$UID', function() {
 
 describe('fn.memoize1', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -66,7 +54,7 @@ describe('fn.memoize1', function() {
 
 describe('string.pad', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -79,7 +67,7 @@ describe('string.pad', function() {
 
 describe('Number.compareTo', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -94,7 +82,7 @@ describe('Number.compareTo', function() {
 });
 describe('String.compareTo', function() {
 
-  beforeEachTest(function() {
+  beforeEach(function() {
   });
   afterEach(function() {
   });
@@ -107,6 +95,3 @@ describe('String.compareTo', function() {
   });
 
 });
-
-
-
