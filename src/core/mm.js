@@ -1208,8 +1208,8 @@ foam.CLASS({
       name: 'traits',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
-          Trait.create({path: o})    :
-          Trait.create(o)            ;
+          foam.core.Trait.create({path: o})    :
+          foam.core.Trait.create(o)            ;
       }
     },
     {
@@ -1217,7 +1217,7 @@ foam.CLASS({
       subType: 'InnerClass',
       name: 'classes',
       adaptArrayElement: function(o) {
-        return InnerClass.isInstance(o) ? o : InnerClass.create({model: o});
+        return foam.core.InnerClass.isInstance(o) ? o : InnerClass.create({model: o});
       }
     },
     {

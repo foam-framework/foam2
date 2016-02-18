@@ -39,7 +39,7 @@ foam.CLASS({
       console.log('Instance of', this.cls_.name);
       console.log('Axiom Type           Name           Value');
       console.log('----------------------------------------------------');
-      var ps = this.cls_.getAxiomsByClass(Property);
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
         console.log(
@@ -59,7 +59,7 @@ foam.sub().__proto__.describe = function() {
   console.log('----------------------------------------------------');
   for ( var key in this ) {
     var value = this[key];
-    var type = FObject.isInstance(value) ? value.cls_.name : typeof value;
+    var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
     console.log(
       foam.string.pad(key,  20),
       foam.string.pad(type, 14),
