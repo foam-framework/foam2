@@ -87,6 +87,9 @@
   However, raw axioms are rarely used directly. Instead we model higher-level
   axiom types, including:
 <ul>
+  <li>Requires   - Require other classes 
+  <li>Imports    - Context imports
+  <li>Exports    - Context exports
   <li>Traits     - Implement multiple inheritance
   <li>Constants  - Add constants to the prototype and class
   <li>Topics     - Publish/subscribe topics
@@ -1607,4 +1610,5 @@ foam.CLASS({
   - Proxy label, plural from Class to Model
   - ID support
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
+  - Singleton Axiom
 */
