@@ -44,8 +44,8 @@ describe('AbstractClass.getAxioms', function() {
   });
 
   it('coverage', function() {
-    /*X.*/Property.getAxioms();
-    /*X.*/Property.getAxioms(); // previous results cached
+    foam.core.Property.getAxioms();
+    foam.core.Property.getAxioms(); // previous results cached
   });
 
 });
@@ -58,7 +58,7 @@ describe('AbstractClass.toString', function() {
   });
 
   it('coverage', function() {
-    /*X.*/Property.toString();
+    foam.core.Property.toString();
   });
 
 });
@@ -177,7 +177,7 @@ describe('Property default comparators', function() {
   var c;
 
   beforeEachTest(function() {
-    c = /*X.*/Property.create().comparePropertyValues;
+    c = foam.core.Property.create().comparePropertyValues;
   });
   afterEach(function() {
     c = null;
@@ -286,7 +286,7 @@ describe('ArrayProperty', function() {
   });
 
   it('has a adapt', function() {
-    var ap = /*X.*/ArrayProperty.create({});
+    var ap = foam.core.ArrayProperty.create({});
     expect(ap.adapt).toBeTruthy();
   });
 
@@ -453,7 +453,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
   it('returns axioms correctly', function() {
     expect(/*X.*/Person.getAxiomByName('age')).toBe(/*X.*/Person.AGE);
 
-    var axs = /*X.*/Person.getAxiomsByClass(/*X.*/Property);
+    var axs = /*X.*/Person.getAxiomsByClass(foam.core.Property);
     expect(axs.length).toEqual(3);
     expect(axs[0]).toBe(/*X.*/Person.NAME);
     expect(axs[1]).toBe(/*X.*/Person.AGE);
@@ -862,21 +862,21 @@ describe('Listeners', function() {
 describe('Bootstrap invariants', function() {
   var t;
   it('Check that all recursive relationships are properly set', function() {
-    expect(Model.isInstance(Model.model_)).toBe(true);
-    expect(Model.isInstance(FObject.model_)).toBe(true);
-    expect(Model.isInstance(Property.model_)).toBe(true);
-    expect(Model.isInstance(Method.model_)).toBe(true);
-    expect(Model.isInstance(StringProperty.model_)).toBe(true);
-    expect(Model.isInstance(ArrayProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Model.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.FObject.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Property.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Method.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.StringProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.ArrayProperty.model_)).toBe(true);
   });
 
   it('Check that Class.model_ and Class.prototype.model_ are the same object', function() {
-    expect(Model.isInstance(AxiomArrayProperty.model_)).toBe(true);
-    expect(Model.isInstance(Constant.model_)).toBe(true);
-    expect(Model.isInstance(Trait.model_)).toBe(true);
-    expect(Model.isInstance(Dynamic.model_)).toBe(true);
-    expect(Model.isInstance(PropertyDynamic.model_)).toBe(true);
-    expect(Model.isInstance(Topic.model_)).toBe(true);
-    expect(Model.isInstance(BooleanProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.AxiomArrayProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Trait.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.PropertyDynamic.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.BooleanProperty.model_)).toBe(true);
   });
 })

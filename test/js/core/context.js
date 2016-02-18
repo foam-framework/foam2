@@ -42,7 +42,7 @@ describe('ConteXt object', function() {
   it('describes', function() {
     foam.sub().describe();
 
-    foam.sub({ hello: 'thing', wee: /*X.*/Property.create() }, 'namey').describe();
+    foam.sub({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
   });
 
 });

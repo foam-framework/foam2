@@ -16,7 +16,7 @@ describe('coverage for debugging helpers', function() {
   });
 
   it('covers describe()', function() {
-    var p = /*X.*/Property.create({});
+    var p = foam.core.Property.create({});
     p.describe();
     p.cls_.describe();
   });
