@@ -307,7 +307,6 @@ foam.LIB({
     function phase2() {
 
       // Upgrade to final CLASS() definition.
-// var Model = foam.core.Model;
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m); 
         return model.getClass();
@@ -1035,6 +1034,39 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Requires',
+
+  documentation: 'Requires Axiom',
+
+  properties: [
+    { name: 'name', getter: function() { return 'requires_' + this.path; } },
+    'path',
+    'as'
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      var path = this.path;
+      var as   = this.as;
+
+      // TODO: Add Context support when implemented
+      Object.defineProperty(proto, as, {
+        get: function requiresGetter() {
+          if ( ! this.hasOwnPrivate_(as) )
+            this.setPrivate_(as, foam.lookup(path));
+
+          return this.getPrivate_(as);
+        },
+        configurable: true,
+        enumerable: false
+      });
+    }
+  ]
+});
+
+
 /**
   Topics delcare the types of events that an object publishes.
 <pre>
@@ -1202,6 +1234,22 @@ foam.CLASS({
   documentation: 'Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
   properties: [
+    {
+      type: 'AxiomArray',
+      subType: 'Requires',
+      name: 'requires',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var a = o.split(' as ');
+          var m = a[0];
+          var path = m.split('.');
+          var as = a[1] || path[path.length-1];
+          return foam.core.Requires.create({path: m, as: as});
+        }
+
+        return foam.core.Requires.create(o);
+      }
+    },
     {
       type: 'AxiomArray',
       subType: 'Trait',

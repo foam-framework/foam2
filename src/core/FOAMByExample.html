@@ -584,9 +584,18 @@ Y2.describe();
 foam.CLASS({
   package: 'com.acme',
   name: 'Test',
-  methods: [ function foo() { console.log('foo'); } ]
+  methods: [ function foo() { console.log('foo from com.acme.Test'); } ]
 });
 com.acme.Test.create().foo();
+
+// Classes can requires: other Classes to avoid having to reference them
+// by their fully-qualified names.
+foam.CLASS({
+  name: 'RequiresTest',
+  requires: [ 'com.acme.Test' ],
+  methods: [ function foo() { this.Test.create().foo(); } ]
+});
+RequiresTest.create().foo();
 
 // A Classes 'id' is a combination of its package and name.
 log(com.acme.Test.id);
