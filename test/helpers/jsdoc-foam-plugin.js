@@ -41,12 +41,8 @@
 
 */
 
-// arg type extraction uses foam to parse out the types
 var fs = require('fs');
-var foam1 = require('../../src/core/stdlib.js');
-var foam2 = require('../../src/core/mm.js');
-var foam3 = require('../../src/core/types.js');
-
+require("../js/core/load.js");
 
 var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   if ( node.properties ) {
