@@ -308,7 +308,7 @@ foam.LIB({
 
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) {
-        var model = foam.core.Model.create(m); 
+        var model = foam.core.Model.create(m);
         return model.getClass();
       };
 
@@ -530,7 +530,7 @@ foam.CLASS({
       var hasDefaultValue = this.hasOwnProperty('defaultValue');
       var defaultValue    = this.defaultValue;
       var dynName         = name + '$';
-      var isFinal = this.final;
+      var isFinal         = this.final;
 
       Object.defineProperty(proto, dynName, {
         get: function propDynGetter() {
@@ -571,6 +571,7 @@ foam.CLASS({
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
 
           this.instance_[name] = newValue;
+
           if ( isFinal ) {
             Object.defineProperty(this, name, {
               value: newValue,
