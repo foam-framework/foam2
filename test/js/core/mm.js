@@ -1,5 +1,5 @@
 
-var corePromise = GLOBAL.loadCoreTo('core/mm.js');
+var corePromise = global.loadCoreTo('core/mm.js');
 var beforeEachTest = function(callback) {
   return beforeEach(function(done) {
     corePromise.then(function() {

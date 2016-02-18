@@ -192,6 +192,8 @@ exports.astNodeVisitor = {
     //       by loading the actual source file and pulling strings from it when
     //       necessary.
 
+    // TODO: generalize for listeners and other things.
+
     // CLASS or LIB
     if (node.type === 'ObjectExpression' &&
       node.parent && node.parent.type === 'CallExpression' &&

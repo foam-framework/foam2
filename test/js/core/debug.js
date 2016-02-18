@@ -1,4 +1,4 @@
-var corePromise = GLOBAL.loadCoreTo('core/debug.js');
+var corePromise = global.loadCoreTo('core/debug.js');
 var beforeEachTest = function(callback) {
   return beforeEach(function(done) {
     corePromise.then(function() {
