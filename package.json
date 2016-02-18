@@ -6,10 +6,12 @@
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jsdoc": "^3.4.0",
-    "jsdom": "^3.1.2"
+    "jsdom": "^3.1.2",
+    "node-inspector": "^0.12.6"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
+    "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug node_modules/jasmine/bin/jasmine.js",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover --include-all-sources -- jasmine",
     "checkCoverage": "node checkCoverage.js",
     "doc": "jsdoc -c jsdoc.conf -r -d ./doc/ ./src/"
