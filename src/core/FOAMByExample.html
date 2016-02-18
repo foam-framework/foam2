@@ -590,6 +590,22 @@ Y.log('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
 
+// Classes can export values for use by objects they create.
+foam.CLASS({
+  name: 'ExportsTest',
+  requires: [ 'ImportsTest' ],
+  exports: [ 'log' ],
+  methods: [
+    function init() {
+      this.ImportsTest.create().foo();
+    },
+    function log(msg) {
+      console.log('log:', msg);
+    }
+  ]
+});
+ExportsTest.create();
+
 // Packages
 // Classes can specify a 'package'.
 foam.CLASS({

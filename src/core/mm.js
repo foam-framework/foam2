@@ -1060,11 +1060,18 @@ foam.CLASS({
       var path = this.path;
       var as   = this.as;
 
-      // TODO: Add Context support when implemented
       Object.defineProperty(proto, as, {
         get: function requiresGetter() {
-          if ( ! this.hasOwnPrivate_(as) )
-            this.setPrivate_(as, foam.lookup(path));
+          if ( ! this.hasOwnPrivate_(as) ) {
+            var Y     = this.Y;
+            var model = foam.lookup(path);
+            this.setPrivate_(
+              as,
+              {
+                __proto__: foam.lookup(path),
+                create: function(args, X) { return model.create(args, X || Y); }
+              });
+          }
 
           return this.getPrivate_(as);
         },
@@ -1100,6 +1107,56 @@ foam.CLASS({
           }
 
           return this.getPrivate_(as);
+        },
+        configurable: true,
+        enumerable: false
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Exports',
+
+  documentation: 'Export Sub-Context Value Axiom',
+
+  properties: [
+    { name: 'name', defaultValue: 'exports_' },
+    {
+      name: 'bindings',
+      adapt: function(_, bs) {
+        for ( var i = 0 ; i < bs.length ; i++ ) {
+          var b = bs[i];
+          if ( typeof b === 'string' ) {
+            var a   = b.split(' as ');
+            var key = a[0];
+            var as  = a[1] || key;
+            bs[i] = [ key, as ];
+          }
+        }
+        return bs;
+      }
+    }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      var bs = this.bindings;
+      Object.defineProperty(proto, 'Y', {
+        get: function YGetter() {
+          if ( ! this.hasOwnPrivate_('Y') ) {
+            var X = this.getPrivate_('X') || foam;
+            var m = {};
+            for ( var i = 0 ; i < bs.length ; i++ ) {
+              var b = bs[i];
+              m[b[1]] = this[b[0]];
+            }
+            this.setPrivate_('Y', X.sub(m));
+          }
+
+          return this.getPrivate_('Y');
         },
         configurable: true,
         enumerable: false
@@ -1305,6 +1362,12 @@ foam.CLASS({
         }
 
         return foam.core.Imports.create(o);
+      }
+    },
+    {
+      name: 'exports',
+      postSet: function(_, xs) {
+        (this.axioms || (this.axioms = [])).push.call(this.axioms, foam.core.Exports.create({bindings: xs}));
       }
     },
     {
