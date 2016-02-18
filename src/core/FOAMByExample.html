@@ -79,17 +79,17 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_.name, a.name); });
 log(Test.getAxiomByName('a'));
 
 // Find all Axioms of a particular class using getAxiomsByClass
-log(Test.getAxiomsByClass(Method));
+log(Test.getAxiomsByClass(foam.core.Method));
 
 // Properties are defined on the class as constants
-log(Method.NAME);
-Method.NAME.describe();
+log(foam.core.Method.NAME);
+foam.core.Method.NAME.describe();
 
 // Property constants contain map functions
-log(Test.getAxiomsByClass(Method).map(Method.NAME.f));
+log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
 
 // Property constants contain comparators
-log(Test.getAxiomsByClass(Method).sort(Method.NAME.compare).map(Method.NAME.f));
+log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).map(foam.core.Method.NAME.f));
 
 // If a Class defineds an init() method, itss called
 // when an object is created.
@@ -309,7 +309,7 @@ log(Person.isSubClass(Employee), Employee.isSubClass(Person));
 log(Person.isSubClass(Person));
 
 // FObject is the root class of all other classes:
-log(FObject.isSubClass(Employee), FObject.isSubClass(Person));
+log(foam.core.FObject.isSubClass(Employee), foam.core.FObject.isSubClass(Person));
 
 // In addition to being extended, a Class can also be refined.
 // Refinement upgrades the existing class rather than create a
