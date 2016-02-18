@@ -1047,7 +1047,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Requires',
 
-  documentation: 'Requires Axiom',
+  documentation: 'Require Class Axiom',
 
   properties: [
     { name: 'name', getter: function() { return 'requires_' + this.path; } },
@@ -1065,6 +1065,39 @@ foam.CLASS({
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(as) )
             this.setPrivate_(as, foam.lookup(path));
+
+          return this.getPrivate_(as);
+        },
+        configurable: true,
+        enumerable: false
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Imports',
+
+  documentation: 'Import Context Value Axiom',
+
+  properties: [
+    { name: 'name', getter: function() { return 'imports_' + this.key; } },
+    'key',
+    'as'
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      var key = this.key;
+      var as  = this.as;
+      Object.defineProperty(proto, as, {
+        get: function importsGetter() {
+          if ( ! this.hasOwnPrivate_(as) ) {
+            var X = this.getPrivate_('X') || foam;
+            this.setPrivate_(as, X[key]);
+          }
 
           return this.getPrivate_(as);
         },
@@ -1261,6 +1294,21 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
+      subType: 'Imports',
+      name: 'imports',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var a = o.split(' as ');
+          var m = a[0];
+          var as = a[1] || m;
+          return foam.core.Imports.create({key: m, as: as});
+        }
+
+        return foam.core.Imports.create(o);
+      }
+    },
+    {
+      type: 'AxiomArray',
       subType: 'Trait',
       name: 'traits',
       adaptArrayElement: function(o) {
@@ -1354,7 +1402,8 @@ foam.CLASS({
       Called to process constructor arguments.
       Replaces simpler version defined in original FObject definition.
     */
-    function initArgs(args) {
+    function initArgs(args, X) {
+      if ( X ) this.setPrivate_('X', X);
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy

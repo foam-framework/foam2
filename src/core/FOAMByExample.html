@@ -579,6 +579,17 @@ console.log(Y2.key, Y2.fn());
 Y1.describe();
 Y2.describe();
 
+// Classes can import values from the Context so that they can be accessed from 'this'.
+var Y = foam.sub({log: function(msg) { console.log('log:', msg); }});
+foam.CLASS({
+  name: 'ImportsTest',
+  imports: [ 'log' ],
+  methods: [ function foo() { this.log('foo from ImportTest'); } ]
+});
+Y.log('test');
+var o = ImportsTest.create(null, Y);
+o.foo();
+
 // Packages
 // Classes can specify a 'package'.
 foam.CLASS({
