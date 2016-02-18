@@ -1601,8 +1601,6 @@ foam.CLASS({
   - "ofClass" instead of "subType"
   - more docs
   - DynamicValue map() and relate() methods
-  - package support
-  - imports / exports
   - listener decorators
   - Lightweight Objects
   - 'expression' Property property
