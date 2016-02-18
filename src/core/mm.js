@@ -1217,7 +1217,7 @@ foam.CLASS({
       subType: 'InnerClass',
       name: 'classes',
       adaptArrayElement: function(o) {
-        return foam.core.InnerClass.isInstance(o) ? o : InnerClass.create({model: o});
+        return foam.core.InnerClass.isInstance(o) ? o : foam.core.InnerClass.create({model: o});
       }
     },
     {
@@ -1229,7 +1229,7 @@ foam.CLASS({
         if ( ! Array.isArray(a) ) {
           var cs = [];
           for ( var key in a )
-            cs.push(Constant.create({name: key, value: a[key]}));
+            cs.push(foam.core.Constant.create({name: key, value: a[key]}));
           return cs;
         }
         return a.map(prop.adaptArrayElement.bind(prop));
