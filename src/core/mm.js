@@ -1321,7 +1321,7 @@ foam.CLASS({
 
     function copyFrom(o) {
       // TODO: should walk through Axioms with initAgents instead
-      var a = this.cls_.getAxiomsByClass(Property);
+      var a = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < a.length ; i++ ) {
         var name = a[i].name;
         if ( typeof o[name] !== 'undefined' )
