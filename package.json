@@ -13,7 +13,6 @@
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug node_modules/jasmine/bin/jasmine.js",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover --include-all-sources -- jasmine",
-    "checkCoverage": "node checkCoverage.js",
     "doc": "jsdoc -c jsdoc.conf -r -d ./doc/ ./src/"
   }
 }
