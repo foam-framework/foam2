@@ -1,4 +1,4 @@
-require("../../../src/core/node.js");
+global.require && require("../../../src/core/node.js");
 
 describe('ConteXt object', function() {
   it('exists', function() {
