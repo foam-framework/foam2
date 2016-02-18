@@ -37,7 +37,7 @@ GLOBAL.readSrcFile = function(path, callback) {
       resolve(fileContents);
     } else {
       var xhr = new XMLHttpRequest();
-      xhr.open(SRC_DIR + '/' + path);
+      xhr.open('GET', SRC_DIR + '/' + path);
       xhr.addEventListener('load', function() { resolve(xhr.responseText); });
       xhr.addEventListener('error', function(error) { reject(error); });
       xhr.send();
@@ -45,12 +45,14 @@ GLOBAL.readSrcFile = function(path, callback) {
   });
 };
 
-var coreFileNamesPromise =
+var coreFileNamesPromise = NODEJS ?
     GLOBAL.readSrcFile('core.json').then(function(coreFilesJSON) {
       return JSON.parse(coreFilesJSON);
-    });
+    }) :
+    Promise.resolve(); // TODO: currently web mode requires manual script tag inclusion
 
-GLOBAL.loadCoreTo = function(lastCoreFileName) {
+GLOBAL.loadCoreTo = NODEJS ?
+function(lastCoreFileName) {
   return coreFileNamesPromise.then(function(coreFileNames) {
     var cont = true;
     return coreFileNames.reduce(function(promise, coreFileName) {
@@ -60,4 +62,5 @@ GLOBAL.loadCoreTo = function(lastCoreFileName) {
       return promise;
     }, Promise.resolve());
   });
-};
+} :
+function() { return Promise.resolve(); }; // TODO: currently web mode requires manual script tag inclusion
