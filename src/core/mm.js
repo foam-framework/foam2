@@ -141,7 +141,7 @@ foam.LIB({
           this.prototype[a.name] = a.code;
         }
 
-      if ( global.Property && m.properties )
+      if ( foam.core.Property && m.properties )
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
           if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
@@ -160,7 +160,7 @@ foam.LIB({
     */
     function installAxiom(a) {
       this.axiomMap_[a.name] = a;
-      this.axiomCache_ = {};
+      this.axiomCache_ = {}; // TODO: is this expensive on startup?
 
       // Store the destination class in the Axiom.  Used by describe().
       a.sourceCls_ = this;
@@ -265,6 +265,7 @@ foam.LIB({
         cls = foam.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
+        console.assert(this.name, 'Missing class name.');
 //        if ( global[this.name] )
 //          console.warn('Redefinition of class: ' + this.name);
 
@@ -278,7 +279,7 @@ foam.LIB({
         cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.axiomCache_      = {};
-        cls.id               = this.id;
+        cls.id               = this.id || ( this.package ? this.package + '.' + this.name : this.name );
         cls.package          = this.package;
         cls.name             = this.name;
         cls.model_           = this;
@@ -306,18 +307,23 @@ foam.LIB({
     function phase2() {
 
       // Upgrade to final CLASS() definition.
-      foam.CLASS = function(m) { return Model.create(m).getClass(); };
+// var Model = foam.core.Model;
+      foam.CLASS = function(m) {
+        var model = foam.core.Model.create(m); 
+        return model.getClass();
+      };
 
       // Upgrade existing classes to real classes.
-      for ( var key in foam._ ) {
+      for ( var key in foam.core ) {
         var m = foam.lookup(key).model_;
-        m.refines = m.name;
+        m.refines = m.id;
         foam.CLASS(m);
       }
     },
 
     /** Finish the bootstrap process, deleting foam.boot when done. */
     function end() {
+      var Model = foam.core.Model;
 
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
@@ -326,7 +332,7 @@ foam.LIB({
       };
 
       // Update psedo-Models to real Models
-      for ( var key in foam._ ) {
+      for ( var key in foam.core ) {
         var c = foam.lookup(key);
         c.prototype.model_ = c.model_ = Model.create(c.model_);
       }
@@ -344,6 +350,7 @@ foam.boot.start();
  *  extend FObject and inherit its methods.
  */
 foam.CLASS({
+  package: 'foam.core',
   name: 'FObject',
 
   documentation: 'Base model for model hierarchy.',
@@ -403,6 +410,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'Model',
   extends: 'FObject', // Isn't the default yet.
 
@@ -432,7 +440,7 @@ foam.CLASS({
       name: 'properties',
       adaptArrayElement: function(o) {
         return typeof o === 'string'     ?
-          Property.create({name: o})     :
+          foam.core.Property.create({name: o})     :
           foam.lookup(this.subType).create(o) ;
       }
     },
@@ -443,7 +451,7 @@ foam.CLASS({
       adaptArrayElement: function(e) {
         if ( typeof e === 'function' ) {
           console.assert(e.name, 'Method must be named');
-          return Method.create({name: e.name, code: e});
+          return foam.core.Method.create({name: e.name, code: e});
         }
         return e;
       }
@@ -455,6 +463,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'Property',
   extends: 'FObject',
 
@@ -488,7 +497,7 @@ foam.CLASS({
     function installInClass(c) {
       var superProp = c.__proto__.getAxiomByName(this.name);
       if ( superProp ) {
-        var a = this.cls_.getAxiomsByClass(Property);
+        var a = this.cls_.getAxiomsByClass(foam.core.Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
           if ( typeof superProp[name] !== 'undefined' && ! this.hasOwnProperty(name) )
@@ -630,6 +639,7 @@ foam.CLASS({
 </pre>
 */
 foam.CLASS({
+  package: 'foam.core',
   name: 'Method',
   extends: 'FObject',
 
@@ -685,6 +695,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'StringProperty',
   extends: 'Property',
 
@@ -704,6 +715,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'ArrayProperty',
   extends: 'Property',
 
@@ -736,7 +748,7 @@ foam.boot.phase2();
 
 
 foam.CLASS({
-  refines: 'FObject',
+  refines: 'foam.core.FObject',
 
   documentation: 'Add listener support to FObject.',
 
@@ -886,7 +898,7 @@ foam.CLASS({
       if ( ! opt_dynName ) opt_dynName = name + '$';
       var dyn = this.getPrivate_(opt_dynName);
       if ( ! dyn ) {
-        dyn = PropertyDynamic.create(this, opt_prop || this.cls_.getAxiomByName(name));
+        dyn = foam.core.PropertyDynamic.create(this, opt_prop || this.cls_.getAxiomByName(name));
         this.setPrivate_(opt_dynName, dyn);
       }
       return dyn;
@@ -897,6 +909,7 @@ foam.CLASS({
 
 /** An ArrayProperty whose elements are Axioms and are added to this.axioms. */
 foam.CLASS({
+  package: 'foam.core',
   name: 'AxiomArrayProperty',
   extends: 'ArrayProperty',
 
@@ -924,6 +937,7 @@ foam.CLASS({
 </pre>
 */
 foam.CLASS({
+  package: 'foam.core',
   name: 'Constant',
 
   documentation: 'Constant Axiom',
@@ -959,6 +973,7 @@ foam.CLASS({
 </pre>
 */
 foam.CLASS({
+  package: 'foam.core',
   name: 'InnerClass',
 
   documentation: 'Inner-Class Axiom',
@@ -968,7 +983,7 @@ foam.CLASS({
       name: 'model',
       adapt: function(_, m) {
         // TODO: Not needed once we have ObjectProperties
-        return Model.isInstance(m) ? m : Model.create(m);
+        return foam.core.Model.isInstance(m) ? m : foam.core.Model.create(m);
       }
     }
   ],
@@ -1004,6 +1019,7 @@ foam.CLASS({
   Any number of traits can be specified.
 */
 foam.CLASS({
+  package: 'foam.core',
   name: 'Trait',
 
   documentation: 'Trait Axiom',
@@ -1038,6 +1054,7 @@ foam.CLASS({
 </pre>
 */
 foam.CLASS({
+  package: 'foam.core',
   name: 'Topic',
 
   documentation: 'Topic Axiom',
@@ -1076,6 +1093,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'BooleanProperty',
   extends: 'Property',
 
@@ -1093,6 +1111,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'IntProperty',
   extends: 'Property',
 
@@ -1145,6 +1164,7 @@ foam.CLASS({
   But listeners are pre-bound.
 */
 foam.CLASS({
+  package: 'foam.core',
   name: 'Listener',
 
   properties: [
@@ -1177,7 +1197,7 @@ foam.CLASS({
 
 /** Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
-  refines: 'Model',
+  refines: 'foam.core.Model',
 
   documentation: 'Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
@@ -1220,9 +1240,9 @@ foam.CLASS({
       subType: 'Topic',
       name: 'topics',
       adaptArrayElement: function(o) {
-        return typeof o === 'string' ?
-          Topic.create({name: o})    :
-          Topic.create(o)            ;
+        return typeof o === 'string'        ?
+          foam.core.Topic.create({name: o}) :
+          foam.core.Topic.create(o)         ;
       }
     },
     {
@@ -1231,7 +1251,7 @@ foam.CLASS({
       name: 'properties',
       adaptArrayElement: function(o) {
         return typeof o === 'string'     ?
-          Property.create({name: o})     :
+          foam.core.Property.create({name: o}) :
           o.type ?
           foam.lookup(o.type + 'Property').create(o) :
           foam.lookup(this.subType).create(o) ;
@@ -1244,7 +1264,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
           console.assert(o.name, 'Method must be named');
-          return Method.create({name: o.name, code: o});
+          return foam.core.Method.create({name: o.name, code: o});
         }
         return foam.lookup(this.subType).create(o);
       }
@@ -1256,9 +1276,9 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
           console.assert(o.name, 'Listener must be named');
-          return Listener.create({name: o.name, code: o});
+          return foam.core.Listener.create({name: o.name, code: o});
         }
-        return Listener.create(o);
+        return foam.core.Listener.create(o);
       }
     }
   ]
@@ -1266,7 +1286,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'FObject',
+  refines: 'foam.core.FObject',
 
   documentation: 'Upgrade FObject to fully bootstraped form.',
 
@@ -1334,6 +1354,7 @@ foam.boot.end();
 
 // TODO: doc
 foam.CLASS({
+  package: 'foam.core',
   name: 'Dynamic',
   extends: null,
 
@@ -1369,8 +1390,9 @@ foam.CLASS({
 
 // TODO: doc
 foam.CLASS({
+  package: 'foam.core',
   name: 'PropertyDynamic',
-  extends: 'Dynamic',
+  extends: 'foam.core.Dynamic',
 
   methods: [
     function initArgs(obj, prop) {

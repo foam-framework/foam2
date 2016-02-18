@@ -32,7 +32,7 @@ foam.AbstractClass.describe = function(opt_name) {
 
 
 foam.CLASS({
-  refines: 'FObject',
+  refines: 'foam.core.FObject',
 
   methods: [
     function describe(opt_name) {

@@ -25,7 +25,7 @@ var global = global || this;
  * @exports foam
  */
 foam = {
-  _:        {},
+  core:     {},
   Array:    Array.prototype,
   Function: Function.prototype,
   Number:   Number.prototype,
@@ -223,18 +223,23 @@ foam.LIB({
     if ( key !== '$' && key !== '$$' ) X[key + '$'] = dValue;
   }
 
+  var ROOT = global;
+  function lookup_(id) {
+    var path = id.split('.');
+    var root = ROOT;
+    for ( var i = 0 ; root && i < path.length ; i++ )
+      root = root[path[i]];
+    return root;
+  }
+
   var X = {
     lookup: function(id) {
-      var path = id.split('.');
-      var root = foam._;
-      for ( var i = 0 ; root && i < path.length ; i++ )
-        root = root[path[i]];
-      return root;
+      return lookup_(id) || lookup_('foam.core.' + id);
     },
 
     register: function(cls) {
-      var path = cls.id ? cls.id.split('.') : [cls.name];
-      var root = foam._;
+      var path = cls.id.split('.');
+      var root = ROOT;
       for ( var i = 0 ; i < path.length-1 ; i++ ) {
         root = root[path[i]] || ( root[path[i]] = {} );
       }
