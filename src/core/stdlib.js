@@ -17,7 +17,11 @@
 
 
 /** Setup nodejs-like 'global' on web */
-var global = global || this;
+try {
+  global;
+} catch(e) {
+  global = this;
+}
 
 
 /**
