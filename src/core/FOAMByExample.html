@@ -365,8 +365,6 @@ log(m(), l());
 
 // TODO: isFramed
 
-// TODO: ability to augment an existing Class(es), foam.ENHANCE()
-
 // In addition to class-inheritance, FOAM also supports
 // 'Traits', which are a form of multiple-inheritance which
 // copy Axioms from another model.
@@ -634,6 +632,17 @@ RequiresAliasTest.create().foo();
 
 // A Classes 'id' is a combination of its package and name.
 log(com.acme.Test.id);
+
+// In addition the the built-in Axiom types, you can also
+// specify arbitrary Axioms with axioms:
+foam.CLASS({
+  name: 'AxiomTest',
+  axioms: [ foam.pattern.Singleton.create() ],
+  methods: [ function init() { log('Creating AxiomTest'); } ]
+});
+AxiomTest.create();  
+AxiomTest.create();  
+log(AxiomTest.create() === AxiomTest.create());
 
 // Stdlib
 

@@ -60,7 +60,7 @@
   Axioms are defined with the following psedo-interface:
 <pre>
     public interface Axiom {
-      optional installInClass(class)
+      optional installInClass(cls)
       optional installInProto(proto)
     }
 </pre>
@@ -1596,6 +1596,30 @@ foam.CLASS({
       this.obj.clearProperty(this.prop.name);
     }
   ]
+});
+
+
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'Singleton',
+
+  methods: [
+    function installInClass(cls) {
+      var instance;
+      var oldCreate = cls.create;
+      cls.create = function() {
+        if ( ! instance )
+          instance = oldCreate.apply(this, arguments);
+        return instance;
+      }
+    }
+  ]
+});
+
+// We only need one Singleton, so make it a Singleton.
+foam.CLASS({
+  refines: 'foam.pattern.Singleton',
+  axioms: [ foam.pattern.Singleton ]
 });
 
 
