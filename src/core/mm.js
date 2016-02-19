@@ -1766,4 +1766,4 @@ foam.CLASS({
   - need the equivalent of FOAM1 Window
 */
 
-foam.X = foam.core.Window.create({window: window}, foam).Y;
+foam.X = foam.core.Window.create({window: global}, foam).Y;
