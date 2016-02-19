@@ -1623,6 +1623,134 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Window',
+
+  exports: [
+    '$$',
+    '$',
+    'async',
+    'cancelAnimationFrame',
+    'clearInterval',
+    'clearTimeout',
+    'console',
+    'delayed',
+    'document',
+    'framed',
+    'dynamic',
+    'error',
+    'info',
+    'log',
+    'merged',
+    'requestAnimationFrame',
+    'setInterval',
+    'setTimeout',
+    'warn',
+    'window'
+  ],
+
+  properties: [
+    {
+      name: 'name',
+      defaultValue: 'window'
+    },
+    {
+      name: 'window'
+    },
+    {
+      name: 'document',
+      factory: function() { return this.window.document; }
+    },
+    {
+      name: 'console',
+      factory: function() { return this.window.console; }
+    }
+  ],
+
+  methods: [
+    function log() { this.console.log.apply(this.console, arguments); },
+    function warn() { this.console.warn.apply(this.console, arguments); },
+    function info() { this.console.info.apply(this.console, arguments); },
+    function error() { this.console.error.apply(this.console, arguments); },
+    function $(id) { return this.document.getElementById(id); },
+    function $$(cls) { return this.document.getElementsByClassName(cls); },
+
+    function async(l) {
+
+    },
+
+    function delayed(l, delay) {
+
+    },
+
+    function merged(l, opt_delay) {
+
+    },
+
+    function framed(l) {
+      return function() {
+        var triggered    = false;
+        var unsubscribed = false;
+        var lastArgs     = null;
+
+        var f = function() {
+          lastArgs = arguments;
+
+          if ( unsubscribed ) throw EventService.UNSUBSCRIBE_EXCEPTION;
+
+          if ( ! triggered ) {
+            triggered = true;
+            this.requestAnimationFrame(
+              function() {
+                triggered = false;
+                var args = argsToArray(lastArgs);
+                lastArgs = null;
+                try {
+                  l.apply(this, args);
+                } catch (x) {
+                  if ( x === EventService.UNSUBSCRIBE_EXCEPTION ) unsubscribed = true;
+                }
+              });
+          }
+        };
+
+        // TODO: move to debug.js
+        // if ( DEBUG ) f.toString = function() {
+        //   return 'ANIMATE(' + l.$UID + ', ' + l + ')';
+        // };
+
+        return f;
+      }();
+    },
+
+    function dynamic() {
+    },
+
+    function setTimeout(f, t) {
+      return this.window.setTimeout.apply(this.window, arguments);
+    },
+    function clearTimeout(id) {
+      this.window.clearTimeout(id);
+    },
+
+    function setInterval(f, t) {
+      return this.window.setInterval.apply(this.window, arguments);
+    },
+    function clearInterval(id) {
+      this.window.clearInterval(id);
+    },
+
+    function requestAnimationFrame(f) {
+      return this.window.requestAnimationFrame(f);
+    },
+    function cancelAnimationFrame(id) {
+      this.window.cancelAnimationFrame(id);
+    }
+  ]
+});
+
+
 /**  TODO:
   - support class: instead of type:
   - "ofClass" instead of "subType"
@@ -1635,4 +1763,7 @@ foam.CLASS({
   - ID support
   - a util method to extract function arguments
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
+  - need the equivalent of FOAM1 Window
 */
+
+foam.X = foam.core.Window.create({window: window}, foam).Y;

@@ -284,5 +284,7 @@ foam.LIB({
     }
   };
 
+  foam.X = X;
+
   for ( var key in X ) foam[key] = X[key].bind(X);
 })();
