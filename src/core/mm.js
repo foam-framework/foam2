@@ -1749,6 +1749,25 @@ foam.CLASS({
   ]
 });
 
+/*
+ * requestAnimationFrame is not available on nodejs,
+ * so swap out with calls to setTimeout.
+ */
+if ( foam.isServer ) {
+  foam.CLASS({
+    refines: 'foam.core.Window',
+    methods: [
+      function requestAnimationFrame(f) {
+        return this.setTimeout(f, 16);
+      },
+      function cancelAnimationFrame(id) {
+        this.clearTimeout(id);
+      }
+    ]
+  });
+}
+
+foam.X = foam.core.Window.create({window: global}, foam).Y;
 
 /**  TODO:
   - support class: instead of type:
@@ -1764,5 +1783,3 @@ foam.CLASS({
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
   - need the equivalent of FOAM1 Window
 */
-
-foam.X = foam.core.Window.create({window: global}, foam).Y;
