@@ -33,6 +33,7 @@ foam = {
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = this;
 
+
 /*
  * A LIB is a collection of static constants, properties and functions.
  */
@@ -72,6 +73,10 @@ foam.LIB = function LIB(model) {
 };
 
 
+/*
+ * Add Unique Identifiers (UIDs) to all Objects.
+ * UID's are created when first accessed.
+ */
 foam.LIB({
   name: 'Object',
 
