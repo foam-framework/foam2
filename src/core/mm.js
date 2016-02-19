@@ -1622,7 +1622,6 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
