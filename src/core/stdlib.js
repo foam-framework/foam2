@@ -33,7 +33,9 @@ foam = {
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = this;
 
-
+/*
+ * A LIB is a collection of static constants, properties and functions.
+ */
 foam.LIB = function LIB(model) {
   var proto;
 
@@ -163,7 +165,7 @@ foam.LIB({
 
     function setName(f, name) {
       // Set a function's name for improved debugging and profiling
-      //Object.defineProperty(f, 'name', {value: name, configurable: true}); //TODO: re-enable if supported
+      Object.defineProperty(f, 'name', {value: name, configurable: true});
     },
 
     function appendArguments(a, args, start) {
@@ -173,6 +175,16 @@ foam.LIB({
     }
   ]
 });
+
+// Disable setName if not supported on this platform.
+try {
+  foam.fn.setName(function() {}, '');
+} catch (x) {
+  foam.LIB({
+    name: 'fn',
+    methods: [ function setName() { /* NOP */ } ]
+  });
+}
 
 
 foam.LIB({
