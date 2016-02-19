@@ -1698,14 +1698,11 @@ foam.CLASS({
       var X     = this;
 
       return function() {
-        var triggered    = false;
-        var unsubscribed = false;
-        var lastArgs     = null;
+        var triggered = false;
+        var lastArgs  = null;
 
-        var f = function(sub) {
+        var f = function() {
           lastArgs = arguments;
-
-          if ( unsubscribed ) { sub.destroy(); return; }
 
           if ( ! triggered ) {
             triggered = true;
@@ -1729,19 +1726,18 @@ foam.CLASS({
     },
 
     function framed(l) {
+      var X = this;
+
       return function() {
-        var triggered    = false;
-        var unsubscribed = false;
-        var lastArgs     = null;
+        var triggered = false;
+        var lastArgs  = null;
 
         var f = function() {
           lastArgs = arguments;
 
-          if ( unsubscribed ) { sub.destroy(); return; }
-
           if ( ! triggered ) {
             triggered = true;
-            this.requestAnimationFrame(
+            X.requestAnimationFrame(
               function() {
                 triggered = false;
                 var args = foam.array.argsToArray(lastArgs);

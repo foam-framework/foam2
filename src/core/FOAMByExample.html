@@ -359,7 +359,10 @@ log(o.m1(), o.l1());
 var m = o.m1, l = o.l1;
 log(m(), l());
 
-// TODO: isMerged
+// If a listener has isMerged: true, it will merge multiple
+// events received withing 'mergeDelay' milliseconds into
+// a single event. 'mergeDelay' is optional and defaults to
+// 16ms.
 foam.CLASS({
   name: 'MergedListenerTest',
   listeners: [
@@ -371,6 +374,7 @@ foam.CLASS({
     {
       name: 'merged',
       isMerged: true,
+      mergeDelay: 1, // 1ms
       code: function() { log('merged listener'); }
     }
   ]
@@ -386,7 +390,24 @@ o.merged(); o.notMerged();
 
 // TODO: mergeDelay
 
-// TODO: isFramed
+// If a listener has isFramed: true, it will merge multiple
+// events received withing one animation frame to a single
+// event delivered at the next animationFrame.
+foam.CLASS({
+  name: 'FramedListenerTest',
+  listeners: [
+    {
+      name: 'framed',
+      isFramed: true,
+      code: function() { log('framed listener'); }
+    }
+  ]
+});
+var o = FramedListenerTest.create();
+o.framed();
+o.framed();
+o.framed();
+o.framed();
 
 // In addition to class-inheritance, FOAM also supports
 // 'Traits', which are a form of multiple-inheritance which
