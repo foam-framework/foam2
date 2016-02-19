@@ -884,8 +884,8 @@ describe('Listeners', function() {
 });
 
 
+
 describe('Bootstrap invariants', function() {
-  var t;
   it('Check that all recursive relationships are properly set', function() {
     expect(foam.core.Model.isInstance(foam.core.Model.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.FObject.model_)).toBe(true);

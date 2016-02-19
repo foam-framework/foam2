@@ -1622,7 +1622,6 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ]
 });
 
-
 /**  TODO:
   - support class: instead of type:
   - "ofClass" instead of "subType"
