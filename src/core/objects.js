@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   refines: 'foam.core.FObject',
 
@@ -26,13 +25,13 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
-      
+
       if ( this.model_ !== other.model_ ) {
         // TODO: This provides unstable ordering if two objects have a different model_
         // but they have the same id.
         return this.model_.id.compareTo(other.model_ && other.model_.id) || 1;
       }
-      
+
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var r = ps[i].compare(this, other);
@@ -57,7 +56,7 @@ foam.CLASS({
           continue;
         }
         // if the primary value is undefined, use the compareTo of the other
-        if ( typeof value !== 'undefined' ) { 
+        if ( typeof value !== 'undefined' ) {
           if ( value.compareTo(otherVal) !== 0) diff[property.name] = otherVal;
         } else if ( typeof otherVal !== 'undefined' ) {
           if ( otherVal.compareTo(value) !== 0) diff[property.name] = otherVal;
@@ -66,6 +65,7 @@ foam.CLASS({
 
       return diff;
     },
+
     function hashCode() {
       var hash = 17;
 
@@ -111,10 +111,10 @@ foam.CLASS({
     //   //   }
     //   // }
     //   // return this.model_.create(m, this.X);
-    // },
-    
+    // }
   ]
 });
+
 
 /** Adds diff functionality to all arrays */
 // TODO: make proto decoration more official
@@ -134,6 +134,7 @@ Array.prototype.diff = function diff(other) {
   return { added: added, removed: removed };
 };
 
+
 /** Adds hashCode functionality to all strings. */
 String.prototype.hashCode = function hashCode() {
   var hash = 0;
@@ -147,4 +148,3 @@ String.prototype.hashCode = function hashCode() {
 
   return hash;
 }
-
