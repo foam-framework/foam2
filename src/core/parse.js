@@ -219,10 +219,10 @@ foam.CLASS({
   ]
 });
 
-// TODO: This should be a singleton
 foam.CLASS({
   package: 'foam.parsers',
   name: 'AnyChar',
+  axioms: [ 'foam.pattern.Singleton' ],
   methods: [
     function parse(ps, obj) {
       return ps.head ? ps.tail : undefined;
@@ -405,10 +405,8 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'anyChar',
-      factory: function() {
-        return foam.lookup('foam.parsers.AnyChar').create();
-      }
+      name: "anyChar",
+      getter: function() { return foam.parsers.AnyChar.create(); }
     },
     {
       name: 'adapt',

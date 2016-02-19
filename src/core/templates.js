@@ -8,14 +8,14 @@ foam.CLASS({
     }
   ],
   methods: [
-    function f() {
+    function output() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         var o = arguments[i];
 
-        if ( typeof o === 'string' ) {
-          this.buf.push(o);
-        } else {
+        if ( typeof o === 'object' ) {
           this.buf.push(o.toString());
+        } else {
+          this.buf.push(o);
         }
       }
     },
@@ -30,10 +30,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
-
-  requires: [
-    'foam.parsers.StringPS'
-  ],
+  axioms: ['foam.patterns.Singleton'],
 
   grammar: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
     return {
@@ -97,10 +94,18 @@ foam.CLASS({
     {
       name: 'ps',
       factory: function() {
-        return this.StringPS.create();
+        return foam.parsers.StringPS.create();
       }
     }
   ],
+
+  constants: {
+    HEADER: 'var self = this, X = this.X, Y = this.Y;\n' +
+      'var output = opt_outputter ? opt_outputter : TOC(this);\n' +
+      'var out = output.output.bind(output);\n' +
+      "out('",
+    FOOTER: "');\nreturn opt_outputter ? output : output.toString();\n"
+  },
 
   methods: [
     function push() {
@@ -110,7 +115,7 @@ foam.CLASS({
     function pushSimple() {
       this.out.push.apply(this.out, arguments);
     },
-    function compileTemplate(t, name) {
+    function compile(t, name, args) {
       this.ps.setString(t);
       var result = this.markup(this.ps);
       if ( ! result ) {
@@ -118,14 +123,29 @@ foam.CLASS({
       }
       result = result.value;
 
-      var code = "var self = this; var outputter = opt_out || foam.templates.TemplateOutput.create(); var out = outputter.f.bind(outputter); out('" + result[1] + "'); return opt_out ? outputter : outputter.toString();";
+      var code = this.HEADER + result[1] + this.FOOTER;
 
-      var args = ['opt_out'];
+      var args = ['opt_outputter'].concat(args);
       var f = eval(
         '(function() { ' +
-          'return function(' + args.join(',') + '){' + code + '};})()');
+          'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
+          'var f = function(' + args.join(',') + '){' + code + '};' +
+          'return function() { '+
+          'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(foam.array.argsToArray(arguments)));' +
+          'return f.apply(this, arguments);};})()');
 
       return f;
+    },
+    function lazyCompile(t, name, args) {
+      return (function(util) {
+        var delegate;
+        return function() {
+          if ( ! delegate ) {
+            delegate = util.compile(t, name, args)
+          }
+          return delegate.apply(this, arguments);
+        };
+      })(this);
     }
   ],
 
@@ -333,24 +353,41 @@ foam.CLASS({
 });
 
 
-//Templatebenchmark.create().benchmark();
-
-
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateAxiom',
+  extends: 'Method',
   properties: [
+    {
+      name: 'name'
+    },
     {
       name: 'template',
       type: 'String'
+    },
+    {
+      name: 'args',
     }
   ],
   methods: [
     function installInProto(proto) {
-      foam.templates.TemplateUtil
+      proto[this.name] =
+        foam.templates.TemplateUtil.create().lazyCompile(this.template, this.name, this.args || []);
     }
   ]
 });
 
-var f = foam.templates.TemplateUtil.create().compileTemplate('Hello <%= this.name %>');
-console.log(f.call({ name: 'Adam' }));
+foam.CLASS({
+  package: 'foam.templates',
+  name: 'TemplateExtension',
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      name: 'templates',
+      type: 'AxiomArray',
+      adaptArrayElement: function(o) {
+        return foam.templates.TemplateAxiom.create(o);
+      }
+    }
+  ]
+});
