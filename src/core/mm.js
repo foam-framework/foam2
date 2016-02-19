@@ -363,7 +363,7 @@ foam.CLASS({
       When the bootstrap is finished, it will be replaced by a version
       that knows about a classes Properties, so it can do a better job.
      */
-    function initArgs(args) {
+    function initArgs(args, opt_X) {
       if ( ! args ) return;
 
       for ( var key in args )
@@ -1105,7 +1105,7 @@ foam.CLASS({
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
           if ( ! this.hasOwnPrivate_(as) ) {
-            var X = this.getPrivate_('X') || foam;
+            var X = this.X || foam;
             this.setPrivate_(as, X[key]);
           }
 
@@ -1150,7 +1150,7 @@ foam.CLASS({
       Object.defineProperty(proto, 'Y', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('Y') ) {
-            var X = this.getPrivate_('X') || foam;
+            var X = this.X || foam;
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
@@ -1311,13 +1311,23 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      var name = this.name;
-      var code = this.code;
+      var name       = this.name;
+      var code       = this.code;
+      var isMerged   = this.isMerged;
+      var isFramed   = this.isFramed;
+      var mergeDelay = this.mergeDelay;
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          if ( ! this.hasOwnPrivate_(name) )
-            this.setPrivate_(name, code.bind(this));
+          if ( ! this.hasOwnPrivate_(name) ) {
+            var l = code.bind(this);
+            if ( isMerged ) {
+              l = this.X.merged(l, mergeDelay);
+            } else if ( isFramed ) {
+              l = this.X.framed(l);
+            }
+            this.setPrivate_(name, l);
+          }
 
           return this.getPrivate_(name);
         },
@@ -1469,7 +1479,7 @@ foam.CLASS({
       Replaces simpler version defined in original FObject definition.
     */
     function initArgs(args, X) {
-      if ( X ) this.setPrivate_('X', X);
+      this.X = X || foam.X; // this.setPrivate_('X', X);
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy
@@ -1684,7 +1694,38 @@ foam.CLASS({
     },
 
     function merged(l, opt_delay) {
+      var delay = opt_delay || 16;
+      var X     = this;
 
+      return function() {
+        var triggered    = false;
+        var unsubscribed = false;
+        var lastArgs     = null;
+
+        var f = function(sub) {
+          lastArgs = arguments;
+
+          if ( unsubscribed ) { sub.destroy(); return; }
+
+          if ( ! triggered ) {
+            triggered = true;
+            X.setTimeout(
+              function() {
+                triggered = false;
+                var args = foam.array.argsToArray(lastArgs);
+                lastArgs = null;
+                l.apply(this, args);
+              }, delay);
+          }
+        };
+
+        // TODO: add in debug.js
+        // if ( DEBUG ) f.toString = function() {
+        //   return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
+        // };
+
+        return f;
+      }();
     },
 
     function framed(l) {
@@ -1696,20 +1737,16 @@ foam.CLASS({
         var f = function() {
           lastArgs = arguments;
 
-          if ( unsubscribed ) throw EventService.UNSUBSCRIBE_EXCEPTION;
+          if ( unsubscribed ) { sub.destroy(); return; }
 
           if ( ! triggered ) {
             triggered = true;
             this.requestAnimationFrame(
               function() {
                 triggered = false;
-                var args = argsToArray(lastArgs);
+                var args = foam.array.argsToArray(lastArgs);
                 lastArgs = null;
-                try {
-                  l.apply(this, args);
-                } catch (x) {
-                  if ( x === EventService.UNSUBSCRIBE_EXCEPTION ) unsubscribed = true;
-                }
+                l.apply(this, args);
               });
           }
         };

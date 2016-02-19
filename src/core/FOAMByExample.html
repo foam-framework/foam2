@@ -360,6 +360,29 @@ var m = o.m1, l = o.l1;
 log(m(), l());
 
 // TODO: isMerged
+foam.CLASS({
+  name: 'MergedListenerTest',
+  listeners: [
+    {
+      name: 'notMerged',
+      isMerged: false, // the default
+      code: function() { log('not merged listener'); }
+    },
+    {
+      name: 'merged',
+      isMerged: true,
+      code: function() { log('merged listener'); }
+    }
+  ]
+});
+var o = MergedListenerTest.create();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
 
 // TODO: mergeDelay
 
