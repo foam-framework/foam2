@@ -1685,12 +1685,17 @@ foam.CLASS({
     function $(id) { return this.document.getElementById(id); },
     function $$(cls) { return this.document.getElementsByClassName(cls); },
 
+    /** Decorate a listener so that the event is delivered asynchronously. **/
     function async(l) {
-
+      return this.delayed(l, 0);
     },
 
     function delayed(l, delay) {
-
+      return function() {
+        this.setTimeout(
+          function() { l.apply(this, arguments); },
+          delay);
+      }.bind(this);
     },
 
     function merged(l, opt_delay) {
@@ -1807,12 +1812,10 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - "ofClass" instead of "subType"
   - more docs
   - DynamicValue map() and relate() methods
-  - listener decorators
   - Lightweight Objects
-  - 'expression' Property property
   - Proxy label, plural from Class to Model
   - ID support
   - a util method to extract function arguments
+  - 'expression' Property property
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
-  - need the equivalent of FOAM1 Window
 */
