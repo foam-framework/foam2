@@ -15,20 +15,12 @@
  * limitations under the License.
  */
 
-
-/** Setup nodejs-like 'global' on web */
-try {
-  global;
-} catch(e) {
-  global = this;
-}
-
-
 /**
  * Top-Level of foam package
  * @exports foam
  */
 foam = {
+  isServer: typeof process === 'object',
   core:     {},
   Array:    Array.prototype,
   Function: Function.prototype,
@@ -36,6 +28,10 @@ foam = {
   Object:   Object.prototype,
   String:   String.prototype
 };
+
+
+/** Setup nodejs-like 'global' on web */
+if ( ! foam.isServer ) global = this;
 
 
 foam.LIB = function LIB(model) {

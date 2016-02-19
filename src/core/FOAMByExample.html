@@ -640,8 +640,8 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
   methods: [ function init() { log('Creating AxiomTest'); } ]
 });
-AxiomTest.create();  
-AxiomTest.create();  
+AxiomTest.create();
+AxiomTest.create();
 log(AxiomTest.create() === AxiomTest.create());
 
 // Stdlib
@@ -691,6 +691,7 @@ log(s, s.length);
 var s = foam.string.pad('foobar', -10);
 log(s, s.length);
 
+// TODO: Putting it all together
 </script>
 
   <div id='output'></div>
