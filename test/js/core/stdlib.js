@@ -95,3 +95,69 @@ describe('String.compareTo', function() {
   });
 
 });
+
+
+describe('Array diff', function() {
+  var x;
+  var y;
+  
+  beforeEach(function() {
+    foam.CLASS({
+      name: 'CompA',
+      package: 'test',
+      properties: [ 'a', 'b' ]
+    });
+    foam.CLASS({
+      name: 'CompB',
+      package: 'test',
+      properties: [ 'b', 'c' ]
+    });
+    x = test.CompA.create();
+    y = test.CompB.create();
+  });
+  afterEach(function() {
+    x = y = null;
+  });
+  
+  it('reports no change correctly', function() {
+    var a = ['a', 't', x];
+    expect(a.diff(a).added).toEqual([]);
+    expect(a.diff(a).removed).toEqual([]);
+
+    var b = [];
+    expect(b.diff(b).added).toEqual([]);
+    expect(b.diff(b).removed).toEqual([]);
+  });
+  it('finds added primitive elements', function() {
+    var a = ['a', 't'];
+    var b = ['a', 'r', 't'];
+    expect(a.diff(b).added).toEqual(['r']);
+  });
+  it('finds removed primitive elements', function() {
+    var a = ['a', 't'];
+    var b = ['a', 'r', 't'];
+    expect(b.diff(a).removed).toEqual(['r']);
+  });
+  it('finds added object elements', function() {
+    var a = [x, 4];
+    var b = [y, x, 4];
+    expect(a.diff(b).added).toEqual([y]);
+  });
+  it('finds removed object elements', function() {
+    var a = [y, 4];
+    var b = [y, x, 4];
+    expect(b.diff(a).removed).toEqual([x]);
+  });
+  it('finds swapped elements', function() {
+    var a = [y, 4, 8];
+    var b = [4, x, 'hello'];
+    expect(a.diff(b).added).toEqual([x, 'hello']);
+    expect(a.diff(b).removed).toEqual([y, 8]);
+  });
+  it('treats multiple copies of an element as separate items', function() {
+    var a = [4,5,6,7,8,8];
+    var b = [4,4,4,4,8,8];
+    expect(a.diff(b).added).toEqual([4,4,4]);
+    expect(a.diff(b).removed).toEqual([5,6,7]);
+  });
+});
