@@ -111,6 +111,41 @@ foam.LIB({
 
   methods: [
     function compareTo(o) { return ( o == this ) ? 0 : this < o ? -1 : 1; },
+    
+    /** Adds hashCode functionality to all strings. */
+    function hashCode() {
+      var hash = 0;
+      if ( this.length == 0 ) return hash;
+
+      for (i = 0; i < this.length; i++) {
+        var code = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + code;
+        hash &= hash;
+      }
+
+      return hash;
+    }    
+  ]
+});
+
+foam.LIB({
+  name: 'Array',
+  methods: [
+    function diff(other) {
+      var added = other.slice(0);
+      var removed = [];
+      for ( var i = 0 ; i < this.length ; i++ ) {
+        for ( var j = 0 ; j < added.length ; j++ ) {
+          if ( this[i].compareTo(added[j]) == 0 ) {
+            added.splice(j, 1);
+            j--;
+            break;
+          }
+        }
+        if ( j == added.length ) removed.push(this[i]);
+      }
+      return { added: added, removed: removed };
+    }
   ]
 });
 

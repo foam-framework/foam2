@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-
-
 // TODO: i18n compatible error messages?
 
 foam.CLASS({
@@ -87,6 +85,7 @@ foam.CLASS({
   ]
 });
 
+
 /** Describes a function return type. */
 foam.CLASS({
   name: 'ReturnValue',
@@ -96,6 +95,7 @@ foam.CLASS({
     PREFIX: 'Return',
   }
 });
+
 
 /** The types library deals with type safety. */
 foam.LIB({
@@ -180,6 +180,7 @@ foam.LIB({
         for (var i = 0; i < args.length; ++i) {
           args[i].validate(arguments[i]);
         }
+
         // If nothing threw an exception, we are free to run the function
         var retVal = fn.apply(this, arguments);
 
@@ -190,11 +191,10 @@ foam.LIB({
 
         return retVal;
       }
+
       // keep the old value of toString (hide the decorator)
       ret.toString = function() { return fn.toString(); }
       return ret;
     }
   ]
 });
-
-
