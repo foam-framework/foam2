@@ -45,8 +45,8 @@ foam.CLASS({
     function diff(other) {
       var diff = {};
 
-      var properties = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0, property ; property = properties[i] ; i++ ) {
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0, property ; property = ps[i] ; i++ ) {
         var value = property.f(this);
         var otherVal = property.f(other);
         if ( Array.isArray(value) ) {
@@ -66,22 +66,22 @@ foam.CLASS({
 
       return diff;
     },
-    // function hashCode() {
-    //   // var hash = 17;
-    //   //
-    //   // var properties = this.model_.getRuntimeProperties();
-    //   // for ( var i = 0 ; i < properties.length ; i++ ) {
-    //   //   var prop = this[properties[i].name];
-    //   //   var code = ! prop ? 0 :
-    //   //     prop.hashCode   ? prop.hashCode()
-    //   //                     : prop.toString().hashCode();
-    //   //
-    //   //   hash = ((hash << 5) - hash) + code;
-    //   //   hash &= hash;
-    //   // }
-    //   //
-    //   // return hash;
-    // },
+    function hashCode() {
+      var hash = 17;
+
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        var prop = this[ps[i].name];
+        var code = ! prop ? 0 :
+          prop.hashCode   ? prop.hashCode()
+                          : prop.toString().hashCode();
+
+        hash = ((hash << 5) - hash) + code;
+        hash &= hash;
+      }
+
+      return hash;
+    },
     // /** Create a shallow copy of this object. **/
     // function clone() {
     //   // var m = {};
@@ -117,6 +117,7 @@ foam.CLASS({
 });
 
 /** Adds diff functionality to all arrays */
+// TODO: make proto decoration more official
 Array.prototype.diff = function diff(other) {
   var added = other.slice(0);
   var removed = [];
@@ -132,4 +133,18 @@ Array.prototype.diff = function diff(other) {
   }
   return { added: added, removed: removed };
 };
+
+/** Adds hashCode functionality to all strings. */
+String.prototype.hashCode = function hashCode() {
+  var hash = 0;
+  if ( this.length == 0 ) return hash;
+
+  for (i = 0; i < this.length; i++) {
+    var code = this.charCodeAt(i);
+    hash = ((hash << 5) - hash) + code;
+    hash &= hash;
+  }
+
+  return hash;
+}
 
