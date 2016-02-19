@@ -139,3 +139,33 @@ describe('FObject hashCode', function() {
     expect(a.hashCode()).toEqual(572756);
   });
 });
+
+//
+// describe('FObject clone', function() {
+//   var a;
+//
+//   beforeEach(function() {
+//     foam.CLASS({
+//       name: 'CompA',
+//       package: 'test',
+//       properties: [ 'a', 'b' ]
+//     });
+//     a = test.CompA.create();
+//   });
+//   afterEach(function() {
+//     a = null;
+//   });
+//
+//   it('regression 1: undefineds', function() {
+//     expect(a.hashCode()).toEqual(16337);
+//   });
+//   it('regression 2: strings and numbers', function() {
+//     a.a = 'this is a longer string!@';
+//     a.b = 998765876.78;
+//     expect(a.hashCode()).toEqual(-359267117);
+//   });
+//   it('regression 3: model instance', function() {
+//     a.a = test.CompA.create({ a: 4 });
+//     expect(a.hashCode()).toEqual(572756);
+//   });
+// });

@@ -82,35 +82,49 @@ foam.CLASS({
 
       return hash;
     },
-    // /** Create a shallow copy of this object. **/
-    // function clone() {
+    /** Create a shallow copy of this object. **/
+    function clone() {
+      var m = {};
+      for ( var key in this.instance_ ) {
+        var value = this[key];
+        if ( value !== undefined ) {
+          var prop = this.cls_.getAxiomByName(key);
+          if ( prop && prop.cloneProperty )
+            prop.cloneProperty(value, m);
+          else
+            m[key] = value;
+        }
+      }
+      return this.model_.create(m/*, this.X*/);
+    },
+
+    // /** Create a deep copy of this object. **/
+    // function deepClone() {
     //   var m = {};
     //   for ( var key in this.instance_ ) {
     //     var value = this[key];
     //     if ( value !== undefined ) {
-    //       var prop = this.model_.getProperty(key);
-    //       if ( prop && prop.cloneProperty )
-    //         prop.cloneProperty.call(prop, value, m);
-    //       else
-    //         m[key] = value;
+    //       var prop = this.cls_.getAxiomByName(key);
+    //       if ( prop && prop.deepCloneProperty ) {
+    //         prop.deepCloneProperty(value, m);
+    //       } else if ( value.deepClone ) {
+    //         m[key] = value.deepClone();
+    //       }
     //     }
     //   }
-    //   return this.model_.create(m, this.X);
+    //   return this.model_.create(m/*, this.X*/);
     // },
-    //
-    // /** Create a deep copy of this object. **/
-    // function deepClone() {
-    //   // var m = {};
-    //   // for ( var key in this.instance_ ) {
-    //   //   var value = this[key];
-    //   //   if ( value !== undefined ) {
-    //   //     var prop = this.model_.getProperty(key);
-    //   //     if ( prop && prop.deepCloneProperty ) {
-    //   //       prop.deepCloneProperty.call(prop, value, m);
-    //   //     }
-    //   //   }
-    //   // }
-    //   // return this.model_.create(m, this.X);
-    // }
+    
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  documentation: 'Add cloning to Properties.',
+
+  methods: [
+    
+
   ]
 });

@@ -1729,6 +1729,8 @@ foam.CLASS({
     },
 
     function framed(l) {
+      var X = this;
+      
       return function() {
         var triggered    = false;
         var unsubscribed = false;
@@ -1741,7 +1743,7 @@ foam.CLASS({
 
           if ( ! triggered ) {
             triggered = true;
-            this.requestAnimationFrame(
+            X.requestAnimationFrame(
               function() {
                 triggered = false;
                 var args = foam.array.argsToArray(lastArgs);
