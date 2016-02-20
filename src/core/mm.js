@@ -507,10 +507,11 @@ foam.CLASS({
         }
       }
 
+      c[foam.string.constantize(this.name)] = this;
+
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
       var f = this.f = function f(o) { return o[name]; };
-      c[foam.string.constantize(this.name)] = this;
 
       /** Makes this Property a comparator, suitable for use with mLangs. */
       var comparePropertyValues = this.comparePropertyValues;
