@@ -1680,19 +1680,21 @@ foam.CLASS({
   ],
 
   methods: [
-    function log() { this.console.log.apply(this.console, arguments); },
-    function warn() { this.console.warn.apply(this.console, arguments); },
-    function info() { this.console.info.apply(this.console, arguments); },
-    function error() { this.console.error.apply(this.console, arguments); },
-    function $(id) { return this.document.getElementById(id); },
+    function $(id)   { return this.document.getElementById(id); },
     function $$(cls) { return this.document.getElementsByClassName(cls); },
 
-    /** Decorate a listener so that the event is delivered asynchronously. **/
+    function error() { this.console.error.apply(this.console, arguments); },
+    function info()  { this.console.info.apply(this.console, arguments); },
+    function log()   { this.console.log.apply(this.console, arguments); },
+    function warn()  { this.console.warn.apply(this.console, arguments); },
+
     function async(l) {
+      /* Decorate a listener so that the event is delivered asynchronously. */
       return this.delayed(l, 0);
     },
 
     function delayed(l, delay) {
+      /* Decorate a listener so that events are delivered 'delay' ms later. */
       return function() {
         this.setTimeout(
           function() { l.apply(this, arguments); },
