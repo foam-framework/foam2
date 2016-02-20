@@ -363,7 +363,7 @@ foam.CLASS({
       When the bootstrap is finished, it will be replaced by a version
       that knows about a classes Properties, so it can do a better job.
      */
-    function initArgs(args) {
+    function initArgs(args, opt_X) {
       if ( ! args ) return;
 
       for ( var key in args )
@@ -1106,7 +1106,7 @@ foam.CLASS({
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
           if ( ! this.hasOwnPrivate_(as) ) {
-            var X = this.getPrivate_('X') || foam;
+            var X = this.X || foam;
             this.setPrivate_(as, X[key]);
           }
 
@@ -1151,7 +1151,7 @@ foam.CLASS({
       Object.defineProperty(proto, 'Y', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('Y') ) {
-            var X = this.getPrivate_('X') || foam;
+            var X = this.X || foam;
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
@@ -1312,13 +1312,23 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      var name = this.name;
-      var code = this.code;
+      var name       = this.name;
+      var code       = this.code;
+      var isMerged   = this.isMerged;
+      var isFramed   = this.isFramed;
+      var mergeDelay = this.mergeDelay;
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          if ( ! this.hasOwnPrivate_(name) )
-            this.setPrivate_(name, code.bind(this));
+          if ( ! this.hasOwnPrivate_(name) ) {
+            var l = code.bind(this);
+            if ( isMerged ) {
+              l = this.X.merged(l, mergeDelay);
+            } else if ( isFramed ) {
+              l = this.X.framed(l);
+            }
+            this.setPrivate_(name, l);
+          }
 
           return this.getPrivate_(name);
         },
@@ -1470,7 +1480,7 @@ foam.CLASS({
       Replaces simpler version defined in original FObject definition.
     */
     function initArgs(args, X) {
-      if ( X ) this.setPrivate_('X', X);
+      this.X = X || foam.X; // this.setPrivate_('X', X);
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy
@@ -1676,41 +1686,69 @@ foam.CLASS({
     function $(id) { return this.document.getElementById(id); },
     function $$(cls) { return this.document.getElementsByClassName(cls); },
 
+    /** Decorate a listener so that the event is delivered asynchronously. **/
     function async(l) {
-
+      return this.delayed(l, 0);
     },
 
     function delayed(l, delay) {
-
+      return function() {
+        this.setTimeout(
+          function() { l.apply(this, arguments); },
+          delay);
+      }.bind(this);
     },
 
     function merged(l, opt_delay) {
+      var delay = opt_delay || 16;
+      var X     = this;
 
-    },
-
-    function framed(l) {
       return function() {
-        var triggered    = false;
-        var unsubscribed = false;
-        var lastArgs     = null;
+        var triggered = false;
+        var lastArgs  = null;
 
         var f = function() {
           lastArgs = arguments;
 
-          if ( unsubscribed ) throw EventService.UNSUBSCRIBE_EXCEPTION;
+          if ( ! triggered ) {
+            triggered = true;
+            X.setTimeout(
+              function() {
+                triggered = false;
+                var args = foam.array.argsToArray(lastArgs);
+                lastArgs = null;
+                l.apply(this, args);
+              }, delay);
+          }
+        };
+
+        // TODO: add in debug.js
+        // if ( DEBUG ) f.toString = function() {
+        //   return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
+        // };
+
+        return f;
+      }();
+    },
+
+    function framed(l) {
+      var X = this;
+
+      return function() {
+        var triggered = false;
+        var lastArgs  = null;
+
+        var f = function() {
+          lastArgs = arguments;
 
           if ( ! triggered ) {
             triggered = true;
-            this.requestAnimationFrame(
+            X.requestAnimationFrame(
               function() {
                 triggered = false;
-                var args = argsToArray(lastArgs);
+                var args = foam.array.argsToArray(lastArgs);
                 lastArgs = null;
-                try {
-                  l.apply(this, args);
-                } catch (x) {
-                  if ( x === EventService.UNSUBSCRIBE_EXCEPTION ) unsubscribed = true;
-                }
+                l.apply(this, args);
               });
           }
         };
@@ -1775,12 +1813,10 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - "ofClass" instead of "subType"
   - more docs
   - DynamicValue map() and relate() methods
-  - listener decorators
   - Lightweight Objects
-  - 'expression' Property property
   - Proxy label, plural from Class to Model
   - ID support
   - a util method to extract function arguments
+  - 'expression' Property property
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
-  - need the equivalent of FOAM1 Window
 */

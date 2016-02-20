@@ -82,69 +82,49 @@ foam.CLASS({
 
       return hash;
     },
-    // /** Create a shallow copy of this object. **/
-    // function clone() {
-    //   // var m = {};
-    //   // for ( var key in this.instance_ ) {
-    //   //   var value = this[key];
-    //   //   if ( value !== undefined ) {
-    //   //     var prop = this.model_.getProperty(key);
-    //   //     if ( prop && prop.cloneProperty )
-    //   //       prop.cloneProperty.call(prop, value, m);
-    //   //     else if ( ! prop.model_ ) // happens during bootstrap
-    //   //       m[key] = value;
-    //   //   }
-    //   // }
-    //   // return this.model_.create(m, this.X);
-    // },
-    //
+    /** Create a shallow copy of this object. **/
+    function clone() {
+      var m = {};
+      for ( var key in this.instance_ ) {
+        var value = this[key];
+        if ( value !== undefined ) {
+          var prop = this.cls_.getAxiomByName(key);
+          if ( prop && prop.cloneProperty )
+            prop.cloneProperty(value, m);
+          else
+            m[key] = value;
+        }
+      }
+      return this.model_.create(m/*, this.X*/);
+    },
+
     // /** Create a deep copy of this object. **/
     // function deepClone() {
-    //   // var m = {};
-    //   // for ( var key in this.instance_ ) {
-    //   //   var value = this[key];
-    //   //   if ( value !== undefined ) {
-    //   //     var prop = this.model_.getProperty(key);
-    //   //     if ( prop && prop.deepCloneProperty ) {
-    //   //       prop.deepCloneProperty.call(prop, value, m);
-    //   //     }
-    //   //   }
-    //   // }
-    //   // return this.model_.create(m, this.X);
-    // }
+    //   var m = {};
+    //   for ( var key in this.instance_ ) {
+    //     var value = this[key];
+    //     if ( value !== undefined ) {
+    //       var prop = this.cls_.getAxiomByName(key);
+    //       if ( prop && prop.deepCloneProperty ) {
+    //         prop.deepCloneProperty(value, m);
+    //       } else if ( value.deepClone ) {
+    //         m[key] = value.deepClone();
+    //       }
+    //     }
+    //   }
+    //   return this.model_.create(m/*, this.X*/);
+    // },
+    
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Property',
 
-/** Adds diff functionality to all arrays */
-// TODO: make proto decoration more official
-Array.prototype.diff = function diff(other) {
-  var added = other.slice(0);
-  var removed = [];
-  for ( var i = 0 ; i < this.length ; i++ ) {
-    for ( var j = 0 ; j < added.length ; j++ ) {
-      if ( this[i].compareTo(added[j]) == 0 ) {
-        added.splice(j, 1);
-        j--;
-        break;
-      }
-    }
-    if ( j == added.length ) removed.push(this[i]);
-  }
-  return { added: added, removed: removed };
-};
+  documentation: 'Add cloning to Properties.',
 
+  methods: [
+    
 
-/** Adds hashCode functionality to all strings. */
-String.prototype.hashCode = function hashCode() {
-  var hash = 0;
-  if ( this.length == 0 ) return hash;
-
-  for (i = 0; i < this.length; i++) {
-    var code = this.charCodeAt(i);
-    hash = ((hash << 5) - hash) + code;
-    hash &= hash;
-  }
-
-  return hash;
-}
+  ]
+});

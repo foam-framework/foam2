@@ -359,11 +359,71 @@ log(o.m1(), o.l1());
 var m = o.m1, l = o.l1;
 log(m(), l());
 
-// TODO: isMerged
+// If a listener has isMerged: true, it will merge multiple
+// events received withing 'mergeDelay' milliseconds into
+// a single event. 'mergeDelay' is optional and defaults to
+// 16ms.
+foam.CLASS({
+  name: 'MergedListenerTest',
+  listeners: [
+    {
+      name: 'notMerged',
+      isMerged: false, // the default
+      code: function() { log('not merged listener'); }
+    },
+    {
+      name: 'merged',
+      isMerged: true,
+      mergeDelay: 1, // 1ms
+      code: function() { log('merged listener'); }
+    }
+  ]
+});
+var o = MergedListenerTest.create();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
+o.merged(); o.notMerged();
 
-// TODO: mergeDelay
+// If a listener has isFramed: true, it will merge multiple
+// events received withing one animation frame to a single
+// event delivered at the next animationFrame.
+foam.CLASS({
+  name: 'FramedListenerTest',
+  listeners: [
+    {
+      name: 'framed',
+      isFramed: true,
+      code: function() { log('framed listener'); }
+    }
+  ]
+});
+var o = FramedListenerTest.create();
+o.framed();
+o.framed();
+o.framed();
+o.framed();
 
-// TODO: isFramed
+// You can decorate a listener with delayed() to delay the
+// execution of the listener. Unlike merged(), which also delays
+// results, delayed() does not merge results.
+var l1 = foam.X.delayed(function() { console.log('l1'); }, 10);
+var l2 = foam.X.delayed(function() { console.log('l2'); }, 5);
+l1();
+l2();
+l1();
+l2();
+
+// async(l) is the same as delayed(l, 0)
+var d1 = foam.X.async(function() { console.log('d1'); });
+var d2 = function() { console.log('d2'); };
+d1();
+d2();
+d1();
+d2();
 
 // In addition to class-inheritance, FOAM also supports
 // 'Traits', which are a form of multiple-inheritance which
