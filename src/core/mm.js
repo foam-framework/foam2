@@ -531,7 +531,7 @@ foam.CLASS({
       var preSet          = this.preSet;
       var postSet         = this.postSet;
       var factory         = this.factory;
-      var hasDefaultValue = this.hasOwnProperty('defaultValue');
+      var hasDefaultValue = 'defaultValue' in this;
       var defaultValue    = this.defaultValue;
       var dynName         = name + '$';
       var isFinal         = this.final;
