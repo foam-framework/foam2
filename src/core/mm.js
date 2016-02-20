@@ -1610,6 +1610,7 @@ foam.CLASS({
 });
 
 
+// TODO: Move somewhere else. This shouldn't be in core.
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
@@ -1619,9 +1620,7 @@ foam.CLASS({
       var instance;
       var oldCreate = cls.create;
       cls.create = function() {
-        if ( ! instance )
-          instance = oldCreate.apply(this, arguments);
-        return instance;
+        return instance || ( instance = oldCreate.apply(this, arguments) );
       }
     }
   ]
@@ -1632,6 +1631,7 @@ foam.CLASS({
   refines: 'foam.pattern.Singleton',
   axioms: [ foam.pattern.Singleton.create() ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
