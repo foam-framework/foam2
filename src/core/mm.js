@@ -1822,4 +1822,5 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - a util method to extract function arguments
   - 'expression' Property property
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
+  - context $ binding
 */

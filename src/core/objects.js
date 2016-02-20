@@ -82,6 +82,7 @@ foam.CLASS({
 
       return hash;
     },
+
     /** Create a shallow copy of this object. **/
     function clone() {
       var m = {};
@@ -114,9 +115,9 @@ foam.CLASS({
     //   }
     //   return this.model_.create(m/*, this.X*/);
     // },
-    
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Property',

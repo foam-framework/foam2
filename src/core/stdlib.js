@@ -128,6 +128,7 @@ foam.LIB({
   ]
 });
 
+
 foam.LIB({
   name: 'Array',
   methods: [
@@ -258,7 +259,7 @@ foam.LIB({
     X[key] = value;
 
     // TODO:
-    //if ( GLOBAL.SimpleReadOnlyValue && key !== '$' && key !== '$$' )
+    // if ( GLOBAL.SimpleReadOnlyValue && key !== '$' && key !== '$$' )
     // X[key + '$'] = SimpleReadOnlyValue.create({value: value});
   }
 
