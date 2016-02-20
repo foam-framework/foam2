@@ -642,7 +642,7 @@ describe('FObject white box test', function() {
 
   it('inits from null', function() {
     var o = test.Person.create();
-    expect(o.name).toBeUndefined();
+    expect(o.name).toEqual('');
   });
   it('inits from a POJSO', function() {
     var o = test.Person.create({ name: 'prop1' });

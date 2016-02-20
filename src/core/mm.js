@@ -531,7 +531,8 @@ foam.CLASS({
       var preSet          = this.preSet;
       var postSet         = this.postSet;
       var factory         = this.factory;
-      var hasDefaultValue = 'defaultValue' in this;
+      // This doesn't let defaultValue to be 'undefined', which is maybe not bad.
+      var hasDefaultValue = typeof this.defaultValue !== 'undefined';
       var defaultValue    = this.defaultValue;
       var dynName         = name + '$';
       var isFinal         = this.final;
