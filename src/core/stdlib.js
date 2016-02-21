@@ -205,14 +205,23 @@ foam.LIB({
     },
 
     function setName(f, name) {
-      // Set a function's name for improved debugging and profiling
+      /** Set a function's name for improved debugging and profiling **/
       Object.defineProperty(f, 'name', {value: name, configurable: true});
     },
 
     function appendArguments(a, args, start) {
-      /** convenience method to append 'arguments' onto a real array */
+      /** Convenience method to append 'arguments' onto a real array **/
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
+    },
+
+    function args(f) {
+      /**
+       * Return a function's arguments as an array.
+       * Ex. args(function(a,b) {...}) == ['a', 'b']
+       **/
+      var args = f.toString().match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2];
+      return args ? args.split(',').map(function(s) { return s.trim(); }) : [];
     }
   ]
 });
