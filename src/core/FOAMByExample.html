@@ -738,8 +738,11 @@ log(f());
 // A call to memoize1() with more than one argument will trigger a failed assertion.
 log(f(1,2));
 
-// foam.fn.args() returns a function's arguments an an array.
-log(foam.fn.args(function(a,b,fooBar) { }));
+// foam.fn.argsStr() returns a function's arguments an a string.
+log(foam.fn.argsStr(function(a,b,fooBar) { }));
+
+// foam.fn.argsArray() returns a function's arguments an an array.
+log(foam.fn.argsArray(function(a,b,fooBar) { }));
 
 // foam.string.constantize converts strings from camelCase to CONSTANT_FORMAT
 log(foam.string.constantize('foo'));

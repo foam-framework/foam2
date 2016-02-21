@@ -215,13 +215,16 @@ foam.LIB({
       return a;
     },
 
-    function args(f) {
+    function argsStr(f) {
+      return f.toString().match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || [];
+    },
+
+    function argsArray(f) {
       /**
        * Return a function's arguments as an array.
        * Ex. args(function(a,b) {...}) == ['a', 'b']
        **/
-      var args = f.toString().match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2];
-      return args ? args.split(',').map(function(s) { return s.trim(); }) : [];
+      return this.argsStr(f).split(',').map(function(s) { return s.trim(); });
     }
   ]
 });

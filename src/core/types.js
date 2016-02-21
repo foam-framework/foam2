@@ -109,11 +109,7 @@ foam.LIB({
         * @return An array of Argument objects.
         */
       // strip newlines and find the function(...) declaration
-      var args = fn.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
-      if ( ! args ) throw "foam.types.getFunctionArgs error parsing: " + fn;
-      args = args[2];
-      if ( ! args ) return [];
-      args += ','; /// easier matching
+      var args = foam.fn.argsStr(fn) + ',';
 
       var ret = [];
       // check each arg for types
