@@ -111,7 +111,7 @@ foam.LIB({
 
   methods: [
     function compareTo(o) { return ( o == this ) ? 0 : this < o ? -1 : 1; },
-    
+
     /** Adds hashCode functionality to all strings. */
     function hashCode() {
       var hash = 0;
@@ -124,7 +124,7 @@ foam.LIB({
       }
 
       return hash;
-    }    
+    }
   ]
 });
 
@@ -216,7 +216,8 @@ foam.LIB({
     },
 
     function argsStr(f) {
-      return f.toString().match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+      /** Finds the function(...) declaration arguments part. Strips newlines. */
+      return f.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
     function argsArray(f) {
