@@ -560,8 +560,8 @@ foam.CLASS({
         enumerable: false
       });
 
-      if ( this.expression )
-        factory = this.expressionFactory(this.expression);
+      var eFactory = this.expression &&
+        this.expressionFactory(this.expression);
 
       var getter =
         prop.getter ? prop.getter :
@@ -569,6 +569,11 @@ foam.CLASS({
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
             defaultValue ;
+        } :
+        eFactory ? function eFactoryGetter() {
+          return this.hasOwnProperty(name) ? this.instance_[name]   :
+                 this.hasOwnPrivate_(name) ? this.getPrivate_(name) :
+                 this.setPrivate_(name, eFactory.call(this)) ;
         } :
         factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
@@ -580,8 +585,9 @@ foam.CLASS({
       var setter = prop.setter ||
         function propSetter(newValue) {
           // Get old value but avoid triggering factory if present
-          var oldValue = factory ?
-            ( this.hasOwnProperty(name) ? this[name] : undefined ) :
+          var oldValue =
+            factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
+            eFactory ? ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ? this[name] : undefined ) :
             this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
@@ -621,7 +627,10 @@ foam.CLASS({
         var value = e.apply(this, args.map(function(a) { return self[a]; }));
         var subs  = [];
         var l     = function() {
-          self.clearProperty(name);
+          if ( ! self.hasOwnProperty(name) ) {
+            delete self.private_[name];
+            self.clearProperty(name); // TODO: this might be wrong
+          }
           for ( var i = 0 ; i < subs.length ; i++ )
             subs[i].destroy();
         };
