@@ -57,9 +57,8 @@ describe('foam.events.oneTime', function() {
     expect(listener.count).toEqual(1);
 
     // listener should be gone now
-    //expect(ep.change.hasListeners_('simple')).toBe(false);
     ep.change.publish('simple');
-    expect(listener.count).toEqual(1);
+    expect(listener.count).toEqual(1); // no change
   });
 
 });
@@ -90,8 +89,8 @@ describe('foam.events.consoleLog', function() {
 });
 
 
-/*
-describe('foam.events.merged', function() {
+
+describe('foam.X.merged', function() {
   var ep;
   var listener;
 
@@ -107,7 +106,7 @@ describe('foam.events.merged', function() {
   });
 
   it('merges with default parameters', function() {
-    var merged = foam.events.merged(listener);
+    var merged = foam.X.merged(listener);
 
     ep.change.subscribe('simple', merged);
 
@@ -124,7 +123,7 @@ describe('foam.events.merged', function() {
   });
 
   it('merges with delay specified', function() {
-    var merged = foam.events.merged(listener, 1300);
+    var merged = foam.X.merged(listener, 1300);
 
     ep.change.subscribe('simple', merged);
 
@@ -135,21 +134,6 @@ describe('foam.events.merged', function() {
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
-    expect(listener.count).toEqual(0);
-
-    jasmine.clock().tick(1300);
-    expect(listener.count).toEqual(1);
-  });
-
-  it('merges with opt_X specified', function() {
-    var merged = foam.events.merged(listener, 1300, GLOBAL);
-
-    ep.change.subscribe('simple', merged);
-
-    ep.change.publish('simple');
-    expect(listener.count).toEqual(0);
-
-    ep.change.publish('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1300);
@@ -158,7 +142,7 @@ describe('foam.events.merged', function() {
 
 
   it('unsubscribes when requested', function() {
-    var merged = foam.events.merged(foam.events.oneTime(listener));
+    var merged = foam.X.merged(foam.events.oneTime(listener));
 
     ep.change.subscribe('simple', merged);
 
@@ -170,7 +154,6 @@ describe('foam.events.merged', function() {
 
     jasmine.clock().tick(17);
     expect(listener.count).toEqual(1);
-    expect(ep.change.hasListeners_(['simple'])).toBe(false);
     // and unsub happens due to the oneTime
 
     ep.change.publish('simple');
@@ -185,7 +168,8 @@ describe('foam.events.merged', function() {
   });
 });
 
-describe('foam.events.async', function() {
+
+describe('foam.X.async', function() {
   var ep;
   var listener;
 
@@ -201,7 +185,7 @@ describe('foam.events.async', function() {
   });
 
   it('async invokes each listener', function() {
-    var delayed = foam.events.async(listener);
+    var delayed = foam.X.async(listener);
 
     ep.change.subscribe('simple', delayed);
 
@@ -218,7 +202,7 @@ describe('foam.events.async', function() {
 
   it('async with opt_X specified', function() {
     var X = { setTimeout: setTimeout };
-    var delayed = foam.events.async(listener, X);
+    var delayed = foam.X.async(listener, X);
 
     ep.change.subscribe('simple', delayed);
 
@@ -236,7 +220,7 @@ describe('foam.events.async', function() {
 });
 
 
-describe('foam.events.framed', function() {
+describe('foam.X.framed', function() {
   var ep;
   var listener;
 
@@ -254,13 +238,8 @@ describe('foam.events.framed', function() {
   });
 
   it('framed listeners accumulate', function() {
-    var X = {
-      requestAnimationFrame: function(fn) {
-        setTimeout(fn, 1);
-      }
-    };
-    var delayed1 = foam.events.framed(listener1, X);
-    var delayed2 = foam.events.framed(listener2, X);
+    var delayed1 = foam.X.framed(listener1);
+    var delayed2 = foam.X.framed(listener2);
     ep.change.subscribe('simple', delayed1);
     ep.change.subscribe('simple', delayed2);
 
@@ -272,103 +251,18 @@ describe('foam.events.framed', function() {
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
-    jasmine.clock().tick(1);
-    expect(listener1.count).toEqual(1);
-    expect(listener2.count).toEqual(1);
-  });
-
-  it('coverage that will not work without Node requestAnimationFrame support', function() {
-    // TODO: fix this 'polyfill' as we shouldn't change the global object.
-    // This should be a browser test, most likely.
-    requestAnimationFrame = function(fn) {
-        setTimeout(fn, 1);
-    };
-    foam.events.framed(listener1);
+    jasmine.clock().tick(17);
+    setTimeout(function() { // triggers requestAnimationFrame() in browser
+      expect(listener1.count).toEqual(1);
+      expect(listener2.count).toEqual(1);
+    }, 0);
   });
 
 });
-*/
 
 
 
-// describe('foam.events.Observable.hasListeners()', function() {
-//   var ep;
-//   var listener;
-//   var listener2;
-//   var listener3;
-
-//   beforeEach(function() {
-//     ep = modelWithTopic();
-//     listener = createTestListener();
-//     listener2 = createTestListener();
-//     listener3 = createTestListener();
-//   });
-//   afterEach(function() {
-//     ep = null;
-//     listener = null;
-//     listener2 = null;
-//     listener3 = null;
-//   });
-
-//   it('reports correctly for no listeners, ever', function() {
-//     expect(ep.change.hasListeners_()).toBe(false);
-//     expect(ep.change.hasListeners_('')).toBe(false);
-//   });
-//   it('reports correctly for no listeners after removing one', function() {
-//     ep.change.subscribe(listener);
-//     expect(ep.change.hasListeners_()).toBe(true);
-
-//     ep.change.unsubscribe(listener);
-//     expect(ep.change.hasListeners_()).toBe(false);
-//   });
-//   it('reports correctly for no listeners after removing one with topic', function() {
-//     ep.change.subscribe('flange', listener);
-//     expect(ep.change.hasListeners_('flange')).toBe(true);
-//     expect(ep.change.hasListeners_()).toBe(false);
-
-//     ep.change.unsubscribe('flange', listener);
-//     expect(ep.change.hasListeners_('flange')).toBe(false);
-//   });
-
-//   it('reports correctly for no listeners after removing three', function() {
-//     ep.change.subscribe(listener);
-//     ep.change.subscribe(listener2);
-//     ep.change.subscribe(listener3);
-//     expect(ep.change.hasListeners_()).toBe(true);
-
-//     ep.change.unsubscribe(listener2);
-//     ep.change.unsubscribe(listener);
-//     ep.change.unsubscribe(listener3);
-//     expect(ep.change.hasListeners_()).toBe(false);
-//   });
-//   it('reports correctly for no listeners after removing three with topic', function() {
-//     ep.change.subscribe('arch', listener);
-//     ep.change.subscribe('arch', listener2);
-//     ep.change.subscribe('arch', listener3);
-//     expect(ep.change.hasListeners_('arch')).toBe(true);
-
-//     ep.change.unsubscribe('arch', listener2);
-//     ep.change.unsubscribe('arch', listener);
-//     ep.change.unsubscribe('arch', listener3);
-//     expect(ep.change.hasListeners_('arch')).toBe(false);
-//   });
-//   it('reports correctly for no listeners after destroying', function() {
-//     ep.change.subscribe(listener);
-//     ep.change.subscribe(listener2);
-//     ep.change.subscribe('arch', listener3);
-//     expect(ep.change.hasListeners_()).toBe(true);
-//     expect(ep.change.hasListeners_('arch')).toBe(true);
-
-//     ep.change.destroy();
-//     expect(ep.change.hasListeners_()).toBe(false);
-//     expect(ep.change.hasListeners_('arch')).toBe(false);
-//   });
-
-
-// });
-
-
-describe('foam.events.Observable.sub()/.pub()', function() {
+describe('foam.X.Observable.sub()/.pub()', function() {
   var ep;
   var listener;
   var listener2;
@@ -391,7 +285,6 @@ describe('foam.events.Observable.sub()/.pub()', function() {
     ep.change.subscribe(listener);
     ep.change.subscribe(listener2);
     ep.change.subscribe(listener3);
-//    expect(ep.change.hasListeners_()).toBe(true);
 
     ep.change.unsubscribe(listener);
     ep.change.publish();
@@ -403,7 +296,6 @@ describe('foam.events.Observable.sub()/.pub()', function() {
     ep.change.subscribe(listener);
     ep.change.subscribe(listener2);
     ep.change.subscribe(listener3);
-//    expect(ep.change.hasListeners_()).toBe(true);
 
     ep.change.unsubscribe(listener2);
     ep.change.publish();
@@ -415,7 +307,6 @@ describe('foam.events.Observable.sub()/.pub()', function() {
     ep.change.subscribe(listener);
     ep.change.subscribe(listener2);
     ep.change.subscribe(listener3);
-//    expect(ep.change.hasListeners_()).toBe(true);
 
     ep.change.unsubscribe(listener3);
     ep.change.publish();
