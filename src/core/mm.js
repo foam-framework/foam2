@@ -106,7 +106,7 @@ foam.LIB({
 
   constants: {
     prototype: Object.prototype,
-    axiomMap_: null,
+    axiomMap_: null
   },
 
   methods: [
