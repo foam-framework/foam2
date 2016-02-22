@@ -100,7 +100,6 @@
 */
 
 foam.LIB({
-  package: 'core',
   name: 'AbstractClass',
 
   documentation: "Root prototype for all classes.",
