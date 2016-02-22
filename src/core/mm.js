@@ -271,8 +271,9 @@ foam.LIB({
 //        if ( global[this.name] )
 //          console.warn('Redefinition of class: ' + this.name);
 
-        var parent = this.extends ? foam.lookup(this.extends) : foam.AbstractClass ;
-        // TODO: make some of these values non-enumerable
+        var parent = this.extends   ?
+          foam.lookup(this.extends) :
+          foam.AbstractClass        ;
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
@@ -281,7 +282,8 @@ foam.LIB({
         cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.axiomCache_      = {};
-        cls.id               = this.id || ( this.package ? this.package + '.' + this.name : this.name );
+        cls.id               = this.id ||
+          ( this.package ? this.package + '.' + this.name : this.name );
         cls.package          = this.package;
         cls.name             = this.name;
         cls.model_           = this;
@@ -400,7 +402,8 @@ foam.CLASS({
 
     function hasOwnPrivate_(name) {
       return this.private_ &&
-        ( typeof this.private_[name] !== 'undefined' || this.private_.hasOwnProperty(name) );
+        ( typeof this.private_[name] !== 'undefined' ||
+          this.private_.hasOwnProperty(name) );
     },
 
     function publishPropertyChange() {
@@ -469,7 +472,17 @@ foam.CLASS({
   extends: 'FObject',
 
   properties: [
-    'name', 'type', 'defaultValue', 'factory', 'adapt', 'preSet', 'postSet', 'expression', 'getter', 'setter', 'final',
+    'name',
+    'type',
+    'defaultValue',
+    'factory',
+    'adapt',
+    'preSet',
+    'postSet',
+    'expression',
+    'getter',
+    'setter',
+    'final',
     {
       /**
         Compare two values taken from this property.
@@ -1403,7 +1416,8 @@ foam.CLASS({
     {
       name: 'exports',
       postSet: function(_, xs) {
-        (this.axioms || (this.axioms = [])).push.call(this.axioms, foam.core.Exports.create({bindings: xs}));
+        (this.axioms || (this.axioms = [])).
+          push.call(this.axioms, foam.core.Exports.create({bindings: xs}));
       }
     },
     {
@@ -1421,7 +1435,9 @@ foam.CLASS({
       subType: 'InnerClass',
       name: 'classes',
       adaptArrayElement: function(o) {
-        return foam.core.InnerClass.isInstance(o) ? o : foam.core.InnerClass.create({model: o});
+        return foam.core.InnerClass.isInstance(o) ?
+          o :
+          foam.core.InnerClass.create({model: o}) ;
       }
     },
     {
