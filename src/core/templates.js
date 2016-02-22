@@ -353,3 +353,5 @@ foam.CLASS({
     }
   ]
 });
+
+//TemplateBenchmark.create().benchmark();

@@ -27,7 +27,12 @@ foam.CLASS({
     {
       name: 'tail',
       getter: function() {
-        if ( ! this.instance_.tail ) this.instance_.tail = foam.parsers.StringPS.create(this.str, this.pos + 1);
+        if ( ! this.instance_.tail ) {
+          var ps = this.cls_.create();
+          ps.str = this.str;
+          ps.pos = this.pos + 1;
+          this.instance_.tail = ps;
+        }
         return this.instance_.tail;
       },
       setter: function(value) {
@@ -45,25 +50,20 @@ foam.CLASS({
     }
   ],
   methods: [
-    function initArgs(str, pos, tail, value) {
-      if ( arguments.length > 0 ) this.str = str;
-      else this.str = [''];
-      if ( arguments.length > 1 ) this.pos = pos;
-      else this.pos = 0
-      if ( arguments.length > 2 ) this.tail = tail;
-      if ( arguments.length > 3 ) this.value = value;
-    },
+    function initArgs() {},
     function setValue(value) {
       // Force undefined values to null so that hasOwnProperty checks are faster.
       if ( value === undefined ) value = null;
-      return foam.parsers.StringPS.create(
-        this.str,
-        this.pos,
-        this.tail,
-        value
-      );
+      var ps = this.cls_.create();
+      ps.str = this.str;
+      ps.pos = this.pos;
+      ps.tail = this.tail;
+      ps.value = value;
+      return ps;
     },
     function setString(s) {
+      if ( ! this.pos ) this.pos = 0;
+      if ( ! this.str ) this.str = [];
       this.str[0] = s;
     }
   ]
