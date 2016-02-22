@@ -3,6 +3,8 @@
   <script language="javascript" src="stdlib.js"></script>
   <script language="javascript" src="mm.js"></script>
   <script language="javascript" src="debug.js"></script>
+  <script language="javascript" src="parse.js"></script>
+  <script language="javascript" src="templates.js"></script>
   <title>FOAM By Example</title>
   <style>
     code {color:blue;}
@@ -773,6 +775,78 @@ log(s, s.length);
 // foam.string.pad() pads a string to the specified length, right justifying if given a negative number.
 var s = foam.string.pad('foobar', -10);
 log(s, s.length);
+
+// Basic templates
+foam.CLASS({
+  name: 'TemplateTest',
+  properties: [
+    'name'
+  ],
+  templates: [
+    {
+      name: 'hello',
+      template: 'Hello, my name is <%= this.name %>.'
+    }
+  ]
+});
+var o = TemplateTest.create({ name: 'Adam' });
+log(o.hello());
+
+foam.CLASS({
+  name: 'TemplateTest',
+  properties: [
+    'name'
+  ],
+  templates: [
+    {
+      name: 'greet',
+      args: [
+        'stranger'
+      ],
+      template: 'Hello <%= stranger %>, my name is <%= this.name %>.'
+    }
+  ]
+});
+var o = TemplateTest.create({ name: 'Adam' });
+log(o.greet("Bob"));
+
+foam.CLASS({
+  name: 'TemplateTest',
+  properties: [ 'name' ],
+  templates: [
+    {
+      name: 'greeter',
+      args: [ 'stranger' ],
+      template: 'Hello <%= stranger %>'
+    },
+    {
+      name: 'greet',
+      args: ['stranger'],
+      template: '<% this.greeter(output, stranger); %>, my name is <%= this.name %>'
+    }
+  ]
+});
+var o = TemplateTest.create({ name: 'Adam' });
+log(o.greet("Alice"));
+
+// More
+foam.CLASS({
+  name: 'TemplateTest',
+  properties: [ 'name' ],
+  templates: [
+    {
+      name: 'complexTemplate',
+      template: 'Use raw JS code for loops and control structures' +
+        '<% for ( var i = 0 ; i < 10; i++ ) { %>\n' +
+        'i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% } '+
+        '} %>' +
+        '\n\n' +
+        'Use percent signs to shortcut access to local properties\n' +
+        'For instance, my name is %%name\n'
+    },
+  ]
+});
+log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
 
 // TODO: Putting it all together
 </script>
