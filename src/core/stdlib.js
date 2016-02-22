@@ -216,7 +216,7 @@ foam.LIB({
     },
 
     function argsStr(f) {
-      return f.toString().match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || [];
+      return f.toString().match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
     function argsArray(f) {
@@ -225,7 +225,17 @@ foam.LIB({
        * Ex. args(function(a,b) {...}) == ['a', 'b']
        **/
       return this.argsStr(f).split(',').map(function(s) { return s.trim(); });
+    },
+
+    // ???: Is this needed?
+    /*
+    function passProperties(args, f) {
+      return function passProperties() {
+        var self = this;
+        return f.apply(this, args.map(function(arg) { return self[arg]; }));
+      };
     }
+    */
   ]
 });
 

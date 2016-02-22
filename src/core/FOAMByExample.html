@@ -624,6 +624,21 @@ log(dv.isDefined());
 dv.clear();
 log(dv.get(), dv.isDefined());
 
+// DynamicExpression **********************
+foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
+var p = Person.create({fname: 'John', lname: 'Smith'});
+var e = foam.core.DynamicExpression.create(
+  [ p.fname$, p.lname$],
+  function(f, l) { return f + ' ' + l; }
+);
+log(e.get());
+e.subscribe(log);
+e.subscribe(function() { console.log(arguments); });
+p.fname = 'Steve';
+p.lname = 'Jones';
+log(e.get());
+
+
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
 var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
@@ -740,9 +755,11 @@ log(f(1,2));
 
 // foam.fn.argsStr() returns a function's arguments an a string.
 log(foam.fn.argsStr(function(a,b,fooBar) { }));
+log(typeof foam.fn.argsStr(function() { }));
 
 // foam.fn.argsArray() returns a function's arguments an an array.
 log(foam.fn.argsArray(function(a,b,fooBar) { }));
+log(Array.isArray(foam.fn.argsArray(function() { })));
 
 // foam.string.constantize converts strings from camelCase to CONSTANT_FORMAT
 log(foam.string.constantize('foo'));
