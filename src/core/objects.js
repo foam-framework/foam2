@@ -83,7 +83,7 @@ foam.CLASS({
       return hash;
     },
 
-    /** Create a shallow copy of this object. **/
+    /** Create a deep copy of this object. **/
     function clone() {
       var m = {};
       for ( var key in this.instance_ ) {
@@ -96,25 +96,8 @@ foam.CLASS({
             m[key] = value;
         }
       }
-      return this.model_.create(m/*, this.X*/);
+      return this.cls_.create(m/*, this.X*/);
     },
-
-    // /** Create a deep copy of this object. **/
-    // function deepClone() {
-    //   var m = {};
-    //   for ( var key in this.instance_ ) {
-    //     var value = this[key];
-    //     if ( value !== undefined ) {
-    //       var prop = this.cls_.getAxiomByName(key);
-    //       if ( prop && prop.deepCloneProperty ) {
-    //         prop.deepCloneProperty(value, m);
-    //       } else if ( value.deepClone ) {
-    //         m[key] = value.deepClone();
-    //       }
-    //     }
-    //   }
-    //   return this.model_.create(m/*, this.X*/);
-    // },
   ]
 });
 
@@ -125,7 +108,14 @@ foam.CLASS({
   documentation: 'Add cloning to Properties.',
 
   methods: [
-    
+    function cloneProperty(
+      /* any // The value to clone */         value,
+      /* object // Add values to this map to
+         have them installed on the clone. */ cloneMap
+    ) {
+      /** Override to provide special deep cloning behavior. */
+      cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
+    },
 
   ]
 });

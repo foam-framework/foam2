@@ -3,7 +3,7 @@ describe('FObject compareTo', function() {
   var a;
   var a2;
   var b;
-  
+
   beforeEach(function() {
     foam.CLASS({
       name: 'CompA',
@@ -22,7 +22,7 @@ describe('FObject compareTo', function() {
   afterEach(function() {
     a = a2 = b = null;
   });
-  
+
   it('returns zero for the same object', function() {
     expect(a.compareTo(a)).toEqual(0);
   });
@@ -64,7 +64,7 @@ describe('FObject compareTo', function() {
 describe('FObject diff', function() {
   var a;
   var b;
-  
+
   beforeEach(function() {
     foam.CLASS({
       name: 'CompA',
@@ -82,7 +82,7 @@ describe('FObject diff', function() {
   afterEach(function() {
     a = b = null;
   });
-  
+
   it('returns empty result for identical objects', function() {
     expect(a.diff(a)).toEqual({});
   });
@@ -100,7 +100,7 @@ describe('FObject diff', function() {
     b.c = 'maybe';
     expect(a.diff(b)).toEqual({ b: 'no' });
   });
-  it('returns changed values not present in the other model', function() {    
+  it('returns changed values not present in the other model', function() {
     a.a = 'yes';
     expect(a.diff(b)).toEqual({ a: undefined });
   });
@@ -113,7 +113,7 @@ describe('FObject diff', function() {
 
 describe('FObject hashCode', function() {
   var a;
-  
+
   beforeEach(function() {
     foam.CLASS({
       name: 'CompA',
@@ -125,7 +125,7 @@ describe('FObject hashCode', function() {
   afterEach(function() {
     a = null;
   });
-  
+
   it('regression 1: undefineds', function() {
     expect(a.hashCode()).toEqual(16337);
   });
@@ -140,32 +140,59 @@ describe('FObject hashCode', function() {
   });
 });
 
-//
-// describe('FObject clone', function() {
-//   var a;
-//
-//   beforeEach(function() {
-//     foam.CLASS({
-//       name: 'CompA',
-//       package: 'test',
-//       properties: [ 'a', 'b' ]
-//     });
-//     a = test.CompA.create();
-//   });
-//   afterEach(function() {
-//     a = null;
-//   });
-//
-//   it('regression 1: undefineds', function() {
-//     expect(a.hashCode()).toEqual(16337);
-//   });
-//   it('regression 2: strings and numbers', function() {
-//     a.a = 'this is a longer string!@';
-//     a.b = 998765876.78;
-//     expect(a.hashCode()).toEqual(-359267117);
-//   });
-//   it('regression 3: model instance', function() {
-//     a.a = test.CompA.create({ a: 4 });
-//     expect(a.hashCode()).toEqual(572756);
-//   });
-// });
+describe('FObject clone', function() {
+  var a;
+  beforeEach(function() {
+    foam.CLASS({
+      name: 'CloneProperty',
+      package: 'test',
+      extends: 'foam.core.Property',
+      methods: [
+        function cloneProperty(value, map) {
+          map[this.name] = value + 5;
+        }
+      ],
+    });
+    foam.CLASS({
+      name: 'CompA',
+      package: 'test',
+      properties: [
+        {
+          name: 'ordinary',
+        },
+        {
+          type: 'test.Clone',
+          name: 'special',
+        }
+      ],
+    });
+
+    a = test.CompA.create();
+  });
+  afterEach(function() {
+    a = null;
+  });
+
+  it('clones primitive values', function() {
+    a.ordinary = "some data";
+    a.special = 77;
+
+    var clone = a.clone();
+    expect(clone.ordinary).toEqual(a.ordinary);
+    expect(clone.special).toEqual(a.special + 5);
+
+  });
+  it('clones nested instances', function() {
+    a.ordinary = test.CompA.create({ ordinary: [3,4,5], special: 88 });
+    a.special = 77;
+
+    var clone = a.clone();
+    expect(clone.ordinary).not.toBe(a.ordinary); // not the same object
+    expect(clone.ordinary.ordinary).toEqual([3,4,5]); // but equal
+    expect(clone.ordinary.special).toEqual(88 + 5); // and went through cloneProperty()
+    expect(clone.special).toEqual(a.special + 5);
+  });
+
+
+
+});

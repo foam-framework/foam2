@@ -100,7 +100,7 @@ describe('String.compareTo', function() {
 describe('Array diff', function() {
   var x;
   var y;
-  
+
   beforeEach(function() {
     foam.CLASS({
       name: 'CompA',
@@ -118,7 +118,7 @@ describe('Array diff', function() {
   afterEach(function() {
     x = y = null;
   });
-  
+
   it('reports no change correctly', function() {
     var a = ['a', 't', x];
     expect(a.diff(a).added).toEqual([]);
@@ -161,3 +161,67 @@ describe('Array diff', function() {
     expect(a.diff(b).removed).toEqual([5,6,7]);
   });
 });
+
+describe('Array shallowClone', function() {
+  it('creates a new array', function() {
+    var a = [2,4,6,8];
+    var b = a.shallowClone();
+    expect(a).not.toBe(b);
+    expect(a).toEqual(b);
+  });
+  it('does not clone instances', function() {
+    var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
+    var b = a.shallowClone();
+    expect(a).not.toBe(b);
+    expect(a).toEqual(b);
+    expect(a[1]).toBe(b[1]);
+  });
+});
+
+describe('Array clone (deep copy)', function() {
+  it('creates a new array', function() {
+    var a = [2,4,6,8];
+    var b = a.clone();
+    expect(a).not.toBe(b);
+    expect(a).toEqual(b);
+  });
+  it('clones instances', function() {
+    var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
+    var b = a.clone();
+    expect(a).not.toBe(b);
+    expect(a).toEqual(b);
+    expect(a[1]).not.toBe(b[1]);
+  });
+});
+
+describe('foam.fn.argsArray', function() {
+
+  it('grabs simple argument names', function() {
+    var fn = function(str, bool ,
+       func, obj, num,  arr ) {
+      return (true);
+    }
+    var args = foam.fn.argsArray(fn);
+    expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
+  });
+
+  it('grabs typed argument names', function() {
+    var fn = function(/* string */ str, /*boolean*/ bool ,
+      /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+      return (true);
+    }
+    var args = foam.fn.argsArray(fn);
+    expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
+  });
+
+  it('grabs commented argument names', function() {
+    var fn = function(/* any // the argument value to validate. */ arg, more,
+        /* // a comment here */ name, another /* return // comment */) {
+      return (true);
+    }
+    var args = foam.fn.argsArray(fn);
+    expect(args).toEqual([ 'arg', 'more', 'name', 'another' ]);
+  });
+
+});
+

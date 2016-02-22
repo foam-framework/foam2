@@ -133,6 +133,9 @@ foam.LIB({
   name: 'Array',
   methods: [
     function diff(other) {
+      /** Finds elements added (found in other, not in this) and removed
+          (found in this, not in other). Repeated values are treated
+          as separate elements, but ordering changes are ignored. */
       var added = other.slice(0);
       var removed = [];
       for ( var i = 0 ; i < this.length ; i++ ) {
@@ -146,6 +149,18 @@ foam.LIB({
         if ( j == added.length ) removed.push(this[i]);
       }
       return { added: added, removed: removed };
+    },
+    function clone() {
+      /** Returns a deep copy of this array and its contents. */
+      var ret = new Array(this.length);
+      for ( var i = 0; i < this.length; i++ ) {
+        ret[i] = ( this[i].clone ) ? this[i].clone() : this[i];
+      }
+      return ret;
+    },
+    function shallowClone() {
+      /** Returns a new array containing the same elements as this. */
+      return this.slice();
     }
   ]
 });
@@ -225,7 +240,18 @@ foam.LIB({
        * Return a function's arguments as an array.
        * Ex. args(function(a,b) {...}) == ['a', 'b']
        **/
-      return this.argsStr(f).split(',').map(function(s) { return s.trim(); });
+      var args = foam.fn.argsStr(f);
+      if ( ! args ) return [];
+      args += ',';
+
+      var ret = [];
+      // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
+      var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
+      var typeMatch;
+      while ((typeMatch = argMatcher.exec(args)) !== null) {
+        ret.push(typeMatch[2]);
+      }
+      return ret;
     },
 
     // ???: Is this needed?
