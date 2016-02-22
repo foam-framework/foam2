@@ -1535,6 +1535,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.boot.end();
 
 
@@ -1636,6 +1637,7 @@ foam.CLASS({
       this.args = args;
       this.fn = fn;
     },
+
     function init() {
       // TODO: record subs for destroying
       for ( var i = 0 ; i < this.args.length ; i++ )
