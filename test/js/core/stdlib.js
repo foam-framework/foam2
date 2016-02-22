@@ -196,6 +196,14 @@ describe('Array clone (deep copy)', function() {
 
 describe('foam.fn.argsArray', function() {
 
+  it('handles an empty arg list', function() {
+    var fn = function( ) {
+      return (true);
+    }
+    var args = foam.fn.argsArray(fn);
+    expect(args).toEqual([]);
+  });
+
   it('grabs simple argument names', function() {
     var fn = function(str, bool ,
        func, obj, num,  arr ) {
