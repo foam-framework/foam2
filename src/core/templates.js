@@ -36,11 +36,8 @@ foam.CLASS({
     return {
       markup: repeat0(simpleAlt(
         sym('comment'),
-        sym('create child'),
         sym('simple value'),
-        sym('live value tag'),
         sym('raw values tag'),
-        sym('values tag'),
         sym('code tag'),
         sym('ignored newline'),
         sym('newline'),
@@ -51,20 +48,11 @@ foam.CLASS({
       'comment': seq1(1, '<!--', repeat0(not('-->', anyChar)), '-->'),
 
 
-      'create child': seq(
-        '$$',
-        repeat(notChars(' $\r\n<{,.'))),
-
       'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
 
-      'live value tag': seq('<%#', repeat(not('%>', anyChar)), '%>'),
-
       'raw values tag': simpleAlt(
-        seq('<%=', repeat(not('%>', anyChar)), '%>'),
-        seq('{{{', repeat(not('}}}', anyChar)), '}}}')
+        seq('<%=', repeat(not('%>', anyChar)), '%>')
       ),
-
-      'values tag': seq('{{', repeat(not('}}', anyChar)), '}}'),
 
       'code tag': seq('<%', repeat(not('%>', anyChar)), '%>'),
       'ignored newline': simpleAlt(
@@ -158,16 +146,6 @@ foam.CLASS({
       return [wasSimple, ret];
     },
     {
-      name: 'create child',
-      code: function(v) {
-        var name = v[1].join('');
-        this.push(
-          "', self.createTemplateView('", name, "'",
-          v[2] ? ', ' + v[2] : '',
-          "),\n'");
-      }
-    },
-    {
       name: 'simple value',
       code: function(v) {
         this.push("',\n self.",
@@ -182,22 +160,6 @@ foam.CLASS({
         this.push("',\n",
                   v[1].join(''),
                   ",\n'");
-      },
-    },
-    {
-      name: 'values tag',
-      code:     function (v) {
-        this.push("',\nescapeHTML(",
-                  v[1].join(''),
-                  "),\n'");
-      },
-    },
-    {
-      name: 'live value tag',
-      code: function (v) {
-        this.push("',\nself.dynamicTag('span', function() { return ",
-                  v[1].join(''),
-                  "; }.bind(this)),\n'");
       },
     },
     {

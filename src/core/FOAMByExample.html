@@ -769,6 +769,25 @@ foam.CLASS({
 var o = TemplateTest.create({ name: 'Adam' });
 log(o.greet("Alice"));
 
+// More
+foam.CLASS({
+  name: 'TemplateTest',
+  properties: [ 'name' ],
+  templates: [
+    {
+      name: 'complexTemplate',
+      template: 'Use raw JS code for loops and control structures' +
+        '<% for ( var i = 0 ; i < 10; i++ ) { %>\n' +
+        'i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% } '+
+        '} %>' +
+        '\n\n' +
+        'Use percent signs to shortcut access to local properties\n' +
+        'For instance, my name is %%name\n'
+    },
+  ]
+});
+log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
+
 // TODO: Putting it all together
 </script>
 
