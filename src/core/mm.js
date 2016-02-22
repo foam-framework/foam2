@@ -1521,9 +1521,11 @@ foam.CLASS({
       A propertyChange event will be fired, even if the value doesn't change.
     */
     function clearProperty(name) {
-      var oldValue = this[name];
-      delete this.instance_[name];
-      this.publish('propertyChange', name, oldValue, this[name]);
+      if ( this.hasOwnProperty(name) ) {
+        var oldValue = this[name];
+        delete this.instance_[name];
+        this.publish('propertyChange', name, oldValue, this[name]);
+      }
     },
 
     function toString() {
@@ -1611,6 +1613,56 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'DynamicExpression',
+  traits: [ 'foam.core.Dynamic' ],
+  
+  properties: [
+    'args',
+    'fn',
+    {
+      name: 'value',
+      factory: function() {
+        return this.fn.apply(this, this.args.map(function(a) {
+          return a.get();
+        }));
+      }
+    }
+  ],
+
+  methods: [
+    function initArgs(args, fn) {
+      this.args = args;
+      this.fn = fn;
+    },
+    function init() {
+      // TODO: record subs for destroying
+      for ( var i = 0 ; i < this.args.length ; i++ )
+        this.args[i].subscribe(this.invalidate);
+    },
+
+    function get() {
+      return this.value;
+    },
+
+    function set() { /* nop */ },
+
+    function subscribe(l) {
+      return this.SUPER('propertyChange', 'value', l);
+    },
+
+    function unsubscribe(l) {
+      this.SUPER('propertyChange', 'value', l);
+    }
+  ],
+
+  listeners: [
+    function invalidate() { this.clearProperty('value'); }
+  ]
+});
+
+
 // TODO: Move somewhere else. This shouldn't be in core.
 foam.CLASS({
   package: 'foam.pattern',
@@ -1648,9 +1700,9 @@ foam.CLASS({
     'console',
     'delayed',
     'document',
-    'framed',
     'dynamic',
     'error',
+    'framed',
     'info',
     'log',
     'merged',
@@ -1819,8 +1871,9 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - Lightweight Objects
   - Proxy label, plural from Class to Model
   - ID support
-  - a util method to extract function arguments
   - 'expression' Property property
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
   - context $ binding
+  - is initArgs() a bad idea?
+    - do performance test
 */

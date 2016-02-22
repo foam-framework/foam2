@@ -624,7 +624,8 @@ log(dv.isDefined());
 dv.clear();
 log(dv.get(), dv.isDefined());
 
-// DynamicExpression **********************
+// DynamicExpression creates a Dynamic from a list of Dynamics
+// and a function which combines them into a new dynamic value.
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
 var e = foam.core.DynamicExpression.create(
@@ -633,7 +634,6 @@ var e = foam.core.DynamicExpression.create(
 );
 log(e.get());
 e.subscribe(log);
-e.subscribe(function() { console.log(arguments); });
 p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
