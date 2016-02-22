@@ -628,10 +628,10 @@ log(dv.get(), dv.isDefined());
 // and a function which combines them into a new dynamic value.
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.DynamicExpression.create(
-  [ p.fname$, p.lname$],
-  function(f, l) { return f + ' ' + l; }
-);
+var e = foam.core.DynamicExpression.create({
+  args: [ p.fname$, p.lname$],
+  fn: function(f, l) { return f + ' ' + l; }
+});
 log(e.get());
 e.subscribe(log);
 p.fname = 'Steve';

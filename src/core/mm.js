@@ -363,7 +363,7 @@ foam.CLASS({
       When the bootstrap is finished, it will be replaced by a version
       that knows about a classes Properties, so it can do a better job.
      */
-    function initArgs(args, opt_X) {
+    function initArgs(args) {
       if ( ! args ) return;
 
       for ( var key in args )
@@ -911,7 +911,9 @@ foam.CLASS({
       if ( ! opt_dynName ) opt_dynName = name + '$';
       var dyn = this.getPrivate_(opt_dynName);
       if ( ! dyn ) {
-        dyn = foam.core.PropertyDynamic.create(this, opt_prop || this.cls_.getAxiomByName(name));
+        dyn = foam.core.DynamicProperty.create();
+        dyn.obj  = this;
+        dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
         this.setPrivate_(opt_dynName, dyn);
       }
       return dyn;
@@ -1578,14 +1580,11 @@ foam.CLASS({
 // TODO: doc
 foam.CLASS({
   package: 'foam.core',
-  name: 'PropertyDynamic',
+  name: 'DynamicProperty',
   extends: 'foam.core.Dynamic',
 
   methods: [
-    function initArgs(obj, prop) {
-      this.obj  = obj;
-      this.prop = prop;
-    },
+    function initArgs() { },
     function get() {
       return this.prop.get(this.obj);
     },
@@ -1633,11 +1632,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function initArgs(args, fn) {
-      this.args = args;
-      this.fn = fn;
-    },
-
     function init() {
       // TODO: record subs for destroying
       for ( var i = 0 ; i < this.args.length ; i++ )
@@ -1876,6 +1870,4 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - 'expression' Property property
   - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
   - context $ binding
-  - is initArgs() a bad idea?
-    - do performance test
 */

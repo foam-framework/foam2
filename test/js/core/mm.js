@@ -900,7 +900,7 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Trait.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.PropertyDynamic.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.DynamicProperty.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.BooleanProperty.model_)).toBe(true);
   });
