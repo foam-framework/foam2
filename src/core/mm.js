@@ -539,16 +539,17 @@ foam.CLASS({
 
       Object.defineProperty(proto, dynName, {
         get: function propDynGetter() {
-          return this.propertyDynamic(name, dynName, prop);
+          return this.dynamicProperty(name, dynName, prop);
         },
         set: function propDynSetter(dyn) {
-          this.propertyDynamic(name, dynName, prop).link(dyn);
+          this.dynamicProperty(name, dynName, prop).link(dyn);
         },
         configurable: true,
         enumerable: false
       });
 
-      // TODO: implement 'expression'
+      if ( this.expression )
+        factory = this.expressionFactory(this.expression);
 
       var getter =
         prop.getter ? prop.getter :
@@ -597,6 +598,25 @@ foam.CLASS({
         set: setter,
         configurable: true
       });
+    },
+
+    function expressionFactory(e) {
+      var args = foam.fn.argsArray(e);
+      var name = this.name;
+
+      return function() {
+        var self  = this;
+        var value = e.apply(this, args.map(function(a) { return self[a]; }));
+        var subs  = [];
+        var l     = function() {
+          self.clearProperty(name);
+          for ( var i = 0 ; i < subs.length ; i++ )
+            subs[i].destroy();
+        };
+        for ( var i = 0 ; i < args.length ; i++ )
+          subs.push(this.subscribe('propertyChange', args[i], l));
+        return value;
+      };
     },
 
     /** Flyweight getter for this Property. */
@@ -897,7 +917,7 @@ foam.CLASS({
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
     function publishPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.propertyDynamic(name);
+        var dyn = this.dynamicProperty(name);
         dyn.setPrev(oldValue);
         this.publish('propertyChange', name, dyn);
       }
@@ -907,7 +927,7 @@ foam.CLASS({
       Creates a Dynamic for a property.
       @private
     */
-    function propertyDynamic(name, opt_dynName, opt_prop) {
+    function dynamicProperty(name, opt_dynName, opt_prop) {
       if ( ! opt_dynName ) opt_dynName = name + '$';
       var dyn = this.getPrivate_(opt_dynName);
       if ( ! dyn ) {
@@ -1526,7 +1546,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         delete this.instance_[name];
-        this.publish('propertyChange', name, oldValue, this[name]);
+        this.publish('propertyChange', name, this.dynamicProperty(name));
       }
     },
 

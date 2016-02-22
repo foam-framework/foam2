@@ -573,9 +573,9 @@ log(dyn.get());
 dyn.set('John');
 log(p.name, dyn.get());
 
-// Calling obj.propertyDynamcic('name') is the same as obj.name$.
+// Calling obj.dynamcicProperty('name') is the same as obj.name$.
 var p = Person.create({name: 'Bob'});
-var dyn = p.propertyDynamic('name');
+var dyn = p.dynamicProperty('name');
 log(dyn.get());
 dyn.set('John');
 log(dyn.get());
@@ -640,6 +640,28 @@ p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
 
+// The same functionality of DynamicExpression is built into Properties
+// with the 'expression' feature. Expression properties are invalidated
+// whenever of their listed source values change, but are only recalculated
+// when their value is accessed.
+foam.CLASS({
+  name: 'Person',
+  properties: [
+    'fname',
+    'lname',
+    {
+      name: 'name',
+      expression: function(fname, lname) { return fname + ' ' + lname; }
+    }
+  ]
+});
+var p = Person.create({fname: 'John', lname: 'Smith'});
+p.describe();
+p.subscribe(log);
+p.fname = 'Steve';
+log(p.name);
+p.lname = 'Jones';
+log(p.name);
 
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
