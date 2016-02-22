@@ -42,7 +42,7 @@
        |
        +------> .model_ -> Object's Model
 </pre>
-  All descendents of FObject haver references to both their Model and Class.
+  All descendents of FObject have references to both their Model and Class.
     - obj.cls_ refers to an Object's Class
     - obj.model_ refers to an Object's Model
 
@@ -1887,7 +1887,6 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - Lightweight Objects
   - Proxy label, plural from Class to Model
   - ID support
-  - 'expression' Property property
-  - expression: function(firstName, lastName) { return firstName + ' ' + lastName; }
+  - 'expression' should store in private_
   - context $ binding
 */
