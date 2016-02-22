@@ -1637,7 +1637,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'DynamicExpression',
   traits: [ 'foam.core.Dynamic' ],
-  
+
   properties: [
     'args',
     'fn',
