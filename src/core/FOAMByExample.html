@@ -896,6 +896,13 @@ log(foam.string.constantize('foo'));
 log(foam.string.constantize('fooBar'));
 log(foam.string.constantize('fooBar12'));
 
+// foam.string.multiline lets you build multi-line strings
+// from function comments.
+log(foam.string.multiline(function(){/*This is
+a
+multi-line
+string*/}));
+
 // foam.string.pad() pads a string to the specified length.
 var s = foam.string.pad('foobar', 10);
 log(s, s.length);

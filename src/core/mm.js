@@ -1922,7 +1922,6 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
     - interfaces
   - compound destroyable
   - more docs
-  - multiline strings
   - DynamicValue map() and relate() methods
   - Proxy label, plural from Class to Model
   - ID support

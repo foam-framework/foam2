@@ -346,6 +346,16 @@ foam.LIB({
       return size < 0 ?
         (new Array(-size).join(' ') + str).slice(size)       :
         (str + new Array(size).join(' ')).substring(0, size) ;
+    },
+
+    function multiline(f) {
+      // Function for returning multi-line strings from commented functions.
+      // Ex. var str = multiline(function() { /* multi-line string here */ });
+      if ( typeof f === 'string' ) return f;
+      var s = f.toString();
+      var start = s.indexOf('/*');
+      var end   = s.lastIndexOf('*/');
+      return s.substring(start+2, end);
     }
   ]
 });
