@@ -68,7 +68,7 @@ foam.sub().__proto__.describe = function() {
   console.log('\n');
 };
 
-
+/*
 foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
@@ -96,3 +96,4 @@ foam.CLASS({
 });
 
 foam.X = foam.debug.Window.create(null, foam.X).Y;
+*/
