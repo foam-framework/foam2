@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+/* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
@@ -31,6 +32,7 @@ foam.AbstractClass.describe = function(opt_name) {
 };
 
 
+/* Add describe() support to objects. */
 foam.CLASS({
   refines: 'foam.core.FObject',
 
@@ -53,6 +55,7 @@ foam.CLASS({
 });
 
 
+/* Add describe support to contexts. */
 foam.sub().__proto__.describe = function() {
   console.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
   console.log('KEY                  Type           Value');

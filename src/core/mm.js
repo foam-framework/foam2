@@ -1323,9 +1323,6 @@ foam.CLASS({
 });
 
 
-// TODO: Add other Property sub-classes here.
-
-
 /**
   Listeners are high-level pre-bound event call-backs.
 <pre>
@@ -1881,6 +1878,7 @@ if ( foam.isServer ) {
 }
 
 foam.X = foam.core.Window.create({window: global}, foam).Y;
+
 
 /**  TODO:
   - context $ binding
