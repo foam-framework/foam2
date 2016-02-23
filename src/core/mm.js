@@ -752,7 +752,7 @@ foam.CLASS({
 
     function exportedValue(obj, m) {
       /** Bind the method to 'this' when exported so that it still works. **/
-      return m.bind(obj);
+      return function() { return m.apply(obj, arguments); };
     }
   ]
 });
@@ -1745,6 +1745,7 @@ foam.CLASS({
   exports: [
     '$$',
     '$',
+    'assert',
     'async',
     'cancelAnimationFrame',
     'clearInterval',
@@ -1786,6 +1787,12 @@ foam.CLASS({
   methods: [
     function $(id)   { return this.document.getElementById(id); },
     function $$(cls) { return this.document.getElementsByClassName(cls); },
+
+    function assert(b /*, args */) {
+      /* Like console.assert() except that it takes more than one argument. */
+      if ( ! b )
+        this.console.assert(false, [].splice.call(arguments, 1).join(''));
+    },
 
     function error() { this.console.error.apply(this.console, arguments); },
     function info()  { this.console.info.apply(this.console, arguments); },
@@ -1911,9 +1918,11 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - support class: instead of type:
   - "ofClass" instead of "subType"
   - model validation
-  - better assert
+    - abstract methods
+    - interfaces
   - compound destroyable
   - more docs
+  - multiline strings
   - DynamicValue map() and relate() methods
   - Proxy label, plural from Class to Model
   - ID support
