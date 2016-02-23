@@ -661,13 +661,20 @@ var p = Person.create({fname: 'John', lname: 'Smith'});
 p.describe();
 p.subscribe(log);
 p.fname = 'Steve';
-log(p.name, p.hasOwnProperty('name'));
+log(p.fname, p.lname, ' = ', p.name);
 p.lname = 'Jones';
+log(p.fname, p.lname, ' = ', p.name);
+
+// Expression properties can also be explicitly set, at which point the
+// dynamic expression no longer holds.
 log(p.name, p.hasOwnProperty('name'));
 p.name = 'Kevin Greer';
 log(p.name, p.hasOwnProperty('name'));
 p.fname = 'Sebastian';
 log(p.fname, p.lname, ':', p.name);
+
+// Clearing a set expression property has it revert to its expression value.
+log(p.name, p.hasOwnProperty('name'));
 p.clearProperty('name');
 log(p.name, p.hasOwnProperty('name'));
 
