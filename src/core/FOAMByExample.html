@@ -978,10 +978,30 @@ foam.CLASS({
         '\n\n' +
         'Use percent signs to shortcut access to local properties\n' +
         'For instance, my name is %%name\n'
-    },
+    }
   ]
 });
 log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
+
+// Multi-line templates can be defined as function comments.
+foam.CLASS({
+  name: 'MultiLineTemplateTest',
+  properties: [ 'name' ],
+  templates: [
+    {
+      name: 'complexTemplate',
+      template: function() {/*
+        Use raw JS code for loops and control structures
+        <% for ( var i = 0 ; i < 10; i++ ) { %>
+        i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% }
+        } %>
+        Use percent signs to shortcut access to local properties
+        For instance, my name is %%name
+      */}
+    }
+  ]
+});
+log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
 
 // TODO: Putting it all together
 </script>

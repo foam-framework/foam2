@@ -357,6 +357,8 @@ foam.CLASS({
 
   documentation: 'Base model for model hierarchy.',
 
+  imports: [ 'assert', 'error', 'log', 'warn' ],
+
   methods: [
     /**
       This is a temporary version of initArgs.
@@ -767,12 +769,16 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'defaultValue',
-      defaultValue: ''
+      name: 'adapt',
+      defaultValue: function(_, a) {
+        return typeof a === 'function' ? foam.string.multiline(a) :
+          a ? a.toString() :
+          '' ;
+      }
     },
     {
-      name: 'preSet',
-      defaultValue: function(_, a) { return a ? a.toString() : ''; }
+      name: 'defaultValue',
+      defaultValue: ''
     }
   ]
 });
@@ -1141,6 +1147,7 @@ foam.CLASS({
 });
 
 
+// TODO: doc
 foam.CLASS({
   package: 'foam.core',
   name: 'Imports',
