@@ -26,7 +26,8 @@ foam = {
   Function: Function.prototype,
   Number:   Number.prototype,
   Object:   Object.prototype,
-  String:   String.prototype
+  String:   String.prototype,
+  Date:     Date.prototype,
 };
 
 
@@ -164,6 +165,55 @@ foam.LIB({
     }
   ]
 });
+
+foam.LIB({
+  name: 'Date',
+  methods: [
+    function toRelativeDateString(){
+      var seconds = Math.floor((Date.now() - this.getTime())/1000);
+
+      if ( seconds < 60 ) return 'moments ago';
+
+      var minutes = Math.floor((seconds)/60);
+
+      if ( minutes == 1 ) return '1 minute ago';
+
+      if ( minutes < 60 ) return minutes + ' minutes ago';
+
+      var hours = Math.floor(minutes/60);
+      if ( hours == 1 ) return '1 hour ago';
+
+      if ( hours < 24 ) return hours + ' hours ago';
+
+      var days = Math.floor(hours / 24);
+      if ( days == 1 ) return '1 day ago';
+
+      if ( days < 7 ) return days + ' days ago';
+
+      if ( days < 365 ) {
+        var year = 1900+this.getYear();
+        var noyear = this.toDateString().replace(' ' + year, '');
+        return noyear.substring(4);
+      }
+
+      return this.toDateString().substring(4);
+    },
+
+    function equals(o) {
+      if ( ! o ) return false;
+      if ( ! o.getTime ) return false;
+      return this.getTime() === o.getTime();
+    },
+
+    function compareTo(o){
+      if ( o === this ) return 0;
+      if ( ! o ) return 1;
+      var d = this.getTime() - o.getTime();
+      return d == 0 ? 0 : d > 0 ? 1 : -1;
+    }
+  ]
+});
+
 
 
 foam.LIB({
