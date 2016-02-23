@@ -204,7 +204,7 @@ foam.CLASS({
   package: 'foam.core',
   extends: 'Property',
 
-  documentation:  'Describes a properties of type Date.',
+  documentation:  'Describes properties of type Date.',
   label: 'Date',
 
   properties: [
@@ -236,7 +236,7 @@ foam.CLASS({
   package: 'foam.core',
   extends: 'DateProperty',
 
-  documentation: 'Describes a properties of type DateTime.',
+  documentation: 'Describes properties of type DateTime.',
   label: 'Date and time',
 });
 
@@ -245,7 +245,7 @@ foam.CLASS({
   package: 'foam.core',
   extends: 'IntProperty',
 
-  documentation:  'Describes a properties of type Long.',
+  documentation:  'Describes properties of type Long.',
   label: 'Round long numbers',
 });
 
@@ -254,7 +254,7 @@ foam.CLASS({
   package: 'foam.core',
   extends: 'IntProperty',
 
-  documentation:  'Describes a properties of type Float.',
+  documentation:  'Describes properties of type Float.',
   label: 'Decimal numbers',
 
   properties: [
@@ -272,7 +272,7 @@ foam.CLASS({
   package: 'foam.core',
   extends: 'Property',
 
-  documentation:  'Describes a properties of type Function.',
+  documentation:  'Describes properties of type Function.',
   label: 'Code that can be run',
 
   properties: [
