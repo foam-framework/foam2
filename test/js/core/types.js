@@ -201,3 +201,162 @@ describe('foam.types.typeCheck', function() {
   });
 
 });
+
+var createTestProperties = function createTestProperties() {
+  foam.CLASS({
+    name: 'PropTypeTester',
+    package: 'test',
+
+    properties: [
+      {
+        type: 'Date',
+        name: 'date',
+      },
+      {
+        type: 'DateTime',
+        name: 'dateTime',
+      },
+      {
+        type: 'Long',
+        name: 'long',
+      },
+      {
+        type: 'Float',
+        name: 'float',
+      },
+      {
+        type: 'Function',
+        name: 'function',
+      },
+      {
+        type: 'Blob',
+        name: 'blob',
+      },
+      {
+        type: 'Reference',
+        name: 'reference',
+      },
+      {
+        type: 'StringArray',
+        name: 'stringArray',
+      },
+      {
+        type: 'ReferenceArray',
+        name: 'referenceArray',
+      },
+      // TODO: other types, as they gain testable functionality
+    ]
+  });
+
+  return test.PropTypeTester.create();
+}
+
+
+
+describe('DateProperty', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('accepts numbers', function() {
+    p.date = 3434;
+    expect(p.date).toEqual(new Date(3434));
+  });
+  it('accepts valid date strings', function() {
+    dateStr = "Wed Dec 31 1987 19:00:03 GMT-0500 (EST)";
+    p.date = dateStr;
+    expect(p.date).toEqual(new Date(dateStr));
+  });
+  it('accepts invalid date strings, retains invalidity', function() {
+    dateStr = "d ";
+    p.date = dateStr;
+    expect(p.date.toUTCString()).toEqual((new Date(dateStr)).toUTCString());
+  });
+});
+
+describe('FloatProperty', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('accepts ints', function() {
+    p.float = 5;
+    expect(p.float).toEqual(5);
+  });
+  it('accepts floats', function() {
+    p.float = 456.456332;
+    expect(p.float).toEqual(456.456332);
+  });
+  it('accepts negative floats', function() {
+    p.float = -3.948474;
+    expect(p.float).toEqual(-3.948474);
+  });
+  it('accepts string floats', function() {
+    p.float = "-3.948474";
+    expect(p.float).toEqual(-3.948474);
+  });
+  it('defaults to 0 if falsey', function() {
+    p.float = null;
+    expect(p.float).toEqual(0);
+    p.float = '';
+    expect(p.float).toEqual(0);
+    p.float = undefined;
+    expect(p.float).toEqual(0);
+  });
+});
+
+
+describe('StringArrayProperty', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('is empty array by default', function() {
+    expect(p.stringArray).toEqual([]);
+  });
+  it('accepts bare strings', function() {
+    p.stringArray = "Hello";
+    expect(p.stringArray).toEqual(['Hello']);
+  });
+  it('accepts comma separated strings', function() {
+    p.stringArray = "Hello,Goodbye,Farewell";
+    expect(p.stringArray).toEqual(['Hello','Goodbye','Farewell']);
+  });
+  it('accepts string in an array', function() {
+    p.stringArray = [ "Hello", "I see", "Well" ];
+    expect(p.stringArray).toEqual([ "Hello", "I see", "Well" ]);
+  });
+});
+
+describe('ReferenceArrayProperty', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('is empty array by default', function() {
+    expect(p.referenceArray).toEqual([]);
+  });
+});
+
+
+

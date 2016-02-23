@@ -196,3 +196,275 @@ foam.LIB({
     }
   ]
 });
+
+
+///////////////////////////////////////////////////////
+foam.CLASS({
+  name:  'DateProperty',
+  package: 'foam.core',
+  extends: 'Property',
+
+  documentation:  'Describes a properties of type Date.',
+  label: 'Date',
+
+  properties: [
+    {
+      name: 'adapt',
+      defaultValue: function (_, d) {
+        if (typeof d === 'number') return new Date(d);
+        if (typeof d === 'string') {
+          var ret = new Date(d);
+          return ret.toUTCString() === 'Invalid Date' ? new Date(+d) : ret;
+        }
+        return d;
+      }
+    },
+    {
+      name: 'compareProperty',
+      defaultValye: function(o1, o2) {
+        if ( ! o1 ) return ( ! o2 ) ? 0: -1;
+        if ( ! o2 ) return 1;
+
+        return o1.compareTo(o2);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'DateTimeProperty',
+  package: 'foam.core',
+  extends: 'DateProperty',
+
+  documentation: 'Describes a properties of type DateTime.',
+  label: 'Date and time',
+});
+
+foam.CLASS({
+  name:  'LongProperty',
+  package: 'foam.core',
+  extends: 'IntProperty',
+
+  documentation:  'Describes a properties of type Long.',
+  label: 'Round long numbers',
+});
+
+foam.CLASS({
+  name:  'FloatProperty',
+  package: 'foam.core',
+  extends: 'IntProperty',
+
+  documentation:  'Describes a properties of type Float.',
+  label: 'Decimal numbers',
+
+  properties: [
+    {
+      name: 'adapt',
+      defaultValue: function (_, v) {
+        return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
+      }
+    },
+  ]
+});
+
+foam.CLASS({
+  name:  'FunctionProperty',
+  package: 'foam.core',
+  extends: 'Property',
+
+  documentation:  'Describes a properties of type Function.',
+  label: 'Code that can be run',
+
+  properties: [
+    {
+      name: 'defaultValue',
+      defaultValue: function() {}
+    },
+    {
+      name: 'adapt',
+      defaultValue: function(_, value) {
+        if ( typeof value === 'string' ) {
+          var parse = JSONParser.parseString(value, JSONParser['function prototype']);
+          if ( parse ) {
+            var body = value.substring(value.indexOf('{') + 1, value.lastIndexOf('}'));
+            return new Function(parse[3], body);
+          }
+          return new Function(value);
+        }
+        return value;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'BlobProperty',
+  package: 'foam.core',
+  extends: 'Property',
+  documentation: 'A chunk of binary data.',
+  label: 'Binary data',
+
+  properties: [
+    {
+      name: 'type',
+      type: 'String',
+      defaultValue: 'Blob',
+      documentation: 'The FOAM type of this property.',
+    }
+  ]
+});
+
+foam.CLASS({
+  name:  'ReferenceProperty',
+  package: 'foam.core',
+  extends: 'Property',
+
+  documentation:  'A foreign key reference to another Entity.',
+  label: 'Reference to another object',
+
+  properties: [
+    {
+      name: 'subType',
+      defaultValue: '',
+      documentation: 'The FOAM sub-type of this property.'
+    },
+    {
+      name: 'subKey',
+      defaultValue: 'ID',
+      documentation: 'The foreign key that this property references.'
+    },
+    // TODO: expression to produce the actual value referenced by this property? or method installed on the host?
+  ]
+});
+
+
+foam.CLASS({
+  name: 'StringArrayProperty',
+  package: 'foam.core',
+  extends: 'ArrayProperty',
+
+  documentation: 'An array of String values.',
+  label: 'List of text strings',
+
+  properties: [
+    {
+      name: 'subType',
+      defaultValue: 'String',
+      documentation: 'The FOAM sub-type of this property.'
+    },
+    {
+      name: 'adapt',
+      defaultValue: function(_, v, prop) {
+        return Array.isArray(v) ? v :
+          ( typeof v === 'string' ) ? prop.fromString(v) :
+          ((v || v === 0) ? [v] : []);
+      }
+    },
+    {
+      name: 'factory',
+      defaultValue: function() { return []; }
+    },
+    {
+      name: 'fromString',
+      defaultValue: function(s) {
+        return s.split(',');
+      }
+    }
+  ]
+});
+
+// foam.CLASS({
+//   name: 'ModelProperty',
+//   package: 'foam.core',
+//   extends: 'Property',
+
+//   documentation: 'Describes a Model property.',
+//   label: 'Data Model definition',
+
+//   properties: [
+//     {
+//       name: 'getter',
+//       defaultValue: function(name) {
+//         var value = this.instance_[name];
+//         // TODO: this is from foam1 standard getter... grab the foam2 path
+//         if ( typeof value === 'undefined' ) {
+//           var prop = this.cls_.getAxiomByName(name);
+//           if ( prop ) {
+//             if ( prop.factory ) {
+//               value = this.instance_[prop.name] = prop.factory.call(this, prop);
+//             } else if ( typeof prop.defaultValue !== undefined ) {
+//               value = prop.defaultValue;
+//             } else {
+//               value = '';
+//             }
+//           } else {
+//             value = '';
+//           }
+//         }
+//         if ( typeof value === 'string' ) {
+//           if ( ! value ) return '';
+//           var ret = this.X.lookup(value);
+//           // console.assert(Model.isInstance(ret), 'Invalid model specified for ' + this.name_);
+//           return ret;
+//         }
+//         if ( foam.core.Model.isInstance(value) ) return value;
+//         return '';
+//       }
+//     }
+//   ]
+// });
+
+foam.CLASS({
+  name: 'ReferenceArrayProperty',
+  package: 'foam.core',
+  extends: 'ReferenceProperty',
+
+  properties: [
+    {
+      name: 'factory',
+      defaultValue: function() { return []; },
+    },
+  ]
+});
+
+foam.CLASS({
+  name: 'EMailProperty',
+  package: 'foam.core',
+  extends: 'StringProperty',
+  label: 'Email address',
+});
+
+foam.CLASS({
+  name: 'ImageProperty',
+  package: 'foam.core',
+  extends: 'StringProperty',
+  label: 'Image data or link',
+});
+
+foam.CLASS({
+  name: 'URLProperty',
+  package: 'foam.core',
+  extends: 'StringProperty',
+  label: 'Web link (URL or internet address)',
+});
+
+foam.CLASS({
+  name: 'ColorProperty',
+  package: 'foam.core',
+  extends: 'StringProperty',
+  label: 'Color',
+});
+
+foam.CLASS({
+  name: 'PasswordProperty',
+  package: 'foam.core',
+  extends: 'StringProperty',
+  label: 'Password that displays protected or hidden text',
+});
+
+foam.CLASS({
+  name: 'PhoneNumberProperty',
+  package: 'foam.core',
+  extends: 'StringProperty',
+  label: 'Phone number',
+});
