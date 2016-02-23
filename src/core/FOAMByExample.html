@@ -315,6 +315,14 @@ log(Person.isSubClass(Person));
 // FObject is the root class of all other classes:
 log(foam.core.FObject.isSubClass(Employee), foam.core.FObject.isSubClass(Person));
 
+// isSubClass() isn't confused by classes with the same name in different packages
+foam.CLASS({
+  package: 'com.acme.package',
+  name: 'Person'
+});
+log(com.acme.package.Person.isSubClass(Person));
+log(Person.isSubClass(com.acme.package.Person));
+
 // In addition to being extended, a Class can also be refined.
 // Refinement upgrades the existing class rather than create a
 // new sub-class. In the following example we add 'salary' to

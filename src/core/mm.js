@@ -162,7 +162,7 @@ foam.LIB({
     */
     function installAxiom(a) {
       this.axiomMap_[a.name] = a;
-      this.axiomCache_ = {}; // TODO: is this expensive on startup?
+      this.axiomCache_ = {};
 
       // Store the destination class in the Axiom.  Used by describe().
       a.sourceCls_ = this;
@@ -181,17 +181,16 @@ foam.LIB({
 
     /** Determine if a class is either this class or a sub-class. */
     function isSubClass(c) {
-      // TODO: switch from 'name' to 'id' when available
       if ( ! c ) return false;
 
       var subClasses_ = this.hasOwnProperty('subClasses_') ?
         this.subClasses_ :
         this.subClasses_ = {} ;
 
-      if ( ! subClasses_.hasOwnProperty(c.name) )
-        subClasses_[c.name] = ( c === this ) || this.isSubClass(c.__proto__);
+      if ( ! subClasses_.hasOwnProperty(c.id) )
+        subClasses_[c.id] = ( c === this ) || this.isSubClass(c.__proto__);
 
-      return subClasses_[c.name];
+      return subClasses_[c.id];
     },
 
     /** Find an axiom by the specified name from either this class or an ancestor. */
@@ -1884,12 +1883,13 @@ if ( foam.isServer ) {
 foam.X = foam.core.Window.create({window: global}, foam).Y;
 
 /**  TODO:
+  - context $ binding
   - support class: instead of type:
   - "ofClass" instead of "subType"
+  - model validation
+  - better assert
   - more docs
   - DynamicValue map() and relate() methods
-  - Lightweight Objects
   - Proxy label, plural from Class to Model
   - ID support
-  - context $ binding
 */
