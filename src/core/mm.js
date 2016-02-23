@@ -968,7 +968,7 @@ foam.CLASS({
       if ( ! opt_dynName ) opt_dynName = name + '$';
       var dyn = this.getPrivate_(opt_dynName);
       if ( ! dyn ) {
-        dyn = foam.core.DynamicProperty.create();
+        dyn = foam.internal.DynamicProperty.create();
         dyn.obj  = this;
         dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
         this.setPrivate_(opt_dynName, dyn);
@@ -1627,10 +1627,16 @@ foam.CLASS({
 foam.boot.end();
 
 
-// TODO: doc
+/**
+  Dynamic values are observable values which can change over time.
+  Types of Dynamics include:
+    DynamicProperty:
+    DynamicExpression: 
+    DynamicValue: to be implemented 
+**/
 foam.CLASS({
   package: 'foam.core',
-  name: 'Dynamic',
+  name: 'Dynamic', // ???: Rename AbstractDynamic or make an Interface
   extends: null,
 
   methods: [
@@ -1663,9 +1669,13 @@ foam.CLASS({
 });
 
 
-// TODO: doc
+/**
+  DynamicProperties export object properties as Dynamic values.
+  Created with calling obj.prop$ or obj.dynamicProperty('prop').
+  For internal use only.
+ **/
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.internal',
   name: 'DynamicProperty',
   extends: 'foam.core.Dynamic',
 
@@ -1699,6 +1709,7 @@ foam.CLASS({
 });
 
 
+// ???: Wasn't used for 'expression', so should be moved out of core.
 foam.CLASS({
   package: 'foam.core',
   name: 'DynamicExpression',
@@ -1748,6 +1759,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
+
+  documentation: 'Encapsulates top-level window/document features.',
 
   exports: [
     '$$',
@@ -1924,6 +1937,7 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - context $ binding
   - support class: instead of type:
   - "ofClass" instead of "subType"
+  - pass 'parent' as second arg to create() instead of X
   - model validation
     - abstract methods
     - interfaces
