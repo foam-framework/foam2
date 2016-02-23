@@ -233,3 +233,49 @@ describe('foam.fn.argsArray', function() {
 
 });
 
+
+describe('Date', function() {
+  beforeEach(function() {
+    jasmine.clock().install();
+  });
+  afterEach(function() {
+    jasmine.clock().uninstall();
+  });
+
+  it('correctly reports equals', function() {
+    expect((new Date(7487474)).equals((new Date(7487474)))).toBe(true);
+    expect((new Date(7487474)).equals((new Date(23423432)))).toBe(false);
+
+    expect((new Date(7487474)).equals(null)).toBe(false);
+    expect((new Date(7487474)).equals(7487474)).toBe(false);
+  });
+  it('correctly reports compareTo', function() {
+    expect((new Date(7487474)).compareTo((new Date(7487474)))).toEqual(0);
+    expect((new Date(234324)).compareTo((new Date(23423432)))).toEqual(-1);
+
+    expect((new Date(234324)).compareTo(null)).toEqual(1);
+    var date = new Date(2423);
+    expect(date.compareTo(date)).toEqual(0);
+  });
+
+  it('correctly generates relative strings', function() {
+    var baseDate = new Date(99999);
+    var d =        new Date(99999);
+
+    jasmine.clock().mockDate(baseDate);
+
+    expect(d.toRelativeDateString()).toEqual('moments ago');
+    jasmine.clock().tick(1000);
+    expect(d.toRelativeDateString()).toEqual('moments ago');
+
+    jasmine.clock().tick(60000);
+    expect(d.toRelativeDateString()).toEqual('1 minute ago');
+
+    // TODO: finish this
+
+  });
+
+
+});
+
+

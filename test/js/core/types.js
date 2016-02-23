@@ -203,66 +203,95 @@ describe('foam.types.typeCheck', function() {
 });
 
 var createTestProperties = function createTestProperties() {
-  foam.CLASS({
-    name: 'PropTypeTester',
-    package: 'test',
+  if ( ! test.PropTypeTester ) {
+    foam.CLASS({
+      name: 'PropTypeTester',
+      package: 'test',
 
-    properties: [
-      {
-        type: 'Date',
-        name: 'date',
-      },
-      {
-        type: 'DateTime',
-        name: 'dateTime',
-      },
-      {
-        type: 'Long',
-        name: 'long',
-      },
-      {
-        type: 'Float',
-        name: 'float',
-      },
-      {
-        type: 'Function',
-        name: 'function',
-      },
-      {
-        type: 'Blob',
-        name: 'blob',
-      },
-      {
-        type: 'Reference',
-        name: 'reference',
-      },
-      {
-        type: 'StringArray',
-        name: 'stringArray',
-      },
-      {
-        type: 'ReferenceArray',
-        name: 'referenceArray',
-      },
-      // TODO: other types, as they gain testable functionality
-    ]
-  });
-
+      properties: [
+        {
+          type: 'Date',
+          name: 'date',
+        },
+        {
+          type: 'DateTime',
+          name: 'dateTime',
+        },
+        {
+          type: 'Long',
+          name: 'long',
+        },
+        {
+          type: 'Float',
+          name: 'float',
+        },
+        {
+          type: 'Function',
+          name: 'func',
+        },
+        {
+          type: 'Blob',
+          name: 'blob',
+        },
+        {
+          type: 'Reference',
+          name: 'reference',
+        },
+        {
+          type: 'StringArray',
+          name: 'stringArray',
+        },
+        {
+          type: 'ReferenceArray',
+          name: 'referenceArray',
+        },
+        // TODO: other types, as they gain testable functionality
+      ]
+    });
+  }
   return test.PropTypeTester.create();
+}
+var createDateTestProperties = function createDateTestProperties() {
+  if ( ! test.DateTypeTester ) {
+    foam.CLASS({
+      name: 'DateTypeTester',
+      package: 'test',
+
+      properties: [
+        {
+          type: 'Date',
+          name: 'date',
+        },
+        {
+          type: 'DateTime',
+          name: 'dateTime',
+        },
+      ]
+    });
+  }
+  return test.DateTypeTester.create();
 }
 
 
 
 describe('DateProperty', function() {
   var p;
+  var p2;
 
   beforeEach(function() {
-    p = createTestProperties();
+    p = createDateTestProperties();
+    p2 = createDateTestProperties();
   });
   afterEach(function() {
     p = null;
+    p2 = null;
   });
 
+  it('accepts dates', function() {
+    var d = new Date();
+    p.date = d;
+    expect(p.date).toBe(d);
+  });
   it('accepts numbers', function() {
     p.date = 3434;
     expect(p.date).toEqual(new Date(3434));
@@ -276,6 +305,36 @@ describe('DateProperty', function() {
     dateStr = "d ";
     p.date = dateStr;
     expect(p.date.toUTCString()).toEqual((new Date(dateStr)).toUTCString());
+  });
+  it('compares', function() {
+    p.date = 55555;
+    p2.date = 88888;
+
+    expect(p.compareTo(p2)).toEqual(-1);
+    expect(p2.compareTo(p)).toEqual(1);
+  });
+  it('compares when undefined', function() {
+    p2.date = 88888;
+
+    expect(p.compareTo(p2)).toEqual(-1);
+    expect(p2.compareTo(p)).toEqual(1);
+  });
+  it('compares when undefined2', function() {
+    p.date = 55555;
+
+    expect(p.compareTo(p2)).toEqual(1);
+    expect(p2.compareTo(p)).toEqual(-1);
+  });
+  it('compares when equal', function() {
+    expect(p.compareTo(p2)).toEqual(0);
+    expect(p2.compareTo(p)).toEqual(0);
+
+    p.date =  55555;
+    p2.date = 55555;
+    expect(p.compareTo(p2)).toEqual(0);
+    expect(p2.compareTo(p)).toEqual(0);
+    expect(p.equals(p2)).toEqual(true);
+
   });
 });
 
@@ -315,6 +374,34 @@ describe('FloatProperty', function() {
   });
 });
 
+describe('FunctionProperty', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('defaults to a function', function() {
+    expect(typeof p.func).toEqual('function');
+    p.func();
+  });
+  it('accepts functions', function() {
+    p.func = function() { return 55; }
+    expect(p.func()).toEqual(55);
+  });
+  it('accepts strings and converts them into functions', function() {
+    p.func = "return 55;"
+    expect(p.func()).toEqual(55);
+  });
+  it('accepts strings including function() and converts them into functions', function() {
+    p.func = "function\r\n(\n)\n\n\n { return 55; }"
+    expect(p.func()).toEqual(55);
+  });
+});
+
 
 describe('StringArrayProperty', function() {
   var p;
@@ -341,6 +428,14 @@ describe('StringArrayProperty', function() {
     p.stringArray = [ "Hello", "I see", "Well" ];
     expect(p.stringArray).toEqual([ "Hello", "I see", "Well" ]);
   });
+  it('puts other things into an array', function() {
+    p.stringArray = 99;
+    expect(p.stringArray).toEqual([ 99 ]);
+    p.stringArray = 0;
+    expect(p.stringArray).toEqual([ 0 ]);
+    p.stringArray = null;
+    expect(p.stringArray).toEqual([ ]);
+  });
 });
 
 describe('ReferenceArrayProperty', function() {
@@ -357,6 +452,3 @@ describe('ReferenceArrayProperty', function() {
     expect(p.referenceArray).toEqual([]);
   });
 });
-
-
-

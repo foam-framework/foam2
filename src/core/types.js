@@ -220,8 +220,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'compareProperty',
-      defaultValye: function(o1, o2) {
+      name: 'comparePropertyValues',
+      defaultValue: function(o1, o2) {
         if ( ! o1 ) return ( ! o2 ) ? 0: -1;
         if ( ! o2 ) return 1;
 
@@ -284,12 +284,9 @@ foam.CLASS({
       name: 'adapt',
       defaultValue: function(_, value) {
         if ( typeof value === 'string' ) {
-          var parse = JSONParser.parseString(value, JSONParser['function prototype']);
-          if ( parse ) {
-            var body = value.substring(value.indexOf('{') + 1, value.lastIndexOf('}'));
-            return new Function(parse[3], body);
-          }
-          return new Function(value);
+          var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
+          body = ( body && body[1] ) ? body[1] : value;
+          return new Function(body);
         }
         return value;
       }
