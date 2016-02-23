@@ -605,7 +605,7 @@ foam.CLASS({
 
           this.publishPropertyChange(name, oldValue, newValue);
 
-          // TODO: publish to a global topic to support dynamic()
+          // TODO(maybe): publish to a global topic to support dynamic()
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         };
@@ -648,6 +648,11 @@ foam.CLASS({
     function set(o, value) {
       o[this.name] = value;
       return this;
+    },
+
+    function exportedValue(obj, m) {
+      /** Export obj.name$ instead of just obj.name. **/
+      return obj.dynamicProperty(this.name);
     }
   ]
 });
@@ -1183,9 +1188,25 @@ foam.CLASS({
         for ( var i = 0 ; i < bs.length ; i++ ) {
           var b = bs[i];
           if ( typeof b === 'string' ) {
-            var a   = b.split(' as ');
-            var key = a[0];
-            var as  = a[1] || key;
+            var a   = b.split(' ');
+            var key, as;
+            switch ( a.length ) {
+              case 1:
+                key = as = a[0];
+              break;
+              case 2:
+                console.assert(a[0] === 'as', 'Invalid export syntax: key [as value] | as value');
+                key = null;
+                as  = a[1]; // signifies 'this'
+              break;
+              case 3:
+                console.assert(a[1] === 'as', 'Invalid export syntax: key [as value] | as value');
+                key = a[2];
+                as  = a[0];
+              break;
+              default:
+                console.error('Invalid export syntax: key [as value] | as value');
+            }
             bs[i] = [ key, as ];
           }
         }
@@ -1204,14 +1225,19 @@ foam.CLASS({
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
-              var a = this.cls_.getAxiomByName(b[0]);
-              var v = this[b[0]];
 
-              console.assert(a, 'Unknown axiom in exports');
+              if ( b[0] ) {
+                var v = this[b[0]];
+                var a = this.cls_.getAxiomByName(b[0]);
 
-              // Axioms have an option of wrapping a value for export.
-              // This could be used to bind a method to 'this', for example.
-              m[b[1]] = a.exportedValue ? a.exportedValue(this, v) : v ;
+                console.assert(a, 'Unknown axiom in exports');
+
+                // Axioms have an option of wrapping a value for export.
+                // This could be used to bind a method to 'this', for example.
+                m[b[1]] = a.exportedValue ? a.exportedValue(this, v) : v ;
+              } else {
+                m[b[1]] = this;
+              }
             }
             this.setPrivate_('Y', X.sub(m));
           }
@@ -1886,6 +1912,7 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - "ofClass" instead of "subType"
   - model validation
   - better assert
+  - compound destroyable
   - more docs
   - DynamicValue map() and relate() methods
   - Proxy label, plural from Class to Model
