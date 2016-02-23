@@ -323,6 +323,89 @@ foam.CLASS({
 log(com.acme.package.Person.isSubClass(Person));
 log(Person.isSubClass(com.acme.package.Person));
 
+// Larger package and imports/exports demo.
+foam.CLASS({
+  package: 'demo.bank',
+  name: 'Account',
+  imports: [ 'reportDeposit' ],
+  properties: [
+    { name: 'id'      },
+    { name: 'status'  },
+    { name: 'balance', defaultValue: 0 }
+  ],
+  methods: [
+    {
+      name: "setStatus",
+      code: function (status) {
+        this.status = status;
+      }
+    },
+    {
+      name: "deposit",
+      code: function (amount) {
+        this.balance += amount;
+        this.reportDeposit(this.id, amount, this.balance);
+        console.log('Bank: ', this.X.Bank);
+        return this.balance;
+      }
+    },
+    {
+      name: "withdraw",
+      code: function (amount) {
+        this.balance -= amount;
+        return this.balance;
+      }
+    }
+  ]
+});
+foam.CLASS({
+  package: 'demo.bank',
+  name: 'SavingsAccount',
+  extends: 'demo.bank.Account',
+  methods: [
+    {
+      name: "withdraw",
+      code: function (amount) {
+        // charge a fee
+        this.balance -= 0.05;
+        return this.SUPER(amount);
+      }
+    }
+  ]
+});
+foam.CLASS({
+  package: 'demo.bank',
+  name: 'AccountTester',
+  requires: [
+    'demo.bank.Account as A',
+    'demo.bank.SavingsAccount'
+  ],
+  imports: [ 'log as l' ],
+  exports: [
+    'reportDeposit',
+    'as Bank' // exports 'this'
+  ],
+  methods: [
+    function reportDeposit(id, amount, bal) {
+      this.l('Deposit: ', id, amount, bal);
+    },
+    function test() {
+      var a = this.A.create({id: 42});
+      a.setStatus(true);
+      a.deposit(100);
+      a.withdraw(10);
+      a.describe();
+      var s = this.SavingsAccount.create({id: 43});
+      s.setStatus(true);
+      s.deposit(100);
+      s.withdraw(10);
+      s.describe();
+    }
+  ]
+});
+var a = demo.bank.AccountTester.create(null);
+a.test();
+
 // In addition to being extended, a Class can also be refined.
 // Refinement upgrades the existing class rather than create a
 // new sub-class. In the following example we add 'salary' to
