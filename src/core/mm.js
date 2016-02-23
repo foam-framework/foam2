@@ -1208,6 +1208,8 @@ foam.CLASS({
               var a = this.cls_.getAxiomByName(b[0]);
               var v = this[b[0]];
 
+              console.assert(a, 'Unknown axiom in exports');
+
               // Axioms have an option of wrapping a value for export.
               // This could be used to bind a method to 'this', for example.
               m[b[1]] = a.exportedValue ? a.exportedValue(this, v) : v ;
