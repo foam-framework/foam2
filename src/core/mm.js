@@ -1703,29 +1703,6 @@ foam.CLASS({
 });
 
 
-// TODO: Move somewhere else. This shouldn't be in core.
-foam.CLASS({
-  package: 'foam.pattern',
-  name: 'Singleton',
-
-  methods: [
-    function installInClass(cls) {
-      var instance;
-      var oldCreate = cls.create;
-      cls.create = function() {
-        return instance || ( instance = oldCreate.apply(this, arguments) );
-      }
-    }
-  ]
-});
-
-// We only need one Singleton, so make it a Singleton.
-foam.CLASS({
-  refines: 'foam.pattern.Singleton',
-  axioms: [ foam.pattern.Singleton.create() ]
-});
-
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
@@ -1911,6 +1888,5 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
   - Lightweight Objects
   - Proxy label, plural from Class to Model
   - ID support
-  - 'expression' should store in private_
   - context $ binding
 */

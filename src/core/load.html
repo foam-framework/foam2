@@ -159,6 +159,29 @@
       Y2.fn();
       Y.describe();
       Y2.describe();
+
+      foam.CLASS({name:'Test1',properties:['a','b']});
+      foam.CLASS({name:'Test2',properties:['a','b'],methods:[function initArgs(a,b) {this.a = a; this.b = b;}]});
+      for ( var i = 0 ; i < 5 ; i++ ) {
+        console.time('1');
+        for ( var j = 0 ; j < 1000000 ; j++ ) {
+          Test1.create({a: 1, b: 2});
+        }
+        console.timeEnd('1');
+
+        console.time('1b');
+        for ( var j = 0 ; j < 1000000 ; j++ ) {
+          var o = Test1.create();
+          o.a = 1; o.b = 2;
+        }
+        console.timeEnd('1b');
+
+        console.time('2');
+        for ( var j = 0 ; j < 1000000 ; j++ ) {
+          Test2.create(1, 2);
+        }
+        console.timeEnd('2');
+      }
     </script>
   </body>
 </html>
