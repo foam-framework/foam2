@@ -1817,11 +1817,6 @@ foam.CLASS({
           }
         };
 
-        // TODO: add in debug.js
-        // if ( DEBUG ) f.toString = function() {
-        //   return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
-        // };
-
         return f;
       }();
     },
@@ -1847,11 +1842,6 @@ foam.CLASS({
               });
           }
         };
-
-        // TODO: move to debug.js
-        // if ( DEBUG ) f.toString = function() {
-        //   return 'ANIMATE(' + l.$UID + ', ' + l + ')';
-        // };
 
         return f;
       }();
