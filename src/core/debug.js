@@ -68,24 +68,24 @@ foam.sub().__proto__.describe = function() {
   console.log('\n');
 };
 
-/*
+
 foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
 
-//  imports: [ 'merged as oldMerged', 'framed as oldFramed' ],
+  documentation: 'Decorated merged() and framed() to have debug friendly toString() methods.',
+
   exports: [ 'merged', 'framed' ],
 
   methods: [
     function merged(l, opt_delay) {
-      var f = this.oldMerged(l, opt_delay);
+      var f = this.X.merged(l, opt_delay);
       f.toString = function() {
         return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
       };
       return f;
     },
     function framed(l) {
-//      var f = this.oldFramed(l);
       var f = this.X.framed(l);
       f.toString = function() {
         return 'ANIMATE(' + l.$UID + ', ' + l + ')';
@@ -96,4 +96,3 @@ foam.CLASS({
 });
 
 foam.X = foam.debug.Window.create(null, foam.X).Y;
-*/

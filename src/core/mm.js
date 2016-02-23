@@ -741,8 +741,14 @@ foam.CLASS({
 
       return f;
     },
+
     function installInProto(proto) {
       proto[this.name] = this.override_(proto, this.code);
+    },
+
+    function exportedValue(obj, m) {
+      /** Bind the method to 'this' when exported so that it still works. **/
+      return m.bind(obj);
     }
   ]
 });
@@ -1199,7 +1205,12 @@ foam.CLASS({
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
-              m[b[1]] = this[b[0]];
+              var a = this.cls_.getAxiomByName(b[0]);
+              var v = this[b[0]];
+
+              // Axioms have an option of wrapping a value for export.
+              // This could be used to bind a method to 'this', for example.
+              m[b[1]] = a.exportedValue ? a.exportedValue(this, v) : v ;
             }
             this.setPrivate_('Y', X.sub(m));
           }
