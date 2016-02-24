@@ -1995,13 +1995,20 @@ foam.LIB({
         out(']');
       }
     },
-    function parse(json) {
+    function parse(json, opt_class) {
       if ( json.class ) {
         var cls = foam.lookup(json.class);
         foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
         return cls.create(json);
       }
+
+      if ( opt_class )
+        return opt_class.create(json);
+
       return json;
+    },
+    function parseArray(a, opt_class) {
+      return a.map(function(e) { return foam.json.parse(e, opt_class); });
     },
     function stringify(o, opt_options) {
       var out = this.createOut();
