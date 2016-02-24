@@ -321,7 +321,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'subType',
+      name: 'of',
       defaultValue: '',
       documentation: 'The FOAM sub-type of this property.'
     },
@@ -345,7 +345,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'subType',
+      name: 'of',
       defaultValue: 'String',
       documentation: 'The FOAM sub-type of this property.'
     },

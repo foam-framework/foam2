@@ -441,17 +441,17 @@ foam.CLASS({
     },
     {
       type: 'Array',
-      subType: 'Property',
+      of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
         return typeof o === 'string'     ?
           foam.core.Property.create({name: o})     :
-          foam.lookup(this.subType).create(o) ;
+          foam.lookup(this.of).create(o) ;
       }
     },
     {
       type: 'Array',
-      subType: 'Method',
+      of: 'Method',
       name: 'methods',
       adaptArrayElement: function(e) {
         if ( typeof e === 'function' ) {
@@ -789,10 +789,10 @@ foam.CLASS({
   name: 'ArrayProperty',
   extends: 'Property',
 
-  documentation: "A Property which contains an array of 'subType' objects.",
+  documentation: "A Property which contains an array of 'of' objects.",
 
   properties: [
-    'subType',
+    'of',
     {
       name: 'factory',
       defaultValue: function() { return []; }
@@ -807,7 +807,7 @@ foam.CLASS({
     {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
-        return foam.lookup(this.subType).create(o);
+        return foam.lookup(this.of).create(o);
       }
     }
   ]
@@ -1435,7 +1435,7 @@ foam.CLASS({
   properties: [
     {
       type: 'AxiomArray',
-      subType: 'Requires',
+      of: 'Requires',
       name: 'requires',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
@@ -1451,7 +1451,7 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
-      subType: 'Imports',
+      of: 'Imports',
       name: 'imports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
@@ -1473,7 +1473,7 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
-      subType: 'Trait',
+      of: 'Trait',
       name: 'traits',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
@@ -1483,7 +1483,7 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
-      subType: 'InnerClass',
+      of: 'InnerClass',
       name: 'classes',
       adaptArrayElement: function(o) {
         return foam.core.InnerClass.isInstance(o) ?
@@ -1493,7 +1493,7 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
-      subType: 'Constant',
+      of: 'Constant',
       name: 'constants',
       adapt: function(_, a, prop) {
         if ( ! a ) return [];
@@ -1508,7 +1508,7 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
-      subType: 'Topic',
+      of: 'Topic',
       name: 'topics',
       adaptArrayElement: function(o) {
         return typeof o === 'string'        ?
@@ -1518,31 +1518,31 @@ foam.CLASS({
     },
     {
       type: 'AxiomArray',
-      subType: 'Property',
+      of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
         return typeof o === 'string'     ?
           foam.core.Property.create({name: o}) :
           o.type ?
           foam.lookup(o.type + 'Property').create(o) :
-          foam.lookup(this.subType).create(o) ;
+          foam.lookup(this.of).create(o) ;
       }
     },
     {
       type: 'AxiomArray',
-      subType: 'Method',
+      of: 'Method',
       name: 'methods',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
           console.assert(o.name, 'Method must be named');
           return foam.core.Method.create({name: o.name, code: o});
         }
-        return foam.lookup(this.subType).create(o);
+        return foam.lookup(this.of).create(o);
       }
     },
     {
       type: 'AxiomArray',
-      subType: 'Listener',
+      of: 'Listener',
       name: 'listeners',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
@@ -1936,7 +1936,6 @@ foam.X = foam.core.Window.create({window: global}, foam).Y;
 /**  TODO:
   - context $ binding
   - support class: instead of type:
-  - "ofClass" instead of "subType"
   - pass 'parent' as second arg to create() instead of X
   - model validation
     - abstract methods

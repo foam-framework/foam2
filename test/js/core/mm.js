@@ -292,8 +292,7 @@ describe('ArrayProperty', function() {
       package: 'test',
       properties: [
         {
-          type: 'Array',
-          subType: 'A',
+          type: 'Array', of: 'A',
           name: 'as'
         }
       ]
@@ -899,7 +898,7 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Trait.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.DynamicProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.internal.DynamicProperty.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.BooleanProperty.model_)).toBe(true);
   });
