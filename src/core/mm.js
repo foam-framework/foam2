@@ -1136,6 +1136,10 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(as) ) {
             var Y     = this.Y;
             var model = foam.lookup(path);
+
+            if ( ! model )
+              console.error('Unknown class: ' + path);
+
             this.setPrivate_(
               as,
               {
@@ -1441,7 +1445,7 @@ foam.CLASS({
 
   properties: [
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Requires',
       name: 'requires',
       adaptArrayElement: function(o) {
