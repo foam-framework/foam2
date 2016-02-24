@@ -2027,7 +2027,6 @@ foam.LIB({
 
 /**  TODO:
   - context $ binding
-  - support class: instead of type:
   - pass 'parent' as second arg to create() instead of X
   - model validation
     - abstract methods
