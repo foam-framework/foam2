@@ -147,7 +147,7 @@ foam.LIB({
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
           if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
-          var type = foam.lookup((a.type || '') + 'Property') || Property;
+          var type = foam.lookup(a.class) || foam.core.Property;
           this.installAxiom(type.create(a));
         }
     },
@@ -273,6 +273,10 @@ foam.LIB({
         var parent = this.extends   ?
           foam.lookup(this.extends) :
           foam.AbstractClass        ;
+
+        if ( ! parent )
+          console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
+ 
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
@@ -440,7 +444,7 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
-      type: 'Array',
+      class: 'Array',
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
@@ -450,7 +454,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'Array',
+      class: 'Array',
       of: 'Method',
       name: 'methods',
       adaptArrayElement: function(e) {
@@ -474,7 +478,7 @@ foam.CLASS({
 
   properties: [
     'name',
-    'type',
+//    'class',
     'defaultValue',
     'factory',
     'adapt',
@@ -762,7 +766,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'StringProperty',
+  name: 'String',
   extends: 'Property',
 
   documentation: 'StringProperties coerce their arguments into Strings.',
@@ -786,7 +790,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'ArrayProperty',
+  name: 'Array',
   extends: 'Property',
 
   documentation: "A Property which contains an array of 'of' objects.",
@@ -979,13 +983,13 @@ foam.CLASS({
 });
 
 
-/** An ArrayProperty whose elements are Axioms and are added to this.axioms. */
+/** An Array whose elements are Axioms and are added to this.axioms. */
 foam.CLASS({
   package: 'foam.core',
-  name: 'AxiomArrayProperty',
-  extends: 'ArrayProperty',
+  name: 'AxiomArray',
+  extends: 'Array',
 
-  documentation: 'An ArrayProperty whose elements are Axioms and are added to this.axioms.',
+  documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
 
   properties: [
     {
@@ -1318,7 +1322,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'BooleanProperty',
+  name: 'Boolean',
   extends: 'Property',
 
   properties: [
@@ -1336,7 +1340,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'IntProperty',
+  name: 'Int',
   extends: 'Property',
 
   properties: [
@@ -1391,9 +1395,9 @@ foam.CLASS({
   properties: [
     'name',
     'code',
-    { type: 'Boolean', name: 'isFramed',   defaultValue: false },
-    { type: 'Boolean', name: 'isMerged',   defaultValue: false },
-    { type: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }
+    { class: 'Boolean', name: 'isFramed',   defaultValue: false },
+    { class: 'Boolean', name: 'isMerged',   defaultValue: false },
+    { class: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }
   ],
 
   methods: [
@@ -1450,7 +1454,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Imports',
       name: 'imports',
       adaptArrayElement: function(o) {
@@ -1472,7 +1476,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Trait',
       name: 'traits',
       adaptArrayElement: function(o) {
@@ -1482,7 +1486,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'InnerClass',
       name: 'classes',
       adaptArrayElement: function(o) {
@@ -1492,7 +1496,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Constant',
       name: 'constants',
       adapt: function(_, a, prop) {
@@ -1507,7 +1511,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Topic',
       name: 'topics',
       adaptArrayElement: function(o) {
@@ -1517,19 +1521,18 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        return typeof o === 'string'     ?
-          foam.core.Property.create({name: o}) :
-          o.type ?
-          foam.lookup(o.type + 'Property').create(o) :
-          foam.lookup(this.of).create(o) ;
+        // TODO: document
+        return typeof o === 'string' ? foam.core.Property.create({name: o}) :
+               o.class               ? foam.lookup(o.class).create(o) :
+                                       foam.lookup(this.of).create(o) ;
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Method',
       name: 'methods',
       adaptArrayElement: function(o) {
@@ -1541,7 +1544,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'AxiomArray',
+      class: 'AxiomArray',
       of: 'Listener',
       name: 'listeners',
       adaptArrayElement: function(o) {

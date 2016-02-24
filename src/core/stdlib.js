@@ -387,6 +387,7 @@ foam.LIB({
   }
 
   var ROOT = global;
+
   function lookup_(id) {
     var path = id.split('.');
     var root = ROOT;
@@ -397,7 +398,7 @@ foam.LIB({
 
   var X = {
     lookup: function(id) {
-      return lookup_(id) || lookup_('foam.core.' + id);
+      return id && ( lookup_('foam.core.' + id) || lookup_(id) );
     },
 
     register: function(cls) {

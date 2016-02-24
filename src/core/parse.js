@@ -1,3 +1,20 @@
+/*
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 foam.CLASS({
   name: 'SimpleProperty',
   extends: 'Property',
@@ -6,9 +23,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'StringPS',
+
   properties: [
     {
       name: 'str',
@@ -69,10 +88,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
-  name: 'ParserArrayProperty',
-  extends: 'ArrayProperty',
+  name: 'ParserArray',
+  extends: 'Array',
   properties: [
     {
       name: 'adaptArrayElement',
@@ -85,10 +105,12 @@ foam.CLASS({
   ]
 })
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserProperty',
   extends: 'Property',
+
   properties: [
     {
       name: 'adapt',
@@ -97,9 +119,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserDecorator',
+
   properties: [
     {
       name: 'p',
@@ -109,9 +133,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Literal',
+
   properties: [
     {
       name: 's',
@@ -133,9 +159,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Alternate',
+
   properties: [
     {
       name: 'args',
@@ -157,9 +185,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Sequence',
+
   properties: [
     {
       name: 'args',
@@ -180,9 +210,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Sequence1',
+
   properties: [
     {
       name: 'args',
@@ -208,10 +240,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Optional',
   extends: 'foam.parsers.ParserDecorator',
+
   methods: [
     function parse(ps, obj) {
       return this.p.parse(ps, obj) || ps.setValue(null);
@@ -219,10 +253,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'AnyChar',
+
   axioms: [ 'foam.pattern.Singleton' ],
+
   methods: [
     function parse(ps, obj) {
       return ps.head ? ps.tail : undefined;
@@ -230,15 +267,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'NotChars',
+
   properties: [
     {
       name: 'string',
       final: true
     }
   ],
+
   methods: [
     function parse(ps) {
       return this.string.indexOf(ps.head) == -1 ?
@@ -247,10 +287,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Repeat',
   extends: 'foam.parsers.ParserDecorator',
+
   methods: [
     function parse(ps, obj) {
       var ret = [];
@@ -265,10 +307,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Repeat0',
   extends: 'foam.parsers.ParserDecorator',
+
   methods: [
     function parse(ps, obj) {
       var res;
@@ -279,10 +323,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Not',
   extends: 'foam.parsers.ParserDecorator',
+
   properties: [
     {
       name: 'else',
@@ -299,14 +345,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserAxiom',
   extends: 'Method',
+
   properties: [
-    {
-      name: 'parser'
-    }
+    'parser'
   ],
   methods: [
     function installInProto(proto) {
@@ -318,9 +364,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Symbol',
+
   properties: [
     {
       name: 'name',
@@ -339,10 +387,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParsersAxiomProperty',
-  extends: 'AxiomArrayProperty',
+  extends: 'AxiomArray',
+
   methods: [
     function seq() {
       return foam.lookup('foam.parsers.Sequence').create({
@@ -452,10 +502,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserAxioms',
   refines: 'foam.core.Model',
+
   properties: [
     {
       name: 'grammar',
@@ -464,10 +516,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserAction',
   extends: 'foam.core.Method',
+
   methods: [
     function installInProto(proto) {
       var f = this.code;
@@ -486,10 +540,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParseAction',
   refines: 'foam.core.Model',
+
   properties: [
     {
       name: 'grammarActions',

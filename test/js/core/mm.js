@@ -282,7 +282,7 @@ describe('Final property', function() {
   });
 });
 
-describe('ArrayProperty', function() {
+describe('Array', function() {
   var t;
 
   beforeEach(function() {
@@ -303,7 +303,7 @@ describe('ArrayProperty', function() {
   });
 
   it('has a adapt', function() {
-    var ap = foam.core.ArrayProperty.create({});
+    var ap = foam.core.Array.create({});
     expect(ap.adapt).toBeTruthy();
   });
 
@@ -889,12 +889,12 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.FObject.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Property.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Method.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.StringProperty.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.ArrayProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.String.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Array.model_)).toBe(true);
   });
 
   it('Check that Class.model_ and Class.prototype.model_ are the same object', function() {
-    expect(foam.core.Model.isInstance(foam.core.AxiomArrayProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.AxiomArray.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Trait.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
