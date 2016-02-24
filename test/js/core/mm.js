@@ -478,13 +478,13 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
 });
 
-describe('Model.traits', function() {
+describe('Model.implements', function() {
   var person;
 
   beforeEach(function() {
     foam.CLASS({
-      name: 'HelloBase',
       package: 'test',
+      name: 'HelloBase',
       methods: [
         {
           name: 'sayHello',
@@ -499,8 +499,8 @@ describe('Model.traits', function() {
 
 
     foam.CLASS({
-      name: 'SalariedTrait',
       package: 'test',
+      name: 'SalariedI',
       properties: [
         {
           name: 'salary',
@@ -523,7 +523,7 @@ describe('Model.traits', function() {
     foam.CLASS({
       name: 'Person',
       extends: 'test.HelloBase',
-      traits: [ 'test.SalariedTrait' ],
+      implements: [ 'test.SalariedI' ],
       package: 'test',
       properties: [
         {
@@ -554,7 +554,7 @@ describe('Model.traits', function() {
     person.sayHello();
     expect(person.result).toEqual("hello Joe"); // Person overrides everyone
     person.sayGoodbye();
-    expect(person.result).toEqual("BYE Joe"); // SalariedTrait overrides HelloBase
+    expect(person.result).toEqual("BYE Joe"); // SalariedI overrides HelloBase
   });
 
 });
@@ -896,7 +896,7 @@ describe('Bootstrap invariants', function() {
   it('Check that Class.model_ and Class.prototype.model_ are the same object', function() {
     expect(foam.core.Model.isInstance(foam.core.AxiomArray.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.Trait.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Implements.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.internal.DynamicProperty.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);

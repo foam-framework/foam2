@@ -521,10 +521,10 @@ d1();
 d2();
 
 // In addition to class-inheritance, FOAM also supports
-// 'Traits', which are a form of multiple-inheritance which
+// interfaces, which are a form of multiple-inheritance which
 // copy Axioms from another model.
 foam.CLASS({
-  name: 'SampleTrait',
+  name: 'SampleI',
   properties: [ 't1', 't2', 't3' ],
   methods: [
     function tfoo() { console.log('ffoo'); },
@@ -532,24 +532,24 @@ foam.CLASS({
   ]
 });
 foam.CLASS({
-  name: 'TraitTest',
-  traits: ['SampleTrait'],
+  name: 'ImplementsTest',
+  implements: ['SampleI'],
   properties: [ 'p1', 'p2', 'p3' ],
   methods: [
     function foo() { console.log('foo'); },
     function bar() { console.log('bar'); }
   ]
 });
-TraitTest.describe();
-var tt = TraitTest.create({p1:1, t1:2});
+ImplementsTest.describe();
+var tt = ImplementsTest.create({p1:1, t1:2});
 tt.describe();
-tt.tfoo(); // From SampleTrait
+tt.tfoo(); // From SampleI
 tt.foo();
 
 // Unlike regular inheritance with extends:, classes
-// can inherit from multiple traits.
+// can implement: from multiple sources.
 foam.CLASS({
-  name: 'SampleTrait2',
+  name: 'Sample2I',
   properties: [ 'tb1', 'tb2', 'tb3' ],
   methods: [
     function tbfoo() { console.log('ffoo'); },
@@ -557,10 +557,10 @@ foam.CLASS({
   ]
 });
 foam.CLASS({
-  name: 'TraitTest2',
-  traits: ['SampleTrait', 'SampleTrait2']
+  name: 'ImplementsTest2',
+  implements: ['SampleI', 'Sample2I']
 });
-TraitTest2.describe();
+ImplementsTest2.describe();
 
 // Classes can have inner-Classes.
 foam.CLASS({

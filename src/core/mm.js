@@ -90,7 +90,7 @@
   <li>Requires   - Require other classes
   <li>Imports    - Context imports
   <li>Exports    - Context exports
-  <li>Traits     - Implement multiple inheritance
+  <li>Implements - Declare interfaces implemented / mix-ins mixed-in
   <li>Constants  - Add constants to the prototype and class
   <li>Topics     - Publish/subscribe topics
   <li>Properties - High-level instance variable definitions
@@ -276,7 +276,7 @@ foam.LIB({
 
         if ( ! parent )
           console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
- 
+
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
@@ -1076,32 +1076,35 @@ foam.CLASS({
 
 
 /**
-  Traits provide a safe form multiple-inheritance.
+  Implements provide a delcaration of a classes intent to implement
+  an interface. Since interfaces can also have implementations, it
+  can also be used to provide mix-ins, which is a safe form of
+  multiple-inheritance.
 <pre>
   Ex.
   foam.CLASS({
-    name: 'SalaryTrait',
+    name: 'SalaryI',
     properties: [ 'salary' ]
   });
 
   foam.CLASS({
     name: 'Employee',
     extends: 'Person',
-    traits: [ 'SalaryTrait' ]
+    implements: [ 'SalaryI' ]
   });
 </pre>
   Employee extends Person through regular inheritance, but
-  the axioms from SalaryTrait are also added to the class.
-  Any number of traits can be specified.
+  the axioms from SalaryI are also added to the class.
+  Any number of mix-ins/interfaces can be specified.
 */
 foam.CLASS({
   package: 'foam.core',
-  name: 'Trait',
+  name: 'Implements',
 
-  documentation: 'Trait Axiom',
+  documentation: 'Implements Axiom',
 
   properties: [
-    { name: 'name', getter: function() { return 'trait_' + this.path; } },
+    { name: 'name', getter: function() { return 'implements_' + this.path; } },
     'path'
   ],
 
@@ -1430,11 +1433,11 @@ foam.CLASS({
 });
 
 
-/** Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model. */
+/** Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  documentation: 'Add new Axiom types (Traits, Constants, Topics, Properties, Methods and Listeners) to Model.',
+  documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
   properties: [
     {
@@ -1477,12 +1480,12 @@ foam.CLASS({
     },
     {
       class: 'AxiomArray',
-      of: 'Trait',
-      name: 'traits',
+      of: 'Implements',
+      name: 'implements',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
-          foam.core.Trait.create({path: o})    :
-          foam.core.Trait.create(o)            ;
+          foam.core.Implements.create({path: o}) :
+          foam.core.Implements.create(o)         ;
       }
     },
     {
@@ -1716,7 +1719,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'DynamicExpression',
-  traits: [ 'foam.core.Dynamic' ],
+  implements: [ 'foam.core.Dynamic' ],
 
   properties: [
     'args',
