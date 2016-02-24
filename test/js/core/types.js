@@ -210,39 +210,39 @@ var createTestProperties = function createTestProperties() {
 
       properties: [
         {
-          type: 'Date',
+          class: 'Date',
           name: 'date',
         },
         {
-          type: 'DateTime',
+          class: 'DateTime',
           name: 'dateTime',
         },
         {
-          type: 'Long',
+          class: 'Long',
           name: 'long',
         },
         {
-          type: 'Float',
+          class: 'Float',
           name: 'float',
         },
         {
-          type: 'Function',
+          class: 'Function',
           name: 'func',
         },
         {
-          type: 'Blob',
+          class: 'Blob',
           name: 'blob',
         },
         {
-          type: 'Reference',
+          class: 'Reference',
           name: 'reference',
         },
         {
-          type: 'StringArray',
+          class: 'StringArray',
           name: 'stringArray',
         },
         {
-          type: 'ReferenceArray',
+          class: 'ReferenceArray',
           name: 'referenceArray',
         },
         // TODO: other types, as they gain testable functionality
@@ -259,11 +259,11 @@ var createDateTestProperties = function createDateTestProperties() {
 
       properties: [
         {
-          type: 'Date',
+          class: 'Date',
           name: 'date',
         },
         {
-          type: 'DateTime',
+          class: 'DateTime',
           name: 'dateTime',
         },
       ]
@@ -274,7 +274,7 @@ var createDateTestProperties = function createDateTestProperties() {
 
 
 
-describe('DateProperty', function() {
+describe('Date', function() {
   var p;
   var p2;
 
@@ -338,7 +338,7 @@ describe('DateProperty', function() {
   });
 });
 
-describe('FloatProperty', function() {
+describe('Float', function() {
   var p;
 
   beforeEach(function() {
@@ -374,7 +374,7 @@ describe('FloatProperty', function() {
   });
 });
 
-describe('FunctionProperty', function() {
+describe('Function', function() {
   var p;
 
   beforeEach(function() {
@@ -403,7 +403,7 @@ describe('FunctionProperty', function() {
 });
 
 
-describe('StringArrayProperty', function() {
+describe('StringArray', function() {
   var p;
 
   beforeEach(function() {
@@ -438,7 +438,7 @@ describe('StringArrayProperty', function() {
   });
 });
 
-describe('ReferenceArrayProperty', function() {
+describe('ReferenceArray', function() {
   var p;
 
   beforeEach(function() {

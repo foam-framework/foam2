@@ -292,7 +292,7 @@ describe('Array', function() {
       package: 'test',
       properties: [
         {
-          type: 'Array', of: 'A',
+          class: 'Array', of: 'A',
           name: 'as'
         }
       ]
@@ -394,7 +394,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
       properties: [
         {
-          type: 'String',
+          class: 'String',
           name: 'name'
         },
         'age',
@@ -527,7 +527,7 @@ describe('Model.traits', function() {
       package: 'test',
       properties: [
         {
-          type: 'String',
+          class: 'String',
           name: 'name'
         },
         'age',
@@ -578,7 +578,7 @@ describe('Model.classes', function() {
 
       properties: [
         {
-          type: 'String',
+          class: 'String',
           name: 'name'
         },
         'age',
@@ -626,7 +626,7 @@ describe('FObject white box test', function() {
       package: 'test',
       properties: [
         {
-          type: 'String',
+          class: 'String',
           name: 'name'
         },
         {
@@ -900,6 +900,6 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.internal.DynamicProperty.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.BooleanProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Boolean.model_)).toBe(true);
   });
 })

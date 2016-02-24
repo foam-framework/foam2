@@ -154,17 +154,17 @@ describe('FObject clone', function() {
       ],
     });
     foam.CLASS({
-      name: 'CompA',
       package: 'test',
+      name: 'CompA',
       properties: [
         {
-          name: 'ordinary',
+          name: 'ordinary'
         },
         {
-          type: 'test.Clone',
-          name: 'special',
+          class: 'test.CloneProperty',
+          name: 'special'
         }
-      ],
+      ]
     });
 
     a = test.CompA.create();
