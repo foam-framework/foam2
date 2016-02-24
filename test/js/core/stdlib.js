@@ -271,7 +271,26 @@ describe('Date', function() {
     jasmine.clock().tick(60000);
     expect(d.toRelativeDateString()).toEqual('1 minute ago');
 
-    // TODO: finish this
+    jasmine.clock().tick(60000);
+    expect(d.toRelativeDateString()).toEqual('2 minutes ago');
+
+    jasmine.clock().tick(60000*60);
+    expect(d.toRelativeDateString()).toEqual('1 hour ago');
+
+    jasmine.clock().tick(60000*60);
+    expect(d.toRelativeDateString()).toEqual('2 hours ago');
+
+    jasmine.clock().tick(60000*60*24);
+    expect(d.toRelativeDateString()).toEqual('1 day ago');
+
+    jasmine.clock().tick(60000*60*24);
+    expect(d.toRelativeDateString()).toEqual('2 days ago');
+
+    jasmine.clock().tick(60000*60*24*7);
+    expect(d.toRelativeDateString()).toEqual('Dec 31');
+
+    jasmine.clock().tick(60000*60*24*365);
+    expect(d.toRelativeDateString()).toEqual('Dec 31 1969');
 
   });
 
