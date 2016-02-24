@@ -968,7 +968,7 @@ foam.CLASS({
       if ( ! opt_dynName ) opt_dynName = name + '$';
       var dyn = this.getPrivate_(opt_dynName);
       if ( ! dyn ) {
-        dyn = foam.internal.DynamicProperty.create();
+        dyn = foam.core.internal.DynamicProperty.create();
         dyn.obj  = this;
         dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
         this.setPrivate_(opt_dynName, dyn);
@@ -1631,8 +1631,8 @@ foam.boot.end();
   Dynamic values are observable values which can change over time.
   Types of Dynamics include:
     DynamicProperty:
-    DynamicExpression: 
-    DynamicValue: to be implemented 
+    DynamicExpression:
+    DynamicValue: to be implemented
 **/
 foam.CLASS({
   package: 'foam.core',
@@ -1675,7 +1675,7 @@ foam.CLASS({
   For internal use only.
  **/
 foam.CLASS({
-  package: 'foam.internal',
+  package: 'foam.core.internal',
   name: 'DynamicProperty',
   extends: 'foam.core.Dynamic',
 
