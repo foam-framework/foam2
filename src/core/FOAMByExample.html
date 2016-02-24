@@ -7,6 +7,7 @@
   <script language="javascript" src="debug.js"></script>
   <script language="javascript" src="parse.js"></script>
   <script language="javascript" src="templates.js"></script>
+  <script language="javascript" src="../lib/graphics.js"></script>
   <title>FOAM By Example</title>
   <style>
     code {color:blue;}
@@ -1016,6 +1017,154 @@ log(foam.json.stringify(o));
 
 //
 log(o.toJSON());
+
+// Graphics Support
+foam.CLASS({
+  name: 'GraphicsDemo',
+  requires: [
+    'foam.graphics.Canvas',
+    'foam.graphics.Arc',
+    'foam.graphics.Box',
+    'foam.graphics.Circle',
+    'foam.graphics.CView',
+    'foam.graphics.Gradient'
+  ],
+  properties: [
+    {
+      name: 'canvas',
+      factory: function() {
+        var c = this.Canvas.create({
+          width: 500,
+          height: 500,
+          id: 'graphics-demo'
+        });
+        c.cview = this.CView.create({
+          children: this.objects
+        });
+        return c;
+      }
+    },
+    {
+      name: 'objects',
+      factory: function() {
+        var objects = [
+          this.Arc.create({
+            start: 0,
+            end: 1.5*Math.PI,
+            radius: 40
+          }),
+          this.Circle.create({
+            fillStyle: this.Gradient.create({
+              radial: true,
+              x0: 0, y0: 0, r0: 10,
+              x1: 0, y1: 0, r1: 100,
+              colors: [
+                [0, 'green'],
+                [0.4, 'blue'],
+                [0.6, 'red'],
+                [1, 'white']
+              ]
+            }),
+            radius: 100,
+            x: 300,
+            y: 300,
+            fill: true,
+            stroke: false
+          }),
+          this.Box.create({
+            fillStyle: this.Gradient.create({
+              radial: false,
+              x0: 0, y0: 0,
+              x1: 1, y1: 1,
+              colors: [
+                [0, 'black'],
+                [0.3, 'white'],
+                [1, 'white']
+              ]
+            }),
+            fill: true,
+            stroke: true,
+            strokeStyle: 'blue',
+            width: 100,
+            height: 100,
+            originX: 50,
+            originY: 50,
+            x: 100,
+            y: 400,
+            children: [
+              this.Circle.create({
+                fillStyle: 'red',
+                x: 30,
+                y: 30,
+                radius: 10,
+                stroke: false,
+                fill: true
+              }),
+              this.Circle.create({
+                fillStyle: 'red',
+                x: 70,
+                y: 30,
+                radius: 10,
+                stroke: false,
+                fill: true
+              }),
+              this.Circle.create({
+                fillStyle: 'red',
+                x: 30,
+                y: 70,
+                radius: 10,
+                stroke: false,
+                fill: true
+              }),
+              this.Circle.create({
+                fillStyle: 'red',
+                x: 70,
+                y: 70,
+                radius: 10,
+                stroke: false,
+                fill: true
+              }),
+              this.Circle.create({
+                fillStyle: 'red',
+                x: 50,
+                y: 50,
+                radius: 10,
+                stroke: false,
+                fill: true
+              })
+            ]
+          })
+        ];
+        return objects;
+      }
+    },
+    {
+      name: 'counter',
+      defaultValue: 0
+    }
+  ],
+  listeners: [
+    {
+      name: 'step',
+      isFramed: true,
+      code: function() {
+        this.counter += 0.01
+        this.objects[0].rotation += 0.1;
+        this.objects[0].x = 150 + 50 * Math.cos(this.counter);
+        this.objects[0].y = 150 + 50 * Math.sin(this.counter);
+        this.objects[1].skewX = Math.sin(this.counter);
+        this.objects[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
+        this.objects[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
+        this.objects[2].rotation += 0.01;
+        this.canvas.paint();
+        this.step();
+      }
+    }
+  ]
+});
+var g = GraphicsDemo.create();
+log_(g.canvas.toHTML());
+g.step();
 
 // TODO: Putting it all together
 </script>
