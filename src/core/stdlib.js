@@ -170,6 +170,7 @@ foam.LIB({
   name: 'Date',
   methods: [
     function toRelativeDateString(){
+      // TODO i18n: make this translatable
       var seconds = Math.floor((Date.now() - this.getTime())/1000);
 
       if ( seconds < 60 ) return 'moments ago';
