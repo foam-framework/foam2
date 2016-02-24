@@ -1003,6 +1003,20 @@ foam.CLASS({
 });
 log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
 
+// JSON Support
+foam.CLASS({
+  name: 'JSONTest',
+  properties: [ 'name', 'age', 'children' ]
+});
+var o = foam.json.parse({class: 'JSONTest', name: 'John', age: 42, children: ['Peter', 'Paul']});
+o.describe();
+
+//
+log(foam.json.stringify(o));
+
+//
+log(o.toJSON());
+
 // TODO: Putting it all together
 </script>
 
