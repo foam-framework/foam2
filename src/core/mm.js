@@ -2029,14 +2029,14 @@ foam.LIB({
 
 
 /**  TODO:
-  - context $ binding
   - pass 'parent' as second arg to create() instead of X
   - model validation
     - abstract methods
     - interfaces
   - compound destroyable
-  - more docs
   - DynamicValue map() and relate() methods
+  - more docs
   - Proxy label, plural from Class to Model
   - ID support
+  - context $ binding
 */
