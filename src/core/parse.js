@@ -16,13 +16,13 @@
  */
 
 foam.CLASS({
-  name: 'SimpleProperty',
+  package: 'foam.core',
+  name: 'Simple',
   extends: 'Property',
   methods: [
     function installInProto(proto) {}
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parsers',
@@ -31,11 +31,11 @@ foam.CLASS({
   properties: [
     {
       name: 'str',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'pos',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'head',
@@ -127,7 +127,7 @@ foam.CLASS({
   properties: [
     {
       name: 'p',
-      type: 'foam.parsers.Parser',
+      class: 'foam.parsers.ParserProperty',
       final: true
     }
   ]
@@ -168,7 +168,7 @@ foam.CLASS({
     {
       name: 'args',
       final: true,
-      type: 'foam.parsers.ParserArray'
+      class: 'foam.parsers.ParserArray'
     }
   ],
   methods: [
@@ -194,7 +194,7 @@ foam.CLASS({
     {
       name: 'args',
       final: true,
-      type: 'foam.parsers.ParserArray'
+      class: 'foam.parsers.ParserArray'
     }
   ],
   methods: [
@@ -219,7 +219,7 @@ foam.CLASS({
     {
       name: 'args',
       final: true,
-      type: 'foam.parsers.ParserArray'
+      class: 'foam.parsers.ParserArray'
     },
     {
       name: 'n',
@@ -333,7 +333,7 @@ foam.CLASS({
     {
       name: 'else',
       final: true,
-      type: 'foam.parsers.Parser'
+      class: 'foam.parsers.ParserProperty'
     }
   ],
   methods: [
@@ -390,7 +390,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parsers',
-  name: 'ParsersAxiomProperty',
+  name: 'ParsersAxiom',
   extends: 'AxiomArray',
 
   methods: [
@@ -511,7 +511,7 @@ foam.CLASS({
   properties: [
     {
       name: 'grammar',
-      type: 'foam.parsers.ParsersAxiom'
+      class: 'foam.parsers.ParsersAxiom'
     }
   ]
 });
@@ -548,11 +548,12 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'AxiomArray',
+      of: 'foam.parsers.ParserAction',
       name: 'grammarActions',
-      type: 'AxiomArray',
       adaptArrayElement: function(o) {
-        if ( foam.parsers.ParserAction.isInstance(o) ) return o;
-        return foam.parsers.ParserAction.create({
+        if ( foam.lookup(this.of).isInstance(o) ) return o;
+        return foam.lookup(this.of).create({
           name: o.name,
           code: typeof o === 'function' ? o : o.code
         });
