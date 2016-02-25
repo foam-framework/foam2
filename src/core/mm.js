@@ -2069,4 +2069,5 @@ foam.LIB({
   - context $ binding
   - fire pre/postSet with factories
   - cascading object property change events
+  - fix axioms to allow axioms: to be defined without clobbering exisitng axioms
 */
