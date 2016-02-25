@@ -1,7 +1,25 @@
+/*
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Float',
   extends: 'Property',
+
   properties: [
     {
       name: 'defaultValue',
@@ -10,53 +28,57 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Matrix',
+
   properties: [
     {
       name: 'a',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'b',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'c',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'd',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'e',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'f',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'g',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'h',
-      type: 'Simple'
+      class: 'Simple'
     },
     {
       name: 'i',
-      type: 'Simple'
+      class: 'Simple'
     }
   ],
+
   methods: [
     function initArgs() {
       this.a = 1; this.b = 0; this.c = 0;
       this.d = 0; this.e = 1; this.f = 0;
       this.g = 0; this.h = 0; this.i = 1;
     },
+
     function mul(m) {
       var a = this.a, b = this.b, c = this.c,
           d = this.d, e = this.e, f = this.f,
@@ -76,6 +98,7 @@ foam.CLASS({
 
       return this;
     },
+
     function invert() {
       // a b c    a d g
       // d e f -> b e h
@@ -96,12 +119,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Transform',
+
   requires: [
     'foam.graphics.Matrix'
   ],
+
   properties: [
     {
       name: 'matrix',
@@ -110,10 +136,12 @@ foam.CLASS({
       },
     }
   ],
+
   methods: [
     function reset() {
       this.matrix = this.Matrix.create();
     },
+
     function translate(dx, dy) {
       var m = this.Matrix.create()
       m.a = 1; m.b = 0; m.c = dx;
@@ -121,6 +149,7 @@ foam.CLASS({
       m.g = 0; m.h = 0; m.i = 1;
       this.matrix.mul(m);
     },
+
     function skew(x, y) {
       var m = this.Matrix.create();
       m.a = 1; m.b = x; m.c = 0;
@@ -128,9 +157,11 @@ foam.CLASS({
       m.g = 0; m.h = 0; m.i = 1;
       this.matrix.mul(m);
     },
+
     function affine(m) {
       this.matrix.mul(m);
     },
+
     function scale(x, y) {
       var m = this.Matrix.create();
       m.a = x; m.b = 0; m.c = 0;
@@ -138,6 +169,7 @@ foam.CLASS({
       m.g = 0; m.h = 0; m.i = 1;
       this.matrix.mul(m);
     },
+
     function rotate(a) {
       var m = this.Matrix.create();
       m.a = Math.cos(a);  m.b = Math.sin(a); m.c = 0;
@@ -148,12 +180,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
+  name: 'CView',
+
   requires: [
     'foam.graphics.Transform'
   ],
-  name: 'CView',
+
   properties: [
     {
       name: 'rotation',
@@ -221,6 +256,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function paint(x) {
       x.save();
@@ -233,15 +269,18 @@ foam.CLASS({
       this.paintChildren(x);
       x.restore();
     },
+
     function doTransform(x) {
       var t = this.transform.matrix;
       x.transform(t.a, t.d, t.b, t.e, t.c, t.f);
     },
+
     function paintChildren(x) {
       for ( var i = 0 ; i < this.children.length ; i++ ) {
         this.children[i].paint(x);
       }
     },
+
     function paintSelf(x) {}
   ]
 });
@@ -251,6 +290,7 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Box',
   extends: 'foam.graphics.CView',
+
   properties: [
     {
       name: 'width',
@@ -271,6 +311,7 @@ foam.CLASS({
       defaultValue: true
     }
   ],
+
   methods: [
     function paintSelf(x) {
       x.beginPath();
@@ -281,10 +322,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Arc',
   extends: 'foam.graphics.CView',
+
   properties: [
     {
       name: 'radius',
@@ -309,6 +352,7 @@ foam.CLASS({
       defaultValue: true
     }
   ],
+
   methods: [
     function paintSelf(x) {
       x.beginPath();
@@ -319,10 +363,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Circle',
   extends: 'foam.graphics.Arc',
+
   properties: [
     {
       name: 'start',
@@ -335,12 +381,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
+
   imports: [
     '$'
   ],
+
   properties: [
     {
       name: 'id'
@@ -379,6 +428,7 @@ foam.CLASS({
       }
     }
   ],
+
   listeners: [
     {
       name: 'paint',
@@ -389,12 +439,14 @@ foam.CLASS({
       }
     }
   ],
+
   templates: [
     {
       name: 'toHTML',
       template: '<canvas id="<%= this.id %>"></canvas>'
     }
   ],
+
   methods: [
     function erase() {
       this.element.width = this.element.width;
@@ -402,9 +454,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Gradient',
+
   properties: [
     'x0', 'y0', 'r0',
     'x1', 'y1', 'r1',
@@ -420,17 +474,16 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function toCanvasStyle(x) {
-      var g;
-      if ( this.radial )
-        g = x.createRadialGradient(this.x0, this.y0, this.r0, this.x1, this.y1, this.r1);
-      else
-        g = x.createLinearGradient(this.x0, this.y0, this.x1, this.y1);
+      var t = this;
+      var g = this.radial ?
+        x.createRadialGradient(t.x0, t.y0, t.r0, t.x1, t.y1, t.r1) :
+        x.createLinearGradient(t.x0, t.y0, t.x1, t.y1) ;
 
-      for ( var i = 0 ; i < this.colors.length ; i++ ) {
-        g.addColorStop(this.colors[i][0], this.colors[i][1]);
-      }
+      for ( var i = 0 ; i < t.colors.length ; i++ )
+        g.addColorStop(t.colors[i][0], t.colors[i][1]);
 
       return g;
     }

@@ -478,7 +478,6 @@ foam.CLASS({
 
   properties: [
     'name',
-//    'class',
     'defaultValue',
     'factory',
     'adapt',
