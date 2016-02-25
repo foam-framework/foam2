@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// ???: Why not use the definition from types.js?
 foam.CLASS({
   package: 'foam.core',
   name: 'Float',
@@ -133,7 +134,7 @@ foam.CLASS({
       name: 'matrix',
       factory: function() {
         return this.Matrix.create();
-      },
+      }
     }
   ],
 
