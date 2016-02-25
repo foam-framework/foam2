@@ -333,8 +333,8 @@ foam.LIB({
 
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
-        for ( var i = 0 ; i < m.axioms.length ; i++ )
-          this.installAxiom(m.axioms[i]);
+        for ( var i = 0 ; i < m.axioms_.length ; i++ )
+          this.installAxiom(m.axioms_[i]);
       };
 
       // Update psedo-Models to real Models
@@ -440,8 +440,13 @@ foam.CLASS({
     },
     'refines',
     {
-      name: 'axioms',
+      name: 'axioms_',
       factory: function() { return []; }
+    },
+    {
+      name: 'axioms',
+      factory: function() { return []; },
+      postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     },
     {
       class: 'Array',
@@ -994,7 +999,8 @@ foam.CLASS({
     {
       name: 'postSet',
       defaultValue: function(_, a) {
-        (this.axioms || (this.axioms = [])).push.apply(this.axioms, a); }
+        // TODO: simplify
+        (this.axioms_ || (this.axioms_ = [])).push.apply(this.axioms_, a); }
     }
   ]
 });
@@ -1477,8 +1483,8 @@ foam.CLASS({
     {
       name: 'exports',
       postSet: function(_, xs) {
-        (this.axioms || (this.axioms = [])).
-          push.call(this.axioms, foam.core.Exports.create({bindings: xs}));
+        (this.axioms_ || (this.axioms_ = [])).
+          push.call(this.axioms_, foam.core.Exports.create({bindings: xs}));
       }
     },
     {
@@ -1570,7 +1576,8 @@ foam.CLASS({
 
   documentation: 'Upgrade FObject to fully bootstraped form.',
 
-  // TODO: fix
+  topics: [ 'propertyChange' ],
+
   axioms: [
     {
       name: 'X',
@@ -1598,8 +1605,6 @@ foam.CLASS({
       }
     }
   ],
-
-  topics: [ 'propertyChange' ],
 
   methods: [
     /**
@@ -2069,5 +2074,4 @@ foam.LIB({
   - context $ binding
   - fire pre/postSet with factories
   - cascading object property change events
-  - fix axioms to allow axioms: to be defined without clobbering exisitng axioms
 */
