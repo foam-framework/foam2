@@ -24,7 +24,7 @@ foam.AbstractClass.describe = function(opt_name) {
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     console.log(
-      foam.string.pad(a.cls_.name, 20),
+      foam.string.pad(a.cls_ ? a.cls_.name : 'anonymous', 20),
       foam.string.pad(a.sourceCls_.name, 14),
       a.name);
   }
@@ -45,7 +45,7 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
         console.log(
-          foam.string.pad(p.cls_.name, 20),
+          foam.string.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
           foam.string.pad(p.name, 14),
           this[p.name]);
       }

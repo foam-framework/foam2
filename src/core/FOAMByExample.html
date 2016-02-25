@@ -78,7 +78,7 @@ o.describe();
 
 // Properties and Methods are types of Axioms
 // Get an array of all Axioms belonging to a Class by calling getAxioms.
-Test.getAxioms().forEach(function(a) { console.log(a.cls_.name, a.name); });
+Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name); });
 
 // Find an Axiom for a class using getAxiomByName
 log(Test.getAxiomByName('a'));

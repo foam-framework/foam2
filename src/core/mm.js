@@ -106,7 +106,7 @@ foam.LIB({
 
   constants: {
     prototype: Object.prototype,
-    axiomMap_: null
+    axiomMap_: {}
   },
 
   methods: [
@@ -518,7 +518,7 @@ foam.CLASS({
         var a = this.cls_.getAxiomsByClass(foam.core.Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
-          if ( typeof superProp[name] !== 'undefined' && ! this.hasOwnProperty(name) )
+          if ( typeof superProp[name] !== 'undefined' /*superProp.hasOwnProperty(name)*/ && ! this.hasOwnProperty(name) )
             this[name] = superProp[name];
         }
       }
@@ -1133,8 +1133,8 @@ foam.CLASS({
       Object.defineProperty(proto, as, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(as) ) {
-            var Y     = this.Y;
-            var model = foam.lookup(path);
+            var model  = foam.lookup(path);
+            var parent = this;
 
             if ( ! model )
               console.error('Unknown class: ' + path);
@@ -1143,7 +1143,7 @@ foam.CLASS({
               as,
               {
                 __proto__: foam.lookup(path),
-                create: function(args, X) { return model.create(args, X || Y); }
+                create: function(args, X) { return model.create(args, X || parent); }
               });
           }
 
@@ -1570,6 +1570,35 @@ foam.CLASS({
 
   documentation: 'Upgrade FObject to fully bootstraped form.',
 
+  // TODO: fix
+  axioms: [
+    {
+      name: 'X',
+      installInProto: function(p) {
+        Object.defineProperty(p, 'X', {
+          get: function() {
+            var x = this.getPrivate_('X');
+            if ( ! x ) {
+              var ySource = this.getPrivate_('ySource');
+              if ( ySource ) {
+                this.setPrivate_('X', x = ySource.Y || ySource.X);
+                this.setPrivate_('ySource', undefined);
+              } else {
+                // console.error('Missing X in ', this.cls_.id);
+                return undefined;
+              }
+            }
+            return x;
+          },
+          set: function(x) {
+            if ( x )
+              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'ySource' : 'X', x);
+          }
+        });
+      }
+    }
+  ],
+
   topics: [ 'propertyChange' ],
 
   methods: [
@@ -1578,7 +1607,7 @@ foam.CLASS({
       Replaces simpler version defined in original FObject definition.
     */
     function initArgs(args, X) {
-      this.X = X || foam.X; // this.setPrivate_('X', X);
+      this.X = X || foam.X;
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy
@@ -2029,7 +2058,6 @@ foam.LIB({
 
 
 /**  TODO:
-  - pass 'parent' as second arg to create() instead of X
   - model validation
     - abstract methods
     - interfaces
@@ -2039,4 +2067,6 @@ foam.LIB({
   - Proxy label, plural from Class to Model
   - ID support
   - context $ binding
+  - fire pre/postSet with factories
+  - cascading object property change events
 */
