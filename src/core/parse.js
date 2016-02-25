@@ -19,10 +19,12 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Simple',
   extends: 'Property',
+
   methods: [
     function installInProto(proto) {}
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parsers',
@@ -68,8 +70,10 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initArgs() {},
+
     function setValue(value) {
       // Force undefined values to null so that hasOwnProperty checks are faster.
       if ( value === undefined ) value = null;
@@ -80,6 +84,7 @@ foam.CLASS({
       ps.value = value;
       return ps;
     },
+
     function setString(s) {
       if ( ! this.pos ) this.pos = 0;
       if ( ! this.str ) this.str = [];
@@ -93,6 +98,7 @@ foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserArray',
   extends: 'Array',
+
   properties: [
     {
       name: 'adaptArrayElement',
@@ -148,6 +154,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       var str = this.s;
@@ -171,6 +178,7 @@ foam.CLASS({
       class: 'foam.parsers.ParserArray'
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       // TODO: Should we remove the obj argument in favour of
@@ -197,6 +205,7 @@ foam.CLASS({
       class: 'foam.parsers.ParserArray'
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       var ret = [];
@@ -226,6 +235,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       var ret;
@@ -336,6 +346,7 @@ foam.CLASS({
       class: 'foam.parsers.ParserProperty'
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       return this.p.parse(ps, obj) ?
@@ -354,6 +365,7 @@ foam.CLASS({
   properties: [
     'parser'
   ],
+
   methods: [
     function installInProto(proto) {
       var parser = this.parser;
@@ -375,6 +387,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       var p = obj[this.name];
@@ -399,53 +412,63 @@ foam.CLASS({
         args: foam.array.argsToArray(arguments)
       });
     },
+
     function repeat0(p) {
       return foam.lookup('foam.parsers.Repeat0').create({
         p: p
       });
     },
+
     function simpleAlt() {
       return foam.lookup('foam.parsers.Alternate').create({
         args: foam.array.argsToArray(arguments)
       });
     },
+
     function alt() {
       return foam.lookup('foam.parsers.Alternate').create({
         args: foam.array.argsToArray(arguments)
       });
     },
+
     function sym(name) {
       return foam.lookup('foam.parsers.Symbol').create({
         name: name
       });
     },
+
     function seq1(n) {
       return foam.lookup('foam.parsers.Sequence1').create({
         n: n,
         args: foam.array.argsToArray(arguments).slice(1)
       });
     },
+
     function repeat(p) {
       return foam.lookup('foam.parsers.Repeat').create({
         p: p
       });
     },
+
     function notChars(s) {
       return foam.lookup('foam.parsers.NotChars').create({
         string: s
       });
     },
+
     function not(p, opt_else) {
       return foam.lookup('foam.parsers.Not').create({
         p: p,
         else: opt_else
       });
     },
+
     function optional(p) {
       return foam.lookup('foam.parsers.Optional').create({
         p: p,
       });
     },
+
     function literal(s, value) {
       return foam.lookup('foam.parsers.Literal').create({
         s: s,
@@ -453,6 +476,7 @@ foam.CLASS({
       });
     }
   ],
+
   properties: [
     {
       name: "anyChar",
@@ -524,13 +548,12 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      var f = this.code;
-      var name = this.name;
+      var f      = this.code;
+      var name   = this.name;
       var parser = proto[this.name];
 
-      if ( ! parser ) {
+      if ( ! parser )
         throw "No existing parser found for " + this.name;
-      }
 
       proto[this.name] = function(ps, grammar) {
         ps = parser.call(this, ps, grammar);
