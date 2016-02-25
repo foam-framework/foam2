@@ -291,10 +291,7 @@ describe('Date', function() {
 
     jasmine.clock().tick(60000*60*24*365);
     expect(d.toRelativeDateString()).toEqual('Dec 31 1969');
-
   });
-
-
 });
 
 
