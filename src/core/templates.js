@@ -325,7 +325,7 @@ foam.CLASS({
     },
     {
       name: 'template',
-      type: 'String'
+      class: 'String'
     },
     {
       name: 'args',
@@ -346,9 +346,10 @@ foam.CLASS({
   properties: [
     {
       name: 'templates',
-      type: 'AxiomArray',
+      class: 'AxiomArray',
+      of: 'foam.templates.TemplateAxiom',
       adaptArrayElement: function(o) {
-        return foam.templates.TemplateAxiom.create(o);
+        return foam.lookup(this.of).create(o);
       }
     }
   ]
