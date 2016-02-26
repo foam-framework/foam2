@@ -1680,8 +1680,13 @@ foam.CLASS({
 
       var dtors = this.getPrivate_('dtors');
       if ( dtors )
-        for ( var i = 0 ; i < dtors.length ; i++ )
-          dtors[i].destroy();
+        for ( var i = 0 ; i < dtors.length ; i++ ) {
+          var d = dtors[i];
+          if ( typeof d === 'function' )
+            d();
+          else
+            d.destroy();
+        }
 
       this.instance_ = null;
       this.private_ = null;
