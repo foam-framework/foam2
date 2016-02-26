@@ -13,7 +13,7 @@
   <script language="javascript" src="../../src/lib/graphics.js"></script>
   <title>FOAM By Example</title>
   <style>
-    code {color:blue;}
+    code {color:blue; white-space: pre-wrap; }
   </style>
  </head>
 
@@ -1186,8 +1186,6 @@ g.step();
     var demo = document.getElementById('demo');
     var out  = document.getElementById('output');
     var log_ = function(o) {
-    if ( o.indexOf('<') != 0 ) o = o.replace(/\n/g, '<br>').replace(/ /g,'&nbsp;');
-    //      out.innerHTML = out.innerHTML + o + '<br/>';
     if ( log_.capture ) log_.output += o;
     document.body.insertAdjacentHTML('beforeend', o + '<br/>');
     }
