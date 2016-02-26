@@ -566,6 +566,7 @@ foam.CLASS({
       var defaultValue    = this.defaultValue;
       var dynName         = name + '$';
       var isFinal         = this.final;
+      var eFactory        = this.exprFactory(this.expression);
 
       Object.defineProperty(proto, dynName, {
         get: function propDynGetter() {
@@ -577,9 +578,6 @@ foam.CLASS({
         configurable: true,
         enumerable: false
       });
-
-      var eFactory = this.expression &&
-        this.expressionFactory(this.expression);
 
       var getter =
         prop.getter ? prop.getter :
@@ -636,7 +634,10 @@ foam.CLASS({
       });
     },
 
-    function expressionFactory(e) {
+    function exprFactory(e) {
+      /* Create a factory function from an expression function. */
+      if ( ! e ) return null;
+
       var args = foam.fn.argsArray(e);
       var name = this.name;
 
