@@ -1676,6 +1676,8 @@ foam.CLASS({
     },
     
     function destroy() {
+      if ( this.destroyed ) return;
+
       this.destroyed = true;
 
       var dtors = this.getPrivate_('dtors');

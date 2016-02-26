@@ -784,6 +784,19 @@ log(p.name, p.hasOwnProperty('name'));
 p.clearProperty('name');
 log(p.name, p.hasOwnProperty('name'));
 
+// Destroyables (objects with a destroy() method) or functions
+// can be registered to be called when an object is destroyed.
+var o = foam.core.FObject.create();
+var o2 = foam.core.FObject.create();
+o.onDestroy(function() { log('destroy 1'); });
+o2.onDestroy(function() { log('destroy 2'); });
+o.onDestroy(o2);
+o.destroy();
+
+// It doesn't hurt to try and destroy an object more than once.
+o.destroy();
+o.destroy();
+
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
 var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
