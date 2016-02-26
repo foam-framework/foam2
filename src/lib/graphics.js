@@ -106,6 +106,7 @@ foam.CLASS({
 });
 
 
+// TODO: Perhaps these methods should be moved to matrix.
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Transform',
@@ -119,6 +120,12 @@ foam.CLASS({
       name: 'matrix',
       factory: function() {
         return this.Matrix.create();
+      },
+    },
+    {
+      name: 'm2',
+      factory: function() {
+        return this.Matrix.create();
       }
     }
   ],
@@ -129,7 +136,8 @@ foam.CLASS({
     },
 
     function translate(dx, dy) {
-      var m = this.Matrix.create()
+      //      var m = this.Matrix.create()
+      var m = this.m2;
       m.a = 1; m.b = 0; m.c = dx;
       m.d = 0; m.e = 1; m.f = dy;
       m.g = 0; m.h = 0; m.i = 1;
@@ -137,7 +145,8 @@ foam.CLASS({
     },
 
     function skew(x, y) {
-      var m = this.Matrix.create();
+      //      var m = this.Matrix.create();
+      var m = this.m2;
       m.a = 1; m.b = x; m.c = 0;
       m.d = y; m.e = 1; m.f = 0;
       m.g = 0; m.h = 0; m.i = 1;
@@ -149,7 +158,8 @@ foam.CLASS({
     },
 
     function scale(x, y) {
-      var m = this.Matrix.create();
+      //      var m = this.Matrix.create();
+      var m = this.m2;
       m.a = x; m.b = 0; m.c = 0;
       m.d = 0; m.e = y; m.f = 0;
       m.g = 0; m.h = 0; m.i = 1;
@@ -157,7 +167,8 @@ foam.CLASS({
     },
 
     function rotate(a) {
-      var m = this.Matrix.create();
+      //      var m = this.Matrix.create();
+      var m = this.m2;
       m.a = Math.cos(a);  m.b = Math.sin(a); m.c = 0;
       m.d = -Math.sin(a); m.e = Math.cos(a); m.f = 0;
       m.g = 0;            m.h = 0;           m.i = 1;
