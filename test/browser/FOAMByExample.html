@@ -1191,7 +1191,6 @@ g.step();
     if ( log_.capture ) log_.output += o;
     document.body.insertAdjacentHTML('beforeend', o + '<br/>');
     }
-    log_.output = "";
     var oldLog = console.log;
     console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw 'assert'; } };
     console.log = function() { log_([].join.call(arguments, ' ')); };
@@ -1212,31 +1211,35 @@ g.step();
 
       log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
       log_.capture = istest;
-      if ( istest ) {
-        test_code += '\n\n// Example ' + (i_ + 1) + '\n';
-        test_code += 'try {\n' + line + '\n} catch(x) {\n log("Exception: ", x);\n }\n';
-      }
+      log_.output = "";
       try {
         eval(line);
       } catch (x) {
         log('Exception: ', x);
       }
       log_.capture = false;
+      if ( istest ) {
+        test_code += '\n\n// Example ' + (i_ + 1) + '\n';
+        test_code += 'log_.output = "";\n';
+        test_code += 'try {\n' + line + '\n} catch(x) {\n log("Exception: ", x);\n }\n';
+        var golden = log_.output.replace(/\n/g, "\\n")
+            .replace(/\r/g, "\\r")
+            .replace(/"/g, '\\"');
+        test_code += '  expect(log_.output).toMatchGolden({ i: ' + i_ + ', str: "' + golden + '" });\n';
+      }
+
       log_('');
     }
-
-    var golden = log_.output
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r")
-        .replace(/"/g, '\\"');
 
     var unittests = [
 "var customMatchers = {\n",
 "  toMatchGolden: function(util, customEqualityTesters) {\n",
 "    return {\n",
-"      compare: function(actual, expected) {\n",
+"      compare: function(actual, golden) {\n",
 "        var _failed = false;\n",
-"        var message = '';\n",
+"        var expected = golden.str;\n",
+"        var example = golden.i;\n",
+"        var message = 'In Example #' + example + '\\n';\n",
 "        if ( actual.length != expected.length ) {\n",
 "          message += 'Lengths dont match\\n' +\n",
 "            '  Expected: ' + expected.length + '\\n' +\n",
@@ -1244,15 +1247,20 @@ g.step();
 "          _failed = true;\n",
 "        }\n",
 "\n",
-"        var min = Math.min(actual.length, expected.length);\n",
-"        for ( var i = 0 ; i < min ; i++ ) {\n",
-"          if ( actual[i] !== expected[i] ) {\n",
-"            message += 'First difference at ' + i + '\\n';\n",
-"            message += '  Expected:  \"' + expected.substring(i-10, i+10) + '\"\\n';\n",
-"            message += '  Actual:    \"' + actual.substring(i-10, i+10) + '\"\\n';\n",
-"            _failed = true;\n",
-"            break;\n",
+"        var min = Math.max(actual.length, expected.length);\n",
+"        if ( expected.length > 80 ) {\n",
+"          for ( var i = 0 ; i < min ; i++ ) {\n",
+"            if ( actual[i] !== expected[i] ) {\n",
+"              message += 'First difference at ' + i + '\\n';\n",
+"              message += '  Expected:  \"' + expected.substring(i-20, i+20) + '\"\\n';\n",
+"              message += '  Actual:    \"' + actual.substring(i-20, i+20) + '\"\\n';\n",
+"              _failed = true;\n",
+"              break;\n",
+"            }\n",
 "          }\n",
+"        } else {\n",
+"          message += '  Expected: \"' + expected + '\"\\n';\n",
+"          message += '  Actual:   \"' + actual + '\"\\n';\n",
 "        }\n",
 "\n",
 "        if ( _failed ) return { pass: false, message: message };\n",
@@ -1289,8 +1297,6 @@ g.step();
     '  console.log = oldLog;\n',
     '});\n\n',
     'it("", function() {\n' + test_code + '\n\n',
-    '// Verify output\n',
-    'expect(log_.output).toMatchGolden(golden);\n',
     '});\n});\n\n');
 
     document.getElementById('unittests').href = URL.createObjectURL(new Blob(unittests, { type: 'application/javascript' }));
