@@ -102,7 +102,7 @@
 foam.LIB({
   name: 'AbstractClass',
 
-  documentation: "Root prototype for all classes.",
+  // documentation: "Root prototype for all classes.",
 
   constants: {
     prototype: Object.prototype,
@@ -247,7 +247,7 @@ foam.LIB({
 foam.LIB({
   name: 'boot',
 
-  documentation: 'Bootstrap support, discarded after use.',
+  // documentation: 'Bootstrap support, discarded after use.',
 
   methods: [
     function start() {
@@ -359,7 +359,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'FObject',
 
-  documentation: 'Base model for model hierarchy.',
+  // documentation: 'Base model for model hierarchy.',
 
   imports: [ 'assert', 'error', 'log', 'warn' ],
 
@@ -432,7 +432,7 @@ foam.CLASS({
   name: 'Model',
   extends: 'FObject', // Isn't the default yet.
 
-  documentation: 'Class/Prototype description.',
+  // documentation: 'Class/Prototype description.',
 
   properties: [
     {
@@ -783,7 +783,7 @@ foam.CLASS({
   name: 'String',
   extends: 'Property',
 
-  documentation: 'StringProperties coerce their arguments into Strings.',
+  // documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
     {
@@ -807,7 +807,7 @@ foam.CLASS({
   name: 'Array',
   extends: 'Property',
 
-  documentation: "A Property which contains an array of 'of' objects.",
+  // documentation: "A Property which contains an array of 'of' objects.",
 
   properties: [
     'of',
@@ -838,7 +838,7 @@ foam.boot.phase2();
 foam.CLASS({
   refines: 'foam.core.FObject',
 
-  documentation: 'Add listener support to FObject.',
+  // documentation: 'Add listener support to FObject.',
 
   methods: [
     /**
@@ -1003,7 +1003,7 @@ foam.CLASS({
   name: 'AxiomArray',
   extends: 'Array',
 
-  documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
+  // documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
 
   properties: [
     {
@@ -1029,7 +1029,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Constant',
 
-  documentation: 'Constant Axiom',
+  // documentation: 'Constant Axiom',
 
   properties: [ 'name', 'value' ],
 
@@ -1065,7 +1065,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'InnerClass',
 
-  documentation: 'Inner-Class Axiom',
+  // documentation: 'Inner-Class Axiom',
 
   properties: [
     {
@@ -1114,7 +1114,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Implements',
 
-  documentation: 'Implements Axiom',
+  // documentation: 'Implements Axiom',
 
   properties: [
     { name: 'name', getter: function() { return 'implements_' + this.path; } },
@@ -1131,7 +1131,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Requires',
 
-  documentation: 'Require Class Axiom',
+  // documentation: 'Require Class Axiom',
 
   properties: [
     { name: 'name', getter: function() { return 'requires_' + this.path; } },
@@ -1176,7 +1176,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Imports',
 
-  documentation: 'Import Context Value Axiom',
+  // documentation: 'Import Context Value Axiom',
 
   properties: [
     { name: 'name', getter: function() { return 'imports_' + this.key; } },
@@ -1209,7 +1209,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Exports',
 
-  documentation: 'Export Sub-Context Value Axiom',
+  // documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
     { name: 'name', defaultValue: 'exports_' },
@@ -1306,7 +1306,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Topic',
 
-  documentation: 'Topic Axiom',
+  // documentation: 'Topic Axiom',
 
   properties: [ 'name', 'description' ],
 
@@ -1455,7 +1455,7 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
+  // documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
   properties: [
     {
@@ -1584,7 +1584,7 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.FObject',
 
-  documentation: 'Upgrade FObject to fully bootstraped form.',
+  // documentation: 'Upgrade FObject to fully bootstraped form.',
 
   topics: [ 'propertyChange' ],
 
@@ -1813,7 +1813,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Window',
 
-  documentation: 'Encapsulates top-level window/document features.',
+  // documentation: 'Encapsulates top-level window/document features.',
 
   exports: [
     '$$',

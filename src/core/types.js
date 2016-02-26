@@ -27,7 +27,7 @@ foam.CLASS({
   name:  'Date',
   extends: 'Property',
 
-  documentation: 'Describes properties of type Date.',
+  // documentation: 'Describes properties of type Date.',
   label: 'Date',
 
   properties: [
@@ -60,7 +60,7 @@ foam.CLASS({
   name: 'DateTime',
   extends: 'Date',
 
-  documentation: 'Describes properties of type DateTime.',
+  // documentation: 'Describes properties of type DateTime.',
   label: 'Date and time'
 });
 
@@ -70,7 +70,7 @@ foam.CLASS({
   name:  'Long',
   extends: 'Int',
 
-  documentation:  'Describes properties of type Long.',
+  // documentation:  'Describes properties of type Long.',
   label: 'Round long numbers'
 });
 
@@ -80,7 +80,7 @@ foam.CLASS({
   name:  'Float',
   extends: 'Int',
 
-  documentation:  'Describes properties of type Float.',
+  // documentation:  'Describes properties of type Float.',
   label: 'Decimal numbers',
 
   properties: [
@@ -99,7 +99,7 @@ foam.CLASS({
   name:  'Function',
   extends: 'Property',
 
-  documentation:  'Describes properties of type Function.',
+  // documentation:  'Describes properties of type Function.',
   label: 'Code that can be run',
 
   properties: [
@@ -127,7 +127,7 @@ foam.CLASS({
   name: 'Blob',
   extends: 'Property',
 
-  documentation: 'A chunk of binary data.',
+  // documentation: 'A chunk of binary data.',
   label: 'Binary data',
 
   properties: [
@@ -135,7 +135,7 @@ foam.CLASS({
       name: 'type',
       type: 'String',
       defaultValue: 'Blob',
-      documentation: 'The FOAM type of this property.'
+      // documentation: 'The FOAM type of this property.'
     }
   ]
 });
@@ -146,19 +146,19 @@ foam.CLASS({
   name:  'Reference',
   extends: 'Property',
 
-  documentation:  'A foreign key reference to another Entity.',
+  // documentation:  'A foreign key reference to another Entity.',
   label: 'Reference to another object',
 
   properties: [
     {
       name: 'of',
       defaultValue: '',
-      documentation: 'The FOAM sub-type of this property.'
+      // documentation: 'The FOAM sub-type of this property.'
     },
     {
       name: 'subKey',
       defaultValue: 'ID',
-      documentation: 'The foreign key that this property references.'
+      // documentation: 'The foreign key that this property references.'
     }
     // TODO: expression to produce the actual value referenced by this property? or method installed on the host?
   ]
@@ -170,14 +170,14 @@ foam.CLASS({
   name: 'StringArray',
   extends: 'Array',
 
-  documentation: 'An array of String values.',
+  // documentation: 'An array of String values.',
   label: 'List of text strings',
 
   properties: [
     {
       name: 'of',
       defaultValue: 'String',
-      documentation: 'The FOAM sub-type of this property.'
+      // documentation: 'The FOAM sub-type of this property.'
     },
     {
       name: 'adapt',
@@ -206,7 +206,7 @@ foam.CLASS({
 //   package: 'foam.core',
 //   extends: 'Property',
 
-//   documentation: 'Describes a Model property.',
+//   // documentation: 'Describes a Model property.',
 //   label: 'Data Model definition',
 
 //   properties: [
