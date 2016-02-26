@@ -594,7 +594,7 @@ foam.CLASS({
         factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            this.instance_[name] = factory.call(this) ;
+            this[name] = factory.call(this) ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
@@ -2082,6 +2082,5 @@ foam.LIB({
   - Proxy label, plural from Class to Model
   - ID support
   - context $ binding
-  - fire pre/postSet with factories
   - cascading object property change events
 */
