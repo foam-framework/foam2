@@ -4,3 +4,5 @@ require("./objects.js");
 require("./patterns.js");
 require("./debug.js");
 require("./types.js");
+require("./parse.js");
+require("./templates.js");
