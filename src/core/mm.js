@@ -1749,6 +1749,7 @@ foam.CLASS({
         destroy: function() {
           sub1.destroy();
           sub2.destroy();
+          sub1 = sub2 = null;
         }
       };
     },
@@ -2117,14 +2118,20 @@ foam.LIB({
 });
 
 
-/**  TODO:
+/**
+  TODO:
   - model validation
     - abstract methods
     - interfaces
   - DynamicValue map() and relate() methods
   - more docs
-  - Proxy label, plural from Class to Model
+  - proxy label, plural from Class to Model
   - ID support
   - context $ binding
+
+  Future:
+  - predicate support for getAxioms() methods.
+  - caching for foam.lookup()
   - cascading object property change events
+  - should destroyables be a linked list for fast removal?
 */
