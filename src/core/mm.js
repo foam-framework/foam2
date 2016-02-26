@@ -2033,7 +2033,9 @@ foam.LIB({
       return out;
     },
     function output(out, o) {
-      if ( typeof o === 'string' ) {
+      if ( typeof o === 'undefined' ) {
+        out('undefined');
+      } else if ( typeof o === 'string' ) {
         out('"', o, '"');
       } else if ( typeof o === 'number' ) {
         out(o);
