@@ -1670,12 +1670,21 @@ foam.CLASS({
     },
 
     function onDestroy(dtor) {
+      /*
+        Register a function or a destroyable to be called
+        when this object is destroyed.
+      */
       var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
       dtors.push(dtor);
       return dtor;
     },
     
     function destroy() {
+      /*
+        Destroy this object.
+        Free any referenced objects and destroy any registered destroyables.
+        This object is completely unusable after being destroyed.
+       */
       if ( this.destroyed ) return;
 
       this.destroyed = true;
