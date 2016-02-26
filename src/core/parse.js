@@ -16,17 +16,6 @@
  */
 
 foam.CLASS({
-  package: 'foam.core',
-  name: 'Simple',
-  extends: 'Property',
-
-  methods: [
-    function installInProto(proto) {}
-  ]
-});
-
-
-foam.CLASS({
   package: 'foam.parsers',
   name: 'StringPS',
 

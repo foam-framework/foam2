@@ -15,21 +15,6 @@
  * limitations under the License.
  */
 
-// ???: Why not use the definition from types.js?
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Float',
-  extends: 'Property',
-
-  properties: [
-    {
-      name: 'defaultValue',
-      defaultValue: 0
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Matrix',

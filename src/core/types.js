@@ -303,3 +303,13 @@ foam.CLASS({
   extends: 'String',
   label: 'Phone number'
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Simple',
+  extends: 'Property',
+
+  methods: [
+    function installInProto(proto) {}
+  ]
+});
