@@ -1,4 +1,4 @@
 instrumentation:
-  root: ./src/
+  root: ./src/core/
   include-all-sources: true
 
