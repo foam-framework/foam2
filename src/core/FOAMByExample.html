@@ -15,6 +15,7 @@
  </head>
 
  <body style="font-family:monospace;">
+   <a id="unittests" download="FOAMByExample.js"/>
 
 <script id="demo" language="xjavascript">
 // Define a new class with foam.CLASS
@@ -1173,10 +1174,25 @@ g.step();
   <script language="javascript">
     var demo = document.getElementById('demo');
     var out  = document.getElementById('output');
+    var unittests = [
+    'var log_ = function log_(o) {\n',
+    "  if ( o.indexOf('<') != 0 ) o = o.replace(/\\n/g, '<br>').replace(/ /g,'&nbsp;');\n",
+    '  log_.output += o\n',
+    '};\n',
+    'var oldLog = console.log;\n',
+    "console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw new Error('assert'); } };\n",
+    "console.log = function() { log_([].join.call(arguments, ' ')); };\n",
+    'console.log.put = console.log.bind(console);\n',
+    'console.log.str = oldLog.str;\n',
+    'console.log.json = oldLog.json;\n',
+    "var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }\n"
+    ];
+
+
     var log_ = function(o) {
-      if ( o.indexOf('<') != 0 ) o = o.replace(/\n/g, '<br>').replace(/ /g,'&nbsp;');
-//      out.innerHTML = out.innerHTML + o + '<br/>';
-      document.body.insertAdjacentHTML('beforeend', o + '<br/>');
+    if ( o.indexOf('<') != 0 ) o = o.replace(/\n/g, '<br>').replace(/ /g,'&nbsp;');
+    //      out.innerHTML = out.innerHTML + o + '<br/>';
+    document.body.insertAdjacentHTML('beforeend', o + '<br/>');
     }
     var oldLog = console.log;
     console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw 'assert'; } };
@@ -1190,6 +1206,15 @@ g.step();
     for ( var i_ = 0 ; i_ < s_.length ; i_++ ) {
       var line = s_[i_];
       log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
+      unittests.push('describe("' + 'Example ' + ( i_ + 1 ) + '", function() {\n' +
+        'var golden;\n' +
+        'beforeEach(function() {\n' +
+        '  log_.output = "";\n' +
+        '});\n\n' +
+        'it("", function() {\n' + line + '\n\n' +
+        '// Verify output\n' +
+        'expect(log_.output).toEqual(golden);\n' +
+        '});\n});\n\n');
       try {
         eval(line);
       } catch (x) {
@@ -1197,7 +1222,11 @@ g.step();
       }
       log_('');
     }
-  </script>
+
+    document.getElementById('unittests').href = URL.createObjectURL(new Blob(unittests, { type: 'application/javascript' }));
+    document.getElementById('unittests').textContent = 'Download as unit tests';
+
+    </script>
 
  </body>
 </html>
