@@ -121,10 +121,22 @@ var getComment = function getComment(node, filename) {
 }
 
 var getCLASSName = function getCLASSName(node) {
-  return getNodePropertyNamed(node, 'name');
+  var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
+  return ( pkg ? pkg + '.' : 'foam/core.' ) + getNodePropertyNamed(node, 'name');
 }
 var getCLASSExtends = function getCLASSExtends(node) {
-  return getNodePropertyNamed(node, 'extends');
+  var ext = getNodePropertyNamed(node, 'extends');
+  if (ext) {
+    // replace package dots with module slashes
+    ext = ext.replace(/\./g, '/');
+    var i = ext.lastIndexOf('/');
+    if ( i > 0 ) {
+      ext = ext.substring(0,i) + "." + ext.substring(i+1);
+    } else {
+      ext = "foam/core."+ext;
+    }
+  }
+  return ext;
 }
 
 var insertIntoComment = function insertIntoComment(comment, tag) {
@@ -196,14 +208,15 @@ exports.astNodeVisitor = {
       node.parent.callee && node.parent.callee.property &&
       ( node.parent.callee.property.name == 'CLASS' || node.parent.callee.property.name == 'LIB' )
     ) {
-      var className = getCLASSName(node);
+      var className = getNodePropertyNamed(node, "name");
+      var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') || 'foam/core';
       var classExt = getCLASSExtends(node);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node, currentSourceName),
         "\n@class " +
-        (( classExt ) ? "\n@extends module:foam."+classExt : "") +
-        "\n@memberof! module:foam"
+        ( ( classExt ) ? "\n@extends module:"+classExt : "") +
+        ( classPackage ? "\n@memberof! module:"+classPackage : "" )
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -215,6 +228,7 @@ exports.astNodeVisitor = {
       };
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
+      console.log("********",e.comment, className, classPackage);
 
     } // function in an array (methods, todo: listeners, etc)
     else if (node.type === 'FunctionExpression' &&
@@ -226,7 +240,7 @@ exports.astNodeVisitor = {
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node, currentSourceName),
-        "\n@method \n@memberof! module:foam."+parentClass + ".prototype"
+        "\n@method \n@memberof! module:"+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -253,13 +267,13 @@ exports.astNodeVisitor = {
       e.comment = insertIntoComment(
         getComment(node.properties[0], currentSourceName) || getComment(node, currentSourceName),
         (( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "") +
-          "\n@memberof! module:foam."+parentClass + ".prototype"
+          "\n@memberof! module:"+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
       e.astnode = node;
       e.code = {
-          name: getCLASSName(node),
+          name: getNodePropertyNamed(node,'name'),
           type: "property",
           node: node
       };
