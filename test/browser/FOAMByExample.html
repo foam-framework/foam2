@@ -797,6 +797,23 @@ o.destroy();
 o.destroy();
 o.destroy();
 
+// If an Object is destroyed, it will unsubscribe from any
+// subscriptions which subsequently try to deliver events.
+var source = foam.core.FObject.create();
+var sink = foam.CLASS({
+  name: 'Sink',
+  listeners: [
+    function l() {
+      log('ping');
+    }
+  ]
+}).create();
+source.subscribe(sink.l);
+source.publish('ping');
+source.publish('ping');
+sink.destroy();
+source.publish('ping');
+
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
 var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');

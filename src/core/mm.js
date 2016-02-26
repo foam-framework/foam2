@@ -1432,7 +1432,17 @@ foam.CLASS({
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
-            var l = code.bind(this);
+            var self = this;
+            var l = function(sub) {
+              if ( self.destroyed ) {
+                if ( sub ) {
+                  console.warn('Destroying stale subscription for', self.cls_.id);
+                  sub.destroy();
+                }
+              } else {
+                code.apply(self, arguments);
+              }
+            };
             if ( isMerged ) {
               l = this.X.merged(l, mergeDelay);
             } else if ( isFramed ) {
