@@ -131,9 +131,9 @@ foam.LIB({
       that only knows how to install axioms.
     */
     function installModel(m) {
-      if ( m.axioms )
-        for ( var i = 0 ; i < m.axioms.length ; i++ )
-          this.installAxiom(m.axioms[i]);
+      if ( m.axioms_ )
+        for ( var i = 0 ; i < m.axioms_.length ; i++ )
+          this.installAxiom(m.axioms_[i]);
 
       if ( m.methods )
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
@@ -1260,7 +1260,8 @@ foam.CLASS({
                 var v = this[b[0]];
                 var a = this.cls_.getAxiomByName(b[0]);
 
-                console.assert(a, 'Unknown axiom in exports');
+                if ( ! a )
+                  console.error('Unknown export: "' + b[0] + '" in model: ' + this.cls_.id);
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.

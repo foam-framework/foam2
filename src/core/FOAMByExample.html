@@ -798,7 +798,7 @@ o.foo();
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log', 'missing' ],
+  exports: [ 'log' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
