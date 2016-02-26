@@ -413,6 +413,15 @@ foam.CLASS({
 
     function publishPropertyChange() {
       // NOP - to be added later
+    },
+
+    function validate() {
+      var as = this.getAxioms();
+      for ( var i = 0 ; i < as.length ; i++ ) {
+        var a = as[i];
+        a.validate && a.validate();
+        // a.validate??? && a.validate???();
+      }
     }
   ]
 });
@@ -998,9 +1007,7 @@ foam.CLASS({
   properties: [
     {
       name: 'postSet',
-      defaultValue: function(_, a) {
-        // TODO: simplify
-        (this.axioms_ || (this.axioms_ = [])).push.apply(this.axioms_, a); }
+      defaultValue: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     }
   ]
 });
@@ -1483,8 +1490,9 @@ foam.CLASS({
     {
       name: 'exports',
       postSet: function(_, xs) {
-        (this.axioms_ || (this.axioms_ = [])).
-          push.call(this.axioms_, foam.core.Exports.create({bindings: xs}));
+        this.axioms_.push.call(
+          this.axioms_,
+          foam.core.Exports.create({bindings: xs}));
       }
     },
     {
