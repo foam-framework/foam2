@@ -743,6 +743,11 @@ p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
 
+// Destroy the DynamicExpression to prevent further updates.
+e.destroy();
+p.fname = 'Steve';
+p.lname = 'Jones';
+
 // The same functionality of DynamicExpression is built into Properties
 // with the 'expression' feature. Expression properties are invalidated
 // whenever of their listed source values change, but are only recalculated

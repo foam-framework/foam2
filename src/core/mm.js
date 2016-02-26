@@ -1669,6 +1669,24 @@ foam.CLASS({
       }
     },
 
+    function onDestroy(dtor) {
+      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
+      dtors.push(dtor);
+      return dtor;
+    },
+    
+    function destroy() {
+      this.destroyed = true;
+
+      var dtors = this.getPrivate_('dtors');
+      if ( dtors )
+        for ( var i = 0 ; i < dtors.length ; i++ )
+          dtors[i].destroy();
+
+      this.instance_ = null;
+      this.private_ = null;
+    },
+
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.name + (this.instance_ ? '' : 'Proto')
@@ -1783,9 +1801,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      // TODO: record subs for destroying
       for ( var i = 0 ; i < this.args.length ; i++ )
-        this.args[i].subscribe(this.invalidate);
+        this.onDestroy(this.args[i].subscribe(this.invalidate));
     },
 
     function get() {
@@ -2076,7 +2093,6 @@ foam.LIB({
   - model validation
     - abstract methods
     - interfaces
-  - compound destroyable
   - DynamicValue map() and relate() methods
   - more docs
   - Proxy label, plural from Class to Model
