@@ -1179,7 +1179,6 @@ g.step();
     var out  = document.getElementById('output');
     var unittests = [
     'var log_ = function log_(o) {\n',
-    "  if ( o.indexOf('<') != 0 ) o = o.replace(/\\n/g, '<br>').replace(/ /g,'&nbsp;');\n",
     '  log_.output += o\n',
     '};\n',
     'var oldLog = console.log;\n',
@@ -1188,7 +1187,7 @@ g.step();
     'console.log.put = console.log.bind(console);\n',
     'console.log.str = oldLog.str;\n',
     'console.log.json = oldLog.json;\n',
-    "var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }\n"
+    "var log = function() { log_([].join.call(arguments, ' ')); }\n"
     ];
 
 
@@ -1197,32 +1196,43 @@ g.step();
     //      out.innerHTML = out.innerHTML + o + '<br/>';
     document.body.insertAdjacentHTML('beforeend', o + '<br/>');
     }
+    var goldenLog_ = function(o) {
+      goldenLog_.output += o.replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/\"/g, '\\"');
+    }
     var oldLog = console.log;
     console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw 'assert'; } };
-    console.log = function() { log_([].join.call(arguments, ' ')); };
+    console.log = function() { 
+      log_([].join.call(arguments, ' ')); 
+      goldenLog_([].join.call(arguments, ' '));
+    };
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
     console.log.json = oldLog.json;
-    var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
+    var log = function() { 
+      log_(' <b>&gt;</b> ' + [].join.call(arguments, ' '));
+      goldenLog_([].join.call(arguments, ' '));
+    }
 
     var s_ = demo.textContent.split('\n\n');
     for ( var i_ = 0 ; i_ < s_.length ; i_++ ) {
       var line = s_[i_];
       log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
-      unittests.push('describe("' + 'Example ' + ( i_ + 1 ) + '", function() {\n' +
-        'var golden;\n' +
-        'beforeEach(function() {\n' +
-        '  log_.output = "";\n' +
-        '});\n\n' +
-        'it("", function() {\n' + line + '\n\n' +
-        '// Verify output\n' +
-        'expect(log_.output).toEqual(golden);\n' +
-        '});\n});\n\n');
+      goldenLog_.output = "";
       try {
         eval(line);
       } catch (x) {
         log('Exception: ', x);
       }
+      unittests.push('describe("' + 'Example ' + ( i_ + 1 ) + '", function() {\n' +
+        'var golden;\n' +
+        'beforeEach(function() {\n' +
+        '  log_.output = "";\n' +
+        '  golden = "' + goldenLog_.output + '";\n' +
+        '});\n\n' +
+        'it("", function() {\n' + line + '\n\n' +
+        '// Verify output\n' +
+        'expect(log_.output).toEqual(golden);\n' +
+        '});\n});\n\n');
       log_('');
     }
 
