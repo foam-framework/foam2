@@ -1270,7 +1270,6 @@ g.step();
 "\n\n",
     'describe("FOAM By Example", function() {\n',
     'var log_ = function log_(o) {\n',
-    "  if ( o.indexOf('<') != 0 ) o = o.replace(/\\n/g, '<br>').replace(/ /g,'&nbsp;');\n",
     '  log_.output += o;\n',
     '};\n',
     "var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }\n"
