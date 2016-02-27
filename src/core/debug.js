@@ -15,6 +15,17 @@
  * limitations under the License.
  */
 
+/*
+ * Debug.js
+ *
+ * This file contains refinements and replacements designed to make
+ * FOAM apps easier to debug. Things like more informative toString() methods
+ * .describe() on various types of objects, extra type checking, warnings,
+ * and asserts, etc. Many of these features may negatively affect performance,
+ * so while this file should be loaded during your day-to-day development,
+ * it should not be included in production.
+ */
+
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
@@ -280,6 +291,3 @@ foam.LIB({
     }
   ]
 });
-
-
-
