@@ -220,6 +220,14 @@ foam.LIB({
       return as;
     },
 
+    /**
+      Return true if an axiom named "name" is defined on this class
+      directly, regardless of what parent classes define.
+    */
+    function hasOwnAxiom(name) {
+      return this.axiomMap_.hasOwnProperty(name);
+    },
+
     /** Returns all axioms defined on this class or its parent classes. */
     function getAxioms() {
       // The full axiom list is stored in the regular cache with '' as a key.
