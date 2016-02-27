@@ -254,6 +254,19 @@ foam.LIB({
 
 
 foam.LIB({
+  name: 'util',
+  methods: [
+    function equals(a, b) {
+      if ( a === b ) return true;
+      if ( ! a || ! b ) return false;
+      if ( a.equals ) return a.equals(b);
+      return a == b;
+    }
+  ]
+});
+
+
+foam.LIB({
   name: 'fn',
 
   methods: [
