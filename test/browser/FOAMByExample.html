@@ -943,6 +943,15 @@ log(foam.string.constantize('foo'));
 log(foam.string.constantize('fooBar'));
 log(foam.string.constantize('fooBar12'));
 
+// foam.string.capitalize capitalizes strings
+log(foam.string.capitalize('Abc def'));
+log(foam.string.capitalize('abc def'));
+
+// foam.string.labelize converts from camelCase to labels
+log(foam.string.labelize('camelCase'));
+log(foam.string.labelize('firstName'));
+log(foam.string.labelize('someLongName'));
+
 // foam.string.multiline lets you build multi-line strings
 // from function comments.
 log(foam.string.multiline(function(){/*This is
