@@ -2119,17 +2119,19 @@ foam.LIB({
 
 
 /**
-  TODO:
+ TODO:
   - model validation
     - abstract methods
     - interfaces
   - DynamicValue map() and relate() methods
   - more docs
-  - proxy label, plural from Class to Model
   - ID support
   - context $ binding
 
-  Future:
+ ???:
+  - ? proxy label, plural from Class to Model
+
+ Future:
   - predicate support for getAxioms() methods.
   - caching for foam.lookup()
   - cascading object property change events

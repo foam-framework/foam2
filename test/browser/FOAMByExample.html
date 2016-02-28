@@ -8,6 +8,7 @@
   <script language="javascript" src="../../src/core/patterns.js"></script>
   <script language="javascript" src="../../src/core/debug.js"></script>
   <script language="javascript" src="../../src/core/types.js"></script>
+  <script language="javascript" src="../../src/core/Action.js"></script>
   <script language="javascript" src="../../src/core/parse.js"></script>
   <script language="javascript" src="../../src/core/templates.js"></script>
   <script language="javascript" src="../../src/lib/graphics.js"></script>
@@ -529,6 +530,31 @@ d1();
 d2();
 d1();
 d2();
+
+// Actions are methods which have extra information to make it easier
+// to call them from GUI's. Extra information includes things like:
+// a label, speech label, functions to determine if the action is currently
+// available and enabled, user help text, etc.
+foam.CLASS({
+  name: 'ActionTest',
+  properties: [ 'enabled', 'available' ],
+  actions: [
+    function shortForm() { log('short action'); },
+    {
+      name: 'longForm',
+      isAvailable: function() { return this.available; }, 
+      isEnabled: function() { return this.enabled; }, 
+      code: function() { log('long action'); }
+    }
+  ]
+});
+var o = ActionTest.create();
+o.shortForm();
+o.longForm(); // Won't be called because is not enabled or available yet
+log(o.enabled = true);
+o.longForm(); // Won't be called because is not available yet
+log(o.available = true);
+o.longForm();
 
 // In addition to class-inheritance, FOAM also supports
 // interfaces, which are a form of multiple-inheritance which
