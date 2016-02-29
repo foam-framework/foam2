@@ -200,6 +200,43 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'DAOOptions',
+  requires: [
+    'foam.mlang.AndExpr'
+  ],
+  properties: [
+    'skip',
+    'limit',
+    'orderBy',
+    'where'
+  ],
+  methods: [
+    function addSkip(s) {
+      var o = this.cls_.create(this);
+      o.skip = s;
+      return o;
+    },
+    function addLimit(l) {
+      var o = this.cls_.create(this);
+      o.limit = Math.min(l, this.limit);
+      return o;
+    },
+    function addOrderBy(o) {
+      var o = this.cls_.create(this);
+      o.orderBy = o;
+      return o;
+    },
+    function addWhere(p) {
+      var o = this.cls_.create(this);
+      o.where = this.where ?
+        this.AndExpr.create({ args: [this.where, p] }) :
+        p;
+      return o;
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -215,7 +252,7 @@ foam.CLASS({
       if ( this.predicate.f(obj) ) this.delegate.put(obj, fc, sink);
     },
     function remove(obj, sink, fc) {
-      if ( this.predicate.f(obj) ) this.delegate.put(obj, fc, sink);
+      if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc, sink);
     }
   ]
 });
@@ -308,8 +345,7 @@ foam.CLASS({
       }
     },
     function remove(obj, sink, fc) {
-      // TODO: This seems wrong
-      this.arr.push(obj);
+      // TODO
     }
   ]
 });
@@ -318,6 +354,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
   extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.dao.DAOOptions'
+  ],
   properties: [
     {
       name: 'predicate'
@@ -325,8 +364,12 @@ foam.CLASS({
   ],
   methods: [
     function select(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addWhere(this.predicate);
+      return this.delegate.select(sink, options);
     },
     function removeAll(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addWhere(this.predicate);
+      return this.delegate.removeAll(sink, options);
     }
   ]
 });
@@ -334,6 +377,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'OrderedDAO',
+  requires:[
+    'foam.dao.DAOOptions',
+  ],
   extends: 'foam.dao.ProxyDAO',
   properties: [
     {
@@ -342,8 +388,12 @@ foam.CLASS({
   ],
   methods: [
     function select(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
+      return this.select(sink, options);
     },
     function removeAll(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
+      return this.removeAll(sink, options);
     }
   ]
 });
@@ -352,15 +402,22 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'SkipDAO',
   extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.dao.DAOOptions'
+  ],
   properties: [
     {
-      name: 'skip'
+      name: 'skip_'
     }
   ],
   methods: [
     function select(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addSkip(this.skip_);
+      return this.delegate.select(sink, options);
     },
     function removeAll(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addSkip(this.skip_);
+      return this.delegate.removeAll(sink, options);
     }
   ]
 });
@@ -369,30 +426,25 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'LimitDAO',
   extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.dao.DAOOptions'
+  ],
   properties: [
     {
-      name: 'limit'
+      name: 'limit_'
     }
   ],
   methods: [
     function select(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
+      return this.select(sink, options);
     },
     function removeAll(sink, options) {
+      options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
+      return this.removeAll(sink, options);
     }
   ]
 });
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'DAOOptions',
-  properties: [
-    'skip',
-    'limit',
-    'orderBy',
-    'where'
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.dao',
@@ -419,24 +471,41 @@ foam.CLASS({
     'foam.dao.LimitedSink',
     'foam.dao.SkipSink',
     'foam.dao.OrderedSink',
-    'foam.dao.PredicatedSink'
+    'foam.dao.PredicatedSink',
+    'foam.dao.FilteredDAO',
+    'foam.dao.OrderedDAO',
+    'foam.dao.SkipDAO',
+    'foam.dao.LimitedDAO'
   ],
   methods: [
-    function put() {},
-    function remove() { },
-    function find() { },
-    function select() { },
-    function removeAll() { },
-    function listen(sink, options) {
+    function listen(sink, options) {},
+    function unlisten(sink) {},
+    function pipe() {},
+    function update() {},
+    function where(p) {
+      return this.FilteredDAO.create({
+        delegate: this,
+        predicate: p
+      });
     },
-    function unlisten(sink) {
+    function orderBy(o) {
+      return this.OrderedDAO.create({
+        delegate: this,
+        comparator: o
+      });
     },
-    function pipe() { },
-    function update() { },
-    function where() { },
-    function orderBy() { },
-    function skip() { },
-    function limit() { },
+    function skip(s) {
+      return this.SkipDAO.create({
+        delegate: this,
+        skip_: s
+      });
+    },
+    function limit(l) {
+      return this.LimitedDAO.create({
+        delegate: this,
+        limit_: l
+      });
+    },
 
     function decorateSink_(sink, options, isListener, disableLimit) {
       if ( options ) {
@@ -454,17 +523,17 @@ foam.CLASS({
             });
         }
 
-        if ( options.order && ! isListener )
+        if ( options.orderBy && ! isListener )
           sink = this.OrderedSink.create({
-            order: options.order,
+            order: options.orderBy,
             delegate: sink
           });
 
-        if ( options.query )
+        if ( options.where )
           sink = this.PredicatedSink.create({
-            predicate: options.query.partialEval ?
-              options.query.partialEval() :
-              options.query,
+            predicate: options.where.partialEval ?
+              options.where.partialEval() :
+              options.where,
             delegate: sink
           });
       }
@@ -551,7 +620,7 @@ foam.CLASS({
       return promise;
     },
     function select(sink, options) {
-      sink = this.decorateSink_(sink || this.ArraySink.create());
+      sink = this.decorateSink_(sink || this.ArraySink.create(), options);
 
       var promise = this.Promise.create();
 
@@ -561,7 +630,7 @@ foam.CLASS({
         if ( fc.errorEvt ) {
           sink.error(fc.errorEvt);
           promise.error = fc.errorEvt;
-          break;
+          return promise;
         }
 
         sink.put(this.array[i], null, fc);
@@ -571,6 +640,8 @@ foam.CLASS({
 
       promise.value = sink;
       return promise;
+    },
+    function removeAll(sink, options) {
     },
     function find(id) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
@@ -603,5 +674,6 @@ questions:
 -enforcement of interfaces
 -generation of ProxyDAO from DAO interface
 -anonymous sinks?
+-removeAll still takes a sink?
 
 */
