@@ -642,6 +642,26 @@ foam.CLASS({
       return promise;
     },
     function removeAll(sink, options) {
+      if ( ! sink && ( ! options || ! options.where ) ) {
+        this.array = [];
+        return this.Promise.create({ value: '' });
+      }
+
+      // TODO: Require TrueExpr when ordering is fixed or we have
+      // better lazy loading
+      var predicate = ( options && options.where ) || foam.mlang.TrueExpr.create();
+
+      for ( var i = 0 ; i < this.array.length ; i++ ) {
+        if ( predicate.f(this.array[i]) ) {
+          var obj = this.array.splice(i, 1);
+          i--;
+          sink && sink.remove(obj);
+        }
+      }
+
+      sink && sink.eof();
+
+      return this.Promise.create({ value: sink || '' });
     },
     function find(id) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {

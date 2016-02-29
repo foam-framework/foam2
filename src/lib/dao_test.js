@@ -86,3 +86,31 @@ dao.select({
     console.log("EOF");
   }
 });
+
+foam.CLASS({
+  name: 'DaoTest',
+  implements: [
+    'With',
+    'foam.mlang.Expressions'
+  ],
+  properties: [
+    'dao'
+  ],
+  methods: [
+    function go() {
+      this.dao.where(this.with(function(GT) {
+        return GT(Abc.ID, 3);
+      })).removeAll().then(function() {
+        this.dao.select({
+          put: function(o, s, fc) {
+            console.log(o.id, o.foo);
+          },
+          eof: function() {
+          }
+        });
+      }.bind(this));
+    }
+  ]
+});
+
+DaoTest.create({ dao: dao }).go();
