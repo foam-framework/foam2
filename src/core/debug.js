@@ -15,6 +15,30 @@
  * limitations under the License.
  */
 
+/*
+ * Debug.js
+ *
+ * This file contains refinements and replacements designed to make
+ * FOAM apps easier to debug. Things like more informative toString() methods
+ * .describe() on various types of objects, extra type checking, warnings,
+ * and asserts, etc. Many of these features may negatively affect performance,
+ * so while this file should be loaded during your day-to-day development,
+ * it should not be included in production.
+ */
+
+/* Validating a Model should also validate all of its Axioms. */
+foam.CLASS({
+  refines: 'foam.core.Model',
+  methods: [
+    function validate() {
+      this.SUPER();
+      for ( var i = 0 ; i < this.axioms_.length ; i++ )
+        this.axioms_[i].validate && this.axioms_[i].validate();
+    }
+  ]
+});
+
+
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
@@ -153,16 +177,16 @@ foam.CLASS({
       }
       // type this for non-modelled types (no model, but a type name specified)
       if ( ! this.type ) {
-        if (   this.typeName
+        if ( this.typeName
             && typeof arg !== this.typeName
             && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
-          throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+(typeof arg));
+          throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
         if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
-          throw new TypeError(this.PREFIX + i + this.name+', expected type '+this.typeName+' but passed '+gotType);
+          throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + gotType);
         }
       }
     }
@@ -205,16 +229,16 @@ foam.LIB({
       var argIdx = 0;
       var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
       var typeMatch;
-      while ((typeMatch = argMatcher.exec(args)) !== null) {
+      while ( typeMatch = argMatcher.exec(args) ) {
         // if can't match from start of string, fail
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
         ret.push(/*X.*/Argument.create({
-          name: typeMatch[6],
-          typeName: typeMatch[2],
-          type: global[typeMatch[2]],
-          optional: typeMatch[3] == '?',
-          argIdx: argIdx++,
+          name:          typeMatch[6],
+          typeName:      typeMatch[2],
+          type:          global[typeMatch[2]],
+          optional:      typeMatch[3] == '?',
+          argIdx:        argIdx++,
           documentation: typeMatch[5],
         }));
         // TODO: this is only valid on the last arg
@@ -259,27 +283,23 @@ foam.LIB({
       var ret = function() {
         // check each declared argument, arguments[i] can be undefined for missing optional args,
         // extra arguments are ok
-        for ( var i = 0 ; i < args.length ; ++i ) {
+        for ( var i = 0 ; i < args.length ; i++ )
           args[i].validate(arguments[i]);
-        }
 
         // If nothing threw an exception, we are free to run the function
         var retVal = fn.apply(this, arguments);
 
         // check the return value
-        if ( args.returnType ) {
+        if ( args.returnType )
           args.returnType.validate(retVal);
-        }
 
         return retVal;
       }
 
       // keep the old value of toString (hide the decorator)
       ret.toString = function() { return fn.toString(); }
+
       return ret;
     }
   ]
 });
-
-
-

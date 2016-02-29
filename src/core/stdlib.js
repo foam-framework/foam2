@@ -355,6 +355,22 @@ foam.LIB({
       })
     },
 
+    {
+      name: 'labelize',
+      code: foam.fn.memoize1(function(str) {
+        if ( str === '' ) return str;
+        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) { return a.charAt(0) + ' ' + a.charAt(1); }));
+      })
+    },
+
+    {
+      name: 'capitalize',
+      code: foam.fn.memoize1(function(str) {
+        // switchFromProperyName to //SwitchFromPropertyName
+        return str[0].toUpperCase() + str.substring(1);
+      })
+    },
+
     function pad(str, size) {
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?

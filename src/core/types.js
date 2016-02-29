@@ -15,13 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: i18n compatible error messages?
-
-
-
-///////////////////////////////////////////////////////
-
-
 foam.CLASS({
   package: 'foam.core',
   name:  'Date',

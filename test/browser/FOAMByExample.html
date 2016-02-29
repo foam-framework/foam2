@@ -8,6 +8,7 @@
   <script language="javascript" src="../../src/core/patterns.js"></script>
   <script language="javascript" src="../../src/core/debug.js"></script>
   <script language="javascript" src="../../src/core/types.js"></script>
+  <script language="javascript" src="../../src/core/Action.js"></script>
   <script language="javascript" src="../../src/core/parse.js"></script>
   <script language="javascript" src="../../src/core/templates.js"></script>
   <script language="javascript" src="../../src/lib/graphics.js"></script>
@@ -530,6 +531,31 @@ d2();
 d1();
 d2();
 
+// Actions are methods which have extra information to make it easier
+// to call them from GUI's. Extra information includes things like:
+// a label, speech label, functions to determine if the action is currently
+// available and enabled, user help text, etc.
+foam.CLASS({
+  name: 'ActionTest',
+  properties: [ 'enabled', 'available' ],
+  actions: [
+    function shortForm() { log('short action'); },
+    {
+      name: 'longForm',
+      isAvailable: function() { return this.available; }, 
+      isEnabled: function() { return this.enabled; }, 
+      code: function() { log('long action'); }
+    }
+  ]
+});
+var o = ActionTest.create();
+o.shortForm();
+o.longForm(); // Won't be called because is not enabled or available yet
+log(o.enabled = true);
+o.longForm(); // Won't be called because is not available yet
+log(o.available = true);
+o.longForm();
+
 // In addition to class-inheritance, FOAM also supports
 // interfaces, which are a form of multiple-inheritance which
 // copy Axioms from another model.
@@ -743,6 +769,11 @@ p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
 
+// Destroy the DynamicExpression to prevent further updates.
+e.destroy();
+p.fname = 'Steve';
+p.lname = 'Jones';
+
 // The same functionality of DynamicExpression is built into Properties
 // with the 'expression' feature. Expression properties are invalidated
 // whenever of their listed source values change, but are only recalculated
@@ -778,6 +809,58 @@ log(p.fname, p.lname, ':', p.name);
 log(p.name, p.hasOwnProperty('name'));
 p.clearProperty('name');
 log(p.name, p.hasOwnProperty('name'));
+
+// Destroyables (objects with a destroy() method) or functions
+// can be registered to be called when an object is destroyed.
+var o = foam.core.FObject.create();
+var o2 = foam.core.FObject.create();
+o.onDestroy(function() { log('destroy 1'); });
+o2.onDestroy(function() { log('destroy 2'); });
+o.onDestroy(o2);
+o.destroy();
+
+// It doesn't hurt to try and destroy an object more than once.
+o.destroy();
+o.destroy();
+
+// If an Object is destroyed, it will unsubscribe from any
+// subscriptions which subsequently try to deliver events.
+var source = foam.core.FObject.create();
+var sink = foam.CLASS({
+  name: 'Sink',
+  listeners: [
+    function l() {
+      log('ping');
+    }
+  ]
+}).create();
+source.subscribe(sink.l);
+source.publish('ping');
+source.publish('ping');
+sink.destroy();
+source.publish('ping');
+
+// Model validation
+foam.CLASS({
+  name: 'ValidationTest',
+  properties: [
+    { name: '' }
+  ]
+});
+ValidationTest.model_.validate();
+
+// Required
+foam.CLASS({
+  name: 'ValidationTest',
+  properties: [
+    { name: 'test', required: true }
+  ]
+});
+var o = ValidationTest.create({test: '42'});
+o.validate();
+log('-');
+var o = ValidationTest.create();
+o.validate();
 
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
@@ -907,6 +990,15 @@ log(Array.isArray(foam.fn.argsArray(function() { })));
 log(foam.string.constantize('foo'));
 log(foam.string.constantize('fooBar'));
 log(foam.string.constantize('fooBar12'));
+
+// foam.string.capitalize capitalizes strings
+log(foam.string.capitalize('Abc def'));
+log(foam.string.capitalize('abc def'));
+
+// foam.string.labelize converts from camelCase to labels
+log(foam.string.labelize('camelCase'));
+log(foam.string.labelize('firstName'));
+log(foam.string.labelize('someLongName'));
 
 // foam.string.multiline lets you build multi-line strings
 // from function comments.

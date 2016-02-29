@@ -146,7 +146,10 @@ foam.LIB({
       if ( foam.core.Property && m.properties )
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
-          if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
+          if ( Array.isArray(a) )
+            m.properties[i] = a = { name: a[0], defaultValue: a[1] };
+          else if ( typeof a === 'string' )
+            m.properties[i] = a = { name: a };
           var type = foam.lookup(a.class) || foam.core.Property;
           this.installAxiom(type.create(a));
         }
@@ -324,6 +327,7 @@ foam.LIB({
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
+        model.validate();
         return model.getClass();
       };
 
@@ -424,11 +428,11 @@ foam.CLASS({
     },
 
     function validate() {
-      var as = this.getAxioms();
+      var as = this.cls_.getAxioms();
       for ( var i = 0 ; i < as.length ; i++ ) {
         var a = as[i];
-        a.validate && a.validate();
-        // a.validate??? && a.validate???();
+//        a.validate && a.validate();
+        a.validateInstance && a.validateInstance(this);
       }
     }
   ]
@@ -451,10 +455,7 @@ foam.CLASS({
     },
     'package',
     'name',
-    {
-      name: 'extends',
-      defaultValue: 'FObject'
-    },
+    [ 'extends', 'FObject' ],
     'refines',
     {
       name: 'axioms_',
@@ -470,9 +471,9 @@ foam.CLASS({
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        return typeof o === 'string'     ?
-          foam.core.Property.create({name: o})     :
-          foam.lookup(this.of).create(o) ;
+        return typeof o === 'string' ? foam.core.Property.create({name: o}) :
+               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
+                                       foam.lookup(this.of).create(o) ;
       }
     },
     {
@@ -499,7 +500,7 @@ foam.CLASS({
   extends: 'FObject',
 
   properties: [
-    'name',
+    { name: 'name', required: true },
     'defaultValue',
     'factory',
     'adapt',
@@ -509,15 +510,16 @@ foam.CLASS({
     'getter',
     'setter',
     'final',
-    {
+    'required',
+    [
       /**
         Compare two values taken from this property.
         <p>Used by Property.compare().
         It is a property rather than a method so that it can be configured
         without subclassing.
       */
-      name: 'comparePropertyValues',
-      defaultValue: function(o1, o2) {
+      'comparePropertyValues',
+      function(o1, o2) {
         if ( o1 === o2 ) return 0;
         if ( ! o1 && ! o2 ) return 0;
         if ( ! o1 ) return -1;
@@ -526,7 +528,7 @@ foam.CLASS({
         if ( o1.compareTo ) return o1.compareTo(o2);
         return o1.$UID.compareTo(o2.$UID);
       }
-    }
+    ]
   ],
 
   methods: [
@@ -640,6 +642,12 @@ foam.CLASS({
         set: setter,
         configurable: true
       });
+    },
+
+    function validateInstance(o) {
+      /* Validate an object which has this property. */
+      if ( this.required && ! o[this.name] )
+        throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
     },
 
     function exprFactory(e) {
@@ -794,18 +802,13 @@ foam.CLASS({
   // documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
-    {
-      name: 'adapt',
-      defaultValue: function(_, a) {
+    [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.string.multiline(a) :
           a ? a.toString() :
           '' ;
       }
-    },
-    {
-      name: 'defaultValue',
-      defaultValue: ''
-    }
+    ],
+    [ 'defaultValue', '' ]
   ]
 });
 
@@ -819,23 +822,16 @@ foam.CLASS({
 
   properties: [
     'of',
-    {
-      name: 'factory',
-      defaultValue: function() { return []; }
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, a, prop) {
+    [ 'factory', function() { return []; } ],
+    [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
         return a.map(prop.adaptArrayElement.bind(prop));
       }
-    },
-    {
-      name: 'adaptArrayElement',
-      defaultValue: function(o) {
+    ],
+    [ 'adaptArrayElement', function(o) {
         return foam.lookup(this.of).create(o);
       }
-    }
+    ]
   ]
 });
 
@@ -1014,10 +1010,7 @@ foam.CLASS({
   // documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
 
   properties: [
-    {
-      name: 'postSet',
-      defaultValue: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
-    }
+    [ 'postSet', function(_, a) { this.axioms_.push.apply(this.axioms_, a); } ]
   ]
 });
 
@@ -1220,7 +1213,7 @@ foam.CLASS({
   // documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
-    { name: 'name', defaultValue: 'exports_' },
+    [ 'name', 'exports_' ],
     {
       name: 'bindings',
       adapt: function(_, bs) {
@@ -1355,14 +1348,8 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    {
-      name: 'defaultValue',
-      defaultValue: false
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, v) { return !!v; }
-    }
+    [ 'defaultValue', false ],
+    [ 'adapt', function(_, v) { return !!v; } ]
   ]
 });
 
@@ -1374,17 +1361,12 @@ foam.CLASS({
 
   properties: [
     'units',
-    {
-      name: 'defaultValue',
-      defaultValue: 0
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, v) {
+    [ 'defaultValue', 0 ],
+    [ 'adapt', function(_, v) {
         return typeof v === 'number' ?
           Math.round(v) : v ? parseInt(v) : 0 ;
       }
-    }
+    ]
   ]
 });
 
@@ -1440,7 +1422,17 @@ foam.CLASS({
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
-            var l = code.bind(this);
+            var self = this;
+            var l = function(sub) {
+              if ( self.destroyed ) {
+                if ( sub ) {
+                  console.warn('Destroying stale subscription for', self.cls_.id);
+                  sub.destroy();
+                }
+              } else {
+                code.apply(self, arguments);
+              }
+            };
             if ( isMerged ) {
               l = this.X.merged(l, mergeDelay);
             } else if ( isFramed ) {
@@ -1557,7 +1549,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         // TODO: document
         return typeof o === 'string' ? foam.core.Property.create({name: o}) :
-               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1] }) :
+               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
                o.class               ? foam.lookup(o.class).create(o) :
                                        foam.lookup(this.of).create(o) ;
       }
@@ -1678,6 +1670,40 @@ foam.CLASS({
       }
     },
 
+    function onDestroy(dtor) {
+      /*
+        Register a function or a destroyable to be called
+        when this object is destroyed.
+      */
+      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
+      dtors.push(dtor);
+      return dtor;
+    },
+
+    function destroy() {
+      /*
+        Destroy this object.
+        Free any referenced objects and destroy any registered destroyables.
+        This object is completely unusable after being destroyed.
+       */
+      if ( this.destroyed ) return;
+
+      this.destroyed = true;
+
+      var dtors = this.getPrivate_('dtors');
+      if ( dtors )
+        for ( var i = 0 ; i < dtors.length ; i++ ) {
+          var d = dtors[i];
+          if ( typeof d === 'function' )
+            d();
+          else
+            d.destroy();
+        }
+
+      this.instance_ = null;
+      this.private_ = null;
+    },
+
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.name + (this.instance_ ? '' : 'Proto')
@@ -1714,6 +1740,7 @@ foam.CLASS({
         destroy: function() {
           sub1.destroy();
           sub2.destroy();
+          sub1 = sub2 = null;
         }
       };
     },
@@ -1792,9 +1819,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      // TODO: record subs for destroying
       for ( var i = 0 ; i < this.args.length ; i++ )
-        this.args[i].subscribe(this.invalidate);
+        this.onDestroy(this.args[i].subscribe(this.invalidate));
     },
 
     function get() {
@@ -1849,13 +1875,9 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      name: 'name',
-      defaultValue: 'window'
-    },
-    {
-      name: 'window'
-    },
+//    { name: 'name', defaultValue: 'window' },
+    [ 'name', 'window' ],
+    { name: 'window' },
     {
       name: 'document',
       factory: function() { return this.window.document; }
@@ -2083,15 +2105,23 @@ foam.LIB({
 });
 
 
-/**  TODO:
+/**
+ TODO:
   - model validation
     - abstract methods
     - interfaces
-  - compound destroyable
   - DynamicValue map() and relate() methods
   - more docs
-  - Proxy label, plural from Class to Model
   - ID support
   - context $ binding
+
+ ???:
+  - ? proxy label, plural from Class to Model
+
+ Future:
+  - predicate support for getAxioms() methods.
+  - caching for foam.lookup()
   - cascading object property change events
+  - should destroyables be a linked list for fast removal?
+  - multi-methods?
 */
