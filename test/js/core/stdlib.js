@@ -102,18 +102,8 @@ describe('Array diff', function() {
   var y;
 
   beforeEach(function() {
-    foam.CLASS({
-      name: 'CompA',
-      package: 'test',
-      properties: [ 'a', 'b' ]
-    });
-    foam.CLASS({
-      name: 'CompB',
-      package: 'test',
-      properties: [ 'b', 'c' ]
-    });
-    x = test.CompA.create();
-    y = test.CompB.create();
+    x = 77;
+    y = 88;
   });
   afterEach(function() {
     x = y = null;
@@ -186,11 +176,10 @@ describe('Array clone (deep copy)', function() {
     expect(a).toEqual(b);
   });
   it('clones instances', function() {
-    var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
+    var a = [2, "44", 4];
     var b = a.clone();
     expect(a).not.toBe(b);
     expect(a).toEqual(b);
-    expect(a[1]).not.toBe(b[1]);
   });
 });
 
