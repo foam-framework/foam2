@@ -43,3 +43,46 @@ dao.find(32).then(function(o) {
 }, function(x) {
   console.error(x.message);
 });
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'Test',
+  implements: [
+    'foam.dao.Sink',
+    'foam.mlang.Expressions',
+    'With'
+  ],
+  imports: ['log'],
+  methods: [
+    function put(o) {
+      this.log("Got object ", o.id, "foo is", o.foo);
+    },
+    function test(o) {
+      dao.where(
+        this.with(function(OR, EQ) {
+          return OR(
+            EQ(Abc.FOO, 100),
+            EQ(Abc.ID, 4))
+        })).select(this);
+    }
+  ]
+});
+
+foam.mlang.Test.create().test();
+
+var c = 0;
+dao.select({
+  put: function(obj, _, fc) {
+    if ( c++ > 1 ) {
+      fc.error(new Error("Too Many"));
+      return;
+    }
+    console.log("Got object", obj.id);
+  },
+  error: function(e) {
+    console.error(e);
+  },
+  eof: function() {
+    console.log("EOF");
+  }
+});
