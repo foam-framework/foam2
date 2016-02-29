@@ -844,6 +844,15 @@ source.publish('ping');
 foam.CLASS({
   name: 'ValidationTest',
   properties: [
+    { name: '' }
+  ]
+});
+ValidationTest.model_.validate();
+
+// Required
+foam.CLASS({
+  name: 'ValidationTest',
+  properties: [
     { name: 'test', required: true }
   ]
 });

@@ -434,7 +434,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Model',
-  extends: 'FObject', // Isn't the default yet.ty
+  extends: 'FObject', // Isn't the default yet.
 
   // documentation: 'Class/Prototype description.',
 
@@ -638,7 +638,7 @@ foam.CLASS({
 
     function validateInstance(o) {
       if ( this.required && ! o[this.name] )
-        throw 'Required property "' + this.name + '" not defined.';
+        throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
     },
 
     function exprFactory(e) {

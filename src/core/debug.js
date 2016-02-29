@@ -26,6 +26,19 @@
  * it should not be included in production.
  */
 
+/* Validating a Model should also validate all of its Axioms. */
+foam.CLASS({
+  refines: 'foam.core.Model',
+  methods: [
+    function validate() {
+      this.SUPER();
+      for ( var i = 0 ; i < this.axioms_.length ; i++ )
+        this.axioms_[i].validate && this.axioms_[i].validate();
+    }
+  ]
+});
+
+
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
