@@ -456,8 +456,8 @@ foam.CLASS({
     {
       name: 'cview',
       postSet: function(old, nu) {
-        old && old.unsubscribe(this.paint);
-        nu && nu.subscribe(this.paint);
+        old && old.invalidated.unsubscribe(this.paint);
+        nu && nu.invalidated.subscribe(this.paint);
         this.paint();
       }
     }
