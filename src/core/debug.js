@@ -32,6 +32,10 @@ foam.CLASS({
   methods: [
     function validate() {
       this.SUPER();
+
+      if ( this.hasOwnProperty('extends') && this.refines )
+        throw this.id + ': "extends" and "refines" are mutually exclusive.';
+
       for ( var i = 0 ; i < this.axioms_.length ; i++ )
         this.axioms_[i].validate && this.axioms_[i].validate();
     }

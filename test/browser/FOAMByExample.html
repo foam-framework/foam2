@@ -840,7 +840,15 @@ source.publish('ping');
 sink.destroy();
 source.publish('ping');
 
-// Model validation
+// Model validation, extends and refines are mutually-exclusive
+foam.CLASS({
+  name: 'EandRTest',
+  extends: 'FObject',
+  refines: 'Model'
+});
+EandRTest.model_.validate();
+
+// Model validation, properties must have names
 foam.CLASS({
   name: 'ValidationTest',
   properties: [
