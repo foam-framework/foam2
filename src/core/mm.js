@@ -146,7 +146,10 @@ foam.LIB({
       if ( foam.core.Property && m.properties )
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
-          if ( typeof a === 'string' ) m.properties[i] = a = { name: a };
+          if ( Array.isArray(a) )
+            m.properties[i] = a = { name: a[0], defaultValue: a[1] }; 
+          else if ( typeof a === 'string' )
+            m.properties[i] = a = { name: a };
           var type = foam.lookup(a.class) || foam.core.Property;
           this.installAxiom(type.create(a));
         }
@@ -443,10 +446,7 @@ foam.CLASS({
     },
     'package',
     'name',
-    {
-      name: 'extends',
-      defaultValue: 'FObject'
-    },
+    [ 'extends', 'FObject' ],
     'refines',
     {
       name: 'axioms_',
@@ -462,9 +462,9 @@ foam.CLASS({
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        return typeof o === 'string'     ?
-          foam.core.Property.create({name: o})     :
-          foam.lookup(this.of).create(o) ;
+        return typeof o === 'string' ? foam.core.Property.create({name: o}) :
+               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) : 
+                                       foam.lookup(this.of).create(o) ;
       }
     },
     {
@@ -501,15 +501,15 @@ foam.CLASS({
     'getter',
     'setter',
     'final',
-    {
+    [
       /**
         Compare two values taken from this property.
         <p>Used by Property.compare().
         It is a property rather than a method so that it can be configured
         without subclassing.
       */
-      name: 'comparePropertyValues',
-      defaultValue: function(o1, o2) {
+      'comparePropertyValues',
+      function(o1, o2) {
         if ( o1 === o2 ) return 0;
         if ( ! o1 && ! o2 ) return 0;
         if ( ! o1 ) return -1;
@@ -518,7 +518,7 @@ foam.CLASS({
         if ( o1.compareTo ) return o1.compareTo(o2);
         return o1.$UID.compareTo(o2.$UID);
       }
-    }
+    ]
   ],
 
   methods: [
@@ -786,18 +786,13 @@ foam.CLASS({
   // documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
-    {
-      name: 'adapt',
-      defaultValue: function(_, a) {
+    [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.string.multiline(a) :
           a ? a.toString() :
           '' ;
       }
-    },
-    {
-      name: 'defaultValue',
-      defaultValue: ''
-    }
+    ],
+    [ 'defaultValue', '' ]
   ]
 });
 
@@ -811,23 +806,16 @@ foam.CLASS({
 
   properties: [
     'of',
-    {
-      name: 'factory',
-      defaultValue: function() { return []; }
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, a, prop) {
+    [ 'factory', function() { return []; } ],
+    [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
         return a.map(prop.adaptArrayElement.bind(prop));
       }
-    },
-    {
-      name: 'adaptArrayElement',
-      defaultValue: function(o) {
+    ],
+    [ 'adaptArrayElement', function(o) {
         return foam.lookup(this.of).create(o);
       }
-    }
+    ]
   ]
 });
 
@@ -1006,10 +994,7 @@ foam.CLASS({
   // documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
 
   properties: [
-    {
-      name: 'postSet',
-      defaultValue: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
-    }
+    [ 'postSet', function(_, a) { this.axioms_.push.apply(this.axioms_, a); } ]
   ]
 });
 
@@ -1212,7 +1197,7 @@ foam.CLASS({
   // documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
-    { name: 'name', defaultValue: 'exports_' },
+    [ 'name', 'exports_' ],
     {
       name: 'bindings',
       adapt: function(_, bs) {
@@ -1347,14 +1332,8 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    {
-      name: 'defaultValue',
-      defaultValue: false
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, v) { return !!v; }
-    }
+    [ 'defaultValue', false ],
+    [ 'adapt', function(_, v) { return !!v; } ]
   ]
 });
 
@@ -1366,17 +1345,12 @@ foam.CLASS({
 
   properties: [
     'units',
-    {
-      name: 'defaultValue',
-      defaultValue: 0
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, v) {
+    [ 'defaultValue', 0 ],
+    [ 'adapt', function(_, v) {
         return typeof v === 'number' ?
           Math.round(v) : v ? parseInt(v) : 0 ;
       }
-    }
+    ]
   ]
 });
 
@@ -1559,6 +1533,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         // TODO: document
         return typeof o === 'string' ? foam.core.Property.create({name: o}) :
+               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) : 
                o.class               ? foam.lookup(o.class).create(o) :
                                        foam.lookup(this.of).create(o) ;
       }
@@ -1884,13 +1859,9 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      name: 'name',
-      defaultValue: 'window'
-    },
-    {
-      name: 'window'
-    },
+//    { name: 'name', defaultValue: 'window' },
+    [ 'name', 'window' ],
+    { name: 'window' },
     {
       name: 'document',
       factory: function() { return this.window.document; }
@@ -2136,4 +2107,5 @@ foam.LIB({
   - caching for foam.lookup()
   - cascading object property change events
   - should destroyables be a linked list for fast removal?
+  - multi-methods?
 */

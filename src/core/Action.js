@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: make isAvailable and isEnabled by dynamic functions
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
@@ -27,16 +28,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      expression: function(name) {
-        return foam.string.labelize(name);
-      }
+      expression: function(name) { return foam.string.labelize(name); }
     },
     {
       class: 'String',
       name: 'speechLabel',
-      expression: function(label) {
-        return label;
-      }
+      expression: function(label) { return label; }
     },
     {
       class: 'String',
