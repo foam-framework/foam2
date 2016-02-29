@@ -840,6 +840,19 @@ source.publish('ping');
 sink.destroy();
 source.publish('ping');
 
+// Model validation
+foam.CLASS({
+  name: 'ValidationTest',
+  properties: [
+    { name: 'test', required: true }
+  ]
+});
+var o = ValidationTest.create({test: '42'});
+o.validate();
+log('-');
+var o = ValidationTest.create();
+o.validate();
+
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
 var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');

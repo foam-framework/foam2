@@ -319,6 +319,7 @@ foam.LIB({
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
+        model.validate();
         return model.getClass();
       };
 
@@ -419,11 +420,11 @@ foam.CLASS({
     },
 
     function validate() {
-      var as = this.getAxioms();
+      var as = this.cls_.getAxioms();
       for ( var i = 0 ; i < as.length ; i++ ) {
         var a = as[i];
-        a.validate && a.validate();
-        // a.validate??? && a.validate???();
+//        a.validate && a.validate();
+        a.validateInstance && a.validateInstance(this);
       }
     }
   ]
@@ -433,7 +434,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Model',
-  extends: 'FObject', // Isn't the default yet.
+  extends: 'FObject', // Isn't the default yet.ty
 
   // documentation: 'Class/Prototype description.',
 
@@ -463,7 +464,7 @@ foam.CLASS({
       name: 'properties',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ? foam.core.Property.create({name: o}) :
-               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) : 
+               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
                                        foam.lookup(this.of).create(o) ;
       }
     },
@@ -491,7 +492,7 @@ foam.CLASS({
   extends: 'FObject',
 
   properties: [
-    'name',
+    { name: 'name', required: true },
     'defaultValue',
     'factory',
     'adapt',
@@ -501,6 +502,7 @@ foam.CLASS({
     'getter',
     'setter',
     'final',
+    'required',
     [
       /**
         Compare two values taken from this property.
@@ -632,6 +634,11 @@ foam.CLASS({
         set: setter,
         configurable: true
       });
+    },
+
+    function validateInstance(o) {
+      if ( this.required && ! o[this.name] )
+        throw 'Required property "' + this.name + '" not defined.';
     },
 
     function exprFactory(e) {
