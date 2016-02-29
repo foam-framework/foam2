@@ -591,20 +591,20 @@ foam.CLASS({
 
       var getter =
         prop.getter ? prop.getter :
-        hasDefaultValue ? function defaultValueGetter() {
+        factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            defaultValue ;
+            this[name] = factory.call(this) ;
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
                  this.hasOwnPrivate_(name) ? this.getPrivate_(name) :
                  this.setPrivate_(name, eFactory.call(this)) ;
         } :
-        factory ? function factoryGetter() {
+        hasDefaultValue ? function defaultValueGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            this[name] = factory.call(this) ;
+            defaultValue ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 

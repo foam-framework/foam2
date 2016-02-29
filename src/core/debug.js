@@ -29,6 +29,7 @@
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Model',
+
   methods: [
     function validate() {
       this.SUPER();
@@ -38,6 +39,27 @@ foam.CLASS({
 
       for ( var i = 0 ; i < this.axioms_.length ; i++ )
         this.axioms_[i].validate && this.axioms_[i].validate();
+    }
+  ]
+});
+
+
+/* Validating a Model should also validate all of its Axioms. */
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  methods: [
+    function validate() {
+      this.SUPER();
+
+      if ( this.factory && this.hasOwnProperty('defaultValue') )
+        throw this.name + ': error to set "defaultValue" if "factory" set.';
+
+      if ( this.expression && this.hasOwnProperty('defaultValue') )
+        throw this.name + ': error to set "defaultValue" if "expression" set.';
+
+      if ( this.factory && this.expression )
+        throw this.name + ': "factory" and "expression" are mutually exclusive.';
     }
   ]
 });
