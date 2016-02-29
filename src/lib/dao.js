@@ -1,80 +1,3 @@
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'Promise',
-  properties: [
-    {
-      name: 'value',
-      final: true,
-      postSet: function() { this.resolved = true; this.maybeResolve_(); }
-    },
-    {
-      name:'error',
-      final: true,
-      postSet: function() { this.resolved = true; this.maybeResolve_(); }
-    },
-    {
-      name: 'resolved',
-      final: true,
-      defaultValue: false
-    }
-  ],
-  topics: [
-    'success',
-    'failure'
-  ],
-  methods: [
-    function maybeResolve_() {
-      if ( ! this.resolved ) return;
-      if ( this.hasOwnProperty('value') )
-        this.success.publish(this.value);
-      else
-        this.failure.publish(this.error);
-    },
-    function resolve(value) {
-      if ( value === this ) {
-        this.error = new TypeError("Resolved promise with itself");
-      } else if ( value && value.then ) {
-        var self = this;
-        value.then(function(a) {
-          self.resolve(a);
-        }, function(a) {
-          self.error = a;
-        });
-      } else {
-        this.value = value;
-      }
-    },
-    function then(success, fail) {
-      var self = this;
-      var next = this.cls_.create();
-
-      if ( success ) this.success.subscribe(function(s, _, v) {
-        s.destroy();
-        next.resolve(success(v));
-      });
-
-      if ( fail ) this.failure.subscribe(function(s, _, v) {
-        s.destroy();
-        next.resolve(fail(v));
-      });
-
-      this.maybeResolve_();
-      return next;
-    }
-  ]
-});
-
-// TODO: This should probably be in core.
-foam.CLASS({
-  name: 'MethodArguments',
-  refines: 'Method',
-  properties: [
-    {
-      name: 'args'
-    }
-  ]
-});
-
 // TODO: Seems like there should be a better entry point for this.
 // In a ModelDAO scenario, we could auto generate the ProxyABC model
 // when requested if there isn't one already in the DAO.  Maybe we
@@ -155,6 +78,128 @@ foam.INTERFACE({
     }
   ]
 });
+
+foam.INTERFACE({
+  package: 'foam.dao',
+  name: 'DAO',
+  documentation: 'DAO Interface',
+  methods: [
+    {
+      name: 'put'
+    },
+    {
+      name: 'remove'
+    },
+    {
+      name: 'find'
+    },
+    {
+      name: 'select'
+    },
+    {
+      name: 'removeAll'
+    },
+    {
+      name: 'listen'
+    },
+    {
+      name: 'unlisten'
+    },
+    {
+      name: 'pipe'
+    },
+    {
+      name: 'where'
+    },
+    {
+      name: 'orderBy'
+    },
+    {
+      name: 'skip'
+    },
+    {
+      name: 'limit'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'Promise',
+  properties: [
+    {
+      name: 'value',
+      final: true,
+      postSet: function() { this.resolved = true; this.maybeResolve_(); }
+    },
+    {
+      name:'error',
+      final: true,
+      postSet: function() { this.resolved = true; this.maybeResolve_(); }
+    },
+    {
+      name: 'resolved',
+      final: true,
+      defaultValue: false
+    }
+  ],
+  topics: [
+    'success',
+    'failure'
+  ],
+  methods: [
+    function maybeResolve_() {
+      if ( ! this.resolved ) return;
+      if ( this.hasOwnProperty('value') )
+        this.success.publish(this.value);
+      else
+        this.failure.publish(this.error);
+    },
+    function resolve(value) {
+      if ( value === this ) {
+        this.error = new TypeError("Resolved promise with itself");
+      } else if ( value && value.then ) {
+        var self = this;
+        value.then(function(a) {
+          self.resolve(a);
+        }, function(a) {
+          self.error = a;
+        });
+      } else {
+        this.value = value;
+      }
+    },
+    function then(success, fail) {
+      var self = this;
+      var next = this.cls_.create();
+
+      if ( success ) this.success.subscribe(function(s, _, v) {
+        s.destroy();
+        next.resolve(success(v));
+      });
+
+      if ( fail ) this.failure.subscribe(function(s, _, v) {
+        s.destroy();
+        next.resolve(fail(v));
+      });
+
+      this.maybeResolve_();
+      return next;
+    }
+  ]
+});
+
+// TODO: This should probably be in core.
+foam.CLASS({
+  name: 'MethodArguments',
+  refines: 'Method',
+  properties: [
+    {
+      name: 'args'
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -271,6 +316,74 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'FilteredDAO',
+  extends: 'foam.dao.ProxyDAO',
+  properties: [
+    {
+      name: 'predicate'
+    }
+  ],
+  methods: [
+    function select(sink, options) {
+    },
+    function removeAll(sink, options) {
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'OrderedDAO',
+  extends: 'foam.dao.ProxyDAO',
+  properties: [
+    {
+      name: 'comparator'
+    }
+  ],
+  methods: [
+    function select(sink, options) {
+    },
+    function removeAll(sink, options) {
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'SkipDAO',
+  extends: 'foam.dao.ProxyDAO',
+  properties: [
+    {
+      name: 'skip'
+    }
+  ],
+  methods: [
+    function select(sink, options) {
+    },
+    function removeAll(sink, options) {
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'LimitDAO',
+  extends: 'foam.dao.ProxyDAO',
+  properties: [
+    {
+      name: 'limit'
+    }
+  ],
+  methods: [
+    function select(sink, options) {
+    },
+    function removeAll(sink, options) {
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
   name: 'DAOOptions',
   properties: [
     'skip',
@@ -280,49 +393,6 @@ foam.CLASS({
   ]
 });
 
-foam.INTERFACE({
-  package: 'foam.dao',
-  name: 'DAO',
-  documentation: 'DAO Interface',
-  methods: [
-    {
-      name: 'put'
-    },
-    {
-      name: 'remove'
-    },
-    {
-      name: 'find'
-    },
-    {
-      name: 'select'
-    },
-    {
-      name: 'removeAll'
-    },
-    {
-      name: 'listen'
-    },
-    {
-      name: 'unlisten'
-    },
-    {
-      name: 'pipe'
-    },
-    {
-      name: 'where'
-    },
-    {
-      name: 'orderBy'
-    },
-    {
-      name: 'skip'
-    },
-    {
-      name: 'limit'
-    }
-  ]
-});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -350,10 +420,6 @@ foam.CLASS({
     'foam.dao.SkipSink',
     'foam.dao.OrderedSink',
     'foam.dao.PredicatedSink'
-  ],
-  topics: [
-    'onPut',
-    'onRemove'
   ],
   methods: [
     function put() {},
@@ -527,6 +593,7 @@ foam.CLASS({
 TODO:
 -mlangs
 -internal vs external errors.
+-Context aware?
 
 questions:
 -listen/unlisten using Topics ?
