@@ -182,9 +182,12 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'CView',
 
-  requires: [
+  topics: ['invalidated'],
+
+   requires: [
     'foam.graphics.Transform'
   ],
+
 
   properties: [
     {
@@ -237,7 +240,19 @@ foam.CLASS({
       name: 'children',
       factory: function() {
         return [];
+      },
+      postSet: function(old, nu) {
+        for ( var i = 0 ; old && i < old.length ; i++ ) {
+          old[i].invalidated.unsubscribe(this.onChildUpdate);
+        }
+        for ( var i = 0 ; nu && i < nu.length ; i++ ) {
+          nu[i].invalidated.subscribe(this.onChildUpdate);
+        }
       }
+    },
+    {
+      name: 'state',
+      defaultValue: 'initial'
     },
     {
       name: 'transform',
@@ -254,8 +269,30 @@ foam.CLASS({
     }
   ],
 
+  listeners: [
+    {
+      name: 'onChildUpdate',
+      code: function() {
+        this.invalidated.publish();
+      }
+    }
+  ],
+
   methods: [
+    function initCView() {
+      this.propertyChange.subscribe(function() {
+        this.invalidated.publish();
+      }.bind(this));
+    },
+    function maybeInitCView() {
+      if ( this.state == 'initial' ) {
+        this.initCView();
+        this.state = 'initailized'
+      }
+    },
+
     function paint(x) {
+      this.maybeInitCView();
       x.save();
       x.strokeStyle = this.strokeStyle.toCanvasStyle ?
         this.strokeStyle.toCanvasStyle(x) : this.strokeStyle;
