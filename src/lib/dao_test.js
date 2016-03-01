@@ -45,6 +45,17 @@ dao.find(32).then(function(o) {
 });
 
 foam.CLASS({
+  name: 'LoggingSink',
+  imports: ['log'],
+  implements: ['foam.dao.Sink'],
+  methods: [
+    function put(obj) {
+      console.log("Got object", obj.id);
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.mlang',
   name: 'Test',
   implements: [
@@ -86,3 +97,21 @@ dao.select({
     console.log("EOF");
   }
 });
+
+foam.CLASS({
+  name: 'DaoTest',
+  implements: [
+    'With',
+    'foam.mlang.Expressions'
+  ],
+  properties: [
+    'dao'
+  ],
+  methods: [
+    function go() {
+      this.dao.limit(2).skip(3).select(LoggingSink.create());
+    }
+  ]
+});
+
+DaoTest.create({ dao: dao }).go();

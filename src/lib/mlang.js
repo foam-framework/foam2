@@ -197,6 +197,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
+  name: 'GtExpr',
+  extends: 'foam.mlang.BINARY',
+  methods: [
+    function f(o) {
+      return this.arg1.f(o) > this.arg2.f(o);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
   name: 'Expressions',
   requires: [
     'foam.mlang.CountExpr',
@@ -205,7 +216,8 @@ foam.CLASS({
     'foam.mlang.OrExpr',
     'foam.mlang.AndExpr',
     'foam.mlang.InExpr',
-    'foam.mlang.EqExpr'
+    'foam.mlang.EqExpr',
+    'foam.mlang.GtExpr'
   ],
   methods: [
     function _nary_(name, args) { return this[name].create({ args: foam.array.argsToArray(args) }); },
@@ -214,7 +226,8 @@ foam.CLASS({
     function AND() { return this._nary_("AndExpr", arguments); },
     function IN(a, b) { return this._binary_("InExpr", a, b); },
     function CONTAINS(a, b) { return this._binary_("ContainsExpr", a, b); },
-    function EQ(a, b) { return this._binary_("EqExpr", a, b); }
+    function EQ(a, b) { return this._binary_("EqExpr", a, b); },
+    function GT(a, b) { return this._binary_("GtExpr", a, b); }
   ]
 });
 
