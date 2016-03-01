@@ -279,7 +279,7 @@ foam.LIB({
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
           optional:      typeMatch[3] == '?',
-          argIdx:        argIdx++,
+          index:        argIdx++,
           documentation: typeMatch[5],
         }));
         // TODO: this is only valid on the last arg
