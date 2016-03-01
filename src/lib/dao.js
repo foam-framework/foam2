@@ -3,7 +3,9 @@
 // when requested if there isn't one already in the DAO.  Maybe we
 // could register a factory in the context?
 foam.INTERFACE = function(json) {
+  var model = foam.core.Model.create(json);
   var intf = foam.CLASS(json);
+  return intf;
 
   var proxy = foam.core.Model.create({
     name: "Proxy" + intf.name,
@@ -16,17 +18,17 @@ foam.INTERFACE = function(json) {
     ]
   });
 
-  var methods = intf.getAxiomsByClass(foam.core.Method);
+  var methods = intf.getAxiomsByClass(foam.core.Method).filter(function(m) { return intf.hasOwnAxiom(m.name); });
 
   for ( var i = 0 ; i < methods.length ; i++ ){
-    if ( ! intf.hasOwnAxiom(methods[i].name) ) continue;
+    if ( methods[i].code ) continue;
 
     if ( methods[i].args ) {
       var createArgs = methods[i].args.slice();
       createArgs.push("return this.delegate." + methods[i].name + '(' + methods[i].args.join(',') + ')');
       var code = Function.apply(Function, createArgs);
     } else {
-      code = Function("return this.delegate." + methods[i].name + ".apply(this, arguments);");
+      code = Function("return this.delegate." + methods[i].name + ".apply(this.delegate, arguments);");
     }
 
     methods[i] = foam.core.Method.create({
@@ -75,6 +77,32 @@ foam.INTERFACE({
       name: 'reset',
       args: [],
       code: function() {}
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxySink',
+  extends: 'foam.dao.Sink',
+  properties: [
+    'delegate'
+  ],
+  methods: [
+    function put(obj, sink, fc) {
+      this.delegate.put(obj, sink, fc);
+    },
+    function remove(obj, sink, fc) {
+      this.delegate.remove(obj, sink, fc);
+    },
+    function eof() {
+      this.delegate.eof();
+    },
+    function error(e) {
+      this.delegate.error(e);
+    },
+    function reset() {
+      this.delegate.reset();
     }
   ]
 });
@@ -207,8 +235,15 @@ foam.CLASS({
     'foam.mlang.AndExpr'
   ],
   properties: [
-    'skip',
-    'limit',
+    {
+      class: 'Int',
+      name: 'skip'
+    },
+    {
+      class: 'Int',
+      name: 'limit',
+      defaultValue: Infinity
+    },
     'orderBy',
     'where'
   ],
@@ -276,7 +311,7 @@ foam.CLASS({
       if ( this.count++ >= this.limit && fc ) {
         fc.stop();
       } else {
-        this.delegate.put(obj, s, fc);
+        this.delegate.put(obj, sink, fc);
       }
     },
     function remove(obj, sink, fc) {
@@ -352,6 +387,216 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'FlowControl',
+  properties: [
+    'stopped',
+    'errorEvt'
+  ],
+  methods: [
+    function stop() { this.stopped = true; },
+    function error(e) { this.errorEvt = e; }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'AbstractDAO',
+  implements: ['foam.dao.DAO'],
+  requires: [
+    'foam.dao.ExternalException',
+    'foam.dao.InternalException',
+    'foam.dao.Promise',
+    'foam.dao.FlowControl',
+    'foam.dao.LimitedSink',
+    'foam.dao.SkipSink',
+    'foam.dao.OrderedSink',
+    'foam.dao.PredicatedSink',
+    'foam.dao.FilteredDAO',
+    'foam.dao.OrderedDAO',
+    'foam.dao.SkipDAO',
+    'foam.dao.LimitedDAO'
+  ],
+  topics: [
+    'onPut',
+    'onRemove'
+  ],
+  methods: [
+    {
+      name: 'where',
+      code: function where(p) {
+        return this.FilteredDAO.create({
+          delegate: this,
+          predicate: p
+        });
+      }
+    },
+    {
+      name: 'orderBy',
+      code: function orderBy(o) {
+        return this.OrderedDAO.create({
+          delegate: this,
+          comparator: o
+        });
+      }
+    },
+    {
+      name: 'skip',
+      code: function skip(s) {
+        return this.SkipDAO.create({
+          delegate: this,
+          skip_: s
+        });
+      }
+    },
+    {
+      name: 'limit',
+      code: function limit(l) {
+        return this.LimitedDAO.create({
+          delegate: this,
+          limit_: l
+        });
+      }
+    },
+    function listen(sink, options) {},
+    function unlisten(sink) {},
+    function pipe() {},
+    function update() {},
+
+    function decorateSink_(sink, options, isListener, disableLimit) {
+      if ( options ) {
+        if ( ! disableLimit ) {
+          if ( options.hasOwnProperty('limit') )
+            sink = this.LimitedSink.create({
+              limit: options.limit,
+              delegate: sink
+            });
+
+          if ( options.hasOwnProperty('skip') )
+            sink = this.SkipSink.create({
+              skip: options.skip,
+              delegate: sink
+            });
+        }
+
+        if ( options.orderBy && ! isListener )
+          sink = this.OrderedSink.create({
+            order: options.orderBy,
+            delegate: sink
+          });
+
+        if ( options.where )
+          sink = this.PredicatedSink.create({
+            predicate: options.where.partialEval ?
+              options.where.partialEval() :
+              options.where,
+            delegate: sink
+          });
+      }
+
+      return sink;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Proxies',
+  properties: [
+    {
+      name: 'delegate'
+    }
+  ],
+  methods: [
+    function installInClass(cls) {
+      var proxee = foam.lookup(this.delegate);
+
+      var delegateProp = foam.core.Property.create({
+        name: 'delegate'
+      });
+
+      cls.installAxiom(delegateProp);
+
+      var methods = proxee
+          .getAxiomsByClass(foam.core.Method)
+          .filter(function(m) {
+            return proxee.hasOwnAxiom(m.name) && ! cls.hasOwnAxiom(m.name);
+          })
+          .forEach(function(m) {
+            m = m.clone();
+            m.code = Function("return this.delegate." + m.name + ".apply(this.delegate, arguments);");
+            cls.installAxiom(m);
+          });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxiesAxiom',
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      name: 'proxies',
+      postSet: function(_, v) {
+        this.axioms_.push(foam.core.Proxies.create({ delegate: v }));
+      }
+    }
+  ]
+});
+
+// TODO: Settle on an implementation of Proxy DAO.
+// We need better way of generating the Proxy that allows for easy customization
+// methods.
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyDAO',
+  extends: 'foam.dao.AbstractDAO',
+  methods: [
+    function where(p) { return this.SUPER(p); },
+    function orderBy(c) { return this.SUPER(c); },
+    function skip(s) { return this.SUPER(s); },
+    function limit(l) { return this.SUPER(l); }
+  ],
+  proxies: 'foam.dao.DAO'
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'MProxyDAO',
+  extends: 'foam.dao.AbstractDAO',
+  properties: [
+    {
+      name: 'delegate'
+    }
+  ],
+  methods: [
+    function put(obj, sink) {
+      return this.delegate.put(obj, sink);
+    },
+    function remove(obj, sink) {
+      return this.delegate.remove(obj, sink);
+    },
+    function select(sink, options) {
+      return this.delegate.select(sink, options);
+    },
+    function update() {
+
+    },
+    function find(obj) {
+      return this.delegate.find(obj);
+    },
+    function removeAll(sink, options) {
+      return this.delegate.removeAll(sink, options);
+    },
+    function listen(sink, options) {
+    },
+    function unlisten(sink) {
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.dao',
   name: 'FilteredDAO',
   extends: 'foam.dao.ProxyDAO',
   requires: [
@@ -389,11 +634,11 @@ foam.CLASS({
   methods: [
     function select(sink, options) {
       options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
-      return this.select(sink, options);
+      return this.delegate.select(sink, options);
     },
     function removeAll(sink, options) {
       options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
-      return this.removeAll(sink, options);
+      return this.delegate.removeAll(sink, options);
     }
   ]
 });
@@ -424,7 +669,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'LimitDAO',
+  name: 'LimitedDAO',
   extends: 'foam.dao.ProxyDAO',
   requires: [
     'foam.dao.DAOOptions'
@@ -437,108 +682,11 @@ foam.CLASS({
   methods: [
     function select(sink, options) {
       options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
-      return this.select(sink, options);
+      return this.delegate.select(sink, options);
     },
     function removeAll(sink, options) {
       options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
-      return this.removeAll(sink, options);
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'FlowControl',
-  properties: [
-    'stopped',
-    'errorEvt'
-  ],
-  methods: [
-    function stop() { this.stopped = true; },
-    function error(e) { this.errorEvt = e; }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'AbstractDAO',
-  implements: ['foam.dao.DAO'],
-  requires: [
-    'foam.dao.ExternalException',
-    'foam.dao.InternalException',
-    'foam.dao.Promise',
-    'foam.dao.FlowControl',
-    'foam.dao.LimitedSink',
-    'foam.dao.SkipSink',
-    'foam.dao.OrderedSink',
-    'foam.dao.PredicatedSink',
-    'foam.dao.FilteredDAO',
-    'foam.dao.OrderedDAO',
-    'foam.dao.SkipDAO',
-    'foam.dao.LimitedDAO'
-  ],
-  methods: [
-    function listen(sink, options) {},
-    function unlisten(sink) {},
-    function pipe() {},
-    function update() {},
-    function where(p) {
-      return this.FilteredDAO.create({
-        delegate: this,
-        predicate: p
-      });
-    },
-    function orderBy(o) {
-      return this.OrderedDAO.create({
-        delegate: this,
-        comparator: o
-      });
-    },
-    function skip(s) {
-      return this.SkipDAO.create({
-        delegate: this,
-        skip_: s
-      });
-    },
-    function limit(l) {
-      return this.LimitedDAO.create({
-        delegate: this,
-        limit_: l
-      });
-    },
-
-    function decorateSink_(sink, options, isListener, disableLimit) {
-      if ( options ) {
-        if ( ! disableLimit ) {
-          if ( options.limit )
-            sink = this.LimitedSink.create({
-              limit: options.limit,
-              delegate: sink
-            });
-
-          if ( options.skip )
-            sink = this.SkipSink.create({
-              skip: options.skip,
-              delegate: sink
-            });
-        }
-
-        if ( options.orderBy && ! isListener )
-          sink = this.OrderedSink.create({
-            order: options.orderBy,
-            delegate: sink
-          });
-
-        if ( options.where )
-          sink = this.PredicatedSink.create({
-            predicate: options.where.partialEval ?
-              options.where.partialEval() :
-              options.where,
-            delegate: sink
-          });
-      }
-
-      return sink;
+      return this.delegate.removeAll(sink, options);
     }
   ]
 });
@@ -685,6 +833,9 @@ TODO:
 -mlangs
 -internal vs external errors.
 -Context aware?
+
+-interface generated proxy didn't work for skip/limit/orderby.  I needed the abstract dao implementation
+
 
 questions:
 -listen/unlisten using Topics ?
