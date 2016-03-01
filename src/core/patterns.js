@@ -26,7 +26,9 @@ foam.CLASS({
       cls.create = function() {
         return instance || ( instance = oldCreate.apply(this, arguments) );
       }
-    }
+    },
+    function clone() { return this; },
+    function equals(other) { return other === this; }
   ]
 });
 
