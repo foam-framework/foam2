@@ -1157,12 +1157,9 @@ foam.CLASS({
             if ( ! model )
               console.error('Unknown class: ' + path);
 
-            this.setPrivate_(
-              as,
-              {
-                __proto__: foam.lookup(path),
-                create: function(args, X) { return model.create(args, X || parent); }
-              });
+            var cls = Object.create(foam.lookup(path));
+            cls.create = function(args, X) { return model.create(args, X || parent); };
+            this.setPrivate_(as, cls);
           }
 
           return this.getPrivate_(as);
