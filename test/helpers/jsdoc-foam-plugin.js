@@ -176,7 +176,8 @@ var getSourceString = function getSourceString(filename, start, end) {
 }
 
 var processArgs = function processArgs(e, node) {
-   // extract arg types using FOAM
+  // extract arg types using FOAM
+  if ( ! node ) return;
   var src = getSourceString(e.filename, node.range[0], node.range[1]);
   try {
     var args = foam.types.getFunctionArgs(src);
@@ -206,7 +207,9 @@ exports.astNodeVisitor = {
     if (node.type === 'ObjectExpression' &&
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property &&
-      ( node.parent.callee.property.name == 'CLASS' || node.parent.callee.property.name == 'LIB' )
+      ( node.parent.callee.property.name == 'CLASS' ||
+        node.parent.callee.property.name == 'LIB' ||
+        node.parent.callee.property.name == 'INTERFACE' )
     ) {
       var className = getNodePropertyNamed(node, "name");
       var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') || 'foam/core';
