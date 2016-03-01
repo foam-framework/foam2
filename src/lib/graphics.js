@@ -378,7 +378,7 @@ foam.CLASS({
     {
       name: 'fill',
       class: 'Boolean',
-      deafultValue: false
+      defaultValue: false
     },
     {
       name: 'stroke',
