@@ -892,6 +892,15 @@ log('-');
 var o = ValidationTest.create();
 o.validate();
 
+// Unknown Properties, detect unknown Model and Property properties
+foam.CLASS({
+  name: 'ValidationTest',
+  unknown: 'foobar',
+  properties: [
+    { name: 'test', unknown: 'foobar' }
+  ]
+});
+
 // Contexts can be explicitly created with foam.sub()
 // The second argument of sub() is an optional name for the Context
 var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');

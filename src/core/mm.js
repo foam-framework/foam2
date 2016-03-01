@@ -455,6 +455,7 @@ foam.CLASS({
     },
     'package',
     'name',
+    { name: 'label', expression: foam.string.labelize },
     [ 'extends', 'FObject' ],
     'refines',
     {
@@ -501,6 +502,8 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
+    { name: 'label', expression: foam.string.labelize },
+    'help',
     'defaultValue',
     'factory',
     'adapt',
@@ -542,7 +545,7 @@ foam.CLASS({
         var a = this.cls_.getAxiomsByClass(foam.core.Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
-          if ( typeof superProp[name] !== 'undefined' /*superProp.hasOwnProperty(name)*/ && ! this.hasOwnProperty(name) )
+          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) )
             this[name] = superProp[name];
         }
       }
@@ -1628,9 +1631,13 @@ foam.CLASS({
 
       // If args are just a simple {} map, just copy
       if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
-        for ( var key in args )
-          if ( this.cls_.getAxiomByName(key) )
+        for ( var key in args ) {
+          if ( this.cls_.getAxiomByName(key) ) {
             this[key] = args[key];
+          } else {
+            this.unknownArg(key, args[key]);
+          }
+        }
       }
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
@@ -1643,6 +1650,10 @@ foam.CLASS({
       else {
         this.copyFrom(args);
       }
+    },
+
+    function unknownArg(key, value) {
+      // NOP
     },
 
     function copyFrom(o) {
@@ -2124,4 +2135,5 @@ foam.LIB({
   - cascading object property change events
   - should destroyables be a linked list for fast removal?
   - multi-methods?
+  - Topic listener relay
 */

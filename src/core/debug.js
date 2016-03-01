@@ -97,6 +97,11 @@ foam.CLASS({
   refines: 'foam.core.FObject',
 
   methods: [
+    function unknownArg(key, value) {
+      if ( key == 'class' ) return;
+      console.warn('Unknown property ' + this.cls_.id + '.' + key + ':', value);
+    },
+
     function describe(opt_name) {
       console.log('Instance of', this.cls_.name);
       console.log('Axiom Type           Name           Value');
@@ -136,7 +141,7 @@ foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
 
-  documentation: 'Decorated merged() and framed() to have debug friendly toString() methods.',
+  // documentation: 'Decorated merged() and framed() to have debug friendly toString() methods.',
 
   exports: [ 'merged', 'framed' ],
 
@@ -164,7 +169,7 @@ foam.X = foam.debug.Window.create(null, foam.X).Y;
 foam.CLASS({
   name: 'Argument',
 
-  documentation: "Describes one argument of a function.",
+  // documentation: "Describes one argument of a function.",
 
   constants: {
     PREFIX: 'Argument',

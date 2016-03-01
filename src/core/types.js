@@ -124,12 +124,6 @@ foam.CLASS({
   label: 'Binary data',
 
   properties: [
-    {
-      name: 'type',
-      type: 'String',
-      defaultValue: 'Blob',
-      // documentation: 'The FOAM type of this property.'
-    }
   ]
 });
 
