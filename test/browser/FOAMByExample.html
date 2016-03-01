@@ -840,7 +840,15 @@ source.publish('ping');
 sink.destroy();
 source.publish('ping');
 
-// Model validation
+// Model validation, extends and refines are mutually-exclusive
+foam.CLASS({
+  name: 'EandRTest',
+  extends: 'FObject',
+  refines: 'Model'
+});
+EandRTest.model_.validate();
+
+// Model validation, properties must have names
 foam.CLASS({
   name: 'ValidationTest',
   properties: [
@@ -848,6 +856,45 @@ foam.CLASS({
   ]
 });
 ValidationTest.model_.validate();
+
+// Property validation, factory and defaultValue
+foam.CLASS({
+  name: 'PV1Test',
+  properties: [
+    {
+      name: 'test',
+      defaultValue: 42,
+      factory: function() { return 42; }
+    }
+  ]
+});
+PV1Test.model_.validate();
+
+// Property validation, factory and expression
+foam.CLASS({
+  name: 'PV2Test',
+  properties: [
+    {
+      name: 'test',
+      factory: function() { return 42; },
+      expression: function() { return 42; }
+    }
+  ]
+});
+PV2Test.model_.validate();
+
+// Property validation, factory and expression
+foam.CLASS({
+  name: 'PV3Test',
+  properties: [
+    {
+      name: 'test',
+      defaultValue: 42,
+      expression: function() { return 42; }
+    }
+  ]
+});
+PV3Test.model_.validate();
 
 // Required
 foam.CLASS({

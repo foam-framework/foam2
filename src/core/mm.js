@@ -147,7 +147,7 @@ foam.LIB({
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
           if ( Array.isArray(a) )
-            m.properties[i] = a = { name: a[0], defaultValue: a[1] }; 
+            m.properties[i] = a = { name: a[0], defaultValue: a[1] };
           else if ( typeof a === 'string' )
             m.properties[i] = a = { name: a };
           var type = foam.lookup(a.class) || foam.core.Property;
@@ -221,6 +221,14 @@ foam.LIB({
       }
 
       return as;
+    },
+
+    /**
+      Return true if an axiom named "name" is defined on this class
+      directly, regardless of what parent classes define.
+    */
+    function hasOwnAxiom(name) {
+      return this.axiomMap_.hasOwnProperty(name);
     },
 
     /** Returns all axioms defined on this class or its parent classes. */
@@ -583,20 +591,20 @@ foam.CLASS({
 
       var getter =
         prop.getter ? prop.getter :
-        hasDefaultValue ? function defaultValueGetter() {
+        factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            defaultValue ;
+            this[name] = factory.call(this) ;
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
                  this.hasOwnPrivate_(name) ? this.getPrivate_(name) :
                  this.setPrivate_(name, eFactory.call(this)) ;
         } :
-        factory ? function factoryGetter() {
+        hasDefaultValue ? function defaultValueGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            this[name] = factory.call(this) ;
+            defaultValue ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
@@ -1541,7 +1549,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         // TODO: document
         return typeof o === 'string' ? foam.core.Property.create({name: o}) :
-               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) : 
+               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
                o.class               ? foam.lookup(o.class).create(o) :
                                        foam.lookup(this.of).create(o) ;
       }
@@ -1671,7 +1679,7 @@ foam.CLASS({
       dtors.push(dtor);
       return dtor;
     },
-    
+
     function destroy() {
       /*
         Destroy this object.
