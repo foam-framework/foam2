@@ -859,42 +859,25 @@ ValidationTest.model_.validate();
 
 // Property validation, factory and defaultValue
 foam.CLASS({
-  name: 'PV1Test',
+  name: 'PropertyValidationTest',
   properties: [
     {
-      name: 'test',
-      defaultValue: 42,
-      factory: function() { return 42; }
-    }
-  ]
-});
-PV1Test.model_.validate();
-
-// Property validation, factory and expression
-foam.CLASS({
-  name: 'PV2Test',
-  properties: [
+      name: 't1',
+      setter: function() {},
+      adapt: function(_,v) { return v; },
+      preSet: function(_,v) { return v; },
+      postSet: function() {}
+    },
     {
-      name: 'test',
+      name: 't2',
+      getter: function() { return 42; },
       factory: function() { return 42; },
-      expression: function() { return 42; }
+      expression: function() { return 42; },
+      defaultValue: 42
     }
   ]
 });
-PV2Test.model_.validate();
-
-// Property validation, factory and expression
-foam.CLASS({
-  name: 'PV3Test',
-  properties: [
-    {
-      name: 'test',
-      defaultValue: 42,
-      expression: function() { return 42; }
-    }
-  ]
-});
-PV3Test.model_.validate();
+PropertyValidationTest.model_.validate();
 
 // Required
 foam.CLASS({

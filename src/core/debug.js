@@ -38,7 +38,7 @@ foam.CLASS({
         throw this.id + ': "extends" and "refines" are mutually exclusive.';
 
       for ( var i = 0 ; i < this.axioms_.length ; i++ )
-        this.axioms_[i].validate && this.axioms_[i].validate();
+        this.axioms_[i].validate && this.axioms_[i].validate(this);
     }
   ]
 });
@@ -49,17 +49,27 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
-    function validate() {
+    function validate(model) {
       this.SUPER();
 
-      if ( this.factory && this.hasOwnProperty('defaultValue') )
-        throw this.name + ': error to set "defaultValue" if "factory" set.';
+      var mName = model ? model.id + '.' : '';
 
-      if ( this.expression && this.hasOwnProperty('defaultValue') )
-        throw this.name + ': error to set "defaultValue" if "expression" set.';
+      // List of properties which are hidden by other properties.
+      var es = [
+        [ 'setter',     [ 'adapt', 'preSet', 'postSet' ] ],
+        [ 'getter',     [ 'factory', 'expression', 'defaultValue' ] ],
+        [ 'factory',    [ 'expression', 'defaultValue' ] ],
+        [ 'expression', [ 'defaultValue' ] ]
+      ];
 
-      if ( this.factory && this.expression )
-        throw this.name + ': "factory" and "expression" are mutually exclusive.';
+      for ( var i = 0 ; i < es.length ; i++ ) {
+        var e = es[i];
+        for ( var j = 0 ; j < e.length ; j++ ) {
+          if ( this[e[0]] && this.hasOwnProperty(e[1][j]) ) {
+            console.warn('Property ' + mName + this.name + ' "' + e[1][j] + '" hidden by "' + e[0] + '"');
+          }
+        }
+      }
     }
   ]
 });
