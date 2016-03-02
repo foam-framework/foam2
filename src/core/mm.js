@@ -479,11 +479,20 @@ foam.CLASS({
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
-        // TODO: document
-        return typeof o === 'string' ? foam.core.Property.create({name: o}) :
-               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
-               o.class               ? foam.lookup(o.class).create(o) :
-                                       foam.core.Property.create(o) ;
+        if ( typeof o === 'string' ) {
+          var p = foam.core.Property.create();
+          p.name = o;
+          return p;
+        }
+        if ( Array.isArray(o) ) {
+          var p = foam.core.Property.create();
+          p.name         = o[0];
+          p.defaultValue = o[1];
+          return p;
+        }
+        return o.class ?
+          foam.lookup(o.class).create(o) :
+          foam.core.Property.create(o)   ;
       }
     },
     {
