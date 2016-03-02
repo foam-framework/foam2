@@ -310,7 +310,7 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'delegates',
-      documentation: 'Methods that we should delegate rather than forward.'
+      // documentation: 'Methods that we should delegate rather than forward.'
     }
   ],
   methods: [
