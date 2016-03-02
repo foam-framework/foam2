@@ -83,7 +83,7 @@ foam.CLASS({
   ]
 });
 
-
+/** Supports Actions */
 foam.CLASS({
   refines: 'foam.core.Model',
 

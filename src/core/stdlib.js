@@ -1,4 +1,4 @@
-/**
+/*
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -269,8 +269,8 @@ foam.LIB({
   name: 'fn',
 
   methods: [
+    /** Faster version of memoize() when only dealing with one argument. */
     function memoize1(f) {
-      // Faster version of memoize() when only dealing with one argument.
       var cache = {};
       var g = function(arg) {
         console.assert(arguments.length == 1, "Memoize1'ed functions must take exactly one argument.");
@@ -334,6 +334,9 @@ foam.LIB({
   try {
     foam.fn.setName(function() {}, '');
   } catch (x) {
+    /**
+      @class fn
+      @ignore */
     foam.LIB({
       name: 'fn',
       methods: [ function setName() { /* NOP */ } ]
