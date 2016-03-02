@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
-    "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug node_modules/jasmine/bin/jasmine.js",
+    "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover -- jasmine \n istanbul instrument ./src/ -o ./tmp_cov___/ \n rm -rf ./tmp_cov___",
     "doc": "jsdoc -c jsdoc.conf -r -d ./doc/ ./src/"
   }
