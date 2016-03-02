@@ -395,7 +395,7 @@ foam.LIB({
 (function() {
 
   function set(X, key, value) {
-    /** Update a Context binding. **/
+    /* Update a Context binding. */
     X[key] = value;
 
     // TODO:
