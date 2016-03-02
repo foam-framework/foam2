@@ -114,11 +114,11 @@ foam.LIB({
       Create a new instance of this class.
       Configured from values taken from 'args', if supplifed.
     */
-    function create(/*args*/) {
+    function create(args, X) {
       var obj = Object.create(this.prototype);
       obj.instance_ = {};
 
-      obj.initArgs.apply(obj, arguments);
+      obj.initArgs(args, X);
 
       obj.init && obj.init();
 
@@ -482,19 +482,22 @@ foam.CLASS({
         return typeof o === 'string' ? foam.core.Property.create({name: o}) :
                Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
                o.class               ? foam.lookup(o.class).create(o) :
-                                       foam.lookup(this.of).create(o) ;
+                                       foam.core.Property.create(o) ;
       }
     },
     {
       class: 'Array',
       of: 'Method',
       name: 'methods',
-      adaptArrayElement: function(e) {
-        if ( typeof e === 'function' ) {
-          console.assert(e.name, 'Method must be named');
-          return foam.core.Method.create({name: e.name, code: e});
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'function' ) {
+          console.assert(o.name, 'Method must be named');
+          var m = foam.core.Method.create();
+          m.name = o.name;
+          m.code = o;
+          return m;
         }
-        return e;
+        return o;
       }
     }
   ],
@@ -1563,9 +1566,12 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
           console.assert(o.name, 'Method must be named');
-          return foam.core.Method.create({name: o.name, code: o});
+          var m = foam.core.Method.create();
+          m.name = o.name;
+          m.code = o;
+          return m;
         }
-        return foam.lookup(this.of).create(o);
+        return foam.core.Method.create(o);
       }
     },
     {
