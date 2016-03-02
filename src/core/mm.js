@@ -271,7 +271,8 @@ foam.LIB({
       /* Start the bootstrap process. */
 
       // Will be replaced in phase2.
-      foam.CLASS = (function(m) { return this.getClass.call(m); }).bind(this);
+      var getClass = this.getClass;
+      foam.CLASS = function(m) { return getClass.call(m); };
     },
 
     /**
