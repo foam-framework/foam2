@@ -356,7 +356,7 @@ foam.LIB({
 
       // Update psedo-Models to real Models
       for ( var key in foam.core ) {
-        var c = foam.lookup(key);
+        var c = foam.core[key];
         c.prototype.model_ = c.model_ = Model.create(c.model_);
       }
 
