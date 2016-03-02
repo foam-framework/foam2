@@ -1883,9 +1883,8 @@ foam.CLASS({
   ],
 
   properties: [
-//    { name: 'name', defaultValue: 'window' },
     [ 'name', 'window' ],
-    { name: 'window' },
+    'window',
     {
       name: 'document',
       factory: function() { return this.window.document; }
