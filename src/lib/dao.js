@@ -769,6 +769,8 @@ foam.CLASS({
       if ( i == this.array.length ) this.array.push(obj);
       promise.value = obj;
 
+      this.onPut.publish(obj);
+
       return promise;
     },
     function remove(obj, sink) {
@@ -778,10 +780,12 @@ foam.CLASS({
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
-          this.array.splice(i, 1);
+          var o2 = this.array.splice(i, 1);
           break;
         }
       }
+
+      this.onRemove.publish(o2[0] || obj);
 
       return promise;
     },
@@ -822,6 +826,7 @@ foam.CLASS({
           var obj = this.array.splice(i, 1);
           i--;
           sink && sink.remove(obj);
+          this.onRemove.publish(obj);
         }
       }
 

@@ -109,9 +109,14 @@ foam.CLASS({
   ],
   methods: [
     function go() {
-      this.dao.limit(2).skip(3).select(LoggingSink.create());
+      this.dao.limit(3).skip(1).select(LoggingSink.create());
     }
   ]
 });
-
 DaoTest.create({ dao: dao }).go();
+
+dao.onPut.subscribe(function(_, _, o) { console.log("On put", o.id); });
+dao.onRemove.subscribe(function(_,_, o) { console.log("On remove", o.id); });
+
+dao.removeAll();
+dao.put(Abc.create({ id: 4 }));
