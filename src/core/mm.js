@@ -269,7 +269,9 @@ foam.LIB({
   methods: [
     function start() {
       /* Start the bootstrap process. */
-      foam.CLASS = this.CLASS.bind(this);
+
+      // Will be replaced in phase2.
+      foam.CLASS = (function(m) { return this.getClass.call(m); }).bind(this);
     },
 
     /**
@@ -319,17 +321,8 @@ foam.LIB({
       return cls;
     },
 
-    /**
-      Bootstrap Model definition.
-      Will be replaced in phase2.
-    */
-    function CLASS(m) {
-      this.getClass.call(m);
-    },
-
     /** Start second phase of bootstrap process. */
     function phase2() {
-
       // Upgrade to final CLASS() definition.
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
