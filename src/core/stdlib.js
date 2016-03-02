@@ -330,15 +330,17 @@ foam.LIB({
   ]
 });
 
-// Disable setName if not supported on this platform.
-try {
-  foam.fn.setName(function() {}, '');
-} catch (x) {
-  foam.LIB({
-    name: 'fn',
-    methods: [ function setName() { /* NOP */ } ]
-  });
-}
+(function() {
+  // Disable setName if not supported on this platform.
+  try {
+    foam.fn.setName(function() {}, '');
+  } catch (x) {
+    foam.LIB({
+      name: 'fn',
+      methods: [ function setName() { /* NOP */ } ]
+    });
+  }
+})();
 
 
 foam.LIB({
