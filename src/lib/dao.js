@@ -1,71 +1,4 @@
 foam.CLASS({
-  package: 'foam.core',
-  name: 'Proxy',
-  extends: 'Property',
-  properties: [ 'of' ],
-  methods: [
-    function installInClass(cls) {
-      this.SUPER(cls);
-
-      var delegate = foam.lookup(this.of);
-      var name = this.name;
-      var methods = delegate.getAxiomsByClass(foam.core.Method)
-          .filter(function(m) {
-            // TODO Is this the right check?
-            return delegate.hasOwnAxiom(m.name);
-          }).map(function(m) {
-            m = m.clone();
-            m.code = Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);");
-            cls.installAxiom(m);
-          });
-    }
-  ]
-});
-
-// TODO: Seems like there should be a better entry point for this.
-// In a ModelDAO scenario, we could auto generate the ProxyABC model
-// when requested if there isn't one already in the DAO.  Maybe we
-// could register a factory in the context?
-foam.INTERFACE = function(json) {
-  var model = foam.core.Model.create(json);
-  var intf = foam.CLASS(json);
-  return intf;
-
-  var proxy = foam.core.Model.create({
-    name: "Proxy" + intf.name,
-    package: intf.package,
-    implements: [intf.id],
-    properties: [
-      {
-        name: 'delegate'
-      }
-    ]
-  });
-
-  var methods = intf.getAxiomsByClass(foam.core.Method).filter(function(m) { return intf.hasOwnAxiom(m.name); });
-
-  for ( var i = 0 ; i < methods.length ; i++ ){
-    if ( methods[i].code ) continue;
-
-    if ( methods[i].args ) {
-      var createArgs = methods[i].args.slice();
-      createArgs.push("return this.delegate." + methods[i].name + '(' + methods[i].args.join(',') + ')');
-      var code = Function.apply(Function, createArgs);
-    } else {
-      code = Function("return this.delegate." + methods[i].name + ".apply(this.delegate, arguments);");
-    }
-
-    methods[i] = foam.core.Method.create({
-      name: methods[i].name,
-      code: code
-    });
-  }
-
-  proxy.methods = methods;
-  proxy.getClass();
-};
-
-foam.INTERFACE({
   package: 'foam.dao',
   name: 'Sink',
   methods: [
@@ -108,7 +41,6 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxySink',
-  implements: ['foam.dao.Sink'],
   properties: [
     {
       class: 'Proxy',
@@ -118,7 +50,7 @@ foam.CLASS({
   ]
 });
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.dao',
   name: 'DAO',
   documentation: 'DAO Interface',
@@ -510,116 +442,24 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core',
-  name: 'Proxies',
-  properties: [
-    {
-      name: 'delegate'
-    }
-  ],
-  methods: [
-    function installInClass(cls) {
-      var proxee = foam.lookup(this.delegate);
-
-      var delegateProp = foam.core.Property.create({
-        name: 'delegate'
-      });
-
-      cls.installAxiom(delegateProp);
-
-      var methods = proxee
-          .getAxiomsByClass(foam.core.Method)
-          .filter(function(m) {
-            return proxee.hasOwnAxiom(m.name) && ! cls.hasOwnAxiom(m.name);
-          })
-          .forEach(function(m) {
-            m = m.clone();
-            m.code = Function("return this.delegate." + m.name + ".apply(this.delegate, arguments);");
-            cls.installAxiom(m);
-          });
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'ProxiesAxiom',
-  refines: 'foam.core.Model',
-  properties: [
-    {
-      name: 'proxies',
-      postSet: function(_, v) {
-        this.axioms_.push(foam.core.Proxies.create({ delegate: v }));
-      }
-    }
-  ]
-});
-
-// TODO: Settle on an implementation of Proxy DAO.
-// We need better way of generating the Proxy that allows for easy customization
-// methods.
-foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
-  methods: [
-    function where(p) { return this.SUPER(p); },
-    function orderBy(c) { return this.SUPER(c); },
-    function skip(s) { return this.SUPER(s); },
-    function limit(l) { return this.SUPER(l); }
-  ],
+  requires: [ 'foam.dao.DAOOptions' ],
   properties: [
     {
       class: 'Proxy',
       of: 'foam.dao.DAO',
-      name: 'delegate'
+      name: 'delegate',
+      delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
     }
   ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'MProxyDAO',
-  extends: 'foam.dao.AbstractDAO',
-  properties: [
-    {
-      name: 'delegate'
-    }
-  ],
-  methods: [
-    function put(obj, sink) {
-      return this.delegate.put(obj, sink);
-    },
-    function remove(obj, sink) {
-      return this.delegate.remove(obj, sink);
-    },
-    function select(sink, options) {
-      return this.delegate.select(sink, options);
-    },
-    function update() {
-
-    },
-    function find(obj) {
-      return this.delegate.find(obj);
-    },
-    function removeAll(sink, options) {
-      return this.delegate.removeAll(sink, options);
-    },
-    function listen(sink, options) {
-    },
-    function unlisten(sink) {
-    },
-  ],
 });
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
   extends: 'foam.dao.ProxyDAO',
-  requires: [
-    'foam.dao.DAOOptions'
-  ],
   properties: [
     {
       name: 'predicate'
@@ -640,9 +480,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'OrderedDAO',
-  requires:[
-    'foam.dao.DAOOptions',
-  ],
   extends: 'foam.dao.ProxyDAO',
   properties: [
     {
@@ -665,9 +502,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'SkipDAO',
   extends: 'foam.dao.ProxyDAO',
-  requires: [
-    'foam.dao.DAOOptions'
-  ],
   properties: [
     {
       name: 'skip_'
@@ -689,9 +523,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'LimitedDAO',
   extends: 'foam.dao.ProxyDAO',
-  requires: [
-    'foam.dao.DAOOptions'
-  ],
   properties: [
     {
       name: 'limit_'
@@ -854,11 +685,7 @@ foam.CLASS({
 /*
 TODO:
 -mlangs
--internal vs external errors.
 -Context oriented?
-
--interface generated proxy didn't work for skip/limit/orderby.  I needed the abstract dao implementation
-
 
 questions:
 -listen/unlisten using Topics ?
@@ -866,7 +693,6 @@ questions:
   Sinks make chaining easier dao1.put(obj, dao2);
   Promises more compatible.
 -enforcement of interfaces
--generation of ProxyDAO from DAO interface
 -anonymous sinks?
 -removeAll still takes a sink?
 

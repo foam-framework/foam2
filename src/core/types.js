@@ -300,3 +300,42 @@ foam.CLASS({
     function installInProto(proto) {}
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Proxy',
+  extends: 'Property',
+  properties: [
+    'of',
+    {
+      class: 'StringArray',
+      name: 'delegates',
+      documentation: 'Methods that we should delegate rather than forward.'
+    }
+  ],
+  methods: [
+    function installInClass(cls) {
+      this.SUPER(cls);
+
+      var delegate = foam.lookup(this.of);
+      var implements = foam.core.Implements.create({ path: this.of });
+      if ( ! cls.getAxiomByName(implements.name) )
+        cls.installAxiom(implements);
+
+      var name = this.name;
+      var methods = delegate.getAxiomsByClass(foam.core.Method)
+          .filter(function(m) {
+            // TODO This isn't the right check, but we need some sort of filter.
+            // We dont' want to proxy all FObject methods, only those defined in the interface
+            // and possibly its parent interfaces?
+            return delegate.hasOwnAxiom(m.name);
+          }).map(function(m) {
+            m = m.clone();
+            m.code = this.delegates.indexOf(m.name) == -1 ?
+              Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);") :
+              Function("return this." + name + "." + m.name + ".apply(this, arguments);");
+            cls.installAxiom(m);
+          }.bind(this));
+    }
+  ]
+});
