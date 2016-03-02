@@ -1,47 +1,4 @@
-// TODO: Seems like there should be a better entry point for this.
-// In a ModelDAO scenario, we could auto generate the ProxyABC model
-// when requested if there isn't one already in the DAO.  Maybe we
-// could register a factory in the context?
-foam.INTERFACE = function(json) {
-  var model = foam.core.Model.create(json);
-  var intf = foam.CLASS(json);
-  return intf;
-
-  var proxy = foam.core.Model.create({
-    name: "Proxy" + intf.name,
-    package: intf.package,
-    implements: [intf.id],
-    properties: [
-      {
-        name: 'delegate'
-      }
-    ]
-  });
-
-  var methods = intf.getAxiomsByClass(foam.core.Method).filter(function(m) { return intf.hasOwnAxiom(m.name); });
-
-  for ( var i = 0 ; i < methods.length ; i++ ){
-    if ( methods[i].code ) continue;
-
-    if ( methods[i].args ) {
-      var createArgs = methods[i].args.slice();
-      createArgs.push("return this.delegate." + methods[i].name + '(' + methods[i].args.join(',') + ')');
-      var code = Function.apply(Function, createArgs);
-    } else {
-      code = Function("return this.delegate." + methods[i].name + ".apply(this.delegate, arguments);");
-    }
-
-    methods[i] = foam.core.Method.create({
-      name: methods[i].name,
-      code: code
-    });
-  }
-
-  proxy.methods = methods;
-  proxy.getClass();
-};
-
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.dao',
   name: 'Sink',
   methods: [
@@ -93,7 +50,7 @@ foam.CLASS({
   ]
 });
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.dao',
   name: 'DAO',
   documentation: 'DAO Interface',
@@ -728,11 +685,7 @@ foam.CLASS({
 /*
 TODO:
 -mlangs
--internal vs external errors.
 -Context oriented?
-
--interface generated proxy didn't work for skip/limit/orderby.  I needed the abstract dao implementation
-
 
 questions:
 -listen/unlisten using Topics ?
@@ -740,7 +693,6 @@ questions:
   Sinks make chaining easier dao1.put(obj, dao2);
   Promises more compatible.
 -enforcement of interfaces
--generation of ProxyDAO from DAO interface
 -anonymous sinks?
 -removeAll still takes a sink?
 
