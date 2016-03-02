@@ -167,6 +167,7 @@ foam.X = foam.debug.Window.create(null, foam.X).Y;
 
 
 foam.CLASS({
+  package: 'foam.core',
   name: 'Argument',
 
   // documentation: "Describes one argument of a function.",
@@ -237,8 +238,9 @@ foam.CLASS({
 
 /** Describes a function return type. */
 foam.CLASS({
+  package: 'foam.core',
   name: 'ReturnValue',
-  extends: 'Argument',
+  extends: 'foam.core.Argument',
 
   constants: {
     PREFIX: 'Return'
@@ -274,7 +276,7 @@ foam.LIB({
         // if can't match from start of string, fail
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
-        ret.push(/*X.*/Argument.create({
+        ret.push(foam.core.Argument.create({
           name:          typeMatch[6],
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
@@ -284,7 +286,7 @@ foam.LIB({
         }));
         // TODO: this is only valid on the last arg
         if ( typeMatch[6] ) {
-          ret.returnType = /*X.*/ReturnValue.create({
+          ret.returnType = foam.core.ReturnValue.create({
             typeName: typeMatch[8],
             type: global[typeMatch[8]]
           });
@@ -294,7 +296,7 @@ foam.LIB({
         // check for bare return type with no args
         typeMatch = args.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
         if ( typeMatch && typeMatch[1] ) {
-          ret.returnType = /*X.*/ReturnValue.create({
+          ret.returnType = foam.core.ReturnValue.create({
             typeName: typeMatch[1],
             type: global[typeMatch[1]]
           });

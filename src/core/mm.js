@@ -16,6 +16,11 @@
  */
 
 /**
+ @module foam/core
+ */
+{ /* for docs only */ }
+
+/**
  FOAM Bootstrap
 <p>
  FOAM uses Models to specify class definitions.
@@ -97,6 +102,7 @@
   <li>Methods    - Prototype methods
   <li>Listeners  - Like methods, but with extra features for use as callbacks
 </ul>
+
 */
 
 foam.LIB({
