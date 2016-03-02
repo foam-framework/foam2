@@ -839,7 +839,10 @@ foam.CLASS({
     [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
-        return a.map(prop.adaptArrayElement.bind(prop));
+        var b = new Array(a.length);
+        for ( var i = 0 ; i < a.length ; i++ )
+          b[i] = prop.adaptArrayElement(a[i]);
+        return b;
       }
     ],
     [ 'adaptArrayElement', function(o) {
@@ -1540,7 +1543,10 @@ foam.CLASS({
             cs.push(foam.core.Constant.create({name: key, value: a[key]}));
           return cs;
         }
-        return a.map(prop.adaptArrayElement.bind(prop));
+        var b = new Array(a.length);
+        for ( var i = 0 ; i < a.length ; i++ )
+          b[i] = prop.adaptArrayElement(a[i]);
+        return b;
       }
     },
     {
