@@ -44,6 +44,8 @@
 var fs = require('fs');
 require("../js/core/load.js");
 
+var modelComments = {};
+
 var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   if ( node.properties ) {
     for (var i = 0; i < node.properties.length; ++i) {
@@ -119,13 +121,39 @@ var getComment = function getComment(node, filename) {
   return getLeadingComment(node);
 
 }
+var getDefinitionType = function getDefinitionType(node) {
+  if ( node.type === 'ObjectExpression' &&
+      node.parent && node.parent.type === 'CallExpression' &&
+      node.parent.callee && node.parent.callee.property ) {
+    var name = node.parent.callee.property.name;
+    if ( name == 'CLASS' || name == 'LIB' || name == 'INTERFACE' ) {
+      return name;
+    }
+  }
+  return '';
+}
+
 
 var getCLASSName = function getCLASSName(node) {
+  var defaultPkg = ( getDefinitionType(node) === 'LIB' ) ? 'foam.' : 'foam.core.';
   var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
-  return ( pkg ? pkg + '.' : 'foam/core.' ) + getNodePropertyNamed(node, 'name');
+  var name = getNodePropertyNamed(node, 'name');
+  if ( ! name ) {
+    var classRefines = getCLASSPath(node, 'refines');
+    if ( classRefines ) {
+      // name the model to match the one it refines
+      var i = classRefines.lastIndexOf('.');
+      if ( i > 0 ) {
+        name = classRefines.substring(i+1);
+        pkg = classRefines.substring(0, i);
+      }
+    }
+  }
+
+  return ( pkg ? pkg + '.' : defaultPkg ) + name;
 }
-var getCLASSExtends = function getCLASSExtends(node) {
-  var ext = getNodePropertyNamed(node, 'extends');
+var getCLASSPath = function getCLASSPath(node, name) {
+  var ext = getNodePropertyNamed(node, name);
   if (ext) {
     // replace package dots with module slashes
     ext = ext.replace(/\./g, '/');
@@ -192,7 +220,17 @@ var processArgs = function processArgs(e, node) {
   }
 }
 
-
+// Looks up existing results (already had their comment processed)
+var getResult = function getResult(parser, longname) {
+  // also update .description on a result, to change the output text.
+  if ( ! parser._resultBuffer ) return null;
+  var name = 'module:'+longname;
+  var rb = parser._resultBuffer;
+  for (var i = 0; i < rb.length; ++i) {
+    if ( rb[i].longname === name ) return rb[i];
+  }
+  return null;
+}
 
 var i = 0;
 exports.astNodeVisitor = {
@@ -204,23 +242,33 @@ exports.astNodeVisitor = {
     // TODO: generalize for listeners and other things.
 
     // CLASS or LIB
-    if (node.type === 'ObjectExpression' &&
-      node.parent && node.parent.type === 'CallExpression' &&
-      node.parent.callee && node.parent.callee.property &&
-      ( node.parent.callee.property.name == 'CLASS' ||
-        node.parent.callee.property.name == 'LIB' ||
-        node.parent.callee.property.name == 'INTERFACE' )
-    ) {
+    if ( getDefinitionType(node) ) {
+      var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, "name");
       var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') ||
-        (( node.parent.callee.property.name !== 'LIB' ) ? 'foam/core' : 'foam');
-      var classExt = getCLASSExtends(node);
+        (( defType !== 'LIB' ) ? 'foam/core' : 'foam');
+      var classExt = getCLASSPath(node, 'extends');
+
+      // If refining, just attach the comment to the original model
+      var classRefines = getCLASSPath(node, 'refines');
+      if ( classRefines ) {
+        if ( ! modelComments[classRefines] ) modelComments[classRefines] = {
+          _queue: [],
+          append: function append(str) {
+            this._queue.push(str);
+          }
+        };
+        modelComments[classRefines].append(getComment(node, currentSourceName));
+        return;
+      }
+
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node, currentSourceName),
         "\n@class " +
         ( ( classExt ) ? "\n@extends module:"+classExt : "") +
-        ( classPackage ? "\n@memberof! module:"+classPackage : "" )
+        ( classPackage ? "\n@memberof! module:"+classPackage : "" ) +
+        ""
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -232,7 +280,34 @@ exports.astNodeVisitor = {
       };
       e.event = "symbolFound";
       e.finishers = [parser.addDocletRef];
-      console.log("********",e.comment, className, classPackage);
+
+      // store for possible future refinements, incorporate existing refinement comments
+      if ( ! modelComments[classPackage + "." + className] )
+        modelComments[classPackage + "." + className] = { _queue: [] };
+      var mc = modelComments[classPackage + "." + className];
+      mc.e = e;
+      var oldAppend = mc.append = function(str) {
+        var clsIdx = mc.e.comment.lastIndexOf('@class'); // move tags to end
+        var trimmed = str.replace('*/', '').replace('/**', '');
+        mc.e.comment = mc.e.comment.substr(0, clsIdx) +
+           trimmed + '\n' +
+           mc.e.comment.substr(clsIdx);
+        mc.e.description += '\n'+trimmed;
+      };
+      for (var i=0; i<mc._queue.length; ++i) {
+        mc.append(mc._queue[i]);
+      }
+      mc._queue = [];
+      // in future, look up the result for this doclet
+      mc.append = function(str) {
+        var r = getResult(parser, (classPackage?classPackage:'foam.core')+'.'+className);
+        if (r) {
+          mc.e = r;
+          oldAppend(str);
+        }
+      };
+
+      //console.log("********",e.comment, className, classPackage);
 
     } // function in an array (methods, todo: listeners, etc)
     else if (node.type === 'FunctionExpression' &&

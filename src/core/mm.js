@@ -445,7 +445,7 @@ foam.CLASS({
   ]
 });
 
-
+/** Class/Prototype description. */
 foam.CLASS({
   package: 'foam.core',
   name: 'Model',
