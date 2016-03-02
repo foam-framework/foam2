@@ -99,7 +99,6 @@
 </ul>
 */
 
-console.profile('mm');
 foam.LIB({
   name: 'AbstractClass',
 
@@ -2021,8 +2020,6 @@ if ( foam.isServer ) {
 }
 
 foam.X = foam.core.Window.create({window: global}, foam).Y;
-
-console.profileEnd('mm');
 
 
 // JSON Support
