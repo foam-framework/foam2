@@ -1,3 +1,27 @@
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Proxy',
+  extends: 'Property',
+  properties: [ 'of' ],
+  methods: [
+    function installInClass(cls) {
+      this.SUPER(cls);
+
+      var delegate = foam.lookup(this.of);
+      var name = this.name;
+      var methods = delegate.getAxiomsByClass(foam.core.Method)
+          .filter(function(m) {
+            // TODO Is this the right check?
+            return delegate.hasOwnAxiom(m.name);
+          }).map(function(m) {
+            m = m.clone();
+            m.code = Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);");
+            cls.installAxiom(m);
+          });
+    }
+  ]
+});
+
 // TODO: Seems like there should be a better entry point for this.
 // In a ModelDAO scenario, we could auto generate the ProxyABC model
 // when requested if there isn't one already in the DAO.  Maybe we
@@ -84,25 +108,12 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxySink',
-  extends: 'foam.dao.Sink',
+  implements: ['foam.dao.Sink'],
   properties: [
-    'delegate'
-  ],
-  methods: [
-    function put(obj, sink, fc) {
-      this.delegate.put(obj, sink, fc);
-    },
-    function remove(obj, sink, fc) {
-      this.delegate.remove(obj, sink, fc);
-    },
-    function eof() {
-      this.delegate.eof();
-    },
-    function error(e) {
-      this.delegate.error(e);
-    },
-    function reset() {
-      this.delegate.reset();
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Sink',
+      name: 'delegate'
     }
   ]
 });
@@ -241,8 +252,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'limit',
-      defaultValue: Infinity
+      name: 'limit'
     },
     'orderBy',
     'where'
@@ -255,7 +265,8 @@ foam.CLASS({
     },
     function addLimit(l) {
       var o = this.cls_.create(this);
-      o.limit = Math.min(l, this.limit);
+      o.limit = this.hasOwnProperty('limit') ?
+        Math.min(l, this.limit) : l;
       return o;
     },
     function addOrderBy(o) {
@@ -530,6 +541,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxiesAxiom',
@@ -557,7 +569,13 @@ foam.CLASS({
     function skip(s) { return this.SUPER(s); },
     function limit(l) { return this.SUPER(l); }
   ],
-  proxies: 'foam.dao.DAO'
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.dao.DAO',
+      name: 'delegate'
+    }
+  ]
 });
 
 foam.CLASS({
@@ -832,7 +850,7 @@ foam.CLASS({
 TODO:
 -mlangs
 -internal vs external errors.
--Context aware?
+-Context oriented?
 
 -interface generated proxy didn't work for skip/limit/orderby.  I needed the abstract dao implementation
 
