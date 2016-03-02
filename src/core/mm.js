@@ -478,8 +478,10 @@ foam.CLASS({
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
+        // TODO: document
         return typeof o === 'string' ? foam.core.Property.create({name: o}) :
                Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
+               o.class               ? foam.lookup(o.class).create(o) :
                                        foam.lookup(this.of).create(o) ;
       }
     },
@@ -1552,13 +1554,7 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Property',
       name: 'properties',
-      adaptArrayElement: function(o) {
-        // TODO: document
-        return typeof o === 'string' ? foam.core.Property.create({name: o}) :
-               Array.isArray(o)      ? foam.core.Property.create({name: o[0], defaultValue: o[1]}) :
-               o.class               ? foam.lookup(o.class).create(o) :
-                                       foam.lookup(this.of).create(o) ;
-      }
+      adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
     {
       class: 'AxiomArray',
