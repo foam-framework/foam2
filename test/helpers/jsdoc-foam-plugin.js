@@ -212,7 +212,8 @@ exports.astNodeVisitor = {
         node.parent.callee.property.name == 'INTERFACE' )
     ) {
       var className = getNodePropertyNamed(node, "name");
-      var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') || 'foam/core';
+      var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') ||
+        (( node.parent.callee.property.name !== 'LIB' ) ? 'foam/core' : 'foam');
       var classExt = getCLASSExtends(node);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
