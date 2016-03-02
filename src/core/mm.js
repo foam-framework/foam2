@@ -324,6 +324,9 @@ foam.LIB({
     /** Start second phase of bootstrap process. */
     function phase2() {
       // Upgrade to final CLASS() definition.
+      /** Creates a Foam class from a plain-old-object definition.
+          @method CLASS
+          @memberof module:foam */
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
         model.validate();
