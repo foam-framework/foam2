@@ -258,6 +258,10 @@ foam.LIB({
 foam.LIB({
   name: 'boot',
 
+  constants: {
+    startTime: Date.now(),
+  },
+
   // documentation: 'Bootstrap support, discarded after use.',
 
   methods: [
@@ -356,6 +360,8 @@ foam.LIB({
       }
 
       delete foam['boot'];
+
+      console.log('core boot time: ', Date.now() - this.startTime);
     }
   ]
 });
