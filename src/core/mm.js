@@ -131,6 +131,10 @@ foam.LIB({
       that only knows how to install axioms.
     */
     function installModel(m) {
+      if ( m.axioms_ )
+        for ( var i = 0 ; i < m.axioms_.length ; i++ )
+          this.installAxiom(m.axioms_[i]);
+
       if ( m.methods )
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
@@ -333,17 +337,17 @@ foam.LIB({
         m.refines = m.id;
         foam.CLASS(m);
       }
+    },
+
+    /** Finish the bootstrap process, deleting foam.boot when done. */
+    function end() {
+      var Model = foam.core.Model;
 
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
         for ( var i = 0 ; i < m.axioms_.length ; i++ )
           this.installAxiom(m.axioms_[i]);
       };
-    },
-
-    /** Finish the bootstrap process, deleting foam.boot when done. */
-    function end() {
-      var Model = foam.core.Model;
 
       // Update psedo-Models to real Models
       for ( var key in foam.core ) {
@@ -824,7 +828,6 @@ foam.CLASS({
     [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
-        // TODO: make faster
         return a.map(prop.adaptArrayElement.bind(prop));
       }
     ],
@@ -1526,7 +1529,6 @@ foam.CLASS({
             cs.push(foam.core.Constant.create({name: key, value: a[key]}));
           return cs;
         }
-        // TODO: make faster
         return a.map(prop.adaptArrayElement.bind(prop));
       }
     },
