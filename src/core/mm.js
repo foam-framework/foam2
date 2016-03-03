@@ -410,13 +410,7 @@ foam.CLASS({
       instance variables.  Things like listeners and topics.
     */
     function setPrivate_(name, value) {
-      if ( ! this.private_ ) {
-        Object.defineProperty(this, 'private_', {
-          value: {},
-          ennumerable: false
-        });
-      }
-      this.private_[name] = value;
+      ( this.private_ || ( this.private_ = {} ) )[name] = value;
       return value;
     },
 
