@@ -439,7 +439,9 @@ foam.LIB({
     },
 
     register: function(cls) {
-      cache = {};
+      cache[cls.id] = cls;
+      if ( cls.package === 'foam.core' )
+        cache[cls.name] = cls;
       var path = cls.id.split('.');
       var root = ROOT;
       for ( var i = 0 ; i < path.length-1 ; i++ ) {
