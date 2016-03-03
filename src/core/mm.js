@@ -145,12 +145,16 @@ foam.LIB({
       if ( foam.core.Property && m.properties )
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
+
           if ( Array.isArray(a) )
             m.properties[i] = a = { name: a[0], defaultValue: a[1] };
           else if ( typeof a === 'string' )
             m.properties[i] = a = { name: a };
+
           var type = foam.lookup(a.class) || foam.core.Property;
-          this.installAxiom(type.create(a));
+          if ( type !== a.cls_ ) a = type.create(a);
+
+          this.installAxiom(a);
         }
     },
 
@@ -388,13 +392,12 @@ foam.CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      for ( var key in args )
-        if ( key.indexOf('_') == -1 )
-          this[key] = args[key];
+      if ( args.originalArgs_ )
+        args = args.originalArgs_;
+      else
+        this.originalArgs_ = args;
 
-      if ( args.instance_ )
-        for ( var key in args.instance_ )
-          this[key] = args[key];
+      for ( var key in args ) this[key] = args[key];
     },
 
     function hasOwnProperty(name) {
