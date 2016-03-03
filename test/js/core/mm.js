@@ -383,8 +383,8 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
   beforeEach(function() {
     foam.CLASS({
-      name: 'Person',
       package: 'test',
+      name: 'Person',
       constants: [
         {
           name: 'KEY',
@@ -415,9 +415,9 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     person = test.Person.create({name: 'Adam', age: 0});
 
     foam.CLASS({
+      package: 'test',
       name: 'Employee',
       extends: 'test.Person',
-      package: 'test',
       properties: [
         {
           name: 'salary'
