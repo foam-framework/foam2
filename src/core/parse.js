@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-{ /* for docs only */ }
 
 
 foam.CLASS({

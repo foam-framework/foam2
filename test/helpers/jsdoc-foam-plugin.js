@@ -237,7 +237,6 @@ var checkForPackageModule = function checkForPackageModule(parser, pkg) {
   var existing = getResult(parser, pkg);
 
   if ( ! existing ) {
-    console.log("adding", pkg);
     parser._resultBuffer.push(
       {
         comment: '/**\n @module'+pkg+'\n */',
