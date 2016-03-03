@@ -421,8 +421,6 @@ foam.LIB({
 
   var ROOT = global;
 
-  // TODO: more sophisticated caching will be required
-  // once we can register models.
   var lookup_ = foam.fn.memoize1(function lookup_(id) {
     var path = id.split('.');
     var root = ROOT;
@@ -432,8 +430,10 @@ foam.LIB({
   });
 
   var X = {
+    // TODO: more sophisticated caching will be required
+    // once we can register models.
     lookup: function(id) {
-      return id && ( lookup_('foam.core.' + id) || lookup_(id) );
+      return id && ( foam.core[id] || lookup_(id) );
     },
 
     register: function(cls) {
