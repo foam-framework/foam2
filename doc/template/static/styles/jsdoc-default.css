@@ -79,16 +79,20 @@ tt, code, kbd, samp {
 #wrap {
   height: 100vh;
   display: flex;
+  display: -webkit-flex;
 }
 
 #wrap-inner {
   flex: 1;
+  -webkit-flex: 1;
   display: flex;
+  display: -webkit-flex;
 }
 
 #main {
   overflow-y: auto;
   flex-basis: 70%;
+  -webkit-flex-basis: 70%;
 }
 
 article dl {
@@ -124,6 +128,7 @@ nav
     padding: 2em;
     overflow-y: auto;
     flex-basis: 30%;
+    -webkit-flex-basis: 30%;
 }
 
 nav ul {
