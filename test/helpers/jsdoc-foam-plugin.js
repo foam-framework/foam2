@@ -264,6 +264,11 @@ exports.astNodeVisitor = {
 
     // TODO: generalize for listeners and other things.
 
+    // JSDoc hax:
+    // For already generated items in the parser._resultBuffer, we can
+    // look them up and modify the generated .comment (raw) and .description
+    // (what ends up in the output template).
+
     // CLASS or LIB
     if ( getDefinitionType(node) ) {
       var defType = getDefinitionType(node);
