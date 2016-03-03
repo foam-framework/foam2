@@ -260,7 +260,7 @@ foam.CLASS({
     },
     {
       name: 'arr',
-      class: 'Array'
+      factory: function() { return []; }
     }
   ],
   methods: [
@@ -550,7 +550,7 @@ foam.CLASS({
   properties: [
     {
       name: 'array',
-      class: 'Array'
+      factory: function() { return []; }
     }
   ],
   methods: [
