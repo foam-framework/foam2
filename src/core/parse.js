@@ -89,10 +89,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserArray',
-  extends: 'Property',
+  extends: 'Array',
 
   properties: [
-    [ 'factory', function() { return []; } ],
+    [ 'of', 'foam.parsers.Parser' ],
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
         var b = new Array(a.length);
