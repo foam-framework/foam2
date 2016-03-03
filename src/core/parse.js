@@ -102,13 +102,7 @@ foam.CLASS({
               a[i];
         return b;
       }
-    ],
-    {
-      name: 'adaptArrayElement',
-      defaultValue: function(a) {
-        return
-      }
-    }
+    ]
   ]
 })
 
