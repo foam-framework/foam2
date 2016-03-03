@@ -399,9 +399,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParsersAxiom',
-  extends: 'Property',
+  extends: 'AxiomArray',
 
   properties: [
+    [ 'of', 'foam.parsers.ParserAxiom' ],
     {
       name: "anyChar",
       getter: function() { return foam.parsers.AnyChar.create(); }
@@ -446,9 +447,7 @@ foam.CLASS({
         }
         return a;
       }
-    },
-    [ 'factory', function() { return []; } ],
-    [ 'postSet', function(_, a) { this.axioms_.push.apply(this.axioms_, a); } ]
+    }
   ],
 
   methods: [
