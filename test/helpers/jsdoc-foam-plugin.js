@@ -359,7 +359,7 @@ exports.astNodeVisitor = {
       };
 
       //console.log("++++++++++++++++++", parser._resultBuffer);
-      console.log("********",e.comment, className, classPackage);
+      //console.log("********",e.comment, className, classPackage);
 
     } // function in an array (methods, todo: listeners, etc)
     else if (node.type === 'FunctionExpression' &&
