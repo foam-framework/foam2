@@ -89,15 +89,24 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParserArray',
-  extends: 'Array',
+  extends: 'Property',
 
   properties: [
+    [ 'factory', function() { return []; } ],
+    [ 'adapt', function(_, a, prop) {
+        if ( ! a ) return [];
+        var b = new Array(a.length);
+        for ( var i = 0 ; i < a.length ; i++ )
+          b[i] = typeof a[i] === 'string' ?
+              foam.parsers.Literal.create({s: a[i]}) :
+              a[i];
+        return b;
+      }
+    ],
     {
       name: 'adaptArrayElement',
       defaultValue: function(a) {
-        return typeof(a) === 'string' ?
-          foam.parsers.Literal.create({ s: a }) :
-          a;
+        return
       }
     }
   ]
@@ -396,7 +405,57 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parsers',
   name: 'ParsersAxiom',
-  extends: 'AxiomArray',
+  extends: 'Property',
+
+  properties: [
+    {
+      name: "anyChar",
+      getter: function() { return foam.parsers.AnyChar.create(); }
+    },
+    {
+      name: 'adapt',
+      defaultValue: function(_, o, prop) {
+        if ( Array.isArray(o) ) return o;
+
+        if ( typeof o === "function" ) {
+          var args = o.toString().match(/\((.*?)\)/);
+          if ( ! args ) {
+            throw "Could not parse arguments from parser factory function";
+          }
+
+          args = args[1].split(",").map(function(a) { return a.trim(); });
+          for ( var i = 0 ; i < args.length; i++ ) {
+            if ( prop[args[i]] ) args[i] = prop[args[i]];
+            else {
+              var cls = foam.lookup(args[i]) || foam.lookup('foam.parsers.' + args[i]);
+              if ( ! cls ) {
+                throw "Could not find class for " + args[i];
+              }
+
+              args[i] = (function(cls) {
+                return function(args) {
+                  return cls.create(args);
+                };
+              })();
+            }
+          }
+
+          o = o.apply(null, args);
+        }
+
+        var a = [];
+        for ( var key in o ) {
+          a.push(foam.lookup('foam.parsers.ParserAxiom').create({
+            name: key,
+            parser: o[key]
+          }));
+        }
+        return a;
+      }
+    },
+    [ 'factory', function() { return []; } ],
+    [ 'postSet', function(_, a) { this.axioms_.push.apply(this.axioms_, a); } ]
+  ],
 
   methods: [
     function seq() {
@@ -466,54 +525,6 @@ foam.CLASS({
         s: s,
         value: value
       });
-    }
-  ],
-
-  properties: [
-    {
-      name: "anyChar",
-      getter: function() { return foam.parsers.AnyChar.create(); }
-    },
-    {
-      name: 'adapt',
-      defaultValue: function(_, o, prop) {
-        if ( Array.isArray(o) ) return o;
-
-        if ( typeof o === "function" ) {
-          var args = o.toString().match(/\((.*?)\)/);
-          if ( ! args ) {
-            throw "Could not parse arguments from parser factory function";
-          }
-
-          args = args[1].split(",").map(function(a) { return a.trim(); });
-          for ( var i = 0 ; i < args.length; i++ ) {
-            if ( prop[args[i]] ) args[i] = prop[args[i]];
-            else {
-              var cls = foam.lookup(args[i]) || foam.lookup('foam.parsers.' + args[i]);
-              if ( ! cls ) {
-                throw "Could not find class for " + args[i];
-              }
-
-              args[i] = (function(cls) {
-                return function(args) {
-                  return cls.create(args);
-                };
-              })();
-            }
-          }
-
-          o = o.apply(null, args);
-        }
-
-        var a = [];
-        for ( var key in o ) {
-          a.push(foam.lookup('foam.parsers.ParserAxiom').create({
-            name: key,
-            parser: o[key]
-          }));
-        }
-        return a;
-      }
     }
   ]
 });

@@ -843,7 +843,7 @@ foam.CLASS({
   // documentation: "A Property which contains an array of 'of' objects.",
 
   properties: [
-    'of',
+    { name: 'of', required: true },
     [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
