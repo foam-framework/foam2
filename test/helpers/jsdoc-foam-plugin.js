@@ -232,6 +232,29 @@ var getResult = function getResult(parser, longname) {
   return null;
 }
 
+var checkForPackageModule = function checkForPackageModule(parser, pkg) {
+
+  var existing = getResult(parser, pkg);
+
+  if ( ! existing ) {
+    console.log("adding", pkg);
+    parser._resultBuffer.push(
+      {
+        comment: '/**\n @module'+pkg+'\n */',
+//         meta:
+//         { range: [Object],
+//          filename: 'mm.js',
+//          lineno: 18,
+//          path: '/usr/local/google/home/jacksonic/foam2/vjlofvhjfgm/src/core',
+//          code: {} },
+        kind: 'module',
+        name: pkg,
+        longname: 'module:'+pkg
+      }
+    );
+  }
+}
+
 var i = 0;
 exports.astNodeVisitor = {
   visitNode: function(node, e, parser, currentSourceName) {
@@ -248,6 +271,9 @@ exports.astNodeVisitor = {
       var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') ||
         (( defType !== 'LIB' ) ? 'foam/core' : 'foam');
       var classExt = getCLASSPath(node, 'extends');
+
+      // check if the package exists as a module yet, create one if necessary
+      checkForPackageModule(parser, classPackage);
 
       // If refining, just attach the comment to the original model
       var classRefines = getCLASSPath(node, 'refines');
@@ -307,6 +333,7 @@ exports.astNodeVisitor = {
         }
       };
 
+      //console.log("++++++++++++++++++", parser._resultBuffer);
       //console.log("********",e.comment, className, classPackage);
 
     } // function in an array (methods, todo: listeners, etc)

@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-/**
- @module foam/dao
- */
+
 { /* for docs only */ }
 
 foam.CLASS({

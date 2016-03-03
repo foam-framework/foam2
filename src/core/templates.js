@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-/**
- @module foam/templates
- */
+
 { /* for docs only */ }
 
 foam.CLASS({
