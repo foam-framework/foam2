@@ -126,7 +126,7 @@ var getDefinitionType = function getDefinitionType(node) {
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property ) {
     var name = node.parent.callee.property.name;
-    if ( name == 'CLASS' || name == 'LIB' || name == 'INTERFACE' ) {
+    if ( name == 'CLASS' || name == 'LIB' ) {
       return name;
     }
   }

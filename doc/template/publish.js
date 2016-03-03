@@ -29,8 +29,21 @@ function tutoriallink(tutorial) {
     return helper.toTutorial(tutorial, null, { tag: 'em', classname: 'disabled', prefix: 'Tutorial: ' });
 }
 
-function getAncestorLinks(doclet) {
-    return helper.getAncestorLinks(data, doclet);
+function getAncestorLinks(doclet, cssClass) {
+    //return helper.getAncestorLinks(data, doclet);
+    var ancestors = helper.getAncestors(data, doclet);
+    var links = [];
+    ancestors.forEach(function(ancestor) {
+        var linkText = (helper.scopeToPunc[ancestor.scope] || '') + ancestor.name;
+        var link = linkto(ancestor.longname, linkText.replace(/\//g,'.'), cssClass);
+        links.push(link);
+    });
+
+    if (links.length) {
+        links[links.length - 1] += (helper.scopeToPunc[doclet.scope] || '');
+    }
+
+    return links;
 }
 
 function hashToLink(doclet, hash) {
@@ -306,7 +319,8 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                 } else {
                     displayName = item.name;
                 }
-                itemsNav += '<li>' + linktoFn(item.longname, displayName.replace(/\b(module|event):/g, '')) + '</li>';
+                itemsNav += '<li>' + linktoFn(item.longname,
+                  displayName.replace(/\b(module|event):/g, '').replace(/\//g,'.')) + '</li>';
 
                 itemsSeen[item.longname] = true;
             }
@@ -347,7 +361,7 @@ function buildNav(members) {
     var seen = {};
     var seenTutorials = {};
 
-    nav += buildMemberNav(members.modules, 'Modules', {}, linkto);
+    nav += buildMemberNav(members.modules, 'Packages', {}, linkto);
     nav += buildMemberNav(members.externals, 'Externals', seen, linktoExternal);
     nav += buildMemberNav(members.classes, 'Classes', seen, linkto);
     nav += buildMemberNav(members.events, 'Events', seen, linkto);
@@ -596,7 +610,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     Object.keys(helper.longnameToUrl).forEach(function(longname) {
         var myModules = helper.find(modules, {longname: longname});
         if (myModules.length) {
-            generate('Module: ' + myModules[0].name, myModules, helper.longnameToUrl[longname]);
+            generate('Package: ' + myModules[0].name.replace(/\//g,'.'), myModules, helper.longnameToUrl[longname]);
         }
 
         var myClasses = helper.find(classes, {longname: longname});
