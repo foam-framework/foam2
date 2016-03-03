@@ -17,7 +17,6 @@
 
 /**
  * Top-Level of foam package
- * @exports foam
  */
 foam = {
   isServer: typeof process === 'object',
@@ -35,7 +34,32 @@ if ( ! foam.isServer ) global = this;
 
 
 /**
- * A LIB is a collection of static constants, properties and functions.
+ * Creates a small library in the foam package. A LIB is a collection of static constants,
+ * properties and functions. It can also add properties to a core javascript
+ * object when you specify name: 'Array', 'Function', 'Number', 'Object',
+ * 'String', or 'Date'.
+ * <pre>
+foam.LIB({
+  name: 'network',
+  properties: [ { name: 'packets' } ],
+  methods: [ function sendPacket() { ... }  ]
+});
+</pre>
+Produces <code>foam.network</code>:
+<pre>
+foam.network.packets = 4;
+foam.network.sendPacket();
+</pre>
+Or add methods and properties to built-in types (avoid this usage if you can):
+<pre>
+foam.LIB({
+  name: 'Number',
+  methods: [ function plusOne() { this += 1; } ]
+});
+console.assert(9.plusOne() == 10, "It works!");
+</pre>
+ * @method LIB
+ * @memberof module:foam
  */
 foam.LIB = function LIB(model) {
   var proto;
@@ -73,15 +97,16 @@ foam.LIB = function LIB(model) {
 };
 
 
-/*
- * Add Unique Identifiers (UIDs) to all Objects.
- * UID's are created when first accessed.
- */
+/** Object prototype additions. */
 foam.LIB({
   name: 'Object',
 
   properties: [
     {
+      /**
+       * Add Unique Identifiers (UIDs) to all Objects.
+       * UID's are created when first accessed.
+       */
       name: '$UID',
       getter: (function() {
         var id = 1;
@@ -97,6 +122,7 @@ foam.LIB({
 });
 
 
+/** Number prototype additions. */
 foam.LIB({
   name: 'Number',
 
@@ -106,6 +132,7 @@ foam.LIB({
 });
 
 
+/** String prototype additions. */
 foam.LIB({
   name: 'String',
 
@@ -129,6 +156,7 @@ foam.LIB({
 });
 
 
+/** Array prototype additions. */
 foam.LIB({
   name: 'Array',
   methods: [
@@ -165,6 +193,7 @@ foam.LIB({
   ]
 });
 
+/** Date prototype additions. */
 foam.LIB({
   name: 'Date',
   methods: [
