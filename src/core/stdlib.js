@@ -289,6 +289,12 @@ foam.LIB({
       if ( ! a || ! b ) return false;
       if ( a.equals ) return a.equals(b);
       return a == b;
+    },
+    function compare(a, b) {
+      if ( a.compareTo ) return a.compareTo(b);
+      if ( b.compareTo ) return - b.compareTo(a);
+      if ( foam.util.equals(a, b) ) return 0;
+      return a.$UID.compareTo(b.$UID);
     }
   ]
 });
