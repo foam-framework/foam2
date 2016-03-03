@@ -133,10 +133,29 @@ var getDefinitionType = function getDefinitionType(node) {
   return '';
 }
 
+var getCLASSPackage = function getCLASSPackage(node) {
+
+  var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
+  if ( ! pkg ) pkg = ( getDefinitionType(node) === 'LIB' ) ? 'foam' : 'foam/core';
+
+  // special cases
+  if ( pkg === 'foam' ) {
+    var name = getNodePropertyNamed(node, 'name');
+    if (
+      name === 'Array' ||
+      name === 'Function' ||
+      name === 'Number' ||
+      name === 'Object' ||
+      name === 'String' ||
+      name === 'Date'
+    ) {
+      return '';
+    }
+  }
+  return pkg;
+}
 
 var getCLASSName = function getCLASSName(node) {
-  var defaultPkg = ( getDefinitionType(node) === 'LIB' ) ? 'foam.' : 'foam.core.';
-  var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
   var name = getNodePropertyNamed(node, 'name');
   if ( ! name ) {
     var classRefines = getCLASSPath(node, 'refines');
@@ -149,8 +168,9 @@ var getCLASSName = function getCLASSName(node) {
       }
     }
   }
+  var pkg = getCLASSPackage(node);
 
-  return ( pkg ? pkg + '.' : defaultPkg ) + name;
+  return ( pkg ? 'module:' + pkg + '.' : '' ) + name;
 }
 var getCLASSPath = function getCLASSPath(node, name) {
   var ext = getNodePropertyNamed(node, name);
@@ -234,6 +254,8 @@ var getResult = function getResult(parser, longname) {
 
 var checkForPackageModule = function checkForPackageModule(parser, pkg) {
 
+  if ( ! pkg ) return;
+
   var existing = getResult(parser, pkg);
 
   if ( ! existing ) {
@@ -272,8 +294,7 @@ exports.astNodeVisitor = {
     if ( getDefinitionType(node) ) {
       var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, "name");
-      var classPackage = getNodePropertyNamed(node, "package").replace(/\./g, '/') ||
-        (( defType !== 'LIB' ) ? 'foam/core' : 'foam');
+      var classPackage = getCLASSPackage(node);
       var classExt = getCLASSPath(node, 'extends');
 
       // check if the package exists as a module yet, create one if necessary
@@ -297,7 +318,7 @@ exports.astNodeVisitor = {
         getComment(node, currentSourceName),
         "\n@class " +
         ( ( classExt ) ? "\n@extends module:"+classExt : "") +
-        ( classPackage ? "\n@memberof! module:"+classPackage : "" ) +
+        (classPackage ? "\n@memberof! module:"+classPackage : "\n@global") +
         ""
       );
       e.lineno = node.parent.loc.start.line;
@@ -350,7 +371,8 @@ exports.astNodeVisitor = {
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node, currentSourceName),
-        "\n@method \n@memberof! module:"+parentClass + ".prototype"
+        "\n@method" +
+        "\n@memberof! "+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
@@ -377,7 +399,7 @@ exports.astNodeVisitor = {
       e.comment = insertIntoComment(
         getComment(node.properties[0], currentSourceName) || getComment(node, currentSourceName),
         (( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "") +
-          "\n@memberof! module:"+parentClass + ".prototype"
+          "\n@memberof! "+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
