@@ -612,6 +612,8 @@ foam.CLASS({
   methods: [
     function put(o) {
       this.a.push(o);
+    },
+    function eof() {
     }
   ]
 });
@@ -621,8 +623,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
-
-  requires: [ 'foam.dao.ArraySink' ],
+  requires: [
+    'foam.dao.ArraySink',
+  ],
 
   properties: [
     {
