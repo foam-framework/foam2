@@ -1160,7 +1160,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInClass(cls) { cls.installModel(foam.lookup(this.path).model_); }
+    function installInClass(cls) {
+      var m = foam.lookup(this.path);
+      if ( ! m ) throw 'No such interface or trait: ' + this.path;
+      cls.installModel(m.model_);
+    }
   ]
 });
 
