@@ -29,6 +29,9 @@ html
     overflow: auto;
     background-color: #fff;
     font-size: 14px;
+    height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 body
@@ -37,6 +40,9 @@ body
     line-height: 1.5;
     color: #4d4e53;
     background-color: white;
+    height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 a, a:visited, a:active {
@@ -69,9 +75,20 @@ tt, code, kbd, samp {
     margin: 0;
 }
 
+
+#wrap {
+  height: 100vh;
+  display: flex;
+}
+
+#wrap-inner {
+  flex: 1;
+  display: flex;
+}
+
 #main {
-    float: left;
-    width: 70%;
+  overflow-y: auto;
+  flex-basis: 70%;
 }
 
 article dl {
@@ -98,15 +115,15 @@ section
     font-weight: lighter;
 }
 
+
+
 nav
 {
-    display: block;
-    float: right;
-    margin-top: 28px;
-    width: 30%;
     box-sizing: border-box;
     border-left: 1px solid #ccc;
-    padding-left: 16px;
+    padding: 2em;
+    overflow-y: auto;
+    flex-basis: 30%;
 }
 
 nav ul {
