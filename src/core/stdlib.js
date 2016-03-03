@@ -422,6 +422,8 @@ foam.LIB({
   var ROOT = global;
 
   var lookup_ = function lookup_(id) {
+    var a = foam.core[id];
+    if ( a ) return a;
     var path = id.split('.');
     var root = ROOT;
     for ( var i = 0 ; root && i < path.length ; i++ )
@@ -429,12 +431,15 @@ foam.LIB({
     return root;
   };
 
+  var cache = {};
+
   var X = {
     lookup: function(id) {
-      return id && ( foam.core[id] || lookup_(id) );
+      return id && ( cache[id] || ( cache[id] = lookup_(id) ) );
     },
 
     register: function(cls) {
+      cache = {};
       var path = cls.id.split('.');
       var root = ROOT;
       for ( var i = 0 ; i < path.length-1 ; i++ ) {
