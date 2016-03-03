@@ -612,8 +612,6 @@ foam.CLASS({
   methods: [
     function put(o) {
       this.a.push(o);
-    },
-    function eof() {
     }
   ]
 });
