@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-/**
- @module foam/core
- */
+
 { /* for docs only */ }
 
 /**

@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-/**
- @module foam/mlang
- */
+
 { /* for docs only */ }
 
 
