@@ -291,6 +291,10 @@ foam.LIB({
       return a == b;
     },
     function compare(a, b) {
+      if ( typeof a === 'number' && typeof b === 'number' )
+        return a < b ? -1 : a > b ? 1 : 0;
+      if ( typeof a === 'string' && typeof b === 'string' )
+        return a < b ? -1 : a > b ? 1 : 0;
       if ( a.compareTo ) return a.compareTo(b);
       if ( b.compareTo ) return - b.compareTo(a);
       if ( foam.util.equals(a, b) ) return 0;
