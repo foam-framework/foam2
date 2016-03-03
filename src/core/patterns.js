@@ -16,7 +16,6 @@
  */
 
 
-{ /* for docs only */ }
 
 foam.CLASS({
   package: 'foam.pattern',

@@ -16,7 +16,6 @@
  */
 
 
-{ /* for docs only */ }
 
 /**
  FOAM Bootstrap
