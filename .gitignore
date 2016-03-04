@@ -3,3 +3,4 @@ npm-debug.log
 server.bat
 *~
 coverage
+doc/gen/*

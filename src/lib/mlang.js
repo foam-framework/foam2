@@ -41,6 +41,10 @@ foam.CLASS({
   extends: 'Array',
   properties: [
     {
+      name: 'of',
+      defaultValue: 'foam.mlang.Expr'
+    },
+    {
       name: 'adaptArrayElement',
       defaultValue: function(o) {
         if ( typeof o !== "object" ) return foam.mlang.ConstantExpr.create({ value: o });

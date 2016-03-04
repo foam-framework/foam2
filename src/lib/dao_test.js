@@ -1,3 +1,4 @@
+
 foam.CLASS({
   name: 'Abc',
   properties: [
@@ -13,7 +14,12 @@ foam.CLASS({
 
 var dao = foam.dao.ArrayDAO.create({ array: [] });
 
-dao.put(Abc.create({ id: 1 }));
+dao.put(Abc.create({ id: 1 })).then(function(a) {
+  console.log("Put wrapper"); return a;
+}, null).then(function(o) {
+  console.log("Put", o.id);
+  dao.put(Abc.create({ id: o.id, foo: 12 }));
+});
 dao.put(Abc.create({ id: 2 }));
 dao.put(Abc.create({ id: 3 }));
 dao.put(Abc.create({ id: 4 }));
@@ -115,8 +121,10 @@ foam.CLASS({
 });
 DaoTest.create({ dao: dao }).go();
 
-dao.onPut.subscribe(function(_, _, o) { console.log("On put", o.id); });
-dao.onRemove.subscribe(function(_,_, o) { console.log("On remove", o.id); });
+dao.on.subscribe(function(_, _, type, o) { console.log("On event", type, o && o.id); });
+dao.on.remove.subscribe(function(_,_,_,o) { console.log("On remove", o.id); });
+
 
 dao.removeAll();
 dao.put(Abc.create({ id: 4 }));
+dao.remove(12).then(console.log.bind(console, "Removed 12"), console.error.bind(console, "Error removing 12"));

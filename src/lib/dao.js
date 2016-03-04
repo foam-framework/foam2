@@ -15,7 +15,16 @@
  * limitations under the License.
  */
 
-
+// TODO: This should probably be in core.
+foam.CLASS({
+  name: 'MethodArguments',
+  refines: 'Method',
+  properties: [
+    {
+      name: 'args'
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -109,83 +118,6 @@ foam.CLASS({
     },
     {
       name: 'limit'
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'Promise',
-  properties: [
-    {
-      name: 'value',
-      final: true,
-      postSet: function() { this.resolved = true; this.maybeResolve_(); }
-    },
-    {
-      name:'error',
-      final: true,
-      postSet: function() { this.resolved = true; this.maybeResolve_(); }
-    },
-    {
-      name: 'resolved',
-      final: true,
-      defaultValue: false
-    }
-  ],
-  topics: [
-    'success',
-    'failure'
-  ],
-  methods: [
-    function maybeResolve_() {
-      if ( ! this.resolved ) return;
-      if ( this.hasOwnProperty('value') )
-        this.success.publish(this.value);
-      else
-        this.failure.publish(this.error);
-    },
-    function resolve(value) {
-      if ( value === this ) {
-        this.error = new TypeError("Resolved promise with itself");
-      } else if ( value && value.then ) {
-        var self = this;
-        value.then(function(a) {
-          self.resolve(a);
-        }, function(a) {
-          self.error = a;
-        });
-      } else {
-        this.value = value;
-      }
-    },
-    function then(success, fail) {
-      var self = this;
-      var next = this.cls_.create();
-
-      if ( success ) this.success.subscribe(function(s, _, v) {
-        s.destroy();
-        next.resolve(success(v));
-      });
-
-      if ( fail ) this.failure.subscribe(function(s, _, v) {
-        s.destroy();
-        next.resolve(fail(v));
-      });
-
-      this.maybeResolve_();
-      return next;
-    }
-  ]
-});
-
-// TODO: This should probably be in core.
-foam.CLASS({
-  name: 'MethodArguments',
-  refines: 'Method',
-  properties: [
-    {
-      name: 'args'
     }
   ]
 });
@@ -328,7 +260,7 @@ foam.CLASS({
     },
     {
       name: 'arr',
-      class: 'Array'
+      factory: function() { return []; }
     }
   ],
   methods: [
@@ -360,6 +292,40 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Exception',
+  properties: [
+    'message'
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'InternalException',
+  extends: 'Exception'
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ExternalException',
+  extends: 'Exception'
+})
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ObjectNotFoundException',
+  extends: 'foam.dao.ExternalException',
+  properties: [
+    'id',
+    {
+      name: 'message',
+      expression: function(id) { return "No record found for id: " + id; }
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
@@ -367,7 +333,8 @@ foam.CLASS({
   requires: [
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
-    'foam.dao.Promise',
+    'foam.dao.ObjectNotFoundException',
+    'foam.promise.Promise',
     'foam.dao.FlowControl',
     'foam.dao.LimitedSink',
     'foam.dao.SkipSink',
@@ -379,9 +346,16 @@ foam.CLASS({
     'foam.dao.LimitedDAO'
   ],
   topics: [
-    'onPut',
-    'onRemove'
+    {
+      name: 'on',
+      topics: [
+        'put',
+        'remove',
+        'reset'
+      ]
+    }
   ],
+  properties: ['of'],
   methods: [
     {
       name: 'where',
@@ -576,38 +550,22 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core',
-  name: 'Exception',
-  properties: [
-    'message'
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'InternalException',
-  extends: 'Exception'
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'ExternalException',
-  extends: 'Exception'
-})
-
-foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       name: 'array',
-      class: 'Array'
+      factory: function() { return []; }
     }
   ],
   methods: [
+    function listen(sink, options) {
+    },
     function put(obj, sink) {
+      sink = sink || this.Promise.create();
       var promise = this.Promise.create();
+      promise.fulfill(sink);
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(obj.id, this.array[i].id) ) {
@@ -617,29 +575,34 @@ foam.CLASS({
       }
 
       if ( i == this.array.length ) this.array.push(obj);
-      promise.value = obj;
-
-      this.onPut.publish(obj);
+      sink.put(obj);
+      this.on.put.publish(obj);
 
       return promise;
     },
     function remove(obj, sink) {
-      var promise = this.Promise.create({ value: '' });
+      sink = sink || this.Promise.create();
+      var promise = this.Promise.create();
+      promise.fulfill(sink);
 
       var id = obj.id ? obj.id : obj;
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
-          var o2 = this.array.splice(i, 1);
-          break;
+          var o2 = this.array.splice(i, 1)[0];
+          sink.remove(o2);
+          this.on.remove.publish(o2);
+          return promise;
         }
       }
 
-      this.onRemove.publish(o2[0] || obj);
-
+      var err = this.ObjectNotFoundException.create({ id: id });
+      sink.error(err);
       return promise;
     },
     function select(sink, options) {
+      var resultSink = sink || this.ArraySink.create();
+
       sink = this.decorateSink_(sink || this.ArraySink.create(), options);
 
       var promise = this.Promise.create();
@@ -649,7 +612,7 @@ foam.CLASS({
         if ( fc.stopped ) break;
         if ( fc.errorEvt ) {
           sink.error(fc.errorEvt);
-          promise.error = fc.errorEvt;
+          promise.reject(fc.errorEvt);
           return promise;
         }
 
@@ -658,15 +621,10 @@ foam.CLASS({
 
       sink.eof();
 
-      promise.value = sink;
+      promise.fulfill(resultSink);
       return promise;
     },
     function removeAll(sink, options) {
-      if ( ! sink && ( ! options || ! options.where ) ) {
-        this.array = [];
-        return this.Promise.create({ value: '' });
-      }
-
       // TODO: Require TrueExpr when ordering is fixed or we have
       // better lazy loading
       var predicate = ( options && options.where ) || foam.mlang.TrueExpr.create();
@@ -676,29 +634,31 @@ foam.CLASS({
           var obj = this.array.splice(i, 1);
           i--;
           sink && sink.remove(obj);
-          this.onRemove.publish(obj);
+          this.on.remove.publish(obj);
         }
       }
 
       sink && sink.eof();
 
-      return this.Promise.create({ value: sink || '' });
+      var promise = this.Promise.create();
+      promise.fulfill(sink || '');
+
+      return promise;
     },
     function find(id) {
+      var promise = this.Promise.create();
+
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
-          return this.Promise.create({ value: this.array[i] });
+          promise.fulfill(this.array[i]);
+          return promise;
         }
       }
 
-      return this.Promise.create({ error: this.ExternalException.create({ message: 'No record for ' + id }) });
+      promise.reject(this.ObjectNotFoundException.create({ id: id }));
+      return promise;
     }
   ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'IDBDAO'
 });
 
 /*

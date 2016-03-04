@@ -368,7 +368,6 @@ foam.LIB({
   ]
 });
 
-
 foam.boot.start();
 
 /** The implicit base model for the model heirarchy. If you do not
@@ -1177,7 +1176,7 @@ foam.CLASS({
             if ( ! model )
               console.error('Unknown class: ' + path);
 
-            var cls = Object.create(foam.lookup(path));
+            var cls = Object.create(model);
             cls.create = function(args, X) { return model.create(args, X || parent); };
             this.setPrivate_(as, cls);
           }
@@ -1329,25 +1328,50 @@ foam.CLASS({
 
   // documentation: 'Topic Axiom',
 
-  properties: [ 'name', 'description' ],
+  properties: [
+    'name',
+    'description',
+    {
+      class: 'Array',
+      of: 'Topic',
+      name: 'topics',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          foam.core.Topic.create({ name: o }) :
+          foam.core.Topic.create(o);
+      }
+    }
+  ],
 
   methods: [
     function installInProto(proto) {
+      function makeTopic(topic, parent) {
+        var name = topic.name;
+        var topics = topic.topics;
+
+        var ret = {
+          publish: parent.publish.bind(parent, name),
+          subscribe: parent.subscribe.bind(parent, name),
+          unsubscribe: parent.unsubscribe.bind(parent, name),
+          toString: function() { return 'Topic(' + name + ')'; }
+        };
+
+        for ( var i = 0 ; i < topics.length ; i++ ) {
+          ret[topics[i].name] = makeTopic(topics[i], ret);
+        }
+
+        return ret;
+      }
+
       var name = this.name;
+      var topic = this;
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
           var self = this;
-          if ( ! this.hasOwnPrivate_(name) )
-            this.setPrivate_(
-              name,
-              {
-                publish:     self.publish.bind(self, name),
-                subscribe:   self.subscribe.bind(self, name),
-                unsubscribe: self.unsubscribe.bind(self, name),
-                toString:    function() { return 'Topic(' + name + ')'; }
-              }
-            );
+          if ( ! this.hasOwnPrivate_(name) ) {
+            this.setPrivate_(name, makeTopic(topic, self));
+          }
 
           return this.getPrivate_(name);
         },
@@ -1410,7 +1434,7 @@ foam.CLASS({
       }
     ]
   });
-</pre<
+</pre>
   You might use the above onAlarm listener like this:
   alarm.ring.subscribe(sprinker.onAlarm);
 <p>
@@ -1745,394 +1769,6 @@ foam.CLASS({
 
 foam.boot.end();
 
-
-/**
-  Dynamic values are observable values which can change over time.
-  Types of Dynamics include:
-    DynamicProperty:
-    DynamicExpression:
-    DynamicValue: to be implemented
-**/
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Dynamic', // ???: Rename AbstractDynamic or make an Interface
-  extends: null,
-
-  methods: [
-    /**
-      Link two Dynamics together, setting both to other's value.
-      Returns a Destroyable which can be used to break the link.
-    */
-    function link(other) {
-      var sub1 = this.follow(other);
-      var sub2 = other.follow(this);
-
-      return {
-        destroy: function() {
-          sub1.destroy();
-          sub2.destroy();
-          sub1 = sub2 = null;
-        }
-      };
-    },
-
-    /**
-      Have this Dynamic dynamically follow other's value.
-      Returns a Destroyable which can be used to cancel the binding.
-    */
-    function follow(other) {
-      return other.subscribe(function() {
-        this.set(other.get());
-      }.bind(this));
-    }
-  ]
-});
-
-
-/**
-  DynamicProperties export object properties as Dynamic values.
-  Created with calling obj.prop$ or obj.dynamicProperty('prop').
-  For internal use only.
- **/
-foam.CLASS({
-  package: 'foam.core.internal',
-  name: 'DynamicProperty',
-  extends: 'foam.core.Dynamic',
-
-  methods: [
-    function initArgs() { },
-    function get() {
-      return this.prop.get(this.obj);
-    },
-    function set(value) {
-      return this.prop.set(this.obj, value);
-    },
-    function getPrev() {
-      return this.oldValue;
-    },
-    function setPrev(value) {
-      return this.oldValue = value;
-    },
-    function subscribe(l) {
-      return this.obj.subscribe('propertyChange', this.prop.name, l);
-    },
-    function unsubscribe(l) {
-      this.obj.unsubscribe('propertyChange', this.prop.name, l);
-    },
-    function isDefined() {
-      return this.obj.hasOwnProperty(this.prop.name);
-    },
-    function clear() {
-      this.obj.clearProperty(this.prop.name);
-    }
-  ]
-});
-
-
-// ???: Wasn't used for 'expression', so should be moved out of core.
-foam.CLASS({
-  package: 'foam.core',
-  name: 'DynamicExpression',
-  implements: [ 'foam.core.Dynamic' ],
-
-  properties: [
-    'args',
-    'fn',
-    {
-      name: 'value',
-      factory: function() {
-        return this.fn.apply(this, this.args.map(function(a) {
-          return a.get();
-        }));
-      }
-    }
-  ],
-
-  methods: [
-    function init() {
-      for ( var i = 0 ; i < this.args.length ; i++ )
-        this.onDestroy(this.args[i].subscribe(this.invalidate));
-    },
-
-    function get() {
-      return this.value;
-    },
-
-    function set() { /* nop */ },
-
-    function subscribe(l) {
-      return this.SUPER('propertyChange', 'value', l);
-    },
-
-    function unsubscribe(l) {
-      this.SUPER('propertyChange', 'value', l);
-    }
-  ],
-
-  listeners: [
-    function invalidate() { this.clearProperty('value'); }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Window',
-
-  // documentation: 'Encapsulates top-level window/document features.',
-
-  exports: [
-    '$$',
-    '$',
-    'assert',
-    'async',
-    'cancelAnimationFrame',
-    'clearInterval',
-    'clearTimeout',
-    'console',
-    'delayed',
-    'document',
-    'dynamic',
-    'error',
-    'framed',
-    'info',
-    'log',
-    'merged',
-    'requestAnimationFrame',
-    'setInterval',
-    'setTimeout',
-    'warn',
-    'window'
-  ],
-
-  properties: [
-    [ 'name', 'window' ],
-    'window',
-    {
-      name: 'document',
-      factory: function() { return this.window.document; }
-    },
-    {
-      name: 'console',
-      factory: function() { return this.window.console; }
-    }
-  ],
-
-  methods: [
-    function $(id)   { return this.document.getElementById(id); },
-    function $$(cls) { return this.document.getElementsByClassName(cls); },
-
-    function assert(b /*, args */) {
-      /* Like console.assert() except that it takes more than one argument. */
-      if ( ! b )
-        this.console.assert(false, [].splice.call(arguments, 1).join(''));
-    },
-
-    function error() { this.console.error.apply(this.console, arguments); },
-    function info()  { this.console.info.apply(this.console, arguments); },
-    function log()   { this.console.log.apply(this.console, arguments); },
-    function warn()  { this.console.warn.apply(this.console, arguments); },
-
-    function async(l) {
-      /* Decorate a listener so that the event is delivered asynchronously. */
-      return this.delayed(l, 0);
-    },
-
-    function delayed(l, delay) {
-      /* Decorate a listener so that events are delivered 'delay' ms later. */
-      return function() {
-        this.setTimeout(
-          function() { l.apply(this, arguments); },
-          delay);
-      }.bind(this);
-    },
-
-    function merged(l, opt_delay) {
-      var delay = opt_delay || 16;
-      var X     = this;
-
-      return function() {
-        var triggered = false;
-        var lastArgs  = null;
-
-        var f = function() {
-          lastArgs = arguments;
-
-          if ( ! triggered ) {
-            triggered = true;
-            X.setTimeout(
-              function() {
-                triggered = false;
-                var args = foam.array.argsToArray(lastArgs);
-                lastArgs = null;
-                l.apply(this, args);
-              }, delay);
-          }
-        };
-
-        return f;
-      }();
-    },
-
-    function framed(l) {
-      var X = this;
-
-      return function() {
-        var triggered = false;
-        var lastArgs  = null;
-
-        var f = function() {
-          lastArgs = arguments;
-
-          if ( ! triggered ) {
-            triggered = true;
-            X.requestAnimationFrame(
-              function() {
-                triggered = false;
-                var args = foam.array.argsToArray(lastArgs);
-                lastArgs = null;
-                l.apply(this, args);
-              });
-          }
-        };
-
-        return f;
-      }();
-    },
-
-    function dynamic() {
-    },
-
-    function setTimeout(f, t) {
-      return this.window.setTimeout.apply(this.window, arguments);
-    },
-    function clearTimeout(id) {
-      this.window.clearTimeout(id);
-    },
-
-    function setInterval(f, t) {
-      return this.window.setInterval.apply(this.window, arguments);
-    },
-    function clearInterval(id) {
-      this.window.clearInterval(id);
-    },
-
-    function requestAnimationFrame(f) {
-      return this.window.requestAnimationFrame(f);
-    },
-    function cancelAnimationFrame(id) {
-      this.window.cancelAnimationFrame(id);
-    }
-  ]
-});
-
-/*
- * requestAnimationFrame is not available on nodejs,
- * so swap out with calls to setTimeout.
- */
-if ( foam.isServer ) {
-  foam.CLASS({
-    refines: 'foam.core.Window',
-    methods: [
-      function requestAnimationFrame(f) {
-        return this.setTimeout(f, 16);
-      },
-      function cancelAnimationFrame(id) {
-        this.clearTimeout(id);
-      }
-    ]
-  });
-}
-
-foam.X = foam.core.Window.create({window: global}, foam).Y;
-
-
-// JSON Support
-//
-// TODO:
-//   - don't output default values (optionally)
-//   - don't output default classes
-//   - quote keys when required
-//   - escape values
-//   - don't output transient properties
-//   - pretty printing
-//   - property filtering
-//   - allow for custom Property JSON support
-//   - compact output
-//   -
-
-foam.CLASS({
-  refines: 'foam.core.FObject',
-  methods: [
-    function toJSON() {
-      return foam.json.stringify(this);
-    },
-    function outputJSON(out, opt_options) {
-      out('{class:"', this.cls_.id, '"');
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        out(',', p.name, ':');
-        foam.json.output(out, this[p.name]);
-      }
-      out('}');
-    }
-  ]
-});
-
-
-foam.LIB({
-  name: 'json',
-  methods: [
-    function createOut() {
-      var buf = '';
-      function out() {
-        for ( var i = 0 ; i < arguments.length ; i++ )
-          buf += arguments[i];
-      }
-      out.toString = function() { return buf; };
-      return out;
-    },
-    function output(out, o) {
-      if ( typeof o === 'undefined' ) {
-        out('undefined');
-      } else if ( typeof o === 'string' ) {
-        out('"', o, '"');
-      } else if ( typeof o === 'number' ) {
-        out(o);
-      } else if ( o.outputJSON ) {
-        o.outputJSON(out);
-      } else if ( Array.isArray(o) ) {
-        out('[');
-        for ( var i = 0 ; i < o.length ; i++ ) {
-          this.output(out, o[i]);
-          if ( i < o.length -1 ) out(',');
-        }
-        out(']');
-      }
-    },
-    function parse(json, opt_class) {
-      if ( json.class ) {
-        var cls = foam.lookup(json.class);
-        foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
-        return cls.create(json);
-      }
-
-      if ( opt_class )
-        return opt_class.create(json);
-
-      return json;
-    },
-    function parseArray(a, opt_class) {
-      return a.map(function(e) { return foam.json.parse(e, opt_class); });
-    },
-    function stringify(o, opt_options) {
-      var out = this.createOut();
-      o.outputJSON(out, opt_options);
-      return out.toString();
-    }
-  ]
-});
 
 
 /**
