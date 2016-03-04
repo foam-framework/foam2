@@ -231,6 +231,11 @@ foam.CLASS({
       class: 'Float'
     },
     {
+      name: 'alpha',
+      class: 'Float',
+      defaultValue: 1
+    },
+    {
       name: 'strokeStyle',
       defaultValue: 'black'
     },
@@ -243,13 +248,9 @@ foam.CLASS({
       factory: function() {
         return [];
       },
-      postSet: function(old, nu) {
-        for ( var i = 0 ; old && i < old.length ; i++ ) {
-          old[i].invalidated.unsubscribe(this.onChildUpdate);
-        }
-        for ( var i = 0 ; nu && i < nu.length ; i++ ) {
-          nu[i].invalidated.subscribe(this.onChildUpdate);
-        }
+      postSet: function(o, n) {
+        for ( var i = 0 ; o && i < o.length ; i++ ) this.removeChild_(o[i]);
+        for ( var i = 0 ; n && i < n.length ; i++ ) this.addChild_(n[i]);
       }
     },
     {
@@ -286,6 +287,7 @@ foam.CLASS({
         this.invalidated.publish();
       }.bind(this));
     },
+
     function maybeInitCView() {
       if ( this.state == 'initial' ) {
         this.initCView();
@@ -296,6 +298,7 @@ foam.CLASS({
     function paint(x) {
       this.maybeInitCView();
       x.save();
+      x.globalAlpha *= this.alpha;
       x.strokeStyle = this.strokeStyle.toCanvasStyle ?
         this.strokeStyle.toCanvasStyle(x) : this.strokeStyle;
       x.fillStyle = this.fillStyle.toCanvasStyle ?
@@ -315,6 +318,21 @@ foam.CLASS({
       for ( var i = 0 ; i < this.children.length ; i++ ) {
         this.children[i].paint(x);
       }
+    },
+
+    function addChild_(c) {
+      c.invalidated.subscribe(this.onChildUpdate);
+      return c;
+    },
+
+    function removeChild_(c) {
+      c.invalidated.unsubscribe(this.onChildUpdate);
+      return c;
+    },
+
+    function addChildren() {
+      for ( var i = 0 ; i < arguments.length ; i++ )
+        this.children.push(arguments[i]);
     },
 
     function paintSelf(x) {}
@@ -457,9 +475,9 @@ foam.CLASS({
     },
     {
       name: 'cview',
-      postSet: function(old, nu) {
-        old && old.invalidated.unsubscribe(this.paint);
-        nu && nu.invalidated.subscribe(this.paint);
+      postSet: function(o, n) {
+        o && o.invalidated.unsubscribe(this.paint);
+        n && n.invalidated.subscribe(this.paint);
         this.paint();
       }
     }
