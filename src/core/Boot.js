@@ -1326,25 +1326,50 @@ foam.CLASS({
 
   // documentation: 'Topic Axiom',
 
-  properties: [ 'name', 'description' ],
+  properties: [
+    'name',
+    'description',
+    {
+      class: 'Array',
+      of: 'Topic',
+      name: 'topics',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          foam.core.Topic.create({ name: o }) :
+          foam.core.Topic.create(o);
+      }
+    }
+  ],
 
   methods: [
     function installInProto(proto) {
+      function makeTopic(topic, parent) {
+        var name = topic.name;
+        var topics = topic.topics;
+
+        var ret = {
+          publish: parent.publish.bind(parent, name),
+          subscribe: parent.subscribe.bind(parent, name),
+          unsubscribe: parent.unsubscribe.bind(parent, name),
+          toString: function() { return 'Topic(' + name + ')'; }
+        };
+
+        for ( var i = 0 ; i < topics.length ; i++ ) {
+          ret[topics[i].name] = makeTopic(topics[i], ret);
+        }
+
+        return ret;
+      }
+
       var name = this.name;
+      var topic = this;
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
           var self = this;
-          if ( ! this.hasOwnPrivate_(name) )
-            this.setPrivate_(
-              name,
-              {
-                publish:     self.publish.bind(self, name),
-                subscribe:   self.subscribe.bind(self, name),
-                unsubscribe: self.unsubscribe.bind(self, name),
-                toString:    function() { return 'Topic(' + name + ')'; }
-              }
-            );
+          if ( ! this.hasOwnPrivate_(name) ) {
+            this.setPrivate_(name, makeTopic(topic, self));
+          }
 
           return this.getPrivate_(name);
         },

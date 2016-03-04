@@ -121,8 +121,9 @@ foam.CLASS({
 });
 DaoTest.create({ dao: dao }).go();
 
-dao.onPut.subscribe(function(_, _, o) { console.log("On put", o.id); });
-dao.onRemove.subscribe(function(_,_, o) { console.log("On remove", o.id); });
+dao.on.subscribe(function(_, _, type, o) { console.log("On event", type, o && o.id); });
+dao.on.remove.subscribe(function(_,_,_,o) { console.log("On remove", o.id); });
+
 
 dao.removeAll();
 dao.put(Abc.create({ id: 4 }));
