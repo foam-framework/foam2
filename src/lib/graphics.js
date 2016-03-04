@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-
-
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Matrix',
@@ -186,7 +184,7 @@ foam.CLASS({
 
   topics: ['invalidated'],
 
-   requires: [
+  requires: [
     'foam.graphics.Transform'
   ],
 
@@ -244,10 +242,14 @@ foam.CLASS({
       defaultValue: 'black'
     },
     {
+      name: 'shadowColor'
+    },
+    {
+      name: 'shadowBlur'
+    },
+    {
       name: 'children',
-      factory: function() {
-        return [];
-      },
+      factory: function() { return []; },
       postSet: function(o, n) {
         for ( var i = 0 ; o && i < o.length ; i++ ) this.removeChild_(o[i]);
         for ( var i = 0 ; n && i < n.length ; i++ ) this.addChild_(n[i]);
@@ -304,6 +306,10 @@ foam.CLASS({
       x.fillStyle = this.fillStyle.toCanvasStyle ?
         this.fillStyle.toCanvasStyle(x) : this.fillStyle;
       this.doTransform(x);
+      if ( this.shadowColor && this.shadowBlur ) {
+        x.shadowColor = this.shadowColor;
+        x.shadowBlur  = this.shadowBlur;
+      }
       this.paintSelf(x);
       this.paintChildren(x);
       x.restore();
@@ -396,6 +402,10 @@ foam.CLASS({
       class: 'Float'
     },
     {
+      name: 'arcWidth',
+      class: 'Float'
+    },
+    {
       name: 'fill',
       class: 'Boolean',
       defaultValue: false
@@ -411,8 +421,14 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
-      if ( this.fill ) x.fill();
-      if ( this.stroke ) x.stroke();
+
+      if ( this.fill ) {
+        x.fill();
+      }
+      if ( this.stroke ) {
+        x.lineWidth = this.arcWidth;
+        x.stroke();
+      }
     }
   ]
 });

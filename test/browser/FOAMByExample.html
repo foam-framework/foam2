@@ -1317,15 +1317,14 @@ foam.CLASS({
         });
       }
     },
-    [ 'alpha',  0.25 ],
     [ 'width',  500 ],
     [ 'height', 500 ],
-    [ 'time',   0 ]
+    [ 'time',   0 ],
   ],
   methods: [
     function addArc(a, arc) {
       this.time$.subscribe(function(_, __, ___, time$) {
-        arc.start += Math.cos(time$.get() / 4000) * (a+1)/70;
+        arc.start += Math.cos(time$.get() / 4000) * (a+1)/100;
         arc.end    = arc.start + Math.PI;
       });
       this.addChildren(arc);
@@ -1336,11 +1335,9 @@ foam.CLASS({
         x: this.width / 2,
         y: this.height / 2,
         radius: 5+a * 12 * this.width / 500,
-//        arcWidth: 10 * this.width / 500,
-        fill: true,
+        arcWidth: 10 * this.width / 500,
         stroke: true,
-        strokeStyle: 'black',
-        fillStyle: 'hsl(' + 18*a + ', 90%, 60%)'
+        strokeStyle: 'hsl(' + 18*a + ', 90%, 60%)'
       }));
       this.tick();
     }
@@ -1350,7 +1347,7 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
-        this.time += 25;
+        this.time++;
         this.canvas.paint();
         this.tick();
       }
