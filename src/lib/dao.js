@@ -691,7 +691,7 @@ foam.CLASS({
     function select(sink, options) {
       var resultSink = sink || this.ArraySink.create();
 
-      sink = this.decorateSink_(sink || this.ArraySink.create(), options);
+      sink = this.decorateSink_(resultSink, options);
 
       var promise = this.Promise.create();
 
