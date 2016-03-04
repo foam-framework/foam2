@@ -1,5 +1,5 @@
 require("./stdlib.js");
-require("./mm.js");
+require("./Boot.js");
 require("./objects.js");
 require("./patterns.js");
 require("./debug.js");

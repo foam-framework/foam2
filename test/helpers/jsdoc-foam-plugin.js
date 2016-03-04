@@ -264,7 +264,7 @@ var checkForPackageModule = function checkForPackageModule(parser, pkg) {
         comment: '/**\n @module'+pkg+'\n */',
 //         meta:
 //         { range: [Object],
-//          filename: 'mm.js',
+//          filename: 'Boot.js',
 //          lineno: 18,
 //          path: '/usr/local/google/home/jacksonic/foam2/vjlofvhjfgm/src/core',
 //          code: {} },
