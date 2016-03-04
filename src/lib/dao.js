@@ -346,8 +346,14 @@ foam.CLASS({
     'foam.dao.LimitedDAO'
   ],
   topics: [
-    'onPut',
-    'onRemove'
+    {
+      name: 'on',
+      topics: [
+        'put',
+        'remove',
+        'reset'
+      ]
+    }
   ],
   properties: ['of'],
   methods: [
@@ -570,7 +576,7 @@ foam.CLASS({
 
       if ( i == this.array.length ) this.array.push(obj);
       sink.put(obj);
-      this.onPut.publish(obj);
+      this.on.put.publish(obj);
 
       return promise;
     },
@@ -585,7 +591,7 @@ foam.CLASS({
         if ( foam.util.equals(id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
           sink.remove(o2);
-          this.onRemove.publish(o2);
+          this.on.remove.publish(o2);
           return promise;
         }
       }
@@ -628,7 +634,7 @@ foam.CLASS({
           var obj = this.array.splice(i, 1);
           i--;
           sink && sink.remove(obj);
-          this.onRemove.publish(obj);
+          this.on.remove.publish(obj);
         }
       }
 
