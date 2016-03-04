@@ -596,6 +596,8 @@ foam.CLASS({
       var isFinal         = this.final;
       var eFactory        = this.exprFactory(this.expression);
 
+      // This costs us about 4% of our boot time.
+      // If not in debug mode we should share implementations like in F1.
       Object.defineProperty(proto, dynName, {
         get: function propDynGetter() {
           return this.dynamicProperty(name, dynName, prop);
