@@ -1,5 +1,9 @@
 require("./stdlib.js");
 require("./Boot.js");
+require("./Dynamic.js");
+require("./Window.js");
+require("./JSON.js");
+
 require("./objects.js");
 require("./patterns.js");
 require("./debug.js");
