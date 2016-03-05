@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-
-
 /**
  FOAM Bootstrap
 <p>
@@ -889,11 +887,23 @@ foam.CLASS({
       Notify all of the listeners in a listener list.
       Returns the number of listeners notified.
     */
-    function notify_(listeners, args) {
+    function notify_(listeners, a) {
       var count = 0;
       while ( listeners ) {
-        args[0] = listeners.sub;
-        listeners.l.apply(null, args);
+        var l = listeners.l;
+        var s = listeners.s;
+        switch ( a.length ) {
+          case 0: l(s); break;
+          case 1: l(s, a[0]); break;
+          case 2: l(s, a[0], a[1]); break;
+          case 3: l(s, a[0], a[1], a[2]); break;
+          case 4: l(s, a[0], a[1], a[2], a[3]); break;
+          case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
+          case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
+          case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
+          case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
+          case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
+        }
         listeners = listeners.next;
         count++;
       }
@@ -920,12 +930,11 @@ foam.CLASS({
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
-      var args      = Array.prototype.concat.apply([null], arguments);
-      var count     = this.notify_(listeners.next, args);
+      var count     = this.notify_(listeners.next, arguments);
       for ( var i = 0 ; i < arguments.length; i++ ) {
         var listeners = listeners.children[arguments[i]];
         if ( ! listeners ) break;
-        count += this.notify_(listeners.next, args);
+        count += this.notify_(listeners.next, arguments);
       }
 
       return count;
