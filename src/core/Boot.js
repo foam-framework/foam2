@@ -926,15 +926,21 @@ foam.CLASS({
       Publish a message to all matching subscribed listeners.
       Returns the number of listeners notified.
     */
-    function publish() { /* args... */
+    function publish() {
+      // This method isn't JIT-ed because of the use of 'arguments',
+      // So we move all of the code to publish_() so that it is JIT-ed.
+      return this.publish_(arguments);
+    },
+  
+    function publish_(args) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
-      var count     = this.notify_(listeners.next, arguments);
-      for ( var i = 0 ; i < arguments.length; i++ ) {
-        var listeners = listeners.children[arguments[i]];
+      var count     = this.notify_(listeners.next, args);
+      for ( var i = 0 ; i < args.length; i++ ) {
+        var listeners = listeners.children[args[i]];
         if ( ! listeners ) break;
-        count += this.notify_(listeners.next, arguments);
+        count += this.notify_(listeners.next, args);
       }
 
       return count;
