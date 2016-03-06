@@ -1289,7 +1289,6 @@ foam.CLASS({
         this.objects[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
         this.objects[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
         this.objects[2].rotation += 0.01;
-        this.canvas.paint();
         this.step();
       }
     }
@@ -1306,20 +1305,9 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
   requires: [ 'foam.graphics.Arc', 'foam.graphics.Canvas' ],
   properties: [
-    {
-      name: 'canvas',
-      factory: function() {
-        return this.Canvas.create({
-          width: 500,
-          height: 500,
-          id: 'spin-demo',
-          cview: this
-        });
-      }
-    },
     [ 'width',  500 ],
     [ 'height', 500 ],
-    [ 'time',   0 ],
+    [ 'time',   0 ]
   ],
   methods: [
     function addArc(a, arc) {
@@ -1346,16 +1334,12 @@ foam.CLASS({
     {
       name: 'tick',
       isFramed: true,
-      code: function() {
-        this.time++;
-        this.canvas.paint();
-        this.tick();
-      }
+      code: function() { this.time++; this.tick(); }
     }
   ]
 });
 var g = Spin.create();
-log_(g.canvas.toHTML());
+log_(g.toHTML());
 
 
 </script>
