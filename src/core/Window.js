@@ -122,15 +122,15 @@ foam.CLASS({
         var triggered = false;
         var lastArgs  = null;
 
-        var f = function() {
+        var f = function framed() {
           lastArgs = arguments;
 
           if ( ! triggered ) {
             triggered = true;
             X.requestAnimationFrame(
-              function() {
+              function framedFired() {
                 triggered = false;
-                var args = foam.array.argsToArray(lastArgs);
+                var args = lastArgs;
                 lastArgs = null;
                 l.apply(this, args);
               });
