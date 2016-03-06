@@ -329,7 +329,16 @@ foam.CLASS({
         this.children.push(arguments[i]);
     },
 
-    function paintSelf(x) {}
+    function paintSelf(x) {},
+
+    // TODO: Replace with toE() when/if ready.
+    function toHTML() {
+      return this.Canvas.create({
+        width: this.x + this.width || this.r * 2,
+        height: this.y + this.height || this.r * 2,
+        cview: this
+      }).toHTML();
+    }
   ],
 
   listeners: [
@@ -452,7 +461,8 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'id'
+      name: 'id',
+      factory: function() { return 'v' + this.$UID; }
     },
     {
       name: 'width',
