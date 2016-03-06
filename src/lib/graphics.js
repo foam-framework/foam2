@@ -182,12 +182,9 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'CView',
 
-  topics: ['invalidated'],
+  topics: [ 'invalidated' ],
 
-  requires: [
-    'foam.graphics.Transform'
-  ],
-
+  requires: [ 'foam.graphics.Transform' ],
 
   properties: [
     {
@@ -274,15 +271,6 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    {
-      name: 'onChildUpdate',
-      code: function() {
-        this.invalidated.publish();
-      }
-    }
-  ],
-
   methods: [
     function initCView() {
       this.propertyChange.subscribe(function() {
@@ -342,6 +330,10 @@ foam.CLASS({
     },
 
     function paintSelf(x) {}
+  ],
+
+  listeners: [
+    function onChildUpdate() { this.invalidated.publish(); }
   ]
 });
 
@@ -456,9 +448,7 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
 
-  imports: [
-    '$'
-  ],
+  imports: [ '$' ],
 
   properties: [
     {
@@ -499,6 +489,12 @@ foam.CLASS({
     }
   ],
 
+  methods: [
+    function erase() {
+      this.element.width = this.element.width;
+    }
+  ],
+
   listeners: [
     {
       name: 'paint',
@@ -514,12 +510,6 @@ foam.CLASS({
     {
       name: 'toHTML',
       template: '<canvas id="<%= this.id %>"></canvas>'
-    }
-  ],
-
-  methods: [
-    function erase() {
-      this.element.width = this.element.width;
     }
   ]
 });
