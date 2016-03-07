@@ -891,7 +891,7 @@ foam.CLASS({
       var count = 0;
       while ( listeners ) {
         var l = listeners.l;
-        var s = listeners.s;
+        var s = listeners.sub;
         switch ( a.length ) {
           case 0: l(s); break;
           case 1: l(s, a[0]); break;
