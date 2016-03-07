@@ -38,9 +38,9 @@ foam.CLASS({
 foam.LIB({
   name: 'Array',
   methods: [
-    function toJSON() {
-      return foam.json.stringify(this);
-    },
+//     function toJSON() { // DANGER! This caused problems with node require when running 'npm run doc'
+//       return foam.json.stringify(this);
+//     },
     function outputJSON(out, opt_options) {
       out('[');
       for ( var i = 0 ; i < this.length ; i++ ) {
