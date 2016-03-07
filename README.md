@@ -41,8 +41,7 @@ to run the unit tests.
 
 ## Documentation
 
-* _npm run doc_ generates API documentation in doc/gen/. Run your favorite web
-server to view it.
+* _npm run doc_ generates HTML API documentation in doc/gen/.
 
 Documentation is created by JSDoc with a plugin to account for Foam's package
 structure and declarative nature. JSDoc modules correspond with Foam packages.

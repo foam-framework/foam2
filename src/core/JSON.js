@@ -35,6 +35,23 @@ foam.CLASS({
   ]
 });
 
+foam.LIB({
+  name: 'Array',
+  methods: [
+    function toJSON() {
+      return foam.json.stringify(this);
+    },
+    function outputJSON(out, opt_options) {
+      out('[');
+      for ( var i = 0 ; i < this.length ; i++ ) {
+        foam.json.output(out, this[i]);
+        if ( i < this.length -1 ) out(',');
+      }
+      out(']');
+    }
+  ]
+});
+
 
 foam.LIB({
   name: 'json',
@@ -57,13 +74,6 @@ foam.LIB({
         out(o);
       } else if ( o.outputJSON ) {
         o.outputJSON(out);
-      } else if ( Array.isArray(o) ) {
-        out('[');
-        for ( var i = 0 ; i < o.length ; i++ ) {
-          this.output(out, o[i]);
-          if ( i < o.length -1 ) out(',');
-        }
-        out(']');
       }
     },
     function parse(json, opt_class) {
@@ -72,7 +82,6 @@ foam.LIB({
         foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
         return cls.create(json);
       }
-
       if ( opt_class )
         return opt_class.create(json);
 
@@ -80,6 +89,9 @@ foam.LIB({
     },
     function parseArray(a, opt_class) {
       return a.map(function(e) { return foam.json.parse(e, opt_class); });
+    },
+    function parseString(str) {
+      return eval('(' + str + ')');
     },
     function stringify(o, opt_options) {
       var out = this.createOut();

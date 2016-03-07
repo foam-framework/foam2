@@ -6,7 +6,8 @@
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
     "jsdoc": "^3.4.0",
-    "node-inspector": "^0.12.6"
+    "node-inspector": "^0.12.6",
+    "node-localstorage": "^0.6.0"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",

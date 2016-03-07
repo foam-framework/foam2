@@ -536,6 +536,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArraySink',
+  implements: ['foam.dao.Sink'],
   properties: [
     {
       name: 'a',
@@ -553,6 +554,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
+  
+  requires: [ 'foam.dao.ArraySink' ],
+  
   properties: [
     {
       name: 'array',
@@ -560,6 +564,10 @@ foam.CLASS({
     }
   ],
   methods: [
+    /** extracts .id */
+    function idF_(obj) { return obj && obj.id; },
+    function identity_(obj) { return obj; },
+    
     function listen(sink, options) {
     },
     function put(obj, sink) {
@@ -567,8 +575,11 @@ foam.CLASS({
       var promise = this.Promise.create();
       promise.fulfill(sink);
 
+      var f = obj.id ? this.idF_ : this.identity_;
+      var id = f(obj);
+      
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(obj.id, this.array[i].id) ) {
+        if ( foam.util.equals(id, f(this.array[i])) ) {
           this.array[i] = obj;
           break;
         }
@@ -585,10 +596,12 @@ foam.CLASS({
       var promise = this.Promise.create();
       promise.fulfill(sink);
 
-      var id = obj.id ? obj.id : obj;
+      //var id = obj.id ? obj.id : obj;
+      var f = ( obj.id ? this.idF_ : this.identity_ );
+      var id = f(obj);
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(id, this.array[i].id) ) {
+        if ( foam.util.equals(id, f(this.array[i])) ) {
           var o2 = this.array.splice(i, 1)[0];
           sink.remove(o2);
           this.on.remove.publish(o2);
@@ -660,6 +673,44 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'LocalStorageDAO',
+  extends: 'foam.dao.ArrayDAO',
+
+  properties: [
+    {
+      name:  'name',
+      label: 'Store Name',
+      class:  'foam.core.String',
+    }
+  ],
+
+  methods: [
+    function init() {
+      var objs = localStorage.getItem(this.name);
+      if ( objs ) this.array = foam.json.parseArray(foam.json.parseString(objs));
+
+      this.on.put.subscribe(this.updated);
+      this.on.remove.subscribe(this.updated);
+
+      // TODO: base on an indexed DAO
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'updated',
+      isMerged: 100,
+      code: function() {
+        localStorage.setItem(this.name, foam.json.stringify(this.array));
+      }
+    }
+  ]
+});
+
+
 
 /*
 TODO:
