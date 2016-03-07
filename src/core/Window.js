@@ -95,19 +95,19 @@ foam.CLASS({
       return function() {
         var triggered = false;
         var lastArgs  = null;
+        function mergedListener() {
+          triggered = false;
+          var args = foam.array.argsToArray(lastArgs);
+          lastArgs = null;
+          l.apply(this, args);
+        }
 
         var f = function() {
           lastArgs = arguments;
 
           if ( ! triggered ) {
             triggered = true;
-            X.setTimeout(
-              function() {
-                triggered = false;
-                var args = foam.array.argsToArray(lastArgs);
-                lastArgs = null;
-                l.apply(this, args);
-              }, delay);
+            X.setTimeout(mergedListener, delay);
           }
         };
 
@@ -121,19 +121,19 @@ foam.CLASS({
       return function() {
         var triggered = false;
         var lastArgs  = null;
+        function frameFired() {
+          triggered = false;
+          var args = lastArgs;
+          lastArgs = null;
+          l.apply(this, args);
+        }
 
         var f = function framed() {
           lastArgs = arguments;
 
           if ( ! triggered ) {
             triggered = true;
-            X.requestAnimationFrame(
-              function framedFired() {
-                triggered = false;
-                var args = lastArgs;
-                lastArgs = null;
-                l.apply(this, args);
-              });
+            X.requestAnimationFrame(frameFired);
           }
         };
 
@@ -186,4 +186,3 @@ if ( foam.isServer ) {
 }
 
 foam.X = foam.core.Window.create({window: global}, foam).Y;
-
