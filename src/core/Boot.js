@@ -891,19 +891,7 @@ foam.CLASS({
       var count = 0;
       while ( listeners ) {
         var l = listeners.l;
-        var s = listeners.s;
-        switch ( a.length ) {
-          case 0: l(s); break;
-          case 1: l(s, a[0]); break;
-          case 2: l(s, a[0], a[1]); break;
-          case 3: l(s, a[0], a[1], a[2]); break;
-          case 4: l(s, a[0], a[1], a[2], a[3]); break;
-          case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
-          case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
-          case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
-          case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
-          case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
-        }
+        l.apply(null, a);
         listeners = listeners.next;
         count++;
       }
@@ -931,7 +919,7 @@ foam.CLASS({
       // So we move all of the code to publish_() so that it is JIT-ed.
       return this.publish_(arguments);
     },
-  
+
     function publish_(args) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
@@ -975,8 +963,7 @@ foam.CLASS({
       var node = {
         sub:  { src: this },
         next: listeners.next,
-        prev: listeners,
-        l: l
+        prev: listeners
       };
       node.sub.destroy = function() {
         if ( node.next ) node.next.prev = node.prev;
@@ -985,6 +972,7 @@ foam.CLASS({
         // Disconnect so that calling destroy more than once is harmless
         node.next = node.prev = null;
       };
+      node.l = l.bind(null, node.sub);
 
       if ( listeners.next ) listeners.next.prev = node;
       listeners.next = node;
@@ -1783,7 +1771,6 @@ foam.CLASS({
 
 
 foam.boot.end();
-
 
 
 /**
