@@ -26,9 +26,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'Sink',
+
   methods: [
     {
       name: 'put',
@@ -66,9 +68,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxySink',
+
   properties: [
     {
       class: 'Proxy',
@@ -78,10 +82,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DAO',
-  documentation: 'DAO Interface',
+
+  // documentation: 'DAO Interface',
+
   methods: [
     {
       name: 'put'
@@ -122,12 +129,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DAOOptions',
+
   requires: [
     'foam.mlang.AndExpr'
   ],
+
   properties: [
     {
       class: 'Int',
@@ -140,6 +150,7 @@ foam.CLASS({
     'orderBy',
     'where'
   ],
+
   methods: [
     function addSkip(s) {
       var o = this.cls_.create(this);
@@ -167,15 +178,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PredicatedSink',
   extends: 'foam.dao.ProxySink',
+
   properties: [
     {
       name: 'predicate'
     }
   ],
+
   methods: [
     function put(obj, sink, fc) {
       if ( this.predicate.f(obj) ) this.delegate.put(obj, fc, sink);
@@ -186,10 +200,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'LimitedSink',
   extends: 'foam.dao.ProxySink',
+
   properties: [
     {
       name: 'limit'
@@ -200,6 +216,7 @@ foam.CLASS({
       defaultValue: 0
     }
   ],
+
   methods: [
     function put(obj, sink, fc) {
       if ( this.count++ >= this.limit && fc ) {
@@ -208,6 +225,7 @@ foam.CLASS({
         this.delegate.put(obj, sink, fc);
       }
     },
+
     function remove(obj, sink, fc) {
       if ( this.count++ >= this.limit && fc ) {
         fc.stop();
@@ -218,10 +236,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'SkipSink',
   extends: 'foam.dao.ProxySink',
+
   properties: [
     {
       name: 'skip'
@@ -232,6 +252,7 @@ foam.CLASS({
       defaultValue: 0
     }
   ],
+
   methods: [
     function put(obj, sink, fc) {
       if ( this.count < this.skip ) {
@@ -240,6 +261,7 @@ foam.CLASS({
       }
       this.delegate.put(obj, sink, fc);
     },
+
     function remove(obj, sink, fc) {
       if ( this.count < this.skip ) {
         this.count++;
@@ -250,10 +272,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'OrderedSink',
   extends: 'foam.dao.ProxySink',
+
   properties: [
     {
       name: 'comparator'
@@ -263,29 +287,35 @@ foam.CLASS({
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function put(obj, sink, fc) {
       this.arr.push(obj);
     },
+
     function eof() {
       this.arr.sort(this.comparator);
       for ( var i = 0 ; i < this.arr.length ; i++ ) {
         this.delegate.put(this.arr[i]);
       }
     },
+
     function remove(obj, sink, fc) {
       // TODO
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FlowControl',
+
   properties: [
     'stopped',
     'errorEvt'
   ],
+
   methods: [
     function stop() { this.stopped = true; },
     function error(e) { this.errorEvt = e; }
@@ -301,11 +331,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'InternalException',
   extends: 'Exception'
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -313,10 +345,12 @@ foam.CLASS({
   extends: 'Exception'
 })
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ObjectNotFoundException',
   extends: 'foam.dao.ExternalException',
+
   properties: [
     'id',
     {
@@ -326,10 +360,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
   implements: ['foam.dao.DAO'],
+
   requires: [
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
@@ -345,6 +381,7 @@ foam.CLASS({
     'foam.dao.SkipDAO',
     'foam.dao.LimitedDAO'
   ],
+
   topics: [
     {
       name: 'on',
@@ -355,7 +392,9 @@ foam.CLASS({
       ]
     }
   ],
+
   properties: ['of'],
+
   methods: [
     {
       name: 'where',
@@ -366,6 +405,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'orderBy',
       code: function orderBy(o) {
@@ -375,6 +415,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'skip',
       code: function skip(s) {
@@ -384,6 +425,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'limit',
       code: function limit(l) {
@@ -393,9 +435,13 @@ foam.CLASS({
         });
       }
     },
+
     function listen(sink, options) {},
+
     function unlisten(sink) {},
+
     function pipe() {},
+
     function update() {},
 
     function decorateSink_(sink, options, isListener, disableLimit) {
@@ -434,11 +480,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [ 'foam.dao.DAOOptions' ],
+
   properties: [
     {
       class: 'Proxy',
@@ -449,36 +498,43 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       name: 'predicate'
     }
   ],
+
   methods: [
     function select(sink, options) {
       options = ( options || this.DAOOptions.create() ).addWhere(this.predicate);
       return this.delegate.select(sink, options);
     },
+
     function removeAll(sink, options) {
       options = ( options || this.DAOOptions.create() ).addWhere(this.predicate);
       return this.delegate.removeAll(sink, options);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'OrderedDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       name: 'comparator'
     }
   ],
+
   methods: [
     function select(sink, options) {
       options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
@@ -490,16 +546,19 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'SkipDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       name: 'skip_'
     }
   ],
+
   methods: [
     function select(sink, options) {
       options = ( options || this.DAOOptions.create() ).addSkip(this.skip_);
@@ -511,21 +570,25 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'LimitedDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       name: 'limit_'
     }
   ],
+
   methods: [
     function select(sink, options) {
       options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
       return this.delegate.select(sink, options);
     },
+
     function removeAll(sink, options) {
       options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
       return this.delegate.removeAll(sink, options);
@@ -533,16 +596,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArraySink',
   implements: ['foam.dao.Sink'],
+
   properties: [
     {
       name: 'a',
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function put(o) {
       this.a.push(o);
@@ -550,26 +616,30 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
-  
+
   requires: [ 'foam.dao.ArraySink' ],
-  
+
   properties: [
     {
       name: 'array',
       factory: function() { return []; }
     }
   ],
+
   methods: [
     /** extracts .id */
     function idF_(obj) { return obj && obj.id; },
+
     function identity_(obj) { return obj; },
-    
+
     function listen(sink, options) {
     },
+
     function put(obj, sink) {
       sink = sink || this.Promise.create();
       var promise = this.Promise.create();
@@ -577,7 +647,7 @@ foam.CLASS({
 
       var f = obj.id ? this.idF_ : this.identity_;
       var id = f(obj);
-      
+
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, f(this.array[i])) ) {
           this.array[i] = obj;
@@ -591,6 +661,7 @@ foam.CLASS({
 
       return promise;
     },
+
     function remove(obj, sink) {
       sink = sink || this.Promise.create();
       var promise = this.Promise.create();
@@ -613,6 +684,7 @@ foam.CLASS({
       sink.error(err);
       return promise;
     },
+
     function select(sink, options) {
       var resultSink = sink || this.ArraySink.create();
 
@@ -637,6 +709,7 @@ foam.CLASS({
       promise.fulfill(resultSink);
       return promise;
     },
+
     function removeAll(sink, options) {
       // TODO: Require TrueExpr when ordering is fixed or we have
       // better lazy loading
@@ -658,6 +731,7 @@ foam.CLASS({
 
       return promise;
     },
+
     function find(id) {
       var promise = this.Promise.create();
 
@@ -673,6 +747,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -709,7 +784,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 
 /*
