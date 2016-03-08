@@ -692,6 +692,11 @@ foam.CLASS({
       };
     },
 
+    /** Returns a human-readable description of this Property. */
+    function toString() {
+      return this.name;
+    },
+
     /** Flyweight getter for this Property. */
     function get(o) {
       return o[this.name];

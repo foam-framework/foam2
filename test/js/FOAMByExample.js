@@ -232,7 +232,7 @@ log(Test.getAxiomByName('a'));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 12, str: " <b>&gt;</b> Property" });
+  expect(log_.output).toMatchGolden({ i: 12, str: " <b>&gt;</b> a" });
 
 
 // Example 14
