@@ -87,6 +87,13 @@ foam.LIB({
         out('"', o, '"');
       } else if ( typeof o === 'number' ) {
         out(o);
+      } else if ( Array.isArray(o) ) {
+        out('[');
+        for ( var i = 0 ; i < o.length ; i++ ) {
+          this.output(out, o[i]);
+          if ( i < o.length -1 ) out(',');
+        }
+        out(']');
       } else if ( o.outputJSON ) {
         o.outputJSON(out);
       }
@@ -105,8 +112,8 @@ foam.LIB({
     function parseArray(a, opt_class) {
       return a.map(function(e) { return foam.json.parse(e, opt_class); });
     },
-    function parseString(str) {
-      return eval('(' + str + ')');
+    function parseString(jsonStr) {
+      return eval('(' + jsonStr + ')');
     },
     function stringify(o, opt_options) {
       var out = this.createOut();
@@ -115,4 +122,3 @@ foam.LIB({
     }
   ]
 });
-
