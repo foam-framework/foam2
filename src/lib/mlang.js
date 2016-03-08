@@ -159,7 +159,7 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return this.cls_.name.constantize() + '(' + this.arg1.toString() + ')';
+      return foam.string.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
     },
   ]
 });
@@ -184,7 +184,7 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return this.cls_.name.constantize() + '(' + this.arg1.toString() + ', ' +
+      return foam.string.constantize(this.cls_.name) + '(' + this.arg1.toString() + ', ' +
           this.arg2.toString() + ')';
     },
   ]
@@ -206,7 +206,7 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      var s = this.cls_.name.constantize() + '(';
+      var s = foam.string.constantize(this.cls_.name) + '(';
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a = this.args[i];
         s += a.toString();

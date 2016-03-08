@@ -156,10 +156,10 @@ describe('MLang', function() {
 
     it('toString()s nicely', function() {
       expect(EQ(test.mlang.Person.NAME, 'Carlos Santana').toString())
-          .toBe('EQ(NAME, "Carlos Santana")');
-      expect(EQ(7, 7))
+          .toBe('EQ(name, "Carlos Santana")');
+      expect(EQ(7, 7).toString())
           .toBe('EQ(7, 7)');
-      expect(EQ(foam.mlang.predicate.Not.create({ arg1: 7 }), 7))
+      expect(EQ(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('EQ(NOT(7), 7)');
     });
   });
@@ -197,6 +197,15 @@ describe('MLang', function() {
         done();
       });
     });
+
+    it('toString()s nicely', function() {
+      expect(NEQ(test.mlang.Person.NAME, 'Carlos Santana').toString())
+          .toBe('NEQ(name, "Carlos Santana")');
+      expect(NEQ(7, 7).toString())
+          .toBe('NEQ(7, 7)');
+      expect(NEQ(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
+          .toBe('NEQ(NOT(7), 7)');
+    });
   });
 
   describe('LT()', function() {
@@ -228,6 +237,15 @@ describe('MLang', function() {
         expect(sink.a.length).toBe(4);
         done();
       });
+    });
+
+    it('toString()s nicely', function() {
+      expect(LT(test.mlang.Person.NAME, 'Carlos Santana').toString())
+          .toBe('LT(name, "Carlos Santana")');
+      expect(LT(7, 7).toString())
+          .toBe('LT(7, 7)');
+      expect(LT(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
+          .toBe('LT(NOT(7), 7)');
     });
   });
 
@@ -262,6 +280,15 @@ describe('MLang', function() {
         done();
       });
     });
+
+    it('toString()s nicely', function() {
+      expect(LTE(test.mlang.Person.NAME, 'Carlos Santana').toString())
+          .toBe('LTE(name, "Carlos Santana")');
+      expect(LTE(7, 7).toString())
+          .toBe('LTE(7, 7)');
+      expect(LTE(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
+          .toBe('LTE(NOT(7), 7)');
+    });
   });
 
   describe('GT()', function() {
@@ -293,6 +320,15 @@ describe('MLang', function() {
         expect(sink.a.length).toBe(4);
         done();
       });
+    });
+
+    it('toString()s nicely', function() {
+      expect(GT(test.mlang.Person.NAME, 'Carlos Santana').toString())
+          .toBe('GT(name, "Carlos Santana")');
+      expect(GT(7, 7).toString())
+          .toBe('GT(7, 7)');
+      expect(GT(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
+          .toBe('GT(NOT(7), 7)');
     });
   });
 
@@ -327,6 +363,15 @@ describe('MLang', function() {
         done();
       });
     });
+
+    it('toString()s nicely', function() {
+      expect(GTE(test.mlang.Person.NAME, 'Carlos Santana').toString())
+          .toBe('GTE(name, "Carlos Santana")');
+      expect(GTE(7, 7).toString())
+          .toBe('GTE(7, 7)');
+      expect(GTE(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
+          .toBe('GTE(NOT(7), 7)');
+    });
   });
 
   it('Boolean properties can be used alone', function(done) {
@@ -353,7 +398,7 @@ describe('MLang', function() {
     });
 
     it('negates other expressions perfectly', function(done) {
-      var q = foam.mlang.predicate.LtExpr.create({
+      var q = foam.mlang.predicate.Lt.create({
         arg1: test.mlang.Person.ID,
         arg2: 4
       });
@@ -371,6 +416,10 @@ describe('MLang', function() {
           expect(keys[i]).toBe(1);
         done();
       });
+    });
+
+    it('toString()s nicely', function() {
+      expect(NOT('something').toString()).toBe('NOT("something")');
     });
   });
 
@@ -396,6 +445,10 @@ describe('MLang', function() {
         done();
       });
     });
+
+    it('toString()s nicely', function() {
+      expect(HAS(test.mlang.Person.NEVER_SET).toString()).toBe('HAS(neverSet)');
+    });
   });
 
   describe('CONTAINS()', function() {
@@ -420,6 +473,11 @@ describe('MLang', function() {
         done();
       });
     });
+
+    it('toString()s nicely', function() {
+      expect(CONTAINS(test.mlang.Person.NAME, 'Santana').toString()).toBe(
+          'CONTAINS(name, "Santana")');
+    });
   });
 
   describe('CONTAINS_IC()', function() {
@@ -435,6 +493,11 @@ describe('MLang', function() {
         expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
         done();
       });
+    });
+
+    it('toString()s nicely', function() {
+      expect(CONTAINS_IC(test.mlang.Person.NAME, 'Santana').toString()).toBe(
+          'CONTAINS_IC(name, "Santana")');
     });
   });
 
@@ -465,6 +528,14 @@ describe('MLang', function() {
       };
       expect(OR(false, true, false, { f: shouldNotBeCalled }).f()).toBe(true);
       expect(called).toBe(false);
+    });
+
+    it('toString()s nicely', function() {
+      expect(OR().toString()).toBe('OR()');
+      expect(OR(7).toString()).toBe('OR(7)');
+      expect(OR(true).toString()).toBe('OR(true)');
+      expect(OR(true, false, 'something').toString()).toBe(
+          'OR(true, false, "something")');
     });
   });
 
@@ -497,6 +568,14 @@ describe('MLang', function() {
       expect(AND(true, true, false, { f: shouldNotBeCalled }).f()).toBe(false);
       expect(called).toBe(false);
     });
+
+    it('toString()s nicely', function() {
+      expect(AND().toString()).toBe('AND()');
+      expect(AND(7).toString()).toBe('AND(7)');
+      expect(AND(true).toString()).toBe('AND(true)');
+      expect(AND(true, false, 'something').toString()).toBe(
+          'AND(true, false, "something")');
+    });
   });
 
   describe('IN()', function() {
@@ -523,6 +602,13 @@ describe('MLang', function() {
         expect(sink.a.length).toBe(2);
         done();
       });
+    });
+
+    // TODO(braden): The toString() for arrays isn't very pleasing, but we
+    // probably don't want to change it anywhere except mlangs.
+    it('toString()s nicely', function() {
+      expect(IN(test.mlang.Person.NAME, ['Jimi Hendrix', 'Mark Knopfler']).toString()).toBe(
+          'IN(name, Jimi Hendrix,Mark Knopfler)');
     });
   });
 });
