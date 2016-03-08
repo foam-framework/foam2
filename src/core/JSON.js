@@ -50,6 +50,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.LIB({
   name: 'Array',
   methods: [
