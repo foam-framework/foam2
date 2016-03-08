@@ -18,7 +18,7 @@
 require('../../../src/lib/promise');
 require('../../../src/lib/dao');
 require('../../../src/lib/mlang');
-
+require('es6-shim');
 
 describe('MLang', function() {
   var dao;
