@@ -260,7 +260,7 @@ foam.CLASS({
   package: 'foam.parsers',
   name: 'AnyChar',
 
-  axioms: [ 'foam.pattern.Singleton' ],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
     function parse(ps, obj) {

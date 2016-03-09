@@ -1524,6 +1524,64 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Identity',
+
+  properties: [
+    'ids'
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var ids  = this.ids.map(function(id) {
+        var prop = cls.getAxiomByName(id);
+        if ( ! prop )
+          console.error('Unknown ids property:', cls.id + '.' + id);
+        return prop;
+      });
+
+      console.assert(ids.length, 'Ids must contain at least one id.');
+
+      if ( ids.length == 1 ) {
+        console.assert(ids[0].name !== 'id', "Redundant to set ids: to just 'id'.");
+        cls.ID = ids[0];
+      } else {
+        cls.ID = {
+          name: 'ID',
+          get: function(o) {
+            var a = new Array(ids.length);
+            for ( var i = 0 ; i < a.length ; i++ ) {
+              a[i] = ids[i].get(o);
+            }
+            return a;
+          },
+          set: function(o, a) {
+            for ( var i = 0 ; i < a.length ; i++ )
+              ids[i].set(o, a[i]);
+          },
+          compare: function(o1, o2) {
+            for ( var i = 0 ; i < a.length ; i++ ) {
+              var c = ids[i].compare(o1, o2);
+              if ( c ) return c;
+            }
+            return 0;
+          }
+        };
+      }
+    },
+
+    function installInProto(proto) {
+      var ID = proto.cls_.ID;
+      Object.defineProperty(proto, 'id', {
+        get: function() { return ID.get(this); },
+        set: function(id) { ID.set(this, id); }
+      });
+    }
+  ]
+});
+
+
 /** Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -1606,6 +1664,14 @@ foam.CLASS({
         for ( var i = 0 ; i < a.length ; i++ )
           b[i] = prop.adaptArrayElement(a[i]);
         return b;
+      }
+    },
+    {
+      name: 'ids',
+      postSet: function(_, ids) {
+        this.axioms_.push.call(
+          this.axioms_,
+          foam.core.Identity.create({ids: ids}));
       }
     },
     {
@@ -1807,8 +1873,8 @@ foam.boot.end();
     - interfaces
   - DynamicValue map() and relate() methods
   - more docs
-  - ID support
   - context $ binding
+  - Axiom ordering/priority
 
  ???:
   - ? proxy label, plural from Class to Model

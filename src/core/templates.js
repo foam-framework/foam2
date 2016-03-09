@@ -47,7 +47,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
-  axioms: ['foam.patterns.Singleton'],
+  axioms: [foam.pattern.Singleton.create()],
 
   grammar: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
     return {
@@ -241,4 +241,3 @@ foam.CLASS({
     }
   ]
 });
-

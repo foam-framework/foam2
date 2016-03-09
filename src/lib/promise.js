@@ -1,85 +1,20 @@
 foam.CLASS({
-  package: 'foam.core',
-  name: 'StateMachine',
-  extends: 'Proxy',
-  properties: [
-    {
-      class: 'StringArray',
-      name: 'states'
-    },
-    {
-      name: 'factory',
-      expression: function(states) {
-        var initial = foam.string.constantize(states[0]);
-        return function() {
-          return this[initial];
-        };
-      }
-    },
-    // TODO: Should onenter/onleave be handled by per-state postset/preset?
-    {
-      name: 'postSet',
-      defaultValue: function(o, s) {
-        if ( this.onEnter ) this.onEnter(o);
-      }
-    },
-    {
-      name: 'preSet',
-      defaultValue: function(o, s) {
-        if ( o && this.onLeave ) this.onLeave(s);
-        return s;
-      }
-    },
-    {
-      name: 'delegates',
-      expression: function(of) {
-        var intf = foam.lookup(of);
-        return intf.getAxiomsByClass(foam.core.Method)
-          .filter(function(m) { return intf.hasOwnAxiom(m.name); })
-          .map(function(m) { return m.name; });
-      }
-    }
-  ],
+  package: 'foam.promise',
+  name: 'IPromise',
   methods: [
-    function installInClass(cls) {
-      var of = this.of;
-      var states = this.states.map(function(m) { return foam.lookup(cls.package + '.' + m + cls.name); });
-
-      for ( var i = 0 ; i < states.length ; i++ ) {
-        var constant = foam.core.Constant.create({
-          name: this.states[i],
-          // TODO: Is this right?  Should each state be a singleton?
-          // depends on whether states can have local state or not.  If all
-          // methods are delegated rather than forwarded, then they probably should
-          // be singletons
-          value: states[i].create()
-        });
-        cls.installAxiom(constant);
-      }
-      this.SUPER(cls);
-    }
+    function then(success, fail) {},
+    function fulfill(v) {},
+    function reject(e) {}
   ]
 });
 
 foam.CLASS({
   package: 'foam.promise',
-  name: 'PromiseState',
-  methods: [
-    function onEnter() {},
-    function onLeave() {},
-    function then() {},
-    function fulfill() {},
-    function reject() {}
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.promise',
-  name: 'PendingPromise',
-  implements: ['foam.promise.PromiseState'],
+  name: 'Pending',
+  implements: ['foam.promise.IPromise'],
   methods: [
     function then(success, fail) {
-      var next = foam.promise.Promise.create();
+      var next = this.cls_.create();
       var self = this;
       this.successCallbacks.push(function() {
         if ( ! success ) {
@@ -117,19 +52,19 @@ foam.CLASS({
     },
     function fulfill(value) {
       this.value = value;
-      this.state = this.RESOLVING;
+      this.state = this.STATE_RESOLVING;
     },
     function reject(e) {
       this.err = e;
-      this.state = this.REJECTED;
+      this.state = this.STATE_REJECTED;
     }
   ]
 });
 
 foam.CLASS({
   package: 'foam.promise',
-  extends: 'foam.promise.PendingPromise',
-  name: 'ResolvingPromise',
+  name: 'Resolving',
+  extends: 'foam.promise.Pending',
   methods: [
     function onEnter(from) {
       this.resolve_(this.value);
@@ -139,8 +74,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.promise',
-  name: 'FulfilledPromise',
-  implements: ['foam.promise.PromiseState'],
+  name: 'Fulfilled',
+  implements: ['foam.promise.IPromise'],
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -168,8 +103,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.promise',
-  name: 'RejectedPromise',
-  implements: ['foam.promise.PromiseState'],
+  name: 'Rejected',
+  implements: ['foam.promise.IPromise'],
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -191,16 +126,22 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.promise',
   name: 'Promise',
+  requires: [
+    'foam.promise.Pending',
+    'foam.promise.Resolving',
+    'foam.promise.Fulfilled',
+    'foam.promise.Rejected'
+  ],
   properties: [
     {
       class: 'StateMachine',
-      of: 'foam.promise.PromiseState',
+      of: 'foam.promise.IPromise',
       name: 'state',
       states: [
-        'Pending',
-        'Resolving',
-        'Fulfilled',
-        'Rejected'
+        'foam.promise.Pending',
+        'foam.promise.Resolving',
+        'foam.promise.Fulfilled',
+        'foam.promise.Rejected'
       ]
     },
     {
@@ -228,14 +169,50 @@ foam.CLASS({
           self.resolve_(v);
         }, function(e) {
           self.err = e;
-          self.state = self.REJECTED;
+          self.state = self.STATE_REJECTED;
         });
       } else {
         this.value = value;
-        this.state = this.FULFILLED;
+        this.state = this.STATE_FULFILLED;
       }
     },
     function put(obj) { this.fulfill(obj); },
+    function remove(obj) { this.fulfill(obj); },
     function error(e) { this.reject(e); }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.promise',
+  name: 'xPromise',
+  properties: [
+    {
+      name: 'p',
+      factory: function() {
+        var self = this;
+        return new Promise(function(f, r) {
+          self.fulfill_ = f;
+          self.reject_ = r;
+        })
+      }
+    },
+    'fulfill_',
+    'reject_'
+  ],
+  methods: [
+    function put(a) { this.fulfill(a); },
+    function remove(a) { this.fulfill(a); },
+    function error(e) { this.reject(e); },
+    function fulfill(v) {
+      this.p;
+      if ( this.fulfill_ ) this.fulfill_(v);
+    },
+    function reject(e) {
+      this.p;
+      if ( this.reject_ ) this.reject_(e);
+    },
+    function then(a, b) {
+      return this.p.then(a, b);
+    }
   ]
 });

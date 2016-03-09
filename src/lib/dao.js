@@ -106,12 +106,6 @@ foam.CLASS({
       name: 'removeAll'
     },
     {
-      name: 'listen'
-    },
-    {
-      name: 'unlisten'
-    },
-    {
       name: 'pipe'
     },
     {
@@ -436,11 +430,41 @@ foam.CLASS({
       }
     },
 
-    function listen(sink, options) {},
+    {
+      name: 'pipe',
+      code: function pipe(sink, options) {
+        var mySink = this.decorateSink_(sink, options, true);
 
-    function unlisten(sink) {},
+        var fc = this.FlowControl.create();
+        var sub;
 
-    function pipe() {},
+        fc.propertyChange.subscribe(function(s, _, p) {
+          if ( p.name == "stopped") {
+            if ( sub ) sub.destroy();
+          } else if ( p.name === "errorEvt" ) {
+            if ( sub ) sub.destroy();
+            mySink.error(fc.errorEvt);
+          }
+        });
+
+        this.select(sink, options).then(function() {
+          this.on.subscribe(function(s, on, e, obj) {
+            sub = s;
+            switch(e) {
+            case 'put':
+              sink.put(obj, null, fc);
+              break;
+            case 'remove':
+              sink.remove(obj, null, fc);
+              break;
+            case 'reset':
+              sink.reset();
+              break;
+            }
+          });
+        }.bind(this));
+      }
+    },
 
     function update() {},
 
@@ -633,11 +657,6 @@ foam.CLASS({
   ],
 
   methods: [
-    /** extracts .id */
-    function idF_(obj) { return obj && obj.id; },
-
-    function identity_(obj) { return obj; },
-
     function listen(sink, options) {
     },
 
@@ -646,11 +665,8 @@ foam.CLASS({
       var promise = this.Promise.create();
       promise.fulfill(sink);
 
-      var f = obj.id ? this.idF_ : this.identity_;
-      var id = f(obj);
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(id, f(this.array[i])) ) {
+        if ( foam.util.equals(obj.id, this.array[i].id) ) {
           this.array[i] = obj;
           break;
         }
@@ -668,12 +684,8 @@ foam.CLASS({
       var promise = this.Promise.create();
       promise.fulfill(sink);
 
-      //var id = obj.id ? obj.id : obj;
-      var f = ( obj.id ? this.idF_ : this.identity_ );
-      var id = f(obj);
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(id, f(this.array[i])) ) {
+        if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
           sink.remove(o2);
           this.on.remove.publish(o2);
@@ -681,7 +693,7 @@ foam.CLASS({
         }
       }
 
-      var err = this.ObjectNotFoundException.create({ id: id });
+      var err = this.ObjectNotFoundException.create({ id: obj.id });
       sink.error(err);
       return promise;
     },
@@ -718,7 +730,7 @@ foam.CLASS({
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
-          var obj = this.array.splice(i, 1);
+          var obj = this.array.splice(i, 1)[0];
           i--;
           sink && sink.remove(obj);
           this.on.remove.publish(obj);
@@ -749,6 +761,68 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'PendingPromiseDAO',
+  implements: ['foam.dao.DAO'],
+  methods: [
+    function put(obj, sink) {
+      return this.promise.then(function(p) {
+        return p.put(obj, sink);
+      });
+    },
+    function remove(obj, sink) {
+      return this.promise.then(function(p) {
+        return p.remove(obj, sink);
+      });
+    },
+    function select(sink, options) {
+      return this.promise.then(function(p) {
+        return p.select(sink, options);
+      });
+    },
+    function removeAll(sink, options) {
+      return this.promise.then(function(p) {
+        return p.removeAll(sink, options);
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'PromiseDAO',
+  extends: 'foam.dao.AbstractDAO',
+  imports: ['error'],
+  properties: [
+    {
+      class: 'StateMachine',
+      of: 'foam.dao.DAO',
+      name: 'delegate',
+      states: [
+        {
+          name: 'pending',
+          className: 'foam.dao.PendingPromiseDAO'
+        },
+        {
+          name: 'fulfilled',
+          className: 'foam.dao.ProxyDAO'
+        }
+      ]
+    },
+    {
+      name: 'promise',
+      final: true,
+      postSet: function(_, p) {
+        p.then(function(dao) {
+          this.state = this.STATE_FULFILLED;
+        }.bind(this), function(error) {
+          this.error("Promise didn't resolve to a DAO", error);
+        }.bind(this));
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',

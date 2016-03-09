@@ -959,6 +959,38 @@ foam.CLASS({
 });
 RequiresAliasTest.create().foo();
 
+// Classes can have a unique-id or primary-key.
+// By default, this is simply the field named 'id'.
+foam.CLASS({
+  name: 'Invoice',
+  properties: [ 'id', 'desc', 'amount' ]
+});
+var o = Invoice.create({id: 1, desc: 'Duct Cleaning', amount: 99.99});
+log(o.id);
+
+// But you can also use the 'ids' property to specify that
+// the primary key be something other than 'id'.
+// In this case, 'id' will become an psedo-property for
+// accessing the real 'invoiceId' property.
+foam.CLASS({
+  name: 'Invoice2',
+  properties: [ 'invoiceId', 'desc', 'amount' ],
+  ids: [ 'invoiceId' ]
+});
+var o = Invoice2.create({invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
+log(o.id, o.invoiceId);
+
+// Multi-park unique identifiers are also supported.
+foam.CLASS({
+  name: 'Invoice3',
+  properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ],
+  ids: [ 'customerId', 'invoiceId' ]
+});
+var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
+log(o.id, o.customerId, o.invoiceId);
+o.id = [2, 3];
+log(o.id, o.customerId, o.invoiceId);
+
 // A Classes 'id' is a combination of its package and name.
 log(com.acme.Test.id);
 

@@ -123,7 +123,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'True',
   extends: 'foam.mlang.predicate.Expr',
-  axioms: [ 'foam.patterns.Singleton' ],
+  axioms: [ foam.pattern.Singleton.create() ],
   methods: [
     function f() { return true; },
     function toString() { return 'TRUE'; }
@@ -135,7 +135,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'False',
   extends: 'foam.mlang.predicate.Expr',
-  axioms: [ 'foam.patterns.Singleton' ],
+  axioms: [ foam.pattern.Singleton.create() ],
   methods: [
     function f() { return false; },
     function toString() { return 'FALSE'; }
