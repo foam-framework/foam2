@@ -121,10 +121,42 @@ foam.CLASS({
 });
 DaoTest.create({ dao: dao }).go();
 
-dao.on.subscribe(function(_, _, type, o) { console.log("On event", type, o && o.id); });
-dao.on.remove.subscribe(function(_,_,_,o) { console.log("On remove", o.id); });
+dao.on.subscribe(function(_, _, type, o) {
+  console.log("On event", type, o && o.id);
+});
+dao.on.remove.subscribe(function(_,_,_,o) {
+  console.log("On remove", o.id);
+});
 
 
 dao.removeAll();
 dao.put(Abc.create({ id: 4 }));
 dao.remove(12).then(console.log.bind(console, "Removed 12"), console.error.bind(console, "Error removing 12"));
+
+
+console.log("Testing promise dao.");
+var dao2 = foam.dao.PromiseDAO.create({ promise: foam.promise.Promise.create(), of: Abc });
+dao2.put(Abc.create({ id: 1 }));
+dao2.put(Abc.create({ id: 2 }));
+dao2.select(LoggingSink.create());
+dao2.remove(Abc.create({ id: 2 }));
+
+dao2.select(LoggingSink.create()).then(function(a) {
+  console.log("Second select finished.");
+  return dao2.put(Abc.create({ id: 4 }));
+}).then(function(p) {
+  console.log("Put object", p.id);
+});
+
+setTimeout(function() {
+  dao2.promise.fulfill(foam.dao.ArrayDAO.create());
+}, 1000);
+
+setTimeout(function() {
+  dao2.select(LoggingSink.create())
+    .then(function() {
+      return dao2.put(Abc.create({ id: 5 }));
+    }).then(function() {
+      dao2.select(LoggingSink.create());
+    });
+}, 2000);
