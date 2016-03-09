@@ -709,8 +709,8 @@ foam.CLASS({
     },
 
     /** Copy this property's value from o1 to o2. **/
-    function copy(o1, o2) {
-      this.set(o2, this.get(o1));
+    function copy(srd, dst) {
+      this.set(dst, this.get(src));
     },
 
     function exportedValue(obj, m) {
@@ -1551,21 +1551,25 @@ foam.CLASS({
           name: 'ID',
           get: function(o) {
             var a = new Array(ids.length);
-            for ( var i = 0 ; i < a.length ; i++ ) {
+            for ( var i = 0 ; i < ids.length ; i++ ) {
               a[i] = ids[i].get(o);
             }
             return a;
           },
           set: function(o, a) {
-            for ( var i = 0 ; i < a.length ; i++ )
+            for ( var i = 0 ; i < ids.length ; i++ )
               ids[i].set(o, a[i]);
           },
           compare: function(o1, o2) {
-            for ( var i = 0 ; i < a.length ; i++ ) {
+            for ( var i = 0 ; i < ids.length ; i++ ) {
               var c = ids[i].compare(o1, o2);
               if ( c ) return c;
             }
             return 0;
+          },
+          copy: function(src, dst) {
+            for ( var i = 0 ; i < ids.length ; i++ )
+              ids[i].copy(src, dst);
           }
         };
       }
