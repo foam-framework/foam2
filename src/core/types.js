@@ -339,3 +339,86 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core.fsm',
+  name: 'State',
+  properties: [
+    {
+      name: 'name',
+      expression: function(className) { return className.substring(className.lastIndexOf('.') + 1); }
+    },
+    {
+      name: 'className'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StateMachine',
+  extends: 'Proxy',
+  properties: [
+    {
+      class: 'Array',
+      of: 'foam.core.fsm.State',
+      name: 'states',
+      adaptArrayElement: function(s) {
+        return typeof s == "string" ?
+          foam.lookup(this.of).create({ className: s }) :
+          foam.lookup(this.of).create(s);
+      }
+    },
+    {
+      name: 'factory',
+      expression: function(name, states) {
+        var initial = foam.string.constantize(name + states[0].name);
+        return function() {
+          return this[initial];
+        };
+      }
+    },
+    {
+      name: 'postSet',
+      defaultValue: function(o, s) {
+        if ( s.onEnter ) s.onEnter.call(this, o);
+      }
+    },
+    {
+      name: 'preSet',
+      defaultValue: function(o, s) {
+        if ( o && o.onLeave ) o.onLeave.call(this, s);
+        return s;
+      }
+    },
+    {
+      name: 'delegates',
+      expression: function(of) {
+        var intf = foam.lookup(of);
+        return intf.getAxiomsByClass(foam.core.Method)
+          .filter(function(m) { return intf.hasOwnAxiom(m.name); })
+          .map(function(m) { return m.name; });
+      }
+    }
+  ],
+  methods: [
+    function installInClass(cls) {
+      this.SUPER(cls);
+
+      var of = this.of;
+      var self = this;
+
+      var states = this.states.map(function(m) {
+        return foam.core.Constant.create({
+          name: foam.string.constantize(self.name + m.name),
+          value: foam.lookup(m.className).create()
+        });
+      });
+
+      for ( var i = 0 ; i < states.length ; i++ ) {
+        cls.installAxiom(states[i]);
+      }
+      this.SUPER(cls);
+    }
+  ]
+});
