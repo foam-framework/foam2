@@ -974,8 +974,8 @@ log(o.id);
 // accessing the real 'invoiceId' property.
 foam.CLASS({
   name: 'Invoice2',
-  properties: [ 'invoiceId', 'desc', 'amount' ],
-  ids: [ 'invoiceId' ]
+  ids: [ 'invoiceId' ],
+  properties: [ 'invoiceId', 'desc', 'amount' ]
 });
 var o = Invoice2.create({invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
 log(o.id, o.invoiceId);
@@ -983,8 +983,8 @@ log(o.id, o.invoiceId);
 // Multi-park unique identifiers are also supported.
 foam.CLASS({
   name: 'Invoice3',
-  properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ],
-  ids: [ 'customerId', 'invoiceId' ]
+  ids: [ 'customerId', 'invoiceId' ],
+  properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ]
 });
 var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
 log(o.id, o.customerId, o.invoiceId);

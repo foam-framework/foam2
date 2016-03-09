@@ -344,8 +344,21 @@ foam.LIB({
     function phase3() {
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
-        for ( var i = 0 ; i < m.axioms_.length ; i++ )
-          this.installAxiom(m.axioms_[i]);
+        this.axiomCache_ = {};
+
+        // Install Axioms in first pass so that they're available in the second-pass
+        // when axioms are actually run.  This avoids some ordering issues.
+        for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
+          var a = m.axioms_[i];
+          this.axiomMap_[a.name] = a;
+          a.sourceCls_ = this;
+        }
+
+        for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
+          var a = m.axioms_[i];
+          a.installInClass && a.installInClass(this);
+          a.installInProto && a.installInProto(this.prototype);
+        }
       };
     },
 
@@ -1528,9 +1541,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Identity',
 
-  properties: [
-    'ids'
-  ],
+  properties: [ 'ids' ],
 
   methods: [
     function installInClass(cls) {
