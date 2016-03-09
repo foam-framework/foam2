@@ -42,7 +42,7 @@
 */
 
 var fs = require('fs');
-require("../js/core/load.js");
+require("../../src/core/foam.js");
 
 var modelComments = {};
 
@@ -276,6 +276,10 @@ var checkForPackageModule = function checkForPackageModule(parser, pkg) {
   }
 }
 
+var isMethod = function isMethod(containerName) {
+  return containerName == 'methods' || containerName == 'listeners';
+}
+
 var i = 0;
 exports.astNodeVisitor = {
   visitNode: function(node, e, parser, currentSourceName) {
@@ -365,7 +369,7 @@ exports.astNodeVisitor = {
     else if (node.type === 'FunctionExpression' &&
       node.parent.type === 'ArrayExpression' &&
       node.parent.parent.type === 'Property' &&
-      node.parent.parent.key.name === 'methods'
+      isMethod(node.parent.parent.key.name)
     ) {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
@@ -392,13 +396,13 @@ exports.astNodeVisitor = {
       node.parent.type === 'ArrayExpression' &&
       node.parent.parent.type === 'Property' &&
       ( node.parent.parent.key.name === 'properties' ||
-        node.parent.parent.key.name === 'methods' )
+        isMethod(node.parent.parent.key.name) )
     ) {
       var parentClass = getCLASSName(node.parent.parent.parent);
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node.properties[0], currentSourceName) || getComment(node, currentSourceName),
-        (( node.parent.parent.key.name === 'methods' ) ? "\n@method " : "") +
+        (( isMethod(node.parent.parent.key.name) ) ? "\n@method " : "") +
           "\n@memberof! "+parentClass + ".prototype"
       );
       e.lineno = node.parent.loc.start.line;

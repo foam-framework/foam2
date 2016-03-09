@@ -1,4 +1,19 @@
-
+/*
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /**
 // JSON Support
@@ -34,6 +49,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.LIB({
   name: 'Array',
@@ -72,6 +88,13 @@ foam.LIB({
         out('"', o, '"');
       } else if ( typeof o === 'number' ) {
         out(o);
+      } else if ( Array.isArray(o) ) {
+        out('[');
+        for ( var i = 0 ; i < o.length ; i++ ) {
+          this.output(out, o[i]);
+          if ( i < o.length -1 ) out(',');
+        }
+        out(']');
       } else if ( o.outputJSON ) {
         o.outputJSON(out);
       }
@@ -90,8 +113,8 @@ foam.LIB({
     function parseArray(a, opt_class) {
       return a.map(function(e) { return foam.json.parse(e, opt_class); });
     },
-    function parseString(str) {
-      return eval('(' + str + ')');
+    function parseString(jsonStr) {
+      return eval('(' + jsonStr + ')');
     },
     function stringify(o, opt_options) {
       var out = this.createOut();
@@ -100,4 +123,3 @@ foam.LIB({
     }
   ]
 });
-

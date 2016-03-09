@@ -645,8 +645,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
-
-  requires: [ 'foam.dao.ArraySink' ],
+  requires: [
+    'foam.dao.ArraySink',
+  ],
 
   properties: [
     {
@@ -656,11 +657,6 @@ foam.CLASS({
   ],
 
   methods: [
-    /** extracts .id */
-    function idF_(obj) { return obj && obj.id; },
-
-    function identity_(obj) { return obj; },
-
     function listen(sink, options) {
     },
 
@@ -669,11 +665,8 @@ foam.CLASS({
       var promise = this.Promise.create();
       promise.fulfill(sink);
 
-      var f = obj.id ? this.idF_ : this.identity_;
-      var id = f(obj);
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(id, f(this.array[i])) ) {
+        if ( foam.util.equals(obj.id, this.array[i].id) ) {
           this.array[i] = obj;
           break;
         }
@@ -691,12 +684,8 @@ foam.CLASS({
       var promise = this.Promise.create();
       promise.fulfill(sink);
 
-      //var id = obj.id ? obj.id : obj;
-      var f = ( obj.id ? this.idF_ : this.identity_ );
-      var id = f(obj);
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(id, f(this.array[i])) ) {
+        if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
           sink.remove(o2);
           this.on.remove.publish(o2);
@@ -704,7 +693,7 @@ foam.CLASS({
         }
       }
 
-      var err = this.ObjectNotFoundException.create({ id: id });
+      var err = this.ObjectNotFoundException.create({ id: obj.id });
       sink.error(err);
       return promise;
     },
@@ -712,7 +701,7 @@ foam.CLASS({
     function select(sink, options) {
       var resultSink = sink || this.ArraySink.create();
 
-      sink = this.decorateSink_(sink || this.ArraySink.create(), options);
+      sink = this.decorateSink_(resultSink, options);
 
       var promise = this.Promise.create();
 

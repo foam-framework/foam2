@@ -692,6 +692,11 @@ foam.CLASS({
       };
     },
 
+    /** Returns a human-readable description of this Property. */
+    function toString() {
+      return this.name;
+    },
+
     /** Flyweight getter for this Property. */
     function get(o) {
       return o[this.name];
@@ -891,7 +896,19 @@ foam.CLASS({
       var count = 0;
       while ( listeners ) {
         var l = listeners.l;
-        l.apply(null, a);
+        var s = listeners.sub;
+        switch ( a.length ) {
+          case 0: l(s); break;
+          case 1: l(s, a[0]); break;
+          case 2: l(s, a[0], a[1]); break;
+          case 3: l(s, a[0], a[1], a[2]); break;
+          case 4: l(s, a[0], a[1], a[2], a[3]); break;
+          case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
+          case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
+          case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
+          case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
+          case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
+        }
         listeners = listeners.next;
         count++;
       }
@@ -919,7 +936,7 @@ foam.CLASS({
       // So we move all of the code to publish_() so that it is JIT-ed.
       return this.publish_(arguments);
     },
-
+  
     function publish_(args) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
@@ -963,7 +980,8 @@ foam.CLASS({
       var node = {
         sub:  { src: this },
         next: listeners.next,
-        prev: listeners
+        prev: listeners,
+        l: l
       };
       node.sub.destroy = function() {
         if ( node.next ) node.next.prev = node.prev;
@@ -972,7 +990,6 @@ foam.CLASS({
         // Disconnect so that calling destroy more than once is harmless
         node.next = node.prev = null;
       };
-      node.l = l.bind(null, node.sub);
 
       if ( listeners.next ) listeners.next.prev = node;
       listeners.next = node;
@@ -1148,7 +1165,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInClass(cls) { cls.installModel(foam.lookup(this.path).model_); }
+    function installInClass(cls) {
+      var m = foam.lookup(this.path);
+      if ( ! m ) throw 'No such interface or trait: ' + this.path;
+      cls.installModel(m.model_);
+    }
   ]
 });
 
@@ -1498,6 +1519,64 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Identity',
+
+  properties: [
+    'ids'
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var ids  = this.ids.map(function(id) {
+        var prop = cls.getAxiomByName(id);
+        if ( ! prop )
+          console.error('Unknown ids property:', cls.id + '.' + id);
+        return prop;
+      });
+
+      console.assert(ids.length, 'Ids must contain at least one id.');
+
+      if ( ids.length == 1 ) {
+        console.assert(ids[0].name !== 'id', "Redundant to set ids: to just 'id'.");
+        cls.ID = ids[0];
+      } else {
+        cls.ID = {
+          name: 'ID',
+          get: function(o) {
+            var a = new Array(ids.length);
+            for ( var i = 0 ; i < a.length ; i++ ) {
+              a[i] = ids[i].get(o);
+            }
+            return a;
+          },
+          set: function(o, a) {
+            for ( var i = 0 ; i < a.length ; i++ )
+              ids[i].set(o, a[i]);
+          },
+          compare: function(o1, o2) {
+            for ( var i = 0 ; i < a.length ; i++ ) {
+              var c = ids[i].compare(o1, o2);
+              if ( c ) return c;
+            }
+            return 0;
+          }
+        };
+      }
+    },
+
+    function installInProto(proto) {
+      var ID = proto.cls_.ID;
+      Object.defineProperty(proto, 'id', {
+        get: function() { return ID.get(this); },
+        set: function(id) { ID.set(this, id); }
+      });
+    }
+  ]
+});
+
+
 /** Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -1580,6 +1659,14 @@ foam.CLASS({
         for ( var i = 0 ; i < a.length ; i++ )
           b[i] = prop.adaptArrayElement(a[i]);
         return b;
+      }
+    },
+    {
+      name: 'ids',
+      postSet: function(_, ids) {
+        this.axioms_.push.call(
+          this.axioms_,
+          foam.core.Identity.create({ids: ids}));
       }
     },
     {
@@ -1773,6 +1860,7 @@ foam.CLASS({
 foam.boot.end();
 
 
+
 /**
  TODO:
   - model validation
@@ -1780,8 +1868,8 @@ foam.boot.end();
     - interfaces
   - DynamicValue map() and relate() methods
   - more docs
-  - ID support
   - context $ binding
+  - Axiom ordering/priority
 
  ???:
   - ? proxy label, plural from Class to Model

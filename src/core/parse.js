@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-
-
 foam.CLASS({
   package: 'foam.parsers',
   name: 'StringPS',
