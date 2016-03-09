@@ -359,6 +359,7 @@ foam.CLASS({
   name: 'StateMachine',
   extends: 'Proxy',
   properties: [
+    'plural',
     {
       class: 'Array',
       of: 'foam.core.fsm.State',
@@ -371,10 +372,11 @@ foam.CLASS({
     },
     {
       name: 'factory',
-      expression: function(name, states) {
-        var initial = foam.string.constantize(name + states[0].name);
+      expression: function(plural, states) {
+        var initial = foam.string.constantize(plural);
+        var state = foam.string.constantize(states[0].name);
         return function() {
-          return this[initial];
+          return this[initial][state];
         };
       }
     },
@@ -408,16 +410,40 @@ foam.CLASS({
       var of = this.of;
       var self = this;
 
-      var states = this.states.map(function(m) {
-        return foam.core.Constant.create({
-          name: foam.string.constantize(self.name + m.name),
-          value: foam.lookup(m.className).create()
+      var states = {};
+      this.states.forEach(function(state) {
+        var name = state.name;
+        var className = state.className;
+        Object.defineProperty(states, foam.string.constantize(state.name), {
+          get: (function() {
+            var value;
+            return function() {
+              if ( ! value ) {
+                value = this[state.name] ? this[state.name].create() :
+                  foam.lookup(state.className).create();
+              }
+              return value;
+            };
+          })()
         });
       });
 
-      for ( var i = 0 ; i < states.length ; i++ ) {
-        cls.installAxiom(states[i]);
-      }
+      states = foam.core.Constant.create({
+        name: foam.string.constantize(this.plural),
+        value: states
+      });
+      cls.installAxiom(states);
+
+      // var states = this.states.map(function(m) {
+      //   return foam.core.Constant.create({
+      //     name: foam.string.constantize(self.name + m.name),
+      //     value: foam.lookup(m.className).create()
+      //   });
+      // });
+
+      // for ( var i = 0 ; i < states.length ; i++ ) {
+      //   cls.installAxiom(states[i]);
+      // }
       this.SUPER(cls);
     }
   ]

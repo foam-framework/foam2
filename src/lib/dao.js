@@ -762,34 +762,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'PendingPromiseDAO',
-  implements: ['foam.dao.DAO'],
-  methods: [
-    function put(obj, sink) {
-      return this.promise.then(function(p) {
-        return p.put(obj, sink);
-      });
-    },
-    function remove(obj, sink) {
-      return this.promise.then(function(p) {
-        return p.remove(obj, sink);
-      });
-    },
-    function select(sink, options) {
-      return this.promise.then(function(p) {
-        return p.select(sink, options);
-      });
-    },
-    function removeAll(sink, options) {
-      return this.promise.then(function(p) {
-        return p.removeAll(sink, options);
-      });
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
   name: 'PromiseDAO',
   extends: 'foam.dao.AbstractDAO',
   imports: ['error'],
@@ -797,11 +769,12 @@ foam.CLASS({
     {
       class: 'StateMachine',
       of: 'foam.dao.DAO',
-      name: 'delegate',
+      name: 'state',
+      plural: 'states',
       states: [
         {
           name: 'pending',
-          className: 'foam.dao.PendingPromiseDAO'
+          className: 'Pending'
         },
         {
           name: 'fulfilled',
@@ -809,16 +782,46 @@ foam.CLASS({
         }
       ]
     },
+    'delegate',
     {
       name: 'promise',
       final: true,
       postSet: function(_, p) {
         p.then(function(dao) {
-          this.state = this.STATE_FULFILLED;
+          this.delegate = dao;
+          this.state = this.STATES.FULFILLED;
         }.bind(this), function(error) {
           this.error("Promise didn't resolve to a DAO", error);
         }.bind(this));
       }
+    }
+  ],
+  classes: [
+    {
+      name: 'Pending',
+      extends: 'foam.dao.AbstractDAO',
+      methods: [
+        function put(obj, sink) {
+          return this.promise.then(function(p) {
+            return p.put(obj, sink);
+          });
+        },
+        function remove(obj, sink) {
+          return this.promise.then(function(p) {
+            return p.remove(obj, sink);
+          });
+        },
+        function select(sink, options) {
+          return this.promise.then(function(p) {
+            return p.select(sink, options);
+          });
+        },
+        function removeAll(sink, options) {
+          return this.promise.then(function(p) {
+            return p.removeAll(sink, options);
+          });
+        }
+      ]
     }
   ]
 });
