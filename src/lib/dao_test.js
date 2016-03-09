@@ -31,7 +31,7 @@ dao.put(Abc.create({ id: 2, foo: 100 })).then(
 
   });
 
-dao.select(foam.mlang.CountExpr.create()).then(function(c) {
+dao.select(foam.mlang.sink.Count.create()).then(function(c) {
   console.log("Count is ", c.value);
 });
 

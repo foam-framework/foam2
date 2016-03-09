@@ -20,7 +20,7 @@
 // TODO(braden): Port the partialEval() code over here.
 
 foam.CLASS({
-  package: 'foam.mlang',
+  package: 'foam.mlang.sink',
   implements: ['foam.dao.Sink'],
   name: 'Count',
   properties: [
@@ -53,8 +53,8 @@ foam.CLASS({
       defaultValue: function(o) {
         if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( Array.isArray(o) ) return foam.mlang.predicate.Constant.create({ value: o });
-        if ( o === true ) return foam.mlang.True.create();
-        if ( o === false ) return foam.mlang.False.create();
+        if ( o === true ) return foam.mlang.predicate.True.create();
+        if ( o === false ) return foam.mlang.predicate.False.create();
         return o;
       }
     }

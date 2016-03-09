@@ -129,7 +129,7 @@ foam.CLASS({
   name: 'DAOOptions',
 
   requires: [
-    'foam.mlang.AndExpr'
+    'foam.mlang.predicate.And'
   ],
 
   properties: [
@@ -165,7 +165,7 @@ foam.CLASS({
     function addWhere(p) {
       var o = this.cls_.create(this);
       o.where = this.where ?
-        this.AndExpr.create({ args: [this.where, p] }) :
+        this.And.create({ args: [this.where, p] }) :
         p;
       return o;
     }
@@ -647,6 +647,7 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
   requires: [
     'foam.dao.ArraySink',
+    'foam.mlang.predicate.True'
   ],
 
   properties: [
@@ -724,9 +725,7 @@ foam.CLASS({
     },
 
     function removeAll(sink, options) {
-      // TODO: Require TrueExpr when ordering is fixed or we have
-      // better lazy loading
-      var predicate = ( options && options.where ) || foam.mlang.TrueExpr.create();
+      var predicate = ( options && options.where ) || this.True.create();
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
@@ -763,34 +762,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'PendingPromiseDAO',
-  implements: ['foam.dao.DAO'],
-  methods: [
-    function put(obj, sink) {
-      return this.promise.then(function(p) {
-        return p.put(obj, sink);
-      });
-    },
-    function remove(obj, sink) {
-      return this.promise.then(function(p) {
-        return p.remove(obj, sink);
-      });
-    },
-    function select(sink, options) {
-      return this.promise.then(function(p) {
-        return p.select(sink, options);
-      });
-    },
-    function removeAll(sink, options) {
-      return this.promise.then(function(p) {
-        return p.removeAll(sink, options);
-      });
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
   name: 'PromiseDAO',
   extends: 'foam.dao.AbstractDAO',
   imports: ['error'],
@@ -798,11 +769,12 @@ foam.CLASS({
     {
       class: 'StateMachine',
       of: 'foam.dao.DAO',
-      name: 'delegate',
+      name: 'state',
+      plural: 'states',
       states: [
         {
           name: 'pending',
-          className: 'foam.dao.PendingPromiseDAO'
+          className: 'Pending'
         },
         {
           name: 'fulfilled',
@@ -810,16 +782,46 @@ foam.CLASS({
         }
       ]
     },
+    'delegate',
     {
       name: 'promise',
       final: true,
       postSet: function(_, p) {
         p.then(function(dao) {
-          this.state = this.STATE_FULFILLED;
+          this.delegate = dao;
+          this.state = this.STATES.FULFILLED;
         }.bind(this), function(error) {
           this.error("Promise didn't resolve to a DAO", error);
         }.bind(this));
       }
+    }
+  ],
+  classes: [
+    {
+      name: 'Pending',
+      extends: 'foam.dao.AbstractDAO',
+      methods: [
+        function put(obj, sink) {
+          return this.promise.then(function(p) {
+            return p.put(obj, sink);
+          });
+        },
+        function remove(obj, sink) {
+          return this.promise.then(function(p) {
+            return p.remove(obj, sink);
+          });
+        },
+        function select(sink, options) {
+          return this.promise.then(function(p) {
+            return p.select(sink, options);
+          });
+        },
+        function removeAll(sink, options) {
+          return this.promise.then(function(p) {
+            return p.removeAll(sink, options);
+          });
+        }
+      ]
     }
   ]
 });

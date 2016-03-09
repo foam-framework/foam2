@@ -52,11 +52,11 @@ foam.CLASS({
     },
     function fulfill(value) {
       this.value = value;
-      this.state = this.STATE_RESOLVING;
+      this.state = this.STATES.RESOLVING;
     },
     function reject(e) {
       this.err = e;
-      this.state = this.STATE_REJECTED;
+      this.state = this.STATES.REJECTED;
     }
   ]
 });
@@ -137,6 +137,7 @@ foam.CLASS({
       class: 'StateMachine',
       of: 'foam.promise.IPromise',
       name: 'state',
+      plural: 'states',
       states: [
         'foam.promise.Pending',
         'foam.promise.Resolving',
@@ -169,11 +170,11 @@ foam.CLASS({
           self.resolve_(v);
         }, function(e) {
           self.err = e;
-          self.state = self.STATE_REJECTED;
+          self.state = self.STATES.REJECTED;
         });
       } else {
         this.value = value;
-        this.state = this.STATE_FULFILLED;
+        this.state = this.STATES.FULFILLED;
       }
     },
     function put(obj) { this.fulfill(obj); },
