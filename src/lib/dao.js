@@ -106,12 +106,6 @@ foam.CLASS({
       name: 'removeAll'
     },
     {
-      name: 'listen'
-    },
-    {
-      name: 'unlisten'
-    },
-    {
       name: 'pipe'
     },
     {
@@ -436,11 +430,41 @@ foam.CLASS({
       }
     },
 
-    function listen(sink, options) {},
+    {
+      name: 'pipe',
+      code: function pipe(sink, options) {
+        var mySink = this.decorateSink_(sink, options, true);
 
-    function unlisten(sink) {},
+        var fc = this.FlowControl.create();
+        var sub;
 
-    function pipe() {},
+        fc.propertyChange.subscribe(function(s, _, p) {
+          if ( p.name == "stopped") {
+            if ( sub ) sub.destroy();
+          } else if ( p.name === "errorEvt" ) {
+            if ( sub ) sub.destroy();
+            mySink.error(fc.errorEvt);
+          }
+        });
+
+        this.select(sink, options).then(function() {
+          this.on.subscribe(function(s, on, e, obj) {
+            sub = s;
+            switch(e) {
+            case 'put':
+              sink.put(obj, null, fc);
+              break;
+            case 'remove':
+              sink.remove(obj, null, fc);
+              break;
+            case 'reset':
+              sink.reset();
+              break;
+            }
+          });
+        }.bind(this));
+      }
+    },
 
     function update() {},
 
