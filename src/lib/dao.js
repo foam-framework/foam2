@@ -129,7 +129,7 @@ foam.CLASS({
   name: 'DAOOptions',
 
   requires: [
-    'foam.mlang.AndExpr'
+    'foam.mlang.predicate.And'
   ],
 
   properties: [
@@ -165,7 +165,7 @@ foam.CLASS({
     function addWhere(p) {
       var o = this.cls_.create(this);
       o.where = this.where ?
-        this.AndExpr.create({ args: [this.where, p] }) :
+        this.And.create({ args: [this.where, p] }) :
         p;
       return o;
     }
@@ -647,6 +647,7 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
   requires: [
     'foam.dao.ArraySink',
+    'foam.mlang.predicate.True'
   ],
 
   properties: [
@@ -724,9 +725,7 @@ foam.CLASS({
     },
 
     function removeAll(sink, options) {
-      // TODO: Require TrueExpr when ordering is fixed or we have
-      // better lazy loading
-      var predicate = ( options && options.where ) || foam.mlang.TrueExpr.create();
+      var predicate = ( options && options.where ) || this.True.create();
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
