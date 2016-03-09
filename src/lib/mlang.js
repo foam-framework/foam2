@@ -82,7 +82,7 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'TrueExpr',
   implements: ['foam.mlang.Expr'],
-  axioms: [ 'foam.patterns.Singleton' ],
+  axioms: [ foam.pattern.Singleton.create() ],
   methods: [
     function f() { return true; }
   ]
@@ -92,7 +92,7 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'FalseExpr',
   implements: ['foam.mlang.Expr'],
-  axioms: [ 'foam.patterns.Singleton' ],
+  axioms: [ foam.pattern.Singleton.create() ],
   methods: [
     function f() { return false; }
   ]
