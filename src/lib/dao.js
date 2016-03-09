@@ -717,7 +717,7 @@ foam.CLASS({
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
-          var obj = this.array.splice(i, 1);
+          var obj = this.array.splice(i, 1)[0];
           i--;
           sink && sink.remove(obj);
           this.on.remove.publish(obj);
