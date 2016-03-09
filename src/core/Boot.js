@@ -667,8 +667,8 @@ foam.CLASS({
         throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
     },
 
+    /** Create a factory function from an expression function. **/
     function exprFactory(e) {
-      /* Create a factory function from an expression function. */
       if ( ! e ) return null;
 
       var args = foam.fn.argsArray(e);
@@ -692,20 +692,25 @@ foam.CLASS({
       };
     },
 
-    /** Returns a human-readable description of this Property. */
+    /** Returns a human-readable description of this Property. **/
     function toString() {
       return this.name;
     },
 
-    /** Flyweight getter for this Property. */
+    /** Flyweight getter for this Property. **/
     function get(o) {
       return o[this.name];
     },
 
-    /** Flyweight setter for this Property. */
+    /** Flyweight setter for this Property. **/
     function set(o, value) {
       o[this.name] = value;
       return this;
+    },
+
+    /** Copy this property's value from o1 to o2. **/
+    function copy(o1, o2) {
+      this.set(o2, this.get(o1));
     },
 
     function exportedValue(obj, m) {
