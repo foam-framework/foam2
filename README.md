@@ -10,6 +10,8 @@ Build fully featured high performance apps in less time using FOAM.
 
 [http://foamdev.com](http://foamdev.com)
 
+[![Build Status](https://travis-ci.org/jacksonic/vjlofvhjfgm.svg?branch=master)](https://travis-ci.org/jacksonic/vjlofvhjfgm)
+
 ## Feature Oriented Active Modeller
 
 Foam is a Modeller: describe your data's properties, methods, event topics,
