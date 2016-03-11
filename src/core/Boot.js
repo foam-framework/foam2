@@ -54,7 +54,7 @@
     Model.model_ === Model
 </pre>
   Models are defined as a collection of Axioms.
-  It is the responsibility of Axioms to isntall itself onto a Model's Class and/or Prototype.
+  It is the responsibility of Axioms to install itself onto a Model's Class and/or Prototype.
 
 <p>
   Axioms are defined with the following psedo-interface:
