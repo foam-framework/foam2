@@ -39,7 +39,7 @@
     return function(filename) {
       document.writeln(
         '<script type="text/javascript" src="' + path + filename + '.js"></script>\n');
-    }
+    };
   }
 
   function loadServer(filename) {

@@ -81,7 +81,7 @@ foam.LIB = function LIB(model) {
       { get: p.getter, enumerable: false });
   }
 
-  for ( key in model.constants )
+  for ( var key in model.constants )
     defineProperty(
       proto,
       key,
