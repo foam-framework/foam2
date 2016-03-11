@@ -39,7 +39,7 @@
     return function(filename) {
       document.writeln(
         '<script type="text/javascript" src="' + path + filename + '.js"></script>\n');
-    };
+    }
   }
 
   function loadServer(filename) {
@@ -59,7 +59,9 @@
     "parse",
     "templates",
     "Action",
-    [ "../lib/graphics", ! isServer ]
+    [ "../lib/graphics", ! isServer ],
+    "../lib/dao",
+    "../lib/promise",
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).

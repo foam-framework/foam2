@@ -1,5 +1,3 @@
-require('../../../src/lib/dao.js');
-require('../../../src/lib/promise.js');
 
 if (typeof localStorage === "undefined" || localStorage === null) {
   var LocalStorage = require('node-localstorage').LocalStorage;
@@ -35,7 +33,7 @@ describe('LocalStorageDAO', function() {
   });
   it('reads back written data', function() {
     var dao = foam.dao.LocalStorageDAO.create({ name: '_test_LS_' });
-    
+
     dao.put(a);
     dao.put(a2);
     dao.put(b);
@@ -44,16 +42,16 @@ describe('LocalStorageDAO', function() {
     // TODO: guarantee file sync so we can test this synchronously
     //var dao2 = foam.dao.LocalStorageDAO.create({ name: '_test_LS_' });
     var dao2 = dao; // still checks deserialization
-    
+
     var result = foam.dao.ArraySink.create();
     dao2.select(result);
-    
+
     expect(result.a[0]).toEqual(a);
     expect(result.a[1]).toEqual(a2);
-    expect(result.a[2]).toEqual(b);    
-    expect(result.a[2].toJSON()).toEqual(b.toJSON());    
+    expect(result.a[2]).toEqual(b);
+    expect(result.a[2].toJSON()).toEqual(b.toJSON());
   });
-  
+
   // TODO: test nested objects when foam.json supports them
 });
 
