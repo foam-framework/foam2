@@ -7,12 +7,14 @@
     "jasmine": "^2.4.1",
     "jsdoc": "^3.4.0",
     "node-inspector": "^0.12.6",
-    "node-localstorage": "^0.6.0"
+    "node-localstorage": "^0.6.0",
+    "jshint": "^2.9.1"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover -- jasmine \n istanbul instrument ./src/ -o ./tmp_cov___/ \n rm -rf ./tmp_cov___",
-    "doc": "rm -rf doc/gen && jsdoc -c jsdoc.conf -r -t ./doc/template -d ./doc/gen ./src/"
+    "doc": "rm -rf doc/gen && jsdoc -c jsdoc.conf -r -t ./doc/template -d ./doc/gen ./src/",
+    "lint": "jshint -c .jshintrc  ./src/"
   }
 }
