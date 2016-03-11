@@ -162,22 +162,6 @@ describe('Array diff', function() {
   });
 });
 
-describe('Array shallowClone', function() {
-  it('creates a new array', function() {
-    var a = [2,4,6,8];
-    var b = a.shallowClone();
-    expect(a).not.toBe(b);
-    expect(a).toEqual(b);
-  });
-  it('does not clone instances', function() {
-    var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
-    var b = a.shallowClone();
-    expect(a).not.toBe(b);
-    expect(a).toEqual(b);
-    expect(a[1]).toBe(b[1]);
-  });
-});
-
 describe('Array clone (deep copy)', function() {
   it('creates a new array', function() {
     var a = [2,4,6,8];
@@ -294,5 +278,3 @@ describe('Date', function() {
   //   expect(d.toRelativeDateString()).toEqual('Dec 31 1969');
   // });
 });
-
-

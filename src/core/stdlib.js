@@ -26,7 +26,7 @@ foam = {
   Number:   Number.prototype,
   Object:   Object.prototype,
   String:   String.prototype,
-  Date:     Date.prototype,
+  Date:     Date.prototype
 };
 
 /** Setup nodejs-like 'global' on web */
@@ -35,7 +35,7 @@ if ( ! foam.isServer ) global = this;
 
 /**
  * Creates a small library in the foam package. A LIB is a collection of static constants,
- * properties and functions. It can also add properties to a core javascript
+ * properties, methods and functions. It can also add properties to a core javascript
  * object when you specify name: 'Array', 'Function', 'Number', 'Object',
  * 'String', or 'Date'.
  * <pre>
@@ -62,8 +62,6 @@ console.assert(9.plusOne() == 10, "It works!");
  * @memberof module:foam
  */
 foam.LIB = function LIB(model) {
-  var proto;
-
   function defineProperty(proto, key, map) {
     if ( ! map.value || proto === Object.prototype || proto === Array.prototype )
       Object.defineProperty.apply(this, arguments);
@@ -71,8 +69,9 @@ foam.LIB = function LIB(model) {
       proto[key] = map.value;
   }
 
-  proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
+  var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
 
+  // TODO: assert type of properties
   if ( model.properties ) for ( var i = 0 ; i < model.properties.length ; i++ ) {
     var p = model.properties[i];
     defineProperty(
@@ -81,12 +80,14 @@ foam.LIB = function LIB(model) {
       { get: p.getter, enumerable: false });
   }
 
+  // TODO: assert type of constants
   for ( var key in model.constants )
     defineProperty(
       proto,
       key,
       { value: model.constants[key], writable: true, enumerable: false });
 
+  // TODO: assert type of methods
   if ( model.methods ) for ( var i = 0 ; i < model.methods.length ; i++ ) {
     var m = model.methods[i];
     defineProperty(
@@ -185,22 +186,21 @@ foam.LIB({
         ret[i] = ( this[i].clone ) ? this[i].clone() : this[i];
       }
       return ret;
-    },
-    function shallowClone() {
-      /** Returns a new array containing the same elements as this. */
-      return this.slice();
     }
   ]
 });
+
 
 /** Date prototype additions. */
 foam.LIB({
   name: 'Date',
   methods: [
+    // TODO: move to LIB
     function toRelativeDateString(){
       // TODO i18n: make this translatable
       var seconds = Math.floor((Date.now() - this.getTime())/1000);
 
+      // TODO: handle future times
       if ( seconds < 60 ) return 'moments ago';
 
       var minutes = Math.floor((seconds)/60);
@@ -244,7 +244,6 @@ foam.LIB({
 });
 
 
-
 foam.LIB({
   name: 'array',
 
@@ -262,10 +261,10 @@ foam.LIB({
 
   methods: [
     function oneTime(listener) {
-      /** Create a "one-time" listener which unsubscribes itself after its first invocation. **/
+      /** Create a "one-time" listener which unsubscribes itself when called. **/
       return function(subscription) {
-        listener.apply(this, foam.array.argsToArray(arguments));
         subscription.destroy();
+        listener.apply(this, foam.array.argsToArray(arguments));
       };
     },
 
@@ -354,17 +353,7 @@ foam.LIB({
         ret.push(typeMatch[2]);
       }
       return ret;
-    },
-
-    // ???: Is this needed?
-    /*
-    function passProperties(args, f) {
-      return function passProperties() {
-        var self = this;
-        return f.apply(this, args.map(function(arg) { return self[arg]; }));
-      };
     }
-    */
   ]
 });
 
@@ -402,7 +391,9 @@ foam.LIB({
       name: 'labelize',
       code: foam.fn.memoize1(function(str) {
         if ( ! str || str === '' ) return str;
-        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) { return a.charAt(0) + ' ' + a.charAt(1); }));
+        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) {
+          return a.charAt(0) + ' ' + a.charAt(1);
+        }));
       })
     },
 
@@ -434,8 +425,10 @@ foam.LIB({
 });
 
 
+// TODO: comment
 (function() {
 
+  // TODO: @internal
   function set(X, key, value) {
     /* Update a Context binding. */
     X[key] = value;
@@ -512,5 +505,6 @@ foam.LIB({
 
   foam.X = X;
 
+  // TODO: comment
   for ( var key in X ) foam[key] = X[key].bind(X);
 })();

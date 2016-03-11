@@ -66,5 +66,4 @@
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
       forEach(isServer ? loadServer : createLoadBrowser());
-
 })();

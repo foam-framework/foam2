@@ -92,9 +92,9 @@
   <li>Exports    - Context exports
   <li>Implements - Declare interfaces implemented / mix-ins mixed-in
   <li>Constants  - Add constants to the prototype and class
-  <li>Topics     - Publish/subscribe topics
   <li>Properties - High-level instance variable definitions
   <li>Methods    - Prototype methods
+  <li>Topics     - Publish/subscribe topics
   <li>Listeners  - Like methods, but with extra features for use as callbacks
 </ul>
 
@@ -448,6 +448,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /** Class/Prototype description. */
 foam.CLASS({
