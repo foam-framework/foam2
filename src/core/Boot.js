@@ -1896,7 +1896,6 @@ foam.boot.end();
 
  Future:
   - predicate support for getAxioms() methods.
-  - caching for foam.lookup()
   - cascading object property change events
   - should destroyables be a linked list for fast removal?
   - multi-methods?
