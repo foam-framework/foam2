@@ -145,7 +145,7 @@ foam.LIB({
       var hash = 0;
       if ( this.length == 0 ) return hash;
 
-      for (i = 0; i < this.length; i++) {
+      for ( i = 0 ; i < this.length ; i++ ) {
         var code = this.charCodeAt(i);
         hash = ((hash << 5) - hash) + code;
         hash &= hash;
@@ -182,7 +182,7 @@ foam.LIB({
     function clone() {
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(this.length);
-      for ( var i = 0; i < this.length; i++ ) {
+      for ( var i = 0 ; i < this.length ; i++ ) {
         ret[i] = ( this[i].clone ) ? this[i].clone() : this[i];
       }
       return ret;
