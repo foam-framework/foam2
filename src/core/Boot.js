@@ -1739,7 +1739,6 @@ foam.CLASS({
 
 foam.boot.phase3();
 
-
 foam.CLASS({
   refines: 'foam.core.FObject',
 
