@@ -135,7 +135,8 @@ dao.remove(12).then(console.log.bind(console, "Removed 12"), console.error.bind(
 
 
 console.log("Testing promise dao.");
-var dao2 = foam.dao.PromiseDAO.create({ promise: foam.promise.Promise.create(), of: Abc });
+var resolver;
+var dao2 = foam.dao.PromiseDAO.create({ promise: new Promise(function(res, rej) { resolver = res; }), of: Abc });
 dao2.put(Abc.create({ id: 1 }));
 dao2.put(Abc.create({ id: 2 }));
 dao2.select(LoggingSink.create());
@@ -149,7 +150,7 @@ dao2.select(LoggingSink.create()).then(function(a) {
 });
 
 setTimeout(function() {
-  dao2.promise.fulfill(foam.dao.ArrayDAO.create());
+  resolver(foam.dao.ArrayDAO.create());
 }, 1000);
 
 setTimeout(function() {

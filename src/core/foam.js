@@ -61,7 +61,6 @@
     "Action",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
-    "../lib/promise",
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
