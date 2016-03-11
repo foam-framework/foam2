@@ -954,7 +954,7 @@ foam.CLASS({
       // So we move all of the code to publish_() so that it is JIT-ed.
       return this.publish_(arguments);
     },
-  
+
     function publish_(args) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
