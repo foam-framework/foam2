@@ -71,29 +71,39 @@ foam.LIB = function LIB(model) {
 
   var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
 
-  // TODO: assert type of properties
-  if ( model.properties ) for ( var i = 0 ; i < model.properties.length ; i++ ) {
-    var p = model.properties[i];
-    defineProperty(
-      proto,
-      p.name,
-      { get: p.getter, enumerable: false });
+  if ( model.properties ) {
+    console.assert(Array.isArray(model.properties), 'Properties must be an array.');
+    for ( var i = 0 ; i < model.properties.length ; i++ ) {
+      var p = model.properties[i];
+      defineProperty(
+        proto,
+        p.name,
+        { get: p.getter, enumerable: false });
+    }
   }
 
-  // TODO: assert type of constants
-  for ( var key in model.constants )
-    defineProperty(
-      proto,
-      key,
-      { value: model.constants[key], writable: true, enumerable: false });
+  if ( model.constants ) {
+    console.assert(
+      typeof model.constants === 'object' && ! Array.isArray(model.properties),
+      'Constants must be a map.');
 
-  // TODO: assert type of methods
-  if ( model.methods ) for ( var i = 0 ; i < model.methods.length ; i++ ) {
-    var m = model.methods[i];
-    defineProperty(
-      proto,
-      m.name,
-      { value: m.code || m, writable: true, enumerable: false });
+    for ( var key in model.constants )
+      defineProperty(
+        proto,
+        key,
+        { value: model.constants[key], writable: true, enumerable: false });
+  }
+
+  if ( model.methods ) {
+    console.assert(Array.isArray(model.methods), 'Methods must be an array.');
+
+    for ( var i = 0 ; i < model.methods.length ; i++ ) {
+      var m = model.methods[i];
+      defineProperty(
+        proto,
+        m.name,
+        { value: m.code || m, writable: true, enumerable: false });
+    }
   }
 };
 
