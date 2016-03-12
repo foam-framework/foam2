@@ -191,14 +191,13 @@ foam.LIB({
 });
 
 
-/** Date prototype additions. */
 foam.LIB({
-  name: 'Date',
+  name: 'date',
+
   methods: [
-    // TODO: move to LIB
-    function toRelativeDateString(){
+    function relativeDateString(date) {
       // TODO i18n: make this translatable
-      var seconds = Math.floor((Date.now() - this.getTime())/1000);
+      var seconds = Math.floor((Date.now() - date.getTime())/1000);
 
       // TODO: handle future times
       if ( seconds < 60 ) return 'moments ago';
@@ -220,14 +219,22 @@ foam.LIB({
       if ( days < 7 ) return days + ' days ago';
 
       if ( days < 365 ) {
-        var year = 1900+this.getYear();
-        var noyear = this.toDateString().replace(' ' + year, '');
+        var year = 1900+date.getYear();
+        var noyear = date.toDateString().replace(' ' + year, '');
         return noyear.substring(4);
       }
 
-      return this.toDateString().substring(4);
-    },
+      return date.toDateString().substring(4);
+    }
+  ]
+});
 
+
+/** Date prototype additions. */
+foam.LIB({
+  name: 'Date',
+
+  methods: [
     function equals(o) {
       if ( ! o ) return false;
       if ( ! o.getTime ) return false;

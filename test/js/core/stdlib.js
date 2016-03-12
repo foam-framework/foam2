@@ -249,32 +249,32 @@ describe('Date', function() {
   //
   //   jasmine.clock().mockDate(baseDate);
   //
-  //   expect(d.toRelativeDateString()).toEqual('moments ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('moments ago');
   //   jasmine.clock().tick(1000);
-  //   expect(d.toRelativeDateString()).toEqual('moments ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('moments ago');
   //
   //   jasmine.clock().tick(60000);
-  //   expect(d.toRelativeDateString()).toEqual('1 minute ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('1 minute ago');
   //
   //   jasmine.clock().tick(60000);
-  //   expect(d.toRelativeDateString()).toEqual('2 minutes ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('2 minutes ago');
   //
   //   jasmine.clock().tick(60000*60);
-  //   expect(d.toRelativeDateString()).toEqual('1 hour ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('1 hour ago');
   //
   //   jasmine.clock().tick(60000*60);
-  //   expect(d.toRelativeDateString()).toEqual('2 hours ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('2 hours ago');
   //
   //   jasmine.clock().tick(60000*60*24);
-  //   expect(d.toRelativeDateString()).toEqual('1 day ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('1 day ago');
   //
   //   jasmine.clock().tick(60000*60*24);
-  //   expect(d.toRelativeDateString()).toEqual('2 days ago');
+  //   expect(foam.date.relativeDateString(d)).toEqual('2 days ago');
   //
   //   jasmine.clock().tick(60000*60*24*7);
-  //   expect(d.toRelativeDateString()).toEqual('Dec 31');
+  //   expect(foam.date.relativeDateString(d)).toEqual('Dec 31');
   //
   //   jasmine.clock().tick(60000*60*24*365);
-  //   expect(d.toRelativeDateString()).toEqual('Dec 31 1969');
+  //   expect(foam.date.relativeDateString(d)).toEqual('Dec 31 1969');
   // });
 });
