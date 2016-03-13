@@ -71,27 +71,35 @@ foam.CLASS({
 
   methods: [
     function initArgs() { },
+
     function get() {
       return this.prop.get(this.obj);
     },
+
     function set(value) {
       return this.prop.set(this.obj, value);
     },
+
     function getPrev() {
       return this.oldValue;
     },
+
     function setPrev(value) {
       return this.oldValue = value;
     },
+
     function subscribe(l) {
       return this.obj.subscribe('propertyChange', this.prop.name, l);
     },
+
     function unsubscribe(l) {
       this.obj.unsubscribe('propertyChange', this.prop.name, l);
     },
+
     function isDefined() {
       return this.obj.hasOwnProperty(this.prop.name);
     },
+
     function clear() {
       this.obj.clearProperty(this.prop.name);
     }
@@ -143,4 +151,3 @@ foam.CLASS({
     function invalidate() { this.clearProperty('value'); }
   ]
 });
-

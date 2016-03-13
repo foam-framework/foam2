@@ -18,12 +18,14 @@
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateOutput',
+
   properties: [
     {
       name: 'buf',
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function output() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
@@ -36,6 +38,7 @@ foam.CLASS({
         }
       }
     },
+
     function toString() {
       return this.buf.length == 0 ? '' :
         this.buf.length == 1 ? this.buf[0] :
@@ -44,10 +47,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
   axioms: [foam.pattern.Singleton.create()],
+
+  constants: {
+    HEADER: 'var self = this, X = this.X, Y = this.Y;\n' +
+      'var output = opt_outputter ? opt_outputter : TOC(this);\n' +
+      'var out = output.output.bind(output);\n' +
+      "out('",
+    FOOTER: "');\nreturn opt_outputter ? output : output.toString();\n"
+  },
 
   grammar: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
     return {
@@ -88,9 +100,7 @@ foam.CLASS({
   properties: [
     {
       name: 'out',
-      factory: function() {
-        return [];
-      }
+      factory: function() { return []; }
     },
     {
       name: 'simple',
@@ -104,22 +114,16 @@ foam.CLASS({
     }
   ],
 
-  constants: {
-    HEADER: 'var self = this, X = this.X, Y = this.Y;\n' +
-      'var output = opt_outputter ? opt_outputter : TOC(this);\n' +
-      'var out = output.output.bind(output);\n' +
-      "out('",
-    FOOTER: "');\nreturn opt_outputter ? output : output.toString();\n"
-  },
-
   methods: [
     function push() {
       this.simple = false;
       this.pushSimple.apply(this, arguments);
     },
+
     function pushSimple() {
       this.out.push.apply(this.out, arguments);
     },
+
     function compile(t, name, args) {
       this.ps.setString(t);
       var result = this.markup(this.ps);
@@ -141,6 +145,7 @@ foam.CLASS({
 
       return f;
     },
+
     function lazyCompile(t, name, args) {
       return (function(util) {
         var delegate;
@@ -202,22 +207,21 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateAxiom',
   extends: 'Method',
+
   properties: [
-    {
-      name: 'name'
-    },
+    'name',
     {
       name: 'template',
       class: 'String'
     },
-    {
-      name: 'args',
-    }
+    'args'
   ],
+
   methods: [
     function installInProto(proto) {
       proto[this.name] =
@@ -226,10 +230,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateExtension',
   refines: 'foam.core.Model',
+
   properties: [
     {
       name: 'templates',

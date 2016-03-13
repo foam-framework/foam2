@@ -291,6 +291,7 @@ foam.CLASS({
   label: 'Phone number'
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Simple',
@@ -301,10 +302,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
   extends: 'Property',
+
   properties: [
     'of',
     {
@@ -313,6 +316,7 @@ foam.CLASS({
       // documentation: 'Methods that we should delegate rather than forward.'
     }
   ],
+
   methods: [
     function installInClass(cls) {
       this.SUPER(cls);
@@ -340,6 +344,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core.fsm',
   name: 'State',
@@ -353,6 +358,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -403,6 +409,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function installInClass(cls) {
       this.SUPER(cls);

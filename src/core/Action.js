@@ -74,6 +74,7 @@ foam.CLASS({
       }
       return false;
     },
+
     function installInProto(proto) {
       var action = this;
       proto[this.name] = function() {
@@ -102,4 +103,3 @@ foam.CLASS({
     }
   ]
 });
-

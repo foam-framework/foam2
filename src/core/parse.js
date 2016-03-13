@@ -556,6 +556,7 @@ foam.CLASS({
   ]
 });
 
+
 /** Supports parser ParserActions */
 foam.CLASS({
   package: 'foam.parsers',
