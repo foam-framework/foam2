@@ -5,7 +5,8 @@
   <script>console.timeEnd('boot');</script>
   <title>FOAM By Example</title>
   <style>
-    code {color:blue; white-space: pre-wrap; }
+    body { white-space: pre-wrap; }
+    code { color:blue; }
   </style>
  </head>
 
@@ -1421,7 +1422,6 @@ log_(g.toHTML());
             .replace(/"/g, '\\"');
         test_code += '  expect(log_.output).toMatchGolden({ i: ' + i_ + ', str: "' + golden + '" });\n';
       }
-
       log_('');
     }
 
