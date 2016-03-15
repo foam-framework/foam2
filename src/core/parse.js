@@ -283,7 +283,7 @@ foam.CLASS({
 
   methods: [
     function parse(ps) {
-      return this.string.indexOf(ps.head) == -1 ?
+      return ps.head && this.string.indexOf(ps.head) == -1 ?
         ps.tail : undefined;
     }
   ]
@@ -578,3 +578,9 @@ foam.CLASS({
     }
   ]
 });
+
+/*
+TODO:
+-detect non string values passed to StringPS.setString()
+
+*/
