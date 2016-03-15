@@ -192,7 +192,7 @@ foam.LIB({
         this.subClasses_ = {} ;
 
       if ( ! subClasses_.hasOwnProperty(c.id) )
-        subClasses_[c.id] = ( c === this ) || this.isSubClass(c.__proto__);
+        subClasses_[c.id] = ( c === this.prototype.cls_ ) || this.isSubClass(c.__proto__);
 
       return subClasses_[c.id];
     },

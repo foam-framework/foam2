@@ -380,6 +380,7 @@ describe('Constants', function() {
 describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', function() {
   var person;
   var employee;
+  var personReq;
 
   beforeEach(function() {
     foam.CLASS({
@@ -431,10 +432,25 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
       ]
     });
     employee = test.Employee.create({name: 'Jane', age: 30, salary: 50000});
+
+    foam.CLASS({
+      package: 'test',
+      name: 'PersonRequirer',
+      requires: ['test.Person'],
+      methods: [
+        function checkIsPersonInstance(other) {
+          // This checks for subclass checking problems introduced by the
+          // 'require' decorating of this.Person
+          return this.Person.isInstance(other);
+        }
+      ]
+    });
+    personReq = test.PersonRequirer.create();
   });
   afterEach(function() {
     person = null;
     employee = null;
+    personReq = null;
   });
 
   it('inherits methods', function() {
@@ -464,6 +480,11 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
     foam.CLASS({ name: 'Fake', package: 'test' });
     expect(test.Person.isInstance(test.Fake.create({}))).toBe(false);
+  });
+
+  it('reports correct subclass checks in required classes', function() {
+    expect(personReq.checkIsPersonInstance(person)).toBe(true);
+    expect(personReq.checkIsPersonInstance(employee)).toBe(true);
   });
 
   it('returns axioms correctly', function() {

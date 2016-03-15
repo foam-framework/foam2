@@ -193,7 +193,7 @@ foam.LIB({
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(this.length);
       for ( var i = 0 ; i < this.length ; i++ ) {
-        ret[i] = ( this[i].clone ) ? this[i].clone() : this[i];
+        ret[i] = (  this[i] && this[i].clone ) ? this[i].clone() : this[i];
       }
       return ret;
     }
