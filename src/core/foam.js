@@ -61,6 +61,7 @@
     "Action",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
+    [ "../lib/node/json_dao", isServer ],
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
