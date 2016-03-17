@@ -157,9 +157,9 @@ foam.CLASS({
         Math.min(l, this.limit) : l;
       return o;
     },
-    function addOrderBy(o) {
+    function addOrderBy(s) {
       var o = this.cls_.create(this);
-      o.orderBy = o;
+      o.orderBy = s;
       return o;
     },
     function addWhere(p) {
@@ -288,7 +288,7 @@ foam.CLASS({
     },
 
     function eof() {
-      this.arr.sort(this.comparator);
+      this.arr.sort(this.comparator.compare || this.comparator);
       for ( var i = 0 ; i < this.arr.length ; i++ ) {
         this.delegate.put(this.arr[i]);
       }
@@ -485,7 +485,7 @@ foam.CLASS({
 
         if ( options.orderBy && ! isListener )
           sink = this.OrderedSink.create({
-            order: options.orderBy,
+            comparator: options.orderBy,
             delegate: sink
           });
 

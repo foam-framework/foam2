@@ -51,6 +51,23 @@ describe('LocalStorageDAO', function() {
     expect(result.a[2].toJSON()).toEqual(b.toJSON());
   });
 
+  // Run the generic suite of DAO tests against it.
+  require('./generic_dao')(function(model) {
+    localStorage.removeItem('_test_LS_generic_');
+    return foam.dao.LocalStorageDAO.create({ name: '_test_LS_generic_', of: model });
+  });
+
+  afterAll(function() {
+    localStorage.clear();
+  });
+
   // TODO: test nested objects when foam.json supports them
+});
+
+
+describe('ArrayDAO', function() {
+  require('./generic_dao')(function(model) {
+    return foam.dao.ArrayDAO.create({ of: model });
+  });
 });
 
