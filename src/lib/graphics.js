@@ -184,7 +184,7 @@ foam.CLASS({
 
   topics: [ 'invalidated' ],
 
-  requires: [ 'foam.graphics.Transform' ],
+  requires: [ 'foam.graphics.Transform', 'foam.graphics.Canvas' ],
 
   properties: [
     {
@@ -231,12 +231,10 @@ foam.CLASS({
       defaultValue: 1
     },
     {
-      name: 'strokeStyle',
-      defaultValue: 'black'
+      name: 'border'
     },
     {
-      name: 'fillStyle',
-      defaultValue: 'black'
+      name: 'color'
     },
     {
       name: 'shadowColor'
@@ -289,10 +287,10 @@ foam.CLASS({
       this.maybeInitCView();
       x.save();
       x.globalAlpha *= this.alpha;
-      x.strokeStyle = this.strokeStyle.toCanvasStyle ?
-        this.strokeStyle.toCanvasStyle(x) : this.strokeStyle;
-      x.fillStyle = this.fillStyle.toCanvasStyle ?
-        this.fillStyle.toCanvasStyle(x) : this.fillStyle;
+      x.strokeStyle = ( this.border && this.border.toCanvasStyle ) ?
+        this.border.toCanvasStyle(x) : this.border;
+      x.fillStyle = ( this.color && this.color.toCanvasStyle ) ?
+        this.color.toCanvasStyle(x) : this.color;
       this.doTransform(x);
       if ( this.shadowColor && this.shadowBlur ) {
         x.shadowColor = this.shadowColor;
@@ -362,14 +360,8 @@ foam.CLASS({
       class: 'Float'
     },
     {
-      name: 'fill',
-      class: 'Boolean',
-      defaultValue: false
-    },
-    {
-      name: 'stroke',
-      class: 'Boolean',
-      defaultValue: true
+      name: 'border',
+      defaultValue: 'black'
     }
   ],
 
@@ -377,8 +369,8 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.rect(0, 0, this.width, this.height);
-      if ( this.stroke ) x.stroke();
-      if ( this.fill ) x.fill();
+      if ( this.border ) x.stroke();
+      if ( this.color ) x.fill();
     }
   ]
 });
@@ -407,14 +399,8 @@ foam.CLASS({
       class: 'Float'
     },
     {
-      name: 'fill',
-      class: 'Boolean',
-      defaultValue: false
-    },
-    {
-      name: 'stroke',
-      class: 'Boolean',
-      defaultValue: true
+      name: 'border',
+      defaultValue: 'black'
     }
   ],
 
@@ -423,10 +409,10 @@ foam.CLASS({
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
 
-      if ( this.fill ) {
+      if ( this.color ) {
         x.fill();
       }
-      if ( this.stroke ) {
+      if ( this.border ) {
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
