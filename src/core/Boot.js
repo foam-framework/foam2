@@ -54,7 +54,7 @@
     Model.model_ === Model
 </pre>
   Models are defined as a collection of Axioms.
-  It is the responsibility of Axioms to isntall itself onto a Model's Class and/or Prototype.
+  It is the responsibility of Axioms to install itself onto a Model's Class and/or Prototype.
 
 <p>
   Axioms are defined with the following psedo-interface:
@@ -192,7 +192,7 @@ foam.LIB({
         this.subClasses_ = {} ;
 
       if ( ! subClasses_.hasOwnProperty(c.id) )
-        subClasses_[c.id] = ( c === this ) || this.isSubClass(c.__proto__);
+        subClasses_[c.id] = ( c === this.prototype.cls_ ) || this.isSubClass(c.__proto__);
 
       return subClasses_[c.id];
     },
@@ -1738,7 +1738,6 @@ foam.CLASS({
 
 
 foam.boot.phase3();
-
 
 foam.CLASS({
   refines: 'foam.core.FObject',

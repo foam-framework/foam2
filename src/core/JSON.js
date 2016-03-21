@@ -92,6 +92,8 @@ foam.LIB({
         out('"', o, '"');
       } else if ( typeof o === 'number' ) {
         out(o);
+      } else if ( typeof o === 'boolean' ) {
+        out(o);
       } else if ( Array.isArray(o) ) {
         out('[');
         for ( var i = 0 ; i < o.length ; i++ ) {
