@@ -182,9 +182,12 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'CView',
 
-  topics: [ 'invalidated' ],
+  requires: [
+    'foam.graphics.Canvas',
+    'foam.graphics.Transform'
+  ],
 
-  requires: [ 'foam.graphics.Transform' ],
+  topics: [ 'invalidated' ],
 
   properties: [
     {
