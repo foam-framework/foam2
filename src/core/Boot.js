@@ -1115,12 +1115,6 @@ foam.CLASS({
 
 /**
 <pre>
-  Ex.
-  constants: {
-    KEY: 'some value'
-  }
-
-  this.cls_.KEY === this.KEY === 'some value'
 </pre>
 */
 foam.CLASS({
@@ -1144,7 +1138,25 @@ foam.CLASS({
       cls[this.model.name] = this.model.getClass();
     },
     function installInProto(proto) {
-      proto[this.model.name] = proto.cls_[this.model.name];
+      // get class already created in installInClass();
+      var name = this.model.name;
+      var cls = proto.cls_[name];
+
+      Object.defineProperty(proto, name, {
+        get: function requiresGetter() {
+          if ( ! this.hasOwnPrivate_(name) ) {
+            var parent = this;
+
+            var c = Object.create(cls);
+            c.create = function(args, X) { return cls.create(args, X || parent); };
+            this.setPrivate_(name, c);
+          }
+
+          return this.getPrivate_(name);
+        },
+        configurable: true,
+        enumerable: false
+      });
     }
   ]
 });
@@ -1213,15 +1225,15 @@ foam.CLASS({
       Object.defineProperty(proto, as, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(as) ) {
-            var model  = foam.lookup(path);
+            var cls    = foam.lookup(path);
             var parent = this;
 
-            if ( ! model )
+            if ( ! cls )
               console.error('Unknown class: ' + path);
 
-            var cls = Object.create(model);
-            cls.create = function(args, X) { return model.create(args, X || parent); };
-            this.setPrivate_(as, cls);
+            var c = Object.create(cls);
+            c.create = function(args, X) { return cls.create(args, X || parent); };
+            this.setPrivate_(as, c);
           }
 
           return this.getPrivate_(as);
