@@ -32,3 +32,46 @@ describe('ConteXt object', function() {
   });
 
 });
+
+// describe('Context Import/Export', function() {
+//   beforeEach(function() {
+//     foam.CLASS({
+//       package: 'test',
+//       name: 'XUser',
+//       imports: [
+//         'foo'
+//       ],
+//       methods: [
+//         function init() {
+//           this.foo; // triggers a parent context access
+//         }
+//       ]
+//     });
+//     foam.CLASS({
+//       package: 'test',
+//       name: 'ContextBase',
+//       requires: [
+//         'test.XUser',
+//       ],
+//       exports: [
+//         'foo',
+//       ],
+//       properties: [
+//         {
+//           name: 'foo',
+//           factory: function() {
+//             return this.XUser.create();
+//           }
+//         },
+//       ],
+//     });
+//
+//   });
+//
+//   it("factories not so lazy that things created in them cause infinite loops grabbing the context", function() {
+//     expect(function() { test.ContextBase.create().foo; }).not.toThrow();
+//
+//   });
+//
+//
+// });
