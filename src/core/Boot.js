@@ -1324,6 +1324,7 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       var bs = this.bindings;
+
       Object.defineProperty(proto, 'Y', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('Y') ) {
@@ -1902,6 +1903,8 @@ foam.boot.end();
   - more docs
   - context $ binding
   - Axiom ordering/priority
+  - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
+  - adaptArrayElement not setting context
 
  ???:
   - ? proxy label, plural from Class to Model
