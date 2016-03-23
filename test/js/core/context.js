@@ -11,7 +11,7 @@ describe('ConteXt object', function() {
   });
 
   it('subcontexts with dynamic values', function() {
-    foam.CLASS({ 
+    foam.CLASS({
       name: 'Tester',
       package: 'test',
       properties: [ 'a' ]
