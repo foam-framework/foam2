@@ -39,11 +39,11 @@ describe('ConteXt object', function() {
 //       package: 'test',
 //       name: 'XUser',
 //       imports: [
-//         'foo'
+//         'bar'
 //       ],
 //       methods: [
 //         function init() {
-//           this.foo; // triggers a parent context access
+//           this.bar; // triggers a parent context access
 //         }
 //       ]
 //     });
@@ -55,6 +55,7 @@ describe('ConteXt object', function() {
 //       ],
 //       exports: [
 //         'foo',
+//         'bar',
 //       ],
 //       properties: [
 //         {
@@ -63,6 +64,7 @@ describe('ConteXt object', function() {
 //             return this.XUser.create();
 //           }
 //         },
+//         ['bar', 99],
 //       ],
 //     });
 //
