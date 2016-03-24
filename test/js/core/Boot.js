@@ -781,7 +781,7 @@ describe('Property Mlang interop', function() {
 });
 
 
-describe('Dynamics', function() {
+describe('Slots', function() {
   var t;
   var t2;
 
@@ -918,8 +918,8 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.AxiomArray.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Implements.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.internal.DynamicProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Slot.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.internal.PropertySlot.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Boolean.model_)).toBe(true);
   });

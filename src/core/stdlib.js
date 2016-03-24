@@ -455,17 +455,17 @@ foam.LIB({
     // X[key + '$'] = SimpleReadOnlyValue.create({value: value});
   }
 
-  function setDynamic(X, key, dValue) {
+  function setSlot(X, key, slot) {
     Object.defineProperty(
       X,
       key,
       {
-        get: function() { return dValue.get(); },
+        get: function() { return slot.get(); },
         configurable: true
       }
     );
 
-    if ( key !== '$' && key !== '$$' ) X[key + '$'] = dValue;
+    if ( key !== '$' && key !== '$$' ) X[key + '$'] = slot;
   }
 
   var ROOT = global;
@@ -506,7 +506,7 @@ foam.LIB({
         if ( opt_args.hasOwnProperty(key) ) {
           var asDyn = key !== '$' && key != '$$' && key.charAt(key.length-1) == '$';
           if ( asDyn ) {
-            setDynamic(sub, key.substring(0, key.length-1), opt_args[key]);
+            setSlot(sub, key.substring(0, key.length-1), opt_args[key]);
           } else {
             set(sub, key, opt_args[key]);
           }

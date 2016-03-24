@@ -683,26 +683,26 @@ o.subscribe(foam.events.oneTime(function() { console.log.apply(console.log, argu
 o.publish('fire');
 o.publish("fire again, but nobody's listenering");
 
-// DynamicValues are like Object-Oriented pointers.
-// A properties dynamic-value is accessed as 'name'$.
-// get() is used to dereference the value of a dynamic
+// Slots are like Object-Oriented pointers.
+// A property's slot is accessed as 'name'$.
+// get() is used to dereference the value of a slot
 var p = Person.create({name: 'Bob'});
 var dyn = p.name$;
 log(dyn.get());
 
-// set() is used to set a dynamic's value:
+// set() is used to set a Slot's value:
 dyn.set('John');
 log(p.name, dyn.get());
 
-// Calling obj.dynamcicProperty('name') is the same as obj.name$.
+// Calling obj.slot('name') is the same as obj.name$.
 var p = Person.create({name: 'Bob'});
-var dyn = p.dynamicProperty('name');
+var dyn = p.slot('name');
 log(dyn.get());
 dyn.set('John');
 log(dyn.get());
 
 // Two-Way Data-Binding
-// Dynamic values can be assigned, causing two values to be
+// Slots can be assigned, causing two values to be
 // bound to the same value.
 var p1 = Person.create(), p2 = Person.create();
 p1.name$ = p2.name$;
@@ -711,7 +711,7 @@ log(p1.name, p2.name);
 p2.name = 'Steve';
 log(p1.name, p2.name);
 
-// Another way to link to Dynamics is to call .link() on one of them.
+// Another way to link two Slots is to call .link() on one of them.
 var p1 = Person.create(), p2 = Person.create();
 var d = p1.name$.link(p2.name$);
 p1.name = 'John';
@@ -733,7 +733,7 @@ log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
 
-// Dynamic Values also let you check if the value is defined by calling isDefined().
+// Slots also let you check if the value is defined by calling isDefined().
 // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
 foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', defaultValue: 42 } ]});
 var o = IsDefinedTest.create();
@@ -742,16 +742,16 @@ log(dv.isDefined());
 dv.set(99);
 log(dv.isDefined());
 
-// You can reset a Dynamic Value to its default value by calling .clear().
+// You can reset a Slot to its default value by calling .clear().
 // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
 dv.clear();
 log(dv.get(), dv.isDefined());
 
-// DynamicExpression creates a Dynamic from a list of Dynamics
-// and a function which combines them into a new dynamic value.
+// ExpressionSlot creates a Slot from a list of Slots
+// and a function which combines them into a new value.
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.DynamicExpression.create({
+var e = foam.core.ExpressionSlot.create({
   args: [ p.fname$, p.lname$],
   fn: function(f, l) { return f + ' ' + l; }
 });
@@ -761,12 +761,12 @@ p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
 
-// Destroy the DynamicExpression to prevent further updates.
+// Destroy the ExpressionSlot to prevent further updates.
 e.destroy();
 p.fname = 'Steve';
 p.lname = 'Jones';
 
-// The same functionality of DynamicExpression is built into Properties
+// The same functionality of ExpressionSlot is built into Properties
 // with the 'expression' feature. Expression properties are invalidated
 // whenever of their listed source values change, but are only recalculated
 // when their value is accessed.

@@ -16,21 +16,26 @@
  */
 
 /**
-  Dynamic values are observable values which can change over time.
-  <ul>Types of Dynamics include:
-    <li>DynamicProperty:
-    <li>DynamicExpression:
-    <li>DynamicValue: to be implemented
+  Slots are observable values which can change over time.
+
+  Slots are simple single-value Model-View-Controller Models, but since
+  another meaning of 'Model' is already heavily used in FOAM, Slot is
+  used to avoid overloading the term.
+
+  <ul>Types of Slots include:
+    <li>PropertySlot
+    <li>ExpressionSlot
+    <li>ConstantSlot
 </ul>
 */
 foam.CLASS({
   package: 'foam.core',
-  name: 'Dynamic', // ???: Rename AbstractDynamic or make an Interface
+  name: 'Slot', // ???: Rename AbstractSlot or make an Interface
   extends: null,
 
   methods: [
     /**
-      Link two Dynamics together, setting both to other's value.
+      Link two Slots together, setting both to other's value.
       Returns a Destroyable which can be used to break the link.
     */
     function link(other) {
@@ -47,7 +52,7 @@ foam.CLASS({
     },
 
     /**
-      Have this Dynamic dynamically follow other's value.
+      Have this Slot dynamically follow other's value.
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
@@ -60,14 +65,14 @@ foam.CLASS({
 
 
 /**
-  DynamicProperties export object properties as Dynamic values.
-  Created with calling obj.prop$ or obj.dynamicProperty('prop').
+  PropertySlot represents object properties as Slots.
+  Created with calling obj.prop$ or obj.slot('prop').
   For internal use only.
  */
 foam.CLASS({
   package: 'foam.core.internal',
-  name: 'DynamicProperty',
-  extends: 'foam.core.Dynamic',
+  name: 'PropertySlot',
+  extends: 'foam.core.Slot',
 
   methods: [
     function initArgs() { },
@@ -110,8 +115,8 @@ foam.CLASS({
 /** Tracks dependencies for a dynamic function and invalidates is they change. */
 foam.CLASS({
   package: 'foam.core',
-  name: 'DynamicExpression',
-  implements: [ 'foam.core.Dynamic' ],
+  name: 'ExpressionSlot',
+  implements: [ 'foam.core.Slot' ],
 
   properties: [
     'args',

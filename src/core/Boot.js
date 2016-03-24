@@ -611,10 +611,10 @@ foam.CLASS({
       // If not in debug mode we should share implementations like in F1.
       Object.defineProperty(proto, dynName, {
         get: function propDynGetter() {
-          return this.dynamicProperty(name, dynName, prop);
+          return this.slot(name, dynName, prop);
         },
         set: function propDynSetter(dyn) {
-          this.dynamicProperty(name, dynName, prop).link(dyn);
+          this.slot(name, dynName, prop).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -729,7 +729,7 @@ foam.CLASS({
 
     function exportedValue(obj, m) {
       /** Export obj.name$ instead of just obj.name. **/
-      return obj.dynamicProperty(this.name);
+      return obj.slot(this.name);
     }
   ]
 });
@@ -1037,21 +1037,21 @@ foam.CLASS({
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
     function publishPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.dynamicProperty(name);
+        var dyn = this.slot(name);
         dyn.setPrev(oldValue);
         this.publish('propertyChange', name, dyn);
       }
     },
 
     /**
-      Creates a Dynamic for a property.
+      Creates a Slot for a property.
       @private
     */
-    function dynamicProperty(name, opt_dynName, opt_prop) {
+    function slot(name, opt_dynName, opt_prop) {
       if ( ! opt_dynName ) opt_dynName = name + '$';
       var dyn = this.getPrivate_(opt_dynName);
       if ( ! dyn ) {
-        dyn = foam.core.internal.DynamicProperty.create();
+        dyn = foam.core.internal.PropertySlot.create();
         dyn.obj  = this;
         dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
         this.setPrivate_(opt_dynName, dyn);
@@ -1335,7 +1335,7 @@ foam.CLASS({
 
               if ( b[0] ) {
                 // TODO: This is wrong. It forces factories to be prematurely fired.
-                // Values should be exported as DynamicValues so that they're only created
+                // Values should be exported as Slots so that they're only created
                 // when first needed.
                 var v = this[b[0]];
                 var a = this.cls_.getAxiomByName(b[0]);
@@ -1847,7 +1847,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         delete this.instance_[name];
-        this.publish('propertyChange', name, this.dynamicProperty(name));
+        this.publish('propertyChange', name, this.slot(name));
       }
     },
 
@@ -1902,7 +1902,7 @@ foam.boot.end();
   - model validation
     - abstract methods
     - interfaces
-  - DynamicValue map() and relate() methods
+  - Slot map() and relate() methods
   - more docs
   - context $ binding
   - Axiom ordering/priority
@@ -1916,6 +1916,7 @@ foam.boot.end();
   - predicate support for getAxioms() methods.
   - cascading object property change events
   - should destroyables be a linked list for fast removal?
+    - should onDestroy be merged with listener support?
   - multi-methods?
   - Topic listener relay
 */

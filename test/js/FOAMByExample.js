@@ -1126,9 +1126,9 @@ o.publish("fire again, but nobody's listenering");
 // Example 64
 log_.output = "";
 try {
-// DynamicValues are like Object-Oriented pointers.
-// A properties dynamic-value is accessed as 'name'$.
-// get() is used to dereference the value of a dynamic
+// Slots are like Object-Oriented pointers.
+// A property's slot is accessed as 'name'$.
+// get() is used to dereference the value of a slot
 var p = Person.create({name: 'Bob'});
 var dyn = p.name$;
 log(dyn.get());
@@ -1141,7 +1141,7 @@ log(dyn.get());
 // Example 65
 log_.output = "";
 try {
-// set() is used to set a dynamic's value:
+// set() is used to set a Slot's value:
 dyn.set('John');
 log(p.name, dyn.get());
 } catch(x) {
@@ -1153,9 +1153,9 @@ log(p.name, dyn.get());
 // Example 66
 log_.output = "";
 try {
-// Calling obj.dynamcicProperty('name') is the same as obj.name$.
+// Calling obj.slot('name') is the same as obj.name$.
 var p = Person.create({name: 'Bob'});
-var dyn = p.dynamicProperty('name');
+var dyn = p.slot('name');
 log(dyn.get());
 dyn.set('John');
 log(dyn.get());
@@ -1169,7 +1169,7 @@ log(dyn.get());
 log_.output = "";
 try {
 // Two-Way Data-Binding
-// Dynamic values can be assigned, causing two values to be
+// Slots can be assigned, causing two values to be
 // bound to the same value.
 var p1 = Person.create(), p2 = Person.create();
 p1.name$ = p2.name$;
@@ -1186,7 +1186,7 @@ log(p1.name, p2.name);
 // Example 68
 log_.output = "";
 try {
-// Another way to link to Dynamics is to call .link() on one of them.
+// Another way to link two Slots is to call .link() on one of them.
 var p1 = Person.create(), p2 = Person.create();
 var d = p1.name$.link(p2.name$);
 p1.name = 'John';
@@ -1232,7 +1232,7 @@ log(p1.name, p2.name);
 // Example 71
 log_.output = "";
 try {
-// Dynamic Values also let you check if the value is defined by calling isDefined().
+// Slots also let you check if the value is defined by calling isDefined().
 // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
 foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', defaultValue: 42 } ]});
 var o = IsDefinedTest.create();
@@ -1249,7 +1249,7 @@ log(dv.isDefined());
 // Example 72
 log_.output = "";
 try {
-// You can reset a Dynamic Value to its default value by calling .clear().
+// You can reset a Slot to its default value by calling .clear().
 // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
 dv.clear();
 log(dv.get(), dv.isDefined());
@@ -1262,11 +1262,11 @@ log(dv.get(), dv.isDefined());
 // Example 73
 log_.output = "";
 try {
-// DynamicExpression creates a Dynamic from a list of Dynamics
-// and a function which combines them into a new dynamic value.
+// ExpressionSlot creates a Slot from a list of Slots
+// and a function which combines them into a new value.
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.DynamicExpression.create({
+var e = foam.core.ExpressionSlot.create({
   args: [ p.fname$, p.lname$],
   fn: function(f, l) { return f + ' ' + l; }
 });
@@ -1284,7 +1284,7 @@ log(e.get());
 // Example 74
 log_.output = "";
 try {
-// Destroy the DynamicExpression to prevent further updates.
+// Destroy the ExpressionSlot to prevent further updates.
 e.destroy();
 p.fname = 'Steve';
 p.lname = 'Jones';
@@ -1297,7 +1297,7 @@ p.lname = 'Jones';
 // Example 75
 log_.output = "";
 try {
-// The same functionality of DynamicExpression is built into Properties
+// The same functionality of ExpressionSlot is built into Properties
 // with the 'expression' feature. Expression properties are invalidated
 // whenever of their listed source values change, but are only recalculated
 // when their value is accessed.
@@ -2061,17 +2061,15 @@ log(o.toJSON());
   expect(log_.output).toMatchGolden({ i: 120, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}" });
 
 
-// Example 124
+// Example 125
 log_.output = "";
 try {
-
 
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 123, str: "" });
+  expect(log_.output).toMatchGolden({ i: 124, str: "" });
 
 
 });
 });
-
