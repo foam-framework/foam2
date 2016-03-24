@@ -20,6 +20,14 @@
   var isServer = typeof process === 'object';
 
   function createLoadBrowser() {
+    // Web Worker case // TODO: auto-determine path to core
+    if ( typeof document == 'undefined' && typeof importScripts !== 'undefined' ) {
+      var path = FOAM_BOOT_PATH;
+      return function(file) {
+        importScripts(path+file+'.js');
+      }
+    }
+    
     var path = document.currentScript && document.currentScript.src;
 
     // document.currentScript isn't supported on all browsers, so the following
