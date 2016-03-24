@@ -103,10 +103,20 @@ foam.LIB({
         out(']');
       } else if ( o.outputJSON ) {
         o.outputJSON(out);
+      } else {
+        out('undefined');
       }
     },
 
     function parse(json, opt_class) {
+      // recurse into sub-objects
+      for (var key in json) {
+        var o = json[key];
+        if (typeof o == 'object' && ! o.cls_ ) { // traverse plain old objects only
+          json[key] = this.parse(o);
+        }
+      }
+
       if ( json.class ) {
         var cls = foam.lookup(json.class);
         foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
