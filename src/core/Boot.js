@@ -603,18 +603,18 @@ foam.CLASS({
       // This doesn't let defaultValue to be 'undefined', which is maybe not bad.
       var hasDefaultValue = typeof this.defaultValue !== 'undefined';
       var defaultValue    = this.defaultValue;
-      var dynName         = name + '$';
+      var slotName        = name + '$';
       var isFinal         = this.final;
       var eFactory        = this.exprFactory(this.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
-      Object.defineProperty(proto, dynName, {
+      Object.defineProperty(proto, slotName, {
         get: function propDynGetter() {
-          return this.slot(name, dynName, prop);
+          return this.slot(name, slotName, prop);
         },
         set: function propDynSetter(dyn) {
-          this.slot(name, dynName, prop).link(dyn);
+          this.slot(name, slotName, prop).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -829,7 +829,7 @@ foam.CLASS({
 
     function exportedValue(obj, m) {
       /** Bind the method to 'this' when exported so that it still works. **/
-      return function() { return m.apply(obj, arguments); };
+      return function exportedMethod() { return m.apply(obj, arguments); };
     }
   ]
 });
@@ -1047,14 +1047,14 @@ foam.CLASS({
       Creates a Slot for a property.
       @private
     */
-    function slot(name, opt_dynName, opt_prop) {
-      if ( ! opt_dynName ) opt_dynName = name + '$';
-      var dyn = this.getPrivate_(opt_dynName);
+    function slot(name, opt_slotName, opt_prop) {
+      if ( ! opt_slotName ) opt_slotName = name + '$';
+      var dyn = this.getPrivate_(opt_slotName);
       if ( ! dyn ) {
         dyn = foam.core.internal.PropertySlot.create();
         dyn.obj  = this;
         dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
-        this.setPrivate_(opt_dynName, dyn);
+        this.setPrivate_(opt_slotName, dyn);
       }
       return dyn;
     }
@@ -1261,16 +1261,29 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      var key = this.key;
-      var as  = this.as;
+      var key      = this.key;
+      var as       = this.as;
+      var slotName = as + '$';
+
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
-          if ( ! this.hasOwnPrivate_(as) ) {
+          return this[slotName].get();
+        },
+        set: function importsSetter(v) {
+          this[slotName].set(v);
+        },
+        configurable: true,
+        enumerable: false
+      });
+
+      Object.defineProperty(proto, slotName, {
+        get: function importsGetter() {
+          if ( ! this.hasOwnPrivate_(slotName) ) {
             var X = this.X || foam;
-            this.setPrivate_(as, X[key]);
+            this.setPrivate_(slotName, X[key + '$']);
           }
 
-          return this.getPrivate_(as);
+          return this.getPrivate_(slotName);
         },
         configurable: true,
         enumerable: false

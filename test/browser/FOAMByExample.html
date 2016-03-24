@@ -1402,15 +1402,15 @@ foam.CLASS({
       ],
       methods: [
         function initCView() {
-          this.x = 4 + this.cellSize.get() * this.col; // TODO: fix
-          this.y = 4 + this.cellSize.get() * this.row; // TODO: fix
-          this.width = this.height = this.FILL_RATIO * this.cellSize.get(); // TODO: fix
+          this.x = 4 + this.cellSize * this.col;
+          this.y = 4 + this.cellSize * this.row;
+          this.width = this.height = this.FILL_RATIO * this.cellSize;
           this.timer.time$.sub(this.onTick);
         },
       ],
       listeners: [
         function onTick() {
-          var hue = ( this.col/this.nx.get()*360 + this.timer.time/3 ) % 360; // TODO: fix
+          var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
 	  this.shadowColor = this.fillStyle = 'hsl(' + hue + ',100%,' + l + '%)';
         }

@@ -22,8 +22,8 @@ foam.CLASS({
   // documentation: 'Encapsulates top-level window/document features.',
 
   exports: [
-    '$$',
-    '$',
+    'getElementsByClassName',
+    'getElementById',
     'assert',
     'async',
     'cancelAnimationFrame',
@@ -59,8 +59,13 @@ foam.CLASS({
   ],
 
   methods: [
-    function $(id)   { return this.document.getElementById(id); },
-    function $$(cls) { return this.document.getElementsByClassName(cls); },
+    function getElementById(id) {
+      return this.document.getElementById(id);
+    },
+
+    function getElementsByClassName(cls) {
+      return this.document.getElementsByClassName(cls);
+    },
 
     function assert(b /*, args */) {
       /* Like console.assert() except that it takes more than one argument. */

@@ -460,7 +460,7 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
 
-  imports: [ '$' ],
+  imports: [ 'getElementById' ],
 
   properties: [
     {
@@ -476,7 +476,7 @@ foam.CLASS({
     {
       name: 'element',
       factory: function() {
-        var e = this.$(this.id);
+        var e = this.getElementById(this.id);
         e.width = this.width;
         e.height = this.height;
         return e;

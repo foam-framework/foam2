@@ -445,36 +445,11 @@ foam.LIB({
 // TODO: comment
 (function() {
 
-  // TODO: @internal
-  function set(X, key, value) {
-    /* Update a Context binding. */
-    X[key] = value;
-
-    // TODO:
-    // if ( GLOBAL.SimpleReadOnlyValue && key !== '$' && key !== '$$' )
-    // X[key + '$'] = SimpleReadOnlyValue.create({value: value});
-  }
-
-  function setSlot(X, key, slot) {
-    Object.defineProperty(
-      X,
-      key,
-      {
-        get: function() { return slot.get(); },
-        configurable: true
-      }
-    );
-
-    if ( key !== '$' && key !== '$$' ) X[key + '$'] = slot;
-  }
-
-  var ROOT = global;
-
   var lookup_ = function lookup_(id) {
     var a = foam.core[id];
     if ( a ) return a;
     var path = id.split('.');
-    var root = ROOT;
+    var root = global;
     for ( var i = 0 ; root && i < path.length ; i++ )
       root = root[path[i]];
     return root;
@@ -492,7 +467,7 @@ foam.LIB({
       if ( cls.package === 'foam.core' )
         cache[cls.name] = cls;
       var path = cls.id.split('.');
-      var root = ROOT;
+      var root = global;
       for ( var i = 0 ; i < path.length-1 ; i++ ) {
         root = root[path[i]] || ( root[path[i]] = {} );
       }
@@ -504,11 +479,19 @@ foam.LIB({
 
       for ( var key in opt_args ) {
         if ( opt_args.hasOwnProperty(key) ) {
-          var asDyn = key !== '$' && key != '$$' && key.charAt(key.length-1) == '$';
-          if ( asDyn ) {
-            setSlot(sub, key.substring(0, key.length-1), opt_args[key]);
+          var v = opt_args[key];
+
+          if ( foam.core.Slot.isInstance(v) ) {
+            sub[key + '$'] = v;
+            // For performance, these could be reused.
+            Object.defineProperty(sub, key, {
+              get: function() { return v.get(); },
+              configurable: true,
+              enumerable: false
+            });
           } else {
-            set(sub, key, opt_args[key]);
+            sub[key + '$'] = foam.core.ConstantSlot.create({value: v});
+            sub[key] = v;
           }
         }
       }

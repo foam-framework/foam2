@@ -17,7 +17,7 @@ describe('ConteXt object', function() {
       properties: [ 'a' ]
     });
     var testa = test.Tester.create({ a: 3 });
-    var sub = foam.sub({ hello$: testa.a$ });
+    var sub = foam.sub({ hello: testa.a$ });
 
     expect(sub.hello).toEqual(3);
     testa.a = 99;
