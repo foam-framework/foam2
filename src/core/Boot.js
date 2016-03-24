@@ -1334,6 +1334,9 @@ foam.CLASS({
               var b = bs[i];
 
               if ( b[0] ) {
+                // TODO: This is wrong. It forces factories to be prematurely fired.
+                // Values should be exported as DynamicValues so that they're only created
+                // when first needed.
                 var v = this[b[0]];
                 var a = this.cls_.getAxiomByName(b[0]);
 
