@@ -727,7 +727,7 @@ foam.CLASS({
       this.set(dst, this.get(src));
     },
 
-    function exportedValue(obj, m) {
+    function exportedValue(obj) {
       /** Export obj.name$ instead of just obj.name. **/
       return obj.slot(this.name);
     }
@@ -827,7 +827,8 @@ foam.CLASS({
       proto[this.name] = this.override_(proto, this.code);
     },
 
-    function exportedValue(obj, m) {
+    function exportedValue(obj) {
+      var m = obj[this.name];
       /** Bind the method to 'this' when exported so that it still works. **/
       return function exportedMethod() { return m.apply(obj, arguments); };
     }
@@ -1347,10 +1348,6 @@ foam.CLASS({
               var b = bs[i];
 
               if ( b[0] ) {
-                // TODO: This is wrong. It forces factories to be prematurely fired.
-                // Values should be exported as Slots so that they're only created
-                // when first needed.
-                var v = this[b[0]];
                 var a = this.cls_.getAxiomByName(b[0]);
 
                 if ( ! a )
@@ -1358,7 +1355,7 @@ foam.CLASS({
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
-                m[b[1]] = a.exportedValue ? a.exportedValue(this, v) : v ;
+                m[b[1]] = a.exportedValue ? a.exportedValue(this) : this[b[0]] ;
               } else {
                 m[b[1]] = this;
               }

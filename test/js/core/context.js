@@ -33,47 +33,43 @@ describe('ConteXt object', function() {
 
 });
 
-// describe('Context Import/Export', function() {
-//   beforeEach(function() {
-//     foam.CLASS({
-//       package: 'test',
-//       name: 'XUser',
-//       imports: [
-//         'bar'
-//       ],
-//       methods: [
-//         function init() {
-//           this.bar; // triggers a parent context access
-//         }
-//       ]
-//     });
-//     foam.CLASS({
-//       package: 'test',
-//       name: 'ContextBase',
-//       requires: [
-//         'test.XUser',
-//       ],
-//       exports: [
-//         'foo',
-//         'bar',
-//       ],
-//       properties: [
-//         {
-//           name: 'foo',
-//           factory: function() {
-//             return this.XUser.create();
-//           }
-//         },
-//         ['bar', 99],
-//       ],
-//     });
-//
-//   });
-//
-//   it("factories not so lazy that things created in them cause infinite loops grabbing the context", function() {
-//     expect(function() { test.ContextBase.create().foo; }).not.toThrow();
-//
-//   });
-//
-//
-// });
+describe('Context Import/Export', function() {
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'XUser',
+      imports: [
+        'bar'
+      ],
+      methods: [
+        function init() {
+          this.bar; // triggers a parent context access
+        }
+      ]
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'ContextBase',
+      requires: [
+        'test.XUser',
+      ],
+      exports: [
+        'foo',
+        'bar',
+      ],
+      properties: [
+        {
+          name: 'foo',
+          factory: function() {
+            return this.XUser.create();
+          }
+        },
+        ['bar', 99],
+      ],
+    });
+  });
+
+  it("factories not so lazy that things created in them cause infinite loops grabbing the context", function() {
+    expect(function() { test.ContextBase.create().foo; }).not.toThrow();
+  });
+});
