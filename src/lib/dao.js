@@ -437,7 +437,7 @@ foam.CLASS({
         var fc = this.FlowControl.create();
         var sub;
 
-        fc.propertyChange.subscribe(function(s, _, p) {
+        fc.propertyChange.sub(function(s, _, p) {
           if ( p.name == "stopped") {
             if ( sub ) sub.destroy();
           } else if ( p.name === "errorEvt" ) {
@@ -447,7 +447,7 @@ foam.CLASS({
         });
 
         this.select(sink, options).then(function() {
-          this.on.subscribe(function(s, on, e, obj) {
+          this.on.sub(function(s, on, e, obj) {
             sub = s;
             switch(e) {
             case 'put':
@@ -670,7 +670,7 @@ foam.CLASS({
 
       if ( i == this.array.length ) this.array.push(obj);
       sink && sink.put(obj);
-      this.on.put.publish(obj);
+      this.on.put.pub(obj);
 
       return Promise.resolve(sink || obj);
     },
@@ -680,7 +680,7 @@ foam.CLASS({
         if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
           sink && sink.remove(o2);
-          this.on.remove.publish(o2);
+          this.on.remove.pub(o2);
           return Promise.resolve(sink || o2);
         }
       }
@@ -719,7 +719,7 @@ foam.CLASS({
           var obj = this.array.splice(i, 1)[0];
           i--;
           sink && sink.remove(obj);
-          this.on.remove.publish(obj);
+          this.on.remove.pub(obj);
         }
       }
 
@@ -824,8 +824,8 @@ foam.CLASS({
       var objs = localStorage.getItem(this.name);
       if ( objs ) this.array = foam.json.parseArray(foam.json.parseString(objs));
 
-      this.on.put.subscribe(this.updated);
-      this.on.remove.subscribe(this.updated);
+      this.on.put.sub(this.updated);
+      this.on.remove.sub(this.updated);
 
       // TODO: base on an indexed DAO
     }

@@ -56,7 +56,7 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      return other.subscribe(function() {
+      return other.sub(function() {
         this.set(other.get());
       }.bind(this));
     }
@@ -93,12 +93,12 @@ foam.CLASS({
       return this.oldValue = value;
     },
 
-    function subscribe(l) {
-      return this.obj.subscribe('propertyChange', this.prop.name, l);
+    function sub(l) {
+      return this.obj.sub('propertyChange', this.prop.name, l);
     },
 
-    function unsubscribe(l) {
-      this.obj.unsubscribe('propertyChange', this.prop.name, l);
+    function unsub(l) {
+      this.obj.unsub('propertyChange', this.prop.name, l);
     },
 
     function isDefined() {
@@ -134,7 +134,7 @@ foam.CLASS({
   methods: [
     function init() {
       for ( var i = 0 ; i < this.args.length ; i++ )
-        this.onDestroy(this.args[i].subscribe(this.invalidate));
+        this.onDestroy(this.args[i].sub(this.invalidate));
     },
 
     function get() {
@@ -143,11 +143,11 @@ foam.CLASS({
 
     function set() { /* nop */ },
 
-    function subscribe(l) {
+    function sub(l) {
       return this.SUPER('propertyChange', 'value', l);
     },
 
-    function unsubscribe(l) {
+    function unsub(l) {
       this.SUPER('propertyChange', 'value', l);
     }
   ],

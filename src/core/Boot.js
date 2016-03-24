@@ -94,7 +94,7 @@
   <li>Constants  - Add constants to the prototype and class
   <li>Properties - High-level instance variable definitions
   <li>Methods    - Prototype methods
-  <li>Topics     - Publish/subscribe topics
+  <li>Topics     - Publish/sub topics
   <li>Listeners  - Like methods, but with extra features for use as callbacks
 </ul>
 
@@ -434,7 +434,7 @@ foam.CLASS({
           this.private_.hasOwnProperty(name) );
     },
 
-    function publishPropertyChange() {
+    function pubPropertyChange() {
       // NOP - to be added later
     },
 
@@ -661,9 +661,9 @@ foam.CLASS({
             });
           }
 
-          this.publishPropertyChange(name, oldValue, newValue);
+          this.pubPropertyChange(name, oldValue, newValue);
 
-          // TODO(maybe): publish to a global topic to support dynamic()
+          // TODO(maybe): pub to a global topic to support dynamic()
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         };
@@ -701,7 +701,7 @@ foam.CLASS({
             subs[i].destroy();
         };
         for ( var i = 0 ; i < args.length ; i++ )
-          subs.push(this.subscribe('propertyChange', args[i], l));
+          subs.push(this.sub('propertyChange', args[i], l));
         return value;
       };
     },
@@ -947,16 +947,16 @@ foam.CLASS({
     },
 
     /**
-      Publish a message to all matching subscribed listeners.
+      Publish a message to all matching subd listeners.
       Returns the number of listeners notified.
     */
-    function publish() {
+    function pub() {
       // This method isn't JIT-ed because of the use of 'arguments',
-      // So we move all of the code to publish_() so that it is JIT-ed.
-      return this.publish_(arguments);
+      // So we move all of the code to pub_() so that it is JIT-ed.
+      return this.pub_(arguments);
     },
 
-    function publish_(args) {
+    function pub_(args) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
@@ -971,16 +971,16 @@ foam.CLASS({
     },
 
     /**
-      Subscribe to published events.
-      args - zero or more values which specify the pattern of published
+      Subscribe to pubed events.
+      args - zero or more values which specify the pattern of pubed
              events to match.
       <p>For example:
 <pre>
-   subscribe('propertyChange', l) will match:
-   publish('propertyChange', 'age', 18, 19), but not:
-   publish('stateChange', 'active');
+   sub('propertyChange', l) will match:
+   pub('propertyChange', 'age', 18, 19), but not:
+   pub('stateChange', 'active');
 </pre>
-      <p>subscribe(l) will match all events.
+      <p>sub(l) will match all events.
       l - the listener to call with notifications.
        <p> The first argument supplied to the listener is the "subscription",
         which contains the "src" of the event and a destroy() method for
@@ -988,7 +988,7 @@ foam.CLASS({
       <p>Returns a "subscrition" which can be cancelled by calling
         its .destroy() method.
     */
-    function subscribe() { /* args..., l */
+    function sub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
@@ -1016,8 +1016,8 @@ foam.CLASS({
       return node.sub;
     },
 
-    /** Unsubscribe a previously subscribed listener. */
-    function unsubscribe() { /* args..., l */
+    /** Unsub a previously subd listener. */
+    function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
@@ -1035,11 +1035,11 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function publishPropertyChange(name, oldValue, newValue) {
+    function pubPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
         var dyn = this.slot(name);
         dyn.setPrev(oldValue);
-        this.publish('propertyChange', name, dyn);
+        this.pub('propertyChange', name, dyn);
       }
     },
 
@@ -1364,7 +1364,7 @@ foam.CLASS({
 
 
 /**
-  Topics delcare the types of events that an object publishes.
+  Topics delcare the types of events that an object pubes.
 <pre>
   Ex.
   foam.CLASS({
@@ -1373,12 +1373,12 @@ foam.CLASS({
   });
 
   then doing:
-  alarm.ring.publish();
-  alarm.ring.subscribe(l);
+  alarm.ring.pub();
+  alarm.ring.sub(l);
 
   is the same as:
-  alarm.publish('ring');
-  alarm.subscribe('ring', l);
+  alarm.pub('ring');
+  alarm.sub('ring', l);
 </pre>
 */
 foam.CLASS({
@@ -1409,9 +1409,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          publish: parent.publish.bind(parent, name),
-          subscribe: parent.subscribe.bind(parent, name),
-          unsubscribe: parent.unsubscribe.bind(parent, name),
+          pub: parent.pub.bind(parent, name),
+          sub: parent.sub.bind(parent, name),
+          unsub: parent.unsub.bind(parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 
@@ -1495,11 +1495,11 @@ foam.CLASS({
   });
 </pre>
   You might use the above onAlarm listener like this:
-  alarm.ring.subscribe(sprinker.onAlarm);
+  alarm.ring.sub(sprinker.onAlarm);
 <p>
   Notice, that normally JS methods forget which object they belong
   to so you would need to do something like:
-    <pre>alarm.ring.subscribe(sprinker.onAlarm.bind(sprinkler));</pre>
+    <pre>alarm.ring.sub(sprinker.onAlarm.bind(sprinkler));</pre>
   But listeners are pre-bound.
 */
 foam.CLASS({
@@ -1847,7 +1847,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         delete this.instance_[name];
-        this.publish('propertyChange', name, this.slot(name));
+        this.pub('propertyChange', name, this.slot(name));
       }
     },
 

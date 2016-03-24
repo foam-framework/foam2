@@ -842,28 +842,28 @@ describe('Slots', function() {
 //     t.a$.clear();
 //     expect(t2.a).toEqual(45);
 //   });
-  it('subscribes manual listeners', function() {
+  it('subs manual listeners', function() {
     var last_args, last_value;
     var l = function() {
       last_args = Array.prototype.slice.call(arguments);
       last_value = last_args[3].get();
     };
-    t.a$.subscribe(l);
+    t.a$.sub(l);
     t.a = 999;
     expect(last_args).toBeDefined();
     expect(last_args[2]).toEqual('a');
     expect(last_value).toEqual(999);
   });
-  it('unsubscribes manual listeners', function() {
+  it('unsubs manual listeners', function() {
     var last_args, last_value;
     var l = function() {
       last_args = Array.prototype.slice.call(arguments);
       last_value = last_args[3].get();
     };
-    t.a$.subscribe(l);
+    t.a$.sub(l);
     t.a = 999;
 
-    t.a$.unsubscribe(l);
+    t.a$.unsub(l);
     t.a = 49;
 
     // same as the first time

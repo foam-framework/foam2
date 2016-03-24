@@ -47,8 +47,8 @@ foam.CLASS({
         this.array = foam.json.parseArray(foam.json.parseString(data));
       }
 
-      this.on.put.subscribe(this.updated);
-      this.on.remove.subscribe(this.updated);
+      this.on.put.sub(this.updated);
+      this.on.remove.sub(this.updated);
 
       // TODO: base on an indexed DAO
     }

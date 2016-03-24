@@ -1001,17 +1001,17 @@ log(! InnerClass1);
 // Example 57
 log_.output = "";
 try {
-// Objects support publish() for publishing events,
-// and subscribe() for listening for published events.
+// Objects support pub() for pubing events,
+// and sub() for listening for pubed events.
 foam.CLASS({
   name: 'PubSubTest'
 });
 var o = PubSubTest.create();
 // Install a listener that listens to all events
-o.subscribe(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
-o.subscribe('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' ')); });
-o.publish('alarm', 'on');
-o.publish('lifecycle', 'loaded');
+o.sub(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
+o.sub('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' ')); });
+o.pub('alarm', 'on');
+o.pub('lifecycle', 'loaded');
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1021,17 +1021,17 @@ o.publish('lifecycle', 'loaded');
 // Example 58
 log_.output = "";
 try {
-// A Class can declare 'Topics' that it publishes events for.
+// A Class can declare 'Topics' that it pubes events for.
 foam.CLASS({
   name: 'TopicTest',
   topics: [ 'alarm' ]
 });
 var o = TopicTest.create();
-o.subscribe('alarm', function(_, _, state) { console.log('alarm: ', state); });
+o.sub('alarm', function(_, _, state) { console.log('alarm: ', state); });
 // The next line uses the Topic and is slightly shorter than the equivalent above.
-o.alarm.subscribe(function(_, _, state) { console.log('alarm (topic): ', state); });
-o.alarm.publish('on');
-o.publish('alarm', 'off');
+o.alarm.sub(function(_, _, state) { console.log('alarm (topic): ', state); });
+o.alarm.pub('on');
+o.pub('alarm', 'off');
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1041,16 +1041,16 @@ o.publish('alarm', 'off');
 // Example 59
 log_.output = "";
 try {
-// Objects implicitly publish events on the 'propertyChange' topic when
+// Objects implicitly pub events on the 'propertyChange' topic when
 foam.CLASS({
   name: 'PropertyChangeTest',
   properties: [ 'a', 'b' ]
 });
 o = PropertyChangeTest.create();
 // Listen for all propertyChange events:
-o.propertyChange.subscribe(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
+o.propertyChange.sub(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
 // Listen for only changes to the 'a' Property:
-o.propertyChange.subscribe('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
+o.propertyChange.sub('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
 o.a = 42;
 o.b = 'bar';
 o.a++;
@@ -1063,14 +1063,14 @@ o.a++;
 // Example 60
 log_.output = "";
 try {
-// There are four ways to unsubscribe a listener
-// 1. Call obj.unsubscribe();
+// There are four ways to unsub a listener
+// 1. Call obj.unsub();
 o = TopicTest.create();
 var l = function() { console.log.apply(console.log, arguments); };
-o.subscribe(l);
-o.publish('fire');
-o.unsubscribe(l);
-o.publish("fire again, but nobody's listenering");
+o.sub(l);
+o.pub('fire');
+o.unsub(l);
+o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1080,11 +1080,11 @@ o.publish("fire again, but nobody's listenering");
 // Example 61
 log_.output = "";
 try {
-// 2. Call .destroy() on the Destroyable that subscribe() returns
-var sub = o.subscribe(l);
-o.publish('fire');
+// 2. Call .destroy() on the Destroyable that sub() returns
+var sub = o.sub(l);
+o.pub('fire');
 sub.destroy();
-o.publish("fire again, but nobody's listenering");
+o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1099,9 +1099,9 @@ var l = function(sub) {
   sub.destroy();
   console.log.apply(console.log, arguments);
 };
-o.subscribe(l);
-o.publish('fire');
-o.publish("fire again, but nobody's listenering");
+o.sub(l);
+o.pub('fire');
+o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1114,9 +1114,9 @@ try {
 // 4. If you only want to receive the first event, decorate your
 // listener with foam.events.oneTime() and it will cancel the subscription
 // when it receives the first event.
-o.subscribe(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
-o.publish('fire');
-o.publish("fire again, but nobody's listenering");
+o.sub(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
+o.pub('fire');
+o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1271,7 +1271,7 @@ var e = foam.core.ExpressionSlot.create({
   fn: function(f, l) { return f + ' ' + l; }
 });
 log(e.get());
-e.subscribe(log);
+e.sub(log);
 p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
@@ -1314,7 +1314,7 @@ foam.CLASS({
 });
 var p = Person.create({fname: 'John', lname: 'Smith'});
 p.describe();
-p.subscribe(log);
+p.sub(log);
 p.fname = 'Steve';
 log(p.fname, p.lname, ' = ', p.name);
 p.lname = 'Jones';
@@ -1386,7 +1386,7 @@ o.destroy();
 // Example 80
 log_.output = "";
 try {
-// If an Object is destroyed, it will unsubscribe from any
+// If an Object is destroyed, it will unsub from any
 // subscriptions which subsequently try to deliver events.
 var source = foam.core.FObject.create();
 var sink = foam.CLASS({
@@ -1397,11 +1397,11 @@ var sink = foam.CLASS({
     }
   ]
 }).create();
-source.subscribe(sink.l);
-source.publish('ping');
-source.publish('ping');
+source.sub(sink.l);
+source.pub('ping');
+source.pub('ping');
 sink.destroy();
-source.publish('ping');
+source.pub('ping');
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1742,10 +1742,10 @@ try {
 // foam.events.consoleLog
 foam.CLASS({name: 'ConsoleLogTest'});
 var o = ConsoleLogTest.create();
-o.subscribe(foam.events.consoleLog());
-o.publish();
-o.publish('foo');
-o.publish('foo','bar');
+o.sub(foam.events.consoleLog());
+o.pub();
+o.pub('foo');
+o.pub('foo','bar');
 } catch(x) {
  log("Exception: ", x);
  }

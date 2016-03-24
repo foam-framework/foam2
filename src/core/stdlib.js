@@ -278,7 +278,7 @@ foam.LIB({
 
   methods: [
     function oneTime(listener) {
-      /** Create a "one-time" listener which unsubscribes itself when called. **/
+      /** Create a "one-time" listener which unsubs itself when called. **/
       return function(subscription) {
         subscription.destroy();
         listener.apply(this, foam.array.argsToArray(arguments));

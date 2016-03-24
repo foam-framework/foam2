@@ -132,11 +132,11 @@ module.exports = function genericDAOTestBattery(daoFactory) {
         });
       });
 
-      it('should publish on.put with the object', function(done) {
+      it('should pub on.put with the object', function(done) {
         var dao = daoFactory(test.dao.generic.Person);
         var p = mkPerson1();
         var listenerCalled = false;
-        dao.on.put.subscribe(function(sub, on, put, obj) {
+        dao.on.put.sub(function(sub, on, put, obj) {
           expect(sub).toBeDefined();
           expect(on).toBe('on');
           expect(put).toBe('put');
@@ -223,11 +223,11 @@ module.exports = function genericDAOTestBattery(daoFactory) {
         }).then(done);
       });
 
-      it('should publish on.remove with the object', function(done) {
+      it('should pub on.remove with the object', function(done) {
         var dao = daoFactory(test.dao.generic.Person);
         var p = mkPerson1();
         var listenerCalled = false;
-        dao.on.remove.subscribe(function(sub, on, remove, obj) {
+        dao.on.remove.sub(function(sub, on, remove, obj) {
           expect(sub).toBeDefined();
           expect(on).toBe('on');
           expect(remove).toBe('remove');

@@ -69,7 +69,7 @@ foam.CLASS({
     function maybeCall(X, that) {
       if ( this.isAvailable.call(that, this) && this.isEnabled.call(that, this) ) {
         this.code.call(that, X, this);
-        that.publish('action', this.name, this);
+        that.pub('action', this.name, this);
         return true;
       }
       return false;
