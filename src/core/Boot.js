@@ -1914,7 +1914,6 @@ foam.boot.end();
     - interfaces
   - Slot map() and relate() methods
   - more docs
-  - context $ binding
   - Axiom ordering/priority
   - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
   - adaptArrayElement not setting context

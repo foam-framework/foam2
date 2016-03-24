@@ -56,6 +56,7 @@
 
   [
     "stdlib",
+    "Context",
     "Boot",
     "Slot",
     "Window",
