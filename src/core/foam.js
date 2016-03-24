@@ -49,7 +49,7 @@
   [
     "stdlib",
     "Boot",
-    "Dynamic",
+    "Slot",
     "Window",
     "JSON",
     "objects",
