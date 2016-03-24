@@ -502,7 +502,7 @@ foam.LIB({
     sub: function sub(opt_args, opt_name) {
       var sub = Object.create(this);
 
-      if ( opt_args ) for ( var key in opt_args ) {
+      for ( var key in opt_args ) {
         if ( opt_args.hasOwnProperty(key) ) {
           var asDyn = key !== '$' && key != '$$' && key.charAt(key.length-1) == '$';
           if ( asDyn ) {
