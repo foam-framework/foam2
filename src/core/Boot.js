@@ -873,7 +873,7 @@ foam.CLASS({
       }
     ],
     [ 'adaptArrayElement', function(o) {
-        return foam.lookup(this.of).create(o);
+        return foam.lookup(this.of).create(o, this);
       }
     ]
   ]
@@ -1409,8 +1409,8 @@ foam.CLASS({
       name: 'topics',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
-          foam.core.Topic.create({ name: o }) :
-          foam.core.Topic.create(o);
+          foam.core.Topic.create({ name: o }, this) :
+          foam.core.Topic.create(o, this);
       }
     }
   ],
