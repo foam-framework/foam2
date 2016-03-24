@@ -156,3 +156,31 @@ foam.CLASS({
     function invalidate() { this.clearProperty('value'); }
   ]
 });
+
+
+/** Tracks dependencies for a dynamic function and invalidates is they change. */
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ConstantSlot',
+  implements: [ 'foam.core.Slot' ],
+
+  properties: [
+    {
+      name: 'value',
+      getter: function() { return this.value_; },
+      setter: function() {}
+    }
+  ],
+
+  methods: [
+    function initArgs(args) { this.value_ = args && args.value; },
+
+    function get() { return this.value; },
+
+    function set() { /* nop */ },
+
+    function sub(l) { /* nop */ },
+
+    function unsub(l) { /* nop */ }
+  ]
+});

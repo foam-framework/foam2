@@ -747,6 +747,13 @@ log(dv.isDefined());
 dv.clear();
 log(dv.get(), dv.isDefined());
 
+// ConstantSlot creates an immutable slot.
+var s = foam.core.ConstantSlot.create({value: 42});
+log(s.get());
+s.value = 66;
+s.set(66);
+log(s.get());
+
 // ExpressionSlot creates a Slot from a list of Slots
 // and a function which combines them into a new value.
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
