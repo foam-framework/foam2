@@ -182,9 +182,12 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'CView',
 
-  topics: [ 'invalidated' ],
+  requires: [
+    'foam.graphics.Canvas',
+    'foam.graphics.Transform'
+  ],
 
-  requires: [ 'foam.graphics.Transform', 'foam.graphics.Canvas' ],
+  topics: [ 'invalidated' ],
 
   properties: [
     {
@@ -271,8 +274,8 @@ foam.CLASS({
 
   methods: [
     function initCView() {
-      this.propertyChange.subscribe(function() {
-        this.invalidated.publish();
+      this.propertyChange.sub(function() {
+        this.invalidated.pub();
       }.bind(this));
     },
 
@@ -313,12 +316,12 @@ foam.CLASS({
     },
 
     function addChild_(c) {
-      c.invalidated.subscribe(this.onChildUpdate);
+      c.invalidated.sub(this.onChildUpdate);
       return c;
     },
 
     function removeChild_(c) {
-      c.invalidated.unsubscribe(this.onChildUpdate);
+      c.invalidated.unsub(this.onChildUpdate);
       return c;
     },
 
@@ -340,7 +343,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onChildUpdate() { this.invalidated.publish(); }
+    function onChildUpdate() { this.invalidated.pub(); }
   ]
 });
 
@@ -443,7 +446,7 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
 
-  imports: [ '$' ],
+  imports: [ 'getElementById' ],
 
   properties: [
     {
@@ -459,7 +462,7 @@ foam.CLASS({
     {
       name: 'element',
       factory: function() {
-        var e = this.$(this.id);
+        var e = this.getElementById(this.id);
         e.width = this.width;
         e.height = this.height;
         return e;
@@ -478,8 +481,8 @@ foam.CLASS({
     {
       name: 'cview',
       postSet: function(o, n) {
-        o && o.invalidated.unsubscribe(this.paint);
-        n && n.invalidated.subscribe(this.paint);
+        o && o.invalidated.unsub(this.paint);
+        n && n.invalidated.sub(this.paint);
         this.paint();
       }
     }

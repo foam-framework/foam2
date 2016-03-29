@@ -51,13 +51,13 @@ describe('foam.events.oneTime', function() {
   it('removes itself after one invokation', function() {
     var one = foam.events.oneTime(listener);
 
-    ep.change.subscribe('simple', one);
+    ep.change.sub('simple', one);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(1);
 
     // listener should be gone now
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(1); // no change
   });
 
@@ -79,9 +79,9 @@ describe('foam.events.consoleLog', function() {
   it('logs ok', function() {
     var logger = foam.events.consoleLog(listener);
 
-    ep.change.subscribe(logger);
+    ep.change.sub(logger);
 
-    ep.change.publish();
+    ep.change.pub();
     expect(listener.count).toEqual(1);
 
   });
@@ -108,12 +108,12 @@ describe('foam.X.merged', function() {
   it('merges with default parameters', function() {
     var merged = foam.X.merged(listener);
 
-    ep.change.subscribe('simple', merged);
+    ep.change.sub('simple', merged);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -125,12 +125,12 @@ describe('foam.X.merged', function() {
   it('merges with delay specified', function() {
     var merged = foam.X.merged(listener, 1300);
 
-    ep.change.subscribe('simple', merged);
+    ep.change.sub('simple', merged);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
@@ -141,25 +141,25 @@ describe('foam.X.merged', function() {
   });
 
 
-  it('unsubscribes when requested', function() {
+  it('unsubs when requested', function() {
     var merged = foam.X.merged(foam.events.oneTime(listener));
 
-    ep.change.subscribe('simple', merged);
+    ep.change.sub('simple', merged);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(17);
     expect(listener.count).toEqual(1);
     // and unsub happens due to the oneTime
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(1);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(1);
 
     jasmine.clock().tick(17); // should be unsubbed,
@@ -187,12 +187,12 @@ describe('foam.X.async', function() {
   it('async invokes each listener', function() {
     var delayed = foam.X.async(listener);
 
-    ep.change.subscribe('simple', delayed);
+    ep.change.sub('simple', delayed);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1);
@@ -204,12 +204,12 @@ describe('foam.X.async', function() {
     var X = { setTimeout: setTimeout };
     var delayed = foam.X.async(listener, X);
 
-    ep.change.subscribe('simple', delayed);
+    ep.change.sub('simple', delayed);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener.count).toEqual(0);
 
     jasmine.clock().tick(1);
@@ -240,14 +240,14 @@ describe('foam.X.framed', function() {
   it('framed listeners accumulate', function() {
     var delayed1 = foam.X.framed(listener1);
     var delayed2 = foam.X.framed(listener2);
-    ep.change.subscribe('simple', delayed1);
-    ep.change.subscribe('simple', delayed2);
+    ep.change.sub('simple', delayed1);
+    ep.change.sub('simple', delayed2);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
-    ep.change.publish('simple');
+    ep.change.pub('simple');
     expect(listener1.count).toEqual(0);
     expect(listener2.count).toEqual(0);
 
@@ -281,35 +281,35 @@ describe('foam.X.Observable.sub()/.pub()', function() {
     listener3 = null;
   });
 
-  it('publishes correctly after removing first of three', function() {
-    ep.change.subscribe(listener);
-    ep.change.subscribe(listener2);
-    ep.change.subscribe(listener3);
+  it('pubes correctly after removing first of three', function() {
+    ep.change.sub(listener);
+    ep.change.sub(listener2);
+    ep.change.sub(listener3);
 
-    ep.change.unsubscribe(listener);
-    ep.change.publish();
+    ep.change.unsub(listener);
+    ep.change.pub();
     expect(listener.count).toEqual(0);
     expect(listener2.count).toEqual(1);
     expect(listener3.count).toEqual(1);
   });
-   it('publishes correctly after removing middle of three', function() {
-    ep.change.subscribe(listener);
-    ep.change.subscribe(listener2);
-    ep.change.subscribe(listener3);
+   it('pubes correctly after removing middle of three', function() {
+    ep.change.sub(listener);
+    ep.change.sub(listener2);
+    ep.change.sub(listener3);
 
-    ep.change.unsubscribe(listener2);
-    ep.change.publish();
+    ep.change.unsub(listener2);
+    ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(0);
     expect(listener3.count).toEqual(1);
   });
-  it('publishes correctly after removing last of three', function() {
-    ep.change.subscribe(listener);
-    ep.change.subscribe(listener2);
-    ep.change.subscribe(listener3);
+  it('pubes correctly after removing last of three', function() {
+    ep.change.sub(listener);
+    ep.change.sub(listener2);
+    ep.change.sub(listener3);
 
-    ep.change.unsubscribe(listener3);
-    ep.change.publish();
+    ep.change.unsub(listener3);
+    ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(1);
     expect(listener3.count).toEqual(0);
@@ -334,7 +334,7 @@ describe('PropertyChangePublisher.propertyChange()', function() {
   });
 
   it('triggers listeners when old/nu value differs', function() {
-    pcp.propertyChange.subscribe(listener);
+    pcp.propertyChange.sub(listener);
 
     pcp.propA = 1;
     pcp.propA = 3;

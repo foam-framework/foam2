@@ -380,6 +380,7 @@ describe('Constants', function() {
 describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', function() {
   var person;
   var employee;
+  var personReq;
 
   beforeEach(function() {
     foam.CLASS({
@@ -431,10 +432,25 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
       ]
     });
     employee = test.Employee.create({name: 'Jane', age: 30, salary: 50000});
+
+    foam.CLASS({
+      package: 'test',
+      name: 'PersonRequirer',
+      requires: ['test.Person'],
+      methods: [
+        function checkIsPersonInstance(other) {
+          // This checks for subclass checking problems introduced by the
+          // 'require' decorating of this.Person
+          return this.Person.isInstance(other);
+        }
+      ]
+    });
+    personReq = test.PersonRequirer.create();
   });
   afterEach(function() {
     person = null;
     employee = null;
+    personReq = null;
   });
 
   it('inherits methods', function() {
@@ -464,6 +480,11 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
 
     foam.CLASS({ name: 'Fake', package: 'test' });
     expect(test.Person.isInstance(test.Fake.create({}))).toBe(false);
+  });
+
+  it('reports correct subclass checks in required classes', function() {
+    expect(personReq.checkIsPersonInstance(person)).toBe(true);
+    expect(personReq.checkIsPersonInstance(employee)).toBe(true);
   });
 
   it('returns axioms correctly', function() {
@@ -760,7 +781,7 @@ describe('Property Mlang interop', function() {
 });
 
 
-describe('Dynamics', function() {
+describe('Slots', function() {
   var t;
   var t2;
 
@@ -821,28 +842,28 @@ describe('Dynamics', function() {
 //     t.a$.clear();
 //     expect(t2.a).toEqual(45);
 //   });
-  it('subscribes manual listeners', function() {
+  it('subs manual listeners', function() {
     var last_args, last_value;
     var l = function() {
       last_args = Array.prototype.slice.call(arguments);
       last_value = last_args[3].get();
     };
-    t.a$.subscribe(l);
+    t.a$.sub(l);
     t.a = 999;
     expect(last_args).toBeDefined();
     expect(last_args[2]).toEqual('a');
     expect(last_value).toEqual(999);
   });
-  it('unsubscribes manual listeners', function() {
+  it('unsubs manual listeners', function() {
     var last_args, last_value;
     var l = function() {
       last_args = Array.prototype.slice.call(arguments);
       last_value = last_args[3].get();
     };
-    t.a$.subscribe(l);
+    t.a$.sub(l);
     t.a = 999;
 
-    t.a$.unsubscribe(l);
+    t.a$.unsub(l);
     t.a = 49;
 
     // same as the first time
@@ -897,8 +918,8 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.AxiomArray.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Constant.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Implements.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.Dynamic.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.internal.DynamicProperty.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.Slot.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.internal.PropertySlot.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Topic.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Boolean.model_)).toBe(true);
   });

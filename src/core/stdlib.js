@@ -193,7 +193,7 @@ foam.LIB({
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(this.length);
       for ( var i = 0 ; i < this.length ; i++ ) {
-        ret[i] = ( this[i].clone ) ? this[i].clone() : this[i];
+        ret[i] = (  this[i] && this[i].clone ) ? this[i].clone() : this[i];
       }
       return ret;
     }
@@ -278,7 +278,7 @@ foam.LIB({
 
   methods: [
     function oneTime(listener) {
-      /** Create a "one-time" listener which unsubscribes itself when called. **/
+      /** Create a "one-time" listener which unsubs itself when called. **/
       return function(subscription) {
         subscription.destroy();
         listener.apply(this, foam.array.argsToArray(arguments));
@@ -440,88 +440,3 @@ foam.LIB({
     }
   ]
 });
-
-
-// TODO: comment
-(function() {
-
-  // TODO: @internal
-  function set(X, key, value) {
-    /* Update a Context binding. */
-    X[key] = value;
-
-    // TODO:
-    // if ( GLOBAL.SimpleReadOnlyValue && key !== '$' && key !== '$$' )
-    // X[key + '$'] = SimpleReadOnlyValue.create({value: value});
-  }
-
-  function setDynamic(X, key, dValue) {
-    Object.defineProperty(
-      X,
-      key,
-      {
-        get: function() { return dValue.get(); },
-        configurable: true
-      }
-    );
-
-    if ( key !== '$' && key !== '$$' ) X[key + '$'] = dValue;
-  }
-
-  var ROOT = global;
-
-  var lookup_ = function lookup_(id) {
-    var a = foam.core[id];
-    if ( a ) return a;
-    var path = id.split('.');
-    var root = ROOT;
-    for ( var i = 0 ; root && i < path.length ; i++ )
-      root = root[path[i]];
-    return root;
-  };
-
-  var cache = {};
-
-  var X = {
-    lookup: function(id) {
-      return id && ( cache[id] || ( cache[id] = lookup_(id) ) );
-    },
-
-    register: function(cls) {
-      cache[cls.id] = cls;
-      if ( cls.package === 'foam.core' )
-        cache[cls.name] = cls;
-      var path = cls.id.split('.');
-      var root = ROOT;
-      for ( var i = 0 ; i < path.length-1 ; i++ ) {
-        root = root[path[i]] || ( root[path[i]] = {} );
-      }
-      root[path[path.length-1]] = cls;
-    },
-
-    sub: function sub(opt_args, opt_name) {
-      var sub = Object.create(this);
-
-      if ( opt_args ) for ( var key in opt_args ) {
-        if ( opt_args.hasOwnProperty(key) ) {
-          var asDyn = key !== '$' && key != '$$' && key.charAt(key.length-1) == '$';
-          if ( asDyn ) {
-            setDynamic(sub, key.substring(0, key.length-1), opt_args[key]);
-          } else {
-            set(sub, key, opt_args[key]);
-          }
-        }
-      }
-
-      if ( opt_name )
-        Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
-
-      return sub;
-    }
-  };
-
-  foam.X = X;
-
-  // TODO: comment
-  for ( var key in X ) foam[key] = X[key].bind(X);
-})();

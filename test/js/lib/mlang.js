@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 // TODO: Move this to node loading stage
 if ( typeof process == 'object' ) {
   require('../../../src/lib/mlang');

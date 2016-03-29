@@ -94,7 +94,7 @@
   <li>Constants  - Add constants to the prototype and class
   <li>Properties - High-level instance variable definitions
   <li>Methods    - Prototype methods
-  <li>Topics     - Publish/subscribe topics
+  <li>Topics     - Publish/sub topics
   <li>Listeners  - Like methods, but with extra features for use as callbacks
 </ul>
 
@@ -192,7 +192,7 @@ foam.LIB({
         this.subClasses_ = {} ;
 
       if ( ! subClasses_.hasOwnProperty(c.id) )
-        subClasses_[c.id] = ( c === this ) || this.isSubClass(c.__proto__);
+        subClasses_[c.id] = ( c === this.prototype.cls_ ) || this.isSubClass(c.__proto__);
 
       return subClasses_[c.id];
     },
@@ -434,7 +434,7 @@ foam.CLASS({
           this.private_.hasOwnProperty(name) );
     },
 
-    function publishPropertyChange() {
+    function pubPropertyChange() {
       // NOP - to be added later
     },
 
@@ -603,18 +603,18 @@ foam.CLASS({
       // This doesn't let defaultValue to be 'undefined', which is maybe not bad.
       var hasDefaultValue = typeof this.defaultValue !== 'undefined';
       var defaultValue    = this.defaultValue;
-      var dynName         = name + '$';
+      var slotName        = name + '$';
       var isFinal         = this.final;
       var eFactory        = this.exprFactory(this.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
-      Object.defineProperty(proto, dynName, {
+      Object.defineProperty(proto, slotName, {
         get: function propDynGetter() {
-          return this.dynamicProperty(name, dynName, prop);
+          return this.slot(name, slotName, prop);
         },
         set: function propDynSetter(dyn) {
-          this.dynamicProperty(name, dynName, prop).link(dyn);
+          this.slot(name, slotName, prop).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -661,9 +661,9 @@ foam.CLASS({
             });
           }
 
-          this.publishPropertyChange(name, oldValue, newValue);
+          this.pubPropertyChange(name, oldValue, newValue);
 
-          // TODO(maybe): publish to a global topic to support dynamic()
+          // TODO(maybe): pub to a global topic to support dynamic()
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         };
@@ -701,7 +701,7 @@ foam.CLASS({
             subs[i].destroy();
         };
         for ( var i = 0 ; i < args.length ; i++ )
-          subs.push(this.subscribe('propertyChange', args[i], l));
+          subs.push(this.sub('propertyChange', args[i], l));
         return value;
       };
     },
@@ -727,9 +727,9 @@ foam.CLASS({
       this.set(dst, this.get(src));
     },
 
-    function exportedValue(obj, m) {
+    function exportedValue(obj) {
       /** Export obj.name$ instead of just obj.name. **/
-      return obj.dynamicProperty(this.name);
+      return obj.slot(this.name);
     }
   ]
 });
@@ -827,9 +827,10 @@ foam.CLASS({
       proto[this.name] = this.override_(proto, this.code);
     },
 
-    function exportedValue(obj, m) {
+    function exportedValue(obj) {
+      var m = obj[this.name];
       /** Bind the method to 'this' when exported so that it still works. **/
-      return function() { return m.apply(obj, arguments); };
+      return function exportedMethod() { return m.apply(obj, arguments); };
     }
   ]
 });
@@ -873,7 +874,7 @@ foam.CLASS({
       }
     ],
     [ 'adaptArrayElement', function(o) {
-        return foam.lookup(this.of).create(o);
+        return foam.lookup(this.of).create(o, this);
       }
     ]
   ]
@@ -947,16 +948,16 @@ foam.CLASS({
     },
 
     /**
-      Publish a message to all matching subscribed listeners.
+      Publish a message to all matching subd listeners.
       Returns the number of listeners notified.
     */
-    function publish() {
+    function pub() {
       // This method isn't JIT-ed because of the use of 'arguments',
-      // So we move all of the code to publish_() so that it is JIT-ed.
-      return this.publish_(arguments);
+      // So we move all of the code to pub_() so that it is JIT-ed.
+      return this.pub_(arguments);
     },
 
-    function publish_(args) {
+    function pub_(args) {
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
@@ -971,16 +972,16 @@ foam.CLASS({
     },
 
     /**
-      Subscribe to published events.
-      args - zero or more values which specify the pattern of published
+      Subscribe to pubed events.
+      args - zero or more values which specify the pattern of pubed
              events to match.
       <p>For example:
 <pre>
-   subscribe('propertyChange', l) will match:
-   publish('propertyChange', 'age', 18, 19), but not:
-   publish('stateChange', 'active');
+   sub('propertyChange', l) will match:
+   pub('propertyChange', 'age', 18, 19), but not:
+   pub('stateChange', 'active');
 </pre>
-      <p>subscribe(l) will match all events.
+      <p>sub(l) will match all events.
       l - the listener to call with notifications.
        <p> The first argument supplied to the listener is the "subscription",
         which contains the "src" of the event and a destroy() method for
@@ -988,7 +989,7 @@ foam.CLASS({
       <p>Returns a "subscrition" which can be cancelled by calling
         its .destroy() method.
     */
-    function subscribe() { /* args..., l */
+    function sub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
@@ -1016,8 +1017,8 @@ foam.CLASS({
       return node.sub;
     },
 
-    /** Unsubscribe a previously subscribed listener. */
-    function unsubscribe() { /* args..., l */
+    /** Unsub a previously subd listener. */
+    function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
@@ -1035,26 +1036,26 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function publishPropertyChange(name, oldValue, newValue) {
+    function pubPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.dynamicProperty(name);
+        var dyn = this.slot(name);
         dyn.setPrev(oldValue);
-        this.publish('propertyChange', name, dyn);
+        this.pub('propertyChange', name, dyn);
       }
     },
 
     /**
-      Creates a Dynamic for a property.
+      Creates a Slot for a property.
       @private
     */
-    function dynamicProperty(name, opt_dynName, opt_prop) {
-      if ( ! opt_dynName ) opt_dynName = name + '$';
-      var dyn = this.getPrivate_(opt_dynName);
+    function slot(name, opt_slotName, opt_prop) {
+      if ( ! opt_slotName ) opt_slotName = name + '$';
+      var dyn = this.getPrivate_(opt_slotName);
       if ( ! dyn ) {
-        dyn = foam.core.internal.DynamicProperty.create();
+        dyn = foam.core.internal.PropertySlot.create();
         dyn.obj  = this;
         dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
-        this.setPrivate_(opt_dynName, dyn);
+        this.setPrivate_(opt_slotName, dyn);
       }
       return dyn;
     }
@@ -1115,12 +1116,6 @@ foam.CLASS({
 
 /**
 <pre>
-  Ex.
-  constants: {
-    KEY: 'some value'
-  }
-
-  this.cls_.KEY === this.KEY === 'some value'
 </pre>
 */
 foam.CLASS({
@@ -1144,7 +1139,25 @@ foam.CLASS({
       cls[this.model.name] = this.model.getClass();
     },
     function installInProto(proto) {
-      proto[this.model.name] = proto.cls_[this.model.name];
+      // get class already created in installInClass();
+      var name = this.model.name;
+      var cls = proto.cls_[name];
+
+      Object.defineProperty(proto, name, {
+        get: function requiresGetter() {
+          if ( ! this.hasOwnPrivate_(name) ) {
+            var parent = this;
+
+            var c = Object.create(cls);
+            c.create = function(args, X) { return cls.create(args, X || parent); };
+            this.setPrivate_(name, c);
+          }
+
+          return this.getPrivate_(name);
+        },
+        configurable: true,
+        enumerable: false
+      });
     }
   ]
 });
@@ -1213,15 +1226,15 @@ foam.CLASS({
       Object.defineProperty(proto, as, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(as) ) {
-            var model  = foam.lookup(path);
+            var cls    = foam.lookup(path);
             var parent = this;
 
-            if ( ! model )
+            if ( ! cls )
               console.error('Unknown class: ' + path);
 
-            var cls = Object.create(model);
-            cls.create = function(args, X) { return model.create(args, X || parent); };
-            this.setPrivate_(as, cls);
+            var c = Object.create(cls);
+            c.create = function(args, X) { return cls.create(args, X || parent); };
+            this.setPrivate_(as, c);
           }
 
           return this.getPrivate_(as);
@@ -1249,16 +1262,29 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      var key = this.key;
-      var as  = this.as;
+      var key      = this.key;
+      var as       = this.as;
+      var slotName = as + '$';
+
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
-          if ( ! this.hasOwnPrivate_(as) ) {
+          return this[slotName].get();
+        },
+        set: function importsSetter(v) {
+          this[slotName].set(v);
+        },
+        configurable: true,
+        enumerable: false
+      });
+
+      Object.defineProperty(proto, slotName, {
+        get: function importsGetter() {
+          if ( ! this.hasOwnPrivate_(slotName) ) {
             var X = this.X || foam;
-            this.setPrivate_(as, X[key]);
+            this.setPrivate_(slotName, X[key + '$']);
           }
 
-          return this.getPrivate_(as);
+          return this.getPrivate_(slotName);
         },
         configurable: true,
         enumerable: false
@@ -1312,6 +1338,7 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       var bs = this.bindings;
+
       Object.defineProperty(proto, 'Y', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('Y') ) {
@@ -1321,7 +1348,6 @@ foam.CLASS({
               var b = bs[i];
 
               if ( b[0] ) {
-                var v = this[b[0]];
                 var a = this.cls_.getAxiomByName(b[0]);
 
                 if ( ! a )
@@ -1329,7 +1355,7 @@ foam.CLASS({
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
-                m[b[1]] = a.exportedValue ? a.exportedValue(this, v) : v ;
+                m[b[1]] = a.exportedValue ? a.exportedValue(this) : this[b[0]] ;
               } else {
                 m[b[1]] = this;
               }
@@ -1348,7 +1374,7 @@ foam.CLASS({
 
 
 /**
-  Topics delcare the types of events that an object publishes.
+  Topics delcare the types of events that an object pubes.
 <pre>
   Ex.
   foam.CLASS({
@@ -1357,12 +1383,12 @@ foam.CLASS({
   });
 
   then doing:
-  alarm.ring.publish();
-  alarm.ring.subscribe(l);
+  alarm.ring.pub();
+  alarm.ring.sub(l);
 
   is the same as:
-  alarm.publish('ring');
-  alarm.subscribe('ring', l);
+  alarm.pub('ring');
+  alarm.sub('ring', l);
 </pre>
 */
 foam.CLASS({
@@ -1380,8 +1406,8 @@ foam.CLASS({
       name: 'topics',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
-          foam.core.Topic.create({ name: o }) :
-          foam.core.Topic.create(o);
+          foam.core.Topic.create({ name: o }, this) :
+          foam.core.Topic.create(o, this);
       }
     }
   ],
@@ -1393,9 +1419,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          publish: parent.publish.bind(parent, name),
-          subscribe: parent.subscribe.bind(parent, name),
-          unsubscribe: parent.unsubscribe.bind(parent, name),
+          pub: parent.pub.bind(parent, name),
+          sub: parent.sub.bind(parent, name),
+          unsub: parent.unsub.bind(parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 
@@ -1479,11 +1505,11 @@ foam.CLASS({
   });
 </pre>
   You might use the above onAlarm listener like this:
-  alarm.ring.subscribe(sprinker.onAlarm);
+  alarm.ring.sub(sprinker.onAlarm);
 <p>
   Notice, that normally JS methods forget which object they belong
   to so you would need to do something like:
-    <pre>alarm.ring.subscribe(sprinker.onAlarm.bind(sprinkler));</pre>
+    <pre>alarm.ring.sub(sprinker.onAlarm.bind(sprinkler));</pre>
   But listeners are pre-bound.
 */
 foam.CLASS({
@@ -1831,7 +1857,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         delete this.instance_[name];
-        this.publish('propertyChange', name, this.dynamicProperty(name));
+        this.pub('propertyChange', name, this.slot(name));
       }
     },
 
@@ -1886,10 +1912,11 @@ foam.boot.end();
   - model validation
     - abstract methods
     - interfaces
-  - DynamicValue map() and relate() methods
+  - Slot map() and relate() methods
   - more docs
-  - context $ binding
   - Axiom ordering/priority
+  - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
+  - adaptArrayElement not setting context
 
  ???:
   - ? proxy label, plural from Class to Model
@@ -1898,6 +1925,7 @@ foam.boot.end();
   - predicate support for getAxioms() methods.
   - cascading object property change events
   - should destroyables be a linked list for fast removal?
+    - should onDestroy be merged with listener support?
   - multi-methods?
   - Topic listener relay
 */

@@ -20,6 +20,14 @@
   var isServer = typeof process === 'object';
 
   function createLoadBrowser() {
+    // Web Worker case // TODO: auto-determine path to core
+    if ( typeof document == 'undefined' && typeof importScripts !== 'undefined' ) {
+      var path = FOAM_BOOT_PATH;
+      return function(file) {
+        importScripts(path+file+'.js');
+      }
+    }
+    
     var path = document.currentScript && document.currentScript.src;
 
     // document.currentScript isn't supported on all browsers, so the following
@@ -48,8 +56,9 @@
 
   [
     "stdlib",
+    "Context",
     "Boot",
-    "Dynamic",
+    "Slot",
     "Window",
     "JSON",
     "objects",
@@ -61,7 +70,7 @@
     "Action",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
-    "../lib/promise",
+    [ "../lib/node/json_dao", isServer ],
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).

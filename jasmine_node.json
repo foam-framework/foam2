@@ -1,8 +1,9 @@
 {
   "spec_dir": "test",
   "spec_files": [
-    "node/**/*.js",
-    "js/**/*.js"
+    "node_engine/**/*.js",
+    "js/**/*.js",
+    "node/**/*.js"
   ],
   "helpers": [
     "helpers/**/*.js"

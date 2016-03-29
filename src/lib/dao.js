@@ -157,9 +157,9 @@ foam.CLASS({
         Math.min(l, this.limit) : l;
       return o;
     },
-    function addOrderBy(o) {
+    function addOrderBy(s) {
       var o = this.cls_.create(this);
-      o.orderBy = o;
+      o.orderBy = s;
       return o;
     },
     function addWhere(p) {
@@ -288,7 +288,7 @@ foam.CLASS({
     },
 
     function eof() {
-      this.arr.sort(this.comparator);
+      this.arr.sort(this.comparator.compare || this.comparator);
       for ( var i = 0 ; i < this.arr.length ; i++ ) {
         this.delegate.put(this.arr[i]);
       }
@@ -364,7 +364,6 @@ foam.CLASS({
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.ObjectNotFoundException',
-    'foam.promise.Promise',
     'foam.dao.FlowControl',
     'foam.dao.LimitedSink',
     'foam.dao.SkipSink',
@@ -438,7 +437,7 @@ foam.CLASS({
         var fc = this.FlowControl.create();
         var sub;
 
-        fc.propertyChange.subscribe(function(s, _, p) {
+        fc.propertyChange.sub(function(s, _, p) {
           if ( p.name == "stopped") {
             if ( sub ) sub.destroy();
           } else if ( p.name === "errorEvt" ) {
@@ -448,7 +447,7 @@ foam.CLASS({
         });
 
         this.select(sink, options).then(function() {
-          this.on.subscribe(function(s, on, e, obj) {
+          this.on.sub(function(s, on, e, obj) {
             sub = s;
             switch(e) {
             case 'put':
@@ -486,7 +485,7 @@ foam.CLASS({
 
         if ( options.orderBy && ! isListener )
           sink = this.OrderedSink.create({
-            order: options.orderBy,
+            comparator: options.orderBy,
             delegate: sink
           });
 
@@ -636,7 +635,7 @@ foam.CLASS({
   methods: [
     function put(o) {
       this.a.push(o);
-    }
+    },
   ]
 });
 
@@ -662,10 +661,6 @@ foam.CLASS({
     },
 
     function put(obj, sink) {
-      sink = sink || this.Promise.create();
-      var promise = this.Promise.create();
-      promise.fulfill(sink);
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(obj.id, this.array[i].id) ) {
           this.array[i] = obj;
@@ -674,29 +669,25 @@ foam.CLASS({
       }
 
       if ( i == this.array.length ) this.array.push(obj);
-      sink.put(obj);
-      this.on.put.publish(obj);
+      sink && sink.put(obj);
+      this.on.put.pub(obj);
 
-      return promise;
+      return Promise.resolve(sink || obj);
     },
 
     function remove(obj, sink) {
-      sink = sink || this.Promise.create();
-      var promise = this.Promise.create();
-      promise.fulfill(sink);
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
-          sink.remove(o2);
-          this.on.remove.publish(o2);
-          return promise;
+          sink && sink.remove(o2);
+          this.on.remove.pub(o2);
+          return Promise.resolve(sink || o2);
         }
       }
 
       var err = this.ObjectNotFoundException.create({ id: obj.id });
-      sink.error(err);
-      return promise;
+      sink && sink.error(err);
+      return Promise.reject(err);
     },
 
     function select(sink, options) {
@@ -704,15 +695,12 @@ foam.CLASS({
 
       sink = this.decorateSink_(resultSink, options);
 
-      var promise = this.Promise.create();
-
       var fc = this.FlowControl.create();
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( fc.stopped ) break;
         if ( fc.errorEvt ) {
           sink.error(fc.errorEvt);
-          promise.reject(fc.errorEvt);
-          return promise;
+          return Promise.reject(fc.errorEvt);
         }
 
         sink.put(this.array[i], null, fc);
@@ -720,8 +708,7 @@ foam.CLASS({
 
       sink.eof();
 
-      promise.fulfill(resultSink);
-      return promise;
+      return Promise.resolve(resultSink);
     },
 
     function removeAll(sink, options) {
@@ -732,30 +719,23 @@ foam.CLASS({
           var obj = this.array.splice(i, 1)[0];
           i--;
           sink && sink.remove(obj);
-          this.on.remove.publish(obj);
+          this.on.remove.pub(obj);
         }
       }
 
-      sink && sink.eof();
+      sink.eof();
 
-      var promise = this.Promise.create();
-      promise.fulfill(sink || '');
-
-      return promise;
+      return Promise.resolve(sink || '');
     },
 
     function find(id) {
-      var promise = this.Promise.create();
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
-          promise.fulfill(this.array[i]);
-          return promise;
+          return Promise.resolve(this.array[i]);
         }
       }
 
-      promise.reject(this.ObjectNotFoundException.create({ id: id }));
-      return promise;
+      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
     }
   ]
 });
@@ -844,8 +824,8 @@ foam.CLASS({
       var objs = localStorage.getItem(this.name);
       if ( objs ) this.array = foam.json.parseArray(foam.json.parseString(objs));
 
-      this.on.put.subscribe(this.updated);
-      this.on.remove.subscribe(this.updated);
+      this.on.put.sub(this.updated);
+      this.on.remove.sub(this.updated);
 
       // TODO: base on an indexed DAO
     }

@@ -5,7 +5,8 @@
   <script>console.timeEnd('boot');</script>
   <title>FOAM By Example</title>
   <style>
-    code {color:blue; white-space: pre-wrap; }
+    body { white-space: pre-wrap; }
+    code { color:blue; }
   </style>
  </head>
 
@@ -613,95 +614,95 @@ InnerClassTest.InnerClass1.describe();
 // TODO: isn't true yet
 log(! InnerClass1);
 
-// Objects support publish() for publishing events,
-// and subscribe() for listening for published events.
+// Objects support pub() for pubing events,
+// and sub() for listening for pubed events.
 foam.CLASS({
   name: 'PubSubTest'
 });
 var o = PubSubTest.create();
 // Install a listener that listens to all events
-o.subscribe(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
-o.subscribe('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' ')); });
-o.publish('alarm', 'on');
-o.publish('lifecycle', 'loaded');
+o.sub(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
+o.sub('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' ')); });
+o.pub('alarm', 'on');
+o.pub('lifecycle', 'loaded');
 
-// A Class can declare 'Topics' that it publishes events for.
+// A Class can declare 'Topics' that it pubes events for.
 foam.CLASS({
   name: 'TopicTest',
   topics: [ 'alarm' ]
 });
 var o = TopicTest.create();
-o.subscribe('alarm', function(_, _, state) { console.log('alarm: ', state); });
+o.sub('alarm', function(_, _, state) { console.log('alarm: ', state); });
 // The next line uses the Topic and is slightly shorter than the equivalent above.
-o.alarm.subscribe(function(_, _, state) { console.log('alarm (topic): ', state); });
-o.alarm.publish('on');
-o.publish('alarm', 'off');
+o.alarm.sub(function(_, _, state) { console.log('alarm (topic): ', state); });
+o.alarm.pub('on');
+o.pub('alarm', 'off');
 
-// Objects implicitly publish events on the 'propertyChange' topic when
+// Objects implicitly pub events on the 'propertyChange' topic when
 foam.CLASS({
   name: 'PropertyChangeTest',
   properties: [ 'a', 'b' ]
 });
 o = PropertyChangeTest.create();
 // Listen for all propertyChange events:
-o.propertyChange.subscribe(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
+o.propertyChange.sub(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
 // Listen for only changes to the 'a' Property:
-o.propertyChange.subscribe('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
+o.propertyChange.sub('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
 o.a = 42;
 o.b = 'bar';
 o.a++;
 
-// There are four ways to unsubscribe a listener
-// 1. Call obj.unsubscribe();
+// There are four ways to unsub a listener
+// 1. Call obj.unsub();
 o = TopicTest.create();
 var l = function() { console.log.apply(console.log, arguments); };
-o.subscribe(l);
-o.publish('fire');
-o.unsubscribe(l);
-o.publish("fire again, but nobody's listenering");
+o.sub(l);
+o.pub('fire');
+o.unsub(l);
+o.pub("fire again, but nobody's listenering");
 
-// 2. Call .destroy() on the Destroyable that subscribe() returns
-var sub = o.subscribe(l);
-o.publish('fire');
+// 2. Call .destroy() on the Destroyable that sub() returns
+var sub = o.sub(l);
+o.pub('fire');
 sub.destroy();
-o.publish("fire again, but nobody's listenering");
+o.pub("fire again, but nobody's listenering");
 
 // 3. Destroy the subscription, which is supplied to the listener
 var l = function(sub) {
   sub.destroy();
   console.log.apply(console.log, arguments);
 };
-o.subscribe(l);
-o.publish('fire');
-o.publish("fire again, but nobody's listenering");
+o.sub(l);
+o.pub('fire');
+o.pub("fire again, but nobody's listenering");
 
 // 4. If you only want to receive the first event, decorate your
 // listener with foam.events.oneTime() and it will cancel the subscription
 // when it receives the first event.
-o.subscribe(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
-o.publish('fire');
-o.publish("fire again, but nobody's listenering");
+o.sub(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
+o.pub('fire');
+o.pub("fire again, but nobody's listenering");
 
-// DynamicValues are like Object-Oriented pointers.
-// A properties dynamic-value is accessed as 'name'$.
-// get() is used to dereference the value of a dynamic
+// Slots are like Object-Oriented pointers.
+// A property's slot is accessed as 'name'$.
+// get() is used to dereference the value of a slot
 var p = Person.create({name: 'Bob'});
 var dyn = p.name$;
 log(dyn.get());
 
-// set() is used to set a dynamic's value:
+// set() is used to set a Slot's value:
 dyn.set('John');
 log(p.name, dyn.get());
 
-// Calling obj.dynamcicProperty('name') is the same as obj.name$.
+// Calling obj.slot('name') is the same as obj.name$.
 var p = Person.create({name: 'Bob'});
-var dyn = p.dynamicProperty('name');
+var dyn = p.slot('name');
 log(dyn.get());
 dyn.set('John');
 log(dyn.get());
 
 // Two-Way Data-Binding
-// Dynamic values can be assigned, causing two values to be
+// Slots can be assigned, causing two values to be
 // bound to the same value.
 var p1 = Person.create(), p2 = Person.create();
 p1.name$ = p2.name$;
@@ -710,7 +711,7 @@ log(p1.name, p2.name);
 p2.name = 'Steve';
 log(p1.name, p2.name);
 
-// Another way to link to Dynamics is to call .link() on one of them.
+// Another way to link two Slots is to call .link() on one of them.
 var p1 = Person.create(), p2 = Person.create();
 var d = p1.name$.link(p2.name$);
 p1.name = 'John';
@@ -732,7 +733,7 @@ log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
 
-// Dynamic Values also let you check if the value is defined by calling isDefined().
+// Slots also let you check if the value is defined by calling isDefined().
 // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
 foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', defaultValue: 42 } ]});
 var o = IsDefinedTest.create();
@@ -741,31 +742,38 @@ log(dv.isDefined());
 dv.set(99);
 log(dv.isDefined());
 
-// You can reset a Dynamic Value to its default value by calling .clear().
+// You can reset a Slot to its default value by calling .clear().
 // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
 dv.clear();
 log(dv.get(), dv.isDefined());
 
-// DynamicExpression creates a Dynamic from a list of Dynamics
-// and a function which combines them into a new dynamic value.
+// ConstantSlot creates an immutable slot.
+var s = foam.core.ConstantSlot.create({value: 42});
+log(s.get());
+s.value = 66;
+s.set(66);
+log(s.get());
+
+// ExpressionSlot creates a Slot from a list of Slots
+// and a function which combines them into a new value.
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.DynamicExpression.create({
+var e = foam.core.ExpressionSlot.create({
   args: [ p.fname$, p.lname$],
   fn: function(f, l) { return f + ' ' + l; }
 });
 log(e.get());
-e.subscribe(log);
+e.sub(log);
 p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
 
-// Destroy the DynamicExpression to prevent further updates.
+// Destroy the ExpressionSlot to prevent further updates.
 e.destroy();
 p.fname = 'Steve';
 p.lname = 'Jones';
 
-// The same functionality of DynamicExpression is built into Properties
+// The same functionality of ExpressionSlot is built into Properties
 // with the 'expression' feature. Expression properties are invalidated
 // whenever of their listed source values change, but are only recalculated
 // when their value is accessed.
@@ -782,7 +790,7 @@ foam.CLASS({
 });
 var p = Person.create({fname: 'John', lname: 'Smith'});
 p.describe();
-p.subscribe(log);
+p.sub(log);
 p.fname = 'Steve';
 log(p.fname, p.lname, ' = ', p.name);
 p.lname = 'Jones';
@@ -814,7 +822,7 @@ o.destroy();
 o.destroy();
 o.destroy();
 
-// If an Object is destroyed, it will unsubscribe from any
+// If an Object is destroyed, it will unsub from any
 // subscriptions which subsequently try to deliver events.
 var source = foam.core.FObject.create();
 var sink = foam.CLASS({
@@ -825,11 +833,11 @@ var sink = foam.CLASS({
     }
   ]
 }).create();
-source.subscribe(sink.l);
-source.publish('ping');
-source.publish('ping');
+source.sub(sink.l);
+source.pub('ping');
+source.pub('ping');
 sink.destroy();
-source.publish('ping');
+source.pub('ping');
 
 // Model validation, extends and refines are mutually-exclusive
 foam.CLASS({
@@ -1021,10 +1029,10 @@ log(a.$UID, b.$UID, c.$UID);
 // foam.events.consoleLog
 foam.CLASS({name: 'ConsoleLogTest'});
 var o = ConsoleLogTest.create();
-o.subscribe(foam.events.consoleLog());
-o.publish();
-o.publish('foo');
-o.publish('foo','bar');
+o.sub(foam.events.consoleLog());
+o.pub();
+o.pub('foo');
+o.pub('foo','bar');
 
 // foam.fn.memoize1() memozies a one-argument function so that if called again
 // with the same argument, the previously generated value will be returned
@@ -1321,7 +1329,7 @@ g.step();
 foam.CLASS({
   name: 'Spin',
   extends: 'foam.graphics.CView',
-  requires: [ 'foam.graphics.Arc', 'foam.graphics.Canvas' ],
+  requires: [ 'foam.graphics.Arc' ],
   properties: [
     [ 'width',  500 ],
     [ 'height', 500 ],
@@ -1329,7 +1337,7 @@ foam.CLASS({
   ],
   methods: [
     function addArc(a, arc) {
-      this.time$.subscribe(function(_, __, ___, time$) {
+      this.time$.sub(function(_, __, ___, time$) {
         arc.start += Math.cos(time$.get() / 4000) * (a+1)/100;
         arc.end    = arc.start + Math.PI;
       });
@@ -1358,6 +1366,70 @@ foam.CLASS({
 var g = Spin.create();
 log_(g.toHTML());
 
+//:NOTEST
+// More Graphic
+foam.CLASS({
+  name: 'TudorWall',
+  extends: 'foam.graphics.Box',
+  exports:  [ 'as timer', 'cellSize', 'nx' ],
+  classes: [
+    {
+      name: 'Cell',
+      extends: 'foam.graphics.Box',
+      imports: [ 'timer', 'cellSize', 'nx' ],
+      constants: { FILL_RATIO: 0.64 },
+      properties: [
+        'row',
+        'col',
+        [ 'fill', true ],
+        [ 'shadowBlur', 5 ],
+        { name: 'lPhase', factory: function() { return Math.random() * Math.PI * 2; } }
+      ],
+      methods: [
+        function initCView() {
+          this.x = 4 + this.cellSize * this.col;
+          this.y = 4 + this.cellSize * this.row;
+          this.width = this.height = this.FILL_RATIO * this.cellSize;
+          this.timer.time$.sub(this.onTick);
+        },
+      ],
+      listeners: [
+        function onTick() {
+          var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
+          var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
+	  this.shadowColor = this.fillStyle = 'hsl(' + hue + ',100%,' + l + '%)';
+        }
+      ]
+    }
+  ],
+  properties: [
+    [ 'fill', true ],
+    [ 'width', 550 ],
+    [ 'height', 300 ],
+    [ 'nx', 25 ],
+    [ 'ny', 13 ],
+    [ 'cellSize', 20 ],
+    [ 'background', 'black' ], // TODO: Why doesn't this work?
+    { class: 'Int', name: 'time' }
+  ],
+  methods: [
+    function initCView() {
+      for ( var i = 0 ; i < this.nx ; i++ )
+	for ( var j = 0 ; j < this.ny ; j++ )
+	  this.addChildren(this.Cell.create({row: j, col: i}));
+      this.tick();
+    }
+  ],
+  listeners: [
+    {
+      name: 'tick',
+      isFramed: true,
+      code: function() { this.time+=16; this.tick(); this.invalidated.pub(); }
+    }
+  ]
+});
+var g = TudorWall.create();
+log_(g.toHTML());
 
 </script>
 
@@ -1406,7 +1478,6 @@ log_(g.toHTML());
             .replace(/"/g, '\\"');
         test_code += '  expect(log_.output).toMatchGolden({ i: ' + i_ + ', str: "' + golden + '" });\n';
       }
-
       log_('');
     }
 

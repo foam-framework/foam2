@@ -16,21 +16,26 @@
  */
 
 /**
-  Dynamic values are observable values which can change over time.
-  <ul>Types of Dynamics include:
-    <li>DynamicProperty:
-    <li>DynamicExpression:
-    <li>DynamicValue: to be implemented
+  Slots are observable values which can change over time.
+
+  Slots are simple single-value Model-View-Controller Models, but since
+  another meaning of 'Model' is already heavily used in FOAM, Slot is
+  used to avoid overloading the term.
+
+  <ul>Types of Slots include:
+    <li>PropertySlot
+    <li>ExpressionSlot
+    <li>ConstantSlot
 </ul>
 */
 foam.CLASS({
   package: 'foam.core',
-  name: 'Dynamic', // ???: Rename AbstractDynamic or make an Interface
+  name: 'Slot', // ???: Rename AbstractSlot or make an Interface
   extends: null,
 
   methods: [
     /**
-      Link two Dynamics together, setting both to other's value.
+      Link two Slots together, setting both to other's value.
       Returns a Destroyable which can be used to break the link.
     */
     function link(other) {
@@ -47,11 +52,11 @@ foam.CLASS({
     },
 
     /**
-      Have this Dynamic dynamically follow other's value.
+      Have this Slot dynamically follow other's value.
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      return other.subscribe(function() {
+      return other.sub(function() {
         this.set(other.get());
       }.bind(this));
     }
@@ -60,14 +65,14 @@ foam.CLASS({
 
 
 /**
-  DynamicProperties export object properties as Dynamic values.
-  Created with calling obj.prop$ or obj.dynamicProperty('prop').
+  PropertySlot represents object properties as Slots.
+  Created with calling obj.prop$ or obj.slot('prop').
   For internal use only.
  */
 foam.CLASS({
   package: 'foam.core.internal',
-  name: 'DynamicProperty',
-  extends: 'foam.core.Dynamic',
+  name: 'PropertySlot',
+  extends: 'foam.core.Slot',
 
   methods: [
     function initArgs() { },
@@ -88,12 +93,12 @@ foam.CLASS({
       return this.oldValue = value;
     },
 
-    function subscribe(l) {
-      return this.obj.subscribe('propertyChange', this.prop.name, l);
+    function sub(l) {
+      return this.obj.sub('propertyChange', this.prop.name, l);
     },
 
-    function unsubscribe(l) {
-      this.obj.unsubscribe('propertyChange', this.prop.name, l);
+    function unsub(l) {
+      this.obj.unsub('propertyChange', this.prop.name, l);
     },
 
     function isDefined() {
@@ -110,8 +115,8 @@ foam.CLASS({
 /** Tracks dependencies for a dynamic function and invalidates is they change. */
 foam.CLASS({
   package: 'foam.core',
-  name: 'DynamicExpression',
-  implements: [ 'foam.core.Dynamic' ],
+  name: 'ExpressionSlot',
+  implements: [ 'foam.core.Slot' ],
 
   properties: [
     'args',
@@ -129,7 +134,7 @@ foam.CLASS({
   methods: [
     function init() {
       for ( var i = 0 ; i < this.args.length ; i++ )
-        this.onDestroy(this.args[i].subscribe(this.invalidate));
+        this.onDestroy(this.args[i].sub(this.invalidate));
     },
 
     function get() {
@@ -138,16 +143,44 @@ foam.CLASS({
 
     function set() { /* nop */ },
 
-    function subscribe(l) {
+    function sub(l) {
       return this.SUPER('propertyChange', 'value', l);
     },
 
-    function unsubscribe(l) {
+    function unsub(l) {
       this.SUPER('propertyChange', 'value', l);
     }
   ],
 
   listeners: [
     function invalidate() { this.clearProperty('value'); }
+  ]
+});
+
+
+/** Tracks dependencies for a dynamic function and invalidates is they change. */
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ConstantSlot',
+  implements: [ 'foam.core.Slot' ],
+
+  properties: [
+    {
+      name: 'value',
+      getter: function() { return this.value_; },
+      setter: function() {}
+    }
+  ],
+
+  methods: [
+    function initArgs(args) { this.value_ = args && args.value; },
+
+    function get() { return this.value; },
+
+    function set() { /* nop */ },
+
+    function sub(l) { /* nop */ },
+
+    function unsub(l) { /* nop */ }
   ]
 });
