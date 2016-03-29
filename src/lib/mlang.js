@@ -488,25 +488,5 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  package: 'foam.core',
-  name: 'With',
-  methods: [
-    {
-      name: 'with',
-      code: function(f) {
-        var argNames = foam.fn.argsArray(f);
-        var args = [];
-        for ( var i = 0 ; i < argNames.length ; i++ ) {
-          var a = this[argNames[i]];
-          if ( typeof a === "function" ) a = a.bind(this);
-          args.push(a);
-        }
-        return f.apply(this, args);
-      }
-    }
-  ]
-});
-
 // TODO(braden): We removed Expr.pipe(). That may still be useful to bring back,
 // probably with a different name. It doesn't mean the same as DAO.pipe().
