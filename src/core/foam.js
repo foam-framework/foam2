@@ -56,6 +56,11 @@
 
   [
     "stdlib",
+    "array",
+    "events",
+    "fn",
+    "string",
+    "compare",
     "Context",
     "Boot",
     "Slot",
