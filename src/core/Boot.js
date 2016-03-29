@@ -1360,7 +1360,7 @@ foam.CLASS({
                 m[b[1]] = this;
               }
             }
-            this.setPrivate_('Y', X.sub(m));
+            this.setPrivate_('Y', X.subContext(m));
           }
 
           return this.getPrivate_('Y');

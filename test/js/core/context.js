@@ -6,7 +6,7 @@ describe('ConteXt object', function() {
   });
 
   it('subcontexts', function() {
-    var sub = foam.sub({ hello: 4 }, 'namey');
+    var sub = foam.subContext({ hello: 4 }, 'namey');
     expect(sub.hello).toEqual(4);
   });
 
@@ -17,7 +17,7 @@ describe('ConteXt object', function() {
       properties: [ 'a' ]
     });
     var testa = test.Tester.create({ a: 3 });
-    var sub = foam.sub({ hello: testa.a$ });
+    var sub = foam.subContext({ hello: testa.a$ });
 
     expect(sub.hello).toEqual(3);
     testa.a = 99;
@@ -26,9 +26,9 @@ describe('ConteXt object', function() {
   });
 
   it('describes', function() {
-    foam.sub().describe();
+    foam.subContext().describe();
 
-    foam.sub({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
+    foam.subContext({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
   });
 
 });
