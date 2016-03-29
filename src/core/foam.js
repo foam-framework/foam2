@@ -61,6 +61,7 @@
     "fn",
     "string",
     "compare",
+    "date",
     "Context",
     "Boot",
     "Slot",
