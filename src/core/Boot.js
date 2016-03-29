@@ -1916,7 +1916,6 @@ foam.boot.end();
   - more docs
   - Axiom ordering/priority
   - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
-  - adaptArrayElement not setting context
 
  ???:
   - ? proxy label, plural from Class to Model
