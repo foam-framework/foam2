@@ -1381,7 +1381,6 @@ foam.CLASS({
       properties: [
         'row',
         'col',
-        [ 'fill', true ],
         [ 'shadowBlur', 5 ],
         { name: 'lPhase', factory: function() { return Math.random() * Math.PI * 2; } }
       ],
@@ -1397,19 +1396,18 @@ foam.CLASS({
         function onTick() {
           var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
-	  this.shadowColor = this.fillStyle = 'hsl(' + hue + ',100%,' + l + '%)';
+	  this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
         }
       ]
     }
   ],
   properties: [
-    [ 'fill', true ],
     [ 'width', 550 ],
     [ 'height', 300 ],
     [ 'nx', 25 ],
     [ 'ny', 13 ],
     [ 'cellSize', 20 ],
-    [ 'background', 'black' ], // TODO: Why doesn't this work?
+    [ 'color', 'black' ],
     { class: 'Int', name: 'time' }
   ],
   methods: [
