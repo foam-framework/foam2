@@ -24,13 +24,29 @@ foam = {
   Array:    Array.prototype,
   Function: Function.prototype,
   Number:   Number.prototype,
-  Object:   Object.prototype,
   String:   String.prototype,
   Date:     Date.prototype
 };
 
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = this;
+
+Object.defineProperty(
+  Object.prototype,
+  '$UID',
+  {
+    get: (function() {
+      var id = 1;
+      return function() {
+        if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
+        Object.defineProperty(this, '$UID__', {value: id, enumerable: false});
+        id++;
+        return this.$UID__;
+      };
+    })(),
+    enumerable: false
+  }
+);
 
 
 /**
@@ -71,17 +87,6 @@ foam.LIB = function LIB(model) {
 
   var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
 
-  if ( model.properties ) {
-    console.assert(Array.isArray(model.properties), 'Properties must be an array.');
-    for ( var i = 0 ; i < model.properties.length ; i++ ) {
-      var p = model.properties[i];
-      defineProperty(
-        proto,
-        p.name,
-        { get: p.getter, enumerable: false });
-    }
-  }
-
   if ( model.constants ) {
     console.assert(
       typeof model.constants === 'object' && ! Array.isArray(model.properties),
@@ -106,31 +111,6 @@ foam.LIB = function LIB(model) {
     }
   }
 };
-
-
-/** Object prototype additions. */
-foam.LIB({
-  name: 'Object',
-
-  properties: [
-    {
-      /**
-       * Add Unique Identifiers (UIDs) to all Objects.
-       * UID's are created when first accessed.
-       */
-      name: '$UID',
-      getter: (function() {
-        var id = 1;
-        return function() {
-          if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
-          Object.defineProperty(this, '$UID__', {value: id, enumerable: false});
-          id++;
-          return this.$UID__;
-        };
-      })()
-    }
-  ]
-});
 
 
 /** Number prototype additions. */
