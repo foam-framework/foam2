@@ -304,7 +304,7 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'util',
+  name: 'compare',
   methods: [
     function equals(a, b) {
       if ( a === b ) return true;
@@ -319,7 +319,7 @@ foam.LIB({
         return a < b ? -1 : a > b ? 1 : 0;
       if ( a.compareTo ) return a.compareTo(b);
       if ( b.compareTo ) return - b.compareTo(a);
-      if ( foam.util.equals(a, b) ) return 0;
+      if ( foam.compare.equals(a, b) ) return 0;
       return a.$UID.compareTo(b.$UID);
     }
   ]

@@ -346,7 +346,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+      return foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
@@ -358,7 +358,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+      return ! foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
@@ -370,7 +370,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
     }
   ]
 });
@@ -382,7 +382,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
     }
   ]
 });
@@ -394,7 +394,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
     }
   ]
 });
@@ -406,7 +406,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
     }
   ]
 });
