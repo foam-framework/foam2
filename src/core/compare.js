@@ -30,14 +30,6 @@ foam.LIB({
       return a == b;
     },
 
-    function compareDates(d1, d2) {
-      if ( d1 === d2 ) return 0;
-      if ( ! d1 ) return -1;
-      if ( ! d2 ) return 1;
-      var d = d1.getTime() - d2.getTime();
-      return d == 0 ? 0 : d > 0 ? 1 : -1;
-    },
-
     function compare(a, b) {
       if ( a === b ) return 0;
 
@@ -51,8 +43,10 @@ foam.LIB({
       if ( typeof a === 'string' && typeof b === 'string' )
         return a < b ? -1 : a > b ? 1 : 0;
 
-      if ( a instanceof Date && b instanceof Date )
-        return this.compareDates(a, b);
+      if ( a instanceof Date && b instanceof Date ) {
+        var d = a.getTime() - b.getTime();
+        return d == 0 ? 0 : d > 0 ? 1 : -1;
+      }
 
       if ( a.compareTo ) return a.compareTo(b);
 
