@@ -534,8 +534,8 @@ foam.CLASS({
     function shortForm() { log('short action'); },
     {
       name: 'longForm',
-      isAvailable: function() { return this.available; }, 
-      isEnabled: function() { return this.enabled; }, 
+      isAvailable: function() { return this.available; },
+      isEnabled: function() { return this.enabled; },
       code: function() { log('long action'); }
     }
   ]
@@ -900,13 +900,13 @@ foam.CLASS({
   ]
 });
 
-// Contexts can be explicitly created with foam.sub()
-// The second argument of sub() is an optional name for the Context
-var Y1 = foam.sub({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
+// Contexts can be explicitly created with foam.subContext()
+// The second argument of subContext() is an optional name for the Context
+var Y1 = foam.subContext({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
 console.log(Y1.key, Y1.fn());
 
 // Sub-Contexts can be created from other Contexts.
-var Y2 = Y1.sub({key: 'value2'});
+var Y2 = Y1.subContext({key: 'value2'});
 console.log(Y2.key, Y2.fn());
 
 //:NOTEST
@@ -915,7 +915,7 @@ Y1.describe();
 Y2.describe();
 
 // Classes can import values from the Context so that they can be accessed from 'this'.
-var Y = foam.sub({log: function(msg) { console.log('log:', msg); }});
+var Y = foam.subContext({log: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
   imports: [ 'log' ],
@@ -1228,7 +1228,7 @@ foam.CLASS({
             radius: 40
           }),
           this.Circle.create({
-            fillStyle: this.Gradient.create({
+            color: this.Gradient.create({
               radial: true,
               x0: 0, y0: 0, r0: 10,
               x1: 0, y1: 0, r1: 100,
@@ -1239,14 +1239,13 @@ foam.CLASS({
                 [1, 'white']
               ]
             }),
+            border: '',
             radius: 100,
             x: 300,
-            y: 300,
-            fill: true,
-            stroke: false
+            y: 300
           }),
           this.Box.create({
-            fillStyle: this.Gradient.create({
+            color: this.Gradient.create({
               radial: false,
               x0: 0, y0: 0,
               x1: 100, y1: 100,
@@ -1255,9 +1254,6 @@ foam.CLASS({
                 [1, 'white']
               ]
             }),
-            fill: true,
-            stroke: true,
-            strokeStyle: 'blue',
             width: 100,
             height: 100,
             originX: 50,
@@ -1266,44 +1262,34 @@ foam.CLASS({
             y: 400,
             children: [
               this.Circle.create({
-                fillStyle: 'red',
+                color: 'red',
                 x: 30,
                 y: 30,
-                radius: 10,
-                stroke: false,
-                fill: true
+                radius: 10
               }),
               this.Circle.create({
-                fillStyle: 'red',
+                color: 'red',
                 x: 70,
                 y: 30,
-                radius: 10,
-                stroke: false,
-                fill: true
+                radius: 10
               }),
               this.Circle.create({
-                fillStyle: 'red',
+                color: 'red',
                 x: 30,
                 y: 70,
-                radius: 10,
-                stroke: false,
-                fill: true
+                radius: 10
               }),
               this.Circle.create({
-                fillStyle: 'red',
+                color: 'red',
                 x: 70,
                 y: 70,
-                radius: 10,
-                stroke: false,
-                fill: true
+                radius: 10
               }),
               this.Circle.create({
-                fillStyle: 'red',
+                color: 'red',
                 x: 50,
                 y: 50,
-                radius: 10,
-                stroke: false,
-                fill: true
+                radius: 10
               })
             ]
           })
@@ -1364,8 +1350,7 @@ foam.CLASS({
         y: this.height / 2,
         radius: 5+a * 12 * this.width / 500,
         arcWidth: 10 * this.width / 500,
-        stroke: true,
-        strokeStyle: 'hsl(' + 18*a + ', 90%, 60%)'
+        border: 'hsl(' + 18*a + ', 90%, 60%)'
       }));
       this.tick();
     }
@@ -1396,7 +1381,6 @@ foam.CLASS({
       properties: [
         'row',
         'col',
-        [ 'fill', true ],
         [ 'shadowBlur', 5 ],
         { name: 'lPhase', factory: function() { return Math.random() * Math.PI * 2; } }
       ],
@@ -1412,19 +1396,19 @@ foam.CLASS({
         function onTick() {
           var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
-	  this.shadowColor = this.fillStyle = 'hsl(' + hue + ',100%,' + l + '%)';
+	  this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
         }
       ]
     }
   ],
   properties: [
-    [ 'fill', true ],
     [ 'width', 550 ],
     [ 'height', 300 ],
     [ 'nx', 25 ],
     [ 'ny', 13 ],
     [ 'cellSize', 20 ],
     [ 'fillStyle', 'black' ],
+    [ 'color', 'black' ],
     { class: 'Int', name: 'time' }
   ],
   methods: [

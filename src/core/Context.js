@@ -69,7 +69,7 @@
       root[path[path.length-1]] = cls;
     },
 
-    sub: function sub(opt_args, opt_name) {
+    subContext: function subContext(opt_args, opt_name) {
       var sub = Object.create(this);
 
       for ( var key in opt_args ) {

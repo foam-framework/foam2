@@ -121,7 +121,7 @@ foam.CLASS({
 
 
 /* Add describe support to contexts. */
-foam.sub().__proto__.describe = function() {
+foam.subContext().__proto__.describe = function() {
   console.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
   console.log('KEY                  Type           Value');
   console.log('----------------------------------------------------');

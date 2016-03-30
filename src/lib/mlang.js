@@ -346,7 +346,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+      return foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
@@ -358,7 +358,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+      return ! foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
@@ -370,7 +370,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
     }
   ]
 });
@@ -382,7 +382,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
     }
   ]
 });
@@ -394,7 +394,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
     }
   ]
 });
@@ -406,7 +406,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
+      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
     }
   ]
 });
@@ -485,26 +485,6 @@ foam.CLASS({
     function GTE(a, b) { return this._binary_("Gte", a, b); },
     function HAS(a) { return this._unary_("Has", a); },
     function NOT(a) { return this._unary_("Not", a); },
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'With',
-  methods: [
-    {
-      name: 'with',
-      code: function(f) {
-        var argNames = foam.fn.argsArray(f);
-        var args = [];
-        for ( var i = 0 ; i < argNames.length ; i++ ) {
-          var a = this[argNames[i]];
-          if ( typeof a === "function" ) a = a.bind(this);
-          args.push(a);
-        }
-        return f.apply(this, args);
-      }
-    }
   ]
 });
 

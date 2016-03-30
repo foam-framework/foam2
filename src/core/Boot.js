@@ -778,7 +778,7 @@ foam.CLASS({
   name: 'Method',
   extends: 'FObject',
 
-  properties: [ 'name', 'code' ],
+  properties: [ 'name', 'code', 'returns' ],
 
   methods: [
     /**
@@ -1360,7 +1360,7 @@ foam.CLASS({
                 m[b[1]] = this;
               }
             }
-            this.setPrivate_('Y', X.sub(m));
+            this.setPrivate_('Y', X.subContext(m));
           }
 
           return this.getPrivate_('Y');
@@ -1916,7 +1916,6 @@ foam.boot.end();
   - more docs
   - Axiom ordering/priority
   - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
-  - adaptArrayElement not setting context
 
  ???:
   - ? proxy label, plural from Class to Model

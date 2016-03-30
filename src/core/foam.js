@@ -18,16 +18,9 @@
 (function() {
 
   var isServer = typeof process === 'object';
+  var isWorker = typeof importScripts !== 'undefined';
 
   function createLoadBrowser() {
-    // Web Worker case // TODO: auto-determine path to core
-    if ( typeof document == 'undefined' && typeof importScripts !== 'undefined' ) {
-      var path = FOAM_BOOT_PATH;
-      return function(file) {
-        importScripts(path+file+'.js');
-      }
-    }
-    
     var path = document.currentScript && document.currentScript.src;
 
     // document.currentScript isn't supported on all browsers, so the following
@@ -35,7 +28,7 @@
     if ( ! path ) {
       var scripts = document.getElementsByTagName('script');
       for ( var i = 0 ; i < scripts.length ; i++ ) {
-        if ( scripts[i].src.match(/\/bootFOAM.js$/) ) {
+        if ( scripts[i].src.match(/\/foam.js$/) ) {
           path = scripts[i].src;
           break;
         }
@@ -54,8 +47,21 @@
     require('./' + filename + '.js');
   }
 
+  function createLoadWorker(filename) {
+    var path = FOAM_BOOT_PATH;
+    return function(filename) {
+      importScripts(path + filename + '.js');
+    };
+  }
+
   [
     "stdlib",
+    "array",
+    "events",
+    "fn",
+    "string",
+    "compare",
+    "date",
     "Context",
     "Boot",
     "Slot",
@@ -70,9 +76,13 @@
     "Action",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
+    "../lib/mlang",
     [ "../lib/node/json_dao", isServer ],
+    "../lib/box",
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
-      forEach(isServer ? loadServer : createLoadBrowser());
+      forEach(isServer ? loadServer :
+              isWorker ? createLoadWorker() :
+              createLoadBrowser());
 })();

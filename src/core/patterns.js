@@ -37,3 +37,25 @@ foam.CLASS({
   refines: 'foam.pattern.Singleton',
   axioms: [ foam.pattern.Singleton.create() ]
 });
+
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'With',
+  axioms: [ foam.pattern.Singleton.create() ],
+  methods: [
+    {
+      name: 'with',
+      code: function(f, opt_source) {
+        opt_source = opt_source || this;
+        var argNames = foam.fn.argsArray(f);
+        var args = [];
+        for ( var i = 0 ; i < argNames.length ; i++ ) {
+          var a = opt_source[argNames[i]];
+          if ( typeof a === "function" ) a = a.bind(opt_source);
+          args.push(a);
+        }
+        return f.apply(this, args);
+      }
+    }
+  ]
+});

@@ -24,13 +24,29 @@ foam = {
   Array:    Array.prototype,
   Function: Function.prototype,
   Number:   Number.prototype,
-  Object:   Object.prototype,
   String:   String.prototype,
   Date:     Date.prototype
 };
 
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = this;
+
+Object.defineProperty(
+  Object.prototype,
+  '$UID',
+  {
+    get: (function() {
+      var id = 1;
+      return function() {
+        if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
+        Object.defineProperty(this, '$UID__', {value: id, enumerable: false});
+        id++;
+        return this.$UID__;
+      };
+    })(),
+    enumerable: false
+  }
+);
 
 
 /**
@@ -71,17 +87,6 @@ foam.LIB = function LIB(model) {
 
   var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
 
-  if ( model.properties ) {
-    console.assert(Array.isArray(model.properties), 'Properties must be an array.');
-    for ( var i = 0 ; i < model.properties.length ; i++ ) {
-      var p = model.properties[i];
-      defineProperty(
-        proto,
-        p.name,
-        { get: p.getter, enumerable: false });
-    }
-  }
-
   if ( model.constants ) {
     console.assert(
       typeof model.constants === 'object' && ! Array.isArray(model.properties),
@@ -106,31 +111,6 @@ foam.LIB = function LIB(model) {
     }
   }
 };
-
-
-/** Object prototype additions. */
-foam.LIB({
-  name: 'Object',
-
-  properties: [
-    {
-      /**
-       * Add Unique Identifiers (UIDs) to all Objects.
-       * UID's are created when first accessed.
-       */
-      name: '$UID',
-      getter: (function() {
-        var id = 1;
-        return function() {
-          if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
-          Object.defineProperty(this, '$UID__', {value: id, enumerable: false});
-          id++;
-          return this.$UID__;
-        };
-      })()
-    }
-  ]
-});
 
 
 /** Number prototype additions. */
@@ -169,6 +149,7 @@ foam.LIB({
 /** Array prototype additions. */
 foam.LIB({
   name: 'Array',
+
   methods: [
     function diff(other) {
       /** Finds elements added (found in other, not in this) and removed
@@ -200,45 +181,6 @@ foam.LIB({
 });
 
 
-foam.LIB({
-  name: 'date',
-
-  methods: [
-    function relativeDateString(date) {
-      // TODO i18n: make this translatable
-      var seconds = Math.floor((Date.now() - date.getTime())/1000);
-
-      // TODO: handle future times
-      if ( seconds < 60 ) return 'moments ago';
-
-      var minutes = Math.floor((seconds)/60);
-
-      if ( minutes == 1 ) return '1 minute ago';
-
-      if ( minutes < 60 ) return minutes + ' minutes ago';
-
-      var hours = Math.floor(minutes/60);
-      if ( hours == 1 ) return '1 hour ago';
-
-      if ( hours < 24 ) return hours + ' hours ago';
-
-      var days = Math.floor(hours / 24);
-      if ( days == 1 ) return '1 day ago';
-
-      if ( days < 7 ) return days + ' days ago';
-
-      if ( days < 365 ) {
-        var year = 1900+date.getYear();
-        var noyear = date.toDateString().replace(' ' + year, '');
-        return noyear.substring(4);
-      }
-
-      return date.toDateString().substring(4);
-    }
-  ]
-});
-
-
 /** Date prototype additions. */
 foam.LIB({
   name: 'Date',
@@ -255,187 +197,6 @@ foam.LIB({
       if ( ! o ) return 1;
       var d = this.getTime() - o.getTime();
       return d == 0 ? 0 : d > 0 ? 1 : -1;
-    }
-  ]
-});
-
-
-foam.LIB({
-  name: 'array',
-
-  methods: [
-    function argsToArray(args) {
-      /** convenience method to turn 'arguments' into a real array */
-      return foam.fn.appendArguments([], args, 0);
-    }
-  ]
-});
-
-
-foam.LIB({
-  name: 'events',
-
-  methods: [
-    function oneTime(listener) {
-      /** Create a "one-time" listener which unsubs itself when called. **/
-      return function(subscription) {
-        subscription.destroy();
-        listener.apply(this, foam.array.argsToArray(arguments));
-      };
-    },
-
-    function consoleLog(listener) {
-      /** Log all listener invocations to console. **/
-      return function() {
-        var args = foam.array.argsToArray(arguments);
-        console.log(args);
-        listener && listener.apply(this, args);
-      };
-    }
-  ]
-});
-
-
-foam.LIB({
-  name: 'util',
-  methods: [
-    function equals(a, b) {
-      if ( a === b ) return true;
-      if ( ! a || ! b ) return false;
-      if ( a.equals ) return a.equals(b);
-      return a == b;
-    },
-    function compare(a, b) {
-      if ( typeof a === 'number' && typeof b === 'number' )
-        return a < b ? -1 : a > b ? 1 : 0;
-      if ( typeof a === 'string' && typeof b === 'string' )
-        return a < b ? -1 : a > b ? 1 : 0;
-      if ( a.compareTo ) return a.compareTo(b);
-      if ( b.compareTo ) return - b.compareTo(a);
-      if ( foam.util.equals(a, b) ) return 0;
-      return a.$UID.compareTo(b.$UID);
-    }
-  ]
-});
-
-
-foam.LIB({
-  name: 'fn',
-
-  methods: [
-    /** Faster version of memoize() when only dealing with one argument. */
-    function memoize1(f) {
-      var cache = {};
-      var g = function(arg) {
-        console.assert(arguments.length == 1, "Memoize1'ed functions must take exactly one argument.");
-        var key = arg ? arg.toString() : '';
-        if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
-        return cache[key];
-      };
-      foam.fn.setName(g, 'memoize1(' + f.name + ')');
-      return g;
-    },
-
-    function setName(f, name) {
-      /** Set a function's name for improved debugging and profiling **/
-      Object.defineProperty(f, 'name', {value: name, configurable: true});
-    },
-
-    function appendArguments(a, args, start) {
-      /** Convenience method to append 'arguments' onto a real array **/
-      for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
-      return a;
-    },
-
-    function argsStr(f) {
-      /** Finds the function(...) declaration arguments part. Strips newlines. */
-      return f.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
-    },
-
-    function argsArray(f) {
-      /**
-       * Return a function's arguments as an array.
-       * Ex. args(function(a,b) {...}) == ['a', 'b']
-       **/
-      var args = foam.fn.argsStr(f);
-      if ( ! args ) return [];
-      args += ',';
-
-      var ret = [];
-      // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
-      var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
-      var typeMatch;
-      while ((typeMatch = argMatcher.exec(args)) !== null) {
-        ret.push(typeMatch[2]);
-      }
-      return ret;
-    }
-  ]
-});
-
-(function() {
-  // Disable setName if not supported on this platform.
-  try {
-    foam.fn.setName(function() {}, '');
-  } catch (x) {
-    /**
-      @class fn
-      @ignore */
-    foam.LIB({
-      name: 'fn',
-      methods: [ function setName() { /* NOP */ } ]
-    });
-  }
-})();
-
-
-foam.LIB({
-  name: 'string',
-
-  methods: [
-    {
-      name: 'constantize',
-      code: foam.fn.memoize1(function(str) {
-        // switchFromCamelCaseToConstantFormat to SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
-        return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
-          return a.substring(0,1) + '_' + a.substring(1,2);
-        }).toUpperCase();
-      })
-    },
-
-    {
-      name: 'labelize',
-      code: foam.fn.memoize1(function(str) {
-        if ( ! str || str === '' ) return str;
-        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) {
-          return a.charAt(0) + ' ' + a.charAt(1);
-        }));
-      })
-    },
-
-    {
-      name: 'capitalize',
-      code: foam.fn.memoize1(function(str) {
-        // switchFromProperyName to //SwitchFromPropertyName
-        return str[0].toUpperCase() + str.substring(1);
-      })
-    },
-
-    function pad(str, size) {
-      // Right pads to size if size > 0, Left pads to -size if size < 0
-      return size < 0 ?
-        (new Array(-size).join(' ') + str).slice(size)       :
-        (str + new Array(size).join(' ')).substring(0, size) ;
-    },
-
-    function multiline(f) {
-      // Function for returning multi-line strings from commented functions.
-      // Ex. var str = multiline(function() { /* multi-line string here */ });
-      if ( typeof f === 'string' ) return f;
-      var s = f.toString();
-      var start = s.indexOf('/*');
-      var end   = s.lastIndexOf('*/');
-      return s.substring(start+2, end);
     }
   ]
 });
