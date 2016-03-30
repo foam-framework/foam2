@@ -67,7 +67,7 @@ foam.CLASS({
   implements: [
     'foam.dao.Sink',
     'foam.mlang.Expressions',
-    'With'
+    'foam.pattern.With'
   ],
   imports: ['log'],
   methods: [
@@ -107,7 +107,7 @@ dao.select({
 foam.CLASS({
   name: 'DaoTest',
   implements: [
-    'With',
+    'foam.pattern.With',
     'foam.mlang.Expressions'
   ],
   properties: [
