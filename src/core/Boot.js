@@ -778,7 +778,7 @@ foam.CLASS({
   name: 'Method',
   extends: 'FObject',
 
-  properties: [ 'name', 'code' ],
+  properties: [ 'name', 'code', 'returns' ],
 
   methods: [
     /**

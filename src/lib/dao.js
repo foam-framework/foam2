@@ -91,19 +91,24 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put'
+      name: 'put',
+      returns: 'Promise'
     },
     {
-      name: 'remove'
+      name: 'remove',
+      returns: 'Promise'
     },
     {
-      name: 'find'
+      name: 'find',
+      returns: 'Promise'
     },
     {
-      name: 'select'
+      name: 'select',
+      returns: 'Promise'
     },
     {
-      name: 'removeAll'
+      name: 'removeAll',
+      returns: 'Promise'
     },
     {
       name: 'pipe'
@@ -122,7 +127,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.dao',
