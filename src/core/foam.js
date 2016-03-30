@@ -76,6 +76,7 @@
     "Action",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
+    "../lib/mlang",
     [ "../lib/node/json_dao", isServer ],
     "../lib/box",
   ].
