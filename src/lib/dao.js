@@ -723,7 +723,7 @@ foam.CLASS({
         }
       }
 
-      sink.eof();
+      sink && sink.eof();
 
       return Promise.resolve(sink || '');
     },
