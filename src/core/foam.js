@@ -78,7 +78,6 @@
     "../lib/dao",
     "../lib/mlang",
     [ "../lib/node/json_dao", isServer ],
-    "../lib/box",
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
