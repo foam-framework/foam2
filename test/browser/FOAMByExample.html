@@ -1382,7 +1382,7 @@ var g = Spin.create();
 log_(g.toHTML());
 
 //:NOTEST
-// More Graphic
+// More Graphics
 foam.CLASS({
   name: 'TudorWall',
   extends: 'foam.graphics.Box',
@@ -1424,7 +1424,7 @@ foam.CLASS({
     [ 'nx', 25 ],
     [ 'ny', 13 ],
     [ 'cellSize', 20 ],
-    [ 'background', 'black' ], // TODO: Why doesn't this work?
+    [ 'fillStyle', 'black' ],
     { class: 'Int', name: 'time' }
   ],
   methods: [

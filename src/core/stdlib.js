@@ -153,7 +153,6 @@ foam.LIB({
     /** Adds hashCode functionality to all strings. */
     function hashCode() {
       var hash = 0;
-      if ( this.length == 0 ) return hash;
 
       for ( i = 0 ; i < this.length ; i++ ) {
         var code = this.charCodeAt(i);
