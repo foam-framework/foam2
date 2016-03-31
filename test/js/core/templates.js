@@ -140,4 +140,11 @@ describe('Template benchmark', function() {
   it('runs succesfully', function() {
     a.benchmark(1);
   });
+
+  it('simple template', function() {
+    var f = foam.templates.TemplateUtil.create().compile(
+      'hello world', 'simple', []);
+    expect(f).toBeDefined();
+    expect(f()).toEqual('hello world');
+  });
 });

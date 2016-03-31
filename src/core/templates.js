@@ -135,7 +135,9 @@ foam.CLASS({
       }
       result = result.value;
 
-      var code = this.HEADER + result[1] + this.FOOTER;
+      var code = this.HEADER +
+          ( result[0] ? t : result[1] )
+          + this.FOOTER;
 
       var args = ['opt_outputter'].concat(args);
       var f = eval(
