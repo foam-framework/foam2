@@ -119,7 +119,7 @@ describe('Template benchmark', function() {
         function benchmark(iterations) {
           var iters = iterations || 500;
 
-          var ps = foam.parsers.StringPS.create();
+          var ps = foam.parse.StringPS.create();
           var util = foam.templates.TemplateUtil.create();
 
           console.time('template-util');

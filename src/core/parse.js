@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'StringPS',
 
   properties: [
@@ -84,18 +84,18 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParserArray',
   extends: 'Array',
 
   properties: [
-    [ 'of', 'foam.parsers.Parser' ],
+    [ 'of', 'foam.parse.Parser' ],
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ )
           b[i] = typeof a[i] === 'string' ?
-              foam.parsers.Literal.create({s: a[i]}) :
+              foam.parse.Literal.create({s: a[i]}) :
               a[i];
         return b;
       }
@@ -105,27 +105,27 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParserProperty',
   extends: 'Property',
 
   properties: [
     {
       name: 'adapt',
-      defaultValue: function(_, v) { return typeof v == 'string' ? foam.parsers.Literal.create({ s: v }) : v }
+      defaultValue: function(_, v) { return typeof v == 'string' ? foam.parse.Literal.create({ s: v }) : v }
     }
   ]
 });
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParserDecorator',
 
   properties: [
     {
       name: 'p',
-      class: 'foam.parsers.ParserProperty',
+      class: 'foam.parse.ParserProperty',
       final: true
     }
   ]
@@ -133,7 +133,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Literal',
 
   properties: [
@@ -160,14 +160,14 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Alternate',
 
   properties: [
     {
       name: 'args',
       final: true,
-      class: 'foam.parsers.ParserArray'
+      class: 'foam.parse.ParserArray'
     }
   ],
 
@@ -187,14 +187,14 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Sequence',
 
   properties: [
     {
       name: 'args',
       final: true,
-      class: 'foam.parsers.ParserArray'
+      class: 'foam.parse.ParserArray'
     }
   ],
 
@@ -213,14 +213,14 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Sequence1',
 
   properties: [
     {
       name: 'args',
       final: true,
-      class: 'foam.parsers.ParserArray'
+      class: 'foam.parse.ParserArray'
     },
     {
       name: 'n',
@@ -244,9 +244,9 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Optional',
-  extends: 'foam.parsers.ParserDecorator',
+  extends: 'foam.parse.ParserDecorator',
 
   methods: [
     function parse(ps, obj) {
@@ -257,7 +257,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'AnyChar',
 
   axioms: [ foam.pattern.Singleton.create() ],
@@ -271,7 +271,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'NotChars',
 
   properties: [
@@ -291,9 +291,9 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Repeat',
-  extends: 'foam.parsers.ParserDecorator',
+  extends: 'foam.parse.ParserDecorator',
 
   methods: [
     function parse(ps, obj) {
@@ -311,9 +311,9 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Repeat0',
-  extends: 'foam.parsers.ParserDecorator',
+  extends: 'foam.parse.ParserDecorator',
 
   methods: [
     function parse(ps, obj) {
@@ -327,15 +327,15 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Not',
-  extends: 'foam.parsers.ParserDecorator',
+  extends: 'foam.parse.ParserDecorator',
 
   properties: [
     {
       name: 'else',
       final: true,
-      class: 'foam.parsers.ParserProperty'
+      class: 'foam.parse.ParserProperty'
     }
   ],
 
@@ -350,7 +350,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParserAxiom',
   extends: 'Method',
 
@@ -370,7 +370,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'Symbol',
 
   properties: [
@@ -394,15 +394,15 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParsersAxiom',
   extends: 'AxiomArray',
 
   properties: [
-    [ 'of', 'foam.parsers.ParserAxiom' ],
+    [ 'of', 'foam.parse.ParserAxiom' ],
     {
       name: "anyChar",
-      getter: function() { return foam.parsers.AnyChar.create(); }
+      getter: function() { return foam.parse.AnyChar.create(); }
     },
     {
       name: 'adapt',
@@ -419,7 +419,7 @@ foam.CLASS({
           for ( var i = 0 ; i < args.length; i++ ) {
             if ( prop[args[i]] ) args[i] = prop[args[i]];
             else {
-              var cls = foam.lookup(args[i]) || foam.lookup('foam.parsers.' + args[i]);
+              var cls = foam.lookup(args[i]) || foam.lookup('foam.parse.' + args[i]);
               if ( ! cls ) {
                 throw "Could not find class for " + args[i];
               }
@@ -437,7 +437,7 @@ foam.CLASS({
 
         var a = [];
         for ( var key in o ) {
-          a.push(foam.lookup('foam.parsers.ParserAxiom').create({
+          a.push(foam.lookup('foam.parse.ParserAxiom').create({
             name: key,
             parser: o[key]
           }));
@@ -449,69 +449,69 @@ foam.CLASS({
 
   methods: [
     function seq() {
-      return foam.lookup('foam.parsers.Sequence').create({
+      return foam.lookup('foam.parse.Sequence').create({
         args: foam.array.argsToArray(arguments)
       });
     },
 
     function repeat0(p) {
-      return foam.lookup('foam.parsers.Repeat0').create({
+      return foam.lookup('foam.parse.Repeat0').create({
         p: p
       });
     },
 
     function simpleAlt() {
-      return foam.lookup('foam.parsers.Alternate').create({
+      return foam.lookup('foam.parse.Alternate').create({
         args: foam.array.argsToArray(arguments)
       });
     },
 
     function alt() {
-      return foam.lookup('foam.parsers.Alternate').create({
+      return foam.lookup('foam.parse.Alternate').create({
         args: foam.array.argsToArray(arguments)
       });
     },
 
     function sym(name) {
-      return foam.lookup('foam.parsers.Symbol').create({
+      return foam.lookup('foam.parse.Symbol').create({
         name: name
       });
     },
 
     function seq1(n) {
-      return foam.lookup('foam.parsers.Sequence1').create({
+      return foam.lookup('foam.parse.Sequence1').create({
         n: n,
         args: foam.array.argsToArray(arguments).slice(1)
       });
     },
 
     function repeat(p) {
-      return foam.lookup('foam.parsers.Repeat').create({
+      return foam.lookup('foam.parse.Repeat').create({
         p: p
       });
     },
 
     function notChars(s) {
-      return foam.lookup('foam.parsers.NotChars').create({
+      return foam.lookup('foam.parse.NotChars').create({
         string: s
       });
     },
 
     function not(p, opt_else) {
-      return foam.lookup('foam.parsers.Not').create({
+      return foam.lookup('foam.parse.Not').create({
         p: p,
         else: opt_else
       });
     },
 
     function optional(p) {
-      return foam.lookup('foam.parsers.Optional').create({
+      return foam.lookup('foam.parse.Optional').create({
         p: p,
       });
     },
 
     function literal(s, value) {
-      return foam.lookup('foam.parsers.Literal').create({
+      return foam.lookup('foam.parse.Literal').create({
         s: s,
         value: value
       });
@@ -521,21 +521,21 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParserAxioms',
   refines: 'foam.core.Model',
 
   properties: [
     {
       name: 'grammar',
-      class: 'foam.parsers.ParsersAxiom'
+      class: 'foam.parse.ParsersAxiom'
     }
   ]
 });
 
 
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParserAction',
   extends: 'foam.core.Method',
 
@@ -559,14 +559,14 @@ foam.CLASS({
 
 /** Supports parser ParserActions */
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parse',
   name: 'ParseAction',
   refines: 'foam.core.Model',
 
   properties: [
     {
       class: 'AxiomArray',
-      of: 'foam.parsers.ParserAction',
+      of: 'foam.parse.ParserAction',
       name: 'grammarActions',
       adaptArrayElement: function(o) {
         if ( foam.lookup(this.of).isInstance(o) ) return o;

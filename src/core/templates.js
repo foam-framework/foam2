@@ -52,6 +52,9 @@ foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
   axioms: [foam.pattern.Singleton.create()],
+  requires: [
+    'foam.parse.StringPS'
+  ],
 
   constants: {
     HEADER: 'var self = this, X = this.X, Y = this.Y;\n' +
@@ -109,7 +112,7 @@ foam.CLASS({
     {
       name: 'ps',
       factory: function() {
-        return foam.parsers.StringPS.create();
+        return this.StringPS.create();
       }
     }
   ],
