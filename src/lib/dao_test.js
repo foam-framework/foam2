@@ -7,7 +7,7 @@ foam.CLASS({
     },
     {
       name: 'foo',
-      defaultValue: 0
+      value: 0
     }
   ]
 });

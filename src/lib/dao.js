@@ -211,7 +211,7 @@ foam.CLASS({
     {
       name: 'count',
       class: 'Int',
-      defaultValue: 0
+      value: 0
     }
   ],
 
@@ -247,7 +247,7 @@ foam.CLASS({
     {
       name: 'count',
       class: 'Int',
-      defaultValue: 0
+      value: 0
     }
   ],
 

@@ -112,7 +112,7 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      defaultValue: function(_, v) { return typeof v == 'string' ? foam.parse.Literal.create({ s: v }) : v }
+      value: function(_, v) { return typeof v == 'string' ? foam.parse.Literal.create({ s: v }) : v }
     }
   ]
 });
@@ -406,7 +406,7 @@ foam.CLASS({
     },
     {
       name: 'adapt',
-      defaultValue: function(_, o, prop) {
+      value: function(_, o, prop) {
         if ( Array.isArray(o) ) return o;
 
         if ( typeof o === "function" ) {

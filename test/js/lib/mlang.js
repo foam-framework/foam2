@@ -44,7 +44,7 @@ describe('MLang', function() {
         {
           class: 'Boolean',
           name: 'deceased',
-          defaultValue: false,
+          value: false,
         },
         {
           class: 'String',

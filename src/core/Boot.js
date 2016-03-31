@@ -145,7 +145,7 @@ foam.LIB({
           var a = m.properties[i];
 
           if ( Array.isArray(a) )
-            m.properties[i] = a = { name: a[0], defaultValue: a[1] };
+            m.properties[i] = a = { name: a[0], value: a[1] };
           else if ( typeof a === 'string' )
             m.properties[i] = a = { name: a };
 
@@ -492,7 +492,7 @@ foam.CLASS({
         if ( Array.isArray(o) ) {
           var p = foam.core.Property.create();
           p.name         = o[0];
-          p.defaultValue = o[1];
+          p.value = o[1];
           return p;
         }
         return o.class ?
@@ -530,7 +530,7 @@ foam.CLASS({
     { name: 'name', required: true },
     { name: 'label', expression: foam.string.labelize },
     'help',
-    'defaultValue',
+    'value',
     'factory',
     'adapt',
     'preSet',
@@ -594,9 +594,9 @@ foam.CLASS({
       var preSet          = this.preSet;
       var postSet         = this.postSet;
       var factory         = this.factory;
-      // This doesn't let defaultValue to be 'undefined', which is maybe not bad.
-      var hasDefaultValue = typeof this.defaultValue !== 'undefined';
-      var defaultValue    = this.defaultValue;
+      // This doesn't let value to be 'undefined', which is maybe not bad.
+      var hasDefaultValue = typeof this.value !== 'undefined';
+      var value    = this.value;
       var slotName        = name + '$';
       var isFinal         = this.final;
       var eFactory        = this.exprFactory(this.expression);
@@ -626,10 +626,10 @@ foam.CLASS({
                  this.hasOwnPrivate_(name) ? this.getPrivate_(name) :
                  this.setPrivate_(name, eFactory.call(this)) ;
         } :
-        hasDefaultValue ? function defaultValueGetter() {
+        hasDefaultValue ? function valueGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            defaultValue ;
+            value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
@@ -844,7 +844,7 @@ foam.CLASS({
           '' ;
       }
     ],
-    [ 'defaultValue', '' ]
+    [ 'value', '' ]
   ]
 });
 
@@ -1455,7 +1455,7 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    [ 'defaultValue', false ],
+    [ 'value', false ],
     [ 'adapt', function(_, v) { return !!v; } ]
   ]
 });
@@ -1468,7 +1468,7 @@ foam.CLASS({
 
   properties: [
     'units',
-    [ 'defaultValue', 0 ],
+    [ 'value', 0 ],
     [ 'adapt', function(_, v) {
         return typeof v === 'number' ?
           Math.round(v) : v ? parseInt(v) : 0 ;
@@ -1513,9 +1513,9 @@ foam.CLASS({
   properties: [
     'name',
     'code',
-    { class: 'Boolean', name: 'isFramed',   defaultValue: false },
-    { class: 'Boolean', name: 'isMerged',   defaultValue: false },
-    { class: 'Int',     name: 'mergeDelay', defaultValue: 16, units: 'ms' }
+    { class: 'Boolean', name: 'isFramed',   value: false },
+    { class: 'Boolean', name: 'isMerged',   value: false },
+    { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' }
   ],
 
   methods: [
@@ -1843,7 +1843,7 @@ foam.CLASS({
 
     /**
       Undefine a Property's value.
-      The value will revert to either the Property's 'defaultValue' or
+      The value will revert to either the Property's 'value' or
       'expression' value, if they're defined or undefined if they aren't.
       A propertyChange event will be fired, even if the value doesn't change.
     */

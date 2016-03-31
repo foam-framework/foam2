@@ -26,7 +26,7 @@ foam.CLASS({
   properties: [
     {
       name: 'value',
-      defaultValue: 0
+      value: 0
     }
   ],
   methods: [
@@ -46,11 +46,11 @@ foam.CLASS({
   properties: [
     {
       name: 'of',
-      defaultValue: 'foam.mlang.predicate.Expr'
+      value: 'foam.mlang.predicate.Expr'
     },
     {
       name: 'adaptArrayElement',
-      defaultValue: function(o) {
+      value: function(o) {
         if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( Array.isArray(o) ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
@@ -68,7 +68,7 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      defaultValue: function(_, o) {
+      value: function(_, o) {
         if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
         return o;

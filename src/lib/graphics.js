@@ -205,12 +205,12 @@ foam.CLASS({
     {
       name: 'scaleX',
       class: 'Float',
-      defaultValue: 1
+      value: 1
     },
     {
       name: 'scaleY',
       class: 'Float',
-      defaultValue: 1
+      value: 1
     },
     {
       name: 'skewX',
@@ -231,7 +231,7 @@ foam.CLASS({
     {
       name: 'alpha',
       class: 'Float',
-      defaultValue: 1
+      value: 1
     },
     {
       name: 'border'
@@ -255,7 +255,7 @@ foam.CLASS({
     },
     {
       name: 'state',
-      defaultValue: 'initial'
+      value: 'initial'
     },
     {
       name: 'transform',
@@ -364,7 +364,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      defaultValue: 'black'
+      value: 'black'
     }
   ],
 
@@ -403,7 +403,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      defaultValue: 'black'
+      value: 'black'
     }
   ],
 
@@ -432,11 +432,11 @@ foam.CLASS({
   properties: [
     {
       name: 'start',
-      defaultValue: 0
+      value: 0
     },
     {
       name: 'end',
-      defaultValue: 2*Math.PI
+      value: 2*Math.PI
     }
   ]
 });
@@ -524,7 +524,7 @@ foam.CLASS({
     {
       name: 'radial',
       class: 'Boolean',
-      defaultValue: false
+      value: false
     },
     {
       name: 'colors',

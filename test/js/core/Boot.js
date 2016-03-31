@@ -134,7 +134,7 @@ describe('Property Factory', function() {
         },
         {
           name: 'testCount',
-          defaultValue: 0
+          value: 0
         }
       ]
     });
@@ -224,7 +224,7 @@ describe('Property default value', function() {
       properties: [
         {
           name: 'a',
-          defaultValue: 42
+          value: 42
         }
       ]
     });
@@ -525,7 +525,7 @@ describe('Model.implements', function() {
       properties: [
         {
           name: 'salary',
-          defaultValue: 50000
+          value: 50000
         }
       ],
 
@@ -757,7 +757,7 @@ describe('Property Mlang interop', function() {
       properties: [
         {
           name: 'a',
-          defaultValue: 45,
+          value: 45,
         },
       ]
     });
@@ -792,7 +792,7 @@ describe('Slots', function() {
       properties: [
         {
           name: 'a',
-          defaultValue: 45,
+          value: 45,
         },
       ]
     });

@@ -107,7 +107,7 @@ foam.CLASS({
     },
     {
       name: 'simple',
-      defaultValue: true
+      value: true
     },
     {
       name: 'ps',
