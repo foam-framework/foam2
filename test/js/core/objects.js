@@ -130,13 +130,15 @@ describe('FObject hashCode', function() {
     expect(a.hashCode()).toEqual(16337);
   });
   it('regression 2: strings and numbers', function() {
+    // KGR: I disagree with this test, how do we expect
+    // any particular value from a hashCode()?
     a.a = 'this is a longer string!@';
     a.b = 998765876.78;
-    expect(a.hashCode()).toEqual(-359267117);
+    expect(a.hashCode()).toEqual(998782213);
   });
   it('regression 3: model instance', function() {
     a.a = test.CompA.create({ a: 4 });
-    expect(a.hashCode()).toEqual(572756);
+    expect(a.hashCode()).toEqual(16337);
   });
 });
 
@@ -192,7 +194,4 @@ describe('FObject clone', function() {
     expect(clone.ordinary.special).toEqual(88 + 5); // and went through cloneProperty()
     expect(clone.special).toEqual(a.special + 5);
   });
-
-
-
 });

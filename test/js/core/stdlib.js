@@ -74,9 +74,9 @@ describe('Number.compareTo', function() {
 
   it('compares', function() {
     var n = new Number(3);
-    expect(n.compareTo(3)).toEqual(0);
-    expect(n.compareTo(1)).toEqual(1);
-    expect(n.compareTo(6)).toEqual(-1);
+    expect(foam.compare.compare(n, 3)).toEqual(0);
+    expect(foam.compare.compare(n, 1)).toEqual(1);
+    expect(foam.compare.compare(n, 6)).toEqual(-1);
   });
 
 });
@@ -89,9 +89,9 @@ describe('String.compareTo', function() {
 
   it('compares', function() {
     var n = new String("bbb");
-    expect(n.compareTo("bbb")).toEqual(0);
-    expect(n.compareTo("aa")).toEqual(1);
-    expect(n.compareTo("ccc")).toEqual(-1);
+    expect(foam.compare.compare(n, "bbb")).toEqual(0);
+    expect(foam.compare.compare(n, "aa")).toEqual(1);
+    expect(foam.compare.compare(n, "ccc")).toEqual(-1);
   });
 
 });
@@ -227,19 +227,19 @@ describe('Date', function() {
   });
 
   it('correctly reports equals', function() {
-    expect((new Date(7487474)).equals((new Date(7487474)))).toBe(true);
-    expect((new Date(7487474)).equals((new Date(23423432)))).toBe(false);
+    expect(foam.compare.equals(new Date(7487474), new Date(7487474))).toBe(true);
+    expect(foam.compare.equals(new Date(7487474), new Date(23423432))).toBe(false);
 
-    expect((new Date(7487474)).equals(null)).toBe(false);
-    expect((new Date(7487474)).equals(7487474)).toBe(false);
+    expect(foam.compare.equals((new Date(7487474), null))).toBe(false);
+    expect(foam.compare.equals(new Date(7487474), 7487474)).toBe(true);
   });
   it('correctly reports compareTo', function() {
-    expect((new Date(7487474)).compareTo((new Date(7487474)))).toEqual(0);
-    expect((new Date(234324)).compareTo((new Date(23423432)))).toEqual(-1);
+    expect(foam.compare.compare(new Date(7487474), new Date(7487474))).toEqual(0);
+    expect(foam.compare.compare(new Date(234324), new Date(23423432))).toEqual(-1);
 
-    expect((new Date(234324)).compareTo(null)).toEqual(1);
+    expect(foam.compare.compare(new Date(234324), null)).toEqual(1);
     var date = new Date(2423);
-    expect(date.compareTo(date)).toEqual(0);
+    expect(foam.compare.compare(date, date)).toEqual(0);
   });
 
   // TODO: fix time zone 

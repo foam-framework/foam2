@@ -23,9 +23,7 @@ foam = {
   core:     {},
   Array:    Array.prototype,
   Function: Function.prototype,
-  Number:   Number.prototype,
-  String:   String.prototype,
-  Date:     Date.prototype
+  Number:   Number.prototype
 };
 
 /** Setup nodejs-like 'global' on web */
@@ -113,39 +111,6 @@ foam.LIB = function LIB(model) {
 };
 
 
-/** Number prototype additions. */
-foam.LIB({
-  name: 'Number',
-
-  methods: [
-    function compareTo(o) { return ( o == this ) ? 0 : this < o ? -1 : 1; },
-  ]
-});
-
-
-/** String prototype additions. */
-foam.LIB({
-  name: 'String',
-
-  methods: [
-    function compareTo(o) { return ( o == this ) ? 0 : this < o ? -1 : 1; },
-
-    /** Adds hashCode functionality to all strings. */
-    function hashCode() {
-      var hash = 0;
-
-      for ( i = 0 ; i < this.length ; i++ ) {
-        var code = this.charCodeAt(i);
-        hash = ((hash << 5) - hash) + code;
-        hash &= hash;
-      }
-
-      return hash;
-    }
-  ]
-});
-
-
 /** Array prototype additions. */
 foam.LIB({
   name: 'Array',
@@ -159,7 +124,7 @@ foam.LIB({
       var removed = [];
       for ( var i = 0 ; i < this.length ; i++ ) {
         for ( var j = 0 ; j < added.length ; j++ ) {
-          if ( this[i].compareTo(added[j]) == 0 ) {
+          if ( foam.compare.compare(this[i], added[j]) == 0 ) {
             added.splice(j, 1);
             j--;
             break;
@@ -176,27 +141,6 @@ foam.LIB({
         ret[i] = (  this[i] && this[i].clone ) ? this[i].clone() : this[i];
       }
       return ret;
-    }
-  ]
-});
-
-
-/** Date prototype additions. */
-foam.LIB({
-  name: 'Date',
-
-  methods: [
-    function equals(o) {
-      if ( ! o ) return false;
-      if ( ! o.getTime ) return false;
-      return this.getTime() === o.getTime();
-    },
-
-    function compareTo(o){
-      if ( o === this ) return 0;
-      if ( ! o ) return 1;
-      var d = this.getTime() - o.getTime();
-      return d == 0 ? 0 : d > 0 ? 1 : -1;
     }
   ]
 });

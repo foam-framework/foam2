@@ -21,15 +21,13 @@ foam.CLASS({
   documentation: 'Add utility methods to FObject.',
 
   methods: [
-    function equals(other) { return this.compareTo(other) == 0; },
+    function equals(other) { return this.compareTo(other) === 0; },
 
     function compareTo(other) {
       if ( other === this ) return 0;
 
       if ( this.model_ !== other.model_ ) {
-        // TODO: This provides unstable ordering if two objects have a different model_
-        // but they have the same id.
-        return this.model_.id.compareTo(other.model_ && other.model_.id) || 1;
+        return other.model_ ? foam.compare.compare(this.model_.id, other.model_.id) : 1;
       }
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
@@ -46,8 +44,9 @@ foam.CLASS({
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
-        var value = property.f(this);
+        var value    = property.f(this);
         var otherVal = property.f(other);
+
         if ( Array.isArray(value) ) {
           var subdiff = value.diff(otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
@@ -55,12 +54,10 @@ foam.CLASS({
           }
           continue;
         }
+
         // if the primary value is undefined, use the compareTo of the other
-        if ( typeof value !== 'undefined' ) {
-          if ( value.compareTo(otherVal) !== 0) diff[property.name] = otherVal;
-        } else if ( typeof otherVal !== 'undefined' ) {
-          if ( otherVal.compareTo(value) !== 0) diff[property.name] = otherVal;
-        } // else they are both undefined and thus not different
+        if ( ! foam.compare.equals(value, otherVal) )
+          diff[property.name] = otherVal;
       }
 
       return diff;
@@ -72,11 +69,7 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var prop = this[ps[i].name];
-        var code = ! prop ? 0 :
-          prop.hashCode   ? prop.hashCode()
-                          : prop.toString().hashCode();
-
-        hash = ((hash << 5) - hash) + code;
+        hash = ((hash << 5) - hash) + foam.compare.hashCode(prop);
         hash &= hash;
       }
 
@@ -115,7 +108,6 @@ foam.CLASS({
     ) {
       /** Override to provide special deep cloning behavior. */
       cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
-    },
-
+    }
   ]
 });

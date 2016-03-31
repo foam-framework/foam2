@@ -38,10 +38,10 @@ foam.CLASS({
     {
       name: 'comparePropertyValues',
       defaultValue: function(o1, o2) {
-        if ( ! o1 ) return ( ! o2 ) ? 0: -1;
+        if ( ! o1 ) return o2 ? -1 : 0;
         if ( ! o2 ) return 1;
 
-        return o1.compareTo(o2);
+        return foam.compare.dateCompare(o1, o2);
       }
     }
   ]
