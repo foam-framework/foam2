@@ -70,7 +70,7 @@ describe('LocalStorageDAO', function() {
   });
 
   // Run the generic suite of DAO tests against it.
-  require('./generic_dao')(function(model) {
+  genericDAOTestBattery(function(model) {
     localStorage.removeItem('_test_LS_generic_');
     return foam.dao.LocalStorageDAO.create({ name: '_test_LS_generic_', of: model });
   });
@@ -84,7 +84,7 @@ describe('LocalStorageDAO', function() {
 
 
 describe('ArrayDAO', function() {
-  require('./generic_dao')(function(model) {
+  genericDAOTestBattery(function(model) {
     return foam.dao.ArrayDAO.create({ of: model });
   });
 });

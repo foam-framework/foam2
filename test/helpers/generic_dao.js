@@ -22,9 +22,8 @@
 // This will run a suite of generic DAO tests against it, that should work
 // against any DAO.
 
-require('../../../src/lib/mlang');
 
-module.exports = function genericDAOTestBattery(daoFactory) {
+global.genericDAOTestBattery = function(daoFactory) {
   describe('generic DAO tests', function() {
     foam.CLASS({
       package: 'test.dao.generic',

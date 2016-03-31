@@ -16,7 +16,7 @@
  */
 
 describe('JSONFileDAO', function() {
-  require('../js/lib/generic_dao')(function(model) {
+  genericDAOTestBattery(function(model) {
     try { require('fs').unlinkSync('test.json'); } catch(e) {}
     return foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model });
   });
