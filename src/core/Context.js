@@ -93,8 +93,7 @@
       if ( opt_name )
         Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
 
-      sub.$UID;
-
+      sub.$UID__ = foam.next$UID();
       sub.__proto__ = this;
       Object.freeze(sub);
 

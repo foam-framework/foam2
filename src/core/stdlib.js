@@ -23,7 +23,14 @@ foam = {
   core:     {},
   Array:    Array.prototype,
   Function: Function.prototype,
-  Number:   Number.prototype
+  Number:   Number.prototype,
+  next$UID: (function() {
+    /* Return a unique id. */
+    var id = 1;
+    return function next$UID() { 
+      return id++;
+    }
+  })(),
 };
 
 /** Setup nodejs-like 'global' on web */
@@ -33,15 +40,11 @@ Object.defineProperty(
   Object.prototype,
   '$UID',
   {
-    get: (function() {
-      var id = 1;
-      return function() {
-        if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
-        Object.defineProperty(this, '$UID__', {value: id, enumerable: false});
-        id++;
-        return this.$UID__;
-      };
-    })(),
+    get: function() {
+      if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
+      Object.defineProperty(this, '$UID__', {value: foam.next$UID(), enumerable: false});
+      return this.$UID__;
+    },
     enumerable: false
   }
 );
