@@ -785,34 +785,23 @@ foam.CLASS({
       // Not overriding, or not using SUPER, so just return original method
       if ( ! super_ || method.toString().indexOf('SUPER') == -1 ) return method;
 
-      var SUPER = function() { return super_.apply(this, arguments); };
-
-      // This code isn't JIT'ed in V8 because of the try/finally,
-      // so we move it outside of 'f' below so that the rest of
-      // that function is JIT'ed.
-      var slowF = function(OLD_SUPER, args) {
-        try {
-          return method.apply(this, args);
-        } finally {
-          this.SUPER = OLD_SUPER;
-        }
-      };
+      function SUPER() { return super_.apply(this, arguments); }
 
       var f = function() {
-        var OLD_SUPER = this.SUPER;
+        var oldSuper = this.SUPER;
         this.SUPER = SUPER;
 
-        if ( OLD_SUPER ) return slowF.call(this, OLD_SUPER, arguments);
+        try {
+          return method.apply(this, arguments);
+        } finally {
+          this.SUPER = oldSuper;
+        }
 
-        // Fast-Path when it doesn't matter if we restore SUPER or not
-        var ret = method.apply(this, arguments);
-        this.SUPER = null;
         return ret;
       };
 
       foam.fn.setName(f, this.name);
       f.toString = function() { return method.toString(); };
-      f.super_ = super_;
 
       return f;
     },
