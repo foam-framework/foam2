@@ -101,7 +101,7 @@ foam.CLASS({
       }
     ]
   ]
-})
+});
 
 
 foam.CLASS({
@@ -131,6 +131,376 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'State',
+  properties: [
+    {
+      class: 'Simple',
+      name: 'success'
+    },
+    {
+      class: 'Simple',
+      name: 'fail'
+    },
+    {
+      class: 'Simple',
+      name: 'ps'
+    }
+  ],
+  methods: [
+    {
+      name: 'step'
+    },
+    function partialEval() {
+      return this;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'BacktrackStart',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'restore',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    //    function step(pps) {
+
+    //      this.restore.ps = pps[0];
+    function step() {
+      this.restore.ps = this.ps;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'BacktrackFinish',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+//    function step(pps) {
+    //      pps[0] = this.ps;
+    function step() {
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'Placeholder',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    //    function step(pps) {
+    function step() {
+      this.next.ps = this.ps;
+      return this.next;
+    },
+    function partialEval() {
+      return this.next.partialEval();
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'Char',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'c',
+      final: true
+    }
+  ],
+  methods: [
+    //    function step(pps) {
+    function step() {
+            if ( this.ps.head === this.c ) {
+//      if ( pps[0].head === this.c ) {
+              this.success.ps = this.ps.tail;
+//        pps[0] = pps[0].tail;
+        return this.success;
+            }
+      this.fail.ps = this.ps;
+      return this.fail;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'LiteralWithValue',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 's',
+      final: true
+    },
+    {
+      name: 'value',
+      final: true
+    }
+  ],
+  methods: [
+//    function step(pps) {
+//      var ps = pps[0];
+    //      var ps1 = pps;
+    function step() {
+      var str = this.s;
+      var ps = this.ps;
+      for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
+        if ( str.charAt(i) !== ps.head ) {
+          this.fail.ps = this.ps;
+          return this.fail;
+        }
+      }
+      //      pps[0] = ps.setValue(this.value || str);
+      this.success.ps = ps.setValue(this.value || str);
+      return this.success;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'Literal',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 's',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      var ps1 = this.ps;
+      var ps = this.ps;
+      var str = this.s;
+      for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
+        if ( str.charAt(i) !== ps.head ) {
+          this.fail.ps = ps1;
+          return this.fail;
+        }
+      }
+      this.success.ps = ps;
+      return this.success;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'AnyChar',
+  extends: 'foam.parse.compiled.State',
+  methods: [
+    //    function step(pps) {
+    function step() {
+            var ps = this.ps;
+//      var ps = pps[0];
+      if ( ps.head ) {
+        this.success.ps = ps.tail;
+//        pps[0] = ps.tail;
+        return this.success;
+      }
+      this.fail.ps = ps;
+      return this.fail;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'ParserState',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'parser',
+      final: true
+    }
+  ],
+  methods: [
+    //    function step(pps) {
+    function step() {
+      var ps = this.ps;
+      //      var ret = this.parser.parse(pps[0]);
+      var ret = this.parser.parse(ps);
+
+      if ( ret ) {
+//        pps[0] = ret;
+        this.success.ps = ret;
+        return this.success;
+      }
+
+      this.fail.ps = ps;
+      return this.fail
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'Action',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'action',
+      final: true
+    }
+  ],
+  methods: [
+    //    function step(pps) {
+    function step() {
+      var ps = this.ps.setValue(this.action(this.ps.value));
+            this.success.ps = ps;
+//      pps[0] = pps[0].setValue(this.action(pps[0].value));
+      return this.success;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'GetValue',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'next',
+      final: true
+    },
+    {
+      name: 'value',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      this.value[0] = this.ps.value;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'SetValue',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'value',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+//    function step(pps) {
+      function step() {
+      var ps = this.ps.setValue(this.value[0]);
+      this.next.ps = ps;
+//      pps[0] = pps[0].setValue(this.value[0]);
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'StartValue',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'next',
+      final: true
+    },
+    {
+      name: 'value',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      this.value.length = 0;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'AddValue',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'value',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+//    function step(pps) {
+    //      this.value.push(pps[0].value);
+    function step() {
+      this.value.push(this.ps.value);
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'FinishValue',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'value',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    function step(pps) {
+//      var ps = this.ps.setValue(this.value);
+      pps[0] = pps[0].setValue(this.value);
+//      this.next.ps = ps;
+      return this.next;
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse',
@@ -148,6 +518,20 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      return withValue ?
+        foam.parse.compiled.LiteralWithValue.create({
+          s: this.s,
+          value: this.value !== undefined ? this.value : this.s,
+          success: success,
+          fail: fail
+        }) :
+      foam.parse.compiled.LiteralWithValue.create({
+        s: this.s,
+        success: success,
+        fail: fail
+      })
+    },
     function parse(ps, obj) {
       var str = this.s;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
@@ -157,7 +541,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -172,6 +555,22 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      var alt = [];
+      var fails = []
+      var args = this.args;
+
+      for ( var i = 0 ; i < args.length ; i++ ) {
+        fails[i] = foam.parse.compiled.Placeholder.create()
+        alt[i] = args[i].compile(success, fails[i], withValue, grammar);
+      }
+
+      for ( var i = 0 ; i < alt.length ; i++ ) {
+        fails[i].next = alt[i+1] || fail;
+      }
+
+      return alt[0];
+    },
     function parse(ps, obj) {
       // TODO: Should we remove the obj argument in favour of
       // passing the obj along via context or something?
@@ -184,7 +583,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -199,6 +597,43 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      var restore = foam.parse.compiled.BacktrackFinish.create({
+        next: fail
+      });
+      var capture = foam.parse.compiled.BacktrackStart.create({
+        restore: restore,
+      });
+
+      var value = [];
+
+      var args = this.args;
+      var successes = [];
+      var seq = [];
+      for ( var i = 0 ; i < args.length ; i++ ) {
+        successes[i] = foam.parse.compiled.Placeholder.create();
+        seq[i] = args[i].compile(
+          withValue ?
+            foam.parse.compiled.AddValue.create({ value: value, next: successes[i] }) : successes[i],
+          restore,
+          withValue,
+          grammar);
+      }
+
+      success = withValue ?
+        foam.parse.compiled.FinishValue.create({ value: value, next: success }) :
+      success;
+
+      for ( var i = 0 ; i < seq.length ; i++ ) {
+        successes[i].next = seq[i+1] || success;
+      }
+
+      capture.next = seq[0];
+
+      return withValue ?
+        foam.parse.compiled.StartValue.create({ value: value, next: capture }) :
+        capture;
+    },
     function parse(ps, obj) {
       var ret = [];
       var args = this.args;
@@ -229,6 +664,41 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      var restore = foam.parse.compiled.BacktrackFinish.create({
+        next: fail
+      });
+      var capture = foam.parse.compiled.BacktrackStart.create({
+        restore: restore,
+      });
+
+      var value = [];
+
+      var args = this.args;
+      var successes = [];
+      var seq = [];
+      for ( var i = 0 ; i < args.length ; i++ ) {
+        successes[i] = foam.parse.compiled.Placeholder.create();
+        seq[i] = args[i].compile(
+          ( withValue && i == this.n ) ?
+            foam.parse.compiled.GetValue.create({ value: value, next: successes[i] }) : successes[i],
+          restore,
+          withValue,
+          grammar);
+      }
+
+      success = withValue ?
+        foam.parse.compiled.SetValue.create({ value: value, next: success }) :
+        success;
+
+      for ( var i = 0 ; i < seq.length ; i++ ) {
+        successes[i].next = seq[i+1] || success;
+      }
+
+      capture.next = seq[0];
+
+      return capture;
+    },
     function parse(ps, obj) {
       var ret;
       var args = this.args;
@@ -249,12 +719,14 @@ foam.CLASS({
   extends: 'foam.parse.ParserDecorator',
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      return this.p.compile(success, success, withValue, grammar);
+    },
     function parse(ps, obj) {
       return this.p.parse(ps, obj) || ps.setValue(null);
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -263,6 +735,12 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
+    function compile(success, fail) {
+      return foam.parse.compiled.AnyChar.create({
+        success: success,
+        fail: fail
+      });
+    },
     function parse(ps, obj) {
       return ps.head ? ps.tail : undefined;
     }
@@ -282,6 +760,13 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      return foam.parse.compiled.ParserState.create({
+        parser: this,
+        success: success,
+        fail: fail
+      })
+    },
     function parse(ps) {
       return ps.head && this.string.indexOf(ps.head) == -1 ?
         ps.tail : undefined;
@@ -296,6 +781,30 @@ foam.CLASS({
   extends: 'foam.parse.ParserDecorator',
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      var value = [];
+      var repeat = foam.parse.compiled.Placeholder.create();
+
+      success = withValue ?
+        foam.parse.compiled.FinishValue.create({ value: value, next: success }) :
+      success;
+
+      var p = this.p.compile(
+        withValue ?
+          foam.parse.compiled.AddValue.create({ value: value, next: repeat }) : repeat,
+        success,
+        withValue,
+        grammar);
+
+      repeat.next = p;
+
+      return withValue ?
+        foam.parse.compiled.StartValue.create({
+          value: value,
+          next: p
+        }) :
+        p;
+    },
     function parse(ps, obj) {
       var ret = [];
       var p = this.p;
@@ -313,9 +822,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parse',
   name: 'Repeat0',
-  extends: 'foam.parse.ParserDecorator',
+  extends: 'foam.parse.Repeat',
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      return this.SUPER(success, fail, false, grammar);
+    },
     function parse(ps, obj) {
       var res;
       var p = this.p;
@@ -324,7 +836,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -340,10 +851,55 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      var restore = foam.parse.compiled.BacktrackFinish.create({
+        next: fail
+      });
+
+      var capture = foam.parse.compiled.BacktrackStart.create({
+        restore: restore
+      });
+
+      var e = this.else ?
+          this.else.compile(
+            success,
+            fail,
+            withValue,
+            grammar) :
+          success;
+
+      var delegate = this.p.compile(restore, e, false, grammar);
+      capture.next = delegate;
+      return capture;
+    },
     function parse(ps, obj) {
       return this.p.parse(ps, obj) ?
         undefined :
         (this.else ? this.else.parse(ps, obj) : ps);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'ParserWithAction',
+  extends: 'foam.parse.ParserDecorator',
+  properties: [
+    'action'
+  ],
+  methods: [
+    function compile(success, fail, withValue, grammar) {
+      success = foam.parse.compiled.Action.create({
+        action: this.action,
+        success: success,
+      });
+      return this.p.compile(success, fail, true, grammar);
+    },
+    function parse(ps, obj) {
+      ps = this.p.parse(ps, obj);
+      return ps ?
+        ps.setValue(this.action(ps.value)) :
+        undefined;
     }
   ]
 });
@@ -381,6 +937,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function compile(success, fail, withValue, grammar) {
+      return grammar.getSymbol(this.name).compile(
+        success, fail, withValue, grammar);
+    },
     function parse(ps, obj) {
       var p = obj[this.name];
       if ( ! p ) {
@@ -392,61 +952,12 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.parse',
-  name: 'ParsersAxiom',
-  extends: 'AxiomArray',
-
-  properties: [
-    [ 'of', 'foam.parse.ParserAxiom' ],
-    {
-      name: "anyChar",
-      getter: function() { return foam.parse.AnyChar.create(); }
-    },
-    {
-      name: 'adapt',
-      value: function(_, o, prop) {
-        if ( Array.isArray(o) ) return o;
-
-        if ( typeof o === "function" ) {
-          var args = o.toString().match(/\((.*?)\)/);
-          if ( ! args ) {
-            throw "Could not parse arguments from parser factory function";
-          }
-
-          args = args[1].split(",").map(function(a) { return a.trim(); });
-          for ( var i = 0 ; i < args.length; i++ ) {
-            if ( prop[args[i]] ) args[i] = prop[args[i]];
-            else {
-              var cls = foam.lookup(args[i]) || foam.lookup('foam.parse.' + args[i]);
-              if ( ! cls ) {
-                throw "Could not find class for " + args[i];
-              }
-
-              args[i] = (function(cls) {
-                return function(args) {
-                  return cls.create(args);
-                };
-              })();
-            }
-          }
-
-          o = o.apply(null, args);
-        }
-
-        var a = [];
-        for ( var key in o ) {
-          a.push(foam.lookup('foam.parse.ParserAxiom').create({
-            name: key,
-            parser: o[key]
-          }));
-        }
-        return a;
-      }
-    }
+  name: 'Parsers',
+  axioms: [
+    foam.pattern.Singleton.create()
   ],
-
   methods: [
     function seq() {
       return foam.lookup('foam.parse.Sequence').create({
@@ -515,6 +1026,49 @@ foam.CLASS({
         s: s,
         value: value
       });
+    },
+
+    function anyChar() {
+      return foam.parse.AnyChar.create();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'ParsersAxiom',
+  extends: 'AxiomArray',
+  requires: [
+    'foam.pattern.With',
+    'foam.parse.Parsers'
+  ],
+
+  properties: [
+    [ 'of', 'foam.parse.ParserAxiom' ],
+    {
+      name: 'adapt',
+      value: function(_, o, prop) {
+        if ( Array.isArray(o) ) return o;
+
+        if ( typeof o === "function" ) {
+          var args = o.toString().match(/\((.*?)\)/);
+          if ( ! args ) {
+            throw "Could not parse arguments from parser factory function";
+          }
+
+          o = prop.With.create().with(o, prop.Parsers.create());
+        }
+
+        var a = [];
+        for ( var key in o ) {
+          a.push(foam.lookup('foam.parse.ParserAxiom').create({
+            name: key,
+            parser: o[key]
+          }));
+        }
+        return a;
+      }
     }
   ]
 });
@@ -532,7 +1086,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -575,6 +1128,137 @@ foam.CLASS({
           code: typeof o === 'function' ? o : o.code
         });
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'PSymbol',
+  properties: [
+    {
+      name: 'name'
+    },
+    {
+      name: 'parser'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'Grammar',
+  requires: [
+    'foam.parse.StringPS'
+  ],
+  properties: [
+    {
+      class: 'Array',
+      of: 'foam.parse.PSymbol',
+      name: 'symbols',
+      adapt: function(_, o) {
+        if ( Array.isArray(o) ) return o;
+
+        if ( typeof o === "function" ) {
+          var args = o.toString().match(/\((.*?)\)/);
+          if ( ! args ) {
+            throw "Could not parse arguments from parser factory function";
+          }
+
+          o = foam.pattern.With.create().with(o, foam.parse.Parsers.create());
+        }
+
+        var a = [];
+        for ( var key in o ) {
+          a.push(foam.parse.PSymbol.create({
+            name: key,
+            parser: o[key]
+          }));
+        }
+        return a;
+      }
+    },
+    {
+      name: 'symbolMap_',
+      expression: function(symbols) {
+        var m = {};
+        for ( var i = 0 ; i < symbols.length ; i++ ) {
+          m[symbols[i].name] = symbols[i];
+        }
+        return m;
+      }
+    },
+    {
+      name: 'finish_success',
+      factory: function() {
+        return {};
+      }
+    },
+    {
+      name: 'finish_fail',
+      factory: function() {
+        return {};
+      }
+    },
+    {
+      name: 'compiled',
+      expression: function(symbolMap_) {
+        return symbolMap_['START'].parser.compile(
+          this.finish_success,
+          this.finish_fail,
+          false,
+          this);
+      }
+    },
+    {
+      name: 'ps',
+      factory: function() {
+        return this.StringPS.create();
+      }
+    }
+  ],
+  methods: [
+    function parseString(str) {
+      this.ps.setString(str);
+      var state = this.compiled;
+      state.ps = this.ps;
+      var success = this.finish_success;
+      var fail = this.finish_fail;
+      return this.parse(this.ps, state, success, fail);
+    },
+    function parse(ps, state, success, fail) {
+//      var pps = [ps];
+      while ( state != success && state != fail ) {
+        //        state = state.step(pps);
+        state = state.step();
+      }
+      if ( state == success ) {
+        return state.ps.value;
+//        return pps[0].value;
+      }
+    },
+    function getSymbol(name) {
+      return this.symbolMap_[name].parser;
+    },
+    function addActions(map) {
+      for ( var key in map ) {
+        this.addAction(key, map[key]);
+      }
+      return this;
+    },
+    function addAction(name, action) {
+      for ( var i = 0 ; i < this.symbols.length ; i++ ) {
+        if ( this.symbols[i].name == name ) {
+          this.symbols[i].parser = foam.parse.ParserWithAction.create({
+            p: this.symbols[i].parser,
+            action: action
+          });
+        }
+      }
+
+      // TODO: Array property should help me here
+      this.pub("propertyChange", "symbols", this.slot("symbols"));
+      return this;
     }
   ]
 });

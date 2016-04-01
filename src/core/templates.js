@@ -77,16 +77,16 @@ foam.CLASS({
         sym('text')
       )),
 
-      'comment': seq1(1, '<!--', repeat0(not('-->', anyChar)), '-->'),
+      'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
 
 
       'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
 
       'raw values tag': simpleAlt(
-        seq('<%=', repeat(not('%>', anyChar)), '%>')
+        seq('<%=', repeat(not('%>', anyChar())), '%>')
       ),
 
-      'code tag': seq('<%', repeat(not('%>', anyChar)), '%>'),
+      'code tag': seq('<%', repeat(not('%>', anyChar())), '%>'),
       'ignored newline': simpleAlt(
         literal('\\\r\\\n'),
         literal('\\\n')
@@ -96,7 +96,7 @@ foam.CLASS({
         literal('\n')
       ),
       'single quote': literal("'"),
-      text: anyChar
+      text: anyChar()
     };
   },
 
