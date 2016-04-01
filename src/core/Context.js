@@ -70,7 +70,7 @@
     },
 
     subContext: function subContext(opt_args, opt_name) {
-      var sub = Object.create(this);
+      var sub = {};
 
       for ( var key in opt_args ) {
         if ( opt_args.hasOwnProperty(key) ) {
@@ -81,7 +81,6 @@
             // For performance, these could be reused.
             Object.defineProperty(sub, key, {
               get: function() { return v.get(); },
-              configurable: true,
               enumerable: false
             });
           } else {
@@ -94,12 +93,17 @@
       if ( opt_name )
         Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
 
+      sub.$UID;
+
+      sub.__proto__ = this;
+      Object.freeze(sub);
+
       return sub;
     }
   };
 
-  foam.X = X;
-
-  // TODO: comment
+  // Create short-cuts for foam.X.[subContext, register, lookup] in foam.
   for ( var key in X ) foam[key] = X[key].bind(X);
+
+  foam.X = X;
 })();
