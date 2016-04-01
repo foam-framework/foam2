@@ -26,7 +26,7 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      defaultValue: function (_, d) {
+      value: function (_, d) {
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
@@ -37,7 +37,7 @@ foam.CLASS({
     },
     {
       name: 'comparePropertyValues',
-      defaultValue: function(o1, o2) {
+      value: function(o1, o2) {
         if ( ! o1 ) return o2 ? -1 : 0;
         if ( ! o2 ) return 1;
 
@@ -79,7 +79,7 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      defaultValue: function (_, v) {
+      value: function (_, v) {
         return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
       }
     }
@@ -97,12 +97,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'defaultValue',
-      defaultValue: function() {}
+      name: 'value',
+      value: function() {}
     },
     {
       name: 'adapt',
-      defaultValue: function(_, value) {
+      value: function(_, value) {
         if ( typeof value === 'string' ) {
           var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
           body = ( body && body[1] ) ? body[1] : value;
@@ -139,12 +139,12 @@ foam.CLASS({
   properties: [
     {
       name: 'of',
-      defaultValue: '',
+      value: '',
       // documentation: 'The FOAM sub-type of this property.'
     },
     {
       name: 'subKey',
-      defaultValue: 'ID',
+      value: 'ID',
       // documentation: 'The foreign key that this property references.'
     }
     // TODO: expression to produce the actual value referenced by this property? or method installed on the host?
@@ -163,12 +163,12 @@ foam.CLASS({
   properties: [
     {
       name: 'of',
-      defaultValue: 'String',
+      value: 'String',
       // documentation: 'The FOAM sub-type of this property.'
     },
     {
       name: 'adapt',
-      defaultValue: function(_, v, prop) {
+      value: function(_, v, prop) {
         return Array.isArray(v) ? v :
           ( typeof v === 'string' ) ? prop.fromString(v) :
           ((v || v === 0) ? [v] : []);
@@ -176,11 +176,11 @@ foam.CLASS({
     },
     {
       name: 'factory',
-      defaultValue: function() { return []; }
+      value: function() { return []; }
     },
     {
       name: 'fromString',
-      defaultValue: function(s) {
+      value: function(s) {
         return s.split(',');
       }
     }
@@ -199,7 +199,7 @@ foam.CLASS({
 //   properties: [
 //     {
 //       name: 'getter',
-//       defaultValue: function(name) {
+//       value: function(name) {
 //         var value = this.instance_[name];
 //         // TODO: this is from foam1 standard getter... grab the foam2 path
 //         if ( typeof value === 'undefined' ) {
@@ -207,8 +207,8 @@ foam.CLASS({
 //           if ( prop ) {
 //             if ( prop.factory ) {
 //               value = this.instance_[prop.name] = prop.factory.call(this, prop);
-//             } else if ( typeof prop.defaultValue !== undefined ) {
-//               value = prop.defaultValue;
+//             } else if ( typeof prop.value !== undefined ) {
+//               value = prop.value;
 //             } else {
 //               value = '';
 //             }
@@ -238,7 +238,7 @@ foam.CLASS({
   properties: [
     {
       name: 'factory',
-      defaultValue: function() { return []; }
+      value: function() { return []; }
     }
   ]
 });
@@ -388,13 +388,13 @@ foam.CLASS({
     },
     {
       name: 'postSet',
-      defaultValue: function(o, s) {
+      value: function(o, s) {
         if ( s.onEnter ) s.onEnter.call(this, o);
       }
     },
     {
       name: 'preSet',
-      defaultValue: function(o, s) {
+      value: function(o, s) {
         if ( o && o.onLeave ) o.onLeave.call(this, s);
         return s;
       }

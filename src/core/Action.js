@@ -43,20 +43,20 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isDefault',
       help: 'Indicates if this is the default action.',
-      defaultValue: false
+      value: false
     },
     {
       class: 'Function',
       name: 'isAvailable',
       label: 'Available',
-      defaultValue: function() { return true; },
+      value: function() { return true; },
       help: 'Function to determine if action is available.'
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
-      defaultValue: function() { return true; },
+      value: function() { return true; },
       help: 'Function to determine if action is enabled.'
     },
     {

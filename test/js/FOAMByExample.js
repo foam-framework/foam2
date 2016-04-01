@@ -291,8 +291,8 @@ try {
 foam.CLASS({
   name: 'DefaultValueTest',
   properties: [
-    { name: 'a', defaultValue: 42 },
-    { name: 'b', defaultValue: 'foo' },
+    { name: 'a', value: 42 },
+    { name: 'b', value: 'foo' },
     { name: 'c' }
   ]
 });
@@ -322,7 +322,7 @@ log(o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
 // Example 21
 log_.output = "";
 try {
-// .clearProperty() reverts a value back to its defaultValue
+// .clearProperty() reverts a value back to its value
 log(o.hasOwnProperty('a'), o.a);
 o.clearProperty('a');
 log(o.hasOwnProperty('a'), o.a);
@@ -675,7 +675,7 @@ foam.CLASS({
   properties: [
     { name: 'id'      },
     { name: 'status'  },
-    { name: 'balance', defaultValue: 0 }
+    { name: 'balance', value: 0 }
   ],
   methods: [
     {
@@ -772,7 +772,7 @@ foam.CLASS({
 var oldPerson = Person.create({name: 'John', sex: 'M'});
 foam.CLASS({
   refines: 'Person',
-  properties: [ { name: 'salary', defaultValue: 0 } ],
+  properties: [ { name: 'salary', value: 0 } ],
   methods: [
     function toString() { return this.SUPER() + ' ' + this.salary; }
   ]
@@ -1234,7 +1234,7 @@ log_.output = "";
 try {
 // Slots also let you check if the value is defined by calling isDefined().
 // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
-foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', defaultValue: 42 } ]});
+foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', value: 42 } ]});
 var o = IsDefinedTest.create();
 var dv = o.a$;
 log(dv.isDefined());
@@ -1459,7 +1459,7 @@ ValidationTest.model_.validate();
 // Example 84
 log_.output = "";
 try {
-// Property validation, factory and defaultValue
+// Property validation, factory and value
 foam.CLASS({
   name: 'PropertyValidationTest',
   properties: [
@@ -1475,7 +1475,7 @@ foam.CLASS({
       getter: function() { return 42; },
       factory: function() { return 42; },
       expression: function() { return 42; },
-      defaultValue: 42
+      value: 42
     }
   ]
 });

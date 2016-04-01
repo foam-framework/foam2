@@ -57,9 +57,9 @@ foam.CLASS({
       // List of properties which are hidden by other properties.
       var es = [
         [ 'setter',     [ 'adapt', 'preSet', 'postSet' ] ],
-        [ 'getter',     [ 'factory', 'expression', 'defaultValue' ] ],
-        [ 'factory',    [ 'expression', 'defaultValue' ] ],
-        [ 'expression', [ 'defaultValue' ] ]
+        [ 'getter',     [ 'factory', 'expression', 'value' ] ],
+        [ 'factory',    [ 'expression', 'value' ] ],
+        [ 'expression', [ 'value' ] ]
       ];
 
       for ( var i = 0 ; i < es.length ; i++ ) {
@@ -191,15 +191,15 @@ foam.CLASS({
     },
     {
       /** If true, indicates that this argument is optional. */
-      name: 'optional', defaultValue: false
+      name: 'optional', value: false
     },
     {
       /** The index of the argument (the first argument is at index 0). */
-      name: 'index', defaultValue: -1
+      name: 'index', value: -1
     },
     {
       /** The documentation associated with the argument (denoted by a // ) */
-      name: 'documentation', defaultValue: ''
+      name: 'documentation', value: ''
     }
   ],
 

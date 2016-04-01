@@ -29,7 +29,7 @@ function modelWithProperty() {
     package: 'test',
     properties: [
       { name: 'propA' },
-      { name: 'propB', defaultValue: 4 }
+      { name: 'propB', value: 4 }
     ],
   });
   return test.PropModel.create();
