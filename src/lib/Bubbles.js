@@ -108,8 +108,6 @@ foam.CLASS({
 
         this.addChildren(b);
       }.bind(this));
-
-      this.engine.start();
     },
 
     function bounceOnWalls(c, w, h) {
