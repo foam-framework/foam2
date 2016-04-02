@@ -114,6 +114,15 @@ foam.LIB = function LIB(model) {
 };
 
 
+foam.LIB({
+  name: 'math',
+
+  methods: [
+    function distance(x, y) { return Math.sqrt(x*x + y*y); }
+  ]
+});
+
+
 /** Array prototype additions. */
 foam.LIB({
   name: 'Array',
