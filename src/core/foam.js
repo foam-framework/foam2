@@ -74,10 +74,11 @@
     "parse",
     "templates",
     "Action",
+    "../lib/Timer",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
     "../lib/mlang",
-    [ "../lib/node/json_dao", isServer ],
+    [ "../lib/node/json_dao", isServer ]
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
