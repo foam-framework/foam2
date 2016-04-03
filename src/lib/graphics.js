@@ -135,7 +135,12 @@ foam.CLASS({
       this.matrix.initArgs();
     },
 
+    function affine(m) {
+      this.matrix.mul(m);
+    },
+
     function translate(dx, dy) {
+      if ( ! dx && ! dy ) return;
       //      var m = this.Matrix.create()
       var m = this.m2;
       m.a = 1; m.b = 0; m.c = dx;
@@ -145,6 +150,7 @@ foam.CLASS({
     },
 
     function skew(x, y) {
+      if ( ! x && ! y ) return;
       //      var m = this.Matrix.create();
       var m = this.m2;
       m.a = 1; m.b = x; m.c = 0;
@@ -153,11 +159,8 @@ foam.CLASS({
       this.matrix.mul(m);
     },
 
-    function affine(m) {
-      this.matrix.mul(m);
-    },
-
     function scale(x, y) {
+      if ( x === 1 && y === 1 ) return;
       //      var m = this.Matrix.create();
       var m = this.m2;
       m.a = x; m.b = 0; m.c = 0;
@@ -167,6 +170,7 @@ foam.CLASS({
     },
 
     function rotate(a) {
+      if ( ! a ) return;
       //      var m = this.Matrix.create();
       var m = this.m2;
       m.a = Math.cos(a);  m.b = Math.sin(a); m.c = 0;
