@@ -132,7 +132,7 @@ foam.CLASS({
 
   methods: [
     function reset() {
-      this.matrix = this.Matrix.create();
+      this.matrix.initArgs();
     },
 
     function translate(dx, dy) {
