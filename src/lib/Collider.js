@@ -53,6 +53,11 @@ foam.CLASS({
     function detectCollisions() {
       /* k-d-tree-like divide-and-conquer algorithm */
       this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+
+      var cs = this.children;
+      for ( var i = 0 ; i < cs.length ; i++ ) {
+        this.updateChild(cs[i]);
+      }
     },
 
     function detectCollisions__(start, end) {
@@ -60,7 +65,6 @@ foam.CLASS({
       var cs = this.children;
       for ( var i = start ; i <= end ; i++ ) {
         var c1 = cs[i];
-        this.updateChild(c1);
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
           if ( c1.intersects(c2) ) this.collide(c1, c2);
