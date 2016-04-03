@@ -679,14 +679,15 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var args = foam.fn.argsArray(e);
+      var argNames = foam.fn.argsArray(e);
       var name = this.name;
 
       return function() {
-        var self  = this;
-        var value = e.apply(this, args.map(function(a) { return self[a]; }));
-        var subs  = [];
-        var l     = function() {
+//        console.log('name: ', name, e);
+        var self = this;
+        var args = new Array(argNames.length);
+        var subs = [];
+        var l    = function() {
           if ( ! self.hasOwnProperty(name) ) {
             delete self.private_[name];
             self.clearProperty(name); // TODO: this might be wrong
@@ -694,9 +695,11 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ )
             subs[i].destroy();
         };
-        for ( var i = 0 ; i < args.length ; i++ )
-          subs.push(this.sub('propertyChange', args[i], l));
-        return value;
+        for ( var i = 0 ; i < argNames.length ; i++ ) {
+          subs.push(this.sub('propertyChange', argNames[i], l));
+          args[i] = this[argNames[i]];
+        }
+        return e.apply(this, args);
       };
     },
 
