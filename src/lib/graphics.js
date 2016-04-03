@@ -269,13 +269,14 @@ foam.CLASS({
     },
     {
       name: 'transform',
-      expression: function(originX, originY, rotation, scaleX, scaleY, skewX, skewY, x, y) {
+      getter: function() {
         var t = this.transform_.reset();
-        t.translate(x, y);
-        t.rotate(rotation);
-        t.skew(skewX, skewY);
-        t.scale(scaleX, scaleY);
-        t.translate(-originX, -originY);
+
+        t.translate(this.x, this.y);
+        t.rotate(this.rotation);
+        t.skew(this.skewX, this.skewY);
+        t.scale(this.scaleX, this.scaleY);
+        t.translate(-this.originX, -this.originY);
 
         return t;
       }
