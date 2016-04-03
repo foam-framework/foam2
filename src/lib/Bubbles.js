@@ -58,7 +58,6 @@ foam.CLASS({
             y: 200+(y-(N-1)/2)*70,
             borderWidth: 6,
             arcWidth: 6, // TODO
-            color: 'white',
             border: 'hsl(' + x/N*100 + ',' + (70+y/N*30) + '%, 60%)'
           });
           this.addChildren(c);
@@ -87,7 +86,6 @@ foam.CLASS({
           radius: 3,
           x: this.width * Math.random(),
           y: this.height/this.scaleY,
-          color: 'white',
           borderWidth: 1,
           arcWidth: 1, // TODO
           border: 'blue',
