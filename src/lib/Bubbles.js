@@ -101,7 +101,7 @@ foam.CLASS({
 
         b.vy = -4;
         b.gravity = -0.2;
-        b.friction = 0.97;
+        b.friction = 0.96;
         this.engine.add(b);
 
         this.addChildren(b);
