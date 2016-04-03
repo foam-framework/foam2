@@ -133,10 +133,12 @@ foam.CLASS({
   methods: [
     function reset() {
       this.matrix.initArgs();
+      return this;
     },
 
     function affine(m) {
       this.matrix.mul(m);
+      return this;
     },
 
     function translate(dx, dy) {
@@ -262,9 +264,13 @@ foam.CLASS({
       value: 'initial'
     },
     {
+      name: 'transform_',
+      factory: function() { return this.Transform.create(); }
+    },
+    {
       name: 'transform',
       expression: function(originX, originY, rotation, scaleX, scaleY, skewX, skewY, x, y) {
-        var t = this.Transform.create()
+        var t = this.transform_.reset();
         t.translate(x, y);
         t.rotate(rotation);
         t.skew(skewX, skewY);
