@@ -60,6 +60,10 @@ describe('pattern.Pooled', function() {
     expect(p.private_).toBe(p_);
   });
 
+  it('remembers pooled classes', function() {
+    expect(foam.pattern.Pooled.create().pooledClasses[test.PooledClass]).toEqual(true);
+    foam.pattern.Pooled.create().clearPools();
+  });
 
 });
 

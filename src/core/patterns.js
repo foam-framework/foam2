@@ -67,15 +67,27 @@ foam.CLASS({
   package: 'foam.pattern',
   name: 'Pooled',
   axioms: [ foam.pattern.Singleton.create() ],
-
   requires: [ 'foam.core.Method' ],
 
+  properties: [
+    {
+      name: 'pooledClasses',
+      factory: function() { return {}; }
+    }
+  ],
+
   methods: [
+    /** Frees up any retained objects in all object pools. */
+    function clearPools() {
+      for ( var key in this.pooledClasses ) {
+        if ( key.__objectPool__ ) { key.__objectPool__ = []; }
+      }
+    },
+
     function installInClass(cls) {
       // Keeping the object pools in an accessible location allows them
       // to be cleared out.
-      if ( ! foam.__pooledClasses__ ) { foam.__pooledClasses__ = []; }
-      foam.__pooledClasses__.push(this);
+      this.pooledClasses[cls] = true;
 
       if ( ! cls.__objectPool__ ) {
         cls.__objectPool__ = [];
