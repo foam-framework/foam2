@@ -78,10 +78,10 @@
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
     "../lib/mlang",
-    "../lib/Physical",
-    "../lib/Collider",
-    "../lib/PhysicsEngine",
-    "../lib/PhysicalCircle",
+    ["../lib/Physical", ! isServer ],
+    ["../lib/Collider", ! isServer ],
+    ["../lib/PhysicsEngine", ! isServer ],
+    ["../lib/PhysicalCircle", ! isServer ],
     [ "../lib/node/json_dao", isServer ]
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
