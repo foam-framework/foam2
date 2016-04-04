@@ -89,9 +89,10 @@ describe('ArrayDAO', function() {
   });
 });
 
-describe('IDBDAO', function() {
-  genericDAOTestBattery(function(model) {
-    return foam.dao.IDBDAO.create({ of: model });
+if ( foam.dao.IDBDAO ) {
+  describe('IDBDAO', function() {
+    genericDAOTestBattery(function(model) {
+      return foam.dao.IDBDAO.create({ of: model });
+    });
   });
-});
-
+}
