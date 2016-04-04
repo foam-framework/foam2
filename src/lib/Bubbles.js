@@ -77,10 +77,7 @@ foam.CLASS({
 
       var count = 0;
       this.timer.i$.sub(function(s) {
-        this.invalidated.pub();
-        if ( count === 100 ) return;
-        count++;
-//        if ( count++ == 100 ) s.destroy();
+        if ( count++ === 100 ) s.destroy();
 
         var b = this.PhysicalCircle.create({
           radius: 3,
