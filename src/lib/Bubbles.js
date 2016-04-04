@@ -56,7 +56,6 @@ foam.CLASS({
             radius: 15,
             x: 400+(x-(N-1)/2)*70,
             y: 200+(y-(N-1)/2)*70,
-            borderWidth: 6,
             arcWidth: 6, // TODO
             border: 'hsl(' + x/N*100 + ',' + (70+y/N*30) + '%, 60%)'
           });
@@ -77,13 +76,15 @@ foam.CLASS({
 
       var count = 0;
       this.timer.i$.sub(function(s) {
+//        this.invalidated.pub();
+//        if ( count === 100 ) return;
+//        count++;
         if ( count++ === 100 ) s.destroy();
 
         var b = this.PhysicalCircle.create({
           radius: 3,
           x: this.width * Math.random(),
           y: this.height/this.scaleY,
-          borderWidth: 1,
           arcWidth: 1, // TODO
           border: 'blue',
           mass: 0.3
