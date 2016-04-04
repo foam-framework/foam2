@@ -654,7 +654,7 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange(name, oldValue, newValue);
+          this.pubPropertyChange(name, oldValue, newValue, slotName);
 
           // TODO(maybe): pub to a global topic to support dynamic()
 
@@ -1030,9 +1030,9 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function pubPropertyChange(name, oldValue, newValue) {
+    function pubPropertyChange(name, oldValue, newValue, opt_slotName) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.slot(name);
+        var dyn = this.slot(name, opt_slotName);
         dyn.setPrev(oldValue);
         this.pub('propertyChange', name, dyn);
       }
