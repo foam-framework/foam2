@@ -302,8 +302,8 @@ foam.CLASS({
     },
 
     function select(sink, options) {
-      sink = sink || this.ArraySink.create();
-      sink = this.decorateSink_(sink, options);
+      var resultSink = sink || this.ArraySink.create();
+      sink = this.decorateSink_(resultSink, options);
 
       var fc = this.FlowControl.create();
       var self = this;
@@ -326,7 +326,7 @@ foam.CLASS({
 
             if (!cursor) {
               sink.eof && sink.eof();
-              resolve(sink);
+              resolve(resultSink);
               return;
             }
 

@@ -92,7 +92,9 @@ describe('ArrayDAO', function() {
 if ( foam.dao.IDBDAO ) {
   describe('IDBDAO', function() {
     genericDAOTestBattery(function(model) {
-      return foam.dao.IDBDAO.create({ of: model });
+      var dao = foam.dao.IDBDAO.create({ of: model });
+      dao.removeAll(); // TODO: not async enough
+      return dao;
     });
   });
 }
