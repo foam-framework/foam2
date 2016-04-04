@@ -411,7 +411,8 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined' || this.instance_.hasOwnProperty(name);
+      return typeof this.instance_[name] !== 'undefined' ||
+          this.instance_.hasOwnProperty(name);
     },
 
     /**
@@ -626,9 +627,8 @@ foam.CLASS({
                  this.setPrivate_(name, eFactory.call(this)) ;
         } :
         hasValue ? function valueGetter() {
-          return this.hasOwnProperty(name) ?
-            this.instance_[name] :
-            value ;
+          var v = this.instance_[name];
+          return typeof v !== 'undefined' || this.instance_.hasOwnProperty(name) ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
