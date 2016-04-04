@@ -21,7 +21,7 @@ describe('pattern.Pooled', function() {
       test.PooledClass.create({ a: 3, b: 4 }),
       test.PooledClass.create({ a: 5, b: 6 }),
     ];
-    expect(foam.__objectPools__[test.PooledClass].length).toEqual(0);
+    expect(test.PooledClass.__objectPool__.length).toEqual(0);
   });
 
   it('returns destroyed instances to the pool', function() {
@@ -31,12 +31,12 @@ describe('pattern.Pooled', function() {
       test.PooledClass.create({ a: 3, b: 4 }),
       test.PooledClass.create({ a: 5, b: 6 }),
     ];
-    expect(foam.__objectPools__[test.PooledClass].length).toEqual(0);
+    expect(test.PooledClass.__objectPool__.length).toEqual(0);
 
     instances.forEach(function(inst) {
       inst.destroy();
     });
-    expect(foam.__objectPools__[test.PooledClass].length).toEqual(instances.length);
+    expect(test.PooledClass.__objectPool__.length).toEqual(instances.length);
   });
 
   it('eliminates the contents of destroyed objects', function() {

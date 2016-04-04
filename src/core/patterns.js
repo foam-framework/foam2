@@ -74,15 +74,17 @@ foam.CLASS({
     function installInClass(cls) {
       // Keeping the object pools in an accessible location allows them
       // to be cleared out.
-      if ( ! foam.__objectPools__ ) { foam.__objectPools__ = {}; }
-      var pool = foam.__objectPools__[cls];
-      if ( ! pool ) {
-        pool = foam.__objectPools__[cls] = [];
+      if ( ! foam.__pooledClasses__ ) { foam.__pooledClasses__ = []; }
+      foam.__pooledClasses__.push(this);
+
+      if ( ! cls.__objectPool__ ) {
+        cls.__objectPool__ = [];
       }
 
       var oldCreate = cls.create;
       cls.create = function(args, X) {
         var nu;
+        var pool = this.__objectPool__;
         // Pull from the pool, run the usual init process that .create() would
         // do. TODO: Alter create to accept the base object so we don't duplicate
         // this init code?
@@ -115,7 +117,7 @@ foam.CLASS({
           this.private_ = priv_;
 
           // put the empty husk into the pool
-          pool.push(this);
+          this.cls_.__objectPool__.push(this);
         }
       }));
 
