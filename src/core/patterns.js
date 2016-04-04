@@ -68,6 +68,8 @@ foam.CLASS({
   name: 'Pooled',
   axioms: [ foam.pattern.Singleton.create() ],
 
+  requires: [ 'foam.core.Method' ],
+
   methods: [
     function installInClass(cls) {
       // Keeping the object pools in an accessible location allows them
@@ -95,25 +97,28 @@ foam.CLASS({
         return nu;
       }
 
-      var oldDestroy = cls.prototype.destroy;
-      cls.prototype.destroy = function() {
-        if ( this.destroyed ) return;
+      cls.installAxiom(this.Method.create({
+        name: 'destroy',
+        code: function() {
+          if ( this.destroyed ) return;
 
-        // Run destroy process on the object, but leave its privates empty but intact
-        // to avoid reallocating them
-        var inst_ = this.instance_;
-        var priv_ = this.private_;
+          // Run destroy process on the object, but leave its privates empty but intact
+          // to avoid reallocating them
+          var inst_ = this.instance_;
+          var priv_ = this.private_;
 
-        oldDestroy.apply(this, arguments);
+          this.SUPER.apply(this, arguments);
 
-        for ( var ikey in inst_ ) { delete inst_[ikey]; }
-        for ( var pkey in priv_ ) { delete priv_[pkey]; }
-        this.instance_ = inst_;
-        this.private_ = priv_;
+          for ( var ikey in inst_ ) { delete inst_[ikey]; }
+          for ( var pkey in priv_ ) { delete priv_[pkey]; }
+          this.instance_ = inst_;
+          this.private_ = priv_;
 
-        // put the empty husk into the pool
-        pool.push(this);
-      }
+          // put the empty husk into the pool
+          pool.push(this);
+        }
+      }));
+
     },
   ]
 });
