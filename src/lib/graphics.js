@@ -286,7 +286,7 @@ foam.CLASS({
   methods: [
     function initCView() {
       this.propertyChange.sub(function() {
-        this.invalidated.pub();
+        this.pub('invalidated');
       }.bind(this));
     },
 
@@ -356,7 +356,11 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onChildUpdate() { this.invalidated.pub(); }
+    {
+      name: 'onChildUpdate',
+      isFramed: true,
+      code: function onChildUpdate() { this.pub('invalidated'); }
+    }
   ]
 });
 
