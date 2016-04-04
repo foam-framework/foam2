@@ -337,8 +337,10 @@ foam.CLASS({
     },
 
     function addChildren() {
-      for ( var i = 0 ; i < arguments.length ; i++ )
+      for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
+        this.addChild_(arguments[i]);
+      }
     },
 
     function paintSelf(x) {},
