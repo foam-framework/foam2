@@ -285,9 +285,11 @@ foam.CLASS({
 
   methods: [
     function initCView() {
+/*
       this.propertyChange.sub(function() {
         this.pub('invalidated');
       }.bind(this));
+*/
     },
 
     function maybeInitCView() {
@@ -339,7 +341,7 @@ foam.CLASS({
     function addChildren() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
-        this.addChild_(arguments[i]);
+        // this.addChild_(arguments[i]);
       }
     },
 
