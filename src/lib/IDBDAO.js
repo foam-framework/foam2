@@ -56,7 +56,8 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'indicies'
+      name: 'indicies',
+      factory: function() { return []; }
     }
   ],
 
@@ -156,76 +157,91 @@ foam.CLASS({
     },
 
     function withStore_(mode, fn) {
-      if ( GLOBAL.__TXN__ && GLOBAL.__TXN__.store ) {
+      if ( global.__TXN__ && global.__TXN__.store ) {
         try {
           fn.call(this, __TXN__.store);
           return;
         } catch (x) {
-          GLOBAL.__TXN__ = undefined;
+          global.__TXN__ = undefined;
         }
       }
       this.withDB((function (db) {
         var tx = db.transaction([this.name], mode);
         var os = tx.objectStore(this.name);
-        if ( GLOBAL.__TXN__ ) GLOBAL.__TXN__.store = os;
+        if ( global.__TXN__ ) global.__TXN__.store = os;
         fn.call(this, os);
       }).bind(this));
     },
 
     function put(value, sink) {
       var self = this;
-      this.withStore("readwrite", function(store) {
-        var request = store.put(self.serialize(value),
-                                value.id);
-
-        request.transaction.addEventListener(
-          'complete',
-          function(e) {
-            self.notify_('put', [value]);
-            sink && sink.put && sink.put(value);
-          });
-        request.transaction.addEventListener(
-          'error',
-          function(e) {
-            // TODO: Parse a better error mesage out of e
-            sink && sink.error && sink.error('put', value);
-          });
+      var p = new Promise(function(resolve, reject) {
+        self.withStore("readwrite", function(store) {
+          var request = store.put(self.serialize(value), value.id);
+          request.transaction.addEventListener(
+            'complete',
+            function(e) {
+              self.notify_('put', [value]);
+              sink && sink.put && sink.put(value);
+              resolve(sink);
+            });
+          request.transaction.addEventListener(
+            'error',
+            function(e) {
+              sink && sink.error && sink.error('put', value, e); // TODO: err message
+              reject(e);
+            });
+        });
       });
+      return p;
     },
 
     function find(key, sink) {
+      var self = this;
+
       if ( Expr.isInstance(key) ) {
         var found = false;
-        this.limit(1).where(key).select({
-          put: function() {
-            found = true;
-            sink.put.apply(sink, arguments);
-          },
-          eof: function() {
-            found || sink.error('find', key);
-          }
-        });
-        return;
-      }
-
-      var self = this;
-      this.withStore("readonly", function(store) {
-        var request = store.get(key);
-        request.transaction.addEventListener(
-          'complete',
-          function() {
-            if (!request.result) {
-              sink && sink.error && sink.error('find', key);
-              return;
+        var p = new Promise(function(resolve, reject) {
+          self.limit(1).where(key).select({
+            put: function(obj) {
+              found = true;
+              sink.put.apply(sink, arguments);
+              resolve(obj);
+            },
+            eof: function() {
+              if ( ! found ) {
+                sink.error('find', key);
+                reject(key); // TODO: err message
+              }
             }
-            var result = self.deserialize(request.result);
-            sink && sink.put && sink.put(result);
           });
-        request.onerror = function(e) {
-          // TODO: Parse a better error out of e
-          sink && sink.error && sink.error('find', key);
-        };
-      });
+        });
+        return p;
+      } else {
+        var p = new Promise(function(resolve, reject) {
+          self.withStore("readonly", function(store) {
+            var request = store.get(key);
+            request.transaction.addEventListener(
+              'complete',
+              function() {
+                if (!request.result) {
+                  sink && sink.error && sink.error('find', key);
+                  reject(key); // TODO: err message
+                  return;
+                }
+                var result = self.deserialize(request.result);
+                sink && sink.put && sink.put(result);
+                resolve(result);
+              });
+            request.onerror = function(e) {
+              // TODO: Parse a better error out of e
+              sink && sink.error && sink.error('find', key);
+              reject(e); // TODO: err message
+            };
+          });
+          return p;
+        });
+      }
     },
 
     function remove(obj, sink) {
@@ -261,56 +277,59 @@ foam.CLASS({
       var query = (options && options.query && options.query.partialEval()) ||
         {  f: function() { return true; } };
 
-      var future = afuture();
       var self = this;
-
 
       // If the caller doesn't care to see the objects as they get removed,
       // then just nuke them in one go.
       if ( ! options && ! ( sink && sink.remove ) ) {
-        this.withStore('readwrite', function(store) {
-          var req = store.clear();
-          req.onsuccess = function() {
-            future.set();
-          };
-          req.onerror = function() {
-            future.set();
-          };
+        var p = new Promise(function(resolve, reject) {
+          self.withStore('readwrite', function(store) {
+            var req = store.clear();
+            req.onsuccess = function() {
+              resolve(sink || '');
+            };
+            req.onerror = function() {
+              reject(arguments);
+            };
+          });
         });
-        return future.get;
+        return p;
+      } else {
+        // send items to the sink and remove one by one
+        var p = new Promise(function(resolve, reject) {
+          self.withStore('readwrite', function(store) {
+            var request = store.openCursor();
+            request.onsuccess = function(e) {
+              var cursor = e.target.result;
+              if (cursor) {
+                var value = self.deserialize(cursor.value);
+                if (query.f(value)) {
+                  var deleteReq = cursor.delete();
+                  deleteReq.transaction.addEventListener(
+                    'complete',
+                    function() {
+                      self.notify_('remove', [value]);
+                      sink && sink.remove && sink.remove(value);
+                    });
+                  deleteReq.onerror = function(e) {
+                    sink && sink.error && sink.error('remove', e);
+                  };
+                }
+                cursor.continue();
+              }
+            };
+            request.transaction.oncomplete = function() {
+              sink && sink.eof && sink.eof();
+              resolve(sink);
+            };
+            request.onerror = function(e) {
+              sink && sink.error && sink.error('remove', e);
+              reject(e); // TODO: err message
+            };
+          });
+        });
+        return p;
       }
-
-
-      this.withStore('readwrite', function(store) {
-        var request = store.openCursor();
-        request.onsuccess = function(e) {
-          var cursor = e.target.result;
-          if (cursor) {
-            var value = self.deserialize(cursor.value);
-            if (query.f(value)) {
-              var deleteReq = cursor.delete();
-              deleteReq.transaction.addEventListener(
-                'complete',
-                function() {
-                  self.notify_('remove', [value]);
-                  sink && sink.remove && sink.remove(value);
-                });
-              deleteReq.onerror = function(e) {
-                sink && sink.error && sink.error('remove', e);
-              };
-            }
-            cursor.continue();
-          }
-        };
-        request.transaction.oncomplete = function() {
-          sink && sink.eof && sink.eof();
-          future.set(sink);
-        };
-        request.onerror = function(e) {
-          sink && sink.error && sink.error('remove', e);
-        };
-      });
-      return future.get;
     },
 
     function select(sink, options) {
