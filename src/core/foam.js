@@ -78,9 +78,9 @@
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
     "../lib/mlang",
-    ["../lib/Physical", ! isServer ],
-    ["../lib/Collider", ! isServer ],
-    ["../lib/PhysicsEngine", ! isServer ],
+    "../lib/Physical",
+    "../lib/Collider",
+    "../lib/PhysicsEngine",
     ["../lib/PhysicalCircle", ! isServer ],
     [ "../lib/node/json_dao", isServer ]
   ].
