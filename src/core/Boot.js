@@ -411,8 +411,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined' ||
-        Object.hasOwnProperty.call(this.instance_, name);
+      return typeof this.instance_[name] !== 'undefined' || this.instance_.hasOwnProperty(name);
     },
 
     /**
@@ -588,18 +587,18 @@ foam.CLASS({
       (Property is 'this').
     */
     function installInProto(proto) {
-      var prop            = this;
-      var name            = this.name;
-      var adapt           = this.adapt
-      var preSet          = this.preSet;
-      var postSet         = this.postSet;
-      var factory         = this.factory;
+      var prop     = this;
+      var name     = this.name;
+      var adapt    = this.adapt
+      var preSet   = this.preSet;
+      var postSet  = this.postSet;
+      var factory  = this.factory;
       // This doesn't let value to be 'undefined', which is maybe not bad.
-      var hasDefaultValue = typeof this.value !== 'undefined';
       var value    = this.value;
-      var slotName        = name + '$';
-      var isFinal         = this.final;
-      var eFactory        = this.exprFactory(this.expression);
+      var hasValue = typeof value !== 'undefined';
+      var slotName = name + '$';
+      var isFinal  = this.final;
+      var eFactory = this.exprFactory(this.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
@@ -626,7 +625,7 @@ foam.CLASS({
                  this.hasOwnPrivate_(name) ? this.getPrivate_(name) :
                  this.setPrivate_(name, eFactory.call(this)) ;
         } :
-        hasDefaultValue ? function valueGetter() {
+        hasValue ? function valueGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
             value ;
@@ -683,7 +682,6 @@ foam.CLASS({
       var name = this.name;
 
       return function() {
-//        console.log('name: ', name, e);
         var self = this;
         var args = new Array(argNames.length);
         var subs = [];
@@ -937,10 +935,20 @@ foam.CLASS({
       Publish a message to all matching subd listeners.
       Returns the number of listeners notified.
     */
-    function pub() {
-      // This method isn't JIT-ed because of the use of 'arguments',
-      // So we move all of the code to pub_() so that it is JIT-ed.
-      return this.pub_(arguments);
+    function pub(a1, a2, a3, a4, a5, a6, a7) {
+      // This method prevents this function not being JIT-ed because
+      // of the use of 'arguments'.  Doesn't generate any garbage.
+      switch ( arguments.length ) {
+        case 0: return this.pub_();
+        case 1: return this.pub_([a1]);
+        case 2: return this.pub_([a1, a2]);
+        case 3: return this.pub_([a1, a2, a3]);
+        case 4: return this.pub_([a1, a2, a3, a4]);
+        case 5: return this.pub_([a1, a2, a3, a4, a5]);
+        case 6: return this.pub_([a1, a2, a3, a4, a5, a6]);
+        case 7: return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
+      }
+      console.error('pub() takes at most 7 arguments.');
     },
 
     function pub_(args) {
@@ -1405,9 +1413,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          pub: parent.pub.bind(parent, name),
-          sub: parent.sub.bind(parent, name),
-          unsub: parent.unsub.bind(parent, name),
+          pub:   foam.bind(parent.pub,   parent, name),
+          sub:   foam.bind(parent.sub,   parent, name),
+          unsub: foam.bind(parent.unsub, parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 
