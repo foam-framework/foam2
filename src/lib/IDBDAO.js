@@ -22,6 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.FlowControl',
+    'foam.dao.ArraySink',
   ],
 
   imports: [
@@ -54,6 +55,10 @@ foam.CLASS({
     {
       name: 'indicies',
       factory: function() { return []; }
+    },
+    {
+      /** @internal */
+      name: 'propKeys_'
     }
   ],
 
@@ -69,7 +74,7 @@ foam.CLASS({
         if ( prop.shortName ) propKeys[prop.shortName] = prop.name;
       }
 
-      this.withDB = foam.fn.memoize1(this.openDB.bind(this));
+      //this.withDB = this.openDB;
     },
 
     function deserialize(json) {
@@ -135,7 +140,7 @@ foam.CLASS({
           global.__TXN__ = undefined;
         }
       }
-      this.withDB((function (db) {
+      this.openDB((function (db) { // TODO: memoize like in foam1
         var tx = db.transaction([this.name], mode);
         var os = tx.objectStore(this.name);
         if ( global.__TXN__ ) global.__TXN__.store = os;
@@ -151,7 +156,7 @@ foam.CLASS({
           request.transaction.addEventListener(
             'complete',
             function(e) {
-              self.pub('put', [value]);
+              self.pub('on','put', value);
               sink && sink.put && sink.put(value);
               resolve(sink || value);
             });
@@ -168,7 +173,7 @@ foam.CLASS({
     function find(key) {
       var self = this;
 
-      if ( Expr.isInstance(key) ) {
+      if ( foam.mlang.predicate.Expr.isInstance(key) ) {
         var found = false;
         return new Promise(function(resolve, reject) {
           self.limit(1).where(key).select({
@@ -191,17 +196,14 @@ foam.CLASS({
               'complete',
               function() {
                 if (!request.result) {
-                  sink && sink.error && sink.error('find', key);
                   reject(key); // TODO: err message
                   return;
                 }
                 var result = self.deserialize(request.result);
-                sink && sink.put && sink.put(result);
                 resolve(result);
               });
             request.onerror = function(e) {
               // TODO: Parse a better error out of e
-              sink && sink.error && sink.error('find', key);
               reject(e); // TODO: err message
             };
           });
@@ -224,7 +226,7 @@ foam.CLASS({
             var data = self.deserialize(getRequest.result);
             var delRequest = store.delete(key);
             delRequest.transaction.addEventListener('complete', function(e) {
-              self.pub('remove', [data]);
+              self.pub('on','remove', data);
               sink && sink.remove && sink.remove(data);
               resolve(sink || data);
             });
@@ -276,7 +278,7 @@ foam.CLASS({
                   deleteReq.transaction.addEventListener(
                     'complete',
                     function() {
-                      self.pub('remove', [value]);
+                      self.pub('on','remove', value);
                       sink && sink.remove && sink.remove(value);
                     });
                   deleteReq.onerror = function(e) {
@@ -345,15 +347,5 @@ foam.CLASS({
       return this;
     }
   ],
-
-  listeners: [
-    {
-      name: 'updated',
-      code: function(evt) {
-        console.log('updated: ', evt);
-        this.publish('updated');
-      }
-    }
-  ]
 
 });
