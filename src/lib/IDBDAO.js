@@ -52,10 +52,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'useSimpleSerialization',
-      value: true
-    },
-    {
       name: 'indicies',
       factory: function() { return []; }
     }
@@ -73,30 +69,14 @@ foam.CLASS({
         if ( prop.shortName ) propKeys[prop.shortName] = prop.name;
       }
 
-      if ( this.useSimpleSerialization ) {
-        this.serialize = this.SimpleSerialize;
-        this.deserialize = this.SimpleDeserialize;
-      } else {
-        this.serialize = this.FOAMSerialize;
-        this.deserialize = this.FOAMDeserialize;
-      }
-
       this.withDB = foam.fn.memoize1(this.openDB.bind(this));
     },
 
-    function FOAMDeserialize(json) {
+    function deserialize(json) {
       return foam.json.parse(foam.json.parseString(json)); //TODO: serialization
     },
 
-    function FOAMSerialize(obj) {
-      return foam.json.stringify(obj); //TODO: serialization
-    },
-
-    function SimpleDeserialize(json) {
-      return foam.json.parse(foam.json.parseString(json)); //TODO: serialization
-    },
-
-    function SimpleSerialize(obj) {
+    function serialize(obj) {
       return foam.json.stringify(obj); //TODO: serialization
     },
 
@@ -106,17 +86,18 @@ foam.CLASS({
         window.mozIndexedDB;
 
       var request = indexedDB.open("FOAM:" + this.name, 1);
+      var self = this;
 
       request.onupgradeneeded = (function(e) {
-        var store = e.target.result.createObjectStore(this.name);
-        for ( var i = 0; i < this.indicies.length; i++ ) {
-          store.createIndex(this.indicies[i][0], this.indicies[i][0], { unique: this.indicies[i][1] });
+        var store = e.target.result.createObjectStore(self.name);
+        for ( var i = 0; i < self.indicies.length; i++ ) {
+          store.createIndex(self.indicies[i][0], self.indicies[i][0], { unique: self.indicies[i][1] });
         }
-      }).bind(this);
+      })
 
       request.onsuccess = (function(e) {
         cc(e.target.result);
-      }).bind(this);
+      })
 
       request.onerror = function (e) {
         console.log('************** failure', e);
