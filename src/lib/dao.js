@@ -358,6 +358,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'SystemException',
+  extends: 'foam.dao.ExternalException',
+
+  properties: [
+    'id',
+    'error',
+    {
+      name: 'message',
+      expression: function(id, error) {
+        return "System Failure: " + id + ", " + ( error && error.toString() );
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.dao',

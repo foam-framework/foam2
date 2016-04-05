@@ -15,6 +15,26 @@
  * limitations under the License.
  */
 
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'IDBException',
+  extends: 'foam.dao.ExternalException',
+
+  properties: [
+    'id',
+    'error',
+    {
+      name: 'message',
+      expression: function(id, error) {
+        return "IndexedDB Error for " + id +
+          ( error ? ": " + error.toString() : "" );
+      }
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'IDBDAO',
@@ -23,6 +43,7 @@ foam.CLASS({
   requires: [
     'foam.dao.FlowControl',
     'foam.dao.ArraySink',
+    'foam.dao.IDBException',
   ],
 
   imports: [
@@ -164,7 +185,7 @@ foam.CLASS({
             'error',
             function(e) {
               sink && sink.error && sink.error('put', value, e); // TODO: err message
-              reject(e);
+              reject(self.IDBException.create({ id: value.id, error: e }));
             });
         });
       });
@@ -183,7 +204,7 @@ foam.CLASS({
             },
             eof: function() {
               if ( ! found ) {
-                reject(key); // TODO: err message
+                reject(self.ObjectNotFoundException.create({ id: key }));
               }
             },
           });
@@ -196,7 +217,7 @@ foam.CLASS({
               'complete',
               function() {
                 if (!request.result) {
-                  reject(key); // TODO: err message
+                  reject(self.ObjectNotFoundException.create({ id: key }));
                   return;
                 }
                 var result = self.deserialize(request.result);
@@ -220,7 +241,7 @@ foam.CLASS({
           getRequest.onsuccess = function(e) {
             if (!getRequest.result) {
               sink && sink.error && sink.error('remove', obj);
-              reject(obj); // TODO: err message
+              reject(self.ObjectNotFoundException.create({ id: key }));
               return;
             }
             var data = self.deserialize(getRequest.result);
@@ -233,12 +254,12 @@ foam.CLASS({
 
             delRequest.onerror = function(e) {
               sink && sink.error && sink.error('remove', e);
-              reject(e); // TODO: err message
+              reject(self.IDBException.create({ id: key, error: e }));
             };
           };
           getRequest.onerror = function(e) {
             sink && sink.error && sink.error('remove', e);
-            reject(e); // TODO: err message
+            reject(self.IDBException.create({ id: key, error: e }));
           };
         });
       });
@@ -259,8 +280,8 @@ foam.CLASS({
             req.onsuccess = function() {
               resolve(sink || '');
             };
-            req.onerror = function() {
-              reject(arguments);
+            req.onerror = function(e) {
+              reject(self.IDBException.create({ id: 'remove_all', error: e }));
             };
           });
         });
@@ -294,7 +315,7 @@ foam.CLASS({
             };
             request.onerror = function(e) {
               sink && sink.error && sink.error('remove', e);
-              reject(e); // TODO: err message
+              reject(self.IDBException.create({ id: 'remove_all', error: e }));
             };
           });
         });
@@ -335,7 +356,7 @@ foam.CLASS({
           };
           request.onerror = function(e) {
             sink.error && sink.error(e);
-            reject(e);  // TODO: err message
+            reject(self.IDBException.create({ id: 'select', error: e }));
           };
         });
       });
