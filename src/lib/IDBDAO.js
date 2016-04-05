@@ -61,6 +61,11 @@ foam.CLASS({
 //    data store.  Obviously this will get slow if you store large amounts
 //    of data in the database.
 //  */},
+  constants: {
+    /** Global cache of the current transaction reference. Only element 0 is used. */
+    __TXN__: [],
+  },
+
   properties: [
     {
       name:  'of',
@@ -153,20 +158,21 @@ foam.CLASS({
     },
 
     function withStore_(mode, fn) {
-      if ( global.__TXN__ && global.__TXN__.store ) {
+      var self = this;
+      if ( self.__TXN__[0] ) {
         try {
-          fn.call(this, __TXN__.store);
+          fn.call(self, self.__TXN__[0]);
           return;
         } catch (x) {
-          global.__TXN__ = undefined;
+          self.__TXN__[0] = undefined;
         }
       }
-      this.openDB((function (db) { // TODO: memoize like in foam1
-        var tx = db.transaction([this.name], mode);
-        var os = tx.objectStore(this.name);
-        if ( global.__TXN__ ) global.__TXN__.store = os;
-        fn.call(this, os);
-      }).bind(this));
+      self.openDB((function (db) { // TODO: memoize like in foam1
+        var tx = db.transaction([self.name], mode);
+        var os = tx.objectStore(self.name);
+        self.__TXN__[0] = os;
+        fn.call(self, os);
+      });
     },
 
     function put(value, sink) {
