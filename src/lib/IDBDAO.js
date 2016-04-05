@@ -317,21 +317,20 @@ foam.CLASS({
           }
           request.onsuccess = function(e) {
             var cursor = e.target.result;
-            if ( fc.stopped ) return;
             if ( fc.errorEvt ) {
               sink.error && sink.error(fc.errorEvt);
               reject(fc.errorEvt);
               return;
             }
 
-            if (!cursor) {
+            if ( ! cursor || fc.stopped ) {
               sink.eof && sink.eof();
               resolve(resultSink);
               return;
             }
 
             var value = self.deserialize(cursor.value);
-            sink.put(value);
+            sink.put(value, null, fc);
             cursor.continue();
           };
           request.onerror = function(e) {
