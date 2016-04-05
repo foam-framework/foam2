@@ -28,6 +28,7 @@ foam = {
     switch ( arguments.length ) {
       case 2: return function() { return f.apply(that, arguments); };
       case 3: return function(b1, b2, b3, b4) {
+        if ( ! arguments ) return f.call(that, a1);
         switch ( arguments.length ) {
           case 0: return f.call(that, a1);
           case 1: return f.call(that, a1, b1);
@@ -37,7 +38,7 @@ foam = {
         }
       };
       case 4: return function(b1, b2, b3, b4) {
-        if ( ! arguments ) return f.call(that, a1);
+        if ( ! arguments ) return f.call(that, a1, a2);
         switch ( arguments.length ) {
           case 0: return f.call(that, a1, a2);
           case 1: return f.call(that, a1, a2, b1);
@@ -47,6 +48,7 @@ foam = {
         }
       };
       case 5: return function(b1, b2, b3, b4) {
+        if ( ! arguments ) return f.call(that, a1, a2, a3);
         switch ( arguments.length ) {
           case 0: return f.call(that, a1, a2, a3);
           case 1: return f.call(that, a1, a2, a3, b1);
@@ -56,6 +58,7 @@ foam = {
         }
       };
       case 6: return function(b1, b2, b3, b4) {
+        if ( ! arguments ) return f.call(that, a1, a2, a3, a4);
         switch ( arguments.length ) {
           case 0: return f.call(that, a1, a2, a3, a4);
           case 1: return f.call(that, a1, a2, a3, a4, b1);
