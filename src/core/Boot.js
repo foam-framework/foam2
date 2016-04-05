@@ -938,9 +938,8 @@ foam.CLASS({
     function pub(a1, a2, a3, a4, a5, a6, a7) {
       // This method prevents this function not being JIT-ed because
       // of the use of 'arguments'.  Doesn't generate any garbage.
-      if ( ! arguments ) return this.pub_();
       switch ( arguments.length ) {
-        case 0: return this.pub_();
+        case 0: return this.pub_([]);
         case 1: return this.pub_([a1]);
         case 2: return this.pub_([a1, a2]);
         case 3: return this.pub_([a1, a2, a3]);
