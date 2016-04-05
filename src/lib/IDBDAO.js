@@ -167,7 +167,7 @@ foam.CLASS({
           self.__TXN__[0] = undefined;
         }
       }
-      self.openDB((function (db) { // TODO: memoize like in foam1
+      self.openDB(function (db) { // TODO: memoize like in foam1
         var tx = db.transaction([self.name], mode);
         var os = tx.objectStore(self.name);
         self.__TXN__[0] = os;
