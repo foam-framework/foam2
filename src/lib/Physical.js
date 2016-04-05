@@ -24,6 +24,8 @@ foam.CLASS({
   },
 
   properties: [
+    { class: 'Float', name: 'friction' },
+    { class: 'Float', name: 'gravity' },
     { class: 'Float', name: 'vx', value: 0 },
     { class: 'Float', name: 'vy', value: 0 },
     {
