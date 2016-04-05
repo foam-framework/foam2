@@ -61,15 +61,20 @@ foam.CLASS({
           });
           this.addChildren(c);
 
-          c.y$.sub(function(c) {
+          c.y$.sub(foam.bind(function(c) {
             if ( c.y > 1/this.scaleY*this.height+50 ) {
               c.y = -50;
             }
-          }.bind(this, c));
+          }, this, c));
+
+          // Bounce on Walls
+          c.x$.sub(foam.bind(function(c, w, h) {
+            if ( c.x < c.radius     ) c.vx =  Math.abs(c.vx)+0.1;
+            if ( c.x > w - c.radius ) c.vx = -Math.abs(c.vx)-0.1;
+          }, this, c, this.width, this.height));
 
           c.gravity = 0.03;
           c.friction = 0.96;
-          this.bounceOnWalls(c, this.width, this.height);
           this.engine.add(c);
         }
       }
@@ -77,7 +82,7 @@ foam.CLASS({
       var count = 0;
       this.timer.i$.sub(function(s) {
         this.invalidated.pub();
-        if ( count === 100 ) return;
+        if ( count === 101 ) return;
         count++;
 //        if ( count++ === 100 ) s.destroy();
 
@@ -90,12 +95,12 @@ foam.CLASS({
           mass: 0.3
         });
 
-        b.y$.sub(function() {
+        b.y$.sub(foam.bind(function() {
           if ( b.y < 1 ) {
             b.y = this.height;
             b.x = this.width * Math.random();
           }
-        }.bind(this));
+        }, this));
 
         b.vy = -4;
         b.gravity = -0.2;
@@ -104,17 +109,6 @@ foam.CLASS({
 
         this.addChildren(b);
       }.bind(this));
-    },
-
-    function bounceOnWalls(c, w, h) {
-      // TODO:
-      /*
-      Events.dynamicFn(function() { c.x; c.y; }, function() {
-        var r = c.r + c.borderWidth;
-        if ( c.x < r ) c.vx = Math.abs(c.vx);
-        if ( c.x > w - r ) c.vx = -Math.abs(c.vx);
-      });
-      */
     }
   ]
 });
