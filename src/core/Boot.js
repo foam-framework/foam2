@@ -1413,9 +1413,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          pub:   foam.bind(parent.pub,   parent, name),
-          sub:   foam.bind(parent.sub,   parent, name),
-          unsub: foam.bind(parent.unsub, parent, name),
+          pub:   foam.fn.bind(parent.pub,   parent, name),
+          sub:   foam.fn.bind(parent.sub,   parent, name),
+          unsub: foam.fn.bind(parent.unsub, parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 
