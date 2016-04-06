@@ -117,6 +117,7 @@ foam.LIB({
     */
     function create(args, X) {
       var obj = Object.create(this.prototype);
+      // TODO: comment
       obj.instance_ = {};
 
       obj.initArgs(args, X);
@@ -127,40 +128,11 @@ foam.LIB({
     },
 
     /**
-      This is a temporary version of installModel.
-      When the bootstrap is finished, it will be replaced by a version
-      that only knows how to install axioms.
-    */
-    function installModel(m) {
-      if ( m.methods )
-        for ( var i = 0 ; i < m.methods.length ; i++ ) {
-          var a = m.methods[i];
-          if ( typeof a === 'function' )
-            m.methods[i] = a = { name: a.name, code: a };
-          this.prototype[a.name] = a.code;
-        }
-
-      if ( foam.core.Property && m.properties )
-        for ( var i = 0 ; i < m.properties.length ; i++ ) {
-          var a = m.properties[i];
-
-          if ( Array.isArray(a) )
-            m.properties[i] = a = { name: a[0], value: a[1] };
-          else if ( typeof a === 'string' )
-            m.properties[i] = a = { name: a };
-
-          var type = foam.lookup(a.class) || foam.core.Property;
-          if ( type !== a.cls_ ) a = type.create(a);
-
-          this.installAxiom(a);
-        }
-    },
-
-    /**
       Install an Axiom into the class and prototype.
       Invalidate the axiom-cache, used by getAxiomsByName().
       -
-      Installs axioms into the protoype immediately, but in the future
+      TODO: wait for first object creation to create prototype
+      Installs axioms into the protoype immediately, but in the future (date)
       we will wait until the first object is created. This will provide
       better startup performance.
     */
@@ -169,6 +141,7 @@ foam.LIB({
       this.axiomCache_ = {};
 
       // Store the destination class in the Axiom.  Used by describe().
+      // TODO: assert sourceCls_ not already, or fix
       a.sourceCls_ = this;
 
       a.installInClass && a.installInClass(this);
@@ -187,6 +160,7 @@ foam.LIB({
     function isSubClass(c) {
       if ( ! c ) return false;
 
+      // TODO: better name
       var subClasses_ = this.hasOwnProperty('subClasses_') ?
         this.subClasses_ :
         this.subClasses_ = {} ;
@@ -207,8 +181,7 @@ foam.LIB({
       that are instances of the specified class.
     */
     function getAxiomsByClass(cls) {
-      // This method will eventually change.
-      // Would like to have efficient support for:
+      // TODO: Would like to have efficient support for:
       //    .where() .orderBy() groupBy
       var as = this.axiomCache_[cls.name];
       if ( ! as ) {
@@ -245,7 +218,43 @@ foam.LIB({
       return as;
     },
 
-    function toString() { return this.name + 'Class'; }
+    function toString() { return this.name + 'Class'; },
+
+    // TODO: convention, move temporary methods to end
+    /**
+      This is a temporary version of installModel.
+      When the bootstrap is finished, it will be replaced by a version
+      that only knows how to install axioms.
+TODO: explain bootstrap process
+    */
+    /* temporary */ function installModel(m) {
+      if ( m.methods ) {
+        for ( var i = 0 ; i < m.methods.length ; i++ ) {
+          var a = m.methods[i];
+          // TODO: get rid of long-form
+          if ( typeof a === 'function' )
+            m.methods[i] = a = { name: a.name, code: a };
+          this.prototype[a.name] = a.code;
+        }
+      }
+
+      if ( foam.core.Property && m.properties ) {
+        for ( var i = 0 ; i < m.properties.length ; i++ ) {
+          var a = m.properties[i];
+
+          if ( Array.isArray(a) )
+            m.properties[i] = a = { name: a[0], value: a[1] };
+          else if ( typeof a === 'string' )
+            m.properties[i] = a = { name: a };
+
+          // TODO: doc
+          var type = foam.lookup(a.class) || foam.core.Property;
+          if ( type !== a.cls_ ) a = type.create(a);
+
+          this.installAxiom(a);
+        }
+      }
+    }
   ]
 });
 
@@ -269,8 +278,8 @@ foam.LIB({
     function start() {
       /* Start the bootstrap process. */
 
-      // Will be replaced in phase2.
       var getClass = this.getClass;
+      // Will be replaced in phase2.
       foam.CLASS = function(m) { return getClass.call(m); };
     },
 
@@ -304,6 +313,7 @@ foam.LIB({
         cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.axiomCache_      = {};
+        // TODO: define 'id' in Model and FObject, then remove this
         cls.id               = this.id ||
           ( this.package ? this.package + '.' + this.name : this.name );
         cls.package          = this.package;
@@ -467,6 +477,7 @@ foam.CLASS({
     },
     'package',
     'name',
+    // TODO: correct?
     { name: 'label', expression: foam.string.labelize },
     [ 'extends', 'FObject' ],
     'refines',
@@ -782,6 +793,7 @@ foam.CLASS({
     */
     function override_(proto, method) {
       var super_ = proto[this.name];
+      // TODO: assert type
 
       // Not overriding, or not using SUPER, so just return original method
       if ( ! super_ || method.toString().indexOf('SUPER') == -1 ) return method;
