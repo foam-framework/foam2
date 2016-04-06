@@ -117,7 +117,12 @@ foam.LIB({
     */
     function create(args, X) {
       var obj = Object.create(this.prototype);
-      // TODO: comment
+
+      // Properties have their values stored in instance_ instead
+      // of on the object directly. This lets us defineProperty on
+      // the object itself so that we can add extra behaviour
+      // to properties (things like preSet, postSet, firing property-
+      // change events, etc.).
       obj.instance_ = {};
 
       obj.initArgs(args, X);
@@ -141,7 +146,7 @@ foam.LIB({
       this.axiomCache_ = {};
 
       // Store the destination class in the Axiom.  Used by describe().
-      // TODO: assert sourceCls_ not already, or fix
+      // TODO: assert sourceCls_ not already set, or fix
       a.sourceCls_ = this;
 
       a.installInClass && a.installInClass(this);
