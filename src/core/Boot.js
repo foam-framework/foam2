@@ -167,15 +167,15 @@ foam.LIB({
     function isSubClass(c) {
       if ( ! c ) return false;
 
-      // TODO: better name
-      var subClasses_ = this.hasOwnProperty('subClasses_') ?
-        this.subClasses_ :
-        this.subClasses_ = {} ;
+      var cache = this.private_.isSubClassCache ||
+        ( this.private_.isSubClassCache = {} );
 
-      if ( ! subClasses_.hasOwnProperty(c.id) )
-        subClasses_[c.id] = ( c === this.prototype.cls_ ) || this.isSubClass(c.__proto__);
+      if ( cache[c.id] === undefined ) {
+        cache[c.id] = ( c === this.prototype.cls_ ) ||
+          this.isSubClass(c.__proto__);
+      }
 
-      return subClasses_[c.id];
+      return cache[c.id];
     },
 
     /** Find an axiom by the specified name from either this class or an ancestor. */
@@ -317,6 +317,7 @@ foam.LIB({
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
         cls.prototype.ID__   = this.name + 'Prototype';
+        cls.private_         = {};
         cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.axiomCache_      = {};
