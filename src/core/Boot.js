@@ -100,11 +100,11 @@
 
 */
 
+
 /**
-  Collection of classes to be repaired/upgraded later.
-  This is needed because they're built before the full
-  class/model infrastructure is finished, so they're lacking
-  features.
+ Bootstrap support.
+
+ Is discarded after use.
 */
 foam.LIB({
   name: 'boot',
@@ -113,19 +113,13 @@ foam.LIB({
     startTime: Date.now(),
   },
 
-  // documentation: 'Bootstrap support, discarded after use.',
-
   methods: [
-    function start() {
-      /* Start the bootstrap process. */
-
-      var getClass = this.getClass;
-      // Will be replaced in phase2.
-      foam.CLASS = function(m) { return getClass.call(m); };
-    },
-
     /**
       Create or Update a Prototype from a Model definition.
+
+      This will be added as a method on the Model class
+      when it is eventually built.
+
       (Model is 'this').
     */
     function getClass() {
@@ -170,6 +164,15 @@ foam.LIB({
       cls.installModel(this);
 
       return cls;
+    },
+
+    function start() {
+      /* Start the bootstrap process. */
+
+      var getClass = this.getClass;
+
+      // Will be replaced in phase2.
+      foam.CLASS = function(m) { return getClass.call(m); };
     },
 
     /** Start second phase of bootstrap process. */
