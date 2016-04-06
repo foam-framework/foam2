@@ -316,9 +316,9 @@ foam.LIB({
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
-        cls.prototype.ID__   = this.name + 'Prototype';
+        cls.prototype.ID__   = this.id + 'Prototype';
+        cls.ID__             = this.id + 'Class';
         cls.private_         = { axiomCache: {} };
-        cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         // TODO: define 'id' in Model and FObject, then remove this
         cls.id               = this.id ||
