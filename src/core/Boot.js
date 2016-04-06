@@ -142,12 +142,14 @@ foam.LIB({
       better startup performance.
     */
     function installAxiom(a) {
+      // Store the destination class in the Axiom.  Used by describe().
+      // Store source class on a clone of 'a' so that the Axiom can be
+      // reused without corrupting the sourceCls_.
+      a = Object.create(a);
+      a.sourceCls_ = this;
+
       this.axiomMap_[a.name] = a;
       this.axiomCache_ = {};
-
-      // Store the destination class in the Axiom.  Used by describe().
-      // TODO: assert sourceCls_ not already set, or fix
-      a.sourceCls_ = this;
 
       a.installInClass && a.installInClass(this);
       a.installInProto && a.installInProto(this.prototype);
