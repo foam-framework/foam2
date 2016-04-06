@@ -149,7 +149,7 @@ foam.LIB({
       a.sourceCls_ = this;
 
       this.axiomMap_[a.name] = a;
-      this.axiomCache_ = {};
+      this.private_.axiomCache = {};
 
       a.installInClass && a.installInClass(this);
       a.installInProto && a.installInProto(this.prototype);
@@ -190,7 +190,7 @@ foam.LIB({
     function getAxiomsByClass(cls) {
       // TODO: Would like to have efficient support for:
       //    .where() .orderBy() groupBy
-      var as = this.axiomCache_[cls.name];
+      var as = this.private_.axiomCache[cls.name];
       if ( ! as ) {
         as = [];
         for ( var key in this.axiomMap_ ) {
@@ -198,7 +198,7 @@ foam.LIB({
           if ( cls.isInstance(a) )
             as.push(a);
         }
-        this.axiomCache_[cls.name] = as;
+        this.private_.axiomCache[cls.name] = as;
       }
 
       return as;
@@ -215,12 +215,12 @@ foam.LIB({
     /** Returns all axioms defined on this class or its parent classes. */
     function getAxioms() {
       // The full axiom list is stored in the regular cache with '' as a key.
-      var as = this.axiomCache_[''];
+      var as = this.private_.axiomCache[''];
       if ( ! as ) {
         as = [];
         for ( var key in this.axiomMap_ )
           as.push(this.axiomMap_[key]);
-        this.axiomCache_[''] = as;
+        this.private_.axiomCache[''] = as;
       }
       return as;
     },
@@ -317,10 +317,9 @@ foam.LIB({
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
         cls.prototype.ID__   = this.name + 'Prototype';
-        cls.private_         = {};
+        cls.private_         = { axiomCache: {} };
         cls.ID__             = this.name + 'Class';
         cls.axiomMap_        = Object.create(parent.axiomMap_);
-        cls.axiomCache_      = {};
         // TODO: define 'id' in Model and FObject, then remove this
         cls.id               = this.id ||
           ( this.package ? this.package + '.' + this.name : this.name );
@@ -362,7 +361,7 @@ foam.LIB({
     function phase3() {
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
-        this.axiomCache_ = {};
+        this.private_.axiomCache = {};
 
         // Install Axioms in first pass so that they're available in the second-pass
         // when axioms are actually run.  This avoids some ordering issues.
