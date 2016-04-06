@@ -114,26 +114,6 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      it('should return a Promise for the sink, if a sink is provided', function(done) {
-        daoFactory(test.dao.generic.Person).then(function(dao) {
-          var p = mkPerson1();
-          var sinkCalled = false;
-          var sink = {
-            put: function(p2) {
-              sinkCalled = true;
-              expect(p2).toBeDefined();
-              expect(p2.id).toBe(p.id);
-            }
-          };
-
-          dao.put(p, sink).then(function(s) {
-            expect(s).toBe(sink);
-            expect(sinkCalled).toBe(true);
-            done();
-          });
-        });
-      });
-
       it('should pub on.put with the object', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();

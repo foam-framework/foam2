@@ -19,7 +19,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'IDBException',
-  extends: 'foam.dao.ExternalException',
+  extends: 'foam.dao.InternalException',
 
   properties: [
     'id',
@@ -175,7 +175,7 @@ foam.CLASS({
       });
     },
 
-    function put(value, sink) {
+    function put(value) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
@@ -184,13 +184,11 @@ foam.CLASS({
             'complete',
             function(e) {
               self.pub('on','put', value);
-              sink && sink.put && sink.put(value);
-              resolve(sink || value);
+              resolve(value);
             });
           request.transaction.addEventListener(
             'error',
             function(e) {
-              sink && sink.error && sink.error('put', value, e); // TODO: err message
               reject(self.IDBException.create({ id: value.id, error: e }));
             });
         });
@@ -238,7 +236,7 @@ foam.CLASS({
       }
     },
 
-    function remove(obj, sink) {
+    function remove(obj) {
       var self = this;
       var key = obj.id != undefined ? obj.id : obj;
       return new Promise(function(resolve, reject) {
@@ -246,25 +244,20 @@ foam.CLASS({
           var getRequest = store.get(key);
           getRequest.onsuccess = function(e) {
             if (!getRequest.result) {
-              sink && sink.error && sink.error('remove', obj);
-              reject(self.ObjectNotFoundException.create({ id: key }));
-              return;
+              resolve(null); // not found? as good as removed!
             }
             var data = self.deserialize(getRequest.result);
             var delRequest = store.delete(key);
             delRequest.transaction.addEventListener('complete', function(e) {
               self.pub('on','remove', data);
-              sink && sink.remove && sink.remove(data);
-              resolve(sink || data);
+              resolve(data);
             });
 
             delRequest.onerror = function(e) {
-              sink && sink.error && sink.error('remove', e);
               reject(self.IDBException.create({ id: key, error: e }));
             };
           };
           getRequest.onerror = function(e) {
-            sink && sink.error && sink.error('remove', e);
             reject(self.IDBException.create({ id: key, error: e }));
           };
         });
