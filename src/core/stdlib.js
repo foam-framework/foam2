@@ -24,6 +24,50 @@ foam = {
   Array:    Array.prototype,
   Function: Function.prototype,
   Number:   Number.prototype,
+  typeLib:  function(o) {
+    if ( o === null ) return foam.types.Null;
+    if ( o === undefined ) return foam.types.Undefined;
+    if ( o === true ) return foam.types.True;
+    if ( o === false ) return foam.types.False;
+    if ( typeof o === 'number' ) return foam.types.Number;
+    if ( typeof o === 'string' ) return foam.types.String;
+    if ( Array.isArray(o) ) return foam.types.Array;
+    if ( o instanceof Date ) return foam.types.Date;
+  },
+  types: {
+    Null: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    Undefined: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    True: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    False: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    Number: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    String: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    Array: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    },
+    Date: {
+      equals:  function(_, o) { return o === null; },
+      compare: function(_, o) { return ; }
+    }
+  },
   bind: function(f, that, a1, a2, a3, a4) {
     switch ( arguments.length ) {
       case 2: return function() { return f.apply(that, arguments); };
