@@ -81,7 +81,7 @@ foam.CLASS({
       var count = 0;
       this.timer.i$.sub(function(s) {
         this.invalidated.pub();
-        if ( count === 101 ) return;
+        if ( count === 201 ) return;
         count++;
 //        if ( count++ === 100 ) s.destroy();
 
