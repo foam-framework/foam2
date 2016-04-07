@@ -137,8 +137,9 @@ foam.LIB({
           foam.lookup(this.extends) :
           foam.AbstractClass        ;
 
-        if ( ! parent )
+        if ( ! parent ) {
           console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
+        }
 
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
@@ -333,8 +334,7 @@ foam.LIB({
         as = [];
         for ( var key in this.axiomMap_ ) {
           var a = this.axiomMap_[key];
-          if ( cls.isInstance(a) )
-            as.push(a);
+          if ( cls.isInstance(a) ) as.push(a);
         }
         this.private_.axiomCache[cls.name] = as;
       }
@@ -356,8 +356,7 @@ foam.LIB({
       var as = this.private_.axiomCache[''];
       if ( ! as ) {
         as = [];
-        for ( var key in this.axiomMap_ )
-          as.push(this.axiomMap_[key]);
+        for ( var key in this.axiomMap_ ) as.push(this.axiomMap_[key]);
         this.private_.axiomCache[''] = as;
       }
       return as;
@@ -383,8 +382,9 @@ foam.LIB({
       if ( m.methods ) {
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
-          if ( typeof a === 'function' )
+          if ( typeof a === 'function' ) {
             m.methods[i] = a = { name: a.name, code: a };
+          }
           this.prototype[a.name] = a.code;
         }
       }
@@ -402,10 +402,11 @@ foam.LIB({
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
           var a = m.properties[i];
 
-          if ( Array.isArray(a) )
+          if ( Array.isArray(a) ) {
             m.properties[i] = a = { name: a[0], value: a[1] };
-          else if ( typeof a === 'string' )
+          } else if ( typeof a === 'string' ) {
             m.properties[i] = a = { name: a };
+          }
 
           var type = foam.lookup(a.class) || foam.core.Property;
           if ( type !== a.cls_ ) a = type.create(a);
@@ -441,10 +442,11 @@ foam.CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      if ( args.originalArgs_ )
+      if ( args.originalArgs_ ) {
         args = args.originalArgs_;
-      else
+      } else {
         this.originalArgs_ = args;
+      }
 
       for ( var key in args ) this[key] = args[key];
     },
@@ -610,8 +612,9 @@ foam.CLASS({
         var a = this.cls_.getAxiomsByClass(foam.core.Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
-          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) )
+          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) ) {
             this[name] = superProp[name];
+          }
         }
       }
 
@@ -715,8 +718,9 @@ foam.CLASS({
 
     function validateInstance(o) {
       /* Validate an object which has this property. */
-      if ( this.required && ! o[this.name] )
+      if ( this.required && ! o[this.name] ) {
         throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
+      }
     },
 
     /** Create a factory function from an expression function. **/
@@ -735,8 +739,9 @@ foam.CLASS({
             delete self.private_[name];
             self.clearProperty(name); // TODO: this might be wrong
           }
-          for ( var i = 0 ; i < subs.length ; i++ )
+          for ( var i = 0 ; i < subs.length ; i++ ) {
             subs[i].destroy();
+          }
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           subs.push(this.sub('propertyChange', argNames[i], l));
@@ -1390,8 +1395,9 @@ foam.CLASS({
               if ( b[0] ) {
                 var a = this.cls_.getAxiomByName(b[0]);
 
-                if ( ! a )
+                if ( ! a ) {
                   console.error('Unknown export: "' + b[0] + '" in model: ' + this.cls_.id);
+                }
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
@@ -1614,8 +1620,9 @@ foam.CLASS({
     function installInClass(cls) {
       var ids  = this.ids.map(function(id) {
         var prop = cls.getAxiomByName(id);
-        if ( ! prop )
+        if ( ! prop ) {
           console.error('Unknown ids property:', cls.id + '.' + id);
+        }
         return prop;
       });
 
@@ -1832,8 +1839,9 @@ foam.CLASS({
             return x;
           },
           set: function(x) {
-            if ( x )
+            if ( x ) {
               this.setPrivate_(foam.core.FObject.isInstance(x) ? 'ySource' : 'X', x);
+            }
           }
         });
       }
@@ -1862,8 +1870,7 @@ foam.CLASS({
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
         for ( var key in args.instance_ )
-          if ( this.cls_.getAxiomByName(key) )
-            this[key] = args[key];
+          if ( this.cls_.getAxiomByName(key) ) this[key] = args[key];
       }
       // Else call copyFrom(), which is the slowest version because
       // it is O(# of properties) not O(# of args)
@@ -1881,8 +1888,7 @@ foam.CLASS({
       var a = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < a.length ; i++ ) {
         var name = a[i].name;
-        if ( typeof o[name] !== 'undefined' )
-          this[name] = o[name];
+        if ( typeof o[name] !== 'undefined' ) this[name] = o[name];
       }
       return this;
     },
@@ -1922,7 +1928,7 @@ foam.CLASS({
       this.destroyed = true;
 
       var dtors = this.getPrivate_('dtors');
-      if ( dtors )
+      if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
           var d = dtors[i];
           if ( typeof d === 'function' )
@@ -1930,6 +1936,7 @@ foam.CLASS({
           else
             d.destroy();
         }
+      }
 
       this.instance_ = null;
       this.private_ = null;
