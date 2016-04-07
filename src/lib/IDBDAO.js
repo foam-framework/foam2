@@ -50,17 +50,6 @@ foam.CLASS({
     'async',
   ],
 
-//   function documentation() {/*
-//   Usage:<br/>
-//    <code>var dao = IDBDAO.create({model: Issue});<br/>
-//    var dao = IDBDAO.create({model: Issue, name: 'ImportantIssues'});<br/></code>
-//   <br/>
-//    TODO:<br/>
-//    Optimization.  This DAO doesn't use any indexes in indexeddb yet, which
-//    means for any query other than a single find/remove we iterate the entire
-//    data store.  Obviously this will get slow if you store large amounts
-//    of data in the database.
-//  */},
   constants: {
     /** Global cache of the current transaction reference. Only element 0 is used. */
     __TXN__: [],
@@ -119,16 +108,16 @@ foam.CLASS({
       var request = indexedDB.open("FOAM:" + this.name, 1);
       var self = this;
 
-      request.onupgradeneeded = (function(e) {
+      request.onupgradeneeded = function(e) {
         var store = e.target.result.createObjectStore(self.name);
         for ( var i = 0; i < self.indicies.length; i++ ) {
           store.createIndex(self.indicies[i][0], self.indicies[i][0], { unique: self.indicies[i][1] });
         }
-      })
+      }
 
-      request.onsuccess = (function(e) {
+      request.onsuccess = function(e) {
         cc(e.target.result);
-      })
+      }
 
       request.onerror = function (e) {
         console.log('************** failure', e);
@@ -149,7 +138,7 @@ foam.CLASS({
             if ( self.q_ == q ) self.q_ = undefined;
             for ( var i = 0 ; i < q.length ; i++ ) q[i](store);
           });
-        }, this.X)();
+        })();
       } else {
         this.q_.push(fn);
         // Diminishing returns after 10000 per batch
