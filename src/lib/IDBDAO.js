@@ -222,13 +222,16 @@ foam.CLASS({
           var getRequest = store.get(key);
           getRequest.onsuccess = function(e) {
             if (!getRequest.result) {
-              resolve(null); // not found? as good as removed!
+              // not found? as good as removed!
+              self.pub('on','remove', data);
+              resolve();
+              return;
             }
             var data = self.deserialize(getRequest.result);
             var delRequest = store.delete(key);
             delRequest.transaction.addEventListener('complete', function(e) {
               self.pub('on','remove', data);
-              resolve(data);
+              resolve();
             });
 
             delRequest.onerror = function(e) {
