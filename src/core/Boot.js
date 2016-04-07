@@ -1931,10 +1931,11 @@ foam.CLASS({
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
           var d = dtors[i];
-          if ( typeof d === 'function' )
+          if ( typeof d === 'function' ) {
             d();
-          else
+          } else {
             d.destroy();
+          }
         }
       }
 
