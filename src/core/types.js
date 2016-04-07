@@ -302,6 +302,14 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Map',
+  extends: 'Property',
+  properties: [
+    ['factory', function() { return {} }]
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',
