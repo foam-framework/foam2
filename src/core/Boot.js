@@ -322,8 +322,8 @@ foam.LIB({
       that are instances of the specified class.
     */
     function getAxiomsByClass(cls) {
-      // TODO: Would like to have efficient support for:
-      //    .where() .orderBy() groupBy
+      // TODO: Add efficient support for:
+      //    .where() .orderBy() .groupBy()
       var as = this.private_.axiomCache[cls.name];
       if ( ! as ) {
         as = [];
@@ -379,7 +379,6 @@ foam.LIB({
       if ( m.methods ) {
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
-          // TODO: get rid of long-form
           if ( typeof a === 'function' )
             m.methods[i] = a = { name: a.name, code: a };
           this.prototype[a.name] = a.code;
@@ -503,8 +502,10 @@ foam.CLASS({
     },
     'package',
     'name',
-    // TODO: correct?
-    { name: 'label', expression: foam.string.labelize },
+    {
+      name: 'label',
+      expression: function(name) { return foam.string.labelize(name); }
+    },
     [ 'extends', 'FObject' ],
     'refines',
     {
@@ -565,7 +566,10 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
-    { name: 'label', expression: foam.string.labelize },
+    {
+      name: 'label',
+      expression: function(name) { return foam.string.labelize(name); }
+    },
     'help',
     'value',
     'factory',
