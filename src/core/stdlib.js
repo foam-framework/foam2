@@ -52,35 +52,27 @@ Object.defineProperty(
 
 /**
  * Creates a small library in the foam package. A LIB is a collection of static constants,
- * properties, methods and functions. It can also add properties to a core javascript
- * object when you specify name: 'Array', 'Function', 'Number', 'Object',
- * 'String', or 'Date'.
+ * methods and functions.
  * <pre>
 foam.LIB({
   name: 'network',
-  properties: [ { name: 'packets' } ],
+  constants: {
+    PORT: 4000
+  },
   methods: [ function sendPacket() { ... }  ]
 });
 </pre>
 Produces <code>foam.network</code>:
 <pre>
-foam.network.packets = 4;
+console.log(foam.network.PORT); // outputs 4000
 foam.network.sendPacket();
-</pre>
-Or add methods and properties to built-in types (avoid this usage if you can):
-<pre>
-foam.LIB({
-  name: 'Number',
-  methods: [ function plusOne() { this += 1; } ]
-});
-console.assert(9.plusOne() == 10, "It works!");
 </pre>
  * @method LIB
  * @memberof module:foam
  */
 foam.LIB = function LIB(model) {
   function defineProperty(proto, key, map) {
-    if ( ! map.value || proto === Object.prototype || proto === Array.prototype )
+    if ( ! map.value || proto === Array.prototype )
       Object.defineProperty.apply(this, arguments);
     else
       proto[key] = map.value;
@@ -89,15 +81,15 @@ foam.LIB = function LIB(model) {
   var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
 
   if ( model.constants ) {
-    console.assert(
-      typeof model.constants === 'object' && ! Array.isArray(model.properties),
-      'Constants must be a map.');
+    console.assert(typeof model.constants === 'object',
+                   'Constants must be a map.');
 
-    for ( var key in model.constants )
+    for ( var key in model.constants ) {
       defineProperty(
         proto,
         key,
         { value: model.constants[key], writable: true, enumerable: false });
+    }
   }
 
   if ( model.methods ) {
