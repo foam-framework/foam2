@@ -259,8 +259,12 @@ foam.LIB({
       // change events, etc.).
       obj.instance_ = {};
 
+      // initArgs() is the standard argument extraction method.
       obj.initArgs(args, X);
 
+      // init(), if defined, is called when object is created.
+      // This is where class specific initialization code should
+      // be put (not in initArgs).
       obj.init && obj.init();
 
       return obj;
