@@ -100,161 +100,11 @@
 
 */
 
-foam.LIB({
-  name: 'AbstractClass',
-
-  // documentation: "Root prototype for all classes.",
-
-  constants: {
-    prototype: Object.prototype,
-    axiomMap_: {}
-  },
-
-  methods: [
-    /**
-      Create a new instance of this class.
-      Configured from values taken from 'args', if supplifed.
-    */
-    function create(args, X) {
-      var obj = Object.create(this.prototype);
-      obj.instance_ = {};
-
-      obj.initArgs(args, X);
-
-      obj.init && obj.init();
-
-      return obj;
-    },
-
-    /**
-      This is a temporary version of installModel.
-      When the bootstrap is finished, it will be replaced by a version
-      that only knows how to install axioms.
-    */
-    function installModel(m) {
-      if ( m.methods )
-        for ( var i = 0 ; i < m.methods.length ; i++ ) {
-          var a = m.methods[i];
-          if ( typeof a === 'function' )
-            m.methods[i] = a = { name: a.name, code: a };
-          this.prototype[a.name] = a.code;
-        }
-
-      if ( foam.core.Property && m.properties )
-        for ( var i = 0 ; i < m.properties.length ; i++ ) {
-          var a = m.properties[i];
-
-          if ( Array.isArray(a) )
-            m.properties[i] = a = { name: a[0], value: a[1] };
-          else if ( typeof a === 'string' )
-            m.properties[i] = a = { name: a };
-
-          var type = foam.lookup(a.class) || foam.core.Property;
-          if ( type !== a.cls_ ) a = type.create(a);
-
-          this.installAxiom(a);
-        }
-    },
-
-    /**
-      Install an Axiom into the class and prototype.
-      Invalidate the axiom-cache, used by getAxiomsByName().
-      -
-      Installs axioms into the protoype immediately, but in the future
-      we will wait until the first object is created. This will provide
-      better startup performance.
-    */
-    function installAxiom(a) {
-      this.axiomMap_[a.name] = a;
-      this.axiomCache_ = {};
-
-      // Store the destination class in the Axiom.  Used by describe().
-      a.sourceCls_ = this;
-
-      a.installInClass && a.installInClass(this);
-      a.installInProto && a.installInProto(this.prototype);
-    },
-
-    /**
-      Determine if an object is an instance of this class
-      or one of its sub-classes.
-    */
-    function isInstance(o) {
-      return !! ( o && o.cls_ && this.isSubClass(o.cls_) );
-    },
-
-    /** Determine if a class is either this class or a sub-class. */
-    function isSubClass(c) {
-      if ( ! c ) return false;
-
-      var subClasses_ = this.hasOwnProperty('subClasses_') ?
-        this.subClasses_ :
-        this.subClasses_ = {} ;
-
-      if ( ! subClasses_.hasOwnProperty(c.id) )
-        subClasses_[c.id] = ( c === this.prototype.cls_ ) || this.isSubClass(c.__proto__);
-
-      return subClasses_[c.id];
-    },
-
-    /** Find an axiom by the specified name from either this class or an ancestor. */
-    function getAxiomByName(name) {
-      return this.axiomMap_[name];
-    },
-
-    /**
-      Returns all axioms defined on this class or its parent classes
-      that are instances of the specified class.
-    */
-    function getAxiomsByClass(cls) {
-      // This method will eventually change.
-      // Would like to have efficient support for:
-      //    .where() .orderBy() groupBy
-      var as = this.axiomCache_[cls.name];
-      if ( ! as ) {
-        as = [];
-        for ( var key in this.axiomMap_ ) {
-          var a = this.axiomMap_[key];
-          if ( cls.isInstance(a) )
-            as.push(a);
-        }
-        this.axiomCache_[cls.name] = as;
-      }
-
-      return as;
-    },
-
-    /**
-      Return true if an axiom named "name" is defined on this class
-      directly, regardless of what parent classes define.
-    */
-    function hasOwnAxiom(name) {
-      return this.axiomMap_.hasOwnProperty(name);
-    },
-
-    /** Returns all axioms defined on this class or its parent classes. */
-    function getAxioms() {
-      // The full axiom list is stored in the regular cache with '' as a key.
-      var as = this.axiomCache_[''];
-      if ( ! as ) {
-        as = [];
-        for ( var key in this.axiomMap_ )
-          as.push(this.axiomMap_[key]);
-        this.axiomCache_[''] = as;
-      }
-      return as;
-    },
-
-    function toString() { return this.name + 'Class'; }
-  ]
-});
-
 
 /**
-  Collection of classes to be repaired/upgraded later.
-  This is needed because they're built before the full
-  class/model infrastructure is finished, so they're lacking
-  features.
+ Bootstrap support.
+
+ Is discarded after use.
 */
 foam.LIB({
   name: 'boot',
@@ -263,19 +113,13 @@ foam.LIB({
     startTime: Date.now(),
   },
 
-  // documentation: 'Bootstrap support, discarded after use.',
-
   methods: [
-    function start() {
-      /* Start the bootstrap process. */
-
-      // Will be replaced in phase2.
-      var getClass = this.getClass;
-      foam.CLASS = function(m) { return getClass.call(m); };
-    },
-
     /**
       Create or Update a Prototype from a Model definition.
+
+      This will be added as a method on the Model class
+      when it is eventually built.
+
       (Model is 'this').
     */
     function getClass() {
@@ -293,17 +137,19 @@ foam.LIB({
           foam.lookup(this.extends) :
           foam.AbstractClass        ;
 
-        if ( ! parent )
+        if ( ! parent ) {
           console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
+        }
 
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
-        cls.prototype.ID__   = this.name + 'Prototype';
-        cls.ID__             = this.name + 'Class';
+        cls.prototype.ID__   = this.id + 'Prototype';
+        cls.ID__             = this.id + 'Class';
+        cls.private_         = { axiomCache: {} };
         cls.axiomMap_        = Object.create(parent.axiomMap_);
-        cls.axiomCache_      = {};
+        // TODO: define 'id' in Model and FObject, then remove this
         cls.id               = this.id ||
           ( this.package ? this.package + '.' + this.name : this.name );
         cls.package          = this.package;
@@ -319,6 +165,15 @@ foam.LIB({
       cls.installModel(this);
 
       return cls;
+    },
+
+    function start() {
+      /* Start the bootstrap process. */
+
+      var getClass = this.getClass;
+
+      // Will be replaced in phase2.
+      foam.CLASS = function(m) { return getClass.call(m); };
     },
 
     /** Start second phase of bootstrap process. */
@@ -344,7 +199,7 @@ foam.LIB({
     function phase3() {
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
-        this.axiomCache_ = {};
+        this.private_.axiomCache = {};
 
         // Install Axioms in first pass so that they're available in the second-pass
         // when axioms are actually run.  This avoids some ordering issues.
@@ -379,6 +234,191 @@ foam.LIB({
   ]
 });
 
+
+foam.LIB({
+  name: 'AbstractClass',
+
+  // documentation: "Root prototype for all classes.",
+
+  constants: {
+    prototype: Object.prototype,
+    axiomMap_: {}
+  },
+
+  methods: [
+    /**
+      Create a new instance of this class.
+      Configured from values taken from 'args', if supplifed.
+    */
+    function create(args, X) {
+      var obj = Object.create(this.prototype);
+
+      // Properties have their values stored in instance_ instead
+      // of on the object directly. This lets us defineProperty on
+      // the object itself so that we can add extra behaviour
+      // to properties (things like preSet, postSet, firing property-
+      // change events, etc.).
+      obj.instance_ = {};
+
+      // initArgs() is the standard argument extraction method.
+      obj.initArgs(args, X);
+
+      // init(), if defined, is called when object is created.
+      // This is where class specific initialization code should
+      // be put (not in initArgs).
+      obj.init && obj.init();
+
+      return obj;
+    },
+
+    /**
+      Install an Axiom into the class and prototype.
+      Invalidate the axiom-cache, used by getAxiomsByName().
+
+      TODO: Wait for first object to be created before creating prototype.
+      Currently it installs axioms into the protoype immediately, but in should
+      wait until the first object is created. This will provide
+      better startup performance.
+    */
+    function installAxiom(a) {
+      // Store the destination class in the Axiom.  Used by describe().
+      // Store source class on a clone of 'a' so that the Axiom can be
+      // reused without corrupting the sourceCls_.
+      a = Object.create(a);
+      a.sourceCls_ = this;
+
+      this.axiomMap_[a.name] = a;
+      this.private_.axiomCache = {};
+
+      a.installInClass && a.installInClass(this);
+      a.installInProto && a.installInProto(this.prototype);
+    },
+
+    /**
+      Determine if an object is an instance of this class
+      or one of its sub-classes.
+    */
+    function isInstance(o) {
+      return !! ( o && o.cls_ && this.isSubClass(o.cls_) );
+    },
+
+    /** Determine if a class is either this class or a sub-class. */
+    function isSubClass(c) {
+      if ( ! c ) return false;
+
+      var cache = this.private_.isSubClassCache ||
+        ( this.private_.isSubClassCache = {} );
+
+      if ( cache[c.id] === undefined ) {
+        cache[c.id] = ( c === this.prototype.cls_ ) ||
+          this.isSubClass(c.__proto__);
+      }
+
+      return cache[c.id];
+    },
+
+    /** Find an axiom by the specified name from either this class or an ancestor. */
+    function getAxiomByName(name) {
+      return this.axiomMap_[name];
+    },
+
+    /**
+      Returns all axioms defined on this class or its parent classes
+      that are instances of the specified class.
+    */
+    function getAxiomsByClass(cls) {
+      // TODO: Add efficient support for:
+      //    .where() .orderBy() .groupBy()
+      var as = this.private_.axiomCache[cls.name];
+      if ( ! as ) {
+        as = [];
+        for ( var key in this.axiomMap_ ) {
+          var a = this.axiomMap_[key];
+          if ( cls.isInstance(a) ) as.push(a);
+        }
+        this.private_.axiomCache[cls.name] = as;
+      }
+
+      return as;
+    },
+
+    /**
+      Return true if an axiom named "name" is defined on this class
+      directly, regardless of what parent classes define.
+    */
+    function hasOwnAxiom(name) {
+      return this.axiomMap_.hasOwnProperty(name);
+    },
+
+    /** Returns all axioms defined on this class or its parent classes. */
+    function getAxioms() {
+      // The full axiom list is stored in the regular cache with '' as a key.
+      var as = this.private_.axiomCache[''];
+      if ( ! as ) {
+        as = [];
+        for ( var key in this.axiomMap_ ) as.push(this.axiomMap_[key]);
+        this.private_.axiomCache[''] = as;
+      }
+      return as;
+    },
+
+    function toString() { return this.name + 'Class'; },
+
+    /**
+      Temporary Bootstrap Implementation
+
+      This is a temporary version of installModel.
+      When the bootstrap is finished, it will be replaced by a
+      version that only knows how to install axioms.
+
+      It is easier to start with hard-coded method and property
+      support because Axioms need methods to install themselves
+      and Property Axioms themselves have properties.
+
+      However, once we've bootstrapped proper Property and Method
+      Axioms, we can remove this support and just install Axioms.
+    */
+    function installModel(m) {
+      if ( m.methods ) {
+        for ( var i = 0 ; i < m.methods.length ; i++ ) {
+          var a = m.methods[i];
+          if ( typeof a === 'function' ) {
+            m.methods[i] = a = { name: a.name, code: a };
+          }
+          this.prototype[a.name] = a.code;
+        }
+      }
+
+      /*
+        Properties can be defined using three formats:
+        1. Short-form String: Ex.: 'firstName' or 'sex'
+        2. Medium-form Array: Ex.: [ 'firstName', 'John' ] or [ 'sex', 'Male' ]
+           The first element of the array is the name and the second is the default value.
+        3. Long-form JSON: Ex.: [ name: 'firstName', value: 'John' ] or
+           { class: 'String', name: 'sex', value: 'Male' }
+           The long-form supports many options, but only 'name' is mandatory.
+       */
+      if ( foam.core.Property && m.properties ) {
+        for ( var i = 0 ; i < m.properties.length ; i++ ) {
+          var a = m.properties[i];
+
+          if ( Array.isArray(a) ) {
+            m.properties[i] = a = { name: a[0], value: a[1] };
+          } else if ( typeof a === 'string' ) {
+            m.properties[i] = a = { name: a };
+          }
+
+          var type = foam.lookup(a.class) || foam.core.Property;
+          if ( type !== a.cls_ ) a = type.create(a);
+
+          this.installAxiom(a);
+        }
+      }
+    }
+  ]
+});
+
+
 foam.boot.start();
 
 /** The implicit base model for the model heirarchy. If you do not
@@ -402,17 +442,18 @@ foam.CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      if ( args.originalArgs_ )
+      if ( args.originalArgs_ ) {
         args = args.originalArgs_;
-      else
+      } else {
         this.originalArgs_ = args;
+      }
 
       for ( var key in args ) this[key] = args[key];
     },
 
     function hasOwnProperty(name) {
       return typeof this.instance_[name] !== 'undefined' ||
-        Object.hasOwnProperty.call(this.instance_, name);
+          this.instance_.hasOwnProperty(name);
     },
 
     /**
@@ -467,7 +508,10 @@ foam.CLASS({
     },
     'package',
     'name',
-    { name: 'label', expression: foam.string.labelize },
+    {
+      name: 'label',
+      expression: function(name) { return foam.string.labelize(name); }
+    },
     [ 'extends', 'FObject' ],
     'refines',
     {
@@ -528,7 +572,10 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
-    { name: 'label', expression: foam.string.labelize },
+    {
+      name: 'label',
+      expression: function(name) { return foam.string.labelize(name); }
+    },
     'help',
     'value',
     'factory',
@@ -565,8 +612,9 @@ foam.CLASS({
         var a = this.cls_.getAxiomsByClass(foam.core.Property);
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
-          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) )
+          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) ) {
             this[name] = superProp[name];
+          }
         }
       }
 
@@ -588,18 +636,18 @@ foam.CLASS({
       (Property is 'this').
     */
     function installInProto(proto) {
-      var prop            = this;
-      var name            = this.name;
-      var adapt           = this.adapt
-      var preSet          = this.preSet;
-      var postSet         = this.postSet;
-      var factory         = this.factory;
+      var prop     = this;
+      var name     = this.name;
+      var adapt    = this.adapt
+      var preSet   = this.preSet;
+      var postSet  = this.postSet;
+      var factory  = this.factory;
       // This doesn't let value to be 'undefined', which is maybe not bad.
-      var hasDefaultValue = typeof this.value !== 'undefined';
       var value    = this.value;
-      var slotName        = name + '$';
-      var isFinal         = this.final;
-      var eFactory        = this.exprFactory(this.expression);
+      var hasValue = typeof value !== 'undefined';
+      var slotName = name + '$';
+      var isFinal  = this.final;
+      var eFactory = this.exprFactory(this.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
@@ -626,10 +674,9 @@ foam.CLASS({
                  this.hasOwnPrivate_(name) ? this.getPrivate_(name) :
                  this.setPrivate_(name, eFactory.call(this)) ;
         } :
-        hasDefaultValue ? function valueGetter() {
-          return this.hasOwnProperty(name) ?
-            this.instance_[name] :
-            value ;
+        hasValue ? function valueGetter() {
+          var v = this.instance_[name];
+          return typeof v !== 'undefined' || this.instance_.hasOwnProperty(name) ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
@@ -655,7 +702,7 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange(name, oldValue, newValue);
+          this.pubPropertyChange(name, oldValue, newValue, slotName);
 
           // TODO(maybe): pub to a global topic to support dynamic()
 
@@ -671,8 +718,9 @@ foam.CLASS({
 
     function validateInstance(o) {
       /* Validate an object which has this property. */
-      if ( this.required && ! o[this.name] )
+      if ( this.required && ! o[this.name] ) {
         throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
+      }
     },
 
     /** Create a factory function from an expression function. **/
@@ -683,7 +731,6 @@ foam.CLASS({
       var name = this.name;
 
       return function() {
-//        console.log('name: ', name, e);
         var self = this;
         var args = new Array(argNames.length);
         var subs = [];
@@ -692,8 +739,9 @@ foam.CLASS({
             delete self.private_[name];
             self.clearProperty(name); // TODO: this might be wrong
           }
-          for ( var i = 0 ; i < subs.length ; i++ )
+          for ( var i = 0 ; i < subs.length ; i++ ) {
             subs[i].destroy();
+          }
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           subs.push(this.sub('propertyChange', argNames[i], l));
@@ -784,6 +832,7 @@ foam.CLASS({
     */
     function override_(proto, method) {
       var super_ = proto[this.name];
+      // TODO: assert type
 
       // Not overriding, or not using SUPER, so just return original method
       if ( ! super_ || method.toString().indexOf('SUPER') == -1 ) return method;
@@ -854,8 +903,9 @@ foam.CLASS({
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
         var b = new Array(a.length);
-        for ( var i = 0 ; i < a.length ; i++ )
+        for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
+        }
         return b;
       }
     ],
@@ -937,10 +987,20 @@ foam.CLASS({
       Publish a message to all matching subd listeners.
       Returns the number of listeners notified.
     */
-    function pub() {
-      // This method isn't JIT-ed because of the use of 'arguments',
-      // So we move all of the code to pub_() so that it is JIT-ed.
-      return this.pub_(arguments);
+    function pub(a1, a2, a3, a4, a5, a6, a7) {
+      // This method prevents this function not being JIT-ed because
+      // of the use of 'arguments'.  Doesn't generate any garbage.
+      switch ( arguments.length ) {
+        case 0: return this.pub_([]);
+        case 1: return this.pub_([a1]);
+        case 2: return this.pub_([a1, a2]);
+        case 3: return this.pub_([a1, a2, a3]);
+        case 4: return this.pub_([a1, a2, a3, a4]);
+        case 5: return this.pub_([a1, a2, a3, a4, a5]);
+        case 6: return this.pub_([a1, a2, a3, a4, a5, a6]);
+        case 7: return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
+      }
+      console.error('pub() takes at most 7 arguments.');
     },
 
     function pub_(args) {
@@ -979,9 +1039,10 @@ foam.CLASS({
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
-      for ( var i = 0 ; i < arguments.length-1 ; i++ )
+      for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
         listeners = listeners.children[arguments[i]] ||
         ( listeners.children[arguments[i]] = this.createListenerList_() );
+      }
 
       var node = {
         sub:  { src: this },
@@ -1008,8 +1069,9 @@ foam.CLASS({
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
-      for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ )
+      for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ ) {
         listeners = listeners.children[arguments[i]];
+      }
 
       var node = listeners && listeners.next;
       while ( node ) {
@@ -1022,9 +1084,9 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function pubPropertyChange(name, oldValue, newValue) {
+    function pubPropertyChange(name, oldValue, newValue, opt_slotName) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.slot(name);
+        var dyn = this.slot(name, opt_slotName);
         dyn.setPrev(oldValue);
         this.pub('propertyChange', name, dyn);
       }
@@ -1336,8 +1398,9 @@ foam.CLASS({
               if ( b[0] ) {
                 var a = this.cls_.getAxiomByName(b[0]);
 
-                if ( ! a )
+                if ( ! a ) {
                   console.error('Unknown export: "' + b[0] + '" in model: ' + this.cls_.id);
+                }
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
@@ -1405,9 +1468,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          pub: parent.pub.bind(parent, name),
-          sub: parent.sub.bind(parent, name),
-          unsub: parent.unsub.bind(parent, name),
+          pub:   foam.fn.bind(parent.pub,   parent, name),
+          sub:   foam.fn.bind(parent.sub,   parent, name),
+          unsub: foam.fn.bind(parent.unsub, parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 
@@ -1560,8 +1623,9 @@ foam.CLASS({
     function installInClass(cls) {
       var ids  = this.ids.map(function(id) {
         var prop = cls.getAxiomByName(id);
-        if ( ! prop )
+        if ( ! prop ) {
           console.error('Unknown ids property:', cls.id + '.' + id);
+        }
         return prop;
       });
 
@@ -1575,14 +1639,11 @@ foam.CLASS({
           name: 'ID',
           get: function(o) {
             var a = new Array(ids.length);
-            for ( var i = 0 ; i < ids.length ; i++ ) {
-              a[i] = ids[i].get(o);
-            }
+            for ( var i = 0 ; i < ids.length ; i++ ) a[i] = ids[i].get(o);
             return a;
           },
           set: function(o, a) {
-            for ( var i = 0 ; i < ids.length ; i++ )
-              ids[i].set(o, a[i]);
+            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].set(o, a[i]);
           },
           compare: function(o1, o2) {
             for ( var i = 0 ; i < ids.length ; i++ ) {
@@ -1592,8 +1653,7 @@ foam.CLASS({
             return 0;
           },
           copy: function(src, dst) {
-            for ( var i = 0 ; i < ids.length ; i++ )
-              ids[i].copy(src, dst);
+            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].copy(src, dst);
           }
         };
       }
@@ -1684,13 +1744,15 @@ foam.CLASS({
         if ( ! a ) return [];
         if ( ! Array.isArray(a) ) {
           var cs = [];
-          for ( var key in a )
+          for ( var key in a ) {
             cs.push(foam.core.Constant.create({name: key, value: a[key]}));
+          }
           return cs;
         }
         var b = new Array(a.length);
-        for ( var i = 0 ; i < a.length ; i++ )
+        for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
+        }
         return b;
       }
     },
@@ -1778,8 +1840,9 @@ foam.CLASS({
             return x;
           },
           set: function(x) {
-            if ( x )
+            if ( x ) {
               this.setPrivate_(foam.core.FObject.isInstance(x) ? 'ySource' : 'X', x);
+            }
           }
         });
       }
@@ -1807,9 +1870,9 @@ foam.CLASS({
       }
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
-        for ( var key in args.instance_ )
-          if ( this.cls_.getAxiomByName(key) )
-            this[key] = args[key];
+        for ( var key in args.instance_ ) {
+          if ( this.cls_.getAxiomByName(key) ) this[key] = args[key];
+        }
       }
       // Else call copyFrom(), which is the slowest version because
       // it is O(# of properties) not O(# of args)
@@ -1827,8 +1890,7 @@ foam.CLASS({
       var a = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < a.length ; i++ ) {
         var name = a[i].name;
-        if ( typeof o[name] !== 'undefined' )
-          this[name] = o[name];
+        if ( typeof o[name] !== 'undefined' ) this[name] = o[name];
       }
       return this;
     },
@@ -1868,14 +1930,16 @@ foam.CLASS({
       this.destroyed = true;
 
       var dtors = this.getPrivate_('dtors');
-      if ( dtors )
+      if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
           var d = dtors[i];
-          if ( typeof d === 'function' )
+          if ( typeof d === 'function' ) {
             d();
-          else
+          } else {
             d.destroy();
+          }
         }
+      }
 
       this.instance_ = null;
       this.private_ = null;
@@ -1890,7 +1954,6 @@ foam.CLASS({
 
 
 foam.boot.end();
-
 
 
 /**

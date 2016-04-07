@@ -24,7 +24,7 @@ foam.CLASS({
     function updateChild(c) {
       var gravity  = c.gravity;
       var friction = c.friction;
-      
+
       if ( gravity ) c.vy += gravity;
 
       if ( friction ) {
@@ -38,4 +38,3 @@ foam.CLASS({
     }
   ]
 });
-

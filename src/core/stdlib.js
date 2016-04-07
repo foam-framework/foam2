@@ -30,7 +30,7 @@ foam = {
     return function next$UID() {
       return id++;
     }
-  })(),
+  })()
 };
 
 /** Setup nodejs-like 'global' on web */
@@ -112,6 +112,56 @@ foam.LIB = function LIB(model) {
     }
   }
 };
+
+
+foam.LIB({
+  name: 'fn',
+
+  methods: [
+    function bind(f, that, a1, a2, a3, a4) {
+      switch ( arguments.length ) {
+        case 2: return function() { return f.apply(that, arguments); };
+        case 3: return function(b1, b2, b3, b4) {
+          switch ( arguments.length ) {
+            case 0: return f.call(that, a1);
+            case 1: return f.call(that, a1, b1);
+            case 2: return f.call(that, a1, b1, b2);
+            case 3: return f.call(that, a1, b1, b2, b3);
+            case 4: return f.call(that, a1, b1, b2, b3, b4);
+          }
+        };
+        case 4: return function(b1, b2, b3, b4) {
+          switch ( arguments.length ) {
+            case 0: return f.call(that, a1, a2);
+            case 1: return f.call(that, a1, a2, b1);
+            case 2: return f.call(that, a1, a2, b1, b2);
+            case 3: return f.call(that, a1, a2, b1, b2, b3);
+            case 4: return f.call(that, a1, a2, b1, b2, b3, b4);
+          }
+        };
+        case 5: return function(b1, b2, b3, b4) {
+          switch ( arguments.length ) {
+            case 0: return f.call(that, a1, a2, a3);
+            case 1: return f.call(that, a1, a2, a3, b1);
+            case 2: return f.call(that, a1, a2, a3, b1, b2);
+            case 3: return f.call(that, a1, a2, a3, b1, b2, b3);
+            case 4: return f.call(that, a1, a2, a3, b1, b2, b3, b4);
+          }
+        };
+        case 6: return function(b1, b2, b3, b4) {
+          switch ( arguments.length ) {
+            case 0: return f.call(that, a1, a2, a3, a4);
+            case 1: return f.call(that, a1, a2, a3, a4, b1);
+            case 2: return f.call(that, a1, a2, a3, a4, b1, b2);
+            case 3: return f.call(that, a1, a2, a3, a4, b1, b2, b3);
+            case 4: return f.call(that, a1, a2, a3, a4, b1, b2, b3, b4);
+          }
+        };
+      }
+      console.error('Attempt to foam.fn.bind more than 4 arguments.');
+    }
+  ]
+});
 
 
 foam.LIB({

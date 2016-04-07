@@ -1195,8 +1195,8 @@ log(o.toJSON());
 // Graphics Support
 foam.CLASS({
   name: 'GraphicsDemo',
+  extends: 'foam.graphics.CView',
   requires: [
-    'foam.graphics.Canvas',
     'foam.graphics.Arc',
     'foam.graphics.Box',
     'foam.graphics.Circle',
@@ -1204,22 +1204,10 @@ foam.CLASS({
     'foam.graphics.Gradient'
   ],
   properties: [
+    [ 'width', 500 ],
+    [ 'height', 500 ],
     {
-      name: 'canvas',
-      factory: function() {
-        var c = this.Canvas.create({
-          width: 500,
-          height: 500,
-          id: 'graphics-demo'
-        });
-        c.cview = this.CView.create({
-          children: this.objects
-        });
-        return c;
-      }
-    },
-    {
-      name: 'objects',
+      name: 'children',
       factory: function() {
         var objects = [
           this.Arc.create({
@@ -1308,20 +1296,21 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         this.counter += 0.01
-        this.objects[0].rotation += 0.1;
-        this.objects[0].x = 150 + 50 * Math.cos(this.counter);
-        this.objects[0].y = 150 + 50 * Math.sin(this.counter);
-        this.objects[1].skewX = Math.sin(this.counter);
-        this.objects[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
-        this.objects[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
-        this.objects[2].rotation += 0.01;
+        this.children[0].rotation += 0.1;
+        this.children[0].x = 150 + 50 * Math.cos(this.counter);
+        this.children[0].y = 150 + 50 * Math.sin(this.counter);
+        this.children[1].skewX = Math.sin(this.counter);
+        this.children[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
+        this.children[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
+        this.children[2].rotation += 0.01;
         this.step();
+        this.invalidated.pub();
       }
     }
   ]
 });
 var g = GraphicsDemo.create();
-log_(g.canvas.toHTML());
+log_(g.toHTML());
 g.step();
 
 //:NOTEST
@@ -1359,7 +1348,7 @@ foam.CLASS({
     {
       name: 'tick',
       isFramed: true,
-      code: function() { this.time++; this.tick(); }
+      code: function() { this.time++; this.tick(); this.invalidated.pub(); }
     }
   ]
 });
