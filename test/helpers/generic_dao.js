@@ -259,6 +259,16 @@ global.genericDAOTestBattery = function(daoFactory) {
           });
         });
       });
+
+      it('should not pub on.remove if nothing was removed', function(done) {
+        var dao = daoFactory(test.dao.generic.Person).then(function(dao) {
+          dao.on.remove.sub(function() {
+            fail('No object should have been removed.');
+          });
+          var p = mkPerson1();
+          dao.remove(p).then(done);
+        });
+      });
     });
 
     describe('select()', function() {

@@ -210,7 +210,6 @@ foam.CLASS({
           getRequest.onsuccess = function(e) {
             if (!getRequest.result) {
               // not found? as good as removed!
-              self.pub('on','remove', obj);
               resolve();
               return;
             }
