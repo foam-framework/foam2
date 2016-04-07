@@ -34,14 +34,18 @@ foam = {
 };
 
 /** Setup nodejs-like 'global' on web */
-if ( ! foam.isServer ) global = this;
+if ( ! foam.isServer ) {
+  global = this;
+}
 
 Object.defineProperty(
   Object.prototype,
   '$UID',
   {
     get: function() {
-      if ( Object.hasOwnProperty.call(this, '$UID__') ) return this.$UID__;
+      if ( Object.hasOwnProperty.call(this, '$UID__') ) {
+        return this.$UID__;
+      }
       Object.defineProperty(this, '$UID__', {value: foam.next$UID(), enumerable: false});
       return this.$UID__;
     },
@@ -72,10 +76,11 @@ foam.network.sendPacket();
  */
 foam.LIB = function LIB(model) {
   function defineProperty(proto, key, map) {
-    if ( ! map.value || proto === Array.prototype )
+    if ( ! map.value || proto === Array.prototype ) {
       Object.defineProperty.apply(this, arguments);
-    else
+    } else {
       proto[key] = map.value;
+    }
   }
 
   var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
