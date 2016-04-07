@@ -101,7 +101,8 @@ foam.CLASS({
         // do. TODO: Alter create to accept the base object so we don't duplicate
         // this init code?
         if ( pool.length ) {
-          nu = pool.splice(-1, 1)[0];
+          nu = pool[pool.length - 1];
+          --pool.length
           nu.destroyed = false;
           nu.initArgs(args, X);
           nu.init && nu.init();
