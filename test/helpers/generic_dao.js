@@ -225,7 +225,7 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function(p3) {
             expect(p3).toBeDefined();
             expect(p3.id).toBe(p.id);
-            return dao.remove(p.id);
+            return dao.remove(p);
           }).then(function() {
             return dao.find(p.id);
           }).then(function() {
