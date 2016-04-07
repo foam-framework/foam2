@@ -803,4 +803,5 @@ TODO:
 -Context oriented ?
 -enforcement of interfaces
 -anonymous sinks ?
+-decide on remove(obj) and remove(id) being allowed
 */
