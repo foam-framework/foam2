@@ -18,9 +18,11 @@
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'IDBException',
+  name: 'IDBInternalException',
   extends: 'foam.dao.InternalException',
 
+  // TODO: Which errors are internal (system problems) vs. external
+  // (i.e. invalid data for clone, but you can try again with different data)
   properties: [
     'id',
     'error',
@@ -43,7 +45,9 @@ foam.CLASS({
   requires: [
     'foam.dao.FlowControl',
     'foam.dao.ArraySink',
-    'foam.dao.IDBException',
+    'foam.dao.IDBInternalException',
+    'foam.mlang.predicate.True',
+    'foam.mlang.predicate.Eq',
   ],
 
   imports: [
@@ -74,7 +78,36 @@ foam.CLASS({
     {
       /** @internal */
       name: 'propKeys_'
-    }
+    },
+    {
+      /** The promise that holds the open DB. Call this.withDB.then(function(db) { ... }); */
+      name: 'withDB',
+      factory: function() {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var indexedDB = window.indexedDB ||
+            window.webkitIndexedDB         ||
+            window.mozIndexedDB;
+
+          var request = indexedDB.open("FOAM:" + self.name, 1);
+
+          request.onupgradeneeded = function(e) {
+            var store = e.target.result.createObjectStore(self.name);
+            for ( var i = 0; i < self.indicies.length; i++ ) {
+              store.createIndex(self.indicies[i][0], self.indicies[i][0], { unique: self.indicies[i][1] });
+            }
+          }
+
+          request.onsuccess = function(e) {
+            resolve(e.target.result);
+          }
+
+          request.onerror = function (e) {
+            reject(self.IDBInternalException.create({ id: 'open', error: e }));
+          };
+        });
+      }
+    },
   ],
 
   methods: [
@@ -88,8 +121,6 @@ foam.CLASS({
         propKeys[prop.name] = prop.name;
         if ( prop.shortName ) propKeys[prop.shortName] = prop.name;
       }
-
-      //this.withDB = this.openDB;
     },
 
     function deserialize(json) {
@@ -98,30 +129,6 @@ foam.CLASS({
 
     function serialize(obj) {
       return foam.json.stringify(obj); //TODO: serialization
-    },
-
-    function openDB(cc) {
-      var indexedDB = window.indexedDB ||
-        window.webkitIndexedDB         ||
-        window.mozIndexedDB;
-
-      var request = indexedDB.open("FOAM:" + this.name, 1);
-      var self = this;
-
-      request.onupgradeneeded = function(e) {
-        var store = e.target.result.createObjectStore(self.name);
-        for ( var i = 0; i < self.indicies.length; i++ ) {
-          store.createIndex(self.indicies[i][0], self.indicies[i][0], { unique: self.indicies[i][1] });
-        }
-      }
-
-      request.onsuccess = function(e) {
-        cc(e.target.result);
-      }
-
-      request.onerror = function (e) {
-        console.log('************** failure', e);
-      };
     },
 
     function withStore(mode, fn) {
@@ -156,7 +163,7 @@ foam.CLASS({
           self.__TXN__[0] = undefined;
         }
       }
-      self.openDB(function (db) { // TODO: memoize like in foam1
+      self.withDB.then(function (db) {
         var tx = db.transaction([self.name], mode);
         var os = tx.objectStore(self.name);
         self.__TXN__[0] = os;
@@ -178,7 +185,7 @@ foam.CLASS({
           request.transaction.addEventListener(
             'error',
             function(e) {
-              reject(self.IDBException.create({ id: value.id, error: e }));
+              reject(self.IDBInternalException.create({ id: value.id, error: e }));
             });
         });
       });
@@ -187,42 +194,24 @@ foam.CLASS({
     function find(key) {
       var self = this;
 
-      if ( foam.mlang.predicate.Expr.isInstance(key) ) {
-        var found = false;
-        return new Promise(function(resolve, reject) {
-          self.limit(1).where(key).select({
-            put: function(obj) {
-              found = true;
-              resolve(obj);
-            },
-            eof: function() {
-              if ( ! found ) {
+      return new Promise(function(resolve, reject) {
+        self.withStore("readonly", function(store) {
+          var request = store.get(key);
+          request.transaction.addEventListener(
+            'complete',
+            function() {
+              if (!request.result) {
                 reject(self.ObjectNotFoundException.create({ id: key }));
+                return;
               }
-            },
-          });
+              var result = self.deserialize(request.result);
+              resolve(result);
+            });
+          request.onerror = function(e) {
+            reject(self.IDBInternalException.create({ id: key, error: e }));
+          };
         });
-      } else {
-        return new Promise(function(resolve, reject) {
-          self.withStore("readonly", function(store) {
-            var request = store.get(key);
-            request.transaction.addEventListener(
-              'complete',
-              function() {
-                if (!request.result) {
-                  reject(self.ObjectNotFoundException.create({ id: key }));
-                  return;
-                }
-                var result = self.deserialize(request.result);
-                resolve(result);
-              });
-            request.onerror = function(e) {
-              // TODO: Parse a better error out of e
-              reject(e); // TODO: err message
-            };
-          });
-        });
-      }
+      });
     },
 
     function remove(obj) {
@@ -243,25 +232,24 @@ foam.CLASS({
             });
 
             delRequest.onerror = function(e) {
-              reject(self.IDBException.create({ id: key, error: e }));
+              reject(self.IDBInternalException.create({ id: key, error: e }));
             };
           };
           getRequest.onerror = function(e) {
-            reject(self.IDBException.create({ id: key, error: e }));
+            reject(self.IDBInternalException.create({ id: key, error: e }));
           };
         });
       });
     },
 
-    function removeAll(sink, options) {
-      var query = (options && options.query && options.query.partialEval()) ||
-        {  f: function() { return true; } };
+    function removeAll(sink, skip, limit, order, predicate) {
+      var query = predicate || this.True.create();
 
       var self = this;
 
       // If the caller doesn't care to see the objects as they get removed,
       // then just nuke them in one go.
-      if ( ! options && ! ( sink && sink.remove ) ) {
+      if ( ! predicate && ! ( sink && sink.remove ) ) {
         return new Promise(function(resolve, reject) {
           self.withStore('readwrite', function(store) {
             var req = store.clear();
@@ -269,7 +257,7 @@ foam.CLASS({
               resolve(sink || '');
             };
             req.onerror = function(e) {
-              reject(self.IDBException.create({ id: 'remove_all', error: e }));
+              reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
             };
           });
         });
@@ -303,24 +291,24 @@ foam.CLASS({
             };
             request.onerror = function(e) {
               sink && sink.error && sink.error('remove', e);
-              reject(self.IDBException.create({ id: 'remove_all', error: e }));
+              reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
             };
           });
         });
       }
     },
 
-    function select(sink, options) {
+    function select(sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
-      sink = this.decorateSink_(resultSink, options);
+      sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
       var fc = this.FlowControl.create();
       var self = this;
 
       return new Promise(function(resolve, reject) {
         self.withStore("readonly", function(store) {
-          if ( options && options.query && EqExpr.isInstance(options.query) && store.indexNames.contains(options.query.arg1.name) ) {
-            var request = store.index(options.query.arg1.name).openCursor(IDBKeyRange.only(options.query.arg2.f()));
+          if ( predicate && this.Eq.isInstance(predicate) && store.indexNames.contains(predicate.arg1.name) ) {
+            var request = store.index(predicate.arg1.name).openCursor(IDBKeyRange.only(predicate.arg2.f()));
           } else {
             var request = store.openCursor();
           }
@@ -344,7 +332,7 @@ foam.CLASS({
           };
           request.onerror = function(e) {
             sink.error && sink.error(e);
-            reject(self.IDBException.create({ id: 'select', error: e }));
+            reject(self.IDBInternalException.create({ id: 'select', error: e }));
           };
         });
       });
