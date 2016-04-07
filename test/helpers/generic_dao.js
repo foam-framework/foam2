@@ -81,235 +81,245 @@ global.genericDAOTestBattery = function(daoFactory) {
 
     describe('put()', function() {
       it('should insert new objects', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        dao.put(p).then(function(p2) {
-          expect(p2).toBeDefined();
-          expect(p2.id).toEqual(p.id);
-          done();
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.put(p).then(function(p2) {
+            expect(p2).toBeDefined();
+            expect(p2.id).toEqual(p.id);
+            done();
+          });
         });
       });
 
       it('should update objects with the same id', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        dao.put(p).then(function(p2) {
-          var clone = p.clone();
-          clone.firstName = 'Neil';
-          expect(p.firstName).toBe('Angus');
-          return dao.put(clone);
-        }).then(function(p3) {
-          expect(p3.firstName).toBe('Neil');
-          return dao.find(p.id);
-        }).then(function(p4) {
-          expect(p4.id).toBe(p.id);
-          expect(p4.firstName).toBe('Neil');
-          return dao.select(foam.mlang.sink.Count.create());
-        }).then(function(c) {
-          expect(c.value).toBe(1);
-        }).catch(function(e) {
-          fail(e);
-        }).then(done);
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.put(p).then(function(p2) {
+            var clone = p.clone();
+            clone.firstName = 'Neil';
+            expect(p.firstName).toBe('Angus');
+            return dao.put(clone);
+          }).then(function(p3) {
+            expect(p3.firstName).toBe('Neil');
+            return dao.find(p.id);
+          }).then(function(p4) {
+            expect(p4.id).toBe(p.id);
+            expect(p4.firstName).toBe('Neil');
+            return dao.select(foam.mlang.sink.Count.create());
+          }).then(function(c) {
+            expect(c.value).toBe(1);
+          }).catch(function(e) {
+            fail(e);
+          }).then(done);
+        });
       });
 
       it('should pub on.put with the object', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        var listenerCalled = false;
-        dao.on.put.sub(function(sub, on, put, obj) {
-          expect(sub).toBeDefined();
-          expect(on).toBe('on');
-          expect(put).toBe('put');
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          var listenerCalled = false;
+          dao.on.put.sub(function(sub, on, put, obj) {
+            expect(sub).toBeDefined();
+            expect(on).toBe('on');
+            expect(put).toBe('put');
 
-          expect(obj).toBeDefined();
-          expect(obj.id).toBe(p.id);
+            expect(obj).toBeDefined();
+            expect(obj.id).toBe(p.id);
 
-          listenerCalled = true;
-        });
+            listenerCalled = true;
+          });
 
-        dao.put(p).then(function() {
-          expect(listenerCalled).toBe(true);
-          done();
+          dao.put(p).then(function() {
+            expect(listenerCalled).toBe(true);
+            done();
+          });
         });
       });
     });
 
     describe('find()', function() {
       it('should get existing objects', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        dao.put(p).then(function() {
-          return dao.find(p.id);
-        }).then(function(p2) {
-          expect(p.id).toBe(p2.id);
-          done();
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.put(p).then(function() {
+            return dao.find(p.id);
+          }).then(function(p2) {
+            expect(p.id).toBe(p2.id);
+            done();
+          });
         });
       });
 
       it('should return a rejected Promise when the object cannot be found', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        dao.find(p.id).then(function() {
-          fail('find() should fail when the ID is not found');
-        }).catch(function() {
-          expect(1).toBe(1);
-        }).then(function() {
-          return dao.put(p);
-        }).then(function() {
-          return dao.find(p.id);
-        }).then(function(p2) {
-          expect(p2.id).toBe(p.id);
-          return dao.find(74);
-        }).then(function() {
-          fail('find() should fail when the ID is not found');
-        }).catch(function() {
-          expect(1).toBe(1);
-        }).then(done);
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.find(p.id).then(function() {
+            fail('find() should fail when the ID is not found');
+          }).catch(function() {
+            expect(1).toBe(1);
+          }).then(function() {
+            return dao.put(p);
+          }).then(function() {
+            return dao.find(p.id);
+          }).then(function(p2) {
+            expect(p2.id).toBe(p.id);
+            return dao.find(74);
+          }).then(function() {
+            fail('find() should fail when the ID is not found');
+          }).catch(function() {
+            expect(1).toBe(1);
+          }).then(done);
+        });
       });
     });
 
     describe('removeAll()', function() {
       it('should only remove that which matches the predicate', function(done) {
-        var exprs = foam.mlang.Expressions.create();
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        var pid = p.id;
-        p.deceased = true;
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var exprs = foam.mlang.Expressions.create();
+          var p = mkPerson1();
+          var pid = p.id;
+          p.deceased = true;
 
-        var p2 = mkPerson2();
-        var p2id = p2.id;
-        p2.deceased = false;
+          var p2 = mkPerson2();
+          var p2id = p2.id;
+          p2.deceased = false;
 
-        var called = false;
+          var called = false;
 
-        dao.on.remove.sub(function(s, on, remove, obj) {
-          expect(s).toBeDefined();
-          expect(on).toBe('on');
-          expect(remove).toBe('remove');
-          expect(obj).toBeDefined();
-          expect(obj.id).toBe(p.id);
-          expect(called).toBe(false);
-          called = true;
+          dao.on.remove.sub(function(s, on, remove, obj) {
+            expect(s).toBeDefined();
+            expect(on).toBe('on');
+            expect(remove).toBe('remove');
+            expect(obj).toBeDefined();
+            expect(obj.id).toBe(p.id);
+            expect(called).toBe(false);
+            called = true;
+          });
+
+          dao.put(p).then(function() {
+            return dao.put(p2);
+          }).then(function() {
+            return dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).removeAll();
+          }).then(function() {
+            return dao.find(pid)
+          }).then(function(p) {
+            fail('fail() should fail since person was removed');
+          }, function(e) {
+            expect(e).toBeDefined();
+            expect(foam.dao.ObjectNotFoundException.isInstance(e)).toBe(true);
+            return dao.find(p2id);
+          }).then(function(p2) {
+            expect(p2.id).toBe(p2id);
+          }).then(done);
         });
-
-        dao.put(p).then(function() {
-          return dao.put(p2);
-        }).then(function() {
-          return dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).removeAll();
-        }).then(function() {
-          return dao.find(pid)
-        }).then(function(p) {
-          fail('fail() should fail since person was removed');
-        }, function(e) {
-          expect(e).toBeDefined();
-          expect(foam.dao.ObjectNotFoundException.isInstance(e)).toBe(true);
-          return dao.find(p2id);
-        }).then(function(p2) {
-          expect(p2.id).toBe(p2id);
-        }).then(done);
-      })
+      });
     });
 
     describe('remove()', function() {
       it('should actually remove the object', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        dao.put(p).then(function(p2) {
-          return dao.find(p.id);
-        }).then(function(p3) {
-          expect(p3).toBeDefined();
-          expect(p3.id).toBe(p.id);
-          return dao.remove(p3);
-        }).then(function() {
-          return dao.find(p.id);
-        }).then(function(o) {
-          console.log(o);
-          fail('find() should fail after remove()');
-        }, function(e) {
-          expect(e).toBeDefined();
-        }).then(done);
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.put(p).then(function(p2) {
+            return dao.find(p.id);
+          }).then(function(p3) {
+            expect(p3).toBeDefined();
+            expect(p3.id).toBe(p.id);
+            return dao.remove(p);
+          }).then(function() {
+            return dao.find(p.id);
+          }).then(function() {
+            fail('find() should fail after remove()');
+          }, function(e) {
+            expect(e).toBeDefined();
+          }).then(done);
+        });
       });
 
       it('should pub on.remove with the object', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p = mkPerson1();
-        var listenerCalled = false;
-        dao.on.remove.sub(function(sub, on, remove, obj) {
-          expect(sub).toBeDefined();
-          expect(on).toBe('on');
-          expect(remove).toBe('remove');
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          var listenerCalled = false;
+          dao.on.remove.sub(function(sub, on, remove, obj) {
+            expect(sub).toBeDefined();
+            expect(on).toBe('on');
+            expect(remove).toBe('remove');
 
-          expect(obj).toBeDefined();
-          expect(obj.id).toBe(p.id);
+            expect(obj).toBeDefined();
+            expect(obj.id).toBe(p.id);
 
-          listenerCalled = true;
-        });
+            listenerCalled = true;
+          });
 
-        dao.put(p).then(function() {
-          return dao.remove(p);
-        }).then(function() {
-          expect(listenerCalled).toBe(true);
-          done();
+          dao.put(p).then(function() {
+            return dao.remove(p);
+          }).then(function() {
+            expect(listenerCalled).toBe(true);
+            done();
+          });
         });
       });
     });
 
     describe('select()', function() {
       it('should just call eof() when the DAO is empty', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var puts = 0;
-        var eofCalled = false;
-        var sink = {
-          put: function() { puts++; },
-          eof: function() { eofCalled = true; }
-        };
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var puts = 0;
+          var eofCalled = false;
+          var sink = {
+            put: function() { puts++; },
+            eof: function() { eofCalled = true; }
+          };
 
-        dao.select(sink).then(function(s) {
-          expect(s).toBe(sink);
-          expect(puts).toBe(0);
-          expect(eofCalled).toBe(true);
-          done();
+          dao.select(sink).then(function(s) {
+            expect(s).toBe(sink);
+            expect(puts).toBe(0);
+            expect(eofCalled).toBe(true);
+            done();
+          });
         });
       });
 
       it('should make an ArraySink if sink is not provided', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
+        daoFactory(test.dao.generic.Person).then(function(dao) {
 
-        dao.select().then(function(s) {
-          expect(s).toBeDefined();
-          expect(foam.dao.ArraySink.isInstance(s)).toBe(true);
-          done();
+          dao.select().then(function(s) {
+            expect(s).toBeDefined();
+            expect(foam.dao.ArraySink.isInstance(s)).toBe(true);
+            done();
+          });
         });
       });
 
       it('should call sink.put for each item', function(done) {
-        var dao = daoFactory(test.dao.generic.Person);
-        var p1 = mkPerson1();
-        var p2 = mkPerson2();
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p1 = mkPerson1();
+          var p2 = mkPerson2();
 
-        var puts = 0;
-        var eofCalled = false;
-        var seen = {};
-        var sink = {
-          put: function(o) {
-            expect(o).toBeDefined();
-            expect(seen[o.id]).toBeUndefined();
-            seen[o.id] = true;
-            puts++;
-          },
-          eof: function() { eofCalled = true; }
-        };
+          var puts = 0;
+          var eofCalled = false;
+          var seen = {};
+          var sink = {
+            put: function(o) {
+              expect(o).toBeDefined();
+              expect(seen[o.id]).toBeUndefined();
+              seen[o.id] = true;
+              puts++;
+            },
+            eof: function() { eofCalled = true; }
+          };
 
-        dao.put(p1).then(function() {
-          return dao.put(p2);
-        }).then(function() {
-          return dao.select(sink);
-        }).then(function(s) {
-          expect(s).toBe(sink);
-          expect(puts).toBe(2);
-          expect(Object.keys(seen).length).toBe(2);
-          expect(eofCalled).toBe(true);
-          done();
+          dao.put(p1).then(function() {
+            return dao.put(p2);
+          }).then(function() {
+            return dao.select(sink);
+          }).then(function(s) {
+            expect(s).toBe(sink);
+            expect(puts).toBe(2);
+            expect(Object.keys(seen).length).toBe(2);
+            expect(eofCalled).toBe(true);
+            done();
+          });
         });
       });
 
@@ -317,9 +327,9 @@ global.genericDAOTestBattery = function(daoFactory) {
         var dao;
         var exprs = foam.mlang.Expressions.create();
         beforeEach(function(done) {
-          dao = daoFactory(test.dao.generic.Person);
-          dao.put(mkPerson1()).then(function() {
-            return dao.put(mkPerson2());
+          daoFactory(test.dao.generic.Person).then(function(idao) {
+            dao = idao;
+            return idao.put(mkPerson1()).then(idao.put(mkPerson2()));
           }).then(done);
         });
 

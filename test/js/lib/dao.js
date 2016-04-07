@@ -72,7 +72,7 @@ describe('LocalStorageDAO', function() {
   // Run the generic suite of DAO tests against it.
   genericDAOTestBattery(function(model) {
     localStorage.removeItem('_test_LS_generic_');
-    return foam.dao.LocalStorageDAO.create({ name: '_test_LS_generic_', of: model });
+    return Promise.resolve(foam.dao.LocalStorageDAO.create({ name: '_test_LS_generic_', of: model }));
   });
 
   afterAll(function() {
@@ -85,6 +85,15 @@ describe('LocalStorageDAO', function() {
 
 describe('ArrayDAO', function() {
   genericDAOTestBattery(function(model) {
-    return foam.dao.ArrayDAO.create({ of: model });
+    return Promise.resolve(foam.dao.ArrayDAO.create({ of: model }));
   });
 });
+
+if ( foam.dao.IDBDAO ) {
+  describe('IDBDAO', function() {
+    genericDAOTestBattery(function(model) {
+      var dao = foam.dao.IDBDAO.create({ of: model });
+      return dao.removeAll().then(function() { return Promise.resolve(dao); } );
+    });
+  });
+}
