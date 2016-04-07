@@ -109,11 +109,13 @@ foam.CLASS({
   methods: [
 
     function deserialize(json) {
-      return foam.json.parse(foam.json.parseString(json)); //TODO: serialization
+      // TODO: Better serialization, error handling
+      return foam.json.parse(foam.json.parseString(json));
     },
 
     function serialize(obj) {
-      return foam.json.stringify(obj); //TODO: serialization
+      // TODO: Better serialization, error handling
+      return foam.json.stringify(obj);
     },
 
     function withStore(mode, fn) {
