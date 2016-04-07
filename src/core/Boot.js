@@ -903,8 +903,9 @@ foam.CLASS({
     [ 'adapt', function(_, a, prop) {
         if ( ! a ) return [];
         var b = new Array(a.length);
-        for ( var i = 0 ; i < a.length ; i++ )
+        for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
+        }
         return b;
       }
     ],
@@ -1038,9 +1039,10 @@ foam.CLASS({
       var l         = arguments[arguments.length-1];
       var listeners = this.listeners_();
 
-      for ( var i = 0 ; i < arguments.length-1 ; i++ )
+      for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
         listeners = listeners.children[arguments[i]] ||
         ( listeners.children[arguments[i]] = this.createListenerList_() );
+      }
 
       var node = {
         sub:  { src: this },
@@ -1067,8 +1069,9 @@ foam.CLASS({
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
 
-      for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ )
+      for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ ) {
         listeners = listeners.children[arguments[i]];
+      }
 
       var node = listeners && listeners.next;
       while ( node ) {
@@ -1636,14 +1639,11 @@ foam.CLASS({
           name: 'ID',
           get: function(o) {
             var a = new Array(ids.length);
-            for ( var i = 0 ; i < ids.length ; i++ ) {
-              a[i] = ids[i].get(o);
-            }
+            for ( var i = 0 ; i < ids.length ; i++ ) a[i] = ids[i].get(o);
             return a;
           },
           set: function(o, a) {
-            for ( var i = 0 ; i < ids.length ; i++ )
-              ids[i].set(o, a[i]);
+            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].set(o, a[i]);
           },
           compare: function(o1, o2) {
             for ( var i = 0 ; i < ids.length ; i++ ) {
@@ -1653,8 +1653,7 @@ foam.CLASS({
             return 0;
           },
           copy: function(src, dst) {
-            for ( var i = 0 ; i < ids.length ; i++ )
-              ids[i].copy(src, dst);
+            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].copy(src, dst);
           }
         };
       }
@@ -1745,13 +1744,15 @@ foam.CLASS({
         if ( ! a ) return [];
         if ( ! Array.isArray(a) ) {
           var cs = [];
-          for ( var key in a )
+          for ( var key in a ) {
             cs.push(foam.core.Constant.create({name: key, value: a[key]}));
+          }
           return cs;
         }
         var b = new Array(a.length);
-        for ( var i = 0 ; i < a.length ; i++ )
+        for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
+        }
         return b;
       }
     },
@@ -1869,8 +1870,9 @@ foam.CLASS({
       }
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
-        for ( var key in args.instance_ )
+        for ( var key in args.instance_ ) {
           if ( this.cls_.getAxiomByName(key) ) this[key] = args[key];
+        }
       }
       // Else call copyFrom(), which is the slowest version because
       // it is O(# of properties) not O(# of args)
@@ -1952,7 +1954,6 @@ foam.CLASS({
 
 
 foam.boot.end();
-
 
 
 /**
