@@ -622,7 +622,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink) {
+    function put(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.compare.equals(obj.id, this.array[i].id) ) {
           this.array[i] = obj;
@@ -631,25 +631,21 @@ foam.CLASS({
       }
 
       if ( i == this.array.length ) this.array.push(obj);
-      sink && sink.put(obj);
       this.on.put.pub(obj);
 
-      return Promise.resolve(sink || obj);
+      return Promise.resolve(obj);
     },
 
-    function remove(obj, sink) {
+    function remove(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.compare.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
-          sink && sink.remove(o2);
           this.on.remove.pub(o2);
-          return Promise.resolve(sink || o2);
+          break;
         }
       }
 
-      var err = this.ObjectNotFoundException.create({ id: obj.id });
-      sink && sink.error(err);
-      return Promise.reject(err);
+      return Promise.resolve(o2 || obj)
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -743,14 +739,14 @@ foam.CLASS({
       name: 'Pending',
       extends: 'foam.dao.AbstractDAO',
       methods: [
-        function put(obj, sink) {
+        function put(obj) {
           return this.promise.then(function(p) {
-            return p.put(obj, sink);
+            return p.put(obj);
           });
         },
-        function remove(obj, sink) {
+        function remove(obj) {
           return this.promise.then(function(p) {
-            return p.remove(obj, sink);
+            return p.remove(obj);
           });
         },
         function select(sink, skip, limit, order, predicate) {
