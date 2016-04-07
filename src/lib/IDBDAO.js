@@ -76,10 +76,6 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
-      /** @internal */
-      name: 'propKeys_'
-    },
-    {
       /** The promise that holds the open DB. Call this.withDB.then(function(db) { ... }); */
       name: 'withDB',
       factory: function() {
@@ -111,17 +107,6 @@ foam.CLASS({
   ],
 
   methods: [
-
-    function init() {
-
-      var propKeys = this.propKeys_ = {};
-      var properties = this.of.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < properties.length ; i++ ) {
-        var prop = properties[i];
-        propKeys[prop.name] = prop.name;
-        if ( prop.shortName ) propKeys[prop.shortName] = prop.name;
-      }
-    },
 
     function deserialize(json) {
       return foam.json.parse(foam.json.parseString(json)); //TODO: serialization
@@ -223,7 +208,7 @@ foam.CLASS({
           getRequest.onsuccess = function(e) {
             if (!getRequest.result) {
               // not found? as good as removed!
-              self.pub('on','remove', data);
+              self.pub('on','remove', obj);
               resolve();
               return;
             }
@@ -245,19 +230,19 @@ foam.CLASS({
       });
     },
 
-    function removeAll(sink, skip, limit, order, predicate) {
+    function removeAll(skip, limit, order, predicate) {
       var query = predicate || this.True.create();
 
       var self = this;
 
       // If the caller doesn't care to see the objects as they get removed,
       // then just nuke them in one go.
-      if ( ! predicate && ! ( sink && sink.remove ) ) {
+      if ( ! predicate && ! self.hasListeners('on', 'remove') ) {
         return new Promise(function(resolve, reject) {
           self.withStore('readwrite', function(store) {
             var req = store.clear();
             req.onsuccess = function() {
-              resolve(sink || '');
+              resolve();
             };
             req.onerror = function(e) {
               reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
@@ -279,21 +264,17 @@ foam.CLASS({
                     'complete',
                     function() {
                       self.pub('on','remove', value);
-                      sink && sink.remove && sink.remove(value);
                     });
                   deleteReq.onerror = function(e) {
-                    sink && sink.error && sink.error('remove', e);
                   };
                 }
                 cursor.continue();
               }
             };
             request.transaction.oncomplete = function() {
-              sink && sink.eof && sink.eof();
-              resolve(sink);
+              resolve();
             };
             request.onerror = function(e) {
-              sink && sink.error && sink.error('remove', e);
               reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
             };
           });

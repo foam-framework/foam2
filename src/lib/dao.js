@@ -501,9 +501,9 @@ foam.CLASS({
           this.predicate);
     },
 
-    function removeAll(sink, skip, limit, order, predicate) {
-      return this.delegate.remoteAll(
-        sink, skip, limit, order,
+    function removeAll(skip, limit, order, predicate) {
+      return this.delegate.removeAll(
+        skip, limit, order,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
@@ -527,8 +527,8 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(sink, skip, limit, this.comparator, predicate);
     },
-    function removeAll(sink, skip, limit, order, predicate) {
-      return this.delegate.remoteAll(sink, skip, limit, this.comparator, predicate);
+    function removeAll(skip, limit, order, predicate) {
+      return this.delegate.removeAll(skip, limit, this.comparator, predicate);
     }
   ]
 });
@@ -549,8 +549,8 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(sink, this.skip_, limit, order, predicate);
     },
-    function removeAll(sink, skip, limit, order, predicate) {
-      return this.delegate.removeAll(sink, this.skip_, limit, order, predicate);
+    function removeAll(skip, limit, order, predicate) {
+      return this.delegate.removeAll(this.skip_, limit, order, predicate);
     }
   ]
 });
@@ -575,9 +575,9 @@ foam.CLASS({
         order, predicate);
     },
 
-    function removeAll(sink, skip, limit, order, predicate) {
+    function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(
-        sink, skip,
+        skip,
         limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
         order, predicate);
     }
@@ -645,7 +645,7 @@ foam.CLASS({
         }
       }
 
-      return Promise.resolve(o2 || obj)
+      return Promise.resolve();
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -669,21 +669,18 @@ foam.CLASS({
       return Promise.resolve(resultSink);
     },
 
-    function removeAll(sink, skip, limit, order, predicate) {
+    function removeAll(skip, limit, order, predicate) {
       predicate = predicate || this.True.create();
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
           var obj = this.array.splice(i, 1)[0];
           i--;
-          sink && sink.remove(obj);
           this.on.remove.pub(obj);
         }
       }
 
-      sink && sink.eof();
-
-      return Promise.resolve(sink || '');
+      return Promise.resolve();
     },
 
     function find(id) {
@@ -754,9 +751,9 @@ foam.CLASS({
             return p.select(sink, skip, limit, order, predicate);
           });
         },
-        function removeAll(sink, skip, limit, order, predicate) {
+        function removeAll(skip, limit, order, predicate) {
           return this.promise.then(function(p) {
-            return p.removeAll(sink, skip, limit, order, predicate);
+            return p.removeAll(skip, limit, order, predicate);
           });
         }
       ]
@@ -803,16 +800,7 @@ foam.CLASS({
 
 /*
 TODO:
--mlangs
--Context oriented?
-
-questions:
--listen/unlisten using Topics ?
--promises vs sinks
-  Sinks make chaining easier dao1.put(obj, dao2);
-  Promises more compatible.
+-Context oriented ?
 -enforcement of interfaces
--anonymous sinks?
--removeAll still takes a sink?
-
+-anonymous sinks ?
 */
