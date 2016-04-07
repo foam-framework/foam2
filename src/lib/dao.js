@@ -128,54 +128,6 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'DAOOptions',
-
-  requires: [
-    'foam.mlang.predicate.And'
-  ],
-
-  properties: [
-    {
-      class: 'Int',
-      name: 'skip'
-    },
-    {
-      class: 'Int',
-      name: 'limit'
-    },
-    'orderBy',
-    'where'
-  ],
-
-  methods: [
-    function addSkip(s) {
-      var o = this.cls_.create(this);
-      o.skip = s;
-      return o;
-    },
-    function addLimit(l) {
-      var o = this.cls_.create(this);
-      o.limit = this.hasOwnProperty('limit') ?
-        Math.min(l, this.limit) : l;
-      return o;
-    },
-    function addOrderBy(s) {
-      var o = this.cls_.create(this);
-      o.orderBy = s;
-      return o;
-    },
-    function addWhere(p) {
-      var o = this.cls_.create(this);
-      o.where = this.where ?
-        this.And.create({ args: [this.where, p] }) :
-        p;
-      return o;
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.dao',
@@ -435,8 +387,8 @@ foam.CLASS({
 
     {
       name: 'pipe',
-      code: function pipe(sink, options) {
-        var mySink = this.decorateSink_(sink, options, true);
+      code: function pipe(sink, skip, limit, order, predicate) {
+        var mySink = this.decorateSink_(sink, skip, limit, order, predicate, true);
 
         var fc = this.FlowControl.create();
         var sub;
@@ -450,7 +402,7 @@ foam.CLASS({
           }
         });
 
-        this.select(sink, options).then(function() {
+        this.select(sink, skip, limit, order, predicate).then(function() {
           this.on.sub(function(s, on, e, obj) {
             sub = s;
             switch(e) {
@@ -471,35 +423,37 @@ foam.CLASS({
 
     function update() {},
 
-    function decorateSink_(sink, options, isListener, disableLimit) {
-      if ( options ) {
-        if ( ! disableLimit ) {
-          if ( options.hasOwnProperty('limit') )
-            sink = this.LimitedSink.create({
-              limit: options.limit,
-              delegate: sink
-            });
-
-          if ( options.hasOwnProperty('skip') )
-            sink = this.SkipSink.create({
-              skip: options.skip,
-              delegate: sink
-            });
+    function decorateSink_(sink, skip, limit, order, predicate, isListener, disableLimit) {
+      if ( ! disableLimit ) {
+        if ( limit !== undefined ) {
+          sink = this.LimitedSink.create({
+            limit: limit,
+            delegate: sink
+          });
         }
 
-        if ( options.orderBy && ! isListener )
-          sink = this.OrderedSink.create({
-            comparator: options.orderBy,
+        if ( skip !== undefined ) {
+          sink = this.SkipSink.create({
+            skip: skip,
             delegate: sink
           });
+        }
+      }
 
-        if ( options.where )
-          sink = this.PredicatedSink.create({
-            predicate: options.where.partialEval ?
-              options.where.partialEval() :
-              options.where,
-            delegate: sink
-          });
+      if ( order !== undefined && ! isListener ) {
+        sink = this.OrderedSink.create({
+          comparator: order,
+          delegate: sink
+        });
+      }
+
+      if ( predicate !== undefined ) {
+        sink = this.PredicatedSink.create({
+          predicate: predicate.partialEval ?
+            predicate.partialEval() :
+            predicate,
+          delegate: sink
+        });
       }
 
       return sink;
@@ -512,8 +466,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
-
-  requires: [ 'foam.dao.DAOOptions' ],
 
   properties: [
     {
@@ -530,6 +482,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
   extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.mlang.predicate.And'
+  ],
 
   properties: [
     {
@@ -538,14 +493,20 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addWhere(this.predicate);
-      return this.delegate.select(sink, options);
+    function select(sink, skip, limit, order, predicate) {
+      return this.delegate.select(
+        sink, skip, limit, order,
+        predicate ?
+          this.And.create({ args: [this.predicate, predicate] }) :
+          this.predicate);
     },
 
-    function removeAll(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addWhere(this.predicate);
-      return this.delegate.removeAll(sink, options);
+    function removeAll(sink, skip, limit, order, predicate) {
+      return this.delegate.remoteAll(
+        sink, skip, limit, order,
+        predicate ?
+          this.And.create({ args: [this.predicate, predicate] }) :
+          this.predicate);
     }
   ]
 });
@@ -563,13 +524,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
-      return this.delegate.select(sink, options);
+    function select(sink, skip, limit, order, predicate) {
+      return this.delegate.select(sink, skip, limit, this.comparator, predicate);
     },
-    function removeAll(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addOrderBy(this.comparator);
-      return this.delegate.removeAll(sink, options);
+    function removeAll(sink, skip, limit, order, predicate) {
+      return this.delegate.remoteAll(sink, skip, limit, this.comparator, predicate);
     }
   ]
 });
@@ -587,13 +546,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addSkip(this.skip_);
-      return this.delegate.select(sink, options);
+    function select(sink, skip, limit, order, predicate) {
+      return this.delegate.select(sink, this.skip_, limit, order, predicate);
     },
-    function removeAll(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addSkip(this.skip_);
-      return this.delegate.removeAll(sink, options);
+    function removeAll(sink, skip, limit, order, predicate) {
+      return this.delegate.removeAll(sink, this.skip_, limit, order, predicate);
     }
   ]
 });
@@ -611,14 +568,18 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
-      return this.delegate.select(sink, options);
+    function select(sink, skip, limit, order, predicate) {
+      return this.delegate.select(
+        sink, skip,
+        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
+        order, predicate);
     },
 
-    function removeAll(sink, options) {
-      options = ( options || this.DAOOptions.create() ).addLimit(this.limit_);
-      return this.delegate.removeAll(sink, options);
+    function removeAll(sink, skip, limit, order, predicate) {
+      return this.delegate.removeAll(
+        sink, skip,
+        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
+        order, predicate);
     }
   ]
 });
@@ -661,10 +622,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function listen(sink, options) {
-    },
-
-    function put(obj, sink) {
+    function put(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.compare.equals(obj.id, this.array[i].id) ) {
           this.array[i] = obj;
@@ -673,31 +631,27 @@ foam.CLASS({
       }
 
       if ( i == this.array.length ) this.array.push(obj);
-      sink && sink.put(obj);
       this.on.put.pub(obj);
 
-      return Promise.resolve(sink || obj);
+      return Promise.resolve(obj);
     },
 
-    function remove(obj, sink) {
+    function remove(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.compare.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
-          sink && sink.remove(o2);
           this.on.remove.pub(o2);
-          return Promise.resolve(sink || o2);
+          break;
         }
       }
 
-      var err = this.ObjectNotFoundException.create({ id: obj.id });
-      sink && sink.error(err);
-      return Promise.reject(err);
+      return Promise.resolve(o2 || obj)
     },
 
-    function select(sink, options) {
+    function select(sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
 
-      sink = this.decorateSink_(resultSink, options);
+      sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
       var fc = this.FlowControl.create();
       for ( var i = 0 ; i < this.array.length ; i++ ) {
@@ -715,8 +669,8 @@ foam.CLASS({
       return Promise.resolve(resultSink);
     },
 
-    function removeAll(sink, options) {
-      var predicate = ( options && options.where ) || this.True.create();
+    function removeAll(sink, skip, limit, order, predicate) {
+      predicate = predicate || this.True.create();
 
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
@@ -785,24 +739,24 @@ foam.CLASS({
       name: 'Pending',
       extends: 'foam.dao.AbstractDAO',
       methods: [
-        function put(obj, sink) {
+        function put(obj) {
           return this.promise.then(function(p) {
-            return p.put(obj, sink);
+            return p.put(obj);
           });
         },
-        function remove(obj, sink) {
+        function remove(obj) {
           return this.promise.then(function(p) {
-            return p.remove(obj, sink);
+            return p.remove(obj);
           });
         },
-        function select(sink, options) {
+        function select(sink, skip, limit, order, predicate) {
           return this.promise.then(function(p) {
-            return p.select(sink, options);
+            return p.select(sink, skip, limit, order, predicate);
           });
         },
-        function removeAll(sink, options) {
+        function removeAll(sink, skip, limit, order, predicate) {
           return this.promise.then(function(p) {
-            return p.removeAll(sink, options);
+            return p.removeAll(sink, skip, limit, order, predicate);
           });
         }
       ]

@@ -56,67 +56,55 @@ foam.CLASS({
             radius: 15,
             x: 400+(x-(N-1)/2)*70,
             y: 200+(y-(N-1)/2)*70,
-            borderWidth: 6,
-            arcWidth: 6, // TODO
+            arcWidth: 6,
+            friction: 0.96,
+            gravity: 0.03,
             border: 'hsl(' + x/N*100 + ',' + (70+y/N*30) + '%, 60%)'
           });
+          this.engine.add(c);
           this.addChildren(c);
 
-          c.y$.sub(function(c) {
+          c.y$.sub(foam.fn.bind(function(c) {
             if ( c.y > 1/this.scaleY*this.height+50 ) {
               c.y = -50;
             }
-          }.bind(this, c));
+          }, this, c));
 
-          c.gravity = 0.03;
-          c.friction = 0.96;
-          this.bounceOnWalls(c, this.width, this.height);
-          this.engine.add(c);
+          // Bounce on Walls
+          c.x$.sub(foam.fn.bind(function(c, w, h) {
+            if ( c.x < 0          ) c.vx =  Math.abs(c.vx)+0.1;
+            if ( c.x > this.width ) c.vx = -Math.abs(c.vx)-0.1;
+          }, this, c));
         }
       }
 
       var count = 0;
       this.timer.i$.sub(function(s) {
         this.invalidated.pub();
-        if ( count === 100 ) return;
+        if ( count === 201 ) return;
         count++;
-//        if ( count++ == 100 ) s.destroy();
+//        if ( count++ === 100 ) s.destroy();
 
         var b = this.PhysicalCircle.create({
           radius: 3,
           x: this.width * Math.random(),
           y: this.height/this.scaleY,
-          borderWidth: 1,
           arcWidth: 1, // TODO
           border: 'blue',
+          gravity: -0.2,
+          friction: 0.96,
           mass: 0.3
         });
+        this.engine.add(b);
+        this.addChildren(b);
 
-        b.y$.sub(function() {
+        b.y$.sub(foam.fn.bind(function() {
           if ( b.y < 1 ) {
             b.y = this.height;
             b.x = this.width * Math.random();
           }
-        }.bind(this));
-
-        b.vy = -4;
-        b.gravity = -0.2;
-        b.friction = 0.96;
-        this.engine.add(b);
-
-        this.addChildren(b);
+        }, this));
       }.bind(this));
-    },
-
-    function bounceOnWalls(c, w, h) {
-      // TODO:
-      /*
-      Events.dynamicFn(function() { c.x; c.y; }, function() {
-        var r = c.r + c.borderWidth;
-        if ( c.x < r ) c.vx = Math.abs(c.vx);
-        if ( c.x > w - r ) c.vx = -Math.abs(c.vx);
-      });
-      */
     }
   ]
 });

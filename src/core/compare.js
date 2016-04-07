@@ -90,7 +90,7 @@ foam.LIB({
         hash = ((hash << 5) - hash) + code;
         hash &= hash;
       }
-      
+
       return hash;
     },
 
@@ -100,7 +100,7 @@ foam.LIB({
       for ( var i = 0 ; i < a.length ; i++ ) {
         hash = ((hash << 5) - hash) + this.hashCode(a[i]);
       }
-      
+
       return hash;
     },
 

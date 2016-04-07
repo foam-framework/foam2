@@ -375,4 +375,3 @@ global.genericDAOTestBattery = function(daoFactory) {
     });
   });
 };
-

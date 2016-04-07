@@ -285,9 +285,11 @@ foam.CLASS({
 
   methods: [
     function initCView() {
+/*
       this.propertyChange.sub(function() {
-        this.invalidated.pub();
+        this.pub('invalidated');
       }.bind(this));
+*/
     },
 
     function maybeInitCView() {
@@ -337,8 +339,10 @@ foam.CLASS({
     },
 
     function addChildren() {
-      for ( var i = 0 ; i < arguments.length ; i++ )
+      for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
+        // this.addChild_(arguments[i]);
+      }
     },
 
     function paintSelf(x) {},
@@ -354,7 +358,11 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onChildUpdate() { this.invalidated.pub(); }
+    {
+      name: 'onChildUpdate',
+      isFramed: true,
+      code: function onChildUpdate() { this.pub('invalidated'); }
+    }
   ]
 });
 
