@@ -150,7 +150,6 @@ foam.LIB({
         cls.ID__             = this.id + 'Class';
         cls.private_         = { axiomCache: {} };
         cls.axiomMap_        = Object.create(parent.axiomMap_);
-        // TODO: define 'id' in Model and FObject, then remove this
         cls.id               = this.id;
         cls.package          = this.package;
         cls.name             = this.name;
@@ -329,14 +328,14 @@ foam.LIB({
     function getAxiomsByClass(cls) {
       // TODO: Add efficient support for:
       //    .where() .orderBy() .groupBy()
-      var as = this.private_.axiomCache[cls.name];
+      var as = this.private_.axiomCache[cls.id];
       if ( ! as ) {
         as = [];
         for ( var key in this.axiomMap_ ) {
           var a = this.axiomMap_[key];
           if ( cls.isInstance(a) ) as.push(a);
         }
-        this.private_.axiomCache[cls.name] = as;
+        this.private_.axiomCache[cls.id] = as;
       }
 
       return as;
