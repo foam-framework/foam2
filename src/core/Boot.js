@@ -129,6 +129,7 @@ foam.LIB({
         cls = foam.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
+        console.assert(this.id, 'Missing id name.', this.name);
         console.assert(this.name, 'Missing class name.');
 //        if ( global[this.name] )
 //          console.warn('Redefinition of class: ' + this.name);
@@ -150,8 +151,7 @@ foam.LIB({
         cls.private_         = { axiomCache: {} };
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         // TODO: define 'id' in Model and FObject, then remove this
-        cls.id               = this.id ||
-          ( this.package ? this.package + '.' + this.name : this.name );
+        cls.id               = this.id;
         cls.package          = this.package;
         cls.name             = this.name;
         cls.model_           = this;
@@ -426,6 +426,7 @@ foam.boot.start();
  *  extend FObject and inherit its methods.
  */
 foam.CLASS({
+  id: 'foam.core.FObject',
   package: 'foam.core',
   name: 'FObject',
 
@@ -493,6 +494,7 @@ foam.CLASS({
 
 /** Class/Prototype description. */
 foam.CLASS({
+  id: 'foam.core.Model',
   package: 'foam.core',
   name: 'Model',
   extends: 'FObject', // Isn't the default yet.
@@ -566,6 +568,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  id: 'foam.core.Property',
   package: 'foam.core',
   name: 'Property',
   extends: 'FObject',
@@ -819,6 +822,7 @@ foam.CLASS({
 </pre>
 */
 foam.CLASS({
+  id: 'foam.core.Method',
   package: 'foam.core',
   name: 'Method',
   extends: 'FObject',
@@ -872,6 +876,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  id: 'foam.core.String',
   package: 'foam.core',
   name: 'String',
   extends: 'Property',
@@ -891,6 +896,7 @@ foam.CLASS({
 
 
 foam.CLASS({
+  id: 'foam.core.Array',
   package: 'foam.core',
   name: 'Array',
   extends: 'Property',
