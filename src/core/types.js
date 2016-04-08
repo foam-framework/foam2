@@ -41,7 +41,7 @@ foam.CLASS({
         if ( ! o1 ) return o2 ? -1 : 0;
         if ( ! o2 ) return 1;
 
-        return foam.compare.dateCompare(o1, o2);
+        return foam.types.Date.compare(o1, o2);
       }
     }
   ]

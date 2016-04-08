@@ -189,7 +189,7 @@ foam.LIB({
       var removed = [];
       for ( var i = 0 ; i < this.length ; i++ ) {
         for ( var j = 0 ; j < added.length ; j++ ) {
-          if ( foam.compare.compare(this[i], added[j]) == 0 ) {
+          if ( foam.compare.equals(this[i], added[j]) ) {
             added.splice(j, 1);
             j--;
             break;

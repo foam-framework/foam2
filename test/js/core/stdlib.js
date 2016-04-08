@@ -65,21 +65,7 @@ describe('string.pad', function() {
 
 });
 
-describe('Number.compareTo', function() {
-
-  beforeEach(function() {
-  });
-  afterEach(function() {
-  });
-
-  it('compares', function() {
-    var n = new Number(3);
-    expect(foam.compare.compare(n, 3)).toEqual(0);
-    expect(foam.compare.compare(n, 1)).toEqual(1);
-    expect(foam.compare.compare(n, 6)).toEqual(-1);
-  });
-
-});
+/*
 describe('String.compareTo', function() {
 
   beforeEach(function() {
@@ -95,7 +81,7 @@ describe('String.compareTo', function() {
   });
 
 });
-
+*/
 
 describe('Array diff', function() {
   var x;
@@ -103,13 +89,13 @@ describe('Array diff', function() {
 
   beforeEach(function() {
     foam.CLASS({
-      name: 'CompA',
       package: 'test',
+      name: 'CompA',
       properties: [ 'a', 'b' ]
     });
     foam.CLASS({
-      name: 'CompB',
       package: 'test',
+      name: 'CompB',
       properties: [ 'b', 'c' ]
     });
     x = test.CompA.create();
