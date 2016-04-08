@@ -22,7 +22,7 @@
  *   put(state, value) -> new state
  *   remove(state, value) -> new state
  *   removeAll(state) -> new state // TODO
- *   plan(state, sink, options) -> {cost: int, toString: fn, execute: fn}
+ *   plan(state, sink, skip, limit, order, predicate) -> {cost: int, toString: fn, execute: fn}
  *   size(state) -> int
  * Add:
  *   get(key) -> obj
@@ -69,15 +69,13 @@ var ValueIndex = {
            return function() { return plan; };
          })(),
   get: function(value, key) { return value; },
-  select: function(value, sink, options) {
-    if ( options ) {
-      if ( options.query && ! options.query.f(value) ) return;
-      if ( 'skip' in options && options.skip-- > 0 ) return;
-      if ( 'limit' in options && options.limit-- < 1 ) return;
-    }
+  select: function(value, sink, skip, limit, order, predicate) {
+    if ( predicate && ! predicate.f(value) ) return;
+    if ( skip && skip-- > 0 ) return;
+    if ( limit && limit-- < 1 ) return;
     sink.put(value);
   },
-  selectReverse: function(value, sink, options) { this.select(value, sink, options); },
+  selectReverse: function(value, sink, skip, limit, order, predicate) { this.select(value, sink, skip, limit, order, predicate); },
   size:   function(obj) { return 1; },
   toString: function() { return 'value'; }
 };
@@ -337,40 +335,36 @@ var TreeIndex = {
     return this.get(r > 0 ? s[LEFT] : s[RIGHT], key);
   },
 
-  select: function(s, sink, options) {
+  select: function(s, sink, skip, limit, order, predicate) {
     if ( ! s ) return;
 
-    if ( options ) {
-      if ( 'limit' in options && options.limit <= 0 ) return;
+    if ( limit && limit <= 0 ) return;
 
-      var size = this.size(s);
-      if ( options.skip >= size && ! options.query ) {
-        options.skip -= size;
-        return;
-      }
+    var size = this.size(s);
+    if ( skip >= size && ! predicate ) {
+      skip -= size;
+      return;
     }
 
-    this.select(s[LEFT], sink, options);
-    this.tail.select(s[VALUE], sink, options);
-    this.select(s[RIGHT], sink, options);
+    this.select(s[LEFT], sink, skip, limit, order, predicate);
+    this.tail.select(s[VALUE], sink, skip, limit, order, predicate);
+    this.select(s[RIGHT], sink, skip, limit, order, predicate);
   },
 
-  selectReverse: function(s, sink, options) {
+  selectReverse: function(s, sink, skip, limit, order, predicate) {
     if ( ! s ) return;
 
-    if ( options ) {
-      if ( 'limit' in options && options.limit <= 0 ) return;
+    if ( limit && limit <= 0 ) return;
 
-      var size = this.size(s);
-      if ( options.skip >= size ) {
-        options.skip -= size;
-        return;
-      }
+    var size = this.size(s);
+    if ( skip >= size ) {
+      skip -= size;
+      return;
     }
 
-    this.selectReverse(s[RIGHT], sink, options);
-    this.tail.selectReverse(s[VALUE], sink, options);
-    this.selectReverse(s[LEFT], sink, options);
+    this.selectReverse(s[RIGHT], sink, skip, limit, order, predicate);
+    this.tail.selectReverse(s[VALUE], sink, skip, limit, order, predicate);
+    this.selectReverse(s[LEFT], sink, skip, limit, order, predicate);
   },
 
   findPos: function(s, key, incl) {
@@ -392,44 +386,44 @@ var TreeIndex = {
     return this.prop.compareProperty(o1, o2);
   },
 
-  plan: function(s, sink, options) {
-    var query = options && options.query;
+  plan: function(s, sink, skip, limit, order, predicate) {
+    var predicate = predicate;
 
-    if ( query === FALSE ) return NOT_FOUND;
+    if ( predicate === FALSE ) return NOT_FOUND;
 
-    if ( ! query && CountExpr.isInstance(sink) ) {
+    if ( ! predicate && CountExpr.isInstance(sink) ) {
       var count = this.size(s);
       //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
       return {
         cost: 0,
-        execute: function(unused, sink, options) { sink.count += count; return anop; },
+        execute: function(unused, sink, skip, limit, order, predicate) { sink.count += count; return anop; },
         toString: function() { return 'short-circuit-count(' + count + ')'; }
       };
     }
 
-//    if ( options && options.limit != null && options.skip != null && options.skip + options.limit > this.size(s) ) return NO_PLAN;
+//    if ( limit != null && skip != null && skip + limit > this.size(s) ) return NO_PLAN;
 
     var prop = this.prop;
 
     var isExprMatch = function(model) {
       if ( ! model ) return undefined;
 
-      if ( query ) {
+      if ( predicate ) {
 
-        if ( model.isInstance(query) && query.arg1 === prop ) {
-          var arg2 = query.arg2;
-          query = undefined;
+        if ( model.isInstance(predicate) && predicate.arg1 === prop ) {
+          var arg2 = predicate.arg2;
+          predicate = undefined;
           return arg2;
         }
 
-        if ( AndExpr.isInstance(query) ) {
-          for ( var i = 0 ; i < query.args.length ; i++ ) {
-            var q = query.args[i];
+        if ( AndExpr.isInstance(predicate) ) {
+          for ( var i = 0 ; i < predicate.args.length ; i++ ) {
+            var q = predicate.args[i];
             if ( model.isInstance(q) && q.arg1 === prop ) {
-              query = query.clone();
-              query.args[i] = TRUE;
-              query = query.partialEval();
-              if ( query === TRUE ) query = null;
+              predicate = predicate.clone();
+              predicate.args[i] = TRUE;
+              predicate = predicate.partialEval();
+              if ( predicate === TRUE ) predicate = null;
               return q.arg2;
             }
           }
@@ -455,17 +449,11 @@ var TreeIndex = {
       var results  = [];
       var cost = 1;
 
-      var newOptions = {};
-      if ( query ) newOptions.query = query;
-      if ( 'limit' in options ) newOptions.limit = options.limit;
-      if ( 'skip'  in options ) newOptions.skip  = options.skip;
-      if ( 'order' in options ) newOptions.order = options.order;
-
       for ( var i = 0 ; i < keys.length ; i++) {
         var result = this.get(s, keys[i]);
 
         if ( result ) {
-          var subPlan = this.tail.plan(result, sink, newOptions);
+          var subPlan = this.tail.plan(result, sink, skip, limit, order, predicate);
 
           cost += subPlan.cost;
           subPlans.push(subPlan);
@@ -477,10 +465,10 @@ var TreeIndex = {
 
       return {
         cost: 1 + cost,
-        execute: function(s2, sink, options) {
+        execute: function(s2, sink, skip, limit, order, predicate) {
           var pars = [];
           for ( var i = 0 ; i < subPlans.length ; i++ ) {
-            pars.push(subPlans[i].execute(results[i], sink, newOptions));
+            pars.push(subPlans[i].execute(results[i], sink, skip, limit, order, predicate));
           }
           return apar.apply(null, pars);
         },
@@ -497,22 +485,15 @@ var TreeIndex = {
 
       if ( ! result ) return NOT_FOUND;
 
-      //        var newOptions = {__proto__: options, query: query};
-      var newOptions = {};
-      if ( query ) newOptions.query = query;
-      if ( 'limit' in options ) newOptions.limit = options.limit;
-      if ( 'skip' in options ) newOptions.skip = options.skip;
-      if ( 'order' in options ) newOptions.order = options.order;
-
-      var subPlan = this.tail.plan(result, sink, newOptions);
+      var subPlan = this.tail.plan(result, sink, skip, limit, order, predicate);
 
       return {
         cost: 1 + subPlan.cost,
-        execute: function(s2, sink, options) {
-          return subPlan.execute(result, sink, newOptions);
+        execute: function(s2, sink, skip, limit, order, predicate) {
+          return subPlan.execute(result, sink, skip, limit, order, predicate);
         },
         toString: function() {
-          return 'lookup(key=' + prop.name + ', cost=' + this.cost + (query && query.toSQL ? ', query: ' + query.toSQL() : '') + ') ' + subPlan.toString();
+          return 'lookup(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ') ' + subPlan.toString();
         }
       };
     }
@@ -521,56 +502,38 @@ var TreeIndex = {
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, false);
-      var newOptions = {skip: ((options && options.skip) || 0) + pos};
-      if ( query ) newOptions.query = query;
-      if ( 'limit' in options ) newOptions.limit = options.limit;
-      if ( 'order' in options ) newOptions.order = options.order;
-      options = newOptions;
+      skip = ((skip) || 0) + pos;
     }
 
     arg2 = isExprMatch(GLOBAL.GteExpr);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, true);
-      var newOptions = {skip: ((options && options.skip) || 0) + pos};
-      if ( query ) newOptions.query = query;
-      if ( 'limit' in options ) newOptions.limit = options.limit;
-      if ( 'order' in options ) newOptions.order = options.order;
-      options = newOptions;
+      skip = ((skip) || 0) + pos;
     }
 
     arg2 = isExprMatch(GLOBAL.LtExpr);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, true);
-      var newOptions = {limit: (pos - (options && options.skip) || 0)};
-      if ( query ) newOptions.query = query;
-      if ( 'limit' in options ) newOptions.limit = Math.min(options.limit, newOptions.limit);
-      if ( 'skip' in options ) newOptions.skip = options.skip;
-      if ( 'order' in options ) newOptions.order = options.order;
-      options = newOptions;
+      limit = Math.min(limit, (pos - (skip || 0)) );
     }
 
     arg2 = isExprMatch(GLOBAL.LteExpr);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, false);
-      var newOptions = {limit: (pos - (options && options.skip) || 0)};
-      if ( query ) newOptions.query = query;
-      if ( 'limit' in options ) newOptions.limit = Math.min(options.limit, newOptions.limit);
-      if ( 'skip' in options ) newOptions.skip = options.skip;
-      if ( 'order' in options ) newOptions.order = options.order;
-      options = newOptions;
+      limit = Math.min(limit, (pos - (skip || 0)) );
     }
 
     var cost = this.size(s);
     var sortRequired = false;
     var reverseSort = false;
 
-    if ( options && options.order ) {
-      if ( options.order === prop ) {
+    if ( order ) {
+      if ( order === prop ) {
         // sort not required
-      } else if ( GLOBAL.DescExpr && DescExpr.isInstance(options.order) && options.order.arg1 === prop ) {
+      } else if ( GLOBAL.DescExpr && DescExpr.isInstance(order) && order.arg1 === prop ) {
         // reverse-sort, sort not required
         reverseSort = true;
       } else {
@@ -579,28 +542,28 @@ var TreeIndex = {
       }
     }
 
-    if ( options && ! sortRequired ) {
-      if ( options.skip ) cost -= options.skip;
-      if ( options.limit ) cost = Math.min(cost, options.limit);
+    if ( ! sortRequired ) {
+      if ( skip ) cost -= skip;
+      if ( limit ) cost = Math.min(cost, limit);
     }
 
     return {
       cost: cost,
       execute: function() {
         /*
-         var o = options && (options.skip || options.limit) ?
-         {skip: options.skip || 0, limit: options.limit || Number.MAX_VALUE} :
+         var o = (skip || limit) ?
+         {skip: skip || 0, limit: limit || Number.MAX_VALUE} :
          undefined;
          */
         if ( sortRequired ) {
           var a = [].sink;
           index.selectCount++;
-          index.select(s, a, {query: options.query});
+          index.select(s, a, {predicate: predicate});
           index.selectCount--;
-          a.sort(toCompare(options.order));
+          a.sort(toCompare(order));
 
-          var skip = options.skip || 0;
-          var limit = Number.isFinite(options.limit) ? options.limit : a.length;
+          var skip = skip || 0;
+          var limit = Number.isFinite(limit) ? limit : a.length;
           limit += skip;
           limit = Math.min(a.length, limit);
 
@@ -608,22 +571,20 @@ var TreeIndex = {
             sink.put(a[i]);
         } else {
 // What did this do?  It appears to break sorting in saturn mail
-/*          if ( reverseSort && options && options.skip )
+/*          if ( reverseSort && skip )
             // TODO: temporary fix, should include range in select and selectReverse calls instead.
-            options = {
-              __proto__: options,
-              skip: index.size(s) - options.skip - (options.limit || index.size(s)-options.skip)
-            };*/
+            skip = index.size(s) - skip - (limit || index.size(s)-skip)
+            */
           index.selectCount++;
           reverseSort ?
-            index.selectReverse(s, sink, options) :
-            index.select(s, sink, options) ;
+            index.selectReverse(s, sink, skip, limit, order, predicate) :
+            index.select(s, sink, skip, limit, order, predicate) ;
           index.selectCount--;
         }
 
         return anop;
       },
-      toString: function() { return 'scan(key=' + prop.name + ', cost=' + this.cost + (query && query.toSQL ? ', query: ' + query.toSQL() : '') + ')'; }
+      toString: function() { return 'scan(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ')'; }
     };
   },
 
@@ -761,10 +722,10 @@ var AutoPositionIndex = {
     return this;
   },
 
-  addPosIndex: function(s, options) {
+  addPosIndex: function(s, skip, limit, order, predicate) {
     var index = PositionIndex.create(
-      options && options.order,
-      options && options.query,
+      order,
+      predicate,
       this.factory,
       this.dao,
       this.networkdao,
@@ -775,39 +736,39 @@ var AutoPositionIndex = {
     s.push(index.bulkLoad([]));
   },
 
-  hasIndex: function(options) {
+  hasIndex: function(skip, limit, order, predicate) {
     for ( var i = 0; i < this.sets.length; i++ ) {
       var set = this.sets[i];
-      if ( set[0].equals((options && options.query) || '') && set[1].equals((options && options.order) || '') ) return true;
+      if ( set[0].equals((predicate) || '') && set[1].equals((order) || '') ) return true;
     }
     return false;
   },
 
-  plan: function(s, sink, options) {
-    var subPlan = this.alt.plan(s, sink, options);
+  plan: function(s, sink, skip, limit, order, predicate) {
+    var subPlan = this.alt.plan(s, sink, skip, limit, order, predicate);
 
     if ( subPlan != NO_PLAN ) return subPlan;
 
-    if ( ( options && options.skip != null && options.limit != null ) ||
+    if ( ( skip != null && limit != null ) ||
          CountExpr.isInstance(sink) ) {
-      if ( this.hasIndex(options) ) return NO_PLAN;
-      this.sets.push([(options && options.query) || '', (options && options.order) || '']);
-      this.addPosIndex(s, options);
-      return this.alt.plan(s, sink, options);
+      if ( this.hasIndex(skip, limit, order, predicate) ) return NO_PLAN;
+      this.sets.push([(predicate) || '', (order) || '']);
+      this.addPosIndex(s, skip, limit, order, predicate);
+      return this.alt.plan(s, sink, skip, limit, order, predicate);
     }
     return NO_PLAN;
   }
 };
 
 var PositionIndex = {
-  create: function(order, query, factory, dao, networkdao, queue, maxage) {
+  create: function(order, predicate, factory, dao, networkdao, queue, maxage) {
     var obj = {
       __proto__: this,
       order: order || '',
-      query: query || '',
+      predicate: predicate || '',
       factory: factory,
       dao: dao,
-      networkdao: networkdao.where(query).orderBy(order),
+      networkdao: networkdao.where(predicate).orderBy(order),
       maxage: maxage,
       queue: arequestqueue(function(ret, request) {
         var s = request.s;
@@ -834,7 +795,7 @@ var PositionIndex = {
 
   put: function(s, newValue) {
     if ( s.feedback === newValue.id ) return s;
-    if ( this.query && ! this.query.f(newValue) ) return s;
+    if ( this.predicate && ! this.predicate.f(newValue) ) return s;
 
     var compare = toCompare(this.order);
 
@@ -881,21 +842,19 @@ var PositionIndex = {
 
   bulkLoad: function(a) { return []; },
 
-  plan: function(s, sink, options) {
-    var order = ( options && options.order ) || '';
-    var query = ( options && options.query ) || '';
-    var skip = options && options.skip;
-    var limit = options && options.limit;
+  plan: function(s, sink, skip, limit, order, predicate) {
+    var order = ( order ) || '';
+    var predicate = ( predicate ) || '';
 
     var self = this;
 
     if ( ! order.equals(this.order) ||
-         ! query.equals(this.query) ) return NO_PLAN;
+         ! predicate.equals(this.predicate) ) return NO_PLAN;
 
     if ( CountExpr.isInstance(sink) ) {
       return {
         cost: 0,
-        execute: function(s, sink, options) {
+        execute: function(s, sink, skip, limit, order, predicate) {
           if ( ! s.count ) {
             s.count = amemo(function(ret) {
               self.networkdao.select(COUNT())(function(c) {
@@ -919,7 +878,7 @@ var PositionIndex = {
     return {
       cost: 0,
       toString: function() { return 'position-index(cost=' + this.cost + ')'; },
-      execute: function(s, sink, options) {
+      execute: function(s, sink, skip, limit, order, predicate) {
         var objs = [];
 
         var min;
@@ -1012,12 +971,12 @@ var AltIndex = {
     return s;
   },
 
-  plan: function(s, sink, options) {
+  plan: function(s, sink, skip, limit, order, predicate) {
     var bestPlan;
     var bestPlanI = 0;
-    //    console.log('Planning: ' + (options && options.query && options.query.toSQL && options.query.toSQL()));
+    //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
     for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-      var plan = this.delegates[i].plan(s[i], sink, options);
+      var plan = this.delegates[i].plan(s[i], sink, skip, limit, order, predicate);
 
       // console.log('  plan ' + i + ': ' + plan);
       if ( plan.cost <= AltIndex.GOOD_ENOUGH_PLAN ) {
@@ -1038,7 +997,7 @@ var AltIndex = {
 
     return {
       __proto__: bestPlan,
-      execute: function(unused, sink, options) { return bestPlan.execute(s[bestPlanI], sink, options); }
+      execute: function(unused, sink, skip, limit, order, predicate) { return bestPlan.execute(s[bestPlanI], sink, skip, limit, order, predicate); }
     };
   },
 
@@ -1057,7 +1016,7 @@ var mLangIndex = {
       mlang: mlang,
       PLAN: {
         cost: 0,
-        execute: function(s, sink, options) { sink.copyFrom(s); return anop; },
+        execute: function(s, sink, skip, limit, order, predicate) { sink.copyFrom(s); return anop; },
         toString: function() { return 'mLangIndex(' + this.s + ')'; }
       }
     };
@@ -1088,9 +1047,9 @@ var mLangIndex = {
 
   size: function(s) { return Number.MAX_VALUE; },
 
-  plan: function(s, sink, options) {
+  plan: function(s, sink, skip, limit, order, predicate) {
     // console.log('s');
-    if ( options && options.query ) return NO_PLAN;
+    if ( predicate ) return NO_PLAN;
 
     if ( sink.model_ && sink.model_.isInstance(s) && s.arg1 === sink.arg1 ) {
       this.PLAN.s = s;
@@ -1133,15 +1092,12 @@ var AutoIndex = {
     this.mdao.addIndex(prop);
   },
 
-  plan: function(s, sink, options) {
-    if ( options ) {
-      if ( options.order && Property.isInstance(options.order) && ! this.properties[options.order.name] ) {
-        this.addIndex(options.order);
-      } else if ( options.query ) {
-        // TODO: check for property in query
-      }
+  plan: function(s, sink, skip, limit, order, predicate) {
+    if ( order && Property.isInstance(order) && ! this.properties[order.name] ) {
+      this.addIndex(order);
+    } else if ( predicate ) {
+      // TODO: check for property in predicate
     }
-
     return NO_PLAN;
   },
 
@@ -1304,11 +1260,10 @@ var MDAO = Model.create({
       });
     },
 
-    removeAll: function(sink, options) {
-      if (!options) options = {};
-      if (!options.query) options.query = TRUE;
+    removeAll: function(sink, skip, limit, order, predicate) {
+      if (!predicate) predicate = TRUE;
       var future = afuture();
-      this.where(options.query).select()(function(a) {
+      this.where(predicate).select()(function(a) {
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.root = this.index.remove(this.root, a[i]);
           delete this.map[a[i].id];
@@ -1321,22 +1276,20 @@ var MDAO = Model.create({
       return future.get;
     },
 
-    select: function(sink, options) {
+    select: function(sink, skip, limit, order, predicate) {
       sink = sink || [].sink;
-      // Clone the options to prevent 'limit' from being mutated in the original.
-      if ( options ) options = {__proto__: options};
 
       if ( GLOBAL.ExplainExpr && GLOBAL.ExplainExpr.isInstance(sink) ) {
-        var plan = this.index.plan(this.root, sink.arg1, options);
+        var plan = this.index.plan(this.root, sink.arg1, skip, limit, order, predicate);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
         return aconstant(sink);
       }
 
-      var plan = this.index.plan(this.root, sink, options);
+      var plan = this.index.plan(this.root, sink, skip, limit, order, predicate);
 
       var future = afuture();
-      plan.execute(this.root, sink, options)(
+      plan.execute(this.root, sink, skip, limit, order, predicate)(
         function(ret) {
           sink && sink.eof && sink.eof();
           future.set(sink)
