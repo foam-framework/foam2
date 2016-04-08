@@ -83,7 +83,13 @@ foam.LIB = function LIB(model) {
     }
   }
 
-  var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
+  var root = global;
+  var path = model.name.split('.');
+  for ( var i = 0 ; i < path.length ; i++ ) {
+    root = root[path[i]] || ( root[path[i]] = {} );
+  }
+//  var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
+  var proto = root;
 
   if ( model.constants ) {
     console.assert(typeof model.constants === 'object',
@@ -112,7 +118,7 @@ foam.LIB = function LIB(model) {
 
 
 foam.LIB({
-  name: 'fn',
+  name: 'foam.fn',
 
   methods: [
     function bind(f, that, a1, a2, a3, a4) {
@@ -162,7 +168,7 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'math',
+  name: 'foam.math',
 
   methods: [
     function distance(x, y) { return Math.sqrt(x*x + y*y); }
@@ -172,7 +178,7 @@ foam.LIB({
 
 /** Array prototype additions. */
 foam.LIB({
-  name: 'Array',
+  name: 'foam.Array',
 
   methods: [
     function diff(other) {

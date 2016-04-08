@@ -16,7 +16,7 @@
  */
 
 foam.LIB({
-  name: 'compare',
+  name: 'foam.compare',
 
   methods: [
     function isDefined(o) {

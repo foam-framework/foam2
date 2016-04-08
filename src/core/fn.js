@@ -16,7 +16,7 @@
  */
 
 foam.LIB({
-  name: 'fn',
+  name: 'foam.fn',
 
   methods: [
     /** Faster version of memoize() when only dealing with one argument. */
@@ -78,7 +78,7 @@ foam.LIB({
       @class fn
       @ignore */
     foam.LIB({
-      name: 'fn',
+      name: 'foam.fn',
       methods: [ function setName() { /* NOP */ } ]
     });
   }

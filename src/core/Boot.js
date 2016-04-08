@@ -107,7 +107,7 @@
  Is discarded after use.
 */
 foam.LIB({
-  name: 'boot',
+  name: 'foam.boot',
 
   constants: {
     startTime: Date.now(),
@@ -235,7 +235,7 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'AbstractClass',
+  name: 'foam.AbstractClass',
 
   // documentation: "Root prototype for all classes.",
 

@@ -16,7 +16,7 @@
  */
 
 foam.LIB({
-  name: 'string',
+  name: 'foam.string',
 
   methods: [
     {

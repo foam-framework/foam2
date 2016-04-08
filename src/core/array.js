@@ -16,7 +16,7 @@
  */
 
 foam.LIB({
-  name: 'array',
+  name: 'foam.array',
 
   methods: [
     function argsToArray(args) {

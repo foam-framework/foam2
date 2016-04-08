@@ -7,7 +7,7 @@ describe('internal foam.LIB', function() {
 
   it('applies constants', function() {
     foam.LIB({
-        name: 'testLib',
+        name: 'foam.testLib',
         constants: {
           CONST: 'val'
         }

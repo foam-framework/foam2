@@ -16,7 +16,7 @@
  */
 
 foam.LIB({
-  name: 'date',
+  name: 'foam.date',
 
   methods: [
     function relativeDateString(date) {

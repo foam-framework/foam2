@@ -16,7 +16,7 @@
  */
 
 foam.LIB({
-  name: 'events',
+  name: 'foam.events',
 
   methods: [
     function oneTime(listener) {

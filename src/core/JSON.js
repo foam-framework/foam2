@@ -53,7 +53,7 @@ foam.CLASS({
 
 
 foam.LIB({
-  name: 'Array',
+  name: 'foam.Array',
 
   methods: [
 //     function toJSON() { // DANGER! This caused problems with node require when running 'npm run doc'
@@ -72,7 +72,7 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'json',
+  name: 'foam.json',
 
   methods: [
     function createOut() {

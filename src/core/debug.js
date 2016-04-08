@@ -250,7 +250,7 @@ foam.CLASS({
 
 /** The types library deals with type safety. */
 foam.LIB({
-  name: 'types',
+  name: 'foam.types',
 
   methods: [
     function getFunctionArgs(fn) {
