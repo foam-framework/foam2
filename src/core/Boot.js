@@ -655,10 +655,10 @@ foam.CLASS({
       // If not in debug mode we should share implementations like in F1.
       Object.defineProperty(proto, slotName, {
         get: function propDynGetter() {
-          return this.slot(name, slotName, prop);
+          return prop.toSlot(this);
         },
         set: function propDynSetter(dyn) {
-          this.slot(name, slotName, prop).link(dyn);
+          prop.toSlot(this).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -704,7 +704,7 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange(name, oldValue, newValue, slotName);
+          this.pubPropertyChange(name, oldValue, newValue);
 
           // TODO(maybe): pub to a global topic to support dynamic()
 
@@ -777,6 +777,20 @@ foam.CLASS({
     function exportedValue(obj) {
       /** Export obj.name$ instead of just obj.name. **/
       return obj.slot(this.name);
+    },
+
+    function toSlot(obj) {
+      var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
+      var dyn      = obj.getPrivate_(slotName);
+
+      if ( ! dyn ) {
+        dyn = foam.core.internal.PropertySlot.create();
+        dyn.obj  = obj;
+        dyn.prop = this;
+        obj.setPrivate_(slotName, dyn);
+      }
+
+      return dyn;
     }
   ]
 });
@@ -1096,9 +1110,9 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function pubPropertyChange(name, oldValue, newValue, opt_slotName) {
+    function pubPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.slot(name, opt_slotName);
+        var dyn = this.slot(name);
         dyn.setPrev(oldValue);
         this.pub('propertyChange', name, dyn);
       }
@@ -1110,16 +1124,18 @@ foam.CLASS({
     */
     // TODO: have this call toSlot() on Axiom, then not Property specific.
     // This will enable imports to be used in expressions.
-    function slot(name, opt_slotName, opt_prop) {
-      if ( ! opt_slotName ) opt_slotName = name + '$';
-      var dyn = this.getPrivate_(opt_slotName);
-      if ( ! dyn ) {
-        dyn = foam.core.internal.PropertySlot.create();
-        dyn.obj  = this;
-        dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
-        this.setPrivate_(opt_slotName, dyn);
-      }
-      return dyn;
+    function slot(name) {
+      var axiom = this.cls_.getAxiomByName(name);
+
+      console.assert(
+        axiom,
+        'Attempt to access slot() on unknown axiom: ',
+        name);
+      console.assert(axiom.toSlot,
+        'Attempt to access slot() on an Axiom without toSlot() support: ',
+         name);
+
+      return axiom.toSlot(this);
     }
   ]
 });
@@ -1326,7 +1342,7 @@ foam.CLASS({
     function installInProto(proto) {
       var key      = this.key;
       var as       = this.as;
-      var slotName = as + '$';
+      var slotName = this.slotName_ = as + '$';
 
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
@@ -1351,6 +1367,10 @@ foam.CLASS({
         configurable: true,
         enumerable: false
       });
+    },
+
+    function toSlot(obj) {
+      return obj[this.slotName_];
     }
   ]
 });
