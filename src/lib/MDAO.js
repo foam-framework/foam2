@@ -36,14 +36,14 @@
 /** Plan indicating that there are no matching records. **/
 var NOT_FOUND = {
   cost: 0,
-  execute: function(_, sink, __) { return anop; },
+  execute: function(_, sink) { return Promise.resolve(sink); },
   toString: function() { return "no-match(cost=0)"; }
 };
 
 /** Plan indicating that an index has no plan for executing a query. **/
 var NO_PLAN = {
   cost: Number.MAX_VALUE,
-  execute: function() { return anop; },
+  execute: function(_, sink) { return Promise.resolve(sink); },
   toString: function() { return "no-plan"; }
 };
 
@@ -1105,33 +1105,32 @@ var AutoIndex = {
 };
 
 
-var MDAO = Model.create({
+foam.CLASS({
   extends: 'AbstractDAO',
-
+  package: 'foam.dao',
   name: 'MDAO',
   label: 'Indexed DAO',
 
   properties: [
     {
-      name:  'model',
-      type:  'Model',
+      name:  'of',
       required: true
     },
     {
       type: 'Boolean',
       name: 'autoIndex',
-      defaultValue: false
+      value: false
     }
   ],
 
-  methods: {
+  methods: [
 
-    init: function() {
+    function init() {
       this.SUPER();
 
       this.map = {};
-      // TODO(kgr): this doesn't support multi-part keys, but should
-      this.index = TreeIndex.create(this.model.getProperty(this.model.ids[0]));
+      // TODO(kgr): this doesn't support multi-part keys, but should (foam2: still applies!)
+      this.index = TreeIndex.create(this.of.getAxiomByName(this.of.ids[0]));
 
       if ( this.autoIndex ) this.addRawIndex(AutoIndex.create(this));
     },
@@ -1140,12 +1139,12 @@ var MDAO = Model.create({
      * Add a non-unique index
      * args: one or more properties
      **/
-    addIndex: function() {
-      var props = argsToArray(arguments);
+    function addIndex() {
+      var props = foam.fn.argsToArray(arguments);
 
       // Add on the primary key(s) to make the index unique.
-      for ( var i = 0 ; i < this.model.ids.length ; i++ ) {
-        props.push(this.model.getProperty(this.model.ids[i]));
+      for ( var i = 0 ; i < this.of.ids.length ; i++ ) {
+        props.push(this.of.getAxiomByName(this.of.ids[i]));
         if ( ! props[props.length - 1] ) throw "Undefined index property";
       }
 
@@ -1156,7 +1155,7 @@ var MDAO = Model.create({
      * Add a unique index
      * args: one or more properties
      **/
-    addUniqueIndex: function() {
+    function addUniqueIndex() {
       var index = ValueIndex;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
@@ -1170,7 +1169,7 @@ var MDAO = Model.create({
     },
 
     // TODO: name 'addIndex' and renamed addIndex
-    addRawIndex: function(index) {
+    function addRawIndex(index) {
       // Upgrade single Index to an AltIndex if required.
       if ( ! /*AltIndex.isInstance(this.index)*/ this.index.delegates ) {
         this.index = AltIndex.create(this.index);
@@ -1187,15 +1186,17 @@ var MDAO = Model.create({
      * Any data already loaded into this DAO will be lost.
      * @arg sink (optional) eof is called when loading is complete.
      **/
-    bulkLoad: function(dao, sink) {
+    function bulkLoad(dao, sink) {
       var self = this;
-      dao.select({ __proto__: [].sink, eof: function() {
-        self.root = self.index.bulkLoad(this);
-        sink && sink.eof && sink.eof();
-      }});
+      return new Promise(function(resolve, reject) {
+        dao.select().then(function() {
+          self.root = self.index.bulkLoad(this);
+          resolve();
+        });        
+      })
     },
 
-    put: function(obj, sink) {
+    put: function(obj) {
       var oldValue = this.map[obj.id];
       if ( oldValue ) {
         this.root = this.index.put(this.index.remove(this.root, oldValue), obj);
@@ -1203,83 +1204,83 @@ var MDAO = Model.create({
         this.root = this.index.put(this.root, obj);
       }
       this.map[obj.id] = obj;
-      this.notify_('put', [obj]);
-      sink && sink.put && sink.put(obj);
+      this.pub('on', 'put', obj);
+      return Promise.resolve(obj);
     },
 
-    findObj_: function(key, sink) {
+    function findObj_(key) {
       var obj = this.map[key];
       // var obj = this.index.get(this.root, key);
       if ( obj ) {
-        sink.put && sink.put(obj);
+        resolve(obj)
       } else {
-        sink.error && sink.error('find', key);
+        reject(this.InternalError.create({ id: key })); // TODO: err
       }
     },
 
-    find: function(key, sink) {
+    function find(key) {
+      var self = this;
       if ( key == undefined ) {
-        sink && sink.error && sink.error('missing key');
+        reject(this.InternalError.create({ id: key })); // TODO: err
         return;
       }
-      if ( ! key.f ) { // TODO: make better test, use model
-        this.findObj_(key, sink);
-        return;
-      }
-      // How to handle multi value primary keys?
-      var found = false;
-      this.where(key).limit(1).select({
-        // ???: Is 'put' needed?
-        put: function(obj) {
-          found = true;
-          sink && sink.put && sink.put(obj);
-        },
-        eof: function() {
-          if ( ! found ) sink && sink.error && sink.error('find', key);
-        }
+      // TODO: How to handle multi value primary keys?
+      var foundObj = null;
+      return new Promise(function(resolve, reject) {
+        self.where(key).limit(1).select({
+          put: function(obj) {
+            foundObj = obj;
+            resolve(obj);
+          },
+          eof: function() {
+            if ( ! foundObj ) {
+              reject(this.InternalError.create({ id: key })); // TODO: err
+            }
+          },
+          error: function(e) {
+            reject(this.InternalError.create({ id: key })); // TODO: err
+          }
+        });
       });
     },
 
-    remove: function(obj, sink) {
-      if ( ! obj ) {
-        sink && sink.error && sink.error('missing key');
-        return;
+    function remove(obj) {
+      if ( ! obj || ! obj.id ) {
+        return Promise.reject(this.ExternalError.create({ id: 'no_id' })); // TODO: err
       }
-      var id = (obj.id !== undefined && obj.id !== '') ? obj.id : obj;
+      var id = obj.id;      
       var self = this;
-      this.find(id, {
-        put: function(obj) {
+
+      return this.find(id).then(
+        function(obj) {
           self.root = self.index.remove(self.root, obj);
           delete self.map[obj.id];
-          self.notify_('remove', [obj]);
-          sink && sink.remove && sink.remove(obj);
-        },
-        error: function() {
-          sink && sink.error && sink.error('remove', obj);
+          self.pub('on', 'remove', obj);
+          return Promise.resolve();
         }
-      });
+      );
     },
 
-    removeAll: function(sink, skip, limit, order, predicate) {
-      if (!predicate) predicate = TRUE;
-      var future = afuture();
-      this.where(predicate).select()(function(a) {
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.index.remove(this.root, a[i]);
-          delete this.map[a[i].id];
-          this.notify_('remove', [a[i]]);
-          sink && sink.remove && sink.remove(a[i]);
+    function removeAll(skip, limit, order, predicate) {
+      if (!predicate) predicate = this.TRUE;
+      var self = this;
+      return this.where(predicate).select(self.ArraySink.create()).then(
+        function(sink) {
+          var a = sink.a;
+          for ( var i = 0 ; i < a.length ; i++ ) {
+            this.root = this.index.remove(this.root, a[i]);
+            delete this.map[a[i].id];
+            this.pub('on', 'remove', a[i]);
+          }
+          return Promise.resolve();
         }
-        sink && sink.eof && sink.eof();
-        future.set(sink);
-      }.bind(this));
-      return future.get;
+      );
     },
 
-    select: function(sink, skip, limit, order, predicate) {
-      sink = sink || [].sink;
+    function select(sink, skip, limit, order, predicate) {
+      sink = sink || this.ArraySink.create();
 
-      if ( GLOBAL.ExplainExpr && GLOBAL.ExplainExpr.isInstance(sink) ) {
+      if ( foam.mlang.sink.Explain && foam.mlang.sink.Explain.isInstance(sink) ) {
         var plan = this.index.plan(this.root, sink.arg1, skip, limit, order, predicate);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
@@ -1288,17 +1289,16 @@ var MDAO = Model.create({
 
       var plan = this.index.plan(this.root, sink, skip, limit, order, predicate);
 
-      var future = afuture();
-      plan.execute(this.root, sink, skip, limit, order, predicate)(
-        function(ret) {
+      return plan.execute(this.root, sink, skip, limit, order, predicate).then(
+        function(sink) {
           sink && sink.eof && sink.eof();
-          future.set(sink)
-        });
-      return future.get;
+          return Promise.resolve(sink);
+        }
+      );
     },
 
-    toString: function() {
-      return 'MDAO(' + this.model.name + ',' + this.index + ')';
+    function toString() {
+      return 'MDAO(' + this.cls_.name + ',' + this.index + ')';
     }
-  }
+  ]
 });
