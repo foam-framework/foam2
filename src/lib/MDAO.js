@@ -61,7 +61,7 @@ var ValueIndex = {
              cost: 1,
              execute: function(s, sink) {
                sink.put(s);
-               return anop;
+               return Promise.resolve(sink);
              },
              toString: function() { return 'unique'; }
            };
@@ -391,12 +391,12 @@ var TreeIndex = {
 
     if ( predicate === FALSE ) return NOT_FOUND;
 
-    if ( ! predicate && CountExpr.isInstance(sink) ) {
+    if ( ! predicate && foam.mlang.sink.Count.isInstance(sink) ) {
       var count = this.size(s);
       //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
       return {
         cost: 0,
-        execute: function(unused, sink, skip, limit, order, predicate) { sink.count += count; return anop; },
+        execute: function(unused, sink, skip, limit, order, predicate) { sink.count += count; return Promise.resolve(sink); },
         toString: function() { return 'short-circuit-count(' + count + ')'; }
       };
     }
@@ -416,7 +416,7 @@ var TreeIndex = {
           return arg2;
         }
 
-        if ( AndExpr.isInstance(predicate) ) {
+        if ( foam.mlang.predicate.And.isInstance(predicate) ) {
           for ( var i = 0 ; i < predicate.args.length ; i++ ) {
             var q = predicate.args[i];
             if ( model.isInstance(q) && q.arg1 === prop ) {
@@ -440,7 +440,7 @@ var TreeIndex = {
 
     var index = this;
 
-    var arg2 = isExprMatch(GLOBAL.InExpr);
+    var arg2 = isExprMatch(foam.mlang.predicate.In);
     if ( arg2 &&
          // Just scan if that would be faster.
          Math.log(this.size(s))/Math.log(2) * arg2.length < this.size(s) ) {
@@ -470,7 +470,7 @@ var TreeIndex = {
           for ( var i = 0 ; i < subPlans.length ; i++ ) {
             pars.push(subPlans[i].execute(results[i], sink, skip, limit, order, predicate));
           }
-          return apar.apply(null, pars);
+          return Promise.all(pars);
         },
         toString: function() {
           return 'IN(key=' + prop.name + ', size=' + results.length + ')';
@@ -478,7 +478,7 @@ var TreeIndex = {
       };
     }
 
-    arg2 = isExprMatch(GLOBAL.EqExpr);
+    arg2 = isExprMatch(foam.mlang.predicate.Eq);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var result = this.get(s, key);
@@ -498,28 +498,28 @@ var TreeIndex = {
       };
     }
 
-    arg2 = isExprMatch(GLOBAL.GtExpr);
+    arg2 = isExprMatch(foam.mlang.predicate.Gt);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, false);
       skip = ((skip) || 0) + pos;
     }
 
-    arg2 = isExprMatch(GLOBAL.GteExpr);
+    arg2 = isExprMatch(foam.mlang.predicate.Gte);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, true);
       skip = ((skip) || 0) + pos;
     }
 
-    arg2 = isExprMatch(GLOBAL.LtExpr);
+    arg2 = isExprMatch(foam.mlang.predicate.Lt);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, true);
       limit = Math.min(limit, (pos - (skip || 0)) );
     }
 
-    arg2 = isExprMatch(GLOBAL.LteExpr);
+    arg2 = isExprMatch(foam.mlang.predicate.Lte);
     if ( arg2 != undefined ) {
       var key = arg2.f();
       var pos = this.findPos(s, key, false);
@@ -533,7 +533,7 @@ var TreeIndex = {
     if ( order ) {
       if ( order === prop ) {
         // sort not required
-      } else if ( GLOBAL.DescExpr && DescExpr.isInstance(order) && order.arg1 === prop ) {
+      } else if ( foam.mlang.predicate.Desc && foam.mlang.predicate.Desc.isInstance(order) && order.arg1 === prop ) {
         // reverse-sort, sort not required
         reverseSort = true;
       } else {
@@ -582,7 +582,7 @@ var TreeIndex = {
           index.selectCount--;
         }
 
-        return anop;
+        return Promise.resolve(sink);
       },
       toString: function() { return 'scan(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ')'; }
     };
@@ -851,22 +851,20 @@ var PositionIndex = {
     if ( ! order.equals(this.order) ||
          ! predicate.equals(this.predicate) ) return NO_PLAN;
 
-    if ( CountExpr.isInstance(sink) ) {
+    if ( foam.mlang.sink.Count.isInstance(sink) ) {
       return {
         cost: 0,
         execute: function(s, sink, skip, limit, order, predicate) {
+          // TODO: double check this bit...
           if ( ! s.count ) {
-            s.count = amemo(function(ret) {
-              self.networkdao.select(COUNT())(function(c) {
-                ret(c);
-              });
-            }, self.maxage);
+            // TODO: memoize, expire after self.maxage, as per foam1 amemo
+            s.count = self.networkdao.select(foam.mlang.sink.Count.create());
           }
 
-          return (function(ret, count) {
-            sink.copyFrom(count);
-            ret();
-          }).ao(s.count);
+          return s.count.then(function(countSink) { 
+            sink.count = countSink.count;  
+            return Promise.resolve(sink);
+          });
         },
         toString: function() { return 'position-index(cost=' + this.cost + ', count)'; }
       }
@@ -913,7 +911,7 @@ var PositionIndex = {
           sink.put(objs[i]);
         }
 
-        return anop;
+        return Promise.resolve(sink);
       }
     };
   }
@@ -1016,7 +1014,7 @@ var mLangIndex = {
       mlang: mlang,
       PLAN: {
         cost: 0,
-        execute: function(s, sink, skip, limit, order, predicate) { sink.copyFrom(s); return anop; },
+        execute: function(s, sink, skip, limit, order, predicate) { sink.copyFrom(s); return Promise.resolve(sink); },
         toString: function() { return 'mLangIndex(' + this.s + ')'; }
       }
     };
