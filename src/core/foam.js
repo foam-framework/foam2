@@ -48,7 +48,7 @@
   }
 
   function createLoadWorker(filename) {
-    var path = FOAM_BOOT_PATH;
+    var path = this.FOAM_BOOT_PATH || '/src/core/';
     return function(filename) {
       importScripts(path + filename + '.js');
     };
@@ -83,7 +83,13 @@
     "../lib/Collider",
     "../lib/PhysicsEngine",
     ["../lib/PhysicalCircle", ! isServer ],
-    [ "../lib/node/json_dao", isServer ]
+    [ "../lib/node/json_dao", isServer ],
+    "../lib/utf8",
+    "../lib/net",
+    "../lib/sw/net",
+    "../lib/firebase",
+    "../lib/box",
+    [ "../lib/node/box", isServer ]
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
