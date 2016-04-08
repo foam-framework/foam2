@@ -1342,7 +1342,7 @@ foam.CLASS({
     function installInProto(proto) {
       var key      = this.key;
       var as       = this.as;
-      var slotName = as + '$';
+      var slotName = this.slotName_ = as + '$';
 
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
@@ -1367,6 +1367,10 @@ foam.CLASS({
         configurable: true,
         enumerable: false
       });
+    },
+
+    function toSlot(obj) {
+      return obj[this.slotName_];
     }
   ]
 });
