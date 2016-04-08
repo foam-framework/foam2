@@ -84,7 +84,8 @@ foam.CLASS({
   ]
 });
 
-/** Supports Actions */
+
+/** Add Action support to Model. */
 foam.CLASS({
   refines: 'foam.core.Model',
 
