@@ -1108,6 +1108,8 @@ foam.CLASS({
       Creates a Slot for a property.
       @private
     */
+    // TODO: have this call toSlot() on Axiom, then not Property specific.
+    // This will enable imports to be used in expressions.
     function slot(name, opt_slotName, opt_prop) {
       if ( ! opt_slotName ) opt_slotName = name + '$';
       var dyn = this.getPrivate_(opt_slotName);
