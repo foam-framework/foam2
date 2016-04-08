@@ -655,10 +655,10 @@ foam.CLASS({
       // If not in debug mode we should share implementations like in F1.
       Object.defineProperty(proto, slotName, {
         get: function propDynGetter() {
-          return this.slot(name, prop);
+          return prop.toSlot(this);
         },
         set: function propDynSetter(dyn) {
-          this.slot(name, prop).link(dyn);
+          prop.toSlot(this).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -1124,8 +1124,8 @@ foam.CLASS({
     */
     // TODO: have this call toSlot() on Axiom, then not Property specific.
     // This will enable imports to be used in expressions.
-    function slot(name, opt_axiom) {
-      var axiom = opt_axiom || this.cls_.getAxiomByName(name);
+    function slot(name) {
+      var axiom = this.cls_.getAxiomByName(name);
 
       console.assert(
         axiom,
