@@ -61,7 +61,6 @@
     "fn",
     "string",
     "mmethod",
-    "compare",
     "date",
     "Context",
     "Boot",
