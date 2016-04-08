@@ -105,4 +105,5 @@
   for ( var key in X ) foam[key] = X[key].bind(X);
 
   foam.X = X;
+
 })();

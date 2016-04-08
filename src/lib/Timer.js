@@ -120,15 +120,6 @@ foam.CLASS({
     }
   ],
 
-  /*
-  methods: [
-    function init() {
-      // this.SUPER();
-      this.tick();
-    }
-  ],
-  */
-
   listeners: [
     {
       name: 'tick',
