@@ -36,7 +36,10 @@ foam.CLASS({
   ]
 });
 
-
+/*
+TODO:
+-verify that multi part keys work properly
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'IDBDAO',
