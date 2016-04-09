@@ -28,6 +28,8 @@ language or platform. Android and iOS Swift support are on the way.
 
 * Run 'npm install' in the root of the Foam repository, where package.json is found.
 
+* Code should folow the style guide here [doc/guides/StyleGuide.md]
+
 ## Testing
 
 * _npm test_ runs standard unit tests.
