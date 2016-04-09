@@ -14,21 +14,32 @@ Build fully featured high performance apps in less time using FOAM.
 
 ## Feature Oriented Active Modeller
 
-Foam is a Modeller: describe your data's properties, methods, event topics,
-listeners, dependencies, etc., and Foam will generate your javascript classes.
-Use them with Foam's data access layer for easy offline support and pick your
-favorite front end framework.
+FOAM is a modeling tool and class based object system.  To use FOAM,
+you create a model of you class by describing the properties, methods,
+event topics, listeners, and dependencies of your class.  FOAM takes
+this model and generates a usable JavaScript class along with several
+companion features such as database support and network marshaling.
 
-While Foam is written in Javascript, it can be used to generate code for any
-language or platform. Android and iOS Swift support are on the way.
+While FOAM is written in JavaScript, it can be used to generate code
+for any language or platform. Android Java and iOS Swift support are
+planned features.
 
-## Developer Setup
+# Development
+
+## Installing Dependencies
+
+FOAM has no runtime dependencies, but uses a number of third party tools for
+unit tests, code coverage, linting.  You can install all required
+tools by doing the following.
 
 * Install nodejs.
 
-* Run 'npm install' in the root of the Foam repository, where package.json is found.
+* Run 'npm install' in the root of the Foam repository, where
+  package.json is found.
 
-* Code should folow the [style guide](doc/guides/StyleGuide.md)
+## Style Guide
+
+All code should folow the [style guide.](doc/guides/StyleGuide.md)
 
 ## Testing
 
@@ -43,7 +54,7 @@ repository. In a browser, navigate to
 [http://localhost:8000/test/browser/SpecRunner.html](http://localhost:8000/test/browser/SpecRunner.html)
 to run the unit tests.
 
-## Documentation
+# Documentation
 
 * _npm run doc_ generates HTML API documentation in doc/gen/.
 
@@ -52,6 +63,6 @@ structure and declarative nature. JSDoc modules correspond with Foam packages.
 See [./doc/Documentation.md](./doc/Documentation.md) for information on comment
 formatting.
 
-### Contributing
+# Contributing
 
 Before contributing code to FOAM, you must complete the [Google Individual Contributor License Agreement](https://cla.developers.google.com/about/google-individual?csw=1).
