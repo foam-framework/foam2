@@ -333,8 +333,7 @@ foam.LIB({
         var retVal = fn.apply(this, arguments);
 
         // check the return value
-        if ( args.returnType )
-          args.returnType.validate(retVal);
+        if ( args.returnType ) args.returnType.validate(retVal);
 
         return retVal;
       }

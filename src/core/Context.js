@@ -56,8 +56,7 @@ var X = {
   register: function(cls) {
     cache[cls.id] = cls;
 
-    if ( cls.package === 'foam.core' )
-      cache[cls.name] = cls;
+    if ( cls.package === 'foam.core' ) cache[cls.name] = cls;
 
     var path = cls.id.split('.');
     var root = global;
@@ -90,8 +89,9 @@ var X = {
       }
     }
 
-    if ( opt_name )
+    if ( opt_name ) {
       Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
+    }
 
     sub.$UID__ = foam.next$UID();
     sub.__proto__ = this;
