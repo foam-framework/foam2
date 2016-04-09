@@ -21,7 +21,7 @@ describe('UTF-8 decoder', function() {
     var string = "Hello world! 23048alsdf alskl234";
 
     var buffer = new Buffer(string, 'utf8');
-    decoder.put(buffer);
+    decoder.put(new Uint8Array(buffer));
 
     expect(decoder.string).toBe(string);
   });
