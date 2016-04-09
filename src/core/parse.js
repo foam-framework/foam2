@@ -1070,7 +1070,6 @@ foam.CLASS({
   extends: 'AxiomArray',
 
   requires: [
-    'foam.pattern.With',
     'foam.parse.Parsers'
   ],
 
@@ -1087,7 +1086,7 @@ foam.CLASS({
             throw "Could not parse arguments from parser factory function";
           }
 
-          o = prop.With.create().with(o, prop.Parsers.create());
+          o = foam.fn.with(prop.Parsers.create(), o, this);
         }
 
         var a = [];
@@ -1177,7 +1176,8 @@ foam.CLASS({
   name: 'Grammar',
 
   requires: [
-    'foam.parse.StringPS'
+    'foam.parse.StringPS',
+    'foam.parse.Parsers'
   ],
 
   properties: [
@@ -1194,7 +1194,7 @@ foam.CLASS({
             throw "Could not parse arguments from parser factory function";
           }
 
-          o = foam.pattern.With.create().with(o, foam.parse.Parsers.create());
+          o = foam.fn.with(this.Parsers.create(), o, this);
         }
 
         var a = [];

@@ -66,8 +66,7 @@ foam.CLASS({
   name: 'Test',
   implements: [
     'foam.dao.Sink',
-    'foam.mlang.Expressions',
-    'foam.pattern.With'
+    'foam.mlang.Expressions'
   ],
   imports: ['log'],
   methods: [
@@ -76,11 +75,13 @@ foam.CLASS({
     },
     function test(o) {
       dao.where(
-        this.with(function(OR, EQ) {
-          return OR(
-            EQ(Abc.FOO, 100),
-            EQ(Abc.ID, 4))
-        })).select(this);
+        foam.fn.with(
+          this,
+          function(OR, EQ) {
+            return OR(
+              EQ(Abc.FOO, 100),
+              EQ(Abc.ID, 4))
+          })).select(this);
     }
   ]
 });
@@ -106,10 +107,6 @@ dao.select({
 
 foam.CLASS({
   name: 'DaoTest',
-  implements: [
-    'foam.pattern.With',
-    'foam.mlang.Expressions'
-  ],
   properties: [
     'dao'
   ],
