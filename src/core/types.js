@@ -41,7 +41,7 @@ foam.CLASS({
         if ( ! o1 ) return o2 ? -1 : 0;
         if ( ! o2 ) return 1;
 
-        return foam.compare.dateCompare(o1, o2);
+        return foam.types.Date.compare(o1, o2);
       }
     }
   ]
@@ -302,6 +302,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Map',
@@ -310,6 +311,7 @@ foam.CLASS({
     ['factory', function() { return {} }]
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -331,23 +333,22 @@ foam.CLASS({
 
       var delegate = foam.lookup(this.of);
       var implements = foam.core.Implements.create({ path: this.of });
-      if ( ! cls.getAxiomByName(implements.name) )
-        cls.installAxiom(implements);
+      if ( ! cls.getAxiomByName(implements.name) ) cls.installAxiom(implements);
 
       var name = this.name;
       var methods = delegate.getAxiomsByClass(foam.core.Method)
-          .filter(function(m) {
-            // TODO This isn't the right check, but we need some sort of filter.
-            // We dont' want to proxy all FObject methods, only those defined in the interface
-            // and possibly its parent interfaces?
-            return delegate.hasOwnAxiom(m.name);
-          }).map(function(m) {
-            m = m.clone();
-            m.code = this.delegates.indexOf(m.name) == -1 ?
-              Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);") :
-              Function("return this." + name + "." + m.name + ".apply(this, arguments);");
-            cls.installAxiom(m);
-          }.bind(this));
+        .filter(function(m) {
+          // TODO This isn't the right check, but we need some sort of filter.
+          // We dont' want to proxy all FObject methods, only those defined in the interface
+          // and possibly its parent interfaces?
+          return delegate.hasOwnAxiom(m.name);
+        }).map(function(m) {
+          m = m.clone();
+          m.code = this.delegates.indexOf(m.name) == -1 ?
+            Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);") :
+            Function("return this." + name + "." + m.name + ".apply(this, arguments);");
+          cls.installAxiom(m);
+        }.bind(this));
     }
   ]
 });
@@ -356,10 +357,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.fsm',
   name: 'State',
+
   properties: [
     {
       name: 'name',
-      expression: function(className) { return className.substring(className.lastIndexOf('.') + 1); }
+      expression: function(className) {
+        return className.substring(className.lastIndexOf('.') + 1);
+      }
     },
     {
       name: 'className'
@@ -372,6 +376,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'StateMachine',
   extends: 'Proxy',
+
   properties: [
     'plural',
     {
@@ -434,7 +439,8 @@ foam.CLASS({
             var value;
             return function() {
               if ( ! value ) {
-                value = this[state.name] ? this[state.name].create() :
+                value = this[state.name] ?
+                  this[state.name].create() :
                   foam.lookup(state.className).create();
               }
               return value;

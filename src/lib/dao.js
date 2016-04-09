@@ -342,7 +342,7 @@ foam.CLASS({
     }
   ],
 
-  properties: ['of'],
+  properties: [ 'of' ],
 
   methods: [
     {
@@ -600,7 +600,7 @@ foam.CLASS({
   methods: [
     function put(o) {
       this.a.push(o);
-    },
+    }
   ]
 });
 
@@ -609,6 +609,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.mlang.predicate.True'
@@ -695,11 +696,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromiseDAO',
+
   extends: 'foam.dao.AbstractDAO',
   imports: ['error'],
+
   properties: [
     {
       class: 'StateMachine',
@@ -731,10 +735,12 @@ foam.CLASS({
       }
     }
   ],
+
   classes: [
     {
       name: 'Pending',
       extends: 'foam.dao.AbstractDAO',
+
       methods: [
         function put(obj) {
           return this.promise.then(function(p) {
@@ -760,6 +766,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',

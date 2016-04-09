@@ -27,7 +27,9 @@ foam.CLASS({
       if ( other === this ) return 0;
 
       if ( this.model_ !== other.model_ ) {
-        return other.model_ ? foam.compare.compare(this.model_.id, other.model_.id) : 1;
+        return other.model_ ?
+          foam.compare.compare(this.model_.id, other.model_.id) :
+          1;
       }
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
@@ -56,8 +58,9 @@ foam.CLASS({
         }
 
         // if the primary value is undefined, use the compareTo of the other
-        if ( ! foam.compare.equals(value, otherVal) )
+        if ( ! foam.compare.equals(value, otherVal) ) {
           diff[property.name] = otherVal;
+        }
       }
 
       return diff;

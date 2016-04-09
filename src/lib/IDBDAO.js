@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'IDBInternalException',
@@ -35,6 +34,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /*
 TODO:
@@ -295,11 +295,14 @@ foam.CLASS({
 
       return new Promise(function(resolve, reject) {
         self.withStore("readonly", function(store) {
-          if ( predicate && this.Eq.isInstance(predicate) && store.indexNames.contains(predicate.arg1.name) ) {
-            var request = store.index(predicate.arg1.name).openCursor(IDBKeyRange.only(predicate.arg2.f()));
-          } else {
-            var request = store.openCursor();
-          }
+          var useIndex = predicate &&
+            this.Eq.isInstance(predicate) &&
+            store.indexNames.contains(predicate.arg1.name);
+
+          var request = useIndex ?
+            store.index(predicate.arg1.name).openCursor(IDBKeyRange.only(predicate.arg2.f())) :
+            store.openCursor() ;
+
           request.onsuccess = function(e) {
             var cursor = e.target.result;
             if ( fc.errorEvt ) {
@@ -330,6 +333,5 @@ foam.CLASS({
       this.indicies.push([prop.name, false]);
       return this;
     }
-  ],
-
+  ]
 });

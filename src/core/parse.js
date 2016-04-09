@@ -112,7 +112,9 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      value: function(_, v) { return typeof v == 'string' ? foam.parse.Literal.create({ s: v }) : v }
+      value: function(_, v) {
+        return typeof v == 'string' ? foam.parse.Literal.create({ s: v }) : v;
+      }
     }
   ]
 });
@@ -131,9 +133,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'State',
+
   properties: [
     {
       class: 'Simple',
@@ -148,6 +152,7 @@ foam.CLASS({
       name: 'ps'
     }
   ],
+
   methods: [
     {
       name: 'step'
@@ -158,10 +163,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'BacktrackStart',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'restore',
@@ -173,9 +180,6 @@ foam.CLASS({
     }
   ],
   methods: [
-    //    function step(pps) {
-
-    //      this.restore.ps = pps[0];
     function step() {
       this.restore.ps = this.ps;
       this.next.ps = this.ps;
@@ -184,10 +188,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'BacktrackFinish',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'next',
@@ -204,10 +210,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Placeholder',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'next',
@@ -226,35 +234,37 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Char',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'c',
       final: true
     }
   ],
+
   methods: [
-    //    function step(pps) {
     function step() {
-            if ( this.ps.head === this.c ) {
-//      if ( pps[0].head === this.c ) {
-              this.success.ps = this.ps.tail;
-//        pps[0] = pps[0].tail;
+      if ( this.ps.head === this.c ) {
+        this.success.ps = this.ps.tail;
         return this.success;
-            }
+      }
       this.fail.ps = this.ps;
       return this.fail;
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'LiteralWithValue',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 's',
@@ -266,9 +276,6 @@ foam.CLASS({
     }
   ],
   methods: [
-//    function step(pps) {
-//      var ps = pps[0];
-    //      var ps1 = pps;
     function step() {
       var str = this.s;
       var ps = this.ps;
@@ -278,23 +285,25 @@ foam.CLASS({
           return this.fail;
         }
       }
-      //      pps[0] = ps.setValue(this.value || str);
       this.success.ps = ps.setValue(this.value || str);
       return this.success;
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Literal',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 's',
       final: true
     }
   ],
+
   methods: [
     function step() {
       var ps1 = this.ps;
@@ -312,18 +321,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'AnyChar',
   extends: 'foam.parse.compiled.State',
+
   methods: [
-    //    function step(pps) {
     function step() {
             var ps = this.ps;
-//      var ps = pps[0];
       if ( ps.head ) {
         this.success.ps = ps.tail;
-//        pps[0] = ps.tail;
         return this.success;
       }
       this.fail.ps = ps;
@@ -332,25 +340,25 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'ParserState',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'parser',
       final: true
     }
   ],
+
   methods: [
-    //    function step(pps) {
     function step() {
       var ps = this.ps;
-      //      var ret = this.parser.parse(pps[0]);
       var ret = this.parser.parse(ps);
 
       if ( ret ) {
-//        pps[0] = ret;
         this.success.ps = ret;
         return this.success;
       }
@@ -361,31 +369,34 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Action',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'action',
       final: true
     }
   ],
+
   methods: [
-    //    function step(pps) {
     function step() {
       var ps = this.ps.setValue(this.action(this.ps.value));
-            this.success.ps = ps;
-//      pps[0] = pps[0].setValue(this.action(pps[0].value));
+      this.success.ps = ps;
       return this.success;
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'GetValue',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'next',
@@ -396,6 +407,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       this.value[0] = this.ps.value;
@@ -405,10 +417,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'SetValue',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'value',
@@ -419,21 +433,22 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
-//    function step(pps) {
       function step() {
       var ps = this.ps.setValue(this.value[0]);
       this.next.ps = ps;
-//      pps[0] = pps[0].setValue(this.value[0]);
       return this.next;
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'StartValue',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'next',
@@ -453,10 +468,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'AddValue',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'value',
@@ -467,9 +484,8 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
-//    function step(pps) {
-    //      this.value.push(pps[0].value);
     function step() {
       this.value.push(this.ps.value);
       this.next.ps = this.ps;
@@ -478,10 +494,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'FinishValue',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'value',
@@ -492,15 +510,15 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step(pps) {
-//      var ps = this.ps.setValue(this.value);
       pps[0] = pps[0].setValue(this.value);
-//      this.next.ps = ps;
       return this.next;
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -541,6 +559,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -584,6 +603,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Sequence',
@@ -614,7 +634,8 @@ foam.CLASS({
         successes[i] = foam.parse.compiled.Placeholder.create();
         seq[i] = args[i].compile(
           withValue ?
-            foam.parse.compiled.AddValue.create({ value: value, next: successes[i] }) : successes[i],
+            foam.parse.compiled.AddValue.create({ value: value, next: successes[i] }) :
+            successes[i],
           restore,
           withValue,
           grammar);
@@ -622,7 +643,7 @@ foam.CLASS({
 
       success = withValue ?
         foam.parse.compiled.FinishValue.create({ value: value, next: success }) :
-      success;
+        success;
 
       for ( var i = 0 ; i < seq.length ; i++ ) {
         successes[i].next = seq[i+1] || success;
@@ -728,6 +749,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'AnyChar',
@@ -787,11 +809,12 @@ foam.CLASS({
 
       success = withValue ?
         foam.parse.compiled.FinishValue.create({ value: value, next: success }) :
-      success;
+        success;
 
       var p = this.p.compile(
         withValue ?
-          foam.parse.compiled.AddValue.create({ value: value, next: repeat }) : repeat,
+          foam.parse.compiled.AddValue.create({ value: value, next: repeat }) :
+          repeat,
         success,
         withValue,
         grammar);
@@ -880,13 +903,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserWithAction',
   extends: 'foam.parse.ParserDecorator',
+
   properties: [
     'action'
   ],
+
   methods: [
     function compile(success, fail, withValue, grammar) {
       success = foam.parse.compiled.Action.create({
@@ -952,12 +978,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Parsers',
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
+
+  axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function seq() {
       return foam.lookup('foam.parse.Sequence').create({
@@ -1039,8 +1066,8 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'ParsersAxiom',
   extends: 'AxiomArray',
+
   requires: [
-    'foam.pattern.With',
     'foam.parse.Parsers'
   ],
 
@@ -1057,7 +1084,7 @@ foam.CLASS({
             throw "Could not parse arguments from parser factory function";
           }
 
-          o = prop.With.create().with(o, prop.Parsers.create());
+          o = foam.fn.with(prop.Parsers.create(), o, this);
         }
 
         var a = [];
@@ -1086,6 +1113,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1132,25 +1160,24 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'PSymbol',
-  properties: [
-    {
-      name: 'name'
-    },
-    {
-      name: 'parser'
-    }
-  ]
+
+  properties: [ 'name', 'parser' ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
   name: 'Grammar',
+
   requires: [
-    'foam.parse.StringPS'
+    'foam.parse.StringPS',
+    'foam.parse.Parsers'
   ],
+
   properties: [
     {
       class: 'Array',
@@ -1165,7 +1192,7 @@ foam.CLASS({
             throw "Could not parse arguments from parser factory function";
           }
 
-          o = foam.pattern.With.create().with(o, foam.parse.Parsers.create());
+          o = foam.fn.with(this.Parsers.create(), o, this);
         }
 
         var a = [];
@@ -1217,6 +1244,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function parseString(str) {
       this.ps.setString(str);
@@ -1227,15 +1255,10 @@ foam.CLASS({
       return this.parse(this.ps, state, success, fail);
     },
     function parse(ps, state, success, fail) {
-//      var pps = [ps];
       while ( state != success && state != fail ) {
-        //        state = state.step(pps);
         state = state.step();
       }
-      if ( state == success ) {
-        return state.ps.value;
-//        return pps[0].value;
-      }
+      if ( state == success ) return state.ps.value;
     },
     function getSymbol(name) {
       return this.symbolMap_[name].parser;

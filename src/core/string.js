@@ -58,7 +58,7 @@ foam.LIB({
       // Function for returning multi-line strings from commented functions.
       // Ex. var str = multiline(function() { /* multi-line string here */ });
       if ( typeof f === 'string' ) return f;
-      var s = f.toString();
+      var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
       return s.substring(start+2, end);

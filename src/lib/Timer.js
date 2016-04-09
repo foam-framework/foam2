@@ -88,7 +88,6 @@ foam.CLASS({
       name: 'startTime_',
       hidden: true
     }
-
   ],
 
   actions: [

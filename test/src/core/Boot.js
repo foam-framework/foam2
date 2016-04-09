@@ -197,14 +197,6 @@ describe('Property default comparators', function() {
     expect(c(4, 0)).toEqual(1);
     expect(c(4, '')).toEqual(1);
   });
-  it('accepts localeCompare', function() {
-    var o1 = { localeCompare: function(arg) { return 6; } };
-    expect(c(o1, 3)).toEqual(6);
-  });
-  it('accepts compareTo', function() {
-    var o1 = { compareTo: function(arg) { return 6; } };
-    expect(c(o1, 3)).toEqual(6);
-  });
   it('falls back on $UID.compareTo', function() {
     var o1 = {};
     var o2 = {};

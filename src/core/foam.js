@@ -60,7 +60,7 @@
     "events",
     "fn",
     "string",
-    "compare",
+    "mmethod",
     "date",
     "Context",
     "Boot",

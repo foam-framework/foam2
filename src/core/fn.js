@@ -51,7 +51,7 @@ foam.LIB({
     function argsArray(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. args(function(a,b) {...}) == ['a', 'b']
+       * Ex. argsArray(function(a,b) {...}) == ['a', 'b']
        **/
       var args = foam.fn.argsStr(f);
       if ( ! args ) return [];
@@ -65,6 +65,45 @@ foam.LIB({
         ret.push(typeMatch[2]);
       }
       return ret;
+    },
+
+    {
+      name: 'with',
+      code: function (source, fn, opt_self) {
+        /**
+         * Calls fn, and provides the arguments to fn by looking
+         * up their names on source.  The this context is either
+         * source, or opt_self if provided.
+         *
+         * If the argument maps to a function on source, it is bound to source.
+         *
+         * Ex.
+         * var a = {
+         *   name: 'adam',
+         *   hello: function() {
+         *     console.blog("Hello " + this.name);
+         *   }
+         * };
+         * function foo(name, hello) {
+         *   console.log("Name is " + name);
+         *   hello();
+         * }
+         * foam.fn.with(a, foo);
+         *
+         * Outputs:
+         * Name is adam
+         * Hello adam
+         *
+         **/
+        var argNames = foam.fn.argsArray(fn);
+        var args = [];
+        for ( var i = 0 ; i < argNames.length ; i++ ) {
+          var a = source[argNames[i]];
+          if ( typeof a === "function" ) a = a.bind(source);
+          args.push(a);
+        }
+        return fn.apply(opt_self || source, args);
+      }
     }
   ]
 });
