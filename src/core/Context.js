@@ -40,8 +40,7 @@ var lookup_ = function lookup_(id) {
   if ( a ) return a;
   var path = id.split('.');
   var root = global;
-  for ( var i = 0 ; root && i < path.length ; i++ )
-  root = root[path[i]];
+  for ( var i = 0 ; root && i < path.length ; i++ ) root = root[path[i]];
   return root;
 };
 
