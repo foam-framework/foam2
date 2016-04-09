@@ -28,7 +28,7 @@ language or platform. Android and iOS Swift support are on the way.
 
 * Run 'npm install' in the root of the Foam repository, where package.json is found.
 
-* Code should folow the [style guide](doc/guides/StyleGuide.ms)
+* Code should folow the [style guide](doc/guides/StyleGuide.md)
 
 ## Testing
 
