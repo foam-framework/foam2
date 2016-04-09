@@ -78,8 +78,7 @@ foam.LIB({
     function createOut() {
       var buf = '';
       function out() {
-        for ( var i = 0 ; i < arguments.length ; i++ )
-          buf += arguments[i];
+        for ( var i = 0 ; i < arguments.length ; i++ ) buf += arguments[i];
       }
       out.toString = function() { return buf; };
       return out;
@@ -122,8 +121,7 @@ foam.LIB({
         foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
         return cls.create(json);
       }
-      if ( opt_class )
-        return opt_class.create(json);
+      if ( opt_class ) return opt_class.create(json);
 
       return json;
     },
