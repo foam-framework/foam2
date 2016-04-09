@@ -18,6 +18,7 @@
 foam.LIB({
   name: 'foam.types.Undefined',
   methods: [
+    function is(o) { return o === undefined; },
     function equals(_, b) { return b === undefined; },
     function compare(_, b) { return b === undefined ? 0 : 1; },
     function hashCode() { return -1; }
@@ -28,6 +29,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.Null',
   methods: [
+    function is(o) { return o === null; },
     function equals(_, b) { return b === null; },
     function compare(_, b) { return b === null ? 0 : b === undefined ? -1 : 1; },
     function hashCode() { return -2; }
@@ -36,8 +38,20 @@ foam.LIB({
 
 
 foam.LIB({
+  name: 'foam.types.Boolean',
+  methods: [
+    function is(o) { return typeof o === 'boolean'; },
+    function equals(a, b) { return a === b; },
+    function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
+    function hashCode(o) { return o ? 1 : 0; }
+  ]
+});
+
+
+foam.LIB({
   name: 'foam.types.True',
   methods: [
+    function is(o) { return o === true; },
     function equals(_, b) { return b === true; },
     function compare(_, b) { return b ? 0 : 1; },
     function hashCode() { return 1; }
@@ -48,6 +62,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.False',
   methods: [
+    function is(o) { return o === false; },
     function equals(_, b) { return b === false; },
     function compare(_, b) { return b ? -1 : 0; },
     function hashCode() { return 0; }
@@ -58,6 +73,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.Number',
   methods: [
+    function is(o) { return typeof o === 'number'; },
     function equals(a, b) { return a === b; },
     function compare(a, b) { return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0; },
     function hashCode(n) { return n & n; }
@@ -68,6 +84,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.String',
   methods: [
+    function is(o) { return typeof o === 'string'; },
     function equals(a, b) { return a === b; },
     function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
     function hashCode(s) {
@@ -88,6 +105,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.Array',
   methods: [
+    function is(o) { return Array.isArray(o); },
     function equals(a, b) {
       if ( ! b || ! Array.isArray(b) || a.length !== b.length ) return false;
       for ( var i = 0 ; i < a.length ; i++ ) {
@@ -120,6 +138,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.Date',
   methods: [
+    function is(o) { return o instanceof Date; },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
@@ -135,6 +154,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.FObject',
   methods: [
+    function is(o) { return foam.core.FObject.isInstance(o); },
     function equals(a, b) { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
     function hashCode(o) { return o.hashCode(); }
@@ -145,6 +165,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.types.Object',
   methods: [
+    function is(o) { return typeof o === 'object'; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
       return foam.types.Number.compare(a.$UID, b ? b.$UID : -1);
@@ -168,15 +189,15 @@ foam.typeOf = (function() {
     tObject    = types.Object;
 
   return function typeOf(o) {
-    if ( typeof o === 'number' ) return tNumber;
-    if ( typeof o === 'string' ) return tString;
-    if ( o === undefined       ) return tUndefined;
-    if ( o === null            ) return tNull;
-    if ( o === true            ) return tTrue;
-    if ( o === false           ) return tFalse;
-    if ( Array.isArray(o)      ) return tArray;
-    if ( o instanceof Date     ) return tDate;
-    if ( foam.core.FObject.isInstance(o) ) return tFObject;
+    if ( tNumber.is(o)    ) return tNumber;
+    if ( tString.is(o)    ) return tString;
+    if ( tUndefined.is(o) ) return tUndefined;
+    if ( tNull.is(o)      ) return tNull;
+    if ( tTrue.is(o)      ) return tTrue;
+    if ( tFalse.is(o)     ) return tFalse;
+    if ( tArray.is(o)     ) return tArray;
+    if ( tDate.is(o)      ) return tDate;
+    if ( tFObject.is(o)   ) return tFObject;
     return tObject;
   }
 })();
