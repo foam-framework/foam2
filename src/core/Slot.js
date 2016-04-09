@@ -133,8 +133,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      for ( var i = 0 ; i < this.args.length ; i++ )
+      for ( var i = 0 ; i < this.args.length ; i++ ) {
         this.onDestroy(this.args[i].sub(this.invalidate));
+      }
     },
 
     function get() {
