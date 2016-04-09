@@ -34,7 +34,7 @@ tools by doing the following.
 
 * Install nodejs.
 
-* Run 'npm install' in the root of the Foam repository, where
+* Run 'npm install' in the root of the FOAM repository, where
   package.json is found.
 
 ## Style Guide
@@ -49,7 +49,7 @@ All code should folow the [style guide.](doc/guides/StyleGuide.md)
 
 * _npm run coverage_ runs code coverage and creates an html report in /coverage.
 
-For in-browser testing, run your favorite web server at the root of the Foam
+For in-browser testing, run your favorite web server at the root of the FOAM
 repository. In a browser, navigate to
 [http://localhost:8000/test/browser/SpecRunner.html](http://localhost:8000/test/browser/SpecRunner.html)
 to run the unit tests.
@@ -58,8 +58,8 @@ to run the unit tests.
 
 * _npm run doc_ generates HTML API documentation in doc/gen/.
 
-Documentation is created by JSDoc with a plugin to account for Foam's package
-structure and declarative nature. JSDoc modules correspond with Foam packages.
+Documentation is created by JSDoc with a plugin to account for FOAM's package
+structure and declarative nature. JSDoc modules correspond with FOAM packages.
 See [./doc/Documentation.md](./doc/Documentation.md) for information on comment
 formatting.
 
