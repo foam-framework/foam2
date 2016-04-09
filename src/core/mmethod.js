@@ -15,6 +15,27 @@
  * limitations under the License.
  */
 
+/**
+  Rather than extending built-in prototypes, we create flyweight versions.
+
+  This has a number of advantages:
+  1. It avoids conflicts with other libraries which might also extend built-in
+     types with methods with the same names but different semantics.
+  2. It is >10X faster (in V8) to call a flyweight method than a Method added
+     to the prototypes of String or Number. This is because calling an added
+     method on those types promotes the object from a string or number to a
+     String or Number, and creates a new object which will need to be GC'ed.
+  3. It lets us effectively add methods to built-in special values like
+     true, false, null, and undefined. This avoids the need for null-pointer
+     checks.
+  4. It avoids the proliferation of large ===/typeof/isInstance/instanceof blocks
+     throughout the rest of the code.
+  5. It provides a consistent method for checking an object's type, since each
+     type flyweight has an .is() method which abstracts the underlying detection
+     mechanism.
+  6. It makes the future implementation of multi-methods much easier.
+*/
+ 
 foam.LIB({
   name: 'foam.types.Undefined',
   methods: [
