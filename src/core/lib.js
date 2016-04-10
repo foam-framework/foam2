@@ -50,8 +50,8 @@ Object.defineProperty(
 
 
 /**
- * Creates a small library in the foam package. A LIB is a collection of static constants,
- * and methods.
+ * Creates a small library in the foam package. A LIB is a collection of
+ * constants and static methods.
  * <pre>
 foam.LIB({
   name: 'network',
