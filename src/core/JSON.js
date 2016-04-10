@@ -51,26 +51,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.LIB({
-  name: 'foam.Array',
-
-  methods: [
-//     function toJSON() { // DANGER! This caused problems with node require when running 'npm run doc'
-//       return foam.json.stringify(this);
-//     },
-    function outputJSON(out, opt_options) {
-      out('[');
-      for ( var i = 0 ; i < this.length ; i++ ) {
-        foam.json.output(out, this[i]);
-        if ( i < this.length -1 ) out(',');
-      }
-      out(']');
-    }
-  ]
-});
-
-
 foam.LIB({
   name: 'foam.json',
 
@@ -138,7 +118,7 @@ foam.LIB({
 
     function stringify(o, opt_options) {
       var out = this.createOut();
-      o && o.outputJSON && o.outputJSON(out, opt_options);
+      this.output(out, o);
       return out.toString();
     }
   ]
