@@ -988,7 +988,7 @@ foam.CLASS({
   methods: [
     function seq() {
       return foam.lookup('foam.parse.Sequence').create({
-        args: foam.array.argsToArray(arguments)
+        args: foam.Array.argsToArray(arguments)
       });
     },
 
@@ -1000,13 +1000,13 @@ foam.CLASS({
 
     function simpleAlt() {
       return foam.lookup('foam.parse.Alternate').create({
-        args: foam.array.argsToArray(arguments)
+        args: foam.Array.argsToArray(arguments)
       });
     },
 
     function alt() {
       return foam.lookup('foam.parse.Alternate').create({
-        args: foam.array.argsToArray(arguments)
+        args: foam.Array.argsToArray(arguments)
       });
     },
 
@@ -1019,7 +1019,7 @@ foam.CLASS({
     function seq1(n) {
       return foam.lookup('foam.parse.Sequence1').create({
         n: n,
-        args: foam.array.argsToArray(arguments).slice(1)
+        args: foam.Array.argsToArray(arguments).slice(1)
       });
     },
 
@@ -1084,7 +1084,7 @@ foam.CLASS({
             throw "Could not parse arguments from parser factory function";
           }
 
-          o = foam.fn.with(prop.Parsers.create(), o, this);
+          o = foam.Function.withArgs(o, prop.Parsers.create(), this);
         }
 
         var a = [];
@@ -1192,7 +1192,7 @@ foam.CLASS({
             throw "Could not parse arguments from parser factory function";
           }
 
-          o = foam.fn.with(this.Parsers.create(), o, this);
+          o = foam.Function.withArgs(o, this.Parsers.create(), this);
         }
 
         var a = [];

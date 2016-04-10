@@ -16,111 +16,73 @@
  */
 
 /**
- * Top-Level of foam package
- */
-foam = {
-  isServer: typeof process === 'object',
-  core:     {},
-  Array:    Array.prototype,
-  Function: Function.prototype,
-  Number:   Number.prototype,
-  next$UID: (function() {
-    /* Return a unique id. */
-    var id = 1;
-    return function next$UID() {
-      return id++;
-    }
-  })()
-};
+  Rather than extending built-in prototypes, we create flyweight versions.
 
-/** Setup nodejs-like 'global' on web */
-if ( ! foam.isServer ) {
-  global = this;
-}
-
-Object.defineProperty(
-  Object.prototype,
-  '$UID',
-  {
-    get: function() {
-      if ( Object.hasOwnProperty.call(this, '$UID__') ) {
-        return this.$UID__;
-      }
-      Object.defineProperty(this, '$UID__', {value: foam.next$UID(), enumerable: false});
-      return this.$UID__;
-    },
-    enumerable: false
-  }
-);
-
-
-/**
- * Creates a small library in the foam package. A LIB is a collection of static constants,
- * methods and functions.
- * <pre>
-foam.LIB({
-  name: 'network',
-  constants: {
-    PORT: 4000
-  },
-  methods: [ function sendPacket() { ... }  ]
-});
-</pre>
-Produces <code>foam.network</code>:
-<pre>
-console.log(foam.network.PORT); // outputs 4000
-foam.network.sendPacket();
-</pre>
- * @method LIB
- * @memberof module:foam
- */
-foam.LIB = function LIB(model) {
-  function defineProperty(proto, key, map) {
-    if ( ! map.value || proto === Array.prototype ) {
-      Object.defineProperty.apply(this, arguments);
-    } else {
-      proto[key] = map.value;
-    }
-  }
-
-  var root = global;
-  var path = model.name.split('.');
-  for ( var i = 0 ; i < path.length ; i++ ) {
-    root = root[path[i]] || ( root[path[i]] = {} );
-  }
-//  var proto = model.name ? foam[model.name] || ( foam[model.name] = {} ) : foam;
-  var proto = root;
-
-  if ( model.constants ) {
-    console.assert(typeof model.constants === 'object',
-                   'Constants must be a map.');
-
-    for ( var key in model.constants ) {
-      defineProperty(
-        proto,
-        key,
-        { value: model.constants[key], writable: true, enumerable: false });
-    }
-  }
-
-  if ( model.methods ) {
-    console.assert(Array.isArray(model.methods), 'Methods must be an array.');
-
-    for ( var i = 0 ; i < model.methods.length ; i++ ) {
-      var m = model.methods[i];
-      defineProperty(
-        proto,
-        m.name,
-        { value: m.code || m, writable: true, enumerable: false });
-    }
-  }
-};
-
+  This has a number of advantages:
+  1. It avoids conflicts with other libraries which might also extend built-in
+     types with methods with the same names but different semantics.
+  2. It is >10X faster (in V8) to call a flyweight method than a Method added
+     to the prototypes of String or Number. This is because calling an added
+     method on those types promotes the object from a primitive string or number
+     to a String or Number object.  Creating the object takes time and creates a
+     new object that will need to be GC'ed.
+  3. It lets us effectively add methods to built-in special values like
+     true, false, null, and undefined. This avoids the need for null-pointer
+     checks.
+  4. It avoids the proliferation of large ===/typeof/isInstance/instanceof blocks
+     throughout the rest of the code.
+  5. It provides a consistent method for checking an object's type, since each
+     type flyweight has an .is() method which abstracts the underlying detection
+     mechanism.
+  6. It makes the future implementation of multi-methods much easier.
+*/
 
 foam.LIB({
-  name: 'foam.fn',
-
+  name: 'foam.Undefined',
   methods: [
+    function is(o) { return o === undefined; },
+    function clone(o) { return o; },
+    function equals(_, b) { return b === undefined; },
+    function compare(_, b) { return b === undefined ? 0 : 1; },
+    function hashCode() { return -1; }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.Null',
+  methods: [
+    function is(o) { return o === null; },
+    function clone(o) { return o; },
+    function equals(_, b) { return b === null; },
+    function compare(_, b) { return b === null ? 0 : b === undefined ? -1 : 1; },
+    function hashCode() { return -2; }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.Boolean',
+  methods: [
+    function is(o) { return typeof o === 'boolean'; },
+    function clone(o) { return o; },
+    function equals(a, b) { return a === b; },
+    function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
+    function hashCode(o) { return o ? 1 : 0; }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.Function',
+  methods: [
+    function is(o) { return typeof o === 'function'; },
+    function clone(o) { return o; },
+    function equals(a, b) { return b ? a.toString() === b.toString() : false; },
+    function compare(a, b) {
+      return b ? foam.String.compare(a.toString(), a.toString()) :  1;
+    },
+    function hashCode(o) { return foam.String.hashCode(o.toString()); },
     function bind(f, that, a1, a2, a3, a4) {
       switch ( arguments.length ) {
         case 2: return function() { return f.apply(that, arguments); };
@@ -161,51 +123,372 @@ foam.LIB({
           }
         };
       }
-      console.error('Attempt to foam.fn.bind more than 4 arguments.');
+      console.error('Attempt to foam.Function.bind more than 4 arguments.');
+    },
+    /** Faster version of memoize() when only dealing with one argument. */
+    function memoize1(f) {
+      var cache = {};
+      var g = function(arg) {
+        console.assert(arguments.length == 1, "Memoize1'ed functions must take exactly one argument.");
+        var key = arg ? arg.toString() : '';
+        if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
+        return cache[key];
+      };
+      foam.Function.setName(g, 'memoize1(' + f.name + ')');
+      return g;
+    },
+
+    function setName(f, name) {
+      /** Set a function's name for improved debugging and profiling **/
+      Object.defineProperty(f, 'name', {value: name, configurable: true});
+    },
+
+    function appendArguments(a, args, start) {
+      /** Convenience method to append 'arguments' onto a real array **/
+      for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
+      return a;
+    },
+
+    function argsStr(f) {
+      /** Finds the function(...) declaration arguments part. Strips newlines. */
+      return f.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+    },
+
+    function argsArray(f) {
+      /**
+       * Return a function's arguments as an array.
+       * Ex. argsArray(function(a,b) {...}) == ['a', 'b']
+       **/
+      var args = foam.Function.argsStr(f);
+      if ( ! args ) return [];
+      args += ',';
+
+      var ret = [];
+      // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
+      var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
+      var typeMatch;
+      while ((typeMatch = argMatcher.exec(args)) !== null) {
+        ret.push(typeMatch[2]);
+      }
+      return ret;
+    },
+
+    function withArgs(fn, source, opt_self) {
+      /**
+       * Calls fn, and provides the arguments to fn by looking
+       * up their names on source.  The this context is either
+       * source, or opt_self if provided.
+       *
+       * If the argument maps to a function on source, it is bound to source.
+       *
+       * Ex.
+       * var a = {
+       *   name: 'adam',
+       *   hello: function() {
+       *     console.blog("Hello " + this.name);
+       *   }
+       * };
+       * function foo(name, hello) {
+       *   console.log("Name is " + name);
+       *   hello();
+       * }
+       * foam.Function.with(foo, a);
+       *
+       * Outputs:
+       * Name is adam
+       * Hello adam
+       *
+       **/
+      var argNames = foam.Function.argsArray(fn);
+      var args = [];
+      for ( var i = 0 ; i < argNames.length ; i++ ) {
+        var a = source[argNames[i]];
+        if ( typeof a === "function" ) a = a.bind(source);
+        args.push(a);
+      }
+      return fn.apply(opt_self || source, args);
+    }
+  ]
+});
+
+(function() {
+  // Disable setName if not supported on this platform.
+  try {
+    foam.Function.setName(function() {}, '');
+  } catch (x) {
+    /**
+      @class fn
+      @ignore */
+    foam.LIB({
+      name: 'foam.Function',
+      methods: [ function setName() { /* NOP */ } ]
+    });
+  }
+})();
+
+
+foam.LIB({
+  name: 'foam.Number',
+  methods: [
+    function is(o) { return typeof o === 'number'; },
+    function clone(o) { return o; },
+    function equals(a, b) { return a === b; },
+    function compare(a, b) { return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0; },
+    function hashCode(n) { return n & n; }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.String',
+  methods: [
+    function is(o) { return typeof o === 'string'; },
+    function clone(o) { return o; },
+    function equals(a, b) { return a === b; },
+    function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
+    function hashCode(s) {
+      var hash = 0;
+
+      for ( i = 0 ; i < s.length ; i++ ) {
+        var code = s.charCodeAt(i);
+        hash = ((hash << 5) - hash) + code;
+        hash &= hash;
+      }
+
+      return hash;
+    },
+    {
+      name: 'constantize',
+      code: foam.Function.memoize1(function(str) {
+        // switchFromCamelCaseToConstantFormat to SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
+        return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
+          return a.substring(0,1) + '_' + a.substring(1,2);
+        }).toUpperCase();
+      })
+    },
+
+    {
+      name: 'labelize',
+      code: foam.Function.memoize1(function(str) {
+        if ( ! str || str === '' ) return str;
+        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) {
+          return a.charAt(0) + ' ' + a.charAt(1);
+        }));
+      })
+    },
+
+    {
+      name: 'capitalize',
+      code: foam.Function.memoize1(function(str) {
+        // switchFromProperyName to //SwitchFromPropertyName
+        return str[0].toUpperCase() + str.substring(1);
+      })
+    },
+
+    function pad(str, size) {
+      // Right pads to size if size > 0, Left pads to -size if size < 0
+      return size < 0 ?
+        (new Array(-size).join(' ') + str).slice(size)       :
+        (str + new Array(size).join(' ')).substring(0, size) ;
+    },
+
+    function multiline(f) {
+      // Function for returning multi-line strings from commented functions.
+      // Ex. var str = multiline(function() { /* multi-line string here */ });
+      if ( typeof f === 'string' ) return f;
+      var s     = f.toString();
+      var start = s.indexOf('/*');
+      var end   = s.lastIndexOf('*/');
+      return s.substring(start+2, end);
     }
   ]
 });
 
 
 foam.LIB({
-  name: 'foam.math',
-
-  methods: [
-    function distance(x, y) { return Math.sqrt(x*x + y*y); }
-  ]
-});
-
-
-/** Array prototype additions. */
-foam.LIB({
   name: 'foam.Array',
-
   methods: [
-    function diff(other) {
+    function is(o) { return Array.isArray(o); },
+    function clone(o) {
+      /** Returns a deep copy of this array and its contents. */
+      var ret = new Array(o.length);
+      for ( var i = 0 ; i < o.length ; i++ ) {
+        ret[i] = foam.util.clone(o[i]);
+      }
+      return ret;
+    },
+    function diff(a, b) {
       /** Finds elements added (found in other, not in this) and removed
           (found in this, not in other). Repeated values are treated
           as separate elements, but ordering changes are ignored. */
-      var added = other.slice(0);
+      var added = b.slice(0);
       var removed = [];
-      for ( var i = 0 ; i < this.length ; i++ ) {
+      for ( var i = 0 ; i < a.length ; i++ ) {
         for ( var j = 0 ; j < added.length ; j++ ) {
-          if ( foam.compare.equals(this[i], added[j]) ) {
+          if ( foam.util.equals(a[i], added[j]) ) {
             added.splice(j, 1);
             j--;
             break;
           }
         }
-        if ( j == added.length ) removed.push(this[i]);
+        if ( j == added.length ) removed.push(a[i]);
       }
       return { added: added, removed: removed };
     },
-    function clone() {
-      /** Returns a deep copy of this array and its contents. */
-      var ret = new Array(this.length);
-      for ( var i = 0 ; i < this.length ; i++ ) {
-        ret[i] = (  this[i] && this[i].clone ) ? this[i].clone() : this[i];
+    function equals(a, b) {
+      if ( ! b || ! Array.isArray(b) || a.length !== b.length ) return false;
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        if ( ! foam.util.equals(a[i], b[i]) ) return false;
       }
-      return ret;
+      return true;
+    },
+    function compare(a, b) {
+      if ( ! b || ! Array.isArray(b) ) return false;
+      var l = Math.min(a.length, b.length);
+      for ( var i = 0 ; i < l ; i++ ) {
+        var c = foam.util.compare(a[i], b[i]);
+        if ( c ) return c;
+      }
+      return a.length === b.length ? true : a.length < b.length ? -1 : 1;
+    },
+    function hashCode(a) {
+      var hash = 0;
+
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        hash = ((hash << 5) - hash) + this.hashCode(a[i]);
+      }
+
+      return hash;
+    },
+    function argsToArray(args) {
+      /** convenience method to turn 'arguments' into a real array */
+      return foam.Function.appendArguments([], args, 0);
     }
   ]
 });
+
+
+foam.LIB({
+  name: 'foam.Date',
+  methods: [
+    function is(o) { return o instanceof Date; },
+    function clone(o) { return o; },
+    function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
+    function equals(a, b) { return this.getTime(a) === this.getTime(b); },
+    function compare(a, b) {
+      a = this.getTime(a);
+      b = this.getTime(b);
+      return a < b ? -1 : a > b ? 1 : 0;
+    },
+    function hashCode(d) { var n = d.getTime(); return n & n; },
+    function relativeDateString(date) {
+      // TODO i18n: make this translatable
+      var seconds = Math.floor((Date.now() - date.getTime())/1000);
+
+      if ( seconds < 60 ) return 'moments ago';
+      if ( seconds > 60 ) return 'in moments';
+
+      var minutes = Math.floor((seconds)/60);
+
+      if ( minutes == 1 ) return '1 minute ago';
+      if ( minutes == -1 ) return 'in 1 minute';
+
+      if ( minutes < 60 ) return minutes + ' minutes ago';
+      if ( minutes > 60 ) return 'in ' + minutes + ' minutes';
+
+      var hours = Math.floor(minutes/60);
+      if ( hours == 1 ) return '1 hour ago';
+      if ( hours == -1 ) return 'in 1 hour';
+
+      if ( hours < 24 ) return hours + ' hours ago';
+      if ( hours < -24 ) return 'in ' + hours + ' hours';
+
+      var days = Math.floor(hours / 24);
+      if ( days == 1 ) return '1 day ago';
+      if ( days == -1 ) return 'in 1 day';
+
+      if ( days < 7 ) return days + ' days ago';
+      if ( days < -7 ) return 'in ' + days + ' days';
+
+      if ( days < 365 ) {
+        var year = 1900+date.getYear();
+        var noyear = date.toDateString().replace(' ' + year, '');
+        return noyear.substring(4);
+      }
+
+      return date.toDateString().substring(4);
+    }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.FObject',
+  methods: [
+    function is(o) { return foam.core.FObject.isInstance(o); },
+    function clone(o) { return o.clone(); },
+    function diff(a, b) { return a.diff(b); },
+    function equals(a, b) { return a.equals(b); },
+    function compare(a, b) { return a.compareTo(b); },
+    function hashCode(o) { return o.hashCode(); }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.Object',
+  methods: [
+    function is(o) { return typeof o === 'object'; },
+    function clone(o) { return o; },
+    function equals(a, b) { return a === b; },
+    function compare(a, b) {
+      return foam.Number.compare(a.$UID, b ? b.$UID : -1);
+    },
+    function hashCode(o) { return 0; }
+  ]
+});
+
+
+foam.typeOf = (function() {
+  var
+    tNumber    = foam.Number,
+    tString    = foam.String,
+    tUndefined = foam.Undefined,
+    tNull      = foam.Null,
+    tBoolean   = foam.Boolean,
+    tArray     = foam.Array,
+    tDate      = foam.Date,
+    tFObject   = foam.FObject,
+    tFunction  = foam.Function,
+    tObject    = foam.Object;
+
+  return function typeOf(o) {
+    if ( tNumber.is(o)    ) return tNumber;
+    if ( tString.is(o)    ) return tString;
+    if ( tUndefined.is(o) ) return tUndefined;
+    if ( tNull.is(o)      ) return tNull;
+    if ( tBoolean.is(o)   ) return tBoolean;
+    if ( tArray.is(o)     ) return tArray;
+    if ( tDate.is(o)      ) return tDate;
+    if ( tFunction.is(o)  ) return tFunction;
+    if ( tFObject.is(o)   ) return tFObject;
+    return tObject;
+  }
+})();
+
+
+( function() {
+  var typeOf = foam.typeOf;
+
+  foam.LIB({
+    name: 'foam.util',
+
+    methods: [
+      function clone(o)      { return typeOf(o).clone(o); },
+      function equals(a, b)  { return typeOf(a).equals(a, b); },
+      function compare(a, b) { return typeOf(a).compare(a, b); },
+      function hashCode(o)   { return typeOf(o).hashCode(o); },
+      function diff(a, b)    { return typeOf(a).diff(a, b); }
+    ]
+  });
+} )();

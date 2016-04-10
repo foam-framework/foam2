@@ -170,7 +170,7 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return foam.string.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
     }
   ]
 });
@@ -196,7 +196,7 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return foam.string.constantize(this.cls_.name) + '(' + this.arg1.toString() + ', ' +
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ', ' +
           this.arg2.toString() + ')';
     }
   ]
@@ -219,7 +219,7 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      var s = foam.string.constantize(this.cls_.name) + '(';
+      var s = foam.String.constantize(this.cls_.name) + '(';
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a = this.args[i];
         s += a.toString();
@@ -373,7 +373,7 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      return foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
+      return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
@@ -387,7 +387,7 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      return ! foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
+      return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
@@ -401,7 +401,7 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
     }
   ]
 });
@@ -415,7 +415,7 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
     }
   ]
 });
@@ -428,7 +428,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
     }
   ]
 });
@@ -441,7 +441,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
     }
   ]
 });
@@ -502,7 +502,7 @@ foam.CLASS({
 
   methods: [
     function _nary_(name, args) {
-      return this[name].create({ args: foam.array.argsToArray(args) });
+      return this[name].create({ args: foam.Array.argsToArray(args) });
     },
     function _unary_(name, arg) {
       return this[name].create({ arg1: arg });
