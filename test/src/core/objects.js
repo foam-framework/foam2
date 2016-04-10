@@ -6,13 +6,13 @@ describe('FObject compareTo', function() {
 
   beforeEach(function() {
     foam.CLASS({
-      name: 'CompA',
       package: 'test',
+      name: 'CompA',
       properties: [ 'a', 'b' ]
     });
     foam.CLASS({
-      name: 'CompB',
       package: 'test',
+      name: 'CompB',
       properties: [ 'b' ]
     });
     a = test.CompA.create();
@@ -107,7 +107,7 @@ describe('FObject diff', function() {
   it('returns diff from an array value', function() {
     a.b = [ 4, 'hello', b ];
     b.b = ['hello', 99, 87, a];
-    expect(a.diff(b)).toEqual({ b: { added: [99,87,a], removed: [4,b] } });
+    expect(foam.util.diff(a, b)).toEqual({ b: { added: [99,87,a], removed: [4,b] } });
   });
 });
 

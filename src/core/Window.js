@@ -86,7 +86,7 @@ foam.CLASS({
 
     function delayed(l, delay) {
       /* Decorate a listener so that events are delivered 'delay' ms later. */
-      return foam.fn.bind(function() {
+      return foam.Function.bind(function() {
         this.setTimeout(
           function() { l.apply(this, arguments); },
           delay);
@@ -102,7 +102,7 @@ foam.CLASS({
         var lastArgs  = null;
         function mergedListener() {
           triggered = false;
-          var args = foam.array.argsToArray(lastArgs);
+          var args = foam.Array.argsToArray(lastArgs);
           lastArgs = null;
           l.apply(this, args);
         }

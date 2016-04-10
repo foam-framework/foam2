@@ -1021,9 +1021,9 @@ var a = {}, b = [], c = Person.create();
 log(a.$UID, b.$UID, c.$UID);
 log(a.$UID, b.$UID, c.$UID);
 
-// foam.array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
+// foam.Array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
 (function() {
-  log(Array.isArray(arguments), Array.isArray(foam.array.argsToArray(arguments)));
+  log(Array.isArray(arguments), Array.isArray(foam.Array.argsToArray(arguments)));
 })();
 
 // foam.events.consoleLog
@@ -1034,10 +1034,10 @@ o.pub();
 o.pub('foo');
 o.pub('foo','bar');
 
-// foam.fn.memoize1() memozies a one-argument function so that if called again
+// foam.Function.memoize1() memozies a one-argument function so that if called again
 // with the same argument, the previously generated value will be returned
 // rather than calling the function again.
-var f = foam.fn.memoize1(function(x) { log('calculating ', x); return x*x; });
+var f = foam.Function.memoize1(function(x) { log('calculating ', x); return x*x; });
 log(f(2));
 log(f(2));
 log(f(4));
@@ -1048,41 +1048,41 @@ log(f());
 // A call to memoize1() with more than one argument will trigger a failed assertion.
 log(f(1,2));
 
-// foam.fn.argsStr() returns a function's arguments an a string.
-log(foam.fn.argsStr(function(a,b,fooBar) { }));
-log(typeof foam.fn.argsStr(function() { }));
+// foam.Function.argsStr() returns a function's arguments an a string.
+log(foam.Function.argsStr(function(a,b,fooBar) { }));
+log(typeof foam.Function.argsStr(function() { }));
 
-// foam.fn.argsArray() returns a function's arguments an an array.
-log(foam.fn.argsArray(function(a,b,fooBar) { }));
-log(Array.isArray(foam.fn.argsArray(function() { })));
+// foam.Function.argsArray() returns a function's arguments an an array.
+log(foam.Function.argsArray(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.argsArray(function() { })));
 
-// foam.string.constantize converts strings from camelCase to CONSTANT_FORMAT
-log(foam.string.constantize('foo'));
-log(foam.string.constantize('fooBar'));
-log(foam.string.constantize('fooBar12'));
+// foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
+log(foam.String.constantize('foo'));
+log(foam.String.constantize('fooBar'));
+log(foam.String.constantize('fooBar12'));
 
-// foam.string.capitalize capitalizes strings
-log(foam.string.capitalize('Abc def'));
-log(foam.string.capitalize('abc def'));
+// foam.String.capitalize capitalizes strings
+log(foam.String.capitalize('Abc def'));
+log(foam.String.capitalize('abc def'));
 
-// foam.string.labelize converts from camelCase to labels
-log(foam.string.labelize('camelCase'));
-log(foam.string.labelize('firstName'));
-log(foam.string.labelize('someLongName'));
+// foam.String.labelize converts from camelCase to labels
+log(foam.String.labelize('camelCase'));
+log(foam.String.labelize('firstName'));
+log(foam.String.labelize('someLongName'));
 
-// foam.string.multiline lets you build multi-line strings
+// foam.String.multiline lets you build multi-line strings
 // from function comments.
-log(foam.string.multiline(function(){/*This is
+log(foam.String.multiline(function(){/*This is
 a
 multi-line
 string*/}));
 
-// foam.string.pad() pads a string to the specified length.
-var s = foam.string.pad('foobar', 10);
+// foam.String.pad() pads a string to the specified length.
+var s = foam.String.pad('foobar', 10);
 log(s, s.length);
 
-// foam.string.pad() pads a string to the specified length, right justifying if given a negative number.
-var s = foam.string.pad('foobar', -10);
+// foam.String.pad() pads a string to the specified length, right justifying if given a negative number.
+var s = foam.String.pad('foobar', -10);
 log(s, s.length);
 
 // Basic templates

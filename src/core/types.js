@@ -41,7 +41,7 @@ foam.CLASS({
         if ( ! o1 ) return o2 ? -1 : 0;
         if ( ! o2 ) return 1;
 
-        return foam.types.Date.compare(o1, o2);
+        return foam.Date.compare(o1, o2);
       }
     }
   ]
@@ -392,8 +392,8 @@ foam.CLASS({
     {
       name: 'factory',
       expression: function(plural, states) {
-        var initial = foam.string.constantize(plural);
-        var state = foam.string.constantize(states[0].name);
+        var initial = foam.String.constantize(plural);
+        var state = foam.String.constantize(states[0].name);
         return function() {
           return this[initial][state];
         };
@@ -434,7 +434,7 @@ foam.CLASS({
       this.states.forEach(function(state) {
         var name = state.name;
         var className = state.className;
-        Object.defineProperty(states, foam.string.constantize(state.name), {
+        Object.defineProperty(states, foam.String.constantize(state.name), {
           get: (function() {
             var value;
             return function() {
@@ -450,14 +450,14 @@ foam.CLASS({
       });
 
       states = foam.core.Constant.create({
-        name: foam.string.constantize(this.plural),
+        name: foam.String.constantize(this.plural),
         value: states
       });
       cls.installAxiom(states);
 
       // var states = this.states.map(function(m) {
       //   return foam.core.Constant.create({
-      //     name: foam.string.constantize(self.name + m.name),
+      //     name: foam.String.constantize(self.name + m.name),
       //     value: foam.lookup(m.className).create()
       //   });
       // });

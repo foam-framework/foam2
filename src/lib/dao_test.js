@@ -75,7 +75,7 @@ foam.CLASS({
     },
     function test(o) {
       dao.where(
-        foam.fn.with(
+        foam.Function.with(
           this,
           function(OR, EQ) {
             return OR(

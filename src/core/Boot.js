@@ -511,7 +511,7 @@ foam.CLASS({
     'name',
     {
       name: 'label',
-      expression: function(name) { return foam.string.labelize(name); }
+      expression: function(name) { return foam.String.labelize(name); }
     },
     [ 'extends', 'FObject' ],
     'refines',
@@ -576,7 +576,7 @@ foam.CLASS({
     { name: 'name', required: true },
     {
       name: 'label',
-      expression: function(name) { return foam.string.labelize(name); }
+      expression: function(name) { return foam.String.labelize(name); }
     },
     'help',
     'value',
@@ -598,7 +598,7 @@ foam.CLASS({
       */
       'comparePropertyValues',
       function(o1, o2) {
-        return foam.compare.compare(o1, o2);
+        return foam.util.compare(o1, o2);
       }
     ]
   ],
@@ -620,7 +620,7 @@ foam.CLASS({
         }
       }
 
-      c[foam.string.constantize(this.name)] = this;
+      c[foam.String.constantize(this.name)] = this;
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
@@ -729,7 +729,7 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var argNames = foam.fn.argsArray(e);
+      var argNames = foam.Function.argsArray(e);
       var name = this.name;
 
       return function() {
@@ -876,7 +876,7 @@ foam.CLASS({
         return ret;
       };
 
-      foam.fn.setName(f, this.name);
+      foam.Function.setName(f, this.name);
       f.toString = function() { return method.toString(); };
 
       return f;
@@ -905,7 +905,7 @@ foam.CLASS({
 
   properties: [
     [ 'adapt', function(_, a) {
-        return typeof a === 'function' ? foam.string.multiline(a) :
+        return typeof a === 'function' ? foam.String.multiline(a) :
           a ? a.toString() :
           '' ;
       }
@@ -1178,7 +1178,7 @@ foam.CLASS({
     function installInClass(cls) {
       Object.defineProperty(
         cls,
-        foam.string.constantize(this.name),
+        foam.String.constantize(this.name),
         {
           value: this.value,
           enumerable: false,
@@ -1502,9 +1502,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          pub:   foam.fn.bind(parent.pub,   parent, name),
-          sub:   foam.fn.bind(parent.sub,   parent, name),
-          unsub: foam.fn.bind(parent.unsub, parent, name),
+          pub:   foam.Function.bind(parent.pub,   parent, name),
+          sub:   foam.Function.bind(parent.sub,   parent, name),
+          unsub: foam.Function.bind(parent.unsub, parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 

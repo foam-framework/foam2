@@ -41,7 +41,7 @@ var createTestProperties = function createTestProperties() {
         {
           class: 'ReferenceArray',
           name: 'referenceArray',
-        },
+        }
         // TODO: other types, as they gain testable functionality
       ]
     });

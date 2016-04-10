@@ -85,8 +85,10 @@ foam.LIB({
     },
 
     function output(out, o) {
-      if ( typeof o === 'undefined' ) {
+      if ( o === undefined ) {
         out('undefined');
+      } else if ( o === null ) {
+        out('null');
       } else if ( typeof o === 'string' ) {
         out('"', o, '"');
       } else if ( typeof o === 'number' ) {
@@ -109,9 +111,9 @@ foam.LIB({
 
     function parse(json, opt_class) {
       // recurse into sub-objects
-      for (var key in json) {
+      for ( var key in json ) {
         var o = json[key];
-        if (typeof o == 'object' && ! o.cls_ ) { // traverse plain old objects only
+        if ( typeof o === 'object' && ! o.cls_ ) { // traverse plain old objects only
           json[key] = this.parse(o);
         }
       }
@@ -136,7 +138,7 @@ foam.LIB({
 
     function stringify(o, opt_options) {
       var out = this.createOut();
-      o.outputJSON(out, opt_options);
+      o && o.outputJSON && o.outputJSON(out, opt_options);
       return out.toString();
     }
   ]
