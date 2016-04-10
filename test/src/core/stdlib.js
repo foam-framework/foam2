@@ -17,6 +17,44 @@ describe('internal foam.LIB', function() {
 
 });
 
+describe('foam.LIB type checking:', function() {
+  it('methods must be named', function() {
+    expect(function() {
+      foam.LIB({
+        name: 'foam.testlib',
+        methods: [
+          function() {
+          }
+        ]
+      })
+    }).toThrow();
+  });
+
+  it('methods must be functions or maps', function() {
+    expect(function() {
+      foam.LIB({
+        name: 'foam.testlib',
+        methods: [
+          'hello'
+        ]
+      })
+    }).toThrow();
+  });
+
+  it('methods as maps must have .code', function() {
+    expect(function() {
+      foam.LIB({
+        name: 'foam.testlib',
+        methods: [
+          {
+            name: 'hello'
+          }
+        ]
+      })
+    }).toThrow();
+  });
+});
+
 describe('Object.$UID', function() {
 
   beforeEach(function() {
@@ -228,7 +266,7 @@ describe('Date', function() {
     expect(foam.util.compare(date, date)).toEqual(0);
   });
 
-  // TODO: fix time zone 
+  // TODO: fix time zone
   // it('correctly generates relative strings', function() {
   //   var baseDate = new Date(99999);
   //   var d =        new Date(99999);

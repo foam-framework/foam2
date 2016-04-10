@@ -90,6 +90,18 @@ foam.LIB = function LIB(model) {
 
     for ( var i = 0 ; i < model.methods.length ; i++ ) {
       var m = model.methods[i];
+
+      console.assert(typeof m === 'object' || typeof m === 'function',
+                     'Methods must be a map of a function');
+
+      console.assert(typeof m.name === 'string' && m.name !== '',
+                     'Methods must be named with a non-empty string');
+
+      if ( typeof m === 'object' ) {
+        console.assert(typeof m.code  === 'function',
+                       'Methods must have a code key which is a function');
+      }
+
       root[m.name] = m.code || m;
     }
   }
