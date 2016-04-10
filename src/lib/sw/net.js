@@ -47,7 +47,7 @@ foam.CLASS({
       var reader = this.resp.body.getReader();
       this.streaming = true;
 
-      var onData = foam.fn.bind(function(e) {
+      var onData = foam.Function.bind(function(e) {
         if ( e.value ) {
           this.data.pub(e.value);
         }
