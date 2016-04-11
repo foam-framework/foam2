@@ -12,8 +12,8 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
   requires: [
     'foam.dao.ArraySink',
-    'foam.net.sw.HTTPRequest',
-    'foam.net.sw.EventSource'
+    'foam.net.HTTPRequest',
+    'foam.net.EventSource'
   ],
   properties: [
     'of',

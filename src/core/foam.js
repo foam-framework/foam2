@@ -83,7 +83,6 @@
     [ "../lib/node/json_dao", isServer ],
     "../lib/utf8",
     "../lib/net",
-    "../lib/sw/net",
     "../lib/firebase",
     "../lib/box",
     [ "../lib/node/box", isServer ]
