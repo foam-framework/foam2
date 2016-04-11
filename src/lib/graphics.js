@@ -457,8 +457,8 @@ foam.CLASS({
   methods: [
     function intersects(c) {
       var r = this.radius + c.radius;
-      if ( this.border ) r += this.arcWidth-2;
-      if ( c.border    ) r += c.arcWidth-2;
+      if ( this.border ) r += this.arcWidth/2-1;
+      if ( c.border    ) r += c.arcWidth/2-1;
       return foam.math.distance(this.x-c.x, this.y-c.y) <= r;
     }
   ]
