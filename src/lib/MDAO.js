@@ -1266,6 +1266,13 @@ foam.CLASS({
           delete self.map[obj.id];
           self.pub('on', 'remove', obj);
           return Promise.resolve();
+        },
+        function(err) {
+          if ( self.ObjectNotFoundException.isInstance(err) ) {
+            return Promise.resolve(); // not found error is actually ok
+          } else {
+            return Promise.reject(err);
+          }
         }
       );
     },
