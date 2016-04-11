@@ -81,7 +81,8 @@
     "../lib/Collider",
     "../lib/PhysicsEngine",
     ["../lib/PhysicalCircle", ! isServer ],
-    [ "../lib/node/json_dao", isServer ]
+    [ "../lib/node/json_dao", isServer ],
+    "../lib/utf8"
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
