@@ -181,7 +181,8 @@ foam.CLASS({
   ],
   methods: [
     function step() {
-      this.restore.ps = this.ps;
+      //      this.restore.ps = this.ps;
+      this.restore.next.ps = this.ps;
       this.next.ps = this.ps;
       return this.next;
     }
@@ -204,7 +205,6 @@ foam.CLASS({
 //    function step(pps) {
     //      pps[0] = this.ps;
     function step() {
-      this.next.ps = this.ps;
       return this.next;
     }
   ]
@@ -513,7 +513,8 @@ foam.CLASS({
 
   methods: [
     function step(pps) {
-      pps[0] = pps[0].setValue(this.value);
+      //      pps[0] = pps[0].setValue(this.value);
+      this.next.ps = this.ps.setValue(this.value)
       return this.next;
     }
   ]
