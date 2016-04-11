@@ -896,6 +896,10 @@ foam.CLASS({
         var delimSuccess = foam.parse.compiled.Placeholder.create();
         var delimFail = foam.parse.compiled.Placeholder.create();
         var delim = this.delimiter.compile(delimSuccess, delimFail, false, grammar);
+      } else {
+        delim = foam.parse.compiled.Placeholer.create({
+          next: delimSuccess
+        });
       }
 
       var start = p;
@@ -940,13 +944,9 @@ foam.CLASS({
         });
       }
 
-      if ( delim ) {
-        pSuccess.next = delim;
-        delimSuccess.next = p;
-        delimFail.next = success;
-      } else {
-        pSuccess.next = p;
-      }
+      pSuccess.next = delim;
+      delimSuccess.next = p;
+      delimFail.next = success;
 
       pFail.next = success;
 
