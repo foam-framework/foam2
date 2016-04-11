@@ -342,6 +342,46 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'InIC',
+  extends: 'foam.mlang.predicate.Binary',
+
+  properties: [
+    {
+      name: 'arg2',
+      postSet: function() {
+        this.valueSet_ = null;
+      }
+    },
+    {
+      name: 'valueSet_'
+    }
+  ],
+
+  methods: [
+    function f(o) {
+      var lhs = this.arg1.f(o).toUpperCase();
+      // If arg2 is a constant array, we use valueSet for it.
+      if ( Array.isArray(this.arg2) ) {
+        if ( ! this.valueSet_ ) {
+          var set = {};
+          for ( var i = 0 ; i < this.arg2.length ; i++ ) {
+            set[this.arg2[i].toUpperCase()] = true;
+          }
+          this.valueSet_ = set;
+        }
+
+        return !! this.valueSet_[lhs];
+      } else {
+        var rhs = this.arg2.f(o);
+        if ( ! rhs ) return false;
+        return rhs.toUpperCase().indexOf(lhs) !== -1;
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
