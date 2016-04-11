@@ -1647,6 +1647,22 @@ foam.CLASS({
 });
 
 
+/**
+  An Identity Axiom which installs a psedo-property to use as an id.
+  Use when you want a multi-part primary-key.
+<pre>
+  Ex.
+  foam.CLASS({
+    name: 'Person',
+    ids: [ 'firstName', 'lastName' ],
+    properties: [ 'firstName', 'lastName', 'age', 'sex' ]
+  });
+
+  > var p = Person.create({firstName: 'Kevin', lastName: 'Greer'});
+  > p.id;
+  ["Kevin", "Greer"]
+</pre>
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Identity',
