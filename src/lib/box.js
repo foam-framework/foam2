@@ -154,6 +154,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'OnMessageBoxServer',
+  imports: [
+    'registry'
+  ],
+  exports: [
+    'as server'
+  ],
   properties: [
     {
       name: 'source',
@@ -164,6 +170,17 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      name: 'inbox_',
+      factory: function() {
+        return this.registry.register('INBOX');
+      }
+    }
+  ],
+  methods: [
+    function inbox() {
+      return this.inbox_;
     }
   ],
   listeners: [
@@ -401,13 +418,34 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.box',
+  name: 'OneShotBox',
+  extends: 'foam.box.ProxyBox',
+  imports: [
+    'registry'
+  ],
+  methods: [
+    function send(msg) {
+      this.registry.unregister(this.id, this);
+      this.delegate.send(msg)
+    },
+    function toRemote_() {
+      return this.cls_.create({
+        delegate: this.delegate.toRemote_()
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'AnonymousReplyBox',
   extends: 'foam.box.ProxyBox',
   requires: [
     'foam.box.SubBox'
   ],
   imports: [
-    'registry'
+    'registry',
+    'server'
   ],
   properties: [
     {
@@ -422,25 +460,36 @@ foam.CLASS({
   ],
   methods: [
     function init() {
-      this.registry.register(this.id, this);
+      this.server.inbox().register(this.id, this);
     },
     function send(msg) {
-      this.registry.unregister(this.id, this);
+      debugger;
+      this.registry.unregister(this.id);
       this.delegate.send(msg);
     },
     function toRemote_() {
       return this.SubBox.create({
         name: this.id,
-        // TODO: This isn't always the right box!
-        // Needs to be dynamic based upon where we are
-        // sending this to
-        // The server could expose a .remoteBox or .replyBox()
-        // which returns the right way to get a box back to this server
-        delegate: foam.box.SelfPostMessageBox.create()
+        delegate: this.server.inbox()
       });
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'PromiseBox',
+  properties: [
+    'promise',
+  ],
+  methods: [
+    function send(msg) {
+      // TODO: Error handling
+      this.promise.then(function(box) { box.send(msg); });
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -488,6 +537,15 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.box',
+  name: 'SubscribeMessage',
+  extends: 'foam.box.Message',
+  properties: [
+    'destination'
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'RPCMessage',
   extends: 'foam.box.Message',
   requires: [
@@ -518,6 +576,117 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Stub',
+  extends: 'Property',
+  properties: [
+    'of',
+    'replyBox',
+    {
+      name: 'methods',
+      expression: function(of) {
+        var cls = foam.lookup(of);
+
+        if ( cls ) {
+          return cls.getAxiomsByClass(foam.core.Method)
+            .filter(function (m) { return cls.hasOwnAxiom(m.name); })
+            .map(function(m) { return m.name; })
+        }
+      }
+    }
+  ],
+  methods: [
+    function installInClass(cls) {
+      var model = foam.lookup(this.of);
+
+      var methods = this.methods
+          .map(function(name) { return model.getAxiomByName(name); })
+          .map(function(m) {
+            var m2 = foam.core.Method.create({
+              name: m.name,
+              returns: m.returns ? 'Promise' : '',
+              code: function() {
+                if ( m.returns ) {
+                  var promise = this.RPCReturnBox.create();
+                  var replyBox = this.AnonymousReplyBox.create({
+                    delegate: promise
+                  });
+                }
+
+                var msg = this.RPCMessage.create({
+                  name: m.name,
+                  args: foam.Array.argsToArray(arguments)
+                });
+                if ( replyBox ) msg.replyBox = replyBox;
+
+                this.box.send(msg);
+
+                return replyBox ? promise.promise : undefined;
+              }
+            });
+            return m2;
+          });
+
+      for ( var i = 0 ; i < methods.length ; i++ ) {
+        cls.installAxiom(methods[i]);
+      }
+
+      [
+        'foam.box.SubscribeMessage',
+        'foam.box.OneShotBox',
+        'foam.box.RPCReturnBox',
+        'foam.box.AnonymousReplyBox',
+        'foam.box.RPCMessage',
+      ].map(function(s) {
+        var path = s.split('.');
+        return foam.core.Requires.create({
+          path: s,
+          as: path[path.length - 1]
+        });
+      }).forEach(function(a) {
+        cls.installAxiom(a);
+      });
+
+      cls.installAxiom(foam.core.Property.create({
+        name: 'box'
+      }));
+
+      cls.installAxiom(foam.core.Method.create({
+        name: 'init',
+        code: function() {
+          this.SUPER();
+          var proxy = this.AnonymousReplyBox.create({
+          });
+          this.box.send(this.SubscribeMessage.create({
+            destination: this.replyBox
+          }));
+        }
+      }));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'StubDAO',
+  extends: 'foam.dao.AbstractDAO',
+  properties: [
+    {
+      class: 'Stub',
+      of: 'foam.dao.DAO',
+      name: 'delegate',
+      methods: [
+        'put',
+        'remove',
+        'select',
+        'removeAll',
+        'find'
+      ]
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Stub2',
   properties: [
     'of',
   ],
@@ -548,7 +717,7 @@ foam.CLASS({
 
                       var msg = this.RPCMessage.create({
                         name: m.name,
-                        args: foam.array.argsToArray(arguments)
+                        args: foam.Array.argsToArray(arguments)
                       });
                       if ( replyBox ) msg.replyBox = replyBox;
 
@@ -591,8 +760,45 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.box',
+  name: 'EventMessage',
+  properties: [
+    {
+      name: 'args'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'EventDispatchBox',
+  implements: ['foam.box.Box'],
+  requires: [
+    'foam.box.EventMessage',
+    'foam.box.InvalidMessageException'
+  ],
+  properties: [
+    {
+      name: 'target'
+    }
+  ],
+  methods: [
+    function send(msg) {
+      if ( ! this.EventMessage.isInstance(msg) ) {
+        throw this.InvalidMessageException.create({
+          messageType: message.cls_.id
+        });
+      }
+
+      target.pub.apply(target, msg.args);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'SkeletonBox',
   requires: [
+    'foam.box.SubscribeMessage',
     'foam.box.RPCMessage',
     'foam.box.InvalidMessageException'
   ],
@@ -603,12 +809,23 @@ foam.CLASS({
   ],
   methods: [
     function send(message) {
-      if ( ! foam.box.RPCMessage.isInstance(message) ) {
-        throw this.InvalidMessageException.create({
-          messageType: message.cls_.id
+      if ( this.RPCMessage.isInstance(message) ) {
+        message.call(this.data);
+        return;
+      } else if ( this.SubscribeMessage.isInstance(message) ) {
+        // TODO: Unsub support
+        var dest = message.destination;
+        this.data.sub(function() {
+          dest.send(foam.box.EventMessage.create({
+            args: foam.Array.argsToArray(arguments)
+          }));
         });
+        return;
       }
-      message.call(this.data);
+
+      throw this.InvalidMessageException.create({
+        messageType: message.cls_.id
+      });
     }
   ]
 });

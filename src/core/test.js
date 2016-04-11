@@ -1,4 +1,4 @@
-foam.CLASS({
+/*foam.CLASS({
   package: 'demos.firebase',
   name: 'Person',
   ids: [
@@ -38,7 +38,7 @@ dao.on.remove.sub(function(s, _, __, obj) {
 dao.on.reset.sub(function() {
   console.log("On reset");
 });
-
+*/
 /*
 foam.CLASS({
   name: 'TemplateBenchmark',
@@ -279,7 +279,6 @@ foam.CLASS({
 test.TemplateBenchmark.create().benchmark(10000);
 */
 
-/*
 var worker = new Worker("/worker.js");
 
 var workerBox = foam.box.WorkerPostMessageBox.create({
@@ -304,9 +303,19 @@ var server = foam.box.OnMessageBoxServer.create({
   source: worker
 }, context);
 
+context = server.Y;
+
 // Client
-var proxy = foam.core.Stub.create({
-  of: 'demos.TestObject',
+var proxy = foam.CLASS({
+  name: 'TestObjectProxy',
+  properties: [
+    {
+      class: 'Stub',
+      of: 'demos.TestObject',
+      name: 'delegate'
+    }
+  ]
+}).create({
   box: foam.box.SubBox.create({
     name: 'testObject',
     delegate: workerBox,
@@ -315,8 +324,8 @@ var proxy = foam.core.Stub.create({
 
 proxy.greetUser("Adam").then(function(s) { console.log(s); });
 
-var dao = foam.core.Stub.create({
-  of: 'foam.dao.DAO',
+var dao = foam.dao.StubDAO.create({
+  of: demos.Person,
   box: foam.box.SubBox.create({
     name: 'personDao',
     delegate: workerBox
@@ -335,4 +344,3 @@ dao.select().then(function(a) {
     console.log(p.name, ' - ', p.phone);
   }
 });
-*/
