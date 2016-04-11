@@ -279,7 +279,7 @@ foam.CLASS({
 test.TemplateBenchmark.create().benchmark(10000);
 */
 
-var worker = new Worker('/worker.js');
+var worker = new Worker('/sandbox/worker.js');
 
 var registry = foam.box.RegistryBox.create({
   delegate: foam.box.LoggingBox.create({
