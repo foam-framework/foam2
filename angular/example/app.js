@@ -37,7 +37,8 @@ foam.CLASS({
 
 
 angular.module('testApp', ['foam']).controller('mainCtrl', function($scope, $q) {
-  $scope.dao = foam.dao.LocalStorageDAO.create({ name: '_todo_NG_' });
+  var dao = foam.dao.LocalStorageDAO.create({ name: '_todo_NG_' });
+  $scope.dao = foam.dao.ProxyDAO.create({ delegate: dao });
 
   $scope.createTodo = function() {
     var text = $scope.newTodo;
@@ -53,5 +54,15 @@ angular.module('testApp', ['foam']).controller('mainCtrl', function($scope, $q) 
       });
     }
   };
+
+  var parser = foam.parse.QueryParser.create().parserFor(ng.Todo);
+  $scope.query = { s: '' };
+  $scope.$watch('query.s', function(nu) {
+    if ( ! nu ) $scope.dao.delegate = dao;
+    else {
+      var q = parser.parseString(nu);
+      $scope.dao.delegate = dao.where(q);
+    }
+  });
 });
 

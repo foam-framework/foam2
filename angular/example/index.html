@@ -10,10 +10,13 @@
   <!-- And lib files here -->
   <script src="../../src/lib/dao.js"></script>
   <script src="../../src/lib/mlang.js"></script>
+
+  <script src="../../src/lib/QueryParser.js"></script>
 </head>
 
 <body ng-app="testApp" ng-controller="mainCtrl">
 
+  <input type="text" size=40 placeholder="Search" ng-model="query.s" />
   <div class="new-todo">
     <input type="text" size=40 placeholder="New Item" ng-model="newTodo" />
     <button ng-disabled="newTodo.length == 0" ng-click="createTodo()">Create</button>
