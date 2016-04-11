@@ -40,8 +40,7 @@ var lookup_ = function lookup_(id) {
   if ( a ) return a;
   var path = id.split('.');
   var root = global;
-  for ( var i = 0 ; root && i < path.length ; i++ )
-  root = root[path[i]];
+  for ( var i = 0 ; root && i < path.length ; i++ ) root = root[path[i]];
   return root;
 };
 
@@ -56,8 +55,7 @@ var X = {
   register: function(cls) {
     cache[cls.id] = cls;
 
-    if ( cls.package === 'foam.core' )
-      cache[cls.name] = cls;
+    if ( cls.package === 'foam.core' ) cache[cls.name] = cls;
 
     var path = cls.id.split('.');
     var root = global;
@@ -90,8 +88,9 @@ var X = {
       }
     }
 
-    if ( opt_name )
+    if ( opt_name ) {
       Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
+    }
 
     sub.$UID__ = foam.next$UID();
     sub.__proto__ = this;

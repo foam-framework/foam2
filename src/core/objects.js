@@ -27,7 +27,9 @@ foam.CLASS({
       if ( other === this ) return 0;
 
       if ( this.model_ !== other.model_ ) {
-        return other.model_ ? foam.compare.compare(this.model_.id, other.model_.id) : 1;
+        return other.model_ ?
+          foam.util.compare(this.model_.id, other.model_.id) :
+          1;
       }
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
@@ -48,7 +50,7 @@ foam.CLASS({
         var otherVal = property.f(other);
 
         if ( Array.isArray(value) ) {
-          var subdiff = value.diff(otherVal);
+          var subdiff = foam.util.diff(value, otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
             diff[property.name] = subdiff;
           }
@@ -56,8 +58,9 @@ foam.CLASS({
         }
 
         // if the primary value is undefined, use the compareTo of the other
-        if ( ! foam.compare.equals(value, otherVal) )
+        if ( ! foam.util.equals(value, otherVal) ) {
           diff[property.name] = otherVal;
+        }
       }
 
       return diff;
@@ -69,7 +72,7 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var prop = this[ps[i].name];
-        hash = ((hash << 5) - hash) + foam.compare.hashCode(prop);
+        hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
         hash &= hash;
       }
 

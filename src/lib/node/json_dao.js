@@ -33,7 +33,7 @@ foam.CLASS({
       factory: function() {
         return require('fs');
       }
-    },
+    }
   ],
 
   methods: [

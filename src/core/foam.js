@@ -55,13 +55,10 @@
   }
 
   [
+    "lib",
     "stdlib",
-    "array",
+    "math",
     "events",
-    "fn",
-    "string",
-    "compare",
-    "date",
     "Context",
     "Boot",
     "Slot",

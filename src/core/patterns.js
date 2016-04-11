@@ -38,28 +38,6 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ]
 });
 
-foam.CLASS({
-  package: 'foam.pattern',
-  name: 'With',
-  axioms: [ foam.pattern.Singleton.create() ],
-  methods: [
-    {
-      name: 'with',
-      code: function(f, opt_source) {
-        opt_source = opt_source || this;
-        var argNames = foam.fn.argsArray(f);
-        var args = [];
-        for ( var i = 0 ; i < argNames.length ; i++ ) {
-          var a = opt_source[argNames[i]];
-          if ( typeof a === "function" ) a = a.bind(opt_source);
-          args.push(a);
-        }
-        return f.apply(this, args);
-      }
-    }
-  ]
-});
-
 /** Causes an class to pool its instances. create() will pull from the pool,
  and destroy() will return instances to the pool. Object pools can be found
  in <code>foam.__objectPools__</code>. */
@@ -80,7 +58,7 @@ foam.CLASS({
     /** Frees up any retained objects in all object pools. */
     function clearPools() {
       for ( var key in this.pooledClasses ) {
-        if ( key.__objectPool__ ) { key.__objectPool__ = []; }
+        if ( key.__objectPool__ ) key.__objectPool__ = [];
       }
     },
 
@@ -89,9 +67,7 @@ foam.CLASS({
       // to be cleared out.
       this.pooledClasses[cls] = true;
 
-      if ( ! cls.__objectPool__ ) {
-        cls.__objectPool__ = [];
-      }
+      if ( ! cls.__objectPool__ ) cls.__objectPool__ = [];
 
       var oldCreate = cls.create;
       cls.create = function(args, X) {
@@ -124,8 +100,8 @@ foam.CLASS({
 
           this.SUPER.apply(this, arguments);
 
-          for ( var ikey in inst_ ) { delete inst_[ikey]; }
-          for ( var pkey in priv_ ) { delete priv_[pkey]; }
+          for ( var ikey in inst_ ) delete inst_[ikey];
+          for ( var pkey in priv_ ) delete priv_[pkey];
           this.instance_ = inst_;
           this.private_ = priv_;
 
@@ -133,7 +109,6 @@ foam.CLASS({
           this.cls_.__objectPool__.push(this);
         }
       }));
-
-    },
+    }
   ]
 });

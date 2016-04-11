@@ -51,7 +51,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
+
   axioms: [foam.pattern.Singleton.create()],
+
   requires: [
     'foam.parse.StringPS'
   ],
@@ -78,7 +80,6 @@ foam.CLASS({
       )),
 
       'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
-
 
       'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
 
@@ -130,9 +131,7 @@ foam.CLASS({
     function compile(t, name, args) {
       this.ps.setString(t);
       var result = this.markup(this.ps);
-      if ( ! result ) {
-        throw "Error parsing template " + name;
-      }
+      if ( ! result ) throw "Error parsing template " + name;
       result = result.value;
 
       var code = this.HEADER +
@@ -145,7 +144,7 @@ foam.CLASS({
           'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
           'var f = function(' + args.join(',') + '){' + code + '};' +
           'return function() { '+
-          'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(foam.array.argsToArray(arguments)));' +
+          'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(foam.Array.argsToArray(arguments)));' +
           'return f.apply(this, arguments);};})()');
 
       return f;
@@ -155,9 +154,7 @@ foam.CLASS({
       return (function(util) {
         var delegate;
         return function() {
-          if ( ! delegate ) {
-            delegate = util.compile(t, name, args)
-          }
+          if ( ! delegate ) delegate = util.compile(t, name, args)
           return delegate.apply(this, arguments);
         };
       })(this);

@@ -1,9 +1,8 @@
 {
   "spec_dir": "test",
   "spec_files": [
-    "node_engine/**/*.js",
-    "js/**/*.js",
-    "node/**/*.js"
+    "FOAMByExample.js",
+    "src/**/*.js"
   ],
   "helpers": [
     "helpers/**/*.js"

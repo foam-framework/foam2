@@ -42,7 +42,7 @@ var log_ = function log_(o) {
   log_.output += o;
 };
 var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
-var golden = "";
+var golden = " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}";
 var oldLog, oldAssert;
 beforeEach(function() {
   oldLog = console.log;
@@ -1741,9 +1741,9 @@ try {
 // Example 102
 log_.output = "";
 try {
-// foam.array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
+// foam.Array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
 (function() {
-  log(Array.isArray(arguments), Array.isArray(foam.array.argsToArray(arguments)));
+  log(Array.isArray(arguments), Array.isArray(foam.Array.argsToArray(arguments)));
 })();
 } catch(x) {
  log("Exception: ", x);
@@ -1770,10 +1770,10 @@ o.pub('foo','bar');
 // Example 104
 log_.output = "";
 try {
-// foam.fn.memoize1() memozies a one-argument function so that if called again
+// foam.Function.memoize1() memozies a one-argument function so that if called again
 // with the same argument, the previously generated value will be returned
 // rather than calling the function again.
-var f = foam.fn.memoize1(function(x) { log('calculating ', x); return x*x; });
+var f = foam.Function.memoize1(function(x) { log('calculating ', x); return x*x; });
 log(f(2));
 log(f(2));
 log(f(4));
@@ -1808,9 +1808,9 @@ log(f(1,2));
 // Example 107
 log_.output = "";
 try {
-// foam.fn.argsStr() returns a function's arguments an a string.
-log(foam.fn.argsStr(function(a,b,fooBar) { }));
-log(typeof foam.fn.argsStr(function() { }));
+// foam.Function.argsStr() returns a function's arguments an a string.
+log(foam.Function.argsStr(function(a,b,fooBar) { }));
+log(typeof foam.Function.argsStr(function() { }));
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1820,9 +1820,9 @@ log(typeof foam.fn.argsStr(function() { }));
 // Example 108
 log_.output = "";
 try {
-// foam.fn.argsArray() returns a function's arguments an an array.
-log(foam.fn.argsArray(function(a,b,fooBar) { }));
-log(Array.isArray(foam.fn.argsArray(function() { })));
+// foam.Function.argsArray() returns a function's arguments an an array.
+log(foam.Function.argsArray(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.argsArray(function() { })));
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1832,10 +1832,10 @@ log(Array.isArray(foam.fn.argsArray(function() { })));
 // Example 109
 log_.output = "";
 try {
-// foam.string.constantize converts strings from camelCase to CONSTANT_FORMAT
-log(foam.string.constantize('foo'));
-log(foam.string.constantize('fooBar'));
-log(foam.string.constantize('fooBar12'));
+// foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
+log(foam.String.constantize('foo'));
+log(foam.String.constantize('fooBar'));
+log(foam.String.constantize('fooBar12'));
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1845,9 +1845,9 @@ log(foam.string.constantize('fooBar12'));
 // Example 110
 log_.output = "";
 try {
-// foam.string.capitalize capitalizes strings
-log(foam.string.capitalize('Abc def'));
-log(foam.string.capitalize('abc def'));
+// foam.String.capitalize capitalizes strings
+log(foam.String.capitalize('Abc def'));
+log(foam.String.capitalize('abc def'));
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1857,10 +1857,10 @@ log(foam.string.capitalize('abc def'));
 // Example 111
 log_.output = "";
 try {
-// foam.string.labelize converts from camelCase to labels
-log(foam.string.labelize('camelCase'));
-log(foam.string.labelize('firstName'));
-log(foam.string.labelize('someLongName'));
+// foam.String.labelize converts from camelCase to labels
+log(foam.String.labelize('camelCase'));
+log(foam.String.labelize('firstName'));
+log(foam.String.labelize('someLongName'));
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1870,9 +1870,9 @@ log(foam.string.labelize('someLongName'));
 // Example 112
 log_.output = "";
 try {
-// foam.string.multiline lets you build multi-line strings
+// foam.String.multiline lets you build multi-line strings
 // from function comments.
-log(foam.string.multiline(function(){/*This is
+log(foam.String.multiline(function(){/*This is
 a
 multi-line
 string*/}));
@@ -1885,8 +1885,8 @@ string*/}));
 // Example 113
 log_.output = "";
 try {
-// foam.string.pad() pads a string to the specified length.
-var s = foam.string.pad('foobar', 10);
+// foam.String.pad() pads a string to the specified length.
+var s = foam.String.pad('foobar', 10);
 log(s, s.length);
 } catch(x) {
  log("Exception: ", x);
@@ -1897,8 +1897,8 @@ log(s, s.length);
 // Example 114
 log_.output = "";
 try {
-// foam.string.pad() pads a string to the specified length, right justifying if given a negative number.
-var s = foam.string.pad('foobar', -10);
+// foam.String.pad() pads a string to the specified length, right justifying if given a negative number.
+var s = foam.String.pad('foobar', -10);
 log(s, s.length);
 } catch(x) {
  log("Exception: ", x);
@@ -2074,16 +2074,6 @@ log(o.toJSON());
  log("Exception: ", x);
  }
   expect(log_.output).toMatchGolden({ i: 121, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}" });
-
-
-// Example 126
-log_.output = "";
-try {
-
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 125, str: "" });
 
 
 });

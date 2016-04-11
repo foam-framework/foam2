@@ -6,13 +6,13 @@ describe('FObject compareTo', function() {
 
   beforeEach(function() {
     foam.CLASS({
-      name: 'CompA',
       package: 'test',
+      name: 'CompA',
       properties: [ 'a', 'b' ]
     });
     foam.CLASS({
-      name: 'CompB',
       package: 'test',
+      name: 'CompB',
       properties: [ 'b' ]
     });
     a = test.CompA.create();
@@ -107,7 +107,7 @@ describe('FObject diff', function() {
   it('returns diff from an array value', function() {
     a.b = [ 4, 'hello', b ];
     b.b = ['hello', 99, 87, a];
-    expect(a.diff(b)).toEqual({ b: { added: [99,87,a], removed: [4,b] } });
+    expect(foam.util.diff(a, b)).toEqual({ b: { added: [99,87,a], removed: [4,b] } });
   });
 });
 
@@ -127,18 +127,18 @@ describe('FObject hashCode', function() {
   });
 
   it('regression 1: undefineds', function() {
-    expect(a.hashCode()).toEqual(16337);
+    expect(a.hashCode()).toEqual(16305);
   });
   it('regression 2: strings and numbers', function() {
     // KGR: I disagree with this test, how do we expect
     // any particular value from a hashCode()?
     a.a = 'this is a longer string!@';
     a.b = 998765876.78;
-    expect(a.hashCode()).toEqual(998782213);
+    expect(a.hashCode()).toEqual(-1106880431);
   });
   it('regression 3: model instance', function() {
     a.a = test.CompA.create({ a: 4 });
-    expect(a.hashCode()).toEqual(16337);
+    expect(a.hashCode()).toEqual(526596);
   });
 });
 

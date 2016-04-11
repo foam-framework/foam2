@@ -342,7 +342,7 @@ foam.CLASS({
     }
   ],
 
-  properties: ['of'],
+  properties: [ 'of' ],
 
   methods: [
     {
@@ -600,7 +600,7 @@ foam.CLASS({
   methods: [
     function put(o) {
       this.a.push(o);
-    },
+    }
   ]
 });
 
@@ -609,6 +609,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.mlang.predicate.True'
@@ -624,7 +625,7 @@ foam.CLASS({
   methods: [
     function put(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.compare.equals(obj.id, this.array[i].id) ) {
+        if ( foam.util.equals(obj.id, this.array[i].id) ) {
           this.array[i] = obj;
           break;
         }
@@ -638,7 +639,7 @@ foam.CLASS({
 
     function remove(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.compare.equals(obj.id, this.array[i].id) ) {
+        if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
           this.on.remove.pub(o2);
           break;
@@ -685,7 +686,7 @@ foam.CLASS({
 
     function find(id) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.compare.equals(id, this.array[i].id) ) {
+        if ( foam.util.equals(id, this.array[i].id) ) {
           return Promise.resolve(this.array[i]);
         }
       }
@@ -695,11 +696,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromiseDAO',
+
   extends: 'foam.dao.AbstractDAO',
   imports: ['error'],
+
   properties: [
     {
       class: 'StateMachine',
@@ -731,10 +735,12 @@ foam.CLASS({
       }
     }
   ],
+
   classes: [
     {
       name: 'Pending',
       extends: 'foam.dao.AbstractDAO',
+
       methods: [
         function put(obj) {
           return this.promise.then(function(p) {
@@ -760,6 +766,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',

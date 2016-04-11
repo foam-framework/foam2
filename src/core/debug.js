@@ -84,8 +84,8 @@ foam.AbstractClass.describe = function(opt_name) {
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     console.log(
-      foam.string.pad(a.cls_ ? a.cls_.name : 'anonymous', 20),
-      foam.string.pad(a.sourceCls_.name, 14),
+      foam.String.pad(a.cls_ ? a.cls_.name : 'anonymous', 20),
+      foam.String.pad(a.sourceCls_.name, 14),
       a.name);
   }
   console.log('\n');
@@ -110,8 +110,8 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
         console.log(
-          foam.string.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
-          foam.string.pad(p.name, 14),
+          foam.String.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
+          foam.String.pad(p.name, 14),
           this[p.name]);
       }
       console.log('\n');
@@ -129,8 +129,8 @@ foam.X.describe = function() {
     var value = this[key];
     var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
     console.log(
-      foam.string.pad(key,  20),
-      foam.string.pad(type, 14),
+      foam.String.pad(key,  20),
+      foam.String.pad(type, 14),
       typeof value === 'string' || typeof value === 'number' ? value : '');
   }
   console.log('\n');
@@ -250,7 +250,7 @@ foam.CLASS({
 
 /** The types library deals with type safety. */
 foam.LIB({
-  name: 'types',
+  name: 'foam.types',
 
   methods: [
     function getFunctionArgs(fn) {
@@ -260,7 +260,7 @@ foam.LIB({
         * @return An array of Argument objects.
         */
       // strip newlines and find the function(...) declaration
-      var args = foam.fn.argsStr(fn);
+      var args = foam.Function.argsStr(fn);
       if ( ! args ) return [];
       args += ','; // easier matching
 
@@ -333,8 +333,7 @@ foam.LIB({
         var retVal = fn.apply(this, arguments);
 
         // check the return value
-        if ( args.returnType )
-          args.returnType.validate(retVal);
+        if ( args.returnType ) args.returnType.validate(retVal);
 
         return retVal;
       }

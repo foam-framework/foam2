@@ -15,34 +15,36 @@
  * limitations under the License.
  */
 
-
-
 // TODO(braden): Port the partialEval() code over here.
 
 foam.CLASS({
   package: 'foam.mlang.sink',
   implements: ['foam.dao.Sink'],
   name: 'Count',
+
   properties: [
     {
       name: 'value',
       value: 0
     }
   ],
+
   methods: [
     function put() {
       this.value++;
     },
     function toString() {
       return 'COUNT()';
-    },
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArray',
   extends: 'Array',
+
   properties: [
     {
       name: 'of',
@@ -61,10 +63,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArgument',
   extends: 'Property',
+
   properties: [
     {
       name: 'adapt',
@@ -118,29 +122,36 @@ foam.CLASS({
   ]
 });
 
+
 /** Singleton for the value "true". */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'True',
   extends: 'foam.mlang.predicate.Expr',
+
   axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function f() { return true; },
     function toString() { return 'TRUE'; }
   ]
 });
 
+
 /** Singleton for the value "true". */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'False',
   extends: 'foam.mlang.predicate.Expr',
+
   axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function f() { return false; },
     function toString() { return 'FALSE'; }
   ]
 });
+
 
 /** Base class for unary expressions. */
 foam.CLASS({
@@ -159,8 +170,8 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return foam.string.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
-    },
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+    }
   ]
 });
 
@@ -171,24 +182,26 @@ foam.CLASS({
   name: 'Binary',
   extends: 'foam.mlang.predicate.Expr',
   abstract: true,
+
   properties: [
     {
       class: 'foam.mlang.ExprArgument',
-      name: 'arg1',
+      name: 'arg1'
     },
     {
       class: 'foam.mlang.ExprArgument',
-      name: 'arg2',
+      name: 'arg2'
     }
   ],
 
   methods: [
     function toString() {
-      return foam.string.constantize(this.cls_.name) + '(' + this.arg1.toString() + ', ' +
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ', ' +
           this.arg2.toString() + ')';
-    },
+    }
   ]
 });
+
 
 /** Base class for n-ary expressions, those with 0 or more arguments. */
 foam.CLASS({
@@ -201,12 +214,12 @@ foam.CLASS({
     {
       class: 'foam.mlang.ExprArray',
       name: 'args'
-    },
+    }
   ],
 
   methods: [
     function toString() {
-      var s = foam.string.constantize(this.cls_.name) + '(';
+      var s = foam.String.constantize(this.cls_.name) + '(';
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a = this.args[i];
         s += a.toString();
@@ -217,10 +230,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Or',
   extends: 'foam.mlang.predicate.Nary',
+
   methods: [
     function f(o) {
       for ( var i = 0 ; i < this.args.length ; i++ ) {
@@ -231,10 +246,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'And',
   extends: 'foam.mlang.predicate.Nary',
+
   methods: [
     function f(o) {
       for ( var i = 0 ; i < this.args.length ; i++ ) {
@@ -245,10 +262,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Contains',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       var s1 = this.arg1.f(o);
@@ -257,10 +276,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ContainsIC',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       var s1 = this.arg1.f(o);
@@ -275,10 +296,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'In',
   extends: 'foam.mlang.predicate.Binary',
+
   properties: [
     {
       name: 'arg2',
@@ -287,9 +310,10 @@ foam.CLASS({
       }
     },
     {
-      name: 'valueSet_',
+      name: 'valueSet_'
     }
   ],
+
   methods: [
     function f(o) {
       var lhs = this.arg1.f(o);
@@ -318,19 +342,21 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Constant',
   extends: 'foam.mlang.predicate.Expr',
+
   properties: [
     {
       name: 'value'
-    },
+    }
   ],
+
   methods: [
     function f(_) { return this.value; },
     function toString_(x) {
       return typeof x === 'number' ? '' + x :
-          typeof x === 'string' ? '"' + x + '"' :
-          Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
-          x.toString ? x.toString() :
-          x;
+        typeof x === 'string' ? '"' + x + '"' :
+        Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
+        x.toString ? x.toString() :
+        x;
     },
     function toString() {
       return this.toString_(this.value);
@@ -344,48 +370,56 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Eq',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
-      return foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
+      return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
+
 
 /** Binary expression for inequality of two arguments. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Neq',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
-      return ! foam.compare.equals(this.arg1.f(o), this.arg2.f(o));
+      return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
     }
   ]
 });
+
 
 /** Binary expression for "strictly less than". */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Lt',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
     }
   ]
 });
+
 
 /** Binary expression for "less than or equal to". */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Lte',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
     }
   ]
 });
+
 
 /** Binary expression for "strictly greater than". */
 foam.CLASS({
@@ -394,10 +428,11 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
     }
   ]
 });
+
 
 /** Binary expression for "greater than or equal to". */
 foam.CLASS({
@@ -406,7 +441,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   methods: [
     function f(o) {
-      return foam.compare.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
+      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
     }
   ]
 });
@@ -428,6 +463,7 @@ foam.CLASS({
   ]
 });
 
+
 /** Unary expression that expects a boolean value and inverts it. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -445,6 +481,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
+
   requires: [
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Constant',
@@ -462,9 +499,10 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
   ],
+
   methods: [
     function _nary_(name, args) {
-      return this[name].create({ args: foam.array.argsToArray(args) });
+      return this[name].create({ args: foam.Array.argsToArray(args) });
     },
     function _unary_(name, arg) {
       return this[name].create({ arg1: arg });
@@ -484,7 +522,7 @@ foam.CLASS({
     function LTE(a, b) { return this._binary_("Lte", a, b); },
     function GTE(a, b) { return this._binary_("Gte", a, b); },
     function HAS(a) { return this._unary_("Has", a); },
-    function NOT(a) { return this._unary_("Not", a); },
+    function NOT(a) { return this._unary_("Not", a); }
   ]
 });
 

@@ -107,7 +107,7 @@
  Is discarded after use.
 */
 foam.LIB({
-  name: 'boot',
+  name: 'foam.boot',
 
   constants: {
     startTime: Date.now(),
@@ -235,7 +235,7 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'AbstractClass',
+  name: 'foam.AbstractClass',
 
   // documentation: "Root prototype for all classes.",
 
@@ -511,7 +511,7 @@ foam.CLASS({
     'name',
     {
       name: 'label',
-      expression: function(name) { return foam.string.labelize(name); }
+      expression: function(name) { return foam.String.labelize(name); }
     },
     [ 'extends', 'FObject' ],
     'refines',
@@ -576,7 +576,7 @@ foam.CLASS({
     { name: 'name', required: true },
     {
       name: 'label',
-      expression: function(name) { return foam.string.labelize(name); }
+      expression: function(name) { return foam.String.labelize(name); }
     },
     'help',
     'value',
@@ -598,7 +598,7 @@ foam.CLASS({
       */
       'comparePropertyValues',
       function(o1, o2) {
-        return foam.compare.compare(o1, o2);
+        return foam.util.compare(o1, o2);
       }
     ]
   ],
@@ -620,7 +620,7 @@ foam.CLASS({
         }
       }
 
-      c[foam.string.constantize(this.name)] = this;
+      c[foam.String.constantize(this.name)] = this;
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
@@ -655,10 +655,10 @@ foam.CLASS({
       // If not in debug mode we should share implementations like in F1.
       Object.defineProperty(proto, slotName, {
         get: function propDynGetter() {
-          return this.slot(name, slotName, prop);
+          return prop.toSlot(this);
         },
         set: function propDynSetter(dyn) {
-          this.slot(name, slotName, prop).link(dyn);
+          prop.toSlot(this).link(dyn);
         },
         configurable: true,
         enumerable: false
@@ -704,7 +704,7 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange(name, oldValue, newValue, slotName);
+          this.pubPropertyChange(name, oldValue, newValue);
 
           // TODO(maybe): pub to a global topic to support dynamic()
 
@@ -729,7 +729,7 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var argNames = foam.fn.argsArray(e);
+      var argNames = foam.Function.argsArray(e);
       var name = this.name;
 
       return function() {
@@ -777,6 +777,20 @@ foam.CLASS({
     function exportedValue(obj) {
       /** Export obj.name$ instead of just obj.name. **/
       return obj.slot(this.name);
+    },
+
+    function toSlot(obj) {
+      var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
+      var dyn      = obj.getPrivate_(slotName);
+
+      if ( ! dyn ) {
+        dyn = foam.core.internal.PropertySlot.create();
+        dyn.obj  = obj;
+        dyn.prop = this;
+        obj.setPrivate_(slotName, dyn);
+      }
+
+      return dyn;
     }
   ]
 });
@@ -862,7 +876,7 @@ foam.CLASS({
         return ret;
       };
 
-      foam.fn.setName(f, this.name);
+      foam.Function.setName(f, this.name);
       f.toString = function() { return method.toString(); };
 
       return f;
@@ -891,7 +905,7 @@ foam.CLASS({
 
   properties: [
     [ 'adapt', function(_, a) {
-        return typeof a === 'function' ? foam.string.multiline(a) :
+        return typeof a === 'function' ? foam.String.multiline(a) :
           a ? a.toString() :
           '' ;
       }
@@ -1096,9 +1110,9 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function pubPropertyChange(name, oldValue, newValue, opt_slotName) {
+    function pubPropertyChange(name, oldValue, newValue) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.slot(name, opt_slotName);
+        var dyn = this.slot(name);
         dyn.setPrev(oldValue);
         this.pub('propertyChange', name, dyn);
       }
@@ -1108,16 +1122,20 @@ foam.CLASS({
       Creates a Slot for a property.
       @private
     */
-    function slot(name, opt_slotName, opt_prop) {
-      if ( ! opt_slotName ) opt_slotName = name + '$';
-      var dyn = this.getPrivate_(opt_slotName);
-      if ( ! dyn ) {
-        dyn = foam.core.internal.PropertySlot.create();
-        dyn.obj  = this;
-        dyn.prop = opt_prop || this.cls_.getAxiomByName(name);
-        this.setPrivate_(opt_slotName, dyn);
-      }
-      return dyn;
+    // TODO: have this call toSlot() on Axiom, then not Property specific.
+    // This will enable imports to be used in expressions.
+    function slot(name) {
+      var axiom = this.cls_.getAxiomByName(name);
+
+      console.assert(
+        axiom,
+        'Attempt to access slot() on unknown axiom: ',
+        name);
+      console.assert(axiom.toSlot,
+        'Attempt to access slot() on an Axiom without toSlot() support: ',
+         name);
+
+      return axiom.toSlot(this);
     }
   ]
 });
@@ -1160,7 +1178,7 @@ foam.CLASS({
     function installInClass(cls) {
       Object.defineProperty(
         cls,
-        foam.string.constantize(this.name),
+        foam.String.constantize(this.name),
         {
           value: this.value,
           enumerable: false,
@@ -1324,7 +1342,7 @@ foam.CLASS({
     function installInProto(proto) {
       var key      = this.key;
       var as       = this.as;
-      var slotName = as + '$';
+      var slotName = this.slotName_ = as + '$';
 
       Object.defineProperty(proto, as, {
         get: function importsGetter() {
@@ -1349,6 +1367,10 @@ foam.CLASS({
         configurable: true,
         enumerable: false
       });
+    },
+
+    function toSlot(obj) {
+      return obj[this.slotName_];
     }
   ]
 });
@@ -1480,9 +1502,9 @@ foam.CLASS({
         var topics = topic.topics;
 
         var ret = {
-          pub:   foam.fn.bind(parent.pub,   parent, name),
-          sub:   foam.fn.bind(parent.sub,   parent, name),
-          unsub: foam.fn.bind(parent.unsub, parent, name),
+          pub:   foam.Function.bind(parent.pub,   parent, name),
+          sub:   foam.Function.bind(parent.sub,   parent, name),
+          unsub: foam.Function.bind(parent.unsub, parent, name),
           toString: function() { return 'Topic(' + name + ')'; }
         };
 

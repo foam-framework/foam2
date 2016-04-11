@@ -51,7 +51,7 @@ foam.CLASS({
     },
 
     function detectCollisions() {
-      /* k-d-tree-like divide-and-conquer algorithm */
+      /* implicit k-d-tree divide-and-conquer algorithm */
       this.detectCollisions_(0, this.children.length-1, 'x', false, '');
 
       var cs = this.children;
@@ -142,8 +142,9 @@ foam.CLASS({
 
     // add one or more components to be monitored for collisions
     function add() {
-      for ( var i = 0 ; i < arguments.length ; i++ )
+      for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
+      }
       return this;
     },
 
@@ -171,8 +172,9 @@ foam.CLASS({
     },
 
     function remove() {
-      for ( var i = 0 ; i < arguments.length ; i++ )
+      for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.deleteI(arguments[i]);
+      }
       return this;
     },
 

@@ -143,7 +143,6 @@ foam.CLASS({
 
     function translate(dx, dy) {
       if ( ! dx && ! dy ) return;
-      //      var m = this.Matrix.create()
       var m = this.m2;
       m.a = 1; m.b = 0; m.c = dx;
       m.d = 0; m.e = 1; m.f = dy;
@@ -153,7 +152,6 @@ foam.CLASS({
 
     function skew(x, y) {
       if ( ! x && ! y ) return;
-      //      var m = this.Matrix.create();
       var m = this.m2;
       m.a = 1; m.b = x; m.c = 0;
       m.d = y; m.e = 1; m.f = 0;
@@ -163,7 +161,6 @@ foam.CLASS({
 
     function scale(x, y) {
       if ( x === 1 && y === 1 ) return;
-      //      var m = this.Matrix.create();
       var m = this.m2;
       m.a = x; m.b = 0; m.c = 0;
       m.d = 0; m.e = y; m.f = 0;
@@ -173,7 +170,6 @@ foam.CLASS({
 
     function rotate(a) {
       if ( ! a ) return;
-      //      var m = this.Matrix.create();
       var m = this.m2;
       m.a = Math.cos(a);  m.b = Math.sin(a); m.c = 0;
       m.d = -Math.sin(a); m.e = Math.cos(a); m.f = 0;
@@ -431,9 +427,8 @@ foam.CLASS({
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
 
-      if ( this.color ) {
-        x.fill();
-      }
+      if ( this.color ) x.fill();
+
       if ( this.border ) {
         x.lineWidth = this.arcWidth;
         x.stroke();
@@ -576,3 +571,5 @@ foam.CLASS({
     }
   ]
 });
+
+// TODO: add configurable repaint strategy. Ex. explicit, on property change, on child change

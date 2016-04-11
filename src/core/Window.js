@@ -69,8 +69,9 @@ foam.CLASS({
 
     function assert(b /*, args */) {
       /* Like console.assert() except that it takes more than one argument. */
-      if ( ! b )
+      if ( ! b ) {
         this.console.assert(false, [].splice.call(arguments, 1).join(''));
+      }
     },
 
     function error() { this.console.error.apply(this.console, arguments); },
@@ -85,7 +86,7 @@ foam.CLASS({
 
     function delayed(l, delay) {
       /* Decorate a listener so that events are delivered 'delay' ms later. */
-      return foam.fn.bind(function() {
+      return foam.Function.bind(function() {
         this.setTimeout(
           function() { l.apply(this, arguments); },
           delay);
@@ -101,7 +102,7 @@ foam.CLASS({
         var lastArgs  = null;
         function mergedListener() {
           triggered = false;
-          var args = foam.array.argsToArray(lastArgs);
+          var args = foam.Array.argsToArray(lastArgs);
           lastArgs = null;
           l.apply(this, args);
         }
@@ -171,6 +172,7 @@ foam.CLASS({
   ]
 });
 
+
 /*
  * requestAnimationFrame is not available on nodejs,
  * so swap out with calls to setTimeout.
@@ -188,5 +190,6 @@ if ( foam.isServer ) {
     ]
   });
 }
+
 
 foam.X = foam.core.Window.create({window: global}, foam).Y;
