@@ -64,14 +64,14 @@ foam.CLASS({
           this.engine.add(c);
           this.addChildren(c);
 
-          c.y$.sub(foam.Function.bind(function(c) {
+          c.y$.sub(foam.Function.bind(function circleWrap(c) {
             if ( c.y > 1/this.scaleY*this.height+50 ) {
               c.y = -50;
             }
           }, this, c));
 
           // Bounce on Walls
-          c.x$.sub(foam.Function.bind(function(c, w, h) {
+          c.x$.sub(foam.Function.bind(function circleBoundOnWalls(c) {
             if ( c.x < 0          ) c.vx =  Math.abs(c.vx)+0.1;
             if ( c.x > this.width ) c.vx = -Math.abs(c.vx)-0.1;
           }, this, c));
@@ -98,7 +98,7 @@ foam.CLASS({
         this.engine.add(b);
         this.addChildren(b);
 
-        b.y$.sub(foam.Function.bind(function() {
+        b.y$.sub(foam.Function.bind(function bubbleWrap() {
           if ( b.y < 1 ) {
             b.y = this.height;
             b.x = this.width * Math.random();
