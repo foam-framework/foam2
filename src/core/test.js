@@ -279,68 +279,74 @@ foam.CLASS({
 test.TemplateBenchmark.create().benchmark(10000);
 */
 
-var worker = new Worker("/worker.js");
-
-var workerBox = foam.box.WorkerPostMessageBox.create({
-  target: worker
-});
-
+var worker = new Worker('/worker.js');
 
 var registry = foam.box.RegistryBox.create({
   delegate: foam.box.LoggingBox.create({
     name: 'root',
     delegate: foam.box.Box.create()
-  }),
+  })
 });
 
-var context = foam.X.subContext({
-  registry: registry
-});
+var server = foam.messaging.MessageChannelServer.create({
+  delegate: registry
+}, registry);
 
+server.connect(worker).then(function(workerBox) {
+  // Client
+  var proxy = foam.CLASS({
+    name: 'TestObjectProxy',
+    properties: [
+      {
+        class: 'Stub',
+        of: 'demos.TestObject',
+        name: 'delegate'
+      }
+    ]
+  }).create({
+    box: foam.box.SubBox.create({
+      name: 'testObject',
+      delegate: workerBox,
+    })
+  }, server);
 
-var server = foam.box.OnMessageBoxServer.create({
-  delegate: registry,
-  source: worker
-}, context);
+  window.proxy = proxy;
 
-context = server.Y;
+  proxy.greetUser("Adam").then(function(s) { console.log(s); });
 
-// Client
-var proxy = foam.CLASS({
-  name: 'TestObjectProxy',
-  properties: [
-    {
-      class: 'Stub',
-      of: 'demos.TestObject',
-      name: 'delegate'
+  var dao = foam.dao.ClientDAO.create({
+    of: demos.Person,
+    box: foam.box.SubBox.create({
+      name: 'personDao',
+      delegate: workerBox
+    })
+  }, server);
+
+  window.dao = dao;
+
+  dao.select(foam.mlang.sink.Count.create()).then(function(c) {
+    console.log("There are ", c.value, " people in the dao");
+  });
+
+  dao.select().then(function(a) {
+    console.log("They are");
+    a = a.a;
+    for ( var i = 0 ; i < a.length ; i++ ) {
+      var p = a[i];
+      console.log(p.name, ' - ', p.phone);
     }
-  ]
-}).create({
-  box: foam.box.SubBox.create({
-    name: 'testObject',
-    delegate: workerBox,
-  }, context)
-}, context);
+  });
 
-proxy.greetUser("Adam").then(function(s) { console.log(s); });
-
-var dao = foam.dao.StubDAO.create({
-  of: demos.Person,
-  box: foam.box.SubBox.create({
-    name: 'personDao',
-    delegate: workerBox
-  }, context)
-}, context);
-
-dao.select(foam.mlang.sink.Count.create()).then(function(c) {
-  console.log("There are ", c.value, " people in the dao");
-});
-
-dao.select().then(function(a) {
-  console.log("They are");
-  a = a.a;
-  for ( var i = 0 ; i < a.length ; i++ ) {
-    var p = a[i];
-    console.log(p.name, ' - ', p.phone);
-  }
+  dao.where(foam.mlang.predicate.Eq.create({
+    arg1: demos.Person.NAME,
+    arg2: 'adam'
+  }))
+    .select()
+    .then(function(a) {
+      console.log("People named adam");
+      a = a.a;
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        console.log(a[i].name, a[i].phone);
+      }
+    });
 });

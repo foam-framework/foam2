@@ -85,52 +85,25 @@ foam.CLASS({
   ]
 });
 
-// NOT serializable
 foam.CLASS({
   package: 'foam.box',
-  name: 'WindowPostMessageBox',
+  name: 'MessagePortBox',
   implements: ['foam.box.Box'],
+  imports: [
+    'messagePortService'
+  ],
   properties: [
     {
-      name: 'target',
-      transient: true
+      name: 'id'
     }
   ],
   methods: [
-    function send(message) {
-      // TODO: What is the right serialization?
-      this.target.postMessage(foam.json.stringify(message.toRemote_()), '*');
-    }
-  ]
-});
-
-// Also not serializable
-foam.CLASS({
-  package: 'foam.box',
-  name: 'WorkerPostMessageBox',
-  implements: ['foam.box.Box'],
-  properties: [
-    {
-      name: 'target',
-      transient: true
-    }
-  ],
-  methods: [
-    function send(message) {
-      this.target.postMessage(foam.json.stringify(message.toRemote_()));
-    }
-  ]
-});
-
-// TODO: this should probably import self or something
-// also a better name would help.
-foam.CLASS({
-  package: 'foam.box',
-  name: 'SelfPostMessageBox',
-  implements: ['foam.box.Box'],
-  methods: [
-    function send(message) {
-      self.postMessage(foam.json.stringify(message.toRemote_()));
+    function send(msg) {
+      // TODO: Improved serialization
+      msg = msg.toRemote_();
+      this.messagePortService
+        .getPortForDst(this.id)
+        .send(foam.json.stringify(msg));
     }
   ]
 });
@@ -147,51 +120,6 @@ foam.CLASS({
   properties: [
     {
       name: 'delegate'
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'OnMessageBoxServer',
-  imports: [
-    'registry'
-  ],
-  exports: [
-    'as server'
-  ],
-  properties: [
-    {
-      name: 'source',
-      postSet: function(old, nu) {
-        old && old.removeEventListener('message', this.onMessage);
-        nu && nu.addEventListener('message', this.onMessage);
-      }
-    },
-    {
-      name: 'delegate'
-    },
-    {
-      name: 'inbox_',
-      factory: function() {
-        return this.registry.register('INBOX');
-      }
-    }
-  ],
-  methods: [
-    function inbox() {
-      return this.inbox_;
-    }
-  ],
-  listeners: [
-    {
-      name: 'onMessage',
-      code: function(e) {
-        // TODO: What is the right serialization/deserialization
-        // this is unsecure since parseString currently uses eval().
-        var msg = foam.json.parse(foam.json.parseString(e.data));
-        this.delegate.send(msg);
-      }
     }
   ]
 });
@@ -377,6 +305,9 @@ foam.CLASS({
   requires: [
     'foam.box.SubBoxMessage'
   ],
+  exports: [
+    'as registry'
+  ],
   properties: [
     {
       class: 'Map',
@@ -418,27 +349,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.box',
-  name: 'OneShotBox',
-  extends: 'foam.box.ProxyBox',
-  imports: [
-    'registry'
-  ],
-  methods: [
-    function send(msg) {
-      this.registry.unregister(this.id, this);
-      this.delegate.send(msg)
-    },
-    function toRemote_() {
-      return this.cls_.create({
-        delegate: this.delegate.toRemote_()
-      });
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'AnonymousReplyBox',
+  name: 'ReplyBox',
   extends: 'foam.box.ProxyBox',
   requires: [
     'foam.box.SubBox'
@@ -460,10 +371,9 @@ foam.CLASS({
   ],
   methods: [
     function init() {
-      this.server.inbox().register(this.id, this);
+      this.registry.register(this.id, this);
     },
     function send(msg) {
-      debugger;
       this.registry.unregister(this.id);
       this.delegate.send(msg);
     },
@@ -606,7 +516,7 @@ foam.CLASS({
               code: function() {
                 if ( m.returns ) {
                   var promise = this.RPCReturnBox.create();
-                  var replyBox = this.AnonymousReplyBox.create({
+                  var replyBox = this.ReplyBox.create({
                     delegate: promise
                   });
                 }
@@ -633,7 +543,7 @@ foam.CLASS({
         'foam.box.SubscribeMessage',
         'foam.box.OneShotBox',
         'foam.box.RPCReturnBox',
-        'foam.box.AnonymousReplyBox',
+        'foam.box.ReplyBox',
         'foam.box.RPCMessage',
       ].map(function(s) {
         var path = s.split('.');
@@ -645,6 +555,16 @@ foam.CLASS({
         cls.installAxiom(a);
       });
 
+      [
+        'registry',
+        'server'
+      ].map(function(s) {
+        cls.installAxiom(foam.core.Imports.create({
+          key: s,
+          as: s
+        }));
+      });
+
       cls.installAxiom(foam.core.Property.create({
         name: 'box'
       }));
@@ -653,10 +573,20 @@ foam.CLASS({
         name: 'init',
         code: function() {
           this.SUPER();
-          var proxy = this.AnonymousReplyBox.create({
-          });
+
+          var events = foam.next$UID();
+
+          this.registry.register(
+            events,
+            foam.box.EventDispatchBox.create({
+              target: this
+            }));
+
           this.box.send(this.SubscribeMessage.create({
-            destination: this.replyBox
+            destination: foam.box.SubBox.create({
+              name: events,
+              delegate: this.server.inbox()
+            })
           }));
         }
       }));
@@ -666,7 +596,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'StubDAO',
+  name: 'ClientDAO',
   extends: 'foam.dao.AbstractDAO',
   properties: [
     {
@@ -685,72 +615,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core',
-  name: 'Stub2',
-  properties: [
-    'of',
-  ],
-  axioms: [
-    {
-      installInClass: function(cls) {
-        var oldCreate = cls.create;
-        var cache = {};
-        cls.create = function(args, p) {
-          var key = args.of;
-          if ( ! cache[key] ) {
-            var model = foam.lookup(args.of);
-            var methods = model.getAxiomsByClass(foam.core.Method)
-                .filter(function(m) {
-                  return model.hasOwnAxiom(m.name);
-                })
-                .map(function(m) {
-                  var m2 = foam.core.Method.create({
-                    name: m.name,
-                    returns: m.returns ? 'Promise' : '',
-                    code: function() {
-                      if ( m.returns ) {
-                        var promise = this.RPCReturnBox.create();
-                        var replyBox = this.AnonymousReplyBox.create({
-                          delegate: promise
-                        });
-                      }
-
-                      var msg = this.RPCMessage.create({
-                        name: m.name,
-                        args: foam.Array.argsToArray(arguments)
-                      });
-                      if ( replyBox ) msg.replyBox = replyBox;
-
-                      this.box.send(msg);
-
-                      return replyBox ? promise.promise : undefined;
-                    }
-                  });
-                  return m2;
-                });
-
-            cache[key] = foam.CLASS({
-              package: model.package,
-              name: model.name + 'Stub',
-              requires: [
-                'foam.box.RPCReturnBox',
-                'foam.box.AnonymousReplyBox',
-                'foam.box.RPCMessage',
-              ],
-              properties: [
-                'box'
-              ],
-              methods: methods
-            });
-          }
-          return cache[key].create(args, p);
-        };
-      }
-    }
-  ]
-});
-
-foam.CLASS({
   package :'foam.box',
   name: 'InvalidMessageException',
   properties: [
@@ -761,6 +625,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'EventMessage',
+  extends: 'foam.box.Message',
   properties: [
     {
       name: 'args'
@@ -789,7 +654,7 @@ foam.CLASS({
         });
       }
 
-      target.pub.apply(target, msg.args);
+      this.target.pub.apply(this.target, msg.args);
     }
   ]
 });
@@ -816,8 +681,13 @@ foam.CLASS({
         // TODO: Unsub support
         var dest = message.destination;
         this.data.sub(function() {
+          var args = foam.Array.argsToArray(arguments);
+
+          // Cannot serialize the subscription object.
+          args.shift();
+
           dest.send(foam.box.EventMessage.create({
-            args: foam.Array.argsToArray(arguments)
+            args: args
           }));
         });
         return;
@@ -902,6 +772,146 @@ foam.CLASS({
       this.webSocketService.getSocket(this.uri).then(function(s) {
         s.send(foam.json.stringify(msg));
       });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.messaging',
+  name: 'MessagePort',
+  properties: [
+    {
+      name: 'port',
+      postSet: function(old, port) {
+        if ( old ) {
+          old.onmessage = null;
+        }
+        if ( port ) {
+//          port.addEventListener('message', this.onMessage);
+          port.onmessage = this.onMessage;
+        }
+      }
+    },
+    {
+      name: 'id'
+    }
+  ],
+  topics: [
+    'message'
+  ],
+  methods: [
+    function send(msg) {
+      this.port.postMessage(msg);
+    }
+  ],
+  listeners: [
+    function onMessage(e) {
+      var msg = foam.json.parse(foam.json.parseString(e.data), undefined, this);
+      this.message.pub(msg);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.messaging',
+  name: 'MessageChannelServer',
+  requires: [
+    'foam.messaging.MessagePort',
+    'foam.box.MessagePortBox'
+  ],
+  properties: [
+    {
+      class: 'Map',
+      name: 'portsBySrc'
+    },
+    {
+      class: 'Map',
+      name: 'portsByDst'
+    },
+    {
+      name: 'delegate'
+    },
+    {
+      name: 'source'
+    },
+    {
+      name: 'inbox_'
+    }
+  ],
+  topics: [
+    'connected'
+  ],
+  exports: [
+    'as server',
+    'as messagePortService'
+  ],
+  methods: [
+    function start() {
+      this.source.addEventListener('message', this.onConnect);
+      this.inbox_ = this.MessagePortBox.create({
+        id: this.$UID
+      });
+    },
+    function inbox() {
+      return this.inbox_;
+    },
+    function connect(target) {
+      var channel = new MessageChannel();
+
+      target.postMessage({
+        type: 'CONNECT',
+        port: channel.port2
+      }, [channel.port2]);
+
+      var port = channel.port1;
+      return new Promise(foam.Function.bind(function(resolve, reject) {
+        port.onmessage = foam.Function.bind(function(e) {
+          if ( e.data && e.data.type === "ID" ) {
+            this.inbox_ = this.MessagePortBox.create({
+              id: e.data.youAre
+            });
+
+            this.addPort(this.MessagePort.create({
+              port: port,
+              id: e.data.iAm
+            }));
+
+            resolve(this.MessagePortBox.create({
+              id: e.data.iAm
+            }));
+          }
+        }, this);
+      }, this));
+    },
+    function getPortForDst(id) {
+      return this.portsByDst[id];
+    },
+    function addPort(port) {
+      this.portsByDst[port.id] = port;
+      port.message.sub(this.onMessage);
+      this.connected.pub(port.id);
+    }
+  ],
+  listeners: [
+    function onConnect(e) {
+      if ( e.data && e.data.type == 'CONNECT' ) {
+        var port = e.ports[0];
+        var resp = {
+          type: 'ID',
+          youAre: foam.next$UID(),
+          iAm: this.$UID
+        };
+        this.addPort(this.MessagePort.create({
+          port: port,
+          id: resp.youAre
+        }));
+        port.postMessage(resp);
+      }
+    },
+    function onMessage(s, _, msg) {
+      if ( this.delegate ) {
+        this.delegate.send(msg);
+      }
     }
   ]
 });
