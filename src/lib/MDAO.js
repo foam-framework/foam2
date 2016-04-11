@@ -348,7 +348,7 @@ var TreeIndex = {
     }
 
     this.select(s[LEFT], sink, skip, limit, order, predicate);
-    this.tail.select(s[VALUE], sink, skip, limit, order, predicate);
+    this.tail.select(s[VALUE], sink, skip, limit, order, predicate); // FIX: limit is expected to be referenced across calls so it can be decremented
     this.select(s[RIGHT], sink, skip, limit, order, predicate);
   },
 
@@ -550,12 +550,7 @@ var TreeIndex = {
 
     return {
       cost: cost,
-      execute: function() {
-        /*
-         var o = (skip || limit) ?
-         {skip: skip || 0, limit: limit || Number.MAX_VALUE} :
-         undefined;
-         */
+      execute: function(s, sink, skip, limit, order, predicate) {
         if ( sortRequired ) {
           var a = [].sink;
           index.selectCount++;
