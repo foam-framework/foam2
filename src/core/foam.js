@@ -74,6 +74,7 @@
     "../lib/Timer",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
+    "../lib/MDAO",
     [ "../lib/IDBDAO", ! isServer ],
     "../lib/mlang",
     "../lib/Physical",

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/** Indexed Memory-based DAO. Foam1 pre-port code. */
+/** Indexed Memory-based DAO. */
 
 /*
  * Index Interface:
@@ -29,6 +29,7 @@
  *   update(oldValue, newValue)
  *
  * TODO:
+ *  model indexes
  *  reuse plans
  *  add ability for indices to pre-populate data
  */
@@ -383,13 +384,13 @@ var TreeIndex = {
   size: function(s) { return s ? s[SIZE] : 0; },
 
   compare: function(o1, o2) {
-    return this.prop.compareProperty(o1, o2);
+    return this.prop.compare(o1, o2);
   },
 
   plan: function(s, sink, skip, limit, order, predicate) {
     var predicate = predicate;
 
-    if ( predicate === FALSE ) return NOT_FOUND;
+    if ( predicate === foam.mlang.predicate.False ) return NOT_FOUND;
 
     if ( ! predicate && foam.mlang.sink.Count.isInstance(sink) ) {
       var count = this.size(s);
@@ -421,9 +422,9 @@ var TreeIndex = {
             var q = predicate.args[i];
             if ( model.isInstance(q) && q.arg1 === prop ) {
               predicate = predicate.clone();
-              predicate.args[i] = TRUE;
+              predicate.args[i] = foam.mlang.predicate.True;
               predicate = predicate.partialEval();
-              if ( predicate === TRUE ) predicate = null;
+              if ( predicate === foam.mlang.predicate.True ) predicate = null;
               return q.arg2;
             }
           }
@@ -861,8 +862,8 @@ var PositionIndex = {
             s.count = self.networkdao.select(foam.mlang.sink.Count.create());
           }
 
-          return s.count.then(function(countSink) { 
-            sink.count = countSink.count;  
+          return s.count.then(function(countSink) {
+            sink.count = countSink.count;
             return Promise.resolve(sink);
           });
         },
@@ -1104,11 +1105,13 @@ var AutoIndex = {
 
 
 foam.CLASS({
-  extends: 'AbstractDAO',
+  extends: 'foam.dao.AbstractDAO',
   package: 'foam.dao',
   name: 'MDAO',
   label: 'Indexed DAO',
-
+  requires: [
+    'foam.mlang.predicate.Eq'
+  ],
   properties: [
     {
       name:  'of',
@@ -1124,11 +1127,11 @@ foam.CLASS({
   methods: [
 
     function init() {
-      this.SUPER();
-
       this.map = {};
       // TODO(kgr): this doesn't support multi-part keys, but should (foam2: still applies!)
-      this.index = TreeIndex.create(this.of.getAxiomByName(this.of.ids[0]));
+      // TODO: generally sort out how .ids is supposed to work
+      this.index = TreeIndex.create(this.of.getAxiomByName(
+        ( this.of.ids && this.of.ids[0] ) || 'id' ) );
 
       if ( this.autoIndex ) this.addRawIndex(AutoIndex.create(this));
     },
@@ -1140,10 +1143,12 @@ foam.CLASS({
     function addIndex() {
       var props = foam.fn.argsToArray(arguments);
 
+      if ( ! this.of.ids )  throw "Undefined index"; // TODO: err
+
       // Add on the primary key(s) to make the index unique.
       for ( var i = 0 ; i < this.of.ids.length ; i++ ) {
         props.push(this.of.getAxiomByName(this.of.ids[i]));
-        if ( ! props[props.length - 1] ) throw "Undefined index property";
+        if ( ! props[props.length - 1] ) throw "Undefined index property"; // TODO: err
       }
 
       return this.addUniqueIndex.apply(this, props);
@@ -1190,11 +1195,11 @@ foam.CLASS({
         dao.select().then(function() {
           self.root = self.index.bulkLoad(this);
           resolve();
-        });        
+        });
       })
     },
 
-    put: function(obj) {
+    function put(obj) {
       var oldValue = this.map[obj.id];
       if ( oldValue ) {
         this.root = this.index.put(this.index.remove(this.root, oldValue), obj);
@@ -1225,7 +1230,9 @@ foam.CLASS({
       // TODO: How to handle multi value primary keys?
       var foundObj = null;
       return new Promise(function(resolve, reject) {
-        self.where(key).limit(1).select({
+        self.where(self.Eq.create({ arg1: self.of.getAxiomByName(
+            ( self.of.ids && self.of.ids[0] ) || 'id' ), arg2: key })
+          ).limit(1).select({
           put: function(obj) {
             foundObj = obj;
             resolve(obj);
@@ -1246,7 +1253,7 @@ foam.CLASS({
       if ( ! obj || ! obj.id ) {
         return Promise.reject(this.ExternalError.create({ id: 'no_id' })); // TODO: err
       }
-      var id = obj.id;      
+      var id = obj.id;
       var self = this;
 
       return this.find(id).then(
@@ -1260,7 +1267,7 @@ foam.CLASS({
     },
 
     function removeAll(skip, limit, order, predicate) {
-      if (!predicate) predicate = this.TRUE;
+      if (!predicate) predicate = this.foam.mlang.predicate.True;
       var self = this;
       return this.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
