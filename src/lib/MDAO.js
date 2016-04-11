@@ -102,14 +102,16 @@ var ValueIndex = {
            return function() { return plan; };
          })(),
   get: function(value, key) { return value; },
-  /** Skip and limit are modified in place, so passed by reference as one-element arrays */
+  /** Skip and limit are modified in place, so passed by reference as one-element arrays.
+    TODO: make this better (this used to be an options object) */
   select: function(value, sink, skip, limit, order, predicate) {
     if ( predicate && ! predicate.f(value) ) return;
     if ( skip && skip[0]-- > 0 ) return;
     if ( limit && limit[0]-- < 1 ) return;
     sink.put(value);
   },
-  /** Skip and limit are modified in place, so passed by reference as one-element arrays */
+  /** Skip and limit are modified in place, so passed by reference as one-element arrays.
+    TODO: make this better (this used to be an options object) */
   selectReverse: function(value, sink, skip, limit, order, predicate) {
     this.select(value, sink, skip, limit, order, predicate);
   },
