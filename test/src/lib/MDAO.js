@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+
 describe("MDAO benchmarks", function() {
   it("runs", function() {
 
@@ -58,7 +59,7 @@ describe("MDAO benchmarks", function() {
       var startTime = Date.now();
       var fn = function(arg) {
         var endTime = Date.now();
-        console.log("Time for ", name, ": ", endTime - startTime);
+        console.log("Time for ", name, ": ", endTime - startTime, "ms");
         return Promise.resolve(arg);
       };
       return promise.then(fn, fn);
@@ -161,7 +162,8 @@ describe("MDAO benchmarks", function() {
     });
 
     var AlbumDAO, PhotoDAO, PhotoDetailDAO;
-    var albums = [].sink, photos = [].sink;
+    var albums = foam.dao.ArraySink.create();
+    var photos = foam.dao.ArraySink.create();
 
     function makeMultiPartKeys(n) {
       var a = [];
@@ -207,25 +209,25 @@ describe("MDAO benchmarks", function() {
     aseq(
       atest('CreateTestAlbums' + NUM_ALBUMS, arepeat(NUM_ALBUMS, (function ( i) {
         testData.albums[i].isLocal = !!testData.albums[i].isLocal;
-        albums.push(Album.create(testData.albums[i]));
-
+        albums.put(Album.create(testData.albums[i]));
+        return Promise.resolve();
       }))),
       atest('CreateTestPhotos' + NUM_PHOTOS, arepeat(NUM_PHOTOS, (function ( i) {
         testData.photos[i].isLocal = !!testData.photos[i].isLocal;
-        photos.push(Photo.create(testData.photos[i]));
-
+        photos.put(Photo.create(testData.photos[i]));
+        return Promise.resolve();
       }))),
-      new Promise( function(resolve, reject) { console.clear(); testData = undefined; resolve(); } ),
+      //new Promise( function(resolve, reject) { console.clear(); testData = undefined; resolve(); } ),
       arepeat(DEBUG ? 1 : 7, aseq(
         alog('Benchmark...'),
         atest('1aCreateAlbums' + NUM_ALBUMS, arepeatpar(NUM_ALBUMS, (function ( i) {
-          return AlbumDAO.put(albums[i]);
+          return AlbumDAO.put(albums.a[i]);
         }))),
-        asleep(2000),
+        //asleep(2000),
         atest('1bCreatePhotos' + NUM_PHOTOS, arepeatpar(NUM_PHOTOS, (function ( i) {
-          return PhotoDAO.put(photos[i]);
+          return PhotoDAO.put(photos.a[i]);
         }))),
-        asleep(5000),
+        //asleep(5000),
         atest('2aSelectAllAlbumsQuery', new Promise( function() { return AlbumDAO.select(); })),
         atest('2aSelectAllPhotosQuery', new Promise( function() { return PhotoDAO.select(); })),
         atest('2bSingleKeyQuery',       new Promise( function() { return PhotoDAO.find(avgKey); })),
