@@ -960,13 +960,13 @@ var AltIndex = {
   create: function() {
     return {
       __proto__: this,
-      delegates: argsToArray(arguments)
+      delegates: foam.Array.argsToArray(arguments)
     };
   },
 
   addIndex: function(s, index) {
     // Populate the index
-    var a = this.ArraySink.create();
+    var a = foam.dao.ArraySink.create();
     this.plan(s, a).execute(s, a);
 
     s.push(index.bulkLoad(a));
@@ -1180,9 +1180,11 @@ foam.CLASS({
      * args: one or more properties
      **/
     function addIndex() {
-      var props = foam.fn.argsToArray(arguments);
+      var props = foam.Array.argsToArray(arguments);
 
-      if ( ! this.of.ids )  throw "Undefined index"; // TODO: err
+      if ( ! this.of.ids ) {// throw "Undefined index"; // TODO: err
+        this.of.ids = ['id'];
+      }
 
       // Add on the primary key(s) to make the index unique.
       for ( var i = 0 ; i < this.of.ids.length ; i++ ) {
