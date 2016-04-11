@@ -1315,7 +1315,7 @@ foam.CLASS({
     },
 
     function removeAll(skip, limit, order, predicate) {
-      if (!predicate) predicate = this.foam.mlang.predicate.True;
+      if (!predicate) predicate = this.True;
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
