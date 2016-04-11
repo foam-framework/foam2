@@ -340,6 +340,78 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'Counter',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'count',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      this.count[0]++;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'CounterStart',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'count',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      this.count[0] = 0;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'MinimumCount',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      class: 'Int',
+      name: 'minimum',
+      final: true
+    },
+    {
+      name: 'count',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      if ( this.count[0] < this.minimum ) {
+        this.fail.ps = this.ps;
+        return this.fail;
+      }
+      this.success.ps = this.ps;
+      return this.success;
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -803,31 +875,82 @@ foam.CLASS({
   name: 'Repeat',
   extends: 'foam.parse.ParserDecorator',
 
+  properties: [
+    {
+      class: 'foam.parse.ParserProperty',
+      name: 'delimiter'
+    },
+    {
+      class: 'Int',
+      name: 'minimum'
+    }
+  ],
+
   methods: [
     function compile(success, fail, withValue, grammar) {
-      var value = [];
-      var repeat = foam.parse.compiled.Placeholder.create();
+      var pSuccess = foam.parse.compiled.Placeholder.create();
+      var pFail = foam.parse.compiled.Placeholder.create();
+      var p = this.p.compile(pSuccess, pFail, withValue, grammar);
 
-      success = withValue ?
-        foam.parse.compiled.FinishValue.create({ value: value, next: success }) :
-        success;
+      if ( this.delimiter ) {
+        var delimSuccess = foam.parse.compiled.Placeholder.create();
+        var delimFail = foam.parse.compiled.Placeholder.create();
+        var delim = this.delimiter.compile(delimSuccess, delimFail, false, grammar);
+      } else {
+        delim = foam.parse.compiled.Placeholer.create({
+          next: delimSuccess
+        });
+      }
 
-      var p = this.p.compile(
-        withValue ?
-          foam.parse.compiled.AddValue.create({ value: value, next: repeat }) :
-          repeat,
-        success,
-        withValue,
-        grammar);
+      var start = p;
 
-      repeat.next = p;
+      if ( this.minimum > 0 ) {
+        var count = [];
 
-      return withValue ?
-        foam.parse.compiled.StartValue.create({
+        start = foam.parse.compiled.CounterStart.create({
+          count: count,
+          next: start
+        });
+
+        pSuccess.next = foam.parse.compiled.Counter.create({
+          count: count
+        });
+        pSuccess = pSuccess.next;
+
+        success = foam.parse.compiled.MinimumCount.create({
+          count: count,
+          minimum: this.minimum,
+          success: success,
+          fail: fail
+        });
+      }
+
+      if ( withValue ) {
+        var value = [];
+
+        pSuccess.next = foam.parse.compiled.AddValue.create({
+          value: value
+        });
+        pSuccess = pSuccess.next;
+
+        start = foam.parse.compiled.StartValue.create({
           value: value,
-          next: p
-        }) :
-        p;
+          next: start
+        });
+
+        success = foam.parse.compiled.FinishValue.create({
+          value: value,
+          next: success
+        });
+      }
+
+      pSuccess.next = delim;
+      delimSuccess.next = p;
+      delimFail.next = success;
+
+      pFail.next = success;
+
+      return start;
     },
     function parse(ps, obj) {
       var ret = [];
@@ -841,7 +964,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -993,9 +1115,11 @@ foam.CLASS({
       });
     },
 
-    function repeat0(p) {
+    function repeat0(p, delim, min) {
       return foam.lookup('foam.parse.Repeat0').create({
-        p: p
+        p: p,
+        minimum: min,
+        delimiter: delim
       });
     },
 
@@ -1024,9 +1148,11 @@ foam.CLASS({
       });
     },
 
-    function repeat(p) {
+    function repeat(p, delim, min) {
       return foam.lookup('foam.parse.Repeat').create({
-        p: p
+        p: p,
+        minimum: min,
+        delimiter: delim
       });
     },
 

@@ -704,7 +704,7 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange(name, oldValue, newValue);
+          this.pubPropertyChange(name, oldValue, newValue, prop);
 
           // TODO(maybe): pub to a global topic to support dynamic()
 
@@ -1112,9 +1112,9 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function pubPropertyChange(name, oldValue, newValue) {
+    function pubPropertyChange(name, oldValue, newValue, opt_axiom) {
       if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = this.slot(name);
+        var dyn = opt_axiom ? opt_axiom.toSlot(this) : this.slot(name);
         dyn.setPrev(oldValue);
         this.pub('propertyChange', name, dyn);
       }
@@ -1129,6 +1129,7 @@ foam.CLASS({
     function slot(name) {
       var axiom = this.cls_.getAxiomByName(name);
 
+ /*
       console.assert(
         axiom,
         'Attempt to access slot() on unknown axiom: ',
@@ -1136,6 +1137,7 @@ foam.CLASS({
       console.assert(axiom.toSlot,
         'Attempt to access slot() on an Axiom without toSlot() support: ',
          name);
+*/
 
       return axiom.toSlot(this);
     }
@@ -1649,6 +1651,22 @@ foam.CLASS({
 });
 
 
+/**
+  An Identity Axiom which installs a psedo-property to use as an id.
+  Use when you want a multi-part primary-key.
+<pre>
+  Ex.
+  foam.CLASS({
+    name: 'Person',
+    ids: [ 'firstName', 'lastName' ],
+    properties: [ 'firstName', 'lastName', 'age', 'sex' ]
+  });
+
+  > var p = Person.create({firstName: 'Kevin', lastName: 'Greer'});
+  > p.id;
+  ["Kevin", "Greer"]
+</pre>
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Identity',

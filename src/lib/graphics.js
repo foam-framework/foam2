@@ -70,17 +70,21 @@ foam.CLASS({
           d = this.d, e = this.e, f = this.f,
           g = this.g, h = this.h, i = this.i;
 
-      this.a = a * m.a + b * m.d + c * m.g;
-      this.b = a * m.b + b * m.e + c * m.h;
-      this.c = a * m.c + b * m.f + c * m.i;
+      var ma = m.a, mb = m.b, mc = m.c,
+          md = m.d, me = m.e, mf = m.f,
+          mg = m.g, mh = m.h, mi = m.i;
 
-      this.d = d * m.a + e * m.d + f * m.g;
-      this.e = d * m.b + e * m.e + f * m.h;
-      this.f = d * m.c + e * m.f + f * m.i;
+      this.a = a * ma + b * md + c * mg;
+      this.b = a * mb + b * me + c * mh;
+      this.c = a * mc + b * mf + c * mi;
 
-      this.g = g * m.a + h * m.d + i * m.g;
-      this.h = g * m.b + h * m.e + i * m.h;
-      this.i = g * m.c + h * m.f + i * m.i;
+      this.d = d * ma + e * md + f * mg;
+      this.e = d * mb + e * me + f * mh;
+      this.f = d * mc + e * mf + f * mi;
+
+      this.g = g * ma + h * md + i * mg;
+      this.h = g * mb + h * me + i * mh;
+      this.i = g * mc + h * mf + i * mi;
 
       return this;
     },
@@ -457,8 +461,8 @@ foam.CLASS({
   methods: [
     function intersects(c) {
       var r = this.radius + c.radius;
-      if ( this.border ) r += this.arcWidth-2;
-      if ( c.border    ) r += c.arcWidth-2;
+      if ( this.border ) r += this.arcWidth/2-1;
+      if ( c.border    ) r += c.arcWidth/2-1;
       return foam.math.distance(this.x-c.x, this.y-c.y) <= r;
     }
   ]
