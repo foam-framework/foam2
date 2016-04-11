@@ -34,6 +34,38 @@
  *  add ability for indices to pre-populate data
  */
 
+/** TODO: move to stdlib */
+var toCompare = function toCompare(c) {
+  if ( Array.isArray(c) ) return CompoundComparator.apply(null, c);
+
+  return c.compare ? c.compare.bind(c) : c;
+};
+/** TODO: move to stdlib */
+var CompoundComparator = function CompoundComparator() {
+  var args = argsToArray(arguments);
+  var cs = [];
+
+  // Convert objects with .compare() methods to compare functions.
+  for ( var i = 0 ; i < args.length ; i++ )
+    cs[i] = toCompare(args[i]);
+
+  var f = function(o1, o2) {
+    for ( var i = 0 ; i < cs.length ; i++ ) {
+      var r = cs[i](o1, o2);
+      if ( r != 0 ) return r;
+    }
+    return 0;
+  };
+
+  f.toSQL = function() { return args.map(function(s) { return s.toSQL(); }).join(','); };
+  f.toMQL = function() { return args.map(function(s) { return s.toMQL(); }).join(' '); };
+  f.toBQL = function() { return args.map(function(s) { return s.toBQL(); }).join(' '); };
+  f.toString = f.toSQL;
+
+  return f;
+};
+
+
 /** Plan indicating that there are no matching records. **/
 var NOT_FOUND = {
   cost: 0,
@@ -70,13 +102,17 @@ var ValueIndex = {
            return function() { return plan; };
          })(),
   get: function(value, key) { return value; },
+  /** Skip and limit are modified in place, so passed by reference as one-element arrays */
   select: function(value, sink, skip, limit, order, predicate) {
     if ( predicate && ! predicate.f(value) ) return;
-    if ( skip && skip-- > 0 ) return;
-    if ( limit && limit-- < 1 ) return;
+    if ( skip && skip[0]-- > 0 ) return;
+    if ( limit && limit[0]-- < 1 ) return;
     sink.put(value);
   },
-  selectReverse: function(value, sink, skip, limit, order, predicate) { this.select(value, sink, skip, limit, order, predicate); },
+  /** Skip and limit are modified in place, so passed by reference as one-element arrays */
+  selectReverse: function(value, sink, skip, limit, order, predicate) {
+    this.select(value, sink, skip, limit, order, predicate);
+  },
   size:   function(obj) { return 1; },
   toString: function() { return 'value'; }
 };
@@ -110,6 +146,7 @@ var TreeIndex = {
    * Faster than loading individually, and produces a balanced tree.
    **/
   bulkLoad: function(a) {
+    a = a.a || a;
     // Only safe if children aren't themselves trees
     if ( this.tail === ValueIndex ) {
       a.sort(toCompare(this.prop));
@@ -339,11 +376,11 @@ var TreeIndex = {
   select: function(s, sink, skip, limit, order, predicate) {
     if ( ! s ) return;
 
-    if ( limit && limit <= 0 ) return;
+    if ( limit && limit[0] <= 0 ) return;
 
     var size = this.size(s);
-    if ( skip >= size && ! predicate ) {
-      skip -= size;
+    if ( skip && skip[0] >= size && ! predicate ) {
+      skip[0] -= size;
       return;
     }
 
@@ -355,11 +392,11 @@ var TreeIndex = {
   selectReverse: function(s, sink, skip, limit, order, predicate) {
     if ( ! s ) return;
 
-    if ( limit && limit <= 0 ) return;
+    if ( limit && limit[0] <= 0 ) return;
 
     var size = this.size(s);
-    if ( skip >= size ) {
-      skip -= size;
+    if ( skip && skip[0] >= size ) {
+      skip[0] -= size;
       return;
     }
 
@@ -552,10 +589,11 @@ var TreeIndex = {
       cost: cost,
       execute: function(s, sink, skip, limit, order, predicate) {
         if ( sortRequired ) {
-          var a = [].sink;
+          var arrSink = foam.dao.ArraySink.create();
           index.selectCount++;
-          index.select(s, a, {predicate: predicate});
+          index.select(s, arrSink, null, null, null, predicate);
           index.selectCount--;
+          var a = arrSink.a;
           a.sort(toCompare(order));
 
           var skip = skip || 0;
@@ -572,9 +610,9 @@ var TreeIndex = {
             skip = index.size(s) - skip - (limit || index.size(s)-skip)
             */
           index.selectCount++;
-          reverseSort ?
-            index.selectReverse(s, sink, skip, limit, order, predicate) :
-            index.select(s, sink, skip, limit, order, predicate) ;
+          reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+            index.selectReverse(s, sink, [skip], [limit], order, predicate) :
+            index.select(s, sink, [skip], [limit], order, predicate) ;
           index.selectCount--;
         }
 
@@ -926,7 +964,7 @@ var AltIndex = {
 
   addIndex: function(s, index) {
     // Populate the index
-    var a = [].sink;
+    var a = this.ArraySink.create();
     this.plan(s, a).execute(s, a);
 
     s.push(index.bulkLoad(a));
@@ -936,7 +974,7 @@ var AltIndex = {
   },
 
   bulkLoad: function(a) {
-    var root = [].sink;
+    var root = this.ArraySink.create();
     for ( var i = 0 ; i < this.delegates.length ; i++ ) {
       root[i] = this.delegates[i].bulkLoad(a);
     }
@@ -948,7 +986,7 @@ var AltIndex = {
   },
 
   put: function(s, newValue) {
-    s = s || [].sink;
+    s = s || this.ArraySink.create();
     for ( var i = 0 ; i < this.delegates.length ; i++ ) {
       s[i] = this.delegates[i].put(s[i], newValue);
     }
@@ -957,7 +995,7 @@ var AltIndex = {
   },
 
   remove: function(s, obj) {
-    s = s || [].sink;
+    s = s || this.ArraySink.create();
     for ( var i = 0 ; i < this.delegates.length ; i++ ) {
       s[i] = this.delegates[i].remove(s[i], obj);
     }
@@ -1284,7 +1322,7 @@ foam.CLASS({
             self.pub('on', 'remove', a[i]);
           }
           return Promise.resolve();
-        } 
+        }
       );
     },
 
