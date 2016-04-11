@@ -384,7 +384,7 @@ var TreeIndex = {
   size: function(s) { return s ? s[SIZE] : 0; },
 
   compare: function(o1, o2) {
-    return this.prop.compare(o1, o2);
+    return foam.util.compare(o1, o2);
   },
 
   plan: function(s, sink, skip, limit, order, predicate) {
@@ -397,7 +397,7 @@ var TreeIndex = {
       //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
       return {
         cost: 0,
-        execute: function(unused, sink, skip, limit, order, predicate) { sink.count += count; return Promise.resolve(sink); },
+        execute: function(unused, sink, skip, limit, order, predicate) { sink.value += count; return Promise.resolve(sink); },
         toString: function() { return 'short-circuit-count(' + count + ')'; }
       };
     }
@@ -857,13 +857,13 @@ var PositionIndex = {
         cost: 0,
         execute: function(s, sink, skip, limit, order, predicate) {
           // TODO: double check this bit...
-          if ( ! s.count ) {
+          if ( ! s.value ) {
             // TODO: memoize, expire after self.maxage, as per foam1 amemo
-            s.count = self.networkdao.select(foam.mlang.sink.Count.create());
+            s.value = self.networkdao.select(foam.mlang.sink.Count.create());
           }
 
-          return s.count.then(function(countSink) {
-            sink.count = countSink.count;
+          return s.value.then(function(countSink) {
+            sink.value = countSink.value;
             return Promise.resolve(sink);
           });
         },
@@ -1110,7 +1110,11 @@ foam.CLASS({
   name: 'MDAO',
   label: 'Indexed DAO',
   requires: [
-    'foam.mlang.predicate.Eq'
+    'foam.dao.ExternalException',
+    'foam.dao.InternalException',
+    'foam.dao.ObjectNotFoundException',
+    'foam.mlang.predicate.Eq',
+    'foam.dao.ArraySink',
   ],
   properties: [
     {
@@ -1217,14 +1221,14 @@ foam.CLASS({
       if ( obj ) {
         resolve(obj)
       } else {
-        reject(this.InternalError.create({ id: key })); // TODO: err
+        reject(this.InternalException.create({ id: key })); // TODO: err
       }
     },
 
     function find(key) {
       var self = this;
       if ( key == undefined ) {
-        reject(this.InternalError.create({ id: key })); // TODO: err
+        reject(self.InternalException.create({ id: key })); // TODO: err
         return;
       }
       // TODO: How to handle multi value primary keys?
@@ -1239,11 +1243,11 @@ foam.CLASS({
           },
           eof: function() {
             if ( ! foundObj ) {
-              reject(this.InternalError.create({ id: key })); // TODO: err
+              reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
             }
           },
           error: function(e) {
-            reject(this.InternalError.create({ id: key })); // TODO: err
+            reject(self.InternalException.create({ id: key })); // TODO: err
           }
         });
       });
@@ -1251,7 +1255,7 @@ foam.CLASS({
 
     function remove(obj) {
       if ( ! obj || ! obj.id ) {
-        return Promise.reject(this.ExternalError.create({ id: 'no_id' })); // TODO: err
+        return Promise.reject(this.ExternalException.create({ id: 'no_id' })); // TODO: err
       }
       var id = obj.id;
       var self = this;
@@ -1269,16 +1273,16 @@ foam.CLASS({
     function removeAll(skip, limit, order, predicate) {
       if (!predicate) predicate = this.foam.mlang.predicate.True;
       var self = this;
-      return this.where(predicate).select(self.ArraySink.create()).then(
+      return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
           var a = sink.a;
           for ( var i = 0 ; i < a.length ; i++ ) {
-            this.root = this.index.remove(this.root, a[i]);
-            delete this.map[a[i].id];
-            this.pub('on', 'remove', a[i]);
+            self.root = self.index.remove(self.root, a[i]);
+            delete self.map[a[i].id];
+            self.pub('on', 'remove', a[i]);
           }
           return Promise.resolve();
-        }
+        } 
       );
     },
 
@@ -1298,6 +1302,10 @@ foam.CLASS({
         function(sink) {
           sink && sink.eof && sink.eof();
           return Promise.resolve(sink);
+        },
+        function(err) {
+          sink && sink.error && sink.error(err);
+          return Promise.reject(err);
         }
       );
     },
