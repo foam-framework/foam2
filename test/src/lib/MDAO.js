@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000;
 
 describe("MDAO benchmarks", function() {
-  it("runs", function() {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000000
+  it("runs", function(done) {
 
     var NUM_ALBUMS = 1000;
     var NUM_PHOTOS = 10000;
@@ -333,7 +332,8 @@ describe("MDAO benchmarks", function() {
           //,asleep(10000)
         )
       ),
-      alog('Done.')
+      alog('Done.'),
+      done
     ));
     }
 
