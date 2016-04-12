@@ -55,7 +55,8 @@ foam.CLASS({
   axioms: [foam.pattern.Singleton.create()],
 
   requires: [
-    'foam.parse.StringPS'
+    'foam.parse.StringPS',
+    'foam.parse.ImperativeGrammar as Grammar'
   ],
 
   constants: {
@@ -66,42 +67,87 @@ foam.CLASS({
     FOOTER: "');\nreturn opt_outputter ? output : output.toString();\n"
   },
 
-  grammar: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
-    return {
-      markup: repeat0(simpleAlt(
-        sym('comment'),
-        sym('simple value'),
-        sym('raw values tag'),
-        sym('code tag'),
-        sym('ignored newline'),
-        sym('newline'),
-        sym('single quote'),
-        sym('text')
-      )),
-
-      'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
-
-      'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
-
-      'raw values tag': simpleAlt(
-        seq('<%=', repeat(not('%>', anyChar())), '%>')
-      ),
-
-      'code tag': seq('<%', repeat(not('%>', anyChar())), '%>'),
-      'ignored newline': simpleAlt(
-        literal('\\\r\\\n'),
-        literal('\\\n')
-      ),
-      newline: simpleAlt(
-        literal('\r\n'),
-        literal('\n')
-      ),
-      'single quote': literal("'"),
-      text: anyChar()
-    };
-  },
-
   properties: [
+    {
+      name: 'grammar',
+      factory: function() {
+        var g = this.Grammar.create({
+          symbols: function(repeat0, simpleAlt, sym, seq1, seq, repeat, notChars, anyChar, not, optional, literal) {
+            return {
+              START: sym('markup'),
+
+              markup: repeat0(simpleAlt(
+                sym('comment'),
+                sym('simple value'),
+                sym('raw values tag'),
+                sym('code tag'),
+                sym('ignored newline'),
+                sym('newline'),
+                sym('single quote'),
+                sym('text')
+              )),
+
+              'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
+
+
+              'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
+
+              'raw values tag': simpleAlt(
+                seq('<%=', repeat(not('%>', anyChar())), '%>')
+              ),
+
+              'code tag': seq('<%', repeat(not('%>', anyChar())), '%>'),
+              'ignored newline': simpleAlt(
+                literal('\\\r\\\n'),
+                literal('\\\n')
+              ),
+              newline: simpleAlt(
+                literal('\r\n'),
+                literal('\n')
+              ),
+              'single quote': literal("'"),
+              text: anyChar()
+            }
+          }
+        });
+        var self = this;
+        g.addActions({
+          markup: function(v) {
+            var wasSimple = self.simple;
+            var ret = wasSimple ? null : self.out.join('');
+            self.out = [];
+            self.simple = true;
+            return [wasSimple, ret];
+          },
+          'simple value': function(v) {
+            self.push("',\n self.",
+                      v[1].join(''),
+                      v[2],
+                      ",\n'");
+          },
+          'raw values tag': function (v) {
+            self.push("',\n",
+                      v[1].join(''),
+                      ",\n'");
+          },
+          'code tag': function (v) {
+            self.push("');\n",
+                      v[1].join(''),
+                      ";out('");
+          },
+          'single quote': function() {
+            self.pushSimple("\\'");
+          },
+          newline: function() {
+            self.pushSimple('\\n');
+          },
+          text: function(v) {
+            self.pushSimple(v);
+          }
+        });
+        return g;
+      }
+    },
     {
       name: 'out',
       factory: function() { return []; }
@@ -129,10 +175,8 @@ foam.CLASS({
     },
 
     function compile(t, name, args) {
-      this.ps.setString(t);
-      var result = this.markup(this.ps);
+      var result = this.grammar.parseString(t);
       if ( ! result ) throw "Error parsing template " + name;
-      result = result.value;
 
       var code = this.HEADER +
           ( result[0] ? t : result[1] )
@@ -158,53 +202,6 @@ foam.CLASS({
           return delegate.apply(this, arguments);
         };
       })(this);
-    }
-  ],
-
-  grammarActions: [
-    function markup (v) {
-      var wasSimple = this.simple;
-      var ret = wasSimple ? null : this.out.join('');
-      this.out = [];
-      this.simple = true;
-      return [wasSimple, ret];
-    },
-    {
-      name: 'simple value',
-      code: function(v) {
-        this.push("',\n self.",
-                  v[1].join(''),
-                  v[2],
-                  ",\n'");
-      },
-    },
-    {
-      name: 'raw values tag',
-      code: function (v) {
-        this.push("',\n",
-                  v[1].join(''),
-                  ",\n'");
-      },
-    },
-    {
-      name: 'code tag',
-      code: function (v) {
-        this.push("');\n",
-                  v[1].join(''),
-                  ";out('");
-      },
-    },
-    {
-      name: 'single quote',
-      code: function () {
-        this.pushSimple("\\'");
-      },
-    },
-    function newline() {
-      this.pushSimple('\\n');
-    },
-    function text(v) {
-      this.pushSimple(v);
     }
   ]
 });

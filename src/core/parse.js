@@ -1053,27 +1053,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParserAxiom',
-  extends: 'Method',
-
-  properties: [
-    'parser'
-  ],
-
-  methods: [
-    function installInProto(proto) {
-      var parser = this.parser;
-      proto[this.name] = function(ps) {
-        return parser.parse(ps, this);
-      };
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.parse',
   name: 'Symbol',
@@ -1090,13 +1069,13 @@ foam.CLASS({
       return grammar.getSymbol(this.name).compile(
         success, fail, withValue, grammar);
     },
-    function parse(ps, obj) {
-      var p = obj[this.name];
+    function parse(ps, grammar) {
+      var p = grammar.getSymbol(this.name);
       if ( ! p ) {
         console.error("No symbol found for", this.name);
         return undefined;
       }
-      return p.call(obj, ps);
+      return p.parse(ps, grammar);
     }
   ]
 });
@@ -1188,113 +1167,12 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParsersAxiom',
-  extends: 'AxiomArray',
-
-  requires: [
-    'foam.parse.Parsers'
-  ],
-
-  properties: [
-    [ 'of', 'foam.parse.ParserAxiom' ],
-    {
-      name: 'adapt',
-      value: function(_, o, prop) {
-        if ( Array.isArray(o) ) return o;
-
-        if ( typeof o === "function" ) {
-          var args = o.toString().match(/\((.*?)\)/);
-          if ( ! args ) {
-            throw "Could not parse arguments from parser factory function";
-          }
-
-          o = foam.Function.withArgs(o, prop.Parsers.create(), this);
-        }
-
-        var a = [];
-        for ( var key in o ) {
-          a.push(foam.lookup('foam.parse.ParserAxiom').create({
-            name: key,
-            parser: o[key]
-          }));
-        }
-        return a;
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParserAxioms',
-  refines: 'foam.core.Model',
-
-  properties: [
-    {
-      name: 'grammar',
-      class: 'foam.parse.ParsersAxiom'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParserAction',
-  extends: 'foam.core.Method',
-
-  methods: [
-    function installInProto(proto) {
-      var f      = this.code;
-      var name   = this.name;
-      var parser = proto[this.name];
-
-      if ( ! parser )
-        throw "No existing parser found for " + this.name;
-
-      proto[this.name] = function(ps, grammar) {
-        ps = parser.call(this, ps, grammar);
-        return ps ? ps.setValue(f.call(this, ps.value)) : null;
-      };
-    }
-  ]
-});
-
-
-/** Supports parser ParserActions */
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParseAction',
-  refines: 'foam.core.Model',
-
-  properties: [
-    {
-      class: 'AxiomArray',
-      of: 'foam.parse.ParserAction',
-      name: 'grammarActions',
-      adaptArrayElement: function(o) {
-        if ( foam.lookup(this.of).isInstance(o) ) return o;
-        return foam.lookup(this.of).create({
-          name: o.name,
-          code: typeof o === 'function' ? o : o.code
-        });
-      }
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.parse',
   name: 'PSymbol',
 
   properties: [ 'name', 'parser' ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1412,6 +1290,25 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'ImperativeGrammar',
+  extends: 'foam.parse.Grammar',
+  methods: [
+    function parseString(str, opt_name) {
+      opt_name = opt_name || 'START';
+
+      this.ps.setString(str);
+      var start = this.getSymbol(opt_name);
+      console.assert(start, "No symbol found for", opt_name);
+
+      var result = start.parse(this.ps, this);
+      return result && result.value;
+    }
+  ]
+});
+
 
 /*
 TODO:
