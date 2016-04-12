@@ -470,9 +470,8 @@ foam.CLASS({
     },
 
     function hasOwnPrivate_(name) {
-      return this.private_ &&
-        ( typeof this.private_[name] !== 'undefined' ||
-          this.private_.hasOwnProperty(name) );
+      return this.private_ && typeof this.private_[name] !== 'undefined';
+
     },
 
     function pubPropertyChange_() {
