@@ -18,7 +18,8 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
 describe("MDAO benchmarks", function() {
   it("runs", function(done) {
-
+//done();
+//return;
     var NUM_ALBUMS = 1000;
     var NUM_PHOTOS = 10000;
 
