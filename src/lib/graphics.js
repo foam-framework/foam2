@@ -525,7 +525,7 @@ foam.CLASS({
     {
       name: 'paint',
       isFramed: true,
-      code: function() {
+      code: function paintCanvas() {
         this.erase();
         this.cview && this.cview.paint(this.context);
       }
