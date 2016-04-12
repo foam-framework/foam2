@@ -81,7 +81,6 @@ foam.CLASS({
   ]
 });
 
-
 /**
  * Base class for all mLang queries.
  *
@@ -121,6 +120,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 
 /** Singleton for the value "true". */
@@ -477,6 +477,24 @@ foam.CLASS({
   ]
 });
 
+/** Map sink transforms each put with a given mapping expression. */
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  implements: [
+    'foam.dao.ProxySink',
+    'foam.mlang.predicate.Unary',
+  ],
+  name: 'Map',
+
+  methods: [
+    function f(o) {
+      return this.arg1.f(o);
+    },
+    function put(o) {
+      this.delegate.put( this.f(o) );
+    },
+  ]
+});
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -498,6 +516,7 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
+    'foam.mlang.sink.Map',
   ],
 
   methods: [
@@ -522,7 +541,9 @@ foam.CLASS({
     function LTE(a, b) { return this._binary_("Lte", a, b); },
     function GTE(a, b) { return this._binary_("Gte", a, b); },
     function HAS(a) { return this._unary_("Has", a); },
-    function NOT(a) { return this._unary_("Not", a); }
+    function NOT(a) { return this._unary_("Not", a); },
+
+    function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
   ]
 });
 

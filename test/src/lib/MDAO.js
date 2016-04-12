@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
 describe("MDAO benchmarks", function() {
   it("runs", function(done) {
@@ -281,19 +281,25 @@ describe("MDAO benchmarks", function() {
           atest('2cMultiKeyQuery5000', function() {
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select(); } ),
 
-  //         atest('2dIndexedFieldQuery',    new Promise( function() {
-  //           return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgKey)).select(M.MAP(Photo.ALBUM_ID));
-  //         })),
-  //         atest('2dIndexedFieldQuery(X10)', arepeat(10,new Promise( function() {
-  //           return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgKey)).select(M.MAP(Photo.ALBUM_ID));
-  //         }))),
-  //         atest('2eAdHocFieldQuery',      new Promise( function() {
-  //           return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(M.MAP(Photo.HASH));
-  //         })),
-  //         atest('2fSimpleInnerJoinQuery', new Promise( function() {
-  //           return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID))(function (ids) {
-  //             return PhotoDAO.where(M.IN(Photo.ALBUM_ID, ids.arg2)).select();
-  //         })})),
+          atest('2dIndexedFieldQuery', function() {
+            return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgKey)).select(
+              M.MAP(Photo.ALBUM_ID, foam.dao.ArraySink.create())
+            );
+          }),
+          atest('2dIndexedFieldQuery(X10)', arepeat(10, function() {
+            return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgKey)).select(
+              M.MAP(Photo.ALBUM_ID, foam.dao.ArraySink.create())
+            );
+          })),
+          atest('2eAdHocFieldQuery',  function() {
+            return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
+              M.MAP(Photo.HASH, foam.dao.ArraySink.create())
+            );
+          }),
+//           atest('2fSimpleInnerJoinQuery',  function() {
+//             return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID))(function (ids) {
+//               return PhotoDAO.where(M.IN(Photo.ALBUM_ID, ids.arg2)).select();
+//           })}),
         //  atest('2fSimpleInnerJoinQuery(Simpler+Slower Version)', new Promise( function() {
         //    AlbumDAO.where(M.EQ(Album.IS_LOCAL, true)).select(M.MAP(JOM.IN(PhotoDAO, Photo.ALBUM_ID, []), []))(ret);
         //  }),
