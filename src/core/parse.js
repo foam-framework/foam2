@@ -274,6 +274,11 @@ foam.CLASS({
       final: true
     },
     {
+      name: 'case',
+      value: true,
+      final: true
+    },
+    {
       name: 'value',
       final: true
     }
@@ -281,15 +286,16 @@ foam.CLASS({
 
   methods: [
     function step() {
-      var str = this.s;
+      var str = this.case ? this.s : this.s.toUpperCase();
       var ps = this.ps;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( str.charAt(i) !== ps.head ) {
+        if ( ! ps.head ||
+            str.charAt(i) !== (this.case ? ps.head : ps.head.toUpperCase()) ) {
           this.fail.ps = this.ps;
           return this.fail;
         }
       }
-      this.success.ps = ps.setValue(this.value || str);
+      this.success.ps = ps.setValue(this.value || this.s);
       return this.success;
     }
   ]
@@ -305,16 +311,22 @@ foam.CLASS({
     {
       name: 's',
       final: true
-    }
+    },
+    {
+      name: 'case',
+      value: true,
+      final: true
+    },
   ],
 
   methods: [
     function step() {
       var ps1 = this.ps;
       var ps = this.ps;
-      var str = this.s;
+      var str = this.case ? this.s : this.s.toUpperCase();
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( str.charAt(i) !== ps.head ) {
+        if ( ! ps.head ||
+            str.charAt(i) !== (this.case ? ps.head : ps.head.toUpperCase()) ) {
           this.fail.ps = ps1;
           return this.fail;
         }
@@ -617,6 +629,11 @@ foam.CLASS({
       final: true
     },
     {
+      name: 'case',
+      value: true,
+      final: true
+    },
+    {
       name: 'value',
       final: true
     }
@@ -627,21 +644,26 @@ foam.CLASS({
       return withValue ?
         foam.parse.compiled.LiteralWithValue.create({
           s: this.s,
+          case: this.case,
           value: this.value !== undefined ? this.value : this.s,
           success: success,
           fail: fail
         }) :
       foam.parse.compiled.LiteralWithValue.create({
         s: this.s,
+        case: this.case,
         success: success,
         fail: fail
       })
     },
 
     function parse(ps, obj) {
-      var str = this.s;
+      var str = this.case ? this.s : this.s.toUpperCase();
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( str.charAt(i) !== ps.head ) return undefined;
+        if ( ! ps.head ||
+            str.charAt(i) !== (this.case ? ps.head : ps.head.toUpperCase()) ) {
+          return undefined;
+        }
       }
       return ps.setValue(this.value !== undefined ? this.value : str);
     }
@@ -1246,6 +1268,14 @@ foam.CLASS({
     function literal(s, value) {
       return foam.lookup('foam.parse.Literal').create({
         s: s,
+        value: value
+      });
+    },
+
+    function literal_ic(s, value) {
+      return foam.lookup('foam.parse.Literal').create({
+        s: s,
+        case: false,
         value: value
       });
     },
