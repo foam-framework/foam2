@@ -269,7 +269,7 @@ foam.CLASS({
     },
     {
       name: 'transform',
-      getter: function() {
+      getter: function getTransform() {
         var t = this.transform_.reset();
 
         t.translate(this.x, this.y);
