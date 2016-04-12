@@ -358,6 +358,36 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parse.compiled',
+  name: 'Range',
+  extends: 'foam.parse.compiled.State',
+
+  properties: [
+    {
+      name: 'from',
+      final: true,
+    },
+    {
+      name: 'to',
+      final: true,
+    },
+  ],
+
+  methods: [
+    function step() {
+      var ps = this.ps;
+      if ( this.from <= ps.head && ps.head <= this.to ) {
+        this.success.ps = ps.tail;
+        return this.success;
+      }
+
+      this.fail.ps = ps;
+      return this.fail;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
   name: 'Counter',
   extends: 'foam.parse.compiled.State',
 
@@ -915,6 +945,40 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parse',
+  name: 'Range',
+
+  properties: [
+    {
+      name: 'from',
+      final: true,
+    },
+    {
+      name: 'to',
+      final: true,
+    },
+  ],
+
+  methods: [
+    function compile(success, fail, withValue, grammar) {
+      return foam.parse.compiled.Range.create({
+        from: this.from,
+        to: this.to,
+        success: success,
+        fail: fail
+      });
+    },
+
+    function parse(ps) {
+      if ( ! ps.head ) return undefined;
+      return ( this.from <= ps.head && ps.head <= this.to ) ?
+          ps.tail.setValue(ps.head) : undefined;
+    },
+  ],
+});
+
+
+foam.CLASS({
+  package: 'foam.parse',
   name: 'Repeat',
   extends: 'foam.parse.ParserDecorator',
 
@@ -1243,6 +1307,13 @@ foam.CLASS({
         p: p,
         minimum: min,
         delimiter: delim
+      });
+    },
+
+    function range(a, b) {
+      return foam.lookup('foam.parse.Range').create({
+        from: a,
+        to: b
       });
     },
 
