@@ -93,9 +93,9 @@ describe("MDAO benchmarks", function() {
 
     function arepeat(times, fn) {
       return function() {
-        var p = Promise.resolve(0);
+        var p = Promise.resolve();
         var n = 0;
-        for ( var i = 1; i < times; ++i ) {
+        for ( var i = 0; i < times; ++i ) {
           p = p.then(function() { return fn(n++); });
         }
         return p;
@@ -103,7 +103,13 @@ describe("MDAO benchmarks", function() {
     }
 
     function arepeatpar(times, fn) {
-      return arepeat(times, fn);
+      return function() {
+        var promises = [];
+        for ( var i = 0; i < times; ++i ) {
+          promises[i] = fn(i);
+        }
+        return Promise.all(promises);
+      };
     }
 
     function alog() {
@@ -250,24 +256,31 @@ describe("MDAO benchmarks", function() {
           atest('1aCreateAlbums' + NUM_ALBUMS, arepeatpar(NUM_ALBUMS, function ( i) {
             return AlbumDAO.put(albums.a[i]);
           })),
-          //asleep(2000),
+          asleep(1000),
           atest('1bCreatePhotos' + NUM_PHOTOS, arepeatpar(NUM_PHOTOS, function ( i) {
             return PhotoDAO.put(photos.a[i]);
           })),
-          //asleep(5000),
-          atest('2aSelectAllAlbumsQuery', function() { return AlbumDAO.select(); } ),
-          atest('2aSelectAllPhotosQuery', function() { return PhotoDAO.select(); } ),
-          atest('2bSingleKeyQuery',       function() { return PhotoDAO.find(avgKey); } ),
+          asleep(2000),
+          atest('2aSelectAllAlbumsQuery', function() {
+            return AlbumDAO.select(); } ),
+          atest('2aSelectAllPhotosQuery', function() {
+            return PhotoDAO.select(); } ),
+          atest('2bSingleKeyQuery',       function() {
+            return PhotoDAO.find(avgKey); } ),
           atest('2bSingleKeyQuery(X10)',
             arepeat(10, function() {
               return PhotoDAO.find(avgKey);
             })
           ),
-          atest('2cMultiKeyQuery10',   function() { return PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select(); } ),
+          atest('2cMultiKeyQuery10',   function() {
+            return PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select(); } ),
 
-          atest('2cMultiKeyQuery100',  function() { return PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select(); } ),
-          atest('2cMultiKeyQuery1000', function() { return PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select(); } ),
-          atest('2cMultiKeyQuery5000', function() { return PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select(); } ),
+          atest('2cMultiKeyQuery100',  function() {
+            return PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select(); } ),
+          atest('2cMultiKeyQuery1000', function() {
+            return PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select(); } ),
+          atest('2cMultiKeyQuery5000', function() {
+            return PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select(); } ),
 
   //         atest('2dIndexedFieldQuery',    new Promise( function() {
   //           return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgKey)).select(M.MAP(Photo.ALBUM_ID));
