@@ -1122,22 +1122,8 @@ foam.CLASS({
       Creates a Slot for a property.
       @private
     */
-    // TODO: have this call toSlot() on Axiom, then not Property specific.
-    // This will enable imports to be used in expressions.
     function slot(name) {
-      var axiom = this.cls_.getAxiomByName(name);
-
- /*
-      console.assert(
-        axiom,
-        'Attempt to access slot() on unknown axiom: ',
-        name);
-      console.assert(axiom.toSlot,
-        'Attempt to access slot() on an Axiom without toSlot() support: ',
-         name);
-*/
-
-      return axiom.toSlot(this);
+      return this.cls_.getAxiomByName(name).toSlot(this);
     }
   ]
 });
