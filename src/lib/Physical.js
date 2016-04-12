@@ -31,7 +31,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'velocity',
-      getter: function() { return foam.math.distance(this.vx, this.vy); },
+      getter: function() { return this.distance(this.vx, this.vy); },
       setter: function(v) { this.setVelocityAndAngle(v, this.angleOfVelocity); }
     },
     {
@@ -44,19 +44,23 @@ foam.CLASS({
   ],
 
   methods: [
+    function distance(dx, dy) {
+      return Math.sqrt(dx*dx, dy*dy);
+    },
+
     function applyMomentum(m, a) {
       this.vx += (m * Math.cos(a) / this.mass);
       this.vy += (m * Math.sin(a) / this.mass);
     },
 
     function momentumAtAngle(a) {
-      if ( this.mass == this.INFINITE_MASS ) return 0;
+      if ( this.mass === this.INFINITE_MASS ) return 0;
       var v = this.velocityAtAngle(a);
       return v * this.mass;
     },
 
     function velocityAtAngle(a) {
-      if ( this.mass == this.INFINITE_MASS ) return 0;
+      if ( this.mass === this.INFINITE_MASS ) return 0;
       return Math.cos(a-this.angleOfVelocity) * this.velocity;
     },
 
@@ -66,7 +70,7 @@ foam.CLASS({
     },
 
     function distanceTo(other) {
-      return foam.math.distance(this.x-other.x, this.y-other.y);
+      return this.distance(this.x-other.x, this.y-other.y);
     }
   ]
 });

@@ -340,6 +340,78 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'Counter',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'count',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      this.count[0]++;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'CounterStart',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      name: 'count',
+      final: true
+    },
+    {
+      name: 'next',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      this.count[0] = 0;
+      this.next.ps = this.ps;
+      return this.next;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'MinimumCount',
+  extends: 'foam.parse.compiled.State',
+  properties: [
+    {
+      class: 'Int',
+      name: 'minimum',
+      final: true
+    },
+    {
+      name: 'count',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      if ( this.count[0] < this.minimum ) {
+        this.fail.ps = this.ps;
+        return this.fail;
+      }
+      this.success.ps = this.ps;
+      return this.success;
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -803,31 +875,82 @@ foam.CLASS({
   name: 'Repeat',
   extends: 'foam.parse.ParserDecorator',
 
+  properties: [
+    {
+      class: 'foam.parse.ParserProperty',
+      name: 'delimiter'
+    },
+    {
+      class: 'Int',
+      name: 'minimum'
+    }
+  ],
+
   methods: [
     function compile(success, fail, withValue, grammar) {
-      var value = [];
-      var repeat = foam.parse.compiled.Placeholder.create();
+      var pSuccess = foam.parse.compiled.Placeholder.create();
+      var pFail = foam.parse.compiled.Placeholder.create();
+      var p = this.p.compile(pSuccess, pFail, withValue, grammar);
 
-      success = withValue ?
-        foam.parse.compiled.FinishValue.create({ value: value, next: success }) :
-        success;
+      if ( this.delimiter ) {
+        var delimSuccess = foam.parse.compiled.Placeholder.create();
+        var delimFail = foam.parse.compiled.Placeholder.create();
+        var delim = this.delimiter.compile(delimSuccess, delimFail, false, grammar);
+      } else {
+        delim = foam.parse.compiled.Placeholer.create({
+          next: delimSuccess
+        });
+      }
 
-      var p = this.p.compile(
-        withValue ?
-          foam.parse.compiled.AddValue.create({ value: value, next: repeat }) :
-          repeat,
-        success,
-        withValue,
-        grammar);
+      var start = p;
 
-      repeat.next = p;
+      if ( this.minimum > 0 ) {
+        var count = [];
 
-      return withValue ?
-        foam.parse.compiled.StartValue.create({
+        start = foam.parse.compiled.CounterStart.create({
+          count: count,
+          next: start
+        });
+
+        pSuccess.next = foam.parse.compiled.Counter.create({
+          count: count
+        });
+        pSuccess = pSuccess.next;
+
+        success = foam.parse.compiled.MinimumCount.create({
+          count: count,
+          minimum: this.minimum,
+          success: success,
+          fail: fail
+        });
+      }
+
+      if ( withValue ) {
+        var value = [];
+
+        pSuccess.next = foam.parse.compiled.AddValue.create({
+          value: value
+        });
+        pSuccess = pSuccess.next;
+
+        start = foam.parse.compiled.StartValue.create({
           value: value,
-          next: p
-        }) :
-        p;
+          next: start
+        });
+
+        success = foam.parse.compiled.FinishValue.create({
+          value: value,
+          next: success
+        });
+      }
+
+      pSuccess.next = delim;
+      delimSuccess.next = p;
+      delimFail.next = success;
+
+      pFail.next = success;
+
+      return start;
     },
     function parse(ps, obj) {
       var ret = [];
@@ -841,7 +964,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -931,27 +1053,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParserAxiom',
-  extends: 'Method',
-
-  properties: [
-    'parser'
-  ],
-
-  methods: [
-    function installInProto(proto) {
-      var parser = this.parser;
-      proto[this.name] = function(ps) {
-        return parser.parse(ps, this);
-      };
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.parse',
   name: 'Symbol',
@@ -968,13 +1069,13 @@ foam.CLASS({
       return grammar.getSymbol(this.name).compile(
         success, fail, withValue, grammar);
     },
-    function parse(ps, obj) {
-      var p = obj[this.name];
+    function parse(ps, grammar) {
+      var p = grammar.getSymbol(this.name);
       if ( ! p ) {
         console.error("No symbol found for", this.name);
         return undefined;
       }
-      return p.call(obj, ps);
+      return p.parse(ps, grammar);
     }
   ]
 });
@@ -993,9 +1094,11 @@ foam.CLASS({
       });
     },
 
-    function repeat0(p) {
+    function repeat0(p, delim, min) {
       return foam.lookup('foam.parse.Repeat0').create({
-        p: p
+        p: p,
+        minimum: min,
+        delimiter: delim
       });
     },
 
@@ -1024,9 +1127,11 @@ foam.CLASS({
       });
     },
 
-    function repeat(p) {
+    function repeat(p, delim, min) {
       return foam.lookup('foam.parse.Repeat').create({
-        p: p
+        p: p,
+        minimum: min,
+        delimiter: delim
       });
     },
 
@@ -1062,113 +1167,12 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParsersAxiom',
-  extends: 'AxiomArray',
-
-  requires: [
-    'foam.parse.Parsers'
-  ],
-
-  properties: [
-    [ 'of', 'foam.parse.ParserAxiom' ],
-    {
-      name: 'adapt',
-      value: function(_, o, prop) {
-        if ( Array.isArray(o) ) return o;
-
-        if ( typeof o === "function" ) {
-          var args = o.toString().match(/\((.*?)\)/);
-          if ( ! args ) {
-            throw "Could not parse arguments from parser factory function";
-          }
-
-          o = foam.Function.withArgs(o, prop.Parsers.create(), this);
-        }
-
-        var a = [];
-        for ( var key in o ) {
-          a.push(foam.lookup('foam.parse.ParserAxiom').create({
-            name: key,
-            parser: o[key]
-          }));
-        }
-        return a;
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParserAxioms',
-  refines: 'foam.core.Model',
-
-  properties: [
-    {
-      name: 'grammar',
-      class: 'foam.parse.ParsersAxiom'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParserAction',
-  extends: 'foam.core.Method',
-
-  methods: [
-    function installInProto(proto) {
-      var f      = this.code;
-      var name   = this.name;
-      var parser = proto[this.name];
-
-      if ( ! parser )
-        throw "No existing parser found for " + this.name;
-
-      proto[this.name] = function(ps, grammar) {
-        ps = parser.call(this, ps, grammar);
-        return ps ? ps.setValue(f.call(this, ps.value)) : null;
-      };
-    }
-  ]
-});
-
-
-/** Supports parser ParserActions */
-foam.CLASS({
-  package: 'foam.parse',
-  name: 'ParseAction',
-  refines: 'foam.core.Model',
-
-  properties: [
-    {
-      class: 'AxiomArray',
-      of: 'foam.parse.ParserAction',
-      name: 'grammarActions',
-      adaptArrayElement: function(o) {
-        if ( foam.lookup(this.of).isInstance(o) ) return o;
-        return foam.lookup(this.of).create({
-          name: o.name,
-          code: typeof o === 'function' ? o : o.code
-        });
-      }
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.parse',
   name: 'PSymbol',
 
   properties: [ 'name', 'parser' ]
 });
-
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1286,6 +1290,25 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'ImperativeGrammar',
+  extends: 'foam.parse.Grammar',
+  methods: [
+    function parseString(str, opt_name) {
+      opt_name = opt_name || 'START';
+
+      this.ps.setString(str);
+      var start = this.getSymbol(opt_name);
+      console.assert(start, "No symbol found for", opt_name);
+
+      var result = start.parse(this.ps, this);
+      return result && result.value;
+    }
+  ]
+});
+
 
 /*
 TODO:

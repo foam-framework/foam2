@@ -51,6 +51,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.LIB({
   name: 'foam.json',
 
