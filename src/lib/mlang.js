@@ -501,9 +501,9 @@ foam.CLASS({
 /** Map sink transforms each put with a given mapping expression. */
 foam.CLASS({
   package: 'foam.mlang.sink',
-  extends: 'foam.mlang.predicate.Unary',
+  extends: 'foam.dao.ProxySink',
   implements: [
-    'foam.dao.ProxySink',
+    'foam.mlang.predicate.Unary'
   ],
   name: 'Map',
 
