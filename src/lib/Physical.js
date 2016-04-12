@@ -54,13 +54,13 @@ foam.CLASS({
     },
 
     function momentumAtAngle(a) {
-      if ( this.mass == this.INFINITE_MASS ) return 0;
+      if ( this.mass === this.INFINITE_MASS ) return 0;
       var v = this.velocityAtAngle(a);
       return v * this.mass;
     },
 
     function velocityAtAngle(a) {
-      if ( this.mass == this.INFINITE_MASS ) return 0;
+      if ( this.mass === this.INFINITE_MASS ) return 0;
       return Math.cos(a-this.angleOfVelocity) * this.velocity;
     },
 
