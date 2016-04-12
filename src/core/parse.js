@@ -1068,7 +1068,12 @@ foam.CLASS({
         var last = ps;
         ps = p.parse(ps, obj);
         if ( ps ) ret.push(ps.value);
+        if ( this.delimiter && ps ) {
+          ps = this.delimiter.parse(ps, obj) || ps;
+        }
       }
+
+      if ( this.minimum > 0 && ret.length < this.minimum ) return undefined;
       return last.setValue(ret);
     }
   ]
