@@ -25,14 +25,14 @@ describe("MDAO benchmarks", function() {
 
     var DEBUG = false;
 
-    if ( DEBUG ) {
-      NUM_ALBUMS = 5;
-      NUM_PHOTOS = 25;
-      Function.prototype.put = function() {
-        console.log.apply(console, arguments);
-        this.apply(this, arguments);
-      };
-    }
+//     if ( DEBUG ) {
+//       NUM_ALBUMS = 5;
+//       NUM_PHOTOS = 25;
+//       Function.prototype.put = function() {
+//         console.log.apply(console, arguments);
+//         this.apply(this, arguments);
+//       };
+//     }
 
     function randomBoolean() { return Math.random() > 0.5; }
 
@@ -61,10 +61,10 @@ describe("MDAO benchmarks", function() {
       if ( ! promise.then ) {
         promise = promise();
       }
-      var fn = function() {
+      var fn = function(arg) {
         var endTime = Date.now();
         console.log("Time for ", name, ": ", endTime - startTime, "ms");
-        //return Promise.resolve();
+        return arg;
       };
       return promise.then(fn);
     }

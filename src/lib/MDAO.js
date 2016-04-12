@@ -510,7 +510,7 @@ var TreeIndex = {
           for ( var i = 0 ; i < subPlans.length ; i++ ) {
             pars.push(subPlans[i].execute(results[i], sink, skip, limit, order, predicate));
           }
-          return Promise.all(pars);
+          return Promise.all(pars).then(function() { return sink; });
         },
         toString: function() {
           return 'IN(key=' + prop.name + ', size=' + results.length + ')';
