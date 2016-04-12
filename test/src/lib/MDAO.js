@@ -208,13 +208,29 @@ describe("MDAO benchmarks", function() {
     function runPhotoBenchmarks() {
     aseq(
       atest('CreateTestAlbums' + NUM_ALBUMS, arepeat(NUM_ALBUMS, (function ( i) {
-        testData.albums[i].isLocal = !!testData.albums[i].isLocal;
-        albums.put(Album.create(testData.albums[i]));
+        albums.put(
+          Album.create({
+            id: i,
+            isLocal: i % 2,
+            byAction: 1 - (i % 2),
+            timestamp: new Date( ( Date.now() - 1000*60*60*24 * 300 ) + Math.random() * 1000*60*60*24 * 300),
+            jspb: [ 'nothing!' ],
+          })
+        );
         return Promise.resolve();
       }))),
       atest('CreateTestPhotos' + NUM_PHOTOS, arepeat(NUM_PHOTOS, (function ( i) {
-        testData.photos[i].isLocal = !!testData.photos[i].isLocal;
-        photos.put(Photo.create(testData.photos[i]));
+        photos.put(
+          Photo.create({
+            id: i,
+            timestamp: new Date( ( Date.now() - 1000*60*60*24 * 300 ) + Math.random() * 1000*60*60*24 * 300),
+            isLocal: i % 2,
+            byAction: 1 - (i % 2),
+            albumId: i % NUM_ALBUMS, // do we want to evenly distribute?
+            isCoverPhoto: ( i % 3 ) > 0,
+            jspb: [ 'nothing!' ],
+          })
+        );
         return Promise.resolve();
       }))),
       //new Promise( function(resolve, reject) { console.clear(); testData = undefined; resolve(); } ),
