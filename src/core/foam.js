@@ -57,7 +57,6 @@
   [
     "lib",
     "stdlib",
-    "math",
     "events",
     "Context",
     "Boot",

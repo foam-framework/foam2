@@ -463,7 +463,9 @@ foam.CLASS({
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
       if ( c.border    ) r += c.arcWidth/2-1;
-      return foam.math.distance(this.x-c.x, this.y-c.y) <= r;
+      var dx = this.x-c.x;
+      var dy = this.y-c.y;
+      return dx * dx + dy * dy <= r * r;
     }
   ]
 });
