@@ -64,31 +64,21 @@ foam.CLASS({
           this.engine.add(c);
           this.addChildren(c);
 
-          c.y$.sub(foam.Function.bind(function(c) {
+          this.timer.i$.sub(foam.Function.bind(function circleBoundOnWalls(c) {
             if ( c.y > 1/this.scaleY*this.height+50 ) {
               c.y = -50;
             }
-          }, this, c));
-
-          // Bounce on Walls
-          c.x$.sub(foam.Function.bind(function(c, w, h) {
             if ( c.x < 0          ) c.vx =  Math.abs(c.vx)+0.1;
             if ( c.x > this.width ) c.vx = -Math.abs(c.vx)-0.1;
           }, this, c));
         }
       }
 
-      var count = 0;
-      this.timer.i$.sub(function(s) {
-        this.invalidated.pub();
-        if ( count === 201 ) return;
-        count++;
-//        if ( count++ === 100 ) s.destroy();
-
+      for ( var i = 0 ; i < 201 ; i++ ) {
         var b = this.PhysicalCircle.create({
           radius: 3,
           x: this.width * Math.random(),
-          y: this.height/this.scaleY,
+          y: this.height + this.height * Math.random(),
           arcWidth: 1, // TODO
           border: 'blue',
           gravity: -0.2,
@@ -98,13 +88,15 @@ foam.CLASS({
         this.engine.add(b);
         this.addChildren(b);
 
-        b.y$.sub(foam.Function.bind(function() {
+        this.timer.i$.sub(foam.Function.bind(function bubbleWrap(b) {
           if ( b.y < 1 ) {
             b.y = this.height;
             b.x = this.width * Math.random();
           }
-        }, this));
-      }.bind(this));
+        }, this, b));
+      }
+
+      this.timer.i$.sub(this.invalidated.pub)
     }
   ]
 });
