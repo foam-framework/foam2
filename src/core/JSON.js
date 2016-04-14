@@ -60,7 +60,7 @@ foam.CLASS({
         o.out(',').nl().out(p.name, ':');
         o.output(this[p.name]);
       }
-      o.end('}');
+      o.nl().end('}');
     }
     */
   ]
@@ -254,7 +254,7 @@ foam.LIB({
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], this);
-            if ( i < o.length -1 ) this.out(',');
+            if ( i < o.length -1 ) this.out(',').nl();
           }
           this.end(']')
         },
