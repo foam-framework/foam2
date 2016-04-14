@@ -38,6 +38,33 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ]
 });
 
+
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'Multiton',
+
+  properties: [
+    {
+      name: 'property'
+    }
+  ],
+  
+  methods: [
+    function installInClass(cls) {
+      var instances;
+      var property = this.property;
+      var oldCreate = cls.create;
+      cls.create = function(args) {
+        var key = args[property.name];
+        return instances[key] || ( instances[key] = oldCreate.apply(this, arguments) );
+      }
+    },
+    function clone() { return this; },
+    function equals(other) { return other === this; }
+  ]
+});
+
+
 /** Causes an class to pool its instances. create() will pull from the pool,
  and destroy() will return instances to the pool. Object pools can be found
  in <code>foam.__objectPools__</code>. */
