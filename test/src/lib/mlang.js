@@ -15,12 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: Move this to node loading stage
-if ( typeof process == 'object' ) {
-  require('../../../src/lib/mlang');
-  require('es6-shim'); // TODO: if we don't need the entire shim, implement some set of polyfills
-}
-
 describe('MLang', function() {
   var dao;
   beforeEach(function() {

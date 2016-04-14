@@ -283,7 +283,8 @@ foam.LIB({
       // Store the destination class in the Axiom.  Used by describe().
       // Store source class on a clone of 'a' so that the Axiom can be
       // reused without corrupting the sourceCls_.
-      a = Object.create(a);
+      // Disabled: is causing dramatic performance slow-down.
+      // a = Object.create(a);
       a.sourceCls_ = this;
 
       this.axiomMap_[a.name] = a;
@@ -470,9 +471,8 @@ foam.CLASS({
     },
 
     function hasOwnPrivate_(name) {
-      return this.private_ &&
-        ( typeof this.private_[name] !== 'undefined' ||
-          this.private_.hasOwnProperty(name) );
+      return this.private_ && typeof this.private_[name] !== 'undefined';
+
     },
 
     function pubPropertyChange_() {
@@ -1123,22 +1123,8 @@ foam.CLASS({
       Creates a Slot for a property.
       @private
     */
-    // TODO: have this call toSlot() on Axiom, then not Property specific.
-    // This will enable imports to be used in expressions.
     function slot(name) {
-      var axiom = this.cls_.getAxiomByName(name);
-
- /*
-      console.assert(
-        axiom,
-        'Attempt to access slot() on unknown axiom: ',
-        name);
-      console.assert(axiom.toSlot,
-        'Attempt to access slot() on an Axiom without toSlot() support: ',
-         name);
-*/
-
-      return axiom.toSlot(this);
+      return this.cls_.getAxiomByName(name).toSlot(this);
     }
   ]
 });
