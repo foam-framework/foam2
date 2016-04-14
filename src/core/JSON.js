@@ -44,7 +44,7 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
         out(',', p.name, ':');
-        foam.json.output(out, this[p.name]);
+        foam.json.output(this[p.name], out);
       }
       out('}');
     }
@@ -65,29 +65,32 @@ foam.LIB({
       return out;
     },
 
-    function output(out, o) {
-      if ( o === undefined ) {
-        out('undefined');
-      } else if ( o === null ) {
-        out('null');
-      } else if ( typeof o === 'string' ) {
-        out('"', o, '"');
-      } else if ( typeof o === 'number' ) {
-        out(o);
-      } else if ( typeof o === 'boolean' ) {
-        out(o);
-      } else if ( Array.isArray(o) ) {
-        out('[');
-        for ( var i = 0 ; i < o.length ; i++ ) {
-          this.output(out, o[i]);
-          if ( i < o.length -1 ) out(',');
+    {
+      name: 'output',
+      code: foam.mmethod({
+        Undefined: function(o, out) { out('undefined'); },
+        Null:      function(o, out) { out('null'); },
+        String:    function(o, out) { out('"', o, '"'); },
+        Number:    function(o, out) { out(o); },
+        Boolean:   function(o, out) { out(o); },
+        Function:  function(o, out) { out(o); },
+        FObject:   function(o, out) { o.outputJSON(out); },
+        Array:     function(o, out) {
+          out('[');
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            this.output(o[i], out);
+            if ( i < o.length -1 ) out(',');
+          }
+          out(']');
+        },
+        Object:    function(o, out) {
+          if ( o.outputJSON ) {
+            o.outputJSON(out)
+          } else {
+            out('undefined');
+          }
         }
-        out(']');
-      } else if ( o.outputJSON ) {
-        o.outputJSON(out);
-      } else {
-        out('undefined');
-      }
+      })
     },
 
     function parse(json, opt_class) {
@@ -119,7 +122,7 @@ foam.LIB({
 
     function stringify(o, opt_options) {
       var out = this.createOut();
-      this.output(out, o);
+      this.output(o, out);
       return out.toString();
     }
   ]
