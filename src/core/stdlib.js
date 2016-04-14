@@ -477,6 +477,23 @@ foam.typeOf = (function() {
 })();
 
 
+foam.mmethod = function(map) {
+  var uid = '__mmethod__' + foam.next$UID() + '__';
+
+  for ( var key in map ) {
+    var type = foam[key];
+    type[uid] = map[key];
+  }
+
+  return function(arg1) {
+    var type = foam.typeOf(arg1);
+    console.assert(type, 'Unknown type: ', arg1);
+    console.assert(type[uid], 'Missing multi-method ', arg1, uid);
+    return type[uid].apply(this, arguments);
+  };
+};
+
+
 ( function() {
   var typeOf = foam.typeOf;
 
