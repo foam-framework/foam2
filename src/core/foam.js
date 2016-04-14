@@ -67,6 +67,7 @@
     "objects",
     "patterns",
     "types",
+    "../lib/async",
     "parse",
     "templates",
     "Action",
