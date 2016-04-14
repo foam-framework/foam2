@@ -49,7 +49,9 @@ foam.CLASS({
       out('}');
     }/*,
     function toJSON2() {
-      return foam.json.Outputer.create().out(this).toString();
+      var out = foam.json.Outputer.create();
+      out.output(this);
+      return out.toString();
     },
     function outputJSON2(o) {
       o.start('{');
@@ -57,12 +59,11 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
-        o.out(',').nl().out(p.name, ':');
+        o.out(',').nl().ind().out(p.name, ':');
         o.output(this[p.name]);
       }
       o.nl().end('}');
-    }
-    */
+    }*/
   ]
 });
 
@@ -144,8 +145,7 @@ foam.LIB({
 });
 
 
-
-foam.LIB({
+foam.CLASS({
   package: 'foam.json',
   name: 'Outputer',
 
@@ -214,15 +214,15 @@ foam.LIB({
     },
 
     function out() {
-      for ( var i = 0 ; i < arguments.length ; i++ ) buf_ += arguments[i];
+      for ( var i = 0 ; i < arguments.length ; i++ ) this.buf_ += arguments[i];
       return this;
     },
 
     function start(c) {
-      if ( c ) this.out(c);
+      if ( c ) this.out(c).nl();
       if ( this.indent ) {
         this.indentLevel++;
-        for ( var i = 0 ; i < this.indentLevel ; i++ ) this.out(this.indent);
+        this.ind();
       }
       return this;
     },
@@ -236,7 +236,14 @@ foam.LIB({
     },
 
     function nl() {
-      if ( this.nl && this.nl.length ) this.out(this.nl);
+      if ( this.newline && this.newline.length ) {
+        this.out(this.newline);
+      }
+      return this;
+    },
+
+    function ind() {
+      for ( var i = 0 ; i < this.indentLevel ; i++ ) this.out(this.indent);
       return this;
     },
 
@@ -259,8 +266,8 @@ foam.LIB({
           this.end(']')
         },
         Object:    function(o) {
-          if ( o.outputJSON ) {
-            o.outputJSON(this)
+          if ( o.outputJSON2 ) {
+            o.outputJSON2(this)
           } else {
             this.out('undefined');
           }
@@ -269,11 +276,11 @@ foam.LIB({
     },
 
     function stringify(o) {
-      this.reset().output(o, out).toString();
+      this.reset().output(o).toString();
     },
 
     function toString() {
-      return this.buf;
+      return this.buf_;
     }
   ]
 });
