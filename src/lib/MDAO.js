@@ -387,7 +387,7 @@ var TreeIndex = {
     }
 
     this.select(s[LEFT], sink, skip, limit, order, predicate);
-    this.tail.select(s[VALUE], sink, skip, limit, order, predicate); // FIX: limit is expected to be referenced across calls so it can be decremented
+    this.tail.select(s[VALUE], sink, skip, limit, order, predicate);
     this.select(s[RIGHT], sink, skip, limit, order, predicate);
   },
 
@@ -573,7 +573,7 @@ var TreeIndex = {
     if ( order ) {
       if ( order === prop ) {
         // sort not required
-      } else if ( foam.mlang.predicate.Desc && foam.mlang.predicate.Desc.isInstance(order) && order.arg1 === prop ) {
+      } else if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(order) && order.arg1 === prop ) {
         // reverse-sort, sort not required
         reverseSort = true;
       } else {
