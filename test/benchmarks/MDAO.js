@@ -229,8 +229,8 @@ describe("MDAO benchmarks", function() {
         albums.put(
           Album.create({
             id: ""+i,
-            isLocal: i % 2,
-            byAction: 1 - (i % 2),
+            isLocal: !! ( i % 2 ),
+            byAction: !! ( 1 - (i % 2) ),
             timestamp: new Date( ( Date.now() - 1000*60*60*24 * 300 ) + Math.random() * 1000*60*60*24 * 300),
             jspb: [ 'nothing!' ],
           })
@@ -241,8 +241,8 @@ describe("MDAO benchmarks", function() {
           Photo.create({
             id: ""+i,
             timestamp: new Date( ( Date.now() - 1000*60*60*24 * 300 ) + Math.random() * 1000*60*60*24 * 300),
-            isLocal: i % 2,
-            byAction: 1 - (i % 2),
+            isLocal: !! ( i % 2 ),
+            byAction: !! ( 1 - (i % 2) ),
             albumId: i % NUM_ALBUMS, // do we want to evenly distribute?
             isCoverPhoto: ( i % 3 ) > 0,
             jspb: [ 'nothing!' ],
@@ -250,7 +250,7 @@ describe("MDAO benchmarks", function() {
         );
       })),
       //new Promise( function(resolve, reject) { console.clear(); testData = undefined; resolve(); } ),
-      arepeat(DEBUG ? 1 : 7,
+      arepeat(DEBUG ? 1 : 3,
         aseq(
           alog('Benchmark...'),
           atest('1aCreateAlbums' + NUM_ALBUMS, arepeatpar(NUM_ALBUMS, function ( i) {
@@ -262,11 +262,14 @@ describe("MDAO benchmarks", function() {
           })),
           asleep(2000),
           atest('2aSelectAllAlbumsQuery', function() {
-            return AlbumDAO.select(); } ),
+            return AlbumDAO.select();
+          }),
           atest('2aSelectAllPhotosQuery', function() {
-            return PhotoDAO.select(); } ),
+            return PhotoDAO.select();
+          }),
           atest('2bSingleKeyQuery',       function() {
-            return PhotoDAO.find(avgKey); } ),
+            return PhotoDAO.find(avgKey);
+          }),
           atest('2bSingleKeyQuery(X10)',
             arepeat(10, function() {
               return PhotoDAO.find(avgKey);
@@ -303,12 +306,16 @@ describe("MDAO benchmarks", function() {
               M.MAP(Photo.HASH, foam.dao.ArraySink.create())
             );
           })),
-//           atest('2fSimpleInnerJoinQuery',  function() {
-//             return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID))(function (ids) {
-//               return PhotoDAO.where(M.IN(Photo.ALBUM_ID, ids.arg2)).select();
-//           })}),
+          atest('2fSimpleInnerJoinQuery',  function() {
+            var idsink = foam.dao.ArraySink.create();
+            return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID, idsink)).then(function (idsmapsink) {
+              return PhotoDAO.where(M.IN(Photo.ALBUM_ID, idsink.a)).select(foam.mlang.sink.Count.create()).then(function(csink) {
+                return csink.value;
+              });
+            })
+          }),
         //  atest('2fSimpleInnerJoinQuery(Simpler+Slower Version)', new Promise( function() {
-        //    AlbumDAO.where(M.EQ(Album.IS_LOCAL, true)).select(M.MAP(JOM.IN(PhotoDAO, Photo.ALBUM_ID, []), []))(ret);
+        //    AlbumDAO.where(M.EQ(Album.IS_LOCAL, true)).select(M.MAP(JOIN(PhotoDAO, Photo.ALBUM_ID, []), []))(ret);
         //  }),
       //     atest('2gSimpleInnerJoinAggregationQuery', new Promise( function() {
       //       AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID))(function (ids) {
@@ -316,7 +323,7 @@ describe("MDAO benchmarks", function() {
       //     })}),
         //  atest('2gSimpleInnerJoinAggregationQuery(Simpler+Slower Version', new Promise( function() {
         //    AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(
-        //        M.MAP(JOM.IN(PhotoDAO, Photo.ALBUM_ID, SUM_PHOTO_COUNT), []))(ret);
+        //        M.MAP(JOIN(PhotoDAO, Photo.ALBUM_ID, SUM_PHOTO_COUNT), []))(ret);
         //  }),
           atest('2hSimpleOrderByQuery', function() {
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(M.DESC(Photo.TIMESTAMP)).select();
