@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/**
+  A Singleton Axiom, when added to a Class, makes it implement
+  the Singleton Pattern, meaning that all calls to create()
+  will return the same (single) instance.
+*/
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
@@ -39,12 +44,20 @@ foam.CLASS({
 });
 
 
+/**
+  A Multiton Axiom, when added to a Class, makes it implement
+  the Multiton Pattern, meaning that calls to create() with
+  the same value for the specified 'property', will return the
+  same instance.
+*/
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Multiton',
 
   properties: [
     {
+      // TODO: swith to 'properties' and add support
+      // for compound keys.
       name: 'property'
     }
   ],
