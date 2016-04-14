@@ -47,7 +47,22 @@ foam.CLASS({
         foam.json.output(this[p.name], out);
       }
       out('}');
+    }/*,
+    function toJSON2() {
+      return foam.json.Outputer.create().out(this).toString();
+    },
+    function outputJSON2(o) {
+      o.start('{');
+      o.out('class:"', this.cls_.id, '"');
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        var p = ps[i];
+        o.out(',').nl().out(p.name, ':');
+        o.output(this[p.name]);
+      }
+      o.end('}');
     }
+    */
   ]
 });
 
@@ -124,6 +139,141 @@ foam.LIB({
       var out = this.createOut();
       this.output(o, out);
       return out.toString();
+    }
+  ]
+});
+
+
+
+foam.LIB({
+  package: 'foam.json',
+  name: 'Outputer',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'buf_',
+      value: ''
+    },
+    {
+      class: 'String',
+      name: 'indent',
+      value: '  '
+    },
+    {
+      class: 'Int',
+      name: 'indentLevel',
+      value: 0
+    },
+    {
+      class: 'String',
+      name: 'newline',
+      value: '\n'
+    },
+    {
+      class: 'Boolean',
+      name: 'pretty',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'alwaysQuoteKeys',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'outputDefaultValues',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'outputTransientProperties',
+      value: false
+    },
+    /*
+    {
+      class: 'Boolean',
+      name: 'useShortNames',
+      value: false
+    },
+    */
+    /*
+    {
+      class: 'Boolean',
+      name: 'functionFormat',
+      value: false
+    },
+    */
+  ],
+
+  methods: [
+    function reset() {
+      this.indentLevel = 0;
+      this.buf_ = '';
+      return this;
+    },
+
+    function out() {
+      for ( var i = 0 ; i < arguments.length ; i++ ) buf_ += arguments[i];
+      return this;
+    },
+
+    function start(c) {
+      if ( c ) this.out(c);
+      if ( this.indent ) {
+        this.indentLevel++;
+        for ( var i = 0 ; i < this.indentLevel ; i++ ) this.out(this.indent);
+      }
+      return this;
+    },
+
+    function end(c) {
+      if ( c ) this.out(c);
+      if ( this.indent ) {
+        this.indentLevel--;
+      }
+      return this.nl();
+    },
+
+    function nl() {
+      if ( this.nl && this.nl.length ) this.out(this.nl);
+      return this;
+    },
+
+    {
+      name: 'output',
+      code: foam.mmethod({
+        Undefined: function(o) { this.out('undefined'); },
+        Null:      function(o) { this.out('null'); },
+        String:    function(o) { this.out('"', o, '"'); },
+        Number:    function(o) { this.out(o); },
+        Boolean:   function(o) { this.out(o); },
+        Function:  function(o) { this.out(o); },
+        FObject:   function(o) { o.outputJSON2(this); },
+        Array:     function(o) {
+          this.start('[');
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            this.output(o[i], this);
+            if ( i < o.length -1 ) this.out(',');
+          }
+          this.end(']')
+        },
+        Object:    function(o) {
+          if ( o.outputJSON ) {
+            o.outputJSON(this)
+          } else {
+            this.out('undefined');
+          }
+        }
+      })
+    },
+
+    function stringify(o) {
+      this.reset().output(o, out).toString();
+    },
+
+    function toString() {
+      return this.buf;
     }
   ]
 });
