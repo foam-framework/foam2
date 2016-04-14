@@ -55,11 +55,11 @@ foam.CLASS({
     },
     function outputJSON2(o) {
       o.start('{');
-      o.out('class:"', this.cls_.id, '"');
+      o.out(o.escapeKey('class'), ':"', this.cls_.id, '"');
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
-        o.out(',').nl().ind().out(p.name, ':');
+        o.out(',').nl().ind().out(o.escapeKey(p.name), ':');
         o.output(this[p.name]);
       }
       o.nl().end('}');
@@ -212,6 +212,26 @@ foam.CLASS({
       this.buf_ = '';
       return this;
     },
+    
+    function escape(str) {
+      return str
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/[\x00-\x1f]/g, function(c) {
+          return "\\u00" + ((c.charCodeAt(0) < 0x10) ?
+                            '0' + c.charCodeAt(0).toString(16) :
+                            c.charCodeAt(0).toString(16));
+        });
+    },
+
+    {
+      name: 'escapeKey',
+      code: foam.Function.memoize1(function(str) {
+        return /^[a-zA-Z\$_][0-9a-zA-Z$_]*$/.test(str) ?
+          str :
+          '"' + str + '"';
+      })
+    },
 
     function out() {
       for ( var i = 0 ; i < arguments.length ; i++ ) this.buf_ += arguments[i];
@@ -252,7 +272,7 @@ foam.CLASS({
       code: foam.mmethod({
         Undefined: function(o) { this.out('undefined'); },
         Null:      function(o) { this.out('null'); },
-        String:    function(o) { this.out('"', o, '"'); },
+        String:    function(o) { this.out('"', this.escape(o), '"'); },
         Number:    function(o) { this.out(o); },
         Boolean:   function(o) { this.out(o); },
         Function:  function(o) { this.out(o); },
