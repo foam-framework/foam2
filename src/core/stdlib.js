@@ -488,7 +488,7 @@ foam.mmethod = function(map) {
   return function(arg1) {
     var type = foam.typeOf(arg1);
     console.assert(type, 'Unknown type: ', arg1);
-    console.assert(type[uid], 'Missing multi-method ', arg1, uid);
+    console.assert(type[uid], 'Missing multi-method for type ', arg1, ' map: ', map);
     return type[uid].apply(this, arguments);
   };
 };
