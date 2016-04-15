@@ -1253,13 +1253,16 @@ foam.CLASS({
     },
 
     function findObj_(key) {
-      var obj = this.map[key];
-      // var obj = this.index.get(this.root, key);
-      if ( obj ) {
-        resolve(obj)
-      } else {
-        reject(this.InternalException.create({ id: key })); // TODO: err
-      }
+      var self = this;
+      return new Promise(function(resolve, reject) {
+        var obj = self.map[key];
+        // var obj = this.index.get(this.root, key);
+        if ( obj ) {
+          resolve(obj);
+        } else {
+          reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
+        }        
+      });
     },
 
     function find(key) {
@@ -1268,26 +1271,27 @@ foam.CLASS({
         reject(self.InternalException.create({ id: key })); // TODO: err
         return;
       }
-      // TODO: How to handle multi value primary keys?
       var foundObj = null;
-      return new Promise(function(resolve, reject) {
-        self.where(self.Eq.create({ arg1: self.of.getAxiomByName(
-            ( self.of.ids && self.of.ids[0] ) || 'id' ), arg2: key })
-          ).limit(1).select({
-          put: function(obj) {
-            foundObj = obj;
-            resolve(obj);
-          },
-          eof: function() {
-            if ( ! foundObj ) {
-              reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
-            }
-          },
-          error: function(e) {
-            reject(self.InternalException.create({ id: key })); // TODO: err
-          }
-        });
-      });
+      return this.findObj_(key);
+      // TODO: How to handle multi value primary keys?
+      // return new Promise(function(resolve, reject) {
+//         self.where(self.Eq.create({ arg1: self.of.getAxiomByName(
+//             ( self.of.ids && self.of.ids[0] ) || 'id' ), arg2: key })
+//           ).limit(1).select({
+//           put: function(obj) {
+//             foundObj = obj;
+//             resolve(obj);
+//           },
+//           eof: function() {
+//             if ( ! foundObj ) {
+//               reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
+//             }
+//           },
+//           error: function(e) {
+//             reject(self.InternalException.create({ id: key })); // TODO: err
+//           }
+//         });
+//       });
     },
 
     function remove(obj) {
