@@ -612,4 +612,67 @@ describe('MLang', function() {
           'IN(name, Jimi Hendrix,Mark Knopfler)');
     });
   });
+
+  describe('MAP()', function() {
+    var MAP;
+    beforeEach(function() {
+      var expr = foam.mlang.Expressions.create();
+      MAP = expr.MAP.bind(expr);
+    });
+
+    it('accepts properties', function(done) {
+      dao.select(
+        MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create())
+      ).then(function(sink) {
+        var a = sink.delegate.a;
+        expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
+        expect(a[0]).toEqual('Jimi Hendrix');
+        expect(a[1]).toEqual('Carlos Santana');
+        done();
+      },
+      function(err) {
+        throw err;
+        done();
+      });
+    });
+
+    it('accepts functions', function(done) {
+      dao.select(
+        MAP(function(o) {
+          return o.name;
+        }, foam.dao.ArraySink.create())
+      ).then(function(sink) {
+        var a = sink.delegate.a;
+        expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
+        expect(a[0]).toEqual('Jimi Hendrix');
+        expect(a[1]).toEqual('Carlos Santana');
+        done();
+      },
+      function(err) {
+        throw err;
+        done();
+      });
+    });
+
+    it('accepts constants', function(done) {
+      dao.select(
+        MAP(55, foam.dao.ArraySink.create())
+      ).then(function(sink) {
+        var a = sink.delegate.a;
+        expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
+        expect(a[0]).toEqual(55);
+        expect(a[1]).toEqual(55);
+        done();
+      },
+      function(err) {
+        throw err;
+        done();
+      });
+    });
+
+    it('toString()s nicely', function() {
+      expect(MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create()).toString()).toBe(
+          'MAP(name)');
+    });
+  });
 });

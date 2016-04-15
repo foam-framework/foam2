@@ -53,6 +53,7 @@ foam.CLASS({
     {
       name: 'adaptArrayElement',
       value: function(o) {
+        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( Array.isArray(o) ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
@@ -73,6 +74,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
+        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
         return o;
@@ -80,7 +82,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 /**
  * Base class for all mLang queries.
@@ -121,6 +122,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 
 /** Singleton for the value "true". */
@@ -364,6 +366,25 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'Func',
+  extends: 'foam.mlang.predicate.Expr',
+
+  properties: [
+    {
+      /** The function to apply to objects passed to this expression */
+      name: 'fn'
+    }
+  ],
+
+  methods: [
+    function f(o) { return this.fn(o); },
+    function toString() {
+      return 'FUNC(' + fn.toString() + ')';
+    }
+  ]
+});
 
 /** Binary expression for equality of two arguments. */
 foam.CLASS({
@@ -477,6 +498,24 @@ foam.CLASS({
   ]
 });
 
+/** Map sink transforms each put with a given mapping expression. */
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  extends: 'foam.dao.ProxySink',
+  implements: [
+    'foam.mlang.predicate.Unary'
+  ],
+  name: 'Map',
+
+  methods: [
+    function f(o) {
+      return this.arg1.f(o);
+    },
+    function put(o) {
+      this.delegate.put( this.f(o) );
+    },
+  ]
+});
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -498,6 +537,7 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
+    'foam.mlang.sink.Map',
   ],
 
   methods: [
@@ -522,7 +562,9 @@ foam.CLASS({
     function LTE(a, b) { return this._binary_("Lte", a, b); },
     function GTE(a, b) { return this._binary_("Gte", a, b); },
     function HAS(a) { return this._unary_("Has", a); },
-    function NOT(a) { return this._unary_("Not", a); }
+    function NOT(a) { return this._unary_("Not", a); },
+
+    function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
   ]
 });
 
