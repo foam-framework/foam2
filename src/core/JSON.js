@@ -234,8 +234,13 @@ foam.CLASS({
       return this;
     },
 
+    function outputPropertyName(p) {
+      this.out(this.escapeKey(this.useShortNames && p.shortName ? p.shortName : p.name));
+      return this;
+    },
+
     function outputProperty(o, p) {
-      this.out(',').nl().ind().out(this.escapeKey(p.name), ':', this.postColonStr);
+      this.out(',').nl().ind().outputPropertyName(p).out(':', this.postColonStr);
       this.output(o[p.name]);
     },
 
