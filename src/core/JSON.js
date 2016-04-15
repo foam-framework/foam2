@@ -32,38 +32,21 @@
 */
 
 foam.CLASS({
+  refines: 'foam.core.Property',
+
+  properties: [
+    { class: 'String', name: 'shortName' }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.FObject',
 
   methods: [
     function toJSON() {
-      return foam.json.stringify(this);
-    },
-    function outputJSON(out, opt_options) {
-      out('{class:"', this.cls_.id, '"');
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        out(',', p.name, ':');
-        foam.json.output(this[p.name], out);
-      }
-      out('}');
-    }/*,
-    function toJSON2() {
-      var out = foam.json.Outputer.create();
-      out.output(this);
-      return out.toString();
-    },
-    function outputJSON2(o) {
-      o.start('{');
-      o.out(o.escapeKey('class'), ':"', this.cls_.id, '"');
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        o.out(',').nl().ind().out(o.escapeKey(p.name), ':');
-        o.output(this[p.name]);
-      }
-      o.nl().end('}');
-    }*/
+      return foam.json.Outputer.create({nlStr:null, postColonStr:null, indentStr:null}).stringify(this);
+    }
   ]
 });
 
@@ -72,43 +55,6 @@ foam.LIB({
   name: 'foam.json',
 
   methods: [
-    function createOut() {
-      var buf = '';
-      function out() {
-        for ( var i = 0 ; i < arguments.length ; i++ ) buf += arguments[i];
-      }
-      out.toString = function() { return buf; };
-      return out;
-    },
-
-    {
-      name: 'output',
-      code: foam.mmethod({
-        Undefined: function(o, out) { out('undefined'); },
-        Null:      function(o, out) { out('null'); },
-        String:    function(o, out) { out('"', o, '"'); },
-        Number:    function(o, out) { out(o); },
-        Boolean:   function(o, out) { out(o); },
-        Function:  function(o, out) { out(o); },
-        FObject:   function(o, out) { o.outputJSON(out); },
-        Array:     function(o, out) {
-          out('[');
-          for ( var i = 0 ; i < o.length ; i++ ) {
-            this.output(o[i], out);
-            if ( i < o.length -1 ) out(',');
-          }
-          out(']');
-        },
-        Object:    function(o, out) {
-          if ( o.outputJSON ) {
-            o.outputJSON(out)
-          } else {
-            out('undefined');
-          }
-        }
-      })
-    },
-
     function parse(json, opt_class) {
       // recurse into sub-objects
       for ( var key in json ) {
@@ -136,10 +82,8 @@ foam.LIB({
       return eval('(' + jsonStr + ')');
     },
 
-    function stringify(o, opt_options) {
-      var out = this.createOut();
-      this.output(o, out);
-      return out.toString();
+    function stringify(o) {
+      return foam.json.Outputer.create({nlStr:null, postColonStr:null, indentStr:null}).stringify(o);
     }
   ]
 });
@@ -156,19 +100,24 @@ foam.CLASS({
       value: ''
     },
     {
-      class: 'String',
-      name: 'indent',
-      value: '  '
-    },
-    {
       class: 'Int',
-      name: 'indentLevel',
+      name: 'indentLevel_',
       value: 0
     },
     {
       class: 'String',
-      name: 'newline',
+      name: 'indentStr',
+      value: '  '
+    },
+    {
+      class: 'String',
+      name: 'nlStr',
       value: '\n'
+    },
+    {
+      class: 'String',
+      name: 'postColonStr',
+      value: ' '
     },
     {
       class: 'Boolean',
@@ -190,6 +139,11 @@ foam.CLASS({
       name: 'outputTransientProperties',
       value: false
     },
+    {
+      class: 'Function',
+      name: 'propertyPredicate',
+      value: function(o, p) { return true; }
+    },
     /*
     {
       class: 'Boolean',
@@ -208,11 +162,11 @@ foam.CLASS({
 
   methods: [
     function reset() {
-      this.indentLevel = 0;
+      this.indentLevel_ = 0;
       this.buf_ = '';
       return this;
     },
-    
+
     function escape(str) {
       return str
         .replace(/\\/g, '\\\\')
@@ -240,8 +194,8 @@ foam.CLASS({
 
     function start(c) {
       if ( c ) this.out(c).nl();
-      if ( this.indent ) {
-        this.indentLevel++;
+      if ( this.indentStr ) {
+        this.indentLevel_++;
         this.ind();
       }
       return this;
@@ -250,21 +204,26 @@ foam.CLASS({
     function end(c) {
       if ( c ) this.out(c);
       if ( this.indent ) {
-        this.indentLevel--;
+        this.indentLevel_--;
       }
       return this.nl();
     },
 
     function nl() {
-      if ( this.newline && this.newline.length ) {
-        this.out(this.newline);
+      if ( this.nlStr && this.nlStr.length ) {
+        this.out(this.nlStr);
       }
       return this;
     },
 
     function ind() {
-      for ( var i = 0 ; i < this.indentLevel ; i++ ) this.out(this.indent);
+      for ( var i = 0 ; i < this.indentLevel_ ; i++ ) this.out(this.indentStr);
       return this;
+    },
+
+    function outputProperty(o, p) {
+      this.out(',').nl().ind().out(this.escapeKey(p.name), ':', this.postColonStr);
+      this.output(o[p.name]);
     },
 
     {
@@ -276,7 +235,17 @@ foam.CLASS({
         Number:    function(o) { this.out(o); },
         Boolean:   function(o) { this.out(o); },
         Function:  function(o) { this.out(o); },
-        FObject:   function(o) { o.outputJSON2(this); },
+        FObject:   function(o) {
+          this.start('{');
+          this.out(this.escapeKey('class'), ':', this.postColonStr, '"', o.cls_.id, '"');
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            if ( this.propertyPredicate(o, ps[i]) ) {
+              this.outputProperty(o, ps[i]);
+            }
+          }
+          this.nl().end('}');
+        },
         Array:     function(o) {
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
@@ -296,11 +265,12 @@ foam.CLASS({
     },
 
     function stringify(o) {
-      this.reset().output(o).toString();
+      this.output(o);
+      var ret = this.toString();
+      this.reset(); // reset to avoid retaining garbage
+      return ret;
     },
 
-    function toString() {
-      return this.buf_;
-    }
+    function toString() { return this.buf_; }
   ]
 });
