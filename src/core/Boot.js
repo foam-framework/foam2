@@ -1971,8 +1971,6 @@ foam.CLASS({
        */
       if ( this.destroyed ) return;
 
-      this.destroyed = true;
-
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
@@ -1984,6 +1982,8 @@ foam.CLASS({
           }
         }
       }
+
+      this.destroyed = true;
 
       this.instance_ = null;
       this.private_ = null;
