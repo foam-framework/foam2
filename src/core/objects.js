@@ -16,6 +16,32 @@
  */
 
 foam.CLASS({
+
+  refines: 'foam.core.Property',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'transient'
+    },
+    {
+      class: 'Boolean',
+      name: 'networkTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'storageTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.FObject',
 
   documentation: 'Add utility methods to FObject.',
