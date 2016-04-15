@@ -25,6 +25,7 @@
 //   - allow for custom Property JSON support
 //   - compact output
 //   - reading shortNames
+//   - date support
 */
 
 /**
@@ -257,12 +258,10 @@ foam.CLASS({
 
     function stringify(o) {
       this.output(o);
-      var ret = this.toString();
+      var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
-    },
-
-    function toString() { return this.buf_; }
+    }
   ]
 });
 
