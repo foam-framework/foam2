@@ -148,19 +148,19 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'Boolean',
-      name: 'outputTransientProperties',
-      value: false
-    },
-    {
       class: 'Function',
       name: 'propertyPredicate',
       value: function(o, p) { return true; }
     },
-    /*
     {
       class: 'Boolean',
       name: 'useShortNames',
+      value: false
+    }
+    /*
+    {
+      class: 'Boolean',
+      name: 'outputTransientProperties',
       value: false
     },
     */
@@ -234,14 +234,25 @@ foam.CLASS({
       return this;
     },
 
+    function isDefaultValue(o, p) {
+      if ( typeof p.value === 'undefined' ) return false;
+      return ( ! o.hasOwnProperty(p.name) ) || foam.util.compare(p.value, p.get(o));
+    },
+
     function outputPropertyName(p) {
       this.out(this.escapeKey(this.useShortNames && p.shortName ? p.shortName : p.name));
       return this;
     },
 
     function outputProperty(o, p) {
+      if ( ! this.propertyPredicate(o, p ) ) return;
+      if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) return;
+
+      var v = o[p.name];
+      if ( Array.isArray(v) && ! v.length ) return;
+
       this.out(',').nl().ind().outputPropertyName(p).out(':', this.postColonStr);
-      this.output(o[p.name]);
+      this.output(v);
     },
 
     {
@@ -255,12 +266,16 @@ foam.CLASS({
         Function:  function(o) { this.out(o); },
         FObject:   function(o) {
           this.start('{');
-          this.out(this.escapeKey('class'), ':', this.postColonStr, '"', o.cls_.id, '"');
+          this.out(
+              this.escapeKey('class'),
+              ':',
+              this.postColonStr,
+              '"',
+              o.cls_.id,
+              '"');
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            if ( this.propertyPredicate(o, ps[i]) ) {
-              this.outputProperty(o, ps[i]);
-            }
+            this.outputProperty(o, ps[i]);
           }
           this.nl().end('}');
         },
