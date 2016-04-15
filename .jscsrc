@@ -10,6 +10,10 @@
     "switch",
     "try"
   ],
+  validateQuoteMarks: {
+    mark: "'",
+    escape: true
+  },
 
   "foamExplodedStatements": true,
   "foamRequireCurlyBraces": true,
