@@ -77,12 +77,12 @@ foam.CLASS({
   label: 'Decimal numbers',
 
   properties: [
-    {
-      name: 'adapt',
-      value: function (_, v) {
+    [
+      'adapt',
+      function (_, v) {
         return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
       }
-    }
+    ]
   ]
 });
 
@@ -96,13 +96,13 @@ foam.CLASS({
   label: 'Code that can be run',
 
   properties: [
-    {
-      name: 'value',
-      value: function() {}
-    },
-    {
-      name: 'adapt',
-      value: function(_, value) {
+    [
+      'value',
+      function() {}
+    ],
+    [
+      'adapt',
+      function(_, value) {
         if ( typeof value === 'string' ) {
           var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
           body = ( body && body[1] ) ? body[1] : value;
@@ -110,7 +110,7 @@ foam.CLASS({
         }
         return value;
       }
-    }
+    ]
   ]
 });
 
@@ -122,9 +122,6 @@ foam.CLASS({
 
   // documentation: 'A chunk of binary data.',
   label: 'Binary data',
-
-  properties: [
-  ]
 });
 
 
@@ -166,24 +163,24 @@ foam.CLASS({
       value: 'String',
       // documentation: 'The FOAM sub-type of this property.'
     },
-    {
-      name: 'adapt',
-      value: function(_, v, prop) {
+    [
+      'adapt',
+      function(_, v, prop) {
         return Array.isArray(v) ? v :
           ( typeof v === 'string' ) ? prop.fromString(v) :
           ((v || v === 0) ? [v] : []);
       }
-    },
-    {
-      name: 'factory',
-      value: function() { return []; }
-    },
-    {
-      name: 'fromString',
-      value: function(s) {
+    ],
+    [
+      'factory',
+      function() { return []; }
+    ],
+    [
+      'fromString',
+      function(s) {
         return s.split(',');
       }
-    }
+    ]
   ]
 });
 
@@ -236,10 +233,7 @@ foam.CLASS({
   extends: 'Reference',
 
   properties: [
-    {
-      name: 'factory',
-      value: function() { return []; }
-    }
+    [ 'factory', function() { return []; } ]
   ]
 });
 
@@ -365,9 +359,7 @@ foam.CLASS({
         return className.substring(className.lastIndexOf('.') + 1);
       }
     },
-    {
-      name: 'className'
-    }
+    'className'
   ]
 });
 
@@ -399,19 +391,11 @@ foam.CLASS({
         };
       }
     },
-    {
-      name: 'postSet',
-      value: function(o, s) {
-        if ( s.onEnter ) s.onEnter.call(this, o);
-      }
-    },
-    {
-      name: 'preSet',
-      value: function(o, s) {
-        if ( o && o.onLeave ) o.onLeave.call(this, s);
-        return s;
-      }
-    },
+    [ 'postSet', function(o, s) { if ( s.onEnter ) s.onEnter.call(this, o); } ],
+    [ 'preSet', function(o, s) {
+      if ( o && o.onLeave ) o.onLeave.call(this, s);
+      return s;
+    }],
     {
       name: 'delegates',
       expression: function(of) {

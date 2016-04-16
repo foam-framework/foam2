@@ -57,7 +57,7 @@ foam.CLASS({
       class: 'Int',
       name:  'time',
       help:  'The current time in milliseconds since epoch.',
-      preSet: function(_, t) { return Math.ceil(t); },
+      adapt: function(_, t) { return Math.ceil(t); },
       value: 0
     },
     {

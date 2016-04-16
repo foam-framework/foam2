@@ -24,7 +24,7 @@ foam = {
   next$UID: (function() {
     /* Return a unique id. */
     var id = 1;
-    return function next$UID() { return id++; }
+    return function next$UID() { return id++; };
   })()
 };
 
@@ -47,7 +47,6 @@ Object.defineProperty(
     enumerable: false
   }
 );
-
 
 /**
  * Creates a small library in the foam package. A LIB is a collection of
@@ -72,8 +71,9 @@ foam.network.sendPacket();
 foam.LIB = function LIB(model) {
   var root = global;
   var path = model.name.split('.');
+  var i;
 
-  for ( var i = 0 ; i < path.length ; i++ ) {
+  for ( i = 0 ; i < path.length ; i++ ) {
     root = root[path[i]] || ( root[path[i]] = {} );
   }
 
@@ -88,7 +88,7 @@ foam.LIB = function LIB(model) {
   if ( model.methods ) {
     console.assert(Array.isArray(model.methods), 'Methods must be an array.');
 
-    for ( var i = 0 ; i < model.methods.length ; i++ ) {
+    for ( i = 0 ; i < model.methods.length ; i++ ) {
       var m = model.methods[i];
 
       console.assert(

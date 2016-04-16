@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.graphics',
-  name: 'Matrix',
+  name: 'Transform',
 
   properties: [
     {
@@ -65,28 +65,28 @@ foam.CLASS({
       this.g = 0; this.h = 0; this.i = 1;
     },
 
-    function mul(m) {
-      var a = this.a, b = this.b, c = this.c,
-          d = this.d, e = this.e, f = this.f,
-          g = this.g, h = this.h, i = this.i;
+    function mul(a, b, c, d, e, f, g, h, i) {
+      var ta = this.a, tb = this.b, tc = this.c,
+          td = this.d, te = this.e, tf = this.f,
+          tg = this.g, th = this.h, ti = this.i;
 
-      var ma = m.a, mb = m.b, mc = m.c,
-          md = m.d, me = m.e, mf = m.f,
-          mg = m.g, mh = m.h, mi = m.i;
+      this.a = ta * a + tb * d + tc * g;
+      this.b = ta * b + tb * e + tc * h;
+      this.c = ta * c + tb * f + tc * i;
 
-      this.a = a * ma + b * md + c * mg;
-      this.b = a * mb + b * me + c * mh;
-      this.c = a * mc + b * mf + c * mi;
+      this.d = td * a + te * d + tf * g;
+      this.e = td * b + te * e + tf * h;
+      this.f = td * c + te * f + tf * i;
 
-      this.d = d * ma + e * md + f * mg;
-      this.e = d * mb + e * me + f * mh;
-      this.f = d * mc + e * mf + f * mi;
-
-      this.g = g * ma + h * md + i * mg;
-      this.h = g * mb + h * me + i * mh;
-      this.i = g * mc + h * mf + i * mi;
+      this.g = tg * a + th * d + ti * g;
+      this.h = tg * b + th * e + ti * h;
+      this.i = tg * c + th * f + ti * i;
 
       return this;
+    },
+
+    function affine(m) {
+      return this.mul(m.a, m.b, m.c, m.d, m.e, m.f, m.g, m.h, m.i);
     },
 
     function invert() {
@@ -105,80 +105,31 @@ foam.CLASS({
       this.f = this.h;
       this.h = tmp;
       return this;
-    }
-  ]
-});
-
-
-// TODO: Perhaps these methods should be moved to matrix.
-foam.CLASS({
-  package: 'foam.graphics',
-  name: 'Transform',
-
-  requires: [
-    'foam.graphics.Matrix'
-  ],
-
-  properties: [
-    {
-      name: 'matrix',
-      factory: function() {
-        return this.Matrix.create();
-      },
     },
-    {
-      name: 'm2',
-      factory: function() {
-        return this.Matrix.create();
-      }
-    }
-  ],
 
-  methods: [
     function reset() {
-      this.matrix.initArgs();
-      return this;
-    },
-
-    function affine(m) {
-      this.matrix.mul(m);
+      this.initArgs();
       return this;
     },
 
     function translate(dx, dy) {
       if ( ! dx && ! dy ) return;
-      var m = this.m2;
-      m.a = 1; m.b = 0; m.c = dx;
-      m.d = 0; m.e = 1; m.f = dy;
-      m.g = 0; m.h = 0; m.i = 1;
-      this.matrix.mul(m);
+      this.mul(1, 0, dx, 0, 1, dy, 0, 0, 1);
     },
 
     function skew(x, y) {
       if ( ! x && ! y ) return;
-      var m = this.m2;
-      m.a = 1; m.b = x; m.c = 0;
-      m.d = y; m.e = 1; m.f = 0;
-      m.g = 0; m.h = 0; m.i = 1;
-      this.matrix.mul(m);
+      this.mul(1, x, 0, y, 1, 0, 0, 0, 1);
     },
 
     function scale(x, y) {
       if ( x === 1 && y === 1 ) return;
-      var m = this.m2;
-      m.a = x; m.b = 0; m.c = 0;
-      m.d = 0; m.e = y; m.f = 0;
-      m.g = 0; m.h = 0; m.i = 1;
-      this.matrix.mul(m);
+      this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
     },
 
     function rotate(a) {
       if ( ! a ) return;
-      var m = this.m2;
-      m.a = Math.cos(a);  m.b = Math.sin(a); m.c = 0;
-      m.d = -Math.sin(a); m.e = Math.cos(a); m.f = 0;
-      m.g = 0;            m.h = 0;           m.i = 1;
-      this.matrix.mul(m);
+      this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
     }
   ]
 });
@@ -269,7 +220,7 @@ foam.CLASS({
     },
     {
       name: 'transform',
-      getter: function() {
+      getter: function getTransform() {
         var t = this.transform_.reset();
 
         t.translate(this.x, this.y);
@@ -318,7 +269,7 @@ foam.CLASS({
     },
 
     function doTransform(x) {
-      var t = this.transform.matrix;
+      var t = this.transform;
       x.transform(t.a, t.d, t.b, t.e, t.c, t.f);
     },
 
@@ -463,7 +414,9 @@ foam.CLASS({
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
       if ( c.border    ) r += c.arcWidth/2-1;
-      return foam.math.distance(this.x-c.x, this.y-c.y) <= r;
+      var dx = this.x-c.x;
+      var dy = this.y-c.y;
+      return dx * dx + dy * dy <= r * r;
     }
   ]
 });
@@ -525,7 +478,7 @@ foam.CLASS({
     {
       name: 'paint',
       isFramed: true,
-      code: function() {
+      code: function paintCanvas() {
         this.erase();
         this.cview && this.cview.paint(this.context);
       }

@@ -28,9 +28,11 @@ foam.CLASS({
     {
       name: 'tick',
       isFramed: true,
-      code: function () {
+      code: function tick() {
         if ( this.stopped_ ) return;
         this.detectCollisions();
+        this.updateChildren();
+
         this.tick();
       }
     }
@@ -50,14 +52,16 @@ foam.CLASS({
     function updateChild(child) {
     },
 
-    function detectCollisions() {
-      /* implicit k-d-tree divide-and-conquer algorithm */
-      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
-
+    function updateChildren() {
       var cs = this.children;
       for ( var i = 0 ; i < cs.length ; i++ ) {
         this.updateChild(cs[i]);
       }
+    },
+
+    function detectCollisions() {
+      /* implicit k-d-tree divide-and-conquer algorithm */
+      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {

@@ -283,7 +283,8 @@ foam.LIB({
       // Store the destination class in the Axiom.  Used by describe().
       // Store source class on a clone of 'a' so that the Axiom can be
       // reused without corrupting the sourceCls_.
-      a = Object.create(a);
+      // Disabled: is causing dramatic performance slow-down.
+      // a = Object.create(a);
       a.sourceCls_ = this;
 
       this.axiomMap_[a.name] = a;
@@ -470,12 +471,11 @@ foam.CLASS({
     },
 
     function hasOwnPrivate_(name) {
-      return this.private_ &&
-        ( typeof this.private_[name] !== 'undefined' ||
-          this.private_.hasOwnProperty(name) );
+      return this.private_ && typeof this.private_[name] !== 'undefined';
+
     },
 
-    function pubPropertyChange() {
+    function pubPropertyChange_() {
       // NOP - to be added later
     },
 
@@ -704,7 +704,7 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange(name, oldValue, newValue, prop);
+          this.pubPropertyChange_(prop, oldValue, newValue);
 
           // TODO(maybe): pub to a global topic to support dynamic()
 
@@ -1112,34 +1112,21 @@ foam.CLASS({
     },
 
     /** Publish to this.propertyChange topic if oldValue and newValue are different. */
-    function pubPropertyChange(name, oldValue, newValue, opt_axiom) {
-      if ( ! Object.is(oldValue, newValue) && this.hasListeners('propertyChange', name) ) {
-        var dyn = opt_axiom ? opt_axiom.toSlot(this) : this.slot(name);
-        dyn.setPrev(oldValue);
-        this.pub('propertyChange', name, dyn);
-      }
+    function pubPropertyChange_(prop, oldValue, newValue) {
+      if ( Object.is(oldValue, newValue) ) return;
+      if ( ! this.hasListeners('propertyChange', prop.name) ) return;
+
+      var slot = prop.toSlot(this);
+      slot.setPrev(oldValue);
+      this.pub('propertyChange', prop.name, slot);
     },
 
     /**
       Creates a Slot for a property.
       @private
     */
-    // TODO: have this call toSlot() on Axiom, then not Property specific.
-    // This will enable imports to be used in expressions.
     function slot(name) {
-      var axiom = this.cls_.getAxiomByName(name);
-
- /*
-      console.assert(
-        axiom,
-        'Attempt to access slot() on unknown axiom: ',
-        name);
-      console.assert(axiom.toSlot,
-        'Attempt to access slot() on an Axiom without toSlot() support: ',
-         name);
-*/
-
-      return axiom.toSlot(this);
+      return this.cls_.getAxiomByName(name).toSlot(this);
     }
   ]
 });
