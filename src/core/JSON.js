@@ -168,17 +168,17 @@ foam.CLASS({
       if ( c ) this.out(c).nl();
       if ( this.indentStr ) {
         this.indentLevel_++;
-        this.ind();
+        this.indent();
       }
       return this;
     },
 
     function end(c) {
-      if ( c ) this.out(c);
       if ( this.indent ) {
         this.indentLevel_--;
       }
-      return this.nl();
+      if ( c ) this.indent().out(c);
+      return this;
     },
 
     function nl() {
@@ -188,7 +188,7 @@ foam.CLASS({
       return this;
     },
 
-    function ind() {
+    function indent() {
       for ( var i = 0 ; i < this.indentLevel_ ; i++ ) this.out(this.indentStr);
       return this;
     },
@@ -210,7 +210,7 @@ foam.CLASS({
       var v = o[p.name];
       if ( Array.isArray(v) && ! v.length ) return;
 
-      this.out(',').nl().ind().outputPropertyName(p).out(':', this.postColonStr);
+      this.out(',').nl().indent().outputPropertyName(p).out(':', this.postColonStr);
       this.output(v);
     },
 
@@ -242,8 +242,9 @@ foam.CLASS({
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], this);
-            if ( i < o.length -1 ) this.out(',').nl();
+            if ( i < o.length -1 ) this.out(',').nl().indent();
           }
+          this.nl();
           this.end(']')
         },
         Object:    function(o) {
