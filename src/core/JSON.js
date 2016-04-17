@@ -55,7 +55,7 @@ foam.CLASS({
 
   methods: [
     function toJSON() {
-      return foam.json.Outputer.create({nlStr:null, postColonStr:null, indentStr:null}).stringify(this);
+      return foam.json.Pretty.stringify(this);
     }
   ]
 });
@@ -104,7 +104,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'outputDefaultValues',
-      value: false
+      value: true
     },
     {
       class: 'Function',
@@ -357,7 +357,7 @@ foam.LIB({
     },
 
     function stringify(o) {
-      return foam.json.Outputer.create({nlStr:null, postColonStr:null, indentStr:null}).stringify(o);
+      return foam.json.Compact.stringify(o);
     }
   ]
 });
