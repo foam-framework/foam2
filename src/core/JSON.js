@@ -199,8 +199,9 @@ foam.CLASS({
     },
 
     function isDefaultValue(o, p) {
-      if ( typeof p.value === 'undefined' ) return false;
-      return ( ! o.hasOwnProperty(p.name) ) || foam.util.compare(p.value, p.get(o));
+      var noValue = ! o.hasOwnProperty(p.name);
+      if ( typeof p.value === 'undefined' ) return noValue;
+      return noValue || foam.util.equals(p.value, p.get(o));
     },
 
     function outputPropertyName(p) {
