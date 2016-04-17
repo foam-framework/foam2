@@ -98,6 +98,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'formatDatesAsNumbers',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'outputDefaultValues',
       value: false
     },
@@ -214,6 +219,14 @@ foam.CLASS({
       this.output(v);
     },
 
+    function outputDate(o) {
+      if ( this.formatDatesAsNumbers ) {
+        this.out(o.valueOf());
+      } else {
+        this.out(JSON.stringify(o));
+      }
+    },
+
     {
       name: 'output',
       code: foam.mmethod({
@@ -222,6 +235,7 @@ foam.CLASS({
         String:    function(o) { this.out('"', this.escape(o), '"'); },
         Number:    function(o) { this.out(o); },
         Boolean:   function(o) { this.out(o); },
+        Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.out(o); },
         FObject:   function(o) {
           this.start('{');
@@ -285,17 +299,20 @@ foam.LIB({
 
     Compact: foam.json.Outputer.create({
       pretty: false,
+      formatDatesAsNumbers: true,
       outputDefaultValues: false
     }),
 
     Short: foam.json.Outputer.create({
       pretty: false,
+      formatDatesAsNumbers: true,
       outputDefaultValues: false,
       useShortNames: true
     }),
 
     Network: foam.json.Outputer.create({
       pretty: false,
+      formatDatesAsNumbers: true,
       outputDefaultValues: false,
       useShortNames: true,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
@@ -303,6 +320,7 @@ foam.LIB({
 
     Storage: foam.json.Outputer.create({
       pretty: false,
+      formatDatesAsNumbers: true,
       outputDefaultValues: false,
       useShortNames: true,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
