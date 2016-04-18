@@ -57,12 +57,12 @@ describe("MDAO benchmarks", function() {
     }
 
     function atime(name, promise) {
-      var startTime = Date.now();
+      var startTime = performance.now();
       if ( ! promise.then ) {
         promise = promise();
       }
       var fn = function(arg) {
-        var endTime = Date.now();
+        var endTime = performance.now();
         console.log("Time for ", name, ": ", endTime - startTime, "ms");
         return arg;
       };
@@ -249,17 +249,17 @@ describe("MDAO benchmarks", function() {
           })
         );
       })),
-      arepeat(DEBUG ? 1 : 3,
+      arepeat(DEBUG ? 1 : 7,
         aseq(
           alog('Benchmark...'),
           atest('1a CreateAlbums' + NUM_ALBUMS, arepeatpar(NUM_ALBUMS, function ( i) {
             return AlbumDAO.put(albums.a[i]);
           })),
-          //asleep(1000),
+          asleep(2000),
           atest('1b CreatePhotos' + NUM_PHOTOS, arepeatpar(NUM_PHOTOS, function ( i) {
             return PhotoDAO.put(photos.a[i]);
           })),
-          //asleep(2000),
+          asleep(5000),
           atest('2a SelectAllAlbumsQuery', function() {
             return AlbumDAO.select()
               .then(function(s) { expect(s.a.length).toEqual(NUM_ALBUMS); });
@@ -271,8 +271,8 @@ describe("MDAO benchmarks", function() {
           atest('2b SingleKeyQuery',       function() {
             return PhotoDAO.find(avgKey);
           }),
-          atest('2b SingleKeyQuery(X10)',
-            arepeat(10, function() {
+          atest('2b SingleKeyQuery(X100)',
+            arepeat(100, function() {
               return PhotoDAO.find(avgKey);
             })
           ),
@@ -367,7 +367,7 @@ describe("MDAO benchmarks", function() {
           atest('Cleanup', function() {
             return AlbumDAO.removeAll().then(PhotoDAO.removeAll());
           })
-          //,asleep(10000)
+          ,asleep(10000)
         )
       ),
       alog('Done.'),
