@@ -918,8 +918,11 @@ Y2.describe();
 var Y = foam.subContext({log: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
-  imports: [ 'log' ],
-  methods: [ function foo() { this.log('foo from ImportTest'); } ]
+  imports: [ 'log', 'warn' ],
+  methods: [ function foo() {
+    this.log('log foo from ImportTest');
+    this.warn('warn foo from ImportTest');
+  } ]
 });
 Y.log('test');
 var o = ImportsTest.create(null, Y);
@@ -929,7 +932,7 @@ o.foo();
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log' ],
+  exports: [ 'log', 'log as warn' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
