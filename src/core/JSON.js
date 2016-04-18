@@ -231,6 +231,7 @@ foam.CLASS({
     {
       name: 'output',
       code: foam.mmethod({
+        // TODO: strict JSON doesn't support 'undefined', use null instead
         Undefined: function(o) { this.out('undefined'); },
         Null:      function(o) { this.out('null'); },
         String:    function(o) { this.out('"', this.escape(o), '"'); },
