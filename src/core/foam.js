@@ -71,6 +71,7 @@
     "templates",
     "Action",
     "../lib/Timer",
+    "../lib/Promise",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
     "../lib/MDAO",

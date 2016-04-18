@@ -20,8 +20,8 @@ foam.CLASS({
   name: 'IPromise',
   methods: [
     function then(success, fail) {},
-    function fulfill(v) {},
-    function reject(e) {}
+    function fulfill_(v) {},
+    function reject_(e) {}
   ]
 });
 
@@ -35,43 +35,43 @@ foam.CLASS({
       var self = this;
       this.successCallbacks.push(function() {
         if ( ! success ) {
-          next.fulfill(self.value);
+          next.fulfill_(self.value);
           return;
         }
 
         try {
           var value = success(self.value);
         } catch(e) {
-          next.reject(e);
+          next.reject_(e);
           return;
         }
 
-        next.fulfill(value);
+        next.fulfill_(value);
       });
 
       this.failCallbacks.push(function() {
         if ( ! fail ) {
-          next.reject(self.err);
+          next.reject_(self.err);
           return;
         }
 
         try {
           var value = fail(self.err);
         } catch(e) {
-          next.reject(e);
+          next.reject_(e);
           return;
         }
 
-        next.fulfill(value);
+        next.fulfill_(value);
       });
 
       return next;
     },
-    function fulfill(value) {
+    function fulfill_(value) {
       this.value = value;
       this.state = this.STATES.RESOLVING;
     },
-    function reject(e) {
+    function reject_(e) {
       this.err = e;
       this.state = this.STATES.REJECTED;
     }
@@ -96,16 +96,16 @@ foam.CLASS({
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
-      if ( typeof success !== "function" ) next.fulfill(this.value);
-      else next.fulfill(success(this.value));
+      if ( typeof success !== "function" ) next.fulfill_(this.value);
+      else next.fulfill_(success(this.value));
 
       return next;
     },
-    function fulfill(value) {
-      throw new Error("Promise already fulfilld.");
+    function fulfill_(value) {
+      throw new Error("Promise already fulfill_d.");
     },
-    function reject(e) {
-      this.fulfill(e);
+    function reject_(e) {
+      this.fulfill_(e);
     },
     function onEnter() {
       var callbacks = this.successCallbacks;
@@ -125,8 +125,8 @@ foam.CLASS({
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
-      if ( typeof fail !== "function" ) next.reject(this.err);
-      else next.fulfill(fail(this.err));
+      if ( typeof fail !== "function" ) next.reject_(this.err);
+      else next.fulfill_(fail(this.err));
 
       return next;
     },
@@ -153,6 +153,7 @@ foam.CLASS({
     'foam.promise.Fulfilled',
     'foam.promise.Rejected'
   ],
+
   properties: [
     {
       class: 'StateMachine',
@@ -184,7 +185,7 @@ foam.CLASS({
   methods: [
     function resolve_(value) {
       if ( value === this ) {
-        this.reject(new TypeError("Promise resolved with itself"));
+        this.reject_(new TypeError("Promise resolved with itself"));
       } else if ( value && typeof value.then == "function" ) {
         var self = this;
         value.then(function(v) {
@@ -198,43 +199,59 @@ foam.CLASS({
         this.state = this.STATES.FULFILLED;
       }
     },
-    function put(obj) { this.fulfill(obj); },
-    function remove(obj) { this.fulfill(obj); },
-    function error(e) { this.reject(e); }
   ]
 });
 
-foam.CLASS({
-  package: 'foam.promise',
-  name: 'xPromise',
-  properties: [
-    {
-      name: 'p',
-      factory: function() {
-        var self = this;
-        return new Promise(function(f, r) {
-          self.fulfill_ = f;
-          self.reject_ = r;
-        })
-      }
-    },
-    'fulfill_',
-    'reject_'
-  ],
+foam.LIB({
+  name: "foam.promise",
+
   methods: [
-    function put(a) { this.fulfill(a); },
-    function remove(a) { this.fulfill(a); },
-    function error(e) { this.reject(e); },
-    function fulfill(v) {
-      this.p;
-      if ( this.fulfill_ ) this.fulfill_(v);
+    {
+      /** Create a new Promise, equivalent to ES6 "new Promise(executor); */
+      name: "newPromise",
+      code: function(executor) {
+        if ( ! executor || ! typeof executor == "function" ) {
+          this.reject_(new TypeError("Promise created with no executor function (", executor, ")"));
+        }
+        var p = foam.promise.Promise.create();
+        var thenable = executor.call(null, p.fulfill_.bind(p), p.reject_.bind(p));
+
+        if ( thenable && typeof thenable.then == "function" ) {
+          thenable.then(function(v) {
+            p.resolve_(v);
+          }, function(e) {
+            p.err = e;
+            p.state = p.STATES.REJECTED;
+          });
+        }
+        return p;
+      },
     },
-    function reject(e) {
-      this.p;
-      if ( this.reject_ ) this.reject_(e);
+    {
+      /** Returns a resolves promise with the given value. */
+      name: "resolve",
+      code: foam.Function.memoize1(function (value) {
+        var p = foam.promise.Promise.create();
+
+        if ( value && typeof value.then == "function" ) {
+          value.then(p);
+        } else {
+          p.value = value;
+          p.state = p.STATES.FULFILLED;
+        }
+        return p;
+      }),
     },
-    function then(a, b) {
-      return this.p.then(a, b);
+    {
+      /** Returns a rejected promise with the given error value. */
+      name: "reject",
+      code: foam.Function.memoize1(function (err) {
+        var p = foam.promise.Promise.create();
+        p.err = err;
+        p.state = p.STATES.REJECTED;
+        return p;
+      }),
     }
-  ]
+  ],
 });
+
