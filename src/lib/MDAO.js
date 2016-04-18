@@ -1232,7 +1232,7 @@ foam.CLASS({
      **/
     function bulkLoad(dao, sink) {
       var self = this;
-      return new Promise(function(resolve, reject) {
+      return foam.promise.newPromise(function(resolve, reject) {
         dao.select().then(function() {
           self.root = self.index.bulkLoad(this);
           resolve();
@@ -1254,14 +1254,14 @@ foam.CLASS({
 
     function findObj_(key) {
       var self = this;
-      return new Promise(function(resolve, reject) {
+      return foam.promise.newPromise(function(resolve, reject) {
         var obj = self.map[key];
         // var obj = this.index.get(this.root, key);
         if ( obj ) {
           resolve(obj);
         } else {
           reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
-        }        
+        }
       });
     },
 

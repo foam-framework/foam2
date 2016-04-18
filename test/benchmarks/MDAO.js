@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 describe("MDAO benchmarks", function() {
   it("runs", function(done) {

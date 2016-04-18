@@ -102,7 +102,7 @@ foam.CLASS({
       return next;
     },
     function fulfill_(value) {
-      throw new Error("Promise already fulfill_d.");
+      throw new Error("Promise already fulfilled.");
     },
     function reject_(e) {
       this.fulfill_(e);
@@ -228,13 +228,19 @@ foam.LIB({
       },
     },
     {
-      /** Returns a resolves promise with the given value. */
+      /** Returns a resolved promise with the given value. */
       name: "resolve",
-      code: foam.Function.memoize1(function (value) {
+      code: //foam.Function.memoize1
+      (function (value) {
         var p = foam.promise.Promise.create();
 
         if ( value && typeof value.then == "function" ) {
-          value.then(p);
+          value.then(function(v) {
+            p.resolve_(v);
+          }, function(e) {
+            p.err = e;
+            p.state = p.STATES.REJECTED;
+          });
         } else {
           p.value = value;
           p.state = p.STATES.FULFILLED;
@@ -245,7 +251,8 @@ foam.LIB({
     {
       /** Returns a rejected promise with the given error value. */
       name: "reject",
-      code: foam.Function.memoize1(function (err) {
+      code: //foam.Function.memoize1
+      (function (err) {
         var p = foam.promise.Promise.create();
         p.err = err;
         p.state = p.STATES.REJECTED;
@@ -254,4 +261,9 @@ foam.LIB({
     }
   ],
 });
+
+// HACK!
+Promise.resolve = foam.promise.resolve;
+Promise.reject = foam.promise.reject;
+
 
