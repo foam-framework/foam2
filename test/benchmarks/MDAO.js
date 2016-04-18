@@ -63,7 +63,7 @@ describe("MDAO benchmarks", function() {
       }
       var fn = function(arg) {
         var endTime = performance.now();
-        console.log("Time for ", name, ": ", endTime - startTime, "ms");
+        console.log(name, ", ", endTime - startTime);
         return arg;
       };
       return promise.then(fn);
@@ -90,6 +90,15 @@ describe("MDAO benchmarks", function() {
         return p;
       }
     }
+    Promise.all = function(promises) {
+      var p = Promise.resolve();
+      for ( var i = 0; i < promises.length; ++i ) {
+        if ( ! promises[i].then ) {
+          promises[i] = promises[i]();
+        }
+      }
+      return aseq.apply(null, promises)();
+    }
 
     function arepeat(times, fn) {
       return function() {
@@ -108,7 +117,7 @@ describe("MDAO benchmarks", function() {
         for ( var i = 0; i < times; ++i ) {
           promises[i] = fn(i);
         }
-        return Promise.all(promises);
+        return aseq.apply(null, promises)(); //Promise.all(promises);
       };
     }
 
@@ -313,11 +322,11 @@ describe("MDAO benchmarks", function() {
               M.MAP(Photo.HASH, foam.dao.ArraySink.create())
             );
           }),
-          atest('2e AdHocFieldQuery(x100)', arepeat(100, function() {
-            return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
-              M.MAP(Photo.HASH, foam.dao.ArraySink.create())
-            );
-          })),
+//           atest('2e AdHocFieldQuery(x100)', arepeat(100, function() {
+//             return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
+//               M.MAP(Photo.HASH, foam.dao.ArraySink.create())
+//             );
+//           })),
           atest('2f SimpleInnerJoinQuery',  function() {
             var idsink = foam.dao.ArraySink.create();
             return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID, idsink)).then(function (idsmapsink) {
@@ -343,12 +352,12 @@ describe("MDAO benchmarks", function() {
           atest('2h SimpleOrderByQuery(X100)', arepeat(100, function() {
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(M.DESC(Photo.TIMESTAMP)).select();
           })),
-          atest('2j AscOrderByQuery', function() {
-            return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(Photo.TIMESTAMP).select();
-          }),
-          atest('2j AscOrderByQuery(X100)', arepeat(100, function() {
-            return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(Photo.TIMESTAMP).select();
-          })),
+//           atest('2j AscOrderByQuery', function() {
+//             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(Photo.TIMESTAMP).select();
+//           }),
+//           atest('2j AscOrderByQuery(X100)', arepeat(100, function() {
+//             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(Photo.TIMESTAMP).select();
+//           })),
       //     atest('2i SimpleOrderAndGroupByQuery', new Promise( function() {
       //       PhotoDAO
       //         .where(M.AND(GTE(Photo.TIMESTAMP, new Date(96, 0, 1)), M.LT(Photo.TIMESTAMP, new Date(96, 2, 1))))

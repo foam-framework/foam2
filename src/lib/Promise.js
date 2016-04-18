@@ -39,12 +39,12 @@ foam.CLASS({
           return;
         }
 
-        try {
+        //try {
           var value = success(self.value);
-        } catch(e) {
-          next.reject_(e);
-          return;
-        }
+        //} catch(e) {
+        //  next.reject_(e);
+        //  return;
+        //}
 
         next.fulfill_(value);
       });
@@ -55,12 +55,12 @@ foam.CLASS({
           return;
         }
 
-        try {
+        //try {
           var value = fail(self.err);
-        } catch(e) {
-          next.reject_(e);
-          return;
-        }
+        //} catch(e) {
+        //  next.reject_(e);
+        //  return;
+        //}
 
         next.fulfill_(value);
       });
