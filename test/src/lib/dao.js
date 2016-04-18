@@ -97,3 +97,10 @@ if ( foam.dao.IDBDAO ) {
     });
   });
 }
+
+describe('MDAO', function() {
+  genericDAOTestBattery(function(model) {
+    return Promise.resolve(foam.dao.MDAO.create({ of: model }));
+  });
+});
+
