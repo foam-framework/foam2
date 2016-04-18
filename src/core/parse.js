@@ -892,12 +892,13 @@ foam.CLASS({
       var pFail = foam.parse.compiled.Placeholder.create();
       var p = this.p.compile(pSuccess, pFail, withValue, grammar);
 
+      var delimSuccess = foam.parse.compiled.Placeholder.create();
+      var delimFail = foam.parse.compiled.Placeholder.create();
+
       if ( this.delimiter ) {
-        var delimSuccess = foam.parse.compiled.Placeholder.create();
-        var delimFail = foam.parse.compiled.Placeholder.create();
         var delim = this.delimiter.compile(delimSuccess, delimFail, false, grammar);
       } else {
-        delim = foam.parse.compiled.Placeholer.create({
+        delim = foam.parse.compiled.Placeholder.create({
           next: delimSuccess
         });
       }
@@ -1061,13 +1062,72 @@ foam.CLASS({
     {
       name: 'name',
       final: true
+    },
+    {
+      class: 'Boolean',
+      name: 'compiling',
+      value: false
+    },
+    {
+      name: 'compiled'
     }
   ],
 
   methods: [
     function compile(success, fail, withValue, grammar) {
-      return grammar.getSymbol(this.name).compile(
+      if ( this.compiling ) {
+        var ret = foam.parse.compiled.Placeholder.create({
+          name: 'symbol placeholder'
+        });
+
+        this.compiled(function(p) {
+          ret.next = p;
+        });
+
+        return ret;
+      }
+
+      var resolve;
+      this.compiling = true;
+      var future = (function(f) {
+        var waiters = [];
+        var value;
+        var set = false;
+
+        return {
+          get: function(f) {
+            if ( set ) {
+              f(value);
+              return
+            }
+
+            waiters.push(f);
+          },
+          set: function(v) {
+            set = true;
+            value = v;
+
+            for ( var i = 0 ; i < waiters.length ; i++ ) {
+              waiters[i](value);
+            }
+
+            waiters = null;
+          }
+        };
+      })();
+
+      this.compiled = future.get;
+
+      var compiled = grammar.getSymbol(this.name).compile(
         success, fail, withValue, grammar);
+
+
+      future.set(compiled);
+
+      this.compiling = false;
+      this.compiled = null;
+
+      return compiled;
     },
     function parse(ps, grammar) {
       var p = grammar.getSymbol(this.name);

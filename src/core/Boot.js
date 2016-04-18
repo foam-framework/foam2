@@ -540,9 +540,14 @@ foam.CLASS({
           p.value = o[1];
           return p;
         }
-        return o.class ?
-          foam.lookup(o.class).create(o) :
-          foam.core.Property.create(o)   ;
+
+        if ( o.class ) {
+          var m = foam.lookup(o.class);
+          if ( ! m ) throw 'Unknown class : ' + o.class;
+          return m.create(o);
+        }
+
+        return foam.core.Property.create(o);
       }
     },
     {
@@ -1968,8 +1973,6 @@ foam.CLASS({
        */
       if ( this.destroyed ) return;
 
-      this.destroyed = true;
-
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
@@ -1981,6 +1984,8 @@ foam.CLASS({
           }
         }
       }
+
+      this.destroyed = true;
 
       this.instance_ = null;
       this.private_ = null;

@@ -19,57 +19,39 @@
 // JSON Support
 //
 // TODO:
-//   - don't output default values (optionally)
 //   - don't output default classes
-//   - quote keys when required
-//   - escape values
 //   - don't output transient properties
 //   - pretty printing
-//   - property filtering
 //   - allow for custom Property JSON support
 //   - compact output
-//   -
+//   - reading shortNames
+//   - date support
 */
 
+/**
+  A short-name is an optional shorter name for a property.
+  It is used by foam.json.Outputer when 'useShortNames'
+  is enabled. Short-names enable JSON output to be smaller,
+  which can save disk space and/or network bandwidth.
+  Ex.
+<pre>
+  properties: [
+    { name: 'firstName', shortName: 'fn' },
+    { name: 'lastName',  shortName: 'ln' }
+  ]
+</pre>
+*/
 foam.CLASS({
-  refines: 'foam.core.FObject',
+  refines: 'foam.core.Property',
 
-  methods: [
-    function toJSON() {
-      return foam.json.stringify(this);
-    },
-    function outputJSON(out, opt_options) {
-      out('{class:"', this.cls_.id, '"');
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        out(',', p.name, ':');
-        foam.json.output(this[p.name], out);
-      }
-      out('}');
-    }/*,
-    function toJSON2() {
-      var out = foam.json.Outputer.create();
-      out.output(this);
-      return out.toString();
-    },
-    function outputJSON2(o) {
-      o.start('{');
-      o.out(o.escapeKey('class'), ':"', this.cls_.id, '"');
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        o.out(',').nl().ind().out(o.escapeKey(p.name), ':');
-        o.output(this[p.name]);
-      }
-      o.nl().end('}');
-    }*/
+  properties: [
+    { class: 'String', name: 'shortName' }
   ]
 });
 
 
-foam.LIB({
-  name: 'foam.json',
+foam.CLASS({
+  refines: 'foam.core.FObject',
 
   methods: [
     function createOut() {
@@ -156,24 +138,24 @@ foam.CLASS({
       value: ''
     },
     {
-      class: 'String',
-      name: 'indent',
-      value: '  '
-    },
-    {
       class: 'Int',
-      name: 'indentLevel',
+      name: 'indentLevel_',
       value: 0
     },
     {
       class: 'String',
-      name: 'newline',
+      name: 'indentStr',
+      value: '\t'
+    },
+    {
+      class: 'String',
+      name: 'nlStr',
       value: '\n'
     },
     {
-      class: 'Boolean',
-      name: 'pretty',
-      value: true
+      class: 'String',
+      name: 'postColonStr',
+      value: ' '
     },
     {
       class: 'Boolean',
@@ -182,21 +164,39 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'outputDefaultValues',
+      name: 'formatDatesAsNumbers',
       value: false
     },
     {
       class: 'Boolean',
-      name: 'outputTransientProperties',
-      value: false
+      name: 'outputDefaultValues',
+      value: true
     },
-    /*
+    {
+      class: 'Function',
+      name: 'propertyPredicate',
+      value: function(o, p) { return ! p.transient; }
+    },
     {
       class: 'Boolean',
       name: 'useShortNames',
       value: false
     },
-    */
+    {
+      class: 'Boolean',
+      name: 'pretty',
+      value: true,
+      postSet: function(_, p) {
+        if ( p ) {
+          this.clearProperty('indentStr');
+          this.clearProperty('nlStr');
+          this.clearProperty('postColonStr');
+          this.clearProperty('useShortNames');
+        } else {
+          this.indentStr = this.nlStr = this.postColonStr = null;
+        }
+      }
+    }
     /*
     {
       class: 'Boolean',
@@ -208,11 +208,11 @@ foam.CLASS({
 
   methods: [
     function reset() {
-      this.indentLevel = 0;
+      this.indentLevel_ = 0;
       this.buf_ = '';
       return this;
     },
-    
+
     function escape(str) {
       return str
         .replace(/\\/g, '\\\\')
@@ -224,13 +224,10 @@ foam.CLASS({
         });
     },
 
-    {
-      name: 'escapeKey',
-      code: foam.Function.memoize1(function(str) {
-        return /^[a-zA-Z\$_][0-9a-zA-Z$_]*$/.test(str) ?
-          str :
-          '"' + str + '"';
-      })
+    function maybeEscapeKey(str) {
+      return this.alwaysQuoteKeys || ! /^[a-zA-Z\$_][0-9a-zA-Z$_]*$/.test(str) ?
+          '"' + str + '"' :
+          str ;
     },
 
     function out() {
@@ -240,49 +237,96 @@ foam.CLASS({
 
     function start(c) {
       if ( c ) this.out(c).nl();
-      if ( this.indent ) {
-        this.indentLevel++;
-        this.ind();
+      if ( this.indentStr ) {
+        this.indentLevel_++;
+        this.indent();
       }
       return this;
     },
 
     function end(c) {
-      if ( c ) this.out(c);
       if ( this.indent ) {
-        this.indentLevel--;
+        this.indentLevel_--;
       }
-      return this.nl();
+      if ( c ) this.indent().out(c);
+      return this;
     },
 
     function nl() {
-      if ( this.newline && this.newline.length ) {
-        this.out(this.newline);
+      if ( this.nlStr && this.nlStr.length ) {
+        this.out(this.nlStr);
       }
       return this;
     },
 
-    function ind() {
-      for ( var i = 0 ; i < this.indentLevel ; i++ ) this.out(this.indent);
+    function indent() {
+      for ( var i = 0 ; i < this.indentLevel_ ; i++ ) this.out(this.indentStr);
       return this;
+    },
+
+    function isDefaultValue(o, p) {
+      var noValue = ! o.hasOwnProperty(p.name);
+      if ( typeof p.value === 'undefined' ) return noValue;
+      return noValue || foam.util.equals(p.value, p.get(o));
+    },
+
+    function outputPropertyName(p) {
+      this.out(this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name));
+      return this;
+    },
+
+    function outputProperty(o, p) {
+      if ( ! this.propertyPredicate(o, p ) ) return;
+      if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) return;
+
+      var v = o[p.name];
+      if ( Array.isArray(v) && ! v.length ) return;
+
+      this.out(',').nl().indent().outputPropertyName(p).out(':', this.postColonStr);
+      this.output(v);
+    },
+
+    function outputDate(o) {
+      if ( this.formatDatesAsNumbers ) {
+        this.out(o.valueOf());
+      } else {
+        this.out(JSON.stringify(o));
+      }
     },
 
     {
       name: 'output',
       code: foam.mmethod({
+        // TODO: strict JSON doesn't support 'undefined', use null instead
         Undefined: function(o) { this.out('undefined'); },
         Null:      function(o) { this.out('null'); },
         String:    function(o) { this.out('"', this.escape(o), '"'); },
         Number:    function(o) { this.out(o); },
         Boolean:   function(o) { this.out(o); },
+        Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.out(o); },
-        FObject:   function(o) { o.outputJSON2(this); },
+        FObject:   function(o) {
+          this.start('{');
+          this.out(
+              this.maybeEscapeKey('class'),
+              ':',
+              this.postColonStr,
+              '"',
+              o.cls_.id,
+              '"');
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            this.outputProperty(o, ps[i]);
+          }
+          this.nl().end('}');
+        },
         Array:     function(o) {
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], this);
-            if ( i < o.length -1 ) this.out(',').nl();
+            if ( i < o.length -1 ) this.out(',').nl().indent();
           }
+          this.nl();
           this.end(']')
         },
         Object:    function(o) {
@@ -296,11 +340,91 @@ foam.CLASS({
     },
 
     function stringify(o) {
-      this.reset().output(o).toString();
+      this.output(o);
+      var ret = this.buf_;
+      this.reset(); // reset to avoid retaining garbage
+      return ret;
+    }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.json',
+
+  constants: {
+
+    Pretty: foam.json.Outputer.create(),
+
+    Strict: foam.json.Outputer.create({
+      pretty: false,
+      alwaysQuoteKeys: true
+    }),
+
+    PrettyStrict: foam.json.Outputer.create({
+      alwaysQuoteKeys: true
+    }),
+
+    Compact: foam.json.Outputer.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false
+    }),
+
+    Short: foam.json.Outputer.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      useShortNames: true
+    }),
+
+    Network: foam.json.Outputer.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      useShortNames: true,
+      propertyPredicate: function(o, p) { return ! p.networkTransient; }
+    }),
+
+    Storage: foam.json.Outputer.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      useShortNames: true,
+      propertyPredicate: function(o, p) { return ! p.storageTransient; }
+    })
+  },
+
+  methods: [
+    function parse(json, opt_class) {
+      // recurse into sub-objects
+      for ( var key in json ) {
+        var o = json[key];
+        if ( typeof o === 'object' && ! o.cls_ ) { // traverse plain old objects only
+          json[key] = this.parse(o);
+        }
+      }
+
+      if ( json.class ) {
+        var cls = foam.lookup(json.class);
+        foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
+        return cls.create(json);
+      }
+      if ( opt_class ) return opt_class.create(json);
+
+      return json;
     },
 
-    function toString() {
-      return this.buf_;
+    function parseArray(a, opt_class) {
+      return a.map(function(e) { return foam.json.parse(e, opt_class); });
+    },
+
+    function parseString(jsonStr) {
+      return eval('(' + jsonStr + ')');
+    },
+
+    function stringify(o) {
+      return foam.json.Compact.stringify(o);
     }
   ]
 });
