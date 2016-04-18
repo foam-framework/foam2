@@ -19,6 +19,7 @@
 // JSON Support
 //
 // TODO:
+//   - add Context Support for parsing
 //   - don't output default classes
 //   - don't output transient properties
 //   - pretty printing
@@ -104,6 +105,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'outputDefaultValues',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'outputClassNames',
       value: true
     },
     {
@@ -216,7 +222,7 @@ foam.CLASS({
       var v = o[p.name];
       if ( Array.isArray(v) && ! v.length ) return;
 
-      this.out(',').nl().indent().outputPropertyName(p).out(':', this.postColonStr);
+      this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
       this.output(v);
     },
 
@@ -241,15 +247,18 @@ foam.CLASS({
         Function:  function(o) { this.out(o); },
         FObject:   function(o) {
           this.start('{');
-          this.out(
-              this.maybeEscapeKey('class'),
-              ':',
-              this.postColonStr,
-              '"',
-              o.cls_.id,
-              '"');
+          if ( this.outputClassNames ) {
+            this.out(
+                this.maybeEscapeKey('class'),
+                ':',
+                this.postColonStr,
+                '"',
+                o.cls_.id,
+                '"');
+          }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
+            if ( this.outClassNames ) this.out(',')
             this.outputProperty(o, ps[i]);
           }
           this.nl().end('}');
@@ -330,6 +339,7 @@ foam.LIB({
   },
 
   methods: [
+    // TODO: provide Context
     function parse(json, opt_class) {
       // recurse into sub-objects
       for ( var key in json ) {

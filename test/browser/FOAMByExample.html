@@ -1252,6 +1252,9 @@ log(o.toJSON());
 log(foam.json.Pretty.stringify(o));
 
 //
+log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
+
+//
 log(foam.json.Strict.stringify(o));
 
 //
