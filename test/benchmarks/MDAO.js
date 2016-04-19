@@ -186,7 +186,7 @@ describe("MDAO benchmarks", function() {
     function makeMultiPartKeys(n) {
       var a = [];
       for ( var i = 0 ; i < n ; i++ ) {
-        a.push((Math.floor(NUM_PHOTOS/n)*i).toString());
+        a.push(""+(Math.floor(NUM_PHOTOS/n)*i));
       }
       return a;
     }
@@ -220,8 +220,8 @@ describe("MDAO benchmarks", function() {
       childDAO: PhotoDAO,
       property: Photo.ALBUM_ID});
     */
-    var avgKey = Math.floor(NUM_PHOTOS/2).toString();
-    var avgAlbumKey = Math.floor(NUM_ALBUMS/2).toString();
+    var avgKey = ""+Math.floor(NUM_PHOTOS/2)/*.toString()*/;
+    var avgAlbumKey = ""+Math.floor(NUM_ALBUMS/2)/*.toString()*/;
 
     function runPhotoBenchmarks() {
     Promise.resolve().then(aseq(
@@ -277,21 +277,42 @@ describe("MDAO benchmarks", function() {
             })
           ),
           atest('2c MultiKeyQuery10',   function() {
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
+//             PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select(asink)
+//               .then(function(s) {
+//                 //console.log("2c10 Explain:", asink.toString());
+//               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select()
-              .then(function(s) { expect(s.a.length).toEqual(10); });
+//               .then(function(s) {
+//                 expect(s.a.length).toEqual(10);
+//               });
           }),
-
           atest('2c MultiKeyQuery100',  function() {
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
+//             PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select(asink)
+//               .then(function(s) {
+//                 //console.log("2c100 Explain:", asink.toString());
+//               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select()
-              .then(function(s) { expect(s.a.length).toEqual(100); });
+//               .then(function(s) { expect(s.a.length).toEqual(100); });
           }),
           atest('2c MultiKeyQuery1000', function() {
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
+//             PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select(asink)
+//               .then(function(s) {
+//                 //console.log("2c1000 Explain:", asink.toString());
+//               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select()
-              .then(function(s) { expect(s.a.length).toEqual(1000); });
+//               .then(function(s) { expect(s.a.length).toEqual(1000); });
           }),
           atest('2cMultiKeyQuery5000', function() {
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
+//             PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select(asink)
+//               .then(function(s) {
+//                 //console.log("2c5000 Explain:", asink.toString());
+//               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select()
-              .then(function(s) { expect(s.a.length).toEqual(5000); });
+//               .then(function(s) { expect(s.a.length).toEqual(5000); });
           }),
 
           atest('2d IndexedFieldQuery', function() {

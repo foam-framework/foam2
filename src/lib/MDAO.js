@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/** Indexed Memory-based DAO. */
+/* Indexed Memory-based DAO. */
 
 /*
  * Index Interface:
@@ -76,7 +76,7 @@ var NOT_FOUND = {
 /** Plan indicating that an index has no plan for executing a query. **/
 var NO_PLAN = {
   cost: Number.MAX_VALUE,
-  execute: function(_, sink) { return Promise.resolve(sink); },
+  execute: function(promise, _, sink) { },
   toString: function() { return "no-plan"; }
 };
 
@@ -92,9 +92,8 @@ var ValueIndex = {
   plan: (function() {
            var plan = {
              cost: 1,
-             execute: function(s, sink) {
+             execute: function(promise, s, sink) {
                sink.put(s);
-               return Promise.resolve(sink);
              },
              toString: function() { return 'unique'; }
            };
@@ -436,7 +435,7 @@ var TreeIndex = {
       //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
       return {
         cost: 0,
-        execute: function(unused, sink, skip, limit, order, predicate) { sink.value += count; return Promise.resolve(sink); },
+        execute: function(promise, unused, sink, skip, limit, order, predicate) { sink.value += count; },
         toString: function() { return 'short-circuit-count(' + count + ')'; }
       };
     }
@@ -489,7 +488,7 @@ var TreeIndex = {
       var results  = [];
       var cost = 1;
 
-      for ( var i = 0 ; i < keys.length ; i++) {
+      for ( var i = 0 ; i < keys.length ; ++i) {
         var result = this.get(s, keys[i]);
 
         if ( result ) {
@@ -505,12 +504,10 @@ var TreeIndex = {
 
       return {
         cost: 1 + cost,
-        execute: function(s2, sink, skip, limit, order, predicate) {
-          var pars = [];
-          for ( var i = 0 ; i < subPlans.length ; i++ ) {
-            pars.push(subPlans[i].execute(results[i], sink, skip, limit, order, predicate));
+        execute: function(promise, s2, sink, skip, limit, order, predicate) {
+          for ( var i = 0 ; i < keys.length ; ++i) {
+            subPlans[i].execute(promise, results[i], sink, skip, limit, order, predicate);
           }
-          return Promise.all(pars).then(function() { return sink; });
         },
         toString: function() {
           return 'IN(key=' + prop.name + ', size=' + results.length + ')';
@@ -529,8 +526,8 @@ var TreeIndex = {
 
       return {
         cost: 1 + subPlan.cost,
-        execute: function(s2, sink, skip, limit, order, predicate) {
-          return subPlan.execute(result, sink, skip, limit, order, predicate);
+        execute: function(promise, s2, sink, skip, limit, order, predicate) {
+          return subPlan.execute(promise, result, sink, skip, limit, order, predicate);
         },
         toString: function() {
           return 'lookup(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ') ' + subPlan.toString();
@@ -589,7 +586,7 @@ var TreeIndex = {
 
     return {
       cost: cost,
-      execute: function(s, sink, skip, limit, order, predicate) {
+      execute: function(promise, s, sink, skip, limit, order, predicate) {
         if ( sortRequired ) {
           var arrSink = foam.dao.ArraySink.create();
           index.selectCount++;
@@ -890,17 +887,17 @@ var PositionIndex = {
     if ( foam.mlang.sink.Count.isInstance(sink) ) {
       return {
         cost: 0,
-        execute: function(s, sink, skip, limit, order, predicate) {
+        execute: function(promise, s, sink, skip, limit, order, predicate) {
           // TODO: double check this bit...
           if ( ! s.value ) {
             // TODO: memoize, expire after self.maxage, as per foam1 amemo
             s.value = self.networkdao.select(foam.mlang.sink.Count.create());
           }
 
-          return s.value.then(function(countSink) {
+          promise[0] = promise[0].then(s.value.then(function(countSink) {
             sink.value = countSink.value;
             return Promise.resolve(sink);
-          });
+          }));
         },
         toString: function() { return 'position-index(cost=' + this.cost + ', count)'; }
       }
@@ -912,7 +909,7 @@ var PositionIndex = {
     return {
       cost: 0,
       toString: function() { return 'position-index(cost=' + this.cost + ')'; },
-      execute: function(s, sink, skip, limit, order, predicate) {
+      execute: function(promise, s, sink, skip, limit, order, predicate) {
         var objs = [];
 
         var min;
@@ -967,7 +964,7 @@ var AltIndex = {
   addIndex: function(s, index) {
     // Populate the index
     var a = foam.dao.ArraySink.create();
-    this.plan(s, a).execute(s, a);
+    this.plan(s, a).execute([Promise.resolve()], s, a);
 
     s.push(index.bulkLoad(a));
     this.delegates.push(index);
@@ -1031,7 +1028,7 @@ var AltIndex = {
 
     return {
       __proto__: bestPlan,
-      execute: function(unused, sink, skip, limit, order, predicate) { return bestPlan.execute(s[bestPlanI], sink, skip, limit, order, predicate); }
+      execute: function(promise, unused, sink, skip, limit, order, predicate) { return bestPlan.execute(promise, s[bestPlanI], sink, skip, limit, order, predicate); }
     };
   },
 
@@ -1050,7 +1047,7 @@ var mLangIndex = {
       mlang: mlang,
       PLAN: {
         cost: 0,
-        execute: function(s, sink, skip, limit, order, predicate) { sink.copyFrom(s); return Promise.resolve(sink); },
+        execute: function(promise, s, sink, skip, limit, order, predicate) { sink.copyFrom(s); },
         toString: function() { return 'mLangIndex(' + this.s + ')'; }
       }
     };
@@ -1232,7 +1229,7 @@ foam.CLASS({
      **/
     function bulkLoad(dao, sink) {
       var self = this;
-      return foam.promise.newPromise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         dao.select().then(function() {
           self.root = self.index.bulkLoad(this);
           resolve();
@@ -1254,7 +1251,7 @@ foam.CLASS({
 
     function findObj_(key) {
       var self = this;
-      return foam.promise.newPromise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         var obj = self.map[key];
         // var obj = this.index.get(this.root, key);
         if ( obj ) {
@@ -1341,13 +1338,15 @@ foam.CLASS({
         var plan = this.index.plan(this.root, sink.arg1, skip, limit, order, predicate);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
-        return aconstant(sink);
+        return Promise.resolve(sink)
       }
 
       var plan = this.index.plan(this.root, sink, skip, limit, order, predicate);
 
-      return plan.execute(this.root, sink, skip, limit, order, predicate).then(
-        function(sink) {
+      var promise = [Promise.resolve()];
+      plan.execute(promise, this.root, sink, skip, limit, order, predicate);
+      return promise[0].then(
+        function() {
           sink && sink.eof && sink.eof();
           return Promise.resolve(sink);
         },

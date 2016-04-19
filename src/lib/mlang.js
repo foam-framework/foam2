@@ -517,6 +517,27 @@ foam.CLASS({
   ]
 });
 
+
+/** Pseudo-expression which outputs a human-readable description of its
+  subexpression, and the plan for evaluating it. */
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Explain',
+  extends: 'foam.dao.ProxySink',
+
+  properties: [
+    {
+      class: 'String',
+      name:  'plan',
+      help:  'Execution Plan',
+    }
+  ],
+
+  methods: [
+    function toString() { return this.plan; },
+  ]
+});
+
 /** Base class for comparators. */
 foam.CLASS({
   package: 'foam.mlang.order',
@@ -578,6 +599,7 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Map',
+    'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
   ],
 
@@ -606,6 +628,7 @@ foam.CLASS({
     function NOT(a) { return this._unary_("Not", a); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
+    function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
   ]
