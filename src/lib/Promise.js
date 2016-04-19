@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'IPromise',
   methods: [
     function then(success, fail) {},
+    { name: "catch", code: function(fail) { return this.then(null, fail); } },
     function fulfill_(v) {},
     function reject_(e) {}
   ]
@@ -141,8 +142,7 @@ foam.CLASS({
 });
 
 /**
- * A fast Promise implementation that skips slow operations such as try/catch,
- * while still implementing the core features of a standard promise.
+ * A fast Promise implementation.
  */
 foam.CLASS({
   package: 'foam.promise',
@@ -230,8 +230,7 @@ foam.LIB({
     {
       /** Returns a resolved promise with the given value. */
       name: "resolve",
-      code: //foam.Function.memoize1
-      (function (value) {
+      code: function (value) {
         var p = foam.promise.Promise.create();
 
         if ( value && typeof value.then == "function" ) {
@@ -246,24 +245,19 @@ foam.LIB({
           p.state = p.STATES.FULFILLED;
         }
         return p;
-      }),
+      },
     },
     {
       /** Returns a rejected promise with the given error value. */
       name: "reject",
-      code: //foam.Function.memoize1
-      (function (err) {
+      code: function (err) {
         var p = foam.promise.Promise.create();
         p.err = err;
         p.state = p.STATES.REJECTED;
         return p;
-      }),
+      },
     }
   ],
 });
-
-// HACK!
-Promise.resolve = foam.promise.resolve;
-Promise.reject = foam.promise.reject;
 
 
