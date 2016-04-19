@@ -1388,8 +1388,7 @@ foam.CLASS({
         for ( var i = 0 ; i < bs.length ; i++ ) {
           var b = bs[i];
           if ( typeof b === 'string' ) {
-            var a   = b.split(' ');
-            var key, as;
+            var key, as, a = b.split(' ');
             switch ( a.length ) {
               case 1:
                 key = as = a[0];
