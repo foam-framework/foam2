@@ -58,11 +58,8 @@ angular.module('testApp', ['foam']).controller('mainCtrl', function($scope, $q) 
   var parser = foam.parse.QueryParser.create().parserFor(ng.Todo);
   $scope.query = { s: '' };
   $scope.$watch('query.s', function(nu) {
-    if ( ! nu ) $scope.dao.delegate = dao;
-    else {
-      var q = parser.parseString(nu);
-      $scope.dao.delegate = dao.where(q);
-    }
+    var q = nu ? parser.parseString(nu) : undefined;
+    $scope.dao.delegate = q ? dao.where(q) : dao;
   });
 });
 

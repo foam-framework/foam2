@@ -286,11 +286,11 @@ foam.CLASS({
 
   methods: [
     function step() {
-      var str = this.case ? this.s : this.s.toUpperCase();
+      var str = this.case ? this.s : this.s.toLowerCase();
       var ps = this.ps;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head ||
-            str.charAt(i) !== (this.case ? ps.head : ps.head.toUpperCase()) ) {
+            str.charAt(i) !== (this.case ? ps.head : ps.head.toLowerCase()) ) {
           this.fail.ps = this.ps;
           return this.fail;
         }
@@ -323,10 +323,10 @@ foam.CLASS({
     function step() {
       var ps1 = this.ps;
       var ps = this.ps;
-      var str = this.case ? this.s : this.s.toUpperCase();
+      var str = this.case ? this.s : this.s.toLowerCase();
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head ||
-            str.charAt(i) !== (this.case ? ps.head : ps.head.toUpperCase()) ) {
+            str.charAt(i) !== (this.case ? ps.head : ps.head.toLowerCase()) ) {
           this.fail.ps = ps1;
           return this.fail;
         }
@@ -688,14 +688,14 @@ foam.CLASS({
     },
 
     function parse(ps, obj) {
-      var str = this.case ? this.s : this.s.toUpperCase();
+      var str = this.case ? this.s : this.s.toLowerCase();
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head ||
-            str.charAt(i) !== (this.case ? ps.head : ps.head.toUpperCase()) ) {
+            str.charAt(i) !== (this.case ? ps.head : ps.head.toLowerCase()) ) {
           return undefined;
         }
       }
-      return ps.setValue(this.value !== undefined ? this.value : str);
+      return ps.setValue(this.value !== undefined ? this.value : this.s);
     }
   ]
 });
