@@ -453,8 +453,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined' ||
-          this.instance_.hasOwnProperty(name);
+      return typeof this.instance_[name] !== 'undefined';
     },
 
     /**
@@ -540,9 +539,14 @@ foam.CLASS({
           p.value = o[1];
           return p;
         }
-        return o.class ?
-          foam.lookup(o.class).create(o) :
-          foam.core.Property.create(o)   ;
+
+        if ( o.class ) {
+          var m = foam.lookup(o.class);
+          if ( ! m ) throw 'Unknown class : ' + o.class;
+          return m.create(o);
+        }
+
+        return foam.core.Property.create(o);
       }
     },
     {
@@ -678,12 +682,17 @@ foam.CLASS({
         } :
         hasValue ? function valueGetter() {
           var v = this.instance_[name];
-          return typeof v !== 'undefined' || this.instance_.hasOwnProperty(name) ? v : value ;
+          return typeof v !== 'undefined' ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
       var setter = prop.setter ||
         function propSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
           // Get old value but avoid triggering factory if present
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
@@ -1392,8 +1401,8 @@ foam.CLASS({
               break;
               case 3:
                 console.assert(a[1] === 'as', 'Invalid export syntax: key [as value] | as value');
-                key = a[2];
-                as  = a[0];
+                key = a[0];
+                as  = a[2];
               break;
               default:
                 console.error('Invalid export syntax: key [as value] | as value');
@@ -1943,7 +1952,7 @@ foam.CLASS({
     function clearProperty(name) {
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
-        delete this.instance_[name];
+        this.instance_[name] = undefined
         this.pub('propertyChange', name, this.slot(name));
       }
     },
@@ -1966,8 +1975,6 @@ foam.CLASS({
        */
       if ( this.destroyed ) return;
 
-      this.destroyed = true;
-
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
@@ -1979,6 +1986,8 @@ foam.CLASS({
           }
         }
       }
+
+      this.destroyed = true;
 
       this.instance_ = null;
       this.private_ = null;

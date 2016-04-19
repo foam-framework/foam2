@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/**
+  A Singleton Axiom, when added to a Class, makes it implement
+  the Singleton Pattern, meaning that all calls to create()
+  will return the same (single) instance.
+*/
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
@@ -37,6 +42,41 @@ foam.CLASS({
   refines: 'foam.pattern.Singleton',
   axioms: [ foam.pattern.Singleton.create() ]
 });
+
+
+/**
+  A Multiton Axiom, when added to a Class, makes it implement
+  the Multiton Pattern, meaning that calls to create() with
+  the same value for the specified 'property', will return the
+  same instance.
+*/
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'Multiton',
+
+  properties: [
+    {
+      // TODO: swith to 'properties' and add support
+      // for compound keys.
+      name: 'property'
+    }
+  ],
+  
+  methods: [
+    function installInClass(cls) {
+      var instances;
+      var property = this.property;
+      var oldCreate = cls.create;
+      cls.create = function(args) {
+        var key = args[property.name];
+        return instances[key] || ( instances[key] = oldCreate.apply(this, arguments) );
+      }
+    },
+    function clone() { return this; },
+    function equals(other) { return other === this; }
+  ]
+});
+
 
 /** Causes an class to pool its instances. create() will pull from the pool,
  and destroy() will return instances to the pool. Object pools can be found

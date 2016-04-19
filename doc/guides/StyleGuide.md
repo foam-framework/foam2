@@ -1,22 +1,32 @@
 # FOAM2 Coding Style Guidelines
 
-Except where noted below, FOAM conforms to the jQuery JavaScript Style Guide available at:
+Except where noted below, FOAM conforms to the Google Javascript Style Guide available at:
 
-https://contribute.jquery.org/style-guide/js/
+https://google.github.io/styleguide/javascriptguide.xml
 
 ## Exceptions
-* Indentation is two spaces rather than one tab.
-* The ! operator is followed by a space.
+* One space is required inside the parentheses of `if`, `for`, `while`, and `switch` headers:
+```javascript
+if ( a < b ) ...
+for ( var i = 0; i < words.length; i++ ) ...
+for ( var key in obj ) ...
+while ( true ) ...
+switch ( argCount ) ...
+```
+* The `!` operator must be followed by a space.
 ```javascript
 if ( ! found ) ...
 ```
-* One-statement if, while, and for statements that fit in less than 80 characters, do not need braces.
+* One-statement `if`, `while`, and `for` statements that can fit on a single line (less than 80 characters) do not need braces:
 ```javascript
 if ( ! found ) return false;
 
 for ( var i = 0 ; i < a.length ; i++ ) a[i] = '';
 ```
-* jQuery type checks don't apply.
+* The rules about using Closure's `goog.provide`, `goog.require` and similar are
+  omitted; use FOAM's `requires: []` support instead.
+* The rules about using JSDoc comments to inform the Closure compiler's
+  type-checking are omitted; use FOAM's type-checking instead.
 
 ## Naming
 
@@ -36,6 +46,7 @@ Line lengths should be 80 characters or less, except for embedded data, like tem
 
 ## Other
  * Do not quote map keys unless necessary.
- * Do not leave trailing unnecessary commas.
+ * Do not leave trailing unnecessary commas (this is implicit in the Google
+   style guide).
 
 ## Comments

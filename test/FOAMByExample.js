@@ -42,7 +42,7 @@ var log_ = function log_(o) {
   log_.output += o;
 };
 var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
-var golden = " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}";
+var golden = " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\"}";
 var oldLog, oldAssert;
 beforeEach(function() {
   oldLog = console.log;
@@ -104,7 +104,7 @@ Test.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 1, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Topic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        toJSONMethod               FObject        outputJSONMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        clone\n" });
+  expect(log_.output).toMatchGolden({ i: 1, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Topic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        toJSON\n" });
 
 
 // Example 3
@@ -221,7 +221,7 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 11, str: "Property aProperty bMethod f1Method f2Topic propertyChange XMethod initArgsMethod unknownArgMethod copyFromMethod clearPropertyMethod onDestroyMethod destroyMethod toStringMethod describeMethod toJSONMethod outputJSONMethod equalsMethod compareToMethod diffMethod hashCodeMethod clone" });
+  expect(log_.output).toMatchGolden({ i: 11, str: "Property aProperty bMethod f1Method f2Topic propertyChange XMethod initArgsMethod unknownArgMethod copyFromMethod clearPropertyMethod onDestroyMethod destroyMethod toStringMethod describeMethod equalsMethod compareToMethod diffMethod hashCodeMethod cloneMethod toJSON" });
 
 
 // Example 13
@@ -243,7 +243,7 @@ log(Test.getAxiomsByClass(foam.core.Method));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 13, str: " <b>&gt;</b> Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method" });
+  expect(log_.output).toMatchGolden({ i: 13, str: " <b>&gt;</b> Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method,Method" });
 
 
 // Example 16
@@ -254,7 +254,7 @@ log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 15, str: " <b>&gt;</b> f1,f2,initArgs,unknownArg,copyFrom,clearProperty,onDestroy,destroy,toString,describe,toJSON,outputJSON,equals,compareTo,diff,hashCode,clone" });
+  expect(log_.output).toMatchGolden({ i: 15, str: " <b>&gt;</b> f1,f2,initArgs,unknownArg,copyFrom,clearProperty,onDestroy,destroy,toString,describe,equals,compareTo,diff,hashCode,clone,toJSON" });
 
 
 // Example 17
@@ -265,7 +265,7 @@ log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> clearProperty,clone,compareTo,copyFrom,describe,destroy,diff,equals,f1,f2,hashCode,initArgs,onDestroy,outputJSON,toJSON,toString,unknownArg" });
+  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> clearProperty,clone,compareTo,copyFrom,describe,destroy,diff,equals,f1,f2,hashCode,initArgs,onDestroy,toJSON,toString,unknownArg" });
 
 
 // Example 18
@@ -784,7 +784,7 @@ log(oldPerson.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 39, str: "CLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringProperty             Person         salaryTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        describeMethod               FObject        toJSONMethod               FObject        outputJSONMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        clone\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
+  expect(log_.output).toMatchGolden({ i: 39, str: "CLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringProperty             Person         salaryTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        describeMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        toJSON\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
 
 
 // Example 41
@@ -923,7 +923,7 @@ tt.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 51, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        toJSONMethod               FObject        outputJSONMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        clone\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
+  expect(log_.output).toMatchGolden({ i: 51, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        toJSON\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
 
 
 // Example 53
@@ -947,7 +947,7 @@ ImplementsTest2.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 52, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        toJSONMethod               FObject        outputJSONMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        clone\n" });
+  expect(log_.output).toMatchGolden({ i: 52, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        toJSON\n" });
 
 
 // Example 54
@@ -983,7 +983,7 @@ InnerClassTest.InnerClass1.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 54, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        toJSONMethod               FObject        outputJSONMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        clone\n" });
+  expect(log_.output).toMatchGolden({ i: 54, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bTopic                FObject        propertyChangeanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgMethod               FObject        copyFromMethod               FObject        clearPropertyMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        toStringMethod               FObject        describeMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        toJSON\n" });
 
 
 // Example 56
@@ -2044,36 +2044,175 @@ try {
 // JSON Support
 foam.CLASS({
   name: 'JSONTest',
-  properties: [ 'name', 'age', 'children' ]
+  properties: [
+    { name: 'name', shortName: 'n' },
+    { class: 'Int', name: 'age', shortName: 'a' },
+    { class: 'StringArray', name: 'children', shortName: 'cs' },
+    { name: 'name That Needs Quoting' },
+    { name: 'undefined' },
+    { name: 'defined' },
+    { class: 'String', name: 'undefinedString' },
+    { class: 'String', name: 'definedString' },
+    { class: 'String', name: 'defaultString', value: 'default' },
+    { class: 'Int', name: 'undefinedInt' },
+    { class: 'Int', name: 'definedInt' },
+    { class: 'Int', name: 'defaultInt', value: 3 },
+    { class: 'Float', name: 'undefinedFloat' },
+    { class: 'Float', name: 'definedFloat' },
+    { class: 'Float', name: 'defaultFloat', value: 3.14 },
+    { class: 'Boolean', name: 'undefinedBoolean' },
+    { class: 'Boolean', name: 'trueBoolean' },
+    { class: 'Boolean', name: 'falseBoolean' },
+    { class: 'Boolean', name: 'defaultBoolean', value: true },
+    { class: 'Date', name: 'undefinedDate' },
+    { class: 'Date', name: 'definedDate' },
+    { class: 'DateTime', name: 'undefinedDateTime' },
+    { class: 'DateTime', name: 'definedDateTime' },
+    { name: 'transient', transient: true },
+    { name: 'networkTransient', networkTransient: true },
+    { name: 'storageTransient', storageTransient: true },
+//    { name: '' },
+  ]
 });
-var o = foam.json.parse({class: 'JSONTest', name: 'John', age: 42, children: ['Peter', 'Paul']});
+var o = foam.json.parse({
+  class: 'JSONTest',
+  name: 'John',
+  age: 42,
+  children: ['Peter', 'Paul']});
 o.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 119, str: "Instance of JSONTestAxiom Type           Name           Value----------------------------------------------------Property             name           JohnProperty             age            42Property             children       Peter,Paul\n" });
+  expect(log_.output).toMatchGolden({ i: 119, str: "Instance of JSONTestAxiom Type           Name           Value----------------------------------------------------Property             name           JohnInt                  age            42StringArray          children       Peter,PaulProperty             name That Need Property             undefined      Property             defined        String               undefinedStrin String               definedString  String               defaultString  defaultInt                  undefinedInt   0Int                  definedInt     0Int                  defaultInt     3Float                undefinedFloat 0Float                definedFloat   0Float                defaultFloat   3.14Boolean              undefinedBoole falseBoolean              trueBoolean    falseBoolean              falseBoolean   falseBoolean              defaultBoolean trueDate                 undefinedDate  Date                 definedDate    DateTime             undefinedDateT DateTime             definedDateTim Property             transient      Property             networkTransie Property             storageTransie \n" });
 
 
 // Example 121
 log_.output = "";
 try {
 //
-log(foam.json.stringify(o));
+o = JSONTest.create({
+  name: 'John',
+  age: 42,
+  children: ['Peter', 'Paul'],
+  "name That Needs Quoting": 42,
+  defined: 'value',
+  definedString: 'stringValue',
+  definedInt: 42,
+  defaultInt: 3,
+  definedFloat: 42.42,
+  defaultFloat: 3.14,
+  trueBoolean: true,
+  falseBoolean: false,
+  defaultBoolean: true,
+  definedDate: new Date("Nov 19, 1970"),
+  definedDateTime: new Date("Nov 19, 1970"),
+  transient: 'transient value',
+  networkTransient: 'network transient value',
+  storageTransient: 'storage transient value'
+});
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 120, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}" });
+  expect(log_.output).toMatchGolden({ i: 120, str: "" });
 
 
 // Example 122
 log_.output = "";
 try {
-//
+// Default JSON formatting
+log(foam.json.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 121, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+
+
+// Example 123
+log_.output = "";
+try {
+// Or as a method on Objects
 log(o.toJSON());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 121, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}" });
+  expect(log_.output).toMatchGolden({ i: 122, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedDate: null,\n	definedDate: \"1970-11-19T05:00:00.000Z\",\n	undefinedDateTime: null,\n	definedDateTime: \"1970-11-19T05:00:00.000Z\",\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+
+
+// Example 124
+log_.output = "";
+try {
+//
+log(foam.json.Pretty.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 123, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedDate: null,\n	definedDate: \"1970-11-19T05:00:00.000Z\",\n	undefinedDateTime: null,\n	definedDateTime: \"1970-11-19T05:00:00.000Z\",\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+
+
+// Example 125
+log_.output = "";
+try {
+//
+log(foam.json.Strict.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 124, str: " <b>&gt;</b> {\"class\":\"JSONTest\",\"name\":\"John\",\"age\":42,\"children\":[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,\"undefined\":null,\"defined\":\"value\",\"undefinedString\":\"\",\"definedString\":\"stringValue\",\"defaultString\":\"default\",\"undefinedInt\":0,\"definedInt\":42,\"defaultInt\":3,\"undefinedFloat\":0,\"definedFloat\":42.42,\"defaultFloat\":3.14,\"undefinedBoolean\":false,\"trueBoolean\":true,\"falseBoolean\":false,\"defaultBoolean\":true,\"undefinedDate\":null,\"definedDate\":\"1970-11-19T05:00:00.000Z\",\"undefinedDateTime\":null,\"definedDateTime\":\"1970-11-19T05:00:00.000Z\",\"networkTransient\":\"network transient value\",\"storageTransient\":\"storage transient value\"}" });
+
+
+// Example 126
+log_.output = "";
+try {
+//
+log(foam.json.PrettyStrict.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 125, str: " <b>&gt;</b> {\n	\"class\": \"JSONTest\",\n	\"name\": \"John\",\n	\"age\": 42,\n	\"children\": [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	\"undefined\": null,\n	\"defined\": \"value\",\n	\"undefinedString\": \"\",\n	\"definedString\": \"stringValue\",\n	\"defaultString\": \"default\",\n	\"undefinedInt\": 0,\n	\"definedInt\": 42,\n	\"defaultInt\": 3,\n	\"undefinedFloat\": 0,\n	\"definedFloat\": 42.42,\n	\"defaultFloat\": 3.14,\n	\"undefinedBoolean\": false,\n	\"trueBoolean\": true,\n	\"falseBoolean\": false,\n	\"defaultBoolean\": true,\n	\"undefinedDate\": null,\n	\"definedDate\": \"1970-11-19T05:00:00.000Z\",\n	\"undefinedDateTime\": null,\n	\"definedDateTime\": \"1970-11-19T05:00:00.000Z\",\n	\"networkTransient\": \"network transient value\",\n	\"storageTransient\": \"storage transient value\"\n}" });
+
+
+// Example 127
+log_.output = "";
+try {
+//
+log(foam.json.Compact.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 126, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+
+
+// Example 128
+log_.output = "";
+try {
+//
+log(foam.json.Short.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 127, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+
+
+// Example 129
+log_.output = "";
+try {
+//
+log(foam.json.Network.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 128, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,storageTransient:\"storage transient value\"}" });
+
+
+// Example 130
+log_.output = "";
+try {
+//
+log(foam.json.Storage.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 129, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\"}" });
 
 
 });

@@ -918,8 +918,11 @@ Y2.describe();
 var Y = foam.subContext({log: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
-  imports: [ 'log' ],
-  methods: [ function foo() { this.log('foo from ImportTest'); } ]
+  imports: [ 'log', 'warn' ],
+  methods: [ function foo() {
+    this.log('log foo from ImportTest');
+    this.warn('warn foo from ImportTest');
+  } ]
 });
 Y.log('test');
 var o = ImportsTest.create(null, Y);
@@ -929,7 +932,7 @@ o.foo();
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log' ],
+  exports: [ 'log', 'log as warn' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
@@ -1180,16 +1183,97 @@ log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
 // JSON Support
 foam.CLASS({
   name: 'JSONTest',
-  properties: [ 'name', 'age', 'children' ]
+  properties: [
+    { name: 'name', shortName: 'n' },
+    { class: 'Int', name: 'age', shortName: 'a' },
+    { class: 'StringArray', name: 'children', shortName: 'cs' },
+    { name: 'name That Needs Quoting' },
+    { name: 'undefined' },
+    { name: 'defined' },
+    { class: 'String', name: 'undefinedString' },
+    { class: 'String', name: 'definedString' },
+    { class: 'String', name: 'defaultString', value: 'default' },
+    { class: 'Int', name: 'undefinedInt' },
+    { class: 'Int', name: 'definedInt' },
+    { class: 'Int', name: 'defaultInt', value: 3 },
+    { class: 'Float', name: 'undefinedFloat' },
+    { class: 'Float', name: 'definedFloat' },
+    { class: 'Float', name: 'defaultFloat', value: 3.14 },
+    { class: 'Boolean', name: 'undefinedBoolean' },
+    { class: 'Boolean', name: 'trueBoolean' },
+    { class: 'Boolean', name: 'falseBoolean' },
+    { class: 'Boolean', name: 'defaultBoolean', value: true },
+    { class: 'Function', name: 'undefinedFunction' },
+    { class: 'Function', name: 'definedFunction' },
+    { class: 'Date', name: 'undefinedDate' },
+    { class: 'Date', name: 'definedDate' },
+    { class: 'DateTime', name: 'undefinedDateTime' },
+    { class: 'DateTime', name: 'definedDateTime' },
+    { name: 'transient', transient: true },
+    { name: 'networkTransient', networkTransient: true },
+    { name: 'storageTransient', storageTransient: true },
+//    { name: '' },
+  ]
 });
-var o = foam.json.parse({class: 'JSONTest', name: 'John', age: 42, children: ['Peter', 'Paul']});
+var o = foam.json.parse({
+  class: 'JSONTest',
+  name: 'John',
+  age: 42,
+  children: ['Peter', 'Paul']});
 o.describe();
 
 //
+o = JSONTest.create({
+  name: 'John',
+  age: 42,
+  children: ['Peter', 'Paul'],
+  "name That Needs Quoting": 42,
+  defined: 'value',
+  definedString: 'stringValue',
+  definedInt: 42,
+  defaultInt: 3,
+  definedFloat: 42.42,
+  defaultFloat: 3.14,
+  trueBoolean: true,
+  falseBoolean: false,
+  defaultBoolean: true,
+  definedFunction: function plus(a, b) { return a + b; },
+  definedDate: new Date("Nov 19, 1970"),
+  definedDateTime: new Date("Nov 19, 1970"),
+  transient: 'transient value',
+  networkTransient: 'network transient value',
+  storageTransient: 'storage transient value'
+});
+
+// Default JSON formatting
 log(foam.json.stringify(o));
 
-//
+// Or as a method on Objects
 log(o.toJSON());
+
+//
+log(foam.json.Pretty.stringify(o));
+
+//
+log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
+
+//
+log(foam.json.Strict.stringify(o));
+
+//
+log(foam.json.PrettyStrict.stringify(o));
+
+//
+log(foam.json.Compact.stringify(o));
+
+//
+log(foam.json.Short.stringify(o));
+
+//
+log(foam.json.Network.stringify(o));
+
+//
+log(foam.json.Storage.stringify(o));
 
 //:NOTEST
 // Graphics Support

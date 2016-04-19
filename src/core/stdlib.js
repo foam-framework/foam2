@@ -85,6 +85,9 @@ foam.LIB({
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
     function bind(f, that, a1, a2, a3, a4) {
       switch ( arguments.length ) {
+        case 1:
+          console.error('No arguments given to bind to.');
+          break;
         case 2: return function() { return f.apply(that, arguments); };
         case 3: return function(b1, b2, b3, b4) {
           switch ( arguments.length ) {
