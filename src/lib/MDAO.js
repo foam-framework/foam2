@@ -75,10 +75,14 @@ foam.CLASS({
       class: 'Integer',
       name: 'cost',
     },
+    {
+      /** The index over which this plan operates */
+      name: 'index',
+    }
   ],
 
   methods: [
-    function execute(promise, state, sink, skip, limit, order, predicate) {},
+    function execute(promise, sink, skip, limit, order, predicate) {},
     function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
   ]
 });
@@ -122,54 +126,95 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
-  properties: [
-    { name: 'size', class: 'Integer' },
-  ],
-
   methods: [
     /** Adds or updates the given value in the index */
-    function put(value),
+    function put(value) {},
     /** Removes the given value from the index */
-    function remove(value),
+    function remove(value) {},
     /** @return a Plan to execute a select with the given parameters */
-    function plan(sink, skip, limit, order, predicate),
+    function plan(sink, skip, limit, order, predicate) {},
     /** @return the stored value for the given key. */
-    function get(key),
+    function get(key) {},
+    /** @return the integer size of this index. */
+    function size() {},
   ],
 });
 
-/** An Index which holds only a single value. **/
-var ValueIndex = {
-  put: function(s, newValue) { return newValue; },
-  remove: function() { return undefined; },
-  plan: (function() {
-           var plan = {
-             cost: 1,
-             execute: function(promise, s, sink) {
-               sink.put(s);
-             },
-             toString: function() { return 'unique'; }
-           };
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'TreeNode',
+  abstract: true,
 
-           return function() { return plan; };
-         })(),
-  get: function(value, key) { return value; },
-  /** Skip and limit are modified in place, so passed by reference as one-element arrays.
-    TODO: make this better (this used to be an options object) */
-  select: function(value, sink, skip, limit, order, predicate) {
-    if ( predicate && ! predicate.f(value) ) return;
-    if ( skip && skip[0]-- > 0 ) return;
-    if ( limit && limit[0]-- < 1 ) return;
-    sink.put(value);
-  },
-  /** Skip and limit are modified in place, so passed by reference as one-element arrays.
-    TODO: make this better (this used to be an options object) */
-  selectReverse: function(value, sink, skip, limit, order, predicate) {
-    this.select(value, sink, skip, limit, order, predicate);
-  },
-  size:   function(obj) { return 1; },
-  toString: function() { return 'value'; }
-};
+  methods: [
+    /** Skip and limit are modified in place, so passed by reference as one-element arrays.
+      TODO: make this better (this used to be an options object) */
+    function select: function( sink, skipArr, limitArr, order, predicate) {},
+    function selectReverse: function( sink, skipArr, limitArr, order, predicate) {},
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'UniqueValuePlan',
+
+  properties: [
+    { name: 'cost', value: 1 },
+  ],
+
+  methods: [
+    function execute(promise, sink, skip, limit, order, predicate) {
+      sink.put(this.index.value);
+    },
+    function toString() { return "unique"; }
+  ]
+});
+
+
+/** An Index which holds only a single value. **/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'ValueIndex',
+  extends: 'foam.dao.index.Index',
+  implements: [
+    'foam.dao.index.TreeNode',
+    'foam.dao.index.Plan',
+  ],
+
+  properties: [
+    {
+      class: 'Simple',
+      name: 'value'
+    },
+    { name: 'cost', value: 1 },
+  ],
+
+  methods: [
+    // from Plan (this index is its own plan)
+    function execute(promise, sink, skip, limit, order, predicate) {
+      sink.put(this.value);
+    },
+
+    // from Index
+    function put(s) { this.value = s; },
+    function remove() { this.value = undefined; },
+    function plan() { return this; },
+    function get(key) { return this.value; },
+    function size() { return 1; },
+    function toString() { return 'value'; }
+
+    // from TreeNode
+    function select: function(sink, skip, limit, order, predicate) {
+      if ( predicate && ! predicate.f(this.value) ) return;
+      if ( skip && skip[0]-- > 0 ) return;
+      if ( limit && limit[0]-- < 1 ) return;
+      sink.put(this.value);
+    },
+    function selectReverse: function(sink, skip, limit, order, predicate) {
+      this.select(sink, skip, limit, order, predicate);
+    },
+
+  ],
+});
 
 var KEY   = 0;
 var VALUE = 1;
