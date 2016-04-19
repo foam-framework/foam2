@@ -233,9 +233,11 @@ foam.CLASS({
       return this;
     },
 
-    function outputProperty(o, p) {
+    function outputProperty(o, p, includeComma) {
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) return;
+
+      if ( includeComma ) this.out(',');
 
       var v = o[p.name];
       if ( Array.isArray(v) && ! v.length ) return;
@@ -284,8 +286,7 @@ foam.CLASS({
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            if ( this.outClassNames || i ) this.out(',')
-            this.outputProperty(o, ps[i]);
+            this.outputProperty(o, ps[i], this.outputClassNames || i );
           }
           this.nl().end('}');
         },
