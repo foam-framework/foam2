@@ -104,6 +104,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'formatFunctionsAsStrings',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'outputDefaultValues',
       value: true
     },
@@ -134,6 +139,19 @@ foam.CLASS({
           this.clearProperty('useShortNames');
         } else {
           this.indentStr = this.nlStr = this.postColonStr = null;
+        }
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'strict',
+      value: false,
+      postSet: function(_, s) {
+        if ( s ) {
+          this.alwaysQuoteKeys          = true;
+          this.useShortNames            = false;
+          this.formatDatesAsNumbers     = false;
+          this.formatFunctionsAsStrings = true;
         }
       }
     }
@@ -234,6 +252,14 @@ foam.CLASS({
       }
     },
 
+    function outputFunction(o) {
+      if ( this.formatFunctionsAsStrings ) {
+        this.output(o.toString());
+      } else {
+        this.out(o.toString());
+      }
+    },
+
     {
       name: 'output',
       code: foam.mmethod({
@@ -244,7 +270,7 @@ foam.CLASS({
         Number:    function(o) { this.out(o); },
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
-        Function:  function(o) { this.out(o); },
+        Function:  function(o) { this.outputFunction(o); },
         FObject:   function(o) {
           this.start('{');
           if ( this.outputClassNames ) {
@@ -258,7 +284,7 @@ foam.CLASS({
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            if ( this.outClassNames ) this.out(',')
+            if ( this.outClassNames || i ) this.out(',')
             this.outputProperty(o, ps[i]);
           }
           this.nl().end('}');
@@ -301,11 +327,12 @@ foam.LIB({
 
     Strict: foam.json.Outputer.create({
       pretty: false,
-      alwaysQuoteKeys: true
+      strict: true
     }),
 
     PrettyStrict: foam.json.Outputer.create({
-      alwaysQuoteKeys: true
+      pretty: true,
+      strict: true
     }),
 
     Compact: foam.json.Outputer.create({
