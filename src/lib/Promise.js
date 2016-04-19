@@ -40,8 +40,9 @@ foam.CLASS({
           return;
         }
 
+        var value;
         try {
-          var value = success(self.value);
+          value = success(self.value);
         } catch(e) {
           next.reject_(e);
           return;
@@ -56,8 +57,9 @@ foam.CLASS({
           return;
         }
 
+        var value;
         try {
-          var value = fail(self.err);
+          value = fail(self.err);
         } catch(e) {
           next.reject_(e);
           return;
@@ -186,7 +188,7 @@ foam.CLASS({
     function resolve_(value) {
       if ( value === this ) {
         this.reject_(new TypeError("Promise resolved with itself"));
-      } else if ( value && typeof value.then == "function" ) {
+      } else if ( value && typeof value.then === "function" ) {
         var self = this;
         value.then(function(v) {
           self.resolve_(v);
@@ -210,13 +212,13 @@ foam.LIB({
       /** Create a new Promise, equivalent to ES6 "new Promise(executor); */
       name: "newPromise",
       code: function(executor) {
-        if ( ! executor || ! typeof executor == "function" ) {
+        if ( ! executor || ! typeof executor === "function" ) {
           this.reject_(new TypeError("Promise created with no executor function (", executor, ")"));
         }
         var p = foam.promise.Promise.create();
         var thenable = executor.call(null, p.fulfill_.bind(p), p.reject_.bind(p));
 
-        if ( thenable && typeof thenable.then == "function" ) {
+        if ( thenable && typeof thenable.then === "function" ) {
           thenable.then(function(v) {
             p.resolve_(v);
           }, function(e) {
@@ -233,7 +235,7 @@ foam.LIB({
       code: function (value) {
         var p = foam.promise.Promise.create();
 
-        if ( value && typeof value.then == "function" ) {
+        if ( value && typeof value.then === "function" ) {
           value.then(function(v) {
             p.resolve_(v);
           }, function(e) {
