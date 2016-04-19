@@ -100,8 +100,11 @@
     }
   };
 
-  // Create short-cuts for foam.X.[subContext, register, lookup] in foam.
-  for ( var key in X ) foam[key] = X[key].bind(X);
+  foam.lookup = function(id) { return foam.X.lookup(id); };
+  foam.register = function(cls) { foam.X.register(cls); };
+  foam.subContext = function(opt_args, opt_name) {
+    return foam.X.subContext(opt_args, opt_name);
+  };
 
   foam.X = X;
 })();
