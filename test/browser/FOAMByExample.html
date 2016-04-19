@@ -924,6 +924,8 @@ foam.CLASS({
     this.warn('warn foo from ImportTest');
   } ]
 });
+var o = ImportsTest.create();
+o.foo();
 Y.log('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
@@ -1209,6 +1211,8 @@ foam.CLASS({
     { class: 'Date', name: 'definedDate' },
     { class: 'DateTime', name: 'undefinedDateTime' },
     { class: 'DateTime', name: 'definedDateTime' },
+    { name: 'undefinedFObject' },
+    { name: 'definedFObject' },
     { name: 'transient', transient: true },
     { name: 'networkTransient', networkTransient: true },
     { name: 'storageTransient', storageTransient: true },
@@ -1240,11 +1244,15 @@ o = JSONTest.create({
   definedFunction: function plus(a, b) { return a + b; },
   definedDate: new Date("Nov 19, 1970"),
   definedDateTime: new Date("Nov 19, 1970"),
+  definedFObject: JSONTest.create({
+    name: 'Janet',
+    age: 32,
+    children: [ 'Kim', 'Kathy' ]
+  }),
   transient: 'transient value',
   networkTransient: 'network transient value',
   storageTransient: 'storage transient value'
 });
-
 // Default JSON formatting
 log(foam.json.stringify(o));
 
