@@ -13,7 +13,9 @@ foam.CLASS({
   requires: [
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest',
-    'foam.net.EventSource'
+    'foam.net.EventSource',
+    'foam.mlang.predicate.Gt',
+    'foam.mlang.predicate.Constant'
   ],
   properties: [
     'of',
@@ -28,7 +30,8 @@ foam.CLASS({
       expression: function(apppath, of) {
         return apppath + of.id.replace(/\./g, '/');
       }
-    }
+    },
+    'startEventsAt_'
   ],
   methods: [
     function put(obj) {
@@ -131,7 +134,12 @@ foam.CLASS({
 
       this.eventSource_ = this.EventSource.create({
         uri: this.basepath + '.json?auth=' + this.secret
-      })
+      });
+
+      if ( this.startEventsAt_ ) {
+        '&orderBy="lastUpdate"&startAt=' + this.startEventsAt_;
+      }
+
       this.eventSource_.message.put.sub(this.onPut);
       this.eventSource_.message.patch.sub(this.onPatch);
       this.eventSource_.start();
@@ -149,6 +157,23 @@ foam.CLASS({
       req.method = "GET";
       req.url = this.basepath + ".json";
       if ( this.secret ) req.url += "?auth=" + encodeURIComponent(this.secret);
+
+      // Efficiently handle GT(lastupdate, #) queries.  Used by the SyncDAO to get
+      // all changes.
+
+      if ( predicate && this.timestampProperty &&
+           this.Gt.isInstance(predicate) &&
+           this.Constant.isInstance(predicate.arg2) &&
+           predicate.arg1 === this.timestampProperty ) {
+
+        // TODO: This is a hack to ensure that
+        if ( ! this.startEventsAt_ )  {
+          this.startEventsAt_ = predicate.arg2.f() + 1;
+          this.startEvents();
+        }
+
+        req.url += '&orderBy="lastUpdate"&startAt=' + ( predicate.arg2.f() + 1 );
+      }
 
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
@@ -184,16 +209,7 @@ foam.CLASS({
         sink.error(e);
         return Promise.reject(e);
       });
-    },
-    function sub(firstTopic) {
-      this.SUPER.apply(this, arguments);
-
-      if ( firstTopic === 'on' ) {
-        // TODO: No reliably way to detect unsubscribes yet
-        // so we don't know when to stop streaming events.
-        this.startEvents();
-      }
-    },
+    }
   ],
   listeners: [
     function onPut(s, _, _, data) {
