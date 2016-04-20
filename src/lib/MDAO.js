@@ -148,8 +148,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.left  = this.left  || foam.dao.index.NullTreeNode.create();
-      this.right = this.right || foam.dao.index.NullTreeNode.create();
+      this.left  = this.left  || foam.dao.index.NullTreeNode.create(this);
+      this.right = this.right || foam.dao.index.NullTreeNode.create(this);
     },
 
     /** Nodes do a shallow clone */
@@ -169,6 +169,105 @@ foam.CLASS({
     function maybeClone() {
       return ( this.index.selectCount > 0 ) ? this.clone() : this;
     },
+
+    function updateSize() {
+      this.size = this.index.size(this.left) +
+        this.index.size(this.right) + this.index.tail.size(this.value);
+    },
+
+    /** @return Another node representing the rebalanced AA tree. */
+    function skew() {
+      if ( this.left.level === this.level ) {
+        // Swap the pointers of horizontal left links.
+        var l = this.left.maybeClone();
+
+        this.left = l.right;
+        l.right = this;
+
+        this.updateSize();
+        l.updateSize();
+
+        return l;
+      }
+
+      return this;
+    },
+
+    /** @return a node representing the rebalanced AA tree. */
+    function split() {
+      if ( this.right.level && this.right.right.level && this.level === this.right.right.level ) {
+        // We have two horizontal right links.  Take the middle node, elevate it, and return it.
+        var r = this.right.maybeClone();
+
+        this.right = r.left;
+        r.left = this;
+        r.level++;
+
+        this.updateSize();
+        r.updateSize();
+
+        return r;
+      }
+
+      return this;
+    },
+
+    function predecessor() {
+      if ( ! this.left.level ) return this;
+      for ( var s = this.left ; s.right.level ; s = s.right );
+        return s;
+    },
+    function successor() {
+      if ( ! this.right.level ) return this;
+      for ( var s = this.right ; s.left.level ; s = s.left );
+        return s;
+    },
+
+    /** Removes links that skip levels.
+      @return the tree with its level decreased. */
+    function decreaseLevel() {
+      var expectedLevel = Math.min(this.left.level ? this.left.level : 0, this.right.level ? this.right.level : 0) + 1;
+
+      if ( expectedLevel < this.level ) {
+        this.level = expectedLevel;
+        if ( this.right.level && expectedLevel < this.right.level ) {
+          this.right = this.right.maybeClone();
+          this.right.level = expectedLevel;
+        }
+      }
+      return this;
+    },
+
+    /** extracts the value with the given key from the index */
+    function get(key) {
+      var r = this.index.compare(this.key, key);
+
+      if ( r === 0 ) return this.value; // TODO... tail.get(this.value) ???
+
+      return r > 0 ? this.left.get(key) : this.right.get(key);
+    },
+
+    function putKeyValue(key, value) {
+      var s = this.maybeClone();
+
+      var r = this.index.compare(s.key, key);
+
+      if ( r === 0 ) {
+        this.index.dedup(value, s.key);
+
+        s.size -= this.index.tail.size(s.value);
+        s.value = this.index.tail.put(s.value, value);
+        s.size += this.index.tail.size(s.value);
+      } else {
+        var side = r > 0 ? 'left' : 'right';
+
+        if ( s[side].level ) s.size -= s[side].size;
+        s[side] = s[side].putKeyValue(key, value);
+        s.size += s[side].size;
+      }
+
+      return s.split().skew();
+    },
   ]
 });
 
@@ -176,7 +275,11 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
   extends: 'foam.dao.index.TreeNode',
-  axioms: [ foam.pattern.Singleton.create() ],
+  axioms: [
+    foam.pattern.Multiton.create({
+      property: foam.dao.index.TreeNode.INDEX
+    })
+  ],
 
   methods: [
     function init() {
@@ -186,11 +289,23 @@ foam.CLASS({
       this.level = 0;
     },
 
-    function clone() {
-      return this;
-    },
-    function maybeClone() {
-      return this;
+    function clone() {         return this; },
+    function maybeClone() {    return this; },
+    function skew() {          return this; },
+    function split() {         return this; },
+    function decreaseLevel() { return this; },
+    function get() {           return undefined; },
+    function updateSize() { },
+
+    /** Add a new value to the tree */
+    function putKeyValue(key, value) {
+      return foam.dao.index.TreeNode.create({
+        key: key,
+        value: this.index.tail.put(null, value),
+        size: 1,
+        level: 1,
+        index: this.index
+      });
     },
   ]
 
@@ -223,7 +338,7 @@ var TreeIndex = {
       return this.bulkLoad_(a, 0, a.length-1);
     }
 
-    var s = foam.dao.index.NullTreeNode.create();
+    var s = foam.dao.index.NullTreeNode.create({ index: this });
     for ( var i = 0 ; i < a.length ; i++ ) {
       s = this.put(s, a[i]);
     }
@@ -243,92 +358,15 @@ var TreeIndex = {
     return tree;
   },
 
-  // Set the value's property to be the same as the key in the index.
-  // This saves memory by sharing objects.
+  /** Set the value's property to be the same as the key in the index.
+      This saves memory by sharing objects. */
   dedup: function(obj, value) {
     obj[this.prop.name] = value;
   },
 
   put: function(s, newValue) {
-    return this.putKeyValue(s, this.prop.f(newValue), newValue);
-  },
-
-  putKeyValue: function(s, key, value) {
-    if ( ! s || ! s.level ) {
-      //[key, this.tail.put(null, value), 1, 1];
-      return foam.dao.index.TreeNode.create({
-        key: key,
-        value: this.tail.put(null, value),
-        size: 1,
-        level: 1,
-        index: this
-      });
-    }
-
-    s = s.maybeClone();
-
-    var r = this.compare(s.key, key);
-
-    if ( r === 0 ) {
-      this.dedup(value, s.key);
-
-      s.size -= this.tail.size(s.value);
-      s.value = this.tail.put(s.value, value);
-      s.size += this.tail.size(s.value);
-    } else {
-      var side = r > 0 ? 'left' : 'right';
-
-      if ( s[side].level ) s.size -= s[side].size;
-      s[side] = this.putKeyValue(s[side], key, value);
-      s.size += s[side].size;
-    }
-
-    return this.split(this.skew(s));
-  },
-
-  //    input: T, a node representing an AA tree that needs to be rebalanced.
-  //    output: Another node representing the rebalanced AA tree.
-
-  skew: function(s) {
-    if ( s.level && s.left.level === s.level ) {
-      // Swap the pointers of horizontal left links.
-      var l = s.left.maybeClone();
-
-      s.left = l.right;
-      l.right = s;
-
-      this.updateSize(s);
-      this.updateSize(l);
-
-      return l;
-    }
-
-    return s;
-  },
-
-  updateSize: function(s) {
-    if ( ! s.level ) return;
-    s.size = this.size(s.left) + this.size(s.right) + this.tail.size(s.value);
-  },
-
-  //  input: T, a node representing an AA tree that needs to be rebalanced.
-  //  output: Another node representing the rebalanced AA tree.
-  split: function(s) {
-    if ( s.level && s.right.level && s.right.right.level && s.level === s.right.right.level ) {
-      // We have two horizontal right links.  Take the middle node, elevate it, and return it.
-      var r = s.right.maybeClone();
-
-      s.right = r.left;
-      r.left = s;
-      r.level++;
-
-      this.updateSize(s);
-      this.updateSize(r);
-
-      return r;
-    }
-
-    return s;
+    if ( ! s ) s = foam.dao.index.NullTreeNode.create({ index: this });
+    return s.putKeyValue(this.prop.f(newValue), newValue);
   },
 
   remove: function(s, value) {
@@ -354,7 +392,9 @@ var TreeIndex = {
       }
 
       // If we're a leaf, easy, otherwise reduce to leaf case.
-      if ( ! s.left.level && ! s.right.level ) return foam.dao.index.NullTreeNode.create();
+      if ( ! s.left.level && ! s.right.level ) {
+        return foam.dao.index.NullTreeNode.create({ index: this });
+      }
 
       var side = s.left.level ? 'left' : 'right';
 
@@ -362,8 +402,8 @@ var TreeIndex = {
       // the entry at the same time in order to prevent two traversals.
       // But, this would also duplicate the delete logic.
       var l = side === 'left' ?
-        this.predecessor(s) :
-        this.successor(s)   ;
+        s.predecessor() :
+        s.successor()   ;
 
       s.key = l.key;
       s.value = l.value;
@@ -379,13 +419,13 @@ var TreeIndex = {
 
     // Rebalance the tree. Decrease the level of all nodes in this level if
     // necessary, and then skew and split all nodes in the new level.
-    s = this.skew(this.decreaseLevel(s));
+    s = s.decreaseLevel().skew();
     if ( s.right.level ) {
-      s.right = this.skew(s.right.maybeClone());
-      if ( s.right.right.level ) s.right.right = this.skew(s.right.right.maybeClone());
+      s.right = s.right.maybeClone().skew();
+      if ( s.right.right.level ) s.right.right = s.right.right.maybeClone().skew();
     }
-    s = this.split(s);
-    s.right = this.split(s.right.maybeClone());
+    s = s.split();
+    s.right = s.right.maybeClone().split();
 
     return s;
   },
@@ -408,43 +448,10 @@ var TreeIndex = {
     return s;
   },
 
-  predecessor: function(s) {
-    if ( ! s.left.level ) return s;
-    for ( s = s.left ; s.right.level ; s = s.right );
-      return s;
-  },
-
-  successor: function(s) {
-    if ( ! s.right.level ) return s;
-    for ( s = s.right ; s.left.level ; s = s.left );
-      return s;
-  },
-
-  // input: T, a tree for which we want to remove links that skip levels.
-  // output: T with its level decreased.
-  decreaseLevel: function(s) {
-    if ( ! s.level ) return;
-    var expectedLevel = Math.min(s.left.level ? s.left.level : 0, s.right.level ? s.right.level : 0) + 1;
-
-    if ( expectedLevel < s.level ) {
-      s.level = expectedLevel;
-      if ( s.right && expectedLevel < s.right.level ) {
-        s.right = s.right.maybeClone();
-        s.right.level = expectedLevel;
-      }
-    }
-
-    return s;
-  },
-
   get: function(s, key) {
-    if ( ! s.level ) return undefined;
+    if ( ! s ) return undefined;
 
-    var r = this.compare(s.key, key);
-
-    if ( r === 0 ) return s.value;
-
-    return this.get(r > 0 ? s.left : s.right, key);
+    return s.get(key);
   },
 
   select: function(s, sink, skip, limit, order, predicate) {
@@ -1236,7 +1243,7 @@ foam.CLASS({
       // TODO: generally sort out how .ids is supposed to work
       this.index = TreeIndex.create(this.of.getAxiomByName(
         ( this.of.ids && this.of.ids[0] ) || 'id' ) );
-      this.root = foam.dao.index.NullTreeNode.create();
+      this.root = foam.dao.index.NullTreeNode.create({ index: this.index });
 
       if ( this.autoIndex ) this.addRawIndex(AutoIndex.create(this));
     },
