@@ -42,7 +42,7 @@ var log_ = function log_(o) {
   log_.output += o;
 };
 var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
-var golden = " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}";
+var golden = " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\"}";
 var oldLog, oldAssert;
 beforeEach(function() {
   oldLog = console.log;
@@ -2044,36 +2044,175 @@ try {
 // JSON Support
 foam.CLASS({
   name: 'JSONTest',
-  properties: [ 'name', 'age', 'children' ]
+  properties: [
+    { name: 'name', shortName: 'n' },
+    { class: 'Int', name: 'age', shortName: 'a' },
+    { class: 'StringArray', name: 'children', shortName: 'cs' },
+    { name: 'name That Needs Quoting' },
+    { name: 'undefined' },
+    { name: 'defined' },
+    { class: 'String', name: 'undefinedString' },
+    { class: 'String', name: 'definedString' },
+    { class: 'String', name: 'defaultString', value: 'default' },
+    { class: 'Int', name: 'undefinedInt' },
+    { class: 'Int', name: 'definedInt' },
+    { class: 'Int', name: 'defaultInt', value: 3 },
+    { class: 'Float', name: 'undefinedFloat' },
+    { class: 'Float', name: 'definedFloat' },
+    { class: 'Float', name: 'defaultFloat', value: 3.14 },
+    { class: 'Boolean', name: 'undefinedBoolean' },
+    { class: 'Boolean', name: 'trueBoolean' },
+    { class: 'Boolean', name: 'falseBoolean' },
+    { class: 'Boolean', name: 'defaultBoolean', value: true },
+    { class: 'Date', name: 'undefinedDate' },
+    { class: 'Date', name: 'definedDate' },
+    { class: 'DateTime', name: 'undefinedDateTime' },
+    { class: 'DateTime', name: 'definedDateTime' },
+    { name: 'transient', transient: true },
+    { name: 'networkTransient', networkTransient: true },
+    { name: 'storageTransient', storageTransient: true },
+//    { name: '' },
+  ]
 });
-var o = foam.json.parse({class: 'JSONTest', name: 'John', age: 42, children: ['Peter', 'Paul']});
+var o = foam.json.parse({
+  class: 'JSONTest',
+  name: 'John',
+  age: 42,
+  children: ['Peter', 'Paul']});
 o.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 119, str: "Instance of JSONTestAxiom Type           Name           Value----------------------------------------------------Property             name           JohnProperty             age            42Property             children       Peter,Paul\n" });
+  expect(log_.output).toMatchGolden({ i: 119, str: "Instance of JSONTestAxiom Type           Name           Value----------------------------------------------------Property             name           JohnInt                  age            42StringArray          children       Peter,PaulProperty             name That Need Property             undefined      Property             defined        String               undefinedStrin String               definedString  String               defaultString  defaultInt                  undefinedInt   0Int                  definedInt     0Int                  defaultInt     3Float                undefinedFloat 0Float                definedFloat   0Float                defaultFloat   3.14Boolean              undefinedBoole falseBoolean              trueBoolean    falseBoolean              falseBoolean   falseBoolean              defaultBoolean trueDate                 undefinedDate  Date                 definedDate    DateTime             undefinedDateT DateTime             definedDateTim Property             transient      Property             networkTransie Property             storageTransie \n" });
 
 
 // Example 121
 log_.output = "";
 try {
 //
-log(foam.json.stringify(o));
+o = JSONTest.create({
+  name: 'John',
+  age: 42,
+  children: ['Peter', 'Paul'],
+  "name That Needs Quoting": 42,
+  defined: 'value',
+  definedString: 'stringValue',
+  definedInt: 42,
+  defaultInt: 3,
+  definedFloat: 42.42,
+  defaultFloat: 3.14,
+  trueBoolean: true,
+  falseBoolean: false,
+  defaultBoolean: true,
+  definedDate: new Date("Nov 19, 1970"),
+  definedDateTime: new Date("Nov 19, 1970"),
+  transient: 'transient value',
+  networkTransient: 'network transient value',
+  storageTransient: 'storage transient value'
+});
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 120, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}" });
+  expect(log_.output).toMatchGolden({ i: 120, str: "" });
 
 
 // Example 122
 log_.output = "";
 try {
-//
+// Default JSON formatting
+log(foam.json.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 121, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+
+
+// Example 123
+log_.output = "";
+try {
+// Or as a method on Objects
 log(o.toJSON());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 121, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"]}" });
+  expect(log_.output).toMatchGolden({ i: 122, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedDate: null,\n	definedDate: \"1970-11-19T05:00:00.000Z\",\n	undefinedDateTime: null,\n	definedDateTime: \"1970-11-19T05:00:00.000Z\",\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+
+
+// Example 124
+log_.output = "";
+try {
+//
+log(foam.json.Pretty.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 123, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedDate: null,\n	definedDate: \"1970-11-19T05:00:00.000Z\",\n	undefinedDateTime: null,\n	definedDateTime: \"1970-11-19T05:00:00.000Z\",\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+
+
+// Example 125
+log_.output = "";
+try {
+//
+log(foam.json.Strict.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 124, str: " <b>&gt;</b> {\"class\":\"JSONTest\",\"name\":\"John\",\"age\":42,\"children\":[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,\"undefined\":null,\"defined\":\"value\",\"undefinedString\":\"\",\"definedString\":\"stringValue\",\"defaultString\":\"default\",\"undefinedInt\":0,\"definedInt\":42,\"defaultInt\":3,\"undefinedFloat\":0,\"definedFloat\":42.42,\"defaultFloat\":3.14,\"undefinedBoolean\":false,\"trueBoolean\":true,\"falseBoolean\":false,\"defaultBoolean\":true,\"undefinedDate\":null,\"definedDate\":\"1970-11-19T05:00:00.000Z\",\"undefinedDateTime\":null,\"definedDateTime\":\"1970-11-19T05:00:00.000Z\",\"networkTransient\":\"network transient value\",\"storageTransient\":\"storage transient value\"}" });
+
+
+// Example 126
+log_.output = "";
+try {
+//
+log(foam.json.PrettyStrict.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 125, str: " <b>&gt;</b> {\n	\"class\": \"JSONTest\",\n	\"name\": \"John\",\n	\"age\": 42,\n	\"children\": [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	\"undefined\": null,\n	\"defined\": \"value\",\n	\"undefinedString\": \"\",\n	\"definedString\": \"stringValue\",\n	\"defaultString\": \"default\",\n	\"undefinedInt\": 0,\n	\"definedInt\": 42,\n	\"defaultInt\": 3,\n	\"undefinedFloat\": 0,\n	\"definedFloat\": 42.42,\n	\"defaultFloat\": 3.14,\n	\"undefinedBoolean\": false,\n	\"trueBoolean\": true,\n	\"falseBoolean\": false,\n	\"defaultBoolean\": true,\n	\"undefinedDate\": null,\n	\"definedDate\": \"1970-11-19T05:00:00.000Z\",\n	\"undefinedDateTime\": null,\n	\"definedDateTime\": \"1970-11-19T05:00:00.000Z\",\n	\"networkTransient\": \"network transient value\",\n	\"storageTransient\": \"storage transient value\"\n}" });
+
+
+// Example 127
+log_.output = "";
+try {
+//
+log(foam.json.Compact.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 126, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+
+
+// Example 128
+log_.output = "";
+try {
+//
+log(foam.json.Short.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 127, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+
+
+// Example 129
+log_.output = "";
+try {
+//
+log(foam.json.Network.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 128, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,storageTransient:\"storage transient value\"}" });
+
+
+// Example 130
+log_.output = "";
+try {
+//
+log(foam.json.Storage.stringify(o));
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 129, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedDate:27838800000,definedDateTime:27838800000,networkTransient:\"network transient value\"}" });
 
 
 });

@@ -918,9 +918,14 @@ Y2.describe();
 var Y = foam.subContext({log: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
-  imports: [ 'log' ],
-  methods: [ function foo() { this.log('foo from ImportTest'); } ]
+  imports: [ 'log', 'warn' ],
+  methods: [ function foo() {
+    this.log('log foo from ImportTest');
+    this.warn('warn foo from ImportTest');
+  } ]
 });
+var o = ImportsTest.create();
+o.foo();
 Y.log('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
@@ -929,7 +934,7 @@ o.foo();
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log' ],
+  exports: [ 'log', 'log as warn' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
@@ -1200,10 +1205,14 @@ foam.CLASS({
     { class: 'Boolean', name: 'trueBoolean' },
     { class: 'Boolean', name: 'falseBoolean' },
     { class: 'Boolean', name: 'defaultBoolean', value: true },
+    { class: 'Function', name: 'undefinedFunction' },
+    { class: 'Function', name: 'definedFunction' },
     { class: 'Date', name: 'undefinedDate' },
     { class: 'Date', name: 'definedDate' },
     { class: 'DateTime', name: 'undefinedDateTime' },
     { class: 'DateTime', name: 'definedDateTime' },
+    { name: 'undefinedFObject' },
+    { name: 'definedFObject' },
     { name: 'transient', transient: true },
     { name: 'networkTransient', networkTransient: true },
     { name: 'storageTransient', storageTransient: true },
@@ -1232,13 +1241,18 @@ o = JSONTest.create({
   trueBoolean: true,
   falseBoolean: false,
   defaultBoolean: true,
+  definedFunction: function plus(a, b) { return a + b; },
   definedDate: new Date("Nov 19, 1970"),
   definedDateTime: new Date("Nov 19, 1970"),
+  definedFObject: JSONTest.create({
+    name: 'Janet',
+    age: 32,
+    children: [ 'Kim', 'Kathy' ]
+  }),
   transient: 'transient value',
   networkTransient: 'network transient value',
   storageTransient: 'storage transient value'
 });
-
 // Default JSON formatting
 log(foam.json.stringify(o));
 
@@ -1247,6 +1261,9 @@ log(o.toJSON());
 
 //
 log(foam.json.Pretty.stringify(o));
+
+//
+log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
 
 //
 log(foam.json.Strict.stringify(o));
@@ -1265,7 +1282,6 @@ log(foam.json.Network.stringify(o));
 
 //
 log(foam.json.Storage.stringify(o));
-
 
 //:NOTEST
 // Graphics Support

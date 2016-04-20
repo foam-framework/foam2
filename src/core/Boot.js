@@ -453,8 +453,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined' ||
-          this.instance_.hasOwnProperty(name);
+      return typeof this.instance_[name] !== 'undefined';
     },
 
     /**
@@ -683,12 +682,17 @@ foam.CLASS({
         } :
         hasValue ? function valueGetter() {
           var v = this.instance_[name];
-          return typeof v !== 'undefined' || this.instance_.hasOwnProperty(name) ? v : value ;
+          return typeof v !== 'undefined' ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
       var setter = prop.setter ||
         function propSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
           // Get old value but avoid triggering factory if present
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
@@ -1389,8 +1393,7 @@ foam.CLASS({
         for ( var i = 0 ; i < bs.length ; i++ ) {
           var b = bs[i];
           if ( typeof b === 'string' ) {
-            var a   = b.split(' ');
-            var key, as;
+            var key, as, a = b.split(' ');
             switch ( a.length ) {
               case 1:
                 key = as = a[0];
@@ -1953,7 +1956,7 @@ foam.CLASS({
     function clearProperty(name) {
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
-        delete this.instance_[name];
+        this.instance_[name] = undefined
         this.pub('propertyChange', name, this.slot(name));
       }
     },
