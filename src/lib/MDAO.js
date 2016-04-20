@@ -118,12 +118,26 @@ var ValueIndex = {
   toString: function() { return 'value'; }
 };
 
-var KEY   = 0;
-var VALUE = 1;
-var SIZE  = 2;
-var LEVEL = 3;
-var LEFT  = 4;
-var RIGHT = 5;
+var KEY   = 'key';
+var VALUE = 'value';
+var SIZE  = 'size';
+var LEVEL = 'level';
+var LEFT  = 'left';
+var RIGHT = 'right';
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'TreeNode',
+
+  properties: [
+    { class: 'Simple', name: 'key' },
+    { class: 'Simple', name: 'value' },
+    { class: 'Simple', name: 'size' },
+    { class: 'Simple', name: 'level' },
+    { class: 'Simple', name: 'left' },
+    { class: 'Simple', name: 'right' },
+  ]
+});
 
 // TODO: investigate how well V8 optimizes static classes
 
@@ -191,7 +205,13 @@ var TreeIndex = {
 
   putKeyValue: function(s, key, value) {
     if ( ! s ) {
-      return [key, this.tail.put(null, value), 1, 1];
+      //[key, this.tail.put(null, value), 1, 1];
+      return foam.dao.index.TreeNode.create({
+        key: key,
+        value: this.tail.put(null, value),
+        size: 1,
+        level: 1,
+      });
     }
 
     s = this.maybeClone(s);
