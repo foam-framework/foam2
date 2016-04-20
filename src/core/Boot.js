@@ -453,8 +453,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined' ||
-          this.instance_.hasOwnProperty(name);
+      return typeof this.instance_[name] !== 'undefined';
     },
 
     /**
@@ -473,6 +472,10 @@ foam.CLASS({
     function hasOwnPrivate_(name) {
       return this.private_ && typeof this.private_[name] !== 'undefined';
 
+    },
+
+    function clearPrivate_(name) {
+      if ( this.private_ ) this.private_[name] = undefined;
     },
 
     function pubPropertyChange_() {
@@ -516,10 +519,13 @@ foam.CLASS({
     [ 'extends', 'FObject' ],
     'refines',
     {
+      // List of all axioms, including methods, properties, listeners,
+      // et. and 'axioms'.
       name: 'axioms_',
       factory: function() { return []; }
     },
     {
+      // List of extra axioms. Is added to axioms_.
       name: 'axioms',
       factory: function() { return []; },
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
@@ -536,13 +542,18 @@ foam.CLASS({
         }
         if ( Array.isArray(o) ) {
           var p = foam.core.Property.create();
-          p.name         = o[0];
+          p.name  = o[0];
           p.value = o[1];
           return p;
         }
-        return o.class ?
-          foam.lookup(o.class).create(o) :
-          foam.core.Property.create(o)   ;
+
+        if ( o.class ) {
+          var m = foam.lookup(o.class);
+          if ( ! m ) throw 'Unknown class : ' + o.class;
+          return m.create(o);
+        }
+
+        return foam.core.Property.create(o);
       }
     },
     {
@@ -610,10 +621,13 @@ foam.CLASS({
     */
     function installInClass(c) {
       var superProp = c.__proto__.getAxiomByName(this.name);
+
       if ( superProp ) {
         var a = this.cls_.getAxiomsByClass(foam.core.Property);
+
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
+
           if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) ) {
             this[name] = superProp[name];
           }
@@ -678,12 +692,17 @@ foam.CLASS({
         } :
         hasValue ? function valueGetter() {
           var v = this.instance_[name];
-          return typeof v !== 'undefined' || this.instance_.hasOwnProperty(name) ? v : value ;
+          return typeof v !== 'undefined' ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
       var setter = prop.setter ||
         function propSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
           // Get old value but avoid triggering factory if present
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
@@ -730,20 +749,17 @@ foam.CLASS({
       if ( ! e ) return null;
 
       var argNames = foam.Function.argsArray(e);
-      var name = this.name;
+      var name     = this.name;
 
+      // TODO: determine how often the value is being invalidated,
+      // and if it's happening often, then don't unsubscribe.
       return function() {
         var self = this;
         var args = new Array(argNames.length);
         var subs = [];
         var l    = function() {
-          if ( ! self.hasOwnProperty(name) ) {
-            delete self.private_[name];
-            self.clearProperty(name); // TODO: this might be wrong
-          }
-          for ( var i = 0 ; i < subs.length ; i++ ) {
-            subs[i].destroy();
-          }
+          if ( ! self.hasOwnProperty(name) ) self.clearPrivate_(name);
+          for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           subs.push(this.sub('propertyChange', argNames[i], l));
@@ -1379,8 +1395,7 @@ foam.CLASS({
         for ( var i = 0 ; i < bs.length ; i++ ) {
           var b = bs[i];
           if ( typeof b === 'string' ) {
-            var a   = b.split(' ');
-            var key, as;
+            var key, as, a = b.split(' ');
             switch ( a.length ) {
               case 1:
                 key = as = a[0];
@@ -1392,8 +1407,8 @@ foam.CLASS({
               break;
               case 3:
                 console.assert(a[1] === 'as', 'Invalid export syntax: key [as value] | as value');
-                key = a[2];
-                as  = a[0];
+                key = a[0];
+                as  = a[2];
               break;
               default:
                 console.error('Invalid export syntax: key [as value] | as value');
@@ -1943,7 +1958,7 @@ foam.CLASS({
     function clearProperty(name) {
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
-        delete this.instance_[name];
+        this.instance_[name] = undefined
         this.pub('propertyChange', name, this.slot(name));
       }
     },
@@ -1966,8 +1981,6 @@ foam.CLASS({
        */
       if ( this.destroyed ) return;
 
-      this.destroyed = true;
-
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
@@ -1979,6 +1992,8 @@ foam.CLASS({
           }
         }
       }
+
+      this.destroyed = true;
 
       this.instance_ = null;
       this.private_ = null;

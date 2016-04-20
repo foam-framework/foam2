@@ -8,7 +8,8 @@
     "jsdoc": "^3.4.0",
     "node-inspector": "^0.12.6",
     "node-localstorage": "^0.6.0",
-    "jshint": "^2.9.1"
+    "jshint": "^2.9.1",
+    "jscs": "^2.11.0"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
@@ -16,6 +17,6 @@
     "coverage": "JASMINE_CONFIG_PATH=jasmine_node.json istanbul cover -- jasmine \n istanbul instrument ./src/ -o ./tmp_cov___/ \n rm -rf ./tmp_cov___",
     "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
     "doc": "rm -rf doc/gen && jsdoc -c jsdoc.conf -r -t ./doc/template -d ./doc/gen ./src/",
-    "lint": "jshint -c .jshintrc  ./src/"
+    "lint": "jshint -c .jshintrc  ./src/ && jscs -c .jscsrc ./src/"
   }
 }

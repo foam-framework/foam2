@@ -1,0 +1,24 @@
+{
+  "preset": "google",
+  "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~"],
+  "requireSpaceAfterPrefixUnaryOperators": ["!"],
+  "disallowSpacesInsideParentheses": null,
+  "requireCurlyBraces": [
+    "catch",
+    "do",
+    "else",
+    "switch",
+    "try"
+  ],
+  validateQuoteMarks: {
+    mark: "'",
+    escape: true
+  },
+
+  "foamExplodedStatements": true,
+  "foamRequireCurlyBraces": true,
+  "additionalRules": [
+    "./tools/style/jscs_parens.js",
+    "./tools/style/jscs_curly_braces.js"
+  ]
+}

@@ -1,19 +1,23 @@
 {
     "boss": true,
-    "curly": true,
     "eqeqeq": true,
     "eqnull": true,
     "expr": true,
     "immed": true,
     "noarg": true,
-    "quotmark": "single",
     "smarttabs": true,
     "trailing": true,
     "undef": true,
     "unused": true,
 
+    "proto": true,
+
     "globals": {
+      "console": true,
+      "describe": true,
+      "expect": true,
       "foam": true,
-      "console": true
+      "global": true,
+      "it": true
     }
 }
