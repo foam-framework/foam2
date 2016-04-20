@@ -814,7 +814,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.messaging',
-  name: 'MessageChannelServer',
+  name: 'MessagePortService',
   requires: [
     'foam.messaging.MessagePort',
     'foam.box.MessagePortBox'
@@ -835,7 +835,12 @@ foam.CLASS({
       name: 'source'
     },
     {
-      name: 'inbox_'
+      name: 'inbox_',
+      factory: function() {
+        this.MessagePortBox.create({
+          id: this.$UID
+        });
+      }
     }
   ],
   topics: [
@@ -848,9 +853,6 @@ foam.CLASS({
   methods: [
     function start() {
       this.source.addEventListener('message', this.onConnect);
-      this.inbox_ = this.MessagePortBox.create({
-        id: this.$UID
-      });
     },
     function inbox() {
       return this.inbox_;
@@ -912,6 +914,23 @@ foam.CLASS({
       if ( this.delegate ) {
         this.delegate.send(msg);
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.messaging',
+  name: 'SharedWorkerMessagePortService',
+  extends: 'foam.messaging.MessagePortService',
+  methods: [
+    function start() {
+      this.source.onconnect = function(e) {
+        var port = e.ports[0];
+        port.onmessage = this.onConnect;
+      }.bind(this);
+      this.inbox_ = this.MessagePortBox.create({
+        id: this.$UID
+      });
     }
   ]
 });
