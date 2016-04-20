@@ -310,11 +310,41 @@ foam.CLASS({
   package: 'foam.net',
   name: 'EventSource',
   requires: [
+    'foam.parse.Grammar',
     'foam.net.HTTPRequest',
-    'foam.encodings.UTF8',
-    'foam.parse.StringPS'
+    'foam.encodings.UTF8'
   ],
   properties: [
+    {
+      name: 'grammar',
+      factory: function() {
+        var self = this;
+        return this.Grammar.create({
+          symbols: function(repeat, alt, sym, notChars, seq) {
+            return {
+              START: sym('line'),
+
+              line: alt(
+                sym('event'),
+                sym('data')),
+
+              event: seq('event: ', sym('event name')),
+              'event name': repeat(notChars('\r\n')),
+
+              data: seq('data: ', sym('data payload')),
+              'data payload': repeat(notChars('\r\n'))
+            }
+          }
+        }).addActions({
+          'event name': function(v) {
+            self.eventName = v.join('');
+          },
+          'data payload': function(p) {
+            self.eventData = JSON.parse(p.join(''));
+          }
+        });
+      }
+    },
     {
       class: 'String',
       name: 'uri'
@@ -333,12 +363,6 @@ foam.CLASS({
         return this.UTF8.create()
       }
     },
-    {
-      name: 'ps',
-      factory: function() {
-        return this.StringPS.create();
-      }
-    },
     'eventData',
     'eventName'
   ],
@@ -352,33 +376,6 @@ foam.CLASS({
         'cancel',
         'auth_revoked'
       ]
-    }
-  ],
-  grammar: function(repeat, alt, sym, notChars, seq) {
-    return {
-      line: alt(
-        sym('event'),
-        sym('data')),
-
-      event: seq('event: ', sym('event name')),
-      'event name': repeat(notChars('\r\n')),
-
-      data: seq('data: ', sym('data payload')),
-      'data payload': repeat(notChars('\r\n'))
-    };
-  },
-  grammarActions: [
-    {
-      name: 'event name',
-      code: function(v) {
-        this.eventName = v.join('');
-      }
-    },
-    {
-      name: 'data payload',
-      code: function(p) {
-        this.eventData = JSON.parse(p.join(''));
-      }
     }
   ],
   methods: [
@@ -425,8 +422,7 @@ foam.CLASS({
         return;
       }
 
-      this.ps.setString(line);
-      this.line(this.ps);
+      this.grammar.parseString(line);
     }
   ],
   listeners: [
