@@ -108,6 +108,7 @@ foam.CLASS({
         return this.FirebaseDAO.create({
           of: this.Message,
           timestampProperty: this.Message.TIMESTAMP,
+          secret: '0Zr5o8wSWmje7gyVvAhVocW8AjPNvjXEqfKr6B33',
           apppath: 'https://glaring-torch-184.firebaseio.com/'
         });
 
@@ -242,6 +243,7 @@ foam.CLASS({
         var dao = this.FirebaseDAO.create({
           of: this.Message,
           timestampProperty: this.Message.SYNC_NO,
+          secret: '0Zr5o8wSWmje7gyVvAhVocW8AjPNvjXEqfKr6B33',
           apppath: 'https://glaring-torch-184.firebaseio.com/'
         });
 
