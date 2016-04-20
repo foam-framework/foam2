@@ -47,6 +47,7 @@ copy client.js
 copy sw.js
 copy worker.js
 copy sharedWorker.js
+copy style.css
 copy index.html
 
 cd site
