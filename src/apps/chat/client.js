@@ -65,7 +65,8 @@ foam.CLASS({
       }
 
       if ( ! this.rows[m.id] ) {
-        var view = this.rows[m.id] = {
+        var view = {
+          obj: m,
           row: document.createElement('div'),
           from: document.createElement('div'),
           message: document.createElement('div'),
@@ -80,14 +81,36 @@ foam.CLASS({
         view.row.appendChild(view.from);
         view.row.appendChild(view.message);
         view.row.appendChild(view.timestamp);
-        this.table.appendChild(view.row);
       } else {
         view = this.rows[m.id];
+        view.row.remove();
+        delete this.rows[m.id];
       }
 
       view.from.textContent = m.from;
       view.message.textContent = m.message;
       view.timestamp.textContent = m.syncNo < 0 ? 'pending...' : formatTime(new Date(m.syncNo));
+
+
+      if ( m.syncNo < 0 ) {
+        this.table.appendChild(view.row);
+      } else {
+        var max;
+        var limit = m.syncNo;
+        for ( var key in this.rows ) {
+          if ( foam.util.compare(this.rows[key].obj.syncNo, limit) < 0 ) continue;
+
+          if ( ! max ) {
+            max = this.rows[key];
+          } else if ( foam.util.compare(this.rows[key].obj.syncNo, max.obj.syncNo) < 0 ) {
+            max = this.rows[key];
+          }
+        }
+
+        this.table.insertBefore(view.row, max ? max.row : null);
+      }
+
+      this.rows[m.id] = view;
     }
   ]
 });
@@ -116,9 +139,9 @@ function onMessage(m) {
   document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
 }
 
-client.messageDAO.select().then(function(a) {
-  a.a.map(onMessage);
-});
+// client.messageDAO.select().then(function(a) {
+//   a.a.map(onMessage);
+// });
 
 client.messageDAO.on.put.sub(function(s, _, _, m) {
   onMessage(m);
