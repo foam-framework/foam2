@@ -320,7 +320,8 @@ foam.CLASS({
     'foam.encodings.UTF8'
   ],
   imports: [
-    'setTimeout'
+    'setTimeout',
+    'clearTimeout'
   ],
   properties: [
     {
@@ -372,6 +373,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'retryTimer'
+    },
+    {
       class: 'Int',
       name: 'delay',
       preSet: function(_, a) {
@@ -406,6 +410,7 @@ foam.CLASS({
       });
 
       this.running = true;
+      this.keepAlive();
       req.send().then(function(resp) {
         if ( ! resp.success ) {
           this.onError();
@@ -413,10 +418,20 @@ foam.CLASS({
         }
 
         resp.data.sub(this.onData);
-        resp.end.sub(this.onEnd);
+        resp.end.sub(this.onError);
         this.resp = resp;
         resp.start();
-      }.bind(this));
+      }.bind(this), this.onError);
+    },
+    function keepAlive() {
+      if ( this.retryTimer ) {
+        this.clearTimeout(this.retryTimer);
+      }
+
+      this.retryTimer = this.setTimeout(foam.Function.bind(function() {
+        this.retryTimer = 0;
+        this.onError();
+      }, this), 60000);
     },
     function close() {
       this.running = false;
@@ -446,14 +461,12 @@ foam.CLASS({
 
       this.grammar.parseString(line);
     },
-    function onError() {
-      this.delay *= 2;
-      this.setTimeout(foam.Function.bind(this.start, this), this.delay);
-    },
   ],
   listeners: [
     function onData(s, _, data) {
       this.delay = 1;
+      this.keepAlive();
+
       this.decoder.put(data);
       var string = this.decoder.string;
       while ( string.indexOf('\n') != -1 ) {
@@ -463,9 +476,13 @@ foam.CLASS({
       }
       this.decoder.string = string;
     },
+    function onError() {
+      this.delay *= 2;
+      this.setTimeout(this.onEnd, this.delay);
+    },
     function onEnd() {
       if ( this.running ) {
-        this.onError();
+        this.start();
       }
     }
   ]
