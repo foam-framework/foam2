@@ -472,7 +472,21 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
+      delegates: [ 'where', 'orderBy', 'skip', 'limit' ],
+      postSet: function(old, nu) {
+        if ( old ) old.on.unsub(this.onEvent);
+        if ( nu ) nu.on.sub(this.onEvent);
+      }
+    }
+  ],
+  listeners: [
+    {
+      name: 'onEvent',
+      code: function(s, a, b, c, d, e, f, g) {
+        // TODO: There should be a standard method for doing this
+        // that will keep up with the maximum amount of supported pub arguments.
+        this.pub(a, b, c, d, e, f, g);
+      }
     }
   ]
 });
@@ -721,7 +735,13 @@ foam.CLASS({
         }
       ]
     },
-    'delegate',
+    {
+      name: 'delegate',
+      postSet: function(old, nu) {
+        if ( old ) old.on.unsub(this.onEvent);
+        if ( nu ) nu.on.sub(this.onEvent);
+      }
+    },
     {
       name: 'promise',
       final: true,
@@ -763,6 +783,16 @@ foam.CLASS({
           });
         }
       ]
+    }
+  ],
+  listeners: [
+    {
+      name: 'onEvent',
+      code: function(s, a, b, c, d, e, f, g) {
+        // TODO: There should be a standard method for doing this
+        // that will keep up with the maximum amount of supported pub arguments.
+        this.pub(a, b, c, d, e, f, g);
+      }
     }
   ]
 });
