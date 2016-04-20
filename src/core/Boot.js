@@ -474,6 +474,10 @@ foam.CLASS({
 
     },
 
+    function clearPrivate_(name) {
+      if ( this.private_ ) this.private_[name] = undefined;
+    },
+
     function pubPropertyChange_() {
       // NOP - to be added later
     },
@@ -515,10 +519,13 @@ foam.CLASS({
     [ 'extends', 'FObject' ],
     'refines',
     {
+      // List of all axioms, including methods, properties, listeners,
+      // et. and 'axioms'.
       name: 'axioms_',
       factory: function() { return []; }
     },
     {
+      // List of extra axioms. Is added to axioms_.
       name: 'axioms',
       factory: function() { return []; },
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
@@ -535,7 +542,7 @@ foam.CLASS({
         }
         if ( Array.isArray(o) ) {
           var p = foam.core.Property.create();
-          p.name         = o[0];
+          p.name  = o[0];
           p.value = o[1];
           return p;
         }
@@ -614,10 +621,13 @@ foam.CLASS({
     */
     function installInClass(c) {
       var superProp = c.__proto__.getAxiomByName(this.name);
+
       if ( superProp ) {
         var a = this.cls_.getAxiomsByClass(foam.core.Property);
+
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
+
           if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) ) {
             this[name] = superProp[name];
           }
@@ -739,20 +749,17 @@ foam.CLASS({
       if ( ! e ) return null;
 
       var argNames = foam.Function.argsArray(e);
-      var name = this.name;
+      var name     = this.name;
 
+      // TODO: determine how often the value is being invalidated,
+      // and if it's happening often, then don't unsubscribe.
       return function() {
         var self = this;
         var args = new Array(argNames.length);
         var subs = [];
         var l    = function() {
-          if ( ! self.hasOwnProperty(name) ) {
-            delete self.private_[name];
-            self.clearProperty(name); // TODO: this might be wrong
-          }
-          for ( var i = 0 ; i < subs.length ; i++ ) {
-            subs[i].destroy();
-          }
+          if ( ! self.hasOwnProperty(name) ) self.clearPrivate_(name);
+          for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           subs.push(this.sub('propertyChange', argNames[i], l));
