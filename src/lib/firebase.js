@@ -21,6 +21,9 @@ foam.CLASS({
     'secret',
     'eventSource_',
     {
+      name: 'timestampProperty'
+    },
+    {
       name: 'basepath',
       expression: function(apppath, of) {
         return apppath + of.id.replace(/\./g, '/');
@@ -30,28 +33,53 @@ foam.CLASS({
   methods: [
     function put(obj) {
       var req = this.HTTPRequest.create();
-      req.method = "PUT";
-      req.url = this.basepath
-        + "/"
-        + encodeURIComponent(obj.id) + ".json";
+
+      if ( obj.id ) {
+        req.method = "PUT";
+        req.url = this.basepath
+          + "/"
+          + encodeURIComponent(obj.id) + ".json";
+      } else {
+        throw new Error('Server generated IDs not supported.');
+        // req.method = 'POST';
+        // req.url = this.basepath + '.json';
+      }
+
       if ( this.secret ) {
         req.url += '?auth=' + encodeURIComponent(this.secret);
       }
 
-      req.payload = JSON.stringify({ data: foam.json.stringify(obj) });
+      req.payload = JSON.stringify({
+        data: foam.json.stringify(obj),
+        lastUpdate: {
+          ".sv": "timestamp"
+        }
+      });
       req.headers['content-type'] = 'application/json';
       req.headers['accept'] = 'application/json';
 
       return req.send().then(function(resp) {
         return resp.payload;
       }).then(function(payload) {
-        return foam.json.parse(foam.json.parseString(JSON.parse(payload).data));
-      }, function(resp) {
+        payload = JSON.parse(payload);
+
+        //        if ( obj.id ) {
+          var o2 = foam.json.parse(foam.json.parseString(payload.data));
+          if ( this.timestampProperty ) {
+            this.timestampProperty.set(o2, payload.lastUpdate);
+          }
+          return o2;
+        //        } else {
+        //           Server created id
+        //        }
+      }.bind(this), function(resp) {
         // TODO: Handle various errors.
         return Promise.reject(foam.dao.InternalException.create());
       });
     },
     function remove(obj) {
+      debugger;
+
       var req = this.HTTPRequest.create();
       req.method = "DELETE",
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";
@@ -81,13 +109,20 @@ foam.CLASS({
           return Promise.reject(foam.dao.ObjectNotFoundException.create({ id: id }));
         }
         try {
-          return foam.json.parse(
-            foam.json.parseString(
-              JSON.parse(data).data));
+          data = JSON.parse(data);
+
+          var obj = foam.json.parse(
+            foam.json.parseString(data.data));
+
+          if ( this.timestampProperty ) {
+            this.timestampProperty.set(obj, data.lastUpdate);
+          }
+
+          return obj;
         } catch(e) {
           return Promise.reject(foam.dao.InternalException.create());
         }
-      });
+      }.bind(this));
     },
     function startEvents() {
       if ( this.eventSource_ ) {
@@ -135,6 +170,10 @@ foam.CLASS({
 
           var obj = foam.json.parse(
             foam.json.parseString(data[key].data));
+          if ( this.timestampProperty ) {
+            this.timestampProperty.set(obj, data[key].lastUpdate);
+          }
+
           sink.put(obj, null, fc);
         }
         sink.eof();
@@ -173,6 +212,9 @@ foam.CLASS({
 
         for ( var key in data.data ) {
           var obj = foam.json.parse(foam.json.parseString(data.data[key].data));
+          if ( this.timestampProperty ) {
+            this.timestampProperty.set(obj, data.data[key].lastUpdate);
+          }
           this.on.put.pub(obj);
         }
         return;
@@ -184,56 +226,41 @@ foam.CLASS({
           return;
         }
         var obj = foam.json.parse(foam.json.parseString(data.data.data));
+        if ( this.timestampProperty ) {
+          this.timestampProperty.set(obj, data.data.lastUpdate);
+        }
         this.on.put.pub(obj);
       } else if ( path.indexOf('/data') === path.length - 5 ) {
-        var obj = foam.json.parse(foam.json.parseString(data.data));
-        this.on.put.pub(obj);
-      } else {
+        // These last two events shouldn't happen unless somebody is editing
+        // the underlying firebase data by hand.
+
+        // Data of an existing row updated.
         debugger;
+        var id = path.substring(1);
+        id = id.substring(0, id.indexOf('/'));
+        this.find(id).then(function(obj) {
+          this.on.put.pub(obj);
+        });
+
+
+        // var obj = foam.json.parse(foam.json.parseString(data.data));
+        // this.on.put.pub(obj);
+      } else if ( path.indexOf('/lastUpdate') === path.length - 11 ) {
+        // Timestamp of an existing row updated, do anything?
+        // presumably if the object itself hasn't been updated we don't care
+        // if it has been updated we should get an event for that.
+
+        debugger;
+        var id = path.substring(1);
+        id = id.substring(0, id.indexOf('/'));
+        this.find(id).then(function(obj) {
+          this.on.put.pub(obj);
+        });
       }
     },
     function onPatch(s, _, _, data) {
           // TODO: What does a patch even look like?
       debugger;
-    },
-    function onEvent(s, _, event) {
-      // TODO: handle removes.
-      if ( event.name == "put" ) {
-        console.log("*** Received event", event);
-        event.data = JSON.parse(event.data);
-        var path = event.data.path;
-
-        if ( event.data.data == null ) {
-          this.notify_("remove", [this.of.create({ id: path.split('/')[1] })]);
-        } else if ( path == '/' ) {
-          for ( var key in event.data.data ) {
-            this.find(key, {
-              put: function(obj) {
-                this.notify_("put", [obj]);
-              }.bind(this),
-              error: function() {
-                console.error("Failed to find object after notification", event);
-              }
-            });
-          }
-        } else {
-          path = path.split('/');
-          var id = path[1];
-
-          this.find(id, {
-            put: function(obj) {
-              this.notify_("put", [obj]);
-            }.bind(this),
-            error: function() {
-              console.error("Failed to find object after notification", event);
-            }
-          });
-        }
-      } else if ( event.name == "patch" ) {
-        // TODO
-      } else {
-        console.log("Ignored event", event.name);
-      }
     }
   ]
 });
