@@ -235,10 +235,12 @@ foam.CLASS({
     {
       name: 'messageDAO',
       factory: function() {
-        var channel = document.location.search.substring(1).split('&').find(function(e) {
-          return e.indexOf('channel=') === 0;
-        });
-        channel = channel && channel.substring(8);
+        // var channel = document.location.search.substring(1).split('&').find(function(e) {
+        //   return e.indexOf('channel=') === 0;
+        // });
+        // channel = channel && channel.substring(8);
+
+        var channel = "foam";
 
         var dao = this.FirebaseDAO.create({
           of: this.Message,
