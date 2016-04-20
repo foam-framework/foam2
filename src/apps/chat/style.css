@@ -42,5 +42,11 @@
 
 .message-timestamp {
     display: inline;
-    float: right;
+}
+
+.message-timestamp::before {
+}
+
+.message-timestamp::after {
+    content: ': '
 }

@@ -87,9 +87,9 @@ foam.CLASS({
         view.message.className = 'message-message';
         view.timestamp.className = 'message-timestamp';
 
+        view.row.appendChild(view.timestamp);
         view.row.appendChild(view.from);
         view.row.appendChild(view.message);
-        view.row.appendChild(view.timestamp);
       } else {
         view = this.rows[m.id];
         view.row.remove();
