@@ -6,14 +6,6 @@ if ( navigator.serviceWorker ) {
 var env = foam.apps.chat.BoxEnvironment.create();
 var client = foam.apps.chat.Client.create(null, env);
 
-document.body.insertAdjacentHTML(
-  'beforeend',
-  '<table id="messages">' +
-    '</table>' +
-    '<div><input type="text" id="message"/></div>');
-
-var messages = document.getElementById('messages');
-var input = document.getElementById('message');
 var ME = 'Anonymous';
 
 document.location.search.substring(1).split('&').forEach(function(s) {
@@ -21,7 +13,12 @@ document.location.search.substring(1).split('&').forEach(function(s) {
   if ( s[0] === 'me' ) ME = s[1];
 });
 
-input.addEventListener('change', function() {
+var messages = document.getElementById('messages');
+var pending = document.getElementById('pending');
+var input = document.getElementById('input');
+var send = document.getElementById('send');
+
+function sendMessage() {
   if ( input.value ) {
     client.messageDAO.put(
       foam.apps.chat.Message.create({
@@ -30,9 +27,80 @@ input.addEventListener('change', function() {
       }));
   }
   input.value = '';
+}
+
+input.addEventListener('keyup', function(e) {
+  if ( e.keyIdentifier === 'Enter' ) {
+    sendMessage();
+  }
 });
 
-var msgs = {};
+send.addEventListener('click', sendMessage);
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'MessageTable',
+  properties: [
+    {
+      name: 'table',
+    },
+    {
+      class: 'Map',
+      name: 'rows'
+    },
+    {
+      class: 'Boolean',
+      name: 'pending',
+      value: false
+    }
+  ],
+  listeners: [
+    function onMessage(m) {
+      if ( m.syncNo < 0 !== this.pending ) {
+        if ( this.rows[m.id] ) {
+          this.rows[m.id].row.remove();
+          this.rows[m.id] = undefined;
+        }
+        return;
+      }
+
+      if ( ! this.rows[m.id] ) {
+        var view = this.rows[m.id] = {
+          row: document.createElement('div'),
+          from: document.createElement('div'),
+          message: document.createElement('div'),
+          timestamp: document.createElement('div')
+        };
+
+        view.row.className = 'message-row';
+        view.from.className = 'message-from';
+        view.message.className = 'message-message';
+        view.timestamp.className = 'message-timestamp';
+
+        view.row.appendChild(view.from);
+        view.row.appendChild(view.message);
+        view.row.appendChild(view.timestamp);
+        this.table.appendChild(view.row);
+      } else {
+        view = this.rows[m.id];
+      }
+
+      view.from.textContent = m.from;
+      view.message.textContent = m.message;
+      view.timestamp.textContent = m.syncNo < 0 ? 'pending...' : formatTime(new Date(m.syncNo));
+    }
+  ]
+});
+
+
+var confirmedMsgs = foam.apps.chat.MessageTable.create({
+  table: messages,
+});
+
+var pendingMsgs = foam.apps.chat.MessageTable.create({
+  table: pending,
+  pending: true
+});
 
 function formatTime(m) {
   var hours = m.getHours().toString();
@@ -43,26 +111,8 @@ function formatTime(m) {
 }
 
 function onMessage(m) {
-  if ( ! msgs[m.id] ) {
-    var view = msgs[m.id] = {
-      row: document.createElement('tr'),
-      from: document.createElement('td'),
-      message: document.createElement('td'),
-      timestamp: document.createElement('td')
-    };
-    view.row.appendChild(view.from);
-    view.row.appendChild(view.message);
-    view.row.appendChild(view.timestamp);
-    messages.appendChild(view.row);
-  } else {
-    view = msgs[m.id];
-  }
-
-  view.from.textContent = m.from;
-  view.message.textContent = m.message;
-  view.row.style.color = m.syncNo < 0 ? 'grey' : 'black';
-  view.timestamp.textContent = m.syncNo < 0 ? 'pending...' : '';
-
+  pendingMsgs.onMessage(m);
+  confirmedMsgs.onMessage(m);
   document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
 }
 
