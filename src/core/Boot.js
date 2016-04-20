@@ -520,7 +520,7 @@ foam.CLASS({
     'refines',
     {
       // List of all axioms, including methods, properties, listeners,
-      // et. and 'axioms'.
+      // etc. and 'axioms'.
       name: 'axioms_',
       factory: function() { return []; }
     },
@@ -531,6 +531,7 @@ foam.CLASS({
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     },
     {
+      // TODO: doc is replaced below
       class: 'Array',
       of: 'Property',
       name: 'properties',
@@ -540,6 +541,7 @@ foam.CLASS({
           p.name = o;
           return p;
         }
+
         if ( Array.isArray(o) ) {
           var p = foam.core.Property.create();
           p.name  = o[0];
@@ -557,6 +559,7 @@ foam.CLASS({
       }
     },
     {
+      // TODO: doc is replaced below
       class: 'Array',
       of: 'Method',
       name: 'methods',
@@ -568,6 +571,7 @@ foam.CLASS({
           m.code = o;
           return m;
         }
+        // TODO: why don't we call Method.create()?
         return o;
       }
     }
@@ -578,17 +582,20 @@ foam.CLASS({
 
 
 foam.CLASS({
-  id: 'foam.core.Property',
+  id: 'foam.core.Property', // TODO: is this require
   package: 'foam.core',
   name: 'Property',
-  extends: 'FObject',
+  extends: 'FObject', // TODO: is this require
 
   properties: [
+    // TODO: validate doesn't end with $
     { name: 'name', required: true },
     {
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
+    // TODO: document these properties in detail
+    /* User-level help. */
     'help',
     'value',
     'factory',
@@ -619,6 +626,7 @@ foam.CLASS({
       Handle overriding of Property definition from parent class by
       copying undefined values from parent Property, if it exists.
     */
+    // TODO: document property inheritance
     function installInClass(c) {
       var superProp = c.__proto__.getAxiomByName(this.name);
 
@@ -634,10 +642,14 @@ foam.CLASS({
         }
       }
 
+      // TODO: detect conflicts, consider making constantName a property
       c[foam.String.constantize(this.name)] = this;
+
+      // Note: can't be used without installing Property first
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
+      // ???: Better name than 'f'?
       var f = this.f = function f(o) { return o[name]; };
 
       /** Makes this Property a comparator, suitable for use with mLangs. */
@@ -658,7 +670,6 @@ foam.CLASS({
       var preSet   = this.preSet;
       var postSet  = this.postSet;
       var factory  = this.factory;
-      // This doesn't let value to be 'undefined', which is maybe not bad.
       var value    = this.value;
       var hasValue = typeof value !== 'undefined';
       var slotName = name + '$';
@@ -667,17 +678,19 @@ foam.CLASS({
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
+      // TODO: doc
       Object.defineProperty(proto, slotName, {
-        get: function propDynGetter() {
+        get: function propertySlotGetter() {
           return prop.toSlot(this);
         },
-        set: function propDynSetter(dyn) {
-          prop.toSlot(this).link(dyn);
+        set: function propertySlotSetter(slot2) {
+          prop.toSlot(this).link(slot2);
         },
         configurable: true,
         enumerable: false
       });
 
+      // TODO: document
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
@@ -696,8 +709,9 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
-      var setter = prop.setter ||
+      var setter = prop.setter ? prop.setter :
         function propSetter(newValue) {
+          // ???: Should clearProperty() call set(undefined)?
           if ( newValue === undefined ) {
             this.clearProperty(name);
             return;
@@ -712,6 +726,8 @@ foam.CLASS({
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
 
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
+
+          // ???: Should newValue === undefined check go here instead?
 
           this.instance_[name] = newValue;
 
