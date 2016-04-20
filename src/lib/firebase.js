@@ -115,13 +115,13 @@ foam.CLASS({
       req.url = this.basepath + ".json";
       if ( this.secret ) req.url += "?auth=" + encodeURIComponent(this.secret);
 
+      var resultSink = sink || this.ArraySink.create();
+      sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
+
       // TODO: This should be streamed for better handling of large responses.
       return req.send().then(function(resp) {
         return resp.payload;
       }).then(function(payload) {
-        var resultSink = sink || this.ArraySink.create();
-        sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
-
         var data = JSON.parse(payload);
         var fc = this.FlowControl.create();
 
