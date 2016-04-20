@@ -145,6 +145,12 @@ foam.CLASS({
         if ( typeof value !== 'undefined' ) c[name] = value;
       }
       return c;
+    },
+
+    /** Clone is only needed if a select() is active in the tree at the
+      same time we are updating it. */
+    function maybeClone() {
+      return ( this.index.selectCount > 0 ) ? this.clone() : this;
     }
   ]
 });
@@ -201,11 +207,6 @@ var TreeIndex = {
     obj[this.prop.name] = value;
   },
 
-  maybeClone: function(s) {
-    if ( s && this.selectCount > 0 ) return s.clone();
-    return s;
-  },
-
   put: function(s, newValue) {
     return this.putKeyValue(s, this.prop.f(newValue), newValue);
   },
@@ -222,7 +223,7 @@ var TreeIndex = {
       });
     }
 
-    s = this.maybeClone(s);
+    s = s.maybeClone();
 
     var r = this.compare(s.key, key);
 
@@ -249,7 +250,7 @@ var TreeIndex = {
   skew: function(s) {
     if ( s && s.left && s.left.level === s.level ) {
       // Swap the pointers of horizontal left links.
-      var l = this.maybeClone(s.left);
+      var l = s.left.maybeClone();
 
       s.left = l.right;
       l.right = s;
@@ -272,7 +273,7 @@ var TreeIndex = {
   split: function(s) {
     if ( s && s.right && s.right.right && s.level === s.right.right.level ) {
       // We have two horizontal right links.  Take the middle node, elevate it, and return it.
-      var r = this.maybeClone(s.right);
+      var r = s.right.maybeClone();
 
       s.right = r.left;
       r.left = s;
@@ -294,7 +295,7 @@ var TreeIndex = {
   removeKeyValue: function(s, key, value) {
     if ( ! s ) return s;
 
-    s = this.maybeClone(s);
+    s = s.maybeClone();
 
     var r = this.compare(s.key, key);
 
@@ -337,11 +338,11 @@ var TreeIndex = {
     // necessary, and then skew and split all nodes in the new level.
     s = this.skew(this.decreaseLevel(s));
     if ( s.right ) {
-      s.right = this.skew(this.maybeClone(s.right));
-      if ( s.right.right ) s.right.right = this.skew(this.maybeClone(s.right.right));
+      s.right = this.skew(s.right.maybeClone());
+      if ( s.right.right ) s.right.right = this.skew(s.right.right.maybeClone());
     }
     s = this.split(s);
-    s.right = this.split(this.maybeClone(s.right));
+    s.right = this.split(s.right.maybeClone());
 
     return s;
   },
@@ -349,7 +350,7 @@ var TreeIndex = {
   removeNode: function(s, key) {
     if ( ! s ) return s;
 
-    s = this.maybeClone(s);
+    s = s.maybeClone();
 
     var r = this.compare(s.key, key);
 
@@ -384,7 +385,7 @@ var TreeIndex = {
     if ( expectedLevel < s.level ) {
       s.level = expectedLevel;
       if ( s.right && expectedLevel < s.right.level ) {
-        s.right = this.maybeClone(s.right);
+        s.right = s.right.maybeClone();
         s.right.level = expectedLevel;
       }
     }
