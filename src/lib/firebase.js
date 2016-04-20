@@ -256,7 +256,7 @@ foam.CLASS({
         id = id.substring(0, id.indexOf('/'));
         this.find(id).then(function(obj) {
           this.on.put.pub(obj);
-        });
+        }.bind(this));
 
 
         // var obj = foam.json.parse(foam.json.parseString(data.data));
@@ -271,7 +271,7 @@ foam.CLASS({
         id = id.substring(0, id.indexOf('/'));
         this.find(id).then(function(obj) {
           this.on.put.pub(obj);
-        });
+        }.bind(this));
       }
     },
     function onPatch(s, _, _, data) {
