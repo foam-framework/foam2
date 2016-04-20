@@ -517,6 +517,31 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  implements: ['foam.dao.Sink'],
+  name: 'Max',
+  properties: [
+    {
+      /** The first argument to the expression. */
+      name: 'arg1',
+      class: 'foam.mlang.ExprArgument',
+    },
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+  methods: [
+    function put(obj) {
+      if ( ! this.hasOwnProperty('value') ) this.value = this.arg1.f(obj);
+      else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) this.value = this.arg1.f(obj);
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
@@ -537,6 +562,7 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
+    'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
   ],
 
@@ -565,6 +591,7 @@ foam.CLASS({
     function NOT(a) { return this._unary_("Not", a); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
+    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
   ]
 });
 
