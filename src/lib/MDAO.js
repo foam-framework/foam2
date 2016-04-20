@@ -118,6 +118,7 @@ var ValueIndex = {
   toString: function() { return 'value'; }
 };
 
+/** Represents one node's state in a binary tree */
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeNode',
@@ -129,22 +130,35 @@ foam.CLASS({
     { class: 'Simple', name: 'level' },
     { class: 'Simple', name: 'left' },
     { class: 'Simple', name: 'right' },
+
+    { class: 'Simple', name: 'index' },
+  ],
+
+  methods: [
+    /** Nodes do a shallow clone */
+    function clone() {
+      var c = this.cls_.create();
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0; i < ps.length; ++i ) {
+        var name = ps[i].name;
+        var value = this[name];
+        if ( typeof value !== 'undefined' ) c[name] = value;
+      }
+      return c;
+    }
   ]
 });
-
-// TODO: investigate how well V8 optimizes static classes
-
-// [0 key, 1 value, 2 size, 3 level, 4 left, 5 right]
 
 /** An AATree (balanced binary search tree) Index. **/
 var TreeIndex = {
   create: function(prop, tail) {
+    // value index just stores the value in each node
     tail = tail || ValueIndex;
 
     return {
       __proto__: this,
-      prop: prop,
-      tail: tail,
+      prop: prop, // the property we index over
+      tail: tail, // the factory for making sub-indexes for the value at each node
       selectCount: 0
     };
   },
@@ -204,6 +218,7 @@ var TreeIndex = {
         value: this.tail.put(null, value),
         size: 1,
         level: 1,
+        index: this
       });
     }
 
