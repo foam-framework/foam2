@@ -1402,8 +1402,8 @@ foam.CLASS({
               break;
               case 3:
                 console.assert(a[1] === 'as', 'Invalid export syntax: key [as value] | as value');
-                key = a[2];
-                as  = a[0];
+                key = a[0];
+                as  = a[2];
               break;
               default:
                 console.error('Invalid export syntax: key [as value] | as value');
