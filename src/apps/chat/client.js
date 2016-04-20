@@ -55,6 +55,15 @@ foam.CLASS({
     }
   ],
   listeners: [
+    function onRemove(m) {
+      if ( this.rows[m.id] ) {
+        this.rows[m.id].row.remove();
+        delete this.rows[m.id];
+      }
+    },
+    function onReset() {
+      this.table.children = [];
+    },
     function onMessage(m) {
       if ( m.syncNo < 0 !== this.pending ) {
         if ( this.rows[m.id] ) {
@@ -145,4 +154,12 @@ function onMessage(m) {
 
 client.messageDAO.on.put.sub(function(s, _, _, m) {
   onMessage(m);
+});
+
+client.messageDAO.on.remove.sub(function(s, _, _, m) {
+  confirmedMsgs.onRemove(m);
+});
+
+client.messageDAO.on.reset.sub(function() {
+  confirmedMsgs.onReset();
 });
