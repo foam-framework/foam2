@@ -118,13 +118,6 @@ var ValueIndex = {
   toString: function() { return 'value'; }
 };
 
-var KEY   = 'key';
-var VALUE = 'value';
-var SIZE  = 'size';
-var LEVEL = 'level';
-var LEFT  = 'left';
-var RIGHT = 'right';
-
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeNode',
@@ -181,9 +174,9 @@ var TreeIndex = {
     var m    = start + Math.floor((end-start+1) / 2);
     var tree = this.put(undefined, a[m]);
 
-    tree[LEFT] = this.bulkLoad_(a, start, m-1);
-    tree[RIGHT] = this.bulkLoad_(a, m+1, end);
-    tree[SIZE] += this.size(tree[LEFT]) + this.size(tree[RIGHT]);
+    tree.left = this.bulkLoad_(a, start, m-1);
+    tree.right = this.bulkLoad_(a, m+1, end);
+    tree.size += this.size(tree.left) + this.size(tree.right);
 
     return tree;
   },
@@ -216,20 +209,20 @@ var TreeIndex = {
 
     s = this.maybeClone(s);
 
-    var r = this.compare(s[KEY], key);
+    var r = this.compare(s.key, key);
 
     if ( r === 0 ) {
-      this.dedup(value, s[KEY]);
+      this.dedup(value, s.key);
 
-      s[SIZE] -= this.tail.size(s[VALUE]);
-      s[VALUE] = this.tail.put(s[VALUE], value);
-      s[SIZE] += this.tail.size(s[VALUE]);
+      s.size -= this.tail.size(s.value);
+      s.value = this.tail.put(s.value, value);
+      s.size += this.tail.size(s.value);
     } else {
-      var side = r > 0 ? LEFT : RIGHT;
+      var side = r > 0 ? 'left' : 'right';
 
-      if ( s[side] ) s[SIZE] -= s[side][SIZE];
+      if ( s[side] ) s.size -= s[side].size;
       s[side] = this.putKeyValue(s[side], key, value);
-      s[SIZE] += s[side][SIZE];
+      s.size += s[side].size;
     }
 
     return this.split(this.skew(s));
@@ -239,12 +232,12 @@ var TreeIndex = {
   //    output: Another node representing the rebalanced AA tree.
 
   skew: function(s) {
-    if ( s && s[LEFT] && s[LEFT][LEVEL] === s[LEVEL] ) {
+    if ( s && s.left && s.left.level === s.level ) {
       // Swap the pointers of horizontal left links.
-      var l = this.maybeClone(s[LEFT]);
+      var l = this.maybeClone(s.left);
 
-      s[LEFT] = l[RIGHT];
-      l[RIGHT] = s;
+      s.left = l.right;
+      l.right = s;
 
       this.updateSize(s);
       this.updateSize(l);
@@ -256,19 +249,19 @@ var TreeIndex = {
   },
 
   updateSize: function(s) {
-    s[SIZE] = this.size(s[LEFT]) + this.size(s[RIGHT]) + this.tail.size(s[VALUE]);
+    s.size = this.size(s.left) + this.size(s.right) + this.tail.size(s.value);
   },
 
   //  input: T, a node representing an AA tree that needs to be rebalanced.
   //  output: Another node representing the rebalanced AA tree.
   split: function(s) {
-    if ( s && s[RIGHT] && s[RIGHT][RIGHT] && s[LEVEL] === s[RIGHT][RIGHT][LEVEL] ) {
+    if ( s && s.right && s.right.right && s.level === s.right.right.level ) {
       // We have two horizontal right links.  Take the middle node, elevate it, and return it.
-      var r = this.maybeClone(s[RIGHT]);
+      var r = this.maybeClone(s.right);
 
-      s[RIGHT] = r[LEFT];
-      r[LEFT] = s;
-      r[LEVEL]++;
+      s.right = r.left;
+      r.left = s;
+      r.level++;
 
       this.updateSize(s);
       this.updateSize(r);
@@ -288,52 +281,52 @@ var TreeIndex = {
 
     s = this.maybeClone(s);
 
-    var r = this.compare(s[KEY], key);
+    var r = this.compare(s.key, key);
 
     if ( r === 0 ) {
-      s[SIZE] -= this.tail.size(s[VALUE]);
-      s[VALUE] = this.tail.remove(s[VALUE], value);
+      s.size -= this.tail.size(s.value);
+      s.value = this.tail.remove(s.value, value);
 
       // If the sub-Index still has values, then don't
       // delete this node.
-      if ( s[VALUE] ) {
-        s[SIZE] += this.tail.size(s[VALUE]);
+      if ( s.value ) {
+        s.size += this.tail.size(s.value);
         return s;
       }
 
       // If we're a leaf, easy, otherwise reduce to leaf case.
-      if ( ! s[LEFT] && ! s[RIGHT] ) return undefined;
+      if ( ! s.left && ! s.right ) return undefined;
 
-      var side = s[LEFT] ? LEFT : RIGHT;
+      var side = s.left ? 'left' : 'right';
 
       // TODO: it would be faster if successor and predecessor also deleted
       // the entry at the same time in order to prevent two traversals.
       // But, this would also duplicate the delete logic.
-      var l = side === LEFT ?
+      var l = side === 'left' ?
         this.predecessor(s) :
         this.successor(s)   ;
 
-      s[KEY] = l[KEY];
-      s[VALUE] = l[VALUE];
+      s.key = l.key;
+      s.value = l.value;
 
-      s[side] = this.removeNode(s[side], l[KEY]);
+      s[side] = this.removeNode(s[side], l.key);
     } else {
-      var side = r > 0 ? LEFT : RIGHT;
+      var side = r > 0 ? 'left' : 'right';
 
-      s[SIZE] -= this.size(s[side]);
+      s.size -= this.size(s[side]);
       s[side] = this.removeKeyValue(s[side], key, value);
-      s[SIZE] += this.size(s[side]);
+      s.size += this.size(s[side]);
     }
 
     // Rebalance the tree. Decrease the level of all nodes in this level if
     // necessary, and then skew and split all nodes in the new level.
     s = this.skew(this.decreaseLevel(s));
-    if ( s[RIGHT] ) {
-      s[RIGHT] = this.skew(this.maybeClone(s[RIGHT]));
-      if ( s[RIGHT][RIGHT] ) s[RIGHT][RIGHT] = this.skew(this.maybeClone(s[RIGHT][RIGHT]));
+    if ( s.right ) {
+      s.right = this.skew(this.maybeClone(s.right));
+      if ( s.right.right ) s.right.right = this.skew(this.maybeClone(s.right.right));
     }
     s = this.split(s);
-    s[RIGHT] = this.split(this.maybeClone(s[RIGHT]));
+    s.right = this.split(this.maybeClone(s.right));
 
     return s;
   },
@@ -343,41 +336,41 @@ var TreeIndex = {
 
     s = this.maybeClone(s);
 
-    var r = this.compare(s[KEY], key);
+    var r = this.compare(s.key, key);
 
-    if ( r === 0 ) return s[LEFT] ? s[LEFT] : s[RIGHT];
+    if ( r === 0 ) return s.left ? s.left : s.right;
 
-    var side = r > 0 ? LEFT : RIGHT;
+    var side = r > 0 ? 'left' : 'right';
 
-    s[SIZE] -= this.size(s[side]);
+    s.size -= this.size(s[side]);
     s[side] = this.removeNode(s[side], key);
-    s[SIZE] += this.size(s[side]);
+    s.size += this.size(s[side]);
 
     return s;
   },
 
   predecessor: function(s) {
-    if ( ! s[LEFT] ) return s;
-    for ( s = s[LEFT] ; s[RIGHT] ; s = s[RIGHT] );
+    if ( ! s.left ) return s;
+    for ( s = s.left ; s.right ; s = s.right );
       return s;
   },
 
   successor: function(s) {
-    if ( ! s[RIGHT] ) return s;
-    for ( s = s[RIGHT] ; s[LEFT] ; s = s[LEFT] );
+    if ( ! s.right ) return s;
+    for ( s = s.right ; s.left ; s = s.left );
       return s;
   },
 
   // input: T, a tree for which we want to remove links that skip levels.
   // output: T with its level decreased.
   decreaseLevel: function(s) {
-    var expectedLevel = Math.min(s[LEFT] ? s[LEFT][LEVEL] : 0, s[RIGHT] ? s[RIGHT][LEVEL] : 0) + 1;
+    var expectedLevel = Math.min(s.left ? s.left.level : 0, s.right ? s.right.level : 0) + 1;
 
-    if ( expectedLevel < s[LEVEL] ) {
-      s[LEVEL] = expectedLevel;
-      if ( s[RIGHT] && expectedLevel < s[RIGHT][LEVEL] ) {
-        s[RIGHT] = this.maybeClone(s[RIGHT]);
-        s[RIGHT][LEVEL] = expectedLevel;
+    if ( expectedLevel < s.level ) {
+      s.level = expectedLevel;
+      if ( s.right && expectedLevel < s.right.level ) {
+        s.right = this.maybeClone(s.right);
+        s.right.level = expectedLevel;
       }
     }
 
@@ -387,11 +380,11 @@ var TreeIndex = {
   get: function(s, key) {
     if ( ! s ) return undefined;
 
-    var r = this.compare(s[KEY], key);
+    var r = this.compare(s.key, key);
 
-    if ( r === 0 ) return s[VALUE];
+    if ( r === 0 ) return s.value;
 
-    return this.get(r > 0 ? s[LEFT] : s[RIGHT], key);
+    return this.get(r > 0 ? s.left : s.right, key);
   },
 
   select: function(s, sink, skip, limit, order, predicate) {
@@ -405,9 +398,9 @@ var TreeIndex = {
       return;
     }
 
-    this.select(s[LEFT], sink, skip, limit, order, predicate);
-    this.tail.select(s[VALUE], sink, skip, limit, order, predicate);
-    this.select(s[RIGHT], sink, skip, limit, order, predicate);
+    this.select(s.left, sink, skip, limit, order, predicate);
+    this.tail.select(s.value, sink, skip, limit, order, predicate);
+    this.select(s.right, sink, skip, limit, order, predicate);
   },
 
   selectReverse: function(s, sink, skip, limit, order, predicate) {
@@ -421,25 +414,25 @@ var TreeIndex = {
       return;
     }
 
-    this.selectReverse(s[RIGHT], sink, skip, limit, order, predicate);
-    this.tail.selectReverse(s[VALUE], sink, skip, limit, order, predicate);
-    this.selectReverse(s[LEFT], sink, skip, limit, order, predicate);
+    this.selectReverse(s.right, sink, skip, limit, order, predicate);
+    this.tail.selectReverse(s.value, sink, skip, limit, order, predicate);
+    this.selectReverse(s.left, sink, skip, limit, order, predicate);
   },
 
   findPos: function(s, key, incl) {
     if ( ! s ) return 0;
-    var r = this.compare(s[KEY], key);
+    var r = this.compare(s.key, key);
     if ( r === 0 ) {
       return incl ?
-        this.size(s[LEFT]) :
-        this.size(s) - this.size(s[RIGHT]);
+        this.size(s.left) :
+        this.size(s) - this.size(s.right);
     }
     return r > 0 ?
-      this.findPos(s[LEFT], key, incl) :
-      this.findPos(s[RIGHT], key, incl) + this.size(s) - this.size(s[RIGHT]);
+      this.findPos(s.left, key, incl) :
+      this.findPos(s.right, key, incl) + this.size(s) - this.size(s.right);
   },
 
-  size: function(s) { return s ? s[SIZE] : 0; },
+  size: function(s) { return s ? s.size : 0; },
 
   compare: function(o1, o2) {
     return foam.util.compare(o1, o2);
