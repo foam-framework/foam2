@@ -89,39 +89,6 @@ foam.CLASS({
           }
         }
       })
-    },
-
-    function parse(json, opt_class, opt_X) {
-      // recurse into sub-objects
-      for ( var key in json ) {
-        var o = json[key];
-        if ( typeof o === 'object' && ! o.cls_ ) { // traverse plain old objects only
-          json[key] = this.parse(o, null, opt_X);
-        }
-      }
-
-      if ( json.class ) {
-        var cls = foam.lookup(json.class);
-        foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
-        return cls.create(json, opt_X);
-      }
-      if ( opt_class ) return opt_class.create(json, opt_X);
-
-      return json;
-    },
-
-    function parseArray(a, opt_class) {
-      return a.map(function(e) { return foam.json.parse(e, opt_class); });
-    },
-
-    function parseString(jsonStr) {
-      return eval('(' + jsonStr + ')');
-    },
-
-    function stringify(o, opt_options) {
-      var out = this.createOut();
-      this.output(o, out);
-      return out.toString();
     }
   ]
 });
