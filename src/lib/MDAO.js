@@ -268,6 +268,105 @@ foam.CLASS({
 
       return s.split().skew();
     },
+
+    function removeKeyValue(key, value) {
+      var s = this.maybeClone();
+
+      var r = this.index.compare(s.key, key);
+
+      if ( r === 0 ) {
+        s.size -= this.index.tail.size(s.value);
+        s.value = this.index.tail.remove(s.value, value);
+
+        // If the sub-Index still has values, then don't
+        // delete this node.
+        if ( s.value ) {
+          s.size += this.index.tail.size(s.value);
+          return s;
+        }
+
+        // If we're a leaf, easy, otherwise reduce to leaf case.
+        if ( ! s.left.level && ! s.right.level ) {
+          return foam.dao.index.NullTreeNode.create({ index: this.index });
+        }
+
+        var side = s.left.level ? 'left' : 'right';
+
+        // TODO: it would be faster if successor and predecessor also deleted
+        // the entry at the same time in order to prevent two traversals.
+        // But, this would also duplicate the delete logic.
+        var l = side === 'left' ?
+          s.predecessor() :
+          s.successor()   ;
+
+        s.key = l.key;
+        s.value = l.value;
+
+        s[side] = s[side].removeNode(l.key);
+      } else {
+        var side = r > 0 ? 'left' : 'right';
+
+        s.size -= s[side].size;
+        s[side] = s[side].removeKeyValue(key, value);
+        s.size += s[side].size;
+      }
+
+      // Rebalance the tree. Decrease the level of all nodes in this level if
+      // necessary, and then skew and split all nodes in the new level.
+      s = s.decreaseLevel().skew();
+      if ( s.right.level ) {
+        s.right = s.right.maybeClone().skew();
+        if ( s.right.right.level ) s.right.right = s.right.right.maybeClone().skew();
+      }
+      s = s.split();
+      s.right = s.right.maybeClone().split();
+
+      return s;
+    },
+
+    function removeNode(key) {
+      var s = this.maybeClone();
+
+      var r = this.index.compare(s.key, key);
+
+      if ( r === 0 ) return s.left.level ? s.left : s.right;
+
+      var side = r > 0 ? 'left' : 'right';
+
+      s.size -= s[side].size;
+      s[side] = s[side].removeNode(key);
+      s.size += s[side].size;
+
+      return s;
+    },
+
+    function select(sink, skip, limit, order, predicate) {
+      if ( limit && limit[0] <= 0 ) return;
+
+      if ( skip && skip[0] >= this.size && ! predicate ) {
+        skip[0] -= this.size;
+        return;
+      }
+      // TODO: all these index.tail references will go away once actual
+      // sub-index instances are stored in this.value
+      this.left.select(sink, skip, limit, order, predicate);
+      this.index.tail.select(this.value, sink, skip, limit, order, predicate);
+      this.right.select(sink, skip, limit, order, predicate);
+    },
+
+    function selectReverse(sink, skip, limit, order, predicate) {
+      if ( limit && limit[0] <= 0 ) return;
+
+      if ( skip && skip[0] >= this.size ) {
+        skip[0] -= this.size;
+        return;
+      }
+
+      this.right.selectReverse(sink, skip, limit, order, predicate);
+      this.index.tail.selectReverse(this.value, sink, skip, limit, order, predicate);
+      this.left.selectReverse(sink, skip, limit, order, predicate);
+    },
+
   ]
 });
 
@@ -307,6 +406,10 @@ foam.CLASS({
         index: this.index
       });
     },
+    function removeKeyValue(key, value) { return this; },
+    function removeNode(key) { return this; },
+    function select() { },
+    function selectReverse() {},
   ]
 
 
@@ -364,88 +467,15 @@ var TreeIndex = {
     obj[this.prop.name] = value;
   },
 
+  // TODO: remove the 's' in these and use a known root node
   put: function(s, newValue) {
     if ( ! s ) s = foam.dao.index.NullTreeNode.create({ index: this });
     return s.putKeyValue(this.prop.f(newValue), newValue);
   },
 
   remove: function(s, value) {
-    return this.removeKeyValue(s, this.prop.f(value), value);
-  },
-
-  removeKeyValue: function(s, key, value) {
-    if ( ! s.level ) return s;
-
-    s = s.maybeClone();
-
-    var r = this.compare(s.key, key);
-
-    if ( r === 0 ) {
-      s.size -= this.tail.size(s.value);
-      s.value = this.tail.remove(s.value, value);
-
-      // If the sub-Index still has values, then don't
-      // delete this node.
-      if ( s.value ) {
-        s.size += this.tail.size(s.value);
-        return s;
-      }
-
-      // If we're a leaf, easy, otherwise reduce to leaf case.
-      if ( ! s.left.level && ! s.right.level ) {
-        return foam.dao.index.NullTreeNode.create({ index: this });
-      }
-
-      var side = s.left.level ? 'left' : 'right';
-
-      // TODO: it would be faster if successor and predecessor also deleted
-      // the entry at the same time in order to prevent two traversals.
-      // But, this would also duplicate the delete logic.
-      var l = side === 'left' ?
-        s.predecessor() :
-        s.successor()   ;
-
-      s.key = l.key;
-      s.value = l.value;
-
-      s[side] = this.removeNode(s[side], l.key);
-    } else {
-      var side = r > 0 ? 'left' : 'right';
-
-      s.size -= this.size(s[side]);
-      s[side] = this.removeKeyValue(s[side], key, value);
-      s.size += this.size(s[side]);
-    }
-
-    // Rebalance the tree. Decrease the level of all nodes in this level if
-    // necessary, and then skew and split all nodes in the new level.
-    s = s.decreaseLevel().skew();
-    if ( s.right.level ) {
-      s.right = s.right.maybeClone().skew();
-      if ( s.right.right.level ) s.right.right = s.right.right.maybeClone().skew();
-    }
-    s = s.split();
-    s.right = s.right.maybeClone().split();
-
-    return s;
-  },
-
-  removeNode: function(s, key) {
-    if ( ! s.level ) return s;
-
-    s = s.maybeClone();
-
-    var r = this.compare(s.key, key);
-
-    if ( r === 0 ) return s.left.level ? s.left : s.right;
-
-    var side = r > 0 ? 'left' : 'right';
-
-    s.size -= this.size(s[side]);
-    s[side] = this.removeNode(s[side], key);
-    s.size += this.size(s[side]);
-
-    return s;
+    if ( ! s ) return s;
+    return s.removeKeyValue(this.prop.f(value), value);
   },
 
   get: function(s, key) {
@@ -455,35 +485,11 @@ var TreeIndex = {
   },
 
   select: function(s, sink, skip, limit, order, predicate) {
-    if ( ! s.level ) return;
-
-    if ( limit && limit[0] <= 0 ) return;
-
-    var size = this.size(s);
-    if ( skip && skip[0] >= size && ! predicate ) {
-      skip[0] -= size;
-      return;
-    }
-
-    this.select(s.left, sink, skip, limit, order, predicate);
-    this.tail.select(s.value, sink, skip, limit, order, predicate);
-    this.select(s.right, sink, skip, limit, order, predicate);
+    return s.select(sink, skip, limit, order, predicate);
   },
 
   selectReverse: function(s, sink, skip, limit, order, predicate) {
-    if ( ! s.level ) return;
-
-    if ( limit && limit[0] <= 0 ) return;
-
-    var size = this.size(s);
-    if ( skip && skip[0] >= size ) {
-      skip[0] -= size;
-      return;
-    }
-
-    this.selectReverse(s.right, sink, skip, limit, order, predicate);
-    this.tail.selectReverse(s.value, sink, skip, limit, order, predicate);
-    this.selectReverse(s.left, sink, skip, limit, order, predicate);
+    return s.selectReverse(sink, skip, limit, order, predicate);
   },
 
   findPos: function(s, key, incl) {

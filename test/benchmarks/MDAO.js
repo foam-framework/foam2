@@ -255,11 +255,11 @@ describe("MDAO benchmarks", function() {
           atest('1a CreateAlbums' + NUM_ALBUMS, arepeatpar(NUM_ALBUMS, function ( i) {
             return AlbumDAO.put(albums.a[i]);
           })),
-          asleep(2000),
+          asleep(1000),
           atest('1b CreatePhotos' + NUM_PHOTOS, arepeatpar(NUM_PHOTOS, function ( i) {
             return PhotoDAO.put(photos.a[i]);
           })),
-          asleep(5000),
+          asleep(1000),
           atest('2a SelectAllAlbumsQuery', function() {
             return AlbumDAO.select()
               .then(function(s) { expect(s.a.length).toEqual(NUM_ALBUMS); });
