@@ -184,12 +184,18 @@ foam.CLASS({
   ],
   topics: [
     'data',
+    'error',
     'end'
   ],
   methods: [
     function start() {
       var reader = this.resp.body.getReader();
       this.streaming = true;
+
+      var onError = foam.Function.bind(function(e) {
+        this.error.pub();
+        this.end.pub();
+      }, this);
 
       var onData = foam.Function.bind(function(e) {
         if ( e.value ) {
@@ -200,10 +206,10 @@ foam.CLASS({
           this.end.pub();
           return this;
         }
-        return reader.read().then(onData);
+        return reader.read().then(onData, onError);
       }, this);
 
-      return reader.read().then(onData);
+      return reader.read().then(onData, onError);
     },
     function stop() {
       this.streaming = false;
@@ -291,7 +297,6 @@ foam.CLASS({
         options.body = this.payload;
       }
 
-
       var request = new Request(
         this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path,
         options);
@@ -313,6 +318,9 @@ foam.CLASS({
     'foam.parse.Grammar',
     'foam.net.HTTPRequest',
     'foam.encodings.UTF8'
+  ],
+  imports: [
+    'setTimeout'
   ],
   properties: [
     {
@@ -363,6 +371,15 @@ foam.CLASS({
         return this.UTF8.create()
       }
     },
+    {
+      class: 'Int',
+      name: 'delay',
+      preSet: function(_, a) {
+        if ( a > 30000 ) return 30000;
+        return a;
+      },
+      value: 1
+    },
     'eventData',
     'eventName'
   ],
@@ -390,6 +407,11 @@ foam.CLASS({
 
       this.running = true;
       req.send().then(function(resp) {
+        if ( ! resp.success ) {
+          this.onError();
+          return;
+        }
+
         resp.data.sub(this.onData);
         resp.end.sub(this.onEnd);
         this.resp = resp;
@@ -423,10 +445,15 @@ foam.CLASS({
       }
 
       this.grammar.parseString(line);
-    }
+    },
+    function onError() {
+      this.delay *= 2;
+      this.setTimeout(foam.Function.bind(this.start, this), this.delay);
+    },
   ],
   listeners: [
     function onData(s, _, data) {
+      this.delay = 1;
       this.decoder.put(data);
       var string = this.decoder.string;
       while ( string.indexOf('\n') != -1 ) {
@@ -437,9 +464,8 @@ foam.CLASS({
       this.decoder.string = string;
     },
     function onEnd() {
-      // TODO: Exponential backoff in the case of errors.
       if ( this.running ) {
-        this.start();
+        this.onError();
       }
     }
   ]
