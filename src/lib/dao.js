@@ -894,10 +894,10 @@ foam.CLASS({
     function onRemoteUpdate(s, on, event, obj) {
       if ( event == 'put' ) {
         this.processFromServer(obj);
-      } else if ( event === 'remote' ) {
-        // TODO
+      } else if ( event === 'remove' ) {
+        this.delegate.remove(obj);
       } else if ( event === 'reset' ) {
-        // TODO
+        this.delegate.removeAll();
       }
     },
     {
