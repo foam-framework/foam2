@@ -74,6 +74,10 @@ foam.CLASS({
       class: 'Int',
       name: 'cost',
     },
+    {
+      /** The index over which this plan operates */
+      name: 'index',
+    }
   ],
 
   methods: [
@@ -115,39 +119,80 @@ foam.CLASS({
   ]
 });
 
+/** The Index interface for an ordering, fast lookup, single value,
+  index multiplexer, or any other MDAO select() assistance class. */
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'Index',
+
+  properties: [
+    'subIndexModel',
+  ],
+
+  methods: [
+    /** Adds or updates the given value in the index */
+    function put(value) {},
+    /** Removes the given value from the index */
+    function remove(value) {},
+    /** @return a Plan to execute a select with the given parameters */
+    function plan(sink, skip, limit, order, predicate) {},
+    /** @return the stored value for the given key. */
+    function get(key) {},
+    /** @return the integer size of this index. */
+    function size() {},
+
+    /** Selects matching items from the index and puts them into sink */
+    function select(sink, skip, limit, order, predicate) { },
+    /** Selects matching items in reverse order from the index and puts
+      them into sink */
+    function selectReverse(sink, skip, limit, order, predicate) { },
+  ],
+});
+
 
 /** An Index which holds only a single value. **/
-var ValueIndex = {
-  put: function(s, newValue) { return newValue; },
-  remove: function() { return undefined; },
-  plan: (function() {
-           var plan = {
-             cost: 1,
-             execute: function(promise, s, sink) {
-               sink.put(s);
-             },
-             toString: function() { return 'unique'; }
-           };
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'ValueIndex',
+  extends: 'foam.dao.index.Index',
+  implements: [
+    'foam.dao.index.Plan',
+  ],
 
-           return function() { return plan; };
-         })(),
-  get: function(value, key) { return value; },
-  /** Skip and limit are modified in place, so passed by reference as one-element arrays.
-    TODO: make this better (this used to be an options object) */
-  select: function(value, sink, skip, limit, order, predicate) {
-    if ( predicate && ! predicate.f(value) ) return;
-    if ( skip && skip[0]-- > 0 ) return;
-    if ( limit && limit[0]-- < 1 ) return;
-    sink.put(value);
-  },
-  /** Skip and limit are modified in place, so passed by reference as one-element arrays.
-    TODO: make this better (this used to be an options object) */
-  selectReverse: function(value, sink, skip, limit, order, predicate) {
-    this.select(value, sink, skip, limit, order, predicate);
-  },
-  size:   function(obj) { return 1; },
-  toString: function() { return 'value'; }
-};
+  properties: [
+    {
+      class: 'Simple',
+      name: 'value'
+    },
+    { name: 'cost', value: 1 },
+  ],
+
+  methods: [
+    // from Plan (this index is its own plan)
+    function execute(promise, sink, skip, limit, order, predicate) {
+      sink.put(this.value);
+    },
+
+    // from Index
+    function put(s) { this.value = s; },
+    function remove() { this.value = undefined; },
+    function plan() { return this; },
+    function get(key) { return this.value; },
+    function size() { return typeof this.value == 'undefined' ? 0 : 1; },
+    function toString() { return 'value'; },
+
+    function select(sink, skip, limit, order, predicate) {
+      if ( predicate && ! predicate.f(this.value) ) return;
+      if ( skip && skip[0]-- > 0 ) return;
+      if ( limit && limit[0]-- < 1 ) return;
+      sink.put(this.value);
+    },
+    function selectReverse(sink, skip, limit, order, predicate) {
+      this.select(sink, skip, limit, order, predicate);
+    },
+
+  ],
+});
 
 /** Represents one node's state in a binary tree */
 foam.CLASS({
@@ -203,7 +248,7 @@ foam.CLASS({
 
     function updateSize() {
       this.size = this.left.size +
-        this.right.size + this.index.tail.size(this.value);
+        this.right.size + this.value.size;
     },
 
     /** @return Another node representing the rebalanced AA tree. */
@@ -286,9 +331,9 @@ foam.CLASS({
       if ( r === 0 ) {
         this.index.dedup(value, s.key);
 
-        s.size -= this.index.tail.size(s.value);
-        s.value = this.index.tail.put(s.value, value);
-        s.size += this.index.tail.size(s.value);
+        s.size -= s.value.size();
+        s.value = s.value.put(value);
+        s.size += s.value.size();
       } else {
         var side = r > 0 ? 'left' : 'right';
 
@@ -306,13 +351,13 @@ foam.CLASS({
       var r = this.index.compare(s.key, key);
 
       if ( r === 0 ) {
-        s.size -= this.index.tail.size(s.value);
-        s.value = this.index.tail.remove(s.value, value);
+        s.size -= s.value.size();
+        s.value = s.value.remove(value);
 
         // If the sub-Index still has values, then don't
         // delete this node.
         if ( s.value ) {
-          s.size += this.index.tail.size(s.value);
+          s.size += s.value.size();
           return s;
         }
 
@@ -378,10 +423,8 @@ foam.CLASS({
         skip[0] -= this.size;
         return;
       }
-      // TODO: all these index.tail references will go away once actual
-      // sub-index instances are stored in this.value
       this.left.select(sink, skip, limit, order, predicate);
-      this.index.tail.select(this.value, sink, skip, limit, order, predicate);
+      this.value.select(sink, skip, limit, order, predicate);
       this.right.select(sink, skip, limit, order, predicate);
     },
 
@@ -394,7 +437,7 @@ foam.CLASS({
       }
 
       this.right.selectReverse(sink, skip, limit, order, predicate);
-      this.index.tail.selectReverse(this.value, sink, skip, limit, order, predicate);
+      this.value.selectReverse(sink, skip, limit, order, predicate);
       this.left.selectReverse(sink, skip, limit, order, predicate);
     },
 
@@ -442,9 +485,11 @@ foam.CLASS({
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
+      var subIndex = this.index.subIndexModel.create();
+      subIndex.put(value);
       return foam.dao.index.TreeNode.create({
         key: key,
-        value: this.index.tail.put(null, value),
+        value: subIndex,
         size: 1,
         level: 1,
         index: this.index
@@ -462,14 +507,16 @@ foam.CLASS({
 
 /** An AATree (balanced binary search tree) Index. **/
 var TreeIndex = {
-  create: function(prop, tail) {
+  create: function(prop, subIndexModel) {
     // value index just stores the value in each node
-    tail = tail || ValueIndex;
+    //tail = tail || ValueIndex;
+    subIndexModel = subIndexModel || foam.dao.index.ValueIndex;
 
     return {
       __proto__: this,
       prop: prop, // the property we index over
-      tail: tail, // the factory for making sub-indexes for the value at each node
+      //tail: tail, // the factory for making sub-indexes for the value at each node
+      subIndexModel: subIndexModel,
       selectCount: 0
     };
   },
@@ -481,7 +528,7 @@ var TreeIndex = {
   bulkLoad: function(a) {
     a = a.a || a;
     // Only safe if children aren't themselves trees
-    if ( this.tail === ValueIndex ) {
+    if ( this.subIndexModel === foam.dao.index.ValueIndex ) {
       a.sort(toCompare(this.prop));
       return this.bulkLoad_(a, 0, a.length-1);
     }
@@ -614,8 +661,8 @@ var TreeIndex = {
       for ( var i = 0 ; i < keys.length ; ++i) {
         var result = this.get(s, keys[i]);
 
-        if ( result ) {
-          var subPlan = this.tail.plan(result, sink, skip, limit, order, predicate);
+        if ( result ) { // TODO: could refactor this subindex recursion into .plan()
+          var subPlan = result.plan(sink, skip, limit, order, predicate);
 
           cost += subPlan.cost;
           subPlans.push(subPlan);
@@ -645,7 +692,7 @@ var TreeIndex = {
 
       if ( ! result ) return foam.dao.index.NotFoundPlan.create();
 
-      var subPlan = this.tail.plan(result, sink, skip, limit, order, predicate);
+      var subPlan = result.plan(sink, skip, limit, order, predicate);
 
       return {
         cost: 1 + subPlan.cost,
@@ -743,10 +790,26 @@ var TreeIndex = {
   },
 
   toString: function() {
-    return 'TreeIndex(' + this.prop.name + ', ' + this.tail + ')';
+    return 'TreeIndex(' + this.prop.name + ', ' + this.subIndexModel + ')';
   }
-
 };
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'TreeIndex',
+  extends: 'foam.dao.index.Index',
+
+
+
+  properties: [
+    {
+      name: 'legacyTree',
+      factory: function() {
+        return TreeIndex.create(this.prop, this.subModelIndex);
+      }
+    }
+  ]
+});
 
 
 /** Case-Insensitive TreeIndex **/
@@ -1316,7 +1379,7 @@ foam.CLASS({
      * args: one or more properties
      **/
     function addUniqueIndex() {
-      var index = ValueIndex;
+      var index = foam.dao.index.ValueIndex;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
