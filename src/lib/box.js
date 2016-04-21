@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'PropertyRefinements',
-  refines: 'foam.core.Property',
-  properties: [
-    {
-      class: 'Boolean',
-      name: 'transient'
-    },
-    {
-      class: 'Boolean',
-      name: 'networkTransient',
-      expression: function(transient) {
-        return transient;
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'storageTransient',
-      expression: function(transient) {
-        return transient
-      }
-    }
-  ]
-});
 
 foam.CLASS({
   package: 'foam.box',
