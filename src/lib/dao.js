@@ -476,6 +476,8 @@ foam.CLASS({
       postSet: function(old, nu) {
         if ( old ) old.on.unsub(this.onEvent);
         if ( nu ) nu.on.sub(this.onEvent);
+
+        if ( old && nu ) this.on.reset.pub();
       }
     }
   ],
@@ -738,8 +740,10 @@ foam.CLASS({
     {
       name: 'delegate',
       postSet: function(old, nu) {
+        // TODO: This should probably be inherited from ProxyDAO propertly.
         if ( old ) old.on.unsub(this.onEvent);
         if ( nu ) nu.on.sub(this.onEvent);
+        if ( old && nu ) this.on.reset.pub();
       }
     },
     {
