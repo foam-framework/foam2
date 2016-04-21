@@ -125,10 +125,6 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
-  properties: [
-    'subIndexModel',
-  ],
-
   methods: [
     /** Adds or updates the given value in the index */
     function put(value) {},
@@ -499,392 +495,359 @@ foam.CLASS({
     function removeNode(key) { return this; },
     function select() { },
     function selectReverse() {},
-    function findPos() { return 0; }
+    function findPos() { return 0; },
+
+    function bulkLoad_(a, start, end) {
+      if ( end < start ) return this;
+
+      var tree = this;
+      var m    = start + Math.floor((end-start+1) / 2);
+      tree = tree.putKeyValue(this.index.prop.f(a[m]), a[m]);
+
+      tree.left = tree.left.bulkLoad_(a, start, m-1);
+      tree.right = tree.right.bulkLoad_(a, m+1, end);
+      tree.size += tree.left.size + tree.right.size;
+
+      return tree;
+    },
   ]
 
 
 });
 
 /** An AATree (balanced binary search tree) Index. **/
-var TreeIndex = {
-  create: function(prop, subIndexModel) {
-    // value index just stores the value in each node
-    //tail = tail || ValueIndex;
-    subIndexModel = subIndexModel || foam.dao.index.ValueIndex;
-
-    return {
-      __proto__: this,
-      prop: prop, // the property we index over
-      //tail: tail, // the factory for making sub-indexes for the value at each node
-      subIndexModel: subIndexModel,
-      selectCount: 0
-    };
-  },
-
-  /**
-   * Bulk load an unsorted array of objects.
-   * Faster than loading individually, and produces a balanced tree.
-   **/
-  bulkLoad: function(a) {
-    a = a.a || a;
-    // Only safe if children aren't themselves trees
-    if ( this.subIndexModel === foam.dao.index.ValueIndex ) {
-      a.sort(toCompare(this.prop));
-      return this.bulkLoad_(a, 0, a.length-1);
-    }
-
-    var s = foam.dao.index.NullTreeNode.create({ index: this });
-    for ( var i = 0 ; i < a.length ; i++ ) {
-      s = this.put(s, a[i]);
-    }
-    return s;
-  },
-
-  bulkLoad_: function(a, start, end) {
-    if ( end < start ) return undefined;
-
-    var m    = start + Math.floor((end-start+1) / 2);
-    var tree = this.put(undefined, a[m]);
-
-    tree.left = this.bulkLoad_(a, start, m-1);
-    tree.right = this.bulkLoad_(a, m+1, end);
-    tree.size += this.size(tree.left) + this.size(tree.right);
-
-    return tree;
-  },
-
-  /** Set the value's property to be the same as the key in the index.
-      This saves memory by sharing objects. */
-  dedup: function(obj, value) {
-    obj[this.prop.name] = value;
-  },
-
-  // TODO: remove the 's' in these and use a known root node
-  put: function(s, newValue) {
-    if ( ! s ) s = foam.dao.index.NullTreeNode.create({ index: this });
-    return s.putKeyValue(this.prop.f(newValue), newValue);
-  },
-
-  remove: function(s, value) {
-    if ( ! s ) return s;
-    return s.removeKeyValue(this.prop.f(value), value);
-  },
-
-  get: function(s, key) {
-    if ( ! s ) return undefined;
-
-    return s.get(key);
-  },
-
-  select: function(s, sink, skip, limit, order, predicate) {
-    return s.select(sink, skip, limit, order, predicate);
-  },
-
-  selectReverse: function(s, sink, skip, limit, order, predicate) {
-    return s.selectReverse(sink, skip, limit, order, predicate);
-  },
-
-  findPos: function(s, key, incl) {
-    if ( ! s.level ) return 0;
-    return s.findPos(key, incl);
-  },
-
-  size: function(s) { return s.level ? s.size : 0; },
-
-  compare: function(o1, o2) {
-    return foam.util.compare(o1, o2);
-  },
-
-  plan: function(s, sink, skip, limit, order, predicate) {
-    var predicate = predicate;
-
-    if ( predicate === foam.mlang.predicate.False ) return foam.dao.index.NotFoundPlan.create();
-
-    if ( ! predicate && foam.mlang.sink.Count.isInstance(sink) ) {
-      var count = this.size(s);
-      //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
-      return {
-        cost: 0,
-        execute: function(promise, unused, sink, skip, limit, order, predicate) { sink.value += count; },
-        toString: function() { return 'short-circuit-count(' + count + ')'; }
-      };
-    }
-
-//    if ( limit != null && skip != null && skip + limit > this.size(s) ) return foam.dao.index.NoPlan.create();
-
-    var prop = this.prop;
-
-    var isExprMatch = function(model) {
-      if ( ! model ) return undefined;
-
-      if ( predicate ) {
-
-        if ( model.isInstance(predicate) && predicate.arg1 === prop ) {
-          var arg2 = predicate.arg2;
-          predicate = undefined;
-          return arg2;
-        }
-
-        if ( foam.mlang.predicate.And.isInstance(predicate) ) {
-          for ( var i = 0 ; i < predicate.args.length ; i++ ) {
-            var q = predicate.args[i];
-            if ( model.isInstance(q) && q.arg1 === prop ) {
-              predicate = predicate.clone();
-              predicate.args[i] = foam.mlang.predicate.True;
-              predicate = predicate.partialEval();
-              if ( predicate === foam.mlang.predicate.True ) predicate = null;
-              return q.arg2;
-            }
-          }
-        }
-      }
-
-      return undefined;
-    };
-
-    // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
-    // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
-    // TODO:
-    // }
-
-    var index = this;
-
-    var arg2 = isExprMatch(foam.mlang.predicate.In);
-    if ( arg2 &&
-         // Just scan if that would be faster.
-         Math.log(this.size(s))/Math.log(2) * arg2.length < this.size(s) ) {
-      var keys = arg2;
-      var subPlans = [];
-      var results  = [];
-      var cost = 1;
-
-      for ( var i = 0 ; i < keys.length ; ++i) {
-        var result = this.get(s, keys[i]);
-
-        if ( result ) { // TODO: could refactor this subindex recursion into .plan()
-          var subPlan = result.plan(sink, skip, limit, order, predicate);
-
-          cost += subPlan.cost;
-          subPlans.push(subPlan);
-          results.push(result);
-        }
-      }
-
-      if ( subPlans.length == 0 ) return foam.dao.index.NotFoundPlan.create();
-
-      return {
-        cost: 1 + cost,
-        execute: function(promise, s2, sink, skip, limit, order, predicate) {
-          for ( var i = 0 ; i < subPlans.length ; ++i) {
-            subPlans[i].execute(promise, results[i], sink, skip, limit, order, predicate);
-          }
-        },
-        toString: function() {
-          return 'IN(key=' + prop.name + ', size=' + results.length + ')';
-        }
-      };
-    }
-
-    arg2 = isExprMatch(foam.mlang.predicate.Eq);
-    if ( arg2 != undefined ) {
-      var key = arg2.f();
-      var result = this.get(s, key);
-
-      if ( ! result ) return foam.dao.index.NotFoundPlan.create();
-
-      var subPlan = result.plan(sink, skip, limit, order, predicate);
-
-      return {
-        cost: 1 + subPlan.cost,
-        execute: function(promise, s2, sink, skip, limit, order, predicate) {
-          return subPlan.execute(promise, result, sink, skip, limit, order, predicate);
-        },
-        toString: function() {
-          return 'lookup(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ') ' + subPlan.toString();
-        }
-      };
-    }
-
-    arg2 = isExprMatch(foam.mlang.predicate.Gt);
-    if ( arg2 != undefined ) {
-      var key = arg2.f();
-      var pos = this.findPos(s, key, false);
-      skip = ((skip) || 0) + pos;
-    }
-
-    arg2 = isExprMatch(foam.mlang.predicate.Gte);
-    if ( arg2 != undefined ) {
-      var key = arg2.f();
-      var pos = this.findPos(s, key, true);
-      skip = ((skip) || 0) + pos;
-    }
-
-    arg2 = isExprMatch(foam.mlang.predicate.Lt);
-    if ( arg2 != undefined ) {
-      var key = arg2.f();
-      var pos = this.findPos(s, key, true);
-      limit = Math.min(limit, (pos - (skip || 0)) );
-    }
-
-    arg2 = isExprMatch(foam.mlang.predicate.Lte);
-    if ( arg2 != undefined ) {
-      var key = arg2.f();
-      var pos = this.findPos(s, key, false);
-      limit = Math.min(limit, (pos - (skip || 0)) );
-    }
-
-    var cost = this.size(s);
-    var sortRequired = false;
-    var reverseSort = false;
-
-    if ( order ) {
-      if ( order === prop ) {
-        // sort not required
-      } else if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(order) && order.arg1 === prop ) {
-        // reverse-sort, sort not required
-        reverseSort = true;
-      } else {
-        sortRequired = true;
-        if ( cost != 0 ) cost *= Math.log(cost) / Math.log(2);
-      }
-    }
-
-    if ( ! sortRequired ) {
-      if ( skip ) cost -= skip;
-      if ( limit ) cost = Math.min(cost, limit);
-    }
-
-    return {
-      cost: cost,
-      execute: function(promise, s, sink, skip, limit, order, predicate) {
-        if ( sortRequired ) {
-          var arrSink = foam.dao.ArraySink.create();
-          index.selectCount++;
-          index.select(s, arrSink, null, null, null, predicate);
-          index.selectCount--;
-          var a = arrSink.a;
-          a.sort(toCompare(order));
-
-          var skip = skip || 0;
-          var limit = Number.isFinite(limit) ? limit : a.length;
-          limit += skip;
-          limit = Math.min(a.length, limit);
-
-          for ( var i = skip; i < limit; i++ )
-            sink.put(a[i]);
-        } else {
-// What did this do?  It appears to break sorting in saturn mail
-/*          if ( reverseSort && skip )
-            // TODO: temporary fix, should include range in select and selectReverse calls instead.
-            skip = index.size(s) - skip - (limit || index.size(s)-skip)
-            */
-          index.selectCount++;
-          reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-            index.selectReverse(s, sink, [skip], [limit], order, predicate) :
-            index.select(s, sink, [skip], [limit], order, predicate) ;
-          index.selectCount--;
-        }
-      },
-      toString: function() { return 'scan(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ')'; }
-    };
-  },
-
-  toString: function() {
-    return 'TreeIndex(' + this.prop.name + ', ' + this.subIndexModel + ')';
-  }
-};
-
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeIndex',
   extends: 'foam.dao.index.Index',
 
-
-
   properties: [
+    'subIndexModel',
+    'prop',
+    [ 'selectCount', 0 ],
     {
-      name: 'legacyTree',
+      name: 'root',
       factory: function() {
-        return TreeIndex.create(this.prop, this.subModelIndex);
+        return foam.dao.index.NullTreeNode.create({ index: this });
       }
+    }
+  ],
+
+  methods: [
+    /**
+     * Bulk load an unsorted array of objects.
+     * Faster than loading individually, and produces a balanced tree.
+     **/
+    function bulkLoad(a) {
+      a = a.a || a;
+      this.root = foam.dao.index.NullTreeNode.create({ index: this });
+
+      // Only safe if children aren't themselves trees
+      if ( this.subIndexModel === foam.dao.index.ValueIndex ) {
+        a.sort(toCompare(this.prop));
+        this.root = this.root.bulkLoad_(a, 0, a.length-1);
+      }
+
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        this.put(a[i]);
+      }
+    },
+
+    /** Set the value's property to be the same as the key in the index.
+        This saves memory by sharing objects. */
+    function dedup(obj, value) {
+      obj[this.prop.name] = value;
+    },
+
+    // TODO: remove the 's' in these and use a known root node
+    function put(newValue) {
+      this.root = this.root.putKeyValue(this.prop.f(newValue), newValue);
+    },
+
+    function remove(value) {
+      this.root = this.root.removeKeyValue(this.prop.f(value), value);
+    },
+
+    function get(key) {
+      return this.root.get(key); // does not delve into sub-indexes
+    },
+
+    function select(sink, skip, limit, order, predicate) {
+      this.root.select(sink, skip, limit, order, predicate);
+    },
+
+    function selectReverse(sink, skip, limit, order, predicate) {
+      this.root.selectReverse(sink, skip, limit, order, predicate);
+    },
+
+    function findPos(key, incl) {
+      return this.root.findPos(key, incl);
+    },
+
+    function size() { return this.root.size; },
+
+    function compare(o1, o2) {
+      return foam.util.compare(o1, o2);
+    },
+
+    function plan(sink, skip, limit, order, predicate) {
+      var predicate = predicate;
+
+      if ( predicate === foam.mlang.predicate.False ) return foam.dao.index.NotFoundPlan.create();
+
+      if ( ! predicate && foam.mlang.sink.Count.isInstance(sink) ) {
+        var count = this.size();
+        //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
+        return {
+          cost: 0,
+          execute: function(promise, unused, sink, skip, limit, order, predicate) { sink.value += count; },
+          toString: function() { return 'short-circuit-count(' + count + ')'; }
+        };
+      }
+
+  //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
+
+      var prop = this.prop;
+
+      var isExprMatch = function(model) {
+        if ( ! model ) return undefined;
+
+        if ( predicate ) {
+
+          if ( model.isInstance(predicate) && predicate.arg1 === prop ) {
+            var arg2 = predicate.arg2;
+            predicate = undefined;
+            return arg2;
+          }
+
+          if ( foam.mlang.predicate.And.isInstance(predicate) ) {
+            for ( var i = 0 ; i < predicate.args.length ; i++ ) {
+              var q = predicate.args[i];
+              if ( model.isInstance(q) && q.arg1 === prop ) {
+                predicate = predicate.clone();
+                predicate.args[i] = foam.mlang.predicate.True;
+                predicate = predicate.partialEval();
+                if ( predicate === foam.mlang.predicate.True ) predicate = null;
+                return q.arg2;
+              }
+            }
+          }
+        }
+
+        return undefined;
+      };
+
+      // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
+      // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
+      // TODO:
+      // }
+
+      var index = this;
+
+      var arg2 = isExprMatch(foam.mlang.predicate.In);
+      if ( arg2 &&
+           // Just scan if that would be faster.
+           Math.log(this.size())/Math.log(2) * arg2.length < this.size() ) {
+        var keys = arg2;
+        var subPlans = [];
+        var results  = [];
+        var cost = 1;
+
+        for ( var i = 0 ; i < keys.length ; ++i) {
+          var result = this.get(keys[i]);
+
+          if ( result ) { // TODO: could refactor this subindex recursion into .plan()
+            var subPlan = result.plan(sink, skip, limit, order, predicate);
+
+            cost += subPlan.cost;
+            subPlans.push(subPlan);
+            results.push(result);
+          }
+        }
+
+        if ( subPlans.length == 0 ) return foam.dao.index.NotFoundPlan.create();
+
+        return {
+          cost: 1 + cost,
+          execute: function(promise, s2, sink, skip, limit, order, predicate) {
+            for ( var i = 0 ; i < subPlans.length ; ++i) {
+              subPlans[i].execute(promise, results[i], sink, skip, limit, order, predicate);
+            }
+          },
+          toString: function() {
+            return 'IN(key=' + prop.name + ', size=' + results.length + ')';
+          }
+        };
+      }
+
+      arg2 = isExprMatch(foam.mlang.predicate.Eq);
+      if ( arg2 != undefined ) {
+        var key = arg2.f();
+        var result = this.get(key);
+
+        if ( ! result ) return foam.dao.index.NotFoundPlan.create();
+
+        var subPlan = result.plan(sink, skip, limit, order, predicate);
+
+        return {
+          cost: 1 + subPlan.cost,
+          execute: function(promise, s2, sink, skip, limit, order, predicate) {
+            return subPlan.execute(promise, result, sink, skip, limit, order, predicate);
+          },
+          toString: function() {
+            return 'lookup(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ') ' + subPlan.toString();
+          }
+        };
+      }
+
+      arg2 = isExprMatch(foam.mlang.predicate.Gt);
+      if ( arg2 != undefined ) {
+        var key = arg2.f();
+        var pos = this.findPos(key, false);
+        skip = ((skip) || 0) + pos;
+      }
+
+      arg2 = isExprMatch(foam.mlang.predicate.Gte);
+      if ( arg2 != undefined ) {
+        var key = arg2.f();
+        var pos = this.findPos(key, true);
+        skip = ((skip) || 0) + pos;
+      }
+
+      arg2 = isExprMatch(foam.mlang.predicate.Lt);
+      if ( arg2 != undefined ) {
+        var key = arg2.f();
+        var pos = this.findPos(key, true);
+        limit = Math.min(limit, (pos - (skip || 0)) );
+      }
+
+      arg2 = isExprMatch(foam.mlang.predicate.Lte);
+      if ( arg2 != undefined ) {
+        var key = arg2.f();
+        var pos = this.findPos(key, false);
+        limit = Math.min(limit, (pos - (skip || 0)) );
+      }
+
+      var cost = this.size();
+      var sortRequired = false;
+      var reverseSort = false;
+
+      if ( order ) {
+        if ( order === prop ) {
+          // sort not required
+        } else if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(order) && order.arg1 === prop ) {
+          // reverse-sort, sort not required
+          reverseSort = true;
+        } else {
+          sortRequired = true;
+          if ( cost != 0 ) cost *= Math.log(cost) / Math.log(2);
+        }
+      }
+
+      if ( ! sortRequired ) {
+        if ( skip ) cost -= skip;
+        if ( limit ) cost = Math.min(cost, limit);
+      }
+
+      return {
+        cost: cost,
+        execute: function(promise, sink, skip, limit, order, predicate) {
+          if ( sortRequired ) {
+            var arrSink = foam.dao.ArraySink.create();
+            index.selectCount++;
+            index.select(arrSink, null, null, null, predicate);
+            index.selectCount--;
+            var a = arrSink.a;
+            a.sort(toCompare(order));
+
+            var skip = skip || 0;
+            var limit = Number.isFinite(limit) ? limit : a.length;
+            limit += skip;
+            limit = Math.min(a.length, limit);
+
+            for ( var i = skip; i < limit; i++ )
+              sink.put(a[i]);
+          } else {
+  // What did this do?  It appears to break sorting in saturn mail
+  /*          if ( reverseSort && skip )
+              // TODO: temporary fix, should include range in select and selectReverse calls instead.
+              skip = index.size(s) - skip - (limit || index.size(s)-skip)
+              */
+            index.selectCount++;
+            reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+              index.selectReverse(sink, [skip], [limit], order, predicate) :
+              index.select(sink, [skip], [limit], order, predicate) ;
+            index.selectCount--;
+          }
+        },
+        toString: function() { return 'scan(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ')'; }
+      };
+    },
+
+    function toString() {
+      return 'TreeIndex(' + this.prop.name + ', ' + this.subIndexModel + ')';
     }
   ]
 });
 
 
 /** Case-Insensitive TreeIndex **/
-var CITreeIndex = {
-  __proto__: TreeIndex,
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'CITreeIndex',
+  extends: 'foam.dao.index.TreeIndex',
 
-  create: function(prop, tail) {
-    tail = tail || ValueIndex;
+  methods: [
+    function put(newValue) {
+      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue);
+    },
 
-    return {
-      __proto__: this,
-      prop: prop,
-      tail: tail
-    };
-  },
-
-  put: function(s, newValue) {
-    return this.putKeyValue(s, this.prop.f(newValue).toLowerCase(), newValue);
-  },
-
-  remove: function(s, value) {
-    return this.removeKeyValue(s, this.prop.f(value).toLowerCase(), value);
-  }
-
-};
+    function remove(value) {
+      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value);
+    }
+  ]
+});
 
 
 /** An Index for storing multi-valued properties. **/
-var SetIndex = {
-  __proto__: TreeIndex,
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'SetIndex',
+  extends: 'foam.dao.index.TreeIndex',
 
-  create: function(prop, tail) {
-    tail = tail || ValueIndex;
+  methods: [
+    // TODO: see if this can be done some other way
+    function dedup(obj, value) {
+      // NOP, not safe to do here
+    },
 
-    return {
-      __proto__: this,
-      prop: prop,
-      tail: tail
-    };
-  },
+    function put(newValue) {
+      var a = this.prop.f(newValue);
 
-  // TODO: see if this can be done some other way
-  dedup: function(obj, value) {
-    // NOP, not safe to do here
-  },
-
-  put: function(s, newValue) {
-    var a = this.prop.f(newValue);
-
-    if ( a.length ) {
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        s = this.putKeyValue(s, a[i], newValue);
+      if ( a.length ) {
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          this.root = this.root.putKeyValue(a[i], newValue);
+        }
+      } else {
+        this.root = this.root.putKeyValue('', newValue);
       }
-    } else {
-      s = this.putKeyValue(s, '', newValue);
-    }
+    },
 
-    return s;
-  },
+    function remove(value) {
+      var a = this.prop.f(value);
 
-  remove: function(s, value) {
-    var a = this.prop.f(value);
-
-    if ( a.length ) {
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        s = this.removeKeyValue(s, a[i], value);
+      if ( a.length ) {
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          this.root = this.root.removeKeyValue(a[i], value);
+        }
+      } else {
+        this.root = this.root.removeKeyValue('', value);
       }
-    } else {
-      s = this.removeKeyValue(s, '', value);
+
+      return s;
     }
-
-    return s;
-  }
-
-};
+  ]
+});
 
 var PositionQuery = {
   create: function(args) {
@@ -1185,20 +1148,17 @@ var AltIndex = {
 
   plan: function(s, sink, skip, limit, order, predicate) {
     var bestPlan;
-    var bestPlanI = 0;
     //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
     for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-      var plan = this.delegates[i].plan(s[i], sink, skip, limit, order, predicate);
+      var plan = this.delegates[i].plan(sink, skip, limit, order, predicate);
 
       // console.log('  plan ' + i + ': ' + plan);
       if ( plan.cost <= AltIndex.GOOD_ENOUGH_PLAN ) {
-        bestPlanI = i;
         bestPlan = plan;
         break;
       }
 
       if ( ! bestPlan || plan.cost < bestPlan.cost ) {
-        bestPlanI = i;
         bestPlan = plan;
       }
     }
@@ -1209,7 +1169,7 @@ var AltIndex = {
 
     return {
       __proto__: bestPlan,
-      execute: function(promise, unused, sink, skip, limit, order, predicate) { return bestPlan.execute(promise, s[bestPlanI], sink, skip, limit, order, predicate); }
+      execute: function(promise, sink, skip, limit, order, predicate) { return bestPlan.execute(promise, sink, skip, limit, order, predicate); }
     };
   },
 
@@ -1347,8 +1307,10 @@ foam.CLASS({
       this.map = {};
       // TODO(kgr): this doesn't support multi-part keys, but should (foam2: still applies!)
       // TODO: generally sort out how .ids is supposed to work
-      this.index = TreeIndex.create(this.of.getAxiomByName(
-        ( this.of.ids && this.of.ids[0] ) || 'id' ) );
+      this.index = foam.dao.index.TreeIndex.create({
+          prop: this.of.getAxiomByName(( this.of.ids && this.of.ids[0] ) || 'id' ),
+          subIndexModel: foam.dao.index.ValueIndex
+      });
       this.root = foam.dao.index.NullTreeNode.create({ index: this.index });
 
       if ( this.autoIndex ) this.addRawIndex(AutoIndex.create(this));
@@ -1379,13 +1341,29 @@ foam.CLASS({
      * args: one or more properties
      **/
     function addUniqueIndex() {
-      var index = foam.dao.index.ValueIndex;
+      var proto = foam.dao.index.ValueIndex;
+      var siFactory = proto;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
+
         // TODO: the index prototype should be in the property
-        var proto = prop.type == 'Array[]' ? SetIndex : TreeIndex;
-        index = proto.create(prop, index);
+        proto = prop.type == 'Array[]' ?
+          foam.dao.index.SetIndex  :
+          foam.dao.index.TreeIndex ;
+        index = proto.create({ prop: prop, subIndexModel: siFactory });
+
+        siFactory = {
+          subIndexModel: siFactory,
+          prop: prop,
+          proto: proto,
+          create: function() {
+            var s = this.proto.create(arguments); // prev iteration proto
+            s.subIndexModel = this.subIndexModel;    // prev iteration prop
+            s.prop = this.prop;
+            return s;
+          }
+        }
       }
 
       return this.addRawIndex(index);
