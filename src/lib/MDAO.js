@@ -328,7 +328,7 @@ foam.CLASS({
         this.index.dedup(value, s.key);
 
         s.size -= s.value.size();
-        s.value = s.value.put(value);
+        s.value.put(value);
         s.size += s.value.size();
       } else {
         var side = r > 0 ? 'left' : 'right';
@@ -348,7 +348,7 @@ foam.CLASS({
 
       if ( r === 0 ) {
         s.size -= s.value.size();
-        s.value = s.value.remove(value);
+        s.value.remove(value);
 
         // If the sub-Index still has values, then don't
         // delete this node.
@@ -1094,91 +1094,85 @@ var PositionIndex = {
   }
 };
 
-var AltIndex = {
-  // Maximum cost for a plan which is good enough to not bother looking at the rest.
-  GOOD_ENOUGH_PLAN: 10, // put to 10 or more when not testing
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'AltIndex',
+  extends: 'foam.dao.index.Index',
 
-  create: function() {
-    return {
-      __proto__: this,
-      delegates: foam.Array.argsToArray(arguments)
-    };
+  constants: {
+    /** Maximum cost for a plan which is good enough to not bother looking at the rest. */
+    GOOD_ENOUGH_PLAN: 10 // put to 10 or more when not testing
   },
 
-  addIndex: function(s, index) {
-    // Populate the index
-    var a = foam.dao.ArraySink.create();
-    this.plan(s, a).execute([Promise.resolve()], s, a);
-
-    s.push(index.bulkLoad(a));
-    this.delegates.push(index);
-
-    return this;
-  },
-
-  bulkLoad: function(a) {
-    var root = this.ArraySink.create();
-    for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-      root[i] = this.delegates[i].bulkLoad(a);
+  properties: [
+    {
+      name: 'delegates',
+      factory: function() { return []; }
     }
-    return root;
-  },
+  ],
 
-  get: function(s, key) {
-    return this.delegates[0].get(s[0], key);
-  },
+  methods: [
+    function addIndex(index) {
+      // Populate the index
+      var a = foam.dao.ArraySink.create();
+      this.plan(a).execute([Promise.resolve()], a);
 
-  put: function(s, newValue) {
-    s = s || this.ArraySink.create();
-    for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-      s[i] = this.delegates[i].put(s[i], newValue);
-    }
+      index.bulkLoad(a);
+      this.delegates.push(index);
 
-    return s;
-  },
+      return this;
+    },
 
-  remove: function(s, obj) {
-    s = s || this.ArraySink.create();
-    for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-      s[i] = this.delegates[i].remove(s[i], obj);
-    }
-
-    return s;
-  },
-
-  plan: function(s, sink, skip, limit, order, predicate) {
-    var bestPlan;
-    //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
-    for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-      var plan = this.delegates[i].plan(sink, skip, limit, order, predicate);
-
-      // console.log('  plan ' + i + ': ' + plan);
-      if ( plan.cost <= AltIndex.GOOD_ENOUGH_PLAN ) {
-        bestPlan = plan;
-        break;
+    function bulkLoad(a) {
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].bulkLoad(a);
       }
+    },
 
-      if ( ! bestPlan || plan.cost < bestPlan.cost ) {
-        bestPlan = plan;
+    function get(key) {
+      return this.delegates[0].get(key);
+    },
+
+    function put(newValue) {
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].put(newValue);
       }
+    },
+
+    function remove(obj) {
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].remove(obj);
+      }
+    },
+
+    function plan(sink, skip, limit, order, predicate) {
+      var bestPlan;
+      //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        var plan = this.delegates[i].plan(sink, skip, limit, order, predicate);
+        // console.log('  plan ' + i + ': ' + plan);
+        if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
+          bestPlan = plan;
+          break;
+        }
+        if ( ! bestPlan || plan.cost < bestPlan.cost ) {
+          bestPlan = plan;
+        }
+      }
+      //    console.log('Best Plan: ' + bestPlan);
+      if ( bestPlan == undefined || bestPlan == foam.dao.index.NoPlan.create() ) {
+        return foam.dao.index.NoPlan.create();
+      }
+      return bestPlan;
+    },
+
+    function size(obj) { return this.delegates[0].size(); },
+
+    function toString() {
+      return 'Alt(' + this.delegates.join(',') + ')';
     }
-
-    //    console.log('Best Plan: ' + bestPlan);
-
-    if ( bestPlan == undefined || bestPlan == foam.dao.index.NoPlan.create() ) return foam.dao.index.NoPlan.create();
-
-    return {
-      __proto__: bestPlan,
-      execute: function(promise, sink, skip, limit, order, predicate) { return bestPlan.execute(promise, sink, skip, limit, order, predicate); }
-    };
-  },
-
-  size: function(obj) { return this.delegates[0].size(obj[0]); },
-
-  toString: function() {
-    return 'Alt(' + this.delegates.join(',') + ')';
-  }
-};
+  ]
+});
 
 
 var mLangIndex = {
@@ -1311,7 +1305,6 @@ foam.CLASS({
           prop: this.of.getAxiomByName(( this.of.ids && this.of.ids[0] ) || 'id' ),
           subIndexModel: foam.dao.index.ValueIndex
       });
-      this.root = foam.dao.index.NullTreeNode.create({ index: this.index });
 
       if ( this.autoIndex ) this.addRawIndex(AutoIndex.create(this));
     },
@@ -1372,12 +1365,11 @@ foam.CLASS({
     // TODO: name 'addIndex' and renamed addIndex
     function addRawIndex(index) {
       // Upgrade single Index to an AltIndex if required.
-      if ( ! /*AltIndex.isInstance(this.index)*/ this.index.delegates ) {
-        this.index = AltIndex.create(this.index);
-        this.root = [this.root];
+      if ( ! foam.dao.index.AltIndex.isInstance(this.index) ) {
+        this.index = foam.dao.index.AltIndex.create({ delegates: [this.index] });
       }
 
-      this.index.addIndex(this.root, index);
+      this.index.addIndex(index);
 
       return this;
     },
@@ -1391,7 +1383,7 @@ foam.CLASS({
       var self = this;
       return new Promise(function(resolve, reject) {
         dao.select().then(function() {
-          self.root = self.index.bulkLoad(this);
+          self.index.bulkLoad(this);
           resolve();
         });
       })
@@ -1400,9 +1392,9 @@ foam.CLASS({
     function put(obj) {
       var oldValue = this.map[obj.id];
       if ( oldValue ) {
-        this.root = this.index.put(this.index.remove(this.root, oldValue), obj);
+        this.index.put(this.index.remove(oldValue), obj);
       } else {
-        this.root = this.index.put(this.root, obj);
+        this.index.put(obj);
       }
       this.map[obj.id] = obj;
       this.pub('on', 'put', obj);
@@ -1413,7 +1405,7 @@ foam.CLASS({
       var self = this;
       return new Promise(function(resolve, reject) {
         var obj = self.map[key];
-        // var obj = this.index.get(this.root, key);
+        // var obj = this.index.get(key);
         if ( obj ) {
           resolve(obj);
         } else {
@@ -1460,7 +1452,7 @@ foam.CLASS({
 
       return this.find(id).then(
         function(obj) {
-          self.root = self.index.remove(self.root, obj);
+          self.index.remove(obj);
           delete self.map[obj.id];
           self.pub('on', 'remove', obj);
           return Promise.resolve();
@@ -1482,7 +1474,7 @@ foam.CLASS({
         function(sink) {
           var a = sink.a;
           for ( var i = 0 ; i < a.length ; i++ ) {
-            self.root = self.index.remove(self.root, a[i]);
+            self.index.remove(a[i]);
             delete self.map[a[i].id];
             self.pub('on', 'remove', a[i]);
           }
@@ -1495,16 +1487,16 @@ foam.CLASS({
       sink = sink || this.ArraySink.create();
 
       if ( foam.mlang.sink.Explain && foam.mlang.sink.Explain.isInstance(sink) ) {
-        var plan = this.index.plan(this.root, sink.arg1, skip, limit, order, predicate);
+        var plan = this.index.plan(sink.arg1, skip, limit, order, predicate);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
         return Promise.resolve(sink)
       }
 
-      var plan = this.index.plan(this.root, sink, skip, limit, order, predicate);
+      var plan = this.index.plan(sink, skip, limit, order, predicate);
 
       var promise = [Promise.resolve()];
-      plan.execute(promise, this.root, sink, skip, limit, order, predicate);
+      plan.execute(promise, sink, skip, limit, order, predicate);
       return promise[0].then(
         function() {
           sink && sink.eof && sink.eof();
