@@ -302,7 +302,8 @@ foam.CLASS({
   name: 'Map',
   extends: 'Property',
   properties: [
-    ['factory', function() { return {} }]
+    ['factory', function() { return {} }],
+    'of'
   ]
 });
 
