@@ -577,6 +577,28 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  implements: [
+    'foam.dao.Sink',
+    'foam.mlang.predicate.Unary'
+  ],
+  name: 'Max',
+
+  properties: [
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+  methods: [
+    function put(obj) {
+      if ( ! this.hasOwnProperty('value') ) this.value = this.arg1.f(obj);
+      else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) this.value = this.arg1.f(obj);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -598,6 +620,7 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
+    'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
@@ -631,6 +654,7 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
+    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
   ]
 });
 

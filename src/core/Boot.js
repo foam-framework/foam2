@@ -882,16 +882,18 @@ foam.CLASS({
     function override_(proto, method) {
       var super_ = proto[this.name];
 
-      // Not overriding, so just return original method
-      if ( ! super_ ) return method;
+      if ( ! method ) return;
+
+      // Not using SUPER, so just return original method
+      if ( method.toString().indexOf('SUPER') == -1 ) return method;
+
+      // Not overriding, stub out super_
+      if ( ! super_ ) super_ = function() {};
 
       console.assert(
           typeof super_ === 'function',
           'Attempt to override non-method: ',
           this.name);
-
-      // Not using SUPER, so just return original method
-      if ( method.toString().indexOf('SUPER') == -1 ) return method;
 
       function SUPER() { return super_.apply(this, arguments); }
 
@@ -1095,6 +1097,9 @@ foam.CLASS({
     */
     function sub() { /* args..., l */
       var l         = arguments[arguments.length-1];
+
+      console.assert(typeof l === 'function', 'Listener must be a function');
+
       var listeners = this.listeners_();
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {

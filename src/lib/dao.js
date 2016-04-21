@@ -472,7 +472,23 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
+      delegates: [ 'where', 'orderBy', 'skip', 'limit' ],
+      postSet: function(old, nu) {
+        if ( old ) old.on.unsub(this.onEvent);
+        if ( nu ) nu.on.sub(this.onEvent);
+
+        if ( old && nu ) this.on.reset.pub();
+      }
+    }
+  ],
+  listeners: [
+    {
+      name: 'onEvent',
+      code: function(s, a, b, c, d, e, f, g) {
+        // TODO: There should be a standard method for doing this
+        // that will keep up with the maximum amount of supported pub arguments.
+        this.pub(a, b, c, d, e, f, g);
+      }
     }
   ]
 });
@@ -721,7 +737,15 @@ foam.CLASS({
         }
       ]
     },
-    'delegate',
+    {
+      name: 'delegate',
+      postSet: function(old, nu) {
+        // TODO: This should probably be inherited from ProxyDAO propertly.
+        if ( old ) old.on.unsub(this.onEvent);
+        if ( nu ) nu.on.sub(this.onEvent);
+        if ( old && nu ) this.on.reset.pub();
+      }
+    },
     {
       name: 'promise',
       final: true,
@@ -764,6 +788,16 @@ foam.CLASS({
         }
       ]
     }
+  ],
+  listeners: [
+    {
+      name: 'onEvent',
+      code: function(s, a, b, c, d, e, f, g) {
+        // TODO: There should be a standard method for doing this
+        // that will keep up with the maximum amount of supported pub arguments.
+        this.pub(a, b, c, d, e, f, g);
+      }
+    }
   ]
 });
 
@@ -804,6 +838,171 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'SyncDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.mlang.Expressions'
+  ],
+  properties: [
+    {
+      name: 'remoteDAO',
+      transient: true,
+      required: true,
+      postSet: function(old, nu) {
+        if ( old ) old.on.unsub(this.onRemoteUpdate);
+        if ( nu ) nu.on.sub(this.onRemoteUpdate);
+      }
+    },
+    {
+      name: 'syncRecordDAO',
+      transient: true,
+      required: true
+    },
+    {
+      name: 'syncProperty',
+      required: true,
+      transient: true
+    },
+    {
+      name: 'of',
+      required: true,
+      transient: true
+    },
+    {
+      name: 'E',
+      factory: function() { return this.Expressions.create(); }
+    }
+  ],
+  classes: [
+    {
+      name: 'SyncRecord',
+      properties: [
+        'id',
+        {
+          class: 'Int',
+          name: 'syncNo',
+          value: -1
+        },
+        {
+          class: 'Boolean',
+          name: 'deleted',
+          value: false
+        }
+      ]
+    }
+  ],
+  listeners: [
+    function onRemoteUpdate(s, on, event, obj) {
+      if ( event == 'put' ) {
+        this.processFromServer(obj);
+      } else if ( event === 'remove' ) {
+        this.delegate.remove(obj);
+      } else if ( event === 'reset' ) {
+        this.delegate.removeAll();
+      }
+    },
+    {
+      name: 'onLocalUpdate',
+      isMerged: 100,
+      code: function() {
+        this.sync();
+      }
+    }
+  ],
+  methods: [
+    function init() {
+      this.delegate.on.sub(this.onLocalUpdate);
+    },
+    function put(obj) {
+      return this.delegate.put(obj).then(function(o) {
+        this.syncRecordDAO.put(
+          this.SyncRecord.create({
+            id: o.id,
+            syncNo: -1
+          }));
+        return o;
+      }.bind(this));
+    },
+    function remove(obj) {
+      return this.delegate.remove(obj).then(function(o) {
+        this.syncRecordDAO.put(
+          this.SyncRecord.create({
+            id: obj.id,
+            deleted: true,
+            syncNo: -1
+          }));
+      }.bind(this));
+    },
+    function removeAll(skip, limit, order, predicate) {
+      this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
+        a = a.a;
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          this.remove(a[i]);
+        }
+      }.bind(this));
+    },
+    function processFromServer(obj) {
+      this.delegate.put(obj).then(function(obj) {
+        this.syncRecordDAO.put(
+          this.SyncRecord.create({
+            id: obj.id,
+            syncNo: obj[this.syncProperty.name]
+          }));
+      }.bind(this));
+    },
+    function syncFromServer() {
+      var E = this.E;
+
+      this.syncRecordDAO.select(E.MAX(this.SyncRecord.SYNC_NO)).then(function(m) {
+        this.remoteDAO
+          .where(
+            E.GT(this.syncProperty, m.value))
+          .select().then(function(a) {
+            a = a.a;
+            for ( var i = 0 ; i < a.length ; i++ ) {
+              this.processFromServer(a[i]);
+            }
+          }.bind(this));
+      }.bind(this));
+    },
+    function syncToServer() {
+      var E = this.E;
+      var self = this;
+
+      this.syncRecordDAO
+        .where(E.EQ(this.SyncRecord.SYNC_NO, -1))
+        .select().then(function(records) {
+          records = records.a;
+
+          for ( var i = 0 ; i < records.length ; i++ ) {
+            var record = records[i]
+            var id = record.id;
+            var deleted = record.deleted;
+
+            if ( deleted ) {
+              var obj = self.of.create();
+              obj.id = id;
+              self.remoteDAO.remove(obj);
+            } else {
+              // TODO: Stop sending updates if the first one fails.
+              self.delegate.find(id).then(function(obj) {
+                return self.remoteDAO.put(obj);
+              }).then(function(obj) {
+                self.processFromServer(obj);
+              });
+            }
+          }
+        });
+    },
+    function sync() {
+      this.syncToServer();
+      this.syncFromServer();
+    }
+  ],
+});
 
 /*
 TODO:

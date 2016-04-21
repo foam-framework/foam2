@@ -84,7 +84,12 @@
     "../lib/PhysicsEngine",
     ["../lib/PhysicalCircle", ! isServer ],
     [ "../lib/node/json_dao", isServer ],
-    "../lib/utf8"
+    "../lib/utf8",
+    "../lib/net",
+    "../lib/firebase",
+    "../lib/box",
+    [ "../lib/node/net", isServer ],
+    [ "../lib/node/box", isServer ]
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
       map(function(f) { return Array.isArray(f) ? f[0] : f; }).
