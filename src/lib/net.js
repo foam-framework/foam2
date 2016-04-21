@@ -17,6 +17,111 @@
 
 foam.CLASS({
   package: 'foam.net',
+  name: 'WebSocket',
+  properties: [
+    {
+      name: 'uri',
+    },
+    {
+      name: 'socket',
+      transient: true
+    }
+  ],
+  topics: [
+    'message',
+    'connected',
+    'disconnected'
+  ],
+  methods: [
+    function send(msg) {
+      // TODO: Error handling
+      this.socket.send(msg);
+    }
+  ],
+  listeners: [
+    {
+      name: 'connect',
+      code: function() {
+        var socket = this.socket = new WebSocket(this.uri);
+        var self = this;
+        socket.addEventListener('open', function() {
+          self.connected.pub();
+        })
+        socket.addEventListener('message', this.onMessage);
+        socket.addEventListener('close', function() {
+          self.disconnected.pub();
+        });
+      }
+    },
+    {
+      name: 'onMessage',
+      code: function(msg) {
+        foam.json.parse(foam.json.parseString(msg.data));
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net',
+  name: 'WebSocketService',
+  requires: [
+    'foam.net.WebSocket'
+  ],
+  exports: [
+    'as webSocketService'
+  ],
+  properties: [
+    {
+      class: 'Map',
+      of: 'foam.net.WebSocket',
+      name: 'sockets'
+    },
+    {
+      name: 'delegate'
+    }
+  ],
+  methods: [
+    function listen() {
+    },
+    function getSocket(uri) {
+      if ( this.sockets[uri] )
+        return Promise.resolve(this.sockets[uri]);
+
+      return new Promise(function(resolve, reject) {
+        var s = this.WebSocket.create({
+          uri: uri
+        });
+
+        s.connected.sub(function(sub) {
+          sub.destroy();
+          this.addSocket(s);
+          resolve(s);
+        }.bind(this));
+
+        s.connect();
+      }.bind(this));
+    },
+    function addSocket(s) {
+      s.message.sub(this.onMessage);
+      s.disconnected.sub(function() {
+        delete this.sockets[s.uri]
+      }.bind(this));
+      this.sockets[s.uri] = s;
+    }
+  ],
+  listeners: [
+    {
+      name: 'onMessage',
+      code: function(s, _, m) {
+        this.delegate && this.delegate.send(m);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net',
   name: 'HTTPResponse',
   properties: [
     {
