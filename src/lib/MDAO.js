@@ -244,7 +244,7 @@ foam.CLASS({
 
     function updateSize() {
       this.size = this.left.size +
-        this.right.size + this.value.size;
+        this.right.size + this.value.size();
     },
 
     /** @return Another node representing the rebalanced AA tree. */
