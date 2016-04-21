@@ -48,7 +48,7 @@
   }
 
   function createLoadWorker(filename) {
-    var path = this.FOAM_BOOT_PATH || '/src/core/';
+    var path = FOAM_BOOT_PATH;
     return function(filename) {
       importScripts(path + filename + '.js');
     };
