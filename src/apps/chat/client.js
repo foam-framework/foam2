@@ -1,7 +1,4 @@
-// unregister old service worker for now.
-if ( navigator.serviceWorker ) {
-  navigator.serviceWorker.getRegistration().then(function(r) { r && r.unregister(); });
-}
+navigator.serviceWorker.register('sw.js');
 
 var env = foam.apps.chat.BoxEnvironment.create();
 var client = foam.apps.chat.Client.create(null, env);
