@@ -253,12 +253,15 @@ foam.CLASS({
           dao.basepath = dao.apppath + 'chat/' + channel;
         }
 
+        // TODO: This could be improved by using strong random values instead
+        // of timestamps.
         dao = this.SyncDAO.create({
           delegate: this.TimestampDAO.create({
             delegate: this.ArrayDAO.create({
               of: this.Message
             }),
           }),
+          of: this.Message,
           remoteDAO: dao,
           syncRecordDAO: this.ArrayDAO.create({
             of: this.SyncDAO.SyncRecord
