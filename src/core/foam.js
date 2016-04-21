@@ -84,6 +84,7 @@
     "../lib/net",
     "../lib/firebase",
     "../lib/box",
+    [ "../lib/node/net", isServer ],
     [ "../lib/node/box", isServer ]
   ].
       filter(function (f) { return ! Array.isArray(f) || f[1]; }).
