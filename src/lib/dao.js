@@ -922,14 +922,22 @@ foam.CLASS({
         return o;
       }.bind(this));
     },
-    function remove(obj, sink) {
+    function remove(obj) {
       return this.delegate.remove(obj).then(function(o) {
         this.syncRecordDAO.put(
           this.SyncRecord.create({
-            id: o.id,
+            id: obj.id,
             deleted: true,
             syncNo: -1
           }));
+      }.bind(this));
+    },
+    function removeAll(skip, limit, order, predicate) {
+      this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
+        a = a.a;
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          this.remove(a[i]);
+        }
       }.bind(this));
     },
     function processFromServer(obj) {
@@ -971,7 +979,7 @@ foam.CLASS({
             var deleted = record.deleted;
 
             if ( deleted ) {
-              var obj = self.model.create();
+              var obj = self.of.create();
               obj.id = id;
               self.remoteDAO.remove(obj);
             } else {
