@@ -367,6 +367,19 @@ foam.CLASS({
       this.left.selectReverse(sink, skip, limit, order, predicate);
     },
 
+    function findPos(key, incl) {
+      var r = this.compare(this.key, key);
+      if ( r === 0 ) {
+        return incl ?
+          this.left.size :
+          this.size - this.right.size;
+      }
+      return r > 0 ?
+        this.left.findPos(key, incl) :
+        this.right.findPos(key, incl) + this.size - this.right.size;
+    },
+
+
   ]
 });
 
@@ -410,6 +423,7 @@ foam.CLASS({
     function removeNode(key) { return this; },
     function select() { },
     function selectReverse() {},
+    function findPos() { return 0; }
   ]
 
 
@@ -494,15 +508,7 @@ var TreeIndex = {
 
   findPos: function(s, key, incl) {
     if ( ! s.level ) return 0;
-    var r = this.compare(s.key, key);
-    if ( r === 0 ) {
-      return incl ?
-        this.size(s.left) :
-        this.size(s) - this.size(s.right);
-    }
-    return r > 0 ?
-      this.findPos(s.left, key, incl) :
-      this.findPos(s.right, key, incl) + this.size(s) - this.size(s.right);
+    return s.findPos(key, incl);
   },
 
   size: function(s) { return s.level ? s.size : 0; },
