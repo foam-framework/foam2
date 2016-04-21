@@ -74,6 +74,8 @@
     "../lib/Promise",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
+    "../lib/IndexBinaryTree",
+    "../lib/Index",
     "../lib/MDAO",
     [ "../lib/IDBDAO", ! isServer ],
     "../lib/mlang",
