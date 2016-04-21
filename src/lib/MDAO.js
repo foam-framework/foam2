@@ -546,10 +546,10 @@ foam.CLASS({
       if ( this.subIndexModel === foam.dao.index.ValueIndex ) {
         a.sort(toCompare(this.prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1);
-      }
-
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        this.put(a[i]);
+      } else {
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          this.put(a[i]);
+        }
       }
     },
 
@@ -605,7 +605,7 @@ foam.CLASS({
         };
       }
 
-  //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
+      //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
 
       var prop = this.prop;
 
@@ -766,8 +766,8 @@ foam.CLASS({
             for ( var i = skip; i < limit; i++ )
               sink.put(a[i]);
           } else {
-  // What did this do?  It appears to break sorting in saturn mail
-  /*          if ( reverseSort && skip )
+              // What did this do?  It appears to break sorting in saturn mail
+              /*          if ( reverseSort && skip )
               // TODO: temporary fix, should include range in select and selectReverse calls instead.
               skip = index.size(s) - skip - (limit || index.size(s)-skip)
               */
