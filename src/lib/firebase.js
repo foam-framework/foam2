@@ -81,8 +81,6 @@ foam.CLASS({
       });
     },
     function remove(obj) {
-      debugger;
-
       var req = this.HTTPRequest.create();
       req.method = "DELETE",
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";
