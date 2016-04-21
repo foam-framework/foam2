@@ -600,7 +600,7 @@ foam.CLASS({
         //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
         return {
           cost: 0,
-          execute: function(promise, unused, sink, skip, limit, order, predicate) { sink.value += count; },
+          execute: function(promise, sink, skip, limit, order, predicate) { sink.value += count; },
           toString: function() { return 'short-circuit-count(' + count + ')'; }
         };
       }
@@ -650,7 +650,6 @@ foam.CLASS({
            Math.log(this.size())/Math.log(2) * arg2.length < this.size() ) {
         var keys = arg2;
         var subPlans = [];
-        var results  = [];
         var cost = 1;
 
         for ( var i = 0 ; i < keys.length ; ++i) {
@@ -661,7 +660,6 @@ foam.CLASS({
 
             cost += subPlan.cost;
             subPlans.push(subPlan);
-            results.push(result);
           }
         }
 
@@ -669,9 +667,9 @@ foam.CLASS({
 
         return {
           cost: 1 + cost,
-          execute: function(promise, s2, sink, skip, limit, order, predicate) {
+          execute: function(promise, sink, skip, limit, order, predicate) {
             for ( var i = 0 ; i < subPlans.length ; ++i) {
-              subPlans[i].execute(promise, results[i], sink, skip, limit, order, predicate);
+              subPlans[i].execute(promise, sink, skip, limit, order, predicate);
             }
           },
           toString: function() {
@@ -691,8 +689,8 @@ foam.CLASS({
 
         return {
           cost: 1 + subPlan.cost,
-          execute: function(promise, s2, sink, skip, limit, order, predicate) {
-            return subPlan.execute(promise, result, sink, skip, limit, order, predicate);
+          execute: function(promise, sink, skip, limit, order, predicate) {
+            return subPlan.execute(promise, sink, skip, limit, order, predicate);
           },
           toString: function() {
             return 'lookup(key=' + prop.name + ', cost=' + this.cost + (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') + ') ' + subPlan.toString();
@@ -1392,7 +1390,8 @@ foam.CLASS({
     function put(obj) {
       var oldValue = this.map[obj.id];
       if ( oldValue ) {
-        this.index.put(this.index.remove(oldValue), obj);
+        this.index.remove(oldValue);
+        this.index.put(obj);
       } else {
         this.index.put(obj);
       }
