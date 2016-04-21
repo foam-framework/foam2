@@ -65,25 +65,56 @@ var CompoundComparator = function CompoundComparator() {
   return f;
 };
 
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'Plan',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'cost',
+    },
+  ],
+
+  methods: [
+    function execute(promise, state, sink, skip, limit, order, predicate) {},
+    function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
+  ]
+});
 
 /** Plan indicating that there are no matching records. **/
-var NOT_FOUND = {
-  cost: 0,
-  execute: function(_, sink) { },
-  toString: function() { return "no-match(cost=0)"; }
-};
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'NotFoundPlan',
+  extends: 'foam.dao.index.Plan',
+  axoims: [ foam.pattern.Singleton.create() ],
+
+  properties: [
+    { name: 'cost', value: 0 }
+  ],
+
+  methods: [
+    function toString() { return "no-match(cost=0)"; }
+  ]
+});
+
 
 /** Plan indicating that an index has no plan for executing a query. **/
-var NO_PLAN = {
-  cost: Number.MAX_VALUE,
-  execute: function(promise, _, sink) { },
-  toString: function() { return "no-plan"; }
-};
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'NoPlan',
+  extends: 'foam.dao.index.Plan',
+  axoims: [ foam.pattern.Singleton.create() ],
 
-function dump(o) {
-  if ( Array.isArray(o) ) return '[' + o.map(dump).join(',') + ']';
-  return o ? o.toString() : '<undefined>';
-}
+  properties: [
+    { name: 'cost', value: Number.MAX_VALUE }
+  ],
+
+  methods: [
+    function toString() { return "no-plan"; }
+  ]
+});
+
 
 /** An Index which holds only a single value. **/
 var ValueIndex = {
@@ -171,8 +202,8 @@ foam.CLASS({
     },
 
     function updateSize() {
-      this.size = this.index.size(this.left) +
-        this.index.size(this.right) + this.index.tail.size(this.value);
+      this.size = this.left.size +
+        this.right.size + this.index.tail.size(this.value);
     },
 
     /** @return Another node representing the rebalanced AA tree. */
@@ -520,7 +551,7 @@ var TreeIndex = {
   plan: function(s, sink, skip, limit, order, predicate) {
     var predicate = predicate;
 
-    if ( predicate === foam.mlang.predicate.False ) return NOT_FOUND;
+    if ( predicate === foam.mlang.predicate.False ) return foam.dao.index.NotFoundPlan.create();
 
     if ( ! predicate && foam.mlang.sink.Count.isInstance(sink) ) {
       var count = this.size(s);
@@ -532,7 +563,7 @@ var TreeIndex = {
       };
     }
 
-//    if ( limit != null && skip != null && skip + limit > this.size(s) ) return NO_PLAN;
+//    if ( limit != null && skip != null && skip + limit > this.size(s) ) return foam.dao.index.NoPlan.create();
 
     var prop = this.prop;
 
@@ -592,7 +623,7 @@ var TreeIndex = {
         }
       }
 
-      if ( subPlans.length == 0 ) return NOT_FOUND;
+      if ( subPlans.length == 0 ) return foam.dao.index.NotFoundPlan.create();
 
       return {
         cost: 1 + cost,
@@ -612,7 +643,7 @@ var TreeIndex = {
       var key = arg2.f();
       var result = this.get(s, key);
 
-      if ( ! result ) return NOT_FOUND;
+      if ( ! result ) return foam.dao.index.NotFoundPlan.create();
 
       var subPlan = this.tail.plan(result, sink, skip, limit, order, predicate);
 
@@ -870,16 +901,16 @@ var AutoPositionIndex = {
   plan: function(s, sink, skip, limit, order, predicate) {
     var subPlan = this.alt.plan(s, sink, skip, limit, order, predicate);
 
-    if ( subPlan != NO_PLAN ) return subPlan;
+    if ( subPlan != foam.dao.index.NoPlan.create() ) return subPlan;
 
     if ( ( skip != null && limit != null ) ||
          CountExpr.isInstance(sink) ) {
-      if ( this.hasIndex(skip, limit, order, predicate) ) return NO_PLAN;
+      if ( this.hasIndex(skip, limit, order, predicate) ) return foam.dao.index.NoPlan.create();
       this.sets.push([(predicate) || '', (order) || '']);
       this.addPosIndex(s, skip, limit, order, predicate);
       return this.alt.plan(s, sink, skip, limit, order, predicate);
     }
-    return NO_PLAN;
+    return foam.dao.index.NoPlan.create();
   }
 };
 
@@ -972,7 +1003,7 @@ var PositionIndex = {
     var self = this;
 
     if ( ! order.equals(this.order) ||
-         ! predicate.equals(this.predicate) ) return NO_PLAN;
+         ! predicate.equals(this.predicate) ) return foam.dao.index.NoPlan.create();
 
     if ( foam.mlang.sink.Count.isInstance(sink) ) {
       return {
@@ -992,7 +1023,7 @@ var PositionIndex = {
         toString: function() { return 'position-index(cost=' + this.cost + ', count)'; }
       }
     } else if ( skip == undefined || limit == undefined ) {
-      return NO_PLAN;
+      return foam.dao.index.NoPlan.create();
     }
 
     var threshold = Date.now() - this.maxage;
@@ -1111,7 +1142,7 @@ var AltIndex = {
 
     //    console.log('Best Plan: ' + bestPlan);
 
-    if ( bestPlan == undefined || bestPlan == NO_PLAN ) return NO_PLAN;
+    if ( bestPlan == undefined || bestPlan == foam.dao.index.NoPlan.create() ) return foam.dao.index.NoPlan.create();
 
     return {
       __proto__: bestPlan,
@@ -1167,14 +1198,14 @@ var mLangIndex = {
 
   plan: function(s, sink, skip, limit, order, predicate) {
     // console.log('s');
-    if ( predicate ) return NO_PLAN;
+    if ( predicate ) return foam.dao.index.NoPlan.create();
 
     if ( sink.model_ && sink.model_.isInstance(s) && s.arg1 === sink.arg1 ) {
       this.PLAN.s = s;
       return this.PLAN;
     }
 
-    return NO_PLAN;
+    return foam.dao.index.NoPlan.create();
   },
 
   toString: function() {
@@ -1216,7 +1247,7 @@ var AutoIndex = {
     } else if ( predicate ) {
       // TODO: check for property in predicate
     }
-    return NO_PLAN;
+    return foam.dao.index.NoPlan.create();
   },
 
   toString: function() { return 'AutoIndex()'; }
