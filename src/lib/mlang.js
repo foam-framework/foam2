@@ -517,6 +517,67 @@ foam.CLASS({
   ]
 });
 
+
+/** Pseudo-expression which outputs a human-readable description of its
+  subexpression, and the plan for evaluating it. */
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Explain',
+  extends: 'foam.dao.ProxySink',
+
+  properties: [
+    {
+      class: 'String',
+      name:  'plan',
+      help:  'Execution Plan',
+    }
+  ],
+
+  methods: [
+    function toString() { return this.plan; },
+  ]
+});
+
+/** Base class for comparators. */
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'Comparator',
+  abstract: true,
+
+  properties: [
+    {
+      /** The first argument to the expression. */
+      name: 'arg1',
+      class: 'foam.mlang.ExprArgument',
+    }
+  ],
+
+  methods: [
+    function toString() {
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+    },
+    function compare(o1, o2) {
+      return this.arg1.compare(o1, o2);
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'Desc',
+  extends: 'foam.mlang.order.Comparator',
+
+  methods: [
+    function toString() {
+      return 'DESC(' + this.arg1.toString() + ')';
+    },
+    function compare(o1, o2) {
+      return -1 * this.arg1.compare(o1, o2);
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
@@ -538,6 +599,8 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Map',
+    'foam.mlang.sink.Explain',
+    'foam.mlang.order.Desc',
   ],
 
   methods: [
@@ -565,6 +628,9 @@ foam.CLASS({
     function NOT(a) { return this._unary_("Not", a); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
+    function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
+
+    function DESC(a) { return this._unary_("Desc", a); },
   ]
 });
 
