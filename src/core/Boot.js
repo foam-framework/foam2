@@ -531,7 +531,7 @@ foam.CLASS({
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     },
     {
-      // TODO: doc is replaced below
+      // Is replaced by an AxiomArray later.
       class: 'Array',
       of: 'Property',
       name: 'properties',
@@ -559,7 +559,7 @@ foam.CLASS({
       }
     },
     {
-      // TODO: doc is replaced below
+      // Is replaced by an AxiomArray later.
       class: 'Array',
       of: 'Method',
       name: 'methods',
@@ -582,10 +582,10 @@ foam.CLASS({
 
 
 foam.CLASS({
-  id: 'foam.core.Property', // TODO: is this require
+  id: 'foam.core.Property',
   package: 'foam.core',
   name: 'Property',
-  extends: 'FObject', // TODO: is this require
+  extends: 'FObject',
 
   properties: [
     // TODO: validate doesn't end with $
