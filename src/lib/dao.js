@@ -472,13 +472,15 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      delegates: [ 'where', 'orderBy', 'skip', 'limit' ],
-      postSet: function(old, nu) {
-        if ( old ) old.on.unsub(this.onEvent);
-        if ( nu ) nu.on.sub(this.onEvent);
-
-        if ( old && nu ) this.on.reset.pub();
+      delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
+    }
+  ],
+  methods: [
+    function sub(a, b, c, d, e, f, g) {
+      if ( a === 'on' ) {
+        this.delegate.on.sub(this.onEvent);
       }
+      return this.SUPER.apply(this, arguments);
     }
   ],
   listeners: [

@@ -130,13 +130,21 @@ foam.CLASS({
         return;
       }
 
-      this.eventSource_ = this.EventSource.create({
-        uri: this.basepath + '.json?auth=' + this.secret
-      });
-
+      var params = [];
+      if ( this.secret ) params.push(['auth', this.secret]);
       if ( this.startEventsAt_ ) {
-        '&orderBy="lastUpdate"&startAt=' + this.startEventsAt_;
+        params.push(['orderBy', '"lastUpdate"']);
+        params.push(['startAt', this.startEventsAt_]);
       }
+
+      var uri = this.basepath + '.json';
+      if ( params.length ) {
+        uri += '?' + params.map(function(p) { return p.map(encodeURIComponent).join('='); }).join('&');
+      }
+
+      this.eventSource_ = this.EventSource.create({
+        uri: uri
+      });
 
       this.eventSource_.message.put.sub(this.onPut);
       this.eventSource_.message.patch.sub(this.onPatch);
@@ -153,8 +161,9 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
-      req.url = this.basepath + ".json";
-      if ( this.secret ) req.url += "?auth=" + encodeURIComponent(this.secret);
+
+      var params = [];
+      if ( this.secret ) params.push(['auth', this.secret]);
 
       // Efficiently handle GT(lastupdate, #) queries.  Used by the SyncDAO to get
       // all changes.
@@ -170,14 +179,25 @@ foam.CLASS({
           this.startEvents();
         }
 
-        req.url += '&orderBy="lastUpdate"&startAt=' + ( predicate.arg2.f() + 1 );
+        params.push(['orderBy', '"lastUpdate"']);
+        params.push(['startAt', predicate.arg2.f() + 1]);
       }
+
+      var url = this.basepath + '.json';
+      if ( params.length ) {
+        url += '?' + params.map(function(p) { return p.map(encodeURIComponent).join('='); }).join('&');
+      }
+
+      req.url = url;
 
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
       // TODO: This should be streamed for better handling of large responses.
       return req.send().then(function(resp) {
+        if ( ! resp.success ) {
+          return Promise.reject(foam.dao.InternalException.create());
+        }
         return resp.payload;
       }).then(function(payload) {
         var data = JSON.parse(payload);
