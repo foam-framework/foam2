@@ -250,7 +250,7 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
-      if ( limit && limit[0]-- < 1 ) return;
+      if ( limit && limit[0]-- <= 0 ) return;
       sink.put(this.value);
     },
     function selectReverse(sink, skip, limit, order, predicate) {
@@ -369,7 +369,7 @@ foam.CLASS({
                 predicate = predicate.clone();
                 predicate.args[i] = foam.mlang.predicate.True;
                 predicate = predicate.partialEval();
-                if ( predicate === foam.mlang.predicate.True ) predicate = null;
+                if ( predicate === foam.mlang.predicate.True ) predicate = undefined;
                 return q.arg2;
               }
             }
@@ -428,35 +428,22 @@ foam.CLASS({
         });
       }
 
+      // Restrict the subtree to search as necessary
+      var subTree = this.root;
+      
       arg2 = isExprMatch(foam.mlang.predicate.Gt);
-      if ( arg2 != undefined ) {
-        var key = arg2.f();
-        var pos = this.findPos(key, false);
-        skip = ((skip) || 0) + pos;
-      }
+      if ( arg2 ) subTree = subTree.gt(arg2.f());
 
       arg2 = isExprMatch(foam.mlang.predicate.Gte);
-      if ( arg2 != undefined ) {
-        var key = arg2.f();
-        var pos = this.findPos(key, true);
-        skip = ((skip) || 0) + pos;
-      }
+      if ( arg2 ) subTree = subTree.gte(arg2.f());
 
       arg2 = isExprMatch(foam.mlang.predicate.Lt);
-      if ( arg2 != undefined ) {
-        var key = arg2.f();
-        var pos = this.findPos(key, true);
-        limit = Math.min(limit, (pos - (skip || 0)) );
-      }
-
+      if ( arg2 ) subTree = subTree.lt(arg2.f());
+      
       arg2 = isExprMatch(foam.mlang.predicate.Lte);
-      if ( arg2 != undefined ) {
-        var key = arg2.f();
-        var pos = this.findPos(key, false);
-        limit = Math.min(limit, (pos - (skip || 0)) );
-      }
-
-      var cost = this.size();
+      if ( arg2 ) subTree = subTree.lte(arg2.f());
+      
+      var cost = subTree.size;
       var sortRequired = false;
       var reverseSort = false;
 
@@ -483,7 +470,7 @@ foam.CLASS({
           if ( sortRequired ) {
             var arrSink = foam.dao.ArraySink.create();
             index.selectCount++;
-            index.select(arrSink, null, null, null, predicate);
+            subTree.select(arrSink, null, null, null, predicate);
             index.selectCount--;
             var a = arrSink.a;
             a.sort(toCompare(order));
@@ -496,15 +483,10 @@ foam.CLASS({
             for ( var i = skip; i < limit; i++ )
               sink.put(a[i]);
           } else {
-              // What did this do?  It appears to break sorting in saturn mail
-              /*          if ( reverseSort && skip )
-              // TODO: temporary fix, should include range in select and selectReverse calls instead.
-              skip = index.size(s) - skip - (limit || index.size(s)-skip)
-              */
             index.selectCount++;
             reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-              index.selectReverse(sink, [skip], [limit], order, predicate) :
-              index.select(sink, [skip], [limit], order, predicate) ;
+              subTree.selectReverse(sink, [skip], [limit], order, predicate) :
+              subTree.select(sink, [skip], [limit], order, predicate) ;
             index.selectCount--;
           }
         },

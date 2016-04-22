@@ -241,7 +241,9 @@ foam.CLASS({
     function selectReverse(sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
-      if ( skip && skip[0] >= this.size ) {
+
+      if ( skip && skip[0] >= this.size && ! predicate ) {
+        console.log('reverse skipping: ', this.key);
         skip[0] -= this.size;
         return;
       }
@@ -251,16 +253,78 @@ foam.CLASS({
       this.left.selectReverse(sink, skip, limit, order, predicate);
     },
 
-    function findPos(key, incl) {
-      var r = this.compare(this.key, key);
-      if ( r === 0 ) {
-        return incl ?
-          this.left.size :
-          this.size - this.right.size;
+    function gt(key) {
+      var s = this;
+      var r = this.index.compare(key, s.key);
+
+      if ( r < 0 ) {
+        var l = s.left.gt(key);
+        var copy = s.clone();
+        copy.size = s.size - s.left.size + l.size;
+        copy.left = l;
+        return copy;
       }
-      return r > 0 ?
-        this.left.findPos(key, incl) :
-        this.right.findPos(key, incl) + this.size - this.right.size;
+
+      if ( r > 0 ) return s.right.gt(key);
+
+      return s.right;
+    },
+
+    function gte(key) {
+      var s = this;
+      var r = this.index.compare(key, s.key);
+
+      if ( r < 0 ) {
+        var l = s.left.gte(key);
+        var copy = s.clone();
+        copy.size = s.size - s.left.size + l.size,
+        copy.left = l;
+        return copy;
+      }
+
+      if ( r > 0 ) return s.right.gte(key);
+
+      var copy = s.clone();
+      copy.size = s.size - s.left.size,
+      copy.left = foam.dao.index.NullTreeNode({ index: s.index });
+      return copy;
+    },
+
+    function lt(s, key) {
+      if ( ! s ) return s;
+      var r = this.index.compare(key, s.key);
+
+      if ( r > 0 ) {
+        var r = s.right.lt(key);
+        var copy = s.clone();
+        copy.size = s.size - s.right.size + r.size;
+        copy.right = r;
+        return copy;
+      }
+
+      if ( r < 0 ) return s.left.lt(key);
+
+      return s.left;
+    },
+
+    function lte(s, key) {
+      if ( ! s ) return s;
+      var r = this.index.compare(key, s.key);
+
+      if ( r > 0 ) {
+        var r = s.right.lte(key);
+        var copy = s.clone();
+        copy.size = s.size - s.right.size + r.size;
+        copy.right = r;
+        return copy;
+      }
+
+      if ( r < 0 ) return s.right.lte(key);
+
+      var copy = s.clone();
+      copy.size = s.size - s.right.size;
+      copy.right = foam.dao.index.NullTreeNode({ index: s.index });
+      return copy;
     },
 
 
@@ -309,7 +373,11 @@ foam.CLASS({
     function removeNode(key) { return this; },
     function select() { },
     function selectReverse() {},
-    function findPos() { return 0; },
+
+    function gt() {  return this; },
+    function gte() { return this; },
+    function lt() {  return this; },
+    function lte() { return this; },
 
     function bulkLoad_(a, start, end) {
       if ( end < start ) return this;
