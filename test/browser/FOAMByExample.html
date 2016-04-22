@@ -1207,10 +1207,6 @@ foam.CLASS({
     { class: 'Boolean', name: 'defaultBoolean', value: true },
     { class: 'Function', name: 'undefinedFunction' },
     { class: 'Function', name: 'definedFunction' },
-    { class: 'Date', name: 'undefinedDate' },
-    { class: 'Date', name: 'definedDate' },
-    { class: 'DateTime', name: 'undefinedDateTime' },
-    { class: 'DateTime', name: 'definedDateTime' },
     { name: 'undefinedFObject' },
     { name: 'definedFObject' },
     { name: 'transient', transient: true },
@@ -1242,8 +1238,6 @@ o = JSONTest.create({
   falseBoolean: false,
   defaultBoolean: true,
   definedFunction: function plus(a, b) { return a + b; },
-  definedDate: new Date("Nov 19, 1970"),
-  definedDateTime: new Date("Nov 19, 1970"),
   definedFObject: JSONTest.create({
     name: 'Janet',
     age: 32,
@@ -1477,7 +1471,7 @@ foam.CLASS({
         function onTick() {
           var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
-	  this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
+    this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
         }
       ]
     }
@@ -1495,8 +1489,8 @@ foam.CLASS({
   methods: [
     function initCView() {
       for ( var i = 0 ; i < this.nx ; i++ )
-	for ( var j = 0 ; j < this.ny ; j++ )
-	  this.addChildren(this.Cell.create({row: j, col: i}));
+  for ( var j = 0 ; j < this.ny ; j++ )
+    this.addChildren(this.Cell.create({row: j, col: i}));
       this.tick();
     }
   ],

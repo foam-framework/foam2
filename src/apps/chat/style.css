@@ -1,0 +1,52 @@
+#pending {
+    color: grey;
+    width: 100%;
+}
+
+.message-border {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+#messages {
+    width: 100%;
+}
+
+#controls {
+    width: 100%;
+    display: flex;
+}
+
+#input {
+    flex: 1;
+}
+
+#send {
+    flex: 0 0 content;
+}
+
+.message-row {
+}
+
+.message-from {
+    display: inline;
+}
+
+.message-from::after {
+    content: '> '
+}
+
+.message-message {
+    display: inline;
+}
+
+.message-timestamp {
+    display: inline;
+}
+
+.message-timestamp::before {
+}
+
+.message-timestamp::after {
+    content: ': '
+}

@@ -17,6 +17,111 @@
 
 foam.CLASS({
   package: 'foam.net',
+  name: 'WebSocket',
+  properties: [
+    {
+      name: 'uri',
+    },
+    {
+      name: 'socket',
+      transient: true
+    }
+  ],
+  topics: [
+    'message',
+    'connected',
+    'disconnected'
+  ],
+  methods: [
+    function send(msg) {
+      // TODO: Error handling
+      this.socket.send(msg);
+    }
+  ],
+  listeners: [
+    {
+      name: 'connect',
+      code: function() {
+        var socket = this.socket = new WebSocket(this.uri);
+        var self = this;
+        socket.addEventListener('open', function() {
+          self.connected.pub();
+        })
+        socket.addEventListener('message', this.onMessage);
+        socket.addEventListener('close', function() {
+          self.disconnected.pub();
+        });
+      }
+    },
+    {
+      name: 'onMessage',
+      code: function(msg) {
+        foam.json.parse(foam.json.parseString(msg.data));
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net',
+  name: 'WebSocketService',
+  requires: [
+    'foam.net.WebSocket'
+  ],
+  exports: [
+    'as webSocketService'
+  ],
+  properties: [
+    {
+      class: 'Map',
+      of: 'foam.net.WebSocket',
+      name: 'sockets'
+    },
+    {
+      name: 'delegate'
+    }
+  ],
+  methods: [
+    function listen() {
+    },
+    function getSocket(uri) {
+      if ( this.sockets[uri] )
+        return Promise.resolve(this.sockets[uri]);
+
+      return new Promise(function(resolve, reject) {
+        var s = this.WebSocket.create({
+          uri: uri
+        });
+
+        s.connected.sub(function(sub) {
+          sub.destroy();
+          this.addSocket(s);
+          resolve(s);
+        }.bind(this));
+
+        s.connect();
+      }.bind(this));
+    },
+    function addSocket(s) {
+      s.message.sub(this.onMessage);
+      s.disconnected.sub(function() {
+        delete this.sockets[s.uri]
+      }.bind(this));
+      this.sockets[s.uri] = s;
+    }
+  ],
+  listeners: [
+    {
+      name: 'onMessage',
+      code: function(s, _, m) {
+        this.delegate && this.delegate.send(m);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net',
   name: 'HTTPResponse',
   properties: [
     {
@@ -79,6 +184,7 @@ foam.CLASS({
   ],
   topics: [
     'data',
+    'error',
     'end'
   ],
   methods: [
@@ -86,7 +192,12 @@ foam.CLASS({
       var reader = this.resp.body.getReader();
       this.streaming = true;
 
-      var onData = foam.fn.bind(function(e) {
+      var onError = foam.Function.bind(function(e) {
+        this.error.pub();
+        this.end.pub();
+      }, this);
+
+      var onData = foam.Function.bind(function(e) {
         if ( e.value ) {
           this.data.pub(e.value);
         }
@@ -95,10 +206,10 @@ foam.CLASS({
           this.end.pub();
           return this;
         }
-        return reader.read().then(onData);
+        return reader.read().then(onData, onError);
       }, this);
 
-      return reader.read().then(onData);
+      return reader.read().then(onData, onError);
     },
     function stop() {
       this.streaming = false;
@@ -186,7 +297,6 @@ foam.CLASS({
         options.body = this.payload;
       }
 
-
       var request = new Request(
         this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path,
         options);
@@ -205,11 +315,45 @@ foam.CLASS({
   package: 'foam.net',
   name: 'EventSource',
   requires: [
-    'foam.net.sw.HTTPRequest',
-    'foam.encodings.UTF8',
-    'foam.parse.StringPS'
+    'foam.parse.Grammar',
+    'foam.net.HTTPRequest',
+    'foam.encodings.UTF8'
+  ],
+  imports: [
+    'setTimeout',
+    'clearTimeout'
   ],
   properties: [
+    {
+      name: 'grammar',
+      factory: function() {
+        var self = this;
+        return this.Grammar.create({
+          symbols: function(repeat, alt, sym, notChars, seq) {
+            return {
+              START: sym('line'),
+
+              line: alt(
+                sym('event'),
+                sym('data')),
+
+              event: seq('event: ', sym('event name')),
+              'event name': repeat(notChars('\r\n')),
+
+              data: seq('data: ', sym('data payload')),
+              'data payload': repeat(notChars('\r\n'))
+            }
+          }
+        }).addActions({
+          'event name': function(v) {
+            self.eventName = v.join('');
+          },
+          'data payload': function(p) {
+            self.eventData = JSON.parse(p.join(''));
+          }
+        });
+      }
+    },
     {
       class: 'String',
       name: 'uri'
@@ -229,10 +373,16 @@ foam.CLASS({
       }
     },
     {
-      name: 'ps',
-      factory: function() {
-        return this.StringPS.create();
-      }
+      name: 'retryTimer'
+    },
+    {
+      class: 'Int',
+      name: 'delay',
+      preSet: function(_, a) {
+        if ( a > 30000 ) return 30000;
+        return a;
+      },
+      value: 1
     },
     'eventData',
     'eventName'
@@ -249,33 +399,6 @@ foam.CLASS({
       ]
     }
   ],
-  grammar: function(repeat, alt, sym, notChars, seq) {
-    return {
-      line: alt(
-        sym('event'),
-        sym('data')),
-
-      event: seq('event: ', sym('event name')),
-      'event name': repeat(notChars('\r\n')),
-
-      data: seq('data: ', sym('data payload')),
-      'data payload': repeat(notChars('\r\n'))
-    };
-  },
-  grammarActions: [
-    {
-      name: 'event name',
-      code: function(v) {
-        this.eventName = v.join('');
-      }
-    },
-    {
-      name: 'data payload',
-      code: function(p) {
-        this.eventData = JSON.parse(p.join(''));
-      }
-    }
-  ],
   methods: [
     function start() {
       var req = this.HTTPRequest.create({
@@ -287,12 +410,28 @@ foam.CLASS({
       });
 
       this.running = true;
+      this.keepAlive();
       req.send().then(function(resp) {
+        if ( ! resp.success ) {
+          this.onError();
+          return;
+        }
+
         resp.data.sub(this.onData);
-        resp.end.sub(this.onEnd);
+        resp.end.sub(this.onError);
         this.resp = resp;
         resp.start();
-      }.bind(this));
+      }.bind(this), this.onError);
+    },
+    function keepAlive() {
+      if ( this.retryTimer ) {
+        this.clearTimeout(this.retryTimer);
+      }
+
+      this.retryTimer = this.setTimeout(foam.Function.bind(function() {
+        this.retryTimer = 0;
+        this.onError();
+      }, this), 60000);
     },
     function close() {
       this.running = false;
@@ -320,12 +459,14 @@ foam.CLASS({
         return;
       }
 
-      this.ps.setString(line);
-      this.line(this.ps);
-    }
+      this.grammar.parseString(line);
+    },
   ],
   listeners: [
     function onData(s, _, data) {
+      this.delay = 1;
+      this.keepAlive();
+
       this.decoder.put(data);
       var string = this.decoder.string;
       while ( string.indexOf('\n') != -1 ) {
@@ -335,8 +476,11 @@ foam.CLASS({
       }
       this.decoder.string = string;
     },
+    function onError() {
+      this.delay *= 2;
+      this.setTimeout(this.onEnd, this.delay);
+    },
     function onEnd() {
-      // TODO: Exponential backoff in the case of errors.
       if ( this.running ) {
         this.start();
       }
