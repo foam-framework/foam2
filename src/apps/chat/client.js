@@ -131,6 +131,63 @@ var pendingMsgs = foam.apps.chat.MessageTable.create({
   pending: true
 });
 
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'Highlight',
+  imports: [
+    'document',
+    'setInterval',
+    'clearInterval'
+  ],
+  properties: [
+    {
+      class: 'String',
+      name: 'oldTitle'
+    },
+    {
+      class: 'Boolean',
+      name: 'active',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'state',
+      value: false
+    },
+    {
+      class: 'Int',
+      name: 'interval'
+    }
+  ],
+  methods: [
+    function init() {
+      this.document.addEventListener('focusin', this.clear);
+    },
+    function highlight(obj) {
+      if ( this.document.hasFocus() || this.interval ) return;
+
+      this.oldTitle = this.document.title;
+      this.newTitle = obj.from + '> ' + obj.message;
+      this.state = true;
+      this.interval = this.setInterval(this.update, 2000);
+      this.update();
+    }
+  ],
+  listeners: [
+    function clear() {
+      this.document.title = this.oldTitle;
+      this.clearInterval(this.interval);
+      this.interval = 0;
+    },
+    function update() {
+      this.state = ! this.state;
+      this.document.title = this.state ? this.oldTitle : this.newTitle;
+    }
+  ]
+});
+
+var highlight = foam.apps.chat.Highlight.create();
+
 function formatTime(m) {
   var hours = m.getHours().toString();
   if ( hours.length == 1 ) hours = "0" + hours;
@@ -140,10 +197,15 @@ function formatTime(m) {
 }
 
 function onMessage(m) {
+  if ( m.syncNo !== -1 ) {
+    highlight.highlight(m);
+  }
+
   pendingMsgs.onMessage(m);
   confirmedMsgs.onMessage(m);
   document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
 }
+
 
 // client.messageDAO.select().then(function(a) {
 //   a.a.map(onMessage);
