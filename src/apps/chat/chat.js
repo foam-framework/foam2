@@ -235,19 +235,28 @@ foam.CLASS({
     {
       name: 'messageDAO',
       factory: function() {
-        // var channel = document.location.search.substring(1).split('&').find(function(e) {
-        //   return e.indexOf('channel=') === 0;
-        // });
-        // channel = channel && channel.substring(8);
+        var channel = document.location.search.substring(1).split('&').find(function(e) {
+          return e.indexOf('channel=') === 0;
+        });
+        channel = channel && channel.substring(8);
 
-        var channel = "foam";
+        var auth = document.location.search.substring(1).split('&').find(function(e) {
+          return e.indexOf('auth=') === 0;
+        });
+
+        auth = auth.substring(5);
+
+        if ( ! channel ) channel = "foam"
 
         var dao = this.FirebaseDAO.create({
           of: this.Message,
           timestampProperty: this.Message.SYNC_NO,
-          secret: '0Zr5o8wSWmje7gyVvAhVocW8AjPNvjXEqfKr6B33',
           apppath: 'https://glaring-torch-184.firebaseio.com/'
         });
+
+        if ( auth ) {
+          dao.secret = auth;
+        }
 
         if ( channel ) {
           dao.basepath = dao.apppath + 'chat/' + channel;
