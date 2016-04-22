@@ -327,7 +327,7 @@ foam.LIB({
       that are instances of the specified class.
     */
     function getAxiomsByClass(cls) {
-      // TODO: Add efficient support for:
+      // FUTURE: Add efficient support for:
       //    .where() .orderBy() .groupBy()
       var as = this.private_.axiomCache[cls.id];
       if ( ! as ) {
@@ -588,8 +588,11 @@ foam.CLASS({
   extends: 'FObject',
 
   properties: [
-    // TODO: validate doesn't end with $
-    { name: 'name', required: true },
+    {
+      name: 'name',
+      required: true
+      // TODO: validate doesn't end with $
+    },
     {
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
@@ -769,7 +772,7 @@ foam.CLASS({
       var argNames = foam.Function.argsArray(e);
       var name     = this.name;
 
-      // TODO: determine how often the value is being invalidated,
+      // FUTURE: determine how often the value is being invalidated,
       // and if it's happening often, then don't unsubscribe.
       return function() {
         var self = this;

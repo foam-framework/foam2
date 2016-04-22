@@ -49,6 +49,14 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
+    function getModelAxiomByName_(model, name) {
+      for ( var i = 0 ; i < model.axioms_.length ; i++ ) {
+        var a = model.axioms_[i];
+        if ( a.name === name ) return a;
+      }
+      return null;
+    },
+
     function validate(model) {
       this.SUPER();
 
@@ -70,6 +78,30 @@ foam.CLASS({
           }
         }
       }
+
+      /*
+        This doesn't work because we need to validate against the class
+        so that we know what axioms we have.
+
+      // Validate that expressions only depend on known Axioms with Slots
+      if ( this.expression ) {
+        var expression = this.expression;
+
+        var argNames = foam.Function.argsArray(expression);
+        for ( var i = 0 ; i < argNames.length ; i++ ) {
+          var name  = argNames[i];
+          var axiom = this.getModelAxiomByName_(model, name);
+          var modelName = model.id || model.refines;
+
+          console.assert(
+              axiom,
+              'Unknown argument "', name, '" in ', modelName, '.', this.name, '.expression: ', expression);
+          console.assert(
+              axiom.toSlot,
+              'Non-Slot argument "', name, '" in ', modelName, '.', this.name, '.expression: ', expression);
+        }
+      }
+      */
     }
   ]
 });
