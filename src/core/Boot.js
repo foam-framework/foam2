@@ -769,8 +769,10 @@ foam.CLASS({
       }
     },
 
-    /** Create a factory function from an expression function. **/
-    // TODO: validate at the Model level that properties exist
+    /**
+     * Create a factory function from an expression function.
+     * Function arguments are validated in debug.js.
+     **/
     function exprFactory(e) {
       if ( ! e ) return null;
 
