@@ -790,8 +790,7 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
-          // TODO: make work with slots instead
-          subs.push(this.sub('propertyChange', argNames[i], l));
+          subs.push(this.slot(argNames[i]).sub(l));
           args[i] = this[argNames[i]];
         }
         return e.apply(this, args);
