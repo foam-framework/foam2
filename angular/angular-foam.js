@@ -165,6 +165,7 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
           remove(cache[id]);
         }
         cache = {};
+        $scope.dao.select(listener);
       }
     }
   };
