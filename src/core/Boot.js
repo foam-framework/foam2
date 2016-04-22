@@ -735,13 +735,13 @@ foam.CLASS({
             Object.defineProperty(this, name, {
               value: newValue,
               writable: false,
-              configurable: true
+              configurable: true // ???: is this needed?
             });
           }
 
           this.pubPropertyChange_(prop, oldValue, newValue);
 
-          // TODO(maybe): pub to a global topic to support dynamic()
+          // FUTURE: pub to a global topic to support dynamic()
 
           if ( postSet ) postSet.call(this, oldValue, newValue, prop);
         };
@@ -754,6 +754,7 @@ foam.CLASS({
     },
 
     function validateInstance(o) {
+      // ???: Should this call hasOwnProperty() instead?
       /* Validate an object which has this property. */
       if ( this.required && ! o[this.name] ) {
         throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
@@ -761,6 +762,7 @@ foam.CLASS({
     },
 
     /** Create a factory function from an expression function. **/
+    // TODO: validate at the Model level that properties exist
     function exprFactory(e) {
       if ( ! e ) return null;
 
@@ -778,6 +780,7 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
+          // TODO: make work with slots instead
           subs.push(this.sub('propertyChange', argNames[i], l));
           args[i] = this[argNames[i]];
         }
@@ -785,7 +788,7 @@ foam.CLASS({
       };
     },
 
-    /** Returns a human-readable description of this Property. **/
+    /** Returns a developer-readable description of this Property. **/
     function toString() {
       return this.name;
     },
@@ -801,28 +804,29 @@ foam.CLASS({
       return this;
     },
 
-    /** Copy this property's value from o1 to o2. **/
-    function copy(srd, dst) {
+    /** Copy this property's value from src to dst. **/
+    // TODO: remove if not used
+    function copy(src, dst) {
       this.set(dst, this.get(src));
     },
 
-    function exportedValue(obj) {
+    function exportAs(obj) {
       /** Export obj.name$ instead of just obj.name. **/
-      return obj.slot(this.name);
+      return this.toSlot(obj);
     },
 
     function toSlot(obj) {
       var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
-      var dyn      = obj.getPrivate_(slotName);
+      var slot     = obj.getPrivate_(slotName);
 
-      if ( ! dyn ) {
-        dyn = foam.core.internal.PropertySlot.create();
-        dyn.obj  = obj;
-        dyn.prop = this;
-        obj.setPrivate_(slotName, dyn);
+      if ( ! slot ) {
+        slot = foam.core.internal.PropertySlot.create();
+        slot.obj  = obj;
+        slot.prop = this;
+        obj.setPrivate_(slotName, slot);
       }
 
-      return dyn;
+      return slot;
     }
   ]
 });
@@ -831,8 +835,8 @@ foam.CLASS({
 /**
 <p>
   Methods are only installed on the prototype.
-  If the method is overriding a method from a parent
-  class, then SUPER support is added.
+  If the method is overriding a method from a parent class,
+  then SUPER support is added.
 
 <p>
   Ex.
@@ -846,7 +850,7 @@ foam.CLASS({
       // long-form
       {
         name: 'sayGoodbye',
-        code: function() { console.log('goodbye');
+        code: function() { console.log('goodbye'); }
       }
     ]
   });
@@ -918,7 +922,7 @@ foam.CLASS({
       proto[this.name] = this.override_(proto, this.code);
     },
 
-    function exportedValue(obj) {
+    function exportAs(obj) {
       var m = obj[this.name];
       /** Bind the method to 'this' when exported so that it still works. **/
       return function exportedMethod() { return m.apply(obj, arguments); };
@@ -937,8 +941,9 @@ foam.CLASS({
 
   properties: [
     [ 'adapt', function(_, a) {
+      // TODO: bug if passed 0
         return typeof a === 'function' ? foam.String.multiline(a) :
-          a ? a.toString() :
+          a != null ? a.toString() :
           '' ;
       }
     ],
@@ -950,7 +955,7 @@ foam.CLASS({
 foam.CLASS({
   id: 'foam.core.Array',
   package: 'foam.core',
-  name: 'Array',
+  name: 'Array', // TODO: rename to FObjectArray
   extends: 'Property',
 
   // documentation: "A Property which contains an array of 'of' objects.",
@@ -958,8 +963,9 @@ foam.CLASS({
   properties: [
     { name: 'of', required: true },
     [ 'factory', function() { return []; } ],
-    [ 'adapt', function(_, a, prop) {
+    [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
+        // TODO: assert that a is an array
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
@@ -968,6 +974,8 @@ foam.CLASS({
       }
     ],
     [ 'adaptArrayElement', function(o) {
+      // TODO: don't create if already an instance of 'of'
+      // TODO: typecheck types
         return foam.lookup(this.of).create(o, this);
       }
     ]
@@ -1458,7 +1466,7 @@ foam.CLASS({
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
-                m[b[1]] = a.exportedValue ? a.exportedValue(this) : this[b[0]] ;
+                m[b[1]] = a.exportAs ? a.exportAs(this) : this[b[0]] ;
               } else {
                 m[b[1]] = this;
               }
