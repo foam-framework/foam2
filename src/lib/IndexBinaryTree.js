@@ -34,8 +34,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.left  = this.left  || foam.dao.index.NullTreeNode.create(this);
-      this.right = this.right || foam.dao.index.NullTreeNode.create(this);
+      this.left  = this.left  || this.index.nullNode;
+      this.right = this.right || this.index.nullNode;
     },
 
     /** Nodes do a shallow clone */
@@ -173,7 +173,7 @@ foam.CLASS({
 
         // If we're a leaf, easy, otherwise reduce to leaf case.
         if ( ! s.left.level && ! s.right.level ) {
-          return foam.dao.index.NullTreeNode.create({ index: this.index });
+          return this.index.nullNode;
         }
 
         var side = s.left.level ? 'left' : 'right';
@@ -286,7 +286,7 @@ foam.CLASS({
 
       var copy = s.clone();
       copy.size = s.size - s.left.size,
-      copy.left = foam.dao.index.NullTreeNode({ index: s.index });
+      copy.left = s.index.nullNode;
       return copy;
     },
 
@@ -323,7 +323,7 @@ foam.CLASS({
 
       var copy = s.clone();
       copy.size = s.size - s.right.size;
-      copy.right = foam.dao.index.NullTreeNode({ index: s.index });
+      copy.right = s.index.nullNode;
       return copy;
     },
 

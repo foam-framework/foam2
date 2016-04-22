@@ -272,9 +272,15 @@ foam.CLASS({
     'prop',
     [ 'selectCount', 0 ],
     {
-      name: 'root',
+      name: 'nullNode',
       factory: function() {
         return foam.dao.index.NullTreeNode.create({ index: this });
+      }
+    },
+    {
+      name: 'root',
+      factory: function() {
+        return this.nullNode;
       }
     }
   ],
