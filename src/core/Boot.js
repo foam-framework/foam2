@@ -184,7 +184,9 @@ foam.LIB({
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
         model.validate();
-        return model.getClass();
+        var cls = model.getClass();
+        cls.validate();
+        return cls;
       };
 
       // Upgrade existing classes to real classes.
@@ -201,7 +203,7 @@ foam.LIB({
         this.private_.axiomCache = {};
 
         // Install Axioms in first pass so that they're available in the second-pass
-        // when axioms are actually run.  This avoids some ordering issues.
+        // when axioms are actually run. This avoids some ordering issues.
         for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
           var a = m.axioms_[i];
           this.axiomMap_[a.name] = a;
@@ -361,6 +363,9 @@ foam.LIB({
       }
       return as;
     },
+
+    // NOP, is replaced if debug.js is loaded
+    function validate() { },
 
     function toString() { return this.name + 'Class'; },
 

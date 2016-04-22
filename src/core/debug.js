@@ -49,17 +49,10 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
-    function getModelAxiomByName_(model, name) {
-      for ( var i = 0 ; i < model.axioms_.length ; i++ ) {
-        var a = model.axioms_[i];
-        if ( a.name === name ) return a;
-      }
-      return null;
-    },
-
     function validate(model) {
       this.SUPER();
 
+      // TODO: Have work with 'extends'.
       var mName = model ? model.id + '.' : '';
 
       // List of properties which are hidden by other properties.
@@ -78,30 +71,27 @@ foam.CLASS({
           }
         }
       }
+    },
 
-      /*
-        This doesn't work because we need to validate against the class
-        so that we know what axioms we have.
-
+    function validateClass(cls) {
       // Validate that expressions only depend on known Axioms with Slots
       if ( this.expression ) {
         var expression = this.expression;
+        var pName = cls.id + '.' + this.name + '.expression: ';
 
         var argNames = foam.Function.argsArray(expression);
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var name  = argNames[i];
-          var axiom = this.getModelAxiomByName_(model, name);
-          var modelName = model.id || model.refines;
+          var axiom = cls.getAxiomByName(name);
 
           console.assert(
               axiom,
-              'Unknown argument "', name, '" in ', modelName, '.', this.name, '.expression: ', expression);
+              'Unknown argument "', name, '" in ', pName, expression);
           console.assert(
               axiom.toSlot,
-              'Non-Slot argument "', name, '" in ', modelName, '.', this.name, '.expression: ', expression);
+              'Non-Slot argument "', name, '" in ', pName, expression);
         }
       }
-      */
     }
   ]
 });
@@ -122,6 +112,13 @@ foam.AbstractClass.describe = function(opt_name) {
   }
   console.log('\n');
 };
+
+foam.AbstractClass.validate = function() {
+  for ( var key in this.axiomMap_ ) {
+    var a = this.axiomMap_[key];
+    a.validateClass && a.validateClass(this);
+  }
+}
 
 
 /* Add describe() support to objects. */
