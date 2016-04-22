@@ -244,7 +244,7 @@ foam.CLASS({
           return e.indexOf('auth=') === 0;
         });
 
-        auth = auth.substring(5);
+        auth = auth && auth.substring(5);
 
         if ( ! channel ) channel = "foam"
 
