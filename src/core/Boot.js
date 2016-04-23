@@ -953,10 +953,10 @@ foam.CLASS({
 
   properties: [
     [ 'adapt', function(_, a) {
-      // TODO: bug if passed 0
         return typeof a === 'function' ? foam.String.multiline(a) :
-          a != null ? a.toString() :
-          '' ;
+               typeof a === 'number'   ? String(a) :
+               a && a.toString         ? a.toString() :
+               '';
       }
     ],
     [ 'value', '' ]
