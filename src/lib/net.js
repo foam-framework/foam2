@@ -487,3 +487,141 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.net',
+  name: 'XHRHTTPRequest',
+  extends: 'foam.net.HTTPRequest',
+  requires: [
+    'foam.net.XHRHTTPResponse as HTTPResponse'
+  ],
+  methods: [
+    function send() {
+      if ( this.url ) {
+        this.fromUrl(this.url);
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open(this.method,
+               this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path);
+      xhr.responseType = this.responseType;
+      for ( var key in this.headers ) {
+        xhr.setRequestHeader(key, this.headers[key]);
+      }
+
+      var self = this;
+      return new Promise(function(resolve, reject) {
+        xhr.addEventListener('readystatechange', function foo() {
+          if ( this.readyState === this.LOADING ||
+               this.readyState === this.DONE ) {
+            this.removeEventListener('readystatechange', foo);
+            resolve(self.HTTPResponse.create({
+              xhr: this
+            }));
+          }
+        });
+        xhr.send(self.payload);
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net',
+  name: 'XHRHTTPResponse',
+  extends: 'foam.net.HTTPResponse',
+  properties: [
+    {
+      name: 'xhr',
+      postSet: function(_, xhr) {
+        this.status = xhr.status;
+        var headers = xhr.getAllResponseHeaders().split('\r\n');
+        for ( var i = 0 ; i < headers.length ; i++ ) {
+          var sep = headers[i].indexOf(':');
+          var key = headers[i].substring(0, sep);
+          var value = headers[i].substring(sep+1);
+          this.headers[key.trim()] = value.trim();
+        }
+      }
+    },
+    {
+      name: 'payload',
+      factory: function() {
+        if ( this.streaming ) {
+          return null;
+        }
+
+        var self = this;
+        var xhr = this.xhr;
+
+        if ( xhr.readyState === xhr.DONE )
+          return Promise.resolve(xhr.response);
+        else
+          return new Promise(function(resolve, reject) {
+            xhr.addEventListener('readystatechange', function() {
+              if ( this.readyState === this.DONE )
+                resolve(this.response);
+            });
+          });
+      }
+    },
+    {
+      class: 'Int',
+      name: 'pos',
+      value: 0
+    }
+  ],
+  constants: {
+    STREAMING_LIMIT: 10 * 1024 * 1024
+  },
+  methods: [
+    function start() {
+      this.streaming = true;
+      this.xhr.addEventListener('loadend', function() {
+        this.done.pub();
+      }.bind(this));
+
+      this.xhr.addEventListener('progress', function() {
+        var substr = this.xhr.responseText.substring(this.pos);
+        this.pos = this.xhr.responseText.length;
+        this.data.pub(substr);
+
+        if ( this.pos > this.STREAMING_LIMIT ) {
+          this.xhr.abort();
+        }
+      }.bind(this));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net',
+  name: 'SafariEventSource',
+  extends: 'foam.net.EventSource',
+  requires: [
+    'foam.net.XHRHTTPRequest as HTTPRequest'
+  ],
+  properties: [
+    {
+      class: 'String',
+      name: 'buffer'
+    }
+  ],
+  listeners: [
+    function onData(s, _, data) {
+      this.delay = 1;
+      this.keepAlive();
+
+      this.buffer += data;
+      var string = this.buffer;
+
+      while ( string.indexOf('\n') != -1 ) {
+        var line = string.substring(0, string.indexOf('\n'));
+        this.processLine(line);
+        string = string.substring(string.indexOf('\n') + 1);
+      }
+
+      this.buffer = string;
+    }
+  ]
+});
