@@ -276,7 +276,7 @@ foam.LIB({
       Install an Axiom into the class and prototype.
       Invalidate the axiom-cache, used by getAxiomsByName().
 
-      TODO: Wait for first object to be created before creating prototype.
+      FUTURE: Wait for first object to be created before creating prototype.
       Currently it installs axioms into the protoype immediately, but in should
       wait until the first object is created. This will provide
       better startup performance.
@@ -650,14 +650,13 @@ foam.CLASS({
         }
       }
 
-      // TODO: detect conflicts, consider making constantName a property
+      // TODO: detect conflicts
       c[foam.String.constantize(this.name)] = this;
 
       // Note: can't be used without installing Property first
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
-      // ???: Better name than 'f'?
       var f = this.f = function f(o) { return o[name]; };
 
       /** Makes this Property a comparator, suitable for use with mLangs. */
@@ -698,7 +697,7 @@ foam.CLASS({
         enumerable: false
       });
 
-      // TODO: document
+      // TODO: doc
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
