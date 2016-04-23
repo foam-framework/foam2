@@ -200,6 +200,7 @@ function onMessage(m) {
   pendingMsgs.onMessage(m);
   confirmedMsgs.onMessage(m);
   document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
+  input.scrollIntoView();
 }
 
 
