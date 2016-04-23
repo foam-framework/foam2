@@ -813,12 +813,6 @@ foam.CLASS({
       return this;
     },
 
-    /** Copy this property's value from src to dst. **/
-    // TODO: remove if not used
-    function copy(src, dst) {
-      this.set(dst, this.get(src));
-    },
-
     function exportAs(obj) {
       /** Export obj.name$ instead of just obj.name. **/
       return this.toSlot(obj);
@@ -1743,9 +1737,6 @@ foam.CLASS({
               if ( c ) return c;
             }
             return 0;
-          },
-          copy: function(src, dst) {
-            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].copy(src, dst);
           }
         };
       }
