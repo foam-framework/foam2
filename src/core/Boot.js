@@ -986,9 +986,10 @@ foam.CLASS({
       }
     ],
     [ 'adaptArrayElement', function(o) {
-      // TODO: don't create if already an instance of 'of'
-      // TODO: typecheck types
-        return foam.lookup(this.of).create(o, this);
+      // FUTURE: replace 'foam.' with '(this.Y || foam).' ?
+      var cls = foam.lookup(this.of);
+      console.assert(cls, 'Unknown array "of": ', this.of);
+      return cls.isInstance(o) ? o : cls.create(o, this);
       }
     ]
   ]
