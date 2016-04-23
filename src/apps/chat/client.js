@@ -1,7 +1,14 @@
-navigator.serviceWorker.register('sw.js');
+if ( navigator.serviceWorker ) {
+  navigator.serviceWorker.getRegistration().then(function(r) {
+    r && r.unregister();
+  });
+}
 
 var env = foam.apps.chat.BoxEnvironment.create();
-var client = foam.apps.chat.Client.create(null, env);
+var client = foam.apps.chat.Client.create({
+  isSafari: navigator.userAgent.indexOf('Safari') !== -1 &&
+    navigator.userAgent.indexOf('Chrome') === -1
+}, env);
 
 var ME = 'Anonymous';
 
