@@ -1,28 +1,33 @@
+body {
+    margin: 0;
+    word-wrap: break-word;
+}
+
 #pending {
     color: grey;
-    width: 100%;
-}
-
-.message-border {
-    margin-left: 8px;
-    margin-right: 8px;
-}
-
-#messages {
-    width: 100%;
 }
 
 #controls {
-    width: 100%;
     display: flex;
+    border: 1px inset;
 }
 
 #input {
-    flex: 1;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100px;
+    border: 0;
+    margin: 0;
 }
 
 #send {
-    flex: 0 0 content;
+    flex-shrink: 0;
+    flex-grow: 0;
+    border: 1px outset;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 .message-row {
@@ -32,21 +37,10 @@
     display: inline;
 }
 
-.message-from::after {
-    content: '> '
-}
-
 .message-message {
     display: inline;
 }
 
 .message-timestamp {
     display: inline;
-}
-
-.message-timestamp::before {
-}
-
-.message-timestamp::after {
-    content: ': '
 }

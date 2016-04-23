@@ -848,6 +848,9 @@ foam.CLASS({
   requires: [
     'foam.mlang.Expressions'
   ],
+  imports: [
+    'setInterval'
+  ],
   properties: [
     {
       name: 'remoteDAO',
@@ -876,6 +879,16 @@ foam.CLASS({
     {
       name: 'E',
       factory: function() { return this.Expressions.create(); }
+    },
+    {
+      class: 'Boolean',
+      name: 'polling',
+      value: false
+    },
+    {
+      class: 'Int',
+      name: 'pollingFrequency',
+      value: 1000
     }
   ],
   classes: [
@@ -917,6 +930,11 @@ foam.CLASS({
   methods: [
     function init() {
       this.delegate.on.sub(this.onLocalUpdate);
+      if ( this.polling ) {
+        this.setInterval(function() {
+          this.sync();
+        }.bind(this), this.pollingFrequency);
+      }
     },
     function put(obj) {
       return this.delegate.put(obj).then(function(o) {

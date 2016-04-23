@@ -1,7 +1,14 @@
-navigator.serviceWorker.register('sw.js');
+if ( navigator.serviceWorker ) {
+  navigator.serviceWorker.getRegistration().then(function(r) {
+    r && r.unregister();
+  });
+}
 
 var env = foam.apps.chat.BoxEnvironment.create();
-var client = foam.apps.chat.Client.create(null, env);
+var client = foam.apps.chat.Client.create({
+  isSafari: navigator.userAgent.indexOf('Safari') !== -1 &&
+    navigator.userAgent.indexOf('Chrome') === -1
+}, env);
 
 var ME = 'Anonymous';
 
@@ -74,28 +81,17 @@ foam.CLASS({
         var view = {
           obj: m,
           row: document.createElement('div'),
-          from: document.createElement('div'),
-          message: document.createElement('div'),
-          timestamp: document.createElement('div')
         };
 
         view.row.className = 'message-row';
-        view.from.className = 'message-from';
-        view.message.className = 'message-message';
-        view.timestamp.className = 'message-timestamp';
-
-        view.row.appendChild(view.timestamp);
-        view.row.appendChild(view.from);
-        view.row.appendChild(view.message);
       } else {
         view = this.rows[m.id];
         view.row.remove();
         delete this.rows[m.id];
       }
 
-      view.from.textContent = m.from;
-      view.message.textContent = m.message;
-      view.timestamp.textContent = m.syncNo < 0 ? 'pending...' : formatTime(new Date(m.syncNo));
+      view.row.textContent = (m.syncNo < 0 ? 'pending' : formatTime(new Date(m.syncNo))) + ': ' +
+        m.from + '> ' + m.message;
 
 
       if ( m.syncNo < 0 ) {
@@ -204,6 +200,7 @@ function onMessage(m) {
   pendingMsgs.onMessage(m);
   confirmedMsgs.onMessage(m);
   document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
+  input.scrollIntoView();
 }
 
 
