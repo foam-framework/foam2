@@ -184,7 +184,9 @@ foam.LIB({
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
         model.validate();
-        return model.getClass();
+        var cls = model.getClass();
+        cls.validate();
+        return cls;
       };
 
       // Upgrade existing classes to real classes.
@@ -201,7 +203,7 @@ foam.LIB({
         this.private_.axiomCache = {};
 
         // Install Axioms in first pass so that they're available in the second-pass
-        // when axioms are actually run.  This avoids some ordering issues.
+        // when axioms are actually run. This avoids some ordering issues.
         for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
           var a = m.axioms_[i];
           this.axiomMap_[a.name] = a;
@@ -274,7 +276,7 @@ foam.LIB({
       Install an Axiom into the class and prototype.
       Invalidate the axiom-cache, used by getAxiomsByName().
 
-      TODO: Wait for first object to be created before creating prototype.
+      FUTURE: Wait for first object to be created before creating prototype.
       Currently it installs axioms into the protoype immediately, but in should
       wait until the first object is created. This will provide
       better startup performance.
@@ -327,7 +329,7 @@ foam.LIB({
       that are instances of the specified class.
     */
     function getAxiomsByClass(cls) {
-      // TODO: Add efficient support for:
+      // FUTURE: Add efficient support for:
       //    .where() .orderBy() .groupBy()
       var as = this.private_.axiomCache[cls.id];
       if ( ! as ) {
@@ -361,6 +363,9 @@ foam.LIB({
       }
       return as;
     },
+
+    // NOP, is replaced if debug.js is loaded
+    function validate() { },
 
     function toString() { return this.name + 'Class'; },
 
@@ -531,7 +536,7 @@ foam.CLASS({
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     },
     {
-      // TODO: doc is replaced below
+      // Is replaced by an AxiomArray later.
       class: 'Array',
       of: 'Property',
       name: 'properties',
@@ -559,7 +564,7 @@ foam.CLASS({
       }
     },
     {
-      // TODO: doc is replaced below
+      // Is replaced by an AxiomArray later.
       class: 'Array',
       of: 'Method',
       name: 'methods',
@@ -582,14 +587,17 @@ foam.CLASS({
 
 
 foam.CLASS({
-  id: 'foam.core.Property', // TODO: is this require
+  id: 'foam.core.Property',
   package: 'foam.core',
   name: 'Property',
-  extends: 'FObject', // TODO: is this require
+  extends: 'FObject',
 
   properties: [
-    // TODO: validate doesn't end with $
-    { name: 'name', required: true },
+    {
+      name: 'name',
+      required: true
+      // TODO: validate doesn't end with $
+    },
     {
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
@@ -642,14 +650,13 @@ foam.CLASS({
         }
       }
 
-      // TODO: detect conflicts, consider making constantName a property
+      // TODO: detect conflicts
       c[foam.String.constantize(this.name)] = this;
 
       // Note: can't be used without installing Property first
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
       var name = this.name;
-      // ???: Better name than 'f'?
       var f = this.f = function f(o) { return o[name]; };
 
       /** Makes this Property a comparator, suitable for use with mLangs. */
@@ -690,7 +697,7 @@ foam.CLASS({
         enumerable: false
       });
 
-      // TODO: document
+      // TODO: doc
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
@@ -761,15 +768,17 @@ foam.CLASS({
       }
     },
 
-    /** Create a factory function from an expression function. **/
-    // TODO: validate at the Model level that properties exist
+    /**
+     * Create a factory function from an expression function.
+     * Function arguments are validated in debug.js.
+     **/
     function exprFactory(e) {
       if ( ! e ) return null;
 
       var argNames = foam.Function.argsArray(e);
       var name     = this.name;
 
-      // TODO: determine how often the value is being invalidated,
+      // FUTURE: determine how often the value is being invalidated,
       // and if it's happening often, then don't unsubscribe.
       return function() {
         var self = this;
@@ -780,8 +789,7 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
-          // TODO: make work with slots instead
-          subs.push(this.sub('propertyChange', argNames[i], l));
+          subs.push(this.slot(argNames[i]).sub(l));
           args[i] = this[argNames[i]];
         }
         return e.apply(this, args);
@@ -802,12 +810,6 @@ foam.CLASS({
     function set(o, value) {
       o[this.name] = value;
       return this;
-    },
-
-    /** Copy this property's value from src to dst. **/
-    // TODO: remove if not used
-    function copy(src, dst) {
-      this.set(dst, this.get(src));
     },
 
     function exportAs(obj) {
@@ -1734,9 +1736,6 @@ foam.CLASS({
               if ( c ) return c;
             }
             return 0;
-          },
-          copy: function(src, dst) {
-            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].copy(src, dst);
           }
         };
       }

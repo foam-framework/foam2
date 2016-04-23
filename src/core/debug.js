@@ -52,6 +52,7 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
+      // TODO: Have work with 'extends'.
       var mName = model ? model.id + '.' : '';
 
       // List of properties which are hidden by other properties.
@@ -68,6 +69,27 @@ foam.CLASS({
           if ( this[e[0]] && this.hasOwnProperty(e[1][j]) ) {
             console.warn('Property ' + mName + this.name + ' "' + e[1][j] + '" hidden by "' + e[0] + '"');
           }
+        }
+      }
+    },
+
+    function validateClass(cls) {
+      // Validate that expressions only depend on known Axioms with Slots
+      if ( this.expression ) {
+        var expression = this.expression;
+        var pName = cls.id + '.' + this.name + '.expression: ';
+
+        var argNames = foam.Function.argsArray(expression);
+        for ( var i = 0 ; i < argNames.length ; i++ ) {
+          var name  = argNames[i];
+          var axiom = cls.getAxiomByName(name);
+
+          console.assert(
+              axiom,
+              'Unknown argument "', name, '" in ', pName, expression);
+          console.assert(
+              axiom.toSlot,
+              'Non-Slot argument "', name, '" in ', pName, expression);
         }
       }
     }
@@ -90,6 +112,13 @@ foam.AbstractClass.describe = function(opt_name) {
   }
   console.log('\n');
 };
+
+foam.AbstractClass.validate = function() {
+  for ( var key in this.axiomMap_ ) {
+    var a = this.axiomMap_[key];
+    a.validateClass && a.validateClass(this);
+  }
+}
 
 
 /* Add describe() support to objects. */
