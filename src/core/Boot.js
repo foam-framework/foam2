@@ -650,8 +650,16 @@ foam.CLASS({
         }
       }
 
-      // TODO: detect conflicts
-      c[foam.String.constantize(this.name)] = this;
+      var cName = foam.String.constantize(this.name);
+      var prev = c[cName];
+
+      // Detect constant name collisions
+      if ( prev && prev.name !== this.name ) {
+        throw 'Class constant conflict: ' +
+          c.id + '.' + cName + ' from: ' + this.name + ' and ' + prev.name;
+      }
+
+      c[cName] = this;
 
       // Note: can't be used without installing Property first
 

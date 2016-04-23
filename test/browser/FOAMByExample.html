@@ -856,6 +856,12 @@ foam.CLASS({
 });
 ValidationTest.model_.validate();
 
+// Property constants musn't conflict
+foam.CLASS({
+  name: 'ConstantConflictTest',
+  properties: [ 'firstName', 'FirstName' ]
+});
+
 // Property validation, factory and value
 foam.CLASS({
   name: 'PropertyValidationTest',
