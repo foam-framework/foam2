@@ -576,8 +576,7 @@ foam.CLASS({
           m.code = o;
           return m;
         }
-        // TODO: why don't we call Method.create()?
-        return o;
+        return foam.core.Method.create(o);
       }
     }
   ],
