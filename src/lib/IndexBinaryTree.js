@@ -49,7 +49,7 @@ foam.CLASS({
     /** Nodes do a shallow clone */
     function clone() {
       var c = this.cls_.create();
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      var ps = this.cls_.getAxiomsByClass(foam.core.SimpleProperty);
       for ( var i = 0; i < ps.length; ++i ) {
         var name = ps[i].name;
         var value = this[name];
