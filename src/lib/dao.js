@@ -457,6 +457,11 @@ foam.CLASS({
       }
 
       return sink;
+    },
+
+    function eof() {
+      // Do nothing by default, but can be overridden.
+      // This allows DAOs to be used as a Sink.
     }
   ]
 });
