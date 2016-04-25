@@ -28,6 +28,12 @@ foam.CLASS({
     'foam.dao.ObjectNotFoundException',
     'foam.mlang.predicate.Eq',
     'foam.dao.ArraySink',
+    'foam.dao.index.TreeIndex',
+    'foam.dao.index.AutoIndex',
+    'foam.dao.index.ValueIndex',
+    'foam.dao.index.AltIndex',
+    'foam.dao.index.SetIndex',
+    'foam.mlang.sink.Explain',
   ],
   properties: [
     {
@@ -47,13 +53,13 @@ foam.CLASS({
       this.map = {};
       // TODO(kgr): this doesn't support multi-part keys, but should (foam2: still applies!)
       // TODO: generally sort out how .ids is supposed to work
-      this.index = foam.dao.index.TreeIndex.create({
+      this.index = this.TreeIndex.create({
           prop: this.of.getAxiomByName(( this.of.ids && this.of.ids[0] ) || 'id' ),
-          tailFactory: foam.dao.index.ValueIndex
+          tailFactory: this.ValueIndex
       });
 
       if ( this.autoIndex ) {
-        this.addRawIndex(foam.dao.index.AutoIndex.create({ mdao: this }));
+        this.addRawIndex(this.AutoIndex.create({ mdao: this }));
       }
     },
 
@@ -82,17 +88,16 @@ foam.CLASS({
      * args: one or more properties
      **/
     function addUniqueIndex() {
-      var proto = foam.dao.index.ValueIndex;
-      var index = foam.dao.index.ValueIndex.create();
+      var index = this.ValueIndex.create();
       //var siFactory = proto;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
 
         // TODO: the index prototype should be in the property
-        proto = prop.type == 'Array[]' ?
-          foam.dao.index.SetIndex  :
-          foam.dao.index.TreeIndex ;
+        var proto = prop.type == 'Array[]' ?
+          this.SetIndex  :
+          this.TreeIndex ;
         index = proto.create({ prop: prop, tailFactory: index });
       }
 
@@ -102,8 +107,8 @@ foam.CLASS({
     // TODO: name 'addIndex' and renamed addIndex
     function addRawIndex(index) {
       // Upgrade single Index to an AltIndex if required.
-      if ( ! foam.dao.index.AltIndex.isInstance(this.index) ) {
-        this.index = foam.dao.index.AltIndex.create({ delegates: [this.index] });
+      if ( ! this.AltIndex.isInstance(this.index) ) {
+        this.index = this.AltIndex.create({ delegates: [this.index] });
       }
 
       this.index.addIndex(index);
@@ -224,7 +229,7 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
 
-      if ( foam.mlang.sink.Explain && foam.mlang.sink.Explain.isInstance(sink) ) {
+      if ( this.Explain.isInstance(sink) ) {
         var plan = this.index.plan(sink.arg1, skip, limit, order, predicate);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();

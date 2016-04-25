@@ -274,6 +274,39 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeIndex',
   extends: 'foam.dao.index.Index',
+  requires: [
+    'foam.dao.index.TreeNode',
+    'foam.dao.index.NullTreeNode',
+    'foam.dao.index.ValueIndex',
+    'foam.dao.index.NotFoundPlan',
+    'foam.dao.index.CountPlan',
+    'foam.dao.index.AltPlan',
+    'foam.dao.index.CustomPlan',
+    'foam.dao.ArraySink',
+
+    'foam.mlang.predicate.True',
+    'foam.mlang.predicate.False',
+    'foam.mlang.predicate.And',
+    'foam.mlang.predicate.Constant',
+    'foam.mlang.predicate.Contains',
+    'foam.mlang.predicate.ContainsIC',
+    'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.Gt',
+    'foam.mlang.predicate.Gte',
+    'foam.mlang.predicate.Has',
+    'foam.mlang.predicate.In',
+    'foam.mlang.predicate.Lt',
+    'foam.mlang.predicate.Lte',
+    'foam.mlang.predicate.Neq',
+    'foam.mlang.predicate.Not',
+    'foam.mlang.predicate.Or',
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.Max',
+    'foam.mlang.sink.Map',
+    'foam.mlang.sink.Explain',
+    'foam.mlang.order.Desc',
+
+  ],
 
   properties: [
     'prop',
@@ -281,13 +314,13 @@ foam.CLASS({
     {
       name: 'nullNode',
       factory: function() {
-        return foam.dao.index.NullTreeNode.create({ index: this });
+        return this.NullTreeNode.create({ index: this });
       }
     },
     {
       name: 'treeNode',
       factory: function() {
-        return foam.dao.index.TreeNode.create({ index: this });
+        return this.TreeNode.create({ index: this });
       }
     },
     {
@@ -312,10 +345,13 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = foam.dao.index.NullTreeNode.create({ index: this });
+      this.root = this.NullTreeNode.create({ index: this });
 
       // Only safe if children aren't themselves trees
-      if ( this.tailFactory === foam.dao.index.ValueIndex ) {
+      // TODO: should be !TreeIndex.isInstance? or are we talking any
+      // non-simple index, and is ValueIndex the only simple index?
+      // It's the default, so ok for now
+      if ( this.tailFactory === this.ValueIndex ) {
         a.sort(toCompare(this.prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1);
       } else {
@@ -363,14 +399,15 @@ foam.CLASS({
     },
 
     function plan(sink, skip, limit, order, predicate) {
+      var index = this;
       var predicate = predicate;
 
-      if ( predicate === foam.mlang.predicate.False ) return foam.dao.index.NotFoundPlan.create();
+      if ( this.False.isInstance(predicate) ) return this.NotFoundPlan.create();
 
-      if ( ! predicate && foam.mlang.sink.Count.isInstance(sink) ) {
+      if ( ! predicate && this.Count.isInstance(sink) ) {
         var count = this.size();
         //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
-        return foam.dao.index.CountPlan.create({ count: count });
+        return this.CountPlan.create({ count: count });
       }
 
       //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
@@ -388,14 +425,14 @@ foam.CLASS({
             return arg2;
           }
 
-          if ( foam.mlang.predicate.And.isInstance(predicate) ) {
+          if ( index.And.isInstance(predicate) ) {
             for ( var i = 0 ; i < predicate.args.length ; i++ ) {
               var q = predicate.args[i];
               if ( model.isInstance(q) && q.arg1 === prop ) {
                 predicate = predicate.clone();
-                predicate.args[i] = foam.mlang.predicate.True;
+                predicate.args[i] = index.True;
                 predicate = predicate.partialEval();
-                if ( predicate === foam.mlang.predicate.True ) predicate = undefined;
+                if (  index.True.isInstance(predicate) ) predicate = undefined;
                 return q.arg2;
               }
             }
@@ -410,9 +447,7 @@ foam.CLASS({
       // TODO:
       // }
 
-      var index = this;
-
-      var arg2 = isExprMatch(foam.mlang.predicate.In);
+      var arg2 = isExprMatch(this.In);
       if ( arg2 &&
            // Just scan if that would be faster.
            Math.log(this.size())/Math.log(2) * arg2.length < this.size() ) {
@@ -431,24 +466,24 @@ foam.CLASS({
           }
         }
 
-        if ( subPlans.length == 0 ) return foam.dao.index.NotFoundPlan.create();
+        if ( subPlans.length == 0 ) return this.NotFoundPlan.create();
 
-        return foam.dao.index.AltPlan.create({
+        return this.AltPlan.create({
           subPlans: subPlans,
           prop: prop
         });
       }
 
-      arg2 = isExprMatch(foam.mlang.predicate.Eq);
+      arg2 = isExprMatch(this.Eq);
       if ( arg2 != undefined ) {
         var key = arg2.f();
         var result = this.get(key);
 
-        if ( ! result ) return foam.dao.index.NotFoundPlan.create();
+        if ( ! result ) return this.NotFoundPlan.create();
 
         var subPlan = result.plan(sink, skip, limit, order, predicate);
 
-        return foam.dao.index.AltPlan.create({
+        return this.AltPlan.create({
           subPlans: [subPlan],
           prop: prop
         });
@@ -457,16 +492,16 @@ foam.CLASS({
       // Restrict the subtree to search as necessary
       var subTree = this.root;
 
-      arg2 = isExprMatch(foam.mlang.predicate.Gt);
+      arg2 = isExprMatch(this.Gt);
       if ( arg2 ) subTree = subTree.gt(arg2.f());
 
-      arg2 = isExprMatch(foam.mlang.predicate.Gte);
+      arg2 = isExprMatch(this.Gte);
       if ( arg2 ) subTree = subTree.gte(arg2.f());
 
-      arg2 = isExprMatch(foam.mlang.predicate.Lt);
+      arg2 = isExprMatch(this.Lt);
       if ( arg2 ) subTree = subTree.lt(arg2.f());
 
-      arg2 = isExprMatch(foam.mlang.predicate.Lte);
+      arg2 = isExprMatch(this.Lte);
       if ( arg2 ) subTree = subTree.lte(arg2.f());
 
       var cost = subTree.size;
@@ -476,7 +511,7 @@ foam.CLASS({
       if ( order ) {
         if ( order === prop ) {
           // sort not required
-        } else if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(order) && order.arg1 === prop ) {
+        } else if ( index.Desc.isInstance(order) && order.arg1 === prop ) {
           // reverse-sort, sort not required
           reverseSort = true;
         } else {
@@ -490,11 +525,11 @@ foam.CLASS({
         if ( limit ) cost = Math.min(cost, limit);
       }
 
-      return foam.dao.index.CustomPlan.create({
+      return this.CustomPlan.create({
         cost: cost,
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           if ( sortRequired ) {
-            var arrSink = foam.dao.ArraySink.create();
+            var arrSink = index.ArraySink.create();
             index.selectCount++;
             subTree.select(arrSink, null, null, null, predicate);
             index.selectCount--;
@@ -594,7 +629,9 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
   extends: 'foam.dao.index.Index',
-
+  requires: [
+    'foam.dao.index.NoPlan',
+  ],
   constants: {
     /** Maximum cost for a plan which is good enough to not bother looking at the rest. */
     GOOD_ENOUGH_PLAN: 10 // put to 10 or more when not testing
@@ -656,8 +693,8 @@ foam.CLASS({
         }
       }
       //    console.log('Best Plan: ' + bestPlan);
-      if ( bestPlan == undefined || bestPlan == foam.dao.index.NoPlan.create() ) {
-        return foam.dao.index.NoPlan.create();
+      if ( bestPlan == undefined ) {
+        return this.NoPlan.create();
       }
       return bestPlan;
     },
@@ -677,6 +714,10 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'AutoIndex',
   extends: 'foam.dao.index.Index',
+  requires: [
+    'foam.core.Property',
+    'foam.dao.index.NoPlan',
+  ],
 
   properties: [
     {
@@ -708,12 +749,12 @@ foam.CLASS({
     },
 
     function plan(sink, skip, limit, order, predicate) {
-      if ( order && foam.core.Property.isInstance(order) && ! this.properties[order.name] ) {
+      if ( order && this.Property.isInstance(order) && ! this.properties[order.name] ) {
         this.addIndex(order);
       } else if ( predicate ) {
         // TODO: check for property in predicate
       }
-      return foam.dao.index.NoPlan.create();
+      return this.NoPlan.create();
     },
     function toString() {
       return 'AutoIndex()';

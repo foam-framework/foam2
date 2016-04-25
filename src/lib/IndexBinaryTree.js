@@ -29,7 +29,7 @@ foam.CLASS({
     { class: 'Simple', name: 'left'  },
     { class: 'Simple', name: 'right' },
 
-    { class: 'Simple', name: 'index' }, // TODO: replace with export/import?
+    { class: 'Simple', name: 'index' }, // TODO: replace with flyweight shared normal prop
   ],
 
   methods: [
