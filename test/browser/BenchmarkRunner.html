@@ -18,6 +18,8 @@
   <script src="../../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
   <script src="../../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
 
+
+
   <!-- include source files here... -->
   <script language="javascript" src="../../src/core/foam.js"></script>
 
@@ -29,5 +31,98 @@
 </head>
 
 <body>
-</body>
+  <div id="_DEBUG_OUTPUT_" style="position:fixed; z-index:1000; width: 100%; height: 100%; background-color: rgba(200,200,255,0.9); -webkit-flex-direction: column; flex-direction: column; overflow-x: hidden; overflow-y: auto;"
+     onclick="window._DEBUG_OUTPUT_toggleSize()" >DEBUG Log</div>
+  </body>
+    <script language="javascript">
+      DEBUG = true;
+      (function() {
+        function argsArray(args) {
+          ret = [];
+          for (var i = 0; i < args.length; i++) {
+            if ( args[i] && args[i].instance_ ) {
+              ret[i] = '{'+args[i];
+              for (var key in args[i].instance_) {
+                ret[i] += " " + key + "=" + args[i].instance_[key];
+              }
+              ret[i] += '}'
+            } else {
+              ret[i] = args[i];
+            }
+          }
+          return ret;
+        }
+        function appendMessage(text, stack, color) {
+          var out = document.getElementById('_DEBUG_OUTPUT_');
+          var e = document.createElement('div');
+          e.style.display = '-webkit-flex';
+          e.style.display = 'flex';
+          e.style.flexDirection = 'row';
+          e.style.webkitFlexDirection = 'row';
+          if ( color ) e.style.backgroundColor = color;
+          e.innerHTML = "<div style='flex-basis: 30%'>"+text+"</div>" +
+            ( stack ? "<pre style='font: inherit; font-size: inherit; margin: 0; padding: 0px 8px; flex-grow:1; overflow-x: auto;'>"+stack.substring(7)+"</pre>" : "");
+
+          out.appendChild(e);
+          out.scrollTop = e.offsetTop + e.offsetHeight;
+          document.body.appendChild(out);
+          out.style.top = 0;
+        }
+
+        var console = window.console;
+
+        var oldLog = console.log;
+        console.log = function() {
+          appendMessage("L: " + argsArray(arguments).join());
+          oldLog.apply(console, arguments);
+        };
+
+        var oldDebug = console.debug;
+        console.debug = function() {
+          appendMessage("D: " + argsArray(arguments).join(), (new Error()).stack);
+          oldDebug.apply(console, arguments);
+        };
+
+        var oldInfo = console.info;
+        console.info = function() {
+          appendMessage("I: " + argsArray(arguments).join());
+          oldInfo.apply(console, arguments);
+        };
+
+        var oldWarn = console.warn;
+        console.warn = function() {
+          appendMessage("W: " + argsArray(arguments).join(), (new Error()).stack, "rgba(255,255,200,0.9)");
+          oldWarn.apply(console, arguments);
+        };
+
+        var oldError = console.error;
+        console.error = function() {
+          appendMessage("E: " + argsArray(arguments).join(), (new Error()).stack, "rgba(255,200,200,0.9)");
+          oldError.apply(console, arguments);
+        };
+
+        var oldAssert = console.assert;
+        console.assert = function() {
+          if ( !arguments[0] ) {
+            var args = argsArray(arguments);
+            appendMessage("Assert: " + args.slice(1).join(), (new Error()).stack, "rgba(255,200,200,0.9)");
+          }
+          oldAssert.apply(console, arguments);
+        };
+
+        window._DEBUG_OUTPUT_toggleSize = function() {
+          var e = document.getElementById('_DEBUG_OUTPUT_');
+          if (e.style.width == '200px' )
+          {
+            e.style.width = window.innerWidth;
+            e.style.height = window.innerHeight;
+            //e.style.overflow = 'auto';
+          } else {
+            e.style.width = '200px';
+            e.style.height = '20px';
+            //e.style.overflow = 'hidden';
+          }
+        };
+      })();
+    </script>
 </html>
