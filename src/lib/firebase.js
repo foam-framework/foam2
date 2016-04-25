@@ -34,7 +34,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enableStreaming',
-      value: false
+      value: true
     },
     'startEventsAt_'
   ],
