@@ -30,13 +30,13 @@
  FObject -> FObject Class                     Prototype
     ^                        +-.prototype---------^
     |                        |                    |
-  Model  -> getClass()  -> Class -> create() -> instance
+  Model  -> buildClass()  -> Class -> create() -> instance
 </pre>
   FObject is the root model/class of all other classes, including Model.
   Abstract Class is the prototype of FObject's Class, which makes it the root of all Classes.
-  From a Model we call getClass() to create a Class (or the previously created Class) object.
+  From a Model we call buildClass() to create a Class (or the previously created Class) object.
   From the Class we call create() to create new instances of that class.
-  New instances extend the classes prototype object, which is store on the class as .prototype.
+  New instances extend the classes prototype object, which is stored on the class as .prototype.
 <pre>
   instance ---> .cls_   -> Object's Class
        |
@@ -50,7 +50,7 @@
 
 <p>  Model is its own definition:
 <pre>
-    Model.getClass().create(Model) == Model
+    Model.buildClass().create(Model) == Model
     Model.model_ === Model
 </pre>
   Models are defined as a collection of Axioms.
@@ -122,11 +122,13 @@ foam.LIB({
 
       (Model is 'this').
     */
-    function getClass() {
+    function buildClass() {
       var cls;
 
+      var X = this.X || foam;
+
       if ( this.refines ) {
-        cls = foam.lookup(this.refines);
+        cls = X.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
         console.assert(this.id, 'Missing id name.', this.name);
@@ -135,8 +137,8 @@ foam.LIB({
 //          console.warn('Redefinition of class: ' + this.name);
 
         var parent = this.extends   ?
-          foam.lookup(this.extends) :
-          foam.AbstractClass        ;
+          X.lookup(this.extends) :
+          foam.AbstractClass ;
 
         if ( ! parent ) {
           console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
@@ -157,8 +159,6 @@ foam.LIB({
 
         // Classes without a package are also registered as globals
         if ( ! cls.package ) global[cls.name] = cls;
-
-        foam.register(cls);
       }
 
       cls.installModel(this);
@@ -169,10 +169,24 @@ foam.LIB({
     function start() {
       /* Start the bootstrap process. */
 
-      var getClass = this.getClass;
+      var buildClass = this.buildClass;
 
       // Will be replaced in phase2.
-      foam.CLASS = function(m) { return getClass.call(m); };
+      foam.CLASS = function(m) {
+        var cls = buildClass.call(m);
+
+        if ( ! m.refines ) foam.register(cls);
+
+        var path = cls.id.split('.');
+        var root = global;
+
+        for ( var i = 0 ; i < path.length-1 ; i++ ) {
+          root = root[path[i]] || ( root[path[i]] = {} );
+        }
+
+        root[path[path.length-1]] = cls;
+        return cls;
+      };
     },
 
     /** Start second phase of bootstrap process. */
@@ -184,8 +198,19 @@ foam.LIB({
       foam.CLASS = function(m) {
         var model = foam.core.Model.create(m);
         model.validate();
-        var cls = model.getClass();
+        var cls = model.buildClass();
         cls.validate();
+
+        if ( ! m.refines ) foam.register(cls);
+
+        var path = cls.id.split('.');
+        var root = global;
+
+        for ( var i = 0 ; i < path.length-1 ; i++ ) {
+          root = root[path[i]] || ( root[path[i]] = {} );
+        }
+
+        root[path[path.length-1]] = cls;
         return cls;
       };
 
@@ -581,7 +606,7 @@ foam.CLASS({
     }
   ],
 
-  methods: [ foam.boot.getClass ]
+  methods: [ foam.boot.buildClass ]
 });
 
 
@@ -1258,7 +1283,7 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      cls[this.model.name] = this.model.getClass();
+      cls[this.model.name] = this.model.buildClass();
     },
     function installInProto(proto) {
       // get class already created in installInClass();
