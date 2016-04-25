@@ -660,40 +660,47 @@ foam.CLASS({
     */
     // TODO: document property inheritance
     function installInClass(c) {
-      var superProp = c.__proto__.getAxiomByName(this.name);
+      var prop = this;
+      var superProp = c.__proto__.getAxiomByName(prop.name);
 
       if ( superProp ) {
-        var a = this.cls_.getAxiomsByClass(foam.core.Property);
+        var a = prop.cls_.getAxiomsByClass(foam.core.Property);
 
+        // Walk all Properties of this Property
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
 
-          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) ) {
-            this[name] = superProp[name];
+          // Copy all Properties from my super-Property, that I don't override
+          if ( superProp.hasOwnProperty(name) && ! prop.hasOwnProperty(name) ) {
+
+            // Clone myself, so as to not modify the Model definition
+            if ( prop === this ) prop = this.clone();
+
+            prop[name] = superProp[name];
           }
         }
       }
 
-      var cName = foam.String.constantize(this.name);
+      var cName = foam.String.constantize(prop.name);
       var prev = c[cName];
 
       // Detect constant name collisions
-      if ( prev && prev.name !== this.name ) {
+      if ( prev && prev.name !== prop.name ) {
         throw 'Class constant conflict: ' +
-          c.id + '.' + cName + ' from: ' + this.name + ' and ' + prev.name;
+          c.id + '.' + cName + ' from: ' + prop.name + ' and ' + prev.name;
       }
 
-      c[cName] = this;
+      c[cName] = prop;
 
       // Note: can't be used without installing Property first
 
       /** Makes this Property an adapter, suitable for use with mLangs. */
-      var name = this.name;
-      var f = this.f = function f(o) { return o[name]; };
+      var name = prop.name;
+      var f = prop.f = function f(o) { return o[name]; };
 
       /** Makes this Property a comparator, suitable for use with mLangs. */
-      var comparePropertyValues = this.comparePropertyValues;
-      this.compare = function compare(o1, o2) {
+      var comparePropertyValues = prop.comparePropertyValues;
+      prop.compare = function compare(o1, o2) {
         return comparePropertyValues(f(o1), f(o2));
       }
     },
@@ -703,17 +710,20 @@ foam.CLASS({
       (Property is 'this').
     */
     function installInProto(proto) {
-      var prop     = this;
-      var name     = this.name;
-      var adapt    = this.adapt
-      var preSet   = this.preSet;
-      var postSet  = this.postSet;
-      var factory  = this.factory;
-      var value    = this.value;
+      // Take Axiom from class rather than using 'this' directly,
+      // since installInClass() may have created a modified version
+      // to inherit Property Properties from a super-Property.
+      var prop     = proto.cls_.getAxiomByName(this.name);
+      var name     = prop.name;
+      var adapt    = prop.adapt
+      var preSet   = prop.preSet;
+      var postSet  = prop.postSet;
+      var factory  = prop.factory;
+      var value    = prop.value;
       var hasValue = typeof value !== 'undefined';
       var slotName = name + '$';
-      var isFinal  = this.final;
-      var eFactory = this.exprFactory(this.expression);
+      var isFinal  = prop.final;
+      var eFactory = this.exprFactory(prop.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
