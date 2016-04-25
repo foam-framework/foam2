@@ -196,6 +196,14 @@ foam.CLASS({
   name: 'Index',
 
   methods: [
+    /** Flyweight constructor. By default returns a non-flyweight instance. */
+    function create(args, X) {
+      var c = Object.create(this);
+      args && c.copyFrom(args);
+      c.init && c.init();
+      return c;
+    },
+
     /** Adds or updates the given value in the index */
     function put(value) {},
     /** Removes the given value from the index */
@@ -268,7 +276,6 @@ foam.CLASS({
   extends: 'foam.dao.index.Index',
 
   properties: [
-    'subIndexModel',
     'prop',
     [ 'selectCount', 0 ],
     {
@@ -278,14 +285,27 @@ foam.CLASS({
       }
     },
     {
-      name: 'root',
+      name: 'treeNode',
       factory: function() {
-        return this.nullNode;
+        return foam.dao.index.TreeNode.create({ index: this });
       }
+    },
+    {
+      class: 'Simple',
+      name: 'root',
+    },
+    {
+      class: 'Simple',
+      name: 'tailFactory',
     }
   ],
 
   methods: [
+    /** Initialize simple properties, since they ignore factories. */
+    function init() {
+      this.root = this.nullNode;
+    },
+
     /**
      * Bulk load an unsorted array of objects.
      * Faster than loading individually, and produces a balanced tree.
@@ -295,7 +315,7 @@ foam.CLASS({
       this.root = foam.dao.index.NullTreeNode.create({ index: this });
 
       // Only safe if children aren't themselves trees
-      if ( this.subIndexModel === foam.dao.index.ValueIndex ) {
+      if ( this.tailFactory === foam.dao.index.ValueIndex ) {
         a.sort(toCompare(this.prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1);
       } else {
@@ -436,7 +456,7 @@ foam.CLASS({
 
       // Restrict the subtree to search as necessary
       var subTree = this.root;
-      
+
       arg2 = isExprMatch(foam.mlang.predicate.Gt);
       if ( arg2 ) subTree = subTree.gt(arg2.f());
 
@@ -445,10 +465,10 @@ foam.CLASS({
 
       arg2 = isExprMatch(foam.mlang.predicate.Lt);
       if ( arg2 ) subTree = subTree.lt(arg2.f());
-      
+
       arg2 = isExprMatch(foam.mlang.predicate.Lte);
       if ( arg2 ) subTree = subTree.lte(arg2.f());
-      
+
       var cost = subTree.size;
       var sortRequired = false;
       var reverseSort = false;
@@ -505,7 +525,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'TreeIndex(' + this.prop.name + ', ' + this.subIndexModel + ')';
+      return 'TreeIndex(' + this.prop.name + ', ' + this.tailFactory + ')';
     }
   ]
 });

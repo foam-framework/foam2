@@ -49,7 +49,7 @@ foam.CLASS({
       // TODO: generally sort out how .ids is supposed to work
       this.index = foam.dao.index.TreeIndex.create({
           prop: this.of.getAxiomByName(( this.of.ids && this.of.ids[0] ) || 'id' ),
-          subIndexModel: foam.dao.index.ValueIndex
+          tailFactory: foam.dao.index.ValueIndex
       });
 
       if ( this.autoIndex ) {
@@ -83,7 +83,8 @@ foam.CLASS({
      **/
     function addUniqueIndex() {
       var proto = foam.dao.index.ValueIndex;
-      var siFactory = proto;
+      var index = foam.dao.index.ValueIndex.create();
+      //var siFactory = proto;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
@@ -92,19 +93,7 @@ foam.CLASS({
         proto = prop.type == 'Array[]' ?
           foam.dao.index.SetIndex  :
           foam.dao.index.TreeIndex ;
-        index = proto.create({ prop: prop, subIndexModel: siFactory });
-
-        siFactory = {
-          subIndexModel: siFactory,
-          prop: prop,
-          proto: proto,
-          create: function() {
-            var s = this.proto.create(arguments); // prev iteration proto
-            s.subIndexModel = this.subIndexModel;    // prev iteration prop
-            s.prop = this.prop;
-            return s;
-          }
-        }
+        index = proto.create({ prop: prop, tailFactory: index });
       }
 
       return this.addRawIndex(index);

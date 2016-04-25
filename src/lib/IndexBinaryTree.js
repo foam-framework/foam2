@@ -38,6 +38,14 @@ foam.CLASS({
       this.right = this.right || this.index.nullNode;
     },
 
+    /** Flyweight constructor. By default returns a non-flyweight instance. */
+    function create(args, X) {
+      var c = Object.create(this);
+      args && c.copyFrom(args);
+      c.init && c.init();
+      return c;
+    },
+
     /** Nodes do a shallow clone */
     function clone() {
       var c = this.cls_.create();
@@ -359,14 +367,13 @@ foam.CLASS({
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
-      var subIndex = this.index.subIndexModel.create();
+      var subIndex = this.index.tailFactory.create();
       subIndex.put(value);
-      return foam.dao.index.TreeNode.create({
+      return this.index.treeNode.create({
         key: key,
         value: subIndex,
         size: 1,
         level: 1,
-        index: this.index
       });
     },
     function removeKeyValue(key, value) { return this; },
