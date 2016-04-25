@@ -76,11 +76,12 @@ foam.CLASS({
 
       for ( var i = 0 ; i < 201 ; i++ ) {
         var b = this.PhysicalCircle.create({
-          radius: 3,
+          radius: 4,
           x: this.width * Math.random(),
           y: this.height + this.height * Math.random(),
-          arcWidth: 1, // TODO
-          border: 'blue',
+          arcWidth: 0,
+          border: null,
+          color: '#88c',
           gravity: -0.2,
           friction: 0.96,
           mass: 0.3
