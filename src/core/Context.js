@@ -61,22 +61,6 @@
       if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
     },
 
-    /**
-     * Unregisters a class from the context.  Further lookups for that class's id
-     * will result in the class register in a parent context, or undefined if there
-     * is no parent registration for the id.
-     */
-    unregister: function unregister(id) {
-      function doUnregister(cache, name) {
-        delete cache[name];
-      }
-
-      doUnregister(this.__cache__, id);
-      if ( id.indexOf('foam.core') === 0 ) {
-        doUnregister(this.__cache__, id.substring(10));
-      }
-    },
-
     subContext: function subContext(opt_args, opt_name) {
       var sub = {};
 
