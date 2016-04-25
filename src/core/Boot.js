@@ -647,10 +647,25 @@ foam.CLASS({
         without subclassing.
       */
       'comparePropertyValues',
-      function(o1, o2) {
-        return foam.util.compare(o1, o2);
+      function(o1, o2) { return foam.util.compare(o1, o2); }
+    ],
+    {
+      name: 'f',
+      factory: function() {
+        var name = this.name;
+        return function f(o) { return o[name]; }
       }
-    ]
+    },
+    {
+      name: 'compare',
+      factory: function() {
+        var comparePropertyValues = this.comparePropertyValues;
+        var f = this.f;
+        return function compare(o1, o2) {
+          return comparePropertyValues(f(o1), f(o2));
+        }
+      }
+    }
   ],
 
   methods: [
@@ -691,18 +706,6 @@ foam.CLASS({
       }
 
       c[cName] = prop;
-
-      // Note: can't be used without installing Property first
-
-      /** Makes this Property an adapter, suitable for use with mLangs. */
-      var name = prop.name;
-      var f = prop.f = function f(o) { return o[name]; };
-
-      /** Makes this Property a comparator, suitable for use with mLangs. */
-      var comparePropertyValues = prop.comparePropertyValues;
-      prop.compare = function compare(o1, o2) {
-        return comparePropertyValues(f(o1), f(o2));
-      }
     },
 
     /**
