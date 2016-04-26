@@ -123,12 +123,15 @@ foam.CLASS({
      **/
     function bulkLoad(dao, sink) {
       var self = this;
-      return new Promise(function(resolve, reject) {
-        dao.select().then(function() {
-          self.index.bulkLoad(this);
-          resolve();
-        });
-      })
+      var sink = self.ArraySink.create();
+      return dao.select(sink).then(function(s) {
+        var a = sink.a;
+        self.index.bulkLoad(a);
+        for ( var i = 0; i < a.length; ++i ) {
+          var obj = a[i];
+          self.map[obj.id] = obj;
+        }
+      });
     },
 
     function put(obj) {

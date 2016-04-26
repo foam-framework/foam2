@@ -63,7 +63,7 @@ describe("MDAO benchmarks", function() {
       }
       var fn = function(arg) {
         var endTime = performance.now();
-        console.log("Time for ", name, ": ", endTime - startTime, "ms");
+        console.log(name, ", ", endTime - startTime);
         return arg;
       };
       return promise.then(fn);
@@ -180,8 +180,8 @@ describe("MDAO benchmarks", function() {
     });
 
     var AlbumDAO, PhotoDAO, PhotoDetailDAO;
-    var albums = foam.dao.ArraySink.create();
-    var photos = foam.dao.ArraySink.create();
+    var albums = foam.dao.ArrayDAO.create();
+    var photos = foam.dao.ArrayDAO.create();
 
     function makeMultiPartKeys(n) {
       var a = [];
@@ -252,13 +252,21 @@ describe("MDAO benchmarks", function() {
       arepeat(DEBUG ? 1 : 7,
         aseq(
           alog('Benchmark...'),
-          atest('1a CreateAlbums' + NUM_ALBUMS, arepeatpar(NUM_ALBUMS, function ( i) {
-            return AlbumDAO.put(albums.a[i]);
-          })),
+          atest('1a CreateAlbums' + NUM_ALBUMS,
+//             arepeatpar(NUM_ALBUMS, function ( i) {
+//                 return AlbumDAO.put(albums.a[i]);
+//             })
+            function() {
+              return AlbumDAO.bulkLoad(albums);
+            }
+          ),
           asleep(1000),
-          atest('1b CreatePhotos' + NUM_PHOTOS, arepeatpar(NUM_PHOTOS, function ( i) {
-            return PhotoDAO.put(photos.a[i]);
-          })),
+          atest('1b CreatePhotos' + NUM_PHOTOS, function() {
+//             arepeatpar(NUM_PHOTOS, function ( i) {
+//                 return PhotoDAO.put(photos.a[i]);
+//             })
+            return PhotoDAO.bulkLoad(photos);
+          }),
           asleep(1000),
           atest('2a SelectAllAlbumsQuery', function() {
             return AlbumDAO.select()
@@ -283,9 +291,9 @@ describe("MDAO benchmarks", function() {
 //                 //console.log("2c10 Explain:", asink.toString());
 //               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select()
-//               .then(function(s) {
-//                 expect(s.a.length).toEqual(10);
-//               });
+              .then(function(s) {
+                expect(s.a.length).toEqual(10);
+              });
           }),
           atest('2c MultiKeyQuery100',  function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
@@ -294,7 +302,7 @@ describe("MDAO benchmarks", function() {
 //                 //console.log("2c100 Explain:", asink.toString());
 //               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select()
-//               .then(function(s) { expect(s.a.length).toEqual(100); });
+              .then(function(s) { expect(s.a.length).toEqual(100); });
           }),
           atest('2c MultiKeyQuery1000', function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
@@ -303,7 +311,7 @@ describe("MDAO benchmarks", function() {
 //                 //console.log("2c1000 Explain:", asink.toString());
 //               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select()
-//               .then(function(s) { expect(s.a.length).toEqual(1000); });
+              .then(function(s) { expect(s.a.length).toEqual(1000); });
           }),
           atest('2cMultiKeyQuery5000', function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
@@ -312,7 +320,7 @@ describe("MDAO benchmarks", function() {
 //                 //console.log("2c5000 Explain:", asink.toString());
 //               });
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select()
-//               .then(function(s) { expect(s.a.length).toEqual(5000); });
+              .then(function(s) { expect(s.a.length).toEqual(5000); });
           }),
 
           atest('2d IndexedFieldQuery', function() {
@@ -388,7 +396,7 @@ describe("MDAO benchmarks", function() {
           atest('Cleanup', function() {
             return AlbumDAO.removeAll().then(PhotoDAO.removeAll());
           })
-          ,asleep(10000)
+          ,asleep(5000)
         )
       ),
       alog('Done.'),
