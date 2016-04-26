@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
+if ( ! typeof performance !== 'undefined' ) performance = {
+  now: function() { return Date.now(); }
+};
 
 describe("MDAO benchmarks", function() {
   it("runs", function(done) {
