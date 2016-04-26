@@ -97,6 +97,8 @@ foam.CLASS({
       var delay = opt_delay || 16;
       var X     = this;
 
+      // TODO: setName
+
       return function() {
         var triggered = false;
         var lastArgs  = null;
@@ -123,6 +125,7 @@ foam.CLASS({
     function framed(l) {
       var X = this;
 
+      // TODO: setName
       return function() {
         var triggered = false;
         var lastArgs  = null;
