@@ -1049,6 +1049,19 @@ foam.CLASS({
       Nodes in the list contain 'next' and 'prev' links, which lets
       removing subscriptions be done quickly by connecting next to prev
       and prev to next.
+
+      Listener List Structure
+      -----------------------
+      next     -> {
+        prev: <-,
+        sub: {src: <source object>, destroy: <destructor function> },
+        l: <listener>,
+        next: -> },
+      children -> {
+          subTopic1: <same structure>,
+          ...
+          subTopicn: <same structure>
+      }
     */
     function createListenerList_() {
       return { next: null, children: {} };
@@ -1062,6 +1075,7 @@ foam.CLASS({
 
     /**
       Notify all of the listeners in a listener list.
+      Pass 'a' arguments to listeners.
       Returns the number of listeners notified.
     */
     function notify_(listeners, a) {
@@ -1069,6 +1083,7 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
+        // Like l.apply(l, [s].concat(a)), but faster.
         switch ( a.length ) {
           case 0: l(s); break;
           case 1: l(s, a[0]); break;
@@ -1080,6 +1095,7 @@ foam.CLASS({
           case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
           case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
           case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
+          default: l.apply(l, [s].concat(a));
         }
         listeners = listeners.next;
         count++;
@@ -1088,6 +1104,7 @@ foam.CLASS({
     },
 
     function hasListeners(/* args */) {
+      /** Return true iff there are listeners for the supplied message. **/
       var listeners = this.getPrivate_('listeners');
 
       for ( var i = 0 ; listeners ; i++ ) {
@@ -1103,27 +1120,36 @@ foam.CLASS({
       Publish a message to all matching subd listeners.
       Returns the number of listeners notified.
     */
-    function pub(a1, a2, a3, a4, a5, a6, a7) {
+    function pub(a1, a2, a3, a4, a5, a6, a7, a8, a9) {
       // This method prevents this function not being JIT-ed because
       // of the use of 'arguments'.  Doesn't generate any garbage.
       switch ( arguments.length ) {
-        case 0: return this.pub_([]);
-        case 1: return this.pub_([a1]);
-        case 2: return this.pub_([a1, a2]);
-        case 3: return this.pub_([a1, a2, a3]);
-        case 4: return this.pub_([a1, a2, a3, a4]);
-        case 5: return this.pub_([a1, a2, a3, a4, a5]);
-        case 6: return this.pub_([a1, a2, a3, a4, a5, a6]);
-        case 7: return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
+        case 0:  return this.pub_([]);
+        case 1:  return this.pub_([a1]);
+        case 2:  return this.pub_([a1, a2]);
+        case 3:  return this.pub_([a1, a2, a3]);
+        case 4:  return this.pub_([a1, a2, a3, a4]);
+        case 5:  return this.pub_([a1, a2, a3, a4, a5]);
+        case 6:  return this.pub_([a1, a2, a3, a4, a5, a6]);
+        case 7:  return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
+        case 8:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8]);
+        case 9:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8, a9]);
+        default: return this.pub_(arguments);
       }
-      console.error('pub() takes at most 7 arguments.');
     },
 
     function pub_(args) {
+      /** Internal publish method, called by pub(). */
+
+      // No listeners, so return.
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
-      var count     = this.notify_(listeners.next, args);
+
+      // Notify all global listeners.
+      var count = this.notify_(listeners.next, args);
+
+      // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
         var listeners = listeners.children[args[i]];
         if ( ! listeners ) break;
@@ -1152,7 +1178,7 @@ foam.CLASS({
         its .destroy() method.
     */
     function sub() { /* args..., l */
-      var l         = arguments[arguments.length-1];
+      var l = arguments[arguments.length-1];
 
       console.assert(typeof l === 'function', 'Listener must be a function');
 
