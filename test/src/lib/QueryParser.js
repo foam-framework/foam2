@@ -30,7 +30,8 @@ describe('Query parser', function() {
       },
       {
         class: 'Date',
-        name: 'timestamp'
+        name: 'timestamp',
+        shortName: 't'
       },
       {
         class: 'Boolean',
@@ -271,5 +272,12 @@ describe('Query parser', function() {
         testQuery('timestamp:2011..2013', [1, 2, 4]));
     it('should handle date ranges',
         testQuery('timestamp:2011-01..2013-12', [1, 2, 4]));
+  });
+
+  describe('field names', function() {
+    it('should ignore case in field names',
+        testQuery('TIMESTAMP:2011', [1, 4]));
+    it('should respect short names, if provided', testQuery('t:2011', [1, 4]));
+    it('should ignore case in short names, too', testQuery('T:2011', [1, 4]));
   });
 });

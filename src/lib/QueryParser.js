@@ -43,6 +43,11 @@ foam.CLASS({
   ],
 
   imports: [
+    /**
+     * This is an optional import. If provided, it's the string used in place
+     * of "me", allowing queries like owner:me to be converted to
+     * EQ(OWNER, 'some_user')
+     */
     'me'
   ],
 
@@ -188,7 +193,13 @@ foam.CLASS({
           s: prop.name,
           value: prop
         }));
-        // TODO(braden): Support aliases and shortName when Property does.
+        if ( prop.shortName ) {
+          fields.push(this.LiteralIC.create({
+            s: prop.shortName,
+            value: prop
+          }));
+        }
+        // TODO(braden): Support aliases when Property does.
       }
       fields.sort(function(a, b) {
         var d = a.length - b.length;

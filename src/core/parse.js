@@ -286,6 +286,9 @@ foam.CLASS({
   ]
 });
 
+/**
+ * Case-insensitive literal that returns a fixed value when it matches.
+ */
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'LiteralICWithValue',
@@ -294,6 +297,13 @@ foam.CLASS({
   properties: [
     {
       name: 's',
+      final: true,
+      postSet: function(old, nu) {
+        this.lower = nu.toLowerCase();
+      }
+    },
+    {
+      name: 'lower',
       final: true
     },
     {
@@ -304,7 +314,7 @@ foam.CLASS({
 
   methods: [
     function step() {
-      var str = this.s.toLowerCase();
+      var str = this.lower;
       var ps = this.ps;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
@@ -355,6 +365,13 @@ foam.CLASS({
   properties: [
     {
       name: 's',
+      final: true,
+      postSet: function(old, nu) {
+        this.lower = nu.toLowerCase();
+      }
+    },
+    {
+      name: 'lower',
       final: true
     }
   ],
@@ -363,7 +380,7 @@ foam.CLASS({
     function step() {
       var ps1 = this.ps;
       var ps = this.ps;
-      var str = this.s.toLowerCase();
+      var str = this.lower;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
           this.fail.ps = ps1;
@@ -730,6 +747,13 @@ foam.CLASS({
   properties: [
     {
       name: 's',
+      final: true,
+      postSet: function(old, nu) {
+        this.lower = nu.toLowerCase();
+      }
+    },
+    {
+      name: 'lower',
       final: true
     },
     {
@@ -754,7 +778,7 @@ foam.CLASS({
       });
     },
     function parse(ps) {
-      var str = this.s.toLowerCase();
+      var str = this.lower;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
           return undefined;
