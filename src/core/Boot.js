@@ -1258,7 +1258,7 @@ foam.CLASS({
 });
 
 
-/** An Array whose elements are Axioms and are added to this.axioms. */
+/** An Array whose elements are Axioms and are added to this.axioms_. */
 foam.CLASS({
   package: 'foam.core',
   name: 'AxiomArray',
