@@ -274,8 +274,34 @@ foam.CLASS({
       final: true
     },
     {
-      name: 'case',
-      value: true,
+      name: 'value',
+      final: true
+    }
+  ],
+  methods: [
+    function step() {
+      var str = this.s;
+      var ps = this.ps;
+      for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
+        if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
+          this.fail.ps = this.ps;
+          return this.fail;
+        }
+      }
+      this.success.ps = ps.setValue(this.value || this.s);
+      return this.success;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'LiteralICWithValue',
+  extends: 'foam.parse.compiled.State',
+
+  properties: [
+    {
+      name: 's',
       final: true
     },
     {
@@ -286,11 +312,10 @@ foam.CLASS({
 
   methods: [
     function step() {
-      var str = this.case ? this.s : this.s.toLowerCase();
+      var str = this.s.toLowerCase();
       var ps = this.ps;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head ||
-            str.charAt(i) !== (this.case ? ps.head : ps.head.toLowerCase()) ) {
+        if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
           this.fail.ps = this.ps;
           return this.fail;
         }
@@ -312,9 +337,33 @@ foam.CLASS({
       name: 's',
       final: true
     },
+  ],
+
+  methods: [
+    function step() {
+      var ps1 = this.ps;
+      var ps = this.ps;
+      var str = this.s;
+      for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
+        if ( ! ps.head || str.charAt(i) !== ps.head ) {
+          this.fail.ps = ps1;
+          return this.fail;
+        }
+      }
+      this.success.ps = ps;
+      return this.success;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse.compiled',
+  name: 'LiteralIC',
+  extends: 'foam.parse.compiled.State',
+
+  properties: [
     {
-      name: 'case',
-      value: true,
+      name: 's',
       final: true
     },
   ],
@@ -323,10 +372,9 @@ foam.CLASS({
     function step() {
       var ps1 = this.ps;
       var ps = this.ps;
-      var str = this.case ? this.s : this.s.toLowerCase();
+      var str = this.s.toLowerCase();
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head ||
-            str.charAt(i) !== (this.case ? ps.head : ps.head.toLowerCase()) ) {
+        if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
           this.fail.ps = ps1;
           return this.fail;
         }
@@ -659,11 +707,6 @@ foam.CLASS({
       final: true
     },
     {
-      name: 'case',
-      value: true,
-      final: true
-    },
-    {
       name: 'value',
       final: true
     }
@@ -674,24 +717,63 @@ foam.CLASS({
       return withValue ?
         foam.parse.compiled.LiteralWithValue.create({
           s: this.s,
-          case: this.case,
           value: this.value !== undefined ? this.value : this.s,
           success: success,
           fail: fail
         }) :
       foam.parse.compiled.LiteralWithValue.create({
         s: this.s,
-        case: this.case,
         success: success,
         fail: fail
       })
     },
 
     function parse(ps, obj) {
-      var str = this.case ? this.s : this.s.toLowerCase();
+      var str = this.s;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head ||
-            str.charAt(i) !== (this.case ? ps.head : ps.head.toLowerCase()) ) {
+        if ( ! ps.head || str.charAt(i) !== ps.head ) {
+          return undefined;
+        }
+      }
+      return ps.setValue(this.value !== undefined ? this.value : this.s);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'LiteralIC',
+
+  properties: [
+    {
+      name: 's',
+      final: true
+    },
+    {
+      name: 'value',
+      final: true
+    }
+  ],
+
+  methods: [
+    function compile(success, fail, withValue) {
+      return withValue ?
+        foam.parse.compiled.LiteralICWithValue.create({
+          s: this.s,
+          value: this.value !== undefined ? this.value : this.s,
+          success: success,
+          fail: fail
+        }) :
+      foam.parse.compiled.LiteralICWithValue.create({
+        s: this.s,
+        success: success,
+        fail: fail
+      });
+    },
+    function parse(ps) {
+      var str = this.s.toLowerCase();
+      for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
+        if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
           return undefined;
         }
       }
@@ -1349,9 +1431,8 @@ foam.CLASS({
     },
 
     function literal_ic(s, value) {
-      return foam.lookup('foam.parse.Literal').create({
+      return foam.lookup('foam.parse.LiteralIC').create({
         s: s,
-        case: false,
         value: value
       });
     },

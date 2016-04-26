@@ -37,7 +37,7 @@ foam.CLASS({
     'foam.mlang.predicate.True',
     'foam.parse.Alternate',
     'foam.parse.ImperativeGrammar',
-    'foam.parse.Literal',
+    'foam.parse.LiteralIC',
     'foam.parse.Parsers',
     'foam.parse.StringPS',
   ],
@@ -184,9 +184,8 @@ foam.CLASS({
       var properties = cls.getAxiomsByClass(foam.core.Property);
       for ( var i = 0; i < properties.length; i++ ) {
         var prop = properties[i];
-        fields.push(this.Literal.create({
+        fields.push(this.LiteralIC.create({
           s: prop.name,
-          case: false,
           value: prop
         }));
         // TODO(braden): Support aliases and shortName when Property does.
