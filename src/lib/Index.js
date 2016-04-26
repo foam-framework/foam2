@@ -357,7 +357,7 @@ foam.CLASS({
       // TODO: should be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.tailFactory === this.ValueIndex ) {
+      if ( this.ValueIndex.isSubClass(this.tailFactory) ) {
         a.sort(toCompare(this.prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1);
       } else {

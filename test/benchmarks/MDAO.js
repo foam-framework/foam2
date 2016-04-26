@@ -180,8 +180,8 @@ describe("MDAO benchmarks", function() {
     });
 
     var AlbumDAO, PhotoDAO, PhotoDetailDAO;
-    var albums = foam.dao.ArrayDAO.create();
-    var photos = foam.dao.ArrayDAO.create();
+    var albums = foam.dao.ArraySink.create();
+    var photos = foam.dao.ArraySink.create();
 
     function makeMultiPartKeys(n) {
       var a = [];
@@ -257,7 +257,8 @@ describe("MDAO benchmarks", function() {
 //                 return AlbumDAO.put(albums.a[i]);
 //             })
             function() {
-              return AlbumDAO.bulkLoad(albums);
+              var dao = foam.dao.ArrayDAO.create({ array: albums.a });
+              return AlbumDAO.bulkLoad(dao);
             }
           ),
           asleep(1000),
@@ -265,7 +266,8 @@ describe("MDAO benchmarks", function() {
 //             arepeatpar(NUM_PHOTOS, function ( i) {
 //                 return PhotoDAO.put(photos.a[i]);
 //             })
-            return PhotoDAO.bulkLoad(photos);
+            var dao = foam.dao.ArrayDAO.create({ array: photos.a });
+            return PhotoDAO.bulkLoad(dao);
           }),
           asleep(1000),
           atest('2a SelectAllAlbumsQuery', function() {
