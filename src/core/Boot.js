@@ -1243,11 +1243,16 @@ foam.CLASS({
     },
 
     /**
-      Creates a Slot for a property.
+      Creates a Slot for an Axiom.
       @private
     */
     function slot(name) {
-      return this.cls_.getAxiomByName(name).toSlot(this);
+      var axiom = this.cls_.getAxiomByName(name);
+
+      console.assert(axiom, 'Unknown axiom:', name);
+      console.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
+
+      return axiom.toSlot(this);
     }
   ]
 });
