@@ -1186,14 +1186,14 @@ foam.CLASS({
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
         listeners = listeners.children[arguments[i]] ||
-        ( listeners.children[arguments[i]] = this.createListenerList_() );
+            ( listeners.children[arguments[i]] = this.createListenerList_() );
       }
 
       var node = {
         sub:  { src: this },
         next: listeners.next,
         prev: listeners,
-        l: l
+        l:    l
       };
       node.sub.destroy = function() {
         if ( node.next ) node.next.prev = node.prev;
@@ -1209,7 +1209,11 @@ foam.CLASS({
       return node.sub;
     },
 
-    /** Unsub a previously subd listener. */
+    /**
+      Unsub a previously sub()'ed listener.
+      It is more efficient to unsubscribe by calling .destroy()
+      on the subscription returned from sub().
+    */
     function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
