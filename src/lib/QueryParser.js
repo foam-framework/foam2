@@ -17,7 +17,7 @@
 foam.CLASS({
   package: 'foam.parse',
   name: 'QueryParser',
-  axioms: [ foam.pattern.Singleton.create() ],
+  axioms: [foam.pattern.Singleton.create()],
 
   // TODO(braden): Support KEYWORD predicates and queries on them.
 
@@ -39,11 +39,11 @@ foam.CLASS({
     'foam.parse.ImperativeGrammar',
     'foam.parse.LiteralIC',
     'foam.parse.Parsers',
-    'foam.parse.StringPS',
+    'foam.parse.StringPS'
   ],
 
   imports: [
-    'me',
+    'me'
   ],
 
   properties: [
@@ -51,18 +51,18 @@ foam.CLASS({
       // The core query parser. Needs a fieldname symbol added to function
       // properly.
       name: 'baseGrammar_',
-      value: function(alt, literal, literal_ic, not, notChars, optional, range,
+      value: function(alt, literal, literalIC, not, notChars, optional, range,
           repeat, seq, seq1, str, sym) {
         return {
           START: sym('query'),
           query: sym('or'),
 
-          or: repeat(sym('and'), alt(literal_ic(' OR '), literal(' | ')), 1),
+          or: repeat(sym('and'), alt(literalIC(' OR '), literal(' | ')), 1),
 
           and: repeat(
               sym('expr'),
-              alt(literal_ic(' AND '),
-                  not(alt(literal_ic(' OR'), literal(' |')), literal(' '))),
+              alt(literalIC(' AND '),
+                  not(alt(literalIC(' OR'), literal(' |')), literal(' '))),
               1),
 
           expr: alt(
@@ -80,21 +80,21 @@ foam.CLASS({
 
           negate: alt(
               seq(literal('-'), sym('expr')),
-              seq(literal_ic('NOT '), sym('expr'))
+              seq(literalIC('NOT '), sym('expr'))
           ),
 
           id: sym('number'),
 
-          has: seq(literal_ic('has:'), sym('fieldname')),
+          has: seq(literalIC('has:'), sym('fieldname')),
 
-          is: seq(literal_ic('is:'), sym('fieldname')),
+          is: seq(literalIC('is:'), sym('fieldname')),
 
           equals: seq(sym('fieldname'), alt(':', '='), sym('valueList')),
 
           // TODO(kgr): Merge with 'equals'.
-          before: seq(sym('fieldname'), alt('<=', '<', literal_ic('-before:')),
+          before: seq(sym('fieldname'), alt('<=', '<', literalIC('-before:')),
               sym('value')),
-          after: seq(sym('fieldname'), alt('>=', '>', literal_ic('-after:')),
+          after: seq(sym('fieldname'), alt('>=', '>', literalIC('-after:')),
               sym('value')),
 
           value: alt(
@@ -112,26 +112,26 @@ foam.CLASS({
 
           negateValue: seq(
               '(',
-              alt('-', literal_ic('not ')),
+              alt('-', literalIC('not ')),
               sym('value'),
               ')'
           ),
 
           orValue: seq(
               '(',
-              repeat(sym('value'), alt('|', literal_ic(' or '), ' | '), 1),
+              repeat(sym('value'), alt('|', literalIC(' or '), ' | '), 1),
               ')'
           ),
 
           andValue: seq(
               '(',
-              repeat(sym('value'), alt(literal_ic(' and '), ' '), 1),
+              repeat(sym('value'), alt(literalIC(' and '), ' '), 1),
               ')'
           ),
 
           valueList: alt(sym('compoundValue'), repeat(sym('value'), ',', 1)),
 
-          me: seq(literal_ic('me'), not(sym('char'))),
+          me: seq(literalIC('me'), not(sym('char'))),
 
           date: alt(
               sym('range date'),
@@ -159,7 +159,7 @@ foam.CLASS({
               seq(sym('number'), '/', sym('number'), '/', sym('number'))
           ),
 
-          'relative date': seq(literal_ic('today'),
+          'relative date': seq(literalIC('today'),
                 optional(seq('-', sym('number')))),
 
           string: alt(sym('word'), sym('quoted string')),
@@ -172,7 +172,7 @@ foam.CLASS({
 
           char: alt(range('a', 'z'), range('A', 'Z'), range('0', '9'), '-', '^',
               '_', '@', '%', '.'),
-          number: repeat(range('0', '9'), null, 1),
+          number: repeat(range('0', '9'), null, 1)
         };
       }
     }
@@ -193,7 +193,7 @@ foam.CLASS({
       fields.sort(function(a, b) {
         var d = a.length - b.length;
         if ( d !== 0 ) return d;
-        if ( a == b ) return 0;
+        if ( a === b ) return 0;
         return a < b ? 1 : -1;
       });
 
@@ -201,7 +201,7 @@ foam.CLASS({
           this.Parsers.create(), this);
       var grammar = {
         __proto__: base,
-        fieldname: this.Alternate.create({ args: fields })
+        fieldname: this.Alternate.create({args: fields})
       };
 
       // This is a closure that's used by some of the actions that follow.
@@ -232,28 +232,34 @@ foam.CLASS({
       // TODO: Fix me to just build the object directly.
       var actions = {
         id: function(v) {
-          return self.Eq.create({ arg1: cls.ID, arg2: v });
+          return self.Eq.create({
+            arg1: cls.ID,
+            arg2: v
+          });
         },
         or: function(v) {
-          return self.Or.create({ args: v });
+          return self.Or.create({args: v});
         },
         and: function(v) {
-          return self.And.create({ args: v });
+          return self.And.create({args: v});
         },
         negate: function(v) {
-          return self.Not.create({ arg1: v[1] });
+          return self.Not.create({arg1: v[1]});
         },
         number: function(v) {
           return parseInt(compactToString(v));
         },
         me: function() {
-          return self.me || "";
+          return self.me || '';
         },
         has: function(v) {
-          return self.Has.create({ arg1: v[1] });
+          return self.Has.create({arg1: v[1]});
         },
         is: function(v) {
-          return self.Eq.create({ arg1: v[1], arg2: self.True.create() });
+          return self.Eq.create({
+            arg1: v[1],
+            arg2: self.True.create()
+          });
         },
 
         before: function(v) {
@@ -316,8 +322,8 @@ foam.CLASS({
             }
             return self.And.create({
               args: [
-                self.Gte.create({ arg1: prop, arg2: values[0][0] }),
-                self.Lt.create({ arg1: prop, arg2: values[0][1] })
+                self.Gte.create({arg1: prop, arg2: values[0][0]}),
+                self.Lt.create({arg1: prop, arg2: values[0][1]})
               ]
             });
           }
@@ -329,23 +335,23 @@ foam.CLASS({
               values[i] = isFloat ? parseFloat(values[i]) : parseInt(values[i]);
             }
 
-            expr = self.In.create({ arg1: prop, arg2: values });
+            expr = self.In.create({arg1: prop, arg2: values});
           } else {
             expr = (v[1] === '=') ?
-                self.InIC.create({ arg1: prop, arg2: values }) :
+                self.InIC.create({arg1: prop, arg2: values}) :
                 self.Or.create({
                   args: values.map(function(v) {
-                    return self.ContainsIC.create({ arg1: prop, arg2: v });
+                    return self.ContainsIC.create({arg1: prop, arg2: v});
                   })
                 });
           }
 
           if ( values.negated ) {
-            return self.Not.create({ arg1: expr });
+            return self.Not.create({arg1: expr});
           } else if ( values.and ) {
             return self.And.create({
               args: values.map(function(x) {
-                expr.class_.create({ arg1: expr.arg1, arg2: [x] });
+                expr.class_.create({arg1: expr.arg1, arg2: [x]});
               })
             });
           } else {
@@ -377,11 +383,13 @@ foam.CLASS({
         // Date formats:
         // YYYY-MM-DDTHH:MM, YYYY-MM-DDTHH, YYYY-MM-DD, YYYY-MM, YY/MM/DD, YYYY
         'literal date': function(v) {
-          var start, end;
+          var start;
+          var end;
 
           start = new Date();
           end = new Date();
-          var ops = ['FullYear', 'Month', 'Date', 'Hours', 'Minutes', 'Seconds'];
+          var ops = ['FullYear', 'Month', 'Date', 'Hours', 'Minutes',
+              'Seconds'];
           var defaults = [0, 1, 1, 0, 0, 0];
           for ( var i = 0; i < ops.length; i++ ) {
             var x = i * 2 > v.length ? defaults[i] : v[i * 2];
@@ -423,15 +431,15 @@ foam.CLASS({
         },
 
         'quoted string': compactToString,
-        word: compactToString,
+        word: compactToString
       };
 
       var g = this.ImperativeGrammar.create({
-        symbols: function() { return grammar; },
+        symbols: grammar
       });
 
       g.addActions(actions);
       return g;
     }
-  ],
+  ]
 });

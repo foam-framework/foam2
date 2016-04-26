@@ -1430,7 +1430,7 @@ foam.CLASS({
       });
     },
 
-    function literal_ic(s, value) {
+    function literalIC(s, value) {
       return foam.lookup('foam.parse.LiteralIC').create({
         s: s,
         value: value

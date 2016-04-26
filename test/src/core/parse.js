@@ -31,7 +31,7 @@ describe('basic parsers', function() {
   var not = parsers.not;
   var optional = parsers.optional;
   var literal = parsers.literal;
-  var literal_ic = parsers.literal_ic;
+  var literalIC = parsers.literalIC;
   var anyChar = parsers.anyChar;
 
   var mkStream = function(str) {
@@ -67,32 +67,32 @@ describe('basic parsers', function() {
     });
   });
 
-  describe('literal_ic()', function() {
+  describe('literalIC()', function() {
     it('should correctly match a matching string', function() {
-      var ps = literal_ic('foo').parse(mkStream('foo'));
+      var ps = literalIC('foo').parse(mkStream('foo'));
       expect(ps).toBeDefined();
       expect(ps.value).toBe('foo');
     });
 
     it('should ignore case and return canonical spelling', function() {
-      var ps = literal_ic('foo').parse(mkStream('FOO'));
+      var ps = literalIC('foo').parse(mkStream('FOO'));
       expect(ps).toBeDefined();
       expect(ps.value).toBe('foo');
     });
 
     it('should parse only as far as it matches', function() {
-      var ps = literal_ic('foo').parse(mkStream('FOOBAR'));
+      var ps = literalIC('foo').parse(mkStream('FOOBAR'));
       expect(ps).toBeDefined();
       expect(ps.value).toBe('foo');
       expect(ps.head).toBe('B');
     });
 
     it('should fail on a mismatch', function() {
-      expect(literal_ic('foo').parse(mkStream('FOBAR'))).toBeUndefined();
+      expect(literalIC('foo').parse(mkStream('FOBAR'))).toBeUndefined();
     });
 
     it('should fail on EOF', function() {
-      expect(literal_ic('foo').parse(mkStream('FO'))).toBeUndefined();
+      expect(literalIC('foo').parse(mkStream('FO'))).toBeUndefined();
     });
   });
 
@@ -146,7 +146,7 @@ describe('basic parsers', function() {
   });
 
   describe('seq()', function() {
-    var parser = seq(literal('abc'), literal_ic('DEF'));
+    var parser = seq(literal('abc'), literalIC('DEF'));
 
     it('should parse each argument in succession, returning an array',
         function() {
@@ -163,7 +163,7 @@ describe('basic parsers', function() {
   });
 
   describe('seq1()', function() {
-    var parser = seq1(1, literal('('), literal_ic('DEF'), literal(')'));
+    var parser = seq1(1, literal('('), literalIC('DEF'), literal(')'));
 
     it('should succeed when all sub-parsers do, and return exactly 1 value',
         function() {
@@ -179,7 +179,7 @@ describe('basic parsers', function() {
   });
 
   describe('optional()', function() {
-    var parser = seq(optional(literal('abc')), literal_ic('DEF'));
+    var parser = seq(optional(literal('abc')), literalIC('DEF'));
 
     it('should parse its argument if possible', function() {
       var ps = parser.parse(mkStream('abcdefg'));

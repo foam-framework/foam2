@@ -38,12 +38,14 @@ describe('Query parser', function() {
       },
       {
         class: 'String',
-        name: 'optional',
+        name: 'optional'
       }
     ]
   }).buildClass();
 
-  var dao = foam.dao.ArrayDAO.create({ of: Item });
+  var dao = foam.dao.ArrayDAO.create({
+    of: Item
+  });
   dao.put(Item.create({
     id: 1,
     name: 'first item',
@@ -54,7 +56,7 @@ describe('Query parser', function() {
     id: 2,
     name: 'second item',
     timestamp: new Date(2013, 9, 2),
-    optional: 'abc',
+    optional: 'abc'
   }));
   dao.put(Item.create({
     id: 3,
@@ -66,7 +68,7 @@ describe('Query parser', function() {
     name: 'FOAM 1',
     timestamp: new Date(2011, 7, 2),
     deleted: true,
-    optional: 'def',
+    optional: 'def'
   }));
   dao.put(Item.create({
     id: 5,
@@ -230,7 +232,9 @@ describe('Query parser', function() {
 
   // This one needs to go last because it mangles the DAO.
   describe('relative dates', function() {
-    var dao2 = foam.dao.ArrayDAO.create({ of: Item });
+    var dao2 = foam.dao.ArrayDAO.create({
+      of: Item
+    });
     dao.select(dao2);
 
     var todayItem = Item.create({
