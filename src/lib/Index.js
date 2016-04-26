@@ -310,7 +310,13 @@ foam.CLASS({
 
   properties: [
     'prop',
-    [ 'selectCount', 0 ],
+    {
+      name: 'selectCount',
+      value: 0,
+      postSet: function(old, nu) {
+        this.treeNode.selectCount = nu;
+      }
+    },
     {
       name: 'nullNode',
       factory: function() {

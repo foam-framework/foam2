@@ -30,6 +30,7 @@ foam.CLASS({
     { class: 'Simple', name: 'right' },
 
     { class: 'Simple', name: 'index' }, // TODO: replace with flyweight shared normal prop
+    { class: 'Simple', name: 'selectCount' },
   ],
 
   methods: [
@@ -49,19 +50,19 @@ foam.CLASS({
     /** Nodes do a shallow clone */
     function clone() {
       var c = this.cls_.create();
-      var ps = this.cls_.getAxiomsByClass(foam.core.SimpleProperty);
-      for ( var i = 0; i < ps.length; ++i ) {
-        var name = ps[i].name;
-        var value = this[name];
-        if ( typeof value !== 'undefined' ) c[name] = value;
-      }
+      c.key   = this.key;
+      c.value = this.value
+      c.size  = this.size;
+      c.level = this.level;
+      c.left  = this.left;
+      c.right = this.right;
       return c;
     },
 
     /** Clone is only needed if a select() is active in the tree at the
       same time we are updating it. */
     function maybeClone() {
-      return ( this.index.selectCount > 0 ) ? this.clone() : this;
+      return this.selectCount ? this.clone() : this;
     },
 
     function updateSize() {
@@ -369,12 +370,12 @@ foam.CLASS({
     function putKeyValue(key, value) {
       var subIndex = this.index.tailFactory.create();
       subIndex.put(value);
-      return this.index.treeNode.create({
-        key: key,
-        value: subIndex,
-        size: 1,
-        level: 1,
-      });
+      var n = this.index.treeNode.create();
+      n.key = key;
+      n.value = subIndex;
+      n.size = 1;
+      n.level = 1;
+      return n;
     },
     function removeKeyValue(key, value) { return this; },
     function removeNode(key) { return this; },
