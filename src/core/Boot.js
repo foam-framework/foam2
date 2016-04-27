@@ -1292,7 +1292,6 @@ foam.CLASS({
   this.cls_.KEY === this.KEY === 'some value'
 </pre>
 */
-// TODO: constants aren't enumerable
 foam.CLASS({
   package: 'foam.core',
   name: 'Constant',
@@ -1308,7 +1307,6 @@ foam.CLASS({
         foam.String.constantize(this.name),
         {
           value: this.value,
-          enumerable: false,
           configurable: false
         });
     },
