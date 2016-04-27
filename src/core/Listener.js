@@ -98,3 +98,22 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'Listener',
+      name: 'listeners',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'function' ) {
+          console.assert(o.name, 'Listener must be named');
+          return foam.core.Listener.create({name: o.name, code: o});
+        }
+        // TODO: check that not already a Listener
+        return foam.core.Listener.create(o);
+      }
+    }
+  ]
+});
