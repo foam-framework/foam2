@@ -49,3 +49,29 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'Constant',
+      name: 'constants',
+      adapt: function(_, a, prop) {
+        if ( ! a ) return [];
+        if ( ! Array.isArray(a) ) {
+          var cs = [];
+          for ( var key in a ) {
+            cs.push(foam.core.Constant.create({name: key, value: a[key]}));
+          }
+          return cs;
+        }
+        var b = new Array(a.length);
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          b[i] = prop.adaptArrayElement(a[i]);
+        }
+        return b;
+      }
+    }
+  ]
+});

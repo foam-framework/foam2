@@ -66,11 +66,11 @@
     "Array",
     "PubSub", // Start Phase2
     "AxiomArray",
-    "Constant",
     "Topic",
     "Boolean",
     "Int",
     "EndBoot", // End Boot
+    "Constant",
     "InnerClass",
     "Implements",
     "ImportsExports",
