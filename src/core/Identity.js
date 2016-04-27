@@ -87,3 +87,17 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      name: 'ids',
+      postSet: function(_, ids) {
+        this.axioms_.push.call(
+          this.axioms_,
+          foam.core.Identity.create({ids: ids}));
+      }
+    }
+  ]
+});

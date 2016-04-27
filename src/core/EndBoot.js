@@ -87,14 +87,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'ids',
-      postSet: function(_, ids) {
-        this.axioms_.push.call(
-          this.axioms_,
-          foam.core.Identity.create({ids: ids}));
-      }
-    },
-    {
       class: 'AxiomArray',
       of: 'Topic',
       name: 'topics',
