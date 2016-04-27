@@ -53,6 +53,7 @@ describe('MDAO TreeIndex', function() {
 
 
   var AlbumDAO, PhotoDAO, PhotoDetailDAO, albums, photos;
+  var NOW = 1461778131578; // reasonable Date.now() substitute
 
   albums = foam.dao.ArrayDAO.create();
   photos = foam.dao.ArrayDAO.create();
@@ -62,7 +63,7 @@ describe('MDAO TreeIndex', function() {
         id: ""+i,
         isLocal: !! ( i % 2 ),
         byAction: !! ( 1 - (i % 2) ),
-        timestamp: new Date( ( Date.now() - 1000*60*60*24 * 300 ) + Math.random() * 1000*60*60*24 * 300),
+        timestamp: new Date( ( NOW - 1000*60*60*24 * 300 ) + (1 - i/NUM_ALBUMS) * 1000*60*60*24 * 300),
         jspb: [ 'nothing!' ],
       })
     );
@@ -71,7 +72,7 @@ describe('MDAO TreeIndex', function() {
     photos.put(
       test.Photo.create({
         id: ""+i,
-        timestamp: new Date( ( Date.now() - 1000*60*60*24 * 300 ) + Math.random() * 1000*60*60*24 * 300),
+        timestamp: new Date( ( NOW - 1000*60*60*24 * 300 ) + (1 - i/NUM_PHOTOS) * 1000*60*60*24 * 300),
         isLocal: !! ( i % 2 ),
         byAction: !! ( 1 - (i % 2) ),
         albumId: ""+(i % NUM_ALBUMS),
@@ -111,17 +112,17 @@ describe('MDAO TreeIndex', function() {
 
     AlbumDAO.bulkLoad(albums).then(PhotoDAO.bulkLoad(photos)).then(done);
   });
-  
+
   afterEach(function() {
 
   });
 
   it('bulk loads', function(done) {
-    AlbumDAO.select().then(function(s) { 
-      expect(s.a.length).toEqual(NUM_ALBUMS); 
+    AlbumDAO.select().then(function(s) {
+      expect(s.a.length).toEqual(NUM_ALBUMS);
     }).then(function() {
-      PhotoDAO.select().then(function(s) { 
-        expect(s.a.length).toEqual(NUM_PHOTOS); 
+      PhotoDAO.select().then(function(s) {
+        expect(s.a.length).toEqual(NUM_PHOTOS);
       }).then(done);
     })
   });
@@ -134,14 +135,14 @@ describe('MDAO TreeIndex', function() {
         PhotoDAO.where(M.IN(test.Photo.ID, KEYS_100)).select()
           .then(function(s) { expect(s.a.length).toEqual(KEYS_100.length); })
       ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_1000)).select() 
+        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_1000)).select()
           .then(function(s) { expect(s.a.length).toEqual(KEYS_1000.length); })
       ).then(
         PhotoDAO.where(M.IN(test.Photo.ID, KEYS_5000)).select()
           .then(function(s) { expect(s.a.length).toEqual(KEYS_5000.length); })
       ).then(done);
   });
-  
+
   it('innner joins', function(done) {
     var idsink = foam.dao.ArraySink.create();
     return AlbumDAO.where(M.EQ(test.Album.IS_LOCAL, false)).select(M.MAP(test.Album.ID, idsink))
@@ -151,7 +152,7 @@ describe('MDAO TreeIndex', function() {
         });
       }).then(done);
   });
-  
+
   it ('orders', function(done) {
     var asink = foam.dao.ArraySink.create();
     PhotoDAO.where(M.EQ(test.Photo.ALBUM_ID, avgAlbumKey))
@@ -159,11 +160,80 @@ describe('MDAO TreeIndex', function() {
         var a = asink.a;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
-          expect(prev >= a[i]).toEqual(true);
+          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
           prev = a[i];
         }
       }).then(done);
   });
+
+  it ('orders and filters gt/desc', function(done) {
+    var asink = foam.dao.ArraySink.create();
+    var cutOff = NOW - 1000*60*60*24 * 10;
+    PhotoDAO
+      .orderBy(M.DESC(test.Photo.TIMESTAMP))
+      .where(M.GT(test.Photo.TIMESTAMP, cutOff))
+      .select(asink).then(function() {
+        var a = asink.a;
+        var prev = a[0];
+        for ( var i = 1; i < a.length; ++i ) {
+          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
+          expect(prev.timestamp.getTime() > cutOff).toEqual(true);
+          prev = a[i];
+        }
+      }).then(done);
+  });
+
+  it ('orders and filters gt/asc', function(done) {
+    var asink = foam.dao.ArraySink.create();
+    var cutOff = NOW - 1000*60*60*24 * 10;
+    PhotoDAO
+      .orderBy(test.Photo.TIMESTAMP)
+      .where(M.GT(test.Photo.TIMESTAMP, cutOff))
+      .select(asink).then(function() {
+        var a = asink.a;
+        var prev = a[0];
+        for ( var i = 1; i < a.length; ++i ) {
+          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
+          expect(prev.timestamp.getTime() > cutOff).toEqual(true);
+          prev = a[i];
+        }
+      }).then(done);
+  });
+
+  it ('orders and filters lt/desc', function(done) {
+    var asink = foam.dao.ArraySink.create();
+    var cutOff = NOW - 1000*60*60*24 * 10;
+    PhotoDAO
+      .orderBy(M.DESC(test.Photo.TIMESTAMP))
+      .where(M.LT(test.Photo.TIMESTAMP, cutOff))
+      .select(asink).then(function() {
+        var a = asink.a;
+        var prev = a[0];
+        for ( var i = 1; i < a.length; ++i ) {
+          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
+          expect(prev.timestamp.getTime() < cutOff).toEqual(true);
+          prev = a[i];
+        }
+      }).then(done);
+  });
+
+  it ('orders and filters lt/asc', function(done) {
+    var asink = foam.dao.ArraySink.create();
+    var cutOff = NOW - 1000*60*60*24 * 10;
+    PhotoDAO
+      .orderBy(test.Photo.TIMESTAMP)
+      .where(M.LT(test.Photo.TIMESTAMP, cutOff))
+      .select(asink).then(function() {
+        var a = asink.a;
+        var prev = a[0];
+        for ( var i = 1; i < a.length; ++i ) {
+          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
+          expect(prev.timestamp.getTime() < cutOff).toEqual(true);
+          prev = a[i];
+        }
+      }).then(done);
+  });
+
 
 });
 

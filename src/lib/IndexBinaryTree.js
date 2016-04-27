@@ -49,7 +49,7 @@ foam.CLASS({
 
     /** Nodes do a shallow clone */
     function clone() {
-      var c = this.cls_.create();
+      var c = this.__proto__.create();
       c.key   = this.key;
       c.value = this.value
       c.size  = this.size;
@@ -299,8 +299,8 @@ foam.CLASS({
       return copy;
     },
 
-    function lt(s, key) {
-      if ( ! s ) return s;
+    function lt(key) {
+      var s = this;
       var r = this.index.compare(key, s.key);
 
       if ( r > 0 ) {
@@ -316,8 +316,8 @@ foam.CLASS({
       return s.left;
     },
 
-    function lte(s, key) {
-      if ( ! s ) return s;
+    function lte(key) {
+      var s = this;
       var r = this.index.compare(key, s.key);
 
       if ( r > 0 ) {
