@@ -55,3 +55,25 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'Requires',
+      name: 'requires',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var a = o.split(' as ');
+          var m = a[0];
+          var path = m.split('.');
+          var as = a[1] || path[path.length-1];
+          return foam.core.Requires.create({path: m, as: as});
+        }
+
+        return foam.core.Requires.create(o);
+      }
+    }
+  ]
+});
