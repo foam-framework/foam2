@@ -24,16 +24,6 @@ foam.CLASS({
   properties: [
     {
       class: 'AxiomArray',
-      of: 'Implements',
-      name: 'implements',
-      adaptArrayElement: function(o) {
-        return typeof o === 'string' ?
-          foam.core.Implements.create({path: o}) :
-          foam.core.Implements.create(o)         ;
-      }
-    },
-    {
-      class: 'AxiomArray',
       of: 'InnerClass',
       name: 'classes',
       // TODO: is this needed?

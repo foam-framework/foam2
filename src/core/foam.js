@@ -59,20 +59,20 @@
     "stdlib",
     "events",
     "Context",
-    "Boot",
+    "Boot", // Start Boot
     "Property",
     "Method",
     "String",
     "Array",
-    "PubSub", // Start phase2
+    "PubSub", // Start Phase2
     "AxiomArray",
     "Constant",
     "InnerClass",
-    "Implements",
     "Topic",
     "Boolean",
     "Int",
-    "EndBoot",
+    "EndBoot", // End Boot
+    "Implements",
     "ImportsExports",
     "Listener",
     "Identity",
