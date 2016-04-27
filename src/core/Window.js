@@ -97,9 +97,7 @@ foam.CLASS({
       var delay = opt_delay || 16;
       var X     = this;
 
-      // TODO: setName
-
-      return function() {
+      return foam.Function.setName(function() {
         var triggered = false;
         var lastArgs  = null;
         function mergedListener() {
@@ -119,14 +117,13 @@ foam.CLASS({
         };
 
         return f;
-      }();
+      }(), 'merged(' + l.name + ')');
     },
 
     function framed(l) {
       var X = this;
 
-      // TODO: setName
-      return function() {
+      return foam.Function.setName(function() {
         var triggered = false;
         var lastArgs  = null;
         function frameFired() {
@@ -146,7 +143,7 @@ foam.CLASS({
         };
 
         return f;
-      }();
+      }(), 'framed(' + l.name + ')');
     },
 
     function dynamic() {
