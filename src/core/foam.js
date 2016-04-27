@@ -65,13 +65,13 @@
     "Property",
     "Method",
     "String",
+    "Array",
+    "PubSub", // Start Phase2
     "Boolean",
     "Int",
-    "Array",
     "AxiomArray",
-    "PubSub", // Start Phase2
-    "Topic",
     "EndBoot", // End Boot
+    "Topic",
     "Constant",
     "InnerClass",
     "Implements",

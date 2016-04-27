@@ -54,8 +54,6 @@ foam.CLASS({
 
   // documentation: 'Upgrade FObject to fully bootstraped form.',
 
-  topics: [ 'propertyChange' ],
-
   axioms: [
     {
       name: 'X',

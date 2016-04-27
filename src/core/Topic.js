@@ -108,3 +108,8 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+  topics: [ 'propertyChange' ]
+});
