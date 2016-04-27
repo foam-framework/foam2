@@ -64,9 +64,9 @@
     "Model",
     "Property",
     "Method",
+    "PubSub", // Start Phase2
     "String",
     "Array",
-    "PubSub", // Start Phase2
     "Boolean",
     "Int",
     "AxiomArray",
