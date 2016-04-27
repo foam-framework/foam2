@@ -647,10 +647,25 @@ foam.CLASS({
         without subclassing.
       */
       'comparePropertyValues',
-      function(o1, o2) {
-        return foam.util.compare(o1, o2);
+      function(o1, o2) { return foam.util.compare(o1, o2); }
+    ],
+    {
+      name: 'f',
+      factory: function() {
+        var name = this.name;
+        return function f(o) { return o[name]; }
       }
-    ]
+    },
+    {
+      name: 'compare',
+      factory: function() {
+        var comparePropertyValues = this.comparePropertyValues;
+        var f = this.f;
+        return function compare(o1, o2) {
+          return comparePropertyValues(f(o1), f(o2));
+        }
+      }
+    }
   ],
 
   methods: [
@@ -660,42 +675,37 @@ foam.CLASS({
     */
     // TODO: document property inheritance
     function installInClass(c) {
-      var superProp = c.__proto__.getAxiomByName(this.name);
+      var prop = this;
+      var superProp = c.__proto__.getAxiomByName(prop.name);
 
       if ( superProp ) {
-        var a = this.cls_.getAxiomsByClass(foam.core.Property);
+        var a = prop.cls_.getAxiomsByClass(foam.core.Property);
 
+        // Walk all Properties of this Property
         for ( var i = 0 ; i < a.length ; i++ ) {
           var name = a[i].name;
 
-          if ( superProp.hasOwnProperty(name) && ! this.hasOwnProperty(name) ) {
-            this[name] = superProp[name];
+          // Copy all Properties from my super-Property, that I don't override
+          if ( superProp.hasOwnProperty(name) && ! prop.hasOwnProperty(name) ) {
+
+            // Clone myself, so as to not modify the Model definition
+            if ( prop === this ) prop = this.clone();
+
+            prop[name] = superProp[name];
           }
         }
       }
 
-      var cName = foam.String.constantize(this.name);
+      var cName = foam.String.constantize(prop.name);
       var prev = c[cName];
 
       // Detect constant name collisions
-      if ( prev && prev.name !== this.name ) {
+      if ( prev && prev.name !== prop.name ) {
         throw 'Class constant conflict: ' +
-          c.id + '.' + cName + ' from: ' + this.name + ' and ' + prev.name;
+          c.id + '.' + cName + ' from: ' + prop.name + ' and ' + prev.name;
       }
 
-      c[cName] = this;
-
-      // Note: can't be used without installing Property first
-
-      /** Makes this Property an adapter, suitable for use with mLangs. */
-      var name = this.name;
-      var f = this.f = function f(o) { return o[name]; };
-
-      /** Makes this Property a comparator, suitable for use with mLangs. */
-      var comparePropertyValues = this.comparePropertyValues;
-      this.compare = function compare(o1, o2) {
-        return comparePropertyValues(f(o1), f(o2));
-      }
+      c[cName] = prop;
     },
 
     /**
@@ -703,17 +713,20 @@ foam.CLASS({
       (Property is 'this').
     */
     function installInProto(proto) {
-      var prop     = this;
-      var name     = this.name;
-      var adapt    = this.adapt
-      var preSet   = this.preSet;
-      var postSet  = this.postSet;
-      var factory  = this.factory;
-      var value    = this.value;
+      // Take Axiom from class rather than using 'this' directly,
+      // since installInClass() may have created a modified version
+      // to inherit Property Properties from a super-Property.
+      var prop     = proto.cls_.getAxiomByName(this.name);
+      var name     = prop.name;
+      var adapt    = prop.adapt
+      var preSet   = prop.preSet;
+      var postSet  = prop.postSet;
+      var factory  = prop.factory;
+      var value    = prop.value;
       var hasValue = typeof value !== 'undefined';
       var slotName = name + '$';
-      var isFinal  = this.final;
-      var eFactory = this.exprFactory(this.expression);
+      var isFinal  = prop.final;
+      var eFactory = this.exprFactory(prop.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
@@ -757,6 +770,7 @@ foam.CLASS({
           }
 
           // Get old value but avoid triggering factory if present
+          // TODO: expand
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
             eFactory ? ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ? this[name] : undefined ) :
@@ -1001,7 +1015,7 @@ foam.CLASS({
     [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
-        // TODO: assert that a is an array
+        console.assert(Array.isArray(a), 'Array required, but received:', a);
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
@@ -1032,13 +1046,26 @@ foam.CLASS({
     /**
       This structure represents the head of a doubly-linked list of
       listeners. It contains 'next', a pointer to the first listener,
-      and 'children', an array of sub-topic chains.
+      and 'children', a map of sub-topic chains.
       Nodes in the list contain 'next' and 'prev' links, which lets
       removing subscriptions be done quickly by connecting next to prev
       and prev to next.
+
+      Listener List Structure
+      -----------------------
+      next     -> {
+        prev: <-,
+        sub: {src: <source object>, destroy: <destructor function> },
+        l: <listener>,
+        next: -> },
+      children -> {
+          subTopic1: <same structure>,
+          ...
+          subTopicn: <same structure>
+      }
     */
     function createListenerList_() {
-      return { next: null, children: [] };
+      return { next: null, children: {} };
     },
 
     /** Return the top-level listener list, creating if necessary. */
@@ -1049,6 +1076,7 @@ foam.CLASS({
 
     /**
       Notify all of the listeners in a listener list.
+      Pass 'a' arguments to listeners.
       Returns the number of listeners notified.
     */
     function notify_(listeners, a) {
@@ -1056,6 +1084,9 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
+        // Like l.apply(l, [s].concat(a)), but faster.
+        // FUTURE: add benchmark to justify
+        // TODO: optional exception trapping
         switch ( a.length ) {
           case 0: l(s); break;
           case 1: l(s, a[0]); break;
@@ -1067,6 +1098,7 @@ foam.CLASS({
           case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
           case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
           case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
+          default: l.apply(l, [s].concat(a));
         }
         listeners = listeners.next;
         count++;
@@ -1075,6 +1107,7 @@ foam.CLASS({
     },
 
     function hasListeners(/* args */) {
+      /** Return true iff there are listeners for the supplied message. **/
       var listeners = this.getPrivate_('listeners');
 
       for ( var i = 0 ; listeners ; i++ ) {
@@ -1087,30 +1120,42 @@ foam.CLASS({
     },
 
     /**
-      Publish a message to all matching subd listeners.
+      Publish a message to all matching sub()'ed listeners.
+      TODO: example
       Returns the number of listeners notified.
     */
-    function pub(a1, a2, a3, a4, a5, a6, a7) {
+    function pub(a1, a2, a3, a4, a5, a6, a7, a8, a9) {
       // This method prevents this function not being JIT-ed because
       // of the use of 'arguments'.  Doesn't generate any garbage.
+      // FUTURE: benchmark
       switch ( arguments.length ) {
-        case 0: return this.pub_([]);
-        case 1: return this.pub_([a1]);
-        case 2: return this.pub_([a1, a2]);
-        case 3: return this.pub_([a1, a2, a3]);
-        case 4: return this.pub_([a1, a2, a3, a4]);
-        case 5: return this.pub_([a1, a2, a3, a4, a5]);
-        case 6: return this.pub_([a1, a2, a3, a4, a5, a6]);
-        case 7: return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
+        case 0:  return this.pub_([]);
+        case 1:  return this.pub_([a1]);
+        case 2:  return this.pub_([a1, a2]);
+        case 3:  return this.pub_([a1, a2, a3]);
+        case 4:  return this.pub_([a1, a2, a3, a4]);
+        case 5:  return this.pub_([a1, a2, a3, a4, a5]);
+        case 6:  return this.pub_([a1, a2, a3, a4, a5, a6]);
+        case 7:  return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
+        case 8:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8]);
+        case 9:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8, a9]);
+        // TODO: add unit test for 10 args or above
+        default: return this.pub_(arguments);
       }
-      console.error('pub() takes at most 7 arguments.');
     },
 
     function pub_(args) {
+      /** Internal publish method, called by pub(). */
+
+      // No listeners, so return.
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
-      var count     = this.notify_(listeners.next, args);
+
+      // Notify all global listeners.
+      var count = this.notify_(listeners.next, args);
+
+      // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
         var listeners = listeners.children[args[i]];
         if ( ! listeners ) break;
@@ -1121,8 +1166,8 @@ foam.CLASS({
     },
 
     /**
-      Subscribe to pubed events.
-      args - zero or more values which specify the pattern of pubed
+      Subscribe to pub()'ed events.
+      args - zero or more values which specify the pattern of pub()'ed
              events to match.
       <p>For example:
 <pre>
@@ -1139,7 +1184,7 @@ foam.CLASS({
         its .destroy() method.
     */
     function sub() { /* args..., l */
-      var l         = arguments[arguments.length-1];
+      var l = arguments[arguments.length-1];
 
       console.assert(typeof l === 'function', 'Listener must be a function');
 
@@ -1147,16 +1192,17 @@ foam.CLASS({
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
         listeners = listeners.children[arguments[i]] ||
-        ( listeners.children[arguments[i]] = this.createListenerList_() );
+            ( listeners.children[arguments[i]] = this.createListenerList_() );
       }
 
       var node = {
         sub:  { src: this },
         next: listeners.next,
         prev: listeners,
-        l: l
+        l:    l
       };
       node.sub.destroy = function() {
+        // TODO: doc how anchor and nodes share same 'next' interface
         if ( node.next ) node.next.prev = node.prev;
         if ( node.prev ) node.prev.next = node.next;
 
@@ -1170,7 +1216,14 @@ foam.CLASS({
       return node.sub;
     },
 
-    /** Unsub a previously subd listener. */
+    // TODO: document destroyable (somewhere)
+
+    /**
+      Unsub a previously sub()'ed listener.
+      It is more efficient to unsubscribe by calling .destroy()
+      on the subscription returned from sub().
+    */
+    // TODO: remove until/when needed
     function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
@@ -1200,17 +1253,21 @@ foam.CLASS({
     },
 
     /**
-      Creates a Slot for a property.
-      @private
+      Creates a Slot for an Axiom.
     */
     function slot(name) {
-      return this.cls_.getAxiomByName(name).toSlot(this);
+      var axiom = this.cls_.getAxiomByName(name);
+
+      console.assert(axiom, 'Unknown axiom:', name);
+      console.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
+
+      return axiom.toSlot(this);
     }
   ]
 });
 
 
-/** An Array whose elements are Axioms and are added to this.axioms. */
+/** An Array whose elements are Axioms and are added to this.axioms_. */
 foam.CLASS({
   package: 'foam.core',
   name: 'AxiomArray',
@@ -1250,7 +1307,6 @@ foam.CLASS({
         foam.String.constantize(this.name),
         {
           value: this.value,
-          enumerable: false,
           configurable: false
         });
     },
@@ -1281,6 +1337,7 @@ foam.CLASS({
     }
   ],
 
+  // TODO: axiom name collision
   methods: [
     function installInClass(cls) {
       cls[this.model.name] = this.model.buildClass();
@@ -1290,13 +1347,14 @@ foam.CLASS({
       var name = this.model.name;
       var cls = proto.cls_[name];
 
+      // TODO: doc
       Object.defineProperty(proto, name, {
-        get: function requiresGetter() {
+        get: function innerClassGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
             var parent = this;
 
             var c = Object.create(cls);
-            c.create = function(args, X) { return cls.create(args, X || parent); };
+            c.create = function innerClassCreate(args, X) { return cls.create(args, X || parent); };
             this.setPrivate_(name, c);
           }
 
@@ -1309,6 +1367,7 @@ foam.CLASS({
   ]
 });
 
+// TODO: add Axioms to own files and refine 1 by 1
 
 /**
   Implements provide a delcaration of a classes intent to implement
@@ -1360,6 +1419,7 @@ foam.CLASS({
   // documentation: 'Require Class Axiom',
 
   properties: [
+    // TODO: rename 'as' to name to get Axiom conflict detection
     { name: 'name', getter: function() { return 'requires_' + this.path; } },
     'path',
     'as'
@@ -1380,7 +1440,7 @@ foam.CLASS({
               console.error('Unknown class: ' + path);
 
             var c = Object.create(cls);
-            c.create = function(args, X) { return cls.create(args, X || parent); };
+            c.create = function requiresCreate(args, X) { return cls.create(args, X || parent); };
             this.setPrivate_(as, c);
           }
 
@@ -1402,6 +1462,7 @@ foam.CLASS({
   // documentation: 'Import Context Value Axiom',
 
   properties: [
+    // TODO: renamed 'as' to 'name' for error detection
     { name: 'name', getter: function() { return 'imports_' + this.key; } },
     'key',
     'as'
@@ -1411,18 +1472,8 @@ foam.CLASS({
     function installInProto(proto) {
       var key      = this.key;
       var as       = this.as;
+      // TODO: make a property
       var slotName = this.slotName_ = as + '$';
-
-      Object.defineProperty(proto, as, {
-        get: function importsGetter() {
-          return this[slotName].get();
-        },
-        set: function importsSetter(v) {
-          this[slotName].set(v);
-        },
-        configurable: true,
-        enumerable: false
-      });
 
       Object.defineProperty(proto, slotName, {
         get: function importsGetter() {
@@ -1436,6 +1487,17 @@ foam.CLASS({
         configurable: true,
         enumerable: false
       });
+
+      Object.defineProperty(proto, as, {
+        get: function importsGetter() {
+          return this[slotName].get();
+        },
+        set: function importsSetter(v) {
+          this[slotName].set(v);
+        },
+        configurable: true,
+        enumerable: false
+      });
     },
 
     function toSlot(obj) {
@@ -1445,6 +1507,7 @@ foam.CLASS({
 });
 
 
+// TODO: move above imports
 foam.CLASS({
   package: 'foam.core',
   name: 'Exports',
@@ -1508,6 +1571,7 @@ foam.CLASS({
                 // This could be used to bind a method to 'this', for example.
                 m[b[1]] = a.exportAs ? a.exportAs(this) : this[b[0]] ;
               } else {
+                // Ex. 'as Bank', which exports an implicit 'this'
                 m[b[1]] = this;
               }
             }
@@ -1595,9 +1659,6 @@ foam.CLASS({
 
           return this.getPrivate_(name);
         },
-        set: function propSetter(newValue) {
-          this.setPrivate_(name, newValue);
-        },
         configurable: true,
         enumerable: false
       });
@@ -1613,7 +1674,7 @@ foam.CLASS({
 
   properties: [
     [ 'value', false ],
-    [ 'adapt', function(_, v) { return !!v; } ]
+    [ 'adapt', function adaptBoolean(_, v) { return !!v; } ]
   ]
 });
 
@@ -1626,9 +1687,9 @@ foam.CLASS({
   properties: [
     'units',
     [ 'value', 0 ],
-    [ 'adapt', function(_, v) {
+    [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ?
-          Math.round(v) : v ? parseInt(v) : 0 ;
+          Math.trunc(v) : v ? parseInt(v) : 0 ;
       }
     ]
   ]
@@ -1668,6 +1729,7 @@ foam.CLASS({
   name: 'Listener',
 
   properties: [
+    // TODO: doc
     'name',
     'code',
     { class: 'Boolean', name: 'isFramed',   value: false },
@@ -1697,11 +1759,15 @@ foam.CLASS({
                 code.apply(self, arguments);
               }
             };
+
+            foam.Function.setName(l, name);
+
             if ( isMerged ) {
               l = this.X.merged(l, mergeDelay);
             } else if ( isFramed ) {
               l = this.X.framed(l);
             }
+            // TODO: warn if both merged and framed.
             this.setPrivate_(name, l);
           }
 
@@ -1731,6 +1797,8 @@ foam.CLASS({
   ["Kevin", "Greer"]
 </pre>
 */
+// TODO: rename
+// TODO: check that 'id' doesn't already exist
 foam.CLASS({
   package: 'foam.core',
   name: 'Identity',
@@ -1739,8 +1807,9 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var ids  = this.ids.map(function(id) {
+      var ids = this.ids.map(function(id) {
         var prop = cls.getAxiomByName(id);
+        // TODO: assert prop is Property
         if ( ! prop ) {
           console.error('Unknown ids property:', cls.id + '.' + id);
         }
@@ -1776,6 +1845,7 @@ foam.CLASS({
 
     function installInProto(proto) {
       var ID = proto.cls_.ID;
+      // FUTURE: install a real property with propertyChange support
       Object.defineProperty(proto, 'id', {
         get: function() { return ID.get(this); },
         set: function(id) { ID.set(this, id); }
@@ -1845,6 +1915,7 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'InnerClass',
       name: 'classes',
+      // TODO: is this needed?
       adaptArrayElement: function(o) {
         return foam.core.InnerClass.isInstance(o) ?
           o :
@@ -1907,6 +1978,7 @@ foam.CLASS({
           m.code = o;
           return m;
         }
+        // TODO: check that not already a Method
         return foam.core.Method.create(o);
       }
     },
@@ -1919,6 +1991,7 @@ foam.CLASS({
           console.assert(o.name, 'Listener must be named');
           return foam.core.Listener.create({name: o.name, code: o});
         }
+        // TODO: check that not already a Listener
         return foam.core.Listener.create(o);
       }
     }
@@ -1948,6 +2021,7 @@ foam.CLASS({
                 this.setPrivate_('X', x = ySource.Y || ySource.X);
                 this.setPrivate_('ySource', undefined);
               } else {
+                // TODO: Why isn't this an error?
                 // console.error('Missing X in ', this.cls_.id);
                 return undefined;
               }
