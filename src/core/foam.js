@@ -60,6 +60,8 @@
     "events",
     "Context",
     "Boot", // Start Boot
+    "FObject",
+    "Model",
     "Property",
     "Method",
     "String",
