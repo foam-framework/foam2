@@ -40,8 +40,7 @@ foam.CLASS({
           m.code = o;
           return m;
         }
-        // TODO: check that not already a Method
-        return foam.core.Method.create(o);
+        return foam.core.Method.isInstance(o) ? o : foam.core.Method.create(o);
       }
     }
   ]
@@ -179,9 +178,7 @@ foam.CLASS({
       }
 
       this.destroyed = true;
-
-      this.instance_ = null;
-      this.private_ = null;
+      this.instance_ = this.private_ = null;
     },
 
     function toString() {
