@@ -16,7 +16,6 @@
  */
 
 foam.CLASS({
-  id: 'foam.core.Property',
   package: 'foam.core',
   name: 'Property',
   extends: 'FObject',

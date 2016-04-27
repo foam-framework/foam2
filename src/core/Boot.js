@@ -173,6 +173,7 @@ foam.LIB({
 
       // Will be replaced in phase2.
       foam.CLASS = function(m) {
+        m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
         if ( ! m.refines ) foam.register(cls);

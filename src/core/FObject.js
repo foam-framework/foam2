@@ -20,7 +20,6 @@
  *  extend FObject and inherit its methods.
  */
 foam.CLASS({
-  id: 'foam.core.FObject',
   package: 'foam.core',
   name: 'FObject',
 

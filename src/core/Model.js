@@ -17,7 +17,6 @@
 
 /** Class/Prototype description. */
 foam.CLASS({
-  id: 'foam.core.Model',
   package: 'foam.core',
   name: 'Model',
   extends: 'FObject', // Isn't the default yet.

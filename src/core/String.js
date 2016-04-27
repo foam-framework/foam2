@@ -16,7 +16,6 @@
  */
 
 foam.CLASS({
-  id: 'foam.core.String',
   package: 'foam.core',
   name: 'String',
   extends: 'Property',

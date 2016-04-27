@@ -16,7 +16,6 @@
  */
 
 foam.CLASS({
-  id: 'foam.core.Array',
   package: 'foam.core',
   name: 'Array', // TODO: rename to FObjectArray
   extends: 'Property',

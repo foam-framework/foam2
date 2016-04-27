@@ -54,7 +54,6 @@
 </pre>
 */
 foam.CLASS({
-  id: 'foam.core.Method',
   package: 'foam.core',
   name: 'Method',
   extends: 'FObject',
