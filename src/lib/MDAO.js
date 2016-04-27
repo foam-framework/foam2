@@ -70,7 +70,7 @@ foam.CLASS({
     function addIndex() {
       var props = foam.Array.argsToArray(arguments);
 
-      if ( ! this.of.ids ) {// throw "Undefined index"; // TODO: err
+      if ( ! this.of.ids ) {// throw "Undefined index"; // TODO: err?
         this.of.ids = ['id'];
       }
 
