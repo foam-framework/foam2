@@ -24,16 +24,6 @@ foam.CLASS({
   properties: [
     {
       class: 'AxiomArray',
-      of: 'Topic',
-      name: 'topics',
-      adaptArrayElement: function(o) {
-        return typeof o === 'string'        ?
-          foam.core.Topic.create({name: o}) :
-          foam.core.Topic.create(o)         ;
-      }
-    },
-    {
-      class: 'AxiomArray',
       of: 'Property',
       name: 'properties',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement

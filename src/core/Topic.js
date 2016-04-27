@@ -92,3 +92,19 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'Topic',
+      name: 'topics',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string'        ?
+          foam.core.Topic.create({name: o}) :
+          foam.core.Topic.create(o)         ;
+      }
+    }
+  ]
+});

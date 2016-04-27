@@ -66,9 +66,9 @@
     "Array",
     "PubSub", // Start Phase2
     "AxiomArray",
-    "Topic",
     "Boolean",
     "Int",
+    "Topic",
     "EndBoot", // End Boot
     "Constant",
     "InnerClass",
