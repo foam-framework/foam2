@@ -24,29 +24,6 @@ foam.CLASS({
   properties: [
     {
       class: 'AxiomArray',
-      of: 'Imports',
-      name: 'imports',
-      adaptArrayElement: function(o) {
-        if ( typeof o === 'string' ) {
-          var a = o.split(' as ');
-          var m = a[0];
-          var as = a[1] || m;
-          return foam.core.Imports.create({key: m, as: as});
-        }
-
-        return foam.core.Imports.create(o);
-      }
-    },
-    {
-      name: 'exports',
-      postSet: function(_, xs) {
-        this.axioms_.push.call(
-          this.axioms_,
-          foam.core.Exports.create({bindings: xs}));
-      }
-    },
-    {
-      class: 'AxiomArray',
       of: 'Implements',
       name: 'implements',
       adaptArrayElement: function(o) {
