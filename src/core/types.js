@@ -316,6 +316,11 @@ foam.CLASS({
   properties: [
     'of',
     {
+      // TODO: Support narrow down to sub-topics
+      class: 'StringArray',
+      name: 'topics'
+    },
+    {
       class: 'StringArray',
       name: 'delegates',
       // documentation: 'Methods that we should delegate rather than forward.'
@@ -344,6 +349,39 @@ foam.CLASS({
             Function("return this." + name + "." + m.name + ".apply(this, arguments);");
           cls.installAxiom(m);
         }.bind(this));
+
+      cls.installAxiom(foam.core.Listener.create({
+        name: 'onDelegateEvent_',
+        code: function(s, a0) {
+          var args = foam.Function.appendArguments([], arguments, 1);
+          var c = this.pub.apply(this, args);
+
+          // Destroy subscription if nobody is listening
+          if ( typeof a0 === 'string' && ! this.hasListeners(a0) ) {
+            s.destroy();
+          }
+        }
+      }));
+
+      var topics = this.topics;
+      var name = this.name;
+
+      cls.installAxiom(foam.core.Method.create({
+        name: 'sub',
+        code: function() {
+          if ( typeof arguments[0] === 'string' ) {
+            for ( var i = 0 ; i < topics.length ; i++ ) {
+              if ( topics[i] === arguments[0] ) {
+                this[name].sub(arguments[0], this.onDelegateEvent_)
+              }
+            }
+          } else {
+            this[name].sub(this.onDelegateEvent_);
+          }
+
+          return this.SUPER.apply(this, arguments);
+        }
+      }));
     }
   ]
 });
