@@ -64,3 +64,20 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'InnerClass',
+      name: 'classes',
+      // TODO: is this needed?
+      adaptArrayElement: function(o) {
+        return foam.core.InnerClass.isInstance(o) ?
+          o :
+          foam.core.InnerClass.create({model: o}) ;
+      }
+    }
+  ]
+});
