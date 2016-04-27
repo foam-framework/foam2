@@ -472,25 +472,10 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
+      topics: [
+        'on'
+      ],
       delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
-    }
-  ],
-  methods: [
-    function sub(a, b, c, d, e, f, g) {
-      if ( a === 'on' ) {
-        this.delegate.on.sub(this.onEvent);
-      }
-      return this.SUPER.apply(this, arguments);
-    }
-  ],
-  listeners: [
-    {
-      name: 'onEvent',
-      code: function(s, a, b, c, d, e, f, g) {
-        // TODO: There should be a standard method for doing this
-        // that will keep up with the maximum amount of supported pub arguments.
-        this.pub(a, b, c, d, e, f, g);
-      }
     }
   ]
 });
@@ -740,13 +725,10 @@ foam.CLASS({
       ]
     },
     {
-      name: 'delegate',
-      postSet: function(old, nu) {
-        // TODO: This should probably be inherited from ProxyDAO propertly.
-        if ( old ) old.on.unsub(this.onEvent);
-        if ( nu ) nu.on.sub(this.onEvent);
-        if ( old && nu ) this.on.reset.pub();
-      }
+      class: 'Proxy',
+      of: 'foam.dao.DAO',
+      topics: [ 'on' ],
+      name: 'delegate'
     },
     {
       name: 'promise',

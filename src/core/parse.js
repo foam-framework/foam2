@@ -1275,6 +1275,7 @@ foam.CLASS({
       expression: function(symbols) {
         var m = {};
         for ( var i = 0 ; i < symbols.length ; i++ ) {
+          if ( m[symbols[i].name] ) console.error('Duplicate symbol found', symbols[i].name);
           m[symbols[i].name] = symbols[i];
         }
         return m;
