@@ -1015,7 +1015,7 @@ foam.CLASS({
     [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
-        // TODO: assert that a is an array
+        console.assert(Array.isArray(a), 'Array required, but received:', a);
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
