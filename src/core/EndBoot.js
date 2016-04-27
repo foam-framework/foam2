@@ -116,6 +116,10 @@ foam.CLASS({
       }
     },
 
+    /**
+      Template method used to report an unknown argument passed
+      to a constructor. Is set in debug.js.
+    */
     function unknownArg(key, value) {
       // NOP
     },
