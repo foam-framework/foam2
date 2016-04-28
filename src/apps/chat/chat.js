@@ -218,6 +218,7 @@ foam.CLASS({
     'foam.dao.CachingDAO',
     'foam.dao.ArrayDAO',
     'foam.dao.IDBDAO',
+    'com.firebase.SafariFirebaseDAO',
     'com.firebase.FirebaseDAO',
     'foam.dao.TimestampDAO',
     'foam.dao.SyncDAO'
@@ -233,8 +234,14 @@ foam.CLASS({
       }
     },
     {
+      class: 'Boolean',
+      name: 'isSafari',
+      value: false
+    },
+    {
       name: 'messageDAO',
       factory: function() {
+
         var channel = document.location.search.substring(1).split('&').find(function(e) {
           return e.indexOf('channel=') === 0;
         });
@@ -244,15 +251,17 @@ foam.CLASS({
           return e.indexOf('auth=') === 0;
         });
 
-        auth = auth.substring(5);
+        auth = auth && auth.substring(5);
 
         if ( ! channel ) channel = "foam"
 
-        var dao = this.FirebaseDAO.create({
-          of: this.Message,
-          timestampProperty: this.Message.SYNC_NO,
-          apppath: 'https://glaring-torch-184.firebaseio.com/'
-        });
+        var dao = this.isSafari ?
+            this.SafariFirebaseDAO.create() :
+            this.FirebaseDAO.create();
+
+        dao.of = this.Message;
+        dao.timestampProperty = this.Message.SYNC_NO;
+        dao.apppath = 'https://glaring-torch-184.firebaseio.com/';
 
         if ( auth ) {
           dao.secret = auth;
@@ -275,7 +284,8 @@ foam.CLASS({
           syncRecordDAO: this.ArrayDAO.create({
             of: this.SyncDAO.SyncRecord
           }),
-          syncProperty: this.Message.SYNC_NO
+          syncProperty: this.Message.SYNC_NO,
+          polling: this.isSafari
         });
 
         window.addEventListener('online', function() { dao.sync(); });

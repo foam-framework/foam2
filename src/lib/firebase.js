@@ -31,6 +31,11 @@ foam.CLASS({
         return apppath + of.id.replace(/\./g, '/');
       }
     },
+    {
+      class: 'Boolean',
+      name: 'enableStreaming',
+      value: true
+    },
     'startEventsAt_'
   ],
   methods: [
@@ -126,7 +131,7 @@ foam.CLASS({
       }.bind(this));
     },
     function startEvents() {
-      if ( this.eventSource_ ) {
+      if ( this.eventSource_ || ! this.enableStreaming ) {
         return;
       }
 
@@ -296,5 +301,18 @@ foam.CLASS({
           // TODO: What does a patch even look like?
       debugger;
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.firebase',
+  name: 'SafariFirebaseDAO',
+  extends: 'com.firebase.FirebaseDAO',
+  requires: [
+    'foam.net.XHRHTTPRequest as HTTPRequest',
+    'foam.net.SafariEventSource as EventSource'
+  ],
+  properties: [
+    ['enableStreaming', false]
   ]
 });

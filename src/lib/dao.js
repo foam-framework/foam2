@@ -472,25 +472,8 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
-    }
-  ],
-  methods: [
-    function sub(a, b, c, d, e, f, g) {
-      if ( a === 'on' ) {
-        this.delegate.on.sub(this.onEvent);
-      }
-      return this.SUPER.apply(this, arguments);
-    }
-  ],
-  listeners: [
-    {
-      name: 'onEvent',
-      code: function(s, a, b, c, d, e, f, g) {
-        // TODO: There should be a standard method for doing this
-        // that will keep up with the maximum amount of supported pub arguments.
-        this.pub(a, b, c, d, e, f, g);
-      }
+      topics: [ 'on' ],
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ]
     }
   ]
 });
@@ -740,13 +723,10 @@ foam.CLASS({
       ]
     },
     {
-      name: 'delegate',
-      postSet: function(old, nu) {
-        // TODO: This should probably be inherited from ProxyDAO propertly.
-        if ( old ) old.on.unsub(this.onEvent);
-        if ( nu ) nu.on.sub(this.onEvent);
-        if ( old && nu ) this.on.reset.pub();
-      }
+      class: 'Proxy',
+      of: 'foam.dao.DAO',
+      topics: [ 'on' ],
+      name: 'delegate'
     },
     {
       name: 'promise',
@@ -789,16 +769,6 @@ foam.CLASS({
           });
         }
       ]
-    }
-  ],
-  listeners: [
-    {
-      name: 'onEvent',
-      code: function(s, a, b, c, d, e, f, g) {
-        // TODO: There should be a standard method for doing this
-        // that will keep up with the maximum amount of supported pub arguments.
-        this.pub(a, b, c, d, e, f, g);
-      }
     }
   ]
 });
@@ -848,6 +818,9 @@ foam.CLASS({
   requires: [
     'foam.mlang.Expressions'
   ],
+  imports: [
+    'setInterval'
+  ],
   properties: [
     {
       name: 'remoteDAO',
@@ -876,6 +849,16 @@ foam.CLASS({
     {
       name: 'E',
       factory: function() { return this.Expressions.create(); }
+    },
+    {
+      class: 'Boolean',
+      name: 'polling',
+      value: false
+    },
+    {
+      class: 'Int',
+      name: 'pollingFrequency',
+      value: 1000
     }
   ],
   classes: [
@@ -917,6 +900,11 @@ foam.CLASS({
   methods: [
     function init() {
       this.delegate.on.sub(this.onLocalUpdate);
+      if ( this.polling ) {
+        this.setInterval(function() {
+          this.sync();
+        }.bind(this), this.pollingFrequency);
+      }
     },
     function put(obj) {
       return this.delegate.put(obj).then(function(o) {

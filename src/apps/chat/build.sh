@@ -13,6 +13,25 @@ cat \
     ../../core/events.js \
     ../../core/Context.js \
     ../../core/Boot.js \
+    ../../core/FObject.js \
+    ../../core/Model.js \
+    ../../core/Property.js \
+    ../../core/Method.js \
+    ../../core/PubSub.js \
+    ../../core/String.js \
+    ../../core/Array.js \
+    ../../core/Boolean.js \
+    ../../core/Int.js \
+    ../../core/AxiomArray.js \
+    ../../core/EndBoot.js \
+    ../../core/Topic.js \
+    ../../core/Constant.js \
+    ../../core/InnerClass.js \
+    ../../core/Implements.js \
+    ../../core/ImportsExports.js \
+    ../../core/Listener.js \
+    ../../core/Identity.js \
+    ../../core/Requires.js \
     ../../core/Slot.js \
     ../../core/debug.js \
     ../../core/Window.js \
