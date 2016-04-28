@@ -204,6 +204,7 @@ foam.CLASS({
   ]
 });
 
+/** A library of standard Promise-style constructors */
 foam.LIB({
   name: "foam.promise",
 
@@ -258,8 +259,34 @@ foam.LIB({
         p.state = p.STATES.REJECTED;
         return p;
       },
+    },
+    {
+      name: "all",
+      code: function (/* array */ promises) {
+        var results = [];
+        var p = Promise.resolve();
+        for ( var i = 0; i < promises.length; ++i ) {
+          (function(idx) {
+            p = p.then(promises[idx].then(function(r) { results[idx] = r; }));
+          })(i);
+        }
+        return p.then(function() { return results; });
+      }
     }
   ],
 });
+
+/** Promise polyfill */
+if ( typeof Promise === 'undefined' ) {
+  var p = function Promise(exec) {
+    return foam.promise.newPromise(exec);
+  };
+  p.resolve = foam.promise.resolve;
+  p.reject = foam.promise.reject;
+  p.all = foam.promise.all;
+  global.Promise = p;
+}
+
+
 
 
