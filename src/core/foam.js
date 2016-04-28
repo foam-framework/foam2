@@ -89,6 +89,7 @@
     "parse",
     "templates",
     "Action",
+    "../lib/Promise",
     "../lib/Timer",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
