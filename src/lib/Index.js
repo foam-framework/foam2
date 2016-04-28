@@ -354,7 +354,7 @@ foam.CLASS({
       this.root = this.NullTreeNode.create({ index: this });
 
       // Only safe if children aren't themselves trees
-      // TODO: should be !TreeIndex.isInstance? or are we talking any
+      // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
       if ( this.ValueIndex.isSubClass(this.tailFactory) ) {

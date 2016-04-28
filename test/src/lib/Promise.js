@@ -15,15 +15,21 @@
  * limitations under the License.
  */
 
-describe('Run MDAO tests with mixed foam.promise/es6.Promise', function() {
-  var oldResolve, oldReject;
+describe('Run MDAO tests with foam.promise', function() {
+  var oldPromise;
 
   beforeAll(function() {
-    oldResolve = Promise.resolve;
-    oldReject = Promise.reject;
+    oldPromise = global.Promise;
 
-    Promise.resolve = foam.promise.resolve;
-    Promise.reject = foam.promise.reject;
+    // This is the node polyfill, so will not do anything if running in a
+    // verion of node without native Promise support.
+    var p = function Promise(exec) {
+      return foam.promise.newPromise(exec);
+    };
+    p.resolve = foam.promise.resolve;
+    p.reject = foam.promise.reject;
+    p.all = foam.promise.all;
+    global.Promise = p;
   });
 
   genericDAOTestBattery(function(model) {
@@ -31,8 +37,7 @@ describe('Run MDAO tests with mixed foam.promise/es6.Promise', function() {
   });
 
   afterAll(function() {
-    Promise.resolve = oldResolve;
-    Promise.reject = oldReject;
+    global.Promise = oldPromise;
   });
 });
 
