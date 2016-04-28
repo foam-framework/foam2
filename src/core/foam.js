@@ -59,6 +59,7 @@
     "stdlib",
     "events",
     "Context",
+    "AbstractClass",
     "Boot", // Start Boot
     "FObject",
     "Model",
