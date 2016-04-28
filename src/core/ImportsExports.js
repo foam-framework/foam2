@@ -23,18 +23,19 @@ foam.CLASS({
   // documentation: 'Import Context Value Axiom',
 
   properties: [
-    // TODO: renamed 'as' to 'name' for error detection
-    { name: 'name', getter: function() { return 'imports_' + this.key; } },
+    'name',
     'key',
-    'as'
+    {
+      name: 'slotName_',
+      factory: function() { return this.name + '$'; }
+    }
   ],
 
   methods: [
     function installInProto(proto) {
+      var name     = this.name;
       var key      = this.key;
-      var as       = this.as;
-      // TODO: make a property
-      var slotName = this.slotName_ = as + '$';
+      var slotName = this.slotName_;
 
       Object.defineProperty(proto, slotName, {
         get: function importsGetter() {
@@ -49,7 +50,7 @@ foam.CLASS({
         enumerable: false
       });
 
-      Object.defineProperty(proto, as, {
+      Object.defineProperty(proto, name, {
         get: function importsGetter() {
           return this[slotName].get();
         },
@@ -158,9 +159,7 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
           var a = o.split(' as ');
-          var m = a[0];
-          var as = a[1] || m;
-          return foam.core.Imports.create({key: m, as: as});
+          return foam.core.Imports.create({name: a[1] || a[0], key: a[0]});
         }
 
         return foam.core.Imports.create(o);
