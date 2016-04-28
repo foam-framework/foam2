@@ -59,18 +59,18 @@
     "stdlib",
     "events",
     "Context",
-    "Boot", // Start Boot
+    "AbstractClass",
+    "Boot",
     "FObject",
     "Model",
     "Property",
     "Method",
-    "PubSub", // Start Phase2
     "String",
     "Array",
     "Boolean",
     "Int",
     "AxiomArray",
-    "EndBoot", // End Boot
+    "EndBoot",
     "Topic",
     "Constant",
     "InnerClass",

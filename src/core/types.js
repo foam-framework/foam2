@@ -322,6 +322,10 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
+      name: 'methods'
+    },
+    {
+      class: 'StringArray',
       name: 'delegates',
       // documentation: 'Methods that we should delegate rather than forward.'
     }
@@ -336,48 +340,41 @@ foam.CLASS({
       if ( ! cls.getAxiomByName(implements.name) ) cls.installAxiom(implements);
 
       var name = this.name;
-      var methods = delegate.getAxiomsByClass(foam.core.Method)
-        .filter(function(m) {
-          // TODO This isn't the right check, but we need some sort of filter.
-          // We dont' want to proxy all FObject methods, only those defined in the interface
-          // and possibly its parent interfaces?
-          return delegate.hasOwnAxiom(m.name);
-        }).map(function(m) {
-          m = m.clone();
-          m.code = this.delegates.indexOf(m.name) == -1 ?
-            Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);") :
-            Function("return this." + name + "." + m.name + ".apply(this, arguments);");
-          cls.installAxiom(m);
-        }.bind(this));
+      var methods = ! this.methods ? [] :
+          this.methods.length ? this.methods.map(function(f) {
+            var m = delegate.getAxiomByName(f);
+            console.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
+            return m;
+          }) :
+          delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
+            // TODO This isn't the right check, but we need some sort of filter.
+            // We dont' want to proxy all FObject methods, only those defined in the interface
+            // and possibly its parent interfaces?
+            return delegate.hasOwnAxiom(m.name);
+          });
 
-      cls.installAxiom(foam.core.Listener.create({
-        name: 'onDelegateEvent_',
-        code: function(s, a0) {
-          var args = foam.Function.appendArguments([], arguments, 1);
-          var c = this.pub.apply(this, args);
+      methods = methods.forEach(function(m) {
+        m = m.clone();
+        m.code = this.delegates.indexOf(m.name) == -1 ?
+          Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);") :
+          Function("return this." + name + "." + m.name + ".apply(this, arguments);");
+        cls.installAxiom(m);
+      }.bind(this));
 
-          // Destroy subscription if nobody is listening
-          if ( typeof a0 === 'string' && ! this.hasListeners(a0) ) {
-            s.destroy();
-          }
-        }
-      }));
-
-      var topics = this.topics;
       var name = this.name;
 
       cls.installAxiom(foam.core.Method.create({
         name: 'sub',
         code: function() {
-          if ( typeof arguments[0] === 'string' ) {
-            for ( var i = 0 ; i < topics.length ; i++ ) {
-              if ( topics[i] === arguments[0] ) {
-                this[name].sub(arguments[0], this.onDelegateEvent_)
-              }
-            }
-          } else {
-            this[name].sub(this.onDelegateEvent_);
-          }
+          var innerSub = foam.Function.appendArguments([], arguments, 0);
+          var topic = innerSub.slice(0, innerSub.length-1);
+          innerSub[innerSub.length-1] = foam.Function.bind(function(s) {
+            var args = foam.Function.appendArguments([], arguments, 1);
+            var c = this.pub.apply(this, args);
+            if ( ! c ) s.destroy();
+          }, this);
+
+          this[name].sub.apply(this[name], innerSub);
 
           return this.SUPER.apply(this, arguments);
         }

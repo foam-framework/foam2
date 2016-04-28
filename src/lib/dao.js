@@ -472,10 +472,8 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      topics: [
-        'on'
-      ],
-      delegates: [ 'where', 'orderBy', 'skip', 'limit' ]
+      topics: [ 'on' ],
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ]
     }
   ]
 });
@@ -771,16 +769,6 @@ foam.CLASS({
           });
         }
       ]
-    }
-  ],
-  listeners: [
-    {
-      name: 'onEvent',
-      code: function(s, a, b, c, d, e, f, g) {
-        // TODO: There should be a standard method for doing this
-        // that will keep up with the maximum amount of supported pub arguments.
-        this.pub(a, b, c, d, e, f, g);
-      }
     }
   ]
 });
