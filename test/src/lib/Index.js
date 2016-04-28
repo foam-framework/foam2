@@ -54,6 +54,7 @@ describe('MDAO TreeIndex', function() {
 
   var AlbumDAO, PhotoDAO, PhotoDetailDAO, albums, photos;
   var NOW = 1461778131578; // reasonable Date.now() substitute
+  var MS_PER_DAY = 1000*60*60*24;
 
   albums = foam.dao.ArrayDAO.create();
   photos = foam.dao.ArrayDAO.create();
@@ -63,7 +64,7 @@ describe('MDAO TreeIndex', function() {
         id: ""+i,
         isLocal: !! ( i % 2 ),
         byAction: !! ( 1 - (i % 2) ),
-        timestamp: new Date( ( NOW - 1000*60*60*24 * 300 ) + (1 - i/NUM_ALBUMS) * 1000*60*60*24 * 300),
+        timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_ALBUMS) * MS_PER_DAY * 300),
         jspb: [ 'nothing!' ],
       })
     );
@@ -72,7 +73,7 @@ describe('MDAO TreeIndex', function() {
     photos.put(
       test.Photo.create({
         id: ""+i,
-        timestamp: new Date( ( NOW - 1000*60*60*24 * 300 ) + (1 - i/NUM_PHOTOS) * 1000*60*60*24 * 300),
+        timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_PHOTOS) * MS_PER_DAY * 300),
         isLocal: !! ( i % 2 ),
         byAction: !! ( 1 - (i % 2) ),
         albumId: ""+(i % NUM_ALBUMS),
@@ -168,7 +169,7 @@ describe('MDAO TreeIndex', function() {
 
   it ('orders and filters gt/desc', function(done) {
     var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - 1000*60*60*24 * 10;
+    var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.GT(test.Photo.TIMESTAMP, cutOff))
@@ -177,7 +178,7 @@ describe('MDAO TreeIndex', function() {
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime() > cutOff).toEqual(true);
+          expect(prev.timestamp.getTime()).toBeGreaterThan(cutOff);
           prev = a[i];
         }
       }).then(done);
@@ -185,7 +186,7 @@ describe('MDAO TreeIndex', function() {
 
   it ('orders and filters gt/asc', function(done) {
     var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - 1000*60*60*24 * 10;
+    var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.GT(test.Photo.TIMESTAMP, cutOff))
@@ -194,7 +195,7 @@ describe('MDAO TreeIndex', function() {
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime() > cutOff).toEqual(true);
+          expect(prev.timestamp.getTime()).toBeGreaterThan(cutOff);
           prev = a[i];
         }
       }).then(done);
@@ -202,7 +203,7 @@ describe('MDAO TreeIndex', function() {
 
   it ('orders and filters lt/desc', function(done) {
     var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - 1000*60*60*24 * 10;
+    var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.LT(test.Photo.TIMESTAMP, cutOff))
@@ -211,7 +212,7 @@ describe('MDAO TreeIndex', function() {
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime() < cutOff).toEqual(true);
+          expect(prev.timestamp.getTime()).toBeLessThan(cutOff);
           prev = a[i];
         }
       }).then(done);
@@ -219,7 +220,7 @@ describe('MDAO TreeIndex', function() {
 
   it ('orders and filters lt/asc', function(done) {
     var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - 1000*60*60*24 * 10;
+    var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.LT(test.Photo.TIMESTAMP, cutOff))
@@ -228,7 +229,7 @@ describe('MDAO TreeIndex', function() {
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime() < cutOff).toEqual(true);
+          expect(prev.timestamp.getTime()).toBeLessThan(cutOff);
           prev = a[i];
         }
       }).then(done);
