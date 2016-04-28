@@ -65,7 +65,6 @@
     "Model",
     "Property",
     "Method",
-    "PubSub", // Start Phase2
     "String",
     "Array",
     "Boolean",
