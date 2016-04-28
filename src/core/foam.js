@@ -60,7 +60,7 @@
     "events",
     "Context",
     "AbstractClass",
-    "Boot", // Start Boot
+    "Boot",
     "FObject",
     "Model",
     "Property",
@@ -70,7 +70,7 @@
     "Boolean",
     "Int",
     "AxiomArray",
-    "EndBoot", // End Boot
+    "EndBoot",
     "Topic",
     "Constant",
     "InnerClass",
