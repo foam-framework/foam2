@@ -410,6 +410,9 @@ foam.CLASS({
             end['setUTC' + ops[i]](val);
           }
 
+          start.setUTCMilliseconds(0);
+          end.setUTCMilliseconds(0);
+
           // start and end are currently clones of each other. We bump the last
           // portion of the date and set it in end.
           var last = Math.floor(v.length / 2);
