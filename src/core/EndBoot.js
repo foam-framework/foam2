@@ -79,6 +79,9 @@ foam.CLASS({
             }
           }
         });
+
+        // If no delcared exports, then sub-context is the same as context.
+        Object.defineProperty(p, 'Y', { get: function() { return this.X; } });
       }
     }
   ],
