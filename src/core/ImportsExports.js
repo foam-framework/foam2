@@ -51,12 +51,8 @@ foam.CLASS({
       });
 
       Object.defineProperty(proto, name, {
-        get: function importsGetter() {
-          return this[slotName].get();
-        },
-        set: function importsSetter(v) {
-          this[slotName].set(v);
-        },
+        get: function importsGetter()  { return this[slotName].get(); },
+        set: function importsSetter(v) { this[slotName].set(v); },
         configurable: true,
         enumerable: false
       });
@@ -69,7 +65,6 @@ foam.CLASS({
 });
 
 
-// TODO: move above imports
 foam.CLASS({
   package: 'foam.core',
   name: 'Exports',
@@ -84,25 +79,25 @@ foam.CLASS({
         for ( var i = 0 ; i < bs.length ; i++ ) {
           var b = bs[i];
           if ( typeof b === 'string' ) {
-            var key, as, a = b.split(' ');
+            var key, name, a = b.split(' ');
             switch ( a.length ) {
               case 1:
-                key = as = a[0];
+                key = name = a[0];
               break;
               case 2:
                 console.assert(a[0] === 'as', 'Invalid export syntax: key [as value] | as value');
-                key = null;
-                as  = a[1]; // signifies 'this'
+                name = a[1]; // signifies 'this'
+                key  = null;
               break;
               case 3:
                 console.assert(a[1] === 'as', 'Invalid export syntax: key [as value] | as value');
-                key = a[0];
-                as  = a[2];
+                name = a[2];
+                key  = a[0];
               break;
               default:
                 console.error('Invalid export syntax: key [as value] | as value');
             }
-            bs[i] = [ key, as ];
+            bs[i] = { name: name, key: key };
           }
         }
         return bs;
@@ -122,19 +117,23 @@ foam.CLASS({
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
 
-              if ( b[0] ) {
-                var a = this.cls_.getAxiomByName(b[0]);
+              if ( b.key ) {
+                var a = this.cls_.getAxiomByName(b.key);
 
                 if ( ! a ) {
-                  console.error('Unknown export: "' + b[0] + '" in model: ' + this.cls_.id);
+                  console.error(
+                    'Unknown export: "' +
+                      b.key +
+                      '" in model: ' +
+                      this.cls_.id);
                 }
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
-                m[b[1]] = a.exportAs ? a.exportAs(this) : this[b[0]] ;
+                m[b.name] = a.exportAs ? a.exportAs(this) : this[b.key] ;
               } else {
                 // Ex. 'as Bank', which exports an implicit 'this'
-                m[b[1]] = this;
+                m[b.name] = this;
               }
             }
             this.setPrivate_('Y', X.subContext(m));
@@ -148,6 +147,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',
