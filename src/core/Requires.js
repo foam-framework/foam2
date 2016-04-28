@@ -21,21 +21,16 @@ foam.CLASS({
 
   // documentation: 'Require Class Axiom',
 
-  properties: [
-    // TODO: rename 'as' to name to get Axiom conflict detection
-    { name: 'name', getter: function() { return 'requires_' + this.path; } },
-    'path',
-    'as'
-  ],
+  properties: [ 'name', 'path' ],
 
   methods: [
     function installInProto(proto) {
+      var name = this.name;
       var path = this.path;
-      var as   = this.as;
 
-      Object.defineProperty(proto, as, {
+      Object.defineProperty(proto, name, {
         get: function requiresGetter() {
-          if ( ! this.hasOwnPrivate_(as) ) {
+          if ( ! this.hasOwnPrivate_(name) ) {
             var cls    = foam.lookup(path);
             var parent = this;
 
@@ -44,10 +39,10 @@ foam.CLASS({
 
             var c = Object.create(cls);
             c.create = function requiresCreate(args, X) { return cls.create(args, X || parent); };
-            this.setPrivate_(as, c);
+            this.setPrivate_(name, c);
           }
 
-          return this.getPrivate_(as);
+          return this.getPrivate_(name);
         },
         configurable: true,
         enumerable: false
@@ -65,11 +60,11 @@ foam.CLASS({
       name: 'requires',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var a = o.split(' as ');
-          var m = a[0];
-          var path = m.split('.');
-          var as = a[1] || path[path.length-1];
-          return foam.core.Requires.create({path: m, as: as});
+          var a     = o.split(' as ');
+          var path  = a[0];
+          var parts = path.split('.');
+          var name  = a[1] || parts[parts.length-1];
+          return foam.core.Requires.create({name: name, path: path});
         }
 
         return foam.core.Requires.create(o);
