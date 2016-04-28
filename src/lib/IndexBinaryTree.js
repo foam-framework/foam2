@@ -30,7 +30,7 @@ foam.CLASS({
     { class: 'Simple', name: 'right' },
 
     { class: 'Simple', name: 'index' }, // TODO: replace with flyweight shared normal prop
-    { class: 'Simple', name: 'selectCount' },
+    { class: 'Simple', name: 'selectCount' }, // compare, dedupe, nullNode
   ],
 
   methods: [
@@ -39,7 +39,7 @@ foam.CLASS({
       this.right = this.right || this.index.nullNode;
     },
 
-    /** Flyweight constructor. By default returns a non-flyweight instance. */
+    /** Flyweight constructor */
     function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
@@ -351,7 +351,7 @@ foam.CLASS({
       property: foam.dao.index.TreeNode.INDEX
     })
   ],
-
+  // tailFactory, treeNode
   methods: [
     function init() {
       this.left  = undefined;

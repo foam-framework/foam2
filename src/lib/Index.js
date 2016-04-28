@@ -196,7 +196,7 @@ foam.CLASS({
   name: 'Index',
 
   methods: [
-    /** Flyweight constructor. By default returns a non-flyweight instance. */
+    /** Flyweight constructor */
     function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
