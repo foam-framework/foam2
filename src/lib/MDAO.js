@@ -42,22 +42,24 @@ foam.CLASS({
       required: true
     },
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'autoIndex',
       value: false
+    },
+    {
+      name: 'idIndex',
+    },
+    {
+      name: 'index',
     }
   ],
 
   methods: [
 
     function init() {
-      this.map = {};
-      // TODO(kgr): this doesn't support multi-part keys, but should (foam2: still applies!)
-      // TODO: generally sort out how .ids is supposed to work
-      this.index = this.TreeIndex.create({
-          prop: this.of.getAxiomByName(( this.of.ids && this.of.ids[0] ) || 'id' ),
-          tailFactory: this.ValueIndex
-      });
+      // adds the primary key(s) as an index, and stores it for fast find().
+      this.addIndex();
+      this.idIndex = this.index;
 
       if ( this.autoIndex ) {
         this.addRawIndex(this.AutoIndex.create({ mdao: this }));
@@ -107,6 +109,11 @@ foam.CLASS({
 
     // TODO: name 'addIndex' and renamed addIndex
     function addRawIndex(index) {
+      if ( ! this.index ) {
+        this.index = index;
+        return this;
+      }
+
       // Upgrade single Index to an AltIndex if required.
       if ( ! this.AltIndex.isInstance(this.index) ) {
         this.index = this.AltIndex.create({ delegates: [this.index] });
@@ -130,43 +137,38 @@ foam.CLASS({
         self.index.bulkLoad(a);
         for ( var i = 0; i < a.length; ++i ) {
           var obj = a[i];
-          self.map[obj.id] = obj;
         }
       });
     },
 
     function put(obj) {
-      var oldValue = this.map[obj.id];
+      var oldValue = this.find(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
         this.index.put(obj);
       } else {
         this.index.put(obj);
       }
-      this.map[obj.id] = obj;
       this.pub('on', 'put', obj);
       return Promise.resolve(obj);
-    },
-
-    function findObj_(key) {
-      var self = this;
-      return new Promise(function(resolve, reject) {
-        var obj = self.map[key];
-        // var obj = this.index.get(key);
-        if ( obj ) {
-          resolve(obj);
-        } else {
-          reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
-        }
-      });
     },
 
     function find(key) {
       if ( key === undefined ) {
         return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
       }
+      
+      if ( ! Array.isArray(key) ) key = [key];
+      var index = this.idIndex;
+      for ( var i = 0; i < key.length && index; ++i ) {
+        index = index.get(key[i]);
+      }
+      if ( index && index.get() ) return Promise.resolve(index.get());
+      
+      return Promise.reject(this.ObjectNotFoundException.create({ id: key }));
+      
       //var foundObj = null;
-      return this.findObj_(key);
+      //return this.findObj_(key);
       // TODO: How to handle multi value primary keys?
       // return new Promise(function(resolve, reject) {
 //         self.where(self.Eq.create({ arg1: self.of.getAxiomByName(
@@ -198,7 +200,6 @@ foam.CLASS({
       return this.find(id).then(
         function(obj) {
           self.index.remove(obj);
-          delete self.map[obj.id];
           self.pub('on', 'remove', obj);
           return Promise.resolve();
         },
@@ -220,7 +221,6 @@ foam.CLASS({
           var a = sink.a;
           for ( var i = 0 ; i < a.length ; i++ ) {
             self.index.remove(a[i]);
-            delete self.map[a[i].id];
             self.pub('on', 'remove', a[i]);
           }
           return Promise.resolve();
