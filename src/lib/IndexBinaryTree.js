@@ -40,7 +40,7 @@ foam.CLASS({
     },
 
     /** Flyweight constructor. By default returns a non-flyweight instance. */
-    function create(args, X) {
+    function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
       c.init && c.init();
@@ -51,7 +51,7 @@ foam.CLASS({
     function clone() {
       var c = this.__proto__.create();
       c.key   = this.key;
-      c.value = this.value
+      c.value = this.value;
       c.size  = this.size;
       c.level = this.level;
       c.left  = this.left;
@@ -166,7 +166,7 @@ foam.CLASS({
 
     function removeKeyValue(key, value) {
       var s = this.maybeClone();
-
+      var side;
       var r = this.index.compare(s.key, key);
 
       if ( r === 0 ) {
@@ -185,7 +185,7 @@ foam.CLASS({
           return this.index.nullNode;
         }
 
-        var side = s.left.level ? 'left' : 'right';
+        side = s.left.level ? 'left' : 'right';
 
         // TODO: it would be faster if successor and predecessor also deleted
         // the entry at the same time in order to prevent two traversals.
@@ -199,7 +199,7 @@ foam.CLASS({
 
         s[side] = s[side].removeNode(l.key);
       } else {
-        var side = r > 0 ? 'left' : 'right';
+        side = r > 0 ? 'left' : 'right';
 
         s.size -= s[side].size;
         s[side] = s[side].removeKeyValue(key, value);
@@ -281,11 +281,12 @@ foam.CLASS({
 
     function gte(key) {
       var s = this;
+      var copy;
       var r = this.index.compare(key, s.key);
 
       if ( r < 0 ) {
         var l = s.left.gte(key);
-        var copy = s.clone();
+        copy = s.clone();
         copy.size = s.size - s.left.size + l.size,
         copy.left = l;
         return copy;
@@ -293,7 +294,7 @@ foam.CLASS({
 
       if ( r > 0 ) return s.right.gte(key);
 
-      var copy = s.clone();
+      copy = s.clone();
       copy.size = s.size - s.left.size,
       copy.left = s.index.nullNode;
       return copy;
@@ -304,10 +305,10 @@ foam.CLASS({
       var r = this.index.compare(key, s.key);
 
       if ( r > 0 ) {
-        var r = s.right.lt(key);
+        var rt = s.right.lt(key);
         var copy = s.clone();
-        copy.size = s.size - s.right.size + r.size;
-        copy.right = r;
+        copy.size = s.size - s.right.size + rt.size;
+        copy.right = rt;
         return copy;
       }
 
@@ -318,19 +319,20 @@ foam.CLASS({
 
     function lte(key) {
       var s = this;
+      var copy;
       var r = this.index.compare(key, s.key);
 
       if ( r > 0 ) {
-        var r = s.right.lte(key);
-        var copy = s.clone();
-        copy.size = s.size - s.right.size + r.size;
-        copy.right = r;
+        var rt = s.right.lte(key);
+        copy = s.clone();
+        copy.size = s.size - s.right.size + rt.size;
+        copy.right = rt;
         return copy;
       }
 
       if ( r < 0 ) return s.right.lte(key);
 
-      var copy = s.clone();
+      copy = s.clone();
       copy.size = s.size - s.right.size;
       copy.right = s.index.nullNode;
       return copy;
@@ -377,8 +379,8 @@ foam.CLASS({
       n.level = 1;
       return n;
     },
-    function removeKeyValue(key, value) { return this; },
-    function removeNode(key) { return this; },
+    function removeKeyValue() { return this; },
+    function removeNode() { return this; },
     function select() { },
     function selectReverse() {},
 

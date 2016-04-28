@@ -32,7 +32,7 @@ var toCompare = function toCompare(c) {
 };
 /** TODO: move to stdlib */
 var CompoundComparator = function CompoundComparator() {
-  var args = argsToArray(arguments);
+  var args = foam.Array.argsToArray(arguments);
   var cs = [];
 
   // Convert objects with .compare() methods to compare functions.
@@ -42,7 +42,7 @@ var CompoundComparator = function CompoundComparator() {
   var f = function(o1, o2) {
     for ( var i = 0 ; i < cs.length ; i++ ) {
       var r = cs[i](o1, o2);
-      if ( r != 0 ) return r;
+      if ( r !== 0 ) return r;
     }
     return 0;
   };
@@ -65,7 +65,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(promise, state, sink, skip, limit, order, predicate) {},
+    function execute(/*promise, state, sink, skip, limit, order, predicate*/) {},
     function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
   ]
 });
@@ -143,7 +143,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(promise, sink, skip, limit, order, predicate) {
+    function execute(promise, sink /*, skip, limit, order, predicate*/) {
       sink.value += this.count;
     },
     function toString() {
@@ -180,9 +180,9 @@ foam.CLASS({
     },
     function toString() {
       return ( this.subPlans.length <= 1 ) ?
-        'IN(key=' + prop && prop.name + ', cost=' + this.cost + ", " +
+        'IN(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ", " +
           ', size=' + this.subPlans.length + ')' :
-        'lookup(key=' + prop && prop.name + ', cost=' + this.cost + ", " +
+        'lookup(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ", " +
           this.subPlans[0].toString();
     }
   ]
@@ -197,7 +197,7 @@ foam.CLASS({
 
   methods: [
     /** Flyweight constructor. By default returns a non-flyweight instance. */
-    function create(args, X) {
+    function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
       c.init && c.init();
@@ -205,21 +205,21 @@ foam.CLASS({
     },
 
     /** Adds or updates the given value in the index */
-    function put(value) {},
+    function put() {},
     /** Removes the given value from the index */
-    function remove(value) {},
+    function remove() {},
     /** @return a Plan to execute a select with the given parameters */
-    function plan(sink, skip, limit, order, predicate) {},
+    function plan(/*sink, skip, limit, order, predicate*/) {},
     /** @return the stored value for the given key. */
-    function get(key) {},
+    function get() {},
     /** @return the integer size of this index. */
     function size() {},
 
     /** Selects matching items from the index and puts them into sink */
-    function select(sink, skip, limit, order, predicate) { },
+    function select(/*sink, skip, limit, order, predicate*/) { },
     /** Selects matching items in reverse order from the index and puts
       them into sink */
-    function selectReverse(sink, skip, limit, order, predicate) { },
+    function selectReverse(/*sink, skip, limit, order, predicate*/) { },
   ],
 });
 
@@ -243,7 +243,7 @@ foam.CLASS({
 
   methods: [
     // from Plan (this index is its own plan)
-    function execute(promise, sink, skip, limit, order, predicate) {
+    function execute(promise, sink /*, skip, limit, order, predicate*/) {
       sink.put(this.value);
     },
 
@@ -251,8 +251,8 @@ foam.CLASS({
     function put(s) { this.value = s; },
     function remove() { this.value = undefined; },
     function plan() { return this; },
-    function get(key) { return this.value; },
-    function size() { return typeof this.value == 'undefined' ? 0 : 1; },
+    function get() { return this.value; },
+    function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function toString() { return 'value'; },
 
     function select(sink, skip, limit, order, predicate) {
@@ -406,7 +406,6 @@ foam.CLASS({
 
     function plan(sink, skip, limit, order, predicate) {
       var index = this;
-      var predicate = predicate;
 
       if ( this.False.isInstance(predicate) ) return this.NotFoundPlan.create();
 
@@ -452,6 +451,7 @@ foam.CLASS({
       // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
       // TODO:
       // }
+      var result, subPlan, cost;
 
       var arg2 = isExprMatch(this.In);
       if ( arg2 &&
@@ -459,20 +459,20 @@ foam.CLASS({
            Math.log(this.size())/Math.log(2) * arg2.length < this.size() ) {
         var keys = arg2;
         var subPlans = [];
-        var cost = 1;
+        cost = 1;
 
         for ( var i = 0 ; i < keys.length ; ++i) {
-          var result = this.get(keys[i]);
+          result = this.get(keys[i]);
 
           if ( result ) { // TODO: could refactor this subindex recursion into .plan()
-            var subPlan = result.plan(sink, skip, limit, order, predicate);
+            subPlan = result.plan(sink, skip, limit, order, predicate);
 
             cost += subPlan.cost;
             subPlans.push(subPlan);
           }
         }
 
-        if ( subPlans.length == 0 ) return this.NotFoundPlan.create();
+        if ( subPlans.length === 0 ) return this.NotFoundPlan.create();
 
         return this.AltPlan.create({
           subPlans: subPlans,
@@ -481,13 +481,13 @@ foam.CLASS({
       }
 
       arg2 = isExprMatch(this.Eq);
-      if ( arg2 != undefined ) {
+      if ( arg2 !== undefined ) {
         var key = arg2.f();
-        var result = this.get(key);
+        result = this.get(key);
 
         if ( ! result ) return this.NotFoundPlan.create();
 
-        var subPlan = result.plan(sink, skip, limit, order, predicate);
+        subPlan = result.plan(sink, skip, limit, order, predicate);
 
         return this.AltPlan.create({
           subPlans: [subPlan],
@@ -510,7 +510,7 @@ foam.CLASS({
       arg2 = isExprMatch(this.Lte);
       if ( arg2 ) subTree = subTree.lte(arg2.f());
 
-      var cost = subTree.size;
+      cost = subTree.size;
       var sortRequired = false;
       var reverseSort = false;
 
@@ -522,7 +522,7 @@ foam.CLASS({
           reverseSort = true;
         } else {
           sortRequired = true;
-          if ( cost != 0 ) cost *= Math.log(cost) / Math.log(2);
+          if ( cost !== 0 ) cost *= Math.log(cost) / Math.log(2);
         }
       }
 
@@ -542,8 +542,8 @@ foam.CLASS({
             var a = arrSink.a;
             a.sort(toCompare(order));
 
-            var skip = skip || 0;
-            var limit = Number.isFinite(limit) ? limit : a.length;
+            skip = skip || 0;
+            limit = Number.isFinite(limit) ? limit : a.length;
             limit += skip;
             limit = Math.min(a.length, limit);
 
@@ -598,7 +598,7 @@ foam.CLASS({
 
   methods: [
     // TODO: see if this can be done some other way
-    function dedup(obj, value) {
+    function dedup() {
       // NOP, not safe to do here
     },
 
@@ -624,8 +624,6 @@ foam.CLASS({
       } else {
         this.root = this.root.removeKeyValue('', value);
       }
-
-      return s;
     }
   ]
 });
@@ -699,13 +697,13 @@ foam.CLASS({
         }
       }
       //    console.log('Best Plan: ' + bestPlan);
-      if ( bestPlan == undefined ) {
+      if ( ! bestPlan ) {
         return this.NoPlan.create();
       }
       return bestPlan;
     },
 
-    function size(obj) { return this.delegates[0].size(); },
+    function size() { return this.delegates[0].size(); },
 
     function toString() {
       return 'Alt(' + this.delegates.join(',') + ')';
@@ -737,11 +735,11 @@ foam.CLASS({
 
   methods: [
 
-    function put(newValue) { },
+    function put() { },
 
-    function remove(obj) { },
+    function remove() { },
 
-    function bulkLoad(a) {
+    function bulkLoad() {
       return 'auto';
     },
 

@@ -19,10 +19,10 @@ foam.CLASS({
   package: 'foam.promise',
   name: 'IPromise',
   methods: [
-    function then(success, fail) {},
+    function then(/*success, fail*/) {},
     { name: "catch", code: function(fail) { return this.then(null, fail); } },
-    function fulfill_(v) {},
-    function reject_(e) {}
+    function fulfill_() {},
+    function reject_() {}
   ]
 });
 
@@ -86,7 +86,7 @@ foam.CLASS({
   name: 'Resolving',
   extends: 'foam.promise.Pending',
   methods: [
-    function onEnter(from) {
+    function onEnter() {
       this.resolve_(this.value);
     }
   ]
@@ -97,14 +97,14 @@ foam.CLASS({
   name: 'Fulfilled',
   implements: ['foam.promise.IPromise'],
   methods: [
-    function then(success, fail) {
+    function then(success) {
       var next = this.cls_.create();
       if ( typeof success !== "function" ) next.fulfill_(this.value);
       else next.fulfill_(success(this.value));
 
       return next;
     },
-    function fulfill_(value) {
+    function fulfill_() {
       throw new Error("Promise already fulfilled.");
     },
     function reject_(e) {
@@ -212,7 +212,7 @@ foam.LIB({
       /** Create a new Promise, equivalent to ES6 "new Promise(executor); */
       name: "newPromise",
       code: function(executor) {
-        if ( ! executor || ! typeof executor === "function" ) {
+        if ( ! ( executor && typeof executor === "function" ) ) {
           this.reject_(new TypeError("Promise created with no executor function (", executor, ")"));
         }
         var p = foam.promise.Promise.create();

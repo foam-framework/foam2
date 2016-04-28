@@ -23,6 +23,7 @@ foam.CLASS({
   name: 'MDAO',
   label: 'Indexed DAO',
   requires: [
+    'foam.core.Array',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.ObjectNotFoundException',
@@ -95,7 +96,7 @@ foam.CLASS({
         var prop = arguments[i];
 
         // TODO: the index prototype should be in the property
-        var proto = prop.type == 'Array[]' ?
+        var proto = this.Array.isInstance(prop) ?
           this.SetIndex  :
           this.TreeIndex ;
         index = proto.create({ prop: prop, tailFactory: index });
@@ -121,10 +122,10 @@ foam.CLASS({
      * Any data already loaded into this DAO will be lost.
      * @arg sink (optional) eof is called when loading is complete.
      **/
-    function bulkLoad(dao, sink) {
+    function bulkLoad(dao) {
       var self = this;
       var sink = self.ArraySink.create();
-      return dao.select(sink).then(function(s) {
+      return dao.select(sink).then(function() {
         var a = sink.a;
         self.index.bulkLoad(a);
         for ( var i = 0; i < a.length; ++i ) {
@@ -161,12 +162,10 @@ foam.CLASS({
     },
 
     function find(key) {
-      var self = this;
-      if ( key == undefined ) {
-        reject(self.InternalException.create({ id: key })); // TODO: err
-        return;
+      if ( key === undefined ) {
+        return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
       }
-      var foundObj = null;
+      //var foundObj = null;
       return this.findObj_(key);
       // TODO: How to handle multi value primary keys?
       // return new Promise(function(resolve, reject) {
@@ -231,15 +230,16 @@ foam.CLASS({
 
     function select(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
+      var plan;
 
       if ( this.Explain.isInstance(sink) ) {
-        var plan = this.index.plan(sink.arg1, skip, limit, order, predicate);
+        plan = this.index.plan(sink.arg1, skip, limit, order, predicate);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
-        return Promise.resolve(sink)
+        return Promise.resolve(sink);
       }
 
-      var plan = this.index.plan(sink, skip, limit, order, predicate);
+      plan = this.index.plan(sink, skip, limit, order, predicate);
 
       var promise = [Promise.resolve()];
       plan.execute(promise, sink, skip, limit, order, predicate);
