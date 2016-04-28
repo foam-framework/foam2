@@ -40,4 +40,3 @@ describe('Run MDAO tests with foam.promise', function() {
     global.Promise = oldPromise;
   });
 });
-

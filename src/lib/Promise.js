@@ -265,10 +265,11 @@ foam.LIB({
       code: function (/* array */ promises) {
         var results = [];
         var p = Promise.resolve();
+        function runPromise(idx) {
+          p = p.then(promises[idx].then(function(r) { results[idx] = r; }));
+        }
         for ( var i = 0; i < promises.length; ++i ) {
-          (function(idx) {
-            p = p.then(promises[idx].then(function(r) { results[idx] = r; }));
-          })(i);
+          runPromise(i);
         }
         return p.then(function() { return results; });
       }

@@ -1,13 +1,4 @@
 require("./foam.js");
-//require("es6-shim"); // Promise, Math.trunc
-
-// TODO: decide on polyfilling ourselves, or continue to use this lib
-
-/** Math.trunc polyfill */
-Math.trunc = Math.trunc || function(x) {
-  return x < 0 ? Math.ceil(x) : Math.floor(x);
-}
-
 
 /** Promise polyfill */
 if ( typeof Promise === 'undefined' ) {

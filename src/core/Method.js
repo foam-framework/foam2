@@ -113,3 +113,5 @@ foam.CLASS({
     }
   ]
 });
+
+foam.boot.phase2();

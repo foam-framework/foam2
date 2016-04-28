@@ -40,8 +40,7 @@ foam.CLASS({
           m.code = o;
           return m;
         }
-        // TODO: check that not already a Method
-        return foam.core.Method.create(o);
+        return foam.core.Method.isInstance(o) ? o : foam.core.Method.create(o);
       }
     }
   ]
@@ -80,6 +79,9 @@ foam.CLASS({
             }
           }
         });
+
+        // If no delcared exports, then sub-context is the same as context.
+        Object.defineProperty(p, 'Y', { get: function() { return this.X; } });
       }
     }
   ],
@@ -179,9 +181,7 @@ foam.CLASS({
       }
 
       this.destroyed = true;
-
-      this.instance_ = null;
-      this.private_ = null;
+      this.instance_ = this.private_ = null;
     },
 
     function toString() {
