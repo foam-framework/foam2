@@ -144,11 +144,11 @@ describe("MDAO benchmarks", function() {
       properties: [
         { name: 'id' },
         { name: 'hash' },
-        { type: 'Boolean', name: 'isLocal' },
-        { type: 'Boolean', name: 'byAction' },
-        { type: 'DateTime', name: 'timestamp' },
+        { class: 'Boolean', name: 'isLocal' },
+        { class: 'Boolean', name: 'byAction' },
+        { class: 'Date', name: 'timestamp' },
         { name: 'albumId' },
-        { type: 'Boolean', name: 'isCoverPhoto' },
+        { class: 'Boolean', name: 'isCoverPhoto' },
         { name: 'jspb', hidden: true }
       ]
     });
@@ -157,9 +157,9 @@ describe("MDAO benchmarks", function() {
       name: 'Album',
       properties: [
         { name: 'id', name: 'id' },
-        { type: 'Boolean', name: 'isLocal' },
-        { type: 'Boolean', name: 'byAction' },
-        { type: 'DateTime', name: 'timestamp' },
+        { class: 'Boolean', name: 'isLocal' },
+        { class: 'Boolean', name: 'byAction' },
+        { class: 'Date', name: 'timestamp' },
         { name: 'jspb', hidden: true }
       ],
       relationships: [
@@ -170,19 +170,8 @@ describe("MDAO benchmarks", function() {
     // Note: The 'relationships' feature is not used in these benchmarks, but to use this feature, you would do:
     // albums[0].Photos.select(console.log)
 
-    foam.CLASS({
-      model_: 'Model',
-      name: 'PhotoDetail',
-      properties: [
-        { type: 'Int', name: 'id' },
-        { name: 'photoId' },
-        { name: 'albumId' },
-        { name: 'hash' },
-        { type: 'Int', name: 'totalComments' }
-      ]
-    });
 
-    var AlbumDAO, PhotoDAO, PhotoDetailDAO;
+    var AlbumDAO, PhotoDAO;
     var albums = foam.dao.ArraySink.create();
     var photos = foam.dao.ArraySink.create();
 
@@ -203,9 +192,6 @@ describe("MDAO benchmarks", function() {
 
     //var SUM_PHOTO_COUNT = SUM({f:function(photo) { return photo.jspb[9] || 0; }});
 
-    PhotoDetailDAO = CachedIDB(foam.dao.MDAO.create({of: PhotoDetail})
-      .addIndex(PhotoDetail.PHOTO_ID)
-      .addIndex(PhotoDetail.ALBUM_ID));
     PhotoDAO = CachedIDB(foam.dao.MDAO.create({of: Photo})
     //  This index isn't worthwhile with only 10 photos / album
     //  .addRawIndex(TreeIndex.create(Photo.ALBUM_ID, mLangIndex.create(SUM_PHOTO_COUNT)))
