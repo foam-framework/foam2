@@ -258,13 +258,13 @@ describe('MDAO TreeIndex', function() {
     var asink = foam.dao.ArraySink.create();
     var lower = NOW - MS_PER_DAY * 100;
     var upper = NOW - MS_PER_DAY * 20;
-    
+
     var countSink = foam.mlang.sink.Count.create();
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
       .select(countSink);
-    
+
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
@@ -286,13 +286,13 @@ describe('MDAO TreeIndex', function() {
     var asink = foam.dao.ArraySink.create();
     var lower = NOW - MS_PER_DAY * 100;
     var upper = NOW - MS_PER_DAY * 20;
-    
+
     var countSink = foam.mlang.sink.Count.create();
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
       .select(countSink);
-    
+
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
@@ -305,6 +305,26 @@ describe('MDAO TreeIndex', function() {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
           expect(prev.timestamp.getTime()).toBeLessThan(upper);
           expect(prev.timestamp.getTime()).toBeGreaterThan(lower);
+          prev = a[i];
+        }
+      }).then(done);
+  });
+
+  it ('filters inverted range', function(done) {
+    // Pick the items NOT in the range
+    var asink = foam.dao.ArraySink.create();
+    var lower = NOW - MS_PER_DAY * 100;
+    var upper = NOW - MS_PER_DAY * 20;
+    PhotoDAO
+      .orderBy(test.Photo.TIMESTAMP)
+      .where(M.OR(M.GT(test.Photo.TIMESTAMP, upper), M.LT(test.Photo.TIMESTAMP, lower)))
+      .select(asink).then(function() {
+        var a = asink.a;
+        var prev = a[0];
+        for ( var i = 1; i < a.length; ++i ) {
+          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
+          expect(prev.timestamp.getTime() > upper ||
+                 prev.timestamp.getTime() < lower).toBe(true);
           prev = a[i];
         }
       }).then(done);
