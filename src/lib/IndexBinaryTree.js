@@ -20,6 +20,7 @@
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeNode',
+  axioms: [ foam.pattern.Flyweight.create() ],
 
   properties: [
     { class: 'Simple', name: 'key'   },
@@ -29,8 +30,8 @@ foam.CLASS({
     { class: 'Simple', name: 'left'  },
     { class: 'Simple', name: 'right' },
 
-    { class: 'Simple', name: 'index' }, // TODO: replace with flyweight shared normal prop
-    { class: 'Simple', name: 'selectCount' }, // compare, dedupe, nullNode
+    { name: 'index' }, 
+    { name: 'selectCount', value: 0 }, // compare, dedupe, nullNode
   ],
 
   methods: [
@@ -39,30 +40,10 @@ foam.CLASS({
       this.right = this.right || this.index.nullNode;
     },
 
-    /** Flyweight constructor */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
-
-    /** Nodes do a shallow clone */
-    function clone() {
-      var c = this.__proto__.create();
-      c.key   = this.key;
-      c.value = this.value;
-      c.size  = this.size;
-      c.level = this.level;
-      c.left  = this.left;
-      c.right = this.right;
-      return c;
-    },
-
     /** Clone is only needed if a select() is active in the tree at the
       same time we are updating it. */
     function maybeClone() {
-      return this.selectCount ? this.clone() : this;
+      return this.selectCount ? this.shallowCopy() : this;
     },
 
     function updateSize() {
@@ -268,7 +249,7 @@ foam.CLASS({
 
       if ( r < 0 ) {
         var l = s.left.gt(key);
-        var copy = s.clone();
+        var copy = s.shallowCopy();
         copy.size = s.size - s.left.size + l.size;
         copy.left = l;
         return copy;
@@ -286,7 +267,7 @@ foam.CLASS({
 
       if ( r < 0 ) {
         var l = s.left.gte(key);
-        copy = s.clone();
+        copy = s.shallowCopy();
         copy.size = s.size - s.left.size + l.size,
         copy.left = l;
         return copy;
@@ -294,7 +275,7 @@ foam.CLASS({
 
       if ( r > 0 ) return s.right.gte(key);
 
-      copy = s.clone();
+      copy = s.shallowCopy();
       copy.size = s.size - s.left.size,
       copy.left = s.index.nullNode;
       return copy;
@@ -306,7 +287,7 @@ foam.CLASS({
 
       if ( r > 0 ) {
         var rt = s.right.lt(key);
-        var copy = s.clone();
+        var copy = s.shallowCopy();
         copy.size = s.size - s.right.size + rt.size;
         copy.right = rt;
         return copy;
@@ -324,7 +305,7 @@ foam.CLASS({
 
       if ( r > 0 ) {
         var rt = s.right.lte(key);
-        copy = s.clone();
+        copy = s.shallowCopy();
         copy.size = s.size - s.right.size + rt.size;
         copy.right = rt;
         return copy;
@@ -332,7 +313,7 @@ foam.CLASS({
 
       if ( r < 0 ) return s.right.lte(key);
 
-      copy = s.clone();
+      copy = s.shallowCopy();
       copy.size = s.size - s.right.size;
       copy.right = s.index.nullNode;
       return copy;
@@ -345,22 +326,28 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
-  extends: 'foam.dao.index.TreeNode',
+//  extends: 'foam.dao.index.TreeNode',
   axioms: [
     foam.pattern.Multiton.create({
       property: foam.dao.index.TreeNode.INDEX
     })
   ],
+  
+  properties: [
+    {  name: 'key'   },
+    {  name: 'value' },
+    {  name: 'size', value: 0  },
+    {  name: 'level', value: 0 },
+    {  name: 'left'  },
+    {  name: 'right' },
+
+    {  name: 'index' },
+  ],
+  
   // tailFactory, treeNode
   methods: [
-    function init() {
-      this.left  = undefined;
-      this.right = undefined;
-      this.size = 0;
-      this.level = 0;
-    },
 
-    function clone() {         return this; },
+    function shallowCopy() {   return this; },
     function maybeClone() {    return this; },
     function skew() {          return this; },
     function split() {         return this; },

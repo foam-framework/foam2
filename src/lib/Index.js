@@ -196,13 +196,13 @@ foam.CLASS({
   name: 'Index',
 
   methods: [
-    /** Flyweight constructor */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
+    // /** Flyweight constructor */
+    // function create(args) {
+    //   var c = Object.create(this);
+    //   args && c.copyFrom(args);
+    //   c.init && c.init();
+    //   return c;
+    // },
 
     /** Adds or updates the given value in the index */
     function put() {},
@@ -232,6 +232,7 @@ foam.CLASS({
   implements: [
     'foam.dao.index.Plan',
   ],
+  axioms: [ foam.pattern.Flyweight.create() ],
 
   properties: [
     {
@@ -307,6 +308,7 @@ foam.CLASS({
     'foam.mlang.order.Desc',
 
   ],
+  axioms: [ foam.pattern.Flyweight.create() ],
 
   properties: [
     'prop',
@@ -636,6 +638,7 @@ foam.CLASS({
   requires: [
     'foam.dao.index.NoPlan',
   ],
+  
   constants: {
     /** Maximum cost for a plan which is good enough to not bother looking at the rest. */
     GOOD_ENOUGH_PLAN: 10 // put to 10 or more when not testing

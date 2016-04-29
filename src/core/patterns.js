@@ -152,3 +152,78 @@ foam.CLASS({
     }
   ]
 });
+
+/** Flyweight classes create instances that can create flyweight copies.
+ Properties of the main instance are shared by all the flyweight instances,
+ with the exception of Simple properties. Listeners and bindings only work
+ on the shared properties.
+<pre>
+  foam.CLASS({ 
+    name: 'MyFlyWeightClass', 
+    axioms: [ foam.pattern.Flyweight.create() ],
+    properties: [
+      { name: 'sharedProp' },
+      { name: 'perFlyProp', class: 'Simple' }
+    ]
+  });
+  // Note that you create an instance of your flyweight class first, then
+  // use it to create flyweight instances.
+  var progenitor = MyFlyWeightClass.create();
+  var fly1 = progenitor.create();
+  var fly2 = progenitor.create({ perFlyProp: 4 });
+  expect(fly1.perFlyProp).toBeUndefined();
+  expect(fly2.perFlyProp).toEqual(4);
+
+  fly1.sharedProp = 3;
+  expect(fly2.sharedProp).toEqual(3);
+
+  fly1.perFlyProp = 6;
+  fly2.perFlyProp = 8;
+  expect(fly1.perFlyProp).toEqual(6);
+  expect(fly2.perFlyProp).toEqual(8);
+
+</pre>
+*/
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'Flyweight',
+  axioms: [ foam.pattern.Singleton.create() ],
+  requires: [ 'foam.core.Method' ],
+
+  methods: [
+    function buildClone(cls) {
+      // Build a fast clone method that only looks at Simple properties,
+      // since they are the only ones that are per-flyweight-instance.
+      var cloneFn = "var c = this.__proto__.create();\n";
+      var ps = cls.getAxiomsByClass(foam.core.Simple);
+      for ( var i = 0; i < ps.length; ++i ) {
+        cloneFn += "if ( typeof this." + ps[i] + " !== 'undefined' ) c." + ps[i] + " = this." + ps[i] + ";\n";
+      }
+      cloneFn += "return c;";
+      return Function(cloneFn);
+    },
+    
+    /** Adds create(args) and shallowCopy() methods to the class. */
+    function installInClass(cls) {
+      // Assemble constructor to use a normal instance of this class
+      // as the prototype for flyweight instances.
+      cls.installAxiom(this.Method.create({
+        name: 'create',
+        code: function(args) {
+          /** Flyweight constructor. Creates a flyweight instance with a 
+            __proto__ pointing to this instance. */
+          var c = Object.create(this);
+          args && c.copyFrom(args);
+          c.init && c.init();
+          return c;
+        }
+      }));
+      
+      cls.installAxiom(this.Method.create({
+        name: 'shallowCopy',
+        code: this.buildClone(cls)
+      }));
+      
+    }
+  ]
+});
