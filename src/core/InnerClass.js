@@ -27,6 +27,10 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'name',
+      getter: function() { return this.model.name; }
+    },
+    {
       name: 'model',
       adapt: function(_, m) {
         // TODO: Not needed once we have ObjectProperties
