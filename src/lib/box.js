@@ -523,7 +523,7 @@ foam.CLASS({
         var path = s.split('.');
         return foam.core.Requires.create({
           path: s,
-          as: path[path.length - 1]
+          name: path[path.length - 1]
         });
       }).forEach(function(a) {
         cls.installAxiom(a);
@@ -535,7 +535,7 @@ foam.CLASS({
       ].map(function(s) {
         cls.installAxiom(foam.core.Imports.create({
           key: s,
-          as: s
+          name: s
         }));
       });
 
