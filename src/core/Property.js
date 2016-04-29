@@ -84,21 +84,11 @@ foam.CLASS({
       var superProp = c.__proto__.getAxiomByName(prop.name);
 
       if ( superProp ) {
-        var a = prop.cls_.getAxiomsByClass(foam.core.Property);
+        prop = prop.cls_ === foam.core.Property ?
+          superProp.clone().copyFrom(prop) :
+          prop.cls_.create().copyFrom(superProp).copyFrom(this) ;
 
-        // Walk all Properties of this Property
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          var name = a[i].name;
-
-          // Copy all Properties from my super-Property, that I don't override
-          if ( superProp.hasOwnProperty(name) && ! prop.hasOwnProperty(name) ) {
-
-            // Clone myself, so as to not modify the Model definition
-            if ( prop === this ) prop = this.clone();
-
-            prop[name] = superProp[name];
-          }
-        }
+        c.axiomMap_[prop.name] = prop;
       }
 
       var cName = foam.String.constantize(prop.name);
