@@ -9,15 +9,20 @@
     "trailing": true,
     "undef": true,
     "unused": true,
+    "shadow": true,
+    "unused": false,
 
     "proto": true,
 
     "globals": {
       "console": true,
       "describe": true,
+      "beforeEach": true,
+      "afterEach": true,
       "expect": true,
       "foam": true,
       "global": true,
-      "it": true
+      "it": true,
+      "require": true
     }
 }
