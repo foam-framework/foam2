@@ -29,8 +29,8 @@ foam.CLASS({
     { class: 'Simple', name: 'left'  },
     { class: 'Simple', name: 'right' },
 
-    { class: 'Simple', name: 'index' }, // TODO: replace with flyweight shared normal prop
-    { class: 'Simple', name: 'selectCount' }, // compare, dedupe, nullNode
+    { name: 'index' },
+    { name: 'selectCount' }, // compare, dedupe, nullNode
   ],
 
   methods: [
