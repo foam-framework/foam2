@@ -884,6 +884,30 @@ foam.CLASS({
 });
 AxiomConflict3.create();
 
+// Error if attempt to change a Property to a non-Property
+foam.CLASS({
+  name: 'AxiomChangeSuper',
+  properties: [ 'sameName' ]
+});
+foam.CLASS({
+  name: 'AxiomChangeSub',
+  extends: 'AxiomChangeSuper',
+  methods: [ function sameName() {} ]
+});
+AxiomChangeSub.create();
+
+// Warn if an Axiom changes its class
+foam.CLASS({
+  name: 'AxiomChangeSuper2',
+  methods: [ function sameName() {} ]
+});
+foam.CLASS({
+  name: 'AxiomChangeSub2',
+  extends: 'AxiomChangeSuper2',
+  properties: [ 'sameName' ]
+});
+AxiomChangeSub2.create();
+
 // Property validation, factory and value
 foam.CLASS({
   name: 'PropertyValidationTest',
@@ -1549,6 +1573,8 @@ log_(g.toHTML());
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
     console.log.json = oldLog.json;
+    console.warn = function() { log_('warn: ' + [].join.call(arguments, ' ')); };
+    console.error = function() { log_('error: ' + [].join.call(arguments, ' ')); };
     var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
     var s_ = demo.textContent.split('\n\n');

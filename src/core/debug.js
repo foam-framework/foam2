@@ -136,6 +136,32 @@ foam.AbstractClass.installModel = function() {
         ! names.hasOwnProperty(a.name),
         'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
+      var prevA    = this.getAxiomByName(a.name);
+      var Property = foam.core.Property;
+      if ( prevA && prevA.cls_ !== a.cls_ &&
+          ! ( a.cls_ === Property && Property.isSubClass(prevA.cls_) )
+      ) {
+        var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
+        var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
+
+        if ( Property.isSubClass(prevA.cls_) && ! Property.isSubClass(a.cls_) ) {
+          throw 'Illegal to change Property to non-Property: ' +
+            this.id + '.' +
+            a.name +
+            ' changed to ' +
+            aCls;
+        } else {
+          console.warn(
+            'Change of Axiom ' +
+            this.id + '.' +
+            a.name +
+            ' type from ' +
+            prevCls +
+            ' to ' +
+            aCls);
+        }
+      }
+
       names[a.name] = a;
     }
 
