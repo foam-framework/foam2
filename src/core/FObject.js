@@ -303,6 +303,151 @@ foam.CLASS({
       console.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
 
       return axiom.toSlot(this);
+    },
+
+    function equals(other) { return this.compareTo(other) === 0; },
+
+    function compareTo(other) {
+      if ( other === this ) return 0;
+
+      if ( this.model_ !== other.model_ ) {
+        return other.model_ ?
+          foam.util.compare(this.model_.id, other.model_.id) :
+          1;
+      }
+
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        var r = ps[i].compare(this, other);
+        if ( r ) return r;
+      }
+
+      return 0;
+    },
+
+    function diff(other) {
+      var diff = {};
+
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0, property ; property = ps[i] ; i++ ) {
+        var value    = property.f(this);
+        var otherVal = property.f(other);
+
+        if ( Array.isArray(value) ) {
+          var subdiff = foam.util.diff(value, otherVal);
+          if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
+            diff[property.name] = subdiff;
+          }
+          continue;
+        }
+
+        // if the primary value is undefined, use the compareTo of the other
+        if ( ! foam.util.equals(value, otherVal) ) {
+          diff[property.name] = otherVal;
+        }
+      }
+
+      return diff;
+    },
+
+    function hashCode() {
+      var hash = 17;
+
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        var prop = this[ps[i].name];
+        hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
+        hash &= hash;
+      }
+
+      return hash;
+    },
+
+    /** Create a deep copy of this object. **/
+    function clone() {
+      var m = {};
+      for ( var key in this.instance_ ) {
+        var value = this[key];
+        if ( value !== undefined ) {
+          var prop = this.cls_.getAxiomByName(key);
+          if ( prop && prop.cloneProperty )
+            prop.cloneProperty(value, m);
+          else
+            m[key] = value;
+        }
+      }
+      return this.cls_.create(m/*, this.X*/);
+    },
+
+    function copyFrom(o) {
+      // TODO: should walk through Axioms with initAgents instead
+      var a = this.cls_.getAxiomsByClass(foam.core.Property);
+
+      if ( foam.core.FObject.isInstance(o) ) {
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          var name = a[i].name;
+          if ( o.hasOwnProperty(name) ) this[name] = o[name];
+        }
+      } else {
+        for ( var i = 0 ; i < a.length ; i++ ) {
+          var name = a[i].name;
+          if ( typeof o[name] !== 'undefined' ) this[name] = o[name];
+        }
+      }
+
+      return this;
+    },
+    /**
+      Undefine a Property's value.
+      The value will revert to either the Property's 'value' or
+      'expression' value, if they're defined or undefined if they aren't.
+      A propertyChange event will be fired, even if the value doesn't change.
+    */
+    function clearProperty(name) {
+      if ( this.hasOwnProperty(name) ) {
+        var oldValue = this[name];
+        this.instance_[name] = undefined
+        this.pub('propertyChange', name, this.slot(name));
+      }
+    },
+
+    function onDestroy(dtor) {
+      /*
+        Register a function or a destroyable to be called
+        when this object is destroyed.
+      */
+      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
+      dtors.push(dtor);
+      return dtor;
+    },
+
+    function destroy() {
+      /*
+        Destroy this object.
+        Free any referenced objects and destroy any registered destroyables.
+        This object is completely unusable after being destroyed.
+       */
+      if ( this.destroyed ) return;
+
+      var dtors = this.getPrivate_('dtors');
+      if ( dtors ) {
+        for ( var i = 0 ; i < dtors.length ; i++ ) {
+          var d = dtors[i];
+          if ( typeof d === 'function' ) {
+            d();
+          } else {
+            d.destroy();
+          }
+        }
+      }
+
+      this.destroyed = true;
+      this.instance_ = this.private_ = null;
+    },
+
+    function toString() {
+      // Distinguish between prototypes and instances.
+      return this.cls_.name + (this.instance_ ? '' : 'Proto')
     }
   ]
 });
