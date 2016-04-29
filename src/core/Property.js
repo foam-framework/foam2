@@ -33,6 +33,7 @@ foam.CLASS({
     // TODO: document these properties in detail
     /* User-level help. */
     'help',
+    'hidden',
     'value',
     'factory',
     'adapt',
