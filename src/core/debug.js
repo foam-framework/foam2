@@ -26,6 +26,15 @@
  * it should not be included in production.
  */
 
+foam.assert = function assert(cond /*, args */) {
+  if ( ! cond ) {
+    var msg = Array.prototype.slice.call(arguments, 1).join(' ');
+    console.log('assert failure: ' + msg);
+    console.error(msg);
+  }
+};
+
+
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -112,6 +121,28 @@ foam.AbstractClass.describe = function(opt_name) {
   }
   console.log('\n');
 };
+
+
+// Decorate installModel() to verify that axiom names aren't duplicated.
+foam.AbstractClass.installModel = function() {
+  var superInstallModel = foam.AbstractClass.installModel;
+
+  return function(m) {
+    var names = {};
+    
+    for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
+      var a = m.axioms_[i];
+
+      foam.assert(
+        ! names.hasOwnProperty(a.name),
+        'Axiom name conflict in ', m.id || m.refines, ':', a.name);
+
+      names[a.name] = a;
+    }
+
+    superInstallModel.call(this, m);
+  };
+}();
 
 foam.AbstractClass.validate = function() {
   for ( var key in this.axiomMap_ ) {
