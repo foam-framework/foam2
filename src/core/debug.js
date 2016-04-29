@@ -29,8 +29,7 @@
 foam.assert = function assert(cond /*, args */) {
   if ( ! cond ) {
     var msg = Array.prototype.slice.call(arguments, 1).join(' ');
-    console.log('assert failure: ' + msg);
-    console.error(msg);
+    console.assert(false, msg);
   }
 };
 
@@ -129,13 +128,13 @@ foam.AbstractClass.installModel = function() {
 
   return function(m) {
     var names = {};
-    
+
     for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
       var a = m.axioms_[i];
 
       foam.assert(
         ! names.hasOwnProperty(a.name),
-        'Axiom name conflict in ', m.id || m.refines, ':', a.name);
+        'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
       names[a.name] = a;
     }

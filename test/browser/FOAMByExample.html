@@ -862,6 +862,28 @@ foam.CLASS({
   properties: [ 'firstName', 'FirstName' ]
 });
 
+// Properties must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict1',
+  properties: [ 'sameName', 'sameName' ]
+});
+AxiomConflict1.create();
+
+// Methods must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict2',
+  methods: [ function sameName() {}, function sameName() {} ]
+});
+AxiomConflict2.create();
+
+// Axioms must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict3',
+  properties: [ 'sameName' ],
+  methods: [ function sameName() {} ]
+});
+AxiomConflict3.create();
+
 // Property validation, factory and value
 foam.CLASS({
   name: 'PropertyValidationTest',
