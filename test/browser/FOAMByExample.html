@@ -590,6 +590,19 @@ foam.CLASS({
 });
 ImplementsTest2.describe();
 
+// FOAM also has Property-Inheritance.
+// Test that a sub-class Property inherits its parent Property's class
+foam.CLASS({
+  name: 'PropertyInheritA',
+  properties: [ {class: 'Boolean', name: 'sameName'} ]
+});
+foam.CLASS({
+  name: 'PropertyInheritB',
+  extends: 'PropertyInheritA',
+  properties: [ 'sameName' ]
+});
+log(PropertyInheritA.SAME_NAME.cls_.id, PropertyInheritB.SAME_NAME.cls_.id);
+
 // Classes can have inner-Classes.
 foam.CLASS({
   name: 'InnerClassTest',
