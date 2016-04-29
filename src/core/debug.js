@@ -150,7 +150,7 @@ foam.AbstractClass.installModel = function() {
             a.name +
             ' changed to ' +
             aCls;
-        } else {
+        } else if ( prevA.cls_ ) {
           console.warn(
             'Change of Axiom ' +
             this.id + '.' +
