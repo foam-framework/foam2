@@ -77,7 +77,7 @@
     "Implements",
     "ImportsExports",
     "Listener",
-    "MultiPartID",
+    "IDSupport",
     "Requires",
     "Slot",
     "debug",
