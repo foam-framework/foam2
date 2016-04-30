@@ -31,62 +31,61 @@
   ["Kevin", "Greer"]
 </pre>
 */
-// TODO: rename
-// TODO: check that 'id' doesn't already exist
+
 foam.CLASS({
   package: 'foam.core',
-  name: 'Identity',
+  name: 'MultiPartID',
+  extends: 'foam.core.Property',
 
-  properties: [ 'ids' ],
+  properties: [
+    [ 'name', 'id' ],
+    'propNames',
+    'props',
+    [ 'getter', function() {
+      var props = this.cls_.ID.props;
+
+      if ( props.length === 1 ) return props[0].get(o);
+
+      var a = new Array(props.length);
+      for ( var i = 0 ; i < props.length ; i++ ) a[i] = props[i].get(o);
+      return a;
+    }],
+    [ 'setter', function(a) {
+      var props = this.cls_.ID.props;
+
+      if ( props.length === 1 ) {
+        props[0].set(a);
+      } else {
+        for ( var i = 0 ; i < props.length ; i++ ) props[i].set(o, a[i]);
+      }
+    }],
+    [
+      'comparePropertyValues',
+      function(o1, o2) {
+        var props = this.cls_.ID.props;
+        for ( var i = 0 ; i < props.length ; i++ ) {
+          var c = props[i].compare(o1, o2);
+          if ( c ) return c;
+        }
+        return 0;
+      }
+    ]
+  ],
 
   methods: [
-    function installInClass(cls) {
-      var ids = this.ids.map(function(id) {
-        var prop = cls.getAxiomByName(id);
-        // TODO: assert prop is Property
-        if ( ! prop ) {
-          console.error('Unknown ids property:', cls.id + '.' + id);
-        }
+    function installInClass(c) {
+      this.props = this.propNames.map(function(n) {
+        var prop = c.getAxiomByName(n);
+        foam.assert(prop, 'Unknown ids property:', c.id + '.' + n);
+        foam.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
         return prop;
       });
 
-      console.assert(ids.length, 'Ids must contain at least one id.');
-
-      if ( ids.length == 1 ) {
-        console.assert(ids[0].name !== 'id', "Redundant to set ids: to just 'id'.");
-        cls.ID = ids[0];
-      } else {
-        cls.ID = {
-          name: 'ID',
-          get: function(o) {
-            var a = new Array(ids.length);
-            for ( var i = 0 ; i < ids.length ; i++ ) a[i] = ids[i].get(o);
-            return a;
-          },
-          set: function(o, a) {
-            for ( var i = 0 ; i < ids.length ; i++ ) ids[i].set(o, a[i]);
-          },
-          compare: function(o1, o2) {
-            for ( var i = 0 ; i < ids.length ; i++ ) {
-              var c = ids[i].compare(o1, o2);
-              if ( c ) return c;
-            }
-            return 0;
-          }
-        };
-      }
-    },
-
-    function installInProto(proto) {
-      var ID = proto.cls_.ID;
-      // FUTURE: install a real property with propertyChange support
-      Object.defineProperty(proto, 'id', {
-        get: function() { return ID.get(this); },
-        set: function(id) { ID.set(this, id); }
-      });
+      this.SUPER(c);
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -94,9 +93,9 @@ foam.CLASS({
     {
       name: 'ids',
       postSet: function(_, ids) {
-        this.axioms_.push.call(
-          this.axioms_,
-          foam.core.Identity.create({ids: ids}));
+        foam.assert(ids.length, 'Ids must contain at least one property.');
+
+        this.axioms_.push(foam.core.MultiPartID.create({propNames: ids}));
       }
     }
   ]
