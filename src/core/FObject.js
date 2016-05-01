@@ -84,6 +84,10 @@ foam.CLASS({
       }
     },
 
+    /************************************************
+     * Publish and Subscribe
+     ************************************************/
+
     /**
       This structure represents the head of a doubly-linked list of
       listeners. It contains 'next', a pointer to the first listener,
@@ -257,8 +261,6 @@ foam.CLASS({
       return node.sub;
     },
 
-    // TODO: document destroyable (somewhere)
-
     /**
       Unsub a previously sub()'ed listener.
       It is more efficient to unsubscribe by calling .destroy()
@@ -304,6 +306,50 @@ foam.CLASS({
 
       return axiom.toSlot(this);
     },
+
+
+    /************************************************
+     * Destruction
+     ************************************************/
+
+    function onDestroy(dtor) {
+      /*
+        Register a function or a destroyable to be called
+        when this object is destroyed.
+      */
+      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
+      dtors.push(dtor);
+      return dtor;
+    },
+
+    function destroy() {
+      /*
+        Destroy this object.
+        Free any referenced objects and destroy any registered destroyables.
+        This object is completely unusable after being destroyed.
+       */
+      if ( this.destroyed ) return;
+
+      var dtors = this.getPrivate_('dtors');
+      if ( dtors ) {
+        for ( var i = 0 ; i < dtors.length ; i++ ) {
+          var d = dtors[i];
+          if ( typeof d === 'function' ) {
+            d();
+          } else {
+            d.destroy();
+          }
+        }
+      }
+
+      this.destroyed = true;
+      this.instance_ = this.private_ = null;
+    },
+
+
+    /************************************************
+     * Utility Methods: clone, equals, hashCode, etc.
+     ************************************************/
 
     function equals(other) { return this.compareTo(other) === 0; },
 
@@ -397,6 +443,7 @@ foam.CLASS({
 
       return this;
     },
+
     /**
       Undefine a Property's value.
       The value will revert to either the Property's 'value' or
@@ -409,40 +456,6 @@ foam.CLASS({
         this.instance_[name] = undefined
         this.pub('propertyChange', name, this.slot(name));
       }
-    },
-
-    function onDestroy(dtor) {
-      /*
-        Register a function or a destroyable to be called
-        when this object is destroyed.
-      */
-      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
-      dtors.push(dtor);
-      return dtor;
-    },
-
-    function destroy() {
-      /*
-        Destroy this object.
-        Free any referenced objects and destroy any registered destroyables.
-        This object is completely unusable after being destroyed.
-       */
-      if ( this.destroyed ) return;
-
-      var dtors = this.getPrivate_('dtors');
-      if ( dtors ) {
-        for ( var i = 0 ; i < dtors.length ; i++ ) {
-          var d = dtors[i];
-          if ( typeof d === 'function' ) {
-            d();
-          } else {
-            d.destroy();
-          }
-        }
-      }
-
-      this.destroyed = true;
-      this.instance_ = this.private_ = null;
     },
 
     function toString() {
