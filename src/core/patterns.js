@@ -68,7 +68,7 @@ foam.CLASS({
       var property = this.property;
       var oldCreate = cls.create;
       cls.create = function(args) {
-        var key = args[property.name];
+        var key = args[property];
         return instances[key] || ( instances[key] = oldCreate.apply(this, arguments) );
       }
     },
