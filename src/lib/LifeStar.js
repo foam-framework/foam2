@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.demos.graphics',
   name: 'LifeStar',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   requires: [ 'foam.graphics.Arc' ],
 
@@ -12,7 +12,8 @@ foam.CLASS({
       properties: [
         { name: 'r' },
         { name: 't' },
-        { name: 'g' }
+        { name: 'g' },
+        { class: 'Float', name: 'glowRadius' }
       ],
       methods: [
         function polar3D(r, t, g) {
@@ -22,6 +23,13 @@ foam.CLASS({
         function paintSelf(x) {
           this.polar3D(this.r, this.t, this.g);
           this.SUPER(x);
+          if ( this.glowRadius ) {
+            x.globalAlpha = 0.2;
+            var oldR = this.radius;
+            this.radius = this.glowRadius;
+            this.SUPER(x);
+            this.radius = oldR;
+          }
         }
       ]
     }
@@ -31,7 +39,8 @@ foam.CLASS({
     [ 'n',  197 ],
     [ 'width', 500 ],
     [ 'height', 500 ],
-    [ 'time',   0 ]
+    [ 'time',   0 ],
+    [ 'color', 'black' ]
   ],
 
   methods: [
@@ -48,14 +57,16 @@ foam.CLASS({
         radius: 3,
         border: null,
         arcWidth: 0,
-        color: 'hsl(' + i*365/this.n + ',' + 100 + '%, 60%)'
+//        color: 'hsl(' + i*365/this.n + ',' + 100 + '%, 60%)'
       });
-      p.shadowColor = p.color;
 
       this.time$.sub(function() {
         p.t -= 0.02;
         p.g += 0.02;
-        p.shadowBlur = Math.abs(this.time % this.n -i) < 5 ? 15 : 0;
+        p.glowRadius = Math.abs(this.time % this.n - i) < 20 ? 8 : 0;
+        var bright = Math.abs(this.time % this.n - i) < 20 ? 70 : 30;
+        var sat = Math.abs(this.time % this.n - i) < 20 ? 100 : 60;
+        p.color = 'hsl(' + i*365/this.n + ',' + 100 + '%, ' + bright + '%)';
       }.bind(this));
       this.addChildren(p);
     }
