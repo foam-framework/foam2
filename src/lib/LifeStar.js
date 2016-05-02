@@ -17,7 +17,7 @@ foam.CLASS({
       ],
       methods: [
         function polar3D(r, t, g) {
-          this.x = 200 + Math.cos(t) * r;
+          this.x = 200 + Math.cos(g) * Math.cos(t) * r;
           this.y = 200 + Math.sin(t) * r;
         },
         function paintSelf(x) {
@@ -53,6 +53,7 @@ foam.CLASS({
       });
       this.time$.sub(function(_, __, ___, time$) {
         p.t -= 0.02;
+        p.g += 0.02;
       });
       this.addChildren(p);
     }
