@@ -50,6 +50,20 @@ foam.CLASS({
     },
 
     /**
+      Undefine a Property's value.
+      The value will revert to either the Property's 'value' or
+      'expression' value, if they're defined or undefined if they aren't.
+      A propertyChange event will be fired, even if the value doesn't change.
+    */
+    function clearProperty(name) {
+      if ( this.hasOwnProperty(name) ) {
+        var oldValue = this[name];
+        this.instance_[name] = undefined
+        this.pub('propertyChange', name, this.slot(name));
+      }
+    },
+
+    /**
       Private support is used to store per-object values that are not
       instance variables.  Things like listeners and topics.
     */
@@ -442,20 +456,6 @@ foam.CLASS({
       }
 
       return this;
-    },
-
-    /**
-      Undefine a Property's value.
-      The value will revert to either the Property's 'value' or
-      'expression' value, if they're defined or undefined if they aren't.
-      A propertyChange event will be fired, even if the value doesn't change.
-    */
-    function clearProperty(name) {
-      if ( this.hasOwnProperty(name) ) {
-        var oldValue = this[name];
-        this.instance_[name] = undefined
-        this.pub('propertyChange', name, this.slot(name));
-      }
     },
 
     function toString() {
