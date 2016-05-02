@@ -325,8 +325,8 @@ foam.CLASS({
       name: 'methods'
     },
     {
-      class: 'StringArray',
       name: 'delegates',
+      expression: function() { return []; }
       // documentation: 'Methods that we should delegate rather than forward.'
     }
   ],
@@ -356,7 +356,7 @@ foam.CLASS({
       methods = methods.forEach(function(m) {
         m = m.clone();
         m.code = this.delegates.indexOf(m.name) == -1 ?
-          Function("return this." + name + "." + m.name + ".apply(this.delegate, arguments);") :
+          Function("return this." + name + "." + m.name + ".apply(this." + name + ", arguments);") :
           Function("return this." + name + "." + m.name + ".apply(this, arguments);");
         cls.installAxiom(m);
       }.bind(this));
