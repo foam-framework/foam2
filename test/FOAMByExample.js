@@ -249,7 +249,7 @@ log(Test.getAxiomsByClass(foam.core.Method));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> Method,Method,Method,Method,Method,Method" });
+  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method" });
 
 
 // Example 16
@@ -758,7 +758,7 @@ a.test();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 39, str: "Deposit:  42 100 100Bank:  AccountTesterInstance of AccountAxiom Type           Name           Value----------------------------------------------------Property             id             42Property             status         trueProperty             balance        90\nDeposit:  43 100 100Bank:  AccountTesterInstance of SavingsAccountAxiom Type           Name           Value----------------------------------------------------Property             id             43Property             status         trueProperty             balance        89.95\n" });
+  expect(log_.output).toMatchGolden({ i: 39, str: "Deposit:  42 100 100Bank:  demo.bank.AccountTesterInstance of AccountAxiom Type           Name           Value----------------------------------------------------Property             id             42Property             status         trueProperty             balance        90\nDeposit:  43 100 100Bank:  demo.bank.AccountTesterInstance of SavingsAccountAxiom Type           Name           Value----------------------------------------------------Property             id             43Property             status         trueProperty             balance        89.95\n" });
 
 
 // Example 40
