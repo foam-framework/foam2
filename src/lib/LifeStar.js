@@ -10,7 +10,7 @@ foam.CLASS({
       name: 'Point',
       extends: 'foam.graphics.Circle',
       properties: [
-        [ 'radius', 3 ],
+        [ 'radius', 4 ],
         { name: 'r' },
         { name: 't' },
         { name: 'g' }
@@ -27,7 +27,7 @@ foam.CLASS({
       ]
     }
   ],
-  
+
   properties: [
     [ 'n',  197 ],
     [ 'width', 500 ],
