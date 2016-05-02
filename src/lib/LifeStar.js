@@ -10,19 +10,26 @@ foam.CLASS({
       name: 'Point',
       extends: 'foam.graphics.Circle',
       properties: [
-        [ 'radius', 3 ]
+        [ 'radius', 3 ],
+        { name: 'r' },
+        { name: 't' },
+        { name: 'g' }
       ],
       methods: [
         function polar3D(r, t, g) {
           this.x = 200 + Math.cos(t) * r;
           this.y = 200 + Math.sin(t) * r;
+        },
+        function paintSelf(x) {
+          this.polar3D(this.r, this.t, this.g);
+          this.SUPER(x);
         }
       ]
     }
   ],
   
   properties: [
-    [ 'n',  211 ],
+    [ 'n',  197 ],
     [ 'width', 500 ],
     [ 'height', 500 ],
     [ 'time',   0 ]
@@ -32,21 +39,21 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
       for ( var i = 0 ; i < this.n ; i++ ) this.addPoint(i);
+      this.tick();
     },
     function addPoint(i) {
       var p = this.Point.create({
+        r: i*200/this.n,
+        t: i*Math.PI*20/this.n,
+        g: 0,
         radius: 3,
         border: null,
         arcWidth: 0,
         color: 'hsl(' + i*365/this.n + ',' + 100 + '%, 60%)'
       });
-      p.polar3D(i*200/this.n, i*Math.PI*20/this.n, 0);  
-      /*
       this.time$.sub(function(_, __, ___, time$) {
-        arc.start += Math.cos(time$.get() / 4000) * (a+1)/100;
-        arc.end    = arc.start + Math.PI;
+        p.t -= 0.02;
       });
-      */
       this.addChildren(p);
     }
   ],
@@ -54,7 +61,11 @@ foam.CLASS({
     {
       name: 'tick',
       isFramed: true,
-      code: function() { this.time++; this.tick(); this.invalidated.pub(); }
+      code: function() {
+        this.time++;
+        this.tick();
+        this.invalidated.pub();
+      }
     }
   ]
 });
