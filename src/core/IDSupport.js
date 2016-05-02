@@ -39,6 +39,7 @@ foam.CLASS({
 
   properties: [
     [ 'name', 'id' ],
+    [ 'transient', true ],
     'propNames',
     'props',
     [ 'getter', function() {

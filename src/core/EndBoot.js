@@ -132,24 +132,27 @@ foam.CLASS({
 foam.boot.end();
 
 
-/**
- TODO:
-  - model validation
-    - abstract methods
-    - interfaces
-  - Slot map() and relate() methods
-  - more docs
-  - Axiom ordering/priority
-  - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
+foam.CLASS({
+  refines: 'foam.core.Property',
 
- ???:
-  - ? proxy label, plural from Class to Model
-
- Future:
-  - predicate support for getAxioms() methods.
-  - cascading object property change events
-  - should destroyables be a linked list for fast removal?
-    - should onDestroy be merged with listener support?
-  - multi-methods?
-  - Topic listener relay
-*/
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'transient'
+    },
+    {
+      class: 'Boolean',
+      name: 'networkTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'storageTransient',
+      expression: function(transient) {
+        return transient;
+      }
+    }
+  ]
+});
