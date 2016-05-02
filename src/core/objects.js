@@ -16,8 +16,8 @@
  */
 
 foam.CLASS({
-
   refines: 'foam.core.Property',
+
   properties: [
     {
       class: 'Boolean',
@@ -36,24 +36,6 @@ foam.CLASS({
       expression: function(transient) {
         return transient;
       }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  refines: 'foam.core.Property',
-
-  documentation: 'Add cloning to Properties.',
-
-  methods: [
-    function cloneProperty(
-      /* any // The value to clone */         value,
-      /* object // Add values to this map to
-         have them installed on the clone. */ cloneMap
-    ) {
-      /** Override to provide special deep cloning behavior. */
-      cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
     }
   ]
 });
