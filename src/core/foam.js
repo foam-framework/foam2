@@ -82,7 +82,6 @@
     "Slot",
     "debug",
     "Window",
-    "objects",
     "patterns",
     "types",
     "JSON",
