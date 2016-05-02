@@ -124,69 +124,6 @@ foam.CLASS({
     */
     function unknownArg(key, value) {
       // NOP
-    },
-
-    function copyFrom(o) {
-      // TODO: should walk through Axioms with initAgents instead
-      var a = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        var name = a[i].name;
-        if ( typeof o[name] !== 'undefined' ) this[name] = o[name];
-      }
-      return this;
-    },
-
-    /**
-      Undefine a Property's value.
-      The value will revert to either the Property's 'value' or
-      'expression' value, if they're defined or undefined if they aren't.
-      A propertyChange event will be fired, even if the value doesn't change.
-    */
-    function clearProperty(name) {
-      if ( this.hasOwnProperty(name) ) {
-        var oldValue = this[name];
-        this.instance_[name] = undefined
-        this.pub('propertyChange', name, this.slot(name));
-      }
-    },
-
-    function onDestroy(dtor) {
-      /*
-        Register a function or a destroyable to be called
-        when this object is destroyed.
-      */
-      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
-      dtors.push(dtor);
-      return dtor;
-    },
-
-    function destroy() {
-      /*
-        Destroy this object.
-        Free any referenced objects and destroy any registered destroyables.
-        This object is completely unusable after being destroyed.
-       */
-      if ( this.destroyed ) return;
-
-      var dtors = this.getPrivate_('dtors');
-      if ( dtors ) {
-        for ( var i = 0 ; i < dtors.length ; i++ ) {
-          var d = dtors[i];
-          if ( typeof d === 'function' ) {
-            d();
-          } else {
-            d.destroy();
-          }
-        }
-      }
-
-      this.destroyed = true;
-      this.instance_ = this.private_ = null;
-    },
-
-    function toString() {
-      // Distinguish between prototypes and instances.
-      return this.cls_.name + (this.instance_ ? '' : 'Proto')
     }
   ]
 });

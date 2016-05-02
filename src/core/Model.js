@@ -31,7 +31,15 @@ foam.CLASS({
       }
     },
     'package',
+    'abstract',
     'name',
+    {
+      // Just discard documentation.
+      // If it's needed, a real 'documentation' property will
+      // be refined in.
+      name: 'documentation',
+      setter: function() { }
+    },
     {
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }

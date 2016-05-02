@@ -77,7 +77,7 @@
     "Implements",
     "ImportsExports",
     "Listener",
-    "Identity",
+    "IDSupport",
     "Requires",
     "Slot",
     "debug",

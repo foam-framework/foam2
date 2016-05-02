@@ -590,6 +590,19 @@ foam.CLASS({
 });
 ImplementsTest2.describe();
 
+// FOAM also has Property-Inheritance.
+// Test that a sub-class Property inherits its parent Property's class
+foam.CLASS({
+  name: 'PropertyInheritA',
+  properties: [ {class: 'Boolean', name: 'sameName'} ]
+});
+foam.CLASS({
+  name: 'PropertyInheritB',
+  extends: 'PropertyInheritA',
+  properties: [ 'sameName' ]
+});
+log(PropertyInheritA.SAME_NAME.cls_.id, PropertyInheritB.SAME_NAME.cls_.id);
+
 // Classes can have inner-Classes.
 foam.CLASS({
   name: 'InnerClassTest',
@@ -861,6 +874,52 @@ foam.CLASS({
   name: 'ConstantConflictTest',
   properties: [ 'firstName', 'FirstName' ]
 });
+
+// Properties must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict1',
+  properties: [ 'sameName', 'sameName' ]
+});
+AxiomConflict1.create();
+
+// Methods must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict2',
+  methods: [ function sameName() {}, function sameName() {} ]
+});
+AxiomConflict2.create();
+
+// Axioms must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict3',
+  properties: [ 'sameName' ],
+  methods: [ function sameName() {} ]
+});
+AxiomConflict3.create();
+
+// Error if attempt to change a Property to a non-Property
+foam.CLASS({
+  name: 'AxiomChangeSuper',
+  properties: [ 'sameName' ]
+});
+foam.CLASS({
+  name: 'AxiomChangeSub',
+  extends: 'AxiomChangeSuper',
+  methods: [ function sameName() {} ]
+});
+AxiomChangeSub.create();
+
+// Warn if an Axiom changes its class
+foam.CLASS({
+  name: 'AxiomChangeSuper2',
+  methods: [ function sameName() {} ]
+});
+foam.CLASS({
+  name: 'AxiomChangeSub2',
+  extends: 'AxiomChangeSuper2',
+  properties: [ 'sameName' ]
+});
+AxiomChangeSub2.create();
 
 // Property validation, factory and value
 foam.CLASS({
@@ -1527,6 +1586,8 @@ log_(g.toHTML());
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
     console.log.json = oldLog.json;
+    console.warn = function() { log_('warn: ' + [].join.call(arguments, ' ')); };
+    console.error = function() { log_('error: ' + [].join.call(arguments, ' ')); };
     var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
     var s_ = demo.textContent.split('\n\n');

@@ -16,8 +16,8 @@
  */
 
 foam.CLASS({
-
   refines: 'foam.core.Property',
+
   properties: [
     {
       class: 'Boolean',
@@ -36,107 +36,6 @@ foam.CLASS({
       expression: function(transient) {
         return transient;
       }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  refines: 'foam.core.FObject',
-
-  documentation: 'Add utility methods to FObject.',
-
-  methods: [
-    function equals(other) { return this.compareTo(other) === 0; },
-
-    function compareTo(other) {
-      if ( other === this ) return 0;
-
-      if ( this.model_ !== other.model_ ) {
-        return other.model_ ?
-          foam.util.compare(this.model_.id, other.model_.id) :
-          1;
-      }
-
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var r = ps[i].compare(this, other);
-        if ( r ) return r;
-      }
-
-      return 0;
-    },
-
-    function diff(other) {
-      var diff = {};
-
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0, property ; property = ps[i] ; i++ ) {
-        var value    = property.f(this);
-        var otherVal = property.f(other);
-
-        if ( Array.isArray(value) ) {
-          var subdiff = foam.util.diff(value, otherVal);
-          if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
-            diff[property.name] = subdiff;
-          }
-          continue;
-        }
-
-        // if the primary value is undefined, use the compareTo of the other
-        if ( ! foam.util.equals(value, otherVal) ) {
-          diff[property.name] = otherVal;
-        }
-      }
-
-      return diff;
-    },
-
-    function hashCode() {
-      var hash = 17;
-
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var prop = this[ps[i].name];
-        hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
-        hash &= hash;
-      }
-
-      return hash;
-    },
-
-    /** Create a deep copy of this object. **/
-    function clone() {
-      var m = {};
-      for ( var key in this.instance_ ) {
-        var value = this[key];
-        if ( value !== undefined ) {
-          var prop = this.cls_.getAxiomByName(key);
-          if ( prop && prop.cloneProperty )
-            prop.cloneProperty(value, m);
-          else
-            m[key] = value;
-        }
-      }
-      return this.cls_.create(m/*, this.X*/);
-    },
-  ]
-});
-
-
-foam.CLASS({
-  refines: 'foam.core.Property',
-
-  documentation: 'Add cloning to Properties.',
-
-  methods: [
-    function cloneProperty(
-      /* any // The value to clone */         value,
-      /* object // Add values to this map to
-         have them installed on the clone. */ cloneMap
-    ) {
-      /** Override to provide special deep cloning behavior. */
-      cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
     }
   ]
 });

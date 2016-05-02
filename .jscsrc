@@ -3,6 +3,11 @@
   "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~"],
   "requireSpaceAfterPrefixUnaryOperators": ["!"],
   "disallowSpacesInsideParentheses": null,
+  "disallowSpacesInsideObjectBrackets": null,
+  "requireSpacesInsideObjectBrackets": "all",
+  "disallowMultipleLineBreaks": null,
+  "requireSpacesInsideArrayBrackets": "all",
+  "disallowSpacesInsideArrayBrackets": null,
   "disallowTrailingComma": true,
   "requireCurlyBraces": [
     "catch",
@@ -15,7 +20,9 @@
     mark: "'",
     escape: true
   },
-
+  "jsDoc": {
+    "checkAnnotations": "jsdoc3"
+  },
 
   "foamExplodedStatements": true,
   "foamRequireCurlyBraces": true,
