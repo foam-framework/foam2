@@ -45,19 +45,19 @@ foam.CLASS({
     [ 'getter', function() {
       var props = this.cls_.ID.props;
 
-      if ( props.length === 1 ) return props[0].get(o);
+      if ( props.length === 1 ) return props[0].get(this);
 
       var a = new Array(props.length);
-      for ( var i = 0 ; i < props.length ; i++ ) a[i] = props[i].get(o);
+      for ( var i = 0 ; i < props.length ; i++ ) a[i] = props[i].get(this);
       return a;
     }],
     [ 'setter', function(a) {
       var props = this.cls_.ID.props;
 
       if ( props.length === 1 ) {
-        props[0].set(a);
+        props[0].set(this, a);
       } else {
-        for ( var i = 0 ; i < props.length ; i++ ) props[i].set(o, a[i]);
+        for ( var i = 0 ; i < props.length ; i++ ) props[i].set(this, a[i]);
       }
     }],
     [
