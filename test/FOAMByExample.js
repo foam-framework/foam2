@@ -612,7 +612,7 @@ log(e.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 33, str: "warn: Change of Axiom Person.toString type from anonymous to foam.core.Method <b>&gt;</b> John M <b>&gt;</b> Jane F 50000" });
+  expect(log_.output).toMatchGolden({ i: 33, str: " <b>&gt;</b> John M <b>&gt;</b> Jane F 50000" });
 
 
 // Example 35
@@ -784,7 +784,7 @@ log(oldPerson.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 39, str: "warn: Change of Axiom Person.toString type from anonymous to foam.core.MethodCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringProperty             Person         salaryanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
+  expect(log_.output).toMatchGolden({ i: 39, str: "CLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringProperty             Person         salaryanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
 
 
 // Example 41
