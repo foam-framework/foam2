@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: doc
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
@@ -32,7 +33,7 @@ foam.CLASS({
     'console',
     'delayed',
     'document',
-    'dynamic',
+    // 'dynamic',
     'error',
     'framed',
     'info',
@@ -146,8 +147,10 @@ foam.CLASS({
       }(), 'framed(' + l.name + ')');
     },
 
+    /*
     function dynamic() {
     },
+    */
 
     function setTimeout(f, t) {
       return this.window.setTimeout.apply(this.window, arguments);

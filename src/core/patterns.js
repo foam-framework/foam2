@@ -78,6 +78,7 @@ foam.CLASS({
 });
 
 
+// TODO: move to lib
 /** Causes an class to pool its instances. create() will pull from the pool,
  and destroy() will return instances to the pool. Object pools can be found
  in <code>foam.__objectPools__</code>. */

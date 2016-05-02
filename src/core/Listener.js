@@ -69,7 +69,8 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(name) ) {
             var self = this;
             var l = function(sub) {
-              if ( self.destroyed ) {
+              // TODO: method isDestroyed()
+              if ( ! self.instance_ ) {
                 if ( sub ) {
                   console.warn('Destroying stale subscription for', self.cls_.id);
                   sub.destroy();

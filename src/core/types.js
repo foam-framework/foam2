@@ -30,6 +30,7 @@ foam.CLASS({
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
+          // TODO: doc, throw Exception
           return ret.toUTCString() === 'Invalid Date' ? new Date(+d) : ret;
         }
         return d;
@@ -68,6 +69,7 @@ foam.CLASS({
 });
 
 
+// TODO: add or rename to 'Double'
 foam.CLASS({
   package: 'foam.core',
   name:  'Float',
@@ -103,6 +105,7 @@ foam.CLASS({
     [
       'adapt',
       function(_, value) {
+        // TODO: doc
         if ( typeof value === 'string' ) {
           var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
           body = ( body && body[1] ) ? body[1] : value;
@@ -166,6 +169,7 @@ foam.CLASS({
     [
       'adapt',
       function(_, v, prop) {
+        // TODO: remove magic, add checking
         return Array.isArray(v) ? v :
           ( typeof v === 'string' ) ? prop.fromString(v) :
           ((v || v === 0) ? [v] : []);
@@ -175,6 +179,7 @@ foam.CLASS({
       'factory',
       function() { return []; }
     ],
+    // TODO: remove
     [
       'fromString',
       function(s) {
@@ -242,6 +247,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'EMail',
   extends: 'String',
+  // FUTURE: verify
   label: 'Email address'
 });
 
@@ -250,6 +256,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Image',
   extends: 'String',
+  // FUTURE: verify
   label: 'Image data or link'
 });
 
@@ -258,6 +265,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'URL',
   extends: 'String',
+  // FUTURE: verify
   label: 'Web link (URL or internet address)'
 });
 
@@ -286,6 +294,8 @@ foam.CLASS({
 });
 
 
+// TODO: doc
+// TODO: move somewhere else
 foam.CLASS({
   package: 'foam.core',
   name: 'Simple',
@@ -307,14 +317,14 @@ foam.CLASS({
   ]
 });
 
-
+//TODO document
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
   extends: 'Property',
 
   properties: [
-    'of',
+    { name: 'of', required: true },
     {
       // TODO: Support narrow down to sub-topics
       class: 'StringArray',

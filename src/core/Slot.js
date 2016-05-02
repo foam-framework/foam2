@@ -44,8 +44,8 @@ foam.CLASS({
 
       return {
         destroy: function() {
-          sub1.destroy();
-          sub2.destroy();
+          sub1 && sub1.destroy();
+          sub2 && sub2.destroy();
           sub1 = sub2 = null;
         }
       };
@@ -56,6 +56,7 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
+      // TODO: use foam.Function.bind() instead
       return other.sub(function() {
         this.set(other.get());
       }.bind(this));

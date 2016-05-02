@@ -61,6 +61,7 @@ foam.CLASS({
       }
     }],
     [
+      // TODO: rename to 'compare', add UnitTest
       'comparePropertyValues',
       function(o1, o2) {
         var props = this.cls_.ID.props;
