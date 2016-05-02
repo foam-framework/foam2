@@ -1616,7 +1616,7 @@ log_(g.toHTML());
         var golden = log_.output.replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/"/g, '\\"');
-        test_code += '  expect(log_.output).toMatchGolden({ i: ' + i_ + ', str: "' + golden + '" });\n';
+        test_code += '  expect(log_.output).toMatchGolden({ i: ' + ( i_ + 1 ) + ', str: "' + golden + '" });\n';
       }
       log_('');
     }
