@@ -10,7 +10,6 @@ foam.CLASS({
       name: 'Point',
       extends: 'foam.graphics.Circle',
       properties: [
-        [ 'radius', 4 ],
         { name: 'r' },
         { name: 't' },
         { name: 'g' }
@@ -51,10 +50,13 @@ foam.CLASS({
         arcWidth: 0,
         color: 'hsl(' + i*365/this.n + ',' + 100 + '%, 60%)'
       });
-      this.time$.sub(function(_, __, ___, time$) {
+      p.shadowColor = p.color;
+
+      this.time$.sub(function() {
         p.t -= 0.02;
         p.g += 0.02;
-      });
+        p.shadowBlur = Math.abs(this.time % this.n -i) < 5 ? 15 : 0;
+      }.bind(this));
       this.addChildren(p);
     }
   ],
