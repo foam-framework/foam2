@@ -75,7 +75,7 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'NotFoundPlan',
   extends: 'foam.dao.index.Plan',
-  axoims: [ foam.pattern.Singleton.create() ],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
     { name: 'cost', value: 0 }
@@ -92,7 +92,7 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'NoPlan',
   extends: 'foam.dao.index.Plan',
-  axoims: [ foam.pattern.Singleton.create() ],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
     { name: 'cost', value: Number.MAX_VALUE }
