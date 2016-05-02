@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.demos.graphics',
   name: 'LifeStar',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   requires: [ 'foam.graphics.Arc' ],
 
@@ -31,7 +31,8 @@ foam.CLASS({
     [ 'n',  197 ],
     [ 'width', 500 ],
     [ 'height', 500 ],
-    [ 'time',   0 ]
+    [ 'time',   0 ],
+    [ 'color', 'white' ]
   ],
 
   methods: [
@@ -55,7 +56,7 @@ foam.CLASS({
       this.time$.sub(function() {
         p.t -= 0.02;
         p.g += 0.02;
-        p.shadowBlur = Math.abs(this.time % this.n -i) < 5 ? 15 : 0;
+        p.shadowBlur = Math.abs(this.time % this.n -i) < 5 ? 10 : 0;
       }.bind(this));
       this.addChildren(p);
     }
