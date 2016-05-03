@@ -100,8 +100,8 @@ foam.CLASS({
       // If args are just a simple {} map, just copy
       if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
         for ( var key in args ) {
-          if ( this.cls_.getAxiomByName(key) ) {
-            // TODO: check that it is a Property
+          var a = this.cls_.getAxiomByName(key);
+          if ( a && foam.core.Property.isInstance(a) ) {
             this[key] = args[key];
           } else {
             this.unknownArg(key, args[key]);
