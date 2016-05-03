@@ -25,6 +25,7 @@
   <ul>Types of Slots include:
     <li>PropertySlot
     <li>ConstantSlot
+    <li>ExpressionSlot
 </ul>
 */
 foam.CLASS({
@@ -135,5 +136,68 @@ foam.CLASS({
     function sub(l) { /* nop */ },
 
     function unsub(l) { /* nop */ }
+  ]
+});
+
+
+/**
+  Tracks dependencies for a dynamic function and invalidates is they change.
+
+<pre>
+foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
+var p = Person.create({fname: 'John', lname: 'Smith'});
+var e = foam.core.ExpressionSlot.create({
+  args: [ p.fname$, p.lname$],
+  fn: function(f, l) { return f + ' ' + l; }
+});
+log(e.get());
+e.sub(log);
+p.fname = 'Steve';
+p.lname = 'Jones';
+log(e.get());
+</pre>
+*/
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ExpressionSlot',
+  implements: [ 'foam.core.Slot' ],
+
+  properties: [
+    'args',
+    'fn',
+    {
+      name: 'value',
+      factory: function() {
+        return this.fn.apply(this, this.args.map(function(a) {
+          return a.get();
+        }));
+      }
+    }
+  ],
+
+  methods: [
+    function init() {
+      for ( var i = 0 ; i < this.args.length ; i++ ) {
+        this.onDestroy(this.args[i].sub(this.invalidate));
+      }
+    },
+
+    function get() {
+      return this.value;
+    },
+
+    function set() { /* nop */ },
+
+    function sub(l) {
+      return this.SUPER('propertyChange', 'value', l);
+    },
+
+    function unsub(l) {
+      this.SUPER('propertyChange', 'value', l);
+    }
+  ],
+
+  listeners: [
+    function invalidate() { this.clearProperty('value'); }
   ]
 });
