@@ -49,10 +49,10 @@
         'Must have an .id property to be registered in a context.');
 
       function doRegister(cache, name) {
-// FUTURE: Re-enable when we have a good plan for unloading classes
-//        console.assert(
-//          cache.hasOwnProperty(name) === false,
-//          cls.id + ' is already registerd in this context.');
+        // FUTURE: Re-enable when we have a good plan for unloading classes
+        // console.assert(
+        //     ! cache.hasOwnProperty(name),
+        //     cls.id + ' is already registerd in this context.');
 
         cache[name] = cls;
       }
