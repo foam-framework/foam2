@@ -39,7 +39,6 @@ foam.CLASS({
     }
   ],
 
-  // TODO: axiom name collision
   methods: [
     function installInClass(cls) {
       cls[this.model.name] = this.model.buildClass();
