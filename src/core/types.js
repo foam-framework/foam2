@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.core',
-  name:  'Date',
+  name: 'Date',
   extends: 'Property',
 
   // documentation: 'Describes properties of type Date.',
@@ -101,7 +101,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name:  'Function',
+  name: 'Function',
   extends: 'Property',
 
   // documentation:  'Describes properties of type Function.',
@@ -140,7 +140,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name:  'Reference',
+  name: 'Reference',
   extends: 'Property',
 
   // documentation:  'A foreign key reference to another Entity.',
@@ -295,19 +295,6 @@ foam.CLASS({
 });
 
 
-// TODO: doc
-// TODO: move somewhere else
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Simple',
-  extends: 'Property',
-
-  methods: [
-    function installInProto(proto) {}
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Map',
@@ -317,6 +304,7 @@ foam.CLASS({
     'of'
   ]
 });
+
 
 //TODO document
 foam.CLASS({

@@ -282,3 +282,15 @@ foam.CLASS({
     }
   ]
 });
+
+
+// TODO: doc
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Simple',
+  extends: 'Property',
+
+  methods: [
+    function installInProto(proto) {}
+  ]
+});
