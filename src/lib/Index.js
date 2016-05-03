@@ -194,8 +194,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
+  extends: 'foam.core.LightWeight',
 
   methods: [
+    
     // /** Flyweight constructor */
     // function create(args) {
     //   var c = Object.create(this);
@@ -235,13 +237,15 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Simple',
-      name: 'value'
-    },
-    { name: 'cost', value: 1 },
+      class: 'Simple',  name: 'value'    },
+    { class: 'Simple',  name: 'cost', value: 1 },
   ],
 
   methods: [
+    function init() {
+      this.cost = 1;
+    },
+    
     // from Plan (this index is its own plan)
     function execute(promise, sink /*, skip, limit, order, predicate*/) {
       sink.put(this.value);
@@ -309,28 +313,20 @@ foam.CLASS({
   ],
 
   properties: [
-    'prop',
+    { 
+      class: 'Simple', name: 'prop'
+    },
     {
+      class: 'Simple',
       name: 'selectCount',
-      value: 0,
     },
     {
+      class: 'Simple',
       name: 'nullNode',
-      factory: function() {
-        console.assert(this.tailFactory, "tailFactory not set!");
-        console.assert(this.treeNodeFactory, "treeNodeFactory not set!");
-        return this.NullTreeNode.create({ 
-          tailFactory: this.tailFactory,
-          treeNodeFactory: this.treeNodeFactory
-        });
-      }
     },
     {
+      class: 'Simple',
       name: 'treeNodeFactory',
-      factory: function() {
-        var self = this;
-        return { create: function(args, X) { return self.TreeNode.create({ nullNode: self.nullNode }, X); } };
-      }
     },
     {
       class: 'Simple',
@@ -345,10 +341,26 @@ foam.CLASS({
   methods: [
     /** Initialize simple properties, since they ignore factories. */
     function init() {
+      var self = this;
+      this.selectCount = 0;
+      
+      // These were shared between each instance of the index, they should be created
+      // by the tailFactory that created this and set on this
+      this.treeNodeFactory = { 
+        create: function(args, X) { 
+          return self.TreeNode.create({ nullNode: self.nullNode }, X); 
+        }
+      };
+
+      this.nullNode = this.NullTreeNode.create({ 
+        tailFactory: this.tailFactory,
+        treeNodeFactory: this.treeNodeFactory
+      });
+          
       this.root = this.nullNode;
       
       // TODO: replace with bound methods when available 
-      this.dedup = foam.Function.bind(this.dedup, this);
+      this.dedup = this.dedup.bind(this); //foam.Function.bind(this.dedup, this);
       //this.compare = foam.Function.bind(this.compare, this);
     },
 
@@ -385,7 +397,7 @@ foam.CLASS({
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value), value, this.compare, this.dedup, this.selectCount > 0);
+      this.root = this.root.removeKeyValue(this.prop.f(value), value, this.compare, this.selectCount > 0);
     },
 
     function get(key) {
@@ -586,11 +598,11 @@ foam.CLASS({
 
   methods: [
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue, this.compare, this.dedup);
+      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue, this.compare, this.dedup, this.selectCount > 0);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value, this.compare);
+      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value, this.compare, this.selectCount > 0);
     }
   ]
 });
@@ -638,7 +650,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
-  extends: 'foam.dao.index.Index',
+  //extends: 'foam.dao.index.Index',
   requires: [
     'foam.dao.index.NoPlan',
   ],

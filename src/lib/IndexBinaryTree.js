@@ -15,11 +15,26 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'LightWeight',
+  extends: null,
+  
+  methods: [
+    function initArgs(args) { args && foam.core.FObject.prototype.copyFrom.call(this, args); },
+    function hasOwnPrivate_(name) { return typeof this[name+"___"] !== 'undefined'; },
+    function setPrivate_(name, value) { this[name+"___"] = value; },
+    function getPrivate_(name) { return this[name+"___"]; },
+    function pubPropertyChange_() {},
+  ]
+});
+
 
 /** Represents one node's state in a binary tree */
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeNode',
+  extends: 'foam.core.LightWeight',
 
   properties: [
     { class: 'Simple', name: 'key'   },
@@ -33,6 +48,7 @@ foam.CLASS({
   ],
 
   methods: [
+      
     function init() {
       this.left  = this.left  || this.nullNode;
       this.right = this.right || this.nullNode;
