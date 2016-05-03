@@ -169,3 +169,73 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
     }
   };
 } ]);
+
+angular.module('foam').directive('foamInternalInject', function() {
+  return {
+    link: function(scope, element, attrs, controller, transcludeFn) {
+      // TODO: Include error message generation here, for production.
+      var innerScope = scope.$new();
+      transcludeFn(innerScope, function(clone) {
+        element.empty();
+        element.append(clone);
+        element.on('$destroy', function() {
+          innerScope.$destroy();
+        });
+      });
+    }
+  };
+});
+
+angular.module('foam').directive('foamDaoController', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      dao: '<',
+      selection: '=',
+      controllerMode: '=',
+      label: '<'
+    },
+    transclude: true,
+    template: foam.String.multiline(function() {/*
+      <div class="foam-dao-controller">
+      <div class="foam-dao-controller-header">
+      <span class="foam-dao-controller-label">{{label}}</span>
+      <button class="foam-dao-controller-create" ng-click="doCreate()">
+      New
+      </button>
+      </div>
+      <div class="foam-dao-controller-list">
+      <div foam-repeat="dao" ng-click="doEdit(object)" foam-internal-inject>
+      </div>
+      </div>
+      </div>
+    */}),
+
+    link: function(scope) {
+      scope.doCreate = function doCreate() {
+        var obj = foam.lookup(scope.dao.of).create();
+        scope.selection = obj;
+        scope.controllerMode = 'create';
+      };
+
+      scope.doSave = function doSave() {
+        scope.dao.put(scope.selection);
+        scope.selection = null;
+        scope.controllerMode = 'none';
+      };
+
+      scope.controllerMode = 'none';
+
+      scope.doEdit = function doEdit(item) {
+        scope.controllerMode = 'edit';
+        scope.selection = item;
+      };
+
+      scope.dao.select().then(function(a) {
+        scope.array = a.a;
+        scope.$apply();
+      });
+    }
+  };
+});
+
