@@ -1490,7 +1490,7 @@ foam.CLASS({
         y: this.height / 2,
         radius: 5+a * 12 * this.width / 500,
         arcWidth: 10 * this.width / 500,
-        border: 'hsl(' + 18*a + ', 90%, 60%)'
+        border: this.hsl(18*a, 90, 60)
       }));
       this.tick();
     }
@@ -1536,7 +1536,7 @@ foam.CLASS({
         function onTick() {
           var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
-    this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
+          this.shadowColor = this.color = this.hsl(hue, 100, l);
         }
       ]
     }

@@ -59,7 +59,7 @@ foam.CLASS({
             arcWidth: 6,
             friction: 0.96,
             gravity: 0.03,
-            border: 'hsl(' + x/N*100 + ',' + (70+y/N*30) + '%, 60%)'
+            border: this.hsl(x/N*100, (70+y/N*30), 60)
           });
           this.engine.add(c);
           this.addChildren(c);
