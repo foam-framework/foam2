@@ -21,7 +21,8 @@
 // Correct load order is Angular 1.5 and FOAM 2 (either order), this library,
 // then your application module that uses Angular and this library.
 
-angular.module('foam', []).directive('foamView', ['$q', function($q) {
+/* globals angular: false */
+angular.module('foam', []).directive('foamView', function() {
   return {
     restrict: 'A',
     scope: {
@@ -30,7 +31,7 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
       key: '<foamView',
       dao: '<foamDao',
       as: '@foamAs',
-      delay: '@foamDelay',
+      delay: '@foamDelay'
     },
     priority: 2000,
     transclude: 'element',
@@ -51,7 +52,7 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
         $scope.dao.find($scope.key).then(hookUpObject);
         daoSub && daoSub.destroy();
         daoSub = $scope.dao.on.sub(function(sub, _, operation, obj) {
-          if (operation === 'reset') {
+          if ( operation === 'reset' ) {
             initialStart();
           } else if ( obj.id === $scope.key ) {
             hookUpObject(obj);
@@ -81,16 +82,17 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
       // TODO: Do I need to add something extra to destroy that scope?
     }
   };
-}])
+});
 
-.directive('foamRepeat', ['$q', '$timeout', function($q, $timeout) {
+angular.module('foam').directive('foamRepeat', [ '$timeout',
+    function($timeout) {
   return {
     restrict: 'A',
     scope: {
       // TODO: Make these one-way reactive bindings, probably.
       // Except for "as", that should just be a string.
       dao: '<foamRepeat',
-      as: '@foamAs',
+      as: '@foamAs'
     },
     priority: 20000,
     transclude: 'element',
@@ -103,7 +105,7 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
         put: onPut,
         remove: onRemove,
         reset: onReset,
-        eof: function() { },
+        eof: function() { }
       };
 
       $scope.dao.pipe(listener);
@@ -122,10 +124,9 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
 
       function onPut(obj) {
         var c = cache[obj.id];
-        if (c) {
+        if ( c ) {
           var o = c.scope[as] = obj.clone();
           $timeout(function() { c.scope.$apply(); }, 0, false);
-          //c.scope.$apply();
           attachObject(o);
           return;
         }
@@ -160,12 +161,11 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
       }
 
       function onReset() {
-        for (var id in cache) {
+        for ( var id in cache ) {
           remove(cache[id]);
         }
         cache = {};
       }
     }
   };
-}]);
-
+} ]);
