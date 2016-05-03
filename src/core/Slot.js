@@ -155,6 +155,11 @@ e.sub(log);
 p.fname = 'Steve';
 p.lname = 'Jones';
 log(e.get());
+Output:
+ > John Smith
+ > [object Object] propertyChange value [object Object]
+ > [object Object] propertyChange value [object Object]
+ > Steve Jones
 </pre>
 */
 foam.CLASS({
