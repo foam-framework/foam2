@@ -68,7 +68,7 @@ foam.CLASS({
       var property = this.property;
       var oldCreate = cls.create;
       cls.create = function(args) {
-        var key = args[property.name];
+        var key = args[property];
         return instances[key] || ( instances[key] = oldCreate.apply(this, arguments) );
       }
     },
@@ -78,6 +78,7 @@ foam.CLASS({
 });
 
 
+// TODO: move to lib
 /** Causes an class to pool its instances. create() will pull from the pool,
  and destroy() will return instances to the pool. Object pools can be found
  in <code>foam.__objectPools__</code>. */

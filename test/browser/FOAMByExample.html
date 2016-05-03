@@ -1490,7 +1490,7 @@ foam.CLASS({
         y: this.height / 2,
         radius: 5+a * 12 * this.width / 500,
         arcWidth: 10 * this.width / 500,
-        border: 'hsl(' + 18*a + ', 90%, 60%)'
+        border: this.hsl(18*a, 90, 60)
       }));
       this.tick();
     }
@@ -1536,7 +1536,7 @@ foam.CLASS({
         function onTick() {
           var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
-    this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
+          this.shadowColor = this.color = this.hsl(hue, 100, l);
         }
       ]
     }
@@ -1616,7 +1616,7 @@ log_(g.toHTML());
         var golden = log_.output.replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/"/g, '\\"');
-        test_code += '  expect(log_.output).toMatchGolden({ i: ' + i_ + ', str: "' + golden + '" });\n';
+        test_code += '  expect(log_.output).toMatchGolden({ i: ' + ( i_ + 1 ) + ', str: "' + golden + '" });\n';
       }
       log_('');
     }
@@ -1669,21 +1669,27 @@ log_(g.toHTML());
 
     unittests.push(
     'var golden = "' + golden + '";\n',
-    'var oldLog, oldAssert;\n',
+    'var oldLog, oldAssert, oldWarn, oldError;\n',
     'beforeEach(function() {\n',
     '  oldLog = console.log;\n',
     '  oldAssert = console.assert;\n',
+    '  oldWarn = console.warn;\n',
+    '  oldError = console.error;\n',
     "  console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw 'assert'; } };\n",
     "  console.log = function() { log_([].join.call(arguments, ' ')); };\n",
     '  console.log.put = console.log.bind(console);\n',
     '  console.log.str = oldLog.str;\n',
     '  console.log.json = oldLog.json;\n',
+    "  console.warn = function() { log_('warn: ' + [].join.call(arguments, ' ')); };\n",
+    "  console.error = function() { log_('error: ' + [].join.call(arguments, ' ')); };\n",
     '  log_.output = "";\n',
     '  jasmine.addMatchers(customMatchers);\n',
     '});\n\n',
     'afterEach(function() {\n',
     '  console.assert = oldAssert;\n',
     '  console.log = oldLog;\n',
+    '  console.warn = oldWarn;\n',
+    '  console.error = oldError;\n',
     '});\n\n',
     'it("", function() {\n' + test_code + '\n\n',
     '});\n});\n\n');

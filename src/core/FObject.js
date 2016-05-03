@@ -342,8 +342,9 @@ foam.CLASS({
         Free any referenced objects and destroy any registered destroyables.
         This object is completely unusable after being destroyed.
        */
-      if ( this.destroyed ) return;
+      if ( ! this.instance_ ) return;
 
+// TODO: add 'destroying' state
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
@@ -356,7 +357,6 @@ foam.CLASS({
         }
       }
 
-      this.destroyed = true;
       this.instance_ = this.private_ = null;
     },
 
@@ -376,6 +376,8 @@ foam.CLASS({
           1;
       }
 
+      // FUTURE: check 'id' first
+      // FUTURE: order properties
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var r = ps[i].compare(this, other);
@@ -385,15 +387,20 @@ foam.CLASS({
       return 0;
     },
 
+    // TODO: doc
     function diff(other) {
       var diff = {};
 
+      // TODO: assert 'other' is same class
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
         var value    = property.f(this);
         var otherVal = property.f(other);
 
+        // FUTURE: add nested Object support
+        // FUTURE: add patch() method?
         if ( Array.isArray(value) ) {
+          // TODO: use foam.Array.diff()
           var subdiff = foam.util.diff(value, otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
             diff[property.name] = subdiff;
@@ -417,7 +424,7 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var prop = this[ps[i].name];
         hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
-        hash &= hash;
+        hash &= hash; // force back to a 32-bit int
       }
 
       return hash;
@@ -430,17 +437,20 @@ foam.CLASS({
         var value = this[key];
         if ( value !== undefined ) {
           var prop = this.cls_.getAxiomByName(key);
-          if ( prop && prop.cloneProperty )
+          // TODO: is check needed?
+          if ( prop && prop.cloneProperty ) {
             prop.cloneProperty(value, m);
-          else
+          } else {
+            // TODO: is this needed?
             m[key] = value;
+          }
         }
       }
       return this.cls_.create(m/*, this.X*/);
     },
 
+    // TODO: doc
     function copyFrom(o) {
-      // TODO: should walk through Axioms with initAgents instead
       var a = this.cls_.getAxiomsByClass(foam.core.Property);
 
       if ( foam.core.FObject.isInstance(o) ) {
@@ -459,8 +469,10 @@ foam.CLASS({
     },
 
     function toString() {
+      // TODO: better test: 'this.cls_ === this'
+      // TODO: add 'Destroyed' if destroyed
       // Distinguish between prototypes and instances.
-      return this.cls_.name + (this.instance_ ? '' : 'Proto')
+      return this.cls_.id + (this.instance_ ? '' : 'Proto')
     }
   ]
 });

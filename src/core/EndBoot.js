@@ -46,7 +46,9 @@ foam.CLASS({
   ]
 });
 
+
 foam.boot.phase3();
+
 
 foam.CLASS({
   refines: 'foam.core.FObject',
@@ -99,6 +101,7 @@ foam.CLASS({
       if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
         for ( var key in args ) {
           if ( this.cls_.getAxiomByName(key) ) {
+            // TODO: check that it is a Property
             this[key] = args[key];
           } else {
             this.unknownArg(key, args[key]);
@@ -108,12 +111,14 @@ foam.CLASS({
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
         for ( var key in args.instance_ ) {
+          // TODO: check that it is a Property
           if ( this.cls_.getAxiomByName(key) ) this[key] = args[key];
         }
       }
       // Else call copyFrom(), which is the slowest version because
       // it is O(# of properties) not O(# of args)
       else {
+        // TODO: ???: How is this possible?
         this.copyFrom(args);
       }
     },
@@ -132,6 +137,7 @@ foam.CLASS({
 foam.boot.end();
 
 
+// TODO: doc
 foam.CLASS({
   refines: 'foam.core.Property',
 

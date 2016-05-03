@@ -60,7 +60,7 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
-      // TODO: Have work with 'extends'.
+      // TODO: Have work with 'refines'.
       var mName = model ? model.id + '.' : '';
 
       // List of properties which are hidden by other properties.
@@ -92,10 +92,10 @@ foam.CLASS({
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);
 
-          console.assert(
+          foam.assert(
               axiom,
               'Unknown argument "', name, '" in ', pName, expression);
-          console.assert(
+          foam.assert(
               axiom.toSlot,
               'Non-Slot argument "', name, '" in ', pName, expression);
         }
@@ -104,6 +104,8 @@ foam.CLASS({
   ]
 });
 
+
+// TODO: assert describe() not already set
 
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
@@ -151,6 +153,7 @@ foam.AbstractClass.installModel = function() {
             ' changed to ' +
             aCls;
         } else if ( prevA.cls_ ) {
+          // FUTURE: make error when supression supported
           console.warn(
             'Change of Axiom ' +
             this.id + '.' +
@@ -184,6 +187,7 @@ foam.CLASS({
   methods: [
     function unknownArg(key, value) {
       if ( key == 'class' ) return;
+      // TODO: call foam.warn() instead
       console.warn('Unknown property ' + this.cls_.id + '.' + key + ':', value);
     },
 
