@@ -426,16 +426,12 @@ foam.CLASS({
         // FUTURE: add nested Object support
         // FUTURE: add patch() method?
         if ( Array.isArray(value) ) {
-          // TODO: use foam.Array.diff()
-          var subdiff = foam.util.diff(value, otherVal);
+          var subdiff = foam.Array.diff(value, otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
             diff[property.name] = subdiff;
           }
-          continue;
-        }
-
-        // if the primary value is undefined, use the compareTo of the other
-        if ( ! foam.util.equals(value, otherVal) ) {
+        } else if ( ! foam.util.equals(value, otherVal) ) {
+          // if the primary value is undefined, use the compareTo of the other
           diff[property.name] = otherVal;
         }
       }
