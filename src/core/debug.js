@@ -60,8 +60,10 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
-      // TODO: Have work with 'refines'.
-      var mName = model ? model.id + '.' : '';
+      var mName =
+        model.id      ? model.id + '.'      :
+        model.refines ? model.refines + '.' :
+        '' ;
 
       // List of properties which are hidden by other properties.
       var es = [

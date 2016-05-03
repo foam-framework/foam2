@@ -69,7 +69,6 @@ foam.CLASS({
 });
 
 
-// TODO: add or rename to 'Double'
 foam.CLASS({
   package: 'foam.core',
   name: 'Float',
