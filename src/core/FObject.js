@@ -462,14 +462,7 @@ foam.CLASS({
       for ( var key in this.instance_ ) {
         var value = this[key];
         if ( value !== undefined ) {
-          var prop = this.cls_.getAxiomByName(key);
-          // TODO: is check needed?
-          if ( prop && prop.cloneProperty ) {
-            prop.cloneProperty(value, m);
-          } else {
-            // TODO: is this needed?
-            m[key] = value;
-          }
+          this.cls_.getAxiomByName(key).cloneProperty(value, m);
         }
       }
       return this.cls_.create(m/*, this.X*/);
