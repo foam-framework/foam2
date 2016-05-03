@@ -33,7 +33,6 @@ foam.CLASS({
     {
       name: 'model',
       adapt: function(_, m) {
-        // TODO: Not needed once we have ObjectProperties
         return foam.core.Model.isInstance(m) ? m : foam.core.Model.create(m);
       }
     }
@@ -75,7 +74,9 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'InnerClass',
       name: 'classes',
-      // TODO: is this needed?
+      // A custom adaptArrayElement is needed because we're
+      // passing the model definition as model:, rather than
+      // as all of the arguments to create().
       adaptArrayElement: function(o) {
         return foam.core.InnerClass.isInstance(o) ?
           o :
