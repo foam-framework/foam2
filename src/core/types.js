@@ -186,13 +186,6 @@ foam.CLASS({
     [
       'factory',
       function() { return []; }
-    ],
-    // TODO: remove
-    [
-      'fromString',
-      function(s) {
-        return s.split(',');
-      }
     ]
   ]
 });
