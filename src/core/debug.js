@@ -107,8 +107,7 @@ foam.CLASS({
 });
 
 
-// TODO: assert describe() not already set
-
+foam.assert(! foam.AbstractClass.describe, 'foam.AbstractClass.describe already set.');
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
