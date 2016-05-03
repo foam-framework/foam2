@@ -1490,7 +1490,7 @@ foam.CLASS({
         y: this.height / 2,
         radius: 5+a * 12 * this.width / 500,
         arcWidth: 10 * this.width / 500,
-        border: 'hsl(' + 18*a + ', 90%, 60%)'
+        border: this.hsl(18*a, 90, 60)
       }));
       this.tick();
     }
