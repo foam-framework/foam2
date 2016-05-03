@@ -17,8 +17,8 @@ foam.CLASS({
       ],
       methods: [
         function polar3D(r, t, g) {
-          this.x = 200 + Math.cos(g) * Math.cos(t) * r;
-          this.y = 200 + Math.sin(t) * r;
+          this.x = 250 + Math.sin(t) * Math.cos(g) * r;
+          this.y = 250 + Math.cos(t) * r;
         },
         function paintSelf(x) {
           this.polar3D(this.r, this.t, this.g);
@@ -51,20 +51,21 @@ foam.CLASS({
     },
     function addPoint(i) {
       var p = this.Point.create({
-        r: i*200/this.n,
-        t: i*Math.PI*20/this.n,
-        g: 0,
+        r: 200,
+        t: i*Math.PI*2/this.n,
+        g: 0, //i*Math.PI/5/this.n,
         radius: 3,
         border: null,
         arcWidth: 0
       });
 
       this.time$.sub(function() {
-        p.t -= 0.02;
-        p.g += 0.02;
-        p.glowRadius = Math.abs(this.time % this.n - i) < 20 ? 8 : 0;
-        var s = Math.abs(this.time % this.n - i) < 20 ? 100 : 70;
-        var l = Math.abs(this.time % this.n - i) < 20 ? 70 : 30;
+        p.t -= 0.01;
+        p.g += 0.01;
+        var on = Math.abs((this.time % this.n - i + this.n)%this.n) < 20
+        p.glowRadius = on ? 8 : 0;
+        var s = on ? 100 : 70;
+        var l = on ? 70 : 30;
         p.color = this.hsl(i*365/this.n, s, l);
       }.bind(this));
       this.addChildren(p);
