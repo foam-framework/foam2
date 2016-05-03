@@ -415,7 +415,9 @@ foam.CLASS({
     function diff(other) {
       var diff = {};
 
-      // TODO: assert 'other' is same class
+      this.assert(other, 'Attempt to diff against null.');
+      this.assert(other.cls_ === this.cls_, 'Attempt to diff objects with different classes.', this, other);
+
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
         var value    = property.f(this);
