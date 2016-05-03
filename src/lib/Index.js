@@ -314,7 +314,7 @@ foam.CLASS({
       name: 'selectCount',
       value: 0,
       postSet: function(old, nu) {
-        this.treeNode.selectCount = nu;
+        this.treeNodeFactory.selectCount = nu;
       }
     },
     {
@@ -324,9 +324,10 @@ foam.CLASS({
       }
     },
     {
-      name: 'treeNode',
+      name: 'treeNodeFactory',
       factory: function() {
-        return this.TreeNode.create({ index: this });
+        var self = this;
+        return { create: function(args, X) { return self.TreeNode.create({ index: self }, X); } };
       }
     },
     {

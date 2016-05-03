@@ -35,21 +35,22 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.left  = this.left  || this.index.nullNode;
-      this.right = this.right || this.index.nullNode;
+      this.left  = this.left  || ( this.index && this.index.nullNode );
+      this.right = this.right || ( this.index && this.index.nullNode );
     },
 
-    /** Flyweight constructor */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
+    // /** Flyweight constructor */
+    // function create(args) {
+    //   var c = Object.create(this);
+    //   args && c.copyFrom(args);
+    //   c.init && c.init();
+    //   return c;
+    // },
 
     /** Nodes do a shallow clone */
     function clone() {
-      var c = this.__proto__.create();
+      var c = this.cls_.create();
+      c.index = this.index;
       c.key   = this.key;
       c.value = this.value;
       c.size  = this.size;
@@ -351,7 +352,7 @@ foam.CLASS({
       property: foam.dao.index.TreeNode.INDEX
     })
   ],
-  // tailFactory, treeNode
+  // tailFactory, treeNodeFactory
   methods: [
     function init() {
       this.left  = undefined;
@@ -372,7 +373,7 @@ foam.CLASS({
     function putKeyValue(key, value) {
       var subIndex = this.index.tailFactory.create();
       subIndex.put(value);
-      var n = this.index.treeNode.create();
+      var n = this.index.treeNodeFactory.create();
       n.key = key;
       n.value = subIndex;
       n.size = 1;
