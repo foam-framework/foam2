@@ -119,8 +119,9 @@ foam.CLASS({
       }
       // Else call copyFrom(), which is the slowest version because
       // it is O(# of properties) not O(# of args)
+      // This is possible if called with a map with a prototype other
+      // than Object.prototype or null. Should rarely happen.
       else {
-        // TODO: ???: How is this possible?
         this.copyFrom(args);
       }
     },
