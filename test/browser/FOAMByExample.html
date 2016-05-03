@@ -1058,7 +1058,7 @@ foam.CLASS({
 var o = Invoice2.create({invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
 log(o.id, o.invoiceId);
 
-// Multi-park unique identifiers are also supported.
+// Multi-part unique identifiers are also supported.
 foam.CLASS({
   name: 'Invoice3',
   ids: [ 'customerId', 'invoiceId' ],
@@ -1068,6 +1068,23 @@ var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amo
 log(o.id, o.customerId, o.invoiceId);
 o.id = [2, 3];
 log(o.id, o.customerId, o.invoiceId);
+
+// Multi-part ids are comparable
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 2}),
+  Invoice3.create({customerId: 1, invoiceId: 1})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 1}),
+  Invoice3.create({customerId: 1, invoiceId: 2})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 1}),
+  Invoice3.create({customerId: 1, invoiceId: 1})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 2, invoiceId: 1}),
+  Invoice3.create({customerId: 1, invoiceId: 1})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 1}),
+  Invoice3.create({customerId: 2, invoiceId: 1})));
 
 // A Classes 'id' is a combination of its package and name.
 log(com.acme.Test.id);

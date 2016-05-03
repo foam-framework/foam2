@@ -42,7 +42,7 @@ foam.CLASS({
     [ 'transient', true ],
     'propNames',
     'props',
-    [ 'getter', function() {
+    [ 'getter', function multiPartGetter() {
       var props = this.cls_.ID.props;
 
       if ( props.length === 1 ) return props[0].get(this);
@@ -51,7 +51,7 @@ foam.CLASS({
       for ( var i = 0 ; i < props.length ; i++ ) a[i] = props[i].get(this);
       return a;
     }],
-    [ 'setter', function(a) {
+    [ 'setter', function multiPartSetter(a) {
       var props = this.cls_.ID.props;
 
       if ( props.length === 1 ) {
@@ -60,18 +60,21 @@ foam.CLASS({
         for ( var i = 0 ; i < props.length ; i++ ) props[i].set(this, a[i]);
       }
     }],
-    [
-      // TODO: rename to 'compare', add UnitTest
-      'comparePropertyValues',
-      function(o1, o2) {
-        var props = this.cls_.ID.props;
+    {
+      name: 'compare',
+      // TODO: setting value: should override factory:
+      factory: null,
+      value: function multiPartCompare(o1, o2) {
+        var props = this.props;
+        if ( props.length === 1 ) return props[0].compare(o1, o2);
+
         for ( var i = 0 ; i < props.length ; i++ ) {
           var c = props[i].compare(o1, o2);
           if ( c ) return c;
         }
         return 0;
       }
-    ]
+    }
   ],
 
   methods: [
