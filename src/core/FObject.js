@@ -493,8 +493,6 @@ foam.CLASS({
     },
 
     function toString() {
-      // TODO: better test: 'this.cls_ === this'
-      // TODO: add 'Destroyed' if destroyed
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' :
