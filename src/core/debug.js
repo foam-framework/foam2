@@ -286,15 +286,16 @@ foam.CLASS({
   ],
 
   methods: [
-    /** Validates the given argument against this type information.
-        If any type checks are failed, a TypeError is thrown.
-         */
+    /**
+      Validates the given argument against this type information.
+      If any type checks are failed, a TypeError is thrown.
+     */
     function validate(/* any // the argument value to validate. */ arg) {
-      i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
+      i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
         if ( ! this.optional ) {
-          throw new TypeError(this.PREFIX + i + this.name+', is not optional, but was undefined in a function call');
+          throw new TypeError(this.PREFIX + i + this.name + ', is not optional, but was undefined in a function call');
         } else {
           return; // value is undefined, but ok with that
         }
@@ -308,7 +309,7 @@ foam.CLASS({
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
-        if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?
+        if ( ! this.type.isInstance(arg) ) {
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
           throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + gotType);
         }
