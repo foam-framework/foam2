@@ -72,7 +72,7 @@ foam.CLASS({
 // TODO: add or rename to 'Double'
 foam.CLASS({
   package: 'foam.core',
-  name:  'Float',
+  name: 'Float',
   extends: 'Int',
 
   // documentation:  'Describes properties of type Float.',
@@ -86,6 +86,16 @@ foam.CLASS({
       }
     ]
   ]
+});
+
+
+/**
+ No different than Float for JS, but useful when targeting with other languages.
+ **/
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Double',
+  extends: 'Float'
 });
 
 
