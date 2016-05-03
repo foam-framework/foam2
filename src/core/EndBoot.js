@@ -111,8 +111,10 @@ foam.CLASS({
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
         for ( var key in args.instance_ ) {
-          // TODO: check that it is a Property
-          if ( this.cls_.getAxiomByName(key) ) this[key] = args[key];
+          var a = this.cls_.getAxiomByName(key);
+          if ( a && foam.core.Property.isInstance(a) ) {
+            this[key] = args[key];
+          }
         }
       }
       // Else call copyFrom(), which is the slowest version because
