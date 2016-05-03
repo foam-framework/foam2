@@ -295,9 +295,9 @@ foam.CLASS({
     /**
       Unsub a previously sub()'ed listener.
       It is more efficient to unsubscribe by calling .destroy()
-      on the subscription returned from sub().
+      on the subscription returned from sub() (so prefer that
+      method when possible).
     */
-    // TODO: remove until/when needed
     function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
