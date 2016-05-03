@@ -178,7 +178,7 @@ foam.CLASS({
     [
       'adapt',
       function(_, v, prop) {
-        foam.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
+        this.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
         return v;
       }
     ],
@@ -341,7 +341,7 @@ foam.CLASS({
       var methods = ! this.methods ? [] :
           this.methods.length ? this.methods.map(function(f) {
             var m = delegate.getAxiomByName(f);
-            console.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
+            foam.X.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
             return m;
           }) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {

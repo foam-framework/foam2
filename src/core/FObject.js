@@ -25,7 +25,7 @@ foam.CLASS({
 
   // documentation: 'Base model for model hierarchy.',
 
-  imports: [ 'assert', 'error', 'log', 'warn' ],
+//  imports: [ 'assert', 'error', 'log', 'warn' ],
 
   methods: [
     /**
@@ -97,6 +97,23 @@ foam.CLASS({
         a.validateInstance && a.validateInstance(this);
       }
     },
+
+
+    /************************************************
+     * Console
+     ************************************************/
+
+    // Imports aren't implemented yet, so mimic:
+    //   imports: [ 'assert', 'error', 'log', 'warn' ],
+
+    function assert() { ((this.X && this.X.assert) || foam.X.assert).apply(null, arguments); },
+
+    function error() { ((this.X && this.X.error) || foam.X.error).apply(null, arguments); },
+
+    function log() { ((this.X && this.X.log) || foam.X.log).apply(null, arguments); },
+
+    function warn() { ((this.X && this.X.warn) || foam.X.warn).apply(null, arguments); },
+
 
     /************************************************
      * Publish and Subscribe
@@ -245,7 +262,7 @@ foam.CLASS({
     function sub() { /* args..., l */
       var l = arguments[arguments.length-1];
 
-      console.assert(typeof l === 'function', 'Listener must be a function');
+      this.assert(typeof l === 'function', 'Listener must be a function');
 
       var listeners = this.listeners_();
 
@@ -315,8 +332,8 @@ foam.CLASS({
     function slot(name) {
       var axiom = this.cls_.getAxiomByName(name);
 
-      console.assert(axiom, 'Unknown axiom:', name);
-      console.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
+      this.assert(axiom, 'Unknown axiom:', name);
+      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
 
       return axiom.toSlot(this);
     },

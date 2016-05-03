@@ -21,7 +21,6 @@
 foam = {
   isServer: typeof process === 'object',
   core:     {},
-  assert: function() { /* NOP */ },
   next$UID: (function() {
     /* Return a unique id. */
     var id = 1;
