@@ -36,8 +36,8 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'n',  227 ],
-    [ 'width', 500 ],
+    [ 'n',      227 ],
+    [ 'width',  500 ],
     [ 'height', 500 ],
     [ 'time',   0 ],
     [ 'color', 'black' ]
