@@ -56,8 +56,7 @@ foam.CLASS({
         g: 0,
         radius: 3,
         border: null,
-        arcWidth: 0,
-//        color: 'hsl(' + i*365/this.n + ',' + 100 + '%, 60%)'
+        arcWidth: 0
       });
 
       this.time$.sub(function() {
@@ -65,8 +64,8 @@ foam.CLASS({
         p.g += 0.02;
         p.glowRadius = Math.abs(this.time % this.n - i) < 20 ? 8 : 0;
         var bright = Math.abs(this.time % this.n - i) < 20 ? 70 : 30;
-        var sat = Math.abs(this.time % this.n - i) < 20 ? 100 : 60;
-        p.color = 'hsl(' + i*365/this.n + ',' + 100 + '%, ' + bright + '%)';
+        var sat = Math.abs(this.time % this.n - i) < 20 ? 100 : 70;
+        p.color = 'hsl(' + i*365/this.n + ',' + sat + '%, ' + bright + '%)';
       }.bind(this));
       this.addChildren(p);
     }
@@ -75,11 +74,7 @@ foam.CLASS({
     {
       name: 'tick',
       isFramed: true,
-      code: function() {
-        this.time++;
-        this.tick();
-        this.invalidated.pub();
-      }
+      code: function() { this.time++; this.tick(); this.invalidated.pub(); }
     }
   ]
 });
