@@ -326,6 +326,10 @@ foam.CLASS({
      * Destruction
      ************************************************/
 
+    function isDestroyed() {
+      return ! this.instance_;
+    },
+
     function onDestroy(dtor) {
       /*
         Register a function or a destroyable to be called
@@ -342,9 +346,12 @@ foam.CLASS({
         Free any referenced objects and destroy any registered destroyables.
         This object is completely unusable after being destroyed.
        */
-      if ( ! this.instance_ ) return;
+      if ( this.isDestroyed() || this.instance_.destroying_ ) return;
 
-// TODO: add 'destroying' state
+      // Record that we're currently destroying this object,
+      // to prevent infitine recursion.
+      this.instance_.destroying_ = true;
+
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
