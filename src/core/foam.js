@@ -92,6 +92,7 @@
     "../lib/Timer",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
+    "../lib/Pooled",
     [ "../lib/IDBDAO", ! isServer ],
     "../lib/mlang",
     "../lib/Physical",
