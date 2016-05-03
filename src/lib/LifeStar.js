@@ -63,9 +63,9 @@ foam.CLASS({
         p.t -= 0.02;
         p.g += 0.02;
         p.glowRadius = Math.abs(this.time % this.n - i) < 20 ? 8 : 0;
-        var bright = Math.abs(this.time % this.n - i) < 20 ? 70 : 30;
-        var sat = Math.abs(this.time % this.n - i) < 20 ? 100 : 70;
-        p.color = 'hsl(' + i*365/this.n + ',' + sat + '%, ' + bright + '%)';
+        var s = Math.abs(this.time % this.n - i) < 20 ? 100 : 70;
+        var l = Math.abs(this.time % this.n - i) < 20 ? 70 : 30;
+        p.color = this.hsl(i*365/this.n, s, l);
       }.bind(this));
       this.addChildren(p);
     }
