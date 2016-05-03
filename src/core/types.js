@@ -179,10 +179,8 @@ foam.CLASS({
     [
       'adapt',
       function(_, v, prop) {
-        // TODO: remove magic, add checking
-        return Array.isArray(v) ? v :
-          ( typeof v === 'string' ) ? prop.fromString(v) :
-          ((v || v === 0) ? [v] : []);
+        foam.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
+        return v;
       }
     ],
     [
