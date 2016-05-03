@@ -91,8 +91,19 @@ foam.CLASS({
      * args: one or more properties
      **/
     function addUniqueIndex() {
-      var index = this.ValueIndex.create();
-      //var siFactory = proto;
+      var index;// = this.ValueIndex.create();
+      var proto; 
+      var siFactory = this.ValueIndex;
+
+      function makeFactory(prot, ppty, siFac) {
+        return {
+          create: function(args, X) {
+            var p = prot.create({ prop: ppty, tailFactory: siFac }, X);
+            if ( args ) p.copyFrom(args);
+            return p;
+          }
+        } 
+      }
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
@@ -100,11 +111,11 @@ foam.CLASS({
         // TODO: the index prototype should be in the property
         var proto = this.Array.isInstance(prop) ?
           this.SetIndex  :
-          this.TreeIndex ;
-        index = proto.create({ prop: prop, tailFactory: index });
+          this.TreeIndex ;  
+        siFactory = makeFactory(proto, prop, siFactory);
       }
 
-      return this.addRawIndex(index);
+      return this.addRawIndex(siFactory.create());
     },
 
     // TODO: name 'addIndex' and renamed addIndex

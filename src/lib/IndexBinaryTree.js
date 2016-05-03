@@ -28,15 +28,14 @@ foam.CLASS({
     { class: 'Simple', name: 'level' },
     { class: 'Simple', name: 'left'  },
     { class: 'Simple', name: 'right' },
-
-    { name: 'index' },
-    { name: 'selectCount' }, // compare, dedupe, nullNode
+    
+    { class: 'Simple', name: 'nullNode' },
   ],
 
   methods: [
     function init() {
-      this.left  = this.left  || ( this.index && this.index.nullNode );
-      this.right = this.right || ( this.index && this.index.nullNode );
+      this.left  = this.left  || this.nullNode;
+      this.right = this.right || this.nullNode;
     },
 
     // /** Flyweight constructor */
@@ -50,7 +49,6 @@ foam.CLASS({
     /** Nodes do a shallow clone */
     function clone() {
       var c = this.cls_.create();
-      c.index = this.index;
       c.key   = this.key;
       c.value = this.value;
       c.size  = this.size;
@@ -62,8 +60,8 @@ foam.CLASS({
 
     /** Clone is only needed if a select() is active in the tree at the
       same time we are updating it. */
-    function maybeClone() {
-      return this.selectCount ? this.clone() : this;
+    function maybeClone(locked) {
+      return locked ? this.clone() : this;
     },
 
     function updateSize() {
@@ -72,10 +70,10 @@ foam.CLASS({
     },
 
     /** @return Another node representing the rebalanced AA tree. */
-    function skew() {
+    function skew(locked) {
       if ( this.left.level === this.level ) {
         // Swap the pointers of horizontal left links.
-        var l = this.left.maybeClone();
+        var l = this.left.maybeClone(locked);
 
         this.left = l.right;
         l.right = this;
@@ -90,10 +88,10 @@ foam.CLASS({
     },
 
     /** @return a node representing the rebalanced AA tree. */
-    function split() {
+    function split(locked) {
       if ( this.right.level && this.right.right.level && this.level === this.right.right.level ) {
         // We have two horizontal right links.  Take the middle node, elevate it, and return it.
-        var r = this.right.maybeClone();
+        var r = this.right.maybeClone(locked);
 
         this.right = r.left;
         r.left = this;
@@ -121,13 +119,13 @@ foam.CLASS({
 
     /** Removes links that skip levels.
       @return the tree with its level decreased. */
-    function decreaseLevel() {
+    function decreaseLevel(locked) {
       var expectedLevel = Math.min(this.left.level ? this.left.level : 0, this.right.level ? this.right.level : 0) + 1;
 
       if ( expectedLevel < this.level ) {
         this.level = expectedLevel;
         if ( this.right.level && expectedLevel < this.right.level ) {
-          this.right = this.right.maybeClone();
+          this.right = this.right.maybeClone(locked);
           this.right.level = expectedLevel;
         }
       }
@@ -135,21 +133,21 @@ foam.CLASS({
     },
 
     /** extracts the value with the given key from the index */
-    function get(key) {
-      var r = this.index.compare(this.key, key);
+    function get(key, compare) {
+      var r = compare(this.key, key);
 
       if ( r === 0 ) return this.value; // TODO... tail.get(this.value) ???
 
-      return r > 0 ? this.left.get(key) : this.right.get(key);
+      return r > 0 ? this.left.get(key, compare) : this.right.get(key, compare);
     },
 
-    function putKeyValue(key, value) {
-      var s = this.maybeClone();
+    function putKeyValue(key, value, compare, dedup, locked) {
+      var s = this.maybeClone(locked);
 
-      var r = this.index.compare(s.key, key);
+      var r = compare(s.key, key);
 
       if ( r === 0 ) {
-        this.index.dedup(value, s.key);
+        dedup(value, s.key);
 
         s.size -= s.value.size();
         s.value.put(value);
@@ -158,17 +156,17 @@ foam.CLASS({
         var side = r > 0 ? 'left' : 'right';
 
         if ( s[side].level ) s.size -= s[side].size;
-        s[side] = s[side].putKeyValue(key, value);
+        s[side] = s[side].putKeyValue(key, value, compare, dedup, locked);
         s.size += s[side].size;
       }
 
-      return s.split().skew();
+      return s.split(locked).skew(locked);
     },
 
-    function removeKeyValue(key, value) {
-      var s = this.maybeClone();
+    function removeKeyValue(key, value, compare, locked) {
+      var s = this.maybeClone(locked);
       var side;
-      var r = this.index.compare(s.key, key);
+      var r = compare(s.key, key);
 
       if ( r === 0 ) {
         s.size -= s.value.size();
@@ -183,7 +181,7 @@ foam.CLASS({
 
         // If we're a leaf, easy, otherwise reduce to leaf case.
         if ( ! s.left.level && ! s.right.level ) {
-          return this.index.nullNode;
+          return this.nullNode;
         }
 
         side = s.left.level ? 'left' : 'right';
@@ -198,39 +196,39 @@ foam.CLASS({
         s.key = l.key;
         s.value = l.value;
 
-        s[side] = s[side].removeNode(l.key);
+        s[side] = s[side].removeNode(l.key, compare, locked);
       } else {
         side = r > 0 ? 'left' : 'right';
 
         s.size -= s[side].size;
-        s[side] = s[side].removeKeyValue(key, value);
+        s[side] = s[side].removeKeyValue(key, value, compare, locked);
         s.size += s[side].size;
       }
 
       // Rebalance the tree. Decrease the level of all nodes in this level if
       // necessary, and then skew and split all nodes in the new level.
-      s = s.decreaseLevel().skew();
+      s = s.decreaseLevel(locked).skew(locked);
       if ( s.right.level ) {
-        s.right = s.right.maybeClone().skew();
-        if ( s.right.right.level ) s.right.right = s.right.right.maybeClone().skew();
+        s.right = s.right.maybeClone(locked).skew(locked);
+        if ( s.right.right.level ) s.right.right = s.right.right.maybeClone(locked).skew(locked);
       }
-      s = s.split();
-      s.right = s.right.maybeClone().split();
+      s = s.split(locked);
+      s.right = s.right.maybeClone(locked).split(locked);
 
       return s;
     },
 
-    function removeNode(key) {
-      var s = this.maybeClone();
+    function removeNode(key, compare, locked) {
+      var s = this.maybeClone(locked);
 
-      var r = this.index.compare(s.key, key);
+      var r = compare(s.key, key);
 
       if ( r === 0 ) return s.left.level ? s.left : s.right;
 
       var side = r > 0 ? 'left' : 'right';
 
       s.size -= s[side].size;
-      s[side] = s[side].removeNode(key);
+      s[side] = s[side].removeNode(key, compare, locked);
       s.size += s[side].size;
 
       return s;
@@ -263,79 +261,79 @@ foam.CLASS({
       this.left.selectReverse(sink, skip, limit, order, predicate);
     },
 
-    function gt(key) {
+    function gt(key, compare) {
       var s = this;
-      var r = this.index.compare(key, s.key);
+      var r = compare(key, s.key);
 
       if ( r < 0 ) {
-        var l = s.left.gt(key);
+        var l = s.left.gt(key, compare);
         var copy = s.clone();
         copy.size = s.size - s.left.size + l.size;
         copy.left = l;
         return copy;
       }
 
-      if ( r > 0 ) return s.right.gt(key);
+      if ( r > 0 ) return s.right.gt(key, compare);
 
       return s.right;
     },
 
-    function gte(key) {
+    function gte(key, compare) {
       var s = this;
       var copy;
-      var r = this.index.compare(key, s.key);
+      var r = compare(key, s.key);
 
       if ( r < 0 ) {
-        var l = s.left.gte(key);
+        var l = s.left.gte(key, compare);
         copy = s.clone();
         copy.size = s.size - s.left.size + l.size,
         copy.left = l;
         return copy;
       }
 
-      if ( r > 0 ) return s.right.gte(key);
+      if ( r > 0 ) return s.right.gte(key, compare);
 
       copy = s.clone();
       copy.size = s.size - s.left.size,
-      copy.left = s.index.nullNode;
+      copy.left = s.nullNode;
       return copy;
     },
 
-    function lt(key) {
+    function lt(key, compare) {
       var s = this;
-      var r = this.index.compare(key, s.key);
+      var r = compare(key, s.key);
 
       if ( r > 0 ) {
-        var rt = s.right.lt(key);
+        var rt = s.right.lt(key, compare);
         var copy = s.clone();
         copy.size = s.size - s.right.size + rt.size;
         copy.right = rt;
         return copy;
       }
 
-      if ( r < 0 ) return s.left.lt(key);
+      if ( r < 0 ) return s.left.lt(key, compare);
 
       return s.left;
     },
 
-    function lte(key) {
+    function lte(key, compare) {
       var s = this;
       var copy;
-      var r = this.index.compare(key, s.key);
+      var r = compare(key, s.key);
 
       if ( r > 0 ) {
-        var rt = s.right.lte(key);
+        var rt = s.right.lte(key, compare);
         copy = s.clone();
         copy.size = s.size - s.right.size + rt.size;
         copy.right = rt;
         return copy;
       }
 
-      if ( r < 0 ) return s.right.lte(key);
+      if ( r < 0 ) return s.right.lte(key, compare);
 
       copy = s.clone();
       copy.size = s.size - s.right.size;
-      copy.right = s.index.nullNode;
+      copy.right = s.nullNode;
       return copy;
     },
 
@@ -347,12 +345,19 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
   extends: 'foam.dao.index.TreeNode',
-  axioms: [
-    foam.pattern.Multiton.create({
-      property: foam.dao.index.TreeNode.INDEX
-    })
+
+  properties: [
+    {
+      name: 'tailFactory',
+      required: true,
+    },
+    {
+      name: 'treeNodeFactory',
+      required: true,
+    }
+    
   ],
-  // tailFactory, treeNodeFactory
+
   methods: [
     function init() {
       this.left  = undefined;
@@ -363,17 +368,17 @@ foam.CLASS({
 
     function clone() {         return this; },
     function maybeClone() {    return this; },
-    function skew() {          return this; },
-    function split() {         return this; },
-    function decreaseLevel() { return this; },
+    function skew(locked) {          return this; },
+    function split(locked) {         return this; },
+    function decreaseLevel(locked) { return this; },
     function get() {           return undefined; },
     function updateSize() { },
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
-      var subIndex = this.index.tailFactory.create();
+      var subIndex = this.tailFactory.create();
       subIndex.put(value);
-      var n = this.index.treeNodeFactory.create();
+      var n = this.treeNodeFactory.create();
       n.key = key;
       n.value = subIndex;
       n.size = 1;
@@ -390,15 +395,15 @@ foam.CLASS({
     function lt() {  return this; },
     function lte() { return this; },
 
-    function bulkLoad_(a, start, end) {
+    function bulkLoad_(a, start, end, keyExtractor) {
       if ( end < start ) return this;
 
       var tree = this;
       var m    = start + Math.floor((end-start+1) / 2);
-      tree = tree.putKeyValue(this.index.prop.f(a[m]), a[m]);
+      tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
 
-      tree.left = tree.left.bulkLoad_(a, start, m-1);
-      tree.right = tree.right.bulkLoad_(a, m+1, end);
+      tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
+      tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);
       tree.size += tree.left.size + tree.right.size;
 
       return tree;

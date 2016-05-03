@@ -196,14 +196,14 @@ foam.CLASS({
   name: 'Index',
 
   methods: [
-    /** Flyweight constructor */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
-
+    // /** Flyweight constructor */
+    // function create(args) {
+    //   var c = Object.create(this);
+    //   args && c.copyFrom(args);
+    //   c.init && c.init();
+    //   return c;
+    // },
+    
     /** Adds or updates the given value in the index */
     function put() {},
     /** Removes the given value from the index */
@@ -313,21 +313,23 @@ foam.CLASS({
     {
       name: 'selectCount',
       value: 0,
-      postSet: function(old, nu) {
-        this.treeNodeFactory.selectCount = nu;
-      }
     },
     {
       name: 'nullNode',
       factory: function() {
-        return this.NullTreeNode.create({ index: this });
+        console.assert(this.tailFactory, "tailFactory not set!");
+        console.assert(this.treeNodeFactory, "treeNodeFactory not set!");
+        return this.NullTreeNode.create({ 
+          tailFactory: this.tailFactory,
+          treeNodeFactory: this.treeNodeFactory
+        });
       }
     },
     {
       name: 'treeNodeFactory',
       factory: function() {
         var self = this;
-        return { create: function(args, X) { return self.TreeNode.create({ index: self }, X); } };
+        return { create: function(args, X) { return self.TreeNode.create({ nullNode: self.nullNode }, X); } };
       }
     },
     {
@@ -344,6 +346,10 @@ foam.CLASS({
     /** Initialize simple properties, since they ignore factories. */
     function init() {
       this.root = this.nullNode;
+      
+      // TODO: replace with bound methods when available 
+      this.dedup = foam.Function.bind(this.dedup, this);
+      //this.compare = foam.Function.bind(this.compare, this);
     },
 
     /**
@@ -352,15 +358,15 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.NullTreeNode.create({ index: this });
+      this.root = this.nullNode;
 
       // Only safe if children aren't themselves trees
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.ValueIndex.isSubClass(this.tailFactory) ) {
+      if ( this.ValueIndex.isInstance(this.tailFactory.create()) ) {
         a.sort(toCompare(this.prop));
-        this.root = this.root.bulkLoad_(a, 0, a.length-1);
+        this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f);
       } else {
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.put(a[i]);
@@ -374,17 +380,16 @@ foam.CLASS({
       obj[this.prop.name] = value;
     },
 
-    // TODO: remove the 's' in these and use a known root node
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue), newValue);
+      this.root = this.root.putKeyValue(this.prop.f(newValue), newValue, this.compare, this.dedup, this.selectCount > 0);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value), value);
+      this.root = this.root.removeKeyValue(this.prop.f(value), value, this.compare, this.dedup, this.selectCount > 0);
     },
 
     function get(key) {
-      return this.root.get(key); // does not delve into sub-indexes
+      return this.root.get(key, this.compare); // does not delve into sub-indexes
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -484,7 +489,7 @@ foam.CLASS({
       arg2 = isExprMatch(this.Eq);
       if ( arg2 !== undefined ) {
         var key = arg2.f();
-        result = this.get(key);
+        result = this.get(key, this.compare);
 
         if ( ! result ) return this.NotFoundPlan.create();
 
@@ -500,16 +505,16 @@ foam.CLASS({
       var subTree = this.root;
 
       arg2 = isExprMatch(this.Gt);
-      if ( arg2 ) subTree = subTree.gt(arg2.f());
+      if ( arg2 ) subTree = subTree.gt(arg2.f(), this.compare);
 
       arg2 = isExprMatch(this.Gte);
-      if ( arg2 ) subTree = subTree.gte(arg2.f());
+      if ( arg2 ) subTree = subTree.gte(arg2.f(), this.compare);
 
       arg2 = isExprMatch(this.Lt);
-      if ( arg2 ) subTree = subTree.lt(arg2.f());
+      if ( arg2 ) subTree = subTree.lt(arg2.f(), this.compare);
 
       arg2 = isExprMatch(this.Lte);
-      if ( arg2 ) subTree = subTree.lte(arg2.f());
+      if ( arg2 ) subTree = subTree.lte(arg2.f(), this.compare);
 
       cost = subTree.size;
       var sortRequired = false;
@@ -581,11 +586,11 @@ foam.CLASS({
 
   methods: [
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue);
+      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue, this.compare, this.dedup);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value);
+      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value, this.compare);
     }
   ]
 });
@@ -608,10 +613,10 @@ foam.CLASS({
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.putKeyValue(a[i], newValue);
+          this.root = this.root.putKeyValue(a[i], newValue, this.compare, this.dedup);
         }
       } else {
-        this.root = this.root.putKeyValue('', newValue);
+        this.root = this.root.putKeyValue('', newValue, this.compare, this.dedup);
       }
     },
 
@@ -620,10 +625,10 @@ foam.CLASS({
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.removeKeyValue(a[i], value);
+          this.root = this.root.removeKeyValue(a[i], value, this.compare);
         }
       } else {
-        this.root = this.root.removeKeyValue('', value);
+        this.root = this.root.removeKeyValue('', value, this.compare);
       }
     }
   ]
