@@ -568,7 +568,7 @@ foam.CLASS({
 
   methods: [
     function _nary_(name, args) {
-      return this[name].create({ args: foam.Array.argsToArray(args) });
+      return this[name].create({ args: Array.from(args) });
     },
     function _unary_(name, arg) {
       return this[name].create({ arg1: arg });

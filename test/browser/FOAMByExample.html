@@ -1121,11 +1121,6 @@ var a = {}, b = [], c = Person.create();
 log(a.$UID, b.$UID, c.$UID);
 log(a.$UID, b.$UID, c.$UID);
 
-// foam.Array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
-(function() {
-  log(Array.isArray(arguments), Array.isArray(foam.Array.argsToArray(arguments)));
-})();
-
 // foam.events.consoleLog
 foam.CLASS({name: 'ConsoleLogTest'});
 var o = ConsoleLogTest.create();

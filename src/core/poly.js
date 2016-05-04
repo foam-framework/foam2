@@ -15,25 +15,13 @@
  * limitations under the License.
  */
 
-foam.LIB({
-  name: 'foam.events',
+// Polyfill
 
-  methods: [
-    function oneTime(listener) {
-      /** Create a "one-time" listener which unsubs itself when called. **/
-      return function(subscription) {
-        subscription.destroy();
-        listener.apply(this, Array.from(arguments));
-      };
-    },
-
-    function consoleLog(listener) {
-      /** Log all listener invocations to console. **/
-      return function() {
-        var args = Array.from(arguments);
-        console.log(args);
-        listener && listener.apply(this, args);
-      };
-    }
-  ]
-});
+if ( ! Array.from ) {
+  /** Turn array-like objects into real arrays. **/
+  Array.from = function(a) {
+    var b = new Array(a.length);
+    for ( var i = 0 ; i < a.length ; i++ ) b[i] = a[i];
+    return b;
+  }
+}

@@ -103,7 +103,7 @@ foam.CLASS({
         var lastArgs  = null;
         function mergedListener() {
           triggered = false;
-          var args = foam.Array.argsToArray(lastArgs);
+          var args = Array.from(lastArgs);
           lastArgs = null;
           l.apply(this, args);
         }
