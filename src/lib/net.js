@@ -68,9 +68,6 @@ foam.CLASS({
   requires: [
     'foam.net.WebSocket'
   ],
-  exports: [
-    'as webSocketService'
-  ],
   properties: [
     {
       class: 'Map',

@@ -301,9 +301,6 @@ foam.CLASS({
       name: 'server',
     }
   ],
-  exports: [
-    'as socketService'
-  ],
   methods: [
     function init() {
       if ( ! this.listen ) return;
