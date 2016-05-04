@@ -19,13 +19,17 @@ foam.CLASS({
   package: 'foam.core',
   name: 'LightWeight',
   extends: null,
-  
+
   methods: [
     function initArgs(args) { args && foam.core.FObject.prototype.copyFrom.call(this, args); },
+
+    // requires needs private storage
     function hasOwnPrivate_(name) { return typeof this[name+"___"] !== 'undefined'; },
     function setPrivate_(name, value) { this[name+"___"] = value; },
     function getPrivate_(name) { return this[name+"___"]; },
-    function pubPropertyChange_() {},
+
+    // Any non-Simple properties will try to call pub
+    //function pubPropertyChange_() {},
   ]
 });
 
@@ -43,12 +47,12 @@ foam.CLASS({
     { class: 'Simple', name: 'level' },
     { class: 'Simple', name: 'left'  },
     { class: 'Simple', name: 'right' },
-    
+
     { class: 'Simple', name: 'nullNode' },
   ],
 
   methods: [
-      
+
     function init() {
       this.left  = this.left  || this.nullNode;
       this.right = this.right || this.nullNode;
@@ -364,14 +368,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Simple',
       name: 'tailFactory',
-      required: true,
     },
     {
+      class: 'Simple',
       name: 'treeNodeFactory',
-      required: true,
     }
-    
+
   ],
 
   methods: [

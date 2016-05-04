@@ -58,13 +58,16 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Simple',
       name: 'cost',
       value: 0
     },
   ],
 
   methods: [
+    function init() {
+      this.cost = this.cost || 0;
+    },
     function execute(/*promise, state, sink, skip, limit, order, predicate*/) {},
     function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
   ]
@@ -197,7 +200,7 @@ foam.CLASS({
   extends: 'foam.core.LightWeight',
 
   methods: [
-    
+
     // /** Flyweight constructor */
     // function create(args) {
     //   var c = Object.create(this);
@@ -205,7 +208,7 @@ foam.CLASS({
     //   c.init && c.init();
     //   return c;
     // },
-    
+
     /** Adds or updates the given value in the index */
     function put() {},
     /** Removes the given value from the index */
@@ -245,7 +248,7 @@ foam.CLASS({
     function init() {
       this.cost = 1;
     },
-    
+
     // from Plan (this index is its own plan)
     function execute(promise, sink /*, skip, limit, order, predicate*/) {
       sink.put(this.value);
@@ -272,12 +275,9 @@ foam.CLASS({
   ],
 });
 
-
-/** An AATree (balanced binary search tree) Index. **/
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'TreeIndex',
-  extends: 'foam.dao.index.Index',
+  name: 'TreeIndexRequires',
   requires: [
     'foam.dao.index.TreeNode',
     'foam.dao.index.NullTreeNode',
@@ -309,11 +309,19 @@ foam.CLASS({
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
-
   ],
 
+});
+var TREE_REQ = foam.dao.index.TreeIndexRequires.create();
+
+/** An AATree (balanced binary search tree) Index. **/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'TreeIndex',
+  extends: 'foam.dao.index.Index',
+
   properties: [
-    { 
+    {
       class: 'Simple', name: 'prop'
     },
     {
@@ -343,23 +351,23 @@ foam.CLASS({
     function init() {
       var self = this;
       this.selectCount = 0;
-      
+
       // These were shared between each instance of the index, they should be created
       // by the tailFactory that created this and set on this
-      this.treeNodeFactory = { 
-        create: function(args, X) { 
-          return self.TreeNode.create({ nullNode: self.nullNode }, X); 
+      this.treeNodeFactory = {
+        create: function(args, X) {
+          return TREE_REQ.TreeNode.create({ nullNode: self.nullNode }, X);
         }
       };
 
-      this.nullNode = this.NullTreeNode.create({ 
+      this.nullNode = TREE_REQ.NullTreeNode.create({
         tailFactory: this.tailFactory,
         treeNodeFactory: this.treeNodeFactory
       });
-          
+
       this.root = this.nullNode;
-      
-      // TODO: replace with bound methods when available 
+
+      // TODO: replace with bound methods when available
       this.dedup = this.dedup.bind(this); //foam.Function.bind(this.dedup, this);
       //this.compare = foam.Function.bind(this.compare, this);
     },
@@ -376,7 +384,7 @@ foam.CLASS({
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.ValueIndex.isInstance(this.tailFactory.create()) ) {
+      if ( TREE_REQ.ValueIndex.isInstance(this.tailFactory.create()) ) {
         a.sort(toCompare(this.prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f);
       } else {
@@ -425,12 +433,12 @@ foam.CLASS({
     function plan(sink, skip, limit, order, predicate) {
       var index = this;
 
-      if ( this.False.isInstance(predicate) ) return this.NotFoundPlan.create();
+      if ( TREE_REQ.False.isInstance(predicate) ) return this.NotFoundPlan.create();
 
-      if ( ! predicate && this.Count.isInstance(sink) ) {
+      if ( ! predicate && TREE_REQ.Count.isInstance(sink) ) {
         var count = this.size();
         //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
-        return this.CountPlan.create({ count: count });
+        return TREE_REQ.CountPlan.create({ count: count });
       }
 
       //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
@@ -448,14 +456,14 @@ foam.CLASS({
             return arg2;
           }
 
-          if ( index.And.isInstance(predicate) ) {
+          if ( TREE_REQ.And.isInstance(predicate) ) {
             for ( var i = 0 ; i < predicate.args.length ; i++ ) {
               var q = predicate.args[i];
               if ( model.isInstance(q) && q.arg1 === prop ) {
                 predicate = predicate.clone();
                 predicate.args[i] = index.True;
                 predicate = predicate.partialEval();
-                if (  index.True.isInstance(predicate) ) predicate = undefined;
+                if (  TREE_REQ.True.isInstance(predicate) ) predicate = undefined;
                 return q.arg2;
               }
             }
@@ -490,9 +498,9 @@ foam.CLASS({
           }
         }
 
-        if ( subPlans.length === 0 ) return this.NotFoundPlan.create();
+        if ( subPlans.length === 0 ) return TREE_REQ.NotFoundPlan.create();
 
-        return this.AltPlan.create({
+        return TREE_REQ.AltPlan.create({
           subPlans: subPlans,
           prop: prop
         });
@@ -503,11 +511,11 @@ foam.CLASS({
         var key = arg2.f();
         result = this.get(key, this.compare);
 
-        if ( ! result ) return this.NotFoundPlan.create();
+        if ( ! result ) return TREE_REQ.NotFoundPlan.create();
 
         subPlan = result.plan(sink, skip, limit, order, predicate);
 
-        return this.AltPlan.create({
+        return TREE_REQ.AltPlan.create({
           subPlans: [subPlan],
           prop: prop
         });
@@ -535,7 +543,7 @@ foam.CLASS({
       if ( order ) {
         if ( order === prop ) {
           // sort not required
-        } else if ( index.Desc.isInstance(order) && order.arg1 === prop ) {
+        } else if ( TREE_REQ.Desc.isInstance(order) && order.arg1 === prop ) {
           // reverse-sort, sort not required
           reverseSort = true;
         } else {
@@ -549,11 +557,11 @@ foam.CLASS({
         if ( limit ) cost = Math.min(cost, limit);
       }
 
-      return this.CustomPlan.create({
+      return TREE_REQ.CustomPlan.create({
         cost: cost,
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           if ( sortRequired ) {
-            var arrSink = index.ArraySink.create();
+            var arrSink = TREE_REQ.ArraySink.create();
             index.selectCount++;
             subTree.select(arrSink, null, null, null, predicate);
             index.selectCount--;
