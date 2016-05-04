@@ -90,7 +90,6 @@ foam.CLASS({
             } else if ( isFramed ) {
               l = this.X.framed(l);
             }
-            // TODO: warn if both merged and framed.
             this.setPrivate_(name, l);
           }
 
