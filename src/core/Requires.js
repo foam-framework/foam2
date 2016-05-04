@@ -35,7 +35,7 @@ foam.CLASS({
             var parent = this;
 
             if ( ! cls )
-              console.error('Unknown class: ' + path);
+              console.error('Requires: Unknown class: ' + path);
 
             var c = Object.create(cls);
             c.create = function requiresCreate(args, X) { return cls.create(args, X || parent); };
