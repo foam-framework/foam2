@@ -25,7 +25,10 @@ foam.CLASS({
 
   // documentation: 'Base model for model hierarchy.',
 
-//  imports: [ 'assert', 'error', 'log', 'warn' ],
+  // Effectively imports the following methods, but imports: isn't available
+  // yet, so we add with 'methods:'.
+  //
+  // imports: [ 'assert', 'error', 'log', 'warn' ],
 
   methods: [
     /**
