@@ -382,7 +382,7 @@ foam.LIB({
           index:        argIdx++,
           documentation: typeMatch[5],
         }));
-        // TODO: this is only valid on the last arg
+        // TODO(js): this is only valid on the last arg
         if ( typeMatch[6] ) {
           ret.returnType = foam.core.ReturnValue.create({
             typeName: typeMatch[8],

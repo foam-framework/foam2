@@ -103,7 +103,7 @@ foam.CLASS({
   name: 'Function',
   extends: 'Property',
 
-  // documentation:  'Describes properties of type Function.',
+  // documentation: 'Describes properties of type Function.',
   label: 'Code that can be run',
 
   properties: [
@@ -114,7 +114,7 @@ foam.CLASS({
     [
       'adapt',
       function(_, value) {
-        // TODO: doc
+        // TODO: doc(adamvy)
         if ( typeof value === 'string' ) {
           var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
           body = ( body && body[1] ) ? body[1] : value;
@@ -156,7 +156,7 @@ foam.CLASS({
       value: 'ID',
       // documentation: 'The foreign key that this property references.'
     }
-    // TODO: expression to produce the actual value referenced by this property? or method installed on the host?
+    // TODO(js): expression to produce the actual value referenced by this property? or method installed on the host?
   ]
 });
 
@@ -203,7 +203,7 @@ foam.CLASS({
 //       name: 'getter',
 //       value: function(name) {
 //         var value = this.instance_[name];
-//         // TODO: this is from foam1 standard getter... grab the foam2 path
+//         // TODO(adamvy): this is from foam1 standard getter... grab the foam2 path
 //         if ( typeof value === 'undefined' ) {
 //           var prop = this.cls_.getAxiomByName(name);
 //           if ( prop ) {
@@ -305,7 +305,7 @@ foam.CLASS({
 });
 
 
-//TODO document
+//TODO(adamvy): document
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
@@ -314,7 +314,7 @@ foam.CLASS({
   properties: [
     { name: 'of', required: true },
     {
-      // TODO: Support narrow down to sub-topics
+      // TODO(adamvy): Support narrow down to sub-topics
       class: 'StringArray',
       name: 'topics'
     },
@@ -345,7 +345,7 @@ foam.CLASS({
             return m;
           }) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
-            // TODO This isn't the right check, but we need some sort of filter.
+            // TODO(adamvy): This isn't the right check, but we need some sort of filter.
             // We dont' want to proxy all FObject methods, only those defined in the interface
             // and possibly its parent interfaces?
             return delegate.hasOwnAxiom(m.name);

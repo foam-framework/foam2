@@ -384,7 +384,7 @@ foam.LIB({
     },
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
-      // TODO i18n: make this translatable
+      // FUTURE: make this translatable for i18n
       var seconds = Math.floor((Date.now() - date.getTime())/1000);
 
       if ( seconds < 60 ) return 'moments ago';

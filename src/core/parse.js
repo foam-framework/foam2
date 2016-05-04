@@ -664,7 +664,7 @@ foam.CLASS({
       return alt[0];
     },
     function parse(ps, obj) {
-      // TODO: Should we remove the obj argument in favour of
+      // TODO(adamvy): Should we remove the obj argument in favour of
       // passing the obj along via context or something?
       var args = this.args;
       for ( var i = 0, p ; p = args[i] ; i++ ) {
@@ -1345,7 +1345,7 @@ foam.CLASS({
         }
       }
 
-      // TODO: Array property should help me here
+      // TODO(adamvy): Array property should help me here
       this.pub("propertyChange", "symbols", this.slot("symbols"));
       return this;
     }
@@ -1372,7 +1372,6 @@ foam.CLASS({
 
 
 /*
-TODO:
--detect non string values passed to StringPS.setString()
-
+TODO(adamvy):
+  -detect non string values passed to StringPS.setString()
 */
