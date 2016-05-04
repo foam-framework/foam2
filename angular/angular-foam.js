@@ -22,7 +22,7 @@
 // then your application module that uses Angular and this library.
 
 /* globals angular: false */
-angular.module('foam', []).directive('foamView', function() {
+angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
   return {
     restrict: 'A',
     scope: {
@@ -239,4 +239,57 @@ angular.module('foam').directive('foamDaoController', function() {
     }
   };
 });
+
+angular.module('foam').directive('foamDetails', [ '$compile',
+    function($compile) {
+  return {
+    restrict: 'A',
+    scope: {
+      object: '<foamDetails'
+    },
+    link: function(scope, element, attrs) {
+      var lastClass;
+      var maybeRebuild = function maybeRebuild(obj) {
+        // We only need to rebuild the view if the model has changed.
+        if ( lastClass && obj.cls_ === lastClass ) return;
+
+        lastClass = obj.cls_;
+        var props = obj.cls_.getAxiomsByClass(foam.core.Property);
+        var html = '';
+        for ( var i = 0; i < props.length; i++ ) {
+          var prop = props[i];
+          if ( prop.hidden ) continue;
+
+          // Otherwise we dispatch on the type of the property.
+          if ( foam.core.Boolean.isInstance(prop) ) {
+            html += '<md-checkbox ng-model="object.' + prop.name + '">' +
+                prop.label + '</md-checkbox>';
+          } else {
+            var type = 'text';
+            if ( foam.core.Int.isInstance(prop) ||
+                foam.core.Float.isInstance(prop) ) {
+              type = 'number';
+            }
+
+            var inputHTML = '<input type="' + type + '" ' +
+                'ng-model="object.' + prop.name + '" ' +
+                (prop.required ? ' required' : '') + ' />';
+            html += '<md-input-container>' +
+                '<label>' + prop.label + '</label>' +
+                inputHTML +
+                '</md-input-container>';
+          }
+        }
+
+        element.empty();
+        element.append(html);
+        $compile(element.contents())(scope);
+      };
+
+      scope.$watch('object', function(nu) {
+        maybeRebuild(nu);
+      });
+    }
+  };
+} ]);
 
