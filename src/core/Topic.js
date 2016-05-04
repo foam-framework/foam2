@@ -43,7 +43,7 @@ foam.CLASS({
     'name',
     'description',
     {
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'Topic',
       name: 'topics',
       adaptArrayElement: function(o) {

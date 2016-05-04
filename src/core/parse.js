@@ -86,7 +86,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserArray',
-  extends: 'Array',
+  extends: 'FObjectArray',
 
   properties: [
     [ 'of', 'foam.parse.Parser' ],
@@ -1245,7 +1245,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'foam.parse.PSymbol',
       name: 'symbols',
       adapt: function(_, o) {

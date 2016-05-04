@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'Array', // TODO: rename to FObjectArray
+  name: 'FObjectArray',
   extends: 'Property',
 
   // documentation: "A Property which contains an array of 'of' FObjects.",

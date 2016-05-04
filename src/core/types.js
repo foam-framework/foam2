@@ -164,7 +164,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'StringArray',
-  extends: 'Array',
+  extends: 'FObjectArray',
 
   // documentation: 'An array of String values.',
   label: 'List of text strings',
@@ -406,7 +406,7 @@ foam.CLASS({
   properties: [
     'plural',
     {
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'foam.core.fsm.State',
       name: 'states',
       adaptArrayElement: function(s) {
