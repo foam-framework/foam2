@@ -123,9 +123,14 @@ foam.CLASS({
       This structure represents the head of a doubly-linked list of
       listeners. It contains 'next', a pointer to the first listener,
       and 'children', a map of sub-topic chains.
+
       Nodes in the list contain 'next' and 'prev' links, which lets
       removing subscriptions be done quickly by connecting next to prev
       and prev to next.
+
+      Note that both the head structure and the nodes themselves have a
+      'next' property. This simplifies the code because there is no
+      special case for handling when the list is empty.
 
       Listener List Structure
       -----------------------
@@ -278,7 +283,6 @@ foam.CLASS({
         l:    l
       };
       node.sub.destroy = function() {
-        // TODO: doc how anchor and nodes share same 'next' interface
         if ( node.next ) node.next.prev = node.prev;
         if ( node.prev ) node.prev.next = node.next;
 
