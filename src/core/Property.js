@@ -201,11 +201,12 @@ foam.CLASS({
       });
     },
 
+    /* Validate an object which has this Property. */
     function validateInstance(o) {
-      // ???: Should this call hasOwnProperty() instead?
-      /* Validate an object which has this property. */
       if ( this.required && ! o[this.name] ) {
-        throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
+        throw 'Required property ' +
+            o.cls_.id + '.' + this.name +
+            ' not defined.';
       }
     },
 
@@ -238,14 +239,10 @@ foam.CLASS({
     },
 
     /** Returns a developer-readable description of this Property. **/
-    function toString() {
-      return this.name;
-    },
+    function toString() { return this.name; },
 
     /** Flyweight getter for this Property. **/
-    function get(o) {
-      return o[this.name];
-    },
+    function get(o) { return o[this.name]; },
 
     /** Flyweight setter for this Property. **/
     function set(o, value) {
@@ -284,7 +281,16 @@ foam.CLASS({
 });
 
 
-// TODO: doc
+/**
+  A Simple Property skips the regular FOAM Property getter/setter/instance_
+  mechanism. In gets installed on the CLASS as a Property constant, but isn't
+  added to the prototype at all. From this point of view, it's mostly just for
+  documentation. Simple Properties are used only in special cases to maximize
+  performance and/or minimize memory use.
+  Used for MDAO indices and Slots.
+
+  USE WITH EXTREME CAUTION (OR NOT AT ALL).
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Simple',
