@@ -57,6 +57,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function validate() {
+      this.assert( ! this.isMerged || ! this.isFramed, "Listener can't be both isMerged and isFramed: ", this.name);
+    },
+
     function installInProto(proto) {
       var name       = this.name;
       var code       = this.code;
