@@ -64,6 +64,7 @@ describe('FObject compareTo', function() {
 describe('FObject diff', function() {
   var a;
   var b;
+  var oldAssert;
 
   beforeEach(function() {
     foam.CLASS({
@@ -78,9 +79,12 @@ describe('FObject diff', function() {
     });
     a = test.CompA.create();
     b = test.CompA.create();
+    oldAssert = foam.core.FObject.prototype.assert;
+    foam.core.FObject.prototype.assert = function(c) { if ( ! c ) throw Array.from(arguments); }
   });
   afterEach(function() {
     a = b = null;
+    foam.core.FObject.prototype.assert = oldAssert;
   });
 
   it('returns empty result for identical objects', function() {
