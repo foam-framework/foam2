@@ -44,6 +44,21 @@ foam.CLASS({
 });
 
 
+/* Validate that Listeners aren't both framed and merged. */
+foam.CLASS({
+  refines: 'foam.core.Listener',
+
+  methods: [
+    function validate() {
+      this.assert(
+        ! this.isMerged || ! this.isFramed,
+        "Listener can't be both isMerged and isFramed: ",
+        this.name);
+    }
+  ]
+});
+
+
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Property',
