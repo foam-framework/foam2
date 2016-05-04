@@ -487,3 +487,93 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Promised',
+  extends: 'Property',
+  properties: [
+    {
+      name: 'of',
+      required: true
+    }
+  ],
+  methods: [
+    function installInClass(cls) {
+      var propName = this.name;
+
+      var target = foam.lookup(this.of);
+
+      var methods = target.getAxiomsByClass(foam.core.Method)
+          .filter(function(m) { return target.hasOwnAxiom(m.name); })
+          .map(function(m) {
+            var name = m.name;
+            var returns = m.returns;
+
+            if ( ! returns ) {
+              var code = function() {
+                var self = this;
+                var args = arguments;
+                this[propName].then(function(a) {
+                  a[name].apply(a, args);
+                });
+              };
+            } else if ( returns === 'Promise' ) {
+              code = function() {
+                var self = this;
+                var args = arguments;
+                return this[propName].then(function(a) {
+                  return a[name].apply(a, args);
+                });
+              };
+            } else {
+              // TODO: Use modelFactories
+
+              var path = m.returns.split('.');
+              path[path.length - 1] = 'Promised' + path[path.length - 1];
+
+              var returnClsId = path.join('.');
+
+              if ( ! foam.lookup(returnClsId) ) {
+                foam.CLASS({
+                  package: path.slice(0, path.length - 1).join('.'),
+                  name: path[path.length - 1]
+                });
+
+                // Done in two passes to prevent infinite recursion.
+                foam.CLASS({
+                  refines: returnClsId,
+                  properties: [
+                    {
+                      class: 'Promised',
+                      of: m.returns,
+                      name: 'delegate'
+                    }
+                  ]
+                });
+              }
+
+              code = function() {
+                var self = this;
+                var args = arguments;
+                return foam.lookup(returnClsId).create({
+                  delegate: this[propName].then(function(d) {
+                    return d[name].apply(d, args);
+                  })
+                });
+              };
+            }
+
+            foam.Function.setName(code, name);
+
+            return foam.core.Method.create({
+              name: name,
+              code: code
+            });
+          }).forEach(function(m) {
+            cls.installAxiom(m);
+          });
+    }
+  ]
+});
