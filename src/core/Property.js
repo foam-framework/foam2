@@ -24,7 +24,6 @@ foam.CLASS({
     {
       name: 'name',
       required: true
-      // TODO: validate doesn't end with $
     },
     {
       name: 'label',

@@ -67,6 +67,10 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
+      this.assert(
+          ! this.name.endsWith('$'),
+          'Illegal Property Name: Can\'t end with "$": ', this.name);
+
       var mName =
         model.id      ? model.id + '.'      :
         model.refines ? model.refines + '.' :

@@ -895,6 +895,15 @@ foam.CLASS({
 });
 ValidationTest.model_.validate();
 
+// Model validation, properties names must not end with '$'
+foam.CLASS({
+  name: 'DollarValidationTest',
+  properties: [
+    { name: 'name$' }
+  ]
+});
+DollarValidationTest.model_.validate();
+
 // Property constants musn't conflict
 foam.CLASS({
   name: 'ConstantConflictTest',
