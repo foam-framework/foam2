@@ -450,7 +450,7 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var prop = this[ps[i].name];
         hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
-        hash &= hash; // force back to a 32-bit int
+        hash &= hash; // forces 'hash' back to a 32-bit int
       }
 
       return hash;
