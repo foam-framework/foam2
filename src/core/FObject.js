@@ -202,7 +202,8 @@ foam.CLASS({
     */
     function pub(a1, a2, a3, a4, a5, a6, a7, a8, a9) {
       // This method prevents this function not being JIT-ed because
-      // of the use of 'arguments'.  Doesn't generate any garbage.
+      // of the use of 'arguments'. Doesn't generate any garbage ([]'s
+      // don't appear to be garbage in V8).
       // FUTURE: benchmark
       switch ( arguments.length ) {
         case 0:  return this.pub_([]);
@@ -215,7 +216,6 @@ foam.CLASS({
         case 7:  return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
         case 8:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8]);
         case 9:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8, a9]);
-        // TODO: add unit test for 10 args or above
         default: return this.pub_(arguments);
       }
     },
