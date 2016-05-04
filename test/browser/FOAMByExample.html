@@ -652,7 +652,20 @@ o.sub('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' '))
 o.pub('alarm', 'on');
 o.pub('lifecycle', 'loaded');
 
-// A Class can declare 'Topics' that it pubes events for.
+// Test publishing with many args
+o.pub(1);
+o.pub(1,2);
+o.pub(1,2,3);
+o.pub(1,2,3,4);
+o.pub(1,2,3,4,5);
+o.pub(1,2,3,4,5,6);
+o.pub(1,2,3,4,5,6,7);
+o.pub(1,2,3,4,5,6,7,8);
+o.pub(1,2,3,4,5,6,7,8,9);
+o.pub(1,2,3,4,5,6,7,8,9,10);
+o.pub(1,2,3,4,5,6,7,8,9,10,11);
+
+// A Class can declare 'Topics' that it publishes events for.
 foam.CLASS({
   name: 'TopicTest',
   topics: [ 'alarm' ]

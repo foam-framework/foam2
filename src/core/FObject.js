@@ -160,9 +160,9 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
-        // Like l.apply(l, [s].concat(a)), but faster.
+        // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
-        // TODO: optional exception trapping
+        // ???: optional exception trapping, benchmark
         switch ( a.length ) {
           case 0: l(s); break;
           case 1: l(s, a[0]); break;
@@ -174,7 +174,7 @@ foam.CLASS({
           case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
           case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
           case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
-          default: l.apply(l, [s].concat(a));
+          default: l.apply(l, [s].concat(Array.from(a)));
         }
         listeners = listeners.next;
         count++;
