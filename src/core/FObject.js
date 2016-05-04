@@ -415,7 +415,7 @@ foam.CLASS({
       return 0;
     },
 
-    // TODO: doc
+    // TODO: doc(adamvy)
     function diff(other) {
       var diff = {};
 
