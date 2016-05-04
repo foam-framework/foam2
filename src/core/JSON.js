@@ -237,10 +237,10 @@ foam.CLASS({
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) return;
 
-      if ( includeComma ) this.out(',');
-
       var v = o[p.name];
       if ( Array.isArray(v) && ! v.length ) return;
+
+      if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
       this.output(v);
