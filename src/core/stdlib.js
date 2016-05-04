@@ -365,10 +365,6 @@ foam.LIB({
       }
 
       return hash;
-    },
-    function argsToArray(args) {
-      /** convenience method to turn 'arguments' into a real array */
-      return foam.Function.appendArguments([], args, 0);
     }
   ]
 });

@@ -71,7 +71,7 @@ foam.CLASS({
      * args: one or more properties
      **/
     function addIndex() {
-      var props = foam.Array.argsToArray(arguments);
+      var props = Array.from(arguments);
 
       if ( ! this.of.ids ) {// throw "Undefined index"; // TODO: err?
         this.of.ids = ['id'];
@@ -168,16 +168,16 @@ foam.CLASS({
       if ( key === undefined ) {
         return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
       }
-      
+
       if ( ! Array.isArray(key) ) key = [key];
       var index = this.idIndex;
       for ( var i = 0; i < key.length && index; ++i ) {
         index = index.get(key[i]);
       }
       if ( index && index.get() ) return Promise.resolve(index.get());
-      
+
       return Promise.reject(this.ObjectNotFoundException.create({ id: key }));
-      
+
       //var foundObj = null;
       //return this.findObj_(key);
       // TODO: How to handle multi value primary keys?

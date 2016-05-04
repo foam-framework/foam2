@@ -26,14 +26,6 @@
  * it should not be included in production.
  */
 
-foam.assert = function assert(cond /*, args */) {
-  if ( ! cond ) {
-    var msg = Array.prototype.slice.call(arguments, 1).join(' ');
-    console.assert(false, msg);
-  }
-};
-
-
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -60,8 +52,10 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
-      // TODO: Have work with 'refines'.
-      var mName = model ? model.id + '.' : '';
+      var mName =
+        model.id      ? model.id + '.'      :
+        model.refines ? model.refines + '.' :
+        '' ;
 
       // List of properties which are hidden by other properties.
       var es = [
@@ -92,10 +86,10 @@ foam.CLASS({
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);
 
-          foam.assert(
+          this.assert(
               axiom,
               'Unknown argument "', name, '" in ', pName, expression);
-          foam.assert(
+          this.assert(
               axiom.toSlot,
               'Non-Slot argument "', name, '" in ', pName, expression);
         }
@@ -105,8 +99,7 @@ foam.CLASS({
 });
 
 
-// TODO: assert describe() not already set
-
+foam.X.assert(! foam.AbstractClass.describe, 'foam.AbstractClass.describe already set.');
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
@@ -134,7 +127,7 @@ foam.AbstractClass.installModel = function() {
     for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
       var a = m.axioms_[i];
 
-      foam.assert(
+      foam.X.assert(
         ! names.hasOwnProperty(a.name),
         'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
@@ -187,14 +180,13 @@ foam.CLASS({
   methods: [
     function unknownArg(key, value) {
       if ( key == 'class' ) return;
-      // TODO: call foam.warn() instead
-      console.warn('Unknown property ' + this.cls_.id + '.' + key + ':', value);
+      this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
     },
 
     function describe(opt_name) {
-      console.log('Instance of', this.cls_.name);
-      console.log('Axiom Type           Name           Value');
-      console.log('----------------------------------------------------');
+      this.log('Instance of', this.cls_.name);
+      this.log('Axiom Type           Name           Value');
+      this.log('----------------------------------------------------');
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
@@ -203,27 +195,28 @@ foam.CLASS({
           foam.String.pad(p.name, 14),
           this[p.name]);
       }
-      console.log('\n');
+      this.log('\n');
     }
   ]
 });
 
 
 /* Add describe support to contexts. */
-foam.X.describe = function() {
-  console.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
-  console.log('KEY                  Type           Value');
-  console.log('----------------------------------------------------');
-  for ( var key in this ) {
-    var value = this[key];
-    var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
-    console.log(
-      foam.String.pad(key,  20),
-      foam.String.pad(type, 14),
-      typeof value === 'string' || typeof value === 'number' ? value : '');
-  }
-  console.log('\n');
-};
+foam.X = foam.X.subContext({
+  describe: function() {
+    this.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
+    this.log('KEY                  Type           Value');
+    this.log('----------------------------------------------------');
+    for ( var key in this ) {
+      var value = this[key];
+      var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
+      this.log(
+        foam.String.pad(key,  20),
+        foam.String.pad(type, 14),
+        typeof value === 'string' || typeof value === 'number' ? value : '');
+    }
+    this.log('\n');
+}});
 
 
 foam.CLASS({
@@ -293,15 +286,16 @@ foam.CLASS({
   ],
 
   methods: [
-    /** Validates the given argument against this type information.
-        If any type checks are failed, a TypeError is thrown.
-         */
+    /**
+      Validates the given argument against this type information.
+      If any type checks are failed, a TypeError is thrown.
+     */
     function validate(/* any // the argument value to validate. */ arg) {
-      i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
+      i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
         if ( ! this.optional ) {
-          throw new TypeError(this.PREFIX + i + this.name+', is not optional, but was undefined in a function call');
+          throw new TypeError(this.PREFIX + i + this.name + ', is not optional, but was undefined in a function call');
         } else {
           return; // value is undefined, but ok with that
         }
@@ -315,7 +309,7 @@ foam.CLASS({
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
-        if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?
+        if ( ! this.type.isInstance(arg) ) {
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
           throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + gotType);
         }

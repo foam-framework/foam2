@@ -32,7 +32,7 @@ var toCompare = function toCompare(c) {
 };
 /** TODO: move to stdlib */
 var CompoundComparator = function CompoundComparator() {
-  var args = foam.Array.argsToArray(arguments);
+  var args = Array.from(arguments);
   var cs = [];
 
   // Convert objects with .compare() methods to compare functions.

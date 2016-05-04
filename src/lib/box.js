@@ -497,7 +497,7 @@ foam.CLASS({
 
                 var msg = this.RPCMessage.create({
                   name: m.name,
-                  args: foam.Array.argsToArray(arguments)
+                  args: Array.from(arguments)
                 });
                 if ( replyBox ) msg.replyBox = replyBox;
 
@@ -655,7 +655,7 @@ foam.CLASS({
         // TODO: Unsub support
         var dest = message.destination;
         this.data.sub(function() {
-          var args = foam.Array.argsToArray(arguments);
+          var args = Array.from(arguments);
 
           // Cannot serialize the subscription object.
           args.shift();

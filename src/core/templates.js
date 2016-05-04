@@ -188,7 +188,7 @@ foam.CLASS({
           'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
           'var f = function(' + args.join(',') + '){' + code + '};' +
           'return function() { '+
-          'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(foam.Array.argsToArray(arguments)));' +
+          'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(Array.from(arguments)));' +
           'return f.apply(this, arguments);};})()');
 
       return f;

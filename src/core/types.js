@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.core',
-  name:  'Date',
+  name: 'Date',
   extends: 'Property',
 
   // documentation: 'Describes properties of type Date.',
@@ -69,10 +69,9 @@ foam.CLASS({
 });
 
 
-// TODO: add or rename to 'Double'
 foam.CLASS({
   package: 'foam.core',
-  name:  'Float',
+  name: 'Float',
   extends: 'Int',
 
   // documentation:  'Describes properties of type Float.',
@@ -89,9 +88,19 @@ foam.CLASS({
 });
 
 
+/**
+ No different than Float for JS, but useful when targeting with other languages.
+ **/
 foam.CLASS({
   package: 'foam.core',
-  name:  'Function',
+  name: 'Double',
+  extends: 'Float'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Function',
   extends: 'Property',
 
   // documentation:  'Describes properties of type Function.',
@@ -130,7 +139,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name:  'Reference',
+  name: 'Reference',
   extends: 'Property',
 
   // documentation:  'A foreign key reference to another Entity.',
@@ -169,22 +178,13 @@ foam.CLASS({
     [
       'adapt',
       function(_, v, prop) {
-        // TODO: remove magic, add checking
-        return Array.isArray(v) ? v :
-          ( typeof v === 'string' ) ? prop.fromString(v) :
-          ((v || v === 0) ? [v] : []);
+        this.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
+        return v;
       }
     ],
     [
       'factory',
       function() { return []; }
-    ],
-    // TODO: remove
-    [
-      'fromString',
-      function(s) {
-        return s.split(',');
-      }
     ]
   ]
 });
@@ -294,19 +294,6 @@ foam.CLASS({
 });
 
 
-// TODO: doc
-// TODO: move somewhere else
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Simple',
-  extends: 'Property',
-
-  methods: [
-    function installInProto(proto) {}
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Map',
@@ -316,6 +303,7 @@ foam.CLASS({
     'of'
   ]
 });
+
 
 //TODO document
 foam.CLASS({
@@ -353,7 +341,7 @@ foam.CLASS({
       var methods = ! this.methods ? [] :
           this.methods.length ? this.methods.map(function(f) {
             var m = delegate.getAxiomByName(f);
-            console.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
+            foam.X.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
             return m;
           }) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {

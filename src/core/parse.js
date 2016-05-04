@@ -1150,7 +1150,7 @@ foam.CLASS({
   methods: [
     function seq() {
       return foam.lookup('foam.parse.Sequence').create({
-        args: foam.Array.argsToArray(arguments)
+        args: Array.from(arguments)
       });
     },
 
@@ -1164,13 +1164,13 @@ foam.CLASS({
 
     function simpleAlt() {
       return foam.lookup('foam.parse.Alternate').create({
-        args: foam.Array.argsToArray(arguments)
+        args: Array.from(arguments)
       });
     },
 
     function alt() {
       return foam.lookup('foam.parse.Alternate').create({
-        args: foam.Array.argsToArray(arguments)
+        args: Array.from(arguments)
       });
     },
 
@@ -1183,7 +1183,7 @@ foam.CLASS({
     function seq1(n) {
       return foam.lookup('foam.parse.Sequence1').create({
         n: n,
-        args: foam.Array.argsToArray(arguments).slice(1)
+        args: Array.from(arguments).slice(1)
       });
     },
 

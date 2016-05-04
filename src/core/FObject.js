@@ -25,7 +25,7 @@ foam.CLASS({
 
   // documentation: 'Base model for model hierarchy.',
 
-  imports: [ 'assert', 'error', 'log', 'warn' ],
+//  imports: [ 'assert', 'error', 'log', 'warn' ],
 
   methods: [
     /**
@@ -97,6 +97,23 @@ foam.CLASS({
         a.validateInstance && a.validateInstance(this);
       }
     },
+
+
+    /************************************************
+     * Console
+     ************************************************/
+
+    // Imports aren't implemented yet, so mimic:
+    //   imports: [ 'assert', 'error', 'log', 'warn' ],
+
+    function assert() { ((this.X && this.X.assert) || foam.X.assert).apply(null, arguments); },
+
+    function error() { ((this.X && this.X.error) || foam.X.error).apply(null, arguments); },
+
+    function log() { ((this.X && this.X.log) || foam.X.log).apply(null, arguments); },
+
+    function warn() { ((this.X && this.X.warn) || foam.X.warn).apply(null, arguments); },
+
 
     /************************************************
      * Publish and Subscribe
@@ -245,7 +262,7 @@ foam.CLASS({
     function sub() { /* args..., l */
       var l = arguments[arguments.length-1];
 
-      console.assert(typeof l === 'function', 'Listener must be a function');
+      this.assert(typeof l === 'function', 'Listener must be a function');
 
       var listeners = this.listeners_();
 
@@ -278,9 +295,9 @@ foam.CLASS({
     /**
       Unsub a previously sub()'ed listener.
       It is more efficient to unsubscribe by calling .destroy()
-      on the subscription returned from sub().
+      on the subscription returned from sub() (so prefer that
+      method when possible).
     */
-    // TODO: remove until/when needed
     function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
@@ -315,8 +332,8 @@ foam.CLASS({
     function slot(name) {
       var axiom = this.cls_.getAxiomByName(name);
 
-      console.assert(axiom, 'Unknown axiom:', name);
-      console.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
+      this.assert(axiom, 'Unknown axiom:', name);
+      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
 
       return axiom.toSlot(this);
     },
@@ -325,6 +342,10 @@ foam.CLASS({
     /************************************************
      * Destruction
      ************************************************/
+
+    function isDestroyed() {
+      return ! this.instance_;
+    },
 
     function onDestroy(dtor) {
       /*
@@ -342,9 +363,12 @@ foam.CLASS({
         Free any referenced objects and destroy any registered destroyables.
         This object is completely unusable after being destroyed.
        */
-      if ( ! this.instance_ ) return;
+      if ( this.isDestroyed() || this.instance_.destroying_ ) return;
 
-// TODO: add 'destroying' state
+      // Record that we're currently destroying this object,
+      // to prevent infitine recursion.
+      this.instance_.destroying_ = true;
+
       var dtors = this.getPrivate_('dtors');
       if ( dtors ) {
         for ( var i = 0 ; i < dtors.length ; i++ ) {
@@ -391,7 +415,9 @@ foam.CLASS({
     function diff(other) {
       var diff = {};
 
-      // TODO: assert 'other' is same class
+      this.assert(other, 'Attempt to diff against null.');
+      this.assert(other.cls_ === this.cls_, 'Attempt to diff objects with different classes.', this, other);
+
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
         var value    = property.f(this);
@@ -400,16 +426,12 @@ foam.CLASS({
         // FUTURE: add nested Object support
         // FUTURE: add patch() method?
         if ( Array.isArray(value) ) {
-          // TODO: use foam.Array.diff()
-          var subdiff = foam.util.diff(value, otherVal);
+          var subdiff = foam.Array.diff(value, otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
             diff[property.name] = subdiff;
           }
-          continue;
-        }
-
-        // if the primary value is undefined, use the compareTo of the other
-        if ( ! foam.util.equals(value, otherVal) ) {
+        } else if ( ! foam.util.equals(value, otherVal) ) {
+          // if the primary value is undefined, use the compareTo of the other
           diff[property.name] = otherVal;
         }
       }
@@ -436,14 +458,7 @@ foam.CLASS({
       for ( var key in this.instance_ ) {
         var value = this[key];
         if ( value !== undefined ) {
-          var prop = this.cls_.getAxiomByName(key);
-          // TODO: is check needed?
-          if ( prop && prop.cloneProperty ) {
-            prop.cloneProperty(value, m);
-          } else {
-            // TODO: is this needed?
-            m[key] = value;
-          }
+          this.cls_.getAxiomByName(key).cloneProperty(value, m);
         }
       }
       return this.cls_.create(m/*, this.X*/);
@@ -469,10 +484,11 @@ foam.CLASS({
     },
 
     function toString() {
-      // TODO: better test: 'this.cls_ === this'
-      // TODO: add 'Destroyed' if destroyed
       // Distinguish between prototypes and instances.
-      return this.cls_.id + (this.instance_ ? '' : 'Proto')
+      return this.cls_.id + (
+          this.cls_.prototype === this ? 'Proto' :
+          this.isDestroyed() ? ':DESTROYED' :
+          '');
     }
   ]
 });

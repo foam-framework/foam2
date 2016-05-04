@@ -36,8 +36,8 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'n',  197 ],
-    [ 'width', 500 ],
+    [ 'n',      227 ],
+    [ 'width',  500 ],
     [ 'height', 500 ],
     [ 'time',   0 ],
     [ 'color', 'black' ]
@@ -51,8 +51,8 @@ foam.CLASS({
     },
     function addPoint(i) {
       var p = this.Point.create({
-        r: 200,
-        t: i*Math.PI*2/this.n,
+        r: i*200/this.n,
+        t: i*Math.PI*20/this.n,
         g: 0, //i*Math.PI/5/this.n,
         radius: 3,
         border: null,

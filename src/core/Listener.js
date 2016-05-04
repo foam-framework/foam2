@@ -57,6 +57,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function validate() {
+      this.assert( ! this.isMerged || ! this.isFramed, "Listener can't be both isMerged and isFramed: ", this.name);
+    },
+
     function installInProto(proto) {
       var name       = this.name;
       var code       = this.code;
@@ -69,8 +73,7 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(name) ) {
             var self = this;
             var l = function(sub) {
-              // TODO: method isDestroyed()
-              if ( ! self.instance_ ) {
+              if ( self.isDestroyed() ) {
                 if ( sub ) {
                   console.warn('Destroying stale subscription for', self.cls_.id);
                   sub.destroy();
@@ -87,7 +90,6 @@ foam.CLASS({
             } else if ( isFramed ) {
               l = this.X.framed(l);
             }
-            // TODO: warn if both merged and framed.
             this.setPrivate_(name, l);
           }
 
@@ -112,8 +114,9 @@ foam.CLASS({
           console.assert(o.name, 'Listener must be named');
           return foam.core.Listener.create({name: o.name, code: o});
         }
-        // TODO: check that not already a Listener
-        return foam.core.Listener.create(o);
+        return foam.core.Listener.isInstance(o) ?
+            o :
+            foam.core.Listener.create(o) ;
       }
     }
   ]
