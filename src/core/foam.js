@@ -55,6 +55,7 @@
   }
 
   [
+    "poly",
     "lib",
     "stdlib",
     "events",
@@ -71,6 +72,7 @@
     "Int",
     "AxiomArray",
     "EndBoot",
+    "types",
     "Topic",
     "Constant",
     "InnerClass",
@@ -80,10 +82,9 @@
     "IDSupport",
     "Requires",
     "Slot",
-    "debug",
     "Window",
+    "debug",
     "patterns",
-    "types",
     "JSON",
     "parse",
     "templates",
@@ -98,6 +99,7 @@
     "../lib/Index",
     "../lib/MDAO",
     [ "../lib/IDBDAO", ! isServer ],
+    "../lib/Pooled",
     "../lib/Physical",
     "../lib/Collider",
     "../lib/PhysicsEngine",

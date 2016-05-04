@@ -210,28 +210,21 @@ describe('StringArray', function() {
     p = null;
   });
 
+  it('setting an array to a number throws an exception', function() {
+    expect(function() { p.stringArray = 42; }).toThrow();
+  });
+  it('setting an array to null throws an exception', function() {
+    expect(function() { p.stringArray = null; }).toThrow();
+  });
+  it('setting an array to an object throws an exception', function() {
+    expect(function() { p.stringArray = {}; }).toThrow();
+  });
   it('is empty array by default', function() {
     expect(p.stringArray).toEqual([]);
-  });
-  it('accepts bare strings', function() {
-    p.stringArray = "Hello";
-    expect(p.stringArray).toEqual(['Hello']);
-  });
-  it('accepts comma separated strings', function() {
-    p.stringArray = "Hello,Goodbye,Farewell";
-    expect(p.stringArray).toEqual(['Hello','Goodbye','Farewell']);
   });
   it('accepts string in an array', function() {
     p.stringArray = [ "Hello", "I see", "Well" ];
     expect(p.stringArray).toEqual([ "Hello", "I see", "Well" ]);
-  });
-  it('puts other things into an array', function() {
-    p.stringArray = 99;
-    expect(p.stringArray).toEqual([ 99 ]);
-    p.stringArray = 0;
-    expect(p.stringArray).toEqual([ 0 ]);
-    p.stringArray = null;
-    expect(p.stringArray).toEqual([ ]);
   });
 });
 

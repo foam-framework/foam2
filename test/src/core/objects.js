@@ -69,7 +69,7 @@ describe('FObject diff', function() {
     foam.CLASS({
       name: 'CompA',
       package: 'test',
-      properties: [ 'a', 'b' ]
+      properties: [ 'a', 'b', 'c' ]
     });
     foam.CLASS({
       name: 'CompB',
@@ -77,7 +77,7 @@ describe('FObject diff', function() {
       properties: [ 'b', 'c' ]
     });
     a = test.CompA.create();
-    b = test.CompB.create();
+    b = test.CompA.create();
   });
   afterEach(function() {
     a = b = null;
@@ -86,19 +86,17 @@ describe('FObject diff', function() {
   it('returns empty result for identical objects', function() {
     expect(a.diff(a)).toEqual({});
   });
-  it('returns new value if undefined in base object', function() {
-    b.b = 4;
-    expect(a.diff(b)).toEqual({ b: 4 });
+  it("Exception if classes don't match", function() {
+    expect(function() { a.diff(foam.core.Int.create()); }).toThrow();
   });
-  it('returns undefined if a base value is missing in other', function() {
-    a.b = 4;
-    expect(a.diff(b)).toEqual({ b: undefined });
+  it("Exception if diffing null", function() {
+    expect(function() { a.diff(null); }).toThrow();
   });
   it('returns only changed values from primary', function() {
     a.b = 'yes';
     b.b = 'no';
     b.c = 'maybe';
-    expect(a.diff(b)).toEqual({ b: 'no' });
+    expect(a.diff(b)).toEqual({ b: 'no', c: 'maybe' });
   });
   it('returns changed values not present in the other model', function() {
     a.a = 'yes';

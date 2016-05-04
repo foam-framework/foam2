@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: doc
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
@@ -32,7 +33,7 @@ foam.CLASS({
     'console',
     'delayed',
     'document',
-    'dynamic',
+    // 'dynamic',
     'error',
     'framed',
     'info',
@@ -70,14 +71,14 @@ foam.CLASS({
     function assert(b /*, args */) {
       /* Like console.assert() except that it takes more than one argument. */
       if ( ! b ) {
-        this.console.assert(false, [].splice.call(arguments, 1).join(''));
+        this.console.assert(false, Array.prototype.slice.call(arguments, 1).join(' '));
       }
     },
 
     function error() { this.console.error.apply(this.console, arguments); },
-    function info()  { this.console.info.apply(this.console, arguments); },
-    function log()   { this.console.log.apply(this.console, arguments); },
-    function warn()  { this.console.warn.apply(this.console, arguments); },
+    function info()  { this.console.info.apply(this.console, arguments);  },
+    function log()   { this.console.log.apply(this.console, arguments);   },
+    function warn()  { this.console.warn.apply(this.console, arguments);  },
 
     function async(l) {
       /* Decorate a listener so that the event is delivered asynchronously. */
@@ -102,7 +103,7 @@ foam.CLASS({
         var lastArgs  = null;
         function mergedListener() {
           triggered = false;
-          var args = foam.Array.argsToArray(lastArgs);
+          var args = Array.from(lastArgs);
           lastArgs = null;
           l.apply(this, args);
         }
@@ -146,8 +147,10 @@ foam.CLASS({
       }(), 'framed(' + l.name + ')');
     },
 
+    /*
     function dynamic() {
     },
+    */
 
     function setTimeout(f, t) {
       return this.window.setTimeout.apply(this.window, arguments);

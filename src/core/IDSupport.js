@@ -42,43 +42,47 @@ foam.CLASS({
     [ 'transient', true ],
     'propNames',
     'props',
-    [ 'getter', function() {
+    [ 'getter', function multiPartGetter() {
       var props = this.cls_.ID.props;
 
-      if ( props.length === 1 ) return props[0].get(o);
+      if ( props.length === 1 ) return props[0].get(this);
 
       var a = new Array(props.length);
-      for ( var i = 0 ; i < props.length ; i++ ) a[i] = props[i].get(o);
+      for ( var i = 0 ; i < props.length ; i++ ) a[i] = props[i].get(this);
       return a;
     }],
-    [ 'setter', function(a) {
+    [ 'setter', function multiPartSetter(a) {
       var props = this.cls_.ID.props;
 
       if ( props.length === 1 ) {
-        props[0].set(a);
+        props[0].set(this, a);
       } else {
-        for ( var i = 0 ; i < props.length ; i++ ) props[i].set(o, a[i]);
+        for ( var i = 0 ; i < props.length ; i++ ) props[i].set(this, a[i]);
       }
     }],
-    [
-      'comparePropertyValues',
-      function(o1, o2) {
-        var props = this.cls_.ID.props;
+    {
+      name: 'compare',
+      // TODO: setting value: should override factory:
+      factory: null,
+      value: function multiPartCompare(o1, o2) {
+        var props = this.props;
+        if ( props.length === 1 ) return props[0].compare(o1, o2);
+
         for ( var i = 0 ; i < props.length ; i++ ) {
           var c = props[i].compare(o1, o2);
           if ( c ) return c;
         }
         return 0;
       }
-    ]
+    }
   ],
 
   methods: [
     function installInClass(c) {
       this.props = this.propNames.map(function(n) {
         var prop = c.getAxiomByName(n);
-        foam.assert(prop, 'Unknown ids property:', c.id + '.' + n);
-        foam.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
+        foam.X.assert(prop, 'Unknown ids property:', c.id + '.' + n);
+        foam.X.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
         return prop;
       });
 
@@ -94,8 +98,8 @@ foam.CLASS({
     {
       name: 'ids',
       postSet: function(_, ids) {
-        foam.assert(Array.isArray(ids), 'Ids must be an array.');
-        foam.assert(ids.length, 'Ids must contain at least one property.');
+        this.assert(Array.isArray(ids), 'Ids must be an array.');
+        this.assert(ids.length, 'Ids must contain at least one property.');
 
         this.axioms_.push(foam.core.MultiPartID.create({propNames: ids}));
       }

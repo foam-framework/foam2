@@ -46,7 +46,9 @@ foam.CLASS({
   ]
 });
 
+
 foam.boot.phase3();
+
 
 foam.CLASS({
   refines: 'foam.core.FObject',
@@ -98,7 +100,8 @@ foam.CLASS({
       // If args are just a simple {} map, just copy
       if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
         for ( var key in args ) {
-          if ( this.cls_.getAxiomByName(key) ) {
+          var a = this.cls_.getAxiomByName(key);
+          if ( a && foam.core.Property.isInstance(a) ) {
             this[key] = args[key];
           } else {
             this.unknownArg(key, args[key]);
@@ -108,11 +111,16 @@ foam.CLASS({
       // If an FObject, copy values from instance_
       else if ( args.instance_ ) {
         for ( var key in args.instance_ ) {
-          if ( this.cls_.getAxiomByName(key) ) this[key] = args[key];
+          var a = this.cls_.getAxiomByName(key);
+          if ( a && foam.core.Property.isInstance(a) ) {
+            this[key] = args[key];
+          }
         }
       }
       // Else call copyFrom(), which is the slowest version because
       // it is O(# of properties) not O(# of args)
+      // This is possible if called with a map with a prototype other
+      // than Object.prototype or null. Should rarely happen.
       else {
         this.copyFrom(args);
       }
@@ -132,6 +140,7 @@ foam.CLASS({
 foam.boot.end();
 
 
+// TODO: doc
 foam.CLASS({
   refines: 'foam.core.Property',
 
