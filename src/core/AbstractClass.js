@@ -38,7 +38,10 @@ foam.LIB({
       // the object itself so that we can add extra behaviour
       // to properties (things like preSet, postSet, firing property-
       // change events, etc.).
-      obj.instance_ = {};
+      if ( obj.__init_instance__ ) // TODO: or just create instance_ in initArgs()
+        obj.__init_instance__();
+      else
+        obj.instance_ = {};
 
       // initArgs() is the standard argument extraction method.
       obj.initArgs(args, X);

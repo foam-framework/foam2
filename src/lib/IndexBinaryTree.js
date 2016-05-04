@@ -21,12 +21,18 @@ foam.CLASS({
   extends: null,
 
   methods: [
-    function initArgs(args) { args && foam.core.FObject.prototype.copyFrom.call(this, args); },
+    function initArgs(args) {
+      args && foam.core.FObject.prototype.copyFrom.call(this, args);
+    },
+
+    function __init_instance__() {
+
+    },
 
     // requires needs private storage
-    function hasOwnPrivate_(name) { return typeof this[name+"___"] !== 'undefined'; },
-    function setPrivate_(name, value) { this[name+"___"] = value; },
-    function getPrivate_(name) { return this[name+"___"]; },
+    //function hasOwnPrivate_(name) { return typeof this[name+"___"] !== 'undefined'; },
+    //function setPrivate_(name, value) { this[name+"___"] = value; },
+    //function getPrivate_(name) { return this[name+"___"]; },
 
     // Any non-Simple properties will try to call pub
     //function pubPropertyChange_() {},
@@ -386,13 +392,13 @@ foam.CLASS({
       this.level = 0;
     },
 
-    function clone() {         return this; },
-    function maybeClone() {    return this; },
-    function skew(locked) {          return this; },
-    function split(locked) {         return this; },
+    function clone()               { return this; },
+    function maybeClone()          { return this; },
+    function skew(locked)          { return this; },
+    function split(locked)         { return this; },
     function decreaseLevel(locked) { return this; },
-    function get() {           return undefined; },
-    function updateSize() { },
+    function get()                 { return undefined; },
+    function updateSize()          {  },
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
@@ -406,14 +412,14 @@ foam.CLASS({
       return n;
     },
     function removeKeyValue() { return this; },
-    function removeNode() { return this; },
-    function select() { },
-    function selectReverse() {},
+    function removeNode()     { return this; },
+    function select()         { },
+    function selectReverse()  { },
 
-    function gt() {  return this; },
-    function gte() { return this; },
-    function lt() {  return this; },
-    function lte() { return this; },
+    function gt()   { return this; },
+    function gte()  { return this; },
+    function lt()   { return this; },
+    function lte()  { return this; },
 
     function bulkLoad_(a, start, end, keyExtractor) {
       if ( end < start ) return this;

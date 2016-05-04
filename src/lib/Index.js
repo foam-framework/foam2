@@ -200,15 +200,6 @@ foam.CLASS({
   extends: 'foam.core.LightWeight',
 
   methods: [
-
-    // /** Flyweight constructor */
-    // function create(args) {
-    //   var c = Object.create(this);
-    //   args && c.copyFrom(args);
-    //   c.init && c.init();
-    //   return c;
-    // },
-
     /** Adds or updates the given value in the index */
     function put() {},
     /** Removes the given value from the index */
@@ -234,30 +225,26 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndex',
   extends: 'foam.dao.index.Index',
-  implements: [
-    'foam.dao.index.Plan',
-  ],
 
   properties: [
-    {
-      class: 'Simple',  name: 'value'    },
-    { class: 'Simple',  name: 'cost', value: 1 },
+    { class: 'Simple',  name: 'value' },
   ],
 
   methods: [
-    function init() {
-      this.cost = 1;
-    },
-
-    // from Plan (this index is its own plan)
-    function execute(promise, sink /*, skip, limit, order, predicate*/) {
-      sink.put(this.value);
-    },
 
     // from Index
     function put(s) { this.value = s; },
     function remove() { this.value = undefined; },
-    function plan() { return this; },
+    function plan() {
+      var self = this;
+      return TREE_REQ.CustomPlan.create({
+        cost: 1,
+        toString: function() { return "constant_plan"; },
+        execute: function(sink) {
+          sink.put(self.value);
+        }
+      });
+    },
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function toString() { return 'value'; },
