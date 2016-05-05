@@ -15,6 +15,16 @@
  * limitations under the License.
  */
 
+/**
+  A Property is a high-level instance variable.
+
+  Properties contain more information than typical variable declarations.
+  Such as: label, help text, pre/post-set callbacks, default value,
+  value factory, units, etc.
+
+  A sub-class or refinement can include a partial Property definition which
+  will override or add meta-information to the Property.
+**/
 foam.CLASS({
   package: 'foam.core',
   name: 'Property',
@@ -78,7 +88,6 @@ foam.CLASS({
       Handle overriding of Property definition from parent class by
       copying undefined values from parent Property, if it exists.
     */
-    // TODO: document property inheritance
     function installInClass(c) {
       var prop = this;
       var superProp = c.__proto__.getAxiomByName(prop.name);
