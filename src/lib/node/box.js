@@ -14,29 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'SocketServer',
-  imports: [
-    'socketService'
-  ],
-  properties: [
-    {
-      name: 'delegate'
-    }
-  ],
-  methods: [
-    function init() {
-      this.socketService.message.sub(this.onMessage);
-    }
-  ],
-  listeners: [
-    {
-      name: 'onMessage',
-      code: function(s, _, msg) {
-        this.delegate.send(msg);
-      }
-    }
-  ]
-});

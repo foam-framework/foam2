@@ -41,6 +41,10 @@ var createTestProperties = function createTestProperties() {
         {
           class: 'ReferenceArray',
           name: 'referenceArray',
+        },
+        {
+          class: 'Class',
+          name: 'class',
         }
         // TODO: other types, as they gain testable functionality
       ]
@@ -245,4 +249,36 @@ describe('ReferenceArray', function() {
   it('is empty array by default', function() {
     expect(p.referenceArray).toEqual([]);
   });
+});
+
+
+describe('Class property', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('is undefined by default', function() {
+    expect(p.class).toBeUndefined();
+  });
+
+  it('stores a given model instance', function() {
+    p.class = test.DateTypeTester;
+    expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('looks up a model from a string name', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('accepts undefined', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+    p.class = undefined;
+    expect(p.class).toBeUndefined();
+  });
+
 });
