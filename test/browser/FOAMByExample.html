@@ -895,6 +895,24 @@ foam.CLASS({
 });
 ValidationTest.model_.validate();
 
+// Action validation, actions must have names
+foam.CLASS({
+  name: 'ActionNameValidation',
+  actions: [
+    { name: '', code: function() {} }
+  ]
+});
+ActionNameValidation.model_.validate();
+
+// Action validation, actions must have code
+foam.CLASS({
+  name: 'ActionCodeValidation',
+  actions: [
+    { name: 'test' }
+  ]
+});
+ActionCodeValidation.model_.validate();
+
 // Model validation, properties names must not end with '$'
 foam.CLASS({
   name: 'DollarValidationTest',
