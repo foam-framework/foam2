@@ -48,9 +48,8 @@ foam.CLASS({
   name: 'Listener',
 
   properties: [
-    // TODO: doc
-    'name',
-    'code',
+    { name: 'name', required: true },
+    { name: 'code', required: true },
     { class: 'Boolean', name: 'isFramed',   value: false },
     { class: 'Boolean', name: 'isMerged',   value: false },
     { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' }
