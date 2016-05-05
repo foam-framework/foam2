@@ -1,4 +1,4 @@
- TODO:
+ToDo:
   - refining a Property doesn't update instances
   - model validation
     - abstract methods

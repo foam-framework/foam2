@@ -30,8 +30,10 @@ foam.CLASS({
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
-          // TODO: doc, throw Exception
-          return ret.toUTCString() === 'Invalid Date' ? new Date(+d) : ret;
+
+          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
+
+          return ret;
         }
         return d;
       }
