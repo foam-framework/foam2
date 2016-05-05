@@ -227,6 +227,26 @@ describe('StringArray', function() {
     p.stringArray = [ "Hello", "I see", "Well" ];
     expect(p.stringArray).toEqual([ "Hello", "I see", "Well" ]);
   });
+  it('converts elements to strings', function() {
+    var d = new Date();
+    var golden = '' + d;
+
+    p.stringArray = [
+      { a: 1 },
+      2,
+      true,
+      d,
+      'hello'
+    ];
+
+    expect(p.stringArray).toEqual([
+      '[object Object]',
+      '2',
+      'true',
+      golden,
+      'hello'
+    ]);
+  });
 });
 
 describe('ReferenceArray', function() {

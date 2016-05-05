@@ -169,7 +169,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'StringArray',
-  extends: 'FObjectArray',
+  extends: 'Property',
 
   // documentation: 'An array of String values.',
   label: 'List of text strings',
@@ -182,7 +182,30 @@ foam.CLASS({
     },
     [
       'adapt',
-      function(_, v, prop) { return v; }
+      function(_, v, prop) {
+        if ( ! Array.isArray(v) ) return v;
+
+        var copy;
+        for ( var i = 0 ; i < v.length ; i++ ) {
+          if ( typeof v[i] !== 'string' ) {
+            if ( ! copy ) copy = v.slice();
+            copy[i] = '' + v[i];
+          }
+        }
+
+        return copy || v;
+      }
+    ],
+    [
+      'assertValue',
+      function(v, prop) {
+        this.assert(Array.isArray(v),
+                    prop.name, 'Tried to set StringArray to non-array type.');
+        for ( var i = 0 ; i < v.length ; i++ ) {
+          this.assert(typeof v[i] === 'string',
+                      prop.name, 'Element', i, 'is not a string', v[i]);
+        }
+      }
     ],
     // TODO: Assert that all values in the array are strings ?
     [
