@@ -94,7 +94,7 @@ foam.CLASS({
 
                 var msg = this.RPCMessage.create({
                   name: m.name,
-                  args: foam.Array.argsToArray(arguments)
+                  args: Array.from(arguments)
                 });
                 if ( replyBox ) msg.replyBox = replyBox.exportBox();
 
@@ -380,6 +380,8 @@ foam.CLASS({
           }),
           localBox: localBox
         };
+
+        console.log("Register", name, foam.json.stringify(exportBox));
 
         return this.registry[name].exportBox;
       }
