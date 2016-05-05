@@ -192,7 +192,8 @@ angular.module('foam').directive('foamInternalInject', function() {
   };
 });
 
-angular.module('foam').directive('foamDaoController', function() {
+angular.module('foam').directive('foamDaoController', [ '$timeout',
+    function($timeout) {
   return {
     restrict: 'E',
     scope: {
@@ -242,11 +243,23 @@ angular.module('foam').directive('foamDaoController', function() {
 
       scope.doEdit = function doEdit(item) {
         scope.controllerMode = 'edit';
-        scope.selection = item;
+        var clone = item.clone();
+        scope.selection = clone;
+
+        var timeout;
+        clone.propertyChange.sub(function(sub) {
+          if ( timeout ) {
+            $timeout.cancel(timeout);
+          }
+          timeout = $timeout(function() {
+            timeout = null;
+            scope.dao.put(clone);
+          }, 500, false);
+        });
       };
     }
   };
-});
+} ]);
 
 angular.module('foam').directive('foamDetails', [ '$compile',
     function($compile) {
