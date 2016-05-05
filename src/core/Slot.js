@@ -112,7 +112,7 @@ foam.CLASS({
 });
 
 
-/** Tracks dependencies for a dynamic function and invalidates is they change. */
+/** Stores a constant value. */
 foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',

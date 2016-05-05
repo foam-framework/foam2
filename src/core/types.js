@@ -141,27 +141,61 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Class',
       name: 'of',
-      value: '',
       // documentation: 'The FOAM sub-type of this property.'
     },
     {
       name: 'subKey',
       value: 'ID',
       // documentation: 'The name of the key (a property of the other object) that this property references.'
+    },
+    {
+      name: 'dao',
+      expression: function(of) {
+        return this.X[of.name+"DAO"];
+      }
     }
   ],
 
   methods: [
-    function installInProto(proto) {
-      this.SUPER(proto);
+    function toSlot(obj) {
+      var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
+      var slot     = obj.getPrivate_(slotName);
 
-      // TODO(js): expression to produce the actual value referenced by
-      // this property? or method installed on the host?
+      if ( ! slot ) {
+        slot = foam.core.internal.ReferencePropertySlot.create();
+        slot.obj  = obj;
+        slot.prop = this;
+        obj.setPrivate_(slotName, slot);
+      }
 
-    }
+      return slot;
+    },
   ]
 });
+
+/**
+  Adds DAO lookup to a Reference property's slot.
+ */
+foam.CLASS({
+  package: 'foam.core.internal',
+  name: 'ReferencePropertySlot',
+  extends: 'foam.core.PropertySlot',
+  implements: [ 'foam.dao.ProxyDAO' ],
+
+  properties: [
+    {
+      /** Filters by the current key value. */
+      name: 'delegate',
+      expression: function(obj) {
+        return prop.dao.where(prop.of[prop.subKey], this.prop.get(obj));
+      }
+    }
+  ],
+
+});
+
 
 
 foam.CLASS({
