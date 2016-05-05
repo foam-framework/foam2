@@ -206,26 +206,66 @@ foam.CLASS({
 
   // documentation: 'Stores a class, and can accept a class name.',
 
-  properties: [
-    {
-      /** FUTURE: adding to the default getter/setter chains is difficult
-        when we want to preserve the existing behavior but add an additional
-        step. This adapt work could be done in a getter that decorates the
-        default getter, but dealing with normal and expression cases is necessary
-        if writing back the looked-up class instance. */
-      name: 'adapt',
-      value: function(old, nu, prop) {
-        if ( typeof nu === 'string' ) {
-          if ( ! nu ) return '';
-          var ret = this.X.lookup(nu);
-          this.assert(foam.core.Model.isInstance(ret), 'Invalid class name ' +
-             nu + ' specified for ' + prop.name);
-          return ret;
-        }
-        this.assert(foam.core.Model.isInstance(nu), 'Invalid class specified for ' +
-          prop.name);
-        return nu;
+  methods: [
+    function adaptGet(val, name) {
+      if ( typeof val === 'string' ) {
+        if ( ! val ) return '';
+        var ret = this.X.lookup(val);
+        this.assert(foam.core.Model.isInstance(ret), 'Invalid class name ' +
+            val + ' specified for ' + name);
+        return ret;
       }
+      this.assert(typeof val === 'undefined' ||
+        foam.core.Model.isInstance(val), 'Invalid class specified for ' + name);
+      return val;
+    },
+
+    function installInProto(proto) {
+      // Take Axiom from class rather than using 'this' directly,
+      // since installInClass() may have created a modified version
+      // to inherit Property Properties from a super-Property.
+      var prop     = proto.cls_.getAxiomByName(this.name);
+      var name     = prop.name;
+      var adapt    = prop.adapt
+      var preSet   = prop.preSet;
+      var postSet  = prop.postSet;
+      var factory  = prop.factory;
+      var value    = prop.value;
+      var hasValue = typeof value !== 'undefined';
+      var slotName = name + '$';
+      var isFinal  = prop.final;
+      var eFactory = this.exprFactory(prop.expression);
+      var adaptGet = prop.adaptGet;
+
+      var getter = prop.getter ?
+        function classPropGetter(name) {
+          // compose custom getter with adaptGet
+          return adaptGet.call(this, prop.getter.call(this, name));
+        } :
+        factory ? function factoryGetter() {
+          return this.hasOwnProperty(name) ?
+            adaptGet.call(this, this.instance_[name], name) :
+            adaptGet.call(this, this[name] = factory.call(this), name);
+        } :
+        eFactory ? function eFactoryGetter() {
+          return this.hasOwnProperty(name) ?
+                  adaptGet.call(this, this.instance_[name], name)  :
+                    this.hasOwnPrivate_(name) ?
+                      adaptGet.call(this, this.getPrivate_(name), name) :
+                        adaptGet.call(this,
+                          this.setPrivate_(name, eFactory.call(this)), name);
+        } :
+        hasValue ? function valueGetter() {
+          var v = adaptGet.call(this, this.instance_[name], name);
+          return typeof v !== 'undefined' ? v : value ;
+        } :
+        function simpleGetter() { return
+          adaptGet.call(this, this.instance_[name], name); };
+
+        // Change the getter, then do a standard installInProto
+        prop.getter = getter;
+
+        this.SUPER(proto);
     }
   ]
 });
