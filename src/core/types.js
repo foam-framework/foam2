@@ -182,9 +182,7 @@ foam.CLASS({
     },
     [
       'adapt',
-      function(_, v, prop) {
-        return v;
-      }
+      function(_, v, prop) { return v; }
     ],
     // TODO: Assert that all values in the array are strings ?
     [
