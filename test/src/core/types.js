@@ -203,16 +203,12 @@ describe('Function', function() {
 
 describe('StringArray', function() {
   var p;
-  var oldAssert;
 
   beforeEach(function() {
     p = createTestProperties();
-    oldAssert = foam.core.FObject.prototype.assert;
-    foam.core.FObject.prototype.assert = function(c) { if ( ! c ) throw Array.from(arguments); }
   });
   afterEach(function() {
     p = null;
-    foam.core.FObject.prototype.assert = oldAssert;
   });
 
   it('setting an array to a number throws an exception', function() {
