@@ -180,6 +180,9 @@ foam.CLASS({
       name: 'remoteAddress'
     },
     {
+      name: 'remotePort'
+    },
+    {
       name: 'socket_',
       postSet: function(o, s) {
         if ( o ) {
@@ -189,6 +192,7 @@ foam.CLASS({
         }
         if ( s ) {
           this.remoteAddress = s.remoteAddress;
+          this.remotePort = s.remotePort;
           s.on('data', this.onData);
           s.on('close', this.onClose);
           s.on('error', this.onError);
@@ -299,6 +303,9 @@ foam.CLASS({
     },
     {
       name: 'server',
+    },
+    {
+      name: 'delegate'
     }
   ],
   methods: [
@@ -307,21 +314,24 @@ foam.CLASS({
 
       var server = this.server = new require('net').Server();
       this.server.on('connection', this.onConnection);
-      this.server.on('error', function() {
-        console.log("error");
+      this.server.on('error', function(e) {
+        console.log("Server error", e);
         server.unref();
       }.bind(this));
       this.server.listen(this.port);
     },
     function getSocket(host, port) {
-      port = port || this.port;
+      console.assert(host, "Host is required");
+      console.assert(port, "Port is required");
 
       var resolve;
       var reject;
       var p = new Promise(function(r, j) { resolve = r; reject = j; });
 
-      require('dns').lookup(host, function(host) {
-        var key = host;
+      require('dns').lookup(host, function(err, address, family) {
+        host = address || host;
+
+        var key = host + ":" + port;
         if ( this.sockets[key] ) {
           resolve(this.sockets[key]);
           return;
@@ -336,7 +346,7 @@ foam.CLASS({
             var s = this.Socket.create({
               socket_: socket
             });
-            this.addSocket(s);
+            this.addSocket(s, key);
             resolve(s);
           }.bind(this));
           socket.connect(port, host);
@@ -345,9 +355,9 @@ foam.CLASS({
 
       return p;
     },
-    function addSocket(socket) {
-      var key = socket.remoteAddress;
-      this.sockets[key] = socket;
+    function addSocket(socket, key) {
+      if ( key ) this.sockets[key] = socket;
+
       socket.message.sub(this.onMessage);
       socket.disconnect.sub(function() {
         this.removeSocket(socket);
@@ -357,20 +367,18 @@ foam.CLASS({
       socket.message.unsub(this.onMessage);
     }
   ],
-  topics: [
-    'message'
-  ],
   listeners: [
     {
       name: 'onMessage',
       code: function(s, _, m) {
-        this.message.pub(m);
+        this.delegate && this.delegate.send(foam.json.parse(foam.json.parseString(m), null, this));
       },
     },
     {
       name: 'onConnection',
       code: function(socket) {
         socket = this.Socket.create({ socket_: socket });
+        var key = socket.remoteAddress + ":" + socket.remotePort;
         this.addSocket(socket);
       }
     }

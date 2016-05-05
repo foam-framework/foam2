@@ -208,53 +208,28 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'Client',
+  name: 'MessageDAO',
+  extends: 'foam.dao.ProxyDAO',
   requires: [
-    'foam.dao.ClientDAO',
-    'foam.box.SubBox',
-    'foam.dao.PromiseDAO',
-    'foam.apps.chat.SharedWorker',
-    'foam.apps.chat.Message',
-    'foam.dao.CachingDAO',
-    'foam.dao.ArrayDAO',
-    'foam.dao.IDBDAO',
-    'com.firebase.SafariFirebaseDAO',
+    'com.firebase.SafariFirebaseDAO' ,
     'com.firebase.FirebaseDAO',
+    'foam.dao.SyncDAO',
     'foam.dao.TimestampDAO',
-    'foam.dao.SyncDAO'
+    'foam.dao.ArrayDAO',
+    'foam.apps.chat.Message'
   ],
-  imports: [
-    'server',
-  ],
+  imports: [ 'isSafari' ],
   properties: [
     {
-      name: 'sw',
-      factory: function() {
-        return this.SharedWorker.create();
-      }
+      name: 'channel',
+      value: 'foam'
     },
     {
-      class: 'Boolean',
-      name: 'isSafari',
-      value: false
+      name: 'auth'
     },
     {
-      name: 'messageDAO',
+      name: 'delegate',
       factory: function() {
-
-        var channel = document.location.search.substring(1).split('&').find(function(e) {
-          return e.indexOf('channel=') === 0;
-        });
-        channel = channel && channel.substring(8);
-
-        var auth = document.location.search.substring(1).split('&').find(function(e) {
-          return e.indexOf('auth=') === 0;
-        });
-
-        auth = auth && auth.substring(5);
-
-        if ( ! channel ) channel = "foam"
-
         var dao = this.isSafari ?
             this.SafariFirebaseDAO.create() :
             this.FirebaseDAO.create();
@@ -263,13 +238,11 @@ foam.CLASS({
         dao.timestampProperty = this.Message.SYNC_NO;
         dao.apppath = 'https://glaring-torch-184.firebaseio.com/';
 
-        if ( auth ) {
+        if ( this.auth ) {
           dao.secret = auth;
         }
 
-        if ( channel ) {
-          dao.basepath = dao.apppath + 'chat/' + channel;
-        }
+        dao.basepath = dao.apppath + 'chat/' + this.channel;
 
         // TODO: This could be improved by using strong random values instead
         // of timestamps.
@@ -288,27 +261,47 @@ foam.CLASS({
           polling: this.isSafari
         });
 
-        window.addEventListener('online', function() { dao.sync(); });
+        //window.addEventListener('online', function() { dao.sync(); });
         dao.sync();
         return dao;
-
-        return this.PromiseDAO.create({
-          promise: this.sw.boxPromise.then(foam.Function.bind(function(box) {
-              return this.ClientDAO.create({
-                of: this.Message,
-                box: this.SubBox.create({
-                  name: 'messageDAO',
-                  delegate: box
-                })
-              });
-          }, this))
-        });
       }
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'Client',
+  requires: [
+    'foam.apps.chat.MessageDAO'
   ],
-  methods: [
-    function init() {
-      this.messageDAO;
+  exports: [ 'isSafari' ],
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'isSafari',
+      value: false
+    },
+    {
+      name: 'messageDAO',
+      factory: function() {
+        var channel = document.location.search.substring(1).split('&').find(function(e) {
+          return e.indexOf('channel=') === 0;
+        });
+        channel = channel && channel.substring(8);
+
+        var auth = document.location.search.substring(1).split('&').find(function(e) {
+          return e.indexOf('auth=') === 0;
+        });
+
+        auth = auth && auth.substring(5);
+
+        var dao = this.MessageDAO.create();
+        if ( channel ) dao.channel = channel;
+        if ( auth ) dao.auth = auth;
+
+        return dao;
+      }
     }
   ]
 });
