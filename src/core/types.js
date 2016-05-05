@@ -489,12 +489,14 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Promised',
   extends: 'Property',
+
   properties: [
     {
       name: 'of',
       required: true
     }
   ],
+
   methods: [
     function installInClass(cls) {
       var propName = this.name;
@@ -524,7 +526,7 @@ foam.CLASS({
                 });
               };
             } else {
-              // TODO: Use modelFactories
+              // TODO(adamvy): Use modelFactories
 
               var path = m.returns.split('.');
               path[path.length - 1] = 'Promised' + path[path.length - 1];
