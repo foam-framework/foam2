@@ -43,6 +43,7 @@ foam.CLASS({
     'setter',
     'final',
     'required',
+    'assertValue',
     [
       /**
         Compare two values taken from this property.
@@ -110,17 +111,18 @@ foam.CLASS({
       // Take Axiom from class rather than using 'this' directly,
       // since installInClass() may have created a modified version
       // to inherit Property Properties from a super-Property.
-      var prop     = proto.cls_.getAxiomByName(this.name);
-      var name     = prop.name;
-      var adapt    = prop.adapt
-      var preSet   = prop.preSet;
-      var postSet  = prop.postSet;
-      var factory  = prop.factory;
-      var value    = prop.value;
-      var hasValue = typeof value !== 'undefined';
-      var slotName = name + '$';
-      var isFinal  = prop.final;
-      var eFactory = this.exprFactory(prop.expression);
+      var prop        = proto.cls_.getAxiomByName(this.name);
+      var name        = prop.name;
+      var adapt       = prop.adapt
+      var assertValue = prop.assertValue;
+      var preSet      = prop.preSet;
+      var postSet     = prop.postSet;
+      var factory     = prop.factory;
+      var value       = prop.value;
+      var hasValue    = typeof value !== 'undefined';
+      var slotName    = name + '$';
+      var isFinal     = prop.final;
+      var eFactory    = this.exprFactory(prop.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
@@ -171,6 +173,8 @@ foam.CLASS({
             this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
+
+          if ( assertValue ) assertValue.call(this, newValue, prop);
 
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
 
