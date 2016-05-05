@@ -183,10 +183,10 @@ foam.CLASS({
     [
       'adapt',
       function(_, v, prop) {
-        this.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
         return v;
       }
     ],
+    // TODO: Assert that all values in the array are strings ?
     [
       'factory',
       function() { return []; }

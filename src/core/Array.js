@@ -27,12 +27,19 @@ foam.CLASS({
     [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
-        console.assert(Array.isArray(a), 'Array required, but received:', a);
+        // If not an array, allow assertValue to assert the type-check.
+        if ( ! Array.isArray(a) ) return a;
+
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ ) {
           b[i] = prop.adaptArrayElement(a[i]);
         }
         return b;
+      }
+    ],
+    [ 'assertValue', function(v, prop) {
+        console.assert(Array.isArray(v),
+                       prop.name, 'Attempt to set array property to non-array value', v);
       }
     ],
     [ 'adaptArrayElement', function(o) {
