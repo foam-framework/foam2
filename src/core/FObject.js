@@ -418,7 +418,20 @@ foam.CLASS({
       return 0;
     },
 
-    // TODO: doc(adamvy)
+    /**
+     * Compare this object to another object of the same type, and produce a raw
+     * javascript object which shows the differences between the two.
+     * Example
+     * <pre>
+     * var obj1 = Abc.create({ a: 1, b: ['A', 'B', 'C'] });
+     * var obj2 = Abc.create({ a: 2, b: ['A', 'D'] });
+     * var diff = obj1.diff(obj2);
+     * </pre>
+     * The diff object will look like
+     * <pre>
+     * { a: 2, b: { added: ['D'], removed: ['B', 'C'] } };
+     * </pre>
+     */
     function diff(other) {
       var diff = {};
 
