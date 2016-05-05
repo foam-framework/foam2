@@ -266,9 +266,6 @@ describe('Class property', function() {
     expect(p.class).toBeUndefined();
   });
 
-  it('is undefined by default', function() {
-    expect(p.class).toBeUndefined();
-  });
   it('stores a given model instance', function() {
     p.class = test.DateTypeTester;
     expect(p.class).toBe(test.DateTypeTester);
@@ -276,6 +273,12 @@ describe('Class property', function() {
   it('looks up a model from a string name', function() {
     p.class = 'test.DateTypeTester';
     expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('accepts undefined', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+    p.class = undefined;
+    expect(p.class).toBeUndefined();
   });
 
 });

@@ -218,11 +218,12 @@ foam.CLASS({
         if ( typeof nu === 'string' ) {
           if ( ! nu ) return '';
           var ret = this.X.lookup(nu);
-          this.assert(foam.core.Model.isInstance(ret), 'Invalid class name ' +
+          this.assert(ret && ret.isSubClass, 'Invalid class name ' +
              nu + ' specified for ' + prop.name);
           return ret;
         }
-        this.assert(foam.core.Model.isInstance(nu), 'Invalid class specified for ' +
+        this.assert(typeof nu === 'undefined' || ( nu && nu.isSubClass ),
+          'Invalid class specified for ' +
           prop.name);
         return nu;
       }
