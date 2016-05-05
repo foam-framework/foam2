@@ -47,14 +47,18 @@ foam.CLASS({
       var name = this.model.name;
       var cls = proto.cls_[name];
 
-      // TODO: doc
+      // Create a private_ clone of the Class with the create() method decorated
+      // to pass 'this' as the context if not explicitly provided.  This ensures
+      // that the created object has access to this object's exported bindings.
       Object.defineProperty(proto, name, {
         get: function innerClassGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
             var parent = this;
+            var c      = Object.create(cls);
 
-            var c = Object.create(cls);
-            c.create = function innerClassCreate(args, X) { return cls.create(args, X || parent); };
+            c.create = function innerClassCreate(args, X) {
+              return cls.create(args, X || parent);
+            };
             this.setPrivate_(name, c);
           }
 
