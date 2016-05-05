@@ -30,8 +30,10 @@ foam.CLASS({
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
-          // TODO: doc, throw Exception
-          return ret.toUTCString() === 'Invalid Date' ? new Date(+d) : ret;
+
+          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
+
+          return ret;
         }
         return d;
       }
@@ -521,12 +523,14 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Promised',
   extends: 'Property',
+
   properties: [
     {
       name: 'of',
       required: true
     }
   ],
+
   methods: [
     function installInClass(cls) {
       var propName = this.name;
@@ -556,7 +560,7 @@ foam.CLASS({
                 });
               };
             } else {
-              // TODO: Use modelFactories
+              // TODO(adamvy): Use modelFactories
 
               var path = m.returns.split('.');
               path[path.length - 1] = 'Promised' + path[path.length - 1];
