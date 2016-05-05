@@ -207,18 +207,6 @@ foam.CLASS({
   // documentation: 'Stores a class, and can accept a class name.',
 
   methods: [
-    function adaptGet(val, name) {
-      if ( typeof val === 'string' ) {
-        if ( ! val ) return '';
-        var ret = this.X.lookup(val);
-        this.assert(foam.core.Model.isInstance(ret), 'Invalid class name ' +
-            val + ' specified for ' + name);
-        return ret;
-      }
-      this.assert(typeof val === 'undefined' ||
-        foam.core.Model.isInstance(val), 'Invalid class specified for ' + name);
-      return val;
-    },
 
     function installInProto(proto) {
       // Take Axiom from class rather than using 'this' directly,
@@ -226,21 +214,28 @@ foam.CLASS({
       // to inherit Property Properties from a super-Property.
       var prop     = proto.cls_.getAxiomByName(this.name);
       var name     = prop.name;
-      var adapt    = prop.adapt
-      var preSet   = prop.preSet;
-      var postSet  = prop.postSet;
       var factory  = prop.factory;
       var value    = prop.value;
       var hasValue = typeof value !== 'undefined';
-      var slotName = name + '$';
-      var isFinal  = prop.final;
       var eFactory = this.exprFactory(prop.expression);
-      var adaptGet = prop.adaptGet;
+
+      var adaptGet = function adaptGet(val, name) {
+        if ( typeof val === 'string' ) {
+          if ( ! val ) return '';
+          var ret = this.X.lookup(val);
+          this.assert(ret && ret.isSubClass, 'Invalid class name ' +
+              val + ' specified for ' + name);
+          return ret;
+        }
+        this.assert(typeof val === 'undefined' ||
+          ( val && val.isSubClass ), 'Invalid class specified for ' + name);
+        return val;
+      };
 
       var getter = prop.getter ?
         function classPropGetter(name) {
           // compose custom getter with adaptGet
-          return adaptGet.call(this, prop.getter.call(this, name));
+          return adaptGet.call(this, prop.getter.call(this, name), name);
         } :
         factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
@@ -259,8 +254,9 @@ foam.CLASS({
           var v = adaptGet.call(this, this.instance_[name], name);
           return typeof v !== 'undefined' ? v : value ;
         } :
-        function simpleGetter() { return
-          adaptGet.call(this, this.instance_[name], name); };
+        function simpleGetter() {
+          return adaptGet.call(this, this.instance_[name], name);
+        };
 
         // Change the getter, then do a standard installInProto
         prop.getter = getter;
