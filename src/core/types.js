@@ -112,15 +112,9 @@ foam.CLASS({
       function() {}
     ],
     [
-      'adapt',
-      function(_, value) {
-        // TODO: doc(adamvy)
-        if ( typeof value === 'string' ) {
-          var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
-          body = ( body && body[1] ) ? body[1] : value;
-          return new Function(body);
-        }
-        return value;
+      'assertValue',
+      function(value, prop) {
+        this.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
       }
     ]
   ]

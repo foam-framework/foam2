@@ -193,13 +193,10 @@ describe('Function', function() {
     p.func = function() { return 55; }
     expect(p.func()).toEqual(55);
   });
-  it('accepts strings and converts them into functions', function() {
-    p.func = "return 55;"
-    expect(p.func()).toEqual(55);
-  });
-  it('accepts strings including function() and converts them into functions', function() {
-    p.func = "function\r\n(\n)\n\n\n { return 55; }"
-    expect(p.func()).toEqual(55);
+  it('rejects non functions', function() {
+    expect(function() {
+      p.func = 'asdlfkjalskdjf';
+    }).toThrow();
   });
 });
 
