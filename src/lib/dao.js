@@ -1014,6 +1014,15 @@ foam.CLASS({
       // documentation: 'The name of the key (a property of the other object) that this property references.'
     },
     {
+      /** Can be one of:
+      <ol>
+        <li>the string name of the dao to pull from the context
+        <li>a DAO instance
+        <li>not set, and the name of the class given in 'of' will be used to
+        construct the default dao name to look up. (Example: MyType -> X.MyTypeDAO)
+      </ol>
+
+        */
       name: 'dao',
     }
   ],
@@ -1079,12 +1088,23 @@ foam.CLASS({
         // swap out the delegate
         this.asDao.delegate = this.createDelegate();
       }
+    },
+    {
+      name: 'cleanup',
+      code: function() { this.oldSub_ && this.oldSub_.destroy(); }
     }
   ],
   methods: [
+    function init() {
+      this.onDestroy(this.cleanup);
+    },
     function createDelegate() {
       var prop = this.prop;
-      var dao = prop.dao || this.obj.X[prop.of.name+"DAO$"].get();
+      // Either look up prop.dao as a name on the host's context, or use it as
+      // a dao instance itself, or if prop.dao not set look up the default
+      // OfTypeDAO.
+      var dao = ( typeof prop.dao === 'string' ? this.obj.X[prop.dao+"$"].get() :
+        prop.dao || this.obj.X[prop.of.name+"DAO$"].get() );
 
       if ( ! ( prop && dao && this.obj ) ) {
         return this.NullDAO.create();
