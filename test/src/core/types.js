@@ -31,10 +31,6 @@ var createTestProperties = function createTestProperties() {
           name: 'blob',
         },
         {
-          class: 'Reference',
-          name: 'reference',
-        },
-        {
           class: 'StringArray',
           name: 'stringArray',
         },
@@ -72,7 +68,6 @@ var createDateTestProperties = function createDateTestProperties() {
   }
   return test.DateTypeTester.create();
 }
-
 
 
 describe('Date', function() {
@@ -200,6 +195,36 @@ describe('Function', function() {
   });
 });
 
+describe('Class property', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('is undefined by default', function() {
+    expect(p.class).toBeUndefined();
+  });
+
+  it('stores a given model instance', function() {
+    p.class = test.DateTypeTester;
+    expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('looks up a model from a string name', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('accepts undefined', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+    p.class = undefined;
+    expect(p.class).toBeUndefined();
+  });
+
+});
 
 describe('StringArray', function() {
   var p;
@@ -233,49 +258,109 @@ describe('StringArray', function() {
   });
 });
 
+var createReferenceTestProperties = function createReferenceTestProperties() {
+  if ( ! test.ReferenceTypeTester ) {
+    foam.CLASS({
+      package: 'test',
+      name: 'Sample',
+      properties: [
+        'id',
+      ]
+    });
+
+    foam.CLASS({
+      name: 'ReferenceTypeTester',
+      package: 'test',
+
+      properties: [
+        {
+          class: 'Reference',
+          name: 'ref',
+          of: 'test.Sample',
+        },
+        {
+          class: 'ReferenceArray',
+          name: 'refArray',
+        },
+      ]
+    });
+
+    foam.CLASS({
+      package: 'test',
+      name: 'SampleDAOExporter',
+      requires: [
+        'foam.dao.ArrayDAO',
+        'test.ReferenceTypeTester',
+      ],
+      exports: [ 'SampleDAO' ],
+      properties: [
+        {
+          name: 'SampleDAO',
+          factory: function() {
+            return this.ArrayDAO.create({ of: test.Sample });
+          }
+        },
+        {
+          name: 'tester',
+          factory: function() {
+            return this.ReferenceTypeTester.create();
+          }
+        }
+      ]
+    });
+  }
+
+  return test.SampleDAOExporter.create();
+}
+
+
+
 describe('ReferenceArray', function() {
   var p;
 
   beforeEach(function() {
-    p = createTestProperties();
+    p = createReferenceTestProperties();
   });
   afterEach(function() {
     p = null;
   });
 
   it('is empty array by default', function() {
-    expect(p.referenceArray).toEqual([]);
+    expect(p.tester.refArray).toEqual([]);
   });
 });
 
-
-describe('Class property', function() {
+describe('Reference', function() {
   var p;
 
   beforeEach(function() {
-    p = createTestProperties();
+    p = createReferenceTestProperties();
   });
   afterEach(function() {
     p = null;
   });
 
-  it('is undefined by default', function() {
-    expect(p.class).toBeUndefined();
+  it('stores an id', function() {
+    p.tester.ref = "123456";
+    expect(p.tester.ref).toEqual("123456");
+    expect(p.tester.ref$.get()).toEqual("123456"); // slot's normal getter
   });
+  it('looks up by id', function(done) {
+    p.tester.ref = "123456";
+    p.SampleDAO.put(test.Sample.create({ id: "123456" }));
 
-  it('stores a given model instance', function() {
-    p.class = test.DateTypeTester;
-    expect(p.class).toBe(test.DateTypeTester);
+    p.tester.ref$.asDAO.select().then(function(s) {
+      expect(s.a.length).toEqual(1);
+      expect(s.a[0].id).toEqual("123456");
+      done();
+    });
   });
-  it('looks up a model from a string name', function() {
-    p.class = 'test.DateTypeTester';
-    expect(p.class).toBe(test.DateTypeTester);
-  });
-  it('accepts undefined', function() {
-    p.class = 'test.DateTypeTester';
-    expect(p.class).toBe(test.DateTypeTester);
-    p.class = undefined;
-    expect(p.class).toBeUndefined();
-  });
-
 });
+
+
+
+
+
+
+
+

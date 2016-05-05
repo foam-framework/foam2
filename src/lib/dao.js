@@ -994,6 +994,121 @@ foam.CLASS({
   ],
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Reference',
+  extends: 'Property',
+
+  // documentation:  'A foreign key reference to another Entity.',
+  label: 'Reference to another object',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      // documentation: 'The FOAM sub-type of this property.'
+    },
+    {
+      name: 'subKey',
+      value: 'ID',
+      // documentation: 'The name of the key (a property of the other object) that this property references.'
+    },
+    {
+      name: 'dao',
+    }
+  ],
+
+  methods: [
+    function toSlot(obj) {
+      var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
+      var slot     = obj.getPrivate_(slotName);
+
+      if ( ! slot ) {
+        slot = foam.core.internal.ReferencePropertySlot.create();
+        slot.obj  = obj;
+        slot.prop = this;
+        obj.setPrivate_(slotName, slot);
+      }
+
+      return slot;
+    },
+  ]
+});
+
+/**
+  Adds DAO lookup to a Reference property's slot.
+ */
+foam.CLASS({
+  package: 'foam.core.internal',
+  name: 'ReferencePropertySlot',
+  implements: [
+    'foam.core.internal.PropertySlot',
+  ],
+  requires: [
+    'foam.mlang.predicate.In',
+    'foam.dao.ProxyDAO',
+    'foam.dao.NullDAO',
+  ],
+
+  properties: [
+    'obj',
+    'prop',
+    {
+      name: 'oldSub_',
+      expression: function(oldSub_, obj, prop) {
+        oldSub_ && oldSub_.destroy();
+        this.keyChange();
+        return prop && obj && this.sub(this.keyChange);
+      }
+    },
+    {
+      /** filter the delegate using the reference's key(s) */
+      name: 'asDAO',
+      factory: function() {
+        return this.ProxyDAO.create({ delegate: this.createDelegate() });
+      }
+    }
+  ],
+  listeners: [
+    {
+      name: 'keyChange',
+      code: function() {
+        // Don't calculate anything if nobody is using asDAO
+        if ( ! this.hasOwnProperty('asDAO') ) return;
+
+        // swap out the delegate
+        this.asDao.delegate = this.createDelegate();
+      }
+    }
+  ],
+  methods: [
+    function createDelegate() {
+      var prop = this.prop;
+      var dao = prop.dao || this.obj.X[prop.of.name+"DAO$"].get();
+
+      if ( ! ( prop && dao && this.obj ) ) {
+        return this.NullDAO.create();
+      } else {
+        return dao.where(this.In.create({
+          arg1: prop.of[prop.subKey],
+          arg2: prop.get(this.obj)
+        }));
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ReferenceArray',
+  extends: 'foam.core.Reference',
+
+  properties: [
+    [ 'factory', function() { return []; } ]
+  ]
+});
+
+
 /*
 TODO:
 -Context oriented ?

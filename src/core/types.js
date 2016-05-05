@@ -135,102 +135,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'Reference',
-  extends: 'Property',
-
-  // documentation:  'A foreign key reference to another Entity.',
-  label: 'Reference to another object',
-
-  properties: [
-    {
-      class: 'Class',
-      name: 'of',
-      // documentation: 'The FOAM sub-type of this property.'
-    },
-    {
-      name: 'subKey',
-      value: 'ID',
-      // documentation: 'The name of the key (a property of the other object) that this property references.'
-    },
-    {
-      name: 'dao',
-      expression: function(of) {
-        return this.X[of.name+"DAO"];
-      }
-    }
-  ],
-
-  methods: [
-    function toSlot(obj) {
-      var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
-      var slot     = obj.getPrivate_(slotName);
-
-      if ( ! slot ) {
-        slot = foam.core.internal.ReferencePropertySlot.create();
-        slot.obj  = obj;
-        slot.prop = this;
-        obj.setPrivate_(slotName, slot);
-      }
-
-      return slot;
-    },
-  ]
-});
-
-/**
-  Adds DAO lookup to a Reference property's slot.
- */
-foam.CLASS({
-  package: 'foam.core.internal',
-  name: 'ReferencePropertySlot',
-  extends: 'foam.core.PropertySlot',
-  implements: [ 'foam.dao.ProxyDAO' ],
-
-  properties: [
-    {
-      /** Filters by the current key value. */
-      name: 'delegate',
-      expression: function(obj) {
-        return prop.dao.where(prop.of[prop.subKey], this.prop.get(obj));
-      }
-    }
-  ],
-
-});
-
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'StringArray',
-  extends: 'FObjectArray',
-
-  // documentation: 'An array of String values.',
-  label: 'List of text strings',
-
-  properties: [
-    {
-      name: 'of',
-      value: 'String',
-      // documentation: 'The FOAM sub-type of this property.'
-    },
-    [
-      'adapt',
-      function(_, v, prop) {
-        this.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
-        return v;
-      }
-    ],
-    [
-      'factory',
-      function() { return []; }
-    ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'Class',
   extends: 'Property',
 
@@ -264,13 +168,33 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'ReferenceArray',
-  extends: 'Reference',
+  name: 'StringArray',
+  extends: 'FObjectArray',
+
+  // documentation: 'An array of String values.',
+  label: 'List of text strings',
 
   properties: [
-    [ 'factory', function() { return []; } ]
+    {
+      name: 'of',
+      value: 'String',
+      // documentation: 'The FOAM sub-type of this property.'
+    },
+    [
+      'adapt',
+      function(_, v, prop) {
+        this.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
+        return v;
+      }
+    ],
+    [
+      'factory',
+      function() { return []; }
+    ]
   ]
 });
+
+
 
 
 foam.CLASS({
