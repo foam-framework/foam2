@@ -109,13 +109,13 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'assert', 'error', 'log', 'warn' ],
 
-    function assert() { ((this.X && this.X.assert) || foam.X.assert).apply(null, arguments); },
+    function assert() { this.X.assert.apply(null, arguments); },
 
-    function error() { ((this.X && this.X.error) || foam.X.error).apply(null, arguments); },
+    function error() { this.X.error.apply(null, arguments); },
 
-    function log() { ((this.X && this.X.log) || foam.X.log).apply(null, arguments); },
+    function log() { this.X.log.apply(null, arguments); },
 
-    function warn() { ((this.X && this.X.warn) || foam.X.warn).apply(null, arguments); },
+    function warn() { this.X.warn.apply(null, arguments); },
 
 
     /************************************************

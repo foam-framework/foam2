@@ -68,9 +68,8 @@ foam.CLASS({
                 this.setPrivate_('X', x = ySource.Y || ySource.X);
                 this.setPrivate_('ySource', undefined);
               } else {
-                // TODO: Why isn't this an error?
-                // console.error('Missing X in ', this.cls_.id);
-                return undefined;
+                // Happens during bootstrap with Properties.
+                x = foam.X;
               }
             }
             return x;

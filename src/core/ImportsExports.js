@@ -112,7 +112,7 @@ foam.CLASS({
       Object.defineProperty(proto, 'Y', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('Y') ) {
-            var X = this.X || foam;
+            var X = this.X || foam.X;
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];

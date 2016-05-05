@@ -195,4 +195,4 @@ if ( foam.isServer ) {
 }
 
 
-foam.X = foam.core.Window.create({window: global}, foam).Y;
+foam.X = foam.core.Window.create({window: global}, foam.X).Y;
