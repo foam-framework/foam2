@@ -205,7 +205,24 @@ foam.CLASS({
 
     /**
       Publish a message to all matching sub()'ed listeners.
-      TODO: example
+
+      All sub()'ed listeners whose specified pattern match the
+      pub()'ed arguments will be notified.
+      Ex.:
+<pre>
+  var obj  = foam.core.FObject.create();
+  var sub1 = obj.sub(               function(a,b,c) { console.log(a,b,c); });
+  var sub2 = obj.sub('alarm',       function(a,b,c) { console.log(a,b,c); });
+  var sub3 = obj.sub('alarm', 'on', function(a,b,c) { console.log(a,b,c); });
+
+  obj.pub('alarm', 'on');  // notifies sub1, sub2 and sub3
+  obj.pub('alarm', 'off'); // notifies sub1 and sub2
+  obj.pub();               // only notifies sub1
+  obj.pub('foobar');       // only notifies sub1
+</pre>
+
+      Note how FObjects can be used as generic pub/subs.
+
       Returns the number of listeners notified.
     */
     function pub(a1, a2, a3, a4, a5, a6, a7, a8, a9) {
