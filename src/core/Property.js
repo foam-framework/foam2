@@ -37,23 +37,95 @@ foam.CLASS({
     },
     {
       name: 'label',
+      // If not provided, it defaults to the name "labelized".
       expression: function(name) { return foam.String.labelize(name); }
     },
-    // TODO: document these properties in detail
-    /* User-level help. */
+
+    /* User-level help. Could/should appear in GUI's as online help. */
     'help',
-    'hidden',
+
+    /* Hidden properties to not appear in GUI's by default. */
+    { class: 'Boolean', name: 'hidden' },
+
+    /**
+      The default-value of this property.
+      A property which has never been set or has been cleared
+      by setting it to 'undefined' or cleared with clearProperty()
+      will have the default value.
+    */
     'value',
+
+    /**
+      A factory is a function which initializes the property value
+      when accessed for the first time, if not already set.
+    */
     'factory',
+
+    /**
+      A function of the form:
+        Object function(oldValue, newValue)
+      adapt is called whenver the property is set. It's intended
+      to adapt the value to the appropriate type if required.
+      Adapt must return a value. It can return newValue unchanged
+      if it was already the appropriate type.
+    */
     'adapt',
+
+    /**
+      A function of the form:
+        Object function(oldValue, newValue)
+      preSet is called before the propery's value is updated.
+      It can veto the value change by returning a different newValue
+      (including returning oldValue to leave the property unchanged).
+    */
     'preSet',
-    'postSet',
-    'expression',
-    'getter',
-    'setter',
-    'final',
-    'required',
+
+    /**
+      A function of the form:
+        void function(oldValue, newValue) throws Exception
+      assertValue can validate newValue and throw an exception if it's an
+      invalid value.
+    */
     'assertValue',
+
+    /**
+      A function of the form:
+        void function(oldValue, newValue)
+      postSet is called after the Property's value has been updated.
+    */
+    'postSet',
+
+    /**
+    */
+    'expression',
+
+    /**
+      A getter function which completely replaces the normal
+      Property getter process. Whenever the property is accessed, getter is
+      called and its value is returned.
+    */
+    'getter',
+
+    /**
+      A setter function which completely replaces the normal
+      Property setter process. Whenever the property is set, setter is
+      called.
+      A function of the form:
+        void function(newValue)
+    */
+    'setter',
+
+    /**
+      A final Property can only be set once.
+      After being set, its value is final (read-only).
+    */
+    'final',
+
+    /**
+      A required Property can not be set to null, undefined, 0 or "".
+     */
+    'required',
+
     [
       /**
         Compare two values taken from this property.
@@ -64,14 +136,18 @@ foam.CLASS({
       'comparePropertyValues',
       function(o1, o2) { return foam.util.compare(o1, o2); }
     ],
+
     {
+      // Makes Properties useful as map functions.
       name: 'f',
       factory: function() {
         var name = this.name;
         return function f(o) { return o[name]; }
       }
     },
+
     {
+      // Makes Properties useful as comparators.
       name: 'compare',
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
