@@ -22,6 +22,17 @@
   Such as: label, help text, pre/post-set callbacks, default value,
   value factory, units, etc.
 
+  When setting a Propery's value, the callback order is:
+    1. adapt()
+    2. assertValue()
+    3. preSet()
+       value updated
+       property change event fired
+    4. postSet()
+
+   Unless the user has provided a customer 'setter', in which case the order is
+     1. setter()
+
   A sub-class or refinement can include a partial Property definition which
   will override or add meta-information to the Property.
 **/
