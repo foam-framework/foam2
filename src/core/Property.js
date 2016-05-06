@@ -96,6 +96,14 @@ foam.CLASS({
     'postSet',
 
     /**
+      A dynamic function which defines this Property's value.
+      Similar to 'factory', except that the function takes arguments
+      which are named the same as other properties of this object.
+      Whenever the values of any of the argument properties change,
+      the value of this Property is invalidated. Like a regular factory,
+      an invalidated property will be recalculated by calling the provided
+      expression function when accessed. This makes expressions very efficient
+      because the value is only recomputed when actually needed.
     */
     'expression',
 
