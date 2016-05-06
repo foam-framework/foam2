@@ -67,7 +67,7 @@
     "Property",
     "Method",
     "String",
-    "Array",
+    "FObjectArray",
     "Boolean",
     "Int",
     "AxiomArray",
