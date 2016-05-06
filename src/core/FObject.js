@@ -501,7 +501,24 @@ foam.CLASS({
       return this.cls_.create(m/*, this.X*/);
     },
 
-    // TODO: doc
+    /**
+      Copy property values from the supplied object or map.
+
+      Ex.:
+<pre>
+  person.copyFrom({fName: 'John', lName: 'Smith', age: 42})
+  or
+  person.copyFrom(otherPerson);
+</pre>
+     The first example is short-form for:
+<pre>
+  person.fName = 'John';
+  person.lName = 'Smith';
+  person.age   = 42;
+</pre>
+     If an FObject is supplied, it doesn't need to be the same class as 'this'.
+     Only properties that the two classes have in common will be copied.
+     */
     function copyFrom(o) {
       var a = this.cls_.getAxiomsByClass(foam.core.Property);
 
