@@ -53,7 +53,6 @@ foam.CLASS({
     'console',
     'delayed',
     'document',
-    // 'dynamic',
     'error',
     'framed',
     'info',
