@@ -15,7 +15,27 @@
  * limitations under the License.
  */
 
-// TODO: doc
+/**
+  Export common window/document services through the Context.
+
+  Rather than using window or document directly, objects should import: the
+  services that foam.core.Window exports:, and then access them as this.name,
+  rather than as console.name or document.name.
+
+  All FObjects already import: [ 'assert', 'error', 'log', 'warn' ], meaning
+  that these do not need to be explicitly imported.
+
+  This is done to remove dependency on the globals 'document' and 'window',
+  which makes it easier to write code which works with multiple windows.
+
+  It also allows for common services to be decorated, trapped, or replaced
+  in sub-contexts (for example, to replace console.error and console.warn when
+  running test).
+
+  A foam.core.Window is installed by FOAM on starup for the default
+  window/document, but if user code opens a new Window, it should create
+  and install a new foam.core.Window explicitly.
+ */
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
@@ -146,11 +166,6 @@ foam.CLASS({
         return f;
       }(), 'framed(' + l.name + ')');
     },
-
-    /*
-    function dynamic() {
-    },
-    */
 
     function setTimeout(f, t) {
       return this.window.setTimeout.apply(this.window, arguments);
