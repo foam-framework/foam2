@@ -505,7 +505,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Promised',
@@ -515,7 +514,8 @@ foam.CLASS({
     {
       name: 'of',
       required: true
-    }
+    },
+    'methods'
   ],
 
   methods: [
@@ -525,74 +525,100 @@ foam.CLASS({
       var target = foam.lookup(this.of);
 
       var methods = target.getAxiomsByClass(foam.core.Method)
-          .filter(function(m) { return target.hasOwnAxiom(m.name); })
-          .map(function(m) {
-            var name = m.name;
-            var returns = m.returns;
+          .filter(function(m) { return target.hasOwnAxiom(m.name); });
 
-            if ( ! returns ) {
-              var code = function() {
-                var self = this;
-                var args = arguments;
-                this[propName].then(function(a) {
-                  a[name].apply(a, args);
-                });
-              };
-            } else if ( returns === 'Promise' ) {
-              code = function() {
-                var self = this;
-                var args = arguments;
-                return this[propName].then(function(a) {
-                  return a[name].apply(a, args);
-                });
-              };
-            } else {
-              // TODO(adamvy): Use modelFactories
+      if ( this.methods ) {
+        methods = methods.filter(function(m) {
+          return this.methods.indexOf(m.name) !== -1;
+        }.bind(this));
+      }
 
-              var path = m.returns.split('.');
-              path[path.length - 1] = 'Promised' + path[path.length - 1];
+      methods.map(function(m) {
+        var name = m.name;
+        var returns = m.returns;
 
-              var returnClsId = path.join('.');
-
-              if ( ! foam.lookup(returnClsId) ) {
-                foam.CLASS({
-                  package: path.slice(0, path.length - 1).join('.'),
-                  name: path[path.length - 1]
-                });
-
-                // Done in two passes to prevent infinite recursion.
-                foam.CLASS({
-                  refines: returnClsId,
-                  properties: [
-                    {
-                      class: 'Promised',
-                      of: m.returns,
-                      name: 'delegate'
-                    }
-                  ]
-                });
-              }
-
-              code = function() {
-                var self = this;
-                var args = arguments;
-                return foam.lookup(returnClsId).create({
-                  delegate: this[propName].then(function(d) {
-                    return d[name].apply(d, args);
-                  })
-                });
-              };
-            }
-
-            foam.Function.setName(code, name);
-
-            return foam.core.Method.create({
-              name: name,
-              code: code
+        if ( ! returns ) {
+          var code = function() {
+            var self = this;
+            var args = arguments;
+            this[propName].then(function(a) {
+              a[name].apply(a, args);
             });
-          }).forEach(function(m) {
-            cls.installAxiom(m);
+          };
+        } else if ( returns === 'Promise' ) {
+          code = function() {
+            var self = this;
+            var args = arguments;
+            return this[propName].then(function(a) {
+              return a[name].apply(a, args);
+            });
+          };
+        } else {
+          // TODO(adamvy): Use modelFactories
+
+          var path = m.returns.split('.');
+          path[path.length - 1] = 'Promised' + path[path.length - 1];
+
+          var returnClsId = path.join('.');
+
+          if ( ! foam.lookup(returnClsId) ) {
+            foam.CLASS({
+              package: path.slice(0, path.length - 1).join('.'),
+              name: path[path.length - 1]
+            });
+
+            // Done in two passes to prevent infinite recursion.
+            foam.CLASS({
+              refines: returnClsId,
+              properties: [
+                {
+                  class: 'Promised',
+                  of: m.returns,
+                  name: 'delegate'
+                }
+              ]
+            });
+          }
+
+          code = function() {
+            var self = this;
+            var args = arguments;
+            return foam.lookup(returnClsId).create({
+              delegate: this[propName].then(function(d) {
+                return d[name].apply(d, args);
+              })
+            });
+          };
+        }
+
+        foam.Function.setName(code, name);
+
+        return foam.core.Method.create({
+          name: name,
+          code: code
+        });
+      }).forEach(function(m) {
+        cls.installAxiom(m);
+      });
+
+      cls.installAxiom(foam.core.Method.create({
+        name: 'sub',
+        code: function() {
+          var innerSub = Array.from(arguments);
+          var topic = innerSub.slice(0, innerSub.length-1);
+          innerSub[innerSub.length-1] = foam.Function.bind(function(s) {
+            var args = Array.from(arguments).slice(1);
+            var c = this.pub.apply(this, args);
+            if ( ! c ) s.destroy();
+          }, this);
+
+          this[propName].then(function(d) {
+            d.sub.apply(d, innerSub);
           });
+
+          return this.SUPER.apply(this, arguments);
+        }
+      }));
     }
   ]
 });
