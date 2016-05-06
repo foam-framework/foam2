@@ -15,7 +15,67 @@
  * limitations under the License.
  */
 
-// TODO: doc
+/**
+  Imports and Exports provide implicit Context dependency management.
+
+  A class can list which values it requires from the Context, and then
+  these values will be added to the object itself so that it doesn't need
+  to explicitly work with the Context.
+
+  A class can list which values (properties, methods, or method-like axioms)
+  that it exports, and these will automatically be added to the object's
+  sub-Context. The object's sub-Context is the context that is used when
+  new objects are created by the object.
+
+  Ex.:
+<pre>
+foam.CLASS({
+  name: 'ImportsTest',
+
+  imports: [ 'log', 'warn' ],
+
+  methods: [ function foo() {
+    this.log('log foo from ImportTest');
+    this.warn('warn foo from ImportTest');
+  } ]
+});
+
+foam.CLASS({
+  name: 'ExportsTest',
+  requires: [ 'ImportsTest' ],
+
+  exports: [ 'log', 'log as warn' ],
+
+  methods: [
+    function init() {
+      // ImportsTest will be created in ExportTest's
+      // sub-Context, which will have 'log' and 'warn'
+      // exported.
+      this.ImportsTest.create().foo();
+    },
+    function log(msg) {
+      console.log('log:', msg);
+    }
+  ]
+});
+</pre>
+
+  Aliasing:
+    Bindings can be renamed or aliased when they're imported or exported using 'as alias'.
+
+  Examples:
+    // import 'userDAO' from the Context and make available as this.dao
+    imports: [ 'userDAO as dao' ]
+
+    // export my log method as 'warn'
+    exports: [ 'log as warn' ]
+
+    // If the axiom to be exported isn't named, but just aliased, then 'this' is exported
+    // as the named alias.  This is how objects export themselves.
+    exports: [ 'as Controller' ]
+
+  See Context.js.
+ */
 foam.CLASS({
   package: 'foam.core',
   name: 'Imports',
