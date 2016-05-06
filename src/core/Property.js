@@ -230,7 +230,13 @@ foam.CLASS({
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
-      // TODO: doc
+      //
+      // Define a PropertySlot accessor (see Slot.js) for this Property.
+      // If the property is named 'name' then 'name$' will access a Slot
+      // for this Property. The Slot is created when first accessed and then
+      // cached.
+      // If the Slot is set (to another slot) the two Slots are link()'ed
+      // together, meaning they will now dynamically share the same value.
       Object.defineProperty(proto, slotName, {
         get: function propertySlotGetter() {
           return prop.toSlot(this);
