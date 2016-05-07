@@ -248,7 +248,15 @@ foam.CLASS({
         enumerable: false
       });
 
-      // TODO: doc
+      // Define Property getter and setter based on Property properties.
+      // By default, getter and setter stores instance value for property
+      // in this.instance_[<name of property>],
+      // unless the user provides custom getter and setter methods.
+
+      // Getter
+      // Call 'getter' if provided, else return value from instance_ if set.
+      // If not set, return value from 'factory', 'expression', or
+      // (default) 'value', if provided.
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
