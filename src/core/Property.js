@@ -287,7 +287,10 @@ foam.CLASS({
           // TODO: expand
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
-            eFactory ? ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ? this[name] : undefined ) :
+            eFactory ?
+                ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ?
+                  this[name] :
+                  undefined ) :
             this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
