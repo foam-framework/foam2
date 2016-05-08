@@ -283,8 +283,10 @@ foam.CLASS({
             return;
           }
 
-          // Get old value but avoid triggering factory if present
-          // TODO: expand
+          // Get old value but avoid triggering factory or expression if present.
+          // Factories and expressions (which are also factories) can be expensive
+          // to generate, and if the value has been explicitly set to some value,
+          // then it isn't worth the expense of computing the old stale value.
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
             eFactory ?
