@@ -73,9 +73,7 @@ foam.CLASS({
 
       p.x = Math.sin(p.t) * Math.cos(p.g) * p.r;
       p.y = Math.cos(p.t) * p.r;
-      p.z = Math.sqrt(200*200 - p.x*p.x - p.y*p.y);
-
-      if ( i > this.n/2 ) p.z *= -1;
+      p.z = Math.sqrt(200*200 - p.x*p.x - p.y*p.y) * (( i > this.n/2 ) ? 1 : -1);
 
       this.time$.sub(function() {
         p.rotateY(0.01);
