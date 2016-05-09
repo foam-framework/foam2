@@ -30,6 +30,7 @@ var toCompare = function toCompare(c) {
 
   return c.compare ? c.compare.bind(c) : c;
 };
+
 /** TODO: move to stdlib */
 var CompoundComparator = function CompoundComparator() {
   var args = Array.from(arguments);
@@ -52,6 +53,7 @@ var CompoundComparator = function CompoundComparator() {
   return f;
 };
 
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Plan',
@@ -69,11 +71,13 @@ foam.CLASS({
   ]
 });
 
+
 /** Plan indicating that there are no matching records. **/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'NotFoundPlan',
   extends: 'foam.dao.index.Plan',
+
   axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
@@ -81,7 +85,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toString() { return "no-match(cost=0)"; }
+    function toString() { return 'no-match(cost=0)'; }
   ]
 });
 
@@ -91,6 +95,7 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'NoPlan',
   extends: 'foam.dao.index.Plan',
+
   axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
@@ -98,9 +103,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function toString() { return "no-plan"; }
+    function toString() { return 'no-plan'; }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao.index',
@@ -110,7 +116,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Function',
-      name: 'customExecute',
+      name: 'customExecute'
     },
     {
       class: 'Function',
@@ -120,8 +126,17 @@ foam.CLASS({
 
   methods: [
     function execute(promise, state, sink, skip, limit, order, predicate) {
-      this.customExecute.call(this, promise, state, sink, skip, limit, order, predicate);
+      this.customExecute.call(
+          this,
+          promise,
+          state,
+          sink,
+          skip,
+          limit,
+          order,
+          predicate);
     },
+
     function toString() {
       return this.customToString.call(this);
     }
@@ -137,14 +152,15 @@ foam.CLASS({
   properties: [
     {
       class: 'Int',
-      name: 'count',
-    },
+      name: 'count'
+    }
   ],
 
   methods: [
     function execute(promise, sink /*, skip, limit, order, predicate*/) {
       sink.value += this.count;
     },
+
     function toString() {
       return 'short-circuit-count(' + this.count + ')';
     }
@@ -167,7 +183,7 @@ foam.CLASS({
         }
       }
     },
-    'prop',
+    'prop'
   ],
 
   methods: [
@@ -177,6 +193,7 @@ foam.CLASS({
         sp[i].execute(promise, sink, skip, limit, order, predicate);
       }
     },
+
     function toString() {
       return ( this.subPlans.length <= 1 ) ?
         'IN(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ", " +
@@ -206,17 +223,22 @@ foam.CLASS({
 
     /** Adds or updates the given value in the index */
     function put() {},
+
     /** Removes the given value from the index */
     function remove() {},
+
     /** @return a Plan to execute a select with the given parameters */
     function plan(/*sink, skip, limit, order, predicate*/) {},
+
     /** @return the stored value for the given key. */
     function get() {},
+
     /** @return the integer size of this index. */
     function size() {},
 
     /** Selects matching items from the index and puts them into sink */
     function select(/*sink, skip, limit, order, predicate*/) { },
+
     /** Selects matching items in reverse order from the index and puts
       them into sink */
     function selectReverse(/*sink, skip, limit, order, predicate*/) { },
@@ -233,7 +255,7 @@ foam.CLASS({
 
   properties: [
     { class: 'Simple',  name: 'value' },
-    { name: 'cost', value: 1 },
+    { name: 'cost', value: 1 }
   ],
 
   methods: [
@@ -241,6 +263,7 @@ foam.CLASS({
     function execute(promise, sink) {
       sink.put(this.value);
     },
+
     function toString() {
       return "ValueIndex_Plan(cost=1, value:" + this.value + ")";
     },
@@ -258,18 +281,20 @@ foam.CLASS({
       if ( limit && limit[0]-- <= 0 ) return;
       sink.put(this.value);
     },
+
     function selectReverse(sink, skip, limit, order, predicate) {
       this.select(sink, skip, limit, order, predicate);
-    },
-
-  ],
+    }
+  ]
 });
+
 
 /** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeIndex',
   extends: 'foam.dao.index.Index',
+
   requires: [
     'foam.dao.index.TreeNode',
     'foam.dao.index.NullTreeNode',
@@ -279,7 +304,6 @@ foam.CLASS({
     'foam.dao.index.AltPlan',
     'foam.dao.index.CustomPlan',
     'foam.dao.ArraySink',
-
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.And',
@@ -302,20 +326,20 @@ foam.CLASS({
     'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
   ],
+
   properties: [
     {
       class: 'Simple',
-      name: 'prop',
+      name: 'prop'
     },
     {
       class: 'Simple',
-      name: 'selectCount',
+      name: 'selectCount'
     },
     {
       class: 'Simple',
-      name: 'root',
+      name: 'root'
     },
-
     {
       name: 'nullNode',
       factory: function() {
@@ -334,7 +358,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'tailFactory',
+      name: 'tailFactory'
     }
   ],
 
@@ -379,15 +403,25 @@ foam.CLASS({
     },
 
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue), newValue, this.compare, this.dedup, this.selectCount > 0);
+      this.root = this.root.putKeyValue(
+          this.prop.f(newValue),
+          newValue,
+          this.compare,
+          this.dedup,
+          this.selectCount > 0);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value), value, this.compare, this.selectCount > 0);
+      this.root = this.root.removeKeyValue(
+          this.prop.f(value),
+          value,
+          this.compare,
+          this.selectCount > 0);
     },
 
     function get(key) {
-      return this.root.get(key, this.compare); // does not delve into sub-indexes
+      // does not delve into sub-indexes
+      return this.root.get(key, this.compare);
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -563,8 +597,8 @@ foam.CLASS({
         },
         customToString: function() {
           return 'scan(key=' + prop.name + ', cost=' + this.cost +
-            (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
-            ')';
+              (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
+              ')';
         }
       });
     },
@@ -584,11 +618,20 @@ foam.CLASS({
 
   methods: [
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue, this.compare, this.dedup, this.selectCount > 0);
+      this.root = this.root.putKeyValue(
+          this.prop.f(newValue).toLowerCase(),
+          newValue,
+          this.compare,
+          this.dedup,
+          this.selectCount > 0);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value, this.compare, this.selectCount > 0);
+      this.root = this.root.removeKeyValue(
+          this.prop.f(value).toLowerCase(),
+          value,
+          this.compare,
+          this.selectCount > 0);
     }
   ]
 });
@@ -611,7 +654,11 @@ foam.CLASS({
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.putKeyValue(a[i], newValue, this.compare, this.dedup);
+          this.root = this.root.putKeyValue(
+              a[i],
+              newValue,
+              this.compare,
+              this.dedup);
         }
       } else {
         this.root = this.root.putKeyValue('', newValue, this.compare, this.dedup);
@@ -637,9 +684,11 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
   //extends: 'foam.dao.index.Index',
+
   requires: [
     'foam.dao.index.NoPlan',
   ],
+
   constants: {
     /** Maximum cost for a plan which is good enough to not bother looking at the rest. */
     GOOD_ENOUGH_PLAN: 10 // put to 10 or more when not testing
@@ -722,6 +771,7 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'AutoIndex',
   extends: 'foam.dao.index.Index',
+
   requires: [
     'foam.core.Property',
     'foam.dao.index.NoPlan',
@@ -743,9 +793,7 @@ foam.CLASS({
 
     function remove() { },
 
-    function bulkLoad() {
-      return 'auto';
-    },
+    function bulkLoad() { return 'auto'; },
 
     function addIndex(prop) {
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
@@ -757,7 +805,10 @@ foam.CLASS({
     },
 
     function plan(sink, skip, limit, order, predicate) {
-      if ( order && this.Property.isInstance(order) && ! this.properties[order.name] ) {
+      if (
+          order &&
+          this.Property.isInstance(order) && ! this.properties[order.name]
+      ) {
         this.addIndex(order);
       } else if ( predicate ) {
         // TODO: check for property in predicate
@@ -769,5 +820,3 @@ foam.CLASS({
     }
   ]
 });
-
-
