@@ -41,6 +41,10 @@ var createTestProperties = function createTestProperties() {
         {
           class: 'ReferenceArray',
           name: 'referenceArray',
+        },
+        {
+          class: 'Class',
+          name: 'class',
         }
         // TODO: other types, as they gain testable functionality
       ]
@@ -189,13 +193,10 @@ describe('Function', function() {
     p.func = function() { return 55; }
     expect(p.func()).toEqual(55);
   });
-  it('accepts strings and converts them into functions', function() {
-    p.func = "return 55;"
-    expect(p.func()).toEqual(55);
-  });
-  it('accepts strings including function() and converts them into functions', function() {
-    p.func = "function\r\n(\n)\n\n\n { return 55; }"
-    expect(p.func()).toEqual(55);
+  it('rejects non functions', function() {
+    expect(function() {
+      p.func = 'asdlfkjalskdjf';
+    }).toThrow();
   });
 });
 
@@ -226,6 +227,26 @@ describe('StringArray', function() {
     p.stringArray = [ "Hello", "I see", "Well" ];
     expect(p.stringArray).toEqual([ "Hello", "I see", "Well" ]);
   });
+  it('converts elements to strings', function() {
+    var d = new Date();
+    var golden = '' + d;
+
+    p.stringArray = [
+      { a: 1 },
+      2,
+      true,
+      d,
+      'hello'
+    ];
+
+    expect(p.stringArray).toEqual([
+      '[object Object]',
+      '2',
+      'true',
+      golden,
+      'hello'
+    ]);
+  });
 });
 
 describe('ReferenceArray', function() {
@@ -241,4 +262,36 @@ describe('ReferenceArray', function() {
   it('is empty array by default', function() {
     expect(p.referenceArray).toEqual([]);
   });
+});
+
+
+describe('Class property', function() {
+  var p;
+
+  beforeEach(function() {
+    p = createTestProperties();
+  });
+  afterEach(function() {
+    p = null;
+  });
+
+  it('is undefined by default', function() {
+    expect(p.class).toBeUndefined();
+  });
+
+  it('stores a given model instance', function() {
+    p.class = test.DateTypeTester;
+    expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('looks up a model from a string name', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+  });
+  it('accepts undefined', function() {
+    p.class = 'test.DateTypeTester';
+    expect(p.class).toBe(test.DateTypeTester);
+    p.class = undefined;
+    expect(p.class).toBeUndefined();
+  });
+
 });

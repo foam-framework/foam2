@@ -43,7 +43,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArray',
-  extends: 'Array',
+  extends: 'FObjectArray',
 
   properties: [
     {

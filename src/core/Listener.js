@@ -48,19 +48,14 @@ foam.CLASS({
   name: 'Listener',
 
   properties: [
-    // TODO: doc
-    'name',
-    'code',
+    { name: 'name', required: true },
+    { name: 'code', required: true },
     { class: 'Boolean', name: 'isFramed',   value: false },
     { class: 'Boolean', name: 'isMerged',   value: false },
     { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' }
   ],
 
   methods: [
-    function validate() {
-      this.assert( ! this.isMerged || ! this.isFramed, "Listener can't be both isMerged and isFramed: ", this.name);
-    },
-
     function installInProto(proto) {
       var name       = this.name;
       var code       = this.code;

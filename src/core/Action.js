@@ -23,7 +23,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      required: true
     },
     {
       class: 'String',
@@ -61,7 +62,9 @@ foam.CLASS({
     },
     {
       class: 'Function',
-      name: 'code'
+      name: 'code',
+      required: true,
+      value: null
     }
   ],
 
@@ -96,7 +99,6 @@ foam.CLASS({
       name: 'actions',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Action must be named');
           return foam.core.Action.create({name: o.name, code: o});
         }
         return foam.lookup(this.of).create(o);

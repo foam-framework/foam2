@@ -274,7 +274,7 @@ describe('Final property', function() {
   });
 });
 
-describe('Array', function() {
+describe('FObjectArray', function() {
   var t;
 
   beforeEach(function() {
@@ -284,7 +284,7 @@ describe('Array', function() {
       package: 'test',
       properties: [
         {
-          class: 'Array', of: 'A',
+          class: 'FObjectArray', of: 'A',
           name: 'as'
         }
       ]
@@ -295,7 +295,7 @@ describe('Array', function() {
   });
 
   it('has a adapt', function() {
-    var ap = foam.core.Array.create({});
+    var ap = foam.core.FObjectArray.create({});
     expect(ap.adapt).toBeTruthy();
   });
 
@@ -903,7 +903,7 @@ describe('Bootstrap invariants', function() {
     expect(foam.core.Model.isInstance(foam.core.Property.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.Method.model_)).toBe(true);
     expect(foam.core.Model.isInstance(foam.core.String.model_)).toBe(true);
-    expect(foam.core.Model.isInstance(foam.core.Array.model_)).toBe(true);
+    expect(foam.core.Model.isInstance(foam.core.FObjectArray.model_)).toBe(true);
   });
 
   it('Check that Class.model_ and Class.prototype.model_ are the same object', function() {

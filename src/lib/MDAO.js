@@ -23,7 +23,6 @@ foam.CLASS({
   name: 'MDAO',
   label: 'Indexed DAO',
   requires: [
-    'foam.core.Array',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.ObjectNotFoundException',
@@ -98,7 +97,7 @@ foam.CLASS({
         var prop = arguments[i];
 
         // TODO: the index prototype should be in the property
-        var proto = this.Array.isInstance(prop) ?
+        var proto = Array.isArray(prop) ?
           this.SetIndex  :
           this.TreeIndex ;
         index = proto.create({ prop: prop, tailFactory: index });
