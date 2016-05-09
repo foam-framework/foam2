@@ -298,6 +298,10 @@ foam.CLASS({
 
     function paintSelf(x) {},
 
+    function hsl(h, s, l) {
+      return 'hsl(' + h + ',' + s + '%,' + l + '%)';
+    },
+
     // TODO: Replace with toE() when/if ready.
     function toHTML() {
       return this.Canvas.create({

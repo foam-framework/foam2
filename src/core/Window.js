@@ -15,6 +15,27 @@
  * limitations under the License.
  */
 
+/**
+  Export common window/document services through the Context.
+
+  Rather than using window or document directly, objects should import: the
+  services that foam.core.Window exports:, and then access them as this.name,
+  rather than as console.name or document.name.
+
+  All FObjects already import: [ 'assert', 'error', 'log', 'warn' ], meaning
+  that these do not need to be explicitly imported.
+
+  This is done to remove dependency on the globals 'document' and 'window',
+  which makes it easier to write code which works with multiple windows.
+
+  It also allows for common services to be decorated, trapped, or replaced
+  in sub-contexts (for example, to replace console.error and console.warn when
+  running test).
+
+  A foam.core.Window is installed by FOAM on starup for the default
+  window/document, but if user code opens a new Window, it should create
+  and install a new foam.core.Window explicitly.
+ */
 foam.CLASS({
   package: 'foam.core',
   name: 'Window',
@@ -32,7 +53,6 @@ foam.CLASS({
     'console',
     'delayed',
     'document',
-    'dynamic',
     'error',
     'framed',
     'info',
@@ -70,14 +90,14 @@ foam.CLASS({
     function assert(b /*, args */) {
       /* Like console.assert() except that it takes more than one argument. */
       if ( ! b ) {
-        this.console.assert(false, [].splice.call(arguments, 1).join(''));
+        this.console.assert(false, Array.prototype.slice.call(arguments, 1).join(' '));
       }
     },
 
     function error() { this.console.error.apply(this.console, arguments); },
-    function info()  { this.console.info.apply(this.console, arguments); },
-    function log()   { this.console.log.apply(this.console, arguments); },
-    function warn()  { this.console.warn.apply(this.console, arguments); },
+    function info()  { this.console.info.apply(this.console, arguments);  },
+    function log()   { this.console.log.apply(this.console, arguments);   },
+    function warn()  { this.console.warn.apply(this.console, arguments);  },
 
     function async(l) {
       /* Decorate a listener so that the event is delivered asynchronously. */
@@ -97,12 +117,12 @@ foam.CLASS({
       var delay = opt_delay || 16;
       var X     = this;
 
-      return function() {
+      return foam.Function.setName(function() {
         var triggered = false;
         var lastArgs  = null;
         function mergedListener() {
           triggered = false;
-          var args = foam.Array.argsToArray(lastArgs);
+          var args = Array.from(lastArgs);
           lastArgs = null;
           l.apply(this, args);
         }
@@ -117,13 +137,13 @@ foam.CLASS({
         };
 
         return f;
-      }();
+      }(), 'merged(' + l.name + ')');
     },
 
     function framed(l) {
       var X = this;
 
-      return function() {
+      return foam.Function.setName(function() {
         var triggered = false;
         var lastArgs  = null;
         function frameFired() {
@@ -143,10 +163,7 @@ foam.CLASS({
         };
 
         return f;
-      }();
-    },
-
-    function dynamic() {
+      }(), 'framed(' + l.name + ')');
     },
 
     function setTimeout(f, t) {
@@ -192,4 +209,4 @@ if ( foam.isServer ) {
 }
 
 
-foam.X = foam.core.Window.create({window: global}, foam).Y;
+foam.X = foam.core.Window.create({window: global}, foam.X).Y;

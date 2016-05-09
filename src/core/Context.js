@@ -34,37 +34,34 @@
  */
 
 (function() {
-
-  var lookup_ = function lookup_(id) {
-    var a = foam.core[id];
-    if ( a ) return a;
-    var path = id.split('.');
-    var root = global;
-    for ( var i = 0 ; root && i < path.length ; i++ ) root = root[path[i]];
-    return root;
-  };
-
-  var cache = {};
-
   var X = {
+    // Temporary: gets replaced in Window.js.
+    assert: function() { console.assert.apply(console, arguments); },
+
     /** Lookup a Model. **/
     lookup: function(id) {
-      return id && ( cache[id] || ( cache[id] = lookup_(id) ) );
+      return this.__cache__[id];
     },
 
     register: function(cls) {
-      cache[cls.id] = cls;
+      console.assert(
+        typeof cls === 'object',
+        'Cannot register non-objects into a context.');
+      console.assert(
+        typeof cls.id === 'string',
+        'Must have an .id property to be registered in a context.');
 
-      if ( cls.package === 'foam.core' ) cache[cls.name] = cls;
+      function doRegister(cache, name) {
+        // FUTURE: Re-enable when we have a good plan for unloading classes
+        // console.assert(
+        //     ! cache.hasOwnProperty(name),
+        //     cls.id + ' is already registerd in this context.');
 
-      var path = cls.id.split('.');
-      var root = global;
-
-      for ( var i = 0 ; i < path.length-1 ; i++ ) {
-        root = root[path[i]] || ( root[path[i]] = {} );
+        cache[name] = cls;
       }
 
-      root[path[path.length-1]] = cls;
+      doRegister(this.__cache__, cls.id);
+      if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
     },
 
     subContext: function subContext(opt_args, opt_name) {
@@ -91,6 +88,10 @@
       if ( opt_name ) {
         Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
       }
+      Object.defineProperty(sub, '__cache__', {
+        value: Object.create(this.__cache__),
+        enumerable: false
+      });
 
       sub.$UID__ = foam.next$UID();
       sub.__proto__ = this;
@@ -100,8 +101,16 @@
     }
   };
 
-  // Create short-cuts for foam.X.[subContext, register, lookup] in foam.
-  for ( var key in X ) foam[key] = X[key].bind(X);
+  Object.defineProperty(X, '__cache__', {
+    value: {},
+    enumerable: false
+  });
+
+  foam.lookup = function(id) { return foam.X.lookup(id); };
+  foam.register = function(cls) { foam.X.register(cls); };
+  foam.subContext = function(opt_args, opt_name) {
+    return foam.X.subContext(opt_args, opt_name);
+  };
 
   foam.X = X;
 })();

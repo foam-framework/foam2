@@ -21,7 +21,8 @@
 // Correct load order is Angular 1.5 and FOAM 2 (either order), this library,
 // then your application module that uses Angular and this library.
 
-angular.module('foam', []).directive('foamView', ['$q', function($q) {
+/* globals angular: false */
+angular.module('foam', []).directive('foamView', function() {
   return {
     restrict: 'A',
     scope: {
@@ -30,7 +31,7 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
       key: '<foamView',
       dao: '<foamDao',
       as: '@foamAs',
-      delay: '@foamDelay',
+      delay: '@foamDelay'
     },
     priority: 2000,
     transclude: 'element',
@@ -51,7 +52,7 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
         $scope.dao.find($scope.key).then(hookUpObject);
         daoSub && daoSub.destroy();
         daoSub = $scope.dao.on.sub(function(sub, _, operation, obj) {
-          if (operation === 'reset') {
+          if ( operation === 'reset' ) {
             initialStart();
           } else if ( obj.id === $scope.key ) {
             hookUpObject(obj);
@@ -81,16 +82,17 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
       // TODO: Do I need to add something extra to destroy that scope?
     }
   };
-}])
+});
 
-.directive('foamRepeat', ['$q', '$timeout', function($q, $timeout) {
+angular.module('foam').directive('foamRepeat', [ '$timeout',
+    function($timeout) {
   return {
     restrict: 'A',
     scope: {
       // TODO: Make these one-way reactive bindings, probably.
       // Except for "as", that should just be a string.
       dao: '<foamRepeat',
-      as: '@foamAs',
+      as: '@foamAs'
     },
     priority: 20000,
     transclude: 'element',
@@ -103,7 +105,7 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
         put: onPut,
         remove: onRemove,
         reset: onReset,
-        eof: function() { },
+        eof: function() { }
       };
 
       $scope.dao.pipe(listener);
@@ -122,10 +124,9 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
 
       function onPut(obj) {
         var c = cache[obj.id];
-        if (c) {
+        if ( c ) {
           var o = c.scope[as] = obj.clone();
           $timeout(function() { c.scope.$apply(); }, 0, false);
-          //c.scope.$apply();
           attachObject(o);
           return;
         }
@@ -160,12 +161,81 @@ angular.module('foam', []).directive('foamView', ['$q', function($q) {
       }
 
       function onReset() {
-        for (var id in cache) {
+        for ( var id in cache ) {
           remove(cache[id]);
         }
         cache = {};
       }
     }
   };
-}]);
+} ]);
+
+angular.module('foam').directive('foamInternalInject', function() {
+  return {
+    link: function(scope, element, attrs, controller, transcludeFn) {
+      // TODO: Include error message generation here, for production.
+      var innerScope = scope.$new();
+      transcludeFn(innerScope, function(clone) {
+        element.empty();
+        element.append(clone);
+        element.on('$destroy', function() {
+          innerScope.$destroy();
+        });
+      });
+    }
+  };
+});
+
+angular.module('foam').directive('foamDaoController', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      dao: '<',
+      selection: '=',
+      controllerMode: '=',
+      label: '<'
+    },
+    transclude: true,
+    template: foam.String.multiline(function() {/*
+      <div class="foam-dao-controller">
+      <div class="foam-dao-controller-header">
+      <span class="foam-dao-controller-label">{{label}}</span>
+      <button class="foam-dao-controller-create" ng-click="doCreate()">
+      New
+      </button>
+      </div>
+      <div class="foam-dao-controller-list">
+      <div foam-repeat="dao" ng-click="doEdit(object)" foam-internal-inject>
+      </div>
+      </div>
+      </div>
+    */}),
+
+    link: function(scope) {
+      scope.doCreate = function doCreate() {
+        var obj = foam.lookup(scope.dao.of).create();
+        scope.selection = obj;
+        scope.controllerMode = 'create';
+      };
+
+      scope.doSave = function doSave() {
+        scope.dao.put(scope.selection);
+        scope.selection = null;
+        scope.controllerMode = 'none';
+      };
+
+      scope.controllerMode = 'none';
+
+      scope.doEdit = function doEdit(item) {
+        scope.controllerMode = 'edit';
+        scope.selection = item;
+      };
+
+      scope.dao.select().then(function(a) {
+        scope.array = a.a;
+        scope.$apply();
+      });
+    }
+  };
+});
 

@@ -44,6 +44,21 @@ foam.CLASS({
 });
 
 
+/* Validate that Listeners aren't both framed and merged. */
+foam.CLASS({
+  refines: 'foam.core.Listener',
+
+  methods: [
+    function validate() {
+      this.assert(
+        ! this.isMerged || ! this.isFramed,
+        "Listener can't be both isMerged and isFramed: ",
+        this.name);
+    }
+  ]
+});
+
+
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -52,7 +67,14 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
-      var mName = model ? model.id + '.' : '';
+      this.assert(
+          ! this.name.endsWith('$'),
+          'Illegal Property Name: Can\'t end with "$": ', this.name);
+
+      var mName =
+        model.id      ? model.id + '.'      :
+        model.refines ? model.refines + '.' :
+        '' ;
 
       // List of properties which are hidden by other properties.
       var es = [
@@ -70,11 +92,33 @@ foam.CLASS({
           }
         }
       }
+    },
+
+    function validateClass(cls) {
+      // Validate that expressions only depend on known Axioms with Slots
+      if ( this.expression ) {
+        var expression = this.expression;
+        var pName = cls.id + '.' + this.name + '.expression: ';
+
+        var argNames = foam.Function.argsArray(expression);
+        for ( var i = 0 ; i < argNames.length ; i++ ) {
+          var name  = argNames[i];
+          var axiom = cls.getAxiomByName(name);
+
+          this.assert(
+              axiom,
+              'Unknown argument "', name, '" in ', pName, expression);
+          this.assert(
+              axiom.toSlot,
+              'Non-Slot argument "', name, '" in ', pName, expression);
+        }
+      }
     }
   ]
 });
 
 
+foam.X.assert(! foam.AbstractClass.describe, 'foam.AbstractClass.describe already set.');
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
@@ -92,6 +136,62 @@ foam.AbstractClass.describe = function(opt_name) {
 };
 
 
+// Decorate installModel() to verify that axiom names aren't duplicated.
+foam.AbstractClass.installModel = function() {
+  var superInstallModel = foam.AbstractClass.installModel;
+
+  return function(m) {
+    var names = {};
+
+    for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
+      var a = m.axioms_[i];
+
+      foam.X.assert(
+        ! names.hasOwnProperty(a.name),
+        'Axiom name conflict in', m.id || m.refines, ':', a.name);
+
+      var prevA    = this.getAxiomByName(a.name);
+      var Property = foam.core.Property;
+      if ( prevA && prevA.cls_ !== a.cls_ &&
+          ! ( a.cls_ === Property && Property.isSubClass(prevA.cls_) )
+      ) {
+        var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
+        var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
+
+        if ( Property.isSubClass(prevA.cls_) && ! Property.isSubClass(a.cls_) ) {
+          throw 'Illegal to change Property to non-Property: ' +
+            this.id + '.' +
+            a.name +
+            ' changed to ' +
+            aCls;
+        } else if ( prevA.cls_ ) {
+          // FUTURE: make error when supression supported
+          console.warn(
+            'Change of Axiom ' +
+            this.id + '.' +
+            a.name +
+            ' type from ' +
+            prevCls +
+            ' to ' +
+            aCls);
+        }
+      }
+
+      names[a.name] = a;
+    }
+
+    superInstallModel.call(this, m);
+  };
+}();
+
+foam.AbstractClass.validate = function() {
+  for ( var key in this.axiomMap_ ) {
+    var a = this.axiomMap_[key];
+    a.validateClass && a.validateClass(this);
+  }
+}
+
+
 /* Add describe() support to objects. */
 foam.CLASS({
   refines: 'foam.core.FObject',
@@ -99,13 +199,13 @@ foam.CLASS({
   methods: [
     function unknownArg(key, value) {
       if ( key == 'class' ) return;
-      console.warn('Unknown property ' + this.cls_.id + '.' + key + ':', value);
+      this.warn('Unknown property ' + this.cls_.id + '.' + key + ': ' + value);
     },
 
     function describe(opt_name) {
-      console.log('Instance of', this.cls_.name);
-      console.log('Axiom Type           Name           Value');
-      console.log('----------------------------------------------------');
+      this.log('Instance of', this.cls_.name);
+      this.log('Axiom Type           Name           Value');
+      this.log('----------------------------------------------------');
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
@@ -114,27 +214,28 @@ foam.CLASS({
           foam.String.pad(p.name, 14),
           this[p.name]);
       }
-      console.log('\n');
+      this.log('\n');
     }
   ]
 });
 
 
 /* Add describe support to contexts. */
-foam.X.describe = function() {
-  console.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
-  console.log('KEY                  Type           Value');
-  console.log('----------------------------------------------------');
-  for ( var key in this ) {
-    var value = this[key];
-    var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
-    console.log(
-      foam.String.pad(key,  20),
-      foam.String.pad(type, 14),
-      typeof value === 'string' || typeof value === 'number' ? value : '');
-  }
-  console.log('\n');
-};
+foam.X = foam.X.subContext({
+  describe: function() {
+    this.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
+    this.log('KEY                  Type           Value');
+    this.log('----------------------------------------------------');
+    for ( var key in this ) {
+      var value = this[key];
+      var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
+      this.log(
+        foam.String.pad(key,  20),
+        foam.String.pad(type, 14),
+        typeof value === 'string' || typeof value === 'number' ? value : '');
+    }
+    this.log('\n');
+}});
 
 
 foam.CLASS({
@@ -204,15 +305,16 @@ foam.CLASS({
   ],
 
   methods: [
-    /** Validates the given argument against this type information.
-        If any type checks are failed, a TypeError is thrown.
-         */
+    /**
+      Validates the given argument against this type information.
+      If any type checks are failed, a TypeError is thrown.
+     */
     function validate(/* any // the argument value to validate. */ arg) {
-      i = ( this.index >= 0 ) ? ' '+this.index+', ' : ', ';
+      i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
         if ( ! this.optional ) {
-          throw new TypeError(this.PREFIX + i + this.name+', is not optional, but was undefined in a function call');
+          throw new TypeError(this.PREFIX + i + this.name + ', is not optional, but was undefined in a function call');
         } else {
           return; // value is undefined, but ok with that
         }
@@ -226,7 +328,7 @@ foam.CLASS({
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
-        if ( ! arg.cls_ || ! this.type.isInstance(arg) ) {   // TODO: .cls_ check in isInstance() instead?
+        if ( ! this.type.isInstance(arg) ) {
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
           throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + gotType);
         }
@@ -276,6 +378,12 @@ foam.LIB({
         // if can't match from start of string, fail
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
+        if ( ret.returnType ) {
+          throw new SyntaxError("foam.types.getFunctionArgs return type '" +
+            ret.returnType.typeName + "' must appear after the last argument only: " + args.toString());
+        }
+
+        // record the argument
         ret.push(foam.core.Argument.create({
           name:          typeMatch[6],
           typeName:      typeMatch[2],
@@ -284,8 +392,9 @@ foam.LIB({
           index:        argIdx++,
           documentation: typeMatch[5],
         }));
-        // TODO: this is only valid on the last arg
-        if ( typeMatch[6] ) {
+        // if present, record return type (if not the last arg, we fail on the
+        // next iteration)
+        if ( typeMatch[8] ) {
           ret.returnType = foam.core.ReturnValue.create({
             typeName: typeMatch[8],
             type: global[typeMatch[8]]
@@ -301,7 +410,7 @@ foam.LIB({
             type: global[typeMatch[1]]
           });
         } else {
-          throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
+          throw new SyntaxError("foam.types.getFunctionArgs argument parsing error: " + args.toString());
         }
       }
 

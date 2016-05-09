@@ -86,7 +86,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserArray',
-  extends: 'Array',
+  extends: 'FObjectArray',
 
   properties: [
     [ 'of', 'foam.parse.Parser' ],
@@ -664,7 +664,7 @@ foam.CLASS({
       return alt[0];
     },
     function parse(ps, obj) {
-      // TODO: Should we remove the obj argument in favour of
+      // TODO(adamvy): Should we remove the obj argument in favour of
       // passing the obj along via context or something?
       var args = this.args;
       for ( var i = 0, p ; p = args[i] ; i++ ) {
@@ -1150,7 +1150,7 @@ foam.CLASS({
   methods: [
     function seq() {
       return foam.lookup('foam.parse.Sequence').create({
-        args: foam.Array.argsToArray(arguments)
+        args: Array.from(arguments)
       });
     },
 
@@ -1164,13 +1164,13 @@ foam.CLASS({
 
     function simpleAlt() {
       return foam.lookup('foam.parse.Alternate').create({
-        args: foam.Array.argsToArray(arguments)
+        args: Array.from(arguments)
       });
     },
 
     function alt() {
       return foam.lookup('foam.parse.Alternate').create({
-        args: foam.Array.argsToArray(arguments)
+        args: Array.from(arguments)
       });
     },
 
@@ -1183,7 +1183,7 @@ foam.CLASS({
     function seq1(n) {
       return foam.lookup('foam.parse.Sequence1').create({
         n: n,
-        args: foam.Array.argsToArray(arguments).slice(1)
+        args: Array.from(arguments).slice(1)
       });
     },
 
@@ -1245,7 +1245,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'foam.parse.PSymbol',
       name: 'symbols',
       adapt: function(_, o) {
@@ -1275,6 +1275,7 @@ foam.CLASS({
       expression: function(symbols) {
         var m = {};
         for ( var i = 0 ; i < symbols.length ; i++ ) {
+          if ( m[symbols[i].name] ) console.error('Duplicate symbol found', symbols[i].name);
           m[symbols[i].name] = symbols[i];
         }
         return m;
@@ -1344,7 +1345,7 @@ foam.CLASS({
         }
       }
 
-      // TODO: Array property should help me here
+      // TODO(adamvy): Array property should help me here
       this.pub("propertyChange", "symbols", this.slot("symbols"));
       return this;
     }
@@ -1371,7 +1372,6 @@ foam.CLASS({
 
 
 /*
-TODO:
--detect non string values passed to StringPS.setString()
-
+TODO(adamvy):
+  -detect non string values passed to StringPS.setString()
 */

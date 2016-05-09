@@ -23,14 +23,14 @@ foam.LIB({
       /** Create a "one-time" listener which unsubs itself when called. **/
       return function(subscription) {
         subscription.destroy();
-        listener.apply(this, foam.Array.argsToArray(arguments));
+        listener.apply(this, Array.from(arguments));
       };
     },
 
     function consoleLog(listener) {
       /** Log all listener invocations to console. **/
       return function() {
-        var args = foam.Array.argsToArray(arguments);
+        var args = Array.from(arguments);
         console.log(args);
         listener && listener.apply(this, args);
       };

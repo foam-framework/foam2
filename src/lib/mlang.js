@@ -43,7 +43,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang',
   name: 'ExprArray',
-  extends: 'Array',
+  extends: 'FObjectArray',
 
   properties: [
     {
@@ -517,6 +517,89 @@ foam.CLASS({
   ]
 });
 
+
+/** Pseudo-expression which outputs a human-readable description of its
+  subexpression, and the plan for evaluating it. */
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Explain',
+  extends: 'foam.dao.ProxySink',
+
+  properties: [
+    {
+      class: 'String',
+      name:  'plan',
+      help:  'Execution Plan',
+    }
+  ],
+
+  methods: [
+    function toString() { return this.plan; },
+  ]
+});
+
+/** Base class for comparators. */
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'Comparator',
+  abstract: true,
+
+  properties: [
+    {
+      /** The first argument to the expression. */
+      name: 'arg1',
+      class: 'foam.mlang.ExprArgument',
+    }
+  ],
+
+  methods: [
+    function toString() {
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+    },
+    function compare(o1, o2) {
+      return this.arg1.compare(o1, o2);
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'Desc',
+  extends: 'foam.mlang.order.Comparator',
+
+  methods: [
+    function toString() {
+      return 'DESC(' + this.arg1.toString() + ')';
+    },
+    function compare(o1, o2) {
+      return -1 * this.arg1.compare(o1, o2);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  implements: [
+    'foam.dao.Sink',
+    'foam.mlang.predicate.Unary'
+  ],
+  name: 'Max',
+
+  properties: [
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+  methods: [
+    function put(obj) {
+      if ( ! this.hasOwnProperty('value') ) this.value = this.arg1.f(obj);
+      else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) this.value = this.arg1.f(obj);
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
@@ -537,12 +620,15 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.sink.Count',
+    'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
+    'foam.mlang.sink.Explain',
+    'foam.mlang.order.Desc',
   ],
 
   methods: [
     function _nary_(name, args) {
-      return this[name].create({ args: foam.Array.argsToArray(args) });
+      return this[name].create({ args: Array.from(args) });
     },
     function _unary_(name, arg) {
       return this[name].create({ arg1: arg });
@@ -565,6 +651,10 @@ foam.CLASS({
     function NOT(a) { return this._unary_("Not", a); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
+    function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
+
+    function DESC(a) { return this._unary_("Desc", a); },
+    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
   ]
 });
 

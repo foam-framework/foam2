@@ -24,8 +24,8 @@
 
   <ul>Types of Slots include:
     <li>PropertySlot
-    <li>ExpressionSlot
     <li>ConstantSlot
+    <li>ExpressionSlot
 </ul>
 */
 foam.CLASS({
@@ -44,8 +44,8 @@ foam.CLASS({
 
       return {
         destroy: function() {
-          sub1.destroy();
-          sub2.destroy();
+          sub1 && sub1.destroy();
+          sub2 && sub2.destroy();
           sub1 = sub2 = null;
         }
       };
@@ -56,9 +56,9 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      return other.sub(function() {
+      return other.sub(foam.Function.bind(function() {
         this.set(other.get());
-      }.bind(this));
+      }, this));
     }
   ]
 });
@@ -115,6 +115,55 @@ foam.CLASS({
 /** Tracks dependencies for a dynamic function and invalidates is they change. */
 foam.CLASS({
   package: 'foam.core',
+  name: 'ConstantSlot',
+  implements: [ 'foam.core.Slot' ],
+
+  properties: [
+    {
+      name: 'value',
+      getter: function() { return this.value_; },
+      setter: function() {}
+    }
+  ],
+
+  methods: [
+    function initArgs(args) { this.value_ = args && args.value; },
+
+    function get() { return this.value; },
+
+    function set() { /* nop */ },
+
+    function sub(l) { /* nop */ },
+
+    function unsub(l) { /* nop */ }
+  ]
+});
+
+
+/**
+  Tracks dependencies for a dynamic function and invalidates is they change.
+
+<pre>
+foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
+var p = Person.create({fname: 'John', lname: 'Smith'});
+var e = foam.core.ExpressionSlot.create({
+  args: [ p.fname$, p.lname$],
+  fn: function(f, l) { return f + ' ' + l; }
+});
+log(e.get());
+e.sub(log);
+p.fname = 'Steve';
+p.lname = 'Jones';
+log(e.get());
+Output:
+ > John Smith
+ > [object Object] propertyChange value [object Object]
+ > [object Object] propertyChange value [object Object]
+ > Steve Jones
+</pre>
+*/
+foam.CLASS({
+  package: 'foam.core',
   name: 'ExpressionSlot',
   implements: [ 'foam.core.Slot' ],
 
@@ -155,33 +204,5 @@ foam.CLASS({
 
   listeners: [
     function invalidate() { this.clearProperty('value'); }
-  ]
-});
-
-
-/** Tracks dependencies for a dynamic function and invalidates is they change. */
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ConstantSlot',
-  implements: [ 'foam.core.Slot' ],
-
-  properties: [
-    {
-      name: 'value',
-      getter: function() { return this.value_; },
-      setter: function() {}
-    }
-  ],
-
-  methods: [
-    function initArgs(args) { this.value_ = args && args.value; },
-
-    function get() { return this.value; },
-
-    function set() { /* nop */ },
-
-    function sub(l) { /* nop */ },
-
-    function unsub(l) { /* nop */ }
   ]
 });

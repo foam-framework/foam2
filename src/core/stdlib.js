@@ -131,19 +131,22 @@ foam.LIB({
     /** Faster version of memoize() when only dealing with one argument. */
     function memoize1(f) {
       var cache = {};
-      var g = function(arg) {
-        console.assert(arguments.length == 1, "Memoize1'ed functions must take exactly one argument.");
-        var key = arg ? arg.toString() : '';
-        if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
-        return cache[key];
-      };
-      foam.Function.setName(g, 'memoize1(' + f.name + ')');
-      return g;
+      return foam.Function.setName(
+          function(arg) {
+            console.assert(
+                arguments.length == 1,
+                "Memoize1'ed functions must take exactly one argument.");
+            var key = arg ? ( '' + arg ) : '';
+            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
+            return cache[key];
+          },
+          'memoize1(' + f.name + ')');
     },
 
     function setName(f, name) {
       /** Set a function's name for improved debugging and profiling **/
       Object.defineProperty(f, 'name', {value: name, configurable: true});
+      return f;
     },
 
     function appendArguments(a, args, start) {
@@ -224,7 +227,7 @@ foam.LIB({
       @ignore */
     foam.LIB({
       name: 'foam.Function',
-      methods: [ function setName() { /* NOP */ } ]
+      methods: [ function setName(f) { return f; } ]
     });
   }
 })();
@@ -362,10 +365,6 @@ foam.LIB({
       }
 
       return hash;
-    },
-    function argsToArray(args) {
-      /** convenience method to turn 'arguments' into a real array */
-      return foam.Function.appendArguments([], args, 0);
     }
   ]
 });
@@ -385,7 +384,7 @@ foam.LIB({
     },
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
-      // TODO i18n: make this translatable
+      // FUTURE: make this translatable for i18n
       var seconds = Math.floor((Date.now() - date.getTime())/1000);
 
       if ( seconds < 60 ) return 'moments ago';

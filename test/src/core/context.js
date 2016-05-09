@@ -36,19 +36,6 @@ describe('ConteXt object', function() {
     expect(foam.lookup('Bar')).toBe(coreClass);
   });
 
-  it('lookup library', function() {
-    foam.LIB({
-      name: 'foam.core.testlib',
-      constants: {
-        VALUE: 'FOO'
-      }
-    });
-
-    expect(foam.lookup('testlib')).toBe(foam.core.testlib);
-    expect(foam.lookup('foam.core.testlib')).toBe(foam.core.testlib);
-    expect(foam.lookup('foam.core.testlib.VALUE')).toEqual('FOO');
-  });
-
   it('subContext', function() {
     var named = foam.subContext(null, "HELLO");
     var unNamed = named.subContext();

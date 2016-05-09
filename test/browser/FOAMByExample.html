@@ -453,6 +453,19 @@ log(o.m1(), o.l1());
 var m = o.m1, l = o.l1;
 log(m(), l());
 
+// It's an error to make a listener both isMerged and isFramed.
+foam.CLASS({
+  name: 'MergedAndFramedTest',
+  listeners: [
+    {
+      name: 'l',
+      isMerged: true,
+      isFramed: true,
+      code: function() { log('listener'); }
+    }
+  ]
+});
+
 //:NOTEST
 // If a listener has isMerged: true, it will merge multiple
 // events received withing 'mergeDelay' milliseconds into
@@ -590,6 +603,19 @@ foam.CLASS({
 });
 ImplementsTest2.describe();
 
+// FOAM also has Property-Inheritance.
+// Test that a sub-class Property inherits its parent Property's class
+foam.CLASS({
+  name: 'PropertyInheritA',
+  properties: [ {class: 'Boolean', name: 'sameName'} ]
+});
+foam.CLASS({
+  name: 'PropertyInheritB',
+  extends: 'PropertyInheritA',
+  properties: [ 'sameName' ]
+});
+log(PropertyInheritA.SAME_NAME.cls_.id, PropertyInheritB.SAME_NAME.cls_.id);
+
 // Classes can have inner-Classes.
 foam.CLASS({
   name: 'InnerClassTest',
@@ -626,7 +652,20 @@ o.sub('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' '))
 o.pub('alarm', 'on');
 o.pub('lifecycle', 'loaded');
 
-// A Class can declare 'Topics' that it pubes events for.
+// Test publishing with many args
+o.pub(1);
+o.pub(1,2);
+o.pub(1,2,3);
+o.pub(1,2,3,4);
+o.pub(1,2,3,4,5);
+o.pub(1,2,3,4,5,6);
+o.pub(1,2,3,4,5,6,7);
+o.pub(1,2,3,4,5,6,7,8);
+o.pub(1,2,3,4,5,6,7,8,9);
+o.pub(1,2,3,4,5,6,7,8,9,10);
+o.pub(1,2,3,4,5,6,7,8,9,10,11);
+
+// A Class can declare 'Topics' that it publishes events for.
 foam.CLASS({
   name: 'TopicTest',
   topics: [ 'alarm' ]
@@ -856,6 +895,85 @@ foam.CLASS({
 });
 ValidationTest.model_.validate();
 
+// Action validation, actions must have names
+foam.CLASS({
+  name: 'ActionNameValidation',
+  actions: [
+    { name: '', code: function() {} }
+  ]
+});
+ActionNameValidation.model_.validate();
+
+// Action validation, actions must have code
+foam.CLASS({
+  name: 'ActionCodeValidation',
+  actions: [
+    { name: 'test' }
+  ]
+});
+ActionCodeValidation.model_.validate();
+
+// Model validation, properties names must not end with '$'
+foam.CLASS({
+  name: 'DollarValidationTest',
+  properties: [
+    { name: 'name$' }
+  ]
+});
+DollarValidationTest.model_.validate();
+
+// Property constants musn't conflict
+foam.CLASS({
+  name: 'ConstantConflictTest',
+  properties: [ 'firstName', 'FirstName' ]
+});
+
+// Properties must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict1',
+  properties: [ 'sameName', 'sameName' ]
+});
+AxiomConflict1.create();
+
+// Methods must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict2',
+  methods: [ function sameName() {}, function sameName() {} ]
+});
+AxiomConflict2.create();
+
+// Axioms must not have the same name
+foam.CLASS({
+  name: 'AxiomConflict3',
+  properties: [ 'sameName' ],
+  methods: [ function sameName() {} ]
+});
+AxiomConflict3.create();
+
+// Error if attempt to change a Property to a non-Property
+foam.CLASS({
+  name: 'AxiomChangeSuper',
+  properties: [ 'sameName' ]
+});
+foam.CLASS({
+  name: 'AxiomChangeSub',
+  extends: 'AxiomChangeSuper',
+  methods: [ function sameName() {} ]
+});
+AxiomChangeSub.create();
+
+// Warn if an Axiom changes its class
+foam.CLASS({
+  name: 'AxiomChangeSuper2',
+  methods: [ function sameName() {} ]
+});
+foam.CLASS({
+  name: 'AxiomChangeSub2',
+  extends: 'AxiomChangeSuper2',
+  properties: [ 'sameName' ]
+});
+AxiomChangeSub2.create();
+
 // Property validation, factory and value
 foam.CLASS({
   name: 'PropertyValidationTest',
@@ -924,6 +1042,8 @@ foam.CLASS({
     this.warn('warn foo from ImportTest');
   } ]
 });
+var o = ImportsTest.create();
+o.foo();
 Y.log('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
@@ -991,7 +1111,7 @@ foam.CLASS({
 var o = Invoice2.create({invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
 log(o.id, o.invoiceId);
 
-// Multi-park unique identifiers are also supported.
+// Multi-part unique identifiers are also supported.
 foam.CLASS({
   name: 'Invoice3',
   ids: [ 'customerId', 'invoiceId' ],
@@ -1001,6 +1121,23 @@ var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amo
 log(o.id, o.customerId, o.invoiceId);
 o.id = [2, 3];
 log(o.id, o.customerId, o.invoiceId);
+
+// Multi-part ids are comparable
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 2}),
+  Invoice3.create({customerId: 1, invoiceId: 1})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 1}),
+  Invoice3.create({customerId: 1, invoiceId: 2})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 1}),
+  Invoice3.create({customerId: 1, invoiceId: 1})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 2, invoiceId: 1}),
+  Invoice3.create({customerId: 1, invoiceId: 1})));
+log(Invoice3.ID.compare(
+  Invoice3.create({customerId: 1, invoiceId: 1}),
+  Invoice3.create({customerId: 2, invoiceId: 1})));
 
 // A Classes 'id' is a combination of its package and name.
 log(com.acme.Test.id);
@@ -1023,11 +1160,6 @@ log(AxiomTest.create() === AxiomTest.create());
 var a = {}, b = [], c = Person.create();
 log(a.$UID, b.$UID, c.$UID);
 log(a.$UID, b.$UID, c.$UID);
-
-// foam.Array.argsToArray() is a convenience method for converting the psedo-array 'arguments'.
-(function() {
-  log(Array.isArray(arguments), Array.isArray(foam.Array.argsToArray(arguments)));
-})();
 
 // foam.events.consoleLog
 foam.CLASS({name: 'ConsoleLogTest'});
@@ -1205,10 +1337,8 @@ foam.CLASS({
     { class: 'Boolean', name: 'defaultBoolean', value: true },
     { class: 'Function', name: 'undefinedFunction' },
     { class: 'Function', name: 'definedFunction' },
-    { class: 'Date', name: 'undefinedDate' },
-    { class: 'Date', name: 'definedDate' },
-    { class: 'DateTime', name: 'undefinedDateTime' },
-    { class: 'DateTime', name: 'definedDateTime' },
+    { name: 'undefinedFObject' },
+    { name: 'definedFObject' },
     { name: 'transient', transient: true },
     { name: 'networkTransient', networkTransient: true },
     { name: 'storageTransient', storageTransient: true },
@@ -1238,13 +1368,15 @@ o = JSONTest.create({
   falseBoolean: false,
   defaultBoolean: true,
   definedFunction: function plus(a, b) { return a + b; },
-  definedDate: new Date("Nov 19, 1970"),
-  definedDateTime: new Date("Nov 19, 1970"),
+  definedFObject: JSONTest.create({
+    name: 'Janet',
+    age: 32,
+    children: [ 'Kim', 'Kathy' ]
+  }),
   transient: 'transient value',
   networkTransient: 'network transient value',
   storageTransient: 'storage transient value'
 });
-
 // Default JSON formatting
 log(foam.json.stringify(o));
 
@@ -1423,7 +1555,7 @@ foam.CLASS({
         y: this.height / 2,
         radius: 5+a * 12 * this.width / 500,
         arcWidth: 10 * this.width / 500,
-        border: 'hsl(' + 18*a + ', 90%, 60%)'
+        border: this.hsl(18*a, 90, 60)
       }));
       this.tick();
     }
@@ -1469,7 +1601,7 @@ foam.CLASS({
         function onTick() {
           var hue = ( this.col/this.nx*360 + this.timer.time/3 ) % 360; // TODO: fix
           var l   = 40 - 30*Math.cbrt(Math.sin(this.lPhase + this.timer.time/200));
-	  this.shadowColor = this.color = 'hsl(' + hue + ',100%,' + l + '%)';
+          this.shadowColor = this.color = this.hsl(hue, 100, l);
         }
       ]
     }
@@ -1487,8 +1619,8 @@ foam.CLASS({
   methods: [
     function initCView() {
       for ( var i = 0 ; i < this.nx ; i++ )
-	for ( var j = 0 ; j < this.ny ; j++ )
-	  this.addChildren(this.Cell.create({row: j, col: i}));
+  for ( var j = 0 ; j < this.ny ; j++ )
+    this.addChildren(this.Cell.create({row: j, col: i}));
       this.tick();
     }
   ],
@@ -1519,6 +1651,8 @@ log_(g.toHTML());
     console.log.put = console.log.bind(console);
     console.log.str = oldLog.str;
     console.log.json = oldLog.json;
+    console.warn = function() { log_('warn: ' + [].join.call(arguments, ' ')); };
+    console.error = function() { log_('error: ' + [].join.call(arguments, ' ')); };
     var log = function() { log_(' <b>&gt;</b> ' + [].join.call(arguments, ' ')); }
 
     var s_ = demo.textContent.split('\n\n');
@@ -1547,7 +1681,7 @@ log_(g.toHTML());
         var golden = log_.output.replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/"/g, '\\"');
-        test_code += '  expect(log_.output).toMatchGolden({ i: ' + i_ + ', str: "' + golden + '" });\n';
+        test_code += '  expect(log_.output).toMatchGolden({ i: ' + ( i_ + 1 ) + ', str: "' + golden + '" });\n';
       }
       log_('');
     }
@@ -1600,21 +1734,27 @@ log_(g.toHTML());
 
     unittests.push(
     'var golden = "' + golden + '";\n',
-    'var oldLog, oldAssert;\n',
+    'var oldLog, oldAssert, oldWarn, oldError;\n',
     'beforeEach(function() {\n',
     '  oldLog = console.log;\n',
     '  oldAssert = console.assert;\n',
+    '  oldWarn = console.warn;\n',
+    '  oldError = console.error;\n',
     "  console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw 'assert'; } };\n",
     "  console.log = function() { log_([].join.call(arguments, ' ')); };\n",
     '  console.log.put = console.log.bind(console);\n',
     '  console.log.str = oldLog.str;\n',
     '  console.log.json = oldLog.json;\n',
+    "  console.warn = function() { log_('warn: ' + [].join.call(arguments, ' ')); };\n",
+    "  console.error = function() { log_('error: ' + [].join.call(arguments, ' ')); };\n",
     '  log_.output = "";\n',
     '  jasmine.addMatchers(customMatchers);\n',
     '});\n\n',
     'afterEach(function() {\n',
     '  console.assert = oldAssert;\n',
     '  console.log = oldLog;\n',
+    '  console.warn = oldWarn;\n',
+    '  console.error = oldError;\n',
     '});\n\n',
     'it("", function() {\n' + test_code + '\n\n',
     '});\n});\n\n');

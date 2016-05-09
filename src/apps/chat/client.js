@@ -1,0 +1,221 @@
+if ( navigator.serviceWorker ) {
+  navigator.serviceWorker.getRegistration().then(function(r) {
+    r && r.unregister();
+  });
+}
+
+var env = foam.apps.chat.BoxEnvironment.create();
+var client = foam.apps.chat.Client.create({
+  isSafari: navigator.userAgent.indexOf('Safari') !== -1 &&
+    navigator.userAgent.indexOf('Chrome') === -1
+}, env);
+
+var ME = 'Anonymous';
+
+document.location.search.substring(1).split('&').forEach(function(s) {
+  s = s.split('=');
+  if ( s[0] === 'me' ) ME = s[1];
+});
+
+var messages = document.getElementById('messages');
+var pending = document.getElementById('pending');
+var input = document.getElementById('input');
+var send = document.getElementById('send');
+
+function sendMessage() {
+  if ( input.value ) {
+    client.messageDAO.put(
+      foam.apps.chat.Message.create({
+        from: ME,
+        message: input.value
+      }));
+  }
+  input.value = '';
+}
+
+input.addEventListener('keyup', function(e) {
+  if ( e.keyIdentifier === 'Enter' ) {
+    sendMessage();
+  }
+});
+
+send.addEventListener('click', sendMessage);
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'MessageTable',
+  properties: [
+    {
+      name: 'table',
+    },
+    {
+      class: 'Map',
+      name: 'rows'
+    },
+    {
+      class: 'Boolean',
+      name: 'pending',
+      value: false
+    }
+  ],
+  listeners: [
+    function onRemove(m) {
+      if ( this.rows[m.id] ) {
+        this.rows[m.id].row.remove();
+        delete this.rows[m.id];
+      }
+    },
+    function onReset() {
+      this.table.children = [];
+    },
+    function onMessage(m) {
+      if ( m.syncNo < 0 !== this.pending ) {
+        if ( this.rows[m.id] ) {
+          this.rows[m.id].row.remove();
+          this.rows[m.id] = undefined;
+        }
+        return;
+      }
+
+      if ( ! this.rows[m.id] ) {
+        var view = {
+          obj: m,
+          row: document.createElement('div'),
+        };
+
+        view.row.className = 'message-row';
+      } else {
+        view = this.rows[m.id];
+        view.row.remove();
+        delete this.rows[m.id];
+      }
+
+      view.row.textContent = (m.syncNo < 0 ? 'pending' : formatTime(new Date(m.syncNo))) + ': ' +
+        m.from + '> ' + m.message;
+
+
+      if ( m.syncNo < 0 ) {
+        this.table.appendChild(view.row);
+      } else {
+        var max;
+        var limit = m.syncNo;
+        for ( var key in this.rows ) {
+          if ( foam.util.compare(this.rows[key].obj.syncNo, limit) < 0 ) continue;
+
+          if ( ! max ) {
+            max = this.rows[key];
+          } else if ( foam.util.compare(this.rows[key].obj.syncNo, max.obj.syncNo) < 0 ) {
+            max = this.rows[key];
+          }
+        }
+
+        this.table.insertBefore(view.row, max ? max.row : null);
+      }
+
+      this.rows[m.id] = view;
+    }
+  ]
+});
+
+
+var confirmedMsgs = foam.apps.chat.MessageTable.create({
+  table: messages,
+});
+
+var pendingMsgs = foam.apps.chat.MessageTable.create({
+  table: pending,
+  pending: true
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'Highlight',
+  imports: [
+    'document',
+    'setInterval',
+    'clearInterval'
+  ],
+  properties: [
+    {
+      class: 'String',
+      name: 'oldTitle'
+    },
+    {
+      class: 'Boolean',
+      name: 'active',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'state',
+      value: false
+    },
+    {
+      class: 'Int',
+      name: 'interval'
+    }
+  ],
+  methods: [
+    function init() {
+      this.document.addEventListener('focusin', this.clear);
+    },
+    function highlight(obj) {
+      if ( this.document.hasFocus() || this.interval ) return;
+
+      this.oldTitle = this.document.title;
+      this.newTitle = obj.from + '> ' + obj.message;
+      this.state = true;
+      this.interval = this.setInterval(this.update, 2000);
+      this.update();
+    }
+  ],
+  listeners: [
+    function clear() {
+      this.document.title = this.oldTitle;
+      this.clearInterval(this.interval);
+      this.interval = 0;
+    },
+    function update() {
+      this.state = ! this.state;
+      this.document.title = this.state ? this.oldTitle : this.newTitle;
+    }
+  ]
+});
+
+var highlight = foam.apps.chat.Highlight.create();
+
+function formatTime(m) {
+  var hours = m.getHours().toString();
+  if ( hours.length == 1 ) hours = "0" + hours;
+  var minutes = m.getMinutes().toString();
+  if ( minutes.length == 1 ) minutes = "0" + minutes;
+  return hours + ':' + minutes;
+}
+
+function onMessage(m) {
+  if ( m.syncNo !== -1 ) {
+    highlight.highlight(m);
+  }
+
+  pendingMsgs.onMessage(m);
+  confirmedMsgs.onMessage(m);
+  document.body.scrollTop = document.body.scrollHeight - document.body.clientHeight;
+  input.scrollIntoView();
+}
+
+
+// client.messageDAO.select().then(function(a) {
+//   a.a.map(onMessage);
+// });
+
+client.messageDAO.on.put.sub(function(s, _, _, m) {
+  onMessage(m);
+});
+
+client.messageDAO.on.remove.sub(function(s, _, _, m) {
+  confirmedMsgs.onRemove(m);
+});
+
+client.messageDAO.on.reset.sub(function() {
+  confirmedMsgs.onReset();
+});
