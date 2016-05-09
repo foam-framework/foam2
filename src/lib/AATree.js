@@ -344,6 +344,8 @@ foam.CLASS({
   ]
 });
 
+/** Guards the leaves of the tree. Once instance is created per instance of
+  TreeIndex, and referenced by every flyweight index and tree node. */
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
