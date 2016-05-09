@@ -10,6 +10,7 @@ foam.CLASS({
   package: 'com.firebase',
   name: 'FirebaseDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest',
@@ -17,6 +18,7 @@ foam.CLASS({
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Constant'
   ],
+
   properties: [
     'of',
     'apppath',
@@ -38,6 +40,7 @@ foam.CLASS({
     },
     'startEventsAt_'
   ],
+
   methods: [
     function put(obj) {
       var req = this.HTTPRequest.create();
@@ -64,7 +67,7 @@ foam.CLASS({
         }
       });
       req.headers['content-type'] = 'application/json';
-      req.headers['accept'] = 'application/json';
+      req.headers['accept']       = 'application/json';
 
       return req.send().then(function(resp) {
         return resp.payload;
@@ -85,9 +88,10 @@ foam.CLASS({
         return Promise.reject(foam.dao.InternalException.create());
       });
     },
+
     function remove(obj) {
       var req = this.HTTPRequest.create();
-      req.method = "DELETE",
+      req.method = 'DELETE',
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";
 
       if ( this.secret ) {
@@ -100,6 +104,7 @@ foam.CLASS({
         return Promise.reject(foam.dao.InternalException.create());
       });
     },
+
     function find(id) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
@@ -130,6 +135,7 @@ foam.CLASS({
         }
       }.bind(this));
     },
+
     function startEvents() {
       if ( this.eventSource_ || ! this.enableStreaming ) {
         return;
@@ -155,6 +161,7 @@ foam.CLASS({
       this.eventSource_.message.patch.sub(this.onPatch);
       this.eventSource_.start();
     },
+
     function stopEvents() {
       if ( this.eventSource_ ) {
         this.eventSource_.close();
@@ -163,6 +170,7 @@ foam.CLASS({
         this.clearProperty('eventSource_');
       }
     },
+
     function select(sink, skip, limit, order, predicate) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
@@ -234,6 +242,7 @@ foam.CLASS({
       });
     }
   ],
+
   listeners: [
     function onPut(s, _, _, data) {
       // PATH is one of
@@ -281,7 +290,6 @@ foam.CLASS({
           this.on.put.pub(obj);
         }.bind(this));
 
-
         // var obj = foam.json.parse(foam.json.parseString(data.data));
         // this.on.put.pub(obj);
       } else if ( path.indexOf('/lastUpdate') === path.length - 11 ) {
@@ -297,6 +305,7 @@ foam.CLASS({
         }.bind(this));
       }
     },
+
     function onPatch(s, _, _, data) {
           // TODO: What does a patch even look like?
       debugger;
@@ -304,15 +313,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.firebase',
   name: 'SafariFirebaseDAO',
   extends: 'com.firebase.FirebaseDAO',
+
   requires: [
     'foam.net.XHRHTTPRequest as HTTPRequest',
     'foam.net.SafariEventSource as EventSource'
   ],
+
   properties: [
-    ['enableStreaming', false]
+    [ 'enableStreaming', false ]
   ]
 });
