@@ -18,26 +18,30 @@
 foam.CLASS({
   package: 'foam.net',
   name: 'WebSocket',
+
   properties: [
     {
-      name: 'uri',
+      name: 'uri'
     },
     {
       name: 'socket',
       transient: true
     }
   ],
+
   topics: [
     'message',
     'connected',
     'disconnected'
   ],
+
   methods: [
     function send(msg) {
       // TODO: Error handling
       this.socket.send(msg);
     }
   ],
+
   listeners: [
     {
       name: 'connect',
@@ -62,12 +66,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'WebSocketService',
+
   requires: [
     'foam.net.WebSocket'
   ],
+
   properties: [
     {
       class: 'Map',
@@ -78,9 +85,11 @@ foam.CLASS({
       name: 'delegate'
     }
   ],
+
   methods: [
     function listen() {
     },
+
     function getSocket(uri) {
       if ( this.sockets[uri] )
         return Promise.resolve(this.sockets[uri]);
@@ -99,6 +108,7 @@ foam.CLASS({
         s.connect();
       }.bind(this));
     },
+
     function addSocket(s) {
       s.message.sub(this.onMessage);
       s.disconnected.sub(function() {
@@ -107,6 +117,7 @@ foam.CLASS({
       this.sockets[s.uri] = s;
     }
   ],
+
   listeners: [
     {
       name: 'onMessage',
@@ -117,9 +128,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPResponse',
+
+  topics: [
+    'data',
+    'error',
+    'end'
+  ],
+
   properties: [
     {
       class: 'Int',
@@ -161,7 +180,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: "success",
+      name: 'success',
       expression: function(status) {
         return status >= 200 && status <= 299;
       }
@@ -179,11 +198,7 @@ foam.CLASS({
       }
     }
   ],
-  topics: [
-    'data',
-    'error',
-    'end'
-  ],
+
   methods: [
     function start() {
       var reader = this.resp.body.getReader();
@@ -214,12 +229,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPRequest',
+
   requires: [
     'foam.net.HTTPResponse'
   ],
+
   properties: [
     {
       class: 'String',
@@ -263,6 +281,7 @@ foam.CLASS({
   topics: [
     'data'
   ],
+
   methods: [
     function fromUrl(url) {
       var u = new URL(url);
@@ -271,6 +290,7 @@ foam.CLASS({
       if ( u.port ) this.port = u.port;
       this.path = u.pathname + u.search;
     },
+
     function send() {
       if ( this.url ) {
         this.fromUrl(this.url);
@@ -295,8 +315,11 @@ foam.CLASS({
       }
 
       var request = new Request(
-        this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path,
-        options);
+          this.protocol + "://" +
+          this.hostname +
+          ( this.port ? ( ':' + this.port ) : '' ) +
+          this.path,
+          options);
 
       return fetch(request).then(function(resp) {
         return this.HTTPResponse.create({
@@ -308,18 +331,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'EventSource',
+
   requires: [
     'foam.parse.Grammar',
     'foam.net.HTTPRequest',
     'foam.encodings.UTF8'
   ],
+
   imports: [
     'setTimeout',
     'clearTimeout'
   ],
+
   properties: [
     {
       name: 'grammar',
@@ -396,6 +423,7 @@ foam.CLASS({
       ]
     }
   ],
+
   methods: [
     function start() {
       var req = this.HTTPRequest.create({
@@ -420,6 +448,7 @@ foam.CLASS({
         resp.start();
       }.bind(this), this.onError);
     },
+
     function keepAlive() {
       if ( this.retryTimer ) {
         this.clearTimeout(this.retryTimer);
@@ -430,10 +459,12 @@ foam.CLASS({
         this.onError();
       }, this), 60000);
     },
+
     function close() {
       this.running = false;
       this.resp.stop();
     },
+
     function dispatchEvent() {
       // Known possible events names
       // put
@@ -446,6 +477,7 @@ foam.CLASS({
       this.eventName = null;
       this.eventData = null;
     },
+
     function processLine(line) {
       // TODO: This can probably be simplified by using state machine based
       // parsers, but in the interest of saving time we're going to do it line
@@ -459,6 +491,7 @@ foam.CLASS({
       this.grammar.parseString(line);
     },
   ],
+
   listeners: [
     function onData(s, _, data) {
       this.delay = 1;
@@ -473,10 +506,12 @@ foam.CLASS({
       }
       this.decoder.string = string;
     },
+
     function onError() {
       this.delay *= 2;
       this.setTimeout(this.onEnd, this.delay);
     },
+
     function onEnd() {
       if ( this.running ) {
         this.start();
@@ -485,13 +520,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'XHRHTTPRequest',
   extends: 'foam.net.HTTPRequest',
+
   requires: [
     'foam.net.XHRHTTPResponse as HTTPResponse'
   ],
+
   methods: [
     function send() {
       if ( this.url ) {
@@ -499,8 +537,11 @@ foam.CLASS({
       }
 
       var xhr = new XMLHttpRequest();
-      xhr.open(this.method,
-               this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path);
+      xhr.open(
+          this.method,
+          this.protocol + "://" +
+          this.hostname + ( this.port ? ( ':' + this.port ) : '' ) +
+          this.path);
       xhr.responseType = this.responseType;
       for ( var key in this.headers ) {
         xhr.setRequestHeader(key, this.headers[key]);
@@ -523,10 +564,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'XHRHTTPResponse',
   extends: 'foam.net.HTTPResponse',
+
+  constants: {
+    STREAMING_LIMIT: 10 * 1024 * 1024
+  },
+
   properties: [
     {
       name: 'xhr',
@@ -568,9 +615,7 @@ foam.CLASS({
       value: 0
     }
   ],
-  constants: {
-    STREAMING_LIMIT: 10 * 1024 * 1024
-  },
+
   methods: [
     function start() {
       this.streaming = true;
@@ -591,19 +636,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'SafariEventSource',
   extends: 'foam.net.EventSource',
+
   requires: [
     'foam.net.XHRHTTPRequest as HTTPRequest'
   ],
+
   properties: [
     {
       class: 'String',
       name: 'buffer'
     }
   ],
+
   listeners: [
     function onData(s, _, data) {
       this.delay = 1;
