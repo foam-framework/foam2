@@ -124,7 +124,7 @@ foam.LIB({
       return function() {
         var promises = [];
         for ( var i = 0; i < times; ++i ) {
-          promises[i] = fn(i);
+          promises[i] = fn(i); // TODO: what if not returned a promise?
         }
         return Promise.all(promises);
       };
