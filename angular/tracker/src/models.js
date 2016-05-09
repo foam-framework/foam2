@@ -131,6 +131,10 @@ foam.CLASS({
       factory: function() {
         return new Date();
       }
+    },
+    {
+      class: 'StringArray',
+      name: 'tags'
     }
   ]
 });
