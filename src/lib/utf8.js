@@ -75,7 +75,7 @@ foam.CLASS({
         } else if ((this.charcode & 0xfe) == 0xfc) {
           this.remaining = 5;
           this.charcode = (byte & 0x01) << (6 * this.remaining);
-        } else throw "Bad charcode value";
+        } else throw 'Bad charcode value';
       } else if ( this.remaining > 0 ) {
         this.remaining--;
         this.charcode |= (byte & 0x3f) << (6 * this.remaining);
