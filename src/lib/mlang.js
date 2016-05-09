@@ -33,6 +33,7 @@ foam.CLASS({
     function put() {
       this.value++;
     },
+
     function toString() {
       return 'COUNT()';
     }
@@ -83,6 +84,7 @@ foam.CLASS({
   ]
 });
 
+
 /**
  * Base class for all mLang queries.
  *
@@ -122,7 +124,6 @@ foam.CLASS({
     },
   ]
 });
-
 
 
 /** Singleton for the value "true". */
@@ -172,7 +173,8 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+      return foam.String.constantize(this.cls_.name) +
+          '(' + this.arg1.toString() + ')';
     }
   ]
 });
@@ -198,7 +200,8 @@ foam.CLASS({
 
   methods: [
     function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ', ' +
+      return foam.String.constantize(this.cls_.name) + '(' +
+          this.arg1.toString() + ', ' +
           this.arg2.toString() + ')';
     }
   ]
@@ -366,6 +369,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Func',
@@ -385,6 +389,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /** Binary expression for equality of two arguments. */
 foam.CLASS({
@@ -498,6 +503,7 @@ foam.CLASS({
   ]
 });
 
+
 /** Map sink transforms each put with a given mapping expression. */
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -529,7 +535,7 @@ foam.CLASS({
     {
       class: 'String',
       name:  'plan',
-      help:  'Execution Plan',
+      help:  'Execution Plan'
     }
   ],
 
@@ -537,6 +543,7 @@ foam.CLASS({
     function toString() { return this.plan; },
   ]
 });
+
 
 /** Base class for comparators. */
 foam.CLASS({
@@ -548,19 +555,21 @@ foam.CLASS({
     {
       /** The first argument to the expression. */
       name: 'arg1',
-      class: 'foam.mlang.ExprArgument',
+      class: 'foam.mlang.ExprArgument'
     }
   ],
 
   methods: [
-    function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
-    },
     function compare(o1, o2) {
       return this.arg1.compare(o1, o2);
     },
+
+    function toString() {
+      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.order',
@@ -568,22 +577,25 @@ foam.CLASS({
   extends: 'foam.mlang.order.Comparator',
 
   methods: [
-    function toString() {
-      return 'DESC(' + this.arg1.toString() + ')';
-    },
     function compare(o1, o2) {
       return -1 * this.arg1.compare(o1, o2);
+    },
+
+    function toString() {
+      return 'DESC(' + this.arg1.toString() + ')';
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Max',
+
   implements: [
     'foam.dao.Sink',
     'foam.mlang.predicate.Unary'
   ],
-  name: 'Max',
 
   properties: [
     {
@@ -591,10 +603,14 @@ foam.CLASS({
       value: 0
     }
   ],
+
   methods: [
     function put(obj) {
-      if ( ! this.hasOwnProperty('value') ) this.value = this.arg1.f(obj);
-      else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) this.value = this.arg1.f(obj);
+      if ( ! this.hasOwnProperty('value') ) {
+        this.value = this.arg1.f(obj);
+      } else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
+        this.value = this.arg1.f(obj);
+      }
     }
   ]
 });
@@ -623,19 +639,22 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc',
+    'foam.mlang.order.Desc'
   ],
 
   methods: [
     function _nary_(name, args) {
       return this[name].create({ args: Array.from(args) });
     },
+
     function _unary_(name, arg) {
       return this[name].create({ arg1: arg });
     },
+
     function _binary_(name, arg1, arg2) {
       return this[name].create({ arg1: arg1, arg2: arg2 });
     },
+
     function OR() { return this._nary_("Or", arguments); },
     function AND() { return this._nary_("And", arguments); },
     function CONTAINS(a, b) { return this._binary_("Contains", a, b); },
