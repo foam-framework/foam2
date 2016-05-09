@@ -15,29 +15,28 @@
  * limitations under the License.
  */
 
-// describe('Run MDAO tests with foam.promise', function() {
-//   var oldPromise;
+describe('Run MDAO tests with foam.promise', function() {
+  var oldPromise;
 
-//   beforeAll(function() {
-//     oldPromise = global.Promise;
+  beforeAll(function() {
+    oldPromise = global.Promise;
 
-//     // This is the node polyfill, so will not do anything if running in a
-//     // verion of node without native Promise support.
-//     var p = function Promise(exec) {
-//       return foam.promise.newPromise(exec);
-//     };
-//     p.resolve = foam.promise.resolve;
-//     p.reject = foam.promise.reject;
-//     p.all = foam.promise.all;
-//     global.Promise = p;
-//   });
+    // This is the node polyfill, so will not do anything if running in a
+    // verion of node without native Promise support.
+    var p = function Promise(exec) {
+      return foam.promise.newPromise(exec);
+    };
+    p.resolve = foam.promise.resolve;
+    p.reject = foam.promise.reject;
+    p.all = foam.promise.all;
+    global.Promise = p;
+  });
 
-//   genericDAOTestBattery(function(model) {
-//     return Promise.resolve(foam.dao.MDAO.create({ of: model }));
-//   });
+  genericDAOTestBattery(function(model) {
+    return Promise.resolve(foam.dao.MDAO.create({ of: model }));
+  });
 
-//   afterAll(function() {
-//     global.Promise = oldPromise;
-//   });
-// });
-
+  afterAll(function() {
+    global.Promise = oldPromise;
+  });
+});

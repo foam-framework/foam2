@@ -1,0 +1,10 @@
+{
+  "spec_dir": "test",
+  "spec_files": [
+    "src/core/load.js",
+    "benchmarks/**/*.js"
+  ],
+  "helpers": [
+    "helpers/**/*.js"
+  ]
+}
