@@ -35,6 +35,9 @@
 
 (function() {
   var X = {
+    // Temporary: gets replaced in Window.js.
+    assert: function() { console.assert.apply(console, arguments); },
+
     /** Lookup a Model. **/
     lookup: function(id) {
       return this.__cache__[id];

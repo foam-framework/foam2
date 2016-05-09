@@ -15,6 +15,27 @@
  * limitations under the License.
  */
 
+/**
+  A Property is a high-level instance variable.
+
+  Properties contain more information than typical variable declarations.
+  Such as: label, help text, pre/post-set callbacks, default value,
+  value factory, units, etc.
+
+  When setting a Propery's value, the callback order is:
+    1. adapt()
+    2. assertValue()
+    3. preSet()
+       value updated
+       property change event fired
+    4. postSet()
+
+   Unless the user has provided a customer 'setter', in which case the order is
+     1. setter()
+
+  A sub-class or refinement can include a partial Property definition which
+  will override or add meta-information to the Property.
+**/
 foam.CLASS({
   package: 'foam.core',
   name: 'Property',
@@ -24,26 +45,106 @@ foam.CLASS({
     {
       name: 'name',
       required: true
-      // TODO: validate doesn't end with $
     },
     {
       name: 'label',
+      // If not provided, it defaults to the name "labelized".
       expression: function(name) { return foam.String.labelize(name); }
     },
-    // TODO: document these properties in detail
-    /* User-level help. */
+
+    /* User-level help. Could/should appear in GUI's as online help. */
     'help',
-    'hidden',
+
+    /* Hidden properties to not appear in GUI's by default. */
+    { class: 'Boolean', name: 'hidden' },
+
+    /**
+      The default-value of this property.
+      A property which has never been set or has been cleared
+      by setting it to 'undefined' or cleared with clearProperty()
+      will have the default value.
+    */
     'value',
+
+    /**
+      A factory is a function which initializes the property value
+      when accessed for the first time, if not already set.
+    */
     'factory',
+
+    /**
+      A function of the form:
+        Object function(oldValue, newValue)
+      adapt is called whenver the property is set. It's intended
+      to adapt the value to the appropriate type if required.
+      Adapt must return a value. It can return newValue unchanged
+      if it was already the appropriate type.
+    */
     'adapt',
+
+    /**
+      A function of the form:
+        Object function(oldValue, newValue)
+      preSet is called before the propery's value is updated.
+      It can veto the value change by returning a different newValue
+      (including returning oldValue to leave the property unchanged).
+    */
     'preSet',
+
+    /**
+      A function of the form:
+        void function(oldValue, newValue) throws Exception
+      assertValue can validate newValue and throw an exception if it's an
+      invalid value.
+    */
+    'assertValue',
+
+    /**
+      A function of the form:
+        void function(oldValue, newValue)
+      postSet is called after the Property's value has been updated.
+    */
     'postSet',
+
+    /**
+      A dynamic function which defines this Property's value.
+      Similar to 'factory', except that the function takes arguments
+      which are named the same as other properties of this object.
+      Whenever the values of any of the argument properties change,
+      the value of this Property is invalidated. Like a regular factory,
+      an invalidated property will be recalculated by calling the provided
+      expression function when accessed. This makes expressions very efficient
+      because the value is only recomputed when actually needed.
+    */
     'expression',
+
+    /**
+      A getter function which completely replaces the normal
+      Property getter process. Whenever the property is accessed, getter is
+      called and its value is returned.
+    */
     'getter',
+
+    /**
+      A setter function which completely replaces the normal
+      Property setter process. Whenever the property is set, setter is
+      called.
+      A function of the form:
+        void function(newValue)
+    */
     'setter',
+
+    /**
+      A final Property can only be set once.
+      After being set, its value is final (read-only).
+    */
     'final',
+
+    /**
+      A required Property can not be set to null, undefined, 0 or "".
+     */
     'required',
+
     [
       /**
         Compare two values taken from this property.
@@ -54,14 +155,18 @@ foam.CLASS({
       'comparePropertyValues',
       function(o1, o2) { return foam.util.compare(o1, o2); }
     ],
+
     {
+      // Makes Properties useful as map functions.
       name: 'f',
       factory: function() {
         var name = this.name;
         return function f(o) { return o[name]; }
       }
     },
+
     {
+      // Makes Properties useful as comparators.
       name: 'compare',
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
@@ -78,7 +183,6 @@ foam.CLASS({
       Handle overriding of Property definition from parent class by
       copying undefined values from parent Property, if it exists.
     */
-    // TODO: document property inheritance
     function installInClass(c) {
       var prop = this;
       var superProp = c.__proto__.getAxiomByName(prop.name);
@@ -111,21 +215,28 @@ foam.CLASS({
       // Take Axiom from class rather than using 'this' directly,
       // since installInClass() may have created a modified version
       // to inherit Property Properties from a super-Property.
-      var prop     = proto.cls_.getAxiomByName(this.name);
-      var name     = prop.name;
-      var adapt    = prop.adapt
-      var preSet   = prop.preSet;
-      var postSet  = prop.postSet;
-      var factory  = prop.factory;
-      var value    = prop.value;
-      var hasValue = typeof value !== 'undefined';
-      var slotName = name + '$';
-      var isFinal  = prop.final;
-      var eFactory = this.exprFactory(prop.expression);
+      var prop        = proto.cls_.getAxiomByName(this.name);
+      var name        = prop.name;
+      var adapt       = prop.adapt
+      var assertValue = prop.assertValue;
+      var preSet      = prop.preSet;
+      var postSet     = prop.postSet;
+      var factory     = prop.factory;
+      var value       = prop.value;
+      var hasValue    = typeof value !== 'undefined';
+      var slotName    = name + '$';
+      var isFinal     = prop.final;
+      var eFactory    = this.exprFactory(prop.expression);
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
-      // TODO: doc
+      //
+      // Define a PropertySlot accessor (see Slot.js) for this Property.
+      // If the property is named 'name' then 'name$' will access a Slot
+      // for this Property. The Slot is created when first accessed and then
+      // cached.
+      // If the Slot is set (to another slot) the two Slots are link()'ed
+      // together, meaning they will now dynamically share the same value.
       Object.defineProperty(proto, slotName, {
         get: function propertySlotGetter() {
           return prop.toSlot(this);
@@ -137,7 +248,15 @@ foam.CLASS({
         enumerable: false
       });
 
-      // TODO: doc
+      // Define Property getter and setter based on Property properties.
+      // By default, getter and setter stores instance value for property
+      // in this.instance_[<name of property>],
+      // unless the user provides custom getter and setter methods.
+
+      // Getter
+      // Call 'getter' if provided, else return value from instance_ if set.
+      // If not set, return value from 'factory', 'expression', or
+      // (default) 'value', if provided.
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
@@ -164,14 +283,21 @@ foam.CLASS({
             return;
           }
 
-          // Get old value but avoid triggering factory if present
-          // TODO: expand
+          // Get old value but avoid triggering factory or expression if present.
+          // Factories and expressions (which are also factories) can be expensive
+          // to generate, and if the value has been explicitly set to some value,
+          // then it isn't worth the expense of computing the old stale value.
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
-            eFactory ? ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ? this[name] : undefined ) :
+            eFactory ?
+                ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ?
+                  this[name] :
+                  undefined ) :
             this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
+
+          if ( assertValue ) assertValue.call(this, newValue, prop);
 
           if ( preSet ) newValue = preSet.call(this, oldValue, newValue, prop);
 
@@ -201,11 +327,12 @@ foam.CLASS({
       });
     },
 
+    /* Validate an object which has this Property. */
     function validateInstance(o) {
-      // ???: Should this call hasOwnProperty() instead?
-      /* Validate an object which has this property. */
       if ( this.required && ! o[this.name] ) {
-        throw 'Required property ' + o.cls_.id + '.' + this.name + ' not defined.';
+        throw 'Required property ' +
+            o.cls_.id + '.' + this.name +
+            ' not defined.';
       }
     },
 
@@ -238,14 +365,10 @@ foam.CLASS({
     },
 
     /** Returns a developer-readable description of this Property. **/
-    function toString() {
-      return this.name;
-    },
+    function toString() { return this.name; },
 
     /** Flyweight getter for this Property. **/
-    function get(o) {
-      return o[this.name];
-    },
+    function get(o) { return o[this.name]; },
 
     /** Flyweight setter for this Property. **/
     function set(o, value) {
@@ -284,7 +407,16 @@ foam.CLASS({
 });
 
 
-// TODO: doc
+/**
+  A Simple Property skips the regular FOAM Property getter/setter/instance_
+  mechanism. In gets installed on the CLASS as a Property constant, but isn't
+  added to the prototype at all. From this point of view, it's mostly just for
+  documentation. Simple Properties are used only in special cases to maximize
+  performance and/or minimize memory use.
+  Used for MDAO indices and Slots.
+
+  USE WITH EXTREME CAUTION (OR NOT AT ALL).
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Simple',

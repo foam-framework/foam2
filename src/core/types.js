@@ -30,8 +30,10 @@ foam.CLASS({
         if ( typeof d === 'number' ) return new Date(d);
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
-          // TODO: doc, throw Exception
-          return ret.toUTCString() === 'Invalid Date' ? new Date(+d) : ret;
+
+          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
+
+          return ret;
         }
         return d;
       }
@@ -103,7 +105,7 @@ foam.CLASS({
   name: 'Function',
   extends: 'Property',
 
-  // documentation:  'Describes properties of type Function.',
+  // documentation: 'Describes properties of type Function.',
   label: 'Code that can be run',
 
   properties: [
@@ -112,15 +114,9 @@ foam.CLASS({
       function() {}
     ],
     [
-      'adapt',
-      function(_, value) {
-        // TODO: doc
-        if ( typeof value === 'string' ) {
-          var body = /^[\s\r\n]*function[\s\r\n]*\([^]*\)[\s\r\n]*\{([^]*)}/.exec(value);
-          body = ( body && body[1] ) ? body[1] : value;
-          return new Function(body);
-        }
-        return value;
+      'assertValue',
+      function(value, prop) {
+        this.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
       }
     ]
   ]
@@ -154,9 +150,18 @@ foam.CLASS({
     {
       name: 'subKey',
       value: 'ID',
-      // documentation: 'The foreign key that this property references.'
+      // documentation: 'The name of the key (a property of the other object) that this property references.'
     }
-    // TODO: expression to produce the actual value referenced by this property? or method installed on the host?
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+
+      // TODO(js): expression to produce the actual value referenced by
+      // this property? or method installed on the host?
+
+    }
   ]
 });
 
@@ -164,7 +169,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'StringArray',
-  extends: 'Array',
+  extends: 'Property',
 
   // documentation: 'An array of String values.',
   label: 'List of text strings',
@@ -178,10 +183,31 @@ foam.CLASS({
     [
       'adapt',
       function(_, v, prop) {
-        this.assert(Array.isArray(v), 'Attempt to set Array property to non-Array value.', v);
-        return v;
+        if ( ! Array.isArray(v) ) return v;
+
+        var copy;
+        for ( var i = 0 ; i < v.length ; i++ ) {
+          if ( typeof v[i] !== 'string' ) {
+            if ( ! copy ) copy = v.slice();
+            copy[i] = '' + v[i];
+          }
+        }
+
+        return copy || v;
       }
     ],
+    [
+      'assertValue',
+      function(v, prop) {
+        this.assert(Array.isArray(v),
+                    prop.name, 'Tried to set StringArray to non-array type.');
+        for ( var i = 0 ; i < v.length ; i++ ) {
+          this.assert(typeof v[i] === 'string',
+                      prop.name, 'Element', i, 'is not a string', v[i]);
+        }
+      }
+    ],
+    // TODO: Assert that all values in the array are strings ?
     [
       'factory',
       function() { return []; }
@@ -190,46 +216,37 @@ foam.CLASS({
 });
 
 
-// foam.CLASS({
-//   name: 'ModelProperty',
-//   package: 'foam.core',
-//   extends: 'Property',
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Class',
+  extends: 'Property',
 
-//   // documentation: 'Describes a Model property.',
-//   label: 'Data Model definition',
+  // documentation: 'Stores a class, and can accept a class name.',
 
-//   properties: [
-//     {
-//       name: 'getter',
-//       value: function(name) {
-//         var value = this.instance_[name];
-//         // TODO: this is from foam1 standard getter... grab the foam2 path
-//         if ( typeof value === 'undefined' ) {
-//           var prop = this.cls_.getAxiomByName(name);
-//           if ( prop ) {
-//             if ( prop.factory ) {
-//               value = this.instance_[prop.name] = prop.factory.call(this, prop);
-//             } else if ( typeof prop.value !== undefined ) {
-//               value = prop.value;
-//             } else {
-//               value = '';
-//             }
-//           } else {
-//             value = '';
-//           }
-//         }
-//         if ( typeof value === 'string' ) {
-//           if ( ! value ) return '';
-//           var ret = this.X.lookup(value);
-//           // console.assert(Model.isInstance(ret), 'Invalid model specified for ' + this.name_);
-//           return ret;
-//         }
-//         if ( foam.core.Model.isInstance(value) ) return value;
-//         return '';
-//       }
-//     }
-//   ]
-// });
+  properties: [
+    {
+      /** FUTURE: adding to the default getter/setter chains is difficult
+        when we want to preserve the existing behavior but add an additional
+        step. This adapt work could be done in a getter that decorates the
+        default getter, but dealing with normal and expression cases is necessary
+        if writing back the looked-up class instance. */
+      name: 'adapt',
+      value: function(old, nu, prop) {
+        if ( typeof nu === 'string' ) {
+          if ( ! nu ) return '';
+          var ret = this.X.lookup(nu);
+          this.assert(ret && ret.isSubClass, 'Invalid class name ' +
+             nu + ' specified for ' + prop.name);
+          return ret;
+        }
+        this.assert(typeof nu === 'undefined' || ( nu && nu.isSubClass ),
+          'Invalid class specified for ' +
+          prop.name);
+        return nu;
+      }
+    }
+  ]
+});
 
 
 foam.CLASS({
@@ -305,7 +322,7 @@ foam.CLASS({
 });
 
 
-//TODO document
+//TODO(adamvy): document
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
@@ -314,7 +331,7 @@ foam.CLASS({
   properties: [
     { name: 'of', required: true },
     {
-      // TODO: Support narrow down to sub-topics
+      // TODO(adamvy): Support narrow down to sub-topics
       class: 'StringArray',
       name: 'topics'
     },
@@ -345,7 +362,7 @@ foam.CLASS({
             return m;
           }) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
-            // TODO This isn't the right check, but we need some sort of filter.
+            // TODO(adamvy): This isn't the right check, but we need some sort of filter.
             // We dont' want to proxy all FObject methods, only those defined in the interface
             // and possibly its parent interfaces?
             return delegate.hasOwnAxiom(m.name);
@@ -406,7 +423,7 @@ foam.CLASS({
   properties: [
     'plural',
     {
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'foam.core.fsm.State',
       name: 'states',
       adaptArrayElement: function(s) {
@@ -484,6 +501,124 @@ foam.CLASS({
       //   cls.installAxiom(states[i]);
       // }
       this.SUPER(cls);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Promised',
+  extends: 'Property',
+
+  properties: [
+    {
+      name: 'of',
+      required: true
+    },
+    'methods'
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var propName = this.name;
+
+      var target = foam.lookup(this.of);
+
+      var methods = target.getAxiomsByClass(foam.core.Method)
+          .filter(function(m) { return target.hasOwnAxiom(m.name); });
+
+      if ( this.methods ) {
+        methods = methods.filter(function(m) {
+          return this.methods.indexOf(m.name) !== -1;
+        }.bind(this));
+      }
+
+      methods.map(function(m) {
+        var name = m.name;
+        var returns = m.returns;
+
+        if ( ! returns ) {
+          var code = function() {
+            var self = this;
+            var args = arguments;
+            this[propName].then(function(a) {
+              a[name].apply(a, args);
+            });
+          };
+        } else if ( returns === 'Promise' ) {
+          code = function() {
+            var self = this;
+            var args = arguments;
+            return this[propName].then(function(a) {
+              return a[name].apply(a, args);
+            });
+          };
+        } else {
+          // TODO(adamvy): Use modelFactories
+
+          var path = m.returns.split('.');
+          path[path.length - 1] = 'Promised' + path[path.length - 1];
+
+          var returnClsId = path.join('.');
+
+          if ( ! foam.lookup(returnClsId) ) {
+            foam.CLASS({
+              package: path.slice(0, path.length - 1).join('.'),
+              name: path[path.length - 1]
+            });
+
+            // Done in two passes to prevent infinite recursion.
+            foam.CLASS({
+              refines: returnClsId,
+              properties: [
+                {
+                  class: 'Promised',
+                  of: m.returns,
+                  name: 'delegate'
+                }
+              ]
+            });
+          }
+
+          code = function() {
+            var self = this;
+            var args = arguments;
+            return foam.lookup(returnClsId).create({
+              delegate: this[propName].then(function(d) {
+                return d[name].apply(d, args);
+              })
+            });
+          };
+        }
+
+        foam.Function.setName(code, name);
+
+        return foam.core.Method.create({
+          name: name,
+          code: code
+        });
+      }).forEach(function(m) {
+        cls.installAxiom(m);
+      });
+
+      cls.installAxiom(foam.core.Method.create({
+        name: 'sub',
+        code: function() {
+          var innerSub = Array.from(arguments);
+          var topic = innerSub.slice(0, innerSub.length-1);
+          innerSub[innerSub.length-1] = foam.Function.bind(function(s) {
+            var args = Array.from(arguments).slice(1);
+            var c = this.pub.apply(this, args);
+            if ( ! c ) s.destroy();
+          }, this);
+
+          this[propName].then(function(d) {
+            d.sub.apply(d, innerSub);
+          });
+
+          return this.SUPER.apply(this, arguments);
+        }
+      }));
     }
   ]
 });

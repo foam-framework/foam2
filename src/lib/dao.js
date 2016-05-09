@@ -697,6 +697,21 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'PromisedDAO',
+  extends: 'foam.dao.AbstractDAO',
+  properties: [
+    {
+      class: 'Promised',
+      of: 'foam.dao.DAO',
+      methods: [
+        'put', 'remove', 'find', 'select', 'removeAll'
+      ],
+      name: 'promise'
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',

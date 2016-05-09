@@ -44,6 +44,21 @@ foam.CLASS({
 });
 
 
+/* Validate that Listeners aren't both framed and merged. */
+foam.CLASS({
+  refines: 'foam.core.Listener',
+
+  methods: [
+    function validate() {
+      this.assert(
+        ! this.isMerged || ! this.isFramed,
+        "Listener can't be both isMerged and isFramed: ",
+        this.name);
+    }
+  ]
+});
+
+
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -51,6 +66,10 @@ foam.CLASS({
   methods: [
     function validate(model) {
       this.SUPER();
+
+      this.assert(
+          ! this.name.endsWith('$'),
+          'Illegal Property Name: Can\'t end with "$": ', this.name);
 
       var mName =
         model.id      ? model.id + '.'      :
@@ -359,6 +378,12 @@ foam.LIB({
         // if can't match from start of string, fail
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
+        if ( ret.returnType ) {
+          throw new SyntaxError("foam.types.getFunctionArgs return type '" +
+            ret.returnType.typeName + "' must appear after the last argument only: " + args.toString());
+        }
+
+        // record the argument
         ret.push(foam.core.Argument.create({
           name:          typeMatch[6],
           typeName:      typeMatch[2],
@@ -367,8 +392,9 @@ foam.LIB({
           index:        argIdx++,
           documentation: typeMatch[5],
         }));
-        // TODO: this is only valid on the last arg
-        if ( typeMatch[6] ) {
+        // if present, record return type (if not the last arg, we fail on the
+        // next iteration)
+        if ( typeMatch[8] ) {
           ret.returnType = foam.core.ReturnValue.create({
             typeName: typeMatch[8],
             type: global[typeMatch[8]]
@@ -384,7 +410,7 @@ foam.LIB({
             type: global[typeMatch[1]]
           });
         } else {
-          throw "foam.types.getFunctionArgs argument parsing error: " + args.toString();
+          throw new SyntaxError("foam.types.getFunctionArgs argument parsing error: " + args.toString());
         }
       }
 
