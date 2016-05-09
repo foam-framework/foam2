@@ -95,7 +95,7 @@
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
     "../lib/mlang",
-    "../lib/IndexBinaryTree",
+    "../lib/AATree",
     "../lib/Index",
     "../lib/MDAO",
     [ "../lib/IDBDAO", ! isServer ],

@@ -196,7 +196,8 @@ foam.CLASS({
   name: 'Index',
 
   methods: [
-    /** Flyweight constructor */
+    /** JS-prototype based 'Flyweight' constructor. Creates plain
+      javascript objects that are __proto__'d to a modeled instance. */
     function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
@@ -269,7 +270,7 @@ foam.CLASS({
 });
 
 
-/** An AATree (balanced binary search tree) Index. **/
+/** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeIndex',
