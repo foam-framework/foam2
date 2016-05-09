@@ -483,6 +483,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.mlang.predicate.And'
   ],
@@ -701,6 +702,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Promised',
@@ -713,12 +715,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromiseDAO',
 
   extends: 'foam.dao.AbstractDAO',
-  imports: ['error'],
+
+  imports: [ 'error' ],
 
   properties: [
     {
@@ -798,7 +802,7 @@ foam.CLASS({
     {
       name:  'name',
       label: 'Store Name',
-      class:  'foam.core.String',
+      class:  'foam.core.String'
     }
   ],
 
@@ -830,12 +834,15 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'SyncDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.mlang.Expressions'
   ],
+
   imports: [
     'setInterval'
   ],
+
   properties: [
     {
       name: 'remoteDAO',
@@ -912,6 +919,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function init() {
       this.delegate.on.sub(this.onLocalUpdate);
@@ -921,6 +929,7 @@ foam.CLASS({
         }.bind(this), this.pollingFrequency);
       }
     },
+
     function put(obj) {
       return this.delegate.put(obj).then(function(o) {
         this.syncRecordDAO.put(
@@ -931,6 +940,7 @@ foam.CLASS({
         return o;
       }.bind(this));
     },
+
     function remove(obj) {
       return this.delegate.remove(obj).then(function(o) {
         this.syncRecordDAO.put(
@@ -941,6 +951,7 @@ foam.CLASS({
           }));
       }.bind(this));
     },
+
     function removeAll(skip, limit, order, predicate) {
       this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
         a = a.a;
@@ -949,6 +960,7 @@ foam.CLASS({
         }
       }.bind(this));
     },
+
     function processFromServer(obj) {
       this.delegate.put(obj).then(function(obj) {
         this.syncRecordDAO.put(
@@ -958,6 +970,7 @@ foam.CLASS({
           }));
       }.bind(this));
     },
+
     function syncFromServer() {
       var E = this.E;
 
@@ -973,6 +986,7 @@ foam.CLASS({
           }.bind(this));
       }.bind(this));
     },
+
     function syncToServer() {
       var E = this.E;
       var self = this;
@@ -1002,6 +1016,7 @@ foam.CLASS({
           }
         });
     },
+
     function sync() {
       this.syncToServer();
       this.syncFromServer();
