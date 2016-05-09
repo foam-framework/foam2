@@ -3,10 +3,6 @@ foam.CLASS({
   name: 'LifeStar',
   extends: 'foam.graphics.Box',
 
-  requires: [ 'foam.graphics.Arc' ],
-
-  imports: [ 'framed' ],
-
   classes: [
     {
       name: 'Point',
