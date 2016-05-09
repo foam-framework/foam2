@@ -5,12 +5,17 @@ foam.CLASS({
 
   requires: [ 'foam.graphics.Arc' ],
 
+  imports: [ 'framed' ],
+
   classes: [
     {
       name: 'Point',
       extends: 'foam.graphics.Circle',
       properties: [
         'z',
+        [ 'radius',   3 ],
+        [ 'border',   null ],
+        [ 'arcWidth', 0 ],
         { class: 'Float', name: 'glowRadius' }
       ],
       methods: [
@@ -45,7 +50,7 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'n',      217 ],
+    [ 'n',      197 ],
     [ 'x',      500 ],
     [ 'y',      350 ],
     [ 'width',  1000 ],
@@ -57,42 +62,33 @@ foam.CLASS({
   methods: [
     function initCView() {
       this.SUPER();
-      for ( var i = 0 ; i < this.n ; i++ ) this.addPoint(i);
-      this.tick();
+      for ( var i = 0 ; i < this.n ; i++ ) this.addChildren(this.Point.create());
     },
-    function addPoint(i) {
-      var p = this.Point.create({
-        radius: 3,
-        border: null,
-        arcWidth: 0
-      });
+    function paint(x) {
+      this.SUPER(x);
 
-      this.time$.sub(function() {
-        var time = this.time;
-        var r    = Math.sin(Math.PI * i/this.n)*200;
-        var a    = (i-time/10)*Math.PI*19/this.n;
+      var time = this.time++;
+
+      for ( var i = 0 ; i < this.n ; i++ ) {
+        var p = this.children[i];
+        var r = Math.sin(Math.PI * i/this.n)*200;
+        var a = (i-time/20)*Math.PI*15/this.n;
 
         p.x = Math.sin(a) * r;
         p.y = Math.cos(a) * r;
-        p.z = Math.sqrt(200*200 - p.x*p.x - p.y*p.y) * (( i > this.n/2 ) ? 1 : -1);
+        p.z = Math.sqrt(40000 - p.x*p.x - p.y*p.y) * (( i > this.n/2 ) ? 1 : -1);
 
-        p.rotateY(0.01*time);
-        p.rotateX(0.005*time);
+        p.rotateY(0.005*time);
+        p.rotateX(0.003*time);
 
         var on = Math.abs((time % this.n - i + this.n)%this.n) < 20
         p.glowRadius = on ? 8 : 0;
         var s = on ? 100 : 70;
         var l = on ?  70 : 40;
         p.color = this.hsl(i*365/this.n, s, l);
-      }.bind(this));
-      this.addChildren(p);
-    }
-  ],
-  listeners: [
-    {
-      name: 'tick',
-      isFramed: true,
-      code: function() { this.time++; this.tick(); this.invalidated.pub(); }
+      }
+
+      this.invalidated.pub();
     }
   ]
 });
