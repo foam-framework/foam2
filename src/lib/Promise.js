@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.promise',
   name: 'IPromise',
+
   methods: [
     function then(/*success, fail*/) {},
     { name: "catch", code: function(fail) { return this.then(null, fail); } },
@@ -26,10 +27,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Pending',
+
   implements: ['foam.promise.IPromise'],
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -81,10 +85,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Resolving',
   extends: 'foam.promise.Pending',
+
   methods: [
     function onEnter() {
       this.resolve_(this.value);
@@ -92,10 +98,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Fulfilled',
+
   implements: ['foam.promise.IPromise'],
+
   methods: [
     function then(success) {
       var next = this.cls_.create();
@@ -104,12 +113,15 @@ foam.CLASS({
 
       return next;
     },
+
     function fulfill_() {
       throw new Error("Promise already fulfilled.");
     },
+
     function reject_(e) {
       this.fulfill_(e);
     },
+
     function onEnter() {
       var callbacks = this.successCallbacks;
       this.successCallbacks = this.failCallbacks = [];
@@ -121,10 +133,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Rejected',
+
   implements: ['foam.promise.IPromise'],
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -133,6 +148,7 @@ foam.CLASS({
 
       return next;
     },
+
     function onEnter() {
       var callbacks = this.failCallbacks;
       this.failCallbacks = this.successCallbacks = [];
@@ -143,12 +159,14 @@ foam.CLASS({
   ]
 });
 
+
 /**
  * A fast Promise implementation.
  */
 foam.CLASS({
   package: 'foam.promise',
   name: 'Promise',
+
   requires: [
     'foam.promise.Pending',
     'foam.promise.Resolving',
@@ -184,6 +202,7 @@ foam.CLASS({
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function resolve_(value) {
       if ( value === this ) {
@@ -203,6 +222,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 /** A library of standard Promise-style constructors */
 foam.LIB({
@@ -274,7 +294,7 @@ foam.LIB({
         return p.then(function() { return results; });
       }
     }
-  ],
+  ]
 });
 
 
