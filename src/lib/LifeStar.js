@@ -9,7 +9,7 @@ foam.CLASS({
       extends: 'foam.graphics.Circle',
       properties: [
         'z',
-        [ 'radius',   3 ],
+        [ 'radius',   4 ],
         [ 'border',   null ],
         [ 'arcWidth', 0 ],
         { class: 'Float', name: 'glowRadius' }
@@ -73,10 +73,10 @@ foam.CLASS({
         p.y = Math.cos(a) * r;
         p.z = Math.sqrt(40000 - p.x*p.x - p.y*p.y) * (( i > this.n/2 ) ? 1 : -1);
 
-        p.rotateY(0.005*time);
-        p.rotateX(0.003*time);
+        p.rotateY(0.008*time);
+        p.rotateX(0.005*time);
 
-        var on = Math.abs((time/1.5 % this.n - i + this.n)%this.n) < 20
+        var on = Math.abs((time % this.n - i + this.n)%this.n) < 20
         p.glowRadius = on ? 8 : 0;
         var s = on ? 100 : 70;
         var l = on ?  70 : 40;

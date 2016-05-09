@@ -30,8 +30,8 @@ foam.CLASS({
     { class: 'Simple', name: 'left'  },
     { class: 'Simple', name: 'right' },
 
-    // pre tree properties
-    { name: 'nullNode' },
+    // per tree properties
+    { name: 'nullNode' }
   ],
 
   methods: [
@@ -68,8 +68,7 @@ foam.CLASS({
     },
 
     function updateSize() {
-      this.size = this.left.size +
-        this.right.size + this.value.size();
+      this.size = this.left.size + this.right.size + this.value.size();
     },
 
     /** @return Another node representing the rebalanced AA tree. */
@@ -92,8 +91,13 @@ foam.CLASS({
 
     /** @return a node representing the rebalanced AA tree. */
     function split(locked) {
-      if ( this.right.level && this.right.right.level && this.level === this.right.right.level ) {
-        // We have two horizontal right links.  Take the middle node, elevate it, and return it.
+      if (
+          this.right.level       &&
+          this.right.right.level &&
+          this.level === this.right.right.level
+      ) {
+        // We have two horizontal right links.
+        // Take the middle node, elevate it, and return it.
         var r = this.right.maybeClone(locked);
 
         this.right = r.left;
@@ -112,18 +116,21 @@ foam.CLASS({
     function predecessor() {
       if ( ! this.left.level ) return this;
       for ( var s = this.left ; s.right.level ; s = s.right );
-        return s;
+      return s;
     },
+
     function successor() {
       if ( ! this.right.level ) return this;
       for ( var s = this.right ; s.left.level ; s = s.left );
-        return s;
+      return s;
     },
 
     /** Removes links that skip levels.
       @return the tree with its level decreased. */
     function decreaseLevel(locked) {
-      var expectedLevel = Math.min(this.left.level ? this.left.level : 0, this.right.level ? this.right.level : 0) + 1;
+      var expectedLevel = Math.min(
+          this.left.level  ? this.left.level  : 0,
+          this.right.level ? this.right.level : 0) + 1;
 
       if ( expectedLevel < this.level ) {
         this.level = expectedLevel;
@@ -132,6 +139,7 @@ foam.CLASS({
           this.right.level = expectedLevel;
         }
       }
+
       return this;
     },
 
@@ -193,8 +201,8 @@ foam.CLASS({
         // the entry at the same time in order to prevent two traversals.
         // But, this would also duplicate the delete logic.
         var l = side === 'left' ?
-          s.predecessor() :
-          s.successor()   ;
+            s.predecessor() :
+            s.successor()   ;
 
         s.key = l.key;
         s.value = l.value;
@@ -213,8 +221,11 @@ foam.CLASS({
       s = s.decreaseLevel(locked).skew(locked);
       if ( s.right.level ) {
         s.right = s.right.maybeClone(locked).skew(locked);
-        if ( s.right.right.level ) s.right.right = s.right.right.maybeClone(locked).skew(locked);
+        if ( s.right.right.level ) {
+          s.right.right = s.right.right.maybeClone(locked).skew(locked);
+        }
       }
+
       s = s.split(locked);
       s.right = s.right.maybeClone(locked).split(locked);
 
@@ -244,6 +255,7 @@ foam.CLASS({
         skip[0] -= this.size;
         return;
       }
+
       this.left.select(sink, skip, limit, order, predicate);
       this.value.select(sink, skip, limit, order, predicate);
       this.right.select(sink, skip, limit, order, predicate);
@@ -261,7 +273,7 @@ foam.CLASS({
 
       this.right.selectReverse(sink, skip, limit, order, predicate);
       this.value.selectReverse(sink, skip, limit, order, predicate);
-      this.left.selectReverse(sink, skip, limit, order, predicate);
+      this.left.selectReverse(sink,  skip, limit, order, predicate);
     },
 
     function gt(key, compare) {
@@ -338,14 +350,15 @@ foam.CLASS({
       copy.size = s.size - s.right.size;
       copy.right = s.nullNode;
       return copy;
-    },
-
-
+    }
   ]
 });
 
-/** Guards the leaves of the tree. Once instance is created per instance of
-  TreeIndex, and referenced by every flyweight index and tree node. */
+
+/**
+  Guards the leaves of the tree. Once instance is created per instance of
+  TreeIndex, and referenced by every flyweight index and tree node.
+*/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
@@ -354,13 +367,12 @@ foam.CLASS({
   properties: [
     {
       class: 'Simple',
-      name: 'tailFactory',
+      name: 'tailFactory'
     },
     {
       class: 'Simple',
-      name: 'treeNodeFactory',
+      name: 'treeNodeFactory'
     }
-
   ],
 
   methods: [
@@ -390,6 +402,7 @@ foam.CLASS({
       n.level = 1;
       return n;
     },
+
     function removeKeyValue() { return this; },
     function removeNode()     { return this; },
     function select()         { },
@@ -412,9 +425,7 @@ foam.CLASS({
       tree.size += tree.left.size + tree.right.size;
 
       return tree;
-    },
+    }
   ]
-
-
 });
 
