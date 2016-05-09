@@ -25,7 +25,10 @@ foam.CLASS({
 
   // documentation: 'Base model for model hierarchy.',
 
-//  imports: [ 'assert', 'error', 'log', 'warn' ],
+  // Effectively imports the following methods, but imports: isn't available
+  // yet, so we add with 'methods:'.
+  //
+  // imports: [ 'assert', 'error', 'log', 'warn' ],
 
   methods: [
     /**
@@ -106,13 +109,13 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'assert', 'error', 'log', 'warn' ],
 
-    function assert() { ((this.X && this.X.assert) || foam.X.assert).apply(null, arguments); },
+    function assert() { this.X.assert.apply(null, arguments); },
 
-    function error() { ((this.X && this.X.error) || foam.X.error).apply(null, arguments); },
+    function error() { this.X.error.apply(null, arguments); },
 
-    function log() { ((this.X && this.X.log) || foam.X.log).apply(null, arguments); },
+    function log() { this.X.log.apply(null, arguments); },
 
-    function warn() { ((this.X && this.X.warn) || foam.X.warn).apply(null, arguments); },
+    function warn() { this.X.warn.apply(null, arguments); },
 
 
     /************************************************
@@ -123,9 +126,14 @@ foam.CLASS({
       This structure represents the head of a doubly-linked list of
       listeners. It contains 'next', a pointer to the first listener,
       and 'children', a map of sub-topic chains.
+
       Nodes in the list contain 'next' and 'prev' links, which lets
       removing subscriptions be done quickly by connecting next to prev
       and prev to next.
+
+      Note that both the head structure and the nodes themselves have a
+      'next' property. This simplifies the code because there is no
+      special case for handling when the list is empty.
 
       Listener List Structure
       -----------------------
@@ -160,9 +168,9 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
-        // Like l.apply(l, [s].concat(a)), but faster.
+        // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
-        // TODO: optional exception trapping
+        // ???: optional exception trapping, benchmark
         switch ( a.length ) {
           case 0: l(s); break;
           case 1: l(s, a[0]); break;
@@ -174,7 +182,7 @@ foam.CLASS({
           case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
           case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
           case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
-          default: l.apply(l, [s].concat(a));
+          default: l.apply(l, [s].concat(Array.from(a)));
         }
         listeners = listeners.next;
         count++;
@@ -197,12 +205,30 @@ foam.CLASS({
 
     /**
       Publish a message to all matching sub()'ed listeners.
-      TODO: example
+
+      All sub()'ed listeners whose specified pattern match the
+      pub()'ed arguments will be notified.
+      Ex.:
+<pre>
+  var obj  = foam.core.FObject.create();
+  var sub1 = obj.sub(               function(a,b,c) { console.log(a,b,c); });
+  var sub2 = obj.sub('alarm',       function(a,b,c) { console.log(a,b,c); });
+  var sub3 = obj.sub('alarm', 'on', function(a,b,c) { console.log(a,b,c); });
+
+  obj.pub('alarm', 'on');  // notifies sub1, sub2 and sub3
+  obj.pub('alarm', 'off'); // notifies sub1 and sub2
+  obj.pub();               // only notifies sub1
+  obj.pub('foobar');       // only notifies sub1
+</pre>
+
+      Note how FObjects can be used as generic pub/subs.
+
       Returns the number of listeners notified.
     */
     function pub(a1, a2, a3, a4, a5, a6, a7, a8, a9) {
       // This method prevents this function not being JIT-ed because
-      // of the use of 'arguments'.  Doesn't generate any garbage.
+      // of the use of 'arguments'. Doesn't generate any garbage ([]'s
+      // don't appear to be garbage in V8).
       // FUTURE: benchmark
       switch ( arguments.length ) {
         case 0:  return this.pub_([]);
@@ -215,7 +241,6 @@ foam.CLASS({
         case 7:  return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
         case 8:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8]);
         case 9:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8, a9]);
-        // TODO: add unit test for 10 args or above
         default: return this.pub_(arguments);
       }
     },
@@ -278,7 +303,6 @@ foam.CLASS({
         l:    l
       };
       node.sub.destroy = function() {
-        // TODO: doc how anchor and nodes share same 'next' interface
         if ( node.next ) node.next.prev = node.prev;
         if ( node.prev ) node.prev.next = node.next;
 
@@ -411,7 +435,20 @@ foam.CLASS({
       return 0;
     },
 
-    // TODO: doc
+    /**
+     * Compare this object to another object of the same type, and produce a raw
+     * javascript object which shows the differences between the two.
+     * Example
+     * <pre>
+     * var obj1 = Abc.create({ a: 1, b: ['A', 'B', 'C'] });
+     * var obj2 = Abc.create({ a: 2, b: ['A', 'D'] });
+     * var diff = obj1.diff(obj2);
+     * </pre>
+     * The diff object will look like
+     * <pre>
+     * { a: 2, b: { added: ['D'], removed: ['B', 'C'] } };
+     * </pre>
+     */
     function diff(other) {
       var diff = {};
 
@@ -446,7 +483,7 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var prop = this[ps[i].name];
         hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
-        hash &= hash; // force back to a 32-bit int
+        hash &= hash; // forces 'hash' back to a 32-bit int
       }
 
       return hash;
@@ -464,7 +501,24 @@ foam.CLASS({
       return this.cls_.create(m/*, this.X*/);
     },
 
-    // TODO: doc
+    /**
+      Copy property values from the supplied object or map.
+
+      Ex.:
+<pre>
+  person.copyFrom({fName: 'John', lName: 'Smith', age: 42})
+  or
+  person.copyFrom(otherPerson);
+</pre>
+     The first example is short-form for:
+<pre>
+  person.fName = 'John';
+  person.lName = 'Smith';
+  person.age   = 42;
+</pre>
+     If an FObject is supplied, it doesn't need to be the same class as 'this'.
+     Only properties that the two classes have in common will be copied.
+     */
     function copyFrom(o) {
       var a = this.cls_.getAxiomsByClass(foam.core.Property);
 

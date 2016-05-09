@@ -68,9 +68,8 @@ foam.CLASS({
                 this.setPrivate_('X', x = ySource.Y || ySource.X);
                 this.setPrivate_('ySource', undefined);
               } else {
-                // TODO: Why isn't this an error?
-                // console.error('Missing X in ', this.cls_.id);
-                return undefined;
+                // Happens during bootstrap with Properties.
+                x = foam.X;
               }
             }
             return x;
@@ -140,9 +139,27 @@ foam.CLASS({
 foam.boot.end();
 
 
-// TODO: doc
+/**
+  Refine foam.core.Property to add 'transient' support.
+
+  A transient Property is not intended to be persisted
+  or transfered over the network.
+
+  Ex. A computed Property could be made transient to avoid
+  wasting disk space or network bandwidth.
+
+  For finer control, there are also separate properties called
+  'networkTransient' and 'storageTransient', which default to
+  the value of 'transient' if not explicitly set.
+
+  A networkTransient field is not marshalled over network calls.
+  foam.json.Network does not encode networkTransient fields.
+
+  A storageTransient field is not stored to persistent storage.
+  foam.json.Storage does not encode storageTransient fields.
+ */
 foam.CLASS({
-  refines: 'foam.core.Property',
+  refines: 'Property',
 
   properties: [
     {

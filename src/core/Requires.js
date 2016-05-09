@@ -28,14 +28,16 @@ foam.CLASS({
       var name = this.name;
       var path = this.path;
 
+      // Create a private_ clone of the Class with the create() method decorated
+      // to pass 'this' as the context if not explicitly provided.  This ensures
+      // that the created object has access to this object's exported bindings.
       Object.defineProperty(proto, name, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
             var cls    = foam.lookup(path);
             var parent = this;
 
-            if ( ! cls )
-              console.error('Unknown class: ' + path);
+            this.assert(cls, 'Requires: Unknown class: ', path);
 
             var c = Object.create(cls);
             c.create = function requiresCreate(args, X) { return cls.create(args, X || parent); };

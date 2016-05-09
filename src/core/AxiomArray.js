@@ -19,7 +19,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'AxiomArray',
-  extends: 'Array',
+  extends: 'FObjectArray',
 
   // documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
 

@@ -60,7 +60,7 @@ foam.CLASS({
     },
     {
       // Is replaced by an AxiomArray later.
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'Property',
       name: 'properties',
       adaptArrayElement: function(o) {
@@ -88,7 +88,7 @@ foam.CLASS({
     },
     {
       // Is replaced by an AxiomArray later.
-      class: 'Array',
+      class: 'FObjectArray',
       of: 'Method',
       name: 'methods',
       adaptArrayElement: function(o) {

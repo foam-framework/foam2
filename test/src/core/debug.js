@@ -82,6 +82,11 @@ describe('foam.types.getFunctionArgs', function() {
 
     expect(function() { foam.types.getFunctionArgs(fn); }).not.toThrow();
   });
+  it('fails a return before the last arg', function() {
+    fn = function(arg1 /* RetType */, arg2){};
+
+    expect(function() { foam.types.getFunctionArgs(fn); }).toThrow();
+  });
 
 });
 
