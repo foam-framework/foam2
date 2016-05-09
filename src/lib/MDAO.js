@@ -22,6 +22,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'MDAO',
   label: 'Indexed DAO',
+
   requires: [
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
@@ -33,8 +34,9 @@ foam.CLASS({
     'foam.dao.index.ValueIndex',
     'foam.dao.index.AltIndex',
     'foam.dao.index.SetIndex',
-    'foam.mlang.sink.Explain',
+    'foam.mlang.sink.Explain'
   ],
+
   properties: [
     {
       name:  'of',
@@ -46,15 +48,14 @@ foam.CLASS({
       value: false
     },
     {
-      name: 'idIndex',
+      name: 'idIndex'
     },
     {
-      name: 'index',
+      name: 'index'
     }
   ],
 
   methods: [
-
     function init() {
       // adds the primary key(s) as an index, and stores it for fast find().
       this.addIndex();
@@ -100,6 +101,7 @@ foam.CLASS({
         var proto = Array.isArray(prop) ?
           this.SetIndex  :
           this.TreeIndex ;
+
         index = proto.create({ prop: prop, tailFactory: index });
       }
 
