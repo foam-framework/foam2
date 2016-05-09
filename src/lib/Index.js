@@ -200,6 +200,15 @@ foam.CLASS({
   extends: 'foam.core.LightWeight',
 
   methods: [
+    /** JS-prototype based 'Flyweight' constructor. Creates plain
+      javascript objects that are __proto__'d to a modeled instance. */
+    function create(args) {
+      var c = Object.create(this);
+      args && c.copyFrom(args);
+      c.init && c.init();
+      return c;
+    },
+
     /** Adds or updates the given value in the index */
     function put() {},
     /** Removes the given value from the index */
@@ -262,6 +271,7 @@ foam.CLASS({
   ],
 });
 
+/** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeIndexRequires',
