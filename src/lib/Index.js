@@ -58,7 +58,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
       name: 'cost',
       value: 0
     },
@@ -230,31 +229,28 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndex',
   extends: 'foam.dao.index.Index',
-  implements: [
-    'foam.dao.index.Plan',
-  ],
+  implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
-    {
-      class: 'Simple',
-      name: 'value'
-    },
+    { class: 'Simple',  name: 'value' },
     { name: 'cost', value: 1 },
   ],
 
   methods: [
-    // from Plan (this index is its own plan)
-    function execute(promise, sink /*, skip, limit, order, predicate*/) {
+    // from plan
+    function execute(promise, sink) {
       sink.put(this.value);
+    },
+    function toString() {
+      return "ValueIndex_Plan(cost=1, value:" + this.value + ")";
     },
 
     // from Index
     function put(s) { this.value = s; },
     function remove() { this.value = undefined; },
-    function plan() { return this; },
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
-    function toString() { return 'value'; },
+    function plan() { return this; },
 
     function select(sink, skip, limit, order, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
@@ -268,7 +264,6 @@ foam.CLASS({
 
   ],
 });
-
 
 /** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
@@ -306,36 +301,39 @@ foam.CLASS({
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
-
   ],
-
   properties: [
-    'prop',
     {
+      class: 'Simple',
+      name: 'prop',
+    },
+    {
+      class: 'Simple',
       name: 'selectCount',
-      value: 0,
-      postSet: function(old, nu) {
-        this.treeNode.selectCount = nu;
-      }
-    },
-    {
-      name: 'nullNode',
-      factory: function() {
-        return this.NullTreeNode.create({ index: this });
-      }
-    },
-    {
-      name: 'treeNode',
-      factory: function() {
-        return this.TreeNode.create({ index: this });
-      }
     },
     {
       class: 'Simple',
       name: 'root',
     },
+
     {
-      class: 'Simple',
+      name: 'nullNode',
+      factory: function() {
+        var nn = this.NullTreeNode.create({
+          tailFactory: this.tailFactory,
+          treeNodeFactory: this.treeNodeFactory
+        });
+        this.treeNodeFactory.nullNode = nn; // don't finite loop between factories
+        return nn;
+      }
+    },
+    {
+      name: 'treeNodeFactory',
+      factory: function() {
+        return this.TreeNode.create(); // don't set nullNode here, infinite loop!
+      }
+    },
+    {
       name: 'tailFactory',
     }
   ],
@@ -343,7 +341,13 @@ foam.CLASS({
   methods: [
     /** Initialize simple properties, since they ignore factories. */
     function init() {
+
+      this.selectCount = 0;
       this.root = this.nullNode;
+
+      // TODO: replace with bound methods when available
+      this.dedup = this.dedup.bind(this); //foam.Function.bind(this.dedup, this);
+      //this.compare = foam.Function.bind(this.compare, this);
     },
 
     /**
@@ -352,15 +356,15 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.NullTreeNode.create({ index: this });
+      this.root = this.nullNode;
 
       // Only safe if children aren't themselves trees
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.ValueIndex.isSubClass(this.tailFactory) ) {
+      if ( this.ValueIndex.isInstance(this.tailFactory.create()) ) {
         a.sort(toCompare(this.prop));
-        this.root = this.root.bulkLoad_(a, 0, a.length-1);
+        this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f);
       } else {
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.put(a[i]);
@@ -374,17 +378,16 @@ foam.CLASS({
       obj[this.prop.name] = value;
     },
 
-    // TODO: remove the 's' in these and use a known root node
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue), newValue);
+      this.root = this.root.putKeyValue(this.prop.f(newValue), newValue, this.compare, this.dedup, this.selectCount > 0);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value), value);
+      this.root = this.root.removeKeyValue(this.prop.f(value), value, this.compare, this.selectCount > 0);
     },
 
     function get(key) {
-      return this.root.get(key); // does not delve into sub-indexes
+      return this.root.get(key, this.compare); // does not delve into sub-indexes
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -408,12 +411,12 @@ foam.CLASS({
     function plan(sink, skip, limit, order, predicate) {
       var index = this;
 
-      if ( this.False.isInstance(predicate) ) return this.NotFoundPlan.create();
+      if ( index.False.isInstance(predicate) ) return this.NotFoundPlan.create();
 
-      if ( ! predicate && this.Count.isInstance(sink) ) {
+      if ( ! predicate && index.Count.isInstance(sink) ) {
         var count = this.size();
         //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
-        return this.CountPlan.create({ count: count });
+        return index.CountPlan.create({ count: count });
       }
 
       //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
@@ -473,9 +476,9 @@ foam.CLASS({
           }
         }
 
-        if ( subPlans.length === 0 ) return this.NotFoundPlan.create();
+        if ( subPlans.length === 0 ) return index.NotFoundPlan.create();
 
-        return this.AltPlan.create({
+        return index.AltPlan.create({
           subPlans: subPlans,
           prop: prop
         });
@@ -484,13 +487,13 @@ foam.CLASS({
       arg2 = isExprMatch(this.Eq);
       if ( arg2 !== undefined ) {
         var key = arg2.f();
-        result = this.get(key);
+        result = this.get(key, this.compare);
 
-        if ( ! result ) return this.NotFoundPlan.create();
+        if ( ! result ) return index.NotFoundPlan.create();
 
         subPlan = result.plan(sink, skip, limit, order, predicate);
 
-        return this.AltPlan.create({
+        return index.AltPlan.create({
           subPlans: [subPlan],
           prop: prop
         });
@@ -500,16 +503,16 @@ foam.CLASS({
       var subTree = this.root;
 
       arg2 = isExprMatch(this.Gt);
-      if ( arg2 ) subTree = subTree.gt(arg2.f());
+      if ( arg2 ) subTree = subTree.gt(arg2.f(), this.compare);
 
       arg2 = isExprMatch(this.Gte);
-      if ( arg2 ) subTree = subTree.gte(arg2.f());
+      if ( arg2 ) subTree = subTree.gte(arg2.f(), this.compare);
 
       arg2 = isExprMatch(this.Lt);
-      if ( arg2 ) subTree = subTree.lt(arg2.f());
+      if ( arg2 ) subTree = subTree.lt(arg2.f(), this.compare);
 
       arg2 = isExprMatch(this.Lte);
-      if ( arg2 ) subTree = subTree.lte(arg2.f());
+      if ( arg2 ) subTree = subTree.lte(arg2.f(), this.compare);
 
       cost = subTree.size;
       var sortRequired = false;
@@ -532,7 +535,7 @@ foam.CLASS({
         if ( limit ) cost = Math.min(cost, limit);
       }
 
-      return this.CustomPlan.create({
+      return index.CustomPlan.create({
         cost: cost,
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           if ( sortRequired ) {
@@ -581,11 +584,11 @@ foam.CLASS({
 
   methods: [
     function put(newValue) {
-      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue);
+      this.root = this.root.putKeyValue(this.prop.f(newValue).toLowerCase(), newValue, this.compare, this.dedup, this.selectCount > 0);
     },
 
     function remove(value) {
-      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value);
+      this.root = this.root.removeKeyValue(this.prop.f(value).toLowerCase(), value, this.compare, this.selectCount > 0);
     }
   ]
 });
@@ -608,10 +611,10 @@ foam.CLASS({
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.putKeyValue(a[i], newValue);
+          this.root = this.root.putKeyValue(a[i], newValue, this.compare, this.dedup);
         }
       } else {
-        this.root = this.root.putKeyValue('', newValue);
+        this.root = this.root.putKeyValue('', newValue, this.compare, this.dedup);
       }
     },
 
@@ -620,10 +623,10 @@ foam.CLASS({
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.removeKeyValue(a[i], value);
+          this.root = this.root.removeKeyValue(a[i], value, this.compare);
         }
       } else {
-        this.root = this.root.removeKeyValue('', value);
+        this.root = this.root.removeKeyValue('', value, this.compare);
       }
     }
   ]
@@ -633,7 +636,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
-  extends: 'foam.dao.index.Index',
+  //extends: 'foam.dao.index.Index',
   requires: [
     'foam.dao.index.NoPlan',
   ],
@@ -767,64 +770,4 @@ foam.CLASS({
   ]
 });
 
-
-
-
-// var mLangIndex = {
-//   create: function(mlang) {
-//     return {
-//       __proto__: this,
-//       mlang: mlang,
-//       PLAN: {
-//         cost: 0,
-//         execute: function(promise, s, sink, skip, limit, order, predicate) {
-//           sink.copyFrom(s);
-//         },
-//         toString: function() { return 'mLangIndex(' + this.s + ')'; }
-//       }
-//     };
-//   },
-
-//   bulkLoad: function(a) {
-//     a.select(this.mlang);
-//     return this.mlang;
-//   },
-
-//   put: function(s, newValue) {
-//     // TODO: Should we clone s here?  That would be more
-//     // correct in terms of the purely functional interface
-//     // but maybe we can get away with it.
-//     s = s || this.mlang.clone();
-//     s.put(newValue);
-//     return s;
-//   },
-
-//   remove: function(s, obj) {
-//     // TODO: Should we clone s here?  That would be more
-//     // correct in terms of the purely functional interface
-//     // but maybe we can get away with it.
-//     s = s || this.mlang.clone();
-//     s.remove && s.remove(obj);
-//     return s;
-//   },
-
-//   size: function(s) { return Number.MAX_VALUE; },
-
-//   plan: function(s, sink, skip, limit, order, predicate) {
-//     // console.log('s');
-//     if ( predicate ) return foam.dao.index.NoPlan.create();
-
-//     if ( sink.model_ && sink.model_.isInstance(s) && s.arg1 === sink.arg1 ) {
-//       this.PLAN.s = s;
-//       return this.PLAN;
-//     }
-
-//     return foam.dao.index.NoPlan.create();
-//   },
-
-//   toString: function() {
-//     return 'mLangIndex(' + this.mlang + ')';
-//   }
-
-// };
 
