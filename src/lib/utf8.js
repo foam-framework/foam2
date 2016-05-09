@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.encodings',
   name: 'UTF8',
+
   properties: [
     {
       name: 'charcode'
@@ -32,12 +33,14 @@ foam.CLASS({
       name: 'string'
     }
   ],
+
   methods: [
     function reset() {
       this.string = '';
       this.remaining = 0;
       this.charcode = null;
     },
+
     function put(byte) {
       if ( byte instanceof ArrayBuffer ) {
         var data = new Uint8Array(byte);
