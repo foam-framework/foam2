@@ -11,19 +11,18 @@ foam.CLASS({
       extends: 'foam.graphics.Circle',
       properties: [
         'z',
-        { name: 'r' },
-        { name: 't' },
-        { name: 'g' },
         { class: 'Float', name: 'glowRadius' }
       ],
       methods: [
         function rotateY(a) {
-          this.z = this.z * Math.cos(a) - this.x * Math.sin(a);
-          this.x = this.z * Math.sin(a) + this.x * Math.cos(a);
+          var x = this.x, z = this.z;
+          this.z = z * Math.cos(a) - x * Math.sin(a);
+          this.x = z * Math.sin(a) + x * Math.cos(a);
         },
         function rotateX(a) {
-          this.z = this.z * Math.cos(a) - this.y * Math.sin(a);
-          this.y = this.z * Math.sin(a) + this.y * Math.cos(a);
+          var y = this.y, z = this.z;
+          this.z = z * Math.cos(a) - y * Math.sin(a);
+          this.y = z * Math.sin(a) + y * Math.cos(a);
         },
         function doTransform(x) {
           var t = this.transform;
@@ -63,30 +62,30 @@ foam.CLASS({
     },
     function addPoint(i) {
       var p = this.Point.create({
-        r: Math.sin(Math.PI * i/this.n)*200,
-        t: i*Math.PI*20/this.n,
-        g: 0, //i*Math.PI/5/this.n,
         radius: 3,
         border: null,
         arcWidth: 0
       });
 
-      p.x = Math.sin(p.t) * Math.cos(p.g) * p.r;
-      p.y = Math.cos(p.t) * p.r;
-      p.z = Math.sqrt(200*200 - p.x*p.x - p.y*p.y) * (( i > this.n/2 ) ? 1 : -1);
-
       this.time$.sub(function() {
-        p.rotateY(0.01);
-        p.rotateX(0.005);
-        var on = Math.abs((this.time % this.n - i + this.n)%this.n) < 20
+        var time = this.time;
+        var r    = Math.sin(Math.PI * i/this.n)*200;
+        var a    = (i-time/10)*Math.PI*19/this.n;
+
+        p.x = Math.sin(a) * r;
+        p.y = Math.cos(a) * r;
+        p.z = Math.sqrt(200*200 - p.x*p.x - p.y*p.y) * (( i > this.n/2 ) ? 1 : -1);
+
+        p.rotateY(0.01*time);
+        p.rotateX(0.005*time);
+
+        var on = Math.abs((time % this.n - i + this.n)%this.n) < 20
         p.glowRadius = on ? 8 : 0;
         var s = on ? 100 : 70;
         var l = on ?  70 : 40;
         p.color = this.hsl(i*365/this.n, s, l);
       }.bind(this));
       this.addChildren(p);
-
-      return p;
     }
   ],
   listeners: [
