@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'Frame',
+
   properties: [
     ['fin', 1],
     ['rsv1',0],
@@ -40,6 +41,7 @@ foam.CLASS({
       value: false
     },
   ],
+
   methods: [
     function toData() {
       this.length = this.buffer.length;
@@ -78,6 +80,7 @@ foam.CLASS({
 
       return buffer;
     },
+
     function onData(data, i) {
       if ( this.framing ) {
         var byte = data.readUInt8(i++);
@@ -172,9 +175,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'Socket',
+
+  topics: [
+    'message',
+    'disconnect',
+    'connect'
+  ],
+
   properties: [
     {
       name: 'remoteAddress'
@@ -213,11 +224,7 @@ foam.CLASS({
       value: 0
     }
   ],
-  topics: [
-    'message',
-    'disconnect',
-    'connect'
-  ],
+
   methods: [
     function write(msg) {
       var serialized = foam.json.stringify(msg);
@@ -233,6 +240,7 @@ foam.CLASS({
       this.message.pub(obj);
     }
   ],
+
   listeners: [
     {
       name: 'onData',
@@ -250,7 +258,6 @@ foam.CLASS({
             remaining = this.nextSize - this.offset;
             start += 4;
           }
-
 
           var written = data.copy(this.buffer,
                                   this.offset,
@@ -281,12 +288,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'SocketService',
+
   requires: [
     'foam.net.Socket'
   ],
+
   properties: [
     {
       class: 'Map',
@@ -302,12 +312,13 @@ foam.CLASS({
       name: 'port'
     },
     {
-      name: 'server',
+      name: 'server'
     },
     {
       name: 'delegate'
     }
   ],
+
   methods: [
     function init() {
       if ( ! this.listen ) return;
@@ -320,6 +331,7 @@ foam.CLASS({
       }.bind(this));
       this.server.listen(this.port);
     },
+
     function getSocket(host, port) {
       console.assert(host, "Host is required");
       console.assert(port, "Port is required");
@@ -355,6 +367,7 @@ foam.CLASS({
 
       return p;
     },
+
     function addSocket(socket, key) {
       if ( key ) this.sockets[key] = socket;
 
@@ -363,34 +376,46 @@ foam.CLASS({
         this.removeSocket(socket);
       }.bind(this));
     },
+
     function removeSocket(socket) {
       socket.message.unsub(this.onMessage);
     }
   ],
+
   listeners: [
     {
       name: 'onMessage',
       code: function(s, _, m) {
-        this.delegate && this.delegate.send(foam.json.parse(foam.json.parseString(m), null, this));
+        this.delegate && this.delegate.send(
+            foam.json.parse(foam.json.parseString(m), null, this));
       },
     },
     {
       name: 'onConnection',
       code: function(socket) {
         socket = this.Socket.create({ socket_: socket });
-        var key = socket.remoteAddress + ":" + socket.remotePort;
+        var key = socket.remoteAddress + ':' + socket.remotePort;
         this.addSocket(socket);
       }
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocket',
+
   requires: [
     'foam.net.node.Frame'
   ],
+
+  topics: [
+    'message',
+    'connected',
+    'disconnected'
+  ],
+
   properties: [
     {
       name: 'socket',
@@ -409,11 +434,7 @@ foam.CLASS({
     'parts',
     'currentFrame'
   ],
-  topics: [
-    'message',
-    'connected',
-    'disconnected'
-  ],
+
   methods: [
     function send(data) {
       if ( typeof data == "string" ) {
@@ -535,10 +556,12 @@ foam.CLASS({
       });
     }
   ],
+
   listeners: [
     function onMessage(s, _, msg) {
       this.delegate.send(foam.json.parse(foam.json.parseString(msg)));
     },
+
     function onUpgrade(req, socket, data) {
       var key = req.headers['sec-websocket-key'];
       key += '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
