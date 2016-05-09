@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'Box',
+
   methods: [
     {
       name: 'send',
@@ -27,9 +28,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'PromisedBox',
+
   properties: [
     {
       class: 'Promised',
@@ -39,10 +42,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Stub',
   extends: 'Property',
+
   properties: [
     'of',
     'replyBox',
@@ -59,6 +64,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function installInClass(cls) {
       var model = foam.lookup(this.of);
@@ -110,7 +116,6 @@ foam.CLASS({
         cls.installAxiom(methods[i]);
       }
 
-
       [
         'foam.box.SubscribeMessage',
         'foam.box.OneShotBox',
@@ -134,7 +139,6 @@ foam.CLASS({
           name: s
         }));
       });
-
 
       cls.installAxiom(foam.core.Method.create({
         name: 'init',
@@ -161,9 +165,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'Message',
+
   properties: [
     {
       name: 'replyBox'
@@ -174,9 +180,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ProxyBox',
+
   properties: [
     {
       class: 'Proxy',
@@ -186,18 +194,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'MessagePortBox',
+
   implements: ['foam.box.Box'],
+
   imports: [
     'messagePortService'
   ],
+
   properties: [
     {
       name: 'id'
     }
   ],
+
   methods: [
     function send(msg) {
       // TODO: Improved serialization
@@ -212,7 +225,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'EchoBox',
-  implements: ['foam.box.Box'],
+
+  implements: [ 'foam.box.Box' ],
+
   methods: [
     function send(msg) {
       if ( msg.replyBox ) {
@@ -224,10 +239,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ForwardMessage',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'nextBox'
@@ -238,13 +255,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ForwardBox',
+
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.RelayMessage'
   ],
+
   methods: [
     function send(msg) {
       if ( this.RelayMessage.isInstance(msg) ) {
@@ -253,6 +274,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /*
 TODO:
@@ -288,11 +310,11 @@ WebSocket Box
 */
 
 
-
 foam.CLASS({
   package: 'foam.box',
   name: 'SubBoxMessage',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'name'
@@ -303,16 +325,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SubBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.SubBoxMessage'
   ],
+
   properties: [
     'name'
   ],
+
   methods: [
     function send(msg) {
       this.delegate.send(this.SubBoxMessage.create({
@@ -323,27 +349,34 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'NameAlreadyRegisteredException',
+
   properties: [
     'name'
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'NoSuchNameException',
+
   properties: [ 'name' ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
   name: 'BoxRegistry',
+
   requires: [
     'foam.box.NoSuchNameException',
     'foam.box.SubBox'
   ],
+
   properties: [
     {
       name: 'registry',
@@ -353,6 +386,7 @@ foam.CLASS({
       name: 'me'
     }
   ],
+
   methods: [
     {
       name: 'lookup',
@@ -389,15 +423,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'BoxRegistryBox',
   extends: 'foam.box.BoxRegistry',
+
   implements: [ 'foam.box.Box' ],
+
   requires: [
     'foam.box.SubBoxMessage',
     'foam.box.SkeletonBox'
   ],
+
   properties: [
     {
       name: 'registrySkeleton',
@@ -406,6 +444,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     {
       name: 'send',
@@ -427,10 +466,12 @@ foam.CLASS({
   ]
 });
 
+
 // TODO: Use ContextFactories to create these on demand.
 foam.CLASS({
   package: 'foam.box',
   name: 'ClientBoxRegistry',
+
   properties: [
     {
       class: 'Stub',
@@ -440,9 +481,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'PromisedBoxRegistry',
+
   properties: [
     {
       class: 'Promised',
@@ -452,21 +495,25 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'LookupBox',
+
   requires: [
     'foam.box.ClientBoxRegistry'
   ],
+
   imports: [
     'root'
   ],
+
   properties: [
     {
-      name: 'name',
+      name: 'name'
     },
     {
-      name: 'parentBox',
+      name: 'parentBox'
     },
     {
       name: 'registry',
@@ -486,6 +533,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function send(msg) {
       this.promise.send(msg);
@@ -493,16 +541,21 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'NamedBox',
+
   implements: [ 'foam.box.Box' ],
+
   requires: [
     'foam.box.LookupBox',
   ],
+
   axioms: [
     foam.pattern.Multiton.create({ property: 'name' })
   ],
+
   properties: [
     {
       class: 'String',
@@ -522,28 +575,34 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function send(msg) {
       this.delegate.send(msg);
     },
+
     function getParentBox() {
       return this.cls_.create({
         name: this.name.substring(0, this.name.lastIndexOf('/'))
       }, this);
     },
+
     function getBaseName() {
       return this.name.substring(this.name.lastIndexOf('/') + 1);
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ReplyBox',
   extends: 'foam.box.ProxyBox',
+
   imports: [
     'registry'
   ],
+
   properties: [
     {
       name: 'id',
@@ -555,6 +614,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function exportBox() {
       return this.registry.register(this.id, null, this);
@@ -566,31 +626,39 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCReturnMessage',
   extends: 'foam.box.Message',
+
   properties: [
     'data'
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SubscribeMessage',
   extends: 'foam.box.Message',
+
   properties: [
     'destination'
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCReturnBox',
+
   implements: ['foam.box.Box'],
+
   requires: [
     'foam.box.RPCReturnMessage'
   ],
+
   properties: [
     {
       name: 'promise',
@@ -608,6 +676,7 @@ foam.CLASS({
       name: 'reject_'
     }
   ],
+
   methods: [
     function send(msg) {
       if ( ! this.RPCReturnMessage.isInstance(msg) ) {
@@ -619,17 +688,21 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCMessage',
   extends: 'foam.box.Message',
+
   requires: [
     'foam.box.RPCReturnMessage'
   ],
+
   properties: [
     'name',
     'args'
   ],
+
   methods: [
     function call(obj) {
       var p = obj[this.name].apply(obj, this.args);
@@ -652,10 +725,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ClientDAO',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Stub',
@@ -672,18 +747,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package :'foam.box',
   name: 'InvalidMessageException',
+
   properties: [
     'messageType'
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'EventMessage',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'args'
@@ -691,19 +770,24 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'EventDispatchBox',
+
   implements: ['foam.box.Box'],
+
   requires: [
     'foam.box.EventMessage',
     'foam.box.InvalidMessageException'
   ],
+
   properties: [
     {
       name: 'target'
     }
   ],
+
   methods: [
     function send(msg) {
       if ( ! this.EventMessage.isInstance(msg) ) {
@@ -717,19 +801,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SkeletonBox',
+
   requires: [
     'foam.box.SubscribeMessage',
     'foam.box.RPCMessage',
     'foam.box.InvalidMessageException'
   ],
+
   properties: [
     {
       name: 'data'
     }
   ],
+
   methods: [
     function send(message) {
       if ( this.RPCMessage.isInstance(message) ) {
@@ -758,16 +846,21 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'LoggingBox',
+
   extends: 'foam.box.ProxyBox',
+
   imports: [
     'log'
   ],
+
   properties: [
     'name'
   ],
+
   methods: [
     function send(msg) {
       this.log(this.name, ":", foam.json.stringify(msg));
@@ -776,33 +869,42 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'NullBox',
+
   implements: ['foam.box.Box']
 });
+
 
 // Various messages
 foam.CLASS({
   package: 'foam.box',
   name: 'TextMessage',
   extends: 'foam.box.Message',
+
   properties: [
     'data'
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SocketBox',
+
   implements: ['foam.box.Box'],
+
   imports: [
     'socketService'
   ],
+
   properties: [
     'host',
     'port'
   ],
+
   methods: [
     function send(msg) {
       this.socketService.getSocket(this.host, this.port).then(
@@ -816,15 +918,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'WebSocketBox',
+
   imports: [
     'webSocketService'
   ],
+
   properties: [
     'uri'
   ],
+
   methods: [
     function send(msg) {
       this.webSocketService.getSocket(this.uri).then(function(s) {
@@ -834,9 +940,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.messaging',
   name: 'MessagePort',
+
+  topics: [
+    'message'
+  ],
+
   properties: [
     {
       name: 'port',
@@ -855,14 +967,13 @@ foam.CLASS({
       name: 'id'
     }
   ],
-  topics: [
-    'message'
-  ],
+
   methods: [
     function send(msg) {
       this.port.postMessage(msg);
     }
   ],
+
   listeners: [
     function onMessage(e) {
       var msg = foam.json.parse(foam.json.parseString(e.data), undefined, this);
@@ -871,13 +982,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.messaging',
   name: 'MessagePortService',
+
   requires: [
     'foam.messaging.MessagePort',
     'foam.box.MessagePortBox'
   ],
+
+  topics: [
+    'connected'
+  ],
+
   properties: [
     {
       class: 'Map',
@@ -902,16 +1020,16 @@ foam.CLASS({
       }
     }
   ],
-  topics: [
-    'connected'
-  ],
+
   methods: [
     function start() {
       this.source.addEventListener('message', this.onConnect);
     },
+
     function inbox() {
       return this.inbox_;
     },
+
     function connect(target) {
       var channel = new MessageChannel();
 
@@ -940,15 +1058,18 @@ foam.CLASS({
         }, this);
       }, this));
     },
+
     function getPortForDst(id) {
       return this.portsByDst[id];
     },
+
     function addPort(port) {
       this.portsByDst[port.id] = port;
       port.message.sub(this.onMessage);
       this.connected.pub(port.id);
     }
   ],
+
   listeners: [
     function onConnect(e) {
       if ( e.data && e.data.type == 'CONNECT' ) {
@@ -965,6 +1086,7 @@ foam.CLASS({
         port.postMessage(resp);
       }
     },
+
     function onMessage(s, _, msg) {
       if ( this.delegate ) {
         this.delegate.send(msg);
@@ -973,10 +1095,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.messaging',
   name: 'SharedWorkerMessagePortService',
   extends: 'foam.messaging.MessagePortService',
+
   methods: [
     function start() {
       this.source.onconnect = function(e) {
