@@ -50,16 +50,16 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.IDBInternalException',
     'foam.mlang.predicate.True',
-    'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.Eq'
   ],
 
   imports: [
-    'async',
+    'async'
   ],
 
   constants: {
     /** Global cache of the current transaction reference. Only element 0 is used. */
-    __TXN__: [],
+    __TXN__: []
   },
 
   properties: [
@@ -93,7 +93,10 @@ foam.CLASS({
           request.onupgradeneeded = function(e) {
             var store = e.target.result.createObjectStore(self.name);
             for ( var i = 0; i < self.indicies.length; i++ ) {
-              store.createIndex(self.indicies[i][0], self.indicies[i][0], { unique: self.indicies[i][1] });
+              store.createIndex(
+                  self.indicies[i][0],
+                  self.indicies[i][0],
+                  { unique: self.indicies[i][1] });
             }
           }
 
@@ -110,7 +113,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     function deserialize(json) {
       // TODO: Better serialization, error handling
       return foam.json.parse(foam.json.parseString(json));
