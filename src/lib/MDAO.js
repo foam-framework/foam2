@@ -23,7 +23,6 @@ foam.CLASS({
   name: 'MDAO',
   label: 'Indexed DAO',
   requires: [
-    'foam.core.Array',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.ObjectNotFoundException',
@@ -92,7 +91,7 @@ foam.CLASS({
      **/
     function addUniqueIndex() {
       var index;// = this.ValueIndex.create();
-      var proto; 
+      var proto;
       var siFactory = this.ValueIndex;
 
       function makeFactory(prot, ppty, siFac) {
@@ -102,16 +101,16 @@ foam.CLASS({
             if ( args ) p.copyFrom(args);
             return p;
           }
-        } 
+        }
       }
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
 
         // TODO: the index prototype should be in the property
-        var proto = this.Array.isInstance(prop) ?
+        var proto = Array.isArray(prop) ?
           this.SetIndex  :
-          this.TreeIndex ;  
+          this.TreeIndex ;
         siFactory = makeFactory(proto, prop, siFactory);
       }
 
