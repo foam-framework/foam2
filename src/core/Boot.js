@@ -146,6 +146,7 @@ foam.LIB({
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
+        // TODO: remove ID__'s, not needed (I think)
         cls.prototype.ID__   = this.id + 'Prototype';
         cls.ID__             = this.id + 'Class';
         cls.private_         = { axiomCache: {} };
