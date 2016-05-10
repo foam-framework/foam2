@@ -20,42 +20,15 @@ foam.CLASS({
   name: 'Transform',
 
   properties: [
-    {
-      name: 'a',
-      class: 'Simple'
-    },
-    {
-      name: 'b',
-      class: 'Simple'
-    },
-    {
-      name: 'c',
-      class: 'Simple'
-    },
-    {
-      name: 'd',
-      class: 'Simple'
-    },
-    {
-      name: 'e',
-      class: 'Simple'
-    },
-    {
-      name: 'f',
-      class: 'Simple'
-    },
-    {
-      name: 'g',
-      class: 'Simple'
-    },
-    {
-      name: 'h',
-      class: 'Simple'
-    },
-    {
-      name: 'i',
-      class: 'Simple'
-    }
+    { class: 'Simple', name: 'a' },
+    { class: 'Simple', name: 'b' },
+    { class: 'Simple', name: 'c' },
+    { class: 'Simple', name: 'd' },
+    { class: 'Simple', name: 'e' },
+    { class: 'Simple', name: 'f' },
+    { class: 'Simple', name: 'g' },
+    { class: 'Simple', name: 'h' },
+    { class: 'Simple', name: 'i' }
   ],
 
   methods: [
