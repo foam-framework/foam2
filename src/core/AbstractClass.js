@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+/**
+  AbstractClass is the root of FOAM's class hierarchy.
+  The FObject Class extends AbstractClass.
+ */
 foam.LIB({
   name: 'foam.AbstractClass',
 
