@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: __context__, __subContext__
+
 /**
  * Context Support
  *
@@ -38,6 +40,7 @@
     // Temporary: gets replaced in Window.js.
     assert: function() { console.assert.apply(console, arguments); },
 
+    // TODO: add second disableException option
     /** Lookup a Model. **/
     lookup: function(id) {
       return this.__cache__[id];
