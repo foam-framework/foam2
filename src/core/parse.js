@@ -179,6 +179,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       //      this.restore.ps = this.ps;
@@ -201,6 +202,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
 //    function step(pps) {
     //      pps[0] = this.ps;
@@ -222,6 +224,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     //    function step(pps) {
     function step() {
@@ -275,6 +278,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       var str = this.s;
@@ -344,6 +348,7 @@ foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Counter',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'count',
@@ -354,6 +359,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       this.count[0]++;
@@ -363,10 +369,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'CounterStart',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       name: 'count',
@@ -377,6 +385,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       this.count[0] = 0;
@@ -386,10 +395,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'MinimumCount',
   extends: 'foam.parse.compiled.State',
+
   properties: [
     {
       class: 'Int',
@@ -401,6 +412,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       if ( this.count[0] < this.minimum ) {
@@ -412,6 +424,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -531,6 +544,7 @@ foam.CLASS({
       final: true
     }
   ],
+
   methods: [
     function step() {
       this.value.length = 0;
@@ -623,6 +637,7 @@ foam.CLASS({
         fail: fail
       })
     },
+
     function parse(ps, obj) {
       var str = this.s;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
@@ -663,6 +678,7 @@ foam.CLASS({
 
       return alt[0];
     },
+
     function parse(ps, obj) {
       // TODO(adamvy): Should we remove the obj argument in favour of
       // passing the obj along via context or something?
@@ -728,6 +744,7 @@ foam.CLASS({
         foam.parse.compiled.StartValue.create({ value: value, next: capture }) :
         capture;
     },
+
     function parse(ps, obj) {
       var ret = [];
       var args = this.args;
@@ -793,6 +810,7 @@ foam.CLASS({
 
       return capture;
     },
+
     function parse(ps, obj) {
       var ret;
       var args = this.args;
@@ -816,6 +834,7 @@ foam.CLASS({
     function compile(success, fail, withValue, grammar) {
       return this.p.compile(success, success, withValue, grammar);
     },
+
     function parse(ps, obj) {
       return this.p.parse(ps, obj) || ps.setValue(null);
     }
@@ -836,6 +855,7 @@ foam.CLASS({
         fail: fail
       });
     },
+
     function parse(ps, obj) {
       return ps.head ? ps.tail : undefined;
     }
@@ -862,6 +882,7 @@ foam.CLASS({
         fail: fail
       })
     },
+
     function parse(ps) {
       return ps.head && this.string.indexOf(ps.head) == -1 ?
         ps.tail : undefined;
@@ -953,6 +974,7 @@ foam.CLASS({
 
       return start;
     },
+
     function parse(ps, obj) {
       var ret = [];
       var p = this.p;
@@ -966,6 +988,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Repeat0',
@@ -975,6 +998,7 @@ foam.CLASS({
     function compile(success, fail, withValue, grammar) {
       return this.SUPER(success, fail, false, grammar);
     },
+
     function parse(ps, obj) {
       var res;
       var p = this.p;
@@ -983,6 +1007,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1019,6 +1044,7 @@ foam.CLASS({
       capture.next = delegate;
       return capture;
     },
+
     function parse(ps, obj) {
       return this.p.parse(ps, obj) ?
         undefined :
@@ -1045,6 +1071,7 @@ foam.CLASS({
       });
       return this.p.compile(success, fail, true, grammar);
     },
+
     function parse(ps, obj) {
       ps = this.p.parse(ps, obj);
       return ps ?
@@ -1053,6 +1080,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1129,6 +1157,7 @@ foam.CLASS({
 
       return compiled;
     },
+
     function parse(ps, grammar) {
       var p = grammar.getSymbol(this.name);
       if ( ! p ) {
@@ -1227,12 +1256,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'PSymbol',
 
   properties: [ 'name', 'parser' ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1320,21 +1351,25 @@ foam.CLASS({
       var fail = this.finish_fail;
       return this.parse(this.ps, state, success, fail);
     },
+
     function parse(ps, state, success, fail) {
       while ( state != success && state != fail ) {
         state = state.step();
       }
       if ( state == success ) return state.ps.value;
     },
+
     function getSymbol(name) {
       return this.symbolMap_[name].parser;
     },
+
     function addActions(map) {
       for ( var key in map ) {
         this.addAction(key, map[key]);
       }
       return this;
     },
+
     function addAction(name, action) {
       for ( var i = 0 ; i < this.symbols.length ; i++ ) {
         if ( this.symbols[i].name == name ) {
@@ -1352,10 +1387,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'ImperativeGrammar',
   extends: 'foam.parse.Grammar',
+
   methods: [
     function parseString(str, opt_name) {
       opt_name = opt_name || 'START';
