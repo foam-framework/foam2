@@ -218,7 +218,7 @@ foam.CLASS({
     'foam.dao.ArrayDAO',
     'foam.apps.chat.Message'
   ],
-  imports: [ 'isSafari' ],
+  imports: [ 'isSafari', 'connected' ],
   properties: [
     {
       name: 'channel',
@@ -237,6 +237,7 @@ foam.CLASS({
         dao.of = this.Message;
         dao.timestampProperty = this.Message.SYNC_NO;
         dao.apppath = 'https://glaring-torch-184.firebaseio.com/';
+        dao.connected$.link(this.connected$);
 
         if ( this.auth ) {
           dao.secret = auth;
@@ -275,12 +276,17 @@ foam.CLASS({
   requires: [
     'foam.apps.chat.MessageDAO'
   ],
-  exports: [ 'isSafari' ],
+  exports: [ 'isSafari', 'connected' ],
   properties: [
     {
       class: 'Boolean',
       name: 'isSafari',
       value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'connected',
+      value: true
     },
     {
       name: 'messageDAO',
