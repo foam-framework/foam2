@@ -192,6 +192,41 @@ foam.AbstractClass.validate = function() {
 }
 
 
+// Change 'false' to 'true' to enable error reporting for setting
+// non-Properties on FObjects.
+if ( false && Proxy ) {
+  (function() {
+
+    var IGNORE = {
+      'SUPER': true,
+      'obj': true,
+      'private_': true,
+      'prop': true,
+      'slotName_': true,
+      'sourceCls_': true,
+      'value': true
+    };
+
+    var oldCreate = foam.AbstractClass.create;
+
+    foam.AbstractClass.create = function(args, X) {
+      return new Proxy(oldCreate.call(this, args, X), {
+        get: function(target, prop, receiver) {
+          return target[prop];
+        },
+        set: function(target, prop, value, receiver) {
+          foam.X.assert(
+              IGNORE[prop] || target.cls_.getAxiomByName(prop),
+              'Invalid Set: ', target.cls_.id, prop, value);
+          target[prop] = value;
+          return true;
+        }
+      });
+    };
+  })();
+}
+
+
 /* Add describe() support to objects. */
 foam.CLASS({
   refines: 'foam.core.FObject',
