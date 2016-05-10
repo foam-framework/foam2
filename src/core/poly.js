@@ -27,6 +27,7 @@ if ( ! Array.from ) {
 }
 
 if ( ! String.prototype.endsWith ) {
+  // Official polyfill
   String.prototype.endsWith = function(searchString, position) {
       var subjectString = this.toString();
       if ( typeof position !== 'number' ||
