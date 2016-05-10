@@ -37,6 +37,8 @@
   6. It makes the future implementation of multi-methods much easier.
 */
 
+// TODO: document interface
+
 foam.LIB({
   name: 'foam.Undefined',
   methods: [
@@ -157,9 +159,13 @@ foam.LIB({
 
     function argsStr(f) {
       /** Finds the function(...) declaration arguments part. Strips newlines. */
-      return f.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+      return f.
+          toString().
+          replace(/(\r\n|\n|\r)/gm,"").
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
+    // TODO: rename to ???
     function argsArray(f) {
       /**
        * Return a function's arguments as an array.
@@ -239,7 +245,9 @@ foam.LIB({
     function is(o) { return typeof o === 'number'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0; },
+    function compare(a, b) {
+      return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+    },
     function hashCode(n) { return n & n; }
   ]
 });
@@ -266,7 +274,8 @@ foam.LIB({
     {
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
-        // switchFromCamelCaseToConstantFormat to SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
+        // switchFromCamelCaseToConstantFormat to
+        // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
         return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
           return a.substring(0,1) + '_' + a.substring(1,2);
         }).toUpperCase();
@@ -450,7 +459,8 @@ foam.LIB({
   ]
 });
 
-
+// TODO: doc
+// TODO?: rename
 foam.typeOf = (function() {
   var
     tNumber    = foam.Number,
@@ -490,7 +500,9 @@ foam.mmethod = function(map) {
   return function(arg1) {
     var type = foam.typeOf(arg1);
     console.assert(type, 'Unknown type: ', arg1);
-    console.assert(type[uid], 'Missing multi-method for type ', arg1, ' map: ', map);
+    console.assert(
+        type[uid],
+        'Missing multi-method for type ', arg1, ' map: ', map);
     return type[uid].apply(this, arguments);
   };
 };
