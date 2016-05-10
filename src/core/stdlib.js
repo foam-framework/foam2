@@ -37,7 +37,31 @@
   6. It makes the future implementation of multi-methods much easier.
 */
 
-// TODO: document interface
+/**
+ * Each of these flyweight types follows a standard interface.
+ *
+ * <pre>
+ * interface Type {
+ *   // Returns true if the given object is of this type.
+ *   // example: foam.String.is('hello') -> true
+ *   is(o) -> Boolean
+ *
+ *   // Returns a deep clone of o, if the type supports it.
+ *   clone(o);
+ *
+ *   // Returns true if a and b are equivalent.
+ *   equals(a, b) -> Boolean
+ *
+ *   // Returns -1, 0 or 1 as a comparsion of the two types.
+ *   // -1 means that 'a' is considered smaller that 'b'
+ *   // 0 means that and 'a' and 'b' are considered equivalent
+ *   // 1 means that 'a' is considered larger than 'b'
+ *   compare(a, b) -> Int
+ *
+ *   // Returns a hash of 'a' useful for hash tables
+ *   hashCode(a) -> Int
+ * }
+ */
 
 foam.LIB({
   name: 'foam.Undefined',
