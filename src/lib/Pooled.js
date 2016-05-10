@@ -81,15 +81,18 @@ foam.CLASS({
 
           this.SUPER.apply(this, arguments);
 
+          this.private_ = priv_;
+          this.instance_ = inst_;
+
           if ( typeof this.pooledDestroy === 'function' ) {
-            this.instance_ = inst_;
-            this.private_ = priv_;
             this.pooledDestroy();
           } else {
             for ( var ikey in inst_ ) delete inst_[ikey];
+          }
+          // pooledDestroy can clear out private, or leave it
+          if ( this.private_ ) {
+            // clear out private, including context and destructors
             for ( var pkey in priv_ ) delete priv_[pkey];
-            this.instance_ = inst_;
-            this.private_ = priv_;
           }
 
           // return to pool
