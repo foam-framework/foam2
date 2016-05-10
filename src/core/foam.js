@@ -91,7 +91,6 @@
     "Action",
     "../lib/Promise",
     "../lib/Timer",
-    "../lib/Promise",
     [ "../lib/graphics", ! isServer ],
     "../lib/dao",
     "../lib/mlang",
