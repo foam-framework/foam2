@@ -275,7 +275,7 @@ foam.CLASS({
       return 'hsl(' + h + ',' + s + '%,' + l + '%)';
     },
 
-    // TODO: Replace with toE() when/if ready.
+    // FUTURE: Replace with toE() when/if ready.
     function toHTML() {
       return this.Canvas.create({
         width: this.x + this.width || this.r * 2,
