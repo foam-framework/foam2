@@ -496,7 +496,7 @@ foam.mmethod = function(map) {
 };
 
 
-( function() {
+(function() {
   var typeOf = foam.typeOf;
 
   foam.LIB({
@@ -510,4 +510,4 @@ foam.mmethod = function(map) {
       function diff(a, b)    { return typeOf(a).diff(a, b); }
     ]
   });
-} )();
+})();
