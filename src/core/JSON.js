@@ -19,7 +19,6 @@
 // JSON Support
 //
 // TODO:
-//   - add Context Support for parsing
 //   - don't output default classes
 //   - don't output transient properties
 //   - pretty printing
@@ -95,6 +94,7 @@ foam.CLASS({
       value: ' '
     },
     {
+// TODO: doc
       class: 'Boolean',
       name: 'alwaysQuoteKeys',
       value: false
@@ -147,6 +147,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'strict',
+      // TODO: change to true by default
       value: false,
       postSet: function(_, s) {
         if ( s ) {
@@ -195,6 +196,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: doc
     function start(c) {
       if ( c ) this.out(c).nl();
       if ( this.indentStr ) {
