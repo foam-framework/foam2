@@ -25,6 +25,11 @@ foam.CLASS({
     'secret',
     'eventSource_',
     {
+      class: 'Boolean',
+      name: 'connected',
+      value: false
+    },
+    {
       name: 'timestampProperty'
     },
     {
@@ -156,6 +161,8 @@ foam.CLASS({
       this.eventSource_ = this.EventSource.create({
         uri: uri
       });
+
+      this.eventSource_.connected$.link(this.connected$);
 
       this.eventSource_.message.put.sub(this.onPut);
       this.eventSource_.message.patch.sub(this.onPatch);
