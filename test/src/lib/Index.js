@@ -18,8 +18,8 @@
 
 describe('MDAO TreeIndex', function() {
 
-  var NUM_ALBUMS = 100;
-  var NUM_PHOTOS = 1000;
+  var NUM_ALBUMS = 10;
+  var NUM_PHOTOS = 100;
 
   foam.CLASS({
     package: 'test',
@@ -98,9 +98,9 @@ describe('MDAO TreeIndex', function() {
   var M = foam.mlang.Expressions.create();
 
   var KEYS_10 = makeMultiPartKeys(1);
-  var KEYS_100 = makeMultiPartKeys(10);
-  var KEYS_1000 = makeMultiPartKeys(100);
-  var KEYS_5000 = makeMultiPartKeys(1000);
+  var KEYS_100 = makeMultiPartKeys(2);
+  var KEYS_1000 = makeMultiPartKeys(10);
+  var KEYS_5000 = makeMultiPartKeys(100);
 
   beforeEach(function(done) {
     PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
@@ -268,10 +268,10 @@ describe('MDAO TreeIndex', function() {
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .limit(countSink.value - 20)
+      .limit(countSink.value - 5)
       .select(asink).then(function() {
         var a = asink.a;
-        expect(a.length).toEqual(countSink.value - 20);
+        expect(a.length).toEqual(countSink.value - 5);
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
@@ -296,10 +296,10 @@ describe('MDAO TreeIndex', function() {
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .skip(countSink.value - 10) // skip all but 10
+      .skip(countSink.value - 5) // skip all but 5
       .select(asink).then(function() {
         var a = asink.a;
-        expect(a.length).toEqual(10);
+        expect(a.length).toEqual(5);
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
