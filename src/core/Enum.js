@@ -18,14 +18,108 @@
 /*
 TODO(adamvy):
 - Only serialize the ordinal?
-- Make all properties final?
+- Freeze the instances?
 - Better documentation
 */
 
 /**
  * For those familiar with Java, FOAM Enums are very similar to Java enums in design.
  *
- * An Enum is essentially a class with a fixed number of named instances.
+ * An Enum is essentially a class with a fixed number of named instances.  The instances
+ * are frequently referred to as the 'values' of the Enum.
+ *
+ * Enums have most of the features available to FOAM classes, including properties, methods,
+ * constants, templates, and listeners.
+ *
+ * Enums extend from FObject, so they inherit FObject features such as pub/sub events,
+ * diffing, hashCode, etc.
+ *
+ * Enums also have a few built-in properties by default.  Every Enum has an 'ordinal'
+ * property, which is a integer unique to all the values of a a particular Enum.  Each
+ * enum also has a 'name' property, which is the name given to each Enum value.
+ *
+ *
+ * Example usage:
+ * <pre>
+ * foam.ENUM({
+ *   name: 'IssueStatus',
+ *   properties: [
+ *     {
+ *       name: 'label'
+ *     }
+ *   ],
+ *   methods: [
+ *     function foo() {
+ *       return 'Label is ' + this.label;
+ *     }
+ *   ],
+ *
+ *   // Defines all the actualy enum values.
+ *   values: [
+ *     {
+ *       name: 'OPEN',
+ *       values: {
+ *         label: 'Open'
+ *       }
+ *     },
+ *     {
+ *       name: 'CLOSED',
+ *       // The ordinal can be specified explicitly.enu
+ *       ordinal: 100,
+ *       values: {
+ *         label: 'Closed'
+ *       }
+ *     },
+ *     {
+ *       name: 'ASSIGNED',
+ *       values: {
+ *         label: 'Assigned'
+ *       }
+ *     }
+ *   ]
+ * });
+ *
+ * console.log(IssueStatus.OPEN.label); // outputs "Open"
+ * console.log(IssueStatus.ASSIGNED.foo()); // outputs "Label is Assigned"
+ *
+ * // Enum value ordinals can be specified.
+ * console.log(IssueStatus.CLOSED.ordinal); // outputs 100
+ * // values without specified ordinals get auto assigned.
+ * console.log(IssueStatus.ASSIGNED.ordinal); // outputs 101
+ *
+ *
+ * // To store enums on a class, it is recommended to use the Enum property
+ * // type.
+ * foam.CLASS({
+ *   name: 'Issue',
+ *   properties: [
+ *     {
+ *       class: 'Enum',
+ *       of: 'Status',
+ *       name: 'status'
+ *     }
+ *   ]
+ * });
+ *
+ * var issue = Issue.create({ status: IssueStatus.OPEN });
+ * console.log(issue.status.label); // outputs "Open"
+ *
+ * // Enum properties give you some convenient adapting.
+ * // You can set the property to the ordinal or the
+ * // name of an enum, and it will set the property
+ * // to the correct Enum value.
+ *
+ * issue.status = 100;
+ *
+ * issue.status === IssueStatus.OPEN; // is true
+ *
+ * // Enum properties also allow you to assign them via the name
+ * // of the enum.
+ *
+ * issue.status = "ASSIGNED"
+ *
+ * issue.status === IssueStatus.ASSIGNED; // is true
+ * </pre>
  */
 
 foam.CLASS({
