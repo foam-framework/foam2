@@ -277,9 +277,15 @@ angular.module('foam').directive('foamDetails', [ '$compile',
     transclude: true,
     link: function(scope, element, attrs, _, $transclude) {
       var lastClass;
+      var subscope;
       var maybeRebuild = function maybeRebuild(obj) {
         // We only need to rebuild the view if the model has changed.
-        if ( ! obj || (lastClass && obj.cls_ === lastClass) ) return;
+        if ( ! obj ) return;
+
+        if ( lastClass && obj.cls_ === lastClass ) {
+          subscope.object = obj;
+          return;
+        }
 
         lastClass = obj.cls_;
         var props = obj.cls_.getAxiomsByClass(foam.core.Property);
@@ -314,7 +320,6 @@ angular.module('foam').directive('foamDetails', [ '$compile',
           }
         }
 
-        var subscope;
         $transclude(function(_, innerScope) {
           if ( subscope ) subscope.$destroy();
           subscope = innerScope.$new();
