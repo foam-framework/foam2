@@ -130,12 +130,44 @@ foam.CLASS({
     {
       class: 'AxiomArray',
       of: 'foam.core.Property',
-      name: 'properties'
+      name: 'properties',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var p = foam.core.Property.create();
+          p.name = o;
+          return p;
+        }
+
+        if ( Array.isArray(o) ) {
+          var p = foam.core.Property.create();
+          p.name  = o[0];
+          p.value = o[1];
+          return p;
+        }
+
+        if ( o.class ) {
+          var m = foam.lookup(o.class);
+          if ( ! m ) throw 'Unknown class : ' + o.class;
+          return m.create(o);
+        }
+
+        return foam.core.Property.create(o);
+      }
     },
     {
       class: 'AxiomArray',
       of: 'foam.core.Method',
-      name: 'methods'
+      name: 'methods',
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'function' ) {
+          console.assert(o.name, 'Method must be named');
+          var m = foam.core.Method.create();
+          m.name = o.name;
+          m.code = o;
+          return m;
+        }
+        return foam.core.Method.create(o);
+      }
     },
     {
       class: 'AxiomArray',
@@ -144,13 +176,32 @@ foam.CLASS({
     },
     {
       class: 'AxiomArray',
+      of: 'foam.core.Listener',
+      name: 'listeners'
+    },
+    {
+      class: 'AxiomArray',
+      of: 'foam.core.Action',
+      name: 'actions'
+    },
+    {
+      class: 'AxiomArray',
       of: 'foam.core.internal.EnumValue',
       name: 'values',
       preSet: function(_, v) {
+        var used = {};
+
         var next = 0;
         for ( var i = 0 ; i < v.length ; i++ ) {
           if ( ! v[i].hasOwnProperty('ordinal') ) v[i].ordinal = next++;
           else next = v[i].ordinal + 1;
+          this.assert(
+            ! used[v[i].ordinal],
+            this.id,
+            'Enum error: duplicate ordinal found', v[i].name,
+            used[v[i].ordinal], 'both have an ordinal of', v[i].ordinal);
+
+          used[v[i].ordinal] = v[i].name;
         }
 
         return v;
