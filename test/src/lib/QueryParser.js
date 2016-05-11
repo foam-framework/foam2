@@ -16,7 +16,7 @@
  */
 
 describe('Query parser', function() {
-  var Item = foam.core.Model.create({
+  foam.CLASS({
     package: 'test.query',
     name: 'Item',
     properties: [
@@ -42,7 +42,9 @@ describe('Query parser', function() {
         name: 'optional'
       }
     ]
-  }).buildClass();
+  });
+
+  var Item = foam.lookup('test.query.Item');
 
   var dao = foam.dao.ArrayDAO.create({
     of: Item
@@ -77,7 +79,7 @@ describe('Query parser', function() {
     timestamp: new Date(2016, 0, 26)
   }));
 
-  var parser = foam.parse.QueryParser.create().parserFor(Item);
+  var parser = foam.parse.QueryParser.create({ of: 'test.query.Item' });
 
   var expectMatches = function(expected) {
     return function(actual) {
