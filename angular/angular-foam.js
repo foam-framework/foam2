@@ -274,7 +274,8 @@ angular.module('foam').directive('foamDetails', [ '$compile',
     scope: {
       object: '<foamDetails'
     },
-    link: function(scope, element, attrs) {
+    transclude: true,
+    link: function(scope, element, attrs, _, $transclude) {
       var lastClass;
       var maybeRebuild = function maybeRebuild(obj) {
         // We only need to rebuild the view if the model has changed.
@@ -308,9 +309,15 @@ angular.module('foam').directive('foamDetails', [ '$compile',
           }
         }
 
-        element.empty();
-        element.append(html);
-        $compile(element.contents())(scope);
+        var subscope;
+        $transclude(function(_, innerScope) {
+          if ( subscope ) subscope.$destroy();
+          subscope = innerScope.$new();
+          subscope.object = scope.object;
+          element.empty();
+          element.append(html);
+          $compile(element.contents())(subscope);
+        });
       };
 
       scope.$watch('object', function(nu) {
