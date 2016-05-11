@@ -18,8 +18,15 @@
 /*
 TODO(adamvy):
 - Only serialize the ordinal?
-- Make all properties final ?
+- Make all properties final?
+- Better documentation
 */
+
+/**
+ * For those familiar with Java, FOAM Enums are very similar to Java enums in design.
+ *
+ * An Enum is essentially a class with a fixed number of named instances.
+ */
 
 foam.CLASS({
   package: 'foam.core.internal',
@@ -51,18 +58,7 @@ foam.CLASS({
         {
           configurable: true,
           get: function() {
-            var value = cls.create({ ordinal: ordinal });
-
-            Object.defineProperty(
-              cls,
-              name,
-              {
-                value: value,
-                writable: false,
-                configurable: false
-              });
-
-            return value;
+            return cls.create({ ordinal: ordinal });
           }
         });
     },
@@ -92,6 +88,10 @@ foam.CLASS({
 
               cls.create = function(args, X) {
                 var key = args.ordinal;
+
+                // Short-circuit if we already create the instance for this ordinal.
+                if ( instances[key] ) return instances[key];
+
                 var values = cls.model_.values.find(function(o) {
                   return o.ordinal === key;
                 });
@@ -100,7 +100,7 @@ foam.CLASS({
                 values = values.values;
                 values.ordinal = key;
 
-                return instances[key] || ( instances[key] = oldCreate.call(this, values, X) );
+                return instances[key] = oldCreate.call(this, values, X);
               };
             }
           }
@@ -198,7 +198,6 @@ foam.CLASS({
     [
       'adapt',
       function(old, nu, prop) {
-        console.log("Adapt", nu);
         var type = foam.typeOf(nu);
         if ( type === foam.FObject ) {
           return nu;
@@ -207,7 +206,6 @@ foam.CLASS({
         var e = this.X.lookup(prop.of);
 
         if ( type === foam.String ) {
-          console.log('Converting from string', nu);
           return e[nu];
         } else if ( type === foam.Number ) {
           return e.create({ ordinal: nu });
