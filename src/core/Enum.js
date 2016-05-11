@@ -80,6 +80,10 @@ foam.CLASS({
             name: 'ordinal',
             final: true
           }),
+          foam.core.String.create({
+            name: 'name',
+            final: true
+          }),
           {
             name: 'enum_create',
             installInClass: function(cls) {
@@ -92,15 +96,16 @@ foam.CLASS({
                 // Short-circuit if we already create the instance for this ordinal.
                 if ( instances[key] ) return instances[key];
 
-                var values = cls.model_.values.find(function(o) {
+                var enumValue = cls.model_.values.find(function(o) {
                   return o.ordinal === key;
                 });
 
-                foam.X.assert(values, 'No enum value found with ordinal', key);
-                values = values.values;
-                values.ordinal = key;
+                foam.X.assert(enumValue, 'No enum value found with ordinal', key);
+                var args = enumValue.values;
+                args.ordinal = key;
+                args.name = enumValue.name;
 
-                return instances[key] = oldCreate.call(this, values, X);
+                return instances[key] = oldCreate.call(this, args, X);
               };
             }
           }
