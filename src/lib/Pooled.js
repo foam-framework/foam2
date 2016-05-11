@@ -23,6 +23,7 @@ foam.CLASS({
   name: 'Pooled',
   axioms: [ foam.pattern.Singleton.create() ],
   requires: [ 'foam.core.Method' ],
+  imports: [ 'assert' ],
 
   properties: [
     {
@@ -42,6 +43,7 @@ foam.CLASS({
     function installInClass(cls) {
       // Keeping the object pools in an accessible location allows them
       // to be cleared out.
+      var ax = this;
       this.pooledClasses[cls] = true;
 
       if ( ! cls.__objectPool__ ) cls.__objectPool__ = [];
@@ -65,10 +67,12 @@ foam.CLASS({
         return nu;
       }
 
+      // TODO: ordering matters here. User defined destroy() should override.
+      // Or just have the user define reset() or pooledDestroy() instead?
       cls.installAxiom(this.Method.create({
         name: 'destroy',
         code: function() {
-          if ( this.destroyed ) return;
+          if ( this.isDestroyed() || this.instance_.destroying_ ) return;
 
           // Run destroy process on the object, but leave its privates empty but intact
           // to avoid reallocating them
@@ -77,13 +81,23 @@ foam.CLASS({
 
           this.SUPER.apply(this, arguments);
 
-          for ( var ikey in inst_ ) delete inst_[ikey];
-          for ( var pkey in priv_ ) delete priv_[pkey];
-          this.instance_ = inst_;
           this.private_ = priv_;
+          this.instance_ = inst_;
 
-          // put the empty husk into the pool
+          if ( typeof this.pooledDestroy === 'function' ) {
+            this.pooledDestroy();
+          } else {
+            // by default, clear out instance_ and private_
+            for ( var ikey in inst_ ) delete inst_[ikey];
+            for ( var pkey in priv_ ) delete priv_[pkey];
+          }
+
+          // return to pool
           this.cls_.__objectPool__.push(this);
+          // ensure we don't retain the destroying_ indicator
+          if ( this.instance_ && this.instance_.destroying_ ) {
+            delete this.instance_.destroying_;
+          }
         }
       }));
     }
