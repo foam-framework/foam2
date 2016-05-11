@@ -101,7 +101,7 @@ describe('pattern.Pooled', function() {
     expect(p.b).toEqual(99);
     var called = 0;
     p.onDestroy(function() { called += 1; });
-    p.destroy();
+    p.destroy(); // runs destructors, pooledDestroy() doesn't clear them
 
     p = test.PooledDestroyClass.create();
     expect(called).toEqual(1);
@@ -110,12 +110,11 @@ describe('pattern.Pooled', function() {
 
     p.a = 88;
     p.b = 33;
-    p.destroy();
+    p.destroy(); // the destructors from last time are still there
     p = test.PooledDestroyClass.create();
     expect(called).toEqual(2);
     expect(p.a).toEqual(0);
     expect(p.b).toEqual(6);
-
   });
 
 });

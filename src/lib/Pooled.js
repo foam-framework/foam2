@@ -87,11 +87,8 @@ foam.CLASS({
           if ( typeof this.pooledDestroy === 'function' ) {
             this.pooledDestroy();
           } else {
+            // by default, clear out instance_ and private_
             for ( var ikey in inst_ ) delete inst_[ikey];
-          }
-          // pooledDestroy can clear out private, or leave it
-          if ( this.private_ ) {
-            // clear out private, including context and destructors
             for ( var pkey in priv_ ) delete priv_[pkey];
           }
 
