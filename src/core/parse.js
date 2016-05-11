@@ -275,12 +275,12 @@ foam.CLASS({
       var str = this.s;
       var ps = this.ps;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
+        if ( str.charAt(i) !== ps.head.toLowerCase() ) {
           this.fail.ps = this.ps;
           return this.fail;
         }
       }
-      this.success.ps = ps.setValue(this.value || this.s);
+      this.success.ps = ps.setValue(this.value || str);
       return this.success;
     }
   ]
@@ -317,7 +317,7 @@ foam.CLASS({
       var str = this.lower;
       var ps = this.ps;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
+        if ( str.charAt(i) !== ps.head.toLowerCase() ) {
           this.fail.ps = this.ps;
           return this.fail;
         }
@@ -346,7 +346,7 @@ foam.CLASS({
       var ps = this.ps;
       var str = this.s;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head || str.charAt(i) !== ps.head ) {
+        if ( str.charAt(i) !== ps.head ) {
           this.fail.ps = ps1;
           return this.fail;
         }
@@ -731,11 +731,11 @@ foam.CLASS({
     function parse(ps) {
       var str = this.s;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
-        if ( ! ps.head || str.charAt(i) !== ps.head ) {
+        if ( str.charAt(i) !== ps.head ) {
           return undefined;
         }
       }
-      return ps.setValue(this.value !== undefined ? this.value : this.s);
+      return ps.setValue(this.value !== undefined ? this.value : str);
     }
   ]
 });
