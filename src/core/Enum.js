@@ -26,7 +26,7 @@ TODO(adamvy):
  * For those familiar with Java, FOAM Enums are very similar to Java enums in design.
  *
  * An Enum is essentially a class with a fixed number of named instances.  The instances
- * are frequently referred to as the 'values' of the Enum.
+ * are frequently referred to as Enum Values, or the 'values' of an Enum.
  *
  * Enums have most of the features available to FOAM classes, including properties, methods,
  * constants, templates, and listeners.
@@ -35,14 +35,18 @@ TODO(adamvy):
  * diffing, hashCode, etc.
  *
  * Enums also have a few built-in properties by default.  Every Enum has an 'ordinal'
- * property, which is a integer unique to all the values of a a particular Enum.  Each
- * enum also has a 'name' property, which is the name given to each Enum value.
+ * property, which is a integer unique to all the Enum Values of a a particular Enum.  Each
+ * enum also has a 'name' property, which is the name given to each Enum Value.
  *
  *
  * Example usage:
  * <pre>
+ * // To define an enum we use the foam.ENUM() function.
  * foam.ENUM({
  *   name: 'IssueStatus',
+ *
+ *   // Enums share many features with regular classes, the properties
+ *   // and methods we want our enums to have are defined as follows.
  *   properties: [
  *     {
  *       name: 'label'
@@ -54,23 +58,27 @@ TODO(adamvy):
  *     }
  *   ],
  *
- *   // Defines all the actualy enum values.
+ *   // Use the values: key to define the actual Enum Values that we want to exist.
  *   values: [
  *     {
  *       name: 'OPEN',
+ *       // Use an inner values: map to define the values we want to assign
+ *       // to the properties of the enum for this specific Enum Value.
  *       values: {
  *         label: 'Open'
  *       }
  *     },
  *     {
  *       name: 'CLOSED',
- *       // The ordinal can be specified explicitly.enu
+ *       // The ordinal can be specified explicitly.
  *       ordinal: 100,
  *       values: {
  *         label: 'Closed'
  *       }
  *     },
  *     {
+ *       // If the ordinal isn't given explicitly it is auto assigned as the previous
+ *       // ordinal + 1
  *       name: 'ASSIGNED',
  *       values: {
  *         label: 'Assigned'
