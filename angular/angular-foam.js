@@ -303,6 +303,12 @@ angular.module('foam').directive('foamDetails', [ '$compile',
           if ( foam.core.Boolean.isInstance(prop) ) {
             html += '<md-checkbox ng-model="object.' + prop.name + '">' +
                 prop.label + '</md-checkbox>';
+          } else if ( foam.core.StringArray.isInstance(prop) ) {
+            html += '<md-input-container><label>' + prop.label + '</label>' +
+                '<md-chips ng-model="object.' + prop.name + '" ' +
+                'md-on-add="onPropertyChange(\'' + prop.name + '\')" ' +
+                'md-on-remove="onPropertyChange(\'' + prop.name + '\')" ' +
+                '></md-chips></md-input-container>';
           } else {
             var type = 'text';
             if ( foam.core.Int.isInstance(prop) ||
@@ -320,10 +326,15 @@ angular.module('foam').directive('foamDetails', [ '$compile',
           }
         }
 
+        var onPropertyChange = function onPropertyChange(name) {
+          scope.object.propertyChange.pub(name, scope.object[name]);
+        };
+
         $transclude(function(_, innerScope) {
           if ( subscope ) subscope.$destroy();
           subscope = innerScope.$new();
           subscope.object = scope.object;
+          subscope.onPropertyChange = onPropertyChange;
           element.empty();
           element.append(html);
           $compile(element.contents())(subscope);
