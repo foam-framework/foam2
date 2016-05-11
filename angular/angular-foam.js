@@ -28,7 +28,7 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
     scope: {
       // TODO: Make these one-way reactive bindings, probably.
       // Except for "as", that should just be a string.
-      key: '<foamView',
+      key: '=foamView',
       dao: '<foamDao',
       as: '@foamAs',
       delay: '@foamDelay'
@@ -56,6 +56,12 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
             initialStart();
           } else if ( obj.id === $scope.key ) {
             hookUpObject(obj);
+          }
+        });
+
+        innerScope.$watch(as, function(nu, old) {
+          if ( nu && nu.id !== (old && old.id) ) {
+            $scope.key = nu.id;
           }
         });
       }
