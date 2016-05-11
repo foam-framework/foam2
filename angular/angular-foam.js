@@ -288,6 +288,11 @@ angular.module('foam').directive('foamDetails', [ '$compile',
           var prop = props[i];
           if ( prop.hidden ) continue;
 
+          if ( prop.ngTemplate ) {
+            html += prop.ngTemplate;
+            continue;
+          }
+
           // Otherwise we dispatch on the type of the property.
           if ( foam.core.Boolean.isInstance(prop) ) {
             html += '<md-checkbox ng-model="object.' + prop.name + '">' +
