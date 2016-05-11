@@ -133,6 +133,7 @@ foam.CLASS({
 });
 
 
+// FUTURE: to be used by or replaced by Relationship axiom
 foam.CLASS({
   package: 'foam.core',
   name: 'Reference',
@@ -153,16 +154,6 @@ foam.CLASS({
       // documentation: 'The name of the key (a property of the other object) that this property references.'
     }
   ],
-
-  methods: [
-    function installInProto(proto) {
-      this.SUPER(proto);
-
-      // TODO(js): expression to produce the actual value referenced by
-      // this property? or method installed on the host?
-
-    }
-  ]
 });
 
 
