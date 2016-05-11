@@ -82,6 +82,7 @@
     "IDSupport",
     "Requires",
     "Slot",
+    "Enum",
     "Window",
     "debug",
     "patterns",
