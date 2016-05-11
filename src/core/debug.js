@@ -88,7 +88,10 @@ foam.CLASS({
         var e = es[i];
         for ( var j = 0 ; j < e.length ; j++ ) {
           if ( this[e[0]] && this.hasOwnProperty(e[1][j]) ) {
-            console.warn('Property ' + mName + this.name + ' "' + e[1][j] + '" hidden by "' + e[0] + '"');
+            console.warn(
+                'Property ' + mName +
+                this.name + ' "' + e[1][j] +
+                '" hidden by "' + e[0] + '"');
           }
         }
       }
@@ -118,7 +121,10 @@ foam.CLASS({
 });
 
 
-foam.X.assert(! foam.AbstractClass.describe, 'foam.AbstractClass.describe already set.');
+foam.X.assert(
+    ! foam.AbstractClass.describe,
+    'foam.AbstractClass.describe already set.');
+
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
@@ -258,12 +264,16 @@ foam.CLASS({
 /* Add describe support to contexts. */
 foam.X = foam.X.subContext({
   describe: function() {
-    this.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
+    this.log(
+        'Context:',
+        this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
     this.log('KEY                  Type           Value');
     this.log('----------------------------------------------------');
     for ( var key in this ) {
       var value = this[key];
-      var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
+      var type = foam.core.FObject.isInstance(value) ?
+          value.cls_.name :
+          typeof value    ;
       this.log(
         foam.String.pad(key,  20),
         foam.String.pad(type, 14),
@@ -277,7 +287,8 @@ foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
 
-  // documentation: 'Decorated merged() and framed() to have debug friendly toString() methods.',
+  // documentation: 'Decorated merged() and framed() to have debug friendly
+  // toString() methods.',
 
   exports: [ 'merged', 'framed' ],
 
@@ -318,7 +329,10 @@ foam.CLASS({
       name: 'name'
     },
     {
-      /** The string name of the type (either a model name or javascript typeof name) */
+      /**
+        The string name of the type
+        (either a model name or javascript typeof name)
+      */
       name: 'typeName'
     },
     {
@@ -346,26 +360,34 @@ foam.CLASS({
      */
     function validate(/* any // the argument value to validate. */ arg) {
       i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
+
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
         if ( ! this.optional ) {
-          throw new TypeError(this.PREFIX + i + this.name + ', is not optional, but was undefined in a function call');
+          throw new TypeError(
+              this.PREFIX + i + this.name +
+              ', is not optional, but was undefined in a function call');
         } else {
           return; // value is undefined, but ok with that
         }
       }
+
       // type this for non-modelled types (no model, but a type name specified)
       if ( ! this.type ) {
         if ( this.typeName
             && typeof arg !== this.typeName
             && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
-          throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
+          throw new TypeError(
+              this.PREFIX + i + this.name +
+              ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
         if ( ! this.type.isInstance(arg) ) {
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
-          throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + gotType);
+          throw new TypeError(
+              this.PREFIX + i + this.name +
+              ', expected type ' + this.typeName + ' but passed ' + gotType);
         }
       }
     }
@@ -392,8 +414,8 @@ foam.LIB({
   methods: [
     function getFunctionArgs(fn) {
       /** Extracts the arguments and their types from the given function.
-        * @arg fn The function to extract from. The toString() of the function must be
-        *     accurate.
+        * @arg fn The function to extract from. The toString() of the function
+        *     must be accurate.
         * @return An array of Argument objects.
         */
       // strip newlines and find the function(...) declaration
@@ -403,7 +425,8 @@ foam.LIB({
 
       var ret = [];
       // check each arg for types
-      // Optional commented type(incl. dots for packages), argument name, optional commented return type
+      // Optional commented type(incl. dots for packages), argument name,
+      // optional commented return type
       // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
       //console.log('-----------------');
       var argIdx = 0;
@@ -415,7 +438,8 @@ foam.LIB({
 
         if ( ret.returnType ) {
           throw new SyntaxError("foam.types.getFunctionArgs return type '" +
-            ret.returnType.typeName + "' must appear after the last argument only: " + args.toString());
+            ret.returnType.typeName +
+            "' must appear after the last argument only: " + args.toString());
         }
 
         // record the argument
@@ -445,7 +469,9 @@ foam.LIB({
             type: global[typeMatch[1]]
           });
         } else {
-          throw new SyntaxError("foam.types.getFunctionArgs argument parsing error: " + args.toString());
+          throw new SyntaxError(
+              'foam.types.getFunctionArgs argument parsing error: ' +
+              args.toString());
         }
       }
 
@@ -457,7 +483,8 @@ foam.LIB({
       * <code>function(\/\*TypeA\*\/ argA, \/\*string\*\/ argB) { ... }</code>
       * Types are either the names of Models (i.e. declared with CLASS), or
       * javascript primitives as returned by 'typeof'. In addition, 'array'
-      * is supported as a special case, corresponding to an Array.isArray() check.
+      * is supported as a special case, corresponding to an Array.isArray()
+      * check.
       * @fn The function to decorate. The toString() of the function must be
       *     accurate.
       * @return A new function that will throw errors if arguments
@@ -468,8 +495,8 @@ foam.LIB({
       // parse out the arguments and their types
       var args = foam.types.getFunctionArgs(fn);
       var ret = function() {
-        // check each declared argument, arguments[i] can be undefined for missing optional args,
-        // extra arguments are ok
+        // check each declared argument, arguments[i] can be undefined for
+        // missing optional args, extra arguments are ok
         for ( var i = 0 ; i < args.length ; i++ )
           args[i].validate(arguments[i]);
 
