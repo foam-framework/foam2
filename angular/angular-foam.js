@@ -49,6 +49,7 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
 
       // Look up our FOAM object on the DAO.
       function initialStart() {
+        if ( ! $scope.dao ) return;
         $scope.dao.find($scope.key).then(hookUpObject);
         daoSub && daoSub.destroy();
         daoSub = $scope.dao.on.sub(function(sub, _, operation, obj) {
@@ -71,7 +72,6 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
 
       function hookUpObject(o) {
         innerScope[as] = obj = o.clone();
-        innerScope.$apply();
 
         objSub && objSub.destroy();
         objSub = obj.propertyChange.sub(foam.X.merged(function(sub) {
