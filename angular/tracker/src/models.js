@@ -27,6 +27,61 @@ foam.CLASS({
   ]
 });
 
+foam.ENUM({
+  package: 'ng.tracker',
+  name: 'IssueStatus',
+
+  properties: [
+    {
+      name: 'label'
+    },
+    {
+      name: 'isOpen',
+      value: false
+    }
+  ],
+
+  values: [
+    {
+      name: 'NEW',
+      values: { label: 'New', isOpen: true }
+    },
+    {
+      name: 'ASSIGNED',
+      values: { label: 'Assigned', isOpen: true }
+    },
+    {
+      name: 'STARTED',
+      values: { label: 'Started', isOpen: true }
+    },
+    {
+      name: 'FIXED',
+      values: { label: 'Fixed' }
+    },
+    {
+      name: 'DUPLICATE',
+      values: { label: 'Duplicate' }
+    },
+    {
+      name: 'NOREPRO',
+      values: { label: 'Not Reproducible' }
+    },
+    {
+      name: 'WONTFIX',
+      values: { label: 'Won\'t Fix' }
+    },
+    {
+      name: 'INTENDED',
+      values: { label: 'Working as Intended' }
+    },
+    {
+      name: 'OBSOLETE',
+      values: { label: 'Obsolete' }
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'ng.dao',
   name: 'QDAO',
@@ -91,10 +146,19 @@ foam.CLASS({
       required: true
     },
     {
+      class: 'Enum',
+      of: 'ng.tracker.IssueStatus',
+      name: 'status',
+      label: 'Status',
+      value: ng.tracker.IssueStatus.NEW
+    },
+    {
       class: 'Boolean',
       name: 'isOpen',
-      label: 'Open',
-      value: true
+      hidden: true,
+      expression: function(status) {
+        return status.isOpen;
+      }
     },
     {
       class: 'ng.tracker.types.Reference',
@@ -122,7 +186,15 @@ foam.CLASS({
           'md-item-text="item.name" ' +
           'md-floating-label="Assignee"><md-item-template>' +
           '<tracker-user-chip user="item"></tracker-user-chip>' +
-          '</md-item-template></md-autocomplete></div>'
+          '</md-item-template></md-autocomplete></div>',
+      postSet: function(old, nu) {
+        if ( nu && this.status === ng.tracker.IssueStatus.NEW ) {
+          this.status = ng.tracker.IssueStatus.ASSIGNED;
+        } else if ( ! nu && (this.status === ng.tracker.IssueStatus.ASSIGNED ||
+            this.status === ng.tracker.IssueStatus.STARTED) ) {
+          this.status = ng.tracker.IssueStatus.NEW;
+        }
+      }
     },
     {
       class: 'DateTime',
