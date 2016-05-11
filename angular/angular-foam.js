@@ -278,6 +278,22 @@ angular.module('foam').directive('foamDetails', [ '$compile',
     link: function(scope, element, attrs, _, $transclude) {
       var lastClass;
       var subscope;
+
+      var enumExtraBinding = function(prop, values, valuesName, ordinalName) {
+        return function(subscope) {
+          subscope[valuesName] = values;
+
+          // Listen to the string ordinal and forward it to the real object.
+          subscope.$watch(ordinalName, function(nu) {
+            if ( ! nu ) return;
+            subscope.object[prop.name] = +nu;
+          });
+          subscope.$watch('object.' + prop.name, function(nu) {
+            subscope[ordinalName] = '' + nu.ordinal;
+          });
+        };
+      };
+
       var maybeRebuild = function maybeRebuild(obj) {
         // We only need to rebuild the view if the model has changed.
         if ( ! obj ) return;
@@ -290,6 +306,7 @@ angular.module('foam').directive('foamDetails', [ '$compile',
         lastClass = obj.cls_;
         var props = obj.cls_.getAxiomsByClass(foam.core.Property);
         var html = '';
+        var extraBindings = [];
         for ( var i = 0; i < props.length; i++ ) {
           var prop = props[i];
           if ( prop.hidden ) continue;
@@ -309,6 +326,20 @@ angular.module('foam').directive('foamDetails', [ '$compile',
                 'md-on-add="onPropertyChange(\'' + prop.name + '\')" ' +
                 'md-on-remove="onPropertyChange(\'' + prop.name + '\')" ' +
                 '></md-chips></md-input-container>';
+          } else if ( foam.core.Enum.isInstance(prop) ) {
+            var valuesName = prop.name + 'Values';
+            var ordinalName = prop.name + 'Ordinal';
+            var values = foam.lookup(prop.of).getValues();
+
+            extraBindings.push(enumExtraBinding(prop, values, valuesName,
+                  ordinalName));
+
+            var labelName = values[0].label ? 'label' : 'name';
+            html += '<md-input-container><label>' + prop.label + '</label>' +
+                '<md-select ng-model="' + ordinalName + '">' +
+                '<md-option ng-repeat="item in ' + valuesName +
+                '" value="{{item.ordinal}}">{{item.' + labelName +
+                '}}</md-option></md-select></md-input-container>';
           } else {
             var type = 'text';
             if ( foam.core.Int.isInstance(prop) ||
@@ -335,6 +366,13 @@ angular.module('foam').directive('foamDetails', [ '$compile',
           subscope = innerScope.$new();
           subscope.object = scope.object;
           subscope.onPropertyChange = onPropertyChange;
+
+          if ( extraBindings.length ) {
+            for ( var i = 0; i < extraBindings.length; i++ ) {
+              extraBindings[i](subscope);
+            }
+          }
+
           element.empty();
           element.append(html);
           $compile(element.contents())(subscope);
