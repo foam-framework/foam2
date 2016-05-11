@@ -7,6 +7,11 @@ describe('Enum tests', function() {
           name: 'label'
         }
       ],
+      methods: [
+        function hello() {
+          return 'hello ' + this.label;
+        }
+      ],
 
       values: [
         {
@@ -50,6 +55,7 @@ describe('Enum tests', function() {
     var todo = Todo.create();
 
     expect(todo.status).toBe(TodoStatus.OPEN);
+    expect(todo.status.name).toBe('OPEN');
     expect(todo.status.label).toBe('Open');
 
     expect(
@@ -66,9 +72,26 @@ describe('Enum tests', function() {
 
     expect(todo.status).toBe(TodoStatus.OPEN);
 
+    expect(todo.status.hello()).toBe('hello Open');
+
     var values = TodoStatus.getValues();
     expect(values[0]).toBe(TodoStatus.OPEN);
     expect(values[1]).toBe(TodoStatus.CLOSED);
     expect(values[2]).toBe(TodoStatus.ASSIGNED);
+
+    expect(function() {
+      foam.ENUM({
+        name: 'BadEnum',
+        values: [
+          {
+            name: 'a',
+          },
+          {
+            name: 'b',
+            ordinal: 0
+          }
+        ]
+      });
+    }).toThrow();
   })
 });
