@@ -111,7 +111,7 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
       $scope.dao.pipe(listener);
 
       $scope.$watch('dao', function() {
-        onReset();
+        doReset();
         $scope.dao.pipe(listener);
       });
 
@@ -160,11 +160,16 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
         delete cache[obj.id];
       }
 
-      function onReset() {
+      function doReset() {
         for ( var id in cache ) {
           remove(cache[id]);
         }
         cache = {};
+        $scope.dao.select(listener);
+      }
+
+      function onReset() {
+        doReset();
         $scope.dao.select(listener);
       }
     }
@@ -194,20 +199,28 @@ angular.module('foam').directive('foamDaoController', function() {
       dao: '<',
       selection: '=',
       controllerMode: '=',
+      header: '<',
+      fab: '<',
       label: '<'
     },
     transclude: true,
     template: foam.String.multiline(function() {/*
       <div class="foam-dao-controller">
-      <div class="foam-dao-controller-header">
+      <div ng-if="header" class="foam-dao-controller-header">
       <span class="foam-dao-controller-label">{{label}}</span>
       <button class="foam-dao-controller-create" ng-click="doCreate()">
       New
       </button>
       </div>
       <div class="foam-dao-controller-list">
-      <div foam-repeat="dao" ng-click="doEdit(object)" foam-internal-inject>
+      <div foam-repeat="dao" ng-click="doEdit(object)"
+      class="foam-dao-controller-list-item"
+      foam-internal-inject>
       </div>
+      <md-button ng-if="fab" class="md-fab md-fab-bottom-right"
+          ng-click="doCreate()">
+      <md-icon>add</md-icon>
+      </md-button>
       </div>
       </div>
     */}),
@@ -231,11 +244,6 @@ angular.module('foam').directive('foamDaoController', function() {
         scope.controllerMode = 'edit';
         scope.selection = item;
       };
-
-      scope.dao.select().then(function(a) {
-        scope.array = a.a;
-        scope.$apply();
-      });
     }
   };
 });
@@ -251,7 +259,7 @@ angular.module('foam').directive('foamDetails', [ '$compile',
       var lastClass;
       var maybeRebuild = function maybeRebuild(obj) {
         // We only need to rebuild the view if the model has changed.
-        if ( lastClass && obj.cls_ === lastClass ) return;
+        if ( ! obj || (lastClass && obj.cls_ === lastClass) ) return;
 
         lastClass = obj.cls_;
         var props = obj.cls_.getAxiomsByClass(foam.core.Property);
