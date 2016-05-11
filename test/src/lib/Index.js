@@ -97,10 +97,9 @@ describe('MDAO TreeIndex', function() {
 
   var M = foam.mlang.Expressions.create();
 
-  var KEYS_10 = makeMultiPartKeys(1);
-  var KEYS_100 = makeMultiPartKeys(2);
-  var KEYS_1000 = makeMultiPartKeys(10);
-  var KEYS_5000 = makeMultiPartKeys(100);
+  var KEYS_SINGLE = makeMultiPartKeys(1);
+  var KEYS_A_FEW = makeMultiPartKeys(10);
+  var KEYS_LOTS = makeMultiPartKeys(100);
 
   beforeEach(function(done) {
     PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
@@ -129,18 +128,15 @@ describe('MDAO TreeIndex', function() {
   });
 
   it('selects with mutliple keys', function(done) {
-    PhotoDAO.where(M.IN(test.Photo.ID, KEYS_10)).select()
+    PhotoDAO.where(M.IN(test.Photo.ID, KEYS_SINGLE)).select()
       .then(
-        function(s) { expect(s.a.length).toEqual(KEYS_10.length); }
+        function(s) { expect(s.a.length).toEqual(KEYS_SINGLE.length); }
       ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_100)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_100.length); })
+        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_A_FEW)).select()
+          .then(function(s) { expect(s.a.length).toEqual(KEYS_A_FEW.length); })
       ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_1000)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_1000.length); })
-      ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_5000)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_5000.length); })
+        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_LOTS)).select()
+          .then(function(s) { expect(s.a.length).toEqual(KEYS_LOTS.length); })
       ).then(done);
   });
 
