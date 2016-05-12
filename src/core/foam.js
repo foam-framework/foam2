@@ -100,6 +100,7 @@
     "../lib/MDAO",
     [ "../lib/IDBDAO", ! isServer ],
     "../lib/Pooled",
+    "../lib/QueryParser",
     "../lib/Physical",
     "../lib/Collider",
     "../lib/PhysicsEngine",
