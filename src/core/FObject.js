@@ -39,12 +39,6 @@ foam.CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      if ( args.originalArgs_ ) {
-        args = args.originalArgs_;
-      } else {
-        this.originalArgs_ = args;
-      }
-
       for ( var key in args ) this[key] = args[key];
     },
 
