@@ -68,7 +68,6 @@
     "Method",
     "FObjectArray",
     "Boolean",
-    "Int",
     "AxiomArray",
     "EndBoot",
     "types",
