@@ -197,7 +197,12 @@ foam.LIB({
           }
 
           var type = foam.lookup(a.class) || foam.core.Property;
-          if ( type !== a.cls_ ) a = type.create(a);
+          console.assert(
+            type !== a.cls_,
+            'Property', a.name, 'on', m.name,
+            'has already been upgraded to a Property.');
+
+          a = type.create(a);
 
           this.installAxiom(a);
         }

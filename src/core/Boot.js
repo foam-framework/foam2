@@ -175,7 +175,11 @@ foam.LIB({
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
-        if ( ! m.refines ) foam.register(cls);
+        console.assert(
+          ! m.refines,
+          'Refines is not supported in early bootstrap');
+
+        foam.register(cls);
 
         var path = cls.id.split('.');
         var root = global;
