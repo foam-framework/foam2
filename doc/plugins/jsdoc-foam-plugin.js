@@ -136,7 +136,14 @@ var getDefinitionType = function getDefinitionType(node) {
 var getCLASSPackage = function getCLASSPackage(node) {
 
   var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
-  if ( ! pkg ) pkg = ( getDefinitionType(node) === 'LIB' ) ? 'foam' : 'foam/core';
+  if ( ! pkg ) {
+    if ( getDefinitionType(node) === 'LIB' ) {
+      pkg = getNodePropertyNamed(node, 'name').replace(/\./g, '/');
+      pkg = pkg.substring(0, pkg.lastIndexOf('/'));
+    } else {
+      pkg = 'foam/core';
+    }
+  }
 
   return pkg;
 }
