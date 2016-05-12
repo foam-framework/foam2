@@ -488,9 +488,7 @@ foam.CLASS({
       var m = {};
       for ( var key in this.instance_ ) {
         var value = this[key];
-        if ( value !== undefined ) {
-          this.cls_.getAxiomByName(key).cloneProperty(value, m);
-        }
+        this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
       return this.cls_.create(m/*, this.X*/);
     },
