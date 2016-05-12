@@ -19,7 +19,6 @@
 TODO(adamvy):
 - Only serialize the ordinal?
 - Freeze the instances?
-- Better documentation
 */
 
 /**
