@@ -132,6 +132,7 @@ TODO(adamvy):
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'EnumValue',
+
   properties: [
     {
       class: 'String',
@@ -148,6 +149,7 @@ foam.CLASS({
       name: 'values'
     }
   ],
+
   methods: [
     function installInClass(cls) {
       var name = this.name;
@@ -169,9 +171,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'EnumModel',
+
   properties: [
     {
       name: 'axioms_',
@@ -309,6 +313,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function buildClass() {
       var cls;
@@ -350,6 +355,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Enum',
   extends: 'Property',
+
   properties: [
     { name: 'of', required: true },
     [
@@ -371,6 +377,7 @@ foam.CLASS({
     ]
   ]
 });
+
 
 foam.ENUM = function(m) {
   var model = foam.core.EnumModel.create(m);
