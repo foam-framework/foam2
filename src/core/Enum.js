@@ -379,15 +379,7 @@ foam.ENUM = function(m) {
   cls.validate();
 
   foam.register(cls);
+  foam.package.registerClass(cls);
 
-  // TODO: Move this to a single shared spot.
-  var path = cls.id.split('.');
-  var root = global;
-
-  for ( var i = 0 ; i < path.length-1 ; i++ ) {
-    root = root[path[i]] || ( root[path[i]] = {} );
-  }
-
-  root[path[path.length-1]] = cls;
   return cls;
 };

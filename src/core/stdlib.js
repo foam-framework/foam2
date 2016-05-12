@@ -547,3 +547,44 @@ foam.mmethod = function(map) {
     ]
   });
 })();
+
+
+foam.LIB({
+  name: 'foam.package',
+  methods: [
+    /**
+     * Registers the given class in the global namespace.
+     * If the given class has an id of 'some.package.MyClass'
+     * then the class object will be made available globally at
+     * global.some.package.MyClass.
+     *
+     */
+    function registerClass(cls) {
+      var pkg = foam.package.ensurePackage(global, cls.package);
+      pkg[cls.name] = cls;
+    },
+
+    /**
+     * Walk a dot separated path starting at root, creating empty
+     * objects if necessary.
+     *
+     * ensurePackage(global, 'some.dot.separated.path');
+     * will ensure that global.some.dot.separated.path exists with
+     * each part being a JS object.
+     */
+    function ensurePackage(root, path) {
+      if ( ! path ) return root;
+
+      console.assert(typeof path === 'string',
+                     'Cannot make a package path of a non-string');
+
+      path = path.split('.');
+
+      for ( var i = 0 ; i < path.length ; i++ ) {
+        root = root[path[i]] || ( root[path[i]] = {} );
+      }
+
+      return root;
+    }
+  ]
+});

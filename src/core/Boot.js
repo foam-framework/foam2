@@ -180,15 +180,8 @@ foam.LIB({
           'Refines is not supported in early bootstrap');
 
         foam.register(cls);
+        foam.package.registerClass(cls);
 
-        var path = cls.id.split('.');
-        var root = global;
-
-        for ( var i = 0 ; i < path.length-1 ; i++ ) {
-          root = root[path[i]] || ( root[path[i]] = {} );
-        }
-
-        root[path[path.length-1]] = cls;
         return cls;
       };
     },
@@ -205,16 +198,11 @@ foam.LIB({
         var cls = model.buildClass();
         cls.validate();
 
-        if ( ! m.refines ) foam.register(cls);
-
-        var path = cls.id.split('.');
-        var root = global;
-
-        for ( var i = 0 ; i < path.length-1 ; i++ ) {
-          root = root[path[i]] || ( root[path[i]] = {} );
+        if ( ! m.refines ) {
+          foam.register(cls);
+          foam.package.registerClass(cls);
         }
 
-        root[path[path.length-1]] = cls;
         return cls;
       };
 
