@@ -15,6 +15,27 @@
  * limitations under the License.
  */
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'String',
+  extends: 'Property',
+
+  // documentation: 'StringProperties coerce their arguments into Strings.',
+
+  properties: [
+    [ 'adapt', function(_, a) {
+        return typeof a === 'function' ? foam.String.multiline(a) :
+               typeof a === 'number'   ? String(a) :
+               a && a.toString         ? a.toString() :
+               '';
+      }
+    ],
+    [ 'value', '' ]
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Date',

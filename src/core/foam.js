@@ -66,7 +66,6 @@
     "Model",
     "Property",
     "Method",
-    "String",
     "FObjectArray",
     "Boolean",
     "Int",
