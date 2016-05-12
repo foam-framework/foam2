@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'QueryParser',
+
   axioms: [
     foam.pattern.Multiton.create({ property: 'of' })
   ],
