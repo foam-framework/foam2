@@ -26,7 +26,7 @@ if ( ! Array.from ) {
   }
 }
 
-// TODO: Polyfill this? Enum is using array.find, IE and old node have no support.
+
 if ( ! Array.prototype.find ) {
   Array.prototype.find = function(predicate) {
     if ( this === null ) {
