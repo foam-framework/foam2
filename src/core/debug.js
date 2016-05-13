@@ -103,7 +103,7 @@ foam.CLASS({
         var expression = this.expression;
         var pName = cls.id + '.' + this.name + '.expression: ';
 
-        var argNames = foam.Function.argsArray(expression);
+        var argNames = foam.Function.formalArgs(expression);
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);

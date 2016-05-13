@@ -343,7 +343,7 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var argNames = foam.Function.argsArray(e);
+      var argNames = foam.Function.formalArgs(e);
       var name     = this.name;
 
       // FUTURE: determine how often the value is being invalidated,

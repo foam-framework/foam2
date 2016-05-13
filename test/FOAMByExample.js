@@ -2065,9 +2065,9 @@ log(typeof foam.Function.argsStr(function() { }));
 // Example 120
 log_.output = "";
 try {
-// foam.Function.argsArray() returns a function's arguments an an array.
-log(foam.Function.argsArray(function(a,b,fooBar) { }));
-log(Array.isArray(foam.Function.argsArray(function() { })));
+// foam.Function.formalArgs() returns a function's arguments an an array.
+log(foam.Function.formalArgs(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.formalArgs(function() { })));
 } catch(x) {
  log("Exception: ", x);
  }

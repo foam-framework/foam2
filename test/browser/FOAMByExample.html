@@ -1187,9 +1187,9 @@ log(f(1,2));
 log(foam.Function.argsStr(function(a,b,fooBar) { }));
 log(typeof foam.Function.argsStr(function() { }));
 
-// foam.Function.argsArray() returns a function's arguments an an array.
-log(foam.Function.argsArray(function(a,b,fooBar) { }));
-log(Array.isArray(foam.Function.argsArray(function() { })));
+// foam.Function.formalArgs() returns a function's arguments an an array.
+log(foam.Function.formalArgs(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.formalArgs(function() { })));
 
 // foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
 log(foam.String.constantize('foo'));

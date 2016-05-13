@@ -189,11 +189,10 @@ foam.LIB({
           match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
-    // TODO: rename to ???
-    function argsArray(f) {
+    function formalArgs(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. argsArray(function(a,b) {...}) == ['a', 'b']
+       * Ex. formalArgs(function(a,b) {...}) == ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       if ( ! args ) return [];
@@ -235,7 +234,7 @@ foam.LIB({
        * Hello adam
        *
        **/
-      var argNames = foam.Function.argsArray(fn);
+      var argNames = foam.Function.formalArgs(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
