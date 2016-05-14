@@ -408,6 +408,11 @@ foam.CLASS({
       },
       value: 1
     },
+    {
+      class: 'Boolean',
+      name: 'connected',
+      value: false
+    },
     'eventData',
     'eventName'
   ],
@@ -442,6 +447,7 @@ foam.CLASS({
           return;
         }
 
+        this.connected = true;
         resp.data.sub(this.onData);
         resp.end.sub(this.onError);
         this.resp = resp;
@@ -457,7 +463,7 @@ foam.CLASS({
       this.retryTimer = this.setTimeout(foam.Function.bind(function() {
         this.retryTimer = 0;
         this.onError();
-      }, this), 60000);
+      }, this), 30000);
     },
 
     function close() {
@@ -508,11 +514,13 @@ foam.CLASS({
     },
 
     function onError() {
+      this.connected = false;
       this.delay *= 2;
       this.setTimeout(this.onEnd, this.delay);
     },
 
     function onEnd() {
+      this.connected = false;
       if ( this.running ) {
         this.start();
       }

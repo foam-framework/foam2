@@ -39,12 +39,6 @@ foam.CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      if ( args.originalArgs_ ) {
-        args = args.originalArgs_;
-      } else {
-        this.originalArgs_ = args;
-      }
-
       for ( var key in args ) this[key] = args[key];
     },
 
@@ -494,9 +488,7 @@ foam.CLASS({
       var m = {};
       for ( var key in this.instance_ ) {
         var value = this[key];
-        if ( value !== undefined ) {
-          this.cls_.getAxiomByName(key).cloneProperty(value, m);
-        }
+        this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
       return this.cls_.create(m/*, this.X*/);
     },

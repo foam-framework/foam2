@@ -234,13 +234,13 @@ describe('Array clone (deep copy)', function() {
   });
 });
 
-describe('foam.Function.argsArray', function() {
+describe('foam.Function.formalArgs', function() {
 
   it('handles an empty arg list', function() {
     var fn = function( ) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([]);
   });
 
@@ -249,7 +249,7 @@ describe('foam.Function.argsArray', function() {
        func, obj, num,  arr ) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
   });
 
@@ -258,7 +258,7 @@ describe('foam.Function.argsArray', function() {
       /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
   });
 
@@ -267,7 +267,7 @@ describe('foam.Function.argsArray', function() {
         /* // a comment here */ name, another /* return // comment */) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([ 'arg', 'more', 'name', 'another' ]);
   });
 

@@ -26,7 +26,28 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Property',
       name: 'properties',
-      adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var p = foam.core.Property.create();
+          p.name = o;
+          return p;
+        }
+
+        if ( Array.isArray(o) ) {
+          var p = foam.core.Property.create();
+          p.name  = o[0];
+          p.value = o[1];
+          return p;
+        }
+
+        if ( o.class ) {
+          var m = foam.lookup(o.class);
+          if ( ! m ) throw 'Unknown class : ' + o.class;
+          return m.create(o);
+        }
+
+        return foam.core.Property.create(o);
+      }
     },
     {
       class: 'AxiomArray',

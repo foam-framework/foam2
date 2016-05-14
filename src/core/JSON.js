@@ -19,7 +19,6 @@
 // JSON Support
 //
 // TODO:
-//   - add Context Support for parsing
 //   - don't output default classes
 //   - don't output transient properties
 //   - pretty printing
@@ -51,6 +50,7 @@ foam.CLASS({
 });
 
 
+/** Add toJSON() method to FObject. **/
 foam.CLASS({
   refines: 'foam.core.FObject',
 
@@ -62,6 +62,7 @@ foam.CLASS({
 });
 
 
+/** JSON Outputer. **/
 foam.CLASS({
   package: 'foam.json',
   name: 'Outputer',
@@ -93,6 +94,7 @@ foam.CLASS({
       value: ' '
     },
     {
+// TODO: doc
       class: 'Boolean',
       name: 'alwaysQuoteKeys',
       value: false
@@ -145,6 +147,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'strict',
+      // TODO: change to true by default
       value: false,
       postSet: function(_, s) {
         if ( s ) {
@@ -177,8 +180,8 @@ foam.CLASS({
         .replace(/"/g, '\\"')
         .replace(/[\x00-\x1f]/g, function(c) {
           return "\\u00" + ((c.charCodeAt(0) < 0x10) ?
-                            '0' + c.charCodeAt(0).toString(16) :
-                            c.charCodeAt(0).toString(16));
+              '0' + c.charCodeAt(0).toString(16) :
+              c.charCodeAt(0).toString(16));
         });
     },
 
@@ -193,6 +196,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: doc
     function start(c) {
       if ( c ) this.out(c).nl();
       if ( this.indentStr ) {
@@ -319,29 +323,35 @@ foam.CLASS({
 });
 
 
+/** Library of pre-configured JSON Outputers. **/
 foam.LIB({
   name: 'foam.json',
 
   constants: {
 
+    // Pretty Print
     Pretty: foam.json.Outputer.create(),
 
+    // Strict means output as proper JSON.
     Strict: foam.json.Outputer.create({
       pretty: false,
       strict: true
     }),
 
+    // Pretty and proper JSON.
     PrettyStrict: foam.json.Outputer.create({
       pretty: true,
       strict: true
     }),
 
+    // Compact output (not pretty)
     Compact: foam.json.Outputer.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false
     }),
 
+    // Shorter than Compact (uses short-names if available)
     Short: foam.json.Outputer.create({
       pretty: false,
       formatDatesAsNumbers: true,
@@ -349,6 +359,7 @@ foam.LIB({
       useShortNames: true
     }),
 
+    // Short, but exclude network-transient properties.
     Network: foam.json.Outputer.create({
       pretty: false,
       formatDatesAsNumbers: true,
@@ -357,6 +368,7 @@ foam.LIB({
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
+    // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputer.create({
       pretty: false,
       formatDatesAsNumbers: true,

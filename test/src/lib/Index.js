@@ -18,8 +18,8 @@
 
 describe('MDAO TreeIndex', function() {
 
-  var NUM_ALBUMS = 100;
-  var NUM_PHOTOS = 1000;
+  var NUM_ALBUMS = 10;
+  var NUM_PHOTOS = 100;
 
   foam.CLASS({
     package: 'test',
@@ -97,10 +97,9 @@ describe('MDAO TreeIndex', function() {
 
   var M = foam.mlang.Expressions.create();
 
-  var KEYS_10 = makeMultiPartKeys(1);
-  var KEYS_100 = makeMultiPartKeys(10);
-  var KEYS_1000 = makeMultiPartKeys(100);
-  var KEYS_5000 = makeMultiPartKeys(1000);
+  var KEYS_SINGLE = makeMultiPartKeys(1);
+  var KEYS_A_FEW = makeMultiPartKeys(10);
+  var KEYS_LOTS = makeMultiPartKeys(100);
 
   beforeEach(function(done) {
     PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
@@ -129,18 +128,15 @@ describe('MDAO TreeIndex', function() {
   });
 
   it('selects with mutliple keys', function(done) {
-    PhotoDAO.where(M.IN(test.Photo.ID, KEYS_10)).select()
+    PhotoDAO.where(M.IN(test.Photo.ID, KEYS_SINGLE)).select()
       .then(
-        function(s) { expect(s.a.length).toEqual(KEYS_10.length); }
+        function(s) { expect(s.a.length).toEqual(KEYS_SINGLE.length); }
       ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_100)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_100.length); })
+        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_A_FEW)).select()
+          .then(function(s) { expect(s.a.length).toEqual(KEYS_A_FEW.length); })
       ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_1000)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_1000.length); })
-      ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_5000)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_5000.length); })
+        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_LOTS)).select()
+          .then(function(s) { expect(s.a.length).toEqual(KEYS_LOTS.length); })
       ).then(done);
   });
 
@@ -268,10 +264,10 @@ describe('MDAO TreeIndex', function() {
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .limit(countSink.value - 20)
+      .limit(countSink.value - 5)
       .select(asink).then(function() {
         var a = asink.a;
-        expect(a.length).toEqual(countSink.value - 20);
+        expect(a.length).toEqual(countSink.value - 5);
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
@@ -296,10 +292,10 @@ describe('MDAO TreeIndex', function() {
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .skip(countSink.value - 10) // skip all but 10
+      .skip(countSink.value - 5) // skip all but 5
       .select(asink).then(function() {
         var a = asink.a;
-        expect(a.length).toEqual(10);
+        expect(a.length).toEqual(5);
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);

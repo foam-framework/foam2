@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+/**
+  AbstractClass is the root of FOAM's class hierarchy.
+  The FObject Class extends AbstractClass.
+ */
 foam.LIB({
   name: 'foam.AbstractClass',
 
@@ -90,8 +94,10 @@ foam.LIB({
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
 
+      // TODO: Should implements be handled here?
       if ( cache[c.id] === undefined ) {
         cache[c.id] = ( c === this.prototype.cls_ ) ||
+          ( c.getAxiomByName && c.getAxiomByName('implements_' + this.id) ) ||
           this.isSubClass(c.__proto__);
       }
 
@@ -193,7 +199,12 @@ foam.LIB({
           }
 
           var type = foam.lookup(a.class) || foam.core.Property;
-          if ( type !== a.cls_ ) a = type.create(a);
+          console.assert(
+            type !== a.cls_,
+            'Property', a.name, 'on', m.name,
+            'has already been upgraded to a Property.');
+
+          a = type.create(a);
 
           this.installAxiom(a);
         }

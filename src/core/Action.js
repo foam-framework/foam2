@@ -15,7 +15,19 @@
  * limitations under the License.
  */
 
-// TODO: make isAvailable and isEnabled by dynamic functions
+/**
+  Actions are high-level executable behaviours that are typically
+  triggered by users and represented as buttons or menus.
+
+  Actions are installed as methods on the class, but contain more
+  meta-information than regular methods. Meta-information includes
+  information needed to surface to action in a meaningful way to
+  users, and includes things like the label to appear in the button
+  or menu, a speech-label for i18n, help text, dynamic functions to
+  enable or disable and hide or unhide the UI associated with this Action.
+
+  Actions implement the Action Design Pattern.
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
@@ -50,6 +62,7 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       label: 'Available',
+      // FUTURE: make dynamic
       value: function() { return true; },
       help: 'Function to determine if action is available.'
     },
@@ -57,6 +70,7 @@ foam.CLASS({
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
+      // FUTURE: make dynamic
       value: function() { return true; },
       help: 'Function to determine if action is enabled.'
     },

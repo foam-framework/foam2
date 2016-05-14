@@ -22,13 +22,13 @@
 // then your application module that uses Angular and this library.
 
 /* globals angular: false */
-angular.module('foam', []).directive('foamView', function() {
+angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
   return {
     restrict: 'A',
     scope: {
       // TODO: Make these one-way reactive bindings, probably.
       // Except for "as", that should just be a string.
-      key: '<foamView',
+      key: '=foamView',
       dao: '<foamDao',
       as: '@foamAs',
       delay: '@foamDelay'
@@ -49,6 +49,7 @@ angular.module('foam', []).directive('foamView', function() {
 
       // Look up our FOAM object on the DAO.
       function initialStart() {
+        if ( ! $scope.dao ) return;
         $scope.dao.find($scope.key).then(hookUpObject);
         daoSub && daoSub.destroy();
         daoSub = $scope.dao.on.sub(function(sub, _, operation, obj) {
@@ -58,6 +59,12 @@ angular.module('foam', []).directive('foamView', function() {
             hookUpObject(obj);
           }
         });
+
+        innerScope.$watch(as, function(nu, old) {
+          if ( nu && nu.id !== (old && old.id) ) {
+            $scope.key = nu.id;
+          }
+        });
       }
 
       $scope.$watch('key', initialStart);
@@ -65,7 +72,6 @@ angular.module('foam', []).directive('foamView', function() {
 
       function hookUpObject(o) {
         innerScope[as] = obj = o.clone();
-        innerScope.$apply();
 
         objSub && objSub.destroy();
         objSub = obj.propertyChange.sub(foam.X.merged(function(sub) {
@@ -111,7 +117,7 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
       $scope.dao.pipe(listener);
 
       $scope.$watch('dao', function() {
-        onReset();
+        doReset();
         $scope.dao.pipe(listener);
       });
 
@@ -160,11 +166,17 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
         delete cache[obj.id];
       }
 
-      function onReset() {
+      function doReset() {
         for ( var id in cache ) {
           remove(cache[id]);
         }
         cache = {};
+        $scope.dao.select(listener);
+      }
+
+      function onReset() {
+        doReset();
+        $scope.dao.select(listener);
       }
     }
   };
@@ -186,27 +198,36 @@ angular.module('foam').directive('foamInternalInject', function() {
   };
 });
 
-angular.module('foam').directive('foamDaoController', function() {
+angular.module('foam').directive('foamDaoController', [ '$timeout',
+    function($timeout) {
   return {
     restrict: 'E',
     scope: {
       dao: '<',
       selection: '=',
       controllerMode: '=',
+      header: '<',
+      fab: '<',
       label: '<'
     },
     transclude: true,
     template: foam.String.multiline(function() {/*
       <div class="foam-dao-controller">
-      <div class="foam-dao-controller-header">
+      <div ng-if="header" class="foam-dao-controller-header">
       <span class="foam-dao-controller-label">{{label}}</span>
       <button class="foam-dao-controller-create" ng-click="doCreate()">
       New
       </button>
       </div>
       <div class="foam-dao-controller-list">
-      <div foam-repeat="dao" ng-click="doEdit(object)" foam-internal-inject>
+      <div foam-repeat="dao" ng-click="doEdit(object)"
+      class="foam-dao-controller-list-item"
+      foam-internal-inject>
       </div>
+      <md-button ng-if="fab" class="md-fab md-fab-bottom-right"
+          ng-click="doCreate()">
+      <md-icon>add</md-icon>
+      </md-button>
       </div>
       </div>
     */}),
@@ -228,14 +249,140 @@ angular.module('foam').directive('foamDaoController', function() {
 
       scope.doEdit = function doEdit(item) {
         scope.controllerMode = 'edit';
-        scope.selection = item;
+        var clone = item.clone();
+        scope.selection = clone;
+
+        var timeout;
+        clone.propertyChange.sub(function(sub) {
+          if ( timeout ) {
+            $timeout.cancel(timeout);
+          }
+          timeout = $timeout(function() {
+            timeout = null;
+            scope.dao.put(clone);
+          }, 500, false);
+        });
+      };
+    }
+  };
+} ]);
+
+angular.module('foam').directive('foamDetails', [ '$compile',
+    function($compile) {
+  return {
+    restrict: 'A',
+    scope: {
+      object: '<foamDetails'
+    },
+    transclude: true,
+    link: function(scope, element, attrs, _, $transclude) {
+      var lastClass;
+      var subscope;
+
+      var enumExtraBinding = function(prop, values, valuesName, ordinalName) {
+        return function(subscope) {
+          subscope[valuesName] = values;
+
+          // Listen to the string ordinal and forward it to the real object.
+          subscope.$watch(ordinalName, function(nu) {
+            if ( ! nu ) return;
+            subscope.object[prop.name] = +nu;
+          });
+          subscope.$watch('object.' + prop.name, function(nu) {
+            subscope[ordinalName] = '' + nu.ordinal;
+          });
+        };
       };
 
-      scope.dao.select().then(function(a) {
-        scope.array = a.a;
-        scope.$apply();
+      var maybeRebuild = function maybeRebuild(obj) {
+        // We only need to rebuild the view if the model has changed.
+        if ( ! obj ) return;
+
+        if ( lastClass && obj.cls_ === lastClass ) {
+          subscope.object = obj;
+          return;
+        }
+
+        lastClass = obj.cls_;
+        var props = obj.cls_.getAxiomsByClass(foam.core.Property);
+        var html = '';
+        var extraBindings = [];
+        for ( var i = 0; i < props.length; i++ ) {
+          var prop = props[i];
+          if ( prop.hidden ) continue;
+
+          if ( prop.ngTemplate ) {
+            html += prop.ngTemplate;
+            continue;
+          }
+
+          // Otherwise we dispatch on the type of the property.
+          if ( foam.core.Boolean.isInstance(prop) ) {
+            html += '<md-checkbox ng-model="object.' + prop.name + '">' +
+                prop.label + '</md-checkbox>';
+          } else if ( foam.core.StringArray.isInstance(prop) ) {
+            html += '<md-input-container><label>' + prop.label + '</label>' +
+                '<md-chips ng-model="object.' + prop.name + '" ' +
+                'md-on-add="onPropertyChange(\'' + prop.name + '\')" ' +
+                'md-on-remove="onPropertyChange(\'' + prop.name + '\')" ' +
+                '></md-chips></md-input-container>';
+          } else if ( foam.core.Enum.isInstance(prop) ) {
+            var valuesName = prop.name + 'Values';
+            var ordinalName = prop.name + 'Ordinal';
+            var values = foam.lookup(prop.of).getValues();
+
+            extraBindings.push(enumExtraBinding(prop, values, valuesName,
+                  ordinalName));
+
+            var labelName = values[0].label ? 'label' : 'name';
+            html += '<md-input-container><label>' + prop.label + '</label>' +
+                '<md-select ng-model="' + ordinalName + '">' +
+                '<md-option ng-repeat="item in ' + valuesName +
+                '" value="{{item.ordinal}}">{{item.' + labelName +
+                '}}</md-option></md-select></md-input-container>';
+          } else {
+            var type = 'text';
+            if ( foam.core.Int.isInstance(prop) ||
+                foam.core.Float.isInstance(prop) ) {
+              type = 'number';
+            }
+
+            var inputHTML = '<input type="' + type + '" ' +
+                'ng-model="object.' + prop.name + '" ' +
+                (prop.required ? ' required' : '') + ' />';
+            html += '<md-input-container>' +
+                '<label>' + prop.label + '</label>' +
+                inputHTML +
+                '</md-input-container>';
+          }
+        }
+
+        var onPropertyChange = function onPropertyChange(name) {
+          scope.object.propertyChange.pub(name, scope.object[name]);
+        };
+
+        $transclude(function(_, innerScope) {
+          if ( subscope ) subscope.$destroy();
+          subscope = innerScope.$new();
+          subscope.object = scope.object;
+          subscope.onPropertyChange = onPropertyChange;
+
+          if ( extraBindings.length ) {
+            for ( var i = 0; i < extraBindings.length; i++ ) {
+              extraBindings[i](subscope);
+            }
+          }
+
+          element.empty();
+          element.append(html);
+          $compile(element.contents())(subscope);
+        });
+      };
+
+      scope.$watch('object', function(nu) {
+        maybeRebuild(nu);
       });
     }
   };
-});
+} ]);
 

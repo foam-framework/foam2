@@ -20,42 +20,15 @@ foam.CLASS({
   name: 'Transform',
 
   properties: [
-    {
-      name: 'a',
-      class: 'Simple'
-    },
-    {
-      name: 'b',
-      class: 'Simple'
-    },
-    {
-      name: 'c',
-      class: 'Simple'
-    },
-    {
-      name: 'd',
-      class: 'Simple'
-    },
-    {
-      name: 'e',
-      class: 'Simple'
-    },
-    {
-      name: 'f',
-      class: 'Simple'
-    },
-    {
-      name: 'g',
-      class: 'Simple'
-    },
-    {
-      name: 'h',
-      class: 'Simple'
-    },
-    {
-      name: 'i',
-      class: 'Simple'
-    }
+    { class: 'Simple', name: 'a' },
+    { class: 'Simple', name: 'b' },
+    { class: 'Simple', name: 'c' },
+    { class: 'Simple', name: 'd' },
+    { class: 'Simple', name: 'e' },
+    { class: 'Simple', name: 'f' },
+    { class: 'Simple', name: 'g' },
+    { class: 'Simple', name: 'h' },
+    { class: 'Simple', name: 'i' }
   ],
 
   methods: [
@@ -302,7 +275,7 @@ foam.CLASS({
       return 'hsl(' + h + ',' + s + '%,' + l + '%)';
     },
 
-    // TODO: Replace with toE() when/if ready.
+    // FUTURE: Replace with toE() when/if ready.
     function toHTML() {
       return this.Canvas.create({
         width: this.x + this.width || this.r * 2,

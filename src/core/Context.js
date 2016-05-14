@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: __context__, __subContext__
+
 /**
  * Context Support
  *
@@ -38,6 +40,7 @@
     // Temporary: gets replaced in Window.js.
     assert: function() { console.assert.apply(console, arguments); },
 
+    // TODO: add second disableException option
     /** Lookup a Model. **/
     lookup: function(id) {
       return this.__cache__[id];
@@ -74,10 +77,12 @@
           if ( foam.core.Slot.isInstance(v) ) {
             sub[key + '$'] = v;
             // For performance, these could be reused.
-            Object.defineProperty(sub, key, {
-              get: function() { return v.get(); },
-              enumerable: false
-            });
+            (function(v) {
+              Object.defineProperty(sub, key, {
+                get: function() { return v.get(); },
+                enumerable: false
+              });
+            })(v);
           } else {
             sub[key + '$'] = foam.core.ConstantSlot.create({value: v});
             sub[key] = v;

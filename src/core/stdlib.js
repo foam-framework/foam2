@@ -37,6 +37,32 @@
   6. It makes the future implementation of multi-methods much easier.
 */
 
+/**
+ * Each of these flyweight types follows a standard interface.
+ *
+ * <pre>
+ * interface Type {
+ *   // Returns true if the given object is of this type.
+ *   // example: foam.String.is('hello') -> true
+ *   is(o) -> Boolean
+ *
+ *   // Returns a deep clone of o, if the type supports it.
+ *   clone(o);
+ *
+ *   // Returns true if a and b are equivalent.
+ *   equals(a, b) -> Boolean
+ *
+ *   // Returns -1, 0 or 1 as a comparsion of the two types.
+ *   // -1 means that 'a' is considered smaller that 'b'
+ *   // 0 means that and 'a' and 'b' are considered equivalent
+ *   // 1 means that 'a' is considered larger than 'b'
+ *   compare(a, b) -> Int
+ *
+ *   // Returns a hash of 'a' useful for hash tables
+ *   hashCode(a) -> Int
+ * }
+ */
+
 foam.LIB({
   name: 'foam.Undefined',
   methods: [
@@ -157,13 +183,16 @@ foam.LIB({
 
     function argsStr(f) {
       /** Finds the function(...) declaration arguments part. Strips newlines. */
-      return f.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+      return f.
+          toString().
+          replace(/(\r\n|\n|\r)/gm,"").
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
-    function argsArray(f) {
+    function formalArgs(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. argsArray(function(a,b) {...}) == ['a', 'b']
+       * Ex. formalArgs(function(a,b) {...}) == ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       if ( ! args ) return [];
@@ -205,7 +234,7 @@ foam.LIB({
        * Hello adam
        *
        **/
-      var argNames = foam.Function.argsArray(fn);
+      var argNames = foam.Function.formalArgs(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
@@ -239,7 +268,9 @@ foam.LIB({
     function is(o) { return typeof o === 'number'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0; },
+    function compare(a, b) {
+      return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+    },
     function hashCode(n) { return n & n; }
   ]
 });
@@ -266,7 +297,8 @@ foam.LIB({
     {
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
-        // switchFromCamelCaseToConstantFormat to SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
+        // switchFromCamelCaseToConstantFormat to
+        // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
         return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
           return a.substring(0,1) + '_' + a.substring(1,2);
         }).toUpperCase();
@@ -450,7 +482,8 @@ foam.LIB({
   ]
 });
 
-
+// TODO: doc
+// TODO?: rename
 foam.typeOf = (function() {
   var
     tNumber    = foam.Number,
@@ -490,13 +523,15 @@ foam.mmethod = function(map) {
   return function(arg1) {
     var type = foam.typeOf(arg1);
     console.assert(type, 'Unknown type: ', arg1);
-    console.assert(type[uid], 'Missing multi-method for type ', arg1, ' map: ', map);
+    console.assert(
+        type[uid],
+        'Missing multi-method for type ', arg1, ' map: ', map);
     return type[uid].apply(this, arguments);
   };
 };
 
 
-( function() {
+(function() {
   var typeOf = foam.typeOf;
 
   foam.LIB({
@@ -510,4 +545,45 @@ foam.mmethod = function(map) {
       function diff(a, b)    { return typeOf(a).diff(a, b); }
     ]
   });
-} )();
+})();
+
+
+foam.LIB({
+  name: 'foam.package',
+  methods: [
+    /**
+     * Registers the given class in the global namespace.
+     * If the given class has an id of 'some.package.MyClass'
+     * then the class object will be made available globally at
+     * global.some.package.MyClass.
+     *
+     */
+    function registerClass(cls) {
+      var pkg = foam.package.ensurePackage(global, cls.package);
+      pkg[cls.name] = cls;
+    },
+
+    /**
+     * Walk a dot separated path starting at root, creating empty
+     * objects if necessary.
+     *
+     * ensurePackage(global, 'some.dot.separated.path');
+     * will ensure that global.some.dot.separated.path exists with
+     * each part being a JS object.
+     */
+    function ensurePackage(root, path) {
+      if ( ! path ) return root;
+
+      console.assert(typeof path === 'string',
+                     'Cannot make a package path of a non-string');
+
+      path = path.split('.');
+
+      for ( var i = 0 ; i < path.length ; i++ ) {
+        root = root[path[i]] || ( root[path[i]] = {} );
+      }
+
+      return root;
+    }
+  ]
+});

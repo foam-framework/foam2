@@ -19,3 +19,4 @@ ToDo:
     - should onDestroy be merged with listener support?
   - multi-methods?
   - Topic listener relay
+  - Should String be the default property type with no way to create an untype property?

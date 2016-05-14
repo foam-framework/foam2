@@ -15,6 +15,46 @@
  * limitations under the License.
  */
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'String',
+  extends: 'Property',
+
+  // documentation: 'StringProperties coerce their arguments into Strings.',
+
+  properties: [
+    [ 'adapt', function(_, a) {
+        return typeof a === 'function' ? foam.String.multiline(a) :
+               typeof a === 'number'   ? String(a) :
+               a && a.toString         ? a.toString() :
+               '';
+      }
+    ],
+    [ 'value', '' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Int',
+  extends: 'Property',
+
+  properties: [
+    'units',
+    [ 'value', 0 ],
+    [ 'adapt', function adaptInt(_, v) {
+        // FUTURE: replace with Math.trunc() when available everywhere.
+        return typeof v === 'number' ? ( v > 0 ? Math.floor(v) : Math.ceil(v) ) :
+          v ? parseInt(v) :
+          0 ;
+      }
+    ]
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Date',
@@ -133,6 +173,7 @@ foam.CLASS({
 });
 
 
+// FUTURE: to be used by or replaced by Relationship axiom
 foam.CLASS({
   package: 'foam.core',
   name: 'Reference',
@@ -153,16 +194,6 @@ foam.CLASS({
       // documentation: 'The name of the key (a property of the other object) that this property references.'
     }
   ],
-
-  methods: [
-    function installInProto(proto) {
-      this.SUPER(proto);
-
-      // TODO(js): expression to produce the actual value referenced by
-      // this property? or method installed on the host?
-
-    }
-  ]
 });
 
 
@@ -504,6 +535,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',

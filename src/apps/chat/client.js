@@ -22,6 +22,18 @@ var pending = document.getElementById('pending');
 var input = document.getElementById('input');
 var send = document.getElementById('send');
 
+var statusbar = document.getElementById('connected-status');
+
+function updateStatus(v) {
+  statusbar.textContent = v ? 'Connected' : 'Disconnected';
+  statusbar.className = v ? 'connected' : 'disconnected';
+}
+
+client.connected$.sub(function(s, o, p, v) {
+  updateStatus(v.get());
+});
+updateStatus(client.connected);
+
 function sendMessage() {
   if ( input.value ) {
     client.messageDAO.put(

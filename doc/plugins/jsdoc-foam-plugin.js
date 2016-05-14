@@ -136,27 +136,22 @@ var getDefinitionType = function getDefinitionType(node) {
 var getCLASSPackage = function getCLASSPackage(node) {
 
   var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
-  if ( ! pkg ) pkg = ( getDefinitionType(node) === 'LIB' ) ? 'foam' : 'foam/core';
-
-  // special cases
-  if ( pkg === 'foam' ) {
-    var name = getNodePropertyNamed(node, 'name');
-    if (
-      name === 'Array' ||
-      name === 'Function' ||
-      name === 'Number' ||
-      name === 'Object' ||
-      name === 'String' ||
-      name === 'Date'
-    ) {
-      return '';
+  if ( ! pkg ) {
+    if ( getDefinitionType(node) === 'LIB' ) {
+      pkg = getNodePropertyNamed(node, 'name').replace(/\./g, '/');
+      pkg = pkg.substring(0, pkg.lastIndexOf('/'));
+    } else {
+      pkg = 'foam/core';
     }
   }
+
   return pkg;
 }
 
 var getCLASSName = function getCLASSName(node) {
   var name = getNodePropertyNamed(node, 'name');
+  var pkg = getCLASSPackage(node);
+
   if ( ! name ) {
     var classRefines = getCLASSPath(node, 'refines');
     if ( classRefines ) {
@@ -168,8 +163,11 @@ var getCLASSName = function getCLASSName(node) {
       }
     }
   }
-  var pkg = getCLASSPackage(node);
-
+  var j = name.lastIndexOf('.');
+  if ( j > 0 ) {
+    name = name.substring(j+1);
+    pkg = '';
+  }
   return ( pkg ? 'module:' + pkg + '.' : '' ) + name;
 }
 var getCLASSPath = function getCLASSPath(node, name) {
@@ -262,12 +260,6 @@ var checkForPackageModule = function checkForPackageModule(parser, pkg) {
     parser._resultBuffer.push(
       {
         comment: '/**\n @module'+pkg+'\n */',
-//         meta:
-//         { range: [Object],
-//          filename: 'Boot.js',
-//          lineno: 18,
-//          path: '/usr/local/google/home/jacksonic/foam2/vjlofvhjfgm/src/core',
-//          code: {} },
         kind: 'module',
         name: pkg,
         longname: 'module:'+pkg
@@ -300,6 +292,11 @@ exports.astNodeVisitor = {
       var className = getNodePropertyNamed(node, "name");
       var classPackage = getCLASSPackage(node);
       var classExt = getCLASSPath(node, 'extends');
+
+      // for LIBs, className contains the package too. Strip it.
+      if ( className.lastIndexOf('.') > 0 ) {
+        className = className.substring(className.lastIndexOf('.'));
+      }
 
       // check if the package exists as a module yet, create one if necessary
       checkForPackageModule(parser, classPackage);

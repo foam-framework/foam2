@@ -146,8 +146,6 @@ foam.LIB({
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
-        cls.prototype.ID__   = this.id + 'Prototype';
-        cls.ID__             = this.id + 'Class';
         cls.private_         = { axiomCache: {} };
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.id               = this.id;
@@ -174,16 +172,13 @@ foam.LIB({
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
-        if ( ! m.refines ) foam.register(cls);
+        console.assert(
+          ! m.refines,
+          'Refines is not supported in early bootstrap');
 
-        var path = cls.id.split('.');
-        var root = global;
+        foam.register(cls);
+        foam.package.registerClass(cls);
 
-        for ( var i = 0 ; i < path.length-1 ; i++ ) {
-          root = root[path[i]] || ( root[path[i]] = {} );
-        }
-
-        root[path[path.length-1]] = cls;
         return cls;
       };
     },
@@ -200,16 +195,11 @@ foam.LIB({
         var cls = model.buildClass();
         cls.validate();
 
-        if ( ! m.refines ) foam.register(cls);
-
-        var path = cls.id.split('.');
-        var root = global;
-
-        for ( var i = 0 ; i < path.length-1 ; i++ ) {
-          root = root[path[i]] || ( root[path[i]] = {} );
+        if ( ! m.refines ) {
+          foam.register(cls);
+          foam.package.registerClass(cls);
         }
 
-        root[path[path.length-1]] = cls;
         return cls;
       };
 

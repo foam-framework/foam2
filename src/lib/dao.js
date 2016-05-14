@@ -457,6 +457,11 @@ foam.CLASS({
       }
 
       return sink;
+    },
+
+    function eof() {
+      // Do nothing by default, but can be overridden.
+      // This allows DAOs to be used as a Sink.
     }
   ]
 });
@@ -473,7 +478,14 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ],
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ]
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      postSet: function(old, nu) {
+        // Only fire a 'reset' when the delegate is actually changing, not being
+        // set for the first time.
+        if ( old ) {
+          this.on.reset.pub();
+        }
+      }
     }
   ]
 });
