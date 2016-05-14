@@ -1,7 +1,7 @@
 foam.CLASS({
   package: 'foam.demos.graphics',
   name: 'LifeStar',
-  extends: 'foam.graphics.Box',
+  extends: 'foam.graphics.StereoCView',
 
   classes: [
     {
@@ -26,10 +26,15 @@ foam.CLASS({
           this.y = z * Math.sin(a) + y * Math.cos(a);
         },
         function doTransform(x) {
+          var oldX = this.x, oldY = this.y;
+          var s = 1 - this.z/800;
+          this.x *= s;
+          this.y *= s;
           var t = this.transform;
-          var s = 1 - this.z/300;
           t.scale(s, s);
           x.transform(t.a, t.d, t.b, t.e, t.c, t.f);
+          this.x = oldX;
+          this.y = oldY;
         },
         function paintSelf(x) {
           this.SUPER(x);
@@ -49,7 +54,7 @@ foam.CLASS({
     [ 'n',      197 ],
     [ 'x',      500 ],
     [ 'y',      350 ],
-    [ 'width',  500 ],
+    [ 'width',  1200 ],
     [ 'height', 500 ],
     [ 'time',     0 ]
   ],
