@@ -32,7 +32,7 @@ foam.CLASS({
   package: 'foam.promise',
   name: 'Pending',
 
-  implements: ['foam.promise.IPromise'],
+  implements: [ 'foam.promise.IPromise' ],
 
   methods: [
     function then(success, fail) {
@@ -296,6 +296,3 @@ foam.LIB({
     }
   ]
 });
-
-
-

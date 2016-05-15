@@ -18,10 +18,10 @@
 /* Indexed Memory-based DAO. */
 
 foam.CLASS({
-  extends: 'foam.dao.AbstractDAO',
   package: 'foam.dao',
   name: 'MDAO',
   label: 'Indexed DAO',
+  extends: 'foam.dao.AbstractDAO',
 
   requires: [
     'foam.dao.ExternalException',

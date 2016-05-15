@@ -21,6 +21,7 @@
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Pooled',
+
   axioms: [ foam.pattern.Singleton.create() ],
   requires: [ 'foam.core.Method' ],
   imports: [ 'assert' ],
