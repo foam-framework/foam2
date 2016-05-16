@@ -111,11 +111,11 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Action',
       name: 'actions',
-      adaptArrayElement: function(o) {
+      adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
           return foam.core.Action.create({name: o.name, code: o});
         }
-        return foam.lookup(this.of).create(o);
+        return foam.lookup(prop.of).create(o);
       }
     }
   ]

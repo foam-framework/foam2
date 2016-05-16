@@ -240,8 +240,8 @@ foam.CLASS({
       name: 'templates',
       class: 'AxiomArray',
       of: 'foam.templates.TemplateAxiom',
-      adaptArrayElement: function(o) {
-        return foam.lookup(this.of).create(o);
+      adaptArrayElement: function(o, prop) {
+        return foam.lookup(prop.of).create(o);
       }
     }
   ]

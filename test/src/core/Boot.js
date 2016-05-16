@@ -274,54 +274,6 @@ describe('Final property', function() {
   });
 });
 
-describe('FObjectArray', function() {
-  var t;
-
-  beforeEach(function() {
-    foam.CLASS({ name: 'A', package: 'test', properties: [ { name: 'a' } ] });
-    foam.CLASS({
-      name: 'B',
-      package: 'test',
-      properties: [
-        {
-          class: 'FObjectArray', of: 'A',
-          name: 'as'
-        }
-      ]
-    });
-  });
-  afterEach(function() {
-    t = null;
-  });
-
-  it('has a adapt', function() {
-    var ap = foam.core.FObjectArray.create({});
-    expect(ap.adapt).toBeTruthy();
-  });
-
-  // it('defaults to an empty array', function() {
-  //   var b = test.B.create({});
-  //   expect(b.as).toEqual([]);
-  // });
-  // TODO: enable when MyMdl.create(instanceA) clones correctly
-//   it('accepts an array value of the correct type', function() {
-//     var b = test.B.create({});
-//     var a = test.A.create({ a: 'a' });
-//     var aa = test.A.create({ a: 'aa' });
-
-//     b.as = [a, aa];
-//     expect(b.as.toString()).toEqual([a, aa].toString());
-
-//     console.log('b',b.as[0], 'a', a)
-
-//     expect(b.as[0]).toEqual(a);
-//     expect(b.as[1]).toEqual(aa);
-//   });
-
-});
-
-
-
 describe('Constants', function() {
   var t;
   var t2;
