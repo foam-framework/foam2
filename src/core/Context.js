@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: __context__, __subContext__
-
 /**
  * Context Support
  *
