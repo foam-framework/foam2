@@ -36,7 +36,7 @@
  */
 
 (function() {
-  var X = {
+  var ctx = {
     // Temporary: gets replaced in Window.js.
     assert: function() { console.assert.apply(console, arguments); },
 
@@ -106,7 +106,7 @@
     }
   };
 
-  Object.defineProperty(X, '__cache__', {
+  Object.defineProperty(ctx, '__cache__', {
     value: {},
     enumerable: false
   });
@@ -117,5 +117,5 @@
     return foam.__context__.subContext(opt_args, opt_name);
   };
 
-  foam.__context__ = X;
+  foam.__context__ = ctx;
 })();

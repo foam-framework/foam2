@@ -56,8 +56,8 @@ foam.CLASS({
             var parent = this;
             var c      = Object.create(cls);
 
-            c.create = function innerClassCreate(args, X) {
-              return cls.create(args, X || parent);
+            c.create = function innerClassCreate(args, ctx) {
+              return cls.create(args, ctx || parent);
             };
             this.setPrivate_(name, c);
           }

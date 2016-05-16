@@ -195,7 +195,7 @@ foam.CLASS({
               var instances = {};
               var oldCreate = cls.create;
 
-              cls.create = function(args, X) {
+              cls.create = function(args, ctx) {
                 var key = args.ordinal;
 
                 // Short-circuit if we already create the instance for this ordinal.
@@ -210,7 +210,7 @@ foam.CLASS({
                 args.ordinal = key;
                 args.name = enumValue.name;
 
-                return instances[key] = oldCreate.call(this, args, X);
+                return instances[key] = oldCreate.call(this, args, ctx);
               };
             }
           }

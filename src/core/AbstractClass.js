@@ -34,7 +34,7 @@ foam.LIB({
       Create a new instance of this class.
       Configured from values taken from 'args', if supplifed.
     */
-    function create(args, X) {
+    function create(args, ctx) {
       var obj = Object.create(this.prototype);
 
       // Properties have their values stored in instance_ instead
@@ -45,7 +45,7 @@ foam.LIB({
       obj.instance_ = {};
 
       // initArgs() is the standard argument extraction method.
-      obj.initArgs(args, X);
+      obj.initArgs(args, ctx);
 
       // init(), if defined, is called when object is created.
       // This is where class specific initialization code should

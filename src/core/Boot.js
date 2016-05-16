@@ -123,10 +123,10 @@ foam.LIB({
       (Model is 'this').
     */
     function buildClass() {
-      var cls, X = this.__context__ || foam.__context__;
+      var cls, ctx = this.__context__ || foam.__context__;
 
       if ( this.refines ) {
-        cls = X.lookup(this.refines);
+        cls = ctx.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
         console.assert(this.id, 'Missing id name.', this.name);
@@ -135,7 +135,7 @@ foam.LIB({
 //          console.warn('Redefinition of class: ' + this.name);
 
         var parent = this.extends   ?
-          X.lookup(this.extends) :
+          ctx.lookup(this.extends) :
           foam.AbstractClass ;
 
         if ( ! parent ) {

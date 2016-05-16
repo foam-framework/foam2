@@ -215,8 +215,8 @@ if ( false && Proxy ) {
 
     var oldCreate = foam.AbstractClass.create;
 
-    foam.AbstractClass.create = function(args, X) {
-      return new Proxy(oldCreate.call(this, args, X), {
+    foam.AbstractClass.create = function(args, ctx) {
+      return new Proxy(oldCreate.call(this, args, ctx), {
         get: function(target, prop, receiver) {
           return target[prop];
         },

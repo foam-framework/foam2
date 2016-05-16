@@ -40,7 +40,7 @@ foam.CLASS({
             this.assert(cls, 'Requires: Unknown class: ', path);
 
             var c = Object.create(cls);
-            c.create = function requiresCreate(args, X) { return cls.create(args, X || parent); };
+            c.create = function requiresCreate(args, ctx) { return cls.create(args, ctx || parent); };
             this.setPrivate_(name, c);
           }
 

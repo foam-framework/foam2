@@ -116,8 +116,8 @@ foam.CLASS({
       Called to process constructor arguments.
       Replaces simpler version defined in original FObject definition.
     */
-    function initArgs(args, X) {
-      this.__context__ = X || foam.__context__;
+    function initArgs(args, ctx) {
+      this.__context__ = ctx || foam.__context__;
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy

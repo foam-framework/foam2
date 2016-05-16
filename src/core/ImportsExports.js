@@ -100,8 +100,8 @@ foam.CLASS({
       Object.defineProperty(proto, slotName, {
         get: function importsGetter() {
           if ( ! this.hasOwnPrivate_(slotName) ) {
-            var X = this.__context__ || foam.__context__;
-            this.setPrivate_(slotName, X[key + '$']);
+            var ctx = this.__context__ || foam.__context__;
+            this.setPrivate_(slotName, ctx[key + '$']);
           }
 
           return this.getPrivate_(slotName);
@@ -172,7 +172,7 @@ foam.CLASS({
       Object.defineProperty(proto, '__subContext__', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('__subContext__') ) {
-            var X = this.__context__ || foam.__context__;
+            var ctx = this.__context__ || foam.__context__;
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
@@ -196,7 +196,7 @@ foam.CLASS({
                 m[b.name] = this;
               }
             }
-            this.setPrivate_('__subContext__', X.subContext(m));
+            this.setPrivate_('__subContext__', ctx.subContext(m));
           }
 
           return this.getPrivate_('__subContext__');

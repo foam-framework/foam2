@@ -116,7 +116,7 @@ foam.CLASS({
 
     function merged(l, opt_delay) {
       var delay = opt_delay || 16;
-      var X     = this;
+      var ctx     = this;
 
       return foam.Function.setName(function() {
         var triggered = false;
@@ -133,7 +133,7 @@ foam.CLASS({
 
           if ( ! triggered ) {
             triggered = true;
-            X.setTimeout(mergedListener, delay);
+            ctx.setTimeout(mergedListener, delay);
           }
         };
 
@@ -142,7 +142,7 @@ foam.CLASS({
     },
 
     function framed(l) {
-      var X = this;
+      var ctx = this;
 
       return foam.Function.setName(function() {
         var triggered = false;
@@ -159,7 +159,7 @@ foam.CLASS({
 
           if ( ! triggered ) {
             triggered = true;
-            X.requestAnimationFrame(frameFired);
+            ctx.requestAnimationFrame(frameFired);
           }
         };
 
