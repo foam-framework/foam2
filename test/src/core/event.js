@@ -200,7 +200,7 @@ describe('foam.X.async', function() {
     expect(listener.count).toEqual(2);
   });
 
-  it('async with opt_X specified', function() {
+  it('async with opt_ctx specified', function() {
     var X = { setTimeout: setTimeout };
     var delayed = foam.X.async(listener, X);
 
