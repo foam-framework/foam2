@@ -642,8 +642,8 @@ exports.publish = function(taffyData, opts, tutorials) {
     // TODO: move the tutorial functions to templateHelper.js
     function generateTutorial(title, tutorial, filename) {
         var tutorialData = {
-            title: title,
-            header: tutorial.title,
+            title: '',
+            header: '',
             content: tutorial.parse(),
             children: tutorial.children
         };
