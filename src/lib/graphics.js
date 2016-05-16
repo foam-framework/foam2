@@ -692,6 +692,12 @@ foam.CLASS({
       }
     },
     {
+      name: 'context3D',
+      factory: function() {
+        return this.element.getContext('webgl');
+      }
+    },
+    {
       name: 'cview',
       postSet: function(o, n) {
         o && o.invalidated.unsub(this.paint);
