@@ -97,7 +97,7 @@ foam.CLASS({
 // TODO: doc
       class: 'Boolean',
       name: 'alwaysQuoteKeys',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
@@ -107,7 +107,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'formatFunctionsAsStrings',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
@@ -147,14 +147,16 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'strict',
-      // TODO: change to true by default
-      value: false,
+      value: true,
       postSet: function(_, s) {
         if ( s ) {
-          this.alwaysQuoteKeys          = true;
           this.useShortNames            = false;
           this.formatDatesAsNumbers     = false;
+          this.alwaysQuoteKeys          = true;
           this.formatFunctionsAsStrings = true;
+        } else {
+          this.alwaysQuoteKeys          = false;
+          this.formatFunctionsAsStrings = false;
         }
       }
     }
@@ -330,7 +332,9 @@ foam.LIB({
   constants: {
 
     // Pretty Print
-    Pretty: foam.json.Outputer.create(),
+    Pretty: foam.json.Outputer.create({
+      strict: false
+    }),
 
     // Strict means output as proper JSON.
     Strict: foam.json.Outputer.create({
@@ -348,7 +352,8 @@ foam.LIB({
     Compact: foam.json.Outputer.create({
       pretty: false,
       formatDatesAsNumbers: true,
-      outputDefaultValues: false
+      outputDefaultValues: false,
+      strict: false
     }),
 
     // Shorter than Compact (uses short-names if available)
@@ -356,7 +361,8 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
-      useShortNames: true
+      useShortNames: true,
+      strict: false
     }),
 
     // Short, but exclude network-transient properties.
@@ -365,6 +371,7 @@ foam.LIB({
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       useShortNames: true,
+      strict: false,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
@@ -374,6 +381,7 @@ foam.LIB({
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
       useShortNames: true,
+      strict: false,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
     })
   },
