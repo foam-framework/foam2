@@ -84,10 +84,10 @@ foam.CLASS({
           get: function() {
             var x = this.getPrivate_('X');
             if ( ! x ) {
-              var ySource = this.getPrivate_('ySource');
-              if ( ySource ) {
-                this.setPrivate_('X', x = ySource.__subContext__ || ySource.X);
-                this.setPrivate_('ySource', undefined);
+              var contextParent = this.getPrivate_('contextParent');
+              if ( contextParent ) {
+                this.setPrivate_('X', x = contextParent.__subContext__ || contextParent.X);
+                this.setPrivate_('contextParent', undefined);
               } else {
                 // Happens during bootstrap with Properties.
                 x = foam.X;
@@ -97,7 +97,7 @@ foam.CLASS({
           },
           set: function(x) {
             if ( x ) {
-              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'ySource' : 'X', x);
+              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'contextParent' : 'X', x);
             }
           }
         });
