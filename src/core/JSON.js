@@ -395,6 +395,8 @@ foam.LIB({
 
   methods: [
     function parse(json, opt_class, opt_ctx) {
+      if ( typeof json !== 'object' ) return json;
+
       // recurse into sub-objects
       for ( var key in json ) {
         var o = json[key];
