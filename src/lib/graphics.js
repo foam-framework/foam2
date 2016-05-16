@@ -424,15 +424,15 @@ foam.CLASS({
 */
     },
 
-    function maybeInitCView() {
+    function maybeInitCView(x) {
       if ( this.state == 'initial' ) {
-        this.initCView();
+        this.initCView(x);
         this.state = 'initailized'
       }
     },
 
     function paint(x) {
-      this.maybeInitCView();
+      this.maybeInitCView(x);
       x.save();
       x.globalAlpha *= this.alpha;
       x.strokeStyle = ( this.border && this.border.toCanvasStyle ) ?
