@@ -540,7 +540,9 @@ foam.CLASS({
     }
   ],
   methods: [
-    function paint(gl) {
+    function paint3D(gl) {
+      // TODO: transform
+      this.paintSelf(gl);
     },
     function paintSelf(gl) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
