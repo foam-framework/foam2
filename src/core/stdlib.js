@@ -158,12 +158,12 @@ foam.LIB({
     function memoize1(f) {
       var cache = {};
       return foam.Function.setName(
-          function(arg) {
+          function(key) {
             console.assert(
                 arguments.length == 1,
                 "Memoize1'ed functions must take exactly one argument.");
-            var key = arg ? ( '' + arg ) : '';
-            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
+
+            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
             return cache[key];
           },
           'memoize1(' + f.name + ')');
