@@ -718,8 +718,13 @@ foam.CLASS({
       name: 'paint',
       isFramed: true,
       code: function paintCanvas() {
-        this.erase();
-        this.cview && this.cview.paint(this.context);
+        var context = this.cview.paint3D ? this.context3D : this.context;
+        this.erase(context);
+
+        if ( this.cview ) {
+          if ( this.cview.paint3D ) this.cview.paint3D(context);
+          else this.cview.paint(context);
+        }
       }
     }
   ],
