@@ -60,7 +60,7 @@ foam.CLASS({
   ],
 
   constants: {
-    HEADER: 'var self = this, X = this.X, Y = this.Y;\n' +
+    HEADER: 'var self = this, X = this.X, Y = this.__subContext__;\n' +
       'var output = opt_outputter ? opt_outputter : TOC(this);\n' +
       'var out = output.output.bind(output);\n' +
       "out('",

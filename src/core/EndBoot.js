@@ -86,7 +86,7 @@ foam.CLASS({
             if ( ! x ) {
               var ySource = this.getPrivate_('ySource');
               if ( ySource ) {
-                this.setPrivate_('X', x = ySource.Y || ySource.X);
+                this.setPrivate_('X', x = ySource.__subContext__ || ySource.X);
                 this.setPrivate_('ySource', undefined);
               } else {
                 // Happens during bootstrap with Properties.
@@ -103,7 +103,10 @@ foam.CLASS({
         });
 
         // If no delcared exports, then sub-context is the same as context.
-        Object.defineProperty(p, 'Y', { get: function() { return this.X; } });
+        Object.defineProperty(
+            p,
+            '__subContext__',
+            { get: function() { return this.X; } });
       }
     }
   ],

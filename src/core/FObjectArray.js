@@ -43,7 +43,7 @@ foam.CLASS({
       }
     ],
     [ 'adaptArrayElement', function(o) {
-      // FUTURE: replace 'foam.' with '(this.Y || foam).' ?
+      // FUTURE: replace 'foam.' with '(this.__subContext__ || foam).' ?
       var cls = foam.lookup(this.of);
       console.assert(cls, 'Unknown array "of": ', this.of);
       return cls.isInstance(o) ? o : cls.create(o, this);

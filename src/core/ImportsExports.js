@@ -169,9 +169,9 @@ foam.CLASS({
     function installInProto(proto) {
       var bs = this.bindings;
 
-      Object.defineProperty(proto, 'Y', {
+      Object.defineProperty(proto, '__subContext__', {
         get: function YGetter() {
-          if ( ! this.hasOwnPrivate_('Y') ) {
+          if ( ! this.hasOwnPrivate_('__subContext__') ) {
             var X = this.X || foam.X;
             var m = {};
             for ( var i = 0 ; i < bs.length ; i++ ) {
@@ -196,10 +196,10 @@ foam.CLASS({
                 m[b.name] = this;
               }
             }
-            this.setPrivate_('Y', X.subContext(m));
+            this.setPrivate_('__subContext__', X.subContext(m));
           }
 
-          return this.getPrivate_('Y');
+          return this.getPrivate_('__subContext__');
         },
         configurable: true,
         enumerable: false

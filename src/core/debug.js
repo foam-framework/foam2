@@ -310,7 +310,7 @@ foam.CLASS({
   ]
 });
 
-foam.X = foam.debug.Window.create(null, foam.X).Y;
+foam.X = foam.debug.Window.create(null, foam.X).__subContext__;
 
 
 foam.CLASS({
