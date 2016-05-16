@@ -81,8 +81,8 @@ foam.CLASS({
     function installInClass(c) {
       this.props = this.propNames.map(function(n) {
         var prop = c.getAxiomByName(n);
-        foam.X.assert(prop, 'Unknown ids property:', c.id + '.' + n);
-        foam.X.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
+        foam.__context__.assert(prop, 'Unknown ids property:', c.id + '.' + n);
+        foam.__context__.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
         return prop;
       });
 

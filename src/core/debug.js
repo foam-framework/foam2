@@ -121,7 +121,7 @@ foam.CLASS({
 });
 
 
-foam.X.assert(
+foam.__context__.assert(
     ! foam.AbstractClass.describe,
     'foam.AbstractClass.describe already set.');
 
@@ -152,7 +152,7 @@ foam.AbstractClass.installModel = function() {
     for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
       var a = m.axioms_[i];
 
-      foam.X.assert(
+      foam.__context__.assert(
         ! names.hasOwnProperty(a.name),
         'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
@@ -221,7 +221,7 @@ if ( false && Proxy ) {
           return target[prop];
         },
         set: function(target, prop, value, receiver) {
-          foam.X.assert(
+          foam.__context__.assert(
               IGNORE[prop] || target.cls_.getAxiomByName(prop),
               'Invalid Set: ', target.cls_.id, prop, value);
           target[prop] = value;
@@ -262,7 +262,7 @@ foam.CLASS({
 
 
 /* Add describe support to contexts. */
-foam.X = foam.X.subContext({
+foam.__context__ = foam.__context__.subContext({
   describe: function() {
     this.log(
         'Context:',
@@ -294,14 +294,14 @@ foam.CLASS({
 
   methods: [
     function merged(l, opt_delay) {
-      var f = this.X.merged(l, opt_delay);
+      var f = this.__context__.merged(l, opt_delay);
       f.toString = function() {
         return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
       };
       return f;
     },
     function framed(l) {
-      var f = this.X.framed(l);
+      var f = this.__context__.framed(l);
       f.toString = function() {
         return 'ANIMATE(' + l.$UID + ', ' + l + ')';
       };
@@ -310,7 +310,7 @@ foam.CLASS({
   ]
 });
 
-foam.X = foam.debug.Window.create(null, foam.X).__subContext__;
+foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
 
 
 foam.CLASS({

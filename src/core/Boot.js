@@ -123,7 +123,7 @@ foam.LIB({
       (Model is 'this').
     */
     function buildClass() {
-      var cls, X = this.X || foam.X;
+      var cls, X = this.__context__ || foam.__context__;
 
       if ( this.refines ) {
         cls = X.lookup(this.refines);

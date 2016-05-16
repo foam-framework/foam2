@@ -103,13 +103,13 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'assert', 'error', 'log', 'warn' ],
 
-    function assert() { this.X.assert.apply(null, arguments); },
+    function assert() { this.__context__.assert.apply(null, arguments); },
 
-    function error() { this.X.error.apply(null, arguments); },
+    function error() { this.__context__.error.apply(null, arguments); },
 
-    function log() { this.X.log.apply(null, arguments); },
+    function log() { this.__context__.log.apply(null, arguments); },
 
-    function warn() { this.X.warn.apply(null, arguments); },
+    function warn() { this.__context__.warn.apply(null, arguments); },
 
 
     /************************************************
@@ -490,7 +490,7 @@ foam.CLASS({
         var value = this[key];
         this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
-      return this.cls_.create(m/*, this.X*/);
+      return this.cls_.create(m/*, this.__context__*/);
     },
 
     /**

@@ -390,7 +390,7 @@ foam.LIB({
 
       if ( json.class ) {
         var cls = foam.lookup(json.class);
-        foam.X.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
+        foam.__context__.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
         return cls.create(json, opt_ctx);
       }
       if ( opt_class ) return opt_class.create(json, opt_ctx);

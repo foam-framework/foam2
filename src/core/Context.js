@@ -31,7 +31,7 @@
  * mechanism provides a high-level declarative method of dependency management
  * which hides their use.
  *
- * foam.X references the root context, which is the ancestor of all other
+ * foam.__context__ references the root context, which is the ancestor of all other
  * contexts.
  */
 
@@ -111,11 +111,11 @@
     enumerable: false
   });
 
-  foam.lookup = function(id) { return foam.X.lookup(id); };
-  foam.register = function(cls) { foam.X.register(cls); };
+  foam.lookup = function(id) { return foam.__context__.lookup(id); };
+  foam.register = function(cls) { foam.__context__.register(cls); };
   foam.subContext = function(opt_args, opt_name) {
-    return foam.X.subContext(opt_args, opt_name);
+    return foam.__context__.subContext(opt_args, opt_name);
   };
 
-  foam.X = X;
+  foam.__context__ = X;
 })();

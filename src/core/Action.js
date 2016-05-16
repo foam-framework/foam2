@@ -95,7 +95,7 @@ foam.CLASS({
     function installInProto(proto) {
       var action = this;
       proto[this.name] = function() {
-        return action.maybeCall(this.X, this);
+        return action.maybeCall(this.__context__, this);
       };
     }
   ]

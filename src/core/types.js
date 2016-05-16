@@ -265,7 +265,7 @@ foam.CLASS({
       value: function(old, nu, prop) {
         if ( typeof nu === 'string' ) {
           if ( ! nu ) return '';
-          var ret = this.X.lookup(nu);
+          var ret = this.__context__.lookup(nu);
           this.assert(ret && ret.isSubClass, 'Invalid class name ' +
              nu + ' specified for ' + prop.name);
           return ret;
@@ -389,7 +389,7 @@ foam.CLASS({
       var methods = ! this.methods ? [] :
           this.methods.length ? this.methods.map(function(f) {
             var m = delegate.getAxiomByName(f);
-            foam.X.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
+            foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
             return m;
           }) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {

@@ -81,9 +81,9 @@ foam.CLASS({
             foam.Function.setName(l, name);
 
             if ( isMerged ) {
-              l = this.X.merged(l, mergeDelay);
+              l = this.__context__.merged(l, mergeDelay);
             } else if ( isFramed ) {
-              l = this.X.framed(l);
+              l = this.__context__.framed(l);
             }
             this.setPrivate_(name, l);
           }

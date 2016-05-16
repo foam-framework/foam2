@@ -205,7 +205,7 @@ foam.CLASS({
                   return o.ordinal === key;
                 });
 
-                foam.X.assert(enumValue, 'No enum value found with ordinal', key);
+                foam.__context__.assert(enumValue, 'No enum value found with ordinal', key);
                 var args = enumValue.values;
                 args.ordinal = key;
                 args.name = enumValue.name;
@@ -366,7 +366,7 @@ foam.CLASS({
           return nu;
         }
 
-        var e = this.X.lookup(prop.of);
+        var e = this.__context__.lookup(prop.of);
 
         if ( type === foam.String ) {
           return e[nu];

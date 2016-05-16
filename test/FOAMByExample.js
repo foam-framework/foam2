@@ -118,7 +118,7 @@ Test.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2anonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n" });
+  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2anonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n" });
 
 
 // Example 3
@@ -235,7 +235,7 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2 XMethod initArgsMethod unknownArgTopic propertyChangeMethod describeMethod toJSON" });
+  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2 __context__Method initArgsMethod unknownArgTopic propertyChangeMethod describeMethod toJSON" });
 
 
 // Example 13
@@ -703,7 +703,7 @@ foam.CLASS({
       code: function (amount) {
         this.balance += amount;
         this.reportDeposit(this.id, amount, this.balance);
-        console.log('Bank: ', this.X.Bank);
+        console.log('Bank: ', this.__context__.Bank);
         return this.balance;
       }
     },
@@ -798,7 +798,7 @@ log(oldPerson.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 40, str: "CLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringProperty             Person         salaryanonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
+  expect(log_.output).toMatchGolden({ i: 40, str: "CLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringProperty             Person         salaryanonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
 
 
 // Example 41
@@ -958,7 +958,7 @@ tt.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 53, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbaranonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
+  expect(log_.output).toMatchGolden({ i: 53, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbaranonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
 
 
 // Example 54
@@ -982,7 +982,7 @@ ImplementsTest2.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 54, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbaranonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n" });
+  expect(log_.output).toMatchGolden({ i: 54, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbaranonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n" });
 
 
 // Example 55
@@ -1039,7 +1039,7 @@ InnerClassTest.InnerClass1.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 57, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    banonymous            FObject        XMethod               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n" });
+  expect(log_.output).toMatchGolden({ i: 57, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    banonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        toJSON\n" });
 
 
 // Example 58

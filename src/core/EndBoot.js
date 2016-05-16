@@ -78,26 +78,26 @@ foam.CLASS({
 
   axioms: [
     {
-      name: 'X',
+      name: '__context__',
       installInProto: function(p) {
-        Object.defineProperty(p, 'X', {
+        Object.defineProperty(p, '__context__', {
           get: function() {
-            var x = this.getPrivate_('X');
+            var x = this.getPrivate_('__context__');
             if ( ! x ) {
               var contextParent = this.getPrivate_('contextParent');
               if ( contextParent ) {
-                this.setPrivate_('X', x = contextParent.__subContext__ || contextParent.X);
+                this.setPrivate_('__context__', x = contextParent.__subContext__ || contextParent.__context__);
                 this.setPrivate_('contextParent', undefined);
               } else {
                 // Happens during bootstrap with Properties.
-                x = foam.X;
+                x = foam.__context__;
               }
             }
             return x;
           },
           set: function(x) {
             if ( x ) {
-              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'contextParent' : 'X', x);
+              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'contextParent' : '__context__', x);
             }
           }
         });
@@ -106,7 +106,7 @@ foam.CLASS({
         Object.defineProperty(
             p,
             '__subContext__',
-            { get: function() { return this.X; } });
+            { get: function() { return this.__context__; } });
       }
     }
   ],
@@ -117,7 +117,7 @@ foam.CLASS({
       Replaces simpler version defined in original FObject definition.
     */
     function initArgs(args, X) {
-      this.X = X || foam.X;
+      this.__context__ = X || foam.__context__;
       if ( ! args ) return;
 
       // If args are just a simple {} map, just copy
