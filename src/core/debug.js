@@ -448,7 +448,7 @@ foam.LIB({
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
           optional:      typeMatch[3] == '?',
-          index:        argIdx++,
+          index:         argIdx++,
           documentation: typeMatch[5],
         }));
         // if present, record return type (if not the last arg, we fail on the

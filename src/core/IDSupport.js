@@ -31,7 +31,6 @@
   ["Kevin", "Greer"]
 </pre>
 */
-
 foam.CLASS({
   package: 'foam.core',
   name: 'MultiPartID',
