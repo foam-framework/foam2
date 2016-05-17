@@ -208,6 +208,20 @@ foam.CLASS({
           superProp.clone().copyFrom(prop) :
           prop.cls_.create().copyFrom(superProp).copyFrom(this) ;
 
+        // If properties would be shadowed by superProp properties, then
+        // clear the shadowing property since the new value should
+        // take precedence since it was set later.
+        var es = foam.core.Property.SHADOW_MAP || {};
+        for ( var key in es ) {
+          var e = es[key];
+          for ( var j = 0 ; j < e.length ; j++ ) {
+            if ( this.hasOwnProperty(e[j]) && superProp[key] ) {
+              prop.clearProperty(key);
+              break;
+            }
+          }
+        }
+
         c.axiomMap_[prop.name] = prop;
       }
 

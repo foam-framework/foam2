@@ -56,7 +56,11 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined
-        this.pub('propertyChange', name, this.slot(name));
+
+        // Avoid creating slot and publishing event if no listeners
+        if ( this.hasListeners('propertyChange', name) ) {
+          this.pub('propertyChange', name, this.slot(name));
+        }
       }
     },
 

@@ -79,12 +79,14 @@ foam.CLASS({
       var es = foam.core.Property.SHADOW_MAP || {};
       for ( var key in es ) {
         var e = es[key];
-        for ( var j = 0 ; j < e.length ; j++ ) {
-          if ( this[key] && this.hasOwnProperty(e[j]) ) {
-            console.warn(
-                'Property ' + mName +
-                this.name + ' "' + e[j] +
-                '" hidden by "' + key + '"');
+        if ( this[key] ) {
+          for ( var j = 0 ; j < e.length ; j++ ) {
+            if ( this.hasOwnProperty(e[j]) ) {
+              console.warn(
+                  'Property ' + mName +
+                  this.name + ' "' + e[j] +
+                  '" hidden by "' + key + '"');
+            }
           }
         }
       }
