@@ -322,6 +322,18 @@ foam.CLASS({
 log(com.acme.package.Person.isSubClass(Person));
 log(Person.isSubClass(com.acme.package.Person));
 
+// isSubClass() works for interfaces
+foam.CLASS({
+  package: 'test',
+  name: 'ThingI'
+});
+foam.CLASS({
+  package: 'test',
+  name: 'C1',
+  implements: [ 'test.ThingI' ]
+});
+log(test.ThingI.isSubClass(test.C1));
+
 // Larger package and imports/exports demo.
 foam.CLASS({
   package: 'demo.bank',
