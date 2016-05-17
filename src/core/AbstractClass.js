@@ -87,14 +87,16 @@ foam.LIB({
       return !! ( o && o.cls_ && this.isSubClass(o.cls_) );
     },
 
-    /** Determine if a class is either this class or a sub-class. */
+    /**
+      Determine if a class is either this class, a sub-class, or
+      if it implements this class (directly or indirectly.
+    */
     function isSubClass(c) {
       if ( ! c ) return false;
 
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
 
-      // TODO: Should implements be handled here?
       if ( cache[c.id] === undefined ) {
         cache[c.id] = ( c === this.prototype.cls_ ) ||
           ( c.getAxiomByName && !! c.getAxiomByName('implements_' + this.id) ) ||
