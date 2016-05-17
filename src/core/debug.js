@@ -76,22 +76,15 @@ foam.CLASS({
         model.refines ? model.refines + '.' :
         '' ;
 
-      // List of properties which are hidden by other properties.
-      var es = [
-        [ 'setter',     [ 'adapt', 'preSet', 'postSet' ] ],
-        [ 'getter',     [ 'factory', 'expression', 'value' ] ],
-        [ 'factory',    [ 'expression', 'value' ] ],
-        [ 'expression', [ 'value' ] ]
-      ];
-
-      for ( var i = 0 ; i < es.length ; i++ ) {
-        var e = es[i];
+      var es = foam.core.Property.SHADOW_MAP || {};
+      for ( var key in es ) {
+        var e = es[key];
         for ( var j = 0 ; j < e.length ; j++ ) {
-          if ( this[e[0]] && this.hasOwnProperty(e[1][j]) ) {
+          if ( this[key] && this.hasOwnProperty(e[j]) ) {
             console.warn(
                 'Property ' + mName +
-                this.name + ' "' + e[1][j] +
-                '" hidden by "' + e[0] + '"');
+                this.name + ' "' + e[j] +
+                '" hidden by "' + key + '"');
           }
         }
       }

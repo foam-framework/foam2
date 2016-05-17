@@ -201,7 +201,7 @@ foam.CLASS({
     /**
       Start a block, using the supplied start character, which would typically
       be '{' for objects or '[' for arrays.  Handles indentation if enabled.
-     */
+    */
     function start(c) {
       if ( c ) this.out(c).nl();
       if ( this.indentStr ) {
@@ -214,7 +214,7 @@ foam.CLASS({
     /**
       End a block, using the supplied end character, which would typically
       be '}' for objects or ']' for arrays.
-     */
+    */
     function end(c) {
       if ( this.indent ) {
         this.indentLevel_--;
