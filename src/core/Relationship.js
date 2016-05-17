@@ -38,7 +38,12 @@ foam.CLASS({
     function init() {
       var src = this.lookup(this.srcModel);
       var dst = this.lookup(this.dstModel);
-      
+
+      this.assert(src, 'Unknown srcModel: ', this.srcModel);
+      this.assert(dst, 'Unknown dstModel: ', this.dstModel);
+
+      src.installAxiom(this.srcProperty);
+      dst.installAxiom(this.dstProperty);
     }
   ]
 });

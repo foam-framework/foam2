@@ -20,3 +20,4 @@ ToDo:
   - multi-methods?
   - Topic listener relay
   - Should String be the default property type with no way to create an untype property?
+  - Design by Contract
