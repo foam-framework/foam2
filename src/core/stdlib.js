@@ -482,8 +482,10 @@ foam.LIB({
   ]
 });
 
-// TODO: doc
-// TODO?: rename
+
+/** 
+  Return the flyweight "type object" for the provided object.
+*/
 foam.typeOf = (function() {
   var
     tNumber    = foam.Number,
