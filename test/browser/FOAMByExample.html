@@ -325,7 +325,8 @@ log(Person.isSubClass(com.acme.package.Person));
 // isSubClass() works for interfaces
 foam.CLASS({
   package: 'test',
-  name: 'ThingI'
+  name: 'ThingI',
+  methods: [ function foo() { log('foo'); } ]
 });
 foam.CLASS({
   package: 'test',
@@ -333,6 +334,28 @@ foam.CLASS({
   implements: [ 'test.ThingI' ]
 });
 log(test.ThingI.isSubClass(test.C1));
+
+// isSubClass() works for sub-interfaces
+foam.CLASS({
+  package: 'test',
+  name: 'Thing2I',
+  implements: [ 'test.ThingI' ]
+});
+foam.CLASS({
+  package: 'test',
+  name: 'Thing3I',
+  implements: [ 'test.ThingI' ]
+});
+foam.CLASS({
+  package: 'test',
+  name: 'C2',
+  implements: [ 'test.Thing2I' ]
+});
+var o = test.C2.create();
+o.foo();
+log(test.ThingI.isSubClass(test.C2));
+log(test.Thing2I.isSubClass(test.C2));
+log(test.Thing3I.isSubClass(test.C2));
 
 // Larger package and imports/exports demo.
 foam.CLASS({
