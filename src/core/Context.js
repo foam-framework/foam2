@@ -36,7 +36,7 @@
 (function() {
   var ctx = {
     // Temporary: gets replaced in Window.js.
-    assert: function() { console.assert.apply(console, arguments); },
+    assert: function(b) { console.assert.apply(console, arguments); return b; },
 
     // TODO: add second disableException option
     /** Lookup a Model. **/

@@ -87,12 +87,16 @@ foam.CLASS({
       return this.document.getElementsByClassName(cls);
     },
 
+    /**
+      Like console.assert(), but faster and context-dependent.
+      Returns the first argument, so that it can be nested as a sub-expression.
+     */
     function assert(b /*, args */) {
-      // TODO: make return 'b'
       /* Like console.assert() except that it takes more than one argument. */
       if ( ! b ) {
         this.console.assert(false, Array.prototype.slice.call(arguments, 1).join(' '));
       }
+      return b;
     },
 
     function error() { this.console.error.apply(this.console, arguments); },
