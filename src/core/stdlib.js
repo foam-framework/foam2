@@ -485,7 +485,7 @@ foam.LIB({
 
 /** 
   Return the flyweight "type object" for the provided object.
-  Null and Undefined are valid values.
+  Any value is a valid argument, including null and undefined.
 */
 foam.typeOf = (function() {
   var
