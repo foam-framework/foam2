@@ -25,38 +25,40 @@
 
 global.genericDAOTestBattery = function(daoFactory) {
   describe('generic DAO tests', function() {
-    foam.CLASS({
-      package: 'test.dao.generic',
-      name: 'Person',
-      properties: [
-        {
-          class: 'Int',
-          name: 'id',
-        },
-        {
-          class: 'String',
-          name: 'firstName',
-        },
-        {
-          class: 'String',
-          name: 'lastName',
-        },
-        // TODO(braden): Put these tags fields back when the serialization
-        // supports them properly.
-        /*
-        {
-          class: 'Array',
-          of: 'String',
-          name: 'tags',
-        },
-        */
-        {
-          class: 'Boolean',
-          name: 'deceased',
-        },
-        // TODO(braden): Test serializing more values: Dates, nested FObjects,
-        // arrays of nested FObjects.
-      ]
+    beforeEach(function() {
+      foam.CLASS({
+        package: 'test.dao.generic',
+        name: 'Person',
+        properties: [
+          {
+            class: 'Int',
+            name: 'id',
+          },
+          {
+            class: 'String',
+            name: 'firstName',
+          },
+          {
+            class: 'String',
+            name: 'lastName',
+          },
+          // TODO(braden): Put these tags fields back when the serialization
+          // supports them properly.
+          /*
+            {
+            class: 'Array',
+            of: 'String',
+            name: 'tags',
+            },
+          */
+          {
+            class: 'Boolean',
+            name: 'deceased',
+          },
+          // TODO(braden): Test serializing more values: Dates, nested FObjects,
+          // arrays of nested FObjects.
+        ]
+      });
     });
 
     var mkPerson1 = function() {
