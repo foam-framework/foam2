@@ -1,6 +1,6 @@
 
 var createTestProperties = function createTestProperties() {
-  if ( ! test.PropTypeTester ) {
+  if ( ! foam.lookup('test.PropTypeTester', true) ) {
     foam.CLASS({
       name: 'PropTypeTester',
       package: 'test',
@@ -50,10 +50,11 @@ var createTestProperties = function createTestProperties() {
       ]
     });
   }
+
   return test.PropTypeTester.create();
 }
 var createDateTestProperties = function createDateTestProperties() {
-  if ( ! test.DateTypeTester ) {
+  if ( ! foam.lookup('test.DateTypeTester', true) ) {
     foam.CLASS({
       name: 'DateTypeTester',
       package: 'test',
@@ -72,19 +73,6 @@ var createDateTestProperties = function createDateTestProperties() {
   }
   return test.DateTypeTester.create();
 }
-
-var oldAssert__;
-beforeAll(function() {
-  oldAssert__ = foam.core.FObject.prototype.assert;
-  foam.core.FObject.prototype.assert = function(c) {
-    oldAssert__.apply(this, arguments);
-    if ( ! c ) throw Array.from(arguments);
-  }
-});
-afterAll(function() {
-  foam.core.FObject.prototype.assert = oldAssert__;
-});
-
 
 describe('Date', function() {
   var p;
@@ -281,6 +269,7 @@ describe('Class property', function() {
 
   beforeEach(function() {
     p = createTestProperties();
+    createDateTestProperties();
   });
   afterEach(function() {
     p = null;

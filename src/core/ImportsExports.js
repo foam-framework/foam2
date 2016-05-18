@@ -196,7 +196,7 @@ foam.CLASS({
                 m[b.name] = this;
               }
             }
-            this.setPrivate_('__subContext__', ctx.subContext(m));
+            this.setPrivate_('__subContext__', ctx.createSubContext(m));
           }
 
           return this.getPrivate_('__subContext__');

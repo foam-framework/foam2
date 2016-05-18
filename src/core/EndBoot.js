@@ -164,7 +164,7 @@ foam.boot.end();
 
 /**
  * Map of Property property names to arrays of names of properties that they shadow.
- * 
+ *
  * Ex. 'setter' has higher precedence than 'adapt', 'preSet', and 'postSet', so if
  * it is set, then it shadows those other properties if they are set, causing their
  * values to be ignored.

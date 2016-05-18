@@ -123,24 +123,19 @@ foam.LIB({
       (Model is 'this').
     */
     function buildClass() {
-      var cls, ctx = this.__context__ || foam.__context__;
+      var context = this.__context__ || foam.__context__;
+      var cls;
 
       if ( this.refines ) {
-        cls = ctx.lookup(this.refines);
+        cls = context.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
         console.assert(this.id, 'Missing id name.', this.name);
         console.assert(this.name, 'Missing class name.');
-//        if ( global[this.name] )
-//          console.warn('Redefinition of class: ' + this.name);
 
-        var parent = this.extends   ?
-          ctx.lookup(this.extends) :
-          foam.AbstractClass ;
-
-        if ( ! parent ) {
-          console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
-        }
+        var parent = this.extends      ?
+          context.lookup(this.extends) :
+          foam.AbstractClass;
 
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
@@ -177,6 +172,8 @@ foam.LIB({
           'Refines is not supported in early bootstrap');
 
         foam.register(cls);
+
+        // Register the class in the global package path.
         foam.package.registerClass(cls);
 
         return cls;
@@ -197,6 +194,8 @@ foam.LIB({
 
         if ( ! m.refines ) {
           foam.register(cls);
+
+          // Register the class in the global package path.
           foam.package.registerClass(cls);
         }
 
@@ -242,7 +241,7 @@ foam.LIB({
         c.prototype.model_ = c.model_ = Model.create(c.model_);
       }
 
-      delete foam['boot'];
+      delete foam.boot;
 
       console.log('core boot time: ', Date.now() - this.startTime);
     }

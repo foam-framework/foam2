@@ -257,7 +257,7 @@ foam.CLASS({
 
 
 /* Add describe support to contexts. */
-foam.__context__ = foam.__context__.subContext({
+foam.__context__ = foam.__context__.createSubContext({
   describe: function() {
     this.log(
         'Context:',

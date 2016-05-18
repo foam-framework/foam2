@@ -168,9 +168,11 @@ describe('Argument.validate', function() {
 
 describe('foam.types.typeCheck', function() {
   var fn;
+  var orig;
 
   beforeEach(function() {
-    fn = foam.types.typeCheck(makeTestFn());
+    orig = makeTestFn();
+    fn = foam.types.typeCheck(orig);
   });
   afterEach(function() {
     fn = null;
@@ -209,9 +211,7 @@ describe('foam.types.typeCheck', function() {
    expect(function() { rfn({}); }).not.toThrow();
   });
   it('does not affect the toString() of the function', function() {
-    var f = makeTestFn();
-    var fck = foam.types.typeCheck(f);
-    expect(f.toString()).toEqual(fck.toString());
+    expect(orig.toString()).toEqual(fn.toString());
   });
 
 });

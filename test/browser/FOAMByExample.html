@@ -1053,13 +1053,13 @@ foam.CLASS({
   ]
 });
 
-// Contexts can be explicitly created with foam.subContext()
-// The second argument of subContext() is an optional name for the Context
-var Y1 = foam.subContext({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
+// Contexts can be explicitly created with foam.createSubContext()
+// The second argument of createSubContext() is an optional name for the Context
+var Y1 = foam.createSubContext({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
 console.log(Y1.key, Y1.fn());
 
 // Sub-Contexts can be created from other Contexts.
-var Y2 = Y1.subContext({key: 'value2'});
+var Y2 = Y1.createSubContext({key: 'value2'});
 console.log(Y2.key, Y2.fn());
 
 //:NOTEST
@@ -1068,7 +1068,7 @@ Y1.describe();
 Y2.describe();
 
 // Classes can import values from the Context so that they can be accessed from 'this'.
-var Y = foam.subContext({log: function(msg) { console.log('log:', msg); }});
+var Y = foam.createSubContext({log: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
   imports: [ 'log', 'warn' ],
@@ -1701,6 +1701,7 @@ log_(g.toHTML());
       }
 
       log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
+      foam.__context__ = foam.createSubContext();
       log_.capture = istest;
       log_.output = "";
       try {
@@ -1711,6 +1712,7 @@ log_(g.toHTML());
       log_.capture = false;
       if ( istest ) {
         test_code += '\n\n// Example ' + (i_ + 1) + '\n';
+        test_code += 'foam.__context__ = foam.createSubContext();\n';
         test_code += 'log_.output = "";\n';
         test_code += 'try {\n' + line + '\n} catch(x) {\n log("Exception: ", x);\n }\n';
         var golden = log_.output.replace(/\n/g, "\\n")
