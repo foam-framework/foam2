@@ -21,3 +21,7 @@ ToDo:
   - Topic listener relay
   - Should String be the default property type with no way to create an untype property?
   - Design by Contract
+
+2 cases:
+  - someone refines an ancestor's Property
+  - someone refines a 'class:'
