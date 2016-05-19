@@ -79,7 +79,7 @@ foam.LIB({
       a.installInProto && a.installInProto(this.prototype);
 
       if ( a.name ) {
-        this.pub && this.pub('installAxiom', a.name, a);
+        this.model_.sub && this.model_.pub('installAxiom', a.name, a);
       }
     },
 
