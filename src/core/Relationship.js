@@ -21,29 +21,73 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'srcModel'
+      name: 'cardinality',
+      value: '0:1' // '1:*', '*:1', '*:*'
     },
     {
-      name: 'srcProperty'
+      name: 'sourceModel'
     },
     {
-      name: 'dstModel'
+      name: 'sourceProperties',
+      class: 'FObjectArray',
+      of: 'Property',
+      adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
     {
-      name: 'dstProperty'
+      name: 'targetModel'
+    },
+    {
+      name: 'targetProperties',
+      class: 'FObjectArray',
+      of: 'Property',
+      adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
+    },
+    {
+      class: 'Boolean',
+      name: 'oneWay'
     }
+    /* FUTURE:
+    {
+      name: 'deleteStrategy'
+      // prevent, cascade, orphan
+    }
+    */
   ],
 
   methods: [
     function init() {
-      var src = this.lookup(this.srcModel);
-      var dst = this.lookup(this.dstModel);
+      // TODO: move to validate method
+      this.assert(
+          this.sourceProperties.length === this.targetProperties.length,
+          'Relationship source/target property list length mismatch.');
 
-      this.assert(src, 'Unknown srcModel: ', this.srcModel);
-      this.assert(dst, 'Unknown dstModel: ', this.dstModel);
+      var source      = this.lookup(this.sourceModel);
+      var target      = this.lookup(this.targetModel);
+      var sourceProps = this.sourceProperties;
+      var targetProps = this.targetProperties;
 
-      src.installAxiom(this.srcProperty);
-      dst.installAxiom(this.dstProperty);
+      this.assert(source, 'Unknown sourceModel: ', this.sourceModel);
+      this.assert(target, 'Unknown targetModel: ', this.targetModel);
+
+      if ( ! this.sourceProperties.length ) {
+        sourceProps = [ foam.core.Property.create({name: this.name}) ];
+        targetProps = [ foam.core.Property.create({name: this.inverseName}) ];
+      }
+
+      source.installAxiom(this.sourceProperty);
+
+      if ( ! this.oneWay ) {
+        sourceProperty.preSet = function(_, newValue) {
+          if ( newValue ) {
+            for ( var i = 0 ; i < sourceProps.length ; i++ ) {
+              newValue[targetProps[i].name] = this[sourceProps[i]];
+            }
+          }
+          return newValue;
+        };
+
+        target.installAxiom(this.targetProperty);
+      }
     }
   ]
 });

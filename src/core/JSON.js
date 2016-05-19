@@ -94,9 +94,9 @@ foam.CLASS({
       value: ' '
     },
     {
-// TODO: doc
       class: 'Boolean',
       name: 'alwaysQuoteKeys',
+      help: 'If true, keys are always quoted, as required by the JSON standard. If false, only quote keys which aren\'tvalid JS identifiers.',
       value: true
     },
     {
@@ -198,7 +198,10 @@ foam.CLASS({
       return this;
     },
 
-    // TODO: doc
+    /**
+      Start a block, using the supplied start character, which would typically
+      be '{' for objects or '[' for arrays.  Handles indentation if enabled.
+    */
     function start(c) {
       if ( c ) this.out(c).nl();
       if ( this.indentStr ) {
@@ -208,6 +211,10 @@ foam.CLASS({
       return this;
     },
 
+    /**
+      End a block, using the supplied end character, which would typically
+      be '}' for objects or ']' for arrays.
+    */
     function end(c) {
       if ( this.indent ) {
         this.indentLevel_--;
@@ -388,6 +395,8 @@ foam.LIB({
 
   methods: [
     function parse(json, opt_class, opt_ctx) {
+      if ( typeof json !== 'object' ) return json;
+
       // recurse into sub-objects
       for ( var key in json ) {
         var o = json[key];

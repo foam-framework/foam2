@@ -31,7 +31,6 @@
   ["Kevin", "Greer"]
 </pre>
 */
-
 foam.CLASS({
   package: 'foam.core',
   name: 'MultiPartID',
@@ -62,8 +61,6 @@ foam.CLASS({
     }],
     {
       name: 'compare',
-      // TODO: setting value: should override factory:
-      factory: null,
       value: function multiPartCompare(o1, o2) {
         var props = this.props;
         if ( props.length === 1 ) return props[0].compare(o1, o2);

@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -154,16 +154,20 @@ foam.LIB({
       }
       console.error('Attempt to foam.Function.bind more than 4 arguments.');
     },
-    /** Faster version of memoize() when only dealing with one argument. */
+    /**
+     * Decorates the function 'f' to cache the return value of 'f' when called
+     * with a particular value for its first argument.
+     *
+     */
     function memoize1(f) {
       var cache = {};
       return foam.Function.setName(
-          function(arg) {
+          function(key) {
             console.assert(
                 arguments.length == 1,
                 "Memoize1'ed functions must take exactly one argument.");
-            var key = arg ? ( '' + arg ) : '';
-            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
+
+            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
             return cache[key];
           },
           'memoize1(' + f.name + ')');
@@ -246,17 +250,20 @@ foam.LIB({
   ]
 });
 
+/* istanbul ignore next */
 (function() {
   // Disable setName if not supported on this platform.
   try {
     foam.Function.setName(function() {}, '');
   } catch (x) {
-    /**
-      @class fn
-      @ignore */
+    console.warn('foam.Function.setName is not supported on your platform. ' +
+                 'Stack traces will be harder to decipher, but no functionaly' +
+                 ' will be lost');
     foam.LIB({
       name: 'foam.Function',
-      methods: [ function setName(f) { return f; } ]
+      methods: [
+        function setName(f) { return f; }
+      ]
     });
   }
 })();
@@ -297,6 +304,9 @@ foam.LIB({
     {
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot constantize non-string values.');
+
         // switchFromCamelCaseToConstantFormat to
         // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
         return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
@@ -483,7 +493,7 @@ foam.LIB({
 });
 
 
-/** 
+/**
   Return the flyweight "type object" for the provided object.
   Any value is a valid argument, including null and undefined.
 */

@@ -34,16 +34,34 @@
  */
 
 (function() {
-  var ctx = {
+  var __context__ = {
     // Temporary: gets replaced in Window.js.
-    assert: function() { console.assert.apply(console, arguments); },
+    assert: function(b) { console.assert.apply(console, arguments); return b; },
 
-    // TODO: add second disableException option
-    /** Lookup a Model. **/
-    lookup: function(id) {
-      return this.__cache__[id];
+    /**
+     * Lookup a class in the context.  Throws an exception if the value
+     * couldn't be found, unless opt_suppress is true.
+     *
+     * @param id The id of the class to lookup.
+     * @param opt_suppress Suppress throwing an error.
+     **/
+    lookup: function(id, opt_suppress) {
+      var ret = typeof id === 'string' && this.__cache__[id];
+
+      if ( ! opt_suppress ) {
+        console.assert(ret,
+                       'Could not find any registered class for ' + id);
+      }
+
+      return ret;
     },
 
+    /**
+     * Register a class into the given context.  After registration
+     * the class can be found again by calling foam.lookup('com.foo.SomeClass');
+     *
+     * @param cls The class to register.
+     */
     register: function(cls) {
       console.assert(
         typeof cls === 'object',
@@ -53,10 +71,9 @@
         'Must have an .id property to be registered in a context.');
 
       function doRegister(cache, name) {
-        // FUTURE: Re-enable when we have a good plan for unloading classes
-        // console.assert(
-        //     ! cache.hasOwnProperty(name),
-        //     cls.id + ' is already registerd in this context.');
+        console.assert(
+          cache.hasOwnProperty(name) === false,
+          cls.id + ' is already registerd in this context.');
 
         cache[name] = cls;
       }
@@ -65,8 +82,22 @@
       if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
     },
 
-    subContext: function subContext(opt_args, opt_name) {
+    /**
+     * Creates a sub context of the context that this is called upon.
+     * @param opt_args A map of bindings to set up in the sub context.
+     *     Currently unused.
+     */
+    createSubContext: function createSubContext(opt_args, opt_name) {
+      console.assert(opt_name === undefined || typeof opt_name === 'string',
+                     'opt_name must be left undefined or be a string.');
+
       var sub = {};
+
+      if ( opt_name ) {
+        Object.defineProperty(sub, 'NAME', {
+          value: opt_name, enumerable: false
+        });
+      }
 
       for ( var key in opt_args ) {
         if ( opt_args.hasOwnProperty(key) ) {
@@ -88,9 +119,6 @@
         }
       }
 
-      if ( opt_name ) {
-        Object.defineProperty(sub, 'NAME', {value: opt_name, enumerable: false});
-      }
       Object.defineProperty(sub, '__cache__', {
         value: Object.create(this.__cache__),
         enumerable: false
@@ -104,16 +132,20 @@
     }
   };
 
-  Object.defineProperty(ctx, '__cache__', {
+  Object.defineProperty(__context__, '__cache__', {
     value: {},
     enumerable: false
   });
 
-  foam.lookup = function(id) { return foam.__context__.lookup(id); };
+  // Create short-cuts for foam.__context__.[createSubContext, register, lookup]
+  // in foam.
+  foam.lookup = function(id, opt_suppress) {
+    return foam.__context__.lookup(id, opt_suppress);
+  };
   foam.register = function(cls) { foam.__context__.register(cls); };
-  foam.subContext = function(opt_args, opt_name) {
-    return foam.__context__.subContext(opt_args, opt_name);
+  foam.createSubContext = function(opt_args, opt_name) {
+    return foam.__context__.createSubContext(opt_args, opt_name);
   };
 
-  foam.__context__ = ctx;
+  foam.__context__ = __context__;
 })();

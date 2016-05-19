@@ -58,7 +58,7 @@ foam.CLASS({
     function installInProto(proto) {
       function makeTopic(topic, parent) {
         var name = topic.name;
-        var topics = topic.topics;
+        var topics = topic.topics || [];
 
         var ret = {
           pub:   foam.Function.bind(parent.pub,   parent, name),

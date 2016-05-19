@@ -76,22 +76,17 @@ foam.CLASS({
         model.refines ? model.refines + '.' :
         '' ;
 
-      // List of properties which are hidden by other properties.
-      var es = [
-        [ 'setter',     [ 'adapt', 'preSet', 'postSet' ] ],
-        [ 'getter',     [ 'factory', 'expression', 'value' ] ],
-        [ 'factory',    [ 'expression', 'value' ] ],
-        [ 'expression', [ 'value' ] ]
-      ];
-
-      for ( var i = 0 ; i < es.length ; i++ ) {
-        var e = es[i];
-        for ( var j = 0 ; j < e.length ; j++ ) {
-          if ( this[e[0]] && this.hasOwnProperty(e[1][j]) ) {
-            console.warn(
-                'Property ' + mName +
-                this.name + ' "' + e[1][j] +
-                '" hidden by "' + e[0] + '"');
+      var es = foam.core.Property.SHADOW_MAP || {};
+      for ( var key in es ) {
+        var e = es[key];
+        if ( this[key] ) {
+          for ( var j = 0 ; j < e.length ; j++ ) {
+            if ( this.hasOwnProperty(e[j]) ) {
+              console.warn(
+                  'Property ' + mName +
+                  this.name + ' "' + e[j] +
+                  '" hidden by "' + key + '"');
+            }
           }
         }
       }
@@ -262,7 +257,7 @@ foam.CLASS({
 
 
 /* Add describe support to contexts. */
-foam.__context__ = foam.__context__.subContext({
+foam.__context__ = foam.__context__.createSubContext({
   describe: function() {
     this.log(
         'Context:',
@@ -448,7 +443,7 @@ foam.LIB({
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
           optional:      typeMatch[3] == '?',
-          index:        argIdx++,
+          index:         argIdx++,
           documentation: typeMatch[5],
         }));
         // if present, record return type (if not the last arg, we fail on the

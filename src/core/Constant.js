@@ -68,7 +68,7 @@ foam.CLASS({
         }
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ ) {
-          b[i] = prop.adaptArrayElement(a[i]);
+          b[i] = prop.adaptArrayElement.call(this, a[i], prop);
         }
         return b;
       }

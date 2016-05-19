@@ -41,6 +41,22 @@ foam.CLASS({
   name: 'Property',
   extends: 'FObject',
 
+  constants: {
+    /**
+      Map of Property property names to arrays of property names
+      that they shadow.
+
+      Ex. When 'setter' is set, it takes precedence over 'adapt',
+      'preSet', and 'postSet', so their values are shadowed.
+    */
+    SHADOW_MAP: {
+      setter:     [ 'adapt', 'preSet', 'postSet' ],
+      getter:     [ 'factory', 'expression', 'value' ],
+      factory:    [ 'expression', 'value' ],
+      expression: [ 'value' ]
+    }
+  },
+
   properties: [
     {
       name: 'name',
@@ -200,6 +216,20 @@ foam.CLASS({
         prop = prop.cls_ === foam.core.Property ?
           superProp.clone().copyFrom(prop) :
           prop.cls_.create().copyFrom(superProp).copyFrom(this) ;
+
+        // If properties would be shadowed by superProp properties, then
+        // clear the shadowing property since the new value should
+        // take precedence since it was set later.
+        var es = foam.core.Property.SHADOW_MAP || {};
+        for ( var key in es ) {
+          var e = es[key];
+          for ( var j = 0 ; j < e.length ; j++ ) {
+            if ( this.hasOwnProperty(e[j]) && superProp[key] ) {
+              prop.clearProperty(key);
+              break;
+            }
+          }
+        }
 
         c.axiomMap_[prop.name] = prop;
       }

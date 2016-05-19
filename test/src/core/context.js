@@ -36,9 +36,9 @@ describe('ConteXt object', function() {
     expect(foam.lookup('Bar')).toBe(coreClass);
   });
 
-  it('subContext', function() {
-    var named = foam.subContext(null, "HELLO");
-    var unNamed = named.subContext();
+  it('createSubContext', function() {
+    var named = foam.createSubContext(null, "HELLO");
+    var unNamed = named.createSubContext();
 
     for ( var key in named ) {
       expect(key).not.toEqual("NAME");
@@ -57,7 +57,7 @@ describe('ConteXt object', function() {
   });
 
   it('subcontexts', function() {
-    var sub = foam.subContext({ hello: 4 }, 'namey');
+    var sub = foam.createSubContext({ hello: 4 }, 'namey');
     expect(sub.hello).toEqual(4);
   });
 
@@ -68,7 +68,7 @@ describe('ConteXt object', function() {
       properties: [ 'a' ]
     });
     var testa = test.Tester.create({ a: 3 });
-    var sub = foam.subContext({ hello: testa.a$ });
+    var sub = foam.createSubContext({ hello: testa.a$ });
 
     expect(sub.hello).toEqual(3);
     testa.a = 99;
@@ -77,8 +77,8 @@ describe('ConteXt object', function() {
   });
 
   it('describes', function() {
-    foam.subContext().describe();
-    foam.subContext({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
+    foam.createSubContext().describe();
+    foam.createSubContext({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
   });
 });
 
