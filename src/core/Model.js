@@ -50,6 +50,7 @@ foam.CLASS({
       // List of all axioms, including methods, properties, listeners,
       // etc. and 'axioms'.
       name: 'axioms_',
+      transient: true,
       factory: function() { return []; }
     },
     {
