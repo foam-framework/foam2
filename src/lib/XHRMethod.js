@@ -143,11 +143,12 @@ foam.CLASS({
       // add on parameters passed as part of the path or query
       this.parameters.forEach(function(param) {
         var val = opt_args[param.name].toString();
+        var pname = param.name.replace('__dot__','.');
         if ( param.location === 'path' ) {
           // find the placeholder and replace it (put the dot back if we removed one)
-          path.replace("{"+param.name.replace('__dot__','.')+"}", val);
+          path.replace("{"+pname+"}", val);
         } else if ( param.location === 'query' ) {
-          query += "&" + val;
+          query += "&" + pname + "=" + val;
         }
       });
       opts.path = path + ( query ? "?" + query.substring(1) : "" );
