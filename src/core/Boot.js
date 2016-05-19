@@ -148,6 +148,20 @@ foam.LIB({
         cls.name             = this.name;
         cls.model_           = this;
 
+        // Install an FObject on the class that we can use as a pub/sub hub.
+        // We have to do this because classes aren't FObjects.
+        // This is used to publish 'installAxiom' events on, so that descendents
+        // properties know when they need to be re-installed.
+        cls.pubsub_          =
+          foam.core.FObject &&
+          foam.core.FObject.create &&
+          foam.core.FObject.create();
+
+        // Relay 'installAxiom' events from parent class.
+        parent.pubsub_ && parent.pubsub_.sub(
+            'installAxiom',
+            function(_, a1, a2, a3) { cls.pubsub_.pub(a1, a2, a3); });
+
         // Classes without a package are also registered as globals
         if ( ! cls.package ) global[cls.name] = cls;
       }
@@ -213,21 +227,7 @@ foam.LIB({
     function phase3() {
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
-        this.private_.axiomCache = {};
-
-        // Install Axioms in first pass so that they're available in the second-pass
-        // when axioms are actually run. This avoids some ordering issues.
-        for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
-          var a = m.axioms_[i];
-          this.axiomMap_[a.name] = a;
-          a.sourceCls_ = this;
-        }
-
-        for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
-          var a = m.axioms_[i];
-          a.installInClass && a.installInClass(this);
-          a.installInProto && a.installInProto(this.prototype);
-        }
+        this.installAxioms(m.axioms_);
       };
     },
 

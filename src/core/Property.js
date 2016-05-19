@@ -203,16 +203,16 @@ foam.CLASS({
       var prop = this;
       var superProp = c.__proto__.getAxiomByName(prop.name);
 
+      // If the superProp is updated, then re-install this property
+      c.__proto__.pubsub_ && c.__proto__.pubsub_.sub(
+        'installAxiom',
+        this.name,
+        function() {
+          // console.log('**************** Updating Property: ', c.name, prop.name);
+          c.installAxiom(prop);
+        });
+
       if ( superProp ) {
-        var model = c.__proto__.model_;
-        model.sub && model.sub(
-            'installAxiom',
-            this.name,
-            function() {
-              console.log('**************************** Updating Property.'); 
-              // prop.installInClass(c);
-            }
-        );
         prop = prop.cls_ === foam.core.Property ?
           superProp.clone().copyFrom(prop) :
           prop.cls_.create().copyFrom(superProp).copyFrom(this) ;
