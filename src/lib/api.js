@@ -18,6 +18,7 @@
 
 
 require('../core/foam');
+require('./XHRMethod');
 
 var fs = require('fs');
 var http = require('http');
@@ -81,6 +82,38 @@ function getProps(schema, pkg) {
   return ret;
 }
 
+function getMethods(res, pkg, basePath) {
+  var ret = [];
+  for ( var name in res.methods ) {
+    var m = res.methods[name];
+    var method = {
+      name: name,
+      path: basePath + m.path,
+      httpMethod: m.httpMethod,
+    };
+    if ( m.response && m.response.$ref ) {
+      method.returns = foam.core.ReturnValue.create({
+        typeName: pkg + '.' + m.response.$ref
+      });
+    }
+
+    //TODO: respect m.parameterOrder []
+    method.parameters = [];
+    for ( var paramName in m.parameters ) {
+      var p = m.parameters[paramName];
+      var param = {
+        name: paramName.replace('.', '_$_dot_$_'),
+        typeName: 'any', // TODO: type
+        location: p.location,
+      }
+      method.parameters.push(param);
+    }
+
+    ret.push(foam.api.XHRMethod.create(method));
+  }
+  return ret;
+}
+
 function outputModel(pkg, name) {
 
   var m = foam.lookup(pkg+'.'+name);
@@ -139,7 +172,22 @@ function apiToModels(api) {
     outputModel(pkg, name);
   }
 
+  var resources = api.resources;
 
+  for ( var name in resources ) {
+    var resource = resources[name];
+    var newModel = {
+      package: pkg,
+      name: name,
+
+      properties: [ 'xhrHostName', 'xhrPort', 'xhrProtocol' ],
+
+      methods: getMethods(resource, pkg, api.servicePath),
+    }
+    foam.CLASS(newModel);
+
+    outputModel(pkg, name);
+  }
 
 
 }
