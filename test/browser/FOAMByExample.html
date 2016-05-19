@@ -465,6 +465,7 @@ log(e.toString());
 log(oldPerson.toString());
 
 // Refine a Property
+// TODO: this test demos a current bug
 log(Person.SALARY.cls_.name);
 foam.CLASS({
   refines: 'Person',
@@ -473,6 +474,22 @@ foam.CLASS({
 log(Person.SALARY.cls_.name);
 var o = Person.create({name:'John'});
 log(o.salary);
+
+// Refine a Property Class
+// TODO: this test demos a current bug
+foam.CLASS({
+  name: 'Salary',
+  extends: 'Float'
+});
+foam.CLASS({
+  name: 'Emp',
+  properties: [ { class: 'Salary', name: 'salary' } ]
+});
+foam.CLASS({
+  refines: 'Salary',
+  properties: [ { name: 'value', value: 30000 } ]
+});
+log(Emp.create().salary);
 
 // TODO: BooleanProperty
 
