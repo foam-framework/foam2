@@ -210,7 +210,7 @@ foam.CLASS({
             this.name,
             function() {
               console.log('**************************** Updating Property.'); 
-              prop.installInClass(c);
+              // prop.installInClass(c);
             }
         );
         prop = prop.cls_ === foam.core.Property ?

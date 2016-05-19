@@ -477,19 +477,17 @@ log(o.salary);
 
 // Refine a Property Class
 // TODO: this test demos a current bug
-foam.CLASS({
-  name: 'Salary',
-  extends: 'Float'
-});
-foam.CLASS({
-  name: 'Emp',
-  properties: [ { class: 'Salary', name: 'salary' } ]
-});
-foam.CLASS({
-  refines: 'Salary',
-  properties: [ { name: 'value', value: 30000 } ]
-});
+foam.CLASS({ name: 'Salary', extends: 'Float' });
+foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
+foam.CLASS({ refines: 'Salary', properties: [ {name: 'value', value: 30000} ]});
 log(Emp.create().salary);
+
+// Refine a SuperProperty Class
+// TODO: this test demos a current bug
+foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ name: 'SubClass', properties: [ 'p1' ]});
+foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
 
 // TODO: BooleanProperty
 
