@@ -102,7 +102,7 @@ function getMethods(res, pkg, basePath) {
     for ( var paramName in m.parameters ) {
       var p = m.parameters[paramName];
       var param = {
-        name: paramName.replace('.', '_$_dot_$_'),
+        name: paramName.replace('.', '__dot__'),
         typeName: 'any', // TODO: type
         location: p.location,
       }

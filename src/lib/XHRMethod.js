@@ -127,8 +127,7 @@ foam.CLASS({
     },
 
     function buildUrlOptions_node_(opt_args, host) {
-      var opts = this.baseOpts_ ||
-        ( this.baseOpts_ = { path: this.path } );
+      var opts = this.baseOpts_ || ( this.baseOpts_ = { path: this.path } );
 
       // work with a 'copy'
       opts = Object.create(opts);
@@ -143,9 +142,10 @@ foam.CLASS({
       // add on parameters passed as part of the path or query
       this.parameters.forEach(function(param) {
         var val = opt_args[param.name].toString();
+        // put the dot back if we removed one from the name
         var pname = param.name.replace('__dot__','.');
         if ( param.location === 'path' ) {
-          // find the placeholder and replace it (put the dot back if we removed one)
+          // find the placeholder and replace it
           path.replace("{"+pname+"}", val);
         } else if ( param.location === 'query' ) {
           query += "&" + pname + "=" + val;
