@@ -454,7 +454,7 @@ foam.CLASS({
 var oldPerson = Person.create({name: 'John', sex: 'M'});
 foam.CLASS({
   refines: 'Person',
-  properties: [ { name: 'salary', value: 0 } ],
+  properties: [ { class: 'Float', name: 'salary', value: 0 } ],
   methods: [
     function toString() { return this.SUPER() + ' ' + this.salary; }
   ]
@@ -463,6 +463,40 @@ Person.describe();
 var e = Person.create({name: 'Jane', sex: 'F', salary: 50000});
 log(e.toString());
 log(oldPerson.toString());
+
+// Refine a Property
+log(Person.SALARY.cls_.name);
+foam.CLASS({
+  refines: 'Person',
+  properties: [ { name: 'salary', value: 30000 } ]
+});
+log(Person.SALARY.cls_.name);
+var o = Person.create({name:'John'});
+log(o.salary);
+
+// Refine a Property Class
+foam.CLASS({ name: 'Salary', extends: 'Float' });
+foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
+foam.CLASS({ refines: 'Salary', properties: [ {name: 'value', value: 30000} ]});
+log(Emp.create().salary);
+
+// Refine foam.core Property Class
+foam.CLASS({ name: 'Emp2', properties: [ { class: 'Float', name: 'salary' } ] });
+foam.CLASS({ refines: 'Float', properties: [ [ 'javaClass', 'Float' ] ]});
+log(Emp2.SALARY.javaClass);
+
+// Refine a SuperProperty Class
+foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
+
+// Refine a SuperProperty Class
+foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
+foam.CLASS({ name: 'SubClass', extends: 'MidClass', properties: [ 'p1' ]});
+foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+log('super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
 
 // TODO: BooleanProperty
 

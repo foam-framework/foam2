@@ -56,7 +56,7 @@ foam.LIB({
     },
 
     /**
-      Install an Axiom into the class and prototype.
+      Install Axioms into the class and prototype.
       Invalidate the axiom-cache, used by getAxiomsByName().
 
       FUTURE: Wait for first object to be created before creating prototype.
@@ -64,19 +64,36 @@ foam.LIB({
       wait until the first object is created. This will provide
       better startup performance.
     */
-    function installAxiom(a) {
-      // Store the destination class in the Axiom.  Used by describe().
-      // Store source class on a clone of 'a' so that the Axiom can be
-      // reused without corrupting the sourceCls_.
-      // Disabled: is causing dramatic performance slow-down.
-      // a = Object.create(a);
-      a.sourceCls_ = this;
-
-      this.axiomMap_[a.name] = a;
+    function installAxioms(axs) {
       this.private_.axiomCache = {};
 
-      a.installInClass && a.installInClass(this);
-      a.installInProto && a.installInProto(this.prototype);
+      for ( var i = 0 ; i < axs.length ; i++ ) {
+        var a = axs[i];
+
+        // Store the destination class in the Axiom.  Used by describe().
+        // Store source class on a clone of 'a' so that the Axiom can be
+        // reused without corrupting the sourceCls_.
+        // Disabled: is causing dramatic performance slow-down.
+        // a = Object.create(a);
+        a.sourceCls_ = this;
+
+        this.axiomMap_[a.name] = a;
+      }
+
+      for ( var i = 0 ; i < axs.length ; i++ ) {
+        var a = axs[i];
+
+        a.installInClass && a.installInClass(this);
+        a.installInProto && a.installInProto(this.prototype);
+
+        if ( a.name ) {
+          this.pubsub_ && this.pubsub_.pub('installAxiom', a.name, a);
+        }
+      }
+    },
+
+    function installAxiom(a) {
+      this.installAxioms([a]);
     },
 
     /**
