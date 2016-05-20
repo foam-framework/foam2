@@ -234,9 +234,17 @@ foam.CLASS({
           c.id + '.' + cName + ' from: ' + prop.name + ' and ' + prev.name;
       }
 
-      var reinstall = foam.events.oneTime(function reinstall() {
-        // console.log('**************** Updating Property: ', c.name, prop.name);
-        c.installAxiom(prop);
+      var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
+        // We only care about Property axioms.
+
+        // FUTURE: we really only care about those properties that affect
+        // the definition of the property getter and setter, so an extra
+        // check would help eliminate extra reinstalls.
+
+        if ( foam.core.Property.isInstance(axiom) ) {
+          // console.log('**************** Updating Property: ', c.name, prop.name);
+          c.installAxiom(prop);
+        }
       });
 
       // If the superProp is updated, then reinstall this property
