@@ -234,17 +234,28 @@ foam.CLASS({
           c.id + '.' + cName + ' from: ' + prop.name + ' and ' + prev.name;
       }
 
-      function reinstall() {
+      var reinstall = foam.events.oneTime(function reinstall() {
         // console.log('**************** Updating Property: ', c.name, prop.name);
         c.installAxiom(prop);
-      }
+      });
 
-      // If the superProp is updated, then re-install this property
+      // If the superProp is updated, then reinstall this property
       c.__proto__.pubsub_ && c.__proto__.pubsub_.sub(
         'installAxiom',
         this.name,
         reinstall
       );
+
+      // If the class of this Property changes, then also reinstall
+      if (
+        c.id !== 'foam.core.Property' &&
+        c.id !== 'foam.core.Model'    &&
+        c.id !== 'foam.core.Method'   &&
+        c.id !== 'foam.core.FObject'  &&
+        this.cls_.id !== 'foam.core.FObject'
+      ) {
+        this.cls_.pubsub_.sub('installAxiom', reinstall);
+      }
       
       c[cName] = prop;
     },
