@@ -179,6 +179,7 @@ foam.CLASS({
   properties: [
     {
       name: 'axioms_',
+      transient: true,
       factory: function() {
         return [
           foam.core.Int.create({

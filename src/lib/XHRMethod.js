@@ -53,9 +53,9 @@ foam.CLASS({
         along a parameter of the type specified here. */
       name: 'returns',
     },
-    [ 'http',  global.require && require('http') ],
-    [ 'https',  global.require && require('https') ],
-    [ 'url',  global.require && require('url') ],
+    { name: 'http', factory: function() { return require('http') } },
+    { name: 'https', factory: function() { return require('https') } },
+    { name: 'url',  factory: function() { return require('url') } },
     {
       /** cache of http options */
       name: 'baseOpts_',
@@ -73,7 +73,7 @@ foam.CLASS({
       // set up function with correct args, pass them into the
       // actual implementation, callRemote_()
       // ALTERNATE: just pass args in and read from arguments
-      var code = "function "+axiom.name+"_"+"(";
+      var code = "(function "+axiom.name+"_"+"(";
       var names = this.parameters.map(axiom.XHRArgument.NAME.f);
       code += names.join(', ');
       code += ') {\n';
@@ -83,17 +83,19 @@ foam.CLASS({
       });
       code += '};\n';
       code += 'return axiom.callRemote_(opt_args, this);\n';
-      code += '};\n';
+      code += '})';
 
       code = eval(code);
+      
       p[axiom.name] = code;
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
       // 'this' is the axiom instance
+      var self = this;
       return new Promise(function(resolve, reject) {
-        if ( this.http ) {
-          this.callRemote_node_(opt_args, host, resolve, reject);
+        if ( self.http ) {
+          self.callRemote_node_(opt_args, host, resolve, reject);
         } else {
           // browser
           // TODO: impl for browser XHR
@@ -107,15 +109,15 @@ foam.CLASS({
       var opt = this.buildUrlOptions_node_(opt_args, host);
 
       var body = "";
-      var req = ( opt.protocol == 'http' ? http : https ).request(opt, function(response) {
+      var req = ( opt.protocol == 'http:' ? self.http : self.https ).request(opt, function(response) {
         console.log('STATUS: ', response.statusCode);
         response.setEncoding('utf8');
         response.on('data', function(chunk) {
           body += chunk;
         });
         response.on('end', function() {
-          if ( response.status >= 300 ) {
-            reject(new Error(self.name + " invalid XHRMethod http response: " + response.status));
+          if ( response.statusCode >= 300 ) {
+            reject(new Error(self.name + " invalid XHRMethod http response: " + response.statusCode + ":" + body));
             return;
           }
           body = JSON.parse(body);
@@ -136,7 +138,7 @@ foam.CLASS({
       opts.port = host.xhrPort;
       opts.protocol = host.xhrProtocol;
 
-      var path = ""+opts.path;
+      var path = host.xhrBasePath + opts.path;
       var query = "";
 
       // add on parameters passed as part of the path or query
@@ -146,7 +148,7 @@ foam.CLASS({
         var pname = param.name.replace('__dot__','.');
         if ( param.location === 'path' ) {
           // find the placeholder and replace it
-          path.replace("{"+pname+"}", val);
+          path = path.replace("{"+pname+"}", val);
         } else if ( param.location === 'query' ) {
           query += "&" + pname + "=" + val;
         }

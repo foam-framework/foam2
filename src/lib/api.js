@@ -88,7 +88,7 @@ function getMethods(res, pkg, basePath) {
     var m = res.methods[name];
     var method = {
       name: name,
-      path: basePath + m.path,
+      path: m.path,
       httpMethod: m.httpMethod,
     };
     if ( m.response && m.response.$ref ) {
@@ -180,7 +180,7 @@ function apiToModels(api) {
       package: pkg,
       name: name,
 
-      properties: [ 'xhrHostName', 'xhrPort', 'xhrProtocol' ],
+      properties: [ 'xhrHostName', 'xhrPort', 'xhrProtocol', 'xhrBasePath' ],
 
       methods: getMethods(resource, pkg, api.servicePath),
     }
@@ -239,6 +239,26 @@ function loadRequest(uri) {
     "\t-f --file PATH: load JSON from a file\n");
 })(process.argv);
 
+require('es6-shim');
 
+// test fire some methods
+setTimeout(function() {
+  try{
+    var meme = api.memegen.meme.create({
+      xhrHostName: 'memegen-hirep.googleplex.com',
+      xhrBasePath: '/_ah/api/memegen/v1/',
+      xhrPort: 443,
+      xhrProtocol: 'https:',
+    });
+  
+    meme.get('5288030157406208').then(
+      function(thing) { console.log("meme:",thing); },
+      function(err) { console.log("meme error:", err); }
+    );
+  
+  } catch(e) { console.log(e);}
+  
+}, 4000);
+setTimeout(function(){console.log("TTL");}, 200000);
 
 
