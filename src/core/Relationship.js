@@ -91,3 +91,18 @@ foam.CLASS({
     }
   ]
 });
+
+
+// Relationship Test
+foam.CLASS({
+  name: 'Parent1'
+});
+foam.CLASS({
+  name: 'Child1'
+});
+foam.core.Relationship.create({
+  sourceModel: 'Parent1',
+  targetModel: 'Child1',
+  name: 'child',
+  inverseName: 'parent'
+});
