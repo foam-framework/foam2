@@ -475,7 +475,6 @@ var o = Person.create({name:'John'});
 log(o.salary);
 
 // Refine a Property Class
-// TODO: this test demos a current bug
 foam.CLASS({ name: 'Salary', extends: 'Float' });
 foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
 foam.CLASS({ refines: 'Salary', properties: [ {name: 'value', value: 30000} ]});
