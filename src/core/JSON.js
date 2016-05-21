@@ -20,12 +20,7 @@
 //
 // TODO:
 //   - don't output default classes
-//   - don't output transient properties
-//   - pretty printing
 //   - allow for custom Property JSON support
-//   - compact output
-//   - reading shortNames
-//   - date support
 */
 
 /**
