@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /** Represents one node's state in a binary tree */
 foam.CLASS({
   package: 'foam.dao.index',
@@ -31,22 +30,21 @@ foam.CLASS({
     { class: 'Simple', name: 'right' },
 
     // per tree properties
-    { name: 'nullNode' }
+    { name: 'nullNode' } // ???: Where is this set?
   ],
 
   methods: [
 
-    function init() {
-      this.left  = this.left  || this.nullNode;
-      this.right = this.right || this.nullNode;
-    },
-
-    /** Flyweight constructor */
     function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
       c.init && c.init();
       return c;
+    },
+
+    function init() {
+      this.left  = this.left  || this.nullNode;
+      this.right = this.right || this.nullNode;
     },
 
     /** Nodes do a shallow clone */
@@ -61,8 +59,10 @@ foam.CLASS({
       return c;
     },
 
-    /** Clone is only needed if a select() is active in the tree at the
-      same time we are updating it. */
+    /**
+       Clone is only needed if a select() is active in the tree at the
+       same time we are updating it.
+    */
     function maybeClone(locked) {
       return locked ? this.clone() : this;
     },
@@ -125,8 +125,10 @@ foam.CLASS({
       return s;
     },
 
-    /** Removes links that skip levels.
-      @return the tree with its level decreased. */
+    /**
+       Removes links that skip levels.
+       @return the tree with its level decreased.
+    */
     function decreaseLevel(locked) {
       var expectedLevel = Math.min(
           this.left.level  ? this.left.level  : 0,
@@ -428,4 +430,3 @@ foam.CLASS({
     }
   ]
 });
-
