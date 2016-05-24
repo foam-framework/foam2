@@ -71,6 +71,7 @@ foam.CLASS({
       var axiom = this;
 
       // TODO: create imports for 'xhrHostName', 'xhrPort', 'xhrProtocol', 'xhrBasePath', 'xhrAuth'
+      // or just import the thing that does the xhr, preconfigured
 
       // set up function with correct args, pass them into the
       // actual implementation, callRemote_()
