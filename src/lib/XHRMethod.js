@@ -28,6 +28,10 @@ foam.CLASS({
   extends: 'foam.core.Method',
   requires: [
     'foam.api.XHRArgument',
+    'foam.core.Imports',
+  ],
+  imports: [
+    'assert',
   ],
 
   properties: [
@@ -38,9 +42,6 @@ foam.CLASS({
     {
       name: 'httpMethod',
       value: 'GET',
-      postSet: function(old,nu) {
-        this.baseOpts_ && ( this.baseOpts_.method = nu );
-      }
     },
     {
       /** The parameters to call with, in order */
@@ -53,25 +54,36 @@ foam.CLASS({
         along a parameter of the type specified here. */
       name: 'returns',
     },
-    { name: 'http', factory: function() { return require('http') } },
-    { name: 'https', factory: function() { return require('https') } },
-    { name: 'url',  factory: function() { return require('url') } },
     {
-      /** cache of http options */
-      name: 'baseOpts_',
-      postSet: function(old,nu) {
-        nu.method = this.httpMethod;
-      }
-    },
+      /** the name of the XHR service to import at run time */
+      name: 'xhrServiceName',
+      value: 'XHRService'
+    }
   ],
 
   methods: [
+    function installInClass(c) {
+      // add an import for the XHRService on our host class
+
+      // May have many XHRMethods in a host class, but only do service import once.
+      var existing = c.getAxiomByName(this.xhrServiceName);
+      this.assert( ( ! existing ) || this.Imports.isInstance(existing),
+        "XHRMethod installInClass found conflicting axiom", existing && existing.name, ".",
+        "Use a different XMRMethod.xhrServiceName.");
+
+      if ( ! existing ) {
+        c.installAxiom(this.Imports.create({
+          name: this.xhrServiceName,
+          key: this.xhrServiceName
+        }));
+      }
+    },
+
     function installInProto(p) {
       // generate body to call through to xhr
       var axiom = this;
 
-      // TODO: create imports for 'xhrHostName', 'xhrPort', 'xhrProtocol', 'xhrBasePath', 'xhrAuth'
-      // or just import the thing that does the xhr, preconfigured
+      // TODO: just import the thing that does the xhr, preconfigured
 
       // set up function with correct args, pass them into the
       // actual implementation, callRemote_()
@@ -91,63 +103,16 @@ foam.CLASS({
       code = eval(code);
 
       p[axiom.name] = code;
+      console.log('installed XHRMethod', axiom.name, code, p[axiom.name]);
+
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
+      self.assert( host[this.xhrServiceName], "XHRMethod call can't find XHR service import ", this.xhrServiceName, "on", host);
+
       // 'this' is the axiom instance
       var self = this;
-      return new Promise(function(resolve, reject) {
-        if ( self.http ) {
-          self.callRemote_node_(opt_args, host, resolve, reject);
-        } else {
-          // browser
-          // TODO: impl for browser XHR
-          reject(new Error('Browser support not available'));
-        }
-      });
-    },
-
-    function callRemote_node_(opt_args, host, resolve, reject) {
-      var self = this;
-      var opt = this.buildUrlOptions_node_(opt_args, host);
-
-      var body = "";
-      var req = ( opt.protocol == 'http:' ? self.http : self.https ).request(opt, function(response) {
-        console.log('STATUS: ', response.statusCode);
-        response.setEncoding('utf8');
-        response.on('data', function(chunk) {
-          body += chunk;
-        });
-        response.on('end', function() {
-          if ( response.statusCode >= 300 ) {
-            reject(new Error(self.name + " invalid XHRMethod http response: " + response.statusCode + ":" + body));
-            return;
-          }
-          body = JSON.parse(body);
-          // handle response
-          self.response_(body, host, resolve, reject);
-        });
-      });
-      req.end();
-    },
-
-    function buildUrlOptions_node_(opt_args, host) {
-      var opts = this.baseOpts_ || ( this.baseOpts_ = { path: this.path } );
-
-      // work with a 'copy'
-      opts = Object.create(opts);
-      // fill in the server to target from the instance hosting this property
-      opts.hostname = host.xhrHostName;
-      opts.port = host.xhrPort;
-      opts.protocol = host.xhrProtocol;
-
-      if ( host.xhrAuth ) {
-        opts.headers = {
-          "Authorization": host.xhrAuth
-        };
-      }
-
-      var path = host.xhrBasePath + opts.path;
+      var path = this.path;
       var query = "";
 
       // add on parameters passed as part of the path or query
@@ -162,24 +127,29 @@ foam.CLASS({
           query += "&" + pname + "=" + val;
         }
       });
-      opts.path = path + ( query ? "?" + query.substring(1) : "" );
+      path = path + ( query ? "?" + query.substring(1) : "" );
+      var request = host[this.xhrServiceName].create({
+        path: path,
+        method: self.httpMethod
+      });
 
-      return opts;
+      return request.send().then(function(response) {
+        self.assert(response.responseType === 'json', "XHRMethod given a request not configured to return JSON", request);
+        var json = response.payload;
+
+        if ( ! self.returns ) {
+          // no return
+          return;
+        }
+        if ( self.returns.type ) {
+          // a modelled return type
+          return self.returns.type.create(json, host);
+        }
+        // else return raw json
+        return json;
+      });
     },
 
-    function response_(json, host, resolve, reject) {
-      if ( ! this.returns ) {
-        resolve();
-        return;
-      }
-      if ( this.returns.type ) {
-        // a modelled return type
-        resolve(this.returns.type.create(json, host));
-        return;
-      }
-      resolve(foam.json.parse(json));
-      return;
-    }
   ]
 
 });
