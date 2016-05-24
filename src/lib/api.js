@@ -180,7 +180,7 @@ function apiToModels(api) {
       package: pkg,
       name: name,
 
-      properties: [ 'xhrHostName', 'xhrPort', 'xhrProtocol', 'xhrBasePath' ],
+      properties: [ 'xhrHostName', 'xhrPort', 'xhrProtocol', 'xhrBasePath', 'xhrAuth' ],
 
       methods: getMethods(resource, pkg, api.servicePath),
     }
@@ -221,8 +221,16 @@ function loadRequest(uri) {
 
 }
 
+var global_auth = "";
 
 (function scanArgs(args) {
+  for ( var i = 0; i < args.length; i++ ) {
+    if ( ( args[i] == '-a' || args[i] == '--auth' ) && args[i+1] ) {
+      global_auth = args[i+1];
+      break;
+    }
+  }
+  
   for ( var i = 0; i < args.length; i++ ) {
     var arg = args[i];
     if ( ( arg == '-g' || arg == '--get' ) && args[i+1] ) {
@@ -236,7 +244,8 @@ function loadRequest(uri) {
 
   console.error("Bad arguments.\nUsage:\n"+
     "\t-g --get URL  : get JSON from a url\n"+
-    "\t-f --file PATH: load JSON from a file\n");
+    "\t-f --file PATH: load JSON from a file\n"+
+    "\t-a --auth TOKEN: An OAuth2 token to use to authenticate requests\n");
 })(process.argv);
 
 require('es6-shim');
@@ -249,8 +258,9 @@ setTimeout(function() {
       xhrBasePath: '/_ah/api/memegen/v1/',
       xhrPort: 443,
       xhrProtocol: 'https:',
+      xhrAuth: global_auth
     });
-  
+    console.log(meme);
     meme.get('5288030157406208').then(
       function(thing) { console.log("meme:",thing); },
       function(err) { console.log("meme error:", err); }
@@ -259,6 +269,6 @@ setTimeout(function() {
   } catch(e) { console.log(e);}
   
 }, 4000);
-setTimeout(function(){console.log("TTL");}, 200000);
+//setTimeout(function(){console.log("TTL");}, 200000);
 
 

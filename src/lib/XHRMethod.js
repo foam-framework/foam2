@@ -138,6 +138,12 @@ foam.CLASS({
       opts.port = host.xhrPort;
       opts.protocol = host.xhrProtocol;
 
+      if ( host.xhrAuth ) {
+        opts.headers = {
+          "Authorization": host.xhrAuth
+        };
+      }
+      
       var path = host.xhrBasePath + opts.path;
       var query = "";
 
