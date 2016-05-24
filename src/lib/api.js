@@ -230,7 +230,7 @@ var global_auth = "";
       break;
     }
   }
-  
+
   for ( var i = 0; i < args.length; i++ ) {
     var arg = args[i];
     if ( ( arg == '-g' || arg == '--get' ) && args[i+1] ) {
@@ -248,27 +248,6 @@ var global_auth = "";
     "\t-a --auth TOKEN: An OAuth2 token to use to authenticate requests\n");
 })(process.argv);
 
-require('es6-shim');
 
-// test fire some methods
-setTimeout(function() {
-  try{
-    var meme = api.memegen.meme.create({
-      xhrHostName: 'memegen-hirep.googleplex.com',
-      xhrBasePath: '/_ah/api/memegen/v1/',
-      xhrPort: 443,
-      xhrProtocol: 'https:',
-      xhrAuth: global_auth
-    });
-    console.log(meme);
-    meme.get('5288030157406208').then(
-      function(thing) { console.log("meme:",thing); },
-      function(err) { console.log("meme error:", err); }
-    );
-  
-  } catch(e) { console.log(e);}
-  
-}, 4000);
-//setTimeout(function(){console.log("TTL");}, 200000);
 
 

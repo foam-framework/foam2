@@ -70,6 +70,8 @@ foam.CLASS({
       // generate body to call through to xhr
       var axiom = this;
 
+      // TODO: create imports for 'xhrHostName', 'xhrPort', 'xhrProtocol', 'xhrBasePath', 'xhrAuth'
+
       // set up function with correct args, pass them into the
       // actual implementation, callRemote_()
       // ALTERNATE: just pass args in and read from arguments
@@ -86,7 +88,7 @@ foam.CLASS({
       code += '})';
 
       code = eval(code);
-      
+
       p[axiom.name] = code;
     },
 
@@ -143,7 +145,7 @@ foam.CLASS({
           "Authorization": host.xhrAuth
         };
       }
-      
+
       var path = host.xhrBasePath + opts.path;
       var query = "";
 
