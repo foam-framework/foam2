@@ -331,12 +331,6 @@ foam.CLASS({
     {
       name: 'objectify',
       code: foam.mmethod({
-        // JSON doesn't support sending 'undefined'
-        Undefined: function(o) { return o; },
-        Null:      function(o) { return o; },
-        String:    function(o) { return o; },
-        Number:    function(o) { return o; },
-        Boolean:   function(o) { return o; },
         Date:      function(o) {
           return this.formatDatesAsNumbers ? o.valueOf() : o;
         },
@@ -360,9 +354,9 @@ foam.CLASS({
             a[i] = this.objectify(o[i]);
           }
           return a;
-        },
-        Object:    function(o) { return o; }
-      })
+        }
+      },
+      function(o) { return o; })
     }
   ]
 });
