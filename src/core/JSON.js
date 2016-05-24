@@ -52,6 +52,10 @@ foam.CLASS({
   methods: [
     function toJSON() {
       return foam.json.Pretty.stringify(this);
+    },
+
+    function objectify() {
+      return foam.json.Compact.objectify(this);
     }
   ]
 });
@@ -357,13 +361,7 @@ foam.CLASS({
           }
           return a;
         },
-        Object:    function(o) {
-          if ( o.objectify ) {
-            o.objectify(this)
-          } else {
-            this.out('undefined');
-          }
-        }
+        Object:    function(o) { return o; }
       })
     }
   ]
