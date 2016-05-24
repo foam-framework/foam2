@@ -525,7 +525,7 @@ foam.typeOf = (function() {
 })();
 
 
-foam.mmethod = function(map) {
+foam.mmethod = function(map, opt_defaultMethod) {
   var uid = '__mmethod__' + foam.next$UID() + '__';
 
   for ( var key in map ) {
@@ -534,7 +534,7 @@ foam.mmethod = function(map) {
   }
 
   return function(arg1) {
-    var type = foam.typeOf(arg1);
+    var type = foam.typeOf(arg1) || opt_defaultMethod;
     console.assert(type, 'Unknown type: ', arg1);
     console.assert(
         type[uid],
