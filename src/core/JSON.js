@@ -322,6 +322,49 @@ foam.CLASS({
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
+    },
+
+    {
+      name: 'objectify',
+      code: foam.mmethod({
+        // JSON doesn't support sending 'undefined'
+        Undefined: function(o) { return o; },
+        Null:      function(o) { return o; },
+        String:    function(o) { return o; },
+        Number:    function(o) { return o; },
+        Boolean:   function(o) { return o; },
+        Date:      function(o) {
+          return this.formatDatesAsNumbers ? o.valueOf() : o;
+        },
+        Function:  function(o) {
+          return this.formatFunctionsAsStrings ? o.toString() : o;
+        },
+        FObject:   function(o) {
+          var m = {};
+          if ( this.outputClassNames ) {
+            m.class = o.cls_.id;
+          }
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            m[ps[i].name] = o[ps[i].name];
+          }
+          return m;
+        },
+        Array:     function(o) {
+          var a = [];
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            a[i] = this.objectify(o[i]);
+          }
+          return a;
+        },
+        Object:    function(o) {
+          if ( o.objectify ) {
+            o.objectify(this)
+          } else {
+            this.out('undefined');
+          }
+        }
+      })
     }
   ]
 });
@@ -420,6 +463,10 @@ foam.LIB({
 
     function stringify(o) {
       return foam.json.Compact.stringify(o);
+    },
+
+    function objectify(o) {
+      return foam.json.Compact.objectify(o)
     }
   ]
 });
