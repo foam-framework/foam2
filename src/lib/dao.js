@@ -719,87 +719,9 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [
-        'put', 'remove', 'find', 'select', 'removeAll'
-      ],
-      name: 'promise'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'PromiseDAO',
-
-  extends: 'foam.dao.AbstractDAO',
-
-  imports: [ 'error' ],
-
-  properties: [
-    {
-      class: 'StateMachine',
-      of: 'foam.dao.DAO',
-      name: 'state',
-      plural: 'states',
-      states: [
-        {
-          name: 'pending',
-          className: 'Pending'
-        },
-        {
-          name: 'fulfilled',
-          className: 'foam.dao.ProxyDAO'
-        }
-      ]
-    },
-    {
-      class: 'Proxy',
-      of: 'foam.dao.DAO',
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       topics: [ 'on' ],
-      name: 'delegate'
-    },
-    {
-      name: 'promise',
-      final: true,
-      postSet: function(_, p) {
-        p.then(function(dao) {
-          this.delegate = dao;
-          this.state = this.STATES.FULFILLED;
-        }.bind(this), function(error) {
-          this.error("Promise didn't resolve to a DAO", error);
-        }.bind(this));
-      }
-    }
-  ],
-
-  classes: [
-    {
-      name: 'Pending',
-      extends: 'foam.dao.AbstractDAO',
-
-      methods: [
-        function put(obj) {
-          return this.promise.then(function(p) {
-            return p.put(obj);
-          });
-        },
-        function remove(obj) {
-          return this.promise.then(function(p) {
-            return p.remove(obj);
-          });
-        },
-        function select(sink, skip, limit, order, predicate) {
-          return this.promise.then(function(p) {
-            return p.select(sink, skip, limit, order, predicate);
-          });
-        },
-        function removeAll(skip, limit, order, predicate) {
-          return this.promise.then(function(p) {
-            return p.removeAll(skip, limit, order, predicate);
-          });
-        }
-      ]
+      name: 'promise'
     }
   ]
 });
