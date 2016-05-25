@@ -236,11 +236,6 @@ foam.CLASS({
                       prop.name, 'Element', i, 'is not a string', v[i]);
         }
       }
-    ],
-    // TODO: Assert that all values in the array are strings ?
-    [
-      'factory',
-      function() { return []; }
     ]
   ]
 });
