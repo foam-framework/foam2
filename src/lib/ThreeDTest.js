@@ -10,7 +10,7 @@ foam.CLASS({
       extends: 'foam.graphics.Circle',
       properties: [
         'z',
-        [ 'radius',   5 ],
+        [ 'radius',   4 ],
         [ 'color',    'white' ],
         [ 'border',   null ],
         [ 'arcWidth', 0 ],
@@ -19,7 +19,7 @@ foam.CLASS({
       methods: [
         function doTransform(x) {
           var oldX = this.x, oldY = this.y;
-          var s = 1 - this.z/800;
+          var s = 1 - this.z/600;
           this.x *= s;
           this.y *= s;
           var t = this.transform;
