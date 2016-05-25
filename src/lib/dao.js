@@ -964,57 +964,44 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'CachingDAO',
   extends: 'foam.dao.PromisedDAO',
-  requires: [
-    'foam.dao.PromisedDAO'
-  ],
   classes: [
     {
-      name: 'Inner',
+      name: 'InnerCachingDAO',
+      extends: 'foam.dao.AbstractDAO',
       properties: [
         {
-          // Proxy mutations to src
           class: 'Proxy',
           of: 'foam.dao.DAO',
-          methods: [ 'put', 'remove', 'removeAll' ],
           name: 'src',
+          methods: [ 'put', 'remove', 'removeAll' ],
+          postSet: function(old, cache) {
+            if ( old ) {
+              old.on.put.unsub(this.onPut);
+              old.on.remove.unsub(this.onRemove);
+              old.on.reset.unsub(this.onReset);
+            }
+            cache.on.put.sub(this.onPut);
+            cache.on.remove.sub(this.onRemove);
+            cache.on.reset.sub(this.onReset);
+          }
         },
         {
-          // Proxy reads to cache, and events from cache
           class: 'Proxy',
           of: 'foam.dao.DAO',
-          methods: [ 'find', 'select' ],
+          name: 'cache',
           topics: [ 'on' ],
-          name: 'cache'
-        }
-      ]
-    },
-    {
-      name: 'DAOListener',
-      properties: [
-        {
-          name: 'src'
-
-        },
-        {
-          name: 'dest'
-        }
-      ],
-      methods: [
-        function init() {
-          this.onDestroy(this.src.on.put.sub(this.onPut));
-          this.onDestroy(this.src.on.remove.sub(this.onRemove));
-          this.onDestroy(this.src.on.reset.sub(this.onReset));
+          methods: [ 'find', 'select' ]
         }
       ],
       listeners: [
-        function onPut(obj) {
-          this.dest.put(obj);
+        function onPut(s, on, put, obj) {
+          this.cache.put(obj);
         },
-        function onRemove(o) {
-          this.dest.remove(o);
+        function onRemove(s, on, remove, obj) {
+          this.cache.remove(obj);
         },
         function onReset() {
-          // TODO: RemoveAll?
+          // TODO: Should this removeAll from the cache?
         }
       ]
     }
@@ -1038,15 +1025,8 @@ foam.CLASS({
 
           // First load the src into the cache
           src.select(cache).then(function() {
-            // Then pipe events from the src to the cache
-            self.onDestroy(self.DAOListener.create({
-              src: src,
-              dest: cache
-            }));
-
-            // And resovle to the inner object which proxies
             // read and writes to the appropriate dao
-            resolve(self.Inner.create({
+            resolve(self.InnerCachingDAO.create({
               src: src,
               cache: cache
             }));
