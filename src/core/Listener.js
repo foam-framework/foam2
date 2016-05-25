@@ -97,8 +97,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Model',
+
   properties: [
     {
       class: 'AxiomArray',
@@ -109,6 +111,7 @@ foam.CLASS({
           console.assert(o.name, 'Listener must be named');
           return foam.core.Listener.create({name: o.name, code: o});
         }
+
         return foam.core.Listener.isInstance(o) ?
             o :
             foam.core.Listener.create(o) ;

@@ -20,12 +20,7 @@
 //
 // TODO:
 //   - don't output default classes
-//   - don't output transient properties
-//   - pretty printing
 //   - allow for custom Property JSON support
-//   - compact output
-//   - reading shortNames
-//   - date support
 */
 
 /**
@@ -57,6 +52,10 @@ foam.CLASS({
   methods: [
     function toJSON() {
       return foam.json.Pretty.stringify(this);
+    },
+
+    function objectify() {
+      return foam.json.Compact.objectify(this);
     }
   ]
 });
@@ -327,6 +326,37 @@ foam.CLASS({
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
+    },
+
+    {
+      name: 'objectify',
+      code: foam.mmethod({
+        Date:      function(o) {
+          return this.formatDatesAsNumbers ? o.valueOf() : o;
+        },
+        Function:  function(o) {
+          return this.formatFunctionsAsStrings ? o.toString() : o;
+        },
+        FObject:   function(o) {
+          var m = {};
+          if ( this.outputClassNames ) {
+            m.class = o.cls_.id;
+          }
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            m[ps[i].name] = o[ps[i].name];
+          }
+          return m;
+        },
+        Array:     function(o) {
+          var a = [];
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            a[i] = this.objectify(o[i]);
+          }
+          return a;
+        }
+      },
+      function(o) { return o; })
     }
   ]
 });
@@ -425,6 +455,10 @@ foam.LIB({
 
     function stringify(o) {
       return foam.json.Compact.stringify(o);
+    },
+
+    function objectify(o) {
+      return foam.json.Compact.objectify(o)
     }
   ]
 });
