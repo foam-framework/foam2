@@ -34,6 +34,10 @@ foam.CLASS({
 
   implements: [ 'foam.promise.IPromise' ],
 
+  axoims: [
+    foam.pattern.Singleton.create()
+  ],
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -76,11 +80,11 @@ foam.CLASS({
     },
     function fulfill_(value) {
       this.value = value;
-      this.state = this.STATES.RESOLVING;
+      this.state = this.Resolving.create();
     },
     function reject_(e) {
       this.err = e;
-      this.state = this.STATES.REJECTED;
+      this.state = this.Rejected.create();
     }
   ]
 });
@@ -104,6 +108,10 @@ foam.CLASS({
   name: 'Fulfilled',
 
   implements: ['foam.promise.IPromise'],
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
 
   methods: [
     function then(success) {
@@ -139,6 +147,10 @@ foam.CLASS({
   name: 'Rejected',
 
   implements: ['foam.promise.IPromise'],
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
 
   methods: [
     function then(success, fail) {
@@ -176,16 +188,17 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'StateMachine',
+      class: 'Proxy',
       of: 'foam.promise.IPromise',
       name: 'state',
-      plural: 'states',
-      states: [
-        'foam.promise.Pending',
-        'foam.promise.Resolving',
-        'foam.promise.Fulfilled',
-        'foam.promise.Rejected'
-      ]
+      methods: [ 'then', 'catch', 'fulfill_', 'reject_' ],
+      delegates: [ 'then', 'catch', 'fulfill_', 'reject_' ],
+      factory: function() {
+        return this.Pending.create();
+      },
+      postSet: function(old, nu) {
+        if ( nu.onEnter ) nu.onEnter.call(this);
+      }
     },
     {
       name: 'value'
@@ -213,11 +226,11 @@ foam.CLASS({
           self.resolve_(v);
         }, function(e) {
           self.err = e;
-          self.state = self.STATES.REJECTED;
+          self.state = self.Rejected.create();
         });
       } else {
         this.value = value;
-        this.state = this.STATES.FULFILLED;
+        this.state = this.Fulfilled.create();
       }
     },
   ]
@@ -244,7 +257,7 @@ foam.LIB({
             p.resolve_(v);
           }, function(e) {
             p.err = e;
-            p.state = p.STATES.REJECTED;
+            p.state = p.Rejected.create();
           });
         }
         return p;
@@ -261,11 +274,11 @@ foam.LIB({
             p.resolve_(v);
           }, function(e) {
             p.err = e;
-            p.state = p.STATES.REJECTED;
+            p.state = p.Rejected.create();
           });
         } else {
           p.value = value;
-          p.state = p.STATES.FULFILLED;
+          p.state = p.Fulfilled.create();
         }
         return p;
       },
@@ -276,7 +289,7 @@ foam.LIB({
       code: function (err) {
         var p = foam.promise.Promise.create();
         p.err = err;
-        p.state = p.STATES.REJECTED;
+        p.state = p.Rejected.create();
         return p;
       },
     },
