@@ -29,14 +29,14 @@ foam.CLASS({
               var self = this;
               var args = arguments;
               return this[property].then(function(d) {
-                return d[name].apply(self, arguments);
+                return d[name].apply(self, args);
               });
             } :
             function() {
               var self = this;
               var args = arguments;
               this[property].then(function(d) {
-                d[name].apply(self, arguments);
+                d[name].apply(self, args);
               });
             };
         }
@@ -45,14 +45,14 @@ foam.CLASS({
             var self = this;
             var args = arguments;
             return this[property].then(function(d) {
-              return d[name].apply(d, arguments);
+              return d[name].apply(d, args);
             });
           } :
           function() {
             var self = this;
             var args = arguments;
             this[property].then(function(d) {
-              d[name].apply(d, arguments);
+              d[name].apply(d, args);
             });
           };
       }
