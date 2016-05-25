@@ -763,6 +763,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao.sync',
+  name: 'SyncRecord',
+  properties: [
+    'id',
+    {
+      class: 'Int',
+      name: 'syncNo',
+      value: -1
+    },
+    {
+      class: 'Boolean',
+      name: 'deleted',
+      value: false
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -770,7 +787,8 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.mlang.Expressions'
+    'foam.mlang.Expressions',
+    'foam.dao.sync.SyncRecord'
   ],
 
   imports: [
@@ -818,22 +836,6 @@ foam.CLASS({
     }
   ],
   classes: [
-    {
-      name: 'SyncRecord',
-      properties: [
-        'id',
-        {
-          class: 'Int',
-          name: 'syncNo',
-          value: -1
-        },
-        {
-          class: 'Boolean',
-          name: 'deleted',
-          value: false
-        }
-      ]
-    }
   ],
   listeners: [
     function onRemoteUpdate(s, on, event, obj) {
