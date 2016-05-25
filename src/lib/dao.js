@@ -960,6 +960,104 @@ foam.CLASS({
   ],
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'CachingDAO',
+  extends: 'foam.dao.PromisedDAO',
+  requires: [
+    'foam.dao.PromisedDAO'
+  ],
+  classes: [
+    {
+      name: 'Inner',
+      properties: [
+        {
+          // Proxy mutations to src
+          class: 'Proxy',
+          of: 'foam.dao.DAO',
+          methods: [ 'put', 'remove', 'removeAll' ],
+          name: 'src',
+        },
+        {
+          // Proxy reads to cache, and events from cache
+          class: 'Proxy',
+          of: 'foam.dao.DAO',
+          methods: [ 'find', 'select' ],
+          topics: [ 'on' ],
+          name: 'cache'
+        }
+      ]
+    },
+    {
+      name: 'DAOListener',
+      properties: [
+        {
+          name: 'src'
+
+        },
+        {
+          name: 'dest'
+        }
+      ],
+      methods: [
+        function init() {
+          this.onDestroy(this.src.on.put.sub(this.onPut));
+          this.onDestroy(this.src.on.remove.sub(this.onRemove));
+          this.onDestroy(this.src.on.reset.sub(this.onReset));
+        }
+      ],
+      listeners: [
+        function onPut(obj) {
+          this.dest.put(obj);
+        },
+        function onRemove(o) {
+          this.dest.remove(o);
+        },
+        function onReset() {
+          // TODO: RemoveAll?
+        }
+      ]
+    }
+  ],
+  properties: [
+    {
+      name: 'src',
+      required: true
+    },
+    {
+      name: 'cache',
+      required: true
+    },
+    {
+      name: 'promise',
+      factory: function() {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var cache = self.cache;
+          var src = self.src;
+
+          // First load the src into the cache
+          src.select(cache).then(function() {
+            // Then pipe events from the src to the cache
+            self.onDestroy(self.DAOListener.create({
+              src: src,
+              dest: cache
+            }));
+
+            // And resovle to the inner object which proxies
+            // read and writes to the appropriate dao
+            resolve(self.Inner.create({
+              src: src,
+              cache: cache
+            }));
+          });
+        });
+      }
+    }
+  ]
+});
+
+
 /*
 TODO:
 -Context oriented ?
