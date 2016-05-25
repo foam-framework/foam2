@@ -50,7 +50,12 @@ foam.CLASS({
   refines: 'foam.core.FObject',
 
   methods: [
-    function toJSON() {
+    /**
+      Output as a pretty-printed JSON-ish String.
+      Use for debugging/testing purposes. If you want actual
+      JSON output, use foam.json.* instead.
+    */
+    function stringify() {
       return foam.json.Pretty.stringify(this);
     }
   ]
@@ -308,8 +313,8 @@ foam.CLASS({
           this.end(']')
         },
         Object:    function(o) {
-          if ( o.outputJSON2 ) {
-            o.outputJSON2(this)
+          if ( o.outputJSON ) {
+            o.outputJSON(this)
           } else {
             this.out('undefined');
           }
@@ -322,6 +327,37 @@ foam.CLASS({
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
+    },
+
+    {
+      name: 'objectify',
+      code: foam.mmethod({
+        Date:      function(o) {
+          return this.formatDatesAsNumbers ? o.valueOf() : o;
+        },
+        Function:  function(o) {
+          return this.formatFunctionsAsStrings ? o.toString() : o;
+        },
+        FObject:   function(o) {
+          var m = {};
+          if ( this.outputClassNames ) {
+            m.class = o.cls_.id;
+          }
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            m[ps[i].name] = o[ps[i].name];
+          }
+          return m;
+        },
+        Array:     function(o) {
+          var a = [];
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            a[i] = this.objectify(o[i]);
+          }
+          return a;
+        }
+      },
+      function(o) { return o; })
     }
   ]
 });
@@ -420,6 +456,10 @@ foam.LIB({
 
     function stringify(o) {
       return foam.json.Compact.stringify(o);
+    },
+
+    function objectify(o) {
+      return foam.json.Compact.objectify(o)
     }
   ]
 });

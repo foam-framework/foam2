@@ -719,87 +719,9 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [
-        'put', 'remove', 'find', 'select', 'removeAll'
-      ],
-      name: 'promise'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'PromiseDAO',
-
-  extends: 'foam.dao.AbstractDAO',
-
-  imports: [ 'error' ],
-
-  properties: [
-    {
-      class: 'StateMachine',
-      of: 'foam.dao.DAO',
-      name: 'state',
-      plural: 'states',
-      states: [
-        {
-          name: 'pending',
-          className: 'Pending'
-        },
-        {
-          name: 'fulfilled',
-          className: 'foam.dao.ProxyDAO'
-        }
-      ]
-    },
-    {
-      class: 'Proxy',
-      of: 'foam.dao.DAO',
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       topics: [ 'on' ],
-      name: 'delegate'
-    },
-    {
-      name: 'promise',
-      final: true,
-      postSet: function(_, p) {
-        p.then(function(dao) {
-          this.delegate = dao;
-          this.state = this.STATES.FULFILLED;
-        }.bind(this), function(error) {
-          this.error("Promise didn't resolve to a DAO", error);
-        }.bind(this));
-      }
-    }
-  ],
-
-  classes: [
-    {
-      name: 'Pending',
-      extends: 'foam.dao.AbstractDAO',
-
-      methods: [
-        function put(obj) {
-          return this.promise.then(function(p) {
-            return p.put(obj);
-          });
-        },
-        function remove(obj) {
-          return this.promise.then(function(p) {
-            return p.remove(obj);
-          });
-        },
-        function select(sink, skip, limit, order, predicate) {
-          return this.promise.then(function(p) {
-            return p.select(sink, skip, limit, order, predicate);
-          });
-        },
-        function removeAll(skip, limit, order, predicate) {
-          return this.promise.then(function(p) {
-            return p.removeAll(skip, limit, order, predicate);
-          });
-        }
-      ]
+      name: 'promise'
     }
   ]
 });
@@ -841,6 +763,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao.sync',
+  name: 'SyncRecord',
+  properties: [
+    'id',
+    {
+      class: 'Int',
+      name: 'syncNo',
+      value: -1
+    },
+    {
+      class: 'Boolean',
+      name: 'deleted',
+      value: false
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -848,7 +787,8 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.mlang.Expressions'
+    'foam.mlang.Expressions',
+    'foam.dao.sync.SyncRecord'
   ],
 
   imports: [
@@ -896,22 +836,6 @@ foam.CLASS({
     }
   ],
   classes: [
-    {
-      name: 'SyncRecord',
-      properties: [
-        'id',
-        {
-          class: 'Int',
-          name: 'syncNo',
-          value: -1
-        },
-        {
-          class: 'Boolean',
-          name: 'deleted',
-          value: false
-        }
-      ]
-    }
   ],
   listeners: [
     function onRemoteUpdate(s, on, event, obj) {
@@ -1035,6 +959,84 @@ foam.CLASS({
     }
   ],
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'CachingDAO',
+  extends: 'foam.dao.PromisedDAO',
+  classes: [
+    {
+      name: 'InnerCachingDAO',
+      extends: 'foam.dao.AbstractDAO',
+      properties: [
+        {
+          class: 'Proxy',
+          of: 'foam.dao.DAO',
+          name: 'src',
+          methods: [ 'put', 'remove', 'removeAll' ],
+          postSet: function(old, cache) {
+            if ( old ) {
+              old.on.put.unsub(this.onPut);
+              old.on.remove.unsub(this.onRemove);
+              old.on.reset.unsub(this.onReset);
+            }
+            cache.on.put.sub(this.onPut);
+            cache.on.remove.sub(this.onRemove);
+            cache.on.reset.sub(this.onReset);
+          }
+        },
+        {
+          class: 'Proxy',
+          of: 'foam.dao.DAO',
+          name: 'cache',
+          topics: [ 'on' ],
+          methods: [ 'find', 'select' ]
+        }
+      ],
+      listeners: [
+        function onPut(s, on, put, obj) {
+          this.cache.put(obj);
+        },
+        function onRemove(s, on, remove, obj) {
+          this.cache.remove(obj);
+        },
+        function onReset() {
+          // TODO: Should this removeAll from the cache?
+        }
+      ]
+    }
+  ],
+  properties: [
+    {
+      name: 'src',
+      required: true
+    },
+    {
+      name: 'cache',
+      required: true
+    },
+    {
+      name: 'promise',
+      factory: function() {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var cache = self.cache;
+          var src = self.src;
+
+          // First load the src into the cache
+          src.select(cache).then(function() {
+            // read and writes to the appropriate dao
+            resolve(self.InnerCachingDAO.create({
+              src: src,
+              cache: cache
+            }));
+          });
+        });
+      }
+    }
+  ]
+});
+
 
 /*
 TODO:

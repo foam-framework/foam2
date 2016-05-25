@@ -143,13 +143,11 @@ foam.CLASS({
     },
 
     function put(obj) {
-      var oldValue = this.find(obj.id);
+      var oldValue = this.find_(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
-        this.index.put(obj);
-      } else {
-        this.index.put(obj);
       }
+      this.index.put(obj);
       this.pub('on', 'put', obj);
       return Promise.resolve(obj);
     },
@@ -159,36 +157,24 @@ foam.CLASS({
         return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
       }
 
+      var obj = this.find_(key);
+
+      if ( obj )
+        return Promise.resolve(obj);
+      else
+        return Promise.reject(this.ObjectNotFoundException.create({ id: key }));
+    },
+
+    /** internal, synchronous version of find, does not throw */
+    function find_(key) {
       if ( ! Array.isArray(key) ) key = [key];
       var index = this.idIndex;
       for ( var i = 0; i < key.length && index; ++i ) {
         index = index.get(key[i]);
       }
-      if ( index && index.get() ) return Promise.resolve(index.get());
+      if ( index && index.get() ) return index.get();
 
-      return Promise.reject(this.ObjectNotFoundException.create({ id: key }));
-
-      //var foundObj = null;
-      //return this.findObj_(key);
-      // TODO: How to handle multi value primary keys?
-      // return new Promise(function(resolve, reject) {
-//         self.where(self.Eq.create({ arg1: self.of.getAxiomByName(
-//             ( self.of.ids && self.of.ids[0] ) || 'id' ), arg2: key })
-//           ).limit(1).select({
-//           put: function(obj) {
-//             foundObj = obj;
-//             resolve(obj);
-//           },
-//           eof: function() {
-//             if ( ! foundObj ) {
-//               reject(self.ObjectNotFoundException.create({ id: key })); // TODO: err
-//             }
-//           },
-//           error: function(e) {
-//             reject(self.InternalException.create({ id: key })); // TODO: err
-//           }
-//         });
-//       });
+      return;
     },
 
     function remove(obj) {

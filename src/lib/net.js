@@ -344,7 +344,8 @@ foam.CLASS({
 
   imports: [
     'setTimeout',
-    'clearTimeout'
+    'clearTimeout',
+    'connected'
   ],
 
   properties: [
@@ -373,7 +374,7 @@ foam.CLASS({
             self.eventName = v.join('');
           },
           'data payload': function(p) {
-            self.eventData = JSON.parse(p.join(''));
+            self.eventData = p.join('');
           }
         });
       }
@@ -408,24 +409,12 @@ foam.CLASS({
       },
       value: 1
     },
-    {
-      class: 'Boolean',
-      name: 'connected',
-      value: false
-    },
     'eventData',
     'eventName'
   ],
   topics: [
     {
-      name: 'message',
-      topics: [
-        'put',
-        'patch',
-        'keep-alive',
-        'cancel',
-        'auth_revoked'
-      ]
+      name: 'message'
     }
   ],
 
@@ -448,6 +437,7 @@ foam.CLASS({
         }
 
         this.connected = true;
+        this.clearProperty('decoder');
         resp.data.sub(this.onData);
         resp.end.sub(this.onError);
         this.resp = resp;
