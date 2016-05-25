@@ -48,6 +48,7 @@ foam.CLASS({
       class: 'FObjectArray',
       name: 'parameters',
       of: 'foam.api.XHRArgument',
+      factory: function() { return []; }
     },
     {
       /** XHRMethods will always return a Promise, but the Promise will pass
@@ -108,7 +109,7 @@ foam.CLASS({
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
-      self.assert( host[this.xhrServiceName], "XHRMethod call can't find XHR service import ", this.xhrServiceName, "on", host);
+      this.assert( host[this.xhrServiceName], "XHRMethod call can't find XHR service import ", this.xhrServiceName, "on", host);
 
       // 'this' is the axiom instance
       var self = this;
@@ -116,7 +117,7 @@ foam.CLASS({
       var query = "";
 
       // add on parameters passed as part of the path or query
-      this.parameters.forEach(function(param) {
+      self.parameters.forEach(function(param) {
         var val = opt_args[param.name].toString();
         // put the dot back if we removed one from the name
         var pname = param.name.replace('__dot__','.');
@@ -135,18 +136,18 @@ foam.CLASS({
 
       return request.send().then(function(response) {
         self.assert(response.responseType === 'json', "XHRMethod given a request not configured to return JSON", request);
-        var json = response.payload;
-
-        if ( ! self.returns ) {
-          // no return
-          return;
-        }
-        if ( self.returns.type ) {
-          // a modelled return type
-          return self.returns.type.create(json, host);
-        }
-        // else return raw json
-        return json;
+        return response.payload.then(function(json) {
+          if ( ! self.returns ) {
+            // no return
+            return;
+          }
+          if ( self.returns.type ) {
+            // a modelled return type
+            return self.returns.type.create(json, host);
+          }
+          // else return raw json
+          return json;
+        });
       });
     },
 
