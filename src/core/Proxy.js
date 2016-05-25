@@ -110,7 +110,7 @@ foam.CLASS({
       var active = true;
       for ( var i = 0 ; i < topic.length ; i++ ) {
         active = active && ! c.active;
-        c = c.getChild(topic);
+        c = c.getChild(topic[i]);
       }
 
       c.active = active;
