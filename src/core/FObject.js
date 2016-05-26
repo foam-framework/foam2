@@ -105,7 +105,9 @@ foam.CLASS({
      ************************************************/
 
     // Imports aren't implemented yet, so mimic:
-    //   imports: [ 'assert', 'error', 'log', 'warn' ],
+    //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
+
+    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
 
     function assert() { return (this.__context__ || foam.__context__).assert.apply(null, arguments); },
 
@@ -114,6 +116,7 @@ foam.CLASS({
     function log() { this.__context__.log.apply(null, arguments); },
 
     function warn() { this.__context__.warn.apply(null, arguments); },
+
 
 
     /************************************************
