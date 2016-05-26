@@ -116,6 +116,7 @@ foam.CLASS({
 
       // add on parameters passed as part of the path or query
       self.parameters.forEach(function(param) {
+        if ( ! opt_args[param.name] ) return;
         var val = opt_args[param.name].toString();
         // put the dot back if we removed one from the name
         var pname = param.name.replace('__dot__','.');
