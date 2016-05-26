@@ -46,9 +46,7 @@ foam.CLASS({
           return m.create(o);
         }
 
-        if ( foam.core.Property.isInstance(o) ) return o;
-
-        return foam.core.Property.create(o);
+        return foam.core.Property.isInstance(o) ? o : foam.core.Property.create(o);
       }
     },
     {
