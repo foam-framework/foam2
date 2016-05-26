@@ -66,7 +66,7 @@ describe('LocalStorageDAO', function() {
     expect(result.a[0]).toEqual(a);
     expect(result.a[1]).toEqual(a2);
     expect(result.a[2]).toEqual(b);
-    expect(result.a[2].toJSON()).toEqual(b.toJSON());
+    expect(result.a[2].stringify()).toEqual(b.stringify());
   });
 
   // Run the generic suite of DAO tests against it.
@@ -103,4 +103,3 @@ describe('MDAO', function() {
     return Promise.resolve(foam.dao.MDAO.create({ of: model }));
   });
 });
-

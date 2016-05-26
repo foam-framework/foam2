@@ -14,7 +14,7 @@ foam.CLASS({
   requires: [
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest',
-    'foam.net.EventSource',
+    'com.firebase.FirebaseEventSource',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Constant'
   ],
@@ -24,11 +24,6 @@ foam.CLASS({
     'apppath',
     'secret',
     'eventSource_',
-    {
-      class: 'Boolean',
-      name: 'connected',
-      value: false
-    },
     {
       name: 'timestampProperty'
     },
@@ -158,14 +153,12 @@ foam.CLASS({
         uri += '?' + params.map(function(p) { return p.map(encodeURIComponent).join('='); }).join('&');
       }
 
-      this.eventSource_ = this.EventSource.create({
+      this.eventSource_ = this.FirebaseEventSource.create({
         uri: uri
       });
 
-      this.eventSource_.connected$.link(this.connected$);
-
-      this.eventSource_.message.put.sub(this.onPut);
-      this.eventSource_.message.patch.sub(this.onPatch);
+      this.eventSource_.put.sub(this.onPut);
+      this.eventSource_.patch.sub(this.onPatch);
       this.eventSource_.start();
     },
 
@@ -251,7 +244,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onPut(s, _, _, data) {
+    function onPut(s, _, data) {
       // PATH is one of
       // / -> new objects
       // /key -> new object
@@ -333,5 +326,94 @@ foam.CLASS({
 
   properties: [
     [ 'enableStreaming', false ]
+  ]
+});
+
+foam.CLASS({
+  package: 'com.firebase',
+  name: 'FirebaseEventSource',
+  requires: [
+    'foam.net.EventSource'
+  ],
+  properties: [
+    {
+      name: 'uri',
+      required: true
+    },
+    {
+      name: 'eventSource',
+      postSet: function(old, nu) {
+        nu.message.sub(this.onMessage);
+      },
+      factory: function() {
+        return this.EventSource.create({
+          uri: this.uri
+        });
+      }
+    },
+    {
+      class: 'String',
+      name: 'buffer'
+    }
+  ],
+  topics: [
+    'put',
+    'patch',
+    'keep-alive',
+    'cancel',
+    'auth_revoked'
+  ],
+  methods: [
+    function start() {
+      this.eventSource.start();
+    }
+  ],
+  listeners: [
+    function onMessage(s, msg, name, data) {
+      switch(name) {
+      case 'put':
+        this.onPut(name, data);
+        break;
+      case 'patch':
+        this.onPatch(name, data);
+        break;
+      case 'keep-alive':
+        this.onKeepAlive(name, data);
+        break;
+      case 'cancel':
+        this.onCancel(name, data);
+        break;
+      case 'auth_revoked':
+        this.onAuthRevoked(name, data);
+        break;
+      default:
+        this.onUnknown(name, data);
+      }
+    },
+    function onPut(name, data) {
+      this.put.pub(JSON.parse(data));
+      return;
+
+      // this.buffer += data;
+      // try {
+      //   var payload = JSON.parse(this.buffer);
+      // } catch(e) {
+      //   this.warn('Failed to parse payload, assuming its incomplete.', e, this.buffer.length);
+      //   return;
+      // }
+
+      // this.buffer = '';
+      // this.put.pub(payload);
+    },
+    function onPatch() {
+      debugger;
+    },
+    function onKeepAlive() {
+    },
+    function onCancel() {
+    },
+    function onUnknown(name, data) {
+      this.warn('Unknown firebase event', name, data);
+    }
   ]
 });

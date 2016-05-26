@@ -120,7 +120,7 @@ foam.CLASS({
 
     function serialize(obj) {
       // TODO: Better serialization, error handling
-      return foam.json.stringify(obj);
+      return foam.json.Storage.stringify(obj);
     },
 
     function withStore(mode, fn) {

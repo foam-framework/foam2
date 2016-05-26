@@ -80,6 +80,8 @@
     "IDSupport",
     "Requires",
     "Slot",
+    "Proxy",
+    "Promised",
     "Enum",
     "Window",
     "debug",

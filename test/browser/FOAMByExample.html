@@ -1449,8 +1449,11 @@ o = JSONTest.create({
 // Default JSON formatting
 log(foam.json.stringify(o));
 
+// Convert to a JSON object (instead of a String)
+log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
+
 // Or as a method on Objects
-log(o.toJSON());
+log(o.stringify());
 
 //
 log(foam.json.Pretty.stringify(o));

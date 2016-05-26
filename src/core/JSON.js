@@ -50,12 +50,13 @@ foam.CLASS({
   refines: 'foam.core.FObject',
 
   methods: [
-    function toJSON() {
+    /**
+      Output as a pretty-printed JSON-ish String.
+      Use for debugging/testing purposes. If you want actual
+      JSON output, use foam.json.* instead.
+    */
+    function stringify() {
       return foam.json.Pretty.stringify(this);
-    },
-
-    function objectify() {
-      return foam.json.Compact.objectify(this);
     }
   ]
 });
@@ -312,8 +313,8 @@ foam.CLASS({
           this.end(']')
         },
         Object:    function(o) {
-          if ( o.outputJSON2 ) {
-            o.outputJSON2(this)
+          if ( o.outputJSON ) {
+            o.outputJSON(this)
           } else {
             this.out('undefined');
           }
