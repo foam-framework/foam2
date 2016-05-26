@@ -84,8 +84,6 @@ foam.CLASS({
       // generate body to call through to xhr
       var axiom = this;
 
-      // TODO: just import the thing that does the xhr, preconfigured
-
       // set up function with correct args, pass them into the
       // actual implementation, callRemote_()
       // ALTERNATE: just pass args in and read from arguments
@@ -113,6 +111,8 @@ foam.CLASS({
       var self = this;
       var path = this.path;
       var query = "";
+
+      // TODO: request body... always the first arg, if present?
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {
