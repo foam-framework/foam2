@@ -104,8 +104,6 @@ foam.CLASS({
       code = eval(code);
 
       p[axiom.name] = code;
-      console.log('installed XHRMethod', axiom.name, code, p[axiom.name]);
-
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
@@ -129,10 +127,9 @@ foam.CLASS({
         }
       });
       path = path + ( query ? "?" + query.substring(1) : "" );
-      var request = host[this.xhrServiceName].create({
-        path: path,
-        method: self.httpMethod
-      });
+      var request = host[this.xhrServiceName].create();
+      request.path += "/" + path;
+      request.method = self.httpMethod;
 
       return request.send().then(function(response) {
         self.assert(response.responseType === 'json', "XHRMethod given a request not configured to return JSON", request);
