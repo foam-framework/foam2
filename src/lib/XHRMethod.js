@@ -23,11 +23,11 @@
   XHRMethod with a normal one.
   <p>FUTURE: Generalize. */
 foam.CLASS({
-  package: 'foam.api',
+  package: 'foam.net',
   name: 'XHRMethod',
   extends: 'foam.core.Method',
   requires: [
-    'foam.api.XHRArgument',
+    'foam.net.XHRArgument',
     'foam.core.Imports',
   ],
   imports: [
@@ -47,7 +47,7 @@ foam.CLASS({
       /** The args to call with, in order */
       class: 'FObjectArray',
       name: 'args',
-      of: 'foam.api.XHRArgument',
+      of: 'foam.net.XHRArgument',
       factory: function() { return []; }
     },
     {
@@ -139,6 +139,9 @@ foam.CLASS({
             // no return
             return;
           }
+          if ( ! self.returns.type ) {
+            self.returns.type = foam.lookup(self.returns.typeName, true);
+          }
           if ( self.returns.type ) {
             // a modelled return type
             return self.returns.type.create(json, host);
@@ -154,7 +157,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.api',
+  package: 'foam.net',
   name: 'XHRArgument',
   extends: 'foam.core.Argument',
   properties: [
