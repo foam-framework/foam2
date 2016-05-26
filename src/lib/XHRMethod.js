@@ -44,9 +44,9 @@ foam.CLASS({
       value: 'GET',
     },
     {
-      /** The parameters to call with, in order */
+      /** The args to call with, in order */
       class: 'FObjectArray',
-      name: 'parameters',
+      name: 'args',
       of: 'foam.api.XHRArgument',
       factory: function() { return []; }
     },
@@ -90,7 +90,7 @@ foam.CLASS({
       // actual implementation, callRemote_()
       // ALTERNATE: just pass args in and read from arguments
       var code = "(function "+axiom.name+"_"+"(";
-      var names = this.parameters.map(axiom.XHRArgument.NAME.f);
+      var names = this.args.map(axiom.XHRArgument.NAME.f);
       code += names.join(', ');
       code += ') {\n';
       code += 'var opt_args = {\n';
@@ -114,8 +114,8 @@ foam.CLASS({
       var path = this.path;
       var query = "";
 
-      // add on parameters passed as part of the path or query
-      self.parameters.forEach(function(param) {
+      // add on args passed as part of the path or query
+      self.args.forEach(function(param) {
         if ( ! opt_args[param.name] ) return;
         var val = opt_args[param.name].toString();
         // put the dot back if we removed one from the name
