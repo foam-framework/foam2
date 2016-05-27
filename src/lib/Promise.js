@@ -34,7 +34,7 @@ foam.CLASS({
 
   implements: [ 'foam.promise.IPromise' ],
 
-  axoims: [
+  axioms: [
     foam.pattern.Singleton.create()
   ],
 
