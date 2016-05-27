@@ -534,12 +534,15 @@ foam.mmethod = function(map, opt_defaultMethod) {
   }
 
   return function(arg1) {
-    var type = foam.typeOf(arg1) || opt_defaultMethod;
-    console.assert(type, 'Unknown type: ', arg1);
-    console.assert(
+    var type = foam.typeOf(arg1)
+    if ( ! opt_defaultMethod ) {
+      console.assert(type, 'Unknown type: ', arg1, 'and no default method provided');
+      console.assert(
         type[uid],
-        'Missing multi-method for type ', arg1, ' map: ', map);
-    return type[uid].apply(this, arguments);
+        'Missing multi-method for type ', arg1, ' map: ', map,
+        'and no deafult method provided');
+    }
+    return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
   };
 };
 
