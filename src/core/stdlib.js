@@ -333,6 +333,14 @@ foam.LIB({
       })
     },
 
+    {
+      name: 'cssClassize',
+      code: foam.Function.memoize1(function(str) {
+        // Turns foam.u2.Foo into foam-u2-Foo
+        return str.replace(/\./g, '-');
+      })
+    },
+
     function pad(str, size) {
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?

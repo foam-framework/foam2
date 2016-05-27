@@ -27,7 +27,7 @@ foam.CLASS({
         },
         function doTransform(x) {
           var oldX = this.x, oldY = this.y;
-          var s = 1 - this.z/800;
+          var s = 1 - this.z/600;
           this.x *= s;
           this.y *= s;
           var t = this.transform;

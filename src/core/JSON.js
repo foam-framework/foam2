@@ -345,7 +345,7 @@ foam.CLASS({
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            m[ps[i].name] = o[ps[i].name];
+            m[ps[i].name] = this.objectify(o[ps[i].name]);
           }
           return m;
         },
