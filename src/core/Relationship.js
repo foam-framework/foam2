@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Relationship',
 
   properties: [
+    'name',
+    'inverseName',
     {
       name: 'cardinality',
       value: '0:1' // '1:*', '*:1', '*:*'
@@ -56,26 +58,36 @@ foam.CLASS({
 
   methods: [
     function init() {
-      // TODO: move to validate method
-//      this.assert(
-//          this.sourceProperties.length === this.targetProperties.length,
-//          'Relationship source/target property list length mismatch.');
+      var sourceProps = this.sourceProperties || [];
+      var targetProps = this.targetProperties || [];
 
-      var source      = this.lookup(this.sourceModel);
-      var target      = this.lookup(this.targetModel);
-      var sourceProps = this.sourceProperties;
-      var targetProps = this.targetProperties;
+      if ( ! sourceProps.length ) {
+        sourceProps = [ foam.core.Property.create({name: this.name}) ];
+      }
+
+      if ( ! targetProps.length ) {
+        targetProps = [ foam.core.Property.create({name: this.inverseName}) ];
+      }
+
+      this.assert(
+          sourceProps.length === targetProps.length,
+          'Relationship source/target property list length mismatch.');
+
+      var source = this.lookup(this.sourceModel);
+      var target = this.lookup(this.targetModel);
 
       this.assert(source, 'Unknown sourceModel: ', this.sourceModel);
       this.assert(target, 'Unknown targetModel: ', this.targetModel);
 
-      if ( ! sourceProps || ! sourceProps.length ) {
-        sourceProps = [ foam.core.Property.create({name: this.name}) ];
-        targetProps = [ foam.core.Property.create({name: this.inverseName}) ];
+      for ( var i = 0 ; i < sourceProps.length ; i++ ) {
+        var sp = sourceProps[i];
+        var tp = targetProps[i];
+
+        source.installAxiom(sp);
+        if ( ! this.oneWay ) target.installAxiom(tp);
       }
 
-      source.installAxiom(this.sourceProperty);
-
+      /*
       if ( ! this.oneWay ) {
         sourceProperty.preSet = function(_, newValue) {
           if ( newValue ) {
@@ -85,9 +97,8 @@ foam.CLASS({
           }
           return newValue;
         };
-
-        target.installAxiom(this.targetProperty);
       }
+      */
     }
   ]
 });
@@ -96,16 +107,18 @@ foam.CLASS({
 // Relationship Test
 foam.CLASS({
   name: 'Parent1',
+  ids: [ 'name' ],
   properties: [ 'name' ]
 });
 foam.CLASS({
   name: 'Child1',
+  ids: [ 'name' ],
   properties: [ 'name' ]
 });
 foam.core.Relationship.create({
   sourceModel: 'Parent1',
   targetModel: 'Child1',
-  name: 'child',
+  name: 'children',
   inverseName: 'parent'
 });
 
