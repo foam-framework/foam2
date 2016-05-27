@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'EventProxy',
+
   properties: [
     {
       name: 'dest'
@@ -63,6 +64,7 @@ foam.CLASS({
       name: 'subscription'
     }
   ],
+
   methods: [
     function init() {
       this.onDestroy(function() {
@@ -74,6 +76,7 @@ foam.CLASS({
         }
       }.bind(this));
     },
+
     function doSub() {
       if ( this.subscription ) this.subscription.destroy();
 
@@ -83,9 +86,11 @@ foam.CLASS({
       args.push(this.onEvent);
       this.subscription = this.src.sub.apply(this.src, args);
     },
+
     function doUnsub() {
       if ( this.subscription ) this.subscription.destroy();
     },
+
     function removeChild(c) {
       for ( var key in this.children ) {
         if ( this.children[key] === c ) {
@@ -94,6 +99,7 @@ foam.CLASS({
         }
       }
     },
+
     function getChild(key) {
       if ( ! this.children[key] ) {
         this.children[key] = this.cls_.create({
@@ -105,6 +111,7 @@ foam.CLASS({
       }
       return this.children[key];
     },
+
     function addProxy(topic) {
       var c = this;
       var active = true;
@@ -116,6 +123,7 @@ foam.CLASS({
       c.active = active;
     }
   ],
+
   listeners: [
     function onEvent(s) {
       if ( this.active ) {
@@ -127,10 +135,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'ProxiedMethod',
   extends: 'Method',
+
   properties: [
     {
       class: 'String',
@@ -157,6 +167,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -203,6 +214,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 //TODO(adamvy): document
 foam.CLASS({
