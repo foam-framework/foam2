@@ -28,8 +28,8 @@ foam.CLASS({
       name: 'sourceModel'
     },
     {
-      name: 'sourceProperties',
       class: 'FObjectArray',
+      name: 'sourceProperties',
       of: 'Property',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
@@ -37,8 +37,8 @@ foam.CLASS({
       name: 'targetModel'
     },
     {
-      name: 'targetProperties',
       class: 'FObjectArray',
+      name: 'targetProperties',
       of: 'Property',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
@@ -57,9 +57,9 @@ foam.CLASS({
   methods: [
     function init() {
       // TODO: move to validate method
-      this.assert(
-          this.sourceProperties.length === this.targetProperties.length,
-          'Relationship source/target property list length mismatch.');
+//      this.assert(
+//          this.sourceProperties.length === this.targetProperties.length,
+//          'Relationship source/target property list length mismatch.');
 
       var source      = this.lookup(this.sourceModel);
       var target      = this.lookup(this.targetModel);
@@ -69,7 +69,7 @@ foam.CLASS({
       this.assert(source, 'Unknown sourceModel: ', this.sourceModel);
       this.assert(target, 'Unknown targetModel: ', this.targetModel);
 
-      if ( ! this.sourceProperties.length ) {
+      if ( ! sourceProps || ! sourceProps.length ) {
         sourceProps = [ foam.core.Property.create({name: this.name}) ];
         targetProps = [ foam.core.Property.create({name: this.inverseName}) ];
       }
@@ -95,10 +95,12 @@ foam.CLASS({
 
 // Relationship Test
 foam.CLASS({
-  name: 'Parent1'
+  name: 'Parent1',
+  properties: [ 'name' ]
 });
 foam.CLASS({
-  name: 'Child1'
+  name: 'Child1',
+  properties: [ 'name' ]
 });
 foam.core.Relationship.create({
   sourceModel: 'Parent1',
@@ -106,3 +108,14 @@ foam.core.Relationship.create({
   name: 'child',
   inverseName: 'parent'
 });
+
+var parents  = foam.dao.MDAO.create({of: 'Parent1'});
+var children = foam.dao.MDAO.create({of: 'Child1'});
+
+parents.put(Parent1.create({name: 'Odin'}));
+children.put(Child1.create({name: 'Thor', parent: 'Odin'}));
+children.put(Child1.create({name: 'Loki', parent: 'Odin'}));
+
+parents.select({put: function(o) { console.log(o.stringify()); }});
+console.log('Children:');
+children.select({put: function(o) { console.log(o.stringify()); }});
