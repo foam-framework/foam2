@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'PromisedMethod',
   extends: 'ProxiedMethod',
+
   properties: [
     {
       name: 'code',
@@ -60,10 +61,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Promised',
   extends: 'Property',
+
   properties: [
     {
       name: 'of',
@@ -93,6 +96,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function installInClass(cls) {
       this.SUPER(cls);
