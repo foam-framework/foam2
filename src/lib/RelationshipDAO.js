@@ -16,33 +16,31 @@
  */
 
 foam.CLASS({
+  package: 'foam.dao',
   name: 'RelationshipDAO',
-  extends: 'FilteredDAO',
+//  extends: 'foam.dao.FilteredDAO',
+  extends: 'foam.dao.ProxyDAO',
 
   documentation: 'Adapts a DAO based on a Relationship.',
 
   properties: [
     {
-      name: 'relatedProperty',
-      required: true
-    },
-    {
-      name: 'relativeID',
+      name: 'relationship',
       required: true
     },
     {
       name: 'query',
-      lazyFactory: function() {
-        return AND(NEQ(this.relatedProperty, ''),
-            EQ(this.relatedProperty, this.relativeID));
+      factory: function() {
+        return this.relationship.targetDAOQuery();
       }
-    },
+    }
   ],
 
   methods: [
     function put(obj, sink) {
-      obj[this.relatedProperty.name] = this.relativeID;
-      this.SUPER(obj, sink);
+      this.relationship.adaptTarget(obj);
+
+      return this.SUPER(obj, sink);
     }
   ]
 });
