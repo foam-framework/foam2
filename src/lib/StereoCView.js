@@ -19,7 +19,6 @@ foam.CLASS({
         var c = this.children[i];
         c.x -= 20;
         c.paint(x);
-        c.x += 20;
       }
     }
   ]
