@@ -24,8 +24,13 @@
 
 
 global.genericDAOTestBattery = function(daoFactory) {
+  var oldContext;
+
   describe('generic DAO tests', function() {
     beforeEach(function() {
+      oldContext = foam.__context__;
+      foam.__context__ = foam.createSubContext();
+
       foam.CLASS({
         package: 'test.dao.generic',
         name: 'Person',
@@ -59,6 +64,10 @@ global.genericDAOTestBattery = function(daoFactory) {
           // arrays of nested FObjects.
         ]
       });
+    });
+
+    afterEach(function() {
+      foam.__context__ = oldContext;
     });
 
     var mkPerson1 = function() {
