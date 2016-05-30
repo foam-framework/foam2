@@ -253,7 +253,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'path'
+      name: 'path',
+      preSet: function(old, nu) {
+        if ( ! nu.startsWith('/') ) return '/'+nu;
+        return nu;
+      }
     },
     {
       class: 'String',
@@ -584,6 +588,8 @@ foam.CLASS({
           var value = headers[i].substring(sep+1);
           this.headers[key.trim()] = value.trim();
         }
+        this.responseType = xhr.responseType;
+        
       }
     },
     {
