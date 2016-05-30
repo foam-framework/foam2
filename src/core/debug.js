@@ -165,16 +165,18 @@ foam.AbstractClass.installModel = function() {
             a.name +
             ' changed to ' +
             aCls;
+        } else if ( foam.core.Method.isSubClass(prevA.cls_) && foam.core.Method.isSubClass(a.cls_) ) {
+          // NOP
         } else if ( prevA.cls_ ) {
           // FUTURE: make error when supression supported
           console.warn(
-            'Change of Axiom ' +
-            this.id + '.' +
-            a.name +
-            ' type from ' +
-            prevCls +
-            ' to ' +
-            aCls);
+              'Change of Axiom ' +
+              this.id + '.' +
+              a.name +
+              ' type from ' +
+              prevCls +
+              ' to ' +
+              aCls);
         }
       }
 

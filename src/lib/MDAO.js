@@ -39,6 +39,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Class',
       name:  'of',
       required: true
     },

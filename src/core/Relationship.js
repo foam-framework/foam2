@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Relationship',
 
   properties: [
+    'name',
+    'inverseName',
     {
       name: 'cardinality',
       value: '0:1' // '1:*', '*:1', '*:*'
@@ -28,8 +30,8 @@ foam.CLASS({
       name: 'sourceModel'
     },
     {
-      name: 'sourceProperties',
       class: 'FObjectArray',
+      name: 'sourceProperties',
       of: 'Property',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
@@ -37,8 +39,8 @@ foam.CLASS({
       name: 'targetModel'
     },
     {
-      name: 'targetProperties',
       class: 'FObjectArray',
+      name: 'targetProperties',
       of: 'Property',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
@@ -56,26 +58,36 @@ foam.CLASS({
 
   methods: [
     function init() {
-      // TODO: move to validate method
+      var sourceProps = this.sourceProperties || [];
+      var targetProps = this.targetProperties || [];
+
+      if ( ! sourceProps.length ) {
+        sourceProps = [ foam.core.Property.create({name: this.name}) ];
+      }
+
+      if ( ! targetProps.length ) {
+        targetProps = [ foam.core.Property.create({name: this.inverseName}) ];
+      }
+
       this.assert(
-          this.sourceProperties.length === this.targetProperties.length,
+          sourceProps.length === targetProps.length,
           'Relationship source/target property list length mismatch.');
 
-      var source      = this.lookup(this.sourceModel);
-      var target      = this.lookup(this.targetModel);
-      var sourceProps = this.sourceProperties;
-      var targetProps = this.targetProperties;
+      var source = this.lookup(this.sourceModel);
+      var target = this.lookup(this.targetModel);
 
       this.assert(source, 'Unknown sourceModel: ', this.sourceModel);
       this.assert(target, 'Unknown targetModel: ', this.targetModel);
 
-      if ( ! this.sourceProperties.length ) {
-        sourceProps = [ foam.core.Property.create({name: this.name}) ];
-        targetProps = [ foam.core.Property.create({name: this.inverseName}) ];
+      for ( var i = 0 ; i < sourceProps.length ; i++ ) {
+        var sp = sourceProps[i];
+        var tp = targetProps[i];
+
+        source.installAxiom(sp);
+        if ( ! this.oneWay ) target.installAxiom(tp);
       }
 
-      source.installAxiom(this.sourceProperty);
-
+      /*
       if ( ! this.oneWay ) {
         sourceProperty.preSet = function(_, newValue) {
           if ( newValue ) {
@@ -85,9 +97,8 @@ foam.CLASS({
           }
           return newValue;
         };
-
-        target.installAxiom(this.targetProperty);
       }
+      */
     }
   ]
 });
@@ -95,14 +106,29 @@ foam.CLASS({
 
 // Relationship Test
 foam.CLASS({
-  name: 'Parent1'
+  name: 'Parent1',
+  ids: [ 'name' ],
+  properties: [ 'name' ]
 });
 foam.CLASS({
-  name: 'Child1'
+  name: 'Child1',
+  ids: [ 'name' ],
+  properties: [ 'name' ]
 });
 foam.core.Relationship.create({
   sourceModel: 'Parent1',
   targetModel: 'Child1',
-  name: 'child',
+  name: 'children',
   inverseName: 'parent'
 });
+
+var parents  = foam.dao.MDAO.create({of: 'Parent1'});
+var children = foam.dao.MDAO.create({of: 'Child1'});
+
+parents.put(Parent1.create({name: 'Odin'}));
+children.put(Child1.create({name: 'Thor', parent: 'Odin'}));
+children.put(Child1.create({name: 'Loki', parent: 'Odin'}));
+
+parents.select({put: function(o) { console.log(o.stringify()); }});
+console.log('Children:');
+children.select({put: function(o) { console.log(o.stringify()); }});

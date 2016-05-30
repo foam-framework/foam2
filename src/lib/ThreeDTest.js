@@ -8,8 +8,9 @@ foam.CLASS({
     {
       name: 'Point',
       extends: 'foam.graphics.Circle',
+      implements: [ 'foam.physics.Physical' ],
       properties: [
-        'z',
+        'z', 'vz',
         [ 'radius',   4 ],
         [ 'color',    'white' ],
         [ 'border',   null ],
@@ -36,7 +37,20 @@ foam.CLASS({
     [ 'x',      500 ],
     [ 'y',      350 ],
     [ 'width',  1200 ],
-    [ 'height', 500 ]
+    [ 'height', 500 ],
+    {
+      name: 'ball',
+      factory: function() {
+        return this.Point.create({
+          vx: 10,
+          vy: 10,
+          vz: 10,
+          z: 0,
+          color: 'red',
+          radius: 10
+        }); 
+      }
+    }
   ],
 
   methods: [
@@ -52,6 +66,33 @@ foam.CLASS({
             }));
           }
         }
+      }
+
+      this.addChildren(this.ball);
+      this.tick();
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      isFramed: true,
+      code: function() {
+        var ball = this.ball;
+
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        ball.z += ball.vz;
+
+        if ( ball.x < -150 ) ball.vx =   9;
+        if ( ball.x >  150 ) ball.vx =  -9;
+        if ( ball.y < -150 ) ball.vy =  10;
+        if ( ball.y >  150 ) ball.vy = -10;
+        if ( ball.z < -150 ) ball.vz =  11;
+        if ( ball.z >  150 ) ball.vz = -11;
+
+        this.invalidated.pub();
+        this.tick();
       }
     }
   ]
