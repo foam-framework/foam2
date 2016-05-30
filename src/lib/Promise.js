@@ -30,13 +30,9 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.promise',
-  name: 'Pending',
+  name: 'PendingBase',
 
   implements: [ 'foam.promise.IPromise' ],
-
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
 
   methods: [
     function then(success, fail) {
@@ -89,11 +85,24 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.promise',
+  name: 'Pending',
+  extends: 'foam.promise.PendingBase',
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
+});
 
 foam.CLASS({
   package: 'foam.promise',
   name: 'Resolving',
-  extends: 'foam.promise.Pending',
+  extends: 'foam.promise.PendingBase',
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
 
   methods: [
     function onEnter() {
