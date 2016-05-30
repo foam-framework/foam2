@@ -133,6 +133,9 @@ foam.CLASS({
       request.method = self.httpMethod;
 
       return request.send().then(function(response) {
+        if ( response.status >= 400 ) {
+          throw "HTTP error status: " + response.status;
+        }
         self.assert(response.responseType === 'json', "XHRMethod given a request not configured to return JSON", request);
         return response.payload.then(function(json) {
           if ( ! self.returns ) {
