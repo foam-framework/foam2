@@ -583,3 +583,140 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.net.node',
+  name: 'HTTPRequest',
+  extends: 'foam.net.HTTPRequest',
+  requires: [
+    'foam.net.node.HTTPResponse'
+  ],
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'followRedirect',
+      value: true
+    }
+  ],
+  methods: [
+    function fromUrl(url) {
+      var data = require('url').parse(url);
+      this.protocol = data.protocol.slice(0, -1);
+      this.hostname = data.hostname;
+      if ( data.port ) this.port = data.port;
+      this.path = data.path;
+    },
+    function send() {
+      if ( this.url ) {
+        this.fromUrl(this.url);
+      }
+
+      if ( this.protocol !== 'http' && this.protocol !== 'https' )
+        throw new Error("Unsupported protocol '" + this.protocol + "'");
+
+      var options = {
+        hostname: this.hostname,
+        headers: this.headers,
+        method: this.method,
+        path: this.path
+      };
+      if ( this.port ) options.port = this.port;
+
+      return new Promise(function(resolve, reject) {
+        var req = require(this.protocol).request(options, function(res) {
+          var resp = this.HTTPResponse.create({
+            resp: res,
+            responseType: this.responseType
+          });
+
+          if ( this.followRedirect &&
+               ( resp.status === 301 ||
+                 resp.status === 302 ||
+                 resp.status === 303 ||
+                 resp.status === 307 ||
+                 resp.status === 308 ) ) {
+            resolve(this.cls_.create({
+              url: resp.headers.location,
+              method: this.method,
+              payload: this.payload,
+              responseType: this.responseType,
+              headers: this.headers,
+              followRedirect: true
+            }).send());
+          } else {
+            resolve(resp);
+          }
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          reject(e);
+        });
+
+        if ( this.payload ) req.write(this.payload);
+        req.end();
+      }.bind(this));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.net.node',
+  name: 'HTTPResponse',
+  extends: 'foam.net.HTTPResponse',
+  properties: [
+    {
+      name: 'payload',
+      factory: function() {
+        if ( this.streaming ) return null;
+
+        // TODO: Handle response type.
+        return new Promise(function(resolve, reject) {
+          var buffer = ""
+          this.resp.on('data', function(d) {
+            buffer += d.toString();
+          });
+          this.resp.on('end', function() {
+            resolve(buffer);
+          });
+          this.resp.on('error', function(e) {
+            reject(e);
+          });
+        }.bind(this));
+      }
+    },
+    {
+      name: 'resp',
+      postSet: function(_, r) {
+        this.status = r.statusCode;
+        this.headers = {};
+        for ( var key in r.headers ) {
+          this.headers[key.toLowerCase()] = r.headers[key];
+        }
+      }
+    }
+  ],
+  methods: [
+    function start() {
+      this.streaming = true;
+
+      return new Promise(function(resolve, reject) {
+        this.resp.on('data', function(chunk) {
+          this.data.pub(chunk);
+        }.bind(this));
+
+        this.resp.on('end', function() {
+          this.end.pub();
+          resolve(this);
+        }.bind(this));
+
+        this.resp.on('error', function(e) {
+          reject(e);
+        });
+      }.bind(this));
+    },
+    function stop() {
+      // TODO?
+    }
+  ]
+});
