@@ -133,6 +133,7 @@ foam.CLASS({
       });
 
       [
+        'registry'
       ].map(function(s) {
         cls.installAxiom(foam.core.Imports.create({
           key: s,
@@ -141,9 +142,23 @@ foam.CLASS({
       });
 
       cls.installAxiom(foam.core.Method.create({
-        name: 'init',
+        name: 'sub',
         code: function() {
-          this.SUPER();
+          this.SUPER.apply(this, arguments);
+
+          if ( arguments.length < 2 ) {
+            console.warn('Currently network subscriptions must include at least one topic.');
+          }
+
+          var replyBox = this.registry.register(
+            foam.next$UID(),
+            null,
+            foam.box.EventDispatchBox.create({ target: this }));
+
+          this[propName].send(this.SubscribeMessage.create({
+            replyBox: replyBox,
+            topic: Array.from(arguments).slice(0, -1)
+          }));
 
           // var events = foam.next$UID();
 
@@ -642,9 +657,10 @@ foam.CLASS({
   package: 'foam.box',
   name: 'SubscribeMessage',
   extends: 'foam.box.Message',
-
   properties: [
-    'destination'
+    {
+      name: 'topic'
+    }
   ]
 });
 
@@ -825,8 +841,10 @@ foam.CLASS({
         return;
       } else if ( this.SubscribeMessage.isInstance(message) ) {
         // TODO: Unsub support
-        var dest = message.destination;
-        this.data.sub(function() {
+        var dest = message.replyBox;
+        var args = message.topic.slice();
+
+        args.push(function() {
           var args = Array.from(arguments);
 
           // Cannot serialize the subscription object.
@@ -836,6 +854,8 @@ foam.CLASS({
             args: args
           }));
         });
+
+        this.data.sub.apply(this.data, args);
         return;
       }
 
