@@ -231,7 +231,7 @@ foam.CLASS({
       // TODO: Improved serialization
       this.messagePortService
         .getPortForDst(this.id)
-        .send(foam.json.stringify(msg));
+        .send(foam.json.Network.stringify(msg));
     }
   ]
 });
@@ -888,7 +888,7 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      this.log(this.name, ":", foam.json.stringify(msg));
+      this.log(this.name, ":", foam.json.Network.stringify(msg));
       this.delegate && this.delegate.send(msg);
     }
   ]
@@ -934,7 +934,7 @@ foam.CLASS({
     function send(msg) {
       this.socketService.getSocket(this.host, this.port).then(
         function(s) {
-          s.write(foam.json.stringify(msg))
+          s.write(foam.json.Network.stringify(msg))
         },
         function(e) {
           // TODO: Handle error
@@ -959,11 +959,31 @@ foam.CLASS({
   methods: [
     function send(msg) {
       this.webSocketService.getSocket(this.uri).then(function(s) {
-        s.send(foam.json.stringify(msg));
+        s.send(foam.json.Network.stringify(msg));
       });
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'WebSocketService',
+  properties: [
+    {
+      name: 'me',
+      postSet: function() {
+        return foam.box.NamedBox.create({
+
+        });
+      }
+    }
+  ],
+  methods: [
+    {
+    }
+  ]
+});
+
 
 
 foam.CLASS({
@@ -1037,7 +1057,7 @@ foam.CLASS({
       name: 'source'
     },
     {
-      name: 'inbox_',
+      name: 'me',
       factory: function() {
         this.MessagePortBox.create({
           id: this.$UID
@@ -1052,7 +1072,7 @@ foam.CLASS({
     },
 
     function inbox() {
-      return this.inbox_;
+      return this.me;
     },
 
     function connect(target) {
@@ -1067,7 +1087,7 @@ foam.CLASS({
       return new Promise(foam.Function.bind(function(resolve, reject) {
         port.onmessage = foam.Function.bind(function(e) {
           if ( e.data && e.data.type === "ID" ) {
-            this.inbox_ = this.MessagePortBox.create({
+            this.me = this.MessagePortBox.create({
               id: e.data.youAre
             });
 
@@ -1132,7 +1152,7 @@ foam.CLASS({
         var port = e.ports[0];
         port.onmessage = this.onConnect;
       }.bind(this);
-      this.inbox_ = this.MessagePortBox.create({
+      this.me = this.MessagePortBox.create({
         id: this.$UID
       });
     }
