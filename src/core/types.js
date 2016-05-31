@@ -195,6 +195,28 @@ foam.CLASS({
   ],
 });
 
+// TODO(adam): Better name for this?
+foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectProperty',
+  extends: 'Property',
+  properties: [
+    {
+      name: 'of',
+      value: 'FObject'
+    },
+    {
+      name: 'adapt',
+      value: function(_, v, prop) {
+        var of = foam.lookup(prop.of);
+
+
+        return of.isInstance(v) ? v :
+          ( v.class ? foam.looup(v.class) : of ).create(v);
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',
