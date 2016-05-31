@@ -1,14 +1,22 @@
 if ( navigator.serviceWorker ) {
-  navigator.serviceWorker.getRegistration().then(function(r) {
-    r && r.unregister();
-  });
+   navigator.serviceWorker.register('sw.js');
+
+   var sw = foam.apps.chat.ServiceWorker.create({
+     registration: navigator.serviceWorker.ready
+   });
+
+  navigator.serviceWorker.onmessage = function(e) {
+    if ( e.data === 'NEWDATA' ) {
+      client.sharedWorker.sync();
+    }
+  };
+  // navigator.serviceWorker.getRegistration().then(function(r) {
+  //   r && r.unregister();
+  // });
 }
 
-var env = foam.apps.chat.BoxEnvironment.create();
-var client = foam.apps.chat.Client.create({
-  isSafari: navigator.userAgent.indexOf('Safari') !== -1 &&
-    navigator.userAgent.indexOf('Chrome') === -1
-}, env);
+var env = foam.apps.chat.BoxEnvironment.create(null, foam.apps.chat.Env.create());
+var client = foam.apps.chat.Client.create(null, env);
 
 var ME = 'Anonymous';
 
@@ -25,14 +33,24 @@ var send = document.getElementById('send');
 var statusbar = document.getElementById('connected-status');
 
 function updateStatus(v) {
-  statusbar.textContent = v ? 'Connected' : 'Disconnected';
-  statusbar.className = v ? 'connected' : 'disconnected';
+//  statusbar.textContent = v ? 'Connected' : 'Disconnected';
+//  statusbar.className = v ? 'connected' : 'disconnected';
 }
 
 client.connected$.sub(function(s, o, p, v) {
   updateStatus(v.get());
 });
 updateStatus(client.connected);
+
+client.sharedWorkerBox.then(function() {
+  client.sharedWorker.sub('journalUpdate', function() {
+    navigator.serviceWorker.ready.then(function(s) {
+      s.sync.register({
+        id: 'messages'
+      });
+    });
+  });
+});
 
 function sendMessage() {
   if ( input.value ) {
@@ -216,9 +234,9 @@ function onMessage(m) {
 }
 
 
-// client.messageDAO.select().then(function(a) {
-//   a.a.map(onMessage);
-// });
+client.messageDAO.select().then(function(a) {
+  a.a.map(onMessage);
+});
 
 client.messageDAO.on.put.sub(function(s, _, _, m) {
   onMessage(m);

@@ -51,7 +51,7 @@ body {
     top: 32px;
     right: 32px;
     font: sans-serif;
-
+    display: none;
 }
 
 #connected-status .connected {

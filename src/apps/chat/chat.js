@@ -1,28 +1,16 @@
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'BoxEnvironment',
-  requires: [
-    'foam.messaging.MessagePortService as BoxServer',
-    'foam.box.RegistryBox'
-  ],
+  name: 'Env',
   exports: [
-    'server as messagePortService',
-    'registry',
-    'server'
+    'isSafari'
   ],
   properties: [
     {
-      name: 'server',
+      class: 'Boolean',
+      name: 'isSafari',
       factory: function() {
-        return this.BoxServer.create({
-          delegate: this.registry
-        });
-      }
-    },
-    {
-      name: 'registry',
-      factory: function() {
-        return this.RegistryBox.create()
+        return navigator.userAgent.indexOf('Safari') !== -1 &&
+          navigator.userAgent.indexOf('Chrome') === -1
       }
     }
   ]
@@ -30,10 +18,74 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'SharedWorkerBoxEnvironment',
-  extends: 'foam.apps.chat.BoxEnvironment',
+  name: 'BoxEnvironment',
   requires: [
-    'foam.messaging.SharedWorkerMessagePortService as BoxServer'
+    'foam.messaging.MessagePortService',
+    'foam.box.BoxRegistryBox'
+  ],
+  exports: [
+    'messagePortService',
+    'sharedWorkerBox',
+    'registry',
+    'root'
+  ],
+  properties: [
+    {
+      name: 'messagePortService',
+      factory: function() {
+        return this.MessagePortService.create({
+          delegate: this.registry
+        });
+      }
+    },
+    {
+      name: 'sharedWorkerBox',
+      factory: function() {
+        return this.messagePortService.connect(
+          new SharedWorker('sharedWorker.js').port).then(function(b) {
+            this.registry.me = this.messagePortService.me;
+            return b;
+          }.bind(this));
+      }
+    },
+    {
+      name: 'root',
+      factory: function() {
+        return foam.box.PromisedBox.create({
+          delegate: this.sharedWorkerBox,
+        });
+      }
+    },
+    {
+      name: 'registry',
+      factory: function() {
+        return this.BoxRegistryBox.create();
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'SharedWorkerI',
+  methods: [
+    {
+      name: 'sync',
+      returns: '',
+      code: function() {}
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'ClientSharedWorkerI',
+  properties: [
+    {
+      class: 'Stub',
+      of: 'foam.apps.chat.SharedWorkerI',
+      name: 'box'
+    }
   ]
 });
 
@@ -89,50 +141,28 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'WorkerAgent',
-  requires: [
-    'foam.dao.ArrayDAO',
-    'com.firebase.FirebaseDAO',
-    'foam.dao.TimestampDAO',
-    'foam.box.SkeletonBox',
-    'foam.apps.chat.Message'
-  ],
-  imports: [
-    'server',
-    'registry',
-  ],
+  name: 'ServiceWorker',
   properties: [
     {
-      name: 'messageDAO',
-      factory: function() {
-        return this.FirebaseDAO.create({
-          of: this.Message,
-          timestampProperty: this.Message.TIMESTAMP,
-          secret: '0Zr5o8wSWmje7gyVvAhVocW8AjPNvjXEqfKr6B33',
-          apppath: 'https://glaring-torch-184.firebaseio.com/'
-        });
-
-        return this.ArrayDAO.create({
-          of: this.Message
-        });
-      },
-      postSet: function(_, dao) {
-        dao.startEvents();
-        this.registry.register(
-          'messageDAO',
-          this.SkeletonBox.create({
-            data: dao
-          }));
-      }
+      name: 'registration',
     }
   ],
   methods: [
-    function execute() {
-      this.server.source = self;
-      this.server.start();
+    {
+      name: 'init',
+      code: function() {
+        this.registration.then(function(r) {
+          r.sync.register({ id: 'messages' });
+        });
 
-      // Trigger messageDAO registration
-      this.messageDAO;
+        this.registration.then(function(r) {
+          r.pushManager.subscribe({
+            userVisibleOnly: true
+          }).then(function(p) {
+          }, function() {
+          });
+        });
+      }
     }
   ]
 });
@@ -140,67 +170,322 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'ServiceWorkerAgent',
-  methods: [
-    function execute() {
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.apps.chat',
-  name: 'ServiceWorker',
-  imports: [
-    'server'
+  requires: [
+    'foam.apps.chat.BgSyncAgent'
   ],
   properties: [
     {
-      name: 'box',
-      factory: function() {
-        //        var w = new Worker('sw.js');
-        //        return this.server.connect(w);
-
-        // return navigator.serviceWorker.register('sw.js').then(function(r) {
-        //   return new Promise(function(resolve, reject) {
-        //     window.setTimeout(function() {
-        //       resolve(this.server.connect(r.active));
-        //     }.bind(this), 0);
-        //   }.bind(this));
-        // }.bind(this));
-      }
-    }
-  ],
-  methods: [
-    function init() {
-      navigator.serviceWorker.register('sw.js')
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.apps.chat',
-  name: 'SharedWorker',
-  imports: [
-    'server'
-  ],
-  properties: [
-    {
-      name: 'worker',
-      factory: function() {
-        if ( global.SharedWorker ) {
-          return new SharedWorker('sharedWorker.js');
-        } else {
-          return new Worker('worker.js');
-        }
-      }
+      name: 'scope',
+      required: true
     },
     {
-      name: 'boxPromise',
+      name: 'bgSync',
       factory: function() {
-        if ( this.worker.port ) {
-          this.worker.port.start();
-          return this.server.connect(this.worker.port);
+        return this.BgSyncAgent.create();
+      }
+    }
+  ],
+  methods: [
+    function execute() {
+      this.scope.onsync = this.sync;
+      this.scope.onpush = this.push;
+    }
+  ],
+  listeners: [
+    function sync(e) {
+      e.waitUntil(
+        this.bgSync.sync.sync().then(function() {
+          return this.scope.clients.matchAll({
+            type: 'all',
+            includeUncontrolled: true
+          }).then(function(clients) {
+            for ( var i = 0 ; i < clients.length ; i++ ) {
+              if ( clients[i].frameType === 'top-level' ) {
+                clients[i].postMessage('NEWDATA');
+              }
+            }
+          });
+        }.bind(this)));
+    },
+    function push(e) {
+      this.scope.registration.sync.register({ id: 'messages' });
+    }
+  ]
+});
+
+// foam.CLASS({
+//   package: 'foam.apps.chat',
+//   name: 'ServiceWorker',
+//   imports: [
+//     'server'
+//   ],
+//   properties: [
+//     {
+//       name: 'box',
+//       factory: function() {
+//         //        var w = new Worker('sw.js');
+//         //        return this.server.connect(w);
+
+//         // return navigator.serviceWorker.register('sw.js').then(function(r) {
+//         //   return new Promise(function(resolve, reject) {
+//         //     window.setTimeout(function() {
+//         //       resolve(this.server.connect(r.active));
+//         //     }.bind(this), 0);
+//         //   }.bind(this));
+//         // }.bind(this));
+//       }
+//     }
+//   ],
+//   methods: [
+//     function init() {
+//       navigator.serviceWorker.register('sw.js')
+//     }
+//   ]
+//});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'JournalEntry',
+  properties: [
+    {
+      name: 'id',
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'record'
+    },
+    {
+      class: 'Boolean',
+      name: 'isRemove',
+      value: false
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'JournalDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.dao.JournalEntry'
+  ],
+  properties: [
+    {
+      name: 'journal'
+    }
+  ],
+  methods: [
+    function put(obj) {
+      return this.delegate.put(obj).then(function(obj) {
+        this.journal.put(this.JournalEntry.create({
+          record: obj
+        }));
+        return obj;
+      }.bind(this));
+    },
+    function remove(obj) {
+      return this.delegate.remove(obj).then(function(r) {
+        this.journal.put(this.JournalEntry.create({
+          record: obj,
+          isRemove: true
+        }));
+        return r;
+      }.bind(this));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.sync',
+  name: 'SyncStatus',
+  properties: [
+    {
+      name: 'id'
+    },
+    {
+      name: 'latestServerTimestamp'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.sync',
+  name: 'FgSync',
+  properties: [
+    {
+      name: 'localDAO',
+      required: true
+    },
+    {
+      name: 'inboundJournal',
+      required: true
+    }
+  ],
+  methods: [
+    {
+      name: 'sync',
+      returns: 'Promise',
+      code: function() {
+        // Consume inbound journal
+        var self = this;
+        return this.inboundJournal.select().then(function(a) {
+          var records = a.a;
+          var i = 0;
+
+          function processRecord() {
+            var record = records[i++];
+            if ( ! record ) return;
+
+            return self.localDAO.put(record.record).then(function(r) {
+              return self.inboundJournal.remove(record);
+            }).then(processRecord);
+          }
+
+          return processRecord();
+        });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.sync',
+  name: 'BgSync',
+  requires: [
+    'foam.dao.sync.SyncStatus',
+    'foam.mlang.Expressions',
+    'foam.dao.JournalEntry'
+  ],
+  properties: [
+    {
+      name: 'timestampProperty',
+      required: true
+    },
+    {
+      name: 'syncStatusId',
+      required: true
+    },
+    {
+      name: 'outboundJournal',
+      required: true,
+    },
+    {
+      name: 'inboundJournal',
+      required: true,
+    },
+    {
+      name: 'syncStatusDAO',
+      required: true,
+    },
+    {
+      name: 'remoteDAO',
+      required: true
+    },
+  ],
+  methods: [
+    {
+      name: 'sync',
+      returns: 'Promise',
+      code: function() {
+        var self = this;
+        return this.syncToServer().then(function() {
+          return self.syncFromServer();
+        });
+      }
+    },
+    function syncToServer() {
+      // Consume the local journal, sending updates to the server
+      // and writing the result to the server journal.
+      var self = this;
+      return this.outboundJournal.select().then(function(a) {
+        var records = a.a;
+        var i = 0;
+
+        function processRecord() {
+          var record = records[i++];
+          if ( ! record ) return;
+
+          return self.remoteDAO[record.isRemove ? 'remove' : 'put'](record.record).then(function(obj) {
+            if ( ( record.isRemove ? record.record : obj ) == undefined ) debugger;
+
+            return self.inboundJournal.put(self.JournalEntry.create({
+              record: record.isRemove ? record.record : obj,
+              isRemove: record.isRemove
+            }));
+          }).then(function() {
+            return self.outboundJournal.remove(record);
+          }).then(processRecord);
         }
-        return this.server.connect(this.worker);
+
+        return processRecord()
+      });
+    },
+    function syncFromServer() {
+      // Downloads updated records from the server and write to the server
+      // journal.
+
+      var self = this;
+      var E = this.Expressions.create();
+      var syncStatus;
+
+      return this.syncStatusDAO.find(this.syncStatusId).then(null, function(e) {
+        if ( ! foam.dao.ObjectNotFoundException.isInstance(e) ) throw e;
+
+        // If not found create a new sync status.
+        return self.syncStatusDAO.put(self.SyncStatus.create({
+          id: self.syncStatusId,
+          latestServerTimestamp: 0
+        }));
+      }).then(function(s) {
+        syncStatus = s;
+
+        return self.remoteDAO
+          .where(E.GT(self.timestampProperty, s.latestServerTimestamp))
+          .orderBy(self.timestampProperty)
+          .select()
+      }).then(function(a) {
+        var records = a.a;
+        var i = 0;
+        var last = syncStatus.latestServerTimestamp;
+
+        function processRecord() {
+          var record = records[i++];
+          if ( ! record ) return last;
+
+          last = self.timestampProperty.get(record);
+
+          return self.inboundJournal.put(self.JournalEntry.create({
+            record: record
+          })).then(processRecord);
+        }
+
+        return processRecord();
+      }).then(function(lastTimestamp) {
+        return self.syncStatusDAO.put(self.SyncStatus.create({
+          id: self.syncStatusId,
+          latestServerTimestamp: lastTimestamp
+        }));
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'RemoteMessageDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+
+  ],
+  properties: [
+    {
+      name: 'delegate',
+      factory: function() {
+        return foam.dao.ClientDAO.create({
+          box: foam.box.WebSocketBox.create({
+
+          })
+        });
       }
     }
   ]
@@ -208,17 +493,16 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'MessageDAO',
+  name: 'RemoteMessageDAO2',
   extends: 'foam.dao.ProxyDAO',
   requires: [
-    'com.firebase.SafariFirebaseDAO' ,
+    'com.firebase.SafariFirebaseDAO',
     'com.firebase.FirebaseDAO',
-    'foam.dao.SyncDAO',
-    'foam.dao.TimestampDAO',
-    'foam.dao.ArrayDAO',
     'foam.apps.chat.Message'
   ],
-  imports: [ 'isSafari', 'connected' ],
+  imports: [
+    'isSafari'
+  ],
   properties: [
     {
       name: 'channel',
@@ -237,33 +521,13 @@ foam.CLASS({
         dao.of = this.Message;
         dao.timestampProperty = this.Message.SYNC_NO;
         dao.apppath = 'https://glaring-torch-184.firebaseio.com/';
-        dao.connected$.link(this.connected$);
 
         if ( this.auth ) {
-          dao.secret = auth;
+          dao.secret = this.auth;
         }
 
-        dao.basepath = dao.apppath + 'chat/' + this.channel;
+        dao.basepath = dao.apppath + 'chat/foam'; // + this.channel;
 
-        // TODO: This could be improved by using strong random values instead
-        // of timestamps.
-        dao = this.SyncDAO.create({
-          delegate: this.TimestampDAO.create({
-            delegate: this.ArrayDAO.create({
-              of: this.Message
-            }),
-          }),
-          of: this.Message,
-          remoteDAO: dao,
-          syncRecordDAO: this.ArrayDAO.create({
-            of: this.SyncDAO.SyncRecord
-          }),
-          syncProperty: this.Message.SYNC_NO,
-          polling: this.isSafari
-        });
-
-        //window.addEventListener('online', function() { dao.sync(); });
-        dao.sync();
         return dao;
       }
     }
@@ -272,25 +536,192 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'Client',
+  name: 'Journal',
+  extends: 'foam.dao.ProxyDAO',
   requires: [
+    'foam.dao.JournalEntry',
+    'foam.dao.TimestampDAO',
+    'foam.dao.IDBDAO'
+  ],
+  properties: [
+    {
+      name: 'name',
+      required: true
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+        return this.TimestampDAO.create({
+          delegate: this.IDBDAO.create({
+            name: this.name,
+            of: this.JournalEntry
+          })
+        });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'SyncStatusDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.dao.IDBDAO',
+    'foam.dao.sync.SyncStatus'
+  ],
+  properties: [
+    {
+      name: 'delegate',
+      factory: function() {
+        return this.IDBDAO.create({
+          of: this.SyncStatus
+        })
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'BgSyncAgent',
+  requires: [
+    'foam.dao.sync.BgSync',
+    'foam.apps.chat.Message',
+    'foam.apps.chat.Journal',
+    'foam.apps.chat.SyncStatusDAO',
+    'foam.apps.chat.RemoteMessageDAO'
+  ],
+  properties: [
+    {
+      name: 'sync',
+      factory: function() {
+        return this.BgSync.create({
+          timestampProperty: this.Message.SYNC_NO,
+          syncStatusId: 'status',
+          outboundJournal: this.Journal.create({ name: 'foam-messages-outbound' }),
+          inboundJournal: this.Journal.create({ name: 'foam-messages-inbound' }),
+          syncStatusDAO: this.SyncStatusDAO.create(),
+          remoteDAO: this.RemoteMessageDAO.create()
+        });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'FgSyncAgent',
+  requires: [
+    'foam.apps.chat.Journal',
+    'foam.dao.sync.FgSync'
+  ],
+  imports: [
+    'messageDAO'
+  ],
+  properties: [
+    {
+      name: 'sync',
+      factory: function() {
+        return this.FgSync.create({
+          localDAO: this.messageDAO.delegate.delegate,
+          inboundJournal: this.Journal.create({ name: 'foam-messages-inbound' })
+        });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'MessageDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.dao.TimestampDAO',
+    'foam.dao.ArrayDAO',
+    'foam.dao.IDBDAO',
+    'foam.dao.CachingDAO',
+    'foam.dao.JournalDAO',
+    'foam.apps.chat.Message',
+    'foam.apps.chat.Sync',
+    'foam.apps.chat.Journal'
+  ],
+  properties: [
+    {
+      name: 'outboundJournal',
+      factory: function() {
+        return this.Journal.create({ name: 'foam-messages-outbound' });
+      }
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+        return this.JournalDAO.create({
+          delegate: this.CachingDAO.create({
+            src: this.TimestampDAO.create({
+              delegate: this.IDBDAO.create({
+                of: this.Message,
+                version: 3
+              })
+            }),
+            cache: this.ArrayDAO.create({
+              of: this.Message
+            })
+          }),
+          journal: this.outboundJournal
+        });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.apps.chat',
+  name: 'Client',
+   requires: [
     'foam.apps.chat.MessageDAO'
   ],
-  exports: [ 'isSafari', 'connected' ],
+  exports: [
+    'connected',
+    'messageDAO'
+  ],
+  imports: [
+    'root',
+    'sharedWorkerBox'
+  ],
   properties: [
     {
       class: 'Boolean',
-      name: 'isSafari',
+      name: 'connected',
       value: false
     },
     {
-      class: 'Boolean',
-      name: 'connected',
-      value: true
+      name: 'sharedWorker',
+      factory: function() {
+        return foam.apps.chat.ClientSharedWorkerI.create({
+          box: foam.box.SubBox.create({
+            name: 'control',
+            delegate: foam.box.PromisedBox.create({
+              delegate: this.sharedWorkerBox
+            }, this)
+          }, this)
+        }, this);
+      }
     },
     {
       name: 'messageDAO',
       factory: function() {
+        return foam.dao.PromisedDAO.create({
+          promise: this.sharedWorkerBox.then(function() {
+            return foam.dao.ClientDAO.create({
+              delegate: foam.box.SubBox.create({
+                name: 'messageDAO',
+                delegate: this.root
+              }, this)
+            }, this);
+          }.bind(this))
+        }, this);
+
         var channel = document.location.search.substring(1).split('&').find(function(e) {
           return e.indexOf('channel=') === 0;
         });
