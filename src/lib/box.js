@@ -430,9 +430,14 @@ foam.CLASS({
           localBox: localBox
         };
 
-        console.log("Register", name, foam.json.stringify(exportBox));
-
         return this.registry[name].exportBox;
+      }
+    },
+    {
+      name: 'unregister',
+      returns: '',
+      code: function(name) {
+        delete this.registry[name];
       }
     }
   ]
@@ -635,7 +640,7 @@ foam.CLASS({
       return this.registry.register(this.id, null, this);
     },
     function send(msg) {
-      // TODO: Unregister
+      this.registry.unregister(this.id);
       this.delegate.send(msg);
     }
   ]
