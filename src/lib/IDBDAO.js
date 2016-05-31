@@ -57,11 +57,6 @@ foam.CLASS({
     'async'
   ],
 
-  constants: {
-    /** Global cache of the current transaction reference. Only element 0 is used. */
-    __TXN__: []
-  },
-
   properties: [
     {
       name:  'of',
@@ -79,18 +74,30 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
-      /** The promise that holds the open DB. Call this.withDB.then(function(db) { ... }); */
+      name: 'version',
+      value: 1
+    },
+    {
+      /** The future that holds the open DB. Call this.withDB.then(function(db) { ... }); */
       name: 'withDB',
       factory: function() {
         var self = this;
-        return new Promise(function(resolve, reject) {
-          var indexedDB = window.indexedDB ||
-            window.webkitIndexedDB         ||
-            window.mozIndexedDB;
 
-          var request = indexedDB.open("FOAM:" + self.name, 1);
+        return new Promise(function(resolve, reject) {
+          var indexedDB = global.indexedDB ||
+            global.webkitIndexedDB         ||
+            global.mozIndexedDB;
+
+          var request = indexedDB.open("FOAM:" + self.name, self.version);
 
           request.onupgradeneeded = function(e) {
+            var db = e.target.result;
+
+            // FUTURE: Provide migration support here?  Or just have people create a new dao?
+            if ( db.objectStoreNames.contains(self.name) ) {
+              db.deleteObjectStore(self.name);
+            }
+
             var store = e.target.result.createObjectStore(self.name);
             for ( var i = 0; i < self.indicies.length; i++ ) {
               store.createIndex(
@@ -114,13 +121,11 @@ foam.CLASS({
 
   methods: [
     function deserialize(json) {
-      // TODO: Better serialization, error handling
-      return foam.json.parse(foam.json.parseString(json));
+      return foam.json.parse(json, this.of);
     },
 
     function serialize(obj) {
-      // TODO: Better serialization, error handling
-      return foam.json.Storage.stringify(obj);
+      return foam.json.Storage.objectify(obj);
     },
 
     function withStore(mode, fn) {
@@ -146,19 +151,14 @@ foam.CLASS({
     },
 
     function withStore_(mode, fn) {
+      // NOTE: Large numbers of insertions can be made
+      // faster by keeping the transaction between puts.
+      // But due to Promises being async, the transaction
+      // is usually closed by the next put.
       var self = this;
-      if ( self.__TXN__[0] ) {
-        try {
-          fn.call(self, self.__TXN__[0]);
-          return;
-        } catch (x) {
-          self.__TXN__[0] = undefined;
-        }
-      }
       self.withDB.then(function (db) {
         var tx = db.transaction([self.name], mode);
         var os = tx.objectStore(self.name);
-        self.__TXN__[0] = os;
         fn.call(self, os);
       });
     },
