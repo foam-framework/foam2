@@ -19,15 +19,15 @@
   function body is required here, as the actual body is generated to call
   the remote service. This will always return a promise that supplies the
   return value of the service call.
-  <p>Overriding by an XHRMethod is not supported. You can override an
-  XHRMethod with a normal one.
+  <p>Overriding by an HTTPMethod is not supported. You can override an
+  HTTPMethod with a normal one.
   <p>FUTURE: Generalize. */
 foam.CLASS({
   package: 'foam.net',
-  name: 'XHRMethod',
+  name: 'HTTPMethod',
   extends: 'foam.core.Method',
   requires: [
-    'foam.net.XHRArgument',
+    'foam.net.HTTPArgument',
     'foam.core.Imports',
   ],
   imports: [
@@ -47,11 +47,11 @@ foam.CLASS({
       /** The args to call with, in order */
       class: 'FObjectArray',
       name: 'args',
-      of: 'foam.net.XHRArgument',
+      of: 'foam.net.HTTPArgument',
       factory: function() { return []; }
     },
     {
-      /** XHRMethods will always return a Promise, but the Promise will pass
+      /** HTTPMethods will always return a Promise, but the Promise will pass
         along a parameter of the type specified here. */
       name: 'returns',
     },
@@ -66,10 +66,10 @@ foam.CLASS({
     function installInClass(c) {
       // add an import for the XHRService on our host class
 
-      // May have many XHRMethods in a host class, but only do service import once.
+      // May have many HTTPMethods in a host class, but only do service import once.
       var existing = c.getAxiomByName(this.xhrServiceName);
       this.assert( ( ! existing ) || this.Imports.isInstance(existing),
-        "XHRMethod installInClass found conflicting axiom", existing && existing.name, ".",
+        "HTTPMethod installInClass found conflicting axiom", existing && existing.name, ".",
         "Use a different XMRMethod.xhrServiceName.");
 
       if ( ! existing ) {
@@ -88,7 +88,7 @@ foam.CLASS({
       // actual implementation, callRemote_()
       // ALTERNATE: just pass args in and read from arguments
       var code = "(function "+axiom.name+"_"+"(";
-      var names = this.args.map(axiom.XHRArgument.NAME.f);
+      var names = this.args.map(axiom.HTTPArgument.NAME.f);
       code += names.join(', ');
       code += ') {\n';
       code += 'var opt_args = {\n';
@@ -105,7 +105,7 @@ foam.CLASS({
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
-      this.assert( host[this.xhrServiceName], "XHRMethod call can't find XHR service import ", this.xhrServiceName, "on", host);
+      this.assert( host[this.xhrServiceName], "HTTPMethod call can't find XHR service import ", this.xhrServiceName, "on", host);
 
       // 'this' is the axiom instance
       var self = this;
@@ -136,7 +136,7 @@ foam.CLASS({
         if ( response.status >= 400 ) {
           throw "HTTP error status: " + response.status;
         }
-        self.assert(response.responseType === 'json', "XHRMethod given a request not configured to return JSON", request);
+        self.assert(response.responseType === 'json', "HTTPMethod given a request not configured to return JSON", request);
         return response.payload.then(function(json) {
           if ( ! self.returns ) {
             // no return
@@ -161,7 +161,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.net',
-  name: 'XHRArgument',
+  name: 'HTTPArgument',
   extends: 'foam.core.Argument',
   properties: [
     {
