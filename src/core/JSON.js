@@ -431,7 +431,7 @@ foam.LIB({
       // recurse into sub-objects
       for ( var key in json ) {
         var o = json[key];
-        if ( typeof o === 'object' && ! o.cls_ ) { // traverse plain old objects only
+        if ( typeof o === 'object' && o && ! o.cls_ ) { // traverse plain old objects only
           json[key] = this.parse(o, null, opt_ctx);
         }
       }
