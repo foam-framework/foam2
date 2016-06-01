@@ -53,8 +53,10 @@ foam.CLASS({
     {
       /** HTTPMethods will always return a Promise, but the Promise will pass
         along a parameter of the type specified here. */
-      name: 'returns',
+      name: 'promisedType',
+      of: 'foam.core.Argument'
     },
+    [ 'returns', 'Promise' ],
     {
       /** the name of the XHR service to import at run time */
       name: 'xhrServiceName',
@@ -111,24 +113,29 @@ foam.CLASS({
       var self = this;
       var path = this.path;
       var query = "";
-
-      // TODO: request body... always the first arg, if present?
+      var request = host[this.xhrServiceName].create();
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {
-        if ( ! opt_args[param.name] ) return;
-        var val = opt_args[param.name].toString();
+        var val = opt_args[param.name];
+        if ( typeof val === 'undefined' ) return; // skip missing args // TODO: assert non-optional
+
         // put the dot back if we removed one from the name
         var pname = param.name.replace('__dot__','.');
-        if ( param.location === 'path' ) {
+        if ( param.location === 'body' ) {
+          // set the request body content
+          // TODO: assert it's the first param, no more than one body
+          // serialize the value
+          request.payload = foam.json.Network.stringify( val );
+        } else if ( param.location === 'path' ) {
           // find the placeholder and replace it
-          path = path.replace("{"+pname+"}", val);
+          path = path.replace("{"+pname+"}", val.toString());
         } else if ( param.location === 'query' ) {
-          query += "&" + pname + "=" + val;
+          // add to query string
+          query += "&" + pname + "=" + val.toString();
         }
       });
       path = path + ( query ? "?" + query.substring(1) : "" );
-      var request = host[this.xhrServiceName].create();
       request.path += "/" + path;
       request.method = self.httpMethod;
 
@@ -138,16 +145,16 @@ foam.CLASS({
         }
         self.assert(response.responseType === 'json', "HTTPMethod given a request not configured to return JSON", request);
         return response.payload.then(function(json) {
-          if ( ! self.returns ) {
+          if ( ! self.promisedType ) {
             // no return
             return;
           }
-          if ( ! self.returns.type ) {
-            self.returns.type = foam.lookup(self.returns.typeName, true);
+          if ( ! self.promisedType.type ) { // TODO: should not need this check. Getter in Arg.type?
+            self.promisedType.type = foam.lookup(self.promisedType.typeName, true);
           }
-          if ( self.returns.type ) {
+          if ( self.promisedType.type ) {
             // a modelled return type
-            return self.returns.type.create(json, host);
+            return self.promisedType.type.create(json, host);
           }
           // else return raw json
           return json;
@@ -165,7 +172,7 @@ foam.CLASS({
   extends: 'foam.core.Argument',
   properties: [
     {
-      /** The location to put this value in the request: 'query' or 'path' */
+      /** The location to put this value in the request: 'query', 'path', or 'body' */
       name: 'location',
       value: 'query',
     },
