@@ -139,7 +139,7 @@ foam.CLASS({
         }
       });
       path = path + ( query ? "?" + query.substring(1) : "" );
-      request.path += "/" + path;
+      request.path += path;
       request.method = self.httpMethod;
 
       return request.send().then(function(response) {

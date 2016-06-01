@@ -249,7 +249,10 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'protocol'
+      name: 'protocol',
+      preSet: function(old, nu) {
+        return nu.replace(':','');
+      }
     },
     {
       class: 'String',
@@ -585,7 +588,7 @@ foam.CLASS({
           this.headers[key.trim()] = value.trim();
         }
         this.responseType = xhr.responseType;
-        
+
       }
     },
     {
