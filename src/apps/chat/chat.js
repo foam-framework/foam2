@@ -1,9 +1,28 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Env',
+
   exports: [
     'isSafari'
   ],
+
   properties: [
     {
       class: 'Boolean',
@@ -16,19 +35,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'BoxEnvironment',
+
   requires: [
     'foam.messaging.MessagePortService',
     'foam.box.BoxRegistryBox'
   ],
+
   exports: [
     'messagePortService',
     'sharedWorkerBox',
     'registry',
     'root'
   ],
+
   properties: [
     {
       name: 'messagePortService',
@@ -65,9 +88,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'SharedWorkerI',
+
   methods: [
     {
       name: 'sync',
@@ -77,9 +102,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'ClientSharedWorkerI',
+
   properties: [
     {
       class: 'Stub',
@@ -89,10 +116,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'TimestampDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       class: 'String',
@@ -100,6 +129,7 @@ foam.CLASS({
       value: 'id'
     }
   ],
+
   methods: [
     function put(obj) {
       if ( ! obj.hasOwnProperty(this.property) ) obj[this.property] = this.nextTimestamp();
@@ -111,9 +141,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Message',
+
   properties: [
     {
       class: 'Int',
@@ -139,14 +171,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'ServiceWorker',
+
   properties: [
     {
       name: 'registration',
     }
   ],
+
   methods: [
     {
       name: 'init',
@@ -166,6 +201,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.apps.chat',
@@ -246,6 +282,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalEntry',
+
   properties: [
     {
       name: 'id',
@@ -262,18 +299,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.dao.JournalEntry'
   ],
+
   properties: [
     {
       name: 'journal'
     }
   ],
+
   methods: [
     function put(obj) {
       return this.delegate.put(obj).then(function(obj) {
@@ -283,6 +324,7 @@ foam.CLASS({
         return obj;
       }.bind(this));
     },
+
     function remove(obj) {
       return this.delegate.remove(obj).then(function(r) {
         this.journal.put(this.JournalEntry.create({
@@ -295,9 +337,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'SyncStatus',
+
   properties: [
     {
       name: 'id'
@@ -308,9 +352,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'FgSync',
+
   properties: [
     {
       name: 'localDAO',
@@ -321,6 +367,7 @@ foam.CLASS({
       required: true
     }
   ],
+
   methods: [
     {
       name: 'sync',
@@ -348,14 +395,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'BgSync',
+
   requires: [
     'foam.dao.sync.SyncStatus',
     'foam.mlang.Expressions',
     'foam.dao.JournalEntry'
   ],
+
   properties: [
     {
       name: 'timestampProperty',
@@ -382,6 +432,7 @@ foam.CLASS({
       required: true
     },
   ],
+
   methods: [
     {
       name: 'sync',
@@ -393,6 +444,7 @@ foam.CLASS({
         });
       }
     },
+
     function syncToServer() {
       // Consume the local journal, sending updates to the server
       // and writing the result to the server journal.
@@ -420,6 +472,7 @@ foam.CLASS({
         return processRecord()
       });
     },
+
     function syncFromServer() {
       // Downloads updated records from the server and write to the server
       // journal.
@@ -470,13 +523,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'RemoteMessageDAO',
   extends: 'foam.dao.ProxyDAO',
-  requires: [
 
-  ],
   properties: [
     {
       name: 'delegate',
@@ -491,18 +543,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'RemoteMessageDAO2',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'com.firebase.SafariFirebaseDAO',
     'com.firebase.FirebaseDAO',
     'foam.apps.chat.Message'
   ],
+
   imports: [
     'isSafari'
   ],
+
   properties: [
     {
       name: 'channel',
@@ -534,15 +590,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Journal',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.dao.JournalEntry',
     'foam.dao.TimestampDAO',
     'foam.dao.IDBDAO'
   ],
+
   properties: [
     {
       name: 'name',
@@ -562,14 +621,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'SyncStatusDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.dao.IDBDAO',
     'foam.dao.sync.SyncStatus'
   ],
+
   properties: [
     {
       name: 'delegate',
@@ -582,9 +644,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'BgSyncAgent',
+
   requires: [
     'foam.dao.sync.BgSync',
     'foam.apps.chat.Message',
@@ -592,6 +656,7 @@ foam.CLASS({
     'foam.apps.chat.SyncStatusDAO',
     'foam.apps.chat.RemoteMessageDAO'
   ],
+
   properties: [
     {
       name: 'sync',
@@ -609,16 +674,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'FgSyncAgent',
+
   requires: [
     'foam.apps.chat.Journal',
     'foam.dao.sync.FgSync'
   ],
+
   imports: [
     'messageDAO'
   ],
+
   properties: [
     {
       name: 'sync',
@@ -632,10 +701,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'MessageDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.dao.TimestampDAO',
     'foam.dao.ArrayDAO',
@@ -646,6 +717,7 @@ foam.CLASS({
     'foam.apps.chat.Sync',
     'foam.apps.chat.Journal'
   ],
+
   properties: [
     {
       name: 'outboundJournal',
@@ -675,20 +747,25 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Client',
-   requires: [
+
+  requires: [
     'foam.apps.chat.MessageDAO'
   ],
-  exports: [
-    'connected',
-    'messageDAO'
-  ],
+
   imports: [
     'root',
     'sharedWorkerBox'
   ],
+
+  exports: [
+    'connected',
+    'messageDAO'
+  ],
+
   properties: [
     {
       class: 'Boolean',
