@@ -58,26 +58,29 @@ foam.CLASS({
     },
     [ 'returns', 'Promise' ],
     {
-      /** the name of the XHR service to import at run time */
-      name: 'xhrServiceName',
-      value: 'XHRService'
+      /** The name of the HTTP factory to import at run time. Instances of
+        HTTPMethod on a class will cause the class to import this name, and
+        when called will call hostInstance.yourHttpFactoryName.create() to
+        create a partially filled request object. */
+      name: 'HTTPRequestFactoryName',
+      value: 'HTTPRequestFactory'
     }
   ],
 
   methods: [
     function installInClass(c) {
-      // add an import for the XHRService on our host class
+      // add an import for the HTTPRequestFactory on our host class
 
       // May have many HTTPMethods in a host class, but only do service import once.
-      var existing = c.getAxiomByName(this.xhrServiceName);
+      var existing = c.getAxiomByName(this.HTTPRequestFactoryName);
       this.assert( ( ! existing ) || this.Imports.isInstance(existing),
         "HTTPMethod installInClass found conflicting axiom", existing && existing.name, ".",
-        "Use a different XMRMethod.xhrServiceName.");
+        "Use a different XMRMethod.HTTPRequestFactoryName.");
 
       if ( ! existing ) {
         c.installAxiom(this.Imports.create({
-          name: this.xhrServiceName,
-          key: this.xhrServiceName
+          name: this.HTTPRequestFactoryName,
+          key: this.HTTPRequestFactoryName
         }));
       }
     },
@@ -107,13 +110,13 @@ foam.CLASS({
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
-      this.assert( host[this.xhrServiceName], "HTTPMethod call can't find XHR service import ", this.xhrServiceName, "on", host);
+      this.assert( host[this.HTTPRequestFactoryName], "HTTPMethod call can't find XHR service import ", this.HTTPRequestFactoryName, "on", host);
 
       // 'this' is the axiom instance
       var self = this;
       var path = this.path;
       var query = "";
-      var request = host[this.xhrServiceName].create();
+      var request = host[this.HTTPRequestFactoryName].create();
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {
