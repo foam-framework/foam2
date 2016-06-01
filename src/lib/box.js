@@ -133,6 +133,7 @@ foam.CLASS({
       });
 
       [
+        'registry'
       ].map(function(s) {
         cls.installAxiom(foam.core.Imports.create({
           key: s,
@@ -141,9 +142,23 @@ foam.CLASS({
       });
 
       cls.installAxiom(foam.core.Method.create({
-        name: 'init',
+        name: 'sub',
         code: function() {
-          this.SUPER();
+          this.SUPER.apply(this, arguments);
+
+          if ( arguments.length < 2 ) {
+            console.warn('Currently network subscriptions must include at least one topic.');
+          }
+
+          var replyBox = this.registry.register(
+            foam.next$UID(),
+            null,
+            foam.box.EventDispatchBox.create({ target: this }));
+
+          this[propName].send(this.SubscribeMessage.create({
+            replyBox: replyBox,
+            topic: Array.from(arguments).slice(0, -1)
+          }));
 
           // var events = foam.next$UID();
 
@@ -216,7 +231,7 @@ foam.CLASS({
       // TODO: Improved serialization
       this.messagePortService
         .getPortForDst(this.id)
-        .send(foam.json.stringify(msg));
+        .send(foam.json.Network.stringify(msg));
     }
   ]
 });
@@ -415,9 +430,14 @@ foam.CLASS({
           localBox: localBox
         };
 
-        console.log("Register", name, foam.json.stringify(exportBox));
-
         return this.registry[name].exportBox;
+      }
+    },
+    {
+      name: 'unregister',
+      returns: '',
+      code: function(name) {
+        delete this.registry[name];
       }
     }
   ]
@@ -620,7 +640,7 @@ foam.CLASS({
       return this.registry.register(this.id, null, this);
     },
     function send(msg) {
-      // TODO: Unregister
+      this.registry.unregister(this.id);
       this.delegate.send(msg);
     }
   ]
@@ -642,9 +662,10 @@ foam.CLASS({
   package: 'foam.box',
   name: 'SubscribeMessage',
   extends: 'foam.box.Message',
-
   properties: [
-    'destination'
+    {
+      name: 'topic'
+    }
   ]
 });
 
@@ -825,8 +846,10 @@ foam.CLASS({
         return;
       } else if ( this.SubscribeMessage.isInstance(message) ) {
         // TODO: Unsub support
-        var dest = message.destination;
-        this.data.sub(function() {
+        var dest = message.replyBox;
+        var args = message.topic.slice();
+
+        args.push(function() {
           var args = Array.from(arguments);
 
           // Cannot serialize the subscription object.
@@ -836,6 +859,8 @@ foam.CLASS({
             args: args
           }));
         });
+
+        this.data.sub.apply(this.data, args);
         return;
       }
 
@@ -863,7 +888,7 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      this.log(this.name, ":", foam.json.stringify(msg));
+      this.log(this.name, ":", foam.json.Network.stringify(msg));
       this.delegate && this.delegate.send(msg);
     }
   ]
@@ -909,7 +934,7 @@ foam.CLASS({
     function send(msg) {
       this.socketService.getSocket(this.host, this.port).then(
         function(s) {
-          s.write(foam.json.stringify(msg))
+          s.write(foam.json.Network.stringify(msg))
         },
         function(e) {
           // TODO: Handle error
@@ -934,11 +959,31 @@ foam.CLASS({
   methods: [
     function send(msg) {
       this.webSocketService.getSocket(this.uri).then(function(s) {
-        s.send(foam.json.stringify(msg));
+        s.send(foam.json.Network.stringify(msg));
       });
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'WebSocketService',
+  properties: [
+    {
+      name: 'me',
+      postSet: function() {
+        return foam.box.NamedBox.create({
+
+        });
+      }
+    }
+  ],
+  methods: [
+    {
+    }
+  ]
+});
+
 
 
 foam.CLASS({
@@ -1012,7 +1057,7 @@ foam.CLASS({
       name: 'source'
     },
     {
-      name: 'inbox_',
+      name: 'me',
       factory: function() {
         this.MessagePortBox.create({
           id: this.$UID
@@ -1027,7 +1072,7 @@ foam.CLASS({
     },
 
     function inbox() {
-      return this.inbox_;
+      return this.me;
     },
 
     function connect(target) {
@@ -1042,7 +1087,7 @@ foam.CLASS({
       return new Promise(foam.Function.bind(function(resolve, reject) {
         port.onmessage = foam.Function.bind(function(e) {
           if ( e.data && e.data.type === "ID" ) {
-            this.inbox_ = this.MessagePortBox.create({
+            this.me = this.MessagePortBox.create({
               id: e.data.youAre
             });
 
@@ -1107,7 +1152,7 @@ foam.CLASS({
         var port = e.ports[0];
         port.onmessage = this.onConnect;
       }.bind(this);
-      this.inbox_ = this.MessagePortBox.create({
+      this.me = this.MessagePortBox.create({
         id: this.$UID
       });
     }

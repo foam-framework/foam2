@@ -1,10 +1,11 @@
 {
-  "firebase": "glaring-torch-184",
-  "public": "public",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/*~",
-    "**/node_modules/**"
-  ]
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/*~",
+      "**/node_modules/**"
+    ]
+  }
 }

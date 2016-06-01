@@ -348,8 +348,7 @@ foam.CLASS({
 
   imports: [
     'setTimeout',
-    'clearTimeout',
-    'connected'
+    'clearTimeout'
   ],
 
   properties: [
@@ -440,7 +439,6 @@ foam.CLASS({
           return;
         }
 
-        this.connected = true;
         this.clearProperty('decoder');
         resp.data.sub(this.onData);
         resp.end.sub(this.onError);
@@ -508,13 +506,11 @@ foam.CLASS({
     },
 
     function onError() {
-      this.connected = false;
       this.delay *= 2;
       this.setTimeout(this.onEnd, this.delay);
     },
 
     function onEnd() {
-      this.connected = false;
       if ( this.running ) {
         this.start();
       }

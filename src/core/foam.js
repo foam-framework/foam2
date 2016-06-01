@@ -108,7 +108,9 @@
     [ "../lib/node/json_dao", isServer ],
     "../lib/utf8",
     "../lib/net",
+    [ "../lib/node/net", isServer ],
     "../lib/firebase",
+    "../lib/fcm",
     "../lib/box",
     [ "../lib/node/net", isServer ],
     [ "../lib/node/box", isServer ]
