@@ -346,12 +346,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.firebase',
   name: 'FirebaseEventSource',
+
   requires: [
     'foam.net.EventSource'
   ],
+
+  topics: [
+    'put',
+    'patch',
+    'keep-alive',
+    'cancel',
+    'auth_revoked'
+  ],
+
   properties: [
     {
       name: 'uri',
@@ -373,21 +384,16 @@ foam.CLASS({
       name: 'buffer'
     }
   ],
-  topics: [
-    'put',
-    'patch',
-    'keep-alive',
-    'cancel',
-    'auth_revoked'
-  ],
+
   methods: [
     function start() {
       this.eventSource.start();
     }
   ],
+
   listeners: [
     function onMessage(s, msg, name, data) {
-      switch(name) {
+      switch (name) {
       case 'put':
         this.onPut(name, data);
         break;
@@ -407,6 +413,7 @@ foam.CLASS({
         this.onUnknown(name, data);
       }
     },
+
     function onPut(name, data) {
       this.put.pub(JSON.parse(data));
       return;
@@ -422,13 +429,17 @@ foam.CLASS({
       // this.buffer = '';
       // this.put.pub(payload);
     },
+
     function onPatch() {
       debugger;
     },
+
     function onKeepAlive() {
     },
+
     function onCancel() {
     },
+
     function onUnknown(name, data) {
       this.warn('Unknown firebase event', name, data);
     }
