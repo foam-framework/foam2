@@ -15,142 +15,81 @@
  * limitations under the License.
  */
 
-/** OAuth2 and web client, ported from FOAM1 */
-CLASS({
-  name: 'OAuth2',
-  package: 'foam.oauth2',
-  requires: [
-    'XHRHTTPRequest',
+foam.CLASS({
+  package: 'foam.net',
+  name: 'GoogleOAuth2HTTPRequestDecorator',
+
+  imports: [
+    'oauth2ClientId',
+    'oauth2CookiePolicy',
+    'oauth2Scopes',
   ],
 
   properties: [
-    {
-      name: 'accessToken',
-      help: 'Token used to authenticate requests.'
-    },
-    {
-      name: 'clientId',
-      required: true,
-      transient: true
-    },
-    {
-      name: 'clientSecret',
-      required: true,
-      transient: true
-    },
-    {
-      type: 'StringArray',
-      name: 'scopes',
-      required: true,
-      transient: true
-    },
-    {
-      type: 'URL',
-      name: 'endpoint',
-      defaultValue: "https://accounts.google.com/o/oauth2/"
-    },
-    {
-      type: 'Function',
-      name: 'refresh_',
-      transient: true,
-      lazyFactory: function() {
-        return this.refresh_ = /*amerged(*/this.refreshNow_.bind(this)/*)*/;
-      }
-    }
+    'auth2',
+    'authToken',
   ],
 
-  methods: {
-    refreshNow_: function(){},
+  methods: [
+    function init() {
+      this.SUPER();
 
-    refresh: function(callback, opt_forceInteractive) {
-      return this.refresh_(callback, opt_forceInteractive);
+      this.headers = this.headers || {};
+
+      var self = this;
+
+      self.auth2 = new Promise(function(resolve, reject) {
+        gapi.load('auth2', function() {
+          var a = gapi.auth2.getAuthInstance();
+          if ( ! a ) {
+            gapi.auth2.init({
+              client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
+              cookiepolicy: 'single_host_origin',
+              scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
+            }).then(function() { resolve(gapi.auth2.getAuthInstance()); });
+            return;
+          }
+          resolve(a);
+        });
+      });
     },
 
-    setJsonpFuture: function(X, future) {
-      var agent = this;
-      future.set((function() {
-        return function(url, params, opt_method, opt_payload) {
-          return function(callback) {
-            var xhr = agent.XHRHTTPRequest.create();
-            xhr.authAgent: agent,
-            xhr.responseType: "json",
-            xhr.retries: 3
-            xhr.url = url + (params ? '?' + params.join('&') : '');
-            xhr.payload = opt_payload;
-            xhr.method = opt_method ? opt_method : "GET";
+    function onSignIn(user) {
+      var authResponse = googleUser.getAuthResponse();
+      this.authToken = authResponse.token_type + " "+ authResponse.access_token;
+      this.headers.Authorization = this.authToken;
+    },
 
-            xhr.send().then(function(response) {
-              return response.payload.then(function(payload) {
-                callback(payload, response.status);
-              });
-            });
-          };
-        };
-      })());
-    }
-  }
-});
-
-
-
-
-CLASS({
-  name: 'OAuth2WebClient',
-  package: 'foam.oauth2',
-  help: 'Strategy for OAuth2 when running as a web page.',
-
-  extends: 'foam.oauth2.OAuth2',
-
-  methods: {
-    refreshNow_: function(callback, opt_forceInteractive) {
+    function send() {
       var self = this;
-      var w;
-      var cb = wrapJsonpCallback(function(code) {
-        self.accessToken = code;
-        try {
-          callback(code);
-        } finally {
-          w && w.close();
+      var SUPER = this.SUPER.bind(this);
+
+      return self.auth2.then(function(auth2) {
+        var user = auth2.currentUser.get();
+        if ( ! user.isSignedIn() || ! self.authToken || ! self.headers.Authorization ) {
+          return auth2.signIn().then(self.onSignIn).then(SUPER).then(self.completeSend);
+        } else {
+          return SUPER().then(self.completeSend);
         }
-      }, true /* nonce */);
+      });
+    },
 
-      var path = location.pathname;
-      var returnPath = location.origin +
-        location.pathname.substring(0, location.pathname.lastIndexOf('/')) + '/oauth2callback.html';
-
-      var queryparams = [
-        '?response_type=token',
-        'client_id=' + encodeURIComponent(this.clientId),
-        'redirect_uri=' + encodeURIComponent(returnPath),
-        'scope=' + encodeURIComponent(this.scopes.join(' ')),
-        'state=' + cb.id,
-        'approval_prompt=' + (opt_forceInteractive ? 'force' : 'auto')
-      ];
-
-      w = window.open(this.endpoint + "auth" + queryparams.join('&'));
+    function completeSend(response) {
+      // check for 403, retry request
+      return Promise.resolve(response);
     }
-  }
+  ]
 });
 
-// direct port from FOAM1, consider refactoring
-foam.__JSONP_CALLBACKS__ = {};
-var wrapJsonpCallback = (function() {
-  var nextID = 0;
+foam.CLASS({
+  package: 'foam.net',
+  name: 'GoogleOAuth2XHRHTTPRequest',
 
-  return function(callback, opt_nonce) {
-    var id = 'c' + (nextID++);
-    if ( opt_nonce ) id += Math.floor(Math.random() * 0xffffff).toString(16);
+  extends: 'foam.net.XHRHTTPRequest',
+  implements: [
+    'foam.net.GoogleOAuth2HTTPRequestDecorator'
+  ],
 
-    var cb = foam.__JSONP_CALLBACKS__[id] = function(data) {
-      delete foam.__JSONP_CALLBACKS__[id];
 
-      // console.log('JSONP Callback', id, data);
-
-      callback && callback.call(this, data);
-    };
-    cb.id = id;
-
-    return cb;
-  };
-})();
+});
 
