@@ -242,7 +242,7 @@ foam.CLASS({
     /** Selects matching items in reverse order from the index and puts
       them into sink */
     function selectReverse(/*sink, skip, limit, order, predicate*/) { },
-  ],
+  ]
 });
 
 
@@ -324,7 +324,7 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc',
+    'foam.mlang.order.Desc'
   ],
 
   properties: [
@@ -788,7 +788,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     function put() { },
 
     function remove() { },
@@ -821,13 +820,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Journal',
   extends: 'foam.dao.index.Index',
+
   requires: [
     'foam.dao.index.NoPlan'
   ],
+
   properties: [
     {
       class: 'String',
@@ -857,6 +859,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function put(obj) {
       this.journal.write('dao.put(foam.json.parse(');
@@ -865,6 +868,7 @@ foam.CLASS({
       this.recordCount += 1;
       this.rollover();
     },
+
     function remove(obj) {
       this.journal.write('dao.remove(model.create(');
       this.journal.write(foam.json.Storage.stringify(obj));
@@ -872,11 +876,14 @@ foam.CLASS({
       this.recordCount += 1;
       this.rollover();
     },
+
     function plan() {
       return this.NoPlan.create();
     },
+
     function bulkLoad() {
     },
+
     function rollover() {
       if ( this.recordCount > this.limit ) {
         this.journal.end();
@@ -885,6 +892,7 @@ foam.CLASS({
         this.journal = undefined;
       }
     },
+
     function compact() {
     }
   ]
