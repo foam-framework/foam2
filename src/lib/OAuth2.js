@@ -23,6 +23,8 @@ foam.CLASS({
     'oauth2ClientId',
     'oauth2CookiePolicy',
     'oauth2Scopes',
+    'setTimeout',
+    'warn'
   ],
 
   properties: [
@@ -39,21 +41,29 @@ foam.CLASS({
       var self = this;
 
       self.auth2 = new Promise(function(resolve, reject) {
-        gapi.load('auth2', function() {
-          gapi.auth2.init({
-                      client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
-                      cookiepolicy: 'single_host_origin',
-                      scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
-                    });
+        var authLoad = function() {
+          if ( ! gapi ) {
+            self.warn("Google Authentication Platform API (gapi) not loaded in time. Retrying.")
+            self.setTimeout(authLoad, 500);
+          }
           
-                    resolve({ a: gapi.auth2.getAuthInstance() }
-                     // || gapi.auth2.init({
-//             client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
-//             cookiepolicy: 'single_host_origin',
-//             scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
-//           })
-          );
-        });
+          gapi.load('auth2', function() {
+            gapi.auth2.init({
+                        client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
+                        cookiepolicy: 'single_host_origin',
+                        scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
+                      });
+          
+                      resolve({ a: gapi.auth2.getAuthInstance() }
+                       // || gapi.auth2.init({
+  //             client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
+  //             cookiepolicy: 'single_host_origin',
+  //             scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
+  //           })
+            );
+          });
+        }
+        authLoad();
       });
     },
 
