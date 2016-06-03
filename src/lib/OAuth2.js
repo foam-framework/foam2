@@ -40,22 +40,25 @@ foam.CLASS({
 
       self.auth2 = new Promise(function(resolve, reject) {
         gapi.load('auth2', function() {
-          var a = gapi.auth2.getAuthInstance();
-          if ( ! a ) {
-            gapi.auth2.init({
-              client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
-              cookiepolicy: 'single_host_origin',
-              scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
-            }).then(function() { resolve(gapi.auth2.getAuthInstance()); });
-            return;
-          }
-          resolve(a);
+          gapi.auth2.init({
+                      client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
+                      cookiepolicy: 'single_host_origin',
+                      scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
+                    });
+          
+                    resolve({ a: gapi.auth2.getAuthInstance() }
+                     // || gapi.auth2.init({
+//             client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
+//             cookiepolicy: 'single_host_origin',
+//             scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
+//           })
+          );
         });
       });
     },
 
     function onSignIn(user) {
-      var authResponse = googleUser.getAuthResponse();
+      var authResponse = user.getAuthResponse();
       this.authToken = authResponse.token_type + " "+ authResponse.access_token;
       this.headers.Authorization = this.authToken;
     },
@@ -65,9 +68,10 @@ foam.CLASS({
       var SUPER = this.SUPER.bind(this);
 
       return self.auth2.then(function(auth2) {
+        auth2 = auth2.a;
         var user = auth2.currentUser.get();
         if ( ! user.isSignedIn() || ! self.authToken || ! self.headers.Authorization ) {
-          return auth2.signIn().then(self.onSignIn).then(SUPER).then(self.completeSend);
+          return auth2.signIn().then(self.onSignIn.bind(self)).then(SUPER).then(self.completeSend);
         } else {
           return SUPER().then(self.completeSend);
         }
