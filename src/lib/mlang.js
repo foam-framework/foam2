@@ -342,6 +342,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'InIC',
