@@ -27,9 +27,13 @@ foam.CLASS({
     'warn'
   ],
 
+  constants: {
+    GAPI_SIGNIN_PROMISE: { a: null }
+  },
+
   properties: [
     'auth2',
-    'authToken',
+    'authToken'
   ],
 
   methods: [
@@ -71,6 +75,7 @@ foam.CLASS({
         }
         authLoad();
       });
+
     },
 
     function onSignIn(user) {
@@ -85,10 +90,19 @@ foam.CLASS({
 
       return self.auth2.then(function(auth2) {
         auth2 = auth2.a;
-        var user = auth2.currentUser.get();
-        if ( ! user.isSignedIn() || ! self.authToken || ! self.headers.Authorization ) {
-          return auth2.signIn().then(self.onSignIn.bind(self)).then(SUPER).then(self.completeSend);
+
+        if ( ! auth2.isSignedIn.get() ) {
+          // kick off GAPI_SIGNIN_PROMISE if non-existent
+          if ( ! self.GAPI_SIGNIN_PROMISE.a ) {
+            self.GAPI_SIGNIN_PROMISE.a = auth2.signIn();
+          }
+          return self.GAPI_SIGNIN_PROMISE.a.then(self.onSignIn.bind(self)).then(SUPER).then(self.completeSend);
+
         } else {
+          // grab token from gapi if we don't have a local copy yet
+          if ( ! self.authToken || ! self.headers.Authorization ) {
+            self.onSignIn(auth2.currentUser.get());
+          }
           return SUPER().then(self.completeSend);
         }
       });
