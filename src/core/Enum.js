@@ -146,7 +146,8 @@ foam.CLASS({
       name: 'ordinal',
     },
     {
-      name: 'values'
+      name: 'values',
+      factory: function() { return {}; }
     }
   ],
 
