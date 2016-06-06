@@ -47,14 +47,27 @@ foam.CLASS({
             self.setTimeout(authLoad, 500);
           }
 
-          gapi.load('auth2', function() {
-            gapi.auth2.init({
-              client_id: self.oauth2ClientId,
-              cookiepolicy: self.oauth2CookiePolicy ,
-              scope: self.oauth2Scopes
+          // fn to init if necessary and resolve everything
+          function getAuth2() {
+            if ( ! gapi.auth2.getAuthInstance() ) {
+              gapi.auth2.init({
+                client_id: self.oauth2ClientId,
+                cookiepolicy: self.oauth2CookiePolicy ,
+                scope: self.oauth2Scopes
+              });
+            }
+            // Note: auth2 is thenable, so can't put it directly into the Promise
+            resolve({ a: gapi.auth2.getAuthInstance() });
+          }
+
+          // load if necessary and complete with getAuth2()
+          if ( ! gapi.auth2 ) {
+            gapi.load('auth2', function() {
+              getAuth2();
             });
-            resolve({ a: gapi.auth2.getAuthInstance() }); // Note: auth2 is thenable, so can't put it directly into the Promise
-          });
+          } else {
+            getAuth2();
+          }
         }
         authLoad();
       });
