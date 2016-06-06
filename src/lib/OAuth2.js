@@ -46,21 +46,14 @@ foam.CLASS({
             self.warn("Google Authentication Platform API (gapi) not loaded in time. Retrying.")
             self.setTimeout(authLoad, 500);
           }
-          
+
           gapi.load('auth2', function() {
             gapi.auth2.init({
-                        client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
-                        cookiepolicy: 'single_host_origin',
-                        scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
-                      });
-          
-                      resolve({ a: gapi.auth2.getAuthInstance() }
-                       // || gapi.auth2.init({
-  //             client_id: '163485588758-gtudr76snfr5lcuvsav62oi1l7vakolg.apps.googleusercontent.com',
-  //             cookiepolicy: 'single_host_origin',
-  //             scope: 'profile email https://www.googleapis.com/auth/memegen.read https://www.googleapis.com/auth/memegen.comment https://www.googleapis.com/auth/memegen.vote'
-  //           })
-            );
+              client_id: self.oauth2ClientId,
+              cookiepolicy: self.oauth2CookiePolicy ,
+              scope: self.oauth2Scopes
+            });
+            resolve({ a: gapi.auth2.getAuthInstance() }); // Note: auth2 is thenable, so can't put it directly into the Promise
           });
         }
         authLoad();
