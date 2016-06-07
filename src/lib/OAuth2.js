@@ -20,9 +20,6 @@ foam.CLASS({
   name: 'GoogleOAuth2HTTPRequestDecorator',
 
   imports: [
-    'oauth2ClientId',
-    'oauth2CookiePolicy',
-    'oauth2Scopes',
     'setTimeout',
     'warn'
   ],
@@ -32,6 +29,10 @@ foam.CLASS({
   },
 
   properties: [
+    'clientId',
+    'cookiePolicy',
+    'scopes',
+
     'auth2',
     'authToken'
   ],
@@ -55,9 +56,9 @@ foam.CLASS({
           function getAuth2() {
             if ( ! gapi.auth2.getAuthInstance() ) {
               gapi.auth2.init({
-                client_id: self.oauth2ClientId,
-                cookiepolicy: self.oauth2CookiePolicy ,
-                scope: self.oauth2Scopes
+                client_id: self.clientId,
+                cookiepolicy: self.cookiePolicy ,
+                scope: self.scopes
               });
             }
             // Note: auth2 is thenable, so can't put it directly into the Promise

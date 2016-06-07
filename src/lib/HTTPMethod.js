@@ -73,16 +73,9 @@ foam.CLASS({
 
       // May have many HTTPMethods in a host class, but only do service import once.
       var existing = c.getAxiomByName(this.HTTPRequestFactoryName);
-      this.assert( ( ! existing ) || this.Imports.isInstance(existing),
-        "HTTPMethod installInClass found conflicting axiom", existing && existing.name, ".",
-        "Use a different XMRMethod.HTTPRequestFactoryName.");
-
-      if ( ! existing ) {
-        c.installAxiom(this.Imports.create({
-          name: this.HTTPRequestFactoryName,
-          key: this.HTTPRequestFactoryName
-        }));
-      }
+      this.assert( existing,
+        "HTTPMethod installInClass did not find an import or property", this.HTTPRequestFactoryName, ".",
+        "Provide one, or set HTTPMethod.HTTPRequestFactoryName to the name of your request factory function.");
     },
 
     function installInProto(p) {
@@ -110,13 +103,15 @@ foam.CLASS({
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
-      this.assert( host[this.HTTPRequestFactoryName], "HTTPMethod call can't find XHR service import ", this.HTTPRequestFactoryName, "on", host);
+      this.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
+        "HTTPMethod call can't find HTTPRequestFactory",
+        this.HTTPRequestFactoryName, "on", host);
 
       // 'this' is the axiom instance
       var self = this;
       var path = this.path;
       var query = "";
-      var request = host[this.HTTPRequestFactoryName].create();
+      var request = host[this.HTTPRequestFactoryName]();
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {
