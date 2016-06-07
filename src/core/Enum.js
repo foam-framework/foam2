@@ -371,7 +371,7 @@ foam.CLASS({
         var e = this.__context__.lookup(prop.of);
 
         if ( type === foam.String ) {
-          return e[nu];
+          return e[foam.String.constantize(nu)];
         } else if ( type === foam.Number ) {
           return e.create({ ordinal: nu });
         }
