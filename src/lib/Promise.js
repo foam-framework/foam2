@@ -85,6 +85,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Pending',
@@ -94,6 +95,7 @@ foam.CLASS({
     foam.pattern.Singleton.create()
   ],
 });
+
 
 foam.CLASS({
   package: 'foam.promise',
