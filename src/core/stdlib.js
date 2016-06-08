@@ -233,7 +233,7 @@ foam.LIB({
        *   console.log("Name is " + name);
        *   hello();
        * }
-       * foam.Function.with(foo, a);
+       * foam.Function.withArgs(foo, a);
        *
        * Outputs:
        * Name is adam
