@@ -1620,7 +1620,7 @@ log(p.fname, p.lname, ' = ', p.name);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 86, str: "Instance of PersonAxiom Type           Name           Value----------------------------------------------------Property             fname          JohnProperty             lname          SmithProperty             name           John Smith\n <b>&gt;</b> [object Object] propertyChange fname [object Object] <b>&gt;</b> Steve Smith  =  Steve Smith <b>&gt;</b> [object Object] propertyChange lname [object Object] <b>&gt;</b> Steve Jones  =  Steve Jones" });
+  expect(log_.output).toMatchGolden({ i: 86, str: "Instance of PersonAxiom Type           Name           Value----------------------------------------------------Property             fname          JohnProperty             lname          SmithProperty             name           John Smith\n <b>&gt;</b> [object Object] propertyChange fname [object Object] <b>&gt;</b> [object Object] propertyChange name [object Object] <b>&gt;</b> Steve Smith  =  Steve Smith <b>&gt;</b> [object Object] propertyChange lname [object Object] <b>&gt;</b> [object Object] propertyChange name [object Object] <b>&gt;</b> Steve Jones  =  Steve Jones" });
 
 
 // Example 87
