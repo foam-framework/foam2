@@ -323,7 +323,7 @@ foam.CLASS({
         factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            this[name] = factory.call(this) ;
+            this.instance_[name] = factory.call(this) ;
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
