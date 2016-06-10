@@ -599,7 +599,11 @@ foam.LIB({
      * each part being a JS object.
      */
     function ensurePackage(root, path) {
-      if ( path === null || path === undefined ) return root;
+      if ( path === null ||
+           path === undefined ||
+           path === '' ) {
+        return root;
+      }
 
       console.assert(typeof path === 'string',
                      'Cannot make a package path of a non-string');
