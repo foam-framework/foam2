@@ -32,12 +32,8 @@ foam.CLASS({
     ['needed', 0],
     ['length', 0],
     ['length_', 0],
-    {
-      name: 'headerState'
-    },
-    {
-      name: 'state'
-    },
+    'headerState',
+    'state',
     {
       type: 'Boolean',
       name: 'framing',
@@ -245,6 +241,15 @@ foam.CLASS({
   package: 'foam.net',
   name: 'Socket',
 
+  imports: [
+    'socketService',
+    'me'
+  ],
+
+  requires: [
+    'foam.box.RegisterSelfMessage'
+  ],
+
   topics: [
     'message',
     'disconnect',
@@ -292,17 +297,41 @@ foam.CLASS({
 
   methods: [
     function write(msg) {
-      var serialized = foam.json.stringify(msg);
+      var serialized = foam.json.Network.stringify(msg);
       var size = Buffer.byteLength(serialized);
       var packet = new Buffer(size + 4);
       packet.writeInt32LE(size);
       packet.write(serialized, 4);
       this.socket_.write(packet);
     },
+    function connectTo(address) {
+      var sep = address.lastIndexOf(':');
+      var host = address.substring(0, sep);
+      var port = address.substring(sep + 1);
+      return new Promise(function(resolve, reject) {
+        require('dns').lookup(host, function(err, address, family) {
+          host = address || host;
+          var socket = new require('net').Socket();
+          socket.once('error', function(e) {
+            reject(e);
+          });
+          socket.once('connect', function() {
+            this.socket_ = socket;
+            this.write(this.RegisterSelfMessage.create({
+              name: this.me
+            }));
+            this.socketService.addSocket(this);
+            this.connect.pub();
+            resolve(this);
+          }.bind(this));
+
+          socket.connect(port, host);
+        }.bind(this));
+      }.bind(this));
+    },
     function onMessage() {
       var data = this.buffer.toString();
-      var obj = foam.json.parse(foam.json.parseString(data));
-      this.message.pub(obj);
+      this.message.pub(data);
     }
   ],
 
@@ -359,14 +388,11 @@ foam.CLASS({
   name: 'SocketService',
 
   requires: [
-    'foam.net.Socket'
+    'foam.net.Socket',
+    'foam.box.RegisterSelfMessage'
   ],
 
   properties: [
-    {
-      class: 'Map',
-      name: 'sockets'
-    },
     {
       class: 'Boolean',
       name: 'listen',
@@ -374,7 +400,8 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'port'
+      name: 'port',
+      value: 7000
     },
     {
       name: 'server'
@@ -397,69 +424,35 @@ foam.CLASS({
       this.server.listen(this.port);
     },
 
-    function getSocket(host, port) {
-      console.assert(host, "Host is required");
-      console.assert(port, "Port is required");
+    function addSocket(socket) {
+      var s1 = socket.message.sub(function(s, _, m) {
+        var m = foam.json.parse(foam.json.parseString(m), null, this);
 
-      var resolve;
-      var reject;
-      var p = new Promise(function(r, j) { resolve = r; reject = j; });
-
-      require('dns').lookup(host, function(err, address, family) {
-        host = address || host;
-
-        var key = host + ":" + port;
-        if ( this.sockets[key] ) {
-          resolve(this.sockets[key]);
-          return;
-        }
-
-        resolve(new Promise(function(resolve, reject) {
-          var socket = new require('net').Socket();
-          socket.once('error', function(e) {
-            reject(e);
+        if ( this.RegisterSelfMessage.isInstance(m) ) {
+          var named = foam.box.NamedBox.create({
+            name: m.name
           });
-          socket.once('connect', function() {
-            var s = this.Socket.create({
-              socket_: socket
-            });
-            this.addSocket(s, key);
-            resolve(s);
-          }.bind(this));
-          socket.connect(port, host);
-        }.bind(this)));
+
+          named.delegate = foam.box.RawSocketBox.create({
+            socket: socket
+          });
+
+        } else {
+          this.delegate && this.delegate.send(m);
+        }
       }.bind(this));
 
-      return p;
-    },
-
-    function addSocket(socket, key) {
-      if ( key ) this.sockets[key] = socket;
-
-      socket.message.sub(this.onMessage);
       socket.disconnect.sub(function() {
-        this.removeSocket(socket);
+        s1.destroy();
       }.bind(this));
-    },
-
-    function removeSocket(socket) {
-      socket.message.unsub(this.onMessage);
     }
   ],
 
   listeners: [
     {
-      name: 'onMessage',
-      code: function(s, _, m) {
-        this.delegate && this.delegate.send(
-            foam.json.parse(foam.json.parseString(m), null, this));
-      },
-    },
-    {
       name: 'onConnection',
       code: function(socket) {
         socket = this.Socket.create({ socket_: socket });
-        var key = socket.remoteAddress + ':' + socket.remotePort;
         this.addSocket(socket);
       }
     }
@@ -585,8 +578,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
+  extends: 'foam.net.WebSocketService',
   requires: [
-    'foam.net.node.WebSocket'
+    'foam.net.node.WebSocket',
+    'foam.box.RegisterSelfMessage'
   ],
   properties: [
     {
@@ -597,36 +592,17 @@ foam.CLASS({
     },
     {
       name: 'delegate'
-    },
-    {
-      class: 'Map',
-      name: 'sockets'
     }
-  ],
-  topics: [
-    'message'
   ],
   methods: [
     function init() {
       this.server = require('http').createServer(this.onRequest);
       this.server.listen(this.port);
       this.server.on('upgrade', this.onUpgrade);
-    },
-    function addSocket(socket) {
-//      this.sockets[socket.id] = socket;
-      var sub = socket.message.sub(this.onMessage);
-      socket.disconnected.sub(function() {
-        sub.destroy();
-//        delete this.sockets[socket.id];
-      });
     }
   ],
 
   listeners: [
-    function onMessage(s, _, msg) {
-      this.delegate.send(foam.json.parse(foam.json.parseString(msg)));
-    },
-
     function onUpgrade(req, socket, data) {
       var key = req.headers['sec-websocket-key'];
       key += '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';

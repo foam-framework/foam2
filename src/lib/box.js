@@ -37,7 +37,8 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.box.Box',
-      name: 'delegate'
+      transient: true,
+      name: 'promise'
     }
   ]
 });
@@ -918,73 +919,139 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'SocketBox',
-
-  implements: ['foam.box.Box'],
-
-  imports: [
-    'socketService'
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.SocketConnectBox'
   ],
-
+  axioms: [
+    foam.pattern.Multiton.create({
+      property: 'address'
+    })
+  ],
   properties: [
-    'host',
-    'port'
-  ],
-
-  methods: [
-    function send(msg) {
-      this.socketService.getSocket(this.host, this.port).then(
-        function(s) {
-          s.write(foam.json.Network.stringify(msg))
-        },
-        function(e) {
-          // TODO: Handle error
-        });
+    {
+      name: 'address'
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+        return foam.box.SocketConnectBox.create({
+          address: this.address
+        }, this);
+      }
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'SocketConnectBox',
+  extends: 'foam.box.PromisedBox',
+  requires: [
+    'foam.net.Socket',
+    'foam.box.RawSocketBox'
+  ],
+  properties: [
+    {
+      name: 'address'
+    },
+    {
+      name: 'promise',
+      factory: function() {
+        return this.Socket.create().connectTo(this.address).then(function(s) {
+          return this.RawSocketBox.create({ socket: s });
+        }.bind(this));
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'RawSocketBox',
+  properties: [
+    'socket'
+  ],
+  methods: [
+    function send(msg) {
+      this.socket.write(msg);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'RawWebSocketBox',
+  properties: [
+    {
+      name: 'socket'
+    }
+  ],
+  methods: [
+    function send(msg) {
+      this.socket.send(foam.json.Network.stringify(msg));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'RegisterSelfMessage',
+  extends: 'foam.box.Message',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.box',
   name: 'WebSocketBox',
-
+  extends: 'foam.box.PromisedBox',
+  requires: [
+    'foam.net.WebSocket',
+    'foam.box.RawWebSocketBox',
+    'foam.box.RegisterSelfMessage'
+  ],
   imports: [
-    'webSocketService'
+    'webSocketService',
+    'me'
   ],
-
-  properties: [
-    'uri'
+  axioms: [
+    foam.pattern.Multiton.create({
+      property: 'uri'
+    })
   ],
-
-  methods: [
-    function send(msg) {
-      this.webSocketService.getSocket(this.uri).then(function(s) {
-        s.send(foam.json.Network.stringify(msg));
-      });
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'WebSocketService',
   properties: [
     {
-      name: 'me',
-      postSet: function() {
-        return foam.box.NamedBox.create({
-
+      name: 'uri',
+    },
+    {
+      name: 'promise',
+      factory: function() {
+        var ws = this.WebSocket.create({
+          uri: this.uri
         });
+
+        return new Promise(function(resolve, reject) {
+          ws.connected.sub(function(s) {
+            s.destroy();
+            var delegate = this.RawWebSocketBox.create({ socket: ws });
+            delegate.send(this.RegisterSelfMessage.create({ name: this.me }));
+            this.webSocketService.addSocket(ws);
+            resolve(delegate);
+          }.bind(this));
+          ws.disconnected.sub(function(s) {
+            reject();
+          });
+          ws.connect();
+        }.bind(this));
       }
     }
-  ],
-  methods: [
-    {
-    }
   ]
 });
-
-
 
 foam.CLASS({
   package: 'foam.messaging',
