@@ -136,6 +136,7 @@ foam.CLASS({
     {
       name: 'bindings',
       adapt: function(_, bs) {
+        var exps = [];
         for ( var i = 0 ; i < bs.length ; i++ ) {
           var b = bs[i];
           if ( typeof b === 'string' ) {
@@ -157,10 +158,12 @@ foam.CLASS({
               default:
                 console.error('Invalid export syntax: key [as value] | as value');
             }
-            bs[i] = { name: name, key: key };
+            exps[i] = { name: name, key: key };
+          } else {
+            exps[i] = bs[i];
           }
         }
-        return bs;
+        return exps;
       }
     }
   ],

@@ -1,6 +1,6 @@
 importScripts('bootFOAMWorker.js');
 
-var env = foam.apps.chat.Env.create();
+var env   = foam.apps.chat.Env.create();
 var agent = foam.apps.chat.ServiceWorkerAgent.create({ scope: this }, env);
 agent.execute();
 

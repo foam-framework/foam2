@@ -6,7 +6,6 @@ ToDo:
   - more docs
   - Axiom ordering/priority
   - The defineProperty() and setPrivate() pattern is used in several spots, maybe make a helper function
-  - Move types.js earlier?
 
  ???:
   - ? proxy label, plural from Class to Model
@@ -21,7 +20,3 @@ ToDo:
   - Topic listener relay
   - Should String be the default property type with no way to create an untype property?
   - Design by Contract
-
-2 cases:
-  - someone refines an ancestor's Property
-  - someone refines a 'class:'

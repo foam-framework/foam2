@@ -4,11 +4,13 @@ importScripts('bootFOAMWorker.js');
 
 foam.CLASS({
   name: 'Env',
+
   exports: [
     'registry',
     'root',
     'messagePortService'
   ],
+
   properties: [
     {
       name: 'messagePortService',
@@ -34,15 +36,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   name: 'SharedWorker',
   extends: 'foam.apps.chat.SharedWorkerI',
+
   imports: [
     'registry'
   ],
+
   exports: [
     'messageDAO'
   ],
+
+  topics: [
+    'journalUpdate'
+  ],
+
   properties: [
     {
       name: 'syncAgent',
@@ -63,9 +73,7 @@ foam.CLASS({
       }
     }
   ],
-  topics: [
-    'journalUpdate'
-  ],
+
   methods: [
     function init() {
       this.registry.register(
@@ -93,6 +101,7 @@ foam.CLASS({
       this.syncAgent.sync.sync();
     }
   ],
+
   listeners: [
     {
       name: 'onJournalUpdate',

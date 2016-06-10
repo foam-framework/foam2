@@ -563,7 +563,6 @@ foam.CLASS({
           this.headers[key.trim()] = value.trim();
         }
         this.responseType = xhr.responseType;
-
       }
     },
     {

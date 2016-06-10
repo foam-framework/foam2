@@ -112,10 +112,9 @@ foam.CLASS({
       of: 'Action',
       name: 'actions',
       adaptArrayElement: function(o, prop) {
-        if ( typeof o === 'function' ) {
-          return foam.core.Action.create({name: o.name, code: o});
-        }
-        return foam.lookup(prop.of).create(o);
+        return typeof o === 'function' ?
+            foam.core.Action.create({name: o.name, code: o}) :
+            foam.lookup(prop.of).create(o) ;
       }
     }
   ]

@@ -98,6 +98,8 @@
     "../lib/AATree",
     "../lib/Index",
     "../lib/MDAO",
+    "../lib/TimestampDAO",
+    "../lib/JournalDAO",
     [ "../lib/IDBDAO", ! isServer ],
     "../lib/Pooled",
     "../lib/QueryParser",

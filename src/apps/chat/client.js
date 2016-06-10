@@ -15,10 +15,9 @@ if ( navigator.serviceWorker ) {
   // });
 }
 
-var env = foam.apps.chat.BoxEnvironment.create(null, foam.apps.chat.Env.create());
+var env    = foam.apps.chat.BoxEnvironment.create(null, foam.apps.chat.Env.create());
 var client = foam.apps.chat.Client.create(null, env);
-
-var ME = 'Anonymous';
+var ME     = 'Anonymous';
 
 document.location.search.substring(1).split('&').forEach(function(s) {
   s = s.split('=');
@@ -26,9 +25,9 @@ document.location.search.substring(1).split('&').forEach(function(s) {
 });
 
 var messages = document.getElementById('messages');
-var pending = document.getElementById('pending');
-var input = document.getElementById('input');
-var send = document.getElementById('send');
+var pending  = document.getElementById('pending');
+var input    = document.getElementById('input');
+var send     = document.getElementById('send');
 
 var statusbar = document.getElementById('connected-status');
 
@@ -74,6 +73,7 @@ send.addEventListener('click', sendMessage);
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'MessageTable',
+
   properties: [
     {
       name: 'table',
@@ -88,6 +88,7 @@ foam.CLASS({
       value: false
     }
   ],
+
   listeners: [
     function onRemove(m) {
       if ( this.rows[m.id] ) {
@@ -95,9 +96,11 @@ foam.CLASS({
         delete this.rows[m.id];
       }
     },
+
     function onReset() {
       this.table.children = [];
     },
+
     function onMessage(m) {
       if ( m.syncNo < 0 !== this.pending ) {
         if ( this.rows[m.id] ) {
@@ -157,14 +160,17 @@ var pendingMsgs = foam.apps.chat.MessageTable.create({
   pending: true
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Highlight',
+
   imports: [
     'document',
     'setInterval',
     'clearInterval'
   ],
+
   properties: [
     {
       class: 'String',
@@ -185,10 +191,12 @@ foam.CLASS({
       name: 'interval'
     }
   ],
+
   methods: [
     function init() {
       this.document.addEventListener('focusin', this.clear);
     },
+
     function highlight(obj) {
       if ( this.document.hasFocus() || this.interval ) return;
 
@@ -199,12 +207,14 @@ foam.CLASS({
       this.update();
     }
   ],
+
   listeners: [
     function clear() {
       this.document.title = this.oldTitle;
       this.clearInterval(this.interval);
       this.interval = 0;
     },
+
     function update() {
       this.state = ! this.state;
       this.document.title = this.state ? this.oldTitle : this.newTitle;
