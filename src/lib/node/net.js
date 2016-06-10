@@ -43,7 +43,7 @@ foam.CLASS({
       type: 'Boolean',
       name: 'finished',
       value: false
-    },
+    }
   ],
 
   methods: [
@@ -51,6 +51,7 @@ foam.CLASS({
       this.headerState = this.frameHeader;
       this.state = this.readHeader;
     },
+
     function toData() {
       this.length = this.buffer.length;
       var headerSize = this.buffer.length > 65535 ? 10 :
@@ -304,6 +305,7 @@ foam.CLASS({
       packet.write(serialized, 4);
       this.socket_.write(packet);
     },
+
     function connectTo(address) {
       var sep = address.lastIndexOf(':');
       var host = address.substring(0, sep);
@@ -329,6 +331,7 @@ foam.CLASS({
         }.bind(this));
       }.bind(this));
     },
+
     function onMessage() {
       var data = this.buffer.toString();
       this.message.pub(data);
@@ -509,10 +512,12 @@ foam.CLASS({
       });
       this.socket.write(frame.toData());
     },
+
     function close() {
       this.socket.end();
     }
   ],
+
   listeners: [
     {
       name: 'onClose',
@@ -579,10 +584,12 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
   extends: 'foam.net.WebSocketService',
+
   requires: [
     'foam.net.node.WebSocket',
     'foam.box.RegisterSelfMessage'
   ],
+
   properties: [
     {
       name: 'port'
@@ -594,6 +601,7 @@ foam.CLASS({
       name: 'delegate'
     }
   ],
+
   methods: [
     function init() {
       this.server = require('http').createServer(this.onRequest);
@@ -625,13 +633,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPRequest',
   extends: 'foam.net.HTTPRequest',
+
   requires: [
     'foam.net.node.HTTPResponse'
   ],
+
   properties: [
     {
       class: 'Boolean',
@@ -639,6 +650,7 @@ foam.CLASS({
       value: true
     }
   ],
+
   methods: [
     function fromUrl(url) {
       var data = require('url').parse(url);
@@ -647,6 +659,7 @@ foam.CLASS({
       if ( data.port ) this.port = data.port;
       this.path = data.path;
     },
+
     function send() {
       if ( this.url ) {
         this.fromUrl(this.url);
@@ -701,10 +714,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPResponse',
   extends: 'foam.net.HTTPResponse',
+
   properties: [
     {
       name: 'payload',
@@ -737,6 +752,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function start() {
       this.streaming = true;
@@ -756,6 +772,7 @@ foam.CLASS({
         });
       }.bind(this));
     },
+
     function stop() {
       // TODO?
     }
