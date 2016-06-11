@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'TimestampDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       class: 'String',
@@ -26,11 +27,13 @@ foam.CLASS({
       value: 'id'
     }
   ],
+
   methods: [
     function put(obj) {
       if ( ! obj.hasOwnProperty(this.property) ) obj[this.property] = this.nextTimestamp();
       return this.delegate.put(obj);
     },
+
     function nextTimestamp() {
       return Date.now();
     }

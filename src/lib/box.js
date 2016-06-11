@@ -943,14 +943,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SocketConnectBox',
   extends: 'foam.box.PromisedBox',
+
   requires: [
     'foam.net.Socket',
     'foam.box.RawSocketBox'
   ],
+
   properties: [
     {
       name: 'address'
@@ -966,12 +969,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RawSocketBox',
+
   properties: [
     'socket'
   ],
+
   methods: [
     function send(msg) {
       this.socket.write(msg);
@@ -979,14 +985,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
+
   properties: [
     {
       name: 'socket'
     }
   ],
+
   methods: [
     function send(msg) {
       this.socket.send(foam.json.Network.stringify(msg));
@@ -994,10 +1003,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RegisterSelfMessage',
   extends: 'foam.box.Message',
+
   properties: [
     {
       class: 'String',
@@ -1006,24 +1017,29 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'WebSocketBox',
   extends: 'foam.box.PromisedBox',
+
   requires: [
     'foam.net.WebSocket',
     'foam.box.RawWebSocketBox',
     'foam.box.RegisterSelfMessage'
   ],
+
   imports: [
     'webSocketService',
     'me'
   ],
+
   axioms: [
     foam.pattern.Multiton.create({
       property: 'uri'
     })
   ],
+
   properties: [
     {
       name: 'uri',
@@ -1052,6 +1068,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.messaging',

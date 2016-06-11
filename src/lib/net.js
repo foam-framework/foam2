@@ -70,15 +70,18 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net',
   name: 'WebSocketService',
+
   requires: [
     'foam.net.WebSocket',
     'foam.box.RegisterSelfMessage'
   ],
+
   properties: [
     {
       name: 'delegate'
     }
   ],
+
   methods: [
     function addSocket(socket) {
       var sub1 = socket.message.sub(function onMessage(s, _, msg) {
@@ -201,6 +204,7 @@ foam.CLASS({
 
       return reader.read().then(onData, onError);
     },
+
     function stop() {
       this.streaming = false;
     }
@@ -214,6 +218,10 @@ foam.CLASS({
 
   requires: [
     'foam.net.HTTPResponse'
+  ],
+
+  topics: [
+    'data'
   ],
 
   properties: [
@@ -259,9 +267,6 @@ foam.CLASS({
       name: 'responseType',
       value: 'text'
     }
-  ],
-  topics: [
-    'data'
   ],
 
   methods: [
@@ -329,6 +334,12 @@ foam.CLASS({
     'clearTimeout'
   ],
 
+  topics: [
+    {
+      name: 'message'
+    }
+  ],
+
   properties: [
     {
       name: 'grammar',
@@ -392,11 +403,6 @@ foam.CLASS({
     },
     'eventData',
     'eventName'
-  ],
-  topics: [
-    {
-      name: 'message'
-    }
   ],
 
   methods: [
