@@ -93,7 +93,7 @@ foam.CLASS({
 
   axioms: [
     foam.pattern.Singleton.create()
-  ],
+  ]
 });
 
 
@@ -127,8 +127,9 @@ foam.CLASS({
   methods: [
     function then(success) {
       var next = this.cls_.create();
-      if ( typeof success !== "function" ) next.fulfill_(this.value);
-      else next.fulfill_(success(this.value));
+
+      next.fulfill_(
+          typeof success !== "function" ? this.value : success(this.value));
 
       return next;
     },
