@@ -19,6 +19,7 @@
 foam.CLASS({
   name: 'MethodArguments',
   refines: 'Method',
+
   properties: [
     {
       name: 'args'
@@ -763,9 +764,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'SyncRecord',
+
   properties: [
     'id',
     {
@@ -780,6 +783,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -835,8 +839,7 @@ foam.CLASS({
       value: 1000
     }
   ],
-  classes: [
-  ],
+
   listeners: [
     function onRemoteUpdate(s, on, event, obj) {
       if ( event == 'put' ) {
@@ -960,10 +963,12 @@ foam.CLASS({
   ],
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'CachingDAO',
   extends: 'foam.dao.PromisedDAO',
+
   classes: [
     {
       name: 'InnerCachingDAO',
@@ -1006,6 +1011,7 @@ foam.CLASS({
       ]
     }
   ],
+
   properties: [
     {
       name: 'src',
