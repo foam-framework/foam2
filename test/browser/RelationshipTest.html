@@ -32,6 +32,10 @@ parents.put(Parent1.create({name: 'Odin'}));
 children.put(Child1.create({name: 'Thor', parent: 'Odin'}));
 children.put(Child1.create({name: 'Loki', parent: 'Odin'}));
 
+parents.put(Parent1.create({name: 'Zeus'}));
+children.put(Child1.create({name: 'Ares', parent: 'Zeus'}));
+children.put(Child1.create({name: 'Athena', parent: 'Zeus'}));
+
 parents.select({put: function(o) { console.log(o.stringify()); }});
 console.log('Children:');
 children.select({put: function(o) { console.log(o.stringify()); }});
