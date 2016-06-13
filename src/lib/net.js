@@ -60,7 +60,7 @@ foam.CLASS({
     {
       name: 'onMessage',
       code: function(msg) {
-        foam.json.parse(foam.json.parseString(msg.data));
+        this.message.pub(msg.data);
       }
     }
   ]
@@ -72,58 +72,39 @@ foam.CLASS({
   name: 'WebSocketService',
 
   requires: [
-    'foam.net.WebSocket'
+    'foam.net.WebSocket',
+    'foam.box.RegisterSelfMessage'
   ],
 
   properties: [
-    {
-      class: 'Map',
-      of: 'foam.net.WebSocket',
-      name: 'sockets'
-    },
     {
       name: 'delegate'
     }
   ],
 
   methods: [
-    function listen() {
-    },
+    function addSocket(socket) {
+      var sub1 = socket.message.sub(function onMessage(s, _, msg) {
+        msg = foam.json.parse(foam.json.parseString(msg), null, this);
 
-    function getSocket(uri) {
-      if ( this.sockets[uri] )
-        return Promise.resolve(this.sockets[uri]);
+        if ( this.RegisterSelfMessage.isInstance(msg) ) {
 
-      return new Promise(function(resolve, reject) {
-        var s = this.WebSocket.create({
-          uri: uri
-        });
+          var named = foam.box.NamedBox.create({
+            name: msg.name
+          });
 
-        s.connected.sub(function(sub) {
-          sub.destroy();
-          this.addSocket(s);
-          resolve(s);
-        }.bind(this));
-
-        s.connect();
+          named.delegate = foam.box.RawWebSocketBox.create({
+            socket: socket
+          });
+        } else {
+          this.delegate.send(msg);
+        }
       }.bind(this));
-    },
 
-    function addSocket(s) {
-      s.message.sub(this.onMessage);
-      s.disconnected.sub(function() {
-        delete this.sockets[s.uri]
-      }.bind(this));
-      this.sockets[s.uri] = s;
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'onMessage',
-      code: function(s, _, m) {
-        this.delegate && this.delegate.send(m);
-      }
+      socket.disconnected.sub(function(s) {
+        s.destroy();
+        sub1.destroy();
+      });
     }
   ]
 });
@@ -223,6 +204,7 @@ foam.CLASS({
 
       return reader.read().then(onData, onError);
     },
+
     function stop() {
       this.streaming = false;
     }
@@ -236,6 +218,10 @@ foam.CLASS({
 
   requires: [
     'foam.net.HTTPResponse'
+  ],
+
+  topics: [
+    'data'
   ],
 
   properties: [
@@ -284,9 +270,6 @@ foam.CLASS({
       name: 'responseType',
       value: 'text'
     }
-  ],
-  topics: [
-    'data'
   ],
 
   methods: [
@@ -354,6 +337,12 @@ foam.CLASS({
     'clearTimeout'
   ],
 
+  topics: [
+    {
+      name: 'message'
+    }
+  ],
+
   properties: [
     {
       name: 'grammar',
@@ -417,11 +406,6 @@ foam.CLASS({
     },
     'eventData',
     'eventName'
-  ],
-  topics: [
-    {
-      name: 'message'
-    }
   ],
 
   methods: [
@@ -588,7 +572,6 @@ foam.CLASS({
           this.headers[key.trim()] = value.trim();
         }
         this.responseType = xhr.responseType;
-
       }
     },
     {

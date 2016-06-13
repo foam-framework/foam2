@@ -323,7 +323,7 @@ foam.CLASS({
         factory ? function factoryGetter() {
           return this.hasOwnProperty(name) ?
             this.instance_[name] :
-            this[name] = factory.call(this) ;
+            this.instance_[name] = factory.call(this) ;
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
@@ -414,7 +414,15 @@ foam.CLASS({
         var args = new Array(argNames.length);
         var subs = [];
         var l    = function() {
-          if ( ! self.hasOwnProperty(name) ) self.clearPrivate_(name);
+          if ( ! self.hasOwnProperty(name) ) {
+            var oldValue = self[name];
+            self.clearPrivate_(name);
+
+            // Avoid creating slot and publishing event if no listeners
+            if ( self.hasListeners('propertyChange', name) ) {
+              self.pub('propertyChange', name, self.slot(name));
+            }
+          }
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {

@@ -15,17 +15,21 @@
  * limitations under the License.
  */
 
+// TODO: doc
 foam.CLASS({
   package: 'com.firebase',
   name: 'CloudMessaging',
+
   requires: [
     'foam.net.node.HTTPRequest',
   ],
+
   properties: [
     {
       name: 'serverKey'
     }
   ],
+
   methods: [
     function send(id, payload, collapseKey) {
       return this.HTTPRequest.create({
@@ -44,7 +48,7 @@ foam.CLASS({
         if ( ! resp.success ) {
           return resp.payload.then(function(p) { return Promise.reject(p); });
         }
-        return;
+        return; // ???: Why is this here?
       });
     }
   ]

@@ -116,32 +116,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'TimestampDAO',
-  extends: 'foam.dao.ProxyDAO',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'property',
-      value: 'id'
-    }
-  ],
-
-  methods: [
-    function put(obj) {
-      if ( ! obj.hasOwnProperty(this.property) ) obj[this.property] = this.nextTimestamp();
-      return this.delegate.put(obj);
-    },
-    function nextTimestamp() {
-      return Date.now();
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Message',
@@ -278,64 +252,6 @@ foam.CLASS({
 //     }
 //   ]
 //});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'JournalEntry',
-
-  properties: [
-    {
-      name: 'id',
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'record'
-    },
-    {
-      class: 'Boolean',
-      name: 'isRemove',
-      value: false
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'JournalDAO',
-  extends: 'foam.dao.ProxyDAO',
-
-  requires: [
-    'foam.dao.JournalEntry'
-  ],
-
-  properties: [
-    {
-      name: 'journal'
-    }
-  ],
-
-  methods: [
-    function put(obj) {
-      return this.delegate.put(obj).then(function(obj) {
-        this.journal.put(this.JournalEntry.create({
-          record: obj
-        }));
-        return obj;
-      }.bind(this));
-    },
-
-    function remove(obj) {
-      return this.delegate.remove(obj).then(function(r) {
-        this.journal.put(this.JournalEntry.create({
-          record: obj,
-          isRemove: true
-        }));
-        return r;
-      }.bind(this));
-    }
-  ]
-});
 
 
 foam.CLASS({
@@ -534,9 +450,6 @@ foam.CLASS({
       name: 'delegate',
       factory: function() {
         return foam.dao.ClientDAO.create({
-          box: foam.box.WebSocketBox.create({
-
-          })
         });
       }
     }
