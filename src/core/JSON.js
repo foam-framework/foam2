@@ -425,25 +425,33 @@ foam.LIB({
   },
 
   methods: [
-    function parse(json, opt_class, opt_ctx) {
-      if ( typeof json !== 'object' ) return json;
+    {
+      name: 'parse',
+      code: foam.mmethod({
+        Array: function(o, opt_class, opt_ctx) {
+          var a = new Array(o.length);
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            a[i] = this.parse(o[i], opt_class, opt_ctx);
+          }
 
-      // recurse into sub-objects
-      for ( var key in json ) {
-        var o = json[key];
-        if ( typeof o === 'object' && ! o.cls_ ) { // traverse plain old objects only
-          json[key] = this.parse(o, null, opt_ctx);
+          return a;
+        },
+        FObject: function(o) { return o; },
+        Object: function(json, opt_class, opt_ctx) {
+          for ( var key in json ) {
+            var o = json[key];
+            json[key] = this.parse(json[key], null, opt_ctx);
+          }
+
+          var cls = json.class || opt_class;
+          if ( cls ) {
+            var class_ = foam.lookup(cls);
+            return class_.create(json, opt_ctx);
+          }
+
+          return json;
         }
-      }
-
-      if ( json.class ) {
-        var cls = foam.lookup(json.class);
-        foam.__context__.assert(cls, 'Unknown class "', json.class, '" in foam.json.parse.');
-        return cls.create(json, opt_ctx);
-      }
-      if ( opt_class ) return opt_class.create(json, opt_ctx);
-
-      return json;
+      }, function(o) { return o; })
     },
 
     function parseArray(a, opt_class, opt_ctx) {
