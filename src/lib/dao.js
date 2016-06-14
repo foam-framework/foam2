@@ -426,14 +426,14 @@ foam.CLASS({
 
     function decorateSink_(sink, skip, limit, order, predicate, isListener, disableLimit) {
       if ( ! disableLimit ) {
-        if ( limit !== undefined ) {
+        if ( limit != undefined ) {
           sink = this.LimitedSink.create({
             limit: limit,
             delegate: sink
           });
         }
 
-        if ( skip !== undefined ) {
+        if ( skip != undefined ) {
           sink = this.SkipSink.create({
             skip: skip,
             delegate: sink
@@ -441,14 +441,14 @@ foam.CLASS({
         }
       }
 
-      if ( order !== undefined && ! isListener ) {
+      if ( order != undefined && ! isListener ) {
         sink = this.OrderedSink.create({
           comparator: order,
           delegate: sink
         });
       }
 
-      if ( predicate !== undefined ) {
+      if ( predicate != undefined ) {
         sink = this.PredicatedSink.create({
           predicate: predicate.partialEval ?
             predicate.partialEval() :
