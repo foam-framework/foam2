@@ -264,7 +264,7 @@ foam.CLASS({
       ) {
         this.cls_.pubsub_.sub('installAxiom', reinstall);
       }
-      
+
       c[cName] = prop;
     },
 
@@ -321,9 +321,13 @@ foam.CLASS({
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
-          return this.hasOwnProperty(name) ?
-            this.instance_[name] :
-            this.instance_[name] = factory.call(this) ;
+          if ( this.hasOwnProperty(name) ) return this.instance_[name];
+
+          // Temporarily set value to null to avoid
+          // possibility of infinite recursions.
+          this.instance_[name] = null;
+
+          return this.instance_[name] = factory.call(this);
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
