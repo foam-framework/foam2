@@ -439,10 +439,11 @@ foam.CLASS({
           named.delegate = foam.box.RawSocketBox.create({
             socket: socket
           });
+          return;
 
-        } else {
-          this.delegate && this.delegate.send(m);
         }
+
+        this.delegate && this.delegate.send(m);
       }.bind(this));
 
       socket.disconnect.sub(function() {
