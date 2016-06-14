@@ -110,6 +110,7 @@
     [ "../lib/node/json_dao", isServer ],
     "../lib/utf8",
     "../lib/net",
+    [ "../lib/messageport", ! isServer ],
     [ "../lib/node/net", isServer ],
     "../lib/firebase",
     "../lib/fcm",

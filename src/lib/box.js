@@ -214,25 +214,50 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'MessagePortBox',
-
-  implements: ['foam.box.Box'],
-
-  imports: [
-    'messagePortService'
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.MessagePortConnectBox',
+    'foam.box.RawMessagePortBox',
+    'foam.box.RegisterSelfMessage'
   ],
+  imports: [
+    'messagePortService',
+    'me'
+  ],
+  properties: [
+    {
+      name: 'port'
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+        var delegate = this.RawMessagePortBox.create({
+          port: this.port
+        });
+
+        this.messagePortService.addPort(this.port);
+        delegate.send(this.RegisterSelfMessage.create({ name: this.me.name }));
+
+        return delegate;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'RawMessagePortBox',
+  implements: ['foam.box.Box'],
 
   properties: [
     {
-      name: 'id'
+      name: 'port'
     }
   ],
 
   methods: [
     function send(msg) {
-      // TODO: Improved serialization
-      this.messagePortService
-        .getPortForDst(this.id)
-        .send(foam.json.Network.stringify(msg));
+      this.port.postMessage(foam.json.Network.stringify(msg));
     }
   ]
 });
@@ -1070,175 +1095,78 @@ foam.CLASS({
 });
 
 
+
 foam.CLASS({
-  package: 'foam.messaging',
-  name: 'MessagePort',
-
-  topics: [
-    'message'
+  package: 'foam.box',
+  name: 'Context',
+  requires: [
+    'foam.box.BoxRegistryBox',
+    'foam.box.NamedBox'
   ],
-
+  exports: [
+    'messagePortService',
+    'socketService',
+    'webSocketService',
+    'registry',
+    'root',
+    'me'
+  ],
   properties: [
     {
-      name: 'port',
-      postSet: function(old, port) {
-        if ( old ) {
-          old.onmessage = null;
-        }
-        if ( port ) {
-          //          port.addEventListener('message', this.onMessage);
-          // The onmessage setter starts the port, so use that instead of addEventListener
-          port.onmessage = this.onMessage;
+      name: 'messagePortService',
+      factory: function() {
+        var model = foam.lookup('foam.messageport.MessagePortService', true);
+        if ( model ) {
+          return model.create({
+            delegate: this.registry
+          }, this);
         }
       }
     },
     {
-      name: 'id'
-    }
-  ],
-
-  methods: [
-    function send(msg) {
-      this.port.postMessage(msg);
-    }
-  ],
-
-  listeners: [
-    function onMessage(e) {
-      var msg = foam.json.parse(foam.json.parseString(e.data), undefined, this);
-      this.message.pub(msg);
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.messaging',
-  name: 'MessagePortService',
-
-  requires: [
-    'foam.messaging.MessagePort',
-    'foam.box.MessagePortBox'
-  ],
-
-  topics: [
-    'connected'
-  ],
-
-  properties: [
-    {
-      class: 'Map',
-      name: 'portsBySrc'
+      name: 'socketService',
+      factory: function() {
+        var model = foam.lookup('foam.net.SocketService', true);
+        if ( model ) {
+          return model.create({
+            delegate: this.registry
+          }, this);
+        }
+      }
     },
     {
-      class: 'Map',
-      name: 'portsByDst'
+      name: 'webSocketService',
+      factory: function() {
+        var model = foam.lookup('foam.net.node.WebSocketService', true) ||
+            foam.lookup('foam.net.WebSocketService', true);
+
+        if ( model ) {
+          return model.create({
+            delegate: this.registry
+          }, this);
+        }
+      }
     },
     {
-      name: 'delegate'
+      name: 'registry',
+      factory: function() {
+        return this.BoxRegistryBox.create({
+          me: this.me
+        });
+      }
     },
     {
-      name: 'source'
+      name: 'root'
     },
     {
       name: 'me',
       factory: function() {
-        this.MessagePortBox.create({
-          id: this.$UID
+        return this.NamedBox.create({
+          name: '/com/foamdev/anonymous/' + foam.uuid.randomGUID()
         });
       }
     }
   ],
-
   methods: [
-    function start() {
-      this.source.addEventListener('message', this.onConnect);
-    },
-
-    function inbox() {
-      return this.me;
-    },
-
-    function connect(target) {
-      var channel = new MessageChannel();
-
-      target.postMessage({
-        type: 'CONNECT',
-        port: channel.port2
-      }, [channel.port2]);
-
-      var port = channel.port1;
-      return new Promise(foam.Function.bind(function(resolve, reject) {
-        port.onmessage = foam.Function.bind(function(e) {
-          if ( e.data && e.data.type === "ID" ) {
-            this.me = this.MessagePortBox.create({
-              id: e.data.youAre
-            });
-
-            this.addPort(this.MessagePort.create({
-              port: port,
-              id: e.data.iAm
-            }));
-
-            resolve(this.MessagePortBox.create({
-              id: e.data.iAm
-            }));
-          }
-        }, this);
-      }, this));
-    },
-
-    function getPortForDst(id) {
-      return this.portsByDst[id];
-    },
-
-    function addPort(port) {
-      this.portsByDst[port.id] = port;
-      port.message.sub(this.onMessage);
-      this.connected.pub(port.id);
-    }
-  ],
-
-  listeners: [
-    function onConnect(e) {
-      if ( e.data && e.data.type == 'CONNECT' ) {
-        var port = e.ports[0];
-        var resp = {
-          type: 'ID',
-          youAre: foam.next$UID(),
-          iAm: this.$UID
-        };
-        this.addPort(this.MessagePort.create({
-          port: port,
-          id: resp.youAre
-        }));
-        port.postMessage(resp);
-      }
-    },
-
-    function onMessage(s, _, msg) {
-      if ( this.delegate ) {
-        this.delegate.send(msg);
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.messaging',
-  name: 'SharedWorkerMessagePortService',
-  extends: 'foam.messaging.MessagePortService',
-
-  methods: [
-    function start() {
-      this.source.onconnect = function(e) {
-        var port = e.ports[0];
-        port.onmessage = this.onConnect;
-      }.bind(this);
-      this.me = this.MessagePortBox.create({
-        id: this.$UID
-      });
-    }
   ]
 });
