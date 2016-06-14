@@ -114,6 +114,7 @@
     [ "../lib/node/net", isServer ],
     "../lib/firebase",
     "../lib/fcm",
+    "../lib/Stub",
     "../lib/box",
     [ "../lib/u2", ! isServer ],
     [ "../lib/node/net", isServer ],
