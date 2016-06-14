@@ -115,6 +115,7 @@
     "../lib/fcm",
     "../lib/box",
     [ "../lib/u2", ! isServer ],
+    [ "../lib/u2/daos", ! isServer ],
     [ "../lib/node/net", isServer ],
     [ "../lib/node/box", isServer ]
   ].
