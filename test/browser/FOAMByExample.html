@@ -747,6 +747,7 @@ o.alarm.pub('on');
 o.pub('alarm', 'off');
 
 // Objects implicitly pub events on the 'propertyChange' topic when
+// property values change.
 foam.CLASS({
   name: 'PropertyChangeTest',
   properties: [ 'a', 'b' ]
