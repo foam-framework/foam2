@@ -23,9 +23,6 @@ foam.CLASS({
     'foam.box.RawMessagePortBox',
     'foam.box.NamedBox'
   ],
-  imports: [
-    'me'
-  ],
   properties: [
     {
       name: 'source',
