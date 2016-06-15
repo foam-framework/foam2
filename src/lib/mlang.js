@@ -661,6 +661,10 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
 
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
+
   requires: [
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Constant',

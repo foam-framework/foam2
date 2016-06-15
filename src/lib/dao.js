@@ -19,6 +19,7 @@
 foam.CLASS({
   name: 'MethodArguments',
   refines: 'Method',
+
   properties: [
     {
       name: 'args'
@@ -425,14 +426,14 @@ foam.CLASS({
 
     function decorateSink_(sink, skip, limit, order, predicate, isListener, disableLimit) {
       if ( ! disableLimit ) {
-        if ( limit !== undefined ) {
+        if ( limit != undefined ) {
           sink = this.LimitedSink.create({
             limit: limit,
             delegate: sink
           });
         }
 
-        if ( skip !== undefined ) {
+        if ( skip != undefined ) {
           sink = this.SkipSink.create({
             skip: skip,
             delegate: sink
@@ -440,14 +441,14 @@ foam.CLASS({
         }
       }
 
-      if ( order !== undefined && ! isListener ) {
+      if ( order != undefined && ! isListener ) {
         sink = this.OrderedSink.create({
           comparator: order,
           delegate: sink
         });
       }
 
-      if ( predicate !== undefined ) {
+      if ( predicate != undefined ) {
         sink = this.PredicatedSink.create({
           predicate: predicate.partialEval ?
             predicate.partialEval() :
@@ -763,9 +764,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'SyncRecord',
+
   properties: [
     'id',
     {
@@ -780,6 +783,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -835,8 +839,7 @@ foam.CLASS({
       value: 1000
     }
   ],
-  classes: [
-  ],
+
   listeners: [
     function onRemoteUpdate(s, on, event, obj) {
       if ( event == 'put' ) {
@@ -960,10 +963,12 @@ foam.CLASS({
   ],
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'CachingDAO',
   extends: 'foam.dao.PromisedDAO',
+
   classes: [
     {
       name: 'InnerCachingDAO',
@@ -974,15 +979,15 @@ foam.CLASS({
           of: 'foam.dao.DAO',
           name: 'src',
           methods: [ 'put', 'remove', 'removeAll' ],
-          postSet: function(old, cache) {
+          postSet: function(old, src) {
             if ( old ) {
               old.on.put.unsub(this.onPut);
               old.on.remove.unsub(this.onRemove);
               old.on.reset.unsub(this.onReset);
             }
-            cache.on.put.sub(this.onPut);
-            cache.on.remove.sub(this.onRemove);
-            cache.on.reset.sub(this.onReset);
+            src.on.put.sub(this.onPut);
+            src.on.remove.sub(this.onRemove);
+            src.on.reset.sub(this.onReset);
           }
         },
         {
@@ -1006,6 +1011,7 @@ foam.CLASS({
       ]
     }
   ],
+
   properties: [
     {
       name: 'src',

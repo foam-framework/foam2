@@ -51,6 +51,8 @@ cat \
     ../../core/../lib/AATree.js \
     ../../core/../lib/Index.js \
     ../../core/../lib/MDAO.js \
+    ../../core/../lib/TimestampDAO.js \
+    ../../core/../lib/JournalDAO.js \
     ../../core/../lib/IDBDAO.js \
     ../../core/../lib/Pooled.js \
     ../../core/../lib/QueryParser.js \
@@ -60,7 +62,10 @@ cat \
     ../../core/../lib/PhysicalCircle.js \
     ../../core/../lib/utf8.js \
     ../../core/../lib/net.js \
+    ../../core/../lib/messageport.js \
     ../../core/../lib/firebase.js \
+    ../../core/../lib/fcm.js \
+    ../../core/../lib/Stub.js \
     ../../core/../lib/box.js \
     chat.js \
     > site/public/foam.js
@@ -78,4 +83,4 @@ copy manifest.json
 copy index.html
 
 cd site
-#firebase deploy
+firebase deploy

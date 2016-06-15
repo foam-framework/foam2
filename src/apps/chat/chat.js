@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.apps.chat',
-  name: 'Env',
+  name: 'Context',
 
   exports: [
     'isSafari'
@@ -34,60 +34,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.apps.chat',
-  name: 'BoxEnvironment',
-
-  requires: [
-    'foam.messaging.MessagePortService',
-    'foam.box.BoxRegistryBox'
-  ],
-
-  exports: [
-    'messagePortService',
-    'sharedWorkerBox',
-    'registry',
-    'root'
-  ],
-
-  properties: [
-    {
-      name: 'messagePortService',
-      factory: function() {
-        return this.MessagePortService.create({
-          delegate: this.registry
-        });
-      }
-    },
-    {
-      name: 'sharedWorkerBox',
-      factory: function() {
-        return this.messagePortService.connect(
-          new SharedWorker('sharedWorker.js').port).then(function(b) {
-            this.registry.me = this.messagePortService.me;
-            return b;
-          }.bind(this));
-      }
-    },
-    {
-      name: 'root',
-      factory: function() {
-        return foam.box.PromisedBox.create({
-          delegate: this.sharedWorkerBox,
-        });
-      }
-    },
-    {
-      name: 'registry',
-      factory: function() {
-        return this.BoxRegistryBox.create();
-      }
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.apps.chat',
@@ -439,27 +385,9 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'RemoteMessageDAO',
-  extends: 'foam.dao.ProxyDAO',
-
-  properties: [
-    {
-      name: 'delegate',
-      factory: function() {
-        return foam.dao.ClientDAO.create({
-        });
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.apps.chat',
-  name: 'RemoteMessageDAO2',
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
@@ -671,7 +599,7 @@ foam.CLASS({
 
   imports: [
     'root',
-    'sharedWorkerBox'
+    'registry'
   ],
 
   exports: [
@@ -686,14 +614,20 @@ foam.CLASS({
       value: false
     },
     {
+      name: 'sharedWorker_',
+      factory: function() {
+        return foam.box.MessagePortBox.create({
+          port: new SharedWorker('sharedWorker.js').port
+        }, this);
+      }
+    },
+    {
       name: 'sharedWorker',
       factory: function() {
         return foam.apps.chat.ClientSharedWorkerI.create({
           box: foam.box.SubBox.create({
             name: 'control',
-            delegate: foam.box.PromisedBox.create({
-              delegate: this.sharedWorkerBox
-            }, this)
+            delegate: this.sharedWorker_
           }, this)
         }, this);
       }
@@ -701,33 +635,12 @@ foam.CLASS({
     {
       name: 'messageDAO',
       factory: function() {
-        return foam.dao.PromisedDAO.create({
-          promise: this.sharedWorkerBox.then(function() {
-            return foam.dao.ClientDAO.create({
-              delegate: foam.box.SubBox.create({
-                name: 'messageDAO',
-                delegate: this.root
-              }, this)
-            }, this);
-          }.bind(this))
+        return foam.dao.ClientDAO.create({
+          delegate: foam.box.SubBox.create({
+            name: 'messageDAO',
+            delegate: this.sharedWorker_
+          }, this)
         }, this);
-
-        var channel = document.location.search.substring(1).split('&').find(function(e) {
-          return e.indexOf('channel=') === 0;
-        });
-        channel = channel && channel.substring(8);
-
-        var auth = document.location.search.substring(1).split('&').find(function(e) {
-          return e.indexOf('auth=') === 0;
-        });
-
-        auth = auth && auth.substring(5);
-
-        var dao = this.MessageDAO.create();
-        if ( channel ) dao.channel = channel;
-        if ( auth ) dao.auth = auth;
-
-        return dao;
       }
     }
   ]

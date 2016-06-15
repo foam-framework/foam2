@@ -1,41 +1,5 @@
 importScripts('bootFOAMWorker.js');
 
-//var env = foam.apps.chat.SharedWorkerBoxEnvironment.create();
-
-foam.CLASS({
-  name: 'Env',
-
-  exports: [
-    'registry',
-    'root',
-    'messagePortService'
-  ],
-
-  properties: [
-    {
-      name: 'messagePortService',
-      factory: function() {
-        return foam.messaging.SharedWorkerMessagePortService.create({
-          source: self,
-          delegate: this.registry
-        }, this);
-      }
-    },
-    {
-      name: 'registry',
-      factory: function() {
-        return foam.box.BoxRegistryBox.create(null, this);
-      }
-    },
-    {
-      name: 'root',
-      factory: function() {
-        return this.registry;
-      }
-    }
-  ]
-});
-
 
 foam.CLASS({
   name: 'SharedWorker',
@@ -113,8 +77,8 @@ foam.CLASS({
   ]
 });
 
-var env = Env.create(null, foam.apps.chat.Env.create());
-env.messagePortService.start();
-env.registry.me = env.messagePortService.me;
+var env = foam.box.Context.create();
+env.messagePortService.source = self;
+var env = foam.apps.chat.Context.create(null, env);
 
 var agent = SharedWorker.create(null, env);

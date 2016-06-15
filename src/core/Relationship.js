@@ -102,33 +102,3 @@ foam.CLASS({
     }
   ]
 });
-
-
-// Relationship Test
-foam.CLASS({
-  name: 'Parent1',
-  ids: [ 'name' ],
-  properties: [ 'name' ]
-});
-foam.CLASS({
-  name: 'Child1',
-  ids: [ 'name' ],
-  properties: [ 'name' ]
-});
-foam.core.Relationship.create({
-  sourceModel: 'Parent1',
-  targetModel: 'Child1',
-  name: 'children',
-  inverseName: 'parent'
-});
-
-var parents  = foam.dao.MDAO.create({of: 'Parent1'});
-var children = foam.dao.MDAO.create({of: 'Child1'});
-
-parents.put(Parent1.create({name: 'Odin'}));
-children.put(Child1.create({name: 'Thor', parent: 'Odin'}));
-children.put(Child1.create({name: 'Loki', parent: 'Odin'}));
-
-parents.select({put: function(o) { console.log(o.stringify()); }});
-console.log('Children:');
-children.select({put: function(o) { console.log(o.stringify()); }});

@@ -1,21 +1,23 @@
 if ( navigator.serviceWorker ) {
-   navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js');
 
-   var sw = foam.apps.chat.ServiceWorker.create({
-     registration: navigator.serviceWorker.ready
-   });
+  var sw = foam.apps.chat.ServiceWorker.create({
+    registration: navigator.serviceWorker.ready
+  });
+
 
   navigator.serviceWorker.onmessage = function(e) {
     if ( e.data === 'NEWDATA' ) {
       client.sharedWorker.sync();
     }
   };
+
   // navigator.serviceWorker.getRegistration().then(function(r) {
   //   r && r.unregister();
   // });
 }
 
-var env    = foam.apps.chat.BoxEnvironment.create(null, foam.apps.chat.Env.create());
+var env    = foam.apps.chat.Context.create(null, foam.box.Context.create());
 var client = foam.apps.chat.Client.create(null, env);
 var ME     = 'Anonymous';
 
@@ -41,13 +43,13 @@ client.connected$.sub(function(s, o, p, v) {
 });
 updateStatus(client.connected);
 
-client.sharedWorkerBox.then(function() {
-  client.sharedWorker.sub('journalUpdate', function() {
-    navigator.serviceWorker.ready.then(function(s) {
-      s.sync.register({
-        id: 'messages'
-      });
+client.sharedWorker.sub('journalUpdate', function() {
+  navigator.serviceWorker.ready.then(function(s) {
+    s.sync.register({
+      id: 'messages'
     });
+  }, function() {
+    // Handle no service worker case.
   });
 });
 

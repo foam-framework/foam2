@@ -1,12 +1,12 @@
 importScripts('bootFOAMWorker.js');
 
-var env   = foam.apps.chat.Env.create();
+var env   = foam.apps.chat.Context.create();
 var agent = foam.apps.chat.ServiceWorkerAgent.create({ scope: this }, env);
 agent.execute();
 
 this.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open('v1').then(function(cache) {
+    caches.open('v3').then(function(cache) {
       cache.addAll([
         'bootFOAMWeb.js',
         'bootFOAMWorker.js',
@@ -20,6 +20,15 @@ this.addEventListener('install', function(e) {
 });
 
 this.addEventListener('activate', function(e) {
+  e.waitUntil(
+    caches.keys().then(function(keyList) {
+      return Promise.all(keyList.map(function(key) {
+        if ( key !== 'v3' ) {
+          return caches.delete(key);
+        }
+      }));
+    })
+  );
 });
 
 this.addEventListener('fetch', function(e) {
