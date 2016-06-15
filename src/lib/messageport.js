@@ -55,6 +55,7 @@ foam.CLASS({
         this.addPort(e.ports[i]);
       }
     },
+
     function onMessage(port, e) {
       var msg = foam.json.parse(foam.json.parseString(e.data));
 
