@@ -288,6 +288,16 @@ foam.CLASS({
       var slotName    = name + '$';
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
+      var FIP         = factory && ''; // Factory In Progress
+
+      // Factory In Progress (FIP) Support
+      // When a factory method is in progress, the property's value is
+      // set to FIP. This allows for the detection and elimination of
+      // infinite recursions (if a factory accesses another property
+      // which in turn tries to access its propery) and allows for
+      // the property change event to not be fired when the value
+      // is first set by the factory (since the value didn't change,
+      // the factory is providing its original value).
 
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
@@ -323,9 +333,13 @@ foam.CLASS({
         factory ? function factoryGetter() {
           if ( this.hasOwnProperty(name) ) return this.instance_[name];
 
-          // Temporarily set value to null to avoid
-          // possibility of infinite recursions.
-          this.instance_[name] = null;
+          if ( this.instance_[name] === FIP ) {
+            console.warn('reentrant factory', name);
+            return undefined;
+          }
+
+          // Indicate the Factory In Progress state
+          this.instance_[name] = undefined;
 
           return this.instance_[name] = factory.call(this);
         } :
@@ -348,10 +362,11 @@ foam.CLASS({
             return;
           }
 
-          // Get old value but avoid triggering factory or expression if present.
-          // Factories and expressions (which are also factories) can be expensive
-          // to generate, and if the value has been explicitly set to some value,
-          // then it isn't worth the expense of computing the old stale value.
+          // Getting the old value but avoid triggering factory or expression if
+          // present. Factories and expressions (which are also factories) can be
+          // expensive to generate, and if the value has been explicitly set to
+          // some value, then it isn't worth the expense of computing the old
+          // stale value.
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
             eFactory ?
@@ -378,7 +393,11 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange_(prop, oldValue, newValue);
+          // If this is the result of a factory setting the initial value,
+          // then don't fire a property change event, since it hasn't
+          // really changed.
+          if ( ! factory || oldValue !== undefined )
+            this.pubPropertyChange_(prop, oldValue, newValue);
 
           // FUTURE: pub to a global topic to support dynamic()
 
