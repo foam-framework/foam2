@@ -77,15 +77,18 @@ foam.CLASS({
   package: 'foam.box',
   name: 'MessagePortBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.MessagePortConnectBox',
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage'
   ],
+
   imports: [
     'messagePortService',
     'me'
   ],
+
   properties: [
     {
       name: 'port'
@@ -105,6 +108,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -369,6 +373,7 @@ foam.CLASS({
         }
       }
     },
+
     function toRemote() {
       return this.me;
     }
@@ -551,6 +556,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'SubscribeMessage',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'topic'
@@ -962,10 +968,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
+
   requires: [
     'foam.box.BoxRegistryBox',
     'foam.box.NamedBox'
   ],
+
   exports: [
     'messagePortService',
     'socketService',
@@ -974,6 +982,7 @@ foam.CLASS({
     'root',
     'me'
   ],
+
   properties: [
     {
       name: 'messagePortService',
@@ -1027,7 +1036,5 @@ foam.CLASS({
         });
       }
     }
-  ],
-  methods: [
   ]
 });
