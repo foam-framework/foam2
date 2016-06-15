@@ -62,16 +62,13 @@
      *
      * @param cls The class to register.
      */
-    register: function(cls, opt_name) {
+    register: function(cls) {
       console.assert(
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
       console.assert(
         typeof cls.id === 'string',
         'Must have an .id property to be registered in a context.');
-      console.assert(
-        ! opt_name || typeof opt_name === 'string',
-        'Models must be registered with a string name.');
 
       function doRegister(cache, name) {
         console.assert(
@@ -81,10 +78,8 @@
         cache[name] = cls;
       }
 
-      doRegister(this.__cache__, ( opt_name || cls.id ));
-      if ( cls.package === 'foam.core' && ! opt_name ) {
-        doRegister(this.__cache__, cls.name);
-      }
+      doRegister(this.__cache__, cls.id);
+      if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
     },
 
     /**
