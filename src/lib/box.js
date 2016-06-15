@@ -280,13 +280,14 @@ foam.CLASS({
     'foam.box.SubBox'
   ],
 
+  imports: [
+    'me'
+  ],
+
   properties: [
     {
       name: 'registry',
       factory: function() { return {}; }
-    },
-    {
-      name: 'me'
     }
   ],
 
@@ -942,7 +943,7 @@ foam.CLASS({
           ws.connected.sub(function(s) {
             s.destroy();
             var delegate = this.RawWebSocketBox.create({ socket: ws });
-            delegate.send(this.RegisterSelfMessage.create({ name: this.me }));
+            delegate.send(this.RegisterSelfMessage.create({ name: this.me.name }));
             this.webSocketService.addSocket(ws);
             resolve(delegate);
           }.bind(this));
@@ -1012,9 +1013,7 @@ foam.CLASS({
     {
       name: 'registry',
       factory: function() {
-        return this.BoxRegistryBox.create({
-          me: this.me
-        });
+        return this.BoxRegistryBox.create();
       }
     },
     {
