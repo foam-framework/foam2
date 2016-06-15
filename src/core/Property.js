@@ -339,7 +339,7 @@ foam.CLASS({
           }
 
           // Indicate the Factory In Progress state
-          this.instance_[name] = undefined;
+          this.instance_[name] = FIP;
 
           return this.instance_[name] = factory.call(this);
         } :
