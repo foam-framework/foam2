@@ -32,7 +32,7 @@ foam.CLASS({
   constants: {
     __ID__: [ 0 ],
     NEXT_ID: function() {
-      return 'u2v' + this.__ID__[ 0 ]++;
+      return 'v' + this.__ID__[ 0 ]++;
     }
   },
 
@@ -51,6 +51,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -77,6 +78,7 @@ foam.CLASS({
     function output(out) { out('&', this.name, ';'); }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -1409,14 +1411,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
+
   properties: [
     'data'
   ]
 });
+
 
 foam.__context__ = foam.__context__.createSubContext({
   E: function(name) {

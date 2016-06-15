@@ -2,6 +2,7 @@ foam.CLASS({
   package: 'boxmail',
   name: 'Message',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'id'
