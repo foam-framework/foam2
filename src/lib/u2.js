@@ -52,6 +52,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'Entity',
@@ -77,6 +78,7 @@ foam.CLASS({
     function output(out) { out('&', this.name, ';'); }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -1409,14 +1411,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
+
   properties: [
     'data'
   ]
 });
+
 
 foam.__context__ = foam.__context__.createSubContext({
   E: function(name) {
