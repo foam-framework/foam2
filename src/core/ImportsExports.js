@@ -61,7 +61,8 @@ foam.CLASS({
 </pre>
 
   Aliasing:
-    Bindings can be renamed or aliased when they're imported or exported using 'as alias'.
+    Bindings can be renamed or aliased when they're imported or exported using
+    'as alias'.
 
   Examples:
     // import 'userDAO' from the Context and make available as this.dao
@@ -70,8 +71,8 @@ foam.CLASS({
     // export my log method as 'warn'
     exports: [ 'log as warn' ]
 
-    // If the axiom to be exported isn't named, but just aliased, then 'this' is exported
-    // as the named alias.  This is how objects export themselves.
+    // If the axiom to be exported isn't named, but just aliased, then 'this'
+    // is exported as the named alias.  This is how objects export themselves.
     exports: [ 'as Controller' ]
 
   See Context.js.
@@ -155,17 +156,22 @@ foam.CLASS({
                 key = name = a[0];
               break;
               case 2:
-                console.assert(a[0] === 'as', 'Invalid export syntax: key [as value] | as value');
+                console.assert(
+                    a[0] === 'as',
+                    'Invalid export syntax: key [as value] | as value');
                 name = a[1]; // signifies 'this'
                 key  = null;
               break;
               case 3:
-                console.assert(a[1] === 'as', 'Invalid export syntax: key [as value] | as value');
+                console.assert(
+                    a[1] === 'as',
+                    'Invalid export syntax: key [as value] | as value');
                 name = a[2];
                 key  = a[0];
               break;
               default:
-                console.error('Invalid export syntax: key [as value] | as value');
+                console.error(
+                    'Invalid export syntax: key [as value] | as value');
             }
             exps[i] = { name: name, key: key };
           } else {
