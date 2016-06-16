@@ -16,7 +16,16 @@
  */
 
 describe('imports/exports tests', function() {
-  xit('with inheritence', function() {
+  it('with inheritence', function() {
+    foam.CLASS({
+      name: 'Importer',
+      imports: [
+        'a',
+        'b',
+        'c'
+      ]
+    });
+
     foam.CLASS({
       name: 'Abc',
       exports: [
@@ -30,25 +39,20 @@ describe('imports/exports tests', function() {
     foam.CLASS({
       name: 'Def',
       extends: 'Abc',
+      requires: [ 'Importer' ],
       exports: [
         'b'
       ],
       properties: [
         [ 'b', 2 ]
+      ],
+      methods: [
+        function createImporter() { return this.Importer.create(); }
       ]
     });
 
-    foam.CLASS({
-      name: 'Importer',
-      imports: [
-        'a',
-        'b',
-        'c'
-      ]
-    });
-
-    var def = Def.create();
-    var importer = Importer.create();
+    var def      = Def.create();
+    var importer = def.createImporter();
 
 
     expect(importer.a).toBe(1);
