@@ -16,7 +16,7 @@
  */
 
 describe('imports/exports tests', function() {
-  it('with inheritence', function() {
+  xit('with inheritence', function() {
     foam.CLASS({
       name: 'Importer',
       imports: [
