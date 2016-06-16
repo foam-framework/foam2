@@ -111,8 +111,17 @@ foam.CLASS({
       });
 
       Object.defineProperty(proto, name, {
-        get: function importsGetter()  { return this[slotName].get(); },
-        set: function importsSetter(v) { this[slotName].set(v); },
+        get: function importsGetter()  {
+          var slot = this[slotName];
+          if ( slot ) return slot.get();
+          console.warn('Access missing import:', name);
+          return undefined;
+        },
+        set: function importsSetter(v) {
+          var slot = this[slotName];
+          if ( slot ) slot.set(v);
+          console.warn('Attempt to set missing import:', name);
+        },
         configurable: true,
         enumerable: false
       });
