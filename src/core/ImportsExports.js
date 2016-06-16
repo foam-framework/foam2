@@ -79,7 +79,7 @@ foam.CLASS({
  */
 foam.CLASS({
   package: 'foam.core',
-  name: 'Imports',
+  name: 'Import',
 
   // documentation: 'Import Context Value Axiom',
 
@@ -137,61 +137,36 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'Exports',
+  name: 'Export',
 
   // documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
-    [ 'name', 'exports_' ],
+    'name',
     {
-      name: 'bindings',
-      adapt: function(_, bs) {
-        var exps = [];
-        for ( var i = 0 ; i < bs.length ; i++ ) {
-          var b = bs[i];
-          if ( typeof b === 'string' ) {
-            var key, name, a = b.split(' ');
-            switch ( a.length ) {
-              case 1:
-                key = name = a[0];
-              break;
-              case 2:
-                console.assert(
-                    a[0] === 'as',
-                    'Invalid export syntax: key [as value] | as value');
-                name = a[1]; // signifies 'this'
-                key  = null;
-              break;
-              case 3:
-                console.assert(
-                    a[1] === 'as',
-                    'Invalid export syntax: key [as value] | as value');
-                name = a[2];
-                key  = a[0];
-              break;
-              default:
-                console.error(
-                    'Invalid export syntax: key [as value] | as value');
-            }
-            exps[i] = { name: name, key: key };
-          } else {
-            exps[i] = bs[i];
-          }
-        }
-        return exps;
+      name: 'exportName',
+      postSet: function(_, name) {
+        this.name = 'export_' + name;
       }
-    }
+    },
+    'key'
   ],
 
   methods: [
     function installInProto(proto) {
-      var bs = this.bindings;
+      if ( proto.hasOwnProperty('__subContext__' ) ) {
+        console.log('redundant');
+        return;
+      } else {
+        console.log('not redundant');
+      }
 
       Object.defineProperty(proto, '__subContext__', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('__subContext__') ) {
             var ctx = this.__context__ || foam.__context__;
             var m = {};
+            var bs = proto.cls_.getAxiomsByClass(foam.core.Export);
             for ( var i = 0 ; i < bs.length ; i++ ) {
               var b = bs[i];
 
@@ -208,10 +183,10 @@ foam.CLASS({
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
-                m[b.name] = a.exportAs ? a.exportAs(this) : this[b.key] ;
+                m[b.exportName] = a.exportAs ? a.exportAs(this) : this[b.key] ;
               } else {
                 // Ex. 'as Bank', which exports an implicit 'this'
-                m[b.name] = this;
+                m[b.exportName] = this;
               }
             }
             this.setPrivate_('__subContext__', ctx.createSubContext(m));
@@ -237,18 +212,44 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
           var a = o.split(' as ');
-          return foam.core.Imports.create({name: a[1] || a[0], key: a[0]});
+          return foam.core.Import.create({name: a[1] || a[0], key: a[0]});
         }
 
-        return foam.core.Imports.create(o);
+        return foam.core.Import.create(o);
       }
     },
     {
+      class: 'AxiomArray',
+      of: 'Exports',
       name: 'exports',
-      postSet: function(_, xs) {
-        this.axioms_.push.call(
-          this.axioms_,
-          foam.core.Exports.create({bindings: xs}));
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var a = o.split(' ');
+
+          switch ( a.length ) {
+            case 1:
+              return foam.core.Export.create({exportName: a[0], key: a[0]}); 
+
+            case 2:
+              // Export 'this'
+              console.assert(
+                  a[0] === 'as',
+                  'Invalid export syntax: key [as value] | as value');
+              return foam.core.Export.create({exportName: a[1], key: null}); 
+
+            case 3:
+              console.assert(
+                  a[1] === 'as',
+                  'Invalid export syntax: key [as value] | as value');
+              return foam.core.Export.create({exportName: a[2], key: a[0]}); 
+
+            default:
+              console.error(
+                  'Invalid export syntax: key [as value] | as value');
+          }
+        }
+
+        return foam.core.Export.create(o);
       }
     }
   ]

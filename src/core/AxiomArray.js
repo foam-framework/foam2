@@ -52,7 +52,8 @@ foam.CLASS({
                     'Tried to set', prop.name, 'to non array value');
 
         // FUTURE: Use __context__.lookup ?
-        var of = foam.lookup(prop.of);
+        var of = foam.lookup(prop.of, true);
+        console.assert(of, 'Unknown "of" Model in AxiomArray: property=', prop.name, ' of=', prop.of);
         for ( var i = 0 ; i < v.length ; i++ ) {
           console.assert(of.isInstance(v[i]),
                       'Element', i, 'of', prop.name, 'is not an instance of',
