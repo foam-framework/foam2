@@ -25,10 +25,6 @@ foam.CLASS({
     'foam.box.NamedBox'
   ],
 
-  imports: [
-    'me'
-  ],
-
   properties: [
     {
       name: 'source',
