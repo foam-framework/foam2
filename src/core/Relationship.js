@@ -87,6 +87,21 @@ foam.CLASS({
         if ( ! this.oneWay ) target.installAxiom(tp);
       }
 
+      var relationship = this;
+
+      // Install filtered target DAO in source Model
+      var daoProp = foam.core.Property.create({
+        name: this.name,
+        factory: function() {
+          return foam.dao.RelationshiopDAO.create({
+            obj: this,
+            relationship: relationship
+          }, this);
+        }
+      });
+
+      source.installAxiom(daoProp);
+
       /*
       if ( ! this.oneWay ) {
         sourceProperty.preSet = function(_, newValue) {

@@ -367,13 +367,18 @@ foam.CLASS({
           // expensive to generate, and if the value has been explicitly set to
           // some value, then it isn't worth the expense of computing the old
           // stale value.
-          var oldValue =
-            factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
-            eFactory ?
-                ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ?
-                  this[name] :
-                  undefined ) :
-            this[name] ;
+          var oldValue;
+
+          if ( factory ) {
+            oldValue = this.instance_[name];
+            oldValue = oldValue === FIP ? undefined : this.hasOwnProperty(name) ? this[name] : undefined;
+          } else if ( eFactory ) {
+            oldValue = this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ?
+                this[name] :
+                undefined  ;
+          } else {
+            oldValue = this[name];
+          }
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
 
