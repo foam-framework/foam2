@@ -339,9 +339,9 @@ foam.CLASS({
           }
 
           // Indicate the Factory In Progress state
-          this[name] = FIP;
+          this.instance_[name] = FIP;
 
-          return this.instance_[name] = factory.call(this);
+          return this[name] = factory.call(this);
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
