@@ -288,17 +288,20 @@ foam.CLASS({
       var slotName    = name + '$';
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
-      var FIP         = factory && {}; // Factory In Progress
+      var FIP         = prop.name + '_fip'; // Factory In Progress
 
       // Factory In Progress (FIP) Support
-      // When a factory method is in progress, the property's value is
-      // set to FIP. This allows for the detection and elimination of
+      // When a factory method is in progress, the object sets a private
+      // flag named by the value in FIP.
+      // This allows for the detection and elimination of
       // infinite recursions (if a factory accesses another property
       // which in turn tries to access its propery) and allows for
       // the property change event to not be fired when the value
       // is first set by the factory (since the value didn't change,
       // the factory is providing its original value).
 
+
+      // Property Slot
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
       //
@@ -333,15 +336,17 @@ foam.CLASS({
         factory ? function factoryGetter() {
           if ( this.hasOwnProperty(name) ) return this.instance_[name];
 
-          if ( this.instance_[name] === FIP ) {
+          // Indicate the Factory In Progress state
+          if ( this.getPrivate_(FIP) ) {
             console.warn('reentrant factory', name);
             return undefined;
           }
 
-          // Indicate the Factory In Progress state
-          this.instance_[name] = FIP;
+          this.setPrivate_(FIP, true);
+          this[name] = factory.call(this);
+          this.setPrivate_(FIP, false);
 
-          return this[name] = factory.call(this);
+          return this.instance_[name];
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
@@ -367,18 +372,13 @@ foam.CLASS({
           // expensive to generate, and if the value has been explicitly set to
           // some value, then it isn't worth the expense of computing the old
           // stale value.
-          var oldValue;
-
-          if ( factory ) {
-            oldValue = this.instance_[name];
-            oldValue = oldValue === FIP ? undefined : this.hasOwnProperty(name) ? this[name] : undefined;
-          } else if ( eFactory ) {
-            oldValue = this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ?
-                this[name] :
-                undefined  ;
-          } else {
-            oldValue = this[name];
-          }
+          var oldValue =
+            factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
+            eFactory ?
+                ( this.hasOwnPrivate_(name) || this.hasOwnProperty(name) ?
+                  this[name] :
+                  undefined ) :
+            this[name] ;
 
           if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
 
