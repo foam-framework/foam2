@@ -17,7 +17,7 @@ if ( navigator.serviceWorker ) {
   // });
 }
 
-var env    = foam.apps.chat.Context.create(null, foam.box.Context.create());
+var env    = foam.apps.chat.Context.create();
 var client = foam.apps.chat.Client.create(null, env);
 var ME     = 'Anonymous';
 
