@@ -435,9 +435,9 @@ foam.CLASS({
             // We turn this into a Date range for the current day, or a day a few
             // weeks before.
             var d = new Date();
-            var year = d.getFullYear();
+            var year  = d.getFullYear();
             var month = d.getMonth();
-            var date = d.getDate();
+            var date  = d.getDate();
             if ( v[1] ) date -= v[1][1];
 
             return actions['literal date']([ year, '-', month + 1, '-', date ]);
