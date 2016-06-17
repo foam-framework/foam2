@@ -19,8 +19,9 @@
 
 foam.CLASS({
   package: 'foam.mlang.sink',
-  implements: ['foam.dao.Sink'],
   name: 'Count',
+
+  implements: ['foam.dao.Sink'],
 
   properties: [
     {
@@ -248,6 +249,7 @@ foam.CLASS({
       }
       return false;
     }
+    // TODO: partialEval
   ]
 });
 
@@ -264,6 +266,7 @@ foam.CLASS({
       }
       return true;
     }
+    // TODO: partialEval
   ]
 });
 
@@ -493,6 +496,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gt',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
@@ -506,6 +510,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gte',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
@@ -541,6 +546,7 @@ foam.CLASS({
     function f(obj) {
       return ! this.arg1.f(obj);
     }
+    // TODO: partialEval
   ]
 });
 
@@ -548,11 +554,12 @@ foam.CLASS({
 /** Map sink transforms each put with a given mapping expression. */
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Map',
   extends: 'foam.dao.ProxySink',
+
   implements: [
     'foam.mlang.predicate.Unary'
   ],
-  name: 'Map',
 
   methods: [
     function f(o) {
