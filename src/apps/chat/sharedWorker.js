@@ -77,8 +77,7 @@ foam.CLASS({
   ]
 });
 
-var env = foam.box.Context.create();
+var env = foam.apps.chat.Context.create();
 env.messagePortService.source = self;
-var env = foam.apps.chat.Context.create(null, env);
 
 var agent = SharedWorker.create(null, env);
