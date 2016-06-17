@@ -107,7 +107,7 @@ foam.CLASS({
       [
         'registry'
       ].map(function(s) {
-        cls.installAxiom(foam.core.Imports.create({
+        cls.installAxiom(foam.core.Import.create({
           key: s,
           name: s
         }));

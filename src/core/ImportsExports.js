@@ -154,11 +154,8 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      if ( proto.hasOwnProperty('__subContext__' ) ) {
-        console.log('redundant');
+      if ( Object.prototype.hasOwnProperty.call(proto, '__subContext__' ) ) {
         return;
-      } else {
-        console.log('not redundant');
       }
 
       Object.defineProperty(proto, '__subContext__', {
@@ -207,7 +204,7 @@ foam.CLASS({
   properties: [
     {
       class: 'AxiomArray',
-      of: 'Imports',
+      of: 'Import',
       name: 'imports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
@@ -220,7 +217,7 @@ foam.CLASS({
     },
     {
       class: 'AxiomArray',
-      of: 'Exports',
+      of: 'Export',
       name: 'exports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
