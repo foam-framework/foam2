@@ -288,7 +288,7 @@ foam.CLASS({
       var slotName    = name + '$';
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
-      var FIP         = factory && ''; // Factory In Progress
+      var FIP         = factory && {}; // Factory In Progress
 
       // Factory In Progress (FIP) Support
       // When a factory method is in progress, the property's value is
