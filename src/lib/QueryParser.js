@@ -437,7 +437,7 @@ foam.CLASS({
             var d = new Date();
             var year  = d.getFullYear();
             var month = d.getMonth();
-            var date  = d.getDate();
+            var date  = d.getDate() + 1;
             if ( v[1] ) date -= v[1][1];
 
             return actions['literal date']([ year, '-', month + 1, '-', date ]);
