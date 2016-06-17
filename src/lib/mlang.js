@@ -248,6 +248,7 @@ foam.CLASS({
       }
       return false;
     }
+    // TODO: partialEval
   ]
 });
 
@@ -264,6 +265,7 @@ foam.CLASS({
       }
       return true;
     }
+    // TODO: partialEval
   ]
 });
 
@@ -541,6 +543,7 @@ foam.CLASS({
     function f(obj) {
       return ! this.arg1.f(obj);
     }
+    // TODO: partialEval
   ]
 });
 
