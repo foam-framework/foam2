@@ -173,9 +173,9 @@ foam.CLASS({
             properties: [
               {
                 class: 'Proxy',
-                name: delegateName,
-                of: this.of,
-                topics: this.topics,
+                name:    delegateName,
+                of:      this.of,
+                topics:  this.topics,
                 methods: methodNames
               }
             ],
