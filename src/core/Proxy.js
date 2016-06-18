@@ -216,7 +216,8 @@ foam.CLASS({
 });
 
 
-//TODO(adamvy): document
+// TODO(adamvy): document
+// TODO: change design to have methods: and forwards:.
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
@@ -243,9 +244,9 @@ foam.CLASS({
     function installInClass(cls) {
       this.SUPER(cls);
 
-      var name = this.name;
+      var name     = this.name;
       var delegate = foam.lookup(this.of);
-      var methods = this.methods ?
+      var methods  = this.methods ?
           this.methods.map(function(f) {
             var m = delegate.getAxiomByName(f);
             foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
