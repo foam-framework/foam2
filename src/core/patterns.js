@@ -20,6 +20,7 @@
   the Singleton Pattern, meaning that all calls to create()
   will return the same (single) instance.
 */
+// TODO: doesn't work with subclassing, fix
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
