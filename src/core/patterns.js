@@ -20,17 +20,16 @@
   the Singleton Pattern, meaning that all calls to create()
   will return the same (single) instance.
 */
-// TODO: doesn't work with subclassing, fix
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
 
   methods: [
     function installInClass(cls) {
-      var instance;
       var oldCreate = cls.create;
       cls.create = function() {
-        return instance || ( instance = oldCreate.apply(this, arguments) );
+        return this.private_.instance_ ||
+            ( this.private_.instance_ = oldCreate.apply(this, arguments) );
       }
     },
     function clone() { return this; },
