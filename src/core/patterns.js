@@ -63,10 +63,11 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var instances = {};
       var property  = this.property;
       var oldCreate = cls.create;
       cls.create = function(args) {
+        var instances = this.private_.instances ||
+            ( this.private_.instances = {} );
         var key = args[property];
         return instances[key] || ( instances[key] = oldCreate.apply(this, arguments) );
       }
