@@ -85,7 +85,7 @@ foam.CLASS({
   ]
 });
 
-
+// TODO(adamvy): Singleton now supports inheritance, so move Singleton to PendingBase.
 foam.CLASS({
   package: 'foam.promise',
   name: 'Pending',
