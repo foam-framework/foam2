@@ -1223,6 +1223,17 @@ AxiomTest.create();
 AxiomTest.create();
 log(AxiomTest.create() === AxiomTest.create());
 
+//
+foam.CLASS({
+  name: 'AxiomSubTest',
+  extends: 'AxiomTest',
+  methods: [ function init() { log('Creating AxiomSubTest'); } ]
+});
+AxiomSubTest.create();
+AxiomSubTest.create();
+log(AxiomSubTest.create() === AxiomSubTest.create());
+log(AxiomSubTest.create() === AxiomTest.create());
+
 // Stdlib
 
 //:NOTEST
