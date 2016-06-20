@@ -122,6 +122,10 @@ foam.CLASS({
       var targetClass = this.lookup(this.targetModel);
       var targetProp  = targetClass['PARENT'];
       return this.EQ(targetProp, obj.id);
+    },
+
+    function adaptTarget(source, target) {
+      target.parent = source.id;
     }
   ]
 });

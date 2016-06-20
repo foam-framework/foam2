@@ -52,7 +52,7 @@ foam.CLASS({
 
   methods: [
     function put(obj, sink) {
-      this.relationship.adaptTarget(obj);
+      this.relationship.adaptTarget(this.obj, obj);
 
       return this.SUPER(obj, sink);
     }
