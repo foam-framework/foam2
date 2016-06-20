@@ -93,7 +93,7 @@ foam.CLASS({
       var daoProp = foam.core.Property.create({
         name: this.name,
         factory: function() {
-          return foam.dao.RelationshiopDAO.create({
+          return foam.dao.RelationshipDAO.create({
             obj: this,
             relationship: relationship
           }, this);
