@@ -288,7 +288,7 @@ foam.CLASS({
       var slotName    = name + '$';
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
-      var FIP         = prop.name + '_fip'; // Factory In Progress
+      var FIP         = factory && ( prop.name + '_fip' ); // Factory In Progress
 
       // Factory In Progress (FIP) Support
       // When a factory method is in progress, the object sets a private
@@ -344,7 +344,7 @@ foam.CLASS({
 
           this.setPrivate_(FIP, true);
           this[name] = factory.call(this);
-          this.setPrivate_(FIP, false);
+          this.clearPrivate_(FIP);
 
           return this.instance_[name];
         } :
