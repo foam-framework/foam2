@@ -42,6 +42,12 @@ foam.CLASS({
       getter: function() {
         return this.relationship.targetQueryFromSource(this.obj);
       }
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+        return this.__context__[this.relationship.targetModel + 'DAO'];
+      }
     }
   ],
 
