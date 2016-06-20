@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Relationship',
+  implements: [ 'foam.mlang.Expressions' ],
 
   properties: [
     'name',
@@ -115,6 +116,12 @@ foam.CLASS({
         };
       }
       */
+    },
+
+    function targetQueryFromSource(obj) {
+      var targetClass = this.lookup(this.targetModel);
+      var targetProp  = targetClass['PARENT'];
+      return this.EQ(targetProp, obj.id);
     }
   ]
 });

@@ -18,8 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'RelationshipDAO',
-//  extends: 'foam.dao.FilteredDAO',
-  extends: 'foam.dao.ProxyDAO',
+  extends: 'foam.dao.FilteredDAO',
 
   documentation: 'Adapts a DAO based on a Relationship.',
 
