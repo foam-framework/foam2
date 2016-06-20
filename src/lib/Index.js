@@ -765,7 +765,6 @@ foam.CLASS({
 });
 
 
-
 /** An Index which adds other indices as needed. **/
 foam.CLASS({
   package: 'foam.dao.index',
@@ -774,7 +773,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.Property',
-    'foam.dao.index.NoPlan',
+    'foam.dao.index.NoPlan'
   ],
 
   properties: [
