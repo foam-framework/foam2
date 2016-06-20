@@ -20,6 +20,11 @@ foam.CLASS({
   name: 'MythologicalWorld',
   requires: [ 'Parent1', 'Child1' ],
 
+  exports: [
+    'parents as Parent1DAO',
+    'children as Child1DAO'
+  ],
+
   properties: [
     {
       name: 'parents',
@@ -53,6 +58,9 @@ foam.CLASS({
 
       console.log('Odin\'s Children:');
       odin.children.select({put: function(o) { console.log(o.stringify()); }});
+
+      console.log('Zeus\'s Children:');
+      zeus.children.select({put: function(o) { console.log(o.stringify()); }});
     }
   ]
 });
