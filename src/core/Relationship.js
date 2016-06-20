@@ -92,6 +92,7 @@ foam.CLASS({
       // Install filtered target DAO in source Model
       var daoProp = foam.core.Property.create({
         name: this.name,
+        transient: true,
         factory: function() {
           return foam.dao.RelationshipDAO.create({
             obj: this,
