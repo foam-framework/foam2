@@ -48,7 +48,6 @@ foam.CLASS({
       parents.put(zeus = this.Parent1.create({name: 'Zeus'}));
       children.put(this.Child1.create({name: 'Ares',   parent: 'Zeus'}));
       children.put(this.Child1.create({name: 'Athena', parent: 'Zeus'}));
-      children.put(this.Child1.create({name: 'Apollo', parent: 'Zeus'}));
 
       console.log('Parents:');
       parents.select({put: function(o) { console.log(o.stringify()); }});
@@ -60,6 +59,11 @@ foam.CLASS({
       odin.children.select({put: function(o) { console.log(o.stringify()); }});
 
       console.log('Zeus\'s Children:');
+      zeus.children.select({put: function(o) { console.log(o.stringify()); }});
+
+      zeus.children.put(this.Child1.create({name: 'Apollo'}));
+
+      console.log('Zeus\'s Children (after adding Apollo):');
       zeus.children.select({put: function(o) { console.log(o.stringify()); }});
     }
   ]
