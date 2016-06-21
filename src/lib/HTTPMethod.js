@@ -84,22 +84,20 @@ foam.CLASS({
 
       // set up function with correct args, pass them into the
       // actual implementation, callRemote_()
-      // ALTERNATE: just pass args in and read from arguments
-      var code = "(function "+axiom.name+"_"+"(";
-      var names = this.args.map(axiom.HTTPArgument.NAME.f);
-      code += names.join(', ');
-      code += ') {\n';
-      code += 'var opt_args = {\n';
-      names.forEach(function(name) {
-        code += '  '+name+': '+name+',\n';
-      });
-      code += '};\n';
-      code += 'return axiom.callRemote_(opt_args, this);\n';
-      code += '})';
 
-      code = eval(code);
+      // Get list of argument names
+      var argNames = this.args.map(axiom.HTTPArgument.NAME.f);
+      // load named values into opt_args object and pass to the generic callRemote_()
+      this.code = function() {
+        var opt_args = {};
+        for ( var i = 0; i < arguments.length && i < argNames.length; i ++ ) {
+          opt_args[argNames[i]] = arguments[i];
+        }
+        return axiom.callRemote_(opt_args, this);
+      }
 
-      p[axiom.name] = code;
+      // set code on proto
+      p[axiom.name] = this.code;
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
