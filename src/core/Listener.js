@@ -43,6 +43,7 @@
     <pre>alarm.ring.sub(sprinker.onAlarm.bind(sprinkler));</pre>
   But listeners are pre-bound.
 */
+// TODO(kgr): Add SUPER support.
 foam.CLASS({
   package: 'foam.core',
   name: 'Listener',
