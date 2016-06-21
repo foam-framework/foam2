@@ -479,7 +479,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ],
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       postSet: function(old, nu) {
         // Only fire a 'reset' when the delegate is actually changing, not being
         // set for the first time.
@@ -978,7 +978,7 @@ foam.CLASS({
           class: 'Proxy',
           of: 'foam.dao.DAO',
           name: 'src',
-          methods: [ 'put', 'remove', 'removeAll' ],
+          forwards: [ 'put', 'remove', 'removeAll' ],
           postSet: function(old, src) {
             if ( old ) {
               old.on.put.unsub(this.onPut);
@@ -995,7 +995,7 @@ foam.CLASS({
           of: 'foam.dao.DAO',
           name: 'cache',
           topics: [ 'on' ],
-          methods: [ 'find', 'select' ]
+          forwards: [ 'find', 'select' ]
         }
       ],
       listeners: [

@@ -208,7 +208,6 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.promise.IPromise',
       name: 'state',
-      methods: [ 'then', 'catch', 'fulfill_', 'reject_' ],
       delegates: [ 'then', 'catch', 'fulfill_', 'reject_' ],
       factory: function() {
         return this.Pending.create();
