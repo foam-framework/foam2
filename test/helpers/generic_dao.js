@@ -24,10 +24,8 @@
 
 
 global.genericDAOTestBattery = function(daoFactory) {
-
   describe('generic DAO tests', function() {
     beforeEach(function() {
-
       foam.CLASS({
         package: 'test.dao.generic',
         name: 'Person',
@@ -62,7 +60,6 @@ global.genericDAOTestBattery = function(daoFactory) {
         ]
       });
     });
-
 
     var mkPerson1 = function() {
       return test.dao.generic.Person.create({
