@@ -47,10 +47,9 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Listener',
+  extends: 'foam.core.AbstractMethod',
 
   properties: [
-    { name: 'name', required: true },
-    { name: 'code', required: true },
     { class: 'Boolean', name: 'isFramed',   value: false },
     { class: 'Boolean', name: 'isMerged',   value: false },
     { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' }
@@ -59,13 +58,15 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       var name       = this.name;
-      var code       = this.code;
+      var code       = this.override_(proto, this.code);
       var isMerged   = this.isMerged;
       var isFramed   = this.isFramed;
       var mergeDelay = this.mergeDelay;
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
+          if ( this.cls_.prototype === this ) return code;
+
           if ( ! this.hasOwnPrivate_(name) ) {
             var self = this;
             var l = function(sub) {
