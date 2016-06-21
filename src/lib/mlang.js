@@ -108,8 +108,8 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-        },
-      ],
+        }
+      ]
     },
     /** Converts this expression to a human-readable string for debugging. */
     function toString() {
