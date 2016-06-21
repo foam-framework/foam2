@@ -605,6 +605,23 @@ d2();
 d1();
 d2();
 
+// Listeners, like Methods, have SUPER support.
+foam.CLASS({
+  name: 'Alarm',
+  listeners: [
+    function alarm() { console.log('alarm'); }
+  ]
+});
+foam.CLASS({
+  name: 'LongAlarm',
+  extends: 'Alarm',
+  listeners: [
+    function alarm() { console.log('LongAlarm:'); this.SUPER(); this.SUPER(); this.SUPER(); }
+  ]
+});
+Alarm.create().alarm();
+LongAlarm.create().alarm();
+
 // Actions are methods which have extra information to make it easier
 // to call them from GUI's. Extra information includes things like:
 // a label, speech label, functions to determine if the action is currently
