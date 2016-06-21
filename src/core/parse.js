@@ -155,9 +155,13 @@ foam.CLASS({
   ],
 
   methods: [
+    /*
+      TODO: make this model abstract
+      TODO: allow methods without code in abstract classes
     {
       name: 'step'
     },
+    */
     function partialEval() {
       return this;
     }

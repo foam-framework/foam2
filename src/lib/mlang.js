@@ -105,6 +105,7 @@ foam.CLASS({
      */
     {
       name: 'f',
+code: function() {}, // TODO: don't require code for abstract classes, then remove
       args: [
         {
           name: 'obj',

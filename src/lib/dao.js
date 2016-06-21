@@ -88,43 +88,55 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'DAO',
 
+  // TODO: make an interface or abstract, then remove NOP code:'s
+
   // documentation: 'DAO Interface',
 
   methods: [
     {
       name: 'put',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'remove',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'find',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'select',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'removeAll',
+code: function() { },
       returns: 'Promise'
     },
     {
-      name: 'pipe'
+      name: 'pipe',
+code: function() { },
     },
     {
-      name: 'where'
+      name: 'where',
+code: function() { },
     },
     {
-      name: 'orderBy'
+      name: 'orderBy',
+code: function() { },
     },
     {
-      name: 'skip'
+      name: 'skip',
+code: function() { },
     },
     {
-      name: 'limit'
+      name: 'limit',
+code: function() { },
     }
   ]
 });
