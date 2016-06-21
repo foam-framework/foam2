@@ -18,8 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'RelationshipDAO',
-//  extends: 'foam.dao.FilteredDAO',
-  extends: 'foam.dao.ProxyDAO',
+  extends: 'foam.dao.FilteredDAO',
 
   documentation: 'Adapts a DAO based on a Relationship.',
 
@@ -42,12 +41,18 @@ foam.CLASS({
       getter: function() {
         return this.relationship.targetQueryFromSource(this.obj);
       }
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+        return this.__context__[this.relationship.targetModel + 'DAO'];
+      }
     }
   ],
 
   methods: [
     function put(obj, sink) {
-      this.relationship.adaptTarget(obj);
+      this.relationship.adaptTarget(this.obj, obj);
 
       return this.SUPER(obj, sink);
     }

@@ -77,15 +77,18 @@ foam.CLASS({
   package: 'foam.box',
   name: 'MessagePortBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.MessagePortConnectBox',
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage'
   ],
+
   imports: [
     'messagePortService',
     'me'
   ],
+
   properties: [
     {
       name: 'port'
@@ -105,6 +108,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -280,13 +284,14 @@ foam.CLASS({
     'foam.box.SubBox'
   ],
 
+  imports: [
+    'me'
+  ],
+
   properties: [
     {
       name: 'registry',
       factory: function() { return {}; }
-    },
-    {
-      name: 'me'
     }
   ],
 
@@ -368,6 +373,7 @@ foam.CLASS({
         }
       }
     },
+
     function toRemote() {
       return this.me;
     }
@@ -550,6 +556,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'SubscribeMessage',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'topic'
@@ -942,7 +949,7 @@ foam.CLASS({
           ws.connected.sub(function(s) {
             s.destroy();
             var delegate = this.RawWebSocketBox.create({ socket: ws });
-            delegate.send(this.RegisterSelfMessage.create({ name: this.me }));
+            delegate.send(this.RegisterSelfMessage.create({ name: this.me.name }));
             this.webSocketService.addSocket(ws);
             resolve(delegate);
           }.bind(this));
@@ -961,10 +968,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
+
   requires: [
     'foam.box.BoxRegistryBox',
     'foam.box.NamedBox'
   ],
+
   exports: [
     'messagePortService',
     'socketService',
@@ -973,6 +982,7 @@ foam.CLASS({
     'root',
     'me'
   ],
+
   properties: [
     {
       name: 'messagePortService',
@@ -1012,9 +1022,7 @@ foam.CLASS({
     {
       name: 'registry',
       factory: function() {
-        return this.BoxRegistryBox.create({
-          me: this.me
-        });
+        return this.BoxRegistryBox.create();
       }
     },
     {
@@ -1028,7 +1036,5 @@ foam.CLASS({
         });
       }
     }
-  ],
-  methods: [
   ]
 });

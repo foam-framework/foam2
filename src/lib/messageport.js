@@ -18,14 +18,13 @@
 foam.CLASS({
   package: 'foam.messageport',
   name: 'MessagePortService',
+
   requires: [
     'foam.box.RegisterSelfMessage',
     'foam.box.RawMessagePortBox',
     'foam.box.NamedBox'
   ],
-  imports: [
-    'me'
-  ],
+
   properties: [
     {
       name: 'source',
@@ -39,17 +38,20 @@ foam.CLASS({
       required: true
     }
   ],
+
   methods: [
     function addPort(p) {
       p.onmessage = this.onMessage.bind(this, p);
     }
   ],
+
   listeners: [
     function onConnect(e) {
       for ( var i = 0 ; i < e.ports.length ; i++ ) {
         this.addPort(e.ports[i]);
       }
     },
+
     function onMessage(port, e) {
       var msg = foam.json.parse(foam.json.parseString(e.data));
 

@@ -213,11 +213,11 @@ foam.CLASS({
   extends: 'Method',
 
   properties: [
-    'name',
     {
       name: 'template',
       class: 'String'
     },
+    { name: 'code', required: false },
     'args'
   ],
 

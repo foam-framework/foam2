@@ -55,10 +55,13 @@
 */
 foam.CLASS({
   package: 'foam.core',
-  name: 'Method',
+  name: 'AbstractMethod',
   extends: 'FObject',
 
-  properties: [ 'name', 'code', 'returns' ],
+  properties: [
+    { name: 'name', required: true },
+    { name: 'code', required: true }
+  ],
 
   methods: [
     /**
@@ -100,8 +103,19 @@ foam.CLASS({
       f.toString = function() { return method.toString(); };
 
       return f;
-    },
+    }
+  ]
+});
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Method',
+  extends: 'foam.core.AbstractMethod',
+
+  properties: [ 'returns' ],
+
+  methods: [
     function installInProto(proto) {
       proto[this.name] = this.override_(proto, this.code);
     },

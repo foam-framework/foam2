@@ -26,10 +26,10 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var instance;
       var oldCreate = cls.create;
       cls.create = function() {
-        return instance || ( instance = oldCreate.apply(this, arguments) );
+        return this.private_.instance_ ||
+            ( this.private_.instance_ = oldCreate.apply(this, arguments) );
       }
     },
     function clone() { return this; },
@@ -63,10 +63,11 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var instances = {};
-      var property = this.property;
+      var property  = this.property;
       var oldCreate = cls.create;
       cls.create = function(args) {
+        var instances = this.private_.instances ||
+            ( this.private_.instances = {} );
         var key = args[property];
         return instances[key] || ( instances[key] = oldCreate.apply(this, arguments) );
       }

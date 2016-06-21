@@ -19,8 +19,9 @@
 
 foam.CLASS({
   package: 'foam.mlang.sink',
-  implements: ['foam.dao.Sink'],
   name: 'Count',
+
+  implements: ['foam.dao.Sink'],
 
   properties: [
     {
@@ -104,11 +105,12 @@ foam.CLASS({
      */
     {
       name: 'f',
+code: function() {}, // TODO: don't require code for abstract classes, then remove
       args: [
         {
           name: 'obj',
-        },
-      ],
+        }
+      ]
     },
     /** Converts this expression to a human-readable string for debugging. */
     function toString() {
@@ -139,7 +141,6 @@ foam.CLASS({
     function toString() { return 'TRUE'; }
   ]
 });
-
 
 /** Singleton for the value "true". */
 foam.CLASS({
@@ -215,6 +216,12 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Expr',
   abstract: true,
 
+  // ???: Is this a good idea, or make a LIB or something else
+  constants: {
+    TRUE:  foam.mlang.predicate.True.create(),
+    FALSE: foam.mlang.predicate.False.create()
+  },
+
   properties: [
     {
       class: 'foam.mlang.ExprArray',
@@ -247,6 +254,49 @@ foam.CLASS({
         if ( this.args[i].f(o) ) return true;
       }
       return false;
+    },
+    function partialEval() {
+      return this;
+      // TODO: port FOAM1 code below
+      var newArgs = [];
+      var updated = false;
+
+      for ( var i = 0 ; i < this.args.length ; i++ ) {
+        var a    = this.args[i];
+        var newA = this.args[i].partialEval();
+
+        if ( newA === TRUE ) return TRUE;
+
+        if ( OrExpr.isInstance(newA) ) {
+          // In-line nested OR clauses
+          for ( var j = 0 ; j < newA.args.length ; j++ ) {
+            newArgs.push(newA.args[j]);
+          }
+          updated = true;
+        }
+        else {
+          if ( newA !== FALSE ) {
+            newArgs.push(newA);
+          }
+          if ( a !== newA ) updated = true;
+        }
+      }
+
+      for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
+        for ( var j = i+1 ; j < newArgs.length ; j++ ) {
+          var a = this.partialOr(newArgs[i], newArgs[j]);
+          if ( a ) {
+            if ( a === TRUE ) return TRUE;
+            newArgs[i] = a;
+            newArgs.splice(j, 1);
+          }
+        }
+      }
+
+      if ( newArgs.length == 0 ) return FALSE;
+      if ( newArgs.length == 1 ) return newArgs[0];
+
+      return updated ? OrExpr.create({args: newArgs}) : this;
     }
   ]
 });
@@ -263,6 +313,51 @@ foam.CLASS({
         if ( ! this.args[i].f(o) ) return false;
       }
       return true;
+    },
+    function partialEval() {
+      return this;
+      // TODO: port FOAM1 code below
+      var newArgs = [];
+      var updated = false;
+
+      for ( var i = 0 ; i < this.args.length ; i++ ) {
+        var a    = this.args[i];
+        var newA = this.args[i].partialEval();
+
+        if ( newA === FALSE ) return FALSE;
+
+        if ( AndExpr.isInstance(newA) ) {
+          // In-line nested AND clauses
+          for ( var j = 0 ; j < newA.args.length ; j++ ) {
+            newArgs.push(newA.args[j]);
+          }
+          updated = true;
+        }
+        else {
+          if ( newA === TRUE ) {
+            updated = true;
+          } else {
+            newArgs.push(newA);
+            if ( a !== newA ) updated = true;
+          }
+        }
+      }
+
+      for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
+        for ( var j = i+1 ; j < newArgs.length ; j++ ) {
+          var a = this.partialAnd(newArgs[i], newArgs[j]);
+          if ( a ) {
+            if ( a === FALSE ) return FALSE;
+            newArgs[i] = a;
+            newArgs.splice(j, 1);
+          }
+        }
+      }
+
+      if ( newArgs.length == 0 ) return TRUE;
+      if ( newArgs.length == 1 ) return newArgs[0];
+
+      return updated ? AndExpr.create({args: newArgs}) : this;
     }
   ]
 });
@@ -493,6 +588,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gt',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
@@ -506,6 +602,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gte',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
@@ -540,6 +637,22 @@ foam.CLASS({
   methods: [
     function f(obj) {
       return ! this.arg1.f(obj);
+    },
+    function partialEval() {
+      return this;
+      var newArg = this.arg1.partialEval();
+
+      if ( newArg === TRUE ) return FALSE;
+      if ( newArg === FALSE ) return TRUE;
+      if ( NotExpr.isInstance(newArg) ) return newArg.arg1;
+      if ( EqExpr.isInstance(newArg)  ) return NeqExpr.create(newArg);
+      if ( NeqExpr.isInstance(newArg) ) return EqExpr.create(newArg);
+      if ( LtExpr.isInstance(newArg)  ) return GteExpr.create(newArg);
+      if ( GtExpr.isInstance(newArg)  ) return LteExpr.create(newArg);
+      if ( LteExpr.isInstance(newArg) ) return GtExpr.create(newArg);
+      if ( GteExpr.isInstance(newArg) ) return LtExpr.create(newArg);
+
+      return this.arg1 === newArg ? this : NOT(newArg);
     }
   ]
 });
@@ -548,11 +661,12 @@ foam.CLASS({
 /** Map sink transforms each put with a given mapping expression. */
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Map',
   extends: 'foam.dao.ProxySink',
+
   implements: [
     'foam.mlang.predicate.Unary'
   ],
-  name: 'Map',
 
   methods: [
     function f(o) {

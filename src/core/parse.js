@@ -82,6 +82,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserArray',
@@ -103,6 +104,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserProperty',
@@ -118,6 +120,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserDecorator',
@@ -130,6 +133,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -151,14 +155,19 @@ foam.CLASS({
   ],
 
   methods: [
+    /*
+      TODO: make this model abstract
+      TODO: allow methods without code in abstract classes
     {
       name: 'step'
     },
+    */
     function partialEval() {
       return this;
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -186,6 +195,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'BacktrackFinish',
@@ -206,6 +216,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -231,6 +242,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Char',
@@ -254,6 +266,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -285,6 +298,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /**
  * Case-insensitive literal that returns a fixed value when it matches.
@@ -328,6 +342,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Literal',
@@ -356,6 +371,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -393,6 +409,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'AnyChar',
@@ -410,6 +427,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -440,6 +458,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -551,6 +570,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'Action',
@@ -571,6 +591,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -597,6 +618,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'SetValue',
@@ -621,6 +643,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse.compiled',
@@ -647,6 +670,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'AddValue',
@@ -672,6 +696,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.compiled',
   name: 'FinishValue',
@@ -696,6 +721,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -739,6 +765,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -789,6 +816,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Alternate',
@@ -831,6 +859,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -898,6 +927,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -967,6 +997,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Optional',
@@ -982,6 +1013,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1002,6 +1034,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1029,6 +1062,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1062,6 +1096,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1232,6 +1267,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'ParserWithAction',
@@ -1344,6 +1380,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',

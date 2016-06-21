@@ -83,10 +83,10 @@ foam.CLASS({
     {
       name: 'postSet',
       expression: function(name) {
-        var stateName = name + 'State';
+        var stateName    = name + 'State';
         var delegateName = name + 'Delegate';
         return function(_, p) {
-          this[stateName] = undefined;
+          this[stateName]    = undefined;
           this[delegateName] = undefined;
 
           p.then(function(d) {
@@ -101,10 +101,10 @@ foam.CLASS({
     function installInClass(cls) {
       this.SUPER(cls);
 
-      var myName = this.name;
-      var stateName = this.name + 'State';
-      var delegateName = this.name + 'Delegate';
-      var pendingState = 'Pending' + foam.String.capitalize(myName);
+      var myName         = this.name;
+      var stateName      = this.name + 'State';
+      var delegateName   = this.name + 'Delegate';
+      var pendingState   = 'Pending' + foam.String.capitalize(myName);
       var fulfilledState = 'Fulfilled' + foam.String.capitalize(myName);
 
       var delegate = foam.lookup(this.of);
@@ -125,9 +125,8 @@ foam.CLASS({
 
       var myAxioms = [
         foam.core.Proxy.create({
-          name: stateName,
-          of: this.of,
-          methods: methodNames,
+          name:      stateName,
+          of:        this.of,
           delegates: methodNames,
           factory: function() {
             return this[pendingState].create();
@@ -141,7 +140,7 @@ foam.CLASS({
         }),
         foam.core.ProxySub.create({
           topics: this.topics,
-          prop: delegateName
+          prop:   delegateName
         })
       ];
 
@@ -151,7 +150,7 @@ foam.CLASS({
         pendingMethods.push(foam.core.PromisedMethod.create({
           name: methods[i].name,
           property: myName,
-          returns: methods[i].returns,
+          returns:  methods[i].returns,
           delegate: false
         }));
       }
@@ -172,11 +171,11 @@ foam.CLASS({
             name: fulfilledState,
             properties: [
               {
-                class: 'Proxy',
-                name: delegateName,
-                of: this.of,
-                topics: this.topics,
-                methods: methodNames
+                class:    'Proxy',
+                name:     delegateName,
+                of:       this.of,
+                topics:   this.topics,
+                forwards: methodNames
               }
             ],
             axioms: [

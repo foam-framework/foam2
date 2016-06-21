@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Context',
+  extends: 'foam.box.Context',
 
   exports: [
     'isSafari'

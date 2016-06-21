@@ -88,43 +88,55 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'DAO',
 
+  // TODO: make an interface or abstract, then remove NOP code:'s
+
   // documentation: 'DAO Interface',
 
   methods: [
     {
       name: 'put',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'remove',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'find',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'select',
+code: function() { },
       returns: 'Promise'
     },
     {
       name: 'removeAll',
+code: function() { },
       returns: 'Promise'
     },
     {
-      name: 'pipe'
+      name: 'pipe',
+code: function() { },
     },
     {
-      name: 'where'
+      name: 'where',
+code: function() { },
     },
     {
-      name: 'orderBy'
+      name: 'orderBy',
+code: function() { },
     },
     {
-      name: 'skip'
+      name: 'skip',
+code: function() { },
     },
     {
-      name: 'limit'
+      name: 'limit',
+code: function() { },
     }
   ]
 });
@@ -479,7 +491,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ],
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       postSet: function(old, nu) {
         // Only fire a 'reset' when the delegate is actually changing, not being
         // set for the first time.
@@ -978,7 +990,7 @@ foam.CLASS({
           class: 'Proxy',
           of: 'foam.dao.DAO',
           name: 'src',
-          methods: [ 'put', 'remove', 'removeAll' ],
+          forwards: [ 'put', 'remove', 'removeAll' ],
           postSet: function(old, src) {
             if ( old ) {
               old.on.put.unsub(this.onPut);
@@ -995,7 +1007,7 @@ foam.CLASS({
           of: 'foam.dao.DAO',
           name: 'cache',
           topics: [ 'on' ],
-          methods: [ 'find', 'select' ]
+          forwards: [ 'find', 'select' ]
         }
       ],
       listeners: [

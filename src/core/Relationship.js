@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Relationship',
+  implements: [ 'foam.mlang.Expressions' ],
 
   properties: [
     'name',
@@ -87,6 +88,22 @@ foam.CLASS({
         if ( ! this.oneWay ) target.installAxiom(tp);
       }
 
+      var relationship = this;
+
+      // Install filtered target DAO in source Model
+      var daoProp = foam.core.Property.create({
+        name: this.name,
+        transient: true,
+        factory: function() {
+          return foam.dao.RelationshipDAO.create({
+            obj: this,
+            relationship: relationship
+          }, this);
+        }
+      });
+
+      source.installAxiom(daoProp);
+
       /*
       if ( ! this.oneWay ) {
         sourceProperty.preSet = function(_, newValue) {
@@ -99,6 +116,16 @@ foam.CLASS({
         };
       }
       */
+    },
+
+    function targetQueryFromSource(obj) {
+      var targetClass = this.lookup(this.targetModel);
+      var targetProp  = targetClass['PARENT'];
+      return this.EQ(targetProp, obj.id);
+    },
+
+    function adaptTarget(source, target) {
+      target.parent = source.id;
     }
   ]
 });

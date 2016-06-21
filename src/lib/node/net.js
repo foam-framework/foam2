@@ -320,7 +320,7 @@ foam.CLASS({
           socket.once('connect', function() {
             this.socket_ = socket;
             this.write(this.RegisterSelfMessage.create({
-              name: this.me
+              name: this.me.name
             }));
             this.socketService.addSocket(this);
             this.connect.pub();
@@ -424,7 +424,7 @@ foam.CLASS({
         console.log("Server error", e);
         server.unref();
       }.bind(this));
-      this.server.listen(this.port);
+      if ( this.listen ) this.server.listen(this.port);
     },
 
     function addSocket(socket) {
@@ -593,7 +593,9 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'port'
+      class: 'Int',
+      name: 'port',
+      value: 4000
     },
     {
       name: 'server'

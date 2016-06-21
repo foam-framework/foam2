@@ -28,9 +28,9 @@ foam.CLASS({
       class: 'Function',
       name: 'rowFactory',
       required: true,
-      documentation: 'Three options: a class name (eg. "my.app.ui.Foo"), an ' +
-          'actual class object, or a function(args, context) returning an ' +
-          'Element.',
+//    documentation: 'Three options: a class name (eg. "my.app.ui.Foo"), an ' +
+//        'actual class object, or a function(args, context) returning an ' +
+//        'Element.',
       adapt: function(old, nu) {
         if ( typeof nu === 'function' ) return nu;
 
