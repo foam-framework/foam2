@@ -18,11 +18,14 @@
 foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'TempConv',
+
   label: 'Temperature Converter',
+
   properties: [
     { type: 'Float', name: 'c' },
     { type: 'Float', name: 'f' }
   ],
+
   templates: [
     // TODO: Outer <span> shouldn't be required.
     // TODO: x:data={{this}} shouldn't be required, use this:c instead
@@ -30,6 +33,7 @@ foam.CLASS({
     // TODO: Whitespace should be preserved as a single character
     function toE() {/*#U2<span x:data={{this}}><:c onKeyMode="true" precision="4"/> Celsius = <:f onKeyMode="true" precision="4"/> Fahrenheit</span>*/}
   ],
+
   methods: [
     function init() { Events.relate(this.c$, this.f$, this.c2f, this.f2c); },
     function c2f(f) { return 9/5 * f + 32; },

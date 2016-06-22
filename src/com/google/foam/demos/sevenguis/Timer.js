@@ -81,6 +81,7 @@ foam.CLASS({
       ^ .foam-u2-RangeView- { width: 182px; }
       ^ row { display: block; height: 30px; }
     */},
+
     function initE() {/*#U2
       <div class="^" x:data={{this}}>
         <row><span class="label">Elapsed Time:</span> <:progress width="50"/></row>

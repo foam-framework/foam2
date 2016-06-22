@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-MODEL({
-  package: 'foam.demos.sevenguisu2',
+foam.CLASS({
+  package: 'foam.demos.sevenguis',
   name: 'FlightBooker',
   extends: 'foam.u2.Element',
 
