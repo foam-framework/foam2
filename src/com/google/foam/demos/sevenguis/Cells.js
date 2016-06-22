@@ -114,7 +114,7 @@ var CellParser = {
 
 
 // https://www.artima.com/pins1ed/the-scells-spreadsheet.html
-MODEL({
+foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'Cells',
   extends: 'foam.u2.Element',
@@ -183,6 +183,7 @@ MODEL({
       ]
     }
   ],
+
   properties: [
     [ 'rows',    99 ],
     [ 'columns', 26 ],
@@ -195,6 +196,7 @@ MODEL({
       factory: function() { return CellParser; }
     }
   ],
+
   methods: [
     function init() {
       this.SUPER();

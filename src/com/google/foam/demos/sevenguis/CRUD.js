@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-MODEL({
-  package: 'foam.demos.sevenguisu2',
+foam.CLASS({
+  package: 'foam.demos.sevenguis',
   name: 'Person',
 
   tableProperties: [ 'surname', 'name' ],
@@ -29,8 +29,8 @@ MODEL({
 });
 
 
-MODEL({
-  package: 'foam.demos.sevenguisu2',
+FOAM.class({
+  package: 'foam.demos.sevenguis',
   name: 'CRUD',
   extends: 'foam.u2.Element',
 
@@ -85,6 +85,7 @@ MODEL({
       factory: function() { return this.Person.create(); }
     }
   ],
+
   templates: [
     function CSS() {/*
       ^ { padding: 10px; }
@@ -111,6 +112,7 @@ MODEL({
       </div>
     */}
   ],
+
   actions: [
     {
       name: 'createItem',

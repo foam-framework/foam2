@@ -64,9 +64,9 @@ MODEL({
     {
       name: 'returnDateMode',
       factory: function() { return this.dynamic(function(oneWay) { return oneWay ? 'disabled' : 'rw'; }, this.oneWay$); }
-    } 
+    }
   ],
-                                                
+
   templates: [
     function CSS() {/*
       ^ { padding: 10px; }
@@ -86,6 +86,7 @@ MODEL({
       </div>
     */}
   ],
+
   actions: [
     {
       name: 'book',

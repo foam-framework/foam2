@@ -34,7 +34,7 @@ foam.CLASS({
     UNSELECTED_COLOR: 'white'
   },
 
-  models: [
+  classes: [
     {
       name: 'DiameterDialog',
       extends: 'foam.u2.Element',
@@ -81,6 +81,7 @@ foam.CLASS({
       }
     },
   ],
+
   methods: [
     /*
       TODO: Need a canvas Element.
@@ -90,6 +91,7 @@ foam.CLASS({
       this.canvas.$.addEventListener('contextmenu', this.onRightClick);
     },
     */
+
     function addCircle(x, y, opt_d) {
       var c = this.Circle.create({
         x: x,
@@ -100,6 +102,7 @@ foam.CLASS({
       this.canvas.addChild(c);
       return c;
     },
+
     function updateMemento() {
       var m = [];
       var cs = this.canvas.children;
@@ -112,6 +115,7 @@ foam.CLASS({
       this.feedback_ = false;
     }
   ],
+
   listeners: [
     function onClick(evt) {
       var x = evt.offsetX, y = evt.offsetY, c = this.canvas.findChildAt(x, y);
@@ -138,6 +142,7 @@ foam.CLASS({
       }.bind(this));
     }
   ],
+
   templates: [
     function CSS() {/*
       ^ { width:600px; margin: 20px; }
@@ -146,6 +151,7 @@ foam.CLASS({
       ^ .actionButton { margin: 10px; }
       ^ input[type='range'] { width: 400px; }
     */},
+
     function initE() {/*#U2
       <div class="^" x:data={{this}}>
         <center class="^buttonRow"><:back label="Undo"}/> <:forth label="Redo"}/></center>
