@@ -1,2 +1,2 @@
-require('../../core/foam.js');
+require('../../foam.js');
 require('./boxmail.js')
