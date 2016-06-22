@@ -120,12 +120,12 @@ foam.CLASS({
 
     function targetQueryFromSource(obj) {
       var targetClass = this.lookup(this.targetModel);
-      var targetProp  = targetClass['PARENT'];
+      var targetProp  = targetClass[foam.String.constantize(this.inverseName)];
       return this.EQ(targetProp, obj.id);
     },
 
     function adaptTarget(source, target) {
-      target.parent = source.id;
+      target[this.inverseName] = source.id;
     }
   ]
 });

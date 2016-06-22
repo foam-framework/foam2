@@ -127,7 +127,6 @@ foam.CLASS({
         foam.core.Proxy.create({
           name:      stateName,
           of:        this.of,
-          methods:   methodNames,
           delegates: methodNames,
           factory: function() {
             return this[pendingState].create();
@@ -172,11 +171,11 @@ foam.CLASS({
             name: fulfilledState,
             properties: [
               {
-                class: 'Proxy',
-                name:    delegateName,
-                of:      this.of,
-                topics:  this.topics,
-                methods: methodNames
+                class:    'Proxy',
+                name:     delegateName,
+                of:       this.of,
+                topics:   this.topics,
+                forwards: methodNames
               }
             ],
             axioms: [

@@ -217,7 +217,6 @@ foam.CLASS({
 
 
 // TODO(adamvy): document
-// TODO: change design to have methods: and forwards:.
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
@@ -231,12 +230,13 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'methods'
+      name: 'forwards'
+      //documentation: 'Methods that are forwarded to the proxies object.'
     },
     {
-      name: 'delegates',
-      expression: function() { return []; }
-      // documentation: 'Methods that we should delegate rather than forward.'
+      class: 'StringArray',
+      name: 'delegates'
+      //documentation: 'Methods that are delegated to the proxied object.'
     }
   ],
 
@@ -246,27 +246,40 @@ foam.CLASS({
 
       var name     = this.name;
       var delegate = foam.lookup(this.of);
-      var methods  = this.methods ?
-          this.methods.map(function(f) {
-            var m = delegate.getAxiomByName(f);
-            foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
-            return m;
-          }) :
+
+      function resolveName(name) {
+        var m = delegate.getAxiomByName(name);
+        foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
+        return m;
+      }
+
+      var delegates = this.delegates ? this.delegates.map(resolveName) : [];
+
+      var forwards = this.forwards ?
+          this.forwards.map(resolveName) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
-            // TODO(adamvy): This isn't the right check, but we need some sort of filter.
-            // We dont' want to proxy all FObject methods, only those defined in the interface
-            // and possibly its parent interfaces?
+            // TODO(adamvy): This isn't the right check.  Once we have modeled interfaces
+            // we can proxy only that which is defined in the interface.
             return delegate.hasOwnAxiom(m.name);
           });
 
       var axioms = [];
-      for ( var i = 0 ; i < methods.length ; i++ ) {
-        var method = methods[i];
+      for ( var i = 0 ; i < forwards.length ; i++ ) {
+        var method = forwards[i];
+        axioms.push(foam.core.ProxiedMethod.create({
+          name: method.name,
+          returns: method.returns,
+          property: name
+        }));
+      }
+
+      for ( var i = 0 ; i < delegates.length ; i++ ) {
+        var method = delegates[i];
         axioms.push(foam.core.ProxiedMethod.create({
           name: method.name,
           returns: method.returns,
           property: name,
-          delegate: this.delegates.indexOf(method.name) != -1
+          delegate: true
         }));
       }
 

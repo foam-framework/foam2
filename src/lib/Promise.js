@@ -30,10 +30,30 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.promise',
-  name: 'PendingBase',
+  name: 'AbstractState',
 
   implements: [ 'foam.promise.IPromise' ],
 
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
+
+  methods: [
+    function fulfill_(value) {
+      this.value = value;
+      this.state = this.Resolving.create();
+    },
+    function reject_(e) {
+      this.err = e;
+      this.state = this.Rejected.create();
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.promise',
+  name: 'Pending',
+  extends: 'foam.promise.AbstractState',
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -73,26 +93,7 @@ foam.CLASS({
       });
 
       return next;
-    },
-    function fulfill_(value) {
-      this.value = value;
-      this.state = this.Resolving.create();
-    },
-    function reject_(e) {
-      this.err = e;
-      this.state = this.Rejected.create();
     }
-  ]
-});
-
-// TODO(adamvy): Singleton now supports inheritance, so move Singleton to PendingBase.
-foam.CLASS({
-  package: 'foam.promise',
-  name: 'Pending',
-  extends: 'foam.promise.PendingBase',
-
-  axioms: [
-    foam.pattern.Singleton.create()
   ]
 });
 
@@ -100,12 +101,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.promise',
   name: 'Resolving',
-  extends: 'foam.promise.PendingBase',
-
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
-
+  extends: 'foam.promise.Pending',
   methods: [
     function onEnter() {
       this.resolve_(this.value);
@@ -117,13 +113,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.promise',
   name: 'Fulfilled',
-
-  implements: ['foam.promise.IPromise'],
-
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
-
+  extends: 'foam.promise.AbstractState',
   methods: [
     function then(success) {
       var next = this.cls_.create();
@@ -157,13 +147,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.promise',
   name: 'Rejected',
-
-  implements: ['foam.promise.IPromise'],
-
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
-
+  extends: 'foam.promise.AbstractState',
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -208,7 +192,6 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.promise.IPromise',
       name: 'state',
-      methods: [ 'then', 'catch', 'fulfill_', 'reject_' ],
       delegates: [ 'then', 'catch', 'fulfill_', 'reject_' ],
       factory: function() {
         return this.Pending.create();
