@@ -64,6 +64,27 @@ foam.CLASS({
         create a partially filled request object. */
       name: 'HTTPRequestFactoryName',
       value: 'HTTPRequestFactory'
+    },
+    {
+      name: 'code',
+      required: false,
+      transient: true,
+      factory: function() {
+        // set up function with correct args, pass them into the
+        // actual implementation, callRemote_()
+        var axiom = this;
+        // Get list of argument names
+        var argNames = this.args.map(axiom.HTTPArgument.NAME.f);
+        // load named values into opt_args object and pass to the generic callRemote_()
+        return function() {
+          var opt_args = {};
+          for ( var i = 0; i < arguments.length && i < argNames.length; i ++ ) {
+            opt_args[argNames[i]] = arguments[i];
+          }
+          return axiom.callRemote_(opt_args, this);
+        }
+
+      }
     }
   ],
 
@@ -79,25 +100,8 @@ foam.CLASS({
     },
 
     function installInProto(p) {
-      // generate body to call through to xhr
-      var axiom = this;
-
-      // set up function with correct args, pass them into the
-      // actual implementation, callRemote_()
-
-      // Get list of argument names
-      var argNames = this.args.map(axiom.HTTPArgument.NAME.f);
-      // load named values into opt_args object and pass to the generic callRemote_()
-      this.code = function() {
-        var opt_args = {};
-        for ( var i = 0; i < arguments.length && i < argNames.length; i ++ ) {
-          opt_args[argNames[i]] = arguments[i];
-        }
-        return axiom.callRemote_(opt_args, this);
-      }
-
       // set code on proto
-      p[axiom.name] = this.code;
+      p[this.name] = this.code;
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
