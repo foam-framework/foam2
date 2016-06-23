@@ -265,7 +265,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.sync.SyncStatus',
-    'foam.mlang.Expressions',
+    'foam.mlang.E',
     'foam.dao.JournalEntry'
   ],
 
@@ -341,7 +341,7 @@ foam.CLASS({
       // journal.
 
       var self = this;
-      var E = this.Expressions.create();
+      var E = this.E.create();
       var syncStatus;
 
       return this.syncStatusDAO.find(this.syncStatusId).then(null, function(e) {
