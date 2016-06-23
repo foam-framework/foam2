@@ -455,6 +455,28 @@ foam.CLASS({
       name: 'id'
     },
     {
+      /*
+      class: 'Proxy',
+      delegates: [
+        'output',
+        'load',
+        'unload',
+        'remove',
+        'destroy',
+        'onSetCls',
+        'onFocus',
+        'onAddListener',
+        'onRemoveListener',
+        'onSetStyle',
+        'onSetAttr',
+        'onRemoveAttr',
+        'onAddChildren',
+        'onInsertChildren',
+        'onReplaceChild',
+        'onRemoveChild',
+        'toString'
+      ],
+      */
       name: 'state',
       factory: function() { return this.INITIAL; }
     },
