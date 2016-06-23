@@ -87,6 +87,8 @@ foam.CLASS({
 
   documentation: 'Default Element validator.',
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function validateNodeName(name) {
       return true;
