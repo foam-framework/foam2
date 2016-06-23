@@ -20,7 +20,8 @@ TODO:
  - Fix handling of Slots that return arrays.
  - Add support for FOAM1 style dynamic functions?
  - Properly handle insertBefore_ of an element that's already been inserted?
- - Fix ExpressionSlot firing too many property change events
+ - Fix ExpressionSlot firing too many property change events (already fixed?)
+ - Merge EID into Element
 */
 
 foam.CLASS({
