@@ -890,6 +890,7 @@ foam.CLASS({
     },
 
     function entity(name) {
+      /* Create and add a named entity. Ex. .entity('gt') */
       this.add(this.Entity.create({ name: name }));
       return this;
     },
