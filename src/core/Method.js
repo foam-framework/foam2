@@ -69,7 +69,7 @@ foam.CLASS({
       method it overrides with this.SUPER().
     */
     function override_(proto, method) {
-      var super_ = proto[this.name];
+      var super_ = proto.__proto__[this.name];
 
       if ( ! method ) return;
 
