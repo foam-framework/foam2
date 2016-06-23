@@ -775,10 +775,6 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
 
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
-
   requires: [
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Constant',
@@ -833,6 +829,15 @@ foam.CLASS({
 
     function DESC(a) { return this._unary_("Desc", a); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'E',
+  extends: 'foam.mlang.Expressions',
+  axioms: [
+    foam.pattern.Singleton.create()
   ]
 });
 
