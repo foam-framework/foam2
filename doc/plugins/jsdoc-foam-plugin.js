@@ -42,7 +42,7 @@
 */
 
 var fs = require('fs');
-require("../../src/core/foam.js");
+require("../../src/foam.js");
 
 var modelComments = {};
 
