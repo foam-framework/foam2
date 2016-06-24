@@ -1,4 +1,4 @@
-require("./foam.js");
+require("../foam.js");
 
 /** Promise polyfill */
 if ( typeof Promise === 'undefined' ) {
@@ -10,4 +10,3 @@ if ( typeof Promise === 'undefined' ) {
   p.all = foam.promise.all;
   global.Promise = p;
 }
-

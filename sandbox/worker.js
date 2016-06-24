@@ -1,6 +1,6 @@
 FOAM_BOOT_PATH="/src/core/";
 
-importScripts('/src/core/foam.js');
+importScripts('/src/foam.js');
 importScripts('testlib.js');
 
 

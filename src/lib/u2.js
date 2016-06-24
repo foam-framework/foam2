@@ -20,7 +20,8 @@ TODO:
  - Fix handling of Slots that return arrays.
  - Add support for FOAM1 style dynamic functions?
  - Properly handle insertBefore_ of an element that's already been inserted?
- - Fix ExpressionSlot firing too many property change events
+ - Fix ExpressionSlot firing too many property change events (already fixed?)
+ - Merge EID into Element
 */
 
 foam.CLASS({
@@ -86,6 +87,8 @@ foam.CLASS({
 
   documentation: 'Default Element validator.',
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
   methods: [
     function validateNodeName(name) {
       return true;
@@ -129,6 +132,55 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ElementState',
+
+  methods: [
+    function ouput(out) {},
+    function load() {},
+    function unload() {},
+    function remove() {},
+    function destroy() {},
+    function onSetCls() {},
+    function onFocus() {},
+    function onAddListener() {},
+    function onRemoveListener() {},
+    function onSetStyle() {},
+    function onSetAttr() {},
+    function onRemoveAttr() {},
+    function onAddChildren() {},
+    function onInsertChildren() {},
+    function onReplaceChild() {},
+    function onRemoveChild() {},
+    function toString() {}
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'InitialElementState',
+  extends: 'foam.u2.ElementState',
+
+  methods: [
+    function output(out) {
+      this.initE();
+      this.output_(out);
+      this.state = this.OUTPUT;
+      return out;
+    },
+    function load() {
+      this.error('Must output before loading.');
+    },
+    function unload() {
+      this.error('Must output and load before unloading.');
+    },
+    function toString() { return 'INITIAL'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'Element',
 
   documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
@@ -155,34 +207,7 @@ foam.CLASS({
     DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
 
     // Initial State of an Element
-    INITIAL: {
-      output: function(out) {
-        this.initE();
-        this.output_(out);
-        this.state = this.OUTPUT;
-        return out;
-      },
-      load:          function() {
-        this.error('Must output before loading.');
-      },
-      unload:        function() {
-        this.error('Must output and load before unloading.');
-      },
-      remove:        function() { },
-      destroy:       function() { },
-      onSetCls:      function() { },
-      onFocus:       function() { },
-      onAddListener: function() { },
-      onRemoveListener: function() { },
-      onSetStyle:    function() { },
-      onSetAttr:     function() { },
-      onRemoveAttr:  function() { },
-      onAddChildren: function() { },
-      onInsertChildren: function() { },
-      onReplaceChild: function() { },
-      onRemoveChild: function() { },
-      toString:      function() { return 'INITIAL'; }
-    },
+    INITIAL: foam.u2.InitialElementState.create(),
 
     // State of an Element after it has been output (to a String) but before it is loaded.
     // This should be only a brief transitory state, as the Element should be loaded
@@ -452,6 +477,29 @@ foam.CLASS({
       name: 'id'
     },
     {
+      /*
+      class: 'Proxy',
+      of: 'foam.u2.ElementState',
+      delegates: [
+        'output',
+        'load',
+        'unload',
+        'remove',
+        'destroy',
+        'onSetCls',
+        'onFocus',
+        'onAddListener',
+        'onRemoveListener',
+        'onSetStyle',
+        'onSetAttr',
+        'onRemoveAttr',
+        'onAddChildren',
+        'onInsertChildren',
+        'onReplaceChild',
+        'onRemoveChild',
+        'toString'
+      ],
+      */
       name: 'state',
       factory: function() { return this.INITIAL; }
     },
@@ -890,6 +938,7 @@ foam.CLASS({
     },
 
     function entity(name) {
+      /* Create and add a named entity. Ex. .entity('gt') */
       this.add(this.Entity.create({ name: name }));
       return this;
     },

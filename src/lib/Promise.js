@@ -50,10 +50,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Pending',
   extends: 'foam.promise.AbstractState',
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -102,6 +104,7 @@ foam.CLASS({
   package: 'foam.promise',
   name: 'Resolving',
   extends: 'foam.promise.Pending',
+
   methods: [
     function onEnter() {
       this.resolve_(this.value);
@@ -114,6 +117,7 @@ foam.CLASS({
   package: 'foam.promise',
   name: 'Fulfilled',
   extends: 'foam.promise.AbstractState',
+
   methods: [
     function then(success) {
       var next = this.cls_.create();
@@ -148,6 +152,7 @@ foam.CLASS({
   package: 'foam.promise',
   name: 'Rejected',
   extends: 'foam.promise.AbstractState',
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();

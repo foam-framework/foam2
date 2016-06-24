@@ -20,6 +20,11 @@
   var isServer = typeof process === 'object';
   var isWorker = typeof importScripts !== 'undefined';
 
+  var flags = {
+    'web': ! isServer,
+    'node': isServer
+  };
+
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
 
@@ -54,76 +59,19 @@
     };
   }
 
-  [
-    "poly",
-    "lib",
-    "stdlib",
-    "events",
-    "Context",
-    "AbstractClass",
-    "Boot",
-    "FObject",
-    "Model",
-    "Property",
-    "Method",
-    "Boolean",
-    "AxiomArray",
-    "EndBoot",
-    "FObjectArray",
-    "Constant",
-    "types",
-    "Topic",
-    "InnerClass",
-    "Implements",
-    "ImportsExports",
-    "Listener",
-    "IDSupport",
-    "Requires",
-    "Slot",
-    "Proxy",
-    "Promised",
-    "Enum",
-    "Window",
-    "debug",
-    "patterns",
-    "JSON",
-    "parse",
-    "templates",
-    "Action",
-    "../lib/Promise",
-    "../lib/Timer",
-    [ "../lib/graphics", ! isServer ],
-    "../lib/dao",
-    "../lib/mlang",
-    "../lib/AATree",
-    "../lib/Index",
-    "../lib/MDAO",
-    "../lib/TimestampDAO",
-    "../lib/JournalDAO",
-    [ "../lib/IDBDAO", ! isServer ],
-    "../lib/Pooled",
-    "../lib/QueryParser",
-    "../lib/Physical",
-    "../lib/Collider",
-    "../lib/PhysicsEngine",
-    ["../lib/PhysicalCircle", ! isServer ],
-    [ "../lib/node/json_dao", isServer ],
-    "../lib/utf8",
-    "../lib/net",
-    [ "../lib/messageport", ! isServer ],
-    [ "../lib/node/net", isServer ],
-    "../lib/firebase",
-    "../lib/fcm",
-    "../lib/Stub",
-    "../lib/box",
-    [ "../lib/u2", ! isServer ],
-    [ "../lib/u2/daos", ! isServer ],
-    [ "../lib/node/net", isServer ],
-    [ "../lib/node/box", isServer ]
-  ].
-      filter(function (f) { return ! Array.isArray(f) || f[1]; }).
-      map(function(f) { return Array.isArray(f) ? f[0] : f; }).
-      forEach(isServer ? loadServer :
-              isWorker ? createLoadWorker() :
-              createLoadBrowser());
+  var load = isServer ? loadServer :
+    isWorker ? createLoadWorker() :
+    createLoadBrowser();
+
+  this.FOAM_FILES = function(files) {
+    files.filter(function(f) {
+      return f.flags ? flags[f.flags] : true;
+    })
+    .map(function(f) { return f.name; })
+    .forEach(load);
+
+    delete this.FOAM_FILES;
+  };
+
+  load('files');
 })();

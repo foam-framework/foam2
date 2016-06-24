@@ -1,7 +1,7 @@
 <html>
  <head>
   <script>console.time('boot');</script>
-  <script language="javascript" src="../../src/core/foam.js"></script>
+  <script language="javascript" src="../../src/foam.js"></script>
   <script>console.timeEnd('boot');</script>
   <title>FOAM By Example</title>
   <style>
@@ -452,11 +452,12 @@ foam.CLASS({
   ]
 });
 var oldPerson = Person.create({name: 'John', sex: 'M'});
+log(oldPerson.toString());
 foam.CLASS({
   refines: 'Person',
   properties: [ { class: 'Float', name: 'salary', value: 0 } ],
   methods: [
-    function toString() { return this.SUPER() + ' ' + this.salary; }
+    function toString() { return this.name + ' ' + this.sex + ' ' + this.salary; }
   ]
 });
 Person.describe();
