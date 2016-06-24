@@ -257,11 +257,9 @@ foam.CLASS({
 
       var forwards = this.forwards ?
           this.forwards.map(resolveName) :
-          delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
-            // TODO(adamvy): This isn't the right check.  Once we have modeled interfaces
-            // we can proxy only that which is defined in the interface.
-            return delegate.hasOwnAxiom(m.name);
-          });
+          // TODO(adamvy): This isn't the right check.  Once we have modeled interfaces
+          // we can proxy only that which is defined in the interface.
+          delegate.getOwnAxiomsByClass(foam.core.Method);
 
       var axioms = [];
       for ( var i = 0 ; i < forwards.length ; i++ ) {
