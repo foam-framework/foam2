@@ -18,9 +18,7 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Relationship',
-  requires: [
-    'foam.mlang.Expressions'
-  ],
+  implements: [ 'foam.mlang.Expressions' ],
 
   properties: [
     'name',
@@ -50,11 +48,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'oneWay'
-    },
-    {
-      name: 'E',
-      factory: function() { return this.Expressions.create(); }
-    },
+    }
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -127,7 +121,7 @@ foam.CLASS({
     function targetQueryFromSource(obj) {
       var targetClass = this.lookup(this.targetModel);
       var targetProp  = targetClass[foam.String.constantize(this.inverseName)];
-      return this.E.EQ(targetProp, obj.id);
+      return this.EQ(targetProp, obj.id);
     },
 
     function adaptTarget(source, target) {
