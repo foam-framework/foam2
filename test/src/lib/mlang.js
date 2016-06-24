@@ -669,4 +669,29 @@ describe('MLang', function() {
           'MAP(name)');
     });
   });
+
+  describe('Keyword()', function() {
+    var KEYWORD;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      KEYWORD = expr.KEYWORD.bind(expr);
+    });
+
+    it('finds substrings of any String properties', function(done) {
+      dao.where(KEYWORD('Hendrix')).select().then(function(sink) {
+        var a = sink.a;
+        expect(a.length).toBe(1);
+        expect(a[0].name).toBe('Jimi Hendrix');
+        done();
+      });
+    });
+
+    it('always fails if the input is empty', function(done) {
+      dao.where(KEYWORD('')).select().then(function(sink) {
+        var a = sink.a;
+        expect(a.length).toBe(0);
+        done();
+      });
+    });
+  });
 });

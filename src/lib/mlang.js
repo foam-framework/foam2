@@ -657,6 +657,30 @@ foam.CLASS({
   ]
 });
 
+/** Unary expression for a generic keyword search. */
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'Keyword',
+  extends: 'foam.mlang.predicate.Unary',
+  requires: [
+    'foam.core.String'
+  ],
+  methods: [
+    function f(obj) {
+      var arg = this.arg1.f(obj);
+      if ( ! arg || typeof arg !== 'string' ) return false;
+      arg = arg.toLowerCase();
+      var props = obj.cls_.getAxiomsByClass(this.String);
+      for ( var i = 0; i < props.length; i++ ) {
+        var s = props[i].f(obj);
+        if ( ! s || typeof s !== 'string' ) continue;
+        if ( s.toLowerCase().indexOf(arg) >= 0 ) return true;
+      }
+      return false;
+    }
+  ]
+});
+
 
 /** Map sink transforms each put with a given mapping expression. */
 foam.CLASS({
@@ -785,6 +809,7 @@ foam.CLASS({
     'foam.mlang.predicate.Gte',
     'foam.mlang.predicate.Has',
     'foam.mlang.predicate.In',
+    'foam.mlang.predicate.Keyword',
     'foam.mlang.predicate.Lt',
     'foam.mlang.predicate.Lte',
     'foam.mlang.predicate.Neq',
@@ -823,6 +848,7 @@ foam.CLASS({
     function GTE(a, b) { return this._binary_("Gte", a, b); },
     function HAS(a) { return this._unary_("Has", a); },
     function NOT(a) { return this._unary_("Not", a); },
+    function KEYWORD(a) { return this._unary_("Keyword", a); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
