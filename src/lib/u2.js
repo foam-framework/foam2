@@ -21,38 +21,7 @@ TODO:
  - Add support for FOAM1 style dynamic functions?
  - Properly handle insertBefore_ of an element that's already been inserted?
  - Fix ExpressionSlot firing too many property change events (already fixed?)
- - Merge EID into Element
 */
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'EID',
-  extends: 'Property',
-  documentation: 'Describes a property used to store a DOM element id.',
-
-  constants: {
-    __ID__: [ 0 ],
-    NEXT_ID: function() {
-      return 'v' + this.__ID__[ 0 ]++;
-    }
-  },
-
-  properties: [
-    {
-      name: 'factory',
-      value: function() { return foam.u2.EID.NEXT_ID(); }
-    },
-    {
-      name: 'transient',
-      value: true
-    },
-    {
-      name: 'hidden',
-      value: true
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.u2',
@@ -93,23 +62,23 @@ foam.CLASS({
     },
 
     function validateClass(cls) {
-
+      // TODO
     },
 
     function validateAttributeName(name) {
-
+      // TODO
     },
 
     function validateAttributeValue(value) {
-
+      // TODO
     },
 
     function validateStyleName(name) {
-
+      // TODO
     },
 
     function validateStyleValue(value) {
-
+      // TODO
     },
 
     function sanitizeText(text) {
@@ -393,8 +362,7 @@ foam.CLASS({
 
   topics: [
     'onload',
-    'onunload',
-    'ondestroy'
+    'onunload'
   ],
 
   constants: {
@@ -439,7 +407,7 @@ foam.CLASS({
     },
 
     // Element nodeName's that are self-closing.
-    // Used to gernate valid HTML output.
+    // Used to generate valid HTML output.
     // Used by ElementParser for valid HTML parsing.
     ILLEGAL_CLOSE_TAGS: {
       area: true,
@@ -455,15 +423,19 @@ foam.CLASS({
       link: true,
       meta: true,
       param: true
+    },
+
+    __ID__: [ 0 ],
+
+    NEXT_ID: function() {
+      return 'v' + this.__ID__[ 0 ]++;
     }
   },
 
   properties: [
     {
-      class: 'foam.u2.EID',
-      // TODO: Move id management out of EIDProperty to Element so that
-      // it can be more easily tied to lifecycle.
-      name: 'id'
+      name: 'id',
+      factory: function() { return this.NEXT_ID(); }
     },
     {
       class: 'Proxy',
