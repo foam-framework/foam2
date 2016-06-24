@@ -803,7 +803,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.mlang.E as Expr',
+    'foam.mlang.ExpressionsSingleton',
     'foam.dao.sync.SyncRecord'
   ],
 
@@ -838,7 +838,7 @@ foam.CLASS({
     },
     {
       name: 'E',
-      factory: function() { return this.Expr.create(); }
+      factory: function() { return this.ExpressionsSingleton.create(); }
     },
     {
       class: 'Boolean',

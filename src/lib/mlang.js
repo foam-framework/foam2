@@ -834,7 +834,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang',
-  name: 'E',
+  name: 'ExpressionsSingleton',
   extends: 'foam.mlang.Expressions',
   axioms: [
     foam.pattern.Singleton.create()
