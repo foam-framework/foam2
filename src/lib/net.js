@@ -235,7 +235,10 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'protocol'
+      name: 'protocol',
+      preSet: function(old, nu) {
+        return nu.replace(':','');
+      }
     },
     {
       class: 'String',
