@@ -150,8 +150,7 @@ foam.CLASS({
     function onAddChildren() {},
     function onInsertChildren() {},
     function onReplaceChild() {},
-    function onRemoveChild() {},
-    function toString() {}
+    function onRemoveChild() {}
   ]
 });
 
@@ -493,24 +492,8 @@ foam.CLASS({
     {
       class: 'Proxy',
       of: 'foam.u2.ElementState',
-      delegates: [
-        'output',
-        'load',
-        'unload',
-        'remove',
-        'destroy',
-        'onSetCls', //
-        'onFocus', //
-        'onAddListener', //
-        'onRemoveListener', //
-        'onSetStyle', //
-        'onSetAttr', //
-        'onRemoveAttr', //
-        'onAddChildren', //
-        'onInsertChildren',
-        'onReplaceChild',
-        'onRemoveChild'
-      ],
+      delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
+          map(function(m) { return m.name; }),
       name: 'state',
       factory: function() { return this.INITIAL; }
     },
