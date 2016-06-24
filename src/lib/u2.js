@@ -135,7 +135,7 @@ foam.CLASS({
   name: 'ElementState',
 
   methods: [
-    function ouput(out) {},
+    function output(out) {},
     function load() {},
     function unload() {},
     function remove() {},
@@ -181,6 +181,203 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'OutputElementState',
+  extends: 'foam.u2.ElementState',
+
+  methods: [
+    function output(out) {
+      // Only warn because it could be useful for debugging.
+      this.warn('Duplicate output.');
+      return this.INITIAL.output.call(this, out);
+    },
+    function load() {
+      this.state = this.LOADED;
+      for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
+        var l = this.elListeners[i];
+        this.addEventListener_(l[0], l[1]);
+      }
+
+      this.visitChildren('load');
+      if ( this.focused ) this.el().focus();
+      // Allows you to take the DOM element and map it back to a
+      // foam.u2.Element object.  This is expensive when building
+      // lots of DOM since it adds an extra DOM call per Element.
+      // But you could use it to cut down on the number of listeners
+      // in something like a table view by doing per table listeners
+      // rather than per-row listeners and in the event finding the right
+      // U2 view by walking the DOM tree and checking e_.
+      // This could save more time than the work spent here adding e_ to each
+      // DOM element.
+      // this.el().e_ = this;
+
+      this.onload.pub();
+    },
+    function unload() {
+      this.state = this.UNLOADED;
+      this.visitChildren('unload');
+      this.onunload.pub();
+    },
+    function onSetCls(cls, enabled) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onFocus(cls, enabled) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onAddListener(topic, listener) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onRemoveListener(topic, listener) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onSetStyle(key, value) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onSetAttr(key, value) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onRemoveAttr(key, value) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onAddChildren(c) {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onInsertChildren() {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onReplaceChild() {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function onRemoveChild() {
+      throw new Error('Mutations not allowed in OUTPUT state.');
+    },
+    function toString() { return 'OUTPUT'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'LoadedElementState',
+  extends: 'foam.u2.ElementState',
+
+  methods: [
+    function output(out) { this.warn('Duplicate output.'); },
+    function load() { this.error('Duplicate load.'); },
+    function unload() {
+      var e = this.el();
+      if ( e ) {
+        e.remove();
+      }
+      this.state = this.UNLOADED;
+      this.visitChildren('unload');
+      this.onunload.pub();
+    },
+    function remove() { this.unload(); },
+    function onSetCls(cls, enabled) {
+      var e = this.el();
+      if ( ! e ) {
+        this.warn('Missing Element: ', this.id);
+        return;
+      }
+
+      e.classList[enabled ? 'add' : 'remove'](cls);
+    },
+    function onFocus() {
+      this.el().focus();
+    },
+    function onAddListener(topic, listener) {
+      this.addEventListener_(topic, listener);
+    },
+    function onRemoveListener(topic, listener) {
+      this.addRemoveListener_(topic, listener);
+    },
+    function onSetStyle(key, value) {
+      this.el().style[key] = value;
+    },
+    function onSetAttr(key, value) {
+      // 'value' doesn't work consistently with setAttribute()
+      if ( key === 'value' ) {
+        this.el().value = value;
+      } else {
+        this.el().setAttribute(key, value === true ? '' : value);
+      }
+    },
+    function onRemoveAttr(key, value) {
+      this.el().removeAttribute(key);
+    },
+    function onAddChildren() {
+      var e = this.el();
+      if ( ! e ) {
+        this.warn('Missing Element: ', this.id);
+        return;
+      }
+      var out = this.createOutputStream();
+      for ( var i = 0 ; i < arguments.length ; i++ ) {
+        out(arguments[i]);
+      }
+      e.insertAdjacentHTML('beforeend', out);
+      for ( var i = 0 ; i < arguments.length ; i++ ) {
+        arguments[i].load && arguments[i].load();
+      }
+    },
+    function onInsertChildren(children, reference, where) {
+      var e = this.el();
+      if ( ! e ) {
+        this.warn('Missing Element: ', this.id);
+        return;
+      }
+      var out = this.createOutputStream();
+      for ( var i = 0 ; i < children.length ; i++ ) {
+        out(children[i]);
+      }
+      reference.el().insertAdjacentHTML(where, out);
+      for ( var i = 0 ; i < children.length ; i++ ) {
+        children[i].load && children[i].load();
+      }
+    },
+    function onReplaceChild(oldE, newE) {
+      var e = this.el();
+      if ( ! e ) {
+        this.warn('Missing Element: ', this.id);
+        return;
+      }
+      var out = this.createOutputStream();
+      out(newE);
+      var n = this.__context__.document.createElement('div');
+      n.innerHTML = out.toString();
+      e.replaceChild(n.firstChild, oldE.el());
+      newE.load && newE.load();
+    },
+    function onRemoveChild(child, index) {
+      if ( typeof child === 'string' ) {
+        this.el().childNodes[index].remove();
+      } else {
+        child.remove();
+      }
+    },
+    function toString() { return 'LOADED'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'UnloadedElementState',
+  extends: 'foam.u2.ElementState',
+
+  methods: [
+    function load() {
+      this.state = this.LOADED;
+      this.visitChildren('load');
+    },
+    function remove() { this.error('Remove after unload.'); },
+    function toString() { return 'UNLOADED'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'Element',
 
   documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
@@ -213,198 +410,15 @@ foam.CLASS({
     // This should be only a brief transitory state, as the Element should be loaded
     // almost immediately after being output.  It is an error to try and mutate the Element
     // while in the OUTPUT state.
-    OUTPUT: {
-      output: function(out) {
-        // Only warn because it could be useful for debugging.
-        this.warn('Duplicate output.');
-        return this.INITIAL.output.call(this, out);
-      },
-      load: function() {
-        this.state = this.LOADED;
-        for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
-          var l = this.elListeners[i];
-          this.addEventListener_(l[0], l[1]);
-        }
-
-        this.visitChildren('load');
-        if ( this.focused ) this.el().focus();
-        // Allows you to take the DOM element and map it back to a
-        // foam.u2.Element object.  This is expensive when building
-        // lots of DOM since it adds an extra DOM call per Element.
-        // But you could use it to cut down on the number of listeners
-        // in something like a table view by doing per table listeners
-        // rather than per-row listeners and in the event finding the right
-        // U2 view by walking the DOM tree and checking e_.
-        // This could save more time than the work spent here adding e_ to each
-        // DOM element.
-        // this.el().e_ = this;
-      },
-      unload: function() {
-        this.state = this.UNLOADED;
-        this.visitChildren('unload');
-      },
-      remove: function() { },
-      destroy: function() { },
-      onSetCls: function(cls, enabled) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onFocus: function(cls, enabled) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onAddListener: function(topic, listener) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onRemoveListener: function(topic, listener) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onSetStyle: function(key, value) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onSetAttr: function(key, value) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onRemoveAttr: function(key, value) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onAddChildren: function(c) {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onInsertChildren: function() {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onReplaceChild: function() {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      onRemoveChild: function() {
-        throw new Error('Mutations not allowed in OUTPUT state.');
-      },
-      toString: function() { return 'OUTPUT'; }
-    },
+    OUTPUT: foam.u2.OutputElementState.create(),
 
     // State of an Element after it has been loaded.
     // A Loaded Element should be visible in the DOM.
-    LOADED: {
-      output:        function(out) { this.warn('Duplicate output.'); },
-      load:          function() { this.error('Duplicate load.'); },
-      unload:        function() {
-        var e = this.el();
-        if ( e ) {
-          e.remove();
-        }
-        this.state = this.UNLOADED;
-        this.visitChildren('unload');
-      },
-      remove: function() { this.unload(); },
-      destroy: function() { },
-      onSetCls: function(cls, enabled) {
-        var e = this.el();
-        if ( ! e ) {
-          this.warn('Missing Element: ', this.id);
-          return;
-        }
-
-        e.classList[enabled ? 'add' : 'remove'](cls);
-      },
-      onFocus: function() {
-        this.el().focus();
-      },
-      onAddListener: function(topic, listener) {
-        this.addEventListener_(topic, listener);
-      },
-      onRemoveListener: function(topic, listener) {
-        this.addRemoveListener_(topic, listener);
-      },
-      onSetStyle: function(key, value) {
-        this.el().style[key] = value;
-      },
-      onSetAttr: function(key, value) {
-        // 'value' doesn't work consistently with setAttribute()
-        if ( key === 'value' ) {
-          this.el().value = value;
-        } else {
-          this.el().setAttribute(key, value === true ? '' : value);
-        }
-      },
-      onRemoveAttr: function(key, value) {
-        this.el().removeAttribute(key);
-      },
-      onAddChildren: function() {
-        var e = this.el();
-        if ( ! e ) {
-          this.warn('Missing Element: ', this.id);
-          return;
-        }
-        var out = this.createOutputStream();
-        for ( var i = 0 ; i < arguments.length ; i++ ) {
-          out(arguments[i]);
-        }
-        e.insertAdjacentHTML('beforeend', out);
-        for ( var i = 0 ; i < arguments.length ; i++ ) {
-          arguments[i].load && arguments[i].load();
-        }
-      },
-      onInsertChildren: function(children, reference, where) {
-        var e = this.el();
-        if ( ! e ) {
-          this.warn('Missing Element: ', this.id);
-          return;
-        }
-        var out = this.createOutputStream();
-        for ( var i = 0 ; i < children.length ; i++ ) {
-          out(children[i]);
-        }
-        reference.el().insertAdjacentHTML(where, out);
-        for ( var i = 0 ; i < children.length ; i++ ) {
-          children[i].load && children[i].load();
-        }
-      },
-      onReplaceChild: function(oldE, newE) {
-        var e = this.el();
-        if ( ! e ) {
-          this.warn('Missing Element: ', this.id);
-          return;
-        }
-        var out = this.createOutputStream();
-        out(newE);
-        var n = this.__context__.document.createElement('div');
-        n.innerHTML = out.toString();
-        e.replaceChild(n.firstChild, oldE.el());
-        newE.load && newE.load();
-      },
-      onRemoveChild: function(child, index) {
-        if ( typeof child === 'string' ) {
-          this.el().childNodes[index].remove();
-        } else {
-          child.remove();
-        }
-      },
-      toString: function() { return 'LOADED'; }
-    },
+    LOADED: foam.u2.LoadedElementState.create(),
 
     // State of an Element after it has been removed from the DOM.
     // An unloaded Element can be re-added to the DOM.
-    UNLOADED: {
-      output: function() { },
-      load: function() {
-        this.state = this.LOADED;
-        this.visitChildren('load');
-      },
-      unload:         function() { },
-      remove:         function() { this.error('Remove after unload.'); },
-      destroy:        function() { },
-      onSetCls:       function() { },
-      onFocus:        function() { },
-      onAddListener:  function() { },
-      onRemoveListener: function() { },
-      onSetStyle:     function() { },
-      onSetAttr:      function() { },
-      onRemoveAttr:   function() { },
-      onAddChildren:  function() { },
-      onInsertChildren: function() { },
-      onReplaceChild: function() { },
-      onRemoveChild: function() { },
-      toString:       function() { return 'UNLOADED'; }
-    },
+    UNLOADED: foam.u2.UnloadedElementState.create(),
 
     // State of an Element after it has been destroyed.
     // A destroyed Element returns all resources and cannot be re-added to the DOM.
@@ -477,7 +491,6 @@ foam.CLASS({
       name: 'id'
     },
     {
-      /*
       class: 'Proxy',
       of: 'foam.u2.ElementState',
       delegates: [
@@ -486,20 +499,18 @@ foam.CLASS({
         'unload',
         'remove',
         'destroy',
-        'onSetCls',
-        'onFocus',
-        'onAddListener',
-        'onRemoveListener',
-        'onSetStyle',
-        'onSetAttr',
-        'onRemoveAttr',
-        'onAddChildren',
+        'onSetCls', //
+        'onFocus', //
+        'onAddListener', //
+        'onRemoveListener', //
+        'onSetStyle', //
+        'onSetAttr', //
+        'onRemoveAttr', //
+        'onAddChildren', //
         'onInsertChildren',
         'onReplaceChild',
-        'onRemoveChild',
-        'toString'
+        'onRemoveChild'
       ],
-      */
       name: 'state',
       factory: function() { return this.INITIAL; }
     },
@@ -652,86 +663,6 @@ foam.CLASS({
       return base.split(/ +/).map(function(c) { return c + '-' + opt_extra; }).join(' ');
     },
 
-
-    //
-    // Lifecycle
-    //
-
-    function output(/* OutputStream */ out) {
-      /* Transitions to the OUTPUT state, outputting self to supplied OutputStream. */
-      return this.state.output.call(this, out);
-    },
-
-    function load() {
-      /* Transitions to the LOADED state, initializing DOM. */
-      this.state.load.call(this);
-      this.onload.pub();
-    },
-
-    function unload() {
-      /* Transitions to the UNLOADED state, removing DOM. */
-      this.state.unload.call(this);
-      this.onunload.pub();
-    },
-
-    function destroy() {
-      /* Transition to the DESTROYED state. Reserved for future use. */
-      this.state.destroy.call(this);
-      this.ondestroy.pub();
-    },
-
-    //
-    // Dynamic Listeners
-    //
-    function dynamic() {
-      var ret = this.__context__.dynamic.apply(this.__context__, arguments);
-      this.on('unload', ret.destroy.bind(ret));
-      return ret;
-    },
-
-    function dynamicFn() {
-      var ret = this.__context__.dynamicFn.apply(this.__context__, arguments);
-      this.on('unload', ret.destroy.bind(ret));
-      return ret;
-    },
-
-    //
-    // State
-    //
-    // The following methods are state-dependent, so just delegate to the current state object.
-
-    function onSetAttr(key, value) {
-      this.state.onSetAttr.call(this, key, value);
-    },
-
-    function onRemoveAttr(key) {
-      this.state.onRemoveAttr.call(this, key);
-    },
-
-    function onAddChildren(/* vargs */) {
-      this.state.onAddChildren.apply(this, arguments);
-    },
-
-    function onAddListener(topic, listener) {
-      this.state.onAddListener.call(this, topic, listener);
-    },
-
-    function onRemoveListener(topic, listener) {
-      this.state.onRemoveListener.call(this, topic, listener);
-    },
-
-    function onSetStyle(key, value) {
-      this.state.onSetStyle.call(this, key, value);
-    },
-
-    function onSetCls(cls, add) {
-      this.state.onSetCls.call(this, cls, add);
-    },
-
-    function onFocus() {
-      this.state.onFocus.call(this);
-    },
-
     function visitChildren(methodName) {
       /*
         Call the named method on all children.
@@ -742,6 +673,23 @@ foam.CLASS({
         var c = this.childNodes[i];
         c[methodName] && c[methodName].call(c);
       }
+    },
+
+
+    //
+    // Dynamic Listeners
+    //
+
+    function dynamic() {
+      var ret = this.__context__.dynamic.apply(this.__context__, arguments);
+      this.on('unload', ret.destroy.bind(ret));
+      return ret;
+    },
+
+    function dynamicFn() {
+      var ret = this.__context__.dynamicFn.apply(this.__context__, arguments);
+      this.on('unload', ret.destroy.bind(ret));
+      return ret;
     },
 
 
