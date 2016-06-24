@@ -224,10 +224,9 @@ foam.CLASS({
       var e = this.el();
       if ( ! e ) {
         this.warn('Missing Element: ', this.id);
-        return;
+      } else {
+        e.classList[enabled ? 'add' : 'remove'](cls);
       }
-
-      e.classList[enabled ? 'add' : 'remove'](cls);
     },
     function onFocus() {
       this.el().focus();
