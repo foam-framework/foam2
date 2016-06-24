@@ -69,12 +69,12 @@ foam.CLASS({
       name: 'code',
       required: false,
       transient: true,
-      factory: function() {
+      expression: function(args) {
         // set up function with correct args, pass them into the
         // actual implementation, callRemote_()
         var axiom = this;
         // Get list of argument names
-        var argNames = this.args.map(axiom.HTTPArgument.NAME.f);
+        var argNames = args.map(axiom.HTTPArgument.NAME.f);
         // load named values into opt_args object and pass to the generic callRemote_()
         return function() {
           var opt_args = {};
