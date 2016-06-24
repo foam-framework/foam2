@@ -183,39 +183,20 @@ foam.CLASS({
       this.visitChildren('unload');
       this.onunload.pub();
     },
-    function onSetCls(cls, enabled) {
+    function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
     },
-    function onFocus(cls, enabled) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onAddListener(topic, listener) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onRemoveListener(topic, listener) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onSetStyle(key, value) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onSetAttr(key, value) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onRemoveAttr(key, value) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onAddChildren(c) {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onInsertChildren() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onReplaceChild() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
-    function onRemoveChild() {
-      throw new Error('Mutations not allowed in OUTPUT state.');
-    },
+    function onSetCls(cls, enabled) { error(); },
+    function onFocus(cls, enabled) { error(); },
+    function onAddListener(topic, listener) { error(); },
+    function onRemoveListener(topic, listener) { error(); },
+    function onSetStyle(key, value) { error(); },
+    function onSetAttr(key, value) { error(); },
+    function onRemoveAttr(key, value) { error(); },
+    function onAddChildren(c) { error(); },
+    function onInsertChildren() { error(); },
+    function onReplaceChild() { error(); },
+    function onRemoveChild() { error(); },
     function toString() { return 'OUTPUT'; }
   ]
 });
@@ -454,8 +435,8 @@ foam.CLASS({
       name: 'validator',
       getter: function() {
         return this.elementValidator$ ?
-          this.elementValidator :
-          this.DEFAULT_VALIDATOR;
+          this.elementValidator       :
+          this.DEFAULT_VALIDATOR      ;
       }
     },
     {
@@ -1236,7 +1217,7 @@ foam.CLASS({
     function addEventListener_(topic, listener) {
       var foamtopic = topic.startsWith('on') ?
           'on' + topic :
-          topic;
+          topic ;
       this.sub(foamtopic, listener);
       this.el() && this.el().addEventListener(topic, listener);
     },
