@@ -87,8 +87,6 @@ foam.CLASS({
 
   documentation: 'Default Element validator.',
 
-  axioms: [ foam.pattern.Singleton.create() ],
-
   methods: [
     function validateNodeName(name) {
       return true;
@@ -419,29 +417,7 @@ foam.CLASS({
     // An unloaded Element can be re-added to the DOM.
     UNLOADED: foam.u2.UnloadedElementState.create(),
 
-    // State of an Element after it has been destroyed.
-    // A destroyed Element returns all resources and cannot be re-added to the DOM.
-    // Not currently used.
-    /*
-    DESTROYED: {
-      output:        function() { throw 'Attempt to output() destroyed Element.'; },
-      load:          function() { throw 'Attempt to load() destroyed Element.'; },
-      unload:        function() { throw 'Attempt to unload() destroyed Element.';},
-      remove:        function() { debugger; this.error('Remove after destroy.'); },
-      destroy:       function() { },
-      onSetCls:      function() { },
-      onFocus:       function() { },
-      onAddListener: function() { },
-      onRemoveListener: function() { },
-      onSetStyle:    function() { },
-      onSetAttr:     function() { },
-      onRemoveAttr:  function() { },
-      onAddChildren: function() { },
-      onInsertChildren: function() { },
-      onReplaceChild: function() { },
-      toString:      function() { return 'DESTROYED'; }
-    },
-    */
+    // ???: Add DESTROYED State?
 
     // TODO: Don't allow these as they lead to ambiguous markup.
     OPTIONAL_CLOSE_TAGS: {
@@ -521,13 +497,13 @@ foam.CLASS({
     },
     {
       name: 'attributeMap',
-      //documentation: 'Same information as attributes, but in map form for faster lookup',
+      // documentation: 'Same information as attributes, but in map form for faster lookup',
       transient: true,
       factory: function() { return {}; }
     },
     {
       name: 'attributes',
-      //documentation: 'Array of {name: ..., value: ...} attributes.',
+      // documentation: 'Array of {name: ..., value: ...} attributes.',
       factory: function() { return []; },
       postSet: function(_, attrs) {
         this.attributeMap = {};
@@ -538,27 +514,27 @@ foam.CLASS({
     },
     {
       name: 'classes',
-      //documentation: 'CSS classes assigned to this Element. Stored as a map of true values.',
+      // documentation: 'CSS classes assigned to this Element. Stored as a map of true values.',
       factory: function() { return {}; }
     },
     {
       name: 'css',
-      //documentation: 'Styles added to this Element.',
+      // documentation: 'Styles added to this Element.',
       factory: function() { return {}; }
     },
     {
       name: 'childNodes',
-      //documentation: 'Children of this Element.',
+      // documentation: 'Children of this Element.',
       factory: function() { return []; }
     },
     {
       name: 'elListeners',
-      //documentation: 'DOM listeners of this Element.',
+      // documentation: 'DOM listeners of this Element.',
       factory: function() { return []; }
     },
     {
       name: 'children',
-      //documentation: 'Virtual property of non-String childNodes.',
+      // documentation: 'Virtual property of non-String childNodes.',
       transient: true,
       getter: function() {
         return this.childNodes.filter(function(c) {
@@ -599,7 +575,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      /* Template method for adding addtion element initialization just before Element is output(). */
+      /*
+        Template method for adding addtion element initialization
+        just before Element is output().
+      */
     },
 
     function el() {
@@ -644,8 +623,12 @@ foam.CLASS({
         With an extra of "foo", results in 'foam-u2-Input-foo'.
       */
       var base = this.CSS_CLASS || foam.String.cssClassize(this.model_.id);
+
       if ( ! opt_extra ) opt_extra = '';
-      return base.split(/ +/).map(function(c) { return c + '-' + opt_extra; }).join(' ');
+
+      return base.split(/ +/).
+          map(function(c) { return c + '-' + opt_extra; }).
+          join(' ');
     },
 
     function visitChildren(methodName) {
@@ -779,12 +762,18 @@ foam.CLASS({
     },
 
     function getAttributeNode(name) {
-      /* Get {name: ..., value: ...} attributeNode associated with 'name', if exists. */
+      /*
+        Get {name: ..., value: ...} attributeNode associated
+        with 'name', if exists.
+      */
       return this.attributeMap[name];
     },
 
     function getAttribute(name) {
-      /* Get value associated with attribute 'name', or undefined if attribute not set. */
+      /*
+        Get value associated with attribute 'name',
+        or undefined if attribute not set.
+      */
       var attr = this.getAttributeNode(name);
       return attr && attr.value;
     },
@@ -1065,7 +1054,10 @@ foam.CLASS({
     },
 
     function setChildren(value) {
-      /** value -- a Value of an array of children which set this elements contents, replacing old children **/
+      /**
+         value -- a Value of an array of children which set this element's
+         contents, replacing old children
+      **/
       var l = function() {
         this.removeAllChildren();
         this.add.apply(this, value.get());
