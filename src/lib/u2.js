@@ -518,6 +518,8 @@ foam.CLASS({
       name: 'parentNode'
     },
     {
+      class: 'Proxy',
+      of: 'foam.u2.DefaultValidator',
       name: 'validator',
       getter: function() {
         return this.elementValidator$ ?
@@ -1153,39 +1155,6 @@ foam.CLASS({
       var s = this.createOutputStream();
       this.output_(s);
       return s.toString();
-    },
-
-
-    //
-    // Validation and Sanitization
-    //
-
-    function validateNodeName(name) {
-      return this.validator.validateNodeName(name);
-    },
-
-    function validateClass(cls) {
-      return this.validator.validateClass(cls);
-    },
-
-    function validateAttributeName(name) {
-      return this.validator.validateAttributeName(name);
-    },
-
-    function validateAttributeValue(value) {
-      return this.validator.validateAttributeValue(value);
-    },
-
-    function validateStyleName(name) {
-      return this.validator.validateStyleName(name);
-    },
-
-    function validateStyleValue(value) {
-      return this.validator.validateStyleValue(value);
-    },
-
-    function sanitizeText(text) {
-      return this.validator.sanitizeText(text);
     },
 
 
