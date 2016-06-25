@@ -101,6 +101,7 @@ var e13 = E('div').add(
   E('br'),
   'dynamic value: ', timer.i$,
   E('br'));
+e13.write();
 
 var e2 = E('font').add('on click (before)', E('br')).on('click', function() { console.log('clicked, before'); });
 e2.write();
@@ -111,4 +112,8 @@ e2b.on('click', function() { console.log('clicked, after'); });
 
 E('br').write();
 
-e13.write();
+
+var e3 = E('div').add('first line, added before');
+e3.write();
+e3.add(E('br'),'second line, added after', E('br'));
+
