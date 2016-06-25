@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'DAOList',
   extends: 'foam.u2.View',
-  documentation: 'Expects its data to be a DAO, and renders one viewFactory ' +
-      'for each one.',
+
+  // documentation: 'Expects its data to be a DAO, and renders one viewFactory for each one.',
 
   topics: [ 'rowClick' ],
 
@@ -38,11 +39,10 @@ foam.CLASS({
           return function(args, ctx) {
             return ctx.lookup(nu).create(args, ctx);
           };
-        } else {
-          return function(args, ctx) {
-            return nu.create(args, ctx);
-          };
         }
+        return function(args, ctx) {
+          return nu.create(args, ctx);
+        };
       }
     },
     {
@@ -50,7 +50,6 @@ foam.CLASS({
       factory: function() { return {}; }
     }
   ],
-
 
   methods: [
     function initE() {
@@ -79,7 +78,7 @@ foam.CLASS({
         return;
       }
 
-      var ctx = this.__subContext__.createSubContext();
+      var ctx   = this.__subContext__.createSubContext();
       var child = this.rowFactory({ data: obj }, ctx);
       child.on('click', this.rowClick.pub.bind(this.rowClick, obj));
 
