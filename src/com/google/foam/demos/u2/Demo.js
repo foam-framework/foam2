@@ -67,28 +67,28 @@ E('b').add(
   'color: ',
   E('font').attrs({color: 'red'}).add('red', E('br'))).write();
 
-var e = E('font').add('text', E('br'));
+var e = E('font').add('click me', E('br'));
 console.log('id: ', e.id);
 e.write();
-e.attrs({color: 'orange'});
-e.style({
-  fontWeight: 'bold',
-  fontSize:  '24pt'
-});
-e.on('click', function() { console.log('clicked'); });
+e.attrs({color: 'orange'}).
+  style({
+    fontWeight: 'bold',
+    fontSize:  '24pt'
+  }).
+  on('click', function() { console.log('clicked'); });
 
 var e13 = E('div').add(
-  'dynamic function PLAN B * ',
+  'dynamic function: ',
   foam.core.ExpressionSlot.create({
     args: [ timer.second$ ],
     fn: function(s) {
       return s % 2 ?
-        E('span').add('PING', ' ', 'PING') :
+        E('span').add('PI', 'NG').style({color: 'aqua'}) :
         E('span').add('PONG').style({color: 'orange'});
     }
   }),
-  ' *    dynamic value: ',
-  timer.i$,
-  '  ');
+  E('br'),
+  'dynamic value: ', timer.i$,
+  E('br'));
 
 e13.write();
