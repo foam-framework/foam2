@@ -135,3 +135,8 @@ e7.cssClass('important');
 
 
 
+E('font').add(E('br'), 'set attr before').attrs({color: 'blue'}).write();
+
+var e11 = E('font').add(E('br'), 'set attr after', E('br'));
+e11.write();
+e11.attrs({color: 'blue'});
