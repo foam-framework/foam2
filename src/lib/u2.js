@@ -1321,9 +1321,7 @@ foam.CLASS({
 
 foam.__context__ = foam.__context__.createSubContext({
   E: function(name) {
-    return foam.u2.Element.create({
-      nodeName: name.toUpperCase()
-    });
+    return foam.u2.Element.create({nodeName: name});
   },
   elementForName: function(name) { }
 });

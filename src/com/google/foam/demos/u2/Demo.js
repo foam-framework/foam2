@@ -44,21 +44,16 @@ foam.CLASS({
 
   listeners: [
     function onTimer() {
-      this.value = this.value === 'aaaa' ?
-        'bbbb' : 'aaaa';
+      this.value = this.value === 'aaaa' ? 'bbbb' : 'aaaa';
     }
   ]
 });
 
+
 var timer = foam.util.Timer.create();
 timer.start();
 
-var E = (function() {
-  var e = foam.u2.Element.create();
-  return function(name) {
-    return e.E.apply(e, arguments);
-  };
-})();
+var E = foam.__context__.E;
 
 E('b').add(
   'bold',
