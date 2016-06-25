@@ -824,6 +824,8 @@ foam.CLASS({
       return this.entity('nbsp');
     },
 
+    // Was renamed from cls() in FOAM1, current name seems
+    // out of place.
     function cssClass(/* Value | String */ cls) {
       /* Add a CSS cls to this Element. */
       if ( typeof cls === 'function' ) {

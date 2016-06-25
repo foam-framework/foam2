@@ -124,5 +124,14 @@ var e5 = E('div').add('add style after');
 e5.write();
 e5.style({color: 'blue'});
 
+E('br').write();
+
+
+E('div').add('add class before').cssClass('important').write();
+
+var e7 = E('div').add('add class after');
+e7.write();
+e7.cssClass('important');
+
 
 
