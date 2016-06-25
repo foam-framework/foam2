@@ -117,3 +117,12 @@ var e3 = E('div').add('first line, added before');
 e3.write();
 e3.add(E('br'),'second line, added after', E('br'));
 
+
+E('div').add('add style before').style({color: 'blue'}).write();
+
+var e5 = E('div').add('add style after');
+e5.write();
+e5.style({color: 'blue'});
+
+
+
