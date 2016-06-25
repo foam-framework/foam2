@@ -102,4 +102,13 @@ var e13 = E('div').add(
   'dynamic value: ', timer.i$,
   E('br'));
 
+var e2 = E('font').add('on click (before)', E('br')).on('click', function() { console.log('clicked, before'); });
+e2.write();
+
+var e2b = E('font').add('on click (after)');
+e2b.write();
+e2b.on('click', function() { console.log('clicked, after'); });
+
+E('br').write();
+
 e13.write();
