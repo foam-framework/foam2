@@ -89,7 +89,7 @@ foam.CLASS({
           case '&': return '&amp;';
           case '<': return '&lt;';
           case '"': return '&quot;';
-          default:  return '&#039';
+          case "'": return '&#039';
         }
       });
     }
@@ -175,13 +175,10 @@ foam.CLASS({
       // This could save more time than the work spent here adding e_ to each
       // DOM element.
       // this.el().e_ = this;
-
-      this.onload.pub();
     },
     function unload() {
       this.state = this.UNLOADED;
       this.visitChildren('unload');
-      this.onunload.pub();
     },
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
@@ -217,7 +214,6 @@ foam.CLASS({
       }
       this.state = this.UNLOADED;
       this.visitChildren('unload');
-      this.onunload.pub();
     },
     function remove() { this.unload(); },
     function onSetCls(cls, enabled) {
@@ -418,12 +414,19 @@ foam.CLASS({
       factory: function() { return this.NEXT_ID(); }
     },
     {
+      name: 'state',
       class: 'Proxy',
       of: 'foam.u2.ElementState',
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      name: 'state',
-      factory: function() { return this.INITIAL; }
+      factory: function() { return this.INITIAL; },
+      postSet: function(_, state) {
+        if ( state === this.LOADED ) {
+          this.onload.pub();
+        } else if ( state === this.UNLOADED ) {
+          this.onunload.pub();
+        }
+      }
     },
     {
       name: 'parentNode'
