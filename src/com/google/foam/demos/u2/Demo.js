@@ -17,9 +17,11 @@
 
 foam.CLASS({
   name: 'Something',
+
   requires: [
     'foam.util.Timer'
   ],
+
   properties: [
     {
       name: 'value',
@@ -32,12 +34,14 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function init() {
       this.timer.start();
       this.timer.propertyChange.sub('second', this.onTimer);
     }
   ],
+
   listeners: [
     function onTimer() {
       this.value = this.value === 'aaaa' ?
