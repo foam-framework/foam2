@@ -140,3 +140,38 @@ E('font').add(E('br'), 'set attr before').attrs({color: 'blue'}).write();
 var e11 = E('font').add(E('br'), 'set attr after', E('br'));
 e11.write();
 e11.attrs({color: 'blue'});
+
+ var e = E('div').add(
+   E('span').add("hello "),
+   E('span').add("!")).write();
+ e.insertBefore(E('span').add('world'), e.children[1]);
+
+var e = E('div').add(
+  E('span').add("hello "),
+  E('span').add("!"));
+e.insertBefore(E('span').add('world'), e.children[1]);
+e.write();
+
+var e = E('div').add(
+  E('span').add("hello "),
+  E('span').add("!")).write();
+e.insertAfter(E('span').add('world'), e.children[0]);
+
+var e = E('div').add(
+  E('span').add("hello "),
+  E('span').add("!"));
+e.insertAfter(E('span').add('world'), e.children[0]);
+e.write();
+
+var e = E('div').add(
+  E('span').add("hello "),
+  E('span').add("!"));
+e.addBefore(e.children[1], E('span').add('there '), E('span').add('world'));
+e.write();
+
+var oldChild = E().add('First Child').style({color: 'red'});
+var newChild = E().add('Second Child').style({color: 'green'});
+var e = E('div').tag('br').add(oldChild).tag('br').write();
+e.replaceChild(newChild, oldChild);
+
+
