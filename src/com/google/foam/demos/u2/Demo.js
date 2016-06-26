@@ -175,3 +175,10 @@ var e = E('div').tag('br').add(oldChild).tag('br').write();
 e.replaceChild(newChild, oldChild);
 
 
+foam.CLASS({
+  name: 'RedElement',
+  extends: 'foam.u2.Element',
+  methods: [ function init() { this.SUPER(); this.style({color: 'red'}); } ]
+});
+
+RedElement.create().add('red element').write();
