@@ -825,7 +825,7 @@ foam.CLASS({
     },
 
     // Was renamed from cls() in FOAM1, current name seems
-    // out of place.
+    // out of place.  Maybe renamed addClass().
     function cssClass(/* Value | String */ cls) {
       /* Add a CSS cls to this Element. */
       if ( typeof cls === 'function' ) {

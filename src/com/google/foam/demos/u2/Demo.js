@@ -63,7 +63,7 @@ E('b').add(
 );
 
 E().
-  add('Entities:').
+  add('Entities: ').
   add('foo').
   nbsp().
   entity('amp').
@@ -71,7 +71,7 @@ E().
   entity('lt').
   entity('quot').
   entity("#039").
-  add(E('br')).
+  tag('br').
   write();
 
 E('b').add(
