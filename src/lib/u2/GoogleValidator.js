@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'GoogleValidator',
-  extends: 'DefaultValidator',
+  extends: 'foam.u2.DefaultValidator',
 
   // documentation: 'Standard Google Element validator, which is stricter than the default.',
 
