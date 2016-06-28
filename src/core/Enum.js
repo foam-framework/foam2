@@ -143,7 +143,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'ordinal',
+      name: 'ordinal'
     },
     {
       name: 'values',
@@ -153,7 +153,7 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var name = this.name;
+      var name    = this.name;
       var ordinal = this.ordinal;
 
       Object.defineProperty(
