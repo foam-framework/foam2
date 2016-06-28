@@ -198,7 +198,7 @@ foam.CLASS({
               var oldCreate = cls.create;
 
               cls.create = function(args, ctx) {
-                var key = args.ordinal;
+                var key = args.ordinal || 0; // use default if not specified
 
                 // Short-circuit if we already create the instance for this ordinal.
                 if ( instances[key] ) return instances[key];
