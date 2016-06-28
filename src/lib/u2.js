@@ -541,7 +541,11 @@ foam.CLASS({
       return this.getElementById(this.id);
     },
 
-    function E(opt_nodeName /* | DIV */) {
+    function E(opt_nodeName) {
+      return this.__subContext__.E(opt_nodeName);
+    },
+
+    function XXXE(opt_nodeName /* | DIV */) {
       /* Create a new Element */
       var Y = this.__subContext__;
 
@@ -1321,9 +1325,48 @@ foam.CLASS({
 });
 
 
-foam.__context__ = foam.__context__.createSubContext({
-  E: function(name) {
-    return foam.u2.Element.create({nodeName: name});
-  },
-  elementForName: function(name) { }
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'U2Context',
+
+  exports: [
+    'E',
+    'registerElement',
+    'elementForName'
+  ],
+
+  properties: [
+    {
+      name: 'elementMap',
+      factory: function() { return {}; }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+
+      // Instead, look in the tag directory
+      // this.registerElement(foam.u2.tag.Image);
+    },
+
+    function E(opt_nodeName) {
+      var nodeName = opt_nodeName || 'div';
+
+      return (
+        this.elementForName(nodeName) || foam.u2.Element).
+        create({nodeName: nodeName}, this);
+    },
+
+    function registerElement(elClass, opt_elName) {
+      var key = opt_elName || elClass.name;
+      this.elementMap[key] = elClass;
+    },
+    
+    function elementForName(nodeName) {
+      return this.elementMap[nodeName];
+    }
+  ]
 });
+
+foam.__context__ = foam.__context__.createSubContext(foam.u2.U2Context.create().__subContext__);
