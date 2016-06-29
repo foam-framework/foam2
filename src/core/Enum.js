@@ -381,14 +381,19 @@ foam.CLASS({
 });
 
 
-foam.ENUM = function(m) {
-  var model = foam.core.EnumModel.create(m);
-  model.validate();
-  var cls = model.buildClass();
-  cls.validate();
-
-  foam.register(cls);
-  foam.package.registerClass(cls);
-
-  return cls;
-};
+foam.LIB({
+  name: 'foam',
+  methods: [
+    function ENUM(m) {
+      var model = foam.core.EnumModel.create(m);
+      model.validate();
+      var cls = model.buildClass();
+      cls.validate();
+      
+      foam.register(cls);
+      foam.package.registerClass(cls);
+      
+      return cls;
+    }
+  ]
+});
