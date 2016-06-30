@@ -247,10 +247,16 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
+        var value;
+        try {
+          value = this[p.name];
+        } catch (x) {
+          value = '?';
+        }
         console.log(
           foam.String.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
           foam.String.pad(p.name, 14),
-          this[p.name]);
+          value);
       }
       this.log('\n');
     }
