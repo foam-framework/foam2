@@ -182,3 +182,11 @@ foam.CLASS({
 });
 
 RedElement.create().add('red element').write();
+
+var i = E('image').attrs({
+  displayWidth: 200,
+  displayHeight: 200,
+  data: 'Dragon.png'
+});
+
+i.write();
