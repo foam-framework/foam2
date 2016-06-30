@@ -676,7 +676,8 @@ foam.CLASS({
            foam.core.Property.isInstance(prop) &&
            prop.attribute ) {
         if ( typeof value === 'string' ) {
-          this[name] = prop.fromString(value);
+          // TODO: remove check when all properties have fromString()
+          this[name] = prop.fromString ? prop.fromString(value) : value;
         } else if ( foam.core.Slot.isInstance(value) ) {
           this.slot(name).follow(value);
         } else {
@@ -1343,15 +1344,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      this.SUPER();
-
-      // Instead, look in the tag directory
-      // this.registerElement(foam.u2.tag.Image);
-    },
-
     function E(opt_nodeName) {
-      var nodeName = opt_nodeName || 'div';
+      var nodeName = (opt_nodeName || 'div').toUpperCase();
 
       return (
         this.elementForName(nodeName) || foam.u2.Element).
@@ -1360,13 +1354,26 @@ foam.CLASS({
 
     function registerElement(elClass, opt_elName) {
       var key = opt_elName || elClass.name;
-      this.elementMap[key] = elClass;
+      this.elementMap[key.toUpperCase()] = elClass;
     },
     
     function elementForName(nodeName) {
+      if ( this.elementMap[nodeName] ) console.log('NODENAME: ', nodeName, this.elementMap[nodeName]);
       return this.elementMap[nodeName];
     }
   ]
 });
 
 foam.__context__ = foam.__context__.createSubContext(foam.u2.U2Context.create().__subContext__);
+
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  properties: [
+    {
+      name: 'attribute',
+      value: false
+    }
+  ]
+});
