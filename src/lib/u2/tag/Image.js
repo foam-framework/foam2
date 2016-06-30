@@ -21,8 +21,18 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   properties: [
-    'displayWidth',
-    'displayHeight',
+    {
+      name: 'displayWidth',
+      attribute: true
+    },
+    {
+      name: 'displayHeight',
+      attribute: true
+    },
+    {
+      name: 'data',
+      attribute: true
+    },
     ['alpha', 1.0],
     ['nodeName', 'img']
   ],
@@ -39,3 +49,5 @@ foam.CLASS({
     }
   ]
 });
+
+foam.__context__.registerElement(foam.u2.tag.Image);
