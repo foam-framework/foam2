@@ -59,7 +59,9 @@ foam.CLASS({
       return other.sub(foam.Function.bind(function() {
         this.set(other.get());
       }, this));
-    }
+    },
+
+    // TODO: implement relate()
   ]
 });
 
