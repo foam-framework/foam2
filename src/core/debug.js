@@ -251,7 +251,7 @@ foam.CLASS({
         try {
           value = this[p.name];
         } catch (x) {
-          value = '?';
+          value = '-';
         }
         console.log(
           foam.String.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
