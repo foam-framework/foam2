@@ -61,7 +61,46 @@ foam.CLASS({
       }, this));
     },
 
-    // TODO: implement relate()
+    /**
+     * Maps values from one model to another.
+     * @param f maps values from srcValue to dstValue
+     */
+    function mapFrom(other, f) {
+      return other.sub(foam.Function.bind(function() {
+        this.set(f(other.get()));
+      }, this));
+    },
+
+    function mapTo(other, f) {
+      return other.mapFrom(this, f);
+    },
+
+    /**
+     * Relate to another Slot.
+     * @param f maps from this to other
+     * @param fprime maps other to this
+     */
+    function relate(other, f, fPrime) {
+      var self     = this;
+      var feedback = false;
+      var sub      = foam.core.FObject.create();
+
+      sub.onDestroy(this.sub(function() {
+        if ( feedback ) return;
+        feedback = true;
+        other.set(f(self.get()));
+        feedback = false;
+      }));
+
+      sub.onDestroy(other.sub(function() {
+        if ( feedback ) return;
+        feedback = true;
+        self.set(fPrime(other.get()));
+        feedback = false;
+      }));
+
+      return sb;
+    }
   ]
 });
 
