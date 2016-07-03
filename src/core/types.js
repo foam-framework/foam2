@@ -295,6 +295,26 @@ foam.CLASS({
   ]
 });
 
+//TODO(adamvy): Replace Class property with Class2 property.
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Class2',
+  extends: 'String',
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+
+      var name = this.name;
+
+      Object.defineProperty(proto, name + '$cls', {
+        get: function classGetter() {
+          return this.__context__.lookup(this[name], true);
+        }
+      });
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core',
