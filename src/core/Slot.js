@@ -66,9 +66,12 @@ foam.CLASS({
      * @param f maps values from srcValue to dstValue
      */
     function mapFrom(other, f) {
-      return other.sub(foam.Function.bind(function() {
-        this.set(f(other.get()));
-      }, this));
+      var self = this;
+      var l = function() {
+        self.set(f(other.get()));
+      };
+      l();
+      return other.sub(l);
     },
 
     function mapTo(other, f) {
