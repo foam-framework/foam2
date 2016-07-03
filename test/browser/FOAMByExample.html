@@ -856,9 +856,22 @@ log(p1.name, p2.name);
 // To do this, use the .follow() method.
 var d = p1.name$.follow(p2.name$);
 p2.name = 'Ringo'; // Will update p1 and p2
+p2.name = 'Paul'; // Will update p1 and p2
 log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
+d.destroy();
+
+// One-Way Data-Binding, with Map function
+var d = p1.name$.mapFrom(p2.name$, function(n) {
+  return "Mr. " + n; 
+});
+p1.name$.clear();
+p2.name = 'Ringo'; // Will update p1 and p2
+log(p1.name, p2.name);
+p1.name = 'George'; // Will only update p1
+log(p1.name, p2.name);
+d.destroy();
 
 // Slots also let you check if the value is defined by calling isDefined().
 // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
