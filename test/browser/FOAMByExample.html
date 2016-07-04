@@ -862,6 +862,12 @@ p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
 d.destroy();
 
+// Follow copies the initial value.
+p1 = Person.create();
+p2 = Person.create({name:'John'});
+p1.name$.follow(p2.name$);
+log(p1.name, p2.name);
+
 // One-Way Data-Binding, with Map function (mapFrom)
 var d = p1.name$.mapFrom(p2.name$, function(n) {
   return "Mr. " + n; 
