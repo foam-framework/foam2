@@ -56,9 +56,10 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      return other.sub(foam.Function.bind(function() {
-        this.set(other.get());
-      }, this));
+      var self = this;
+      var l = function() { self.set(other.get()); };
+      l();
+      return other.sub(l);
     },
 
     /**
@@ -67,9 +68,7 @@ foam.CLASS({
      */
     function mapFrom(other, f) {
       var self = this;
-      var l = function() {
-        self.set(f(other.get()));
-      };
+      var l = function() { self.set(f(other.get())); };
       l();
       return other.sub(l);
     },
