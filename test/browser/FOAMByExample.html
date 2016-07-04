@@ -862,11 +862,24 @@ p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
 d.destroy();
 
-// One-Way Data-Binding, with Map function
+// One-Way Data-Binding, with Map function (mapFrom)
 var d = p1.name$.mapFrom(p2.name$, function(n) {
   return "Mr. " + n; 
 });
 p1.name$.clear();
+p2.name$.clear();
+p2.name = 'Ringo'; // Will update p1 and p2
+log(p1.name, p2.name);
+p1.name = 'George'; // Will only update p1
+log(p1.name, p2.name);
+d.destroy();
+
+// One-Way Data-Binding, with Map function (mapTo)
+var d = p2.name$.mapTo(p1.name$, function(n) {
+  return "Mr. " + n; 
+});
+p1.name$.clear();
+p2.name$.clear();
 p2.name = 'Ringo'; // Will update p1 and p2
 log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
