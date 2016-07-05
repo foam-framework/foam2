@@ -265,7 +265,7 @@ foam.CLASS({
     function expression(fn /* ... args */) {
       return this.ExpressionSlot.create({
         fn: fn,
-        args: Array.prototype.slice.call(arguments, 1);
+        args: Array.prototype.slice.call(arguments, 1)
       });
     }
   ]
