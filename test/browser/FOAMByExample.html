@@ -850,6 +850,30 @@ d.destroy();
 p2.name = 'Steve';
 log(p1.name, p2.name);
 
+// Two values can be linked through a relationship,
+// which provides functions to adapt between the two values.
+foam.CLASS({
+  name: 'Temperature',
+  properties: [
+    { class: 'Float', name: 'f' },
+    { class: 'Float', name: 'c' }
+  ],
+  methods: [
+    function init() {
+      this.f$.relate(
+        this.c$,
+        function c2f(f) { log('f', f); return 9/5 * f + 32; },
+        function f2c(c) { log('fp', c); return 5/9 * ( c - 32 ); });
+    }
+  ]
+});
+var t = Temperature.create();
+log(t.stringify());
+t.f = 100;
+log(t.stringify());
+t.c = 100;
+log(t.stringify());
+
 // One-Way Data-Binding
 // Calling .link() creates a two-way data-binding, meaning a change in either
 // value is reflected in the other.  But FOAM supports one-way data-binding as well.
