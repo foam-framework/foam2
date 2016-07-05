@@ -86,22 +86,25 @@ foam.CLASS({
       var self     = this;
       var feedback = false;
       var sub      = foam.core.FObject.create();
-
-      sub.onDestroy(this.sub(function() {
+      var l1 = function() {
         if ( feedback ) return;
         feedback = true;
         other.set(f(self.get()));
         feedback = false;
-      }));
-
-      sub.onDestroy(other.sub(function() {
+      };
+      var l2 = function() {
         if ( feedback ) return;
         feedback = true;
         self.set(fPrime(other.get()));
         feedback = false;
-      }));
+      };
 
-      return sb;
+      sub.onDestroy(this.sub(l1));
+      sub.onDestroy(other.sub(l2));
+
+      l1();
+
+      return sub;
     }
   ]
 });
@@ -247,5 +250,23 @@ foam.CLASS({
 
   listeners: [
     function invalidate() { this.clearProperty('value'); }
+  ]
+});
+
+
+// ???: Should there also be an 'obj' option instead of 'args'?
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ExpressionSlotHelper',
+
+  requires: [ 'foam.core.ExpressionSlot' ],
+
+  methods: [
+    function expression(fn /* ... args */) {
+      return this.ExpressionSlot.create({
+        fn: fn,
+        args: Array.prototype.slice.call(arguments, 1);
+      });
+    }
   ]
 });
