@@ -48,7 +48,6 @@ foam.CLASS({
         if ( ! resp.success ) {
           return resp.payload.then(function(p) { return Promise.reject(p); });
         }
-        return; // ???: Why is this here?
       });
     }
   ]
