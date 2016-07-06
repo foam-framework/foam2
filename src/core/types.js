@@ -299,7 +299,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Class2',
-  extends: 'String',
+  extends: 'Property',
   methods: [
     function installInProto(proto) {
       this.SUPER(proto);
@@ -308,6 +308,7 @@ foam.CLASS({
 
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
+          if ( typeof this[name] !== 'string' ) return this[name];
           return this.__context__.lookup(this[name], true);
         }
       });
