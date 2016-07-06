@@ -85,6 +85,7 @@ FOAM_FILES([
   { name: "lib/box" },
   { name: "lib/u2", flags: ['web'] },
   { name: "lib/u2/daos", flags: ['web'] },
+  { name: "lib/u2/TableView", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] }
 ]);

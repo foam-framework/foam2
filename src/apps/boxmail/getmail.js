@@ -7,11 +7,6 @@ var dst = foam.box.SocketBox.create({
   address: 'localhost:7000',
 }, env);
 
-var msg = boxmail.Message.create({
-  subject: 'random mail',
-  body: 'hello world'
-});
-
 var dao = foam.dao.ClientDAO.create({
   delegate: foam.box.SubBox.create({
     name: 'INBOX',

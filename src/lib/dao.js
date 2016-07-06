@@ -95,48 +95,48 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-code: function() { },
+      code: function() { },
       returns: 'Promise'
     },
     {
       name: 'remove',
-code: function() { },
+      code: function() { },
       returns: 'Promise'
     },
     {
       name: 'find',
-code: function() { },
+      code: function() { },
       returns: 'Promise'
     },
     {
       name: 'select',
-code: function() { },
+      code: function() { },
       returns: 'Promise'
     },
     {
       name: 'removeAll',
-code: function() { },
+      code: function() { },
       returns: 'Promise'
     },
     {
       name: 'pipe',
-code: function() { },
+      code: function() { },
     },
     {
       name: 'where',
-code: function() { },
+      code: function() { },
     },
     {
       name: 'orderBy',
-code: function() { },
+      code: function() { },
     },
     {
       name: 'skip',
-code: function() { },
+      code: function() { },
     },
     {
       name: 'limit',
-code: function() { },
+      code: function() { },
     }
   ]
 });

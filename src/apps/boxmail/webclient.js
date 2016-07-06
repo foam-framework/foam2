@@ -9,16 +9,25 @@ var dao = foam.dao.ClientDAO.create({
   }, env)
 }, env);
 
-dao.select().then(function(m) {
-  var out = "";
-  out += '<div>Read ' + m.a.length + ' mails.';
-  out += '<table><thead><td>Subject</td><td>Body</td></thead><tbody>';
+foam.u2.TableView.create({
+  of: 'boxmail.Message',
+  properties: [
+    'subject',
+    'body'
+  ],
+  data: dao
+}).write();
 
-  for ( var i = 0 ; i < m.a.length ; i++ ) {
-    var mail = m.a[i];
-    out += '<tr><td>' + mail.subject + '</td><td>' + mail.body + '</td></tr>';
-  }
-  out += '</tbody></table>';
+// dao.select().then(function(m) {
+//   var out = "";
+//   out += '<div>Read ' + m.a.length + ' mails.';
+//   out += '<table><thead><td>Subject</td><td>Body</td></thead><tbody>';
 
-  document.body.insertAdjacentHTML('beforeend', out);
-});
+//   for ( var i = 0 ; i < m.a.length ; i++ ) {
+//     var mail = m.a[i];
+//     out += '<tr><td>' + mail.subject + '</td><td>' + mail.body + '</td></tr>';
+//   }
+//   out += '</tbody></table>';
+
+//   document.body.insertAdjacentHTML('beforeend', out);
+// });
