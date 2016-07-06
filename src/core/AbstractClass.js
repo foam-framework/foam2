@@ -114,7 +114,7 @@ foam.LIB({
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
 
-      if ( cache[c.id] === undefined ) {
+      if ( ! c.id || cache[c.id] === undefined ) {
         cache[c.id] = ( c === this.prototype.cls_ ) ||
           ( c.getAxiomByName && !! c.getAxiomByName('implements_' + this.id) ) ||
           this.isSubClass(c.__proto__);
