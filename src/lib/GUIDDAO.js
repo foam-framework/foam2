@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'GUIDDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       class: 'String',
@@ -26,9 +27,13 @@ foam.CLASS({
       value: 'id'
     }
   ],
+
   methods: [
     function put(obj) {
-      if ( ! obj.hasOwnProperty(this.property) ) obj[this.property] = foam.uuid.randomGUID();
+      if ( ! obj.hasOwnProperty(this.property) ) {
+        obj[this.property] = foam.uuid.randomGUID();
+      }
+
       return this.delegate.put(obj);
     }
   ]

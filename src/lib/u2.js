@@ -322,7 +322,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
-  documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
+  implements: [ 'foam.core.ExpressionSlotHelper' ],
+
+  // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
     'foam.u2.DefaultValidator',
@@ -607,12 +609,15 @@ foam.CLASS({
     // Dynamic Listeners
     //
 
+    // TODO: rename to expression, or add destroy support
+    // to ExpressionSlotHelper
     function dynamic() {
       var ret = this.__context__.dynamic.apply(this.__context__, arguments);
       this.on('unload', ret.destroy.bind(ret));
       return ret;
     },
 
+    // TODO: remove
     function dynamicFn() {
       var ret = this.__context__.dynamicFn.apply(this.__context__, arguments);
       this.on('unload', ret.destroy.bind(ret));
@@ -1326,6 +1331,21 @@ foam.CLASS({
 });
 
 
+// A Method which doesn't bind to 'this' when exported.
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ContextMethod',
+  extends: 'foam.core.Method',
+  
+  methods: [
+    function exportAs(obj) {
+      debugger;
+      return obj[this.name];
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'U2Context',
@@ -1344,12 +1364,16 @@ foam.CLASS({
   ],
 
   methods: [
-    function E(opt_nodeName) {
-      var nodeName = (opt_nodeName || 'div').toUpperCase();
+    {
+      class: 'foam.core.ContextMethod',
+      name: 'E',
+      code: function E(opt_nodeName) {
+        var nodeName = (opt_nodeName || 'div').toUpperCase();
 
-      return (
-        this.elementForName(nodeName) || foam.u2.Element).
-        create({nodeName: nodeName}, this);
+        return (
+          this.elementForName(nodeName) || foam.u2.Element).
+          create({nodeName: nodeName}, this);
+      }
     },
 
     function registerElement(elClass, opt_elName) {
