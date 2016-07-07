@@ -61,7 +61,9 @@ foam.CLASS({
           m.code = o;
           return m;
         }
-        return foam.core.Method.isInstance(o) ? o : foam.core.Method.create(o);
+        if ( foam.core.Method.isInstance(o) ) return o;
+        if ( o.class ) return this.lookup(o.class).create(o);
+        return foam.core.Method.create(o);
       }
     }
   ]
