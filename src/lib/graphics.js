@@ -67,13 +67,13 @@ foam.CLASS({
           td = this.d, te = this.e, tf = this.f,
           tg = this.g, th = this.h, ti = this.i;
 
-      var a = p[0];
-      var d = p[1];
-      var g = p[2];
+      var a = p.x;
+      var d = p.y;
+      var g = p.w;
 
-      p[0] = ta * a + tb * d + tc * g;
-      p[1] = td * a + te * d + tf * g;
-      p[2] = tg * a + th * d + ti * g;
+      p.x = ta * a + tb * d + tc * g;
+      p.y = td * a + te * d + tf * g;
+      p.w = tg * a + th * d + ti * g;
 
       return this;
     },
@@ -708,6 +708,36 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Point',
+  properties: [
+    {
+      class: 'Simple',
+      name: 'x'
+    },
+    {
+      class: 'Simple',
+      name: 'y'
+    },
+    {
+      class: 'Simple',
+      name: 'w'
+    }
+  ],
+  methods: [
+    function toCartesian() {
+      // TODO: What is the right name for this function?
+      // It's related to perspective transformations
+      // It transforms this point from the homogeneous coordinate space
+      // to the cartesian coordiate space.
+
+      this.x = this.x / this.w;
+      this.y = this.y / this.w;
+      this.w = 1;
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.graphics',
