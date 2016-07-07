@@ -972,7 +972,7 @@ foam.CLASS({
       this.syncToServer();
       this.syncFromServer();
     }
-  ],
+  ]
 });
 
 
