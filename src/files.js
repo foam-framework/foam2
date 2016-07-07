@@ -66,6 +66,7 @@ FOAM_FILES([
   { name: "lib/Index" },
   { name: "lib/MDAO" },
   { name: "lib/TimestampDAO" },
+  { name: "lib/GUIDDAO" },
   { name: "lib/JournalDAO" },
   { name: "lib/IDBDAO", flags: ['web'] },
   { name: "lib/Pooled" },
