@@ -190,3 +190,14 @@ var i = E('image').attrs({
 });
 
 i.write();
+
+foam.CLASS({
+  name: 'Person',
+  properties: [ 'firstName', 'lastName', 'age' ]
+});
+
+var p = Person.create();
+
+foam.u2.DetailView.create({
+  data: p
+}).write();
