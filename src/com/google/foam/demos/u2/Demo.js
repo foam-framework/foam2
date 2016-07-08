@@ -53,7 +53,7 @@ foam.CLASS({
 var timer = foam.util.Timer.create();
 timer.start();
 
-var E = foam.__context__.E;
+var E = foam.__context__.E.bind(foam.__context__);
 
 E('b').add(
   'bold',
