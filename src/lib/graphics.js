@@ -58,11 +58,31 @@ foam.CLASS({
       return this;
     },
 
+    function mulT(t) {
+      return this.mul(t.a, t.b, t.c, t.d, t.e, t.f, t.g, t.h, t.i);
+    },
+
+    function mulP(p) {
+      var ta = this.a, tb = this.b, tc = this.c,
+          td = this.d, te = this.e, tf = this.f,
+          tg = this.g, th = this.h, ti = this.i;
+
+      var a = p.x;
+      var d = p.y;
+      var g = p.w;
+
+      p.x = ta * a + tb * d + tc * g;
+      p.y = td * a + te * d + tf * g;
+      p.w = tg * a + th * d + ti * g;
+
+      return this;
+    },
+
     function affine(m) {
       return this.mul(m.a, m.b, m.c, m.d, m.e, m.f, m.g, m.h, m.i);
     },
 
-    function invert() {
+    function transpose() {
       // a b c    a d g
       // d e f -> b e h
       // g h i    c f i
@@ -78,6 +98,38 @@ foam.CLASS({
       this.f = this.h;
       this.h = tmp;
       return this;
+    },
+
+    function invert() {
+      var ta = this.a, tb = this.b, tc = this.c,
+          td = this.d, te = this.e, tf = this.f,
+          tg = this.g, th = this.h, ti = this.i;
+
+      var det = ta*(te*ti  - tf*th) - tb*(td*ti - tf*tg) + tc*(td*th-te*tg);
+      var detinv = 1 / det;
+
+      this.a = detinv * (te*ti - tf*th);
+      this.b = detinv * (tc*th - tb*ti);
+      this.c = detinv * (tb*tf - tc*te);
+
+      this.d = detinv * (tf*tg - td*ti);
+      this.e = detinv * (ta*ti - tc*tg);
+      this.f = detinv * (tc*td - ta*tf);
+
+      this.g = detinv * (td*th - te*tg);
+      this.h = detinv * (tb*tg - ta*th);
+      this.i = detinv * (ta*te - tb*td);
+
+      return this;
+    },
+
+    function det() {
+      // Compute the determinant
+      var a = this.a, b = this.b, c = this.c,
+          d = this.d, e = this.e, f = this.f,
+          g = this.g, h = this.h, i = this.i;
+
+      return a*(e*i  - f*h) - b*(d*i - f*g) + c*(d*h-e*g);
     },
 
     function reset() {
@@ -656,6 +708,36 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Point',
+  properties: [
+    {
+      class: 'Simple',
+      name: 'x'
+    },
+    {
+      class: 'Simple',
+      name: 'y'
+    },
+    {
+      class: 'Simple',
+      name: 'w'
+    }
+  ],
+  methods: [
+    function toCartesian() {
+      // TODO: What is the right name for this function?
+      // It's related to perspective transformations
+      // It transforms this point from the homogeneous coordinate space
+      // to the cartesian coordiate space.
+
+      this.x = this.x / this.w;
+      this.y = this.y / this.w;
+      this.w = 1;
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.graphics',
