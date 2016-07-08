@@ -1332,6 +1332,7 @@ foam.CLASS({
 
 
 // A Method which doesn't bind to 'this' when exported.
+// TODO: move somewhere else when satisfied with design
 foam.CLASS({
   package: 'foam.core',
   name: 'ContextMethod',
@@ -1339,7 +1340,6 @@ foam.CLASS({
   
   methods: [
     function exportAs(obj) {
-      debugger;
       return obj[this.name];
     }
   ]
