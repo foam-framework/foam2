@@ -333,31 +333,39 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Quaternion',
+
+  // TODO: doc
+
   properties: [
     { class: 'Simple', name: 'a' },
     { class: 'Simple', name: 'b' },
     { class: 'Simple', name: 'c' },
     { class: 'Simple', name: 'd' }
   ],
+
   methods: [
     function init() {
       this.a = this.b = this.c = this.d = 0;
     },
+
     function add(o) {
       this.a += o.a;
       this.b += o.b;
       this.c += o.b;
       this.d += o.d;
     },
+
     function scale(a) {
       this.a *= a;
       this.b *= a;
       this.c *= a;
       this.d *= a;
     },
+
     function mul(a, b, c, d) {
       var ta = this.a, tb = this.b, tc = this.c, td = this.d;
 
@@ -554,12 +562,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'CView3D',
+
   requires: [
     'foam.graphics.Transform3D'
   ],
+
   properties: [
     { class: 'Float', name: 'x' },
     { class: 'Float', name: 'y' },
@@ -591,11 +602,13 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function paint3D(gl) {
       // TODO: transform
       this.paintSelf(gl);
     },
+
     function paintSelf(gl) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
       gl.enableVertexAttribArray(this.positionAttribute);
@@ -604,6 +617,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.graphics',
@@ -708,9 +722,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Point',
+
   properties: [
     {
       class: 'Simple',
@@ -725,6 +741,7 @@ foam.CLASS({
       name: 'w'
     }
   ],
+
   methods: [
     function toCartesian() {
       // TODO: What is the right name for this function?
@@ -738,6 +755,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.graphics',
@@ -815,6 +833,7 @@ foam.CLASS({
 
   templates: [
     {
+      // ???: Shouldn't this be toE() instead?
       name: 'toHTML',
       template: '<canvas id="<%= this.id %>"></canvas>'
     }
