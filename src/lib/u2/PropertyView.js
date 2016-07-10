@@ -89,6 +89,7 @@ foam.CLASS({
 
   listeners: [
     function bindData_(old, nu) {
+      // TODO: introduce slot.slot() to simplify/eliminate this
       if ( ! this.child_ ) return;
       if ( old ) Events.unlink(old.propertyValue(this.prop.name), this.child_.data$);
       if ( nu  ) Events.link(nu.propertyValue(this.prop.name), this.child_.data$);
