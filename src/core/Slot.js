@@ -35,6 +35,12 @@ foam.CLASS({
 
   methods: [
     /**
+    */
+    function slot(name) {
+
+    },
+
+    /**
       Link two Slots together, setting both to other's value.
       Returns a Destroyable which can be used to break the link.
     */
@@ -153,6 +159,70 @@ foam.CLASS({
 
     function clear() {
       this.obj.clearProperty(this.prop.name);
+    }
+  ]
+});
+
+
+/**
+  For internal use only.
+ */
+foam.CLASS({
+  package: 'foam.core.internal',
+  name: 'SubSlot',
+  extends: 'foam.core.Slot',
+
+  properties: [
+    'parent',
+    'name',
+    'prevSub'
+  ],
+
+  methods: [
+    function init() {
+      this.parent.sub(this.parentChange);
+      this.parentChange();
+      //this.parent.slot(this.name).sub(
+    },
+
+    function get() {
+      return this.parent[this.name];
+    },
+
+    function set(value) {
+      this.parent[this.name] = value;
+    },
+
+    /** Needed?
+    function getPrev() {
+      return this.oldValue;
+    },
+
+    function setPrev(value) {
+      return this.oldValue = value;
+    },
+    */
+
+    function sub(l) {
+      return this.obj.sub('propertyChange', this.prop.name, l);
+    },
+
+    function unsub(l) {
+      this.obj.unsub('propertyChange', this.prop.name, l);
+    },
+
+    function isDefined() {
+      return this.obj.hasOwnProperty(this.prop.name);
+    },
+
+    function clear() {
+      this.obj.clearProperty(this.prop.name);
+    }
+  ],
+
+  listeners: [
+    function parentChange(_, __, slot) {
+      this.prevSub && this.prevSub.destroy();
     }
   ]
 });
