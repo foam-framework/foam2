@@ -778,6 +778,10 @@ foam.CLASS({
   name: 'Canvas',
   extends: 'foam.u2.Element',
 
+  requires: [
+    'foam.input.Pointer'
+  ],
+
   imports: [ 'getElementById' ],
 
   exports: [
@@ -804,6 +808,14 @@ foam.CLASS({
         o && o.invalidated.unsub(this.paint);
         n && n.invalidated.sub(this.paint);
         this.paint();
+      }
+    },
+    {
+      name: 'pointer',
+      factory: function() {
+        var m = this.Pointer.create();
+        m.install(this.el());
+        return m;
       }
     }
   ],
