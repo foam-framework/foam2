@@ -1,22 +1,48 @@
 var env = foam.box.Context.create();
 
+
+foam.box.NamedBox.create({
+  name: '/ca/vany/adam'
+}, env).delegate = foam.box.WebSocketBox.create({ uri: 'ws://localhost:4000 '}, env);
+
+
 var dao = foam.dao.ClientDAO.create({
-  delegate: foam.box.SubBox.create({
-    name: 'INBOX',
-    delegate: foam.box.WebSocketBox.create({
-      uri: 'ws://localhost:4000'
-    }, env)
+  delegate: foam.box.NamedBox.create({
+    name: '/ca/vany/adam/INBOX'
   }, env)
 }, env);
 
-foam.u2.TableView.create({
+var canvas = foam.graphics.Canvas.create({
+  width: 600,
+  height: 600
+});
+
+canvas.cview = foam.graphics.ScrollCView.create({
+  size: 1000,
+  rotation: -0.4,
+  skewY: 0.2,
+  x: 50,
+  y: 20,
+  extent: 10
+}, canvas);
+
+canvas.write();
+
+var view = foam.u2.TableView.create({
   of: 'boxmail.Message',
   properties: [
     'subject',
     'body'
-  ],
-  data: dao
-}).write();
+  ]
+});
+view.write();
+
+
+function updateTable() {
+  view.data = dao.limit(canvas.cview.extent).skip(canvas.cview.value);
+}
+canvas.cview.value$.sub(updateTable);
+updateTable();
 
 // dao.select().then(function(m) {
 //   var out = "";
