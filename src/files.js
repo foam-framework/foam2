@@ -59,6 +59,7 @@ FOAM_FILES([
   { name: "core/Action" },
   { name: "lib/Promise" },
   { name: "lib/Timer" },
+  { name: "lib/input", flags: ['web'] },
   { name: "lib/u2", flags: ['web'] },
   { name: "lib/graphics", flags: ['web'] },
   { name: "lib/dao" },
