@@ -487,6 +487,15 @@ foam.CLASS({
 */
     },
 
+    function toLocalCoordinates(p) {
+      if ( this.parent ) this.parent.toLocalCoordinates(p);
+
+      var t = this.transform.invert().mulP(p);
+      p.x /= p.w;
+      p.y /= p.w;
+      p.w = 1;
+    },
+
     function maybeInitCView(x) {
       if ( this.state == 'initial' ) {
         this.initCView(x);
