@@ -543,13 +543,15 @@ foam.CLASS({
       return 'hsl(' + h + ',' + s + '%,' + l + '%)';
     },
 
-    // FUTURE: Replace with toE() when/if ready.
-    function toHTML() {
-      return this.Canvas.create({
-        width: this.x + this.width || this.r * 2,
-        height: this.y + this.height || this.r * 2,
-        cview: this
-      }).toHTML();
+    function write() {
+      this.toE().write();
+    },
+
+    function toE(X) {
+      var e = this.Canvas.create({ cview: this }, X);
+      e.setAttribute('width', this.x + this.width || this.r * 2);
+      e.setAttribute('height',this.y + this.height || this.r * 2);
+      return e;
     }
   ],
 
@@ -760,43 +762,26 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
+  extends: 'foam.u2.Element',
 
   imports: [ 'getElementById' ],
 
+  exports: [
+    'pointer'
+  ],
+
   properties: [
-    {
-      name: 'id',
-      factory: function() { return 'v' + this.$UID; }
-    },
-    {
-      name: 'width',
-    },
-    {
-      name: 'height',
-    },
-    {
-      name: 'element',
-      factory: function() {
-        var e = this.getElementById(this.id);
-        e.width = this.width;
-        e.height = this.height;
-        return e;
-      },
-      postSet: function(_, e) {
-        e.width = this.width;
-        e.height = this.height;
-      }
-    },
+    [ 'nodeName', 'CANVAS' ],
     {
       name: 'context',
       factory: function() {
-        return this.element.getContext('2d');
+        return this.el().getContext('2d');
       }
     },
     {
       name: 'context3D',
       factory: function() {
-        return this.element.getContext('webgl');
+        return this.el().getContext('webgl');
       }
     },
     {
@@ -810,8 +795,11 @@ foam.CLASS({
   ],
 
   methods: [
+    function initE() {
+      this.on('load', this.paint);
+    },
     function erase() {
-      this.element.width = this.element.width;
+      this.el().width = this.el().width;
     }
   ],
 
@@ -820,6 +808,9 @@ foam.CLASS({
       name: 'paint',
       isFramed: true,
       code: function paintCanvas() {
+        // Only paint after being loaded
+        if ( this.state !== this.LOADED ) return;
+
         var context = this.cview.paint3D ? this.context3D : this.context;
         this.erase(context);
 
@@ -828,14 +819,6 @@ foam.CLASS({
           else this.cview.paint(context);
         }
       }
-    }
-  ],
-
-  templates: [
-    {
-      // ???: Shouldn't this be toE() instead?
-      name: 'toHTML',
-      template: '<canvas id="<%= this.id %>"></canvas>'
     }
   ]
 });
