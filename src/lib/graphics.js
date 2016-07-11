@@ -456,6 +456,9 @@ foam.CLASS({
       value: 'initial'
     },
     {
+      name: 'parent'
+    },
+    {
       name: 'transform_',
       factory: function() { return this.Transform.create(); }
     },
@@ -521,11 +524,13 @@ foam.CLASS({
     },
 
     function addChild_(c) {
+      c.parent = this;
       c.invalidated.sub(this.onChildUpdate);
       return c;
     },
 
     function removeChild_(c) {
+      c.parent = undefined;
       c.invalidated.unsub(this.onChildUpdate);
       return c;
     },
