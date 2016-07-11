@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: Respect minHandleSize
 foam.CLASS({
   package: 'foam.graphics',
   name: 'ScrollCView',
