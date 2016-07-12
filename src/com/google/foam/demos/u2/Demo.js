@@ -196,7 +196,11 @@ foam.CLASS({
   properties: [ 'firstName', 'lastName', 'age' ]
 });
 
-var p = Person.create();
+var p = Person.create({firstName: 'John', lastName: 'Doe', age: 42});
+
+foam.u2.DetailView.create({
+  data: p
+}).write();
 
 foam.u2.DetailView.create({
   data: p
