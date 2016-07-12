@@ -124,7 +124,9 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.__subContext__.register(this.DetailPropertyView, 'foam.u2.PropertyView');
+      this.__subContext__.register(
+          this.DetailPropertyView,
+          'foam.u2.PropertyView');
     },
 
     function initE() {
@@ -132,9 +134,9 @@ foam.CLASS({
         if ( ! model ) return 'Set model or data.';
 
         var title = this.title && this.E('tr').
-              start('td').cssClass(this.myCls('title')).attrs({colspan: 2}).
-                add(this.title$).
-              end();
+          start('td').cssClass(this.myCls('title')).attrs({colspan: 2}).
+            add(this.title$).
+          end();
 
         return this.actionBorder(
           this.E('table').cssClass(this.myCls()).add(title).add(properties));
@@ -144,7 +146,8 @@ foam.CLASS({
     function actionBorder(e) {
       if ( ! this.showActions || ! this.of.actions.length ) return e;
 
-      return this.Y.E().add(e).start('div').cls(this.myCls('toolbar')).add(this.of.actions).end();
+      return this.E().add(e).
+        start('div').cssClass(this.myCls('toolbar')).add(this.of.actions).end();
     },
 
     function elementForFeature(fName) {
