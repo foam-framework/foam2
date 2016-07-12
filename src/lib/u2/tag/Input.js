@@ -45,8 +45,7 @@ foam.CLASS({
     },
 
     function link() {
-      // TODO
-      Events.link(this.data$, this.attrValue(null, this.onKey ? 'input' : null));
+      this.data$ = this.attrSlot(null, this.onKey ? 'input' : null);
     },
 
     function updateMode_(mode) {
