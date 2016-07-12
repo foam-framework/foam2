@@ -41,12 +41,6 @@ foam.CLASS({
         parent: this,
         name:   name
       });
-      var s = foam.core.internal.SubSlot.create();
-      
-      s.parent = this;
-      s.name   = name;
-
-      return s;
     },
 
     /**
