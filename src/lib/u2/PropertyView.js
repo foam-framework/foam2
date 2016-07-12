@@ -22,8 +22,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.Property',
-    'foam.u2.TextField',
-//    'foam.u2.DateView'
+    'foam.u2.TextField'
   ],
 
   imports: [
@@ -31,17 +30,7 @@ foam.CLASS({
   ],
 
   properties: [
-    /*
-    {
-      name: 'data',
-      postSet: function(old, nu) {
-        this.bindData_(old, nu);
-      }
-    },
-    */
-    {
-      name: 'prop'
-    },
+    'prop',
     {
       name: 'view',
       attribute: true,
@@ -54,46 +43,23 @@ foam.CLASS({
         return v;
       }
     },
-    {
-      name: 'child_',
-    },
+    'child_',
     'validator_',
     [ 'nodeName', 'span' ]
   ],
 
   methods: [
     function initE() {
-      var self = this;
-
-      this.onDestroy(this.data$.sub(function(_, __, slot) {
-        self.bindData_(slot.getPrev(), slot.get());
-      }));
-
       var view = this.view || this.prop.toPropertyE(this.Y);
-      var prop = this.prop;
 
-      // TODO: remove check once all views extend View
-      view.fromProperty && view.fromProperty(prop);
+      view.data$ = this.data$.slot(this.prop.name);
+      view.fromProperty && view.fromProperty(this.prop);
 
       this.child_ = view;
       this.cssClass(this.myCls());
-      this.add(this.child_);
-      this.bindData_(null, this.data);
-    },
-    // Set properties on delegate view instead of this
-    function attrs(map) {
-      this.view.attrs(map);
-      return this;
-    }
-  ],
+      this.add(view);
 
-  listeners: [
-    function bindData_(old, nu) {
-      // TODO: introduce slot.slot() to simplify/eliminate this
-      if ( ! this.child_ ) return;
-      if ( old ) Events.unlink(old.propertyValue(this.prop.name), this.child_.data$);
-      if ( nu  ) Events.link(nu.propertyValue(this.prop.name), this.child_.data$);
-
+      /*
       // Attach property validation if it's enabled and available.
       if ( this.validator_ ) this.validator_();
       if ( this.child_.showValidation && this.prop.validate ) {
@@ -101,6 +67,13 @@ foam.CLASS({
           this.child_.validationError_ = err;
         }.bind(this));
       }
+      */
+    },
+
+    // Set properties on delegate view instead of this
+    function attrs(map) {
+      this.view.attrs(map);
+      return this;
     }
   ]
 });

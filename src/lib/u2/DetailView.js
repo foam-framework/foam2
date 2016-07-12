@@ -51,7 +51,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'showActions'
     },
     {
@@ -124,7 +124,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-//      this.Y.registerModel(this.DetailPropertyView, 'foam.u2.PropertyView');
+      this.__subContext__.register(this.DetailPropertyView, 'foam.u2.PropertyView');
     },
 
     function initE() {
@@ -169,7 +169,7 @@ foam.CLASS({
     },
 
     function toE(X) {
-      return this.PropertyView.create({
+      return X.lookup('foam.u2.PropertyView').create({
         prop: this,
         view: this.toPropertyE(X)
       }, X);

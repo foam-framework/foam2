@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-CLASS({
+foam.CLASS({
   package: 'foam.u2',
   name: 'DetailPropertyView',
   extends: 'foam.u2.PropertyView',
 
+  /*
   requires: [
-    'foam.u2.tag.Select',
+    'foam.u2.tag.Select'
   ],
+  */
 
   properties: [
     [ 'nodeName', 'tr' ]
@@ -51,19 +53,16 @@ CLASS({
 
   methods: [
     function initE() {
-      var view = this.view || this.prop.toPropertyE();
+      this.SUPER();
+
       var prop = this.prop;
-      view.fromProperty && view.fromProperty(prop);
-      this.child_ = view;
 
-      this.cls('foam-u2-PropertyView-')
-          .start('td').cls('foam-u2-PropertyView-label').add(prop.label).end()
-          .start('td').cls('foam-u2-PropertyView-view').add(
+      this.cssClass('foam-u2-PropertyView-')
+          .start('td').cssClass('foam-u2-PropertyView-label').add(prop.label).end()
+          .start('td').cssClass('foam-u2-PropertyView-view').add(
               this.child_,
-              prop.units && this.E('span').cls('foam-u2-PropertyView-units').add(prop.units))
+              prop.units && this.E('span').cssClass('foam-u2-PropertyView-units').add(prop.units))
           .end();
-
-      this.bindData_(null, this.data);
     }
   ]
 });
