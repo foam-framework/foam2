@@ -43,7 +43,7 @@ var createTestProperties = function createTestProperties() {
           name: 'referenceArray',
         },
         {
-          class: 'Class',
+          class: 'Class2',
           name: 'class',
         }
         // TODO: other types, as they gain testable functionality
@@ -285,13 +285,17 @@ describe('Class property', function() {
   });
   it('looks up a model from a string name', function() {
     p.class = 'test.DateTypeTester';
-    expect(p.class).toBe(test.DateTypeTester);
+    expect(p.class).toBe('test.DateTypeTester');
+    expect(p.class$cls).toBe(test.DateTypeTester);
   });
   it('accepts undefined', function() {
     p.class = 'test.DateTypeTester';
-    expect(p.class).toBe(test.DateTypeTester);
+    expect(p.class).toBe('test.DateTypeTester');
+    expect(p.class$cls).toBe(test.DateTypeTester);
+
     p.class = undefined;
     expect(p.class).toBeUndefined();
+    expect(p.class$cls).toBeUndefined();
   });
 
 });

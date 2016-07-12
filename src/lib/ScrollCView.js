@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: Respect minHandleSize
 foam.CLASS({
   package: 'foam.graphics',
   name: 'ScrollCView',
@@ -29,7 +28,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'width',
-      value: 40
+      value: 20
     },
     {
       class: 'Int',
@@ -78,6 +77,20 @@ foam.CLASS({
       value: 10
     },
     {
+      class: 'Float',
+      name: 'handleSize',
+      expression: function(minHandleSize, size, extent, height, innerBorder) {
+        var h = height - 2*innerBorder;
+        var hs = extent * h / size;
+        return hs < minHandleSize ? minHandleSize : hs;
+      }
+    },
+    {
+      class: 'Int',
+      name: 'innerBorder',
+      value: 2
+    },
+    {
       class: 'String',
       name: 'handleColor',
       value: 'rgb(107,136,173)'
@@ -86,6 +99,18 @@ foam.CLASS({
       class: 'String',
       name: 'borderColor',
       value: '#999'
+    },
+    {
+      name: 'yMax',
+      expression: function(height, innerBorder, handleSize)  {
+        return height - innerBorder - handleSize;
+      }
+    },
+    {
+      name: 'rate',
+      expression: function(size, yMax, innerBorder) {
+        return ( yMax - innerBorder ) / size;
+      }
     }
   ],
 
@@ -120,11 +145,11 @@ foam.CLASS({
     },
 
     function yToValue(y) {
-      return ( y - 2 ) * ( this.size / ( this.height - 4 ) );
+      return ( y - this.innerBorder ) / this.rate;
     },
 
     function valueToY(value) {
-      return value * ( ( this.height - 4 ) / this.size ) + 2;
+      return value * this.rate + this.innerBorder;
     },
 
     function paintSelf(c) {
@@ -140,13 +165,11 @@ foam.CLASS({
 
       c.fillStyle = this.handleColor;
 
-      var handleSize = this.height - 2 - this.valueToY(this.size - this.extent);
-
       c.fillRect(
         2,
         this.valueToY(this.value),
         this.width - 11,
-        handleSize);
+        this.handleSize);
     }
   ]
 });

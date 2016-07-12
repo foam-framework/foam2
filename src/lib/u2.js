@@ -117,7 +117,17 @@ foam.CLASS({
     function onAddChildren() {},
     function onInsertChildren() {},
     function onReplaceChild() {},
-    function onRemoveChild() {}
+    function onRemoveChild() {},
+    function getBoundingClientRect() {
+      return {
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 0,
+        width: 0,
+        height: 0
+      };
+    }
   ]
 });
 
@@ -296,6 +306,9 @@ foam.CLASS({
       } else {
         child.remove();
       }
+    },
+    function getBoundingClientRect() {
+      return this.el().getBoundingClientRect();
     },
     function toString() { return 'LOADED'; }
   ]

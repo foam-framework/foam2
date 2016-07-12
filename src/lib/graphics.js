@@ -813,9 +813,7 @@ foam.CLASS({
     {
       name: 'pointer',
       factory: function() {
-        var m = this.Pointer.create();
-        m.install(this.el());
-        return m;
+        return this.Pointer.create({ element: this });
       }
     }
   ],
