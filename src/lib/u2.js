@@ -328,7 +328,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.DefaultValidator',
-    'foam.u2.ElementValue',
+    'foam.u2.ElementSlot',
     'foam.u2.Entity'
   ],
 
@@ -565,15 +565,15 @@ foam.CLASS({
 
       return e;
     },
-
-    function attrValue(opt_name, opt_event) {
-      /* Convenience method for creating an ElementValue. */
+    
+    function attrSlot(opt_name, opt_event) {
+      /* Convenience method for creating an ElementSlot. */
       var args = { element: this };
 
       if ( opt_name  ) args.property = opt_name;
       if ( opt_event ) args.event    = opt_event;
 
-      return this.ElementValue.create(args);
+      return this.ElementSlot.create(args);
     },
 
     function myCls(opt_extra) {
