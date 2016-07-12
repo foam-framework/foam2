@@ -193,17 +193,17 @@ foam.CLASS({
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
     },
-    function onSetCls(cls, enabled) { error(); },
-    function onFocus(cls, enabled) { error(); },
-    function onAddListener(topic, listener) { error(); },
-    function onRemoveListener(topic, listener) { error(); },
-    function onSetStyle(key, value) { error(); },
-    function onSetAttr(key, value) { error(); },
-    function onRemoveAttr(key, value) { error(); },
-    function onAddChildren(c) { error(); },
-    function onInsertChildren() { error(); },
-    function onReplaceChild() { error(); },
-    function onRemoveChild() { error(); },
+    function onSetCls(cls, enabled) { this.error(); },
+    function onFocus(cls, enabled) { this.error(); },
+    function onAddListener(topic, listener) { this.error(); },
+    function onRemoveListener(topic, listener) { this.error(); },
+    function onSetStyle(key, value) { this.error(); },
+    function onSetAttr(key, value) { this.error(); },
+    function onRemoveAttr(key, value) { this.error(); },
+    function onAddChildren(c) { this.error(); },
+    function onInsertChildren() { this.error(); },
+    function onReplaceChild() { this.error(); },
+    function onRemoveChild() { this.error(); },
     function toString() { return 'OUTPUT'; }
   ]
 });
