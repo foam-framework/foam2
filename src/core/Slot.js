@@ -179,7 +179,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
-//  extends: 'foam.core.Slot',
+  implements: [ 'foam.core.Slot' ],
 
   properties: [
     'parent',
@@ -189,13 +189,6 @@ foam.CLASS({
   ],
 
   methods: [
-    /*
-    function initArgs(args) {
-      this.parent = args.parent;
-      this.name   = args.name;
-    },
-    */
-
     function init() {
       this.parent.sub(this.parentChange);
       this.parentChange();
