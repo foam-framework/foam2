@@ -828,6 +828,24 @@ log(dyn.get());
 dyn.set('John');
 log(dyn.get());
 
+// Nested slots
+foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
+var p1 = Person.create({name: 'John'});
+var p2 = Person.create({name: 'Paul'});
+var h = Holder.create({data: p1});
+var s = h.slot('data').slot('name'); /* same as h.data$.slot('name') */
+s.sub(function() { console.log('change: ', arguments, h.data.name); });
+log(s.get());
+s.set('George');
+log(p1.name);
+p1.name = 'Ringo';
+log('Setting to p2');
+h.data = p2;
+log(s.get());
+s.set('George');
+log(p2.name);
+p2.name = 'Ringo';
+
 // Two-Way Data-Binding
 // Slots can be assigned, causing two values to be
 // bound to the same value.
