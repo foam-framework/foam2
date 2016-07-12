@@ -115,6 +115,11 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
+        if ( ! this.data ) {
+          this.rows = [];
+          return;
+        }
+
         this.data.select().then(function(a) { this.rows = a.a; }.bind(this));
       }
     }

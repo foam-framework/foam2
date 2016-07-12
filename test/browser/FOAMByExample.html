@@ -912,7 +912,7 @@ log(p1.name, p2.name);
 
 // One-Way Data-Binding, with Map function (mapFrom)
 var d = p1.name$.mapFrom(p2.name$, function(n) {
-  return "Mr. " + n; 
+  return "Mr. " + n;
 });
 p1.name$.clear();
 p2.name$.clear();
@@ -924,7 +924,7 @@ d.destroy();
 
 // One-Way Data-Binding, with Map function (mapTo)
 var d = p2.name$.mapTo(p1.name$, function(n) {
-  return "Mr. " + n; 
+  return "Mr. " + n;
 });
 p1.name$.clear();
 p2.name$.clear();
@@ -1702,7 +1702,7 @@ foam.CLASS({
   ]
 });
 var g = GraphicsDemo.create();
-log_(g.toHTML());
+g.write();
 g.step();
 
 //:NOTEST
@@ -1745,7 +1745,7 @@ foam.CLASS({
   ]
 });
 var g = Spin.create();
-log_(g.toHTML());
+g.write();
 
 //:NOTEST
 // More Graphics
@@ -1809,7 +1809,7 @@ foam.CLASS({
   ]
 });
 var g = TudorWall.create();
-log_(g.toHTML());
+g.write();
 </script>
 
   <div id='output'></div>

@@ -1337,7 +1337,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ContextMethod',
   extends: 'foam.core.Method',
-  
+
   methods: [
     function exportAs(obj) {
       return obj[this.name];
@@ -1380,7 +1380,7 @@ foam.CLASS({
       var key = opt_elName || elClass.name;
       this.elementMap[key.toUpperCase()] = elClass;
     },
-    
+
     function elementForName(nodeName) {
       if ( this.elementMap[nodeName] ) console.log('NODENAME: ', nodeName, this.elementMap[nodeName]);
       return this.elementMap[nodeName];

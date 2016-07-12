@@ -456,6 +456,9 @@ foam.CLASS({
       value: 'initial'
     },
     {
+      name: 'parent'
+    },
+    {
       name: 'transform_',
       factory: function() { return this.Transform.create(); }
     },
@@ -482,6 +485,15 @@ foam.CLASS({
         this.pub('invalidated');
       }.bind(this));
 */
+    },
+
+    function toLocalCoordinates(p) {
+      if ( this.parent ) this.parent.toLocalCoordinates(p);
+
+      var t = this.transform.invert().mulP(p);
+      p.x /= p.w;
+      p.y /= p.w;
+      p.w = 1;
     },
 
     function maybeInitCView(x) {
@@ -521,11 +533,13 @@ foam.CLASS({
     },
 
     function addChild_(c) {
+      c.parent = this;
       c.invalidated.sub(this.onChildUpdate);
       return c;
     },
 
     function removeChild_(c) {
+      c.parent = undefined;
       c.invalidated.unsub(this.onChildUpdate);
       return c;
     },
@@ -543,13 +557,15 @@ foam.CLASS({
       return 'hsl(' + h + ',' + s + '%,' + l + '%)';
     },
 
-    // FUTURE: Replace with toE() when/if ready.
-    function toHTML() {
-      return this.Canvas.create({
-        width: this.x + this.width || this.r * 2,
-        height: this.y + this.height || this.r * 2,
-        cview: this
-      }).toHTML();
+    function write() {
+      this.toE().write();
+    },
+
+    function toE(X) {
+      var e = this.Canvas.create({ cview: this }, X);
+      e.setAttribute('width', this.x + this.width || this.r * 2);
+      e.setAttribute('height',this.y + this.height || this.r * 2);
+      return e;
     }
   ],
 
@@ -760,43 +776,30 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
+  extends: 'foam.u2.Element',
+
+  requires: [
+    'foam.input.Pointer'
+  ],
 
   imports: [ 'getElementById' ],
 
+  exports: [
+    'pointer'
+  ],
+
   properties: [
-    {
-      name: 'id',
-      factory: function() { return 'v' + this.$UID; }
-    },
-    {
-      name: 'width',
-    },
-    {
-      name: 'height',
-    },
-    {
-      name: 'element',
-      factory: function() {
-        var e = this.getElementById(this.id);
-        e.width = this.width;
-        e.height = this.height;
-        return e;
-      },
-      postSet: function(_, e) {
-        e.width = this.width;
-        e.height = this.height;
-      }
-    },
+    [ 'nodeName', 'CANVAS' ],
     {
       name: 'context',
       factory: function() {
-        return this.element.getContext('2d');
+        return this.el().getContext('2d');
       }
     },
     {
       name: 'context3D',
       factory: function() {
-        return this.element.getContext('webgl');
+        return this.el().getContext('webgl');
       }
     },
     {
@@ -806,12 +809,23 @@ foam.CLASS({
         n && n.invalidated.sub(this.paint);
         this.paint();
       }
+    },
+    {
+      name: 'pointer',
+      factory: function() {
+        var m = this.Pointer.create();
+        m.install(this.el());
+        return m;
+      }
     }
   ],
 
   methods: [
+    function initE() {
+      this.on('load', this.paint);
+    },
     function erase() {
-      this.element.width = this.element.width;
+      this.el().width = this.el().width;
     }
   ],
 
@@ -820,6 +834,9 @@ foam.CLASS({
       name: 'paint',
       isFramed: true,
       code: function paintCanvas() {
+        // Only paint after being loaded
+        if ( this.state !== this.LOADED ) return;
+
         var context = this.cview.paint3D ? this.context3D : this.context;
         this.erase(context);
 
@@ -828,14 +845,6 @@ foam.CLASS({
           else this.cview.paint(context);
         }
       }
-    }
-  ],
-
-  templates: [
-    {
-      // ???: Shouldn't this be toE() instead?
-      name: 'toHTML',
-      template: '<canvas id="<%= this.id %>"></canvas>'
     }
   ]
 });
