@@ -321,6 +321,8 @@ foam.CLASS({
       }
     },
 
+    function slot() { return null; }, // TODO: temporary fix
+
     function get() {
       return this.value;
     },
