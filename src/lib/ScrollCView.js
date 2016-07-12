@@ -55,7 +55,7 @@ foam.CLASS({
       class: 'Int',
       name: 'extent',
 //      help: 'Number of elements shown.',
-      minValue: 1,
+//      minValue: 1, // TODO: add back when minValue supported
       value: 10,
       postSet: function(old, nu) {
         if ( old !== nu ) this.invalidated.pub();

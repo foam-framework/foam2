@@ -27,10 +27,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableView',
   extends: 'foam.u2.Element',
+
   properties: [
     {
       class: 'Class2',
@@ -104,12 +106,14 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       this.onDAOUpdate();
       return this.add(this.header$, this.body$);
     }
   ],
+
   listeners: [
     {
       name: 'onDAOUpdate',

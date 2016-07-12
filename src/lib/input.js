@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.input',
   name: 'TouchEvent',
+
   properties: [
     {
       class: 'Float',
@@ -35,27 +36,32 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.input',
   name: 'Mouse',
-  properties: [
-    'lastTouch',
-    'x',
-    'y'
-  ],
+
   topics: [
     'down',
     'up',
     'move',
     'touch'
   ],
+
+  properties: [
+    'lastTouch',
+    'x',
+    'y'
+  ],
+
   methods: [
     function install(element) {
-      element.addEventListener('mousedown', this.onMouseDown);
-      element.addEventListener('mouseup', this.onMouseUp);
-      element.addEventListener('mousemove', this.onMouseMove);
+      element.on('mousedown', this.onMouseDown);
+      element.on('mouseup',   this.onMouseUp);
+      element.on('mousemove', this.onMouseMove);
     }
   ],
+
   listeners: [
     {
       name: 'onMouseDown',
@@ -107,9 +113,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.input',
   name: 'Touch',
+
+  topics: [
+    'touch'
+  ],
+
   properties: [
     {
       name: 'touches',
@@ -119,21 +131,20 @@ foam.CLASS({
       name: 'ref'
     }
   ],
-  topics: [
-    'touch'
-  ],
+
   methods: [
     function install(e) {
       this.ref = e;
-      e.addEventListener('touchstart', this.onTouchStart);
-      e.addEventListener('touchmove', this.onTouchMove);
-      e.addEventListener('touchend', this.onTouchEnd);
+      e.on('touchstart', this.onTouchStart);
+      e.on('touchmove',  this.onTouchMove);
+      e.on('touchend',   this.onTouchEnd);
     }
   ],
+
   listeners: [
     function onTouchStart(e) {
       var newTouches = e.changedTouches;
-      var reference = this.ref.getBoundingClientRect();
+      var reference  = this.ref.getBoundingClientRect();
 
       for ( var i = 0 ; i < newTouches.length ; i++ ) {
         var touch = newTouches.item(i);
@@ -149,6 +160,7 @@ foam.CLASS({
         this.touches[touch.identifier] = touchEvent;
       }
     },
+
     function onTouchMove(e) {
       var changed = e.changedTouches;
 
@@ -163,6 +175,7 @@ foam.CLASS({
         if ( event.claimed ) e.preventDefault();
       }
     },
+
     function onTouchEnd(e) {
       var changed = e.changedTouches;
       for ( var i = 0 ; i < changed.length ; i++ ) {
@@ -175,16 +188,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.input',
   name: 'Pointer',
+
   requires: [
     'foam.input.Mouse',
     'foam.input.Touch'
   ],
+
   topics: [
     'touch'
   ],
+
   properties: [
     {
       name: 'mouseInput',
@@ -199,6 +216,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function install(e) {
       this.mouseInput.install(e);
@@ -207,6 +225,7 @@ foam.CLASS({
       this.touchInput.touch.sub(this.onTouch);
     }
   ],
+
   listeners: [
     function onTouch(e, _, t) {
       this.touch.pub(t);
