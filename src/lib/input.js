@@ -51,14 +51,25 @@ foam.CLASS({
   properties: [
     'lastTouch',
     'x',
-    'y'
+    'y',
+    {
+      name: 'element',
+      postSet: function(old, e) {
+        if ( old ) {
+          old.removeEventListener('mousedown', this.onMouseDown);
+          old.removeEventListener('mouseup',   this.onMouseUp);
+          old.removeEventListener('mousemove', this.onMouseMove);
+        }
+        e.addEventListener('mousedown', this.onMouseDown);
+        e.addEventListener('mouseup',   this.onMouseUp);
+        e.addEventListener('mousemove', this.onMouseMove);
+      }
+    }
   ],
 
   methods: [
     function install(element) {
-      element.addEventListener('mousedown', this.onMouseDown);
-      element.addEventListener('mouseup',   this.onMouseUp);
-      element.addEventListener('mousemove', this.onMouseMove);
+      this.ref = element;
     }
   ],
 
@@ -66,8 +77,10 @@ foam.CLASS({
     {
       name: 'onMouseDown',
       code: function(e) {
-        this.x = e.offsetX;
-        this.y = e.offsetY;
+        var bounds = this.element.getBoundingClientRect();
+
+        this.x = e.clientX - bounds.left;
+        this.y = e.clientY - bounds.top;
 
         this.down.pub();
 
@@ -101,8 +114,11 @@ foam.CLASS({
         if ( this.lastTouch ||
              this.hasListeners('propertyChange') ||
              this.move.hasListeners() ) {
-          this.x = e.offsetX;
-          this.y = e.offsetY;
+
+          var bounds = this.element.getBoundingClientRect();
+
+          this.x = e.clientX - bounds.left;
+          this.y = e.clientY - bounds.top;
 
           this.move.pub();
 
@@ -128,30 +144,31 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
-      name: 'ref'
-    }
-  ],
-
-  methods: [
-    function install(e) {
-      this.ref = e;
-      e.addEventListener('touchstart', this.onTouchStart);
-      e.addEventListener('touchmove',  this.onTouchMove);
-      e.addEventListener('touchend',   this.onTouchEnd);
+      name: 'element',
+      postSet: function(old, e) {
+        if ( old ) {
+          old.removeEventListener('touchstart', this.onTouchStart);
+          old.removeEventListener('touchmove',  this.onTouchMove);
+          old.removeEventListener('touchend',   this.onTouchEnd);
+        }
+        e.addEventListener('touchstart', this.onTouchStart);
+        e.addEventListener('touchmove',  this.onTouchMove);
+        e.addEventListener('touchend',   this.onTouchEnd);
+      }
     }
   ],
 
   listeners: [
     function onTouchStart(e) {
       var newTouches = e.changedTouches;
-      var reference  = this.ref.getBoundingClientRect();
+      var bounds     = this.element.getBoundingClientRect();
 
       for ( var i = 0 ; i < newTouches.length ; i++ ) {
         var touch = newTouches.item(i);
 
         var touchEvent = foam.input.TouchEvent.create({
-          x: touch.clientX - reference.left,
-          y: touch.clientY - reference.top
+          x: touch.clientX - bounds.left,
+          y: touch.clientY - bounds.top
         });
 
         this.touch.pub(touchEvent);
@@ -163,15 +180,14 @@ foam.CLASS({
 
     function onTouchMove(e) {
       var changed = e.changedTouches;
-
-      var reference = this.ref.getBoundingClientRect();
+      var bounds  = this.element.getBoundingClientRect();
 
       for ( var i = 0 ; i < changed.length ; i++ ) {
         var touch = changed.item(i);
 
         var event = this.touches[touch.identifier];
-        event.x = touch.clientX - reference.left;
-        event.y = touch.clientY - reference.top;
+        event.x = touch.clientX - bounds.left;
+        event.y = touch.clientY - bounds.top;
         if ( event.claimed ) e.preventDefault();
       }
     },
@@ -204,29 +220,32 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'element',
+      required: true
+    },
+    {
       name: 'mouseInput',
       factory: function() {
-        return this.Mouse.create();
+        var m = this.Mouse.create();
+        this.onDestroy(m.element$.follow(this.element$));
+        this.onDestroy(m.touch.sub(this.onTouch));
       }
     },
     {
       name: 'touchInput',
       factory: function() {
-        return this.Touch.create();
+        var t = this.Touch.create();
+        this.onDestroy(t.element$.follow(this.element$));
+        this.onDestroy(t.touch.sub(this.onTouch));
       }
     }
   ],
 
-  methods: [
-    function install(e) {
-      this.mouseInput.install(e);
-      this.touchInput.install(e);
-      this.mouseInput.touch.sub(this.onTouch);
-      this.touchInput.touch.sub(this.onTouch);
-    }
-  ],
-
   listeners: [
+    function init() {
+      this.mouseInput;
+      this.touchInput;
+    },
     function onTouch(e, _, t) {
       this.touch.pub(t);
     }
