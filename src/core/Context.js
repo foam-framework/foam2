@@ -49,8 +49,9 @@
       var ret = typeof id === 'string' && this.__cache__[id];
 
       if ( ! opt_suppress ) {
-        console.assert(ret,
-                       'Could not find any registered class for ' + id);
+        console.assert(
+            ret,
+            'Could not find any registered class for ' + id);
       }
 
       return ret;
@@ -62,13 +63,10 @@
      *
      * @param cls The class to register.
      */
-    register: function(cls) {
+    register: function(cls, opt_id) {
       console.assert(
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
-      console.assert(
-        typeof cls.id === 'string',
-        'Must have an .id property to be registered in a context.');
 
       function doRegister(cache, name) {
         console.assert(
@@ -78,8 +76,15 @@
         cache[name] = cls;
       }
 
-      doRegister(this.__cache__, cls.id);
-      if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
+      if ( opt_id ) {
+        doRegister(this.__cache__, opt_id);
+      } else {
+        console.assert(
+            typeof cls.id === 'string',
+            'Must have an .id property to be registered in a context.');
+        doRegister(this.__cache__, cls.id);
+        if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
+      }
     },
 
     /**
