@@ -274,6 +274,93 @@ foam.CLASS({
   properties: [ 'name' ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'BoxRegistration',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      name: 'exportBox'
+    },
+    {
+      name: 'localBox',
+      networkTransient: true
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'BoxRegistryDAO',
+  extends: 'foam.dao.AbstractDAO',
+  requires: [
+    'foam.box.BoxRegistration',
+    'foam.dao.ArraySink'
+  ],
+  properties: [
+    {
+      name: 'of',
+      expression: function() { return this.BoxRegistration; }
+    },
+    {
+      name: 'registry'
+    }
+  ],
+  methods: [
+    function put(obj) {
+      return Promise.resolve(
+        this.registry.register(obj.name, obj.exportBox, obj.localBox));
+    },
+    function remove(obj) {
+      this.registry.unregister(obj.name);
+      return Promise.resolve(obj);
+    },
+    function find(id) {
+      return Promise.resolve(this.registry.lookup(id));
+    },
+    function select(sink, skip, limit, order, predicate) {
+      var resultSink = sink || this.ArraySink.create();
+
+      sink = this.decorateSink_(
+        resultSink, skip, limit, order, predicate);
+
+      var registrations = this.registry.registry;
+      var fc = this.FlowControl.create();
+
+      for ( var key in registrations ) {
+        if ( fc.stopped ) break;
+        if ( fc.errorEvt ) {
+          sink.error(fc.errorEvt);
+          return Promise.reject(fc.errorEvt);
+        }
+
+        sink.put(this.BoxRegistration.create({
+          name: key,
+          exportBox: registrations[key].exportBox,
+          localBox: registrations[key].localBox
+        }), null, fc);
+      }
+
+      sink.eof();
+
+      return Promise.resolve(resultSink);
+    },
+    function removeAll(skip, limit, order, predicate) {
+      var registrations = this.registry.registry;
+
+      for ( var key in registrations ) {
+        this.registry.remove(key);
+      }
+
+      return Promise.resolve();
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -281,6 +368,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.NoSuchNameException',
+    'foam.box.BoxRegistration',
     'foam.box.SubBox'
   ],
 
@@ -297,12 +385,30 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'select',
+      returns: 'Promise',
+      code: function() {
+        var results = [];
+        for ( var key in this.registry ) {
+          if ( ! this.registry[key].exportBox ) continue;
+
+          results.push(this.BoxRegistration.create({
+            name: key,
+            exportBox: this.registry[key].exportBox
+          }));
+        }
+
+        return Promise.resolve(results);
+      }
+    },
+    {
       name: 'lookup',
-      returns: 'foam.box.Box',
+//      returns: 'foam.box.Box',
+      returns: 'Promise',
       code: function lookup(name) {
         if ( this.registry[name] &&
              this.registry[name].exportBox )
-          return this.registry[name].exportBox;
+          return Promise.resolve(this.registry[name].exportBox);
 
         throw this.NoSuchNameException.create({ name: name });
       }
@@ -438,23 +544,24 @@ foam.CLASS({
       }
     },
     {
-      name: 'promise',
+      name: 'delegate',
       factory: function() {
         if ( this.name === '' ) {
           return this.root;
         }
-        return this.registry.lookup(this.name);
+        return foam.box.PromisedBox.create({
+          promise: this.registry.lookup(this.name)
+        });
       }
     }
   ],
 
   methods: [
     function send(msg) {
-      this.promise.send(msg);
+      this.delegate.send(msg);
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.box',
@@ -717,6 +824,12 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'DiscoverMessage',
+  extends: 'foam.box.Message'
+});
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -725,6 +838,7 @@ foam.CLASS({
   requires: [
     'foam.box.SubscribeMessage',
     'foam.box.RPCMessage',
+    'foam.box.DiscoverMessage',
     'foam.box.InvalidMessageException'
   ],
 
@@ -837,6 +951,56 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'SocketBox2',
+  imports: [
+    'socketService',
+  ],
+  properties: [
+    {
+      name: 'socket',
+      transient: true,
+      factory: function() {
+        return new require('net').Socket();
+      },
+      postSet: function(_, socket) {
+        socket.on('connect', this.onConnect);
+        socket.on('error', this.onError);
+      }
+    },
+    {
+      class: 'String',
+      name: 'address'
+    },
+    {
+      name: 'promise',
+      transient: true,
+      factory: function() {
+      }
+    }
+  ],
+  axioms: [
+    foam.pattern.Multiton.create({
+      property: 'address'
+    })
+  ],
+  methods: [
+    function send(m) {
+    }
+  ],
+  listeners: [
+    function onConnect() {
+      this.socketService.addSocket(this);
+      this.send(this.RegisterSelfMessage.create({
+        name: this.me.name
+      }));
+      this.connect.pub();
+    },
+    function onError() {
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.box',

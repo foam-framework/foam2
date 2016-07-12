@@ -39,7 +39,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class',
+      class: 'Class2',
       name:  'of',
       required: true
     },
@@ -74,13 +74,13 @@ foam.CLASS({
     function addIndex() {
       var props = Array.from(arguments);
 
-      if ( ! this.of.ids ) {// throw "Undefined index"; // TODO: err?
-        this.of.ids = ['id'];
+      if ( ! this.of$cls.ids ) {// throw "Undefined index"; // TODO: err?
+        this.of$cls.ids = ['id'];
       }
 
       // Add on the primary key(s) to make the index unique.
-      for ( var i = 0 ; i < this.of.ids.length ; i++ ) {
-        props.push(this.of.getAxiomByName(this.of.ids[i]));
+      for ( var i = 0 ; i < this.of$cls.ids.length ; i++ ) {
+        props.push(this.of$cls.getAxiomByName(this.of$cls.ids[i]));
         if ( ! props[props.length - 1] ) throw "Undefined index property"; // TODO: err
       }
 
