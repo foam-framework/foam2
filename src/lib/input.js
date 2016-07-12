@@ -56,9 +56,9 @@ foam.CLASS({
 
   methods: [
     function install(element) {
-      element.on('mousedown', this.onMouseDown);
-      element.on('mouseup',   this.onMouseUp);
-      element.on('mousemove', this.onMouseMove);
+      element.addEventListener('mousedown', this.onMouseDown);
+      element.addEventListener('mouseup',   this.onMouseUp);
+      element.addEventListener('mousemove', this.onMouseMove);
     }
   ],
 
@@ -135,9 +135,9 @@ foam.CLASS({
   methods: [
     function install(e) {
       this.ref = e;
-      e.on('touchstart', this.onTouchStart);
-      e.on('touchmove',  this.onTouchMove);
-      e.on('touchend',   this.onTouchEnd);
+      e.addEventListener('touchstart', this.onTouchStart);
+      e.addEventListener('touchmove',  this.onTouchMove);
+      e.addEventListener('touchend',   this.onTouchEnd);
     }
   ],
 
