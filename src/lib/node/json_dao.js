@@ -44,7 +44,7 @@ foam.CLASS({
       } catch(e) { }
 
       if (data && data.length) {
-        this.array = foam.json.parseArray(foam.json.parseString(data));
+        this.array = foam.json.parse(foam.json.parseString(data));
       }
 
       this.on.put.sub(this.updated);

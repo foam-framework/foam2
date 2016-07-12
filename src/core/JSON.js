@@ -458,10 +458,6 @@ foam.LIB({
       }, function(o) { return o; })
     },
 
-    function parseArray(a, opt_class, opt_ctx) {
-      return a.map(function(e) { return foam.json.parse(e, opt_class, opt_ctx); });
-    },
-
     function parseString(jsonStr) {
       return eval('(' + jsonStr + ')');
     },
