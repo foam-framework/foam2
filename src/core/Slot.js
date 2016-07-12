@@ -37,7 +37,16 @@ foam.CLASS({
     /**
     */
     function slot(name) {
+      return foam.core.internal.SubSlot.create({
+        parent: this,
+        name:   name
+      });
+      var s = foam.core.internal.SubSlot.create();
+      
+      s.parent = this;
+      s.name   = name;
 
+      return s;
     },
 
     /**
@@ -170,27 +179,34 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
-  extends: 'foam.core.Slot',
+//  extends: 'foam.core.Slot',
 
   properties: [
-    'parentSlot',
+    'parent',
     'name',
     'value',
     'prevSub'
   ],
 
   methods: [
+    /*
+    function initArgs(args) {
+      this.parent = args.parent;
+      this.name   = args.name;
+    },
+    */
+
     function init() {
-      this.parentSlot.sub(this.parentChange);
+      this.parent.sub(this.parentChange);
       this.parentChange();
     },
 
     function get() {
-      return this.parentSlot[this.name];
+      return this.parent[this.name];
     },
 
     function set(value) {
-      this.parentSlot[this.name] = value;
+      this.parent[this.name] = value;
     },
 
     /** Needed? **/
@@ -214,18 +230,18 @@ foam.CLASS({
     },
 
     function isDefined() {
-      return this.parentSlot.get().hasOwnProperty(this.name);
+      return this.parent.get().hasOwnProperty(this.name);
     },
 
     function clear() {
-      this.parentSlot.get().clearProperty(this.prop.name);
+      this.parent.get().clearProperty(this.prop.name);
     }
   ],
 
   listeners: [
     function parentChange() {
       this.prevSub && this.prevSub.destroy();
-      this.prevSub = this.parent.sub('propertyChange', this.name, this.valueChange);
+      this.prevSub = this.parent.get().sub('propertyChange', this.name, this.valueChange);
       this.valueChange();
     },
 
