@@ -46,20 +46,25 @@ foam.CLASS({
 
     function get() { return this.value; },
 
-    function set(value) { this.value = value; },
+    function set(value) {
+      this.value = value;
+      this.element.pub('attributeChange', this.property, value);
+    },
 
     function sub(l) {
+      console.log('sub ' + this.property);
       if ( this.firstListener_ ) {
-        if ( this.event )
+        if ( this.event ) {
           this.element.on(this.event, this.onAttrValueChange, false);
+        }
 
         this.firstListener_ = false;
       }
-      // this.value$.sub(l); // TODO: this is broken
+      return this.element.sub('attributeChange', this.property, l);
     },
 
     function unsub(l) {
-      this.value$.unsub(l);
+      this.element.unsub('attributeChange', this.property, l);
     },
 
     function toString() {
@@ -71,9 +76,7 @@ foam.CLASS({
     {
       name: 'onAttrValueChange',
       code: function() {
-        this.value = this.element.el() ?
-          this.element.el()[this.property] :
-          this.element.getAttribute(this.property) ;
+        this.value = this.element.getAttribute(this.property) ;
       }
     }
   ]
