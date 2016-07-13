@@ -52,7 +52,7 @@ foam.CLASS({
     function initE() {
       var view = this.view || this.prop.toPropertyE(this.Y);
 
-      view.data$ = this.data$.slot(this.prop.name);
+      view.data$ = this.data$.dot(this.prop.name);
       view.fromProperty && view.fromProperty(this.prop);
 
       this.child_ = view;
