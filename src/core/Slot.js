@@ -36,12 +36,14 @@ foam.CLASS({
   methods: [
     /**
     */
-    function slot(name) {
+    function dot(name) {
       return foam.core.internal.SubSlot.create({
         parent: this,
         name:   name
       });
     },
+
+    // TODO: renamed linkFrom and add linkTo
 
     /**
       Link two Slots together, setting both to other's value.
@@ -314,8 +316,6 @@ foam.CLASS({
         this.onDestroy(this.args[i].sub(this.invalidate));
       }
     },
-
-    function slot() { return null; }, // TODO: temporary fix
 
     function get() {
       return this.value;
