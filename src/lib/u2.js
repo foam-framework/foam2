@@ -341,7 +341,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.DefaultValidator',
-    'foam.u2.ElementSlot',
+    'foam.u2.AttrSlot',
     'foam.u2.Entity'
   ],
 
@@ -467,7 +467,7 @@ foam.CLASS({
     },
     {
       name: 'attributeMap',
-      // documentation: 'Same information as attributes, but in map form for faster lookup',
+      // documentation: 'Same information as "attributes", but in map form for faster lookup',
       transient: true,
       factory: function() { return {}; }
     },
@@ -580,13 +580,13 @@ foam.CLASS({
     },
     
     function attrSlot(opt_name, opt_event) {
-      /* Convenience method for creating an ElementSlot. */
+      /* Convenience method for creating an AttrSlot. */
       var args = { element: this };
 
       if ( opt_name  ) args.property = opt_name;
       if ( opt_event ) args.event    = opt_event;
 
-      return this.ElementSlot.create(args);
+      return this.AttrSlot.create(args);
     },
 
     function myCls(opt_extra) {
@@ -748,6 +748,21 @@ foam.CLASS({
     },
 
     function getAttribute(name) {
+      // TODO: add support for other dynamic attributes also
+      // TODO: don't lookup in real DOM if listener present
+      if ( name === 'value' && this.el() ) {
+        var value = this.el().value;
+        var attr  = this.getAttributeNode(name);
+
+        if ( attr ) {
+          attr.value = value;
+        } else {
+          // TODO: add attribute
+        }
+
+        return value;
+      }
+
       /*
         Get value associated with attribute 'name',
         or undefined if attribute not set.
@@ -1241,12 +1256,13 @@ foam.CLASS({
       return e;
     },
 
+    // ???/TODO: What is this doing?
     function addEventListener_(topic, listener) {
       var foamtopic = topic.startsWith('on') ?
           'on' + topic :
           topic ;
       this.sub(foamtopic, listener);
-      this.el() && this.el().addEventListener(topic, listener);
+      this.el() && this.el().addEventListener(topic, listener, false);
     },
 
     function removeEventListener_(topic, listener) {
