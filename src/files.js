@@ -60,7 +60,7 @@ FOAM_FILES([
   { name: "lib/Promise" },
   { name: "lib/Timer" },
   { name: "lib/input", flags: ['web'] },
-  { name: "lib/u2/ElementSlot", flags: ['web'] },
+  { name: "lib/u2/AttrSlot", flags: ['web'] },
   { name: "lib/u2", flags: ['web'] },
   { name: "lib/graphics", flags: ['web'] },
   { name: "lib/ScrollCView", flags: ['web'] },
