@@ -833,7 +833,7 @@ foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
 var p1 = Person.create({name: 'John'});
 var p2 = Person.create({name: 'Paul'});
 var h = Holder.create({data: p1});
-var s = h.slot('data').slot('name'); /* same as h.data$.slot('name') */
+var s = h.data$.dot('name');
 s.sub(function() { console.log('change: ', arguments, h.data.name); });
 log(s.get());
 s.set('George');
