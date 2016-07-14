@@ -193,7 +193,15 @@ i.write();
 
 foam.CLASS({
   name: 'Person',
-  properties: [ 'firstName', 'lastName', 'age' ]
+  properties: [ 'firstName', 'lastName', 'age' ],
+  actions: [
+    function sayHello() {
+      console.log('hello');
+    },
+    function sayGoodbye() {
+      console.log('goodbye');
+    }
+  ]
 });
 
 var p = Person.create({firstName: 'John', lastName: 'Doe', age: 42});
@@ -222,5 +230,6 @@ foam.u2.DetailView.create({
 }).write();
 
 var dv2 = foam.u2.DetailView.create({
-  data: p
+  data: p,
+  showActions: true
 }).write();
