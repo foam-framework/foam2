@@ -491,13 +491,13 @@ foam.CLASS({
     },
 
     /** Create a deep copy of this object. **/
-    function clone() {
+    function clone(opt_X) {
       var m = {};
       for ( var key in this.instance_ ) {
         var value = this[key];
         this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
-      return this.cls_.create(m/*, this.__context__*/);
+      return this.cls_.create(m, opt_X || this.__context__);
     },
 
     /**
