@@ -42,7 +42,7 @@ foam.CLASS({
     function initE() {
       this.cssClass(this.myCls());
 
-      this.attrSlot(null, this.onKey ? 'input' : null).link(this.data$);
+      this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
     },
 
     function updateMode_(mode) {
