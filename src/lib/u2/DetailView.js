@@ -44,6 +44,7 @@ foam.CLASS({
         console.assert(foam.core.FObject.isSubClass(cls), 'Invalid model specified for ' + this.name_);
         if ( oldCls !== cls ) {
           this.properties = cls.getAxiomsByClass(foam.core.Property).filter(function(p) { return ! p.hidden; });
+          this.actions    = cls.getAxiomsByClass(foam.core.Action);
         }
         if ( ( ! oldCls && ! this.hasOwnProperty('title') ) || this.title === oldCls.label ) {
           this.title = cls.label;
@@ -56,6 +57,9 @@ foam.CLASS({
     },
     {
       name: 'properties'
+    },
+    {
+      name: 'actions'
     },
     {
       name: 'controllerMode',
@@ -145,10 +149,11 @@ foam.CLASS({
     },
 
     function actionBorder(e) {
-      if ( ! this.showActions || ! this.of.actions.length ) return e;
+      if ( ! this.showActions || ! this.actions.length ) return e;
 
+      console.log('adding actions', this.actions);
       return this.E().add(e).
-        start('div').cssClass(this.myCls('toolbar')).add(this.of.actions).end();
+        start('div').cssClass(this.myCls('toolbar')).add(this.actions).end();
     },
 
     function elementForFeature(fName) {

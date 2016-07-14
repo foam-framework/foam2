@@ -1451,3 +1451,20 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'foam.core.Action',
+
+  requires: [
+    'foam.u2.ActionView'
+  ],
+
+  methods: [
+    function toE(X) {
+      return X.lookup('foam.u2.ActionView').create({
+        action: this
+      }, X);
+    }
+  ]
+});
