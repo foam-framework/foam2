@@ -500,6 +500,11 @@ foam.CLASS({
 
   methods: [
     function send(data) {
+      if ( foam.box.Message.isInstance(data) ) {
+        data = data.clone().toRemote();
+        data = foam.json.Network.stringify(data);
+      }
+
       if ( typeof data == "string" ) {
         var opcode = 1;
         data = new Buffer(data);

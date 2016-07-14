@@ -74,7 +74,7 @@ foam.CLASS({
                   name: m.name,
                   args: Array.from(arguments)
                 });
-                if ( replyBox ) msg.replyBox = replyBox.exportBox();
+                if ( replyBox ) msg.replyBox = replyBox;
 
                 this[propName].send(msg);
 

@@ -37,26 +37,39 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      // TODO: Error handling
-      this.socket.send(msg);
-    }
-  ],
+      // Apparently you can't catch exceptions from calling .send()
+      // when the socket isn't open.  So we'll try to predict an exception
+      // happening and throw early.
+      //
+      // There could be a race condition here if the socket
+      // closes between our check and .send().
+      if ( this.socket.readyState !== this.socket.OPEN ) {
+        throw new Error('Socket is not open');
+      }
+      msg = msg.clone().toRemote();
+      this.socket.send(foam.json.Network.stringify(msg));
+    },
+    function connect() {
+      var socket = this.socket = new WebSocket(this.uri);
+      var self = this;
 
-  listeners: [
-    {
-      name: 'connect',
-      code: function() {
-        var socket = this.socket = new WebSocket(this.uri);
-        var self = this;
+      return new Promise(function(resolve, reject) {
+        function onConnect() {
+          socket.removeEventListener('open', onConnect);
+          resolve(self);
+        }
+        socket.addEventListener('open', onConnect);
         socket.addEventListener('open', function() {
           self.connected.pub();
-        })
-        socket.addEventListener('message', this.onMessage);
+        });
+        socket.addEventListener('message', self.onMessage);
         socket.addEventListener('close', function() {
           self.disconnected.pub();
         });
-      }
-    },
+      });
+    }
+  ],
+  listeners: [
     {
       name: 'onMessage',
       code: function(msg) {
@@ -88,7 +101,6 @@ foam.CLASS({
         msg = foam.json.parse(foam.json.parseString(msg), null, this);
 
         if ( this.RegisterSelfMessage.isInstance(msg) ) {
-
           var named = foam.box.NamedBox.create({
             name: msg.name
           });
