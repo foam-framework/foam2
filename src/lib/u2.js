@@ -215,7 +215,10 @@ foam.CLASS({
   extends: 'foam.u2.ElementState',
 
   methods: [
-    function output(out) { this.warn('Duplicate output.'); },
+    function output(out) {
+      this.warn('Duplicate output.');
+      return this.INITIAL.output.call(this, out);
+    },
     function load() { this.error('Duplicate load.'); },
     function unload() {
       var e = this.el();
@@ -560,27 +563,27 @@ foam.CLASS({
       return this.__subContext__.E(opt_nodeName);
     },
 
-    function XXXE(opt_nodeName /* | DIV */) {
-      /* Create a new Element */
-      var Y = this.__subContext__;
-
-      // ???: Is this needed / a good idea?
-      if ( this.data && ! Y.data ) Y = Y.createSubContext({ data: this.data });
-
-      // Some names have sub-Models registered for them.
-      // Example 'input'
-      var e = Y.elementForName(opt_nodeName);
-
-      if ( ! e ) {
-        e = foam.u2.Element.create(null, Y);
-        if ( opt_nodeName ) e.nodeName = opt_nodeName;
-      }
-
-      return e;
-    },
+    // function XXXE(opt_nodeName /* | DIV */) {
+    //   /* Create a new Element */
+    //   var Y = this.__subContext__;
+    //
+    //   // ???: Is this needed / a good idea?
+    //   if ( this.data && ! Y.data ) Y = Y.createSubContext({ data: this.data });
+    //
+    //   // Some names have sub-Models registered for them.
+    //   // Example 'input'
+    //   var e = Y.elementForName(opt_nodeName);
+    //
+    //   if ( ! e ) {
+    //     e = foam.u2.Element.create(null, Y);
+    //     if ( opt_nodeName ) e.nodeName = opt_nodeName;
+    //   }
+    //
+    //   return e;
+    // },
     
     function attrSlot(opt_name, opt_event) {
-      /* Convenience method for creating an AttrSlot. */
+      /* Convenience method for creating an AttrSlot's. */
       var args = { element: this };
 
       if ( opt_name  ) args.property = opt_name;
