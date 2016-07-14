@@ -43,13 +43,17 @@ foam.CLASS({
       });
     },
 
-    // TODO: renamed linkFrom and add linkTo
+    // TODO: remove when all code ported
+    function link(other) {
+      console.warn('deprecated use of link(), use linkFrom() instead');
+      return this.linkFrom(other);
+    },
 
     /**
       Link two Slots together, setting both to other's value.
       Returns a Destroyable which can be used to break the link.
     */
-    function link(other) {
+    function linkFrom(other) {
       var sub1 = this.follow(other);
       var sub2 = other.follow(this);
 
@@ -60,6 +64,10 @@ foam.CLASS({
           sub1 = sub2 = null;
         }
       };
+    },
+
+    function linkTo(other) {
+      return other.linkFrom(this);
     },
 
     /**
@@ -164,6 +172,10 @@ foam.CLASS({
 
     function clear() {
       this.obj.clearProperty(this.prop.name);
+    },
+
+    function toString() {
+      return 'PropertySlot(' + this.prop.name + ')';
     }
   ]
 });
@@ -178,7 +190,7 @@ foam.CLASS({
   implements: [ 'foam.core.Slot' ],
 
   properties: [
-    'parent',
+    'parent', // parent slot, not parent object
     'name',
     'value',
     'prevSub'
@@ -191,11 +203,11 @@ foam.CLASS({
     },
 
     function get() {
-      return this.parent[this.name];
+      return this.parent.get()[this.name];
     },
 
     function set(value) {
-      this.parent[this.name] = value;
+      this.parent.get()[this.name] = value;
     },
 
     /** Needed? **/
@@ -223,7 +235,11 @@ foam.CLASS({
     },
 
     function clear() {
-      this.parent.get().clearProperty(this.prop.name);
+      this.parent.get().clearProperty(this.name);
+    },
+
+    function toString() {
+      return 'SubSlot(' + this.parent + ',' + this.name + ')';
     }
   ],
 
