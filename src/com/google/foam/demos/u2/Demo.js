@@ -233,3 +233,8 @@ var dv2 = foam.u2.DetailView.create({
   data: p,
   showActions: true
 }).write();
+
+foam.u2.DetailView.create({
+  data: foam.util.Timer.create(),
+  showActions: true
+}).write();
