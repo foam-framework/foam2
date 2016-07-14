@@ -49,15 +49,20 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    function init() {
+      this.SUPER();
+
       var view = this.view || this.prop.toPropertyE(this.Y);
 
       view.data$ = this.data$.dot(this.prop.name);
       view.fromProperty && view.fromProperty(this.prop);
 
       this.child_ = view;
+    },
+
+    function initE() {
       this.cssClass(this.myCls());
-      this.add(view);
+      this.add(this.child_);
 
       /*
       // Attach property validation if it's enabled and available.

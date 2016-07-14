@@ -130,6 +130,7 @@ foam.CLASS({
     },
 
     function initE() {
+      // TODO: replace with fast bind()
       this.add(this.expression(function(model, properties) {
         if ( ! model ) return 'Set model or data.';
 

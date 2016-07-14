@@ -53,8 +53,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.SUPER();
-
       var prop = this.prop;
 
       this.cssClass('foam-u2-PropertyView-')
