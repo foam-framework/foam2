@@ -298,7 +298,7 @@ foam.CLASS({
 
   methods: [
     function write(msg) {
-      var serialized = foam.json.Network.stringify(msg);
+      var serialized = foam.json.Network.stringify(msg.clone().toRemote());
       var size = Buffer.byteLength(serialized);
       var packet = new Buffer(size + 4);
       packet.writeInt32LE(size);
