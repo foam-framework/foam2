@@ -157,26 +157,3 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  refines: 'foam.core.Property',
-
-  requires: [
-    'foam.u2.PropertyView',
-    'foam.u2.TextField'
-  ],
-
-  methods: [
-    function toPropertyE(X) {
-      return this.TextField.create(null, X);
-    },
-
-    function toE(X) {
-      return X.lookup('foam.u2.PropertyView').create({
-        prop: this,
-        view: this.toPropertyE(X)
-      }, X);
-    }
-  ]
-});
