@@ -38,7 +38,7 @@ foam.CLASS({
       class: 'Promised',
       of: 'foam.box.Box',
       transient: true,
-      name: 'promise'
+      name: 'delegate'
     }
   ]
 });
@@ -432,7 +432,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'LookupBox',
-  extends: 'foam.box.PromisedBox',
+  extends: 'foam.box.ProxyBox',
 
   requires: [
     'foam.box.ClientBoxRegistry',
@@ -456,7 +456,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'promise',
+      name: 'delegate',
+      transient: true,
       factory: function() {
         return this.registry.lookup(this.name)
       }
@@ -945,7 +946,7 @@ foam.CLASS({
       name: 'address'
     },
     {
-      name: 'promise',
+      name: 'delegate',
       factory: function() {
         return this.Socket.create().connectTo(this.address).then(function(s) {
           return this.RawSocketBox.create({ socket: s });
