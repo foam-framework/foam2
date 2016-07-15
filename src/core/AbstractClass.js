@@ -96,6 +96,19 @@ foam.LIB({
       this.installAxioms([a]);
     },
 
+    function installConstant(key, value) {
+      var cName = foam.String.constantize(key);
+      var prev = this[cName];
+
+      // Detect constant name collisions
+      if ( prev && prev.name !== key ) {
+        throw 'Class constant conflict: ' +
+          this.id + '.' + cName + ' from: ' + key + ' and ' + prev.name;
+      }
+
+      this[cName] = value;
+    },
+
     /**
       Determine if an object is an instance of this class
       or one of its sub-classes.
