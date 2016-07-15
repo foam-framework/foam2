@@ -26,24 +26,9 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Function',
+      class: 'foam.u2.ViewFactory',
       name: 'rowFactory',
-      required: true,
-//    documentation: 'Three options: a class name (eg. "my.app.ui.Foo"), an ' +
-//        'actual class object, or a function(args, context) returning an ' +
-//        'Element.',
-      adapt: function(old, nu) {
-        if ( typeof nu === 'function' ) return nu;
-
-        if ( typeof nu === 'string' ) {
-          return function(args, ctx) {
-            return ctx.lookup(nu).create(args, ctx);
-          };
-        }
-        return function(args, ctx) {
-          return nu.create(args, ctx);
-        };
-      }
+      required: true
     },
     {
       name: 'rows_',
@@ -79,7 +64,7 @@ foam.CLASS({
       }
 
       var ctx   = this.__subContext__.createSubContext();
-      var child = this.rowFactory({ data: obj }, ctx);
+      var child = this.rowFactory$f({ data: obj }, ctx);
       child.on('click', function() {
         this.rowClick.pub(child.data);
       }.bind(this));
