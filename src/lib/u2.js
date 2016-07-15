@@ -20,7 +20,6 @@ TODO:
  - Fix handling of Slots that return arrays.
  - Add support for FOAM1 style dynamic functions?
  - Properly handle insertBefore_ of an element that's already been inserted?
- - Fix ExpressionSlot firing too many property change events (already fixed?)
 */
 
 foam.CLASS({
@@ -1425,14 +1424,49 @@ foam.CLASS({
 
 foam.__context__ = foam.__context__.createSubContext(foam.u2.U2Context.create().__subContext__);
 
-
 foam.CLASS({
   refines: 'foam.core.Property',
 
+  requires: [
+    'foam.u2.PropertyView',
+    'foam.u2.TextField'
+  ],
+
   properties: [
     {
+      // If true, this property is treated as a psedo-U2 attribute.
       name: 'attribute',
       value: false
+    }
+  ],
+
+  methods: [
+    function toPropertyE(X) {
+      return this.TextField.create(null, X);
+    },
+
+    function toE(X) {
+      return X.lookup('foam.u2.PropertyView').create({
+        prop: this,
+        view: this.toPropertyE(X)
+      }, X);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Action',
+
+  requires: [
+    'foam.u2.ActionView'
+  ],
+
+  methods: [
+    function toE(X) {
+      return X.lookup('foam.u2.ActionView').create({
+        action: this
+      }, X);
     }
   ]
 });

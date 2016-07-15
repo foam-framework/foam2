@@ -111,6 +111,9 @@ foam.LIB({
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
 
     function bind(f, that, a1, a2, a3, a4) {
+      /**
+       * Faster than Function.prototype.bind
+       */
       switch ( arguments.length ) {
         case 1:
           console.error('No arguments given to bind to.');
@@ -153,15 +156,16 @@ foam.LIB({
           }
         };
       }
+
       console.error('Attempt to foam.Function.bind more than 4 arguments.');
     },
 
-   /**
-     * Decorates the function 'f' to cache the return value of 'f' when called
-     * with a particular value for its first argument.
-     *
-     */
     function memoize1(f) {
+      /**
+       * Decorates the function 'f' to cache the return value of 'f' when called
+       * with a particular value for its first argument.
+       *
+       */
       var cache = {};
       return foam.Function.setName(
           function(key) {
@@ -217,7 +221,7 @@ foam.LIB({
     function withArgs(fn, source, opt_self) {
       /**
        * Calls fn, and provides the arguments to fn by looking
-       * up their names on source.  The 'this' context is either
+       * up their names on source. The 'this' context is either
        * source, or opt_self if provided.
        *
        * If the argument maps to a function on source, it is bound to source.
@@ -260,8 +264,8 @@ foam.LIB({
     foam.Function.setName(function() {}, '');
   } catch (x) {
     console.warn('foam.Function.setName is not supported on your platform. ' +
-                 'Stack traces will be harder to decipher, but no functionaly' +
-                 ' will be lost');
+                 'Stack traces will be harder to decipher, but no functionaly ' +
+                 'will be lost');
     foam.LIB({
       name: 'foam.Function',
       methods: [

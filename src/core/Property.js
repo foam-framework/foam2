@@ -225,14 +225,6 @@ foam.CLASS({
         c.axiomMap_[prop.name] = prop;
       }
 
-      var cName = foam.String.constantize(prop.name);
-      var prev = c[cName];
-
-      // Detect constant name collisions
-      if ( prev && prev.name !== prop.name ) {
-        throw 'Class constant conflict: ' +
-          c.id + '.' + cName + ' from: ' + prop.name + ' and ' + prev.name;
-      }
 
       var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
         // We only care about Property axioms.
@@ -265,7 +257,7 @@ foam.CLASS({
         this.cls_.pubsub_.sub('installAxiom', reinstall);
       }
 
-      c[cName] = prop;
+      c.installConstant(prop.name, prop);
     },
 
     /**

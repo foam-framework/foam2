@@ -92,6 +92,10 @@ foam.CLASS({
       return false;
     },
 
+    function installInClass(c) {
+      c.installConstant(this.name, this);
+    },
+
     function installInProto(proto) {
       var action = this;
       proto[this.name] = function() {

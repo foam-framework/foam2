@@ -287,14 +287,14 @@ foam.CLASS({
 
 
 /**
-  Tracks dependencies for a dynamic function and invalidates is they change.
+  Tracks dependencies for a dynamic function and invalidates if they change.
 
 <pre>
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
 var e = foam.core.ExpressionSlot.create({
   args: [ p.fname$, p.lname$ ],
-  fn: function(f, l) { return f + ' ' + l; }
+  code: function(f, l) { return f + ' ' + l; }
 });
 log(e.get());
 e.sub(log);
@@ -306,6 +306,12 @@ Output:
  > [object Object] propertyChange value [object Object]
  > [object Object] propertyChange value [object Object]
  > Steve Jones
+
+var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
+var e = foam.core.ExpressionSlot.create({
+  obj: p,
+  code: function(f, l) { return f + ' ' + l; }
+});
 </pre>
 */
 foam.CLASS({
@@ -314,12 +320,13 @@ foam.CLASS({
   implements: [ 'foam.core.Slot' ],
 
   properties: [
+    'obj',
     'args',
-    'fn',
+    'code',
     {
       name: 'value',
       factory: function() {
-        return this.fn.apply(this, this.args.map(function(a) {
+        return this.code.apply(this, this.args.map(function(a) {
           return a.get();
         }));
       }
@@ -328,6 +335,18 @@ foam.CLASS({
 
   methods: [
     function init() {
+      this.assert(
+          !! this.obj !== !! this.args,
+          'ExpressionSlot: set only one of "obj" and "args".');
+
+      if ( ! this.args ) {
+        var args = foam.Function.formalArgs(this.code);
+        for ( var i = 0 ; i < args.length ; i++ ) {
+          args[i] = this.obj.slot(args[i]);
+        }
+        this.args = args;
+      }
+
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         this.onDestroy(this.args[i].sub(this.invalidate));
       }
@@ -354,7 +373,6 @@ foam.CLASS({
 });
 
 
-// ???: Should there also be an 'obj' option instead of 'args'?
 foam.CLASS({
   package: 'foam.core',
   name: 'ExpressionSlotHelper',
@@ -363,10 +381,11 @@ foam.CLASS({
 
   methods: [
     function expression(fn /* ... args */) {
-      return this.ExpressionSlot.create({
-        fn: fn,
-        args: Array.prototype.slice.call(arguments, 1)
-      });
+      return this.ExpressionSlot.create(
+          arguments.length == 1 ?
+              { code: fn, obj: this } :
+              { code: fn, args: Array.prototype.slice.call(arguments, 1) }
+          );
     }
   ]
 });
