@@ -39,27 +39,24 @@ foam.CLASS({
     },
     {
 //      type: 'Model',
-      name: 'of',
-      postSet: function(oldCls, cls) {
-        console.assert(foam.core.FObject.isSubClass(cls), 'Invalid model specified for ' + this.name_);
-        if ( oldCls !== cls ) {
-          this.properties = cls.getAxiomsByClass(foam.core.Property).filter(function(p) { return ! p.hidden; });
-          this.actions    = cls.getAxiomsByClass(foam.core.Action);
-        }
-        if ( ( ! oldCls && ! this.hasOwnProperty('title') ) || this.title === oldCls.label ) {
-          this.title = cls.label;
-        }
-      }
+      name: 'of'
     },
     {
       class: 'Boolean',
       name: 'showActions'
     },
     {
-      name: 'properties'
+      name: 'properties',
+      expression: function(of) {
+        return of.getAxiomsByClass(foam.core.Property).
+          filter(function(p) { return ! p.hidden; });
+      }
     },
     {
-      name: 'actions'
+      name: 'actions',
+      expression: function(of) {
+        return of.getAxiomsByClass(foam.core.Action);
+      }
     },
     {
       name: 'controllerMode',
@@ -68,6 +65,7 @@ foam.CLASS({
     {
       name: 'title',
       attribute: true,
+      expression: function(of) { return of.label; },
       documentation: function() {/*
         <p>The display title for the $$DOC{ref:'foam.ui.View'}.
         </p>
