@@ -429,12 +429,14 @@ foam.CLASS({
   properties: [
     {
       name: 'id',
+      transient: true,
       factory: function() { return this.NEXT_ID(); }
     },
     {
       name: 'state',
       class: 'Proxy',
       of: 'foam.u2.ElementState',
+      transient: true,
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
       factory: function() { return this.INITIAL; },
@@ -447,7 +449,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'parentNode'
+      name: 'parentNode',
+      transient: true
     },
     {
       class: 'Proxy',
@@ -581,7 +584,7 @@ foam.CLASS({
     //
     //   return e;
     // },
-    
+
     function attrSlot(opt_name, opt_event) {
       /* Convenience method for creating an AttrSlot's. */
       var args = { element: this };
