@@ -238,3 +238,10 @@ foam.u2.DetailView.create({
   data: foam.util.Timer.create(),
   showActions: true
 }).write();
+
+foam.u2.DetailView.create({
+  data: foam.util.Timer.create(),
+  showActions: true,
+  properties: [ foam.util.Timer.INTERVAL, foam.util.Timer.I ],
+  actions: [ foam.util.Timer.STOP, foam.util.Timer.START ]
+}).write();
