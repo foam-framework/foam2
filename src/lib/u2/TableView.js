@@ -32,10 +32,12 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TableBody',
   extends: 'foam.u2.Element',
+
   properties: [
-    ['nodeName', 'tbody'],
-    ['properties_']
+    [ 'nodeName', 'tbody' ],
+    [ 'properties_' ]
   ],
+
   methods: [
     function put(obj) {
       var e = this.start('tr')
