@@ -98,6 +98,7 @@ FOAM_FILES([
   { name: "lib/fcm" },
   { name: "lib/Stub" },
   { name: "lib/box" },
+  { name: "lib/u2/ViewFactory", flags: ['web'] },
   { name: "lib/u2/daos", flags: ['web'] },
   { name: "lib/u2/TableView", flags: ['web'] },
   { name: "lib/u2/ActionView", flags: ['web'] },
