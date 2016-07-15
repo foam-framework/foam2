@@ -961,12 +961,24 @@ foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
 var e = foam.core.ExpressionSlot.create({
   args: [ p.fname$, p.lname$],
-  fn: function(f, l) { return f + ' ' + l; }
+  code: function(f, l) { return f + ' ' + l; }
 });
 log(e.get());
 e.sub(log);
 p.fname = 'Steve';
 p.lname = 'Jones';
+log(e.get());
+
+// ExpressionSlot can also be supplied an object to work with, and then takes slots from function argument names.
+var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Smith'});
+var e = foam.core.ExpressionSlot.create({
+  obj: p,
+  code: function(f, l) { return f + ' ' + l; }
+});
+log(e.get());
+e.sub(log);
+p.f = 'Steve';
+p.l = 'Jones';
 log(e.get());
 
 // Destroy the ExpressionSlot to prevent further updates.
