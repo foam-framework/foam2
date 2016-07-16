@@ -856,16 +856,23 @@ log(p1.name, p2.name);
 p2.name = 'Steve';
 log(p1.name, p2.name);
 
-// Another way to link two Slots is to call .link() on one of them.
-var p1 = Person.create(), p2 = Person.create();
-var d = p1.name$.link(p2.name$);
+// Another way to link two Slots is to call .linkFrom() on one of them.
+var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
+var d = p1.name$.linkFrom(p2.name$);
 p1.name = 'John';
 log(p1.name, p2.name);
 
 // But this style of link can be broken by calling .destroy()
-// on the object return from .link().
+// on the object return from .linkFrom/To().
 d.destroy();
 p2.name = 'Steve';
+log(p1.name, p2.name);
+
+// linkTo() is the same as linkFrom(), except that the initial value
+// is taken from 'this' instead of the other object.
+var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
+var d = p1.name$.linkTo(p2.name$);
+p1.name = 'John';
 log(p1.name, p2.name);
 
 // Two values can be linked through a relationship,
@@ -893,7 +900,7 @@ t.c = 100;
 log(t.stringify());
 
 // One-Way Data-Binding
-// Calling .link() creates a two-way data-binding, meaning a change in either
+// Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a change in either
 // value is reflected in the other.  But FOAM supports one-way data-binding as well.
 // To do this, use the .follow() method.
 var d = p1.name$.follow(p2.name$);
