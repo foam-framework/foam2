@@ -35,12 +35,12 @@ foam.CLASS({
     'headerState',
     'state',
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'framing',
       value: true
     },
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'finished',
       value: false
     }
