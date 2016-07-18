@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-
-// A Method which doesn't bind to 'this' when exported.
-// TODO: move somewhere else when satisfied with design
+/**
+ * A Method which doesn't bind to 'this' when exported.
+ * TODO: move somewhere else when satisfied with design
+ */
 foam.CLASS({
   package: 'foam.core',
   name: 'ContextMethod',
@@ -25,7 +26,14 @@ foam.CLASS({
 
   methods: [
     function exportAs(obj) {
-      return obj[this.name];
+      var m = obj[this.name];
+
+      return m;
+/*
+      return function() {
+
+      };
+*/
     }
   ]
 });
