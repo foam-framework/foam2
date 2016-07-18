@@ -1572,7 +1572,7 @@ foam.CLASS({
   ],
   methods: [
     function init() {
-      this.f$.relate(
+      this.f$.relateTo(
         this.c$,
         function c2f(f) { log('f', f); return 9/5 * f + 32; },
         function f2c(c) { log('fp', c); return 5/9 * ( c - 32 ); });
