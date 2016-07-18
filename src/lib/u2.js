@@ -131,6 +131,7 @@ foam.CLASS({
 });
 
 
+// TODO: merge with Unloaded state
 foam.CLASS({
   package: 'foam.u2',
   name: 'InitialElementState',
