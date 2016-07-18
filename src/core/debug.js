@@ -299,7 +299,7 @@ foam.CLASS({
     function merged(l, opt_delay) {
       var f = this.__context__.merged(l, opt_delay);
       f.toString = function() {
-        return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
+        return 'MERGED(' + opt_delay + ', ' + listener.$UID + ', ' + listener + ')';
       };
       return f;
     },

@@ -131,6 +131,7 @@ foam.CLASS({
 });
 
 
+// TODO: merge with Unloaded state
 foam.CLASS({
   package: 'foam.u2',
   name: 'InitialElementState',
@@ -1361,21 +1362,6 @@ foam.CLASS({
 
   properties: [
     'data'
-  ]
-});
-
-
-// A Method which doesn't bind to 'this' when exported.
-// TODO: move somewhere else when satisfied with design
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ContextMethod',
-  extends: 'foam.core.Method',
-
-  methods: [
-    function exportAs(obj) {
-      return obj[this.name];
-    }
   ]
 });
 
