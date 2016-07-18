@@ -119,7 +119,7 @@ foam.LIB({
 
     /**
       Determine if a class is either this class, a sub-class, or
-      if it implements this class (directly or indirectly.
+      if it implements this class (directly or indirectly).
     */
     function isSubClass(c) {
       if ( ! c ) return false;

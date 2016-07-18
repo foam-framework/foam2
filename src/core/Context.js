@@ -61,7 +61,8 @@
      * Register a class into the given context.  After registration
      * the class can be found again by calling foam.lookup('com.foo.SomeClass');
      *
-     * @param cls The class to register.
+     * @param cls    The class to register.
+     * @param opt_id Optional id under which to register class.
      */
     register: function(cls, opt_id) {
       console.assert(
