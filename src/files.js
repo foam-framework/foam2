@@ -50,6 +50,7 @@ FOAM_FILES([
   { name: "core/Proxy" },
   { name: "core/Promised" },
   { name: "core/Enum" },
+  { name: "core/ContextMethod" },
   { name: "core/Window" },
   { name: "core/debug" },
   { name: "core/patterns" },
