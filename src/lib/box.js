@@ -346,6 +346,20 @@ foam.CLASS({
       }
     },
     {
+      name: 'register2',
+      returns: 'foam.box.Box',
+      code: function(name, service, localBox) {
+        this.registry[name] = {
+          exportBox: service.clientBox(this.SubBox.create({
+            name: name,
+            delegate: this.me
+          })),
+          localBox: service.serverBox(localBox)
+        };
+        return this.registry[name].exportBox;
+      }
+    },
+    {
       name: 'unregister',
       returns: '',
       code: function(name) {
@@ -1158,6 +1172,34 @@ foam.CLASS({
         me.delegate = this.registry;
         return me;
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'BoxService',
+  properties: [
+    'next',
+    {
+      class: 'Class2',
+      name: 'server'
+    },
+    {
+      class: 'Class2',
+      name: 'client'
+    }
+  ],
+  methods: [
+    function serverBox(box) {
+      box = this.next ? this.next.serverBox(box) : box;
+      return this.server$cls.create({ delegate: box })
+    },
+    function clientBox(box) {
+      box = this.client$cls.create({ delegate: box });
+      return this.next ?
+        this.next.clientBox(box) :
+        box;
     }
   ]
 });
