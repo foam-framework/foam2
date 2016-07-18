@@ -101,7 +101,7 @@ foam.CLASS({
      * @param f maps from this to other
      * @param fprime maps other to this
      */
-    function relate(other, f, fPrime) {
+    function relateTo(other, f, fPrime) {
       var self     = this;
       var feedback = false;
       var sub      = foam.core.FObject.create();
@@ -124,6 +124,10 @@ foam.CLASS({
       l1();
 
       return sub;
+    },
+
+    function relateFrom(other, f, fPrime) {
+      return other.relateTo(this, fPrime, f);
     }
   ]
 });
