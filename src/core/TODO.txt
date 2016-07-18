@@ -20,3 +20,5 @@ ToDo:
   - Topic listener relay
   - Should String be the default property type with no way to create an untype property?
   - Design by Contract
+
+An ExpressionSlot's sub() method is overloaded since it is both an FObject and a Slot.
