@@ -66,10 +66,10 @@ foam.CLASS({
       name: 'title',
       attribute: true,
       expression: function(of) { return of.label; },
-      documentation: function() {/*
-        <p>The display title for the $$DOC{ref:'foam.ui.View'}.
-        </p>
-      */}
+      // documentation: function() {/*
+      //  <p>The display title for the $$DOC{ref:'foam.ui.View'}.
+      //  </p>
+      //*/}
     },
     [ 'nodeName', 'div' ]
   ],

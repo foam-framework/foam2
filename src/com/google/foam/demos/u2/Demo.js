@@ -92,7 +92,7 @@ var e13 = E('div').add(
   'dynamic function: ',
   foam.core.ExpressionSlot.create({
     args: [ timer.second$ ],
-    fn: function(s) {
+    code: function(s) {
       return s % 2 ?
         E('span').add('PI', 'NG').style({color: 'aqua'}) :
         E('span').add('PONG').style({color: 'orange'});

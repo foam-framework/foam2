@@ -101,7 +101,7 @@ foam.CLASS({
      * @param f maps from this to other
      * @param fprime maps other to this
      */
-    function relate(other, f, fPrime) {
+    function relateTo(other, f, fPrime) {
       var self     = this;
       var feedback = false;
       var sub      = foam.core.FObject.create();
@@ -124,6 +124,10 @@ foam.CLASS({
       l1();
 
       return sub;
+    },
+
+    function relateFrom(other, f, fPrime) {
+      return other.relateTo(this, fPrime, f);
     }
   ]
 });
@@ -321,8 +325,26 @@ foam.CLASS({
 
   properties: [
     'obj',
-    'args',
     'code',
+    {
+      name: 'args',
+      expression: function(obj) {
+        this.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
+
+        var args = foam.Function.formalArgs(this.code);
+        for ( var i = 0 ; i < args.length ; i++ ) {
+          args[i] = obj.slot(args[i]);
+        }
+
+        this.invalidate();
+        this.subToArgs_(args);
+
+        return args;
+      },
+      postSet: function(_, args) {
+        this.subToArgs_(args);
+      }
+    },
     {
       name: 'value',
       factory: function() {
@@ -330,44 +352,44 @@ foam.CLASS({
           return a.get();
         }));
       }
-    }
+    },
+    'cleanup_', // destroyable to cleanup old subs when obj changes
   ],
 
   methods: [
-    function init() {
-      this.assert(
-          !! this.obj !== !! this.args,
-          'ExpressionSlot: set only one of "obj" and "args".');
+    function init() { this.onDestroy(this.cleanup); },
 
-      if ( ! this.args ) {
-        var args = foam.Function.formalArgs(this.code);
-        for ( var i = 0 ; i < args.length ; i++ ) {
-          args[i] = this.obj.slot(args[i]);
-        }
-        this.args = args;
-      }
-
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
-        this.onDestroy(this.args[i].sub(this.invalidate));
-      }
-    },
-
-    function get() {
-      return this.value;
-    },
+    function get() { return this.value; },
 
     function set() { /* nop */ },
 
     function sub(l) {
-      return this.SUPER('propertyChange', 'value', l);
+      return arguments.length === 1 ?
+        this.SUPER('propertyChange', 'value', l) :
+        this.SUPER.apply(this,arguments);
     },
 
     function unsub(l) {
-      this.SUPER('propertyChange', 'value', l);
+      return arguments.length === 1 ?
+        this.SUPER('propertyChange', 'value', l) :
+        this.SUPER.apply(this,arguments);
+    },
+
+    function subToArgs_(args) {
+      this.cleanup();
+      
+      var cleanup = foam.core.FObject.create();
+      
+      for ( var i = 0 ; i < args.length ; i++ ) {
+        cleanup.onDestroy(args[i].sub(this.invalidate));
+      }
+      
+      this.cleanup_ = cleanup;
     }
   ],
 
   listeners: [
+    function cleanup() { this.cleanup_ && this.cleanup_.destroy(); },
     function invalidate() { this.clearProperty('value'); }
   ]
 });

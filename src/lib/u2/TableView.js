@@ -32,10 +32,12 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TableBody',
   extends: 'foam.u2.Element',
+
   properties: [
-    ['nodeName', 'tbody'],
-    ['properties_']
+    [ 'nodeName', 'tbody' ],
+    [ 'properties_' ]
   ],
+
   methods: [
     function put(obj) {
       var e = this.start('tr')
@@ -71,8 +73,8 @@ foam.CLASS({
       name: 'properties',
       expression: function(of) {
         return this.of$cls && this.of$cls.getAxiomsByClass(foam.core.Property)
-                              .filter(function(p) { return ! p.hidden; })
-                              .map(foam.core.Property.NAME.f)
+            .filter(function(p) { return ! p.hidden; })
+            .map(foam.core.Property.NAME.f)
       }
     },
     {

@@ -62,7 +62,6 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       label: 'Available',
-      // FUTURE: make dynamic
       value: function() { return true; },
       help: 'Function to determine if action is available.'
     },
@@ -70,7 +69,6 @@ foam.CLASS({
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
-      // FUTURE: make dynamic
       value: function() { return true; },
       help: 'Function to determine if action is enabled.'
     },
@@ -83,12 +81,31 @@ foam.CLASS({
   ],
 
   methods: [
-    function maybeCall(ctx, that) {
-      if ( this.isAvailable.call(that, this) && this.isEnabled.call(that, this) ) {
-        this.code.call(that, ctx, this);
-        that.pub('action', this.name, this);
+    function createIsEnabled$(data$) {
+      var e = foam.core.ExpressionSlot.create({
+        code: this.isEnabled
+      });
+
+      e.obj$ = data$;
+      // e.obj = data$.get();
+
+      return e;
+      /*
+        // TODO: use when obj$: data$ works.
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this.isEnabled
+      });
+      */
+    },
+
+    function maybeCall(ctx, data) {
+      if ( this.isAvailable.call(data, this) && this.isEnabled.call(data, this) ) {
+        this.code.call(data, ctx, this);
+        data.pub('action', this.name, this);
         return true;
       }
+
       return false;
     },
 

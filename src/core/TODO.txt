@@ -11,7 +11,6 @@ ToDo:
   - ? proxy label, plural from Class to Model
 
  Future:
-  - Slot map() and relate() methods
   - predicate support for getAxioms() methods.
   - cascading object property change events
   - should destroyables be a linked list for fast removal?
@@ -20,3 +19,5 @@ ToDo:
   - Topic listener relay
   - Should String be the default property type with no way to create an untype property?
   - Design by Contract
+
+An ExpressionSlot's sub() method is overloaded since it is both an FObject and a Slot.
