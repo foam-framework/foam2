@@ -40,6 +40,7 @@ foam.CLASS({
       this.
         cssClass(this.myCls()).
         add(this.action.label).
+        // TODO: it would be nicer if Slot had some kind of filter method
         attrs({disabled: this.expression(
           function(e) { return e ? undefined : 'disabled'; },
           this.action.createIsEnabled$(this.data$))}).
