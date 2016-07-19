@@ -16,8 +16,9 @@
  */
 
 /**
- * A Method which doesn't bind to 'this' when exported.
- * TODO: move somewhere else when satisfied with design
+ * A Method which has the call-site context added as the first argument
+ * when exported.
+ * See use in foam.u2.U2Context.E
  */
 foam.CLASS({
   package: 'foam.core',
@@ -28,12 +29,11 @@ foam.CLASS({
     function exportAs(obj) {
       var m = obj[this.name];
 
-      return m;
-/*
       return function() {
+        var ctx = foam.core.FObject.isInstance(this) ? this.__context__ : this;
 
+        return m.apply(obj, foam.Function.appendArguments([ctx], arguments, 0));
       };
-*/
     }
   ]
 });

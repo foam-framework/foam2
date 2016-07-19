@@ -1387,12 +1387,12 @@ foam.CLASS({
     {
       class: 'foam.core.ContextMethod',
       name: 'E',
-      code: function E(opt_nodeName) {
+      code: function E(ctx, opt_nodeName) {
         var nodeName = (opt_nodeName || 'div').toUpperCase();
 
         return (
-          this.elementForName(nodeName) || foam.u2.Element).
-          create({nodeName: nodeName}, this);
+          ctx.elementForName(nodeName) || foam.u2.Element).
+          create({nodeName: nodeName}, ctx);
       }
     },
 
@@ -1408,7 +1408,7 @@ foam.CLASS({
   ]
 });
 
-foam.__context__ = foam.__context__.createSubContext(foam.u2.U2Context.create().__subContext__);
+foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 foam.CLASS({
   refines: 'foam.core.Property',
