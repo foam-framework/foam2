@@ -35,16 +35,15 @@ foam.CLASS({
   ],
 
   methods: [
-    /*
-    function init() {
-      this.SUPER();
-    },
-    */
-
     function initE() {
+
       this.
         cssClass(this.myCls()).
         add(this.action.label).
+        attrs({disabled: this.expression(
+          function(e) { return e ? undefined : 'disabled'; },
+          this.action.createIsEnabled$(this.data$))}).
+        cssClass(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
         on('click', this.click);
     }
   ],
