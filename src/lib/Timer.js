@@ -95,7 +95,7 @@ foam.CLASS({
       name:  'start',
       help:  'Start the timer.',
       isAvailable: function() { return true; },
-      isEnabled:   function() { return ! this.isStarted; },
+      isEnabled:   function(isStarted) { return ! isStarted; },
       code:        function() { this.isStarted = true; this.tick(); }
     },
     {
@@ -114,7 +114,7 @@ foam.CLASS({
       name:  'stop',
       help:  'Stop the timer.',
       isAvailable: function() { return true; },
-      isEnabled:   function() { return this.isStarted; },
+      isEnabled:   function(isStarted) { return isStarted; },
       code:        function() { this.isStarted = false; }
     }
   ],
