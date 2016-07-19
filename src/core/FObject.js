@@ -259,6 +259,7 @@ foam.CLASS({
 
       // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
+        if ( typeof args[i] !== 'string' ) break;
         var listeners = listeners.children[args[i]];
         if ( ! listeners ) break;
         count += this.notify_(listeners.next, args);
