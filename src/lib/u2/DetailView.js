@@ -149,7 +149,6 @@ foam.CLASS({
     function actionBorder(e) {
       if ( ! this.showActions || ! this.actions.length ) return e;
 
-      console.log('adding actions', this.actions);
       return this.E().add(e).
         start('div').cssClass(this.myCls('toolbar')).add(this.actions).end();
     },
