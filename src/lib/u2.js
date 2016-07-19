@@ -131,10 +131,9 @@ foam.CLASS({
 });
 
 
-// TODO: merge with Unloaded state
 foam.CLASS({
   package: 'foam.u2',
-  name: 'InitialElementState',
+  name: 'UnloadedElementState',
   extends: 'foam.u2.ElementState',
 
   methods: [
@@ -150,7 +149,7 @@ foam.CLASS({
     function unload() {
       this.error('Must output and load before unloading.');
     },
-    function toString() { return 'INITIAL'; }
+    function toString() { return 'UNLOADED'; }
   ]
 });
 
@@ -164,7 +163,7 @@ foam.CLASS({
     function output(out) {
       // Only warn because it could be useful for debugging.
       this.warn('Duplicate output.');
-      return this.INITIAL.output.call(this, out);
+      return this.UNLOADED.output.call(this, out);
     },
     function load() {
       this.state = this.LOADED;
@@ -217,7 +216,7 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.warn('Duplicate output.');
-      return this.INITIAL.output.call(this, out);
+      return this.UNLOADED.output.call(this, out);
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
@@ -320,22 +319,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'UnloadedElementState',
-  extends: 'foam.u2.ElementState',
-
-  methods: [
-    function load() {
-      this.state = this.LOADED;
-      this.visitChildren('load');
-    },
-    function remove() { this.error('Remove after unload.'); },
-    function toString() { return 'UNLOADED'; }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
   name: 'Element',
 
   implements: [ 'foam.core.ExpressionSlotHelper' ],
@@ -362,9 +345,6 @@ foam.CLASS({
   constants: {
     DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
 
-    // Initial State of an Element
-    INITIAL: foam.u2.InitialElementState.create(),
-
     // State of an Element after it has been output (to a String) but before it is loaded.
     // This should be only a brief transitory state, as the Element should be loaded
     // almost immediately after being output.  It is an error to try and mutate the Element
@@ -375,8 +355,9 @@ foam.CLASS({
     // A Loaded Element should be visible in the DOM.
     LOADED: foam.u2.LoadedElementState.create(),
 
-    // State of an Element after it has been removed from the DOM.
-    // An unloaded Element can be re-added to the DOM.
+    // State of an Element before it has been added to the DOM, or after it has
+    // been removed from the DOM.
+    // An unloaded Element can be (re-)added to the DOM.
     UNLOADED: foam.u2.UnloadedElementState.create(),
 
     // ???: Add DESTROYED State?
@@ -439,7 +420,7 @@ foam.CLASS({
       transient: true,
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      factory: function() { return this.INITIAL; },
+      factory: function() { return this.UNLOADED; },
       postSet: function(_, state) {
         if ( state === this.LOADED ) {
           this.onload.pub();
