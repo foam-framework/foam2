@@ -36,16 +36,15 @@ foam.CLASS({
 
   methods: [
     function initE() {
-
       this.
         cssClass(this.myCls()).
-        add(this.action.label).
+        cssClass(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
         // TODO: it would be nicer if Slot had some kind of filter method
         attrs({disabled: this.expression(
           function(e) { return e ? undefined : 'disabled'; },
           this.action.createIsEnabled$(this.data$))}).
-        cssClass(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
-        on('click', this.click);
+        on('click', this.click).
+        add(this.action.label);
     }
   ],
 
