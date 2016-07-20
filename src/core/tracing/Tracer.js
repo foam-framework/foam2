@@ -97,11 +97,8 @@ foam.CLASS({
       this.rebind_(false, this.enabled);
     },
     function put(event) {
-      // TODO(markdittmer): Turn this into an UntraceableDAO decorator.
-      return this.withoutTracing( // From foam.core.tracing.FObject.
-        this.eventDAO_.put.bind(this.eventDAO_, event))
-        // Tracing to DAO is best effort: silence Promise-emitted errors.
-        .catch(function() {});
+      // Tracing to DAO is best effort: silence Promise-emitted errors.
+      return this.eventDAO_.put(event).catch(function() {});
     },
     function rebind_(wasEnabled, isEnabled) {
       if ( wasEnabled === isEnabled || ! this.tps || ! this.predicate ) return;
@@ -132,8 +129,10 @@ foam.CLASS({
     {
       name: 'onEvent',
       code: function(subscription, topic, event) {
-        this.put(event);
+        // TODO(markdittmer): Turn this into an UntraceableDAO decorator.
+        return this.withoutTracing( // From foam.core.tracing.FObject.
+          this.put.bind(this, event));
       }
-    }
+    },
   ]
 });
