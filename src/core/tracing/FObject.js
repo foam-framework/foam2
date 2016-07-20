@@ -16,7 +16,7 @@
  */
 
 // FObjects with tracing wired up to their pub/sub system.
-// Coupling note: Depends on foam.core.tracing.Window refinement
+// Coupling note: Depends on foam.core.tracing.Window refinement.
 foam.CLASS({
   package: 'foam.core.tracing',
   name: 'FObject',
