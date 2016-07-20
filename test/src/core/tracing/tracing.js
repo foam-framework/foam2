@@ -15,6 +15,22 @@
  * limitations under the License.
  */
 
+if ( foam.isServer ) {
+  performance = {
+    now: require('present')
+  };
+
+  require('../../../../src/core/tracing/Untraceable.js');
+  require('../../../../src/core/tracing/Event.js');
+  require('../../../../src/core/tracing/Publication.js');
+  require('../../../../src/core/tracing/Notification.js');
+  require('../../../../src/core/tracing/Window.js');
+  require('../../../../src/core/tracing/FObject.js');
+  require('../../../../src/core/tracing/EventNode.js');
+  require('../../../../src/core/tracing/EventDAO.js');
+  require('../../../../src/core/tracing/Tracer.js');
+}
+
 describe('Tracing', function() {
   var M = foam.lookup('foam.mlang.Expressions').create();
   var Tracer = foam.lookup('foam.core.tracing.Tracer');
