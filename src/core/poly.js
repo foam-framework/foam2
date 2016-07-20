@@ -17,6 +17,13 @@
 
 // Polyfill
 
+if ( ! Math.trunc ) {
+  Math.trunc = function trunc(v) {
+    return v > 0 ? Math.floor(v) : Math.ceil(v);
+  };
+}
+
+
 if ( ! Array.from ) {
   /** Turn array-like objects into real arrays. **/
   Array.from = function(a) {
