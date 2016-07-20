@@ -303,15 +303,18 @@ foam.CLASS({
       // No listeners, so return.
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
-      return this.pubKeyedListeners_(args) + this.pubExprListeners_(args);
+      var listeners = this.listeners_();
+      return this.pubGlobalListeners_(args, listeners) +
+        this.pubKeyedListeners_(args, listeners) +
+        this.pubExprListeners_(args, listeners);
     },
 
-    function pubKeyedListeners_(args) {
-      /** Internal publish method for string-keyed listeners. */
-      var listeners = this.listeners_();
+    function pubGlobalListeners_(args, listeners) {
+      return this.notify_(listeners.next, args);
+    },
 
-      // Notify all global listeners.
-      var count = this.notify_(listeners.next, args);
+    function pubKeyedListeners_(args, listeners) {
+      var count = 0;
 
       // Walk string arguments, notifying keyed child listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
@@ -329,12 +332,8 @@ foam.CLASS({
       return count;
     },
 
-    function pubExprListeners_(args) {
-      /** Internal publish method for expr-matched listeners. */
-      var listeners = this.listeners_();
-
-      // Notify all global listeners.
-      var count = this.notify_(listeners.next, args);
+    function pubExprListeners_(args, listeners) {
+      var count = 0;
 
       // Walk string arguments, notify matching expr-based listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
