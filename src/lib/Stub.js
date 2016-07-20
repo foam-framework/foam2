@@ -130,12 +130,12 @@ foam.CLASS({
           this.SUPER.apply(this, arguments);
 
           if ( arguments.length < 2 ) {
-            console.warn('Currently network subscriptions must include at least one topic.');
+            throw 'Currently network subscriptions must include at least one topic.';
           }
 
-          var replyBox = this.registry.register(
+          var replyBox = this.registry.register2(
             foam.next$UID(),
-            null,
+            this[replyPolicyName],
             foam.box.EventDispatchBox.create({ target: this }));
 
           this[propName].send(this.SubscribeMessage.create({
