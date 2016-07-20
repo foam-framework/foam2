@@ -22,7 +22,6 @@ foam.CLASS({
 
   properties: [
     'of',
-    'replyBox',
     {
       name: 'methods',
       expression: function(of) {
@@ -41,6 +40,12 @@ foam.CLASS({
     function installInClass(cls) {
       var model = foam.lookup(this.of);
       var propName = this.name;
+
+      var replyPolicyName = this.name + 'ReplyPolicy';
+
+      cls.installAxiom(foam.core.Property.create({
+        name: replyPolicyName
+      }));
 
       var methods = this.methods
           .map(function(name) { return model.getAxiomByName(name); })
@@ -62,6 +67,12 @@ foam.CLASS({
                     delegate: returnBox
                   });
 
+                  var exportBox = this.registry.register2(
+                    replyBox.id,
+                    this[replyPolicyName],
+                    replyBox
+                  );
+
                   var ret = returnBox.promise;
 
                   // TODO: Move this into RPCReturnBox ?
@@ -74,7 +85,7 @@ foam.CLASS({
                   name: m.name,
                   args: Array.from(arguments)
                 });
-                if ( replyBox ) msg.replyBox = replyBox;
+                if ( exportBox ) msg.replyBox = exportBox;
 
                 this[propName].send(msg);
 
@@ -131,21 +142,6 @@ foam.CLASS({
             replyBox: replyBox,
             topic: Array.from(arguments).slice(0, -1)
           }));
-
-          // var events = foam.next$UID();
-
-          // this.server.inbox().subBox(
-          //   events,
-          //   foam.box.EventDispatchBox.create({
-          //     target: this
-          //   }));
-
-          // this[propName].send(this.SubscribeMessage.create({
-          //   destination: foam.box.SubBox.create({
-          //     name: events,
-          //     delegate: this.server.inbox()
-          //   })
-          // }));
         }
       }));
     }
