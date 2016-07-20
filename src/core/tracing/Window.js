@@ -41,7 +41,9 @@ foam.CLASS({
         if ( tps ) {
           tps.pub('notification', ctx.Notification.create({
             // Grab publisher from Publication stored before async callback.
-            publisher: state.lastEvent.publisher,
+            // Note: Some notifications are simply listener callbacks, and may
+            // have no lastEvent.
+            publisher: state.lastEvent ? state.lastEvent.publisher : null,
             // Rest of data drawn from foam.core.Window's merged() and framed()
             // state object, as well as in-situ function properties added in
             // foam.core.Listener.
