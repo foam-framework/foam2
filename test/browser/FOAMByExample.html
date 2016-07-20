@@ -37,6 +37,7 @@ foam.CLASS({
 });
 log(Test);
 
+//:NOTEST
 // Use class.describe() to learn about the class
 Test.describe();
 
@@ -73,6 +74,7 @@ log(o.toString());
 // Call describe() on an object to see its Property values
 o.describe();
 
+//:NOTEST
 // Properties and Methods are types of Axioms
 // Get an array of all Axioms belonging to a Class by calling getAxioms.
 Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name); });
@@ -80,6 +82,7 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name
 // Find an Axiom for a class using getAxiomByName
 log(Test.getAxiomByName('a'));
 
+//:NOTEST
 // Find all Axioms of a particular class using getAxiomsByClass
 log(Test.getAxiomsByClass(foam.core.Method));
 
@@ -88,9 +91,11 @@ log(Test.getAxiomsByClass(foam.core.Method));
 log(foam.core.Method.NAME);
 foam.core.Method.NAME.describe();
 
+//:NOTEST
 // Property constants contain map functions
 log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
 
+//:NOTEST
 // Property constants contain comparators
 log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).map(foam.core.Method.NAME.f));
 
@@ -440,6 +445,7 @@ foam.CLASS({
 var a = demo.bank.AccountTester.create(null);
 a.test();
 
+//:NOTEST
 // In addition to being extended, a Class can also be refined.
 // Refinement upgrades the existing class rather than create a
 // new sub-class. In the following example we add 'salary' to
@@ -465,6 +471,7 @@ var e = Person.create({name: 'Jane', sex: 'F', salary: 50000});
 log(e.toString());
 log(oldPerson.toString());
 
+//:NOTEST
 // Refine a Property
 log(Person.SALARY.cls_.name);
 foam.CLASS({
@@ -648,6 +655,7 @@ o.longForm(); // Won't be called because is not available yet
 log(o.available = true);
 o.longForm();
 
+//:NOTEST
 // In addition to class-inheritance, FOAM also supports
 // interfaces, which are a form of multiple-inheritance which
 // copy Axioms from another model.
@@ -674,6 +682,7 @@ tt.describe();
 tt.tfoo(); // From SampleI
 tt.foo();
 
+//:NOTEST
 // Unlike regular inheritance with extends:, classes
 // can implement: from multiple sources.
 foam.CLASS({
@@ -720,6 +729,7 @@ foam.CLASS({
 });
 InnerClassTest.create();
 
+//:NOTEST
 // Inner-classes can also be accessed from the outer-class
 InnerClassTest.InnerClass1.describe();
 

@@ -111,18 +111,6 @@ log(Test);
   expect(log_.output).toMatchGolden({ i: 1, str: " <b>&gt;</b> TestClass" });
 
 
-// Example 2
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Use class.describe() to learn about the class
-Test.describe();
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2anonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n" });
-
-
 // Example 3
 foam.__context__ = foam.createSubContext();
 log_.output = "";
@@ -237,19 +225,6 @@ o.describe();
   expect(log_.output).toMatchGolden({ i: 11, str: "Instance of TestAxiom Type           Name           Value----------------------------------------------------Property             a              42Property             b              rosebud\n" });
 
 
-// Example 12
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Properties and Methods are types of Axioms
-// Get an array of all Axioms belonging to a Class by calling getAxioms.
-Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name); });
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2 __context__Method initArgsMethod unknownArgTopic propertyChangeMethod describeMethod stringify" });
-
-
 // Example 13
 foam.__context__ = foam.createSubContext();
 log_.output = "";
@@ -260,42 +235,6 @@ log(Test.getAxiomByName('a'));
  log("Exception: ", x);
  }
   expect(log_.output).toMatchGolden({ i: 13, str: " <b>&gt;</b> a" });
-
-
-// Example 14
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Find all Axioms of a particular class using getAxiomsByClass
-log(Test.getAxiomsByClass(foam.core.Method));
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method" });
-
-
-// Example 16
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Property constants contain map functions
-log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,unknownArg,describe,stringify" });
-
-
-// Example 17
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Property constants contain comparators
-log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).map(foam.core.Method.NAME.f));
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> describe,f1,f2,initArgs,stringify,unknownArg" });
 
 
 // Example 18
@@ -860,59 +799,6 @@ a.test();
   expect(log_.output).toMatchGolden({ i: 41, str: "Deposit:  42 100 100Bank:  demo.bank.AccountTesterInstance of AccountAxiom Type           Name           Value----------------------------------------------------Property             id             42Property             status         trueProperty             balance        90\nDeposit:  43 100 100Bank:  demo.bank.AccountTesterInstance of SavingsAccountAxiom Type           Name           Value----------------------------------------------------Property             id             43Property             status         trueProperty             balance        89.95\n" });
 
 
-// Example 42
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// In addition to being extended, a Class can also be refined.
-// Refinement upgrades the existing class rather than create a
-// new sub-class. In the following example we add 'salary' to
-// the person class, rather than creating a new Employee sub-class.
-foam.CLASS({
-  name: 'Person',
-  properties: [ 'name', 'sex' ],
-  methods: [
-    function toString() { return this.name + ' ' + this.sex; }
-  ]
-});
-var oldPerson = Person.create({name: 'John', sex: 'M'});
-log(oldPerson.toString());
-foam.CLASS({
-  refines: 'Person',
-  properties: [ { class: 'Float', name: 'salary', value: 0 } ],
-  methods: [
-    function toString() { return this.name + ' ' + this.sex + ' ' + this.salary; }
-  ]
-});
-Person.describe();
-var e = Person.create({name: 'Jane', sex: 'F', salary: 50000});
-log(e.toString());
-log(oldPerson.toString());
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryanonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
-
-
-// Example 43
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Refine a Property
-log(Person.SALARY.cls_.name);
-foam.CLASS({
-  refines: 'Person',
-  properties: [ { name: 'salary', value: 30000 } ]
-});
-log(Person.SALARY.cls_.name);
-var o = Person.create({name:'John'});
-log(o.salary);
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 43, str: " <b>&gt;</b> Float <b>&gt;</b> Property <b>&gt;</b> 30000" });
-
-
 // Example 44
 foam.__context__ = foam.createSubContext();
 log_.output = "";
@@ -1133,66 +1019,6 @@ o.longForm();
   expect(log_.output).toMatchGolden({ i: 60, str: " <b>&gt;</b> short action <b>&gt;</b> true <b>&gt;</b> true <b>&gt;</b> long action" });
 
 
-// Example 61
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// In addition to class-inheritance, FOAM also supports
-// interfaces, which are a form of multiple-inheritance which
-// copy Axioms from another model.
-foam.CLASS({
-  name: 'SampleI',
-  properties: [ 't1', 't2', 't3' ],
-  methods: [
-    function tfoo() { console.log('ffoo'); },
-    function tbar() { console.log('tbar'); }
-  ]
-});
-foam.CLASS({
-  name: 'ImplementsTest',
-  implements: ['SampleI'],
-  properties: [ 'p1', 'p2', 'p3' ],
-  methods: [
-    function foo() { console.log('foo'); },
-    function bar() { console.log('bar'); }
-  ]
-});
-ImplementsTest.describe();
-var tt = ImplementsTest.create({p1:1, t1:2});
-tt.describe();
-tt.tfoo(); // From SampleI
-tt.foo();
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbaranonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
-
-
-// Example 62
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Unlike regular inheritance with extends:, classes
-// can implement: from multiple sources.
-foam.CLASS({
-  name: 'Sample2I',
-  properties: [ 'tb1', 'tb2', 'tb3' ],
-  methods: [
-    function tbfoo() { console.log('ffoo'); },
-    function tbbar() { console.log('tbar'); }
-  ]
-});
-foam.CLASS({
-  name: 'ImplementsTest2',
-  implements: ['SampleI', 'Sample2I']
-});
-ImplementsTest2.describe();
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbaranonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n" });
-
-
 // Example 63
 foam.__context__ = foam.createSubContext();
 log_.output = "";
@@ -1239,18 +1065,6 @@ InnerClassTest.create();
  log("Exception: ", x);
  }
   expect(log_.output).toMatchGolden({ i: 64, str: " <b>&gt;</b> 1 2 5 10" });
-
-
-// Example 65
-foam.__context__ = foam.createSubContext();
-log_.output = "";
-try {
-// Inner-classes can also be accessed from the outer-class
-InnerClassTest.InnerClass1.describe();
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    banonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n" });
 
 
 // Example 66
