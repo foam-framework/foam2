@@ -724,8 +724,7 @@ InnerClassTest.create();
 InnerClassTest.InnerClass1.describe();
 
 // Inner-classes do not appear in the global namespace
-// TODO: isn't true yet
-log(! InnerClass1);
+log(! global.InnerClass1);
 
 // Objects support pub() for pubing events,
 // and sub() for listening for pubed events.
