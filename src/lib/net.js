@@ -58,7 +58,13 @@ foam.CLASS({
           socket.removeEventListener('open', onConnect);
           resolve(self);
         }
+        function onConnectError(e) {
+          socket.removeEventListener('error', onConnectError);
+          reject();
+        }
         socket.addEventListener('open', onConnect);
+        socket.addEventListener('error', onConnectError);
+
         socket.addEventListener('open', function() {
           self.connected.pub();
         });
