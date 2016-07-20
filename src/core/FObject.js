@@ -320,7 +320,7 @@ foam.CLASS({
       for ( var i = 0 ; i < args.length; i++ ) {
         var listeners = listeners.children && listeners.children[args[i]];
         if ( typeof args[i] === 'string' )
-          listeners = listeners.children[args[i]];
+          listeners = listeners.children && listeners.children[args[i]];
         else
           break;
 
@@ -349,7 +349,7 @@ foam.CLASS({
         }
 
         if ( typeof args[i] === 'string' )
-          listeners = listeners.children[args[i]];
+          listeners = listeners.children && listeners.children[args[i]];
         else
           break;
 
@@ -386,19 +386,17 @@ foam.CLASS({
       var listeners = this.listeners_();
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
-        var children = listeners.children || ( listeners.children = {} );
-        listeners = children[arguments[i]] ||
-            ( children[arguments[i]] = this.createListenerList_() );
         if ( Expr && Expr.isInstance(arguments[i]) ) {
+          var exprs = listeners.exprs || ( listeners.exprs = {} );
           var key = arguments[i].toString();
           listeners.hasExprs = true;
-          if ( ! listeners.exprs ) listeners.exprs = {};
-          listeners = listeners.exprs[key] ||
-              ( listeners.exprs[key] = this.createListenerList_() );
+          listeners = exprs[key] ||
+              ( exprs[key] = this.createListenerList_() );
           listeners.expr = arguments[i];
         } else {
-          listeners = listeners.children[arguments[i]] ||
-              ( listeners.children[arguments[i]] = this.createListenerList_() );
+          var children = listeners.children || ( listeners.children = {} );
+          listeners = children[arguments[i]] ||
+              ( children[arguments[i]] = this.createListenerList_() );
         }
       }
 
