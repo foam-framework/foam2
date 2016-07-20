@@ -377,13 +377,13 @@ foam.CLASS({
 
     function subToArgs_(args) {
       this.cleanup();
-      
+
       var cleanup = foam.core.FObject.create();
-      
+
       for ( var i = 0 ; i < args.length ; i++ ) {
         cleanup.onDestroy(args[i].sub(this.invalidate));
       }
-      
+
       this.cleanup_ = cleanup;
     }
   ],
