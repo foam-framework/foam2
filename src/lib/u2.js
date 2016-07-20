@@ -1437,3 +1437,44 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'CSS',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code'
+    },
+    {
+      name: 'name',
+      factory: function() { return 'CSS-' + this.$UID; }
+    },
+    {
+      name: 'installedDocuments_',
+      factory: function() {
+        return new WeakMap();
+      }
+    }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      // Install myself in this Window, if not already there.
+      var oldCreate = cls.create;
+      var axiom = this;
+
+      cls.create = function(args, X) {
+        // Install our own CSS, and then all parent models as well.
+        if ( ! axiom.installedDocuments_.has(X.document) ) {
+          X.installCSS(axiom.code);
+          axiom.installedDocuments_.set(X.document, true);
+        }
+
+        // Now call through to the original create.
+        return oldCreate.call(this, args, X);
+      };
+    }
+  ]
+});

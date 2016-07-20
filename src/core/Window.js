@@ -56,6 +56,7 @@ foam.CLASS({
     'error',
     'framed',
     'info',
+    'installCSS',
     'log',
     'merged',
     'requestAnimationFrame',
@@ -190,6 +191,11 @@ foam.CLASS({
     },
     function cancelAnimationFrame(id) {
       this.window.cancelAnimationFrame(id);
+    },
+    function installCSS(text) {
+      /* Create a new <style> tag containing the given CSS code. */
+      this.document.head.insertAdjacentHTML('beforeend',
+          '<style>' + text + '</style>');
     }
   ]
 });
