@@ -4,26 +4,7 @@
   <title>Test</title>
  </head>
  <body>
-  <script>
-foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
-var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.ExpressionSlot.create({
-  args: [ p.fname$, p.lname$ ],
-  fn: function(f, l) { return f + ' ' + l; }
-});
-e.sub(function() { console.log('event: ', arguments); });
-
-console.log(e.get());
-p.fname = 'Steve';
-p.lname = 'Jones';
-p.fname = 'Dave';
-p.lname = 'Smith';
-console.log(e.get());
-p.fname = 'Steve';
-p.lname = 'Jones';
-p.fname = 'Dave';
-p.lname = 'Smith';
-console.log(e.get());
+  <script src="Test.js">
   </script>
  </body>
 </html>

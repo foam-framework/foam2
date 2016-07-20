@@ -150,7 +150,7 @@ foam.CLASS({
       }
     */
     function createListenerList_() {
-      return { next: null, children: {} };
+      return { next: null };
     },
 
     /** Return the top-level listener list, creating if necessary. */
@@ -198,7 +198,7 @@ foam.CLASS({
       for ( var i = 0 ; listeners ; i++ ) {
         if ( listeners.next        ) return true;
         if ( i == arguments.length ) return false;
-        listeners = listeners.children[arguments[i]];
+        listeners = listeners.children && listeners.children[arguments[i]];
       }
 
       return false;
@@ -259,7 +259,7 @@ foam.CLASS({
 
       // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
-        var listeners = listeners.children[args[i]];
+        var listeners = listeners.children && listeners.children[args[i]];
         if ( ! listeners ) break;
         count += this.notify_(listeners.next, args);
       }
@@ -293,8 +293,9 @@ foam.CLASS({
       var listeners = this.listeners_();
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
-        listeners = listeners.children[arguments[i]] ||
-            ( listeners.children[arguments[i]] = this.createListenerList_() );
+        var children = listeners.children || ( listeners.children = {} );
+        listeners = children[arguments[i]] ||
+            ( children[arguments[i]] = this.createListenerList_() );
       }
 
       var node = {
@@ -328,7 +329,7 @@ foam.CLASS({
       var listeners = this.getPrivate_('listeners');
 
       for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ ) {
-        listeners = listeners.children[arguments[i]];
+        listeners = listeners.children && listeners.children[arguments[i]];
       }
 
       var node = listeners && listeners.next;

@@ -20,6 +20,52 @@ foam.CLASS({
   name: 'ActionView',
   extends: 'foam.u2.Element',
 
+  constants: {
+    CSS: function() {
+      return {
+        '^' : {
+          '-webkit-box-shadow': 'inset 0 1px 0 0 #ffffff',
+          'box-shadow': 'inset 0 1px 0 0 #ffffff',
+          background: '-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) )',
+          background: '-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% )',
+          'background-color': '#ededed',
+          '-moz-border-radius': '3px',
+          '-webkit-border-radius': '3px',
+          'border-radius': '3px',
+          border: '1px solid #dcdcdc',
+          display: 'inline-block',
+          color: '#777777',
+          'font-family': 'arial',
+          'font-size': '12px',
+          'font-weight': 'bold',
+          margin: '2px',
+          padding: '4px 16px',
+          'text-decoration': 'none',
+          visibility: 'hidden'
+        },
+
+        '^available': {
+          visibility: 'visible'
+        },
+
+        '^:hover': {
+          background: '-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) )',
+          background: '-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% )',
+          'background-color': '#dfdfdf'
+        },
+
+        '^ img': {
+          'vertical-align': 'middle'
+        },
+
+        '^:disabled': {
+          color: '#bbb',
+          '-webkit-filter': 'grayscale(0.8)'
+        }
+      };
+    }
+  },
+
   requires: [
 //    'foam.core.Property',
 //    'foam.u2.TextField'
@@ -35,17 +81,16 @@ foam.CLASS({
   ],
 
   methods: [
-    /*
-    function init() {
-      this.SUPER();
-    },
-    */
-
     function initE() {
       this.
         cssClass(this.myCls()).
-        add(this.action.label).
-        on('click', this.click);
+        cssClass(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
+        // TODO: it would be nicer if Slot had some kind of filter method
+        attrs({disabled: this.expression(
+          function(e) { return e ? undefined : 'disabled'; },
+          this.action.createIsEnabled$(this.data$))}).
+        on('click', this.click).
+        add(this.action.label);
     }
   ],
 

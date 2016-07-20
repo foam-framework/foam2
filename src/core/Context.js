@@ -111,6 +111,7 @@
 
           if ( foam.core.Slot.isInstance(v) ) {
             sub[key + '$'] = v;
+
             // For performance, these could be reused.
             (function(v) {
               Object.defineProperty(sub, key, {

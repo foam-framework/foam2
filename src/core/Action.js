@@ -81,6 +81,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function isEnabledFor(data) {
+      return foam.Function.withArgs(this.isEnabled, data);
+    },
+
     function createIsEnabled$(data$) {
       var e = foam.core.ExpressionSlot.create({
         code: this.isEnabled
@@ -99,8 +103,30 @@ foam.CLASS({
       */
     },
 
+    function isAvailableFor(data) {
+      return foam.Function.withArgs(this.isAvailable, data);
+    },
+
+    function createIsAvailable$(data$) {
+      var e = foam.core.ExpressionSlot.create({
+        code: this.isAvailable
+      });
+
+      e.obj$ = data$;
+      // e.obj = data$.get();
+
+      return e;
+      /*
+        // TODO: use when obj$: data$ works.
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this.isAvailable
+      });
+      */
+    },
+
     function maybeCall(ctx, data) {
-      if ( this.isAvailable.call(data, this) && this.isEnabled.call(data, this) ) {
+      if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
         data.pub('action', this.name, this);
         return true;
