@@ -65,14 +65,14 @@ foam.CLASS({
 
     function reloadData() {
       this.data.select({
-        put: this.onDAOPut,
+        put: this.daoPut,
         eof: function() { }
       });
     }
   ],
 
   listeners: [
-    function onDAOPut(obj) {
+    function daoPut(obj) {
       if ( this.rows_[obj.id] ) {
         this.rows_[obj.id].data = obj;
         return;
@@ -80,18 +80,28 @@ foam.CLASS({
 
       var ctx   = this.__subContext__.createSubContext();
       var child = this.rowFactory({ data: obj }, ctx);
-      child.on('click', this.rowClick.pub.bind(this.rowClick, obj));
+      child.on('click', function() {
+        this.rowClick.pub(child.data);
+      }.bind(this));
 
       this.rows_[obj.id] = child;
       this.add(child);
     },
+    function onDAOPut(_, __, ___, obj) {
+      this.daoPut(obj);
+    },
 
-    function onDAORemove(obj) {
+    function daoRemove(obj) {
       if ( this.rows_[obj.id] ) {
         this.removeChild(this.rows_[obj.id]);
         delete this.rows_[obj.id];
       }
     },
+    function onDAORemove(_, __, ___, obj) {
+      this.daoRemove(obj);
+    },
+
+
 
     function onDAOReset() {
       this.removeAllChildren();
