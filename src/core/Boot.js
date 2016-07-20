@@ -161,9 +161,6 @@ foam.LIB({
         parent.pubsub_ && parent.pubsub_.sub(
             'installAxiom',
             function(_, a1, a2, a3) { cls.pubsub_.pub(a1, a2, a3); });
-
-        // Classes without a package are also registered as globals
-        if ( ! cls.package ) global[cls.name] = cls;
       }
 
       cls.installModel(this);

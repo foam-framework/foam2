@@ -1258,12 +1258,11 @@ foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Inner-classes do not appear in the global namespace
-// TODO: isn't true yet
-log(! InnerClass1);
+log(! global.InnerClass1);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 66, str: " <b>&gt;</b> false" });
+  expect(log_.output).toMatchGolden({ i: 66, str: " <b>&gt;</b> true" });
 
 
 // Example 67
