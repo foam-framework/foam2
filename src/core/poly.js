@@ -70,7 +70,12 @@ if ( ! String.prototype.endsWith ) {
   };
 }
 
+<<<<<<< HEAD
 if ( ! this.WeakMap ) {
+=======
+(function() {
+  if ( this.WeakMap ) return;
+>>>>>>> f830c3f43a6df0c2de18c2681121b4e7bd23aa7c
   this.WeakMap = function WeakMap() {
     var id = '__WEAK_MAP__' + this.$UID;
 
@@ -87,4 +92,4 @@ if ( ! this.WeakMap ) {
       has: has
     };
   };
-}
+})();
