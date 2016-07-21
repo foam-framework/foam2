@@ -96,6 +96,10 @@ foam.CLASS({
       return other.mapFrom(this, f);
     },
 
+    function map(f) {
+      return foam.core.ExpressionSlot.create({code: f, args: [this]});
+    },
+
     /**
      * Relate to another Slot.
      * @param f maps from this to other
