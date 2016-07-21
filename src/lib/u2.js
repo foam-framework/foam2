@@ -960,18 +960,6 @@ foam.CLASS({
       return this.parentNode;
     },
 
-    function startCtx(opt_nodeName) {
-      /* Create a new Element and add it as a child. Return the child. */
-      var c = this.E(opt_nodeName);
-      this.add(c);
-      return c;
-    },
-
-    function endCtx() {
-      /* Return this Element's parent. Used to terminate a start(). */
-      return this.parentNode;
-    },
-
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
