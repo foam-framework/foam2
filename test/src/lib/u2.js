@@ -137,5 +137,80 @@ describe('U2', function() {
       expect(seenCSS).toContain('c2');
       expect(seenCSS).toContain('c3');
     });
+
+    describe('^ shorthand', function() {
+      foam.CLASS({
+        package: 'test.css',
+        name: 'Shorthand',
+        extends: 'foam.u2.Element',
+        axioms: [
+          foam.u2.CSS.create({
+            code: function() {/*
+              ^ {}
+              ^bar {}
+              ^ ^foo^bar {}
+            */}
+          })
+        ]
+      });
+
+      foam.CLASS({
+        package: 'test.css',
+        name: 'ShorthandOverride',
+        extends: 'foam.u2.Element',
+        constants: {
+          CSS_NAME: 'some-other-name'
+        },
+        axioms: [
+          foam.u2.CSS.create({
+            code: function() {/*
+              ^ {}
+              ^bar {}
+              ^ ^foo^bar {}
+            */}
+          })
+        ]
+      });
+
+      it('should expand properly', function() {
+        var X = foam.core.Window.create();
+        X.document = {};
+        var css = '';
+        X.installCSS = function(text) {
+          css += text;
+        };
+
+        expect(css.length).toBe(0);
+        var e = test.css.Shorthand.create(null, X);
+        expect(css.indexOf('.test-css-Shorthand- {')).toBeGreaterThan(0);
+        expect(css.indexOf('.test-css-Shorthand-bar {')).toBeGreaterThan(0);
+        expect(css.indexOf(
+            '.test-css-Shorthand- .test-css-Shorthand-foo.test-css-Shorthand-bar {'
+            )).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myCls())).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myCls('foo'))).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myCls('bar'))).toBeGreaterThan(0);
+      });
+
+      it('should honour the CSS_NAME constant', function() {
+        var X = foam.core.Window.create();
+        X.document = {};
+        var css = '';
+        X.installCSS = function(text) {
+          css += text;
+        };
+
+        expect(css.length).toBe(0);
+        var e = test.css.ShorthandOverride.create(null, X);
+        expect(css.indexOf('.some-other-name- {')).toBeGreaterThan(0);
+        expect(css.indexOf('.some-other-name-bar {')).toBeGreaterThan(0);
+        expect(css.indexOf(
+            '.some-other-name- .some-other-name-foo.some-other-name-bar {'))
+          .toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myCls())).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myCls('foo'))).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myCls('bar'))).toBeGreaterThan(0);
+      });
+    });
   });
 });
