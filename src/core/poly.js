@@ -70,8 +70,8 @@ if ( ! String.prototype.endsWith ) {
   };
 }
 
-if ( ! global.WeakMap ) {
-  global.WeakMap = function WeakMap() {
+if ( ! this.WeakMap ) {
+  this.WeakMap = function WeakMap() {
     var id = '__WEAK_MAP__' + this.$UID;
 
     function del(key) { delete key[id]; }
