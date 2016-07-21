@@ -584,7 +584,7 @@ foam.CLASS({
         Without an extra, results in eg. 'foam-u2-Input-'.
         With an extra of "foo", results in 'foam-u2-Input-foo'.
       */
-      var base = this.CSS_CLASS || foam.String.cssClassize(this.model_.id);
+      var base = this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id);
 
       if ( ! opt_extra ) opt_extra = '';
 
@@ -1487,13 +1487,21 @@ foam.CLASS({
       cls.create = function(args, X) {
         // Install our own CSS, and then all parent models as well.
         if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.code);
+          X.installCSS(axiom.expandCSS(cls, axiom.code));
           axiom.installedDocuments_.set(X.document, true);
         }
 
         // Now call through to the original create.
         return oldCreate.call(this, args, X);
       };
+    },
+
+    function expandCSS(cls, text) {
+      /* Performs expansion of the ^ shorthand on the CSS. */
+      // TODO(braden): Parse and validate the CSS.
+      // TODO(braden): Add the automatic prefixing once we have the parser.
+      return text.replace(/\^/g,
+          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
     }
   ]
 });
