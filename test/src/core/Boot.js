@@ -755,6 +755,7 @@ describe('Slots', function() {
     expect(t.a$.isDefined()).toBe(true);
   });
   it('binds property slots', function() {
+    debugger;
     t.a$ = t2.a$; // bind
     t.a = 999;
     expect(t2.a).toEqual(999);
@@ -801,6 +802,7 @@ describe('Slots', function() {
   it('unsubs manual listeners', function() {
     var last_args, last_value;
     var l = function() {
+      debugger;
       last_args = Array.prototype.slice.call(arguments);
       last_value = last_args[3].get();
     };

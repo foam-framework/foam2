@@ -318,7 +318,6 @@ foam.CLASS({
 
       // Walk string arguments, notifying keyed child listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
-        var listeners = listeners.children && listeners.children[args[i]];
         if ( typeof args[i] === 'string' )
           listeners = listeners.children && listeners.children[args[i]];
         else
@@ -432,12 +431,11 @@ foam.CLASS({
       var Expr = foam.lookup('foam.mlang.predicate.Expr', true);
 
       for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ ) {
-        listeners = listeners.children && listeners.children[arguments[i]];
         if ( listeners.hasExprs && Expr && Expr.isInstance(arguments[i]) ) {
           var key = arguments[i].toString();
-          listeners = listeners.exprs[key];
+          listeners = listeners.exprs && listeners.exprs[key];
         } else {
-          listeners = listeners.children[arguments[i]];
+          listeners = listeners.children && listeners.children[arguments[i]];
         }
       }
 
