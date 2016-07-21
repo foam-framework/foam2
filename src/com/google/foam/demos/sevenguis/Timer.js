@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'Timer',
   extends: 'foam.u2.Element',
 
+  exports: [ 'as data' ],
   /*
   requires: [
     'foam.u2.ProgressView',
@@ -61,6 +62,22 @@ foam.CLASS({
       this.SUPER();
       this.duration$.sub(this.tick);
       this.tick();
+    },
+
+    function initE() {
+      this.nodeName = 'div';
+      this.start('row').add('Elapsed Time:', this.PROGRESS).end();
+      this.start('row').add(this.elapsedTime$).end();
+      this.start('row').add('Duration:', this.DURATION).end();
+      this.add('[', this.RESET, ']');
+      /*
+        <div class="^" x:data={{this}}>
+        <row><span class="label">Elapsed Time:</span> <:progress width="50"/></row>
+        <row class="elapsed">{{this.dynamic(function(t) { return t.toFixed(1); }, this.elapsedTime$)}}s</row>
+        <row><span class="label">Duration:</span> <:duration onKeyMode="true"/></row>
+        <:reset/>
+        </div>
+        */
     }
   ],
 
@@ -71,7 +88,7 @@ foam.CLASS({
     }
   ],
 
-  templates: [
+  xxxtemplates: [
     function CSS() {/*
       ^ { padding: 10px !important; font-size: 18px; }
       ^ .elapsed { margin-top: 10px; }
@@ -97,6 +114,7 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
+console.log('tick', this.elapsedTime, this.duration, this.lastTick_);
         if ( 1000 * this.elapsedTime >= this.duration ) return;
         var now = Date.now();
         if ( this.lastTick_ ) this.elapsedTime += (now - this.lastTick_)/1000;

@@ -297,6 +297,7 @@ foam.CLASS({
       }
       var out = this.createOutputStream();
       out(newE);
+      // TODO: import document
       var n = this.__context__.document.createElement('div');
       n.innerHTML = out.toString();
       e.replaceChild(n.firstChild, oldE.el());
@@ -959,6 +960,18 @@ foam.CLASS({
       return this.parentNode;
     },
 
+    function startCtx(opt_nodeName) {
+      /* Create a new Element and add it as a child. Return the child. */
+      var c = this.E(opt_nodeName);
+      this.add(c);
+      return c;
+    },
+
+    function endCtx() {
+      /* Return this Element's parent. Used to terminate a start(). */
+      return this.parentNode;
+    },
+
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
@@ -1328,6 +1341,7 @@ foam.CLASS({
     function s(opt_nodeName) { return this.start(opt_nodeName); },
     function t(as) { return this.attrs(as); },
     function x(m) {
+      // TODO: this doesn't work in FOAM2
       for ( var k in m ) this.__context__.set(k, m[k]);
       return this;
     },
@@ -1341,8 +1355,13 @@ foam.CLASS({
   name: 'View',
   extends: 'foam.u2.Element',
 
+  exports: [ 'data' ],
+
   properties: [
-    'data'
+    {
+      name: 'data',
+      factory: function() { return this.__context__.data; }
+    }
   ]
 });
 
