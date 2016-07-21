@@ -93,8 +93,15 @@ FOAM_FILES([
   { name: "lib/box" },
 //  { name: "lib/u2/daos", flags: ['web'] },
 //  { name: "lib/u2/TableView", flags: ['web'] },
-  { name: "lib/u2/daos"},
-  { name: "lib/u2/TableView"},
+  { name: "lib/u2/daos" },
+  { name: "lib/u2/TableView" },
+  { name: "lib/u2/ActionView" },
+  { name: "lib/u2/PropertyView" },
+  { name: "lib/u2/DetailPropertyView" },
+  { name: "lib/u2/DetailView" },
+  { name: "lib/u2/tag/Image" },
+  { name: "lib/u2/tag/Input" },
+  { name: "lib/u2/TextField" },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] }
 ]);
