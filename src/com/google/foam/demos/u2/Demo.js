@@ -99,6 +99,12 @@ var e13 = E('div').add(
     }
   }),
   E('br'),
+  timer.second$.map(function(s) {
+    return s % 2 ?
+      E('span').add('PI', 'NG').style({color: 'aqua'}) :
+      E('span').add('PONG').style({color: 'orange'})   ;
+  }),
+  E('br'),
   'dynamic value: ', timer.i$,
   E('br'));
 e13.write();
