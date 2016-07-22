@@ -18,15 +18,11 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'PropertyView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
 
   requires: [
     'foam.core.Property',
     'foam.u2.TextField'
-  ],
-
-  imports: [
-    'data'
   ],
 
   properties: [
@@ -77,7 +73,11 @@ foam.CLASS({
 
     // Set properties on delegate view instead of this
     function attrs(map) {
-      this.view.attrs(map);
+      if ( map.data ) {
+        this.data = map.data;
+        delete map.data;
+      }
+      this.child_.attrs(map);
       return this;
     }
   ]
