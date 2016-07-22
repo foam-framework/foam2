@@ -251,3 +251,20 @@ foam.u2.DetailView.create({
   properties: [ foam.util.Timer.INTERVAL, foam.util.Timer.I ],
   actions: [ foam.util.Timer.STOP, foam.util.Timer.START ]
 }).write();
+
+foam.CLASS({
+  name: 'CustomDetailView',
+  extends: 'foam.u2.Element',
+
+  exports: [ 'as data' ],
+
+  properties: [ 'field1', 'field2' ],
+  actions: [ function sayHello() { console.log('hello'); } ],
+  methods: [
+    function initE() {
+      this.field1 = 'foo';
+      this.field2 = 'bar';
+      this.add('start: ', this.field1$/*this.FIELD1, this.FIELD2*/, this.SAY_HELLO);
+    }
+  ]
+}).create().write();
