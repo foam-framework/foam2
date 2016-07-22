@@ -213,8 +213,8 @@ foam.CLASS({
 
     function hasListeners(/* args */) {
       /** Return true iff there are listeners for the supplied message. **/
-      var args = Array.from(arguments);
-      return this.hasKeyedListeners_(args) || this.hasExprListeners_(args);
+      return this.hasKeyedListeners_(arguments) ||
+        this.hasExprListeners_(arguments);
     },
 
     function hasKeyedListeners_(args) {

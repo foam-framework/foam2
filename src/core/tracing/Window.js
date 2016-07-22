@@ -21,7 +21,10 @@ foam.CLASS({
   name: 'Window',
   extends: 'foam.core.Window',
 
-  requires: [ 'foam.core.tracing.Notification' ],
+  requires: [
+    'FObject',
+    'foam.core.tracing.Notification'
+  ],
   exports: [ 'lastEvent_' ],
 
   properties: [
@@ -36,7 +39,7 @@ foam.CLASS({
       var ctx = this;
       var baseListener = this.SUPER(state);
       return function asyncListener() {
-        var tps = foam.lookup('foam.core.FObject').TRACING_PUB_SUB;
+        var tps = ctx.FObject.TRACING_PUB_SUB;
         // Publish notification now, during async callback.
         if ( tps ) {
           tps.pub('notification', ctx.Notification.create({
