@@ -467,6 +467,13 @@ foam.CLASS({
       return this;
     },
 
+    /**
+     * Used during axiom installation when a child class includes
+     * a property with the same name as a property in the parent class.
+     *
+     * Copies property properties from the child property into the to-be-installed
+     * property.
+     */
     function inheritProperties_(childProp) {
       for ( var key in childProp.instance_ ) {
         this.instance_[key] = childProp.instance_[key];

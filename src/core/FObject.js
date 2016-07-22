@@ -554,7 +554,6 @@ foam.CLASS({
       // If the source is an FObject, copy any properties
       // that we have in common.
       if ( foam.core.FObject.isInstance(o) ) {
-        console.log('Copy from fobject', this.cls_.name, o.cls_.name, this.name, o.name);
         for ( var i = 0 ; i < props.length ; i++ ) {
           var name = props[i].name;
           var otherProp = o.cls_.getAxiomByName(name);
