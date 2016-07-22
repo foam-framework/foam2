@@ -222,11 +222,10 @@ foam.CLASS({
       var listeners = this.getPrivate_('listeners');
 
       for ( var i = 0; listeners; i++ ) {
-        if ( listeners.next        ) return true;
+        if ( listeners.next   ) return true;
         if ( i == args.length ) return false;
-        listeners = listeners.children && listeners.children[arguments[i]];
         if ( typeof args[i] === 'string' ) {
-          listeners = listeners.children[args[i]];
+          listeners = listeners.children && listeners.children[args[i]];
         }
       }
 
