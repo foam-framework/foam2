@@ -259,12 +259,15 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   properties: [ 'field1', 'field2' ],
-  actions: [ function sayHello() { console.log('hello'); } ],
+  actions: [
+    function reset() { this.field1 = this.field2 = ''; },
+    function sayHello() { console.log('hello'); }
+  ],
   methods: [
     function initE() {
       this.field1 = 'foo';
       this.field2 = 'bar';
-      this.add('start: ', this.field1$/*this.FIELD1, this.FIELD2*/, this.SAY_HELLO);
+      this.add('start: ', this.field1$, this.field2$, this.FIELD1, this.FIELD2, this.SAY_HELLO, this.RESET);
     }
   ]
 }).create().write();
