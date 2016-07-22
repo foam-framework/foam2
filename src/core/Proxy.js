@@ -37,8 +37,11 @@ foam.CLASS({
         }
 
         if ( old !== a ) {
-          if ( a ) this.doSub();
-          else this.doUnsub();
+          if ( a ) {
+            this.doSub();
+          } else {
+            this.doUnsub();
+          }
         }
       }
     },
@@ -155,14 +158,13 @@ foam.CLASS({
       class: 'Function',
       name: 'code',
       expression: function(name, property, returns, delegate) {
-        if ( delegate ) {
-          return function() {
-            return this[property][name].apply(this, arguments);
-          };
-        }
-        return function() {
-          return this[property][name].apply(this[property], arguments);
-        };
+        return delegate ?
+            function delegate() {
+              return this[property][name].apply(this, arguments);
+            } :
+            function forward() {
+              return this[property][name].apply(this[property], arguments);
+            } ;
       }
     }
   ]
@@ -173,6 +175,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ProxySub',
   extends: 'Method',
+
   properties: [
     {
       name: 'name',
