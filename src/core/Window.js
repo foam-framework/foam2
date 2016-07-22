@@ -128,7 +128,7 @@ foam.CLASS({
           lastArgs: null,
           l: l
         };
-        return ctx.prepareFramedListener_(state);
+        return ctx.prepareMergedListener_(state, delay);
       }(), 'merged(' + l.name + ')');
     },
 
@@ -145,13 +145,22 @@ foam.CLASS({
       }(), 'framed(' + l.name + ')');
     },
 
+    function prepareMergedListener_(state, delay) {
+      /* Wrap a merged listener with given state, overridden in
+         foam.core.tracing. */
+      return this.getMergedListener_(
+        state, this.getAsyncListener_(state), delay);
+    },
+
     function prepareFramedListener_(state) {
-      /* Wrap a framed listener with given state, overridden in foam.core.tracing. */
+      /* Wrap a framed listener with given state, overridden in
+         foam.core.tracing. */
       return this.getFramedListener_(state, this.getAsyncListener_(state));
     },
 
     function getAsyncListener_(state) {
-      /* Get async wrapper for listener with given state, overridden in foam.core.tracing. */
+      /* Get async wrapper for listener with given state, overridden in
+         foam.core.tracing. */
       return function asyncListener() {
           state.triggered = false;
           var args = Array.from(state.lastArgs);
@@ -160,8 +169,23 @@ foam.CLASS({
       };
     },
 
+    function getMergedListener_(state, mergedListener, delay) {
+      /* Get merged callback for listener with given state, overridden in
+         foam.core.tracing. */
+      var ctx = this;
+      return function merged() {
+        state.lastArgs = arguments;
+
+        if ( ! state.triggered ) {
+          state.triggered = true;
+          ctx.setTimeout(mergedListener, delay);
+        }
+      };
+    },
+
     function getFramedListener_(state, frameFired) {
-      /* Get framed callback for listener with given state, overridden in foam.core.tracing. */
+      /* Get framed callback for listener with given state, overridden in
+         foam.core.tracing. */
       var ctx = this;
       return function framed() {
         state.lastArgs = arguments;
