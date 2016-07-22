@@ -139,8 +139,8 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.initE();
-      this.output_(out);
       this.state = this.OUTPUT;
+      this.output_(out);
       return out;
     },
     function load() {
@@ -161,8 +161,8 @@ foam.CLASS({
 
   methods: [
     function output(out) {
-      // Only warn because it could be useful for debugging.
-      this.warn('Duplicate output.');
+      // TODO: raise a real error
+      this.warn('ERROR: Duplicate output.');
       return this.UNLOADED.output.call(this, out);
     },
     function load() {
@@ -431,7 +431,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'parentNode',
+      name: 'parentNode'
       transient: true
     },
     {
@@ -680,7 +680,8 @@ foam.CLASS({
 
       if ( prop &&
            foam.core.Property.isInstance(prop) &&
-           prop.attribute ) {
+           prop.attribute )
+      {
         if ( typeof value === 'string' ) {
           // TODO: remove check when all properties have fromString()
           this[name] = prop.fromString ? prop.fromString(value) : value;
@@ -700,6 +701,10 @@ foam.CLASS({
         } else if ( foam.core.Slot.isInstance(value) ) {
           this.valueAttr_(name, value);
         } else {
+          this.assert(
+              typeof value === 'string' || typeof value === 'number',
+              'Attribute value must be a string or a number.');
+
           var attr = this.getAttributeNode(name);
 
           if ( attr ) {
@@ -950,7 +955,10 @@ foam.CLASS({
 
     function start(opt_nodeName) {
       /* Create a new Element and add it as a child. Return the child. */
-      var c = this.E(opt_nodeName);
+      var c = opt_nodeName && opt_nodeName.toE ?
+          opt_nodeName.toE(this) :
+          this.E(opt_nodeName)   ;
+
       this.add(c);
       return c;
     },
@@ -964,7 +972,6 @@ foam.CLASS({
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subContext__;
-
       var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
@@ -1340,22 +1347,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'View',
-  extends: 'foam.u2.Element',
-
-  exports: [ 'data' ],
-
-  properties: [
-    {
-      name: 'data',
-      factory: function() { return this.__context__.data; }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2',
   name: 'U2Context',
 
   exports: [
@@ -1424,6 +1415,23 @@ foam.CLASS({
         prop: this,
         view: this.toPropertyE(X)
       }, X);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'View',
+  extends: 'foam.u2.Element',
+
+  exports: [ 'data' ],
+
+  properties: [
+    {
+      name: 'data',
+      attribute: true,
+      factory: function() { return this.__context__.data; }
     }
   ]
 });
