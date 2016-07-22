@@ -297,6 +297,7 @@ foam.CLASS({
       }
       var out = this.createOutputStream();
       out(newE);
+      // TODO: import document
       var n = this.__context__.document.createElement('div');
       n.innerHTML = out.toString();
       e.replaceChild(n.firstChild, oldE.el());
@@ -583,7 +584,7 @@ foam.CLASS({
         Without an extra, results in eg. 'foam-u2-Input-'.
         With an extra of "foo", results in 'foam-u2-Input-foo'.
       */
-      var base = this.CSS_CLASS || foam.String.cssClassize(this.model_.id);
+      var base = this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id);
 
       if ( ! opt_extra ) opt_extra = '';
 
@@ -1328,6 +1329,7 @@ foam.CLASS({
     function s(opt_nodeName) { return this.start(opt_nodeName); },
     function t(as) { return this.attrs(as); },
     function x(m) {
+      // TODO: this doesn't work in FOAM2
       for ( var k in m ) this.__context__.set(k, m[k]);
       return this;
     },
@@ -1341,8 +1343,13 @@ foam.CLASS({
   name: 'View',
   extends: 'foam.u2.Element',
 
+  exports: [ 'data' ],
+
   properties: [
-    'data'
+    {
+      name: 'data',
+      factory: function() { return this.__context__.data; }
+    }
   ]
 });
 
@@ -1434,6 +1441,55 @@ foam.CLASS({
       return X.lookup('foam.u2.ActionView').create({
         action: this
       }, X);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'CSS',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code'
+    },
+    {
+      name: 'name',
+      factory: function() { return 'CSS-' + this.$UID; }
+    },
+    {
+      name: 'installedDocuments_',
+      factory: function() {
+        return new WeakMap();
+      }
+    }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      // Install myself in this Window, if not already there.
+      var oldCreate = cls.create;
+      var axiom = this;
+
+      cls.create = function(args, X) {
+        // Install our own CSS, and then all parent models as well.
+        if ( ! axiom.installedDocuments_.has(X.document) ) {
+          X.installCSS(axiom.expandCSS(cls, axiom.code));
+          axiom.installedDocuments_.set(X.document, true);
+        }
+
+        // Now call through to the original create.
+        return oldCreate.call(this, args, X);
+      };
+    },
+
+    function expandCSS(cls, text) {
+      /* Performs expansion of the ^ shorthand on the CSS. */
+      // TODO(braden): Parse and validate the CSS.
+      // TODO(braden): Add the automatic prefixing once we have the parser.
+      return text.replace(/\^/g,
+          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
     }
   ]
 });

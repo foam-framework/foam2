@@ -210,7 +210,6 @@ foam.CLASS({
       value: function(_, v, prop) {
         var of = foam.lookup(prop.of);
 
-
         return of.isInstance(v) ? v :
           ( v.class ? foam.looup(v.class) : of ).create(v);
       }
@@ -295,11 +294,13 @@ foam.CLASS({
   ]
 });
 
+
 //TODO(adamvy): Replace Class property with Class2 property.
 foam.CLASS({
   package: 'foam.core',
   name: 'Class2',
   extends: 'Property',
+
   methods: [
     function installInProto(proto) {
       this.SUPER(proto);

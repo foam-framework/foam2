@@ -20,12 +20,28 @@ foam.CLASS({
   name: 'Timer',
   extends: 'foam.u2.Element',
 
+  exports: [ 'as data' ],
+
   /*
   requires: [
     'foam.u2.ProgressView',
     'foam.u2.RangeView'
   ],
   */
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ { padding: 10px !important; font-size: 18px; }
+        ^ .elapsed { margin-top: 10px; }
+        ^ .label { display: inline-block; width: 130px; }
+        ^ button { width: 332px !important; margin-top: 16px !important; }
+        ^ input { margin-left: 12px; }
+        ^ .foam-u2-RangeView- { width: 182px; }
+        ^ row { display: block; height: 30px; }
+      */}
+    })
+  ],
 
   properties: [
     {
@@ -61,6 +77,24 @@ foam.CLASS({
       this.SUPER();
       this.duration$.sub(this.tick);
       this.tick();
+    },
+
+    function initE() {
+      this.nodeName = 'div';
+      this.
+        cssClass(this.myCls()).
+        start('row').start('span').cssClass('label').add('Elapsed Time:', this.PROGRESS).end().end().
+        start('row').cssClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
+        start('row').start('span').cssClass('label').add('Duration:', this.DURATION).end().end().
+        add(this.RESET);
+      /*
+        <div class="^" x:data={{this}}>
+        <row><span class="label">Elapsed Time:</span> <:progress width="50"/></row>
+        <row class="elapsed">{{this.dynamic(function(t) { return t.toFixed(1); }, this.elapsedTime$)}}s</row>
+        <row><span class="label">Duration:</span> <:duration onKeyMode="true"/></row>
+        <:reset/>
+        </div>
+        */
     }
   ],
 
@@ -71,32 +105,12 @@ foam.CLASS({
     }
   ],
 
-  templates: [
-    function CSS() {/*
-      ^ { padding: 10px !important; font-size: 18px; }
-      ^ .elapsed { margin-top: 10px; }
-      ^ .label { display: inline-block; width: 130px; }
-      ^ button { width: 332px !important; margin-top: 16px !important; }
-      ^ input { margin-left: 12px; }
-      ^ .foam-u2-RangeView- { width: 182px; }
-      ^ row { display: block; height: 30px; }
-    */},
-
-    function initE() {/*#U2
-      <div class="^" x:data={{this}}>
-        <row><span class="label">Elapsed Time:</span> <:progress width="50"/></row>
-        <row class="elapsed">{{this.dynamic(function(t) { return t.toFixed(1); }, this.elapsedTime$)}}s</row>
-        <row><span class="label">Duration:</span> <:duration onKeyMode="true"/></row>
-        <:reset/>
-      </div>
-    */}
-  ],
-
   listeners: [
     {
       name: 'tick',
       isFramed: true,
       code: function() {
+console.log('tick', this.elapsedTime, this.duration, this.lastTick_);
         if ( 1000 * this.elapsedTime >= this.duration ) return;
         var now = Date.now();
         if ( this.lastTick_ ) this.elapsedTime += (now - this.lastTick_)/1000;

@@ -106,7 +106,7 @@ foam.LIB({
           this.id + '.' + cName + ' from: ' + key + ' and ' + prev.name;
       }
 
-      this[cName] = value;
+      this.prototype[cName] = this[cName] = value;
     },
 
     /**
