@@ -21,6 +21,18 @@
   <!-- include source files here... -->
   <script language="javascript" src="../../src/foam.js"></script>
 
+  <!-- extensions under test not included in default foam core -->
+  <script language="javascript" src="../../src/core/tracing/Untraceable.js"></script>
+  <script language="javascript" src="../../src/core/tracing/Event.js"></script>
+  <script language="javascript" src="../../src/core/tracing/Publication.js"></script>
+  <script language="javascript" src="../../src/core/tracing/Notification.js"></script>
+  <script language="javascript" src="../../src/core/tracing/Window.js"></script>
+  <script language="javascript" src="../../src/core/tracing/FObject.js"></script>
+  <script language="javascript" src="../../src/core/tracing/EventNode.js"></script>
+  <script language="javascript" src="../../src/core/tracing/EventDAO.js"></script>
+  <script language="javascript" src="../../src/core/tracing/Tracer.js"></script>
+
+
   <!-- include helper files here... -->
   <script language="javascript" src="../helpers/testcontext.js"></script>
   <script language="javascript" src="../helpers/generic_dao.js"></script>
@@ -28,22 +40,23 @@
   <!-- include spec files here... -->
   <script src="../FOAMByExample.js"></script>
   <script src="../src/core/Boot.js"></script>
+  <script src="../src/core/Enum.js"></script>
+  <script src="../src/core/ImportsExports.js"></script>
   <script src="../src/core/context.js"></script>
   <script src="../src/core/debug.js"></script>
   <script src="../src/core/event.js"></script>
   <script src="../src/core/objects.js"></script>
+  <script src="../src/core/parse.js"></script>
   <script src="../src/core/stdlib.js"></script>
   <script src="../src/core/templates.js"></script>
+  <script src="../src/core/tracing/tracing.js"></script>
   <script src="../src/core/types.js"></script>
-  <script src="../src/core/Enum.js"></script>
-  <script src="../src/core/ImportsExports.js"></script>
+  <script src="../src/lib/Index.js"></script>
   <script src="../src/lib/Pooled.js"></script>
+  <script src="../src/lib/Promise.js"></script>
   <script src="../src/lib/QueryParser.js"></script>
-  <script src="../src/core/Enum.js"></script>
   <script src="../src/lib/dao.js"></script>
   <script src="../src/lib/mlang.js"></script>
-  <script src="../src/lib/Index.js"></script>
-  <script src="../src/lib/Promise.js"></script>
 </head>
 
 <body>
