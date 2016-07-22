@@ -100,10 +100,21 @@ foam.CLASS({
       return b;
     },
 
-    function error() { this.console.error.apply(this.console, arguments); },
-    function info()  { this.console.info.apply(this.console, arguments);  },
-    function log()   { this.console.log.apply(this.console, arguments);   },
-    function warn()  { this.console.warn.apply(this.console, arguments);  },
+    function error() {
+      this.console.error.apply(this.console, arguments);
+    },
+
+    function info() {
+      this.console.info.apply(this.console, arguments);
+    },
+
+    function log() {
+      this.console.log.apply(this.console, arguments);
+    },
+
+    function warn() {
+      this.console.warn.apply(this.console, arguments);
+    },
 
     function async(l) {
       /* Decorate a listener so that the event is delivered asynchronously. */
