@@ -25,6 +25,12 @@ foam.CLASS({
   properties: [
     [ 'nodeName', 'input' ],
     {
+      name: 'data',
+      assertValue: function(d) {
+        this.assert(! d || typeof d === 'string' || typeof d === 'number', 'Set Input data to non-primitive.');
+      }
+    },
+    {
       class: 'Boolean',
       name: 'onKey',
       attribute: true,
