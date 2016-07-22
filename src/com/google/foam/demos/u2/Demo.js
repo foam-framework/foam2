@@ -219,7 +219,7 @@ var s = p.firstName$;
 var input = foam.u2.tag.Input.create({data: 'william'});
 var input2 = foam.u2.tag.Input.create({data: 'john'});
 input.data$ = input2.data$;
-input.write(); 
+input.write();
 input2.write();
 
 Person.FIRST_NAME.toE(Y).write();
@@ -267,7 +267,29 @@ foam.CLASS({
     function initE() {
       this.field1 = 'foo';
       this.field2 = 'bar';
-      this.add('start: ', this.field1$, this.field2$, this.FIELD1, this.FIELD2, this.SAY_HELLO, this.RESET);
+
+      var o2 = this.cls_.create({field2: 'baz'});
+
+      this.
+          tag('br').
+          tag('hr').
+          add(
+              'start: ',
+              this.field1$, ' ',
+              this.field2$, ' ',
+              o2.field2$,
+              this.E('br'),
+              this.FIELD1, ' ',
+              this.FIELD2, ' ',
+              this.E('br'),
+              this.SAY_HELLO, ' ',
+              this.RESET,
+              this.E('br')
+          ).
+          start(this.FIELD1).end().
+          start(this.FIELD2).attrs({onKey: true}).end().
+          tag('br').
+          start(this.FIELD2).attrs({data: o2}).end();
     }
   ]
 }).create().write();
