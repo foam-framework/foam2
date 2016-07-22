@@ -2157,7 +2157,7 @@ foam.CLASS({
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 113, str: "warn: Unknown property foam.core.Model.unknown: foobarwarn: Unknown property foam.core.Property.unknown: foobar" });
+  expect(log_.output).toMatchGolden({ i: 113, str: "" });
 
 
 // Example 114

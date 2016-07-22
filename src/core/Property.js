@@ -203,10 +203,12 @@ foam.CLASS({
       var prop = this;
       var superProp = c.__proto__.getAxiomByName(prop.name);
 
-      if ( superProp ) {
+      if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = prop.cls_ === foam.core.Property ?
-          superProp.clone().copyFrom(prop) :
-          prop.cls_.create().copyFrom(superProp).copyFrom(this) ;
+          superProp.clone().inheritProperties_(prop) :
+          prop.cls_.create()
+            .inheritProperties_(superProp)
+            .inheritProperties_(this);
 
         // If properties would be shadowed by superProp properties, then
         // clear the shadowing property since the new value should
@@ -462,6 +464,13 @@ foam.CLASS({
     /** Flyweight setter for this Property. **/
     function set(o, value) {
       o[this.name] = value;
+      return this;
+    },
+
+    function inheritProperties_(childProp) {
+      for ( var key in childProp.instance_ ) {
+        this.instance_[key] = childProp.instance_[key];
+      }
       return this;
     },
 
