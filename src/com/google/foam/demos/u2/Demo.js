@@ -258,19 +258,46 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  properties: [ 'field1', 'field2' ],
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        important { color: red; }
+      */}
+    })
+  ],
+
+  properties: [ 'field1', 'field2', 'flip' ],
+
   actions: [
     function reset() { this.field1 = this.field2 = ''; },
     function sayHello() { console.log('hello'); }
   ],
+
+  listeners: [
+    {
+      name: 'flop',
+      isMerged: true,
+      mergeDelay: 1000,
+      code: function() {
+        this.flip = ! this.flip;
+        this.flop();
+      }
+    }
+  ],
+
   methods: [
     function initE() {
+      this.flop();
+
       this.field1 = 'foo';
       this.field2 = 'bar';
 
       var o2 = this.cls_.create({field2: 'baz'});
 
       this.
+          cssClass(function(flip) {
+            return flip ? 'important' : '';
+          }).
           tag('br').
           tag('hr').
           add(
