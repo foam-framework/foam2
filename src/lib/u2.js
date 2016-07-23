@@ -431,7 +431,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'parentNode'
+      name: 'parentNode',
       transient: true
     },
     {
@@ -1313,34 +1313,7 @@ foam.CLASS({
       }
 
       out('>');
-    },
-
-
-    //
-    // Template Support
-    //
-    // Shorter versions of methods used by TemplateParser.
-    //
-    // !!! INTERNAL USE ONLY !!!
-
-    function a() { return this.add.apply(this, arguments); },
-    function c() { return this.cls.apply(this, arguments); },
-    function d() { return this.enableCls.apply(this, arguments); },
-    function e() { return this.end(); },
-    function f(e) { return this.entity(e); },
-    function g(opt_nodeName) { return this.tag(opt_nodeName); },
-    function i(id) { return this.setID(id); },
-    function n(nodeName) { this.nodeName = nodeName; return this; },
-    function o(m) { for ( var k in m ) this.on(k, m[k]); return this; },
-    function p(a) { a[0] = this; return this; },
-    function s(opt_nodeName) { return this.start(opt_nodeName); },
-    function t(as) { return this.attrs(as); },
-    function x(m) {
-      // TODO: this doesn't work in FOAM2
-      for ( var k in m ) this.__context__.set(k, m[k]);
-      return this;
-    },
-    function y() { return this.style.apply(this, arguments); }
+    }
   ]
 });
 
