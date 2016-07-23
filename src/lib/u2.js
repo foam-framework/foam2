@@ -1436,6 +1436,7 @@ foam.CLASS({
       var axiom = this;
 
       cls.create = function(args, opt_parent) {
+        // TODO: move this functionality somewhere reusable
         var X = opt_parent ?
           ( opt_parent.__subContext__ || opt_parent.__context__ ) :
           foam.__context__;
