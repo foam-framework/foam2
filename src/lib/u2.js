@@ -18,7 +18,6 @@
 /*
 TODO:
  - Fix handling of Slots that return arrays.
- - Add support for FOAM1 style dynamic functions?
  - Properly handle insertBefore_ of an element that's already been inserted?
 */
 
@@ -607,26 +606,6 @@ foam.CLASS({
 
 
     //
-    // Dynamic Listeners
-    //
-
-    // TODO: rename to expression, or add destroy support
-    // to ExpressionSlotHelper
-    function dynamic() {
-      var ret = this.__context__.dynamic.apply(this.__context__, arguments);
-      this.on('unload', ret.destroy.bind(ret));
-      return ret;
-    },
-
-    // TODO: remove
-    function dynamicFn() {
-      var ret = this.__context__.dynamicFn.apply(this.__context__, arguments);
-      this.on('unload', ret.destroy.bind(ret));
-      return ret;
-    },
-
-
-    //
     // Focus
     //
 
@@ -857,14 +836,17 @@ foam.CLASS({
 
     // Was renamed from cls() in FOAM1, current name seems
     // out of place.  Maybe renamed addClass().
-    function cssClass(/* Value | String */ cls) {
+    function cssClass(/* Slot | String | function */ cls) {
       /* Add a CSS cls to this Element. */
       if ( typeof cls === 'function' ) {
         var lastValue = null;
-        this.dynamicFn(cls, function(value) {
+        var slot = this.expression(cls);
+        slot.sub(function() {
+          var value = slot.get();
           this.cssClass_(lastValue, value);
           lastValue = value;
         }.bind(this));
+        slot.get();
       } else if ( foam.core.Slot.isInstance(cls) ) {
         var lastValue = null;
         var l = function() {
@@ -1453,7 +1435,11 @@ foam.CLASS({
       var oldCreate = cls.create;
       var axiom = this;
 
-      cls.create = function(args, X) {
+      cls.create = function(args, opt_parent) {
+        var X = opt_parent ?
+          ( opt_parent.__subContext__ || opt_parent.__context__ ) :
+          foam.__context__;
+
         // Install our own CSS, and then all parent models as well.
         if ( ! axiom.installedDocuments_.has(X.document) ) {
           X.installCSS(axiom.expandCSS(cls, axiom.code));
