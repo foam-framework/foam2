@@ -321,8 +321,6 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
-  implements: [ 'foam.core.ExpressionSlotHelper' ],
-
   // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
@@ -836,18 +834,9 @@ foam.CLASS({
 
     // Was renamed from cls() in FOAM1, current name seems
     // out of place.  Maybe renamed addClass().
-    function cssClass(/* Slot | String | function */ cls) {
+    function cssClass(/* Slot | String */ cls) {
       /* Add a CSS cls to this Element. */
-      if ( typeof cls === 'function' ) {
-        var lastValue = null;
-        var slot = this.expression(cls);
-        slot.sub(function() {
-          var value = slot.get();
-          this.cssClass_(lastValue, value);
-          lastValue = value;
-        }.bind(this));
-        slot.get();
-      } else if ( foam.core.Slot.isInstance(cls) ) {
+      if ( foam.core.Slot.isInstance(cls) ) {
         var lastValue = null;
         var l = function() {
           var v = cls.get();
@@ -856,9 +845,12 @@ foam.CLASS({
         }.bind(this);
         cls.sub(l);
         l();
-      } else {
+      } else if ( typeof cls === 'string' ) {
         this.cssClass_(null, cls);
+      } else {
+        this.error('cssClass type error. Must be Slot or String.');
       }
+      
       return this;
     },
 
@@ -866,12 +858,8 @@ foam.CLASS({
       /* Enable/disable a CSS class based on a boolean-ish dynamic value. */
       function negate(a, b) { return b ? ! a : a; }
 
-      if ( typeof enabled === 'function' ) {
-        var fn = enabled;
-        this.dynamicFn(fn, function(value) {
-          this.enableCls(cls, value, opt_negate);
-        }.bind(this));
-      } else if ( foam.core.Slot.isInstance(enabled) ) {
+      // TODO: add type checking
+      if ( foam.core.Slot.isInstance(enabled) ) {
         var value = enabled;
         var l = function() {
           this.enableCls(cls, value.get(), opt_negate);
@@ -917,14 +905,14 @@ foam.CLASS({
       */
       for ( var key in map ) {
         var value = map[key];
-        if ( typeof value === 'function' ) {
-          this.dynamicStyle_(key, value);
-        } else if ( foam.core.Slot.isInstance(value) ) {
+        if ( foam.core.Slot.isInstance(value) ) {
           this.valueStyle_(key, value);
         } else {
           this.style_(key, value);
         }
+        // TODO: add type checking for this
       }
+
       return this;
     },
 
@@ -1148,9 +1136,12 @@ foam.CLASS({
 
     function dynamicAttr_(key, fn) {
       /* Set an attribute based off of a dynamic function. */
-      this.dynamicFn(fn, function(value) {
-        this.setAttribute(key, value);
-      }.bind(this));
+      var self = this;
+      var slot = this.slot(fn);
+      slot.sub(function() {
+        self.setAttribute(key, slot.get());
+      });
+      slot.get();
     },
 
     function valueAttr_(key, value) {
@@ -1160,13 +1151,6 @@ foam.CLASS({
       }.bind(this);
       value.sub(l);
       l();
-    },
-
-    function dynamicStyle_(key, fn) {
-      /* Set a CSS style based off of a dynamic function. */
-      this.dynamicFn(fn, function(value) {
-        this.style_(key, value);
-      }.bind(this));
     },
 
     function valueStyle_(key, v) {
