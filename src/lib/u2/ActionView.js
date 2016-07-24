@@ -86,7 +86,7 @@ foam.CLASS({
         cssClass(this.myCls()).
         cssClass(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
         // TODO: it would be nicer if Slot had some kind of filter method
-        attrs({disabled: this.expression(
+        attrs({disabled: this.slot(
           function(e) { return e ? undefined : 'disabled'; },
           this.action.createIsEnabled$(this.data$))}).
         on('click', this.click).

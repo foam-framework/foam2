@@ -132,18 +132,18 @@ foam.CLASS({
     },
 
     function initE() {
-      // TODO: replace with fast bind()
-      this.add(this.expression(function(model, properties) {
+      var self = this;
+      this.add(this.slot(function(model, properties) {
         if ( ! model ) return 'Set model or data.';
 
-        var title = this.title && this.E('tr').
-          start('td').cssClass(this.myCls('title')).attrs({colspan: 2}).
+        var title = self.title && self.E('tr').
+          start('td').cssClass(self.myCls('title')).attrs({colspan: 2}).
             add(this.title$).
           end();
 
-        return this.actionBorder(
-          this.E('table').cssClass(this.myCls()).add(title).add(properties));
-      }.bind(this), this.of$, this.properties$));
+        return self.actionBorder(
+          self.E('table').cssClass(self.myCls()).add(title).add(properties));
+      }, this.of$, this.properties$));
     },
 
     function actionBorder(e) {
