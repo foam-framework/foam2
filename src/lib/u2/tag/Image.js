@@ -29,10 +29,6 @@ foam.CLASS({
       name: 'displayHeight',
       attribute: true
     },
-    {
-      name: 'data',
-      attribute: true
-    },
     ['alpha', 1.0],
     ['nodeName', 'img']
   ],
