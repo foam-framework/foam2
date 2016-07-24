@@ -266,7 +266,12 @@ foam.CLASS({
     })
   ],
 
-  properties: [ 'field1', 'field2', 'flip' ],
+  properties: [
+    { class: 'Int', name: 'i' },
+    'field1',
+    'field2',
+    'flip'
+  ],
 
   actions: [
     function reset() { this.field1 = this.field2 = ''; },
@@ -279,6 +284,7 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 1000,
       code: function() {
+        this.i++;
         this.flip = ! this.flip;
         this.flop();
       }
@@ -295,9 +301,9 @@ foam.CLASS({
       var o2 = this.cls_.create({field2: 'baz'});
 
       this.
-          cssClass(function(flip) {
+        cssClass(this.slot(function(flip) {
             return flip ? 'important' : '';
-          }).
+          })).
           tag('br').
           tag('hr').
           add(
@@ -313,6 +319,12 @@ foam.CLASS({
               this.RESET,
               this.E('br')
           ).
+          start('notimage').
+            attrs({
+              data: 'dragon.png',
+              displayWidth: this.slot(function(i) { return i * 10 % 100; })
+            }).
+          end().
           start(this.FIELD1).end().
           start(this.FIELD2).attrs({onKey: true}).end().
           tag('br').
