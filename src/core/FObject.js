@@ -355,10 +355,18 @@ foam.CLASS({
     /**
       Creates a Slot for an Axiom.
     */
-    function slot(name) {
-      var axiom = this.cls_.getAxiomByName(name);
+    function slot(obj) {
+      if ( typeof obj === 'function' ) {
+        return foam.core.ExpressionSlot.create(
+          arguments.length == 1 ?
+            { code: obj, obj: this } :
+            { code: obj, args: Array.prototype.slice.call(arguments, 1) }
+        );
+      }
 
-      this.assert(axiom, 'Unknown axiom:', name);
+      var axiom = this.cls_.getAxiomByName(obj);
+
+      this.assert(axiom, 'Unknown axiom:', obj);
       this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
 
       return axiom.toSlot(this);
