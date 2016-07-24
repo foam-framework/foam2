@@ -397,21 +397,3 @@ foam.CLASS({
     function invalidate() { this.clearProperty('value'); }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ExpressionSlotHelper',
-
-  requires: [ 'foam.core.ExpressionSlot' ],
-
-  methods: [
-    function expression(fn /* ... args */) {
-      return this.ExpressionSlot.create(
-          arguments.length == 1 ?
-              { code: fn, obj: this } :
-              { code: fn, args: Array.prototype.slice.call(arguments, 1) }
-          );
-    }
-  ]
-});
