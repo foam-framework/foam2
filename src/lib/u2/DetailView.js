@@ -27,7 +27,6 @@ foam.CLASS({
   ],
 
   exports: [
-    'data',
     'controllerMode'
   ],
 
