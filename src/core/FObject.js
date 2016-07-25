@@ -367,7 +367,7 @@ foam.CLASS({
       var axiom = this.cls_.getAxiomByName(obj);
 
       this.assert(axiom, 'Unknown axiom:', obj);
-      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
+      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
 
       return axiom.toSlot(this);
     },
