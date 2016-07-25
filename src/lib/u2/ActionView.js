@@ -18,77 +18,60 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ActionView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
 
-  constants: {
-    CSS: function() {
-      return {
-        '^' : {
-          '-webkit-box-shadow': 'inset 0 1px 0 0 #ffffff',
-          'box-shadow': 'inset 0 1px 0 0 #ffffff',
-          background: '-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) )',
-          background: '-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% )',
-          'background-color': '#ededed',
-          '-moz-border-radius': '3px',
-          '-webkit-border-radius': '3px',
-          'border-radius': '3px',
-          border: '1px solid #dcdcdc',
-          display: 'inline-block',
-          color: '#777777',
-          'font-family': 'arial',
-          'font-size': '12px',
-          'font-weight': 'bold',
-          margin: '2px',
-          padding: '4px 16px',
-          'text-decoration': 'none',
-          visibility: 'hidden'
-        },
+  axioms: [
+    foam.u2.CSS.create({code: function() {/*
+      ^ {
+        -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
+        box-shadow: inset 0 1px 0 0 #ffffff;
+        background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+        background: -moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+        background-color: #ededed;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        border: 1px solid #dcdcdc;
+        display: inline-block;
+        color: #777777;
+        font-family: arial;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 2px;
+        padding: 4px 16px;
+        text-decoration: none;
+        visibility: hidden;
+      }
 
-        '^available': {
-          visibility: 'visible'
-        },
+      ^available {
+        visibility: visible;
+      }
 
-        '^:hover': {
-          background: '-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) )',
-          background: '-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% )',
-          'background-color': '#dfdfdf'
-        },
+      ^:hover {
+        background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+        background: -moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+        background-color: #dfdfdf;
+      }
 
-        '^ img': {
-          'vertical-align': 'middle'
-        },
+      ^ img {
+        vertical-align: middle;
+      }
 
-        '^:disabled': {
-          color: '#bbb',
-          '-webkit-filter': 'grayscale(0.8)'
-        }
-      };
-    }
-  },
-
-  requires: [
-//    'foam.core.Property',
-//    'foam.u2.TextField'
-  ],
-
-  imports: [
-    'data'
+      ^:disabled { color: #bbb; -webkit-filter: grayscale(0.8); }
+    */}})
   ],
 
   properties: [
-    'action',
-    [ 'nodeName', 'button' ]
+    'action'
   ],
 
   methods: [
     function initE() {
+      this.nodeName = 'button';
       this.
         cssClass(this.myCls()).
-        cssClass(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
-        // TODO: it would be nicer if Slot had some kind of filter method
-        attrs({disabled: this.slot(
-          function(e) { return e ? undefined : 'disabled'; },
-          this.action.createIsEnabled$(this.data$))}).
+        enableCls(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
+        attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })}).
         on('click', this.click).
         add(this.action.label);
     }
