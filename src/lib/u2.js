@@ -678,10 +678,12 @@ foam.CLASS({
         } else if ( foam.core.Slot.isInstance(value) ) {
           this.valueAttr_(name, value);
         } else {
+// TODO: put back
+/*
           this.assert(
               typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean',
               'Attribute value must be a string or a number.');
-
+*/
           var attr = this.getAttributeNode(name);
 
           if ( attr ) {
@@ -1329,6 +1331,7 @@ foam.CLASS({
 
 foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -1351,10 +1354,15 @@ foam.CLASS({
     },
 
     function toE(X) {
-      return X.lookup('foam.u2.PropertyView').create({
-        prop: this,
-        view: this.toPropertyE(X)
-      }, X);
+      var e = this.toPropertyE(X);
+
+      e.fromProperty && e.fromProperty(this);
+
+      if ( X.data ) {
+        e.data$ = X.data$.dot(this.name);
+      }
+
+      return e;
     }
   ]
 });

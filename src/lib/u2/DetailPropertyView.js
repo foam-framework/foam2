@@ -18,15 +18,10 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'DetailPropertyView',
-  extends: 'foam.u2.PropertyView',
-
-  /*
-  requires: [
-    'foam.u2.tag.Select'
-  ],
-  */
+  extends: 'foam.u2.Element',
 
   properties: [
+    'prop',
     [ 'nodeName', 'tr' ]
   ],
 
@@ -58,7 +53,7 @@ foam.CLASS({
       this.cssClass('foam-u2-PropertyView-')
           .start('td').cssClass('foam-u2-PropertyView-label').add(prop.label).end()
           .start('td').cssClass('foam-u2-PropertyView-view').add(
-              this.child_,
+              this.prop,
               prop.units && this.E('span').cssClass('foam-u2-PropertyView-units').add(prop.units))
           .end();
     }

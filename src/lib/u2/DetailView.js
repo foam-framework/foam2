@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'DetailView',
   extends: 'foam.u2.View',
 
+  // TODO: Rename DetailPropertyView and delete PropertyView
   requires: [
     'foam.core.Property',
     'foam.u2.DetailPropertyView'
@@ -142,7 +143,13 @@ foam.CLASS({
           end();
 
         return self.actionBorder(
-          self.E('table').cssClass(self.myCls()).add(title).add(properties));
+          self.
+            E('table').
+            cssClass(self.myCls()).
+            add(title).
+            add(properties.map(function(p) {
+              return self.DetailPropertyView.create({prop: p, view: p});
+            })));
       }, this.of$, this.properties$));
     },
 
