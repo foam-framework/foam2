@@ -1422,7 +1422,7 @@ foam.CLASS({
       cls.create = function(args, opt_parent) {
         // TODO: move this functionality somewhere reusable
         var X = opt_parent ?
-          ( opt_parent.__subContext__ || opt_parent.__context__ ) :
+          ( opt_parent.__subContext__ || opt_parent.__context__ || opt_parent ) :
           foam.__context__;
 
         // Install our own CSS, and then all parent models as well.
