@@ -679,7 +679,7 @@ foam.CLASS({
           this.valueAttr_(name, value);
         } else {
           this.assert(
-              typeof value === 'string' || typeof value === 'number',
+              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean',
               'Attribute value must be a string or a number.');
 
           var attr = this.getAttributeNode(name);
@@ -1264,9 +1264,10 @@ foam.CLASS({
 
       for ( var i = 0 ; i < this.attributes.length ; i++ ) {
         var attr  = this.attributes[i];
-        var value = this.attributes[i].value;
+        var name  = attr.name;
+        var value = attr.value;
 
-        out(' ', attr.name);
+        out(' ', name);
         if ( value !== false ) out('="', value, '"');
       }
 
