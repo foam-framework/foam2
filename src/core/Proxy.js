@@ -155,7 +155,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'Function',
       name: 'code',
       expression: function(name, property, returns, delegate) {
         return delegate ?
