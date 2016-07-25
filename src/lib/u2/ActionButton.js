@@ -108,11 +108,6 @@ foam.CLASS({
         cssClass(this.myCls('available'), this.isAvailable$).
         on('click', function() { self.action.maybeCall(self.X, self.data); }).
         attrs({disabled: this.isEnabled$.map(function(e) { return e ? undefined: 'disabled'; })}).
-        /*
-        attrs({disabled: function() {
-          return self.action.isEnabled.call(self.data, self.action) ? undefined : 'disabled';
-        }}).
-        */
         add(this.iconUrl && this.Image.create({src: this.iconUrl})).
         add(this.showLabel && this.label$);
     }
