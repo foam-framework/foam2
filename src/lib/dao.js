@@ -355,7 +355,12 @@ foam.CLASS({
     }
   ],
 
-  properties: [ 'of' ],
+  properties: [
+    {
+      class: 'Class2',
+      name: 'of'
+    }
+  ],
 
   methods: [
     {

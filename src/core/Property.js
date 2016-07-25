@@ -204,11 +204,7 @@ foam.CLASS({
       var superProp = c.__proto__.getAxiomByName(prop.name);
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
-        prop = prop.cls_ === foam.core.Property ?
-          superProp.clone().inheritProperties_(prop) :
-          prop.cls_.create()
-            .inheritProperties_(superProp)
-            .inheritProperties_(this);
+        prop = superProp.createChildProperty_(prop);
 
         // If properties would be shadowed by superProp properties, then
         // clear the shadowing property since the new value should
@@ -468,17 +464,25 @@ foam.CLASS({
     },
 
     /**
-     * Used during axiom installation when a child class includes
-     * a property with the same name as a property in the parent class.
-     *
-     * Copies property properties from the child property into the to-be-installed
-     * property.
+     * Handles property inheritance.  Builds a new version of
+     * this property to be installed on classes that inherit from
+     * this but define their own property with the same name as this.
      */
-    function inheritProperties_(childProp) {
-      for ( var key in childProp.instance_ ) {
-        this.instance_[key] = childProp.instance_[key];
+    function createChildProperty_(child) {
+      var prop = this.clone();
+
+      if ( child.cls_ !== foam.core.Property &&
+           child.cls_ !== this.cls_ ) {
+        this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+
+        return child;
       }
-      return this;
+
+      for ( var key in child.instance_ ) {
+        prop.instance_[key] = child.instance_[key];
+      }
+
+      return prop;
     },
 
     function exportAs(obj) {
