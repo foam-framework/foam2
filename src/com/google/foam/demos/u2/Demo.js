@@ -319,17 +319,19 @@ foam.CLASS({
               this.RESET,
               this.E('br')
           ).
+          /*
           start('notimage').
             attrs({
               data: 'dragon.png',
               displayWidth: this.slot(function(i) { return i * 10 % 100; })
             }).
           end().
+          */
           start(this.FIELD1).end().
           start(this.FIELD2).attrs({onKey: true}).end().
-          tag('br');
-          // TODO: make this work
-          // start(this.FIELD2).attrs({data: o2}).end();
+          tag('br').
+          // TODO: make this work better
+          start(this.FIELD2).attrs({data: o2.field2$}).end();
     }
   ]
 }).create().write();
