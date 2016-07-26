@@ -1391,9 +1391,8 @@ foam.CLASS({
 
   methods: [
     function toE(X) {
-      // TODO: bind data$ instead, when it works
       return X.lookup('foam.u2.ActionView').create({
-        data:  X.data,
+        data$:  X.data$,
         action: this
       }, X);
     }
