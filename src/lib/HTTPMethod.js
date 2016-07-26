@@ -34,6 +34,10 @@ foam.CLASS({
     'assert',
   ],
 
+  constants: {
+    OUTPUTTER: { __proto__: foam.json.Strict, outputDefaultValues: false },
+  },
+
   properties: [
     {
       /** The path prefix. Parameters may add to the path */
@@ -125,8 +129,7 @@ foam.CLASS({
         if ( param.location === 'body' ) {
           // set the request body content
           // TODO: assert it's the first param, no more than one body
-          // serialize the value
-          request.payload = foam.json.Network.stringify( val );
+          request.payload = self.OUTPUTTER.stringify(val);
         } else if ( param.location === 'path' ) {
           // find the placeholder and replace it
           path = path.replace("{"+pname+"}", val.toString());
