@@ -98,11 +98,26 @@ var e13 = E('div').add(
         E('span').add('PONG').style({color: 'orange'});
     }
   }),
-  E('br'),
+  ' dynamic function2: ',
   timer.second$.map(function(s) {
     return s % 2 ?
       E('span').add('PI', 'NG').style({color: 'aqua'}) :
-      E('span').add('PONG').style({color: 'orange'})   ;
+      E('span').add('PONG').style({color: 'orange'});
+  }),
+  ' dynamic function3: ',
+  timer.slot(function (second) {
+    return second % 2 ?
+      E('span').add('PI', 'NG').style({color: 'aqua'}) :
+      E('span').add('PONG').style({color: 'orange'});
+  }),
+  ' dynamic function4: ',
+  foam.core.ExpressionSlot.create({
+    args: [ timer.second$ ],
+    code: function(s) {
+      return s % 2 ?
+        E('span').add('PI', 'NG').style({color: 'aqua'}) :
+        E('span').add('PONG').style({color: 'orange'});
+    }
   }),
   E('br'),
   'dynamic value: ', timer.i$,
