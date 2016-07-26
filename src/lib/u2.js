@@ -653,6 +653,13 @@ foam.CLASS({
         Value can be either a string, a Value, or an Object.
         If Value is undefined, null or false, the attribute will be removed.
       */
+      
+      // handle slot binding, ex.: data$: ...
+      if ( name.endsWith('$') ) {
+        this[name] = value;
+        return;
+      }
+
       var prop = this.cls_.getAxiomByName(name);
 
       if ( prop &&

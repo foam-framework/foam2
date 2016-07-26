@@ -310,6 +310,8 @@ foam.CLASS({
               'start: ',
               this.field1$, ' ',
               this.field2$, ' ',
+              this.field1$, ' ',
+              this.field2$, ' O2: ',
               o2.field2$,
               this.E('br'),
               this.FIELD1, ' ',
@@ -317,7 +319,8 @@ foam.CLASS({
               this.E('br'),
               this.SAY_HELLO, ' ',
               this.RESET,
-              this.E('br')
+              this.E('br'),
+              'OnKey: '
           ).
           /*
           start('notimage').
@@ -327,11 +330,11 @@ foam.CLASS({
             }).
           end().
           */
-          start(this.FIELD1).end().
+          start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
           tag('br').
-          // TODO: make this work better
-          start(this.FIELD2).attrs({data: o2.field2$}).end();
+          // TODO: make this work, doesn't bind to o2
+          start(this.FIELD2).attrs({data$: o2.field2$}).end();
     }
   ]
 }).create().write();
