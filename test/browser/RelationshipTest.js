@@ -62,11 +62,34 @@ foam.CLASS({
       zeus.children.select({put: function(o) { console.log(o.stringify()); }});
 
       zeus.children.put(this.Child1.create({name: 'Apollo'}));
-
       console.log('Zeus\'s Children (after adding Apollo):');
       zeus.children.select({put: function(o) { console.log(o.stringify()); }});
     }
   ]
 });
 
-MythologicalWorld.create();
+var mythos = MythologicalWorld.create();
+
+foam.CLASS({
+  name: 'RealWorld',
+  requires: [ 'Parent1', 'Child1' ],
+
+  methods: [
+    function init() {
+
+      var joe = this.Parent1.create({name: 'Joe'});
+      // Real world has no parent/child DAOs, so the relationships won't work yet
+      mythos.parents.put(joe);
+      mythos.children.put(this.Child1.create({name: 'Larry', parent: 'Joe'}));
+      mythos.children.put(this.Child1.create({name: 'Edna', parent: 'Joe'}));
+
+      // clone joe to the mythological context to access the right DAOs
+      var mythoJoe = this.Parent1.create(joe, mythos);
+      console.log("Joe's children:");
+      mythoJoe.children.select({put: function(o) { console.log(o.stringify()); }});
+    }
+  ]
+});
+
+RealWorld.create();
+
