@@ -80,6 +80,15 @@ foam.CLASS({
               }
             };
 
+            // Extensions to listener function objects are used in
+            // foam.core.tracing to trace listener subscribers and their
+            // "actual" code.
+            // TODO(markdittmer): Should this be abstracted out to a
+            // method that can no-op here and be overridden when tracing
+            // is turned on?
+            l.code = code;
+            l.self = self;
+
             foam.Function.setName(l, name);
 
             if ( isMerged ) {

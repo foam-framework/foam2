@@ -135,25 +135,12 @@ foam.CLASS({
       var ctx     = this;
 
       return foam.Function.setName(function() {
-        var triggered = false;
-        var lastArgs  = null;
-        function mergedListener() {
-          triggered = false;
-          var args = Array.from(lastArgs);
-          lastArgs = null;
-          l.apply(this, args);
-        }
-
-        var f = function() {
-          lastArgs = arguments;
-
-          if ( ! triggered ) {
-            triggered = true;
-            ctx.setTimeout(mergedListener, delay);
-          }
+        var state = {
+          triggered: false,
+          lastArgs: null,
+          l: l
         };
-
-        return f;
+        return ctx.prepareMergedListener_(state, delay);
       }(), 'merged(' + l.name + ')');
     },
 
@@ -161,26 +148,65 @@ foam.CLASS({
       var ctx = this;
 
       return foam.Function.setName(function() {
-        var triggered = false;
-        var lastArgs  = null;
-        function frameFired() {
-          triggered = false;
-          var args = lastArgs;
-          lastArgs = null;
-          l.apply(this, args);
-        }
-
-        var f = function framed() {
-          lastArgs = arguments;
-
-          if ( ! triggered ) {
-            triggered = true;
-            ctx.requestAnimationFrame(frameFired);
-          }
+        var state = {
+          triggered: false,
+          lastArgs: null,
+          l: l
         };
-
-        return f;
+        return ctx.prepareFramedListener_(state);
       }(), 'framed(' + l.name + ')');
+    },
+
+    function prepareMergedListener_(state, delay) {
+      /* Wrap a merged listener with given state, overridden in
+         foam.core.tracing. */
+      return this.getMergedListener_(
+        state, this.getAsyncListener_(state), delay);
+    },
+
+    function prepareFramedListener_(state) {
+      /* Wrap a framed listener with given state, overridden in
+         foam.core.tracing. */
+      return this.getFramedListener_(state, this.getAsyncListener_(state));
+    },
+
+    function getAsyncListener_(state) {
+      /* Get async wrapper for listener with given state, overridden in
+         foam.core.tracing. */
+      return function asyncListener() {
+          state.triggered = false;
+          var args = Array.from(state.lastArgs);
+          state.lastArgs = null;
+          state.l.apply(this, args);
+      };
+    },
+
+    function getMergedListener_(state, mergedListener, delay) {
+      /* Get merged callback for listener with given state, overridden in
+         foam.core.tracing. */
+      var ctx = this;
+      return function merged() {
+        state.lastArgs = arguments;
+
+        if ( ! state.triggered ) {
+          state.triggered = true;
+          ctx.setTimeout(mergedListener, delay);
+        }
+      };
+    },
+
+    function getFramedListener_(state, frameFired) {
+      /* Get framed callback for listener with given state, overridden in
+         foam.core.tracing. */
+      var ctx = this;
+      return function framed() {
+        state.lastArgs = arguments;
+
+        if ( ! state.triggered ) {
+          state.triggered = true;
+          ctx.requestAnimationFrame(frameFired);
+        }
+      };
     },
 
     function setTimeout(f, t) {

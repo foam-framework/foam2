@@ -8,7 +8,8 @@
     "node-inspector": "^0.12.6",
     "node-localstorage": "^0.6.0",
     "jshint": "^2.9.1",
-    "jscs": "^2.11.0"
+    "jscs": "^2.11.0",
+    "present": "^1.0.0"
   },
   "scripts": {
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",

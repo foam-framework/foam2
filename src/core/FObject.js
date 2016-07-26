@@ -132,6 +132,12 @@ foam.CLASS({
       removing subscriptions be done quickly by connecting next to prev
       and prev to next.
 
+      Additional properties support mLang matching of topics. 'expr'
+      contains the expression to match against at this element of the
+      topic list; 'exprs' contains a map of expression-match children,
+      and 'hasExprs' provides an efficient check for whether 'exprs' is
+      empty.
+
       Note that both the head structure and the nodes themselves have a
       'next' property. This simplifies the code because there is no
       special case for handling when the list is empty.
@@ -147,10 +153,20 @@ foam.CLASS({
           subTopic1: <same structure>,
           ...
           subTopicn: <same structure>
-      }
+      },
+      expr: <mLang-expr or null>,
+      exprs: {
+        <expr1.toString()>: <same structure: expr=expr1>,
+        ...
+        <exprm.toString()>: <same structure: expr=exprm>
+      },
+      hasExprs: <bool: is exprs empty?>
     */
     function createListenerList_() {
-      return { next: null };
+      return {
+        next: null,
+        expr: null
+      };
     },
 
     /** Return the top-level listener list, creating if necessary. */
@@ -169,36 +185,70 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
-        // Like l.apply(l, [s].concat(Array.from(a))), but faster.
-        // FUTURE: add benchmark to justify
-        // ???: optional exception trapping, benchmark
-        switch ( a.length ) {
-          case 0: l(s); break;
-          case 1: l(s, a[0]); break;
-          case 2: l(s, a[0], a[1]); break;
-          case 3: l(s, a[0], a[1], a[2]); break;
-          case 4: l(s, a[0], a[1], a[2], a[3]); break;
-          case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
-          case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
-          case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
-          case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
-          case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
-          default: l.apply(l, [s].concat(Array.from(a)));
-        }
+        this.notifyListener_(l, s, a);
         listeners = listeners.next;
         count++;
       }
       return count;
     },
 
+    function notifyListener_(l, s, a) {
+      // Like l.apply(l, [s].concat(Array.from(a))), but faster.
+      // FUTURE: add benchmark to justify
+      // ???: optional exception trapping, benchmark
+      switch ( a.length ) {
+      case 0: l(s); break;
+      case 1: l(s, a[0]); break;
+      case 2: l(s, a[0], a[1]); break;
+      case 3: l(s, a[0], a[1], a[2]); break;
+      case 4: l(s, a[0], a[1], a[2], a[3]); break;
+      case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
+      case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
+      case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
+      case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
+      case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
+      default: l.apply(l, [s].concat(Array.from(a)));
+      }
+    },
+
     function hasListeners(/* args */) {
       /** Return true iff there are listeners for the supplied message. **/
+      return this.hasKeyedListeners_(arguments) ||
+        this.hasExprListeners_(arguments);
+    },
+
+    function hasKeyedListeners_(args) {
+      /** Return true iff there are string-keyed listeners for message. **/
       var listeners = this.getPrivate_('listeners');
 
-      for ( var i = 0 ; listeners ; i++ ) {
-        if ( listeners.next        ) return true;
-        if ( i == arguments.length ) return false;
-        listeners = listeners.children && listeners.children[arguments[i]];
+      for ( var i = 0; listeners; i++ ) {
+        if ( listeners.next   ) return true;
+        if ( i == args.length ) return false;
+        if ( typeof args[i] === 'string' ) {
+          listeners = listeners.children && listeners.children[args[i]];
+        }
+      }
+
+      return false;
+    },
+
+    function hasExprListeners_(args) {
+      /** Return true iff there are expr-matched listeners for message. **/
+      var listeners = this.getPrivate_('listeners');
+
+      for ( var i = 0; listeners; i++ ) {
+        if ( listeners.hasExprs ) {
+          var exprs = listeners.exprs;
+          var exprKeys = Object.keys(exprs);
+          for ( var j = 0; j < exprKeys.length; j++ ) {
+            if ( exprs[exprKeys[j]].expr.f(args[i]) ) return true;
+          }
+        }
+
+        if ( i == args.length ) return false;
+        if ( typeof args[i] === 'string' ) {
+          listeners = listeners.children && listeners.children[args[i]];
+        }
       }
 
       return false;
@@ -253,15 +303,55 @@ foam.CLASS({
       if ( ! this.hasOwnPrivate_('listeners') ) return 0;
 
       var listeners = this.listeners_();
+      return this.pubGlobalListeners_(args, listeners) +
+        this.pubKeyedListeners_(args, listeners) +
+        this.pubExprListeners_(args, listeners);
+    },
 
-      // Notify all global listeners.
-      var count = this.notify_(listeners.next, args);
+    function pubGlobalListeners_(args, listeners) {
+      return this.notify_(listeners.next, args);
+    },
 
-      // Walk the arguments, notifying more specific listeners.
+    function pubKeyedListeners_(args, listeners) {
+      var count = 0;
+
+      // Walk string arguments, notifying keyed child listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
-        var listeners = listeners.children && listeners.children[args[i]];
+        if ( typeof args[i] === 'string' )
+          listeners = listeners.children && listeners.children[args[i]];
+        else
+          break;
+
         if ( ! listeners ) break;
+
         count += this.notify_(listeners.next, args);
+      }
+
+      return count;
+    },
+
+    function pubExprListeners_(args, listeners) {
+      var count = 0;
+
+      // Walk string arguments, notify matching expr-based listeners.
+      for ( var i = 0 ; i < args.length; i++ ) {
+        var hasExprs = listeners.hasExprs;
+        var exprs = listeners.exprs;
+
+        if ( hasExprs ) {
+          var exprKeys = Object.keys(exprs);
+          for ( var j = 0; j < exprKeys.length; j++ ) {
+            if ( exprs[exprKeys[j]].expr.f(args[i]) )
+              count += this.notify_(exprs[exprKeys[j]].next, args);
+          }
+        }
+
+        if ( typeof args[i] === 'string' )
+          listeners = listeners.children && listeners.children[args[i]];
+        else
+          break;
+
+        if ( ! listeners ) break;
       }
 
       return count;
@@ -287,15 +377,25 @@ foam.CLASS({
     */
     function sub() { /* args..., l */
       var l = arguments[arguments.length-1];
+      var Expr = foam.lookup('foam.mlang.predicate.Expr', true);
 
       this.assert(typeof l === 'function', 'Listener must be a function');
 
       var listeners = this.listeners_();
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
-        var children = listeners.children || ( listeners.children = {} );
-        listeners = children[arguments[i]] ||
-            ( children[arguments[i]] = this.createListenerList_() );
+        if ( Expr && Expr.isInstance(arguments[i]) ) {
+          var exprs = listeners.exprs || ( listeners.exprs = {} );
+          var key = arguments[i].toString();
+          listeners.hasExprs = true;
+          listeners = exprs[key] ||
+              ( exprs[key] = this.createListenerList_() );
+          listeners.expr = arguments[i];
+        } else {
+          var children = listeners.children || ( listeners.children = {} );
+          listeners = children[arguments[i]] ||
+              ( children[arguments[i]] = this.createListenerList_() );
+        }
       }
 
       var node = {
@@ -327,9 +427,15 @@ foam.CLASS({
     function unsub() { /* args..., l */
       var l         = arguments[arguments.length-1];
       var listeners = this.getPrivate_('listeners');
+      var Expr = foam.lookup('foam.mlang.predicate.Expr', true);
 
       for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ ) {
-        listeners = listeners.children && listeners.children[arguments[i]];
+        if ( listeners.hasExprs && Expr && Expr.isInstance(arguments[i]) ) {
+          var key = arguments[i].toString();
+          listeners = listeners.exprs && listeners.exprs[key];
+        } else {
+          listeners = listeners.children && listeners.children[arguments[i]];
+        }
       }
 
       var node = listeners && listeners.next;
