@@ -678,12 +678,10 @@ foam.CLASS({
         } else if ( foam.core.Slot.isInstance(value) ) {
           this.valueAttr_(name, value);
         } else {
-// TODO: put back
-/*
           this.assert(
               typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean',
-              'Attribute value must be a string or a number.');
-*/
+              'Attribute value must be a primitive type.');
+
           var attr = this.getAttributeNode(name);
 
           if ( attr ) {
@@ -1378,8 +1376,7 @@ foam.CLASS({
   properties: [
     {
       name: 'data',
-      attribute: true,
-      factory: function() { return this.__context__.data; }
+      attribute: true
     }
   ]
 });
@@ -1394,7 +1391,9 @@ foam.CLASS({
 
   methods: [
     function toE(X) {
+      // TODO: bind data$ instead, when it works
       return X.lookup('foam.u2.ActionView').create({
+        data:  X.data,
         action: this
       }, X);
     }
