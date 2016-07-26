@@ -327,8 +327,9 @@ foam.CLASS({
           end().
           start(this.FIELD1).end().
           start(this.FIELD2).attrs({onKey: true}).end().
-          tag('br').
-          start(this.FIELD2).attrs({data: o2}).end();
+          tag('br');
+          // TODO: make this work
+          // start(this.FIELD2).attrs({data: o2}).end();
     }
   ]
 }).create().write();
