@@ -333,7 +333,6 @@ foam.CLASS({
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
           tag('br').
-          // TODO: make this work, doesn't bind to o2
           start(this.FIELD2).attrs({data$: o2.field2$}).end();
     }
   ]

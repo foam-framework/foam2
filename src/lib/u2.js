@@ -654,7 +654,8 @@ foam.CLASS({
         If Value is undefined, null or false, the attribute will be removed.
       */
       
-      // handle slot binding, ex.: data$: ...
+      // handle slot binding, ex.: data$: ...,
+      // Remove if we add a props() method
       if ( name.endsWith('$') ) {
         this[name] = value;
         return;
