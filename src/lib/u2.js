@@ -1212,7 +1212,8 @@ foam.CLASS({
         e = e2;
       };
 
-      this.on('unload', slot.sub(this.framed(l)));
+      var s = slot.sub(this.framed(l));
+      this.on('unload', s.destroy.bind(s));
 
       return e;
     },
