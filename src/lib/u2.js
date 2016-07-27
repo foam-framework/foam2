@@ -1169,16 +1169,16 @@ foam.CLASS({
       return this;
     },
 
-    function slotE_(value) {
+    function slotE_(slot) {
       /*
         Return an Element or an Array of Elements which are
-        returned from the supplied dynamic Value.
-        The Element(s) are replaced when the Value changes.
+        returned from the supplied dynamic Slot.
+        The Element(s) are replaced when the Slot changes.
       */
       var self = this;
 
       function nextE() {
-        var e = value.get();
+        var e = slot.get();
 
         // Convert e or e[0] into a SPAN if needed,
         // So that it can be located later.
@@ -1211,9 +1211,9 @@ foam.CLASS({
         }
         e = e2;
       };
-      var fl = this.framed(l);
-      value.sub(fl);
-      this.on('unload', function() { value.removeListener(fl); });
+
+      this.on('unload', slot.sub(this.framed(l)));
+
       return e;
     },
 
