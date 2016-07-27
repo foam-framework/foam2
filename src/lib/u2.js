@@ -1176,8 +1176,12 @@ foam.CLASS({
         The Element(s) are replaced when the Slot changes.
       */
       var self = this;
+      var ctx  = this.__subSubContext__ || this.__subContext__;
 
       function nextE() {
+        // Run Slot in same subSubContext that it was created in.
+        var oldCtx = self.__subSubContext__;
+        self.__subSubContext__ = ctx;
         var e = slot.get();
 
         // Convert e or e[0] into a SPAN if needed,
@@ -1195,6 +1199,8 @@ foam.CLASS({
         } else if ( ! foam.u2.Element.isInstance(e) ) {
           e = self.E('SPAN').add(e);
         }
+
+        self.__subSubContext__ = oldCtx;
 
         return e;
       }
