@@ -352,7 +352,7 @@ foam.CLASS({
     {
       name: 'value',
       factory: function() {
-        return this.code.apply(this, this.args.map(function(a) {
+        return this.code.apply(this.obj || this, this.args.map(function(a) {
           return a.get();
         }));
       }
