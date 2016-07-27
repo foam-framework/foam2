@@ -1169,6 +1169,7 @@ foam.CLASS({
       return this;
     },
 
+    // TODO: add same context capturing behviour to other slotXXX_() methods.
     function slotE_(slot) {
       /*
         Return an Element or an Array of Elements which are
