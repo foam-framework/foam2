@@ -684,7 +684,7 @@ foam.CLASS({
         }
 
         if ( foam.core.Slot.isInstance(value) ) {
-          this.valueAttr_(name, value);
+          this.slotAttr_(name, value);
         } else {
           this.assert(
               typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean',
@@ -914,7 +914,7 @@ foam.CLASS({
       for ( var key in map ) {
         var value = map[key];
         if ( foam.core.Slot.isInstance(value) ) {
-          this.valueStyle_(key, value);
+          this.slotStyle_(key, value);
         } else {
           this.style_(key, value);
         }
@@ -978,7 +978,7 @@ foam.CLASS({
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
-          var v = this.valueE_(c);
+          var v = this.slotE_(c);
           if ( Array.isArray(v) ) {
             es = es.concat(v.map(mapper));
           } else {
@@ -1144,7 +1144,7 @@ foam.CLASS({
       }
     },
 
-    function valueAttr_(key, value) {
+    function slotAttr_(key, value) {
       /* Set an attribute based off of a dynamic Value. */
       var l = function() {
         this.setAttribute(key, value.get());
@@ -1153,7 +1153,7 @@ foam.CLASS({
       l();
     },
 
-    function valueStyle_(key, v) {
+    function slotStyle_(key, v) {
       /* Set a CSS style based off of a dynamic Value. */
       var l = function(value) {
         this.style_(key, v.get());
@@ -1169,7 +1169,7 @@ foam.CLASS({
       return this;
     },
 
-    function valueE_(value) {
+    function slotE_(value) {
       /*
         Return an Element or an Array of Elements which are
         returned from the supplied dynamic Value.
