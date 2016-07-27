@@ -654,6 +654,8 @@ foam.CLASS({
         If Value is undefined, null or false, the attribute will be removed.
       */
       
+      // TODO: type checking
+
       // handle slot binding, ex.: data$: ...,
       // Remove if we add a props() method
       if ( name.endsWith('$') ) {
@@ -681,9 +683,7 @@ foam.CLASS({
           return;
         }
 
-        if ( typeof value === 'function' ) {
-          this.dynamicAttr_(name, value);
-        } else if ( foam.core.Slot.isInstance(value) ) {
+        if ( foam.core.Slot.isInstance(value) ) {
           this.valueAttr_(name, value);
         } else {
           this.assert(
@@ -977,17 +977,6 @@ foam.CLASS({
           es.push(c.toE(Y));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
-
-          // es.push((function() {
-          //   var dyn = Y.E('span');
-          //   var last = null;
-
-          //   X.dynamicFn(this, function(e) {
-          //     e = X.E('span').add(e);
-          //     if ( last ) dyn.removeChild(last); //last.remove();
-          //     dyn.add(last = e);
-          //   });
-          // })());
         } else if ( foam.core.Slot.isInstance(c) ) {
           var v = this.valueE_(c);
           if ( Array.isArray(v) ) {
@@ -1153,16 +1142,6 @@ foam.CLASS({
         this.classes[newClass] = true;
         this.onSetCls(newClass, true);
       }
-    },
-
-    function dynamicAttr_(key, fn) {
-      /* Set an attribute based off of a dynamic function. */
-      var self = this;
-      var slot = this.slot(fn);
-      slot.sub(function() {
-        self.setAttribute(key, slot.get());
-      });
-      slot.get();
     },
 
     function valueAttr_(key, value) {
