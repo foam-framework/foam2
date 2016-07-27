@@ -542,7 +542,7 @@ foam.CLASS({
     },
 
     function E(opt_nodeName) {
-      return this.__subContext__.E(opt_nodeName);
+      return (this.__subSubContext__ || this.__subContext__).E(opt_nodeName);
     },
 
     // function XXXE(opt_nodeName /* | DIV */) {
@@ -934,13 +934,13 @@ foam.CLASS({
     function startContext(map) {
       var m = {};
       Object.assign(m, map);
-      m.__oldAddContext__ = this.__addSubContext__;
-      this.__addSubContext__ = (this.__addSubContext__ || this.__subContext__).createSubContext(m);
+      m.__oldAddContext__ = this.__subSubContext__;
+      this.__subSubContext__ = (this.__subSubContext__ || this.__subContext__).createSubContext(m);
       return this;
     },
 
     function endContext() {
-      this.__addSubContext__ = this.__addSubContext__.__oldAddContext__;
+      this.__subSubContext__ = this.__subSubContext__.__oldAddContext__;
       return this;
     },
 
@@ -962,7 +962,7 @@ foam.CLASS({
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
-      var Y = this.__addSubContext__ || this.__subContext__;
+      var Y = this.__subSubContext__ || this.__subContext__;
       var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
@@ -1419,6 +1419,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
