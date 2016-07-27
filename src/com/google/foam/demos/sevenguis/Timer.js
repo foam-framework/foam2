@@ -22,12 +22,10 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  /*
   requires: [
     'foam.u2.ProgressView',
     'foam.u2.RangeView'
   ],
-  */
 
   axioms: [
     foam.u2.CSS.create({
@@ -48,9 +46,14 @@ foam.CLASS({
       name: 'progress',
       label: 'Elapsed Time',
       expression: function(duration, elapsedTime) {
+        // TODO: this isn't working
+console.log('*************');
         return this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
+      },
+      toPropertyE: function(X) {
+        return X.lookup('foam.u2.ProgressView').create(null, X);
       }
-      // XXXtoPropertyE: 'foam.u2.ProgressView'
+//      toPropertyE: 'foam.u2.ProgressView'
     },
     {
       name: 'elapsedTime',
@@ -62,7 +65,9 @@ foam.CLASS({
       class: 'Int',
       name: 'duration',
       units: 'ms',
-      // toPropertyE: function() { return this.X.lookup('foam.u2.RangeView').create({maxValue: 10000}); },
+      toPropertyE: function(X) {
+        return X.lookup('foam.u2.RangeView').create({maxValue: 10000}, X);
+      },
       value: 5000
     },
     {
@@ -87,14 +92,6 @@ foam.CLASS({
         start('row').cssClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
         start('row').start('span').cssClass('label').add('Duration:', this.DURATION).end().end().
         add(this.RESET);
-      /*
-        <div class="^" x:data={{this}}>
-        <row><span class="label">Elapsed Time:</span> <:progress width="50"/></row>
-        <row class="elapsed">{{this.dynamic(function(t) { return t.toFixed(1); }, this.elapsedTime$)}}s</row>
-        <row><span class="label">Duration:</span> <:duration onKeyMode="true"/></row>
-        <:reset/>
-        </div>
-        */
     }
   ],
 
@@ -110,11 +107,12 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
-console.log('tick', this.elapsedTime, this.duration, this.lastTick_);
+console.log('tick', this.progress, this.elapsedTime, this.duration, this.lastTick_);
         if ( 1000 * this.elapsedTime >= this.duration ) return;
         var now = Date.now();
         if ( this.lastTick_ ) this.elapsedTime += (now - this.lastTick_)/1000;
         this.elapsedTime = Math.min(this.duration/1000, this.elapsedTime);
+        this.progress = this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
         this.lastTick_ = now;
         this.tick();
       }
