@@ -24,6 +24,56 @@
  *  add ability for indices to pre-populate data
  */
 
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+  requires: [
+    'foam.dao.index.TreeIndex',
+  ],
+  methods: [
+    function toIndex(tailFactory) {
+      /** Creates the correct type of index for this property, passing in the
+          tail factory (sub-index) provided. */
+      return this.TreeIndex.create({ prop: this, tailFactory: tailFactory });
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  requires: [
+    'foam.dao.index.SetIndex',
+  ],
+  methods: [
+    function toIndex(tailFactory) {
+       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+    }
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.AxiomArray',
+  requires: [
+    'foam.dao.index.SetIndex',
+  ],
+  methods: [
+    function toIndex(tailFactory) {
+       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+    }
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+  requires: [
+    'foam.dao.index.SetIndex',
+  ],
+  methods: [
+    function toIndex(tailFactory) {
+       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+    }
+  ]
+});
+
+
 /** TODO: move to stdlib */
 var toCompare = function toCompare(c) {
   if ( Array.isArray(c) ) return CompoundComparator.apply(null, c);
