@@ -1351,16 +1351,18 @@ foam.CLASS({
       // If true, this property is treated as a psedo-U2 attribute.
       name: 'attribute',
       value: false
+    },
+    {
+      name: 'toPropertyE',
+      default: function toPropertyE(X, obj) {
+        return this.TextField.create(null, X);
+      }
     }
   ],
 
   methods: [
-    function toPropertyE(X) {
-      return this.TextField.create(null, X);
-    },
-
     function toE(X) {
-      var e = this.toPropertyE(X);
+      var e = this.toPropertyE(X, this);
 
       e.fromProperty && e.fromProperty(this);
 
