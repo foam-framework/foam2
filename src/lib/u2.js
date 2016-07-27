@@ -931,6 +931,19 @@ foam.CLASS({
       return this;
     },
 
+    function startContext(map) {
+      var m = {};
+      Object.assign(m, map);
+      m.__oldAddContext__ = this.__addSubContext__;
+      this.__addSubContext__ = (this.__addSubContext__ || this.__subContext__).createSubContext(m);
+      return this;
+    },
+
+    function endContext() {
+      this.__addSubContext__ = this.__addSubContext__.__oldAddContext__;
+      return this;
+    },
+
     function start(opt_nodeName) {
       /* Create a new Element and add it as a child. Return the child. */
       var c = opt_nodeName && opt_nodeName.toE ?
@@ -949,7 +962,7 @@ foam.CLASS({
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
-      var Y = this.__subContext__;
+      var Y = this.__addSubContext__ || this.__subContext__;
       var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
