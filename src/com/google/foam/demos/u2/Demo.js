@@ -343,8 +343,8 @@ global.o2 = o2;
           start(this.FIELD2).attrs({onKey: true}).end().
           tag('br').
 
-          start(this.FIELD1).attrs({data$: o2.field1$}).end().
-          start(this.FIELD2).attrs({data$: o2.field2$}).end().
+          start(this.FIELD1, {data$: o2.field1$}).end().
+          start(this.FIELD2, {data$: o2.field2$}).end().
 
           add('subContext: ').
           startContext({data: o2}).
