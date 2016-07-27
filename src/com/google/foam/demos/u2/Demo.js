@@ -298,7 +298,9 @@ foam.CLASS({
       this.field1 = 'foo';
       this.field2 = 'bar';
 
-      var o2 = this.cls_.create({field2: 'baz'});
+      var o2 = this.cls_.create({field1: 'O2.f1', field2: 'O2.f2'});
+
+global.o2 = o2;
 
       this.
         cssClass(this.slot(function(flip) {
@@ -322,6 +324,20 @@ foam.CLASS({
               this.E('br'),
               'OnKey: '
           ).
+          start(this.FIELD1).attrs({onKey: true}).end().
+          start(this.FIELD2).attrs({onKey: true}).end().
+          tag('br').
+
+          start(this.FIELD1).attrs({data$: o2.field1$}).end().
+          start(this.FIELD2).attrs({data$: o2.field2$}).end().
+
+          add('subContext: ').
+          startContext({data: o2}).
+            add(o2.FIELD1).
+            add(o2.FIELD2).
+          endContext();
+
+
           /*
           start('notimage').
             attrs({
@@ -330,10 +346,8 @@ foam.CLASS({
             }).
           end().
           */
-          start(this.FIELD1).attrs({onKey: true}).end().
-          start(this.FIELD2).attrs({onKey: true}).end().
-          tag('br').
-          start(this.FIELD2).attrs({data$: o2.field2$}).end();
+
+
     }
   ]
 }).create().write();
