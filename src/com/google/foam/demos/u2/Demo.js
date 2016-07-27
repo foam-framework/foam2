@@ -315,8 +315,6 @@ foam.CLASS({
 
       var o2 = this.cls_.create({field1: 'O2.f1', field2: 'O2.f2'});
 
-global.o2 = o2;
-
       this.
         cssClass(this.slot(function(flip) {
             return flip ? 'important' : '';
@@ -346,10 +344,14 @@ global.o2 = o2;
           start(this.FIELD1, {data$: o2.field1$}).end().
           start(this.FIELD2, {data$: o2.field2$}).end().
 
+          tag('br').
           add('subContext: ').
           startContext({data: o2}).
             add(o2.FIELD1).
             add(o2.FIELD2).
+            add(this.slot(function(flip) {
+              return flip ? o2.FIELD1 : o2.FIELD2;
+            })).
           endContext();
 
 
