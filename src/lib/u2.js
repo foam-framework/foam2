@@ -947,7 +947,7 @@ foam.CLASS({
     function start(opt_nodeName) {
       /* Create a new Element and add it as a child. Return the child. */
       var c = opt_nodeName && opt_nodeName.toE ?
-          opt_nodeName.toE(this.__subContext__) :
+          opt_nodeName.toE(this.__subSubContext__ || this.__subContext__) :
           this.E(opt_nodeName)   ;
 
       this.add(c);
@@ -1118,7 +1118,7 @@ foam.CLASS({
 
       if ( ! Array.isArray(children) ) children = [ children ];
 
-      var Y = this.__subContext__;
+      var Y = this.__subSubContext__ || this.__subContext__;
       children = children.map(function(e) { return e.toE ? e.toE(Y) : e; });
 
       var index = before ? i : (i + 1);
