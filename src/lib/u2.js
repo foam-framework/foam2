@@ -1354,7 +1354,7 @@ foam.CLASS({
     },
     {
       name: 'toPropertyE',
-      default: function toPropertyE(X, obj) {
+      value: function toPropertyE(X, obj) {
         return this.TextField.create(null, X);
       }
     }
