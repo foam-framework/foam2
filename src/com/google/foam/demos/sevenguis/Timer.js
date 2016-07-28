@@ -88,7 +88,7 @@ console.log('*************');
       this.nodeName = 'div';
       this.
         cssClass(this.myCls()).
-        start('row').start('span').cssClass('label').add('Elapsed Time:', this.PROGRESS).end().end().
+        start('row').start('span').cssClass('label').add('Elapsed Time:', this.PROGRESS).end().
         start('row').cssClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
         start('row').start('span').cssClass('label').add('Duration:', this.DURATION).end().end().
         add(this.RESET);
