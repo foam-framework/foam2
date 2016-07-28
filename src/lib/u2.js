@@ -542,7 +542,7 @@ foam.CLASS({
     },
 
     function E(opt_nodeName) {
-      return this.__subContext__.E(opt_nodeName);
+      return (this.__subSubContext__ || this.__subContext__).E(opt_nodeName);
     },
 
     // function XXXE(opt_nodeName /* | DIV */) {
@@ -653,6 +653,16 @@ foam.CLASS({
         Value can be either a string, a Value, or an Object.
         If Value is undefined, null or false, the attribute will be removed.
       */
+
+      // TODO: type checking
+
+      // handle slot binding, ex.: data$: ...,
+      // Remove if we add a props() method
+      if ( name.endsWith('$') ) {
+        this[name] = value;
+        return;
+      }
+
       var prop = this.cls_.getAxiomByName(name);
 
       if ( prop &&
@@ -673,13 +683,11 @@ foam.CLASS({
           return;
         }
 
-        if ( typeof value === 'function' ) {
-          this.dynamicAttr_(name, value);
-        } else if ( foam.core.Slot.isInstance(value) ) {
-          this.valueAttr_(name, value);
+        if ( foam.core.Slot.isInstance(value) ) {
+          this.slotAttr_(name, value);
         } else {
           this.assert(
-              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean',
+              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || foam.Date.is(value),
               'Attribute value must be a primitive type.');
 
           var attr = this.getAttributeNode(name);
@@ -850,7 +858,7 @@ foam.CLASS({
       } else {
         this.error('cssClass type error. Must be Slot or String.');
       }
-      
+
       return this;
     },
 
@@ -906,7 +914,7 @@ foam.CLASS({
       for ( var key in map ) {
         var value = map[key];
         if ( foam.core.Slot.isInstance(value) ) {
-          this.valueStyle_(key, value);
+          this.slotStyle_(key, value);
         } else {
           this.style_(key, value);
         }
@@ -923,10 +931,23 @@ foam.CLASS({
       return this;
     },
 
+    function startContext(map) {
+      var m = {};
+      Object.assign(m, map);
+      m.__oldAddContext__ = this.__subSubContext__;
+      this.__subSubContext__ = (this.__subSubContext__ || this.__subContext__).createSubContext(m);
+      return this;
+    },
+
+    function endContext() {
+      this.__subSubContext__ = this.__subSubContext__.__oldAddContext__;
+      return this;
+    },
+
     function start(opt_nodeName) {
       /* Create a new Element and add it as a child. Return the child. */
       var c = opt_nodeName && opt_nodeName.toE ?
-          opt_nodeName.toE(this) :
+          opt_nodeName.toE(this.__subSubContext__ || this.__subContext__) :
           this.E(opt_nodeName)   ;
 
       this.add(c);
@@ -941,7 +962,7 @@ foam.CLASS({
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
-      var Y = this.__subContext__;
+      var Y = this.__subSubContext__ || this.__subContext__;
       var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
@@ -956,19 +977,8 @@ foam.CLASS({
           es.push(c.toE(Y));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
-
-          // es.push((function() {
-          //   var dyn = Y.E('span');
-          //   var last = null;
-
-          //   X.dynamicFn(this, function(e) {
-          //     e = X.E('span').add(e);
-          //     if ( last ) dyn.removeChild(last); //last.remove();
-          //     dyn.add(last = e);
-          //   });
-          // })());
         } else if ( foam.core.Slot.isInstance(c) ) {
-          var v = this.valueE_(c);
+          var v = this.slotE_(c);
           if ( Array.isArray(v) ) {
             es = es.concat(v.map(mapper));
           } else {
@@ -1108,7 +1118,7 @@ foam.CLASS({
 
       if ( ! Array.isArray(children) ) children = [ children ];
 
-      var Y = this.__subContext__;
+      var Y = this.__subSubContext__ || this.__subContext__;
       children = children.map(function(e) { return e.toE ? e.toE(Y) : e; });
 
       var index = before ? i : (i + 1);
@@ -1134,17 +1144,7 @@ foam.CLASS({
       }
     },
 
-    function dynamicAttr_(key, fn) {
-      /* Set an attribute based off of a dynamic function. */
-      var self = this;
-      var slot = this.slot(fn);
-      slot.sub(function() {
-        self.setAttribute(key, slot.get());
-      });
-      slot.get();
-    },
-
-    function valueAttr_(key, value) {
+    function slotAttr_(key, value) {
       /* Set an attribute based off of a dynamic Value. */
       var l = function() {
         this.setAttribute(key, value.get());
@@ -1153,7 +1153,7 @@ foam.CLASS({
       l();
     },
 
-    function valueStyle_(key, v) {
+    function slotStyle_(key, v) {
       /* Set a CSS style based off of a dynamic Value. */
       var l = function(value) {
         this.style_(key, v.get());
@@ -1169,16 +1169,21 @@ foam.CLASS({
       return this;
     },
 
-    function valueE_(value) {
+    // TODO: add same context capturing behviour to other slotXXX_() methods.
+    function slotE_(slot) {
       /*
         Return an Element or an Array of Elements which are
-        returned from the supplied dynamic Value.
-        The Element(s) are replaced when the Value changes.
+        returned from the supplied dynamic Slot.
+        The Element(s) are replaced when the Slot changes.
       */
       var self = this;
+      var ctx  = this.__subSubContext__ || this.__subContext__;
 
       function nextE() {
-        var e = value.get();
+        // Run Slot in same subSubContext that it was created in.
+        var oldCtx = self.__subSubContext__;
+        self.__subSubContext__ = ctx;
+        var e = slot.get();
 
         // Convert e or e[0] into a SPAN if needed,
         // So that it can be located later.
@@ -1196,6 +1201,8 @@ foam.CLASS({
           e = self.E('SPAN').add(e);
         }
 
+        self.__subSubContext__ = oldCtx;
+
         return e;
       }
 
@@ -1211,9 +1218,10 @@ foam.CLASS({
         }
         e = e2;
       };
-      var fl = this.framed(l);
-      value.sub(fl);
-      this.on('unload', function() { value.removeListener(fl); });
+
+      var s = slot.sub(this.framed(l));
+      this.on('unload', s.destroy.bind(s));
+
       return e;
     },
 
@@ -1343,16 +1351,18 @@ foam.CLASS({
       // If true, this property is treated as a psedo-U2 attribute.
       name: 'attribute',
       value: false
+    },
+    {
+      name: 'toPropertyE',
+      value: function toPropertyE(X, obj) {
+        return this.TextField.create(null, X);
+      }
     }
   ],
 
   methods: [
-    function toPropertyE(X) {
-      return this.TextField.create(null, X);
-    },
-
     function toE(X) {
-      var e = this.toPropertyE(X);
+      var e = this.toPropertyE(X, this);
 
       e.fromProperty && e.fromProperty(this);
 
@@ -1391,14 +1401,14 @@ foam.CLASS({
 
   methods: [
     function toE(X) {
-      // TODO: bind data$ instead, when it works
       return X.lookup('foam.u2.ActionView').create({
-        data:  X.data,
+        data$:  X.data$,
         action: this
       }, X);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',

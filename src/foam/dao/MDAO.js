@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-/* Indexed Memory-based DAO. */
 
+/* Indexed Memory-based DAO. */
 foam.CLASS({
   package: 'foam.dao',
   name: 'MDAO',
@@ -98,12 +98,9 @@ foam.CLASS({
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
 
-        // TODO: the index prototype should be in the property
-        var proto = Array.isArray(prop) ?
-          this.SetIndex  :
-          this.TreeIndex ;
-
-        index = proto.create({ prop: prop, tailFactory: index });
+        // Pass previous index as the sub-index of the next level up.
+        // (we are working from leaf-most index up to root index in the list)
+        index = prop.toIndex(index);
       }
 
       return this.addRawIndex(index);

@@ -98,11 +98,26 @@ var e13 = E('div').add(
         E('span').add('PONG').style({color: 'orange'});
     }
   }),
-  E('br'),
+  ' dynamic function2: ',
   timer.second$.map(function(s) {
     return s % 2 ?
       E('span').add('PI', 'NG').style({color: 'aqua'}) :
-      E('span').add('PONG').style({color: 'orange'})   ;
+      E('span').add('PONG').style({color: 'orange'});
+  }),
+  ' dynamic function3: ',
+  timer.slot(function (second) {
+    return second % 2 ?
+      E('span').add('PI', 'NG').style({color: 'aqua'}) :
+      E('span').add('PONG').style({color: 'orange'});
+  }),
+  ' dynamic function4: ',
+  foam.core.ExpressionSlot.create({
+    args: [ timer.second$ ],
+    code: function(s) {
+      return s % 2 ?
+        E('span').add('PI', 'NG').style({color: 'aqua'}) :
+        E('span').add('PONG').style({color: 'orange'});
+    }
   }),
   E('br'),
   'dynamic value: ', timer.i$,
@@ -298,7 +313,7 @@ foam.CLASS({
       this.field1 = 'foo';
       this.field2 = 'bar';
 
-      var o2 = this.cls_.create({field2: 'baz'});
+      var o2 = this.cls_.create({field1: 'O2.f1', field2: 'O2.f2'});
 
       this.
         cssClass(this.slot(function(flip) {
@@ -310,6 +325,8 @@ foam.CLASS({
               'start: ',
               this.field1$, ' ',
               this.field2$, ' ',
+              this.field1$, ' ',
+              this.field2$, ' O2: ',
               o2.field2$,
               this.E('br'),
               this.FIELD1, ' ',
@@ -317,19 +334,37 @@ foam.CLASS({
               this.E('br'),
               this.SAY_HELLO, ' ',
               this.RESET,
-              this.E('br')
+              this.E('br'),
+              'OnKey: '
           ).
+          start(this.FIELD1).attrs({onKey: true}).end().
+          start(this.FIELD2).attrs({onKey: true}).end().
+          tag('br').
+
+          start(this.FIELD1, {data$: o2.field1$}).end().
+          start(this.FIELD2, {data$: o2.field2$}).end().
+
+          tag('br').
+          add('subContext: ').
+          startContext({data: o2}).
+            add(o2.FIELD1).
+            add(o2.FIELD2).
+            add(this.slot(function(flip) {
+              return flip ? o2.FIELD1 : o2.FIELD2;
+            })).
+          endContext();
+
+
+          /*
           start('notimage').
             attrs({
               data: 'dragon.png',
               displayWidth: this.slot(function(i) { return i * 10 % 100; })
             }).
           end().
-          start(this.FIELD1).end().
-          start(this.FIELD2).attrs({onKey: true}).end().
-          tag('br');
-          // TODO: make this work
-          // start(this.FIELD2).attrs({data: o2}).end();
+          */
+
+
     }
   ]
 }).create().write();

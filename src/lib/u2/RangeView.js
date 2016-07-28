@@ -15,31 +15,19 @@
  * limitations under the License.
  */
 
-// TODO: support 'precision' in FloatView
 foam.CLASS({
-  package: 'com.google.foam.demos.sevenguis',
-  name: 'TempConv',
-  extends: 'foam.u2.Element',
-
-  exports: [ 'as data' ],
+  package: 'foam.u2',
+  name: 'RangeView',
+  extends: 'foam.u2.tag.Input',
 
   properties: [
-    // TODO: why is 'value' required?
-    { type: 'Float', name: 'c', value: 0 },
-    { type: 'Float', name: 'f' }
+    [ 'maxValue', 100 ]
   ],
 
   methods: [
     function initE() {
-      this.nodeName = 'span';
-      this.c$.relateTo(this.f$, this.c2f, this.f2c);
-      this.
-          start(this.C, {onKeyMode: true, precision: 4}).end().
-          add('Celsius = ').
-          start(this.F, {onKeyMode: true, precision: 4}).end().
-          add('Fahrenheit');
-    },
-    function c2f(f) { return 9/5 * f + 32; },
-    function f2c(c) { return 5/9 * ( c - 32 ); }
+      this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
+      this.attrs({type: 'range', max: this.maxValue$});
+    }
   ]
 });

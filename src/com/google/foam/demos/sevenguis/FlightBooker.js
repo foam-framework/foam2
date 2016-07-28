@@ -16,25 +16,36 @@
  */
 
 foam.CLASS({
-  package: 'foam.demos.sevenguis',
+  package: 'com.google.foam.demos.sevenguis',
   name: 'FlightBooker',
   extends: 'foam.u2.Element',
 
-  // TODO: these shouldn't be required
   requires: [
     'foam.u2.DateView',
     'foam.u2.tag.Select'
   ],
 
-  imports: [ 'dynamic' ],
+  exports: [ 'as data' ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+      ^ { padding: 10px; }
+      ^ .error { border: 2px solid red; }
+      ^title { font-size: 18px; }
+      ^title, ^ button, ^ input, ^ select {
+        width: 160px; height: 24px; margin: 5px;
+      */}
+    })
+  ],
 
   properties: [
     {
       type: 'Boolean',
       name: 'oneWay',
-      defaultValue: true,
-      toPropertyE: function(X) {
-        // TODO: Why do I need to lookup here?
+      value: true,
+      // TODO
+      xxxtoPropertyE: function(X) {
         return X.lookup('foam.u2.tag.Select').create({
           choices: [
             [ true,  'one-way flight' ],
@@ -63,20 +74,26 @@ foam.CLASS({
     },
     {
       name: 'returnDateMode',
-      factory: function() { return this.dynamic(function(oneWay) { return oneWay ? 'disabled' : 'rw'; }, this.oneWay$); }
+      expression: function(oneWay) { return oneWay ? 'disabled' : 'rw'; }
     }
   ],
 
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.nodeName = 'div';
+      this.
+          start('div').cssClass('^title').add('Book Flight').end().
+          add(this.ONE_WAY).tag('br').
+          add(this.DEPART_DATE).tag('br').
+          start(this.RETURN_DATE).attrs({mode: this.returnDateMode$}).end().tag('br').
+          add(this.BOOK);
+    }
+  ],
+
+  /*
   templates: [
-    function CSS() {/*
-      ^ { padding: 10px; }
-      ^ .error { border: 2px solid red; }
-      ^title { font-size: 18px; }
-      ^title, ^ button, ^ input, ^ select {
-        width: 160px; height: 24px; margin: 5px;
-      }
-    */},
-    function initE() {/*#U2
+    function initE() {
       <div class="^" x:data={{this}}>
         <div class="^title">Book Flight</div>
         <:oneWay/> <br>
@@ -84,13 +101,14 @@ foam.CLASS({
         <:returnDate mode={{this.returnDateMode}}/> <br>
         <:book/> <br>
       </div>
-    */}
+    }
   ],
+  */
 
   actions: [
     {
       name: 'book',
-      isEnabled: function() { return this.isValid(); },
+      // isEnabled: function() { return this.isValid(); },
       code: function() {
         var depart = this.departDate.toLocaleDateString();
 

@@ -15,31 +15,37 @@
  * limitations under the License.
  */
 
-// TODO: support 'precision' in FloatView
 foam.CLASS({
-  package: 'com.google.foam.demos.sevenguis',
-  name: 'TempConv',
-  extends: 'foam.u2.Element',
+  package: 'foam.u2',
+  name: 'ProgressView',
+  extends: 'foam.u2.View',
 
-  exports: [ 'as data' ],
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ {
+          margin: 2px 0 0 10px;
+          height: 23px;
+          width: 183px;
+        }
+      */}
+    })
+  ],
 
   properties: [
-    // TODO: why is 'value' required?
-    { type: 'Float', name: 'c', value: 0 },
-    { type: 'Float', name: 'f' }
+    [ 'nodeName', 'progress' ]
   ],
 
   methods: [
     function initE() {
-      this.nodeName = 'span';
-      this.c$.relateTo(this.f$, this.c2f, this.f2c);
+//      this.SUPER();
+//      this.attrs({max: 100});
       this.
-          start(this.C, {onKeyMode: true, precision: 4}).end().
-          add('Celsius = ').
-          start(this.F, {onKeyMode: true, precision: 4}).end().
-          add('Fahrenheit');
-    },
-    function c2f(f) { return 9/5 * f + 32; },
-    function f2c(c) { return 5/9 * ( c - 32 ); }
+        cssClass(this.myCls()).
+        attrs({max: 100});
+      this.attrSlot().follow(this.data$);
+
+//        attrs({value: this.data$, max: 100});
+    }
   ]
 });
