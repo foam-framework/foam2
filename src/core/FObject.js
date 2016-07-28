@@ -531,9 +531,9 @@ foam.CLASS({
       // When copying from a plain map, just enumerate the keys
       if ( o.__proto__ === Object.prototype || ! o.__proto__ ) {
         for ( var key in o ) {
-          var name = key.lastIndexOf('$') === key.length - 1 ?
+          var name = key.endsWith('$') ?
               key.substring(0, key.length - 1) :
-              key;
+              key ;
 
           var a = this.cls_.getAxiomByName(name);
           if ( a && foam.core.Property.isInstance(a) ) {
