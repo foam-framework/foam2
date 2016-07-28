@@ -37,7 +37,7 @@ foam.CLASS({
   requires: [
     'foam.u2.DetailView',
     'foam.u2.TableView',
-//    'foam.dao.EasyDAO',
+    'foam.dao.EasyDAO',
     'foam.demos.sevenguis.Person'
   ],
 
@@ -72,17 +72,17 @@ foam.CLASS({
       model_: 'foam.core.types.DAOProperty',
       name: 'dao',
       factory: function() {
+          /*
         return foam.dao.MDAO.create({
           of: foam.demos.sevenguis.Person
         });
-        /*
+*/
         return foam.dao.EasyDAO.create({
           of: foam.demos.sevenguis.Person,
-          daoType: 'IDB',
-          cache: true,
+          daoType: 'MDAO',
+          cache: false,
           seqNo: true
         });
-        */
       }
     },
     {
