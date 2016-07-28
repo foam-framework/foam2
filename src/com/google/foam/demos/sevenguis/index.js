@@ -2,12 +2,10 @@
 
 var els = document.getElementsByTagName('foam');
 
-for ( var i = 0 ; i < els.length ; i++ ) {
-  if ( i !== 0 && i !== 3 ) continue;
+for ( var i = els.length-1 ; i >= 0 ; i-- ) {
   var el = els[i];
   var modelName = els[i].getAttribute('model');
   var cls = foam.lookup(modelName, true);
-  console.log('***', modelName, !!cls);
   if ( cls ) {
     var view = cls.create(null, foam.__context__);
     if ( view.toE ) {
