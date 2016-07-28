@@ -20,7 +20,8 @@ foam.CLASS({
   name: 'CircleDrawer',
   extends: 'foam.u2.Element',
 
-  traits: [ 'foam.memento.MementoMgr' ],
+// TODO: port MementoMgr
+//  implements: [ 'foam.memento.MementoMgr' ],
 
   requires: [
     'foam.graphics.Circle',
@@ -28,6 +29,8 @@ foam.CLASS({
     'foam.ui.md.ChoiceMenuView',
     'foam.ui.PopupView'
   ],
+
+  exports: [ 'as data' ],
 
   constants: {
     SELECTED_COLOR:   '#ddd',
@@ -95,6 +98,17 @@ foam.CLASS({
   ],
 
   methods: [
+
+    function initE() {
+      this.SUPER();
+      this.nodeName = 'div';
+      this.
+          start('center').
+            cssClass('^buttonRow').
+            start(this.BACK,  {label: 'Undo'}).end().
+            start(this.FORTH, {label: 'Redo'}).end().
+          end();
+    },
     /*
       TODO: Need a canvas Element.
     function initHTML() {
@@ -153,14 +167,5 @@ foam.CLASS({
         p = null;
       }.bind(this));
     }
-  ],
-
-  templates: [
-    function initE() {/*#U2
-      <div class="^" x:data={{this}}>
-        <center class="^buttonRow"><:back label="Undo"}/> <:forth label="Redo"}/></center>
-        {{this.canvas}}
-      </div>
-    */}
   ]
 });

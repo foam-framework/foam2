@@ -105,7 +105,7 @@ foam.CLASS({
     },
     {
       name: 'person',
-//      toPropertyE: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
+      toPropertyE: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
 //      toPropertyE: 'foam.u2.DetailView',
       factory: function() { return this.Person.create(); }
     }
@@ -123,60 +123,42 @@ foam.CLASS({
               start(this.FILTERED_DAO, {hardSelection$: this.selection$}).end().
             end().
             start('span').cssClass('detailPane').
-//              add(this.PERSON).
-                add('detail: ', this.person.id$, ' ', this.person.name$, ' ', this.person.surname$).
+              add(this.PERSON).
               start('div').cssClass('buttons').
                 add(this.CREATE_ITEM, this.UPDATE_ITEM, this.DELETE_ITEM).
               end().
             end().
           end();
     }
-    /*
-  templates: [
-    function initE() {
-      <div class="^" x:data={{this}}>
-        <span class="prefix label">Filter prefix: </span> <:prefix onKeyMode="true" type="search"/>
-        <div class="content">
-          <span class="summaryPane"><:filteredDAO hardSelection$={{this.selection$}}/></span>
-          <span class="detailPane">
-            <:data/>
-            <div class="buttons"><:createItem/> <:updateItem/> <:deleteItem/></div>
-          </span>
-        </div>
-      </div>
-    }
-  */
   ],
 
   actions: [
     {
       name: 'createItem',
       label: 'Create',
-      isEnabled: function(person) {
-        return person.name && person.surname;
-      },
+//      isEnabled: function(person) { return person.name && person.surname; },
       code: function() {
-        var data = this.data.clone();
+        var data = this.person.clone();
         data.id = undefined;
         this.dao.put(data, {
-          put: function(data) { this.data.copyFrom(data); }.bind(this)
+          put: function(data) { this.person.copyFrom(data); }.bind(this)
         });
       }
     },
     {
       name: 'updateItem',
       label: 'Update',
-      isEnabled: function(person) { return person.id; },
+//      isEnabled: function(person) { return person.id; },
       code: function() {
-        this.dao.put(this.data.clone(), {
-          put: function(data) { self.data = data; }
+        this.dao.put(this.person.clone(), {
+          put: function(data) { self.person = data; }
         });
       }
     },
     {
       name: 'deleteItem',
       label: 'Delete',
-      isEnabled: function(person) { return person.id; },
+//      isEnabled: function(person) { return person.id; },
       code: function() {
         this.dao.remove(this.person);
         this.person.id = this.person.name = this.person.surname = '';
