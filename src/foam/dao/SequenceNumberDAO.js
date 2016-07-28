@@ -20,7 +20,8 @@
   sequence number on DAO.put() if the properties value
   is set to the properties default value.
 */
-CLASS({
+
+foam.CLASS({
   package: 'foam.dao',
   name: 'SequenceNumberDAO',
 
@@ -58,13 +59,13 @@ CLASS({
       name: 'property_',
       hidden: true,
       expression: function(property, of) {
-        return this.of$cls[property.toUppercase()];
+        return this.of$cls[property.toUpperCase()];
       }
     }
   ],
 
-  methods: {
-    put: function(obj, sink) {
+  methods: [
+    function put(obj, sink) {
       var self = this;
       this.calcDelegateMax_.then(function() {
         var val = self.property_.f(obj);
@@ -73,8 +74,8 @@ CLASS({
           obj[self.property_.name] = self.value++;
         }
 
-        this.delegate.put(obj, sink);
+        self.delegate.put(obj, sink);
       });
     }
-  }
+  ]
 });
