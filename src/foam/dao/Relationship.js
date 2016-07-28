@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.dao',
   name: 'Relationship',
   implements: [ 'foam.mlang.Expressions' ],
 

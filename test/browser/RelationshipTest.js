@@ -9,7 +9,7 @@ foam.CLASS({
   ids: [ 'name' ],
   properties: [ 'name' ]
 });
-foam.core.Relationship.create({
+foam.dao.Relationship.create({
   sourceModel: 'Parent1',
   targetModel: 'Child1',
   name: 'children',
