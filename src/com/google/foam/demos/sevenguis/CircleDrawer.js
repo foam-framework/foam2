@@ -34,6 +34,18 @@ foam.CLASS({
     UNSELECTED_COLOR: 'white'
   },
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+      ^ { width:600px; margin: 20px; }
+      ^ canvas { border: 1px solid black; }
+      ^ .md-card { font-size: 20px; }
+      ^ .actionButton { margin: 10px; }
+      ^ input[type='range'] { width: 400px; }
+      */}
+    })
+  ],
+
   classes: [
     {
       name: 'DiameterDialog',
@@ -144,14 +156,6 @@ foam.CLASS({
   ],
 
   templates: [
-    function CSS() {/*
-      ^ { width:600px; margin: 20px; }
-      ^ canvas { border: 1px solid black; }
-      ^ .md-card { font-size: 20px; }
-      ^ .actionButton { margin: 10px; }
-      ^ input[type='range'] { width: 400px; }
-    */},
-
     function initE() {/*#U2
       <div class="^" x:data={{this}}>
         <center class="^buttonRow"><:back label="Undo"}/> <:forth label="Redo"}/></center>
