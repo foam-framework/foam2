@@ -21,5 +21,5 @@ foam.CLASS({
 
   properties: [ { class: 'Int', name: 'value' } ],
 
-  actions: [ function Count() { this.value++; } ]
+  actions: [ function count() { this.value++; } ]
 });
