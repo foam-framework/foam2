@@ -653,7 +653,7 @@ foam.CLASS({
         Value can be either a string, a Value, or an Object.
         If Value is undefined, null or false, the attribute will be removed.
       */
-      
+
       // TODO: type checking
 
       // handle slot binding, ex.: data$: ...,
@@ -858,7 +858,7 @@ foam.CLASS({
       } else {
         this.error('cssClass type error. Must be Slot or String.');
       }
-      
+
       return this;
     },
 
