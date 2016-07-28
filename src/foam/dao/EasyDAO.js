@@ -25,7 +25,7 @@
     DAO, without worrying about the internal DAO doing the work.
     </p>
 */
-CLASS({
+foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
@@ -36,6 +36,7 @@ CLASS({
     'foam.dao.JournalDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
+    'foam.dao.SequenceNumberDAO',
     //'foam.core.dao.CloningDAO',
     //'foam.core.dao.MergeDAO',
     //'foam.core.dao.MigrationDAO',
@@ -49,19 +50,18 @@ CLASS({
     //'foam.dao.ContextualizingDAO',
     //'foam.dao.DeDupDAO',
     //'foam.dao.EasyClientDAO',
-    //'foam.dao.SeqNoDAO',
     //'foam.dao.LoggingDAO',
     //'foam.dao.TimingDAO'
   ],
 
   help: 'A facade for easy DAO setup.',
 
-  imports: ['document'],
+  imports: [ 'document' ],
 
   properties: [
     {
       name: 'name',
-      factory: function() { return this.model.id; },
+      factory: function() { return this.of.id; },
       //documentation: "The developer-friendly name for this $$DOC{ref:'.'}."
     },
     {
@@ -140,9 +140,9 @@ CLASS({
       //documentation: "Automatically generate an index."
     },
     {
-      class: 'Array',
+      class: 'FObjectArray',
       name: 'migrationRules',
-      subType: 'foam.core.dao.MigrationRule',
+      of: 'foam.core.dao.MigrationRule',
       //documentation: "Creates an internal $$DOC{ref:'MigrationDAO'} and applies the given array of $$DOC{ref:'MigrationRule'}."
     },
     {
@@ -179,6 +179,7 @@ CLASS({
   constants: {
     // Aliases for daoType
     ALIASES: {
+      MDAO:  'foam.dao.MDAO',
       IDB:   'foam.dao.IDBDAO',
       LOCAL: 'foam.dao.LocalStorageDAO',
       //SYNC:  'foam.dao.StorageDAO'
@@ -202,8 +203,8 @@ CLASS({
 //       }
 
       var daoType  = typeof this.daoType === 'string' ? this.ALIASES[this.daoType] || this.daoType : this.daoType;
-      var daoModel = typeof daoType === 'string' ? this.X.lookup(daoType) || GLOBAL[daoType] : daoType;
-      var params   = { model: this.model, autoIndex: this.autoIndex };
+      var daoModel = typeof daoType === 'string' ? this.lookup(daoType) || global[daoType] : daoType;
+      var params   = { of: this.of, autoIndex: this.autoIndex };
 
       if ( ! daoModel ) {
         console.warn("EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list.");
@@ -212,42 +213,42 @@ CLASS({
       if ( this.name  ) params.name = this.name;
       if ( this.seqNo || this.guid ) params.property = this.seqProperty;
 
-      var dao = daoModel.create(params, this.Y);
+      var dao = daoModel.create(params, this.__subContext__);
 
-      if ( MDAO.isInstance(dao) ) {
+      if ( this.MDAO.isInstance(dao) ) {
         this.mdao = dao;
-        if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao}, this.Y);
+        if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
         if ( this.migrationRules && this.migrationRules.length ) {
           dao = this.MigrationDAO.create({
             delegate: dao,
             rules: this.migrationRules,
             name: this.model.id + "_" + daoModel.id + "_" + this.name
-          }, this.Y);
+          });
         }
         if ( this.cache ) {
-          this.mdao = this.MDAO.create(params, this.Y);
+          this.mdao = this.MDAO.create(params);
           dao = this.CachingDAO.create({
             cache: this.dedup ?
               this.mdao :
               this.DeDupDAO.create({delegate: this.mdao}),
             src: dao,
-            model: this.model}, this.Y);
+            of: this.model});
         }
       }
 
       if ( this.seqNo && this.guid ) throw "EasyDAO 'seqNo' and 'guid' features are mutually exclusive.";
 
       if ( this.seqNo ) {
-        var args = {__proto__: params, delegate: dao, model: this.model};
+        var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
-        dao = this.SeqNoDAO.create(args, this.Y);
+        dao = this.SequenceNumberDAO.create(args);
       }
 
       if ( this.guid ) {
-        var args = {__proto__: params, delegate: dao, model: this.model};
+        var args = {__proto__: params, delegate: dao, of: this.of};
         if ( this.seqProperty ) args.property = this.seqProperty;
-        dao = this.GUIDDAO.create(args, this.Y);
+        dao = this.GUIDDAO.create(args);
       }
 
       var model = this.model;
@@ -275,18 +276,18 @@ CLASS({
             model: model,
             sockets: this.sockets,
             reconnectPeriod: 5000
-          }, this.Y),
+          }),
           syncProperty: this.syncProperty,
           deletedProperty: this.deletedProperty,
           delegate: dao,
           period: 1000
-        }, this.Y);
+        });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
           model: dao.SyncRecord,
           cache: true,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
-        }, this.Y);
+        });
       }
 
       if ( this.isServer ) {
@@ -294,20 +295,20 @@ CLASS({
           delegate: dao,
           property: this.syncProperty,
           version: 2
-        }, this.Y);
+        });
       }
 
       if ( this.contextualize ) dao = this.ContextualizingDAO.create({
         delegate: dao
-      }, this.Y);
+      });
 
       if ( this.cloning ) dao = this.CloningDAO.create({
         delegate: dao
-      }, this.Y);
+      });
 
 
-      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.model.plural + 'DAO', delegate: dao }, this.Y);
-      if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao }, this.Y);
+      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.model.plural + 'DAO', delegate: dao });
+      if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
 
       this.delegate = dao;
     },
