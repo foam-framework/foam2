@@ -131,7 +131,7 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
-    { name: 'cost', value: 0 }
+    { name: 'cost', value: Number.MAX_VALUE }
   ],
 
   methods: [
@@ -157,7 +157,8 @@ foam.CLASS({
   ]
 });
 
-
+/** Convenience wrapper for indexes that want to create a closure'd function
+    for each plan instance */
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'CustomPlan',
