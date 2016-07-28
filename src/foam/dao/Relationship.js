@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.dao',
   name: 'Relationship',
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -91,14 +91,18 @@ foam.CLASS({
       var relationship = this;
 
       // Install filtered target DAO in source Model
+      var name = this.name;
       var daoProp = foam.core.Property.create({
-        name: this.name,
+        name: name,
         transient: true,
-        expression: function() {
-          return foam.dao.RelationshipDAO.create({
-            obj: this,
-            relationship: relationship
-          }, this);
+        setter: function() {},
+        getter: function() {
+          return this.instance_[name] ?
+            this.instance_[name] :
+            this.instance_[name] = foam.dao.RelationshipDAO.create({
+              obj: this,
+              relationship: relationship
+            }, this);
         }
       });
 
