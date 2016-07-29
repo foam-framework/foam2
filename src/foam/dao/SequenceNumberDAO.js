@@ -25,6 +25,10 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'SequenceNumberDAO',
 
+  requires: [
+    'foam.dao.InternalException',
+  ],
+
   extends: 'foam.dao.ProxyDAO',
   implements: ['foam.mlang.Expressions'],
 
@@ -59,7 +63,9 @@ foam.CLASS({
       name: 'property_',
       hidden: true,
       expression: function(property, of) {
-        return this.of$cls[property.toUpperCase()];
+        var a = this.of$cls.getAxiomByName(property);
+        throw this.InternalException.create({ message: 'SequenceNumberDAO specified with invalid property ' 
+          + property + ' for class ' + this.of });
       }
     }
   ],
@@ -67,14 +73,14 @@ foam.CLASS({
   methods: [
     function put(obj, sink) {
       var self = this;
-      this.calcDelegateMax_.then(function() {
+      return this.calcDelegateMax_.then(function() {
         var val = self.property_.f(obj);
 
         if ( ! val || val == self.property_.value ) {
           obj[self.property_.name] = self.value++;
         }
 
-        self.delegate.put(obj, sink);
+        return self.delegate.put(obj, sink);
       });
     }
   ]
