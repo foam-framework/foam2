@@ -44,7 +44,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'value',
-      defaultValue: 1
+      value: 1
     },
     { /** Returns a promise that fulfills when the maximum existing number
           has been found and assigned to this.value */
