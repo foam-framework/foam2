@@ -24,16 +24,16 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   requires: [
+    'foam.dao.ArraySink',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.ObjectNotFoundException',
-    'foam.mlang.predicate.Eq',
-    'foam.dao.ArraySink',
-    'foam.dao.index.TreeIndex',
-    'foam.dao.index.AutoIndex',
-    'foam.dao.index.ValueIndex',
     'foam.dao.index.AltIndex',
+    'foam.dao.index.AutoIndex',
     'foam.dao.index.SetIndex',
+    'foam.dao.index.TreeIndex',
+    'foam.dao.index.ValueIndex',
+    'foam.mlang.predicate.Eq',
     'foam.mlang.sink.Explain'
   ],
 
@@ -176,10 +176,11 @@ foam.CLASS({
     },
 
     function remove(obj) {
-      if ( ! obj || ! obj.id ) {
+      if ( ! obj || obj.id === undefined ) {
         return Promise.reject(this.ExternalException.create({ id: 'no_id' })); // TODO: err
       }
-      var id = obj.id;
+
+      var id   = obj.id;
       var self = this;
 
       return this.find(id).then(
@@ -199,7 +200,7 @@ foam.CLASS({
     },
 
     function removeAll(skip, limit, order, predicate) {
-      if (!predicate) predicate = this.True;
+      if ( ! predicate ) predicate = this.True;
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
