@@ -24,13 +24,16 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'SequenceNumberDAO',
+  extends: 'foam.dao.ProxyDAO',
+
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   requires: [
     'foam.dao.InternalException',
   ],
 
-  extends: 'foam.dao.ProxyDAO',
-  implements: ['foam.mlang.Expressions'],
 
   properties: [
     {
