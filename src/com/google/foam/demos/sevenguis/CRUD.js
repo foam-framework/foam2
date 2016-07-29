@@ -22,7 +22,7 @@ foam.CLASS({
   tableProperties: [ 'id', 'surname', 'name' ],
 
   properties: [
-    { name: 'id', hidden: true },
+    { name: 'id' /*, hidden: true*/ },
     { name: 'name',    toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } },
     { name: 'surname', toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } }
   ]
@@ -141,8 +141,8 @@ foam.CLASS({
         var data = this.person.clone();
         data.id = undefined;
         this.dao.put(data).then(function(data) {
-            debugger;
-          this.person.copyFrom(data); }.bind(this));
+          this.person.copyFrom(data);
+        }.bind(this));
       }
     },
     {
