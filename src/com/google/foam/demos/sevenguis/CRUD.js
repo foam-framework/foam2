@@ -22,7 +22,7 @@ foam.CLASS({
   tableProperties: [ 'id', 'surname', 'name' ],
 
   properties: [
-    { name: 'id' /*, hidden: true*/ },
+    { name: 'id', hidden: true },
     { name: 'name',    toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } },
     { name: 'surname', toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } }
   ]
@@ -150,9 +150,7 @@ foam.CLASS({
       label: 'Update',
 //      isEnabled: function(person) { return person.id; },
       code: function() {
-        this.dao.put(this.person.clone(), {
-          put: function(data) { self.person = data; }
-        });
+        this.dao.put(this.person.clone());
       }
     },
     {
@@ -160,8 +158,9 @@ foam.CLASS({
       label: 'Delete',
 //      isEnabled: function(person) { return person.id; },
       code: function() {
-        this.dao.remove(this.person);
-        this.person.id = this.person.name = this.person.surname = '';
+        this.dao.remove(this.person).then(function() {
+          // this.person.id = this.person.name = this.person.surname = '';
+        }.bind(this));
       }
     }
   ]
