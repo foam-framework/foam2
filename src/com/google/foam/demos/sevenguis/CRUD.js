@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.demos.sevenguis',
   name: 'Person',
 
-  tableProperties: [ 'surname', 'name' ],
+  tableProperties: [ 'id', 'surname', 'name' ],
 
   properties: [
     { name: 'id', hidden: true },
@@ -140,9 +140,9 @@ foam.CLASS({
       code: function() {
         var data = this.person.clone();
         data.id = undefined;
-        this.dao.put(data, {
-          put: function(data) { this.person.copyFrom(data); }.bind(this)
-        });
+        this.dao.put(data).then(function(data) {
+            debugger;
+          this.person.copyFrom(data); }.bind(this));
       }
     },
     {

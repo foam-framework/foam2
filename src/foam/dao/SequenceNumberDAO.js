@@ -48,7 +48,7 @@ foam.CLASS({
       name: 'calcDelegateMax_',
       hidden: true,
       expression: function(delegate, property) {
-        // TODO: validate property self.of[self.property.toUppercase()]
+        // TODO: validate property self.of[self.property.toUpperCase()]
         var self = this;
         return self.delegate.select(
           self.MAX(self.property_)
@@ -64,8 +64,10 @@ foam.CLASS({
       hidden: true,
       expression: function(property, of) {
         var a = this.of$cls.getAxiomByName(property);
-        throw this.InternalException.create({ message: 'SequenceNumberDAO specified with invalid property ' 
-          + property + ' for class ' + this.of });
+        throw this.InternalException.create({message:
+            'SequenceNumberDAO specified with invalid property ' +
+            property + ' for class ' + this.of
+        });
       }
     }
   ],
