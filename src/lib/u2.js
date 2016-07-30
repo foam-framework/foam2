@@ -1463,3 +1463,33 @@ foam.CLASS({
     }
   ]
 });
+
+// TODO: make a tableProperties property on AbstractClass
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'TableProperties',
+
+  properties: [
+    [ 'name', 'tableProperties' ],
+    {
+      name: 'properties',
+      factory: function() {
+        debugger;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      name: 'tableProperties',
+      postSet: function(_, properties) {
+        this.axioms_.push(foam.u2.TableProperties.create({properties: properties}));
+      }
+    }
+  ]
+});
