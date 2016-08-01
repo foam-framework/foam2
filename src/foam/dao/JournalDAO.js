@@ -18,10 +18,9 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalEntry',
+
   properties: [
-    {
-      name: 'id',
-    },
+    'id',
     {
       class: 'FObjectProperty',
       name: 'record'
@@ -34,18 +33,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalDAO',
   extends: 'foam.dao.ProxyDAO',
+
   requires: [
     'foam.dao.JournalEntry'
   ],
+
   properties: [
     {
       name: 'journal'
     }
   ],
+
   methods: [
     function put(obj) {
       return this.delegate.put(obj).then(function(obj) {
@@ -55,6 +58,7 @@ foam.CLASS({
         return obj;
       }.bind(this));
     },
+
     function remove(obj) {
       return this.delegate.remove(obj).then(function(r) {
         this.journal.put(this.JournalEntry.create({
