@@ -490,11 +490,27 @@ foam.CLASS({
     function toLocalCoordinates(p) {
       if ( this.parent ) this.parent.toLocalCoordinates(p);
 
-      var t = this.transform.invert().mulP(p);
+      this.transform.invert().mulP(p);
       p.x /= p.w;
       p.y /= p.w;
       p.w = 1;
     },
+
+    function findFirstChildAt(p) {
+      this.toLocalCoordinates(p);
+
+      for ( var i = 0 ; i < this.children.length ; i++ ) {
+        var c = this.children[i].findFirstChildAt(p.clone());
+        if ( c ) return c;
+      }
+
+      if ( this.hitTest(p) ) {
+        return this;
+      }
+    },
+
+    // p must be in local coordinates.
+    function hitTest(p) {},
 
     function maybeInitCView(x) {
       if ( this.state == 'initial' ) {
@@ -529,6 +545,16 @@ foam.CLASS({
     function paintChildren(x) {
       for ( var i = 0 ; i < this.children.length ; i++ ) {
         this.children[i].paint(x);
+      }
+    },
+
+    function removeChild(c) {
+      for ( var i = 0 ; i < this.children.length ; i++ ) {
+        if ( this.children[i] === c ) {
+          this.children.splice(i, 1);
+          this.removeChild_(c);
+          return;
+        }
       }
     },
 
@@ -727,6 +753,11 @@ foam.CLASS({
   ],
 
   methods: [
+    function hitTest(p) {
+      var r = this.radius + this.arcWidth/2 - 1;
+      return p.x*p.x + p.y*p.y <= r*r;
+    },
+
     function intersects(c) {
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
@@ -759,6 +790,14 @@ foam.CLASS({
   ],
 
   methods: [
+    function clone() {
+      var p = this.cls_.create();
+      p.x = this.x;
+      p.y = this.y;
+      p.w = this.w;
+      return p;
+    },
+
     function toCartesian() {
       // TODO: What is the right name for this function?
       // It's related to perspective transformations
@@ -807,6 +846,12 @@ foam.CLASS({
       postSet: function(o, n) {
         o && o.invalidated.unsub(this.paint);
         n && n.invalidated.sub(this.paint);
+
+        if ( this.attributeMap.width === undefined || this.attributeMap.height === undefined ) {
+          this.setAttribute('width', n.width);
+          this.setAttribute('height', n.height);
+        }
+
         this.paint();
       }
     },
