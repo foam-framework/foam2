@@ -1354,7 +1354,7 @@ foam.CLASS({
     },
     {
       name: 'toPropertyE',
-      value: function toPropertyE(X, obj) {
+      value: function toPropertyE(X) {
         return this.TextField.create(null, X);
       }
     }
@@ -1372,6 +1372,17 @@ foam.CLASS({
 
       return e;
     }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Date',
+  requires: [ 'foam.u2.DateView' ],
+  properties: [
+    [ 'toPropertyE', function(X) {
+      return this.DateView.create(null, X);
+    }]
   ]
 });
 
