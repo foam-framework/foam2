@@ -53,13 +53,26 @@ foam.CLASS({
       this.delegate && this.remote && this.remote.pipe(this.delegate);
     },
     function put(obj) {
-      return this.remote.put(obj);
+      var self = this;
+      return self.remote.put(obj).then(
+        function(obj) { return self.delegate.put(obj); }
+      );
     },
     function remove(obj) {
-      return this.remote.remove(obj);
+      var self = this;
+      return self.remote.remove(obj).then(
+        function(obj) { return self.delegate.remove(obj)
+          .catch(function() {}); // don't fail on double remove
+        }
+      );
     },
     function removeAll(skip, limit, order, predicate) {
-      return this.remote.removeAll(skip, limit, order, predicate);
+      var self = this;
+      return self.remote.removeAll(skip, limit, order, predicate).then(
+        function(obj) {
+          return self.delegate.removeAll(skip, limit, order, predicate);
+        }
+      );
     },
   ]
 });
