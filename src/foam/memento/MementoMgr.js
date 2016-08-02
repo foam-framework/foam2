@@ -21,7 +21,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'mementoValue'
+      name: 'memento'
     },
     {
       name:  'stack',
@@ -30,7 +30,9 @@ foam.CLASS({
     {
       name:  'redo',
       factory: function() { return []; }
-    }
+    },
+    'stackSize_',
+    'redoSize_'
   ],
 
   actions: [
@@ -39,13 +41,12 @@ foam.CLASS({
       label: ' <-- ',
       help:  'Go to previous view',
 
-      isEnabled: function() { return this.stack.length; },
+      isEnabled: function(stackSize_) { return !! stackSize_; },
       code: function() {
         this.dumpState('preBack');
-        this.redo.push(this.mementoValue.get());
+        this.redo.push(this.memento);
         this.restore(this.stack.pop());
-        this.propertyChange('stack', '', this.stack);
-        this.propertyChange('redo', '', this.redo);
+        this.updateSizes();
         this.dumpState('postBack');
       }
     },
@@ -54,59 +55,59 @@ foam.CLASS({
       label: ' --> ',
       help:  'Undo the previous back.',
 
-      isEnabled: function() { return this.redo.length; },
+      isEnabled: function(redoSize_) { return !! redoSize_; },
       code: function() {
-      this.dumpState('preForth');
-        this.remember(this.mementoValue.get());
+        this.dumpState('preForth');
+        this.remember(this.memento);
         this.restore(this.redo.pop());
-        this.propertyChange('stack', '', this.stack);
-        this.propertyChange('redo', '', this.redo);
-      this.dumpState('postForth');
+        this.updateSizes();
+        this.dumpState('postForth');
       }
     }
   ],
 
-  listeners: [
-    {
-      name: 'onMementoChange',
-      code: function(_, __, oldValue, newValue) {
-        if ( this.ignore_ ) return;
-
-        // console.log('MementoMgr.onChange', oldValue, newValue);
-        this.remember(oldValue);
-        this.redo = [];
-        this.propertyChange('redo', '', this.redo);
-      }
-    }
-  ],
-
-  methods: {
-    init: function() {
-      this.SUPER();
-
-      this.mementoValue.addListener(this.onMementoChange);
+  methods: [
+    function init() {
+      this.memento$.sub(this.onMementoChange);
     },
 
-    remember: function(value) {
+    function updateSizes() {
+      this.stackSize_ = this.stack.length;
+      this.redoSize_  = this.redo.length;
+    },
+
+    function remember(value) {
       this.dumpState('preRemember');
       this.stack.push(value);
-      this.propertyChange('stack', '', this.stack);
+      this.updateSizes();
       this.dumpState('postRemember');
     },
 
-    restore: function(value) {
+    function restore(value) {
       this.dumpState('restore');
       this.ignore_ = true;
-      this.mementoValue.set(value);
+      this.memento = value;
       this.ignore_ = false;
     },
 
     dumpState: function(spot) {
+      // Uncomment for debugging
       /*
       console.log('--- ', spot);
       console.log('stack: ', JSON.stringify(this.stack));
       console.log('redo: ', JSON.stringify(this.redo));
       */
     }
-  }
+  ],
+
+  listeners: [
+    function onMementoChange(_, __, oldValue, newValue) {
+      if ( this.ignore_ ) return;
+
+      // console.log('MementoMgr.onChange', oldValue, newValue);
+      this.remember(oldValue);
+      this.redo = [];
+      this.updateSizes();
+    }
+  ]
 });
