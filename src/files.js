@@ -77,6 +77,7 @@ FOAM_FILES([
   { name: "foam/dao/JournalDAO" },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
+  { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/SequenceNumberDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/IDBDAO", flags: ['web'] },
