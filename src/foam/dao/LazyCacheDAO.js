@@ -40,6 +40,21 @@ foam.CLASS({
     },
     {
       /**
+        TODO: This is attempting to express a link between two other properties,
+        and a side-effect (subscription) is what is desired, not a value. Also
+        the cacheSync_ prop needs to be tickled to ensure the link exists.
+        Change this to define an expression that defines a run-time 'thing'
+        to be done between properties, and allows cleanup when re-evaluating.
+      */
+      name: 'cacheSync_',
+      expression: function(delegate, cache) {
+        return delegate.on.remove.sub(function(sub_, on_, remove_, obj) {
+          cache.remove(obj);
+        });
+      }
+    },
+    {
+      /**
         When true, makes a network call in the background to
         update the record, even on a cache hit.
       */
@@ -94,17 +109,9 @@ foam.CLASS({
 
   methods: [
 
-    // clear cache aggressively
-    function remove(obj) {
-      var self = this;
-      return self.delegate.remove(obj).then(function() {
-        return self.cache.remove(obj);
-      });
-    },
-    // TODO: also cache puts?
-
     function find(id) {
       var self = this;
+      self.cacheSync_; // ensures listeners are set TODO: express this better
       // TODO: stale timeout on find?
 
       // Check the in-flight remote finds_
@@ -161,6 +168,7 @@ foam.CLASS({
       sink = sink || this.ArraySink.create();
       var key = this.selectKey(sink, skip, limit, order, predicate);
       var self = this;
+      self.cacheSync_; // ensures listeners are set TODO: express this better
 
       // Check for missing or stale remote request. If needed, immediately
       // start a new one that will trigger a reset of this when complete.
