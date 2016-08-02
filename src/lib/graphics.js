@@ -497,6 +497,13 @@ foam.CLASS({
     },
 
     function findFirstChildAt(p) {
+      if ( arguments.length > 1 ) {
+        p = foam.graphics.Point.create();
+        p.x = arguments[0];
+        p.y = arguments[1];
+        p.w = 1;
+      }
+
       this.toLocalCoordinates(p);
 
       for ( var i = 0 ; i < this.children.length ; i++ ) {
