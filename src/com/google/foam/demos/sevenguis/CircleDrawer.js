@@ -25,7 +25,7 @@ foam.CLASS({
 
   requires: [
     'foam.graphics.Circle',
-    'foam.graphics.CView',
+    'foam.graphics.Box as CView',
     'foam.ui.md.ChoiceMenuView',
     'foam.ui.PopupView'
   ],
@@ -92,7 +92,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'});
+        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'}).toE(this.__subContext__);
       }
     },
   ],
@@ -100,13 +100,17 @@ foam.CLASS({
   methods: [
 
     function initE() {
-      this.SUPER();
       this.nodeName = 'div';
       this.
           start('center').
             cssClass('^buttonRow').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
+            tag('br').
+            start(this.canvas).
+              on('click', this.onClick).
+              on('contextmenu', this.onRightClick).
+            end().
           end();
     },
     /*
