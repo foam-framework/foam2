@@ -142,7 +142,7 @@ foam.CLASS({
 
   listeners: [
     function onClick(evt) {
-      var x = evt.offsetX, y = evt.offsetY, c = null; // this.canvas.findChildAt(x, y);
+      var x = evt.offsetX, y = evt.offsetY, c = this.canvas.findFirstChildAt(x, y);
       if ( c ) {
         this.selected = c;
       } else {
@@ -156,7 +156,7 @@ foam.CLASS({
       if ( ! this.selected ) return;
 
       var p = this.PopupView.create({view: this.DiameterDialog.create({data: this.selected}), width: 450, height: 110});
-      p.openOn(this.$);
+      p.openOn(this);
 
       // If the size is changed with the dialog, then create an updated memento
       var oldR = this.selected.r;
