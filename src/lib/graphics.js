@@ -498,20 +498,27 @@ foam.CLASS({
 
     function findFirstChildAt(p) {
       if ( arguments.length > 1 ) {
-        p = foam.graphics.Point.create();
-        p.x = arguments[0];
-        p.y = arguments[1];
-        p.w = 1;
+        var tmp = foam.graphics.Point.create();
+        tmp.x = arguments[0];
+        tmp.y = arguments[1];
+        tmp.w = 1;
+        p = tmp;
       }
 
       this.toLocalCoordinates(p);
 
+      var p2 = foam.graphics.Point.create();
+
       for ( var i = 0 ; i < this.children.length ; i++ ) {
-        var c = this.children[i].findFirstChildAt(p.clone());
+        p2.x = p.x;
+        p2.y = p.y;
+        p2.w = p.w;
+
+        var c = this.children[i].findFirstChildAt(p2);
         if ( c ) return c;
       }
 
-      if ( this.hitTest(p) ) {
+      if ( this.hitTest(sp) ) {
         return this;
       }
     },
