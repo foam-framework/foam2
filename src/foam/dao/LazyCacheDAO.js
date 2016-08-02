@@ -16,6 +16,12 @@
  */
  // TODO: Don't use yet! Port awaiting manual testing
 
+/**
+  LazyCacheDAO can cache successful results from find() and select() on its
+  delegate. It only updates after new queries come in, and returns cached
+  results immediately, even if new results arrive from the delegate.
+  listen or pipe from this DAO to stay up to date.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'LazyCacheDAO',
@@ -25,6 +31,7 @@ foam.CLASS({
   properties: [
     {
       name: 'cache',
+      required: true
       // TODO: old code did listening on cache... still needed?
       //postSet: function(old, nu) {
         //if (old) this.unlisten(old);
@@ -94,6 +101,7 @@ foam.CLASS({
         return self.cache.remove(obj);
       });
     },
+    // TODO: also cache puts?
 
     function find(id) {
       var self = this;
