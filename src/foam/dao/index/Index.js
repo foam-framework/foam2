@@ -39,6 +39,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
   requires: [
@@ -50,6 +51,8 @@ foam.CLASS({
     }
   ]
 });
+
+
 foam.CLASS({
   refines: 'foam.core.AxiomArray',
   requires: [
@@ -61,6 +64,8 @@ foam.CLASS({
     }
   ]
 });
+
+
 foam.CLASS({
   refines: 'foam.core.StringArray',
   requires: [
@@ -80,6 +85,7 @@ var toCompare = function toCompare(c) {
 
   return c.compare ? c.compare.bind(c) : c;
 };
+
 
 /** TODO: move to stdlib */
 var CompoundComparator = function CompoundComparator() {
@@ -156,6 +162,7 @@ foam.CLASS({
     function toString() { return 'no-plan'; }
   ]
 });
+
 
 /** Convenience wrapper for indexes that want to create a closure'd function
     for each plan instance */

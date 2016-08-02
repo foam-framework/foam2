@@ -20,14 +20,17 @@ foam.CLASS({
   name: 'CircleDrawer',
   extends: 'foam.u2.Element',
 
-  traits: [ 'foam.memento.MementoMgr' ],
+// TODO: port MementoMgr
+  implements: [ 'foam.memento.MementoMgr' ],
 
   requires: [
     'foam.graphics.Circle',
-    'foam.graphics.CView',
+    'foam.graphics.Box as CView',
     'foam.ui.md.ChoiceMenuView',
     'foam.ui.PopupView'
   ],
+
+  exports: [ 'as data' ],
 
   constants: {
     SELECTED_COLOR:   '#ddd',
@@ -95,23 +98,32 @@ foam.CLASS({
   ],
 
   methods: [
-    /*
-      TODO: Need a canvas Element.
-    function initHTML() {
-      this.SUPER();
-      this.canvas.$.addEventListener('click',       this.onClick);
-      this.canvas.$.addEventListener('contextmenu', this.onRightClick);
+
+    function initE() {
+      this.nodeName = 'div';
+      this.
+          start('center').
+            cssClass('^buttonRow').
+            start(this.BACK,  {label: 'Undo'}).end().
+            start(this.FORTH, {label: 'Redo'}).end().
+            tag('br').
+            start(this.canvas).
+              on('click', this.onClick).
+              on('contextmenu', this.onRightClick).
+            end().
+          end();
     },
-    */
 
     function addCircle(x, y, opt_d) {
       var c = this.Circle.create({
         x: x,
         y: y,
-        r: opt_d || 25,
+        radius: opt_d || 25,
         color: this.UNSELECTED_COLOR,
         border: 'black'});
-      this.canvas.addChild(c);
+
+      this.canvas.addChildren(c);
+
       return c;
     },
 
@@ -130,7 +142,7 @@ foam.CLASS({
 
   listeners: [
     function onClick(evt) {
-      var x = evt.offsetX, y = evt.offsetY, c = this.canvas.findChildAt(x, y);
+      var x = evt.offsetX, y = evt.offsetY, c = null; // this.canvas.findChildAt(x, y);
       if ( c ) {
         this.selected = c;
       } else {
@@ -138,6 +150,7 @@ foam.CLASS({
         this.updateMemento();
       }
     },
+
     function onRightClick(evt) {
       evt.preventDefault();
       if ( ! this.selected ) return;
@@ -153,14 +166,5 @@ foam.CLASS({
         p = null;
       }.bind(this));
     }
-  ],
-
-  templates: [
-    function initE() {/*#U2
-      <div class="^" x:data={{this}}>
-        <center class="^buttonRow"><:back label="Undo"}/> <:forth label="Redo"}/></center>
-        {{this.canvas}}
-      </div>
-    */}
   ]
 });

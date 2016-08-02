@@ -946,9 +946,12 @@ foam.CLASS({
 
     function start(opt_nodeName) {
       /* Create a new Element and add it as a child. Return the child. */
-      var c = opt_nodeName && opt_nodeName.toE ?
+      var c =
+        foam.u2.Element.isInstance(opt_nodeName) ?
+          opt_nodeName :
+        opt_nodeName && opt_nodeName.toE ?
           opt_nodeName.toE(this.__subSubContext__ || this.__subContext__) :
-          this.E(opt_nodeName)   ;
+          this.E(opt_nodeName) ;
 
       this.add(c);
       return c;
@@ -1354,7 +1357,7 @@ foam.CLASS({
     },
     {
       name: 'toPropertyE',
-      value: function toPropertyE(X, obj) {
+      value: function toPropertyE(X) {
         return this.TextField.create(null, X);
       }
     }
@@ -1372,6 +1375,17 @@ foam.CLASS({
 
       return e;
     }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Date',
+  requires: [ 'foam.u2.DateView' ],
+  properties: [
+    [ 'toPropertyE', function(X) {
+      return this.DateView.create(null, X);
+    }]
   ]
 });
 
@@ -1460,6 +1474,36 @@ foam.CLASS({
       // TODO(braden): Add the automatic prefixing once we have the parser.
       return text.replace(/\^/g,
           '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
+    }
+  ]
+});
+
+// TODO: make a tableProperties property on AbstractClass
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'TableProperties',
+
+  properties: [
+    [ 'name', 'tableProperties' ],
+    {
+      name: 'properties',
+      factory: function() {
+        debugger;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      name: 'tableProperties',
+      postSet: function(_, properties) {
+        this.axioms_.push(foam.u2.TableProperties.create({properties: properties}));
+      }
     }
   ]
 });

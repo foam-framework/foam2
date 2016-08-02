@@ -187,7 +187,7 @@ foam.CLASS({
 
         // If the sub-Index still has values, then don't
         // delete this node.
-        if ( s.value ) {
+        if ( s.value && s.value.size() > 0 ) {
           s.size += s.value.size();
           return s;
         }

@@ -72,7 +72,13 @@ foam.CLASS({
     {
       name: 'properties',
       expression: function(of) {
-        return this.of$cls && this.of$cls.getAxiomsByClass(foam.core.Property)
+        if ( ! this.of$cls ) return undefined;
+
+        var tableProperties = this.of$cls.getAxiomByName('tableProperties');
+
+        if ( tableProperties ) return tableProperties.properties;
+
+        return this.of$cls.getAxiomsByClass(foam.core.Property)
             .filter(function(p) { return ! p.hidden; })
             .map(foam.core.Property.NAME.f)
       }

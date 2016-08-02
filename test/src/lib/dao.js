@@ -103,3 +103,29 @@ describe('MDAO', function() {
     return Promise.resolve(foam.dao.MDAO.create({ of: model }));
   });
 });
+
+describe('LazyCacheDAO', function() {
+  // test caching against an IDBDAO remote and MDAO cache.
+  genericDAOTestBattery(function(model) {
+    var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
+      .create({ name: '_test_lazyCache_', of: model });
+    return idbDAO.removeAll().then(function() {
+      var mDAO = foam.dao.MDAO.create({ of: model });
+      return foam.dao.LazyCacheDAO.create({ delegate: idbDAO, cache: mDAO });
+    });
+  });
+});
+
+describe('ReadCacheDAO', function() {
+  // test caching against an IDBDAO remote and MDAO cache.
+  genericDAOTestBattery(function(model) {
+    var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
+      .create({ name: '_test_readCache_', of: model });
+    return idbDAO.removeAll().then(function() {
+      var mDAO = foam.dao.MDAO.create({ of: model });
+      return foam.dao.ReadCacheDAO.create({ remote: idbDAO, delegate: mDAO });
+    });
+  });
+});
+
+

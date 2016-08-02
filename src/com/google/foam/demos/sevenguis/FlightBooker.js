@@ -41,11 +41,10 @@ foam.CLASS({
 
   properties: [
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'oneWay',
       value: true,
-      // TODO
-      xxxtoPropertyE: function(X) {
+      toPropertyE: function(X) {
         return X.lookup('foam.u2.tag.Select').create({
           choices: [
             [ true,  'one-way flight' ],
@@ -55,7 +54,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'Date',
+      class: 'Date',
       name: 'departDate',
       factory: function() { return new Date(Date.now()+3600000*24); },
       validate: function(departDate) {
@@ -65,7 +64,7 @@ foam.CLASS({
       }
     },
     {
-      type: 'Date',
+      class: 'Date',
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
       validate: function(oneWay, returnDate, departDate) {

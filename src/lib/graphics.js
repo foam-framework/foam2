@@ -575,6 +575,7 @@ foam.CLASS({
         this.children.push(arguments[i]);
         // this.addChild_(arguments[i]);
       }
+      this.invalidated.pub();
     },
 
     function paintSelf(x) {},
