@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
 // TODO: port MementoMgr
-//  implements: [ 'foam.memento.MementoMgr' ],
+  implements: [ 'foam.memento.MementoMgr' ],
 
   requires: [
     'foam.graphics.Circle',
@@ -152,6 +152,7 @@ foam.CLASS({
         this.updateMemento();
       }
     },
+
     function onRightClick(evt) {
       evt.preventDefault();
       if ( ! this.selected ) return;
