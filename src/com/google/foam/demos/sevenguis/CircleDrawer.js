@@ -92,7 +92,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'})/*.toE(this.__subContext__)*/;
+        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'});
       }
     },
   ],
@@ -113,14 +113,6 @@ foam.CLASS({
             end().
           end();
     },
-    /*
-      TODO: Need a canvas Element.
-    function initHTML() {
-      this.SUPER();
-      this.canvas.$.addEventListener('click',       this.onClick);
-      this.canvas.$.addEventListener('contextmenu', this.onRightClick);
-    },
-    */
 
     function addCircle(x, y, opt_d) {
       var c = this.Circle.create({
