@@ -44,8 +44,7 @@ foam.CLASS({
       type: 'Boolean',
       name: 'oneWay',
       value: true,
-      // TODO
-      xxxtoPropertyE: function(X) {
+      toPropertyE: function(X) {
         return X.lookup('foam.u2.tag.Select').create({
           choices: [
             [ true,  'one-way flight' ],
