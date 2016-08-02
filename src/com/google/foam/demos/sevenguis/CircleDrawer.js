@@ -160,7 +160,7 @@ foam.CLASS({
 
       // If the size is changed with the dialog, then create an updated memento
       var oldR = this.selected.r;
-      p.subscribe(p.CLOSED_TOPIC, function() {
+      p.closed.sub(function() {
         if ( this.selected.r !== oldR )
           this.updateMemento();
         p = null;
