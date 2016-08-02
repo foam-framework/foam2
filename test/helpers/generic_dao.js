@@ -345,7 +345,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         beforeEach(function(done) {
           daoFactory(test.dao.generic.Person).then(function(idao) {
             dao = idao;
-            return idao.put(mkPerson1()).then(idao.put(mkPerson2()));
+            return idao.put(mkPerson1()).then(function() { return idao.put(mkPerson2()) } );
           }).then(done);
         });
 
