@@ -946,9 +946,12 @@ foam.CLASS({
 
     function start(opt_nodeName) {
       /* Create a new Element and add it as a child. Return the child. */
-      var c = opt_nodeName && opt_nodeName.toE ?
+      var c =
+        foam.u2.Element.isInstance(opt_nodeName) ?
+          opt_nodeName :
+        opt_nodeName && opt_nodeName.toE ?
           opt_nodeName.toE(this.__subSubContext__ || this.__subContext__) :
-          this.E(opt_nodeName)   ;
+          this.E(opt_nodeName) ;
 
       this.add(c);
       return c;
