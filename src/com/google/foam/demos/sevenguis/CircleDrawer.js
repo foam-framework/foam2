@@ -92,7 +92,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'}).toE(this.__subContext__);
+        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'})/*.toE(this.__subContext__)*/;
       }
     },
   ],
@@ -126,10 +126,12 @@ foam.CLASS({
       var c = this.Circle.create({
         x: x,
         y: y,
-        r: opt_d || 25,
+        radius: opt_d || 25,
         color: this.UNSELECTED_COLOR,
         border: 'black'});
-      this.canvas.addChild(c);
+
+      this.canvas.addChildren(c);
+
       return c;
     },
 
@@ -148,7 +150,7 @@ foam.CLASS({
 
   listeners: [
     function onClick(evt) {
-      var x = evt.offsetX, y = evt.offsetY, c = this.canvas.findChildAt(x, y);
+      var x = evt.offsetX, y = evt.offsetY, c = null; // this.canvas.findChildAt(x, y);
       if ( c ) {
         this.selected = c;
       } else {
