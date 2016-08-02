@@ -90,7 +90,7 @@ foam.CLASS({
       this.ignore_ = false;
     },
 
-    dumpState: function(spot) {
+    function dumpState(spot) {
       // Uncomment for debugging
       /*
       console.log('--- ', spot);
