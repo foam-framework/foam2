@@ -48,7 +48,11 @@ foam.CLASS({
   methods: [
     function initE() {
       this.cssClass(this.myCls());
+      this.link();
+    },
 
+    function link() {
+      // Template method, can be overriden by sub-classes
       this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
     },
 
