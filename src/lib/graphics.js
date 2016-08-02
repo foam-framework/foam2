@@ -518,7 +518,7 @@ foam.CLASS({
         if ( c ) return c;
       }
 
-      if ( this.hitTest(sp) ) {
+      if ( this.hitTest(p) ) {
         return this;
       }
     },
