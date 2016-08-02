@@ -86,10 +86,6 @@ foam.CLASS({
       },
     },
     {
-      name: 'mementoValue',
-      factory: function() { return this.memento$; }
-    },
-    {
       name: 'canvas',
       factory: function() {
         return this.CView.create({width: 600, height: 500, background: '#f3f3f3'});
