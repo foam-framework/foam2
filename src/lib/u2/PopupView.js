@@ -71,7 +71,7 @@ foam.CLASS({
           top: 0,
           zIndex: 998
         }).
-        on('click', this.close.bind(this)).
+        on('click', this.remove.bind(this)).
         write(this.__context__);
 
       this.
@@ -84,10 +84,6 @@ foam.CLASS({
         onunload.sub(bg.remove.bind(bg));
 
       parent.style({position: 'relative'});
-    },
-
-    function close() {
-      this.remove();
     }
   ]
 });
