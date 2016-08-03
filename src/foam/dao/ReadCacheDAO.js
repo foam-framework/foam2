@@ -35,7 +35,9 @@ foam.CLASS({
   properties: [
     {
       /** The source DAO on which to add caching. Writes go straight
-        to the src, and cache is updated to match. */
+        to the src, and cache is updated to match.
+        TODO: can this be a proxy? Resolve the constistency issue addressed
+        in the current put/remove methods. */
       name: 'src',
       postSet: function(old, src) {
         if ( old ) {
@@ -55,10 +57,11 @@ foam.CLASS({
     },
     {
       name: 'delegate',
+      forwards: [ 'find', 'select' ], // don't forward put/remove/removeAll
       expression: function(src, cache) {
         // Preload src into cache, then proxy everything to cache that we
         // don't override explicitly.
-        return this.PreloadDAO.create({ delegate: this.cache, src: this.src });
+        return this.PreloadDAO.create({ delegate: cache, src: src });
       }
     },
     {
