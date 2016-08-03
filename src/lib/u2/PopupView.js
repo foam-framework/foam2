@@ -92,33 +92,42 @@ foam.CLASS({
     openOn: function(parent) {
       var self     = this;
       var document = this.document;
-      var bg       = document.createElement('div');
-      var div      = document.createElement('div');
 
-      bg.style.width = bg.style.height = '10000px';
-      bg.style.opacity = 0;
-      bg.style.position = 'fixed';
-      bg.style.top = '0';
-      bg.style.zIndex = 998;
-      div.style.zIndex = 999;
+      var div = this.E('div').
+        cssClass(this.myCls()).
+        style({
+          zIndex: 999
+        });
+
+      var bg = this.E('div').
+        style({
+          width: '10000px',
+          height: '10000px',
+          opacity: 0,
+          top: 0,
+          zIndex: 998
+        });
 
       if ( ! this.y ) this.y = (parent.clientHeight - this.height)/2;
-      if ( ! this.x ) this.x = (parent.clientWidth - this.width)/2;
-      div.className = 'popup';
-      div.style.left = this.x + 'px';
-      div.style.top  = this.y + 'px';
+      if ( ! this.x ) this.x = (parent.clientWidth  - this.width )/2;
 
-      if ( this.width )     div.style.width     = this.width     + 'px';
-      if ( this.height )    div.style.height    = this.height    + 'px';
-      if ( this.maxWidth )  div.style.maxWidth  = this.maxWidth  + 'px';
-      if ( this.maxHeight ) div.style.maxHeight = this.maxHeight + 'px';
+      div.style({
+        left: this.x + 'px',
+        top: this.y + 'px'
+      });
 
-      parent.style.position = 'relative';
+      if ( this.width )     div.style({width    : this.width     + 'px'});
+      if ( this.height )    div.style({height   : this.height    + 'px'});
+      if ( this.maxWidth )  div.style({maxWidth : this.maxWidth  + 'px'});
+      if ( this.maxHeight ) div.style({maxHeight: this.maxHeight + 'px'});
+
+      parent.style({position: 'relative'});
+
       div.id = this.id;
       div.innerHTML = this.view.toHTML();
 
       document.body.appendChild(bg);
-      bg.addEventListener('click', function() {
+      bg.on('click', function() {
         div.remove();
         bg.remove();
         self.destroy();
@@ -130,7 +139,7 @@ foam.CLASS({
     },
 
     close: function() {
-      this.$ && this.$.remove();
+      this.remove();
     },
 
     destroy: function( isParentDestroyed ) {
