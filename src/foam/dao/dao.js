@@ -1060,6 +1060,18 @@ foam.CLASS({
   ]
 });
 
+foam.LIB({
+  name: 'foam.String',
+  methods: [
+    {
+      name: 'daoize',
+      code: foam.Function.memoize1(function(str) {
+        // Turns SomeClassName into someClassNameDAO.
+        return str.substring(0, 1).toLowerCase() + str.substring(1) + 'DAO';
+      })
+    }
+  ]
+});
 
 /*
 TODO:
