@@ -26,24 +26,9 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Function',
+      class: 'foam.u2.ViewFactory',
       name: 'rowFactory',
-      required: true,
-//    documentation: 'Three options: a class name (eg. "my.app.ui.Foo"), an ' +
-//        'actual class object, or a function(args, context) returning an ' +
-//        'Element.',
-      adapt: function(old, nu) {
-        if ( typeof nu === 'function' ) return nu;
-
-        if ( typeof nu === 'string' ) {
-          return function(args, ctx) {
-            return ctx.lookup(nu).create(args, ctx);
-          };
-        }
-        return function(args, ctx) {
-          return nu.create(args, ctx);
-        };
-      }
+      required: true
     },
     {
       name: 'rows_',
@@ -65,33 +50,43 @@ foam.CLASS({
 
     function reloadData() {
       this.data.select({
-        put: this.onDAOPut,
+        put: this.daoPut,
         eof: function() { }
       });
     }
   ],
 
   listeners: [
-    function onDAOPut(obj) {
+    function daoPut(obj) {
       if ( this.rows_[obj.id] ) {
         this.rows_[obj.id].data = obj;
         return;
       }
 
       var ctx   = this.__subContext__.createSubContext();
-      var child = this.rowFactory({ data: obj }, ctx);
-      child.on('click', this.rowClick.pub.bind(this.rowClick, obj));
+      var child = this.rowFactory$f({ data: obj }, ctx);
+      child.on('click', function() {
+        this.rowClick.pub(child.data);
+      }.bind(this));
 
       this.rows_[obj.id] = child;
       this.add(child);
     },
+    function onDAOPut(_, __, ___, obj) {
+      this.daoPut(obj);
+    },
 
-    function onDAORemove(obj) {
+    function daoRemove(obj) {
       if ( this.rows_[obj.id] ) {
         this.removeChild(this.rows_[obj.id]);
         delete this.rows_[obj.id];
       }
     },
+    function onDAORemove(_, __, ___, obj) {
+      this.daoRemove(obj);
+    },
+
+
 
     function onDAOReset() {
       this.removeAllChildren();

@@ -334,3 +334,10 @@ describe('Date', function() {
   //   expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
   // });
 });
+
+describe('String.daoize', function() {
+  it('should convert "FooBar" to "fooBarDAO"', function() {
+    expect(foam.String.daoize('Foo')).toBe('fooDAO');
+    expect(foam.String.daoize('FooBar')).toBe('fooBarDAO');
+  });
+});

@@ -123,9 +123,22 @@ describe('ReadCacheDAO', function() {
       .create({ name: '_test_readCache_', of: model });
     return idbDAO.removeAll().then(function() {
       var mDAO = foam.dao.MDAO.create({ of: model });
-      return foam.dao.ReadCacheDAO.create({ remote: idbDAO, delegate: mDAO });
+      return foam.dao.ReadCacheDAO.create({ src: idbDAO, cache: mDAO });
     });
   });
 });
+
+
+// describe('(Promised)CacheDAO', function() {
+//   // test caching against an IDBDAO remote and MDAO cache.
+//   genericDAOTestBattery(function(model) {
+//     var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
+//       .create({ name: '_test_promiseCache_', of: model });
+//     return idbDAO.removeAll().then(function() {
+//       var mDAO = foam.dao.MDAO.create({ of: model });
+//       return foam.dao.CachingDAO.create({ src: idbDAO, cache: mDAO });
+//     });
+//   });
+// });
 
 

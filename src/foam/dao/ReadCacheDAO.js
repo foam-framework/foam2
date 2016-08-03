@@ -18,8 +18,8 @@
 
 /**
   ReadCacheDAO will do all queries from its fast delegate (cache). Writes
-  are sent through to the remote, which will eventually update the cache.
-  The cache maintains full copy of the remote, but the remote is the source
+  are sent through to the src, which will eventually update the cache.
+  The cache maintains full copy of the src, but the src is the source
   of truth.
 */
 foam.CLASS({
@@ -28,39 +28,57 @@ foam.CLASS({
 
   extends: 'foam.dao.ProxyDAO',
 
+  requires: [
+    'foam.dao.PreloadDAO',
+  ],
+
   properties: [
     {
-      name: 'remote',
-      postSet: function() { this.tryPreLoad(); }
+      /** The source DAO on which to add caching. Writes go straight
+        to the src, and cache is updated to match. */
+      name: 'src',
+      postSet: function(old, src) {
+        if ( old ) {
+          old.on.put.unsub(this.onSrcPut);
+          old.on.remove.unsub(this.onSrcRemove);
+          old.on.reset.unsub(this.onSrcReset);
+        }
+        src.on.put.sub(this.onSrcPut);
+        src.on.remove.sub(this.onSrcRemove);
+        src.on.reset.sub(this.onSrcReset);
+      }
+    },
+    {
+      /** The cache to read items quickly. Cache contains a complete
+        copy of src. */
+      name: 'cache',
     },
     {
       name: 'delegate',
-      postSet: function() { this.tryPreLoad(); }
+      expression: function(src, cache) {
+        // Preload src into cache, then proxy everything to cache that we
+        // don't override explicitly.
+        return this.PreloadDAO.create({ delegate: this.cache, src: this.src });
+      }
     },
     {
       name: 'model',
-      expression: function(delegate, remote) {
-        return delegate.model || remote.model;
+      expression: function(delegate, src) {
+        return src.model || cache.model;
       }
     }
   ],
 
   methods: [
-    function tryPreLoad() {
-      // pre-load contents of remote into cache
-      // TODO: replace this with the same kind of linkage as LazyCacheDAO
-      // ends up with (make listener expression dependent on two props)
-      this.delegate && this.remote && this.remote.pipe(this.delegate);
-    },
     function put(obj) {
       var self = this;
-      return self.remote.put(obj).then(
+      return self.src.put(obj).then(
         function(obj) { return self.delegate.put(obj); }
       );
     },
     function remove(obj) {
       var self = this;
-      return self.remote.remove(obj).then(
+      return self.src.remove(obj).then(
         function(obj) { return self.delegate.remove(obj)
           .catch(function() {}); // don't fail on double remove
         }
@@ -68,11 +86,23 @@ foam.CLASS({
     },
     function removeAll(skip, limit, order, predicate) {
       var self = this;
-      return self.remote.removeAll(skip, limit, order, predicate).then(
+      return self.src.removeAll(skip, limit, order, predicate).then(
         function(obj) {
           return self.delegate.removeAll(skip, limit, order, predicate);
         }
       );
     },
+  ],
+
+  listeners: [
+    function onSrcPut(s, on, put, obj) {
+      this.cache.put(obj);
+    },
+    function onSrcRemove(s, on, remove, obj) {
+      this.cache.remove(obj);
+    },
+    function onSrcReset() {
+      // TODO: Should this removeAll from the cache?
+    }
   ]
 });
