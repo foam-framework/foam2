@@ -330,9 +330,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'document',
     'elementValidator',
-    'getElementById',
-    'framed'
+    'framed',
+    'getElementById'
   ],
 
   topics: [
@@ -1090,10 +1091,9 @@ foam.CLASS({
       return f;
     },
 
-    function write(opt_X /* | GLOBAL */) {
+    function write() {
       /* Write Element to document. For testing purposes. */
-      opt_X = opt_X || foam.__context__;
-      opt_X.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
+      this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
       this.load();
       return this;
     },
@@ -1439,9 +1439,7 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() {
-        return new WeakMap();
-      }
+      factory: function() { return new WeakMap(); }
     }
   ],
 
