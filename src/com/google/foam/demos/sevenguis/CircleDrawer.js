@@ -73,24 +73,13 @@ foam.CLASS({
   ],
 
   properties: [
+    'feedback_',
     {
       name: 'selected',
       postSet: function(o, n) {
         if ( o ) o.color = this.UNSELECTED_COLOR;
         if ( n ) n.color = this.SELECTED_COLOR;
       }
-    },
-    {
-      name: 'memento',
-      postSet: function(_, m) {
-        if ( this.feedback_ ) return;
-        this.canvas.removeAllChildren();
-        for ( var i = 0 ; i < m.length ; i++ ) {
-          var c = m[i];
-          this.addCircle(c.x, c.y, c.r);
-        }
-        this.selected = null;
-      },
     },
     {
       name: 'canvas',
@@ -103,7 +92,19 @@ foam.CLASS({
   methods: [
 
     function initE() {
-      this.nodeName = 'div';
+      this.memento$.sub(function() {
+        var m = this.memento;
+        if ( this.feedback_ ) return;
+        this.canvas.children = [];
+        if ( m ) {
+          for ( var i = 0 ; i < m.length ; i++ ) {
+            var c = m[i];
+            this.addCircle(c.x, c.y, c.radius);
+          }
+        }
+        this.selected = null;
+      }.bind(this));
+
       this.
           cssClass(this.myCls()).
           start('center').
@@ -118,11 +119,11 @@ foam.CLASS({
           end();
     },
 
-    function addCircle(x, y, opt_d) {
+    function addCircle(x, y, opt_r) {
       var c = this.Circle.create({
         x: x,
         y: y,
-        radius: opt_d || 25,
+        radius: opt_r || 25,
         color: this.UNSELECTED_COLOR,
         border: 'black'});
 
@@ -136,7 +137,7 @@ foam.CLASS({
       var cs = this.canvas.children;
       for ( var i = 0 ; i < cs.length ; i++ ) {
         var c = cs[i];
-        m.push({x: c.x, y: c.y, r: c.r});
+        m.push({x: c.x, y: c.y, radius: c.radius});
       }
       this.feedback_ = true;
       this.memento = m;
@@ -157,17 +158,21 @@ foam.CLASS({
 
     function onRightClick(evt) {
       evt.preventDefault();
+
       if ( ! this.selected ) return;
 
-      var p = this.PopupView.create({view: this.DiameterDialog.create({data: this.selected}), width: 450, height: 110});
+      var p = this.PopupView.create({
+        view: this.DiameterDialog.create({data: this.selected}),
+        width: 450,
+        height: 110
+      });
+
       this.add(p);
 
       // If the size is changed with the dialog, then create an updated memento
-      var oldR = this.selected.r;
+      var oldR = this.selected.radius;
       p.onunload.sub(function() {
-        if ( this.selected.r !== oldR )
-          this.updateMemento();
-        p = null;
+        if ( this.selected.radius !== oldR ) this.updateMemento();
       }.bind(this));
     }
   ]
