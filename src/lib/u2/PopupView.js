@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'PopupView',
-  extends: 'foam.ui.SimpleView',
+  extends: 'foam.u2.Element',
 
   imports: [
     'document'
@@ -27,7 +27,7 @@ foam.CLASS({
   topics: [
     'closed'
   ],
-    
+
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
@@ -50,27 +50,62 @@ foam.CLASS({
       name: 'view',
       // type: 'foam.ui.View',
     },
-    {
-      name: 'x'
-    },
-    {
-      name: 'y'
-    },
-    {
-      name: 'width'
-    },
-    {
-      name: 'maxWidth'
-    },
-    {
-      name: 'maxHeight'
-    },
-    {
-      name: 'height'
-    }
+    'x',
+    'y',
+    'width',
+    'maxWidth',
+    'maxHeight',
+    'height'
   ],
 
-  methods: {
+  methods: [
+    function initE() {
+      var self     = this;
+      var document = this.document;
+      var parent   = this.parentNode;
+
+      if ( ! this.y ) this.y = (parent.clientHeight - this.height)/2;
+      if ( ! this.x ) this.x = (parent.clientWidth  - this.width )/2;
+
+      this.nodeName = 'div';
+
+      this.
+        cssClass(this.myCls()).
+        style({
+          zIndex: 999,
+          left:   this.x + 'px',
+          top:    this.y + 'px'
+        }).
+        add(this.view);
+
+      var bg = this.E('div').
+        style({
+          width: '10000px',
+          height: '10000px',
+          opacity: 0,
+          top: 0,
+          zIndex: 998
+        });
+
+      if ( this.width )     this.style({width    : this.width     + 'px'});
+      if ( this.height )    this.style({height   : this.height    + 'px'});
+      if ( this.maxWidth )  this.style({maxWidth : this.maxWidth  + 'px'});
+      if ( this.maxHeight ) this.style({maxHeight: this.maxHeight + 'px'});
+
+      parent.style({position: 'relative'});
+
+      /*
+      document.body.appendChild(bg);
+      bg.on('click', function() {
+        div.remove();
+        bg.remove();
+        self.destroy();
+        self.closed.pub();
+      });
+      */
+    },
+
+    /*
     open: function() {
       if ( this.$ ) return;
       var document = this.X.document;
@@ -88,64 +123,18 @@ foam.CLASS({
       document.body.appendChild(div);
       this.view.initHTML();
     },
+    */
 
-    openOn: function(parent) {
-      var self     = this;
-      var document = this.document;
-
-      var div = this.E('div').
-        cssClass(this.myCls()).
-        style({
-          zIndex: 999
-        });
-
-      var bg = this.E('div').
-        style({
-          width: '10000px',
-          height: '10000px',
-          opacity: 0,
-          top: 0,
-          zIndex: 998
-        });
-
-      if ( ! this.y ) this.y = (parent.clientHeight - this.height)/2;
-      if ( ! this.x ) this.x = (parent.clientWidth  - this.width )/2;
-
-      div.style({
-        left: this.x + 'px',
-        top: this.y + 'px'
-      });
-
-      if ( this.width )     div.style({width    : this.width     + 'px'});
-      if ( this.height )    div.style({height   : this.height    + 'px'});
-      if ( this.maxWidth )  div.style({maxWidth : this.maxWidth  + 'px'});
-      if ( this.maxHeight ) div.style({maxHeight: this.maxHeight + 'px'});
-
-      parent.style({position: 'relative'});
-
-      div.id = this.id;
-      div.innerHTML = this.view.toHTML();
-
-      document.body.appendChild(bg);
-      bg.on('click', function() {
-        div.remove();
-        bg.remove();
-        self.destroy();
-        self.closed.pub();
-      });
-
-      parent.appendChild(div);
-      this.view.initHTML();
-    },
-
-    close: function() {
+    function close() {
       this.remove();
-    },
+    }
 
+    /*
     destroy: function( isParentDestroyed ) {
       this.SUPER(isParentDestroyed);
       this.close();
       this.view.destroy();
     }
-  }
+    */
+  ]
 });
