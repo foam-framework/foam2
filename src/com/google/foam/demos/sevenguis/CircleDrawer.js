@@ -66,7 +66,7 @@ foam.CLASS({
               cssClass(this.myCls()).
               add('Adjust the diameter of the circle at (', this.data.x$, ', ', this.data.y$, ').').
               tag('br').
-              start(this.RangeView.create({data$: this.data.radius$, maxValue: 200, onKey: true})).end();
+              add(this.RangeView.create({data$: this.data.radius$, maxValue: 200, onKey: true}));
         }
       ]
     }
@@ -105,6 +105,7 @@ foam.CLASS({
     function initE() {
       this.nodeName = 'div';
       this.
+          cssClass(this.myCls()).
           start('center').
             cssClass('^buttonRow').
             start(this.BACK,  {label: 'Undo'}).end().
@@ -163,7 +164,7 @@ foam.CLASS({
 
       // If the size is changed with the dialog, then create an updated memento
       var oldR = this.selected.r;
-      p.closed.sub(function() {
+      p.onunload.sub(function() {
         if ( this.selected.r !== oldR )
           this.updateMemento();
         p = null;
