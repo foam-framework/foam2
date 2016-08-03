@@ -133,14 +133,10 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      var m = [];
-      var cs = this.canvas.children;
-      for ( var i = 0 ; i < cs.length ; i++ ) {
-        var c = cs[i];
-        m.push({x: c.x, y: c.y, radius: c.radius});
-      }
       this.feedback_ = true;
-      this.memento = m;
+      this.memento = this.canvas.children.map(function(c) {
+        return {x: c.x, y: c.y, radius: c.radius};
+      });;
       this.feedback_ = false;
     }
   ],
