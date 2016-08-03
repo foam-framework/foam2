@@ -129,6 +129,65 @@ describe('ReadCacheDAO', function() {
 });
 
 
+describe('LRUDecoratorDAO', function() {
+  var mDAO;
+  var lruManager;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+
+    mDAO = foam.dao.MDAO.create({ of: test.CompA });
+    lruManager = foam.dao.LRUDecoratorDAO.create({ dao: mDAO, maxSize: 4 });
+  });
+  afterEach(function() {
+    mDAO = null;
+    lruManager = null;
+  });
+
+  it('accepts items up to its max size', function(done) {
+    // Note that MDAO and LRU do not go async for this test
+
+    mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
+    mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
+    mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
+    mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
+
+    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+      expect(counter.value).toEqual(4);
+      done();
+    });
+  });
+
+  it('clears old items to maintain its max size', function(done) {
+    // Note that MDAO and LRU do not go async for this test
+
+    mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
+    mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
+    mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
+    mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
+    mDAO.put(test.CompA.create({ id: 5, a: 'five' }));
+
+    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+      expect(counter.value).toEqual(4);
+    }).then(function() {
+      mDAO.find(1).then(function() {
+        fail("Expected no item 1 to be found");
+      },
+      function(err) {
+        //expected not to find it
+        done();
+      });
+
+    });
+
+
+
+  });
+});
 // describe('(Promised)CacheDAO', function() {
 //   // test caching against an IDBDAO remote and MDAO cache.
 //   genericDAOTestBattery(function(model) {

@@ -1,186 +1,108 @@
-// /*
-//  * @license
-//  * Copyright 2015 Google Inc. All Rights Reserved.
-//  *
-//  * Licensed under the Apache License, Version 2.0 (the "License");
-//  * you may not use this file except in compliance with the License.
-//  * You may obtain a copy of the License at
-//  *
-//  *     http://www.apache.org/licenses/LICENSE-2.0
-//  *
-//  * Unless required by applicable law or agreed to in writing, software
-//  * distributed under the License is distributed on an "AS IS" BASIS,
-//  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  * See the License for the specific language governing permissions and
-//  * limitations under the License.
-//  */
+/*
+ * @license
+ * Copyright 2015 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-// /**
-//   Manages a DAO's size by removing old items. Commonly applied inside a cache
-//   to limit the cache's size. Item freshness is tracked in a separate DAO.
-// */
-// CLASS({
-//   name: 'LRUDectoratorDAO',
-//   package: 'foam.dao',
+/**
+  Manages a DAO's size by removing old items. Commonly applied inside a cache
+  to limit the cache's size. Item freshness is tracked in a separate DAO.
+  Use as a proxy to hide the removal operations.
+*/
+foam.CLASS({
+  name: 'LRUDecoratorDAO',
+  package: 'foam.dao',
 
-//   implements: [ 'foam.dao.DAO' ],
+  requires: [ 'foam.dao.MDAO' ],
+  implements: [ 'foam.mlang.Expressions' ],
 
-//   properties: [
-//     {
-//       class: 'Int',
-//       name: 'maxSize',
-//       value: 100
-//     },
-//     {
-//       name: 'timeTrackingDAO',
-//       factory: function() {
-//         return this.MDAO.create({ of: this.LRUCacheItem });
-//       }
-//     },
-//     {
-//       /** The DAO to manage. Items will be removed if they become stale. */
-//       name: 'dao',
-//     },
-//   ],
+  properties: [
+    {
+      class: 'Int',
+      name: 'maxSize',
+      value: 100
+    },
+    {
+      name: 'trackingDAO',
+      factory: function() {
+        return this.MDAO.create({ of: this.LRUCacheItem });
+      }
+    },
+    {
+      /** The DAO to manage. Items will be removed from this DAO as needed. */
+      name: 'dao',
+      postSet: function(old, nu) {
+        if ( old ) {
+          old.on.unsub(this.onPut);
+          old.on.unsub(this.onRemove);
+          old.on.unsub(this.onReset);
+        }
+        nu.on.sub(this.onPut);
+        nu.on.sub(this.onRemove);
+        nu.on.sub(this.onReset);
+      }
+    }
+  ],
 
-//   models: [
-//     {
-//       /** Links an object id to a last-accessed timestamp */
-//       name: 'LRUCacheItem',
-//       properties: [
-//         {
-//           name: 'id',
-//         },
-//         {
-//           type: 'DateTime',
-//           name: 'timestamp'
-//         }
-//       ]
-//     }
-//   ],
+  classes: [
+    {
+      /** Links an object id to a last-accessed timestamp */
+      name: 'LRUCacheItem',
+      properties: [
+        {
+          name: 'id',
+        },
+        {
+          type: 'DateTime',
+          name: 'timestamp'
+        }
+      ]
+    }
+  ],
 
-//   methods: {
-//     init: function(args) {
-//       this.SUPER();
-//       this.cache = this.cacheFactory.create({
-//         model: this.LRUCacheItem
-//       });
-//       var self = this;
-//       this.delegate.listen({
-//         remove: function(obj) {
-//           self.cache.remove(obj);
-//         }
-//       });
-//     },
-//     find: function(id, sink) {
-//       var self = this;
-//       this.cache.find(id, {
-//         put: function(obj) {
-//           obj.timestamp = new Date();
-//           self.cache.put(obj, {
-//             put: function() {
-//               sink && sink.put && sink.put(obj.obj);
-//             }
-//           });
-//         },
-//         error: function() {
-//           self.delegate.find(id, {
-//             put: function(obj) {
-//               self.cache.put(self.LRUCacheItem.create({
-//                 id: id,
-//                 timestamp: new Date(),
-//                 obj: obj
-//               }), {
-//                 put: function(obj) {
-//                   sink && sink.put && sink.put(obj.obj);
-//                   self.cleanup_();
-//                 },
-//                 error: function() {
-//                   sink && sink.error && sink.error.apply(sink, arguments);
-//                 }
-//               });
-//             },
-//             error: function() {
-//               sink && sink.error && sink.error.apply(sink, arguments);
-//             }
-//           });
-//         }
-//       });
-//     },
-//     put: function(obj, sink) {
-//       var self = this;
-//       this.cache.find(obj.id, {
-//         put: function(obj) {
-//           obj.timestamp = new Date();
-//           self.cache.put(obj, {
-//             put: function(obj) {
-//               self.delegate.put(obj.obj, sink);
-//             },
-//             error: function() {
-//               sink && sink.error && sink.error.apply(this, arguments);
-//             }
-//           });
-//         },
-//         error: function() {
-//           self.cache.put(self.LRUCacheItem.create({
-//             timestamp: new Date(),
-//             id: obj.id,
-//             obj: obj
-//           }), {
-//             put: function() {
-//               self.delegate.put(obj, sink);
-//               self.cleanup_();
-//             },
-//             error: function() {
-//               sink && sink.error && sink.error.apply(this, arguments);
-//             }
-//           });
-//         }
-//       });
-//     },
-//     remove: function(obj, sink) {
-//       if ( obj.id ) var id = obj.id;
-//       else id = obj;
+  listeners: [
+    function onPut(s, on, put, obj) {
+      var self = this;
+      this.trackingDAO.put(
+        this.LRUCacheItem.create({
+          id: obj.id,
+          timestamp: Date.now()
+        })
+      ).then(function() {
+        self.cleanup();
+      });
+    },
+    function onRemove(s, on, put, obj) {
+      // ensure tracking DAO is cleaned up
+      this.trackingDAO.remove(obj);
+    },
+    function onReset(s, on, put, obj) {
+      this.trackingDAO.removeAll(obj);
+    },
+  ],
 
-//       var self = this;
-//       this.cache.remove(obj.id, {
-//         remove: function() {
-//           self.delegate.remove(obj, sink);
-//         },
-//         error: function() {
-//           sink && sink.error && sink.error('remove', obj);
-//         }
-//       });
-//     },
-//     removeAll: function(sink, options) {
-//       var self = this;
-//       this.delegate.removeAll({
-//         remove: function(obj) {
-//           self.cache.remove(obj.id, {
-//             remove: function() {
-//               sink && sink.remove && sink.remove(obj);
-//             },
-//             error: function() {
-//               // TODO: what's the right course of action here?
-//             }
-//           });
-//         },
-//         error: function() {
-//           sink && sink.error && sink.error.apply(sink, arguments);
-//         }
-//       }, options);
-//     },
-//     cleanup_: function() {
-//       // TODO: Use removeAll instead of select when
-//       // all DAOs respect skip in removeAll.
-//       var self = this;
-//       this.cache
-//         .orderBy(DESC(this.LRUCacheItem.TIMESTAMP))
-//         .skip(this.maxSize).select({
-//           put: function(obj) {
-//             self.cache.remove(obj);
-//           }
-//         });
-//     }
-//   }
-// });
+  methods: [
+    function cleanup() {
+      var self = this;
+      self.trackingDAO
+        .orderBy(this.DESC(self.LRUCacheItem.TIMESTAMP))
+        .skip(self.maxSize)
+        .select({
+          put: function(obj) {
+            self.dao.remove(obj);
+          }
+        });
+    }
+  ]
+});
