@@ -77,8 +77,8 @@ foam.CLASS({
       this.
         cssClass(this.myCls()).
         style({
-          left:   this.x + 'px',
-          top:    this.y + 'px'
+          left: this.x + 'px',
+          top:  this.y + 'px'
         }).
         add(this.view).
         onunload.sub(bg.remove.bind(bg));
