@@ -20,7 +20,6 @@ foam.CLASS({
   name: 'CircleDrawer',
   extends: 'foam.u2.Element',
 
-// TODO: port MementoMgr
   implements: [ 'foam.memento.MementoMgr' ],
 
   requires: [
@@ -38,11 +37,11 @@ foam.CLASS({
   },
 
   axioms: [
+    // TODO: Fix .actionButton CSS
     foam.u2.CSS.create({
       code: function() {/*
       ^ { width:600px; margin: 20px; }
       ^ canvas { border: 1px solid black; }
-      ^ .md-card { font-size: 20px; }
       ^ .actionButton { margin: 10px; }
       ^ input[type='range'] { width: 400px; }
       */}
@@ -105,6 +104,7 @@ foam.CLASS({
         this.selected = null;
       }.bind(this));
 
+      // TODO: label doesn't work
       this.
           cssClass(this.myCls()).
           start('center').
@@ -143,7 +143,9 @@ foam.CLASS({
 
   listeners: [
     function onClick(evt) {
-      var x = evt.offsetX, y = evt.offsetY, c = this.canvas.findFirstChildAt(x, y);
+      var x = evt.offsetX, y = evt.offsetY;
+      var c = this.canvas.findFirstChildAt(x, y);
+
       if ( c ) {
         this.selected = c;
       } else {
@@ -166,9 +168,9 @@ foam.CLASS({
       this.add(p);
 
       // If the size is changed with the dialog, then create an updated memento
-      var oldR = this.selected.radius;
+      var oldRadius = this.selected.radius;
       p.onunload.sub(function() {
-        if ( this.selected.radius !== oldR ) this.updateMemento();
+        if ( this.selected.radius !== oldRadius ) this.updateMemento();
       }.bind(this));
     }
   ]
