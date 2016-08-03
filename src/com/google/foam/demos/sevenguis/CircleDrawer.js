@@ -27,7 +27,7 @@ foam.CLASS({
     'foam.graphics.Circle',
     'foam.graphics.Box as CView',
     'foam.ui.md.ChoiceMenuView',
-    'foam.ui.PopupView'
+    'foam.u2.PopupView'
   ],
 
   exports: [ 'as data' ],
@@ -52,15 +52,22 @@ foam.CLASS({
   classes: [
     {
       name: 'DiameterDialog',
-      extends: 'foam.u2.Element',
+      extends: 'foam.u2.View',
 
-      templates: [
-        function initE() {/*#U2
-          <span x:data={{this}}>
-            Adjust the diameter of the circle at (<:x mode="read-only"/>, <:y mode="read-only"/>).<br><br>
-            <:r model_="foam.ui.RangeView" maxValue="200" onKeyMode="true"/>
-          </span>
-        */}
+      requires: [
+        'foam.graphics.Circle',
+        'foam.u2.RangeView'
+      ],
+
+      methods: [
+        function initE() {
+          this.nodeName = 'span';
+          this.
+              cssClass(this.myCls()).
+              add('Adjust the diameter of the circle at (', this.data.x$, ', ', this.data.y$, ').').
+              tag('br').
+              start(this.RangeView.create({data$: this.data.radius$, maxValue: 200, onKey: true})).end();
+        }
       ]
     }
   ],
@@ -152,7 +159,7 @@ foam.CLASS({
       if ( ! this.selected ) return;
 
       var p = this.PopupView.create({view: this.DiameterDialog.create({data: this.selected}), width: 450, height: 110});
-      p.openOn(this);
+      this.add(p);
 
       // If the size is changed with the dialog, then create an updated memento
       var oldR = this.selected.r;

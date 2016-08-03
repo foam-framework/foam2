@@ -79,7 +79,6 @@ foam.CLASS({
 
     function hasOwnPrivate_(name) {
       return this.private_ && typeof this.private_[name] !== 'undefined';
-
     },
 
     function clearPrivate_(name) {
