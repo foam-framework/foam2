@@ -1092,7 +1092,7 @@ foam.CLASS({
     },
 
     function write() {
-      /* Write Element to document. For testing purposes. */
+      /* Write Element to document. */
       this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
       this.load();
       return this;
