@@ -72,7 +72,7 @@ foam.CLASS({
           zIndex: 998
         }).
         on('click', this.remove.bind(this)).
-        write(this.__context__);
+        write();
 
       this.
         cssClass(this.myCls()).
