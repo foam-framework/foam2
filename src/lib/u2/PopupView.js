@@ -43,9 +43,9 @@ foam.CLASS({
     'x',
     'y',
     'width',
+    'height',
     'maxWidth',
-    'maxHeight',
-    'height'
+    'maxHeight'
   ],
 
   methods: [
