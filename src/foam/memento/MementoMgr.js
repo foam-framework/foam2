@@ -35,6 +35,41 @@ foam.CLASS({
     'redoSize_'
   ],
 
+  methods: [
+    function init() {
+      this.memento$.sub(this.onMementoChange);
+    },
+
+    function updateSizes() {
+      this.stackSize_ = this.stack.length;
+      this.redoSize_  = this.redo.length;
+    },
+
+    function remember(memento) {
+      this.dumpState('preRemember');
+      this.stack.push(memento);
+      this.updateSizes();
+      this.dumpState('postRemember');
+    },
+
+    function restore(memento) {
+      this.dumpState('preRestore');
+      this.ignore_ = true;
+      this.memento = memento;
+      this.ignore_ = false;
+      this.dumpState('postRestore');
+    },
+
+    function dumpState(spot) {
+      // Uncomment for debugging
+      /*
+      console.log('--- ', spot);
+      console.log('stack: ', JSON.stringify(this.stack));
+      console.log('redo: ', JSON.stringify(this.redo));
+      */
+    }
+  ],
+
   actions: [
     {
       name:  'back',
@@ -66,46 +101,12 @@ foam.CLASS({
     }
   ],
 
-  methods: [
-    function init() {
-      this.memento$.sub(this.onMementoChange);
-    },
-
-    function updateSizes() {
-      this.stackSize_ = this.stack.length;
-      this.redoSize_  = this.redo.length;
-    },
-
-    function remember(value) {
-      this.dumpState('preRemember');
-      this.stack.push(value);
-      this.updateSizes();
-      this.dumpState('postRemember');
-    },
-
-    function restore(value) {
-      this.dumpState('restore');
-      this.ignore_ = true;
-      this.memento = value;
-      this.ignore_ = false;
-    },
-
-    function dumpState(spot) {
-      // Uncomment for debugging
-      /*
-      console.log('--- ', spot);
-      console.log('stack: ', JSON.stringify(this.stack));
-      console.log('redo: ', JSON.stringify(this.redo));
-      */
-    }
-  ],
-
   listeners: [
-    function onMementoChange(_, __, oldValue, newValue) {
+    function onMementoChange(_,__,___,memento$) {
       if ( this.ignore_ ) return;
 
       // console.log('MementoMgr.onChange', oldValue, newValue);
-      this.remember(oldValue);
+      this.remember(memento$.oldValue);
       this.redo = [];
       this.updateSizes();
     }
