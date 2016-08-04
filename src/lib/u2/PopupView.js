@@ -39,7 +39,6 @@ foam.CLASS({
   ],
 
   properties: [
-    'view',
     'x',
     'y',
     'width',
@@ -80,7 +79,6 @@ foam.CLASS({
           left: this.x + 'px',
           top:  this.y + 'px'
         }).
-        add(this.view).
         onunload.sub(bg.remove.bind(bg));
 
       parent.style({position: 'relative'});
