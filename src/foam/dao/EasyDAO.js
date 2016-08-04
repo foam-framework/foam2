@@ -37,17 +37,13 @@ foam.CLASS({
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
-    //'foam.core.dao.CloningDAO',
+    'foam.dao.ReadCacheDAO',
     //'foam.core.dao.MergeDAO',
     //'foam.core.dao.MigrationDAO',
     //'foam.core.dao.StorageDAO',
-    //'foam.core.dao.SyncDAO',
-    //'foam.core.dao.SyncTrait',
-    //'foam.core.dao.sync.PollingSyncDAO',
-    //'foam.core.dao.sync.SocketSyncDAO',
+    'foam.core.dao.SyncDAO',
     //'foam.core.dao.VersionNoDAO',
-    //'foam.dao.CachingDAO',
-    //'foam.dao.ContextualizingDAO',
+    'foam.dao.ContextualizingDAO',
     //'foam.dao.DeDupDAO',
     //'foam.dao.EasyClientDAO',
     //'foam.dao.LoggingDAO',
@@ -147,12 +143,13 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'syncWithServer'
+      name: 'syncWithServer',
+      value: false
     },
     {
       class: 'Boolean',
-      name: 'sockets',
-      value: false
+      name: 'syncPolling',
+      value: true
     },
     {
       class: 'String',
@@ -171,9 +168,6 @@ foam.CLASS({
     {
       name: 'syncProperty'
     },
-    {
-      name: 'deletedProperty'
-    }
   ],
 
   constants: {
@@ -219,16 +213,16 @@ foam.CLASS({
         this.mdao = dao;
         if ( this.dedup ) dao = this.DeDupDAO.create({delegate: dao});
       } else {
-        if ( this.migrationRules && this.migrationRules.length ) {
-          dao = this.MigrationDAO.create({
-            delegate: dao,
-            rules: this.migrationRules,
-            name: this.model.id + "_" + daoModel.id + "_" + this.name
-          });
-        }
+//         if ( this.migrationRules && this.migrationRules.length ) {
+//           dao = this.MigrationDAO.create({
+//             delegate: dao,
+//             rules: this.migrationRules,
+//             name: this.model.id + "_" + daoModel.id + "_" + this.name
+//           });
+//         }
         if ( this.cache ) {
           this.mdao = this.MDAO.create(params);
-          dao = this.CachingDAO.create({
+          dao = this.ReadCacheDAO.create({
             cache: this.dedup ?
               this.mdao :
               this.DeDupDAO.create({delegate: this.mdao}),
@@ -251,39 +245,33 @@ foam.CLASS({
         dao = this.GUIDDAO.create(args);
       }
 
-      var model = this.model;
+      var cls = this.of$cls;
 
       if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
 
       if ( this.syncWithServer || this.isServer ) {
-        if ( ! this.syncProperty || ! this.deletedProperty ) {
-          if ( model.traits.indexOf('foam.core.dao.SyncTrait') != -1 ) {
-            // TODO(adamvy): This doesn't work without getPrototype();
-            // should models be built such that getPrototype() is unnecessary?
-            this.syncProperty = model.getPrototype().SYNC_PROPERTY;
-            this.deletedProperty = model.getPrototype().DELETED;
-          } else {
-            throw "Syncing with server requires the foam.core.dao.SyncTrait be applied to your model, '" + this.model.id + "'.";
+        if ( ! this.syncProperty ) {
+          this.syncProperty = cls.SYNC_PROPERTY;
+          if ( ! this.syncProperty ) {
+            throw "EasyDAO sync with class " + cls.id + " invalid. Sync requires a sync property be set, or be of a class including a property 'sync_property'.";
           }
         }
       }
 
       if ( this.syncWithServer ) {
-        var syncStrategy = this.sockets ? this.SocketSyncDAO : this.PollingSyncDAO;
-        dao = syncStrategy.create({
+        dao = this.SyncDAO.create({
           remoteDAO: this.EasyClientDAO.create({
             serverUri: this.serverUri,
-            model: model,
+            cls: cls,
             sockets: this.sockets,
             reconnectPeriod: 5000
           }),
           syncProperty: this.syncProperty,
-          deletedProperty: this.deletedProperty,
           delegate: dao,
           period: 1000
         });
         dao.syncRecordDAO = foam.dao.EasyDAO.create({
-          model: dao.SyncRecord,
+          of: dao.SyncRecord,
           cache: true,
           daoType: this.daoType,
           name: this.name + '_SyncRecords'
@@ -302,12 +290,8 @@ foam.CLASS({
         delegate: dao
       });
 
-      if ( this.cloning ) dao = this.CloningDAO.create({
-        delegate: dao
-      });
 
-
-      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.model.plural + 'DAO', delegate: dao });
+      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.of.id + 'DAO', delegate: dao });
       if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
 
       this.delegate = dao;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,3 +109,87 @@ foam.CLASS({
     }
   ]
 });
+
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'CachingDAO',
+  extends: 'foam.dao.ReadCacheDAO'
+});
+//   extends: 'foam.dao.PromisedDAO',
+
+//   classes: [
+//     {
+//       name: 'InnerCachingDAO',
+//       extends: 'foam.dao.AbstractDAO',
+//       properties: [
+//         {
+//           class: 'Proxy',
+//           of: 'foam.dao.DAO',
+//           name: 'src',
+//           forwards: [ 'put', 'remove', 'removeAll' ],
+//           postSet: function(old, src) {
+//             if ( old ) {
+//               old.on.put.unsub(this.onPut);
+//               old.on.remove.unsub(this.onRemove);
+//               old.on.reset.unsub(this.onReset);
+//             }
+//             src.on.put.sub(this.onPut);
+//             src.on.remove.sub(this.onRemove);
+//             src.on.reset.sub(this.onReset);
+//           }
+//         },
+//         {
+//           class: 'Proxy',
+//           of: 'foam.dao.DAO',
+//           name: 'cache',
+//           topics: [ 'on' ],
+//           forwards: [ 'find', 'select' ]
+//         }
+//       ],
+//       listeners: [
+//         function onPut(s, on, put, obj) {
+//           this.cache.put(obj);
+//         },
+//         function onRemove(s, on, remove, obj) {
+//           this.cache.remove(obj);
+//         },
+//         function onReset() {
+//           // TODO: Should this removeAll from the cache?
+//         }
+//       ]
+//     }
+//   ],
+
+//   properties: [
+//     {
+//       name: 'src',
+//       required: true
+//     },
+//     {
+//       name: 'cache',
+//       required: true
+//     },
+//     {
+//       name: 'promise',
+//       factory: function() {
+//         var self = this;
+//         return new Promise(function(resolve, reject) {
+//           var cache = self.cache;
+//           var src = self.src;
+
+//           // First load the src into the cache
+//           src.select(cache).then(function() {
+//             // read and writes to the appropriate dao
+//             resolve(self.InnerCachingDAO.create({
+//               src: src,
+//               cache: cache
+//             }));
+//           });
+//         });
+//       }
+//     }
+//   ]
+// });
+

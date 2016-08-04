@@ -82,6 +82,8 @@ FOAM_FILES([
   { name: "foam/dao/PreloadDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
+  { name: "foam/dao/ContextualizingDAO" },
+  { name: "foam/dao/SyncDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/IDBDAO", flags: ['web'] },
   { name: "lib/Pooled" },
