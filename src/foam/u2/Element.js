@@ -950,15 +950,17 @@ foam.CLASS({
       return this;
     },
 
-    function start(node, args) {
-      /* Create a new Element and add it as a child. Return the child. */
-      var c =
-        foam.u2.Element.isInstance(node) ?
-          node :
-        node && node.toE ?
-          node.toE(this.__subSubContext__ || this.__subContext__, args) :
-          this.E(node) ;
+    function createChild_(spec, args) {
+      if ( foam.u2.Element.isInstance(spec) ) return spec;
 
+      if ( spec && spec.toE ) return spec.toE(this.__subSubContext__ || this.__subContext__, args);
+
+      return this.E(spec) ;
+    },
+
+    function start(spec, args) {
+      /* Create a new Element and add it as a child. Return the child. */
+      var c = this.createChild_(spec, args);
       this.add(c);
       return c;
     },
