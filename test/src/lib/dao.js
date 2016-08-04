@@ -129,7 +129,7 @@ describe('ReadCacheDAO', function() {
 });
 
 
-describe('LRUDecoratorDAO', function() {
+describe('LRUDAOManager', function() {
   var mDAO;
   var lruManager;
 
@@ -141,7 +141,7 @@ describe('LRUDecoratorDAO', function() {
     });
 
     mDAO = foam.dao.MDAO.create({ of: test.CompA });
-    lruManager = foam.dao.LRUDecoratorDAO.create({ dao: mDAO, maxSize: 4 });
+    lruManager = foam.dao.LRUDAOManager.create({ dao: mDAO, maxSize: 4 });
   });
   afterEach(function() {
     mDAO = null;
@@ -163,7 +163,7 @@ describe('LRUDecoratorDAO', function() {
   });
 
   it('clears old items to maintain its max size', function(done) {
-    // Note that MDAO and LRU do not go async for this test
+
 
     mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
     mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
@@ -171,19 +171,22 @@ describe('LRUDecoratorDAO', function() {
     mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
     mDAO.put(test.CompA.create({ id: 5, a: 'five' }));
 
-    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
-      expect(counter.value).toEqual(4);
-    }).then(function() {
-      mDAO.find(1).then(function() {
-        fail("Expected no item 1 to be found");
-      },
-      function(err) {
-        //expected not to find it
-        done();
+    // LRU updates the dao slighly asynchronously, so give the notifies a
+    // frame to propagate (browser only)
+    setTimeout(function() {
+      mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+        expect(counter.value).toEqual(4);
+      }).then(function() {
+        mDAO.find(1).then(function() {
+          fail("Expected no item 1 to be found");
+        },
+        function(err) {
+          //expected not to find it
+          done();
+        });
+
       });
-
-    });
-
+    }, 100);
 
 
   });

@@ -21,7 +21,7 @@
   Use as a proxy to hide the removal operations.
 */
 foam.CLASS({
-  name: 'LRUDecoratorDAO',
+  name: 'LRUDAOManager',
   package: 'foam.dao',
 
   requires: [ 'foam.dao.MDAO' ],
@@ -44,13 +44,14 @@ foam.CLASS({
       name: 'dao',
       postSet: function(old, nu) {
         if ( old ) {
-          old.on.unsub(this.onPut);
-          old.on.unsub(this.onRemove);
-          old.on.unsub(this.onReset);
+          old.on.put.unsub(this.onPut);
+          old.on.remove.unsub(this.onRemove);
+          old.on.reset.unsub(this.onReset);
         }
-        nu.on.sub(this.onPut);
-        nu.on.sub(this.onRemove);
-        nu.on.sub(this.onReset);
+        // TODO: removeAll from nu?
+        nu.on.put.sub(this.onPut);
+        nu.on.remove.sub(this.onRemove);
+        nu.on.reset.sub(this.onReset);
       }
     }
   ],
@@ -83,11 +84,11 @@ foam.CLASS({
         self.cleanup();
       });
     },
-    function onRemove(s, on, put, obj) {
+    function onRemove(s, on, remove, obj) {
       // ensure tracking DAO is cleaned up
       this.trackingDAO.remove(obj);
     },
-    function onReset(s, on, put, obj) {
+    function onReset(s, on, reset, obj) {
       this.trackingDAO.removeAll(obj);
     },
   ],
