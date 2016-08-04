@@ -179,6 +179,7 @@ describe('LRUDAOManager', function() {
       }).then(function() {
         mDAO.find(1).then(function() {
           fail("Expected no item 1 to be found");
+          done();
         },
         function(err) {
           //expected not to find it

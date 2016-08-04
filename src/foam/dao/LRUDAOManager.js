@@ -48,11 +48,19 @@ foam.CLASS({
           old.on.remove.unsub(this.onRemove);
           old.on.reset.unsub(this.onReset);
         }
-        // TODO: removeAll from nu?
+        // TODO: Clear out items not found in trackingDAO? If both DAOs are persisted.
         nu.on.put.sub(this.onPut);
         nu.on.remove.sub(this.onRemove);
         nu.on.reset.sub(this.onReset);
       }
+    },
+    {
+      /** By starting at the current time, this should always be higher
+        than previously stored timestamps. (only relevant if trackingDAO
+        is persisted.) */
+      class: 'Int',
+      name: 'lastTimeUsed_',
+      factory: function() { return Date.now(); }
     }
   ],
 
@@ -65,7 +73,7 @@ foam.CLASS({
           name: 'id',
         },
         {
-          type: 'DateTime',
+          class: 'Int',
           name: 'timestamp'
         }
       ]
@@ -78,7 +86,7 @@ foam.CLASS({
       this.trackingDAO.put(
         this.LRUCacheItem.create({
           id: obj.id,
-          timestamp: Date.now()
+          timestamp: self.getTimestamp()
         })
       ).then(function() {
         self.cleanup();
@@ -94,6 +102,9 @@ foam.CLASS({
   ],
 
   methods: [
+    function getTimestamp() {
+      return ++this.lastTimeUsed_;
+    },
     function cleanup() {
       var self = this;
       self.trackingDAO
