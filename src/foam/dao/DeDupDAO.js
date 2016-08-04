@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DeDupDAO',
@@ -30,7 +31,7 @@ foam.CLASS({
       for ( var key in inst ) {
         var val = inst[key];
         if ( typeof val === 'string' ) {
-          inst[key] = val.intern();
+          inst[key] = foam.String.intern(val);
         }
       }
     }

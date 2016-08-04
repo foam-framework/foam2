@@ -363,7 +363,15 @@ foam.LIB({
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
       return s.substring(start+2, end);
-    }
+    },
+    (function() {
+      var map = {};
+
+      return function intern(val) {
+        /** Convert a string to an internal canonical copy. **/
+        return map[val] || (map[val] = val.toString());
+      };
+    })(),
   ]
 });
 

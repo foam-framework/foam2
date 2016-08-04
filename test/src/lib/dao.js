@@ -139,6 +139,13 @@ describe('ReadCacheDAO', function() {
   });
 });
 
+describe('DeDupDAO', function() {
+  // test caching against an IDBDAO remote and MDAO cache.
+  genericDAOTestBattery(function(model) {
+    var mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.DeDupDAO.create({ delegate: mDAO }));
+  });
+});
 
 describe('LRUDAOManager', function() {
   var mDAO;
