@@ -37,12 +37,12 @@ foam.CLASS({
   },
 
   axioms: [
-    // TODO: Fix .actionButton CSS
+    // TODO: remove '-' after ActionView when CSS naming fixed
     foam.u2.CSS.create({
       code: function() {/*
       ^ { width:600px; margin: 20px; }
       ^ canvas { border: 1px solid black; }
-      ^ .actionButton { margin: 10px; }
+      ^ .foam-u2-ActionView- { margin: 10px; }
       ^ input[type='range'] { width: 400px; }
       */}
     })
@@ -104,16 +104,14 @@ foam.CLASS({
         this.selected = null;
       }.bind(this));
 
-      // TODO: label doesn't work
       this.
           cssClass(this.myCls()).
           start('center').
-            cssClass('^buttonRow').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
             tag('br').
             start(this.canvas).
-              on('click', this.onClick).
+              on('click',       this.onClick).
               on('contextmenu', this.onRightClick).
             end().
           end();
@@ -160,10 +158,9 @@ foam.CLASS({
       if ( ! this.selected ) return;
 
       var p = this.PopupView.create({
-        view: this.DiameterDialog.create({data: this.selected}),
         width: 450,
         height: 110
-      });
+      }).add(this.DiameterDialog.create({data: this.selected}));
 
       this.add(p);
 
