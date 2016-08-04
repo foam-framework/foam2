@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/ReadCacheDAO" },
   { name: "foam/dao/PreloadDAO" },
+  { name: "foam/dao/DeDupDAO" },
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
   { name: "foam/dao/ContextualizingDAO" },

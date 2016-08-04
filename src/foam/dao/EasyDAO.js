@@ -44,7 +44,7 @@ foam.CLASS({
     'foam.core.dao.SyncDAO',
     //'foam.core.dao.VersionNoDAO',
     'foam.dao.ContextualizingDAO',
-    //'foam.dao.DeDupDAO',
+    'foam.dao.DeDupDAO',
     //'foam.dao.EasyClientDAO',
     //'foam.dao.LoggingDAO',
     //'foam.dao.TimingDAO'
