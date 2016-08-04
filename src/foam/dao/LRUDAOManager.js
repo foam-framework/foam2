@@ -18,7 +18,6 @@
 /**
   Manages a DAO's size by removing old items. Commonly applied inside a cache
   to limit the cache's size. Item freshness is tracked in a separate DAO.
-  Use as a proxy to hide the removal operations.
 */
 foam.CLASS({
   name: 'LRUDAOManager',

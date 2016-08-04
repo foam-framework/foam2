@@ -172,7 +172,8 @@ describe('LRUDAOManager', function() {
     mDAO.put(test.CompA.create({ id: 5, a: 'five' }));
 
     // LRU updates the dao slighly asynchronously, so give the notifies a
-    // frame to propagate (browser only)
+    // frame to propagate (relevant for browser only, node promises are sync-y
+    // enough to get by)
     setTimeout(function() {
       mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
         expect(counter.value).toEqual(4);
