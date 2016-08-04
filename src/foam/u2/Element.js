@@ -930,11 +930,9 @@ foam.CLASS({
       return this;
     },
 
-    function tag(opt_nodeName) {
+    function tag(spec, args) {
       /* Create a new Element and add it as a child. Return this. */
-      var c = this.E(opt_nodeName || 'br');
-      this.add(c);
-      return this;
+      return this.add(this.createChild_(spec, args));
     },
 
     function startContext(map) {
