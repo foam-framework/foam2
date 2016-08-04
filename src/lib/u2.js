@@ -945,14 +945,14 @@ foam.CLASS({
       return this;
     },
 
-    function start(opt_nodeName) {
+    function start(node, args) {
       /* Create a new Element and add it as a child. Return the child. */
       var c =
-        foam.u2.Element.isInstance(opt_nodeName) ?
-          opt_nodeName :
-        opt_nodeName && opt_nodeName.toE ?
-          opt_nodeName.toE(this.__subSubContext__ || this.__subContext__) :
-          this.E(opt_nodeName) ;
+        foam.u2.Element.isInstance(node) ?
+          node :
+        node && node.toE ?
+          node.toE(this.__subSubContext__ || this.__subContext__, args) :
+          this.E(node) ;
 
       this.add(c);
       return c;
@@ -1357,8 +1357,8 @@ foam.CLASS({
     },
     {
       name: 'toPropertyE',
-      value: function toPropertyE(X) {
-        return this.TextField.create(null, X);
+      value: function toPropertyE(X, args) {
+        return this.TextField.create(args, X);
       }
     }
   ],
@@ -1383,8 +1383,8 @@ foam.CLASS({
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
-    [ 'toPropertyE', function(X) {
-      return this.DateView.create(null, X);
+    [ 'toPropertyE', function(X, args) {
+      return this.DateView.create(args, X);
     }]
   ]
 });
@@ -1414,11 +1414,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function toE(X) {
+    function toE(X, args) {
       return X.lookup('foam.u2.ActionView').create({
         data$:  X.data$,
         action: this
-      }, X);
+      }, X).copyFrom(args || {});
     }
   ]
 });
