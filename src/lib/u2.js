@@ -17,6 +17,11 @@
 
 /*
 TODO:
+ - Remove use of E() and replace with create-ing axiom to add same behaviour.
+ - create 'inner' element which defaults to this. add() adds to inner to make
+   creating borders simple
+ - start('leftPanel') should work for locating pre-existing named spaces
+ - start, tag, and add() should use standard helper method
  - Fix handling of Slots that return arrays.
  - Properly handle insertBefore_ of an element that's already been inserted?
 */
