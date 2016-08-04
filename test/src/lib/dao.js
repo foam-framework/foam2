@@ -116,6 +116,17 @@ describe('LazyCacheDAO', function() {
   });
 });
 
+describe('CachingDAO', function() {
+  genericDAOTestBattery(function(model) {
+    var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
+      .create({ name: '_test_readCache_', of: model });
+    return idbDAO.removeAll().then(function() {
+      var mDAO = foam.dao.MDAO.create({ of: model });
+      return foam.dao.CachingDAO.create({ src: idbDAO, cache: mDAO });
+    });
+  });
+});
+
 describe('ReadCacheDAO', function() {
   // test caching against an IDBDAO remote and MDAO cache.
   genericDAOTestBattery(function(model) {
@@ -204,5 +215,3 @@ describe('LRUDAOManager', function() {
 //     });
 //   });
 // });
-
-

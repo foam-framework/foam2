@@ -112,11 +112,6 @@ foam.CLASS({
 
 
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'CachingDAO',
-  extends: 'foam.dao.ReadCacheDAO'
-});
 //   extends: 'foam.dao.PromisedDAO',
 
 //   classes: [
@@ -192,4 +187,3 @@ foam.CLASS({
 //     }
 //   ]
 // });
-

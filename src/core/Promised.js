@@ -128,6 +128,7 @@ foam.CLASS({
           name:      stateName,
           of:        this.of,
           delegates: methodNames,
+          forwards:  [],
           factory: function() {
             return this[pendingState].create();
           }

@@ -266,8 +266,8 @@ foam.CLASS({
                 var value = self.deserialize(cursor.value);
                 if (query.f(value)) {
                   var deleteReq = cursor.delete();
-                  deleteReq.transaction.addEventListener(
-                    'complete',
+                  deleteReq.addEventListener(
+                    'success',
                     function() {
                       self.pub('on','remove', value);
                     });
@@ -277,9 +277,9 @@ foam.CLASS({
                 cursor.continue();
               }
             };
-            request.transaction.oncomplete = function() {
+            request.transaction.addEventListener('complete', function() {
               resolve();
-            };
+            });
             request.onerror = function(e) {
               reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
             };
