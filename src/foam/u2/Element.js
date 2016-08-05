@@ -1383,7 +1383,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toE(X) {
+    function toE(X, args) {
       var e = this.toPropertyE(X, this);
 
       e.fromProperty && e.fromProperty(this);
@@ -1391,6 +1391,8 @@ foam.CLASS({
       if ( X.data ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      if ( args ) e.copyFrom(args);
 
       return e;
     }
