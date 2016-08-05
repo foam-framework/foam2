@@ -121,7 +121,7 @@ foam.CLASS({
       this.
           cssClass(this.myCls()).
           start('span').cssClass('prefix', 'label').add('Filter prefix: ').end().
-          start(this.PREFIX, {onKeyMode: true, type: 'search'}).end().
+          start(this.PREFIX, {onKey: true, type: 'search'}).end().
           start('div').cssClass('content').
             start('span').cssClass('summaryPane').
               start(this.FILTERED_DAO, {hardSelection$: this.selection$}).end().
