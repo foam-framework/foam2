@@ -69,7 +69,7 @@ foam.CLASS({
       name: 'prefix',
       label: 'Filter prefix',
       postSet: function(_, prefix) {
-        this.filteredDAO = this.dao.where(this.CONTAINS_IC(this.Person.SURNAME, prefix));
+        this.filteredDAO = this.dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
       }
     },
     {
