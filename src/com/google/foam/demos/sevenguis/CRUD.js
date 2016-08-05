@@ -34,6 +34,10 @@ foam.CLASS({
   name: 'CRUD',
   extends: 'foam.u2.Element',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
     'foam.u2.DetailView',
     'foam.u2.TableView',
@@ -65,7 +69,7 @@ foam.CLASS({
       name: 'prefix',
       label: 'Filter prefix',
       postSet: function(_, prefix) {
-        this.filteredDAO = this.dao.where(STARTS_WITH_IC(this.Person.SURNAME, prefix));
+        this.filteredDAO = this.dao.where(this.CONTAINS_IC(this.Person.SURNAME, prefix));
       }
     },
     {
