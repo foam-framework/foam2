@@ -26,8 +26,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
-      this.attrs({type: 'range', max: this.maxValue$});
+      this.
+        cssClass(this.myCls()).
+        attrs({type: 'range', max: this.maxValue$}).
+        attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
     }
   ]
 });
