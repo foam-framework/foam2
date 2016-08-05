@@ -830,6 +830,11 @@ foam.CLASS({
     //
     // Methods which return 'this' so they can be chained.
 
+    function setNodeName(name) {
+      this.nodeName = name;
+      return this;
+    },
+
     function setID(id) {
       /*
         Explicitly set Element's id.
@@ -1036,22 +1041,27 @@ foam.CLASS({
       return this;
     },
 
-    function setChildren(value) {
+    function setChildren(slot) {
       /**
-         value -- a Value of an array of children which set this element's
+         slot -- a Slot of an array of children which set this element's
          contents, replacing old children
       **/
       var l = function() {
         this.removeAllChildren();
-        this.add.apply(this, value.get());
+        this.add.apply(this, slot.get());
       }.bind(this);
 
-      value.sub(l);
+      slot.sub(l);
       l();
 
       return this;
     },
 
+    function call(f) {
+      f.call(this);
+
+      return this;
+    },
 
     //
     // Output Methods

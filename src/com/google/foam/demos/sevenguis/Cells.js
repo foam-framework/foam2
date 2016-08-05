@@ -119,11 +119,15 @@ foam.CLASS({
   name: 'Cells',
   extends: 'foam.u2.Element',
 
-  requires: [ 'foam.u2.tag.Input', 'foam.u2.ElementParser', 'foam.u2.PropertyView' ],
-  imports:  [ 'dynamicFn' ],
+  requires: [
+    'foam.u2.tag.Input',
+    'foam.u2.ElementParser',
+    'foam.u2.PropertyView'
+  ],
+
   exports:  [ 'as cells' ],
 
-  models: [
+  classes: [
     {
       name: 'Cell',
       extends: 'foam.u2.ReadWriteView',
@@ -133,7 +137,27 @@ foam.CLASS({
         Doesn't build inner views until value is set or user clicks on view.
         This complicates the design but saves memory and startup time.
       */},
+      axioms: [
+        foam.u2.CSS.create({
+          code: function() {/*
+            ^ > span {
+              display: block;
+              height: 15px;
+              padding: 2px;
+              width: 100%;
+            }
+            ^ > input {
+              border: none;
+              outline: 1px solid blue;
+              outline-offset: 0;
+              padding-left: 2px;
+              width: 100%;
+            }
+          */}
+        })
+      ],
       properties: [
+        [ 'nodeName', 'span' ],
         {
           name: 'formula',
           displayWidth: 10
@@ -152,6 +176,7 @@ foam.CLASS({
         }
       ],
       methods: [
+        function initE() { this.cssClass(this.myCls()); },
         function isLoaded() { return this.value; },
         function listenForLoad() { this.value$.addListener(this.onDataLoad); },
         function toReadE() { return this.E('span').add(this.value$); },
@@ -161,27 +186,37 @@ foam.CLASS({
           e.data$ = this.formula$;
           return e;
         }
-      ],
-
-      templates: [
-        function CSS() {/*
-          ^ > span {
-            display: block;
-            height: 15px;
-            padding: 2px;
-            width: 100%;
-          }
-          ^ > input {
-            border: none;
-            outline: 1px solid blue;
-            outline-offset: 0;
-            padding-left: 2px;
-            width: 100%;
-          }
-        */},
-        function initE(){/*#U2<span class="^"></span>*/}
       ]
     }
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+      ^ tr, ^ td, ^ th, ^ input {
+        color: #333;
+        font: 13px roboto, arial, sans-serif;
+      }
+      ^ tr { height: 26px; }
+      ^cell { min-width: 102px; }
+      ^, ^ th, ^ td { border: 1px solid #ccc; }
+      ^ td { height: 100%; }
+      ^ th, ^ td {
+        border-right: none;
+        border-bottom: none;
+      }
+      ^ th {
+        background: #eee;
+        color: #333;
+        padding: 2px 18px;
+      }
+      ^ {
+        border-left: none;
+        border-top: none;
+        overflow: auto;
+      }
+      */}
+    })
   ],
 
   properties: [
@@ -212,9 +247,52 @@ foam.CLASS({
 
 this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>","B0":"<b><u>IndexedDB</u></b>","C0":"<b><u>DAO</u></b>","A1":"Create Albums","B1":"190","C1":"366","A2":"Create Photos","B2":"2772","C2":"2492","A3":"Select All Albums","B3":"168","C3":"1.93","A4":"Select All Photos","B4":"1361","C4":"3.86","B5":"1.43","C5":"0.06","B6":"1.56","C6":"0.63","B7":"10.28","C7":"1.12","D0":"<b><u>Speedup</u></b>","D1":"=div(B1,C1)","D2":"=div(B2,C2)","D3":"=div(B3,C3)","D4":"=div(B4,C4)","A5":"Single Key Query","D5":"=div(B5,C5)","A6":"Multi-Key Query","D6":"=div(B6,C6)","A7":"Multi-Key Query","D7":"=div(B7,C7)","A8":"Multi-Key Query","B8":"102","C8":"12.24","D8":"=div(B8,C8)","A9":"Multi-Key Query","B9":"561","C9":"15.24","D9":"=div(B9,C9)","A10":"Indexed Field Query","B10":"4.63","C10":"0.46","D10":"=div(B10,C10)","A11":"Ad-Hoc Query","B11":"658","C11":"9.91","D11":"=div(B11,C11)","A12":"Simple Inner-Join","B12":"721","C12":"9.55","D12":"=div(B12,C12)","A13":"Inner-Join Aggregation","B13":"647","C13":"38.56","D13":"=div(B13,C13)","A14":"Order-By","B14":"59","C14":"0.55","D14":"=div(B14,C14)","A15":"Order and Group By","B15":"1232","C15":"3.63","D15":"=div(B15,C15)","A16":"<b>Average:</b>","B16":"=SUM(B1:B15)","C16":"=SUM(C1:C15)","D16":"=div(B14,C14)"});
     },
+
+    function initE() {
+      this.setNodeName('table').cssClass(this.myCls()).attrs({cellspacing: 0}).
+        start('tr').
+          tag('th').
+          call(function () {
+            for ( var i = 0 ; i < this.columns ; i++ ) {
+              this.start('th').add(String.fromCharCode(65 + i)).end();
+            }
+          }).
+        end().
+        call(function() {
+          for ( var i = 0 ; i < this.rows ; i++ ) {
+            this.start('tr').
+              start('th').add(i).end().
+              start('td').
+                call(function() {
+                  for ( var j = 0 ; j < this.columns ; j++ ) {
+                    this.add(this.cell(this.cellName(j, i)));
+                  }
+                }).
+              end().
+            end();
+          }
+        });
+    },
+
+              /*
+    function initE() {
+      <table class="^" cellspacing="0">
+        <tr>
+          <th></th>
+          <th repeat="j in 0 .. this.columns-1">{{String.fromCharCode(65 + j)}}</th>
+        </tr>
+        <tr repeat="i in 0 .. this.rows-1">
+          <th>{{i}}</th>
+          <td class="^cell" repeat="j in 0 .. this.columns-1">{{this.cell(this.cellName(j, i))}}</td>
+        </tr>
+      </table>
+    },
+                */
+
     function loadCells(map) {
       for ( var key in map ) this.cell(key).formula = String(map[key]);
     },
+
     function save() {
       var map = {};
       for ( var key in this.cells ) {
@@ -223,7 +301,9 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
       }
       return map;
     },
+
     function cellName(c, r) { return String.fromCharCode(65 + c) + r; },
+
     function cell(name) {
       var self = this;
       var cell = this.cells[name];
@@ -242,41 +322,5 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
     }
   ],
   templates: [
-    function CSS() {/*
-      ^ tr, ^ td, ^ th, ^ input {
-        color: #333;
-        font: 13px roboto, arial, sans-serif;
-      }
-      ^ tr { height: 26px; }
-      ^cell { min-width: 102px; }
-      ^, ^ th, ^ td { border: 1px solid #ccc; }
-      ^ td { height: 100%; }
-      ^ th, ^ td {
-        border-right: none;
-        border-bottom: none;
-      }
-      ^ th {
-        background: #eee;
-        color: #333;
-        padding: 2px 18px;
-      }
-      ^ {
-        border-left: none;
-        border-top: none;
-        overflow: auto;
-      }
-    */},
-    function initE() {/*#U2
-      <table class="^" cellspacing="0">
-        <tr>
-          <th></th>
-          <th repeat="j in 0 .. this.columns-1">{{String.fromCharCode(65 + j)}}</th>
-        </tr>
-        <tr repeat="i in 0 .. this.rows-1">
-          <th>{{i}}</th>
-          <td class="^cell" repeat="j in 0 .. this.columns-1">{{this.cell(this.cellName(j, i))}}</td>
-        </tr>
-      </table>
-    */}
   ]
 });
