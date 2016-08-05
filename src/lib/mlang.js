@@ -893,8 +893,8 @@ foam.CLASS({
     function HAS(a) { return this._unary_("Has", a); },
     function NOT(a) { return this._unary_("Not", a); },
     function KEYWORD(a) { return this._unary_("Keyword", a); },
-    function STARTS_WITH(a) { return this._binary_("StartsWith", a); },
-    function STARTS_WITH_IC(a) { return this._binary_("StartsWithIC", a); },
+    function STARTS_WITH(a, b) { return this._binary_("StartsWith", a); },
+    function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
