@@ -18,6 +18,17 @@ foam.CLASS({
 
   exports: [ 'as board' ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+      ^ {
+        border: 1px solid gray;
+        display: inline-block;
+      }
+      */}
+    })
+  ],
+
   properties: [
     [ 'width', 14 ],
     [ 'height', 14 ],
@@ -38,6 +49,28 @@ foam.CLASS({
   ],
 
   methods: [
+    function initE() {
+      this.
+        cssClass(this.myCls()).
+        repeat(0, this.height-1, function(row) {
+          for ( var col = 0 ; col < this.width ; col++ ) {
+            this.start('div').
+              cssClass(this.myCls('row')).
+              add(this.cells[row][col]);
+            end();
+          }
+        });
+      /*
+      <div class="^">
+        <div class="^row" repeat="row in 0..this.height-1">
+          (( for ( var col = 0 ; col < this.width ; col++ ) { ))
+            {{this.cells[row][col]}}
+          (( } ))
+        </div>
+      </div>
+      */
+    },
+
     function forEachNeighbour(cell, f) {
       for ( var row = Math.max(0, cell.y-1) ; row < Math.min(this.height, cell.y+2) ; row++ )
         for ( var col = Math.max(0, cell.x-1) ; col < Math.min(this.width, cell.x+2) ; col++ )
@@ -49,24 +82,6 @@ foam.CLASS({
       this.forEachNeighbour(cell, function(c) { if ( c.mined ) count++; });
       return count;
     }
-  ],
-
-  templates: [
-    function CSS() {/*
-      ^ {
-        border: 1px solid gray;
-        display: inline-block;
-      }
-    */},
-    function initE() {/*#U2
-      <div class="^">
-        <div class="^row" repeat="row in 0..this.height-1">
-          (( for ( var col = 0 ; col < this.width ; col++ ) { ))
-            {{this.cells[row][col]}}
-          (( } ))
-        </div>
-      </div>
-    */}
   ],
 
   listeners: [

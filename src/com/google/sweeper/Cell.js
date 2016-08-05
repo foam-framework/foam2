@@ -20,40 +20,9 @@ foam.CLASS({
     COLOURS: [ '', 'green', 'blue', 'orange', 'red', 'red', 'red', 'red' ],
   },
 
-  properties: [
-    'x',
-    'y',
-    {
-      type: 'Int',
-      name: 'mineCount',
-      lazyFactory: function() { return this.board.getMineCount(this); }
-    },
-    {
-      type: 'Boolean',
-      name: 'covered',
-      defaultValue: true
-    },
-    {
-      type: 'Boolean',
-      name: 'marked'
-    },
-    {
-      type: 'Boolean',
-      name: 'mined',
-      factory: function() { return Math.random() < 0.18; }
-    }
-  ],
-
-  methods: [
-    function stateClass() {
-      return this.dynamic(
-        function(covered, marked) { return marked ? 'marked' : covered ? 'covered' : ''; },
-        this.covered$, this.marked$);
-    }
-  ],
-
-  templates: [
-    function CSS() {/*
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
       body { -webkit-user-select: none; }
       ^ {
         border: 1px solid gray;
@@ -77,14 +46,62 @@ foam.CLASS({
       ^.marked font { display: none; }
       ^flag { display: none; }
       ^.marked { background-color: #ccc; }
-    */},
-    function initE() {/*#U2
+      */}
+    })
+  ],
+
+  properties: [
+    'x',
+    'y',
+    {
+      type: 'Int',
+      name: 'mineCount',
+      lazyFactory: function() { return this.board.getMineCount(this); }
+    },
+    {
+      type: 'Boolean',
+      name: 'covered',
+      defaultValue: true
+    },
+    {
+      type: 'Boolean',
+      name: 'marked'
+    },
+    {
+      type: 'Boolean',
+      name: 'mined',
+      factory: function() { return Math.random() < 0.18; }
+    },
+    {
+      name: 'stateClass',
+      expression: function(covered, marked) {
+         return marked ? 'marked' : covered ? 'covered' : '';
+      }
+    }
+  ],
+
+  methods: [
+    function initE() {
+      this.
+        setNodeName('span').
+        cssClass(this.myCls()).
+        cssClass(this.stateClass$).
+        on('click',       this.sweep).
+        on('contextmenu', this.mark).
+        start('span').class(this.myClass('flag')).entity('&#x2691;').end();
+      
+      if ( this.mined ) this.entity('&#x2699;');
+      if ( ! this.mined && this.mineCount ) {
+        this.start('font').attrs({color: this.COLOURS[this.mineCount]}).add(this.mineCount).end();
+      }
+      /*
       <span class="^" class={{this.stateClass()}} onclick="sweep" oncontextmenu="mark">
         <span class="^flag">&#x2691;</span>
         <font if={{this.mined}}>&#x2699;</font>
         <font if={{!this.mined && this.mineCount}} color={{this.COLOURS[this.mineCount]}}>{{this.mineCount}}</font>
       </span>
-    */}
+      */
+    }
   ],
 
   listeners: [
