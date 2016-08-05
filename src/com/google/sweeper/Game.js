@@ -18,7 +18,7 @@ foam.CLASS({
 
   properties: [
     {
-      type: 'Int',
+      class: 'Int',
       name: 'time'
     },
     {
