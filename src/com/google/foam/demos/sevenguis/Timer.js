@@ -33,10 +33,10 @@ foam.CLASS({
         ^ { padding: 10px !important; font-size: 18px; }
         ^ .elapsed { margin-top: 10px; }
         ^ .label { display: inline-block; width: 130px; }
-        ^ button { width: 332px !important; margin-top: 16px !important; }
+        ^ .foam-u2-ActionView- { width: 332px !important; margin-top: 16px !important; }
         ^ input { margin-left: 12px; }
         ^ .foam-u2-RangeView- { width: 182px; }
-        ^ row { display: block; height: 30px; }
+        ^ row { display: block; min-height: 30px; }
       */}
     })
   ],
@@ -85,12 +85,11 @@ foam.CLASS({
     },
 
     function initE() {
-      this.nodeName = 'div';
       this.
         cssClass(this.myCls()).
-        start('row').start('span').cssClass('label').add('Elapsed Time:', this.PROGRESS).end().
+        start('row').start('span').cssClass('label').add('Elapsed Time:').end().add(this.PROGRESS).end().
         start('row').cssClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
-        start('row').start('span').cssClass('label').add('Duration:', this.DURATION).end().end().
+        start('row').start('span').cssClass('label').add('Duration:').end().add(this.DURATION).end().
         add(this.RESET);
     }
   ],
