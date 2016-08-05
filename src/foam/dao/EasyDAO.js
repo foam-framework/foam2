@@ -44,7 +44,7 @@ foam.CLASS({
     'foam.core.dao.SyncDAO',
     //'foam.core.dao.VersionNoDAO',
     'foam.dao.ContextualizingDAO',
-    'foam.dao.DeDupDAO',
+    'foam.dao.DeDupDAO'
     //'foam.dao.EasyClientDAO',
     //'foam.dao.LoggingDAO',
     //'foam.dao.TimingDAO'
@@ -167,7 +167,7 @@ foam.CLASS({
     },
     {
       name: 'syncProperty'
-    },
+    }
   ],
 
   constants: {
@@ -196,12 +196,20 @@ foam.CLASS({
 //         this.ALIASES.SYNC  = 'foam.core.dao.ChromeSyncStorageDAO';
 //       }
 
-      var daoType  = typeof this.daoType === 'string' ? this.ALIASES[this.daoType] || this.daoType : this.daoType;
-      var daoModel = typeof daoType === 'string' ? this.lookup(daoType) || global[daoType] : daoType;
-      var params   = { of: this.of, autoIndex: this.autoIndex };
+      var daoType = typeof this.daoType === 'string' ?
+        this.ALIASES[this.daoType] || this.daoType :
+        this.daoType;
+
+      var daoModel = typeof daoType === 'string' ?
+        this.lookup(daoType) || global[daoType] :
+        daoType;
+
+      var params = { of: this.of, autoIndex: this.autoIndex };
 
       if ( ! daoModel ) {
-        console.warn("EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list.");
+        this.warn(
+          "EasyDAO: Unknown DAO Type.  Add '" + daoType + "' to requires: list."
+        );
       }
 
       if ( this.name  ) params.name = this.name;
@@ -286,10 +294,9 @@ foam.CLASS({
 //         });
 //       }
 
-      if ( this.contextualize ) dao = this.ContextualizingDAO.create({
-        delegate: dao
-      });
-
+      if ( this.contextualize ) {
+        dao = this.ContextualizingDAO.create({delegate: dao});
+      }
 
 //       if ( this.timing  ) dao = this.TimingDAO.create({ name: this.of.id + 'DAO', delegate: dao });
 //       if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });

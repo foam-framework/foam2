@@ -20,7 +20,6 @@
   sequence number on DAO.put() if the properties value
   is set to the properties default value.
 */
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'SequenceNumberDAO',
@@ -31,7 +30,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.dao.InternalException',
+    'foam.dao.InternalException'
   ],
 
 

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'SyncRecord',
@@ -101,6 +100,7 @@ foam.CLASS({
         this.delegate.removeAll();
       }
     },
+
     {
       name: 'onLocalUpdate',
       isMerged: 100,

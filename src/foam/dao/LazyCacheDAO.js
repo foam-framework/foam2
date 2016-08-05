@@ -25,7 +25,6 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'LazyCacheDAO',
-
   extends: 'foam.dao.ProxyDAO',
 
   properties: [
@@ -108,7 +107,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     function find(id) {
       var self = this;
       self.cacheSync_; // ensures listeners are set TODO: express this better
