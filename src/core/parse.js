@@ -928,6 +928,18 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'String',
+  extends: 'foam.parse.ParserDecorator',
+  methods: [
+    function parse(ps, obj) {
+      ps = this.p.parse(ps, obj);
+      return ps ? ps.setValue(ps.value.join('')) : undefined;
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1202,6 +1214,14 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'Plus',
+  extends: 'foam.parse.Repeat',
+  properties: [
+    ['minimum', 1]
+  ]
+});
 
 foam.CLASS({
   package: 'foam.parse',
@@ -1433,6 +1453,19 @@ foam.CLASS({
         p: p,
         minimum: min,
         delimiter: delim
+      });
+    },
+
+    function plus(p, delim) {
+      return foam.lookup('foam.parse.Plus').create({
+        p: p,
+        delimiter: delim
+      });
+    },
+
+    function str(p) {
+      return foam.lookup('foam.parse.String').create({
+        p: p
       });
     },
 

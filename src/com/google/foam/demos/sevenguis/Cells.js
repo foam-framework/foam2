@@ -15,103 +15,120 @@
  * limitations under the License.
  */
 
-var CellParser = {
-  __proto__: grammar,
+foam.CLASS({
+  package: 'com.google.foam.demos.sevenguis',
+  name: 'CellParser',
+  extends: 'foam.parse.ImperativeGrammar',
 
-  START: alt(sym('number'), sym('formula'), sym('string')),
+  properties: [
+    {
+      name: 'symbols',
+      factory: function() {
+        return function(alt, sym, seq1, seq, literalIC, repeat, str, optional, plus, range, anyChar) {
+          return {
+            START: alt(sym('number'), sym('formula'), sym('string')),
 
-  formula: seq1(1, '=', sym('expr')),
+            formula: seq1(1, '=', sym('expr')),
 
-  expr: alt(
-    sym('number'),
-    sym('cell'),
-    sym('add'),
-    sym('sub'),
-    sym('mul'),
-    sym('div'),
-    sym('mod'),
-    sym('sum'),
-    sym('prod')
-  ),
+            expr: alt(
+              sym('number'),
+              sym('cell'),
+              sym('add'),
+              sym('sub'),
+              sym('mul'),
+              sym('div'),
+              sym('mod'),
+              sym('sum'),
+              sym('prod')
+            ),
 
-  add:  seq(literal_ic('add('),  sym('expr'), ',', sym('expr'), ')'),
-  sub:  seq(literal_ic('sub('),  sym('expr'), ',', sym('expr'), ')'),
-  mul:  seq(literal_ic('mul('),  sym('expr'), ',', sym('expr'), ')'),
-  div:  seq(literal_ic('div('),  sym('expr'), ',', sym('expr'), ')'),
-  mod:  seq(literal_ic('mod('),  sym('expr'), ',', sym('expr'), ')'),
-  sum:  seq(literal_ic('sum('),  sym('vargs'), ')'),
-  prod: seq(literal_ic('prod('), sym('vargs'), ')'),
+            add:  seq(literalIC('add('),  sym('expr'), ',', sym('expr'), ')'),
+            sub:  seq(literalIC('sub('),  sym('expr'), ',', sym('expr'), ')'),
+            mul:  seq(literalIC('mul('),  sym('expr'), ',', sym('expr'), ')'),
+            div:  seq(literalIC('div('),  sym('expr'), ',', sym('expr'), ')'),
+            mod:  seq(literalIC('mod('),  sym('expr'), ',', sym('expr'), ')'),
+            sum:  seq(literalIC('sum('),  sym('vargs'), ')'),
+            prod: seq(literalIC('prod('), sym('vargs'), ')'),
 
-  vargs: repeat(alt(sym('range'), sym('expr')), ','),
+            vargs: repeat(alt(sym('range'), sym('expr')), ','),
 
-  range: seq(sym('col'), sym('row'), ':', sym('col'), sym('row')),
+            range: seq(sym('col'), sym('row'), ':', sym('col'), sym('row')),
 
-  number: str(seq(
-    optional('-'),
-    str(alt(
-      seq(str(repeat(sym('digit'))), '.', str(plus(sym('digit')))),
-      plus(sym('digit')))))),
+            number: str(seq(
+              optional('-'),
+              str(alt(
+                seq(str(repeat(sym('digit'))), '.', str(plus(sym('digit')))),
+                plus(sym('digit')))))),
 
-  cell: seq(sym('col'), sym('row')),
+            cell: seq(sym('col'), sym('row')),
 
-  col: alt(sym('az'), sym('AZ')),
+            col: alt(sym('az'), sym('AZ')),
 
-  digit: range('0', '9'),
+            digit: range('0', '9'),
 
-  az: range('a', 'z'),
+            az: range('a', 'z'),
 
-  AZ: range('A', 'Z'),
+            AZ: range('A', 'Z'),
 
-  row: str(repeat(sym('digit'), null, 1, 2)),
+            row: str(repeat(sym('digit'), null, 1, 2)),
 
-  string: str(repeat(anyChar))
-}.addActions({
-  add: function(a) { return function(cs) { return a[1](cs) + a[3](cs); }; },
-  sub: function(a) { return function(cs) { return a[1](cs) - a[3](cs); }; },
-  mul: function(a) { return function(cs) { return a[1](cs) * a[3](cs); }; },
-  div: function(a) { return function(cs) { return a[1](cs) / a[3](cs); }; },
-  mod: function(a) { return function(cs) { return a[1](cs) % a[3](cs); }; },
-  sum: function(a) { return function(cs) {
-    var arr = a[1](cs), sum = 0;
-    for ( var i = 0 ; i < arr.length ; i++ ) sum += arr[i];
-    return sum;
-  }; },
-  prod: function(a) { return function(cs) {
-    var arr = a[1](cs), prod = 1;
-    for ( var i = 0 ; i < arr.length ; i++ ) prod *= arr[i];
-    return prod;
-  }; },
-  az:  function(c) { return c.toUpperCase(); },
-  //AZ:  function(c) { return c.charCodeAt(0) - 'A'.charCodeAt(0); },
-  row: function(c) { return parseInt(c); },
-  number: function(s) { var f = parseFloat(s); return function() { return f; }; },
-  cell: function(a) { return function(cs) { return cs.cell(a[0] + a[1]).numValue; }; },
-  vargs: function(a) {
-    return function(cs) {
-      var ret = [];
-      for ( var i = 0 ; i < a.length ; i++ ) {
-        var r = a[i](cs);
-        if ( Array.isArray(r) )
-          ret.pushAll(r);
-        else
-          ret.push(r);
+            string: str(repeat(anyChar()))
+          };
+        }
       }
-      return ret;
     }
-  },
-  range: function(a) {
-    var c1 = a[0], r1 = a[1], c2 = a[3], r2 = a[4];
-    return function(cs) {
-      var ret = [];
-      for ( var c = c1 ; c <= c2; c++ )
-        for ( var r = r1 ; r <= r2 ; r++ )
-          ret.push(cs.cell(c + r).numValue);
-      return ret;
+  ],
+  methods: [
+    function init() {
+      this.addActions({
+        add: function(a) { return function(cs) { return a[1](cs) + a[3](cs); }; },
+        sub: function(a) { return function(cs) { return a[1](cs) - a[3](cs); }; },
+        mul: function(a) { return function(cs) { return a[1](cs) * a[3](cs); }; },
+        div: function(a) { return function(cs) { return a[1](cs) / a[3](cs); }; },
+        mod: function(a) { return function(cs) { return a[1](cs) % a[3](cs); }; },
+        sum: function(a) { return function(cs) {
+          var arr = a[1](cs), sum = 0;
+          for ( var i = 0 ; i < arr.length ; i++ ) sum += arr[i];
+          return sum;
+        }; },
+        prod: function(a) { return function(cs) {
+          var arr = a[1](cs), prod = 1;
+          for ( var i = 0 ; i < arr.length ; i++ ) prod *= arr[i];
+          return prod;
+        }; },
+        az:  function(c) { return c.toUpperCase(); },
+        //AZ:  function(c) { return c.charCodeAt(0) - 'A'.charCodeAt(0); },
+        row: function(c) { return parseInt(c); },
+        number: function(s) { var f = parseFloat(s); return function() { return f; }; },
+        cell: function(a) { return function(cs) { return cs.cell(a[0] + a[1]).numValue; }; },
+        vargs: function(a) {
+          return function(cs) {
+            var ret = [];
+            for ( var i = 0 ; i < a.length ; i++ ) {
+              var r = a[i](cs);
+              if ( Array.isArray(r) )
+                ret.pushAll(r);
+              else
+                ret.push(r);
+            }
+            return ret;
+          }
+        },
+        range: function(a) {
+          var c1 = a[0], r1 = a[1], c2 = a[3], r2 = a[4];
+          return function(cs) {
+            var ret = [];
+            for ( var c = c1 ; c <= c2; c++ )
+              for ( var r = r1 ; r <= r2 ; r++ )
+                ret.push(cs.cell(c + r).numValue);
+            return ret;
+          }
+        },
+        string: function(s) { return function() { return s; }; }
+      });
     }
-  },
-  string: function(s) { return function() { return s; }; }
+  ]
 });
-
 
 // https://www.artima.com/pins1ed/the-scells-spreadsheet.html
 foam.CLASS({
@@ -122,7 +139,8 @@ foam.CLASS({
   requires: [
     'foam.u2.tag.Input',
     'foam.u2.ElementParser',
-    'foam.u2.PropertyView'
+    'foam.u2.PropertyView',
+    'com.google.foam.demos.sevenguis.CellParser'
   ],
 
   exports:  [ 'as cells' ],
@@ -228,7 +246,7 @@ foam.CLASS({
     },
     {
       name: 'parser',
-      factory: function() { return CellParser; }
+      factory: function() { return this.CellParser.create(); }
     }
   ],
 
