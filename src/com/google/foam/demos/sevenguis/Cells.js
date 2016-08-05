@@ -130,6 +130,7 @@ foam.CLASS({
   ]
 });
 
+
 // https://www.artima.com/pins1ed/the-scells-spreadsheet.html
 foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
