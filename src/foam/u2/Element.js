@@ -523,6 +523,10 @@ foam.CLASS({
     },
     {
       name: 'clickTarget_'
+    },
+    {
+      name: '__subSubContext__',
+      factory: function() { return this.__subContext__; }
     }
   ],
 
@@ -548,7 +552,7 @@ foam.CLASS({
     },
 
     function E(opt_nodeName) {
-      return (this.__subSubContext__ || this.__subContext__).E(opt_nodeName);
+      return this.__subSubContext__.E(opt_nodeName);
     },
 
     // function XXXE(opt_nodeName /* | DIV */) {
@@ -939,7 +943,7 @@ foam.CLASS({
       var m = {};
       Object.assign(m, map);
       m.__oldAddContext__ = this.__subSubContext__;
-      this.__subSubContext__ = (this.__subSubContext__ || this.__subContext__).createSubContext(m);
+      this.__subSubContext__ = this.__subSubContext__.createSubContext(m);
       return this;
     },
 
@@ -951,9 +955,9 @@ foam.CLASS({
     function createChild_(spec, args) {
       if ( foam.u2.Element.isInstance(spec) ) return spec;
 
-      if ( spec && spec.toE ) return spec.toE(this.__subSubContext__ || this.__subContext__, args);
+      if ( spec && spec.toE ) return spec.toE(this.__subSubContext__, args);
 
-      return this.E(spec) ;
+      return this.E(spec);
     },
 
     function start(spec, args) {
@@ -971,7 +975,7 @@ foam.CLASS({
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
-      var Y = this.__subSubContext__ || this.__subContext__;
+      var Y = this.__subSubContext__;
       var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
@@ -1126,7 +1130,7 @@ foam.CLASS({
 
       if ( ! Array.isArray(children) ) children = [ children ];
 
-      var Y = this.__subSubContext__ || this.__subContext__;
+      var Y = this.__subSubContext__;
       children = children.map(function(e) { return e.toE ? e.toE(Y) : e; });
 
       var index = before ? i : (i + 1);
@@ -1185,7 +1189,7 @@ foam.CLASS({
         The Element(s) are replaced when the Slot changes.
       */
       var self = this;
-      var ctx  = this.__subSubContext__ || this.__subContext__;
+      var ctx  = this.__subSubContext__;
 
       function nextE() {
         // Run Slot in same subSubContext that it was created in.
