@@ -90,30 +90,30 @@ foam.CLASS({
       value: false,
       //documentation: "Enable value de-duplication to save memory when caching."
     },
-    {
-      class: 'Boolean',
-      name: 'logging',
-      value: false,
-      //documentation: "Enable logging on the $$DOC{ref:'DAO'}."
-    },
-    {
-      class: 'Boolean',
-      name: 'timing',
-      value: false,
-      //documentation: "Enable time tracking for concurrent $$DOC{ref:'DAO'} operations."
-    },
+//     {
+//       class: 'Boolean',
+//       name: 'logging',
+//       value: false,
+//       //documentation: "Enable logging on the $$DOC{ref:'DAO'}."
+//     },
+//     {
+//       class: 'Boolean',
+//       name: 'timing',
+//       value: false,
+//       //documentation: "Enable time tracking for concurrent $$DOC{ref:'DAO'} operations."
+//     },
     {
       class: 'Boolean',
       name: 'contextualize',
       value: false,
       //documentation: "Contextualize objects on .find"
     },
-    {
-      class: 'Boolean',
-      name: 'cloning',
-      value: false,
-      //documentation: "True to clone results on select"
-    },
+//     {
+//       class: 'Boolean',
+//       name: 'cloning',
+//       value: false,
+//       //documentation: "True to clone results on select"
+//     },
     {
       name: 'daoType',
       value: 'foam.dao.IDBDAO',
@@ -135,12 +135,12 @@ foam.CLASS({
       value: false,
       //documentation: "Automatically generate an index."
     },
-    {
-      class: 'FObjectArray',
-      name: 'migrationRules',
-      of: 'foam.core.dao.MigrationRule',
-      //documentation: "Creates an internal $$DOC{ref:'MigrationDAO'} and applies the given array of $$DOC{ref:'MigrationRule'}."
-    },
+//     {
+//       class: 'FObjectArray',
+//       name: 'migrationRules',
+//       of: 'foam.core.dao.MigrationRule',
+//       //documentation: "Creates an internal $$DOC{ref:'MigrationDAO'} and applies the given array of $$DOC{ref:'MigrationRule'}."
+//     },
     {
       class: 'Boolean',
       name: 'syncWithServer',
@@ -245,54 +245,54 @@ foam.CLASS({
         dao = this.GUIDDAO.create(args);
       }
 
-      var cls = this.of$cls;
+//       var cls = this.of$cls;
 
-      if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
+//       if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
 
-      if ( this.syncWithServer || this.isServer ) {
-        if ( ! this.syncProperty ) {
-          this.syncProperty = cls.SYNC_PROPERTY;
-          if ( ! this.syncProperty ) {
-            throw "EasyDAO sync with class " + cls.id + " invalid. Sync requires a sync property be set, or be of a class including a property 'sync_property'.";
-          }
-        }
-      }
+//       if ( this.syncWithServer || this.isServer ) {
+//         if ( ! this.syncProperty ) {
+//           this.syncProperty = cls.SYNC_PROPERTY;
+//           if ( ! this.syncProperty ) {
+//             throw "EasyDAO sync with class " + cls.id + " invalid. Sync requires a sync property be set, or be of a class including a property 'sync_property'.";
+//           }
+//         }
+//       }
 
-      if ( this.syncWithServer ) {
-        dao = this.SyncDAO.create({
-          remoteDAO: this.EasyClientDAO.create({
-            serverUri: this.serverUri,
-            cls: cls,
-            sockets: this.sockets,
-            reconnectPeriod: 5000
-          }),
-          syncProperty: this.syncProperty,
-          delegate: dao,
-          period: 1000
-        });
-        dao.syncRecordDAO = foam.dao.EasyDAO.create({
-          of: dao.SyncRecord,
-          cache: true,
-          daoType: this.daoType,
-          name: this.name + '_SyncRecords'
-        });
-      }
+//       if ( this.syncWithServer ) {
+//         dao = this.SyncDAO.create({
+//           remoteDAO: this.EasyClientDAO.create({
+//             serverUri: this.serverUri,
+//             cls: cls,
+//             sockets: this.sockets,
+//             reconnectPeriod: 5000
+//           }),
+//           syncProperty: this.syncProperty,
+//           delegate: dao,
+//           period: 1000
+//         });
+//         dao.syncRecordDAO = foam.dao.EasyDAO.create({
+//           of: dao.SyncRecord,
+//           cache: true,
+//           daoType: this.daoType,
+//           name: this.name + '_SyncRecords'
+//         });
+//       }
 
-      if ( this.isServer ) {
-        dao = this.VersionNoDAO.create({
-          delegate: dao,
-          property: this.syncProperty,
-          version: 2
-        });
-      }
+//       if ( this.isServer ) {
+//         dao = this.VersionNoDAO.create({
+//           delegate: dao,
+//           property: this.syncProperty,
+//           version: 2
+//         });
+//       }
 
       if ( this.contextualize ) dao = this.ContextualizingDAO.create({
         delegate: dao
       });
 
 
-      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.of.id + 'DAO', delegate: dao });
-      if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
+//       if ( this.timing  ) dao = this.TimingDAO.create({ name: this.of.id + 'DAO', delegate: dao });
+//       if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
 
       this.delegate = dao;
     },

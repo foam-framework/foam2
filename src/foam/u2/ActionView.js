@@ -62,7 +62,11 @@ foam.CLASS({
   ],
 
   properties: [
-    'action'
+    'action',
+    {
+      name: 'label',
+      expression: function(action) { return action.label; }
+    }
   ],
 
   methods: [
@@ -73,7 +77,7 @@ foam.CLASS({
         enableCls(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
         attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })}).
         on('click', this.click).
-        add(this.action.label);
+        add(this.label$);
     }
   ],
 
