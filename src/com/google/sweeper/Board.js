@@ -40,7 +40,7 @@ foam.CLASS({
           cells[row] = [];
           for ( var col = 0 ; col < this.width ; col++ ) {
             var cell = cells[row][col] = this.Cell.create({x: col, y: row});
-            cell.covered$.addListener(this.cellUncovered);
+            cell.covered$.sub(this.cellUncovered);
           }
         }
         return cells;
@@ -50,15 +50,17 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
+
       this.
         cssClass(this.myCls()).
         repeat(0, this.height-1, function(row) {
-          for ( var col = 0 ; col < this.width ; col++ ) {
-            this.start('div').
-              cssClass(this.myCls('row')).
-              add(this.cells[row][col]);
-            end();
-          }
+          this.start('div').
+            cssClass(this.myCls('row')).
+            repeat(0, this.width-1, function(col) {
+              this.add(self.cells[row][col]);
+            }).
+          end();
         });
       /*
       <div class="^">

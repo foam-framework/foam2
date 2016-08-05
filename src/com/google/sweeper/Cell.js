@@ -88,9 +88,9 @@ foam.CLASS({
         cssClass(this.stateClass$).
         on('click',       this.sweep).
         on('contextmenu', this.mark).
-        start('span').class(this.myClass('flag')).entity('&#x2691;').end();
+        start('span').cssClass(this.myCls('flag')).entity('x2691').end();
       
-      if ( this.mined ) this.entity('&#x2699;');
+      if ( this.mined ) this.entity('x2699');
       if ( ! this.mined && this.mineCount ) {
         this.start('font').attrs({color: this.COLOURS[this.mineCount]}).add(this.mineCount).end();
       }

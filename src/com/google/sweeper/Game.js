@@ -32,8 +32,8 @@ foam.CLASS({
       this.SUPER();
       this.add(this.time$).tag('br').add(this.board);
       this.tick();
-    ]
-  },
+    }
+  ],
 
   listeners: [
     {
