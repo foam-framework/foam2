@@ -1057,6 +1057,14 @@ foam.CLASS({
       return this;
     },
 
+    function repeat(s, e, f) {
+      // TODO: support descending
+      for ( var i = s ; i <= e ; i++ ) {
+        f.call(this, i);
+      }
+      return this;
+    },
+
     function call(f) {
       f.call(this);
 
