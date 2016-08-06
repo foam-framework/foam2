@@ -271,21 +271,16 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
       this.setNodeName('table').cssClass(this.myCls()).attrs({cellspacing: 0}).
         start('tr').
           tag('th').
-          call(function () {
-            for ( var i = 0 ; i < this.columns ; i++ ) {
-              this.start('th').add(String.fromCharCode(65 + i)).end();
-            }
+          repeat(0, this.columns-1, function (i) {
+            this.start('th').add(String.fromCharCode(65 + i)).end();
           }).
         end().
-        call(function() {
-          for ( var i = 0 ; i < this.rows ; i++ ) {
+        repeat(0, this.rows-1, function(i) {
             this.start('tr').
               start('th').add(i).end().
               start('td').
-                call(function() {
-                  for ( var j = 0 ; j < this.columns ; j++ ) {
-                    this.add(this.cell(this.cellName(j, i)));
-                  }
+                repeat(0, this.columns-1, function(j) {
+                  this.add(this.cell(this.cellName(j, i)));
                 }).
               end().
             end();
