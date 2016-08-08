@@ -16,6 +16,7 @@ foam.CLASS({
 
   requires: [ 'com.google.sweeper.Cell' ],
 
+  imports: [ 'setTimeout' ],
   exports: [ 'as board' ],
 
   axioms: [
@@ -87,9 +88,10 @@ foam.CLASS({
   ],
 
   listeners: [
-    function cellUncovered(cell) {
+    function cellUncovered(e) {
+      var cell = e.src;
       if ( cell.mineCount ) return;
-      this.X.setTimeout(this.forEachNeighbour.bind(this, cell, function(c) { if ( ! c.mined ) c.covered = false; }), 32);
+      this.setTimeout(this.forEachNeighbour.bind(this, cell, function(c) { if ( ! c.mined ) c.covered = false; }), 32);
     }
   ]
 });
