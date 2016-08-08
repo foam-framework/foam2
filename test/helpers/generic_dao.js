@@ -128,13 +128,10 @@ global.genericDAOTestBattery = function(daoFactory) {
             expect(obj).toBeDefined();
             expect(obj.id).toBe(p.id);
 
-            listenerCalled = true;
-          });
-
-          dao.put(p).then(function() {
-            expect(listenerCalled).toBe(true);
             done();
           });
+
+          dao.put(p);
         });
       });
     });
@@ -255,13 +252,11 @@ global.genericDAOTestBattery = function(daoFactory) {
             expect(obj.id).toBe(p.id);
 
             listenerCalled = true;
+            done();
           });
 
           dao.put(p).then(function() {
             return dao.remove(p);
-          }).then(function() {
-            expect(listenerCalled).toBe(true);
-            done();
           });
         });
       });
