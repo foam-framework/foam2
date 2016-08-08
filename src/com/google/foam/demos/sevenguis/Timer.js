@@ -85,7 +85,6 @@ foam.CLASS({
     },
 
     function initE() {
-      this.nodeName = 'div';
       this.
         cssClass(this.myCls()).
         start('row').start('span').cssClass('label').add('Elapsed Time:', this.PROGRESS).end().
