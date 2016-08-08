@@ -41,8 +41,11 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.mlang.ExpressionsSingleton',
     'foam.dao.sync.SyncRecord'
+  ],
+
+  implements: [
+    'foam.mlang.Expressions'
   ],
 
   imports: [
@@ -73,10 +76,6 @@ foam.CLASS({
       name: 'of',
       required: true,
       transient: true
-    },
-    {
-      name: 'E',
-      factory: function() { return this.ExpressionsSingleton.create(); }
     },
     {
       class: 'Boolean',
@@ -162,7 +161,7 @@ foam.CLASS({
     },
 
     function syncFromServer() {
-      var E = this.E;
+      var E = this;
 
       this.syncRecordDAO.select(E.MAX(this.SyncRecord.SYNC_NO)).then(function(m) {
         this.remoteDAO
@@ -178,7 +177,7 @@ foam.CLASS({
     },
 
     function syncToServer() {
-      var E = this.E;
+      var E = this;
       var self = this;
 
       this.syncRecordDAO
@@ -213,4 +212,3 @@ foam.CLASS({
     }
   ]
 });
-

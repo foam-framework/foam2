@@ -168,6 +168,11 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
+
+        // Update 'listeners' before notifying because the listener
+        // may set next to null.
+        listeners = listeners.next;
+
         // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
         // ???: optional exception trapping, benchmark
@@ -184,7 +189,6 @@ foam.CLASS({
           case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
           default: l.apply(l, [s].concat(Array.from(a)));
         }
-        listeners = listeners.next;
         count++;
       }
       return count;
@@ -537,6 +541,8 @@ foam.CLASS({
           var a = this.cls_.getAxiomByName(name);
           if ( a && foam.core.Property.isInstance(a) ) {
             this[key] = o[key];
+          } else if ( opt_warn ) {
+            this.unknownArg(key, o[key]);
           }
         }
         return this;

@@ -311,7 +311,8 @@ foam.CLASS({
         get: function classGetter() {
           if ( typeof this[name] !== 'string' ) return this[name];
           return this.__context__.lookup(this[name], true);
-        }
+        },
+        configurable: true
       });
     }
   ]

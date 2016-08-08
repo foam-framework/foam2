@@ -122,7 +122,7 @@ foam.CLASS({
       this.__context__ = ctx || foam.__context__;
       if ( ! args ) return;
 
-      this.copyFrom(args);
+      this.copyFrom(args, true);
     },
 
     /**

@@ -37,7 +37,7 @@ foam.CLASS({
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
-    'foam.dao.ReadCacheDAO',
+    'foam.dao.CachingDAO',
     //'foam.core.dao.MergeDAO',
     //'foam.core.dao.MigrationDAO',
     //'foam.core.dao.StorageDAO',
@@ -230,7 +230,7 @@ foam.CLASS({
 //         }
         if ( this.cache ) {
           this.mdao = this.MDAO.create(params);
-          dao = this.ReadCacheDAO.create({
+          dao = this.CachingDAO.create({
             cache: this.dedup ?
               this.mdao :
               this.DeDupDAO.create({delegate: this.mdao}),

@@ -16,6 +16,7 @@ foam.CLASS({
 
   requires: [ 'com.google.sweeper.Cell' ],
 
+  imports: [ 'setTimeout' ],
   exports: [ 'as board' ],
 
   axioms: [
@@ -74,9 +75,14 @@ foam.CLASS({
     },
 
     function forEachNeighbour(cell, f) {
-      for ( var row = Math.max(0, cell.y-1) ; row < Math.min(this.height, cell.y+2) ; row++ )
-        for ( var col = Math.max(0, cell.x-1) ; col < Math.min(this.width, cell.x+2) ; col++ )
+      var maxRow = Math.min(this.height, cell.y+2);
+      var maxCol = Math.min(this.width, cell.x+2);
+
+      for ( var row = Math.max(0, cell.y-1) ; row < maxRow ; row++ ) {
+        for ( var col = Math.max(0, cell.x-1) ; col < maxCol ; col++ ) {
           f(this.cells[row][col]);
+        }
+      }
     },
 
     function getMineCount(cell) {
@@ -87,9 +93,17 @@ foam.CLASS({
   ],
 
   listeners: [
-    function cellUncovered(cell) {
+    function cellUncovered(e) {
+      var cell = e.src;
+
       if ( cell.mineCount ) return;
-      this.X.setTimeout(this.forEachNeighbour.bind(this, cell, function(c) { if ( ! c.mined ) c.covered = false; }), 32);
+
+      this.setTimeout(
+        this.forEachNeighbour.bind(
+          this,
+          cell,
+          function(c) { if ( ! c.mined ) c.covered = false; }),
+        32);
     }
   ]
 });
