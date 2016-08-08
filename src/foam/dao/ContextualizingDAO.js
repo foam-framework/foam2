@@ -27,7 +27,7 @@ foam.CLASS({
       return this.delegate.find(id).then(function(obj) {
         return obj.cls_.create(obj, this);
       });
-    },
+    }
     // TODO: select() too?
   ]
 });

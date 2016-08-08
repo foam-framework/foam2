@@ -23,8 +23,9 @@ foam.CLASS({
   name: 'LRUDAOManager',
   package: 'foam.dao',
 
-  requires: [ 'foam.dao.MDAO' ],
   implements: [ 'foam.mlang.Expressions' ],
+
+  requires: [ 'foam.dao.MDAO' ],
 
   properties: [
     {
@@ -91,6 +92,7 @@ foam.CLASS({
         self.cleanup();
       });
     },
+
     function onRemove(s, on, remove, obj) {
       // ensure tracking DAO is cleaned up
       this.trackingDAO.remove(obj);
@@ -102,8 +104,9 @@ foam.CLASS({
 
   methods: [
     function getTimestamp() {
-      return ++this.lastTimeUsed_;
+      return this.lastTimeUsed_++;
     },
+
     function cleanup() {
       var self = this;
       self.trackingDAO

@@ -70,6 +70,12 @@ if ( ! String.prototype.endsWith ) {
   };
 }
 
+if ( ! String.prototype.startsWith ) {
+  String.prototype.startsWith = function(str, pos) {
+    return this.indexOf(str) === 0;
+  };
+}
+
 (function() {
   if ( this.WeakMap ) return;
   this.WeakMap = function WeakMap() {

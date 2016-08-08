@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'DeDupDAO',
@@ -26,6 +25,7 @@ foam.CLASS({
       this.dedup(obj);
       return this.delegate.put(obj);
     },
+
     function dedup(obj) {
       var inst = obj.instance_;
       for ( var key in inst ) {

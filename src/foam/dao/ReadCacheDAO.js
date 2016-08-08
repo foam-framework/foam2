@@ -25,11 +25,10 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'ReadCacheDAO',
-
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.dao.PreloadDAO',
+    'foam.dao.PreloadDAO'
   ],
 
   properties: [
@@ -79,6 +78,7 @@ foam.CLASS({
         function(obj) { return self.delegate.put(obj); }
       );
     },
+
     function remove(obj) {
       var self = this;
       return self.src.remove(obj).then(
@@ -87,6 +87,7 @@ foam.CLASS({
         }
       );
     },
+
     function removeAll(skip, limit, order, predicate) {
       var self = this;
       return self.src.removeAll(skip, limit, order, predicate).then(
@@ -101,9 +102,11 @@ foam.CLASS({
     function onSrcPut(s, on, put, obj) {
       this.cache.put(obj);
     },
+
     function onSrcRemove(s, on, remove, obj) {
       this.cache.remove(obj);
     },
+
     function onSrcReset() {
       // TODO: Should this removeAll from the cache?
     }

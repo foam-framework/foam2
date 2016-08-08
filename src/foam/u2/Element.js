@@ -523,6 +523,10 @@ foam.CLASS({
     },
     {
       name: 'clickTarget_'
+    },
+    {
+      name: '__subSubContext__',
+      factory: function() { return this.__subContext__; }
     }
   ],
 
@@ -548,7 +552,7 @@ foam.CLASS({
     },
 
     function E(opt_nodeName) {
-      return (this.__subSubContext__ || this.__subContext__).E(opt_nodeName);
+      return this.__subSubContext__.E(opt_nodeName);
     },
 
     // function XXXE(opt_nodeName /* | DIV */) {
@@ -826,6 +830,11 @@ foam.CLASS({
     //
     // Methods which return 'this' so they can be chained.
 
+    function setNodeName(name) {
+      this.nodeName = name;
+      return this;
+    },
+
     function setID(id) {
       /*
         Explicitly set Element's id.
@@ -930,18 +939,16 @@ foam.CLASS({
       return this;
     },
 
-    function tag(opt_nodeName) {
+    function tag(spec, args) {
       /* Create a new Element and add it as a child. Return this. */
-      var c = this.E(opt_nodeName || 'br');
-      this.add(c);
-      return this;
+      return this.add(this.createChild_(spec, args));
     },
 
     function startContext(map) {
       var m = {};
       Object.assign(m, map);
       m.__oldAddContext__ = this.__subSubContext__;
-      this.__subSubContext__ = (this.__subSubContext__ || this.__subContext__).createSubContext(m);
+      this.__subSubContext__ = this.__subSubContext__.createSubContext(m);
       return this;
     },
 
@@ -950,15 +957,17 @@ foam.CLASS({
       return this;
     },
 
-    function start(node, args) {
-      /* Create a new Element and add it as a child. Return the child. */
-      var c =
-        foam.u2.Element.isInstance(node) ?
-          node :
-        node && node.toE ?
-          node.toE(this.__subSubContext__ || this.__subContext__, args) :
-          this.E(node) ;
+    function createChild_(spec, args) {
+      if ( foam.u2.Element.isInstance(spec) ) return spec;
 
+      if ( spec && spec.toE ) return spec.toE(this.__subSubContext__, args);
+
+      return this.E(spec);
+    },
+
+    function start(spec, args) {
+      /* Create a new Element and add it as a child. Return the child. */
+      var c = this.createChild_(spec, args);
       this.add(c);
       return c;
     },
@@ -971,7 +980,7 @@ foam.CLASS({
     function add(/* vargs */) {
       /* Add Children to this Element. */
       var es = [];
-      var Y = this.__subSubContext__ || this.__subContext__;
+      var Y = this.__subSubContext__;
       var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
@@ -1032,22 +1041,35 @@ foam.CLASS({
       return this;
     },
 
-    function setChildren(value) {
+    function setChildren(slot) {
       /**
-         value -- a Value of an array of children which set this element's
+         slot -- a Slot of an array of children which set this element's
          contents, replacing old children
       **/
       var l = function() {
         this.removeAllChildren();
-        this.add.apply(this, value.get());
+        this.add.apply(this, slot.get());
       }.bind(this);
 
-      value.sub(l);
+      slot.sub(l);
       l();
 
       return this;
     },
 
+    function repeat(s, e, f) {
+      // TODO: support descending
+      for ( var i = s ; i <= e ; i++ ) {
+        f.call(this, i);
+      }
+      return this;
+    },
+
+    function call(f) {
+      f.call(this);
+
+      return this;
+    },
 
     //
     // Output Methods
@@ -1126,7 +1148,7 @@ foam.CLASS({
 
       if ( ! Array.isArray(children) ) children = [ children ];
 
-      var Y = this.__subSubContext__ || this.__subContext__;
+      var Y = this.__subSubContext__;
       children = children.map(function(e) { return e.toE ? e.toE(Y) : e; });
 
       var index = before ? i : (i + 1);
@@ -1185,7 +1207,7 @@ foam.CLASS({
         The Element(s) are replaced when the Slot changes.
       */
       var self = this;
-      var ctx  = this.__subSubContext__ || this.__subContext__;
+      var ctx  = this.__subSubContext__;
 
       function nextE() {
         // Run Slot in same subSubContext that it was created in.
@@ -1369,7 +1391,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toE(X) {
+    function toE(X, args) {
       var e = this.toPropertyE(X, this);
 
       e.fromProperty && e.fromProperty(this);
@@ -1377,6 +1399,8 @@ foam.CLASS({
       if ( X.data ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      if ( args ) e.copyFrom(args);
 
       return e;
     }

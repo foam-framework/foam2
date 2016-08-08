@@ -396,6 +396,48 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'StartsWith',
+  extends: 'foam.mlang.predicate.Binary',
+
+  methods: [
+    function f(o) {
+      var arg1 = this.arg1.f(o);
+      var arg2 = this.arg2.f(o);
+
+      if ( Array.isArray(arg1) ) {
+        return arg1.some(function(arg) {
+          return arg.startsWith(arg2);
+        });
+      }
+
+      return arg1.startsWith(arg2);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'StartsWithIC',
+  extends: 'foam.mlang.predicate.Binary',
+
+  methods: [
+    function f(o) {
+      var arg1 = this.arg1.f(o);
+      var arg2 = this.arg2.f(o);
+
+      if ( Array.isArray(arg1) ) {
+        return arg1.some(function(arg) {
+          return foam.String.startsWithIC(arg, arg2);
+        });
+      }
+
+      return foam.String.startsWithIC(arg1, arg2);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -804,6 +846,8 @@ foam.CLASS({
     'foam.mlang.predicate.Constant',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
+    'foam.mlang.predicate.StartsWith',
+    'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
@@ -849,6 +893,8 @@ foam.CLASS({
     function HAS(a) { return this._unary_("Has", a); },
     function NOT(a) { return this._unary_("Not", a); },
     function KEYWORD(a) { return this._unary_("Keyword", a); },
+    function STARTS_WITH(a, b) { return this._binary_("StartsWith", a); },
+    function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },

@@ -34,6 +34,10 @@ foam.CLASS({
   name: 'CRUD',
   extends: 'foam.u2.Element',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
     'foam.u2.DetailView',
     'foam.u2.TableView',
@@ -65,7 +69,7 @@ foam.CLASS({
       name: 'prefix',
       label: 'Filter prefix',
       postSet: function(_, prefix) {
-        this.filteredDAO = this.dao.where(STARTS_WITH_IC(this.Person.SURNAME, prefix));
+        this.filteredDAO = this.dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
       }
     },
     {
@@ -117,7 +121,7 @@ foam.CLASS({
       this.
           cssClass(this.myCls()).
           start('span').cssClass('prefix', 'label').add('Filter prefix: ').end().
-          start(this.PREFIX, {onKeyMode: true, type: 'search'}).end().
+          start(this.PREFIX, {onKey: true, type: 'search'}).end().
           start('div').cssClass('content').
             start('span').cssClass('summaryPane').
               start(this.FILTERED_DAO, {hardSelection$: this.selection$}).end().

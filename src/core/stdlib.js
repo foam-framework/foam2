@@ -364,6 +364,9 @@ foam.LIB({
       var end   = s.lastIndexOf('*/');
       return s.substring(start+2, end);
     },
+    function startsWithIC(a, b) {
+      return a.toUpperCase().startsWith(b.toUpperCase());
+    },
     (function() {
       var map = {};
 
