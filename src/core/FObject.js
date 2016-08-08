@@ -537,6 +537,8 @@ foam.CLASS({
           var a = this.cls_.getAxiomByName(name);
           if ( a && foam.core.Property.isInstance(a) ) {
             this[key] = o[key];
+          } else if ( opt_warn ) {
+            this.unknownArg(key, o[key]);
           }
         }
         return this;
