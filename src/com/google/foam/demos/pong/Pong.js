@@ -27,8 +27,12 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Float', // TODO: shouldn't be needed
       name: 'vx',
-      preSet: function(_, v) { return Math.sign(v) * Math.max(5, Math.abs(v)); }
+      preSet: function(_, v) {
+// TODO: isn't called
+        console.log('preSet', v);
+ return Math.sign(v) * Math.max(5, Math.abs(v)); }
     }
   ]
 });
@@ -47,7 +51,15 @@ foam.CLASS({
   properties: [
     [ 'color', 'white' ],
     [ 'radius', 30 ],
-    { name: 'mass', factory: function() { return this.INFINITE_MASS; } }
+    {
+      class: 'Float', // TODO: shouldn't be needed
+      name: 'mass',
+      factory: function() {
+// TODO: isn't called
+console.log('********************');
+ debugger;
+return this.INFINITE_MASS; }
+    }
   ]
 });
 
@@ -55,7 +67,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
   name: 'Pong',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   requires: [
     'com.google.foam.demos.pong.Ball',
@@ -70,21 +82,19 @@ foam.CLASS({
   },
 
   properties: [
+    [ 'color', 'lightgray' ],
     [ 'width',  800 ],
     [ 'height', 300 ],
     {
       name: 'ball',
-      view: 'foam.ui.DetailView',
       factory: function() { return this.Ball.create({color: 'white', radius: 20}); }
     },
     {
       name: 'lPaddle',
-      view: 'foam.ui.DetailView',
       factory: function() { return this.Paddle.create(); }
     },
     {
       name: 'rPaddle',
-      view: 'foam.ui.DetailView',
       factory: function() { return this.Paddle.create(); }
     },
     {
@@ -142,22 +152,22 @@ foam.CLASS({
   actions: [
     {
       name: 'lUp',
-      keyboardShortcuts: [ 'q' ],
+//      keyboardShortcuts: [ 'q' ],
       code: function() { this.lPaddle.y -= this.PADDLE_SPEED; }
     },
     {
       name: 'lDown',
-      keyboardShortcuts: [ 'a' ],
+//      keyboardShortcuts: [ 'a' ],
       code: function() { this.lPaddle.y += this.PADDLE_SPEED; }
     },
     {
       name: 'rUp',
-      keyboardShortcuts: [ 38 /* up arrow */ ],
+//      keyboardShortcuts: [ 38 /* up arrow */ ],
       code: function() { this.rPaddle.y -= this.PADDLE_SPEED; }
     },
     {
       name: 'rDown',
-      keyboardShortcuts: [ 40 /* down arrow */ ],
+//      keyboardShortcuts: [ 40 /* down arrow */ ],
       code: function() { this.rPaddle.y += this.PADDLE_SPEED; }
     }
   ],
@@ -166,22 +176,21 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.background = 'lightgray';
       this.addChildren(
-          this.Box.create({x: this.width/2-5, width:10, height: this.height, border:'rgba(0,0,0,0)' , background: 'white'}),
+          this.Box.create({x: this.width/2-5, width:10, height: this.height, border:'rgba(0,0,0,0)' , color: 'white'}),
           this.ball,
           this.lPaddle,
           this.rPaddle);
 
-      // this.addChildren(this.collider);
+      this.lPaddle.mass = this.rPaddle.mass = this.lPaddle.INFINITE_MASS;
 
       // Position Paddles
       this.lPaddle.x = 25+this.lPaddle.radius;
       this.rPaddle.x = this.width-25-this.rPaddle.radius;
-      this.lPaddle.y = this.rPaddle.y = (this.height-this.rPaddle.height)/2;
+      this.lPaddle.y = this.rPaddle.y = this.height/2-this.rPaddle.radius;
 
       // Setup Ball
-      this.ball.x  = this.ball.y = 100;
+      this.ball.x  = 110;
       this.ball.y  = this.rPaddle.y;
       this.ball.vx = this.ball.vy = 10;
 
@@ -189,7 +198,6 @@ foam.CLASS({
 
       // Setup Physics
       this.collider.add(this.ball, this.lPaddle, this.rPaddle).start();
-      // Movement.inertia(this.ball);
     }
   ]
 });
