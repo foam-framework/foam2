@@ -129,6 +129,7 @@ foam.CLASS({
     },
 
     function withStore(mode, fn) {
+      return this.withStore_(mode, fn);
       if ( mode !== 'readwrite' ) return this.withStore_(mode, fn);
 
       var self = this;
@@ -187,7 +188,7 @@ foam.CLASS({
       var self = this;
 
       return new Promise(function(resolve, reject) {
-        self.withStore("readonly", function(store) {
+        self.withStore("readwrite", function(store) {
           var request = store.get(key);
           request.transaction.addEventListener(
             'complete',
@@ -296,7 +297,7 @@ foam.CLASS({
       var self = this;
 
       return new Promise(function(resolve, reject) {
-        self.withStore("readonly", function(store) {
+        self.withStore("readwrite", function(store) {
           var useIndex = predicate &&
             this.Eq.isInstance(predicate) &&
             store.indexNames.contains(predicate.arg1.name);
