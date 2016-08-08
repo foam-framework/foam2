@@ -139,7 +139,6 @@ foam.CLASS({
 
   requires: [
     'foam.u2.tag.Input',
-    'foam.u2.ElementParser',
     'foam.u2.PropertyView',
     'com.google.foam.demos.sevenguis.CellParser'
   ],
@@ -197,7 +196,7 @@ foam.CLASS({
       methods: [
         function initE() { this.cssClass(this.myCls()); },
         function isLoaded() { return this.value; },
-        function listenForLoad() { this.value$.addListener(this.onDataLoad); },
+        function listenForLoad() { this.value$.sub(this.onDataLoad); },
         function toReadE() { return this.E('span').add(this.value$); },
         function toWriteE() {
           this.formula$.addListener(this.onDataLoad);
@@ -255,8 +254,6 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.ElementParser.getPrototype();
-
       // Two sample spreadsheets
       // Spreadsheet taken from Visicalc
 // this.loadCells({"A0":"<b><u>Item</u></b>","B0":"<b><u>No.</u></b>","C0":"<b><u>Unit</u></b>","D0":"<b><u>Cost</u></b>","A1":"Muck Rake","B1":"43","C1":"12.95","D1":"=mul(B1,C1)","A2":"Buzz Cut","B2":"15","C2":"6.76","D2":"=mul(B2,C2)","A3":"Toe Toner","B3":"250","C3":"49.95","D3":"=mul(B3,C3)","A4":"Eye Snuff","B4":"2","C4":"4.95","D4":"=mul(B4,C4)","C5":"Subtotal","D5":"=sum(D1:D4)","B6":"9.75","C6":"Tax","D6":"=div(mul(B6,D5),100)","C7":"<b>Total</b>","D7":"=add(D5,D6)"});
@@ -268,28 +265,22 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
     },
 
     function initE() {
+      var self = this;
+
       this.setNodeName('table').cssClass(this.myCls()).attrs({cellspacing: 0}).
         start('tr').
           tag('th').
-          call(function () {
-            for ( var i = 0 ; i < this.columns ; i++ ) {
-              this.start('th').add(String.fromCharCode(65 + i)).end();
-            }
+          repeat(0, this.columns-1, function (i) {
+            this.start('th').add(String.fromCharCode(65 + i)).end();
           }).
         end().
-        call(function() {
-          for ( var i = 0 ; i < this.rows ; i++ ) {
-            this.start('tr').
-              start('th').add(i).end().
-              start('td').
-                call(function() {
-                  for ( var j = 0 ; j < this.columns ; j++ ) {
-                    this.add(this.cell(this.cellName(j, i)));
-                  }
-                }).
-              end().
-            end();
-          }
+        repeat(0, this.rows-1, function(i) {
+          this.start('tr').
+            start('th').add(i).end().
+            repeat(0, this.columns-1, function(j) {
+              this.start('td').add(self.cell(self.cellName(j, i))).end();
+            }).
+          end();
         });
     },
 
@@ -329,17 +320,18 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
       var cancel = null;
       if ( ! cell ) {
         cell = this.cells[name] = this.Cell.create();
-        cell.formula$.addListener(function(_, __, ___, formula) {
+        cell.formula$.sub(function(_, __, ___, formula) {
           var f = self.parser.parseString(formula);
           cancel && cancel.destroy();
+          // TODO: parser should return Slot
+          /*
           cancel = self.dynamicFn(f.bind(null, self), function(v) {
             cell.value = v;
           });
+          */
         });
       }
       return cell;
     }
-  ],
-  templates: [
   ]
 });
