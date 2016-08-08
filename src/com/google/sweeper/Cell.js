@@ -100,7 +100,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function mark(e) { this.marked = ! this.marked; e.preventDefault(); },
+    function mark(e)  { this.marked = ! this.marked; e.preventDefault(); },
     function sweep(e) { this.covered = false; }
   ]
 });
