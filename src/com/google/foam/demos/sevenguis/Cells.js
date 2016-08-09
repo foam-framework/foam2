@@ -149,12 +149,16 @@ foam.CLASS({
     {
       name: 'Cell',
       extends: 'foam.u2.ReadWriteView',
+
       requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
+
       imports: [ 'cells' ],
+
       documentation: function() {/*
         Doesn't build inner views until value is set or user clicks on view.
         This complicates the design but saves memory and startup time.
       */},
+
       axioms: [
         foam.u2.CSS.create({
           code: function() {/*
@@ -174,6 +178,7 @@ foam.CLASS({
           */}
         })
       ],
+
       properties: [
         [ 'nodeName', 'span' ],
         {
@@ -193,8 +198,12 @@ foam.CLASS({
           getter: function() { return parseFloat(this.data); }
         }
       ],
+
       methods: [
-        function initE() { this.SUPER(); this.cssClass(this.myCls()); },
+        function initE() {
+          this.SUPER();
+          this.cssClass(this.myCls());
+        },
         // function isLoaded() { return this.value; },
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
         function toReadE() { return this.HTMLElement.create({nodeName: 'span'}, this.__subSubContext__).add(this.data$); },
@@ -284,21 +293,6 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
         });
     },
 
-              /*
-    function initE() {
-      <table class="^" cellspacing="0">
-        <tr>
-          <th></th>
-          <th repeat="j in 0 .. this.columns-1">{{String.fromCharCode(65 + j)}}</th>
-        </tr>
-        <tr repeat="i in 0 .. this.rows-1">
-          <th>{{i}}</th>
-          <td class="^cell" repeat="j in 0 .. this.columns-1">{{this.cell(this.cellName(j, i))}}</td>
-        </tr>
-      </table>
-    },
-                */
-
     function loadCells(map) {
       for ( var key in map ) this.cell(key).formula = String(map[key]);
     },
@@ -318,8 +312,10 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
       var self = this;
       var cell = this.cells[name];
       var cancel = null;
+
       if ( ! cell ) {
         cell = this.cells[name] = this.Cell.create();
+
         cell.formula$.sub(function(_, __, ___, formula$) {
           var f = self.parser.parseString(formula$.get());
           cancel && cancel.destroy();
@@ -332,6 +328,7 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
           */
         });
       }
+
       return cell;
     }
   ]
