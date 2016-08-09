@@ -50,27 +50,21 @@ foam.CLASS({
 
     function toWriteE() {
       this.data$.sub(this.onDataLoad);
-//      var e = this.E('input');
-//      e.data$ = this.data$;
-//      return e;
       return this.Input.create({data$: this.data$});
     }
   ],
 
   listeners: [
     function onDataLoad() {
-      console.log('onDataLoad');
       this.data$.unsub(this.onDataLoad);
       this.initReadView();
     },
 
     function initReadView() {
-      console.log('initReadView');
       this.removeAllChildren().add(this.toReadE().on('click', this.initWriteView));
     },
 
     function initWriteView() {
-      console.log('initWriteView');
       this.removeAllChildren().add(this.toWriteE().on('blur', this.initReadView).focus());
     }
   ]
