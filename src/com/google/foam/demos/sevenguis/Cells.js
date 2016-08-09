@@ -138,9 +138,9 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
-    'foam.u2.tag.Input',
+    'com.google.foam.demos.sevenguis.CellParser',
     'foam.u2.PropertyView',
-    'com.google.foam.demos.sevenguis.CellParser'
+    'foam.u2.tag.Input'
   ],
 
   exports:  [ 'as cells' ],
@@ -149,7 +149,7 @@ foam.CLASS({
     {
       name: 'Cell',
       extends: 'foam.u2.ReadWriteView',
-      requires: [ 'foam.u2.tag.Input' ],
+      requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
       imports: [ 'cells' ],
       documentation: function() {/*
         Doesn't build inner views until value is set or user clicks on view.
@@ -197,7 +197,7 @@ foam.CLASS({
         function initE() { this.SUPER(); this.cssClass(this.myCls()); },
         // function isLoaded() { return this.value; },
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
-//        function toReadE() { return this.E('span').add(this.value$); },
+        function toReadE() { return this.HTMLElement.create({nodeName: 'span'}, this.__subSubContext__).add(this.data$); },
         function toWriteE() {
           this.formula$.sub(this.onDataLoad);
           var e = this.Input.create(); //this.E('input');
@@ -324,7 +324,6 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
           var f = self.parser.parseString(formula$.get());
           cancel && cancel.destroy();
           cell.data = f(self);
-          console.log(cell, cell.data);
           // TODO: parser should return Slot
           /*
           cancel = self.dynamicFn(f.bind(null, self), function(v) {
