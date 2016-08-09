@@ -46,8 +46,6 @@ foam.CLASS({
       name: 'progress',
       label: 'Elapsed Time',
       expression: function(duration, elapsedTime) {
-        // TODO: this isn't working
-// console.log('*************');
         return this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
       },
       toPropertyE: function(X) {
@@ -111,7 +109,6 @@ foam.CLASS({
         var now = Date.now();
         if ( this.lastTick_ ) this.elapsedTime += (now - this.lastTick_)/1000;
         this.elapsedTime = Math.min(this.duration/1000, this.elapsedTime);
-        this.progress = this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
         this.lastTick_ = now;
         this.tick();
       }
