@@ -24,7 +24,8 @@ foam.CLASS({
   requires: [ 'foam.u2.tag.Input' ],
 
   methods: [
-    function init() {
+    function initE() {
+      // Don't create ReadView if no data (saves memory and startup time).
       if ( this.isLoaded() ) {
         this.initReadView();
       } else {
@@ -35,11 +36,12 @@ foam.CLASS({
     // Template Methods
 
     function isLoaded() {
+      /** Return true iff data is available for this view. **/
       return this.data;
     },
 
     function listenForLoad() {
-      this.data$.addListener(this.onDataLoad);
+      this.data$.sub(this.onDataLoad);
     },
 
     function toReadE() {
@@ -48,23 +50,27 @@ foam.CLASS({
 
     function toWriteE() {
       this.data$.sub(this.onDataLoad);
-      var e = this.E('input');
-      e.data$ = this.data$;
-      return e;
+//      var e = this.E('input');
+//      e.data$ = this.data$;
+//      return e;
+      return this.Input.create({data$: this.data$});
     }
   ],
 
   listeners: [
     function onDataLoad() {
-      this.data$.removeListener(this.onDataLoad);
+      console.log('onDataLoad');
+      this.data$.unsub(this.onDataLoad);
       this.initReadView();
     },
 
     function initReadView() {
+      console.log('initReadView');
       this.removeAllChildren().add(this.toReadE().on('click', this.initWriteView));
     },
 
     function initWriteView() {
+      console.log('initWriteView');
       this.removeAllChildren().add(this.toWriteE().on('blur', this.initReadView).focus());
     }
   ]
