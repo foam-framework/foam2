@@ -16,17 +16,6 @@
  */
 
 // TODO: This should probably be in core.
-foam.CLASS({
-  name: 'MethodArguments',
-  refines: 'Method',
-
-  properties: [
-    {
-      name: 'args'
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.dao',
