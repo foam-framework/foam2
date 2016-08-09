@@ -480,11 +480,10 @@ foam.CLASS({
 
   methods: [
     function initCView() {
-/*
+
       this.propertyChange.sub(function() {
         this.pub('invalidated');
       }.bind(this));
-*/
     },
 
     function toLocalCoordinates(p) {
@@ -587,7 +586,7 @@ foam.CLASS({
     function addChildren() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
-        // this.addChild_(arguments[i]);
+this.addChild_(arguments[i]);
       }
       this.invalidated.pub();
     },
@@ -614,7 +613,9 @@ foam.CLASS({
     {
       name: 'onChildUpdate',
       isFramed: true,
-      code: function onChildUpdate() { this.pub('invalidated'); }
+      code: function onChildUpdate() {
+        this.invalidated.pub();
+      }
     }
   ]
 });

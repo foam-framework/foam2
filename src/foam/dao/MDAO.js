@@ -183,20 +183,15 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      return this.find(id).then(
-        function(obj) {
-          self.index.remove(obj);
-          self.pub('on', 'remove', obj);
-          return Promise.resolve();
-        },
-        function(err) {
-          if ( self.ObjectNotFoundException.isInstance(err) ) {
-            return Promise.resolve(); // not found error is actually ok
-          } else {
-            return Promise.reject(err);
-          }
-        }
-      );
+      var obj = this.find_(id);
+      if ( obj ) {
+        self.index.remove(obj);
+        self.pub('on', 'remove', obj);
+        return Promise.resolve();
+      } else {
+        // object not found is ok, remove post-condition still met
+        return Promise.resolve();
+      }      
     },
 
     function removeAll(skip, limit, order, predicate) {
