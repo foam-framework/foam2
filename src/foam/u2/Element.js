@@ -57,6 +57,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DefaultValidator',
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
   documentation: 'Default Element validator.',
 
   methods: [
@@ -441,10 +443,8 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
-      getter: function() {
-        return this.elementValidator$ ?
-          this.elementValidator       :
-          this.DEFAULT_VALIDATOR      ;
+      factory: function() {
+        return this.elementValidator$ ? this.elementValidator : this.DEFAULT_VALIDATOR;
       }
     },
     {
