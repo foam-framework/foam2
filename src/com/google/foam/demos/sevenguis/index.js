@@ -1,4 +1,4 @@
-  // TODO: move somewhere reusable, just prototyping here
+// TODO: move somewhere reusable, just prototyping here
 
 var els = document.getElementsByTagName('foam');
 
@@ -13,7 +13,7 @@ for ( var i = els.length-1 ; i >= 0 ; i-- ) {
     } else if ( ! foam.u2.Element.isInstance(view) )  {
       view = foam.u2.DetailView.create({data: view, showActions: true});
     }
-    console.log('Installing view: ', modelName, view);
+//     console.log('Installing view: ', modelName, view);
     el.outerHTML = view.outerHTML;
     view.load();
   } else {

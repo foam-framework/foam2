@@ -38,14 +38,11 @@ foam.CLASS({
 
   methods: [
     function initE() {
-//      this.SUPER();
-//      this.attrs({max: 100});
       this.
         cssClass(this.myCls()).
         attrs({max: 100});
-      this.attrSlot().follow(this.data$);
 
-//        attrs({value: this.data$, max: 100});
+      this.attrSlot().follow(this.data$);
     }
   ]
 });

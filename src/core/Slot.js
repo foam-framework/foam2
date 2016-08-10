@@ -76,7 +76,11 @@ foam.CLASS({
     */
     function follow(other) {
       var self = this;
-      var l = function() { self.set(other.get()); };
+      var l = function() {
+        if ( ! foam.util.equals(self.get(), other.get()) ) {
+          self.set(other.get());
+        }
+      };
       l();
       return other.sub(l);
     },

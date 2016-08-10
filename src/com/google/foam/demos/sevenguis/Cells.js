@@ -107,7 +107,7 @@ foam.CLASS({
             for ( var i = 0 ; i < a.length ; i++ ) {
               var r = a[i](cs);
               if ( Array.isArray(r) )
-                ret.pushAll(r);
+                ret.push.apply(ret, r);
               else
                 ret.push(r);
             }
@@ -138,9 +138,9 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
-    'foam.u2.tag.Input',
+    'com.google.foam.demos.sevenguis.CellParser',
     'foam.u2.PropertyView',
-    'com.google.foam.demos.sevenguis.CellParser'
+    'foam.u2.tag.Input'
   ],
 
   exports:  [ 'as cells' ],
@@ -149,7 +149,7 @@ foam.CLASS({
     {
       name: 'Cell',
       extends: 'foam.u2.ReadWriteView',
-      requires: [ 'foam.u2.tag.Input' ],
+      requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
       imports: [ 'cells' ],
       documentation: function() {/*
         Doesn't build inner views until value is set or user clicks on view.
@@ -181,7 +181,7 @@ foam.CLASS({
           displayWidth: 10
         },
         {
-          name: 'value',
+          name: 'data',
           adapt: function(_, v) {
             var ret = parseFloat(v);
             return ret && ! Number.isInteger(ret) ? ret.toFixed(2) : v;
@@ -190,17 +190,17 @@ foam.CLASS({
         },
         {
           name: 'numValue',
-          getter: function() { return parseFloat(this.value); }
+          getter: function() { return parseFloat(this.data); }
         }
       ],
       methods: [
-        function initE() { this.cssClass(this.myCls()); },
-        function isLoaded() { return this.value; },
-        function listenForLoad() { this.value$.sub(this.onDataLoad); },
-        function toReadE() { return this.E('span').add(this.value$); },
+        function initE() { this.SUPER(); this.cssClass(this.myCls()); },
+        // function isLoaded() { return this.value; },
+        // function listenForLoad() { this.value$.sub(this.onDataLoad); },
+        function toReadE() { return this.HTMLElement.create({nodeName: 'span'}, this.__subSubContext__).add(this.data$); },
         function toWriteE() {
-          this.formula$.addListener(this.onDataLoad);
-          var e = this.E('input');
+          this.formula$.sub(this.onDataLoad);
+          var e = this.Input.create(); //this.E('input');
           e.data$ = this.formula$;
           return e;
         }
@@ -320,9 +320,10 @@ this.loadCells({"A0":"<div style=\"width:200px;\"><b><u>Benchmark</u></b></div>"
       var cancel = null;
       if ( ! cell ) {
         cell = this.cells[name] = this.Cell.create();
-        cell.formula$.sub(function(_, __, ___, formula) {
-          var f = self.parser.parseString(formula);
+        cell.formula$.sub(function(_, __, ___, formula$) {
+          var f = self.parser.parseString(formula$.get());
           cancel && cancel.destroy();
+          cell.data = f(self);
           // TODO: parser should return Slot
           /*
           cancel = self.dynamicFn(f.bind(null, self), function(v) {
