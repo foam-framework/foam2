@@ -192,7 +192,7 @@ foam.CLASS({
       // Setup Ball
       this.ball.x  = 110;
       this.ball.y  = this.rPaddle.y;
-      this.ball.vx = this.ball.vy = 10;
+      this.ball.vx = this.ball.vy = 20;
 
       this.ball.x$.sub(this.onBallMove);
 
