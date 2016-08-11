@@ -37,3 +37,4 @@ U2 renames cls() to cssClass().
 The use of 'subType' or 'model' to specify types being used in compound property types or in DAO's or Views have been replaced by 'of'.
 The signature of property-change events have changed.
 In U2, 'onKeyMode' is renamed to just 'onKey'
+U2 no longer takes functions direction for use as dynamic values.  Instead, use obj.slot(fn[, slots]). 
