@@ -36,3 +36,4 @@ Support for specifying methods: or listeners: as maps ({}) is no longer supporte
 U2 renames cls() to cssClass().
 The use of 'subType' or 'model' to specify types being used in compound property types or in DAO's or Views have been replaced by 'of'.
 The signature of property-change events have changed.
+In U2, 'onKeyMode' is renamed to just 'onKey'
