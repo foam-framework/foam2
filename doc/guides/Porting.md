@@ -34,4 +34,5 @@ CSS is now specified as a CSS Axiom, rather than as a template named CSS:
   ],
 Support for specifying methods: or listeners: as maps ({}) is no longer supported. They must be specified as arrays ([]) in FOAM2.
 U2 renames cls() to cssClass().
-The use of 'subType' or 'model' to specify types being used in compound property types or in DAO's or Views have been replaced by 'of'. 
+The use of 'subType' or 'model' to specify types being used in compound property types or in DAO's or Views have been replaced by 'of'.
+The signature of property-change events have changed.
