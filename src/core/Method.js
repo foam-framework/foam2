@@ -60,7 +60,9 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
-    { name: 'code', required: true }
+    { name: 'code', required: true },
+    'returns',
+    'args'
   ],
 
   methods: [
@@ -112,8 +114,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Method',
   extends: 'foam.core.AbstractMethod',
-
-  properties: [ 'returns' ],
 
   methods: [
     function installInProto(proto) {
