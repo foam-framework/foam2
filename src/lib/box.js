@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.box',
   name: 'Box',
 
@@ -23,7 +23,13 @@ foam.CLASS({
     {
       name: 'send',
       returns: '',
-      code: function send(message) {}
+      args: [
+        {
+          name: 'message',
+          type: 'foam.box.Message',
+          javaType: 'foam.box.Message'
+        }
+      ]
     }
   ]
 });
@@ -50,10 +56,14 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'replyBox'
+      class: 'FObjectProperty',
+      name: 'replyBox',
+      of: 'foam.box.Box'
     },
     {
-      name: 'errorBox'
+      class: 'FObjectProperty',
+      name: 'errorBox',
+      of: 'foam.box.Box'
     }
   ],
 
@@ -72,7 +82,9 @@ foam.CLASS({
   extends: 'foam.box.Message',
   properties: [
     {
-      name: 'message'
+      class: 'FObjectProperty',
+      name: 'message',
+      of: 'foam.box.Message'
     }
   ],
   methods: [
@@ -243,6 +255,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'name'
     }
   ]
@@ -860,7 +873,10 @@ foam.CLASS({
   extends: 'foam.box.Message',
 
   properties: [
-    'data'
+    {
+      class: 'String',
+      name: 'data'
+    }
   ]
 });
 
