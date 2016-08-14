@@ -65,7 +65,7 @@ FOAM_FILES([
   { name: "foam/u2/Element" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
 //  { name: "foam/u2", flags: ['web'] },
-  { name: "lib/graphics", flags: ['web'] },
+  { name: "foam/graphics/CView", flags: ['web'] },
   { name: "lib/ScrollCView", flags: ['web'] },
   { name: "foam/dao/dao" },
   { name: "lib/mlang" },
