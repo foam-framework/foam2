@@ -59,7 +59,7 @@ FOAM_FILES([
   { name: "core/templates" },
   { name: "core/Action" },
   { name: "lib/Promise" },
-  { name: "lib/Timer" },
+  { name: "foam/util/Timer" },
   { name: "lib/input", flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/Element" },
