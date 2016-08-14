@@ -59,6 +59,7 @@ FOAM_FILES([
   { name: "core/parse" },
   { name: "core/templates" },
   { name: "core/Action" },
+  { name: "lib/java" },
   { name: "lib/Promise" },
   { name: "lib/Timer" },
   { name: "lib/input", flags: ['web'] },

@@ -26,14 +26,89 @@ foam.LIB({
 });
 
 foam.CLASS({
+  refines: 'foam.core.AbstractMethod',
+  properties: [
+    {
+      class: 'String',
+      name: 'javaCode'
+    },
+    {
+      class: 'String',
+      name: 'javaReturns'
+    }
+  ],
+  templates: [
+    {
+      name: 'axiomJavaInterfaceSource',
+      template: function() {/*
+  public <%= this.javaReturns || 'void' %> <%= this.name %>(<%
+for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+  var arg = this.args[i];
+  %><%= arg.javaType || 'Object' %> <%= arg.name %><%
+  if ( i != this.args.length - 1 ) { %>, <% }
+}
+%>);
+*/}
+    },
+    {
+      name: 'axiomJavaSource',
+      template: function() {/*<% if ( ! this.javaCode ) { return opt_outputter || ''; } %>
+  public <%= this.javaReturns || 'void' %> <%= this.name %>(<%
+for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+  var arg = this.args[i];
+  %><%= arg.javaType || 'Object' %> <%= arg.name %><%
+  if ( i != this.args.length - 1 ) { %>, <% }
+}
+%>) {
+  <%= this.javaCode %>
+  }
+*/}
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Interface',
+  templates: [
+    {
+      name: 'javaSource',
+      template: function() {/*
+// GENERATED CODE
+package <%= this.package %>;
+
+public interface <%= this.name %><% if ( this.extends ) { %><%= this.extends %><% } %> {
+<%
+  for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
+    var axiom = this.axioms_[i];
+    if ( axiom.axiomJavaInterfaceSource ) axiom.axiomJavaInterfaceSource(output, this);
+  }
+%>
+}
+*/}
+    }
+  ]
+});
+
+foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
     {
       class: 'String',
       name: 'javaType'
+    },
+    {
+      class: 'String',
+      name: 'javaJsonParser'
     }
   ],
   templates: [
+    {
+      name: 'axiomJavaInterfaceSource',
+      template: function() {/*<% var cls = arguments[1] %>
+  public <%= this.javaType %> get<%= foam.String.capitalize(this.name) %>();
+  public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.javaType %> val);
+*/}
+    },
     {
       name: 'axiomJavaSource',
       template: function() {/*<% var cls = arguments[1]; if ( this.javaType ) { %>
@@ -69,7 +144,7 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
 
       @Override
       public Parser jsonParser() {
-        return new <%= foam.String.capitalize(this.javaType) %>Parser();
+        return new <%= this.javaJsonParser %>();
       }})
 */}
     }
@@ -79,14 +154,28 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
-    ['javaType', 'String']
+    {
+      class: 'String',
+      name: 'javaType',
+      value: 'String'
+    },
+    ['javaJsonParser', 'foam.lib.json.StringParser']
   ]
 });
 
 foam.CLASS({
   refines: 'foam.core.Int',
   properties: [
-    ['javaType', 'int']
+    ['javaType', 'int'],
+    ['javaJsonParser', 'foam.lib.json.IntParser']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+  properties: [
+    ['javaType', 'foam.core.FObject'],
+    ['javaJsonParser', 'foam.lib.json.FObjectParser']
   ]
 });
 
