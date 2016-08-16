@@ -96,7 +96,43 @@ foam.CLASS({
     }
   ]
 });
+foam.CLASS({
+  package: 'foam.geo',
+  name: 'Point3D',
 
+  implements: [ 'foam.geo.Point' ],
+
+  properties: [
+    {
+      class: 'Float',
+      name: 'x',
+      value: 0.0
+    },
+    {
+      class: 'Float',
+      name: 'y',
+      value: 0.0
+    }
+    {
+      class: 'Float',
+      name: 'z',
+      value: 0.0
+    }
+  ],
+
+  methods: [
+    function getAxisNames() { return [ 'x' , 'y', 'z' ]; },
+    function toArray() { return [ this.x , this.y, this.z ]; },
+    function map(fn) {
+      /** Copies this, calls supplied fn with each axis value and Property */
+      var ret = this.clone();
+      ret['x'] = fn(this.x, this.X);
+      ret['y'] = fn(this.y, this.Y);
+      ret['z'] = fn(this.z, this.Z);
+      return ret;
+    }
+  ]
+});
 
 /** Generate a BB for an object with location+radius */
 foam.CLASS({
