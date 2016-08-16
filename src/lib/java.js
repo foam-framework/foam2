@@ -215,7 +215,16 @@ import foam.core.PropertyInfo;
 import foam.lib.parse.*;
 import foam.lib.json.*;
 
-public class <%= cls.name %> extends FObject {
+public <%= cls.model_.abstract ? 'abstract ' : '' %>class <%= cls.name %> extends <%= cls.model_.extends %><%
+  var interfaces = cls.getAxiomsByClass(foam.core.Implements);
+  if ( interfaces.length > 0 ) { %> implements <% }
+  for ( var i = 0 ; i < interfaces.length ; i++ ) {
+    var intf = interfaces[i];
+    %><%= intf.path %><%
+    if ( i < interfaces.length - 1 ) { %>,<% }
+    %> <%
+  }
+%> {
   private static ClassInfo classInfo_ = <% this.classInfo(output, cls) %>
 
   public ClassInfo getClassInfo() {
