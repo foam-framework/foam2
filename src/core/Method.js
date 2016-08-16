@@ -105,6 +105,19 @@ foam.CLASS({
       f.toString = function() { return method.toString(); };
 
       return f;
+    },
+    function createChildMethod_(child) {
+      return child;
+    },
+    function installInClass(cls) {
+      var method = this;
+
+      var superMethod = cls.__proto__.getAxiomByName(method.name);
+      if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
+        method = superMethod.createChildMethod_(method);
+      }
+
+      cls.axiomMap_[method.name] = method;
     }
   ]
 });
