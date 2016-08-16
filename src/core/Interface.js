@@ -83,6 +83,9 @@ foam.CLASS({
     },
     function hasOwnAxiom(name) {
       return this.axioms_.some(function(a) { return a.name === name; });
+    },
+    function isInstance(o) {
+      return !! ( o && o.cls_ && o.cls_.getAxiomByName('implements_' + this.id) );
     }
   ]
 });
