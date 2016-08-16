@@ -92,7 +92,6 @@ foam.CLASS({
     {
       model_: 'foam.core.types.DAOProperty',
       name: 'filteredDAO',
-      // TODO: replace with foam.u2.TableView when available
       toPropertyE: function(X) {
         return X.lookup('foam.u2.TableView').create({
           of: foam.demos.sevenguis.Person,
