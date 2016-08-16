@@ -487,6 +487,8 @@ foam.CLASS({
         return child;
       }
 
+      prop.sourceCls_ = child.sourceCls_;
+
       for ( var key in child.instance_ ) {
         prop.instance_[key] = child.instance_[key];
       }

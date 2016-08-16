@@ -43,6 +43,7 @@ foam.CLASS({
       m.returns = this.returns;
       m.args = this.args;
       m.javaReturns = this.javaReturns;
+      m.sourceCls_ = child.sourceCls_;
       return m;
     }
   ],
