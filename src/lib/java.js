@@ -133,14 +133,14 @@ foam.CLASS({
     {
       name: 'axiomJavaSource',
       template: function() {/*<% var cls = arguments[1]; if ( this.javaType ) { %>
-private <%= this.javaType %> <%= this.name %>_;
+private <%= this.javaType %> <%= this.name %>;
 
 public <%= this.javaType %> get<%= foam.String.capitalize(this.name) %>() {
-  return <%= this.name %>_;
+  return <%= this.name %>;
 }
 
 public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.javaType %> val) {
-  <%= this.name %>_ = val;
+  <%= this.name %> = val;
   return this;
 }
 <% } %>*/}
@@ -159,8 +159,17 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
       }
 
       @Override
-      public void set(Object obj, Object value) {
+      public void set(Object obj, Object value) {<%
+// TODO(adamvy): There should be a more polymorphic way of doing this.
+// or we shouldn't support Array properties and use Lists instead.
+if ( foam.core.FObjectArray.isInstance(this) ) { %>
+        Object[] src = (Object[])value;
+        <%= this.javaType %> a = new <%= this.of %>[src.length];
+        System.arraycopy(src, 0, a, 0, src.length);
+        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>(a);
+<% } else { %>
         ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
+<% } %>
       }
 
       @Override
@@ -197,6 +206,22 @@ foam.CLASS({
   properties: [
     ['javaType', 'foam.core.FObject'],
     ['javaJsonParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      name: 'javaType',
+      expression: function(of) {
+        return of + '[]'
+      }
+    },
+    {
+      name: 'javaJsonParser',
+      value: 'foam.lib.json.FObjectArrayParser'
+    }
   ]
 });
 
