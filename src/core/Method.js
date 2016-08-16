@@ -60,7 +60,9 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
-    { name: 'code', required: true }
+    { name: 'code', required: true },
+    'returns',
+    'args'
   ],
 
   methods: [
@@ -103,6 +105,19 @@ foam.CLASS({
       f.toString = function() { return method.toString(); };
 
       return f;
+    },
+    function createChildMethod_(child) {
+      return child;
+    },
+    function installInClass(cls) {
+      var method = this;
+
+      var superMethod = cls.__proto__.getAxiomByName(method.name);
+      if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
+        method = superMethod.createChildMethod_(method);
+      }
+
+      cls.axiomMap_[method.name] = method;
     }
   ]
 });
@@ -112,8 +127,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Method',
   extends: 'foam.core.AbstractMethod',
-
-  properties: [ 'returns' ],
 
   methods: [
     function installInProto(proto) {

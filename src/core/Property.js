@@ -231,6 +231,15 @@ foam.CLASS({
         // the definition of the property getter and setter, so an extra
         // check would help eliminate extra reinstalls.
 
+        // Handle special case of axiom being installed into itself.
+        // For example foam.core.String has foam.core.String axioms for things
+        // like "label"
+        // In the future this shouldn't be required if a reinstall is
+        // only triggered on this which affect getter/setter.
+        if ( prop.cls_ === c ) {
+          return;
+        }
+
         if ( foam.core.Property.isInstance(axiom) ) {
           // console.log('**************** Updating Property: ', c.name, prop.name);
           c.installAxiom(prop);
@@ -477,6 +486,8 @@ foam.CLASS({
 
         return child;
       }
+
+      prop.sourceCls_ = child.sourceCls_;
 
       for ( var key in child.instance_ ) {
         prop.instance_[key] = child.instance_[key];

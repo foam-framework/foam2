@@ -52,7 +52,14 @@ foam.CLASS({
     function installInClass(cls) {
       var m = foam.lookup(this.path);
       if ( ! m ) throw 'No such interface or trait: ' + this.path;
-      cls.installModel(m.model_);
+
+      if ( foam.core.Interface && foam.core.Interface.isInstance(m) ) {
+        cls.installModel(m);
+      } else {
+        // TODO(adamvy): Remove this code path when all usages of implements
+        // use modeled interfaces instead of classes.
+        cls.installModel(m.model_);
+      }
     }
   ]
 });
