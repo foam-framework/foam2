@@ -37,6 +37,15 @@ foam.CLASS({
       name: 'javaReturns'
     }
   ],
+  methods: [
+    function createChildMethod_(child) {
+      var m = child.clone();
+      m.returns = this.returns;
+      m.args = this.args;
+      m.javaReturns = this.javaReturns;
+      return m;
+    }
+  ],
   templates: [
     {
       name: 'axiomJavaInterfaceSource',
@@ -63,6 +72,17 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
   <%= this.javaCode %>
   }
 */}
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+  methods: [
+    {
+      name: 'toString',
+      javaReturns: 'String',
+      code: foam.core.FObject.prototype.toString
     }
   ]
 });
