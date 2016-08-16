@@ -47,7 +47,8 @@ foam.CLASS({
     }
   ]
 });
-/** BoundingBox is really just a Range(of:Point) */
+/** BoundingBox is really just a Range(of:Point). Currently designed to operate
+  on any kind of point with any dimension. */
 foam.CLASS({
   package: 'foam.geo',
   name: 'BoundingBox',
