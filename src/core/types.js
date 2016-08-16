@@ -510,3 +510,19 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'TypedProperty',
+  extends: 'Property',
+
+  // documentation: 'Describes properties with a type "of".',
+  properties: [
+    {
+      class: 'Class2',
+      name: 'of',
+      required: true
+    },
+  ]
+});
+

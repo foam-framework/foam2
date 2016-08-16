@@ -39,6 +39,19 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.TypedProperty',
+  methods: [
+    function toIndex(tailFactory) {
+      /** Creates the correct type of index for this property, passing in the
+          tail factory (sub-index) provided. */
+      return ( this.of$cls && this.of$cls.toIndex )  ?
+        this.of$cls.toIndex(tailFactory, this) :
+        this.TreeIndex.create({ prop: this, tailFactory: tailFactory });
+    }
+  ]
+});
+
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
@@ -47,7 +60,9 @@ foam.CLASS({
   ],
   methods: [
     function toIndex(tailFactory) {
-       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+       var newTail = ( this.of$cls && this.of$cls.toIndex )  ?
+         this.of$cls.toIndex(tailFactory, this) : tailFactory;
+       return this.SetIndex.create({ prop: this, tailFactory: newTail });
     }
   ]
 });

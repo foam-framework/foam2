@@ -22,7 +22,19 @@ foam.CLASS({
 
   // define one property per axis
 
+
   methods: [
+    {
+      /** Called as a static method of the class */
+      class: 'ClassMethod',
+      name: 'toIndex',
+      code: function toIndex(tailFactory, prop) {
+        console.log("Returning index for Point:", this, tailFactory, prop);
+        this.describe();
+        return foam.dao.index.TreeIndex.create({ prop: prop, tailFactory: tailFactory });
+      }
+    },
+
     function getAxisNames() {
       /** Reimplement more efficiently for each point type */
       return this.cls_.getAxiomsByClass(foam.core.Property).map(function(o) {
@@ -53,15 +65,31 @@ foam.CLASS({
   package: 'foam.geo',
   name: 'BoundingBox',
 
+
   properties: [
     {
+      class: 'TypedProperty',
       of: 'foam.geo.Point',
       name: 'upper'
     },
     {
+      class: 'TypedProperty',
       of: 'foam.geo.Point',
       name: 'lower'
     },
+  ],
+
+  methods: [
+    {
+      /** Called as a static method of the class */
+      class: 'ClassMethod',
+      name: 'toIndex',
+      code: function toIndex(tailFactory, prop) {
+        console.log("Returning index for BB:", this, tailFactory, prop, this.UPPER.of);
+        this.describe();
+        return foam.dao.index.TreeIndex.create({ prop: prop, tailFactory: tailFactory });
+      }
+    }
   ]
 });
 
@@ -112,7 +140,7 @@ foam.CLASS({
       class: 'Float',
       name: 'y',
       value: 0.0
-    }
+    },
     {
       class: 'Float',
       name: 'z',
@@ -147,7 +175,7 @@ foam.CLASS({
       name: 'radius',
     },
     {
-      class: 'foam.geo.Point',
+      of: 'foam.geo.Point',
       name: 'location',
     },
     {
@@ -172,48 +200,48 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
-  package: 'foam.geo',
-  name: 'PointProperty',
+// foam.CLASS({
+//   package: 'foam.geo',
+//   name: 'PointProperty',
 
-  extends: 'foam.core.Property',
+//   extends: 'foam.core.Property',
 
-  properties: [
-    [ 'of', 'foam.geo.Point' ],
-  ],
+//   properties: [
+//     [ 'of', 'foam.geo.Point' ],
+//   ],
 
-  methods: [
-    function toIndex(tailFactory) {
-      //return spatial index, kD
-    }
-  ],
-});
-/** Actually dependent on the type of Point in the BoundingBox */
-foam.CLASS({
-  package: 'foam.geo',
-  name: 'BoundingBoxProperty',
+//   methods: [
+//     function toIndex(tailFactory) {
+//       //return spatial index, kD
+//     }
+//   ],
+// });
+// /** Actually dependent on the type of Point in the BoundingBox */
+// foam.CLASS({
+//   package: 'foam.geo',
+//   name: 'BoundingBoxProperty',
 
-  extends: 'foam.core.Property',
+//   extends: 'foam.core.Property',
 
-  properties: [
-    {
-      name: 'of',
-      value: 'foam.geo.BoundingBox',
-    },
-    {
-      name: 'ofPoint',
-      value: 'foam.geo.Point',
-      // could check this is a subtype of boundingbox upper/lower in 'of'
-    },
-  ],
+//   properties: [
+//     {
+//       name: 'of',
+//       value: 'foam.geo.BoundingBox',
+//     },
+//     {
+//       name: 'ofPoint',
+//       value: 'foam.geo.Point',
+//       // could check this is a subtype of boundingbox upper/lower in 'of'
+//     },
+//   ],
 
-  methods: [
-    function toIndex(tailFactory) {
+//   methods: [
+//     function toIndex(tailFactory) {
 
-      // Depending on Point type,
-      // return spatial index, quad/oct/R tree
-    }
-  ],
+//       // Depending on Point type,
+//       // return spatial index, quad/oct/R tree
+//     }
+//   ],
 
-});
+// });
 
