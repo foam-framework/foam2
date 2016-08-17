@@ -40,24 +40,27 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   properties: [
-    { class: 'String', name: 'shortName' }
-  ],
-
-  methods: [
-    function parseJSON(parser, value, opt_ctx) {
-      return parser.parse(value, null, opt_ctx);
+    { class: 'String', name: 'shortName' },
+    {
+      name: 'parseJSON',
+      value: function parseJSON(parser, value, opt_ctx) {
+        return parser.parse(value, null, opt_ctx);
+      }
     },
-    function outputJSON(os, obj, includeComma) {
-      if ( ! os.propertyPredicate(obj, this ) ) return;
-      if ( ! os.outputDefaultValues && os.isDefaultValue(obj, this) ) return;
+    {
+      name: 'outputJSON',
+      value: function outputJSON(os, obj, includeComma) {
+        if ( ! os.propertyPredicate(obj, this ) ) return;
+        if ( ! os.outputDefaultValues && os.isDefaultValue(obj, this) ) return;
 
-      var v = obj[this.name];
-      if ( Array.isArray(v) && ! v.length ) return;
+        var v = obj[this.name];
+        if ( Array.isArray(v) && ! v.length ) return;
 
-      if ( includeComma ) os.out(',');
+        if ( includeComma ) os.out(',');
 
-      os.nl().indent().outputPropertyName(this).out(':', os.postColonStr);
-      os.output(v);
+        os.nl().indent().outputPropertyName(this).out(':', os.postColonStr);
+        os.output(v);
+      }
     }
   ]
 });
