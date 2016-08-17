@@ -173,6 +173,16 @@ if ( foam.core.FObjectArray.isInstance(this) ) { %>
       }
 
       @Override
+      public Object f(FObject o) {
+        return this.get(o);
+      }
+
+      @Override
+      public foam.mlang.Expr partialEval() {
+        return this;
+      }
+
+      @Override
       public Parser jsonParser() {
         return new <%= this.javaJsonParser %>();
       }})
