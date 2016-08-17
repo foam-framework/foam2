@@ -65,32 +65,14 @@ foam.CLASS({
   package: 'foam.geo',
   name: 'BoundingBox',
 
-
   properties: [
     {
-      //class: 'TypedProperty',
-      //of: 'foam.geo.Point',
       name: 'upper'
     },
     {
-      //class: 'TypedProperty',
-      //of: 'foam.geo.Point',
       name: 'lower'
     },
   ],
-
-//   methods: [
-//     {
-//       /** Called as a static method of the class */
-//       class: 'ClassMethod',
-//       name: 'toIndex',
-//       code: function toIndex(tailFactory, prop) {
-//         console.log("Returning index for BB:", this, tailFactory, prop, this.UPPER.of);
-//         this.describe();
-//         return foam.dao.index.TreeIndex.create({ prop: prop, tailFactory: tailFactory });
-//       }
-//     }
-//   ]
 });
 
 foam.CLASS({
@@ -241,6 +223,5 @@ foam.CLASS({
       //this.of$cls.getAxisNames()...
     }
   ],
-
 });
 
