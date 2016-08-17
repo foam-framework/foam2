@@ -44,6 +44,9 @@ foam.CLASS({
   ],
 
   methods: [
+    function parseJSON(parser, value, opt_ctx) {
+      return parser.parse(value, null, opt_ctx);
+    },
     function outputJSON(os, obj, includeComma) {
       if ( ! os.propertyPredicate(obj, this ) ) return;
       if ( ! os.outputDefaultValues && os.isDefaultValue(obj, this) ) return;
@@ -350,13 +353,13 @@ foam.CLASS({
     {
       name: 'objectify',
       code: foam.mmethod({
-        Date:      function(o) {
+        Date: function(o) {
           return this.formatDatesAsNumbers ? o.valueOf() : o;
         },
-        Function:  function(o) {
+        Function: function(o) {
           return this.formatFunctionsAsStrings ? o.toString() : o;
         },
-        FObject:   function(o) {
+        FObject: function(o) {
           var m = {};
           if ( this.outputClassNames ) {
             m.class = o.cls_.id;
@@ -371,7 +374,7 @@ foam.CLASS({
           }
           return m;
         },
-        Array:     function(o) {
+        Array: function(o) {
           var a = [];
           for ( var i = 0 ; i < o.length ; i++ ) {
             a[i] = this.objectify(o[i]);
@@ -460,15 +463,24 @@ foam.LIB({
         },
         FObject: function(o) { return o; },
         Object: function(json, opt_class, opt_ctx) {
+          var cls = json.class || opt_class;
+
+          if ( cls ) {
+            var c = foam.lookup(cls);
+
+            for ( var key in json ) {
+              var prop = c.getAxiomByName(key);
+              if ( prop ) {
+                json[key] = prop.parseJSON(this, json[key], opt_ctx);
+              }
+            }
+
+            return c.create(json, opt_ctx);
+          }
+
           for ( var key in json ) {
             var o = json[key];
             json[key] = this.parse(json[key], null, opt_ctx);
-          }
-
-          var cls = json.class || opt_class;
-          if ( cls ) {
-            var class_ = foam.lookup(cls);
-            return class_.create(json, opt_ctx);
           }
 
           return json;
