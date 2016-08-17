@@ -42,22 +42,12 @@ foam.CLASS({
   properties: [
     { class: 'String', name: 'shortName' },
     {
-      name: 'parseJSON',
-      value: function parseJSON(parser, value, opt_ctx) {
-        return parser.parse(value, null, opt_ctx);
-      }
+      name: 'fromJSON',
+      value: function fromJSON(value, opt_ctx) { return value; }
     },
     {
-      name: 'outputJSON',
-      value: function outputJSON(os, obj, includeComma) {
-        var v = obj[this.name];
-        if ( Array.isArray(v) && ! v.length ) return;
-
-        if ( includeComma ) os.out(',');
-
-        os.nl().indent().outputPropertyName(this).out(':', os.postColonStr);
-        os.output(v);
-      }
+      name: 'toJSON',
+      value: function toJSON(value) { return value; }
     }
   ]
 });
@@ -264,7 +254,6 @@ foam.CLASS({
       return this;
     },
 
-    /*
     function outputProperty(o, p, includeComma) {
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) return;
@@ -275,9 +264,8 @@ foam.CLASS({
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
-      this.output(v);
+      this.output(p.toJSON(v));
     },
-    */
 
     function outputDate(o) {
       if ( this.formatDatesAsNumbers ) {
@@ -319,11 +307,7 @@ foam.CLASS({
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            if ( ! this.propertyPredicate(o, ps[i]) ) continue;
-            if ( ! this.outputDefaultValues && this.isDefaultValue(o, ps[i]) ) continue;
-
-            ps[i].outputJSON(this, o, this.outputClassNames || i);
-            //            this.outputProperty(o, ps[i], this.outputClassNames || i );
+            this.outputProperty(o, ps[i], this.outputClassNames || i );
           }
           this.nl().end('}');
         },
@@ -340,7 +324,14 @@ foam.CLASS({
           if ( o.outputJSON ) {
             o.outputJSON(this)
           } else {
-            this.out('undefined');
+            this.start('{');
+            var first = true;
+            for ( var key in o ) {
+              if ( ! first ) this.out(',').nl();
+              this.indent().out(this.maybeEscapeKey(key), ':').output(o[key]);
+              first = false;
+            }
+            this.end('}');
           }
         }
       })
@@ -373,7 +364,7 @@ foam.CLASS({
             if ( ! this.propertyPredicate(o, p) ) continue;
             if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) continue;
 
-            m[p.name] = this.objectify(o[p.name]);
+            m[p.name] = this.objectify(p.toJSON(o[p.name]));
           }
           return m;
         },
@@ -474,7 +465,7 @@ foam.LIB({
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
               if ( prop ) {
-                json[key] = prop.parseJSON(this, json[key], opt_ctx);
+                json[key] = prop.fromJSON(json[key], opt_ctx);
               }
             }
 
@@ -492,7 +483,7 @@ foam.LIB({
     },
 
     function parseString(jsonStr) {
-      return eval('(' + jsonStr + ')');
+      return this.parse(eval('(' + jsonStr + ')'));
     },
 
     function stringify(o) {

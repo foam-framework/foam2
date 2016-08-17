@@ -83,24 +83,19 @@ foam.CLASS({
       }
     },
     {
-      name: 'parseJSON',
-      value: function parseJSON(parser, value, opt_ctx) {
-        return parser.parse(value, null, opt_ctx);
+      name: 'fromJSON',
+      value: function(value, opt_ctx) {
+        return value.c ?
+            foam.lookup(value.c).getAxiomByName(value.p) :
+            value.v ;
       }
     },
     {
-      name: 'outputJSON',
-      value: function outputJSON(os, obj, includeComma) {
-        if ( ! os.propertyPredicate(obj, this ) ) return;
-        if ( ! os.outputDefaultValues && os.isDefaultValue(obj, this) ) return;
-
-        var v = obj[this.name];
-        if ( Array.isArray(v) && ! v.length ) return;
-
-        if ( includeComma ) os.out(',');
-
-        os.nl().indent().outputPropertyName(this).out(':', os.postColonStr);
-        os.output(v);
+      name: 'toJSON',
+      value: function(value) {
+        return foam.core.Property.isInstance(value) ?
+            {c: value.cls_.id, p: value.name} :
+            {v: value} ;
       }
     }
   ]
