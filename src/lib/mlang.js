@@ -41,16 +41,97 @@ foam.CLASS({
   ]
 });
 
+foam.INTERFACE({
+  package: 'foam.mlang',
+  name: 'Expr',
+  methods: [
+    {
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaReturns: 'Object'
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.Expr'
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang',
-  name: 'ExprArray',
+  name: 'ExprProperty',
+  extends: 'FObjectProperty',
+
+  properties: [
+    ['javaType', 'foam.mlang.Expr'],
+    {
+      name: 'adapt',
+      value: function(_, o) {
+        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
+        if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
+        if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
+        return o;
+      }
+    }
+  ]
+});
+
+
+foam.INTERFACE({
+  package: 'foam.mlang.predicate',
+  name: 'Predicate',
+  methods: [
+    {
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaReturns: 'boolean'
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'PredicateProperty',
+  extends: 'FObjectProperty',
+  properties: [
+    ['javaType', 'foam.mlang.predicate.Predicate'],
+    ['of', 'foam.mlang.predicate.Predicate'],
+    {
+      name: 'adapt',
+      value: function(_, o) {
+        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
+        return o;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'PredicateArray',
   extends: 'FObjectArray',
 
   properties: [
+    ['javaType', 'foam.mlang.predicate.Predicate[]'],
     {
       name: 'of',
-      value: 'foam.mlang.predicate.Expr'
+      value: 'foam.mlang.predicate.Predicate'
     },
     {
       name: 'adaptArrayElement',
@@ -68,107 +149,94 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.mlang',
-  name: 'ExprArgument',
-  extends: 'Property',
-
-  properties: [
+  package: 'foam.mlang.predicate',
+  name: 'AbstractPredicate',
+  abstract: true,
+  implements: ['foam.mlang.predicate.Predicate'],
+  methods: [
     {
-      name: 'adapt',
-      value: function(_, o) {
-        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
-        if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
-        return o;
+      name: 'partialEval',
+      javaCode: 'return this;',
+      // Return this javaReturns when it is inherited properly. (Traits are fixed).
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      code: function() {
+        return this;
+      }
+    },
+    {
+      name: 'toString',
+      javaCode: 'return classInfo_.getId();',
+      code: function() {
+        return this.cls_.name;
       }
     }
   ]
 });
 
 
-/**
- * Base class for all mLang queries.
- *
- * Contains many default implementations of methods.
- */
 foam.CLASS({
-  package: 'foam.mlang.predicate',
-  name: 'Expr',
+  package: 'foam.mlang',
+  name: 'AbstractExpr',
   abstract: true,
-
+  implements: ['foam.mlang.Expr'],
   methods: [
-    /**
-     * Abstract projection or evaluation method. Given an object, returns the
-     * value of this expression for it. That might mean extracting a specific
-     * property from the argument object, or evaluating some predicate like
-     * equality on the expressions two arguments.
-     */
     {
-      name: 'f',
-code: function() {}, // TODO: don't require code for abstract classes, then remove
-      args: [
-        {
-          name: 'obj',
-        }
-      ]
-    },
-    /** Converts this expression to a human-readable string for debugging. */
-    function toString() {
-      return this.cls_.name;
-    },
-    /**
-     * Simplifies an expression by eliminating unnecessary clauses, and
-     * combining others. Can sometimes reduce whole (sub)expressions to TRUE or
-     * FALSE.
-     */
-    function partialEval() {
-      return this;
-    },
+      name: 'partialEval',
+      javaCode: 'return this;',
+      // Return this javaReturns when it is inherited properly. (Traits are fixed).
+      javaReturns: 'foam.mlang.Expr',
+      code: function() {
+        return this;
+      }
+    }
   ]
 });
 
 
-/** Singleton for the value "true". */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'True',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
 
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
-    function f() { return true; },
-    function toString() { return 'TRUE'; }
+    {
+      name: 'f',
+      code: function() { return true; },
+      javaCode: 'return true;'
+    }
   ]
 });
 
-/** Singleton for the value "true". */
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'False',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
 
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
-    function f() { return false; },
-    function toString() { return 'FALSE'; }
+    {
+      name: 'f',
+      javaCode: 'return false;',
+      code: function() { return false; }
+    }
   ]
 });
 
 
-/** Base class for unary expressions. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Unary',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
 
   properties: [
     {
-      /** The first argument to the expression. */
-      name: 'arg1',
-      class: 'foam.mlang.ExprArgument',
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
     }
   ],
 
@@ -185,16 +253,16 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Binary',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
 
   properties: [
     {
-      class: 'foam.mlang.ExprArgument',
+      class: 'foam.mlang.ExprProperty',
       name: 'arg1'
     },
     {
-      class: 'foam.mlang.ExprArgument',
+      class: 'foam.mlang.ExprProperty',
       name: 'arg2'
     }
   ],
@@ -213,18 +281,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Nary',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
   abstract: true,
-
-  // ???: Is this a good idea, or make a LIB or something else
-  constants: {
-    TRUE:  foam.mlang.predicate.True.create(),
-    FALSE: foam.mlang.predicate.False.create()
-  },
 
   properties: [
     {
-      class: 'foam.mlang.ExprArray',
+      class: 'foam.mlang.predicate.PredicateArray',
       name: 'args'
     }
   ],
@@ -249,11 +311,18 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Nary',
 
   methods: [
-    function f(o) {
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
-        if ( this.args[i].f(o) ) return true;
-      }
-      return false;
+    {
+      name: 'f',
+      code: function f(o) {
+        for ( var i = 0 ; i < this.args.length ; i++ ) {
+          if ( this.args[i].f(o) ) return true;
+        }
+        return false;
+      },
+      javaCode: 'for ( int i = 0 ; i < args.length ; i++ ) {\n'
+                + '  if ( args[i].f(obj) ) return true;\n'
+                + '}\n'
+                + 'return false;\n'
     },
     function partialEval() {
       return this;
@@ -308,11 +377,18 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Nary',
 
   methods: [
-    function f(o) {
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
-        if ( ! this.args[i].f(o) ) return false;
-      }
-      return true;
+    {
+      name: 'f',
+      code: function(o) {
+        for ( var i = 0 ; i < this.args.length ; i++ ) {
+          if ( ! this.args[i].f(o) ) return false;
+        }
+        return true;
+      },
+      javaCode: 'for ( int i = 0 ; i < args.length ; i++ ) {\n'
+                + '  if ( ! args[i].f(obj) ) return false;\n'
+                + '}\n'
+                + 'return true;'
     },
     function partialEval() {
       return this;
@@ -369,10 +445,16 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      var s1 = this.arg1.f(o);
-      return s1 ? s1.indexOf(this.arg2.f(o)) !== -1 : false;
-    },
+    {
+      name: 'f',
+      javaCode: 'String s1 = (String)this.arg1.f(obj);\n'
+                + 'String s2 = (String)this.arg2.f(obj);\n'
+                + 'return s1 != null ? s1.indexOf(s2) != -1 : false;\n',
+      code: function(o) {
+        var s1 = this.arg1.f(o);
+        return s1 ? s1.indexOf(this.arg2.f(o)) !== -1 : false;
+      }
+    }
   ]
 });
 
@@ -524,7 +606,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Constant',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
 
   properties: [
     {
@@ -551,7 +633,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Func',
-  extends: 'foam.mlang.predicate.Expr',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
 
   properties: [
     {
@@ -576,8 +658,13 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+    {
+      name: 'f',
+      code: function(o) {
+        return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+      },
+      // TODO(adamvy): Better optional than all the Comparable casts?
+      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) == 0;'
     }
   ]
 });
@@ -590,8 +677,12 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+    {
+      name: 'f',
+      code: function(o) {
+        return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+      },
+      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) != 0;'
     }
   ]
 });
@@ -604,8 +695,12 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
+    {
+      name: 'f',
+      code: function(o) {
+        return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
+      },
+      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) < 0;'
     }
   ]
 });
@@ -618,8 +713,12 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
+    {
+      name: 'f',
+      code: function(o) {
+        return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
+      },
+      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) <= 0;'
     }
   ]
 });
@@ -632,8 +731,12 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
+    {
+      name: 'f',
+      code: function(o) {
+        return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
+      },
+      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) > 0;'
     }
   ]
 });
@@ -646,8 +749,12 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
+    {
+      name: 'f',
+      code: function(o) {
+        return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
+      },
+      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) >= 0;'
     }
   ]
 });
@@ -674,11 +781,26 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
-  extends: 'foam.mlang.predicate.Unary',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+
+  properties: [
+    {
+      class: 'foam.mlang.predicate.PredicateProperty',
+      name: 'arg1'
+    }
+  ],
 
   methods: [
-    function f(obj) {
-      return ! this.arg1.f(obj);
+    {
+      name: 'f',
+      code: function(obj) {
+        return ! this.arg1.f(obj);
+      },
+      javaCode: 'return ! arg1.f(obj);'
+    },
+    function toString() {
+      return foam.String.constantize(this.cls_.name) +
+          '(' + this.arg1.toString() + ')';
     },
     function partialEval() {
       return this;
@@ -766,44 +888,58 @@ foam.CLASS({
 });
 
 
-/** Base class for comparators. */
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.mlang.order',
   name: 'Comparator',
-  abstract: true,
-
-  properties: [
-    {
-      /** The first argument to the expression. */
-      name: 'arg1',
-      class: 'foam.mlang.ExprArgument'
-    }
-  ],
-
   methods: [
-    function compare(o1, o2) {
-      return this.arg1.compare(o1, o2);
-    },
-
-    function toString() {
-      return foam.String.constantize(this.cls_.name) + '(' + this.arg1.toString() + ')';
+    {
+      name: 'compare',
+      args: [
+        {
+          name: 'o1',
+          javaType: 'Object'
+        },
+        {
+          name: 'o2',
+          javaType: 'Object'
+        }
+      ]
     }
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Desc',
-  extends: 'foam.mlang.order.Comparator',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
+        // of parameter is an interface rather than a class.
+        return a;
+      },
+      name: 'arg1'
+    }
+  ],
 
   methods: [
-    function compare(o1, o2) {
-      return -1 * this.arg1.compare(o1, o2);
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        return -1 * this.arg1.compare(o1, o2);
+      },
+      javaCode: 'return -1 * arg1.compare(o1, o2);'
     },
-
-    function toString() {
-      return 'DESC(' + this.arg1.toString() + ')';
+    {
+      name: 'toString',
+      code: function() {
+        return 'DESC(' + this.arg1.toString() + ')';
+      },
+      javaCode: 'return "DESC(" + arg1.toString() + ")";'
     }
   ]
 });
