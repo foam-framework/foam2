@@ -50,9 +50,6 @@ foam.CLASS({
     {
       name: 'outputJSON',
       value: function outputJSON(os, obj, includeComma) {
-        if ( ! os.propertyPredicate(obj, this ) ) return;
-        if ( ! os.outputDefaultValues && os.isDefaultValue(obj, this) ) return;
-
         var v = obj[this.name];
         if ( Array.isArray(v) && ! v.length ) return;
 
@@ -322,6 +319,9 @@ foam.CLASS({
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
+            if ( ! this.propertyPredicate(o, ps[i]) ) continue;
+            if ( ! this.outputDefaultValues && this.isDefaultValue(o, ps[i]) ) continue;
+
             ps[i].outputJSON(this, o, this.outputClassNames || i);
             //            this.outputProperty(o, ps[i], this.outputClassNames || i );
           }
