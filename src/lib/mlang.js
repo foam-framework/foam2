@@ -78,6 +78,24 @@ foam.CLASS({
         if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
         return o;
       }
+    },
+    {
+      name: 'fromJSON',
+      value: function(value, opt_ctx) {
+        return value.c ?
+            foam.lookup(value.c).getAxiomByName(value.p) :
+            value.v ;
+      }
+    },
+    {
+      name: 'toJSON',
+      value: function(value) {
+        return foam.core.Property.isInstance(value) ?
+            {c: value.sourceCls_.id, p: value.name} :
+            foam.mlang.predicate.Constant.isInstance(value) ?
+                {v: value.value} :
+                {v: value} ;
+      }
     }
   ]
 });
