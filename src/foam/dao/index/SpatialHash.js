@@ -22,44 +22,44 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   requires: [
     'foam.mlang.predicate.Constant',
+    'foam.geo.Point',
+    'foam.geo.BoundingBox'
   ],
   properties: [
     {
-      /** The set of properties that define a bounding box for each axis. */
-      name: 'arg1',
-      adapt: function(old,nu) {
-        if ( Array.isArray( nu ) ) {
-          return this.Constant.create({ value: nu });
-        }
-        return nu;
-      },
-      factory: function() {
-        /** Default to 2D bounding box */
-        return [
-          [ { f: function(o) { return o['bx']; }, name: 'bx' },
-            { f: function(o) { return o['bx2']; }, name: 'bx2' } ],
-          [ { f: function(o) { return o['by']; }, name: 'by' },
-            { f: function(o) { return o['by2']; }, name: 'by2' } ]
-        ];
-      },
+      /** The first point or region to test */
+      name: 'arg1'
     },
     {
-      name: 'arg2',
-      adapt: function(old,nu) {
-        if ( ! nu.f || typeof nu.f !== 'function' ) {
-          return this.Constant.create({ value: nu });
-        }
-        return nu;
-      }
+      /** The second point or region to test */
+      name: 'arg2'
     },
   ],
   methods: [
     function f(o) {
-      var s = this.arg1.f(o);
-      for (var axis = 0; axis < s.length; ++axis) {
+      var a = this.arg1.f(o);
+      var b = this.arg2.f(o);
+      var aLower, aUpper, bLower, bUpper;
+      if ( this.Point.isInstance(a) ) { // TODO: generalize point/BB/region compare
+        aLower = a;
+        aUpper = a;
+      } else {
+        aLower = a.lower;
+        aUpper = a.upper;
+      }
+      if ( this.Point.isInstance(b) ) {
+        bLower = b;
+        bUpper = b;
+      } else {
+        bLower = b.lower;
+        bUpper = b.upper;
+      }
+
+      var axes = aUpper.getAxisNames();
+      for (var axis = 0; axis < axes.length; ++axis) {
         if (
-          ( s[axis][0].f(o) > s[axis][1].f(this.arg2.f(o)) ) ||
-          ( s[axis][1].f(o) < s[axis][0].f(this.arg2.f(o)) )
+          ( aLower[axis] > bUpper[axis] ) ||
+          ( aUpper[axis] < bLower[axis] )
         ) {
           return false;
         }
@@ -76,11 +76,29 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Intersects',
   methods: [
     function f(o) {
-      var s = this.arg1.f(o);
-      for (var axis = 0; axis < s.length; ++axis) {
+      var a = this.arg1.f(o);
+      var b = this.arg2.f(o);
+      var aLower, aUpper, bLower, bUpper;
+      if ( this.Point.isInstance(a) ) { // TODO: generalize point/BB/region compare
+        aLower = a;
+        aUpper = a;
+      } else {
+        aLower = a.lower;
+        aUpper = a.upper;
+      }
+      if ( this.Point.isInstance(b) ) {
+        bLower = b;
+        bUpper = b;
+      } else {
+        bLower = b.lower;
+        bUpper = b.upper;
+      }
+
+      var axes = aUpper.getAxisNames();
+      for (var axis = 0; axis < axes.length; ++axis) {
         if (
-          ( s[axis][0].f(o) < s[axis][0].f(this.arg2.f(o)) ) ||
-          ( s[axis][1].f(o) > s[axis][1].f(this.arg2.f(o)) )
+          ( aLower[axis] < bLower[axis] ) ||
+          ( aUpper[axis] > bUpper[axis] )
         ) {
           return false;
         }
