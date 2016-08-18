@@ -52,7 +52,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'CSS',
@@ -673,10 +672,8 @@ foam.CLASS({
       */
       var base = this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id);
 
-      if ( ! opt_extra ) opt_extra = '';
-
       return base.split(/ +/).
-          map(function(c) { return c + '-' + opt_extra; }).
+          map(function(c) { return c + (opt_extra ? '-' + opt_extra : ''); }).
           join(' ');
     },
 

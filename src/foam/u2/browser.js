@@ -60,11 +60,8 @@ foam.CLASS({
     {
       name: 'rowClick',
       code: function(sub, _, obj) {
-        this.stack.pushAfter(this, this.DAOUpdateController.create({
-          of: this.of,
-          data: obj,
-          dao: this.data
-        }));
+        this.stack.pushAfter(this,
+            this.buildUpdateController(this.__subContext__, obj));
       }
     }
   ],
@@ -74,10 +71,8 @@ foam.CLASS({
       name: 'newItem',
       label: 'New',
       code: function() {
-        this.stack.pushAfter(this, this.DAOCreateController.create({
-          of: this.of,
-          dao: this.data
-        }));
+        this.stack.pushAfter(this,
+            this.buildCreateController(this.__subContext__));
       }
     }
   ],
@@ -95,6 +90,21 @@ foam.CLASS({
           .add(this.NEW_ITEM)
           .add(list)
           .endContext();
+    },
+
+    // These two functions are designed to be overridden by subclasses that
+    // need to wrap or replace the DAOUpdateController.
+    function buildUpdateController(X, data) {
+      return this.DAOUpdateController.create({
+        data: data,
+        dao: this.data
+      }, X);
+    },
+    function buildCreateController(X) {
+      return this.DAOCreateController.create({
+        of: this.of,
+        dao: this.data
+      }, X);
     }
   ]
 });
@@ -221,7 +231,7 @@ foam.CLASS({
     // Pops anything after the host!
     function pushAfter(host, child) {
       // NB: If the host is not found, throws an error.
-      if ( this.views.indexOf(host) < 0 ) {
+      if ( this.indexOf(host) < 0 ) {
         throw new Error('StackView: Host not found.');
       }
 
@@ -245,7 +255,7 @@ foam.CLASS({
 
     // Pops everything below the current view.
     function popChildren(host) {
-      var index = this.views.indexOf(host);
+      var index = this.indexOf(host);
       if ( index < 0 ) {
         this.views.splice(0, this.views.length);
         return;
@@ -266,6 +276,18 @@ foam.CLASS({
     function removeTopmost_() {
       var e = this.views.pop();
       this.viewRemoved.pub(e, this.views.length);
+    },
+
+    function indexOf(host) {
+      // Scan through the views looking for the host.
+      // If that fails, try again with the parent of host, if defined.
+      // This allows children views (eg. action buttons) to pop their parents
+      // off the stack.
+      while ( host ) {
+        var index = this.views.indexOf(host);
+        if ( index >= 0 ) return index;
+        host = host.parentNode;
+      }
     }
   ]
 });
@@ -495,7 +517,7 @@ foam.CLASS({
       class: 'String',
       name: 'title',
       expression: function(of) {
-        return 'New ' + of.label;
+        return 'New ' + of.model_.label;
       }
     },
     {
@@ -527,14 +549,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var dv;
-      if ( this.data && this.data.toE ) {
-        dv = this.data.toE(this.__subContext__);
-      } else {
-        dv = this.DetailView.create({ of: this.of });
-        dv.data$ = this.data$;
-      }
-
+      var dv = this.buildDetailView();
       this.startContext({ data: this })
           .cssClass(this.myCls())
           .add(this.CANCEL)
@@ -544,6 +559,17 @@ foam.CLASS({
               .add(dv)
           .end()
           .endContext();
+    },
+
+    function buildDetailView() {
+      var dv;
+      if ( this.data && this.data.toE ) {
+        dv = this.data.toE(this.__subContext__);
+      } else {
+        dv = this.DetailView.create({ of: this.of });
+        dv.data$ = this.data$;
+      }
+      return dv;
     },
 
     function clearFocus_() {
