@@ -85,19 +85,19 @@ foam.CLASS({
     {
       name: 'fromJSON',
       value: function(value, opt_ctx) {
-        return value.c ?
-            foam.lookup(value.c).getAxiomByName(value.p) :
-            value.v ;
+        return value && '__Property__' === value.class ?
+            foam.lookup(value.source).getAxiomByName(value.name) :
+            value ;
       }
     },
     {
       name: 'toJSON',
       value: function(value) {
         return foam.core.Property.isInstance(value) ?
-            {c: value.sourceCls_.id, p: value.name} :
+            { class: '__Property__', source: value.sourceCls_.id, name: value.name } :
             foam.mlang.predicate.Constant.isInstance(value) ?
-                {v: value.value} :
-                {v: value} ;
+                value.value :
+                value ;
       }
     }
   ]

@@ -153,6 +153,7 @@ foam.CLASS({
       }
     },
     {
+      // TODO: rename to FON
       class: 'Boolean',
       name: 'strict',
       value: true,
