@@ -156,11 +156,11 @@ foam.CLASS({
   TODO: This will become an index for an MDAO/IndexedDAO
 */
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'SpatialHashDAO',
-  extends: 'foam.dao.AbstractDAO',
+  package: 'foam.dao.index',
+  name: 'SpatialHash',
+  implements: 'foam.dao.index.Index',
   requires: [
-    'foam.dao.ArraySink',
+    'foam.dao.index.SelectingPlan',
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.Intersects',
     'foam.mlang.predicate.ContainedBy',
@@ -172,6 +172,9 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'tailFactory'
+    },
     {
       /** A map of the items stored, by id. Helps removal of items. */
       name: 'items',
@@ -325,7 +328,10 @@ foam.CLASS({
         if ( ! axes.length ) {
           var bucket = this.buckets[prefix];
           if ( ( ! bucket ) && createMode ) {
-            bucket = this.buckets[prefix] = { _hash_: prefix };
+            bucket = this.buckets[prefix] = {
+              _hash_: prefix,
+              value: this.tailFactory.create()
+            };
           }
           if ( bucket ) {
             ret.push(bucket);
@@ -346,62 +352,6 @@ foam.CLASS({
       return ret;
     },
 
-    function put(obj) {
-      var min = this.hash_(obj, false);
-      var max = this.hash_(obj, true);
-
-      if ( this.items[obj.id] ) {
-        var prev = this.items[obj.id];
-        // If the object moved, but the min/max points are in the same buckets
-        // as before, none of the buckets need to be altered.
-        if ( min == prev.min && max == prev.max ) {
-          // hashes match, no change in buckets
-          this.on.put.pub(obj);
-          return Promise.resolve(obj);
-        }
-        // otherwise remove the old bucket entries and continue to re-insert
-        this.remove_(obj);
-      }
-
-      // add to the buckets the item overlaps
-      var buckets = this.findBucketsFn(obj, true);
-      buckets.min = min;
-      buckets.max = max;
-      this.items[obj.id] = buckets; // for fast removal later
-      for (var i = 0; i < buckets.length; ++i) {
-        buckets[i][obj.id] = obj;
-      }
-
-      this.on.put.pub(obj);
-      return Promise.resolve(obj);
-    },
-
-    function remove(obj) {
-      this.remove_(obj);
-      this.on.remove.pub(obj);
-      return Promise.resolve();
-    },
-    /** Internal version of remove, without DAO notification. @internal */
-    function remove_(obj) {
-      var buckets = this.items[obj.id];
-
-      if (! buckets || ! buckets.length ) {
-        return false;
-      } else {
-        for (var i = 0; i < buckets.length; ++i) {
-          delete buckets[i][obj.id];
-
-          // check for empty bucket
-          // TODO: maybe batch this on the next frame to avoid churn when removing
-          // and re-adding immediately
-//           if ( Object.keys( buckets[i] ).length == 1 ) {
-//             delete this.buckets[buckets[i]._hash_];
-//           }
-        }
-        delete this.items[obj.id];
-        return true;
-      }
-    },
     /** Attempts to optimize the query and find all buckets that contain
       potential matches. */
     function queryBuckets_(skip, limit, order, predicate) {
@@ -529,61 +479,80 @@ foam.CLASS({
     },
 
     function selectAll_(isink, skip, limit, order, predicate) {
-      var resultSink = isink || this.ArraySink.create();
+      var resultSink = isink;
       var sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
       // no optimal filtering available, so run all items through
-      var fc = this.FlowControl.create();
       var items = this.items;
       for ( var key in items ) {
-        if ( fc.stopped ) break;
-        if ( fc.errorEvt ) {
-          var err = fc.errorEvt;
-          fc.destroy();
-          sink.error(err);
-          return Promise.reject(err);
-         }
-        sink.put(items[key].object, fc);
+        sink.put(items[key].object);
       }
-      fc.destroy();
-
-      sink.eof();
-      return Promise.resolve(resultSink);
     },
 
     function selectBuckets_(isink, buckets, skip, limit, order, predicate) {
-      var resultSink = isink || this.ArraySink.create();
+      var resultSink = isink;
       var sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var duplicates = {};
-      var fc = this.FlowControl.create();
+      // TODO: also prevent duplicates
+      // TODO: flow control?
       for ( var i = 0; ( i < buckets.length && ! fc.stopped ); ++i ) {
-        for ( var key in buckets[i] ) {
-          if ( fc.stopped ) break;
-          if ( fc.errorEvt ) {
-            var err = fc.errorEvt;
-            fc.destroy();
-            sink.error(err);
-            return Promise.reject(err);
-           }
-          // skip things we've already seen from other buckets
-          if ( duplicates[key] ) { continue; }
-          duplicates[key] = true;
-          var obj = buckets[i][key];
-          if ( obj.id ) {
-            sink.put(obj); // HACK: removed FlowControl to gain optimization
-          }
-        }
+        buckets[i].value.select(isink, skip, limit, order, predicate);
       }
-      fc.destroy();
-      sink.eof();
-      return Promise.resolve(resultSink);
     },
 
+    /** Adds or updates the given value in the index */
+    function put(obj) {
+      var bb = this.prop.f(obj);
+      var lower = this.hash_(bb.lower);
+      var upper = this.hash_(bb.upper);
+
+      if ( this.items[obj.id] ) {
+        var prev = this.items[obj.id];
+        // If the object moved, but the lower/upper points are in the same buckets
+        // as before, none of the buckets need to be altered.
+        if ( lower !== prev.lower || upper !== prev.upper ) {
+          this.remove_(obj);
+        }
+      }
+
+      // add to the buckets the item overlaps
+      var buckets = this.findBucketsFn(obj, true);
+      buckets.lower = lower;
+      buckets.upper = upper;
+      this.items[obj.id] = buckets; // for fast removal later
+      for (var i = 0; i < buckets.length; ++i) {
+        buckets[i].value.put(obj);
+      }
+    },
+
+    /** Removes the given value from the index */
+    function remove() {
+      var buckets = this.items[obj.id];
+
+      if ( buckets && buckets.length ) {
+        for (var i = 0; i < buckets.length; ++i) {
+          buckets[i].value.remove(obj);
+          // TODO: check for empty bucket, clean up later
+        }
+        delete this.items[obj.id];
+      }
+    },
+
+    /** @return the stored subindex for the given key. */
+    function get(key) {
+      return this.buckets[key].value;
+    },
+
+    /** @return the integer size of this index. */
+    function size() {
+      return this.items.length;
+    },
+
+    /** Selects matching items from the index and puts them into sink */
     function select(isink, skip, limit, order, predicate) {
       var buckets;
 
-      if ( predicate &&
+      if ( predicate && predicate.arg2 === this.prop &&
        ( this.Intersects.isInstance(predicate) || this.ContainedBy.isInstance(predicate))) {
         buckets = this.findBucketsFn(predicate.arg2.f());
       } else {
@@ -597,29 +566,18 @@ foam.CLASS({
       }
     },
 
-    function removeAll(skip, limit, order, predicate) {
-      var predicate = ( predicate ) || this.True.create();
-
-      for ( var key in this.items ) {
-        var obj = this.items[key].object;
-        if ( predicate.f(obj) ) {
-          this.remove(obj);
-          this.on.remove.pub(obj);
-        }
-      }
-
-      sink && sink.eof && sink.eof();
-
-      return Promise.resolve();
+    /** Selects matching items in reverse order from the index and puts
+      them into sink */
+    function selectReverse(/*sink, skip, limit, order, predicate*/) {
+      // ordering not supported
+      this.select.apply(this, arguments);
     },
 
-    function find(id) {
-      var obj = this.items[id] && this.items[id].object;
-      if ( obj ) {
-        return Promise.resolve(obj);
-      } else {
-        return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
-      }
-    }
+    /** @return a Plan to execute a select with the given parameters */
+    function plan(sink, skip, limit, order, predicate) {
+      // TODO: refine cost estimate
+      this.SelectingPlan.create({ index: this, cost: this.size() });
+    },
+
   ]
 });

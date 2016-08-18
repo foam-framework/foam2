@@ -121,7 +121,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(/*promise, state, sink, skip, limit, order, predicate*/) {},
+    function execute(/*promise, sink, skip, limit, order, predicate*/) {},
     function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
   ]
 });
@@ -140,7 +140,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toString() { return 'no-match(cost=0)'; }
+    function toString() { return 'no-match(cost=MAX)'; }
   ]
 });
 
@@ -162,6 +162,24 @@ foam.CLASS({
   ]
 });
 
+/** Plan for a synchronous index that just needs to select() on itself. **/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'SelectingPlan',
+  extends: 'foam.dao.index.Plan',
+
+  properties: [
+    { name: 'cost', value: 0 },
+    { name: 'index', required: true },
+  ],
+
+  methods: [
+    function execute(promise, sink, skip, limit, order, predicate) {
+      // TODO: account for reverse ordering
+      this.index.select(sink, skip, limit, order, predicate);
+    },
+  ]
+});
 
 /** Convenience wrapper for indexes that want to create a closure'd function
     for each plan instance */
@@ -182,11 +200,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(promise, state, sink, skip, limit, order, predicate) {
+    function execute(promise, sink, skip, limit, order, predicate) {
       this.customExecute.call(
           this,
           promise,
-          state,
           sink,
           skip,
           limit,
@@ -386,7 +403,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Simple',
+      class: 'Simple', // TODO: why not shared?
       name: 'prop'
     },
     {
