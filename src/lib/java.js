@@ -120,6 +120,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaJsonParser'
+    },
+    {
+      class: 'String',
+      name: 'javaToJSON'
     }
   ],
   templates: [
@@ -149,7 +153,7 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
       name: 'axiomClassInfo',
       template: function() {/*<% var cls = arguments[1]; %>
   .addProperty(
-    new PropertyInfo() {
+    new AbstractPropertyInfo() {
       @Override
       public String getName() { return "<%= this.name %>"; }
 
@@ -172,15 +176,12 @@ if ( foam.core.FObjectArray.isInstance(this) ) { %>
 <% } %>
       }
 
+<% if ( this.javaOutputJSON ) { %>
       @Override
-      public Object f(FObject o) {
-        return this.get(o);
+      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
+<%= this.javaToJSON %>
       }
-
-      @Override
-      public foam.mlang.Expr partialEval() {
-        return this;
-      }
+<% } %>
 
       @Override
       public Parser jsonParser() {
@@ -264,9 +265,7 @@ new ClassInfo()
 // adamvy@google.com
 package <%= cls.package %>;
 
-import foam.core.ClassInfo;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
+import foam.core.*;
 
 import foam.lib.parse.*;
 import foam.lib.json.*;
