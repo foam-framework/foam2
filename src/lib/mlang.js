@@ -74,8 +74,8 @@ foam.CLASS({
       name: 'adapt',
       value: function(_, o) {
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
-        if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
+        if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
+        if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
         return o;
       }
     },
@@ -155,8 +155,8 @@ foam.CLASS({
       name: 'adaptArrayElement',
       value: function(o) {
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
-        if ( Array.isArray(o) ) return foam.mlang.predicate.Constant.create({ value: o });
+        if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
+        if ( Array.isArray(o) ) return foam.mlang.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
         return o;
@@ -622,18 +622,26 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.mlang.predicate',
+  package: 'foam.mlang',
   name: 'Constant',
-  extends: 'foam.mlang.predicate.AbstractPredicate',
+  extends: 'foam.mlang.AbstractExpr',
 
   properties: [
     {
-      name: 'value'
+      name: 'value',
+      javaJsonParser: 'foam.lib.json.ConstantParser',
+      javaType: 'Object'
     }
   ],
 
   methods: [
-    function f(_) { return this.value; },
+    {
+      name: 'f',
+      code: function() {
+        return this.value;
+      },
+      javaCode: 'return this.value;'
+    },
     function toString_(x) {
       return typeof x === 'number' ? '' + x :
         typeof x === 'string' ? '"' + x + '"' :
