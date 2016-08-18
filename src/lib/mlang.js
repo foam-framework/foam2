@@ -94,8 +94,10 @@ foam.CLASS({
       name: 'toJSON',
       value: function(value) {
         return foam.core.Property.isInstance(value) ?
-            {c: value.cls_.id, p: value.name} :
-            {v: value} ;
+            {c: value.sourceCls_.id, p: value.name} :
+            foam.mlang.predicate.Constant.isInstance(value) ?
+                {v: value.value} :
+                {v: value} ;
       }
     }
   ]
