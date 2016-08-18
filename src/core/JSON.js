@@ -296,6 +296,11 @@ foam.CLASS({
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
         FObject:   function(o) {
+          if ( o.outputJSON ) {
+            o.outputJSON(this)
+            return;
+          }
+
           this.start('{');
           if ( this.outputClassNames ) {
             this.out(

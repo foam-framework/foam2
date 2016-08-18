@@ -60,7 +60,8 @@ foam.CLASS({
         if ( Array.isArray(o) ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
-        return o;
+        if ( foam.core.FObject.isInstance(o) ) return o;
+        console.error('Invalid expression value: ', o);
       }
     }
   ]
@@ -79,7 +80,8 @@ foam.CLASS({
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.predicate.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.predicate.Constant.create({ value: o });
-        return o;
+        if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
+        console.error('Invalid expression value: ', o);
       }
     },
     {
@@ -95,9 +97,7 @@ foam.CLASS({
       value: function(value) {
         return foam.core.Property.isInstance(value) ?
             { class: '__Property__', source: value.sourceCls_.id, name: value.name } :
-            foam.mlang.predicate.Constant.isInstance(value) ?
-                value.value :
-                value ;
+            value ;
       }
     }
   ]
@@ -561,6 +561,9 @@ foam.CLASS({
     },
     function toString() {
       return this.toString_(this.value);
+    },
+    function outputJSON(os) {
+      os.output(this.value);
     }
   ]
 });
