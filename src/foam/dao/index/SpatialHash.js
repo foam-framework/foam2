@@ -40,7 +40,8 @@ foam.CLASS({
       var a = this.arg1.f(o);
       var b = this.arg2.f(o);
       var aLower, aUpper, bLower, bUpper;
-      if ( this.Point.isInstance(a) ) { // TODO: generalize point/BB/region compare
+      // TODO: generalize point/BB/region compare
+      if ( this.Point.isInstance(a) ) {
         aLower = a;
         aUpper = a;
       } else {
@@ -57,9 +58,10 @@ foam.CLASS({
 
       var axes = aUpper.getAxisNames();
       for (var axis = 0; axis < axes.length; ++axis) {
+        var ax = axes[axis];
         if (
-          ( aLower[axis] > bUpper[axis] ) ||
-          ( aUpper[axis] < bLower[axis] )
+          ( aLower[ax] > bUpper[ax] ) ||
+          ( aUpper[ax] < bLower[ax] )
         ) {
           return false;
         }
@@ -79,7 +81,8 @@ foam.CLASS({
       var a = this.arg1.f(o);
       var b = this.arg2.f(o);
       var aLower, aUpper, bLower, bUpper;
-      if ( this.Point.isInstance(a) ) { // TODO: generalize point/BB/region compare
+      // TODO: generalize point/BB/region compare
+      if ( this.Point.isInstance(a) ) {
         aLower = a;
         aUpper = a;
       } else {
@@ -96,9 +99,10 @@ foam.CLASS({
 
       var axes = aUpper.getAxisNames();
       for (var axis = 0; axis < axes.length; ++axis) {
+        var ax = axes[axis];
         if (
-          ( aLower[axis] < bLower[axis] ) ||
-          ( aUpper[axis] > bUpper[axis] )
+          ( aLower[ax] < bLower[ax] ) ||
+          ( aUpper[ax] > bUpper[ax] )
         ) {
           return false;
         }
@@ -186,32 +190,26 @@ foam.CLASS({
     },
     {
       /**
-        The space contains the names of the properties that define the
-        range on each axis.
-        <p>For example, a simple 2D space might use bx, by, bx2, by2. An item's
-        axis-aligned bounding box would range from bx to bx2 on one axis,
-        and by to by2 on the other.
-        <p>Spaces can have any number of dimensions, so a z, time, level, etc.
-        axis can also be added.
+
       */
-      name: 'space',
-      factory: function() {
-        return [
-          [ { f: function(o) { return o['bx']; }, name: 'bx' },
-            { f: function(o) { return o['bx2']; }, name: 'bx2' } ],
-          [ { f: function(o) { return o['by']; }, name: 'by' },
-            { f: function(o) { return o['by2']; }, name: 'by2' } ]
-        ];
-      },
+      class: 'Class2',
+      name: 'pointClass',
+      value: 'foam.geo.Point2D',
       postSet: function(old, nu) {
+        this.axisNames = this.pointClass$cls.create().getAxisNames();
+      }
+    },
+    {
+      name: 'axisNames',
+      postSet: function(old,nu) {
         if ( nu.length === 2 ) {
           this.findBucketsFn = this.findBuckets2_;
-        } else if ( nu.length === 3 ) {
-          this.findBucketsFn = this.findBuckets3_;
-        } else if ( nu.length === 4 ) {
-          this.findBucketsFn = this.findBuckets4_;
+//         } else if ( nu.length === 3 ) {
+//           this.findBucketsFn = this.findBuckets3_;
+//         } else if ( nu.length === 4 ) {
+//           this.findBucketsFn = this.findBuckets4_;
         } else {
-          throw new Error("Unsupported dimensions in SpatialHashDAO: " + nu.length);
+          this.findBucketsFn = this.findBucketsN_;
         }
       }
     },
@@ -220,7 +218,7 @@ foam.CLASS({
         value and round off to get the hash). Changing this value invalidates
         the existing buckets. The default is for 10 unit buckets on the x and y axes. */
       name: 'bucketWidths',
-      factory: function() { return [10, 10]; },
+      factory: function() { return foam.geo.Point2D.create({ x: 10, y: 10 }); },
       postSet: function(old, nu) {
         // TODO: removeAll and re-add
       }
@@ -240,50 +238,32 @@ foam.CLASS({
       return sink;
     },
 
-    /** A default hash for any object with an x, y, x2, y2.
-      Returns an array of buckets the object should occupy. if createMode is
-      true, buckets will be created if not present. */
-    function hash2_(x, y) {
-      var bw = this.bucketWidths;
-      return "p" + Math.floor( ( x ) / bw[0] ) * bw[0] +
-             "p" + Math.floor( ( y ) / bw[1] ) * bw[1];
-    },
-    function hash3_(x, y, z) {
-      var bw = this.bucketWidths;
-      return "p" + Math.floor( ( x ) / bw[0] ) * bw[0] +
-             "p" + Math.floor( ( y ) / bw[1] ) * bw[1] +
-             "p" + Math.floor( ( z ) / bw[2] ) * bw[2];
-    },
-    function hash4_(x, y, z, w) {
-      var bw = this.bucketWidths;
-      return "p" + Math.floor( ( x ) / bw[0] ) * bw[0] +
-             "p" + Math.floor( ( y ) / bw[1] ) * bw[1] +
-             "p" + Math.floor( ( z ) / bw[2] ) * bw[2] +
-             "p" + Math.floor( ( w ) / bw[3] ) * bw[3];
-    },
     /** Calculates the hash for an item, using the minimum bound point by default
       or the maximum if max is true. In 2D space, the default is to use the
       top-left corner of the bounding box, max == true uses the bottom-right. */
-    function hash_(/* object */ bounds, /* boolean */ max) {
+    function hash_(/* foam.geo.Point */ point) {
       var bw = this.bucketWidths;
-      var s = this.space;
-      var minmax = max ? 1 : 0;
       var ret = "";
-      for (var axis = 0; axis < s.length; ++axis) {
-        ret += "p" + Math.floor( s[axis][minmax].f(bounds) / bw[axis] ) * bw[axis];
+      var axes = this.axisNames();
+      for (var axis = 0; axis < axes.length; ++axis) {
+        var ax = axes[axis];
+        ret += "p" + Math.floor( point[ax] / bw[ax] ) * bw[ax];
       }
       return ret;
     },
 
     /** Find all the buckets the given bounds overlaps */
-    function findBuckets2_(bounds, createMode /* array */) {
+    function findBuckets2_(obj, createMode /* array */) {
+      var bound = this.prop.f(obj);
       var bw = this.bucketWidths;
-      var s = this.space;
+      var axes = this.axisNames;
+      var ax0 = axes[0];
+      var ax1 = axes[1];
 
-      var x =  s[0][0].f(bounds);
-      var y =  s[1][0].f(bounds);
-      var x2 = s[0][1].f(bounds);
-      var y2 = s[1][1].f(bounds);
+      var x =  bound.lower[ax0];
+      var y =  bound.lower[ax1];
+      var x2 = bound.upper[ax0];
+      var y2 = bound.upper[ax1];
       // if infinite area, don't try to filter (not optimal: we might only
       // want half, but this data structure is not equipped for space partitioning)
       if ( x !== x || y !== y || x2 !== x2 || y2 !== y2 ||
@@ -295,8 +275,12 @@ foam.CLASS({
 
       var ret = [];
 
-      for ( var w = Math.floor( x / bw[0] ) * bw[0]; w <= Math.floor( x2 / bw[0] ) * bw[0]; w += bw[0] ) {
-        for ( var h = Math.floor( y / bw[1] ) * bw[1]; h <= Math.floor( y2 / bw[1] ) * bw[1]; h += bw[1] ) {
+      for ( var w = Math.floor( x / bw[ax0] ) * bw[ax0];
+            w <= Math.floor( x2 / bw[ax0] ) * bw[ax0];
+            w += bw[ax0] ) {
+        for ( var h = Math.floor( y / bw[ax1] ) * bw[ax1];
+              h <= Math.floor( y2 / bw[ax1] ) * bw[ax1];
+              h += bw[ax1] ) {
           var key = "p" + w + "p" + h;
           var bucket = this.buckets[key];
           if ( ( ! bucket ) && createMode ) {
@@ -307,51 +291,59 @@ foam.CLASS({
           }
         }
       }
-      ret.object = bounds;
+      ret.object = obj;
       return ret;
     },
 
-    function findBuckets3_(bounds, createMode /* array */) {
+        /** Find all the buckets the given bounds overlaps */
+    function findBucketsN_(obj, createMode /* array */) {
+      var bound = this.prop.f(obj);
+      var upper = bound.upper;
+      var lower = bound.lower;
       var bw = this.bucketWidths;
-      var s = this.space;
+      var axes = this.axisNames;
+      var self = this;
 
-      var x =  s[0][0].f(bounds);
-      var y =  s[1][0].f(bounds);
-      var z =  s[2][0].f(bounds);
-      var x2 = s[0][1].f(bounds);
-      var y2 = s[1][1].f(bounds);
-      var z2 = s[2][1].f(bounds);
-      // if infinite area, don't try to filter (not optimal: we might only
-      // want half, but this data structure is not equipped for space partitioning)
-      if ( x !== x || y !== y || z !== z || x2 !== x2 || y2 !== y2 || z2 !== z2 ||
-           x === Infinity || y === Infinity || z === Infinity || x2 === Infinity || y2 === Infinity || z2 === Infinity ||
-           x === -Infinity || y === -Infinity || z === -Infinity || x2 === -Infinity || y2 === -Infinity ||  z2 === -Infinity
-         ) {
-        return null;
+      var abort = false;
+
+      axes.forEach(function(ax) {
+        // if infinite area, don't try to filter (not optimal: we might only
+        // want half, but this data structure is not equipped for space partitioning)
+        if ( lower[ax] !== lower[ax] || upper[ax] !== upper[ax]
+             lower[ax] === Infinity || upper[ax] === Infinity
+             lower[ax] === -Infinity || upper[ax] === -Infinity
+           ) {
+          abort = true;
+        }
       }
+      if ( abort ) return null;
 
       var ret = [];
 
-      for ( var w = Math.floor( x / bw[0] ) * bw[0]; w <= Math.floor( x2 / bw[0] ) * bw[0]; w += bw[0] ) {
-        for ( var h = Math.floor( y / bw[1] ) * bw[1]; h <= Math.floor( y2 / bw[1] ) * bw[1]; h += bw[1] ) {
-          for ( var d = Math.floor( z / bw[2] ) * bw[2]; d <= Math.floor( z2 / bw[2] ) * bw[2]; d += bw[2] ) {
-            var key = "p" + w + "p" + h + "p" + d;
-            var bucket = this.buckets[key];
-            if ( ( ! bucket ) && createMode ) {
-              bucket = this.buckets[key] = { _hash_: key };
-            }
-            if ( bucket ) {
-              ret.push(bucket);
-            }
+      // recusively scan a region for existing buckets
+      function scanNextAxis(axes, prefix) {
+        if ( ! axes.length ) {
+          var bucket = this.buckets[prefix];
+          if ( ( ! bucket ) && createMode ) {
+            bucket = this.buckets[prefix] = { _hash_: prefix };
+          }
+          if ( bucket ) {
+            ret.push(bucket);
+          }
+        } else {
+          var ax = axes[0];
+          var subAxes = axes.slice(1);
+          for ( var w = Math.floor( lower[ax] / bw[ax] ) * bw[ax];
+                w <= Math.floor( upper[ax] / bw[ax] ) * bw[ax];
+                w += bw[ax] ) {
+            scanNextAxis(subAxes, prefix + "p" + w);
           }
         }
       }
-      ret.object = bounds;
-      return ret;
-    },
+      scanNextAxis(axes, "");
 
-    function findBuckets4_(bounds, createMode /* array */) {
-      throw new Error("SpatialHashDAO.findBuckets4_() not implemented!");
+      ret.object = obj;
+      return ret;
     },
 
     function put(obj) {

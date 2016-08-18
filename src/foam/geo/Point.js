@@ -35,6 +35,7 @@ foam.CLASS({
 //       }
 //     },
 
+  //TODO: should be class method
     function getAxisNames() {
       /** Reimplement more efficiently for each point type */
       return this.cls_.getAxiomsByClass(foam.core.Property).map(function(o) {
