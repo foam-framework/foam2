@@ -18,13 +18,21 @@ public class ClassInfo {
     return this;
   }
 
+  private HashMap axiomsByName_ = new HashMap();
+
   public ClassInfo addProperty(PropertyInfo p) {
+    p.setClassInfo(this);
     axioms.add(p);
+    axiomsByName_.put(p.getName(), p);
     return this;
   }
 
   public List<Object> getAxioms() {
     return axioms;
+  }
+
+  public Object getAxiomByName(String name) {
+    return axiomsByName_.get(name);
   }
 
   public String getId() {
