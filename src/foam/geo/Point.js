@@ -190,13 +190,19 @@ foam.CLASS({
 
   extends: 'foam.core.Property',
 
+  requires: [ 'foam.dao.index.SpatialHash' ],
+
   properties: [
     [ 'of', 'foam.geo.Point' ],
   ],
 
   methods: [
     function toIndex(tailFactory) {
-      //return spatial index, kD
+      return this.SpatialHash.create({
+        prop: this,
+        pointClass: this.of,
+        tailFactory: tailFactory
+      });
     }
   ],
 });
@@ -207,6 +213,8 @@ foam.CLASS({
   name: 'BoundingBoxProperty',
 
   extends: 'foam.core.Property',
+
+  requires: [ 'foam.dao.index.SpatialHash' ],
 
   properties: [
     {
@@ -219,9 +227,11 @@ foam.CLASS({
 
   methods: [
     function toIndex(tailFactory) {
-      // Depending on Point type,
-      // return spatial index, quad/oct/R tree
-      //this.of$cls.getAxisNames()...
+      return this.SpatialHash.create({
+        prop: this,
+        pointClass: this.of,
+        tailFactory: tailFactory
+      });
     }
   ],
 });

@@ -133,19 +133,13 @@ foam.CLASS({
     'foam.mlang.predicate.ByRefConstant',
   ],
   methods: [
-    function INTERSECTS(space, o) { return this._binary_("Intersects", space, o); },
-    function CONTAINED_BY(space, o) { return this._binary_("ContainedBy", space, o); },
+    function INTERSECTS(axes, o) { return this._binary_("Intersects", axes, o); },
+    function CONTAINED_BY(axes, o) { return this._binary_("ContainedBy", axes, o); },
     function BY_REF(o) { return this.ByRefConstant.create({ value: o }); },
     function BY_VAL(o) { return this.Constant.create({ value: ( o && o.f && o.f() ) || o }); },
   ],
 });
 
-
-
-// TODO: implement CONTAINED_BY, INTERSECTS, etc.
-// They should accept a 'space' that also works with the spatial DAOs, to
-// define which properties to use for axes. For mlangs you could set that
-// once on creation, and only specify the range values when querying.
 
 /**
   Spatial hashing DAO
@@ -173,6 +167,10 @@ foam.CLASS({
 
   properties: [
     {
+      // TODO: set pointClass based on prop.of?
+      name: 'prop'
+    },
+    {
       name: 'tailFactory'
     },
     {
@@ -187,13 +185,13 @@ foam.CLASS({
     },
     {
       /** Swaps to the appropriate findBuckets function depending on the number
-        of dimensions in the space. */
+        of dimensions in the axes. */
       name: 'findBucketsFn',
       factory: function() { return this.findBuckets2_; }
     },
     {
       /**
-
+        The type of point (number of dimensions) to index
       */
       class: 'Class2',
       name: 'pointClass',
@@ -204,16 +202,18 @@ foam.CLASS({
     },
     {
       name: 'axisNames',
+      value: ['x', 'y'],
       postSet: function(old,nu) {
         if ( nu.length === 2 ) {
           this.findBucketsFn = this.findBuckets2_;
-//         } else if ( nu.length === 3 ) {
-//           this.findBucketsFn = this.findBuckets3_;
-//         } else if ( nu.length === 4 ) {
-//           this.findBucketsFn = this.findBuckets4_;
         } else {
           this.findBucketsFn = this.findBucketsN_;
         }
+        // augment bucketWidths with more default values
+        var bw = this.bucketWidths;
+        nu.forEach(function(ax) {
+          if ( ! bw[ax] ) bw[ax] = 10;
+        });
       }
     },
     {
@@ -223,6 +223,8 @@ foam.CLASS({
       name: 'bucketWidths',
       factory: function() { return foam.geo.Point2D.create({ x: 10, y: 10 }); },
       postSet: function(old, nu) {
+        // TODO: how to autodetect bucket size? Users won't usually set parameters
+        // on an index directly
         // TODO: removeAll and re-add
       }
     },
@@ -242,7 +244,7 @@ foam.CLASS({
     },
 
     /** Calculates the hash for an item, using the minimum bound point by default
-      or the maximum if max is true. In 2D space, the default is to use the
+      or the maximum if max is true. In 2D axes, the default is to use the
       top-left corner of the bounding box, max == true uses the bottom-right. */
     function hash_(/* foam.geo.Point */ point) {
       var bw = this.bucketWidths;
@@ -255,7 +257,8 @@ foam.CLASS({
       return ret;
     },
 
-    /** Find all the buckets the given bounds overlaps */
+    /** Find all the buckets the given bounds overlaps, optimized for 2D. Much
+        faster than nested functions. */
     function findBuckets2_(obj, createMode /* array */) {
       var bound = this.prop.f(obj);
       var bw = this.bucketWidths;
@@ -268,7 +271,7 @@ foam.CLASS({
       var x2 = bound.upper[ax0];
       var y2 = bound.upper[ax1];
       // if infinite area, don't try to filter (not optimal: we might only
-      // want half, but this data structure is not equipped for space partitioning)
+      // want half, but this data structure is not equipped for axes partitioning)
       if ( x !== x || y !== y || x2 !== x2 || y2 !== y2 ||
            x === Infinity || y === Infinity || x2 === Infinity || y2 === Infinity ||
            x === -Infinity || y === -Infinity || x2 === -Infinity || y2 === -Infinity
@@ -287,7 +290,10 @@ foam.CLASS({
           var key = "p" + w + "p" + h;
           var bucket = this.buckets[key];
           if ( ( ! bucket ) && createMode ) {
-            bucket = this.buckets[key] = { _hash_: key };
+            bucket = this.buckets[key] = {
+              _hash_: key,
+              value: this.tailFactory.create()
+            };
           }
           if ( bucket ) {
             ret.push(bucket);
@@ -298,7 +304,7 @@ foam.CLASS({
       return ret;
     },
 
-        /** Find all the buckets the given bounds overlaps */
+    /** Find all the buckets the given bounds overlaps */
     function findBucketsN_(obj, createMode /* array */) {
       var bound = this.prop.f(obj);
       var upper = bound.upper;
@@ -311,7 +317,7 @@ foam.CLASS({
 
       axes.forEach(function(ax) {
         // if infinite area, don't try to filter (not optimal: we might only
-        // want half, but this data structure is not equipped for space partitioning)
+        // want half, but this data structure is not equipped for axes partitioning)
         if ( lower[ax] !== lower[ax] || upper[ax] !== upper[ax]
              lower[ax] === Infinity || upper[ax] === Infinity
              lower[ax] === -Infinity || upper[ax] === -Infinity
@@ -353,18 +359,19 @@ foam.CLASS({
     },
 
     /** Attempts to optimize the query and find all buckets that contain
-      potential matches. */
+      potential matches. Need to change predicate to DNF and subquery OR'd
+      parts */
     function queryBuckets_(skip, limit, order, predicate) {
       var buckets;
       var whereQuery = predicate ? predicate.clone() : null;
 
-      var space = this.space;
+      var axes = this.axisNames;
       var isIndexed = function(mlangArg) {
         var n = mlangArg.name;
         // It's not a predicate that takes a property as arg1, we can't judge
         if ( ! n ) { return true; }
-        for (var ax = 0; ax < space.length; ++ax) {
-          if ( space[ax][0].name == n || space[ax][1].name == n ) {
+        for (var ax = 0; ax < axes.length; ++ax) {
+          if ( axes[ax] == n ) {
             return true;
           }
         }
@@ -413,24 +420,13 @@ foam.CLASS({
       };
 
       // accumulate range limits so we can make as specific query as possible
-      var ranges = {};
-      for (var ax = 0; ax < space.length; ++ax) {
-        ranges[space[ax][0].name] = -Infinity;
-        ranges[space[ax][1].name] = Infinity;
-      }
-
-      function findAxis(name) {
-        for (var ax = 0; ax < space.length; ++ax) {
-          var a = space[ax];
-          if ( a[0].name == name ||  a[1].name == name ) {
-            return a;
-          }
-        }
-        return null;
+      var ranges = { upper: {}, lower: {} };
+      for (var ax = 0; ax < axes.length; ++ax) {
+        ranges.lower[axes[ax]] = -Infinity;
+        ranges.upper[axes[ax]] = Infinity;
       }
 
       var args;
-      var axis;
       // Each hit of isExprMatch will pick off one thing ANDed at the top
       // level. Since all these bounds apply at once, keep shrinking the
       // search bounds.
@@ -442,31 +438,28 @@ foam.CLASS({
         var name = args.arg1.name;
         var r = args.arg2.f();
         // accumulate the bounds (largest minimum, smallest maximum)
-        ranges[name] = r;
+        ranges.upper[name] = r;
+        ranges.lower[name] = r;
       }
 
       // Less than restricts the maximum for an axis
       while ( args = ( isExprMatch(this.Lte) || isExprMatch(this.Lt) ) ) {
         var name = args.arg1.name;
         var r = args.arg2.f();
-        axis = findAxis(name);
-        if ( axis ) {
-          ranges[axis[1].name] = Math.min( ranges[axis[1].name], r );
-        }
+        ranges.upper[name] = Math.min( ranges.upper[name], r );
       }
 
       // Greater than restricts the minimum for an axis
       while ( args = ( isExprMatch(this.Gte) || isExprMatch(this.Gt) ) ) {
         var name = args.arg1.name;
         var r = args.arg2.f();
-        axis = findAxis(name);
-        if ( axis ) {
-          ranges[axis[0].name] = Math.max( ranges[axis[0].name], r );
-        }
+        ranges.lower[name] = Math.max( ranges.lower[name], r );
       }
 
       // check for buckets with the bounds found so far
-      buckets = this.findBucketsFn(ranges);
+      var tmpObj; // TODO: get rid of this tmpObj, change findBucketsFn?
+      tmbObj[this.prop.name] = ranges;
+      buckets = this.findBucketsFn(tmpObj);
 
       // TODO: multiple ANDed intersects should reduce the search area,
       // ORed should cause multiple searches
