@@ -60,10 +60,10 @@ public class Outputter {
     out.append(p.getName());
     out.append(afterKey_());
     out.append(":");
-    output(out, p.get(o));
+    p.toJSON(this, out, p.get(o));
   }
 
-  protected void output(StringBuilder out, Object value) {
+  public void output(StringBuilder out, Object value) {
     if ( value instanceof String ) {
       outputString(out, (String)value);
     } else if ( value instanceof FObject ) {
