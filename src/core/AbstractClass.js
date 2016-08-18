@@ -70,11 +70,10 @@ foam.LIB({
       for ( var i = 0 ; i < axs.length ; i++ ) {
         var a = axs[i];
 
-        // Store the destination class in the Axiom.  Used by describe().
+        // Store the destination class in the Axiom. Used by describe().
         // Store source class on a clone of 'a' so that the Axiom can be
         // reused without corrupting the sourceCls_.
-        // Disabled: is causing dramatic performance slow-down.
-        // a = Object.create(a);
+        a = Object.create(a);
         a.sourceCls_ = this;
 
         this.axiomMap_[a.name] = a;
