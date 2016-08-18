@@ -76,25 +76,24 @@ foam.CLASS({
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
-        return o;
+        if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
+        console.error('Invalid expression value: ', o);
       }
     },
     {
       name: 'fromJSON',
       value: function(value, opt_ctx) {
-        return value.c ?
-            foam.lookup(value.c).getAxiomByName(value.p) :
-            value.v ;
+        return value && '__Property__' === value.class ?
+            foam.lookup(value.source).getAxiomByName(value.name) :
+            value ;
       }
     },
     {
       name: 'toJSON',
       value: function(value) {
         return foam.core.Property.isInstance(value) ?
-            {c: value.sourceCls_.id, p: value.name} :
-            foam.mlang.predicate.Constant.isInstance(value) ?
-                {v: value.value} :
-                {v: value} ;
+            { class: '__Property__', source: value.sourceCls_.id, name: value.name } :
+            value ;
       }
     }
   ]
@@ -159,7 +158,8 @@ foam.CLASS({
         if ( Array.isArray(o) ) return foam.mlang.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
-        return o;
+        if ( foam.core.FObject.isInstance(o) ) return o;
+        console.error('Invalid expression value: ', o);
       }
     }
   ]
@@ -651,6 +651,9 @@ foam.CLASS({
     },
     function toString() {
       return this.toString_(this.value);
+    },
+    function outputJSON(os) {
+      os.output(this.value);
     }
   ]
 });
@@ -1005,7 +1008,6 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.predicate.And',
-    'foam.mlang.predicate.Constant',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.StartsWith',
@@ -1021,6 +1023,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.Constant',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
