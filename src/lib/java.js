@@ -120,6 +120,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaJsonParser'
+    },
+    {
+      class: 'String',
+      name: 'javaToJSON'
     }
   ],
   templates: [
@@ -133,14 +137,14 @@ foam.CLASS({
     {
       name: 'axiomJavaSource',
       template: function() {/*<% var cls = arguments[1]; if ( this.javaType ) { %>
-private <%= this.javaType %> <%= this.name %>_;
+private <%= this.javaType %> <%= this.name %>;
 
 public <%= this.javaType %> get<%= foam.String.capitalize(this.name) %>() {
-  return <%= this.name %>_;
+  return <%= this.name %>;
 }
 
 public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.javaType %> val) {
-  <%= this.name %>_ = val;
+  <%= this.name %> = val;
   return this;
 }
 <% } %>*/}
@@ -149,7 +153,7 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
       name: 'axiomClassInfo',
       template: function() {/*<% var cls = arguments[1]; %>
   .addProperty(
-    new PropertyInfo() {
+    new AbstractPropertyInfo() {
       @Override
       public String getName() { return "<%= this.name %>"; }
 
@@ -159,9 +163,25 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
       }
 
       @Override
-      public void set(Object obj, Object value) {
+      public void set(Object obj, Object value) {<%
+// TODO(adamvy): There should be a more polymorphic way of doing this.
+// or we shouldn't support Array properties and use Lists instead.
+if ( foam.core.FObjectArray.isInstance(this) ) { %>
+        Object[] src = (Object[])value;
+        <%= this.javaType %> a = new <%= this.of %>[src.length];
+        System.arraycopy(src, 0, a, 0, src.length);
+        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>(a);
+<% } else { %>
         ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
+<% } %>
       }
+
+<% if ( this.javaOutputJSON ) { %>
+      @Override
+      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
+<%= this.javaToJSON %>
+      }
+<% } %>
 
       @Override
       public Parser jsonParser() {
@@ -201,6 +221,22 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      name: 'javaType',
+      expression: function(of) {
+        return of + '[]'
+      }
+    },
+    {
+      name: 'javaJsonParser',
+      value: 'foam.lib.json.FObjectArrayParser'
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.java',
   name: 'JavaUtil',
   axioms: [
@@ -229,9 +265,7 @@ new ClassInfo()
 // adamvy@google.com
 package <%= cls.package %>;
 
-import foam.core.ClassInfo;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
+import foam.core.*;
 
 import foam.lib.parse.*;
 import foam.lib.json.*;

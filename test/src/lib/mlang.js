@@ -379,9 +379,11 @@ describe('MLang', function() {
 
   describe('NOT()', function() {
     var NOT;
+    var EQ;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       NOT = expr.NOT.bind(expr);
+      EQ = expr.EQ.bind(expr);
     });
 
     it('works on solitary Boolean properties', function(done) {
@@ -414,7 +416,7 @@ describe('MLang', function() {
     });
 
     it('toString()s nicely', function() {
-      expect(NOT('something').toString()).toBe('NOT("something")');
+      expect(NOT(EQ(test.mlang.Person.ID, "123")).toString()).toBe('NOT(EQ(id, "123"))');
     });
   });
 

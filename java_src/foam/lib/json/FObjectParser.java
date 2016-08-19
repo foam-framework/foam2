@@ -35,7 +35,6 @@ public class FObjectParser extends ProxyParser {
             throw new RuntimeException(e);
           }
 
-          System.out.println("Parsing: " + c.getName());
           ps = ModelParserFactory.getInstance(c).parse(ps, subx);
 
           if ( ps != null ) {
