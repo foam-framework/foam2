@@ -20,7 +20,6 @@
 //
 // TODO:
 //   - don't output default classes
-//   - allow for custom Property JSON support
 */
 
 /**

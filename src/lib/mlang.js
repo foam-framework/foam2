@@ -152,6 +152,7 @@ foam.CLASS({
     },
     {
       name: 'adaptArrayElement',
+      // TODO?: Make into a multi-method?
       value: function(o) {
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
