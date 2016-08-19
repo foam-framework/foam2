@@ -652,7 +652,8 @@ foam.CLASS({
     function toString() {
       return this.toString_(this.value);
     },
-    function outputJSON(os) {
+    // TODO(adamvy): Re-enable when we can parse this in java more correctly.
+    function xxoutputJSON(os) {
       os.output(this.value);
     }
   ]
