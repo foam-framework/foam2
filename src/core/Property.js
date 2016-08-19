@@ -200,8 +200,8 @@ foam.CLASS({
       copying undefined values from parent Property, if it exists.
     */
     function installInClass(c) {
-      var prop = this;
-      var superProp = c.__proto__.getAxiomByName(prop.name);
+      var prop      = this;
+      var superProp = c.getSuperAxiomByName(prop.name);
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);
@@ -222,7 +222,6 @@ foam.CLASS({
 
         c.axiomMap_[prop.name] = prop;
       }
-
 
       var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
         // We only care about Property axioms.
