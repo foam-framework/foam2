@@ -137,7 +137,7 @@ foam.CLASS({
     {
       name: 'axiomJavaSource',
       template: function() {/*<% var cls = arguments[1]; if ( this.javaType ) { %>
-private <%= this.javaType %> <%= this.name %> = null;
+private <%= this.javaType %> <%= this.name %>;
 
 public <%= this.javaType %> get<%= foam.String.capitalize(this.name) %>() {
   return <%= this.name %>;
