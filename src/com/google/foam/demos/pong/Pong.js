@@ -27,12 +27,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Float', // TODO: shouldn't be needed
       name: 'vx',
-      preSet: function(_, v) {
-// TODO: isn't called
-        console.log('preSet', v);
- return Math.sign(v) * Math.max(5, Math.abs(v)); }
+      preSet: function(_, v) { return Math.sign(v) * Math.max(5, Math.abs(v)); }
     }
   ]
 });
@@ -52,13 +48,8 @@ foam.CLASS({
     [ 'color', 'white' ],
     [ 'radius', 30 ],
     {
-      class: 'Float', // TODO: shouldn't be needed
       name: 'mass',
-      factory: function() {
-// TODO: isn't called
-console.log('********************');
- debugger;
-return this.INFINITE_MASS; }
+      factory: function() { return this.INFINITE_MASS; }
     }
   ]
 });
@@ -182,8 +173,6 @@ foam.CLASS({
           this.lPaddle,
           this.rPaddle);
 
-      this.lPaddle.mass = this.rPaddle.mass = this.lPaddle.INFINITE_MASS;
-
       // Position Paddles
       this.lPaddle.x = 25+this.lPaddle.radius;
       this.rPaddle.x = this.width-25-this.rPaddle.radius;
@@ -192,7 +181,7 @@ foam.CLASS({
       // Setup Ball
       this.ball.x  = 110;
       this.ball.y  = this.rPaddle.y;
-      this.ball.vx = this.ball.vy = 20;
+      this.ball.vx = this.ball.vy = 10;
 
       this.ball.x$.sub(this.onBallMove);
 
