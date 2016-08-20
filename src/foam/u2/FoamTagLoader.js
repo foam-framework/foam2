@@ -39,11 +39,13 @@ foam.CLASS({
 
         if ( cls ) {
           var view = cls.create(null, foam.__context__);
+
           if ( view.toE ) {
             view = view.toE(foam.__context__);
           } else if ( ! foam.u2.Element.isInstance(view) )  {
             view = foam.u2.DetailView.create({data: view, showActions: true});
           }
+
           el.outerHTML = view.outerHTML;
           view.load();
         } else {
