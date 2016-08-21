@@ -67,13 +67,15 @@ foam.LIB({
     function installAxioms(axs) {
       this.private_.axiomCache = {};
 
+      // We install in two passes to avoid ordering issues from Axioms which
+      // need to access other axioms, like ids: and exports:.
+
       for ( var i = 0 ; i < axs.length ; i++ ) {
         var a = axs[i];
 
         // Store the destination class in the Axiom. Used by describe().
         // Store source class on a clone of 'a' so that the Axiom can be
         // reused without corrupting the sourceCls_.
-        a = Object.create(a);
         a.sourceCls_ = this;
 
         this.axiomMap_[a.name] = a;
@@ -97,7 +99,7 @@ foam.LIB({
 
     function installConstant(key, value) {
       var cName = foam.String.constantize(key);
-      var prev = this[cName];
+      var prev  = this[cName];
 
       // Detect constant name collisions
       if ( prev && prev.name !== key ) {
@@ -138,6 +140,11 @@ foam.LIB({
     /** Find an axiom by the specified name from either this class or an ancestor. */
     function getAxiomByName(name) {
       return this.axiomMap_[name];
+    },
+
+    /** Find an axiom by the specified name from an ancestor. */
+    function getSuperAxiomByName(name) {
+      return this.axiomMap_.__proto__[name];
     },
 
     /**

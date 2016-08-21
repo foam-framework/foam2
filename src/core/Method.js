@@ -112,7 +112,7 @@ foam.CLASS({
     function installInClass(cls) {
       var method = this;
 
-      var superMethod = cls.__proto__.getAxiomByName(method.name);
+      var superMethod = cls.getSuperAxiomByName(method.name);
       if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
         method = superMethod.createChildMethod_(method);
       }

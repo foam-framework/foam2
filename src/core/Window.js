@@ -231,4 +231,7 @@ if ( foam.isServer ) {
 }
 
 
-foam.__context__ = foam.core.Window.create({window: global}, foam.__context__).__subContext__;
+foam.__context__ = foam.core.Window.create(
+  { window: global },
+  foam.__context__
+).__subContext__;

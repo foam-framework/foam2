@@ -80,6 +80,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function init() {
       var slot = this.slot.bind(this);
