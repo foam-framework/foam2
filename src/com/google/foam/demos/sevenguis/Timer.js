@@ -51,6 +51,7 @@ foam.CLASS({
       toPropertyE: function(X) {
         return X.lookup('foam.u2.ProgressView').create(null, X);
       }
+      // TODO: allow short-form
 //      toPropertyE: 'foam.u2.ProgressView'
     },
     {
@@ -63,6 +64,7 @@ foam.CLASS({
       class: 'Int',
       name: 'duration',
       units: 'ms',
+      // TODO: support short-form
       toPropertyE: function(X) {
         return X.lookup('foam.u2.RangeView').create({maxValue: 10000}, X);
       },
