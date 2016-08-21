@@ -70,6 +70,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'foam.mlang.Expr'],
+    ['javaJsonParser', 'foam.lib.json.ExprParser'],
     {
       name: 'adapt',
       value: function(_, o) {
