@@ -359,7 +359,7 @@ foam.CLASS({
     },
 
     /** Attempts to optimize the query and find all buckets that contain
-      potential matches. Need to change predicate to DNF and subquery OR'd
+      potential matches. TODO: Need to change predicate to DNF and subquery OR'd
       parts */
     function queryBuckets_(skip, limit, order, predicate) {
       var buckets;

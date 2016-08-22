@@ -24,18 +24,7 @@ foam.CLASS({
 
 
   methods: [
-//     {
-//       /** Called as a static method of the class */
-//       class: 'ClassMethod',
-//       name: 'toIndex',
-//       code: function toIndex(tailFactory, prop) {
-//         console.log("Returning index for Point:", this, tailFactory, prop);
-//         this.describe();
-//         return foam.dao.index.TreeIndex.create({ prop: prop, tailFactory: tailFactory });
-//       }
-//     },
-
-  //TODO: should be class method
+    //TODO: should be class method
     function getAxisNames() {
       /** Reimplement more efficiently for each point type */
       return this.cls_.getAxiomsByClass(foam.core.Property).map(function(o) {
