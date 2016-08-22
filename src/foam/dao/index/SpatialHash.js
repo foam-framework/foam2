@@ -249,7 +249,7 @@ foam.CLASS({
     function hash_(/* foam.geo.Point */ point) {
       var bw = this.bucketWidths;
       var ret = "";
-      var axes = this.axisNames();
+      var axes = this.axisNames;
       for (var axis = 0; axis < axes.length; ++axis) {
         var ax = axes[axis];
         ret += "p" + Math.floor( point[ax] / bw[ax] ) * bw[ax];
@@ -332,11 +332,11 @@ foam.CLASS({
       // recusively scan a region for existing buckets
       function scanNextAxis(axes, prefix) {
         if ( ! axes.length ) {
-          var bucket = this.buckets[prefix];
+          var bucket = self.buckets[prefix];
           if ( ( ! bucket ) && createMode ) {
-            bucket = this.buckets[prefix] = {
+            bucket = self.buckets[prefix] = {
               _hash_: prefix,
-              value: this.tailFactory.create()
+              value: self.tailFactory.create()
             };
           }
           if ( bucket ) {
@@ -526,7 +526,7 @@ foam.CLASS({
     },
 
     /** Removes the given value from the index */
-    function remove() {
+    function remove(obj) {
       var buckets = this.items[obj.id];
 
       if ( buckets && buckets.length ) {

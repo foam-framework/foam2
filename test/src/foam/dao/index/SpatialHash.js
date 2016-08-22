@@ -25,15 +25,15 @@ describe('SpatialHash index', function() {
       'id',
       {
         class: 'foam.geo.PointProperty',
-        of: 'foam.geo.Point2D',
+        of: 'foam.geo.Point3D',
         name: 'location',
       },
       {
         class: 'foam.geo.BoundingBoxProperty',
-        of: 'foam.geo.Point2D',
+        of: 'foam.geo.Point3D',
         name: 'bb',
         factory: function() {
-          var ret = foam.geo.RadialBoundingBox();
+          var ret = foam.geo.RadialBoundingBox.create();
           ret.location$.linkFrom(this.location$);
           ret.radius = 10;
           return ret;
@@ -42,6 +42,19 @@ describe('SpatialHash index', function() {
       
     ]
   });
+  
+  function generatePointies() {
+    return [
+      [ 20, 20, 20 ],
+      [ 10, 10, 10 ],
+      [ 0, 0, 0 ],
+      [ 5, 0, 0 ],
+      [ 20, 4, 0 ],
+      [ 22, 3, 23 ],
+    ].map(function(pt) {
+      return test.Pointy.create({ location: foam.geo.Point3D.create({ x: pt[0], y: pt[1], z: pt[2] }) });
+    });
+  }
 
   beforeEach(function() {
   });
@@ -61,6 +74,10 @@ describe('SpatialHash index', function() {
   it('works in MDAO', function() {
     var mdao = foam.dao.MDAO.create({ of: test.Pointy  });
     mdao.addIndex(test.Pointy.BB);
+    
+    generatePointies().forEach(function(pt) {
+      mdao.put(pt);
+    });
     
     
     
