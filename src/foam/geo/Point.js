@@ -55,7 +55,7 @@ foam.CLASS({
   package: 'foam.geo',
   name: 'Point2D',
 
-  implements: [ 'foam.geo.Point' ],
+  extends: 'foam.geo.Point',
 
   properties: [
     {
@@ -86,7 +86,7 @@ foam.CLASS({
   package: 'foam.geo',
   name: 'Point3D',
 
-  implements: [ 'foam.geo.Point' ],
+  extends: 'foam.geo.Point',
 
   properties: [
     {

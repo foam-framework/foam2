@@ -120,6 +120,8 @@ describe('Generic Point implementation, 5D test', function() {
 
 });
 
+// TODO: PointProperty
 
+// TODO: test a Point composed of other Points >:D
 
 

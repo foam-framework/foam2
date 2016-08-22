@@ -16,7 +16,8 @@
  */
 
 /** BoundingBox is really just a Range(of:Point). Currently designed to operate
-  on any kind of point with any dimension. */
+  on any kind of point with any dimension. Taken to the extreme, a BoundingBox is
+  really just a Point with two Point axes (each axis is a space itself). */
 foam.CLASS({
   package: 'foam.geo',
   name: 'BoundingBox',
@@ -31,14 +32,12 @@ foam.CLASS({
   ],
 });
 
-
-
 /** Generate a BB for an object with location+radius */
 foam.CLASS({
   package: 'foam.geo',
   name: 'RadialBoundingBox',
 
-  implements: [ 'foam.geo.BoundingBox' ],
+  extends: 'foam.geo.BoundingBox',
 
   properties: [
     {
@@ -69,7 +68,6 @@ foam.CLASS({
     },
   ]
 });
-
 
 /** Actually dependent on the type of Point in the BoundingBox */
 foam.CLASS({
