@@ -18,11 +18,16 @@
 
 describe('SpatialHash index', function() {
 
+  var testIdPointy = 0;
+
   foam.CLASS({
     name: 'Pointy',
     package: 'test',
     properties:[
-      'id',
+      {
+        name: 'id',
+        factory: function() { return testIdPointy++; }
+      },
       {
         class: 'foam.geo.PointProperty',
         of: 'foam.geo.Point3D',
@@ -52,8 +57,19 @@ describe('SpatialHash index', function() {
       [ 20, 4, 0 ],
       [ 22, 3, 23 ],
     ].map(function(pt) {
-      return test.Pointy.create({ location: foam.geo.Point3D.create({ x: pt[0], y: pt[1], z: pt[2] }) });
+      return test.Pointy.create({ 
+        location: foam.geo.Point3D.create({ x: pt[0], y: pt[1], z: pt[2] })
+      });
     });
+  }
+  function loadedMDAO() {
+    var mdao = foam.dao.MDAO.create({ of: test.Pointy  });
+    mdao.addIndex(test.Pointy.BB);
+    
+    generatePointies().forEach(function(pt) {
+      mdao.put(pt);
+    });
+    return mdao;
   }
 
   beforeEach(function() {
@@ -71,16 +87,35 @@ describe('SpatialHash index', function() {
     expect(index.axisNames[1]).toEqual('y');
   }); 
 
-  it('works in MDAO', function() {
-    var mdao = foam.dao.MDAO.create({ of: test.Pointy  });
-    mdao.addIndex(test.Pointy.BB);
+  it('works in MDAO', function(done) {
+    var mdao = loadedMDAO();
     
-    generatePointies().forEach(function(pt) {
-      mdao.put(pt);
+    mdao.select(foam.mlang.sink.Count.create()).then(function(count) {
+      expect(count.value).toEqual(6);
+      done();
     });
-    
+  });
+  
+  it('executes queries', function(done) {
+    var mdao = loadedMDAO();
+
+    mdao.where(
+      foam.mlang.predicate.Intersects.create({
+        arg1: test.Pointy.BB, 
+        arg2: foam.mlang.predicate.Constant.create({ value: {
+          lower: foam.geo.Point3D.create({ x: 9, y: 9, z: 9 }),
+          upper: foam.geo.Point3D.create({ x: 21, y: 21, z: 21 })
+        } })
+      })
+    ).select().then(function(sink) { 
+      var a = sink.a;
+      console.log("Intersects:", a);
+    }).then(done);
     
     
   });
 
 });
+
+
+
