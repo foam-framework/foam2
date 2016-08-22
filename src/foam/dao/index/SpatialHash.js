@@ -152,7 +152,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'SpatialHash',
-  implements: 'foam.dao.index.Index',
+  extends: 'foam.dao.index.Index',
   requires: [
     'foam.dao.index.SelectingPlan',
     'foam.mlang.predicate.True',
@@ -318,13 +318,13 @@ foam.CLASS({
       axes.forEach(function(ax) {
         // if infinite area, don't try to filter (not optimal: we might only
         // want half, but this data structure is not equipped for axes partitioning)
-        if ( lower[ax] !== lower[ax] || upper[ax] !== upper[ax]
-             lower[ax] === Infinity || upper[ax] === Infinity
+        if ( lower[ax] !== lower[ax] || upper[ax] !== upper[ax] ||
+             lower[ax] === Infinity || upper[ax] === Infinity ||
              lower[ax] === -Infinity || upper[ax] === -Infinity
            ) {
           abort = true;
         }
-      }
+      });
       if ( abort ) return null;
 
       var ret = [];
@@ -490,6 +490,13 @@ foam.CLASS({
       // TODO: flow control?
       for ( var i = 0; ( i < buckets.length && ! fc.stopped ); ++i ) {
         buckets[i].value.select(isink, skip, limit, order, predicate);
+      }
+    },
+
+    function bulkLoad(a) {
+      a = a.a || a;
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        this.put(a[i]);
       }
     },
 

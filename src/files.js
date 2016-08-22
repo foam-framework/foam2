@@ -90,6 +90,7 @@ FOAM_FILES([
   { name: "lib/Pooled" },
   { name: "foam/geo/Point" },
   { name: "foam/geo/BoundingBox" },
+  { name: "foam/dao/index/SpatialHash" },
   { name: "lib/QueryParser" },
   { name: "lib/Physical" },
   { name: "lib/Collider" },
