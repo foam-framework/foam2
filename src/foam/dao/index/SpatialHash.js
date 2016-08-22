@@ -211,6 +211,8 @@ foam.CLASS({
       postSet: function(old,nu) {
         if ( nu.length === 2 ) {
           this.findBucketsFn = this.findBuckets2_;
+        } else if ( nu.length === 3 ) {
+          this.findBucketsFn = this.findBuckets3_;
         } else {
           this.findBucketsFn = this.findBucketsN_;
         }
@@ -276,8 +278,8 @@ foam.CLASS({
 
     /** Find all the buckets the given bounds overlaps, optimized for 2D. Much
         faster than nested functions. */
-    function findBuckets2_(obj, createMode /* array */) {
-      var bound = this.prop.f(obj);
+    function findBuckets2_(bound, createMode /* array */) {
+      //var bound = this.prop.f(obj);
       var bw = this.bucketWidths;
       var axes = this.axisNames;
       var ax0 = axes[0];
@@ -317,13 +319,61 @@ foam.CLASS({
           }
         }
       }
-      ret.object = obj;
       return ret;
     },
+  function findBuckets3_(bound, createMode /* array */) {
+    //var bound = this.prop.f(obj);
+    var bw = this.bucketWidths;
+    var axes = this.axisNames;
+    var ax0 = axes[0];
+    var ax1 = axes[1];
+    var ax2 = axes[2];
 
+    var x =  bound.lower[ax0];
+    var y =  bound.lower[ax1];
+    var z =  bound.lower[ax2];
+    var x2 = bound.upper[ax0];
+    var y2 = bound.upper[ax1];
+    var z2 = bound.upper[ax2];
+    // if infinite area, don't try to filter (not optimal: we might only
+    // want half, but this data structure is not equipped for axes partitioning)
+    if ( x !== x || y !== y || x2 !== x2 || y2 !== y2 || z !== z || z2 !== z2 ||
+         x === Infinity || y === Infinity || x2 === Infinity || y2 === Infinity || z === Infinity || z2 === Infinity ||
+         x === -Infinity || y === -Infinity || x2 === -Infinity || y2 === -Infinity || z === -Infinity || z2 === -Infinity 
+       ) {
+      return null;
+    }
+
+    var ret = [];
+
+    for ( var w = Math.floor( x / bw[ax0] ) * bw[ax0];
+          w <= Math.floor( x2 / bw[ax0] ) * bw[ax0];
+          w += bw[ax0] ) {
+      for ( var h = Math.floor( y / bw[ax1] ) * bw[ax1];
+            h <= Math.floor( y2 / bw[ax1] ) * bw[ax1];
+            h += bw[ax1] ) {
+        for ( var d = Math.floor( z / bw[ax2] ) * bw[ax2];
+              d <= Math.floor( z2 / bw[ax2] ) * bw[ax2];
+              d += bw[ax2] ) {
+          var key = "p" + w + "p" + h + "p" + d;
+          var bucket = this.buckets[key];
+          if ( ( ! bucket ) && createMode ) {
+            bucket = this.buckets[key] = {
+              _hash_: key,
+              value: this.tailFactory.create()
+            };
+          }
+          if ( bucket ) {
+            ret.push(bucket);
+          }
+        }
+      }
+    }
+    return ret;
+  },
     /** Find all the buckets the given bounds overlaps */
-    function findBucketsN_(obj, createMode /* array */) {
-      var bound = this.prop.f(obj);
+    function findBucketsN_(bound, createMode /* array */) {
+      //var bound = this.prop.f(obj);
       var upper = bound.upper;
       var lower = bound.lower;
       var bw = this.bucketWidths;
@@ -371,7 +421,6 @@ foam.CLASS({
       }
       scanNextAxis(axes, "");
 
-      ret.object = obj;
       return ret;
     },
 
@@ -474,9 +523,7 @@ foam.CLASS({
       }
 
       // check for buckets with the bounds found so far
-      var tmpObj = {}; // TODO: get rid of this tmpObj, change findBucketsFn?
-      tmpObj[this.prop.name] = ranges;
-      buckets = this.findBucketsFn(tmpObj);
+      buckets = this.findBucketsFn(ranges);
 
       // TODO: multiple ANDed intersects should reduce the search area,
       // ORed should cause multiple searches
@@ -505,7 +552,7 @@ foam.CLASS({
 
       // TODO: also prevent duplicates
       // TODO: flow control?
-      for ( var i = 0; ( i < buckets.length && ! fc.stopped ); ++i ) {
+      for ( var i = 0; i < buckets.length; ++i ) {
         buckets[i].value.select(isink, skip, limit, order, predicate);
       }
     },
@@ -533,7 +580,8 @@ foam.CLASS({
       }
 
       // add to the buckets the item overlaps
-      var buckets = this.findBucketsFn(obj, true);
+      var buckets = this.findBucketsFn(this.prop.f(obj), true);
+      buckets.object = obj;
       buckets.lower = lower;
       buckets.upper = upper;
       this.items[obj.id] = buckets; // for fast removal later
@@ -569,7 +617,7 @@ foam.CLASS({
     function select(isink, skip, limit, order, predicate) {
       var buckets;
 
-      if ( predicate && predicate.arg2 === this.prop &&
+      if ( predicate && predicate.arg1 === this.prop &&
        ( this.Intersects.isInstance(predicate) || this.ContainedBy.isInstance(predicate))) {
         buckets = this.findBucketsFn(predicate.arg2.f());
       } else {
