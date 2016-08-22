@@ -96,23 +96,39 @@ describe('SpatialHash index', function() {
     });
   });
   
-  it('executes queries', function(done) {
+  it('executes intersection queries', function(done) {
     var mdao = loadedMDAO();
 
     mdao.where(
       foam.mlang.predicate.Intersects.create({
         arg1: test.Pointy.BB, 
         arg2: foam.mlang.predicate.Constant.create({ value: {
-          lower: foam.geo.Point3D.create({ x: 9, y: 9, z: 9 }),
-          upper: foam.geo.Point3D.create({ x: 21, y: 21, z: 21 })
+          lower: foam.geo.Point3D.create({ x: 15, y: 15, z: 15 }),
+          upper: foam.geo.Point3D.create({ x: 20, y: 20, z: 20 })
         } })
       })
     ).select().then(function(sink) { 
       var a = sink.a;
-      console.log("Intersects:", a);
-    }).then(done);
-    
-    
+      expect(a.length).toEqual(2);
+//      console.log("Intersects:", a);
+    }).then(done);    
+  });
+  it('executes containment queries', function(done) {
+    var mdao = loadedMDAO();
+
+    mdao.where(
+      foam.mlang.predicate.ContainedBy.create({
+        arg1: test.Pointy.BB, 
+        arg2: foam.mlang.predicate.Constant.create({ value: {
+          lower: foam.geo.Point3D.create({ x: 9, y: 9, z: 9 }),
+          upper: foam.geo.Point3D.create({ x: 31, y: 31, z: 31 })
+        } })
+      })
+    ).select().then(function(sink) { 
+      var a = sink.a;
+      expect(a.length).toEqual(1);
+//      console.log("ContainedBy:", a);
+    }).then(done);    
   });
 
 });
