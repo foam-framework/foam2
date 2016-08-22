@@ -1383,6 +1383,7 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'foam.u2.ViewFactory2',
       name: 'toPropertyE',
       value: function toPropertyE(X, args) {
         return this.TextField.create(args, X);
