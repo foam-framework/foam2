@@ -168,7 +168,12 @@ foam.CLASS({
   properties: [
     {
       // TODO: set pointClass based on prop.of?
-      name: 'prop'
+      name: 'prop',
+      postSet: function(old,nu) {
+        if ( nu.of ) {
+          this.pointClass = nu.of;
+        }
+      }
     },
     {
       name: 'tailFactory'
@@ -228,13 +233,25 @@ foam.CLASS({
         // TODO: removeAll and re-add
       }
     },
+    {
+      name: 'selectingPlan_',
+      factory: function() {
+        return this.SelectingPlan.create({ index: this, cost: this.size() });
+      }
+    }
   ],
 
   methods: [
 
     function decorateSink_(sink, skip, limit, order, predicate) {
+      var dupes = {}; // crude dedup
       if ( predicate ) return {
-        put: function(o) { if ( predicate.f(o) ) sink.put(o); },
+        put: function(o) { 
+          if ( o.instance_ && ! dupes[o.id] && predicate.f(o) ) {
+            sink.put(o);
+            dupes[o.id] = true;
+          }
+        },
         remove: function(o) { if ( predicate.f(o) ) sink.remove(o); },
         eof: function() { sink.eof(); },
         error: function(e) { sink.error(e); }
@@ -457,8 +474,8 @@ foam.CLASS({
       }
 
       // check for buckets with the bounds found so far
-      var tmpObj; // TODO: get rid of this tmpObj, change findBucketsFn?
-      tmbObj[this.prop.name] = ranges;
+      var tmpObj = {}; // TODO: get rid of this tmpObj, change findBucketsFn?
+      tmpObj[this.prop.name] = ranges;
       buckets = this.findBucketsFn(tmpObj);
 
       // TODO: multiple ANDed intersects should reduce the search area,
@@ -511,7 +528,7 @@ foam.CLASS({
         // If the object moved, but the lower/upper points are in the same buckets
         // as before, none of the buckets need to be altered.
         if ( lower !== prev.lower || upper !== prev.upper ) {
-          this.remove_(obj);
+          this.remove(obj);
         }
       }
 
@@ -576,7 +593,7 @@ foam.CLASS({
     /** @return a Plan to execute a select with the given parameters */
     function plan(sink, skip, limit, order, predicate) {
       // TODO: refine cost estimate
-      this.SelectingPlan.create({ index: this, cost: this.size() });
+      return this.selectingPlan_;
     },
 
   ]
