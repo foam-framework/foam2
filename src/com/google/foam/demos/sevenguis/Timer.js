@@ -48,11 +48,7 @@ foam.CLASS({
       expression: function(duration, elapsedTime) {
         return this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
       },
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.ProgressView').create(null, X);
-      }
-      // TODO: allow short-form
-//      toPropertyE: 'foam.u2.ProgressView'
+      toPropertyE: 'foam.u2.ProgressView'
     },
     {
       name: 'elapsedTime',
@@ -64,10 +60,7 @@ foam.CLASS({
       class: 'Int',
       name: 'duration',
       units: 'ms',
-      // TODO: support short-form
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.RangeView').create({maxValue: 10000}, X);
-      },
+      toPropertyE: { class: 'foam.u2.RangeView', maxValue: 10000 },
       value: 5000
     },
     {
