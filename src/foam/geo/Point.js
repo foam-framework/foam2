@@ -49,21 +49,7 @@ foam.CLASS({
     }
   ]
 });
-/** BoundingBox is really just a Range(of:Point). Currently designed to operate
-  on any kind of point with any dimension. */
-foam.CLASS({
-  package: 'foam.geo',
-  name: 'BoundingBox',
 
-  properties: [
-    {
-      name: 'upper'
-    },
-    {
-      name: 'lower'
-    },
-  ],
-});
 
 foam.CLASS({
   package: 'foam.geo',
@@ -134,42 +120,6 @@ foam.CLASS({
   ]
 });
 
-/** Generate a BB for an object with location+radius */
-foam.CLASS({
-  package: 'foam.geo',
-  name: 'RadialBoundingBox',
-
-  implements: [ 'foam.geo.BoundingBox' ],
-
-  properties: [
-    {
-      class: 'Float',
-      name: 'radius',
-    },
-    {
-      of: 'foam.geo.Point',
-      name: 'location',
-    },
-    {
-      name: 'upper',
-      expression: function(location, radius) {
-        if ( ! location ) return undefined;
-        return location.map(function(val, prop) {
-          return val + radius;
-        });
-      }
-    },
-    {
-      name: 'lower',
-      expression: function(location, radius) {
-        if ( ! location ) return undefined;
-        return location.map(function(val, prop) {
-          return val - radius;
-        });
-      }
-    },
-  ]
-});
 
 
 
@@ -195,33 +145,3 @@ foam.CLASS({
     }
   ],
 });
-
-/** Actually dependent on the type of Point in the BoundingBox */
-foam.CLASS({
-  package: 'foam.geo',
-  name: 'BoundingBoxProperty',
-
-  extends: 'foam.core.Property',
-
-  requires: [ 'foam.dao.index.SpatialHash' ],
-
-  properties: [
-    {
-      /** The type of point the bounding box works with */
-      class: 'Class2',
-      name: 'of',
-      value: 'foam.geo.Point',
-    },
-  ],
-
-  methods: [
-    function toIndex(tailFactory) {
-      return this.SpatialHash.create({
-        prop: this,
-        pointClass: this.of,
-        tailFactory: tailFactory
-      });
-    }
-  ],
-});
-

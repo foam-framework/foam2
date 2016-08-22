@@ -89,6 +89,7 @@ FOAM_FILES([
   { name: "foam/dao/IDBDAO", flags: ['web'] },
   { name: "lib/Pooled" },
   { name: "foam/geo/Point" },
+  { name: "foam/geo/BoundingBox" },
   { name: "lib/QueryParser" },
   { name: "lib/Physical" },
   { name: "lib/Collider" },
