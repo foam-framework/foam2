@@ -63,15 +63,6 @@ foam.CLASS({
             }).
           end();
         });
-      /*
-      <div class="^">
-        <div class="^row" repeat="row in 0..this.height-1">
-          (( for ( var col = 0 ; col < this.width ; col++ ) { ))
-            {{this.cells[row][col]}}
-          (( } ))
-        </div>
-      </div>
-      */
     },
 
     function forEachNeighbour(cell, f) {
