@@ -89,20 +89,6 @@ foam.CLASS({
     }
   ],
 
-  /*
-  templates: [
-    function initE() {
-      <div class="^" x:data={{this}}>
-        <div class="^title">Book Flight</div>
-        <:oneWay/> <br>
-        <:departDate/> <br>
-        <:returnDate mode={{this.returnDateMode}}/> <br>
-        <:book/> <br>
-      </div>
-    }
-  ],
-  */
-
   actions: [
     {
       name: 'book',
