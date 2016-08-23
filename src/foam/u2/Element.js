@@ -331,9 +331,10 @@ foam.CLASS({
   // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
-    'foam.u2.DefaultValidator',
     'foam.u2.AttrSlot',
-    'foam.u2.Entity'
+    'foam.u2.DefaultValidator',
+    'foam.u2.Entity',
+    'foam.u2.ViewSpec'
   ],
 
   imports: [
@@ -958,25 +959,7 @@ foam.CLASS({
     },
 
     function createChild_(spec, args) {
-      var ctx = this.__subSubContext__;
-
-      return foam.u2.Element.isInstance(spec) ?
-            spec :
-
-        spec.toE ?
-            spec.toE(args, ctx) :
-
-        typeof spec === 'function' ?
-            spec.call(this, args, ctx) :
-
-        foam.Object.is(spec) ?
-            ctx.lookup(spec.class).create(spec, ctx).copyFrom(args) :
-
-        foam.AbstractClass.isSubClass(spec) ?
-            spec.create(args, ctx) :
-
-        // TODO: verify a String
-        foam.u2.Element.create({nodeName: spec}, ctx);
+      return this.ViewSpec.createView(spec, args, this, this.__subSubContext__);
     },
 
     function start(spec, args) {
@@ -1405,9 +1388,7 @@ foam.CLASS({
 
   methods: [
     function toE(args, X) {
-      var e = foam.u2.Element.prototype.createChild_.call(
-        { __subSubContext__: X },
-        this.toPropertyE);
+      var e = foam.u2.ViewSpec.createView(this.toPropertyE, args, this, X);
 
       e.fromProperty && e.fromProperty(this);
 
@@ -1427,7 +1408,7 @@ foam.CLASS({
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
-    [ 'toPropertyE', 'foam.u2.DateView' ]
+    [ 'toPropertyE', { class: 'foam.u2.DateView' } ]
   ]
 });
 
