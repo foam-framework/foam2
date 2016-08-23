@@ -113,6 +113,7 @@ FOAM_FILES([
   { name: "foam/u2/tag/Image", flags: ['web'] },
   { name: "foam/u2/tag/Input", flags: ['web'] },
   { name: "foam/u2/TextField", flags: ['web'] },
+  { name: "foam/u2/CheckBox", flags: ['web'] },
   { name: "foam/u2/PopupView", flags: ['web'] },
   { name: "foam/u2/DateView", flags: ['web'] },
   { name: "foam/u2/RangeView", flags: ['web'] },

@@ -739,12 +739,12 @@ foam.CLASS({
     function getAttribute(name) {
       // TODO: add support for other dynamic attributes also
       // TODO: don't lookup in real DOM if listener present
-      if ( name === 'value' && this.el() ) {
-        var value = this.el().value;
+      if ( ( name === 'value' || name === 'checked' ) && this.el() ) {
+        var value = this.el()[name];
         var attr  = this.getAttributeNode(name);
 
         if ( attr ) {
-          attr.value = value;
+          attr[name] = value;
         } else {
           // TODO: add attribute
         }
@@ -1409,6 +1409,15 @@ foam.CLASS({
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'toPropertyE', { class: 'foam.u2.DateView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Boolean',
+  requires: [ 'foam.u2.CheckBox' ],
+  properties: [
+    [ 'toPropertyE', { class: 'foam.u2.CheckBox' } ],
   ]
 });
 
