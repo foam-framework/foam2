@@ -66,14 +66,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'prefix',
-      label: 'Filter prefix',
-      postSet: function(_, prefix) {
-        this.filteredDAO = this.dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
-      }
+      label: 'Filter prefix'
     },
     {
-      model_: 'foam.core.types.DAOProperty',
       name: 'dao',
       factory: function() {
           /*
@@ -90,8 +87,10 @@ foam.CLASS({
       }
     },
     {
-      model_: 'foam.core.types.DAOProperty',
       name: 'filteredDAO',
+      expression: function(dao, prefix) {
+        return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
+      },
       toPropertyE: function(X) {
         return X.lookup('foam.u2.TableView').create({
           of: foam.demos.sevenguis.Person,
@@ -99,12 +98,11 @@ foam.CLASS({
           scrollEnabed: true,
           editColumns: false
         });
-      },
-      factory: function() { return this.dao; }
+      }
     },
     {
       name: 'selection',
-      postSet: function(_, s) { this.data.copyFrom(s); }
+      postSet: function(_, s) { this.person.copyFrom(s); }
     },
     {
       name: 'person',
