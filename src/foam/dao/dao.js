@@ -730,6 +730,12 @@ foam.CLASS({
           this.on.reset.pub();
         }
       }
+    },
+    {
+      name: 'of',
+      expression: function(delegate) {
+        return delegate.of;
+      }
     }
   ]
 });

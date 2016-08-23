@@ -81,7 +81,7 @@ foam.CLASS({
       name: 'handleSize',
       expression: function(minHandleSize, size, extent, height, innerBorder) {
         var h = height - 2*innerBorder;
-        var hs = extent * h / size;
+        var hs = size > 0 ? extent * h / size : 0;
         return hs < minHandleSize ? minHandleSize : hs;
       }
     },
@@ -109,7 +109,7 @@ foam.CLASS({
     {
       name: 'rate',
       expression: function(size, yMax, innerBorder) {
-        return ( yMax - innerBorder ) / size;
+        return size ? ( yMax - innerBorder ) / size : 0;
       }
     }
   ],

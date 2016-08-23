@@ -86,7 +86,10 @@ foam.CLASS({
   properties: [
     {
       class: 'Class2',
-      name: 'of'
+      name: 'of',
+      expression: function(data) {
+        return data.of;
+      }
     },
     [ 'nodeName', 'table' ],
     {
