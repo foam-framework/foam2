@@ -1417,7 +1417,7 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
-    [ 'toPropertyE', { class: 'foam.u2.CheckBox' } ],
+    [ 'view', { class: 'foam.u2.CheckBox' } ],
   ]
 });
 
