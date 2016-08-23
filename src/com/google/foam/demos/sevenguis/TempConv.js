@@ -24,15 +24,15 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   properties: [
-    { class: 'Float', name: 'c', view: { class: 'foam.u2.TextField', onKeyMode: true, precision: 4 } },
-    { class: 'Float', name: 'f', view: { class: 'foam.u2.TextField', onKeyMode: true, precision: 4 } }
+    { class: 'Float', name: 'c', view: { class: 'foam.u2.TextField', onKey: true, precision: 4 } },
+    { class: 'Float', name: 'f', view: { class: 'foam.u2.TextField', onKey: true, precision: 4 } }
   ],
 
   methods: [
     function initE() {
       this.nodeName = 'span';
       this.c$.relateTo(this.f$, this.c2f, this.f2c);
-      this.add(this.C, 'Celsius = ', this.F, 'Fahrenheit');
+      this.add(this.C, ' Celsius = ', this.F, ' Fahrenheit');
     },
     function c2f(f) { return 9/5 * f + 32; },
     function f2c(c) { return 5/9 * ( c - 32 ); }
