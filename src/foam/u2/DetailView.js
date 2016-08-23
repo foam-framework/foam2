@@ -147,7 +147,7 @@ foam.CLASS({
             cssClass(self.myCls()).
             add(title).
             add(properties.map(function(p) {
-              return self.DetailPropertyView.create({prop: p, view: p});
+              return self.DetailPropertyView.create({prop: p});
             })));
       }, this.of$, this.properties$));
     },
