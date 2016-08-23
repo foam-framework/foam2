@@ -24,8 +24,8 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   properties: [
-    { class: 'Float', name: 'c', toPropertyE: { class: 'foam.u2.TextField', onKeyMode: true, precision: 4 } },
-    { class: 'Float', name: 'f', toPropertyE: { class: 'foam.u2.TextField', onKeyMode: true, precision: 4 } }
+    { class: 'Float', name: 'c', view: { class: 'foam.u2.TextField', onKeyMode: true, precision: 4 } },
+    { class: 'Float', name: 'f', view: { class: 'foam.u2.TextField', onKeyMode: true, precision: 4 } }
   ],
 
   methods: [

@@ -23,8 +23,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { name: 'name',    toPropertyE: { class: 'foam.u2.TextField', onKey: true } },
-    { name: 'surname', toPropertyE: { class: 'foam.u2.TextField', onKey: true } }
+    { name: 'name',    view: { class: 'foam.u2.TextField', onKey: true } },
+    { name: 'surname', view: { class: 'foam.u2.TextField', onKey: true } }
   ]
 });
 
@@ -92,7 +92,7 @@ foam.CLASS({
     {
       model_: 'foam.core.types.DAOProperty',
       name: 'filteredDAO',
-      toPropertyE: {
+      view: {
         class: 'foam.u2.TableView',
         of: foam.demos.sevenguis.Person,
         title: '',
@@ -100,7 +100,7 @@ foam.CLASS({
         editColumns: false
       },
       /*
-      toPropertyE: function(X) {
+      view: function(X) {
         return X.lookup('foam.u2.TableView').create({
           of: foam.demos.sevenguis.Person,
           title: '',
@@ -117,9 +117,9 @@ foam.CLASS({
     },
     {
       name: 'person',
-//      toPropertyE: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
-      toPropertyE: { class: 'foam.u2.DetailView', of: foam.demos.sevenguis.Person },
-//      toPropertyE: 'foam.u2.DetailView',
+//      view: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
+      view: { class: 'foam.u2.DetailView', of: foam.demos.sevenguis.Person },
+//      view: 'foam.u2.DetailView',
       factory: function() { return this.Person.create(); }
     }
   ],

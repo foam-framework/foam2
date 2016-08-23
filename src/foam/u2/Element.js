@@ -1381,14 +1381,14 @@ foam.CLASS({
     },
     {
       class: 'foam.u2.ViewSpec',
-      name: 'toPropertyE',
+      name: 'view',
       value: { class: 'foam.u2.TextField' }
     }
   ],
 
   methods: [
     function toE(args, X) {
-      var e = foam.u2.ViewSpec.createView(this.toPropertyE, args, this, X);
+      var e = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
       e.fromProperty && e.fromProperty(this);
 
@@ -1408,7 +1408,7 @@ foam.CLASS({
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
-    [ 'toPropertyE', { class: 'foam.u2.DateView' } ]
+    [ 'view', { class: 'foam.u2.DateView' } ]
   ]
 });
 

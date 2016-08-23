@@ -44,7 +44,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'oneWay',
       value: true,
-      toPropertyE: {
+      view: {
         class: 'foam.u2.tag.Select',
         choices: [
           [ true,  'one-way flight' ],
