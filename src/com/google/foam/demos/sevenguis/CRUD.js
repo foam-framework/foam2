@@ -66,25 +66,17 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'prefix',
-      label: 'Filter prefix',
-      postSet: function(_, prefix) {
-        this.filteredDAO = this.dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
-      }
+      label: 'Filter prefix'
     },
     {
       model_: 'foam.core.types.DAOProperty',
       name: 'dao',
       factory: function() {
-          /*
-        return foam.dao.MDAO.create({
-          of: foam.demos.sevenguis.Person
-        });
-*/
         return foam.dao.EasyDAO.create({
           of: foam.demos.sevenguis.Person,
           daoType: 'MDAO',
-          cache: false,
           seqNo: true
         });
       }
@@ -92,24 +84,16 @@ foam.CLASS({
     {
       model_: 'foam.core.types.DAOProperty',
       name: 'filteredDAO',
+      expression: function(dao, prefix) {
+        return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
+      },
       view: {
         class: 'foam.u2.TableView',
         of: foam.demos.sevenguis.Person,
         title: '',
         scrollEnabed: true,
         editColumns: false
-      },
-      /*
-      view: function(X) {
-        return X.lookup('foam.u2.TableView').create({
-          of: foam.demos.sevenguis.Person,
-          title: '',
-          scrollEnabed: true,
-          editColumns: false
-        });
-        },
-*/
-      factory: function() { return this.dao; }
+      }
     },
     {
       name: 'selection',
@@ -117,9 +101,7 @@ foam.CLASS({
     },
     {
       name: 'person',
-//      view: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
-      view: { class: 'foam.u2.DetailView', of: foam.demos.sevenguis.Person },
-//      view: 'foam.u2.DetailView',
+      view: 'foam.u2.DetailView',
       factory: function() { return this.Person.create(); }
     }
   ],
