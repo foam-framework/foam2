@@ -20,13 +20,15 @@
   The FObject Class extends AbstractClass.
  */
 foam.LIB({
+  // ???: Why is this is 'foam' instead of 'foam.core'
   name: 'foam.AbstractClass',
 
   // documentation: "Root prototype for all classes.",
 
   constants: {
     prototype: Object.prototype,
-    axiomMap_: {}
+    axiomMap_: {},
+    private_:  { axiomCache: {} }
   },
 
   methods: [
