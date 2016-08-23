@@ -172,8 +172,6 @@ foam.CLASS({
 
       requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
 
-      imports: [ 'cells' ],
-
       documentation: function() {/*
         Doesn't build inner views until value is set or user clicks on view.
         This complicates the design but saves memory and startup time.
