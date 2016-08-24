@@ -50,7 +50,7 @@ foam.LIB({
       // init(), if defined, is called when object is created.
       // This is where class specific initialization code should
       // be put (not in initArgs).
-      obj.init && obj.init();
+      obj.init();
 
       return obj;
     },
