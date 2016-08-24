@@ -71,20 +71,30 @@ foam.CLASS({
       method it overrides with this.SUPER().
     */
     function override_(proto, method) {
-      var super_ = proto.__proto__[this.name];
-
       if ( ! method ) return;
 
       // Not using SUPER, so just return original method
       if ( method.toString().indexOf('SUPER') == -1 ) return method;
 
-      // Not overriding, stub out super_
-      if ( ! super_ ) super_ = function() {};
+      var superMethod_ = proto.cls_.getSuperAxiomByName(this.name);
+      var super_;
 
-      console.assert(
-          typeof super_ === 'function',
-          'Attempt to override non-method: ',
-          this.name);
+      if ( ! superMethod_ ) {
+        var name = this.name;
+        var id = proto.cls_.id;
+
+        super_ = function() {
+          console.warn('Attempted to use SUPER() in',
+            name, 'on', id, 'but no parent method exists.');
+        };
+      } else {
+        this.assert(foam.core.AbstractMethod.isInstance(superMethod_),
+          'Attempt to override non-method', this.name, 'on', proto.cls_.id);
+
+        // Fetch the super method from the proto, as the super method axiom
+        // may have decorated the code before installing it.
+        super_ = proto.__proto__[this.name];
+      }
 
       function SUPER() { return super_.apply(this, arguments); }
 
