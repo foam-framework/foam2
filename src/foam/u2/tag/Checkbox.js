@@ -33,7 +33,7 @@ CLASS({
   methods: [
     function initE() {
       this.attrs({type: 'checkbox'});
-      Events.link(this.data$, this.attrValue('checked', 'change'));
+      Events.link(this.data$, this.attrValue('checked'));
     },
     function updateMode_(mode) {
       this.setAttribute('disabled', mode === 'disabled' || mode === 'ro');
