@@ -341,7 +341,7 @@ foam.CLASS({
           }
 
           this.setPrivate_(FIP, true);
-          this[name] = factory.call(this);
+          this[name] = factory.call(this, prop);
           this.clearPrivate_(FIP);
 
           return this.instance_[name];
