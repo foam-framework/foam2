@@ -1213,18 +1213,21 @@ Y1.describe();
 Y2.describe();
 
 // Classes can import values from the Context so that they can be accessed from 'this'.
-var Y = foam.createSubContext({log: function(msg) { console.log('log:', msg); }});
+var Y = foam.createSubContext({ myLogger: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
-  imports: [ 'log', 'warn' ],
+  imports: [ 'myLogger' ],
   methods: [ function foo() {
-    this.log('log foo from ImportTest');
-    this.warn('warn foo from ImportTest');
+    this.myLogger('log foo from ImportTest');
   } ]
 });
-var o = ImportsTest.create();
-o.foo();
-Y.log('test');
+try {
+  var o = ImportsTest.create();
+  o.foo();
+} catch(e) {
+  log(e);
+}
+Y.myLogger('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
 
