@@ -2,7 +2,21 @@
 # DAO: Data Access Object
 
 A DAO, or Data Access Object, is a universal interface to a collection of
-objects.
+objects. The role of a DAO is to operate as an object store, uniquely
+identifying objects by their `id`, and allowing queries based on the 
+object's properties.
+
+To use your class in a DAO, just add an `id` property:
+
+    foam.CLASS({
+      package: 'fun',
+      name: 'StoreMe',
+      properties: [ 'id' ],
+    });
+    
+Your `id` must be unique for separate objects, so either set it carefully or use a
+`foam.dao.SequenceNumberDAO` or `foam.dao.EasyDAO` with `seqNo:true` to set 
+`id` automatically.
 
 ## Basic DAO operations
 
@@ -10,24 +24,22 @@ Here are the fundamental functions in the interface, written as though
 Javascript functions specified return types:
 
     Promise<object> find(id);
-    Promise<object> put(obj);
-    Promise remove(obj);
+    Promise<object> put(object);
+    Promise         remove(object);
     
     Promise<Sink> select(sink, skip, limit, order, predicate);
-    void removeAll(sink, skip, limit, order, predicate);
+    Promise       removeAll(skip, limit, order, predicate);
+    
     //TODO: listen?
     void pipe(sink);
 
 Most of these operations are asynchronous, indicating completion by resolving
-the returned promise. `select` will call `put(object)` events on the given sink
-until it is finished, then call `eof()` and resolve the promise. You can respond
-to events in the sink as they happen, or wait until the `select` is finished
-and use the sink when the promise is resolved.
+the returned promise. `select` will call `sink.put(object)` events on the given sink
+until it is finished, then call `sink.eof()` and resolve the promise.
 
-Some of the operations take a `sink`, whose interface is detailed below. Various
-functions on the `sink` are called asynchronously when operations are complete,
-and data is available.
-
+You can create a sink as an event handler, responding to events as they happen,
+or use a sink that accumulates the results and wait until the `select` is
+finished. When the promise resolves, your sink will be ready.
 
 ### Filtering DAOs
 
@@ -43,6 +55,21 @@ They can filter, sort, limit results, and skip early results.
 These operations can be easily chained:
 
     dao.where(this.EQ(this.Todo.IS_COMPLETED, true)).skip(40).limit(20).select(sink)
+
+For easy access to the basic mLangs and Sinks, either implement 
+`foam.mlang.Expressions` or create an instance of 
+`foam.mlang.ExpressionsSingleton`. You'll see this in most of the examples.
+
+    foam.CLASS({
+      name: 'GoingToUseMLangs',
+      implements: [ 'foam.mlang.Expressions' ],
+      methods: [
+        function makeQuery() { return this.EQ; }
+      ]
+    });
+    // or
+    var m = foam.mlang.ExpressionsSingleton.create();
+    m.EQ(...)
 
 ### Sinks
 
@@ -115,13 +142,18 @@ removes all matching entries from the DAO instead of returning them.
 Be careful! `myDAO.removeAll()` without any filtering will delete every entry.
 
 
-### where(query)
+### where(predicate)
 
-`where(query)` returns a new DAO that is a filtered window onto the data in the
-original.
+`where(predicate)` returns a new DAO that is a filtered window onto the 
+data in the original.
 
-The `query` is structured using FOAM's mLang syntax. This is a structured,
-injection-safe query language written in Javascript. 
+The `predicate` argument is structured using FOAM's mLang syntax. This is 
+a structured, injection-safe query language written in Javascript. Just like
+SQL, you can compose comparisons like GT, EQ, IN, or CONTAINS with operators
+like AND and OR.
+
+The language is extensible, so you can write your own mLangs, or use
+`foam.mlang.predicate.Func` to run an inline function on each potential object.
 
 ### orderBy(order)
 
