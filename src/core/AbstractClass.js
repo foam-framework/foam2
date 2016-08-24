@@ -178,7 +178,7 @@ foam.LIB({
       directly, regardless of what parent classes define.
     */
     function hasOwnAxiom(name) {
-      return this.axiomMap_.hasOwnProperty(name);
+      return Object.hasOwnProperty.call(this.axiomMap_, name);
     },
 
     /** Returns all axioms defined on this class or its parent classes. */
