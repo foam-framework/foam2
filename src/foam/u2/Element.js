@@ -55,6 +55,59 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'CSS',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code'
+    },
+    {
+      name: 'name',
+      factory: function() { return 'CSS-' + this.$UID; }
+    },
+    {
+      name: 'installedDocuments_',
+      factory: function() { return new WeakMap(); }
+    }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      // Install myself in this Window, if not already there.
+      var oldCreate = cls.create;
+      var axiom     = this;
+
+      cls.create = function(args, opt_parent) {
+        // TODO: move this functionality somewhere reusable
+        var X = opt_parent ?
+          ( opt_parent.__subContext__ || opt_parent.__context__ || opt_parent ) :
+          foam.__context__;
+
+        // Install our own CSS, and then all parent models as well.
+        if ( ! axiom.installedDocuments_.has(X.document) ) {
+          X.installCSS(axiom.expandCSS(cls, axiom.code));
+          axiom.installedDocuments_.set(X.document, true);
+        }
+
+        // Now call through to the original create.
+        return oldCreate.call(this, args, X);
+      };
+    },
+
+    function expandCSS(cls, text) {
+      /* Performs expansion of the ^ shorthand on the CSS. */
+      // TODO(braden): Parse and validate the CSS.
+      // TODO(braden): Add the automatic prefixing once we have the parser.
+      return text.replace(/\^/g,
+          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'DefaultValidator',
 
   axioms: [ foam.pattern.Singleton.create() ],
@@ -414,6 +467,15 @@ foam.CLASS({
     }
   },
 
+  axioms: [
+    foam.u2.CSS.create({
+      // We hide Elements by adding this style rather than setting
+      // 'display: none' directly because then when we re-show the
+      // Element we don't need to remember it's desired 'display' value.
+      code: '.foam-u2-Element-hidden { display: none !important; }'
+    })
+  ],
+
   properties: [
     {
       name: 'id',
@@ -439,6 +501,19 @@ foam.CLASS({
     {
       name: 'parentNode',
       transient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'shown',
+      value: true,
+      postSet: function(o, n) {
+        if ( o === n ) return;
+        if ( n ) {
+          this.removeCls('foam-u2-Element-hidden');
+        } else {
+          this.cssClass('foam-u2-Element-hidden');
+        }
+      }
     },
     {
       class: 'Proxy',
@@ -529,14 +604,6 @@ foam.CLASS({
       name: '__subSubContext__',
       factory: function() { return this.__subContext__; }
     }
-  ],
-
-  templates: [
-    function CSS() {/*
-      .foam-u2-Element-hidden {
-        display: none !important;
-      }
-    */}
   ],
 
   methods: [
@@ -633,18 +700,25 @@ foam.CLASS({
     //
     // Visibility
     //
+    // Fluent methods for setting 'shown' property.
 
     function show(opt_shown) {
-      if ( opt_shown ) {
-        this.removeCls('foam-u2-Element-hidden');
+      if ( opt_shown === undefined ) {
+        this.show = true;
+      } else if ( foam.core.Slot.isInstance(opt_shown) ) {
+        this.shown$ = opt_shown;
       } else {
-        this.cssClass('foam-u2-Element-hidden');
+        this.shown = !! opt_shown;
       }
+
       return this;
     },
 
     function hide(opt_hidden) {
-      return this.show(opt_hidden === undefined ? false : ! opt_hidden);
+      return this.show(
+          opt_hidden === undefined              ? false :
+          foam.core.Slot.isInstance(opt_hidden) ? opt_hidden.map(function(s) { return ! s; }) :
+          ! opt_hidden);
     },
 
 
@@ -1455,58 +1529,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'CSS',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'code'
-    },
-    {
-      name: 'name',
-      factory: function() { return 'CSS-' + this.$UID; }
-    },
-    {
-      name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); }
-    }
-  ],
-
-  methods: [
-    function installInClass(cls) {
-      // Install myself in this Window, if not already there.
-      var oldCreate = cls.create;
-      var axiom = this;
-
-      cls.create = function(args, opt_parent) {
-        // TODO: move this functionality somewhere reusable
-        var X = opt_parent ?
-          ( opt_parent.__subContext__ || opt_parent.__context__ || opt_parent ) :
-          foam.__context__;
-
-        // Install our own CSS, and then all parent models as well.
-        if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(cls, axiom.code));
-          axiom.installedDocuments_.set(X.document, true);
-        }
-
-        // Now call through to the original create.
-        return oldCreate.call(this, args, X);
-      };
-    },
-
-    function expandCSS(cls, text) {
-      /* Performs expansion of the ^ shorthand on the CSS. */
-      // TODO(braden): Parse and validate the CSS.
-      // TODO(braden): Add the automatic prefixing once we have the parser.
-      return text.replace(/\^/g,
-          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
-    }
-  ]
-});
 
 // TODO: make a tableProperties property on AbstractClass
 
