@@ -30,10 +30,12 @@ Javascript functions specified return types:
     Promise       removeAll(skip, limit, order, predicate);
     
 Most of these operations are asynchronous, indicating completion by resolving
-the returned promise. `select` will call `sink.put(object)` events on the given sink
-until it is finished, then call `sink.eof()` and resolve the promise.
+the returned promise. `select` will call `sink.put(object)` events on the given
+sink until it is finished, then call `sink.eof()` and resolve the promise.
 
-You can create a sink as an event handler, responding to events as they happen,
-or use a sink that accumulates the results and wait until the `select` is
-finished. When the promise resolves, your sink will be ready.
+
+
+
+## Composing other DAOs
+
 
