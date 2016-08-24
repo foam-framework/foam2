@@ -101,7 +101,6 @@ foam.CLASS({
           },
           set: function(x) {
             if ( x ) {
-//              if ( x === foam.__context__ );
               this.setPrivate_(
                   foam.core.FObject.isInstance(x) ?
                       'contextParent' :
