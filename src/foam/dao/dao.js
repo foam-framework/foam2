@@ -26,7 +26,6 @@ foam.CLASS({
       name: 'put',
       args: [
         'obj',
-        'sink',
         'fc'
       ],
       code: function () {}
@@ -35,7 +34,6 @@ foam.CLASS({
       name: 'remove',
       args: [
         'obj',
-        'sink',
         'fc'
       ],
       code: function() {}
@@ -108,7 +106,7 @@ foam.CLASS({
       returns: 'Promise'
     },
     {
-      name: 'pipe',
+      name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       code: function() { },
     },
     {
@@ -143,11 +141,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink, fc) {
-      if ( this.predicate.f(obj) ) this.delegate.put(obj, fc, sink);
+    function put(obj, fc) {
+      if ( this.predicate.f(obj) ) this.delegate.put(obj, fc);
     },
-    function remove(obj, sink, fc) {
-      if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc, sink);
+    function remove(obj, fc) {
+      if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc);
     }
   ]
 });
@@ -170,19 +168,19 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink, fc) {
+    function put(obj, fc) {
       if ( this.count++ >= this.limit && fc ) {
         fc.stop();
       } else {
-        this.delegate.put(obj, sink, fc);
+        this.delegate.put(obj, fc);
       }
     },
 
-    function remove(obj, sink, fc) {
+    function remove(obj, fc) {
       if ( this.count++ >= this.limit && fc ) {
         fc.stop();
       } else {
-        this.delegate.remove(obj, s, fc);
+        this.delegate.remove(obj, fc);
       }
     }
   ]
@@ -206,20 +204,20 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink, fc) {
+    function put(obj, fc) {
       if ( this.count < this.skip ) {
         this.count++;
         return;
       }
-      this.delegate.put(obj, sink, fc);
+      this.delegate.put(obj, fc);
     },
 
-    function remove(obj, sink, fc) {
+    function remove(obj, fc) {
       if ( this.count < this.skip ) {
         this.count++;
         return;
       }
-      this.delegate.remove(obj, sink, fc);
+      this.delegate.remove(obj, fc);
     }
   ]
 });
@@ -241,7 +239,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink, fc) {
+    function put(obj, fc) {
       this.arr.push(obj);
     },
 
@@ -252,7 +250,7 @@ foam.CLASS({
       }
     },
 
-    function remove(obj, sink, fc) {
+    function remove(obj, fc) {
       // TODO
     }
   ]
@@ -414,10 +412,10 @@ foam.CLASS({
             sub = s;
             switch(e) {
             case 'put':
-              sink.put(obj, null, fc);
+              sink.put(obj, fc);
               break;
             case 'remove':
-              sink.remove(obj, null, fc);
+              sink.remove(obj, fc);
               break;
             case 'reset':
               sink.reset();
@@ -683,7 +681,7 @@ foam.CLASS({
           return Promise.reject(fc.errorEvt);
         }
 
-        sink.put(this.array[i], null, fc);
+        sink.put(this.array[i], fc);
       }
 
       sink.eof();
@@ -790,5 +788,4 @@ TODO:
 -Context oriented ?
 -enforcement of interfaces
 -anonymous sinks ?
--decide on remove(obj) and remove(id) being allowed
 */

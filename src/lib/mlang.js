@@ -1067,6 +1067,7 @@ foam.CLASS({
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
+    function COUNT() { return this.Count.create(); },
 
     function DESC(a) { return this._unary_("Desc", a); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
