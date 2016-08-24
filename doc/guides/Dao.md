@@ -4,17 +4,6 @@
 A DAO, or Data Access Object, is a universal interface to a collection of
 objects.
 
-The guides for DAOs are split into three parts.
-
-[Here]({{ site.baseurl }}/foam/demos/dao.html), we show many examples of
-manipulating DAOs.
-
-Below, we discuss the `DAO` and `Sink` interfaces.
-
-Finally, there is a separate
-[DAO authorship guide]({{ site.baseurl }}/guides/dao-author).
-
-
 ## Basic DAO operations
 
 Here are the fundamental functions in the interface, written as though
@@ -132,8 +121,7 @@ Be careful! `myDAO.removeAll()` without any filtering will delete every entry.
 original.
 
 The `query` is structured using FOAM's mLang syntax. This is a structured,
-injection-safe query language written in Javascript. Many examples can be
-found in the [DAO examples page]({{ site.baseurl }}/foam/demos/dao.html).
+injection-safe query language written in Javascript. 
 
 ### orderBy(order)
 
