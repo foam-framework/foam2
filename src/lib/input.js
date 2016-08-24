@@ -241,11 +241,14 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
+  methods: [
     function init() {
       this.mouseInput;
       this.touchInput;
-    },
+    }
+  ],
+
+  listeners: [
     function onTouch(e, _, t) {
       this.touch.pub(t);
     }
