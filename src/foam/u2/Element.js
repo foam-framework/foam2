@@ -257,7 +257,7 @@ foam.CLASS({
     function onRemoveListener(topic, listener) { this.error(); },
     function onSetStyle(key, value) { this.error(); },
     function onSetAttr(key, value) { this.error(); },
-    function onRemoveAttr(key, value) { this.error(); },
+    function onRemoveAttr(key) { this.error(); },
     function onAddChildren(c) { this.error(); },
     function onInsertChildren() { this.error(); },
     function onReplaceChild() { this.error(); },
@@ -315,8 +315,12 @@ foam.CLASS({
         this.el().setAttribute(key, value === true ? '' : value);
       }
     },
-    function onRemoveAttr(key, value) {
-      this.el().removeAttribute(key);
+    function onRemoveAttr(key) {
+      if ( key === 'value' ) {
+        this.el().value = '';
+      } else {
+        this.el().removeAttribute(key);
+      }
     },
     function onAddChildren() {
       var e = this.el();
@@ -820,7 +824,9 @@ foam.CLASS({
         if ( attr ) {
           attr[name] = value;
         } else {
-          // TODO: add attribute
+          attr = { name: name, value: value };
+          this.attributes.push(attr);
+          this.attributeMap[name] = attr;
         }
 
         return value;
