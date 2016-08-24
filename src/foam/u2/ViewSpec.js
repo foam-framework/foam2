@@ -17,30 +17,49 @@
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'ViewFactory2',
+  name: 'ViewSpec',
   extends: 'foam.core.Property',
+
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.createView = function(spec, args, that, ctx) {
+          return foam.u2.Element.isInstance(spec) ?
+            spec :
+
+          (spec && spec.toE) ?
+            spec.toE(args, ctx) :
+
+          typeof spec === 'function' ?
+            spec.call(that, args, ctx) :
+
+          foam.Object.is(spec) ?
+            (spec.create ?
+              spec.create(args, ctx) :
+              ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
+
+          foam.AbstractClass.isSubClass(spec) ?
+            spec.create(args, ctx) :
+
+          // TODO: verify a String
+          foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
+        };
+      }
+    }
+  ],
 
   documentation: 'Set a ViewFactory to be a string containing a class name, ' +
       'a Class object, or a factory function(args, context). ' +
       'Useful for rowViews and similar.',
 
   properties: [
-    [ 'adapt', function(_, raw, prop) {
-      var f = typeof raw === 'function' ? function(ctx, args) {
-        return raw.call(this, args, ctx);
-      } : typeof raw === 'string' ? function(args, ctx) {
-        return ctx.lookup(raw).create(args, ctx);
-      } : foam.Object.is(raw) ? function(args, ctx) {
-        // TODO: merge args and raw(-class)
-        return ctx.lookup(raw.class).create(raw, ctx);
-      } : f;
-
-      f.src_ = raw;
-
-      return f;
-    } ],
-    [ 'toJSON', function(value) {
-      return value && value.src_;
+    [ 'adapt', function(_, spec, prop) {
+      return foam.String.is(spec) ? { class: spec } : spec ;
     } ]
+    /*
+    [ 'toJSON', function(value) {
+      Output as string if 'class' is only defined value.
+    } ]
+    */
   ]
 });

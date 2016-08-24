@@ -23,8 +23,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { name: 'name',    toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } },
-    { name: 'surname', toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } }
+    { name: 'name',    view: { class: 'foam.u2.TextField', onKey: true } },
+    { name: 'surname', view: { class: 'foam.u2.TextField', onKey: true } }
   ]
 });
 
@@ -73,15 +73,9 @@ foam.CLASS({
     {
       name: 'dao',
       factory: function() {
-          /*
-        return foam.dao.MDAO.create({
-          of: foam.demos.sevenguis.Person
-        });
-*/
         return foam.dao.EasyDAO.create({
           of: foam.demos.sevenguis.Person,
           daoType: 'MDAO',
-          cache: false,
           seqNo: true
         });
       }
@@ -91,13 +85,12 @@ foam.CLASS({
       expression: function(dao, prefix) {
         return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
       },
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.TableView').create({
-          of: foam.demos.sevenguis.Person,
-          title: '',
-          scrollEnabed: true,
-          editColumns: false
-        });
+      view: {
+        class: 'foam.u2.TableView',
+        of: foam.demos.sevenguis.Person,
+        title: '',
+        scrollEnabed: true,
+        editColumns: false
       }
     },
     {
@@ -106,8 +99,7 @@ foam.CLASS({
     },
     {
       name: 'person',
-      toPropertyE: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
-//      toPropertyE: 'foam.u2.DetailView',
+      view: 'foam.u2.DetailView',
       factory: function() { return this.Person.create(); }
     }
   ],

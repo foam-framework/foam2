@@ -331,9 +331,10 @@ foam.CLASS({
   // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
-    'foam.u2.DefaultValidator',
     'foam.u2.AttrSlot',
-    'foam.u2.Entity'
+    'foam.u2.DefaultValidator',
+    'foam.u2.Entity',
+    'foam.u2.ViewSpec'
   ],
 
   imports: [
@@ -738,12 +739,12 @@ foam.CLASS({
     function getAttribute(name) {
       // TODO: add support for other dynamic attributes also
       // TODO: don't lookup in real DOM if listener present
-      if ( name === 'value' && this.el() ) {
-        var value = this.el().value;
+      if ( ( name === 'value' || name === 'checked' ) && this.el() ) {
+        var value = this.el()[name];
         var attr  = this.getAttributeNode(name);
 
         if ( attr ) {
-          attr.value = value;
+          attr[name] = value;
         } else {
           // TODO: add attribute
         }
@@ -958,11 +959,7 @@ foam.CLASS({
     },
 
     function createChild_(spec, args) {
-      if ( foam.u2.Element.isInstance(spec) ) return spec;
-
-      if ( spec && spec.toE ) return spec.toE(this.__subSubContext__, args);
-
-      return this.E(spec);
+      return this.ViewSpec.createView(spec, args, this, this.__subSubContext__);
     },
 
     function start(spec, args) {
@@ -981,7 +978,7 @@ foam.CLASS({
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
-      var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
+      var mapper = function(c) { return c.toE ? c.toE(null, Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         var c = arguments[i];
@@ -992,7 +989,7 @@ foam.CLASS({
         } else if ( Array.isArray(c) ) {
           es = es.concat(c.map(mapper));
         } else if ( c.toE ) {
-          es.push(c.toE(Y));
+          es.push(c.toE(null, Y));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1149,7 +1146,7 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) { return e.toE ? e.toE(Y) : e; });
+      children = children.map(function(e) { return e.toE ? e.toE(null, Y) : e; });
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes,
@@ -1383,17 +1380,15 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'foam.u2.ViewFactory2',
-      name: 'toPropertyE',
-      value: function toPropertyE(X, args) {
-        return this.TextField.create(args, X);
-      }
+      class: 'foam.u2.ViewSpec',
+      name: 'view',
+      value: { class: 'foam.u2.TextField' }
     }
   ],
 
   methods: [
-    function toE(X, args) {
-      var e = this.toPropertyE(X, this);
+    function toE(args, X) {
+      var e = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
       e.fromProperty && e.fromProperty(this);
 
@@ -1413,9 +1408,16 @@ foam.CLASS({
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
-    [ 'toPropertyE', function(X, args) {
-      return this.DateView.create(args, X);
-    }]
+    [ 'view', { class: 'foam.u2.DateView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Boolean',
+  requires: [ 'foam.u2.CheckBox' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.CheckBox' } ],
   ]
 });
 
@@ -1444,7 +1446,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toE(X, args) {
+    function toE(args, X) {
       return X.lookup('foam.u2.ActionView').create({
         data$:  X.data$,
         action: this

@@ -15,26 +15,18 @@
  * limitations under the License.
  */
 
-// TODO: support 'precision' in FloatView
 foam.CLASS({
-  package: 'com.google.foam.demos.sevenguis',
-  name: 'TempConv',
-  extends: 'foam.u2.Element',
-
-  exports: [ 'as data' ],
-
-  properties: [
-    { class: 'Float', name: 'c', view: { class: 'foam.u2.TextField', onKey: true, precision: 4 } },
-    { class: 'Float', name: 'f', view: { class: 'foam.u2.TextField', onKey: true, precision: 4 } }
-  ],
+  package: 'foam.u2',
+  name: 'CheckBox',
+  extends: 'foam.u2.tag.Input',
 
   methods: [
     function initE() {
-      this.nodeName = 'span';
-      this.c$.relateTo(this.f$, this.c2f, this.f2c);
-      this.add(this.C, ' Celsius = ', this.F, ' Fahrenheit');
+      this.SUPER();
+      this.setAttribute('type', 'checkbox');
     },
-    function c2f(f) { return 9/5 * f + 32; },
-    function f2c(c) { return 5/9 * ( c - 32 ); }
+    function link() {
+      this.data$.linkTo(this.attrSlot('checked'));
+    }
   ]
 });
