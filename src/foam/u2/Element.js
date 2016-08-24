@@ -308,15 +308,14 @@ foam.CLASS({
       this.el().style[key] = value;
     },
     function onSetAttr(key, value) {
-      // 'value' doesn't work consistently with setAttribute()
-      if ( key === 'value' ) {
+      if ( this.PSEDO_ATTRIBUTES[key] ) {
         this.el().value = value;
       } else {
         this.el().setAttribute(key, value === true ? '' : value);
       }
     },
     function onRemoveAttr(key) {
-      if ( key === 'value' ) {
+      if ( this.PSEDO_ATTRIBUTES[key] ) {
         this.el().value = '';
       } else {
         this.el().removeAttribute(key);
@@ -407,6 +406,13 @@ foam.CLASS({
   ],
 
   constants: {
+    // Psedo-attributes don't work consistently with setAttribute()
+    // so need to be set on the real DOM element directly.
+    PSEDO_ATTRIBUTES: {
+      value: true,
+      checked: true
+    },
+
     DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
 
     // State of an Element after it has been output (to a String) but before it is loaded.
@@ -817,7 +823,7 @@ foam.CLASS({
     function getAttribute(name) {
       // TODO: add support for other dynamic attributes also
       // TODO: don't lookup in real DOM if listener present
-      if ( ( name === 'value' || name === 'checked' ) && this.el() ) {
+      if ( this.PSEDO_ATTRIBUTES[name] && this.el() ) {
         var value = this.el()[name];
         var attr  = this.getAttributeNode(name);
 
