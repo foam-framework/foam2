@@ -76,13 +76,23 @@ For easy access to the basic mLangs and Sinks, either implement
 The `Sink` interface is a target for data retrieved from a DAO. Its functions
 are called asynchronously by the DAO.
 
-    void put(obj);
-    void remove();
+    void put(obj, [opt_flowControl]);
+    void remove(obj, [opt_flowControl]);
     void eof();
     void error(error);
 
 When each of these is called is detailed as we summarize the DAO operations
-below.
+below. Flow control is optionally passed in as a way to stop further operations.
+If the sink has an unrecoverable error, for instance, calling `error()`
+`stop()` on the flow control object will hint that the upstream DAO should stop.
+
+    MySink {
+      function put(o, fc) {
+        if ( ! mystore.store(o) ) {
+          fc && fc.error(); // updates will cease, if flow control provided
+        }
+      }
+    }
 
 
 ### find(id)
