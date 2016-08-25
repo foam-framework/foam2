@@ -153,6 +153,7 @@ foam.CLASS({
 
   methods: [
     function initArgs() { },
+    function init() { },
 
     function get() {
       return this.prop.get(this.obj);

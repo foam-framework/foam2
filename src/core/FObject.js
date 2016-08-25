@@ -46,6 +46,10 @@ foam.CLASS({
       for ( var key in args ) this[key] = args[key];
     },
 
+    function init() {
+      /* Template method to do on creation initialization */
+    },
+
     function hasOwnProperty(name) {
       return typeof this.instance_[name] !== 'undefined';
     },

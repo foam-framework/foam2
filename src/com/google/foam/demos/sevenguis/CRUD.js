@@ -71,7 +71,6 @@ foam.CLASS({
       label: 'Filter prefix'
     },
     {
-      model_: 'foam.core.types.DAOProperty',
       name: 'dao',
       factory: function() {
         return foam.dao.EasyDAO.create({
@@ -82,7 +81,6 @@ foam.CLASS({
       }
     },
     {
-      model_: 'foam.core.types.DAOProperty',
       name: 'filteredDAO',
       expression: function(dao, prefix) {
         return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
@@ -97,7 +95,7 @@ foam.CLASS({
     },
     {
       name: 'selection',
-      postSet: function(_, s) { this.data.copyFrom(s); }
+      postSet: function(_, s) { this.person.copyFrom(s); }
     },
     {
       name: 'person',

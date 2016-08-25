@@ -27,21 +27,23 @@ foam.CLASS({
           return foam.u2.Element.isInstance(spec) ?
             spec :
 
-          spec.toE ?
+          (spec && spec.toE) ?
             spec.toE(args, ctx) :
 
           typeof spec === 'function' ?
             spec.call(that, args, ctx) :
 
           foam.Object.is(spec) ?
-            ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {}) :
+            (spec.create ?
+              spec.create(args, ctx) :
+              ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
 
           foam.AbstractClass.isSubClass(spec) ?
             spec.create(args, ctx) :
 
           // TODO: verify a String
-          foam.u2.Element.create({nodeName: spec}, ctx);
-        }
+          foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
+        };
       }
     }
   ],

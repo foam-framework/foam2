@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,21 @@
  * limitations under the License.
  */
 
-// TODO: Add datalist support.
+describe('Method', function() {
+  it('Cannot override non-method', function() {
+    foam.CLASS({
+      name: 'Parent',
+      properties: ['foo']
+    });
 
-CLASS({
-  package: 'foam.u2.tag',
-  name: 'Checkbox',
-  extends: 'foam.u2.View',
-
-  properties: [
-    [ 'nodeName', 'input' ],
-    {
-      type: 'Boolean',
-      name: 'data'
-    }
-  ],
-
-  methods: [
-    function initE() {
-      this.attrs({type: 'checkbox'});
-      Events.link(this.data$, this.attrValue('checked'));
-    },
-    function updateMode_(mode) {
-      this.setAttribute('disabled', mode === 'disabled' || mode === 'ro');
-    }
-  ]
+    expect(function() {
+      foam.CLASS({
+        name: 'Child',
+        extends: 'Parent',
+        methods: [
+          function foo() {}
+        ]
+      });
+    }).toThrow();
+  });
 });

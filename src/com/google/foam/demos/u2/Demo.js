@@ -237,8 +237,8 @@ input.data$ = input2.data$;
 input.write();
 input2.write();
 
-Person.FIRST_NAME.toE(Y).write();
-Person.FIRST_NAME.toE(Y).write();
+Person.FIRST_NAME.toE(null, Y).write();
+Person.FIRST_NAME.toE(null, Y).write();
 
 var e = Y.E('div').add('simple: ').add(Person.FIRST_NAME, Person.LAST_NAME);
 e.write();
@@ -337,6 +337,9 @@ foam.CLASS({
               this.E('br'),
               'OnKey: '
           ).
+          start('div').show(this.flip$).add('flip').end().
+          start('div').hide(this.flip$).add('flop').end().
+          start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
           tag('br').

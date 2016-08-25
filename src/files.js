@@ -65,7 +65,7 @@ FOAM_FILES([
   { name: "foam/memento/MementoMgr" },
   { name: "lib/input", flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
-  { name: "foam/u2/ViewSpec", flags: ['web'] },
+  { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Element" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
 //  { name: "foam/u2/Element", flags: ['web'] },
