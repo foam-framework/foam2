@@ -247,10 +247,9 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
-        if ( p.hidden ) continue;
         var value;
         try {
-          value = this[p.name];
+          value = p.hidden ? '-hidden-' : this[p.name];
         } catch (x) {
           value = '-';
         }
