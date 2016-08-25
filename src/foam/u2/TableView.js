@@ -32,6 +32,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TableBody',
   extends: 'foam.u2.Element',
+  implements: ['foam.dao.Sink'],
 
   properties: [
     [ 'nodeName', 'tbody' ],
