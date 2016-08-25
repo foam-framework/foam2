@@ -1,0 +1,131 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+foam.CLASS({
+  package: 'com.google.foam.demos.clock',
+  name: 'Clock',
+  extends: 'foam.graphics.Circle',
+
+  implements: [ 'com.google.misc.Colors' ],
+
+  requires: [
+    'foam.graphics.Circle'
+  ],
+
+  properties: [
+    [ 'radius', 100 ],
+    [ 'x', 120 ],
+    [ 'y', 120 ],
+    [ 'color', 'white' ],
+    [ 'arcWidth', 5 ],
+    {
+      class: 'Boolean',
+      name: 'drawTicks'
+    },
+    {
+      name: 'border',
+      factory: function() { return this.BLUE; }
+    },
+    {
+      name: 'minuteHand',
+      factory: function() {
+        return this.Hand.create({radius:this.radius-6, width:5, color: this.GREEN});
+      }
+    },
+    {
+      name: 'hourHand',
+      factory: function() {
+        return this.Hand.create({radius:this.radius-15, width:7, color: this.YELLOW});
+      }
+    },
+    {
+      name: 'secondHand',
+      factory: function() {
+        return this.Hand.create({radius:this.radius-6, width:3, color: this.RED});
+      }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.addChildren(this.hourHand, this.minuteHand, this.secondHand);
+      this.tick();
+    },
+
+    function paintSelf(c) {
+      this.SUPER(c);
+
+      var date = new Date();
+
+      this.secondHand.a = Math.PI/2 - Math.PI*2 * date.getSeconds() / 60 ;
+      this.minuteHand.a = Math.PI/2 - Math.PI*2 * date.getMinutes() / 60 ;
+      this.hourHand.a   = Math.PI/2 - Math.PI*2 * (date.getHours() % 12) / 12 + this.minuteHand.a / 12;
+
+      if ( ! this.drawTicks ) return;
+
+      for ( var i = 0 ; i < 12 ; i++ ) {
+        var a = Math.PI*2/12*i;
+        var l = i % 3 ? 6 : 10;
+        var w = i % 3 ? 2 : 3;
+        c.beginPath();
+        c.moveTo((this.radius-l)*Math.cos(a),-(this.radius-l)*Math.sin(a));
+        c.lineTo((this.radius)*Math.cos(a),-(this.radius)*Math.sin(a));
+        c.closePath();
+
+        c.lineWidth = w;
+        c.strokeStyle = this.border;
+        c.stroke();
+      }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      isMerged: true,
+      mergeDelay: 1000,
+      code: function() { this.invalidated.pub(); this.tick(); }
+    }
+  ],
+
+  classes: [
+    {
+      name: 'Hand',
+      label: 'Clock Hand',
+      extends: 'foam.graphics.CView',
+
+      properties: [
+        [ 'width', 5 ],
+        'radius'
+      ],
+
+      methods: [
+        function paint(canvas) {
+          canvas.beginPath();
+          canvas.moveTo(0,0);
+          canvas.lineTo(this.radius*Math.cos(this.a),-this.radius*Math.sin(this.a));
+          canvas.closePath();
+
+          canvas.lineWidth   = this.width;
+          canvas.strokeStyle = this.color;
+          canvas.stroke();
+        }
+      ]
+    }
+  ]
+});
