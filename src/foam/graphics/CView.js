@@ -946,3 +946,63 @@ foam.CLASS({
 });
 
 // TODO: add configurable repaint strategy. Ex. explicit, on property change, on child change
+
+
+foam.CLASS({
+  package: 'foam.graphics',
+  name:  'Label',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    'width',
+    'height',
+    {
+      class: 'String',
+      name:  'text'
+    },
+    {
+      name:  'align',
+      label: 'Alignment',
+      value: 'start' // values: left, right, center, start, end
+    },
+    {
+      class: 'String',
+      name:  'font'
+    },
+    {
+      class: 'Color',
+      name:  'color',
+      value: 'black'
+    },
+    {
+      class: 'Color',
+      name: 'border',
+      label: 'Border Color'
+    },
+    {
+      class: 'Float',
+      name:  'maxWidth',
+      label: 'Maximum Width',
+      value: -1
+    }
+  ],
+
+  methods: [
+    function paintSelf(c) {
+      if ( this.font ) c.font = this.font;
+
+      c.textAlign = this.align;
+      c.fillStyle = this.color;
+
+      c.fillText(
+        this.text,
+        this.align === 'center' ? this.width/2 : 0,
+        this.height/2+10);
+
+      if ( this.border ) {
+        c.strokeStyle = this.border;
+        c.strokeRect(0, 0, this.width-1, this.height-1);
+      }
+    }
+  ]
+});
