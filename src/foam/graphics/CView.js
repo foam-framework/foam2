@@ -598,13 +598,14 @@ this.addChild_(arguments[i]);
     },
 
     function write() {
-      this.toE().write();
+      return this.toE().write();
     },
 
     function toE(X) {
       var e = this.Canvas.create({ cview: this }, X);
-      e.setAttribute('width', this.x + this.width || this.r * 2);
-      e.setAttribute('height',this.y + this.height || this.r * 2);
+      // TODO: better to make Arc compute it's width and height
+      e.setAttribute('width', this.x + (this.width  || (this.radius + this.arcWidth) * 2));
+      e.setAttribute('height',this.y + (this.height || (this.radius + this.arcWidth) * 2));
       return e;
     }
   ],
