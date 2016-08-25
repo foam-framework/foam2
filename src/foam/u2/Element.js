@@ -511,6 +511,7 @@ foam.CLASS({
     {
       name: 'outerHTML',
       transient: true,
+      hidden: true,
       getter: function() {
         return this.output(this.createOutputStream()).toString();
       }
@@ -518,6 +519,7 @@ foam.CLASS({
     {
       name: 'innerHTML',
       transient: true,
+      hidden: true,
       getter: function() {
         return this.outputInnerHTML(this.createOutputStream()).toString();
       }
@@ -1123,10 +1125,14 @@ foam.CLASS({
     },
 
     function toString() {
+      return this.cls_.id + '(nodeName=' + this.nodeName + ', state=' + this.state + ')';
       /* Converts Element to HTML String without transitioning state. */
+      /*
+        TODO: put this somewhere useful for debugging
       var s = this.createOutputStream();
       this.output_(s);
       return s.toString();
+      */
     },
 
 
