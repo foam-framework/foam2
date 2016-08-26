@@ -127,6 +127,16 @@ describe('CachingDAO', function() {
   });
 });
 
+describe('CachingDAO-async', function() {
+  genericDAOTestBattery(function(model) {
+    var idbDAO = test.helpers.RandomDelayDAO.create({ of: model, delays: [ 30, 5, 20, 1, 10, 20, 5, 20 ] });
+    return idbDAO.removeAll().then(function() {
+      var mDAO = test.helpers.RandomDelayDAO.create({ of: model, delays: [ 5, 20, 1, 10, 20, 5, 20 ] });
+      return foam.dao.CachingDAO.create({ src: idbDAO, cache: mDAO });
+    });
+  });
+});
+
 describe('DeDupDAO', function() {
   // test caching against an IDBDAO remote and MDAO cache.
   genericDAOTestBattery(function(model) {
