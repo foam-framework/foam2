@@ -321,7 +321,7 @@ foam.CLASS({
             }
 
             var value = self.deserialize(cursor.value);
-            sink.put(value, null, fc);
+            sink.put(value, fc);
             cursor.continue();
           };
           request.onerror = function(e) {
