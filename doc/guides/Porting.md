@@ -61,4 +61,7 @@ The signature of property-change events have changed.
 In U2, 'onKeyMode' is renamed to just 'onKey'
 
 U2 no longer takes functions direction for use as dynamic values.  Instead, use obj.slot(fn[, slots]). 
+X is now renamed __context__
+
+Y is now renamed __subContext__
 
