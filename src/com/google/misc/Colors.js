@@ -15,28 +15,17 @@
  * limitations under the License.
  */
 
-// TODO: Add datalist support.
+foam.CLASS({
+  package: 'com.google.misc',
+  name: 'Colors',
 
-CLASS({
-  package: 'foam.u2.tag',
-  name: 'Checkbox',
-  extends: 'foam.u2.View',
+  documentation: 'Google color scheme.',
 
-  properties: [
-    [ 'nodeName', 'input' ],
-    {
-      type: 'Boolean',
-      name: 'data'
-    }
-  ],
-
-  methods: [
-    function initE() {
-      this.attrs({type: 'checkbox'});
-      Events.link(this.data$, this.attrValue('checked'));
-    },
-    function updateMode_(mode) {
-      this.setAttribute('disabled', mode === 'disabled' || mode === 'ro');
-    }
-  ]
+  constants: {
+    RED:    '#EA4335',
+    GREEN:  '#34A853',
+    BLUE:   '#4285F4',
+    YELLOW: '#FBBC05',
+    COLORS: [ '#EA4335', '#34A853', '#4285F4', '#FBBC05' ]
+  }
 });

@@ -191,6 +191,9 @@ foam.CLASS({
 
           return this.getPrivate_('__subContext__');
         },
+        set: function() {
+          throw new Error('Attempted to set unsettable __subContext__ in ' + this.cls_.id);
+        },
         configurable: true,
         enumerable: false
       });

@@ -598,13 +598,14 @@ this.addChild_(arguments[i]);
     },
 
     function write() {
-      this.toE().write();
+      return this.toE().write();
     },
 
     function toE(X) {
       var e = this.Canvas.create({ cview: this }, X);
-      e.setAttribute('width', this.x + this.width || this.r * 2);
-      e.setAttribute('height',this.y + this.height || this.r * 2);
+      // TODO: better to make Arc compute it's width and height
+      e.setAttribute('width', this.x + (this.width  || (this.radius + this.arcWidth) * 2));
+      e.setAttribute('height',this.y + (this.height || (this.radius + this.arcWidth) * 2));
       return e;
     }
   ],
@@ -945,3 +946,63 @@ foam.CLASS({
 });
 
 // TODO: add configurable repaint strategy. Ex. explicit, on property change, on child change
+
+
+foam.CLASS({
+  package: 'foam.graphics',
+  name:  'Label',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    'width',
+    'height',
+    {
+      class: 'String',
+      name:  'text'
+    },
+    {
+      name:  'align',
+      label: 'Alignment',
+      value: 'start' // values: left, right, center, start, end
+    },
+    {
+      class: 'String',
+      name:  'font'
+    },
+    {
+      class: 'Color',
+      name:  'color',
+      value: 'black'
+    },
+    {
+      class: 'Color',
+      name: 'border',
+      label: 'Border Color'
+    },
+    {
+      class: 'Float',
+      name:  'maxWidth',
+      label: 'Maximum Width',
+      value: -1
+    }
+  ],
+
+  methods: [
+    function paintSelf(c) {
+      if ( this.font ) c.font = this.font;
+
+      c.textAlign = this.align;
+      c.fillStyle = this.color;
+
+      c.fillText(
+        this.text,
+        this.align === 'center' ? this.width/2 : 0,
+        this.height/2+10);
+
+      if ( this.border ) {
+        c.strokeStyle = this.border;
+        c.strokeRect(0, 0, this.width-1, this.height-1);
+      }
+    }
+  ]
+});

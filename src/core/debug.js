@@ -249,9 +249,14 @@ foam.CLASS({
         var p = ps[i];
         var value;
         try {
-          value = this[p.name];
+          value = p.hidden ? '-hidden-' : this[p.name];
         } catch (x) {
           value = '-';
+        }
+        if ( foam.Array.is(value) ) {
+          // NOP
+        } else if ( value && value.toString ) {
+          value = value.toString();
         }
         console.log(
           foam.String.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
