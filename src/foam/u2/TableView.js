@@ -27,12 +27,10 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableBody',
   extends: 'foam.u2.Element',
-  implements: ['foam.dao.Sink'],
 
   properties: [
     [ 'nodeName', 'tbody' ],
@@ -40,13 +38,35 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function addObj(obj) {
       var e = this.start('tr')
       for ( var j = 0 ; j < this.properties_.length ; j++ ) {
         var prop = this.properties_[j];
         e = e.start('td').add(prop.tableFormatter(obj, e)).end();
       }
       e.end();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'TableBodySink',
+  implements: ['foam.dao.Sink'],
+  requires: [
+    'foam.u2.TableBody'
+  ],
+  properties: [
+    'properties_',
+    {
+      name: 'body',
+      factory: function() { return this.TableBody.create({ properties_: this.properties_ }); }
+    }
+  ],
+  methods: [
+    function put(obj) {
+      this.body.addObj(obj);
     }
   ]
 });
@@ -129,8 +149,8 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        this.data.select(foam.u2.TableBody.create({ properties_: this.properties_ })).then(
-          function(a) { this.body = a; }.bind(this));
+        this.data.select(foam.u2.TableBodySink.create({ properties_: this.properties_ }, this)).then(
+          function(a) { this.body = a.body; }.bind(this));
       }
     }
   ]
