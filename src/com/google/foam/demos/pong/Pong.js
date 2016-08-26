@@ -63,8 +63,9 @@ foam.CLASS({
   requires: [
     'com.google.foam.demos.pong.Ball',
     'com.google.foam.demos.pong.Paddle',
-    'foam.graphics.CView',
     'foam.graphics.Box',
+    'foam.graphics.CView',
+    'foam.graphics.Label',
     'foam.physics.PhysicsEngine'
   ],
 
@@ -167,9 +168,31 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
+      var lScoreLabel = this.Label.create({
+        text$: this.lScore$,
+        align: 'center',
+        x: this.width/4,
+        y: 25,
+        color: 'white',
+        font: '70px Arial',
+        width: 200,
+        height: 70});
+
+      var rScoreLabel = this.Label.create({
+        text$: this.rScore$,
+        align: 'center',
+        x: this.width/2,
+        y: 25,
+        color: 'white',
+        font: '70px Arial',
+        width: 200,
+        height: 70});
+
       this.addChildren(
           this.Box.create({x: this.width/2-5, width:10, height: this.height, border:'rgba(0,0,0,0)' , color: 'white'}),
           this.ball,
+          lScoreLabel,
+          rScoreLabel,
           this.lPaddle,
           this.rPaddle);
 

@@ -229,7 +229,7 @@ describe('Array clone (deep copy)', function() {
     var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
     var b = foam.util.clone(a);
     expect(a).not.toBe(b);
-    expect(a).toEqual(b);
+    expect(a[1].compareTo(b[1])).toEqual(0);
     expect(a[1]).not.toBe(b[1]);
   });
 });

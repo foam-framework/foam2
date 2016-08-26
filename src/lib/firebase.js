@@ -247,7 +247,7 @@ foam.CLASS({
             this.timestampProperty.set(obj, data[key].lastUpdate);
           }
 
-          sink.put(obj, null, fc);
+          sink.put(obj, fc);
         }
         sink.eof();
 

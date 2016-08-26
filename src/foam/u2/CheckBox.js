@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'CheckBox',
   extends: 'foam.u2.tag.Input',
 
+  properties: [
+    { class: 'Boolean', name: 'data' }
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
