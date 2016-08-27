@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.TextField',
 
   properties: [
+    [ 'type', 'number' ],
     { class: 'Float', name: 'data' },
     'precision'
   ],
@@ -29,8 +30,8 @@ foam.CLASS({
     function link() {
       this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
           this.data$,
-          this.dataToText,
-          this.textToData);
+          this.textToData.bind(this),
+          this.dataToText.bind(this));
     },
 
     function formatNumber(val) {
@@ -42,7 +43,7 @@ foam.CLASS({
     },
 
     function dataToText(val) {
-      return this.hasOwnProperty('precision') ?
+      return this.precision !== undefined ?
         this.formatNumber(val) :
         '' + val ;
     },
