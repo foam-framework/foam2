@@ -21,15 +21,14 @@ foam.CLASS({
   extends: 'foam.u2.tag.Input',
 
   properties: [
+    [ 'type', 'range' ],
     [ 'maxValue', 100 ]
   ],
 
   methods: [
     function initE() {
-      this.
-        cssClass(this.myCls()).
-        attrs({type: 'range', max: this.maxValue$}).
-        attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$);
+      this.SUPER();
+      this.attrs({max: this.maxValue$});
     }
   ]
 });
