@@ -40,7 +40,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'src',
       topics: [],
-      forwards: [ 'put', 'remove', 'removeAll' ],
+      forwards: [ ], //'put', 'remove', 'removeAll' ],
       postSet: function(old, src) {
         // FUTURE: clean up this listener swap, forward methods directly
         if ( old ) {
@@ -80,6 +80,28 @@ foam.CLASS({
         });
       }
     },
+  ],
+  
+  methods: [
+    function put(o) {
+      var self = this;
+      return self.delegate.put(o).then(function() {
+        return self.src.put(o);
+      })
+    },
+    function remove(o) {
+      var self = this;
+      return self.delegate.remove(o).then(function() {
+        return self.src.remove(o);
+      })
+    }, 
+    function removeAll(a, b, c, d, e, f) {
+      var self = this;
+      return self.delegate.removeAll(a, b, c, d, e, f).then(function() {
+        return self.src.removeAll(a, b, c, d, e, f);
+      })
+    }
+
   ],
 
   listeners: [
