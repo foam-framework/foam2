@@ -67,6 +67,8 @@ foam.CLASS({
     function setVelocityAndAngle(v, a) {
       this.vx = v * Math.cos(a);
       this.vy = v * Math.sin(a);
+
+      return this;
     },
 
     function distanceTo(other) {
