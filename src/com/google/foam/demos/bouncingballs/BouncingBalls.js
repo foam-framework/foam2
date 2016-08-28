@@ -34,10 +34,10 @@ foam.CLASS({
         return timer;
       }
     },
-    [ 'n',          500 ],
-    [ 'width',      800 ],
-    [ 'height',     600 ],
-    [ 'color', 'black' ],
+    [ 'n',       500 ],
+    [ 'width',   800 ],
+    [ 'height',  600 ],
+    [ 'color',   'black' ],
     { name: 'engine',   factory: function() {
       return this.onDestroy(this.PhysicsEngine.create().start());
     }}
@@ -50,19 +50,19 @@ foam.CLASS({
       for ( var x = 0 ; x < this.n ; x++ ) {
         var c = this.PhysicalCircle.create({
           alpha: 0.2,
-          radius: 20+Math.random() * 25,
-          x: this.width * Math.random(),
+          radius: 20+Math.random() * 40,
+          x: this.width  * Math.random(),
           y: this.height * Math.random(),
           color: 'red',
           border: null
         }).setVelocityAndAngle(
-          Math.sqrt(Math.random()) * 30 + 1,
-          Math.random() * Math.PI * 2); 
+          Math.sqrt(Math.random()) * 30 + 10,
+          Math.random() * Math.PI * 2);
 
         this.addChildren(c);
 
         this.timer.i$.sub(foam.Function.bind(function(c, i) {
-          c.color = 'hsl(' + ( i ) + ',100%,50%)';
+          c.color = 'hsl(' + ( i*200/this.n+this.timer.i) + ',100%,50%)';
           if ( c.y < 0           ) c.vy =  Math.abs(c.vy);
           if ( c.y > this.height ) c.vy = -Math.abs(c.vy);
           if ( c.x < 0           ) c.vx =  Math.abs(c.vx);
