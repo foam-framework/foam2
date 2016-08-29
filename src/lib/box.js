@@ -1268,20 +1268,26 @@ foam.CLASS({
         var replyBox = msg.replyBox;
         var errorBox = msg.errorBox;
 
-        msg.replyBox = this.HTTPReplyBox.create();
+        if ( replyBox ) {
+          msg.replyBox = this.HTTPReplyBox.create();
+        }
         // TODO: set error box as well?
 
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
           payload: foam.json.Network.stringify(msg)
-        }).send().then(function(resp) {
-          return resp.payload;
-        }).then(function(p) {
-          replyBox.send(foam.json.parse(foam.json.parseString(p, null, this)));
-        }, function(e) {
-          errorBox.send(e);
-        });
+        }).send();
+
+        if ( replyBox ) {
+          req.then(function(resp) {
+            return resp.payload;
+          }).then(function(p) {
+            replyBox.send(foam.json.parse(foam.json.parseString(p, null, this)));
+          }, function(e) {
+            errorBox.send(e);
+          });
+        }
       }
     }
   ]
