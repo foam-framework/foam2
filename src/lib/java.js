@@ -15,6 +15,96 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'foam.java',
+  name: 'JavaClass',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'package'
+    },
+    {
+      class: 'String',
+      name: 'id',
+      expression: function(name, package) {
+        return package + '.' + name;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'abstract',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'extends',
+      value: 'foam.core.FObject'
+    },
+    {
+      class: 'StringArray',
+      name: 'imports',
+    },
+    {
+      class: 'StringArray',
+      name: 'implements',
+      adapt: function(o, v) {
+        if ( foam.String.is(v) ) return [v];
+        return v;
+      }
+    },
+    {
+      class: 'String',
+      name: 'code'
+    }
+  ],
+  methods: [
+    function fromClass(cls) {
+      this.package = cls.model_.package;
+      this.name = cls.model_.name;
+      this.extends = cls.model_.extends;
+      this.implements = cls.getAxiomsByClass(foam.core.Implements).map(function(a) {
+        return a.path;
+      });
+      this.abstract = cls.model_.abstract;
+
+      var axioms = cls.getAxioms();
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
+        var axiom = axioms[i];
+        if ( axiom.axiomClassInfo ) this.code += axiom.axiomClassInfo(null, cls, this);
+      }
+
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
+        var axiom = axioms[i];
+        if ( axiom.axiomJavaSource ) this.code += axiom.axiomJavaSource(null, cls, this);
+      }
+    }
+  ],
+  templates: [
+    {
+      name: 'toJavaSource',
+      template: function() {/*// GENERATED CODE.  DO NOT MODIFY BY HAND.
+<% if ( this.package ) { %>package <%= this.pacakge %>;
+<% }
+%>public <%= this.abstract ? 'abstract ' : '' %> class <%= this.name %><%
+  if ( this.extends ) { %> extends <%= this.extends %><%
+  }
+  if ( this.implements.length > 0 ) { %> implements <%
+    for ( var i = 0 ; i < this.implements.length ; i++ ) {
+      %><%= this.implements[i] %><%
+      if ( i != this.implements.length - 1 ) { %>, <% }
+    }
+  }
+%> {
+<%= this.code %>
+}
+    */}
+    }
+  ]
+});
 
 foam.LIB({
   name: 'foam.AbstractClass',
