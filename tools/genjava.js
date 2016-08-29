@@ -1,8 +1,7 @@
 require('../src/foam.js');
-//require('../src/lib/java.js');
 
-if ( process.argv.length !== 4 ) {
-  console.log("USAGE: genjava.js output-path class-names");
+if ( process.argv.length < 4 ) {
+  console.log("USAGE: genjava.js output-path class-names skeletons");
   process.exit(1);
 }
 
@@ -26,9 +25,11 @@ function ensurePath(p) {
   }
 }
 
-var args = process.argv[3].split(',');
+var classes = process.argv[3].split(',');
+var skeletons = process.argv[4].split(',');
 
 
+var args = classes;
 for ( var i = 0 ; i < args.length ; i++ ) {
   if ( ! foam.lookup(args[i], true) ) require('../src/' + args[i].replace(/\./g, '/') + '.js');
 
@@ -38,4 +39,20 @@ for ( var i = 0 ; i < args.length ; i++ ) {
 
   ensurePath(outfile);
   require('fs').writeFileSync(outfile, cls.javaSource());
+}
+
+args = skeletons;
+for ( var i = 0 ; i < args.length ; i++ ) {
+  if ( ! foam.lookup(args[i], true) ) require('../src/' + args[i].replace(/\./g, '/') + '.js');
+
+  var cls = foam.lookup(args[i]);
+
+  var outfile = outdir + require('path').sep + cls.package.replace(/\./g, require('path').sep) +
+    require('path').sep +
+    cls.name + 'Skeleton.java';
+
+  ensurePath(outfile);
+  require('fs').writeFileSync(outfile, foam.java.Skeleton.create({
+    of: args[i]
+  }).code());
 }
