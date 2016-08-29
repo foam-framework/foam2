@@ -48,12 +48,15 @@ TODO(adamvy):
  *   // and methods we want our enums to have are defined as follows.
  *   properties: [
  *     {
- *       name: 'label'
+ *       class: 'Boolean',
+ *       name: 'consideredOpen',
+ *       value: true
  *     }
  *   ],
  *   methods: [
  *     function foo() {
- *       return 'Label is ' + this.label;
+ *       return this.label + ( this.consideredOpen ? ' is' : ' is not' ) +
+ *           ' considered open.';
  *     }
  *   ],
  *
@@ -61,39 +64,43 @@ TODO(adamvy):
  *   values: [
  *     {
  *       name: 'OPEN',
- *       // Use an inner values: map to define the values we want to assign
- *       // to the properties of the enum for this specific Enum Value.
- *       values: {
- *         label: 'Open'
- *       }
  *     },
  *     {
- *       name: 'CLOSED',
  *       // The ordinal can be specified explicitly.
+ *       name: 'CLOSED',
  *       ordinal: 100,
- *       values: {
- *         label: 'Closed'
- *       }
  *     },
  *     {
  *       // If the ordinal isn't given explicitly it is auto assigned as the previous
  *       // ordinal + 1
  *       name: 'ASSIGNED',
- *       values: {
- *         label: 'Assigned'
- *       }
+ *     },
+ *     {
+ *       // You can specify the label, which will be used when rendering in a
+ *       // combo box or similar
+ *       name: 'UNVERIFIED',
+ *       label: 'Unverified'
+ *     },
+ *     {
+ *       // Values for additional properties to your enum are also defined
+ *       // inline.
+ *       name: 'FIXED',
+ *       label: 'Fixed',
+ *       consideredOpen: false
  *     }
  *   ]
  * });
  *
- * console.log(IssueStatus.OPEN.label); // outputs "Open"
- * console.log(IssueStatus.ASSIGNED.foo()); // outputs "Label is Assigned"
+ * console.log(IssueStatus.OPEN.name); // outputs "OPEN"
+ * console.log(IssueStatus.ASSIGNED.consideredOpen); // outputs "true"
  *
  * // Enum value ordinals can be specified.
  * console.log(IssueStatus.CLOSED.ordinal); // outputs 100
  * // values without specified ordinals get auto assigned.
  * console.log(IssueStatus.ASSIGNED.ordinal); // outputs 101
  *
+ * // Methods can be called on the enum values.
+ * console.log(IssueStatus.FIXED.foo()); // outputs "Fixed is not considered open.")
  *
  * // To store enums on a class, it is recommended to use the Enum property
  * // type.
@@ -108,8 +115,8 @@ TODO(adamvy):
  *   ]
  * });
  *
- * var issue = Issue.create({ status: IssueStatus.OPEN });
- * console.log(issue.status.label); // outputs "Open"
+ * var issue = Issue.create({ status: IssueStatus.UNVERIFIED });
+ * console.log(issue.status.label); // outputs "Unverified"
  *
  * // Enum properties give you some convenient adapting.
  * // You can set the property to the ordinal or the
@@ -118,7 +125,7 @@ TODO(adamvy):
  *
  * issue.status = 100;
  *
- * issue.status === IssueStatus.OPEN; // is true
+ * issue.status === IssueStatus.CLOSED; // is true
  *
  * // Enum properties also allow you to assign them via the name
  * // of the enum.
@@ -142,12 +149,15 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'label'
+    },
+    {
       class: 'Int',
       name: 'ordinal'
     },
     {
-      name: 'values',
-      factory: function() { return {}; }
+      name: 'values'
     }
   ],
 
@@ -168,6 +178,10 @@ foam.CLASS({
     },
     function installInProto(proto) {
       this.installInClass(proto);
+    },
+    function initArgs(args, ctx) {
+      this.values = args;
+      this.SUPER(args, ctx);
     }
   ]
 });
@@ -190,6 +204,12 @@ foam.CLASS({
           foam.core.String.create({
             name: 'name',
             final: true
+          }),
+          foam.core.Method.create({
+            name: 'toString',
+            code: function() {
+              return this.name;
+            }
           }),
           {
             name: 'enum_create',
@@ -352,7 +372,7 @@ foam.CLASS({
   ]
 });
 
-
+// TODO(adamvy): Support default values.
 foam.CLASS({
   package: 'foam.core',
   name: 'Enum',
@@ -389,10 +409,10 @@ foam.LIB({
       model.validate();
       var cls = model.buildClass();
       cls.validate();
-      
+
       foam.register(cls);
       foam.package.registerClass(cls);
-      
+
       return cls;
     }
   ]
