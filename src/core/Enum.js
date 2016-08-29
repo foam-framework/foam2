@@ -176,9 +176,11 @@ foam.CLASS({
           }
         });
     },
+
     function installInProto(proto) {
       this.installInClass(proto);
     },
+
     function initArgs(args, ctx) {
       this.values = args;
       this.SUPER(args, ctx);
@@ -376,6 +378,7 @@ foam.CLASS({
   ]
 });
 
+
 // TODO(adamvy): Support default values.
 foam.CLASS({
   package: 'foam.core',
@@ -407,6 +410,7 @@ foam.CLASS({
 
 foam.LIB({
   name: 'foam',
+
   methods: [
     function ENUM(m) {
       var model = foam.core.EnumModel.create(m);

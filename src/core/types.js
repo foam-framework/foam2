@@ -195,6 +195,7 @@ foam.CLASS({
   ],
 });
 
+
 // TODO(adam): Better name for this?
 foam.CLASS({
   package: 'foam.core',
@@ -216,6 +217,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
