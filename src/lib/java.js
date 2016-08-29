@@ -106,6 +106,87 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.java',
+  name: 'Skeleton',
+  properties: [
+    {
+      class: 'Class2',
+      name: 'of'
+    },
+    {
+      name: 'name',
+      expression: function(of) {
+        return this.of$cls.name + 'Skeleton';
+      }
+    },
+    {
+      name: 'package',
+      expression: function(of) {
+        return this.of$cls.package;
+      }
+    },
+    {
+      name: 'id',
+      expression: function(name, package) {
+        return package + '.' + name;
+      }
+    }
+  ],
+  templates: [
+    {
+      name: 'code',
+      template: function() {/*
+package <%= this.package %>;
+
+import foam.core.X;
+
+public class <%= this.name %> implements foam.box.Box {
+  private X x_;
+  public X getX() { return x_; }
+
+  public <%= this.name %>(X x) {
+    x_ = x;
+  }
+
+  private <%= this.of %> delegate_;
+  public <%= this.of %> getDelegate() { return delegate_; }
+  public <%= this.name %> setDelegate(<%= this.of %> delegate) {
+    delegate_ = delegate;
+    return this;
+  }
+
+  public void send(foam.box.Message message) {
+    if ( ! ( message instanceof foam.box.RPCMessage) ) {
+      // TODO error to errorBox
+      return;
+    }
+
+    foam.box.RPCMessage rpc = (foam.box.RPCMessage)message;
+
+    switch ( rpc.getName() ) {<%
+  var methods = this.of$cls.getAxiomsByClass(foam.core.Method);
+  for ( var i = 0 ; i < methods.length ; i++ ) {
+    var m = methods[i]; %>
+      case "<%= m.name %>":
+        getDelegate().<%= m.name %>(<%
+    for ( var j = 0 ; j < m.args.length ; j++ ) {
+      %>(<%= m.args[j].javaType %>)rpc.getArgs()[<%= i %>]<%
+      if ( j != m.args.length - 1 ) { %>, <% }
+    }
+    %>);
+        break;
+    <%
+  }%>
+      default: throw new RuntimeException("No such method found \\"" + rpc.getName() + "\\"");
+    }
+  }
+}
+  */}
+    }
+  ]
+});
+
 foam.LIB({
   name: 'foam.AbstractClass',
   methods: [
