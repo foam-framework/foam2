@@ -677,8 +677,14 @@ foam.CLASS({
   ],
 
   properties: [
-    'name',
-    'args'
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'Array',
+      name: 'args'
+    }
   ],
 
   methods: [
