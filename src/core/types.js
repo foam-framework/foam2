@@ -211,7 +211,7 @@ foam.CLASS({
         var of = foam.lookup(prop.of);
 
         return of.isInstance(v) ? v :
-          ( v.class ? foam.looup(v.class) : of ).create(v);
+          ( v.class ? foam.lookup(v.class) : of ).create(v);
       }
     }
   ]
