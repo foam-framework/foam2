@@ -168,6 +168,20 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
 });
 
 foam.CLASS({
+  refines: 'foam.core.Import',
+  templates: [
+    {
+      name: 'axiomJavaSource',
+      template: function() {/*
+  public Object get<%= foam.String.capitalize(this.name) %>() {
+    return getX().get("<%= this.key %>");
+  }
+*/}
+     }
+  ]
+});
+
+foam.CLASS({
   refines: 'foam.core.FObject',
   methods: [
     {
@@ -305,7 +319,12 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
   properties: [
-    ['javaType', 'foam.core.FObject'],
+    {
+      name: 'javaType',
+      expression: function(of) {
+        return of ? of : 'foam.core.FObject';
+      }
+    },
     ['javaJsonParser', 'foam.lib.json.FObjectParser']
   ]
 });
@@ -379,6 +398,8 @@ public <%= cls.model_.abstract ? 'abstract ' : '' %>class <%= cls.name %> extend
   public static ClassInfo getOwnClassInfo() {
     return classInfo_;
   }
+
+  public <%= cls.name %>(X x) { super(x); }
 
 <%
   var a = cls.getAxioms();
