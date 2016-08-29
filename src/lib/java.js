@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.java',
   name: 'JavaClass',
+
   properties: [
     {
       class: 'String',
@@ -46,7 +47,7 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'imports',
+      name: 'imports'
     },
     {
       class: 'StringArray',
@@ -61,6 +62,7 @@ foam.CLASS({
       name: 'code'
     }
   ],
+
   methods: [
     function fromClass(cls) {
       this.package = cls.model_.package;
@@ -83,6 +85,7 @@ foam.CLASS({
       }
     }
   ],
+
   templates: [
     {
       name: 'toJavaSource',
@@ -198,6 +201,7 @@ foam.LIB({
 
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
+
   properties: [
     {
       class: 'String',
@@ -208,6 +212,7 @@ foam.CLASS({
       name: 'javaReturns'
     }
   ],
+
   methods: [
     function createChildMethod_(child) {
       var m = child.clone();
@@ -218,6 +223,7 @@ foam.CLASS({
       return m;
     }
   ],
+
   templates: [
     {
       name: 'axiomJavaInterfaceSource',
@@ -248,6 +254,7 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Import',
   templates: [
@@ -262,6 +269,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObject',
   methods: [
@@ -272,6 +280,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Interface',
@@ -295,6 +304,7 @@ public interface <%= this.name %><% if ( this.extends ) { %><%= this.extends %><
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
@@ -311,6 +321,7 @@ foam.CLASS({
       name: 'javaToJSON'
     }
   ],
+
   templates: [
     {
       name: 'axiomJavaInterfaceSource',
@@ -377,6 +388,7 @@ if ( foam.core.FObjectArray.isInstance(this) ) { %>
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
@@ -389,6 +401,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Int',
   properties: [
@@ -396,6 +409,7 @@ foam.CLASS({
     ['javaJsonParser', 'foam.lib.json.IntParser']
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Array',
@@ -418,6 +432,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
   properties: [
@@ -434,12 +449,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'JavaUtil',
+
   axioms: [
     foam.pattern.Singleton.create()
   ],
+
   templates: [
     {
       name: 'classInfo',
