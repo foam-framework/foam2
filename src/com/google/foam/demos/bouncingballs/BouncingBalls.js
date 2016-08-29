@@ -37,10 +37,7 @@ foam.CLASS({
     [ 'n',       1000 ],
     [ 'width',   1200 ],
     [ 'height',  500 ],
-    [ 'color',   'black' ],
-    { name: 'engine',   factory: function() {
-      return this.onDestroy(this.PhysicsEngine.create().start());
-    }}
+    [ 'color',   'black' ]
   ],
 
   methods: [
