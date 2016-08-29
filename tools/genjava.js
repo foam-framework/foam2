@@ -1,5 +1,5 @@
 require('../src/foam.js');
-require('../src/lib/java.js');
+//require('../src/lib/java.js');
 
 if ( process.argv.length !== 4 ) {
   console.log("USAGE: genjava.js output-path class-names");

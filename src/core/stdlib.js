@@ -508,7 +508,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Object',
   methods: [
-    function is(o) { return typeof o === 'object'; },
+    function is(o) { return typeof o === 'object' && ! Array.isArray(o); },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {

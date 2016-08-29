@@ -24,8 +24,7 @@ foam.CLASS({
 
   requires: [
     'foam.graphics.Circle',
-    'foam.graphics.Box as CView',
-    'foam.ui.md.ChoiceMenuView',
+    'foam.graphics.Box',
     'foam.u2.PopupView'
   ],
 
@@ -83,7 +82,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.CView.create({width: 600, height: 500, background: '#f3f3f3'});
+        return this.Box.create({width: 600, height: 500, background: '#f3f3f3'});
       }
     },
   ],
@@ -134,7 +133,7 @@ foam.CLASS({
       this.feedback_ = true;
       this.memento = this.canvas.children.map(function(c) {
         return {x: c.x, y: c.y, radius: c.radius};
-      });;
+      });
       this.feedback_ = false;
     }
   ],

@@ -27,12 +27,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Float', // TODO: shouldn't be needed
       name: 'vx',
-      preSet: function(_, v) {
-// TODO: isn't called
-        console.log('preSet', v);
- return Math.sign(v) * Math.max(5, Math.abs(v)); }
+      preSet: function(_, v) { return Math.sign(v) * Math.max(5, Math.abs(v)); }
     }
   ]
 });
@@ -52,13 +48,8 @@ foam.CLASS({
     [ 'color', 'white' ],
     [ 'radius', 30 ],
     {
-      class: 'Float', // TODO: shouldn't be needed
       name: 'mass',
-      factory: function() {
-// TODO: isn't called
-console.log('********************');
- debugger;
-return this.INFINITE_MASS; }
+      factory: function() { return this.INFINITE_MASS; }
     }
   ]
 });
@@ -72,8 +63,9 @@ foam.CLASS({
   requires: [
     'com.google.foam.demos.pong.Ball',
     'com.google.foam.demos.pong.Paddle',
-    'foam.graphics.CView',
     'foam.graphics.Box',
+    'foam.graphics.CView',
+    'foam.graphics.Label',
     'foam.physics.PhysicsEngine'
   ],
 
@@ -176,13 +168,33 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
+      var lScoreLabel = this.Label.create({
+        text$: this.lScore$,
+        align: 'center',
+        x: this.width/4,
+        y: 25,
+        color: 'white',
+        font: '70px Arial',
+        width: 200,
+        height: 70});
+
+      var rScoreLabel = this.Label.create({
+        text$: this.rScore$,
+        align: 'center',
+        x: this.width/2,
+        y: 25,
+        color: 'white',
+        font: '70px Arial',
+        width: 200,
+        height: 70});
+
       this.addChildren(
           this.Box.create({x: this.width/2-5, width:10, height: this.height, border:'rgba(0,0,0,0)' , color: 'white'}),
           this.ball,
+          lScoreLabel,
+          rScoreLabel,
           this.lPaddle,
           this.rPaddle);
-
-      this.lPaddle.mass = this.rPaddle.mass = this.lPaddle.INFINITE_MASS;
 
       // Position Paddles
       this.lPaddle.x = 25+this.lPaddle.radius;
@@ -192,7 +204,7 @@ foam.CLASS({
       // Setup Ball
       this.ball.x  = 110;
       this.ball.y  = this.rPaddle.y;
-      this.ball.vx = this.ball.vy = 20;
+      this.ball.vx = this.ball.vy = 10;
 
       this.ball.x$.sub(this.onBallMove);
 

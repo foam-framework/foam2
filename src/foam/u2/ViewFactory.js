@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'ViewFactory',
@@ -33,7 +34,11 @@ foam.CLASS({
       proto[name + '$f'] = function(args, ctx) {
         ctx = ctx || this;
         var raw = this[name];
-        if ( typeof raw === 'function' ) return raw.call(this, args, ctx);
+
+        if ( typeof raw === 'function' ) {
+          return raw.call(this, args, ctx);
+        }
+
         if ( typeof raw === 'string' ) {
           return ctx.lookup(raw).create(args, ctx);
         }

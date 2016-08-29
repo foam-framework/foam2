@@ -48,10 +48,7 @@ foam.CLASS({
       expression: function(duration, elapsedTime) {
         return this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
       },
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.ProgressView').create(null, X);
-      }
-//      toPropertyE: 'foam.u2.ProgressView'
+      view: 'foam.u2.ProgressView'
     },
     {
       name: 'elapsedTime',
@@ -63,9 +60,7 @@ foam.CLASS({
       class: 'Int',
       name: 'duration',
       units: 'ms',
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.RangeView').create({maxValue: 10000}, X);
-      },
+      view: { class: 'foam.u2.RangeView', maxValue: 10000 },
       value: 5000
     },
     {
@@ -104,7 +99,6 @@ foam.CLASS({
       name: 'tick',
       isFramed: true,
       code: function() {
-// console.log('tick', this.progress, this.elapsedTime, this.duration, this.lastTick_);
         if ( 1000 * this.elapsedTime >= this.duration ) return;
         var now = Date.now();
         if ( this.lastTick_ ) this.elapsedTime += (now - this.lastTick_)/1000;

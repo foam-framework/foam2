@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: support 'precision' in FloatView
 foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'TempConv',
@@ -24,20 +23,15 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   properties: [
-    // TODO: why is 'value' required?
-    { type: 'Float', name: 'c', value: 0 },
-    { type: 'Float', name: 'f' }
+    [ 'nodeName', 'span' ],
+    { class: 'Float', name: 'c', view: { class: 'foam.u2.FloatView', onKey: true, precision: 4 } },
+    { class: 'Float', name: 'f', view: { class: 'foam.u2.FloatView', onKey: true, precision: 4 } }
   ],
 
   methods: [
     function initE() {
-      this.nodeName = 'span';
       this.c$.relateTo(this.f$, this.c2f, this.f2c);
-      this.
-          start(this.C, {onKeyMode: true, precision: 4}).end().
-          add('Celsius = ').
-          start(this.F, {onKeyMode: true, precision: 4}).end().
-          add('Fahrenheit');
+      this.add(this.C, ' Celsius = ', this.F, ' Fahrenheit');
     },
     function c2f(f) { return 9/5 * f + 32; },
     function f2c(c) { return 5/9 * ( c - 32 ); }

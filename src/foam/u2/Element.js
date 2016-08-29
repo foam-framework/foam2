@@ -55,6 +55,59 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'CSS',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code'
+    },
+    {
+      name: 'name',
+      factory: function() { return 'CSS-' + this.$UID; }
+    },
+    {
+      name: 'installedDocuments_',
+      factory: function() { return new WeakMap(); }
+    }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      // Install myself in this Window, if not already there.
+      var oldCreate = cls.create;
+      var axiom     = this;
+
+      cls.create = function(args, opt_parent) {
+        // TODO: move this functionality somewhere reusable
+        var X = opt_parent ?
+          ( opt_parent.__subContext__ || opt_parent.__context__ || opt_parent ) :
+          foam.__context__;
+
+        // Install our own CSS, and then all parent models as well.
+        if ( ! axiom.installedDocuments_.has(X.document) ) {
+          X.installCSS(axiom.expandCSS(cls, axiom.code));
+          axiom.installedDocuments_.set(X.document, true);
+        }
+
+        // Now call through to the original create.
+        return oldCreate.call(this, args, X);
+      };
+    },
+
+    function expandCSS(cls, text) {
+      /* Performs expansion of the ^ shorthand on the CSS. */
+      // TODO(braden): Parse and validate the CSS.
+      // TODO(braden): Add the automatic prefixing once we have the parser.
+      return text.replace(/\^/g,
+          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'DefaultValidator',
 
   axioms: [ foam.pattern.Singleton.create() ],
@@ -204,7 +257,7 @@ foam.CLASS({
     function onRemoveListener(topic, listener) { this.error(); },
     function onSetStyle(key, value) { this.error(); },
     function onSetAttr(key, value) { this.error(); },
-    function onRemoveAttr(key, value) { this.error(); },
+    function onRemoveAttr(key) { this.error(); },
     function onAddChildren(c) { this.error(); },
     function onInsertChildren() { this.error(); },
     function onReplaceChild() { this.error(); },
@@ -255,15 +308,18 @@ foam.CLASS({
       this.el().style[key] = value;
     },
     function onSetAttr(key, value) {
-      // 'value' doesn't work consistently with setAttribute()
-      if ( key === 'value' ) {
+      if ( this.PSEDO_ATTRIBUTES[key] ) {
         this.el().value = value;
       } else {
         this.el().setAttribute(key, value === true ? '' : value);
       }
     },
-    function onRemoveAttr(key, value) {
-      this.el().removeAttribute(key);
+    function onRemoveAttr(key) {
+      if ( this.PSEDO_ATTRIBUTES[key] ) {
+        this.el().value = '';
+      } else {
+        this.el().removeAttribute(key);
+      }
     },
     function onAddChildren() {
       var e = this.el();
@@ -331,9 +387,10 @@ foam.CLASS({
   // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
-    'foam.u2.DefaultValidator',
     'foam.u2.AttrSlot',
-    'foam.u2.Entity'
+    'foam.u2.DefaultValidator',
+    'foam.u2.Entity',
+    'foam.u2.ViewSpec'
   ],
 
   imports: [
@@ -349,6 +406,13 @@ foam.CLASS({
   ],
 
   constants: {
+    // Psedo-attributes don't work consistently with setAttribute()
+    // so need to be set on the real DOM element directly.
+    PSEDO_ATTRIBUTES: {
+      value: true,
+      checked: true
+    },
+
     DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
 
     // State of an Element after it has been output (to a String) but before it is loaded.
@@ -413,6 +477,15 @@ foam.CLASS({
     }
   },
 
+  axioms: [
+    foam.u2.CSS.create({
+      // We hide Elements by adding this style rather than setting
+      // 'display: none' directly because then when we re-show the
+      // Element we don't need to remember it's desired 'display' value.
+      code: '.foam-u2-Element-hidden { display: none !important; }'
+    })
+  ],
+
   properties: [
     {
       name: 'id',
@@ -438,6 +511,19 @@ foam.CLASS({
     {
       name: 'parentNode',
       transient: true
+    },
+    {
+      class: 'Boolean',
+      name: 'shown',
+      value: true,
+      postSet: function(o, n) {
+        if ( o === n ) return;
+        if ( n ) {
+          this.removeCls('foam-u2-Element-hidden');
+        } else {
+          this.cssClass('foam-u2-Element-hidden');
+        }
+      }
     },
     {
       class: 'Proxy',
@@ -510,6 +596,7 @@ foam.CLASS({
     {
       name: 'outerHTML',
       transient: true,
+      hidden: true,
       getter: function() {
         return this.output(this.createOutputStream()).toString();
       }
@@ -517,6 +604,7 @@ foam.CLASS({
     {
       name: 'innerHTML',
       transient: true,
+      hidden: true,
       getter: function() {
         return this.outputInnerHTML(this.createOutputStream()).toString();
       }
@@ -528,14 +616,6 @@ foam.CLASS({
       name: '__subSubContext__',
       factory: function() { return this.__subContext__; }
     }
-  ],
-
-  templates: [
-    function CSS() {/*
-      .foam-u2-Element-hidden {
-        display: none !important;
-      }
-    */}
   ],
 
   methods: [
@@ -632,18 +712,25 @@ foam.CLASS({
     //
     // Visibility
     //
+    // Fluent methods for setting 'shown' property.
 
     function show(opt_shown) {
-      if ( opt_shown ) {
-        this.removeCls('foam-u2-Element-hidden');
+      if ( opt_shown === undefined ) {
+        this.show = true;
+      } else if ( foam.core.Slot.isInstance(opt_shown) ) {
+        this.shown$ = opt_shown;
       } else {
-        this.cssClass('foam-u2-Element-hidden');
+        this.shown = !! opt_shown;
       }
+
       return this;
     },
 
     function hide(opt_hidden) {
-      return this.show(opt_hidden === undefined ? false : ! opt_hidden);
+      return this.show(
+          opt_hidden === undefined              ? false :
+          foam.core.Slot.isInstance(opt_hidden) ? opt_hidden.map(function(s) { return ! s; }) :
+          ! opt_hidden);
     },
 
 
@@ -738,14 +825,16 @@ foam.CLASS({
     function getAttribute(name) {
       // TODO: add support for other dynamic attributes also
       // TODO: don't lookup in real DOM if listener present
-      if ( name === 'value' && this.el() ) {
-        var value = this.el().value;
+      if ( this.PSEDO_ATTRIBUTES[name] && this.el() ) {
+        var value = this.el()[name];
         var attr  = this.getAttributeNode(name);
 
         if ( attr ) {
-          attr.value = value;
+          attr[name] = value;
         } else {
-          // TODO: add attribute
+          attr = { name: name, value: value };
+          this.attributes.push(attr);
+          this.attributeMap[name] = attr;
         }
 
         return value;
@@ -958,11 +1047,7 @@ foam.CLASS({
     },
 
     function createChild_(spec, args) {
-      if ( foam.u2.Element.isInstance(spec) ) return spec;
-
-      if ( spec && spec.toE ) return spec.toE(this.__subSubContext__, args);
-
-      return this.E(spec);
+      return this.ViewSpec.createView(spec, args, this, this.__subSubContext__);
     },
 
     function start(spec, args) {
@@ -981,7 +1066,7 @@ foam.CLASS({
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
-      var mapper = function(c) { return c.toE ? c.toE(Y) : c; };
+      var mapper = function(c) { return c.toE ? c.toE(null, Y) : c; };
 
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         var c = arguments[i];
@@ -992,7 +1077,7 @@ foam.CLASS({
         } else if ( Array.isArray(c) ) {
           es = es.concat(c.map(mapper));
         } else if ( c.toE ) {
-          es.push(c.toE(Y));
+          es.push(c.toE(null, Y));
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1126,10 +1211,14 @@ foam.CLASS({
     },
 
     function toString() {
+      return this.cls_.id + '(nodeName=' + this.nodeName + ', state=' + this.state + ')';
       /* Converts Element to HTML String without transitioning state. */
+      /*
+        TODO: put this somewhere useful for debugging
       var s = this.createOutputStream();
       this.output_(s);
       return s.toString();
+      */
     },
 
 
@@ -1149,7 +1238,7 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) { return e.toE ? e.toE(Y) : e; });
+      children = children.map(function(e) { return e.toE ? e.toE(null, Y) : e; });
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes,
@@ -1383,16 +1472,15 @@ foam.CLASS({
       value: false
     },
     {
-      name: 'toPropertyE',
-      value: function toPropertyE(X, args) {
-        return this.TextField.create(args, X);
-      }
+      class: 'foam.u2.ViewSpec',
+      name: 'view',
+      value: { class: 'foam.u2.TextField' }
     }
   ],
 
   methods: [
-    function toE(X, args) {
-      var e = this.toPropertyE(X, this);
+    function toE(args, X) {
+      var e = foam.u2.ViewSpec.createView(this.view, args, this, X);
 
       e.fromProperty && e.fromProperty(this);
 
@@ -1412,9 +1500,25 @@ foam.CLASS({
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
-    [ 'toPropertyE', function(X, args) {
-      return this.DateView.create(args, X);
-    }]
+    [ 'view', { class: 'foam.u2.DateView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Float',
+  requires: [ 'foam.u2.FloatView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.FloatView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Boolean',
+  requires: [ 'foam.u2.CheckBox' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.CheckBox' } ],
   ]
 });
 
@@ -1443,7 +1547,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toE(X, args) {
+    function toE(args, X) {
       return X.lookup('foam.u2.ActionView').create({
         data$:  X.data$,
         action: this
@@ -1452,58 +1556,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.u2',
-  name: 'CSS',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'code'
-    },
-    {
-      name: 'name',
-      factory: function() { return 'CSS-' + this.$UID; }
-    },
-    {
-      name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); }
-    }
-  ],
-
-  methods: [
-    function installInClass(cls) {
-      // Install myself in this Window, if not already there.
-      var oldCreate = cls.create;
-      var axiom = this;
-
-      cls.create = function(args, opt_parent) {
-        // TODO: move this functionality somewhere reusable
-        var X = opt_parent ?
-          ( opt_parent.__subContext__ || opt_parent.__context__ || opt_parent ) :
-          foam.__context__;
-
-        // Install our own CSS, and then all parent models as well.
-        if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(cls, axiom.code));
-          axiom.installedDocuments_.set(X.document, true);
-        }
-
-        // Now call through to the original create.
-        return oldCreate.call(this, args, X);
-      };
-    },
-
-    function expandCSS(cls, text) {
-      /* Performs expansion of the ^ shorthand on the CSS. */
-      // TODO(braden): Parse and validate the CSS.
-      // TODO(braden): Add the automatic prefixing once we have the parser.
-      return text.replace(/\^/g,
-          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
-    }
-  ]
-});
 
 // TODO: make a tableProperties property on AbstractClass
 

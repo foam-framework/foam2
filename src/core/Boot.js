@@ -150,9 +150,9 @@ foam.LIB({
 
         // Install an FObject on the class that we can use as a pub/sub hub.
         // We have to do this because classes aren't FObjects.
-        // This is used to publish 'installAxiom' events on, so that descendents
+        // This is used to publish 'installAxiom' events to, so that descendents
         // properties know when they need to be re-installed.
-        cls.pubsub_          =
+        cls.pubsub_ =
           foam.core.FObject &&
           foam.core.FObject.create &&
           foam.core.FObject.create();

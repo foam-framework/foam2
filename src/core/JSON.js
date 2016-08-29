@@ -20,7 +20,6 @@
 //
 // TODO:
 //   - don't output default classes
-//   - allow for custom Property JSON support
 */
 
 /**
@@ -40,7 +39,15 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   properties: [
-    { class: 'String', name: 'shortName' }
+    { class: 'String', name: 'shortName' },
+    {
+      name: 'fromJSON',
+      value: function fromJSON(value, opt_ctx) { return value; }
+    },
+    {
+      name: 'toJSON',
+      value: function toJSON(value) { return value; }
+    }
   ]
 });
 
@@ -145,6 +152,7 @@ foam.CLASS({
       }
     },
     {
+      // TODO: rename to FON
       class: 'Boolean',
       name: 'strict',
       value: true,
@@ -256,7 +264,7 @@ foam.CLASS({
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
-      this.output(v);
+      this.output(p.toJSON(v));
     },
 
     function outputDate(o) {
@@ -287,6 +295,11 @@ foam.CLASS({
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
         FObject:   function(o) {
+          if ( o.outputJSON ) {
+            o.outputJSON(this)
+            return;
+          }
+
           this.start('{');
           if ( this.outputClassNames ) {
             this.out(
@@ -303,7 +316,7 @@ foam.CLASS({
           }
           this.nl().end('}');
         },
-        Array:     function(o) {
+        Array: function(o) {
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], this);
@@ -312,11 +325,18 @@ foam.CLASS({
           this.nl();
           this.end(']')
         },
-        Object:    function(o) {
+        Object: function(o) {
           if ( o.outputJSON ) {
             o.outputJSON(this)
           } else {
-            this.out('undefined');
+            this.start('{');
+            var first = true;
+            for ( var key in o ) {
+              if ( ! first ) this.out(',').nl();
+              this.indent().out(this.maybeEscapeKey(key), ':').output(o[key]);
+              first = false;
+            }
+            this.end('}');
           }
         }
       })
@@ -332,13 +352,13 @@ foam.CLASS({
     {
       name: 'objectify',
       code: foam.mmethod({
-        Date:      function(o) {
+        Date: function(o) {
           return this.formatDatesAsNumbers ? o.valueOf() : o;
         },
-        Function:  function(o) {
+        Function: function(o) {
           return this.formatFunctionsAsStrings ? o.toString() : o;
         },
-        FObject:   function(o) {
+        FObject: function(o) {
           var m = {};
           if ( this.outputClassNames ) {
             m.class = o.cls_.id;
@@ -349,11 +369,11 @@ foam.CLASS({
             if ( ! this.propertyPredicate(o, p) ) continue;
             if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) continue;
 
-            m[p.name] = this.objectify(o[p.name]);
+            m[p.name] = this.objectify(p.toJSON(o[p.name]));
           }
           return m;
         },
-        Array:     function(o) {
+        Array: function(o) {
           var a = [];
           for ( var i = 0 ; i < o.length ; i++ ) {
             a[i] = this.objectify(o[i]);
@@ -442,15 +462,24 @@ foam.LIB({
         },
         FObject: function(o) { return o; },
         Object: function(json, opt_class, opt_ctx) {
+          var cls = json.class || opt_class;
+
+          if ( cls ) {
+            var c = foam.lookup(cls);
+
+            for ( var key in json ) {
+              var prop = c.getAxiomByName(key);
+              if ( prop ) {
+                json[key] = prop.fromJSON(json[key], opt_ctx);
+              }
+            }
+
+            return c.create(json, opt_ctx);
+          }
+
           for ( var key in json ) {
             var o = json[key];
             json[key] = this.parse(json[key], null, opt_ctx);
-          }
-
-          var cls = json.class || opt_class;
-          if ( cls ) {
-            var class_ = foam.lookup(cls);
-            return class_.create(json, opt_ctx);
           }
 
           return json;
@@ -459,7 +488,7 @@ foam.LIB({
     },
 
     function parseString(jsonStr) {
-      return eval('(' + jsonStr + ')');
+      return this.parse(eval('(' + jsonStr + ')'));
     },
 
     function stringify(o) {

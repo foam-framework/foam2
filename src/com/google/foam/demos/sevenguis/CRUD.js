@@ -23,8 +23,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { name: 'name',    toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } },
-    { name: 'surname', toPropertyE: function(X) { return X.lookup('foam.u2.TextField').create({onKey: true}, X); } }
+    { name: 'name',    view: { class: 'foam.u2.TextField', onKey: true } },
+    { name: 'surname', view: { class: 'foam.u2.TextField', onKey: true } }
   ]
 });
 
@@ -66,51 +66,40 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'prefix',
-      label: 'Filter prefix',
-      postSet: function(_, prefix) {
-        this.filteredDAO = this.dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
-      }
+      label: 'Filter prefix'
     },
     {
-      model_: 'foam.core.types.DAOProperty',
       name: 'dao',
       factory: function() {
-          /*
-        return foam.dao.MDAO.create({
-          of: foam.demos.sevenguis.Person
-        });
-*/
         return foam.dao.EasyDAO.create({
           of: foam.demos.sevenguis.Person,
           daoType: 'MDAO',
-          cache: false,
           seqNo: true
         });
       }
     },
     {
-      model_: 'foam.core.types.DAOProperty',
       name: 'filteredDAO',
-      // TODO: replace with foam.u2.TableView when available
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.TableView').create({
-          of: foam.demos.sevenguis.Person,
-          title: '',
-          scrollEnabed: true,
-          editColumns: false
-        });
+      expression: function(dao, prefix) {
+        return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
       },
-      factory: function() { return this.dao; }
+      view: {
+        class: 'foam.u2.TableView',
+        of: foam.demos.sevenguis.Person,
+        title: '',
+        scrollEnabed: true,
+        editColumns: false
+      }
     },
     {
       name: 'selection',
-      postSet: function(_, s) { this.data.copyFrom(s); }
+      postSet: function(_, s) { this.person.copyFrom(s); }
     },
     {
       name: 'person',
-      toPropertyE: function(X) { return X.lookup('foam.u2.DetailView').create({of: foam.demos.sevenguis.Person}, X); },
-//      toPropertyE: 'foam.u2.DetailView',
+      view: 'foam.u2.DetailView',
       factory: function() { return this.Person.create(); }
     }
   ],

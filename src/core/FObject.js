@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+// TODO: Methods defined here, like copyFrom() and toString() don't appear
+// in describe() because they aren't added as method axioms, but as bootstrap
+// methods instead. Fix.
+
 /** The implicit base model for the model heirarchy. If you do not
  *  explicitly extend another model, FObject is used. Most models will
  *  extend FObject and inherit its methods.
@@ -40,6 +44,10 @@ foam.CLASS({
       if ( ! args ) return;
 
       for ( var key in args ) this[key] = args[key];
+    },
+
+    function init() {
+      /* Template method to do on creation initialization */
     },
 
     function hasOwnProperty(name) {
@@ -430,6 +438,7 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
+      if ( ! other        ) return 1;
 
       if ( this.model_ !== other.model_ ) {
         return other.model_ ?

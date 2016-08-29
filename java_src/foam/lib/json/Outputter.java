@@ -46,24 +46,32 @@ public class Outputter {
   protected void outputDate(StringBuilder out) {
   }
 
-  protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p, boolean comma) {
+  protected void outputArray(StringBuilder out, Object[] array) {
+    out.append("[");
+    for ( int i = 0 ; i < array.length ; i++ ) {
+      output(out, array[i]);
+      if ( i < array.length - 1 ) out.append(",");
+    }
+    out.append("]");
+  }
+
+  protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p) {
     out.append(beforeKey_());
     out.append(p.getName());
     out.append(afterKey_());
     out.append(":");
-    output(out, p.get(o));
-    if ( comma ) {
-      out.append(",");
-    }
+    p.toJSON(this, out, p.get(o));
   }
 
-  protected void output(StringBuilder out, Object value) {
+  public void output(StringBuilder out, Object value) {
     if ( value instanceof String ) {
       outputString(out, (String)value);
     } else if ( value instanceof FObject ) {
       outputFObject(out, (FObject)value);
     } else if ( value instanceof Number ) {
       outputNumber(out, (Number)value);
+    } else if ( value.getClass().isArray() ) {
+      outputArray(out, (Object[])value);
     }
   }
 
@@ -80,17 +88,13 @@ public class Outputter {
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
 
-    boolean first = true;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo)i.next();
       Object value = prop.get(o);
       if ( value == null ) continue;
 
-      if ( first ) {
-        out.append(",");
-        first = false;
-      }
-      outputProperty(out, o, prop, i.hasNext());
+      out.append(",");
+      outputProperty(out, o, prop);
     }
 
     out.append("}");

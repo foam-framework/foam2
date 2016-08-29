@@ -36,7 +36,8 @@ foam.CLASS({
       name: 'onKey',
       attribute: true,
       // documentation: 'When true, $$DOC{ref:".data"} is updated on every keystroke, rather than on blur.'
-    }
+    },
+    'type'
   ],
 
   templates: [
@@ -47,6 +48,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      if ( this.type ) this.attrs({type: this.type});
       this.cssClass(this.myCls());
       this.link();
     },

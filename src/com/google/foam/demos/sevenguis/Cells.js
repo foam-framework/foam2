@@ -80,6 +80,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function init() {
       var slot = this.slot.bind(this);
@@ -170,8 +171,6 @@ foam.CLASS({
       extends: 'foam.u2.ReadWriteView',
 
       requires: [ 'foam.u2.tag.Input', 'foam.u2.HTMLElement' ],
-
-      imports: [ 'cells' ],
 
       documentation: function() {/*
         Doesn't build inner views until value is set or user clicks on view.
@@ -295,7 +294,6 @@ foam.CLASS({
     },
 
     function initE() {
-global.cells = this;
       var self = this;
 
       this.setNodeName('table').cssClass(this.myCls()).attrs({cellspacing: 0}).
@@ -331,8 +329,8 @@ global.cells = this;
     function cellName(c, r) { return String.fromCharCode(65 + c) + r; },
 
     function cell(name) {
-      var self = this;
-      var cell = this.cells[name];
+      var self   = this;
+      var cell   = this.cells[name];
       var cancel = null;
 
       if ( ! cell ) {
@@ -344,12 +342,6 @@ global.cells = this;
           var slot = self.parser.parseString(formula$.get());
           cancel && cancel.destroy();
           s = cell.data$.linkFrom(slot);
-          // TODO: parser should return Slot
-          /*
-          cancel = self.dynamicFn(f.bind(null, self), function(v) {
-            cell.value = v;
-          });
-          */
         });
       }
 

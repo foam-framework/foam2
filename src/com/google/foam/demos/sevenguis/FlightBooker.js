@@ -44,13 +44,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'oneWay',
       value: true,
-      toPropertyE: function(X) {
-        return X.lookup('foam.u2.tag.Select').create({
-          choices: [
-            [ true,  'one-way flight' ],
-            [ false, 'return flight'  ]
-          ]
-        });
+      view: {
+        class: 'foam.u2.tag.Select',
+        choices: [
+          [ true,  'one-way flight' ],
+          [ false, 'return flight'  ]
+        ]
       }
     },
     {
@@ -89,20 +88,6 @@ foam.CLASS({
           add(this.BOOK);
     }
   ],
-
-  /*
-  templates: [
-    function initE() {
-      <div class="^" x:data={{this}}>
-        <div class="^title">Book Flight</div>
-        <:oneWay/> <br>
-        <:departDate/> <br>
-        <:returnDate mode={{this.returnDateMode}}/> <br>
-        <:book/> <br>
-      </div>
-    }
-  ],
-  */
 
   actions: [
     {

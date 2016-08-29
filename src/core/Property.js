@@ -200,8 +200,8 @@ foam.CLASS({
       copying undefined values from parent Property, if it exists.
     */
     function installInClass(c) {
-      var prop = this;
-      var superProp = c.__proto__.getAxiomByName(prop.name);
+      var prop      = this;
+      var superProp = c.getSuperAxiomByName(prop.name);
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);
@@ -223,13 +223,21 @@ foam.CLASS({
         c.axiomMap_[prop.name] = prop;
       }
 
-
       var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
         // We only care about Property axioms.
 
         // FUTURE: we really only care about those properties that affect
         // the definition of the property getter and setter, so an extra
         // check would help eliminate extra reinstalls.
+
+        // Handle special case of axiom being installed into itself.
+        // For example foam.core.String has foam.core.String axioms for things
+        // like "label"
+        // In the future this shouldn't be required if a reinstall is
+        // only triggered on this which affect getter/setter.
+        if ( prop.cls_ === c ) {
+          return;
+        }
 
         if ( foam.core.Property.isInstance(axiom) ) {
           // console.log('**************** Updating Property: ', c.name, prop.name);
@@ -333,7 +341,7 @@ foam.CLASS({
           }
 
           this.setPrivate_(FIP, true);
-          this[name] = factory.call(this);
+          this[name] = factory.call(this, prop);
           this.clearPrivate_(FIP);
 
           return this.instance_[name];
@@ -477,6 +485,8 @@ foam.CLASS({
 
         return child;
       }
+
+      prop.sourceCls_ = child.sourceCls_;
 
       for ( var key in child.instance_ ) {
         prop.instance_[key] = child.instance_[key];

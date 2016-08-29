@@ -48,7 +48,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      var view = this.view || this.prop.toPropertyE(this.Y);
+      var view = this.view || this.prop.view(this.Y);
 
       view.data$ = this.data$.dot(this.prop.name);
       view.fromProperty && view.fromProperty(this.prop);

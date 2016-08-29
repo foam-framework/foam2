@@ -88,7 +88,9 @@ foam.CLASS({
             if ( ! x ) {
               var contextParent = this.getPrivate_('contextParent');
               if ( contextParent ) {
-                this.setPrivate_('__context__', x = contextParent.__subContext__ || contextParent.__context__);
+                this.setPrivate_(
+                    '__context__',
+                    x = contextParent.__subContext__ || contextParent.__context__);
                 this.setPrivate_('contextParent', undefined);
               } else {
                 // Happens during bootstrap with Properties.
@@ -99,7 +101,11 @@ foam.CLASS({
           },
           set: function(x) {
             if ( x ) {
-              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'contextParent' : '__context__', x);
+              this.setPrivate_(
+                  foam.core.FObject.isInstance(x) ?
+                      'contextParent' :
+                      '__context__',
+                  x);
             }
           }
         });
@@ -108,7 +114,12 @@ foam.CLASS({
         Object.defineProperty(
             p,
             '__subContext__',
-            { get: function() { return this.__context__; } });
+            {
+              get: function() { return this.__context__; },
+              set: function() {
+                throw new Error('Attempted to set unsettable __subContext__ in ' + this.cls_.id);
+              }
+            });
       }
     }
   ],
@@ -119,10 +130,8 @@ foam.CLASS({
       Replaces simpler version defined in original FObject definition.
     */
     function initArgs(args, ctx) {
-      this.__context__ = ctx || foam.__context__;
-      if ( ! args ) return;
-
-      this.copyFrom(args, true);
+      if ( ctx  ) this.__context__ = ctx;
+      if ( args ) this.copyFrom(args, true);
     },
 
     /**

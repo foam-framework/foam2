@@ -18,6 +18,7 @@ foam.CLASS({
 
   methods: [
     function sanitizeText(text) {
+      // TODO: validate text
       return text;
     }
   ]
