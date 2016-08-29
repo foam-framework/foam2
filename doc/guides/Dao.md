@@ -1,5 +1,5 @@
 
-# DAO: Data Access Object
+# DAO: Data Access Objects
 
 A DAO, or Data Access Object, is a universal interface to a collection of
 objects. The role of a DAO is to operate as an object store, uniquely
@@ -76,8 +76,12 @@ case-insensitive:
 
 The language is extensible, so you can write your own mLangs, or use
 `foam.mlang.predicate.Func` to run an inline function on each potential object.
+Be aware that custom behavior is harder for DAOs to optimize, to try to
+use the standard mLangs.
 
-For easy access to the basic mLangs and Sinks, either implement
+### Using mLangs
+
+For easy access to the basic mLangs and standard Sinks, either implement
 `foam.mlang.Expressions` or create an instance of
 `foam.mlang.ExpressionsSingleton`. You'll see this in most of the examples.
 
@@ -85,7 +89,7 @@ For easy access to the basic mLangs and Sinks, either implement
       name: 'GoingToUseMLangs',
       implements: [ 'foam.mlang.Expressions' ],
       methods: [
-        function makeQuery() { return this.EQ; }
+        function makeSomeQuery() { return this.EQ(...); }
       ]
     });
     // or
@@ -123,7 +127,7 @@ Often you want to perform a query and do something with each object it
 produces. You can declare a Sink inline with `foam.dao.QuickSink`:
 
     dao.select(foam.dao.QuickSink.create({
-      put: function(o) {
+      putFn: function(o) {
         console.log("Got an object:", o);
       },
     }));
