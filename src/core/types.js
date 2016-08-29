@@ -219,6 +219,12 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Array',
+  extends: 'Property'
+});
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'StringArray',
   extends: 'Property',
 
