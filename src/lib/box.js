@@ -841,10 +841,6 @@ foam.CLASS({
 
   extends: 'foam.box.ProxyBox',
 
-  imports: [
-    'log'
-  ],
-
   properties: [
     'name'
   ],

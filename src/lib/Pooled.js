@@ -24,7 +24,6 @@ foam.CLASS({
 
   axioms: [ foam.pattern.Singleton.create() ],
   requires: [ 'foam.core.Method' ],
-  imports: [ 'assert' ],
 
   properties: [
     {
