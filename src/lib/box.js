@@ -99,6 +99,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'ProxyBox',
+  implements: ['foam.box.Box'],
 
   properties: [
     {
@@ -1210,6 +1211,72 @@ foam.CLASS({
       return this.next ?
         this.next.clientBox(box) :
         box;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'HTTPReplyBox',
+  implements: ['foam.box.Box'],
+  imports: [
+    'httpResponse'
+  ],
+  methods: [
+    {
+      name: 'send',
+      javaCode: 'try {\n'
+              + '  java.io.PrintWriter writer = ((javax.servlet.ServletResponse)getHttpResponse()).getWriter();\n'
+              + '  writer.print(new foam.lib.json.Outputter().stringify(message));\n'
+              + '  writer.flush();\n'
+              + '} catch(java.io.IOException e) {\n'
+              + '  throw new RuntimeException(e);\n'
+              + '}',
+      code: function(m) {
+        throw 'unimplemented';
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'HTTPBox',
+  implements: ['foam.box.Box'],
+  requires: [
+    'foam.net.HTTPRequest',
+    'foam.box.HTTPReplyBox'
+  ],
+  properties: [
+    {
+      name: 'url'
+    },
+    {
+      name: 'method'
+    }
+  ],
+  methods: [
+    {
+      name: 'send',
+      code: function(msg) {
+        var replyBox = msg.replyBox;
+        var errorBox = msg.errorBox;
+
+        msg.replyBox = this.HTTPReplyBox.create();
+        // TODO: set error box as well?
+
+        var req = this.HTTPRequest.create({
+          url: this.url,
+          method: this.method,
+          payload: foam.json.Network.stringify(msg)
+        }).send().then(function(resp) {
+          return resp.payload;
+        }).then(function(p) {
+          replyBox.send(foam.json.parse(foam.json.parseString(p, null, this)));
+        }, function(e) {
+          errorBox.send(e);
+        });
+      }
     }
   ]
 });
