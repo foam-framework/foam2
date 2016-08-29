@@ -44,10 +44,10 @@ describe('SpatialHash index', function() {
           return ret;
         }
       },
-      
+
     ]
   });
-  
+
   function generatePointies() {
     return [
       [ 20, 20, 20 ],
@@ -57,7 +57,7 @@ describe('SpatialHash index', function() {
       [ 20, 4, 0 ],
       [ 22, 3, 23 ],
     ].map(function(pt) {
-      return test.Pointy.create({ 
+      return test.Pointy.create({
         location: foam.geo.Point3D.create({ x: pt[0], y: pt[1], z: pt[2] })
       });
     });
@@ -65,7 +65,7 @@ describe('SpatialHash index', function() {
   function loadedMDAO() {
     var mdao = foam.dao.MDAO.create({ of: test.Pointy  });
     mdao.addIndex(test.Pointy.BB);
-    
+
     generatePointies().forEach(function(pt) {
       mdao.put(pt);
     });
@@ -85,50 +85,50 @@ describe('SpatialHash index', function() {
 
     expect(index.axisNames[0]).toEqual('x');
     expect(index.axisNames[1]).toEqual('y');
-  }); 
+  });
 
   it('works in MDAO', function(done) {
     var mdao = loadedMDAO();
-    
+
     mdao.select(foam.mlang.sink.Count.create()).then(function(count) {
       expect(count.value).toEqual(6);
       done();
     });
   });
-  
+
   it('executes intersection queries', function(done) {
     var mdao = loadedMDAO();
 
     mdao.where(
       foam.mlang.predicate.Intersects.create({
-        arg1: test.Pointy.BB, 
-        arg2: foam.mlang.predicate.Constant.create({ value: {
+        arg1: test.Pointy.BB,
+        arg2: foam.mlang.Constant.create({ value: {
           lower: foam.geo.Point3D.create({ x: 15, y: 15, z: 15 }),
           upper: foam.geo.Point3D.create({ x: 20, y: 20, z: 20 })
         } })
       })
-    ).select().then(function(sink) { 
+    ).select().then(function(sink) {
       var a = sink.a;
       expect(a.length).toEqual(2);
 //      console.log("Intersects:", a);
-    }).then(done);    
+    }).then(done);
   });
   it('executes containment queries', function(done) {
     var mdao = loadedMDAO();
 
     mdao.where(
       foam.mlang.predicate.ContainedBy.create({
-        arg1: test.Pointy.BB, 
-        arg2: foam.mlang.predicate.Constant.create({ value: {
+        arg1: test.Pointy.BB,
+        arg2: foam.mlang.Constant.create({ value: {
           lower: foam.geo.Point3D.create({ x: 9, y: 9, z: 9 }),
           upper: foam.geo.Point3D.create({ x: 31, y: 31, z: 31 })
         } })
       })
-    ).select().then(function(sink) { 
+    ).select().then(function(sink) {
       var a = sink.a;
       expect(a.length).toEqual(1);
 //      console.log("ContainedBy:", a);
-    }).then(done);    
+    }).then(done);
   });
 
 });

@@ -381,7 +381,7 @@ foam.CLASS({
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.False',
     'foam.mlang.predicate.And',
-    'foam.mlang.predicate.Constant',
+    'foam.mlang.Constant',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.Eq',

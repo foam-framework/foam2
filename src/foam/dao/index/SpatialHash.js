@@ -21,7 +21,7 @@ foam.CLASS({
   name: 'Intersects',
   extends: 'foam.mlang.predicate.Binary',
   requires: [
-    'foam.mlang.predicate.Constant',
+    'foam.mlang.Constant',
     'foam.geo.Point',
     'foam.geo.BoundingBox'
   ],
@@ -117,7 +117,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ByRefConstant',
-  extends: 'foam.mlang.predicate.Constant',
+  extends: 'foam.mlang.Constant',
   methods: [
     function clone() {
       return this.cls_.create({ value: this.value });
@@ -248,7 +248,7 @@ foam.CLASS({
     function decorateSink_(sink, skip, limit, order, predicate) {
       var dupes = {}; // crude dedup
       if ( predicate ) return {
-        put: function(o) { 
+        put: function(o) {
           if ( o.instance_ && ! dupes[o.id] && predicate.f(o) ) {
             sink.put(o);
             dupes[o.id] = true;
@@ -339,7 +339,7 @@ foam.CLASS({
     // want half, but this data structure is not equipped for axes partitioning)
     if ( x !== x || y !== y || x2 !== x2 || y2 !== y2 || z !== z || z2 !== z2 ||
          x === Infinity || y === Infinity || x2 === Infinity || y2 === Infinity || z === Infinity || z2 === Infinity ||
-         x === -Infinity || y === -Infinity || x2 === -Infinity || y2 === -Infinity || z === -Infinity || z2 === -Infinity 
+         x === -Infinity || y === -Infinity || x2 === -Infinity || y2 === -Infinity || z === -Infinity || z2 === -Infinity
        ) {
       return null;
     }

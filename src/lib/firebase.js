@@ -33,7 +33,7 @@ foam.CLASS({
     'foam.net.HTTPRequest',
     'com.firebase.FirebaseEventSource',
     'foam.mlang.predicate.Gt',
-    'foam.mlang.predicate.Constant'
+    'foam.mlang.Constant'
   ],
 
   properties: [
