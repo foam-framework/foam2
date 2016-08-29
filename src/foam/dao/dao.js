@@ -130,9 +130,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'AbstractSink',
+
+  implements: [ 'foam.dao.Sink' ]
+
+});
+
+foam.CLASS({
+  package: 'foam.dao',
   name: 'QuickSink',
 
-  extends: 'foam.dao.Sink',
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
     {
