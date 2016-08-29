@@ -18,14 +18,10 @@
 foam.CLASS({
   package: 'test.helpers',
   name: 'RandomDelayDAO',
-  
+
   extends: 'foam.dao.ArrayDAO',
-  
+
   properties: [
-    {
-      name: 'writes_',
-      factory: function() { return {}; }
-    },
     {
       name: 'delays',
       value: [ 200, 10, 30, 5, 100, 130, 50 ]
@@ -39,45 +35,30 @@ foam.CLASS({
   constants: {
     DELAY_FUNC_BODY: function(o) {
       var s = this.SUPER.bind(this);
-      var w = this.writes_;
       var d = this.nextDelay();
-      var p = new Promise(function(resolve) {
+      return new Promise(function(resolve) {
         setTimeout(function() {
           s(o);
           resolve(o);
         }, Math.random() * d);
       });
-      w[o] = p;
-      return p.then(
-        function(n) { delete w[o]; return n; },
-        function(err) { delete w[o]; throw err; }
-      );
     }
   },
-  
+
   methods: [
     function put(o) {
       this.SUPER;
       return this.DELAY_FUNC_BODY(o);
     },
-    
+
     function remove(o) {
       this.SUPER;
       return this.DELAY_FUNC_BODY(o);
     },
-    
-    function eof() {
-      var arr = [];
-      for (var key in this.writes_) { 
-        if ( this.writes_[key].then ) arr.push(this.writes_[key]);
-      }
-      // TODO: clear out writes_, since we have ended the 'transaction'?
-      return Promise.all(arr);
-    },
-    
+
     function nextDelay() {
       var d = this.delays[this.delayIdx_];
-      this.delayIdx_ = ( this.delayIdx_ + 1 ) % this.delays.length; 
+      this.delayIdx_ = ( this.delayIdx_ + 1 ) % this.delays.length;
     }
   ]
 })
