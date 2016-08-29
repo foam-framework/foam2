@@ -1506,6 +1506,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Float',
+  requires: [ 'foam.u2.FloatView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.FloatView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [

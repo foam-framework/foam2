@@ -438,6 +438,7 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
+      if ( ! other        ) return 1;
 
       if ( this.model_ !== other.model_ ) {
         return other.model_ ?

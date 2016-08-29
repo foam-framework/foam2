@@ -197,6 +197,7 @@ foam.AbstractClass.validate = function() {
 
 // Change 'false' to 'true' to enable error reporting for setting
 // non-Properties on FObjects.
+// TODO: add 'Did you mean...' support.
 if ( false && Proxy ) {
   (function() {
 
