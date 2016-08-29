@@ -205,6 +205,10 @@ foam.CLASS({
             name: 'name',
             final: true
           }),
+          foam.core.String.create({
+            name: 'label',
+            final: true
+          }),
           foam.core.Method.create({
             name: 'toString',
             code: function() {

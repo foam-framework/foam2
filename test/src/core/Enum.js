@@ -4,7 +4,9 @@ describe('Enum tests', function() {
       name: 'TodoStatus',
       properties: [
         {
-          name: 'label'
+          class: 'Boolean',
+          name: 'isOpen',
+          value: true
         }
       ],
       methods: [
@@ -16,22 +18,17 @@ describe('Enum tests', function() {
       values: [
         {
           name: 'OPEN',
-          values: {
-            label: 'Open'
-          }
+          label: 'Open'
         },
         {
-          name: 'CLOSED',
           ordinal: 100,
-          values: {
-            label: 'Closed'
-          }
+          name: 'CLOSED',
+          label: 'Closed',
+          isOpen: false
         },
         {
           name: 'ASSIGNED',
-          values: {
-            label: 'Assigned'
-          }
+          label: 'Assigned'
         }
       ]
     });
@@ -55,6 +52,7 @@ describe('Enum tests', function() {
     var todo = Todo.create();
 
     expect(todo.status).toBe(TodoStatus.OPEN);
+    expect(todo.status.toString()).toBe('OPEN');
     expect(todo.status.name).toBe('OPEN');
     expect(todo.status.label).toBe('Open');
 
@@ -71,8 +69,14 @@ describe('Enum tests', function() {
     todo.status = 'OPEN';
 
     expect(todo.status).toBe(TodoStatus.OPEN);
+    expect(todo.status.isOpen).toBe(true);
 
     expect(todo.status.hello()).toBe('hello Open');
+
+    todo.status = 'CLOSED';
+
+    expect(todo.status.isOpen).toBe(false);
+
 
     var values = TodoStatus.getValues();
     expect(values[0]).toBe(TodoStatus.OPEN);
