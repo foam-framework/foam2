@@ -1,6 +1,7 @@
 package foam.lib.json;
 
 import foam.lib.parse.*;
+import foam.core.*;
 
 public class FObjectParser extends ProxyParser {
   public FObjectParser() {
@@ -27,13 +28,8 @@ public class FObjectParser extends ProxyParser {
           }
 
           ParserContext subx = x.sub();
-          try {
-            subx.set("obj", c.newInstance());
-          } catch(InstantiationException e) {
-            throw new RuntimeException(e);
-          } catch(IllegalAccessException e) {
-            throw new RuntimeException(e);
-          }
+          Object obj = ((X)x.get("X")).create(c);
+          subx.set("obj", obj);
 
           ps = ModelParserFactory.getInstance(c).parse(ps, subx);
 
