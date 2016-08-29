@@ -44,7 +44,7 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
-      for ( var x = 0 ; x < this.n ; x++ ) {
+      for ( var i = 0 ; i < this.n ; i++ ) {
         var c = this.PhysicalCircle.create({
           radius: 10+20*Math.random(),
           x: this.width  * Math.random(),
@@ -64,7 +64,7 @@ foam.CLASS({
           if ( c.x > this.width  ) c.vx = -Math.abs(c.vx);
           c.x += c.vx;
           c.y += c.vy;
-        }, this, c, x));
+        }, this, c, i));
       }
     }
   ]
