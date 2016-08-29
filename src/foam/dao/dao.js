@@ -128,6 +128,56 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'QuickSink',
+
+  extends: 'foam.dao.Sink',
+
+  properties: [
+    {
+      class: 'Function',
+      name: 'putFn'
+    },
+    {
+      class: 'Function',
+      name: 'removeFn'
+    },
+    {
+      class: 'Function',
+      name: 'eofFn'
+    },
+    {
+      class: 'Function',
+      name: 'errorFn'
+    },
+    {
+      class: 'Function',
+      name: 'resetFn'
+    },
+  ],
+
+  methods: [
+    function put() {
+      return this.putFn && this.putFn.apply(this, arguments);
+    },
+    function remove() {
+      return this.removeFn && this.removeFn.apply(this, arguments);
+    },
+    function eof() {
+      return this.eofFn && this.eofFn.apply(this, arguments);
+    },
+    function error() {
+      return this.errorFn && this.errorFn.apply(this, arguments);
+    },
+    function reset() {
+      return this.resetFn && this.resetFn.apply(this, arguments);
+    },
+  ]
+});
+
+
+
 
 foam.CLASS({
   package: 'foam.dao',
