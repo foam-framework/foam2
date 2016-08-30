@@ -166,15 +166,17 @@ public class <%= this.name %> implements foam.box.Box {
     }
 
     foam.box.RPCMessage rpc = (foam.box.RPCMessage)message;
+    foam.box.Box replyBox = message.getReplyBox();
+    Object result = null;
 
     switch ( rpc.getName() ) {<%
   var methods = this.of$cls.getAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
       case "<%= m.name %>":
-        getDelegate().<%= m.name %>(<%
+        <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(<%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
-      %>(<%= m.args[j].javaType %>)rpc.getArgs()[<%= i %>]<%
+      %>(<%= m.args[j].javaType %>)rpc.getArgs()[<%= j %>]<%
       if ( j != m.args.length - 1 ) { %>, <% }
     }
     %>);
@@ -182,6 +184,13 @@ public class <%= this.name %> implements foam.box.Box {
     <%
   }%>
       default: throw new RuntimeException("No such method found \\"" + rpc.getName() + "\\"");
+    }
+
+    if ( replyBox != null ) {
+      foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
+      reply.setData(result);
+
+      replyBox.send(reply);
     }
   }
 }
