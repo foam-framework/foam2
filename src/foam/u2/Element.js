@@ -225,13 +225,13 @@ foam.CLASS({
       return this.UNLOADED.output.call(this, out);
     },
     function load() {
-      this.state = this.LOADED;
       for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
         var l = this.elListeners[i];
         this.addEventListener_(l[0], l[1]);
       }
 
       this.visitChildren('load');
+      this.state = this.LOADED;
       if ( this.focused ) this.el().focus();
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
