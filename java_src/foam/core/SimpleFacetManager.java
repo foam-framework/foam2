@@ -9,12 +9,13 @@ public class SimpleFacetManager implements FacetManager {
 
   public Object create(Class type, X x) {
     try {
-      Constructor[] ctors = type.getConstructors();
-      if ( ctors[0].getParameterTypes()[0] == X.class ) {
-        return ctors[0].newInstance(x);
+      Object obj = type.newInstance();
+
+      if ( obj instanceof ContextAware ) {
+        ((ContextAware)obj).setX(x);
       }
 
-      return type.newInstance();
+      return obj;
     } catch(Exception e) {
       throw new RuntimeException(e);
     }
