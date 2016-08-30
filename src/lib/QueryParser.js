@@ -48,7 +48,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
+      class: 'Class2',
       name: 'of'
     },
     /** An optional input. If this is defined, 'me' is a keyword in the search
@@ -192,7 +192,7 @@ foam.CLASS({
     {
       name: 'grammar_',
       factory: function() {
-        var cls = foam.lookup(this.of);
+        var cls = this.of$cls;
         var fields = [];
         var properties = cls.getAxiomsByClass(foam.core.Property);
         for ( var i = 0; i < properties.length; i++ ) {
@@ -356,6 +356,8 @@ foam.CLASS({
               }
 
               expr = self.In.create({ arg1: prop, arg2: values });
+            } else if ( foam.core.Enum.isInstance(prop) ) {
+              expr = self.In.create({ arg1: prop, arg2: values });
             } else {
               expr = (v[1] === '=') ?
                   self.InIC.create({ arg1: prop, arg2: values }) :
@@ -477,7 +479,8 @@ foam.CLASS({
 
   methods: [
     function parseString(str, opt_name) {
-      return this.grammar_.parseString(str, opt_name);
+      var query = this.grammar_.parseString(str, opt_name);
+      return query && query.partialEval ? query.partialEval() : query;
     }
   ]
 });

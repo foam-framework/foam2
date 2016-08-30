@@ -568,12 +568,16 @@ foam.CLASS({
   methods: [
     function f(o) {
       var lhs = this.arg1.f(o);
+      var upperCase = foam.core.Enum.isInstance(this.arg1);
+
       // If arg2 is a constant array, we use valueSet for it.
       if ( Array.isArray(this.arg2) ) {
         if ( ! this.valueSet_ ) {
           var set = {};
           for ( var i = 0 ; i < this.arg2.length ; i++ ) {
-            set[this.arg2[i]] = true;
+            var s = this.arg2[i];
+            if ( upperCase ) s = s.toUpperCase();
+            set[s] = true;
           }
           this.valueSet_ = set;
         }
