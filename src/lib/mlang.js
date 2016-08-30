@@ -331,6 +331,11 @@ foam.CLASS({
   name: 'Or',
   extends: 'foam.mlang.predicate.Nary',
 
+  requires: [
+    'foam.mlang.predicate.False',
+    'foam.mlang.predicate.True'
+  ],
+
   methods: [
     {
       name: 'f',
@@ -346,10 +351,11 @@ foam.CLASS({
                 + 'return false;\n'
     },
     function partialEval() {
-      return this;
-      // TODO: port FOAM1 code below
       var newArgs = [];
       var updated = false;
+
+      var TRUE = this.True.create();
+      var FALSE = this.False.create();
 
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a    = this.args[i];
@@ -357,7 +363,7 @@ foam.CLASS({
 
         if ( newA === TRUE ) return TRUE;
 
-        if ( OrExpr.isInstance(newA) ) {
+        if ( this.cls_.isInstance(newA) ) {
           // In-line nested OR clauses
           for ( var j = 0 ; j < newA.args.length ; j++ ) {
             newArgs.push(newA.args[j]);
@@ -372,6 +378,11 @@ foam.CLASS({
         }
       }
 
+      /*
+      TODO(braden): Implement partialOr and PARTIAL_OR_RULES, for full partial
+      eval support. Currently this is only dropping FALSE, and short-circuiting
+      on TRUE.
+
       for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
         for ( var j = i+1 ; j < newArgs.length ; j++ ) {
           var a = this.partialOr(newArgs[i], newArgs[j]);
@@ -382,11 +393,12 @@ foam.CLASS({
           }
         }
       }
+      */
 
-      if ( newArgs.length == 0 ) return FALSE;
-      if ( newArgs.length == 1 ) return newArgs[0];
+      if ( newArgs.length === 0 ) return FALSE;
+      if ( newArgs.length === 1 ) return newArgs[0];
 
-      return updated ? OrExpr.create({args: newArgs}) : this;
+      return updated ? this.cls_.create({ args: newArgs }) : this;
     }
   ]
 });
