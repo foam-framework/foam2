@@ -19,37 +19,89 @@
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'FlowControl',
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'stopped'
+    },
+    {
+      name: 'errorEvt',
+      javaType: 'Object',
+      javaJsonParser: 'foam.lib.json.AnyParser'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'stop',
+      code: function() { this.stopped = true; },
+      javaCode: 'setStopped(true);'
+    },
+    {
+      name: 'error',
+      code: function error(e) { this.errorEvt = e; }
+    }
+  ]
+});
+
+
+foam.INTERFACE({
+  package: 'foam.dao',
   name: 'Sink',
 
   methods: [
     {
       name: 'put',
+      returns: '',
+      javaReturns: 'void',
       args: [
-        'obj',
-        'fc'
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'fc',
+          javaType: 'foam.dao.FlowControl'
+        }
       ],
-      code: function () {}
+      code: function() {}
     },
     {
       name: 'remove',
+      return: '',
+      javaReturns: 'void',
       args: [
-        'obj',
-        'fc'
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'fc',
+          javaType: 'foam.dao.FlowControl'
+        }
       ],
       code: function() {}
     },
     {
       name: 'eof',
+      returns: '',
+      javaReturns: 'void',
       args: [],
       code: function() {}
     },
     {
       name: 'error',
+      returns: '',
+      javaReturns: 'void',
       args: [],
       code: function() {}
     },
     {
       name: 'reset',
+      returns: '',
+      javaReturns: 'void',
       args: [],
       code: function() {}
     }
@@ -71,59 +123,118 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.dao',
   name: 'DAO',
-
-  // TODO: make an interface or abstract, then remove NOP code:'s
 
   // documentation: 'DAO Interface',
 
   methods: [
     {
       name: 'put',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
     },
     {
       name: 'remove',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
     },
     {
       name: 'find',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'id',
+          javaType: 'Object'
+        }
+      ]
     },
     {
       name: 'select',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.dao.Sink',
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ]
     },
     {
       name: 'removeAll',
-      code: function() { },
-      returns: 'Promise'
+      returns: '',
+      javaReturns: 'void',
+      args: []
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
-      code: function() { },
+      returns: '',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ],
+      code: function() {}
     },
     {
       name: 'where',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ]
     },
     {
       name: 'orderBy',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'comparator',
+          javaType: 'foam.mlang.order.Comparator'
+        }
+      ]
     },
     {
       name: 'skip',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'count',
+          javaType: 'int'
+        }
+      ]
     },
     {
       name: 'limit',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'count',
+          javaType: 'int'
+        }
+      ]
     }
   ]
 });
@@ -316,22 +427,6 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'FlowControl',
-
-  properties: [
-    'stopped',
-    'errorEvt'
-  ],
-
-  methods: [
-    function stop() { this.stopped = true; },
-    function error(e) { this.errorEvt = e; }
-  ]
-});
-
-
-foam.CLASS({
   package: 'foam.core',
   name: 'Exception',
   properties: [
@@ -368,11 +463,13 @@ foam.CLASS({
   ]
 });
 
-
+/**
+  The base class for most DAOs, defining basic DAO behavior.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
-  implements: ['foam.dao.DAO'],
+  implements: [ 'foam.dao.DAO' ],
 
   requires: [
     'foam.dao.ExternalException',
@@ -402,6 +499,10 @@ foam.CLASS({
 
   properties: [
     {
+      /**
+        Set to the name or class instance of the type of object the DAO
+        will store.
+      */
       class: 'Class2',
       name: 'of'
     }
@@ -409,8 +510,13 @@ foam.CLASS({
 
   methods: [
     {
+      /**
+        Returns a filtered DAO that only returns objects which match the
+        given predicate.
+      */
       name: 'where',
-      code: function where(p) {
+      code: function where(/* foam.mlang.predicate.Predicate */ p
+          /* foam.dao.DAO */) {
         return this.FilteredDAO.create({
           delegate: this,
           predicate: p
@@ -419,8 +525,13 @@ foam.CLASS({
     },
 
     {
+      /**
+        Returns a filtered DAO that orders select() by the given
+        ordering.
+      */
       name: 'orderBy',
-      code: function orderBy(o) {
+      code: function orderBy(/* foam.mlang.order.Comparator */ o
+          /* foam.dao.DAO */) {
         return this.OrderedDAO.create({
           delegate: this,
           comparator: o
@@ -429,8 +540,12 @@ foam.CLASS({
     },
 
     {
+      /**
+        Returns a filtered DAO that skips the given number of items
+        on a select()
+      */
       name: 'skip',
-      code: function skip(s) {
+      code: function skip(/* number */ s /* foam.dao.DAO */ ) {
         return this.SkipDAO.create({
           delegate: this,
           skip_: s
@@ -439,8 +554,12 @@ foam.CLASS({
     },
 
     {
+      /**
+        Returns a filtered DAO that stops producing items after the
+        given count on a select().
+      */
       name: 'limit',
-      code: function limit(l) {
+      code: function limit(/* number */ l /* foam.dao.DAO */) {
         return this.LimitedDAO.create({
           delegate: this,
           limit_: l
@@ -448,44 +567,100 @@ foam.CLASS({
       }
     },
 
-    {
-      name: 'pipe',
-      code: function pipe(sink, skip, limit, order, predicate) {
-        var mySink = this.decorateSink_(sink, skip, limit, order, predicate, true);
+    /**
+      Selects the contents of this DAO into a sink, then listens to keep
+      the sink up to date. Returns a promise that resolves with the subscription.
+      Updates are filtered based on the optional skip, limit, order, and predicate
+      provided.
+    */
+    function pipe(
+      /* foam.dao.Sink */                   sink,
+      /* number? */                         skip,
+      /* number? */                         limit,
+      /* foam.mlang.order.Comparator? */    order,
+      /* foam.mlang.predicate.Predicate? */ predicate
+        /* Promise */
+    ) {
+      var mySink = this.decorateSink_(sink, skip, limit, order, predicate, true);
 
-        var fc = this.FlowControl.create();
-        var sub;
+      var fc = this.FlowControl.create();
+      var sub;
 
-        fc.propertyChange.sub(function(s, _, p) {
-          if ( p.name == "stopped") {
-            if ( sub ) sub.destroy();
-          } else if ( p.name === "errorEvt" ) {
-            if ( sub ) sub.destroy();
-            mySink.error(fc.errorEvt);
+      fc.propertyChange.sub(function(s, _, p) {
+        if ( p.name == "stopped") {
+          if ( sub ) sub.destroy();
+        } else if ( p.name === "errorEvt" ) {
+          if ( sub ) sub.destroy();
+          mySink.error(fc.errorEvt);
+        }
+      });
+
+      return this.select(mySink, skip, limit, order, predicate).then(function() {
+        return this.on.sub(function(s, on, e, obj) {
+          sub = s;
+          switch(e) {
+          case 'put':
+            mySink.put(obj, fc);
+            break;
+          case 'remove':
+            mySink.remove(obj, fc);
+            break;
+          case 'reset':
+            mySink.reset();
+            break;
           }
         });
-
-        this.select(sink, skip, limit, order, predicate).then(function() {
-          this.on.sub(function(s, on, e, obj) {
-            sub = s;
-            switch(e) {
-            case 'put':
-              sink.put(obj, fc);
-              break;
-            case 'remove':
-              sink.remove(obj, fc);
-              break;
-            case 'reset':
-              sink.reset();
-              break;
-            }
-          });
-        }.bind(this));
-      }
+      }.bind(this));
     },
 
-    function update() {},
+    /**
+      Keeps the given sink up to date with changes to this DAO.
+      Updates are filtered based on the optional skip, limit, order, and predicate
+      provided.
+    */
+    function listen(
+      /* foam.dao.Sink */                   sink,
+      /* number? */                         skip,
+      /* number? */                         limit,
+      /* foam.mlang.order.Comparator? */    order,
+      /* foam.mlang.predicate.Predicate? */ predicate
+        /* object // The subscription object, with a .destroy() to clean up. */
+    ) {
+      var mySink = this.decorateSink_(sink, skip, limit, order, predicate, true);
 
+      var fc = this.FlowControl.create();
+      var sub;
+
+      fc.propertyChange.sub(function(s, _, p) {
+        if ( p.name == "stopped") {
+          if ( sub ) sub.destroy();
+        } else if ( p.name === "errorEvt" ) {
+          if ( sub ) sub.destroy();
+          mySink.error(fc.errorEvt);
+        }
+      });
+
+      return this.on.sub(function(s, on, e, obj) {
+        sub = s;
+        switch(e) {
+        case 'put':
+          mySink.put(obj, fc);
+          break;
+        case 'remove':
+          mySink.remove(obj, fc);
+          break;
+        case 'reset':
+          mySink.reset();
+          break;
+        }
+      });
+    },
+
+    /**
+      Used by DAO implementations to apply filters to a sink, often in a
+      select() or removeAll() implementation.
+      @private
+    */
     function decorateSink_(sink, skip, limit, order, predicate, isListener, disableLimit) {
       if ( ! disableLimit ) {
         if ( limit != undefined ) {
@@ -522,10 +697,9 @@ foam.CLASS({
       return sink;
     },
 
-    function eof() {
-      // Do nothing by default, but can be overridden.
-      // This allows DAOs to be used as a Sink.
-    }
+    // Placeholder functions to that selecting from DAO to DAO works.
+    function eof() {},
+    function error() {}
   ]
 });
 

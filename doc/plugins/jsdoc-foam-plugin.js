@@ -51,7 +51,7 @@ var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
     for (var i = 0; i < node.properties.length; ++i) {
       var p = node.properties[i];
       if ( p.key && p.key.name == propName ) {
-        return ( p.value && p.value.value ) || '';
+        return ( p.value && p.value.value ) || ( p.value && p.value.elements ) || '';
       }
     }
   }
@@ -126,7 +126,7 @@ var getDefinitionType = function getDefinitionType(node) {
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property ) {
     var name = node.parent.callee.property.name;
-    if ( name == 'CLASS' || name == 'LIB' ) {
+    if ( name == 'CLASS' || name == 'LIB' || name == 'INTERFACE' ) {
       return name;
     }
   }
@@ -190,7 +190,7 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
   return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
 }
 
-var replaceCommentArg = function replaceCommentArg(comment, name, type, docs) {
+var replaceCommentArg = function replaceCommentArg(comment, name, type, optional, repeats, docs) {
   // if the @arg is defined in the comment, add the type, otherwise insert
   // the @arg directive. Documentation (if any) from the argument declaration
   // is only used if the @arg is not specified in the original comment.
@@ -200,12 +200,14 @@ var replaceCommentArg = function replaceCommentArg(comment, name, type, docs) {
     function(match, p1, p2) {
       found = true;
       if ( p2 ) return match; // a type was specified, abort
-      return p1 + " {" + type + "} " + name + " ";
+      return p1 + " {" + (repeats?"...":"") + type
+        + (optional?"=":"") + "} " + name + " ";
     }
   );
 
   if ( found ) return ret;
-  return insertIntoComment(comment, "\n@arg {"+type+"} "+name+" "+docs);
+  return insertIntoComment(comment, "\n@arg {"+ (repeats?"...":"") +
+    type+ (optional?"=":"") + "} "+name+" "+docs);
 }
 
 
@@ -230,12 +232,22 @@ var processArgs = function processArgs(e, node) {
     for (var i = 0; i < args.length; ++i) {
       var arg = args[i];
       if ( arg.typeName ) {
-        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName, arg.documentation);
+        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName,
+          arg.optional, arg.repeats, arg.documentation);
       }
     }
   } catch(err) {
     console.log("Args not processed for ", err);
   }
+}
+
+var getImplements = function getImplements(node) {
+  var ret = [];
+  var nodes = getNodePropertyNamed(node, 'implements');
+  for ( var i = 0; i < nodes.length; i++ ) {
+    ret.push(nodes[i].value);
+  }
+  return ret;
 }
 
 // Looks up existing results (already had their comment processed)
@@ -286,7 +298,7 @@ exports.astNodeVisitor = {
     // look them up and modify the generated .comment (raw) and .description
     // (what ends up in the output template).
 
-    // CLASS or LIB
+    // CLASS or LIB or INTERFACE
     if ( getDefinitionType(node) ) {
       var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, "name");
@@ -314,20 +326,31 @@ exports.astNodeVisitor = {
         return;
       }
 
+      var strBody = ( defType == 'INTERFACE' ? "\n@interface " : "\n@class " ) +
+        ( ( classExt ) ? "\n@extends module:"+classExt : "");
+
+      var classImplements = getImplements(node);
+      if ( classImplements ) {
+        for ( var i = 0; i < classImplements.length; i++ ) {
+          strBody += "\n@implements " + classImplements[i];
+        }
+      }
+
+      strBody += (classPackage ? "\n@memberof! module:"+classPackage : "\n@global") +
+        "";
+
+
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node, currentSourceName),
-        "\n@class " +
-        ( ( classExt ) ? "\n@extends module:"+classExt : "") +
-        (classPackage ? "\n@memberof! module:"+classPackage : "\n@global") +
-        ""
+        strBody
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
       e.astnode = node;
       e.code = {
           name: className,
-          type: "class",
+          type: ( defType == 'INTERFACE' ? "interface" : "class" ),
           node: node
       };
       e.event = "symbolFound";
@@ -339,7 +362,10 @@ exports.astNodeVisitor = {
       var mc = modelComments[classPackage + "." + className];
       mc.e = e;
       var oldAppend = mc.append = function(str) {
-        var clsIdx = mc.e.comment.lastIndexOf('@class'); // move tags to end
+        var clsIdx = Math.max( // move tags to end
+          mc.e.comment.lastIndexOf('@class'),
+          mc.e.comment.lastIndexOf('@interface')
+        );
         var trimmed = str.replace('*/', '').replace('/**', '');
         mc.e.comment = mc.e.comment.substr(0, clsIdx) +
            trimmed + '\n' +
