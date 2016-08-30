@@ -38,75 +38,79 @@ foam.CLASS({
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.CachingDAO',
+    'foam.core.dao.SyncDAO',
+    'foam.dao.ContextualizingDAO',
+    'foam.dao.DeDupDAO',
+    'foam.dao.ClientDAO',
+    'foam.box.Context',
+    'foam.box.HTTPBox',
+    'foam.box.SocketBox',
     //'foam.core.dao.MergeDAO',
     //'foam.core.dao.MigrationDAO',
-    //'foam.core.dao.StorageDAO',
-    'foam.core.dao.SyncDAO',
     //'foam.core.dao.VersionNoDAO',
-    'foam.dao.ContextualizingDAO',
-    'foam.dao.DeDupDAO'
     //'foam.dao.EasyClientDAO',
     //'foam.dao.LoggingDAO',
     //'foam.dao.TimingDAO'
   ],
 
-  help: 'A facade for easy DAO setup.',
-
   imports: [ 'document' ],
 
   properties: [
     {
+      /** The developer-friendly name for this EasyDAO. */
       name: 'name',
       factory: function() { return this.of.id; },
-      //documentation: "The developer-friendly name for this $$DOC{ref:'.'}."
     },
     {
+      /** Have EasyDAO use a sequence number to index items. Note that
+        .seqNo and .guid features are mutually
+        exclusive. */
       class: 'Boolean',
       name: 'seqNo',
       value: false,
-      //documentation: "Have $$DOC{ref:'.'} use a sequence number to index items. Note that $$DOC{ref:'.seqNo'} and $$DOC{ref:'.guid'} features are mutually exclusive."
     },
     {
+      /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
       class: 'Boolean',
       name: 'guid',
       label: 'GUID',
       value: false,
-      //documentation: "Have $$DOC{ref:'.'} generate guids to index items. Note that $$DOC{ref:'.seqNo'} and $$DOC{ref:'.guid'} features are mutually exclusive."
     },
     {
+      /** The property on your items to use to store the sequence number or guid. This is required for .seqNo or .guid mode. */
       name: 'seqProperty',
       class: 'Property',
-      //documentation: "The property on your items to use to store the sequence number or guid. This is required for $$DOC{ref:'.seqNo'} or $$DOC{ref:'.guid'} mode."
     },
     {
+      /** Enable local in-memory caching of the DAO. */
       class: 'Boolean',
       name: 'cache',
       value: false,
-      //documentation: "Enable local caching of the $$DOC{ref:'DAO'}."
     },
     {
+      /** Enable value de-duplication to save memory when caching. */
       class: 'Boolean',
       name: 'dedup',
       value: false,
-      //documentation: "Enable value de-duplication to save memory when caching."
     },
 //     {
 //       class: 'Boolean',
 //       name: 'logging',
 //       value: false,
-//       //documentation: "Enable logging on the $$DOC{ref:'DAO'}."
+//       //documentation: "Enable logging on the DAO."
 //     },
 //     {
 //       class: 'Boolean',
 //       name: 'timing',
 //       value: false,
-//       //documentation: "Enable time tracking for concurrent $$DOC{ref:'DAO'} operations."
+//       //documentation: "Enable time tracking for concurrent DAO operations."
 //     },
     {
+      /** Contextualize objects on .find, re-creating them with this EasyDAO's
+        exports, as if they were children of this EasyDAO. */
       class: 'Boolean',
       name: 'contextualize',
       value: false,
-      //documentation: "Contextualize objects on .find"
     },
 //     {
 //       class: 'Boolean',
@@ -115,43 +119,52 @@ foam.CLASS({
 //       //documentation: "True to clone results on select"
 //     },
     {
+      /**
+        <p>Selects the basic functionality this EasyDAO should provide.
+        You can specify an instance of a DAO model definition such as
+        MDAO, or a constant indicating your requirements.</p>
+        <p>Choices are:</p>
+        <ul>
+          <li>IDB: Use IndexDB for storage.</li>
+          <li>LOCAL: Use local storage.</li>
+          <li>MDAO: Use non-persistent in-memory storage.</li>
+        </ul>
+      */
       name: 'daoType',
       value: 'foam.dao.IDBDAO',
-      //documentation: function() { /*
-//           <p>Selects the basic functionality this $$DOC{ref:'foam.dao.EasyDAO'} should provide.
-//           You can specify an instance of a DAO model definition such as
-//           $$DOC{ref:'MDAO'}, or a constant indicating your requirements.</p>
-//           <p>Choices are:</p>
-//           <ul>
-//             <li>$$DOC{ref:'.ALIASES',text:'IDB'}: Use IndexDB for storage.</li>
-//             <li>$$DOC{ref:'.ALIASES',text:'LOCAL'}: Use local storage (for Chrome Apps, this will use local, non-synced storage).</li>
-//             <li>$$DOC{ref:'.ALIASES',text:'SYNC'}: Use synchronized storage (for Chrome Apps, this will use Chrome Sync storage).</li>
-//           </ul>
-//        */}
     },
     {
+      /** Automatically generate indexes as necessary, if using an MDAO or cache. */
       class: 'Boolean',
       name: 'autoIndex',
       value: false,
-      //documentation: "Automatically generate an index."
     },
 //     {
+//       /** Creates an internal MigrationDAO and applies the given array of MigrationRule. */
 //       class: 'FObjectArray',
 //       name: 'migrationRules',
 //       of: 'foam.core.dao.MigrationRule',
-//       //documentation: "Creates an internal $$DOC{ref:'MigrationDAO'} and applies the given array of $$DOC{ref:'MigrationRule'}."
 //     },
     {
+      /** Turn on to activate synchronization with a server. Specify serverUri
+        and syncProperty as well. */
       class: 'Boolean',
       name: 'syncWithServer',
       value: false
     },
     {
+      /** Setting to true activates polling, periodically checking in with
+        the server. If sockets are used, polling is optional as the server
+        can push changes to this client. */
       class: 'Boolean',
       name: 'syncPolling',
       value: true
     },
     {
+      /** The URI of the server to use. If sockets is true, this will use
+        a web socket, otherwise HTTP to contact the server-side DAO. On your
+        server, use an EasyDAO with isServer:true to provide the other end
+        of the connection. */
       class: 'String',
       name: 'serverUri',
       factory: function() {
@@ -161,11 +174,15 @@ foam.CLASS({
       }
     },
     {
+      /** Set to true if you are running this on a server, and clients will
+        synchronize with this DAO. */
       class: 'Boolean',
       name: 'isServer',
       value: false
     },
     {
+      /** The property to synchronize on. This is typically an integer value
+        indicating the version last seen on the remote. */
       name: 'syncProperty'
     }
   ],
@@ -176,25 +193,19 @@ foam.CLASS({
       MDAO:  'foam.dao.MDAO',
       IDB:   'foam.dao.IDBDAO',
       LOCAL: 'foam.dao.LocalStorageDAO',
-      //SYNC:  'foam.dao.StorageDAO'
     }
   },
 
   methods: [
-    function init(args) {
-      /*
-        <p>On initialization, the $$DOC{ref:'.'} creates an appropriate chain of
-        internal $$DOC{ref:'DAO'} instances based on the $$DOC{ref:'.'}
+    function init() {
+      /**
+        <p>On initialization, the EasyDAO creates an appropriate chain of
+        internal EasyDAO instances based on the EasyDAO
         property settings.</p>
         <p>This process is transparent to the developer, and you can use your
-        $$DOC{ref:'.'} like any other $$DOC{ref:'DAO'}.</p>
+        EasyDAO like any other DAO.</p>
       */
       this.SUPER(args);
-
-//       if ( window.chrome && chrome.storage ) {
-//         this.ALIASES.LOCAL = 'foam.core.dao.ChromeStorageDAO';
-//         this.ALIASES.SYNC  = 'foam.core.dao.ChromeSyncStorageDAO';
-//       }
 
       var daoType = typeof this.daoType === 'string' ?
         this.ALIASES[this.daoType] || this.daoType :
@@ -253,38 +264,47 @@ foam.CLASS({
         dao = this.GUIDDAO.create(args);
       }
 
-//       var cls = this.of$cls;
+      var cls = this.of$cls;
 
-//       if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
+      if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
 
-//       if ( this.syncWithServer || this.isServer ) {
-//         if ( ! this.syncProperty ) {
-//           this.syncProperty = cls.SYNC_PROPERTY;
-//           if ( ! this.syncProperty ) {
-//             throw "EasyDAO sync with class " + cls.id + " invalid. Sync requires a sync property be set, or be of a class including a property 'sync_property'.";
-//           }
-//         }
-//       }
+      if ( this.syncWithServer || this.isServer ) {
+        if ( ! this.syncProperty ) {
+          this.syncProperty = cls.SYNC_PROPERTY;
+          if ( ! this.syncProperty ) {
+            throw "EasyDAO sync with class " + cls.id + " invalid. Sync requires a sync property be set, or be of a class including a property 'sync_property'.";
+          }
+        }
+      }
 
-//       if ( this.syncWithServer ) {
-//         dao = this.SyncDAO.create({
-//           remoteDAO: this.EasyClientDAO.create({
-//             serverUri: this.serverUri,
-//             cls: cls,
-//             sockets: this.sockets,
-//             reconnectPeriod: 5000
-//           }),
-//           syncProperty: this.syncProperty,
-//           delegate: dao,
-//           period: 1000
-//         });
-//         dao.syncRecordDAO = foam.dao.EasyDAO.create({
-//           of: dao.SyncRecord,
-//           cache: true,
-//           daoType: this.daoType,
-//           name: this.name + '_SyncRecords'
-//         });
-//       }
+      if ( this.syncWithServer ) {
+        var boxContext = this.Context.create();
+        var boxSender = ( this.sockets ) ?
+          this.SocketBox.create({
+            address: this.serverUri
+          }) :
+          this.HTTPBox.create({
+             url: this.serverUri,
+             method: 'POST'
+          }); // TODO: retry?
+          //TODO: EasyClientDAO
+
+        dao = this.SyncDAO.create({
+          remoteDAO: this.ClientDAO.create({
+              name: this.name,
+              delegate: boxSender
+          }),
+          syncProperty: this.syncProperty,
+          delegate: dao,
+          pollingFrequency: 1000
+        });
+        dao.syncRecordDAO = foam.dao.EasyDAO.create({
+          of: dao.SyncRecord,
+          cache: true,
+          daoType: this.daoType,
+          name: this.name + '_SyncRecords'
+        });
+      }
 
 //       if ( this.isServer ) {
 //         dao = this.VersionNoDAO.create({
@@ -304,18 +324,20 @@ foam.CLASS({
       this.delegate = dao;
     },
 
-    function addIndex() {
-      /* <p>Only relevant if $$DOC{ref:'.cache'} is true or if $$DOC{ref:'.daoType'}
-         was set to $$DOC{ref:'MDAO'}, but harmless otherwise.</p>
-         <p>See $$DOC{ref:'MDAO.addIndex', text:'MDAO.addIndex()'}.</p> */
+    function addIndex(/* foam.core.Property* */ var_args) {
+      /** Only relevant if cache is true or if daoType
+         was set to MDAO, but harmless otherwise.
+         @arg var_args specify any number of Properties to be indexed.
+      */
       this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
       return this;
     },
 
-    function addRawIndex() {
-      /* <p>Only relevant if $$DOC{ref:'.cache'} is true or if $$DOC{ref:'.daoType'}
-         was set to $$DOC{ref:'MDAO'}, but harmless otherwise.</p>
-         <p>See $$DOC{ref:'MDAO.addRawIndex', text:'MDAO.addRawIndex()'}. */
+    function addRawIndex(/* foam.dao.index.Index */ index) {
+      /** Only relevant if cache is true or if daoType
+        was set to MDAO, but harmless otherwise.
+        @arg index The index to add.
+      */
       this.mdao && this.mdao.addRawIndex.apply(this.mdao, arguments);
       return this;
     }
