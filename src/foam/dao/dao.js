@@ -19,37 +19,87 @@
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'FlowControl',
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'stopped'
+    },
+    {
+      name: 'errorEvt',
+      javaType: 'Object',
+      javaJsonParser: 'foam.lib.json.AnyParser'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'stop',
+      code: function() { this.stopped = true; },
+      javaCode: 'setStopped(true);'
+    },
+    {
+      name: 'error',
+      code: function error(e) { this.errorEvt = e; }
+    }
+  ]
+});
+
+
+foam.INTERFACE({
+  package: 'foam.dao',
   name: 'Sink',
 
   methods: [
     {
       name: 'put',
+      returns: '',
+      javaReturns: 'void',
       args: [
-        'obj',
-        'fc'
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'fc',
+          javaType: 'foam.dao.FlowControl'
+        }
       ],
-      code: function () {}
+      code: function() {}
     },
     {
       name: 'remove',
       args: [
-        'obj',
-        'fc'
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'fc',
+          javaType: 'foam.dao.FlowControl'
+        }
       ],
       code: function() {}
     },
     {
       name: 'eof',
+      returns: '',
+      javaReturns: 'void',
       args: [],
       code: function() {}
     },
     {
       name: 'error',
+      returns: '',
+      javaReturns: 'void',
       args: [],
       code: function() {}
     },
     {
       name: 'reset',
+      returns: '',
+      javaReturns: 'void',
       args: [],
       code: function() {}
     }
@@ -71,59 +121,117 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.dao',
   name: 'DAO',
-
-  // TODO: make an interface or abstract, then remove NOP code:'s
 
   // documentation: 'DAO Interface',
 
   methods: [
     {
       name: 'put',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
     },
     {
       name: 'remove',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
     },
     {
       name: 'find',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'id',
+          javaType: 'Object'
+        }
+      ]
     },
     {
       name: 'select',
-      code: function() { },
-      returns: 'Promise'
+      returns: 'Promise',
+      javaReturns: 'foam.dao.Sink',
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ]
     },
     {
       name: 'removeAll',
-      code: function() { },
-      returns: 'Promise'
+      returns: '',
+      javaReturns: 'void',
+      args: []
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
-      code: function() { },
+      returns: '',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ]
     },
     {
       name: 'where',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ]
     },
     {
       name: 'orderBy',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'comparator',
+          javaType: 'foam.mlang.order.Comparator'
+        }
+      ]
     },
     {
       name: 'skip',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'count',
+          javaType: 'int'
+        }
+      ]
     },
     {
       name: 'limit',
-      code: function() { },
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'count',
+          javaType: 'int'
+        }
+      ]
     }
   ]
 });
@@ -311,22 +419,6 @@ foam.CLASS({
     function remove(obj, fc) {
       // TODO
     }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'FlowControl',
-
-  properties: [
-    'stopped',
-    'errorEvt'
-  ],
-
-  methods: [
-    function stop() { this.stopped = true; },
-    function error(e) { this.errorEvt = e; }
   ]
 });
 
