@@ -2,13 +2,13 @@ package foam.lib.parse;
 
 public class Literal implements Parser {
   private String string;
-  private String value;
+  private Object value;
 
   public Literal(String s) {
     this(s, s);
   }
 
-  public Literal(String s, String v) {
+  public Literal(String s, Object v) {
     string = s;
     value = v;
   }
