@@ -47,7 +47,10 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'imports'
+      name: 'imports',
+      value: [
+        'foam.core.*'
+      ]
     },
     {
       class: 'StringArray',
@@ -58,8 +61,13 @@ foam.CLASS({
       }
     },
     {
-      class: 'String',
-      name: 'code'
+      class: 'Boolean',
+      name: 'generateClassInfo',
+      value: true
+    },
+    {
+      class: 'Array',
+      name: 'axioms'
     }
   ],
 
@@ -72,39 +80,67 @@ foam.CLASS({
         return a.path;
       });
       this.abstract = cls.model_.abstract;
-
-      var axioms = cls.getAxioms();
-      for ( var i = 0 ; i < axioms.length ; i++ ) {
-        var axiom = axioms[i];
-        if ( axiom.axiomClassInfo ) this.code += axiom.axiomClassInfo(null, cls, this);
-      }
-
-      for ( var i = 0 ; i < axioms.length ; i++ ) {
-        var axiom = axioms[i];
-        if ( axiom.axiomJavaSource ) this.code += axiom.axiomJavaSource(null, cls, this);
-      }
+      this.axioms = cls.getAxioms();
+      return this;
     }
   ],
 
   templates: [
     {
-      name: 'toJavaSource',
-      template: function() {/*// GENERATED CODE.  DO NOT MODIFY BY HAND.
-<% if ( this.package ) { %>package <%= this.pacakge %>;
-<% }
-%>public <%= this.abstract ? 'abstract ' : '' %> class <%= this.name %><%
-  if ( this.extends ) { %> extends <%= this.extends %><%
-  }
-  if ( this.implements.length > 0 ) { %> implements <%
+      name: 'code',
+      template: function() {/*<%
+%>// GENERATED CODE
+// adamvy@google.com
+package <%= this.package %>;
+
+<% for ( var i = 0 ; this.imports && i < this.imports.length ; i++ ) {
+%>import <%= this.imports[i] %>;
+<% } %>
+
+public <%= this.abstract ? 'abstract ' : '' %>class <%= this.name %> extends <%= this.extends %><%
+  if ( this.implements && this.implements.length > 0 ) { %> implements <%
     for ( var i = 0 ; i < this.implements.length ; i++ ) {
       %><%= this.implements[i] %><%
-      if ( i != this.implements.length - 1 ) { %>, <% }
+      if ( i < this.implements.length - 1 ) { %>,<% }
+      %> <%
     }
   }
 %> {
-<%= this.code %>
+<% if ( this.generateClassInfo ) { %>
+  private static ClassInfo classInfo_ = new ClassInfo()
+    .setId("<%= this.id %>")
+<%
+  var a = this.axioms;
+  for ( var i = 0 ; i < a.length ; i++ ) {
+    if ( ! a[i].axiomClassInfo ) continue;
+    a[i].axiomClassInfo(output, this);
+%>
+  <%
+  }
+%>;
+
+  public ClassInfo getClassInfo() {
+    return classInfo_;
+  }
+
+  public static ClassInfo getOwnClassInfo() {
+    return classInfo_;
+  }
+
+<%
+  }
+
+  var a = this.axioms;
+
+for ( var i = 0 ; i < a.length; i++ ) {
+  if ( ! a[i].axiomJavaSource ) continue;
+  a[i].axiomJavaSource(output, this); %>
+<%
 }
-    */}
+
+%>
+}
+*/}
     }
   ]
 });
@@ -142,16 +178,9 @@ foam.CLASS({
       template: function() {/*
 package <%= this.package %>;
 
-import foam.core.X;
+import foam.core.ContextAwareSupport;
 
-public class <%= this.name %> implements foam.box.Box {
-  private X x_;
-  public X getX() { return x_; }
-
-  public <%= this.name %>(X x) {
-    x_ = x;
-  }
-
+public class <%= this.name %> extends ContextAwareSupport implements foam.box.Box {
   private <%= this.of %> delegate_;
   public <%= this.of %> getDelegate() { return delegate_; }
   public <%= this.name %> setDelegate(<%= this.of %> delegate) {
@@ -203,7 +232,7 @@ foam.LIB({
   name: 'foam.AbstractClass',
   methods: [
     function javaSource() {
-      return foam.java.JavaUtil.create().javaSource(this);
+      return foam.java.JavaClass.create().fromClass(this).code();
     }
   ]
 });
@@ -389,7 +418,7 @@ if ( foam.core.FObjectArray.isInstance(this) ) { %>
 <% } %>
 
       @Override
-      public Parser jsonParser() {
+      public foam.lib.parse.Parser jsonParser() {
         return new <%= this.javaJsonParser %>();
       }})
 */}
@@ -458,78 +487,10 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
-  package: 'foam.java',
-  name: 'JavaUtil',
-
-  axioms: [
-    foam.pattern.Singleton.create()
-  ],
-
-  templates: [
-    {
-      name: 'classInfo',
-      template: function(cls) {/*<% var cls = arguments[1]; %>
-new ClassInfo()
-  .setId("<%= cls.id %>")
-  <%
-  var a = cls.getAxioms();
-  for ( var i = 0 ; i < a.length ; i++ ) {
-    if ( ! a[i].axiomClassInfo ) continue;
-    a[i].axiomClassInfo(output, cls);
-%>
-  <%
-  }
-%>;*/}
-    },
-    {
-      name: 'javaSource',
-      template: function(cls) {/*<% var cls = arguments[1];
-%>// GENERATED CODE
-// adamvy@google.com
-package <%= cls.package %>;
-
-import foam.core.*;
-
-import foam.lib.parse.*;
-import foam.lib.json.*;
-
-public <%= cls.model_.abstract ? 'abstract ' : '' %>class <%= cls.name %> extends <%= cls.model_.extends %><%
-  var interfaces = cls.getAxiomsByClass(foam.core.Implements);
-  if ( interfaces.length > 0 ) { %> implements <% }
-  for ( var i = 0 ; i < interfaces.length ; i++ ) {
-    var intf = interfaces[i];
-    %><%= intf.path %><%
-    if ( i < interfaces.length - 1 ) { %>,<% }
-    %> <%
-  }
-%> {
-  private static ClassInfo classInfo_ = <% this.classInfo(output, cls) %>
-
-  public ClassInfo getClassInfo() {
-    return classInfo_;
-  }
-
-  public static ClassInfo getOwnClassInfo() {
-    return classInfo_;
-  }
-
-  public <%= cls.name %>(X x) { super(x); }
-
-<%
-  var a = cls.getAxioms();
-
-for ( var i = 0 ; i < a.length; i++ ) {
-if ( ! a[i].axiomJavaSource ) continue;
-%>
-  <% a[i].axiomJavaSource(output, cls); %>
-<%
-}
-
-%>
-}
-*/}
-    }
+  refines: 'foam.core.Boolean',
+  properties: [
+    ['javaType', 'boolean'],
+    ['javaJsonParser', 'foam.lib.json.BooleanParser']
   ]
 });
