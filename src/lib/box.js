@@ -610,7 +610,11 @@ foam.CLASS({
   name: 'RPCReturnMessage',
   extends: 'foam.box.Message',
   properties: [
-    'data'
+    {
+      name: 'data',
+      javaType: 'Object',
+      javaJsonParser: 'foam.lib.json.AnyParser'
+    }
   ]
 });
 
