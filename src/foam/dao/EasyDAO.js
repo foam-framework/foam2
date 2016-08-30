@@ -62,6 +62,11 @@ foam.CLASS({
       factory: function() { return this.of.id; },
     },
     {
+      /** This is set automatically when you create an EasyDAO.
+        @private */
+      name: 'delegate'
+    },
+    {
       /** Have EasyDAO use a sequence number to index items. Note that
         .seqNo and .guid features are mutually
         exclusive. */
@@ -324,20 +329,22 @@ foam.CLASS({
       this.delegate = dao;
     },
 
+    /** Only relevant if cache is true or if daoType
+       was set to MDAO, but harmless otherwise. Generates an index
+       for a query over all specified properties together.
+       @arg var_args specify any number of Properties to be indexed.
+    */
     function addIndex(/* foam.core.Property* */ var_args) {
-      /** Only relevant if cache is true or if daoType
-         was set to MDAO, but harmless otherwise.
-         @arg var_args specify any number of Properties to be indexed.
-      */
       this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
       return this;
     },
 
+    /** Only relevant if cache is true or if daoType
+      was set to MDAO, but harmless otherwise. Adds an existing index
+      to the MDAO.
+      @arg index The index to add.
+    */
     function addRawIndex(/* foam.dao.index.Index */ index) {
-      /** Only relevant if cache is true or if daoType
-        was set to MDAO, but harmless otherwise.
-        @arg index The index to add.
-      */
       this.mdao && this.mdao.addRawIndex.apply(this.mdao, arguments);
       return this;
     }
