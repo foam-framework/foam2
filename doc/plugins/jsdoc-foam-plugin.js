@@ -51,7 +51,7 @@ var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
     for (var i = 0; i < node.properties.length; ++i) {
       var p = node.properties[i];
       if ( p.key && p.key.name == propName ) {
-        return ( p.value && p.value.value ) || '';
+        return ( p.value && p.value.value ) || ( p.value && p.value.elements ) || '';
       }
     }
   }
@@ -126,7 +126,7 @@ var getDefinitionType = function getDefinitionType(node) {
       node.parent && node.parent.type === 'CallExpression' &&
       node.parent.callee && node.parent.callee.property ) {
     var name = node.parent.callee.property.name;
-    if ( name == 'CLASS' || name == 'LIB' ) {
+    if ( name == 'CLASS' || name == 'LIB' || name == 'INTERFACE' ) {
       return name;
     }
   }
@@ -241,6 +241,15 @@ var processArgs = function processArgs(e, node) {
   }
 }
 
+var getImplements = function getImplements(node) {
+  var ret = [];
+  var nodes = getNodePropertyNamed(node, 'implements');
+  for ( var i = 0; i < nodes.length; i++ ) {
+    ret.push(nodes[i].value);
+  }
+  return ret;
+}
+
 // Looks up existing results (already had their comment processed)
 var getResult = function getResult(parser, longname) {
   // also update .description on a result, to change the output text.
@@ -289,7 +298,7 @@ exports.astNodeVisitor = {
     // look them up and modify the generated .comment (raw) and .description
     // (what ends up in the output template).
 
-    // CLASS or LIB
+    // CLASS or LIB or INTERFACE
     if ( getDefinitionType(node) ) {
       var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, "name");
@@ -317,20 +326,31 @@ exports.astNodeVisitor = {
         return;
       }
 
+      var strBody = ( defType == 'INTERFACE' ? "\n@interface " : "\n@class " ) +
+        ( ( classExt ) ? "\n@extends module:"+classExt : "");
+
+      var classImplements = getImplements(node);
+      if ( classImplements ) {
+        for ( var i = 0; i < classImplements.length; i++ ) {
+          strBody += "\n@implements " + classImplements[i];
+        }
+      }
+
+      strBody += (classPackage ? "\n@memberof! module:"+classPackage : "\n@global") +
+        "";
+
+
       e.id = 'astnode'+Date.now();
       e.comment = insertIntoComment(
         getComment(node, currentSourceName),
-        "\n@class " +
-        ( ( classExt ) ? "\n@extends module:"+classExt : "") +
-        (classPackage ? "\n@memberof! module:"+classPackage : "\n@global") +
-        ""
+        strBody
       );
       e.lineno = node.parent.loc.start.line;
       e.filename = currentSourceName;
       e.astnode = node;
       e.code = {
           name: className,
-          type: "class",
+          type: ( defType == 'INTERFACE' ? "interface" : "class" ),
           node: node
       };
       e.event = "symbolFound";
@@ -342,7 +362,10 @@ exports.astNodeVisitor = {
       var mc = modelComments[classPackage + "." + className];
       mc.e = e;
       var oldAppend = mc.append = function(str) {
-        var clsIdx = mc.e.comment.lastIndexOf('@class'); // move tags to end
+        var clsIdx = Math.max( // move tags to end
+          mc.e.comment.lastIndexOf('@class'),
+          mc.e.comment.lastIndexOf('@interface')
+        );
         var trimmed = str.replace('*/', '').replace('/**', '');
         mc.e.comment = mc.e.comment.substr(0, clsIdx) +
            trimmed + '\n' +
