@@ -321,12 +321,10 @@ foam.CLASS({
 
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
 
-
+/** Describes one argument of a function or method. */
 foam.CLASS({
   package: 'foam.core',
   name: 'Argument',
-
-  // documentation: "Describes one argument of a function.",
 
   constants: {
     PREFIX: 'Argument',
@@ -351,6 +349,10 @@ foam.CLASS({
     {
       /** If true, indicates that this argument is optional. */
       name: 'optional', value: false
+    },
+    {
+      /** If true, indicates a variable number of arguments. */
+      name: 'repeats', value: false
     },
     {
       /** The index of the argument (the first argument is at index 0). */
@@ -439,7 +441,7 @@ foam.LIB({
       // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
       //console.log('-----------------');
       var argIdx = 0;
-      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
+      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?(\*)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
       var typeMatch;
       while ( typeMatch = argMatcher.exec(args) ) {
         // if can't match from start of string, fail
@@ -453,19 +455,20 @@ foam.LIB({
 
         // record the argument
         ret.push(foam.core.Argument.create({
-          name:          typeMatch[6],
+          name:          typeMatch[7],
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
           optional:      typeMatch[3] == '?',
+          repeats:       typeMatch[3] == '*',
           index:         argIdx++,
-          documentation: typeMatch[5],
+          documentation: typeMatch[6],
         }));
         // if present, record return type (if not the last arg, we fail on the
         // next iteration)
-        if ( typeMatch[8] ) {
+        if ( typeMatch[9] ) {
           ret.returnType = foam.core.ReturnValue.create({
-            typeName: typeMatch[8],
-            type: global[typeMatch[8]]
+            typeName: typeMatch[9],
+            type: global[typeMatch[9]]
           });
         }
       }
@@ -508,6 +511,14 @@ foam.LIB({
         // missing optional args, extra arguments are ok
         for ( var i = 0 ; i < args.length ; i++ )
           args[i].validate(arguments[i]);
+
+        // if last arg repeats, validate remaining arguments against lastArg
+        var lastArg = args[args.length - 1];
+        if ( lastArg && lastArg.repeats ) {
+          for ( var i = args.length ; i < arguments.length ; i++ ) {
+            lastArg.validate(arguments[i]);
+          }
+        }
 
         // If nothing threw an exception, we are free to run the function
         var retVal = fn.apply(this, arguments);
