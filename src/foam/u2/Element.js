@@ -98,8 +98,19 @@ foam.CLASS({
       /* Performs expansion of the ^ shorthand on the CSS. */
       // TODO(braden): Parse and validate the CSS.
       // TODO(braden): Add the automatic prefixing once we have the parser.
-      return text.replace(/\^/g,
-          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
+      var base = '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id));
+      return text.replace(/\^(.)/g, function(match, next) {
+        var c = next.charCodeAt(0);
+        // Check if the next character is an uppercase or lowercase letter,
+        // number, - or _. If so, add a - because this is a modified string.
+        // If not, there's no extra -.
+        if ( (65 <= c && c <= 90) || (97 <= c && c <= 122) ||
+            (48 <= c && c <= 57) || c === 45 || c === 95 ) {
+          return base + '-' + next;
+        } else {
+          return base + next;
+        }
+      });
     }
   ]
 });
