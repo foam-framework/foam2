@@ -9,10 +9,7 @@ public class ArrayParser extends ProxyParser {
                    new Literal("["),
                    new Whitespace(),
                    new Repeat(
-                              new Alt(
-                                      new StringParser(),
-                                      new IntParser(),
-                                      new FObjectParser()),
+                              new AnyParser(),
                               new Seq0(new Whitespace(),
                                        new Literal(","),
                                        new Whitespace())),
