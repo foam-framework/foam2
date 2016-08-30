@@ -190,7 +190,7 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
   return comment.slice(0, idx) + " "+tag+" " + comment.slice(idx);
 }
 
-var replaceCommentArg = function replaceCommentArg(comment, name, type, docs) {
+var replaceCommentArg = function replaceCommentArg(comment, name, type, optional, repeats, docs) {
   // if the @arg is defined in the comment, add the type, otherwise insert
   // the @arg directive. Documentation (if any) from the argument declaration
   // is only used if the @arg is not specified in the original comment.
@@ -200,12 +200,14 @@ var replaceCommentArg = function replaceCommentArg(comment, name, type, docs) {
     function(match, p1, p2) {
       found = true;
       if ( p2 ) return match; // a type was specified, abort
-      return p1 + " {" + type + "} " + name + " ";
+      return p1 + " {" + (repeats?"...":"") + type
+        + (optional?"=":"") + "} " + name + " ";
     }
   );
 
   if ( found ) return ret;
-  return insertIntoComment(comment, "\n@arg {"+type+"} "+name+" "+docs);
+  return insertIntoComment(comment, "\n@arg {"+ (repeats?"...":"") +
+    type+ (optional?"=":"") + "} "+name+" "+docs);
 }
 
 
@@ -230,7 +232,8 @@ var processArgs = function processArgs(e, node) {
     for (var i = 0; i < args.length; ++i) {
       var arg = args[i];
       if ( arg.typeName ) {
-        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName, arg.documentation);
+        e.comment = replaceCommentArg(e.comment, arg.name, arg.typeName,
+          arg.optional, arg.repeats, arg.documentation);
       }
     }
   } catch(err) {
