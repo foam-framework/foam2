@@ -159,9 +159,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Transform3D',
+
   properties: [
     { class: 'Simple', name: 'a' },
     { class: 'Simple', name: 'b' },
@@ -295,7 +297,7 @@ foam.CLASS({
     },
 
     function rotateX(a) {
-      if ( !a ) return;
+      if ( ! a ) return;
       var c = Math.cos(a);
       var s = Math.sin(a);
 
@@ -307,7 +309,7 @@ foam.CLASS({
     },
 
     function rotateY(a) {
-      if ( !a ) return;
+      if ( ! a ) return;
       var c = Math.cos(a);
       var s = Math.sin(a);
 
@@ -320,7 +322,7 @@ foam.CLASS({
 
 
     function rotateZ(a) {
-      if ( !a ) return;
+      if ( ! a ) return;
       var c = Math.cos(a);
       var s = Math.sin(a);
 
@@ -333,7 +335,7 @@ foam.CLASS({
   ]
 });
 
-
+/*
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Quaternion',
@@ -374,7 +376,7 @@ foam.CLASS({
     }
   ]
 });
-
+*/
 
 foam.CLASS({
   package: 'foam.graphics',
@@ -385,6 +387,13 @@ foam.CLASS({
     'foam.graphics.Transform'
   ],
 
+  // An optional function taken from context to be called if this object
+  // becomes invalid and needs to be repainted.
+  exports: [ 'invalidate' ],
+
+  // Fires when this CView is invalidated and needs a repaint.
+  // Is listened to a foam.u2.Canvas() if one was created for
+  // this CView.
   topics: [ 'invalidated' ],
 
   properties: [
@@ -475,15 +484,28 @@ foam.CLASS({
 
         return t;
       }
+    },
+    {
+      // If set to true, then this CView will automatically repaint
+      // whenever a child is added or removed, a property changes, or
+      // a property of a child changes. Only works if this CView has
+      // an associated Canvas (by calling toE()).
+      class: 'Boolean',
+      name: 'autoRepaint'
+    },
+    {
+      name: 'invalidate',
+      factory: function() {
+        return this.autoRepaint ?
+          this.invalidated.pub :
+          this.__context__.invalidate;
+      }
     }
   ],
 
   methods: [
     function initCView() {
-
-      this.propertyChange.sub(function() {
-        this.pub('invalidated');
-      }.bind(this));
+      this.invalidate && this.propertyChange.sub(this.invalidate);
     },
 
     function toLocalCoordinates(p) {
@@ -526,7 +548,7 @@ foam.CLASS({
     function hitTest(p) {},
 
     function maybeInitCView(x) {
-      if ( this.state == 'initial' ) {
+      if ( this.state === 'initial' ) {
         this.initCView(x);
         this.state = 'initailized'
       }
@@ -534,19 +556,42 @@ foam.CLASS({
 
     function paint(x) {
       this.maybeInitCView(x);
+
       x.save();
-      x.globalAlpha *= this.alpha;
-      x.strokeStyle = ( this.border && this.border.toCanvasStyle ) ?
-        this.border.toCanvasStyle(x) : this.border;
-      x.fillStyle = ( this.color && this.color.toCanvasStyle ) ?
-        this.color.toCanvasStyle(x) : this.color;
-      this.doTransform(x);
-      if ( this.shadowColor && this.shadowBlur ) {
-        x.shadowColor = this.shadowColor;
-        x.shadowBlur  = this.shadowBlur;
+
+      var
+        alpha       = this.alpha,
+        border      = this.border,
+        color       = this.color,
+        shadowColor = this.shadowColor,
+        shadowBlur  = this.shadowBlur;
+
+      if ( alpha !== 1 ) {
+        x.globalAlpha *= alpha;
       }
+
+      if ( border ) {
+        x.strokeStyle = border.toCanvasStyle ?
+          border.toCanvasStyle(x) :
+          border ;
+      }
+
+      if ( color ) {
+        x.fillStyle = color.toCanvasStyle ?
+          color.toCanvasStyle(x) :
+          color ;
+      }
+
+      this.doTransform(x);
+
+      if ( shadowColor && shadowBlur ) {
+        x.shadowColor = shadowColor;
+        x.shadowBlur  = shadowBlur;
+      }
+
       this.paintSelf(x);
       this.paintChildren(x);
+
       x.restore();
     },
 
@@ -573,22 +618,21 @@ foam.CLASS({
 
     function addChild_(c) {
       c.parent = this;
-      c.invalidated.sub(this.onChildUpdate);
       return c;
     },
 
     function removeChild_(c) {
       c.parent = undefined;
-      c.invalidated.unsub(this.onChildUpdate);
+      this.invalidate && this.invalidate();
       return c;
     },
 
     function addChildren() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
-this.addChild_(arguments[i]);
+        this.addChild_(arguments[i]);
       }
-      this.invalidated.pub();
+      this.invalidate && this.invalidate();
     },
 
     function paintSelf(x) {},
@@ -602,21 +646,11 @@ this.addChild_(arguments[i]);
     },
 
     function toE(X) {
-      var e = this.Canvas.create({ cview: this }, X);
-      // TODO: better to make Arc compute it's width and height
-      e.setAttribute('width', this.x + (this.width  || (this.radius + this.arcWidth) * 2));
-      e.setAttribute('height',this.y + (this.height || (this.radius + this.arcWidth) * 2));
-      return e;
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'onChildUpdate',
-      isFramed: true,
-      code: function onChildUpdate() {
-        this.invalidated.pub();
-      }
+      return this.Canvas.create({ cview: this }, X).attrs({
+        // TODO: better to make Arc compute it's width and height
+        width: this.x + (this.width  || (this.radius + this.arcWidth) * 2),
+        height: this.y + (this.height || (this.radius + this.arcWidth) * 2)
+      });
     }
   ]
 });
@@ -703,7 +737,7 @@ foam.CLASS({
       x.beginPath();
       x.rect(0, 0, this.width, this.height);
       if ( this.border ) x.stroke();
-      if ( this.color ) x.fill();
+      if ( this.color  ) x.fill();
     }
   ]
 });
