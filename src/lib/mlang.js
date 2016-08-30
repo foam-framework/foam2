@@ -412,18 +412,19 @@ foam.CLASS({
                 + 'return true;'
     },
     function partialEval() {
-      return this;
-      // TODO: port FOAM1 code below
       var newArgs = [];
       var updated = false;
 
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
+      var FALSE = foam.mlang.predicate.False.create();
+      var TRUE = foam.mlang.predicate.True.create();
+
+      for ( var i = 0; i < this.args.length; i++ ) {
         var a    = this.args[i];
         var newA = this.args[i].partialEval();
 
         if ( newA === FALSE ) return FALSE;
 
-        if ( AndExpr.isInstance(newA) ) {
+        if ( this.cls_.isInstance(newA) ) {
           // In-line nested AND clauses
           for ( var j = 0 ; j < newA.args.length ; j++ ) {
             newArgs.push(newA.args[j]);
@@ -440,8 +441,12 @@ foam.CLASS({
         }
       }
 
-      for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
-        for ( var j = i+1 ; j < newArgs.length ; j++ ) {
+      /*
+      TODO(braden): Implement partialAnd and PARTIAL_AND_RULES, for full partial
+      eval support. Currently it just drops TRUE and bails on FALSE.
+
+      for ( var i = 0; i < newArgs.length - 1; i++ ) {
+        for ( var j = i + 1; j < newArgs.length; j++ ) {
           var a = this.partialAnd(newArgs[i], newArgs[j]);
           if ( a ) {
             if ( a === FALSE ) return FALSE;
@@ -450,11 +455,12 @@ foam.CLASS({
           }
         }
       }
+      */
 
-      if ( newArgs.length == 0 ) return TRUE;
-      if ( newArgs.length == 1 ) return newArgs[0];
+      if ( newArgs.length === 0 ) return TRUE;
+      if ( newArgs.length === 1 ) return newArgs[0];
 
-      return updated ? AndExpr.create({args: newArgs}) : this;
+      return updated ? this.cls_.create({ args: newArgs }) : this;
     }
   ]
 });
