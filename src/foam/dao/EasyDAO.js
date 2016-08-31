@@ -17,7 +17,7 @@
 
 /**
     <p>If you don't know which DAO implementation to choose, EasyDAO is
-    ready to help. Simply <code>this.X.EasyDAO.create()</code> and set the flags
+    ready to help. Simply require foam.dao.EasyDAO and create() with the flags
     to indicate what behavior you're looking for. Under the hood, EasyDAO
     will create one or more DAO instances to service your requirements.
     </p>
