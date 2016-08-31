@@ -28,7 +28,10 @@ foam.CLASS({
         return [];
       }
     },
-    ['placeholder', '']
+    ['placeholder', ''],
+    {
+      name: 'size'
+    }
   ],
 
   methods: [
@@ -37,6 +40,7 @@ foam.CLASS({
       var self = this;
 
       this.attrSlot().linkFrom(this.data$);
+      this.attrs({ size: this.size$ });
 
       this.setChildren(this.slot(function(choices, placeholder) {
         var cs = [];
@@ -47,7 +51,10 @@ foam.CLASS({
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
           var c = choices[i];
-          cs.push(self.E('option').attrs({value: i}).add(c[1]));
+          cs.push(self.E('option').attrs({
+            value: i,
+            selected: self.data === i ? true : undefined
+          }).add(c[1]));
         }
 
         return cs;
