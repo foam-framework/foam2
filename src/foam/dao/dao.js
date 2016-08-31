@@ -698,7 +698,9 @@ foam.CLASS({
     },
 
     // Placeholder functions to that selecting from DAO to DAO works.
+    /** @private */
     function eof() {},
+    /** @private */
     function error() {}
   ]
 });
