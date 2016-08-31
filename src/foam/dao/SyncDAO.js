@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+/**
+  Used by foam.dao.SyncDAO to track object updates and deletions.
+*/
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'SyncRecord',
@@ -34,7 +37,14 @@ foam.CLASS({
   ]
 });
 
-
+/**
+  SyncDAO synchronizes data between multiple client's offline caches and a server.
+  When syncronizing, each client tracks the last-seen version of each object,
+  or if the object was deleted. The most recent version is retained.
+  <p>
+  Make sure to set the syncProperty to use to track each object's version.
+  It will automatically be incremented as changes are put() into the SyncDAO.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'SyncDAO',
@@ -54,6 +64,9 @@ foam.CLASS({
 
   properties: [
     {
+      /**
+        The shared server DAO to synchronize through.
+      */
       name: 'remoteDAO',
       transient: true,
       required: true,
@@ -63,26 +76,45 @@ foam.CLASS({
       }
     },
     {
+      /**
+        The DAO in which to store SyncRecords for each object. Each client
+        tracks their own sync state in a separate syncRecordDAO.
+      */
       name: 'syncRecordDAO',
       transient: true,
       required: true
     },
     {
+      /**
+        The property to use to store the object version. This value on each
+        object will be incremented each time it is put() into the SyncDAO.
+      */
       name: 'syncProperty',
       required: true,
       transient: true
     },
     {
+      /**
+        The class of object this DAO will store.
+      */
       name: 'of',
       required: true,
       transient: true
     },
     {
+      /**
+        If using a remote DAO without push capabilities, such as an HTTP
+        server, polling will periodically attempt to synchronize.
+      */
       class: 'Boolean',
       name: 'polling',
       value: false
     },
     {
+      /**
+        If using polling, pollingFrequency will determine the number of
+        milliseconds to wait between synchronization attempts.
+      */
       class: 'Int',
       name: 'pollingFrequency',
       value: 1000
@@ -90,6 +122,7 @@ foam.CLASS({
   ],
 
   listeners: [
+    /** @private */
     function onRemoteUpdate(s, on, event, obj) {
       if ( event == 'put' ) {
         this.processFromServer(obj);
@@ -101,6 +134,7 @@ foam.CLASS({
     },
 
     {
+      /** @private */
       name: 'onLocalUpdate',
       isMerged: 100,
       code: function() {
@@ -110,6 +144,7 @@ foam.CLASS({
   ],
 
   methods: [
+    /** @private */
     function init() {
       this.delegate.on.sub(this.onLocalUpdate);
       if ( this.polling ) {
@@ -119,6 +154,9 @@ foam.CLASS({
       }
     },
 
+    /**
+      Updates the object's last seen info.
+    */
     function put(obj) {
       return this.delegate.put(obj).then(function(o) {
         this.syncRecordDAO.put(
@@ -130,6 +168,10 @@ foam.CLASS({
       }.bind(this));
     },
 
+
+    /**
+      Marks the object as deleted.
+    */
     function remove(obj) {
       return this.delegate.remove(obj).then(function(o) {
         this.syncRecordDAO.put(
@@ -141,6 +183,10 @@ foam.CLASS({
       }.bind(this));
     },
 
+
+    /**
+      Marks all the removed objects' sync records as deleted.
+    */
     function removeAll(skip, limit, order, predicate) {
       this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
         a = a.a;
@@ -150,6 +196,7 @@ foam.CLASS({
       }.bind(this));
     },
 
+    /** @private */
     function processFromServer(obj) {
       this.delegate.put(obj).then(function(obj) {
         this.syncRecordDAO.put(
@@ -160,6 +207,7 @@ foam.CLASS({
       }.bind(this));
     },
 
+    /** @private */
     function syncFromServer() {
       var E = this;
 
@@ -176,6 +224,7 @@ foam.CLASS({
       }.bind(this));
     },
 
+    /** @private */
     function syncToServer() {
       var E = this;
       var self = this;
@@ -206,6 +255,7 @@ foam.CLASS({
         });
     },
 
+    /** @private */
     function sync() {
       this.syncToServer();
       this.syncFromServer();
