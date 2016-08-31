@@ -697,6 +697,11 @@ foam.CLASS({
       return sink;
     },
 
+    function compareTo(other) {
+      if ( ! other ) return 1;
+      return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
+    },
+
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
