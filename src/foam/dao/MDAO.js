@@ -191,7 +191,7 @@ foam.CLASS({
       } else {
         // object not found is ok, remove post-condition still met
         return Promise.resolve();
-      }      
+      }
     },
 
     function removeAll(skip, limit, order, predicate) {
