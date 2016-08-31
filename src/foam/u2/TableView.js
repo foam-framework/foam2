@@ -16,10 +16,12 @@
  */
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'TableCellRefinement',
   refines: 'foam.core.Property',
   properties: [
     {
-      name: 'tableFormatter',
+      name: 'tableCellView',
       value: function(obj) {
         return obj[this.name];
       }
@@ -32,6 +34,10 @@ foam.CLASS({
   name: 'TableBody',
   extends: 'foam.u2.Element',
 
+  requires: [
+    'foam.u2.TableCellRefinement'
+  ],
+
   properties: [
     [ 'nodeName', 'tbody' ],
     [ 'properties_' ]
@@ -42,7 +48,7 @@ foam.CLASS({
       var e = this.start('tr')
       for ( var j = 0 ; j < this.properties_.length ; j++ ) {
         var prop = this.properties_[j];
-        e = e.start('td').add(prop.tableFormatter(obj, e)).end();
+        e = e.start('td').add(prop.tableCellView(obj, e)).end();
       }
       e.end();
     }
