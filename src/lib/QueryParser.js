@@ -406,8 +406,16 @@ foam.CLASS({
             var start;
             var end;
 
-            start = new Date();
-            end = new Date();
+            // Previously we used just new Date() (ie. right now). That breaks
+            // when the current date is eg. 31 but the parsed date wants to be a
+            // shorter month (eg. April with 30 days). We would set the month to
+            // April, but "April 31" gets corrected to "May 1" and then our
+            // parsed dates are wrong.
+            //
+            // We fix that by using a fixed starting date that won't get
+            // adjusted like that.
+            start = new Date(2000, 0, 1);
+            end = new Date(2000, 0, 1);
             var ops = [ 'FullYear', 'Month', 'Date', 'Hours', 'Minutes',
                 'Seconds' ];
             var defaults = [ 0, 1, 1, 0, 0, 0 ];
