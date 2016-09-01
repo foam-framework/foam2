@@ -511,3 +511,103 @@ describe('ContextualizingDAO', function() {
 });
 
 
+describe('SyncDAO', function() {
+
+  // NOTE: Test assumes polling can be simulated by calling SyncDAO.sync()
+
+  var remoteDAO;
+  var cacheDAO;
+  var syncDAO;
+  var syncRecordDAO;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'SyncModel',
+      properties: [ 'id', 'version' ]
+    });
+
+    remoteDAO = test.helpers.OfflineableDAO.create({ of: test.SyncModel });
+    cacheDAO = foam.dao.ArrayDAO.create({ of: test.SyncModel });
+    syncRecordDAO = foam.dao.ArrayDAO.create({ of: foam.dao.SyncRecord });
+
+    syncDAO = foam.dao.SyncDAO.create({
+      of: test.SyncModel,
+      syncProperty: test.SyncModel.VERSION,
+      remoteDAO: remoteDAO,
+      delegate: cacheDAO,
+      syncRecordDAO: syncRecordDAO,
+      polling: false, // Polling simulated by invasive calls to sync()
+    });
+  });
+
+  // isolate sync/timeout call code, as it may change with SyncDAO's implementation
+  function doSyncThen(fn) {
+    syncDAO.sync();
+    // let promises settle
+    setTimeout(fn, 100);
+  }
+
+  function preloadRemote() {
+    remoteDAO.array = [
+      test.SyncModel.create({ id: 0 }),
+      test.SyncModel.create({ id: 1, version: 45 }),
+      test.SyncModel.create({ id: 2, version: 23 }),
+      test.SyncModel.create({ id: 3 }),
+      test.SyncModel.create({ id: 4, version: 2 }),
+    ];
+  }
+
+  function loadSync() {
+    remoteDAO.array = [
+      test.SyncModel.create({ id: 2 }),
+      test.SyncModel.create({ id: 3 }),
+      test.SyncModel.create({ id: 4 }),
+    ];
+  }
+
+  it('syncs from remote on first connect', function(done) {
+
+    preloadRemote();
+    remoteDAO.offline = false;
+
+    doSyncThen(function() {
+      syncDAO.select().then(function(sink) {
+        expect(sink.a.length).toEqual(5);
+        expect(sink.a[2].version).toEqual(23);
+      }).then(done);
+    });
+  });
+
+  it('syncs from remote on first connect', function(done) {
+    preloadRemote();
+    remoteDAO.offline = false;
+
+    doSyncThen(function() {
+      syncDAO.select().then(function(sink) {
+        expect(sink.a.length).toEqual(5);
+        expect(sink.a[2].version).toEqual(23);
+      }).then(done);
+    });
+  });
+
+//   it('starts offline, items put to client, then online, syncs to remote', function(done) {
+//     remoteDAO.offline = true;
+//     loadSync();
+
+//     remoteDAO.offline = false;
+//     doSyncThen(function() {
+
+//       done();
+//     });
+//   });
+
+
+
+
+  // Cases:
+  // - offline, items put to client, items inserted into remote, then online, synced both ways
+
+
+
+});
