@@ -82,7 +82,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({width: 600, height: 500, background: '#f3f3f3'});
+        return this.Box.create({width: 600, height: 500, background: '#f3f3f3', autoRepaint: true});
       }
     },
   ],
