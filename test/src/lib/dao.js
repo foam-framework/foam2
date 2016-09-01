@@ -524,7 +524,7 @@ describe('SyncDAO', function() {
     foam.CLASS({
       package: 'test',
       name: 'SyncModel',
-      properties: [ 'id', 'version' ]
+      properties: [ 'id', 'version', 'source' ]
     });
 
     remoteDAO = test.helpers.OfflineableDAO.create({ of: test.SyncModel });
@@ -550,20 +550,19 @@ describe('SyncDAO', function() {
 
   function preloadRemote() {
     remoteDAO.array = [
-      test.SyncModel.create({ id: 0 }),
-      test.SyncModel.create({ id: 1, version: 45 }),
-      test.SyncModel.create({ id: 2, version: 23 }),
-      test.SyncModel.create({ id: 3 }),
-      test.SyncModel.create({ id: 4, version: 2 }),
+      test.SyncModel.create({ id: 0, source: 'server' }),
+      test.SyncModel.create({ id: 1, version: 3, source: 'server' }),
+      test.SyncModel.create({ id: 2, version: 3, source: 'server' }),
+      test.SyncModel.create({ id: 3, source: 'server' }),
+      test.SyncModel.create({ id: 4, version: 2, source: 'server' }),
     ];
   }
 
   function loadSync() {
-    remoteDAO.array = [
-      test.SyncModel.create({ id: 2 }),
-      test.SyncModel.create({ id: 3 }),
-      test.SyncModel.create({ id: 4 }),
-    ];
+    syncDAO.put(test.SyncModel.create({ id: 2, source: 'client' }));
+    syncDAO.put(test.SyncModel.create({ id: 3, source: 'client' }));
+    syncDAO.put(test.SyncModel.create({ id: 4, source: 'client' }));
+    syncDAO.put(test.SyncModel.create({ id: 5, source: 'client' }));
   }
 
   it('syncs from remote on first connect', function(done) {
@@ -574,7 +573,7 @@ describe('SyncDAO', function() {
     doSyncThen(function() {
       syncDAO.select().then(function(sink) {
         expect(sink.a.length).toEqual(5);
-        expect(sink.a[2].version).toEqual(23);
+        expect(sink.a[2].version).toEqual(3);
       }).then(done);
     });
   });
@@ -586,27 +585,39 @@ describe('SyncDAO', function() {
     doSyncThen(function() {
       syncDAO.select().then(function(sink) {
         expect(sink.a.length).toEqual(5);
-        expect(sink.a[2].version).toEqual(23);
+        expect(sink.a[2].version).toEqual(3);
       }).then(done);
     });
   });
 
-//   it('starts offline, items put to client, then online, syncs to remote', function(done) {
-//     remoteDAO.offline = true;
-//     loadSync();
+  it('starts offline, items put to client, then online, syncs to remote', function(done) {
+    remoteDAO.offline = true;
+    loadSync();
 
-//     remoteDAO.offline = false;
-//     doSyncThen(function() {
+    remoteDAO.offline = false;
+    doSyncThen(function() {
+      expect(remoteDAO.array.length).toEqual(4);
+      done();
+    });
+  });
 
-//       done();
-//     });
-//   });
+  it('starts offline, items put to client, items inserted into remote, then online, syncs both ways', function(done) {
+    remoteDAO.offline = true;
+    preloadRemote();
+    loadSync();
 
+    remoteDAO.offline = false;
+    doSyncThen(function() {
+      expect(remoteDAO.array.length).toEqual(6);
+      expect(cacheDAO.array.length).toEqual(6);
+      done();
+    });
+  });
 
 
 
   // Cases:
-  // - offline, items put to client, items inserted into remote, then online, synced both ways
+  // - 
 
 
 
