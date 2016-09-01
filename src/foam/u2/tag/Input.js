@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: Add datalist support.
-
 foam.CLASS({
   package: 'foam.u2.tag',
   name: 'Input',
@@ -48,7 +46,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      if ( this.type ) this.attrs({type: this.type});
+      if ( this.type ) this.attrs({ type: this.type });
       this.cssClass(this.myCls());
       this.link();
     },

@@ -182,10 +182,10 @@ describe('U2', function() {
 
         expect(css.length).toBe(0);
         var e = test.css.Shorthand.create(null, X);
-        expect(css.indexOf('.test-css-Shorthand- {')).toBeGreaterThan(0);
+        expect(css.indexOf('.test-css-Shorthand {')).toBeGreaterThan(0);
         expect(css.indexOf('.test-css-Shorthand-bar {')).toBeGreaterThan(0);
         expect(css.indexOf(
-            '.test-css-Shorthand- .test-css-Shorthand-foo.test-css-Shorthand-bar {'
+            '.test-css-Shorthand .test-css-Shorthand-foo.test-css-Shorthand-bar {'
             )).toBeGreaterThan(0);
         expect(css.indexOf('.' + e.myCls())).toBeGreaterThan(0);
         expect(css.indexOf('.' + e.myCls('foo'))).toBeGreaterThan(0);
@@ -202,10 +202,10 @@ describe('U2', function() {
 
         expect(css.length).toBe(0);
         var e = test.css.ShorthandOverride.create(null, X);
-        expect(css.indexOf('.some-other-name- {')).toBeGreaterThan(0);
+        expect(css.indexOf('.some-other-name {')).toBeGreaterThan(0);
         expect(css.indexOf('.some-other-name-bar {')).toBeGreaterThan(0);
         expect(css.indexOf(
-            '.some-other-name- .some-other-name-foo.some-other-name-bar {'))
+            '.some-other-name .some-other-name-foo.some-other-name-bar {'))
           .toBeGreaterThan(0);
         expect(css.indexOf('.' + e.myCls())).toBeGreaterThan(0);
         expect(css.indexOf('.' + e.myCls('foo'))).toBeGreaterThan(0);

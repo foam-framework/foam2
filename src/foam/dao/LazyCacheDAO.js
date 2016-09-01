@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- // TODO: Don't use yet! Port awaiting manual testing
 
 /**
   LazyCacheDAO can cache successful results from find() and select() on its
@@ -26,16 +25,15 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'LazyCacheDAO',
   extends: 'foam.dao.ProxyDAO',
+  implements: [ 'foam.mlang.Expressions' ],
+
+  requires: [ 'foam.dao.ArraySink' ],
 
   properties: [
     {
+      /** Set to the desired cache, such as a foam.dao.MDAO. */
       name: 'cache',
       required: true
-      // TODO: old code did listening on cache... still needed?
-      //postSet: function(old, nu) {
-        //if (old) this.unlisten(old);
-        //if (nu) this.listen(nu);
-      //}
     },
     {
       /**
@@ -44,12 +42,24 @@ foam.CLASS({
         the cacheSync_ prop needs to be tickled to ensure the link exists.
         Change this to define an expression that defines a run-time 'thing'
         to be done between properties, and allows cleanup when re-evaluating.
+        @private
       */
       name: 'cacheSync_',
       expression: function(delegate, cache) {
-        return delegate.on.remove.sub(function(sub_, on_, remove_, obj) {
-          cache.remove(obj);
-        });
+        var s = this.cacheSyncSub_ = delegate.on.remove.sub(
+          function(sub_, on_, remove_, obj) {
+            cache.remove(obj);
+          }
+        );
+        return s;
+      }
+    },
+    {
+      /** Stores cleanup info for the cache sychronization subscription.
+        @private */
+      name: 'cacheSyncSub_',
+      postSet: function(old, nu) {
+        if ( old && old.destroy ) old.destroy();
       }
     },
     {
@@ -84,6 +94,7 @@ foam.CLASS({
       /**
         The active promises for remote finds in progress, for re-use
         by subsequent finds made before the previous resolves.
+        @private
       */
       name: 'finds_',
       hidden: true,
@@ -91,12 +102,21 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
+      /**
+        The active promises for remote selects in progress, for re-use
+        by subsequent selects made before the previous resolves.
+        @private
+      */
       name: 'selects_',
       hidden: true,
       transient: true,
       factory: function() { return {}; }
     },
     {
+      /**
+        Generates an internal key to uniquely identify a select.
+        @private
+      */
       class: 'Function',
       name: 'selectKey',
       value: function(sink, skip, limit, order, predicate /*string*/) {
@@ -107,6 +127,19 @@ foam.CLASS({
   ],
 
   methods: [
+
+    /** Ensures removal from both cache and delegate before resolving. */
+    function remove(obj) {
+      var self = this;
+      return self.cache.remove(obj).then(function() {
+        return self.delegate.remove(obj);
+      });
+    },
+
+    /**
+      Executes the find on the cache first, and if it fails triggers an
+      update from the delegate.
+    */
     function find(id) {
       var self = this;
       self.cacheSync_; // ensures listeners are set TODO: express this better
@@ -159,6 +192,13 @@ foam.CLASS({
       }
     },
 
+    /**
+      Executes the select on the cache first, and if it fails triggers an
+      update from the delegate.
+      <p>
+      If .cacheOnSelect is false, the select()
+      bypasses the cache and goes directly to the delegate.
+    */
     function select(sink, skip, limit, order, predicate) {
       if ( ! this.cacheOnSelect ) {
         return this.SUPER(sink, skip, limit, order, predicate);
@@ -178,7 +218,7 @@ foam.CLASS({
           promise:
             self.delegate.select(self.cache, skip, limit, order, predicate)
               .then(function(cache) {
-                self.notify_('reset', []);
+                self.pub('on', 'reset');
                 return cache;
               })
         }

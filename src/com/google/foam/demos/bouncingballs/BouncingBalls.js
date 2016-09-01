@@ -17,11 +17,29 @@
 
 foam.CLASS({
   package: 'com.google.foam.demos.bouncingballs',
+  name: 'FastCircle',
+  extends: 'foam.physics.PhysicalCircle',
+
+  methods: [
+    function paint(x) {
+      this.maybeInitCView(x);
+      x.fillStyle = this.color;
+      x.beginPath();
+      x.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+      x.fill();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.foam.demos.bouncingballs',
   name: 'BouncingBalls',
   extends: 'foam.graphics.Box',
 
   requires: [
-    'foam.physics.PhysicalCircle',
+//    'foam.physics.PhysicalCircle',
+    'com.google.foam.demos.bouncingballs.FastCircle as PhysicalCircle',
     'foam.util.Timer'
   ],
 
@@ -49,8 +67,8 @@ foam.CLASS({
           radius: 10+20*Math.random(),
           x: this.width  * Math.random(),
           y: this.height * Math.random(),
-          vx: 1 + Math.random()*10,
-          vy: 1 + Math.random()*10,
+          vx: 2 + Math.random()*10,
+          vy: 2 + Math.random()*10,
           border: null
         });
 
@@ -58,14 +76,17 @@ foam.CLASS({
 
         this.timer.i$.sub(foam.Function.bind(function(c, i) {
           c.color = 'hsl(' + ( i*347%180+this.timer.i*2) + ',100%,50%)';
-          if ( c.y < 0           ) c.vy =  Math.abs(c.vy);
-          if ( c.y > this.height ) c.vy = -Math.abs(c.vy);
-          if ( c.x < 0           ) c.vx =  Math.abs(c.vx);
-          if ( c.x > this.width  ) c.vx = -Math.abs(c.vx);
+          var x = c.x, y = c.y;
+          if ( y < 0           ) c.vy =  Math.abs(c.vy);
+          if ( y > this.height ) c.vy = -Math.abs(c.vy);
+          if ( x < 0           ) c.vx =  Math.abs(c.vx);
+          if ( x > this.width  ) c.vx = -Math.abs(c.vx);
           c.x += c.vx;
           c.y += c.vy;
         }, this, c, i));
       }
+
+      this.timer.i$.sub(this.invalidated.pub);
     }
   ]
 });

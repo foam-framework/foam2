@@ -36,11 +36,15 @@ foam.CLASS({
 
   properties: [
     {
+      /** The property to set uniquely. */
       class: 'String',
       name: 'property',
       value: 'id'
     },
     {
+      /** The starting sequence value. This will be calclated from the
+        existing contents of the delegate DAO, so it is one greater
+        than the maximum existing value. */
       class: 'Int',
       name: 'value',
       value: 1
@@ -52,7 +56,7 @@ foam.CLASS({
       expression: function(delegate, property) {
         // TODO: validate property self.of[self.property.toUpperCase()]
         var self = this;
-        return self.delegate.select(
+        return self.delegate.select( // TODO: make it a pipe?
           self.MAX(self.property_)
         ).then(
           function(max) {
@@ -62,6 +66,7 @@ foam.CLASS({
       }
     },
     {
+      /** @private */
       name: 'property_',
       hidden: true,
       expression: function(property, of) {
@@ -78,16 +83,23 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink) {
+    /** Sets the property on the given object and increments the next value.
+      If the unique starting value has not finished calculating, the returned
+      promise will not resolve until it is ready. */
+    function put(obj) {
       var self = this;
       return this.calcDelegateMax_.then(function() {
         var val = self.property_.f(obj);
 
         if ( ! val || val == self.property_.value ) {
           obj[self.property_.name] = self.value++;
+        } else if ( val && ( val >= self.value ) ) {
+          // if the object has a value, and it's greater than our current value,
+          // bump up the next value we try to auto-assign.
+          self.value = val + 1;
         }
 
-        return self.delegate.put(obj, sink);
+        return self.delegate.put(obj);
       });
     }
   ]

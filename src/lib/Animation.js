@@ -36,10 +36,10 @@ foam.LIB({
 //        janitor.onDestroy(obj.propertyChange(argNames[i]));
       }
 
-      foam.Function.withArgs(f, obj) {
+//       foam.Function.withArgs(f, obj) {
 
 
-      }
+//       }
 
       for ( var i = 0 ; i < argNames ; i++ ) {
         endValues[i] = obj[argNames[i]];

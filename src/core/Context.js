@@ -83,8 +83,12 @@
         console.assert(
             typeof cls.id === 'string',
             'Must have an .id property to be registered in a context.');
+
         doRegister(this.__cache__, cls.id);
-        if ( cls.package === 'foam.core' ) doRegister(this.__cache__, cls.name);
+
+        if ( cls.package === 'foam.core' ) {
+          doRegister(this.__cache__, cls.name);
+        }
       }
     },
 

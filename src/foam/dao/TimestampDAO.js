@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+/**
+  TimestampDAO is a decorator that sets the current time on each incoming
+  object with no existing value. By default, the .id property is set.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'TimestampDAO',
@@ -22,6 +26,9 @@ foam.CLASS({
 
   properties: [
     {
+      /**
+        The property of incoming objects to set.
+      */
       class: 'String',
       name: 'property',
       value: 'id'
@@ -29,11 +36,15 @@ foam.CLASS({
   ],
 
   methods: [
+    /** For each put() object, set the timestamp if .property is not
+      set for that object. */
     function put(obj) {
       if ( ! obj.hasOwnProperty(this.property) ) obj[this.property] = this.nextTimestamp();
       return this.delegate.put(obj);
     },
 
+    /** Generates a timestamp. Override to change the way timestamps are
+      created. */
     function nextTimestamp() {
       return Date.now();
     }
