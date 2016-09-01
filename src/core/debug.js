@@ -194,7 +194,7 @@ foam.AbstractClass.validate = function() {
   }
 }
 
-
+global.abc = 0;
 // Change 'false' to 'true' to enable error reporting for setting
 // non-Properties on FObjects.
 // TODO: add 'Did you mean...' support.
@@ -202,13 +202,14 @@ if ( false && Proxy ) {
   (function() {
 
     var IGNORE = {
-      'SUPER': true,
-      'obj': true,
-      'private_': true,
-      'prop': true,
-      'slotName_': true,
-      'sourceCls_': true,
-      'value': true
+      oldValue: true,
+      SUPER: true,
+      obj: true,
+      private_: true,
+      prop: true,
+      slotName_: true,
+      sourceCls_: true,
+      value: true
     };
 
     var oldCreate = foam.AbstractClass.create;
@@ -220,7 +221,8 @@ if ( false && Proxy ) {
         },
         set: function(target, prop, value, receiver) {
           foam.__context__.assert(
-              IGNORE[prop] || target.cls_.getAxiomByName(prop),
+              IGNORE[prop] || target.cls_.getAxiomByName(
+                prop.endsWith('$') ? prop.substring(0, prop.length-1) : prop),
               'Invalid Set: ', target.cls_.id, prop, value);
           target[prop] = value;
           return true;
