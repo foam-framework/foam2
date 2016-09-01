@@ -110,6 +110,7 @@ foam.CLASS({
       extends: 'foam.graphics.CView',
 
       properties: [
+        'a',
         [ 'width', 5 ],
         'radius'
       ],
