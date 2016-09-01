@@ -1102,9 +1102,10 @@ foam.CLASS({
 
       if ( es.length ) {
         for ( var i = 0 ; i < es.length ; i++ ) {
-          if ( foam.u2.Element.isInstance(es[i]) ||
-              this.Entity.isInstance(es[i]) ) {
+          if ( foam.u2.Element.isInstance(es[i]) ) {
             es[i].parentNode = this;
+          } else if ( this.Entity.isInstance(es[i]) ) {
+            // NOP
           } else {
             es[i] = this.sanitizeText(es[i]);
           }
