@@ -138,12 +138,121 @@ describe('CachingDAO-async', function() {
 });
 
 describe('DeDupDAO', function() {
-  // test caching against an IDBDAO remote and MDAO cache.
   genericDAOTestBattery(function(model) {
     var mDAO = foam.dao.MDAO.create({ of: model });
     return Promise.resolve(foam.dao.DeDupDAO.create({ delegate: mDAO }));
   });
 });
+
+describe('SequenceNumberDAO', function() {
+
+  var mDAO;
+  var sDAO;
+
+  genericDAOTestBattery(function(model) {
+    mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.SequenceNumberDAO.create({ delegate: mDAO, of: model }));
+  });
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+
+    mDAO = foam.dao.MDAO.create({ of: test.CompA });
+    sDAO = foam.dao.SequenceNumberDAO.create({ delegate: mDAO, of: test.CompA });
+  });
+
+  it('assigns sequence numbers to objects missing the value', function(done) {
+    var a = test.CompA.create({ a: 4 }); // id not set
+    sDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].id).toEqual(1);
+        a = test.CompA.create({ a: 6 }); // id not set
+        return sDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(2);
+            expect(sink.a[0].id).toEqual(1);
+            expect(sink.a[0].a).toEqual(4);
+            expect(sink.a[1].id).toEqual(2);
+            expect(sink.a[1].a).toEqual(6);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('skips sequence numbers to objects with an existing value', function(done) {
+    var a = test.CompA.create({ id: 3, a: 4 });
+    sDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].id).toEqual(3);
+        a = test.CompA.create({ id: 2, a: 6 });
+        return sDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(2);
+            expect(sink.a[0].id).toEqual(2);
+            expect(sink.a[0].a).toEqual(6);
+            expect(sink.a[1].id).toEqual(3);
+            expect(sink.a[1].a).toEqual(4);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('does not reuse sequence numbers from objects with an existing value', function(done) {
+    var a = test.CompA.create({ id: 1, a: 4 });
+    sDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].id).toEqual(1);
+        a = test.CompA.create({ a: 6 }); // id not set
+        return sDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(2);
+            expect(sink.a[0].id).toEqual(1);
+            expect(sink.a[0].a).toEqual(4);
+            expect(sink.a[1].id).toEqual(2);
+            expect(sink.a[1].a).toEqual(6);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('starts from the existing max value', function(done) {
+
+    mDAO.put(test.CompA.create({ id: 568, a: 4 }));
+    mDAO.put(test.CompA.create({ id: 45, a: 5 }));
+
+    var a = test.CompA.create({ a: 6 }); // id not set
+    sDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(3);
+        expect(sink.a[0].id).toEqual(45);
+        expect(sink.a[1].id).toEqual(568);
+        expect(sink.a[2].id).toEqual(569);
+        a = test.CompA.create({ a: 6 }); // id not set
+        return sDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(4);
+            expect(sink.a[3].id).toEqual(570);
+            done();
+          });
+        });
+      });
+    });
+  });
+});
+
 
 describe('LRUDAOManager', function() {
   var mDAO;
