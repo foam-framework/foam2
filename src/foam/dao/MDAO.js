@@ -34,6 +34,7 @@ foam.CLASS({
     'foam.dao.index.TreeIndex',
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.True',
     'foam.mlang.sink.Explain'
   ],
 
@@ -191,11 +192,11 @@ foam.CLASS({
       } else {
         // object not found is ok, remove post-condition still met
         return Promise.resolve();
-      }      
+      }
     },
 
     function removeAll(skip, limit, order, predicate) {
-      if ( ! predicate ) predicate = this.True;
+      if ( ! predicate ) predicate = this.True.create();
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {

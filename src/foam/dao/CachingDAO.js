@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// TODO: Don't use yet! Port awaiting manual testing
 
 /**
-  CachingDAO will do all queries from its fast delegate (cache). Writes
-  are sent through to the src, which will eventually update the cache.
-  The cache maintains full copy of the src, but the src is the source
-  of truth.
+  CachingDAO will do all queries from its fast cache. Writes
+  are sent through to the src and cached before resolving any put() or
+  remove().
+  <p>
+  You can use a foam.dao.EasyDAO with caching:true to use caching
+  automatically with an indexed MDAO cache.
+  <p>
+  The cache maintains full copy of the src, but the src is considered the
+  source of truth.
 */
 foam.CLASS({
   package: 'foam.dao',
@@ -59,10 +63,15 @@ foam.CLASS({
       name: 'cache',
     },
     {
-      /** Read operations and notifications go to the cache, waiting
+      /**
+        Set .cache rather than using delegate directly.
+        Read operations and notifications go to the cache, waiting
         for the cache to preload the complete src state. 'Unforward'
-        ProxyDAO's default forwarding of put/remove/removeAll. */
+        ProxyDAO's default forwarding of put/remove/removeAll.
+        @private
+      */
       name: 'delegate',
+      hidden: true,
       forwards: [ 'find', 'select' ],
       expression: function(src, cache) {
         // Preload src into cache, then proxy everything to cache that we
@@ -81,38 +90,51 @@ foam.CLASS({
       }
     },
   ],
-  
+
   methods: [
+    /** Puts are sent to the cache and to the source, ensuring both
+      are up to date. */
     function put(o) {
       var self = this;
-      return self.delegate.put(o).then(function() {
-        return self.src.put(o);
+      // ensure the returned object from src is cached.
+      return self.src.put(o).then(function(srcObj) {
+        return self.delegate.put(srcObj);
       })
     },
+    /** Removes are sent to the cache and to the source, ensuring both
+      are up to date. */
     function remove(o) {
       var self = this;
-      return self.delegate.remove(o).then(function() {
-        return self.src.remove(o);
+      return self.src.remove(o).then(function() {
+        return self.delegate.remove(o);
       })
-    }, 
-    function removeAll(a, b, c, d, e, f) {
+    },
+   /** removeAll is executed on the cache and the source, ensuring both
+      are up to date. */
+    function removeAll(skip, limit, order, predicate) {
       var self = this;
-      return self.delegate.removeAll(a, b, c, d, e, f).then(function() {
-        return self.src.removeAll(a, b, c, d, e, f);
+      return self.src.removeAll(skip, limit, order, predicate).then(function() {
+        return self.delegate.removeAll(skip, limit, order, predicate);
       })
     }
 
   ],
 
   listeners: [
+    /** Keeps the cache in sync with changes from the source.
+      @private */
     function onSrcPut(s, on, put, obj) {
       this.delegate.put(obj);
     },
 
+    /** Keeps the cache in sync with changes from the source.
+      @private */
     function onSrcRemove(s, on, remove, obj) {
       this.delegate.remove(obj);
     },
 
+    /** Keeps the cache in sync with changes from the source.
+      @private */
     function onSrcReset() {
       // TODO: Should this removeAll from the cache?
     }

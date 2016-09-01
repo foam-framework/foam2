@@ -29,11 +29,13 @@ foam.CLASS({
 
   properties: [
     {
+      /** The maximum size to allow the target dao to be. */
       class: 'Int',
       name: 'maxSize',
       value: 100
     },
     {
+      /** Tracks the age of items in the target dao. */
       name: 'trackingDAO',
       factory: function() {
         return this.MDAO.create({ of: this.LRUCacheItem });
@@ -81,6 +83,8 @@ foam.CLASS({
   ],
 
   listeners: [
+    /** Adds the put() item to the tracking dao, runs cleanup() to check
+      the dao size. */
     function onPut(s, on, put, obj) {
       var self = this;
       this.trackingDAO.put(
@@ -93,20 +97,26 @@ foam.CLASS({
       });
     },
 
+    /** Clears the remove()'d item from the tracking dao. */
     function onRemove(s, on, remove, obj) {
       // ensure tracking DAO is cleaned up
       this.trackingDAO.remove(obj);
     },
+    /** On reset, clear the tracking dao. */
     function onReset(s, on, reset, obj) {
       this.trackingDAO.removeAll(obj);
     },
   ],
 
   methods: [
+    /** Calculates a timestamp to use in the tracking dao. Override to
+      provide a different timestamp calulation. */
     function getTimestamp() {
+      // Just increment on each request.
       return this.lastTimeUsed_++;
     },
 
+    /**  */
     function cleanup() {
       var self = this;
       self.trackingDAO

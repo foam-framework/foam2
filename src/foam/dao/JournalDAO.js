@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+/**
+  Used by JournalDAO to store the state of an object at a specific time.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalEntry',
@@ -22,10 +25,13 @@ foam.CLASS({
   properties: [
     'id',
     {
+      /** The object state to store */
       class: 'FObjectProperty',
       name: 'record'
     },
     {
+      /** Set true if this record was a removal of the object, not an
+        update or add. */
       class: 'Boolean',
       name: 'isRemove',
       value: false
@@ -33,7 +39,11 @@ foam.CLASS({
   ]
 });
 
-
+/**
+  Saves each addition, update, or removal of objects to the delegate DAO.
+  Previous state for the object is stored, so the journal can replay
+  the object put() and remove() events to recreate the delegate DAO.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalDAO',

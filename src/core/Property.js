@@ -163,6 +163,16 @@ foam.CLASS({
 
     [
       /**
+        Called to convert a string into a value suitable for this property.
+        Eg. this might convert strings to numbers, or parse RFC 2822 timestamps.
+        By default it simply returns the string unchanged.
+       */
+      'fromString',
+      function(str) { return str; }
+    ],
+
+    [
+      /**
         Compare two values taken from this property.
         <p>Used by Property.compare().
         It is a property rather than a method so that it can be configured

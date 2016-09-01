@@ -52,7 +52,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'CSS',
@@ -99,8 +98,19 @@ foam.CLASS({
       /* Performs expansion of the ^ shorthand on the CSS. */
       // TODO(braden): Parse and validate the CSS.
       // TODO(braden): Add the automatic prefixing once we have the parser.
-      return text.replace(/\^/g,
-          '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id)) + '-');
+      var base = '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id));
+      return text.replace(/\^(.)/g, function(match, next) {
+        var c = next.charCodeAt(0);
+        // Check if the next character is an uppercase or lowercase letter,
+        // number, - or _. If so, add a - because this is a modified string.
+        // If not, there's no extra -.
+        if ( (65 <= c && c <= 90) || (97 <= c && c <= 122) ||
+            (48 <= c && c <= 57) || c === 45 || c === 95 ) {
+          return base + '-' + next;
+        } else {
+          return base + next;
+        }
+      });
     }
   ]
 });
@@ -225,13 +235,13 @@ foam.CLASS({
       return this.UNLOADED.output.call(this, out);
     },
     function load() {
-      this.state = this.LOADED;
       for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
         var l = this.elListeners[i];
         this.addEventListener_(l[0], l[1]);
       }
 
       this.visitChildren('load');
+      this.state = this.LOADED;
       if ( this.focused ) this.el().focus();
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
@@ -673,10 +683,8 @@ foam.CLASS({
       */
       var base = this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id);
 
-      if ( ! opt_extra ) opt_extra = '';
-
       return base.split(/ +/).
-          map(function(c) { return c + '-' + opt_extra; }).
+          map(function(c) { return c + (opt_extra ? '-' + opt_extra : ''); }).
           join(' ');
     },
 

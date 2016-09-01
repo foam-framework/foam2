@@ -4,3 +4,4 @@ server.bat
 *~
 coverage
 doc/gen/*
+**/bower_components/*

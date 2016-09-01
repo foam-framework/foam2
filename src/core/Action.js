@@ -49,6 +49,9 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      name: 'icon'
+    },
+    {
       class: 'String',
       name: 'help'
     },

@@ -15,17 +15,27 @@
  * limitations under the License.
  */
 
+
+/**
+  DeDupDAO is a decorator that internalizes strings in put() objects
+  to save memory. Useful for indexed or cached data.
+  <p>
+  Use a foam.dao.EasyDAO with dedup:true to automatically apply deduplication.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'DeDupDAO',
   extends: 'foam.dao.ProxyDAO',
 
   methods: [
+    /** Scan each object for strings and internalize them. */
     function put(obj) {
       this.dedup(obj);
       return this.delegate.put(obj);
     },
 
+    /** Internalizes strings in the given object.
+      @private */
     function dedup(obj) {
       var inst = obj.instance_;
       for ( var key in inst ) {

@@ -15,6 +15,16 @@
  * limitations under the License.
  */
 
+
+/** GUIDDAO is a decorator that sets a property on incoming objects to be
+  a new random GUID (globally unique identifier). Incoming objects with
+  any existing value set are not altered. By default, the .id property
+  is used.
+  <p>
+  Use a foam.dao.EasyDAO with guid:true to automatically set GUIDs. Set
+  EasyDAO.seqProperty to the desired property name or use the default
+  of 'id'.
+*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'GUIDDAO',
@@ -22,6 +32,8 @@ foam.CLASS({
 
   properties: [
     {
+      /** The property to set with a random GUID value, if not already set
+        on put() objects. */
       class: 'String',
       name: 'property',
       value: 'id'
@@ -29,6 +41,8 @@ foam.CLASS({
   ],
 
   methods: [
+    /** Ensures all objects put() in have a unique id set.
+      @arg obj the object to process. */
     function put(obj) {
       if ( ! obj.hasOwnProperty(this.property) ) {
         obj[this.property] = foam.uuid.randomGUID();

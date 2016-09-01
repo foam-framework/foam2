@@ -49,6 +49,10 @@ foam.CLASS({
           v ? parseInt(v) :
           0 ;
       }
+    ],
+    [ 'fromString', function intFromString(str) {
+        return str ? parseInt(str) : 0;
+      }
     ]
   ]
 });

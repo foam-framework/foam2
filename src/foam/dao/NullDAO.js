@@ -14,29 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
-  ContextualizingDAO recreates objects returned by find(), giving them
-  access to the exports that this ContextualizingDAO has access to.
-  <p>
-  If using a foam.dao.EasyDAO, set contextualize:true to automatically
-  contextualize objects returned by find().
-*/
 foam.CLASS({
   package: 'foam.dao',
-  name: 'ContextualizingDAO',
-  extends: 'foam.dao.ProxyDAO',
+  name: 'NullDAO',
+  extends: 'foam.dao.AbstractDAO',
 
-  // TODO: notify put too?
-
+  requires: [
+    'foam.dao.ExternalException',
+    'foam.dao.ObjectNotFoundException'
+  ],
   methods: [
-    /** Found objects are re-created as if this DAO had created them, giving
-      them access to the exports that this DAO has access to. */
+    function put(obj) {
+      return Promise.reject(this.ExternalException.create({
+        message: 'NullDAO: Cannot handle put()'
+      }));
+    },
+    function remove(obj) {
+      return Promise.resolve();
+    },
     function find(id) {
-      return this.delegate.find(id).then(function(obj) {
-        return obj.cls_.create(obj, this);
-      });
+      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
+    },
+    function select(sink) {
+      sink.eof();
+      return Promise.resolve(sink);
+    },
+    function removeAll() {
     }
-    // TODO: select() too?
   ]
 });
