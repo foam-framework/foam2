@@ -195,6 +195,11 @@ foam.CLASS({
   ],
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Object',
+  extends: 'Property'
+});
 
 // TODO(adam): Better name for this?
 foam.CLASS({
