@@ -387,10 +387,6 @@ foam.CLASS({
     'foam.graphics.Transform'
   ],
 
-  // An optional function taken from context to be called if this object
-  // becomes invalid and needs to be repainted.
-  exports: [ 'invalidate' ],
-
   // Fires when this CView is invalidated and needs a repaint.
   // Is listened to a foam.u2.Canvas() if one was created for
   // this CView.
@@ -491,21 +487,26 @@ foam.CLASS({
       // a property of a child changes. Only works if this CView has
       // an associated Canvas (by calling toE()).
       class: 'Boolean',
-      name: 'autoRepaint'
+      name: 'autoRepaint',
+      value: true
     },
     {
-      name: 'invalidate',
+      name: 'invalidate_',
       factory: function() {
-        return this.autoRepaint ?
-          this.invalidated.pub :
-          this.__context__.invalidate;
+        return this.parent ? this.parent.invalidate_ :
+          this.autoRepaint ? this.invalidated.pub   :
+          null ;
       }
     }
   ],
 
   methods: [
     function initCView() {
-      this.invalidate && this.propertyChange.sub(this.invalidate);
+      this.invalidate_ && this.propertyChange.sub(this.invalidate_);
+    },
+
+    function invalidate() {
+      this.invalidate_ && this.invalidate_();
     },
 
     function toLocalCoordinates(p) {
@@ -623,7 +624,7 @@ foam.CLASS({
 
     function removeChild_(c) {
       c.parent = undefined;
-      this.invalidate && this.invalidate();
+      this.invalidate();
       return c;
     },
 
@@ -632,7 +633,7 @@ foam.CLASS({
         this.children.push(arguments[i]);
         this.addChild_(arguments[i]);
       }
-      this.invalidate && this.invalidate();
+      this.invalidate();
     },
 
     function paintSelf(x) {},
