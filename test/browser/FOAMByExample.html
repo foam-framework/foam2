@@ -475,6 +475,7 @@ log(Person.SALARY.cls_.name);
 var o = Person.create({name:'John'});
 log(o.salary);
 
+// Currently unsupported and unlikely to be supported.
 // Refine a Property Class
 foam.CLASS({ name: 'Salary', extends: 'Float' });
 foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
@@ -486,12 +487,14 @@ foam.CLASS({ name: 'Emp2', properties: [ { class: 'Float', name: 'salary' } ] })
 foam.CLASS({ refines: 'Float', properties: [ [ 'javaClass', 'Float' ] ]});
 log(Emp2.SALARY.javaClass);
 
+// Currently unsupported and unlikely to be supported.
 // Refine a SuperProperty Class
 foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
 log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
 
+// Currently unsupported and unlikely to be supported.
 // Refine a SuperProperty Class
 foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
@@ -1225,7 +1228,7 @@ try {
   var o = ImportsTest.create();
   o.foo();
 } catch(e) {
-  log(e);
+  log('Could not import "myLogger" since nobody provided it.');
 }
 Y.myLogger('test');
 var o = ImportsTest.create(null, Y);
@@ -1235,13 +1238,13 @@ o.foo();
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log', 'log as warn' ],
+  exports: [ 'myLogger' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
     },
-    function log(msg) {
-      console.log('log:', msg);
+    function myLogger(msg) {
+      console.log('log from ExportsTest:', msg);
     }
   ]
 });
