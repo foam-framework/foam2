@@ -56,7 +56,7 @@ foam.CLASS({
       expression: function(delegate, property) {
         // TODO: validate property self.of[self.property.toUpperCase()]
         var self = this;
-        return self.delegate.select(
+        return self.delegate.select( // TODO: make it a pipe?
           self.MAX(self.property_)
         ).then(
           function(max) {
@@ -93,6 +93,10 @@ foam.CLASS({
 
         if ( ! val || val == self.property_.value ) {
           obj[self.property_.name] = self.value++;
+        } else if ( val && ( val >= self.value ) ) {
+          // if the object has a value, and it's greater than our current value,
+          // bump up the next value we try to auto-assign.
+          self.value = val + 1;
         }
 
         return self.delegate.put(obj);

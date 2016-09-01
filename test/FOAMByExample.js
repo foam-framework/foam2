@@ -917,6 +917,7 @@ log(o.salary);
 foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
+// Currently unsupported and unlikely to be supported.
 // Refine a Property Class
 foam.CLASS({ name: 'Salary', extends: 'Float' });
 foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
@@ -925,7 +926,7 @@ log(Emp.create().salary);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 44, str: " <b>&gt;</b> 30000" });
+  expect(log_.output).toMatchGolden({ i: 44, str: " <b>&gt;</b> 0" });
 
 
 // Example 45
@@ -946,6 +947,7 @@ log(Emp2.SALARY.javaClass);
 foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
+// Currently unsupported and unlikely to be supported.
 // Refine a SuperProperty Class
 foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
@@ -954,13 +956,14 @@ log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 46, str: " <b>&gt;</b> super:  42 sub:  42" });
+  expect(log_.output).toMatchGolden({ i: 46, str: " <b>&gt;</b> super:  42 sub:  " });
 
 
 // Example 47
 foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
+// Currently unsupported and unlikely to be supported.
 // Refine a SuperProperty Class
 foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
@@ -970,7 +973,7 @@ log('super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', S
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 47, str: " <b>&gt;</b> super:  42 mid:  42 sub:  42" });
+  expect(log_.output).toMatchGolden({ i: 47, str: " <b>&gt;</b> super:  42 mid:  42 sub:  " });
 
 
 // Example 48
@@ -2204,7 +2207,7 @@ try {
   var o = ImportsTest.create();
   o.foo();
 } catch(e) {
-  log(e);
+  log('Could not import "myLogger" since nobody provided it.');
 }
 Y.myLogger('test');
 var o = ImportsTest.create(null, Y);
@@ -2212,7 +2215,7 @@ o.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 117, str: "warn: Access missing import: myLogger <b>&gt;</b> TypeError: this.myLogger is not a functionlog: testlog: log foo from ImportTest" });
+  expect(log_.output).toMatchGolden({ i: 117, str: "warn: Access missing import: myLogger <b>&gt;</b> Could not import \"myLogger\" since nobody provided it.log: testlog: log foo from ImportTest" });
 
 
 // Example 118
@@ -2223,13 +2226,13 @@ try {
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log', 'log as warn' ],
+  exports: [ 'myLogger' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
     },
-    function log(msg) {
-      console.log('log:', msg);
+    function myLogger(msg) {
+      console.log('log from ExportsTest:', msg);
     }
   ]
 });
@@ -2237,7 +2240,7 @@ ExportsTest.create();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 118, str: "warn: Access missing import: myLogger <b>&gt;</b> Exception:  TypeError: this.myLogger is not a function" });
+  expect(log_.output).toMatchGolden({ i: 118, str: "log from ExportsTest: log foo from ImportTest" });
 
 
 // Example 119

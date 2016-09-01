@@ -43,7 +43,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'extends',
-      value: 'foam.core.FObject'
+      preSet: function(_, a) {
+        if ( a === 'FObject' ) return 'AbstractFObject';
+        return a;
+      }
     },
     {
       class: 'StringArray',
@@ -348,11 +351,17 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'javaType'
+      name: 'javaType',
+      value: 'Object'
     },
     {
       class: 'String',
-      name: 'javaJsonParser'
+      name: 'javaJSONParser',
+      value: 'foam.lib.json.AnyPArser'
+    },
+    {
+      class: 'String',
+      name: 'javaInfoType'
     },
     {
       class: 'String',
@@ -387,30 +396,25 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
       name: 'axiomClassInfo',
       template: function() {/*<% var cls = arguments[1]; %>
   .addProperty(
-    new AbstractPropertyInfo() {
+    new <%= this.javaInfoType %>() {
       @Override
       public String getName() { return "<%= this.name %>"; }
 
       @Override
-      public Object get(Object obj) {
+      public Object get(Object o) {
+        return get_(o);
+      }
+
+      public <%= this.javaType %> get_(Object obj) {
         return ((<%= cls.name %>)obj).get<%= foam.String.capitalize(this.name) %>();
       }
 
       @Override
-      public void set(Object obj, Object value) {<%
-// TODO(adamvy): There should be a more polymorphic way of doing this.
-// or we shouldn't support Array properties and use Lists instead.
-if ( foam.core.FObjectArray.isInstance(this) ) { %>
-        Object[] src = (Object[])value;
-        <%= this.javaType %> a = new <%= this.of %>[src.length];
-        System.arraycopy(src, 0, a, 0, src.length);
-        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>(a);
-<% } else { %>
+      public void set(Object obj, Object value) {
         ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
-<% } %>
       }
 
-<% if ( this.javaOutputJSON ) { %>
+<% if ( this.javaToJSON ) { %>
       @Override
       public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
 <%= this.javaToJSON %>
@@ -418,10 +422,92 @@ if ( foam.core.FObjectArray.isInstance(this) ) { %>
 <% } %>
 
       @Override
+      public int compare(Object o1, Object o2) {
+        return compareValues((<%= this.javaType %>)get(o1), (<%= this.javaType %>)get(o2));
+      }
+
+      @Override
       public foam.lib.parse.Parser jsonParser() {
-        return new <%= this.javaJsonParser %>();
+        return new <%= this.javaJSONParser %>();
       }})
 */}
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'PropertyInfo',
+  properties: [
+    {
+      class: 'String',
+      name: 'className'
+    },
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'String',
+      name: 'parent'
+    },
+    {
+      class: 'String',
+      name: 'getter',
+      expression: function(className, name, type) {
+        return 'return ((' + className + ')obj).set' + foam.String.capitalize(name) + '((' + type + ')value);\n'
+      }
+    },
+    {
+      class: 'String',
+      name: 'setter',
+      expression: function(className, name, type) {
+        return '((' + className + ')obj).set' + foam.String.capitalize(name) + '((' + type + ')value);\n';
+      }
+    },
+    {
+      class: 'String',
+      name: 'toJSON'
+    },
+    {
+      class: 'String',
+      name: 'jsonParser',
+      value: 'foam.lib.json.AnyParser'
+    }
+  ],
+  templates: [
+    {
+      name: 'code',
+      template: function() {/*
+    new <%= this.parent %>() {
+      @Override
+      public String getName() { return "<%= this.name %>"; }
+
+      @Override
+      public Object get(Object obj) {
+        <%= this.getter %>
+      }
+
+      @Override
+      public void set(Object obj, Object value) {
+        <%= this.setter %>
+      }
+
+<% if ( this.toJSON ) { %>
+      @Override
+      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
+<%= this.toJSON %>
+      }
+<% } %>
+
+      @Override
+      public foam.lib.parse.Parser jsonParser() {
+        return new <%= this.jsonParser %>();
+      }}*/}
     }
   ]
 });
@@ -430,12 +516,9 @@ if ( foam.core.FObjectArray.isInstance(this) ) { %>
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
-    {
-      class: 'String',
-      name: 'javaType',
-      value: 'String'
-    },
-    ['javaJsonParser', 'foam.lib.json.StringParser']
+    ['javaType', 'String'],
+    ['javaInfoType', 'AbstractStringPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.StringParser']
   ]
 });
 
@@ -444,16 +527,8 @@ foam.CLASS({
   refines: 'foam.core.Int',
   properties: [
     ['javaType', 'int'],
-    ['javaJsonParser', 'foam.lib.json.IntParser']
-  ]
-});
-
-
-foam.CLASS({
-  refines: 'foam.core.Array',
-  properties: [
-    ['javaType', 'Object[]'],
-    ['javaJsonParser', 'foam.lib.json.ArrayParser']
+    ['javaInfoType', 'AbstractIntPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.IntParser']
   ]
 });
 
@@ -466,7 +541,68 @@ foam.CLASS({
         return of ? of : 'foam.core.FObject';
       }
     },
-    ['javaJsonParser', 'foam.lib.json.FObjectParser']
+    ['javaInfoType', 'AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Array',
+  properties: [
+    ['javaType', 'Object[]'],
+    ['javaInfoType', 'AbstractPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.ArrayParser']
+  ],
+  templates: [
+    {
+      name: 'axiomClassInfo',
+      template: function() {/*<% var cls = arguments[1]; %>
+  .addProperty(
+    new <%= this.javaInfoType %>() {
+      @Override
+      public String getName() { return "<%= this.name %>"; }
+
+      @Override
+      public Object get(Object o) {
+        return get_(o);
+      }
+
+      public <%= this.javaType %> get_(Object obj) {
+        return ((<%= cls.name %>)obj).get<%= foam.String.capitalize(this.name) %>();
+      }
+
+      @Override
+      public void set(Object obj, Object value) {
+        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
+      }
+
+<% if ( this.javaToJSON ) { %>
+      @Override
+      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
+<%= this.javaToJSON %>
+      }
+<% } %>
+
+      public int compare(Object o1, Object o2) {
+        <%= this.javaType %> values1 = get_(o1);
+        <%= this.javaType %> values2 = get_(o2);
+        if ( values1.length > values2.length ) return 1;
+        if ( values1.length < values2.length ) return -1;
+
+        int result;
+        for ( int i = 0 ; i < values1.length ; i++ ) {
+          result = ((Comparable)values1[i]).compareTo(values2[i]);
+          if ( result != 0 ) return result;
+        }
+        return 0;
+      }
+
+      @Override
+      public foam.lib.parse.Parser jsonParser() {
+        return new <%= this.javaJSONParser %>();
+      }})*/}
+    }
   ]
 });
 
@@ -481,8 +617,59 @@ foam.CLASS({
       }
     },
     {
-      name: 'javaJsonParser',
+      name: 'javaJSONParser',
       value: 'foam.lib.json.FObjectArrayParser'
+    },
+    ['javaInfoType', 'AbstractPropertyInfo']
+  ],
+  templates: [
+    {
+      name: 'axiomClassInfo',
+      template: function() {/*<% var cls = arguments[1]; %>
+  .addProperty(
+    new <%= this.javaInfoType %>() {
+      @Override
+      public String getName() { return "<%= this.name %>"; }
+
+      @Override
+      public Object get(Object o) {
+        return get_(o);
+      }
+
+      public <%= this.javaType %> get_(Object obj) {
+        return ((<%= cls.name %>)obj).get<%= foam.String.capitalize(this.name) %>();
+      }
+
+      @Override
+      public void set(Object obj, Object value) {
+        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
+      }
+
+<% if ( this.javaToJSON ) { %>
+      @Override
+      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
+<%= this.javaToJSON %>
+      }
+<% } %>
+
+      public int compare(Object o1, Object o2) {
+        <%= this.javaType %> values1 = get_(o1);
+        <%= this.javaType %> values2 = get_(o2);
+        if ( values1.length > values2.length ) return 1;
+        if ( values1.length < values2.length ) return -1;
+
+        int result;
+        for ( int i = 0 ; i < values1.length ; i++ ) {
+          result = ((Comparable)values1[i]).compareTo(values2[i]);
+          if ( result != 0 ) return result;
+        }
+        return 0;
+      }
+
+      @Override
+      public foam.lib.parse.Parser jsonParser() {
+        return new <%= this.javaJSONParser %>();
+      }})*/}
     }
   ]
 });
@@ -491,6 +678,33 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   properties: [
     ['javaType', 'boolean'],
-    ['javaJsonParser', 'foam.lib.json.BooleanParser']
+    ['javaJSONParser', 'foam.lib.json.BooleanParser'],
+    ['javaInfoType', 'AbstractBooleanPropertyInfo']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.MultiPartID',
+  properties: [
+    ['javaType', 'Object']
+  ],
+  templates: [
+    {
+      name: 'axiomJavaSource',
+      template: function() {/* */}
+    },
+    {
+      name: 'axiomClassInfo',
+      template: function() {/* */}
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Object',
+  properties: [
+    ['javaType', 'Object'],
+    ['javaJSONParser', 'foam.lib.json.AnyParser'],
+    ['javaInfoType', 'AbstractObjectPropertyInfo']
   ]
 });

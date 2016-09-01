@@ -27,9 +27,8 @@ foam.CLASS({
       name: 'stopped'
     },
     {
-      name: 'errorEvt',
-      javaType: 'Object',
-      javaJsonParser: 'foam.lib.json.AnyParser'
+      class: 'Object',
+      name: 'errorEvt'
     }
   ],
 

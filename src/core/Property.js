@@ -233,45 +233,45 @@ foam.CLASS({
         c.axiomMap_[prop.name] = prop;
       }
 
-      var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
-        // We only care about Property axioms.
+      // var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
+      //   // We only care about Property axioms.
 
-        // FUTURE: we really only care about those properties that affect
-        // the definition of the property getter and setter, so an extra
-        // check would help eliminate extra reinstalls.
+      //   // FUTURE: we really only care about those properties that affect
+      //   // the definition of the property getter and setter, so an extra
+      //   // check would help eliminate extra reinstalls.
 
-        // Handle special case of axiom being installed into itself.
-        // For example foam.core.String has foam.core.String axioms for things
-        // like "label"
-        // In the future this shouldn't be required if a reinstall is
-        // only triggered on this which affect getter/setter.
-        if ( prop.cls_ === c ) {
-          return;
-        }
+      //   // Handle special case of axiom being installed into itself.
+      //   // For example foam.core.String has foam.core.String axioms for things
+      //   // like "label"
+      //   // In the future this shouldn't be required if a reinstall is
+      //   // only triggered on this which affect getter/setter.
+      //   if ( prop.cls_ === c ) {
+      //     return;
+      //   }
 
-        if ( foam.core.Property.isInstance(axiom) ) {
-          // console.log('**************** Updating Property: ', c.name, prop.name);
-          c.installAxiom(prop);
-        }
-      });
+      //   if ( foam.core.Property.isInstance(axiom) ) {
+      //     // console.log('**************** Updating Property: ', c.name, prop.name);
+      //     c.installAxiom(prop);
+      //   }
+      // });
 
-      // If the superProp is updated, then reinstall this property
-      c.__proto__.pubsub_ && c.__proto__.pubsub_.sub(
-        'installAxiom',
-        this.name,
-        reinstall
-      );
+      // // If the superProp is updated, then reinstall this property
+      // c.__proto__.pubsub_ && c.__proto__.pubsub_.sub(
+      //   'installAxiom',
+      //   this.name,
+      //   reinstall
+      // );
 
-      // If the class of this Property changes, then also reinstall
-      if (
-        c.id !== 'foam.core.Property' &&
-        c.id !== 'foam.core.Model'    &&
-        c.id !== 'foam.core.Method'   &&
-        c.id !== 'foam.core.FObject'  &&
-        this.cls_.id !== 'foam.core.FObject'
-      ) {
-        this.cls_.pubsub_.sub('installAxiom', reinstall);
-      }
+      // // If the class of this Property changes, then also reinstall
+      // if (
+      //   c.id !== 'foam.core.Property' &&
+      //   c.id !== 'foam.core.Model'    &&
+      //   c.id !== 'foam.core.Method'   &&
+      //   c.id !== 'foam.core.FObject'  &&
+      //   this.cls_.id !== 'foam.core.FObject'
+      // ) {
+      //   this.cls_.pubsub_.sub('installAxiom', reinstall);
+      // }
 
       c.installConstant(prop.name, prop);
     },

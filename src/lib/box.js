@@ -611,9 +611,8 @@ foam.CLASS({
   extends: 'foam.box.Message',
   properties: [
     {
-      name: 'data',
-      javaType: 'Object',
-      javaJsonParser: 'foam.lib.json.AnyParser'
+      class: 'Object',
+      name: 'data'
     }
   ]
 });

@@ -25,6 +25,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'LazyCacheDAO',
   extends: 'foam.dao.ProxyDAO',
+  implements: [ 'foam.mlang.Expressions' ],
+
+  requires: [ 'foam.dao.ArraySink' ],
 
   properties: [
     {
@@ -124,6 +127,15 @@ foam.CLASS({
   ],
 
   methods: [
+
+    /** Ensures removal from both cache and delegate before resolving. */
+    function remove(obj) {
+      var self = this;
+      return self.cache.remove(obj).then(function() {
+        return self.delegate.remove(obj);
+      });
+    },
+
     /**
       Executes the find on the cache first, and if it fails triggers an
       update from the delegate.
@@ -206,7 +218,7 @@ foam.CLASS({
           promise:
             self.delegate.select(self.cache, skip, limit, order, predicate)
               .then(function(cache) {
-                self.notify_('reset', []);
+                self.pub('on', 'reset');
                 return cache;
               })
         }
