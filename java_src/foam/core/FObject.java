@@ -1,5 +1,5 @@
 package foam.core;
 
-public abstract class FObject extends ContextAwareSupport {
-  public abstract ClassInfo getClassInfo();
+public interface FObject extends ContextAware, Comparable {
+  public ClassInfo getClassInfo();
 }
