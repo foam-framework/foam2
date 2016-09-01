@@ -405,18 +405,55 @@ describe('LRUDAOManager', function() {
   it('handles a dao switch', function(done) {
     // Note that MDAO and LRU do not go async for this test
 
+    // swap dao
     mDAO2 = foam.dao.MDAO.create({ of: test.CompA });
     lruManager.dao = mDAO2;
 
+    // original dao should not be managed
     mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
     mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
     mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
     mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
+    mDAO.put(test.CompA.create({ id: 5, a: 'five' }));
 
-    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
-      expect(counter.value).toEqual(4);
-      done();
-    });
+    // LRU updates the dao slighly asynchronously, so give the notifies a
+    // frame to propagate (relevant for browser only, node promises are sync-y
+    // enough to get by)
+    setTimeout(function() {
+      mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+        expect(counter.value).toEqual(5);
+      });
+    }, 100);
+
+
+    //////// new dao should be managed.
+    mDAO2.put(test.CompA.create({ id: 1, a: 'one' }));
+    mDAO2.put(test.CompA.create({ id: 2, a: 'two' }));
+    mDAO2.put(test.CompA.create({ id: 3, a: 'three' }));
+    mDAO2.put(test.CompA.create({ id: 4, a: 'four' }));
+    mDAO2.put(test.CompA.create({ id: 5, a: 'five' }));
+
+    // LRU updates the dao slighly asynchronously, so give the notifies a
+    // frame to propagate (relevant for browser only, node promises are sync-y
+    // enough to get by)
+    setTimeout(function() {
+      mDAO2.select(foam.mlang.sink.Count.create()).then(function(counter) {
+        expect(counter.value).toEqual(4);
+      }).then(function() {
+        mDAO2.find(1).then(function() {
+          fail("Expected no item 1 to be found");
+          done();
+        },
+        function(err) {
+          //expected not to find it
+          done();
+        });
+
+      });
+    }, 100);
+
+
+
   });
 });
 
