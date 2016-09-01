@@ -356,8 +356,59 @@ describe('LRUDAOManager', function() {
 
       });
     }, 100);
+  });
+});
 
+describe('ContextualizingDAO', function() {
 
+  var mDAO;
+  var cDAO;
+
+  genericDAOTestBattery(function(model) {
+    mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.ContextualizingDAO.create({ delegate: mDAO, of: model }));
+  });
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'Environment',
+      exports: [ 'exp' ],
+      properties: [ 'exp' ]
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'ImporterA',
+      imports: [ 'exp' ],
+      properties: [ 'id' ]
+    });
+
+    var env = test.Environment.create({ exp: 66 });
+
+    mDAO = foam.dao.MDAO.create({ of: test.ImporterA });
+    cDAO = foam.dao.ContextualizingDAO.create({
+      delegate: mDAO, of: test.ImporterA
+    }, env);
+  });
+
+  it('swaps context so find() result objects see ContextualizingDAO context', function(done) {
+
+    var a = test.ImporterA.create({ id: 1 });
+
+    expect(a.exp).toBeUndefined();
+
+    cDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].exp).toBeUndefined();
+
+        return cDAO.find(1).then(function (obj) {
+          expect(obj.exp).toEqual(66); // now has context with env export
+          done();
+        });
+
+      });
+    });
   });
 });
 
