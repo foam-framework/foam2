@@ -21,7 +21,8 @@ foam.CLASS({
   name: 'Collider',
 
   properties: [
-    { name: 'children', factory: function() { return []; } }
+    { name: 'children', factory: function() { return []; } },
+    'stopped_'
   ],
 
   listeners: [
