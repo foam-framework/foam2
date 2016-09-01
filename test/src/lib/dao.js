@@ -400,6 +400,24 @@ describe('LRUDAOManager', function() {
       });
     }, 100);
   });
+
+
+  it('handles a dao switch', function(done) {
+    // Note that MDAO and LRU do not go async for this test
+
+    mDAO2 = foam.dao.MDAO.create({ of: test.CompA });
+    lruManager.dao = mDAO2;
+
+    mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
+    mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
+    mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
+    mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
+
+    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+      expect(counter.value).toEqual(4);
+      done();
+    });
+  });
 });
 
 describe('ContextualizingDAO', function() {
@@ -454,4 +472,5 @@ describe('ContextualizingDAO', function() {
     });
   });
 });
+
 
