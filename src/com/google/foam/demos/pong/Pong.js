@@ -100,8 +100,7 @@ foam.CLASS({
     {
       name: 'collider',
       factory: function() { return this.PhysicsEngine.create(); }
-    },
-    [ 'autoRepaint', true ]
+    }
   ],
 
   listeners: [
