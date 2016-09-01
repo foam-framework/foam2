@@ -614,6 +614,30 @@ describe('SyncDAO', function() {
     });
   });
 
+  it('syncs removes from client, to server', function(done) {
+
+    preloadRemote();
+    remoteDAO.offline = false;
+
+    doSyncThen(function() {
+      syncDAO.select().then(function(sink) {
+        expect(sink.a.length).toEqual(5);
+
+        remoteDAO.offline = true;
+        syncDAO.remove(sink.a[1]);
+        syncDAO.remove(sink.a[0]); // version is stale, will not remove
+        remoteDAO.offline = false;
+
+        doSyncThen(function() {
+          expect(remoteDAO.array.length).toEqual(4);
+          done();
+        });
+      })
+    });
+  });
+
+
+// TODO: is there a server removal path intended?
 // it('syncs removes from client and server', function(done) {
 
 //     preloadRemote();
