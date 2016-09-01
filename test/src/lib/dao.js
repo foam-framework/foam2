@@ -253,6 +253,48 @@ describe('SequenceNumberDAO', function() {
   });
 });
 
+describe('GUIDDAO', function() {
+
+  var mDAO;
+  var gDAO;
+
+  genericDAOTestBattery(function(model) {
+    mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.GUIDDAO.create({ delegate: mDAO, of: model }));
+  });
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+
+    mDAO = foam.dao.MDAO.create({ of: test.CompA });
+    gDAO = foam.dao.GUIDDAO.create({ delegate: mDAO, of: test.CompA });
+  });
+
+  it('assigns GUIDs to objects missing the value', function(done) {
+    var a = test.CompA.create({ a: 4 }); // id not set
+    gDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].id.length).toBeGreaterThan(8);
+        // id set, not a GUID character for predictable sorting in this test
+        a = test.CompA.create({ id: '!!!', a: 6 });
+        return gDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(2);
+            expect(sink.a[0].id.length).toBeLessThan(8);
+            expect(sink.a[1].id.length).toBeGreaterThan(8);
+            done();
+          });
+        });
+      });
+    });
+  });
+});
+
 
 describe('LRUDAOManager', function() {
   var mDAO;
