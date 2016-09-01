@@ -614,10 +614,31 @@ describe('SyncDAO', function() {
     });
   });
 
+// it('syncs removes from client and server', function(done) {
 
+//     preloadRemote();
+//     remoteDAO.offline = false;
 
-  // Cases:
-  // - 
+//     doSyncThen(function() {
+//       syncDAO.select().then(function(sink) {
+//         expect(sink.a.length).toEqual(5);
+//           console.log("cache1", cacheDAO.array);
+
+//         remoteDAO.remove(sink.a[1]);
+//         remoteDAO.offline = true;
+//         syncDAO.remove(sink.a[0]);
+//         remoteDAO.offline = false;
+//         doSyncThen(function() {
+//           expect(remoteDAO.array.length).toEqual(3);
+//           expect(cacheDAO.array.length).toEqual(3);
+//           console.log("remote2", remoteDAO.array);
+//           console.log("cache2", cacheDAO.array);
+//           console.log("sync2", syncRecordDAO.array);
+//           done();
+//         });
+//       })
+//     });
+//   });
 
 
 
