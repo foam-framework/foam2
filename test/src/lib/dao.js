@@ -104,6 +104,45 @@ describe('MDAO', function() {
   });
 });
 
+// NOTE: not all generic tests are applicable, as LazyCacheDAO does not
+//   offer a way to immediately sync results. It will eagerly deliver
+//   partial results and update eventually. Perhaps a different set
+//   of genericDAOTestBattery for this kind of partial-result case.
+// describe('LazyCacheDAO-cacheOnSelect-async', function() {
+//   // test caching against an IDBDAO remote and MDAO cache.
+//   genericDAOTestBattery(function(model) {
+//     var idbDAO = test.helpers.RandomDelayDAO.create({
+//       of: model,
+//       delays: [ 5, 20, 1, 10, 20, 5, 20 ]
+//     });
+//     var mDAO = test.helpers.RandomDelayDAO.create({
+//       of: model,
+//       delays: [ 5, 20, 1, 10, 20, 5, 20 ]
+//     });
+//     return Promise.resolve(foam.dao.LazyCacheDAO.create({
+//       delegate: idbDAO,
+//       cache: mDAO,
+//       cacheOnSelect: true
+//     }));
+//   });
+// });
+
+describe('LazyCacheDAO-cacheOnSelect', function() {
+  // test caching against an IDBDAO remote and MDAO cache.
+  genericDAOTestBattery(function(model) {
+    var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
+      .create({ name: '_test_lazyCache_', of: model });
+    return idbDAO.removeAll().then(function() {
+      var mDAO = foam.dao.MDAO.create({ of: model });
+      return foam.dao.LazyCacheDAO.create({
+        delegate: idbDAO,
+        cache: mDAO,
+        cacheOnSelect: true
+      });
+    });
+  });
+});
+
 describe('LazyCacheDAO', function() {
   // test caching against an IDBDAO remote and MDAO cache.
   genericDAOTestBattery(function(model) {
@@ -111,7 +150,11 @@ describe('LazyCacheDAO', function() {
       .create({ name: '_test_lazyCache_', of: model });
     return idbDAO.removeAll().then(function() {
       var mDAO = foam.dao.MDAO.create({ of: model });
-      return foam.dao.LazyCacheDAO.create({ delegate: idbDAO, cache: mDAO });
+      return foam.dao.LazyCacheDAO.create({
+        delegate: idbDAO,
+        cache: mDAO,
+        cacheOnSelect: false
+      });
     });
   });
 });
