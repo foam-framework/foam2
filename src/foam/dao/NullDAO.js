@@ -40,6 +40,7 @@ foam.CLASS({
       return Promise.resolve(sink);
     },
     function removeAll() {
+      return Promise.resolve();
     }
   ]
 });
