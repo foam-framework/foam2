@@ -947,7 +947,8 @@ describe('EasyDAO-permutations', function() {
   ].forEach(function(cfg) {
     genericDAOTestBattery(function(model) {
       cfg.of = model;
-      return Promise.resolve(foam.dao.EasyDAO.create(cfg));
+      var dao = foam.dao.EasyDAO.create(cfg);
+      return dao.removeAll().then(function() { return dao; });
     });
   });
 });
