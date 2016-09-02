@@ -224,7 +224,7 @@ foam.CLASS({
         this.lookup(daoType) || global[daoType] :
         daoType;
 
-      var params = { of: this.of, autoIndex: this.autoIndex };
+      var params = { of: this.of };
 
       if ( ! daoModel ) {
         this.warn(
@@ -232,8 +232,9 @@ foam.CLASS({
         );
       }
 
-      if ( this.name  ) params.name = this.name;
-      if ( this.seqNo || this.guid ) params.property = this.seqProperty;
+      if ( this.name && daoModel.getAxiomByName('name')  ) params.name = this.name;
+      if ( daoModel.getAxiomByName('autoIndex') ) params.autoIndex = this.autoIndex;
+      //if ( this.seqNo || this.guid ) params.property = this.seqProperty;
 
       var dao = daoModel.create(params, this.__subContext__);
 
