@@ -118,3 +118,31 @@ foam.CLASS({
 
   ]
 });
+
+
+foam.CLASS({
+  package: 'test.helpers',
+  name: 'MockHTTPBox',
+  implements: ['foam.box.HTTPBox'],
+
+  properties: [
+    {
+      name: 'url'
+    },
+    {
+      name: 'method'
+    },
+    {
+      name: 'MOCK_sentMessages_',
+      factory: function() { return []; }
+    }
+  ],
+  methods: [
+    {
+      name: 'send',
+      code: function(msg) {
+        this.MOCK_sentMessages_.push(msg);
+      }
+    }
+  ]
+});
