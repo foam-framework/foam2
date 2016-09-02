@@ -60,6 +60,7 @@ FOAM_FILES([
   { name: "core/templates" },
   { name: "core/Action" },
   { name: "lib/java" },
+  { name: "lib/JavaClass" },
   { name: "lib/Promise" },
   { name: "foam/util/Timer" },
   { name: "foam/memento/MementoMgr" },
