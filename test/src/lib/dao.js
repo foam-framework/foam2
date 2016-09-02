@@ -907,3 +907,50 @@ describe('TimestampDAO', function() {
 
 });
 
+describe('EasyDAO-permutations', function() {
+
+  [
+    {
+      daoType: 'MDAO',
+    },
+    {
+      daoType: 'LOCAL',
+    },
+//     {
+//       daoType: 'MDAO',
+//       seqNo: true,
+//       seqProperty: 'id'
+//     },
+//     {
+//       daoType: 'LOCAL',
+//       guid: true,
+//       seqProperty: 'id'
+//     },
+
+
+// Property             name           foam.core.Property
+// debug.js:264 Boolean              seqNo          false
+// debug.js:264 Boolean              guid           false
+// debug.js:264 Property             seqProperty    undefined
+// debug.js:264 Boolean              cache          false
+// debug.js:264 Boolean              dedup          false
+// debug.js:264 Property             journal        false
+// debug.js:264 Boolean              contextualize  false
+// debug.js:264 Property             daoType        foam.dao.IDBDAO
+// debug.js:264 Boolean              autoIndex      false
+// debug.js:264 Boolean              syncWithServer false
+// debug.js:264 Boolean              syncPolling    true
+// debug.js:264 String               serverUri      http://localhost:8000/api
+// debug.js:264 Boolean              isServer       false
+// debug.js:264 Property             syncProperty   undefined
+// debug.js:264 Class2               of             PropertyClass
+  ].forEach(function(cfg) {
+    genericDAOTestBattery(function(model) {
+      cfg.of = model;
+      return Promise.resolve(foam.dao.EasyDAO.create(cfg));
+    });
+  });
+});
+
+
+
