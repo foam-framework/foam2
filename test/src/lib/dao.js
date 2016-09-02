@@ -949,6 +949,15 @@ describe('EasyDAO-permutations', function() {
       dedup: true,
       contextualize: true
     },
+    {
+      daoType: 'MDAO',
+      cache: true,
+    },
+// TODO: fix cache issues:
+//     {
+//       daoType: foam.dao.ArrayDAO,
+//       cache: true,
+//     },
 //     {
 //       daoType: 'LOCAL',
 //       cache: true,
