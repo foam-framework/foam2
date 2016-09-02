@@ -757,3 +757,32 @@ describe('JournalDAO', function() {
     });
   });
 });
+
+describe('TimingDAO', function() {
+
+  genericDAOTestBattery(function(model) {
+    mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.TimingDAO.create({
+      delegate: mDAO,
+      of: model,
+      name: 'timingtest',
+    }));
+  });
+
+});
+
+
+describe('LoggingDAO', function() {
+
+  genericDAOTestBattery(function(model) {
+    mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.LoggingDAO.create({
+      delegate: mDAO,
+      of: model,
+      logger: function() { },
+      name: 'loggingtest',
+    }));
+  });
+
+});
+

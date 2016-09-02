@@ -339,8 +339,8 @@ foam.CLASS({
         });
       }
 
-//       if ( this.timing  ) dao = this.TimingDAO.create({ name: this.of.id + 'DAO', delegate: dao });
-//       if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
+      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.name + 'DAO', delegate: dao });
+      if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
 
       this.delegate = dao;
     },

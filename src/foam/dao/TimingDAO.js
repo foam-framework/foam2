@@ -21,42 +21,65 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'TimingDAO',
-  requires: [ 'foam.dao.QuickSink' ],
 
   extends: 'foam.dao.ProxyDAO',
 
   properties: [
     'name',
-    'id',
-    ['activeOps', {put: 0, remove:0, find: 0, select: 0}]
+    {
+      name: 'id',
+      value: 0
+    },
+    ['activeOps', {put: 0, remove:0, find: 0, select: 0}],
+    {
+      /** High resolution time value function */
+      class: 'Function',
+      name: 'now',
+      factory: function() {
+        if ( global.window && global.window.performance ) {
+          return function() {
+            return window.performance.now();
+          }
+        } else if ( global.process && global.process.hrtime ) {
+          return function() {
+            var hr = global.process.hrtime();
+            return ( hr[0] * 1000 ) + ( hr[1] / 1000 );
+          }
+        } else {
+          return function() { return Date.now(); }
+        }
+      }
+    }
   ],
 
   methods: [
     function start(op) {
       var str = this.name + '-' + op;
       var key = this.activeOps[op]++ ? str + '-' + (this.id++) : str;
-      console.time(this.id);
-      return [key, str, window.performance.now(), op];
+      console.time(key);
+      return [key, str, this.now(), op];
     },
 
     function end(act) {
       this.activeOps[act[3]]--;
       this.id--;
       console.timeEnd(act[0]);
-      console.log('Timing: ', act[1], ' ', (window.performance.now()-act[2]).toFixed(3), ' ms');
+      console.log('Timing: ', act[1], ' ', (this.now()-act[2]).toFixed(3), ' ms');
     },
 
     function put(obj) {
-      var self = this;
       var act = this.start('put');
+      var self = this;
       return this.SUPER(obj).then(function(o) { self.end(act); return o; });
     },
     function remove(obj) {
       var act = this.start('remove');
+      var self = this;
       return this.SUPER(obj).then(function() { self.end(act); });
     },
     function find(key) {
       var act = this.start('find');
+      var self = this;
       return this.SUPER(key).then(function(o) { self.end(act); return o; });
     },
     function select() {
