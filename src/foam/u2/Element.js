@@ -1065,10 +1065,11 @@ foam.CLASS({
       return this.ViewSpec.createView(spec, args, this, this.__subSubContext__);
     },
 
-    function start(spec, args) {
+    function start(spec, args, slot) {
       /* Create a new Element and add it as a child. Return the child. */
       var c = this.createChild_(spec, args);
       this.add(c);
+      if ( slot ) slot.set(c);
       return c;
     },
 
@@ -1079,7 +1080,7 @@ foam.CLASS({
 
     function add(/* vargs */) {
       if ( this.content ) {
-        return this.content.add.apply(this.content.add, arguments);
+        return this.content.add.apply(this.content, arguments);
       }
 
       /* Add Children to this Element. */
