@@ -952,7 +952,6 @@ describe('EasyDAO-permutations', function() {
 //     {
 //       daoType: 'LOCAL',
 //       cache: true,
-//       autoIndex: true,
 //     },
 
 
@@ -979,6 +978,37 @@ describe('EasyDAO-permutations', function() {
       return dao.removeAll().then(function() { return dao; });
     });
   });
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+  });
+
+  it('throws on seqNo && guid', function() {
+    expect(function() {
+      foam.dao.EasyDAO.create({
+        of: test.CompA,
+        daoType: 'MDAO',
+        seqNo: true,
+        guid: true,
+      });
+    }).toThrow();
+  });
+
+  it('forwards addIndex', function() {
+    var dao = foam.dao.EasyDAO.create({
+      of: test.CompA,
+      daoType: foam.dao.MDAO
+    });
+    // TODO: mock MDAO, check that these get called through
+    dao.addIndex(test.CompA.A);
+    dao.addRawIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
+  });
+
+
 });
 
 
