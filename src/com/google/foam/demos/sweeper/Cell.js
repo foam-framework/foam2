@@ -10,7 +10,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.sweeper',
+  package: 'com.google.foam.demos.sweeper',
   name: 'Cell',
   extends: 'foam.u2.Element',
 

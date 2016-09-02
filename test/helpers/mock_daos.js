@@ -61,4 +61,60 @@ foam.CLASS({
       this.delayIdx_ = ( this.delayIdx_ + 1 ) % this.delays.length;
     }
   ]
-})
+});
+
+/** Test helper DAO that fails all operations when offline is true. */
+foam.CLASS({
+  package: 'test.helpers',
+  name: 'OfflineableDAO',
+
+  extends: 'foam.dao.ArrayDAO',
+
+  properties: [
+    {
+      name: 'offline',
+      value: false
+    }
+  ],
+
+  constants: {
+    OFFLINE_FUNC_BODY: function() {
+      if ( this.offline )
+        return Promise.reject(foam.dao.InternalException.create({ message: 'offline mode' }));
+      else
+        return this.SUPER.apply(this, arguments);
+    }
+  },
+
+  methods: [
+    function pub() {
+      return ( this.offline ) ? undefined : this.SUPER.apply(this, arguments);
+    },
+
+    function put() {
+      this.SUPER;
+      return this.OFFLINE_FUNC_BODY.apply(this, arguments);
+    },
+
+    function remove() {
+      this.SUPER;
+      return this.OFFLINE_FUNC_BODY.apply(this, arguments);
+    },
+
+    function removeAll() {
+      this.SUPER;
+      return this.OFFLINE_FUNC_BODY.apply(this, arguments);
+    },
+
+    function select() {
+      this.SUPER;
+      return this.OFFLINE_FUNC_BODY.apply(this, arguments);
+    },
+
+    function find() {
+      this.SUPER;
+      return this.OFFLINE_FUNC_BODY.apply(this, arguments);
+    },
+
+  ]
+});

@@ -49,6 +49,10 @@ foam.CLASS({
           v ? parseInt(v) :
           0 ;
       }
+    ],
+    [ 'fromString', function intFromString(str) {
+        return str ? parseInt(str) : 0;
+      }
     ]
   ]
 });
@@ -195,6 +199,11 @@ foam.CLASS({
   ],
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Object',
+  extends: 'Property'
+});
 
 // TODO(adam): Better name for this?
 foam.CLASS({

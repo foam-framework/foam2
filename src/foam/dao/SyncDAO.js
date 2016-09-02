@@ -76,6 +76,10 @@ foam.CLASS({
       }
     },
     {
+      /** The local cache to sync with the server DAO. */
+      name: 'delegate',
+    },
+    {
       /**
         The DAO in which to store SyncRecords for each object. Each client
         tracks their own sync state in a separate syncRecordDAO.
@@ -168,7 +172,6 @@ foam.CLASS({
       }.bind(this));
     },
 
-
     /**
       Marks the object as deleted.
     */
@@ -182,7 +185,6 @@ foam.CLASS({
           }));
       }.bind(this));
     },
-
 
     /**
       Marks all the removed objects' sync records as deleted.

@@ -243,7 +243,7 @@ foam.CLASS({
               var q = predicate.args[i];
               if ( model.isInstance(q) && q.arg1 === prop ) {
                 predicate = predicate.clone();
-                predicate.args[i] = index.True;
+                predicate.args[i] = index.True.create();
                 predicate = predicate.partialEval();
                 if (  index.True.isInstance(predicate) ) predicate = undefined;
                 return q.arg2;

@@ -10,11 +10,11 @@
  */
 
 foam.CLASS({
-  package: 'com.google.sweeper',
+  package: 'com.google.foam.demos.sweeper',
   name: 'Game',
   extends: 'foam.u2.Element',
 
-  requires: [ 'com.google.sweeper.Board' ],
+  requires: [ 'com.google.foam.demos.sweeper.Board' ],
 
   properties: [
     {

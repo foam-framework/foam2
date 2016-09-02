@@ -49,6 +49,9 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      name: 'icon'
+    },
+    {
       class: 'String',
       name: 'help'
     },
@@ -86,21 +89,10 @@ foam.CLASS({
     },
 
     function createIsEnabled$(data$) {
-      var e = foam.core.ExpressionSlot.create({
-        code: this.isEnabled
-      });
-
-      e.obj$ = data$;
-      // e.obj = data$.get();
-
-      return e;
-      /*
-        // TODO: use when obj$: data$ works.
       return foam.core.ExpressionSlot.create({
         obj$: data$,
         code: this.isEnabled
       });
-      */
     },
 
     function isAvailableFor(data) {
@@ -108,21 +100,10 @@ foam.CLASS({
     },
 
     function createIsAvailable$(data$) {
-      var e = foam.core.ExpressionSlot.create({
-        code: this.isAvailable
-      });
-
-      e.obj$ = data$;
-      // e.obj = data$.get();
-
-      return e;
-      /*
-        // TODO: use when obj$: data$ works.
       return foam.core.ExpressionSlot.create({
         obj$: data$,
         code: this.isAvailable
       });
-      */
     },
 
     function maybeCall(ctx, data) {

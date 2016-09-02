@@ -10,11 +10,11 @@
  */
 
 foam.CLASS({
-  package: 'com.google.sweeper',
+  package: 'com.google.foam.demos.sweeper',
   name: 'Board',
   extends: 'foam.u2.Element',
 
-  requires: [ 'com.google.sweeper.Cell' ],
+  requires: [ 'com.google.foam.demos.sweeper.Cell' ],
 
   imports: [ 'setTimeout' ],
   exports: [ 'as board' ],

@@ -27,9 +27,8 @@ foam.CLASS({
       name: 'stopped'
     },
     {
-      name: 'errorEvt',
-      javaType: 'Object',
-      javaJsonParser: 'foam.lib.json.AnyParser'
+      class: 'Object',
+      name: 'errorEvt'
     }
   ],
 
@@ -697,6 +696,11 @@ foam.CLASS({
       return sink;
     },
 
+    function compareTo(other) {
+      if ( ! other ) return 1;
+      return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
+    },
+
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
@@ -724,6 +728,12 @@ foam.CLASS({
         if ( old ) {
           this.on.reset.pub();
         }
+      }
+    },
+    {
+      name: 'of',
+      expression: function(delegate) {
+        return delegate.of;
       }
     }
   ]

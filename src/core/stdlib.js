@@ -508,13 +508,18 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Object',
   methods: [
+    function forEach(obj, f) {
+      for ( var key in obj ) {
+        if ( obj.hasOwnProperty(key) ) f(obj[key], key);
+      }
+    },
     function is(o) { return typeof o === 'object' && ! Array.isArray(o); },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
-    function hashCode(o) { return 0; }
+    function hashCode(o) { return 0; },
   ]
 });
 

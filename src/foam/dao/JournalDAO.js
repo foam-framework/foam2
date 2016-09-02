@@ -55,6 +55,9 @@ foam.CLASS({
 
   properties: [
     {
+      /** The DAO to store the journal entries.
+        Note that this must have a TimestampDAO or SequenceNumberDAO to
+        apply a unique id to each entry. */
       name: 'journal'
     }
   ],

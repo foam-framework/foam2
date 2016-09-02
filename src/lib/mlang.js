@@ -70,7 +70,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'foam.mlang.Expr'],
-    ['javaJsonParser', 'foam.lib.json.ExprParser'],
+    ['javaJSONParser', 'foam.lib.json.ExprParser'],
     {
       name: 'adapt',
       value: function(_, o) {
@@ -331,6 +331,11 @@ foam.CLASS({
   name: 'Or',
   extends: 'foam.mlang.predicate.Nary',
 
+  requires: [
+    'foam.mlang.predicate.False',
+    'foam.mlang.predicate.True'
+  ],
+
   methods: [
     {
       name: 'f',
@@ -346,10 +351,11 @@ foam.CLASS({
                 + 'return false;\n'
     },
     function partialEval() {
-      return this;
-      // TODO: port FOAM1 code below
       var newArgs = [];
       var updated = false;
+
+      var TRUE = this.True.create();
+      var FALSE = this.False.create();
 
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a    = this.args[i];
@@ -357,7 +363,7 @@ foam.CLASS({
 
         if ( newA === TRUE ) return TRUE;
 
-        if ( OrExpr.isInstance(newA) ) {
+        if ( this.cls_.isInstance(newA) ) {
           // In-line nested OR clauses
           for ( var j = 0 ; j < newA.args.length ; j++ ) {
             newArgs.push(newA.args[j]);
@@ -372,6 +378,11 @@ foam.CLASS({
         }
       }
 
+      /*
+      TODO(braden): Implement partialOr and PARTIAL_OR_RULES, for full partial
+      eval support. Currently this is only dropping FALSE, and short-circuiting
+      on TRUE.
+
       for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
         for ( var j = i+1 ; j < newArgs.length ; j++ ) {
           var a = this.partialOr(newArgs[i], newArgs[j]);
@@ -382,11 +393,12 @@ foam.CLASS({
           }
         }
       }
+      */
 
-      if ( newArgs.length == 0 ) return FALSE;
-      if ( newArgs.length == 1 ) return newArgs[0];
+      if ( newArgs.length === 0 ) return FALSE;
+      if ( newArgs.length === 1 ) return newArgs[0];
 
-      return updated ? OrExpr.create({args: newArgs}) : this;
+      return updated ? this.cls_.create({ args: newArgs }) : this;
     }
   ]
 });
@@ -412,18 +424,19 @@ foam.CLASS({
                 + 'return true;'
     },
     function partialEval() {
-      return this;
-      // TODO: port FOAM1 code below
       var newArgs = [];
       var updated = false;
 
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
+      var FALSE = foam.mlang.predicate.False.create();
+      var TRUE = foam.mlang.predicate.True.create();
+
+      for ( var i = 0; i < this.args.length; i++ ) {
         var a    = this.args[i];
         var newA = this.args[i].partialEval();
 
         if ( newA === FALSE ) return FALSE;
 
-        if ( AndExpr.isInstance(newA) ) {
+        if ( this.cls_.isInstance(newA) ) {
           // In-line nested AND clauses
           for ( var j = 0 ; j < newA.args.length ; j++ ) {
             newArgs.push(newA.args[j]);
@@ -440,8 +453,12 @@ foam.CLASS({
         }
       }
 
-      for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
-        for ( var j = i+1 ; j < newArgs.length ; j++ ) {
+      /*
+      TODO(braden): Implement partialAnd and PARTIAL_AND_RULES, for full partial
+      eval support. Currently it just drops TRUE and bails on FALSE.
+
+      for ( var i = 0; i < newArgs.length - 1; i++ ) {
+        for ( var j = i + 1; j < newArgs.length; j++ ) {
           var a = this.partialAnd(newArgs[i], newArgs[j]);
           if ( a ) {
             if ( a === FALSE ) return FALSE;
@@ -450,11 +467,12 @@ foam.CLASS({
           }
         }
       }
+      */
 
-      if ( newArgs.length == 0 ) return TRUE;
-      if ( newArgs.length == 1 ) return newArgs[0];
+      if ( newArgs.length === 0 ) return TRUE;
+      if ( newArgs.length === 1 ) return newArgs[0];
 
-      return updated ? AndExpr.create({args: newArgs}) : this;
+      return updated ? this.cls_.create({ args: newArgs }) : this;
     }
   ]
 });
@@ -562,12 +580,16 @@ foam.CLASS({
   methods: [
     function f(o) {
       var lhs = this.arg1.f(o);
+      var upperCase = foam.core.Enum.isInstance(this.arg1);
+
       // If arg2 is a constant array, we use valueSet for it.
       if ( Array.isArray(this.arg2) ) {
         if ( ! this.valueSet_ ) {
           var set = {};
           for ( var i = 0 ; i < this.arg2.length ; i++ ) {
-            set[this.arg2[i]] = true;
+            var s = this.arg2[i];
+            if ( upperCase ) s = s.toUpperCase();
+            set[s] = true;
           }
           this.valueSet_ = set;
         }
@@ -631,9 +653,9 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Object',
       name: 'value',
-      javaJsonParser: 'foam.lib.json.ConstantParser',
-      javaType: 'Object'
+      javaJSONParser: 'foam.lib.json.ConstantParser'
     }
   ],
 
@@ -896,6 +918,65 @@ foam.CLASS({
     function put(o) {
       this.delegate.put( this.f(o) );
     },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'GroupBy',
+  extends: 'foam.mlang.predicate.Binary',
+
+  properties: [
+    {
+      name: 'groups',
+      factory: function() { return {}; }
+    },
+    {
+      class: 'StringArray',
+      name: 'groupKeys',
+      factory: function() { return []; }
+    }
+  ],
+
+  methods: [
+    function sortedKeys(opt_comparator) {
+      this.groupKeys.sort(opt_comparator || this.arg1.comparePropertyValues);
+      return this.groupKeys;
+    },
+    function putInGroup_(key, obj) {
+      var group = this.groups.hasOwnProperty(key) && this.groups[key];
+      if ( ! group ) {
+        group = this.arg2.clone();
+        this.groups[key] = group;
+        this.groupKeys.push(key);
+      }
+      group.put(obj);
+    },
+    function put(obj) {
+      var key = this.arg1.f(obj);
+      if ( Array.isArray(key) ) {
+        if ( key.length ) {
+          for ( var i = 0; i < key.length; i++ ) {
+            this.putInGroup_(key[i], obj);
+          }
+        } else {
+          // Perhaps this should be a key value of null, not '', since '' might
+          // actually be a valid key.
+          this.putInGroup_('', obj);
+        }
+      } else {
+        this.putInGroup_(key, obj);
+      }
+    },
+    function eof() {
+    },
+    function clone() {
+      // Don't use the default clone because we don't want to copy 'groups'.
+      return this.cls_.create({ arg1: this.arg1, arg2: this.arg2 });
+    },
+    function toString() {
+      return this.groups.toString();
+    }
   ]
 });
 
