@@ -48,7 +48,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function loadE() {
+    function initE() {
       var self     = this;
       var parent   = this.parentNode;
 

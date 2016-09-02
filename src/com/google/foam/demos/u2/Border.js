@@ -17,7 +17,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    function init() {
       this.
           cssClass(this.myCls()).
           start('div').cssClass(this.myCls('title')).add(this.title$).end().
@@ -55,7 +55,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    function init() {
       this.
           cssClass(this.myCls()).
           start('div', null, this.leftPanel$).
