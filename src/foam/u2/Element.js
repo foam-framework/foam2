@@ -170,6 +170,7 @@ foam.CLASS({
   name: 'ElementState',
 
   methods: [
+    function initialize() {},
     function output(out) {},
     function load() {},
     function unload() {},
@@ -206,11 +207,13 @@ foam.CLASS({
   extends: 'foam.u2.ElementState',
 
   methods: [
-    function output(out) {
+    function initialize() {
+      this.state = this.INITIALIZED;
       this.initE();
-      this.state = this.OUTPUT;
-      this.output_(out);
-      return out;
+    },
+    function output(out) {
+      this.initialize();
+      return this.output(out);
     },
     function load() {
       this.error('Must output before loading.');
@@ -225,6 +228,29 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'InitializedElementState',
+  extends: 'foam.u2.ElementState',
+
+  methods: [
+    function output(out) {
+      this.state = this.OUTPUT;
+      this.loadE();
+      this.output_(out);
+      return out;
+    },
+    function load() {
+      this.error('Must output before loading.');
+    },
+    function unload() {
+      this.error('Must output and load before unloading.');
+    },
+    function toString() { return 'INITIALIZED'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'OutputElementState',
   extends: 'foam.u2.ElementState',
 
@@ -232,7 +258,7 @@ foam.CLASS({
     function output(out) {
       // TODO: raise a real error
       this.warn('ERROR: Duplicate output.');
-      return this.START.output.call(this, out);
+      return this.INITIALIZED.output.call(this, out);
     },
     function load() {
       for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
@@ -255,7 +281,7 @@ foam.CLASS({
       // this.el().e_ = this;
     },
     function unload() {
-      this.state = this.START;
+      this.state = this.INITIALIZED;
       this.visitChildren('unload');
     },
     function error() {
@@ -285,7 +311,7 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.warn('Duplicate output.');
-      return this.START.output.call(this, out);
+      return this.INITIALIZED.output.call(this, out);
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
@@ -293,7 +319,7 @@ foam.CLASS({
       if ( e ) {
         e.remove();
       }
-      this.state = this.START;
+      this.state = this.INITIALIZED;
       this.visitChildren('unload');
     },
     function remove() { this.unload(); },
@@ -425,6 +451,14 @@ foam.CLASS({
 
     DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
 
+    // Starting state of an Element before it has been initialized or added to the DOM.
+    START: foam.u2.StartElementState.create(),
+
+    // State of an Element after initE() has been called but before it's been added to the DOM,
+    // or after it's been removed from the DOM.
+    // An INITIALIZED Element can be (re-)added to the DOM.
+    INITIALIZED: foam.u2.InitializedElementState.create(),
+
     // State of an Element after it has been output (to a String) but before it is loaded.
     // This should be only a brief transitory state, as the Element should be loaded
     // almost immediately after being output.  It is an error to try and mutate the Element
@@ -434,11 +468,6 @@ foam.CLASS({
     // State of an Element after it has been loaded.
     // A Loaded Element should be visible in the DOM.
     LOADED: foam.u2.LoadedElementState.create(),
-
-    // State of an Element before it has been added to the DOM, or after it has
-    // been removed from the DOM.
-    // An unloaded Element can be (re-)added to the DOM.
-    START: foam.u2.StartElementState.create(),
 
     // ???: Add DESTROYED State?
 
@@ -510,10 +539,10 @@ foam.CLASS({
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
       factory: function() { return this.START; },
-      postSet: function(_, state) {
+      postSet: function(old, state) {
         if ( state === this.LOADED ) {
           this.onload.pub();
-        } else if ( state === this.START ) {
+        } else if ( old === this.LOADED && state === this.INITIALIZED ) {
           this.onunload.pub();
         }
       }
@@ -589,7 +618,15 @@ foam.CLASS({
     {
       name: 'childNodes',
       // documentation: 'Children of this Element.',
-      factory: function() { return []; }
+      getter: function() {
+        var v = this.instance_.childNodes;
+        if ( ! v ) {
+          v = [];
+          this.instance_.childNodes = v;
+          this.initialize();
+        }
+        return v;
+      }
     },
     {
       name: 'elListeners',
@@ -638,7 +675,14 @@ foam.CLASS({
   methods: [
     function initE() {
       /*
-        Template method for adding addtion element initialization
+        Template method for adding additional element initialization
+        just before Element has children added to it.
+      */
+    },
+
+    function loadE() {
+      /*
+        Template method for adding addtional element initialization
         just before Element is output().
       */
     },
@@ -904,7 +948,7 @@ foam.CLASS({
     function remove() {
       /*
         Remove this Element from its parent Element.
-        Will transition to START state.
+        Will transition to INITIALIZED state.
       */
       // TODO: remove from parent
       this.state.remove.call(this);
