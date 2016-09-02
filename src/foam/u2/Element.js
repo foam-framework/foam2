@@ -202,7 +202,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'UnloadedElementState',
+  name: 'StartElementState',
   extends: 'foam.u2.ElementState',
 
   methods: [
@@ -218,7 +218,7 @@ foam.CLASS({
     function unload() {
       this.error('Must output and load before unloading.');
     },
-    function toString() { return 'UNLOADED'; }
+    function toString() { return 'START'; }
   ]
 });
 
@@ -232,7 +232,7 @@ foam.CLASS({
     function output(out) {
       // TODO: raise a real error
       this.warn('ERROR: Duplicate output.');
-      return this.UNLOADED.output.call(this, out);
+      return this.START.output.call(this, out);
     },
     function load() {
       for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
@@ -255,7 +255,7 @@ foam.CLASS({
       // this.el().e_ = this;
     },
     function unload() {
-      this.state = this.UNLOADED;
+      this.state = this.START;
       this.visitChildren('unload');
     },
     function error() {
@@ -285,7 +285,7 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.warn('Duplicate output.');
-      return this.UNLOADED.output.call(this, out);
+      return this.START.output.call(this, out);
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
@@ -293,7 +293,7 @@ foam.CLASS({
       if ( e ) {
         e.remove();
       }
-      this.state = this.UNLOADED;
+      this.state = this.START;
       this.visitChildren('unload');
     },
     function remove() { this.unload(); },
@@ -438,7 +438,7 @@ foam.CLASS({
     // State of an Element before it has been added to the DOM, or after it has
     // been removed from the DOM.
     // An unloaded Element can be (re-)added to the DOM.
-    UNLOADED: foam.u2.UnloadedElementState.create(),
+    START: foam.u2.StartElementState.create(),
 
     // ???: Add DESTROYED State?
 
@@ -509,11 +509,11 @@ foam.CLASS({
       transient: true,
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      factory: function() { return this.UNLOADED; },
+      factory: function() { return this.START; },
       postSet: function(_, state) {
         if ( state === this.LOADED ) {
           this.onload.pub();
-        } else if ( state === this.UNLOADED ) {
+        } else if ( state === this.START ) {
           this.onunload.pub();
         }
       }
@@ -904,7 +904,7 @@ foam.CLASS({
     function remove() {
       /*
         Remove this Element from its parent Element.
-        Will transition to UNLOADED state.
+        Will transition to START state.
       */
       // TODO: remove from parent
       this.state.remove.call(this);
