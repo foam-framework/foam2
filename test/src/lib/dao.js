@@ -664,6 +664,96 @@ describe('SyncDAO', function() {
 //     });
 //   });
 
+});
 
 
+describe('JournalDAO', function() {
+
+  var delegateDAO;
+  var journalDAO;
+  var dao;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'JournalModel',
+      properties: [ 'id', 'value' ]
+    });
+
+    journalDAO = foam.dao.ArrayDAO.create({ of: foam.dao.JournalEntry });
+    delegateDAO = foam.dao.ArrayDAO.create({ of: test.JournalModel });
+    dao = foam.dao.JournalDAO.create({
+      of: test.JournalModel,
+      delegate: delegateDAO,
+      journal: foam.dao.SequenceNumberDAO.create({
+          of: foam.dao.JournalEntry,
+          delegate: journalDAO
+      })
+    });
+
+  });
+
+  function loadItems1() {
+    return Promise.all([
+      dao.put(test.JournalModel.create({ id: 0, value: 1 })),
+      dao.put(test.JournalModel.create({ id: 1, value: 'one' })),
+      dao.put(test.JournalModel.create({ id: 2, value: 'a' }))
+    ]);
+  }
+  function removeItems2() {
+    return dao.remove(test.JournalModel.create({ id: 1, value: 'two' }));
+  }
+  function loadItems3() {
+    return Promise.all([
+      dao.put(test.JournalModel.create({ id: 0, value: 3 })),
+      dao.put(test.JournalModel.create({ id: 2, value: 'c' }))
+    ]);
+  }
+
+  it('records write operations', function(done) {
+    loadItems1().then(function() {
+      expect(journalDAO.array.length).toEqual(3);
+
+      removeItems2().then(function() {
+        expect(journalDAO.array.length).toEqual(4);
+
+        loadItems3().then(function() {
+          expect(journalDAO.array.length).toEqual(6);
+          done();
+        });
+      });
+    });
+  });
+
+
+  it('records enough to rebuild the delegate DAO', function(done) {
+    Promise.all([
+      loadItems1(),
+      removeItems2(),
+      loadItems3()
+    ]).then(function() {
+      // rebuild from the journal
+      // select() to ensure the ordering is what the journal thinks is correct
+      journalDAO.select().then(function(sink) {
+        var newDAO = foam.dao.ArrayDAO.create({ of: test.JournalModel });
+        var journal = sink.a;
+        for ( var i = 0; i < journal.length; i++ ) {
+          var entry = journal[i];
+          if ( entry.isRemove )
+            newDAO.remove(entry.record);
+          else
+            newDAO.put(entry.record);
+        }
+
+        // compare newDAO and delegateDAO
+        expect(delegateDAO.array.length).toEqual(newDAO.array.length);
+        for ( var i = 0; i < delegateDAO.array.length; i++ ) {
+          if ( delegateDAO.array[i].compareTo(newDAO.array[i]) !== 0 ) {
+            fail('mismatched results');
+          }
+        }
+        done();
+      });
+    });
+  });
 });

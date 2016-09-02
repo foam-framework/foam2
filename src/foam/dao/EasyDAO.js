@@ -32,7 +32,6 @@ foam.CLASS({
 
   requires: [
     'foam.dao.MDAO',
-    'foam.dao.TimestampDAO',
     'foam.dao.JournalDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
@@ -97,6 +96,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'dedup',
       value: false,
+    },
+    {
+      /** Keep a history of all state changes to the DAO. */
+      name: 'journal',
+      value: false
     },
 //     {
 //       class: 'Boolean',
@@ -321,6 +325,18 @@ foam.CLASS({
 
       if ( this.contextualize ) {
         dao = this.ContextualizingDAO.create({delegate: dao});
+      }
+
+      if ( this.journal ) {
+        dao = this.JournalDAO.create({
+          delegate: dao,
+          journal: foam.dao.EasyDAO.create({
+            of: foam.dao.JournalEntry,
+            daoType: this.daoType,
+            seqNo: true,
+            name: this.name + '_Journal'
+          })
+        });
       }
 
 //       if ( this.timing  ) dao = this.TimingDAO.create({ name: this.of.id + 'DAO', delegate: dao });
