@@ -43,7 +43,7 @@ foam.CLASS({
         } else if ( global.process && global.process.hrtime ) {
           return function() {
             var hr = global.process.hrtime();
-            return ( hr[0] * 1000 ) + ( hr[1] / 1000 );
+            return ( hr[0] * 1000 ) + ( hr[1] / 1000000 );
           }
         } else {
           return function() { return Date.now(); }
