@@ -781,6 +781,7 @@ describe('LoggingDAO', function() {
       of: model,
       logger: function() { },
       name: 'loggingtest',
+      logReads: true
     }));
   });
 
@@ -853,6 +854,8 @@ describe('TimestampDAO', function() {
   });
 
   beforeEach(function() {
+    jasmine.clock().install();
+
     foam.CLASS({
       package: 'test',
       name: 'CompA',
@@ -863,15 +866,23 @@ describe('TimestampDAO', function() {
     sDAO = foam.dao.TimestampDAO.create({ delegate: mDAO, of: test.CompA });
   });
 
+  afterEach(function() {
+   jasmine.clock().uninstall();
+  });
+
   it('assigns timestamps to objects missing the value', function(done) {
+    jasmine.clock().tick(2000);
     var a = test.CompA.create({ a: 4 }); // id not set
     sDAO.put(a).then(function() {
+      jasmine.clock().tick(2000);
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toBeGreaterThan(0);
         a = test.CompA.create({ a: 6 }); // id not set
+        jasmine.clock().tick(2000);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
+            jasmine.clock().tick(2000);
             expect(sink.a.length).toEqual(2);
             expect(sink.a[0].id).toBeGreaterThan(0);
             expect(sink.a[0].a).toEqual(4);
@@ -885,14 +896,18 @@ describe('TimestampDAO', function() {
   });
 
   it('skips assigning to objects with an existing value', function(done) {
+    jasmine.clock().tick(2000);
     var a = test.CompA.create({ id: 3, a: 4 });
     sDAO.put(a).then(function() {
+      jasmine.clock().tick(2000);
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toEqual(3);
         a = test.CompA.create({ id: 2, a: 6 });
+        jasmine.clock().tick(2000);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
+            jasmine.clock().tick(2000);
             expect(sink.a.length).toEqual(2);
             expect(sink.a[0].id).toEqual(2);
             expect(sink.a[0].a).toEqual(6);
@@ -916,15 +931,36 @@ describe('EasyDAO-permutations', function() {
     {
       daoType: 'LOCAL',
     },
+    {
+      daoType: 'MDAO',
+      seqNo: true,
+      seqProperty: 'id'
+    },
+    {
+      daoType: 'LOCAL',
+      guid: true,
+      seqProperty: 'id'
+    },
+    {
+      daoType: 'MDAO',
+      logging: true,
+      timing: true,
+      journal: true,
+      dedup: true,
+      contextualize: true
+    },
+    {
+      daoType: 'MDAO',
+      cache: true,
+    },
+// TODO: fix cache issues:
 //     {
-//       daoType: 'MDAO',
-//       seqNo: true,
-//       seqProperty: 'id'
+//       daoType: foam.dao.ArrayDAO,
+//       cache: true,
 //     },
 //     {
 //       daoType: 'LOCAL',
-//       guid: true,
-//       seqProperty: 'id'
+//       cache: true,
 //     },
 
 
@@ -951,6 +987,37 @@ describe('EasyDAO-permutations', function() {
       return dao.removeAll().then(function() { return dao; });
     });
   });
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+  });
+
+  it('throws on seqNo && guid', function() {
+    expect(function() {
+      foam.dao.EasyDAO.create({
+        of: test.CompA,
+        daoType: 'MDAO',
+        seqNo: true,
+        guid: true,
+      });
+    }).toThrow();
+  });
+
+  it('forwards addIndex', function() {
+    var dao = foam.dao.EasyDAO.create({
+      of: test.CompA,
+      daoType: foam.dao.MDAO
+    });
+    // TODO: mock MDAO, check that these get called through
+    dao.addIndex(test.CompA.A);
+    dao.addRawIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
+  });
+
+
 });
 
 
