@@ -92,6 +92,8 @@ FOAM_FILES([
   { name: "foam/dao/SyncDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NullDAO" },
+  { name: "foam/dao/TimingDAO" },
+  { name: "foam/dao/LoggingDAO" },
   { name: "foam/dao/IDBDAO", flags: ['web'] },
   { name: "lib/Pooled" },
   { name: "lib/QueryParser" },
