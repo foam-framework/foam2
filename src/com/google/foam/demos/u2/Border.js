@@ -6,8 +6,8 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ { background: gray; padding: 10px; display: inline-block; }
-        ^title { align-content: center; background: pink; }
-        ^content { width: 300px; height: 300px; background: white; }
+        ^title { padding: 6px; align-content: center; background: aliceblue; }
+        ^content { padding: 6px; width: 300px; height: 300px; background: white; }
       */}
     })
   ],
