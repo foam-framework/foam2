@@ -21,11 +21,13 @@ foam.CLASS({
       this.
           cssClass(this.myCls()).
           start('div').cssClass(this.myCls('title')).add(this.title$).end().
-          start('div').cssClass(this.myCls('content')).add('sample content').end();
+          start('div', null, this.content$).
+            cssClass(this.myCls('content')).
+          end();
     }
   ]
 });
 
 var sb = SampleBorder.create({title: 'Title'});
-sb.add('content');
 sb.write();
+sb.add('content');
