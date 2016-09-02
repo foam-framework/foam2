@@ -102,18 +102,18 @@ foam.CLASS({
       name: 'journal',
       value: false
     },
-//     {
-//       class: 'Boolean',
-//       name: 'logging',
-//       value: false,
-//       //documentation: "Enable logging on the DAO."
-//     },
-//     {
-//       class: 'Boolean',
-//       name: 'timing',
-//       value: false,
-//       //documentation: "Enable time tracking for concurrent DAO operations."
-//     },
+    {
+      /** Enable logging on the DAO. */
+      class: 'Boolean',
+      name: 'logging',
+      value: false,
+    },
+    {
+      /** Enable time tracking for concurrent DAO operations. */
+      class: 'Boolean',
+      name: 'timing',
+      value: false,
+    },
     {
       /** Contextualize objects on .find, re-creating them with this EasyDAO's
         exports, as if they were children of this EasyDAO. */

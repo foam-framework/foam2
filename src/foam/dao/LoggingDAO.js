@@ -21,8 +21,9 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'LoggingDAO',
-
   extends: 'foam.dao.ProxyDAO',
+
+  requires: [ 'foam.dao.ArraySink' ],
 
   properties: [
     {
@@ -52,6 +53,7 @@ foam.CLASS({
     },
     function select(sink, skip, limit, order, predicate) {
       this.logger('select', skip, limit, order, predicate);
+      sink = sink || this.ArraySink.create();
       if ( this.logReads ) {
         var put = sink.put.bind(sink);
         var newSink = { __proto__: sink };
@@ -59,7 +61,9 @@ foam.CLASS({
           this.logger('read', o);
           return put.apply(null, arguments);
         }.bind(this);
-        return this.SUPER(newSink, skip, limit, order, predicate);
+        return this.SUPER(newSink, skip, limit, order, predicate).then(function() {
+          return sink;
+        });
       }
       return this.SUPER(sink, skip, limit, order, predicate);
     },

@@ -781,6 +781,7 @@ describe('LoggingDAO', function() {
       of: model,
       logger: function() { },
       name: 'loggingtest',
+      logReads: true
     }));
   });
 
@@ -916,16 +917,29 @@ describe('EasyDAO-permutations', function() {
     {
       daoType: 'LOCAL',
     },
-//     {
-//       daoType: 'MDAO',
-//       seqNo: true,
-//       seqProperty: 'id'
-//     },
-//     {
-//       daoType: 'LOCAL',
-//       guid: true,
-//       seqProperty: 'id'
-//     },
+    {
+      daoType: 'MDAO',
+      seqNo: true,
+      seqProperty: 'id'
+    },
+    {
+      daoType: 'LOCAL',
+      guid: true,
+      seqProperty: 'id'
+    },
+    {
+      daoType: 'MDAO',
+      logging: true,
+      timing: true,
+      journal: true,
+      dedup: true,
+      contextualize: true
+    },
+    {
+      daoType: 'LOCAL',
+      cache: true,
+      autoIndex: true,
+    },
 
 
 // Property             name           foam.core.Property
