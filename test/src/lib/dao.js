@@ -786,3 +786,124 @@ describe('LoggingDAO', function() {
 
 });
 
+
+describe('NullDAO', function() {
+
+  it('rejects put operations', function(done) {
+    var nDAO = foam.dao.NullDAO.create();
+    nDAO.put().then(
+      function() {
+        fail('put should not be accepted');
+      },
+      function(err) {
+        done();
+      }
+    );
+  });
+  it('rejects find operations', function(done) {
+    var nDAO = foam.dao.NullDAO.create();
+    nDAO.find(4).then(
+      function() {
+        fail('find should not be accepted');
+      },
+      function(err) {
+        done();
+      }
+    );
+  });
+  it('selects as empty', function(done) {
+    var sink = {
+      eof: function() { this.eofCalled++ },
+      eofCalled: 0,
+      put: function(o) { this.putCalled++ },
+      putCalled: 0,
+    };
+
+    var nDAO = foam.dao.NullDAO.create();
+
+    nDAO.select(sink).then(function(sink) {
+      expect(sink.eofCalled).toEqual(1);
+      expect(sink.putCalled).toEqual(0);
+      done();
+    });
+  });
+
+  it('accepts remove as no-op', function(done) {
+    var nDAO = foam.dao.NullDAO.create();
+    nDAO.remove().then(done);
+  });
+
+  it('accepts removeAll as no-op', function(done) {
+    var nDAO = foam.dao.NullDAO.create();
+    nDAO.removeAll().then(done);
+  });
+
+
+
+});
+
+describe('TimestampDAO', function() {
+
+  var mDAO;
+  var sDAO;
+
+  genericDAOTestBattery(function(model) {
+    mDAO = foam.dao.MDAO.create({ of: model });
+    return Promise.resolve(foam.dao.SequenceNumberDAO.create({ delegate: mDAO, of: model }));
+  });
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+
+    mDAO = foam.dao.MDAO.create({ of: test.CompA });
+    sDAO = foam.dao.TimestampDAO.create({ delegate: mDAO, of: test.CompA });
+  });
+
+  it('assigns timestamps to objects missing the value', function(done) {
+    var a = test.CompA.create({ a: 4 }); // id not set
+    sDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].id).toBeGreaterThan(0);
+        a = test.CompA.create({ a: 6 }); // id not set
+        return sDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(2);
+            expect(sink.a[0].id).toBeGreaterThan(0);
+            expect(sink.a[0].a).toEqual(4);
+            expect(sink.a[1].id).toBeGreaterThan(sink.a[0].id);
+            expect(sink.a[1].a).toEqual(6);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('skips assigning to objects with an existing value', function(done) {
+    var a = test.CompA.create({ id: 3, a: 4 });
+    sDAO.put(a).then(function() {
+      return mDAO.select().then(function (sink) {
+        expect(sink.a.length).toEqual(1);
+        expect(sink.a[0].id).toEqual(3);
+        a = test.CompA.create({ id: 2, a: 6 });
+        return sDAO.put(a).then(function() {
+          return mDAO.select().then(function (sink) {
+            expect(sink.a.length).toEqual(2);
+            expect(sink.a[0].id).toEqual(2);
+            expect(sink.a[0].a).toEqual(6);
+            expect(sink.a[1].id).toEqual(3);
+            expect(sink.a[1].a).toEqual(4);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+});
+
