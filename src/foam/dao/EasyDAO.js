@@ -48,8 +48,8 @@ foam.CLASS({
     //'foam.core.dao.MigrationDAO',
     //'foam.core.dao.VersionNoDAO',
     //'foam.dao.EasyClientDAO',
-    //'foam.dao.LoggingDAO',
-    //'foam.dao.TimingDAO'
+    'foam.dao.LoggingDAO',
+    'foam.dao.TimingDAO',
   ],
 
   imports: [ 'document' ],
