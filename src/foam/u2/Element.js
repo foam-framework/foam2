@@ -509,6 +509,13 @@ foam.CLASS({
       }
     },
     {
+      name: 'content',
+      preSet: function(o, n) {
+        // Prevent setting to 'this', which wouldn't change the behaviour.
+        return n === this ? null : n ;
+      }
+    },
+    {
       name: 'parentNode',
       transient: true
     },
@@ -1063,6 +1070,10 @@ foam.CLASS({
     },
 
     function add(/* vargs */) {
+      if ( this.content ) {
+        return this.content.add.apply(this.content.add, arguments);
+      }
+
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
