@@ -1080,18 +1080,21 @@ foam.CLASS({
 
     function add(/* vargs */) {
       if ( this.content ) {
-        var e = this.content.add.apply(this.content, arguments);
-        e.parentNode = this;
-        return e;
+        this.content.add_(arguments, this);
+      } else {
+        this.add_(arguments, this);
       }
+      return this;
+    },
 
+    function add_(cs, parentNode) {
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
       var mapper = function(c) { return c.toE ? c.toE(null, Y) : c; };
 
-      for ( var i = 0 ; i < arguments.length ; i++ ) {
-        var c = arguments[i];
+      for ( var i = 0 ; i < cs.length ; i++ ) {
+        var c = cs[i];
 
         // Remove null values
         if ( c === undefined || c === null ) {
@@ -1117,7 +1120,7 @@ foam.CLASS({
       if ( es.length ) {
         for ( var i = 0 ; i < es.length ; i++ ) {
           if ( foam.u2.Element.isInstance(es[i]) ) {
-            es[i].parentNode = this;
+            es[i].parentNode = parentNode;
           } else if ( this.Entity.isInstance(es[i]) ) {
             // NOP
           } else {
