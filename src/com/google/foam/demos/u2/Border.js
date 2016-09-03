@@ -5,11 +5,8 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   properties: [
-    'label',
-    {
-      class: 'Boolean',
-      name: 'selected'
-    }
+    { class: 'String',  name: 'label' },
+    { class: 'Boolean', name: 'selected' }
   ]
 });
 
@@ -54,10 +51,12 @@ foam.CLASS({
   ],
 
   properties: [
+    /* not used
     {
       name: 'tabs',
       factory: function() { return []; }
     },
+    */
     {
       name: 'selected',
       postSet: function(o, n) {
@@ -144,8 +143,9 @@ var sb = SampleBorder.create({title: 'Title'});
 sb.add('content');
 sb.write();
 
-
 E('br').write();
+
+
 
 foam.CLASS({
   name: 'SampleSplitContainer',
