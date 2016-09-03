@@ -1,6 +1,116 @@
 var E = foam.__context__.E.bind(foam.__context__);
 
 foam.CLASS({
+  name: 'Tab',
+  extends: 'foam.u2.Element',
+
+  properties: [
+    'label',
+    {
+      class: 'Boolean',
+      name: 'selected'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  name: 'Tabs',
+  extends: 'foam.u2.Element',
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ {
+          background: gray;
+          width: 600px;
+          height: 200px;
+          padding: 10px;
+          display: block;
+        }
+        ^handles { height: 30px; }
+        ^tab {
+          border: 1px solid black;
+          border-bottom: none;
+          padding: 5px;
+          background: lightgray;
+        }
+        ^tab.selected {
+          background: white;
+          position: relative;
+          z-index: 1;
+        }
+        ^content {
+          margin: 4px;
+          padding: 6px;
+          background: white;
+          border: 1px solid black;
+          position: relative;
+          top: -13px;
+          left: -4px;
+        }
+      */}
+    })
+  ],
+
+  properties: [
+    {
+      name: 'tabs',
+      factory: function() { return []; }
+    },
+    {
+      name: 'selected',
+      postSet: function(o, n) {
+        if ( o ) o.selected = false;
+        n.selected = true;
+      }
+    },
+    'handles',
+    'area'
+  ],
+
+  methods: [
+    function init() {
+      this.
+          cssClass(this.myCls()).
+          start('div', null, this.handles$).
+            cssClass(this.myCls('handles')).
+          end().
+          start('div', null, this.content$).
+            cssClass(this.myCls('content')).
+          end();
+    },
+
+    function add(tab) {
+      if ( Tab.isInstance(tab) ) {
+        if ( ! this.selected ) this.selected = tab;
+        this.handles.start('span').
+            cssClass(this.myCls('tab')).
+            on('click', function() { this.selected = tab;}.bind(this)).
+            enableCls('selected', tab.selected$).
+            add(tab.label).
+        end();
+        tab.shown$ = tab.selected$;
+      }
+
+      this.SUPER(tab);
+    }
+  ]
+});
+
+var tabs = Tabs.create().
+  start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+  start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end().
+  start(Tab, {label: 'Tab 3'}).add('Even more contents in tab 3').end();
+
+tabs.write();
+
+
+E('br').write();
+
+
+
+foam.CLASS({
   name: 'SampleBorder',
   extends: 'foam.u2.Element',
 
@@ -72,80 +182,3 @@ var split = SampleSplitContainer.create();
 split.write();
 split.leftPanel.add('leftContent');
 split.rightPanel.add('rightContent');
-
-E('br').write();
-
-
-foam.CLASS({
-  name: 'Tab',
-  extends: 'foam.u2.Element',
-
-  properties: [ 'label' ]
-});
-
-
-foam.CLASS({
-  name: 'Tabs',
-  extends: 'foam.u2.Element',
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ { background: gray; width: 600px; height: 200px; padding: 10px; display: block; }
-        ^handles { height: 30px; backround: pink; }
-        ^tab {
-          border: 1px solid black;
-          border-bottom: none;
-          padding: 5px;
-        }
-        ^content {
-          margin: 4px;
-          padding: 6px;
-          background: white;
-          border: 1px solid black;
-          position: relative;
-          top: -13px;
-          left: -4px;
-        }
-      */}
-    })
-  ],
-
-  properties: [
-    {
-      name: 'tabs',
-      factory: function() { return []; }
-    },
-    'handles',
-    'area'
-  ],
-
-  methods: [
-    function init() {
-      this.
-          cssClass(this.myCls()).
-          start('div', null, this.handles$).
-            cssClass(this.myCls('handles')).
-          end().
-          start('div', null, this.content$).
-            cssClass(this.myCls('content')).
-          end();
-    },
-
-    function add(tab) {
-//      this.assert(Tab.isInstance(tab), 'Can only add Tab elements to Tabs.');
-
-      if ( Tab.isInstance(tab) ) {
-        this.handles.start('span').cssClass(this.myCls('tab')).add(tab.label).end();
-      }
-
-      this.SUPER(tab);
-    }
-  ]
-});
-
-var tabs = Tabs.create().
-  start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
-  start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end();
-
-tabs.write();
