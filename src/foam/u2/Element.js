@@ -1080,7 +1080,9 @@ foam.CLASS({
 
     function add(/* vargs */) {
       if ( this.content ) {
-        return this.content.add.apply(this.content, arguments);
+        var e = this.content.add.apply(this.content, arguments);
+        e.parentNode = this;
+        return e;
       }
 
       /* Add Children to this Element. */
