@@ -1,3 +1,5 @@
+var E = foam.__context__.E.bind(foam.__context__);
+
 foam.CLASS({
   name: 'SampleBorder',
   extends: 'foam.u2.Element',
@@ -29,12 +31,10 @@ foam.CLASS({
 });
 
 var sb = SampleBorder.create({title: 'Title'});
-sb.write();
 sb.add('content');
+sb.write();
 
 
-var E = foam.__context__.E.bind(foam.__context__);
-E('br').write();
 E('br').write();
 
 foam.CLASS({
@@ -72,3 +72,60 @@ var split = SampleSplitContainer.create();
 split.write();
 split.leftPanel.add('leftContent');
 split.rightPanel.add('rightContent');
+
+E('br').write();
+
+
+foam.CLASS({
+  name: 'Tab',
+  extends: 'foam.u2.Element',
+
+  properties: [ 'label' ]
+});
+
+
+foam.CLASS({
+  name: 'Tabs',
+  extends: 'foam.u2.Element',
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ { background: gray; width: 600px; height: 200px; padding: 10px; display: block; }
+        ^handles { height: 30px; backround: pink; }
+        ^content { margin: 4px; padding: 6px; background: white; }
+      */}
+    })
+  ],
+
+  properties: [
+    {
+      name: 'tabs',
+      factory: function() { return []; }
+    },
+    'handles',
+    'area'
+  ],
+
+  methods: [
+    function init() {
+      this.
+          cssClass(this.myCls()).
+          start('div', null, this.handles$).
+            cssClass(this.myCls('handles')).
+            add('handles').
+          end().
+          start('div', null, this.content$).
+            add('content').
+            cssClass(this.myCls('content')).
+          end();
+    }
+  ]
+});
+
+var tabs = Tabs.create();
+var t2 = tabs.
+  start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
+  start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end();
+
+tabs.write();
