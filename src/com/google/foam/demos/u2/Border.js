@@ -93,7 +93,20 @@ foam.CLASS({
       code: function() {/*
         ^ { background: gray; width: 600px; height: 200px; padding: 10px; display: block; }
         ^handles { height: 30px; backround: pink; }
-        ^content { margin: 4px; padding: 6px; background: white; }
+        ^tab {
+          border: 1px solid black;
+          border-bottom: none;
+          padding: 5px;
+        }
+        ^content {
+          margin: 4px;
+          padding: 6px;
+          background: white;
+          border: 1px solid black;
+          position: relative;
+          top: -13px;
+          left: -4px;
+        }
       */}
     })
   ],
@@ -113,17 +126,25 @@ foam.CLASS({
           cssClass(this.myCls()).
           start('div', null, this.handles$).
             cssClass(this.myCls('handles')).
-            add('handles').
           end().
           start('div', null, this.content$).
             cssClass(this.myCls('content')).
           end();
+    },
+
+    function add(tab) {
+//      this.assert(Tab.isInstance(tab), 'Can only add Tab elements to Tabs.');
+
+      if ( Tab.isInstance(tab) ) {
+        this.handles.start('span').cssClass(this.myCls('tab')).add(tab.label).end();
+      }
+
+      this.SUPER(tab);
     }
   ]
 });
 
-var tabs = Tabs.create();
-var t2 = tabs.
+var tabs = Tabs.create().
   start(Tab, {label: 'Tab 1'}).add('tab 1 contents').end().
   start(Tab, {label: 'Tab 2'}).add('tab 2 contents').end();
 
