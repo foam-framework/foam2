@@ -116,7 +116,6 @@ foam.CLASS({
             add('handles').
           end().
           start('div', null, this.content$).
-            add('content').
             cssClass(this.myCls('content')).
           end();
     }
