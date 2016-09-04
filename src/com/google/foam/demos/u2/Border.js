@@ -25,7 +25,7 @@ foam.CLASS({
           padding: 10px;
           display: block;
         }
-        ^handles { height: 30px; }
+        ^tabRow { height: 30px; }
         ^tab {
           border: 1px solid black;
           border-bottom: none;
@@ -64,16 +64,15 @@ foam.CLASS({
         n.selected = true;
       }
     },
-    'handles',
-    'area'
+    'tabRow'
   ],
 
   methods: [
     function init() {
       this.
           cssClass(this.myCls()).
-          start('div', null, this.handles$).
-            cssClass(this.myCls('handles')).
+          start('div', null, this.tabRow$).
+            cssClass(this.myCls('tabRow')).
           end().
           start('div', null, this.content$).
             cssClass(this.myCls('content')).
@@ -82,13 +81,16 @@ foam.CLASS({
 
     function add(tab) {
       if ( Tab.isInstance(tab) ) {
+
         if ( ! this.selected ) this.selected = tab;
-        this.handles.start('span').
+
+        this.tabRow.start('span').
             cssClass(this.myCls('tab')).
-            on('click', function() { this.selected = tab;}.bind(this)).
             enableCls('selected', tab.selected$).
+            on('click', function() { this.selected = tab; }.bind(this)).
             add(tab.label).
         end();
+
         tab.shown$ = tab.selected$;
       }
 
