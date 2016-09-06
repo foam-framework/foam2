@@ -138,6 +138,7 @@ foam.CLASS({
       postSet: function(old, nu) {
         old && old.on.unsub(this.onDAOUpdate);
         nu && nu.on.sub(this.onDAOUpdate);
+        this.onDAOUpdate();
       }
     },
     {
@@ -163,7 +164,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'selectSpec',
-      value: 'foam.u2.tag.Select'
+      value: { class: 'foam.u2.tag.Select' }
     },
     {
       name: 'view_'
@@ -192,9 +193,10 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         this.dao.select(foam.mlang.sink.Map.create({
-          f: this.objToChoice
+          arg1: this.objToChoice,
+          delegate: foam.dao.ArraySink.create()
         })).then(function(map) {
-          this.choices = map.arg2;
+          this.choices = map.delegate.a;
         }.bind(this));
       }
     }
