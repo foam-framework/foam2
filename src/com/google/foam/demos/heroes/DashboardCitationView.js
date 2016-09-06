@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.demos.heroes',
+  package: 'com.google.foam.demos.heroes',
   name: 'DashboardCitationView',
   extends: 'foam.u2.View',
 
