@@ -216,11 +216,15 @@ foam.CLASS({
     },
 
     function get() {
-      return this.parent.get()[this.name];
+      var o = this.parent.get();
+
+      return o && o[this.name];
     },
 
     function set(value) {
-      this.parent.get()[this.name] = value;
+      var o = this.parent.get();
+
+      if ( o ) o[this.name] = value;
     },
 
     /** Needed? **/
@@ -259,7 +263,8 @@ foam.CLASS({
   listeners: [
     function parentChange() {
       this.prevSub && this.prevSub.destroy();
-      this.prevSub = this.parent.get().sub('propertyChange', this.name, this.valueChange);
+      var o = this.parent.get();
+      this.prevSub = o && o.sub('propertyChange', this.name, this.valueChange);
       this.valueChange();
     },
 
