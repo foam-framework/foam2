@@ -27,8 +27,8 @@ Javascript functions specified return types:
     Promise<object> put(object);
     Promise         remove(object);
 
-    Promise<Sink> select(sink, skip, limit, order, predicate);
-    Promise       removeAll(skip, limit, order, predicate);
+    Promise<Sink> select(sink);
+    Promise       removeAll();
 
     //TODO: listen?
     void pipe(sink);
@@ -182,7 +182,7 @@ Deletes a single object from the DAO.
 in some fashion.
 
 
-### select(sink, *skip, limit, order, predicate*)
+### select(sink)
 *`returns Promise<sink>`*
 
 The primary way of getting objects out of a DAO, `select(sink)` retrieves
@@ -223,7 +223,7 @@ When calling `select()` or `removeAll()`, the returned Promise will resolve
 after all `put` and `remove` operations have been called (if those operations
 happen to return Promises, they are ignored).
 
-### removeAll(skip, limit, order, predicate)
+### removeAll()
 *`returns Promise`*
 
 `removeAll()` is very similar to `select()`, with the obvious exception that it
