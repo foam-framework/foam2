@@ -20,15 +20,23 @@ foam.CLASS({
   name: 'DAOList',
   extends: 'foam.u2.View',
 
+  requires: [
+    'foam.u2.ViewSpec'
+  ],
+
   // documentation: 'Expects its data to be a DAO, and renders one viewFactory for each one.',
 
   topics: [ 'rowClick' ],
 
   properties: [
     {
+      class: 'foam.u2.ViewSpec',
+      name: 'rowView'
+    },
+    {
+      // deprecated
       class: 'foam.u2.ViewFactory',
-      name: 'rowFactory',
-      required: true
+      name: 'rowFactory'
     },
     {
       name: 'rows_',
@@ -48,6 +56,13 @@ foam.CLASS({
       this.reloadData();
     },
 
+    function createRowView(obj, ctx) {
+      // TODO: remove rowFactory support when all code ported
+      return this.rowView ?
+        this.ViewSpec.createView(this.rowView, {data: obj}, this, ctx) :
+        this.rowFactory$f({data: obj}, ctx) ;
+    },
+
     function reloadData() {
       this.data.select({
         put: this.daoPut,
@@ -63,8 +78,7 @@ foam.CLASS({
         return;
       }
 
-      var ctx   = this.__subContext__.createSubContext();
-      var child = this.rowFactory$f({ data: obj }, ctx);
+      var child = this.createRowView(obj, this.__subContext__.createSubContext());
       child.on('click', function() {
         this.rowClick.pub(child.data);
       }.bind(this));
@@ -72,6 +86,7 @@ foam.CLASS({
       this.rows_[obj.id] = child;
       this.add(child);
     },
+
     function onDAOPut(_, __, ___, obj) {
       this.daoPut(obj);
     },
@@ -82,11 +97,10 @@ foam.CLASS({
         delete this.rows_[obj.id];
       }
     },
+
     function onDAORemove(_, __, ___, obj) {
       this.daoRemove(obj);
     },
-
-
 
     function onDAOReset() {
       this.removeAllChildren();

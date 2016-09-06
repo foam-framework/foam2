@@ -1017,6 +1017,28 @@ describe('EasyDAO-permutations', function() {
     dao.addRawIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
   });
 
+  it('constructs HTTP ClientDAO', function() {
+
+    foam.CLASS({
+      package: 'test',
+      name: 'HTTPBoxMocker',
+    });
+
+    var env = test.HTTPBoxMocker.create();
+    env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
+
+    var dao = foam.dao.EasyDAO.create({
+      of: test.CompA,
+      daoType: 'MDAO',
+      syncWithServer: true,
+      serverUri: 'localhost:8888',
+      syncPolling: true,
+      syncProperty: test.CompA.A
+    }, env);
+
+
+  });
+
 
 });
 

@@ -37,7 +37,7 @@ foam.CLASS({
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.CachingDAO',
-    'foam.core.dao.SyncDAO',
+    'foam.dao.SyncDAO',
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
     'foam.dao.ClientDAO',
@@ -292,18 +292,18 @@ foam.CLASS({
         var boxSender = ( this.sockets ) ?
           this.SocketBox.create({
             address: this.serverUri
-          }) :
+          }, boxContext) :
           this.HTTPBox.create({
              url: this.serverUri,
              method: 'POST'
-          }); // TODO: retry?
+          }, boxContext); // TODO: retry?
           //TODO: EasyClientDAO
 
         dao = this.SyncDAO.create({
           remoteDAO: this.ClientDAO.create({
               name: this.name,
               delegate: boxSender
-          }),
+          }, boxContext),
           syncProperty: this.syncProperty,
           delegate: dao,
           pollingFrequency: 1000

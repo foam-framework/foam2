@@ -20,11 +20,16 @@ foam.CLASS({
   name: 'Controller',
   extends: 'foam.u2.Element',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
     'com.google.foam.demos.heroes.CitationView',
     'com.google.foam.demos.heroes.DashboardCitationView',
     'com.google.foam.demos.heroes.Hero',
-    'foam.u2.DAOListView',
+    'foam.dao.ArrayDAO',
+    'foam.u2.DAOList',
     'foam.u2.DetailView',
     'foam.u2.CheckBox'
   ],
@@ -52,11 +57,11 @@ foam.CLASS({
       //      class: 'foam.core.types.DAO',
       name: 'heroDAO',
       view: {
-        class: 'foam.u2.DAOListView',
-        rowView: 'foam.demos.heroes.CitationView'
+        class: 'foam.u2.DAOList',
+        rowView: 'com.google.foam.demos.heroes.CitationView'
       },
       factory: function() {
-        return JSONUtil.arrayToObjArray(this.X, [
+        return this.ArrayDAO.create({array: foam.json.parse([
           { id: 11, name: "Mr. Nice"},
           { id: 12, name: "Narco",     starred: true},
           { id: 13, name: "Bombasto",  starred: true},
@@ -67,7 +72,7 @@ foam.CLASS({
           { id: 18, name: "Dr IQ"},
           { id: 19, name: "Magma"},
           { id: 20, name: "Tornado"}
-        ], this.Hero);
+        ], this.Hero)});
       }
     },
     {
@@ -75,10 +80,10 @@ foam.CLASS({
       // type: 'foam.core.types.DAO',
       name: 'starredHeroDAO',
       view: {
-        class: 'foam.u2.DAOListView',
-        rowView: 'foam.demos.heroes.DashboardCitationView'
+        class: 'foam.u2.DAOList',
+        rowView: 'com.google.foam.demos.heroes.DashboardCitationView'
       },
-      factory: function() { return this.heroDAO.where(EQ(this.Hero.STARRED, true)); }
+      factory: function() { return this.heroDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },
     {
       name: 'view',
@@ -97,11 +102,11 @@ foam.CLASS({
         br().
         add(this.DASHBOARD, this.HEROES).
         br().
-        add(this.slot(selection, view) {
+        add(this.slot(function(selection, view) {
           return selection ? this.detailE() :
-            v === 'dashboard' ? this.dashboardE() :
+            view === 'dashboard' ? this.dashboardE() :
             this.heroesE();
-        });
+        }));
     },
 
     function detailE() {
@@ -113,7 +118,7 @@ foam.CLASS({
     },
 
     function heroesE() {
-      return this.E().start('h3').add('My Heroes').end();
+      return this.E().start('h3').add('My Heroes').end().add(this.HERO_DAO);
     },
 
     function editHero(hero) {
@@ -125,16 +130,16 @@ foam.CLASS({
     {
       name: 'dashboard',
       isEnabled: function(view) { return view != 'dashboard'; },
-      code: function(view) { this.back(); view = 'dashboard'; }
+      code: function() { this.back(); this.view = 'dashboard'; }
     },
     {
       name: 'heroes',
       isEnabled: function(view) { return view != 'heroes'; },
-      code: function(view) { this.back(); view = 'heroes'; }
+      code: function() { this.back(); this.view = 'heroes'; }
     },
     {
       name: 'back',
-      code: function(selection) { selection = null; }
+      code: function() { this.selection = null; }
     }
   ]
 });

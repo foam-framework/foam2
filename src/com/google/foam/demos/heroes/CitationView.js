@@ -23,7 +23,7 @@ foam.CLASS({
   imports: [ 'editHero' ],
 
   methods: [
-    function init#() {
+    function initE() {
       this.
         on('click', this.onClick).
         add(this.data.id, ' ').
