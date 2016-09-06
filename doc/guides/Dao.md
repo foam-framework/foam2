@@ -199,7 +199,6 @@ limit the scope of the `select()`.
     mySink = this.ArrayDAO.create(); // DAOs are sinks too!
     dao.where(this.EQ(this.Todo.IS_COMPLETED, false)).select(mySink);
 
-Note that the arguments after `sink` are almost never manipulated directly.
 The DAOs returned by
 `where()` and friends are actually small wrappers around the original DAO that
 populate the filtering arguments on a `select()` or `removeAll()`.
