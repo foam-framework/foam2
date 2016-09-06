@@ -36,12 +36,10 @@ foam.CLASS({
     })
   ],
 
-  templates: [
-    function initE() {/*#U2
-      <div class="^" onClick="onClick">
-        {{this.data.name$}}
-      </div>
-    */}
+  methods: [
+    function initE() {
+      this.setClass(this.myCls()).on('click', this.onClick).add(this.data.name$);
+    }
   ],
 
   listeners: [

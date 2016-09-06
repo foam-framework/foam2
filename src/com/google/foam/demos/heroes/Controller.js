@@ -26,19 +26,22 @@ foam.CLASS({
     'com.google.foam.demos.heroes.Hero',
     'foam.u2.DAOListView',
     'foam.u2.DetailView',
-    'foam.u2.tag.Checkbox'
+    'foam.u2.CheckBox'
   ],
 
-  exports: [ 'editHero' ],
+  exports: [
+    'as data',
+    'editHero'
+  ],
 
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-      h2 { color: #444; font-weight: lighter; }
-      body { margin: 2em; }
-      body, input[text], button { color: #888; font-family: Cambria, Georgia; }
-      button { padding: 0.2em; font-size: 14px}
-      * { font-family: Arial; }
+        h2 { color: #444; font-weight: lighter; }
+        body { margin: 2em; }
+        body, input[text], button { color: #888; font-family: Cambria, Georgia; }
+        button { padding: 0.2em; font-size: 14px}
+        * { font-family: Arial; }
       */}
     })
   ],
@@ -46,10 +49,11 @@ foam.CLASS({
   properties: [
     {
       // TODO:
-      class: 'foam.core.types.DAO',
+      //      class: 'foam.core.types.DAO',
       name: 'heroDAO',
-      view: function(X) {
-        return X.lookup('foam.u2.DAOListView').create({rowView: 'foam.demos.heroes.CitationView'}, X);
+      view: {
+        class: 'foam.u2.DAOListView',
+        rowView: 'foam.demos.heroes.CitationView'
       },
       factory: function() {
         return JSONUtil.arrayToObjArray(this.X, [
@@ -68,80 +72,69 @@ foam.CLASS({
     },
     {
       // TODO:
-      type: 'foam.core.types.DAO',
+      // type: 'foam.core.types.DAO',
       name: 'starredHeroDAO',
-      view: function(X) {
-        return X.lookup('foam.u2.DAOListView').create({rowView: 'foam.demos.heroes.DashboardCitationView'}, X);
+      view: {
+        class: 'foam.u2.DAOListView',
+        rowView: 'foam.demos.heroes.DashboardCitationView'
       },
       factory: function() { return this.heroDAO.where(EQ(this.Hero.STARRED, true)); }
     },
     {
       name: 'view',
-      defaultValue: 'dashboard'
+      value: 'dashboard'
     },
     {
       name: 'selection',
-      toPropertyE: 'foam.u2.DetailView'
+      view: { class: 'foam.u2.DetailView', title: '' }
     }
   ],
 
   methods: [
+    function initE() {
+      this.
+        start('h2').add('Tour of Heroes').end().
+        br().
+        add(this.DASHBOARD, this.HEROES).
+        br().
+        add(this.slot(selection, view) {
+          return selection ? this.detailE() :
+            v === 'dashboard' ? this.dashboardE() :
+            this.heroesE();
+        });
+    },
+
+    function detailE() {
+      return this.E().add(this.selection.name$, ' details!', this.SELECTION, this.BACK);
+    },
+
+    function dashboardE() {
+      return this.E().start('h3').add('Top Heroes').end().add(this.STARRED_HERO_DAO);
+    },
+
+    function heroesE() {
+      return this.E().start('h3').add('My Heroes').end();
+    },
+
     function editHero(hero) {
       this.selection = hero;
     }
   ],
 
-  templates: [
-    function initE() {/*#U2
-      <div x:data={{this}}>
-        <h2>Tour of Heroes</h2>
-        <:dashboard/> <:heroes/>
-        <br>
-        {{ this.dynamic(function (s, v) {
-          if ( s )                return this.detailE(X);
-          if ( v == 'dashboard' ) return this.dashboardE(X);
-          return this.heroesE(X);
-        }.bind(this), this.selection$, this.view$)}}
-      </div>
-    */},
-
-    function detailE() {/*#U2
-      <div>
-        {{this.selection.name$}} details!
-        <:selection title=""/>
-        <:back/>
-      </div>
-    */},
-
-    function dashboardE() {/*#U2
-      <div>
-        <h3>Top Heroes</h3>
-        <:starredHeroDAO/>
-      </div>
-    */},
-
-    function heroesE() {/*#U2
-      <div>
-        <h3>My Heroes</h3>
-        <:heroDAO/>
-      </div>
-    */}
-  ],
-
   actions: [
     {
       name: 'dashboard',
-      isEnabled: function() { return this.view != 'dashboard'; },
-      code: function() { this.back(); this.view = 'dashboard'; }
+      isEnabled: function(view) { return view != 'dashboard'; },
+      code: function(view) { this.back(); view = 'dashboard'; }
     },
     {
       name: 'heroes',
-      isEnabled: function() { return this.view != 'heroes'; },
-      code: function() { this.back(); this.view = 'heroes'; }
+      isEnabled: function(view) { return view != 'heroes'; },
+      code: function(view) { this.back(); view = 'heroes'; }
     },
     {
       name: 'back',
-      code: function() { this.selection = null; }
+      code: function(selection) { selection = null; }
     }
   ]
 });

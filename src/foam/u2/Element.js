@@ -1048,6 +1048,10 @@ foam.CLASS({
       return this.add(this.createChild_(spec, args));
     },
 
+    function br() {
+      return this.tag('br');
+    },
+
     function startContext(map) {
       var m = {};
       Object.assign(m, map);

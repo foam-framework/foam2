@@ -24,12 +24,11 @@ foam.CLASS({
 
   methods: [
     function init#() {
-      this.nodeName = 'div';
       this.
-          on('click', this.onClick).
-          add(this.data.id, ' ').
-          entity('nbsp').
-          add(' ', this.data.name);
+        on('click', this.onClick).
+        add(this.data.id, ' ').
+        entity('nbsp').
+        add(' ', this.data.name);
     }
   ],
 
