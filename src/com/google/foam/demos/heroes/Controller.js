@@ -53,8 +53,6 @@ foam.CLASS({
 
   properties: [
     {
-      // TODO:
-      //      class: 'foam.core.types.DAO',
       name: 'heroDAO',
       view: {
         class: 'foam.u2.DAOList',
@@ -63,21 +61,19 @@ foam.CLASS({
       factory: function() {
         return this.ArrayDAO.create({array: foam.json.parse([
           { id: 11, name: "Mr. Nice"},
-          { id: 12, name: "Narco",     starred: true},
-          { id: 13, name: "Bombasto",  starred: true},
-          { id: 14, name: "Celeritas", starred: true},
-          { id: 15, name: "Magneta",   starred: true},
-          { id: 16, name: "RubberMan"},
-          { id: 17, name: "Dynama"},
-          { id: 18, name: "Dr IQ"},
-          { id: 19, name: "Magma"},
-          { id: 20, name: "Tornado"}
+          { id: 12, name: "Narco",     starred: true },
+          { id: 13, name: "Bombasto",  starred: true },
+          { id: 14, name: "Celeritas", starred: true },
+          { id: 15, name: "Magneta",   starred: true },
+          { id: 16, name: "RubberMan" },
+          { id: 17, name: "Dynama" },
+          { id: 18, name: "Dr IQ" },
+          { id: 19, name: "Magma" },
+          { id: 20, name: "Tornado" }
         ], this.Hero)});
       }
     },
     {
-      // TODO:
-      // type: 'foam.core.types.DAO',
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
@@ -86,7 +82,7 @@ foam.CLASS({
       factory: function() { return this.heroDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },
     {
-      name: 'view',
+      name: 'mode',
       value: 'dashboard'
     },
     {
@@ -99,12 +95,11 @@ foam.CLASS({
     function initE() {
       this.
         start('h2').add('Tour of Heroes').end().
-        br().
         add(this.DASHBOARD, this.HEROES).
         br().
-        add(this.slot(function(selection, view) {
+        add(this.slot(function(selection, mode) {
           return selection ? this.detailE() :
-            view === 'dashboard' ? this.dashboardE() :
+            mode === 'dashboard' ? this.dashboardE() :
             this.heroesE();
         }));
     },
@@ -129,13 +124,13 @@ foam.CLASS({
   actions: [
     {
       name: 'dashboard',
-      isEnabled: function(view) { return view != 'dashboard'; },
-      code: function() { this.back(); this.view = 'dashboard'; }
+      isEnabled: function(mode) { return mode != 'dashboard'; },
+      code: function() { this.back(); this.mode = 'dashboard'; }
     },
     {
       name: 'heroes',
-      isEnabled: function(view) { return view != 'heroes'; },
-      code: function() { this.back(); this.view = 'heroes'; }
+      isEnabled: function(mode) { return mode != 'heroes'; },
+      code: function() { this.back(); this.mode = 'heroes'; }
     },
     {
       name: 'back',
