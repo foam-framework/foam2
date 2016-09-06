@@ -46,6 +46,9 @@ foam.CLASS({
         body { margin: 2em; }
         body, input[text], button { color: #888; font-family: Cambria, Georgia; }
         button { padding: 0.2em; font-size: 14px}
+        ^starred .foam-u2-DAOList {
+          display: flex;
+        }
         * { font-family: Arial; }
       */}
     })
@@ -109,7 +112,7 @@ foam.CLASS({
     },
 
     function dashboardE() {
-      return this.E().start('h3').add('Top Heroes').end().add(this.STARRED_HERO_DAO);
+      return this.E().cssClass(this.myCls('starred')).start('h3').add('Top Heroes').end().add(this.STARRED_HERO_DAO);
     },
 
     function heroesE() {

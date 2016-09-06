@@ -31,10 +31,9 @@ foam.CLASS({
         border-radius: 2px;
         color: white;
         display: block;
-        margin: 20px;
+        margin: 10px;
         padding: 20px;
         text-align: center;
-        vertical-align: center;
         width: 100px;
       }
       ^:hover {
