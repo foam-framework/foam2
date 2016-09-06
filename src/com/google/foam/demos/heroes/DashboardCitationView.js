@@ -26,11 +26,19 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
       ^ {
+        background: #607d8b;
+        border: none;
+        border-radius: 2px;
+        color: white;
+        display: block;
+        margin: 10px;
+        padding: 20px;
+        text-align: center;
         width: 100px;
-        height: 100px;
-        border: 2px solid black;
-        background: green;
-        margin: 20px;
+      }
+      ^:hover {
+        background: #eee;
+        color: #607d8b;
       }
       */}
     })
