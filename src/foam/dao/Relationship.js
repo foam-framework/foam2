@@ -133,3 +133,15 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.LIB({
+  name: 'foam',
+  methods: [
+    function RELATIONSHIP(m) {
+      var r = foam.dao.Relationship.create(m);
+      r.validate && r.validate();
+      return r;
+    }
+  ]
+});

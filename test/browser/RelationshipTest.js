@@ -9,7 +9,8 @@ foam.CLASS({
   ids: [ 'name' ],
   properties: [ 'name' ]
 });
-foam.dao.Relationship.create({
+
+foam.RELATIONSHIP({
   sourceModel: 'Parent1',
   targetModel: 'Child1',
   name: 'children',
@@ -92,4 +93,3 @@ foam.CLASS({
 });
 
 RealWorld.create();
-
