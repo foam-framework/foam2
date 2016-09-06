@@ -110,6 +110,43 @@ tabs.write();
 E('br').write();
 
 
+// TODO: add CardDeck example
+foam.CLASS({
+  name: 'Card',
+  extends: 'foam.u2.Element',
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ {
+          background: white;
+          border-radius: 3px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+          margin: 8px;
+          transform-origin: top left;
+          display: inline-block;
+        }
+        ^content { padding: 6px; width: 300px; height: 200px; background: white; }
+      */}
+    })
+  ],
+
+  methods: [
+    function init() {
+      this.
+          cssClass(this.myCls()).
+          start('div', null, this.content$).
+            cssClass(this.myCls('content')).
+          end();
+    }
+  ]
+});
+
+Card.create().add('content').tag('br').add('more content').tag('br').add('even more conent').write();
+
+E('br').write();
+
+
 
 foam.CLASS({
   name: 'SampleBorder',
