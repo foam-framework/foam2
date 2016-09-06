@@ -26,11 +26,14 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
       ^ {
-        width: 100px;
-        height: 100px;
-        border: 2px solid black;
-        background: green;
+        background: #607d8b;
+        border: none;
+        color: white;
+        display: block;
         margin: 20px;
+        padding: 20px;
+        vertical-align: center;
+        width: 100px;
       }
       */}
     })
