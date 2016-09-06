@@ -193,7 +193,13 @@ foam.CLASS({
       /** The property to synchronize on. This is typically an integer value
         indicating the version last seen on the remote. */
       name: 'syncProperty'
-    }
+    },
+    {
+      /** If true, uses sockets instead of HTTP for server communication. */
+      name: 'sockets',
+      value: false
+    },
+
   ],
 
   constants: {
