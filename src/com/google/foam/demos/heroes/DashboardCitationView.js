@@ -35,6 +35,10 @@ foam.CLASS({
         vertical-align: center;
         width: 100px;
       }
+      ^:hover {
+        background: #eee;
+        color: #607d8b;
+      }
       */}
     })
   ],
