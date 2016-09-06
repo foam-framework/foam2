@@ -44,8 +44,7 @@ foam.CLASS({
       code: function() {/*
         h2 { color: #444; font-weight: lighter; }
         body { margin: 2em; }
-        body, input[text], button {     text-align: center;
-    display: block; color: #888; font-family: Cambria, Georgia; }
+        body, input[text], button { color: #888; font-family: Cambria, Georgia; }
         button { padding: 0.2em; font-size: 14px}
         * { font-family: Arial; }
       */}

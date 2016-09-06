@@ -28,10 +28,12 @@ foam.CLASS({
       ^ {
         background: #607d8b;
         border: none;
+        border-radius: 2px;
         color: white;
         display: block;
         margin: 20px;
         padding: 20px;
+        text-align: center;
         vertical-align: center;
         width: 100px;
       }
