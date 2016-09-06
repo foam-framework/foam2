@@ -38,7 +38,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.setClass(this.myCls()).on('click', this.onClick).add(this.data.name$);
+      this.cssClass(this.myCls()).on('click', this.onClick).add(this.data.name$);
     }
   ],
 
