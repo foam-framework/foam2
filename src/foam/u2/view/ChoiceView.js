@@ -136,8 +136,8 @@ foam.CLASS({
     {
       name: 'dao',
       postSet: function(old, nu) {
-        old.on.unsub(this.onDAOUpdate);
-        nu.on.sub(this.onDAOUpdate);
+        old && old.on.unsub(this.onDAOUpdate);
+        nu && nu.on.sub(this.onDAOUpdate);
       }
     },
     {
