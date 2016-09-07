@@ -30,7 +30,19 @@ foam.CLASS({
     { class: 'Simple', name: 'right' },
 
     // per tree properties
-    { name: 'nullNode' } // ???: Where is this set?
+    {
+      /**
+        The null node guards the leaves of the tree. It is a single shared
+        instance per tree, set by TreeIndex when setting up the tree node
+        factory. Every partial or empty node is marked by setting its
+        left and/or right to the nullNode.
+        <p>
+        TreeNodes use the nullNode reference to clear their left/right
+        references, and NullTreeNode uses the tree node factory to create
+        new nodes.
+      */
+      name: 'nullNode'
+    }
   ],
 
   methods: [
@@ -359,7 +371,12 @@ foam.CLASS({
 
 /**
   Guards the leaves of the tree. Once instance is created per instance of
-  TreeIndex, and referenced by every flyweight index and tree node.
+  TreeIndex, and referenced by every tree node. Most of its methods are
+  no-ops, cleanly terminating queries and other tree operations.
+  <p>
+  NullTreeNode covers creation of new nodes: when a put value hits the
+  nullNode, a new TreeNode is returned and the caller replaces the
+  nullNode reference with the new node.
 */
 foam.CLASS({
   package: 'foam.dao.index',
@@ -368,10 +385,18 @@ foam.CLASS({
 
   properties: [
     {
+      /**
+        The nullNode for a given tree creates all the new nodes, so it needs
+        the factory for the tail index to create inside each new node.
+      */
       class: 'Simple',
       name: 'tailFactory'
     },
     {
+      /**
+        The tree node factory is used to create new, empty tree nodes. They
+        will be initialized with a new tail index from tailFactory.
+      */
       class: 'Simple',
       name: 'treeNodeFactory'
     }
