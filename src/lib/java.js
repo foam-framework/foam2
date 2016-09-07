@@ -175,24 +175,35 @@ foam.CLASS({
       }
     }
   ],
+  methods: [
+    function buildJavaClass(cls) {
+      cls = cls || foam.java.Class.create();
+
+      cls.package = this.package;
+      cls.name = this.name;
+      cls.extends = 'foam.core.ContextAwareSupport',
+      cls.implements = ['foam.box.Box'];
+
+      foam.core.Object.create({
+        name: 'delegate',
+        javaType: this.of
+      }).buildJavaClass(cls);
+
+      cls.method({
+        type: 'void',
+        visibility: 'public',
+        name: 'send',
+        args: [ { name: 'message', type: 'foam.box.Message' } ],
+        body: this.sendMethodCode()
+      });
+
+      return cls;
+    }
+  ],
   templates: [
     {
-      name: 'code',
-      template: function() {/*
-package <%= this.package %>;
-
-import foam.core.ContextAwareSupport;
-
-public class <%= this.name %> extends ContextAwareSupport implements foam.box.Box {
-  private <%= this.of %> delegate_;
-  public <%= this.of %> getDelegate() { return delegate_; }
-  public <%= this.name %> setDelegate(<%= this.of %> delegate) {
-    delegate_ = delegate;
-    return this;
-  }
-
-  public void send(foam.box.Message message) {
-    if ( ! ( message instanceof foam.box.RPCMessage) ) {
+      name: 'sendMethodCode',
+      template: function() {/*if ( ! ( message instanceof foam.box.RPCMessage) ) {
       // TODO error to errorBox
       return;
     }
@@ -223,10 +234,7 @@ public class <%= this.name %> extends ContextAwareSupport implements foam.box.Bo
       reply.setData(result);
 
       replyBox.send(reply);
-    }
-  }
-}
-  */}
+    }*/}
     }
   ]
 });
