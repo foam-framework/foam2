@@ -60,20 +60,6 @@ foam.CLASS({
       view: {
         class: 'foam.u2.DAOList',
         rowView: 'com.google.foam.demos.heroes.CitationView'
-      },
-      factory: function() {
-        return this.ArrayDAO.create({array: foam.json.parse([
-          { id: 11, name: "Mr. Nice"},
-          { id: 12, name: "Narco",     starred: true },
-          { id: 13, name: "Bombasto",  starred: true },
-          { id: 14, name: "Celeritas", starred: true },
-          { id: 15, name: "Magneta",   starred: true },
-          { id: 16, name: "RubberMan" },
-          { id: 17, name: "Dynama" },
-          { id: 18, name: "Dr IQ" },
-          { id: 19, name: "Magma" },
-          { id: 20, name: "Tornado" }
-        ], this.Hero)});
       }
     },
     {
