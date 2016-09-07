@@ -40,10 +40,111 @@ foam.CLASS({
   ]
 });
 
+var createData1 = function createData1() {
+  return [
+    {
+      int: 0,
+      float: 0.0,
+      string: "",
+      date: new Date(0),
+    },
+    {
+      int: 1,
+      float: 1.1,
+      string: "one!",
+      date: new Date(1),
+    },
+  ].map(function(cfg) {
+    return test.Indexable.create(cfg);
+  });
+}
+
+
+
 describe('ValueIndex', function() {
 
+  var data;
+  var idx;
+
+  beforeEach(function() {
+    data = createData1();
+    idx = foam.dao.index.ValueIndex.create();
+  });
+
+  it('stores a value', function() {
+    idx.put(data[0]);
+    expect(idx.get()).toBe(data[0]);
+  });
+  it('clears its value', function() {
+    idx.put(data[0]);
+    expect(idx.get()).toBe(data[0]);
+    idx.remove();
+    expect(idx.get()).toBeUndefined();
+  });
+  it('selects when skip and limit allow', function() {
+    idx.put(data[0]);
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    idx.select(sink);
+    expect(sink.putted).toBe(data[0]);
+    delete sink.putted;
+
+    var skip = [2];
+    idx.select(sink, skip);
+    expect(sink.putted).toBeUndefined(); // skipped
+    expect(skip[0]).toEqual(1); // skip decremented
+    delete sink.putted;
+
+    var limit = [3];
+    idx.select(sink, undefined, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(2); // limit decremented
+    delete sink.putted;
+
+    skip = [1];
+    limit = [3];
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBeUndefined(); // skip
+    expect(skip[0]).toEqual(0);
+    expect(limit[0]).toEqual(3);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(2);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(1);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(0);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBeUndefined(); // at limit
+    expect(limit[0]).toEqual(-1);
+    delete sink.putted;
 
 
+  });
+
+  it('selects when predicate allows', function() {
+    idx.put(data[0]);
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    var predicate = { f: function() { return false; } };
+    idx.select(sink, undefined, undefined, undefined, predicate);
+    expect(sink.putted).toBeUndefined();
+    delete sink.putted;
+
+    predicate = { f: function() { return true; } };
+    idx.select(sink, undefined, undefined, undefined, predicate);
+    expect(sink.putted).toBe(data[0]);
+    delete sink.putted;
+
+  });
 
 
 });
