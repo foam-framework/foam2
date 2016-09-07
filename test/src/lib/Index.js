@@ -146,10 +146,62 @@ describe('ValueIndex', function() {
 
   });
 
+  it('returns proper size', function() {
+    expect(idx.size()).toEqual(0);
+    idx.put(data[0]);
+    expect(idx.size()).toEqual(1);
+    idx.put(data[1]);
+    expect(idx.size()).toEqual(1);
+    idx.remove();
+    expect(idx.size()).toEqual(0);
+  });
+
+  it('covers toString()', function() {
+    idx.toString(); // empty
+    idx.put(data[0]);
+    idx.toString(); // with value
+  });
+
 
 });
 
 
+describe('ValueIndex (as Plan)', function() {
+
+  var data;
+  var idx;
+  var plan;
+
+  beforeEach(function() {
+    data = createData1();
+    idx = foam.dao.index.ValueIndex.create();
+  });
+
+  it('plans for no value', function() {
+    plan = idx.plan();
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    expect(plan.cost).toEqual(1);
+    plan.execute([/*promise*/], sink);
+    expect(sink.putted).toBeUndefined();
+    delete sink.putted;
+  });
+
+
+  it('plans for a value', function() {
+    idx.put(data[0]);
+    plan = idx.plan();
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    expect(plan.cost).toEqual(1);
+    plan.execute([/*promise*/], sink);
+    expect(sink.putted).toBe(data[0]);
+    delete sink.putted;
+  });
+
+});
 
 
 
