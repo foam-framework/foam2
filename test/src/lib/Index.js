@@ -15,319 +15,194 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'test',
+  name: 'Indexable',
 
-describe('MDAO TreeIndex', function() {
+  properties: [
+    {
+      class: 'Int',
+      name: 'int'
+    },
+    {
+      class: 'Float',
+      name: 'float'
+    },
+    {
+      class: 'String',
+      name: 'string'
+    },
+    {
+      class: 'Date',
+      name: 'date'
+    },
 
-  var NUM_ALBUMS = 10;
-  var NUM_PHOTOS = 100;
+  ]
+});
 
-  foam.CLASS({
-    package: 'test',
-    name: 'Photo',
-    properties: [
-      { name: 'id' },
-      { name: 'hash' },
-      { class: 'Boolean', name: 'isLocal' },
-      { class: 'Boolean', name: 'byAction' },
-      { class: 'Date', name: 'timestamp' },
-      { name: 'albumId' },
-      { class: 'Boolean', name: 'isCoverPhoto' },
-      { name: 'jspb', hidden: true }
-    ]
+var createData1 = function createData1() {
+  return [
+    {
+      int: 0,
+      float: 0.0,
+      string: "",
+      date: new Date(0),
+    },
+    {
+      int: 1,
+      float: 1.1,
+      string: "one!",
+      date: new Date(1),
+    },
+  ].map(function(cfg) {
+    return test.Indexable.create(cfg);
+  });
+}
+
+
+
+describe('ValueIndex', function() {
+
+  var data;
+  var idx;
+
+  beforeEach(function() {
+    data = createData1();
+    idx = foam.dao.index.ValueIndex.create();
   });
 
-  foam.CLASS({
-    package: 'test',
-    name: 'Album',
-    properties: [
-      { name: 'id', name: 'id' },
-      { class: 'Boolean', name: 'isLocal' },
-      { class: 'Boolean', name: 'byAction' },
-      { class: 'Date', name: 'timestamp' },
-      { name: 'jspb', hidden: true }
-    ],
-    relationships: [
-      { model_: 'Relationship', relatedModel: 'Photo', relatedProperty: 'albumId' }
-    ]
+  it('stores a value', function() {
+    idx.put(data[0]);
+    expect(idx.get()).toBe(data[0]);
   });
-
-
-  var AlbumDAO, PhotoDAO, PhotoDetailDAO, albums, photos;
-  var NOW = 1461778131578; // reasonable Date.now() substitute
-  var MS_PER_DAY = 1000*60*60*24;
-
-  albums = foam.dao.ArrayDAO.create();
-  photos = foam.dao.ArrayDAO.create();
-  for ( var i = 0; i < NUM_ALBUMS; ++i ) {
-    albums.put(
-      test.Album.create({
-        id: ""+i,
-        isLocal: !! ( i % 2 ),
-        byAction: !! ( 1 - (i % 2) ),
-        timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_ALBUMS) * MS_PER_DAY * 300),
-        jspb: [ 'nothing!' ],
-      })
-    );
-  }
-  for ( var i = 0; i < NUM_PHOTOS; ++i ) {
-    photos.put(
-      test.Photo.create({
-        id: ""+i,
-        timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_PHOTOS) * MS_PER_DAY * 300),
-        isLocal: !! ( i % 2 ),
-        byAction: !! ( 1 - (i % 2) ),
-        albumId: ""+(i % NUM_ALBUMS),
-        isCoverPhoto: ( i % 3 ) > 0,
-        jspb: [ 'nothing!' ],
-      })
-    );
-  }
-
-
-  var avgKey = ""+Math.floor(NUM_PHOTOS/2)/*.toString()*/;
-  var avgAlbumKey = ""+Math.floor(NUM_ALBUMS/2)/*.toString()*/;
-
-  function makeMultiPartKeys(n) {
-    var a = [];
-    for ( var i = 0 ; i < n ; i++ ) {
-      a.push(""+(Math.floor(NUM_PHOTOS/n)*i));
-    }
-    return a;
-  }
-
-  var M = foam.mlang.Expressions.create();
-
-  var KEYS_SINGLE = makeMultiPartKeys(1);
-  var KEYS_A_FEW = makeMultiPartKeys(10);
-  var KEYS_LOTS = makeMultiPartKeys(100);
-
-  beforeEach(function(done) {
-    PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
-      .addIndex(test.Photo.ALBUM_ID)
-      .addIndex(test.Photo.TIMESTAMP)
-      .addIndex(test.Photo.IS_LOCAL);
-    AlbumDAO = foam.dao.MDAO.create({of: test.Album})
-     .addIndex(test.Album.IS_LOCAL)
-     .addIndex(test.Album.TIMESTAMP);
-
-    AlbumDAO.bulkLoad(albums).then(PhotoDAO.bulkLoad(photos)).then(done);
+  it('clears its value', function() {
+    idx.put(data[0]);
+    expect(idx.get()).toBe(data[0]);
+    idx.remove();
+    expect(idx.get()).toBeUndefined();
   });
+  it('selects when skip and limit allow', function() {
+    idx.put(data[0]);
 
-  afterEach(function() {
+    var sink = { put: function(o) { this.putted = o; } };
+
+    idx.select(sink);
+    expect(sink.putted).toBe(data[0]);
+    delete sink.putted;
+
+    var skip = [2];
+    idx.select(sink, skip);
+    expect(sink.putted).toBeUndefined(); // skipped
+    expect(skip[0]).toEqual(1); // skip decremented
+    delete sink.putted;
+
+    var limit = [3];
+    idx.select(sink, undefined, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(2); // limit decremented
+    delete sink.putted;
+
+    skip = [1];
+    limit = [3];
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBeUndefined(); // skip
+    expect(skip[0]).toEqual(0);
+    expect(limit[0]).toEqual(3);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(2);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(1);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBe(data[0]); // not at limit
+    expect(limit[0]).toEqual(0);
+    delete sink.putted;
+    idx.select(sink, skip, limit);
+    expect(sink.putted).toBeUndefined(); // at limit
+    expect(limit[0]).toEqual(-1);
+    delete sink.putted;
+
 
   });
 
-  it('bulk loads', function(done) {
-    AlbumDAO.select().then(function(s) {
-      expect(s.a.length).toEqual(NUM_ALBUMS);
-    }).then(function() {
-      PhotoDAO.select().then(function(s) {
-        expect(s.a.length).toEqual(NUM_PHOTOS);
-      }).then(done);
-    })
+  it('selects when predicate allows', function() {
+    idx.put(data[0]);
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    var predicate = { f: function() { return false; } };
+    idx.select(sink, undefined, undefined, undefined, predicate);
+    expect(sink.putted).toBeUndefined();
+    delete sink.putted;
+
+    predicate = { f: function() { return true; } };
+    idx.select(sink, undefined, undefined, undefined, predicate);
+    expect(sink.putted).toBe(data[0]);
+    delete sink.putted;
+
   });
 
-  it('selects with mutliple keys', function(done) {
-    PhotoDAO.where(M.IN(test.Photo.ID, KEYS_SINGLE)).select()
-      .then(
-        function(s) { expect(s.a.length).toEqual(KEYS_SINGLE.length); }
-      ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_A_FEW)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_A_FEW.length); })
-      ).then(
-        PhotoDAO.where(M.IN(test.Photo.ID, KEYS_LOTS)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_LOTS.length); })
-      ).then(done);
+  it('returns proper size', function() {
+    expect(idx.size()).toEqual(0);
+    idx.put(data[0]);
+    expect(idx.size()).toEqual(1);
+    idx.put(data[1]);
+    expect(idx.size()).toEqual(1);
+    idx.remove();
+    expect(idx.size()).toEqual(0);
   });
 
-  it('innner joins', function(done) {
-    var idsink = foam.dao.ArraySink.create();
-    return AlbumDAO.where(M.EQ(test.Album.IS_LOCAL, false)).select(M.MAP(test.Album.ID, idsink))
-      .then(function (idsmapsink) {
-        return PhotoDAO.where(M.IN(test.Photo.ALBUM_ID, idsink.a)).select().then(function(csink) {
-          expect(csink.a.length).toEqual(NUM_PHOTOS / 2);
-        });
-      }).then(done);
-  });
-
-  it ('orders', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    PhotoDAO.where(M.EQ(test.Photo.ALBUM_ID, avgAlbumKey))
-      .orderBy(M.DESC(test.Photo.TIMESTAMP)).select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('orders and filters gt/desc', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - MS_PER_DAY * 10;
-    PhotoDAO
-      .orderBy(M.DESC(test.Photo.TIMESTAMP))
-      .where(M.GT(test.Photo.TIMESTAMP, cutOff))
-      .select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeGreaterThan(cutOff);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('orders and filters gt/asc', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - MS_PER_DAY * 10;
-    PhotoDAO
-      .orderBy(test.Photo.TIMESTAMP)
-      .where(M.GT(test.Photo.TIMESTAMP, cutOff))
-      .select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeGreaterThan(cutOff);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('orders and filters lt/desc', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - MS_PER_DAY * 10;
-    PhotoDAO
-      .orderBy(M.DESC(test.Photo.TIMESTAMP))
-      .where(M.LT(test.Photo.TIMESTAMP, cutOff))
-      .select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeLessThan(cutOff);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('orders and filters lt/asc', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var cutOff = NOW - MS_PER_DAY * 10;
-    PhotoDAO
-      .orderBy(test.Photo.TIMESTAMP)
-      .where(M.LT(test.Photo.TIMESTAMP, cutOff))
-      .select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeLessThan(cutOff);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('orders and filters a range', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var lower = NOW - MS_PER_DAY * 100;
-    var upper = NOW - MS_PER_DAY * 20;
-    PhotoDAO
-      .orderBy(test.Photo.TIMESTAMP)
-      .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeLessThan(upper);
-          expect(prev.timestamp.getTime()).toBeGreaterThan(lower);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('order, range, limit', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var lower = NOW - MS_PER_DAY * 100;
-    var upper = NOW - MS_PER_DAY * 20;
-
-    var countSink = foam.mlang.sink.Count.create();
-    PhotoDAO
-      .orderBy(test.Photo.TIMESTAMP)
-      .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .select(countSink);
-
-    PhotoDAO
-      .orderBy(test.Photo.TIMESTAMP)
-      .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .limit(countSink.value - 5)
-      .select(asink).then(function() {
-        var a = asink.a;
-        expect(a.length).toEqual(countSink.value - 5);
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeLessThan(upper);
-          expect(prev.timestamp.getTime()).toBeGreaterThan(lower);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('order, range, skip', function(done) {
-    var asink = foam.dao.ArraySink.create();
-    var lower = NOW - MS_PER_DAY * 100;
-    var upper = NOW - MS_PER_DAY * 20;
-
-    var countSink = foam.mlang.sink.Count.create();
-    PhotoDAO
-      .orderBy(M.DESC(test.Photo.TIMESTAMP))
-      .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .select(countSink);
-
-    PhotoDAO
-      .orderBy(M.DESC(test.Photo.TIMESTAMP))
-      .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
-      .skip(countSink.value - 5) // skip all but 5
-      .select(asink).then(function() {
-        var a = asink.a;
-        expect(a.length).toEqual(5);
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime()).toBeLessThan(upper);
-          expect(prev.timestamp.getTime()).toBeGreaterThan(lower);
-          prev = a[i];
-        }
-      }).then(done);
-  });
-
-  it ('filters inverted range', function(done) {
-    // Pick the items NOT in the range
-    var asink = foam.dao.ArraySink.create();
-    var lower = NOW - MS_PER_DAY * 100;
-    var upper = NOW - MS_PER_DAY * 20;
-    PhotoDAO
-      .orderBy(test.Photo.TIMESTAMP)
-      .where(M.OR(M.GT(test.Photo.TIMESTAMP, upper), M.LT(test.Photo.TIMESTAMP, lower)))
-      .select(asink).then(function() {
-        var a = asink.a;
-        var prev = a[0];
-        for ( var i = 1; i < a.length; ++i ) {
-          expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
-          expect(prev.timestamp.getTime() > upper ||
-                 prev.timestamp.getTime() < lower).toBe(true);
-          prev = a[i];
-        }
-      }).then(done);
+  it('covers toString()', function() {
+    idx.toString(); // empty
+    idx.put(data[0]);
+    idx.toString(); // with value
   });
 
 
 });
+
+
+describe('ValueIndex (as Plan)', function() {
+
+  var data;
+  var idx;
+  var plan;
+
+  beforeEach(function() {
+    data = createData1();
+    idx = foam.dao.index.ValueIndex.create();
+  });
+
+  it('plans for no value', function() {
+    plan = idx.plan();
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    expect(plan.cost).toEqual(1);
+    plan.execute([/*promise*/], sink);
+    expect(sink.putted).toBeUndefined();
+    delete sink.putted;
+  });
+
+
+  it('plans for a value', function() {
+    idx.put(data[0]);
+    plan = idx.plan();
+
+    var sink = { put: function(o) { this.putted = o; } };
+
+    expect(plan.cost).toEqual(1);
+    plan.execute([/*promise*/], sink);
+    expect(sink.putted).toBe(data[0]);
+    delete sink.putted;
+  });
+
+});
+
 
 
 

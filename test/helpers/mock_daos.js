@@ -146,3 +146,83 @@ foam.CLASS({
     }
   ]
 });
+
+/**
+  Use as a tail index for testing that indexes find the correct sub-index
+  TODO: Model a mocker axiom to generate a mock from a base class:
+    - just use $mockCalls, or property like Proxy?
+    - optionally specify method bodies for fake return values
+    - property getters and setters?
+*/
+foam.CLASS({
+  package: 'test.helpers',
+  name: 'MockIndex',
+  extends: 'foam.dao.index.Index',
+
+  properties: [
+    '$mockCalls', // name, args
+    '$lastCalled',
+    {
+      name: '$callCounts',
+      factory: function() { return {}; }
+    }
+  ],
+
+  constants: {
+    MOCK_BODY: function() {
+      this.$mockCalls.push({
+        name: this.$lastCalled,
+        args: Array.prototype.slice.call(arguments)
+      });
+      this.$callCounts[this.$lastCalled] =
+        ( this.$callCounts[this.$lastCalled] ) ?
+          this.$callCounts[this.$lastCalled] + 1 : 1;
+    }
+  },
+
+  methods: [
+
+    /** Adds or updates the given value in the index */
+    function put() {
+      this.$lastCalled = 'put';
+      this.MOCK_BODY(arguments);
+    },
+
+    /** Removes the given value from the index */
+    function remove() {
+      this.$lastCalled = 'remove';
+      this.MOCK_BODY(arguments);
+    },
+
+    /** @return a Plan to execute a select with the given parameters */
+    function plan(/*sink, skip, limit, order, predicate*/) {
+      this.$lastCalled = 'plan';
+      this.MOCK_BODY(arguments);
+    },
+
+    /** @return the stored value for the given key. */
+    function get() {
+      this.$lastCalled = 'get';
+      this.MOCK_BODY(arguments);
+    },
+
+    /** @return the integer size of this index. */
+    function size() {
+      this.$lastCalled = 'size';
+      this.MOCK_BODY(arguments);
+    },
+
+    /** Selects matching items from the index and puts them into sink */
+    function select(/*sink, skip, limit, order, predicate*/) {
+      this.$lastCalled = 'select';
+      this.MOCK_BODY(arguments);
+    },
+
+    /** Selects matching items in reverse order from the index and puts
+      them into sink */
+    function selectReverse(/*sink, skip, limit, order, predicate*/) {
+      this.$lastCalled = 'selectReverse';
+      this.MOCK_BODY(arguments);
+    },
+  ]
+});
