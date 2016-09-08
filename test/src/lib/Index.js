@@ -54,11 +54,47 @@ var createData1 = function createData1() {
       string: "one!",
       date: new Date(1),
     },
+    {
+      int: 2,
+      float: 2.2,
+      string: "One!",
+      date: new Date(1),
+    },
+    {
+      int: 3,
+      float: 3.1,
+      string: "Three",
+      date: new Date(1),
+    },
+    {
+      int: 4,
+      float: 4.4,
+      string: "three",
+      date: new Date(1),
+    },
   ].map(function(cfg) {
     return test.Indexable.create(cfg);
   });
 }
 
+
+var createData2 = function createData2() {
+  var arr = [];
+  var count = 20;
+
+  for (var i = 0; i < count; i++ ) {
+    arr.push({
+      int: i,
+      float: count - i,
+      string: 'hello' + ( i % (count / 4) ),
+      date: new Date(0)
+    });
+  }
+
+  return arr.map(function(cfg) {
+    return test.Indexable.create(cfg);
+  });
+}
 
 
 describe('ValueIndex', function() {
@@ -204,5 +240,197 @@ describe('ValueIndex (as Plan)', function() {
 });
 
 
+describe('TreeIndex', function() {
+
+
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData2();
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.INT,
+      tailFactory: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.FLOAT,
+        tailFactory: foam.dao.index.ValueIndex.create()
+      })
+    });
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('covers toString()', function() {
+    plan = idx.plan(sink);
+
+    // cover
+    plan.toString();
+    idx.toString();
+  });
+
+  it('optimizes IN', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.IN(test.Indexable.INT, [ 0, 1, 2 ]));
+
+    // Note: this is checking an implementation detail
+    // Each item in the In array produces a plan
+    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
+    expect(plan.subPlans.length).toEqual(3);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(3);
+    expect(sink.a[0].int).toEqual(0);
+    expect(sink.a[1].int).toEqual(1);
+    expect(sink.a[2].int).toEqual(2);
+  });
+
+  it('optimizes not found IN', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.IN(test.Indexable.INT, [ 22, 25 ]));
+
+    expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(0);
+  });
+
+  it('optimizes EQ', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, 4));
+
+    // Note: this is checking an implementation detail
+    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
+    expect(plan.subPlans.length).toEqual(1);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].int).toEqual(4);
+  });
+
+  it('optimizes not found EQ', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, 56));
+
+    expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(0);
+  });
+
+  it('optimizes False', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      foam.mlang.predicate.False.create());
+
+    expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+    plan.execute([], sink);
+    expect(sink.a.length).toEqual(0);
+  });
+
+
+  it('optimizes range searches', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.AND(
+        m.GT(test.Indexable.FLOAT, 7),
+        m.LT(test.Indexable.FLOAT, 25),
+        m.GTE(test.Indexable.INT, 3),
+        m.LTE(test.Indexable.INT, 10)
+      )
+    );
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(5);
+    expect(sink.a[0].int).toEqual(3);
+    expect(sink.a[1].int).toEqual(4);
+    expect(sink.a[2].int).toEqual(5);
+    expect(sink.a[3].int).toEqual(6);
+    expect(sink.a[4].int).toEqual(7);
+
+  });
+
+
+//   it('optimizes True', function() {
+//     // not a valid case
+//     var baseEq = m.EQ(test.Indexable.INT, 4);
+//     var fakePredicate = {
+//       __proto__: baseEq,
+//       f: function() { return true; },
+//       partialEval: function() { return foam.mlang.predicate.True.create(); }
+//     }
+
+//     plan = idx.plan(sink, undefined, undefined, undefined,
+//       m.AND(
+//         fakePredicate,
+//         fakePredicate
+//       )
+//     );
+
+//     //expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+//     plan.execute([], sink);
+//     expect(sink.a.length).toEqual(data.length);
+//   });
+
+
+
+});
+
+
+
+
+describe('Case-Insensitive TreeIndex', function() {
+
+
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData1();
+    idx = foam.dao.index.CITreeIndex.create({
+      prop: test.Indexable.STRING,
+      tailFactory: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.INT,
+        tailFactory: foam.dao.index.ValueIndex.create()
+      })
+    });
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('selects case-insensitive', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'three')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(2);
+    expect(sink.a[0].string).toEqual('Three');
+    expect(sink.a[1].string).toEqual('three');
+  });
+
+  it('removes case-insensitive', function() {
+    idx.remove(data[3]);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'three')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].string).toEqual('three');
+  });
+});
 
 
