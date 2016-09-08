@@ -518,6 +518,17 @@ describe('SetIndex', function() {
 
 });
 
+describe('Plan', function() {
+  it('covers toString()', function() {
+    foam.dao.index.Plan.create().toString();
+    foam.dao.index.NotFoundPlan.create().toString();
+    foam.dao.index.NoPlan.create().toString();
+    foam.dao.index.CustomPlan.create().toString();
+    foam.dao.index.CountPlan.create().toString();
+    foam.dao.index.AltPlan.create().toString();
+  });
+});
+
 
 
 
