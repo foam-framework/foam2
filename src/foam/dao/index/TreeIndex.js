@@ -415,6 +415,17 @@ foam.CLASS({
       // NOP, not safe to do here
     },
 
+    /**
+     * Do not optimize bulkload to SetIndex
+     **/
+    function bulkLoad(a) {
+      a = a.a || a;
+      this.root = this.nullNode;
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        this.put(a[i]);
+      }
+    },
+
     function put(newValue) {
       var a = this.prop.f(newValue);
 

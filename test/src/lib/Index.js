@@ -36,7 +36,9 @@ foam.CLASS({
       class: 'Date',
       name: 'date'
     },
-
+    {
+      name: 'array',
+    }
   ]
 });
 
@@ -96,6 +98,26 @@ var createData2 = function createData2() {
   });
 }
 
+var createData3 = function createData3() {
+  return [
+    {
+      int: 0,
+      float: 0.0,
+      string: "",
+      date: new Date(0),
+      array: ['hello', 'bye']
+    },
+    {
+      int: 1,
+      float: 1.1,
+      string: "one!",
+      date: new Date(1),
+      array: ['apple', 'banana','kiwi']
+    },
+  ].map(function(cfg) {
+    return test.Indexable.create(cfg);
+  });
+}
 
 describe('ValueIndex', function() {
 
@@ -384,11 +406,7 @@ describe('TreeIndex', function() {
 });
 
 
-
-
 describe('Case-Insensitive TreeIndex', function() {
-
-
   var data;
   var idx;
   var plan;
@@ -409,7 +427,7 @@ describe('Case-Insensitive TreeIndex', function() {
     sink = foam.dao.ArraySink.create();
   });
 
-  it('selects case-insensitive', function() {
+  it('puts case-insensitive', function() {
     plan = idx.plan(sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.STRING, 'three')
     );
@@ -421,16 +439,85 @@ describe('Case-Insensitive TreeIndex', function() {
   });
 
   it('removes case-insensitive', function() {
-    idx.remove(data[3]);
+    // Remove both '3' items: ids 3 and 4, but setting both strings to
+    // capitalized value to make sure CI accepts both
+    var newData = data[3].clone();
+    newData.string = 'Three';
+    idx.remove(newData);
+
+    newData = data[4].clone();
+    newData.string = 'Three';
+    idx.remove(newData);
 
     plan = idx.plan(sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.STRING, 'three')
     );
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(1);
-    expect(sink.a[0].string).toEqual('three');
+    expect(sink.a.length).toEqual(0);
   });
 });
+
+
+describe('SetIndex', function() {
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData3();
+    idx = foam.dao.index.SetIndex.create({
+      prop: test.Indexable.ARRAY,
+      tailFactory: foam.dao.index.ValueIndex.create()
+    });
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('finds based on array values', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'banana')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].int).toEqual(1);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'hello')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(2);
+    expect(sink.a[1].int).toEqual(0);
+  });
+
+  it('removes based on array values', function() {
+    idx.remove(data[0]);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'banana')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].int).toEqual(1);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'hello')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+
+  });
+
+
+});
+
+
 
 
