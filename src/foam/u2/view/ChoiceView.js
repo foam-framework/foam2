@@ -179,6 +179,8 @@ foam.CLASS({
         this.index = 0;
       }
 
+      if ( this.dao ) this.onDAOUpdate();
+
       this.start(this.selectSpec, {
         data$: this.index$,
         choices$: this.choices$,

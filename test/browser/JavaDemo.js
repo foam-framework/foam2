@@ -2,6 +2,7 @@
 foam.CLASS({
   package: 'com.example',
   name: 'Person',
+  ids: ['name'],
   properties: [
     {
       class: 'String',
@@ -17,4 +18,8 @@ foam.CLASS({
 var cls = foam.java.Class.create();
 com.example.Person.buildJavaClass(cls);
 
-foam.u2.Element.create().setNodeName('pre').add(cls.code()).write();
+
+var output = foam.java.Outputter.create();
+output.out(cls);
+
+foam.u2.Element.create().setNodeName('pre').add(output.buf_).write()

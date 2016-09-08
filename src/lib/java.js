@@ -175,24 +175,35 @@ foam.CLASS({
       }
     }
   ],
+  methods: [
+    function buildJavaClass(cls) {
+      cls = cls || foam.java.Class.create();
+
+      cls.package = this.package;
+      cls.name = this.name;
+      cls.extends = 'foam.core.ContextAwareSupport',
+      cls.implements = ['foam.box.Box'];
+
+      foam.core.Object.create({
+        name: 'delegate',
+        javaType: this.of
+      }).buildJavaClass(cls);
+
+      cls.method({
+        type: 'void',
+        visibility: 'public',
+        name: 'send',
+        args: [ { name: 'message', type: 'foam.box.Message' } ],
+        body: this.sendMethodCode()
+      });
+
+      return cls;
+    }
+  ],
   templates: [
     {
-      name: 'code',
-      template: function() {/*
-package <%= this.package %>;
-
-import foam.core.ContextAwareSupport;
-
-public class <%= this.name %> extends ContextAwareSupport implements foam.box.Box {
-  private <%= this.of %> delegate_;
-  public <%= this.of %> getDelegate() { return delegate_; }
-  public <%= this.name %> setDelegate(<%= this.of %> delegate) {
-    delegate_ = delegate;
-    return this;
-  }
-
-  public void send(foam.box.Message message) {
-    if ( ! ( message instanceof foam.box.RPCMessage) ) {
+      name: 'sendMethodCode',
+      template: function() {/*if ( ! ( message instanceof foam.box.RPCMessage) ) {
       // TODO error to errorBox
       return;
     }
@@ -223,10 +234,7 @@ public class <%= this.name %> extends ContextAwareSupport implements foam.box.Bo
       reply.setData(result);
 
       replyBox.send(reply);
-    }
-  }
-}
-  */}
+    }*/}
     }
   ]
 });
@@ -235,7 +243,12 @@ foam.LIB({
   name: 'foam.AbstractClass',
   methods: [
     function javaSource() {
-      return foam.java.JavaClass.create().fromClass(this).code();
+//      return foam.java.JavaClass.create().fromClass(this).code();
+      var c = foam.java.Class.create();
+      var outputter = foam.java.Outputter.create();
+      this.buildJavaClass(c);
+      outputter.out(c);
+      return outputter.buf_;
     }
   ]
 });
@@ -262,6 +275,22 @@ foam.CLASS({
       m.javaReturns = this.javaReturns;
       m.sourceCls_ = child.sourceCls_;
       return m;
+    },
+    function buildJavaClass(cls) {
+      if ( ! this.javaCode ) return;
+
+      cls.method({
+        name: this.name,
+        type: this.javaReturns || 'void',
+        visibility: 'public',
+        args: this.args && this.args.map(function(a) {
+          return {
+            name: a.name,
+            type: a.javaType
+          };
+        }),
+        body: this.javaCode
+      });
     }
   ],
 
@@ -298,6 +327,16 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
 
 foam.CLASS({
   refines: 'foam.core.Import',
+  methods: [
+    function buildJavaClass(cls) {
+      cls.method({
+        type: 'Object',
+        name: 'get' + foam.String.capitalize(this.name),
+        body: 'return getX().get("' + this.key + '");',
+        visibility: 'protected'
+      });
+    }
+  ],
   templates: [
     {
       name: 'axiomJavaSource',
@@ -436,88 +475,10 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
 });
 
 foam.CLASS({
-  package: 'foam.java',
-  name: 'PropertyInfo',
-  properties: [
-    {
-      class: 'String',
-      name: 'className'
-    },
-    {
-      class: 'String',
-      name: 'name'
-    },
-    {
-      class: 'String',
-      name: 'type'
-    },
-    {
-      class: 'String',
-      name: 'parent'
-    },
-    {
-      class: 'String',
-      name: 'getter',
-      expression: function(className, name, type) {
-        return 'return ((' + className + ')obj).set' + foam.String.capitalize(name) + '((' + type + ')value);\n'
-      }
-    },
-    {
-      class: 'String',
-      name: 'setter',
-      expression: function(className, name, type) {
-        return '((' + className + ')obj).set' + foam.String.capitalize(name) + '((' + type + ')value);\n';
-      }
-    },
-    {
-      class: 'String',
-      name: 'toJSON'
-    },
-    {
-      class: 'String',
-      name: 'jsonParser',
-      value: 'foam.lib.json.AnyParser'
-    }
-  ],
-  templates: [
-    {
-      name: 'code',
-      template: function() {/*
-    new <%= this.parent %>() {
-      @Override
-      public String getName() { return "<%= this.name %>"; }
-
-      @Override
-      public Object get(Object obj) {
-        <%= this.getter %>
-      }
-
-      @Override
-      public void set(Object obj, Object value) {
-        <%= this.setter %>
-      }
-
-<% if ( this.toJSON ) { %>
-      @Override
-      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
-<%= this.toJSON %>
-      }
-<% } %>
-
-      @Override
-      public foam.lib.parse.Parser jsonParser() {
-        return new <%= this.jsonParser %>();
-      }}*/}
-    }
-  ]
-});
-
-
-foam.CLASS({
   refines: 'foam.core.String',
   properties: [
     ['javaType', 'String'],
-    ['javaInfoType', 'AbstractStringPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.StringParser']
   ]
 });
@@ -527,7 +488,7 @@ foam.CLASS({
   refines: 'foam.core.Int',
   properties: [
     ['javaType', 'int'],
-    ['javaInfoType', 'AbstractIntPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser']
   ]
 });
@@ -541,7 +502,7 @@ foam.CLASS({
         return of ? of : 'foam.core.FObject';
       }
     },
-    ['javaInfoType', 'AbstractFObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ]
 });
@@ -551,7 +512,7 @@ foam.CLASS({
   refines: 'foam.core.Array',
   properties: [
     ['javaType', 'Object[]'],
-    ['javaInfoType', 'AbstractPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
   ],
   templates: [
@@ -620,7 +581,7 @@ foam.CLASS({
       name: 'javaJSONParser',
       value: 'foam.lib.json.FObjectArrayParser'
     },
-    ['javaInfoType', 'AbstractPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractPropertyInfo']
   ],
   templates: [
     {
@@ -679,23 +640,115 @@ foam.CLASS({
   properties: [
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
-    ['javaInfoType', 'AbstractBooleanPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'MultiPartGetter',
+  properties: [
+    'props',
+    'clsName'
+  ],
+  methods: [
+    function outputJava(o) {
+      var props = this.props;
+      o.indent();
+      o.out('return new foam.core.CompoundKey(new Object[] {\n');
+      o.increaseIndent();
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        o.indent();
+        o.out('get', foam.String.capitalize(props[i].name), '()');
+        if ( i != props.length - 1 ) o.out(',\n');
+      }
+      o.decreaseIndent();
+      o.out('\n');
+      o.indent()
+      o.out('}, new foam.core.PropertyInfo[] {\n');
+      o.increaseIndent();
+      o.indent();
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        o.out(this.clsName, '.', foam.String.constantize(props[i].name));
+        if ( i != props.length - 1 ) o.out(',\n');
+      }
+      o.out('\n');
+      o.decreaseIndent();
+      o.indent()
+      o.out('});\n');
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'MultiPartSetter',
+  properties: [
+    'props',
+    'clsName'
+  ],
+  methods: [
+    function outputJava(o) {
+      var props = this.props;
+      o.indent();
+      o.out('Object[] values = val.getValues();\n');
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        o.indent();
+        o.out('set', foam.String.capitalize(props[i].name), '((', props[i].javaType, ')values[', i, ']);\n');
+      }
+      o.indent();
+      o.out('return this;\n');
+    }
   ]
 });
 
 foam.CLASS({
   refines: 'foam.core.MultiPartID',
   properties: [
-    ['javaType', 'Object']
+    ['javaType', 'foam.core.CompoundKey'],
+    ['javaJSONParser', 'foam.lib.parse.Fail'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ],
-  templates: [
-    {
-      name: 'axiomJavaSource',
-      template: function() {/* */}
-    },
-    {
-      name: 'axiomClassInfo',
-      template: function() {/* */}
+  methods: [
+    function buildJavaClass(cls) {
+      var privateName = this.name + '_';
+      var capitalized = foam.String.capitalize(this.name);
+      var constantize = foam.String.constantize(this.name);
+
+      var props = this.props;
+
+      cls
+        .method({
+          name: 'get' + capitalized,
+          type: this.javaType,
+          visibility: 'public',
+          body: foam.java.MultiPartGetter.create({
+            props: props,
+            clsName: cls.name
+          })
+        })
+        .method({
+          name: 'set' + capitalized,
+          visibility: 'public',
+          args: [
+            {
+              type: this.javaType,
+              name: 'val'
+            }
+          ],
+          type: cls.name,
+          body: foam.java.MultiPartSetter.create({
+            props: props
+          })
+        });
+
+
+      cls.field({
+        name: constantize,
+        static: true,
+        type: 'foam.core.PropertyInfo',
+        initializer: this.createJavaPropertyInfo_(cls)
+      });
     }
   ]
 });
@@ -705,6 +758,6 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser'],
-    ['javaInfoType', 'AbstractObjectPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });

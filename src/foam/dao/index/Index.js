@@ -65,7 +65,10 @@ foam.CLASS({
 });
 
 
-/** An Index which holds only a single value. **/
+/**
+  An Index which holds only a single value. This class also functions as its
+  own execution Plan, since it only has to return the single value.
+**/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndex',
@@ -80,6 +83,9 @@ foam.CLASS({
   methods: [
     // from plan
     function execute(promise, sink) {
+      /** Note that this will put(undefined) if you remove() the item but
+        leave this ValueIndex intact. Most usages of ValueIndex will clean up
+        the ValueIndex itself when the value is removed. */
       sink.put(this.value);
     },
 
