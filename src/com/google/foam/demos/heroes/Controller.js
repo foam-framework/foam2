@@ -56,6 +56,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'heroName',
+      view: {
+        class: 'foam.u2.TextField',
+        onKey: true
+      }
+    },
+    {
       name: 'heroDAO',
       view: {
         class: 'foam.u2.DAOList',
@@ -84,6 +92,7 @@ foam.CLASS({
     function initE() {
       this.
         start('h2').add('Tour of Heroes').end().
+          // TODO: start(this.HEROES) and set class
         add(this.DASHBOARD, this.HEROES).
         br().
         add(this.slot(function(selection, mode) {
@@ -102,7 +111,14 @@ foam.CLASS({
     },
 
     function heroesE() {
-      return this.E().start('h3').add('My Heroes').end().add(this.HERO_DAO);
+      return this.E().
+          start().
+            add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
+          end().
+          start('h3').
+            add('My Heroes').
+          end().
+          add(this.HERO_DAO);
     },
 
     function editHero(hero) {
@@ -111,6 +127,14 @@ foam.CLASS({
   ],
 
   actions: [
+    {
+      name: 'addHero',
+      isEnabled: function(heroName) { return !!heroName; },
+      code: function() {
+        this.heroDAO.put(this.Hero.create({name: this.heroName}));
+        this.heroName = '';
+      }
+    },
     {
       name: 'dashboard',
       isEnabled: function(mode) { return mode != 'dashboard'; },

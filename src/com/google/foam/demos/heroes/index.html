@@ -8,8 +8,13 @@
   </head>
   <body>
     <script>
-      com.google.foam.demos.heroes.Controller.create({
-        heroDAO:  foam.dao.ArrayDAO.create({array: foam.json.parse([
+      var heroDAO = foam.dao.EasyDAO.create({
+        of: com.google.foam.demos.heroes.Hero,
+        seqNo: true,
+        dayType: 'MDAO'
+      });
+
+      foam.json.parse([
           { id: 11, name: "Mr. Nice"},
           { id: 12, name: "Narco",     starred: true },
           { id: 13, name: "Bombasto",  starred: true },
@@ -20,8 +25,9 @@
           { id: 18, name: "Dr IQ" },
           { id: 19, name: "Magma" },
           { id: 20, name: "Tornado" }
-        ], com.google.foam.demos.heroes.Hero)})
-      }).write();
+        ], com.google.foam.demos.heroes.Hero).forEach(function(h) { heroDAO.put(h); });
+
+      com.google.foam.demos.heroes.Controller.create({ heroDAO: heroDAO }).write();
     </script>
   </body>
 </html>
