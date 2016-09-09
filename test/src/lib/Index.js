@@ -125,6 +125,23 @@ var callPlan = function callPlan(idx, sink, pred) {
   return plan;
 }
 
+describe('Index interface', function() {
+  it('has enough methods', function() {
+    var idxFac = foam.dao.index.Index.create();
+    idxFac.create({ });
+    
+    idxFac.put();
+    idxFac.remove();
+    idxFac.plan(/*sink, skip, limit, order, predicate*/);
+    idxFac.get();
+    idxFac.size();
+    idxFac.select(/*sink, skip, limit, order, predicate*/);
+    idxFac.selectReverse(/*sink, skip, limit, order, predicate*/);
+  });
+  
+});
+
+
 describe('ValueIndex', function() {
 
   var data;
