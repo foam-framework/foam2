@@ -34,15 +34,15 @@ foam.CLASS({
           entity('nbsp').
           add(' ', this.data.name).
         end().
-        add(this.REMOVE);
+        add(this.REMOVE_HERO);
     }
   ],
 
   actions: [
     {
-      name: 'remove',
-      label: ' X ',
-      code: function(X) { X.heroDAO.remove(X.data); console.log('remove', X.data.id); }
+      name: 'removeHero',
+      label: 'X',
+      code: function(X) { X.heroDAO.remove(this); }
     }
   ],
 
