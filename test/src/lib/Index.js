@@ -607,4 +607,55 @@ describe('AltIndex', function() {
   });
 });
 
+describe('AutoIndex', function() {
+  var idx;
+  var plan;
+  var m;
+  var sink;
+  var mdao;
 
+  beforeEach(function() {
+    mdao = {
+      lastIndex: null,
+      addIndex: function(index) {
+        this.lastIndex = index;
+      }
+    }
+    idx = foam.dao.index.AutoIndex.create({
+      mdao: mdao
+    });
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('covers unimplemented put(), remove(), buldLoad()', function() {
+    idx.put();
+    idx.remove();
+    idx.bulkLoad();
+  });
+  it('covers toString()', function() {
+    idx.toString();
+  });
+  
+  it('supports manual addIndex()', function() {
+    idx.addIndex(test.Indexable.INT);
+    
+    expect(idx.properties['int']).toEqual(true);
+    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+  });
+
+  it('auto indexes on ordering', function() {
+    idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
+    
+    expect(idx.properties['float']).toEqual(true);
+    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+  });
+
+  // it('auto indexes on predicate', function() {
+  //   idx.plan(...)
+  //
+  //   expect(idx.properties['float']).toEqual(true);
+  //   expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+  // });
+  
+});
