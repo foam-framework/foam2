@@ -62,7 +62,7 @@ foam.CLASS({
           font-height: 18px;
           font-size: 1em;
           font-weight: 500;
-          margin-top: 20px;
+          margin: 0 3px;
           padding: 10px 12px;
         }
         ^nav .foam-u2-ActionView:hover {
