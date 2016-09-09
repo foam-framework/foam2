@@ -107,6 +107,41 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.java',
+  name: 'InterfaceMethod',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'visibility'
+    },
+    'type',
+    {
+      class: 'FObjectArray',
+      of: 'foam.java.Argument',
+      name: 'args'
+    }
+  ],
+  methods: [
+    function outputJava(o) {
+      o.indent();
+      o.out(this.visibility, this.visibility ? ' ' : '',
+        this.type, ' ', this.name, '(');
+
+      for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+        o.out(this.args[i]);
+        if ( i != this.args.length - 1 ) o.out(', ');
+      }
+
+      o.out(');\n');
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
   name: 'Method',
   properties: [
     'name',
@@ -263,6 +298,83 @@ foam.CLASS({
       o.decreaseIndent();
       o.indent();
       o.out('}');
+    },
+    function toJavaSource() {
+      var output = foam.java.Outputter.create();
+      output.out(this);
+      return output.buf_;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'Interface',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'package'
+    },
+    {
+      class: 'StringArray',
+      name: 'extends'
+    },
+    {
+      class: 'String',
+      name: 'visibility',
+      value: 'public'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.java.InterfaceMethod',
+      name: 'methods',
+      factory: function() { return []; }
+    }
+  ],
+  methods: [
+    function method(m) {
+      this.methods.push(foam.java.InterfaceMethod.create(m));
+      return this;
+    },
+    function getMethod(name) {
+      return this.methods.find(function(m) { return m.name == name; });
+    },
+    function field() {
+    },
+    function toJavaSource() {
+      var output = foam.java.Outputter.create();
+      output.out(this);
+      return output.buf_;
+    },
+    function outputJava(o) {
+      if ( this.package ) { o.out('package ', this.package, ';\n\n'); }
+
+      o.out(this.visibility, this.visibility ? ' ' : '',
+        'interface ', this.name);
+
+      if ( this.extends ) {
+        o.out(' extends ');
+        for ( var i = 0 ; i < this.extends.length ; i++ ) {
+          o.out(this.extends[i]);
+          if ( i != this.extends.length - 1 ) o.out(', ');
+        }
+      }
+
+      o.out(' {\n');
+
+      o.increaseIndent();
+      for ( var i = 0 ; i < this.methods.length ; i++ ) {
+        o.indent();
+        o.out(this.methods[i]);
+        o.out('\n');
+      }
+
+      o.decreaseIndent();
+      o.out('}');
     }
   ]
 });
@@ -321,6 +433,8 @@ foam.LIB({
   name: 'foam.AbstractClass',
   methods: [
     function buildJavaClass(cls) {
+      cls = cls || foam.java.Class.create();
+
       cls.name = this.model_.name;
       cls.package = this.model_.package;
       cls.extends = this.model_.extends === 'FObject' ?
@@ -342,10 +456,12 @@ foam.LIB({
         body: 'return classInfo_;'
       });
 
-      var axioms = this.getAxioms();
+      var axioms = this.getOwnAxioms();
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
+
+      return cls;
     }
   ]
 });

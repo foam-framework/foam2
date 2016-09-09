@@ -1,7 +1,50 @@
 require('../src/foam.js');
 
-if ( process.argv.length < 4 ) {
-  console.log("USAGE: genjava.js output-path class-names skeletons");
+var classes = [
+  'foam.mlang.predicate.Predicate',
+  'foam.mlang.predicate.True',
+  'foam.mlang.predicate.False',
+  'foam.mlang.predicate.And',
+  'foam.mlang.predicate.Or',
+  'foam.mlang.predicate.AbstractPredicate',
+  'foam.mlang.predicate.Nary',
+  'foam.mlang.predicate.Unary',
+  'foam.mlang.predicate.Binary',
+  'foam.mlang.predicate.Contains',
+  'foam.mlang.Expr',
+  'foam.mlang.AbstractExpr',
+  'foam.mlang.predicate.Eq',
+  'foam.mlang.Constant',
+  'foam.box.Box',
+  'foam.box.Message',
+  'foam.box.WrappedMessage',
+  'foam.box.TextMessage',
+  'foam.box.SubBoxMessage',
+  'com.google.foam.demos.appengine.TestModel',
+  'foam.box.HTTPReplyBox',
+  'com.google.foam.demos.appengine.TestService',
+  'foam.box.RPCMessage',
+  'foam.box.RPCReturnMessage',
+  'foam.dao.DAO',
+  'foam.dao.Sink',
+  'foam.dao.AbstractSink',
+  'foam.dao.FlowControl',
+  'foam.mlang.order.Comparator',
+  'foam.mlang.sink.Count'
+];
+
+var skeletons = [
+  'com.google.foam.demos.appengine.TestService',
+  'foam.dao.DAO'
+];
+
+var proxies = [
+  'foam.dao.DAO',
+  'foam.dao.Sink'
+];
+
+if ( process.argv.length != 3 ) {
+  console.log("USAGE: genjava.js output-path");
   process.exit(1);
 }
 
@@ -25,36 +68,61 @@ function ensurePath(p) {
   }
 }
 
-var classes = process.argv[3].split(',');
-var skeletons = process.argv[4].split(',');
-
-
-var args = classes;
-for ( var i = 0 ; i < args.length ; i++ ) {
-  if ( ! foam.lookup(args[i], true) ) require('../src/' + args[i].replace(/\./g, '/') + '.js');
-
-  var cls = foam.lookup(args[i]);
-
-  var outfile = outdir + require('path').sep + cls.id.replace(/\./g, require('path').sep) + '.java';
-
-  ensurePath(outfile);
-  require('fs').writeFileSync(outfile, cls.javaSource());
+function loadClass(next) {
+  return function(c) {
+    // Poor mans class loader.
+    if ( ! foam.lookup(c, true) ) require('../src/' + c.replace(/\./g, '/') + '.js');
+    var cls = foam.lookup(c);
+    return next(cls);
+  };
 }
 
-args = skeletons;
-for ( var i = 0 ; i < args.length ; i++ ) {
-  if ( ! foam.lookup(args[i], true) ) require('../src/' + args[i].replace(/\./g, '/') + '.js');
 
-  var cls = foam.lookup(args[i]);
-
-  var outfile = outdir + require('path').sep + cls.package.replace(/\./g, require('path').sep) +
-    require('path').sep +
-    cls.name + 'Skeleton.java';
+function generateClass(cls) {
+  var outfile = outdir + require('path').sep +
+    cls.id.replace(/\./g, require('path').sep) + '.java';
 
   ensurePath(outfile);
-  var output = foam.java.Outputter.create();
-  output.out(foam.java.Skeleton.create({
-    of: args[i]
-  }).buildJavaClass());
-  require('fs').writeFileSync(outfile, output.buf_);
+
+  require('fs').writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
 }
+
+function generateSkeleton(cls) {
+
+  var outfile = outdir + require('path').sep +
+    cls.package.replace(/\./g, require('path').sep) +
+    require('path').sep + cls.name + 'Skeleton.java';
+
+  ensurePath(outfile);
+
+  require('fs').writeFileSync(
+    outfile,
+    foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
+}
+
+function generateProxy(cls) {
+  var existing = foam.lookup(cls.model_.package + '.Proxy' + cls.model_.name, true);
+
+  if ( existing ) {
+    generateClass(existing);
+    return;
+  }
+
+  var proxy = foam.core.Model.create({
+    package: cls.package,
+    name: 'Proxy' + cls.name,
+    properties: [
+      {
+        class: 'Proxy',
+        of: cls.id,
+        name: 'delegate'
+      }
+    ]
+  });
+
+  generateClass(proxy.buildClass());
+}
+
+classes.forEach(loadClass(generateClass));
+skeletons.forEach(loadClass(generateSkeleton));
+proxies.forEach(loadClass(generateProxy));
