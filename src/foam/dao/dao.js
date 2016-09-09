@@ -170,6 +170,22 @@ foam.INTERFACE({
         {
           name: 'sink',
           javaType: 'foam.dao.Sink'
+        },
+        {
+          name: 'skip',
+          javaType: 'Integer'
+        },
+        {
+          name: 'limit',
+          javaType: 'Integer'
+        },
+        {
+          name: 'order',
+          javaType: 'foam.mlang.order.Comparator'
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
         }
       ]
     },
@@ -177,7 +193,24 @@ foam.INTERFACE({
       name: 'removeAll',
       returns: '',
       javaReturns: 'void',
-      args: []
+      args: [
+        {
+          name: 'skip',
+          javaType: 'Integer'
+        },
+        {
+          name: 'limit',
+          javaType: 'Integer'
+        },
+        {
+          name: 'order',
+          javaType: 'foam.mlang.order.Comparator'
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
@@ -188,8 +221,7 @@ foam.INTERFACE({
           name: 'sink',
           javaType: 'foam.dao.Sink'
         }
-      ],
-      code: function() {}
+      ]
     },
     {
       name: 'where',
@@ -242,8 +274,35 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractSink',
 
-  implements: [ 'foam.dao.Sink' ]
+  implements: [ 'foam.dao.Sink' ],
 
+  methods: [
+    {
+      name: 'put',
+      code: function() {},
+      javaCode: 'return;'
+    },
+    {
+      name: 'remove',
+      code: function() {},
+      javaCode: 'return;'
+    },
+    {
+      name: 'eof',
+      code: function() {},
+      javaCode: 'return;'
+    },
+    {
+      name: 'error',
+      code: function() {},
+      javaCode: 'return;'
+    },
+    {
+      name: 'reset',
+      code: function() {},
+      javaCode: 'return;'
+    }
+  ]
 });
 
 foam.CLASS({

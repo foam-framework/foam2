@@ -20,11 +20,11 @@
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Count',
-
-  implements: ['foam.dao.Sink'],
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
     {
+      class: 'Int',
       name: 'value',
       value: 0
     }
