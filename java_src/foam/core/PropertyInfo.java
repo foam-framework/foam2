@@ -7,6 +7,7 @@ public interface PropertyInfo extends foam.mlang.Expr, Comparator {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
 
+  public boolean getTransient();
   public String getName();
   public Object get(Object obj);
   public void set(Object obj, Object value);

@@ -358,6 +358,11 @@ foam.CLASS({
     ['anonymous', true],
     'propName',
     {
+      class: 'Boolean',
+      name: 'transient',
+      value: false
+    },
+    {
       name: 'getterName',
       expression: function(propName) {
         return 'get' + foam.String.capitalize(propName);
@@ -415,6 +420,12 @@ foam.CLASS({
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
             body: 'return new ' + this.jsonParser + '();'
+          },
+          {
+            name: 'getTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.transient + ';'
           }
         ]
       }
@@ -433,7 +444,8 @@ foam.CLASS({
         propName: this.name,
         propType: this.javaType,
         jsonParser: this.javaJSONParser,
-        extends: this.javaInfoType
+        extends: this.javaInfoType,
+        transient: this.transient
       })
     },
     function buildJavaClass(cls) {
