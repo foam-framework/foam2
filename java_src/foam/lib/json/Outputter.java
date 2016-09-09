@@ -90,6 +90,8 @@ public class Outputter {
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo)i.next();
+      if ( prop.getTransient() ) continue;
+
       Object value = prop.get(o);
       if ( value == null ) continue;
 
