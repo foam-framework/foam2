@@ -856,7 +856,10 @@ foam.CLASS({
   properties: [
     {
       name: 'a',
-      factory: function() { return []; }
+      factory: function() { return []; },
+      fromJSON: function(json, ctx) {
+        return foam.json.parse(json, null, ctx);
+      }
     }
   ],
 

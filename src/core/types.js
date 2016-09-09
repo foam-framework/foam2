@@ -202,7 +202,15 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Object',
-  extends: 'Property'
+  extends: 'Property',
+  properties: [
+    {
+      name: 'fromJSON',
+      value: function(value, ctx) {
+        return foam.json.parse(value, null, ctx);
+      }
+    }
+  ]
 });
 
 // TODO(adam): Better name for this?
