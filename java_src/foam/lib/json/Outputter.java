@@ -64,7 +64,9 @@ public class Outputter {
   }
 
   public void output(StringBuilder out, Object value) {
-    if ( value instanceof String ) {
+    if ( value instanceof OutputJSON ) {
+      ((OutputJSON)value).outputJSON(out, this);
+    } else if ( value instanceof String ) {
       outputString(out, (String)value);
     } else if ( value instanceof FObject ) {
       outputFObject(out, (FObject)value);
