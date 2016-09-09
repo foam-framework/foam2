@@ -23,6 +23,11 @@ foam.CLASS({
     {
       name: 'code',
       required: false
+    },
+    {
+      class: 'Boolean',
+      name: 'abstract',
+      value: true
     }
   ]
 });
@@ -40,7 +45,7 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'String',
+      class: 'StringArray',
       name: 'extends'
     },
     {
