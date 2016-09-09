@@ -236,13 +236,17 @@ foam.CLASS({
       this.properties[prop.name] = true;
       this.mdao.addIndex(prop);
     },
-
+    // TODO: mlang comparators should support input collection for 
+    //   index-building cases like this
     function plan(sink, skip, limit, order, predicate) {
-      if (
-          order &&
-          this.Property.isInstance(order) && ! this.properties[order.name]
-      ) {
-        this.addIndex(order);
+      if ( order ) {
+        // find name of property to order by
+        var name = ( this.Property.isInstance(order) ) ? order.name : 
+          ( order.arg1 && order.arg1.name ) || null;
+        // if no index added for it yet, add one
+        if ( name && ! this.properties[name] ) {
+          this.addIndex(order);
+        }
       } else if ( predicate ) {
         // TODO: check for property in predicate
       }
