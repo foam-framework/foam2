@@ -135,7 +135,7 @@ foam.CLASS({
     },
 
     function detailE() {
-      return this.E().add(this.selection.name$, ' details!', this.SELECTION, this.BACK);
+      return this.E('h3').add(this.selection.name$, ' details!').br().add(this.SELECTION, this.BACK);
     },
 
     function dashboardE() {
