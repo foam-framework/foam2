@@ -259,79 +259,79 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
-  package: 'foam.dao.index',
-  name: 'Journal',
-  extends: 'foam.dao.index.Index',
-
-  requires: [
-    'foam.dao.index.NoPlan'
-  ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'basename'
-    },
-    {
-      class: 'Int',
-      name: 'journalNo',
-      value: 0
-    },
-    {
-      class: 'Int',
-      name: 'limit',
-      value: 50000
-    },
-    {
-      class: 'Int',
-      name: 'recordCount',
-      value: 0
-    },
-    {
-      name: 'journal',
-      factory: function() {
-        return require('fs').createWriteStream(
-          this.basename + this.journalNo + '.dat',
-          { flags: 'a' });
-      }
-    }
-  ],
-
-  methods: [
-    function put(obj) {
-      this.journal.write('dao.put(foam.json.parse(');
-      this.journal.write(foam.json.Storage.stringify(obj));
-      this.journal.write('));\r\n');
-      this.recordCount += 1;
-      this.rollover();
-    },
-
-    function remove(obj) {
-      this.journal.write('dao.remove(model.create(');
-      this.journal.write(foam.json.Storage.stringify(obj));
-      this.journal.write('));\r\n');
-      this.recordCount += 1;
-      this.rollover();
-    },
-
-    function plan() {
-      return this.NoPlan.create();
-    },
-
-    function bulkLoad() {
-    },
-
-    function rollover() {
-      if ( this.recordCount > this.limit ) {
-        this.journal.end();
-        this.recordCount = 0;
-        this.journalNo += 1;
-        this.journal = undefined;
-      }
-    },
-
-    function compact() {
-    }
-  ]
-});
+// foam.CLASS({
+//   package: 'foam.dao.index',
+//   name: 'Journal',
+//   extends: 'foam.dao.index.Index',
+//
+//   requires: [
+//     'foam.dao.index.NoPlan'
+//   ],
+//
+//   properties: [
+//     {
+//       class: 'String',
+//       name: 'basename'
+//     },
+//     {
+//       class: 'Int',
+//       name: 'journalNo',
+//       value: 0
+//     },
+//     {
+//       class: 'Int',
+//       name: 'limit',
+//       value: 50000
+//     },
+//     {
+//       class: 'Int',
+//       name: 'recordCount',
+//       value: 0
+//     },
+//     {
+//       name: 'journal',
+//       factory: function() {
+//         return require('fs').createWriteStream(
+//           this.basename + this.journalNo + '.dat',
+//           { flags: 'a' });
+//       }
+//     }
+//   ],
+//
+//   methods: [
+//     function put(obj) {
+//       this.journal.write('dao.put(foam.json.parse(');
+//       this.journal.write(foam.json.Storage.stringify(obj));
+//       this.journal.write('));\r\n');
+//       this.recordCount += 1;
+//       this.rollover();
+//     },
+//
+//     function remove(obj) {
+//       this.journal.write('dao.remove(model.create(');
+//       this.journal.write(foam.json.Storage.stringify(obj));
+//       this.journal.write('));\r\n');
+//       this.recordCount += 1;
+//       this.rollover();
+//     },
+//
+//     function plan() {
+//       return this.NoPlan.create();
+//     },
+//
+//     function bulkLoad() {
+//     },
+//
+//     function rollover() {
+//       if ( this.recordCount > this.limit ) {
+//         this.journal.end();
+//         this.recordCount = 0;
+//         this.journalNo += 1;
+//         this.journal = undefined;
+//       }
+//     },
+//
+//     function compact() {
+//     }
+//   ]
+// });
