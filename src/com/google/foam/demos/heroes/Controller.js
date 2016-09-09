@@ -44,6 +44,12 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         h2 { color: #aaa; }
+        h3 {
+          color: #444;
+          font-size: 1.75em;
+          font-weight: 100;
+          margin-top: 0;
+        }
         body { margin: 2em; }
         body, input[text], button { color: #888; font-family: Cambria, Georgia; }
         ^starred .foam-u2-DAOList { display: flex; }
@@ -138,11 +144,11 @@ foam.CLASS({
 
     function heroesE() {
       return this.E().
-          start().
-            add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
-          end().
           start('h3').
             add('My Heroes').
+          end().
+          start().
+            add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
           end().
           add(this.HERO_DAO);
     },
@@ -155,6 +161,7 @@ foam.CLASS({
   actions: [
     {
       name: 'addHero',
+      label: 'Add',
       isEnabled: function(heroName) { return !!heroName; },
       code: function() {
         this.heroDAO.put(this.Hero.create({name: this.heroName}));

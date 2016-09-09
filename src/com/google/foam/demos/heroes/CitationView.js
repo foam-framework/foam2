@@ -32,12 +32,12 @@ foam.CLASS({
           padding-right: 8px;
           margin: 8px;
           display: flex;
-          background: #DDD;
-          width: 200px;
+          background: #EEE;
+          width: 220px;
           border-radius: 5px;
         }
         ^:hover {
-          background: #EEE;
+          background: #DDD;
         }
         ^id {
           padding: 8px;
