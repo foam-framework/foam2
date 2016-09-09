@@ -222,7 +222,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
-  extends: 'Property',
+  extends: 'FObjectProperty',
 
   properties: [
     { name: 'of', required: true },
