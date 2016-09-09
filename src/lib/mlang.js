@@ -20,11 +20,11 @@
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Count',
-
-  implements: ['foam.dao.Sink'],
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
     {
+      class: 'Int',
       name: 'value',
       value: 0
     }
@@ -345,8 +345,8 @@ foam.CLASS({
         }
         return false;
       },
-      javaCode: 'for ( int i = 0 ; i < args.length ; i++ ) {\n'
-                + '  if ( args[i].f(obj) ) return true;\n'
+      javaCode: 'for ( int i = 0 ; i < getArgs().length ; i++ ) {\n'
+                + '  if ( getArgs()[i].f(obj) ) return true;\n'
                 + '}\n'
                 + 'return false;\n'
     },
@@ -418,8 +418,8 @@ foam.CLASS({
         }
         return true;
       },
-      javaCode: 'for ( int i = 0 ; i < args.length ; i++ ) {\n'
-                + '  if ( ! args[i].f(obj) ) return false;\n'
+      javaCode: 'for ( int i = 0 ; i < getArgs().length ; i++ ) {\n'
+                + '  if ( ! getArgs()[i].f(obj) ) return false;\n'
                 + '}\n'
                 + 'return true;'
     },
@@ -486,8 +486,8 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'String s1 = (String)this.arg1.f(obj);\n'
-                + 'String s2 = (String)this.arg2.f(obj);\n'
+      javaCode: 'String s1 = (String)getArg1().f(obj);\n'
+                + 'String s2 = (String)getArg2().f(obj);\n'
                 + 'return s1 != null ? s1.indexOf(s2) != -1 : false;\n',
       code: function(o) {
         var s1 = this.arg1.f(o);
@@ -665,7 +665,7 @@ foam.CLASS({
       code: function() {
         return this.value;
       },
-      javaCode: 'return this.value;'
+      javaCode: 'return getValue();'
     },
     function toString_(x) {
       return typeof x === 'number' ? '' + x :
@@ -719,7 +719,7 @@ foam.CLASS({
         return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
       },
       // TODO(adamvy): Better optional than all the Comparable casts?
-      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) == 0;'
+      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
     }
   ]
 });
@@ -737,7 +737,7 @@ foam.CLASS({
       code: function(o) {
         return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
       },
-      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) != 0;'
+      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) != 0;'
     }
   ]
 });
@@ -755,7 +755,7 @@ foam.CLASS({
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
       },
-      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) < 0;'
+      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) < 0;'
     }
   ]
 });
@@ -773,7 +773,7 @@ foam.CLASS({
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
       },
-      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) <= 0;'
+      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) <= 0;'
     }
   ]
 });
@@ -791,7 +791,7 @@ foam.CLASS({
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
       },
-      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) > 0;'
+      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) > 0;'
     }
   ]
 });
@@ -809,7 +809,7 @@ foam.CLASS({
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
       },
-      javaCode: 'return ((Comparable)arg1.f(obj)).compareTo((Comparable)arg2.f(obj)) >= 0;'
+      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) >= 0;'
     }
   ]
 });
@@ -851,7 +851,7 @@ foam.CLASS({
       code: function(obj) {
         return ! this.arg1.f(obj);
       },
-      javaCode: 'return ! arg1.f(obj);'
+      javaCode: 'return ! getArg1().f(obj);'
     },
     function toString() {
       return foam.String.constantize(this.cls_.name) +
@@ -1046,14 +1046,14 @@ foam.CLASS({
       code: function(o1, o2) {
         return -1 * this.arg1.compare(o1, o2);
       },
-      javaCode: 'return -1 * arg1.compare(o1, o2);'
+      javaCode: 'return -1 * getArg1().compare(o1, o2);'
     },
     {
       name: 'toString',
       code: function() {
         return 'DESC(' + this.arg1.toString() + ')';
       },
-      javaCode: 'return "DESC(" + arg1.toString() + ")";'
+      javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     }
   ]
 });

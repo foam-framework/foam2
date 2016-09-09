@@ -2,6 +2,7 @@
 foam.CLASS({
   package: 'com.example',
   name: 'Person',
+  ids: ['name'],
   properties: [
     {
       class: 'String',

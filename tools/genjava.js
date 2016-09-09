@@ -52,7 +52,9 @@ for ( var i = 0 ; i < args.length ; i++ ) {
     cls.name + 'Skeleton.java';
 
   ensurePath(outfile);
-  require('fs').writeFileSync(outfile, foam.java.Skeleton.create({
+  var output = foam.java.Outputter.create();
+  output.out(foam.java.Skeleton.create({
     of: args[i]
-  }).code());
+  }).buildJavaClass());
+  require('fs').writeFileSync(outfile, output.buf_);
 }

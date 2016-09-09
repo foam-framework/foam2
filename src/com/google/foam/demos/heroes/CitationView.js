@@ -20,15 +20,29 @@ foam.CLASS({
   name: 'CitationView',
   extends: 'foam.u2.View',
 
-  imports: [ 'editHero' ],
+  imports: [
+    'heroDAO',
+    'editHero'
+  ],
 
   methods: [
     function initE() {
       this.
-        on('click', this.onClick).
-        add(this.data.id, ' ').
-        entity('nbsp').
-        add(' ', this.data.name);
+        start('span').
+          on('click', this.onClick).
+          add(this.data.id, ' ').
+          entity('nbsp').
+          add(' ', this.data.name).
+        end().
+        add(this.REMOVE);
+    }
+  ],
+
+  actions: [
+    {
+      name: 'remove',
+      label: ' X ',
+      code: function(X) { X.heroDAO.remove(X.data); console.log('remove', X.data.id); }
     }
   ],
 

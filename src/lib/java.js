@@ -175,24 +175,35 @@ foam.CLASS({
       }
     }
   ],
+  methods: [
+    function buildJavaClass(cls) {
+      cls = cls || foam.java.Class.create();
+
+      cls.package = this.package;
+      cls.name = this.name;
+      cls.extends = 'foam.core.ContextAwareSupport',
+      cls.implements = ['foam.box.Box'];
+
+      foam.core.Object.create({
+        name: 'delegate',
+        javaType: this.of
+      }).buildJavaClass(cls);
+
+      cls.method({
+        type: 'void',
+        visibility: 'public',
+        name: 'send',
+        args: [ { name: 'message', type: 'foam.box.Message' } ],
+        body: this.sendMethodCode()
+      });
+
+      return cls;
+    }
+  ],
   templates: [
     {
-      name: 'code',
-      template: function() {/*
-package <%= this.package %>;
-
-import foam.core.ContextAwareSupport;
-
-public class <%= this.name %> extends ContextAwareSupport implements foam.box.Box {
-  private <%= this.of %> delegate_;
-  public <%= this.of %> getDelegate() { return delegate_; }
-  public <%= this.name %> setDelegate(<%= this.of %> delegate) {
-    delegate_ = delegate;
-    return this;
-  }
-
-  public void send(foam.box.Message message) {
-    if ( ! ( message instanceof foam.box.RPCMessage) ) {
+      name: 'sendMethodCode',
+      template: function() {/*if ( ! ( message instanceof foam.box.RPCMessage) ) {
       // TODO error to errorBox
       return;
     }
@@ -206,10 +217,12 @@ public class <%= this.name %> extends ContextAwareSupport implements foam.box.Bo
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
       case "<%= m.name %>":
-        <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(<%
+        <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(
+          <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
-      %>(<%= m.args[j].javaType %>)rpc.getArgs()[<%= j %>]<%
-      if ( j != m.args.length - 1 ) { %>, <% }
+      %>(<%= m.args[j].javaType %>)(rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? rpc.getArgs()[<%= j %>] : null)<%
+      if ( j != m.args.length - 1 ) { %>,
+          <% }
     }
     %>);
         break;
@@ -223,10 +236,7 @@ public class <%= this.name %> extends ContextAwareSupport implements foam.box.Bo
       reply.setData(result);
 
       replyBox.send(reply);
-    }
-  }
-}
-  */}
+    }*/}
     }
   ]
 });
@@ -235,7 +245,12 @@ foam.LIB({
   name: 'foam.AbstractClass',
   methods: [
     function javaSource() {
-      return foam.java.JavaClass.create().fromClass(this).code();
+//      return foam.java.JavaClass.create().fromClass(this).code();
+      var c = foam.java.Class.create();
+      var outputter = foam.java.Outputter.create();
+      this.buildJavaClass(c);
+      outputter.out(c);
+      return outputter.buf_;
     }
   ]
 });
@@ -262,6 +277,22 @@ foam.CLASS({
       m.javaReturns = this.javaReturns;
       m.sourceCls_ = child.sourceCls_;
       return m;
+    },
+    function buildJavaClass(cls) {
+      if ( ! this.javaCode ) return;
+
+      cls.method({
+        name: this.name,
+        type: this.javaReturns || 'void',
+        visibility: 'public',
+        args: this.args && this.args.map(function(a) {
+          return {
+            name: a.name,
+            type: a.javaType
+          };
+        }),
+        body: this.javaCode
+      });
     }
   ],
 
@@ -298,6 +329,16 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
 
 foam.CLASS({
   refines: 'foam.core.Import',
+  methods: [
+    function buildJavaClass(cls) {
+      cls.method({
+        type: 'Object',
+        name: 'get' + foam.String.capitalize(this.name),
+        body: 'return getX().get("' + this.key + '");',
+        visibility: 'protected'
+      });
+    }
+  ],
   templates: [
     {
       name: 'axiomJavaSource',
@@ -439,7 +480,7 @@ foam.CLASS({
   refines: 'foam.core.String',
   properties: [
     ['javaType', 'String'],
-    ['javaInfoType', 'AbstractStringPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.StringParser']
   ]
 });
@@ -449,7 +490,7 @@ foam.CLASS({
   refines: 'foam.core.Int',
   properties: [
     ['javaType', 'int'],
-    ['javaInfoType', 'AbstractIntPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser']
   ]
 });
@@ -463,7 +504,7 @@ foam.CLASS({
         return of ? of : 'foam.core.FObject';
       }
     },
-    ['javaInfoType', 'AbstractFObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ]
 });
@@ -473,7 +514,7 @@ foam.CLASS({
   refines: 'foam.core.Array',
   properties: [
     ['javaType', 'Object[]'],
-    ['javaInfoType', 'AbstractPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
   ],
   templates: [
@@ -542,7 +583,7 @@ foam.CLASS({
       name: 'javaJSONParser',
       value: 'foam.lib.json.FObjectArrayParser'
     },
-    ['javaInfoType', 'AbstractPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractPropertyInfo']
   ],
   templates: [
     {
@@ -601,24 +642,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
-    ['javaInfoType', 'AbstractBooleanPropertyInfo']
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.MultiPartID',
-  properties: [
-    ['javaType', 'Object']
-  ],
-  templates: [
-    {
-      name: 'axiomJavaSource',
-      template: function() {/* */}
-    },
-    {
-      name: 'axiomClassInfo',
-      template: function() {/* */}
-    }
+    ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
   ]
 });
 
@@ -627,6 +651,6 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser'],
-    ['javaInfoType', 'AbstractObjectPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });
