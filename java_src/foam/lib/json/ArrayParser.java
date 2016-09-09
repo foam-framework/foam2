@@ -13,7 +13,7 @@ public class ArrayParser extends ProxyParser {
                               new Seq0(new Whitespace(),
                                        new Literal(","),
                                        new Whitespace())),
-                   new Literal("]"),
-                   new Whitespace()));
+                   new Whitespace(),
+                   new Literal("]")));
   }
 }

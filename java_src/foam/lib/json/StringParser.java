@@ -13,6 +13,10 @@ public class StringParser implements Parser {
 
   public PStream parse(PStream ps, ParserContext x) {
     delim_ = ps.head();
+    if ( delim_ != '"' && delim_ != '\'' ) {
+      return null;
+    }
+
     ps = ps.tail();
     char lastc = delim_;
 

@@ -8,12 +8,25 @@ public class IntParser implements Parser {
 
     boolean negate = false;
 
-    while ( ps.valid() ) {
-      char c = ps.head();
+    if ( ! ps.valid() ) return null;
 
-      if ( c == '-' ) {
-        negate = true;
-      } else if ( Character.isDigit(c) ) {
+    char c = ps.head();
+
+    if ( c == '-' ) {
+      negate = true;
+      ps = ps.tail();
+      if ( ! ps.valid() ) return null;
+      c = ps.head();
+    }
+
+    if ( Character.isDigit(c) ) n = Character.digit(c, 10);
+    else return null;
+
+    ps = ps.tail();
+
+    while ( ps.valid() ) {
+      c = ps.head();
+      if ( Character.isDigit(c) ) {
         n *= 10;
         n += Character.digit(c, 10);
       } else {
