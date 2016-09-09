@@ -649,6 +649,25 @@ describe('AutoIndex', function() {
     
     expect(idx.properties['float']).toEqual(true);
     expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    
+    idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.INT));
+    
+    expect(idx.properties['int']).toEqual(true);
+    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+  });
+
+  it('skips already auto indexed orderings', function() {
+    idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
+    
+    expect(idx.properties['float']).toEqual(true);
+    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    
+    mdao.lastIndex = null;
+    
+    idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT));
+    
+    expect(idx.properties['float']).toEqual(true);
+    expect(mdao.lastIndex).toBe(null);
   });
 
   // it('auto indexes on predicate', function() {
