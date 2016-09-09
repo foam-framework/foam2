@@ -119,6 +119,12 @@ var createData3 = function createData3() {
   });
 }
 
+var callPlan = function callPlan(idx, sink, pred) {
+  var plan = idx.plan(sink, undefined, undefined, undefined, pred);
+  plan.execute([], sink, undefined, undefined, undefined, pred);
+  return plan;
+}
+
 describe('ValueIndex', function() {
 
   var data;
@@ -573,24 +579,32 @@ describe('AltIndex', function() {
 
   it('removes items from all indexes', function() {
     idx.remove(data[0]);
+    
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
+    expect(sink.a.length).toEqual(0);
 
-    plan = idx.plan(sink, undefined, undefined, undefined,
-      m.EQ(test.Indexable.FLOAT, data[0].float)
-    );
-    plan.execute([], sink);
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
+    expect(sink.a.length).toEqual(0);
 
-//    expect(sink.a.length).toEqual(0);
+    // puts back
+    idx.put(data[0]);
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
+    expect(sink.a.length).toEqual(1);
 
-    plan = idx.plan(sink, undefined, undefined, undefined,
-      m.EQ(test.Indexable.INT, data[0].int)
-    );
-    plan.execute([], sink);
-
-//    expect(sink.a.length).toEqual(0);
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
+    expect(sink.a.length).toEqual(2);
 
   });
 
-
+  it('covers get()', function() {
+    expect(idx.get(4)).not.toBeUndefined();
+  });
+  it('covers size()', function() {
+    expect(idx.size()).toEqual(data.length);
+  });
+  it('covers toString()', function() {
+    idx.toString();
+  });
 });
 
 
