@@ -69,7 +69,7 @@ foam.INTERFACE({
     },
     {
       name: 'remove',
-      return: '',
+      returns: '',
       javaReturns: 'void',
       args: [
         {

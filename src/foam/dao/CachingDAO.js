@@ -40,11 +40,7 @@ foam.CLASS({
       /** The source DAO on which to add caching. Writes go straight
         to the src, and cache is updated to match.
       */
-      class: 'Proxy',
-      of: 'foam.dao.DAO',
       name: 'src',
-      topics: [],
-      forwards: [ ], //'put', 'remove', 'removeAll' ],
       postSet: function(old, src) {
         // FUTURE: clean up this listener swap, forward methods directly
         if ( old ) {
@@ -70,8 +66,11 @@ foam.CLASS({
         ProxyDAO's default forwarding of put/remove/removeAll.
         @private
       */
+      class: 'Proxy',
+      of: 'foam.dao.DAO',
       name: 'delegate',
       hidden: true,
+      topics: [ 'on' ],
       forwards: [ 'find', 'select' ],
       expression: function(src, cache) {
         // Preload src into cache, then proxy everything to cache that we
@@ -140,5 +139,3 @@ foam.CLASS({
     }
   ]
 });
-
-
