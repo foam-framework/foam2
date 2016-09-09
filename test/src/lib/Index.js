@@ -530,5 +530,67 @@ describe('Plan', function() {
 });
 
 
+describe('AltIndex', function() {
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData2();
+    idx = foam.dao.index.AltIndex.create({
+      delegates: [
+        foam.dao.index.TreeIndex.create({
+          prop: test.Indexable.INT,
+          tailFactory: foam.dao.index.ValueIndex.create()
+        }),
+        foam.dao.index.TreeIndex.create({
+          prop: test.Indexable.FLOAT,
+          tailFactory: foam.dao.index.ValueIndex.create()
+        }),
+      ]
+    });
+    idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('Picks correct index for query', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, 4)
+    );
+
+    expect(plan.cost).toBeLessThan(data.length/2);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.FLOAT, 4)
+    );
+
+    expect(plan.cost).toBeLessThan(data.length/2);
+  });
+
+  it('removes items from all indexes', function() {
+    idx.remove(data[0]);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.FLOAT, data[0].float)
+    );
+    plan.execute([], sink);
+
+//    expect(sink.a.length).toEqual(0);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, data[0].int)
+    );
+    plan.execute([], sink);
+
+//    expect(sink.a.length).toEqual(0);
+
+  });
+
+
+});
 
 
