@@ -40,7 +40,8 @@ var skeletons = [
 
 var proxies = [
   'foam.dao.DAO',
-  'foam.dao.Sink'
+  'foam.dao.Sink',
+  'com.google.foam.demos.appengine.TestService'
 ];
 
 if ( process.argv.length != 3 ) {
@@ -100,8 +101,8 @@ function generateSkeleton(cls) {
     foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
 }
 
-function generateProxy(cls) {
-  var existing = foam.lookup(cls.model_.package + '.Proxy' + cls.model_.name, true);
+function generateProxy(intf) {
+  var existing = foam.lookup(intf.package + '.Proxy' + intf.name, true);
 
   if ( existing ) {
     generateClass(existing);
@@ -109,12 +110,13 @@ function generateProxy(cls) {
   }
 
   var proxy = foam.core.Model.create({
-    package: cls.package,
-    name: 'Proxy' + cls.name,
+    package: intf.package,
+    name: 'Proxy' + intf.name,
+    implements: [intf.id],
     properties: [
       {
         class: 'Proxy',
-        of: cls.id,
+        of: intf.id,
         name: 'delegate'
       }
     ]

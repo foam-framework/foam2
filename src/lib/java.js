@@ -651,3 +651,15 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Proxy',
+  properties: [
+    {
+      name: 'javaType',
+      expression: function(of) { return of ? of : 'Object'; }
+    },
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});

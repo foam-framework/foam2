@@ -565,6 +565,9 @@ foam.CLASS({
       })
     },
     function buildJavaClass(cls) {
+      // Use javaInfoType as an indicator that this property should be generated to java code.
+      if ( ! this.javaInfoType ) return;
+
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
@@ -783,6 +786,33 @@ foam.CLASS({
         props: props,
         clsName: cls.name
       });
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.ProxiedMethod',
+  properties: [
+    {
+      name: 'javaCode',
+      expression: function(name, property, returns) {
+        var code = '';
+
+        if ( this.returns ) {
+          code += 'return ';
+        }
+
+        code += 'get' + foam.String.capitalize(property) + '()';
+        code += '.' + name + '(';
+
+        for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+          code += this.args[i].name;
+          if ( i != this.args.length - 1 ) code += ', ';
+        }
+        code += ');';
+
+        return code;
+      }
     }
   ]
 });
