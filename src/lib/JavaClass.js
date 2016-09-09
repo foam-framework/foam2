@@ -569,3 +569,104 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'MultiPartGetter',
+  properties: [
+    'props',
+    'clsName'
+  ],
+  methods: [
+    function outputJava(o) {
+      var props = this.props;
+      if ( props.length == 1 ) {
+        o.indent();
+        o.out('return get', foam.String.capitalize(props[0].name), '();\n');
+        return;
+      }
+
+      o.indent();
+      o.out('return new foam.core.CompoundKey(new Object[] {\n');
+      o.increaseIndent();
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        o.indent();
+        o.out('get', foam.String.capitalize(props[i].name), '()');
+        if ( i != props.length - 1 ) o.out(',\n');
+      }
+      o.decreaseIndent();
+      o.out('\n');
+      o.indent()
+      o.out('}, new foam.core.PropertyInfo[] {\n');
+      o.increaseIndent();
+      o.indent();
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        o.out(this.clsName, '.', foam.String.constantize(props[i].name));
+        if ( i != props.length - 1 ) o.out(',\n');
+      }
+      o.out('\n');
+      o.decreaseIndent();
+      o.indent()
+      o.out('});\n');
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.java',
+  name: 'MultiPartSetter',
+  properties: [
+    'props',
+    'clsName'
+  ],
+  methods: [
+    function outputJava(o) {
+      var props = this.props;
+      if ( props.length == 1 ) {
+        o.indent();
+        o.out('set', foam.String.capitalize(props[0].name), '((', props[0].javaType, ')val);\n');
+        o.indent();
+        o.out('return this;\n');
+        return;
+      }
+
+      o.indent();
+      o.out('Object[] values = val.getValues();\n');
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        o.indent();
+        o.out('set', foam.String.capitalize(props[i].name), '((', props[i].javaType, ')values[', i, ']);\n');
+      }
+      o.indent();
+      o.out('return this;\n');
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.MultiPartID',
+  properties: [
+    ['javaType', 'Object'],
+    ['javaJSONParser', 'foam.lib.parse.Fail'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+  ],
+  methods: [
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      var privateName = this.name + '_';
+      var capitalized = foam.String.capitalize(this.name);
+      var constantize = foam.String.constantize(this.name);
+
+      var props = this.props;
+
+      cls.getMethod("get" + capitalized).body = foam.java.MultiPartGetter.create({
+        props: props,
+        clsName: cls.name
+      });
+      cls.getMethod("set" + capitalized).body = foam.java.MultiPartSetter.create({
+        props: props,
+        clsName: cls.name
+      });
+    }
+  ]
+});
