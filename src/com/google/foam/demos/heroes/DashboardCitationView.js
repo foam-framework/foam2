@@ -34,7 +34,7 @@ foam.CLASS({
         margin: 10px;
         padding: 30px 20px;
         text-align: center;
-        width: 100px;
+        min-width: 100px;
       }
       ^:hover {
         background: #eee;
