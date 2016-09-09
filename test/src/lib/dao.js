@@ -871,6 +871,7 @@ describe('TimestampDAO', function() {
   });
 
   it('assigns timestamps to objects missing the value', function(done) {
+    jasmine.clock().mockDate(new Date(0));
     jasmine.clock().tick(2000);
     var a = test.CompA.create({ a: 4 }); // id not set
     sDAO.put(a).then(function() {
@@ -896,6 +897,7 @@ describe('TimestampDAO', function() {
   });
 
   it('skips assigning to objects with an existing value', function(done) {
+    jasmine.clock().mockDate(new Date(0));
     jasmine.clock().tick(2000);
     var a = test.CompA.create({ id: 3, a: 4 });
     sDAO.put(a).then(function() {

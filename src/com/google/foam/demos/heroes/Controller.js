@@ -36,6 +36,7 @@ foam.CLASS({
 
   exports: [
     'as data',
+    'heroDAO',
     'editHero'
   ],
 

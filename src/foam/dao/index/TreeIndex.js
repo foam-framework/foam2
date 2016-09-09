@@ -93,6 +93,7 @@ foam.CLASS({
     'foam.mlang.predicate.Lte',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.True',
+    'foam.mlang.predicate.In',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
   ],
@@ -200,10 +201,6 @@ foam.CLASS({
 
     function selectReverse(sink, skip, limit, order, predicate) {
       this.root.selectReverse(sink, skip, limit, order, predicate);
-    },
-
-    function findPos(key, incl) {
-      return this.root.findPos(key, incl);
     },
 
     function size() { return this.root.size; },
@@ -416,6 +413,17 @@ foam.CLASS({
     // TODO: see if this can be done some other way
     function dedup() {
       // NOP, not safe to do here
+    },
+
+    /**
+     * Do not optimize bulkload to SetIndex
+     **/
+    function bulkLoad(a) {
+      a = a.a || a;
+      this.root = this.nullNode;
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        this.put(a[i]);
+      }
     },
 
     function put(newValue) {

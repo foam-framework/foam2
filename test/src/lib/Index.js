@@ -36,7 +36,9 @@ foam.CLASS({
       class: 'Date',
       name: 'date'
     },
-
+    {
+      name: 'array',
+    }
   ]
 });
 
@@ -54,12 +56,74 @@ var createData1 = function createData1() {
       string: "one!",
       date: new Date(1),
     },
+    {
+      int: 2,
+      float: 2.2,
+      string: "One!",
+      date: new Date(1),
+    },
+    {
+      int: 3,
+      float: 3.1,
+      string: "Three",
+      date: new Date(1),
+    },
+    {
+      int: 4,
+      float: 4.4,
+      string: "three",
+      date: new Date(1),
+    },
   ].map(function(cfg) {
     return test.Indexable.create(cfg);
   });
 }
 
 
+var createData2 = function createData2() {
+  var arr = [];
+  var count = 20;
+
+  for (var i = 0; i < count; i++ ) {
+    arr.push({
+      int: i,
+      float: count - i,
+      string: 'hello' + ( i % (count / 4) ),
+      date: new Date(0)
+    });
+  }
+
+  return arr.map(function(cfg) {
+    return test.Indexable.create(cfg);
+  });
+}
+
+var createData3 = function createData3() {
+  return [
+    {
+      int: 0,
+      float: 0.0,
+      string: "",
+      date: new Date(0),
+      array: ['hello', 'bye']
+    },
+    {
+      int: 1,
+      float: 1.1,
+      string: "one!",
+      date: new Date(1),
+      array: ['apple', 'banana','kiwi']
+    },
+  ].map(function(cfg) {
+    return test.Indexable.create(cfg);
+  });
+}
+
+var callPlan = function callPlan(idx, sink, pred) {
+  var plan = idx.plan(sink, undefined, undefined, undefined, pred);
+  plan.execute([], sink, undefined, undefined, undefined, pred);
+  return plan;
+}
 
 describe('ValueIndex', function() {
 
@@ -204,5 +268,343 @@ describe('ValueIndex (as Plan)', function() {
 });
 
 
+describe('TreeIndex', function() {
+
+
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData2();
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.INT,
+      tailFactory: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.FLOAT,
+        tailFactory: foam.dao.index.ValueIndex.create()
+      })
+    });
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('covers toString()', function() {
+    plan = idx.plan(sink);
+
+    // cover
+    plan.toString();
+    idx.toString();
+  });
+
+  it('optimizes IN', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.IN(test.Indexable.INT, [ 0, 1, 2 ]));
+
+    // Note: this is checking an implementation detail
+    // Each item in the In array produces a plan
+    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
+    expect(plan.subPlans.length).toEqual(3);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(3);
+    expect(sink.a[0].int).toEqual(0);
+    expect(sink.a[1].int).toEqual(1);
+    expect(sink.a[2].int).toEqual(2);
+  });
+
+  it('optimizes not found IN', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.IN(test.Indexable.INT, [ 22, 25 ]));
+
+    expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(0);
+  });
+
+  it('optimizes EQ', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, 4));
+
+    // Note: this is checking an implementation detail
+    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
+    expect(plan.subPlans.length).toEqual(1);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].int).toEqual(4);
+  });
+
+  it('optimizes not found EQ', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, 56));
+
+    expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(0);
+  });
+
+  it('optimizes False', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      foam.mlang.predicate.False.create());
+
+    expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+    plan.execute([], sink);
+    expect(sink.a.length).toEqual(0);
+  });
+
+
+  it('optimizes range searches', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.AND(
+        m.GT(test.Indexable.FLOAT, 7),
+        m.LT(test.Indexable.FLOAT, 25),
+        m.GTE(test.Indexable.INT, 3),
+        m.LTE(test.Indexable.INT, 10)
+      )
+    );
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(5);
+    expect(sink.a[0].int).toEqual(3);
+    expect(sink.a[1].int).toEqual(4);
+    expect(sink.a[2].int).toEqual(5);
+    expect(sink.a[3].int).toEqual(6);
+    expect(sink.a[4].int).toEqual(7);
+
+  });
+
+
+//   it('optimizes True', function() {
+//     // not a valid case
+//     var baseEq = m.EQ(test.Indexable.INT, 4);
+//     var fakePredicate = {
+//       __proto__: baseEq,
+//       f: function() { return true; },
+//       partialEval: function() { return foam.mlang.predicate.True.create(); }
+//     }
+
+//     plan = idx.plan(sink, undefined, undefined, undefined,
+//       m.AND(
+//         fakePredicate,
+//         fakePredicate
+//       )
+//     );
+
+//     //expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
+
+//     plan.execute([], sink);
+//     expect(sink.a.length).toEqual(data.length);
+//   });
+
+
+
+});
+
+
+describe('Case-Insensitive TreeIndex', function() {
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData1();
+    idx = foam.dao.index.CITreeIndex.create({
+      prop: test.Indexable.STRING,
+      tailFactory: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.INT,
+        tailFactory: foam.dao.index.ValueIndex.create()
+      })
+    });
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('puts case-insensitive', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'three')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(2);
+    expect(sink.a[0].string).toEqual('Three');
+    expect(sink.a[1].string).toEqual('three');
+  });
+
+  it('removes case-insensitive', function() {
+    // Remove both '3' items: ids 3 and 4, but setting both strings to
+    // capitalized value to make sure CI accepts both
+    var newData = data[3].clone();
+    newData.string = 'Three';
+    idx.remove(newData);
+
+    newData = data[4].clone();
+    newData.string = 'Three';
+    idx.remove(newData);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'three')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(0);
+  });
+});
+
+
+describe('SetIndex', function() {
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData3();
+    idx = foam.dao.index.SetIndex.create({
+      prop: test.Indexable.ARRAY,
+      tailFactory: foam.dao.index.ValueIndex.create()
+    });
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('finds based on array values', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'banana')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].int).toEqual(1);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'hello')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(2);
+    expect(sink.a[1].int).toEqual(0);
+  });
+
+  it('removes based on array values', function() {
+    idx.remove(data[0]);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'banana')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].int).toEqual(1);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.ARRAY, 'hello')
+    );
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(1);
+
+  });
+
+
+});
+
+describe('Plan', function() {
+  it('covers toString()', function() {
+    foam.dao.index.Plan.create().toString();
+    foam.dao.index.NotFoundPlan.create().toString();
+    foam.dao.index.NoPlan.create().toString();
+    foam.dao.index.CustomPlan.create().toString();
+    foam.dao.index.CountPlan.create().toString();
+    foam.dao.index.AltPlan.create().toString();
+  });
+});
+
+
+describe('AltIndex', function() {
+  var data;
+  var idx;
+  var plan;
+  var m;
+  var sink;
+
+  beforeEach(function() {
+    data = createData2();
+    idx = foam.dao.index.AltIndex.create({
+      delegates: [
+        foam.dao.index.TreeIndex.create({
+          prop: test.Indexable.INT,
+          tailFactory: foam.dao.index.ValueIndex.create()
+        }),
+        foam.dao.index.TreeIndex.create({
+          prop: test.Indexable.FLOAT,
+          tailFactory: foam.dao.index.ValueIndex.create()
+        }),
+      ]
+    });
+    idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
+    idx.bulkLoad(data);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('Picks correct index for query', function() {
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.INT, 4)
+    );
+
+    expect(plan.cost).toBeLessThan(data.length/2);
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.FLOAT, 4)
+    );
+
+    expect(plan.cost).toBeLessThan(data.length/2);
+  });
+
+  it('removes items from all indexes', function() {
+    idx.remove(data[0]);
+    
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
+    expect(sink.a.length).toEqual(0);
+
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
+    expect(sink.a.length).toEqual(0);
+
+    // puts back
+    idx.put(data[0]);
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
+    expect(sink.a.length).toEqual(1);
+
+    plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
+    expect(sink.a.length).toEqual(2);
+
+  });
+
+  it('covers get()', function() {
+    expect(idx.get(4)).not.toBeUndefined();
+  });
+  it('covers size()', function() {
+    expect(idx.size()).toEqual(data.length);
+  });
+  it('covers toString()', function() {
+    idx.toString();
+  });
+});
 
 
