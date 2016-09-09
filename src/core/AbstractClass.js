@@ -183,6 +183,12 @@ foam.LIB({
       return Object.hasOwnProperty.call(this.axiomMap_, name);
     },
 
+    function getOwnAxioms() {
+      return this.getAxioms().filter(function(a) {
+        return this.hasOwnAxiom(a.name);
+      }.bind(this));
+    },
+
     /** Returns all axioms defined on this class or its parent classes. */
     function getAxioms() {
       // The full axiom list is stored in the regular cache with '' as a key.
