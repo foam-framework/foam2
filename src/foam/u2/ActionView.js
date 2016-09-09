@@ -82,8 +82,9 @@ foam.CLASS({
   ],
 
   listeners: [
-    function click() {
+    function click(e) {
       this.action.maybeCall(this.__subContext__, this.data);
+      e.stopPropagation();
     }
   ]
 });
