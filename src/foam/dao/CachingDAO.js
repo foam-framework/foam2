@@ -70,6 +70,8 @@ foam.CLASS({
         ProxyDAO's default forwarding of put/remove/removeAll.
         @private
       */
+      class: 'Proxy',
+      of: 'foam.dao.DAO',
       name: 'delegate',
       hidden: true,
       forwards: [ 'find', 'select' ],
@@ -140,5 +142,3 @@ foam.CLASS({
     }
   ]
 });
-
-
