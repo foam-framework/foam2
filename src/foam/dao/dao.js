@@ -810,7 +810,50 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'predicate'
+      name: 'predicate',
+      required: true
+    },
+    {
+      class: 'Proxy',
+      of: 'foam.dao.DAO',
+      name: 'delegate',
+      topics: [ ],
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      postSet: function(old, nu) {
+        // Only fire a 'reset' when the delegate is actually changing, not being
+        // set for the first time.
+        if ( old ) {
+          this.on.reset.pub();
+        }
+        
+        if ( old ) {
+          old.on.put.unsub(this.onSrcPut);
+          old.on.remove.unsub(this.onSrcRemove);
+          old.on.reset.unsub(this.onSrcReset);
+        }
+        nu.on.put.sub(this.onSrcPut);
+        nu.on.remove.sub(this.onSrcRemove);
+        nu.on.reset.sub(this.onSrcReset);
+      }
+    },
+  ],
+
+  listeners: [
+    /** If the predicate returns false for the object added or updated, change
+      to an on.remove event. If the listener had previously been told about
+      the object, it should now remove it since it no longer matches. */
+    function onSrcPut(s, on, put, obj) {
+      if ( this.predicate.f(obj) ) {
+        this.pub.apply(this, arguments);
+      } else {
+        this.pub(s, on, 'remove', obj);
+      }
+    },
+    function onSrcRemove(s, on, remove, obj) {
+      this.pub.apply(this, arguments);
+    },
+    function onSrcReset() {
+      this.pub.apply(this, arguments);
     }
   ],
 
