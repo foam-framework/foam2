@@ -101,7 +101,7 @@
       console.assert(opt_name === undefined || typeof opt_name === 'string',
                      'opt_name must be left undefined or be a string.');
 
-      var sub = {};
+      var sub = Object.create(this);
 
       if ( opt_name ) {
         Object.defineProperty(sub, 'NAME', {
@@ -136,7 +136,6 @@
       });
 
       sub.$UID__ = foam.next$UID();
-      sub.__proto__ = this;
       Object.freeze(sub);
 
       return sub;
