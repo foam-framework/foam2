@@ -817,7 +817,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      topics: [ ],
+      //topics: [ 'propertyChange' ],
       forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       postSet: function(old, nu) {
         // Only fire a 'reset' when the delegate is actually changing, not being
@@ -844,16 +844,16 @@ foam.CLASS({
       the object, it should now remove it since it no longer matches. */
     function onSrcPut(s, on, put, obj) {
       if ( this.predicate.f(obj) ) {
-        this.pub.apply(this, arguments);
+        this.pub(on, put, obj);
       } else {
-        this.pub(s, on, 'remove', obj);
+        this.pub(on, 'remove', obj);
       }
     },
     function onSrcRemove(s, on, remove, obj) {
-      this.pub.apply(this, arguments);
+      this.pub(on, remove, obj);
     },
-    function onSrcReset() {
-      this.pub.apply(this, arguments);
+    function onSrcReset(s, on, reset) {
+      this.pub(on, reset);
     }
   ],
 
