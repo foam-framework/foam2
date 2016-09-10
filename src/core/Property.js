@@ -492,8 +492,11 @@ foam.CLASS({
       var prop = this.clone();
 
       if ( child.cls_ !== foam.core.Property &&
-           child.cls_ !== this.cls_ ) {
-        this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+           child.cls_ !== this.cls_ )
+      {
+        if ( this.cls_ !== foam.core.Property ) {
+          this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+        }
 
         return child;
       }

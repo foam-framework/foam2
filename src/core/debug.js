@@ -154,7 +154,7 @@ foam.AbstractClass.installModel = function() {
       var prevA    = this.getAxiomByName(a.name);
       var Property = foam.core.Property;
       if ( prevA && prevA.cls_ !== a.cls_ &&
-          ! ( a.cls_ === Property && Property.isSubClass(prevA.cls_) )
+          ! ( a.cls_ === Property || prevA.cls_ === Property && Property.isSubClass(a.cls_) )
       ) {
         var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
         var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
