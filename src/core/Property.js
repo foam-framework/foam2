@@ -68,6 +68,8 @@ foam.CLASS({
       expression: function(name) { return foam.String.labelize(name); }
     },
 
+    'documentation',
+
     /* User-level help. Could/should appear in GUI's as online help. */
     'help',
 
