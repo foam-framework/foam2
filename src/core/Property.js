@@ -369,6 +369,8 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
+      // TODO: experiment to see if a simpler setter for Properties which
+      // don't use any of the options is faster.
       var setter = prop.setter ? prop.setter :
         function propSetter(newValue) {
           // ???: Should clearProperty() call set(undefined)?
