@@ -114,18 +114,26 @@
           var v = opt_args[key];
 
           if ( ! foam.core.Slot.isInstance(v) ) {
-            v = foam.core.ConstantSlot.create({ value: v });
+            sub[key + '$'] = foam.core.ConstantSlot.create({ value: v });
+
+            (function(v) {
+              Object.defineProperty(sub, key, {
+                get: function() { return v; },
+                enumerable: false
+              });
+            })(v);
+          } else {
+            sub[key + '$'] = v;
+
+            // For performance, these could be reused.
+            (function(v) {
+              Object.defineProperty(sub, key, {
+                get: function() { return v.get(); },
+                enumerable: false
+              });
+            })(v);
           }
 
-          sub[key + '$'] = v;
-
-          // For performance, these could be reused.
-          (function(v) {
-            Object.defineProperty(sub, key, {
-              get: function() { return v.get(); },
-              enumerable: false
-            });
-          })(v);
         }
       }
 
@@ -135,7 +143,7 @@
       });
 
       sub.$UID__ = foam.next$UID();
-      Object.freeze(sub);
+//      Object.freeze(sub);
 
       return sub;
     }
