@@ -1097,6 +1097,8 @@ foam.CLASS({
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
+      // TODO(kgr): remove use of mapper because this is a performance
+      // critical function.
       var mapper = function(c) { return c.toE ? c.toE(null, Y) : c; };
 
       for ( var i = 0 ; i < cs.length ; i++ ) {
