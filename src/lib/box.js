@@ -174,12 +174,20 @@ foam.CLASS({
   implements: [ 'foam.box.Box' ],
 
   methods: [
-    function send(msg) {
-      if ( msg.replyBox ) {
-        var reply = msg.replyBox;
-        msg.clearProperty('replyBox');
-        reply.send(msg);
-      }
+    {
+      name: 'send',
+      code: function (msg) {
+        if ( msg.replyBox ) {
+          var reply = msg.replyBox;
+          msg.clearProperty('replyBox');
+          reply.send(msg);
+        }
+      },
+      javaCode: 'foam.box.Box b = message.getReplyBox();\n'
+                + 'if ( b != null ) {\n'
+                + '  message.setReplyBox(null);\n'
+                + '  b.send(message);\n'
+                + '}'
     }
   ]
 });

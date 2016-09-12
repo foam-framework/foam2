@@ -1519,11 +1519,10 @@ foam.CLASS({
 
       e.fromProperty && e.fromProperty(this);
 
-      if ( X.data ) {
+      if ( X.data$ &&
+           ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
-
-      if ( args ) e.copyFrom(args);
 
       return e;
     }
@@ -1592,10 +1591,15 @@ foam.CLASS({
 
   methods: [
     function toE(args, X) {
-      return X.lookup('foam.u2.ActionView').create({
-        data$:  X.data$,
-        action: this
-      }, X).copyFrom(args || {});
+      var view = foam.u2.ViewSpec.createView(
+        { class: 'foam.u2.ActionView', action: this }, args, this, X);
+
+      if ( X.data$ &&
+           ! ( args && ( args.data || args.data$ ) ) ) {
+        view.data$ = X.data$;
+      }
+
+      return view;
     }
   ]
 });

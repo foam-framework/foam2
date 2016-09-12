@@ -153,8 +153,14 @@ foam.AbstractClass.installModel = function() {
 
       var prevA    = this.getAxiomByName(a.name);
       var Property = foam.core.Property;
-      if ( prevA && prevA.cls_ !== a.cls_ &&
-          ! ( a.cls_ === Property || prevA.cls_ === Property && Property.isSubClass(a.cls_) )
+      // Potential failure if:
+      //    previousAxiom class does not match newAxiom class
+      // But ignore valid cases:
+      //    base Property extended by subclass of Property
+      //    subclass of Property extended without specifying class
+      if (  prevA && prevA.cls_ !== a.cls_ &&
+          ! ( prevA.cls_ === Property && Property.isSubClass(a.cls_) ) &&
+          ! ( Property.isSubClass(prevA.cls_) && a.cls_ === Property )
       ) {
         var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
         var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';

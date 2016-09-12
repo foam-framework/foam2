@@ -220,6 +220,11 @@ foam.CLASS({
 
 
 // TODO(adamvy): document
+// NB: Extending a Proxied object and unsetting options (like setting
+//     topics: []) will not undo the work the base class has already done.
+//     The ProxySub is already installed in the prototype and will still
+//     be active in the derived class, even though it appears that topics is
+//     not proxied when examining the dervied class' axiom.
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
@@ -270,7 +275,8 @@ foam.CLASS({
         axioms.push(foam.core.ProxiedMethod.create({
           name: method.name,
           returns: method.returns,
-          property: name
+          property: name,
+          args: method.args
         }));
       }
 
@@ -280,6 +286,7 @@ foam.CLASS({
           name: method.name,
           returns: method.returns,
           property: name,
+          args: method.args,
           delegate: true
         }));
       }

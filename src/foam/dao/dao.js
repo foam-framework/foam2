@@ -396,16 +396,16 @@ foam.CLASS({
 
   methods: [
     function put(obj, fc) {
-      if ( this.count++ >= this.limit && fc ) {
-        fc.stop();
+      if ( this.count++ >= this.limit ) {
+        fc && fc.stop();
       } else {
         this.delegate.put(obj, fc);
       }
     },
 
     function remove(obj, fc) {
-      if ( this.count++ >= this.limit && fc ) {
-        fc.stop();
+      if ( this.count++ >= this.limit ) {
+        fc && fc.stop();
       } else {
         this.delegate.remove(obj, fc);
       }
@@ -802,7 +802,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
-  extends: 'foam.dao.ProxyDAO',
+  extends: 'foam.dao.AbstractDAO',
 
   requires: [
     'foam.mlang.predicate.And'
@@ -814,9 +814,16 @@ foam.CLASS({
       required: true
     },
     {
+      name: 'of',
+      expression: function(delegate) {
+        return delegate.of;
+      }
+    },
+    {
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
+      topics: [],
       forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       postSet: function(old, nu) {
         // Only fire a 'reset' when the delegate is actually changing, not being
@@ -845,7 +852,7 @@ foam.CLASS({
           this.pub(on, 'remove', obj);
         }
       } else {
-        this.pub(on, putRemoveReset, obj)
+        this.pub(on, putRemoveReset, obj);
       }
     },
   ],
