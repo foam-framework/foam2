@@ -826,13 +826,9 @@ foam.CLASS({
         }
 
         if ( old ) {
-          old.on.put.unsub(this.onSrcPut);
-          old.on.remove.unsub(this.onSrcRemove);
-          old.on.reset.unsub(this.onSrcReset);
+          old.on.unsub(this.onEvent);
         }
-        nu.on.put.sub(this.onSrcPut);
-        nu.on.remove.sub(this.onSrcRemove);
-        nu.on.reset.sub(this.onSrcReset);
+        nu.on.sub(this.onEvent);
       }
     },
   ],
@@ -841,19 +837,17 @@ foam.CLASS({
     /** If the predicate returns false for the object added or updated, change
       to an on.remove event. If the listener had previously been told about
       the object, it should now remove it since it no longer matches. */
-    function onSrcPut(s, on, put, obj) {
-      if ( this.predicate.f(obj) ) {
-        this.pub(on, put, obj);
+    function onEvent(s, on, putRemoveReset, obj) {
+      if ( putRemoveReset === 'put' ) {
+        if ( this.predicate.f(obj) ) {
+          this.pub(on, 'put', obj);
+        } else {
+          this.pub(on, 'remove', obj);
+        }
       } else {
-        this.pub(on, 'remove', obj);
+        this.pub(on, putRemoveReset, obj)
       }
     },
-    function onSrcRemove(s, on, remove, obj) {
-      this.pub(on, remove, obj);
-    },
-    function onSrcReset(s, on, reset) {
-      this.pub(on, reset);
-    }
   ],
 
   methods: [
