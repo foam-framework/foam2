@@ -817,7 +817,6 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      //topics: [ 'propertyChange' ],
       forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       postSet: function(old, nu) {
         // Only fire a 'reset' when the delegate is actually changing, not being
@@ -825,7 +824,7 @@ foam.CLASS({
         if ( old ) {
           this.on.reset.pub();
         }
-        
+
         if ( old ) {
           old.on.put.unsub(this.onSrcPut);
           old.on.remove.unsub(this.onSrcRemove);
