@@ -507,6 +507,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.ElementState',
       transient: true,
+      topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
       factory: function() { return this.UNLOADED; },
@@ -546,6 +547,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
+      topics: [],
       factory: function() {
         return this.elementValidator$ ? this.elementValidator : this.DEFAULT_VALIDATOR;
       }
