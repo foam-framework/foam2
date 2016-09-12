@@ -1378,11 +1378,14 @@ foam.CLASS({
 
     // ???/TODO: What is this doing?
     function addEventListener_(topic, listener) {
+      // TODO: this looks broken
       var foamtopic = topic.startsWith('on') ?
           'on' + topic :
           topic ;
       this.sub(foamtopic, listener);
-      this.el() && this.el().addEventListener(topic, listener, false);
+
+      var el = this.el();
+      el && el.addEventListener(topic, listener, false);
     },
 
     function removeEventListener_(topic, listener) {
@@ -1568,6 +1571,15 @@ foam.CLASS({
       attribute: true
     }
   ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'Controller',
+  extends: 'foam.u2.Element',
+
+  exports: [ 'as data' ]
 });
 
 
