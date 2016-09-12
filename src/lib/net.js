@@ -134,7 +134,7 @@ foam.CLASS({
 
   topics: [
     'data',
-    'error',
+    'err',
     'end'
   ],
 
@@ -204,7 +204,7 @@ foam.CLASS({
       this.streaming = true;
 
       var onError = foam.Function.bind(function(e) {
-        this.error.pub();
+        this.err.pub();
         this.end.pub();
       }, this);
 

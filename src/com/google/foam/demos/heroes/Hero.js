@@ -23,7 +23,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'id',
-      visibility: 'final'
+      final: true // TODO: implement
     },
     {
       class: 'String',

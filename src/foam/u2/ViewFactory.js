@@ -26,17 +26,13 @@ foam.CLASS({
       'to create an instance. Useful for rowViews and similar.',
 
   methods: [
-    function init() {
-      this.SUPER();
-      console.warn('Deprecated use of ViewFactory; use ViewSpec instead!');
-    },
-
     function installInProto(proto) {
       this.SUPER(proto);
 
       var name = this.name;
 
       proto[name + '$f'] = function(args, ctx) {
+        console.warn('Deprecated use of ViewFactory; use ViewSpec instead!');
         ctx = ctx || this;
         var raw = this[name];
 

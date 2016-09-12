@@ -46,6 +46,7 @@ foam.CLASS({
     },
     [ 'extends', 'FObject' ],
     'refines',
+    'documentation',
     {
       // List of all axioms, including methods, properties, listeners,
       // etc. and 'axioms'.

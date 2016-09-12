@@ -170,6 +170,7 @@ foam.CLASS({
 });
 
 
+// TODO(adamvy): document
 foam.CLASS({
   package: 'foam.core',
   name: 'ProxySub',
@@ -194,7 +195,7 @@ foam.CLASS({
       name: 'code',
       expression: function(prop, topics) {
         var privateName = prop + 'EventProxy_';
-        return function(a1) {
+        return function subProxy(a1) {
           if ( ! topics || topics.indexOf(a1) != -1 ) {
             var proxy = this.getPrivate_(privateName);
             if ( ! proxy ) {
@@ -219,6 +220,11 @@ foam.CLASS({
 
 
 // TODO(adamvy): document
+// NB: Extending a Proxied object and unsetting options (like setting
+//     topics: []) will not undo the work the base class has already done.
+//     The ProxySub is already installed in the prototype and will still
+//     be active in the derived class, even though it appears that topics is
+//     not proxied when examining the dervied class' axiom.
 foam.CLASS({
   package: 'foam.core',
   name: 'Proxy',
@@ -285,10 +291,12 @@ foam.CLASS({
         }));
       }
 
-      axioms.push(foam.core.ProxySub.create({
-        topics: this.topics,
-        prop: this.name
-      }));
+      if ( ! this.topics || this.topics.length ) {
+        axioms.push(foam.core.ProxySub.create({
+          topics: this.topics,
+          prop:   this.name
+        }));
+      }
 
       cls.installAxioms(axioms);
     }

@@ -34,7 +34,7 @@ foam.CLASS({
         border: 1px solid #dcdcdc;
         display: inline-block;
         color: #777777;
-        font-family: arial;
+        font-family: Arial;
         font-size: 12px;
         font-weight: bold;
         margin: 2px;
@@ -82,8 +82,9 @@ foam.CLASS({
   ],
 
   listeners: [
-    function click() {
+    function click(e) {
       this.action.maybeCall(this.__subContext__, this.data);
+      e.stopPropagation();
     }
   ]
 });

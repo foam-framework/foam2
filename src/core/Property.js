@@ -68,6 +68,8 @@ foam.CLASS({
       expression: function(name) { return foam.String.labelize(name); }
     },
 
+    'documentation',
+
     /* User-level help. Could/should appear in GUI's as online help. */
     'help',
 
@@ -368,6 +370,18 @@ foam.CLASS({
         function simpleGetter() { return this.instance_[name]; };
 
       var setter = prop.setter ? prop.setter :
+        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ? 
+        function simplePropSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
+          var oldValue = this.instance_[name] ;
+          this.instance_[name] = newValue;
+          this.pubPropertyChange_(prop, oldValue, newValue);
+        }
+        :
         function propSetter(newValue) {
           // ???: Should clearProperty() call set(undefined)?
           if ( newValue === undefined ) {
@@ -490,8 +504,11 @@ foam.CLASS({
       var prop = this.clone();
 
       if ( child.cls_ !== foam.core.Property &&
-           child.cls_ !== this.cls_ ) {
-        this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+           child.cls_ !== this.cls_ )
+      {
+        if ( this.cls_ !== foam.core.Property ) {
+          this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+        }
 
         return child;
       }

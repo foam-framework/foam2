@@ -101,7 +101,7 @@
       console.assert(opt_name === undefined || typeof opt_name === 'string',
                      'opt_name must be left undefined or be a string.');
 
-      var sub = {};
+      var sub = Object.create(this);
 
       if ( opt_name ) {
         Object.defineProperty(sub, 'NAME', {
@@ -113,7 +113,16 @@
         if ( opt_args.hasOwnProperty(key) ) {
           var v = opt_args[key];
 
-          if ( foam.core.Slot.isInstance(v) ) {
+          if ( ! foam.core.Slot.isInstance(v) ) {
+            sub[key + '$'] = foam.core.ConstantSlot.create({ value: v });
+
+            (function(v) {
+              Object.defineProperty(sub, key, {
+                get: function() { return v; },
+                enumerable: false
+              });
+            })(v);
+          } else {
             sub[key + '$'] = v;
 
             // For performance, these could be reused.
@@ -123,10 +132,8 @@
                 enumerable: false
               });
             })(v);
-          } else {
-            sub[key + '$'] = foam.core.ConstantSlot.create({value: v});
-            sub[key] = v;
           }
+
         }
       }
 
@@ -136,8 +143,7 @@
       });
 
       sub.$UID__ = foam.next$UID();
-      sub.__proto__ = this;
-      Object.freeze(sub);
+//      Object.freeze(sub);
 
       return sub;
     }
