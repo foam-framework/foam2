@@ -396,16 +396,16 @@ foam.CLASS({
 
   methods: [
     function put(obj, fc) {
-      if ( this.count++ >= this.limit && fc ) {
-        fc.stop();
+      if ( this.count++ >= this.limit ) {
+        fc && fc.stop();
       } else {
         this.delegate.put(obj, fc);
       }
     },
 
     function remove(obj, fc) {
-      if ( this.count++ >= this.limit && fc ) {
-        fc.stop();
+      if ( this.count++ >= this.limit ) {
+        fc && fc.stop();
       } else {
         this.delegate.remove(obj, fc);
       }

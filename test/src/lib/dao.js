@@ -160,6 +160,118 @@ describe('QuickSink', function() {
 
 
 
+describe('LimitedSink', function() {
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+  });
+
+  it('only puts when below limit', function() {
+    var sink = foam.dao.LimitedSink.create({
+      limit: 3,
+      delegate: foam.dao.ArrayDAO.create()
+    });
+
+    var a = test.CompA.create({ id: 0, a: 9 });
+    var b = test.CompA.create({ id: 1, a: 7 });
+    var c = test.CompA.create({ id: 2, a: 5 });
+    var d = test.CompA.create({ id: 3, a: 3 });
+
+    sink.put(a);
+    sink.put(b);
+    sink.put(c);
+    sink.put(d);
+
+    expect(sink.delegate.array.length).toEqual(3);
+    expect(sink.delegate.array[0].id).toEqual(0);
+    expect(sink.delegate.array[1].id).toEqual(1);
+    expect(sink.delegate.array[2].id).toEqual(2);
+
+  });
+
+  it('only removes when below limit', function() {
+    var sink = foam.dao.LimitedSink.create({
+      limit: 3,
+      delegate: foam.dao.ArrayDAO.create()
+    });
+
+    var a = test.CompA.create({ id: 0, a: 9 });
+    var b = test.CompA.create({ id: 1, a: 7 });
+    var c = test.CompA.create({ id: 2, a: 5 });
+    var d = test.CompA.create({ id: 3, a: 3 });
+
+    sink.delegate.put(a);
+    sink.delegate.put(b);
+    sink.delegate.put(c);
+    sink.delegate.put(d);
+
+    sink.remove(a);
+    sink.remove(b);
+    sink.remove(c);
+    sink.remove(d);
+
+    expect(sink.delegate.array.length).toEqual(1);
+    expect(sink.delegate.array[0].id).toEqual(3);
+
+  });
+
+  it('put stops flow control', function() {
+    var sink = foam.dao.LimitedSink.create({
+      limit: 3,
+      delegate: foam.dao.ArrayDAO.create()
+    });
+    var fc = foam.dao.FlowControl.create();
+
+    var a = test.CompA.create({ id: 0, a: 9 });
+    var b = test.CompA.create({ id: 1, a: 7 });
+    var c = test.CompA.create({ id: 2, a: 5 });
+    var d = test.CompA.create({ id: 3, a: 3 });
+
+    sink.put(a, fc);
+    expect(fc.stopped).toEqual(false);
+    sink.put(b, fc);
+    expect(fc.stopped).toEqual(false);
+    sink.put(c, fc);
+    expect(fc.stopped).toEqual(false);
+    sink.put(d, fc);
+    expect(fc.stopped).toEqual(true);
+  });
+
+  it('remove stops flow control', function() {
+    var sink = foam.dao.LimitedSink.create({
+      limit: 3,
+      delegate: foam.dao.ArrayDAO.create()
+    });
+    var fc = foam.dao.FlowControl.create();
+
+    var a = test.CompA.create({ id: 0, a: 9 });
+    var b = test.CompA.create({ id: 1, a: 7 });
+    var c = test.CompA.create({ id: 2, a: 5 });
+    var d = test.CompA.create({ id: 3, a: 3 });
+
+    sink.delegate.put(a);
+    sink.delegate.put(b);
+    sink.delegate.put(c);
+    sink.delegate.put(d);
+
+    sink.remove(a, fc);
+    expect(fc.stopped).toEqual(false);
+    sink.remove(b, fc);
+    expect(fc.stopped).toEqual(false);
+    sink.remove(c, fc);
+    expect(fc.stopped).toEqual(false);
+    sink.remove(d, fc);
+    expect(fc.stopped).toEqual(true);
+
+  });
+
+});
+
+
 if ( typeof localStorage === "undefined" || localStorage === null ) {
   var LocalStorage = require('node-localstorage').LocalStorage;
   localStorage = new LocalStorage('./tmp');
