@@ -31,4 +31,4 @@ foam.INTERFACE({
   ]
 });
 
-foam.u2.Element.create().setNodeName('pre').add(foam.dao.ProxySink.buildJavaClass().toJavaSource()).write()
+foam.u2.Element.create().setNodeName('pre').add(foam.box.RPCMessage.buildJavaClass().toJavaSource()).write()

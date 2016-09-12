@@ -22,6 +22,7 @@ var classes = [
   'foam.box.SubBoxMessage',
   'com.google.foam.demos.appengine.TestModel',
   'foam.box.HTTPReplyBox',
+  'foam.box.EchoBox',
   'com.google.foam.demos.appengine.TestService',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',

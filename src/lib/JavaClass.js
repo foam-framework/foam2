@@ -122,6 +122,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.java.Argument',
       name: 'args'
+    },
+    {
+      name: 'body',
+      documentation: 'Dummy property to silence warnings',
+      setter: function() {},
+      getter: function() {}
     }
   ],
   methods: [
@@ -255,7 +261,11 @@ foam.CLASS({
       }
     },
     function field(f) {
-      this.fields.push(foam.java.Field.create(f));
+      if ( ! foam.core.FObject.isInstance(f) ) {
+        f = ( f.class ? foam.lookup(f.class) : foam.java.Field ).create(f, this);
+      }
+
+      this.fields.push(f);
       return this;
     },
     function method(m) {
@@ -405,7 +415,7 @@ foam.CLASS({
     },
     function outputJava(o) {
       o.indent();
-      o.out('private static final foam.core.ClassInfo classInfo_ = new foam.core.ClassInfo()\n')
+      o.out('private static final foam.core.ClassInfo classInfo_ = new foam.core.ClassInfoImpl()\n')
       o.increaseIndent();
       o.indent();
       o.out('.setId("', this.id, '")');
