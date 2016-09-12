@@ -272,6 +272,69 @@ describe('LimitedSink', function() {
 });
 
 
+describe('SkipSink', function() {
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+  });
+
+  it('only puts when above limit', function() {
+    var sink = foam.dao.SkipSink.create({
+      skip: 2,
+      delegate: foam.dao.ArrayDAO.create()
+    });
+
+    var a = test.CompA.create({ id: 0, a: 9 });
+    var b = test.CompA.create({ id: 1, a: 7 });
+    var c = test.CompA.create({ id: 2, a: 5 });
+    var d = test.CompA.create({ id: 3, a: 3 });
+
+    sink.put(a);
+    sink.put(b);
+    sink.put(c);
+    sink.put(d);
+
+    expect(sink.delegate.array.length).toEqual(2);
+    expect(sink.delegate.array[0].id).toEqual(2);
+    expect(sink.delegate.array[1].id).toEqual(3);
+
+  });
+
+  it('only removes when below limit', function() {
+    var sink = foam.dao.SkipSink.create({
+      skip: 2,
+      delegate: foam.dao.ArrayDAO.create()
+    });
+
+    var a = test.CompA.create({ id: 0, a: 9 });
+    var b = test.CompA.create({ id: 1, a: 7 });
+    var c = test.CompA.create({ id: 2, a: 5 });
+    var d = test.CompA.create({ id: 3, a: 3 });
+
+    sink.delegate.put(a);
+    sink.delegate.put(b);
+    sink.delegate.put(c);
+    sink.delegate.put(d);
+
+    sink.remove(a);
+    sink.remove(b);
+    sink.remove(c);
+    sink.remove(d);
+
+    expect(sink.delegate.array.length).toEqual(2);
+    expect(sink.delegate.array[0].id).toEqual(0);
+    expect(sink.delegate.array[1].id).toEqual(1);
+
+  });
+
+});
+
+
+
 if ( typeof localStorage === "undefined" || localStorage === null ) {
   var LocalStorage = require('node-localstorage').LocalStorage;
   localStorage = new LocalStorage('./tmp');
