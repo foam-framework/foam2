@@ -153,8 +153,13 @@ foam.AbstractClass.installModel = function() {
 
       var prevA    = this.getAxiomByName(a.name);
       var Property = foam.core.Property;
-      if ( prevA && prevA.cls_ !== a.cls_ &&
-          ! ( a.cls_ === Property || prevA.cls_ === Property && Property.isSubClass(a.cls_) )
+      // Potential failure if:
+      //    previousAxiom class does not match newAxiom class
+      //    AND not moving from generic property to specific property sublass
+      //    AND not specifying generic Property extend of a specific property sublass
+      if (  prevA && prevA.cls_ !== a.cls_ &&
+          ! ( prevA.cls_ === Property && Property.isSubClass(a.cls_) ) &&
+          ! ( a.cls_ === Property && Property.isSubClass(prevA.cls_) )
       ) {
         var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
         var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
