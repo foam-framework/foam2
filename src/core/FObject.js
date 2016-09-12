@@ -77,9 +77,7 @@ foam.CLASS({
       instance variables.  Things like listeners and topics.
     */
     function setPrivate_(name, value) {
-      var p = this.private_;
-      if ( ! p ) p = this.private_ = {};
-      p[name] = value;
+      ( this.private_ || ( this.private_ = {} ) )[name] = value;
       return value;
     },
 
@@ -92,7 +90,7 @@ foam.CLASS({
     },
 
     function clearPrivate_(name) {
-      this.private_[name] = undefined;
+      if ( this.private_ ) this.private_[name] = undefined;
     },
 
     function pubPropertyChange_() {
