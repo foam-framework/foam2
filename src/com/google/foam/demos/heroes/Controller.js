@@ -154,6 +154,7 @@ foam.CLASS({
     },
 
     function editHero(hero) {
+      console.log('*****', this.selection, hero);
       this.selection = hero;
     }
   ],
