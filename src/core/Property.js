@@ -299,7 +299,7 @@ foam.CLASS({
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
       var FIP         = factory && ( prop.name + '_fip' ); // Factory In Progress
-      var fip         = false;
+      var fip         = 0;
 
       // Factory In Progress (FIP) Support
       // When a factory method is in progress, the object sets a private
@@ -351,23 +351,21 @@ foam.CLASS({
           if ( this.hasOwnProperty(name) ) return this.instance_[name];
 
           // Indicate the Factory In Progress state
-          if ( fip && this.getPrivate_(FIP) ) {
+          if ( fip > 10 && this.getPrivate_(FIP) ) {
             console.warn('reentrant factory', name);
             return undefined;
           }
 
           var oldFip = fip;
-          if ( oldFip ) {
+          fip++;
+          if ( oldFip === 10 ) {
             this.setPrivate_(FIP, true);
-          } else {
-            fip = true;
           }
           this[name] = factory.call(this, prop);
-          if ( oldFip ) {
+          if ( oldFip === 10 ) {
             this.clearPrivate_(FIP);
-          } else {
-            fip = false;
           }
+          fip--;
 
           return this.instance_[name];
         } :
