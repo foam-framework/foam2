@@ -49,7 +49,7 @@
       var ret = typeof id === 'string' && this.__cache__[id];
 
       if ( ! opt_suppress ) {
-        console.assert(
+        this.assert(
             ret,
             'Could not find any registered class for ' + id);
       }
@@ -65,7 +65,7 @@
      * @param opt_id Optional id under which to register class.
      */
     register: function(cls, opt_id) {
-      console.assert(
+      this.assert(
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
 
@@ -80,7 +80,7 @@
       if ( opt_id ) {
         doRegister(this.__cache__, opt_id);
       } else {
-        console.assert(
+        this.assert(
             typeof cls.id === 'string',
             'Must have an .id property to be registered in a context.');
 
@@ -98,7 +98,9 @@
      *     Currently unused.
      */
     createSubContext: function createSubContext(opt_args, opt_name) {
-      console.assert(
+      if ( ! opt_args ) return this;
+
+      this.assert(
           opt_name === undefined || typeof opt_name === 'string',
           'opt_name must be left undefined or be a string.');
 
