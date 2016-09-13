@@ -1,0 +1,91 @@
+<html>
+ <head>
+  <script>console.time('boot');</script>
+  <script language="javascript" src="../../src/foam.js"></script>
+  <script>console.timeEnd('boot');</script>
+  <title>DAO By Example</title>
+  <style>
+    body { white-space: pre-wrap; }
+    code { color:blue; }
+  </style>
+ </head>
+
+ <body style="font-family:monospace;">
+<script id="demo" language="xjavascript">
+foam.CLASS({
+  name: 'Person',
+  properties: [
+    'id',
+    'name',
+    'age'
+  ]
+});
+global.dao = foam.dao.EasyDAO.create({
+  of: Person,
+  seqNo: true,
+  daoType: 'MDAO'
+});
+dao.put(Person.create({ name: 'adam', age: 12 }));
+dao.put(Person.create({ name: 'bob', age: 24 }));
+
+setTimeout(function() {
+  dao.select().then(function(a) {
+    var people = a.a;
+    people.forEach(function(p) { log(foam.json.stringify(p)); });
+  });
+}, 2000);
+
+
+// Table view of the DAO.
+log(foam.u2.TableView.create({ data: dao }));
+</script>
+
+  <div id='output'></div>
+
+  <script language="javascript">
+    var demo = document.getElementById('demo');
+    var out  = document.getElementById('output');
+
+    function runExample(code, i_) {
+      var output = document.createElement('div');
+      var log_ = function() {
+        var args = Array.from(arguments);
+        for ( var i = 0 ; i < args.length ; i++ ) {
+          var o = args[i];
+          if ( foam.u2.Element.isInstance(o) ) {
+            output.insertAdjacentHTML('beforeend', o.outerHTML);
+            o.load();
+          } else {
+            output.insertAdjacentHTML('beforeend', '' + o);
+          }
+        }
+        output.insertAdjacentHTML('beforeend', '<br/>');
+      };
+      var log = log_;
+
+      var console = {};
+      console.log = log_;
+      console.warn = log_.bind(null, 'warn:');
+      console.error = log_.bind(null, 'error:');
+
+      log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
+      eval(code);
+      return output;
+    }
+
+    var s_ = demo.textContent.split('\n\n\n');
+    var test_code = "";
+    for ( var i_ = 0 ; i_ < s_.length ; i_++ ) {
+      var line = s_[i_];
+      var istest = true;
+      if ( line.startsWith('//:NOTEST\n') ) {
+        istest = false;
+        line = line.substring(10);
+      }
+
+      out.appendChild(runExample(line, i_));
+    }
+    </script>
+
+ </body>
+</html>
