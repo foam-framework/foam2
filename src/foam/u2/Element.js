@@ -1097,9 +1097,6 @@ foam.CLASS({
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
-      // TODO(kgr): remove use of mapper because this is a performance
-      // critical function.
-      var mapper = function(c) { return c.toE ? c.toE(null, Y) : c; };
 
       for ( var i = 0 ; i < cs.length ; i++ ) {
         var c = cs[i];
@@ -1108,7 +1105,10 @@ foam.CLASS({
         if ( c === undefined || c === null ) {
           // nop
         } else if ( Array.isArray(c) ) {
-          es = es.concat(c.map(mapper));
+          for ( var j = 0 ; j < c.length ; j++ ) {
+            var v = c[j];
+            es.push(v.toE ? v.toE(null, Y) : v);
+          }
         } else if ( c.toE ) {
           es.push(c.toE(null, Y));
         } else if ( typeof c === 'function' ) {
@@ -1116,9 +1116,12 @@ foam.CLASS({
         } else if ( foam.core.Slot.isInstance(c) ) {
           var v = this.slotE_(c);
           if ( Array.isArray(v) ) {
-            es = es.concat(v.map(mapper));
+            for ( var j = 0 ; j < v.length ; j++ ) {
+              var u = v[j];
+              es.push(u.toE ? u.toE(null, Y) : u);
+            }
           } else {
-            es.push(mapper(v));
+            es.push(v.toE ? v.toE(null, Y) : v);
           }
         } else {
           es.push(c);
