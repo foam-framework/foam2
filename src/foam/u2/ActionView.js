@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ActionView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
@@ -61,6 +61,7 @@ foam.CLASS({
   ],
 
   properties: [
+    'data',
     'action',
     {
       name: 'label',
