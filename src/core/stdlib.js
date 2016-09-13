@@ -341,6 +341,13 @@ foam.LIB({
     },
 
     {
+      name: 'toUpperCase',
+      code: foam.Function.memoize1(function(str) {
+        return str.toUpperCase();
+      })
+    },
+
+    {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
         // Turns foam.u2.Foo into foam-u2-Foo
