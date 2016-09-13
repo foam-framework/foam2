@@ -358,13 +358,9 @@ foam.CLASS({
 
           var oldFip = fip;
           fip++;
-          if ( oldFip === 10 ) {
-            this.setPrivate_(FIP, true);
-          }
+          if ( oldFip === 10 ) this.setPrivate_(FIP, true);
           this[name] = factory.call(this, prop);
-          if ( oldFip === 10 ) {
-            this.clearPrivate_(FIP);
-          }
+          if ( oldFip === 10 ) this.clearPrivate_(FIP);
           fip--;
 
           return this.instance_[name];
