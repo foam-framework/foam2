@@ -24,7 +24,7 @@
 
   beforeEach(function() {
     oldContext = foam.__context__;
-    foam.__context__ = foam.createSubContext();
+    foam.__context__ = foam.createSubContext({});
   });
   afterEach(function() {
     foam.__context__ = oldContext;

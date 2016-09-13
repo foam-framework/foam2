@@ -37,8 +37,8 @@ describe('ConteXt object', function() {
   });
 
   it('createSubContext', function() {
-    var named = foam.createSubContext(null, "HELLO");
-    var unNamed = named.createSubContext();
+    var named = foam.createSubContext({}, "HELLO");
+    var unNamed = named.createSubContext({});
 
     for ( var key in named ) {
       expect(key).not.toEqual("NAME");
@@ -77,7 +77,7 @@ describe('ConteXt object', function() {
   });
 
   it('describes', function() {
-    foam.createSubContext().describe();
+    foam.createSubContext({}).describe();
     foam.createSubContext({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
   });
 });

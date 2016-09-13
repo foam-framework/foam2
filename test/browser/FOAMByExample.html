@@ -1866,7 +1866,7 @@ g.write();
       }
 
       log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
-      foam.__context__ = foam.createSubContext();
+      foam.__context__ = foam.createSubContext({});
       log_.capture = istest;
       log_.output = "";
       try {
@@ -1877,7 +1877,7 @@ g.write();
       log_.capture = false;
       if ( istest ) {
         test_code += '\n\n// Example ' + (i_ + 1) + '\n';
-        test_code += 'foam.__context__ = foam.createSubContext();\n';
+        test_code += 'foam.__context__ = foam.createSubContext({});\n';
         test_code += 'log_.output = "";\n';
         test_code += 'try {\n' + line + '\n} catch(x) {\n log("Exception: ", x);\n }\n';
         var golden = log_.output.replace(/\n/g, "\\n")
