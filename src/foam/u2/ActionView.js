@@ -40,11 +40,10 @@ foam.CLASS({
         margin: 2px;
         padding: 4px 16px;
         text-decoration: none;
-        visibility: hidden;
       }
 
-      ^available {
-        visibility: visible;
+      ^unavailable {
+        visibility: hidden;
       }
 
       ^:hover {
@@ -74,10 +73,16 @@ foam.CLASS({
       this.nodeName = 'button';
       this.
         cssClass(this.myCls()).
-        enableCls(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
-        attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })}).
         on('click', this.click).
         add(this.label$);
+
+      if ( this.action.isAvailable ) {
+        this.enableCls(this.myCls('unavailable'), this.action.createIsAvailable$(this.data$), true);
+      }
+
+      if ( this.action.isEnabled ) {
+        this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+      }
     }
   ],
 

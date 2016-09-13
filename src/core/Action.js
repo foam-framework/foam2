@@ -65,15 +65,15 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       label: 'Available',
-      value: function() { return true; },
-      help: 'Function to determine if action is available.'
+      help: 'Function to determine if action is available.',
+      value: null
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
-      value: function() { return true; },
-      help: 'Function to determine if action is enabled.'
+      help: 'Function to determine if action is enabled.',
+      value: null
     },
     {
       class: 'Function',
@@ -85,7 +85,9 @@ foam.CLASS({
 
   methods: [
     function isEnabledFor(data) {
-      return foam.Function.withArgs(this.isEnabled, data);
+      return this.isEnabled ?
+        foam.Function.withArgs(this.isEnabled, data) :
+        true;
     },
 
     function createIsEnabled$(data$) {
@@ -96,7 +98,9 @@ foam.CLASS({
     },
 
     function isAvailableFor(data) {
-      return foam.Function.withArgs(this.isAvailable, data);
+      return this.isAvailable ?
+        foam.Function.withArgs(this.isAvailable, data) :
+        true ;
     },
 
     function createIsAvailable$(data$) {
