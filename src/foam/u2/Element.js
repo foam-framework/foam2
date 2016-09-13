@@ -1373,7 +1373,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.on('unload', s.destroy.bind(s));
+      this.onunload.sub(s.destroy.bind(s));
 
       return e;
     },
