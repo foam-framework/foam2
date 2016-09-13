@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ActionView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
@@ -40,11 +40,10 @@ foam.CLASS({
         margin: 2px;
         padding: 4px 16px;
         text-decoration: none;
-        visibility: hidden;
       }
 
-      ^available {
-        visibility: visible;
+      ^unavailable {
+        visibility: hidden;
       }
 
       ^:hover {
@@ -62,6 +61,7 @@ foam.CLASS({
   ],
 
   properties: [
+    'data',
     'action',
     {
       name: 'label',
@@ -74,10 +74,16 @@ foam.CLASS({
       this.nodeName = 'button';
       this.
         cssClass(this.myCls()).
-        enableCls(this.myCls('available'), this.action.createIsAvailable$(this.data$)).
-        attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })}).
         on('click', this.click).
-        add(this.label$);
+        add(this.label/*$*/);
+
+      if ( this.action.isAvailable ) {
+        this.enableCls(this.myCls('unavailable'), this.action.createIsAvailable$(this.data$), true);
+      }
+
+      if ( this.action.isEnabled ) {
+        this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+      }
     }
   ],
 

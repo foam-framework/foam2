@@ -513,9 +513,9 @@ foam.CLASS({
       factory: function() { return this.UNLOADED; },
       postSet: function(_, state) {
         if ( state === this.LOADED ) {
-          this.onload.pub();
+          this.pub('onload');
         } else if ( state === this.UNLOADED ) {
-          this.onunload.pub();
+          this.pub('onunload');
         }
       }
     },
@@ -1376,26 +1376,17 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.onunload.sub(s.destroy.bind(s));
+      this.sub('onunload', s.destroy.bind(s));
 
       return e;
     },
 
-    // ???/TODO: What is this doing?
     function addEventListener_(topic, listener) {
-      // TODO: this looks broken
-      var foamtopic = topic.startsWith('on') ?
-          'on' + topic :
-          topic ;
-      this.sub(foamtopic, listener);
-
       var el = this.el();
       el && el.addEventListener(topic, listener, false);
     },
 
     function removeEventListener_(topic, listener) {
-      if ( ! topic.startsWith('on') ) topic = 'on' + topic;
-      this.unsub(topic, listener);
       this.el() && this.el().removeEventListener(topic, listener);
     },
 
