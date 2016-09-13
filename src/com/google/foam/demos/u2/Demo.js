@@ -371,3 +371,15 @@ foam.CLASS({
     }
   ]
 }).create().write();
+
+
+// Converted from Angular2 demo:
+// https://github.com/thelgevold/angular-2-samples/blob/master/components/bound-textbox/bound-textbox.js
+foam.CLASS({
+  name: 'BoundTextbox',
+  extends: 'foam.u2.Controller',
+  properties: [ ['text', 'hello' ] ],
+  methods: [ function initE() {
+    this.start('h1').add("Bound Textbox").end().start(this.TEXT, {onKey: true}).end().add(this.text$);
+  }]
+}).create().write();
