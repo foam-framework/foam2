@@ -1408,6 +1408,12 @@ describe('DAO.listen', function() {
 
   });
 
+  it('covers reset', function() {
+    dao.listen(sink);
+    dao.pub('on', 'reset');
+
+  });
+
   it('filters puts', function() {
     var a = test.CompA.create({ id: 0, a: 4 });
     var b = test.CompA.create({ id: 4, a: 8 });
