@@ -373,7 +373,7 @@ foam.CLASS({
         return foam.core.ExpressionSlot.create(
           arguments.length == 1 ?
             { code: obj, obj: this } :
-            { code: obj, args: Array.prototype.slice.call(arguments, 1) }
+            { code: obj, obj: this, args: Array.prototype.slice.call(arguments, 1) }
         );
       }
 
