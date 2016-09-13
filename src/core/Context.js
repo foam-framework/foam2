@@ -98,14 +98,16 @@
      *     Currently unused.
      */
     createSubContext: function createSubContext(opt_args, opt_name) {
-      console.assert(opt_name === undefined || typeof opt_name === 'string',
-                     'opt_name must be left undefined or be a string.');
+      console.assert(
+          opt_name === undefined || typeof opt_name === 'string',
+          'opt_name must be left undefined or be a string.');
 
       var sub = Object.create(this);
 
       if ( opt_name ) {
         Object.defineProperty(sub, 'NAME', {
-          value: opt_name, enumerable: false
+          value: opt_name,
+          enumerable: false
         });
       }
 
@@ -118,14 +120,13 @@
 
             (function(v) {
               Object.defineProperty(sub, key, {
-                get: function() { return v; },
+                value: v,
                 enumerable: false
               });
             })(v);
           } else {
             sub[key + '$'] = v;
 
-            // For performance, these could be reused.
             (function(v) {
               Object.defineProperty(sub, key, {
                 get: function() { return v.get(); },
