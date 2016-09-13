@@ -125,12 +125,12 @@ foam.LIB({
       if it implements this class (directly or indirectly).
     */
     function isSubClass(c) {
-      if ( ! c ) return false;
+      if ( ! c || ! c.id ) return false;
 
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
 
-      if ( ! c.id || cache[c.id] === undefined ) {
+      if ( cache[c.id] === undefined ) {
         cache[c.id] = ( c === this.prototype.cls_ ) ||
           ( c.getAxiomByName && !! c.getAxiomByName('implements_' + this.id) ) ||
           this.isSubClass(c.__proto__);
@@ -181,6 +181,12 @@ foam.LIB({
     */
     function hasOwnAxiom(name) {
       return Object.hasOwnProperty.call(this.axiomMap_, name);
+    },
+
+    function getOwnAxioms() {
+      return this.getAxioms().filter(function(a) {
+        return this.hasOwnAxiom(a.name);
+      }.bind(this));
     },
 
     /** Returns all axioms defined on this class or its parent classes. */

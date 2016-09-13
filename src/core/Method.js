@@ -99,7 +99,7 @@ foam.CLASS({
 
       function SUPER() { return super_.apply(this, arguments); }
 
-      var f = function() {
+      var f = function superWrapper() {
         var oldSuper = this.SUPER;
         this.SUPER = SUPER;
 

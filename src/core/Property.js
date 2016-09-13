@@ -372,6 +372,18 @@ foam.CLASS({
       // TODO: experiment to see if a simpler setter for Properties which
       // don't use any of the options is faster.
       var setter = prop.setter ? prop.setter :
+        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ? 
+        function simplePropSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
+          var oldValue = this.instance_[name] ;
+          this.instance_[name] = newValue;
+          this.pubPropertyChange_(prop, oldValue, newValue);
+        }
+        :
         function propSetter(newValue) {
           // ???: Should clearProperty() call set(undefined)?
           if ( newValue === undefined ) {

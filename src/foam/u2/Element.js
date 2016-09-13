@@ -507,6 +507,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.ElementState',
       transient: true,
+      topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
       factory: function() { return this.UNLOADED; },
@@ -546,6 +547,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
+      topics: [],
       factory: function() {
         return this.elementValidator$ ? this.elementValidator : this.DEFAULT_VALIDATOR;
       }
@@ -682,17 +684,17 @@ foam.CLASS({
     },
 
     function myCls(opt_extra) {
-      /*
-        Constructs a default class name for this view, with an optional extra.
-      // TODO: Braden, remove the trailing '-'.
-        Without an extra, results in eg. 'foam-u2-Input-'.
-        With an extra of "foo", results in 'foam-u2-Input-foo'.
-      */
-      var base = this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id);
+      var f = this.cls_.myCls_;
 
-      return base.split(/ +/).
-          map(function(c) { return c + (opt_extra ? '-' + opt_extra : ''); }).
-          join(' ');
+      if ( ! f ) {
+        var base = (this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id)).split(/ +/);
+
+        f = this.cls_.myCls_ = foam.Function.memoize1(function(e) {
+          return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
+        });
+      }
+
+      return f(opt_extra);
     },
 
     function visitChildren(methodName) {
@@ -1095,6 +1097,8 @@ foam.CLASS({
       /* Add Children to this Element. */
       var es = [];
       var Y = this.__subSubContext__;
+      // TODO(kgr): remove use of mapper because this is a performance
+      // critical function.
       var mapper = function(c) { return c.toE ? c.toE(null, Y) : c; };
 
       for ( var i = 0 ; i < cs.length ; i++ ) {
@@ -1376,11 +1380,14 @@ foam.CLASS({
 
     // ???/TODO: What is this doing?
     function addEventListener_(topic, listener) {
+      // TODO: this looks broken
       var foamtopic = topic.startsWith('on') ?
           'on' + topic :
           topic ;
       this.sub(foamtopic, listener);
-      this.el() && this.el().addEventListener(topic, listener, false);
+
+      var el = this.el();
+      el && el.addEventListener(topic, listener, false);
     },
 
     function removeEventListener_(topic, listener) {
@@ -1514,11 +1521,10 @@ foam.CLASS({
 
       e.fromProperty && e.fromProperty(this);
 
-      if ( X.data ) {
+      if ( X.data$ &&
+           ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
-
-      if ( args ) e.copyFrom(args);
 
       return e;
     }
@@ -1570,6 +1576,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'Controller',
+  extends: 'foam.u2.Element',
+
+  exports: [ 'as data' ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Action',
 
   requires: [
@@ -1578,10 +1593,15 @@ foam.CLASS({
 
   methods: [
     function toE(args, X) {
-      return X.lookup('foam.u2.ActionView').create({
-        data$:  X.data$,
-        action: this
-      }, X).copyFrom(args || {});
+      var view = foam.u2.ViewSpec.createView(
+        { class: 'foam.u2.ActionView', action: this }, args, this, X);
+
+      if ( X.data$ &&
+           ! ( args && ( args.data || args.data$ ) ) ) {
+        view.data$ = X.data$;
+      }
+
+      return view;
     }
   ]
 });

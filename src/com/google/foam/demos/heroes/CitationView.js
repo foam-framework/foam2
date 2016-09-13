@@ -70,7 +70,7 @@ foam.CLASS({
         on('click', this.onClick).
         start('div').cssClass(this.myCls('id')).add(this.data.id).end().
         start('div').cssClass(this.myCls('name')).add(this.data.name).end().
-        add(this.REMOVE_HERO);
+        start(this.REMOVE_HERO, { data: this }).end();
     }
   ],
 
@@ -78,7 +78,7 @@ foam.CLASS({
     {
       name: 'removeHero',
       label: 'X',
-      code: function(X) { X.heroDAO.remove(this); }
+      code: function() { this.heroDAO.remove(this.data); }
     }
   ],
 

@@ -186,7 +186,7 @@ foam.CLASS({
 
       foam.core.Object.create({
         name: 'delegate',
-        javaType: this.of
+        javaType: this.of$cls.id
       }).buildJavaClass(cls);
 
       cls.method({
@@ -241,20 +241,6 @@ foam.CLASS({
   ]
 });
 
-foam.LIB({
-  name: 'foam.AbstractClass',
-  methods: [
-    function javaSource() {
-//      return foam.java.JavaClass.create().fromClass(this).code();
-      var c = foam.java.Class.create();
-      var outputter = foam.java.Outputter.create();
-      this.buildJavaClass(c);
-      outputter.out(c);
-      return outputter.buf_;
-    }
-  ]
-});
-
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
 
@@ -266,6 +252,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaReturns'
+    },
+    {
+      class: 'Boolean',
+      name: 'abstract',
+      value: true
     }
   ],
 
@@ -279,7 +270,7 @@ foam.CLASS({
       return m;
     },
     function buildJavaClass(cls) {
-      if ( ! this.javaCode ) return;
+      if ( ! this.javaCode && ! this.abstract ) return;
 
       cls.method({
         name: this.name,
@@ -291,7 +282,7 @@ foam.CLASS({
             type: a.javaType
           };
         }),
-        body: this.javaCode
+        body: this.javaCode ? this.javaCode : ''
       });
     }
   ],
@@ -326,6 +317,16 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Method',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'abstract',
+      value: false
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Import',
@@ -366,26 +367,22 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Interface',
-  templates: [
-    {
-      name: 'javaSource',
-      template: function() {/*
-// GENERATED CODE
-package <%= this.package %>;
+  methods: [
+    function buildJavaClass(cls) {
+      cls = cls || foam.java.Interface.create();
 
-public interface <%= this.name %><% if ( this.extends ) { %><%= this.extends %><% } %> {
-<%
-  for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
-    var axiom = this.axioms_[i];
-    if ( axiom.axiomJavaInterfaceSource ) axiom.axiomJavaInterfaceSource(output, this);
-  }
-%>
-}
-*/}
+      cls.name = this.name;
+      cls.package = this.package;
+      cls.extends = this.extends;
+
+      for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
+        this.axioms_[i].buildJavaClass && this.axioms_[i].buildJavaClass(cls);
+      }
+
+      return cls;
     }
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -652,5 +649,17 @@ foam.CLASS({
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Proxy',
+  properties: [
+    {
+      name: 'javaType',
+      expression: function(of) { return of ? of : 'Object'; }
+    },
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ]
 });
