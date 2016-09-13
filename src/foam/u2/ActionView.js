@@ -75,7 +75,7 @@ foam.CLASS({
       this.
         cssClass(this.myCls()).
         on('click', this.click).
-        add(this.label$);
+        add(this.label/*$*/);
 
       if ( this.action.isAvailable ) {
         this.enableCls(this.myCls('unavailable'), this.action.createIsAvailable$(this.data$), true);
