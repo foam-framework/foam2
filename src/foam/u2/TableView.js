@@ -83,6 +83,11 @@ foam.CLASS({
   name: 'TableView',
   extends: 'foam.u2.Element',
 
+  requires: [
+    'foam.mlang.order.Desc',
+    'foam.u2.Entity'
+  ],
+
   properties: [
     {
       class: 'Class2',
@@ -133,7 +138,26 @@ foam.CLASS({
 
         e = e.start('tr');
         for ( var i = 0 ; i < properties_.length ; i++ ) {
-          e = e.start('td').add(properties_[i].label).end();
+          var sorting$ = this.sortOrder$.map(function(prop, order) {
+            if ( ! order ) return '';
+            var desc = this.Desc.isInstance(order);
+            var baseOrder = desc ? order.arg1 : order;
+            if ( prop.name === baseOrder.name ) {
+              return desc ? this.Entity.create({ name: 'darr' }) :
+                  this.Entity.create({ name: 'uarr' });
+            }
+            return '';
+          }.bind(this, properties_[i]));
+
+          e = e.start('td')
+              .enableCls(this.myCls('sorting'), sorting$)
+              .start('span')
+                  .cssClass(this.myCls('sort-direction'))
+                  .add(sorting$)
+              .end()
+              .add(properties_[i].label)
+              .on('click', this.sortBy.bind(this, properties_[i]))
+              .end();
         }
         e = e.end();
 
@@ -143,6 +167,9 @@ foam.CLASS({
     {
       name: 'body',
       factory: function() { return this.E('tbody'); }
+    },
+    {
+      name: 'sortOrder'
     }
   ],
 
@@ -150,6 +177,22 @@ foam.CLASS({
     function initE() {
       this.onDAOUpdate();
       return this.add(this.header$, this.body$);
+    },
+    function sortBy(prop) {
+      // Two cases: same as the current prop, or different.
+      var sortName = this.sortOrder ?
+          (this.Desc.isInstance(this.sortOrder) ? this.sortOrder.arg1.name :
+              this.sortOrder.name) :
+          '';
+      if ( sortName === prop.name ) {
+        // Invert the previous order.
+        this.sortOrder = this.Desc.isInstance(this.sortOrder) ?
+            prop : this.Desc.create({ arg1: prop });
+      } else {
+        // Set it to the new column.
+        this.sortOrder = prop;
+      }
+      this.onDAOUpdate();
     }
   ],
 
@@ -158,9 +201,34 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        this.data.select(foam.u2.TableBodySink.create({ properties_: this.properties_ }, this)).then(
-          function(a) { this.body = a.body; }.bind(this));
+        var dao = this.data;
+        if ( this.sortOrder ) {
+          dao = dao.orderBy(this.sortOrder);
+        }
+        dao.select(foam.u2.TableBodySink.create({
+          properties_: this.properties_
+        }, this)).then(function(a) {
+          this.body = a.body;
+        }.bind(this));
       }
     }
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^sorting {
+          font-weight: bold;
+        }
+
+        ^sort-direction {
+          display: none;
+          margin-right: 8px;
+        }
+        ^sorting ^sort-direction {
+          display: initial;
+        }
+      */}
+    })
   ]
 });
