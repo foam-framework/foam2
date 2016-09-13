@@ -71,7 +71,7 @@ foam.CLASS({
       var mergeDelay = this.mergeDelay;
 
       Object.defineProperty(proto, name, {
-        get: function topicGetter() {
+        get: function listenerGetter() {
           if ( this.cls_.prototype === this ) return code;
 
           if ( ! this.hasOwnPrivate_(name) ) {
