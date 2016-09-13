@@ -118,7 +118,7 @@ foam.CLASS({
 
     function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
 
-    function assert() { return (this.__context__ || foam.__context__).assert.apply(null, arguments); },
+    function assert(f) { if ( ! f ) (this.__context__ || foam.__context__).assert.apply(null, arguments); },
 
     function error() { this.__context__.error.apply(null, arguments); },
 
