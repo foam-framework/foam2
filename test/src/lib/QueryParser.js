@@ -31,11 +31,13 @@ describe('Query parser', function() {
       {
         class: 'Date',
         name: 'timestamp',
-        shortName: 't'
+        shortName: 't',
+        aliases: [ 'time', 'datestamp', 'd' ]
       },
       {
         class: 'Boolean',
-        name: 'deleted'
+        name: 'deleted',
+        aliases: [ 'DEAD', 'trashed' ]
       },
       {
         class: 'String',
@@ -281,5 +283,13 @@ describe('Query parser', function() {
         testQuery('TIMESTAMP:2011', [1, 4]));
     it('should respect short names, if provided', testQuery('t:2011', [1, 4]));
     it('should ignore case in short names, too', testQuery('T:2011', [1, 4]));
+
+    describe('have aliases', function() {
+      it('should follow aliases 1', testQuery('datestamp:2011', [1, 4]));
+      it('should follow aliases 2', testQuery('time:2011', [1, 4]));
+      it('should follow aliases 3', testQuery('t:2011', [1, 4]));
+      it('should ignore case in aliases 1', testQuery('D:2011', [1, 4]));
+      it('should ignore case in aliases 2', testQuery('is:dead', [1, 4]));
+    });
   });
 });
