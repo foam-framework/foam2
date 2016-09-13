@@ -764,7 +764,9 @@ foam.CLASS({
     /** @private */
     function eof() {},
     /** @private */
-    function error() {}
+    function error() {},
+    /** @private */
+    function reset() {}
   ]
 });
 
