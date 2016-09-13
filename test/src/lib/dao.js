@@ -1355,12 +1355,75 @@ describe('EasyDAO-permutations', function() {
       syncPolling: true,
       syncProperty: test.CompA.A
     }, env);
+  });
+});
 
+
+describe('DAO.listen', function() {
+
+  var dao;
+  var sink;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+
+    dao  = foam.dao.ArrayDAO.create({ of: test.CompA });
+    sink = foam.dao.ArrayDAO.create({ of: test.CompA });
+  });
+
+  it('forwards puts', function() {
+    var a = test.CompA.create({ id: 0, a: 4 });
+    var b = test.CompA.create({ id: 4, a: 8 });
+
+    dao.listen(sink);
+    dao.put(a);
+
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0]).toEqual(a);
+
+    dao.put(b);
+    expect(sink.array.length).toEqual(2);
+    expect(sink.array[1]).toEqual(b);
+  });
+
+  it('forwards removes', function() {
+    var a = test.CompA.create({ id: 0, a: 4 });
+    var b = test.CompA.create({ id: 4, a: 8 });
+
+    sink.put(a);
+    sink.put(b);
+
+    dao.put(a);
+    dao.put(b);
+
+    dao.listen(sink);
+    dao.remove(a);
+
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0]).toEqual(b);
 
   });
 
+  it('filters puts', function() {
+    var a = test.CompA.create({ id: 0, a: 4 });
+    var b = test.CompA.create({ id: 4, a: 8 });
+    var pred = foam.mlang.predicate.Eq.create({ arg1: test.CompA.A, arg2: 4 });
+
+    dao.listen(sink, undefined, undefined, undefined, pred);
+    dao.put(a);
+
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0]).toEqual(a);
+
+    dao.put(b);
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0]).toEqual(a);
+  });
 
 });
-
 
 
