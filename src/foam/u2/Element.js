@@ -557,7 +557,7 @@ foam.CLASS({
       adapt: function(_, v) {
         // Convert to uppercase so that checks against OPTIONAL_CLOSE_TAGS
         // and ILLEGAL_CLOSE_TAGS work.
-        return v.toUpperCase();
+        return foam.String.toUpperCase(v);
       },
       value: 'DIV'
     },
@@ -1068,7 +1068,7 @@ foam.CLASS({
     },
 
     function createChild_(spec, args) {
-      return this.ViewSpec.createView(spec, args, this, this.__subSubContext__);
+      return foam.u2.ViewSpec.createView(spec, args, this, this.__subSubContext__);
     },
 
     function start(spec, args, slot) {
@@ -1132,7 +1132,7 @@ foam.CLASS({
         for ( var i = 0 ; i < es.length ; i++ ) {
           if ( foam.u2.Element.isInstance(es[i]) ) {
             es[i].parentNode = parentNode;
-          } else if ( this.Entity.isInstance(es[i]) ) {
+          } else if ( es[i].cls_ && es[i].cls_ === 'foam.u2.Entity' ) {
             // NOP
           } else {
             es[i] = this.sanitizeText(es[i]);
