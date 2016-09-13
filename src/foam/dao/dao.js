@@ -801,12 +801,15 @@ foam.CLASS({
           this.on.reset.pub();
         }
 
-        if ( old ) {
-          old.on.unsub(this.onEvent);
+        // TODO: replace this with a manually installed ProxySub,
+        //   or implement interceptors in Proxy
+        if ( this.delegateSub_ ) {
+          this.delegateSub_.destroy();
+          this.delegateSub_ = nu.on.sub(this.onEvent);
         }
-        nu.on.sub(this.onEvent);
       }
     },
+    'delegateSub_',
   ],
 
   listeners: [
@@ -827,6 +830,17 @@ foam.CLASS({
   ],
 
   methods: [
+    function sub(arg1) {
+      if ( arg1 === 'on' ) {
+        var self = this;
+        this.delegateSub_ = this.delegate.on.sub(this.onEvent);
+        this.onDestroy(function() {
+          self.delegateSub_ && self.delegateSub_.destroy();
+        });
+      }
+      this.SUPER.apply(this, arguments);
+    },
+
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(
         sink, skip, limit, order,

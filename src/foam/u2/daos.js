@@ -79,10 +79,11 @@ foam.CLASS({
       }
 
       var child = this.createRowView(obj, this.__subContext__.createSubContext());
+
+      // TODO: make a single listener of this
       child.on('click', function() {
         this.rowClick.pub(child.data);
       }.bind(this));
-
       this.rows_[obj.id] = child;
       this.add(child);
     },

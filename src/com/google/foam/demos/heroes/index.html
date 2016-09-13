@@ -24,8 +24,9 @@
           { id: 17, name: "Dynama" },
           { id: 18, name: "Dr IQ" },
           { id: 19, name: "Magma" },
-          { id: 20, name: "Tornado" }
         ], com.google.foam.demos.heroes.Hero).forEach(function(h) { heroDAO.put(h); });
+
+// for ( var i = 0 ; i < 1000 ; i++ ) { heroDAO.put(com.google.foam.demos.heroes.Hero.create({name: 'hero ' + i})); }
 
       com.google.foam.demos.heroes.Controller.create({ heroDAO: heroDAO }).write();
     </script>
