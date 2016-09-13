@@ -299,6 +299,7 @@ foam.CLASS({
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
       var FIP         = factory && ( prop.name + '_fip' ); // Factory In Progress
+      var fip         = false;
 
       // Factory In Progress (FIP) Support
       // When a factory method is in progress, the object sets a private
@@ -309,7 +310,10 @@ foam.CLASS({
       // the property change event to not be fired when the value
       // is first set by the factory (since the value didn't change,
       // the factory is providing its original value).
-
+      // However, this is expensive, so we keep a global 'fip' variable
+      // which indicates that the factory is already being called on any
+      // object and then we only track on a per-instance basis when this
+      // is on. This eliminates almost all per-instance FIP checks.
 
       // Property Slot
       // This costs us about 4% of our boot time.
@@ -347,14 +351,23 @@ foam.CLASS({
           if ( this.hasOwnProperty(name) ) return this.instance_[name];
 
           // Indicate the Factory In Progress state
-          if ( this.getPrivate_(FIP) ) {
+          if ( fip && this.getPrivate_(FIP) ) {
             console.warn('reentrant factory', name);
             return undefined;
           }
 
-          this.setPrivate_(FIP, true);
+          var oldFip = fip;
+          if ( oldFip ) {
+            this.setPrivate_(FIP, true);
+          } else {
+            fip = true;
+          }
           this[name] = factory.call(this, prop);
-          this.clearPrivate_(FIP);
+          if ( oldFip ) {
+            this.clearPrivate_(FIP);
+          } else {
+            fip = false;
+          }
 
           return this.instance_[name];
         } :
