@@ -95,14 +95,16 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       var name     = this.name;
-      var key      = this.key;
+      var key      = this.key + '$';
       var slotName = this.slotName_;
 
       Object.defineProperty(proto, slotName, {
         get: function importsSlotGetter() {
           if ( ! this.hasOwnPrivate_(slotName) ) {
             var ctx = this.__context__ || foam.__context__;
-            this.setPrivate_(slotName, ctx[key + '$']);
+            var val = ctx[key];
+            this.setPrivate_(slotName, val);
+            return val;
           }
 
           return this.getPrivate_(slotName);
