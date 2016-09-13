@@ -1108,6 +1108,7 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
+    'foam.mlang.predicate.Func',
     'foam.mlang.Constant',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
@@ -1145,6 +1146,7 @@ foam.CLASS({
     function KEYWORD(a) { return this._unary_("Keyword", a); },
     function STARTS_WITH(a, b) { return this._binary_("StartsWith", a); },
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
+    function FUNC(fn) { return this.Func.create({ fn: fn }); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },

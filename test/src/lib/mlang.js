@@ -500,9 +500,11 @@ describe('MLang', function() {
 
   describe('OR()', function() {
     var OR;
+    var FUNC;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       OR = expr.OR.bind(expr);
+      FUNC = expr.FUNC.bind(expr);
     });
 
     it('returns false when passed no arguments', function() {
@@ -523,7 +525,7 @@ describe('MLang', function() {
         called = true;
         return false;
       };
-      expect(OR(false, true, false, { f: shouldNotBeCalled }).f()).toBe(true);
+      expect(OR(false, true, false, FUNC(shouldNotBeCalled)).f()).toBe(true);
       expect(called).toBe(false);
     });
 
@@ -538,9 +540,11 @@ describe('MLang', function() {
 
   describe('AND()', function() {
     var AND;
+    var FUNC;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       AND = expr.AND.bind(expr);
+      FUNC = expr.FUNC.bind(expr);
     });
 
     it('returns true when passed no arguments', function() {
@@ -562,7 +566,7 @@ describe('MLang', function() {
         called = true;
         return false;
       };
-      expect(AND(true, true, false, { f: shouldNotBeCalled }).f()).toBe(false);
+      expect(AND(true, true, false, FUNC(shouldNotBeCalled)).f()).toBe(false);
       expect(called).toBe(false);
     });
 
