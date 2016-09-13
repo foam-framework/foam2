@@ -628,53 +628,16 @@ foam.CLASS({
     /**
       Selects the contents of this DAO into a sink, then listens to keep
       the sink up to date. Returns a promise that resolves with the subscription.
-      Updates are filtered based on the optional skip, limit, order, and predicate
-      provided.
     */
-    function pipe(
-      /* foam.dao.Sink */                   sink,
-      /* number? */                         skip,
-      /* number? */                         limit,
-      /* foam.mlang.order.Comparator? */    order,
-      /* foam.mlang.predicate.Predicate? */ predicate
-        /* Promise */
-    ) {
-      var mySink = this.decorateSink_(sink, skip, limit, order, predicate, true);
-
-      var fc = this.FlowControl.create();
-      var sub;
-
-      fc.propertyChange.sub(function(s, _, p) {
-        if ( p.name == "stopped") {
-          if ( sub ) sub.destroy();
-        } else if ( p.name === "errorEvt" ) {
-          if ( sub ) sub.destroy();
-          mySink.error(fc.errorEvt);
-        }
+    function pipe(/* foam.dao.Sink */ sink /* Promise */) {
+      var self = this;
+      return self.select(sink).then(function() {
+        return self.listen(sink);
       });
-
-      return this.select(mySink, skip, limit, order, predicate).then(function() {
-        return this.on.sub(function(s, on, e, obj) {
-          sub = s;
-          switch(e) {
-          case 'put':
-            mySink.put(obj, fc);
-            break;
-          case 'remove':
-            mySink.remove(obj, fc);
-            break;
-          case 'reset':
-            mySink.reset();
-            break;
-          }
-        });
-      }.bind(this));
     },
 
     /**
       Keeps the given sink up to date with changes to this DAO.
-      Updates are filtered based on the optional skip, limit, order, and predicate
-      provided.
     */
     function listen(
       /* foam.dao.Sink */                   sink,
@@ -698,6 +661,10 @@ foam.CLASS({
         }
       });
 
+      // Note that FilteredDAO, LimitedDAO, OrderedDAO and SkipDAO all
+      // pass listen() calls down through the delegate chain, so the
+      // topics we subscribe to are not filtered by those DAO decorators.
+      // The sink we create in .decorateSink_() is responsible for filtering.
       return this.on.sub(function(s, on, e, obj) {
         sub = s;
         switch(e) {
@@ -874,6 +841,14 @@ foam.CLASS({
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
+    },
+
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(
+        sink, skip, limit, order,
+        predicate ?
+          this.And.create({ args: [this.predicate, predicate] }) :
+          this.predicate);
     }
   ]
 });
@@ -896,6 +871,9 @@ foam.CLASS({
     },
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(skip, limit, this.comparator, predicate);
+    },
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(sink, skip, limit, this.comparator, predicate);
     }
   ]
 });
@@ -918,7 +896,10 @@ foam.CLASS({
     },
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(this.skip_, limit, order, predicate);
-    }
+    },
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(sink, this.skip_, limit, order, predicate);
+    },
   ]
 });
 
@@ -945,6 +926,13 @@ foam.CLASS({
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(
         skip,
+        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
+        order, predicate);
+    },
+
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(
+        sink, skip,
         limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
         order, predicate);
     }
