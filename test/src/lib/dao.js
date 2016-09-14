@@ -1453,8 +1453,108 @@ describe('DAO.listen', function() {
     expect(sink.array.length).toEqual(2);
     expect(sink.array[1]).toEqual(c);
   });
+});
+
+
+
+describe('FilteredDAO', function() {
+
+  var dao;
+  var sink;
+  var m;
+  var l;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+    m = foam.mlang.ExpressionsSingleton.create();
+    dao  = foam.dao.ArrayDAO.create({ of: test.CompA });
+    sink = foam.dao.ArrayDAO.create({ of: test.CompA });
+    l = function(s, on, evt, obj) {
+      l.evt = evt;
+      l.obj = obj;
+    }
+  });
+
+  it('filters put events', function() {
+    var a = test.CompA.create({ id: 0, a: 4 });
+    var b = test.CompA.create({ id: 4, a: 8 });
+
+    dao = dao.where(m.EQ(test.CompA.A, 4));
+    dao.on.sub(l);
+    
+    dao.put(a);
+    expect(l.evt).toEqual('put');
+    expect(l.obj).toEqual(a);
+    
+    // since 'b' is filtered out, the put changes to remove to ensure the 
+    // listener knows it shouldn't exist
+    dao.put(b);
+    expect(l.evt).toEqual('remove');
+    expect(l.obj).toEqual(b);
+  });
+
+  it('does not filter remove events', function() {
+    var a = test.CompA.create({ id: 0, a: 4 });
+    var b = test.CompA.create({ id: 4, a: 8 });
+
+    dao.put(a);
+    dao.put(b);
+
+    dao = dao.where(m.EQ(test.CompA.A, 4));
+    dao.on.sub(l);
+    
+    dao.remove(a);
+    expect(l.evt).toEqual('remove');
+    expect(l.obj).toEqual(a);
+
+    dao.remove(b);
+    expect(l.evt).toEqual('remove');
+    expect(l.obj).toEqual(b);
+  });
+
+  it('handles a delegate swap', function() {
+    var a = test.CompA.create({ id: 0, a: 4 });
+    var b = test.CompA.create({ id: 4, a: 8 });
+
+    dao = dao.where(m.EQ(test.CompA.A, 4));
+    dao.on.sub(l);
+    
+    // normal put test
+    dao.put(a);
+    expect(l.evt).toEqual('put');
+    expect(l.obj).toEqual(a);
+    
+    dao.put(b);
+    expect(l.evt).toEqual('remove');
+    expect(l.obj).toEqual(b);
+    
+    // swap a new base dao in
+    delete l.evt;
+    delete l.obj;
+    var newBaseDAO = foam.dao.ArrayDAO.create({ of: test.CompA });
+    var oldDAO = dao.delegate; 
+    dao.delegate = newBaseDAO;
+    expect(l.evt).toEqual('reset');
+    
+    // filtered put from new base
+    newBaseDAO.put(b);
+    expect(l.evt).toEqual('remove');
+    expect(l.obj).toEqual(b);
+    delete l.evt;
+    delete l.obj;
+    
+    // old dao does not cause updates
+    oldDAO.put(a);
+    expect(l.evt).toBeUndefined();
+    expect(l.obj).toBeUndefined();
+  });
 
 
 });
+
 
 
