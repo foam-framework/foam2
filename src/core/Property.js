@@ -349,7 +349,6 @@ foam.CLASS({
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
           if ( this.hasOwnProperty(name) ) return this.instance_[name];
-
           // Indicate the Factory In Progress state
           if ( fip > 10 && this.getPrivate_(FIP) ) {
             console.warn('reentrant factory', name);
@@ -485,7 +484,7 @@ foam.CLASS({
 
       // FUTURE: determine how often the value is being invalidated,
       // and if it's happening often, then don't unsubscribe.
-      return function() {
+      return function exportedFactory() {
         var self = this;
         var args = new Array(argNames.length);
         var subs = [];
