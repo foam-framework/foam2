@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 foam.ENUM({
-  package: 'foam.demos.olympics',
+  package: 'com.google.foam.demos.olympics',
   name: 'MedalColor',
   values: [
     {
@@ -34,7 +34,7 @@ foam.ENUM({
 });
 
 foam.CLASS({
-  package: 'foam.demos.olympics',
+  package: 'com.google.foam.demos.olympics',
   name: 'Medal',
 
   properties: [
@@ -42,7 +42,7 @@ foam.CLASS({
     { class: 'Int', name: 'year', shortName: 'y' },
     {
       class: 'Enum',
-      of: 'foam.demos.olympics.MedalColor',
+      of: 'com.google.foam.demos.olympics.MedalColor',
       name: 'color',
       shortName: 'c',
       aliases: [ 'colour', 'medal' ],
@@ -62,7 +62,7 @@ foam.CLASS({
     },
     { name: 'city', shortName: 'cy' },
     { name: 'country', shortName: 'cn' },
-    { name: 'discipline', shortName: 'd' },
+    { name: 'discipline', shortName: 'd', hidden: true },
     { name: 'sport', shortName: 's' },
     { name: 'event', shortName: 'e' },
     { name: 'eventGender', shortName: 'eg', value: 'M' },

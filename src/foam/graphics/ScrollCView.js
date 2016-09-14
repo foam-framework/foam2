@@ -68,6 +68,8 @@ foam.CLASS({
       value: 0,
       postSet: function(old, size) {
         if ( old !== size ) this.invalidated.pub();
+        // Trigger the preSet for value, so it stays within range.
+        this.value = this.value;
       }
     },
     {
@@ -80,7 +82,7 @@ foam.CLASS({
       class: 'Float',
       name: 'handleSize',
       expression: function(minHandleSize, size, extent, height, innerBorder) {
-        var h = height - 2*innerBorder;
+        var h = height - 2 * innerBorder;
         var hs = size > 0 ? extent * h / size : 0;
         return hs < minHandleSize ? minHandleSize : hs;
       }
@@ -108,8 +110,8 @@ foam.CLASS({
     },
     {
       name: 'rate',
-      expression: function(size, yMax, innerBorder) {
-        return size ? ( yMax - innerBorder ) / size : 0;
+      expression: function(size, extent, yMax, innerBorder) {
+        return size ? ( yMax - innerBorder ) / (size - extent) : 0;
       }
     }
   ],

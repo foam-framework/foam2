@@ -77,6 +77,55 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'TableHeader',
+  extends: 'foam.u2.Element',
+  requires: [
+    'foam.mlang.order.Desc',
+    'foam.u2.Entity'
+  ],
+  imports: [
+    'tableView',
+  ],
+
+  properties: [
+    {
+      name: 'properties_',
+      required: true
+    },
+    'sortOrder'
+  ],
+
+  methods: [
+    function initE() {
+      this.nodeName = 'thead';
+
+      var e = this.start('tr');
+      for ( var i = 0 ; i < this.properties_.length ; i++ ) {
+        var sorting$ = this.sortOrder$.map(function(prop, order) {
+          if ( ! order ) return '';
+          var desc = this.Desc.isInstance(order);
+          var baseOrder = desc ? order.arg1 : order;
+          return prop.name === baseOrder.name ?
+              this.Entity.create({ name: desc ? 'darr' : 'uarr' }) : '';
+        }.bind(this, this.properties_[i]));
+
+        e.start('td')
+            .enableCls(this.myCls('sorting'), sorting$)
+            .start('span')
+                .cssClass(this.myCls('sort-direction'))
+                .add(sorting$)
+            .end()
+            .add(this.properties_[i].label)
+            .on('click', this.tableView.sortBy.bind(this.tableView,
+                  this.properties_[i]))
+            .end();
+      }
+      e.end();
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2',
@@ -85,16 +134,18 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.order.Desc',
-    'foam.u2.Entity'
+    'foam.u2.TableHeader'
+  ],
+
+  exports: [
+    'as tableView'
   ],
 
   properties: [
     {
       class: 'Class2',
       name: 'of',
-      expression: function(data) {
-        return data.of;
-      }
+      required: true
     },
     [ 'nodeName', 'table' ],
     {
@@ -129,39 +180,10 @@ foam.CLASS({
     {
       name: 'header',
       expression: function(properties_) {
-        var E = this.E('thead');
-        var e = E;
-
-        if ( ! properties_ ) {
-          return e.add("'of' or 'properties' is required for table view configuration.");
-        }
-
-        e = e.start('tr');
-        for ( var i = 0 ; i < properties_.length ; i++ ) {
-          var sorting$ = this.sortOrder$.map(function(prop, order) {
-            if ( ! order ) return '';
-            var desc = this.Desc.isInstance(order);
-            var baseOrder = desc ? order.arg1 : order;
-            if ( prop.name === baseOrder.name ) {
-              return desc ? this.Entity.create({ name: 'darr' }) :
-                  this.Entity.create({ name: 'uarr' });
-            }
-            return '';
-          }.bind(this, properties_[i]));
-
-          e = e.start('td')
-              .enableCls(this.myCls('sorting'), sorting$)
-              .start('span')
-                  .cssClass(this.myCls('sort-direction'))
-                  .add(sorting$)
-              .end()
-              .add(properties_[i].label)
-              .on('click', this.sortBy.bind(this, properties_[i]))
-              .end();
-        }
-        e = e.end();
-
-        return E;
+        return this.TableHeader.create({
+          properties_: properties_,
+          sortOrder$: this.sortOrder$
+        });
       }
     },
     {

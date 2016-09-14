@@ -57,10 +57,12 @@ foam.CLASS({
       factory: function() { return this.True.create(); }
     },
     {
-      name: 'view',
-      factory: function() {
-        return this.Input.create({ type: 'search' });
-      }
+      class: 'foam.u2.ViewSpec',
+      name: 'viewSpec',
+      value: { class: 'foam.u2.tag.Input' }
+    },
+    {
+      name: 'view'
     },
     {
       name: 'label',
@@ -78,7 +80,11 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.cssClass(this.myCls()).add(this.view);
+      this.view = this.cssClass(this.myCls()).start(this.viewSpec, {
+        alwaysFloatLabel: true,
+        label$: this.label$
+      });
+      this.view.end();
       this.view.data$.sub(this.updateValue);
     },
     function clear() {
