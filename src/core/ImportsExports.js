@@ -100,16 +100,9 @@ foam.CLASS({
 
       Object.defineProperty(proto, slotName, {
         get: function importsSlotGetter() {
-          if ( ! this.hasOwnPrivate_(slotName) ) {
-            var ctx = this.__context__ || foam.__context__;
-            var val = ctx[key];
-            this.setPrivate_(slotName, val);
-            return val;
-          }
-
-          return this.getPrivate_(slotName);
+          return this.__context__[key];
         },
-        configurable: true,
+        configurable: false,
         enumerable: false
       });
 
