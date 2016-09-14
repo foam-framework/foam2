@@ -25,19 +25,78 @@ global.dao = foam.dao.EasyDAO.create({
   seqNo: true,
   daoType: 'MDAO'
 });
-dao.put(Person.create({ name: 'adam', age: 12 }));
 dao.put(Person.create({ name: 'bob', age: 24 }));
+dao.put(Person.create({ name: 'charlie', age: 36 }));
+dao.put(Person.create({ name: 'doug', age: 20 }));
+dao.put(Person.create({ name: 'carlo', age: 31 }));
+dao.put(Person.create({ name: 'adam', age: 12 }));
+dao.put(Person.create({ name: 'steve', age: 56 }));
+dao.put(Person.create({ name: 'ron', age: 90 }));
 
-setTimeout(function() {
+global.asyncExample = function(fn) {
+  // wait a tick for any slightly async work to complete
+  setTimeout(fn, 200);
+}
+asyncExample(function() {
   dao.select().then(function(a) {
     var people = a.a;
     people.forEach(function(p) { log(foam.json.stringify(p)); });
   });
-}, 2000);
+});
 
 
 // Table view of the DAO.
-log(foam.u2.TableView.create({ data: dao }));
+log(foam.u2.TableView.create({ data: dao })); // TableView handles the async waiting for us
+
+
+// Filtered DAOs.
+global.m = foam.mlang.ExpressionsSingleton.create();
+
+global.twentiesDAO = dao.where(m.AND(m.GTE(Person.AGE, 20), m.LT(Person.AGE, 30)));
+log(foam.u2.TableView.create({ data: twentiesDAO }));
+
+var startsWithCDAO = dao.where(m.STARTS_WITH_IC(Person.NAME, 'c'));
+log(foam.u2.TableView.create({ data: startsWithCDAO }));
+
+
+// Selecting into a sink
+asyncExample(function() {
+  twentiesDAO.select(foam.dao.QuickSink.create({
+    putFn: function(obj) {
+      log("Processing ", obj.name);
+    },
+    eofFn: function() {
+      log("Done!");
+    }
+  })).then(function(sink) {
+    log("Promise resolved, select() complete.");
+  });
+});
+
+
+// Ordering
+var sortedDAO = dao.orderBy(Person.NAME);
+log(foam.u2.TableView.create({ data: sortedDAO }));
+
+
+// Skip and Limit
+global.skipAndLimitDAO = dao.skip(2).limit(3);
+// by default ordered by ID, skip first two and show next three
+log(foam.u2.TableView.create({ data: skipAndLimitDAO }));
+
+
+// Skip, limit, and ordering
+global.skipLimitOrderDAO = skipAndLimitDAO.orderBy(m.DESC(Person.AGE));
+// skips the oldest two, returns next three in descending order of age
+log(foam.u2.TableView.create({ data: skipLimitOrderDAO }));
+
+
+// Filtering, skip, limit and ordering
+var allRestrictionsDAO = skipLimitOrderDAO.where(m.CONTAINS_IC(Person.NAME, 'o'));
+// Note how .where() predicates, skip, and limit are applied in a fixed order
+// regardless of what order you add them: where->orderBy->skip->limit.
+log(foam.u2.TableView.create({ data: allRestrictionsDAO }));
+
 </script>
 
   <div id='output'></div>

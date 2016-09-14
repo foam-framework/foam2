@@ -641,13 +641,10 @@ foam.CLASS({
     */
     function listen(
       /* foam.dao.Sink */                   sink,
-      /* number? */                         skip,
-      /* number? */                         limit,
-      /* foam.mlang.order.Comparator? */    order,
       /* foam.mlang.predicate.Predicate? */ predicate
         /* object // The subscription object, with a .destroy() to clean up. */
     ) {
-      var mySink = this.decorateSink_(sink, skip, limit, order, predicate, true);
+      var mySink = this.decorateSink_(sink, undefined, undefined, undefined, predicate);
 
       var fc = this.FlowControl.create();
       var sub;
@@ -686,21 +683,19 @@ foam.CLASS({
       select() or removeAll() implementation.
       @private
     */
-    function decorateSink_(sink, skip, limit, order, predicate, isListener, disableLimit) {
-      if ( ! disableLimit ) {
-        if ( limit != undefined ) {
-          sink = this.LimitedSink.create({
-            limit: limit,
-            delegate: sink
-          });
-        }
+    function decorateSink_(sink, skip, limit, order, predicate, isListener) {
+      if ( limit != undefined ) {
+        sink = this.LimitedSink.create({
+          limit: limit,
+          delegate: sink
+        });
+      }
 
-        if ( skip != undefined ) {
-          sink = this.SkipSink.create({
-            skip: skip,
-            delegate: sink
-          });
-        }
+      if ( skip != undefined ) {
+        sink = this.SkipSink.create({
+          skip: skip,
+          delegate: sink
+        });
       }
 
       if ( order != undefined && ! isListener ) {
@@ -857,9 +852,9 @@ foam.CLASS({
           this.predicate);
     },
 
-    function listen(sink, skip, limit, order, predicate) {
+    function listen(sink, predicate) {
       return this.delegate.listen(
-        sink, skip, limit, order,
+        sink,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
@@ -886,8 +881,8 @@ foam.CLASS({
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(skip, limit, this.comparator, predicate);
     },
-    function listen(sink, skip, limit, order, predicate) {
-      return this.delegate.listen(sink, skip, limit, this.comparator, predicate);
+    function listen(sink, predicate) {
+      return this.delegate.listen(sink, predicate);
     }
   ]
 });
@@ -911,8 +906,8 @@ foam.CLASS({
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(this.skip_, limit, order, predicate);
     },
-    function listen(sink, skip, limit, order, predicate) {
-      return this.delegate.listen(sink, this.skip_, limit, order, predicate);
+    function listen(sink, predicate) {
+      return this.delegate.listen(sink, predicate);
     },
   ]
 });
@@ -944,11 +939,8 @@ foam.CLASS({
         order, predicate);
     },
 
-    function listen(sink, skip, limit, order, predicate) {
-      return this.delegate.listen(
-        sink, skip,
-        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
-        order, predicate);
+    function listen(sink, predicate) {
+      return this.delegate.listen(sink, predicate);
     }
   ]
 });
