@@ -356,10 +356,17 @@ foam.CLASS({
       for ( var i = 0 ; i < children.length ; i++ ) {
         out(children[i]);
       }
+
       reference.el().insertAdjacentHTML(where, out);
-      for ( var i = 0 ; i < children.length ; i++ ) {
-        children[i].load && children[i].load();
-      }
+
+      // EXPERIMENTAL:
+      // Load (mostly adding listeners) on the next frame
+      // to allow the HTML to be shown more quickly.
+      this.__context__.window.setTimeout(function() {
+        for ( var i = 0 ; i < children.length ; i++ ) {
+          children[i].load && children[i].load();
+        }
+      }, 33);
     },
     function onReplaceChild(oldE, newE) {
       var e = this.el();
