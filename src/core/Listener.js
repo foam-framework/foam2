@@ -65,7 +65,7 @@ foam.CLASS({
         'Attempt to override non-listener', this.name);
 
       var name       = this.name;
-      var code       = this.override_(proto, this.code);
+      var code       = this.override_(proto, foam.Function.setName(this.code, name));
       var isMerged   = this.isMerged;
       var isFramed   = this.isFramed;
       var mergeDelay = this.mergeDelay;
@@ -86,8 +86,6 @@ foam.CLASS({
                 code.apply(self, arguments);
               }
             };
-
-            foam.Function.setName(l, name);
 
             if ( isMerged ) {
               l = this.__context__.merged(l, mergeDelay);
