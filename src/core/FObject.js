@@ -51,7 +51,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined';
+      return this.instance_[name] !== undefined;
     },
 
     /**
