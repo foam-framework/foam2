@@ -70,14 +70,14 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.onDestroy(function() {
+      this.onDestroy(foam.Function.bind(function() {
         this.subscription && this.subscription.destroy();
 
         if ( this.parent ) {
           this.parent.removeChild(this);
           this.parent.active = true;
         }
-      }.bind(this));
+      }, this));
     },
 
     function doSub() {
