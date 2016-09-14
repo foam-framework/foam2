@@ -1430,30 +1430,6 @@ describe('DAO.listen', function() {
     expect(sink.array[0]).toEqual(a);
   });
 
-  it('filters puts with skip, limit', function() {
-    var a = test.CompA.create({ id: 0, a: 8 });
-    var b = test.CompA.create({ id: 1, a: 6 });
-    var c = test.CompA.create({ id: 2, a: 4 });
-    var d = test.CompA.create({ id: 3, a: 2 });
-
-    dao.skip(1).limit(2).listen(sink);
-
-    dao.put(a);
-    expect(sink.array.length).toEqual(0);
-
-    dao.put(b);
-    expect(sink.array.length).toEqual(1);
-    expect(sink.array[0]).toEqual(b);
-
-    dao.put(c);
-    expect(sink.array.length).toEqual(2);
-    expect(sink.array[1]).toEqual(c);
-
-    dao.put(d);
-    expect(sink.array.length).toEqual(2);
-    expect(sink.array[1]).toEqual(c);
-  });
-
   it('terminates on flow control stop', function() {
     var a = test.CompA.create({ id: 0, a: 8 });
     var b = test.CompA.create({ id: 1, a: 6 });
