@@ -1453,6 +1453,84 @@ describe('DAO.listen', function() {
     expect(sink.array.length).toEqual(2);
     expect(sink.array[1]).toEqual(c);
   });
+
+  it('terminates on flow control stop', function() {
+    var a = test.CompA.create({ id: 0, a: 8 });
+    var b = test.CompA.create({ id: 1, a: 6 });
+    var c = test.CompA.create({ id: 2, a: 4 });
+    var d = test.CompA.create({ id: 3, a: 2 });
+
+    var obj;
+    var fcSink = foam.dao.QuickSink.create({
+      putFn: function(o, fc) {
+        obj = o;
+        fc.stop();
+      }
+    });
+
+    dao.listen(fcSink);
+
+    dao.put(a);
+    expect(obj).toEqual(a);
+
+    dao.put(b);
+    expect(obj).toEqual(a);
+
+  });
+  it('terminates on flow control error', function() {
+    var a = test.CompA.create({ id: 0, a: 8 });
+    var b = test.CompA.create({ id: 1, a: 6 });
+    var c = test.CompA.create({ id: 2, a: 4 });
+    var d = test.CompA.create({ id: 3, a: 2 });
+
+    var obj;
+    var fcSink = foam.dao.QuickSink.create({
+      putFn: function(o, fc) {
+        obj = o;
+        fc.error("err!");
+      }
+    });
+
+    dao.listen(fcSink);
+
+    dao.put(a);
+    expect(obj).toEqual(a);
+
+    dao.put(b);
+    expect(obj).toEqual(a);
+
+  });
+
+  it('and pipe() listens', function(done) {
+    var a = test.CompA.create({ id: 0, a: 8 });
+    var b = test.CompA.create({ id: 1, a: 6 });
+    var c = test.CompA.create({ id: 2, a: 4 });
+    var d = test.CompA.create({ id: 3, a: 2 });
+
+    dao.put(a);
+    dao.put(b);
+
+    dao.pipe(sink).then(function(sub) {
+      expect(sink.array.length).toEqual(2);
+      expect(sink.array[0]).toEqual(a); 
+      expect(sink.array[1]).toEqual(b);
+      
+      // and we should be listening, too
+      dao.put(c);
+      expect(sink.array.length).toEqual(3);
+      expect(sink.array[2]).toEqual(c); 
+      
+      // subscription allows disconnect
+      sub.destroy();
+      dao.put(d); // no longer listening
+      expect(sink.array.length).toEqual(3);
+      
+      done();
+    });
+
+  });
+
+
 });
 
 
@@ -1551,6 +1629,9 @@ describe('FilteredDAO', function() {
     oldDAO.put(a);
     expect(l.evt).toBeUndefined();
     expect(l.obj).toBeUndefined();
+    
+    // cover destructor
+    dao.destroy();
   });
 
 
