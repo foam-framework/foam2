@@ -966,13 +966,14 @@ foam.CLASS({
     // out of place.  Maybe renamed addClass().
     function cssClass(/* Slot | String */ cls) {
       /* Add a CSS cls to this Element. */
+      var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
         var lastValue = null;
         var l = function() {
           var v = cls.get();
-          this.cssClass_(lastValue, v);
+          self.cssClass_(lastValue, v);
           lastValue = v;
-        }.bind(this);
+        };
         cls.sub(l);
         l();
       } else if ( typeof cls === 'string' ) {
@@ -990,10 +991,9 @@ foam.CLASS({
 
       // TODO: add type checking
       if ( foam.core.Slot.isInstance(enabled) ) {
+        var self = this;
         var value = enabled;
-        var l = function() {
-          this.enableCls(cls, value.get(), opt_negate);
-        }.bind(this);
+        var l = function() { self.enableCls(cls, value.get(), opt_negate); };
         value.sub(l);
         l();
       } else {
@@ -1303,18 +1303,16 @@ foam.CLASS({
 
     function slotAttr_(key, value) {
       /* Set an attribute based off of a dynamic Value. */
-      var l = function() {
-        this.setAttribute(key, value.get());
-      }.bind(this);
+      var self = this;
+      var l = function() { self.setAttribute(key, value.get()); };
       value.sub(l);
       l();
     },
 
     function slotStyle_(key, v) {
       /* Set a CSS style based off of a dynamic Value. */
-      var l = function(value) {
-        this.style_(key, v.get());
-      }.bind(this);
+      var self = this;
+      var l = function(value) { self.style_(key, v.get()); };
       v.sub(l);
       l();
     },
@@ -1377,7 +1375,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', s.destroy.bind(s));
+      this.sub('onunload', foam.Function.bind(s.destroy, s));
 
       return e;
     },
