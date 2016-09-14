@@ -1609,9 +1609,15 @@ describe('FilteredDAO', function() {
     // cover destructor
     dao.destroy();
   });
-
-
 });
 
 
+describe('String.daoize', function() {
+  it('handles a model name', function() {
+    expect(foam.String.daoize('MyModel')).toEqual('myModelDAO');
+  });
+  it('handles a model name with package', function() {
+    expect(foam.String.daoize('test.package.PkgModel')).toEqual('test.package.PkgModelDAO');
+  });
 
+});
