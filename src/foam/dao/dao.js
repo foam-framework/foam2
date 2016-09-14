@@ -652,10 +652,10 @@ foam.CLASS({
       var fc = this.FlowControl.create();
       var sub;
 
-      fc.propertyChange.sub(function(s, _, p) {
-        if ( p.name == "stopped") {
+      fc.propertyChange.sub(function(s, _, pname) {
+        if ( pname == "stopped") {
           if ( sub ) sub.destroy();
-        } else if ( p.name === "errorEvt" ) {
+        } else if ( pname === "errorEvt" ) {
           if ( sub ) sub.destroy();
           mySink.error(fc.errorEvt);
         }
