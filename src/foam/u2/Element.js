@@ -235,9 +235,9 @@ foam.CLASS({
       return this.UNLOADED.output.call(this, out);
     },
     function load() {
-      for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
-        var l = this.elListeners[i];
-        this.addEventListener_(l[0], l[1]);
+      var ls = this.elListeners;
+      for ( var i = 0 ; i < ls.length ; i+=2 ) {
+        this.addEventListener_(ls[i], ls[i+1]);
       }
 
       this.visitChildren('load');
@@ -595,7 +595,7 @@ foam.CLASS({
     },
     {
       name: 'elListeners',
-      // documentation: 'DOM listeners of this Element.',
+      // documentation: 'DOM listeners of this Element. Stored as topic then listener.',
       factory: function() { return []; }
     },
     {
@@ -914,16 +914,17 @@ foam.CLASS({
 
     function addEventListener(topic, listener) {
       /* Add DOM listener. */
-      this.elListeners.push([ topic, listener ]);
+      this.elListeners.push(topic, listener);
       this.onAddListener(topic, listener);
     },
 
     function removeEventListener(topic, listener) {
       /* Remove DOM listener. */
-      for ( var i = 0 ; i < this.elListeners.length ; i++ ) {
-        var l = this.elListeners[i];
-        if ( l[0] === topic && l[1] === listener ) {
-          this.elListeners.splice(i, 1);
+      var ls = this.elListeners;
+      for ( var i = 0 ; i < ls.length ; i+=2 ) {
+        var t = ls[i], l = ls[i+1];
+        if ( t === topic && l === listener ) {
+          ls.splice(i, 2);
           this.onRemoveListener(topic, listener);
           return;
         }
