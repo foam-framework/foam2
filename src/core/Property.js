@@ -390,6 +390,23 @@ foam.CLASS({
           this.instance_[name] = newValue;
           this.pubPropertyChange_(prop, oldValue, newValue);
         }
+        : factory && ! ( postSet || eFactory || adapt || assertValue || preSet || isFinal ) ?
+        function factoryPropSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
+          var oldValue = this.hasOwnProperty(name) ? this[name] : undefined;
+
+          this.instance_[name] = newValue;
+
+          // If this is the result of a factory setting the initial value,
+          // then don't fire a property change event, since it hasn't
+          // really changed.
+          if ( oldValue !== undefined )
+            this.pubPropertyChange_(prop, oldValue, newValue);
+        }
         :
         function propSetter(newValue) {
           // ???: Should clearProperty() call set(undefined)?
