@@ -1621,3 +1621,59 @@ describe('String.daoize', function() {
   });
 
 });
+
+describe('Relationship', function() {
+  
+  foam.CLASS({
+    package: 'test',
+    name: 'RelA',
+    properties: [
+      'bRef'
+    ]
+  });
+  foam.CLASS({
+    package: 'test',
+    name: 'RelB',
+    properties: [
+      'aRef'
+    ]
+  });
+  
+  foam.CLASS({
+    package: 'test',
+    name: 'relEnv',
+    exports: [
+      'test.RelADAO',
+      'test.RelBDAO'
+    ],
+    properties: [
+      {
+        name: 'test.RelADAO',
+        factory: function() {
+          return foam.dao.ArrayDAO.create();
+        }
+      },
+      {
+        name: 'test.RelBDAO',
+        factory: function() {
+          return foam.dao.ArrayDAO.create();
+        }
+      }
+      
+    ]
+  });
+  
+  foam.RELATIONSHIP({
+    name: 'child',
+    inverseName: 'parent',
+    sourceModel: 'test.RelA',
+    //sourceProperties: [ 'bRef' ],
+    targetModel: 'test.RelB',
+    //targetProperties: [ 'aRef' ],
+    
+  });
+  
+  
+});
+
+
