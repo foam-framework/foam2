@@ -1664,7 +1664,7 @@ describe('Relationship', function() {
   });
   
   foam.RELATIONSHIP({
-    name: 'child',
+    name: 'children',
     inverseName: 'parent',
     sourceModel: 'test.RelA',
     //sourceProperties: [ 'bRef' ],
@@ -1673,6 +1673,15 @@ describe('Relationship', function() {
     
   });
   
+  it('has relationship DAOs', function() {
+    var env = test.relEnv.create();
+    var relObjA = test.RelA.create(undefined, env);
+    
+    var relDAO = relObjA.children;
+    
+    
+    
+  })
   
 });
 
