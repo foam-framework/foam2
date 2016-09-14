@@ -441,9 +441,10 @@ foam.CLASS({
           .filter(function(m) { return target.hasOwnAxiom(m.name); });
 
       if ( this.methods ) {
+        var ms = this.methods;
         methods = methods.filter(function(m) {
-          return this.methods.indexOf(m.name) !== -1;
-        }.bind(this));
+          return ms.indexOf(m.name) !== -1;
+        });
       }
 
       methods.map(function(m) {
