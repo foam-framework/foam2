@@ -83,10 +83,10 @@ foam.CLASS({
     {
       name: 'postSet',
       expression: function(name) {
-        var self         = this;
         var stateName    = name + 'State';
         var delegateName = name + 'Delegate';
         return function(_, p) {
+          var self = this;
           this[stateName]    = undefined;
           this[delegateName] = undefined;
 
