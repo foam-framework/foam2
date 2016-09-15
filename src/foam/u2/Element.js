@@ -519,8 +519,7 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      factory: function() { return this.UNLOADED; },
-      postSet: function(_, state) {
+      postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
         } else if ( state === this.UNLOADED ) {
@@ -647,6 +646,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.state = this.UNLOADED;
+    },
+
     function initE() {
       /*
         Template method for adding addtion element initialization
