@@ -127,6 +127,7 @@ foam.CLASS({
         // inner enclosing end
         if ( self.hasAsyncDeps ) {
           ret += tabs + '})\n';
+          indent.level -= 1;
         }
 
       // outer enclosing end

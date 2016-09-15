@@ -57,7 +57,7 @@ var te = test.helpers.Exemplar.create({
   name: 'testE',
   description: "The E test code, async dep",
   isAsync: false,
-  dependencies: [ 'testD' ],
+  dependencies: [ 'testD', 'testA' ],
   code: foam.String.multiline(function() {/*
 var e = results[0];
 console.log("results2",e);
