@@ -106,6 +106,11 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'foam.u2.ViewSpec',
+      name: 'filterAreaSpec',
+      value: 'div'
+    },
+    {
       class: 'Boolean',
       name: 'textSearch',
       help: 'Set this to true to enable freeform text search.',
@@ -178,13 +183,9 @@ foam.CLASS({
       }
     },
     {
-      name: 'filtersE_',
-      factory: function() {
-        var e = this.start().cssClass(this.myCls('filters'));
-        e.end();
-        return e;
-      }
-    }
+      name: 'filtersE_'
+    },
+    [ 'addingSpec', undefined ]
   ],
 
   methods: [
@@ -195,8 +196,9 @@ foam.CLASS({
 
       this.cssClass(this.myCls());
       this.startContext({ data: this });
-      var topPanel = this.start().cssClass(this.myCls('search-panel'))
-          .start().cssClass(this.myCls('adding'));
+      var searchPanel = this.start().cssClass(this.myCls('search-panel'));
+      var topPanel = searchPanel.start(this.addingSpec)
+          .cssClass(this.myCls('adding'));
       if ( this.allowAddingFilters ) {
         topPanel.start()
             .cssClass(this.myCls('add-filter'))
@@ -215,14 +217,13 @@ foam.CLASS({
               .cssClass(this.myCls('count-text'))
               .add(this.countString$)
           .end()
-          .add(this.CLEAR)
-      .end()
-      .end()
-      .start().cssClass(this.myCls('filter-area'))
-          .add(this.filtersE_)
-      .end()
+          .start(this.CLEAR, { raised: true }).end()
       .end();
+      this.filtersE_ = searchPanel.start(this.filterAreaSpec)
+          .cssClass(this.myCls('filter-area'));
+      this.filtersE_.end();
       this.endContext();
+      searchPanel.end();
 
       var e = this.start().cssClass(this.myCls('results'));
       this.tableE(e);
@@ -231,10 +232,11 @@ foam.CLASS({
       var self = this;
       this.onload.sub(function() {
         if ( self.textSearch ) {
-          self.filtersE_.add(self.wrapCard_(self.FilterView.create({
-            label: self.search.label,
-            showRemove: false
-          }).add(self.search)));
+          self.filtersE_.add(self.buildFilter({
+            label: 'Search',
+            showRemove: false,
+            view: self.search
+          }));
           self.searchMgr_.add(self.search);
         }
 
@@ -261,21 +263,38 @@ foam.CLASS({
 
       var e = this.ViewSpec.createView(spec, map, this, this.searchMgr_);
       var view = this.searchMgr_.add(e);
-      var filterView = this.FilterView.create({
+      var filterView = this.buildFilter({
         key: view.name,
+        label: prop.label,
         prop: prop,
-        showRemove: this.allowAddingFilters
-      }).add(view);
+        showRemove: this.allowAddingFilters,
+        view: view
+      });
 
-      this.searchViews_[view.name] = this.wrapCard_(filterView);
+      this.searchViews_[view.name] = filterView;
       return filterView;
     },
 
-    function wrapCard_(view) {
-      return this.Card.create({ padding: false }).style({
+    function buildFilter(args) {
+      var e = this.Card.create({ padding: false });
+      e.style({
         'margin-bottom': '0',
         overflow: 'visible'
-      }).add(view);
+      }).cssClass(this.myCls('filter-container'))
+          .start('div')
+              .cssClass(this.myCls('filter-header'))
+              .add(args.label)
+          .end()
+          .startContext({ data: args.key })
+          .add(args.showRemove ? this.REMOVE_FILTER : undefined)
+          .endContext()
+      .end();
+
+      e.start('div')
+          .cssClass(this.myCls('filter-body'))
+          .add(args.view)
+      .end();
+      return e;
     },
 
     function renderFilter(key) {
@@ -389,106 +408,23 @@ foam.CLASS({
           justify-content: space-between;
         }
         ^results {
+          display: flex;
           flex-grow: 1;
           overflow: auto;
         }
+
+        ^filter-header {
+          align-items: center;
+          display: flex;
+        }
+        ^filter-label {
+          flex-grow: 1;
+        }
+        ^filter-container {
+          margin: 12px;
+        }
       */}
     })
-  ],
-
-  classes: [
-    {
-      name: 'FilterView',
-      extends: 'foam.u2.View',
-      imports: [
-        'filterController'
-      ],
-      properties: [
-        'prop',
-        'key',
-        'bodyE',
-        // TODO(braden): Replace this custom hack when we have "inner" views.
-        [ 'overrideAdd_', true ],
-        {
-          name: 'label',
-          expression: function(prop) { return prop.label; }
-        },
-        [ 'showRemove', true ],
-        {
-          name: 'addQueue_',
-          factory: function() { return []; }
-        }
-      ],
-
-      actions: [
-        {
-          name: 'removeFilter',
-          label: 'Close',
-          icon: 'close',
-          code: function() {
-            this.filterController.removeFilter(this.key);
-          }
-        }
-      ],
-
-      methods: [
-        function add() {
-          if ( this.overrideAdd_ ) {
-            if ( this.bodyE ) {
-              this.bodyE.add.apply(this.bodyE, arguments);
-            } else {
-              this.addQueue_.push(Array.prototype.slice.call(arguments));
-            }
-          } else {
-            this.SUPER.apply(this, arguments);
-          }
-          return this;
-        },
-        function initE() {
-          this.overrideAdd_ = false;
-
-          this.cssClass(this.myCls()).cssClass(this.myCls('container'));
-          this.start('div')
-              .cssClass(this.myCls('header'))
-              .start()
-                  .cssClass(this.myCls('label'))
-                  .add(this.label)
-                  .end()
-              .startContext({ data: this })
-              .add(this.showRemove ? this.REMOVE_FILTER : undefined)
-              .endContext()
-              .end();
-
-          this.bodyE = this.start('div').cssClass(this.myCls('body'));
-          for ( var i = 0; i < this.addQueue_.length; i++ ) {
-            this.bodyE.add.apply(this.bodyE, this.addQueue_[i]);
-          }
-          this.bodyE.end();
-
-          this.overrideAdd_ = true;
-        }
-      ],
-
-      axioms: [
-        foam.u2.CSS.create({
-          code: function CSS() {/*
-            ^header {
-              align-items: center;
-              display: flex;
-            }
-            ^label {
-              flex-grow: 1;
-            }
-            ^container {
-              margin: 12px;
-            }
-            ^body input {
-              width: 100%;
-            }
-          */}
-        })
-      ]
-    }
   ]
 });
 

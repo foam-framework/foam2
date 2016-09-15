@@ -1609,9 +1609,80 @@ describe('FilteredDAO', function() {
     // cover destructor
     dao.destroy();
   });
+});
 
+
+describe('String.daoize', function() {
+  it('handles a model name', function() {
+    expect(foam.String.daoize('MyModel')).toEqual('myModelDAO');
+  });
+  it('handles a model name with package', function() {
+    expect(foam.String.daoize('test.package.PkgModel')).toEqual('test.package.PkgModelDAO');
+  });
 
 });
 
+describe('Relationship', function() {
+  
+  foam.CLASS({
+    package: 'test',
+    name: 'RelA',
+    properties: [
+      'bRef'
+    ]
+  });
+  foam.CLASS({
+    package: 'test',
+    name: 'RelB',
+    properties: [
+      'aRef'
+    ]
+  });
+  
+  foam.CLASS({
+    package: 'test',
+    name: 'relEnv',
+    exports: [
+      'test.RelADAO',
+      'test.RelBDAO'
+    ],
+    properties: [
+      {
+        name: 'test.RelADAO',
+        factory: function() {
+          return foam.dao.ArrayDAO.create();
+        }
+      },
+      {
+        name: 'test.RelBDAO',
+        factory: function() {
+          return foam.dao.ArrayDAO.create();
+        }
+      }
+      
+    ]
+  });
+  
+  foam.RELATIONSHIP({
+    name: 'children',
+    inverseName: 'parent',
+    sourceModel: 'test.RelA',
+    //sourceProperties: [ 'bRef' ],
+    targetModel: 'test.RelB',
+    //targetProperties: [ 'aRef' ],
+    
+  });
+  
+  it('has relationship DAOs', function() {
+    var env = test.relEnv.create();
+    var relObjA = test.RelA.create(undefined, env);
+    
+    var relDAO = relObjA.children;
+    
+    
+    
+  })
+  
+});
 
 

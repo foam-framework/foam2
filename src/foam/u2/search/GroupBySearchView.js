@@ -83,7 +83,10 @@ foam.CLASS({
     },
     function initE() {
       this.cssClass(this.myCls());
-      this.view = this.start(this.viewSpec);
+      this.view = this.start(this.viewSpec, {
+        label$: this.label$,
+        alwaysFloatLabel: true
+      });
       this.view.end();
 
       this.dao.on.sub(this.updateDAO);

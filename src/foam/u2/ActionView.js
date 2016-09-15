@@ -65,7 +65,7 @@ foam.CLASS({
     'action',
     {
       name: 'label',
-      expression: function(action) { return action.label; }
+      factory: function(action) { return this.action.label; }
     }
   ],
 

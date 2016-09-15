@@ -34,6 +34,8 @@ foam.CLASS({
       name: 'view',
       value: { class: 'foam.u2.tag.Input' }
     },
+    'label',
+    'alwaysFloatLabel',
     'type',
     'autocompleter',
     'autocompleteList_'
@@ -43,6 +45,8 @@ foam.CLASS({
     function initE() {
       var e = this.start(this.view, {
         data$: this.data$,
+        label$: this.label$,
+        alwaysFloatLabel: this.alwaysFloatLabel,
         type: this.type,
         onKey: this.onKey
       });

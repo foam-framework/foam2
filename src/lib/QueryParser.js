@@ -43,6 +43,7 @@ foam.CLASS({
     'foam.parse.ImperativeGrammar',
     'foam.parse.LiteralIC',
     'foam.parse.Parsers',
+    'foam.parse.PropertyRefinement',
     'foam.parse.StringPS'
   ],
 
@@ -207,13 +208,20 @@ foam.CLASS({
               value: prop
             }));
           }
-          // TODO(braden): Support aliases when Property does.
+          if ( prop.aliases ) {
+            for ( var j = 0; j < prop.aliases.length; j++ ) {
+              fields.push(this.LiteralIC.create({
+                s: prop.aliases[j],
+                value: prop
+              }));
+            }
+          }
         }
         fields.sort(function(a, b) {
-          var d = a.length - b.length;
+          var d = b.lower.length - a.lower.length;
           if ( d !== 0 ) return d;
-          if ( a === b ) return 0;
-          return a < b ? 1 : -1;
+          if ( a.lower === b.lower ) return 0;
+          return a.lower < b.lower ? 1 : -1;
         });
 
         var base = foam.Function.withArgs(this.baseGrammar_,
@@ -481,6 +489,19 @@ foam.CLASS({
     function parseString(str, opt_name) {
       var query = this.grammar_.parseString(str, opt_name);
       return query && query.partialEval ? query.partialEval() : query;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
+  name: 'PropertyRefinement',
+  refines: 'foam.core.Property',
+
+  properties: [
+    {
+      class: 'StringArray',
+      name: 'aliases'
     }
   ]
 });

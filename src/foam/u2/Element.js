@@ -235,9 +235,11 @@ foam.CLASS({
       return this.UNLOADED.output.call(this, out);
     },
     function load() {
-      var ls = this.elListeners;
-      for ( var i = 0 ; i < ls.length ; i+=2 ) {
-        this.addEventListener_(ls[i], ls[i+1]);
+      if ( this.hasOwnProperty('elListeners') ) {
+        var ls = this.elListeners;
+        for ( var i = 0 ; i < ls.length ; i+=2 ) {
+          this.addEventListener_(ls[i], ls[i+1]);
+        }
       }
 
       this.visitChildren('load');
@@ -710,8 +712,9 @@ foam.CLASS({
         Typically used to transition state of all children at once.
         Ex.: this.visitChildren('load');
       */
-      for ( var i = 0 ; i < this.childNodes.length ; i++ ) {
-        var c = this.childNodes[i];
+      var cs = this.childNodes;
+      for ( var i = 0 ; i < cs.length ; i++ ) {
+        var c = cs[i];
         c[methodName] && c[methodName].call(c);
       }
     },
@@ -879,9 +882,10 @@ foam.CLASS({
 
     function removeChild(c) {
       /* Remove a Child node (String or Element). */
-      for ( var i = 0 ; i < this.childNodes.length ; ++i ) {
-        if ( this.childNodes[i] === c ) {
-          this.childNodes.splice(i, 1);
+      var cs = this.childNodes;
+      for ( var i = 0 ; i < cs.length ; ++i ) {
+        if ( cs[i] === c ) {
+          cs.splice(i, 1);
           this.state.onRemoveChild.call(this, c, i);
           return;
         }
@@ -890,9 +894,10 @@ foam.CLASS({
 
     function replaceChild(newE, oldE) {
       /* Replace current child oldE with newE. */
-      for ( var i = 0 ; i < this.childNodes.length ; ++i ) {
-        if ( this.childNodes[i] === oldE ) {
-          this.childNodes[i] = newE;
+      var cs = this.childNodes;
+      for ( var i = 0 ; i < cs.length ; ++i ) {
+        if ( cs[i] === oldE ) {
+          cs[i] = newE;
           this.state.onReplaceChild.call(this, oldE, newE);
           oldE.unload && oldE.unload();
           return;
@@ -1140,7 +1145,7 @@ foam.CLASS({
         for ( var i = 0 ; i < es.length ; i++ ) {
           if ( foam.u2.Element.isInstance(es[i]) ) {
             es[i].parentNode = parentNode;
-          } else if ( es[i].cls_ && es[i].cls_ === 'foam.u2.Entity' ) {
+          } else if ( es[i].cls_ && es[i].cls_.id === 'foam.u2.Entity' ) {
             // NOP
           } else {
             es[i] = this.sanitizeText(es[i]);
@@ -1165,8 +1170,9 @@ foam.CLASS({
 
     function removeAllChildren() {
       /* Remove all of this Element's children. */
-      while ( this.childNodes.length ) {
-        this.removeChild(this.childNodes[0]);
+      var cs = this.childNodes;
+      while ( cs.length ) {
+        this.removeChild(cs[0]);
       }
       return this;
     },
@@ -1206,8 +1212,9 @@ foam.CLASS({
     //
 
     function outputInnerHTML(out) {
-      for ( var i = 0 ; i < this.childNodes.length ; i++ ) {
-        out(this.childNodes[i]);
+      var cs = this.childNodes;
+      for ( var i = 0 ; i < cs.length ; i++ ) {
+        out(cs[i]);
       }
       return out;
     },
@@ -1399,48 +1406,58 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      if ( this.id ) out(' id="', this.id, '"');
+      out(' id="', this.id, '"');
 
       var first = true;
-      for ( var key in this.classes ) {
-        if ( ! this.classes[key] ) continue;
-        if ( first ) {
-          out(' class="');
-          first = false;
-        } else {
-          out(' ');
+      if ( this.hasOwnProperty('classes') ) {
+        var cs = this.classes;
+        for ( var key in cs ) {
+          if ( ! cs[key] ) continue;
+          if ( first ) {
+            out(' class="');
+            first = false;
+          } else {
+            out(' ');
+          }
+          out(key);
         }
-        out(key);
+        if ( ! first ) out('"');
       }
-      if ( ! first ) out('"');
 
-      first = true;
-      for ( var key in this.css ) {
-        var value = this.css[key];
+      if ( this.hasOwnProperty('css') ) {
+        first = true;
+        var cs = this.css;
+        for ( var key in cs ) {
+          var value = cs[key];
 
-        if ( first ) {
-          out(' style="');
-          first = false;
+          if ( first ) {
+            out(' style="');
+            first = false;
+          }
+          out(key, ':', value, ';');
         }
-        out(key, ':', value, ';');
-      }
-      if ( ! first ) out('"');
-
-      for ( var i = 0 ; i < this.attributes.length ; i++ ) {
-        var attr  = this.attributes[i];
-        var name  = attr.name;
-        var value = attr.value;
-
-        out(' ', name);
-        if ( value !== false ) out('="', value, '"');
+        if ( ! first ) out('"');
       }
 
-      if ( ! this.ILLEGAL_CLOSE_TAGS[this.nodeName] &&
-          ( ! this.OPTIONAL_CLOSE_TAGS[this.nodeName] ||
-          this.childNodes.length ) ) {
-        out('>');
-        this.outputInnerHTML(out);
-        out('</', this.nodeName);
+      if ( this.hasOwnProperty('attributes') ) {
+        var as = this.attributes;
+        for ( var i = 0 ; i < as.length ; i++ ) {
+          var attr  = as[i];
+          var name  = attr.name;
+          var value = attr.value;
+
+          out(' ', name);
+          if ( value !== false ) out('="', value, '"');
+        }
+      }
+
+      if ( ! this.ILLEGAL_CLOSE_TAGS[this.nodeName] ) {
+        var hasChildren = this.hasOwnProperty('childNodes') && this.childNodes.length;
+        if ( hasChildren || ! this.OPTIONAL_CLOSE_TAGS[this.nodeName] ) {
+          out('>');
+          if ( hasChildren ) this.outputInnerHTML(out);
+          out('</', this.nodeName);
+        }
       }
 
       out('>');

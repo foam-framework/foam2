@@ -167,6 +167,10 @@ foam.CLASS({
       value: { class: 'foam.u2.tag.Select' }
     },
     {
+      class: 'Boolean',
+      name: 'alwaysFloatLabel'
+    },
+    {
       name: 'view_'
     }
   ],
@@ -183,6 +187,8 @@ foam.CLASS({
 
       this.start(this.selectSpec, {
         data$: this.index$,
+        label$: this.label$,
+        alwaysFloatLabel: this.alwaysFloatLabel,
         choices$: this.choices$,
         placeholder$: this.placeholder$
       }).end();

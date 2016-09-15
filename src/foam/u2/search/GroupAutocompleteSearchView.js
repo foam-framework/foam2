@@ -116,7 +116,8 @@ foam.CLASS({
     function initE() {
       this.view = this.start(this.viewSpec, {
         prop: this.property,
-        inline: true,
+        label$: this.label$,
+        alwaysFloatLabel: true,
         autocompleter: this.autocompleter
       });
 

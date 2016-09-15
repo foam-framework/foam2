@@ -21,19 +21,24 @@ foam.CLASS({
   properties: [
     [ 'nodeName', 'paper-input' ],
     {
-      class: 'Boolean',
-      name: 'onKey'
-    },
-    {
       class: 'String',
       name: 'label'
+    },
+    {
+      class: 'Boolean',
+      name: 'alwaysFloatLabel'
     }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-      this.attrs({ label: this.label$ });
+      this.attrs({
+        label: this.label$,
+        'always-float-label': this.alwaysFloatLabel,
+        'no-label-float': this.slot(function(label) { return ! label; },
+            this.label$)
+      });
     },
     function link() {
       this.attrSlot(null, this.onKey ? 'input' : 'change').linkFrom(this.data$);
