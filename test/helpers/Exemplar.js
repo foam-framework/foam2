@@ -42,7 +42,28 @@ foam.CLASS({
       name: 'dependencies'
     },
     {
-      /** The code for this example. */
+      /** Is true if any dependencies are async */
+      class: 'Boolean',
+      name: 'hasAsyncDeps',
+      expression: function(dependencies) {
+        dependencies.forEach(function(depName) {
+          var dep = this.registry.lookup(depName);
+          if ( dep.hasAsyncDeps || dep.isAsync ) { 
+            return true;
+          }
+        });
+        return false;
+      }
+    },
+    {
+      /** Set to true if your code is a function that returns a promise */
+      class: 'Boolean',
+      name: 'isAsync',
+      value: false
+    },
+    {
+      /** The code for this example. This should be either bare code, or a 
+        function that returns a promise if async. */
       class: 'String',
       name: 'code',
       adapt: function(old, nu) {
@@ -65,12 +86,24 @@ foam.CLASS({
 
       // output each dependency
       if ( this.dependencies ) {
-        this.dependencies.foreach(function(depName) {
+        this.dependencies.forEach(function(depName) {
           var dep = this.registry.lookup(depName);
+          if ( dep.hasAsyncDeps || dep.isAsync ) {
+            indent.level += 1;
+            ret += tabs + "p.push(()\n";
+            ret += dep.generateExample(indent);
+            ret += tabs + ")());\n";
+            indent.level -= 1;
+          }
           ret += dep.generateExample(indent);
         });
+        // in the simple case we just concat the code, but if anything is async
+        // we have to decorate ourselves to become async
+        if ( this.hasAsyncDeps ) {
+          ret =  tabs + "function() { var p = [];\n" + ret;
+          ret += tabs + "return Promise.all(p); }\n";
+        }        
       }
-
       ret += this.outputSelf(indent);
 
       return ret;
