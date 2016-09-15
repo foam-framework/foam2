@@ -239,7 +239,15 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Array',
-  extends: 'Property'
+  extends: 'Property',
+  properties: [
+    {
+      name: 'fromJSON',
+      value: function(value, opt_ctx) {
+        return foam.json.parse(value, null, opt_ctx);
+      }
+    }
+  ]
 });
 
 foam.CLASS({
