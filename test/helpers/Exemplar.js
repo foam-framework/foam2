@@ -74,7 +74,7 @@ foam.CLASS({
         if ( foam.Function.is(nu) ) {
           return nu.toString();
         }
-        return nu;
+        return nu.trim();
       }
     }
   ],
@@ -94,6 +94,8 @@ foam.CLASS({
       // outer enclosing - function() {
       if ( self.hasAsyncDeps || self.isAsync ) {
         ret += tabs + "(function() {\n";
+        tabs += '\t';
+        indent.level += 1;
         if ( self.hasAsyncDeps ) {
           ret += tabs + "var p = [];\n";
         }
@@ -132,6 +134,8 @@ foam.CLASS({
 
       // outer enclosing end
       if ( self.hasAsyncDeps || self.isAsync ) {
+        tabs = tabs.slice(1);
+        indent.level -= 1;
         ret += tabs + '})()\n';
       }
 
@@ -141,7 +145,7 @@ foam.CLASS({
 
     function outputSelf(indent) {
 
-      var ret = "";
+      var ret = "\n";
       var lines = this.code.split('\n');
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '\t'; }
@@ -152,6 +156,8 @@ foam.CLASS({
       lines.forEach(function(line) {
         ret += tabs + line + '\n';
       });
+
+      ret += "\n";
 
       return ret;
     }
