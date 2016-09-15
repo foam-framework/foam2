@@ -391,7 +391,7 @@ foam.CLASS({
           flex-direction: column;
           flex-shrink: 0;
           overflow: hidden;
-          width: 250px;
+          min-width: 250px;
         }
         ^adding {
           border: 1px solid #e0e0e0;
