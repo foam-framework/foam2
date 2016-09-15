@@ -362,13 +362,15 @@ foam.CLASS({
       reference.el().insertAdjacentHTML(where, out);
 
       // EXPERIMENTAL:
+      // TODO(kgr): This causes some elements to get stuck in OUTPUT state
+      // forever. It can be resurrected if that problem is fixed.
       // Load (mostly adding listeners) on the next frame
       // to allow the HTML to be shown more quickly.
-      this.__context__.window.setTimeout(function() {
-        for ( var i = 0 ; i < children.length ; i++ ) {
-          children[i].load && children[i].load();
-        }
-      }, 33);
+      // this.__context__.window.setTimeout(function() {
+      for ( var i = 0 ; i < children.length ; i++ ) {
+        children[i].load && children[i].load();
+      }
+      // }, 33);
     },
     function onReplaceChild(oldE, newE) {
       var e = this.el();
