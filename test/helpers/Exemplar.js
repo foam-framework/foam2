@@ -46,9 +46,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'hasAsyncDeps',
       expression: function(dependencies) {
-        dependencies.forEach(function(depName) {
-          var dep = this.registry.lookup(depName);
-          if ( dep.hasAsyncDeps || dep.isAsync ) { 
+        var self = this;
+        dependencies && dependencies.forEach(function(depName) {
+          var dep = self.registry.lookup(depName);
+          if ( dep.hasAsyncDeps || dep.isAsync ) {
             return true;
           }
         });
@@ -62,7 +63,7 @@ foam.CLASS({
       value: false
     },
     {
-      /** The code for this example. This should be either bare code, or a 
+      /** The code for this example. This should be either bare code, or a
         function that returns a promise if async. */
       class: 'String',
       name: 'code',
@@ -83,11 +84,12 @@ foam.CLASS({
     function generateExample(indent) {
       if ( ! indent ) indent = { level: 0 };
       var ret = "";
+      var self = this;
 
       // output each dependency
-      if ( this.dependencies ) {
-        this.dependencies.forEach(function(depName) {
-          var dep = this.registry.lookup(depName);
+      if ( self.dependencies ) {
+        self.dependencies.forEach(function(depName) {
+          var dep = self.registry.lookup(depName);
           if ( dep.hasAsyncDeps || dep.isAsync ) {
             indent.level += 1;
             ret += tabs + "p.push(()\n";
@@ -99,12 +101,12 @@ foam.CLASS({
         });
         // in the simple case we just concat the code, but if anything is async
         // we have to decorate ourselves to become async
-        if ( this.hasAsyncDeps ) {
+        if ( self.hasAsyncDeps ) {
           ret =  tabs + "function() { var p = [];\n" + ret;
           ret += tabs + "return Promise.all(p); }\n";
-        }        
+        }
       }
-      ret += this.outputSelf(indent);
+      ret += self.outputSelf(indent);
 
       return ret;
     },
@@ -135,7 +137,7 @@ foam.CLASS({
 */
 foam.CLASS({
   package: 'test.helpers',
-  name: 'ExemplarRergistry',
+  name: 'ExemplarRegistry',
 
   exports: [ 'as exemplarRegistry' ],
 
@@ -157,8 +159,8 @@ foam.CLASS({
     function register(ex) {
       /** Registers an examplar. Re-registering the same one is allowed, but
         two Examplars with the same name is not. */
-      var prev = this.lookup(ex.name);
-      if ( prev !== ex ) throw "Exemplar " + ex.name + " already registered!";
+      var prev = this.registrants[ex.name];
+      if ( prev && prev !== ex ) throw "Exemplar " + ex.name + " already registered!";
 
       this.registrants[ex.name] = ex;
     }
