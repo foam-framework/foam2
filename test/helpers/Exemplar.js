@@ -43,23 +43,6 @@ foam.CLASS({
       name: 'dependencies'
     },
     {
-      /** Is true if any dependencies are async */
-      class: 'Boolean',
-      name: 'hasAsyncDeps',
-      expression: function(dependencies) {
-        var self = this;
-        var ret = false;
-        self.dependencies && self.dependencies.forEach(function(depName) {
-          var dep = self.registry.lookup(depName);
-          if ( dep.hasAsyncDeps || dep.isAsync ) {
-            ret = true;
-            return true;
-          }
-        });
-        return ret;
-      }
-    },
-    {
       /** Set to true if your code is a function that returns a promise */
       class: 'Boolean',
       name: 'isAsync',
@@ -76,7 +59,26 @@ foam.CLASS({
         }
         return nu.trim();
       }
-    }
+    },
+    {
+      /** Is true if any dependencies are async.
+        @private */
+      class: 'Boolean',
+      name: 'hasAsyncDeps_',
+      hidden: true,
+      expression: function(dependencies) {
+        var self = this;
+        var ret = false;
+        self.dependencies && self.dependencies.forEach(function(depName) {
+          var dep = self.registry.lookup(depName);
+          if ( dep.hasAsyncDeps_ || dep.isAsync ) {
+            ret = true;
+            return true;
+          }
+        });
+        return ret;
+      }
+    },
   ],
 
   methods: [
@@ -92,11 +94,11 @@ foam.CLASS({
       for ( var i = 0; i < indent.level; i++) { tabs += '\t'; }
 
       // outer enclosing - function() {
-      if ( self.hasAsyncDeps || self.isAsync ) {
+      if ( self.hasAsyncDeps_ || self.isAsync ) {
         ret += tabs + "(function() {\n";
         tabs += '\t';
         indent.level += 1;
-        if ( self.hasAsyncDeps ) {
+        if ( self.hasAsyncDeps_ ) {
           ret += tabs + "var p = [];\n";
         }
       }
@@ -105,7 +107,7 @@ foam.CLASS({
         if ( self.dependencies ) {
           self.dependencies.forEach(function(depName) {
             var dep = self.registry.lookup(depName);
-            if ( dep.hasAsyncDeps || dep.isAsync ) {
+            if ( dep.hasAsyncDeps_ || dep.isAsync ) {
               indent.level += 1;
               ret += tabs + "p.push(\n";
               ret += dep.generateExample(indent);
@@ -119,7 +121,7 @@ foam.CLASS({
         // in the simple case we just concat the code, but if anything is async
         // we have to decorate ourselves to become async
         // inner enclosing - function(results) {
-        if ( self.hasAsyncDeps ) {
+        if ( self.hasAsyncDeps_ ) {
           ret += tabs + "return Promise.all(p).then(function(results) {\n";
           indent.level += 1;
         }
@@ -127,13 +129,13 @@ foam.CLASS({
           ret += self.outputSelf(indent);
 
         // inner enclosing end
-        if ( self.hasAsyncDeps ) {
+        if ( self.hasAsyncDeps_ ) {
           ret += tabs + '})\n';
           indent.level -= 1;
         }
 
       // outer enclosing end
-      if ( self.hasAsyncDeps || self.isAsync ) {
+      if ( self.hasAsyncDeps_ || self.isAsync ) {
         tabs = tabs.slice(1);
         indent.level -= 1;
         ret += tabs + '})()\n';
