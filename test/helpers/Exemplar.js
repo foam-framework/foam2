@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+(typeof require !== "undefined") &&  require("../../src/core/node.js");
 
 /**
   Serves to generate executable examples and unit test cases.
@@ -47,13 +48,15 @@ foam.CLASS({
       name: 'hasAsyncDeps',
       expression: function(dependencies) {
         var self = this;
-        dependencies && dependencies.forEach(function(depName) {
+        var ret = false;
+        self.dependencies && self.dependencies.forEach(function(depName) {
           var dep = self.registry.lookup(depName);
           if ( dep.hasAsyncDeps || dep.isAsync ) {
+            ret = true;
             return true;
           }
         });
-        return false;
+        return ret;
       }
     },
     {
@@ -85,34 +88,58 @@ foam.CLASS({
       if ( ! indent ) indent = { level: 0 };
       var ret = "";
       var self = this;
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '\t'; }
 
-      // output each dependency
-      if ( self.dependencies ) {
-        self.dependencies.forEach(function(depName) {
-          var dep = self.registry.lookup(depName);
-          if ( dep.hasAsyncDeps || dep.isAsync ) {
-            indent.level += 1;
-            ret += tabs + "p.push(()\n";
-            ret += dep.generateExample(indent);
-            ret += tabs + ")());\n";
-            indent.level -= 1;
-          }
-          ret += dep.generateExample(indent);
-        });
-        // in the simple case we just concat the code, but if anything is async
-        // we have to decorate ourselves to become async
+      // outer enclosing - function() {
+      if ( self.hasAsyncDeps || self.isAsync ) {
+        ret += tabs + "(function() {\n";
         if ( self.hasAsyncDeps ) {
-          ret =  tabs + "function() { var p = [];\n" + ret;
-          ret += tabs + "return Promise.all(p); }\n";
+          ret += tabs + "var p = [];\n";
         }
       }
-      ret += self.outputSelf(indent);
+
+        // output each dependency
+        if ( self.dependencies ) {
+          self.dependencies.forEach(function(depName) {
+            var dep = self.registry.lookup(depName);
+            if ( dep.hasAsyncDeps || dep.isAsync ) {
+              indent.level += 1;
+              ret += tabs + "p.push(\n";
+              ret += dep.generateExample(indent);
+              ret += tabs + ");\n";
+              indent.level -= 1;
+            } else {
+              ret += dep.generateExample(indent);
+            }
+          });
+        }
+        // in the simple case we just concat the code, but if anything is async
+        // we have to decorate ourselves to become async
+        // inner enclosing - function(results) {
+        if ( self.hasAsyncDeps ) {
+          ret += tabs + "return Promise.all(p).then(function(results) {\n";
+          indent.level += 1;
+        }
+
+          ret += self.outputSelf(indent);
+
+        // inner enclosing end
+        if ( self.hasAsyncDeps ) {
+          ret += tabs + '})\n';
+        }
+
+      // outer enclosing end
+      if ( self.hasAsyncDeps || self.isAsync ) {
+        ret += tabs + '})()\n';
+      }
+
 
       return ret;
     },
 
     function outputSelf(indent) {
-      // For non-async code
+
       var ret = "";
       var lines = this.code.split('\n');
       var tabs = "";
@@ -124,6 +151,7 @@ foam.CLASS({
       lines.forEach(function(line) {
         ret += tabs + line + '\n';
       });
+
       ret += '\n';
 
       return ret;
