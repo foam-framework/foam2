@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'com.google.foam.demos.heroes',
   name: 'CitationView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
 
   imports: [
     'heroDAO',
@@ -61,6 +61,10 @@ foam.CLASS({
         }
       */}
     })
+  ],
+
+  properties: [
+    'data'
   ],
 
   methods: [
