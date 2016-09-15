@@ -152,8 +152,6 @@ foam.CLASS({
         ret += tabs + line + '\n';
       });
 
-      ret += '\n';
-
       return ret;
     }
 
