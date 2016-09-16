@@ -521,10 +521,13 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
+      factory: function() { return this.UNLOADED; },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED ) {
+        } else if ( state === this.UNLOADED && oldState == undefined ) {
+          // Check oldState == undefined so that we don't publish onunload
+          // when we've never been loaded.
           this.pub('onunload');
         }
       }

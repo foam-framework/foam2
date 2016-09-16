@@ -338,9 +338,9 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'lookup',
+      name: 'doLookup',
       returns: 'foam.box.Box',
-      code: function lookup(name) {
+      code: function doLookup(name) {
         if ( this.registry[name] &&
              this.registry[name].exportBox )
           return this.registry[name].exportBox;
@@ -496,7 +496,7 @@ foam.CLASS({
       name: 'delegate',
       transient: true,
       factory: function() {
-        return this.registry.lookup(this.name)
+        return this.registry.doLookup(this.name)
       }
     }
   ]

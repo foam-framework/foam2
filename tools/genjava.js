@@ -29,6 +29,10 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.Sink',
   'foam.dao.AbstractSink',
+  'foam.dao.PredicatedSink',
+  'foam.dao.OrderedSink',
+  'foam.dao.LimitedSink',
+  'foam.dao.SkipSink',
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count'

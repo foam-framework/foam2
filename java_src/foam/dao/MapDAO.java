@@ -56,6 +56,8 @@ public class MapDAO extends AbstractDAO {
       s = new ListSink();
     }
 
+    s = decorateSink_(s, skip, limit, order, predicate);
+
     FlowControl fc = (FlowControl)getX().create(FlowControl.class);
 
     for ( FObject obj : getData().values() ) {

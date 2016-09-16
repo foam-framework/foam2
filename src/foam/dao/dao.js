@@ -111,6 +111,7 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxySink',
+  implements: [ 'foam.dao.Sink' ],
 
   properties: [
     {
@@ -363,16 +364,26 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
       name: 'predicate'
     }
   ],
 
   methods: [
-    function put(obj, fc) {
-      if ( this.predicate.f(obj) ) this.delegate.put(obj, fc);
+    {
+      name: 'put',
+      code: function put(obj, fc) {
+        if ( this.predicate.f(obj) ) this.delegate.put(obj, fc);
+      },
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(obj, fc);'
     },
-    function remove(obj, fc) {
-      if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc);
+    {
+      name: 'remove',
+      code:     function remove(obj, fc) {
+        if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc);
+      },
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(obj, fc);'
     }
   ]
 });
@@ -385,6 +396,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Int',
       name: 'limit'
     },
     {
@@ -395,20 +407,37 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, fc) {
-      if ( this.count++ >= this.limit ) {
-        fc && fc.stop();
-      } else {
-        this.delegate.put(obj, fc);
-      }
+    {
+      name: 'put',
+      code: function put(obj, fc) {
+        if ( this.count++ >= this.limit ) {
+          fc && fc.stop();
+        } else {
+          this.delegate.put(obj, fc);
+        }
+      },
+      javaCode: 'setCount(getCount() + 1);\n'
+              + 'if ( getCount() >= getLimit() ) {\n'
+              + '  fc.stop();\n'
+              + '} else {\n'
+              + '  getDelegate().put(obj, fc);\n'
+              + '}\n'
     },
-
-    function remove(obj, fc) {
-      if ( this.count++ >= this.limit ) {
-        fc && fc.stop();
-      } else {
-        this.delegate.remove(obj, fc);
-      }
+    {
+      name: 'remove',
+      code: function remove(obj, fc) {
+        if ( this.count++ >= this.limit ) {
+          fc && fc.stop();
+        } else {
+          this.delegate.remove(obj, fc);
+        }
+      },
+      javaCode: 'setCount(getCount() + 1);\n'
+                + 'if ( getCount() >= getLimit() ) {\n'
+                + '  fc.stop();\n'
+                + '} else {'
+                + '  getDelegate().put(obj, fc);\n'
+                + '}'
     }
   ]
 });
@@ -421,6 +450,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Int',
       name: 'skip'
     },
     {
@@ -431,20 +461,36 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, fc) {
-      if ( this.count < this.skip ) {
-        this.count++;
-        return;
-      }
-      this.delegate.put(obj, fc);
-    },
+    {
+      name: 'put',
+      code: function put(obj, fc) {
+        if ( this.count < this.skip ) {
+          this.count++;
+          return;
+        }
 
-    function remove(obj, fc) {
-      if ( this.count < this.skip ) {
-        this.count++;
-        return;
-      }
-      this.delegate.remove(obj, fc);
+        this.delegate.put(obj, fc);
+      },
+      javaCode: 'if ( getCount() < getSkip() ) {\n'
+              + '  setCount(getCount() + 1);\n'
+              + '  return;'
+              + '}\n'
+              + 'getDelegate().put(obj, fc);'
+    },
+    {
+      name: 'remove',
+      code: function remove(obj, fc) {
+        if ( this.count < this.skip ) {
+          this.count++;
+          return;
+        }
+        this.delegate.remove(obj, fc);
+      },
+      javaCode: 'if ( getCount() < getSkip() ) {\n'
+              + '  setCount(getCount() + 1);\n'
+              + '  return;'
+              + '}\n'
+              + 'getDelegate().remove(obj, fc);'
     }
   ]
 });
@@ -457,24 +503,45 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
       name: 'comparator'
     },
     {
-      name: 'arr',
+      class: 'Object',
+      name: 'array',
+      javaType: 'java.util.List',
+      // TODO(adamvy): Java factory
       factory: function() { return []; }
     }
   ],
 
   methods: [
-    function put(obj, fc) {
-      this.arr.push(obj);
+    {
+      name: 'put',
+      code: function put(obj, fc) {
+        this.array.push(obj);
+      },
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+                + 'getArray().add(obj);'
     },
-
-    function eof() {
-      this.arr.sort(this.comparator.compare || this.comparator);
-      for ( var i = 0 ; i < this.arr.length ; i++ ) {
-        this.delegate.put(this.arr[i]);
-      }
+    {
+      name: 'eof',
+      code: function eof() {
+        this.array.sort(this.comparator.compare || this.comparator);
+        for ( var i = 0 ; i < this.array.length ; i++ ) {
+          this.delegate.put(this.array[i]);
+        }
+      },
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+                + 'java.util.Collections.sort(getArray());\n'
+                + 'foam.dao.FlowControl fc = (foam.dao.FlowControl)getX().create(foam.dao.FlowControl.class);\n'
+                + 'for ( Object o : getArray() ) {\n'
+                + '  if ( fc.getStopped() || fc.getErrorEvt() != null ) {\n'
+                + '    break;\n'
+                + '  }\n'
+                + '  getDelegate().put((foam.core.FObject)o, fc);\n'
+                + '}'
     },
 
     function remove(obj, fc) {
@@ -949,7 +1016,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArraySink',
-  implements: ['foam.dao.Sink'],
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
     {
