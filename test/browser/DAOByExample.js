@@ -230,25 +230,23 @@ var examples = [
       var nullSink = foam.dao.QuickSink.create();
       
       var promises = [];
-      
-      promises.push(app.customerDAO.where(M.EQ(app.Customer.ID, 2)).select(
-        M.MAP(function(cust) {
-          promises.push(app.accountDAO.where(M.EQ(app.Account.OWNER, cust.id)).select(
-            M.MAP(function(acc) {
-              console.log("account dump", acc.id)
-              promises.push(
-                app.transactionDAO
-                  .where(M.EQ(app.Transaction.ACCOUNT, acc.id))
+      var customerIds = foam.dao.ArraySink.create();
+      var accountIds = foam.dao.ArraySink.create();
+      return app.customerDAO
+        .where(M.EQ(app.Customer.ID, 2))
+        .select(M.MAP(app.Customer.ID, customerIds))
+        .then(function() {
+          return app.accountDAO
+            .where(M.IN(app.Account.OWNER, customerIds.a))
+            .select(M.MAP(app.Account.ID, accountIds))
+            .then(function() {
+                return app.transactionDAO
+                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
                   .select(tsink)
-              );
-            }, nullSink)
-          ));
-        }, nullSink)
-      ));
-
-      return Promise.all(promises).then(function() {
-        foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
-      });
+            });
+        }).then(function(results) {
+          foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
+        });
     }
   },
   
