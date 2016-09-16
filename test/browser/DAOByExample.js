@@ -1,6 +1,13 @@
 var reg = test.helpers.ExemplarRegistry.create();
-
+var ex;
 var examples = [
+  {
+    name: 'Load MLangs',
+    description: "Loads the mlang query langauage",
+    code: function() {
+      global.M = foam.mlang.ExpressionsSingleton.create();
+    }
+  },
   {
     name: 'Bank Classes',
     description: 'Example data models for bank accounts',
@@ -23,7 +30,12 @@ var examples = [
       foam.CLASS({
         package: 'example',
         name: 'Transaction',
-        properties: [ 'id', 'date', 'label', 'amount' ]
+        properties: [
+          'id',
+          'label',
+          'amount',
+          { class: 'Date', name: 'date' }, 
+        ]
       });
       
       // relate with foreign key relationships
@@ -45,6 +57,55 @@ var examples = [
         targetModel: 'example.Transaction',
         inverseName: 'account'
       });
+      
+      // create the example app with our DAOs exported
+      foam.CLASS({
+        package: 'example',
+        name: 'BankApp',
+        requires: [ // using app.Customer.create() gives it our exports
+          'example.Bank',
+          'example.Customer',
+          'example.Account',
+          'example.Transaction',
+          'foam.dao.EasyDAO'
+        ],
+        exports: [ // by default, DAOs are looked up by class name
+          'bankDAO as example.BankDAO',
+          'customerDAO as example.CustomerDAO',
+          'accountDAO as example.AccountDAO',
+          'transactionDAO as example.TransactionDAO',
+        ],
+        properties: [
+          { name: 'bankDAO', factory: function() {
+            return this.EasyDAO.create({
+              name: 'banks',
+              of: this.Bank, daoType: 'MDAO'
+            });
+          }},
+          { name: 'customerDAO', factory: function() {
+            return this.EasyDAO.create({
+              name: 'customers',
+              seqNo: true,
+              of: this.Customer, daoType: 'MDAO'
+            });
+          }},
+          { name: 'accountDAO', factory: function() {
+            return this.EasyDAO.create({
+              name: 'accounts',
+              seqNo: true,
+              of: this.Account, daoType: 'MDAO'
+            });
+          }},
+          { name: 'transactionDAO', factory: function() {
+            return this.EasyDAO.create({
+              name: 'transactions',
+              seqNo: true,
+              of: this.Transaction, daoType: 'MDAO'
+            });
+          }},
+        ]
+      });
+      global.app = example.BankApp.create();
     }
   },
   {
@@ -52,48 +113,124 @@ var examples = [
     description: "Sets up Bank DAO with example banks",
     dependencies: [ 'Bank Classes' ],
     code: function async() {
-
-      var bankDAO = foam.dao.EasyDAO.create({
-        name: 'banks',
-        of: example.Bank,
-        type: 'MDAO'
-      });
-
       return Promise.all([
-        bankDAO.put(example.Bank.create({ id: 'fn', name: 'First National' })),
-        bankDAO.put(example.Bank.create({ id: 'tt', name: 'Tortuga Credit Union' }))
-      ]).then(function() { return bankDAO; });
+        app.bankDAO.put(app.Bank.create({ id: 'fn', name: 'First National' })),
+        app.bankDAO.put(app.Bank.create({ id: 'tt', name: 'Tortuga Credit Union' }))
+      ]);
     }
   },
   {
     name: 'Load Customers',
     description: "Sets up Customer DAO with example customers",
+    dependencies: [ 'Bank Classes', 'Load Banks' ],
     code: function async() {
 
-      var customerDAO = foam.dao.EasyDAO.create({
-        name: 'customers',
-        of: example.Customer,
-        seqNo: true,
-        type: 'MDAO'
-      });
-
       return Promise.all([
-        customerDAO.put(example.Customer.create({ firstName: 'Sarah', lastName: 'Smith' })),
-        customerDAO.put(example.Customer.create({ firstName: 'Harry', lastName: 'Sullivan' })),
-        customerDAO.put(example.Customer.create({ firstName: 'Albert', lastName: 'Bronson' })),
-      ]).then(function() { return customerDAO; });
+        app.customerDAO.put(app.Customer.create({ firstName: 'Sarah',  lastName: 'Smith',    bank: 'fn' })),
+        app.customerDAO.put(app.Customer.create({ firstName: 'Harry',  lastName: 'Sullivan', bank: 'fn' })),
+        app.customerDAO.put(app.Customer.create({ firstName: 'Albert', lastName: 'Bronson',  bank: 'fn' })),
+
+        app.customerDAO.put(app.Customer.create({ firstName: 'Herman',  lastName: 'Blackbeard', bank: 'tt' })),
+        app.customerDAO.put(app.Customer.create({ firstName: 'Hector',  lastName: 'Barbossa',   bank: 'tt' })),
+        app.customerDAO.put(app.Customer.create({ firstName: 'William', lastName: 'Roberts',    bank: 'tt' })),
+      ]);
+    }
+  },
+  {
+    name: 'Create Accounts',
+    description: "Sets up Accounts DAO with example account, by select()ing into a sink",
+    dependencies: [ 'Load Customers' ],
+    code: function async() {
+      // we want to wait for the puts to complete, so save the promises
+      accountPuts = [];
+      // Generate accounts for each customer. Select into an in-line 
+      // sink to process results as they come in.
+      app.customerDAO.select(foam.dao.QuickSink.create({
+        putFn: function(customer) {
+          // create accounts, add to accountDAO, save the promises for later
+          // so we know all the puts have completed.
+          accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
+          accountPuts.push(customer.accounts.put(app.Account.create({ type: 'sav' })));
+        } 
+      }));
+      
+      return Promise.all(accountPuts);
+    }
+  },
+  {
+    name: 'Create Transactions',
+    description: "Sets up Transactions DAO with example transactions",
+    dependencies: [ 'Load MLangs', 'Create Accounts' ],
+    code: function async() {
+      // we want to wait for the puts to complete, so save the promises
+      transactionPuts = [];
+      
+      // Generate transactions for each account. 
+      var amount = 0;
+      var date = new Date(0);
+      
+      // functions to generate some data
+      function generateAccountChq(account) {
+        for ( var j = 0; j < 10; j++ ) {
+          date.setDate(date.getDate() + 1);
+          transactionPuts.push(account.transactions.put(app.Transaction.create({
+            date: new Date(date),
+            label: 'x'+amount+'x',
+            amount: ((amount += 0.25) % 20) - 5
+          })));
+        }
+      }
+      function generateAccountSav(account) {
+        for ( var j = 0; j < 5; j++ ) {
+          date.setDate(date.getDate() + 2.5);
+          transactionPuts.push(account.transactions.put(app.Transaction.create({
+            date: new Date(date),
+            label: 's'+amount+'s',
+            amount: ((amount += 1.5) % 50)
+          })));        
+        }
+      }
+      
+      // Select into an ArraySink, which dumps the results of the query to a 
+      // plain array, and run data generating functions for each one.
+      // Calling select() with no arguments resolves with an ArraySink.
+      // If you pass a sink to .select(mySink), your sink is resolved.
+      
+      // Select 'chq' accounts first
+      app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
+        .select().then(function(defaultArraySink) {
+          var accounts = defaultArraySink.a;
+          for ( var i = 0; i < accounts.length; i++ ) {
+            generateAccountChq(accounts[i]);
+          }
+        });
+      // Then select 'sav' accounts
+      amount = 0;
+      date = new Date(0);
+      app.accountDAO.where(M.EQ(app.Account.TYPE, 'sav'))
+        .select().then(function(defaultArraySink) {
+          var accounts = defaultArraySink.a;
+          for ( var i = 0; i < accounts.length; i++ ) {
+            generateAccountSav(accounts[i]);
+          }
+        });
+      //foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+      return Promise.all(accountPuts);
     }
   },
   
 ].forEach(function(def) {
-  var ex = test.helpers.Exemplar.create(def, reg);
-  var oldContext = foam.__context__;
-  foam.__context__ = foam.createSubContext({});
+  ex = test.helpers.Exemplar.create(def, reg);
+  // Note: eval() for each exemplar may be async, so don't
+  // nuke the context without waiting for the promise to resolve
+  
+  //foam.__context__ = oldContext;
+  //varoldContext = foam.__context__;
+  //foam.__context__ = foam.createSubContext({});
 
-  document.write("<hr><pre>"+
-  ex.generateExample()+
-  eval(ex.generateExample())+
-  "</pre>");
 
-  foam.__context__ = oldContext;
 });
+document.write("<hr><pre>"+
+ex.generateExample()+
+eval(ex.generateExample())+
+"</pre>");

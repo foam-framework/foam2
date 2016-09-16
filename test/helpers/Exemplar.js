@@ -88,8 +88,12 @@ foam.CLASS({
       this.registry.register(this);
     },
 
-    function generateExample(indent) {
+    function generateExample(indent, syncDepsLoaded) {
       if ( ! indent ) indent = { level: 0 };
+      if ( ! syncDepsLoaded ) 
+        syncDepsLoaded = {};
+      else
+        syncDepsLoaded = { __proto__: syncDepsLoaded }
       var ret = "";
       var self = this;
       var tabs = "";
@@ -108,15 +112,20 @@ foam.CLASS({
         // output each dependency
         if ( self.dependencies ) {
           self.dependencies.forEach(function(depName) {
+            // don't reload deps already installed above our scope
+            // (async deps are inside functions and not visible)
+            if ( syncDepsLoaded[depName] ) return; 
+            
             var dep = self.registry.lookup(depName);
             if ( dep.hasAsyncDeps_ || dep.isAsync ) {
               indent.level += 1;
               ret += tabs + "p.push(\n";
-              ret += dep.generateExample(indent);
+              ret += dep.generateExample(indent, syncDepsLoaded);
               ret += tabs + ");\n";
               indent.level -= 1;
             } else {
-              ret += dep.generateExample(indent);
+              syncDepsLoaded[dep.name] = true;
+              ret += dep.generateExample(indent, syncDepsLoaded);
             }
           });
         }
@@ -154,6 +163,7 @@ foam.CLASS({
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
+      ret += tabs + '//=====================================================\n';
       ret += tabs + '//' + this.name + '\n';
       ret += tabs + '//' + this.description + '\n';
 
