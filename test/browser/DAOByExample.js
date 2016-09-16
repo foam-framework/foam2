@@ -229,30 +229,58 @@ var examples = [
       var tsink = foam.dao.ArrayDAO.create();
       var nullSink = foam.dao.QuickSink.create();
       
-      var promises = [];
-      // to store intermediate reuslts for matching customer IDs
-      var customerIds = foam.dao.ArraySink.create(); 
-      // to store intermediate results for matching account IDs
-      var accountIds = foam.dao.ArraySink.create(); 
+      
       // Start querying at the top, and produce a larger set of results 
       //   to sub-query at each step
-      return app.customerDAO
-        .where(M.EQ(app.Customer.ID, 2)) // a fixed customer ID, in this case
-        .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
-        .then(function() {
-          return app.accountDAO // query matches for the array of customer IDs
-            .where(M.IN(app.Account.OWNER, customerIds.a)) 
-            .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
-            .then(function() {
-                return app.transactionDAO // query matches for list of accounts
-                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
-                  .select(tsink) // could dedup, but no duplicates in this case
-            });
-        }).then(function(results) {
-          foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
+      return app.customerDAO.find(2)
+        .then(function(customer) {
+          var transactionSelectPromises = [];
+          return customer.accounts.select(foam.dao.QuickSink.create({
+            putFn: function(account) {
+              // no route to return promise here, since Sink.put doesn't return a promise...
+              transactionSelectPromises.push(account.transactions.select(tsink));
+            }
+          })).then(function() {
+            return Promise.all(transactionSelectPromises);
+          })
+        }).then(function() {
+          foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
         });
     }
   },
+  
+  // {
+  //   name: 'Manual Join',
+  //   description: "Without using Relationships, finds all transactions for a given customer",
+  //   dependencies: [ 'Load MLangs', 'Create Transactions' ],
+  //   code: function async() {
+  //     var tsink = foam.dao.ArrayDAO.create();
+  //     var nullSink = foam.dao.QuickSink.create();
+  //
+  //     var promises = [];
+  //     // to store intermediate reuslts for matching customer IDs
+  //     var customerIds = foam.dao.ArraySink.create();
+  //     // to store intermediate results for matching account IDs
+  //     var accountIds = foam.dao.ArraySink.create();
+  //     // Start querying at the top, and produce a larger set of results
+  //     //   to sub-query at each step
+  //     return app.customerDAO
+  //       .where(M.EQ(app.Customer.ID, 2)) // a fixed customer ID, in this case
+  //       .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
+  //       .then(function() {
+  //         return app.accountDAO // query matches for the array of customer IDs
+  //           .where(M.IN(app.Account.OWNER, customerIds.a))
+  //           .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
+  //           .then(function() {
+  //               return app.transactionDAO // query matches for list of accounts
+  //                 .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
+  //                 .select(tsink) // could dedup, but no duplicates in this case
+  //           });
+  //       }).then(function(results) {
+  //         foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
+  //       });
+  //   }
+  // },
   
 ].forEach(function(def) {
   ex = test.helpers.Exemplar.create(def, reg);
