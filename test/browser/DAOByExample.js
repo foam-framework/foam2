@@ -145,16 +145,16 @@ var examples = [
       accountPuts = [];
       // Generate accounts for each customer. Select into an in-line 
       // sink to process results as they come in.
-      app.customerDAO.select(foam.dao.QuickSink.create({
+      return app.customerDAO.select(foam.dao.QuickSink.create({
         putFn: function(customer) {
           // create accounts, add to accountDAO, save the promises for later
           // so we know all the puts have completed.
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'sav' })));
         } 
-      }));
-      
-      return Promise.all(accountPuts);
+      })).then(function() {
+        return Promise.all(accountPuts);
+      });
     }
   },
   {
@@ -197,25 +197,58 @@ var examples = [
       // If you pass a sink to .select(mySink), your sink is resolved.
       
       // Select 'chq' accounts first
-      app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
+      return app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
         .select().then(function(defaultArraySink) {
           var accounts = defaultArraySink.a;
           for ( var i = 0; i < accounts.length; i++ ) {
             generateAccountChq(accounts[i]);
           }
-        });
-      // Then select 'sav' accounts
-      amount = 0;
-      date = new Date(0);
-      app.accountDAO.where(M.EQ(app.Account.TYPE, 'sav'))
-        .select().then(function(defaultArraySink) {
-          var accounts = defaultArraySink.a;
-          for ( var i = 0; i < accounts.length; i++ ) {
-            generateAccountSav(accounts[i]);
-          }
-        });
-      //foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
-      return Promise.all(accountPuts);
+      }).then(function() {
+        // Then select 'sav' accounts
+        amount = 0;
+        date = new Date(0);
+        app.accountDAO.where(M.EQ(app.Account.TYPE, 'sav'))
+          .select().then(function(defaultArraySink) {
+            var accounts = defaultArraySink.a;
+            for ( var i = 0; i < accounts.length; i++ ) {
+              generateAccountSav(accounts[i]);
+            }
+          });
+      }).then(function() {
+        // build transactionPuts first, when selects are done the list is ready
+        return Promise.all(transactionPuts);
+      });
+    }
+  },
+  
+  {
+    name: 'Join',
+    description: "Finds all transactions for a given customer",
+    dependencies: [ 'Load MLangs', 'Create Transactions' ],
+    code: function async() {
+      var tsink = foam.dao.ArrayDAO.create();
+      var nullSink = foam.dao.QuickSink.create();
+      
+      var promises = [];
+      
+      promises.push(app.customerDAO.where(M.EQ(app.Customer.ID, 2)).select(
+        M.MAP(function(cust) {
+          promises.push(app.accountDAO.where(M.EQ(app.Account.OWNER, cust.id)).select(
+            M.MAP(function(acc) {
+              console.log("account dump", acc.id)
+              promises.push(
+                app.transactionDAO
+                  .where(M.EQ(app.Transaction.ACCOUNT, acc.id))
+                  .select(tsink)
+              );
+            }, nullSink)
+          ));
+        }, nullSink)
+      ));
+
+      return Promise.all(promises).then(function() {
+        foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
+      });
     }
   },
   
@@ -234,3 +267,7 @@ document.write("<hr><pre>"+
 ex.generateExample()+
 eval(ex.generateExample())+
 "</pre>");
+// foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
+// foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
+// foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
+ foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();

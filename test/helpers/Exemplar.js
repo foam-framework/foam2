@@ -164,8 +164,9 @@ foam.CLASS({
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       ret += tabs + '//=====================================================\n';
-      ret += tabs + '//' + this.name + '\n';
-      ret += tabs + '//' + this.description + '\n';
+      ret += tabs + '// ' + this.name + '\n';
+      ret += tabs + '// ' + this.description + '\n';
+      ret += tabs + '//=====================================================\n';
 
       // only keep source indent relative to first line
       var firstLineIndent = -1; 
