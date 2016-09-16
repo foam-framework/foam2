@@ -43,10 +43,10 @@ var td = test.helpers.Exemplar.create({
   isAsync: false,
   dependencies: [ 'testC' ],
   code: foam.String.multiline(function() {/*
-var d = results[0];
-console.log("results",d);
-return d;
-*/}),
+    var d = results[0];
+      console.log("results",d);
+    return d;
+  */}),
 }, reg);
 
 document.write("<hr><pre>"+td.generateExample()+"</pre>");
@@ -59,9 +59,9 @@ var te = test.helpers.Exemplar.create({
   isAsync: false,
   dependencies: [ 'testD', 'testA' ],
   code: foam.String.multiline(function() {/*
-var e = results[0];
-console.log("results2",e);
-*/}),
+    var e = results[0];
+      console.log("results2",e);
+  */}),
 }, reg);
 
 document.write("<hr><pre>"+

@@ -57,7 +57,7 @@ foam.CLASS({
         if ( foam.Function.is(nu) ) {
           return nu.toString();
         }
-        return nu.trim();
+        return nu.replace('\t', '  ');
       }
     },
     {
@@ -91,12 +91,12 @@ foam.CLASS({
       var ret = "";
       var self = this;
       var tabs = "";
-      for ( var i = 0; i < indent.level; i++) { tabs += '\t'; }
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       // outer enclosing - function() {
       if ( self.hasAsyncDeps_ || self.isAsync ) {
         ret += tabs + "(function() {\n";
-        tabs += '\t';
+        tabs += '  ';
         indent.level += 1;
         if ( self.hasAsyncDeps_ ) {
           ret += tabs + "var p = [];\n";
@@ -136,7 +136,7 @@ foam.CLASS({
 
       // outer enclosing end
       if ( self.hasAsyncDeps_ || self.isAsync ) {
-        tabs = tabs.slice(1);
+        tabs = tabs.slice(2);
         indent.level -= 1;
         ret += tabs + '})()\n';
       }
@@ -150,12 +150,24 @@ foam.CLASS({
       var ret = "\n";
       var lines = this.code.split('\n');
       var tabs = "";
-      for ( var i = 0; i < indent.level; i++) { tabs += '\t'; }
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       ret += tabs + '//' + this.name + '\n';
       ret += tabs + '//' + this.description + '\n';
 
+      // only keep source indent relative to first line
+      var firstLineIndent = -1; 
       lines.forEach(function(line) {
+        
+        if ( firstLineIndent < 0 ) {
+          // skip initial blank lines
+          var trimmed = line.trim();
+          if ( trimmed.length == 0 ) return;
+          firstLineIndent = line.indexOf(trimmed);
+          line = trimmed;
+        } else {
+          line = line.slice(firstLineIndent);
+        }
         ret += tabs + line + '\n';
       });
 
