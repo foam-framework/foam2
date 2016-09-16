@@ -123,6 +123,7 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'PredicateProperty',
@@ -1032,6 +1033,11 @@ foam.INTERFACE({
 });
 
 foam.CLASS({
+  refines: 'foam.core.Property',
+  implements: [ 'foam.mlang.order.Comparator' ]
+});
+
+foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Desc',
   implements: ['foam.mlang.order.Comparator'],
@@ -1071,9 +1077,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Max',
+  extends: 'foam.dao.AbstractSink',
 
   implements: [
-    'foam.dao.Sink',
     'foam.mlang.predicate.Unary'
   ],
 

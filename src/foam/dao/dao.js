@@ -528,9 +528,9 @@ foam.CLASS({
     {
       name: 'eof',
       code: function eof() {
-        this.arr.sort(this.comparator.compare || this.comparator);
-        for ( var i = 0 ; i < this.arr.length ; i++ ) {
-          this.delegate.put(this.arr[i]);
+        this.array.sort(this.comparator.compare || this.comparator);
+        for ( var i = 0 ; i < this.array.length ; i++ ) {
+          this.delegate.put(this.array[i]);
         }
       },
       javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
@@ -1016,7 +1016,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArraySink',
-  implements: ['foam.dao.Sink'],
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
     {
