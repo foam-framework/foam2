@@ -230,19 +230,23 @@ var examples = [
       var nullSink = foam.dao.QuickSink.create();
       
       var promises = [];
-      var customerIds = foam.dao.ArraySink.create();
-      var accountIds = foam.dao.ArraySink.create();
+      // to store intermediate reuslts for matching customer IDs
+      var customerIds = foam.dao.ArraySink.create(); 
+      // to store intermediate results for matching account IDs
+      var accountIds = foam.dao.ArraySink.create(); 
+      // Start querying at the top, and produce a larger set of results 
+      //   to sub-query at each step
       return app.customerDAO
-        .where(M.EQ(app.Customer.ID, 2))
-        .select(M.MAP(app.Customer.ID, customerIds))
+        .where(M.EQ(app.Customer.ID, 2)) // a fixed customer ID, in this case
+        .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
         .then(function() {
-          return app.accountDAO
-            .where(M.IN(app.Account.OWNER, customerIds.a))
-            .select(M.MAP(app.Account.ID, accountIds))
+          return app.accountDAO // query matches for the array of customer IDs
+            .where(M.IN(app.Account.OWNER, customerIds.a)) 
+            .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
             .then(function() {
-                return app.transactionDAO
+                return app.transactionDAO // query matches for list of accounts
                   .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
-                  .select(tsink)
+                  .select(tsink) // could dedup, but no duplicates in this case
             });
         }).then(function(results) {
           foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
@@ -268,4 +272,4 @@ eval(ex.generateExample())+
 // foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
 // foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
 // foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
- foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+// foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
