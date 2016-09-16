@@ -55,7 +55,9 @@ foam.CLASS({
       name: 'code',
       adapt: function(old, nu) {
         if ( foam.Function.is(nu) ) {
-          return nu.toString();
+          var matches = nu.toString().match(/function\s*(async)?\(\s*\)\s*\{((?:.|\n)*)\}/);
+          if ( matches[1] ) this.isAsync = true;
+          return matches[2];
         }
         return nu.replace('\t', '  ');
       }
