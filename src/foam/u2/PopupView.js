@@ -51,6 +51,10 @@ foam.CLASS({
     function initE() {
       var self     = this;
       var parent   = this.parentNode;
+      var close    = function() {
+        self.remove();
+        bg.remove();
+      };
 
       if ( ! this.y       ) this.y = (parent.el().clientHeight - this.height)/2;
       if ( ! this.x       ) this.x = (parent.el().clientWidth  - this.width )/2;
@@ -70,7 +74,7 @@ foam.CLASS({
           top: 0,
           zIndex: 998
         }).
-        on('click', this.remove.bind(this)).
+        on('click', close).
         write();
 
       this.
@@ -79,7 +83,7 @@ foam.CLASS({
           left: this.x + 'px',
           top:  this.y + 'px'
         }).
-        onunload.sub(bg.remove.bind(bg));
+        onunload.sub(close);
 
       parent.style({position: 'relative'});
     }
