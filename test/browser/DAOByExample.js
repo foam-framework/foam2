@@ -227,21 +227,17 @@ var examples = [
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
-      var nullSink = foam.dao.QuickSink.create();
-      
       
       // Start querying at the top, and produce a larger set of results 
       //   to sub-query at each step
       return app.customerDAO.find(2)
         .then(function(customer) {
-          var transactionSelectPromises = [];
-          return customer.accounts.select(foam.dao.QuickSink.create({
+          return customer.accounts.select(foam.dao.QuickTransactionSink.create({
             putFn: function(account) {
-              // no route to return promise here, since Sink.put doesn't return a promise...
-              transactionSelectPromises.push(account.transactions.select(tsink));
+              return account.transactions.select(tsink);
             }
-          })).then(function() {
-            return Promise.all(transactionSelectPromises);
+          })).then(function(transactionSink) {
+            return transactionSink.complete();
           })
         }).then(function() {
           foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
