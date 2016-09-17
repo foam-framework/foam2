@@ -667,6 +667,26 @@ foam.CLASS({
       return this.getElementById(this.id);
     },
 
+    function findChildForEvent(e) {
+      var src  = e.srcElement;
+      var el   = this.el();
+      var cMap = {};
+      var cs   = this.children;
+
+      if ( ! el ) return;
+
+      for ( var i = 0 ; i < cs.length ; i++ ) {
+        var c = cs[i];
+        cMap[c.id] = c;
+      }
+
+      while ( src !== el ) {
+        var c = cMap[src.id];
+        if ( c ) return c;
+        src = src.parentElement;
+      }
+    },
+
     function E(opt_nodeName) {
       return this.__subSubContext__.E(opt_nodeName);
     },
