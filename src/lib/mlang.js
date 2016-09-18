@@ -1095,6 +1095,66 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Join',
+  extends: 'foam.dao.AbstractSink',
+  
+  requires: [
+    'foam.mlang.ExpressionsSingleton'
+  ],
+  
+  implements: [
+    //transaction
+  ],
+
+  properties: [
+    {
+      /** the property of incoming put(objects) to match against */
+      name: 'srcProperty',
+    },
+    {
+      /** the property of the dao objects to select matches for */
+      name: 'daoProperty',
+    },
+    {
+      name: 'dao',
+    },
+    {
+      name: 'sink',
+    },
+    {
+      name: 'transactionPromises_',
+      factory: function() { return []; }
+    },
+    {
+      name: 'm',
+      factory: function() { return this.ExpressionsSingleton.create(); }
+    }
+  ],
+
+  methods: [
+    function put(obj) {
+      var sink = this.sink;
+      var p = this.dao.where(this.m.EQ(this.daoProperty, this.srcProperty.f(obj))).select(sink);
+      // if select always waited for eof()'s returned a promise, this if logic would be avoided
+      if ( sink.complete ) p = p.then(function() { return sink.complete(); });
+      this.transactionPromises_.push(p);
+    },
+    
+    function complete() {
+      var p = Promise.all(this.transactionPromises_);
+      this.transactionPromises_ = [];
+      return p;
+    },
+
+    function toString() {
+      return 'JOIN('+this.predicate.toString()+', '+this.dao.toString()+')';
+    }
+  ]
+});
+
+
 
 foam.CLASS({
   package: 'foam.mlang',
@@ -1123,7 +1183,8 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc'
+    'foam.mlang.order.Desc',
+    'foam.mlang.sink.Join'
   ],
 
   methods: [
@@ -1162,7 +1223,16 @@ foam.CLASS({
     function COUNT() { return this.Count.create(); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
+    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    
+    function JOIN(prop, dao, daoProp, sink) { 
+      return this.Join.create({ 
+        srcProperty: prop, 
+        dao: dao,
+        daoProperty: daoProp, 
+        sink: sink 
+      });
+    },
   ]
 });
 

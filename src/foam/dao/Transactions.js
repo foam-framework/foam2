@@ -83,7 +83,7 @@ foam.CLASS({
       this.promises_ = [];
       return p;
     },
-    function rollback() { // error
+    function rollback() { // 
       // TODO: journal and roll back
       throw "Rollback not supported";
     }

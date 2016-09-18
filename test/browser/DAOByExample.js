@@ -244,6 +244,27 @@ var examples = [
         });
     }
   },
+
+  {
+    name: 'Join Mlang',
+    description: "Finds all transactions for a given customer",
+    dependencies: [ 'Load MLangs', 'Create Transactions' ],
+    code: function async() {
+      var tsink = foam.dao.ArrayDAO.create();
+      
+      // Start querying at the top, and produce a larger set of results 
+      //   to sub-query at each step
+      return app.customerDAO
+        .where(M.EQ(app.Customer.ID, 2)).select(
+          M.JOIN(app.Customer.ID, app.accountDAO, app.Account.OWNER, 
+            M.JOIN(app.Account.ID, app.transactionDAO, app.Transaction.ACCOUNT, tsink)
+          )
+        ).then(function() {
+          foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
+        });
+    }
+  },
+
   
   // {
   //   name: 'Manual Join',
