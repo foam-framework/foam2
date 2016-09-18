@@ -125,28 +125,6 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    /** @private */
-    function onRemoteUpdate(s, on, event, obj) {
-      if ( event == 'put' ) {
-        this.processFromServer(obj);
-      } else if ( event === 'remove' ) {
-        this.delegate.remove(obj);
-      } else if ( event === 'reset' ) {
-        this.delegate.removeAll();
-      }
-    },
-
-    {
-      /** @private */
-      name: 'onLocalUpdate',
-      isMerged: 100,
-      code: function() {
-        this.sync();
-      }
-    }
-  ],
-
   methods: [
     /** @private */
     function init() {
@@ -261,6 +239,28 @@ foam.CLASS({
     function sync() {
       this.syncToServer();
       this.syncFromServer();
+    }
+  ],
+
+  listeners: [
+    /** @private */
+    function onRemoteUpdate(s, on, event, obj) {
+      if ( event == 'put' ) {
+        this.processFromServer(obj);
+      } else if ( event === 'remove' ) {
+        this.delegate.remove(obj);
+      } else if ( event === 'reset' ) {
+        this.delegate.removeAll();
+      }
+    },
+
+    {
+      /** @private */
+      name: 'onLocalUpdate',
+      isMerged: 100,
+      code: function() {
+        this.sync();
+      }
     }
   ]
 });

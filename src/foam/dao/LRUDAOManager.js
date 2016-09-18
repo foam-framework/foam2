@@ -27,6 +27,22 @@ foam.CLASS({
 
   requires: [ 'foam.dao.MDAO' ],
 
+  classes: [
+    {
+      /** Links an object id to a last-accessed timestamp */
+      name: 'LRUCacheItem',
+      properties: [
+        {
+          name: 'id',
+        },
+        {
+          class: 'Int',
+          name: 'timestamp'
+        }
+      ]
+    }
+  ],
+
   properties: [
     {
       /** The maximum size to allow the target dao to be. */
@@ -66,19 +82,25 @@ foam.CLASS({
     }
   ],
 
-  classes: [
-    {
-      /** Links an object id to a last-accessed timestamp */
-      name: 'LRUCacheItem',
-      properties: [
-        {
-          name: 'id',
-        },
-        {
-          class: 'Int',
-          name: 'timestamp'
-        }
-      ]
+  methods: [
+    /** Calculates a timestamp to use in the tracking dao. Override to
+      provide a different timestamp calulation. */
+    function getTimestamp() {
+      // Just increment on each request.
+      return this.lastTimeUsed_++;
+    },
+
+    /**  */
+    function cleanup() {
+      var self = this;
+      self.trackingDAO
+        .orderBy(this.DESC(self.LRUCacheItem.TIMESTAMP))
+        .skip(self.maxSize)
+        .select({
+          put: function(obj) {
+            self.dao.remove(obj);
+          }
+        });
     }
   ],
 
@@ -102,31 +124,10 @@ foam.CLASS({
       // ensure tracking DAO is cleaned up
       this.trackingDAO.remove(obj);
     },
+
     /** On reset, clear the tracking dao. */
     function onReset(s, on, reset, obj) {
       this.trackingDAO.removeAll(obj);
-    },
-  ],
-
-  methods: [
-    /** Calculates a timestamp to use in the tracking dao. Override to
-      provide a different timestamp calulation. */
-    function getTimestamp() {
-      // Just increment on each request.
-      return this.lastTimeUsed_++;
-    },
-
-    /**  */
-    function cleanup() {
-      var self = this;
-      self.trackingDAO
-        .orderBy(this.DESC(self.LRUCacheItem.TIMESTAMP))
-        .skip(self.maxSize)
-        .select({
-          put: function(obj) {
-            self.dao.remove(obj);
-          }
-        });
     }
   ]
 });

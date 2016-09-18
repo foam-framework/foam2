@@ -33,7 +33,6 @@ foam.CLASS({
     'foam.dao.InternalException'
   ],
 
-
   properties: [
     {
       /** The property to set uniquely. */
