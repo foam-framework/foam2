@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Plan',
@@ -24,7 +23,7 @@ foam.CLASS({
     {
       name: 'cost',
       value: 0
-    },
+    }
   ],
 
   methods: [
