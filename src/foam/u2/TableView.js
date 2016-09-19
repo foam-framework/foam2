@@ -59,7 +59,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableBodySink',
-  implements: ['foam.dao.Sink'],
+  extends: 'foam.dao.AbstractSink',
   requires: [
     'foam.u2.TableBody'
   ],
