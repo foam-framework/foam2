@@ -528,7 +528,9 @@ foam.LIB({
     },
     function hashCode(o) { return 0; },
     function freeze(o) {
-      o.$UID;
+      // Force $UID creation before freezing because it can't
+      // be added to the object after it's frozen.
+      o.$UID__ = foam.next$UID();
       Object.freeze(o);
     }
   ]
