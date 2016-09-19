@@ -47,7 +47,9 @@ foam.CLASS({
   methods: [
     function initE() {
       // Just starts out empty.
-      this.cssClass(this.myCls());
+      this.
+        cssClass(this.myCls()).
+        on('click', this.onClick);
 
       // Kick off the select(), that will populate the view.
       this.data.on.put.sub(this.onDAOPut);
@@ -72,6 +74,11 @@ foam.CLASS({
   ],
 
   listeners: [
+    function onClick(e) {
+      var c = this.findChildForEvent(e);
+      if ( c ) this.rowClick.pub(c.data);
+    },
+
     function daoPut(obj) {
       if ( this.rows_[obj.id] ) {
         this.rows_[obj.id].data = obj;
@@ -79,11 +86,6 @@ foam.CLASS({
       }
 
       var child = this.createRowView(obj, this.__subContext__.createSubContext());
-
-      // TODO: make a single listener of this
-      child.on('click', function() {
-        this.rowClick.pub(child.data);
-      }.bind(this));
       this.rows_[obj.id] = child;
       this.add(child);
     },

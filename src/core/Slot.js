@@ -52,10 +52,41 @@ foam.CLASS({
     /**
       Link two Slots together, setting both to other's value.
       Returns a Destroyable which can be used to break the link.
+      After copying a value from one slot to the other, this implementation
+      then copies the value back in case the target slot rejected the value.
     */
-    function linkFrom(other) {
-      var sub1 = this.follow(other);
-      var sub2 = other.follow(this);
+    function linkFrom(s2) {
+      var s1       = this;
+      var feedback = false;
+
+      // TODO: once all slot types property set 'src', these
+      // two listeneners can be merged.
+      var l1 = function(e) {
+        if ( feedback ) return;
+
+        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+            feedback = true;
+            s2.set(s1.get());
+            s1.set(s2.get());
+            feedback = false;
+        }
+      };
+
+      var l2 = function(e) {
+        if ( feedback ) return;
+
+        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+            feedback = true;
+            s1.set(s2.get());
+            s2.set(s1.get());
+            feedback = false;
+        }
+      };
+
+      var sub1 = s1.sub(l1);
+      var sub2 = s2.sub(l2)
+
+      l2();
 
       return {
         destroy: function() {
@@ -172,7 +203,9 @@ foam.CLASS({
     },
 
     function sub(l) {
-      return this.obj.sub('propertyChange', this.prop.name, l);
+      var s = this.obj.sub('propertyChange', this.prop.name, l);
+      s.src = this;
+      return s;
     },
 
     function unsub(l) {

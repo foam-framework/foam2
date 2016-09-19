@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.md.tag',
   name: 'PaperInput',
   extends: 'foam.u2.tag.Input',
+
   properties: [
     [ 'nodeName', 'paper-input' ],
     {
@@ -40,6 +42,7 @@ foam.CLASS({
             this.label$)
       });
     },
+
     function link() {
       this.attrSlot(null, this.onKey ? 'input' : 'change').linkFrom(this.data$);
     }

@@ -14,16 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'GroupBySearchView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.mlang.Constant',
     'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
     'foam.u2.view.ChoiceView'
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^ select {
+          width: 100%;
+        }
+      */}
+    })
   ],
 
   properties: [
@@ -158,15 +170,5 @@ foam.CLASS({
         this.updatePredicate_(slot.get());
       }
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ select {
-          width: 100%;
-        }
-      */}
-    })
   ]
 });

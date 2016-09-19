@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'TextSearchView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.True',
@@ -87,6 +89,7 @@ foam.CLASS({
       this.view.end();
       this.view.data$.sub(this.updateValue);
     },
+
     function clear() {
       this.view.data = '';
       this.predicate = this.True.create();

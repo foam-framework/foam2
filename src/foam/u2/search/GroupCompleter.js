@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'GroupCompleter',
   extends: 'foam.u2.Autocompleter',
+
   requires: [
     'foam.dao.MDAO',
     'foam.dao.ProxyDAO',

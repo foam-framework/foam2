@@ -527,6 +527,10 @@ foam.LIB({
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
     function hashCode(o) { return 0; },
+    function freeze(o) {
+      o.$UID;
+      Object.freeze(o);
+    }
   ]
 });
 

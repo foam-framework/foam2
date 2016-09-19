@@ -114,7 +114,6 @@ foam.CLASS({
 });
 
 
-
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
