@@ -2,15 +2,22 @@ package foam.dao;
 
 import foam.core.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 public class MapDAO extends AbstractDAO {
   private Map<Object, FObject> data_ = null;
 
+  private synchronized void data_factory() {
+    if ( data_ == null ) {
+      data_ = (Map<Object, FObject>)getX().create(ConcurrentHashMap.class);
+    }
+  }
+
   private Map<Object, FObject> getData() {
     if ( data_ == null ) {
-      data_ = (HashMap<Object, FObject>)getX().create(HashMap.class);
+      data_factory();
     }
     return data_;
   }
@@ -25,6 +32,7 @@ public class MapDAO extends AbstractDAO {
   public ClassInfo getOf() {
     return of_;
   }
+
   public MapDAO setOf(ClassInfo of) {
     of_ = of;
     primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
@@ -37,7 +45,6 @@ public class MapDAO extends AbstractDAO {
 
   public FObject put(FObject obj) {
     getData().put(getPrimaryKey().get(obj), obj);
-
     return obj;
   }
 
@@ -51,12 +58,12 @@ public class MapDAO extends AbstractDAO {
     return result;
   }
 
-  public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    if ( s == null ) {
-      s = new ListSink();
+  public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    if ( sink == null ) {
+      sink = new ListSink();
     }
 
-    s = decorateSink_(s, skip, limit, order, predicate);
+    Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
     FlowControl fc = (FlowControl)getX().create(FlowControl.class);
 
@@ -65,17 +72,17 @@ public class MapDAO extends AbstractDAO {
         break;
       }
 
-      s.put(obj, fc);
+      decorated.put(obj, fc);
     }
 
     if ( fc.getErrorEvt() != null ) {
-      s.error();
-      return s;
+      decorated.error();
+      return sink;
     }
 
-    s.eof();
+    decorated.eof();
 
-    return s;
+    return sink;
   }
 
   public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
