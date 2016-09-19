@@ -1105,13 +1105,29 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Join',
   extends: 'foam.dao.AbstractSink',
-  
+
   requires: [
     'foam.mlang.ExpressionsSingleton'
   ],
-  
+
   implements: [
     //transaction
+  ],
+
+  classes: [
+    {
+      name: 'AggregatorSink',
+      extends: 'foam.dao.ProxySink',
+
+      methods: [
+        function eof() {
+          // nop
+        },
+        function forceEof() {
+          return this.delegate.eof();
+        }
+      ]
+    }
   ],
 
   properties: [
@@ -1128,6 +1144,12 @@ foam.CLASS({
     },
     {
       name: 'sink',
+      adapt: function(old, nu) {
+        if ( ! this.AggregatorSink.isInstance(nu) ) {
+          return this.AggregatorSink.create({ delegate: nu });
+        }
+        return nu;
+      }
     },
     {
       name: 'transactionPromises_',
@@ -1147,7 +1169,12 @@ foam.CLASS({
       if ( sink.complete ) p = p.then(function() { return sink.complete(); });
       this.transactionPromises_.push(p);
     },
-    
+    function eof() {
+      // Guard our result sink against multiple eof()s from the selects we issue,
+      // and send out one eof() now, when the Join itself is eof()'d
+      this.sink.forceEof();
+    },
+
     function complete() {
       var p = Promise.all(this.transactionPromises_);
       this.transactionPromises_ = [];
@@ -1230,13 +1257,13 @@ foam.CLASS({
 
     function DESC(a) { return this._unary_("Desc", a); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
-    
-    function JOIN(prop, dao, daoProp, sink) { 
-      return this.Join.create({ 
-        srcProperty: prop, 
+
+    function JOIN(prop, dao, daoProp, sink) {
+      return this.Join.create({
+        srcProperty: prop,
         dao: dao,
-        daoProperty: daoProp, 
-        sink: sink 
+        daoProperty: daoProp,
+        sink: sink
       });
     },
   ]
