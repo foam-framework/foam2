@@ -151,7 +151,7 @@
       });
 
       sub.$UID__ = foam.next$UID();
-      Object.freeze(sub);
+      foam.Object.freeze(sub);
 
       return sub;
     }
