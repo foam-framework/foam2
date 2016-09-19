@@ -110,7 +110,7 @@ foam.CLASS({
       documentation: 'The index of the current choice in the choices array.',
       transient: true,
       value: -1,
-      adapt: function(old, nu) {
+      preSet: function(old, nu) {
         if ( this.choices.length === 0 && this.dao ) return nu;
         if ( nu < 0 || this.choices.length === 0 ) return 0;
         if ( nu >= this.choices.length ) return this.choices.length - 1;
