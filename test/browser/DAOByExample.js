@@ -5,7 +5,7 @@ var examples = [
     name: 'Load MLangs',
     description: "Loads the mlang query langauage",
     code: function() {
-      global.M = foam.mlang.ExpressionsSingleton.create();
+      var M = foam.mlang.ExpressionsSingleton.create();
     }
   },
   {
@@ -21,7 +21,7 @@ var examples = [
         package: 'example',
         name: 'Customer',
         properties: [ 'id', 'firstName', 'lastName' ]
-      });      
+      });
       foam.CLASS({
         package: 'example',
         name: 'Account',
@@ -34,10 +34,10 @@ var examples = [
           'id',
           'label',
           'amount',
-          { class: 'Date', name: 'date' }, 
+          { class: 'Date', name: 'date' },
         ]
       });
-      
+
       // relate with foreign key relationships
       foam.RELATIONSHIP({
         sourceModel: 'example.Bank',
@@ -57,7 +57,7 @@ var examples = [
         targetModel: 'example.Transaction',
         inverseName: 'account'
       });
-      
+
       // create the example app with our DAOs exported
       foam.CLASS({
         package: 'example',
@@ -105,7 +105,7 @@ var examples = [
           }},
         ]
       });
-      global.app = example.BankApp.create();
+      var app = example.BankApp.create();
     }
   },
   {
@@ -143,7 +143,7 @@ var examples = [
     code: function async() {
       // we want to wait for the puts to complete, so save the promises
       accountPuts = [];
-      // Generate accounts for each customer. Select into an in-line 
+      // Generate accounts for each customer. Select into an in-line
       // sink to process results as they come in.
       return app.customerDAO.select(foam.dao.QuickSink.create({
         putFn: function(customer) {
@@ -151,7 +151,7 @@ var examples = [
           // so we know all the puts have completed.
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'sav' })));
-        } 
+        }
       })).then(function() {
         return Promise.all(accountPuts);
       });
@@ -164,11 +164,11 @@ var examples = [
     code: function async() {
       // we want to wait for the puts to complete, so save the promises
       transactionPuts = [];
-      
-      // Generate transactions for each account. 
+
+      // Generate transactions for each account.
       var amount = 0;
       var date = new Date(0);
-      
+
       // functions to generate some data
       function generateAccountChq(account) {
         for ( var j = 0; j < 10; j++ ) {
@@ -187,15 +187,15 @@ var examples = [
             date: new Date(date),
             label: 's'+amount+'s',
             amount: ((amount += 1.5) % 50)
-          })));        
+          })));
         }
       }
-      
-      // Select into an ArraySink, which dumps the results of the query to a 
+
+      // Select into an ArraySink, which dumps the results of the query to a
       // plain array, and run data generating functions for each one.
       // Calling select() with no arguments resolves with an ArraySink.
       // If you pass a sink to .select(mySink), your sink is resolved.
-      
+
       // Select 'chq' accounts first
       return app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
         .select().then(function(defaultArraySink) {
@@ -220,7 +220,7 @@ var examples = [
       });
     }
   },
-  
+
   {
     name: 'Join',
     description: "Finds all transactions for a given customer",
@@ -228,9 +228,9 @@ var examples = [
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
       var nullSink = foam.dao.QuickSink.create();
-      
-      
-      // Start querying at the top, and produce a larger set of results 
+
+
+      // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
       return app.customerDAO.find(2)
         .then(function(customer) {
@@ -248,7 +248,7 @@ var examples = [
         });
     }
   },
-  
+
   // {
   //   name: 'Manual Join',
   //   description: "Without using Relationships, finds all transactions for a given customer",
@@ -281,12 +281,12 @@ var examples = [
   //       });
   //   }
   // },
-  
+
 ].forEach(function(def) {
   ex = test.helpers.Exemplar.create(def, reg);
   // Note: eval() for each exemplar may be async, so don't
   // nuke the context without waiting for the promise to resolve
-  
+
   //foam.__context__ = oldContext;
   //varoldContext = foam.__context__;
   //foam.__context__ = foam.createSubContext({});

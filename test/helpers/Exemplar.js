@@ -88,70 +88,39 @@ foam.CLASS({
       this.registry.register(this);
     },
 
-    function generateExample(indent, syncDepsLoaded) {
+    function generateExample(indent) {
       if ( ! indent ) indent = { level: 0 };
-      if ( ! syncDepsLoaded ) 
-        syncDepsLoaded = {};
-      else
-        syncDepsLoaded = { __proto__: syncDepsLoaded }
       var ret = "";
       var self = this;
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
-      // outer enclosing - function() {
-      if ( self.hasAsyncDeps_ || self.isAsync ) {
-        ret += tabs + "(function() {\n";
-        tabs += '  ';
-        indent.level += 1;
-        if ( self.hasAsyncDeps_ ) {
-          ret += tabs + "var p = [];\n";
-        }
+      // flatten dependencies
+      var deps = this.flattenDependencies();
+
+      deps.sync.forEach(function(dep) {
+        ret += dep.outputSelf(indent);
+      });
+
+
+      if ( deps.async.length ) {
+        ret += tabs + "Promise.resolve({\n";
+      }
+      deps.async.forEach(function(dep) {
+        ret += tabs + "}).then(function() {\n";
+        ret += dep.outputSelf(indent);
+      });
+      if ( deps.async.length ) {
+        ret += tabs + "}).then(function() {\n";
       }
 
-        // output each dependency
-        if ( self.dependencies ) {
-          self.dependencies.forEach(function(depName) {
-            // don't reload deps already installed above our scope
-            // (async deps are inside functions and not visible)
-            if ( syncDepsLoaded[depName] ) return; 
-            
-            var dep = self.registry.lookup(depName);
-            if ( dep.hasAsyncDeps_ || dep.isAsync ) {
-              indent.level += 1;
-              ret += tabs + "p.push(\n";
-              ret += dep.generateExample(indent, syncDepsLoaded);
-              ret += tabs + ");\n";
-              indent.level -= 1;
-            } else {
-              syncDepsLoaded[dep.name] = true;
-              ret += dep.generateExample(indent, syncDepsLoaded);
-            }
-          });
-        }
-        // in the simple case we just concat the code, but if anything is async
-        // we have to decorate ourselves to become async
-        // inner enclosing - function(results) {
-        if ( self.hasAsyncDeps_ ) {
-          ret += tabs + "return Promise.all(p).then(function(results) {\n";
-          indent.level += 1;
-        }
+      ret += self.outputSelf(indent);
 
-          ret += self.outputSelf(indent);
-
-        // inner enclosing end
-        if ( self.hasAsyncDeps_ ) {
-          ret += tabs + '})\n';
-          indent.level -= 1;
-        }
-
-      // outer enclosing end
-      if ( self.hasAsyncDeps_ || self.isAsync ) {
-        tabs = tabs.slice(2);
+      // inner enclosing end
+      if ( deps.async.length ) {
+        ret += tabs + '})\n';
         indent.level -= 1;
-        ret += tabs + '})()\n';
       }
-
 
       return ret;
     },
@@ -169,9 +138,9 @@ foam.CLASS({
       ret += tabs + '//=====================================================\n';
 
       // only keep source indent relative to first line
-      var firstLineIndent = -1; 
+      var firstLineIndent = -1;
       lines.forEach(function(line) {
-        
+
         if ( firstLineIndent < 0 ) {
           // skip initial blank lines
           var trimmed = line.trim();
@@ -187,6 +156,44 @@ foam.CLASS({
       ret += "\n";
 
       return ret;
+    },
+
+    function flattenDependencies(depsLoaded) {
+      var self = this;
+      if ( ! self.dependencies ) {
+        return {
+          sync: [],
+          async: []
+        };
+      } else {
+        depsLoaded = depsLoaded || {};
+
+        var syncDeps = [];
+        var asyncDeps = [];
+
+        self.dependencies.forEach(function(depName) {
+          if ( depsLoaded[depName] ) return; // only load each dependency once
+
+          var dep = self.registry.lookup(depName);
+          var depDeps = dep.flattenDependencies(depsLoaded);
+
+          syncDeps = syncDeps.concat(depDeps.sync);
+          asyncDeps = asyncDeps.concat(depDeps.async);
+
+          depsLoaded[dep.name] = true;
+
+          if ( dep.hasAsyncDeps_ || dep.isAsync ) {
+            asyncDeps.push(dep);
+          } else {
+            syncDeps.push(dep);
+          }
+        });
+        return {
+          sync: syncDeps,
+          async: asyncDeps
+        }
+      }
+
     }
 
   ]
