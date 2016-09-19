@@ -100,6 +100,7 @@ foam.CLASS({
         return self.delegate.put(srcObj);
       })
     },
+
     /** Removes are sent to the cache and to the source, ensuring both
       are up to date. */
     function remove(o) {
@@ -116,7 +117,6 @@ foam.CLASS({
         return self.delegate.removeAll(skip, limit, order, predicate);
       })
     }
-
   ],
 
   listeners: [

@@ -348,7 +348,8 @@ foam.CLASS({
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
-          if ( this.hasOwnProperty(name) ) return this.instance_[name];
+          var v = this.instance_[name];
+          if ( v !== undefined ) return v;
           // Indicate the Factory In Progress state
           if ( fip > 10 && this.getPrivate_(FIP) ) {
             console.warn('reentrant factory', name);
@@ -371,7 +372,7 @@ foam.CLASS({
         } :
         hasValue ? function valueGetter() {
           var v = this.instance_[name];
-          return typeof v !== 'undefined' ? v : value ;
+          return v !== undefined ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 

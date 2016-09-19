@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'NullDAO',
@@ -23,22 +24,27 @@ foam.CLASS({
     'foam.dao.ExternalException',
     'foam.dao.ObjectNotFoundException'
   ],
+
   methods: [
     function put(obj) {
       return Promise.reject(this.ExternalException.create({
         message: 'NullDAO: Cannot handle put()'
       }));
     },
+
     function remove(obj) {
       return Promise.resolve();
     },
+
     function find(id) {
       return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
     },
+
     function select(sink) {
       sink.eof();
       return Promise.resolve(sink);
     },
+
     function removeAll() {
       return Promise.resolve();
     }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'SearchManager',
@@ -60,6 +61,7 @@ foam.CLASS({
         args: Object.keys(views).map(function(k) { return views[k].predicate; })
       }).partialEval();
     },
+
     function add(view) {
       // Check the view's name, and if it's a duplicate, change its name to add
       // a number.
@@ -76,6 +78,7 @@ foam.CLASS({
       this.updateViews();
       return view;
     },
+
     function remove(viewOrName) {
       var view;
       var name;
@@ -94,6 +97,7 @@ foam.CLASS({
       delete this.views[name];
       delete this.subs_[name];
     },
+
     function removeAll() {
       this.clear();
       foam.Object.forEach(this.subs_, function(sub) {

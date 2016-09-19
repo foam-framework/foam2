@@ -27,9 +27,9 @@ foam.CLASS({
       name: 'element',
       required: true
     },
-    [ 'property',       'value'  ],
-    [ 'event',          'change' ],
-    [ 'firstListener_', true     ]
+    'value',
+    [ 'property', 'value'  ],
+    [ 'event',    'change' ]
   ],
 
   methods: [
@@ -38,18 +38,25 @@ foam.CLASS({
     },
 
     function set(value) {
+      // The next line is necessary to fire a change event.
+      // This is necessary because DOM isn't proper MVC and
+      // doesn't fire a change event when the value is explicitly set.
+      this.value = value;
       this.element.setAttribute(this.property, value);
     },
 
     function sub(l) {
-      this.element.on(this.event, l);
-      return {
-        destroy: function() { this.unsub(l); }.bind(this)
-      };
+      if ( ! this.hasListeners() ) {
+        var self = this;
+        this.element.on(this.event, function() {
+          self.value = self.get();
+        });
+      }
+      this.SUPER('propertyChange', 'value', l);
     },
 
     function unsub(l) {
-      this.element.on(this.event, l);
+      this.SUPER('propertyChange', 'value', l);
     },
 
     function toString() {

@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'FilterController',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.mlang.sink.Count',
     'foam.u2.TableView',
@@ -37,6 +39,57 @@ foam.CLASS({
 
   exports: [
     'as filterController'
+  ],
+
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^ {
+          display: flex;
+          overflow: hidden;
+          flex-grow: 1;
+          width: 100%;
+        }
+        ^search-panel {
+          display: flex;
+          flex-direction: column;
+          flex-shrink: 0;
+          overflow: hidden;
+          min-width: 250px;
+        }
+        ^adding {
+          border: 1px solid #e0e0e0;
+          padding: 8px;
+        }
+        ^add-filter {
+          align-items: center;
+          display: flex;
+          justify-content: space-between;
+        }
+        ^count {
+          align-items: center;
+          display: flex;
+          justify-content: space-between;
+        }
+        ^results {
+          display: flex;
+          flex-grow: 1;
+          overflow: auto;
+        }
+
+        ^filter-header {
+          align-items: center;
+          display: flex;
+        }
+        ^filter-label {
+          flex-grow: 1;
+        }
+        ^filter-container {
+          margin: 12px;
+        }
+      */}
+    })
   ],
 
   properties: [
@@ -375,63 +428,15 @@ foam.CLASS({
         this.addFilter_(this.filterChoice);
       }
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          display: flex;
-          overflow: hidden;
-          flex-grow: 1;
-          width: 100%;
-        }
-        ^search-panel {
-          display: flex;
-          flex-direction: column;
-          flex-shrink: 0;
-          overflow: hidden;
-          width: 250px;
-        }
-        ^adding {
-          border: 1px solid #e0e0e0;
-          padding: 8px;
-        }
-        ^add-filter {
-          align-items: center;
-          display: flex;
-          justify-content: space-between;
-        }
-        ^count {
-          align-items: center;
-          display: flex;
-          justify-content: space-between;
-        }
-        ^results {
-          display: flex;
-          flex-grow: 1;
-          overflow: auto;
-        }
-
-        ^filter-header {
-          align-items: center;
-          display: flex;
-        }
-        ^filter-label {
-          flex-grow: 1;
-        }
-        ^filter-container {
-          margin: 12px;
-        }
-      */}
-    })
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'PropertyRefinement',
   refines: 'foam.core.Property',
+
   properties: [
     {
       // Set this field to override the default logic for choosing a view.
@@ -442,10 +447,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'BooleanRefinement',
   refines: 'foam.core.Boolean',
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -454,11 +461,13 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'EnumRefinement',
   refines: 'foam.core.Enum',
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -467,4 +476,3 @@ foam.CLASS({
     }
   ]
 });
-

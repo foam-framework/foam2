@@ -25,6 +25,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'LazyCacheDAO',
   extends: 'foam.dao.ProxyDAO',
+
   implements: [ 'foam.mlang.Expressions' ],
 
   requires: [ 'foam.dao.ArraySink' ],
@@ -127,7 +128,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     /** Ensures removal from both cache and delegate before resolving. */
     function remove(obj) {
       var self = this;

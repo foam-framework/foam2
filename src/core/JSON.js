@@ -470,7 +470,7 @@ foam.LIB({
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
               if ( prop ) {
-                json[key] = prop.fromJSON(json[key], opt_ctx);
+                json[key] = prop.fromJSON(json[key], opt_ctx, prop);
               }
             }
 

@@ -29,6 +29,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
   requires: [
@@ -402,6 +403,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /** An Index for storing multi-valued properties. **/
 foam.CLASS({

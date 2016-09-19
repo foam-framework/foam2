@@ -47,10 +47,12 @@ foam.CLASS({
       this.logger('put', obj);
       return this.SUPER(obj);
     },
+
     function remove(obj) {
       this.logger('remove', obj);
       return this.SUPER(obj);
     },
+
     function select(sink, skip, limit, order, predicate) {
       this.logger('select', skip, limit, order, predicate);
       sink = sink || this.ArraySink.create();
@@ -67,10 +69,12 @@ foam.CLASS({
       }
       return this.SUPER(sink, skip, limit, order, predicate);
     },
+
     function removeAll(sink, skip, limit, order, predicate) {
       this.logger('removeAll', skip, limit, order, predicate);
       return this.SUPER(sink, skip, limit, order, predicate);
     },
+
     function find(id) {
       this.logger('find', id);
       return this.SUPER(id);

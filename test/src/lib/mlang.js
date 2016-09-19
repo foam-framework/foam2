@@ -369,14 +369,6 @@ describe('MLang', function() {
     });
   });
 
-  it('Boolean properties can be used alone', function(done) {
-    dao.where(test.mlang.Person.DECEASED).select()
-    .then(function(sink) {
-      expect(sink.a.length).toBe(2);
-      done();
-    });
-  });
-
   describe('NOT()', function() {
     var NOT;
     var EQ;
