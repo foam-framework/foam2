@@ -8,19 +8,19 @@ import foam.mlang.order.*;
 
 public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
   public DAO where(Predicate predicate) {
-    return ((FilteredDAO)getX().create(FilteredDAO.class)).setPredicate(predicate);
+    return ((FilteredDAO)getX().create(FilteredDAO.class)).setPredicate(predicate).setDelegate(this);
   }
 
   public DAO orderBy(Comparator comparator) {
-    return ((OrderedDAO)getX().create(OrderedDAO.class)).setOrder(comparator);
+    return ((OrderedDAO)getX().create(OrderedDAO.class)).setOrder(comparator).setDelegate(this);
   }
 
   public DAO skip(int count) {
-    return ((SkipDAO)getX().create(SkipDAO.class)).setSkip(count);
+    return ((SkipDAO)getX().create(SkipDAO.class)).setSkip(count).setDelegate(this);
   }
 
   public DAO limit(int count) {
-    return ((LimitedDAO)getX().create(LimitedDAO.class)).setLimit(count);
+    return ((LimitedDAO)getX().create(LimitedDAO.class)).setLimit(count).setDelegate(this);
   }
 
   public void pipe(foam.dao.Sink sink) {
@@ -29,19 +29,19 @@ public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
 
   protected Sink decorateSink_(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
     if ( limit != null ) {
-      sink = ((LimitedSink)getX().create(LimitedSink.class)).setLimit(limit.intValue());
+      sink = ((LimitedSink)getX().create(LimitedSink.class)).setLimit(limit.intValue()).setDelegate(sink);
     }
 
     if ( skip != null ) {
-      sink = ((SkipSink)getX().create(SkipSink.class)).setSkip(skip.intValue());
+      sink = ((SkipSink)getX().create(SkipSink.class)).setSkip(skip.intValue()).setDelegate(sink);
     }
 
     if ( order != null ) {
-      sink = ((OrderedSink)getX().create(OrderedSink.class)).setComparator(order);
+      sink = ((OrderedSink)getX().create(OrderedSink.class)).setComparator(order).setDelegate(sink);
     }
 
     if ( predicate != null ) {
-      sink = ((PredicatedSink)getX().create(PredicatedSink.class)).setPredicate(predicate);
+      sink = ((PredicatedSink)getX().create(PredicatedSink.class)).setPredicate(predicate).setDelegate(sink);
     }
 
     return sink;
