@@ -7,54 +7,9 @@ if [ "$SCRIPT_PATH" ] && [ "$SCRIPT_PATH" != ${0} ]; then
     cd $SCRIPT_PATH
 fi
 
-cat \
-    ../../core/lib.js \
-    ../../core/stdlib.js \
-    ../../core/events.js \
-    ../../core/Context.js \
-    ../../core/Boot.js \
-    ../../core/FObject.js \
-    ../../core/Model.js \
-    ../../core/Property.js \
-    ../../core/Method.js \
-    ../../core/PubSub.js \
-    ../../core/String.js \
-    ../../core/Array.js \
-    ../../core/Boolean.js \
-    ../../core/Int.js \
-    ../../core/AxiomArray.js \
-    ../../core/EndBoot.js \
-    ../../core/Topic.js \
-    ../../core/Constant.js \
-    ../../core/InnerClass.js \
-    ../../core/Implements.js \
-    ../../core/ImportsExports.js \
-    ../../core/Listener.js \
-    ../../core/Identity.js \
-    ../../core/Requires.js \
-    ../../core/Slot.js \
-    ../../core/debug.js \
-    ../../core/Window.js \
-    ../../core/objects.js \
-    ../../core/patterns.js \
-    ../../core/types.js \
-    ../../core/JSON.js \
-    ../../core/parse.js \
-    ../../core/templates.js \
-    ../../core/Action.js \
-    ../../core/../lib/Timer.js \
-    ../../core/../lib/graphics.js \
-    ../../core/../lib/dao.js \
-    ../../core/../lib/IDBDAO.js \
-    ../../core/../lib/mlang.js \
-    ../../core/../lib/Physical.js \
-    ../../core/../lib/Collider.js \
-    ../../core/../lib/PhysicsEngine.js \
-    ../../core/../lib/PhysicalCircle.js \
-    ../../core/../lib/utf8.js \
-    ../../core/../lib/net.js \
-    ../../core/../lib/firebase.js \
-    ../../core/../lib/box.js \
+node ../../../tools/build.js
+
+cat ../../../foam-bin.js \
     chat.js \
     > site/public/foam.js
 
@@ -67,6 +22,7 @@ copy sw.js
 copy worker.js
 copy sharedWorker.js
 copy style.css
+copy manifest.json
 copy index.html
 
 cd site

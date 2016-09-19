@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script language="javascript" src="../../../../../foam.js"></script>
+    <script language="javascript" src="Hero.js"></script>
+    <script language="javascript" src="CitationView.js"></script>
+    <script language="javascript" src="DashboardCitationView.js"></script>
+    <script language="javascript" src="Controller.js"></script>
+  </head>
+  <body>
+    <script>
+      var heroDAO = foam.dao.EasyDAO.create({
+        of: com.google.foam.demos.heroes.Hero,
+        seqNo: true,
+        daoType: 'MDAO'
+      });
+
+      foam.json.parse([
+          { id: 11, name: "Mr. Nice"},
+          { id: 12, name: "Narco",     starred: true },
+          { id: 13, name: "Bombasto",  starred: true },
+          { id: 14, name: "Celeritas", starred: true },
+          { id: 15, name: "Magneta",   starred: true },
+          { id: 16, name: "RubberMan" },
+          { id: 17, name: "Dynama" },
+          { id: 18, name: "Dr IQ" },
+          { id: 19, name: "Magma" },
+        ], com.google.foam.demos.heroes.Hero).forEach(function(h) { heroDAO.put(h); });
+
+// for ( var i = 0 ; i < 1000 ; i++ ) { heroDAO.put(com.google.foam.demos.heroes.Hero.create({name: 'hero ' + i})); }
+
+      com.google.foam.demos.heroes.Controller.create({ heroDAO: heroDAO }).write();
+    </script>
+  </body>
+</html>

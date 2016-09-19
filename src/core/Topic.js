@@ -56,32 +56,15 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      function makeTopic(topic, parent) {
-        var name = topic.name;
-        var topics = topic.topics;
 
-        var ret = {
-          pub:   foam.Function.bind(parent.pub,   parent, name),
-          sub:   foam.Function.bind(parent.sub,   parent, name),
-          unsub: foam.Function.bind(parent.unsub, parent, name),
-          toString: function() { return 'Topic(' + name + ')'; }
-        };
-
-        for ( var i = 0 ; i < topics.length ; i++ ) {
-          ret[topics[i].name] = makeTopic(topics[i], ret);
-        }
-
-        return ret;
-      }
-
-      var name = this.name;
-      var topic = this;
+      var name      = this.name;
+      var topic     = this;
+      var makeTopic = this.makeTopic;
 
       Object.defineProperty(proto, name, {
         get: function topicGetter() {
-          var self = this;
           if ( ! this.hasOwnPrivate_(name) ) {
-            this.setPrivate_(name, makeTopic(topic, self));
+            this.setPrivate_(name, makeTopic(topic, this));
           }
 
           return this.getPrivate_(name);
@@ -89,6 +72,25 @@ foam.CLASS({
         configurable: true,
         enumerable: false
       });
+    },
+
+    function makeTopic(topic, parent) {
+      var name   = topic.name;
+      var topics = topic.topics || [];
+
+      var ret = {
+        pub:   foam.Function.bind(parent.pub,   parent, name),
+        sub:   foam.Function.bind(parent.sub,   parent, name),
+        unsub: foam.Function.bind(parent.unsub, parent, name),
+        hasListeners: foam.Function.bind(parent.hasListeners, parent, name),
+        toString: function() { return 'Topic(' + name + ')'; }
+      };
+
+      for ( var i = 0 ; i < topics.length ; i++ ) {
+        ret[topics[i].name] = makeTopic(topics[i], ret);
+      }
+
+      return ret;
     }
   ]
 });

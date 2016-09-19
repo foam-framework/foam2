@@ -123,31 +123,24 @@ foam.LIB({
       (Model is 'this').
     */
     function buildClass() {
-      var cls, X = this.X || foam.X;
+      var context = this.__context__ || foam.__context__;
+      var cls;
 
       if ( this.refines ) {
-        cls = X.lookup(this.refines);
+        cls = context.lookup(this.refines);
         console.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
         console.assert(this.id, 'Missing id name.', this.name);
         console.assert(this.name, 'Missing class name.');
-//        if ( global[this.name] )
-//          console.warn('Redefinition of class: ' + this.name);
 
-        var parent = this.extends   ?
-          X.lookup(this.extends) :
-          foam.AbstractClass ;
-
-        if ( ! parent ) {
-          console.error('Unknown extends: ' + this.extends + ', in class ' + this.id);
-        }
+        var parent = this.extends      ?
+          context.lookup(this.extends) :
+          foam.AbstractClass;
 
         cls                  = Object.create(parent);
         cls.prototype        = Object.create(parent.prototype);
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
-        cls.prototype.ID__   = this.id + 'Prototype';
-        cls.ID__             = this.id + 'Class';
         cls.private_         = { axiomCache: {} };
         cls.axiomMap_        = Object.create(parent.axiomMap_);
         cls.id               = this.id;
@@ -155,8 +148,19 @@ foam.LIB({
         cls.name             = this.name;
         cls.model_           = this;
 
-        // Classes without a package are also registered as globals
-        if ( ! cls.package ) global[cls.name] = cls;
+        // Install an FObject on the class that we can use as a pub/sub hub.
+        // We have to do this because classes aren't FObjects.
+        // This is used to publish 'installAxiom' events to, so that descendents
+        // properties know when they need to be re-installed.
+        cls.pubsub_ =
+          foam.core.FObject &&
+          foam.core.FObject.create &&
+          foam.core.FObject.create();
+
+        // Relay 'installAxiom' events from parent class.
+        parent.pubsub_ && parent.pubsub_.sub(
+            'installAxiom',
+            function(_, a1, a2, a3) { cls.pubsub_.pub(a1, a2, a3); });
       }
 
       cls.installModel(this);
@@ -174,16 +178,15 @@ foam.LIB({
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
-        if ( ! m.refines ) foam.register(cls);
+        console.assert(
+          ! m.refines,
+          'Refines is not supported in early bootstrap');
 
-        var path = cls.id.split('.');
-        var root = global;
+        foam.register(cls);
 
-        for ( var i = 0 ; i < path.length-1 ; i++ ) {
-          root = root[path[i]] || ( root[path[i]] = {} );
-        }
+        // Register the class in the global package path.
+        foam.package.registerClass(cls);
 
-        root[path[path.length-1]] = cls;
         return cls;
       };
     },
@@ -200,16 +203,13 @@ foam.LIB({
         var cls = model.buildClass();
         cls.validate();
 
-        if ( ! m.refines ) foam.register(cls);
+        if ( ! m.refines ) {
+          foam.register(cls);
 
-        var path = cls.id.split('.');
-        var root = global;
-
-        for ( var i = 0 ; i < path.length-1 ; i++ ) {
-          root = root[path[i]] || ( root[path[i]] = {} );
+          // Register the class in the global package path.
+          foam.package.registerClass(cls);
         }
 
-        root[path[path.length-1]] = cls;
         return cls;
       };
 
@@ -224,21 +224,7 @@ foam.LIB({
     function phase3() {
       // Substitute AbstractClass.installModel() with simpler axiom-only version.
       foam.AbstractClass.installModel = function installModel(m) {
-        this.private_.axiomCache = {};
-
-        // Install Axioms in first pass so that they're available in the second-pass
-        // when axioms are actually run. This avoids some ordering issues.
-        for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
-          var a = m.axioms_[i];
-          this.axiomMap_[a.name] = a;
-          a.sourceCls_ = this;
-        }
-
-        for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
-          var a = m.axioms_[i];
-          a.installInClass && a.installInClass(this);
-          a.installInProto && a.installInProto(this.prototype);
-        }
+        this.installAxioms(m.axioms_);
       };
     },
 
@@ -252,7 +238,7 @@ foam.LIB({
         c.prototype.model_ = c.model_ = Model.create(c.model_);
       }
 
-      delete foam['boot'];
+      delete foam.boot;
 
       console.log('core boot time: ', Date.now() - this.startTime);
     }

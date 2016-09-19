@@ -41,6 +41,22 @@ foam.CLASS({
   name: 'Property',
   extends: 'FObject',
 
+  constants: {
+    /**
+      Map of Property property names to arrays of property names
+      that they shadow.
+
+      Ex. When 'setter' is set, it takes precedence over 'adapt',
+      'preSet', and 'postSet', so their values are shadowed.
+    */
+    SHADOW_MAP: {
+      setter:     [ 'adapt', 'preSet', 'postSet' ],
+      getter:     [ 'factory', 'expression', 'value' ],
+      factory:    [ 'expression', 'value' ],
+      expression: [ 'value' ]
+    }
+  },
+
   properties: [
     {
       name: 'name',
@@ -51,6 +67,8 @@ foam.CLASS({
       // If not provided, it defaults to the name "labelized".
       expression: function(name) { return foam.String.labelize(name); }
     },
+
+    'documentation',
 
     /* User-level help. Could/should appear in GUI's as online help. */
     'help',
@@ -147,6 +165,16 @@ foam.CLASS({
 
     [
       /**
+        Called to convert a string into a value suitable for this property.
+        Eg. this might convert strings to numbers, or parse RFC 2822 timestamps.
+        By default it simply returns the string unchanged.
+       */
+      'fromString',
+      function(str) { return str; }
+    ],
+
+    [
+      /**
         Compare two values taken from this property.
         <p>Used by Property.compare().
         It is a property rather than a method so that it can be configured
@@ -184,27 +212,70 @@ foam.CLASS({
       copying undefined values from parent Property, if it exists.
     */
     function installInClass(c) {
-      var prop = this;
-      var superProp = c.__proto__.getAxiomByName(prop.name);
+      var prop      = this;
+      var superProp = c.getSuperAxiomByName(prop.name);
 
-      if ( superProp ) {
-        prop = prop.cls_ === foam.core.Property ?
-          superProp.clone().copyFrom(prop) :
-          prop.cls_.create().copyFrom(superProp).copyFrom(this) ;
+      if ( superProp && foam.core.Property.isInstance(superProp) ) {
+        prop = superProp.createChildProperty_(prop);
+
+        // If properties would be shadowed by superProp properties, then
+        // clear the shadowing property since the new value should
+        // take precedence since it was set later.
+        var es = foam.core.Property.SHADOW_MAP || {};
+        for ( var key in es ) {
+          var e = es[key];
+          for ( var j = 0 ; j < e.length ; j++ ) {
+            if ( this.hasOwnProperty(e[j]) && superProp[key] ) {
+              prop.clearProperty(key);
+              break;
+            }
+          }
+        }
 
         c.axiomMap_[prop.name] = prop;
       }
 
-      var cName = foam.String.constantize(prop.name);
-      var prev = c[cName];
+      // var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
+      //   // We only care about Property axioms.
 
-      // Detect constant name collisions
-      if ( prev && prev.name !== prop.name ) {
-        throw 'Class constant conflict: ' +
-          c.id + '.' + cName + ' from: ' + prop.name + ' and ' + prev.name;
-      }
+      //   // FUTURE: we really only care about those properties that affect
+      //   // the definition of the property getter and setter, so an extra
+      //   // check would help eliminate extra reinstalls.
 
-      c[cName] = prop;
+      //   // Handle special case of axiom being installed into itself.
+      //   // For example foam.core.String has foam.core.String axioms for things
+      //   // like "label"
+      //   // In the future this shouldn't be required if a reinstall is
+      //   // only triggered on this which affect getter/setter.
+      //   if ( prop.cls_ === c ) {
+      //     return;
+      //   }
+
+      //   if ( foam.core.Property.isInstance(axiom) ) {
+      //     // console.log('**************** Updating Property: ', c.name, prop.name);
+      //     c.installAxiom(prop);
+      //   }
+      // });
+
+      // // If the superProp is updated, then reinstall this property
+      // c.__proto__.pubsub_ && c.__proto__.pubsub_.sub(
+      //   'installAxiom',
+      //   this.name,
+      //   reinstall
+      // );
+
+      // // If the class of this Property changes, then also reinstall
+      // if (
+      //   c.id !== 'foam.core.Property' &&
+      //   c.id !== 'foam.core.Model'    &&
+      //   c.id !== 'foam.core.Method'   &&
+      //   c.id !== 'foam.core.FObject'  &&
+      //   this.cls_.id !== 'foam.core.FObject'
+      // ) {
+      //   this.cls_.pubsub_.sub('installAxiom', reinstall);
+      // }
+
+      c.installConstant(prop.name, prop);
     },
 
     /**
@@ -227,7 +298,24 @@ foam.CLASS({
       var slotName    = name + '$';
       var isFinal     = prop.final;
       var eFactory    = this.exprFactory(prop.expression);
+      var FIP         = factory && ( prop.name + '_fip' ); // Factory In Progress
+      var fip         = 0;
 
+      // Factory In Progress (FIP) Support
+      // When a factory method is in progress, the object sets a private
+      // flag named by the value in FIP.
+      // This allows for the detection and elimination of
+      // infinite recursions (if a factory accesses another property
+      // which in turn tries to access its propery) and allows for
+      // the property change event to not be fired when the value
+      // is first set by the factory (since the value didn't change,
+      // the factory is providing its original value).
+      // However, this is expensive, so we keep a global 'fip' variable
+      // which indicates that the factory is already being called on any
+      // object and then we only track on a per-instance basis when this
+      // is on. This eliminates almost all per-instance FIP checks.
+
+      // Property Slot
       // This costs us about 4% of our boot time.
       // If not in debug mode we should share implementations like in F1.
       //
@@ -242,7 +330,7 @@ foam.CLASS({
           return prop.toSlot(this);
         },
         set: function propertySlotSetter(slot2) {
-          prop.toSlot(this).link(slot2);
+          prop.toSlot(this).linkFrom(slot2);
         },
         configurable: true,
         enumerable: false
@@ -260,9 +348,22 @@ foam.CLASS({
       var getter =
         prop.getter ? prop.getter :
         factory ? function factoryGetter() {
-          return this.hasOwnProperty(name) ?
-            this.instance_[name] :
-            this[name] = factory.call(this) ;
+          var v = this.instance_[name];
+          if ( v !== undefined ) return v;
+          // Indicate the Factory In Progress state
+          if ( fip > 10 && this.getPrivate_(FIP) ) {
+            console.warn('reentrant factory', name);
+            return undefined;
+          }
+
+          var oldFip = fip;
+          fip++;
+          if ( oldFip === 10 ) this.setPrivate_(FIP, true);
+          this[name] = factory.call(this, prop);
+          if ( oldFip === 10 ) this.clearPrivate_(FIP);
+          fip--;
+
+          return this.instance_[name];
         } :
         eFactory ? function eFactoryGetter() {
           return this.hasOwnProperty(name) ? this.instance_[name]   :
@@ -271,11 +372,42 @@ foam.CLASS({
         } :
         hasValue ? function valueGetter() {
           var v = this.instance_[name];
-          return typeof v !== 'undefined' ? v : value ;
+          return v !== undefined ? v : value ;
         } :
         function simpleGetter() { return this.instance_[name]; };
 
+      // TODO: experiment to see if a simpler setter for Properties which
+      // don't use any of the options is faster.
       var setter = prop.setter ? prop.setter :
+        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ? 
+        function simplePropSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
+          var oldValue = this.instance_[name] ;
+          this.instance_[name] = newValue;
+          this.pubPropertyChange_(prop, oldValue, newValue);
+        }
+        : factory && ! ( postSet || eFactory || adapt || assertValue || preSet || isFinal ) ?
+        function factoryPropSetter(newValue) {
+          if ( newValue === undefined ) {
+            this.clearProperty(name);
+            return;
+          }
+
+          var oldValue = this.hasOwnProperty(name) ? this[name] : undefined;
+
+          this.instance_[name] = newValue;
+
+          // If this is the result of a factory setting the initial value,
+          // then don't fire a property change event, since it hasn't
+          // really changed.
+          if ( oldValue !== undefined )
+            this.pubPropertyChange_(prop, oldValue, newValue);
+        }
+        :
         function propSetter(newValue) {
           // ???: Should clearProperty() call set(undefined)?
           if ( newValue === undefined ) {
@@ -283,10 +415,11 @@ foam.CLASS({
             return;
           }
 
-          // Get old value but avoid triggering factory or expression if present.
-          // Factories and expressions (which are also factories) can be expensive
-          // to generate, and if the value has been explicitly set to some value,
-          // then it isn't worth the expense of computing the old stale value.
+          // Getting the old value but avoid triggering factory or expression if
+          // present. Factories and expressions (which are also factories) can be
+          // expensive to generate, and if the value has been explicitly set to
+          // some value, then it isn't worth the expense of computing the old
+          // stale value.
           var oldValue =
             factory  ? ( this.hasOwnProperty(name) ? this[name] : undefined ) :
             eFactory ?
@@ -313,7 +446,11 @@ foam.CLASS({
             });
           }
 
-          this.pubPropertyChange_(prop, oldValue, newValue);
+          // If this is the result of a factory setting the initial value,
+          // then don't fire a property change event, since it hasn't
+          // really changed.
+          if ( ! factory || oldValue !== undefined )
+            this.pubPropertyChange_(prop, oldValue, newValue);
 
           // FUTURE: pub to a global topic to support dynamic()
 
@@ -343,17 +480,25 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var argNames = foam.Function.argsArray(e);
+      var argNames = foam.Function.formalArgs(e);
       var name     = this.name;
 
       // FUTURE: determine how often the value is being invalidated,
       // and if it's happening often, then don't unsubscribe.
-      return function() {
+      return function exportedFactory() {
         var self = this;
         var args = new Array(argNames.length);
         var subs = [];
         var l    = function() {
-          if ( ! self.hasOwnProperty(name) ) self.clearPrivate_(name);
+          if ( ! self.hasOwnProperty(name) ) {
+            var oldValue = self[name];
+            self.clearPrivate_(name);
+
+            // Avoid creating slot and publishing event if no listeners
+            if ( self.hasListeners('propertyChange', name) ) {
+              self.pub('propertyChange', name, self.slot(name));
+            }
+          }
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
@@ -374,6 +519,33 @@ foam.CLASS({
     function set(o, value) {
       o[this.name] = value;
       return this;
+    },
+
+    /**
+     * Handles property inheritance.  Builds a new version of
+     * this property to be installed on classes that inherit from
+     * this but define their own property with the same name as this.
+     */
+    function createChildProperty_(child) {
+      var prop = this.clone();
+
+      if ( child.cls_ !== foam.core.Property &&
+           child.cls_ !== this.cls_ )
+      {
+        if ( this.cls_ !== foam.core.Property ) {
+          this.warn('Unsupported change of property type from', this.cls_.id, 'to', child.cls_.id);
+        }
+
+        return child;
+      }
+
+      prop.sourceCls_ = child.sourceCls_;
+
+      for ( var key in child.instance_ ) {
+        prop.instance_[key] = child.instance_[key];
+      }
+
+      return prop;
     },
 
     function exportAs(obj) {

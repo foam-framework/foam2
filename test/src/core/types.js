@@ -1,6 +1,6 @@
 
 var createTestProperties = function createTestProperties() {
-  if ( ! test.PropTypeTester ) {
+  if ( ! foam.lookup('test.PropTypeTester', true) ) {
     foam.CLASS({
       name: 'PropTypeTester',
       package: 'test',
@@ -43,17 +43,18 @@ var createTestProperties = function createTestProperties() {
           name: 'referenceArray',
         },
         {
-          class: 'Class',
+          class: 'Class2',
           name: 'class',
         }
         // TODO: other types, as they gain testable functionality
       ]
     });
   }
+
   return test.PropTypeTester.create();
 }
 var createDateTestProperties = function createDateTestProperties() {
-  if ( ! test.DateTypeTester ) {
+  if ( ! foam.lookup('test.DateTypeTester', true) ) {
     foam.CLASS({
       name: 'DateTypeTester',
       package: 'test',
@@ -73,7 +74,16 @@ var createDateTestProperties = function createDateTestProperties() {
   return test.DateTypeTester.create();
 }
 
-
+// For tests that rely on asserts firing, make sure they throw so the 
+// assert can be detected in tests.
+var oldAssert;
+beforeAll(function() {
+  oldAssert = foam.core.FObject.prototype.assert;
+  foam.core.FObject.prototype.assert = function(c) { if ( ! c ) throw Array.from(arguments); }
+});
+afterAll(function() {
+  foam.core.FObject.prototype.assert = oldAssert;
+})
 
 describe('Date', function() {
   var p;
@@ -221,7 +231,7 @@ describe('StringArray', function() {
     expect(function() { p.stringArray = {}; }).toThrow();
   });
   it('is empty array by default', function() {
-    expect(p.stringArray).toEqual([]);
+    expect(p.stringArray).toEqual(undefined);
   });
   it('accepts string in an array', function() {
     p.stringArray = [ "Hello", "I see", "Well" ];
@@ -270,6 +280,7 @@ describe('Class property', function() {
 
   beforeEach(function() {
     p = createTestProperties();
+    createDateTestProperties();
   });
   afterEach(function() {
     p = null;
@@ -285,13 +296,17 @@ describe('Class property', function() {
   });
   it('looks up a model from a string name', function() {
     p.class = 'test.DateTypeTester';
-    expect(p.class).toBe(test.DateTypeTester);
+    expect(p.class).toBe('test.DateTypeTester');
+    expect(p.class$cls).toBe(test.DateTypeTester);
   });
   it('accepts undefined', function() {
     p.class = 'test.DateTypeTester';
-    expect(p.class).toBe(test.DateTypeTester);
+    expect(p.class).toBe('test.DateTypeTester');
+    expect(p.class$cls).toBe(test.DateTypeTester);
+
     p.class = undefined;
     expect(p.class).toBeUndefined();
+    expect(p.class$cls).toBeUndefined();
   });
 
 });

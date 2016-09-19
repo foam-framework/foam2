@@ -24,7 +24,6 @@ foam.CLASS({
 
   properties: [
     { name: 'of', required: true },
-    [ 'factory', function() { return []; } ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
         // If not an array, allow assertValue to assert the type-check.
@@ -32,21 +31,21 @@ foam.CLASS({
 
         var b = new Array(a.length);
         for ( var i = 0 ; i < a.length ; i++ ) {
-          b[i] = prop.adaptArrayElement(a[i]);
+          b[i] = prop.adaptArrayElement(a[i], this);
         }
         return b;
       }
     ],
     [ 'assertValue', function(v, prop) {
-        console.assert(Array.isArray(v),
+        this.assert(Array.isArray(v),
                        prop.name, 'Attempt to set array property to non-array value', v);
       }
     ],
-    [ 'adaptArrayElement', function(o) {
-      // FUTURE: replace 'foam.' with '(this.Y || foam).' ?
+    [ 'adaptArrayElement', function(o, obj) {
+      // FUTURE: replace 'foam.' with '(this.__subContext__ || foam).' ?
       var cls = foam.lookup(this.of);
-      console.assert(cls, 'Unknown array "of": ', this.of);
-      return cls.isInstance(o) ? o : cls.create(o, this);
+      this.assert(cls, 'Unknown array "of": ', this.of);
+      return cls.isInstance(o) ? o : cls.create(o, obj);
       }
     ]
   ]

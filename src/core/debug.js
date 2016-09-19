@@ -76,19 +76,17 @@ foam.CLASS({
         model.refines ? model.refines + '.' :
         '' ;
 
-      // List of properties which are hidden by other properties.
-      var es = [
-        [ 'setter',     [ 'adapt', 'preSet', 'postSet' ] ],
-        [ 'getter',     [ 'factory', 'expression', 'value' ] ],
-        [ 'factory',    [ 'expression', 'value' ] ],
-        [ 'expression', [ 'value' ] ]
-      ];
-
-      for ( var i = 0 ; i < es.length ; i++ ) {
-        var e = es[i];
-        for ( var j = 0 ; j < e.length ; j++ ) {
-          if ( this[e[0]] && this.hasOwnProperty(e[1][j]) ) {
-            console.warn('Property ' + mName + this.name + ' "' + e[1][j] + '" hidden by "' + e[0] + '"');
+      var es = foam.core.Property.SHADOW_MAP || {};
+      for ( var key in es ) {
+        var e = es[key];
+        if ( this[key] ) {
+          for ( var j = 0 ; j < e.length ; j++ ) {
+            if ( this.hasOwnProperty(e[j]) ) {
+              console.warn(
+                  'Property ' + mName +
+                  this.name + ' "' + e[j] +
+                  '" hidden by "' + key + '"');
+            }
           }
         }
       }
@@ -100,7 +98,7 @@ foam.CLASS({
         var expression = this.expression;
         var pName = cls.id + '.' + this.name + '.expression: ';
 
-        var argNames = foam.Function.argsArray(expression);
+        var argNames = foam.Function.formalArgs(expression);
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);
@@ -118,7 +116,10 @@ foam.CLASS({
 });
 
 
-foam.X.assert(! foam.AbstractClass.describe, 'foam.AbstractClass.describe already set.');
+foam.__context__.assert(
+    ! foam.AbstractClass.describe,
+    'foam.AbstractClass.describe already set.');
+
 /* Add describe() support to classes. */
 foam.AbstractClass.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
@@ -146,14 +147,20 @@ foam.AbstractClass.installModel = function() {
     for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
       var a = m.axioms_[i];
 
-      foam.X.assert(
+      foam.__context__.assert(
         ! names.hasOwnProperty(a.name),
         'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
       var prevA    = this.getAxiomByName(a.name);
       var Property = foam.core.Property;
-      if ( prevA && prevA.cls_ !== a.cls_ &&
-          ! ( a.cls_ === Property && Property.isSubClass(prevA.cls_) )
+      // Potential failure if:
+      //    previousAxiom class does not match newAxiom class
+      // But ignore valid cases:
+      //    base Property extended by subclass of Property
+      //    subclass of Property extended without specifying class
+      if (  prevA && prevA.cls_ !== a.cls_ &&
+          ! ( prevA.cls_ === Property && Property.isSubClass(a.cls_) ) &&
+          ! ( Property.isSubClass(prevA.cls_) && a.cls_ === Property )
       ) {
         var prevCls = prevA.cls_ ? prevA.cls_.id : 'anonymous';
         var aCls    = a.cls_     ? a.cls_.id     : 'anonymous';
@@ -164,16 +171,18 @@ foam.AbstractClass.installModel = function() {
             a.name +
             ' changed to ' +
             aCls;
+        } else if ( foam.core.Method.isSubClass(prevA.cls_) && foam.core.Method.isSubClass(a.cls_) ) {
+          // NOP
         } else if ( prevA.cls_ ) {
           // FUTURE: make error when supression supported
           console.warn(
-            'Change of Axiom ' +
-            this.id + '.' +
-            a.name +
-            ' type from ' +
-            prevCls +
-            ' to ' +
-            aCls);
+              'Change of Axiom ' +
+              this.id + '.' +
+              a.name +
+              ' type from ' +
+              prevCls +
+              ' to ' +
+              aCls);
         }
       }
 
@@ -189,6 +198,44 @@ foam.AbstractClass.validate = function() {
     var a = this.axiomMap_[key];
     a.validateClass && a.validateClass(this);
   }
+}
+
+global.abc = 0;
+// Change 'false' to 'true' to enable error reporting for setting
+// non-Properties on FObjects.
+// TODO: add 'Did you mean...' support.
+if ( false && global.Proxy ) {
+  (function() {
+
+    var IGNORE = {
+      oldValue: true,
+      SUPER: true,
+      obj: true,
+      private_: true,
+      prop: true,
+      slotName_: true,
+      sourceCls_: true,
+      value: true
+    };
+
+    var oldCreate = foam.AbstractClass.create;
+
+    foam.AbstractClass.create = function(args, ctx) {
+      return new Proxy(oldCreate.call(this, args, ctx), {
+        get: function(target, prop, receiver) {
+          return Reflect.get(target, prop, receiver);
+        },
+        set: function(target, prop, value, receiver) {
+          foam.__context__.assert(
+              IGNORE[prop] || target.cls_.getAxiomByName(
+                prop.endsWith('$') ? prop.substring(0, prop.length-1) : prop),
+              'Invalid Set: ', target.cls_.id, prop, value);
+          Reflect.set(target, prop, value, receiver);
+          return true;
+        }
+      });
+    };
+  })();
 }
 
 
@@ -209,10 +256,21 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
+        var value;
+        try {
+          value = p.hidden ? '-hidden-' : this[p.name];
+        } catch (x) {
+          value = '-';
+        }
+        if ( foam.Array.is(value) ) {
+          // NOP
+        } else if ( value && value.toString ) {
+          value = value.toString();
+        }
         console.log(
           foam.String.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
           foam.String.pad(p.name, 14),
-          this[p.name]);
+          value);
       }
       this.log('\n');
     }
@@ -221,14 +279,18 @@ foam.CLASS({
 
 
 /* Add describe support to contexts. */
-foam.X = foam.X.subContext({
+foam.__context__ = foam.__context__.createSubContext({
   describe: function() {
-    this.log('Context:', this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
+    this.log(
+        'Context:',
+        this.hasOwnProperty('NAME') ? this.NAME : ('anonymous ' + this.$UID));
     this.log('KEY                  Type           Value');
     this.log('----------------------------------------------------');
     for ( var key in this ) {
       var value = this[key];
-      var type = foam.core.FObject.isInstance(value) ? value.cls_.name : typeof value;
+      var type = foam.core.FObject.isInstance(value) ?
+          value.cls_.name :
+          typeof value    ;
       this.log(
         foam.String.pad(key,  20),
         foam.String.pad(type, 14),
@@ -242,20 +304,21 @@ foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
 
-  // documentation: 'Decorated merged() and framed() to have debug friendly toString() methods.',
+  // documentation: 'Decorated merged() and framed() to have debug friendly
+  // toString() methods.',
 
   exports: [ 'merged', 'framed' ],
 
   methods: [
     function merged(l, opt_delay) {
-      var f = this.X.merged(l, opt_delay);
+      var f = this.__context__.merged(l, opt_delay);
       f.toString = function() {
-        return 'MERGED(' + delay + ', ' + listener.$UID + ', ' + listener + ')';
+        return 'MERGED(' + opt_delay + ', ' + listener.$UID + ', ' + listener + ')';
       };
       return f;
     },
     function framed(l) {
-      var f = this.X.framed(l);
+      var f = this.__context__.framed(l);
       f.toString = function() {
         return 'ANIMATE(' + l.$UID + ', ' + l + ')';
       };
@@ -264,14 +327,12 @@ foam.CLASS({
   ]
 });
 
-foam.X = foam.debug.Window.create(null, foam.X).Y;
+foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
 
-
+/** Describes one argument of a function or method. */
 foam.CLASS({
   package: 'foam.core',
   name: 'Argument',
-
-  // documentation: "Describes one argument of a function.",
 
   constants: {
     PREFIX: 'Argument',
@@ -283,7 +344,10 @@ foam.CLASS({
       name: 'name'
     },
     {
-      /** The string name of the type (either a model name or javascript typeof name) */
+      /**
+        The string name of the type
+        (either a model name or javascript typeof name)
+      */
       name: 'typeName'
     },
     {
@@ -293,6 +357,10 @@ foam.CLASS({
     {
       /** If true, indicates that this argument is optional. */
       name: 'optional', value: false
+    },
+    {
+      /** If true, indicates a variable number of arguments. */
+      name: 'repeats', value: false
     },
     {
       /** The index of the argument (the first argument is at index 0). */
@@ -311,26 +379,34 @@ foam.CLASS({
      */
     function validate(/* any // the argument value to validate. */ arg) {
       i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
+
       // optional check
       if ( ( ! arg ) && typeof arg === 'undefined' ) {
         if ( ! this.optional ) {
-          throw new TypeError(this.PREFIX + i + this.name + ', is not optional, but was undefined in a function call');
+          throw new TypeError(
+              this.PREFIX + i + this.name +
+              ', is not optional, but was undefined in a function call');
         } else {
           return; // value is undefined, but ok with that
         }
       }
+
       // type this for non-modelled types (no model, but a type name specified)
       if ( ! this.type ) {
         if ( this.typeName
             && typeof arg !== this.typeName
             && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
-          throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
+          throw new TypeError(
+              this.PREFIX + i + this.name +
+              ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
         } // else no this: no type, no typeName
       } else {
         // have a modelled type
         if ( ! this.type.isInstance(arg) ) {
           var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
-          throw new TypeError(this.PREFIX + i + this.name + ', expected type ' + this.typeName + ' but passed ' + gotType);
+          throw new TypeError(
+              this.PREFIX + i + this.name +
+              ', expected type ' + this.typeName + ' but passed ' + gotType);
         }
       }
     }
@@ -357,8 +433,8 @@ foam.LIB({
   methods: [
     function getFunctionArgs(fn) {
       /** Extracts the arguments and their types from the given function.
-        * @arg fn The function to extract from. The toString() of the function must be
-        *     accurate.
+        * @arg fn The function to extract from. The toString() of the function
+        *     must be accurate.
         * @return An array of Argument objects.
         */
       // strip newlines and find the function(...) declaration
@@ -368,11 +444,12 @@ foam.LIB({
 
       var ret = [];
       // check each arg for types
-      // Optional commented type(incl. dots for packages), argument name, optional commented return type
+      // Optional commented type(incl. dots for packages), argument name,
+      // optional commented return type
       // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
       //console.log('-----------------');
       var argIdx = 0;
-      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
+      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?(\*)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
       var typeMatch;
       while ( typeMatch = argMatcher.exec(args) ) {
         // if can't match from start of string, fail
@@ -380,24 +457,26 @@ foam.LIB({
 
         if ( ret.returnType ) {
           throw new SyntaxError("foam.types.getFunctionArgs return type '" +
-            ret.returnType.typeName + "' must appear after the last argument only: " + args.toString());
+            ret.returnType.typeName +
+            "' must appear after the last argument only: " + args.toString());
         }
 
         // record the argument
         ret.push(foam.core.Argument.create({
-          name:          typeMatch[6],
+          name:          typeMatch[7],
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
           optional:      typeMatch[3] == '?',
-          index:        argIdx++,
-          documentation: typeMatch[5],
+          repeats:       typeMatch[3] == '*',
+          index:         argIdx++,
+          documentation: typeMatch[6],
         }));
         // if present, record return type (if not the last arg, we fail on the
         // next iteration)
-        if ( typeMatch[8] ) {
+        if ( typeMatch[9] ) {
           ret.returnType = foam.core.ReturnValue.create({
-            typeName: typeMatch[8],
-            type: global[typeMatch[8]]
+            typeName: typeMatch[9],
+            type: global[typeMatch[9]]
           });
         }
       }
@@ -410,7 +489,9 @@ foam.LIB({
             type: global[typeMatch[1]]
           });
         } else {
-          throw new SyntaxError("foam.types.getFunctionArgs argument parsing error: " + args.toString());
+          throw new SyntaxError(
+              'foam.types.getFunctionArgs argument parsing error: ' +
+              args.toString());
         }
       }
 
@@ -422,7 +503,8 @@ foam.LIB({
       * <code>function(\/\*TypeA\*\/ argA, \/\*string\*\/ argB) { ... }</code>
       * Types are either the names of Models (i.e. declared with CLASS), or
       * javascript primitives as returned by 'typeof'. In addition, 'array'
-      * is supported as a special case, corresponding to an Array.isArray() check.
+      * is supported as a special case, corresponding to an Array.isArray()
+      * check.
       * @fn The function to decorate. The toString() of the function must be
       *     accurate.
       * @return A new function that will throw errors if arguments
@@ -433,10 +515,18 @@ foam.LIB({
       // parse out the arguments and their types
       var args = foam.types.getFunctionArgs(fn);
       var ret = function() {
-        // check each declared argument, arguments[i] can be undefined for missing optional args,
-        // extra arguments are ok
+        // check each declared argument, arguments[i] can be undefined for
+        // missing optional args, extra arguments are ok
         for ( var i = 0 ; i < args.length ; i++ )
           args[i].validate(arguments[i]);
+
+        // if last arg repeats, validate remaining arguments against lastArg
+        var lastArg = args[args.length - 1];
+        if ( lastArg && lastArg.repeats ) {
+          for ( var i = args.length ; i < arguments.length ; i++ ) {
+            lastArg.validate(arguments[i]);
+          }
+        }
 
         // If nothing threw an exception, we are free to run the function
         var retVal = fn.apply(this, arguments);

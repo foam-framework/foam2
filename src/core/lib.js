@@ -36,7 +36,8 @@ Object.defineProperty(
   '$UID',
   {
     get: function() {
-      if ( ! Object.hasOwnProperty.call(this, '$UID__') ) {
+      if ( ! Object.hasOwnProperty.call(this, '$UID__') &&
+           ! Object.isFrozen(this) ) {
         Object.defineProperty(
             this,
             '$UID__',

@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.promise',
   name: 'IPromise',
+
   methods: [
     function then(/*success, fail*/) {},
     { name: "catch", code: function(fail) { return this.then(null, fail); } },
@@ -26,10 +27,35 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.promise',
+  name: 'AbstractState',
+
+  implements: [ 'foam.promise.IPromise' ],
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
+
+  methods: [
+    function fulfill_(value) {
+      this.value = value;
+      this.state = this.Resolving.create();
+    },
+    function reject_(e) {
+      this.err = e;
+      this.state = this.Rejected.create();
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Pending',
-  implements: ['foam.promise.IPromise'],
+  extends: 'foam.promise.AbstractState',
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
@@ -69,22 +95,16 @@ foam.CLASS({
       });
 
       return next;
-    },
-    function fulfill_(value) {
-      this.value = value;
-      this.state = this.STATES.RESOLVING;
-    },
-    function reject_(e) {
-      this.err = e;
-      this.state = this.STATES.REJECTED;
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.promise',
   name: 'Resolving',
   extends: 'foam.promise.Pending',
+
   methods: [
     function onEnter() {
       this.resolve_(this.value);
@@ -92,24 +112,30 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Fulfilled',
-  implements: ['foam.promise.IPromise'],
+  extends: 'foam.promise.AbstractState',
+
   methods: [
     function then(success) {
       var next = this.cls_.create();
-      if ( typeof success !== "function" ) next.fulfill_(this.value);
-      else next.fulfill_(success(this.value));
+
+      next.fulfill_(
+          typeof success !== "function" ? this.value : success(this.value));
 
       return next;
     },
+
     function fulfill_() {
       throw new Error("Promise already fulfilled.");
     },
+
     function reject_(e) {
       this.fulfill_(e);
     },
+
     function onEnter() {
       var callbacks = this.successCallbacks;
       this.successCallbacks = this.failCallbacks = [];
@@ -121,21 +147,29 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.promise',
   name: 'Rejected',
-  implements: ['foam.promise.IPromise'],
+  extends: 'foam.promise.AbstractState',
+
   methods: [
     function then(success, fail) {
       var next = this.cls_.create();
-      if ( typeof fail !== "function" ) next.reject_(this.err);
-      else next.fulfill_(fail(this.err));
+
+      if ( typeof fail !== "function" ) {
+        next.reject_(this.err);
+      } else {
+        next.fulfill_(fail(this.err));
+      }
 
       return next;
     },
+
     function onEnter() {
       var callbacks = this.failCallbacks;
       this.failCallbacks = this.successCallbacks = [];
+
       for ( var i = 0 ; i < callbacks.length ; i++ ) {
         callbacks[i](this.err);
       }
@@ -143,12 +177,14 @@ foam.CLASS({
   ]
 });
 
+
 /**
  * A fast Promise implementation.
  */
 foam.CLASS({
   package: 'foam.promise',
   name: 'Promise',
+
   requires: [
     'foam.promise.Pending',
     'foam.promise.Resolving',
@@ -158,16 +194,16 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'StateMachine',
+      class: 'Proxy',
       of: 'foam.promise.IPromise',
       name: 'state',
-      plural: 'states',
-      states: [
-        'foam.promise.Pending',
-        'foam.promise.Resolving',
-        'foam.promise.Fulfilled',
-        'foam.promise.Rejected'
-      ]
+      delegates: [ 'then', 'catch', 'fulfill_', 'reject_' ],
+      factory: function() {
+        return this.Pending.create();
+      },
+      postSet: function(old, nu) {
+        if ( nu.onEnter ) nu.onEnter.call(this);
+      }
     },
     {
       name: 'value'
@@ -184,6 +220,7 @@ foam.CLASS({
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function resolve_(value) {
       if ( value === this ) {
@@ -194,15 +231,16 @@ foam.CLASS({
           self.resolve_(v);
         }, function(e) {
           self.err = e;
-          self.state = self.STATES.REJECTED;
+          self.state = self.Rejected.create();
         });
       } else {
         this.value = value;
-        this.state = this.STATES.FULFILLED;
+        this.state = this.Fulfilled.create();
       }
     },
   ]
 });
+
 
 /** A library of standard Promise-style constructors */
 foam.LIB({
@@ -216,7 +254,7 @@ foam.LIB({
         if ( ! ( executor && typeof executor === "function" ) ) {
           this.reject_(new TypeError("Promise created with no executor function (", executor, ")"));
         }
-        var p = foam.promise.Promise.create();
+        var p        = foam.promise.Promise.create();
         var thenable = executor.call(null, p.fulfill_.bind(p), p.reject_.bind(p));
 
         if ( thenable && typeof thenable.then === "function" ) {
@@ -224,7 +262,7 @@ foam.LIB({
             p.resolve_(v);
           }, function(e) {
             p.err = e;
-            p.state = p.STATES.REJECTED;
+            p.state = p.Rejected.create();
           });
         }
         return p;
@@ -241,11 +279,11 @@ foam.LIB({
             p.resolve_(v);
           }, function(e) {
             p.err = e;
-            p.state = p.STATES.REJECTED;
+            p.state = p.Rejected.create();
           });
         } else {
           p.value = value;
-          p.state = p.STATES.FULFILLED;
+          p.state = p.Fulfilled.create();
         }
         return p;
       },
@@ -256,7 +294,7 @@ foam.LIB({
       code: function (err) {
         var p = foam.promise.Promise.create();
         p.err = err;
-        p.state = p.STATES.REJECTED;
+        p.state = p.Rejected.create();
         return p;
       },
     },
@@ -265,17 +303,17 @@ foam.LIB({
       code: function (/* array */ promises) {
         var results = [];
         var p = Promise.resolve();
+
         function runPromise(idx) {
           p = p.then(promises[idx].then(function(r) { results[idx] = r; }));
         }
+
         for ( var i = 0; i < promises.length; ++i ) {
           runPromise(i);
         }
+
         return p.then(function() { return results; });
       }
     }
-  ],
+  ]
 });
-
-
-

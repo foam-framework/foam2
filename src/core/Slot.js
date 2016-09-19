@@ -35,12 +35,58 @@ foam.CLASS({
 
   methods: [
     /**
+    */
+    function dot(name) {
+      return foam.core.internal.SubSlot.create({
+        parent: this,
+        name:   name
+      });
+    },
+
+    // TODO: remove when all code ported
+    function link(other) {
+      console.warn('deprecated use of link(), use linkFrom() instead');
+      return this.linkFrom(other);
+    },
+
+    /**
       Link two Slots together, setting both to other's value.
       Returns a Destroyable which can be used to break the link.
+      After copying a value from one slot to the other, this implementation
+      then copies the value back in case the target slot rejected the value.
     */
-    function link(other) {
-      var sub1 = this.follow(other);
-      var sub2 = other.follow(this);
+    function linkFrom(s2) {
+      var s1       = this;
+      var feedback = false;
+
+      // TODO: once all slot types property set 'src', these
+      // two listeneners can be merged.
+      var l1 = function(e) {
+        if ( feedback ) return;
+
+        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+            feedback = true;
+            s2.set(s1.get());
+            s1.set(s2.get());
+            feedback = false;
+        }
+      };
+
+      var l2 = function(e) {
+        if ( feedback ) return;
+
+        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+            feedback = true;
+            s1.set(s2.get());
+            s2.set(s1.get());
+            feedback = false;
+        }
+      };
+
+      var sub1 = s1.sub(l1);
+      var sub2 = s2.sub(l2)
+
+      l2();
 
       return {
         destroy: function() {
@@ -51,14 +97,76 @@ foam.CLASS({
       };
     },
 
+    function linkTo(other) {
+      return other.linkFrom(this);
+    },
+
     /**
       Have this Slot dynamically follow other's value.
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      return other.sub(foam.Function.bind(function() {
-        this.set(other.get());
-      }, this));
+      var self = this;
+      var l = function() {
+        if ( ! foam.util.equals(self.get(), other.get()) ) {
+          self.set(other.get());
+        }
+      };
+      l();
+      return other.sub(l);
+    },
+
+    /**
+     * Maps values from one model to another.
+     * @param f maps values from srcValue to dstValue
+     */
+    function mapFrom(other, f) {
+      var self = this;
+      var l = function() { self.set(f(other.get())); };
+      l();
+      return other.sub(l);
+    },
+
+    function mapTo(other, f) {
+      return other.mapFrom(this, f);
+    },
+
+    function map(f) {
+      return foam.core.ExpressionSlot.create({code: f, args: [this]});
+    },
+
+    /**
+     * Relate to another Slot.
+     * @param f maps from this to other
+     * @param fprime maps other to this
+     */
+    function relateTo(other, f, fPrime) {
+      var self     = this;
+      var feedback = false;
+      var sub      = foam.core.FObject.create();
+      var l1 = function() {
+        if ( feedback ) return;
+        feedback = true;
+        other.set(f(self.get()));
+        feedback = false;
+      };
+      var l2 = function() {
+        if ( feedback ) return;
+        feedback = true;
+        self.set(fPrime(other.get()));
+        feedback = false;
+      };
+
+      sub.onDestroy(this.sub(l1));
+      sub.onDestroy(other.sub(l2));
+
+      l1();
+
+      return sub;
+    },
+
+    function relateFrom(other, f, fPrime) {
+      return other.relateTo(this, fPrime, f);
     }
   ]
 });
@@ -76,6 +184,7 @@ foam.CLASS({
 
   methods: [
     function initArgs() { },
+    function init() { },
 
     function get() {
       return this.prop.get(this.obj);
@@ -94,7 +203,9 @@ foam.CLASS({
     },
 
     function sub(l) {
-      return this.obj.sub('propertyChange', this.prop.name, l);
+      var s = this.obj.sub('propertyChange', this.prop.name, l);
+      s.src = this;
+      return s;
     },
 
     function unsub(l) {
@@ -107,6 +218,92 @@ foam.CLASS({
 
     function clear() {
       this.obj.clearProperty(this.prop.name);
+    },
+
+    function toString() {
+      return 'PropertySlot(' + this.prop.name + ')';
+    }
+  ]
+});
+
+
+/**
+  For internal use only.
+ */
+foam.CLASS({
+  package: 'foam.core.internal',
+  name: 'SubSlot',
+  implements: [ 'foam.core.Slot' ],
+
+  properties: [
+    'parent', // parent slot, not parent object
+    'name',
+    'value',
+    'prevSub'
+  ],
+
+  methods: [
+    function init() {
+      this.parent.sub(this.parentChange);
+      this.parentChange();
+    },
+
+    function get() {
+      var o = this.parent.get();
+
+      return o && o[this.name];
+    },
+
+    function set(value) {
+      var o = this.parent.get();
+
+      if ( o ) o[this.name] = value;
+    },
+
+    /** Needed? **/
+    function getPrev() {
+      debugger;
+      return this.oldValue;
+    },
+
+    /** Needed? **/
+    function setPrev(value) {
+      debugger;
+      return this.oldValue = value;
+    },
+
+    function sub(l) {
+      return this.SUPER('propertyChange', 'value', l);
+    },
+
+    function unsub(l) {
+      this.SUPER('propertyChange', 'value', l);
+    },
+
+    function isDefined() {
+      return this.parent.get().hasOwnProperty(this.name);
+    },
+
+    function clear() {
+      this.parent.get().clearProperty(this.name);
+    },
+
+    function toString() {
+      return 'SubSlot(' + this.parent + ',' + this.name + ')';
+    }
+  ],
+
+  listeners: [
+    function parentChange() {
+      this.prevSub && this.prevSub.destroy();
+      var o = this.parent.get();
+      this.prevSub = o && o.sub('propertyChange', this.name, this.valueChange);
+      this.valueChange();
+    },
+
+    function valueChange() {
+      var parentValue = this.parent.get();
+      this.value = parentValue ? parentValue[this.name] : undefined;
     }
   ]
 });
@@ -141,14 +338,14 @@ foam.CLASS({
 
 
 /**
-  Tracks dependencies for a dynamic function and invalidates is they change.
+  Tracks dependencies for a dynamic function and invalidates if they change.
 
 <pre>
 foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
 var e = foam.core.ExpressionSlot.create({
-  args: [ p.fname$, p.lname$],
-  fn: function(f, l) { return f + ' ' + l; }
+  args: [ p.fname$, p.lname$ ],
+  code: function(f, l) { return f + ' ' + l; }
 });
 log(e.get());
 e.sub(log);
@@ -160,6 +357,12 @@ Output:
  > [object Object] propertyChange value [object Object]
  > [object Object] propertyChange value [object Object]
  > Steve Jones
+
+var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
+var e = foam.core.ExpressionSlot.create({
+  obj: p,
+  code: function(f, l) { return f + ' ' + l; }
+});
 </pre>
 */
 foam.CLASS({
@@ -168,41 +371,72 @@ foam.CLASS({
   implements: [ 'foam.core.Slot' ],
 
   properties: [
-    'args',
-    'fn',
+    'obj',
+    'code',
+    {
+      name: 'args',
+      expression: function(obj) {
+        this.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
+
+        var args = foam.Function.formalArgs(this.code);
+        for ( var i = 0 ; i < args.length ; i++ ) {
+          args[i] = obj.slot(args[i]);
+        }
+
+        this.invalidate();
+        this.subToArgs_(args);
+
+        return args;
+      },
+      postSet: function(_, args) {
+        this.subToArgs_(args);
+      }
+    },
     {
       name: 'value',
       factory: function() {
-        return this.fn.apply(this, this.args.map(function(a) {
+        return this.code.apply(this.obj || this, this.args.map(function(a) {
           return a.get();
         }));
       }
-    }
+    },
+    'cleanup_', // destroyable to cleanup old subs when obj changes
   ],
 
   methods: [
-    function init() {
-      for ( var i = 0 ; i < this.args.length ; i++ ) {
-        this.onDestroy(this.args[i].sub(this.invalidate));
-      }
-    },
+    function init() { this.onDestroy(this.cleanup); },
 
-    function get() {
-      return this.value;
-    },
+    function get() { return this.value; },
 
     function set() { /* nop */ },
 
     function sub(l) {
-      return this.SUPER('propertyChange', 'value', l);
+      return arguments.length === 1 ?
+        this.SUPER('propertyChange', 'value', l) :
+        this.SUPER.apply(this,arguments);
     },
 
     function unsub(l) {
-      this.SUPER('propertyChange', 'value', l);
+      return arguments.length === 1 ?
+        this.SUPER('propertyChange', 'value', l) :
+        this.SUPER.apply(this,arguments);
+    },
+
+    function subToArgs_(args) {
+      this.cleanup();
+
+      var cleanup = foam.core.FObject.create();
+
+      for ( var i = 0 ; i < args.length ; i++ ) {
+        cleanup.onDestroy(args[i].sub(this.invalidate));
+      }
+
+      this.cleanup_ = cleanup;
     }
   ],
 
   listeners: [
+    function cleanup() { this.cleanup_ && this.cleanup_.destroy(); },
     function invalidate() { this.clearProperty('value'); }
   ]
 });

@@ -26,7 +26,28 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Property',
       name: 'properties',
-      adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
+      adaptArrayElement: function(o) {
+        if ( typeof o === 'string' ) {
+          var p = foam.core.Property.create();
+          p.name = o;
+          return p;
+        }
+
+        if ( Array.isArray(o) ) {
+          var p = foam.core.Property.create();
+          p.name  = o[0];
+          p.value = o[1];
+          return p;
+        }
+
+        if ( o.class ) {
+          var m = foam.lookup(o.class);
+          if ( ! m ) throw 'Unknown class : ' + o.class;
+          return m.create(o);
+        }
+
+        return foam.core.Property.isInstance(o) ? o : foam.core.Property.create(o);
+      }
     },
     {
       class: 'AxiomArray',
@@ -40,7 +61,9 @@ foam.CLASS({
           m.code = o;
           return m;
         }
-        return foam.core.Method.isInstance(o) ? o : foam.core.Method.create(o);
+        if ( foam.core.Method.isInstance(o) ) return o;
+        if ( o.class ) return this.lookup(o.class).create(o);
+        return foam.core.Method.create(o);
       }
     }
   ]
@@ -57,32 +80,46 @@ foam.CLASS({
 
   axioms: [
     {
-      name: 'X',
+      name: '__context__',
       installInProto: function(p) {
-        Object.defineProperty(p, 'X', {
+        Object.defineProperty(p, '__context__', {
           get: function() {
-            var x = this.getPrivate_('X');
+            var x = this.getPrivate_('__context__');
             if ( ! x ) {
-              var ySource = this.getPrivate_('ySource');
-              if ( ySource ) {
-                this.setPrivate_('X', x = ySource.Y || ySource.X);
-                this.setPrivate_('ySource', undefined);
+              var contextParent = this.getPrivate_('contextParent');
+              if ( contextParent ) {
+                this.setPrivate_(
+                    '__context__',
+                    x = contextParent.__subContext__ || contextParent.__context__);
+                this.setPrivate_('contextParent', undefined);
               } else {
                 // Happens during bootstrap with Properties.
-                x = foam.X;
+                x = foam.__context__;
               }
             }
             return x;
           },
           set: function(x) {
             if ( x ) {
-              this.setPrivate_(foam.core.FObject.isInstance(x) ? 'ySource' : 'X', x);
+              this.setPrivate_(
+                  foam.core.FObject.isInstance(x) ?
+                      'contextParent' :
+                      '__context__',
+                  x);
             }
           }
         });
 
         // If no delcared exports, then sub-context is the same as context.
-        Object.defineProperty(p, 'Y', { get: function() { return this.X; } });
+        Object.defineProperty(
+            p,
+            '__subContext__',
+            {
+              get: function() { return this.__context__; },
+              set: function() {
+                throw new Error('Attempted to set unsettable __subContext__ in ' + this.cls_.id);
+              }
+            });
       }
     }
   ],
@@ -92,37 +129,9 @@ foam.CLASS({
       Called to process constructor arguments.
       Replaces simpler version defined in original FObject definition.
     */
-    function initArgs(args, X) {
-      this.X = X || foam.X;
-      if ( ! args ) return;
-
-      // If args are just a simple {} map, just copy
-      if ( args.__proto__ === Object.prototype || ! args.__proto__ ) {
-        for ( var key in args ) {
-          var a = this.cls_.getAxiomByName(key);
-          if ( a && foam.core.Property.isInstance(a) ) {
-            this[key] = args[key];
-          } else {
-            this.unknownArg(key, args[key]);
-          }
-        }
-      }
-      // If an FObject, copy values from instance_
-      else if ( args.instance_ ) {
-        for ( var key in args.instance_ ) {
-          var a = this.cls_.getAxiomByName(key);
-          if ( a && foam.core.Property.isInstance(a) ) {
-            this[key] = args[key];
-          }
-        }
-      }
-      // Else call copyFrom(), which is the slowest version because
-      // it is O(# of properties) not O(# of args)
-      // This is possible if called with a map with a prototype other
-      // than Object.prototype or null. Should rarely happen.
-      else {
-        this.copyFrom(args);
-      }
+    function initArgs(args, ctx) {
+      if ( ctx  ) this.__context__ = ctx;
+      if ( args ) this.copyFrom(args, true);
     },
 
     /**
@@ -137,6 +146,22 @@ foam.CLASS({
 
 
 foam.boot.end();
+
+/**
+ * Map of Property property names to arrays of names of properties that they shadow.
+ *
+ * Ex. 'setter' has higher precedence than 'adapt', 'preSet', and 'postSet', so if
+ * it is set, then it shadows those other properties if they are set, causing their
+ * values to be ignored.
+ *
+ * Not defined as a constant, because they haven't been defined yet.
+ */
+foam.core.Property.SHADOW_MAP = {
+  setter:     [ 'adapt', 'preSet', 'postSet' ],
+  getter:     [ 'factory', 'expression', 'value' ],
+  factory:    [ 'expression', 'value' ],
+  expression: [ 'value' ]
+};
 
 
 /**

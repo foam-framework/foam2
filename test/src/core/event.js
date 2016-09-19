@@ -90,7 +90,7 @@ describe('foam.events.consoleLog', function() {
 
 
 
-describe('foam.X.merged', function() {
+describe('foam.__context__.merged', function() {
   var ep;
   var listener;
 
@@ -106,7 +106,7 @@ describe('foam.X.merged', function() {
   });
 
   it('merges with default parameters', function() {
-    var merged = foam.X.merged(listener);
+    var merged = foam.__context__.merged(listener);
 
     ep.change.sub('simple', merged);
 
@@ -123,7 +123,7 @@ describe('foam.X.merged', function() {
   });
 
   it('merges with delay specified', function() {
-    var merged = foam.X.merged(listener, 1300);
+    var merged = foam.__context__.merged(listener, 1300);
 
     ep.change.sub('simple', merged);
 
@@ -142,7 +142,7 @@ describe('foam.X.merged', function() {
 
 
   it('unsubs when requested', function() {
-    var merged = foam.X.merged(foam.events.oneTime(listener));
+    var merged = foam.__context__.merged(foam.events.oneTime(listener));
 
     ep.change.sub('simple', merged);
 
@@ -169,7 +169,7 @@ describe('foam.X.merged', function() {
 });
 
 
-describe('foam.X.async', function() {
+describe('foam.__context__.async', function() {
   var ep;
   var listener;
 
@@ -185,7 +185,7 @@ describe('foam.X.async', function() {
   });
 
   it('async invokes each listener', function() {
-    var delayed = foam.X.async(listener);
+    var delayed = foam.__context__.async(listener);
 
     ep.change.sub('simple', delayed);
 
@@ -200,9 +200,9 @@ describe('foam.X.async', function() {
     expect(listener.count).toEqual(2);
   });
 
-  it('async with opt_X specified', function() {
+  it('async with opt_ctx specified', function() {
     var X = { setTimeout: setTimeout };
-    var delayed = foam.X.async(listener, X);
+    var delayed = foam.__context__.async(listener, X);
 
     ep.change.sub('simple', delayed);
 
@@ -220,7 +220,7 @@ describe('foam.X.async', function() {
 });
 
 
-describe('foam.X.framed', function() {
+describe('foam.__context__.framed', function() {
   var ep;
   var listener;
 
@@ -238,8 +238,8 @@ describe('foam.X.framed', function() {
   });
 
   it('framed listeners accumulate', function() {
-    var delayed1 = foam.X.framed(listener1);
-    var delayed2 = foam.X.framed(listener2);
+    var delayed1 = foam.__context__.framed(listener1);
+    var delayed2 = foam.__context__.framed(listener2);
     ep.change.sub('simple', delayed1);
     ep.change.sub('simple', delayed2);
 
@@ -262,7 +262,7 @@ describe('foam.X.framed', function() {
 
 
 
-describe('foam.X.Observable.sub()/.pub()', function() {
+describe('foam.__context__.Observable.sub()/.pub()', function() {
   var ep;
   var listener;
   var listener2;

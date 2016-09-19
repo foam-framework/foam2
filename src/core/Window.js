@@ -56,6 +56,7 @@ foam.CLASS({
     'error',
     'framed',
     'info',
+    'installCSS',
     'log',
     'merged',
     'requestAnimationFrame',
@@ -87,17 +88,33 @@ foam.CLASS({
       return this.document.getElementsByClassName(cls);
     },
 
+    /**
+      Like console.assert(), but faster and context-dependent.
+      Returns the first argument, so that it can be nested as a sub-expression.
+     */
     function assert(b /*, args */) {
       /* Like console.assert() except that it takes more than one argument. */
       if ( ! b ) {
         this.console.assert(false, Array.prototype.slice.call(arguments, 1).join(' '));
       }
+      return b;
     },
 
-    function error() { this.console.error.apply(this.console, arguments); },
-    function info()  { this.console.info.apply(this.console, arguments);  },
-    function log()   { this.console.log.apply(this.console, arguments);   },
-    function warn()  { this.console.warn.apply(this.console, arguments);  },
+    function error() {
+      this.console.error.apply(this.console, arguments);
+    },
+
+    function info() {
+      this.console.info.apply(this.console, arguments);
+    },
+
+    function log() {
+      this.console.log.apply(this.console, arguments);
+    },
+
+    function warn() {
+      this.console.warn.apply(this.console, arguments);
+    },
 
     function async(l) {
       /* Decorate a listener so that the event is delivered asynchronously. */
@@ -115,7 +132,7 @@ foam.CLASS({
 
     function merged(l, opt_delay) {
       var delay = opt_delay || 16;
-      var X     = this;
+      var ctx     = this;
 
       return foam.Function.setName(function() {
         var triggered = false;
@@ -132,7 +149,7 @@ foam.CLASS({
 
           if ( ! triggered ) {
             triggered = true;
-            X.setTimeout(mergedListener, delay);
+            ctx.setTimeout(mergedListener, delay);
           }
         };
 
@@ -141,7 +158,7 @@ foam.CLASS({
     },
 
     function framed(l) {
-      var X = this;
+      var ctx = this;
 
       return foam.Function.setName(function() {
         var triggered = false;
@@ -158,7 +175,7 @@ foam.CLASS({
 
           if ( ! triggered ) {
             triggered = true;
-            X.requestAnimationFrame(frameFired);
+            ctx.requestAnimationFrame(frameFired);
           }
         };
 
@@ -185,6 +202,11 @@ foam.CLASS({
     },
     function cancelAnimationFrame(id) {
       this.window.cancelAnimationFrame(id);
+    },
+    function installCSS(text) {
+      /* Create a new <style> tag containing the given CSS code. */
+      this.document.head.insertAdjacentHTML('beforeend',
+          '<style>' + text + '</style>');
     }
   ]
 });
@@ -209,4 +231,7 @@ if ( foam.isServer ) {
 }
 
 
-foam.X = foam.core.Window.create({window: global}, foam.X).Y;
+foam.__context__ = foam.core.Window.create(
+  { window: global },
+  foam.__context__
+).__subContext__;

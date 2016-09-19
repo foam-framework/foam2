@@ -52,10 +52,45 @@ foam.CLASS({
     function installInClass(cls) {
       var m = foam.lookup(this.path);
       if ( ! m ) throw 'No such interface or trait: ' + this.path;
-      cls.installModel(m.model_);
+
+      // TODO: clone these axioms since they could be reused and then would
+      // have the wrong sourceCls_;
+
+      // This next part is a bit tricky.
+      // If we install a mixin and then override properties of one of the
+      // Properties from the mixin, the mixin Property will see the overridden
+      // Property as its super-prop, which is wrong. So, we insert a new level
+      // in the axiomMap_ between the current axiomMap_ and its prototype, and
+      // then install the mixin there.
+
+      // Current AxiomMap
+      var aMap = cls.axiomMap_;
+
+      // New mixin AxiomMap to install into
+      var sMap = Object.create(aMap.__proto__);
+
+      // Insert new AxiomMap between current and its parent
+      aMap.__proto__ = sMap;
+
+      // Temporarily set the class'es AxiomMap to sMap so that
+      // mixin axioms get installed into it.
+      cls.axiomMap_ = sMap;
+
+      // TODO(adamvy): Remove this code path when all usages of implements
+      // use modeled interfaces instead of classes.
+
+      if ( foam.core.Interface && foam.core.Interface.isInstance(m) ) {
+        cls.installModel(m);
+      } else {
+        cls.installModel(m.model_);
+      }
+
+      // Put the original AxiomMap back, with the inserted parent.
+      cls.axiomMap_ = aMap;
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',

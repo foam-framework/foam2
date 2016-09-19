@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'Frame',
+
   properties: [
     ['fin', 1],
     ['rsv1',0],
@@ -29,18 +30,28 @@ foam.CLASS({
     'buffer',
     ['bufferPos', 0],
     ['needed', 0],
+    ['length', 0],
+    ['length_', 0],
+    'headerState',
+    'state',
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'framing',
       value: true
     },
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'finished',
       value: false
-    },
+    }
   ],
+
   methods: [
+    function init() {
+      this.headerState = this.frameHeader;
+      this.state = this.readHeader;
+    },
+
     function toData() {
       this.length = this.buffer.length;
       var headerSize = this.buffer.length > 65535 ? 10 :
@@ -78,78 +89,123 @@ foam.CLASS({
 
       return buffer;
     },
-    function onData(data, i) {
-      if ( this.framing ) {
-        var byte = data.readUInt8(i++);
-        this.opcode = byte & 0x0f;
-        this.fin = !! ( byte & 0x80 );
-        this.rsv1 = !! ( byte & 0x40 );
-        this.rsv2  = !! ( byte & 0x20 );
-        this.rsv3 = !! ( byte & 0x10 );
 
-        byte = data.readUInt8(i++);
-        this.mask = !! ( byte & 0x80 );
-        var length = byte & 0x7f;
+    function frameHeader(byte) {
+      this.opcode = byte & 0x0f;
+      this.fin  = !! ( byte & 0x80 );
+      this.rsv1 = !! ( byte & 0x40 );
+      this.rsv2 = !! ( byte & 0x20 );
+      this.rsv3 = !! ( byte & 0x10 );
 
-        if ( length == 126 ) {
-          length = 0;
-          byte = data.readUInt8(i++);
-          length += byte << 8;
-          byte = data.readUInt8(i++);
-          length += byte;
-        } else if ( length == 127 ) {
-          length = 0;
-          var tolarge = false;
-          byte = data.readUInt8(i++);
-          if ( byte !== 0 ) tolarge = true;
-          //length += byte << 56;
+      this.headerState = this.maskLength0;
+    },
 
-          byte = data.readUInt8(i++);
-          if ( byte !== 0 ) tolarge = true;
-          //length += byte << 48;
+    function maskLength0(byte) {
+      this.mask = !! ( byte & 0x80 );
+      this.length_ = byte & 0x7f;
 
-          byte = data.readUInt8(i++);
-          if ( byte !== 0 ) tolarge = true;
-          //length += byte << 40;
-
-          byte = data.readUInt8(i++);
-          if ( byte !== 0 ) tolarge = true;
-          //length += byte << 32;
-
-          byte = data.readUInt8(i++);
-          length += byte << 24;
-          byte = data.readUInt8(i++);
-          length += byte << 16;
-          byte = data.readUInt8(i++);
-          length += byte << 8;
-          byte = data.readUInt8(i++);
-          length += byte;
-
-          if ( tolarge ) {
-            console.error("Payload too large.");
-            this.socket.end();
-            return;
-          }
-        }
-        this.length = length;
-        this.buffer = new Buffer(this.length);
-        this.bufferPos = 0;
-        this.needed = this.length;
-        this.framing = false;
-
-        if ( this.mask ) {
-          this.masking_key = [];
-          byte = data.readUInt8(i++);
-          this.masking_key.push(byte);
-          byte = data.readUInt8(i++);
-          this.masking_key.push(byte);
-          byte = data.readUInt8(i++);
-          this.masking_key.push(byte);
-          byte = data.readUInt8(i++);
-          this.masking_key.push(byte);
-        }
+      if ( this.length_ == 126 ) {
+        this.headerState = this.lengthShort0;
+      } else if ( this.length_ === 127 ) {
+        this.headerState = this.lengthShort1;
+      } else {
+        this.headerState = this.maskingKey0;
       }
+    },
 
+    function lengthShort0(byte) {
+      this.length_ = 0;
+      this.length_ += byte << 8;
+      this.headerState = this.lengthShort1;
+    },
+
+    function lengthShort1(byte) {
+      this.length_ += byte;
+      this.headerState = this.maskingKey0;
+    },
+
+    function lengthLong0(byte) {
+      this.length_ = 0;
+      if ( byte !== 0 ) this.state = this.tooLarge;
+      this.headerState = this.lengthLong1;
+    },
+
+    function lengthLong1(byte) {
+      if ( byte !== 0 ) this.state = this.tooLarge;
+      this.headerState = this.lengthLong2;
+    },
+
+    function lengthLong2(byte) {
+      if ( byte !== 0 ) this.state = this.tooLarge;
+      this.headerState = this.lengthLong3;
+    },
+
+    function lengthLong3(byte) {
+      if ( byte !== 0 ) this.state = this.tooLarge;
+      this.headerState = this.lengthLong4;
+    },
+
+    function lengthLong4(byte) {
+      this.length_ += byte << 24;
+      this.headerState = this.lengthLong5;
+    },
+
+    function lengthLong5(byte) {
+      this.length_ += byte << 16;
+      this.headerState = this.lengthLong6;
+    },
+
+    function lengthLong6(byte) {
+      this.length_ += byte << 8;
+      this.headerState = this.lengthLong7;
+    },
+
+    function lengthLong7(byte) {
+      this.length_ += byte;
+      this.headerState = this.maskingKey0;
+    },
+
+    function maskingKey0(byte) {
+      this.length = this.length_
+      this.buffer = new Buffer(this.length);
+      this.bufferPos = 0;
+      this.needed = this.length;
+
+      if ( this.mask ) {
+        this.masking_key = [];
+        this.masking_key.push(byte);
+        this.headerState = this.maskingKey1;
+      } else {
+        this.headerState = this.frameHeader;
+        this.state = this.readData;
+      }
+    },
+
+    function maskingKey1(byte) {
+      this.masking_key.push(byte);
+      this.headerState = this.maskingKey2;
+    },
+
+    function maskingKey2(byte) {
+      this.masking_key.push(byte);
+      this.headerState = this.maskingKey3;
+    },
+
+    function maskingKey3(byte) {
+      this.masking_key.push(byte);
+      this.headerState = this.frameHeader;
+      this.state = this.readData;
+    },
+
+    function readHeader(data, i) {
+      while ( this.state === this.readHeader &&
+              i < data.byteLength ) {
+        this.headerState(data.readUInt8(i++));
+      }
+      return i;
+    },
+
+    function readData(data, i) {
       var amount = Math.min(data.length - i, this.needed);
       data.copy(this.buffer, this.bufferPos, i, i + amount);
 
@@ -168,13 +224,39 @@ foam.CLASS({
       }
 
       return i;
+    },
+
+    function tooLarge(data, i) {
+      console.error('WebSocket payload too large');
+      this.socket.end();
+    },
+
+    function onData(data, i) {
+      return this.state(data, i);
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'Socket',
+
+  imports: [
+    'socketService',
+    'me'
+  ],
+
+  requires: [
+    'foam.box.RegisterSelfMessage'
+  ],
+
+  topics: [
+    'message',
+    'disconnect',
+    'connect'
+  ],
+
   properties: [
     {
       name: 'remoteAddress'
@@ -213,26 +295,49 @@ foam.CLASS({
       value: 0
     }
   ],
-  topics: [
-    'message',
-    'disconnect',
-    'connect'
-  ],
+
   methods: [
     function write(msg) {
-      var serialized = foam.json.stringify(msg);
+      var serialized = foam.json.Network.stringify(msg.clone().toRemote());
       var size = Buffer.byteLength(serialized);
       var packet = new Buffer(size + 4);
       packet.writeInt32LE(size);
       packet.write(serialized, 4);
       this.socket_.write(packet);
     },
+
+    function connectTo(address) {
+      var sep = address.lastIndexOf(':');
+      var host = address.substring(0, sep);
+      var port = address.substring(sep + 1);
+      return new Promise(function(resolve, reject) {
+        require('dns').lookup(host, function(err, address, family) {
+          host = address || host;
+          var socket = new require('net').Socket();
+          socket.once('error', function(e) {
+            reject(e);
+          });
+          socket.once('connect', function() {
+            this.socket_ = socket;
+            this.write(this.RegisterSelfMessage.create({
+              name: this.me.name
+            }));
+            this.socketService.addSocket(this);
+            this.connect.pub();
+            resolve(this);
+          }.bind(this));
+
+          socket.connect(port, host);
+        }.bind(this));
+      }.bind(this));
+    },
+
     function onMessage() {
       var data = this.buffer.toString();
-      var obj = foam.json.parse(foam.json.parseString(data));
-      this.message.pub(obj);
+      this.message.pub(data);
     }
   ],
+
   listeners: [
     {
       name: 'onData',
@@ -251,11 +356,11 @@ foam.CLASS({
             start += 4;
           }
 
-
-          var written = data.copy(this.buffer,
-                                  this.offset,
-                                  start,
-                                  Math.min(remaining + start, end));
+          var written = data.copy(
+              this.buffer,
+              this.offset,
+              start,
+              Math.min(remaining + start, end));
 
           start += written;
           this.offset += written;
@@ -281,17 +386,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'SocketService',
+
   requires: [
-    'foam.net.Socket'
+    'foam.net.Socket',
+    'foam.box.RegisterSelfMessage'
   ],
+
   properties: [
-    {
-      class: 'Map',
-      name: 'sockets'
-    },
     {
       class: 'Boolean',
       name: 'listen',
@@ -299,15 +404,17 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'port'
+      name: 'port',
+      value: 7000
     },
     {
-      name: 'server',
+      name: 'server'
     },
     {
       name: 'delegate'
     }
   ],
+
   methods: [
     function init() {
       if ( ! this.listen ) return;
@@ -318,79 +425,60 @@ foam.CLASS({
         console.log("Server error", e);
         server.unref();
       }.bind(this));
-      this.server.listen(this.port);
+
+      if ( this.listen ) this.server.listen(this.port);
     },
-    function getSocket(host, port) {
-      console.assert(host, "Host is required");
-      console.assert(port, "Port is required");
 
-      var resolve;
-      var reject;
-      var p = new Promise(function(r, j) { resolve = r; reject = j; });
+    function addSocket(socket) {
+      var s1 = socket.message.sub(function(s, _, m) {
+        var m = foam.json.parse(foam.json.parseString(m), null, this);
 
-      require('dns').lookup(host, function(err, address, family) {
-        host = address || host;
+        if ( this.RegisterSelfMessage.isInstance(m) ) {
+          var named = foam.box.NamedBox.create({
+            name: m.name
+          });
 
-        var key = host + ":" + port;
-        if ( this.sockets[key] ) {
-          resolve(this.sockets[key]);
+          named.delegate = foam.box.RawSocketBox.create({
+            socket: socket
+          });
           return;
         }
 
-        resolve(new Promise(function(resolve, reject) {
-          var socket = new require('net').Socket();
-          socket.once('error', function(e) {
-            reject(e);
-          });
-          socket.once('connect', function() {
-            var s = this.Socket.create({
-              socket_: socket
-            });
-            this.addSocket(s, key);
-            resolve(s);
-          }.bind(this));
-          socket.connect(port, host);
-        }.bind(this)));
+        this.delegate && this.delegate.send(m);
       }.bind(this));
 
-      return p;
-    },
-    function addSocket(socket, key) {
-      if ( key ) this.sockets[key] = socket;
-
-      socket.message.sub(this.onMessage);
       socket.disconnect.sub(function() {
-        this.removeSocket(socket);
+        s1.destroy();
       }.bind(this));
-    },
-    function removeSocket(socket) {
-      socket.message.unsub(this.onMessage);
     }
   ],
+
   listeners: [
-    {
-      name: 'onMessage',
-      code: function(s, _, m) {
-        this.delegate && this.delegate.send(foam.json.parse(foam.json.parseString(m), null, this));
-      },
-    },
     {
       name: 'onConnection',
       code: function(socket) {
         socket = this.Socket.create({ socket_: socket });
-        var key = socket.remoteAddress + ":" + socket.remotePort;
         this.addSocket(socket);
       }
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocket',
+
   requires: [
     'foam.net.node.Frame'
   ],
+
+  topics: [
+    'message',
+    'connected',
+    'disconnected'
+  ],
+
   properties: [
     {
       name: 'socket',
@@ -409,13 +497,14 @@ foam.CLASS({
     'parts',
     'currentFrame'
   ],
-  topics: [
-    'message',
-    'connected',
-    'disconnected'
-  ],
+
   methods: [
     function send(data) {
+      if ( foam.box.Message.isInstance(data) ) {
+        data = data.clone().toRemote();
+        data = foam.json.Network.stringify(data);
+      }
+
       if ( typeof data == "string" ) {
         var opcode = 1;
         data = new Buffer(data);
@@ -430,10 +519,12 @@ foam.CLASS({
       });
       this.socket.write(frame.toData());
     },
+
     function close() {
       this.socket.end();
     }
   ],
+
   listeners: [
     {
       name: 'onClose',
@@ -499,46 +590,36 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
+  extends: 'foam.net.WebSocketService',
+
   requires: [
-    'foam.net.node.WebSocket'
+    'foam.net.node.WebSocket',
+    'foam.box.RegisterSelfMessage'
   ],
+
   properties: [
     {
-      name: 'port'
+      class: 'Int',
+      name: 'port',
+      value: 4000
     },
     {
       name: 'server'
     },
     {
       name: 'delegate'
-    },
-    {
-      class: 'Map',
-      name: 'sockets'
     }
   ],
-  topics: [
-    'message'
-  ],
+
   methods: [
     function init() {
       this.server = require('http').createServer(this.onRequest);
       this.server.listen(this.port);
       this.server.on('upgrade', this.onUpgrade);
-    },
-    function addSocket(socket) {
-//      this.sockets[socket.id] = socket;
-      var sub = socket.message.sub(this.onMessage);
-      socket.disconnected.sub(function() {
-        sub.destroy();
-//        delete this.sockets[socket.id];
-      });
     }
   ],
+
   listeners: [
-    function onMessage(s, _, msg) {
-      this.delegate.send(foam.json.parse(foam.json.parseString(msg)));
-    },
     function onUpgrade(req, socket, data) {
       var key = req.headers['sec-websocket-key'];
       key += '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
@@ -557,6 +638,152 @@ foam.CLASS({
         socket: socket
       });
       this.addSocket(socket);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.net.node',
+  name: 'HTTPRequest',
+  extends: 'foam.net.HTTPRequest',
+
+  requires: [
+    'foam.net.node.HTTPResponse'
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'followRedirect',
+      value: true
+    }
+  ],
+
+  methods: [
+    function fromUrl(url) {
+      var data = require('url').parse(url);
+      this.protocol = data.protocol.slice(0, -1);
+      this.hostname = data.hostname;
+      if ( data.port ) this.port = data.port;
+      this.path = data.path;
+    },
+
+    function send() {
+      if ( this.url ) {
+        this.fromUrl(this.url);
+      }
+
+      if ( this.protocol !== 'http' && this.protocol !== 'https' )
+        throw new Error("Unsupported protocol '" + this.protocol + "'");
+
+      var options = {
+        hostname: this.hostname,
+        headers: this.headers,
+        method: this.method,
+        path: this.path
+      };
+      if ( this.port ) options.port = this.port;
+
+      return new Promise(function(resolve, reject) {
+        var req = require(this.protocol).request(options, function(res) {
+          var resp = this.HTTPResponse.create({
+            resp: res,
+            responseType: this.responseType
+          });
+
+          if ( this.followRedirect &&
+               ( resp.status === 301 ||
+                 resp.status === 302 ||
+                 resp.status === 303 ||
+                 resp.status === 307 ||
+                 resp.status === 308 ) ) {
+            resolve(this.cls_.create({
+              url: resp.headers.location,
+              method: this.method,
+              payload: this.payload,
+              responseType: this.responseType,
+              headers: this.headers,
+              followRedirect: true
+            }).send());
+          } else {
+            resolve(resp);
+          }
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          reject(e);
+        });
+
+        if ( this.payload ) req.write(this.payload);
+        req.end();
+      }.bind(this));
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.net.node',
+  name: 'HTTPResponse',
+  extends: 'foam.net.HTTPResponse',
+
+  properties: [
+    {
+      name: 'payload',
+      factory: function() {
+        if ( this.streaming ) return null;
+
+        // TODO: Handle response type.
+        return new Promise(function(resolve, reject) {
+          var buffer = ""
+          this.resp.on('data', function(d) {
+            buffer += d.toString();
+          });
+          this.resp.on('end', function() {
+            resolve(buffer);
+          });
+          this.resp.on('error', function(e) {
+            reject(e);
+          });
+        }.bind(this));
+      }
+    },
+    {
+      name: 'resp',
+      postSet: function(_, r) {
+        this.status = r.statusCode;
+        this.headers = {};
+        for ( var key in r.headers ) {
+          this.headers[key.toLowerCase()] = r.headers[key];
+        }
+      }
+    }
+  ],
+
+  methods: [
+    function start() {
+      this.streaming = true;
+
+      return new Promise(function(resolve, reject) {
+        this.resp.on('data', function(chunk) {
+          this.data.pub(chunk);
+        }.bind(this));
+
+        this.resp.on('end', function() {
+          this.end.pub();
+          resolve(this);
+        }.bind(this));
+
+        this.resp.on('error', function(e) {
+          reject(e);
+        });
+      }.bind(this));
+    },
+
+    function stop() {
+      // TODO?
     }
   ]
 });

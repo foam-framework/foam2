@@ -1,4 +1,6 @@
 instrumentation:
-  root: ./src/core/
+  root: ./src/
   include-all-sources: true
+  default-excludes: true
+  excludes: [ '**/IDBDAO.js' ]
 

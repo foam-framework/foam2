@@ -1,7 +1,7 @@
 <html>
  <head>
   <script>console.time('boot');</script>
-  <script language="javascript" src="../../src/core/foam.js"></script>
+  <script language="javascript" src="../../src/foam.js"></script>
   <script>console.timeEnd('boot');</script>
   <title>FOAM By Example</title>
   <style>
@@ -322,6 +322,41 @@ foam.CLASS({
 log(com.acme.package.Person.isSubClass(Person));
 log(Person.isSubClass(com.acme.package.Person));
 
+// isSubClass() works for interfaces
+foam.CLASS({
+  package: 'test',
+  name: 'ThingI',
+  methods: [ function foo() { log('foo'); } ]
+});
+foam.CLASS({
+  package: 'test',
+  name: 'C1',
+  implements: [ 'test.ThingI' ]
+});
+log(test.ThingI.isSubClass(test.C1));
+
+// isSubClass() works for sub-interfaces
+foam.CLASS({
+  package: 'test',
+  name: 'Thing2I',
+  implements: [ 'test.ThingI' ]
+});
+foam.CLASS({
+  package: 'test',
+  name: 'Thing3I',
+  implements: [ 'test.ThingI' ]
+});
+foam.CLASS({
+  package: 'test',
+  name: 'C2',
+  implements: [ 'test.Thing2I' ]
+});
+var o = test.C2.create();
+o.foo();
+log(test.ThingI.isSubClass(test.C2));
+log(test.Thing2I.isSubClass(test.C2));
+log(test.Thing3I.isSubClass(test.C2));
+
 // Larger package and imports/exports demo.
 foam.CLASS({
   package: 'demo.bank',
@@ -344,7 +379,7 @@ foam.CLASS({
       code: function (amount) {
         this.balance += amount;
         this.reportDeposit(this.id, amount, this.balance);
-        console.log('Bank: ', this.X.Bank);
+        console.log('Bank: ', this.__context__.Bank);
         return this.balance;
       }
     },
@@ -417,17 +452,55 @@ foam.CLASS({
   ]
 });
 var oldPerson = Person.create({name: 'John', sex: 'M'});
+log(oldPerson.toString());
 foam.CLASS({
   refines: 'Person',
-  properties: [ { name: 'salary', value: 0 } ],
+  properties: [ { class: 'Float', name: 'salary', value: 0 } ],
   methods: [
-    function toString() { return this.SUPER() + ' ' + this.salary; }
+    function toString() { return this.name + ' ' + this.sex + ' ' + this.salary; }
   ]
 });
 Person.describe();
 var e = Person.create({name: 'Jane', sex: 'F', salary: 50000});
 log(e.toString());
 log(oldPerson.toString());
+
+// Refine a Property
+log(Person.SALARY.cls_.name);
+foam.CLASS({
+  refines: 'Person',
+  properties: [ { name: 'salary', value: 30000 } ]
+});
+log(Person.SALARY.cls_.name);
+var o = Person.create({name:'John'});
+log(o.salary);
+
+// Currently unsupported and unlikely to be supported.
+// Refine a Property Class
+foam.CLASS({ name: 'Salary', extends: 'Float' });
+foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
+foam.CLASS({ refines: 'Salary', properties: [ {name: 'value', value: 30000} ]});
+log(Emp.create().salary);
+
+// Refine foam.core Property Class
+foam.CLASS({ name: 'Emp2', properties: [ { class: 'Float', name: 'salary' } ] });
+foam.CLASS({ refines: 'Float', properties: [ [ 'javaClass', 'Float' ] ]});
+log(Emp2.SALARY.javaClass);
+
+// Currently unsupported and unlikely to be supported.
+// Refine a SuperProperty Class
+foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
+
+// Currently unsupported and unlikely to be supported.
+// Refine a SuperProperty Class
+foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
+foam.CLASS({ name: 'SubClass', extends: 'MidClass', properties: [ 'p1' ]});
+foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+log('super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
 
 // TODO: BooleanProperty
 
@@ -520,8 +593,8 @@ o.framed();
 // You can decorate a listener with delayed() to delay the
 // execution of the listener. Unlike merged(), which also delays
 // results, delayed() does not merge results.
-var l1 = foam.X.delayed(function() { console.log('l1'); }, 10);
-var l2 = foam.X.delayed(function() { console.log('l2'); }, 5);
+var l1 = foam.__context__.delayed(function() { console.log('l1'); }, 10);
+var l2 = foam.__context__.delayed(function() { console.log('l2'); }, 5);
 l1();
 l2();
 l1();
@@ -529,12 +602,29 @@ l2();
 
 //:NOTEST
 // async(l) is the same as delayed(l, 0)
-var d1 = foam.X.async(function() { console.log('d1'); });
+var d1 = foam.__context__.async(function() { console.log('d1'); });
 var d2 = function() { console.log('d2'); };
 d1();
 d2();
 d1();
 d2();
+
+// Listeners, like Methods, have SUPER support.
+foam.CLASS({
+  name: 'Alarm',
+  listeners: [
+    function alarm() { console.log('alarm'); }
+  ]
+});
+foam.CLASS({
+  name: 'LongAlarm',
+  extends: 'Alarm',
+  listeners: [
+    function alarm() { console.log('LongAlarm:'); this.SUPER(); this.SUPER(); this.SUPER(); }
+  ]
+});
+Alarm.create().alarm();
+LongAlarm.create().alarm();
 
 // Actions are methods which have extra information to make it easier
 // to call them from GUI's. Extra information includes things like:
@@ -637,8 +727,7 @@ InnerClassTest.create();
 InnerClassTest.InnerClass1.describe();
 
 // Inner-classes do not appear in the global namespace
-// TODO: isn't true yet
-log(! InnerClass1);
+log(! global.InnerClass1);
 
 // Objects support pub() for pubing events,
 // and sub() for listening for pubed events.
@@ -678,6 +767,7 @@ o.alarm.pub('on');
 o.pub('alarm', 'off');
 
 // Objects implicitly pub events on the 'propertyChange' topic when
+// property values change.
 foam.CLASS({
   name: 'PropertyChangeTest',
   properties: [ 'a', 'b' ]
@@ -740,6 +830,24 @@ log(dyn.get());
 dyn.set('John');
 log(dyn.get());
 
+// Nested slots
+foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
+var p1 = Person.create({name: 'John'});
+var p2 = Person.create({name: 'Paul'});
+var h = Holder.create({data: p1});
+var s = h.data$.dot('name');
+s.sub(function() { console.log('change: ', arguments, h.data.name); });
+log(s.get());
+s.set('George');
+log(p1.name);
+p1.name = 'Ringo';
+log('Setting to p2');
+h.data = p2;
+log(s.get());
+s.set('George');
+log(p2.name);
+p2.name = 'Ringo';
+
 // Two-Way Data-Binding
 // Slots can be assigned, causing two values to be
 // bound to the same value.
@@ -750,27 +858,90 @@ log(p1.name, p2.name);
 p2.name = 'Steve';
 log(p1.name, p2.name);
 
-// Another way to link two Slots is to call .link() on one of them.
-var p1 = Person.create(), p2 = Person.create();
-var d = p1.name$.link(p2.name$);
+// Another way to link two Slots is to call .linkFrom() on one of them.
+var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
+var d = p1.name$.linkFrom(p2.name$);
 p1.name = 'John';
 log(p1.name, p2.name);
 
 // But this style of link can be broken by calling .destroy()
-// on the object return from .link().
+// on the object return from .linkFrom/To().
 d.destroy();
 p2.name = 'Steve';
 log(p1.name, p2.name);
 
+// linkTo() is the same as linkFrom(), except that the initial value
+// is taken from 'this' instead of the other object.
+var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
+var d = p1.name$.linkTo(p2.name$);
+p1.name = 'John';
+log(p1.name, p2.name);
+
+// Two values can be linked through a relationship,
+// which provides functions to adapt between the two values.
+foam.CLASS({
+  name: 'Temperature',
+  properties: [
+    { class: 'Float', name: 'f' },
+    { class: 'Float', name: 'c' }
+  ],
+  methods: [
+    function init() {
+      this.f$.relateTo(
+        this.c$,
+        function c2f(f) { log('f', f); return 9/5 * f + 32; },
+        function f2c(c) { log('fp', c); return 5/9 * ( c - 32 ); });
+    }
+  ]
+});
+var t = Temperature.create();
+log(t.stringify());
+t.f = 100;
+log(t.stringify());
+t.c = 100;
+log(t.stringify());
+
 // One-Way Data-Binding
-// Calling .link() creates a two-way data-binding, meaning a change in either
+// Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a change in either
 // value is reflected in the other.  But FOAM supports one-way data-binding as well.
 // To do this, use the .follow() method.
 var d = p1.name$.follow(p2.name$);
 p2.name = 'Ringo'; // Will update p1 and p2
+p2.name = 'Paul'; // Will update p1 and p2
 log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
+d.destroy();
+
+// Follow copies the initial value.
+p1 = Person.create();
+p2 = Person.create({name:'John'});
+p1.name$.follow(p2.name$);
+log(p1.name, p2.name);
+
+// One-Way Data-Binding, with Map function (mapFrom)
+var d = p1.name$.mapFrom(p2.name$, function(n) {
+  return "Mr. " + n;
+});
+p1.name$.clear();
+p2.name$.clear();
+p2.name = 'Ringo'; // Will update p1 and p2
+log(p1.name, p2.name);
+p1.name = 'George'; // Will only update p1
+log(p1.name, p2.name);
+d.destroy();
+
+// One-Way Data-Binding, with Map function (mapTo)
+var d = p2.name$.mapTo(p1.name$, function(n) {
+  return "Mr. " + n;
+});
+p1.name$.clear();
+p2.name$.clear();
+p2.name = 'Ringo'; // Will update p1 and p2
+log(p1.name, p2.name);
+p1.name = 'George'; // Will only update p1
+log(p1.name, p2.name);
+d.destroy();
 
 // Slots also let you check if the value is defined by calling isDefined().
 // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
@@ -799,12 +970,24 @@ foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
 var p = Person.create({fname: 'John', lname: 'Smith'});
 var e = foam.core.ExpressionSlot.create({
   args: [ p.fname$, p.lname$],
-  fn: function(f, l) { return f + ' ' + l; }
+  code: function(f, l) { return f + ' ' + l; }
 });
 log(e.get());
 e.sub(log);
 p.fname = 'Steve';
 p.lname = 'Jones';
+log(e.get());
+
+// ExpressionSlot can also be supplied an object to work with, and then takes slots from function argument names.
+var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Smith'});
+var e = foam.core.ExpressionSlot.create({
+  obj: p,
+  code: function(f, l) { return f + ' ' + l; }
+});
+log(e.get());
+e.sub(log);
+p.f = 'Steve';
+p.l = 'Jones';
 log(e.get());
 
 // Destroy the ExpressionSlot to prevent further updates.
@@ -1018,13 +1201,13 @@ foam.CLASS({
   ]
 });
 
-// Contexts can be explicitly created with foam.subContext()
-// The second argument of subContext() is an optional name for the Context
-var Y1 = foam.subContext({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
+// Contexts can be explicitly created with foam.createSubContext()
+// The second argument of createSubContext() is an optional name for the Context
+var Y1 = foam.createSubContext({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
 console.log(Y1.key, Y1.fn());
 
 // Sub-Contexts can be created from other Contexts.
-var Y2 = Y1.subContext({key: 'value2'});
+var Y2 = Y1.createSubContext({key: 'value2'});
 console.log(Y2.key, Y2.fn());
 
 //:NOTEST
@@ -1033,18 +1216,21 @@ Y1.describe();
 Y2.describe();
 
 // Classes can import values from the Context so that they can be accessed from 'this'.
-var Y = foam.subContext({log: function(msg) { console.log('log:', msg); }});
+var Y = foam.createSubContext({ myLogger: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
-  imports: [ 'log', 'warn' ],
+  imports: [ 'myLogger' ],
   methods: [ function foo() {
-    this.log('log foo from ImportTest');
-    this.warn('warn foo from ImportTest');
+    this.myLogger('log foo from ImportTest');
   } ]
 });
-var o = ImportsTest.create();
-o.foo();
-Y.log('test');
+try {
+  var o = ImportsTest.create();
+  o.foo();
+} catch(e) {
+  log('Could not import "myLogger" since nobody provided it.');
+}
+Y.myLogger('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
 
@@ -1052,13 +1238,13 @@ o.foo();
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'log', 'log as warn' ],
+  exports: [ 'myLogger' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
     },
-    function log(msg) {
-      console.log('log:', msg);
+    function myLogger(msg) {
+      console.log('log from ExportsTest:', msg);
     }
   ]
 });
@@ -1153,6 +1339,17 @@ AxiomTest.create();
 AxiomTest.create();
 log(AxiomTest.create() === AxiomTest.create());
 
+//
+foam.CLASS({
+  name: 'AxiomSubTest',
+  extends: 'AxiomTest',
+  methods: [ function init() { log('Creating AxiomSubTest'); } ]
+});
+AxiomSubTest.create();
+AxiomSubTest.create();
+log(AxiomSubTest.create() === AxiomSubTest.create());
+log(AxiomSubTest.create() === AxiomTest.create());
+
 // Stdlib
 
 //:NOTEST
@@ -1187,9 +1384,9 @@ log(f(1,2));
 log(foam.Function.argsStr(function(a,b,fooBar) { }));
 log(typeof foam.Function.argsStr(function() { }));
 
-// foam.Function.argsArray() returns a function's arguments an an array.
-log(foam.Function.argsArray(function(a,b,fooBar) { }));
-log(Array.isArray(foam.Function.argsArray(function() { })));
+// foam.Function.formalArgs() returns a function's arguments an an array.
+log(foam.Function.formalArgs(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.formalArgs(function() { })));
 
 // foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
 log(foam.String.constantize('foo'));
@@ -1380,8 +1577,11 @@ o = JSONTest.create({
 // Default JSON formatting
 log(foam.json.stringify(o));
 
+// Convert to a JSON object (instead of a String)
+log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
+
 // Or as a method on Objects
-log(o.toJSON());
+log(o.stringify());
 
 //
 log(foam.json.Pretty.stringify(o));
@@ -1526,7 +1726,7 @@ foam.CLASS({
   ]
 });
 var g = GraphicsDemo.create();
-log_(g.toHTML());
+g.write();
 g.step();
 
 //:NOTEST
@@ -1569,7 +1769,7 @@ foam.CLASS({
   ]
 });
 var g = Spin.create();
-log_(g.toHTML());
+g.write();
 
 //:NOTEST
 // More Graphics
@@ -1633,7 +1833,7 @@ foam.CLASS({
   ]
 });
 var g = TudorWall.create();
-log_(g.toHTML());
+g.write();
 </script>
 
   <div id='output'></div>
@@ -1666,6 +1866,7 @@ log_(g.toHTML());
       }
 
       log_(' <h3>Example ' + (i_+1) + '</h3><code>' + line + '</code><br>');
+      foam.__context__ = foam.createSubContext({});
       log_.capture = istest;
       log_.output = "";
       try {
@@ -1676,6 +1877,7 @@ log_(g.toHTML());
       log_.capture = false;
       if ( istest ) {
         test_code += '\n\n// Example ' + (i_ + 1) + '\n';
+        test_code += 'foam.__context__ = foam.createSubContext({});\n';
         test_code += 'log_.output = "";\n';
         test_code += 'try {\n' + line + '\n} catch(x) {\n log("Exception: ", x);\n }\n';
         var golden = log_.output.replace(/\n/g, "\\n")
@@ -1734,28 +1936,38 @@ log_(g.toHTML());
 
     unittests.push(
     'var golden = "' + golden + '";\n',
-    'var oldLog, oldAssert, oldWarn, oldError;\n',
+    'var oldLog, oldAssert, oldWarn, oldError, oldFAssert;\n',
     'beforeEach(function() {\n',
     '  oldLog = console.log;\n',
     '  oldAssert = console.assert;\n',
+    '  oldFAssert = foam.core.FObject.prototype.assert;\n',
     '  oldWarn = console.warn;\n',
     '  oldError = console.error;\n',
-    "  console.assert = function(b, e) { if ( ! b ) { log('Assertion failed:', e); throw 'assert'; } };\n",
-    "  console.log = function() { log_([].join.call(arguments, ' ')); };\n",
+    '  console.assert = function(b) {\n',
+    '    if ( ! b ) {\n',
+    '      var args = Array.from(arguments);\n',
+    '      args[0] = "Assertion failed:";\n',
+    '      log.apply(this, args);\n',
+    '      throw "assert";\n',
+    '    }\n',
+    '  };\n',
+    '  foam.core.FObject.prototype.assert = console.assert;\n',
+    '  console.log = function() { log_([].join.call(arguments, " ")); };\n',
     '  console.log.put = console.log.bind(console);\n',
     '  console.log.str = oldLog.str;\n',
     '  console.log.json = oldLog.json;\n',
-    "  console.warn = function() { log_('warn: ' + [].join.call(arguments, ' ')); };\n",
-    "  console.error = function() { log_('error: ' + [].join.call(arguments, ' ')); };\n",
+    '  console.warn = function() { log_("warn: " + [].join.call(arguments, " ")); };\n',
+    '  console.error = function() { log_("error: " + [].join.call(arguments, " ")); };\n',
     '  log_.output = "";\n',
     '  jasmine.addMatchers(customMatchers);\n',
-    '});\n\n',
+    '});\n',
     'afterEach(function() {\n',
     '  console.assert = oldAssert;\n',
     '  console.log = oldLog;\n',
     '  console.warn = oldWarn;\n',
     '  console.error = oldError;\n',
-    '});\n\n',
+    '  foam.core.FObject.prototype.assert = oldFAssert;\n',
+    '});\n',
     'it("", function() {\n' + test_code + '\n\n',
     '});\n});\n\n');
 

@@ -369,19 +369,13 @@ describe('MLang', function() {
     });
   });
 
-  it('Boolean properties can be used alone', function(done) {
-    dao.where(test.mlang.Person.DECEASED).select()
-    .then(function(sink) {
-      expect(sink.a.length).toBe(2);
-      done();
-    });
-  });
-
   describe('NOT()', function() {
     var NOT;
+    var EQ;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       NOT = expr.NOT.bind(expr);
+      EQ = expr.EQ.bind(expr);
     });
 
     it('works on solitary Boolean properties', function(done) {
@@ -414,7 +408,7 @@ describe('MLang', function() {
     });
 
     it('toString()s nicely', function() {
-      expect(NOT('something').toString()).toBe('NOT("something")');
+      expect(NOT(EQ(test.mlang.Person.ID, "123")).toString()).toBe('NOT(EQ(id, "123"))');
     });
   });
 
@@ -498,9 +492,11 @@ describe('MLang', function() {
 
   describe('OR()', function() {
     var OR;
+    var FUNC;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       OR = expr.OR.bind(expr);
+      FUNC = expr.FUNC.bind(expr);
     });
 
     it('returns false when passed no arguments', function() {
@@ -521,7 +517,7 @@ describe('MLang', function() {
         called = true;
         return false;
       };
-      expect(OR(false, true, false, { f: shouldNotBeCalled }).f()).toBe(true);
+      expect(OR(false, true, false, FUNC(shouldNotBeCalled)).f()).toBe(true);
       expect(called).toBe(false);
     });
 
@@ -536,9 +532,11 @@ describe('MLang', function() {
 
   describe('AND()', function() {
     var AND;
+    var FUNC;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       AND = expr.AND.bind(expr);
+      FUNC = expr.FUNC.bind(expr);
     });
 
     it('returns true when passed no arguments', function() {
@@ -560,7 +558,7 @@ describe('MLang', function() {
         called = true;
         return false;
       };
-      expect(AND(true, true, false, { f: shouldNotBeCalled }).f()).toBe(false);
+      expect(AND(true, true, false, FUNC(shouldNotBeCalled)).f()).toBe(false);
       expect(called).toBe(false);
     });
 
@@ -667,6 +665,31 @@ describe('MLang', function() {
     it('toString()s nicely', function() {
       expect(MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create()).toString()).toBe(
           'MAP(name)');
+    });
+  });
+
+  describe('Keyword()', function() {
+    var KEYWORD;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      KEYWORD = expr.KEYWORD.bind(expr);
+    });
+
+    it('finds substrings of any String properties', function(done) {
+      dao.where(KEYWORD('Hendrix')).select().then(function(sink) {
+        var a = sink.a;
+        expect(a.length).toBe(1);
+        expect(a[0].name).toBe('Jimi Hendrix');
+        done();
+      });
+    });
+
+    it('always fails if the input is empty', function(done) {
+      dao.where(KEYWORD('')).select().then(function(sink) {
+        var a = sink.a;
+        expect(a.length).toBe(0);
+        done();
+      });
     });
   });
 });

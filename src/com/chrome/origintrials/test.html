@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="../../../foam.js"></script>
+    <script src="model/Application.js"></script>
+    <script src="ui/Apply.js"></script>
+    <script src="ui/Browse.js"></script>
+    <script src="TestConfiguration.js"></script>
+  </head>
+  <body>
+    <script>
+      var env = com.chrome.origintrials.TestConfiguration.create();
+      var controller = com.chrome.origintrials.ui.Browse.create({ data: env.applicationDAO }, env).write();
+    </script>
+  </body>
+</html>

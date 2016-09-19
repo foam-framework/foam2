@@ -21,7 +21,8 @@ foam.CLASS({
   name: 'Collider',
 
   properties: [
-    { name: 'children', factory: function() { return []; } }
+    { name: 'children', factory: function() { return []; } },
+    'stopped_'
   ],
 
   listeners: [
@@ -137,7 +138,7 @@ foam.CLASS({
       var m2 = -c2.momentumAtAngle(a);
       var m  = 2 * ( m1 + m2 );
 
-      // ensure a minimum amount of momentum to that objects don't overlap
+      // ensure a minimum amount of momentum so that objects don't overlap
       m = Math.max(1, m);
       var tMass = c1.mass + c2.mass;
       c1.applyMomentum(-m * c2.mass/tMass, a);

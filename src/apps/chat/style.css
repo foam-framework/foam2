@@ -1,3 +1,4 @@
+
 body {
     margin: 0;
     word-wrap: break-word;
@@ -43,4 +44,20 @@ body {
 
 .message-timestamp {
     display: inline;
+}
+
+#connected-status {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    font: sans-serif;
+    display: none;
+}
+
+#connected-status .connected {
+    color: green;
+}
+
+#connected-status .disconnected {
+    color: red;
 }

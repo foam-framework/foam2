@@ -15,14 +15,20 @@
  * limitations under the License.
  */
 
+/**
+  AbstractClass is the root of FOAM's class hierarchy.
+  The FObject Class extends AbstractClass.
+ */
 foam.LIB({
+  // ???: Why is this is 'foam' instead of 'foam.core'
   name: 'foam.AbstractClass',
 
   // documentation: "Root prototype for all classes.",
 
   constants: {
     prototype: Object.prototype,
-    axiomMap_: {}
+    axiomMap_: {},
+    private_:  { axiomCache: {} }
   },
 
   methods: [
@@ -30,7 +36,7 @@ foam.LIB({
       Create a new instance of this class.
       Configured from values taken from 'args', if supplifed.
     */
-    function create(args, X) {
+    function create(args, opt_parent) {
       var obj = Object.create(this.prototype);
 
       // Properties have their values stored in instance_ instead
@@ -41,18 +47,18 @@ foam.LIB({
       obj.instance_ = {};
 
       // initArgs() is the standard argument extraction method.
-      obj.initArgs(args, X);
+      obj.initArgs(args, opt_parent);
 
       // init(), if defined, is called when object is created.
       // This is where class specific initialization code should
       // be put (not in initArgs).
-      obj.init && obj.init();
+      obj.init();
 
       return obj;
     },
 
     /**
-      Install an Axiom into the class and prototype.
+      Install Axioms into the class and prototype.
       Invalidate the axiom-cache, used by getAxiomsByName().
 
       FUTURE: Wait for first object to be created before creating prototype.
@@ -60,19 +66,50 @@ foam.LIB({
       wait until the first object is created. This will provide
       better startup performance.
     */
-    function installAxiom(a) {
-      // Store the destination class in the Axiom.  Used by describe().
-      // Store source class on a clone of 'a' so that the Axiom can be
-      // reused without corrupting the sourceCls_.
-      // Disabled: is causing dramatic performance slow-down.
-      // a = Object.create(a);
-      a.sourceCls_ = this;
-
-      this.axiomMap_[a.name] = a;
+    function installAxioms(axs) {
       this.private_.axiomCache = {};
 
-      a.installInClass && a.installInClass(this);
-      a.installInProto && a.installInProto(this.prototype);
+      // We install in two passes to avoid ordering issues from Axioms which
+      // need to access other axioms, like ids: and exports:.
+
+      for ( var i = 0 ; i < axs.length ; i++ ) {
+        var a = axs[i];
+
+        // Store the destination class in the Axiom. Used by describe().
+        // Store source class on a clone of 'a' so that the Axiom can be
+        // reused without corrupting the sourceCls_.
+        a.sourceCls_ = this;
+
+        this.axiomMap_[a.name] = a;
+      }
+
+      for ( var i = 0 ; i < axs.length ; i++ ) {
+        var a = axs[i];
+
+        a.installInClass && a.installInClass(this);
+        a.installInProto && a.installInProto(this.prototype);
+
+        if ( a.name ) {
+          this.pubsub_ && this.pubsub_.pub('installAxiom', a.name, a);
+        }
+      }
+    },
+
+    function installAxiom(a) {
+      this.installAxioms([a]);
+    },
+
+    function installConstant(key, value) {
+      var cName = foam.String.constantize(key);
+      var prev  = this[cName];
+
+      // Detect constant name collisions
+      if ( prev && prev.name !== key ) {
+        throw 'Class constant conflict: ' +
+          this.id + '.' + cName + ' from: ' + key + ' and ' + prev.name;
+      }
+
+      this.prototype[cName] = this[cName] = value;
     },
 
     /**
@@ -83,15 +120,19 @@ foam.LIB({
       return !! ( o && o.cls_ && this.isSubClass(o.cls_) );
     },
 
-    /** Determine if a class is either this class or a sub-class. */
+    /**
+      Determine if a class is either this class, a sub-class, or
+      if it implements this class (directly or indirectly).
+    */
     function isSubClass(c) {
-      if ( ! c ) return false;
+      if ( ! c || ! c.id ) return false;
 
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
 
       if ( cache[c.id] === undefined ) {
         cache[c.id] = ( c === this.prototype.cls_ ) ||
+          ( c.getAxiomByName && !! c.getAxiomByName('implements_' + this.id) ) ||
           this.isSubClass(c.__proto__);
       }
 
@@ -101,6 +142,11 @@ foam.LIB({
     /** Find an axiom by the specified name from either this class or an ancestor. */
     function getAxiomByName(name) {
       return this.axiomMap_[name];
+    },
+
+    /** Find an axiom by the specified name from an ancestor. */
+    function getSuperAxiomByName(name) {
+      return this.axiomMap_.__proto__[name];
     },
 
     /**
@@ -123,12 +169,24 @@ foam.LIB({
       return as;
     },
 
+    function getOwnAxiomsByClass(cls) {
+      return this.getAxiomsByClass(cls).filter(function(a) {
+        return this.hasOwnAxiom(a.name);
+      }.bind(this));
+    },
+
     /**
       Return true if an axiom named "name" is defined on this class
       directly, regardless of what parent classes define.
     */
     function hasOwnAxiom(name) {
-      return this.axiomMap_.hasOwnProperty(name);
+      return Object.hasOwnProperty.call(this.axiomMap_, name);
+    },
+
+    function getOwnAxioms() {
+      return this.getAxioms().filter(function(a) {
+        return this.hasOwnAxiom(a.name);
+      }.bind(this));
     },
 
     /** Returns all axioms defined on this class or its parent classes. */
@@ -169,7 +227,17 @@ foam.LIB({
           if ( typeof a === 'function' ) {
             m.methods[i] = a = { name: a.name, code: a };
           }
-          this.prototype[a.name] = a.code;
+
+          if ( foam.core.Method ) {
+            console.assert(a.cls_ !== foam.core.Method,
+              'Method', a.name, 'on', m.name,
+              'has already been upgraded to a Method');
+
+            a = foam.core.Method.create(a);
+            this.installAxiom(a);
+          } else {
+            this.prototype[a.name] = a.code;
+          }
         }
       }
 
@@ -192,8 +260,13 @@ foam.LIB({
             m.properties[i] = a = { name: a };
           }
 
-          var type = foam.lookup(a.class) || foam.core.Property;
-          if ( type !== a.cls_ ) a = type.create(a);
+          var type = foam.lookup(a.class, true) || foam.core.Property;
+          console.assert(
+            type !== a.cls_,
+            'Property', a.name, 'on', m.name,
+            'has already been upgraded to a Property.');
+
+          a = type.create(a);
 
           this.installAxiom(a);
         }

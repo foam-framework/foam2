@@ -55,10 +55,16 @@
 */
 foam.CLASS({
   package: 'foam.core',
-  name: 'Method',
+  name: 'AbstractMethod',
   extends: 'FObject',
 
-  properties: [ 'name', 'code', 'returns' ],
+  properties: [
+    { name: 'name', required: true },
+    { name: 'code', required: true },
+    'documentation',
+    'returns',
+    'args'
+  ],
 
   methods: [
     /**
@@ -66,24 +72,34 @@ foam.CLASS({
       method it overrides with this.SUPER().
     */
     function override_(proto, method) {
-      var super_ = proto[this.name];
-
       if ( ! method ) return;
 
       // Not using SUPER, so just return original method
       if ( method.toString().indexOf('SUPER') == -1 ) return method;
 
-      // Not overriding, stub out super_
-      if ( ! super_ ) super_ = function() {};
+      var superMethod_ = proto.cls_.getSuperAxiomByName(this.name);
+      var super_;
 
-      console.assert(
-          typeof super_ === 'function',
-          'Attempt to override non-method: ',
-          this.name);
+      if ( ! superMethod_ ) {
+        var name = this.name;
+        var id = proto.cls_.id;
+
+        super_ = function() {
+          console.warn('Attempted to use SUPER() in',
+            name, 'on', id, 'but no parent method exists.');
+        };
+      } else {
+        this.assert(foam.core.AbstractMethod.isInstance(superMethod_),
+          'Attempt to override non-method', this.name, 'on', proto.cls_.id);
+
+        // Fetch the super method from the proto, as the super method axiom
+        // may have decorated the code before installing it.
+        super_ = proto.__proto__[this.name];
+      }
 
       function SUPER() { return super_.apply(this, arguments); }
 
-      var f = function() {
+      var f = function superWrapper() {
         var oldSuper = this.SUPER;
         this.SUPER = SUPER;
 
@@ -101,7 +117,29 @@ foam.CLASS({
 
       return f;
     },
+    function createChildMethod_(child) {
+      return child;
+    },
+    function installInClass(cls) {
+      var method = this;
 
+      var superMethod = cls.getSuperAxiomByName(method.name);
+      if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
+        method = superMethod.createChildMethod_(method);
+      }
+
+      cls.axiomMap_[method.name] = method;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Method',
+  extends: 'foam.core.AbstractMethod',
+
+  methods: [
     function installInProto(proto) {
       proto[this.name] = this.override_(proto, this.code);
     },

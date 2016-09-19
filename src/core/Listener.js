@@ -43,13 +43,13 @@
     <pre>alarm.ring.sub(sprinker.onAlarm.bind(sprinkler));</pre>
   But listeners are pre-bound.
 */
+// TODO(kgr): Add SUPER support.
 foam.CLASS({
   package: 'foam.core',
   name: 'Listener',
+  extends: 'foam.core.AbstractMethod',
 
   properties: [
-    { name: 'name', required: true },
-    { name: 'code', required: true },
     { class: 'Boolean', name: 'isFramed',   value: false },
     { class: 'Boolean', name: 'isMerged',   value: false },
     { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' }
@@ -57,14 +57,23 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
+      var superAxiom = proto.cls_.getSuperAxiomByName(this.name);
+
+      this.assert(
+        ! superAxiom ||
+          foam.core.Listener.isInstance(superAxiom),
+        'Attempt to override non-listener', this.name);
+
       var name       = this.name;
-      var code       = this.code;
+      var code       = this.override_(proto, foam.Function.setName(this.code, name));
       var isMerged   = this.isMerged;
       var isFramed   = this.isFramed;
       var mergeDelay = this.mergeDelay;
 
       Object.defineProperty(proto, name, {
-        get: function topicGetter() {
+        get: function listenerGetter() {
+          if ( this.cls_.prototype === this ) return code;
+
           if ( ! this.hasOwnPrivate_(name) ) {
             var self = this;
             var l = function(sub) {
@@ -78,12 +87,10 @@ foam.CLASS({
               }
             };
 
-            foam.Function.setName(l, name);
-
             if ( isMerged ) {
-              l = this.X.merged(l, mergeDelay);
+              l = this.__context__.merged(l, mergeDelay);
             } else if ( isFramed ) {
-              l = this.X.framed(l);
+              l = this.__context__.framed(l);
             }
             this.setPrivate_(name, l);
           }
@@ -97,8 +104,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Model',
+
   properties: [
     {
       class: 'AxiomArray',
@@ -109,6 +118,7 @@ foam.CLASS({
           console.assert(o.name, 'Listener must be named');
           return foam.core.Listener.create({name: o.name, code: o});
         }
+
         return foam.core.Listener.isInstance(o) ?
             o :
             foam.core.Listener.create(o) ;

@@ -229,18 +229,18 @@ describe('Array clone (deep copy)', function() {
     var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
     var b = foam.util.clone(a);
     expect(a).not.toBe(b);
-    expect(a).toEqual(b);
+    expect(a[1].compareTo(b[1])).toEqual(0);
     expect(a[1]).not.toBe(b[1]);
   });
 });
 
-describe('foam.Function.argsArray', function() {
+describe('foam.Function.formalArgs', function() {
 
   it('handles an empty arg list', function() {
     var fn = function( ) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([]);
   });
 
@@ -249,7 +249,7 @@ describe('foam.Function.argsArray', function() {
        func, obj, num,  arr ) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
   });
 
@@ -258,7 +258,7 @@ describe('foam.Function.argsArray', function() {
       /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
   });
 
@@ -267,7 +267,7 @@ describe('foam.Function.argsArray', function() {
         /* // a comment here */ name, another /* return // comment */) {
       return (true);
     }
-    var args = foam.Function.argsArray(fn);
+    var args = foam.Function.formalArgs(fn);
     expect(args).toEqual([ 'arg', 'more', 'name', 'another' ]);
   });
 
@@ -333,4 +333,11 @@ describe('Date', function() {
   //   jasmine.clock().tick(60000*60*24*365);
   //   expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
   // });
+});
+
+describe('String.daoize', function() {
+  it('should convert "FooBar" to "fooBarDAO"', function() {
+    expect(foam.String.daoize('Foo')).toBe('fooDAO');
+    expect(foam.String.daoize('FooBar')).toBe('fooBarDAO');
+  });
 });

@@ -1,16 +1,25 @@
 if ( navigator.serviceWorker ) {
-  navigator.serviceWorker.getRegistration().then(function(r) {
-    r && r.unregister();
+  navigator.serviceWorker.register('sw.js');
+
+  var sw = foam.apps.chat.ServiceWorker.create({
+    registration: navigator.serviceWorker.ready
   });
+
+
+  navigator.serviceWorker.onmessage = function(e) {
+    if ( e.data === 'NEWDATA' ) {
+      client.sharedWorker.sync();
+    }
+  };
+
+  // navigator.serviceWorker.getRegistration().then(function(r) {
+  //   r && r.unregister();
+  // });
 }
 
-var env = foam.apps.chat.BoxEnvironment.create();
-var client = foam.apps.chat.Client.create({
-  isSafari: navigator.userAgent.indexOf('Safari') !== -1 &&
-    navigator.userAgent.indexOf('Chrome') === -1
-}, env);
-
-var ME = 'Anonymous';
+var env    = foam.apps.chat.Context.create();
+var client = foam.apps.chat.Client.create(null, env);
+var ME     = 'Anonymous';
 
 document.location.search.substring(1).split('&').forEach(function(s) {
   s = s.split('=');
@@ -18,9 +27,31 @@ document.location.search.substring(1).split('&').forEach(function(s) {
 });
 
 var messages = document.getElementById('messages');
-var pending = document.getElementById('pending');
-var input = document.getElementById('input');
-var send = document.getElementById('send');
+var pending  = document.getElementById('pending');
+var input    = document.getElementById('input');
+var send     = document.getElementById('send');
+
+var statusbar = document.getElementById('connected-status');
+
+function updateStatus(v) {
+//  statusbar.textContent = v ? 'Connected' : 'Disconnected';
+//  statusbar.className = v ? 'connected' : 'disconnected';
+}
+
+client.connected$.sub(function(s, o, p, v) {
+  updateStatus(v.get());
+});
+updateStatus(client.connected);
+
+client.sharedWorker.sub('journalUpdate', function() {
+  navigator.serviceWorker.ready.then(function(s) {
+    s.sync.register({
+      id: 'messages'
+    });
+  }, function() {
+    // Handle no service worker case.
+  });
+});
 
 function sendMessage() {
   if ( input.value ) {
@@ -44,6 +75,7 @@ send.addEventListener('click', sendMessage);
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'MessageTable',
+
   properties: [
     {
       name: 'table',
@@ -58,6 +90,7 @@ foam.CLASS({
       value: false
     }
   ],
+
   listeners: [
     function onRemove(m) {
       if ( this.rows[m.id] ) {
@@ -65,9 +98,11 @@ foam.CLASS({
         delete this.rows[m.id];
       }
     },
+
     function onReset() {
       this.table.children = [];
     },
+
     function onMessage(m) {
       if ( m.syncNo < 0 !== this.pending ) {
         if ( this.rows[m.id] ) {
@@ -127,14 +162,17 @@ var pendingMsgs = foam.apps.chat.MessageTable.create({
   pending: true
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'Highlight',
+
   imports: [
     'document',
     'setInterval',
     'clearInterval'
   ],
+
   properties: [
     {
       class: 'String',
@@ -155,10 +193,12 @@ foam.CLASS({
       name: 'interval'
     }
   ],
+
   methods: [
     function init() {
       this.document.addEventListener('focusin', this.clear);
     },
+
     function highlight(obj) {
       if ( this.document.hasFocus() || this.interval ) return;
 
@@ -169,12 +209,14 @@ foam.CLASS({
       this.update();
     }
   ],
+
   listeners: [
     function clear() {
       this.document.title = this.oldTitle;
       this.clearInterval(this.interval);
       this.interval = 0;
     },
+
     function update() {
       this.state = ! this.state;
       this.document.title = this.state ? this.oldTitle : this.newTitle;
@@ -204,9 +246,9 @@ function onMessage(m) {
 }
 
 
-// client.messageDAO.select().then(function(a) {
-//   a.a.map(onMessage);
-// });
+client.messageDAO.select().then(function(a) {
+  a.a.map(onMessage);
+});
 
 client.messageDAO.on.put.sub(function(s, _, _, m) {
   onMessage(m);

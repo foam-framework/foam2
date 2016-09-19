@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+// TODO: Methods defined here, like copyFrom() and toString() don't appear
+// in describe() because they aren't added as method axioms, but as bootstrap
+// methods instead. Fix.
+
 /** The implicit base model for the model heirarchy. If you do not
  *  explicitly extend another model, FObject is used. Most models will
  *  extend FObject and inherit its methods.
@@ -39,17 +43,15 @@ foam.CLASS({
     function initArgs(args) {
       if ( ! args ) return;
 
-      if ( args.originalArgs_ ) {
-        args = args.originalArgs_;
-      } else {
-        this.originalArgs_ = args;
-      }
-
       for ( var key in args ) this[key] = args[key];
     },
 
+    function init() {
+      /* Template method to do on creation initialization */
+    },
+
     function hasOwnProperty(name) {
-      return typeof this.instance_[name] !== 'undefined';
+      return this.instance_[name] !== undefined;
     },
 
     /**
@@ -62,7 +64,11 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined
-        this.pub('propertyChange', name, this.slot(name));
+
+        // Avoid creating slot and publishing event if no listeners
+        if ( this.hasListeners('propertyChange', name) ) {
+          this.pub('propertyChange', name, this.slot(name));
+        }
       }
     },
 
@@ -71,7 +77,9 @@ foam.CLASS({
       instance variables.  Things like listeners and topics.
     */
     function setPrivate_(name, value) {
-      ( this.private_ || ( this.private_ = {} ) )[name] = value;
+      var p = this.private_;
+      if ( ! p ) p = this.private_ = {};
+      p[name] = value;
       return value;
     },
 
@@ -81,11 +89,10 @@ foam.CLASS({
 
     function hasOwnPrivate_(name) {
       return this.private_ && typeof this.private_[name] !== 'undefined';
-
     },
 
     function clearPrivate_(name) {
-      if ( this.private_ ) this.private_[name] = undefined;
+      this.private_[name] = undefined;
     },
 
     function pubPropertyChange_() {
@@ -107,15 +114,18 @@ foam.CLASS({
      ************************************************/
 
     // Imports aren't implemented yet, so mimic:
-    //   imports: [ 'assert', 'error', 'log', 'warn' ],
+    //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
 
-    function assert() { this.X.assert.apply(null, arguments); },
+    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
 
-    function error() { this.X.error.apply(null, arguments); },
+    function assert(f) { if ( ! f ) (this.__context__ || foam.__context__).assert.apply(null, arguments); },
 
-    function log() { this.X.log.apply(null, arguments); },
+    function error() { this.__context__.error.apply(null, arguments); },
 
-    function warn() { this.X.warn.apply(null, arguments); },
+    function log() { this.__context__.log.apply(null, arguments); },
+
+    function warn() { this.__context__.warn.apply(null, arguments); },
+
 
 
     /************************************************
@@ -149,7 +159,7 @@ foam.CLASS({
       }
     */
     function createListenerList_() {
-      return { next: null, children: {} };
+      return { next: null };
     },
 
     /** Return the top-level listener list, creating if necessary. */
@@ -168,6 +178,11 @@ foam.CLASS({
       while ( listeners ) {
         var l = listeners.l;
         var s = listeners.sub;
+
+        // Update 'listeners' before notifying because the listener
+        // may set next to null.
+        listeners = listeners.next;
+
         // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
         // ???: optional exception trapping, benchmark
@@ -184,7 +199,6 @@ foam.CLASS({
           case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
           default: l.apply(l, [s].concat(Array.from(a)));
         }
-        listeners = listeners.next;
         count++;
       }
       return count;
@@ -197,7 +211,7 @@ foam.CLASS({
       for ( var i = 0 ; listeners ; i++ ) {
         if ( listeners.next        ) return true;
         if ( i == arguments.length ) return false;
-        listeners = listeners.children[arguments[i]];
+        listeners = listeners.children && listeners.children[arguments[i]];
       }
 
       return false;
@@ -258,7 +272,7 @@ foam.CLASS({
 
       // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
-        var listeners = listeners.children[args[i]];
+        var listeners = listeners.children && listeners.children[args[i]];
         if ( ! listeners ) break;
         count += this.notify_(listeners.next, args);
       }
@@ -292,8 +306,9 @@ foam.CLASS({
       var listeners = this.listeners_();
 
       for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
-        listeners = listeners.children[arguments[i]] ||
-            ( listeners.children[arguments[i]] = this.createListenerList_() );
+        var children = listeners.children || ( listeners.children = {} );
+        listeners = children[arguments[i]] ||
+            ( children[arguments[i]] = this.createListenerList_() );
       }
 
       var node = {
@@ -327,7 +342,7 @@ foam.CLASS({
       var listeners = this.getPrivate_('listeners');
 
       for ( var i = 0 ; i < arguments.length-1 && listeners ; i++ ) {
-        listeners = listeners.children[arguments[i]];
+        listeners = listeners.children && listeners.children[arguments[i]];
       }
 
       var node = listeners && listeners.next;
@@ -353,11 +368,19 @@ foam.CLASS({
     /**
       Creates a Slot for an Axiom.
     */
-    function slot(name) {
-      var axiom = this.cls_.getAxiomByName(name);
+    function slot(obj) {
+      if ( typeof obj === 'function' ) {
+        return foam.core.ExpressionSlot.create(
+          arguments.length == 1 ?
+            { code: obj, obj: this } :
+            { code: obj, obj: this, args: Array.prototype.slice.call(arguments, 1) }
+        );
+      }
 
-      this.assert(axiom, 'Unknown axiom:', name);
-      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', name);
+      var axiom = this.cls_.getAxiomByName(obj);
+
+      this.assert(axiom, 'Unknown axiom:', obj);
+      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
 
       return axiom.toSlot(this);
     },
@@ -417,6 +440,7 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
+      if ( ! other        ) return 1;
 
       if ( this.model_ !== other.model_ ) {
         return other.model_ ?
@@ -490,15 +514,13 @@ foam.CLASS({
     },
 
     /** Create a deep copy of this object. **/
-    function clone() {
+    function clone(opt_X) {
       var m = {};
       for ( var key in this.instance_ ) {
         var value = this[key];
-        if ( value !== undefined ) {
-          this.cls_.getAxiomByName(key).cloneProperty(value, m);
-        }
+        this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
-      return this.cls_.create(m/*, this.X*/);
+      return this.cls_.create(m, opt_X || this.__context__);
     },
 
     /**
@@ -519,21 +541,65 @@ foam.CLASS({
      If an FObject is supplied, it doesn't need to be the same class as 'this'.
      Only properties that the two classes have in common will be copied.
      */
-    function copyFrom(o) {
-      var a = this.cls_.getAxiomsByClass(foam.core.Property);
+    function copyFrom(o, opt_warn) {
+      // When copying from a plain map, just enumerate the keys
+      if ( o.__proto__ === Object.prototype || ! o.__proto__ ) {
+        for ( var key in o ) {
+          var name = key.endsWith('$') ?
+              key.substring(0, key.length - 1) :
+              key ;
 
-      if ( foam.core.FObject.isInstance(o) ) {
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          var name = a[i].name;
-          if ( o.hasOwnProperty(name) ) this[name] = o[name];
+          var a = this.cls_.getAxiomByName(name);
+          if ( a && foam.core.Property.isInstance(a) ) {
+            this[key] = o[key];
+          } else if ( opt_warn ) {
+            this.unknownArg(key, o[key]);
+          }
         }
-      } else {
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          var name = a[i].name;
-          if ( typeof o[name] !== 'undefined' ) this[name] = o[name];
-        }
+        return this;
       }
 
+      // When copying from an object of the same class
+      // We don't copy default values or the values of expressions
+      // so that the unset state of those properties is preserved
+      var props = this.cls_.getAxiomsByClass(foam.core.Property);
+
+      if ( o.cls_ && ( o.cls_ === this.cls_ || o.cls_.isSubClass(this.cls_) ) ) {
+        for ( var i = 0 ; i < props.length ; i++ ) {
+          var name = props[i].name;
+
+          // Only copy values that are set or have a factory.
+          // Any default values or expressions will be the same
+          // for each object since they are of the exact same
+          // type.
+          if ( o.hasOwnProperty(name) || props[i].factory ) {
+            this[name] = o[name];
+          }
+        }
+        return this;
+      }
+
+      // If the source is an FObject, copy any properties
+      // that we have in common.
+      if ( foam.core.FObject.isInstance(o) ) {
+        for ( var i = 0 ; i < props.length ; i++ ) {
+          var name = props[i].name;
+          var otherProp = o.cls_.getAxiomByName(name);
+          if ( otherProp && foam.core.Property.isInstance(otherProp) ) {
+            this[name] = o[name];
+          }
+        }
+        return this;
+      }
+
+      // If the source is some unknown object, we do our best
+      // to copy any values that are not undefined.
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        var name = props[i].name;
+        if ( typeof o[name] !== 'undefined' ) {
+          this[name] = o[name];
+        }
+      }
       return this;
     },
 

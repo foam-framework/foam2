@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -36,6 +36,32 @@
      mechanism.
   6. It makes the future implementation of multi-methods much easier.
 */
+
+/**
+ * Each of these flyweight types follows a standard interface.
+ *
+ * <pre>
+ * interface Type {
+ *   // Returns true if the given object is of this type.
+ *   // example: foam.String.is('hello') -> true
+ *   is(o) -> Boolean
+ *
+ *   // Returns a deep clone of o, if the type supports it.
+ *   clone(o);
+ *
+ *   // Returns true if a and b are equivalent.
+ *   equals(a, b) -> Boolean
+ *
+ *   // Returns -1, 0 or 1 as a comparsion of the two types.
+ *   // -1 means that 'a' is considered smaller that 'b'
+ *   // 0 means that and 'a' and 'b' are considered equivalent
+ *   // 1 means that 'a' is considered larger than 'b'
+ *   compare(a, b) -> Int
+ *
+ *   // Returns a hash of 'a' useful for hash tables
+ *   hashCode(a) -> Int
+ * }
+ */
 
 foam.LIB({
   name: 'foam.Undefined',
@@ -83,7 +109,11 @@ foam.LIB({
       return b ? foam.String.compare(a.toString(), a.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
+
     function bind(f, that, a1, a2, a3, a4) {
+      /**
+       * Faster than Function.prototype.bind
+       */
       switch ( arguments.length ) {
         case 1:
           console.error('No arguments given to bind to.');
@@ -126,18 +156,24 @@ foam.LIB({
           }
         };
       }
+
       console.error('Attempt to foam.Function.bind more than 4 arguments.');
     },
-    /** Faster version of memoize() when only dealing with one argument. */
+
     function memoize1(f) {
+      /**
+       * Decorates the function 'f' to cache the return value of 'f' when called
+       * with a particular value for its first argument.
+       *
+       */
       var cache = {};
       return foam.Function.setName(
-          function(arg) {
+          function(key) {
             console.assert(
                 arguments.length == 1,
                 "Memoize1'ed functions must take exactly one argument.");
-            var key = arg ? ( '' + arg ) : '';
-            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, arg);
+
+            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
             return cache[key];
           },
           'memoize1(' + f.name + ')');
@@ -157,13 +193,16 @@ foam.LIB({
 
     function argsStr(f) {
       /** Finds the function(...) declaration arguments part. Strips newlines. */
-      return f.toString().replace(/(\r\n|\n|\r)/gm,"").match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+      return f.
+          toString().
+          replace(/(\r\n|\n|\r)/gm,"").
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
-    function argsArray(f) {
+    function formalArgs(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. argsArray(function(a,b) {...}) == ['a', 'b']
+       * Ex. formalArgs(function(a,b) {...}) == ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       if ( ! args ) return [];
@@ -182,7 +221,7 @@ foam.LIB({
     function withArgs(fn, source, opt_self) {
       /**
        * Calls fn, and provides the arguments to fn by looking
-       * up their names on source.  The this context is either
+       * up their names on source. The 'this' context is either
        * source, or opt_self if provided.
        *
        * If the argument maps to a function on source, it is bound to source.
@@ -198,14 +237,14 @@ foam.LIB({
        *   console.log("Name is " + name);
        *   hello();
        * }
-       * foam.Function.with(foo, a);
+       * foam.Function.withArgs(foo, a);
        *
        * Outputs:
        * Name is adam
        * Hello adam
        *
        **/
-      var argNames = foam.Function.argsArray(fn);
+      var argNames = foam.Function.formalArgs(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
@@ -217,17 +256,21 @@ foam.LIB({
   ]
 });
 
+
+/* istanbul ignore next */
 (function() {
   // Disable setName if not supported on this platform.
   try {
     foam.Function.setName(function() {}, '');
   } catch (x) {
-    /**
-      @class fn
-      @ignore */
+    console.warn('foam.Function.setName is not supported on your platform. ' +
+                 'Stack traces will be harder to decipher, but no functionaly ' +
+                 'will be lost');
     foam.LIB({
       name: 'foam.Function',
-      methods: [ function setName(f) { return f; } ]
+      methods: [
+        function setName(f) { return f; }
+      ]
     });
   }
 })();
@@ -239,7 +282,9 @@ foam.LIB({
     function is(o) { return typeof o === 'number'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0; },
+    function compare(a, b) {
+      return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+    },
     function hashCode(n) { return n & n; }
   ]
 });
@@ -266,7 +311,11 @@ foam.LIB({
     {
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
-        // switchFromCamelCaseToConstantFormat to SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
+        console.assert(typeof str === 'string',
+                       'Cannot constantize non-string values.');
+
+        // switchFromCamelCaseToConstantFormat to
+        // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
         return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
           return a.substring(0,1) + '_' + a.substring(1,2);
         }).toUpperCase();
@@ -291,6 +340,21 @@ foam.LIB({
       })
     },
 
+    {
+      name: 'toUpperCase',
+      code: foam.Function.memoize1(function(str) {
+        return str.toUpperCase();
+      })
+    },
+
+    {
+      name: 'cssClassize',
+      code: foam.Function.memoize1(function(str) {
+        // Turns foam.u2.Foo into foam-u2-Foo
+        return str.replace(/\./g, '-');
+      })
+    },
+
     function pad(str, size) {
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
@@ -306,7 +370,18 @@ foam.LIB({
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
       return s.substring(start+2, end);
-    }
+    },
+    function startsWithIC(a, b) {
+      return a.toUpperCase().startsWith(b.toUpperCase());
+    },
+    (function() {
+      var map = {};
+
+      return function intern(val) {
+        /** Convert a string to an internal canonical copy. **/
+        return map[val] || (map[val] = val.toString());
+      };
+    })(),
   ]
 });
 
@@ -440,17 +515,30 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Object',
   methods: [
-    function is(o) { return typeof o === 'object'; },
+    function forEach(obj, f) {
+      for ( var key in obj ) {
+        if ( obj.hasOwnProperty(key) ) f(obj[key], key);
+      }
+    },
+    function is(o) { return typeof o === 'object' && ! Array.isArray(o); },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
-    function hashCode(o) { return 0; }
+    function hashCode(o) { return 0; },
+    function freeze(o) {
+      o.$UID;
+      Object.freeze(o);
+    }
   ]
 });
 
 
+/**
+  Return the flyweight "type object" for the provided object.
+  Any value is a valid argument, including null and undefined.
+*/
 foam.typeOf = (function() {
   var
     tNumber    = foam.Number,
@@ -479,7 +567,7 @@ foam.typeOf = (function() {
 })();
 
 
-foam.mmethod = function(map) {
+foam.mmethod = function(map, opt_defaultMethod) {
   var uid = '__mmethod__' + foam.next$UID() + '__';
 
   for ( var key in map ) {
@@ -488,15 +576,20 @@ foam.mmethod = function(map) {
   }
 
   return function(arg1) {
-    var type = foam.typeOf(arg1);
-    console.assert(type, 'Unknown type: ', arg1);
-    console.assert(type[uid], 'Missing multi-method for type ', arg1, ' map: ', map);
-    return type[uid].apply(this, arguments);
+    var type = foam.typeOf(arg1)
+    if ( ! opt_defaultMethod ) {
+      console.assert(type, 'Unknown type: ', arg1, 'and no default method provided');
+      console.assert(
+        type[uid],
+        'Missing multi-method for type ', arg1, ' map: ', map,
+        'and no deafult method provided');
+    }
+    return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
   };
 };
 
 
-( function() {
+(function() {
   var typeOf = foam.typeOf;
 
   foam.LIB({
@@ -510,4 +603,61 @@ foam.mmethod = function(map) {
       function diff(a, b)    { return typeOf(a).diff(a, b); }
     ]
   });
-} )();
+})();
+
+
+foam.LIB({
+  name: 'foam.package',
+  methods: [
+    /**
+     * Registers the given class in the global namespace.
+     * If the given class has an id of 'some.package.MyClass'
+     * then the class object will be made available globally at
+     * global.some.package.MyClass.
+     *
+     */
+    function registerClass(cls) {
+      var pkg = foam.package.ensurePackage(global, cls.package);
+      pkg[cls.name] = cls;
+    },
+
+    /**
+     * Walk a dot separated path starting at root, creating empty
+     * objects if necessary.
+     *
+     * ensurePackage(global, 'some.dot.separated.path');
+     * will ensure that global.some.dot.separated.path exists with
+     * each part being a JS object.
+     */
+    function ensurePackage(root, path) {
+      if ( path === null ||
+           path === undefined ||
+           path === '' ) {
+        return root;
+      }
+
+      console.assert(typeof path === 'string',
+                     'Cannot make a package path of a non-string');
+
+      path = path.split('.');
+
+      for ( var i = 0 ; i < path.length ; i++ ) {
+        root = root[path[i]] || ( root[path[i]] = {} );
+      }
+
+      return root;
+    }
+  ]
+});
+
+foam.LIB({
+  name: 'foam.uuid',
+  methods: [
+    function randomGUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    }
+  ]
+});

@@ -15,7 +15,19 @@
  * limitations under the License.
  */
 
-// TODO: make isAvailable and isEnabled by dynamic functions
+/**
+  Actions are high-level executable behaviours that are typically
+  triggered by users and represented as buttons or menus.
+
+  Actions are installed as methods on the class, but contain more
+  meta-information than regular methods. Meta-information includes
+  information needed to surface to action in a meaningful way to
+  users, and includes things like the label to appear in the button
+  or menu, a speech-label for i18n, help text, dynamic functions to
+  enable or disable and hide or unhide the UI associated with this Action.
+
+  Actions implement the Action Design Pattern.
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Action',
@@ -37,6 +49,9 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      name: 'icon'
+    },
+    {
       class: 'String',
       name: 'help'
     },
@@ -50,15 +65,15 @@ foam.CLASS({
       class: 'Function',
       name: 'isAvailable',
       label: 'Available',
-      value: function() { return true; },
-      help: 'Function to determine if action is available.'
+      help: 'Function to determine if action is available.',
+      value: null
     },
     {
       class: 'Function',
       name: 'isEnabled',
       label: 'Enabled',
-      value: function() { return true; },
-      help: 'Function to determine if action is enabled.'
+      help: 'Function to determine if action is enabled.',
+      value: null
     },
     {
       class: 'Function',
@@ -69,19 +84,50 @@ foam.CLASS({
   ],
 
   methods: [
-    function maybeCall(X, that) {
-      if ( this.isAvailable.call(that, this) && this.isEnabled.call(that, this) ) {
-        this.code.call(that, X, this);
-        that.pub('action', this.name, this);
+    function isEnabledFor(data) {
+      return this.isEnabled ?
+        foam.Function.withArgs(this.isEnabled, data) :
+        true;
+    },
+
+    function createIsEnabled$(data$) {
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this.isEnabled
+      });
+    },
+
+    function isAvailableFor(data) {
+      return this.isAvailable ?
+        foam.Function.withArgs(this.isAvailable, data) :
+        true ;
+    },
+
+    function createIsAvailable$(data$) {
+      return foam.core.ExpressionSlot.create({
+        obj$: data$,
+        code: this.isAvailable
+      });
+    },
+
+    function maybeCall(ctx, data) {
+      if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
+        this.code.call(data, ctx, this);
+        data.pub('action', this.name, this);
         return true;
       }
+
       return false;
+    },
+
+    function installInClass(c) {
+      c.installConstant(this.name, this);
     },
 
     function installInProto(proto) {
       var action = this;
       proto[this.name] = function() {
-        return action.maybeCall(this.X, this);
+        return action.maybeCall(this.__context__, this);
       };
     }
   ]
@@ -97,11 +143,10 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Action',
       name: 'actions',
-      adaptArrayElement: function(o) {
-        if ( typeof o === 'function' ) {
-          return foam.core.Action.create({name: o.name, code: o});
-        }
-        return foam.lookup(this.of).create(o);
+      adaptArrayElement: function(o, prop) {
+        return typeof o === 'function' ?
+            foam.core.Action.create({name: o.name, code: o}) :
+            foam.lookup(prop.of).create(o) ;
       }
     }
   ]

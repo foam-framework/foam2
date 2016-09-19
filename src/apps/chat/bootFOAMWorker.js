@@ -1,2 +1,2 @@
-FOAM_BOOT_DIR='../../core'
-importScripts('../../core/foam.js', 'chat.js');
+FOAM_BOOT_PATH='../../core/';
+importScripts('../../foam.js', 'chat.js');

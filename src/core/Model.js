@@ -46,10 +46,12 @@ foam.CLASS({
     },
     [ 'extends', 'FObject' ],
     'refines',
+    'documentation',
     {
       // List of all axioms, including methods, properties, listeners,
       // etc. and 'axioms'.
       name: 'axioms_',
+      transient: true,
       factory: function() { return []; }
     },
     {
@@ -59,48 +61,14 @@ foam.CLASS({
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     },
     {
-      // Is replaced by an AxiomArray later.
-      class: 'FObjectArray',
+      // Is upgraded to an AxiomArray later.
       of: 'Property',
-      name: 'properties',
-      adaptArrayElement: function(o) {
-        if ( typeof o === 'string' ) {
-          var p = foam.core.Property.create();
-          p.name = o;
-          return p;
-        }
-
-        if ( Array.isArray(o) ) {
-          var p = foam.core.Property.create();
-          p.name  = o[0];
-          p.value = o[1];
-          return p;
-        }
-
-        if ( o.class ) {
-          var m = foam.lookup(o.class);
-          if ( ! m ) throw 'Unknown class : ' + o.class;
-          return m.create(o);
-        }
-
-        return foam.core.Property.create(o);
-      }
+      name: 'properties'
     },
     {
-      // Is replaced by an AxiomArray later.
-      class: 'FObjectArray',
+      // Is upgraded to an AxiomArray later.
       of: 'Method',
-      name: 'methods',
-      adaptArrayElement: function(o) {
-        if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Method must be named');
-          var m = foam.core.Method.create();
-          m.name = o.name;
-          m.code = o;
-          return m;
-        }
-        return foam.core.Method.create(o);
-      }
+      name: 'methods'
     }
   ],
 

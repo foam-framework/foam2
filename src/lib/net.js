@@ -18,108 +18,126 @@
 foam.CLASS({
   package: 'foam.net',
   name: 'WebSocket',
+
   properties: [
     {
-      name: 'uri',
+      name: 'uri'
     },
     {
       name: 'socket',
       transient: true
     }
   ],
+
   topics: [
     'message',
     'connected',
     'disconnected'
   ],
+
   methods: [
     function send(msg) {
-      // TODO: Error handling
-      this.socket.send(msg);
+      // Apparently you can't catch exceptions from calling .send()
+      // when the socket isn't open.  So we'll try to predict an exception
+      // happening and throw early.
+      //
+      // There could be a race condition here if the socket
+      // closes between our check and .send().
+      if ( this.socket.readyState !== this.socket.OPEN ) {
+        throw new Error('Socket is not open');
+      }
+      msg = msg.clone().toRemote();
+      this.socket.send(foam.json.Network.stringify(msg));
+    },
+    function connect() {
+      var socket = this.socket = new WebSocket(this.uri);
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        function onConnect() {
+          socket.removeEventListener('open', onConnect);
+          resolve(self);
+        }
+        function onConnectError(e) {
+          socket.removeEventListener('error', onConnectError);
+          reject();
+        }
+        socket.addEventListener('open', onConnect);
+        socket.addEventListener('error', onConnectError);
+
+        socket.addEventListener('open', function() {
+          self.connected.pub();
+        });
+        socket.addEventListener('message', self.onMessage);
+        socket.addEventListener('close', function() {
+          self.disconnected.pub();
+        });
+      });
     }
   ],
   listeners: [
     {
-      name: 'connect',
-      code: function() {
-        var socket = this.socket = new WebSocket(this.uri);
-        var self = this;
-        socket.addEventListener('open', function() {
-          self.connected.pub();
-        })
-        socket.addEventListener('message', this.onMessage);
-        socket.addEventListener('close', function() {
-          self.disconnected.pub();
-        });
-      }
-    },
-    {
       name: 'onMessage',
       code: function(msg) {
-        foam.json.parse(foam.json.parseString(msg.data));
+        this.message.pub(msg.data);
       }
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.net',
   name: 'WebSocketService',
+
   requires: [
-    'foam.net.WebSocket'
+    'foam.net.WebSocket',
+    'foam.box.RegisterSelfMessage'
   ],
+
   properties: [
-    {
-      class: 'Map',
-      of: 'foam.net.WebSocket',
-      name: 'sockets'
-    },
     {
       name: 'delegate'
     }
   ],
+
   methods: [
-    function listen() {
-    },
-    function getSocket(uri) {
-      if ( this.sockets[uri] )
-        return Promise.resolve(this.sockets[uri]);
+    function addSocket(socket) {
+      var sub1 = socket.message.sub(function onMessage(s, _, msg) {
+        msg = foam.json.parse(foam.json.parseString(msg), null, this);
 
-      return new Promise(function(resolve, reject) {
-        var s = this.WebSocket.create({
-          uri: uri
-        });
+        if ( this.RegisterSelfMessage.isInstance(msg) ) {
+          var named = foam.box.NamedBox.create({
+            name: msg.name
+          });
 
-        s.connected.sub(function(sub) {
-          sub.destroy();
-          this.addSocket(s);
-          resolve(s);
-        }.bind(this));
-
-        s.connect();
+          named.delegate = foam.box.RawWebSocketBox.create({
+            socket: socket
+          });
+        } else {
+          this.delegate.send(msg);
+        }
       }.bind(this));
-    },
-    function addSocket(s) {
-      s.message.sub(this.onMessage);
-      s.disconnected.sub(function() {
-        delete this.sockets[s.uri]
-      }.bind(this));
-      this.sockets[s.uri] = s;
-    }
-  ],
-  listeners: [
-    {
-      name: 'onMessage',
-      code: function(s, _, m) {
-        this.delegate && this.delegate.send(m);
-      }
+
+      socket.disconnected.sub(function(s) {
+        s.destroy();
+        sub1.destroy();
+      });
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPResponse',
+
+  topics: [
+    'data',
+    'err',
+    'end'
+  ],
+
   properties: [
     {
       class: 'Int',
@@ -161,7 +179,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: "success",
+      name: 'success',
       expression: function(status) {
         return status >= 200 && status <= 299;
       }
@@ -179,18 +197,14 @@ foam.CLASS({
       }
     }
   ],
-  topics: [
-    'data',
-    'error',
-    'end'
-  ],
+
   methods: [
     function start() {
       var reader = this.resp.body.getReader();
       this.streaming = true;
 
       var onError = foam.Function.bind(function(e) {
-        this.error.pub();
+        this.err.pub();
         this.end.pub();
       }, this);
 
@@ -208,18 +222,26 @@ foam.CLASS({
 
       return reader.read().then(onData, onError);
     },
+
     function stop() {
       this.streaming = false;
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPRequest',
+
   requires: [
     'foam.net.HTTPResponse'
   ],
+
+  topics: [
+    'data'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -231,11 +253,18 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'protocol'
+      name: 'protocol',
+      preSet: function(old, nu) {
+        return nu.replace(':','');
+      }
     },
     {
       class: 'String',
-      name: 'path'
+      name: 'path',
+      preSet: function(old, nu) {
+        if ( ! nu.startsWith('/') ) return '/'+nu;
+        return nu;
+      }
     },
     {
       class: 'String',
@@ -260,9 +289,7 @@ foam.CLASS({
       value: 'text'
     }
   ],
-  topics: [
-    'data'
-  ],
+
   methods: [
     function fromUrl(url) {
       var u = new URL(url);
@@ -271,6 +298,7 @@ foam.CLASS({
       if ( u.port ) this.port = u.port;
       this.path = u.pathname + u.search;
     },
+
     function send() {
       if ( this.url ) {
         this.fromUrl(this.url);
@@ -295,8 +323,11 @@ foam.CLASS({
       }
 
       var request = new Request(
-        this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path,
-        options);
+          this.protocol + "://" +
+          this.hostname +
+          ( this.port ? ( ':' + this.port ) : '' ) +
+          this.path,
+          options);
 
       return fetch(request).then(function(resp) {
         return this.HTTPResponse.create({
@@ -308,18 +339,28 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'EventSource',
+
   requires: [
     'foam.parse.Grammar',
     'foam.net.HTTPRequest',
     'foam.encodings.UTF8'
   ],
+
   imports: [
     'setTimeout',
     'clearTimeout'
   ],
+
+  topics: [
+    {
+      name: 'message'
+    }
+  ],
+
   properties: [
     {
       name: 'grammar',
@@ -346,7 +387,7 @@ foam.CLASS({
             self.eventName = v.join('');
           },
           'data payload': function(p) {
-            self.eventData = JSON.parse(p.join(''));
+            self.eventData = p.join('');
           }
         });
       }
@@ -384,18 +425,7 @@ foam.CLASS({
     'eventData',
     'eventName'
   ],
-  topics: [
-    {
-      name: 'message',
-      topics: [
-        'put',
-        'patch',
-        'keep-alive',
-        'cancel',
-        'auth_revoked'
-      ]
-    }
-  ],
+
   methods: [
     function start() {
       var req = this.HTTPRequest.create({
@@ -414,12 +444,14 @@ foam.CLASS({
           return;
         }
 
+        this.clearProperty('decoder');
         resp.data.sub(this.onData);
         resp.end.sub(this.onError);
         this.resp = resp;
         resp.start();
       }.bind(this), this.onError);
     },
+
     function keepAlive() {
       if ( this.retryTimer ) {
         this.clearTimeout(this.retryTimer);
@@ -428,12 +460,14 @@ foam.CLASS({
       this.retryTimer = this.setTimeout(foam.Function.bind(function() {
         this.retryTimer = 0;
         this.onError();
-      }, this), 60000);
+      }, this), 30000);
     },
+
     function close() {
       this.running = false;
       this.resp.stop();
     },
+
     function dispatchEvent() {
       // Known possible events names
       // put
@@ -446,6 +480,7 @@ foam.CLASS({
       this.eventName = null;
       this.eventData = null;
     },
+
     function processLine(line) {
       // TODO: This can probably be simplified by using state machine based
       // parsers, but in the interest of saving time we're going to do it line
@@ -459,6 +494,7 @@ foam.CLASS({
       this.grammar.parseString(line);
     },
   ],
+
   listeners: [
     function onData(s, _, data) {
       this.delay = 1;
@@ -473,10 +509,12 @@ foam.CLASS({
       }
       this.decoder.string = string;
     },
+
     function onError() {
       this.delay *= 2;
       this.setTimeout(this.onEnd, this.delay);
     },
+
     function onEnd() {
       if ( this.running ) {
         this.start();
@@ -485,13 +523,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'XHRHTTPRequest',
   extends: 'foam.net.HTTPRequest',
+
   requires: [
     'foam.net.XHRHTTPResponse as HTTPResponse'
   ],
+
   methods: [
     function send() {
       if ( this.url ) {
@@ -499,8 +540,11 @@ foam.CLASS({
       }
 
       var xhr = new XMLHttpRequest();
-      xhr.open(this.method,
-               this.protocol + "://" + this.hostname + ( this.port ? ( ':' + this.port ) : '' ) + this.path);
+      xhr.open(
+          this.method,
+          this.protocol + "://" +
+          this.hostname + ( this.port ? ( ':' + this.port ) : '' ) +
+          this.path);
       xhr.responseType = this.responseType;
       for ( var key in this.headers ) {
         xhr.setRequestHeader(key, this.headers[key]);
@@ -523,10 +567,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'XHRHTTPResponse',
   extends: 'foam.net.HTTPResponse',
+
+  constants: {
+    STREAMING_LIMIT: 10 * 1024 * 1024
+  },
+
   properties: [
     {
       name: 'xhr',
@@ -539,6 +589,7 @@ foam.CLASS({
           var value = headers[i].substring(sep+1);
           this.headers[key.trim()] = value.trim();
         }
+        this.responseType = xhr.responseType;
       }
     },
     {
@@ -568,9 +619,7 @@ foam.CLASS({
       value: 0
     }
   ],
-  constants: {
-    STREAMING_LIMIT: 10 * 1024 * 1024
-  },
+
   methods: [
     function start() {
       this.streaming = true;
@@ -591,19 +640,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'SafariEventSource',
   extends: 'foam.net.EventSource',
+
   requires: [
     'foam.net.XHRHTTPRequest as HTTPRequest'
   ],
+
   properties: [
     {
       class: 'String',
       name: 'buffer'
     }
   ],
+
   listeners: [
     function onData(s, _, data) {
       this.delay = 1;

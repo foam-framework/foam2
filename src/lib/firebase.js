@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /*
 TODO:
 -better serialization/deserialization
@@ -10,13 +27,15 @@ foam.CLASS({
   package: 'com.firebase',
   name: 'FirebaseDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest',
-    'foam.net.EventSource',
+    'com.firebase.FirebaseEventSource',
     'foam.mlang.predicate.Gt',
-    'foam.mlang.predicate.Constant'
+    'foam.mlang.Constant'
   ],
+
   properties: [
     'of',
     'apppath',
@@ -38,6 +57,7 @@ foam.CLASS({
     },
     'startEventsAt_'
   ],
+
   methods: [
     function put(obj) {
       var req = this.HTTPRequest.create();
@@ -64,7 +84,7 @@ foam.CLASS({
         }
       });
       req.headers['content-type'] = 'application/json';
-      req.headers['accept'] = 'application/json';
+      req.headers['accept']       = 'application/json';
 
       return req.send().then(function(resp) {
         return resp.payload;
@@ -85,9 +105,10 @@ foam.CLASS({
         return Promise.reject(foam.dao.InternalException.create());
       });
     },
+
     function remove(obj) {
       var req = this.HTTPRequest.create();
-      req.method = "DELETE",
+      req.method = 'DELETE',
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";
 
       if ( this.secret ) {
@@ -100,6 +121,7 @@ foam.CLASS({
         return Promise.reject(foam.dao.InternalException.create());
       });
     },
+
     function find(id) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
@@ -130,6 +152,7 @@ foam.CLASS({
         }
       }.bind(this));
     },
+
     function startEvents() {
       if ( this.eventSource_ || ! this.enableStreaming ) {
         return;
@@ -147,14 +170,15 @@ foam.CLASS({
         uri += '?' + params.map(function(p) { return p.map(encodeURIComponent).join('='); }).join('&');
       }
 
-      this.eventSource_ = this.EventSource.create({
+      this.eventSource_ = this.FirebaseEventSource.create({
         uri: uri
       });
 
-      this.eventSource_.message.put.sub(this.onPut);
-      this.eventSource_.message.patch.sub(this.onPatch);
+      this.eventSource_.put.sub(this.onPut);
+      this.eventSource_.patch.sub(this.onPatch);
       this.eventSource_.start();
     },
+
     function stopEvents() {
       if ( this.eventSource_ ) {
         this.eventSource_.close();
@@ -163,6 +187,7 @@ foam.CLASS({
         this.clearProperty('eventSource_');
       }
     },
+
     function select(sink, skip, limit, order, predicate) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
@@ -222,7 +247,7 @@ foam.CLASS({
             this.timestampProperty.set(obj, data[key].lastUpdate);
           }
 
-          sink.put(obj, null, fc);
+          sink.put(obj, fc);
         }
         sink.eof();
 
@@ -234,8 +259,9 @@ foam.CLASS({
       });
     }
   ],
+
   listeners: [
-    function onPut(s, _, _, data) {
+    function onPut(s, _, data) {
       // PATH is one of
       // / -> new objects
       // /key -> new object
@@ -281,7 +307,6 @@ foam.CLASS({
           this.on.put.pub(obj);
         }.bind(this));
 
-
         // var obj = foam.json.parse(foam.json.parseString(data.data));
         // this.on.put.pub(obj);
       } else if ( path.indexOf('/lastUpdate') === path.length - 11 ) {
@@ -297,6 +322,7 @@ foam.CLASS({
         }.bind(this));
       }
     },
+
     function onPatch(s, _, _, data) {
           // TODO: What does a patch even look like?
       debugger;
@@ -304,15 +330,118 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.firebase',
   name: 'SafariFirebaseDAO',
   extends: 'com.firebase.FirebaseDAO',
+
   requires: [
     'foam.net.XHRHTTPRequest as HTTPRequest',
     'foam.net.SafariEventSource as EventSource'
   ],
+
   properties: [
-    ['enableStreaming', false]
+    [ 'enableStreaming', false ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.firebase',
+  name: 'FirebaseEventSource',
+
+  requires: [
+    'foam.net.EventSource'
+  ],
+
+  topics: [
+    'put',
+    'patch',
+    'keep-alive',
+    'cancel',
+    'auth_revoked'
+  ],
+
+  properties: [
+    {
+      name: 'uri',
+      required: true
+    },
+    {
+      name: 'eventSource',
+      postSet: function(old, nu) {
+        nu.message.sub(this.onMessage);
+      },
+      factory: function() {
+        return this.EventSource.create({
+          uri: this.uri
+        });
+      }
+    },
+    {
+      class: 'String',
+      name: 'buffer'
+    }
+  ],
+
+  methods: [
+    function start() {
+      this.eventSource.start();
+    }
+  ],
+
+  listeners: [
+    function onMessage(s, msg, name, data) {
+      switch (name) {
+      case 'put':
+        this.onPut(name, data);
+        break;
+      case 'patch':
+        this.onPatch(name, data);
+        break;
+      case 'keep-alive':
+        this.onKeepAlive(name, data);
+        break;
+      case 'cancel':
+        this.onCancel(name, data);
+        break;
+      case 'auth_revoked':
+        this.onAuthRevoked(name, data);
+        break;
+      default:
+        this.onUnknown(name, data);
+      }
+    },
+
+    function onPut(name, data) {
+      this.put.pub(JSON.parse(data));
+      return;
+
+      // this.buffer += data;
+      // try {
+      //   var payload = JSON.parse(this.buffer);
+      // } catch(e) {
+      //   this.warn('Failed to parse payload, assuming its incomplete.', e, this.buffer.length);
+      //   return;
+      // }
+
+      // this.buffer = '';
+      // this.put.pub(payload);
+    },
+
+    function onPatch() {
+      debugger;
+    },
+
+    function onKeepAlive() {
+    },
+
+    function onCancel() {
+    },
+
+    function onUnknown(name, data) {
+      this.warn('Unknown firebase event', name, data);
+    }
   ]
 });

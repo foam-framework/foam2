@@ -60,7 +60,7 @@ foam.CLASS({
   ],
 
   constants: {
-    HEADER: 'var self = this, X = this.X, Y = this.Y;\n' +
+    HEADER: 'var self = this, ctx = this.__context__, Y = this.__subContext__;\n' +
       'var output = opt_outputter ? opt_outputter : TOC(this);\n' +
       'var out = output.output.bind(output);\n' +
       "out('",
@@ -213,11 +213,11 @@ foam.CLASS({
   extends: 'Method',
 
   properties: [
-    'name',
     {
       name: 'template',
       class: 'String'
     },
+    { name: 'code', required: false },
     'args'
   ],
 
@@ -240,8 +240,8 @@ foam.CLASS({
       name: 'templates',
       class: 'AxiomArray',
       of: 'foam.templates.TemplateAxiom',
-      adaptArrayElement: function(o) {
-        return foam.lookup(this.of).create(o);
+      adaptArrayElement: function(o, prop) {
+        return foam.lookup(prop.of).create(o);
       }
     }
   ]
