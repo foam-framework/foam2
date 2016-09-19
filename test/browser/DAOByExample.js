@@ -227,8 +227,6 @@ var examples = [
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
-      var nullSink = foam.dao.QuickSink.create();
-
 
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
@@ -255,12 +253,13 @@ var examples = [
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
-      var nullSink = foam.dao.QuickSink.create();
-    //     var promises = [];
+
       // to store intermediate reuslts for matching customer IDs
       var customerIds = foam.dao.ArraySink.create();
+
       // to store intermediate results for matching account IDs
       var accountIds = foam.dao.ArraySink.create();
+
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
       return app.customerDAO
