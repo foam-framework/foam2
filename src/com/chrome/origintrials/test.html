@@ -10,7 +10,7 @@
   <body>
     <script>
       var env = com.chrome.origintrials.TestConfiguration.create();
-      com.chrome.origintrials.ui.Browse.create({ data: env.applicationDAO }, env).write();
+      var controller = com.chrome.origintrials.ui.Browse.create({ data: env.applicationDAO }, env).write();
     </script>
   </body>
 </html>
