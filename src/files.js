@@ -72,6 +72,7 @@ FOAM_FILES([
 //  { name: "foam/u2/Element", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/dao/dao" },
+  { name: "foam/dao/DAOProperty" },
   { name: "lib/mlang" },
   { name: "foam/mlang/LabeledValue" },
   { name: "foam/dao/index/Plan" },
