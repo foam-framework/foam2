@@ -64,14 +64,25 @@ describe('PredicatedSink', function() {
       name: 'CompA',
       properties: [ 'id', 'a' ]
     });
+
+    foam.CLASS({
+      name: 'TestPredicate',
+      implements: [ 'foam.mlang.predicate.Predicate' ],
+      properties: [
+        'calledWith',
+        'allow',
+        'f'
+      ]
+    });
   });
 
   it('only puts on a match', function() {
-    var fakePredicate = {
+    var fakePredicate = TestPredicate.create({
       calledWith: null,
       allow: false,
       f: function(o) { this.calledWith = o; if ( this.allow ) return true; }
-    }
+    });
+
     var sink = foam.dao.PredicatedSink.create({
       predicate: fakePredicate,
       delegate: foam.dao.ArraySink.create()
@@ -90,11 +101,12 @@ describe('PredicatedSink', function() {
   });
 
   it('only removes on a match', function() {
-    var fakePredicate = {
+    var fakePredicate = TestPredicate.create({
       calledWith: null,
       allow: false,
       f: function(o) { this.calledWith = o; if ( this.allow ) return true; }
-    }
+    });
+
     var sink = foam.dao.PredicatedSink.create({
       predicate: fakePredicate,
       delegate: foam.dao.ArrayDAO.create()
@@ -1488,19 +1500,19 @@ describe('DAO.listen', function() {
 
     dao.pipe(sink).then(function(sub) {
       expect(sink.array.length).toEqual(2);
-      expect(sink.array[0]).toEqual(a); 
+      expect(sink.array[0]).toEqual(a);
       expect(sink.array[1]).toEqual(b);
-      
+
       // and we should be listening, too
       dao.put(c);
       expect(sink.array.length).toEqual(3);
-      expect(sink.array[2]).toEqual(c); 
-      
+      expect(sink.array[2]).toEqual(c);
+
       // subscription allows disconnect
       sub.destroy();
       dao.put(d); // no longer listening
       expect(sink.array.length).toEqual(3);
-      
+
       done();
     });
 
@@ -1539,12 +1551,12 @@ describe('FilteredDAO', function() {
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
-    
+
     dao.put(a);
     expect(l.evt).toEqual('put');
     expect(l.obj).toEqual(a);
-    
-    // since 'b' is filtered out, the put changes to remove to ensure the 
+
+    // since 'b' is filtered out, the put changes to remove to ensure the
     // listener knows it shouldn't exist
     dao.put(b);
     expect(l.evt).toEqual('remove');
@@ -1560,7 +1572,7 @@ describe('FilteredDAO', function() {
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
-    
+
     dao.remove(a);
     expect(l.evt).toEqual('remove');
     expect(l.obj).toEqual(a);
@@ -1576,36 +1588,36 @@ describe('FilteredDAO', function() {
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
-    
+
     // normal put test
     dao.put(a);
     expect(l.evt).toEqual('put');
     expect(l.obj).toEqual(a);
-    
+
     dao.put(b);
     expect(l.evt).toEqual('remove');
     expect(l.obj).toEqual(b);
-    
+
     // swap a new base dao in
     delete l.evt;
     delete l.obj;
     var newBaseDAO = foam.dao.ArrayDAO.create({ of: test.CompA });
-    var oldDAO = dao.delegate; 
+    var oldDAO = dao.delegate;
     dao.delegate = newBaseDAO;
     expect(l.evt).toEqual('reset');
-    
+
     // filtered put from new base
     newBaseDAO.put(b);
     expect(l.evt).toEqual('remove');
     expect(l.obj).toEqual(b);
     delete l.evt;
     delete l.obj;
-    
+
     // old dao does not cause updates
     oldDAO.put(a);
     expect(l.evt).toBeUndefined();
     expect(l.obj).toBeUndefined();
-    
+
     // cover destructor
     dao.destroy();
   });
@@ -1623,7 +1635,7 @@ describe('String.daoize', function() {
 });
 
 describe('Relationship', function() {
-  
+
   foam.CLASS({
     package: 'test',
     name: 'RelA',
@@ -1638,7 +1650,7 @@ describe('Relationship', function() {
       'aRef'
     ]
   });
-  
+
   foam.CLASS({
     package: 'test',
     name: 'relEnv',
@@ -1659,10 +1671,10 @@ describe('Relationship', function() {
           return foam.dao.ArrayDAO.create();
         }
       }
-      
+
     ]
   });
-  
+
   foam.RELATIONSHIP({
     name: 'children',
     inverseName: 'parent',
@@ -1670,19 +1682,17 @@ describe('Relationship', function() {
     //sourceProperties: [ 'bRef' ],
     targetModel: 'test.RelB',
     //targetProperties: [ 'aRef' ],
-    
+
   });
-  
+
   it('has relationship DAOs', function() {
     var env = test.relEnv.create();
     var relObjA = test.RelA.create(undefined, env);
-    
+
     var relDAO = relObjA.children;
-    
-    
-    
+
+
+
   })
-  
+
 });
-
-

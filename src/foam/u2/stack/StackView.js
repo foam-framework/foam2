@@ -14,22 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-foam.CLASS({
-  package: 'com.chrome.apis',
-  name: 'Origin',
 
-  properties: [
-    {
-      name: 'id',
-      hidden: true
-    },
-    {
-      class: 'String',
-      name: 'origin'
-      // TODO(braden): Validation rules for origins.
+foam.CLASS({
+  package: 'foam.u2.control',
+  name: 'StackView',
+  extends: 'foam.u2.View',
+  methods: [
+    function initE() {
+      this.setNodeName('div').
+        add(foam.u2.control.Stack.BACK, foam.u2.control.Stack.FORWARD).
+        add(this.slot(function(s) {
+          return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
+        }, this.data$.dot('top')));
     }
-    // TODO(braden): Add a reference to the owner here, for use with that
-    // Relationship.
   ]
-  // TODO(braden): Add the relationship for activeExperiments on this origin.
 });

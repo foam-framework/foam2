@@ -122,16 +122,19 @@
           var v = opt_args[key];
 
           if ( ! foam.core.Slot.isInstance(v) ) {
-            sub[this.toSlotName_(key)] = foam.core.ConstantSlot.create({ value: v });
+            Object.defineProperty(sub, this.toSlotName_(key), {
+              value: foam.core.ConstantSlot.create({ value: v })
+            });
 
             (function(v) {
               Object.defineProperty(sub, key, {
-                value: v,
-                enumerable: false
+                value: v
               });
             })(v);
           } else {
-            sub[this.toSlotName_(key)] = v;
+            Object.defineProperty(sub, this.toSlotName_(key), {
+              value: v
+            });
 
             (function(v) {
               Object.defineProperty(sub, key, {
@@ -149,7 +152,7 @@
       });
 
       sub.$UID__ = foam.next$UID();
-//      Object.freeze(sub);
+      Object.freeze(sub);
 
       return sub;
     }

@@ -63,6 +63,10 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
+      var hsl = foam.Function.memoize1(function(h) {
+        return 'hsl(' + h + ',100%,50%)';
+      });
+
       for ( var i = 0 ; i < this.n ; i++ ) {
         var c = this.PhysicalCircle.create({
           radius: 10+20*Math.random(),
@@ -76,7 +80,7 @@ foam.CLASS({
         this.addChildren(c);
 
         this.timer.i$.sub(foam.Function.bind(function(c, i) {
-          c.color = 'hsl(' + ( i*347%180+this.timer.i*2) + ',100%,50%)';
+          c.color = hsl((i*347%180+this.timer.i*2)%360);
           var x = c.x, y = c.y;
           if ( y < 0           ) c.vy =  Math.abs(c.vy);
           if ( y > this.height ) c.vy = -Math.abs(c.vy);

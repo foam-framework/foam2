@@ -29,6 +29,10 @@ foam.CLASS({
       name: 'abstract',
       value: true
     }
+  ],
+  methods: [
+    function installInProto() {
+    }
   ]
 });
 

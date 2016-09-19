@@ -39,6 +39,7 @@ foam.CLASS({
   ]
 });
 
+
 /**
   Saves each addition, update, or removal of objects to the delegate DAO.
   Previous state for the object is stored, so the journal can replay

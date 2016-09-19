@@ -245,6 +245,12 @@ foam.CLASS({
       class: 'StringArray',
       name: 'delegates'
       //documentation: 'Methods that are delegated to the proxied object.'
+    },
+    {
+      name: 'fromJSON',
+      value: function(json, ctx) {
+        return foam.json.parse(json, null, ctx);
+      }
     }
   ],
 

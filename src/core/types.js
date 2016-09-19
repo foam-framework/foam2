@@ -224,6 +224,12 @@ foam.CLASS({
       value: 'FObject'
     },
     {
+      name: 'fromJSON',
+      value: function(json, ctx, prop) {
+        return foam.json.parse(json, prop.of, ctx);
+      }
+    },
+    {
       name: 'adapt',
       value: function(_, v, prop) {
         var of = foam.lookup(prop.of);

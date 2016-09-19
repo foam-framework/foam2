@@ -14,15 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TextField',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
+
   requires: [
     'foam.u2.tag.Input'
   ],
 
   properties: [
+    'data',
     {
       class: 'Boolean',
       name: 'onKey',

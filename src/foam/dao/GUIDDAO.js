@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /** GUIDDAO is a decorator that sets a property on incoming objects to be
   a new random GUID (globally unique identifier). Incoming objects with
   any existing value set are not altered. By default, the .id property

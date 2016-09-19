@@ -14,13 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.search',
   name: 'FilterView',
   extends: 'foam.u2.View',
+
   imports: [
     'filterController'
   ],
+
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^header {
+          align-items: center;
+          display: flex;
+        }
+        ^label {
+          flex-grow: 1;
+        }
+        ^container {
+          margin: 12px;
+        }
+        ^body input {
+          width: 100%;
+        }
+      */}
+    })
+  ],
+
   properties: [
     'prop',
     'key',
@@ -85,25 +109,5 @@ foam.CLASS({
 
       this.overrideAdd_ = true;
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^header {
-          align-items: center;
-          display: flex;
-        }
-        ^label {
-          flex-grow: 1;
-        }
-        ^container {
-          margin: 12px;
-        }
-        ^body input {
-          width: 100%;
-        }
-      */}
-    })
   ]
 });

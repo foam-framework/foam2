@@ -27,11 +27,16 @@ foam.CLASS({
       this.SUPER();
       this.setAttribute('type', 'date');
     },
+
     function link() {
       this.data$.relateTo(
-        this.attrSlot(null, this.onKey ? 'input' : null),
-        function(date) { return date ? date.toISOString().substring(0,10) : date; },
-        function(value) { return new Date(value); }
+          this.attrSlot(null, this.onKey ? 'input' : null),
+          function(date) {
+            return date ? date.toISOString().substring(0,10) : date;
+          },
+          function(value) {
+            return new Date(value);
+          }
       );
     }
   ]

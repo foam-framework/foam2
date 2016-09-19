@@ -521,10 +521,13 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
+      factory: function() { return this.UNLOADED; },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED ) {
+        } else if ( state === this.UNLOADED && oldState == undefined ) {
+          // Check oldState == undefined so that we don't publish onunload
+          // when we've never been loaded.
           this.pub('onunload');
         }
       }
@@ -662,6 +665,26 @@ foam.CLASS({
     function el() {
       /* Return this Element's real DOM element, if loaded. */
       return this.getElementById(this.id);
+    },
+
+    function findChildForEvent(e) {
+      var src  = e.srcElement;
+      var el   = this.el();
+      var cMap = {};
+      var cs   = this.children;
+
+      if ( ! el ) return;
+
+      for ( var i = 0 ; i < cs.length ; i++ ) {
+        var c = cs[i];
+        cMap[c.id] = c;
+      }
+
+      while ( src !== el ) {
+        var c = cMap[src.id];
+        if ( c ) return c;
+        src = src.parentElement;
+      }
     },
 
     function E(opt_nodeName) {
