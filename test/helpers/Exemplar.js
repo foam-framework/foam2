@@ -88,8 +88,8 @@ foam.CLASS({
       this.registry.register(this);
     },
 
-    function generateExample(indent) {
-      if ( ! indent ) indent = { level: 0 };
+    function generateExample() {
+      var indent = { level: 0 };
       var ret = "";
       var self = this;
       var tabs = "";
@@ -104,6 +104,7 @@ foam.CLASS({
 
 
       if ( deps.async.length ) {
+        indent.level += 1;
         ret += tabs + "Promise.resolve({\n";
       }
       deps.async.forEach(function(dep) {
@@ -193,7 +194,6 @@ foam.CLASS({
           async: asyncDeps
         }
       }
-
     }
 
   ]
