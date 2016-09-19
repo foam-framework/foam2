@@ -1,11 +1,11 @@
 var reg = test.helpers.ExemplarRegistry.create();
-var ex;
+var exemplars = [];
 var examples = [
   {
     name: 'Load MLangs',
     description: "Loads the mlang query langauage",
     code: function() {
-      global.M = foam.mlang.ExpressionsSingleton.create();
+      var M = foam.mlang.ExpressionsSingleton.create();
     }
   },
   {
@@ -21,7 +21,7 @@ var examples = [
         package: 'example',
         name: 'Customer',
         properties: [ 'id', 'firstName', 'lastName' ]
-      });      
+      });
       foam.CLASS({
         package: 'example',
         name: 'Account',
@@ -34,10 +34,10 @@ var examples = [
           'id',
           'label',
           'amount',
-          { class: 'Date', name: 'date' }, 
+          { class: 'Date', name: 'date' },
         ]
       });
-      
+
       // relate with foreign key relationships
       foam.RELATIONSHIP({
         sourceModel: 'example.Bank',
@@ -57,7 +57,7 @@ var examples = [
         targetModel: 'example.Transaction',
         inverseName: 'account'
       });
-      
+
       // create the example app with our DAOs exported
       foam.CLASS({
         package: 'example',
@@ -105,7 +105,7 @@ var examples = [
           }},
         ]
       });
-      global.app = example.BankApp.create();
+      var app = example.BankApp.create();
     }
   },
   {
@@ -128,7 +128,7 @@ var examples = [
       return Promise.all([
         app.customerDAO.put(app.Customer.create({ firstName: 'Sarah',  lastName: 'Smith',    bank: 'fn' })),
         app.customerDAO.put(app.Customer.create({ firstName: 'Harry',  lastName: 'Sullivan', bank: 'fn' })),
-        app.customerDAO.put(app.Customer.create({ firstName: 'Albert', lastName: 'Bronson',  bank: 'fn' })),
+        app.customerDAO.put(app.Customer.create({ firstName: 'Jamie', lastName: 'MacKenzie',  bank: 'fn' })),
 
         app.customerDAO.put(app.Customer.create({ firstName: 'Herman',  lastName: 'Blackbeard', bank: 'tt' })),
         app.customerDAO.put(app.Customer.create({ firstName: 'Hector',  lastName: 'Barbossa',   bank: 'tt' })),
@@ -143,7 +143,7 @@ var examples = [
     code: function async() {
       // we want to wait for the puts to complete, so save the promises
       accountPuts = [];
-      // Generate accounts for each customer. Select into an in-line 
+      // Generate accounts for each customer. Select into an in-line
       // sink to process results as they come in.
       return app.customerDAO.select(foam.dao.QuickSink.create({
         putFn: function(customer) {
@@ -151,7 +151,7 @@ var examples = [
           // so we know all the puts have completed.
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'sav' })));
-        } 
+        }
       })).then(function() {
         return Promise.all(accountPuts);
       });
@@ -164,11 +164,11 @@ var examples = [
     code: function async() {
       // we want to wait for the puts to complete, so save the promises
       transactionPuts = [];
-      
-      // Generate transactions for each account. 
+
+      // Generate transactions for each account.
       var amount = 0;
       var date = new Date(0);
-      
+
       // functions to generate some data
       function generateAccountChq(account) {
         for ( var j = 0; j < 10; j++ ) {
@@ -187,15 +187,15 @@ var examples = [
             date: new Date(date),
             label: 's'+amount+'s',
             amount: ((amount += 1.5) % 50)
-          })));        
+          })));
         }
       }
-      
-      // Select into an ArraySink, which dumps the results of the query to a 
+
+      // Select into an ArraySink, which dumps the results of the query to a
       // plain array, and run data generating functions for each one.
       // Calling select() with no arguments resolves with an ArraySink.
       // If you pass a sink to .select(mySink), your sink is resolved.
-      
+
       // Select 'chq' accounts first
       return app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
         .select().then(function(defaultArraySink) {
@@ -220,17 +220,15 @@ var examples = [
       });
     }
   },
-  
+
   {
     name: 'Join',
     description: "Finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
-      var nullSink = foam.dao.QuickSink.create();
-      
-      
-      // Start querying at the top, and produce a larger set of results 
+
+      // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
       return app.customerDAO.find(2)
         .then(function(customer) {
@@ -248,56 +246,75 @@ var examples = [
         });
     }
   },
-  
-  // {
-  //   name: 'Manual Join',
-  //   description: "Without using Relationships, finds all transactions for a given customer",
-  //   dependencies: [ 'Load MLangs', 'Create Transactions' ],
-  //   code: function async() {
-  //     var tsink = foam.dao.ArrayDAO.create();
-  //     var nullSink = foam.dao.QuickSink.create();
-  //
-  //     var promises = [];
-  //     // to store intermediate reuslts for matching customer IDs
-  //     var customerIds = foam.dao.ArraySink.create();
-  //     // to store intermediate results for matching account IDs
-  //     var accountIds = foam.dao.ArraySink.create();
-  //     // Start querying at the top, and produce a larger set of results
-  //     //   to sub-query at each step
-  //     return app.customerDAO
-  //       .where(M.EQ(app.Customer.ID, 2)) // a fixed customer ID, in this case
-  //       .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
-  //       .then(function() {
-  //         return app.accountDAO // query matches for the array of customer IDs
-  //           .where(M.IN(app.Account.OWNER, customerIds.a))
-  //           .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
-  //           .then(function() {
-  //               return app.transactionDAO // query matches for list of accounts
-  //                 .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
-  //                 .select(tsink) // could dedup, but no duplicates in this case
-  //           });
-  //       }).then(function(results) {
-  //         foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
-  //       });
-  //   }
-  // },
-  
+
+  {
+    name: 'Manual Join',
+    description: "Without using Relationships, finds all transactions for a given customer",
+    dependencies: [ 'Load MLangs', 'Create Transactions' ],
+    code: function async() {
+      var tsink = foam.dao.ArrayDAO.create();
+
+      // to store intermediate reuslts for matching customer IDs
+      var customerIds = foam.dao.ArraySink.create();
+
+      // to store intermediate results for matching account IDs
+      var accountIds = foam.dao.ArraySink.create();
+
+      // Start querying at the top, and produce a larger set of results
+      //   to sub-query at each step
+      return app.customerDAO
+        .where(M.EQ(app.Customer.ID, 2)) // a fixed customer ID, in this case
+        .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
+        .then(function() {
+          return app.accountDAO // query matches for the array of customer IDs
+            .where(M.IN(app.Account.OWNER, customerIds.a))
+            .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
+            .then(function() {
+                return app.transactionDAO // query matches for list of accounts
+                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
+                  .select(tsink) // could dedup, but no duplicates in this case
+            });
+        }).then(function(results) {
+          foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
+        });
+    }
+  },
+
+  {
+    name: 'Table Output',
+    description: "Outputs Banking DAOs into simple tables",
+    dependencies: [ 'Create Transactions' ],
+    code: function() {
+      document.write("Banks");
+      foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
+
+      document.write("Customers");
+      foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
+
+      document.write("Accounts");
+      foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
+
+      document.write("Transactions");
+      foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+    }
+  },
+
 ].forEach(function(def) {
-  ex = test.helpers.Exemplar.create(def, reg);
+  exemplars.push(test.helpers.Exemplar.create(def, reg));
+});
+
+var oldContext;
+foam.async.repeat(exemplars.length, function runExemplar(index) {
+  var ex = exemplars[index];
   // Note: eval() for each exemplar may be async, so don't
   // nuke the context without waiting for the promise to resolve
-  
-  //foam.__context__ = oldContext;
-  //varoldContext = foam.__context__;
-  //foam.__context__ = foam.createSubContext({});
+  if ( oldContext) foam.__context__ = oldContext;
 
+  oldContext = foam.__context__;
+  foam.__context__ = foam.createSubContext({});
 
-});
-document.write("<hr><pre>"+
-ex.generateExample()+
-eval(ex.generateExample())+
-"</pre>");
-// foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
-// foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
-// foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
-// foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+  var code = ex.generateExample();
+  document.write("<hr><pre>"+code+"</pre>");
+  var result = eval("(function runExemplar___() { " + code + " })();");
+  return result;
+})();

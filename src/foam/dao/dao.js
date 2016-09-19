@@ -416,10 +416,10 @@ foam.CLASS({
           this.delegate.put(obj, fc);
         }
       },
-      javaCode: 'setCount(getCount() + 1);\n'
-              + 'if ( getCount() >= getLimit() ) {\n'
+      javaCode: 'if ( getCount() >= getLimit() ) {\n'
               + '  fc.stop();\n'
               + '} else {\n'
+              + '  setCount(getCount() + 1);\n'
               + '  getDelegate().put(obj, fc);\n'
               + '}\n'
     },
@@ -432,12 +432,12 @@ foam.CLASS({
           this.delegate.remove(obj, fc);
         }
       },
-      javaCode: 'setCount(getCount() + 1);\n'
-                + 'if ( getCount() >= getLimit() ) {\n'
-                + '  fc.stop();\n'
-                + '} else {'
-                + '  getDelegate().put(obj, fc);\n'
-                + '}'
+      javaCode: 'if ( getCount() >= getLimit() ) {\n'
+              + '  fc.stop();\n'
+              + '} else {'
+              + '  setCount(getCount() + 1);\n'
+              + '  getDelegate().put(obj, fc);\n'
+              + '}\n'
     }
   ]
 });
