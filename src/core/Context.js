@@ -92,6 +92,10 @@
       }
     },
 
+    toSlotName_: foam.Function.memoize1(function toSlotName_(key) {
+      return key + '$';
+    }),
+
     /**
      * Creates a sub context of the context that this is called upon.
      * @param opt_args A map of bindings to set up in the sub context.
@@ -118,7 +122,7 @@
           var v = opt_args[key];
 
           if ( ! foam.core.Slot.isInstance(v) ) {
-            sub[key + '$'] = foam.core.ConstantSlot.create({ value: v });
+            sub[this.toSlotName_(key)] = foam.core.ConstantSlot.create({ value: v });
 
             (function(v) {
               Object.defineProperty(sub, key, {
@@ -127,7 +131,7 @@
               });
             })(v);
           } else {
-            sub[key + '$'] = v;
+            sub[this.toSlotName_(key)] = v;
 
             (function(v) {
               Object.defineProperty(sub, key, {
@@ -136,7 +140,6 @@
               });
             })(v);
           }
-
         }
       }
 
