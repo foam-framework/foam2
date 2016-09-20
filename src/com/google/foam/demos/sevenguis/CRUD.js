@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.demos.sevenguis',
+  package: 'com.google.foam.demos.sevenguis',
   name: 'Person',
 
   tableProperties: [ 'id', 'surname', 'name' ],
@@ -30,7 +30,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.demos.sevenguis',
+  package: 'com.google.foam.demos.sevenguis',
   name: 'CRUD',
   extends: 'foam.u2.Element',
 
@@ -42,7 +42,7 @@ foam.CLASS({
     'foam.u2.DetailView',
     'foam.u2.TableView',
     'foam.dao.EasyDAO',
-    'foam.demos.sevenguis.Person'
+    'com.google.foam.demos.sevenguis.Person'
   ],
 
   exports: [ 'as data' ],
@@ -74,7 +74,7 @@ foam.CLASS({
       name: 'dao',
       factory: function() {
         return foam.dao.EasyDAO.create({
-          of: foam.demos.sevenguis.Person,
+          of: com.google.foam.demos.sevenguis.Person,
           daoType: 'MDAO',
           seqNo: true
         });
@@ -87,7 +87,7 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.TableView',
-        of: foam.demos.sevenguis.Person,
+        of: com.google.foam.demos.sevenguis.Person,
         title: '',
         scrollEnabed: true,
         editColumns: false
