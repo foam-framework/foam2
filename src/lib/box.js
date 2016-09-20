@@ -742,6 +742,74 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'EventlessClientDAO',
+  extends: 'foam.dao.AbstractDAO',
+  properties: [
+    {
+      class: 'Stub',
+      of: 'foam.dao.DAO',
+      name: 'delegate',
+      methods: [
+        'put',
+        'remove',
+        'select',
+        'removeAll',
+        'find'
+      ],
+      eventProxy: false
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'PollingClientDAO',
+  extends: 'foam.dao.EventlessClientDAO',
+  methods: [
+    function put(obj) {
+      var self = this;
+      return this.SUPER(obj).then(function(o) {
+        self.on.put.pub(o);
+        return o;
+      });
+    },
+    function remove(obj) {
+      var self = this;
+      return this.SUPER(obj).then(function(o) {
+        self.on.remove.pub(obj);
+        return o;
+      });
+    },
+    function select(sink, skip, limit, order, predicate) {
+      // TODO: Determine which sinks are serializable.
+      var self = this;
+      return this.SUPER(null, skip, limit, order, predicate).then(function(a) {
+        var fc = self.FlowControl.create();
+
+        for ( var i = 0 ; i < a.a.length ; i++ ) {
+          if ( fc.stopped ) break;
+          if ( fc.errorEvt ) {
+            sink.error(fc.errorEvt);
+            throw fc.errorEvt;
+          }
+
+          sink.put(a.a[i], fc);
+        }
+
+        sink.eof();
+
+        return sink;
+      });
+    },
+    function removeAll(skip, limit, order, predicate) {
+      this.SUPER(skip, limit, order, predicate);
+      this.on.reset.pub();
+    }
+  ]
+});
+
 
 foam.CLASS({
   package :'foam.box',

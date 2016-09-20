@@ -19,15 +19,12 @@ public class ModelParserFactory {
       return parsers_.get(c);
     }
 
-    ClassInfo info;
+    ClassInfo info = null;
+
     try {
       info = (ClassInfo)c.getMethod("getOwnClassInfo").invoke(null);
-    } catch(NoSuchMethodException e) {
-      return null;
-    } catch(IllegalAccessException e) {
-      return null;
-    } catch(InvocationTargetException e) {
-      return null;
+    } catch(NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
+      throw new RuntimeException("Failed to build parser for " + info.getId(), e);
     }
 
     Parser parser = buildInstance_(info);
