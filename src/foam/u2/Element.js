@@ -380,10 +380,7 @@ foam.CLASS({
       }
       var out = this.createOutputStream();
       out(newE);
-      // TODO: import document
-      var n = this.__context__.document.createElement('div');
-      n.innerHTML = out.toString();
-      e.replaceChild(n.firstChild, oldE.el());
+      oldE.el().outerHTML = out.toString();
       newE.load && newE.load();
     },
     function onRemoveChild(child, index) {
@@ -926,6 +923,7 @@ foam.CLASS({
       for ( var i = 0 ; i < cs.length ; ++i ) {
         if ( cs[i] === oldE ) {
           cs[i] = newE;
+          newE.parentNode = this;
           this.state.onReplaceChild.call(this, oldE, newE);
           oldE.unload && oldE.unload();
           return;
@@ -1221,13 +1219,7 @@ foam.CLASS({
       return this;
     },
 
-    function repeat(a, b, c) {
-      return arguments.length === 3 ?
-        this.repeatStartToEnd_(a, b, c) :
-        this.repeatDAO_(a, b) ;
-    },
-
-    function repeatStartToEnd_(s, e, f) {
+    function repeat(s, e, f) {
       // TODO: support descending
       for ( var i = s ; i <= e ; i++ ) {
         f.call(this, i);
@@ -1235,7 +1227,7 @@ foam.CLASS({
       return this;
     },
 
-    function repeatDAO_(dao, f) {
+    function select(dao, f, update) {
       // TODO: cleanup on destroy
       var es   = {};
       var self = this;
@@ -1246,8 +1238,26 @@ foam.CLASS({
         dao.select({ put: function(o) { addRow(null, null, null, o); } });
       };
       var addRow = function(_, _, _, o) {
+        if ( update ) {
+          o = o.clone();
+        }
+
         // todo: add o listener and add in sub-context??
+        self.startContext({data: o});
         var e = f.call(self, o);
+        if ( update ) {
+          // ???: Why is it necessary to delay this until after load?
+          e.onload.sub(function() {
+            console.log('**********onload');
+            o.propertyChange.sub(function(_,_,prop,slot) {
+              console.log('***', prop, slot.prevValue, slot.get());
+              dao.put(o.clone());
+            });
+          });
+
+        }
+        self.endContext();
+
         if ( es[o.id] ) {
           self.replaceChild(es[o.id], e) 
         } else {
