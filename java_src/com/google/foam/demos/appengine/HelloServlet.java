@@ -51,7 +51,7 @@ public class HelloServlet extends HttpServlet {
   private TestService myService = new TestServiceImpl();
   private foam.box.Box dest = ((TestServiceSkeleton)x.create(TestServiceSkeleton.class)).setDelegate(myService);
 
-  private DAO dao = ((MapDAO)x.create(MapDAO.class)).setOf(TestModel.getOwnClassInfo());
+  private DAO dao = ((DatastoreDAO)x.create(DatastoreDAO.class)).setOf(TestModel.getOwnClassInfo());
   private foam.box.Box daoSkeleton = ((DAOSkeleton)x.create(DAOSkeleton.class)).setDelegate(dao);
 
   @Override
