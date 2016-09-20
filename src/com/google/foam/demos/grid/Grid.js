@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// http://www.discoversdk.com/blog/grid-control-with-different-javascript-frameworks
+
 foam.CLASS({
   package: 'com.google.foam.demos.grid',
   name: 'Resource',
@@ -31,19 +33,59 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.foam.demos.grid',
+  name: 'ResourceView',
+  extends: 'foam.u2.Element',
+
+  imports: [ 'dao' ],
+
+  properties: [ 'data' ],
+
+  methods: [
+    function initE() {
+      this.
+        start('tr').
+          start('td').
+            start('div').add(this.data.description).end().
+          end().
+          start('td').
+            start('div').add(this.data.url).end().
+          end().
+          start('td').
+            start(this.REMOVE_RESOURCE, { data: this }).end().
+          end().
+        end();
+    }
+  ],
+
+  actions: [
+    {
+      name: 'removeResource',
+      label: 'Remove',
+      code: function() { this.dao.remove(this.data); }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.foam.demos.grid',
   name: 'Controller',
   extends: 'foam.u2.Controller',
 
   requires: [
     'foam.u2.DetailView',
     'foam.u2.TableView',
-    'foam.dao.EasyDAO',
     'com.google.foam.demos.grid.Resource'
   ],
+
+  exports: [ 'dao' ],
 
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
+        .foam-u2.DetailView tr {
+          background: pink;
+        }
       */}
     })
   ],
@@ -51,14 +93,8 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource },
-      factory: function() {
-        return foam.dao.EasyDAO.create({
-          of: foam.demos.sevenguis.Person,
-          daoType: 'MDAO',
-          seqNo: true
-        });
-      }
+       view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
+//       view: { class: 'foam.u2.DAOList', of: com.google.foam.demos.grid.Resource, rowView: 'com.google.foam.demos.grid.ResourceView' }
     },
     {
       name: 'person',
@@ -70,11 +106,53 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        cssClass(this.myCls()).
-        start('h1').add('Add Resources').end().
-        add(this.PERSON, this.ADD_RESOURCE).
-        start('h1').add('List of Resources').end().
-        add(this.DAO, this.SHOW);
+        cssClass(this.myCls()). // TODO: needed?
+        start('h3').add('Add Resources').end().
+
+        // Use this block to have input in a single row
+        add('Description: ').
+        start(this.person.DESCRIPTION, {data$: this.person.description$}).end().
+        add(' URL: ').
+        start(this.person.URL,         {data$: this.person.url$}).end().
+
+        // Or this line to appear in a property-sheet
+        // add(this.PERSON).
+
+        add(this.ADD_RESOURCE).
+        start('h3').add('List of Resources').end().
+
+      /*
+        start('table').
+          start('tr').
+            start('th').add('Description').end().
+            start('th').add('Resource').end().
+          end().
+          */
+          add(this.DAO).
+       // end().
+
+        start('table').
+          start('tr').
+            start('th').add('Description').end().
+            start('th').add('Resource').end().
+          end().
+          repeat(this.dao, function(r) {
+            var e = this.
+              start('tr').
+                start('td').
+                  start('div').add(r.description).end().
+                end().
+                start('td').
+                  start('div').add(r.url).end().
+                end().
+                start('td').
+                  start('button').on('click', function() { self.dao.remove(r); }).add('Remove').end().
+                end().
+              end();
+          }).
+       end().
+
+        add(this.SHOW);
     }
   ],
 
@@ -84,6 +162,7 @@ foam.CLASS({
       label: 'Add',
       code: function() {
         var p = this.person;
+        // TODO: remove clone()
         this.dao.put(p.clone());
         p.id = p.description = p.url = undefined;
       }
@@ -92,12 +171,11 @@ foam.CLASS({
       name: 'show',
       code: function() {
         console.log('show');
-        var a = [];
-        this.dao.select({put: function(r) { a.push(r); }}).then(function() {
+        this.dao.select().then(function(s) {
           window.alert(foam.json.Outputer.create({
             pretty: false,
             outputClassNames: false
-          }).stringify(a));
+          }).stringify(s.a));
         });
       }
     },
@@ -114,5 +192,4 @@ foam.CLASS({
 // Didn't specify 'of' for TableView
 // Invalid names in tableProperties:
 // added invalid action name, no error
-// select should default to ArraySink (does it?)
 // clone on DAO.put

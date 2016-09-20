@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 2400000;
 if ( ! typeof performance !== 'undefined' ) performance = {
   now: function() { return Date.now(); }
 };
@@ -58,26 +58,22 @@ describe("MDAO benchmarks", function() {
        });
     }
 
-    function atime(name, promise) {
+    function atime(name, fn) {
       var startTime = performance.now();
-      if ( ! promise.then ) {
-        promise = promise();
-      }
-      var fn = function(arg) {
+      var fn2 = function(arg) {
         var endTime = performance.now();
         console.log(name, ", ", endTime - startTime);
         return arg;
       };
-      return promise.then(fn);
+      return foam.async.sequence([ fn, fn2 ]);
     }
 
-    function atest(name, promise) {
-      return function() {
-        if ( DEBUG ) console.log("Starting:", name);
-        return atime(name, promise).then(function(arg) {
-          if ( DEBUG ) console.log(name, 'result: ', arg);
-        });
-      }
+    function atest(name, fn) {
+      if ( DEBUG ) console.log("Starting:", name);
+      var fn2 = function() {
+        if ( DEBUG ) console.log(name, 'result: ', arg);
+      };
+      return foam.async.sequence([ atime(name, fn), fn2 ]);
     }
 
     foam.CLASS({
@@ -136,7 +132,7 @@ describe("MDAO benchmarks", function() {
     var avgAlbumKey = ""+Math.floor(NUM_ALBUMS/2)/*.toString()*/;
 
     function runPhotoBenchmarks() {
-    Promise.resolve().then(foam.async.sequence(
+    Promise.resolve().then(foam.async.sequence([
       atest('CreateTestAlbums' + NUM_ALBUMS, foam.async.repeat(NUM_ALBUMS, function ( i) {
         albums.put(
           Album.create({
@@ -162,7 +158,7 @@ describe("MDAO benchmarks", function() {
         );
       })),
       foam.async.repeat(DEBUG ? 1 : 7,
-        foam.async.sequence(
+        foam.async.sequence([
           foam.async.log('Benchmark...'),
           atest('1a CreateAlbums' + NUM_ALBUMS, function() {
               var dao = foam.dao.ArrayDAO.create({ array: albums.a });
@@ -303,11 +299,11 @@ describe("MDAO benchmarks", function() {
             return AlbumDAO.removeAll().then(PhotoDAO.removeAll());
           })
           ,foam.async.sleep(5000)
-        )
+        ])
       ),
       foam.async.log('Done.'),
       done
-    ));
+    ]));
     }
 
     runPhotoBenchmarks();

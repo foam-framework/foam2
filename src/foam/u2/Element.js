@@ -1221,11 +1221,48 @@ foam.CLASS({
       return this;
     },
 
-    function repeat(s, e, f) {
+    function repeat(a, b, c) {
+      return arguments.length === 3 ?
+        this.repeatStartToEnd_(a, b, c) :
+        this.repeatDAO_(a, b) ;
+    },
+
+    function repeatStartToEnd_(s, e, f) {
       // TODO: support descending
       for ( var i = s ; i <= e ; i++ ) {
         f.call(this, i);
       }
+      return this;
+    },
+
+    function repeatDAO_(dao, f) {
+      // TODO: cleanup on destroy
+      var es   = {};
+      var self = this;
+      var reset = function() {
+        for ( var key in es ) {
+          removeRow(null, null, null, {id: key});
+        }
+        dao.select({ put: function(o) { addRow(null, null, null, o); } });
+      };
+      var addRow = function(_, _, _, o) {
+        removeRow(null, null, null, o);
+        f.call(self, o);
+        es[o.id] = self.childNodes[self.childNodes.length-1];
+      };
+      var removeRow = function(_, _, _, o) {
+        var e = es[o.id];
+        if ( e ) {
+          e.remove();
+          delete es[o.id];
+        }
+      }
+
+      reset();
+      dao.on.put.sub(addRow);
+      dao.on.remove.sub(removeRow);
+      dao.on.reset.sub(reset);
+
       return this;
     },
 
