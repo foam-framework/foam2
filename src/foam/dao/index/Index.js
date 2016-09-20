@@ -41,16 +41,16 @@ foam.CLASS({
     },
 
     /** Adds or updates the given value in the index */
-    function put() {},
+    function put(/*o*/) {},
 
     /** Removes the given value from the index */
-    function remove() {},
+    function remove(/*o*/) {},
 
     /** @return a Plan to execute a select with the given parameters */
     function plan(/*sink, skip, limit, order, predicate*/) {},
 
     /** @return the stored value for the given key. */
-    function get() {},
+    function get(/*key*/) {},
 
     /** @return the integer size of this index. */
     function size() {},
@@ -61,6 +61,46 @@ foam.CLASS({
     /** Selects matching items in reverse order from the index and puts
       them into sink */
     function selectReverse(/*sink, skip, limit, order, predicate*/) { },
+
+    /** Efficiently (if possible) loads the contents of the given DAO into the index */
+    function bulkLoad(/*dao*/) {},
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'ProxyIndex',
+  extends: 'foam.dao.index.Index',
+
+  properties: [
+    {
+      name: 'delegate',
+      required: true
+    }
+  ],
+
+  methods: [
+    function put(o) { return this.delegate.put(o); },
+
+    function remove(o) { return this.delegate.remove(o); },
+
+    function plan(sink, skip, limit, order, predicate) {
+      return this.delegate.plan(sink, skip, limit, order, predicate);
+    },
+
+    function get(key) { return this.delegate.get(key); },
+
+    function size() { return this.delegate.size(); },
+
+    function select(sink, skip, limit, order, predicate) {
+      return this.delegate.select(sink, skip, limit, order, predicate);
+    },
+
+    function selectReverse(sink, skip, limit, order, predicate) {
+      return this.delegate.selectReverse(sink, skip, limit, order, predicate);
+    },
+
+    function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
   ]
 });
 
@@ -117,7 +157,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
-  //extends: 'foam.dao.index.Index',
+  extends: 'foam.dao.index.Index',
 
   requires: [
     'foam.dao.index.NoPlan',
@@ -198,6 +238,57 @@ foam.CLASS({
   ]
 });
 
+/**
+  ORIndex runs multiple plans over the clauses of the OR predicate, and
+  combines the results. Typically an AltIndex will be used under the ORIndex
+  to optimize the various sub-queries the OR executes.
+*/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'OrIndex',
+  extends: 'foam.dao.index.ProxyIndex',
+
+  requires: [
+    'foam.mlang.predicate.Or',
+    'foam.dao.index.MergePlan'
+  ],
+
+  methods: [
+    function plan(sink, skip, limit, order, predicate) {
+      if ( ! predicate || ! this.Or.isInstance(predicate) ) {
+        return this.delegate.plan(sink, skip, limit, order, predicate);
+      }
+
+      // TODO: check how ordering is handled in existing TreeIndex etc.
+      //   compound comparators should be handled better than forcing our
+      //   sink to re-sort.
+
+      // if there's a limit, add skip to make sure we get enough results
+      //   from each subquery. Our sink will throw out the extra results
+      //   after sorting.
+      var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
+
+      // This is an instance of OR, break up into separate queries
+      var args = predicate.args;
+      var plans = [];
+      for ( var i = 0; i < args.length; i++ ) {
+        // NOTE: we pass sink here, but it's not going to be the one eventually
+        // used.
+        plans.push(
+          this.delegate.plan(sink, undefined, subLimit, undefined, args[i])
+        );
+      }
+
+      return this.MergePlan.create({ subPlans: plans });
+    },
+
+    function toString() {
+      return 'OrIndex('+this.delegate.toString()+')';
+    }
+
+  ]
+
+});
 
 /** An Index which adds other indices as needed. **/
 foam.CLASS({
@@ -235,12 +326,12 @@ foam.CLASS({
       this.properties[prop.name] = true;
       this.mdao.addIndex(prop);
     },
-    // TODO: mlang comparators should support input collection for 
+    // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate) {
       if ( order ) {
         // find name of property to order by
-        var name = ( this.Property.isInstance(order) ) ? order.name : 
+        var name = ( this.Property.isInstance(order) ) ? order.name :
           ( order.arg1 && order.arg1.name ) || null;
         // if no index added for it yet, add one
         if ( name && ! this.properties[name] ) {

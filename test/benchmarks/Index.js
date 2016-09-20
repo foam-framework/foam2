@@ -23,7 +23,7 @@ if ( ! typeof performance !== 'undefined' ) performance = {
 
 
 describe("Index benchmarks", function() {
-  var DEBUG = true;
+  var DEBUG = false;
   var oldRandom;
   var rseed;
 
@@ -96,9 +96,27 @@ describe("Index benchmarks", function() {
     var M = foam.mlang.ExpressionsSingleton.create();
 
     subjectDAO = foam.dao.MDAO.create({ of: Subject })
-      .addIndex(Subject.INT_P)
-      .addIndex(Subject.INT_P, Subject.BOOL_P)
-      .addIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)
+      //.addIndex(Subject.INT_P)
+      //.addIndex(Subject.INT_P, Subject.BOOL_P)
+      .addRawIndex(
+        foam.dao.index.OrIndex.create({
+          delegate: foam.dao.index.AltIndex.create({
+            delegates: [
+              Subject.INT_P.toIndex(
+                Subject.BOOL_P.toIndex(
+                  Subject.ID.toIndex(
+                    foam.dao.index.ValueIndex.create()
+              ))),
+              Subject.STRING_P.toIndex(
+                Subject.INT_P.toIndex(
+                  Subject.ID.toIndex(
+                    foam.dao.index.ValueIndex.create()
+              ))),
+            ]
+          })
+        })
+      )
+      //.addIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)
       .addIndex(Subject.STRING_P, Subject.BOOL_P);
 
     function cloneSubjects() {
@@ -122,7 +140,7 @@ describe("Index benchmarks", function() {
           })
         );
       })),
-      foam.async.repeat(5,
+      foam.async.repeat(10,
         foam.async.sequence([
           foam.async.log('Benchmark...'),
           resetRandomizer,
