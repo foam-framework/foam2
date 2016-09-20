@@ -40,7 +40,9 @@ public class Outputter {
   protected void outputDouble(StringBuilder out) {
   }
 
-  protected void outputBoolean(StringBuilder out) {
+  protected void outputBoolean(StringBuilder out, Boolean value) {
+    if ( value ) out.append("true");
+    else out.append("false");
   }
 
   protected void outputDate(StringBuilder out) {
@@ -74,6 +76,8 @@ public class Outputter {
       outputNumber(out, (Number)value);
     } else if ( value.getClass().isArray() ) {
       outputArray(out, (Object[])value);
+    } else if ( value instanceof Boolean ) {
+      outputBoolean(out, (Boolean)value);
     }
   }
 
