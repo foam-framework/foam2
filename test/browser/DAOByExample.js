@@ -176,7 +176,7 @@ var examples = [
           transactionPuts.push(account.transactions.put(app.Transaction.create({
             date: new Date(date),
             label: 'x'+amount+'x',
-            amount: ((amount += 0.25) % 20) - 5
+            amount: ((amount += 0.25) % 20) - 5 + (amount % 2) * 5
           })));
         }
       }
@@ -186,7 +186,7 @@ var examples = [
           transactionPuts.push(account.transactions.put(app.Transaction.create({
             date: new Date(date),
             label: 's'+amount+'s',
-            amount: ((amount += 1.5) % 50)
+            amount: ((amount += 1.5) % 50) + (amount % 4) * 5
           })));
         }
       }
@@ -280,24 +280,69 @@ var examples = [
     }
   },
 
+  // {
+  //   name: 'Table Output',
+  //   description: "Outputs Banking DAOs into simple tables",
+  //   dependencies: [ 'Create Transactions' ],
+  //   code: function() {
+  //     document.write("Banks");
+  //     foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
+  //
+  //     document.write("Customers");
+  //     foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
+  //
+  //     document.write("Accounts");
+  //     foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
+  //
+  //     document.write("Transactions");
+  //     foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+  //   }
+  // },
+  
   {
-    name: 'Table Output',
-    description: "Outputs Banking DAOs into simple tables",
-    dependencies: [ 'Create Transactions' ],
+    name: 'Selecting with skip and limit',
+    description: "A pseudo scroll effect with skip and limit",
+    dependencies: [ 'Load Customers' ],
     code: function() {
-      document.write("Banks");
-      foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
-
-      document.write("Customers");
-      foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
-
-      document.write("Accounts");
-      foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
-
-      document.write("Transactions");
-      foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+      var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
+      var skip = 0;
+      var limit = 3;
+      
+      // Change skip value, reassign the proxy's source. 
+      // The table will update automatically.
+      setInterval(function() {
+        skip = (skip + 1) % 4;
+        proxyDAO.delegate = app.customerDAO.skip(skip).limit(limit);
+      }, 500);
+      
+      document.write("Customers with Skip and Limit");
+      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();      
     }
   },
+
+  {
+    name: 'Ordering',
+    description: "Sorting results",
+    dependencies: [ 'Create Transactions' ],
+    code: function async() {
+      return app.accountDAO.find(3).then(function(account) {
+        var transactionsDAO = account.transactions;
+        
+        document.write("Sort by amount, descending");
+        foam.u2.TableView.create({ 
+          of: app.Transaction,
+          data: transactionsDAO.orderBy(M.DESC(app.Transaction.AMOUNT))
+        }).write();              
+
+        document.write("Sort by date");
+        foam.u2.TableView.create({ 
+          of: app.Transaction,
+          data: transactionsDAO.orderBy(app.Transaction.DATE)
+        }).write();              
+      })
+    }
+  },
+
 
 ].forEach(function(def) {
   exemplars.push(test.helpers.Exemplar.create(def, reg));
