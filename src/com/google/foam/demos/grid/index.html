@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <script language="javascript" src="../../../../../foam.js"></script>
+    <script language="javascript" src="Grid.js"></script>
+  </head>
+  <body>
+    <script>
+      var dao = foam.dao.EasyDAO.create({
+        of: com.google.foam.demos.grid.Resource,
+        seqNo: true,
+        daoType: 'IDB'
+      });
+
+      /*
+      foam.json.parse([
+        { description: 'Google', url: 'http://google.com/'}
+      ], com.google.foam.demos.grid.Resource).forEach(function(h) { dao.put(h); });
+      */
+
+      com.google.foam.demos.grid.Controller.create({ dao: dao }).write();
+    </script>
+  </body>
+</html>
