@@ -23,6 +23,11 @@ foam.CLASS({
   properties: [
     'of',
     {
+      class: 'Boolean',
+      name: 'eventProxy',
+      value: false
+    },
+    {
       name: 'methods',
       expression: function(of) {
         var cls = foam.lookup(of);
@@ -124,26 +129,28 @@ foam.CLASS({
         }));
       });
 
-      cls.installAxiom(foam.core.Method.create({
-        name: 'sub',
-        code: function() {
-          this.SUPER.apply(this, arguments);
+      if ( this.eventProxy ) {
+        cls.installAxiom(foam.core.Method.create({
+          name: 'sub',
+          code: function() {
+            this.SUPER.apply(this, arguments);
 
-          if ( arguments.length < 2 ) {
-            throw 'Currently network subscriptions must include at least one topic.';
+            if ( arguments.length < 2 ) {
+              throw 'Currently network subscriptions must include at least one topic.';
+            }
+
+            var replyBox = this.registry.register2(
+              foam.next$UID(),
+              this[replyPolicyName],
+              foam.box.EventDispatchBox.create({ target: this }));
+
+            this[propName].send(this.SubscribeMessage.create({
+              replyBox: replyBox,
+              topic: Array.from(arguments).slice(0, -1)
+            }));
           }
-
-          var replyBox = this.registry.register2(
-            foam.next$UID(),
-            this[replyPolicyName],
-            foam.box.EventDispatchBox.create({ target: this }));
-
-          this[propName].send(this.SubscribeMessage.create({
-            replyBox: replyBox,
-            topic: Array.from(arguments).slice(0, -1)
-          }));
-        }
-      }));
+        }));
+      }
     }
   ]
 });
