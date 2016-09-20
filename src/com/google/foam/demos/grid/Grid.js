@@ -92,12 +92,11 @@ foam.CLASS({
       name: 'show',
       code: function() {
         console.log('show');
-        var a = [];
-        this.dao.select({put: function(r) { a.push(r); }}).then(function() {
+        this.dao.select().then(function(s) {
           window.alert(foam.json.Outputer.create({
             pretty: false,
             outputClassNames: false
-          }).stringify(a));
+          }).stringify(s.a));
         });
       }
     },
@@ -114,5 +113,4 @@ foam.CLASS({
 // Didn't specify 'of' for TableView
 // Invalid names in tableProperties:
 // added invalid action name, no error
-// select should default to ArraySink (does it?)
 // clone on DAO.put
