@@ -534,7 +534,14 @@ foam.CLASS({
             type: 'void',
             visibility: 'public',
             args: [ { name: 'o', type: 'Object' }, { name: 'value', type: 'Object' } ],
-            body: '((' + this.sourceCls.name + ')o).' + this.setterName + '((' + this.propType + ')value);'
+            body: '((' + this.sourceCls.name + ')o).' + this.setterName + '(cast(value));'
+          },
+          {
+            name: 'cast',
+            type: this.propType,
+            visibility: 'public',
+            args: [ { name: 'o', type: 'Object' } ],
+            body: 'return (' + this.propType + ')o;'
           },
           {
             name: 'compare',
@@ -825,6 +832,25 @@ foam.CLASS({
 
         return code;
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Int',
+  properties: [
+    ['javaType', 'int'],
+    ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.IntParser']
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Long ) ?'
+             + '((Long)o).intValue() :'
+             + '(int)o;'
+      return info;
     }
   ]
 });
