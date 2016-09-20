@@ -1246,9 +1246,14 @@ foam.CLASS({
         dao.select({ put: function(o) { addRow(null, null, null, o); } });
       };
       var addRow = function(_, _, _, o) {
-        removeRow(null, null, null, o);
-        f.call(self, o);
-        es[o.id] = self.childNodes[self.childNodes.length-1];
+        // todo: add o listener and add in sub-context??
+        var e = f.call(self, o);
+        if ( es[o.id] ) {
+          self.replaceChild(es[o.id], e) 
+        } else {
+          self.add(e);
+        }
+        es[o.id] = e;
       };
       var removeRow = function(_, _, _, o) {
         var e = es[o.id];
