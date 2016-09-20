@@ -101,7 +101,8 @@ foam.LIB({
       };
     },
 
-    /** Takes a function (that may return a promise) and runs it multiple
+    /**
+      Takes a function (that may return a promise) and runs it multiple
       times in parallel. A function that returns a promise will have that
       promise chained, such that the entire group will not resolve until
       all returned promises have resolved (as in the standard Promise.all);
@@ -115,7 +116,8 @@ foam.LIB({
       <p>You can use repeatParallel's returned function directly in a then call:
       <pre>promise.then(foam.async.repeatParallel(...));</pre>
       <p>Or call it directly:
-      <pre>(foam.async.repeatParallel(...))().then(...);</pre> */
+      <pre>(foam.async.repeatParallel(...))().then(...);</pre>
+    */
     function repeatParallel(
       /* number // number of times to repeat in parallel */ times,
       /* function // that returns a Promise */ fn
