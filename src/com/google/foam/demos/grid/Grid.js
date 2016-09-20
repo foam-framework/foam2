@@ -37,13 +37,15 @@ foam.CLASS({
   requires: [
     'foam.u2.DetailView',
     'foam.u2.TableView',
-    'foam.dao.EasyDAO',
     'com.google.foam.demos.grid.Resource'
   ],
 
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
+        .foam-u2.DetailView tr {
+          background: pink;
+        }
       */}
     })
   ],
@@ -51,14 +53,7 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource },
-      factory: function() {
-        return foam.dao.EasyDAO.create({
-          of: foam.demos.sevenguis.Person,
-          daoType: 'MDAO',
-          seqNo: true
-        });
-      }
+      view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
     },
     {
       name: 'person',
@@ -71,9 +66,19 @@ foam.CLASS({
     function initE() {
       this.
         cssClass(this.myCls()).
-        start('h2').add('Add Resources').end().
-        add(this.PERSON, this.ADD_RESOURCE).
-        start('h2').add('List of Resources').end().
+        start('h3').add('Add Resources').end().
+
+        // Use this block to have input in a single row
+        add('Description: ').
+        start(this.person.DESCRIPTION, {data$: this.person.description$}).end().
+        add(' URL: ').
+        start(this.person.URL,         {data$: this.person.url$}).end().
+
+        // Or this line to appear in a property-sheet
+        // add(this.PERSON).
+
+        add(this.ADD_RESOURCE).
+        start('h3').add('List of Resources').end().
         add(this.DAO, this.SHOW);
     }
   ],
@@ -84,6 +89,7 @@ foam.CLASS({
       label: 'Add',
       code: function() {
         var p = this.person;
+        // TODO: remove clone()
         this.dao.put(p.clone());
         p.id = p.description = p.url = undefined;
       }
