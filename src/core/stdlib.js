@@ -527,6 +527,12 @@ foam.LIB({
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
     function hashCode(o) { return 0; },
+    function freeze(o) {
+      // Force $UID creation before freezing because it can't
+      // be added to the object after it's frozen.
+      o.$UID__ = foam.next$UID();
+      Object.freeze(o);
+    }
   ]
 });
 

@@ -10,7 +10,7 @@ public class ListSink extends AbstractSink implements foam.lib.json.OutputJSON {
   }
 
   public void put(foam.core.FObject obj, FlowControl fc) {
-    data_.add(obj);
+    getData().add(obj);
   }
 
   public void outputJSON(StringBuilder out, foam.lib.json.Outputter outputter) {

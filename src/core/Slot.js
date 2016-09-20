@@ -56,30 +56,32 @@ foam.CLASS({
       then copies the value back in case the target slot rejected the value.
     */
     function linkFrom(s2) {
-      var s1       = this;
-      var feedback = false;
+      var s1        = this;
+      var feedback1 = false, feedback2 = false;
 
       // TODO: once all slot types property set 'src', these
       // two listeneners can be merged.
       var l1 = function(e) {
-        if ( feedback ) return;
+        if ( feedback1 ) return;
 
         if ( ! foam.util.equals(s1.get(), s2.get()) ) {
-            feedback = true;
-            s2.set(s1.get());
+          feedback1 = true;
+          s2.set(s1.get());
+          if ( ! foam.util.equals(s1.get(), s2.get()) )
             s1.set(s2.get());
-            feedback = false;
+          feedback1 = false;
         }
       };
 
       var l2 = function(e) {
-        if ( feedback ) return;
+        if ( feedback2 ) return;
 
         if ( ! foam.util.equals(s1.get(), s2.get()) ) {
-            feedback = true;
-            s1.set(s2.get());
+          feedback2 = true;
+          s1.set(s2.get());
+          if ( ! foam.util.equals(s1.get(), s2.get()) )
             s2.set(s1.get());
-            feedback = false;
+          feedback2 = false;
         }
       };
 
@@ -106,6 +108,7 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
+      console.assert(other, 'Slot.follow requires Slot argument.');
       var self = this;
       var l = function() {
         if ( ! foam.util.equals(self.get(), other.get()) ) {

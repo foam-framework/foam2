@@ -46,6 +46,7 @@ foam.CLASS({
     },
 
     function sub(l) {
+      // TODO: remove listener on unsubscribe. But how?
       if ( ! this.hasListeners() ) {
         var self = this;
         this.element.on(this.event, function() {

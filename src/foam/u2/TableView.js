@@ -29,6 +29,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableBody',
@@ -59,10 +60,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableBodySink',
-  implements: ['foam.dao.Sink'],
+  extends: 'foam.dao.AbstractSink',
+
   requires: [
     'foam.u2.TableBody'
   ],
+
   properties: [
     'properties_',
     {
@@ -77,16 +80,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableHeader',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.mlang.order.Desc',
     'foam.u2.Entity'
   ],
+
   imports: [
-    'tableView',
+    'tableView'
   ],
 
   properties: [
@@ -127,6 +133,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableView',
@@ -139,6 +146,25 @@ foam.CLASS({
 
   exports: [
     'as tableView'
+  ],
+
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^sorting {
+          font-weight: bold;
+        }
+
+        ^sort-direction {
+          display: none;
+          margin-right: 8px;
+        }
+        ^sorting ^sort-direction {
+          display: initial;
+        }
+      */}
+    })
   ],
 
   properties: [
@@ -200,6 +226,7 @@ foam.CLASS({
       this.onDAOUpdate();
       return this.add(this.header$, this.body$);
     },
+
     function sortBy(prop) {
       // Two cases: same as the current prop, or different.
       var sortName = this.sortOrder ?
@@ -234,23 +261,5 @@ foam.CLASS({
         }.bind(this));
       }
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^sorting {
-          font-weight: bold;
-        }
-
-        ^sort-direction {
-          display: none;
-          margin-right: 8px;
-        }
-        ^sorting ^sort-direction {
-          display: initial;
-        }
-      */}
-    })
   ]
 });
