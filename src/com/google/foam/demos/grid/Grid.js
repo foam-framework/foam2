@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// http://www.discoversdk.com/blog/grid-control-with-different-javascript-frameworks
+
 foam.CLASS({
   package: 'com.google.foam.demos.grid',
   name: 'Resource',
@@ -31,6 +33,42 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.foam.demos.grid',
+  name: 'ResourceView',
+  extends: 'foam.u2.Element',
+
+  imports: [ 'dao' ],
+
+  properties: [ 'data' ],
+
+  methods: [
+    function initE() {
+      this.
+        start('tr').
+          start('td').
+            start('div').add(this.data.description).end().
+          end().
+          start('td').
+            start('div').add(this.data.url).end().
+          end().
+          start('td').
+            start(this.REMOVE_RESOURCE, { data: this }).end().
+          end().
+        end();
+    }
+  ],
+
+  actions: [
+    {
+      name: 'removeResource',
+      label: 'Remove',
+      code: function() { this.dao.remove(this.data); }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.foam.demos.grid',
   name: 'Controller',
   extends: 'foam.u2.Controller',
 
@@ -39,6 +77,8 @@ foam.CLASS({
     'foam.u2.TableView',
     'com.google.foam.demos.grid.Resource'
   ],
+
+  exports: [ 'dao' ],
 
   axioms: [
     foam.u2.CSS.create({
@@ -53,7 +93,8 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
+       view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
+//       view: { class: 'foam.u2.DAOList', of: com.google.foam.demos.grid.Resource, rowView: 'com.google.foam.demos.grid.ResourceView' }
     },
     {
       name: 'person',
@@ -65,7 +106,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        cssClass(this.myCls()).
+        cssClass(this.myCls()). // TODO: needed?
         start('h3').add('Add Resources').end().
 
         // Use this block to have input in a single row
@@ -79,7 +120,39 @@ foam.CLASS({
 
         add(this.ADD_RESOURCE).
         start('h3').add('List of Resources').end().
-        add(this.DAO, this.SHOW);
+
+      /*
+        start('table').
+          start('tr').
+            start('th').add('Description').end().
+            start('th').add('Resource').end().
+          end().
+          */
+          add(this.DAO).
+       // end().
+
+        start('table').
+          start('tr').
+            start('th').add('Description').end().
+            start('th').add('Resource').end().
+          end().
+          repeat(this.dao, function(r) {
+            var e = this.
+              start('tr').
+                start('td').
+                  start('div').add(r.description).end().
+                end().
+                start('td').
+                  start('div').add(r.url).end().
+                end().
+                start('td').
+                  start('button').on('click', function() { self.dao.remove(r); }).add('Remove').end().
+                end().
+              end();
+          }).
+       end().
+
+        add(this.SHOW);
     }
   ],
 
