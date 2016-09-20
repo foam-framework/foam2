@@ -664,8 +664,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Object',
-      name: 'value',
-      javaJSONParser: 'foam.lib.json.ConstantParser'
+      name: 'value'
     }
   ],
 

@@ -484,15 +484,6 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.core.Int',
-  properties: [
-    ['javaType', 'int'],
-    ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.IntParser']
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.core.FObjectProperty',
   properties: [
     {

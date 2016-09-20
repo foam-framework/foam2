@@ -96,9 +96,8 @@ describe("Index benchmarks", function() {
     var M = foam.mlang.ExpressionsSingleton.create();
 
     subjectDAO = foam.dao.MDAO.create({ of: Subject })
-      .addIndex(Subject.INT_P)
       .addIndex(Subject.INT_P, Subject.BOOL_P)
-      .addIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)
+      .addIndex(Subject.STRING_P, Subject.INT_P)
       .addIndex(Subject.STRING_P, Subject.BOOL_P);
 
     function cloneSubjects() {
