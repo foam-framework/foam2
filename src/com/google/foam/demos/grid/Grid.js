@@ -71,9 +71,9 @@ foam.CLASS({
     function initE() {
       this.
         cssClass(this.myCls()).
-        start('h1').add('Add Resources').end().
+        start('h2').add('Add Resources').end().
         add(this.PERSON, this.ADD_RESOURCE).
-        start('h1').add('List of Resources').end().
+        start('h2').add('List of Resources').end().
         add(this.DAO, this.SHOW);
     }
   ],
