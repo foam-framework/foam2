@@ -93,7 +93,6 @@ public class DatastoreDAO extends AbstractDAO {
     List<PropertyInfo> props = getProperties(obj.getClassInfo());
 
     for ( PropertyInfo prop : props ) {
-      System.out.println("Reading prop: " + prop.getName() + " value: " + e.getProperty(prop.getName()) + " type: " + e.getProperty(prop.getName()).getClass());
       prop.set(obj, e.getProperty(prop.getName()));
     }
 
