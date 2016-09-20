@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 2400000;
 if ( ! typeof performance !== 'undefined' ) performance = {
   now: function() { return Date.now(); }
 };
