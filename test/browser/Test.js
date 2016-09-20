@@ -1,16 +1,20 @@
+
 foam.CLASS({
-  name: 'Person',
-  properties: ['firstName', 'lastName'],
-  actions: [ function boo() { console.log('boo'); } ]
+  name: 'Test',
+  properties: [
+    {
+      class: 'Int',
+      name: 'foo',
+      preSet: function(_, a) {
+        if ( a > 20 ) return 20;
+        return a;
+      }
+    }
+  ]
 });
 
-var p = Person.create({firstName:'Bob', lxxxastName: 'Smith'});
-var X = foam.__context__.createSubContext({data: p});
-
-var e = X.E().add('a: ', Person.FIRST_NAME, ' b: ', Person.FIRST_NAME, ' | ', p.firstName$, ' ', p.lastName$, ' ', Person.BOO);
-e.write();
-
-foam.u2.DetailView.create({
-  data: p,
-  showActions: true
-}).write();
+var d = Test.create();
+foam.u2.DetailView.create({ data: d }).write();
+foam.u2.DetailView.create({ data: d }).write();
+//foam.u2.DetailView.create({ data: d }).write();
+d.foo$.sub(console.log.bind(console));
