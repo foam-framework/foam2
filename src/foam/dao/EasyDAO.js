@@ -51,7 +51,7 @@ foam.CLASS({
     //'foam.core.dao.VersionNoDAO',
     //'foam.dao.EasyClientDAO',
     'foam.dao.LoggingDAO',
-    'foam.dao.TimingDAO',
+    'foam.dao.TimingDAO'
   ],
 
   imports: [ 'document' ],
@@ -62,7 +62,7 @@ foam.CLASS({
       ARRAY: 'foam.dao.ArrayDAO',
       MDAO:  'foam.dao.MDAO',
       IDB:   'foam.dao.IDBDAO',
-      LOCAL: 'foam.dao.LocalStorageDAO',
+      LOCAL: 'foam.dao.LocalStorageDAO'
     }
   },
 
@@ -70,7 +70,7 @@ foam.CLASS({
     {
       /** The developer-friendly name for this EasyDAO. */
       name: 'name',
-      factory: function() { return this.of.id; },
+      factory: function() { return this.of.id; }
     },
     {
       /** This is set automatically when you create an EasyDAO.
@@ -83,25 +83,25 @@ foam.CLASS({
         exclusive. */
       class: 'Boolean',
       name: 'seqNo',
-      value: false,
+      value: false
     },
     {
       /** Have EasyDAO generate guids to index items. Note that .seqNo and .guid features are mutually exclusive. */
       class: 'Boolean',
       name: 'guid',
       label: 'GUID',
-      value: false,
+      value: false
     },
     {
       /** The property on your items to use to store the sequence number or guid. This is required for .seqNo or .guid mode. */
       name: 'seqProperty',
-      class: 'Property',
+      class: 'Property'
     },
     {
       /** Enable local in-memory caching of the DAO. */
       class: 'Boolean',
       name: 'cache',
-      value: false,
+      value: false
     },
     {
       /** Enable value de-duplication to save memory when caching. */
@@ -124,14 +124,14 @@ foam.CLASS({
       /** Enable time tracking for concurrent DAO operations. */
       class: 'Boolean',
       name: 'timing',
-      value: false,
+      value: false
     },
     {
       /** Contextualize objects on .find, re-creating them with this EasyDAO's
         exports, as if they were children of this EasyDAO. */
       class: 'Boolean',
       name: 'contextualize',
-      value: false,
+      value: false
     },
 //     {
 //       class: 'Boolean',
@@ -152,13 +152,13 @@ foam.CLASS({
         </ul>
       */
       name: 'daoType',
-      value: 'foam.dao.IDBDAO',
+      value: 'foam.dao.IDBDAO'
     },
     {
       /** Automatically generate indexes as necessary, if using an MDAO or cache. */
       class: 'Boolean',
       name: 'autoIndex',
-      value: false,
+      value: false
     },
 //     {
 //       /** Creates an internal MigrationDAO and applies the given array of MigrationRule. */
