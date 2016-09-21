@@ -57,6 +57,26 @@ foam.CLASS({
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate) {
+      if ( predicate ) {
+        if ( this.existingIndexes[predicate] ) {
+          // already seen this exact predicate, nothing to do
+          return this.NoPlan.create();
+        }
+        this.existingIndexes[predicate] = true;
+
+        // create the index to optimize the predicate, if none existing
+        // from similar predicates
+        var signature = predicate.toIndexSignature();
+        if ( ! this.existingIndexes[signature] ) {
+
+          var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
+
+          this.mdao.addRawIndex(newIndex);
+
+          this.existingIndexes[signature] = true;
+          console.log("inputs: ", predicate.toIndexSignature());
+        }
+      }
       if ( order ) {
         // TODO: compound comparator case
         // find name of property to order by
@@ -66,13 +86,6 @@ foam.CLASS({
         if ( name && ! this.existingIndexes[name] ) {
           this.addIndex(order);
         }
-      } else if ( predicate ) {
-        // collect the tree of ANDed/ORed properties from the predicate
-        var inputs = this.collectInputs(predicate);
-        if ( inputs ) {
-          // create the index to optimize the predicate, if none existing
-          console.log("inputs: ", inputs.toString());
-        }
       }
       return this.NoPlan.create();
     },
@@ -81,36 +94,199 @@ foam.CLASS({
       return 'AutoIndex()';
     },
 
-    function collectInputs(predicate) {
-      // TODO: invert this to be methods on mlangs
-      if ( this.And.isInstance(predicate) ) {
-        var ret = { name: '__AND__' };
-        for ( var i = 0; i < predicate.args.length; i++ ) {
-          var p = this.collectInputs(predicate.args[i]);
-          if ( p ) ret[p.name] = p;
-        }
-        return ret;
-      } else if ( this.Or.isInstance(predicate) ) {
-        var ret = { name: '__OR__' };
-        for ( var i = 0; i < predicate.args.length; i++ ) {
-          var p = this.collectInputs(predicate.args[i]);
-          if ( p ) ret[p.name] = p;
-        }
-        return ret;
-      } else {
-        var arg1 = predicate.arg1;
-        if ( arg1 && this.Property.isInstance(arg1) ) {
-          return arg1;
-        }
-      }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.AbstractPredicate',
+
+  methods: [
+    function toIndex(/*tailFactory*/) {
+      return undefined;
+    },
+    function toDisjunctiveNormalForm() {
+      return this;
     }
   ]
 });
 
 
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Nary',
+
+  methods: [
+    function toIndexSignature() {
+      if ( this.args ) {
+        var args = this.args;
+        var sigs = []; // to be sorted
+        for (var i = 0; i < args.length; i++ ) {
+          var sig = args[i].toIndexSignature();
+          sig && sigs.push(sig);
+        }
+        // reverse sort leaves *AND,*OR at the end
+        sigs.sort(function(a,b) { return -foam.util.compare(a.name, b.name); });
+
+        var ret = "*"+this.cls_.name + "{" + sigs.join(',') + "}";
+        return ret;
+      } else {
+        return "*"+this.cls_.name+"{}";
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Binary',
+
+  methods: [
+    function toIndexSignature() {
+      if ( this.arg1 ) {
+        return this.arg1.toIndexSignature();
+      } else {
+        return;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Unary',
+
+  methods: [
+    function toIndexSignature() {
+      if ( this.arg1 ) {
+        return this.arg1.toIndexSignature();
+      } else {
+        return;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  methods: [
+    function toIndexSignature() {
+      return this.name;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.And',
+
+  requires: [
+    'foam.mlang.predicate.Or'
+  ],
+
+  methods: [
+    function toIndex(tailFactory) {
+      var self = this.toDisjunctiveNormalForm();
+
+      var args = this.args;
+      for (var i = 0; i < args.length; i++ ) {
+        var arg = args[i];
+        // for nested Nary predicates, process them first, put at the end
+        // of the tailFactory chain
+        if ( this.cls_.isInstance(arg) ) {
+
+
+        }
 
 
 
+        var idx = args[i].toIndex(tailFactory);
+        if ( idx ) {
 
+        }
+      }
+
+    },
+
+    function toDisjunctiveNormalForm() {
+      // for each nested OR, multiply:
+      // AND(a,b,OR(c,d),OR(e,f)) -> OR(abce,abcf,abde,abdf)
+
+      var andArgs = [];
+      var orArgs = [];
+      var oldArgs = this.args;
+      for (var i = 0; i < oldArgs.length; i++ ) {
+        var a = oldArgs[i].toDisjunctiveNormalForm();
+        if ( this.Or.isInstance(a) ) {
+          orArgs.push(a);
+        } else {
+          andArgs.push(a);
+        }
+      }
+
+      if ( orArgs.length > 0 ) {
+        var newAndGroups = [];
+
+        var activeOrIdxs = new Array(orArgs.length).fill(0);
+        var active = true;
+        var idx = activeOrIdxs.length - 1;
+        while ( active ) {
+          if ( ++activeOrIdxs[idx] > orArgs[idx].length ) {
+            // reset array index count, carry the one
+            if ( idx === 0 ) { active = false; break; }
+            activeOrIdxs[idx] = 0;
+            idx--;
+            continue;
+          }
+          if ( idx === (activeOrIdxs.length - 1) ) {
+            // for the last group iterated, read back up the indexes
+            // to get the result set
+            var and = this.cls_.create();
+            for ( var j = activeOrIdxs.length - 1; j >= 0; j-- ) {
+              and.args.push(orArgs[j].args[activeOrIdxs[j]]);
+            }
+          }
+
+        }
+
+        return this.Or.create({ args: newAndGroups });
+      } else {
+        // no OR args, no DNF transform needed
+        return this;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Or',
+
+  methods: [
+    function toIndex(tailFactory) {
+      var self = this.toDisjunctiveNormalForm();
+
+
+    },
+
+    function toDisjunctiveNormalForm() {
+      // TODO: memoization around this process
+      // DNF our args, note if anything changes
+      var oldArgs = this.args;
+      var newArgs = [];
+      var changed = false;
+      for (var i = 0; i < oldArgs.length; i++ ) {
+        var a = oldArgs[i].toDisjunctiveNormalForm();
+        if ( a !== oldArgs[i] ) changed = true;
+        newArgs[i] = a;
+      }
+
+      // partialEval will take care of nested ORs
+      var self = this;
+      if ( changed ) {
+        self = this.clone();
+        self.args = newArgs;
+        self = self.partialEval();
+      }
+
+      return self;
+    }
+  ]
+});
 
 

@@ -634,8 +634,12 @@ describe('AutoIndex', function() {
   beforeEach(function() {
     mdao = {
       lastIndex: null,
+      lastRawIndex: null,
       addIndex: function(index) {
         this.lastIndex = index;
+      }
+      addRawIndex: function(index) {
+        this.lastRawIndex = index;
       }
     }
     idx = foam.dao.index.AutoIndex.create({
@@ -685,6 +689,20 @@ describe('AutoIndex', function() {
 
     expect(idx.existingIndexes['float']).toEqual(test.Indexable.FLOAT);
     expect(mdao.lastIndex).toBe(null);
+  });
+
+  it('auto indexes on predicate', function() {
+
+    var pred = m.AND(
+      m.OR(
+        m.LT(test.Indexable.INT, 8),
+        m.EQ(test.Indexable.FLOAT, 4)
+      ),
+      m.CONTAINS_IC(test.Indexable.STRING, "we")
+    );
+
+    idx.plan(sink, undefined, undefined, undefined, pred);
+
   });
 
   // it('auto indexes on predicate', function() {

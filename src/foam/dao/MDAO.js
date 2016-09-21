@@ -53,6 +53,9 @@ foam.CLASS({
       name: 'idIndex'
     },
     {
+      name: 'idIndexFactory'
+    },
+    {
       name: 'index'
     }
   ],
@@ -61,7 +64,6 @@ foam.CLASS({
     function init() {
       // adds the primary key(s) as an index, and stores it for fast find().
       this.addIndex();
-      this.idIndex = this.index;
 
       if ( this.autoIndex ) {
         this.addRawIndex(this.AutoIndex.create({ mdao: this }));
@@ -108,9 +110,10 @@ foam.CLASS({
     },
 
     // TODO: name 'addIndex' and renamed addIndex
-    function addRawIndex(index) {
+    function addRawIndex(indexFactory) {
       if ( ! this.index ) {
-        this.index = index;
+        this.idIndex = this.index = indexFactory.create();
+        this.idIndexFactory = this.indexFactory;
         return this;
       }
 
@@ -119,7 +122,7 @@ foam.CLASS({
         this.index = this.AltIndex.create({ delegates: [this.index] });
       }
 
-      this.index.addIndex(index);
+      this.index.addIndex(indexFactory.create());
 
       return this;
     },
