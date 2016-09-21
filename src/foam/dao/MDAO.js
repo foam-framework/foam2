@@ -74,16 +74,9 @@ foam.CLASS({
      **/
     function addIndex() {
       var props = Array.from(arguments);
-      var ids = this.of$cls.ids;
-      if ( ! ids ) {// throw "Undefined index"; // TODO: err?
-        ids = ['id'];
-      }
 
-      // Add on the primary key(s) to make the index unique.
-      for ( var i = 0 ; i < ids.length ; i++ ) {
-        props.push(this.of$cls.getAxiomByName(ids[i]));
-        if ( ! props[props.length - 1] ) throw "Undefined index property"; // TODO: err
-      }
+      // Add ID to make each sure the object is uniquely identified
+      props.push(this.of$cls.ID);
 
       return this.addUniqueIndex.apply(this, props);
     },
@@ -166,11 +159,9 @@ foam.CLASS({
 
     /** internal, synchronous version of find, does not throw */
     function find_(key) {
-      if ( ! Array.isArray(key) ) key = [key];
       var index = this.idIndex;
-      for ( var i = 0; i < key.length && index; ++i ) {
-        index = index.get(key[i]);
-      }
+      index = index.get(key);
+
       if ( index && index.get() ) return index.get();
 
       return;
