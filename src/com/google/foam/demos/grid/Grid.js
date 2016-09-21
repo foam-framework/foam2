@@ -205,3 +205,5 @@ foam.CLASS({
 // clone on DAO.put
 // width support is missing
 // DAO.put(null) didn't give meaningful error
+// Typo causing null to pass to Element.add()
+// Problems getting rid of CSS
