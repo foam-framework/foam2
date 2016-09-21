@@ -430,7 +430,7 @@ foam.LIB({
         var c = foam.util.compare(a[i], b[i]);
         if ( c ) return c;
       }
-      return a.length === b.length ? true : a.length < b.length ? -1 : 1;
+      return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
     },
     function hashCode(a) {
       var hash = 0;
