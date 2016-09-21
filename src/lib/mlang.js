@@ -74,9 +74,9 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
+        if ( o === null ) return foam.mlang.Constant.create({ value: o });
         if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== 'object' ) return foam.mlang.Constant.create({ value: o });
-        if ( o === null ) return foam.mlang.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
         if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
         console.error('Invalid expression value: ', o);
@@ -158,9 +158,9 @@ foam.CLASS({
       name: 'adaptArrayElement',
       // TODO?: Make into a multi-method?
       value: function(o) {
+        if ( o === null ) return foam.mlang.Constant.create({ value: o });
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
-        if ( o === null ) return foam.mlang.Constant.create({ value: o });
         if ( Array.isArray(o) ) return foam.mlang.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
