@@ -424,6 +424,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Map',
   extends: 'Property',
+
   properties: [
     ['factory', function() { return {} }],
     'of'
