@@ -105,6 +105,7 @@ foam.CLASS({
       name: 'query',
       view: {
         class: 'foam.u2.TextField',
+        type: 'search',
         onKey: true
       }
     },
@@ -112,7 +113,7 @@ foam.CLASS({
       name: 'filteredDAO',
       expression: function(heroDAO, query) {
 // console.log('******************************** query: ', query);
-        return heroDAO.where(this.STARTS_WITH_IC(this.Hero.NAME, query));
+        return heroDAO.where(this.CONTAINS_IC(this.Hero.NAME, query));
       },
       view: {
         class: 'foam.u2.DAOList',
@@ -163,7 +164,7 @@ foam.CLASS({
     },
 
     function dashboardE() {
-      return this.E().cssClass(this.myCls('starred')).start('h3').add('Top Heroes').end().add(this.STARRED_DAO);
+      return this.E().cssClass(this.myCls('starred')).start('h3').add('Top Heroes').end().add(this.STARRED_HERO_DAO);
     },
 
     function heroesE() {
