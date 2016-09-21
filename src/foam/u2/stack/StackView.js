@@ -16,13 +16,16 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.control',
+  package: 'foam.u2.stack',
   name: 'StackView',
   extends: 'foam.u2.View',
+  requires: [
+    'foam.u2.stack.Stack'
+  ],
   methods: [
     function initE() {
       this.setNodeName('div').
-        add(foam.u2.control.Stack.BACK, foam.u2.control.Stack.FORWARD).
+        add(this.Stack.BACK, this.Stack.FORWARD).
         add(this.slot(function(s) {
           return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
         }, this.data$.dot('top')));
