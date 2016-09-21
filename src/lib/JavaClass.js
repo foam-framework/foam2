@@ -651,6 +651,13 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      var cast = info.getMethod('cast');
+      cast.body = 'Object[] value = (Object[])o;\n'
+                + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
+                + 'System.arraycopy(value, 0, ret, 0, value.length);\n'
+                + 'return ret;'
+
       return info;
     }
   ],
