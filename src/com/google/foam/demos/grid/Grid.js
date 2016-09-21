@@ -204,3 +204,4 @@ foam.CLASS({
 // added invalid action name, no error
 // clone on DAO.put
 // width support is missing
+// DAO.put(null) didn't give meaningful error
