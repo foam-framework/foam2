@@ -11,10 +11,11 @@
       var heroDAO = foam.dao.EasyDAO.create({
         of: com.google.foam.demos.heroes.Hero,
         seqNo: true,
-        daoType: 'MDAO'
-      });
-
-      foam.json.parse([
+        cache: true,
+        daoType: 'LOCAL',
+//      daoType: 'IDB',
+//      daoType: 'ARRAY',
+        testData: [
           { id: 11, name: "Mr. Nice"},
           { id: 12, name: "Narco",     starred: true },
           { id: 13, name: "Bombasto",  starred: true },
@@ -24,7 +25,8 @@
           { id: 17, name: "Dynama" },
           { id: 18, name: "Dr IQ" },
           { id: 19, name: "Magma" },
-        ], com.google.foam.demos.heroes.Hero).forEach(function(h) { heroDAO.put(h); });
+        ]
+      });
 
 // for ( var i = 0 ; i < 1000 ; i++ ) { heroDAO.put(com.google.foam.demos.heroes.Hero.create({name: 'hero ' + i})); }
 
