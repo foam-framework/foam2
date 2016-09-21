@@ -1339,14 +1339,14 @@ describe('EasyDAO-permutations', function() {
     }).toThrow();
   });
 
-  it('forwards addIndex', function() {
+  it('forwards addPropertyIndex', function() {
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
       daoType: foam.dao.MDAO
     });
     // TODO: mock MDAO, check that these get called through
-    dao.addIndex(test.CompA.A);
-    dao.addRawIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
+    dao.addPropertyIndex(test.CompA.A);
+    dao.addIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
   });
 
   it('constructs HTTP ClientDAO', function() {
@@ -1528,7 +1528,7 @@ describe('FilteredDAO', function() {
   var dao;
   var sink;
   var m;
-  var l;
+  var l, l2;
 
   beforeEach(function() {
     foam.CLASS({
@@ -1542,6 +1542,12 @@ describe('FilteredDAO', function() {
     l = function(s, on, evt, obj) {
       l.evt = evt;
       l.obj = obj;
+      l.count = ( l.count + 1 ) || 1;
+    };
+    l2 = function(s, on, evt, obj) {
+      l2.evt = evt;
+      l2.obj = obj;
+      l2.count = ( l2.count + 1 ) || 1;
     }
   });
 
@@ -1551,16 +1557,21 @@ describe('FilteredDAO', function() {
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
+    dao.on.sub(l2);
 
     dao.put(a);
     expect(l.evt).toEqual('put');
     expect(l.obj).toEqual(a);
+    expect(l.count).toEqual(1);
 
     // since 'b' is filtered out, the put changes to remove to ensure the
     // listener knows it shouldn't exist
     dao.put(b);
     expect(l.evt).toEqual('remove');
     expect(l.obj).toEqual(b);
+    expect(l.count).toEqual(2);
+
+
   });
 
   it('does not filter remove events', function() {
@@ -1696,3 +1707,59 @@ describe('Relationship', function() {
   })
 
 });
+
+
+describe('MultiPartID MDAO support', function() {
+  var mDAO;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'Mpid',
+      ids: [ 'a', 'b' ],
+      properties: [ 'a', 'b', 'c' ]
+    });
+
+    mDAO = foam.dao.MDAO.create({ of: test.Mpid });
+  });
+
+  afterEach(function() {
+    mDAO = null;
+  });
+
+  it('generates a proper ID index', function(done) {
+
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 2 })); // update
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 })); // update
+    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 2 })); // update
+
+    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+      expect(counter.value).toEqual(4);
+      done();
+    });
+  });
+
+  it('finds by multipart ID array', function(done) {
+
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 3 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 4 })); // add
+
+    mDAO.find([ 2, 1 ]).then(function(obj) { // with array key
+      expect(obj.c).toEqual(3);
+
+      mDAO.find(test.Mpid.create({ a: 2, b: 2 }).id) // array from MultiPartID
+        .then(function(obj2) {
+          expect(obj2.c).toEqual(4);
+          done();
+        });
+    });
+  });
+
+});
+

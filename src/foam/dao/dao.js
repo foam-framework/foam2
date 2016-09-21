@@ -893,11 +893,12 @@ foam.CLASS({
 
   methods: [
     function sub(arg1) {
-      if ( arg1 === 'on' ) {
+      if ( arg1 === 'on' && ! this.delegateSub_ ) {
         var self = this;
         this.delegateSub_ = this.delegate.on.sub(this.onEvent);
         this.onDestroy(function() {
           self.delegateSub_ && self.delegateSub_.destroy();
+          self.delegateSub_ = null;
         });
       }
       this.SUPER.apply(this, arguments);
