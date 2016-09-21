@@ -27,6 +27,8 @@ foam.CLASS({
     'foam.dao.index.NoPlan',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Or',
+    'foam.dao.index.OrIndex',
+    'foam.dao.index.AltIndex',
   ],
 
   properties: [
@@ -36,6 +38,17 @@ foam.CLASS({
     },
     {
       name: 'mdao'
+    },
+    {
+      name: 'baseAltIndex',
+      expression: function(mdao) {
+        if ( ! mdao ) return;
+        var index = this.OrIndex.create({
+          delegate: this.AltIndex.create()
+        });
+        mdao.addIndex(index);
+        return index.delegate;
+      }
     }
   ],
 
@@ -46,13 +59,16 @@ foam.CLASS({
 
     function bulkLoad() { return 'auto'; },
 
-    function addIndex(prop) {
+    function addPropertyIndex(prop) {
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
         prop = prop.arg1;
       }
       console.log('Adding AutoIndex : ', prop.id);
       this.existingIndexes[prop.name] = prop;
       this.mdao.addPropertyIndex(prop);
+    },
+    function addIndex(index) {
+      this.baseAltIndex.addIndex(index);
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
@@ -82,7 +98,7 @@ foam.CLASS({
           ( order.arg1 && order.arg1.name ) || null;
         // if no index added for it yet, add one
         if ( name && ! this.existingIndexes[name] ) {
-          this.addIndex(order);
+          this.addPropertyIndex(order);
         }
       }
       return this.NoPlan.create();
@@ -94,7 +110,7 @@ foam.CLASS({
         this.processAndPredicate_(dnf);
       } else if ( this.Property.isInstance(dnf) ||
           dnf.arg1 && this.Property.isInstance(dnf.arg1) ) {
-        this.addIndex(dnf.arg1 || dnf);
+        this.addPropertyIndex(dnf.arg1 || dnf);
       } else {
         throw "AutoIndex found unknown predicate: " + dnf.toString();
       }

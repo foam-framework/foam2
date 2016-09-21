@@ -659,7 +659,7 @@ describe('AutoIndex', function() {
   });
 
   it('supports manual addIndex()', function() {
-    idx.addIndex(test.Indexable.INT);
+    idx.addPropertyIndex(test.Indexable.INT);
 
     expect(idx.existingIndexes['int']).toEqual(test.Indexable.INT);
     expect(mdao.lastPropertyIndex).toBe(test.Indexable.INT);
