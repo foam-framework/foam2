@@ -24,12 +24,14 @@ foam.CLASS({
 
   requires: [
     'foam.core.Property',
-    'foam.dao.index.NoPlan'
+    'foam.dao.index.NoPlan',
+    'foam.mlang.predicate.And',
+    'foam.mlang.predicate.Or',
   ],
 
   properties: [
     {
-      name: 'properties',
+      name: 'existingIndexes',
       factory: function() { return {}; }
     },
     {
@@ -49,7 +51,7 @@ foam.CLASS({
         prop = prop.arg1;
       }
       console.log('Adding AutoIndex : ', prop.id);
-      this.properties[prop.name] = true;
+      this.existingIndexes[prop.name] = prop;
       this.mdao.addIndex(prop);
     },
     // TODO: mlang comparators should support input collection for
@@ -61,19 +63,46 @@ foam.CLASS({
         var name = ( this.Property.isInstance(order) ) ? order.name :
           ( order.arg1 && order.arg1.name ) || null;
         // if no index added for it yet, add one
-        if ( name && ! this.properties[name] ) {
+        if ( name && ! this.existingIndexes[name] ) {
           this.addIndex(order);
         }
       } else if ( predicate ) {
-
-
-
-
+        // collect the tree of ANDed/ORed properties from the predicate
+        var inputs = this.collectInputs(predicate);
+        if ( inputs ) {
+          // create the index to optimize the predicate, if none existing
+          console.log("inputs: ", inputs.toString());
+        }
       }
       return this.NoPlan.create();
     },
+
     function toString() {
       return 'AutoIndex()';
+    },
+
+    function collectInputs(predicate) {
+      // TODO: invert this to be methods on mlangs
+      if ( this.And.isInstance(predicate) ) {
+        var ret = { name: '__AND__' };
+        for ( var i = 0; i < predicate.args.length; i++ ) {
+          var p = this.collectInputs(predicate.args[i]);
+          if ( p ) ret[p.name] = p;
+        }
+        return ret;
+      } else if ( this.Or.isInstance(predicate) ) {
+        var ret = { name: '__OR__' };
+        for ( var i = 0; i < predicate.args.length; i++ ) {
+          var p = this.collectInputs(predicate.args[i]);
+          if ( p ) ret[p.name] = p;
+        }
+        return ret;
+      } else {
+        var arg1 = predicate.arg1;
+        if ( arg1 && this.Property.isInstance(arg1) ) {
+          return arg1;
+        }
+      }
     }
   ]
 });
