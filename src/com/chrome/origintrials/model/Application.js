@@ -63,6 +63,22 @@ foam.CLASS({
       class: 'String',
       required: false,
       name: 'comments'
+    },
+    {
+      class: 'Boolean',
+      name: 'approved',
+      value: false
+    }
+  ],
+  actions: [
+    {
+      name: 'approve',
+      isEnabled: function(approved) {
+        return ! approved
+      },
+      code: function() {
+        this.approved = true;
+      }
     }
   ]
 });
