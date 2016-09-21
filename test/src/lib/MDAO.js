@@ -103,12 +103,12 @@ describe('MDAO with TreeIndex', function() {
 
   beforeEach(function(done) {
     PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
-      .addIndex(test.Photo.ALBUM_ID)
-      .addIndex(test.Photo.TIMESTAMP)
-      .addIndex(test.Photo.IS_LOCAL);
+      .addPropertyIndex(test.Photo.ALBUM_ID)
+      .addPropertyIndex(test.Photo.TIMESTAMP)
+      .addPropertyIndex(test.Photo.IS_LOCAL);
     AlbumDAO = foam.dao.MDAO.create({of: test.Album})
-     .addIndex(test.Album.IS_LOCAL)
-     .addIndex(test.Album.TIMESTAMP);
+     .addPropertyIndex(test.Album.IS_LOCAL)
+     .addPropertyIndex(test.Album.TIMESTAMP);
 
     AlbumDAO.bulkLoad(albums).then(PhotoDAO.bulkLoad(photos)).then(done);
   });

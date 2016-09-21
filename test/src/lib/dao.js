@@ -1339,14 +1339,14 @@ describe('EasyDAO-permutations', function() {
     }).toThrow();
   });
 
-  it('forwards addIndex', function() {
+  it('forwards addPropertyIndex', function() {
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
       daoType: foam.dao.MDAO
     });
     // TODO: mock MDAO, check that these get called through
-    dao.addIndex(test.CompA.A);
-    dao.addRawIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
+    dao.addPropertyIndex(test.CompA.A);
+    dao.addIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
   });
 
   it('constructs HTTP ClientDAO', function() {
@@ -1709,7 +1709,6 @@ describe('Relationship', function() {
 });
 
 
-
 describe('MultiPartID MDAO support', function() {
   var mDAO;
 
@@ -1763,3 +1762,4 @@ describe('MultiPartID MDAO support', function() {
   });
 
 });
+

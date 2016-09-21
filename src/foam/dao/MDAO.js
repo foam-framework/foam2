@@ -60,11 +60,11 @@ foam.CLASS({
   methods: [
     function init() {
       // adds the primary key(s) as an index, and stores it for fast find().
-      this.addIndex();
+      this.addPropertyIndex();
       this.idIndex = this.index;
 
       if ( this.autoIndex ) {
-        this.addRawIndex(this.AutoIndex.create({ mdao: this }));
+        this.addIndex(this.AutoIndex.create({ mdao: this }));
       }
     },
 
@@ -72,22 +72,22 @@ foam.CLASS({
      * Add a non-unique index
      * args: one or more properties
      **/
-    function addIndex() {
+    function addPropertyIndex() {
       var props = Array.from(arguments);
 
       // Add ID to make each sure the object is uniquely identified
       props.push(this.of$cls.ID);
 
-      return this.addUniqueIndex.apply(this, props);
+      return this.addUniqueIndex_.apply(this, props);
     },
 
     /**
      * Add a unique index
      * args: one or more properties
+     * @private
      **/
-    function addUniqueIndex() {
+    function addUniqueIndex_() {
       var index = this.ValueIndex.create();
-      //var siFactory = proto;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
@@ -97,11 +97,10 @@ foam.CLASS({
         index = prop.toIndex(index);
       }
 
-      return this.addRawIndex(index);
+      return this.addIndex(index);
     },
 
-    // TODO: name 'addIndex' and renamed addIndex
-    function addRawIndex(index) {
+    function addIndex(index) {
       if ( ! this.index ) {
         this.index = index;
         return this;
