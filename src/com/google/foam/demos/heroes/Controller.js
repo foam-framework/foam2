@@ -101,12 +101,31 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'query',
+      view: {
+        class: 'foam.u2.TextField',
+        onKey: true
+      }
+    },
+    {
+      name: 'filteredDAO',
+      expression: function(heroDAO, query) {
+// console.log('******************************** query: ', query);
+        return heroDAO.where(this.STARTS_WITH_IC(this.Hero.NAME, query));
+      },
+      view: {
+        class: 'foam.u2.DAOList',
+        rowView: 'com.google.foam.demos.heroes.CitationView'
+      }
+    },
+    {
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
         rowView: 'com.google.foam.demos.heroes.DashboardCitationView'
       },
-      factory: function() { return this.heroDAO.where(this.EQ(this.Hero.STARRED, true)); }
+      expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },
     {
       name: 'mode',
@@ -123,23 +142,28 @@ foam.CLASS({
       this.
         start('h2').add('Tour of Heroes').end().
           // TODO: start(this.HEROES) and set class
+        add('Search: ', this.QUERY).
+        br().
         start().cssClass(this.myCls('nav')).
           add(this.DASHBOARD, this.HEROES).
         end().
         br().
         add(this.slot(function(selection, mode) {
-          return selection ? this.detailE() :
+          return selection       ? this.detailE()    :
             mode === 'dashboard' ? this.dashboardE() :
             this.heroesE();
         }));
     },
 
     function detailE() {
-      return this.E('h3').add(this.selection.name$, ' details!').br().add(this.SELECTION, this.BACK);
+      return this.E('h3').
+        add(this.selection.name$, ' details!').
+        br().
+        add(this.SELECTION, this.BACK);
     },
 
     function dashboardE() {
-      return this.E().cssClass(this.myCls('starred')).start('h3').add('Top Heroes').end().add(this.STARRED_HERO_DAO);
+      return this.E().cssClass(this.myCls('starred')).start('h3').add('Top Heroes').end().add(this.STARRED_DAO);
     },
 
     function heroesE() {
@@ -150,11 +174,11 @@ foam.CLASS({
           start().
             add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
           end().
-          add(this.HERO_DAO);
+          add(this.FILTERED_DAO);
     },
 
     function editHero(hero) {
-      this.selection = hero;
+      this.selection = hero.clone();
     }
   ],
 
@@ -180,7 +204,10 @@ foam.CLASS({
     },
     {
       name: 'back',
-      code: function() { this.selection = null; }
+      code: function() {
+        if ( this.selection ) this.heroDAO.put(this.selection);
+        this.selection = null;
+      }
     }
   ]
 });

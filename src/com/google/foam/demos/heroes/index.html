@@ -11,7 +11,10 @@
       var heroDAO = foam.dao.EasyDAO.create({
         of: com.google.foam.demos.heroes.Hero,
         seqNo: true,
-        daoType: 'ARRAY',
+        cache: true,
+        daoType: 'LOCAL',
+//      daoType: 'IDB',
+//      daoType: 'ARRAY',
         testData: [
           { id: 11, name: "Mr. Nice"},
           { id: 12, name: "Narco",     starred: true },
