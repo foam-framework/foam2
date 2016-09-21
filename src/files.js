@@ -77,6 +77,7 @@ FOAM_FILES([
   { name: "foam/mlang/LabeledValue" },
   { name: "foam/dao/index/Plan" },
   { name: "foam/dao/index/Index" },
+  { name: "foam/dao/index/AutoIndex" },
   { name: "foam/dao/index/AATree" },
   { name: "foam/dao/index/TreeIndex" },
   { name: "foam/dao/MDAO" },

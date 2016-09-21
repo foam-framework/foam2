@@ -290,64 +290,6 @@ foam.CLASS({
 
 });
 
-/** An Index which adds other indices as needed. **/
-foam.CLASS({
-  package: 'foam.dao.index',
-  name: 'AutoIndex',
-  extends: 'foam.dao.index.Index',
-
-  requires: [
-    'foam.core.Property',
-    'foam.dao.index.NoPlan'
-  ],
-
-  properties: [
-    {
-      name: 'properties',
-      factory: function() { return {}; }
-    },
-    {
-      name: 'mdao'
-    }
-  ],
-
-  methods: [
-    function put() { },
-
-    function remove() { },
-
-    function bulkLoad() { return 'auto'; },
-
-    function addIndex(prop) {
-      if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
-        prop = prop.arg1;
-      }
-      console.log('Adding AutoIndex : ', prop.id);
-      this.properties[prop.name] = true;
-      this.mdao.addIndex(prop);
-    },
-    // TODO: mlang comparators should support input collection for
-    //   index-building cases like this
-    function plan(sink, skip, limit, order, predicate) {
-      if ( order ) {
-        // find name of property to order by
-        var name = ( this.Property.isInstance(order) ) ? order.name :
-          ( order.arg1 && order.arg1.name ) || null;
-        // if no index added for it yet, add one
-        if ( name && ! this.properties[name] ) {
-          this.addIndex(order);
-        }
-      } else if ( predicate ) {
-        // TODO: check for property in predicate
-      }
-      return this.NoPlan.create();
-    },
-    function toString() {
-      return 'AutoIndex()';
-    }
-  ]
-});
-
 
 // foam.CLASS({
 //   package: 'foam.dao.index',
