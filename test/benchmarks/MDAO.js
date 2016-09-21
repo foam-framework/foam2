@@ -121,12 +121,12 @@ describe("MDAO benchmarks", function() {
     var KEYS_5000 = makeMultiPartKeys(5000);
 
     PhotoDAO = foam.dao.MDAO.create({of: Photo})
-      .addIndex(Photo.ALBUM_ID)
-      .addIndex(Photo.TIMESTAMP)
-      .addIndex(Photo.IS_LOCAL);
+      .addPropertyIndex(Photo.ALBUM_ID)
+      .addPropertyIndex(Photo.TIMESTAMP)
+      .addPropertyIndex(Photo.IS_LOCAL);
     AlbumDAO = foam.dao.MDAO.create({of: Album})
-     .addIndex(Album.IS_LOCAL)
-     .addIndex(Album.TIMESTAMP);
+     .addPropertyIndex(Album.IS_LOCAL)
+     .addPropertyIndex(Album.TIMESTAMP);
 
     var avgKey = ""+Math.floor(NUM_PHOTOS/2)/*.toString()*/;
     var avgAlbumKey = ""+Math.floor(NUM_ALBUMS/2)/*.toString()*/;

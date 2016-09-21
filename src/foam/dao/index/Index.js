@@ -227,24 +227,24 @@ foam.CLASS({
 
     function bulkLoad() { return 'auto'; },
 
-    function addIndex(prop) {
+    function addPropertyIndex(prop) {
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
         prop = prop.arg1;
       }
       console.log('Adding AutoIndex : ', prop.id);
       this.properties[prop.name] = true;
-      this.mdao.addIndex(prop);
+      this.mdao.addPropertyIndex(prop);
     },
-    // TODO: mlang comparators should support input collection for 
+    // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate) {
       if ( order ) {
         // find name of property to order by
-        var name = ( this.Property.isInstance(order) ) ? order.name : 
+        var name = ( this.Property.isInstance(order) ) ? order.name :
           ( order.arg1 && order.arg1.name ) || null;
         // if no index added for it yet, add one
         if ( name && ! this.properties[name] ) {
-          this.addIndex(order);
+          this.addPropertyIndex(order);
         }
       } else if ( predicate ) {
         // TODO: check for property in predicate
