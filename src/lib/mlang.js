@@ -74,8 +74,9 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
+        if ( o === null ) return foam.mlang.Constant.create({ value: o });
+        if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
+        if ( typeof o !== 'object' ) return foam.mlang.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
         if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
         console.error('Invalid expression value: ', o);
@@ -148,7 +149,7 @@ foam.CLASS({
   extends: 'FObjectArray',
 
   properties: [
-    ['javaType', 'foam.mlang.predicate.Predicate[]'],
+    [ 'javaType', 'foam.mlang.predicate.Predicate[]' ],
     {
       name: 'of',
       value: 'foam.mlang.predicate.Predicate'
@@ -157,6 +158,7 @@ foam.CLASS({
       name: 'adaptArrayElement',
       // TODO?: Make into a multi-method?
       value: function(o) {
+        if ( o === null ) return foam.mlang.Constant.create({ value: o });
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
         if ( Array.isArray(o) ) return foam.mlang.Constant.create({ value: o });
@@ -524,17 +526,20 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      var arg1 = this.arg1.f(o);
-      var arg2 = this.arg2.f(o);
+    {
+      name: 'f',
+      code: function(o) {
+        var arg1 = this.arg1.f(o);
+        var arg2 = this.arg2.f(o);
 
-      if ( Array.isArray(arg1) ) {
-        return arg1.some(function(arg) {
-          return arg.startsWith(arg2);
-        });
+        if ( Array.isArray(arg1) ) {
+          return arg1.some(function(arg) {
+            return arg.startsWith(arg2);
+          });
+        }
+
+        return arg1.startsWith(arg2);
       }
-
-      return arg1.startsWith(arg2);
     }
   ]
 });
@@ -545,17 +550,33 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
 
   methods: [
-    function f(o) {
-      var arg1 = this.arg1.f(o);
-      var arg2 = this.arg2.f(o);
+    {
+      name: 'f',
+      code: function f(o) {
+        var arg1 = this.arg1.f(o);
+        var arg2 = this.arg2.f(o);
 
-      if ( Array.isArray(arg1) ) {
-        return arg1.some(function(arg) {
-          return foam.String.startsWithIC(arg, arg2);
-        });
-      }
+        if ( Array.isArray(arg1) ) {
+          return arg1.some(function(arg) {
+            return foam.String.startsWithIC(arg, arg2);
+          });
+        }
 
-      return foam.String.startsWithIC(arg1, arg2);
+        return foam.String.startsWithIC(arg1, arg2);
+      },
+      javaCode: 'String arg2 = ((String)getArg2().f(obj)).toUpperCase();\n'
+                + 'Object arg1 = getArg1().f(obj);\n'
+                + 'if ( arg1 instanceof Object[] ) {\n'
+                + '  Object[] values = (Object[])arg1;\n'
+                + '  for ( int i = 0 ; i < values.length ; i++ ) {\n'
+                + '    if ( ((String)values[i]).toUpperCase().startsWith(arg2) ) {\n'
+                + '      return true;\n'
+                + '    }\n'
+                + '  }\n'
+                + '  return false;'
+                + '}'
+                + 'String value = (String)arg1;\n'
+                + 'return value.toUpperCase().startsWith(arg2);\n'
     }
   ]
 });
@@ -664,8 +685,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Object',
-      name: 'value',
-      javaJSONParser: 'foam.lib.json.ConstantParser'
+      name: 'value'
     }
   ],
 

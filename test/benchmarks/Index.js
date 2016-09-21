@@ -96,9 +96,9 @@ describe("Index benchmarks", function() {
     var M = foam.mlang.ExpressionsSingleton.create();
 
     subjectDAO = foam.dao.MDAO.create({ of: Subject })
-      //.addIndex(Subject.INT_P)
-      //.addIndex(Subject.INT_P, Subject.BOOL_P)
-      .addRawIndex(
+      //.addPropertyIndex(Subject.INT_P)
+      //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P)
+      .addIndex(
         foam.dao.index.OrIndex.create({
           delegate: foam.dao.index.AltIndex.create({
             delegates: [

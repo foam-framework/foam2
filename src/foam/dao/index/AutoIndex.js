@@ -52,7 +52,7 @@ foam.CLASS({
       }
       console.log('Adding AutoIndex : ', prop.id);
       this.existingIndexes[prop.name] = prop;
-      this.mdao.addIndex(prop);
+      this.mdao.addPropertyIndex(prop);
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
@@ -71,7 +71,7 @@ foam.CLASS({
 
           var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
 
-          this.mdao.addRawIndex(newIndex);
+          this.mdao.addIndex(newIndex);
 
           this.existingIndexes[signature] = true;
           console.log("inputs: ", predicate.toIndexSignature());
@@ -227,7 +227,7 @@ foam.CLASS({
         var active = true;
         var idx = activeOrIdxs.length - 1;
         while ( active ) {
-          if ( ++activeOrIdxs[idx] > orArgs[idx].length ) {
+          if ( ++activeOrIdxs[idx] >= orArgs[idx].args.length ) {
             // reset array index count, carry the one
             if ( idx === 0 ) { active = false; break; }
             activeOrIdxs[idx] = 0;
@@ -237,10 +237,11 @@ foam.CLASS({
           if ( idx === (activeOrIdxs.length - 1) ) {
             // for the last group iterated, read back up the indexes
             // to get the result set
-            var and = this.cls_.create();
+            var newAndArgs = [];
             for ( var j = activeOrIdxs.length - 1; j >= 0; j-- ) {
-              and.args.push(orArgs[j].args[activeOrIdxs[j]]);
+              newAndArgs.push(orArgs[j].args[activeOrIdxs[j]]);
             }
+            newAndGroups.push(this.cls_.create({ args: newAndArgs }));
           }
 
         }

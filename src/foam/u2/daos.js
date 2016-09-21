@@ -30,6 +30,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'data'
+    },
+    {
       class: 'foam.u2.ViewSpec',
       name: 'rowView'
     },
@@ -51,10 +55,11 @@ foam.CLASS({
         cssClass(this.myCls()).
         on('click', this.onClick);
 
+      var dao = this.data$proxy;
       // Kick off the select(), that will populate the view.
-      this.data.on.put.sub(this.onDAOPut);
-      this.data.on.remove.sub(this.onDAORemove);
-      this.data.on.reset.sub(this.onDAOReset);
+      dao.on.put.sub(this.onDAOPut);
+      dao.on.remove.sub(this.onDAORemove);
+      dao.on.reset.sub(this.onDAOReset);
       this.reloadData();
     },
 

@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// http://www.discoversdk.com/blog/grid-control-with-different-javascript-frameworks
+
 foam.CLASS({
   package: 'com.google.foam.demos.grid',
   name: 'Resource',
@@ -23,8 +25,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { name: 'description' },
-    { name: 'url', label: 'URL' }
+    { name: 'description', label: 'Description: ' },
+    { name: 'url',         label: 'URL: ' }
   ]
 });
 
@@ -43,8 +45,59 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        .foam-u2.DetailView tr {
-          background: pink;
+        body {
+          font-family:Arial;
+          color:#3a3a3a;
+        }
+        ^list table {
+          border:none;
+          text-align:left;
+          margin-bottom:20px;
+        }
+        ^list tr th {
+          background-color: #3b97d3;
+          color: #fff;
+          padding: 5px;
+          border-right: solid 1px #3b97d3;
+          border-left: solid 1px #fff;
+        }
+        ^list tr th:first-child {
+          border-left: solid 1px #3b97d3;
+        }
+        ^list tr td {
+          padding:5px;
+          padding: 5px;
+          border-right: solid 1px #d4d4d4;
+        }
+        ^list tr td:first-child {
+          border-left: solid 1px #d4d4d4;
+        }
+        ^list tr:last-child td {
+          border-bottom: solid 1px #d4d4d4;
+        }
+        input[type="text"] {
+          height:20px;
+          font-size:14px;
+        }
+        button, ^ .foam-u2-ActionView {
+          border:none;
+          color:#fff;
+          background:#3b97d3;
+          padding:0px 10px;
+          height:26px;
+          display:inline-block;
+          line-height:26px;
+          text-decoration:none;
+          border-radius:3px;
+          -moz-border-radius:3px;
+          -webkit-border-radius:3px;
+          cursor:pointer;
+        }
+        ^ button:hover {
+          background-color:#73c7ff;
+        }
+        ^ .foam-u2-DetailView tr {
+          display: inline;
         }
       */}
     })
@@ -53,7 +106,8 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
+       view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
+//       view: { class: 'foam.u2.DAOList', of: com.google.foam.demos.grid.Resource, rowView: 'com.google.foam.demos.grid.ResourceView' }
     },
     {
       name: 'person',
@@ -64,22 +118,51 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var dao = this.dao;
+
       this.
         cssClass(this.myCls()).
         start('h3').add('Add Resources').end().
 
-        // Use this block to have input in a single row
+        // Use this block to create the form manually
+        /*
         add('Description: ').
         start(this.person.DESCRIPTION, {data$: this.person.description$}).end().
         add(' URL: ').
         start(this.person.URL,         {data$: this.person.url$}).end().
+        */
 
-        // Or this line to appear in a property-sheet
-        // add(this.PERSON).
+        // Or this to use a DetailView
+        add(this.PERSON).
 
         add(this.ADD_RESOURCE).
         start('h3').add('List of Resources').end().
-        add(this.DAO, this.SHOW);
+
+        // Use a Standard TableView
+        // add(this.DAO).
+
+        // Or make one manually
+        start('table').
+          cssClass(this.myCls('list')).
+          start('tr').
+            start('th').add('Description').end().
+            start('th').add('URL').end().
+            start('th').end().
+          end().
+          select(this.dao, function(r) {
+            return this.E('tr').
+              start('td').
+                start('div').add(r.DESCRIPTION).end().
+              end().
+              start('td').
+                start('div').add(r.URL).end().
+              end().
+              start('td').
+                start('button').on('click', function() { dao.remove(r); }).add('Remove').end().
+              end();
+          }, true).
+        end().
+        add(this.SHOW);
     }
   ],
 
@@ -120,3 +203,7 @@ foam.CLASS({
 // Invalid names in tableProperties:
 // added invalid action name, no error
 // clone on DAO.put
+// width support is missing
+// DAO.put(null) didn't give meaningful error
+// Typo causing null to pass to Element.add()
+// Problems getting rid of CSS

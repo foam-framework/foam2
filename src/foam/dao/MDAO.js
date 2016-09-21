@@ -63,10 +63,11 @@ foam.CLASS({
   methods: [
     function init() {
       // adds the primary key(s) as an index, and stores it for fast find().
-      this.addIndex();
+      this.addPropertyIndex();
+      this.idIndex = this.index;
 
       if ( this.autoIndex ) {
-        this.addRawIndex(this.AutoIndex.create({ mdao: this }));
+        this.addIndex(this.AutoIndex.create({ mdao: this }));
       }
     },
 
@@ -74,29 +75,22 @@ foam.CLASS({
      * Add a non-unique index
      * args: one or more properties
      **/
-    function addIndex() {
+    function addPropertyIndex() {
       var props = Array.from(arguments);
 
-      if ( ! this.of$cls.ids ) {// throw "Undefined index"; // TODO: err?
-        this.of$cls.ids = ['id'];
-      }
+      // Add ID to make each sure the object is uniquely identified
+      props.push(this.of$cls.ID);
 
-      // Add on the primary key(s) to make the index unique.
-      for ( var i = 0 ; i < this.of$cls.ids.length ; i++ ) {
-        props.push(this.of$cls.getAxiomByName(this.of$cls.ids[i]));
-        if ( ! props[props.length - 1] ) throw "Undefined index property"; // TODO: err
-      }
-
-      return this.addUniqueIndex.apply(this, props);
+      return this.addUniqueIndex_.apply(this, props);
     },
 
     /**
      * Add a unique index
      * args: one or more properties
+     * @private
      **/
-    function addUniqueIndex() {
+    function addUniqueIndex_() {
       var index = this.ValueIndex.create();
-      //var siFactory = proto;
 
       for ( var i = arguments.length-1 ; i >= 0 ; i-- ) {
         var prop = arguments[i];
@@ -106,11 +100,10 @@ foam.CLASS({
         index = prop.toIndex(index);
       }
 
-      return this.addRawIndex(index);
+      return this.addIndex(index);
     },
 
-    // TODO: name 'addIndex' and renamed addIndex
-    function addRawIndex(indexFactory) {
+    function addIndex(indexFactory) {
       if ( ! this.index ) {
         this.idIndex = this.index = indexFactory.create();
         this.idIndexFactory = this.indexFactory;
@@ -169,11 +162,9 @@ foam.CLASS({
 
     /** internal, synchronous version of find, does not throw */
     function find_(key) {
-      if ( ! Array.isArray(key) ) key = [key];
       var index = this.idIndex;
-      for ( var i = 0; i < key.length && index; ++i ) {
-        index = index.get(key[i]);
-      }
+      index = index.get(key);
+
       if ( index && index.get() ) return index.get();
 
       return;

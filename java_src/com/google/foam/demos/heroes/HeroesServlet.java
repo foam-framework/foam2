@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.foam.demos.appengine;
+package com.google.foam.demos.heroes;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,37 +33,28 @@ import foam.lib.json.JSONParser;
 import foam.lib.parse.StringPS;
 import foam.lib.parse.*;
 
-import com.google.foam.demos.appengine.TestModel;
+import com.google.foam.demos.heroes.Hero;
 import foam.box.*;
 import foam.core.*;
 import foam.dao.*;
 
-import com.google.foam.demos.appengine.TestService;
-import com.google.foam.demos.appengine.TestServiceSkeleton;
-import com.google.foam.demos.appengine.TestServiceImpl;
-
 @SuppressWarnings("serial")
-public class HelloServlet extends HttpServlet {
+public class HeroesServlet extends HttpServlet {
   private X x = EmptyX.instance();
 
-  private FObject obj = ((TestModel)x.create(TestModel.class)).setName("Adam");
-
-  private TestService myService = new TestServiceImpl();
-  private foam.box.Box dest = ((TestServiceSkeleton)x.create(TestServiceSkeleton.class)).setDelegate(myService);
-
-  private DAO dao = ((DatastoreDAO)x.create(DatastoreDAO.class)).setOf(TestModel.getOwnClassInfo());
+  private DAO dao = ((DatastoreDAO)x.create(DatastoreDAO.class)).setOf(Hero.getOwnClassInfo());
   private foam.box.Box daoSkeleton = ((DAOSkeleton)x.create(DAOSkeleton.class)).setDelegate(dao);
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setHeader("Access-Control-Allow-Origin", "*");
-
-    PrintWriter out = resp.getWriter();
-    out.print(new Outputter().stringify(obj));
-    out.flush();
+    resp.setStatus(resp.SC_OK);
+    resp.flushBuffer();
   }
 
   public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    System.out.println("Incoming post on heroes.");
+
     resp.setHeader("Access-Control-Allow-Origin", "*");
     CharBuffer buffer_ = CharBuffer.allocate(65535);
     Reader reader = req.getReader();

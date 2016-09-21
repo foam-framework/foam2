@@ -634,12 +634,12 @@ describe('AutoIndex', function() {
   beforeEach(function() {
     mdao = {
       lastIndex: null,
-      lastRawIndex: null,
+      lastPropertyIndex: null,
+      addPropertyIndex: function(index) {
+        this.lastPropertyIndex = index;
+      },
       addIndex: function(index) {
         this.lastIndex = index;
-      }
-      addRawIndex: function(index) {
-        this.lastRawIndex = index;
       }
     }
     idx = foam.dao.index.AutoIndex.create({
@@ -662,33 +662,33 @@ describe('AutoIndex', function() {
     idx.addIndex(test.Indexable.INT);
 
     expect(idx.existingIndexes['int']).toEqual(test.Indexable.INT);
-    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+    expect(mdao.lastPropertyIndex).toBe(test.Indexable.INT);
   });
 
   it('auto indexes on ordering', function() {
     idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
 
     expect(idx.existingIndexes['float']).toEqual(test.Indexable.FLOAT);
-    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    expect(mdao.lastPropertyIndex).toBe(test.Indexable.FLOAT);
 
     idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.INT));
 
     expect(idx.existingIndexes['int']).toEqual(test.Indexable.INT);
-    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+    expect(mdao.lastPropertyIndex).toBe(test.Indexable.INT);
   });
 
   it('skips already auto indexed orderings', function() {
     idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
 
     expect(idx.existingIndexes['float']).toEqual(test.Indexable.FLOAT);
-    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    expect(mdao.lastPropertyIndex).toBe(test.Indexable.FLOAT);
 
-    mdao.lastIndex = null;
+    mdao.lastPropertyIndex = null;
 
     idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT));
 
     expect(idx.existingIndexes['float']).toEqual(test.Indexable.FLOAT);
-    expect(mdao.lastIndex).toBe(null);
+    expect(mdao.lastPropertyIndex).toBe(null);
   });
 
   it('auto indexes on predicate', function() {
@@ -703,13 +703,8 @@ describe('AutoIndex', function() {
 
     idx.plan(sink, undefined, undefined, undefined, pred);
 
+    // TODO expect
   });
 
-  // it('auto indexes on predicate', function() {
-  //   idx.plan(...)
-  //
-  //   expect(idx.properties['float']).toEqual(true);
-  //   expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
-  // });
 
 });

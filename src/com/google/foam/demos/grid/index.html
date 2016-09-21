@@ -8,12 +8,21 @@
       var dao = foam.dao.EasyDAO.create({
         of: com.google.foam.demos.grid.Resource,
         seqNo: true,
-        daoType: 'IDB'
+        daoType: 'IDB',
+        testData: [
+          { description: 'Google',  url: 'http://google.com/'  },
+          { description: 'Dilbert', url: 'http://dilbert.com/' },
+          { description: 'FOAM',    url: 'http://foamdev.com/' }
+        ]
       });
 
       /*
+      // Instead of using the EasyDAO's 'testData' feature, we could have
+      // just done it ourself:
       foam.json.parse([
-        { description: 'Google', url: 'http://google.com/'}
+        { description: 'Google',  url: 'http://google.com/'  },
+        { description: 'Dilbert', url: 'http://dilbert.com/' },
+        { description: 'FOAM',    url: 'http://foamdev.com/' }
       ], com.google.foam.demos.grid.Resource).forEach(function(h) { dao.put(h); });
       */
 
