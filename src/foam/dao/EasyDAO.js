@@ -30,6 +30,8 @@ foam.CLASS({
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   requires: [
     'foam.dao.MDAO',
     'foam.dao.JournalDAO',
@@ -53,6 +55,16 @@ foam.CLASS({
   ],
 
   imports: [ 'document' ],
+
+  constants: {
+    // Aliases for daoType
+    ALIASES: {
+      ARRAY: 'foam.dao.ArrayDAO',
+      MDAO:  'foam.dao.MDAO',
+      IDB:   'foam.dao.IDBDAO',
+      LOCAL: 'foam.dao.LocalStorageDAO',
+    }
+  },
 
   properties: [
     {
@@ -199,18 +211,8 @@ foam.CLASS({
       name: 'sockets',
       value: false
     },
-
+    'testData'
   ],
-
-  constants: {
-    // Aliases for daoType
-    ALIASES: {
-      ARRAY: 'foam.dao.ArrayDAO',
-      MDAO:  'foam.dao.MDAO',
-      IDB:   'foam.dao.IDBDAO',
-      LOCAL: 'foam.dao.LocalStorageDAO',
-    }
-  },
 
   methods: [
     function init() {
@@ -339,18 +341,35 @@ foam.CLASS({
         dao = this.JournalDAO.create({
           delegate: dao,
           journal: foam.dao.EasyDAO.create({
-            of: foam.dao.JournalEntry,
+            of:      foam.dao.JournalEntry,
             daoType: this.daoType,
-            seqNo: true,
-            name: this.name + '_Journal'
+            seqNo:   true,
+            name:    this.name + '_Journal'
           })
         });
       }
 
-      if ( this.timing  ) dao = this.TimingDAO.create({ name: this.name + 'DAO', delegate: dao });
-      if ( this.logging ) dao = this.LoggingDAO.create({ delegate: dao });
+      if ( this.timing  ) {
+        dao = this.TimingDAO.create({ name: this.name + 'DAO', delegate: dao });
+      }
+
+      if ( this.logging ) {
+        dao = this.LoggingDAO.create({ delegate: dao });
+      }
 
       this.delegate = dao;
+
+      if ( this.testData ) {
+        var self = this;
+        this.select(this.COUNT()).then(function(c) {
+          // Only load testData if DAO is empty
+          if ( c.value ) return;
+
+          foam.json.parse(self.testData, self.of).forEach(
+            function(o) { self.put(o); }
+          );
+        });
+      }
     },
 
     /** Only relevant if cache is true or if daoType
