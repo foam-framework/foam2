@@ -715,7 +715,7 @@ describe('AutoIndex', function() {
 
     idx.plan(sink, undefined, undefined, undefined, pred);
 
-    // TODO expect
+    // TODO expectations
   });
 
 

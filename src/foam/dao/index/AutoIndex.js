@@ -66,15 +66,13 @@ foam.CLASS({
 
         // create the index to optimize the predicate, if none existing
         // from similar predicates
-        var signature = predicate.toIndexSignature();
-        if ( ! this.existingIndexes[signature] ) {
-
-          var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
-
-          this.mdao.addIndex(newIndex);
-
-          this.existingIndexes[signature] = true;
-          console.log("inputs: ", predicate.toIndexSignature());
+        var dnf = predicate.toDisjunctiveNormalForm();
+        if ( this.Or.isInstance(dnf) ) {
+          for ( var i = 0; i < dnf.args.length; i++ ) {
+            this.dispatchPredicate_(dnf.args[i]);
+          }
+        } else {
+          this.dispatchPredicate_(dnf);
         }
       }
       if ( order ) {
@@ -88,6 +86,54 @@ foam.CLASS({
         }
       }
       return this.NoPlan.create();
+    },
+
+    /** @private */
+    function dispatchPredicate_(dnf) {
+      if ( this.And.isInstance(dnf) ) {
+        this.processAndPredicate_(dnf);
+      } else if ( this.Property.isInstance(dnf) ||
+          dnf.arg1 && this.Property.isInstance(dnf.arg1) ) {
+        this.addIndex(dnf.arg1 || dnf);
+      } else {
+        throw "AutoIndex found unknown predicate: " + dnf.toString();
+      }
+    },
+
+    /** @private */
+    function processAndPredicate_(predicate) {
+      // one AND clause. For now make a string for comparison
+      // TODO[meta]: use an index to remember what indexes we made?
+
+      // check for duplicates (different mlangs referencing the same
+      //   property that will create the same index)
+      var args = predicate.args;
+      var dedupedArgs = [];
+      for ( var k = 0; k < args.length; k++ ) {
+        var sig = args[k].toIndexSignature();
+        for ( var l = k+1; l < args.length; l++ ) {
+          // check against remaning items
+          var oSig = args[l].toIndexSignature();//TODO: memoize
+          if ( sig === oSig ) {
+            sig = null;
+            break;
+          }
+        }
+        if ( sig ) dedupedArgs.push(args[k]);
+      }
+      // if args were removed, recreate the predicate
+      if ( dedupedArgs.length !== args.length ) {
+        predicate = predicate.cls_.create({ args: dedupedArgs });
+      }
+
+      var signature = predicate.toIndexSignature().join(',');
+console.log("AutoIndex: ", "          checking ", signature);
+      if ( ! this.existingIndexes[signature] ) {
+console.log("AutoIndex: ", "+++not found, adding ", signature);
+        var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
+        this.mdao.addIndex(newIndex);
+        this.existingIndexes[signature] = true;
+      }
     },
 
     function toString() {
@@ -116,21 +162,15 @@ foam.CLASS({
 
   methods: [
     function toIndexSignature() {
-      if ( this.args ) {
-        var args = this.args;
-        var sigs = []; // to be sorted
-        for (var i = 0; i < args.length; i++ ) {
-          var sig = args[i].toIndexSignature();
-          sig && sigs.push(sig);
-        }
-        // reverse sort leaves *AND,*OR at the end
-        sigs.sort(function(a,b) { return -foam.util.compare(a.name, b.name); });
-
-        var ret = "*"+this.cls_.name + "{" + sigs.join(',') + "}";
-        return ret;
-      } else {
-        return "*"+this.cls_.name+"{}";
+      var sigs = [];
+      var args = this.args;
+      sigs.name = this.cls_.name; // mark what kind of signature
+      for (var i = 0; i < args.length; i++ ) {
+        var sig = args[i].toIndexSignature();
+        sig && sigs.push(sig);
       }
+      sigs.sort();
+      return sigs;
     }
   ]
 });
@@ -197,8 +237,8 @@ foam.CLASS({
   methods: [
     function toIndex(tailFactory) {
       // Find DNF, if we were already in it, proceed
-      var self = this.toDisjunctiveNormalForm();
-      if ( self !== this ) return self.toIndex(tailFactory);
+      //var self = this.toDisjunctiveNormalForm();
+      //if ( self !== this ) return self.toIndex(tailFactory);
 
       var args = this.args;
       var tail = tailFactory;
@@ -229,7 +269,7 @@ foam.CLASS({
 
       if ( orArgs.length > 0 ) {
         var newAndGroups = [];
-
+        // Generate every combination of the arguments of the OR clauses
         var activeOrIdxs = new Array(orArgs.length).fill(0);
         var active = true;
         var idx = activeOrIdxs.length - 1;
@@ -250,11 +290,13 @@ foam.CLASS({
           for ( var j = activeOrIdxs.length - 1; j >= 0; j-- ) {
             newAndArgs.push(orArgs[j].args[activeOrIdxs[j]]);
           }
+          newAndArgs = newAndArgs.concat(andArgs);
+
           newAndGroups.push(
-            this.cls_.create({ args: newAndArgs.concat(andArgs) })
+            this.cls_.create({ args: newAndArgs })
           );
         }
-        return this.Or.create({ args: newAndGroups });
+        return this.Or.create({ args: newAndGroups }).partialEval();
       } else {
         // no OR args, no DNF transform needed
         return this;
@@ -273,7 +315,7 @@ foam.CLASS({
 
   methods: [
     function toIndex(tailFactory) {
-      var self = this.toDisjunctiveNormalForm();
+      //var self = this.toDisjunctiveNormalForm();
 console.log("Pre: ", this.toString());
 console.log("DNF: ", self.toString());
 
