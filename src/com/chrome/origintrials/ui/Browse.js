@@ -30,7 +30,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.setNodeName('table').
-        repeat(this.data, function(r) {
+        select(this.data, function(r) {
           var e = this.E('tr').
             start('td').add(r.applicantName).end().
             start('td').add(r.applicantEmail).end().

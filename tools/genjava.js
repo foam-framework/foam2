@@ -11,6 +11,7 @@ var classes = [
   'foam.mlang.predicate.Unary',
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.Contains',
+  'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
