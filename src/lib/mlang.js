@@ -149,7 +149,7 @@ foam.CLASS({
   extends: 'FObjectArray',
 
   properties: [
-    ['javaType', 'foam.mlang.predicate.Predicate[]'],
+    [ 'javaType', 'foam.mlang.predicate.Predicate[]' ],
     {
       name: 'of',
       value: 'foam.mlang.predicate.Predicate'
@@ -160,6 +160,7 @@ foam.CLASS({
       value: function(o) {
         if ( ! o.f && typeof o === "function" ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== "object" ) return foam.mlang.Constant.create({ value: o });
+        if ( o === null ) return foam.mlang.Constant.create({ value: o });
         if ( Array.isArray(o) ) return foam.mlang.Constant.create({ value: o });
         if ( o === true ) return foam.mlang.predicate.True.create();
         if ( o === false ) return foam.mlang.predicate.False.create();
