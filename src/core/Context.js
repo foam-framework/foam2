@@ -151,7 +151,6 @@
         enumerable: false
       });
 
-      sub.$UID__ = foam.next$UID();
       foam.Object.freeze(sub);
 
       return sub;
