@@ -698,7 +698,19 @@ describe('AutoIndex', function() {
         m.LT(test.Indexable.INT, 8),
         m.EQ(test.Indexable.FLOAT, 4)
       ),
-      m.CONTAINS_IC(test.Indexable.STRING, "we")
+      m.CONTAINS_IC(test.Indexable.STRING, "we"),
+      m.OR(
+        m.GT(test.Indexable.INT, 8),
+        m.LTE(test.Indexable.FLOAT, 4)
+      )
+    );
+
+    pred = m.OR(
+      pred,
+      m.AND(
+        m.CONTAINS_IC(test.Indexable.STRING, "we"),
+        m.EQ(test.Indexable.DATE, "today")
+      )
     );
 
     idx.plan(sink, undefined, undefined, undefined, pred);

@@ -145,6 +145,13 @@ foam.CLASS({
       } else {
         return;
       }
+    },
+    function toIndex(tailFactory) {
+      if ( this.arg1 ) {
+        return this.arg1.toIndex(tailFactory);
+      } else {
+        return;
+      }
     }
   ]
 });
@@ -156,6 +163,13 @@ foam.CLASS({
     function toIndexSignature() {
       if ( this.arg1 ) {
         return this.arg1.toIndexSignature();
+      } else {
+        return;
+      }
+    },
+    function toIndex(tailFactory) {
+      if ( this.arg1 ) {
+        return this.arg1.toIndex(tailFactory);
       } else {
         return;
       }
@@ -182,26 +196,19 @@ foam.CLASS({
 
   methods: [
     function toIndex(tailFactory) {
+      // Find DNF, if we were already in it, proceed
       var self = this.toDisjunctiveNormalForm();
+      if ( self !== this ) return self.toIndex(tailFactory);
 
       var args = this.args;
+      var tail = tailFactory;
       for (var i = 0; i < args.length; i++ ) {
-        var arg = args[i];
-        // for nested Nary predicates, process them first, put at the end
-        // of the tailFactory chain
-        if ( this.cls_.isInstance(arg) ) {
-
-
-        }
-
-
-
-        var idx = args[i].toIndex(tailFactory);
+        var idx = args[i].toIndex(tail);
         if ( idx ) {
-
+          tail = idx;
         }
       }
-
+      return tail;
     },
 
     function toDisjunctiveNormalForm() {
@@ -226,26 +233,27 @@ foam.CLASS({
         var activeOrIdxs = new Array(orArgs.length).fill(0);
         var active = true;
         var idx = activeOrIdxs.length - 1;
+        activeOrIdxs[idx] = -1; // compensate for intial ++activeOrIdxs[idx]
         while ( active ) {
-          if ( ++activeOrIdxs[idx] >= orArgs[idx].args.length ) {
+          while ( ++activeOrIdxs[idx] >= orArgs[idx].args.length ) {
             // reset array index count, carry the one
             if ( idx === 0 ) { active = false; break; }
             activeOrIdxs[idx] = 0;
             idx--;
-            continue;
           }
-          if ( idx === (activeOrIdxs.length - 1) ) {
-            // for the last group iterated, read back up the indexes
-            // to get the result set
-            var newAndArgs = [];
-            for ( var j = activeOrIdxs.length - 1; j >= 0; j-- ) {
-              newAndArgs.push(orArgs[j].args[activeOrIdxs[j]]);
-            }
-            newAndGroups.push(this.cls_.create({ args: newAndArgs }));
-          }
+          idx = activeOrIdxs.length - 1;
+          if ( ! active ) break;
 
+          // for the last group iterated, read back up the indexes
+          // to get the result set
+          var newAndArgs = [];
+          for ( var j = activeOrIdxs.length - 1; j >= 0; j-- ) {
+            newAndArgs.push(orArgs[j].args[activeOrIdxs[j]]);
+          }
+          newAndGroups.push(
+            this.cls_.create({ args: newAndArgs.concat(andArgs) })
+          );
         }
-
         return this.Or.create({ args: newAndGroups });
       } else {
         // no OR args, no DNF transform needed
@@ -258,11 +266,30 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.predicate.Or',
 
+  requires: [
+    'foam.dao.index.OrIndex',
+    'foam.dao.index.AltIndex'
+  ],
+
   methods: [
     function toIndex(tailFactory) {
       var self = this.toDisjunctiveNormalForm();
+console.log("Pre: ", this.toString());
+console.log("DNF: ", self.toString());
 
-
+      // return an OR index with Alt index spanning each possible index
+      // TODO: this may duplicate indexes for the same set of properties
+      //   Use signature to dedup
+      var subIndexes = [];
+      for ( var i = 0; i < this.args.length; i++ ) {
+        var index = this.args[i].toIndex(tailFactory);
+        index && subIndexes.push(index);
+      }
+      return this.OrIndex.create({ delegate:
+        this.AltIndex.create({
+          delegates: subIndexes
+        })
+      });
     },
 
     function toDisjunctiveNormalForm() {
