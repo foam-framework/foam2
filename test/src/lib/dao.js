@@ -1696,3 +1696,59 @@ describe('Relationship', function() {
   })
 
 });
+
+
+
+describe('MultiPartID MDAO support', function() {
+  var mDAO;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'Mpid',
+      ids: [ 'a', 'b' ],
+      properties: [ 'a', 'b', 'c' ]
+    });
+
+    mDAO = foam.dao.MDAO.create({ of: test.Mpid });
+  });
+
+  afterEach(function() {
+    mDAO = null;
+  });
+
+  it('generates a proper ID index', function(done) {
+
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 2 })); // update
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 })); // update
+    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 2 })); // update
+
+    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
+      expect(counter.value).toEqual(4);
+      done();
+    });
+  });
+
+  it('finds by multipart ID array', function(done) {
+
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 3 })); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 4 })); // add
+
+    mDAO.find([ 2, 1 ]).then(function(obj) { // with array key
+      expect(obj.c).toEqual(3);
+
+      mDAO.find(test.Mpid.create({ a: 2, b: 2 }).id) // array from MultiPartID
+        .then(function(obj2) {
+          expect(obj2.c).toEqual(4);
+          done();
+        });
+    });
+  });
+
+});
