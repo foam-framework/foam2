@@ -42,8 +42,6 @@ foam.CLASS({
     'com.google.foam.demos.grid.Resource'
   ],
 
-  exports: [ 'dao' ],
-
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
@@ -120,8 +118,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var dao = this.dao;
+
       this.
-        cssClass(this.myCls()). // TODO: needed?
+        cssClass(this.myCls()).
         start('h3').add('Add Resources').end().
 
         // Use this block to create the form manually
@@ -149,25 +149,19 @@ foam.CLASS({
             start('th').add('URL').end().
             start('th').end().
           end().
-          repeat(this.dao, function(r) {
-            var e = this.
-              E('tr').
-              startContext({data: r}).
-                start('td').
-                  start('div').add(r.DESCRIPTION).end().
-                end().
-                start('td').
-                  start('div').add(r.URL).end().
-                end().
-                start('td').
-                  start('button').on('click', function() { self.dao.remove(r); }).add('Remove').end().
-                end().
-              endContext();
-              r.propertyChange.sub(function() { self.dao.put(r.clone()); });
-              return e;
-          }).
-       end().
-
+          select(this.dao, function(r) {
+            return this.E('tr').
+              start('td').
+                start('div').add(r.DESCRIPTION).end().
+              end().
+              start('td').
+                start('div').add(r.URL).end().
+              end().
+              start('td').
+                start('button').on('click', function() { dao.remove(r); }).add('Remove').end().
+              end();
+          }, true).
+        end().
         add(this.SHOW);
     }
   ],
@@ -210,3 +204,4 @@ foam.CLASS({
 // added invalid action name, no error
 // clone on DAO.put
 // width support is missing
+// DAO.put(null) didn't give meaningful error
