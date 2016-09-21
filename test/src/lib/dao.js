@@ -1528,7 +1528,7 @@ describe('FilteredDAO', function() {
   var dao;
   var sink;
   var m;
-  var l;
+  var l, l2;
 
   beforeEach(function() {
     foam.CLASS({
@@ -1542,6 +1542,12 @@ describe('FilteredDAO', function() {
     l = function(s, on, evt, obj) {
       l.evt = evt;
       l.obj = obj;
+      l.count = ( l.count + 1 ) || 1;
+    };
+    l2 = function(s, on, evt, obj) {
+      l2.evt = evt;
+      l2.obj = obj;
+      l2.count = ( l2.count + 1 ) || 1;
     }
   });
 
@@ -1551,16 +1557,21 @@ describe('FilteredDAO', function() {
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
+    dao.on.sub(l2);
 
     dao.put(a);
     expect(l.evt).toEqual('put');
     expect(l.obj).toEqual(a);
+    expect(l.count).toEqual(1);
 
     // since 'b' is filtered out, the put changes to remove to ensure the
     // listener knows it shouldn't exist
     dao.put(b);
     expect(l.evt).toEqual('remove');
     expect(l.obj).toEqual(b);
+    expect(l.count).toEqual(2);
+
+
   });
 
   it('does not filter remove events', function() {
