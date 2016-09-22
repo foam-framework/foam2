@@ -112,7 +112,7 @@ foam.CLASS({
           dnf.arg1 && this.Property.isInstance(dnf.arg1) ) {
         this.addPropertyIndex(dnf.arg1 || dnf);
       } else {
-        throw "AutoIndex found unknown predicate: " + dnf.toString();
+        console.log("AutoIndex found unknown predicate: " + dnf.toString());
       }
     },
 
@@ -142,13 +142,19 @@ foam.CLASS({
         predicate = predicate.cls_.create({ args: dedupedArgs });
       }
 
-      var signature = predicate.toIndexSignature().join(',');
-console.log("AutoIndex: ", "          checking ", signature);
-      if ( ! this.existingIndexes[signature] ) {
-console.log("AutoIndex: ", "+++not found, adding ", signature);
-        var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
-        this.mdao.addIndex(newIndex);
-        this.existingIndexes[signature] = true;
+      // For each prefix of the index, also mark it as completed
+      // (index(city,country) can also serve index(city) queries)
+      var signature = predicate.toIndexSignature();
+      while ( signature.length ) {
+        var sigStr = signature.join(',');
+        console.log("AutoIndex: ", "          checking ", sigStr);
+        if ( ! this.existingIndexes[sigStr] ) {
+          console.log("AutoIndex: ", "+++not found, adding ", sigStr);
+          var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
+          this.mdao.addIndex(newIndex);
+          this.existingIndexes[sigStr] = true;
+        }
+        signature = signature.slice(0, -1);
       }
     },
 

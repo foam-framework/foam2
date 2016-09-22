@@ -106,7 +106,7 @@ foam.CLASS({
     function addIndex(indexFactory) {
       if ( ! this.index ) {
         this.idIndex = this.index = indexFactory.create();
-        this.idIndexFactory = this.indexFactory;
+        this.idIndexFactory = indexFactory;
         return this;
       }
 
@@ -207,7 +207,9 @@ foam.CLASS({
 
     function select(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
-      if ( this.autoIndex ) predicate = predicate.toDisjunctiveNormalForm(); // TODO: do this where?
+      if ( this.autoIndex && predicate ) {
+        predicate = predicate.toDisjunctiveNormalForm(); // TODO: do this where?
+      }
       var plan;
 
       if ( this.Explain.isInstance(sink) ) {
