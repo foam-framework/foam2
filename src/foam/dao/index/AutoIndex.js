@@ -63,7 +63,7 @@ foam.CLASS({
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
         prop = prop.arg1;
       }
-      console.log('Adding AutoIndex : ', prop.id);
+      //console.log('Adding AutoIndex : ', prop.id);
       this.existingIndexes[prop.name] = prop;
       this.mdao.addPropertyIndex(prop);
     },
@@ -145,12 +145,13 @@ foam.CLASS({
       // For each prefix of the index, also mark it as completed
       // (index(city,country) can also serve index(city) queries)
       var signature = predicate.toIndexSignature();
+      var newIndex;
       while ( signature.length ) {
         var sigStr = signature.join(',');
-        console.log("AutoIndex: ", "          checking ", sigStr);
+        //console.log("AutoIndex: ", "          checking ", sigStr);
         if ( ! this.existingIndexes[sigStr] ) {
-          console.log("AutoIndex: ", "+++not found, adding ", sigStr);
-          var newIndex = predicate.toIndex(this.mdao.idIndexFactory);
+          //console.log("AutoIndex: ", "+++not found, adding ", sigStr);
+          if ( ! newIndex ) newIndex = predicate.toIndex(this.mdao.idIndexFactory);
           this.mdao.addIndex(newIndex);
           this.existingIndexes[sigStr] = true;
         }

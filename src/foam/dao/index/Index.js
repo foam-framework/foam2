@@ -179,7 +179,7 @@ foam.CLASS({
     function addIndex(index) {
       // Populate the index
       var a = foam.dao.ArraySink.create();
-      this.plan(a).execute([Promise.resolve()], a);
+      this.plan(a).execute([], a);
 
       index.bulkLoad(a);
       this.delegates.push(index);

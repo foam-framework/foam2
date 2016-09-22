@@ -71,7 +71,7 @@ foam.CLASS({
 
     /** Nodes do a shallow clone */
     function clone() {
-      var c = this.cls_.create();
+      var c = this.__proto__.create();
       c.key   = this.key;
       c.value = this.value;
       c.size  = this.size;
@@ -450,15 +450,40 @@ foam.CLASS({
     function lt()   { return this; },
     function lte()  { return this; },
 
-    function bulkLoad_(a, start, end, keyExtractor) {
+    function bulkLoad_(a, start, end, keyExtractor, compare) {
       if ( end < start ) return this;
 
       var tree = this;
       var m    = start + Math.floor((end-start+1) / 2);
-      tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
 
-      tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
-      tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);
+      // find the range that matches the middle value
+      var mval = a[m];
+      var mstart, mend;
+      for ( mstart = m;
+            mstart >= start && compare(a[mstart], mval) === 0;
+            mstart-- ) {}
+      for ( mend = m;
+            mend <= end && compare(a[mend], mval) === 0;
+            mend++ ) {}
+      // the loop finds the first one not matching, so rewind
+      if ( mstart < m ) mstart++;
+      if ( mend > m ) mend--;
+
+      if ( mstart === mend ) {
+        tree = tree.putKeyValue(keyExtractor(mval), mval);
+      } else {
+        var subIndex = this.tailFactory.create();
+        var b = a.slice(mstart, mend);
+        subIndex.bulkLoad(b); // will sort
+        tree = this.treeNodeFactory.create();
+        tree.key = keyExtractor(mval);
+        tree.value = subIndex;
+        tree.size = subIndex.size();
+        tree.level = 1;
+      }
+
+      tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor, compare);
+      tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor, compare);
       tree.size += tree.left.size + tree.right.size;
 
       return tree;

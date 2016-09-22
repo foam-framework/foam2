@@ -158,14 +158,14 @@ foam.CLASS({
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.ValueIndex.isInstance(this.tailFactory.create()) ) {
+      //if ( this.ValueIndex.isInstance(this.tailFactory.create()) ) {
         a.sort(toCompare(this.prop));
-        this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f);
-      } else {
-        for ( var i = 0 ; i < a.length ; i++ ) {
-          this.put(a[i]);
-        }
-      }
+        this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f, this.compare);
+//       } else {
+//         for ( var i = 0 ; i < a.length ; i++ ) {
+//           this.put(a[i]);
+//         }
+//       }
     },
 
     /** Set the value's property to be the same as the key in the index.
