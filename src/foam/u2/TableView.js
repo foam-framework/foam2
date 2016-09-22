@@ -148,7 +148,6 @@ foam.CLASS({
     'as tableView'
   ],
 
-
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -196,12 +195,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'data',
-      postSet: function(old, nu) {
-        old && old.on.unsub(this.onDAOUpdate);
-        nu && nu.on.sub(this.onDAOUpdate);
-        this.onDAOUpdate();
-      }
+      class: 'foam.dao.DAOProperty',
+      name: 'data'
     },
     {
       name: 'header',
@@ -223,6 +218,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.data$proxy.sub('on', this.onDAOUpdate);
       this.onDAOUpdate();
       return this.add(this.header$, this.body$);
     },
