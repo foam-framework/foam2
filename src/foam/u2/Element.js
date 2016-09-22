@@ -321,14 +321,14 @@ foam.CLASS({
     },
     function onSetAttr(key, value) {
       if ( this.PSEDO_ATTRIBUTES[key] ) {
-        this.el().value = value;
+        this.el()[key] = value;
       } else {
         this.el().setAttribute(key, value === true ? '' : value);
       }
     },
     function onRemoveAttr(key) {
       if ( this.PSEDO_ATTRIBUTES[key] ) {
-        this.el().value = '';
+        this.el()[key] = '';
       } else {
         this.el().removeAttribute(key);
       }
