@@ -47,11 +47,11 @@ foam.CLASS({
   methods: [
     function initE() {
       var e = this.start(this.view, {
-        data$: this.data$,
-        label$: this.label$,
+        data$:            this.data$,
+        label$:           this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
-        type: this.type,
-        onKey: this.onKey
+        type:             this.type,
+        onKey:            this.onKey
       });
       e.end();
 
