@@ -21,7 +21,6 @@ foam.CLASS({
       name: 'typeOfDays',
       view: {
         class: 'foam.u2.view.ChoiceView',
-        value: 'All',
         choices: [
           'All',
           'Week Days',
@@ -46,5 +45,5 @@ foam.CLASS({
 });
 
 
-var t = Test.create({stringValue: 'This is a test!'});
+var t = Test.create({stringValue: 'This is a test!', typeOfDays: 'All'});
 foam.u2.DetailView.create({data: t}).write();
