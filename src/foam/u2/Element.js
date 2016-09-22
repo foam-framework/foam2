@@ -1638,9 +1638,7 @@ foam.CLASS({
       class: 'Int',
       name: 'displayWidth',
       expression: function(width) { return width; }
-    },
-    // TODO: make an IntView
-    [ 'view', { class: 'foam.u2.TextField', type: 'number' } ]
+    }
   ]
 });
 
@@ -1659,6 +1657,15 @@ foam.CLASS({
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Int',
+  requires: [ 'foam.u2.FloatView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.IntView' } ]
   ]
 });
 
