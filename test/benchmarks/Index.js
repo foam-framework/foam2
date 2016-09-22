@@ -23,7 +23,7 @@ if ( ! typeof performance !== 'undefined' ) performance = {
 
 
 describe("Index benchmarks", function() {
-  var DEBUG = true;
+  var DEBUG = false;
   var oldRandom;
   var rseed;
 
@@ -51,7 +51,7 @@ describe("Index benchmarks", function() {
       }
       var fn2 = function(arg) {
         var endTime = performance.now();
-        console.log(name.replace(',', ';'), ", ", endTime - startTime);
+        console.log(name.replace(/\,/g, ';'), ", ", endTime - startTime);
         return arg;
       };
       return foam.async.sequence([ fn1, fn, fn2 ]);
