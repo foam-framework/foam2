@@ -17,26 +17,6 @@
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'String',
-  extends: 'Property',
-
-  // documentation: 'StringProperties coerce their arguments into Strings.',
-
-  properties: [
-    [ 'adapt', function(_, a) {
-        return typeof a === 'function' ? foam.String.multiline(a) :
-               typeof a === 'number'   ? String(a) :
-               a && a.toString         ? a.toString() :
-               '';
-      }
-    ],
-    [ 'value', '' ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'Int',
   extends: 'Property',
 
@@ -54,6 +34,27 @@ foam.CLASS({
         return str ? parseInt(str) : 0;
       }
     ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'String',
+  extends: 'Property',
+
+  // documentation: 'StringProperties coerce their arguments into Strings.',
+
+  properties: [
+    { class: 'Int', name: 'width' },
+    [ 'adapt', function(_, a) {
+        return typeof a === 'function' ? foam.String.multiline(a) :
+               typeof a === 'number'   ? String(a)                :
+               a && a.toString         ? a.toString()             :
+                                         ''                       ;
+      }
+    ],
+    [ 'value', '' ]
   ]
 });
 
