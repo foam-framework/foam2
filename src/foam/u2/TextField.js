@@ -20,6 +20,26 @@ foam.CLASS({
   name: 'TextField',
   extends: 'foam.u2.tag.Input',
 
+  properties: [
+    {
+      class: 'Int',
+      name: 'displayWidth'
+    }
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      if ( this.displayWidth ) this.setAttribute('size', this.displayWidth);
+    },
+
+    function fromProperty(prop) {
+      console.log(prop, prop.displayWidth);
+      this.displayWidth = prop.displayWidth;
+    }
+  ],
+
   templates: [
     function CSS() {/*
       ^:read-only { border-width: 0; }

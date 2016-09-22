@@ -25,8 +25,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { name: 'description', label: 'Description: ' },
-    { name: 'url',         label: 'URL: ' }
+    { class: 'String', name: 'description', width: 25, label: 'Description: ' },
+    { class: 'String', name: 'url',         width: 50, label: 'URL: ' }
   ]
 });
 
@@ -49,7 +49,7 @@ foam.CLASS({
           font-family:Arial;
           color:#3a3a3a;
         }
-        ^list table {
+        ^list {
           border:none;
           text-align:left;
           margin-bottom:20px;
