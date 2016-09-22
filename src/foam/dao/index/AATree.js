@@ -71,7 +71,7 @@ foam.CLASS({
 
     /** Nodes do a shallow clone */
     function clone() {
-      var c = this.cls_.create();
+      var c = this.__proto__.create();
       c.key   = this.key;
       c.value = this.value;
       c.size  = this.size;
