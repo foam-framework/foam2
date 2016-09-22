@@ -2,13 +2,16 @@
 foam.CLASS({
   name: 'Test',
   properties: [
+    'foo',
     {
-      class: 'Int',
-      name: 'foo',
-      preSet: function(_, a) {
-        if ( a > 20 ) return 20;
-        return a;
-      }
+      class: 'Boolean',
+      name: 't',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'f',
+      value: false
     }
   ]
 });
@@ -16,5 +19,6 @@ foam.CLASS({
 var d = Test.create();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
-//foam.u2.DetailView.create({ data: d }).write();
-d.foo$.sub(console.log.bind(console));
+d.propertyChange.sub(function(_, _, prop, s) {
+  console.log('prop: ', prop, s.get());
+});

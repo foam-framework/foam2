@@ -152,7 +152,7 @@ foam.CLASS({
         add(this.slot(function(selection, mode) {
           return selection       ? this.detailE()    :
             mode === 'dashboard' ? this.dashboardE() :
-            this.heroesE();
+                                   this.heroesE()    ;
         }));
     },
 
@@ -164,18 +164,21 @@ foam.CLASS({
     },
 
     function dashboardE() {
-      return this.E().cssClass(this.myCls('starred')).start('h3').add('Top Heroes').end().add(this.STARRED_HERO_DAO);
+      return this.E().
+        cssClass(this.myCls('starred')).
+        start('h3').add('Top Heroes').end().
+        add(this.STARRED_HERO_DAO);
     },
 
     function heroesE() {
       return this.E().
-          start('h3').
-            add('My Heroes').
-          end().
-          start().
-            add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
-          end().
-          add(this.FILTERED_DAO);
+        start('h3').
+          add('My Heroes').
+        end().
+        start().
+          add('Hero name: ', this.HERO_NAME, ' ', this.ADD_HERO).
+        end().
+        add(this.FILTERED_DAO);
     },
 
     function editHero(hero) {
