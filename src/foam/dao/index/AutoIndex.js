@@ -300,25 +300,27 @@ foam.CLASS({
       if ( orArgs.length > 0 ) {
         var newAndGroups = [];
         // Generate every combination of the arguments of the OR clauses
-        var activeOrIdxs = new Array(orArgs.length).fill(0);
+        // orArgsOffsets[g] represents the array index we are lookig at
+        // in orArgs[g].args[offset]
+        var orArgsOffsets = new Array(orArgs.length).fill(0);
         var active = true;
-        var idx = activeOrIdxs.length - 1;
-        activeOrIdxs[idx] = -1; // compensate for intial ++activeOrIdxs[idx]
+        var idx = orArgsOffsets.length - 1;
+        orArgsOffsets[idx] = -1; // compensate for intial ++orArgsOffsets[idx]
         while ( active ) {
-          while ( ++activeOrIdxs[idx] >= orArgs[idx].args.length ) {
+          while ( ++orArgsOffsets[idx] >= orArgs[idx].args.length ) {
             // reset array index count, carry the one
             if ( idx === 0 ) { active = false; break; }
-            activeOrIdxs[idx] = 0;
+            orArgsOffsets[idx] = 0;
             idx--;
           }
-          idx = activeOrIdxs.length - 1;
+          idx = orArgsOffsets.length - 1;
           if ( ! active ) break;
 
           // for the last group iterated, read back up the indexes
           // to get the result set
           var newAndArgs = [];
-          for ( var j = activeOrIdxs.length - 1; j >= 0; j-- ) {
-            newAndArgs.push(orArgs[j].args[activeOrIdxs[j]]);
+          for ( var j = orArgsOffsets.length - 1; j >= 0; j-- ) {
+            newAndArgs.push(orArgs[j].args[orArgsOffsets[j]]);
           }
           newAndArgs = newAndArgs.concat(andArgs);
 
