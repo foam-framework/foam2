@@ -82,7 +82,7 @@ foam.CLASS({
 
         // create the index to optimize the predicate, if none existing
         // from similar predicates
-        var dnf = predicate.toDisjunctiveNormalForm();
+        var dnf = predicate; //.toDisjunctiveNormalForm(); // TODO: settle on where to do this, or cache it
         if ( this.Or.isInstance(dnf) ) {
           for ( var i = 0; i < dnf.args.length; i++ ) {
             this.dispatchPredicate_(dnf.args[i]);
@@ -250,6 +250,16 @@ foam.CLASS({
     'foam.mlang.predicate.Or'
   ],
 
+  properties: [
+    {
+      name: 'dnf_',
+      expression: function(args) {
+        // TODO: depend on each arg
+        return this.toDisjunctiveNormalForm_();
+      }
+    }
+  ],
+
   methods: [
     function toIndex(tailFactory) {
       // Find DNF, if we were already in it, proceed
@@ -268,6 +278,10 @@ foam.CLASS({
     },
 
     function toDisjunctiveNormalForm() {
+      return this.dnf_;
+    },
+
+    function toDisjunctiveNormalForm_() {
       // for each nested OR, multiply:
       // AND(a,b,OR(c,d),OR(e,f)) -> OR(abce,abcf,abde,abdf)
 
@@ -329,11 +343,20 @@ foam.CLASS({
     'foam.dao.index.AltIndex'
   ],
 
+  properties: [
+    {
+      name: 'dnf_',
+      expression: function(args) {
+        return this.toDisjunctiveNormalForm_();
+      }
+    }
+  ],
+
   methods: [
     function toIndex(tailFactory) {
       //var self = this.toDisjunctiveNormalForm();
-console.log("Pre: ", this.toString());
-console.log("DNF: ", self.toString());
+//console.log("Pre: ", this.toString());
+//console.log("DNF: ", self.toString());
 
       // return an OR index with Alt index spanning each possible index
       // TODO: this may duplicate indexes for the same set of properties
@@ -351,6 +374,10 @@ console.log("DNF: ", self.toString());
     },
 
     function toDisjunctiveNormalForm() {
+      return this.dnf_;
+    },
+
+    function toDisjunctiveNormalForm_() {
       // TODO: memoization around this process
       // DNF our args, note if anything changes
       var oldArgs = this.args;

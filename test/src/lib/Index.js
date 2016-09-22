@@ -713,6 +713,9 @@ describe('AutoIndex', function() {
       )
     );
 
+    // TODO: fix if MDAO isn't the one doing DNF xform
+    pred = pred.toDisjunctiveNormalForm();
+
     idx.plan(sink, undefined, undefined, undefined, pred);
 
     // TODO expectations

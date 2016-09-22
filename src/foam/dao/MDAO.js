@@ -191,6 +191,7 @@ foam.CLASS({
 
     function removeAll(skip, limit, order, predicate) {
       if ( ! predicate ) predicate = this.True.create();
+      if ( this.autoIndex ) predicate = predicate.toDisjunctiveNormalForm(); // TODO: do this where?
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
@@ -206,6 +207,7 @@ foam.CLASS({
 
     function select(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
+      if ( this.autoIndex ) predicate = predicate.toDisjunctiveNormalForm(); // TODO: do this where?
       var plan;
 
       if ( this.Explain.isInstance(sink) ) {
