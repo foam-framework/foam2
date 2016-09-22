@@ -38,11 +38,12 @@ foam.CLASS({
     },
 
     function set(value) {
+      this.element.setAttribute(this.property, value);
+
       // The next line is necessary to fire a change event.
       // This is necessary because DOM isn't proper MVC and
       // doesn't fire a change event when the value is explicitly set.
       this.value = value;
-      this.element.setAttribute(this.property, value);
     },
 
     function sub(l) {
