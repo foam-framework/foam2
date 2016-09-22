@@ -1149,7 +1149,11 @@ foam.CLASS({
             es.push(v.toE ? v.toE(null, Y) : v);
           }
         } else if ( c.toE ) {
-          es.push(c.toE(null, Y));
+          var e = c.toE(null, Y);
+          if ( foam.core.Slot.isInstance(e) ) {
+            e = this.slotE_(e);
+          }
+          es.push(e);
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1634,7 +1638,9 @@ foam.CLASS({
       class: 'Int',
       name: 'displayWidth',
       expression: function(width) { return width; }
-    }
+    },
+    // TODO: make an IntView
+    [ 'view', { class: 'foam.u2.TextField', type: 'number' } ]
   ]
 });
 
