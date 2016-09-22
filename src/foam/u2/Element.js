@@ -1248,9 +1248,7 @@ foam.CLASS({
         if ( update ) {
           // ???: Why is it necessary to delay this until after load?
           e.onload.sub(function() {
-            console.log('**********onload');
             o.propertyChange.sub(function(_,_,prop,slot) {
-              console.log('***', prop, slot.prevValue, slot.get());
               dao.put(o.clone());
             });
           });
@@ -1624,6 +1622,18 @@ foam.CLASS({
       }
 
       return e;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.String',
+  properties: [
+    {
+      class: 'Int',
+      name: 'displayWidth',
+      expression: function(width) { return width; }
     }
   ]
 });
