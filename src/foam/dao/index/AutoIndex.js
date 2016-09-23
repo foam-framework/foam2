@@ -34,7 +34,7 @@ foam.CLASS({
   properties: [
     {
       name: 'existingIndexes',
-      factory: function() { return {}; }
+      factory: function() { return []; }
     },
     {
       name: 'mdao'
@@ -63,9 +63,17 @@ foam.CLASS({
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
         prop = prop.arg1;
       }
-      //console.log('Adding AutoIndex : ', prop.id);
-      this.existingIndexes[prop.name] = prop;
-      this.mdao.addPropertyIndex(prop);
+      var name = prop.name;
+      console.log('Adding 1 sig: ', name);
+      for ( var j = 0; j < this.existingIndexes.length; j++ ) {
+        if ( this.existingIndexes[j][0] === name ) { // check first item of each existing index
+          return; // the first prop matches, we can rely this index
+        }
+      }
+
+      this.existingIndexes.push([name]);
+      //this.mdao.addPropertyIndex(prop);
+      this.addIndex(prop.toIndex(this.mdao.idIndexFactory));
     },
     function addIndex(index) {
       this.baseAltIndex.addIndex(index);
@@ -135,28 +143,51 @@ foam.CLASS({
             break;
           }
         }
-        if ( sig ) dedupedArgs.push(args[k]);
+        if ( sig ) dedupedArgs.push(sig);
       }
-      // if args were removed, recreate the predicate
-      if ( dedupedArgs.length !== args.length ) {
-        predicate = predicate.cls_.create({ args: dedupedArgs });
-      }
+      // // if args were removed, recreate the predicate
+//       if ( dedupedArgs.length !== args.length ) {
+//         predicate = predicate.cls_.create({ args: dedupedArgs });
+//       }
 
-      // For each prefix of the index, also mark it as completed
-      // (index(city,country) can also serve index(city) queries)
-      var signature = predicate.toIndexSignature();
-      var newIndex;
-      while ( signature.length ) {
-        var sigStr = signature.join(',');
-        //console.log("AutoIndex: ", "          checking ", sigStr);
-        if ( ! this.existingIndexes[sigStr] ) {
-          //console.log("AutoIndex: ", "+++not found, adding ", sigStr);
-          if ( ! newIndex ) newIndex = predicate.toIndex(this.mdao.idIndexFactory);
-          this.mdao.addIndex(newIndex);
-          this.existingIndexes[sigStr] = true;
-        }
-        signature = signature.slice(0, -1);
+      // Find existing indexes whose prefix contains at least all the properties in our predicate
+      var signature = {};
+      var sigArr = dedupedArgs; //predicate.toIndexSignature();
+      for ( var i = 0; i < sigArr.length; i++ ) {
+        signature[sigArr[i]] = true;
       }
+      var newIndex;
+      for ( var j = 0; j < this.existingIndexes.length; j++ ) {
+        var existing = this.existingIndexes[j];
+        var matched = 0;
+        for ( var i = 0; i < existing.length; i++ ) {
+          var existingProp = existing[i];
+          if ( signature[existingProp] ) {
+            matched++;
+          } else {
+            break; // as soon as we don't want one of the existing props, stop
+          }
+        }
+        // ok if the prefix is exactly our props (in any order, but must be the first props)
+        if ( matched === sigArr.length ) {
+          newIndex = existing;
+          break;
+        }
+      }
+      // if nothing found, create a new index
+      if ( ! newIndex ) {
+         newIndex = predicate.toIndex(this.mdao.idIndexFactory);
+         this.mdao.addIndex(newIndex);
+         // set a key for each property we index
+         var newSig = [];
+         //newSig.index = newIndex;
+         for ( var key in signature ) {
+           newSig.push(key)
+         }
+         this.existingIndexes.push(newSig);
+         console.log("Adding sig", newSig);
+      }
+      
     },
 
     function toString() {

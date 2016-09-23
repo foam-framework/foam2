@@ -36,8 +36,9 @@ describe("Index benchmarks", function() {
       responseType: 'json',
       method: 'GET'
     });
-    xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
-                'master/js/foam/demos/olympics/MedalData.json');
+    xhr.fromUrl('http://localhost:8888/MedalData.json');
+    // xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
+    //             'master/js/foam/demos/olympics/MedalData.json');
     var self = this;
     return xhr.send().then(function(res) {
       console.log("XHR started");
@@ -123,6 +124,7 @@ describe("Index benchmarks", function() {
       of: Medal,
       seqNo: true,
       autoIndex: false,
+      dedup: true,
       daoType: 'MDAO'
     });
 
@@ -130,6 +132,7 @@ describe("Index benchmarks", function() {
       of: Medal,
       seqNo: true,
       autoIndex: true,
+      dedup: true,
       daoType: 'MDAO'
     });
 
@@ -140,7 +143,7 @@ describe("Index benchmarks", function() {
   });
 
 
-  it('benchmarks manual indexes', function(done) {
+  xit('benchmarks manual indexes', function(done) {
     loadMedalData(dao).then(
       foam.async.sequence([
         foam.async.atest('Build index on most properties', function() {
@@ -328,17 +331,22 @@ describe("Index benchmarks", function() {
         )
       ])
     ).then(function() {
-      loadMedalData(dao).then(foam.async.atest(
-        'Run predicate set A no index',
-        foam.async.repeat(SAMPLE_PREDICATES_A.length,
-          function(i) {
-            return foam.async.atest('NPredicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
-              var pred = SAMPLE_PREDICATES_A[i];
-              return dao.where(pred).select();
-            })();
-          }
-        )
-      )).then(done);
+      autodao.select(dao).then(foam.async.sequence([
+        function() { autodao = null; /* allow gc */ },
+        foam.async.sleep(2000),
+        foam.async.atest(
+          'Run predicate set A no index',
+          foam.async.repeat(SAMPLE_PREDICATES_A.length,
+            function(i) {
+              return foam.async.atest('NPredicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+                var pred = SAMPLE_PREDICATES_A[i];
+                return dao.where(pred).select();
+              })();
+            }
+          )
+        ),
+        
+      ])).then(done);
     });
   });
 
