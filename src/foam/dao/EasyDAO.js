@@ -241,11 +241,14 @@ foam.CLASS({
         );
       }
 
-      if ( this.name && daoModel.getAxiomByName('name')  ) params.name = this.name;
+      if ( this.name && daoModel.getAxiomByName('name') ) params.name = this.name;
       if ( daoModel.getAxiomByName('autoIndex') ) params.autoIndex = this.autoIndex;
       //if ( this.seqNo || this.guid ) params.property = this.seqProperty;
 
       var dao = daoModel.create(params, this.__subContext__);
+
+      // Not used by decorators.
+      delete params['name'];
 
       if ( this.MDAO.isInstance(dao) ) {
         this.mdao = dao;
