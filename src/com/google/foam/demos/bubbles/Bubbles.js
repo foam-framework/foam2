@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.demos.physics',
+  package: 'com.google.foam.demos.bubbles',
   name: 'Bubbles',
   extends: 'foam.graphics.Box',
 
