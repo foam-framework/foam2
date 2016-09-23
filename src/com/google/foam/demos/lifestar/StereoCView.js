@@ -12,7 +12,7 @@ foam.CLASS({
         c.x += 20;
         c.paint(x);
       }
-      
+
       x.translate(500, 0);
 
       for ( var i = 0 ; i < this.children.length ; i++ ) {
@@ -22,5 +22,4 @@ foam.CLASS({
       }
     }
   ]
-
 });
