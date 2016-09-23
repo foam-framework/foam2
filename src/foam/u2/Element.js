@@ -321,14 +321,14 @@ foam.CLASS({
     },
     function onSetAttr(key, value) {
       if ( this.PSEDO_ATTRIBUTES[key] ) {
-        this.el().value = value;
+        this.el()[key] = value;
       } else {
         this.el().setAttribute(key, value === true ? '' : value);
       }
     },
     function onRemoveAttr(key) {
       if ( this.PSEDO_ATTRIBUTES[key] ) {
-        this.el().value = '';
+        this.el()[key] = '';
       } else {
         this.el().removeAttribute(key);
       }
@@ -1149,7 +1149,11 @@ foam.CLASS({
             es.push(v.toE ? v.toE(null, Y) : v);
           }
         } else if ( c.toE ) {
-          es.push(c.toE(null, Y));
+          var e = c.toE(null, Y);
+          if ( foam.core.Slot.isInstance(e) ) {
+            e = this.slotE_(e);
+          }
+          es.push(e);
         } else if ( typeof c === 'function' ) {
           throw new Error('Unsupported');
         } else if ( foam.core.Slot.isInstance(c) ) {
@@ -1248,9 +1252,7 @@ foam.CLASS({
         if ( update ) {
           // ???: Why is it necessary to delay this until after load?
           e.onload.sub(function() {
-            console.log('**********onload');
             o.propertyChange.sub(function(_,_,prop,slot) {
-              console.log('***', prop, slot.prevValue, slot.get());
               dao.put(o.clone());
             });
           });
@@ -1630,6 +1632,18 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.String',
+  properties: [
+    {
+      class: 'Int',
+      name: 'displayWidth',
+      expression: function(width) { return width; }
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Date',
   requires: [ 'foam.u2.DateView' ],
   properties: [
@@ -1643,6 +1657,15 @@ foam.CLASS({
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Int',
+  requires: [ 'foam.u2.FloatView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.IntView' } ]
   ]
 });
 
