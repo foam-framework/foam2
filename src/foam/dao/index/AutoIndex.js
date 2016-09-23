@@ -108,7 +108,7 @@ foam.CLASS({
         var name = ( this.Property.isInstance(order) ) ? order.name :
           ( order.arg1 && order.arg1.name ) || null;
         // if no index added for it yet, add one
-        if ( name && ! this.existingIndexes[name] ) {
+        if ( name ) {
           this.addPropertyIndex(order);
         }
       }
