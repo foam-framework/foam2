@@ -29,6 +29,7 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.dao.index.OrIndex',
     'foam.dao.index.AltIndex',
+    'foam.dao.index.ValueIndex',
   ],
 
   properties: [
@@ -44,7 +45,9 @@ foam.CLASS({
       expression: function(mdao) {
         if ( ! mdao ) return;
         var index = this.OrIndex.create({
-          delegate: this.AltIndex.create()
+          delegate: this.AltIndex.create({
+            delegates: [ mdao.idIndex ]
+          })
         });
         mdao.addIndex(index);
         return index.delegate;
@@ -64,12 +67,12 @@ foam.CLASS({
         prop = prop.arg1;
       }
       var name = prop.name;
-      console.log('Adding 1 sig: ', name);
       for ( var j = 0; j < this.existingIndexes.length; j++ ) {
         if ( this.existingIndexes[j][0] === name ) { // check first item of each existing index
           return; // the first prop matches, we can rely this index
         }
       }
+      console.log('Adding 1 sig: ', [name]);
 
       this.existingIndexes.push([name]);
       //this.mdao.addPropertyIndex(prop);
