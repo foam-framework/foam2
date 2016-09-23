@@ -180,15 +180,17 @@ foam.CLASS({
       // if nothing found, create a new index
       if ( ! newIndex ) {
          newIndex = predicate.toIndex(this.mdao.idIndexFactory);
-         this.mdao.addIndex(newIndex);
-         // set a key for each property we index
-         var newSig = [];
-         //newSig.index = newIndex;
-         for ( var key in signature ) {
-           newSig.push(key)
+         if ( newIndex ) {
+           this.mdao.addIndex(newIndex);
+           // set a key for each property we index
+           var newSig = [];
+           //newSig.index = newIndex;
+           for ( var key in signature ) {
+             newSig.push(key)
+           }
+           this.existingIndexes.push(newSig);
+           console.log("Adding sig", newSig);
          }
-         this.existingIndexes.push(newSig);
-         console.log("Adding sig", newSig);
       }
       
     },
@@ -253,40 +255,6 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  refines: 'foam.mlang.predicate.Contains',
-
-  methods: [
-    function toIndexSignature() {
-      if ( this.arg1 ) {
-        return this.arg1.toIndexSignature()+"+substr";
-      } else {
-        return;
-      }
-    },
-    function toIndex(tailFactory) {
-      // TODO: index for substring matching
-      return;
-    }
-  ]
-});
-foam.CLASS({
-  refines: 'foam.mlang.predicate.ContainsIC',
-
-  methods: [
-    function toIndexSignature() {
-      if ( this.arg1 ) {
-        return this.arg1.toIndexSignature()+"+substr+IC";
-      } else {
-        return;
-      }
-    },
-    function toIndex(tailFactory) {
-      // TODO: index for substring matching
-      return;
-    }
-  ]
-});
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
