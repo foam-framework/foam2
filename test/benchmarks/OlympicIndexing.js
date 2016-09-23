@@ -36,9 +36,9 @@ describe("Index benchmarks", function() {
       responseType: 'json',
       method: 'GET'
     });
-    xhr.fromUrl('http://localhost:8888/MedalData.json');
-    // xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
-    //             'master/js/foam/demos/olympics/MedalData.json');
+    //xhr.fromUrl('http://localhost:8888/MedalData.json');
+    xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
+               'master/js/foam/demos/olympics/MedalData.json');
     var self = this;
     return xhr.send().then(function(res) {
       console.log("XHR started");
@@ -311,7 +311,7 @@ describe("Index benchmarks", function() {
           'Run predicate set A with AutoIndex',
           foam.async.repeat(SAMPLE_PREDICATES_A.length,
             function(i) {
-              return foam.async.atest('Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+              return foam.async.atest('A-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
                 var pred = SAMPLE_PREDICATES_A[i];
                 return autodao.where(pred).select();
               })();
@@ -322,7 +322,7 @@ describe("Index benchmarks", function() {
           'Run predicate set A with AutoIndex Again(already indexed)',
           foam.async.repeat(SAMPLE_PREDICATES_A.length,
             function(i) {
-              return foam.async.atest('Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+              return foam.async.atest('R-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
                 var pred = SAMPLE_PREDICATES_A[i];
                 return autodao.where(pred).select();
               })();
@@ -338,7 +338,7 @@ describe("Index benchmarks", function() {
           'Run predicate set A no index',
           foam.async.repeat(SAMPLE_PREDICATES_A.length,
             function(i) {
-              return foam.async.atest('NPredicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+              return foam.async.atest('N-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
                 var pred = SAMPLE_PREDICATES_A[i];
                 return dao.where(pred).select();
               })();
