@@ -45,7 +45,7 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-        return this.__context__[this.relationship.targetModel + 'DAO'];
+        return this.__context__[this.relationship.targetDAOKey];
       }
     }
   ],

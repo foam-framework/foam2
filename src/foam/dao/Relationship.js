@@ -36,8 +36,23 @@ foam.CLASS({
       of: 'Property',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
+    /*
+      // Not used yet.
+    {
+      name: 'sourceDAOKey',
+      expression: function(sourceModel) {
+        return sourceModel.id + 'DAO';
+      }
+    },
+    */
     {
       name: 'targetModel'
+    },
+    {
+      name: 'targetDAOKey',
+      expression: function(targetModel) {
+        return targetModel + 'DAO';
+      }
     },
     {
       class: 'FObjectArray',
