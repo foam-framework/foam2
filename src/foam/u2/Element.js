@@ -1261,7 +1261,7 @@ foam.CLASS({
         self.endContext();
 
         if ( es[o.id] ) {
-          self.replaceChild(es[o.id], e) 
+          self.replaceChild(es[o.id], e);
         } else {
           self.add(e);
         }
