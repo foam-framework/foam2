@@ -381,16 +381,15 @@ describe('TreeIndex', function() {
 
 
   it('optimizes range searches', function() {
-    plan = idx.plan(sink, undefined, undefined, undefined,
-      m.AND(
-        m.GT(test.Indexable.FLOAT, 7),
-        m.LT(test.Indexable.FLOAT, 25),
+    var pred = m.AND(
+        m.GT(test.Indexable.FLOAT, 12),
+        m.LT(test.Indexable.FLOAT, 18),
         m.GTE(test.Indexable.INT, 3),
         m.LTE(test.Indexable.INT, 10)
-      )
-    );
+      );
+    plan = idx.plan(sink, undefined, undefined, undefined, pred);
 
-    plan.execute([], sink);
+    plan.execute([], sink, undefined, undefined, undefined, pred);
 
     expect(sink.a.length).toEqual(5);
     expect(sink.a[0].int).toEqual(3);
@@ -452,13 +451,22 @@ describe('Case-Insensitive TreeIndex', function() {
 
   it('puts case-insensitive', function() {
     plan = idx.plan(sink, undefined, undefined, undefined,
-      m.EQ(test.Indexable.STRING, 'three')
-    );
-    plan.execute([], sink);
+      m.EQ(test.Indexable.STRING, 'three'));
+    plan.execute([], sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'three'));
 
-    expect(sink.a.length).toEqual(2);
-    expect(sink.a[0].string).toEqual('Three');
-    expect(sink.a[1].string).toEqual('three');
+    expect(sink.a.length).toEqual(1);
+    expect(sink.a[0].string).toEqual('three');
+
+
+    plan = idx.plan(sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'one!'));
+    plan.execute([], sink, undefined, undefined, undefined,
+      m.EQ(test.Indexable.STRING, 'one!'));
+
+    expect(sink.a.length).toEqual(3);
+    expect(sink.a[1].string).toEqual('one!');
+    expect(sink.a[2].string).toEqual('one!');
   });
 
   it('removes case-insensitive', function() {

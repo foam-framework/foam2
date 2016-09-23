@@ -400,7 +400,18 @@ foam.CLASS({
           value,
           this.compare,
           this.selectCount > 0);
-    }
+    },
+
+    /**
+     * Do not optimize bulkload
+     **/
+    function bulkLoad(a) {
+      a = a.a || a;
+      this.root = this.nullNode;
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        this.put(a[i]);
+      }
+    },
   ]
 });
 
