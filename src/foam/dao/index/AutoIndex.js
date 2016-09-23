@@ -254,6 +254,41 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  refines: 'foam.mlang.predicate.Contains',
+
+  methods: [
+    function toIndexSignature() {
+      if ( this.arg1 ) {
+        return this.arg1.toIndexSignature()+"+substr";
+      } else {
+        return;
+      }
+    },
+    function toIndex(tailFactory) {
+      // TODO: index for substring matching
+      return;
+    }
+  ]
+});
+foam.CLASS({
+  refines: 'foam.mlang.predicate.ContainsIC',
+
+  methods: [
+    function toIndexSignature() {
+      if ( this.arg1 ) {
+        return this.arg1.toIndexSignature()+"+substr+IC";
+      } else {
+        return;
+      }
+    },
+    function toIndex(tailFactory) {
+      // TODO: index for substring matching
+      return;
+    }
+  ]
+});
+
+foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
 
   methods: [

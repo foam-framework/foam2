@@ -36,8 +36,10 @@ describe("Index benchmarks", function() {
       responseType: 'json',
       method: 'GET'
     });
-    //xhr.fromUrl('http://localhost:8888/MedalData.json');
-    xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
+    if ( foam.net.node ) 
+      xhr.fromUrl('http://localhost:8888/MedalData.json');
+    else
+      xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
                'master/js/foam/demos/olympics/MedalData.json');
     var self = this;
     return xhr.send().then(function(res) {
