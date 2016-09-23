@@ -99,9 +99,9 @@ FOAM_FILES([
   { name: "foam/dao/IDBDAO", flags: ['web'] },
   { name: "lib/Pooled" },
   { name: "lib/QueryParser" },
-  { name: "lib/Physical" },
-  { name: "lib/Collider" },
-  { name: "lib/PhysicsEngine" },
+  { name: "foam/physics/Physical" },
+  { name: "foam/physics/Collider" },
+  { name: "foam/physics/PhysicsEngine" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
   { name: "lib/net" },
@@ -146,7 +146,7 @@ FOAM_FILES([
   { name: "foam/u2/FoamTagLoader", flags: ['web'] },
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
-  { name: "lib/PhysicalCircle", flags: ['web'] },
+  { name: "foam/physics/PhysicalCircle", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] }
 ]);
