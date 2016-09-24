@@ -69,11 +69,23 @@ foam.CLASS({
 
     /** extracts the value with the given key from the index */
     function get(/* array */ key, offset) {
-      if ( offset >= key.length ) return this.tail;
+      if ( offset >= key.length ) {
+        var ret = [];
+        this.tails(ret);
+        return ret;
+      }
       // TODO: When key stores multiple chars for this node, check for match
       var child = this.children[key[offset]];
       if ( child ) {
         return child.get(key, offset + 1); // next character
+      }
+    },
+
+    function tails(tailArray) {
+      this.tail && tailArray.push(this.tail);
+      var cs = this.children;
+      for ( var c in cs ) {
+        cs[c].tails(tailArray);
       }
     },
 

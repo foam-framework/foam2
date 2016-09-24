@@ -154,7 +154,7 @@ foam.CLASS({
       ret = [];
       while ( key.length > 0 ) {
         var r = this.root.get(key, 0);
-        r && ret.push(r);
+        if ( r ) ret = ret.concat(r);
         key = key.slice(1);
       }
       return ret;
@@ -400,7 +400,7 @@ foam.CLASS({
       ret = [];
       while ( key.length > 0 ) {
         var r = this.root.get(key, 0);
-        r && ret.push(r);
+        if ( r ) ret = ret.concat(r);
         key = key.slice(1);
       }
       return ret;
