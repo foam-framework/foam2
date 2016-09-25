@@ -27,6 +27,7 @@ foam.CLASS({
     // per node properties
     { class: 'Simple', name: 'key'   },
     { class: 'Simple', name: 'tail' },
+    { class: 'Simple', name: 'subTails' },
     { class: 'Simple', name: 'size'  },
     { class: 'Simple', name: 'children' },
 
@@ -56,6 +57,7 @@ foam.CLASS({
       for ( var key in this.children ) {
         c.children[key] = this.children[key];
       }
+      c.subTails = this.subTails.slice();
       return c;
     },
 
@@ -83,66 +85,89 @@ foam.CLASS({
 
     function tails(tailArray) {
       this.tail && tailArray.push(this.tail);
+      var subTails = this.subTails;
+      if ( subTails ) {
+        for ( var st in subTails ) {  
+          tailArray.push(subTails[st]);
+        }
+      }
       var cs = this.children;
       for ( var c in cs ) {
         cs[c].tails(tailArray);
       }
     },
 
-    function putKeyValue(/* array */key, value, offset, nodeFactory, tailFactory, locked) {      
+    function putKeyValue(/* array */key, value, offset, nodeFactory, tailFactory, locked, tailRef) {      
+      // tailRef is the tail index created for the full string. Each substring added to the trie can just
+      // reference that tail index rather than create a new tail. If substrings are not desired, supply an
+      // empty tailRef array [].
       var s = this.maybeClone(locked);
 
       // if we're at the end of the key, our tail is the subindex to use
       if ( offset >= key.length ) {
-        if ( s.tail ) {
-          s.size -= s.tail.size();      
+        if ( tailRef[0] ) { // we are putting a substring, so don't use the primary tail
+          s.subTails = s.subTails || { __proto__: null };
+          s.subTails[tailRef[1]] = tailRef[0];
         } else {
-          s.tail = tailFactory.create();
+          if ( s.tail ) {
+            s.size -= s.tail.size();      
+          } else {
+            s.tail = tailFactory.create();
+          }
+          s.tail.put(value);
+          tailRef[0] = s.tail; // as we return back up the tree, nodes can record this index
+          tailRef[1] = key.join("");
+          s.size += s.tail.size();    
+          //console.log("put ", key); 
         }
-        s.tail.put(value);
-        s.size += s.tail.size();    
-        //console.log("put ", key); 
       } else {
         var k = key[offset];
         // TODO: compress empty 'value' nodes into multi-character keyed nodes
         var child = s.children[k];
         if ( child ) {
           s.size -= child.size;
-          child = child.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, locked); // next character
+          // next character
+          child = child.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, locked, tailRef); 
           s.children[k] = child;
           s.size += child.size;
         } else {
           var newchild = nodeFactory.create({ key: k });
-          newchild.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, false); // new node, ignore 'locked'          
+          // new node, ignore 'locked'          
+          newchild.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, false, tailRef); 
           s.children[k] = newchild;
           s.size += newchild.size;
         }
-      }  
-          
+      }   
       return s;
     },
 
-    function removeKeyValue(/* array */key, value, offset, locked) {      
+    function removeKeyValue(/* array */key, value, offset, locked, tailRef) {      
       var s = this.maybeClone(locked);
       
       // if we're at the end of the key, our tail is the subindex to use
       if ( offset >= key.length ) {
-        s.tail.remove(value);
-        if ( s.tail.size() < 1 ) {
-          s.tail = null;
+        if ( tailRef[1] ) { // we are removing a substring, so don't use the primary tail
+          if ( s.subTails ) delete s.subTails[tailRef[1]];
+        } else {
+          s.tail.remove(value);
+          tailRef[0] = s.tail;
+          tailRef[1] = key.join("");
+          if ( s.tail.size() < 1 ) {
+            s.tail = null;
+          }
         }
       } else {     
         var k = key[offset];
-      
         var child = s.children[k];
         if ( child ) {
-           child = child.removeKeyValue(key, value, offset + 1, locked); // next character
-           if ( child ) {
-             s.children[k] = child;
-           } else {
-             delete s.children[k];
-           }
-           s.size -= 1;
+          s.size -= child.size;
+          child = child.removeKeyValue(key, value, offset + 1, locked); // next character
+          if ( child ) {
+            s.children[k] = child;
+            s.size += child.size;
+          } else {
+            delete s.children[k];
+          }
         } 
       }
       // if empty, remove self

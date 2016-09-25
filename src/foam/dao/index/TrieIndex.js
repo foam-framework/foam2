@@ -104,7 +104,15 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
 
+      this.selectCount = 0;
+      this.root = this.treeNodeFactory.create();
+
+      this.dedup = null;
+      
+    },
+    
     /**
      * Bulk load an unsorted array of objects.
      **/
@@ -114,36 +122,41 @@ foam.CLASS({
         this.put(a[i]);
       }
     },
+    
+    function extractKey(obj) {
+      return this.prop.f(obj).split("");
+    },
 
     function put(newValue) {
       //TODO: repeat for each suffix
+      var tailRef = [];
+      key = this.extractKey(newValue);
       
-      key = this.prop.f(newValue).split("");
-
-      while ( key.length > 0 ) {
+      for ( var start = 0; start < key.length; start++ ) {
         this.root = this.root.putKeyValue(
           key,
-            newValue,
-            0,
-            this.treeNodeFactory,
-            this.tailFactory,
-            this.selectCount > 0);
-        key = key.slice(1);
+          newValue,
+          start,
+          this.treeNodeFactory,
+          this.tailFactory,
+          this.selectCount > 0,
+          tailRef);
       }
       
       
     },
 
     function remove(value) {
-      key = this.prop.f(value).split("");
-
-      while ( key.length > 0 ) {
+      key = this.extractKey(value);
+      var tailRef = [];
+      
+      for ( var start = 0; start < key.length; start++ ) {
         this.root = this.root.removeKeyValue(
           key,
           value,
-          0,
-          this.selectCount > 0);
-        key = key.slice(1);
+          start,
+          this.selectCount > 0,
+          tailRef);
       }
     },
 
@@ -151,12 +164,25 @@ foam.CLASS({
       //TODO: repeat for each suffix?
       // does not delve into sub-indexes
       key = key.split("");
-      ret = [];
-      while ( key.length > 0 ) {
-        var r = this.root.get(key, 0);
-        if ( r ) ret = ret.concat(r);
-        key = key.slice(1);
+      indexes = [];
+      for ( var start = 0; start < key.length; start++ ) {
+        var r = this.root.get(key, start);
+        if ( r ) indexes = indexes.concat(r);
       }
+      // dedup return array
+      var ret = [];
+      for ( var d = 0; d < indexes.length - 1; d++ ) {
+        var idx = indexes[d];
+        for ( var e = d+1; e < indexes.length; e++ ) {
+          if ( idx === ret[e] ) {
+            console.warn("Trie found dupe!");
+            idx = null;
+            break;
+          }
+        }
+        if ( idx ) ret.push(idx); 
+      }
+      
       return ret;
     },
 
@@ -361,50 +387,17 @@ foam.CLASS({
   extends: 'foam.dao.index.TrieIndex',
 
   methods: [
-    function put(newValue) {
-      //TODO: repeat for each suffix
-      
-      key = this.prop.f(newValue).toLowerCase().split("");
-
-      while ( key.length > 0 ) {
-        this.root = this.root.putKeyValue(
-          key,
-            newValue,
-            0,
-            this.treeNodeFactory,
-            this.tailFactory,
-            this.selectCount > 0);
-        key = key.slice(1);
-      }
-      
-      
+    
+    function extractKey(obj) {
+      return this.prop.f(obj).toLowerCase().split("");
     },
-
-    function remove(value) {
-      key = this.prop.f(value).toLowerCase().split("");
-
-      while ( key.length > 0 ) {
-        this.root = this.root.removeKeyValue(
-          key,
-          value,
-          0,
-          this.selectCount > 0);
-        key = key.slice(1);
-      }
-    },
-
+    
     function get(key) {
       //TODO: repeat for each suffix?
       // does not delve into sub-indexes
-      key = key.toLowerCase().split("");
-      ret = [];
-      while ( key.length > 0 ) {
-        var r = this.root.get(key, 0);
-        if ( r ) ret = ret.concat(r);
-        key = key.slice(1);
-      }
-      return ret;
+      return this.SUPER(key.toLowerCase());
     },
+
     
   ]
 });
