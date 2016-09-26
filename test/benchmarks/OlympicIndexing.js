@@ -354,11 +354,10 @@ describe("Index benchmarks", function() {
 
   it('benchmarks sample set B', function(done) {
     var SAMPLE_B = [
-      m.AND(m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
-      m.AND(m.EQ(Medal.YEAR, 20), m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
-      m.AND(m.EQ(Medal.YEAR, 19), m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.EQ(Medal.GENDER, "Men")),
-      m.AND(m.EQ(Medal.YEAR, 1956), m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.EVENT, "71-"), m.EQ(Medal.GENDER, "Men")),
-      m.AND(m.EQ(Medal.COLOR, 'BRONZE'), m.EQ(Medal.YEAR, 1956), m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
+      m.AND(m.CONTAINS_IC(Medal.CITY, "a"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.CONTAINS_IC(Medal.COUNTRY, "CHI")),
+      m.AND(m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "oot"), m.CONTAINS_IC(Medal.EVENT, "the"), m.CONTAINS_IC(Medal.COUNTRY, "A")),
+      m.AND(m.CONTAINS_IC(Medal.CITY, "ondon"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg")),
+      m.AND(m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.EVENT, "71-")),
     ];
 
     loadMedalData(autodao).then(

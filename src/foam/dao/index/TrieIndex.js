@@ -17,46 +17,46 @@
 
 
 
-foam.CLASS({
-  refines: 'foam.mlang.predicate.Contains',
-  
-  requires: [
-    'foam.dao.index.TrieIndex',
-  ],
-
-  methods: [
-    function toIndexSignature() {
-      if ( this.arg1 ) {
-        return this.arg1.toIndexSignature()+"+substr";
-      } else {
-        return;
-      }
-    },
-    function toIndex(tailFactory) {
-      return this.TrieIndex.create({ prop: this.arg1, tailFactory: tailFactory });
-    }
-  ]
-});
-foam.CLASS({
-  refines: 'foam.mlang.predicate.ContainsIC',
-
-  requires: [
-    'foam.dao.index.CITrieIndex',
-  ],
-
-  methods: [
-    function toIndexSignature() {
-      if ( this.arg1 ) {
-        return this.arg1.toIndexSignature()+"+substr+IC";
-      } else {
-        return;
-      }
-    },
-    function toIndex(tailFactory) {
-      return this.CITrieIndex.create({ prop: this.arg1, tailFactory: tailFactory });
-    }
-  ]
-});
+// foam.CLASS({
+//   refines: 'foam.mlang.predicate.Contains',
+//
+//   requires: [
+//     'foam.dao.index.TrieIndex',
+//   ],
+//
+//   methods: [
+//     function toIndexSignature() {
+//       if ( this.arg1 ) {
+//         return this.arg1.toIndexSignature()+"+substr";
+//       } else {
+//         return;
+//       }
+//     },
+//     function toIndex(tailFactory) {
+//       return this.TrieIndex.create({ prop: this.arg1, tailFactory: tailFactory });
+//     }
+//   ]
+// });
+// foam.CLASS({
+//   refines: 'foam.mlang.predicate.ContainsIC',
+//
+//   requires: [
+//     'foam.dao.index.CITrieIndex',
+//   ],
+//
+//   methods: [
+//     function toIndexSignature() {
+//       if ( this.arg1 ) {
+//         return this.arg1.toIndexSignature()+"+substr+IC";
+//       } else {
+//         return;
+//       }
+//     },
+//     function toIndex(tailFactory) {
+//       return this.CITrieIndex.create({ prop: this.arg1, tailFactory: tailFactory });
+//     }
+//   ]
+// });
 
 /** A trie-based Index to support Contains and ContainsIC substring matching. **/
 foam.CLASS({
