@@ -58,8 +58,6 @@ foam.CLASS({
   ]
 });
 
-
-
 /** A trie-based Index to support Contains and ContainsIC substring matching. **/
 foam.CLASS({
   package: 'foam.dao.index',
@@ -105,7 +103,6 @@ foam.CLASS({
 
   methods: [
     function init() {
-
       this.selectCount = 0;
       this.root = this.treeNodeFactory.create();
 
@@ -128,7 +125,6 @@ foam.CLASS({
     },
 
     function put(newValue) {
-      //TODO: repeat for each suffix
       var tailRef = [];
       key = this.extractKey(newValue);
       
@@ -168,27 +164,29 @@ foam.CLASS({
     function get(key) {
       //TODO: repeat for each suffix?
       // does not delve into sub-indexes
+      //console.log("Get for ", key);
       key = key.split("");
-      indexes = [];
-      for ( var start = 0; start < key.length; start++ ) {
-        var r = this.root.get(key, start);
-        if ( r ) indexes = indexes.concat(r);
-      }
-      // dedup return array
-      var ret = [];
-      for ( var d = 0; d < indexes.length - 1; d++ ) {
-        var idx = indexes[d];
-        for ( var e = d+1; e < indexes.length; e++ ) {
-          if ( idx === ret[e] ) {
-            console.warn("Trie found dupe!");
-            idx = null;
-            break;
-          }
-        }
-        if ( idx ) ret.push(idx); 
-      }
+      indexes = this.root.get(key, 0)
+      // for ( var start = 0; start < key.length; start++ ) {
+      //   var r = this.root.get(key, start);
+      //   if ( r ) indexes = indexes.concat(r);
+      // }
       
-      return ret;
+      // dedup return array
+      // var ret = [];
+//       for ( var d = 0; d < indexes.length - 1; d++ ) {
+//         var idx = indexes[d];
+//         for ( var e = d+1; e < indexes.length; e++ ) {
+//           if ( idx === ret[e] ) {
+//             console.log("Trie found dupe!");
+//             idx = null;
+//             break;
+//           }
+//         }
+//         if ( idx ) ret.push(idx);
+//       }
+//
+      return indexes;
     },
 
 

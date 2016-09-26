@@ -19,6 +19,7 @@
   Represents one node's state in a trie. The trie is not balanced
   and does not support ordering. It is good for substring matching.
 */
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'TrieNode',
@@ -121,7 +122,6 @@ foam.CLASS({
           }
           s.tail.put(value);
           s.size += s.tail.size();    
-          //console.log("put ", key); 
         }
       } else {
         var k = key[offset];

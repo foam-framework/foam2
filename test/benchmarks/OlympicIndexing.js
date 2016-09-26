@@ -162,7 +162,7 @@ describe("Index benchmarks", function() {
   });
 
 
-  it('benchmarks sample set A', function(done) {
+  xit('benchmarks sample set A', function(done) {
     SAMPLE_PREDICATES_A = [
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
@@ -351,6 +351,62 @@ describe("Index benchmarks", function() {
       ])).then(done);
     });
   });
+
+  it('benchmarks sample set B', function(done) {
+    var SAMPLE_B = [
+      m.AND(m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
+      m.AND(m.EQ(Medal.YEAR, 20), m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
+      m.AND(m.EQ(Medal.YEAR, 19), m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.EQ(Medal.GENDER, "Men")),
+      m.AND(m.EQ(Medal.YEAR, 1956), m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.EVENT, "71-"), m.EQ(Medal.GENDER, "Men")),
+      m.AND(m.EQ(Medal.COLOR, 'BRONZE'), m.EQ(Medal.YEAR, 1956), m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
+    ];
+
+    loadMedalData(autodao).then(
+      foam.async.sequence([
+        foam.async.atest(
+          'Run predicate set B with AutoIndex 100 times',
+          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+            function(i) {
+              return foam.async.atest('A-Predicate '+SAMPLE_B[i].toString(), function() {
+                var pred = SAMPLE_B[i];
+                return autodao.where(pred).select();
+              })();
+            }
+          ))
+        ),
+        foam.async.atest(
+          'Run predicate set B with AutoIndex Again(already indexed) 100 times',
+          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+            function(i) {
+              return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString(), function() {
+                var pred = SAMPLE_B[i];
+                return autodao.where(pred).select();
+              })();
+            }
+          ))
+        )
+      ])
+    ).then(function() {
+      autodao.select(dao).then(foam.async.sequence([
+        function() { autodao = null; /* allow gc */ },
+        foam.async.sleep(2000),
+        foam.async.atest(
+          'Run predicate set B no index 100 times',
+          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+            function(i) {
+              return foam.async.atest('N-Predicate '+SAMPLE_B[i].toString(), function() {
+                var pred = SAMPLE_B[i];
+                return dao.where(pred).select();
+              })();
+            }
+          ))
+        ),
+        
+      ])).then(done);
+    });
+  });
+
+
 
 });
 
