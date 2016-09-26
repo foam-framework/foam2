@@ -113,10 +113,13 @@ foam.CLASS({
             s.size -= s.tail.size();      
           } else {
             s.tail = tailFactory.create();
+            // Only set tailRef if adding a new index, so substring references can be added.
+            // Since subTails reference the primary's index, they don't need puts or
+            // removes called on them.
+            tailRef[0] = s.tail;
+            tailRef[1] = key.join("");
           }
           s.tail.put(value);
-          tailRef[0] = s.tail; // as we return back up the tree, nodes can record this index
-          tailRef[1] = key.join("");
           s.size += s.tail.size();    
           //console.log("put ", key); 
         }

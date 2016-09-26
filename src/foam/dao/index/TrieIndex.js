@@ -141,6 +141,9 @@ foam.CLASS({
           this.tailFactory,
           this.selectCount > 0,
           tailRef);
+
+        // only continue adding substring references if we add a new index
+        if ( ! tailRef[0] ) break; 
       }
       
       
@@ -157,6 +160,8 @@ foam.CLASS({
           start,
           this.selectCount > 0,
           tailRef);
+        // only clean up substring references if we add a removed the entire index
+        if ( ! tailRef[0] ) break; 
       }
     },
 
