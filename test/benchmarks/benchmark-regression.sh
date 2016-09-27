@@ -20,4 +20,5 @@ cd ../..
 
 npm run benchmark-regression > bench-regression-current.log
 
-diff bench-regression-reference.log bench-regression-current.log
+echo "BENCH_A = {" `cat bench-regression-reference.log` "}; BENCH_B = {" `cat bench-regression-current.log` "}" `cat test/benchmarks/regressionCheck.js` > benchmark_regression_test.js
+npm run benchmark-regression-check

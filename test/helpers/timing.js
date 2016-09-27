@@ -21,6 +21,33 @@ if ( ! typeof performance !== 'undefined' ) performance = {
   now: function() { return Date.now(); }
 };
 
+foam.CLASS({
+  package: 'test',
+  name: 'TestRun',
+  
+  constants: {
+    WITHIN: 0.1 // variance within 10%
+  },
+  
+  properties: [
+    { 
+      name: 'name' 
+    },
+    {
+      name: 'time',
+      comparePropertyValues: function(v1, v2) {
+        if ( Math.abs(v1 - v2) < Math.abs( v1 * WITHIN ) ) { 
+          return 0; // close values are considered equal
+        } else {
+          return foam.util.compare(v1, v2);
+        }
+      }
+    },
+    { 
+      name: 'length' 
+    },
+  ]
+});
 
 foam.LIB({
   name: 'foam.async',
@@ -32,9 +59,17 @@ foam.LIB({
         startTime = performance.now();
       }
       var fn2 = function(arg) {
+        var testName = name.replace(/\,/g, ';').replace(/\"/g, '\'');
         var endTime = performance.now();
-        console.log(name.replace(/\,/g, ';'), ", ", endTime - startTime);
-        return arg;
+        console.log("\"" + testName + "\": { name: \"" + testName + "\", time:", 
+            endTime - startTime, 
+            (( arg && arg.a ) ? ", length: " + arg.a.length : ""), 
+            "},");
+        return test.TestRun.create({ 
+          name: testName,
+          time: endTime - startTime,
+          length: ( arg && arg.a ) ? arg.a.length : undefined
+        });
       };
       return foam.async.sequence([ fn1, fn, fn2 ]);
     },
