@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-(typeof require !== "undefined") &&  require("../../src/core/node.js");
+(typeof require !== "undefined") &&  require("../../src/foam/core/node.js");
 
 /**
   Serves to generate executable examples and unit test cases.
