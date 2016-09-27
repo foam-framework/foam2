@@ -11,8 +11,7 @@
     "jscs": "^2.11.0"
   },
   "scripts": {
-    "test": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
-    "normal_test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
+    "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_coverage.json istanbul cover -- jasmine \n istanbul instrument ./src/ -o ./tmp_cov___/ \n rm -rf ./tmp_cov___",
     "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
