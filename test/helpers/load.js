@@ -1,1 +1,1 @@
-require("../../src/core/node.js");
+require("../../src/foam/core/node.js");
