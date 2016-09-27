@@ -14,7 +14,9 @@
     "test": "JASMINE_CONFIG_PATH=jasmine_node.json jasmine",
     "testDebug": "JASMINE_CONFIG_PATH=jasmine_node.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "coverage": "JASMINE_CONFIG_PATH=jasmine_coverage.json istanbul cover -- jasmine \n istanbul instrument ./src/ -o ./tmp_cov___/ \n rm -rf ./tmp_cov___",
-    "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json jasmine",
+    "benchmarks": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json node --expose-gc node_modules/jasmine/bin/jasmine.js",
+    "benchmark-regression": "JASMINE_CONFIG_PATH=jasmine_benchmark-regression.json node --expose-gc node_modules/jasmine/bin/jasmine.js",
+    "benchmark-reg-check":  "JASMINE_CONFIG_PATH=jasmine_benchmark-regression-check.json jasmine",
     "benchmarksDebug": "JASMINE_CONFIG_PATH=jasmine_benchmarks.json node-debug -c node_modules/jasmine/bin/jasmine.js",
     "doc": "rm -rf doc/gen && jsdoc -c jsdoc.conf -r -t ./doc/template -d ./doc/gen ./src/",
     "lint": "jshint -c .jshintrc  ./src/ && jscs -c .jscsrc ./src/"
