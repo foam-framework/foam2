@@ -318,6 +318,7 @@ foam.CLASS({
           // nodeKey can't contain masterKey if it's too short
           if ( nodeKey.length < masterKey.length ) return -1;
           // iterate over substrings
+          if ( ic ) nodeKey = nodeKey.toLowerCase(); // TODO: handle case-insensitive better
           for ( var start = 0; start < (nodeKey.length - masterKey.length + 1); start++ ) {
             if ( nodeKey.substring(start, start + masterKey.length) === masterKey ) {
               return 0;
