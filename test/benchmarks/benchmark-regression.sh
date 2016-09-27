@@ -4,11 +4,20 @@
 # runs for reference and current revision, compares the 
 # output.
 
-npm run benchmark-regression > bench-regression-current.log
+mkdir tmp
+mkdir tmp/regressionBenchmark
+cd tmp/regressionBenchmark
 
 # reference revision
-git checkout e8e8ebd79ba1f04f356dcef2dfe441b2682a4b0a
+git clone ../.. . --no-checkout
+git checkout ae46ebd9ffb0fb6f0d22d86abfc96b927b7161a8
+ln -s ../../node_modules
 
-npm run benchmark-regression > bench-regression-reference.log
+npm run benchmark-regression > ../../bench-regression-reference.log
+
+rm node_modules
+cd ../..
+
+npm run benchmark-regression > bench-regression-current.log
 
 diff bench-regression-reference.log bench-regression-current.log
