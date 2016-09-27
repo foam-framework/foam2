@@ -16,14 +16,42 @@
  */
 
 foam.CLASS({
+  name: 'Tick',
+  extends: 'foam.graphics.Circle',
+
+  imports: [ 'data' ],
+
+  properties: [
+    'second',
+    'ring'
+  ],
+
+  methods: [
+   function initCView() {
+     this.SUPER();
+
+     var self = this;
+
+     this.color$ = this.data.slot(function(seconds) {
+       return seconds === self.second ? self.border : 'white';
+     });
+   }
+  ]
+});
+
+
+foam.CLASS({
   name: 'TabataCView',
   extends: 'foam.graphics.CView',
 
-  requires: [ 'foam.graphics.Circle' ],
+  requires: [ 'Tick' ],
+
+  exports: [ 'data' ],
 
   properties: [
     [ 'width',  500 ],
     [ 'height', 500 ],
+    [ 'autoRepaint', true ],
     'data'
   ],
 
@@ -31,15 +59,20 @@ foam.CLASS({
    function initCView() {
      this.SUPER();
 
+//     var self = this;
+//     this.second$.sub(function() { self.invalidated.pub(); });
+
      var d = this.data;
      for ( var r = 0 ; r < d.rounds ; r++ ) {
        var n = d.workTime + d.restTime;
        for ( var i = 0 ; i < n ; i++ ) {
-         var c = this.Circle.create({
-           color: i < d.workTime ? 'green' : 'red',
+         var c = this.Tick.create({
+           arcWidth: 2,
+           border: i < d.workTime ? 'green' : 'red',
            x: this.width  / 2 + (this.width/2  - (r+1) * 14) * Math.cos(i/n*Math.PI*2),
            y: this.height / 2 + (this.height/2 - (r+1) * 14) * Math.sin(i/n*Math.PI*2),
-           radius: 6
+           radius: 5,
+           second: d.warmupTime + r * n + i
          });
          this.addChildren(c);
        }
