@@ -43,7 +43,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      value: 15,
+      value: 5,
       name: 'warmupTime'
     },
     {
