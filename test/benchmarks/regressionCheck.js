@@ -16,11 +16,22 @@
  */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 2400000;
 
+var fs = require('fs');
 
 describe("Comparing benchmarks", function() {
 
+  var BENCH_A, BENCH_B;
+
   beforeEach(function() {
-    
+    var strA = fs.readFileSync('bench-regression-reference.log').toString();
+    strA = strA.substring(strA.indexOf('"'), strA.lastIndexOf('},')+1);
+    var strB = fs.readFileSync('bench-regression-current.log').toString();
+    strB = strB.substring(strB.indexOf('"'), strB.lastIndexOf('},')+1);
+
+    console.log("read",strA.lastIndexOf(','),"{"+strA+"}", "{"+strB+"}");
+
+    BENCH_A = eval("{"+strA+"}");
+    BENCH_B = eval("{"+strB+"}");
   });
   afterEach(function() {
   });

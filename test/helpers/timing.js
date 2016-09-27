@@ -59,7 +59,7 @@ foam.LIB({
         startTime = performance.now();
       }
       var fn2 = function(arg) {
-        var testName = name.replace(/\,/g, ';').replace(/\"/g, '\'');
+        var testName = name.replace(/[\,\;\:]/g, '-').replace(/\"/g, '\'');
         var endTime = performance.now();
         console.log("\"" + testName + "\": { name: \"" + testName + "\", time:", 
             endTime - startTime, 

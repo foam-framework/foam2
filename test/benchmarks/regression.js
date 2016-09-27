@@ -97,10 +97,9 @@ describe("Index benchmarks", function() {
     function resetRandomizer() {
       rseed = 1;
     }
-
     return Promise.resolve().then(foam.async.atest('Index tests', foam.async.sequence([
       foam.async.sleep(100),
-      foam.async.atest('CreateSubjects' + NUM_SUBJECTS, foam.async.repeat(NUM_SUBJECTS, function (i) {
+      foam.async.repeat(NUM_SUBJECTS, function (i) {
         subjects.array.push(
           Subject.create({
             id: ""+i,
@@ -109,40 +108,39 @@ describe("Index benchmarks", function() {
             stringP: foam.uuid.randomGUID()
           })
         );
-      })),
+      }),
       foam.async.repeat(4,
         foam.async.sequence([
           resetRandomizer,
           cloneSubjects,
-          foam.async.atest('Bulk Load ' + NUM_SUBJECTS, function() {
+          function() {
             return subjectDAO.bulkLoad(subjects);
-          }),
-          foam.async.atestSelect('Select EQ By Index(Int, Bool)', function() {
+          },
+          function() {
             return subjectDAO.where(M.AND(
               M.EQ(Subject.INT_P,  subjects.array[SUBJECT_EQ].intP),
               M.EQ(Subject.BOOL_P, subjects.array[SUBJECT_EQ].boolP)
             )).select();
-          }),
-          foam.async.atestSelect('Select GT By Index(Int: '+MEAN_INT_VALUE+', Bool:true)', function() {
+          },
+          function() {
             return subjectDAO.where(M.AND(
               M.GT(Subject.INT_P,  MEAN_INT_VALUE),
               M.EQ(Subject.BOOL_P, true)
             )).select();
-          }),
-          foam.async.atestSelect('Select GT By Index(Int: '+MEAN_INT_VALUE+
-              ', String: for '+SUBJECT_EQ+' )', function() {
+          },
+          function() {
             return subjectDAO.where(M.AND(
               M.GT(Subject.INT_P,  MEAN_INT_VALUE),
               M.EQ(Subject.STRING_P, subjects.array[SUBJECT_EQ].stringP)
             )).select();
-          }),
-          foam.async.atestSelect('Select LT/GT By Index(String: for '+SUBJECT_EQ+', Int: '+MEAN_INT_VALUE+' )', function() {
+          },
+          function() {
             return subjectDAO.where(M.AND(
               M.LT(Subject.STRING_P, subjects.array[SUBJECT_EQ].stringP),
               M.GT(Subject.INT_P,  MEAN_INT_VALUE)
             )).select();
-          }),
-          foam.async.atestSelect('Select OR By Index(Int: range(20), Bool:true || Int: range(20), Bool:false)', function() {
+          },
+          function() {
             return subjectDAO.where(
               M.OR(
                 M.AND(
@@ -157,10 +155,10 @@ describe("Index benchmarks", function() {
                 )
               )
             ).select();
-          }),
+          },
           foam.async.sleep(1000), // pause to let GC run
           cloneSubjects,
-          foam.async.atest('Update some 100', function() {
+          function() {
             var p = [];
             for ( var i = 200; i < 300; i++ ) {
               // change every property
@@ -173,9 +171,9 @@ describe("Index benchmarks", function() {
               p.push(subjectDAO.put(subj));
             }
             return Promise.all(p);
-          }),
+          },
           cloneSubjects,
-          foam.async.atest('Update many ' + NUM_SUBJECTS/10, function() {
+          function() {
             var p = [];
             for ( var i = 0; i < subjects.array.length/10; i++ ) {
               // change every property
@@ -187,12 +185,12 @@ describe("Index benchmarks", function() {
               // put back in
               p.push(subjectDAO.put(subj));
             }
-            //return Promise.all(p); // on node this makes a difference
-          }),
+            return Promise.all(p); // on node this makes a difference
+          },
 
-          foam.async.atest('Cleanup', function() {
+          function() {
             return subjectDAO.removeAll();
-          }),
+          },
           foam.async.sleep(2000) // pause to let GC run
         ])
       )
