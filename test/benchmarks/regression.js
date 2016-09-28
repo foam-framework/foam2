@@ -69,21 +69,19 @@ describe("Index benchmarks", function() {
       //.addPropertyIndex(Subject.INT_P)
       //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P)
       .addIndex(
-        foam.dao.index.OrIndex.create({
-          delegate: foam.dao.index.AltIndex.create({
-            delegates: [
+        foam.dao.index.AltIndex.create({
+          delegates: [
+            Subject.INT_P.toIndex(
+              Subject.BOOL_P.toIndex(
+                Subject.ID.toIndex(
+                  foam.dao.index.ValueIndex.create()
+            ))),
+            Subject.STRING_P.toIndex(
               Subject.INT_P.toIndex(
-                Subject.BOOL_P.toIndex(
-                  Subject.ID.toIndex(
-                    foam.dao.index.ValueIndex.create()
-              ))),
-              Subject.STRING_P.toIndex(
-                Subject.INT_P.toIndex(
-                  Subject.ID.toIndex(
-                    foam.dao.index.ValueIndex.create()
-              ))),
-            ]
-          })
+                Subject.ID.toIndex(
+                  foam.dao.index.ValueIndex.create()
+            ))),
+          ]
         })
       )
       //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)
