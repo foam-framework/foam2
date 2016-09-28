@@ -3,6 +3,7 @@ foam.CLASS({
   name: 'TudorWall',
   extends: 'foam.graphics.Box',
   exports:  [ 'as timer', 'cellSize', 'nx' ],
+
   classes: [
     {
       name: 'Cell',
@@ -32,6 +33,7 @@ foam.CLASS({
       ]
     }
   ],
+
   properties: [
     [ 'width', 550 ],
     [ 'height', 300 ],
@@ -42,14 +44,16 @@ foam.CLASS({
     [ 'color', 'black' ],
     { class: 'Int', name: 'time' }
   ],
+
   methods: [
     function initCView() {
       for ( var i = 0 ; i < this.nx ; i++ )
-  for ( var j = 0 ; j < this.ny ; j++ )
-    this.addChildren(this.Cell.create({row: j, col: i}));
+        for ( var j = 0 ; j < this.ny ; j++ )
+          this.addChildren(this.Cell.create({row: j, col: i}));
       this.tick();
     }
   ],
+
   listeners: [
     {
       name: 'tick',
