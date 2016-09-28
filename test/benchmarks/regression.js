@@ -54,7 +54,7 @@ describe("Index benchmarks", function() {
       ]
     });
 
-    var NUM_SUBJECTS = 10000;
+    var NUM_SUBJECTS = 5000;
 
     var SUBJECT_EQ = NUM_SUBJECTS / 2;
     var MEAN_INT_VALUE = 10;
@@ -97,8 +97,12 @@ describe("Index benchmarks", function() {
     function resetRandomizer() {
       rseed = 1;
     }
+    function garbageCollect() {
+      global.gc && global.gc();
+    }
+
     return Promise.resolve().then(foam.async.atest('Index tests', foam.async.sequence([
-      foam.async.sleep(100),
+      garbageCollect,
       foam.async.repeat(NUM_SUBJECTS, function (i) {
         subjects.array.push(
           Subject.create({
@@ -111,6 +115,7 @@ describe("Index benchmarks", function() {
       }),
       foam.async.repeat(4,
         foam.async.sequence([
+          garbageCollect,
           resetRandomizer,
           cloneSubjects,
           function() {
@@ -156,8 +161,8 @@ describe("Index benchmarks", function() {
               )
             ).select();
           },
-          foam.async.sleep(1000), // pause to let GC run
           cloneSubjects,
+          garbageCollect, // pause to let GC run
           function() {
             var p = [];
             for ( var i = 200; i < 300; i++ ) {
@@ -173,6 +178,7 @@ describe("Index benchmarks", function() {
             return Promise.all(p);
           },
           cloneSubjects,
+          garbageCollect,
           function() {
             var p = [];
             for ( var i = 0; i < subjects.array.length/10; i++ ) {
@@ -191,7 +197,7 @@ describe("Index benchmarks", function() {
           function() {
             return subjectDAO.removeAll();
           },
-          foam.async.sleep(2000) // pause to let GC run
+          garbageCollect // pause to let GC run
         ])
       )
     ]))).then(done);
