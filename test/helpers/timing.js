@@ -25,10 +25,6 @@ foam.CLASS({
   package: 'test',
   name: 'TestRun',
   
-  constants: {
-    WITHIN: 0.1 // variance within 10%
-  },
-  
   properties: [
     { 
       name: 'name' 
@@ -36,7 +32,7 @@ foam.CLASS({
     {
       name: 'time',
       comparePropertyValues: function(v1, v2) {
-        if ( Math.abs(v1 - v2) < Math.abs( v1 * WITHIN ) ) { 
+        if ( Math.abs(v1 - v2) < Math.abs( v1 * 0.2 ) ) { //TODO: per-instance tolerance
           return 0; // close values are considered equal
         } else {
           return foam.util.compare(v1, v2);

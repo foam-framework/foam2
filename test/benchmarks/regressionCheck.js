@@ -28,10 +28,10 @@ describe("Comparing benchmarks", function() {
     var strB = fs.readFileSync('bench-regression-current.log').toString();
     strB = strB.substring(strB.indexOf('"'), strB.lastIndexOf('},')+1);
 
-    console.log("read",strA.lastIndexOf(','),"{"+strA+"}", "{"+strB+"}");
+    console.log("read","{"+strA+"},", "{"+strB+"}");
 
-    BENCH_A = eval("{"+strA+"}");
-    BENCH_B = eval("{"+strB+"}");
+    eval("BENCH_A = {"+strA+"}");
+    eval("BENCH_B = {"+strB+"}");
   });
   afterEach(function() {
   });

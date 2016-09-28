@@ -11,7 +11,7 @@ cd tmp/regressionBenchmark
 
 # reference revision
 git clone ../.. . --no-checkout
-git checkout 501fde8b685eefa8f90940af2a1870401f9a653a
+git checkout 8314378b96dd2d7820e48f45483b38a75b19adac
 ln -s ../../node_modules
 
 npm run benchmark-regression > ../../bench-regression-reference.log
