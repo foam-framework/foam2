@@ -2,4 +2,4 @@ language: node_js
 node_js:
   - "5"
   - "4"
-
+script: npm test && ./test/benchmarks/benchmark-regression.sh
