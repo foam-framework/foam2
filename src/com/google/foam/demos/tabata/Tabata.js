@@ -17,9 +17,11 @@
 
 foam.CLASS({
   name: 'Tabata',
+
   requires: [
     'foam.util.Timer'
   ],
+
   properties: [
     {
       class: 'Int',
@@ -41,7 +43,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      value: 15,
+      value: 5,
       name: 'warmupTime'
     },
     {

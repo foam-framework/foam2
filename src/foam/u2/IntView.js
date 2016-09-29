@@ -17,35 +17,17 @@
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TextField',
-  extends: 'foam.u2.tag.Input',
+  name: 'IntView',
+  extends: 'foam.u2.TextField',
 
   properties: [
-    {
-      class: 'Int',
-      name: 'displayWidth'
-    },
-    'type'
+    [ 'type', 'number' ],
+    { class: 'Int', name: 'data' }
   ],
 
   methods: [
-    function initE() {
-      this.SUPER();
-
-      if ( this.type         ) this.setAttribute('type', this.type);
-      if ( this.displayWidth ) this.setAttribute('size', this.displayWidth);
-    },
-
-    function fromProperty(prop) {
-      if ( ! this.displayWidth ) {
-        this.displayWidth = prop.displayWidth;
-      }
+    function link() {
+      this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$)
     }
-  ],
-
-  templates: [
-    function CSS() {/*
-      ^:read-only { border-width: 0; }
-    */}
   ]
 });
