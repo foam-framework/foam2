@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.demos.graphics',
+  package: 'com.google.foam.demos.lifestar',
   name: 'LifeStar',
   extends: 'foam.graphics.StereoCView',
 

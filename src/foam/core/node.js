@@ -1,4 +1,4 @@
-require("../foam.js");
+require("../../foam.js");
 
 /** Promise polyfill */
 if ( typeof Promise === 'undefined' ) {
