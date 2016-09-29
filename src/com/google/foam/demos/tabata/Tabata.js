@@ -107,6 +107,7 @@ foam.CLASS({
       hidden: true
     }
   ],
+
   methods: [
     function init() {
       this.elapsed$ = this.slot(function(seconds, roundStart) {
@@ -117,6 +118,7 @@ foam.CLASS({
       });
     }
   ],
+
   classes: [
     {
       name: 'Warmup',
@@ -180,6 +182,7 @@ foam.CLASS({
       ]
     }
   ],
+
   actions: [
     {
       name: 'start',
