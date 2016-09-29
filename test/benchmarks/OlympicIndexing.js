@@ -347,7 +347,7 @@ describe("Index benchmarks", function() {
             }
           )
         ),
-        
+
       ])).then(done);
     });
   });
@@ -400,7 +400,7 @@ describe("Index benchmarks", function() {
             }
           ))
         ),
-        
+
       ])).then(done);
     });
   });
