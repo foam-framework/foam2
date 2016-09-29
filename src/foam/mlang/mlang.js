@@ -954,9 +954,17 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'GroupBy',
-  extends: 'foam.mlang.predicate.Binary',
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    },
     {
       name: 'groups',
       factory: function() { return {}; }

@@ -32,8 +32,26 @@ foam.CLASS({
 
      var self = this;
 
-     this.color$ = this.data.slot(function(seconds) {
-       return seconds === self.second ? self.border : 'white';
+     this.shadowColor = this.border;
+
+     this.data.seconds$.sub(function() {
+       var seconds = self.data.seconds;
+       if ( seconds === self.second ) {
+         self.alpha = 1;
+         self.color = self.border;
+         self.radius = 7;
+         self.shadowBlur = 15;
+       } else if ( seconds > self.second ) {
+         self.alpha = 0.3;
+         self.color = 'white';
+         self.radius = 3;
+         self.shadowBlur = 0;
+       } else {
+         self.alpha = 1;
+         self.color = 'white';
+         self.radius = 4;
+         self.shadowBlur = 0;
+       }
      });
    }
   ]
@@ -69,8 +87,8 @@ foam.CLASS({
          var c = this.Tick.create({
            arcWidth: 2,
            border: i < d.workTime ? 'green' : 'red',
-           x: this.width  / 2 + (this.width/2  - (r+1) * 14) * Math.cos(i/n*Math.PI*2),
-           y: this.height / 2 + (this.height/2 - (r+1) * 14) * Math.sin(i/n*Math.PI*2),
+           x: this.width  / 2 + (this.width/2  - (r+1) * 16) * Math.cos(-Math.PI/2 + i/n*Math.PI*2),
+           y: this.height / 2 + (this.height/2 - (r+1) * 16) * Math.sin(-Math.PI/2 + i/n*Math.PI*2),
            radius: 5,
            second: d.warmupTime + r * n + i
          });
