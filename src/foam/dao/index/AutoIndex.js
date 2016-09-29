@@ -50,6 +50,7 @@ foam.CLASS({
           })
         });
         mdao.addIndex(index);
+        this.addUniversalIndexTo(index.delegate);
         return index.delegate;
       }
     }
@@ -61,6 +62,22 @@ foam.CLASS({
     function remove() { },
 
     function bulkLoad() { return 'auto'; },
+
+    function addUniversalIndexTo(toBase) {
+      // build an index of all the properties of the object
+      var props = this.mdao.of$cls.getAxiomsByClass(this.Property);
+      var names = []
+      var index = this.mdao.idIndexFactory;
+      for ( var i = 0; i < props.length; i++ ) {
+        var prop = props[i];
+        index = prop.toIndex(index); // chain property indexes
+        names = [ prop.name ].concat(names); // prepend
+      }
+
+      console.log('Adding universal sig: ', names);
+      this.existingIndexes.push(names);
+      toBase.addIndex(index);
+    },
 
     function addPropertyIndex(prop) {
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
@@ -168,7 +185,7 @@ foam.CLASS({
           if ( signature[existingProp] ) {
             matched++;
           } else {
-            break; // as soon as we don't want one of the existing props, stop
+            //break; // as soon as we don't want one of the existing props, stop
           }
         }
         // ok if the prefix is exactly our props (in any order, but must be the first props)
@@ -181,7 +198,7 @@ foam.CLASS({
       if ( ! newIndex ) {
          newIndex = predicate.toIndex(this.mdao.idIndexFactory);
          if ( newIndex ) {
-           this.mdao.addIndex(newIndex);
+           this.addIndex(newIndex);
            // set a key for each property we index
            var newSig = [];
            //newSig.index = newIndex;
@@ -192,7 +209,7 @@ foam.CLASS({
            console.log("Adding sig", newSig);
          }
       }
-      
+
     },
 
     function toString() {

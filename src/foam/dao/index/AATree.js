@@ -292,7 +292,12 @@ foam.CLASS({
       }
 
       this.left.select(sink, skip, limit, order, predicate);
-      this.value.select(sink, skip, limit, order, predicate);
+
+      //this.value.select(sink, skip, limit, order, predicate);
+      this.value // TODO: if going this route, add [promise] arg to select()
+        .plan(sink, skip, limit, order, predicate)
+        .execute([], sink, skip, limit, order, predicate);
+
       this.right.select(sink, skip, limit, order, predicate);
     },
 
@@ -307,7 +312,12 @@ foam.CLASS({
       }
 
       this.right.selectReverse(sink, skip, limit, order, predicate);
-      this.value.selectReverse(sink, skip, limit, order, predicate);
+
+      //this.value.selectReverse(sink, skip, limit, order, predicate);
+      this.value // TODO: if going this route, add [promise] arg to select()
+        .plan(sink, skip, limit, order, predicate)
+        .execute([], sink, skip, limit, order, predicate);
+
       this.left.selectReverse(sink,  skip, limit, order, predicate);
     },
 

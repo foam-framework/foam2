@@ -122,10 +122,13 @@ foam.CLASS({
 
   methods: [
     // from plan
-    function execute(promise, sink) {
+    function execute(promise, sink, skip, limit, order, predicate) {
       /** Note that this will put(undefined) if you remove() the item but
         leave this ValueIndex intact. Most usages of ValueIndex will clean up
         the ValueIndex itself when the value is removed. */
+      if ( predicate && ! predicate.f(this.value) ) return;
+      if ( skip && skip[0]-- > 0 ) return;
+      if ( limit && limit[0]-- <= 0 ) return;
       sink.put(this.value);
     },
 

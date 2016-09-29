@@ -142,10 +142,12 @@ describe("Index benchmarks", function() {
   });
   afterEach(function() {
     Math.random = oldRandom;
+    dao = null;
+    autodao = null;
   });
 
 
-  it('benchmarks manual indexes', function(done) {
+  xit('benchmarks manual indexes', function(done) {
     loadMedalData(dao).then(
       foam.async.sequence([
         foam.async.atest('Build index on most properties', function() {
@@ -162,7 +164,7 @@ describe("Index benchmarks", function() {
   });
 
 
-  it('benchmarks sample set A', function(done) {
+  xit('benchmarks sample set A', function(done) {
     SAMPLE_PREDICATES_A = [
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
