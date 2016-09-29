@@ -26,6 +26,7 @@ var classes = [
   'foam.box.EchoBox',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
+  'com.chrome.origintrials.model.Application',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',
   'foam.dao.DAO',
