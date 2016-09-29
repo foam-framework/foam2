@@ -46,7 +46,7 @@ foam.CLASS({
         if ( ! mdao ) return;
         var index = this.OrIndex.create({
           delegate: this.AltIndex.create({
-            delegates: [ mdao.idIndex ]
+            delegates: [ mdao.idIndex ],
           })
         });
         mdao.addIndex(index);
@@ -102,6 +102,7 @@ foam.CLASS({
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate) {
       if ( predicate ) {
+        this.baseAltIndex; // trigger universal index creation if needed
         if ( this.existingIndexes[predicate] ) {
           // already seen this exact predicate, nothing to do
           return this.NoPlan.create();

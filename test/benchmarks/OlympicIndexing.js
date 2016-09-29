@@ -366,18 +366,22 @@ describe("Index benchmarks", function() {
       foam.async.sequence([
         foam.async.atest(
           'Run predicate set B with AutoIndex 100 times',
-          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+          foam.async.repeat(2, foam.async.repeat(SAMPLE_B.length,
             function(i) {
               return foam.async.atest('A-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];
-                return autodao.where(pred).select();
+                return autodao.where(pred)
+                  .select();//foam.mlang.sink.Explain.create({
+                    //delegate: foam.dao.ArraySink.create()
+                  //}))
+                  //.then(function(s){ console.log(s.toString()); });
               })();
             }
           ))
         ),
         foam.async.atest(
           'Run predicate set B with AutoIndex Again(already indexed) 100 times',
-          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+          foam.async.repeat(0, foam.async.repeat(SAMPLE_B.length,
             function(i) {
               return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];
@@ -393,7 +397,7 @@ describe("Index benchmarks", function() {
         foam.async.sleep(2000),
         foam.async.atest(
           'Run predicate set B no index 100 times',
-          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+          foam.async.repeat(0, foam.async.repeat(SAMPLE_B.length,
             function(i) {
               return foam.async.atest('N-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];

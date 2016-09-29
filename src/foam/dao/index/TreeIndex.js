@@ -198,12 +198,12 @@ foam.CLASS({
       return this.root.get(key, this.compare);
     },
 
-    function select(sink, skip, limit, order, predicate) {
-      this.root.select(sink, skip, limit, order, predicate);
+    function select(subPlans, sink, skip, limit, order, predicate) {
+      this.root.select(subPlans, sink, skip, limit, order, predicate);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
-      this.root.selectReverse(sink, skip, limit, order, predicate);
+    function selectReverse(subPlans, sink, skip, limit, order, predicate) {
+      this.root.selectReverse(subPlans, sink, skip, limit, order, predicate);
     },
 
     function size() { return this.root.size; },
@@ -309,7 +309,7 @@ foam.CLASS({
       arg2 = arg2 || isExprMatch(this.Contains);
       if ( arg2 !== undefined ) {
         var key = ic ? arg2.f().toLowerCase() : arg2.f();
-        
+
         // Substring comparison function:
         // returns 0 if nodeKey contains masterKey.
         // returns -1 if nodeKey is shorter than masterKey
@@ -325,7 +325,7 @@ foam.CLASS({
             }
           }
           return 1;
-        }  
+        }
 
         var indexes = [];
         this.root.getAll(key, compareSubstring, indexes);
@@ -378,14 +378,18 @@ foam.CLASS({
         if ( limit ) cost = Math.min(cost, limit);
       }
 
-      return index.CustomPlan.create({
-        cost: cost,
-        customExecute: function(promise, sink, skip, limit, order, predicate) {
-          if ( sortRequired ) {
+      if ( sortRequired ) {
+        var subPlans = [];
+        index.selectCount++;
+        subTree.select(subPlans, arrSink, null, null, null, predicate);
+        index.selectCount--;
+        var altPlan = index.AltPlan.create({ subPlans: subPlans, prop: prop });
+
+        return index.CustomPlan.create({
+          cost: altPlan.cost,
+          customExecute: function(promise, sink, skip, limit, order, predicate) {
             var arrSink = index.ArraySink.create();
-            index.selectCount++;
-            subTree.select(arrSink, null, null, null, predicate);
-            index.selectCount--;
+            altPlan.execute(promise, arrSink, null, null, null, predicate);
             var a = arrSink.a;
             a.sort(toCompare(order));
 
@@ -394,22 +398,55 @@ foam.CLASS({
             limit += skip;
             limit = Math.min(a.length, limit);
 
-            for ( var i = skip; i < limit; i++ )
+            for ( var i = skip; i < limit; i++ ) {
               sink.put(a[i]);
-          } else {
-            index.selectCount++;
-            reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-              subTree.selectReverse(sink, [skip], [limit], order, predicate) :
-              subTree.select(sink, [skip], [limit], order, predicate) ;
-            index.selectCount--;
+            }
           }
-        },
-        customToString: function() {
-          return 'scan(key=' + prop.name + ', cost=' + this.cost +
-              (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
-              ')';
-        }
-      });
+        });
+      } else {
+        var subPlans = [];
+        index.selectCount++;
+        if ( this.prop.name === 'lastName' ) { console.time('lastName'); }
+        reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+          subTree.selectReverse(subPlans, sink, [skip], [limit], order, predicate) :
+          subTree.select(subPlans, sink, [skip], [limit], order, predicate) ;
+        index.selectCount--;
+        if ( this.prop.name === 'lastName' ) { console.timeEnd('lastName'); }
+        return index.AltPlan.create({ subPlans: subPlans, prop: prop });
+      }
+
+//       return index.CustomPlan.create({
+//         cost: cost,
+//         customExecute: function(promise, sink, skip, limit, order, predicate) {
+//           if ( sortRequired ) {
+//             var arrSink = index.ArraySink.create();
+//             index.selectCount++;
+//             subTree.select(arrSink, null, null, null, predicate);
+//             index.selectCount--;
+//             var a = arrSink.a;
+//             a.sort(toCompare(order));
+
+//             skip = skip || 0;
+//             limit = Number.isFinite(limit) ? limit : a.length;
+//             limit += skip;
+//             limit = Math.min(a.length, limit);
+
+//             for ( var i = skip; i < limit; i++ )
+//               sink.put(a[i]);
+//           } else {
+//             index.selectCount++;
+//             reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+//               subTree.selectReverse(sink, [skip], [limit], order, predicate) :
+//               subTree.select(sink, [skip], [limit], order, predicate) ;
+//             index.selectCount--;
+//           }
+//         },
+//         customToString: function() {
+//           return 'trie_scan(key=' + prop.name + ', cost=' + this.cost +
+//               (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
+//               ')';
+//         }
+//       });
     },
 
     function toString() {

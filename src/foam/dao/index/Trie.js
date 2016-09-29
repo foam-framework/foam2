@@ -88,7 +88,7 @@ foam.CLASS({
       this.tail && tailArray.push(this.tail);
       var subTails = this.subTails;
       if ( subTails ) {
-        for ( var st in subTails ) {  
+        for ( var st in subTails ) {
           tailArray.push(subTails[st]);
         }
       }
@@ -98,7 +98,7 @@ foam.CLASS({
       }
     },
 
-    function putKeyValue(/* array */key, value, offset, nodeFactory, tailFactory, locked, tailRef) {      
+    function putKeyValue(/* array */key, value, offset, nodeFactory, tailFactory, locked, tailRef) {
       // tailRef is the tail index created for the full string. Each substring added to the trie can just
       // reference that tail index rather than create a new tail. If substrings are not desired, supply an
       // empty tailRef array [].
@@ -111,7 +111,7 @@ foam.CLASS({
           s.subTails[tailRef[1]] = tailRef[0];
         } else {
           if ( s.tail ) {
-            s.size -= s.tail.size();      
+            s.size -= s.tail.size();
           } else {
             s.tail = tailFactory.create();
             // Only set tailRef if adding a new index, so substring references can be added.
@@ -121,7 +121,7 @@ foam.CLASS({
             tailRef[1] = key.join("");
           }
           s.tail.put(value);
-          s.size += s.tail.size();    
+          s.size += s.tail.size();
         }
       } else {
         var k = key[offset];
@@ -130,23 +130,23 @@ foam.CLASS({
         if ( child ) {
           s.size -= child.size;
           // next character
-          child = child.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, locked, tailRef); 
+          child = child.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, locked, tailRef);
           s.children[k] = child;
           s.size += child.size;
         } else {
           var newchild = nodeFactory.create({ key: k });
-          // new node, ignore 'locked'          
-          newchild.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, false, tailRef); 
+          // new node, ignore 'locked'
+          newchild.putKeyValue(key, value, offset + 1, nodeFactory, tailFactory, false, tailRef);
           s.children[k] = newchild;
           s.size += newchild.size;
         }
-      }   
+      }
       return s;
     },
 
-    function removeKeyValue(/* array */key, value, offset, locked, tailRef) {      
+    function removeKeyValue(/* array */key, value, offset, locked, tailRef) {
       var s = this.maybeClone(locked);
-      
+
       // if we're at the end of the key, our tail is the subindex to use
       if ( offset >= key.length ) {
         if ( tailRef[1] ) { // we are removing a substring, so don't use the primary tail
@@ -159,7 +159,7 @@ foam.CLASS({
             s.tail = null;
           }
         }
-      } else {     
+      } else {
         var k = key[offset];
         var child = s.children[k];
         if ( child ) {
@@ -171,17 +171,17 @@ foam.CLASS({
           } else {
             delete s.children[k];
           }
-        } 
+        }
       }
       // if empty, remove self
       if ( Object.keys(s.children).length < 1 && ! s.tail ) {
         return;
       }
-    
+
       return s;
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select(subPlans, sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -191,12 +191,12 @@ foam.CLASS({
 
       var cs = this.children;
       for ( var c in cs ) {
-        cs[c].select(sink, skip, limit, order, predicate);
+        cs[c].select(subPlans, sink, skip, limit, order, predicate);
       }
-      this.value && this.value.select(sink, skip, limit, order, predicate);
+      this.value && subPlans.push(this.value.plan(sink, skip, limit, order, predicate));
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
+    function selectReverse(subPlans, sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
 
@@ -208,11 +208,11 @@ foam.CLASS({
 
       var cs = this.children;
       for ( var c in cs ) {
-        cs[c].select(sink, skip, limit, order, predicate);
+        cs[c].select(subPlans, sink, skip, limit, order, predicate);
       }
-      this.value && this.value.select(sink, skip, limit, order, predicate);
+      this.value && subPlans.push(this.value.plan(sink, skip, limit, order, predicate));
     },
-    
+
     function print() {
       var cs = this.children;
       var ret = "{n:"+this.key+(this.value?" V":"") + ":";

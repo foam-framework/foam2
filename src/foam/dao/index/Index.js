@@ -56,11 +56,11 @@ foam.CLASS({
     function size() {},
 
     /** Selects matching items from the index and puts them into sink */
-    function select(/*sink, skip, limit, order, predicate*/) { },
+    function select(/*subPlans, sink, skip, limit, order, predicate*/) { },
 
     /** Selects matching items in reverse order from the index and puts
       them into sink */
-    function selectReverse(/*sink, skip, limit, order, predicate*/) { },
+    function selectReverse(/*subPlans, sink, skip, limit, order, predicate*/) { },
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},
@@ -92,12 +92,12 @@ foam.CLASS({
 
     function size() { return this.delegate.size(); },
 
-    function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(sink, skip, limit, order, predicate);
+    function select(subPlans, sink, skip, limit, order, predicate) {
+      return this.delegate.select(subPlans, sink, skip, limit, order, predicate);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
-      return this.delegate.selectReverse(sink, skip, limit, order, predicate);
+    function selectReverse(subPlans, sink, skip, limit, order, predicate) {
+      return this.delegate.selectReverse(subPlans, sink, skip, limit, order, predicate);
     },
 
     function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
@@ -143,15 +143,16 @@ foam.CLASS({
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function plan() { return this; },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select(subPlans, sink, skip, limit, order, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;
-      sink.put(this.value);
+      //sink.put(this.value);
+      subPlans.push(this);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
-      this.select(sink, skip, limit, order, predicate);
+    function selectReverse(subPlans, sink, skip, limit, order, predicate) {
+      this.select(subPlans, sink, skip, limit, order, predicate);
     }
   ]
 });

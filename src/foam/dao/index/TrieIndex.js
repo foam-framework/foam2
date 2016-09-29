@@ -107,9 +107,9 @@ foam.CLASS({
       this.root = this.treeNodeFactory.create();
 
       this.dedup = null;
-      
+
     },
-    
+
     /**
      * Bulk load an unsorted array of objects.
      **/
@@ -119,7 +119,7 @@ foam.CLASS({
         this.put(a[i]);
       }
     },
-    
+
     function extractKey(obj) {
       return this.prop.f(obj).split("");
     },
@@ -127,7 +127,7 @@ foam.CLASS({
     function put(newValue) {
       var tailRef = [];
       key = this.extractKey(newValue);
-      
+
       for ( var start = 0; start < key.length; start++ ) {
         this.root = this.root.putKeyValue(
           key,
@@ -139,16 +139,16 @@ foam.CLASS({
           tailRef);
 
         // only continue adding substring references if we add a new index
-        if ( ! tailRef[0] ) break; 
+        if ( ! tailRef[0] ) break;
       }
-      
-      
+
+
     },
 
     function remove(value) {
       key = this.extractKey(value);
       var tailRef = [];
-      
+
       for ( var start = 0; start < key.length; start++ ) {
         this.root = this.root.removeKeyValue(
           key,
@@ -157,7 +157,7 @@ foam.CLASS({
           this.selectCount > 0,
           tailRef);
         // only clean up substring references if we add a removed the entire index
-        if ( ! tailRef[0] ) break; 
+        if ( ! tailRef[0] ) break;
       }
     },
 
@@ -171,7 +171,7 @@ foam.CLASS({
       //   var r = this.root.get(key, start);
       //   if ( r ) indexes = indexes.concat(r);
       // }
-      
+
       // dedup return array
       // var ret = [];
 //       for ( var d = 0; d < indexes.length - 1; d++ ) {
@@ -343,14 +343,18 @@ foam.CLASS({
         if ( limit ) cost = Math.min(cost, limit);
       }
 
-      return index.CustomPlan.create({
-        cost: cost,
-        customExecute: function(promise, sink, skip, limit, order, predicate) {
-          if ( sortRequired ) {
+      if ( sortRequired ) {
+        var subPlans = [];
+        index.selectCount++;
+        subTree.select(subPlans, arrSink, null, null, null, predicate);
+        index.selectCount--;
+        var altPlan = index.AltPlan.create({ subPlans: subPlans });
+
+        return index.CustomPlan.create({
+          cost: altPlan.cost,
+          customExecute: function(promise, sink, skip, limit, order, predicate) {
             var arrSink = index.ArraySink.create();
-            index.selectCount++;
-            subTree.select(arrSink, null, null, null, predicate);
-            index.selectCount--;
+            altPlan.execute(promise, arrSink, null, null, null, predicate);
             var a = arrSink.a;
             a.sort(toCompare(order));
 
@@ -359,22 +363,53 @@ foam.CLASS({
             limit += skip;
             limit = Math.min(a.length, limit);
 
-            for ( var i = skip; i < limit; i++ )
+            for ( var i = skip; i < limit; i++ ) {
               sink.put(a[i]);
-          } else {
-            index.selectCount++;
-            reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-              subTree.selectReverse(sink, [skip], [limit], order, predicate) :
-              subTree.select(sink, [skip], [limit], order, predicate) ;
-            index.selectCount--;
+            }
           }
-        },
-        customToString: function() {
-          return 'trie_scan(key=' + prop.name + ', cost=' + this.cost +
-              (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
-              ')';
-        }
-      });
+        });
+      } else {
+        var subPlans = [];
+        index.selectCount++;
+        reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+          subTree.selectReverse(subPlans, sink, [skip], [limit], order, predicate) :
+          subTree.select(subPlans, sink, [skip], [limit], order, predicate) ;
+        index.selectCount--;
+        return index.AltPlan.create({ subPlans: subPlans });
+      }
+
+//       return index.CustomPlan.create({
+//         cost: cost,
+//         customExecute: function(promise, sink, skip, limit, order, predicate) {
+//           if ( sortRequired ) {
+//             var arrSink = index.ArraySink.create();
+//             index.selectCount++;
+//             subTree.select(arrSink, null, null, null, predicate);
+//             index.selectCount--;
+//             var a = arrSink.a;
+//             a.sort(toCompare(order));
+
+//             skip = skip || 0;
+//             limit = Number.isFinite(limit) ? limit : a.length;
+//             limit += skip;
+//             limit = Math.min(a.length, limit);
+
+//             for ( var i = skip; i < limit; i++ )
+//               sink.put(a[i]);
+//           } else {
+//             index.selectCount++;
+//             reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+//               subTree.selectReverse(sink, [skip], [limit], order, predicate) :
+//               subTree.select(sink, [skip], [limit], order, predicate) ;
+//             index.selectCount--;
+//           }
+//         },
+//         customToString: function() {
+//           return 'trie_scan(key=' + prop.name + ', cost=' + this.cost +
+//               (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
+//               ')';
+//         }
+//       });
     },
 
     function toString() {
@@ -390,17 +425,17 @@ foam.CLASS({
   extends: 'foam.dao.index.TrieIndex',
 
   methods: [
-    
+
     function extractKey(obj) {
       return this.prop.f(obj).toLowerCase().split("");
     },
-    
+
     function get(key) {
       //TODO: repeat for each suffix?
       // does not delve into sub-indexes
       return this.SUPER(key.toLowerCase());
     },
 
-    
+
   ]
 });
