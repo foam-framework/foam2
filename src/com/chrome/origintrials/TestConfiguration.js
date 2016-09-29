@@ -26,6 +26,13 @@ foam.CLASS({
     'applicationDAO'
   ],
   methods: [
+    function genTestData() {
+      var data = [];
+      for ( var i = 0 ; i < 100 ; i++ ) {
+        data.push(this.genApplication());
+      }
+      return data;
+    },
     function genApplication() {
       var names = [ 'Adam', 'Alex', 'Kevin', 'Braden', 'Jackson' ];
       var emails = [ 'adamvy@google.com', 'kgr@google.com', 'foo@example.com', 'unknown@somehwere.asdfasdf' ];
@@ -38,7 +45,7 @@ foam.CLASS({
       }
       function bool() { return Math.random() < 0.5; }
 
-      return this.Application.create({
+      return {
         applicantName: rand(names),
         applicantEmail: rand(emails),
         origin: rand(origins),
@@ -46,7 +53,7 @@ foam.CLASS({
         requestedFeature: rand(features),
         agreedToTerms: bool(),
         comments: rand(comments)
-      });
+      };
     }
   ],
   properties: [
@@ -56,12 +63,9 @@ foam.CLASS({
         var dao = this.EasyDAO.create({
           of: this.Application,
           guid: true,
-          daoType: 'MDAO'
+          daoType: 'MDAO',
+          testData: this.genTestData()
         });
-
-        for ( var i = 0 ; i < 50 ; i++ ) {
-          dao.put(this.genApplication());
-        }
 
         return dao;
       }
