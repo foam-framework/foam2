@@ -20,10 +20,6 @@ foam.CLASS({
   name: 'ScrollCView',
   extends: 'foam.graphics.CView',
 
-  imports: [
-    'pointer'
-  ],
-
   properties: [
     {
       class: 'Int',
@@ -143,7 +139,7 @@ foam.CLASS({
 
   methods: [
     function initCView() {
-      this.pointer.touch.sub(this.onTouch);
+      this.canvas.pointer.touch.sub(this.onTouch);
     },
 
     function yToValue(y) {
