@@ -47,7 +47,7 @@ foam.CLASS({
     function remove(/*o*/) {},
 
     /** @return a Plan to execute a select with the given parameters */
-    function plan(/*sink, skip, limit, order, predicate*/) {},
+    function plan(/*sink, skip, limit, order, predicate, selfs*/) {},
 
     /** @return the stored value for the given key. */
     function get(/*key*/) {},
@@ -84,8 +84,8 @@ foam.CLASS({
 
     function remove(o) { return this.delegate.remove(o); },
 
-    function plan(sink, skip, limit, order, predicate) {
-      return this.delegate.plan(sink, skip, limit, order, predicate);
+    function plan(sink, skip, limit, order, predicate, selfs) {
+      return this.delegate.plan(sink, skip, limit, order, predicate, selfs);
     },
 
     function get(key) { return this.delegate.get(key); },
@@ -114,6 +114,9 @@ foam.CLASS({
   name: 'ValueIndex',
   extends: 'foam.dao.index.Index',
   implements: [ 'foam.dao.index.Plan' ],
+  requires: [
+    'foam.dao.index.AltPlan',
+  ],
 
   properties: [
     { class: 'Simple',  name: 'value' },
@@ -141,7 +144,11 @@ foam.CLASS({
     function remove() { this.value = undefined; },
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
-    function plan() { return this; },
+    function plan(sink, skip, limit, order, predicate, selfs) {
+      // if mutliple instances, return an alt plan with the list
+      if ( ! selfs ) return this;
+      return this.AltPlan.create({ subPlans: selfs });
+    },
 
     function select(subPlans, sink, skip, limit, order, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
@@ -174,6 +181,8 @@ foam.CLASS({
 
   properties: [
     {
+      // TODO: this won't work if used as a tail under a TreeIndex.
+      // state for the delegates must be per node
       name: 'delegates',
       factory: function() { return []; }
     }
@@ -213,10 +222,13 @@ foam.CLASS({
       }
     },
 
-    function plan(sink, skip, limit, order, predicate) {
+    //TODO: select() support?
+
+    function plan(sink, skip, limit, order, predicate, selfs) {
       var bestPlan;
       //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        // TODO: this should be selfs[j].delegates[i]
         var plan = this.delegates[i].plan(sink, skip, limit, order, predicate);
         // console.log('  plan ' + i + ': ' + plan);
         if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
@@ -258,9 +270,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function plan(sink, skip, limit, order, predicate) {
+    function plan(sink, skip, limit, order, predicate, selfs) {
       if ( ! predicate || ! this.Or.isInstance(predicate) ) {
-        return this.delegate.plan(sink, skip, limit, order, predicate);
+        return this.delegate.plan(sink, skip, limit, order, predicate,
+          selfs && selfs.map(function(o) { return o.delegate; }));
       }
 
       // TODO: check how ordering is handled in existing TreeIndex etc.

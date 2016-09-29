@@ -190,7 +190,8 @@ foam.CLASS({
     },
 
 
-    function plan(sink, skip, limit, order, predicate) {
+    function plan(sink, skip, limit, order, predicate, selfs) {
+      if ( selfs ) throw "Multi index plan not implemented in TrieIndex";
       var index = this;
 
       if ( index.False.isInstance(predicate) ) return this.NotFoundPlan.create();

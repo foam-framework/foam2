@@ -381,7 +381,7 @@ describe("Index benchmarks", function() {
         ),
         foam.async.atest(
           'Run predicate set B with AutoIndex Again(already indexed) 100 times',
-          foam.async.repeat(0, foam.async.repeat(SAMPLE_B.length,
+          foam.async.repeat(2, foam.async.repeat(SAMPLE_B.length,
             function(i) {
               return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];
@@ -397,7 +397,7 @@ describe("Index benchmarks", function() {
         foam.async.sleep(2000),
         foam.async.atest(
           'Run predicate set B no index 100 times',
-          foam.async.repeat(0, foam.async.repeat(SAMPLE_B.length,
+          foam.async.repeat(2, foam.async.repeat(SAMPLE_B.length,
             function(i) {
               return foam.async.atest('N-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];

@@ -100,7 +100,10 @@ foam.CLASS({
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
-    function plan(sink, skip, limit, order, predicate) {
+    // selfs is an array of this type of index, when index.select()
+    //   calls plan for a collection of matching tails
+    function plan(sink, skip, limit, order, predicate, selfs) {
+      if ( selfs ) throw "select support in AutoIndex not implemented";
       if ( predicate ) {
         this.baseAltIndex; // trigger universal index creation if needed
         if ( this.existingIndexes[predicate] ) {

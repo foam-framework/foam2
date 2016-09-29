@@ -212,8 +212,10 @@ foam.CLASS({
       return foam.util.compare(o1, o2);
     },
 
-    function plan(sink, skip, limit, order, predicate) {
+    function plan(sink, skip, limit, order, predicate, selfs) {
       var index = this;
+
+      if ( ! selfs ) selfs = [ this ];
 
       if ( index.False.isInstance(predicate) ) return this.NotFoundPlan.create();
 
@@ -328,7 +330,9 @@ foam.CLASS({
         }
 
         var indexes = [];
-        this.root.getAll(key, compareSubstring, indexes);
+        for ( var i = 0; i < selfs.length; i++ ) {
+          selfs[i].root.getAll(key, compareSubstring, indexes);
+        }
         var subPlans = [];
         // iterate over all keys
         for ( var i = 0; i < indexes.length; i++ ) {
@@ -343,21 +347,44 @@ foam.CLASS({
 
 
       // Restrict the subtree to search as necessary
-      var subTree = this.root;
+      var subTrees = [];
+      for ( var i = 0; i < selfs.length; i++ ) {
+        subTrees[i] = selfs[i].root;
+      }
 
       arg2 = isExprMatch(this.Gt);
-      if ( arg2 ) subTree = subTree.gt(arg2.f(), this.compare);
+      if ( arg2 ) {
+        for ( var i = 0; i < selfs.length; i++ ) {
+          subTrees[i] = subTrees[i].gt(arg2.f(), this.compare);
+        }
+      }
 
       arg2 = isExprMatch(this.Gte);
-      if ( arg2 ) subTree = subTree.gte(arg2.f(), this.compare);
+      if ( arg2 ) {
+        for ( var i = 0; i < selfs.length; i++ ) {
+          subTrees[i] = subTrees[i].gte(arg2.f(), this.compare);
+        }
+      }
 
       arg2 = isExprMatch(this.Lt);
-      if ( arg2 ) subTree = subTree.lt(arg2.f(), this.compare);
+      if ( arg2 ) {
+        for ( var i = 0; i < selfs.length; i++ ) {
+          subTrees[i] = subTrees[i].lt(arg2.f(), this.compare);
+        }
+      }
 
       arg2 = isExprMatch(this.Lte);
-      if ( arg2 ) subTree = subTree.lte(arg2.f(), this.compare);
+      if ( arg2 ) {
+        for ( var i = 0; i < selfs.length; i++ ) {
+          subTrees[i] = subTrees[i].lte(arg2.f(), this.compare);
+        }
+      }
 
-      cost = subTree.size;
+
+      cost = 0;
+      for ( var i = 0; i < selfs.length; i++ ) {
+        cost += subTrees[i].size;
+      }
       var sortRequired = false;
       var reverseSort = false;
 
@@ -379,17 +406,22 @@ foam.CLASS({
       }
 
       if ( sortRequired ) {
-        var subPlans = [];
+        var tails = [];
         index.selectCount++;
-        subTree.select(subPlans, arrSink, null, null, null, predicate);
+        for ( var i = 0; i < selfs.length; i++ ) {
+          subTrees[i].select(tails, arrSink, null, null, null, predicate);
+        }
         index.selectCount--;
-        var altPlan = index.AltPlan.create({ subPlans: subPlans, prop: prop });
+
+        if ( tails.length < 1 ) return this.NotFoundPlan.create();
+
+        var tailPlan = tails[0].plan(arrSink, null, null, null, predicate);
 
         return index.CustomPlan.create({
-          cost: altPlan.cost,
+          cost: tailPlan.cost,
           customExecute: function(promise, sink, skip, limit, order, predicate) {
             var arrSink = index.ArraySink.create();
-            altPlan.execute(promise, arrSink, null, null, null, predicate);
+            tailPlan.execute(promise, arrSink, null, null, null, predicate);
             var a = arrSink.a;
             a.sort(toCompare(order));
 
@@ -404,15 +436,20 @@ foam.CLASS({
           }
         });
       } else {
-        var subPlans = [];
+        var tails = [];
         index.selectCount++;
-        if ( this.prop.name === 'lastName' ) { console.time('lastName'); }
-        reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-          subTree.selectReverse(subPlans, sink, [skip], [limit], order, predicate) :
-          subTree.select(subPlans, sink, [skip], [limit], order, predicate) ;
+        for ( var i = 0; i < selfs.length; i++ ) {
+          reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+            subTrees[i].selectReverse(tails, sink, [skip], [limit], order, predicate) :
+            subTrees[i].select(tails, sink, [skip], [limit], order, predicate) ;
+        }
         index.selectCount--;
-        if ( this.prop.name === 'lastName' ) { console.timeEnd('lastName'); }
-        return index.AltPlan.create({ subPlans: subPlans, prop: prop });
+        //assert tails.length > 0
+        // Pass tails into plan() for that index. index.plan() should know what to do
+        //  with multiple instances of itself.
+        if ( tails.length < 1 ) return this.NotFoundPlan.create();
+        return tails[0].plan(sink, [skip], [limit], order, predicate, tails);
+
       }
 
 //       return index.CustomPlan.create({

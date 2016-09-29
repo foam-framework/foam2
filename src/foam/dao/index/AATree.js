@@ -283,7 +283,7 @@ foam.CLASS({
       return s;
     },
 
-    function select(subPlans, sink, skip, limit, order, predicate) {
+    function select(tailIndexes, sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -291,15 +291,12 @@ foam.CLASS({
         return;
       }
 
-      this.left.select(subPlans, sink, skip, limit, order, predicate);
-
-      //this.value.select(sink, skip, limit, order, predicate);
-      subPlans.push(this.value.plan(sink, skip, limit, order, predicate));
-
-      this.right.select(subPlans, sink, skip, limit, order, predicate);
+      this.left.select(tailIndexes, sink, skip, limit, order, predicate);
+      tailIndexes.push(this.value);
+      this.right.select(tailIndexes, sink, skip, limit, order, predicate);
     },
 
-    function selectReverse(subPlans, sink, skip, limit, order, predicate) {
+    function selectReverse(tailIndexes, sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
 
@@ -309,12 +306,9 @@ foam.CLASS({
         return;
       }
 
-      this.right.selectReverse(subPlans, sink, skip, limit, order, predicate);
-
-      //this.value.selectReverse(sink, skip, limit, order, predicate);
-      subPlans.push(this.value.plan(sink, skip, limit, order, predicate));
-
-      this.left.selectReverse(subPlans, sink,  skip, limit, order, predicate);
+      this.right.selectReverse(tailIndexes, sink, skip, limit, order, predicate);
+      tailIndexes.push(this.value);
+      this.left.selectReverse(tailIndexes, sink,  skip, limit, order, predicate);
     },
 
     function gt(key, compare) {
