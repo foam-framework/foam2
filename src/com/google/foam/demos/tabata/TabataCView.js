@@ -38,17 +38,14 @@ foam.CLASS({
        var seconds = self.data.seconds;
        if ( seconds === self.second ) {
          self.alpha = 1;
-//         self.color = self.border;
-         self.radius = 7;
+         self.radius = 10;
          self.shadowBlur = 15;
        } else if ( seconds > self.second ) {
-         self.alpha = 0.4;
-//         self.color = 'white';
+         self.alpha = 0;
          self.radius = 1;
          self.shadowBlur = 0;
        } else {
          self.alpha = 1;
-//         self.color = 'white';
          self.radius = 4;
          self.shadowBlur = 0;
        }
@@ -86,7 +83,7 @@ foam.CLASS({
 
      for ( var r = 0 ; r < d.rounds ; r++ ) {
        var n = d.workTime + d.restTime;
-       for ( var i = r ? 0 : d.restTime - d.warmupTime ; i < n ; i++ ) {
+       for ( var i = r ? 0 : d.restTime - d.setupTime ; i < n ; i++ ) {
          var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
          var c = this.Tick.create({
            arcWidth: 2,
@@ -101,18 +98,22 @@ foam.CLASS({
        }
      }
 
+     var colors = {
+       Rest: 'red',
+       Finished: 'gray',
+       "WORK!": 'green',
+       Warmup: 'gray'
+     };
+
      var round = this.Circle.create({
-       border: 'gray',
+       border$: d.action$.map(function(s) { return colors[s]; }),
+       radius$: d.currentRound$.map(function(round) { return R - round * 16; }),
        arcWidth: 20,
        color: null,
        alpha: 0.1,
        x: this.width  / 2,
        y: this.height / 2
      });
-
-     var l = function() { round.radius = R - d.currentRound * 16; };
-     d.currentRound$.sub(l);
-     l();
 
      this.addChildren(round);
    }
