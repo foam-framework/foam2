@@ -38,17 +38,17 @@ foam.CLASS({
        var seconds = self.data.seconds;
        if ( seconds === self.second ) {
          self.alpha = 1;
-         self.color = self.border;
+//         self.color = self.border;
          self.radius = 7;
          self.shadowBlur = 15;
        } else if ( seconds > self.second ) {
-         self.alpha = 0.3;
-         self.color = 'white';
-         self.radius = 3;
+         self.alpha = 0.4;
+//         self.color = 'white';
+         self.radius = 1;
          self.shadowBlur = 0;
        } else {
          self.alpha = 1;
-         self.color = 'white';
+//         self.color = 'white';
          self.radius = 4;
          self.shadowBlur = 0;
        }
@@ -62,7 +62,7 @@ foam.CLASS({
   name: 'TabataCView',
   extends: 'foam.graphics.CView',
 
-  requires: [ 'Tick' ],
+  requires: [ 'foam.graphics.Circle', 'Tick' ],
 
   exports: [ 'data' ],
 
@@ -81,20 +81,40 @@ foam.CLASS({
 //     this.second$.sub(function() { self.invalidated.pub(); });
 
      var d = this.data;
+     var second = 0;
+     var R = Math.min(this.width, this.height)/2;
+
      for ( var r = 0 ; r < d.rounds ; r++ ) {
        var n = d.workTime + d.restTime;
-       for ( var i = 0 ; i < n ; i++ ) {
+       for ( var i = r ? 0 : d.restTime - d.warmupTime ; i < n ; i++ ) {
+         var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
          var c = this.Tick.create({
            arcWidth: 2,
-           border: i < d.workTime ? 'green' : 'red',
-           x: this.width  / 2 + (this.width/2  - (r+1) * 16) * Math.cos(-Math.PI/2 + i/n*Math.PI*2),
-           y: this.height / 2 + (this.height/2 - (r+1) * 16) * Math.sin(-Math.PI/2 + i/n*Math.PI*2),
-           radius: 5,
-           second: d.warmupTime + r * n + i
+           color: i > d.restTime ? '#0e0' : 'white',
+           border: i > d.restTime ? '#0e0' : r ? 'red' : 'gray',
+           x: this.width/2  + (R - (r+1) * 16) * Math.cos(a),
+           y: this.height/2 + (R - (r+1) * 16) * Math.sin(a),
+           radius: 4,
+           second: second++
          });
          this.addChildren(c);
        }
      }
+
+     var round = this.Circle.create({
+       border: 'gray',
+       arcWidth: 20,
+       color: null,
+       alpha: 0.1,
+       x: this.width  / 2,
+       y: this.height / 2
+     });
+
+     var l = function() { round.radius = R - d.currentRound * 16; };
+     d.currentRound$.sub(l);
+     l();
+
+     this.addChildren(round);
    }
   ]
 });
