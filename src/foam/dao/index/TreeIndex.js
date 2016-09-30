@@ -415,7 +415,7 @@ foam.CLASS({
 
         if ( tails.length < 1 ) return this.NotFoundPlan.create();
 
-        var tailPlan = tails[0].plan(arrSink, null, null, null, predicate);
+        var tailPlan = tails[0].plan(arrSink, null, null, null, predicate, tails);
 
         return index.CustomPlan.create({
           cost: tailPlan.cost,
@@ -440,15 +440,21 @@ foam.CLASS({
         index.selectCount++;
         for ( var i = 0; i < selfs.length; i++ ) {
           reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-            subTrees[i].selectReverse(tails, sink, [skip], [limit], order, predicate) :
-            subTrees[i].select(tails, sink, [skip], [limit], order, predicate) ;
+            subTrees[i].selectReverse(tails, sink, 
+              skip > 0 ? [skip] : undefined, 
+              limit > 0 ? [limit] : undefined,
+              order, predicate) :
+            subTrees[i].select(tails, sink, 
+              skip > 0 ? [skip] : undefined, 
+              limit > 0 ? [limit] : undefined,
+              order, predicate);
         }
         index.selectCount--;
         //assert tails.length > 0
         // Pass tails into plan() for that index. index.plan() should know what to do
         //  with multiple instances of itself.
         if ( tails.length < 1 ) return this.NotFoundPlan.create();
-        return tails[0].plan(sink, [skip], [limit], order, predicate, tails);
+        return tails[0].plan(sink, skip, limit, order, predicate, tails);
 
       }
 
