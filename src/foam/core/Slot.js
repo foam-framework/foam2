@@ -386,7 +386,7 @@ foam.CLASS({
           args[i] = obj.slot(args[i]);
         }
 
-        this.invalidate();
+        // this.invalidate(); // ???: Is this needed?
         this.subToArgs_(args);
 
         return args;
