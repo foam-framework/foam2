@@ -65,13 +65,26 @@ foam.CLASS({
 
     function addUniversalIndexTo(toBase) {
       // build an index of all the properties of the object
-      var props = this.mdao.of$cls.getAxiomsByClass(this.Property);
-      var names = []
+      // var props = this.mdao.of$cls.getAxiomsByClass(this.Property);
+      // var names = []
+      var names = [ 
+              'color',
+              'sport', 
+              'event', 
+              'year', 
+              'country', 
+              'city', 
+              'discipline', 
+              'eventGender', 
+              'gender', 
+              'firstName',
+              'lastName'
+             ];
+      
       var index = this.mdao.idIndexFactory;
-      for ( var i = 0; i < props.length; i++ ) {
-        var prop = props[i];
+      for ( var i = names.length - 1; i >= 0; i-- ) {
+        var prop = this.mdao.of$cls.getAxiomByName(names[i]);
         index = prop.toIndex(index); // chain property indexes
-        names = [ prop.name ].concat(names); // prepend
       }
 
       console.log('Adding universal sig: ', names);

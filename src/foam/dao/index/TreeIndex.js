@@ -335,14 +335,8 @@ foam.CLASS({
         }
         var subPlans = [];
         // iterate over all keys
-        for ( var i = 0; i < indexes.length; i++ ) {
-          subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate));
-        }
-
-        return index.AltPlan.create({
-          subPlans: subPlans,
-          prop: prop
-        });
+        if ( indexes.length < 1 ) return this.NotFoundPlan.create();
+        return indexes[0].plan(sink, skip, limit, order, predicate, indexes);
       }
 
 
