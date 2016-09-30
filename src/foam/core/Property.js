@@ -352,14 +352,18 @@ foam.CLASS({
           if ( v !== undefined ) return v;
           // Indicate the Factory In Progress state
           if ( fip > 10 && this.getPrivate_(FIP) ) {
-            console.warn('reentrant factory', name);
+            console.warn('reentrant factory for property:', name);
             return undefined;
           }
 
           var oldFip = fip;
           fip++;
           if ( oldFip === 10 ) this.setPrivate_(FIP, true);
-          this[name] = factory.call(this, prop);
+          var v = factory.call(this, prop);
+          // Convert undefined to null because undefined means that the
+          // value hasn't been set but it has. Setting it to undefined
+          // would prevent propertyChange events if the value were cleared.
+          this[name] = v === undefined ? null : v;
           if ( oldFip === 10 ) this.clearPrivate_(FIP);
           fip--;
 
@@ -379,7 +383,7 @@ foam.CLASS({
       // TODO: experiment to see if a simpler setter for Properties which
       // don't use any of the options is faster.
       var setter = prop.setter ? prop.setter :
-        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ? 
+        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ?
         function simplePropSetter(newValue) {
           if ( newValue === undefined ) {
             this.clearProperty(name);
