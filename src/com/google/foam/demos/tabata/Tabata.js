@@ -95,6 +95,7 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         var t = this.Timer.create();
+t.timeWarp = 10;
         this.seconds$ = t.time$.map(function(t) { return Math.floor(t / 1000); });
         return t;
       }
@@ -107,6 +108,7 @@ foam.CLASS({
       hidden: true
     }
   ],
+
   methods: [
     function init() {
       this.elapsed$ = this.slot(function(seconds, roundStart) {
@@ -117,6 +119,7 @@ foam.CLASS({
       });
     }
   ],
+
   classes: [
     {
       name: 'Warmup',
@@ -180,6 +183,7 @@ foam.CLASS({
       ]
     }
   ],
+
   actions: [
     {
       name: 'start',
