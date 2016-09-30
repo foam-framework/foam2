@@ -37,30 +37,34 @@ foam.CLASS({
   ],
 
   constants: {
-    BATCH_SIZE: 20,
-    SMALL_ENOUGH_SIZE: 100
+    BATCH_SIZE: 1000,
+    SMALL_ENOUGH_SIZE: 1000
   },
 
   properties: [
     {
       name: 'sourceIndex',
-      postSet: function(old, nu) {
-        this.beginLoad();
-      }
     },
     {
       // TODO: state machine
+      class: 'Simple',
       name: 'loaded',
-      value: false
     },
     {
       /** @private */
+      class: 'Simple',
       name: 'ignoreList_',
-      hidden: true
     }
   ],
 
   methods: [
+    function init() {
+      this.loaded = false;
+      this.ignoreList_ = {};
+      
+      this.beginLoad();
+    },
+    
     function beginLoad() {
       this.loaded = false;
 
@@ -73,20 +77,20 @@ foam.CLASS({
         return;
       }
       this.ignoreList_ = {};
-      
+console.log(this.$UID, "PoliteIndex load started for ", this.sourceIndex.size());
       // otherwise load in batches
-      this.loadBatch(data.a, 0);
+      this.loadBatch(this, data.a, 0);
     },
     
     function put(o) {
       // if loading, use this change instead of source data, add ignore 
-      if ( ! this.loaded ) { this.ignoreList[o.id] = true; }
+      if ( ! this.loaded ) { this.ignoreList_[o.id] = true; }
       this.SUPER(o);
     },
 
     function remove(o) {
       // if loading, use this change instead of source data, add ignore  
-      if ( ! this.loaded ) { this.ignoreList[o.id] = true; }
+      if ( ! this.loaded ) { this.ignoreList_[o.id] = true; }
       this.SUPER(o);
     },    
     
@@ -100,29 +104,28 @@ foam.CLASS({
     function toString() {
       return 'PoliteIndex('+this.delegate.toString()+')';
     },
-  ],
-  
-  listeners: [
     {
       name: 'loadBatch',
-      framed: true,
-      code: function(a, startAt) {
-        // assert(this.loaded == false)
-        var endAt = Math.min(startAt + this.BATCH_SIZE, a.length);
+      code: function(self, a, startAt) { //TODO: lightweights make listeners weird
+
+        // assert(self.loaded == false)
+        var endAt = Math.min(startAt + self.BATCH_SIZE, a.length);
         for ( var i = startAt; i < endAt; i++ ) {
           var o = a[i];
-          if ( ! this.ignoreList_[o.id] ) {
-            this.delegate.put(o);
+          if ( ! self.ignoreList_[o.id] ) {
+            self.delegate.put(o);
           }
         }
         startAt = endAt;
         if ( startAt < a.length ) {
           // load next batch on next frame, since we are framed
-          this.loadBatch(a, startAt);
+          setTimeout(function() { self.loadBatch(self, a, startAt); }, 16);
         } else {
           // finished
-          this.loaded = true;
-          this.ignoreList_ = null;
+          self.loaded = true;
+          self.ignoreList_ = null;
+          console.log(self.$UID, "PoliteIndex load finished", self.sourceIndex.size());
+
         }
       }
     }

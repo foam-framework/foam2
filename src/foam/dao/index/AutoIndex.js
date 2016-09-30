@@ -30,6 +30,7 @@ foam.CLASS({
     'foam.dao.index.OrIndex',
     'foam.dao.index.AltIndex',
     'foam.dao.index.ValueIndex',
+    'foam.dao.index.PoliteIndex',
   ],
 
   properties: [

@@ -364,25 +364,27 @@ describe("Index benchmarks", function() {
       foam.async.sequence([
         foam.async.atest(
           'Run predicate set B with AutoIndex 100 times',
-          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
-            function(i) {
+          foam.async.repeat(100, foam.async.sequence([
+            foam.async.repeat(SAMPLE_B.length, function(i) {
               return foam.async.atest('A-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];
                 return autodao.where(pred).select();
               })();
-            }
-          ))
+            }),
+            foam.async.sleep(16)
+          ]))
         ),
         foam.async.atest(
           'Run predicate set B with AutoIndex Again(already indexed) 100 times',
-          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
-            function(i) {
+          foam.async.repeat(100, foam.async.sequence([
+            foam.async.repeat(SAMPLE_B.length, function(i) {
               return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];
                 return autodao.where(pred).select();
               })();
-            }
-          ))
+            }),
+            foam.async.sleep(16)            
+          ]))
         )
       ])
     ).then(function() {
@@ -391,14 +393,15 @@ describe("Index benchmarks", function() {
         foam.async.sleep(2000),
         foam.async.atest(
           'Run predicate set B no index 100 times',
-          foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
-            function(i) {
+          foam.async.repeat(100, foam.async.sequence([
+            foam.async.repeat(SAMPLE_B.length, function(i) {
               return foam.async.atest('N-Predicate '+SAMPLE_B[i].toString(), function() {
                 var pred = SAMPLE_B[i];
                 return dao.where(pred).select();
               })();
-            }
-          ))
+            }),
+            foam.async.sleep(16)
+          ]))
         ),
 
       ])).then(done);

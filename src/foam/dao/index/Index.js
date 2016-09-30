@@ -74,8 +74,8 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'delegate',
-      required: true
+      class: 'Simple',
+      name: 'delegate'
     }
   ],
 
@@ -161,6 +161,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.index.NoPlan',
+    'foam.dao.index.PoliteIndex'
   ],
 
   constants: {
@@ -177,13 +178,20 @@ foam.CLASS({
 
   methods: [
     function addIndex(index) {
-      // Populate the index
-      var a = foam.dao.ArraySink.create();
-      this.plan(a).execute([], a);
+      // TODO: refine when to pick a PoliteIndex for delayed loading
+      if ( this.delegates[0].size() > this.PoliteIndex.SMALL_ENOUGH_SIZE ) {
+        this.delegates.push(this.PoliteIndex.create({
+          delegate: index,
+          sourceIndex: this.delegates[0]
+        }));
+      } else {
+        // Populate the index
+        var a = foam.dao.ArraySink.create();
+        this.plan(a).execute([], a);
 
-      index.bulkLoad(a);
-      this.delegates.push(index);
-
+        index.bulkLoad(a);
+        this.delegates.push(index);
+      }
       return this;
     },
 
