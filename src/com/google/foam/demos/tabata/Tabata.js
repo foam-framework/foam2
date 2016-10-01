@@ -147,6 +147,7 @@ foam.CLASS({
           t.currentRound++;
           if ( t.currentRound >= t.rounds + 1 ) {
             t.state = t.Finish.create();
+            t.currentRound = t.rounds;
           } else {
             t.state = t.Rest.create();
           }

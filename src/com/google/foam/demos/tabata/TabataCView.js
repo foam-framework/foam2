@@ -59,7 +59,11 @@ foam.CLASS({
   name: 'TabataCView',
   extends: 'foam.graphics.CView',
 
-  requires: [ 'foam.graphics.Circle', 'Tick' ],
+  requires: [
+    'foam.graphics.Label',
+    'foam.graphics.Circle',
+    'Tick'
+  ],
 
   exports: [ 'data' ],
 
@@ -105,17 +109,47 @@ foam.CLASS({
        Warmup: 'gray'
      };
 
-     var round = this.Circle.create({
-       border$: d.action$.map(function(s) { return colors[s]; }),
-       radius$: d.currentRound$.map(function(round) { return R - round * 16; }),
-       arcWidth: 20,
-       color: null,
-       alpha: 0.1,
-       x: this.width  / 2,
-       y: this.height / 2
-     });
-
-     this.addChildren(round);
+     this.addChildren(
+       this.Circle.create({
+         border$: d.action$.map(function(s) { return colors[s]; }),
+         radius$: d.currentRound$.map(function(round) { return R - round * 16; }),
+         arcWidth: 20,
+         color: null,
+         alpha: 0.1,
+         x: this.width  / 2,
+         y: this.height / 2
+       }),
+       this.Label.create({
+         font: '50px Arial',
+         width: 60,
+         height: 60,
+         x: this.width  / 2 - 30,
+         y: this.height / 2 - 20,
+         align: 'center',
+         color$: d.action$.map(function(s) { return colors[s]; }),
+         text$: d.action$
+       }),
+       this.Label.create({
+         font: '30px Arial',
+         width: 60,
+         height: 60,
+         x: this.width  / 2 - 30,
+         y: this.height / 2 - 85,
+         align: 'center',
+         color: 'gray',
+         text$: d.slot(function(currentRound, rounds) { return currentRound + ' / ' + rounds; })
+       }),
+       this.Label.create({
+         font: '40px Arial',
+         width: 60,
+         height: 60,
+         x: this.width  / 2 - 30,
+         y: this.height / 2 + 35,
+         align: 'center',
+         color$: d.action$.map(function(s) { return colors[s]; }),
+         text$: d.remaining$.map(function(s) { return s; })
+       })
+     );
    }
   ]
 });
