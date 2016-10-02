@@ -162,6 +162,7 @@ foam.CLASS({
               end();
           }, true).
         end().
+
         add(this.SHOW);
     }
   ],
@@ -207,3 +208,4 @@ foam.CLASS({
 // DAO.put(null) didn't give meaningful error
 // Typo causing null to pass to Element.add()
 // Problems getting rid of CSS
+// Set Slot to non Slot
