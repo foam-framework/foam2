@@ -177,3 +177,57 @@ foam.CLASS({
    }
   ]
 });
+
+
+foam.CLASS({
+  name: 'TabataBarCView',
+  extends: 'foam.graphics.Box',
+
+  requires: [
+    'foam.graphics.Label',
+    'foam.graphics.Box'
+  ],
+
+  exports: [ 'data' ],
+
+  properties: [
+    [ 'color', 'black' ],
+    [ 'width',  100 ],
+    [ 'height', 500 ],
+    [ 'autoRepaint', true ],
+    'data'
+  ],
+
+  methods: [
+   function initCView() {
+     this.SUPER();
+
+     var d = this.data;
+     var second = 0;
+     var seconds = d.rounds * ( d.workTime + d.restTime ) - d.restTime + d.setupTime;
+
+     for ( var r = 0 ; r < d.rounds ; r++ ) {
+       var restTime = r ? d.restTime : d.setupTime;
+
+       this.addChildren(
+         this.Box.create({
+           color: r ? '#f00' : 'yellow',
+           x: 30,
+           y: second / seconds * this.height,
+           width : this.width - 20,
+           height: restTime / seconds * this.height
+         }),
+         this.Box.create({
+           color: '#0f0',
+           x: 30,
+           y: (second+restTime) / seconds * this.height,
+           width : this.width - 20,
+           height: d.workTime / seconds * this.height
+         })
+       );
+       second += d.workTime;
+       second += restTime;
+     }
+   }
+  ]
+});
