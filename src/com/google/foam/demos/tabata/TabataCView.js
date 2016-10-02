@@ -22,15 +22,29 @@ foam.CLASS({
   imports: [ 'data' ],
 
   properties: [
+    'maxRadius',
+    'position',
+    'round',
     'second',
-    'ring'
+    [ 'arcWidth', 2 ],
+    [ 'radius', 4 ]
   ],
 
   methods: [
-   function initCView() {
+   function init() {
      this.SUPER();
 
      var self = this;
+     var d = this.data;
+     var i = this.position;
+     var r = this.round;
+     var n = d.workTime + d.restTime;
+     var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
+
+     this.color  = i > d.restTime ? '#0e0' : 'white';
+     this.border = i > d.restTime ? '#0e0' : r ? 'red' : 'gray';
+     this.x     += (this.maxRadius - (r+1) * 16) * Math.cos(a);
+     this.y     += (this.maxRadius - (r+1) * 16) * Math.sin(a);
 
      this.shadowColor = this.border;
 
@@ -81,24 +95,21 @@ foam.CLASS({
 //     var self = this;
 //     this.second$.sub(function() { self.invalidated.pub(); });
 
-     var d = this.data;
+     var d      = this.data;
      var second = 0;
-     var R = Math.min(this.width, this.height)/2;
+     var R      = Math.min(this.width, this.height)/2;
 
      for ( var r = 0 ; r < d.rounds ; r++ ) {
        var n = d.workTime + d.restTime;
        for ( var i = r ? 0 : d.restTime - d.setupTime ; i < n ; i++ ) {
-         var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
-         var c = this.Tick.create({
-           arcWidth: 2,
-           color: i > d.restTime ? '#0e0' : 'white',
-           border: i > d.restTime ? '#0e0' : r ? 'red' : 'gray',
-           x: this.width/2  + (R - (r+1) * 16) * Math.cos(a),
-           y: this.height/2 + (R - (r+1) * 16) * Math.sin(a),
-           radius: 4,
+         this.addChildren(this.Tick.create({
+           x: this.width/2,
+           y: this.height/2,
+           maxRadius: R,
+           position: i,
+           round: r,
            second: second++
-         });
-         this.addChildren(c);
+         }));
        }
      }
 
