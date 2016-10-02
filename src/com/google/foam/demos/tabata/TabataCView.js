@@ -40,9 +40,9 @@ foam.CLASS({
      var n = d.workTime + d.restTime;
      var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
 
-     this.border      = i > d.restTime ? '#0f0' : r>1 ? '#f00' : 'gray';
+     this.border      = i > d.restTime ? '#0f0' : r>1 ? '#f00' : 'yellow';
      this.arcWidth    = this.maxRadius / 2 / d.rounds - 4;
-     this.radius      = this.maxRadius - (r+1) * 16;
+     this.radius      = this.maxRadius - r * 16;
      this.start       = a+0.01;
      this.end         = a + Math.PI*2/n-0.01;
      this.shadowColor = this.border;
@@ -119,7 +119,7 @@ foam.CLASS({
        Rest: '#f00',
        Finished: 'white',
        "WORK!": '#0f0',
-       Warmup: 'white'
+       Warmup: 'yellow'
      };
 
      var color$ = d.action$.map(function(s) { return colors[s]; });
