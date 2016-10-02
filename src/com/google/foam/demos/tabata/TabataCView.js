@@ -170,6 +170,7 @@ foam.CLASS({
          shadowBlur: 10,
          color$: color$,
          shadowColor$: color$,
+         // TODO: why is this necessary?
          text$: d.remaining$.map(function(s) { return s; })
        })
      );
