@@ -17,7 +17,7 @@
 
 foam.CLASS({
   name: 'Tick',
-  extends: 'foam.graphics.Circle',
+  extends: 'foam.graphics.Arc',
 
   imports: [ 'data' ],
 
@@ -26,8 +26,7 @@ foam.CLASS({
     'position',
     'round',
     'second',
-    [ 'arcWidth', 2 ],
-    [ 'radius', 4 ]
+    [ 'radius', 10 ]
   ],
 
   methods: [
@@ -41,27 +40,29 @@ foam.CLASS({
      var n = d.workTime + d.restTime;
      var a = -Math.PI/2 + (i-d.restTime-1)/n*Math.PI*2;
 
-     this.color  = i > d.restTime ? '#0e0' : 'white';
-     this.border = i > d.restTime ? '#0e0' : r ? 'red' : 'gray';
-     this.x     += (this.maxRadius - (r+1) * 16) * Math.cos(a);
-     this.y     += (this.maxRadius - (r+1) * 16) * Math.sin(a);
-
+     this.border      = i > d.restTime ? '#0e0' : r>1 ? 'red' : 'gray';
+     this.arcWidth    = this.maxRadius / 2 / d.rounds - 4;
+     this.radius      = this.maxRadius - (r+1) * 16;
+     this.start       = a+0.01;
+     this.end         = a + Math.PI*2/n-0.01;
      this.shadowColor = this.border;
 
      this.data.seconds$.sub(function() {
-       var seconds = self.data.seconds;
-       if ( seconds === self.second ) {
-         self.alpha = 1;
-         self.radius = 10;
+       self.alpha      = 0.6;
+       self.shadowBlur = 0;
+
+       if ( d.currentRound === self.round ) {
+         self.alpha = 0.75;
          self.shadowBlur = 15;
-       } else if ( seconds > self.second ) {
-         self.alpha = 0;
-         self.radius = 1;
-         self.shadowBlur = 0;
-       } else {
+       }
+
+       if ( d.seconds === self.second ) {
          self.alpha = 1;
-         self.radius = 4;
-         self.shadowBlur = 0;
+         self.shadowBlur = 25;
+       }
+
+       if ( d.seconds > self.second ) {
+         self.alpha = 0.2;
        }
      });
    }
@@ -71,7 +72,7 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'TabataCView',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   requires: [
     'foam.graphics.Label',
@@ -82,6 +83,7 @@ foam.CLASS({
   exports: [ 'data' ],
 
   properties: [
+    [ 'color', 'black' ],
     [ 'width',  500 ],
     [ 'height', 500 ],
     [ 'autoRepaint', true ],
@@ -107,7 +109,7 @@ foam.CLASS({
            y: this.height/2,
            maxRadius: R,
            position: i,
-           round: r,
+           round: r+1,
            second: second++
          }));
        }
@@ -115,12 +117,15 @@ foam.CLASS({
 
      var colors = {
        Rest: 'red',
-       Finished: 'gray',
+       Finished: 'white',
        "WORK!": 'green',
-       Warmup: 'gray'
+       Warmup: 'white'
      };
 
+     var color$ = d.action$.map(function(s) { return colors[s]; });
+
      this.addChildren(
+       /*
        this.Circle.create({
          border$: d.action$.map(function(s) { return colors[s]; }),
          radius$: d.currentRound$.map(function(round) { return R - round * 16; }),
@@ -130,6 +135,7 @@ foam.CLASS({
          x: this.width  / 2,
          y: this.height / 2
        }),
+       */
        this.Label.create({
          font: '50px Arial',
          width: 60,
@@ -137,7 +143,9 @@ foam.CLASS({
          x: this.width  / 2 - 30,
          y: this.height / 2 - 20,
          align: 'center',
-         color$: d.action$.map(function(s) { return colors[s]; }),
+         shadowBlur: 10,
+         color$: color$,
+         shadowColor$: color$,
          text$: d.action$
        }),
        this.Label.create({
@@ -147,7 +155,9 @@ foam.CLASS({
          x: this.width  / 2 - 30,
          y: this.height / 2 - 85,
          align: 'center',
-         color: 'gray',
+         shadowBlur: 10,
+         shadowColor: 'white',
+         color: 'white',
          text$: d.slot(function(currentRound, rounds) { return currentRound + ' / ' + rounds; })
        }),
        this.Label.create({
@@ -157,7 +167,9 @@ foam.CLASS({
          x: this.width  / 2 - 30,
          y: this.height / 2 + 35,
          align: 'center',
-         color$: d.action$.map(function(s) { return colors[s]; }),
+         shadowBlur: 10,
+         color$: color$,
+         shadowColor$: color$,
          text$: d.remaining$.map(function(s) { return s; })
        })
      );
