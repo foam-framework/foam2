@@ -464,6 +464,9 @@ foam.CLASS({
       name: 'parent'
     },
     {
+      name: 'canvas'
+    },
+    {
       name: 'transform_',
       factory: function() { return this.Transform.create(); }
     },
@@ -619,11 +622,13 @@ foam.CLASS({
 
     function addChild_(c) {
       c.parent = this;
+      c.canvas = this.canvas;
       return c;
     },
 
     function removeChild_(c) {
       c.parent = undefined;
+      c.canvas = undefined;
       this.invalidate();
       return c;
     },
@@ -875,10 +880,6 @@ foam.CLASS({
 
   imports: [ 'getElementById' ],
 
-  exports: [
-    'pointer'
-  ],
-
   properties: [
     [ 'nodeName', 'CANVAS' ],
     {
@@ -898,6 +899,8 @@ foam.CLASS({
       postSet: function(o, n) {
         o && o.invalidated.unsub(this.paint);
         n && n.invalidated.sub(this.paint);
+
+        n.canvas = this;
 
         if ( this.attributeMap.width === undefined || this.attributeMap.height === undefined ) {
           this.setAttribute('width', n.width);

@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'Application',
   properties: [
     {
+      class: 'String',
       name: 'id',
       hidden: true
     },

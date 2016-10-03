@@ -38,20 +38,50 @@ foam.CLASS({
   requires: [
     'foam.u2.TableCellRefinement'
   ],
+  imports: [
+    'tableView'
+  ],
 
   properties: [
     [ 'nodeName', 'tbody' ],
-    [ 'properties_' ]
+    [ 'properties_' ],
+    {
+      name: 'rows_',
+      factory: function() { return {}; }
+    }
   ],
 
   methods: [
+    function initE() {
+      var self = this;
+      this.on('click', function(event) {
+        var me = self.el();
+        var e = event.target;
+        while ( e.nodeName !== 'TR' && e !== me ) {
+          e = e.parentNode;
+        }
+
+        // If we managed to click between rows, do nothing.
+        if ( e === me ) return;
+        // Otherwise, we found the tr.
+        var obj = self.rows_[e.id];
+        if ( obj ) self.tableView.selection = obj;
+      });
+    },
+
     function addObj(obj) {
       var e = this.start('tr')
+          .enableCls(this.tableView.myCls('selected'),
+              this.tableView.selection$.map(function(sel) {
+                return sel === obj;
+              }));
+
       for ( var j = 0 ; j < this.properties_.length ; j++ ) {
         var prop = this.properties_[j];
         e = e.start('td').add(prop.tableCellView(obj, e)).end();
       }
       e.end();
+      this.rows_[e.id] = obj;
     }
   ]
 });
@@ -213,6 +243,9 @@ foam.CLASS({
     },
     {
       name: 'sortOrder'
+    },
+    {
+      name: 'selection'
     }
   ],
 

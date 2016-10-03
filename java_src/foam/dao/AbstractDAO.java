@@ -46,4 +46,26 @@ public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
 
     return sink;
   }
+
+
+  private ClassInfo of_ = null;
+  private PropertyInfo primaryKey_ = null;
+
+  public ClassInfo getOf() {
+    return of_;
+  }
+
+  public AbstractDAO setOf(ClassInfo of) {
+    of_ = of;
+    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
+    return this;
+  }
+
+  public PropertyInfo getPrimaryKey() {
+    return primaryKey_;
+  }
+
+  protected Object getPK(FObject obj) {
+    return getPrimaryKey().get(obj);
+  }
 }

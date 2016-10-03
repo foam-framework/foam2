@@ -44,7 +44,7 @@ foam.CLASS({
     {
       class: 'Int',
       value: 5,
-      name: 'warmupTime'
+      name: 'setupTime'
     },
     {
       class: 'Int',
@@ -95,6 +95,7 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         var t = this.Timer.create();
+ t.timeWarp = 10;
         this.seconds$ = t.time$.map(function(t) { return Math.floor(t / 1000); });
         return t;
       }
@@ -107,6 +108,7 @@ foam.CLASS({
       hidden: true
     }
   ],
+
   methods: [
     function init() {
       this.elapsed$ = this.slot(function(seconds, roundStart) {
@@ -117,12 +119,13 @@ foam.CLASS({
       });
     }
   ],
+
   classes: [
     {
       name: 'Warmup',
       methods: [
         function start(t) {
-          t.roundLength = t.warmupTime;
+          t.roundLength = t.setupTime;
           t.roundStart = t.seconds;
           t.action = 'Warmup';
         },
@@ -144,6 +147,7 @@ foam.CLASS({
           t.currentRound++;
           if ( t.currentRound >= t.rounds + 1 ) {
             t.state = t.Finish.create();
+            t.currentRound = t.rounds;
           } else {
             t.state = t.Rest.create();
           }
@@ -170,7 +174,7 @@ foam.CLASS({
       name: 'Finish',
       methods: [
         function start(t) {
-          t.action = 'Finished.';
+          t.action = 'Finished';
           t.roundLength = 0;
           t.roundStart = t.seconds;
           t.stop();
@@ -180,6 +184,7 @@ foam.CLASS({
       ]
     }
   ],
+
   actions: [
     {
       name: 'start',

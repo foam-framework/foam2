@@ -238,6 +238,9 @@ foam.CLASS({
     {
       name: 'filtersE_'
     },
+    {
+      name: 'table'
+    },
     [ 'addingSpec', undefined ]
   ],
 
@@ -301,11 +304,16 @@ foam.CLASS({
     },
 
     function tableE(parent) {
+      // NB: This function should render the table into the parent Element, and
+      // should also set this.table to be the TableView.
+      var self = this;
       parent.start(this.TableView, {
         data$: this.filteredDAO$,
         editColumnsEnabled: true,
         title$: this.title$
-      }).end();
+      })
+          .call(function() { self.table = this; })
+      .end();
     },
 
     function addGroup(spec, prop, opt_map) {
