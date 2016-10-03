@@ -125,8 +125,10 @@ foam.CLASS({
         var rows = Math.ceil(Math.abs(e.deltaY) / self.ROW_HEIGHT);
         scroller.value += negative ? -rows : rows;
       });
-      this.container_ = parent.start().cssClass(this.myCls('table-container'));
-      this.container_.start(this.TableView, {
+      parent.start()
+          .cssClass(this.myCls('table-container'))
+          .call(function() { self.container_ = this; })
+          .start(this.TableView, {
             of: this.data.of,
             data$: this.slot(function(dao, extent, value) {
               return dao.limit(extent).skip(value);
@@ -134,6 +136,7 @@ foam.CLASS({
             editColumnsEnabled: true,
             title$: this.title$
           })
+              .call(function() { self.table = this; })
           .end()
       .end();
 
