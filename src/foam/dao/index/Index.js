@@ -246,57 +246,6 @@ foam.CLASS({
   ]
 });
 
-/**
-  ORIndex runs multiple plans over the clauses of the OR predicate, and
-  combines the results. Typically an AltIndex will be used under the ORIndex
-  to optimize the various sub-queries the OR executes.
-*/
-foam.CLASS({
-  package: 'foam.dao.index',
-  name: 'OrIndex',
-  extends: 'foam.dao.index.ProxyIndex',
-
-  requires: [
-    'foam.mlang.predicate.Or',
-    'foam.dao.index.MergePlan'
-  ],
-
-  methods: [
-    function plan(sink, skip, limit, order, predicate) {
-      if ( ! predicate || ! this.Or.isInstance(predicate) ) {
-        return this.delegate.plan(sink, skip, limit, order, predicate);
-      }
-
-      // TODO: check how ordering is handled in existing TreeIndex etc.
-      //   compound comparators should be handled better than forcing our
-      //   sink to re-sort.
-
-      // if there's a limit, add skip to make sure we get enough results
-      //   from each subquery. Our sink will throw out the extra results
-      //   after sorting.
-      var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
-
-      // This is an instance of OR, break up into separate queries
-      var args = predicate.args;
-      var plans = [];
-      for ( var i = 0; i < args.length; i++ ) {
-        // NOTE: we pass sink here, but it's not going to be the one eventually
-        // used.
-        plans.push(
-          this.delegate.plan(sink, undefined, subLimit, undefined, args[i])
-        );
-      }
-
-      return this.MergePlan.create({ subPlans: plans });
-    },
-
-    function toString() {
-      return 'OrIndex('+this.delegate.toString()+')';
-    }
-
-  ]
-
-});
 
 
 // foam.CLASS({

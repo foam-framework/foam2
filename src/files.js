@@ -81,6 +81,7 @@ FOAM_FILES([
   { name: "foam/dao/index/AATree" },
   { name: "foam/dao/index/TreeIndex" },
   { name: "foam/dao/index/PoliteIndex" },
+  { name: "foam/dao/index/OrIndex" },
   { name: "foam/dao/MDAO" },
   { name: "foam/dao/TimestampDAO" },
   { name: "foam/dao/GUIDDAO" },
