@@ -354,8 +354,38 @@ foam.CLASS({
   ]
 });
 
-
-
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'AnonymousSink',
+  implements: [ 'foam.dao.Sink' ],
+  properties: [
+    {
+      name: 'sink'
+    }
+  ],
+  methods: [
+    function put(obj, fc) {
+      var s = this.sink;
+      s && s.put && s.put(obj, fc);
+    },
+    function remove(obj, fc) {
+      var s = this.sink;
+      s && s.remove && s.remove(obj, fc);
+    },
+    function eof() {
+      var s = this.sink;
+      s && s.eof && s.eof();
+    },
+    function error() {
+      var s = this.sink;
+      s && s.error && s.error();
+    },
+    function reset() {
+      var s = this.sink;
+      s && s.reset && s.reset();
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
