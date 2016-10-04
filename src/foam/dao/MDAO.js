@@ -263,3 +263,183 @@ foam.CLASS({
     }
   ]
 });
+
+
+// DNF transform // TODO: move to mlangs
+foam.CLASS({
+  refines: 'foam.mlang.predicate.AbstractPredicate',
+
+  methods: [
+    function toIndex(/*tailFactory*/) {
+      return undefined;
+    },
+    function toDisjunctiveNormalForm() {
+      return this;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Binary',
+
+  methods: [
+    function toIndex(tailFactory) {
+      if ( this.arg1 ) {
+        return this.arg1.toIndex(tailFactory);
+      } else {
+        return;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Unary',
+
+  methods: [
+    function toIndex(tailFactory) {
+      if ( this.arg1 ) {
+        return this.arg1.toIndex(tailFactory);
+      } else {
+        return;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.And',
+
+  requires: [
+    'foam.mlang.predicate.Or'
+  ],
+
+  methods: [
+    function toIndex(tailFactory) {
+      // Find DNF, if we were already in it, proceed
+      //var self = this.toDisjunctiveNormalForm();
+      //if ( self !== this ) return self.toIndex(tailFactory);
+
+      var args = this.args;
+      var tail = tailFactory;
+      for (var i = 0; i < args.length; i++ ) {
+        var idx = args[i].toIndex(tail);
+        if ( idx ) {
+          tail = idx;
+        }
+      }
+      return tail;
+    },
+
+    function toDisjunctiveNormalForm() {
+      // for each nested OR, multiply:
+      // AND(a,b,OR(c,d),OR(e,f)) -> OR(abce,abcf,abde,abdf)
+
+      var andArgs = [];
+      var orArgs = [];
+      var oldArgs = this.args;
+      for (var i = 0; i < oldArgs.length; i++ ) {
+        var a = oldArgs[i].toDisjunctiveNormalForm();
+        if ( this.Or.isInstance(a) ) {
+          orArgs.push(a);
+        } else {
+          andArgs.push(a);
+        }
+      }
+
+      if ( orArgs.length > 0 ) {
+        var newAndGroups = [];
+        // Generate every combination of the arguments of the OR clauses
+        // orArgsOffsets[g] represents the array index we are lookig at
+        // in orArgs[g].args[offset]
+        var orArgsOffsets = new Array(orArgs.length).fill(0);
+        var active = true;
+        var idx = orArgsOffsets.length - 1;
+        orArgsOffsets[idx] = -1; // compensate for intial ++orArgsOffsets[idx]
+        while ( active ) {
+          while ( ++orArgsOffsets[idx] >= orArgs[idx].args.length ) {
+            // reset array index count, carry the one
+            if ( idx === 0 ) { active = false; break; }
+            orArgsOffsets[idx] = 0;
+            idx--;
+          }
+          idx = orArgsOffsets.length - 1;
+          if ( ! active ) break;
+
+          // for the last group iterated, read back up the indexes
+          // to get the result set
+          var newAndArgs = [];
+          for ( var j = orArgsOffsets.length - 1; j >= 0; j-- ) {
+            newAndArgs.push(orArgs[j].args[orArgsOffsets[j]]);
+          }
+          newAndArgs = newAndArgs.concat(andArgs);
+
+          newAndGroups.push(
+            this.cls_.create({ args: newAndArgs })
+          );
+        }
+        return this.Or.create({ args: newAndGroups }).partialEval();
+      } else {
+        // no OR args, no DNF transform needed
+        return this;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Or',
+
+  requires: [
+    'foam.dao.index.AltIndex'
+  ],
+
+  methods: [
+    function toIndex(tailFactory) {
+      //var self = this.toDisjunctiveNormalForm();
+//console.log("Pre: ", this.toString());
+//console.log("DNF: ", self.toString());
+
+      // return an OR index with Alt index spanning each possible index
+      // TODO: this may duplicate indexes for the same set of properties
+      //   Use signature to dedup
+      var subIndexes = [];
+      for ( var i = 0; i < this.args.length; i++ ) {
+        var index = this.args[i].toIndex(tailFactory);
+        index && subIndexes.push(index);
+      }
+      return this.OrIndex.create({ delegate:
+        this.AltIndex.create({
+          delegates: subIndexes
+        })
+      });
+    },
+
+    function toDisjunctiveNormalForm() {
+      // TODO: memoization around this process
+      // DNF our args, note if anything changes
+      var oldArgs = this.args;
+      var newArgs = [];
+      var changed = false;
+      for (var i = 0; i < oldArgs.length; i++ ) {
+        var a = oldArgs[i].toDisjunctiveNormalForm();
+        if ( a !== oldArgs[i] ) changed = true;
+        newArgs[i] = a;
+      }
+
+      // partialEval will take care of nested ORs
+      var self = this;
+      if ( changed ) {
+        self = this.clone();
+        self.args = newArgs;
+        self = self.partialEval();
+      }
+
+      return self;
+    }
+  ]
+});
+
