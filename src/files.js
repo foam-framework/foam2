@@ -59,6 +59,7 @@ FOAM_FILES([
   { name: "foam/parse/parse" },
   { name: "foam/core/templates" },
   { name: "foam/core/Action" },
+  { name: "foam/core/Serializable" },
   { name: "lib/java" },
   { name: "lib/JavaClass" },
   { name: "lib/Promise" },
