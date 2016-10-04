@@ -74,6 +74,10 @@ foam.CLASS({
     {
       name: 'axioms_',
       factory: function() { return []; }
+    },
+    {
+      class: 'String',
+      name: 'documentation'
     }
   ],
   methods: [
