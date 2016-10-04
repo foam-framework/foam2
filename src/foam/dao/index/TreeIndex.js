@@ -135,15 +135,19 @@ foam.CLASS({
   ],
 
   methods: [
-    /** Initialize simple properties, since they ignore factories. */
     function init() {
+      
+      // TODO: replace with bound methods when available
+      this.dedup = this.dedup.bind(this); //foam.Function.bind(this.dedup, this);
+      //this.compare = foam.Function.bind(this.compare, this);
+    },
+
+    /** Initialize simple properties, since they ignore factories. */
+    function initInstance() {
 
       this.selectCount = 0;
       this.root = this.nullNode;
 
-      // TODO: replace with bound methods when available
-      this.dedup = this.dedup.bind(this); //foam.Function.bind(this.dedup, this);
-      //this.compare = foam.Function.bind(this.compare, this);
     },
 
     /**
@@ -195,6 +199,14 @@ foam.CLASS({
       // does not delve into sub-indexes
       return this.root.get(key, this.compare);
     },
+    
+    function mapOver(fn, ofIndex) {
+      if ( this.tailFactory === ofIndex ) {
+        return this.root.mapTail(fn);
+      } else {
+        return this.root.mapOver(fn, ofIndex);
+      }
+    },
 
     function select(sink, skip, limit, order, predicate) {
       this.root.select(sink, skip, limit, order, predicate);
@@ -210,7 +222,7 @@ foam.CLASS({
       return foam.util.compare(o1, o2);
     },
 
-    function plan(sink, skip, limit, order, predicate) {
+    function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
 
       if ( index.False.isInstance(predicate) ) return this.NotFoundPlan.create();
@@ -271,7 +283,7 @@ foam.CLASS({
           result = this.get(keys[i]);
 
           if ( result ) { // TODO: could refactor this subindex recursion into .plan()
-            subPlan = result.plan(sink, skip, limit, order, predicate);
+            subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
             cost += subPlan.cost;
             subPlans.push(subPlan);
@@ -293,7 +305,7 @@ foam.CLASS({
 
         if ( ! result ) return index.NotFoundPlan.create();
 
-        subPlan = result.plan(sink, skip, limit, order, predicate);
+        subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
         return index.AltPlan.create({
           subPlans: [subPlan],

@@ -104,16 +104,18 @@ foam.CLASS({
 
     function addIndex(index) {
       if ( ! this.index ) {
-        this.index = index;
+        this.index = index.create();
         return this;
       }
 
       // Upgrade single Index to an AltIndex if required.
       if ( ! this.AltIndex.isInstance(this.index) ) {
-        this.index = this.AltIndex.create({ delegates: [this.index] });
+        this.index = this.AltIndex
+          .create({ delegates: [ this.index.__proto__ ] }) // create factory
+          .create({ instances: [ this.index ] }); // create an instance
       }
 
-      this.index.addIndex(index);
+      this.index.addIndex(index, this.index);
 
       return this;
     },
@@ -207,7 +209,7 @@ foam.CLASS({
       var plan;
 
       if ( this.Explain.isInstance(sink) ) {
-        plan = this.index.plan(sink.arg1, skip, limit, order, predicate);
+        plan = this.index.plan(sink.arg1, skip, limit, order, predicate, this.index);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
         return Promise.resolve(sink);
@@ -215,7 +217,7 @@ foam.CLASS({
 
       predicate = predicate && predicate.toDisjunctiveNormalForm();
       if ( ! predicate || ! this.Or.isInstance(predicate) ) {
-        plan = this.index.plan(sink, skip, limit, order, predicate);
+        plan = this.index.plan(sink, skip, limit, order, predicate, this.index);
       } else {
         plan = this.planForOr(sink, skip, limit, order, predicate);
       }
@@ -251,7 +253,7 @@ foam.CLASS({
         // NOTE: we pass sink here, but it's not going to be the one eventually
         // used.
         plans.push(
-          this.index.plan(sink, undefined, subLimit, undefined, args[i])
+          this.index.plan(sink, undefined, subLimit, undefined, args[i], this.index)
         );
       }
 

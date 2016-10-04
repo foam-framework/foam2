@@ -27,7 +27,7 @@ foam.CLASS({
     function create(args) {
       var c = Object.create(this);
       args && c.copyFrom(args);
-      c.init && c.init();
+      c.initInstance && c.initInstance();
       return c;
     },
 
@@ -38,10 +38,20 @@ foam.CLASS({
     function remove(/*o*/) {},
 
     /** @return a Plan to execute a select with the given parameters */
-    function plan(/*sink, skip, limit, order, predicate*/) {},
+    function plan(/*sink, skip, limit, order, predicate, root*/) {},
 
-    /** @return the stored value for the given key. */
+    /** @return the tail index instance for the given key. */
     function get(/*key*/) {},
+
+    /** executes the given function for each index that was created from the given
+      index factory (target.__proto__ === ofIndex). Function should take an index
+      instance argument and return the index instance to replace it with.  
+    
+      NOTE: size() is not allowed to change with this operation,
+        since changing the type of index is not actually removing
+        or adding items. Therefore: tail.size() == fn(tail).size();
+    */
+    function mapOver(fn, ofIndex) {},
 
     /** @return the integer size of this index. */
     function size() {},
@@ -75,11 +85,13 @@ foam.CLASS({
 
     function remove(o) { return this.delegate.remove(o); },
 
-    function plan(sink, skip, limit, order, predicate) {
-      return this.delegate.plan(sink, skip, limit, order, predicate);
+    function plan(sink, skip, limit, order, predicate, root) {
+      return this.delegate.plan(sink, skip, limit, order, predicate, root);
     },
 
     function get(key) { return this.delegate.get(key); },
+
+    function mapOver(fn, ofIndex) { return this.delegate.mapOver(fn, ofIndex); },
 
     function size() { return this.delegate.size(); },
 
@@ -130,6 +142,7 @@ foam.CLASS({
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function plan() { return this; },
+    function mapOver(fn, ofIndex) { },
 
     function select(sink, skip, limit, order, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
@@ -161,49 +174,85 @@ foam.CLASS({
 
   properties: [
     {
+      /** delegate factories (TODOL: rename) */
       name: 'delegates',
       factory: function() { return []; }
+    },
+    {
+      /** the delegate instances for each Alt instance */
+      class: 'Simple',
+      name: 'instances'
+    },
+    {
+      /** the parent index for each Alt instance, used to access */
+      class: 'Simple',
+      name: 'parent'
     }
   ],
 
   methods: [
-    function addIndex(index) {
-      // Populate the index
-      var a = foam.dao.ArraySink.create();
-      this.plan(a).execute([], a);
+    function initInstance() {
+      if ( ! this.instances ) {
+        this.instances = [];
+        for ( var i = 0; i < this.delegates.length; i++ ) {
+          this.instances[i] = this.delegates[i].create();
+        }
+      }
+    },
+    
+    function addIndex(index, root) {
+      // assert(root)
+      // This should be called on the factory, not an instance
+      var self = this.instances ? this.__proto__ : this;
+      self.delegates.push(index);
+      
+      function addIndexTo(inst) {
+        // Populate the index
+        var a = foam.dao.ArraySink.create();
+        inst.plan(a).execute([], a);
 
-      index.bulkLoad(a);
-      this.delegates.push(index);
-      return this;
+        index.bulkLoad(a);
+        inst.instances.push(index);
+        return inst;
+      }
+      
+      // find all instances created by this factory, addIndexTo them
+      root.mapOver(addIndexTo, self);
     },
 
     function bulkLoad(a) {
-      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].bulkLoad(a);
+      for ( var i = 0 ; i < this.instances.length ; i++ ) {
+        this.instances[i].bulkLoad(a);
       }
     },
 
     function get(key) {
-      return this.delegates[0].get(key);
+      return this.instances[0].get(key);
+    },
+
+    function mapOver(fn, ofIndex) {
+      for ( var i = 0 ; i < this.instances.length ; i++ ) {
+        this.instances[i].mapOver(fn, ofIndex);
+      }
     },
 
     function put(newValue) {
-      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].put(newValue);
+      for ( var i = 0 ; i < this.instances.length ; i++ ) {
+        this.instances[i].put(newValue);
       }
     },
 
     function remove(obj) {
-      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        this.delegates[i].remove(obj);
+      for ( var i = 0 ; i < this.instances.length ; i++ ) {
+        this.instances[i].remove(obj);
       }
     },
 
-    function plan(sink, skip, limit, order, predicate) {
+    function plan(sink, skip, limit, order, predicate, root) {
       var bestPlan;
       //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
-      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        var plan = this.delegates[i].plan(sink, skip, limit, order, predicate);
+      for ( var i = 0 ; i < this.instances.length ; i++ ) {
+        var plan = this.instances[i].plan(sink, skip, limit, order, predicate, root);
         // console.log('  plan ' + i + ': ' + plan);
         if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
           bestPlan = plan;
@@ -220,7 +269,7 @@ foam.CLASS({
       return bestPlan;
     },
 
-    function size() { return this.delegates[0].size(); },
+    function size() { return this.instances[0].size(); },
 
     function toString() {
       return 'Alt(' + this.delegates.join(',') + ')';

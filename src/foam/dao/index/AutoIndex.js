@@ -64,7 +64,7 @@ foam.CLASS({
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
-    function plan(sink, skip, limit, order, predicate) {
+    function plan(sink, skip, limit, order, predicate, root) {
       if ( predicate ) {
         if ( this.existingIndexes[predicate] ) {
           // already seen this exact predicate, nothing to do

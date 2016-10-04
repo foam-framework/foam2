@@ -634,7 +634,7 @@ describe('AltIndex', function() {
   });
 });
 
-describe('AutoIndex', function() {
+xdescribe('AutoIndex', function() {
   var idx;
   var plan;
   var m;
