@@ -55,6 +55,11 @@ foam.CLASS({
       this.relationship.adaptTarget(this.obj, obj);
 
       return this.SUPER(obj, sink);
+    },
+
+    function clone() {
+      // Prevent cloneing
+      return this;
     }
   ]
 });

@@ -85,7 +85,7 @@ foam.CLASS({
 
         // Install our own CSS, and then all parent models as well.
         if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(cls, axiom.code));
+          X.installCSS(axiom.expandCSS(this, axiom.code));
           axiom.installedDocuments_.set(X.document, true);
         }
 
@@ -98,7 +98,7 @@ foam.CLASS({
       /* Performs expansion of the ^ shorthand on the CSS. */
       // TODO(braden): Parse and validate the CSS.
       // TODO(braden): Add the automatic prefixing once we have the parser.
-      var base = '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id));
+      var base = '.' + foam.String.cssClassize(cls.id);
       return text.replace(/\^(.)/g, function(match, next) {
         var c = next.charCodeAt(0);
         // Check if the next character is an uppercase or lowercase letter,
@@ -721,7 +721,7 @@ foam.CLASS({
       var f = this.cls_.myCls_;
 
       if ( ! f ) {
-        var base = (this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id)).split(/ +/);
+        var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
 
         f = this.cls_.myCls_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');

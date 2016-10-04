@@ -19,9 +19,42 @@ foam.CLASS({
   name: 'PolymerController',
   extends: 'com.google.foam.demos.olympics.Controller',
 
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'filterController',
+      value: {
+        class: 'foam.u2.search.FilterController',
+        addingSpec: { class: 'foam.u2.Element', nodeName: 'paper-material' },
+        filterAreaSpec: {
+          class: 'foam.u2.Element',
+          nodeName: 'paper-material'
+        },
+        textSearch: true,
+        allowAddingFilters: false,
+        tableView: { class: 'foam.u2.Scroller' },
+        searchFields: [
+          'color',
+          'year',
+          'city',
+          'sport',
+          'event',
+          'country',
+          'gender'
+        ],
+        buildFilter: function(args) {
+          if ( args.view.cls_.getAxiomByName('label') ) {
+            args.view.label = args.label || args.prop.label;
+          }
+          return this.E().cssClass(this.myCls('filter-container'))
+              .add(args.view);
+        }
+      }
+    }
+  ],
+
   methods: [
     function init() {
-      this.SUPER();
       // Load the Polymer overrides.
       this.__subContext__.register(foam.lookup('foam.u2.md.tag.PaperInput'),
           'foam.u2.tag.Input');
@@ -30,13 +63,7 @@ foam.CLASS({
           'foam.u2.tag.Select');
       this.__subContext__.register(foam.lookup('foam.u2.md.ActionView'),
           'foam.u2.ActionView');
-    },
-
-    function buildFilter(args) {
-      if ( args.view.cls_.getAxiomByName('label') ) {
-        args.view.label = args.label || args.prop.label;
-      }
-      return this.E().cssClass(this.myCls('filter-container')).add(args.view);
+      this.SUPER();
     }
   ]
 });
