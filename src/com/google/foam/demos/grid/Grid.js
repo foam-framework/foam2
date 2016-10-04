@@ -79,6 +79,9 @@ foam.CLASS({
           height:20px;
           font-size:14px;
         }
+        ^ .foam.u2-ActionView {
+          vertical-align: bottom;
+        }
         button, ^ .foam-u2-ActionView {
           border:none;
           color:#fff;
@@ -98,6 +101,7 @@ foam.CLASS({
         }
         ^ .foam-u2-DetailView tr {
           display: inline;
+          font-size: 16px;
         }
       */}
     })
@@ -133,9 +137,11 @@ foam.CLASS({
         */
 
         // Or this to use a DetailView
-        add(this.PERSON).
+        start('span').style({display: "flex"}).
+          add(this.PERSON).
+          add(this.ADD_RESOURCE).
+        end().
 
-        add(this.ADD_RESOURCE).
         start('h3').add('List of Resources').end().
 
         // Use a Standard TableView
