@@ -583,7 +583,7 @@ describe('AltIndex', function() {
           tailFactory: foam.dao.index.ValueIndex.create()
         }),
       ]
-    });
+    }).create();
     idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
@@ -686,15 +686,15 @@ xdescribe('AutoIndex', function() {
 
     expect(idx.existingIndexes[0][0]).toEqual('float');
     expect(mdao.lastIndex).toBeTruthy();
-    expect(idx.baseAltIndex.delegates[0]).toBe(mdao.idIndex);
-    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
+    expect(idx.baseAltIndex.instances[0]).toBe(mdao.idIndex);
+    expect(idx.baseAltIndex.instances[1]).toBeTruthy();
     mdao.lastIndex = null;
 
     idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.INT));
 
     expect(idx.existingIndexes[1][0]).toEqual('int');
-    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
-    expect(idx.baseAltIndex.delegates[2]).toBeTruthy();
+    expect(idx.baseAltIndex.instances[1]).toBeTruthy();
+    expect(idx.baseAltIndex.instances[2]).toBeTruthy();
   });
 
   it('skips already auto indexed orderings', function() {
@@ -702,16 +702,16 @@ xdescribe('AutoIndex', function() {
 
     expect(idx.existingIndexes[0][0]).toEqual('float');
     expect(mdao.lastIndex).toBeTruthy();
-    expect(idx.baseAltIndex.delegates[0]).toBe(mdao.idIndex);
-    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
+    expect(idx.baseAltIndex.instances[0]).toBe(mdao.idIndex);
+    expect(idx.baseAltIndex.instances[1]).toBeTruthy();
     mdao.lastIndex = null;
 
     idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT));
 
     expect(idx.existingIndexes[1]).toBeUndefined();
-    expect(idx.baseAltIndex.delegates[0]).toBe(mdao.idIndex);
-    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
-    expect(idx.baseAltIndex.delegates[2]).toBeUndefined();
+    expect(idx.baseAltIndex.instances[0]).toBe(mdao.idIndex);
+    expect(idx.baseAltIndex.instances[1]).toBeTruthy();
+    expect(idx.baseAltIndex.instances[2]).toBeUndefined();
     
   });
 
