@@ -15,15 +15,6 @@
  * limitations under the License.
  */
 
-/* Indexed Memory-based DAO. */
-
-/*
- * TODO:
- *  update(oldValue, newValue)
- *  reuse plans
- *  add ability for indices to pre-populate data
- */
-
 /** The Index interface for an ordering, fast lookup, single value,
   index multiplexer, or any other MDAO select() assistance class. */
 foam.CLASS({
@@ -41,16 +32,16 @@ foam.CLASS({
     },
 
     /** Adds or updates the given value in the index */
-    function put() {},
+    function put(/*o*/) {},
 
     /** Removes the given value from the index */
-    function remove() {},
+    function remove(/*o*/) {},
 
     /** @return a Plan to execute a select with the given parameters */
     function plan(/*sink, skip, limit, order, predicate*/) {},
 
     /** @return the stored value for the given key. */
-    function get() {},
+    function get(/*key*/) {},
 
     /** @return the integer size of this index. */
     function size() {},
@@ -61,6 +52,46 @@ foam.CLASS({
     /** Selects matching items in reverse order from the index and puts
       them into sink */
     function selectReverse(/*sink, skip, limit, order, predicate*/) { },
+
+    /** Efficiently (if possible) loads the contents of the given DAO into the index */
+    function bulkLoad(/*dao*/) {},
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'ProxyIndex',
+  extends: 'foam.dao.index.Index',
+
+  properties: [
+    {
+      class: 'Simple',
+      name: 'delegate'
+    }
+  ],
+
+  methods: [
+    function put(o) { return this.delegate.put(o); },
+
+    function remove(o) { return this.delegate.remove(o); },
+
+    function plan(sink, skip, limit, order, predicate) {
+      return this.delegate.plan(sink, skip, limit, order, predicate);
+    },
+
+    function get(key) { return this.delegate.get(key); },
+
+    function size() { return this.delegate.size(); },
+
+    function select(sink, skip, limit, order, predicate) {
+      return this.delegate.select(sink, skip, limit, order, predicate);
+    },
+
+    function selectReverse(sink, skip, limit, order, predicate) {
+      return this.delegate.selectReverse(sink, skip, limit, order, predicate);
+    },
+
+    function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
   ]
 });
 
@@ -117,10 +148,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
-  //extends: 'foam.dao.index.Index',
+  extends: 'foam.dao.index.Index',
 
   requires: [
-    'foam.dao.index.NoPlan',
+    'foam.dao.index.NoPlan'
   ],
 
   constants: {
@@ -139,11 +170,10 @@ foam.CLASS({
     function addIndex(index) {
       // Populate the index
       var a = foam.dao.ArraySink.create();
-      this.plan(a).execute([Promise.resolve()], a);
+      this.plan(a).execute([], a);
 
       index.bulkLoad(a);
       this.delegates.push(index);
-
       return this;
     },
 
@@ -194,65 +224,6 @@ foam.CLASS({
 
     function toString() {
       return 'Alt(' + this.delegates.join(',') + ')';
-    }
-  ]
-});
-
-
-/** An Index which adds other indices as needed. **/
-foam.CLASS({
-  package: 'foam.dao.index',
-  name: 'AutoIndex',
-  extends: 'foam.dao.index.Index',
-
-  requires: [
-    'foam.core.Property',
-    'foam.dao.index.NoPlan'
-  ],
-
-  properties: [
-    {
-      name: 'properties',
-      factory: function() { return {}; }
-    },
-    {
-      name: 'mdao'
-    }
-  ],
-
-  methods: [
-    function put() { },
-
-    function remove() { },
-
-    function bulkLoad() { return 'auto'; },
-
-    function addPropertyIndex(prop) {
-      if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
-        prop = prop.arg1;
-      }
-      console.log('Adding AutoIndex : ', prop.id);
-      this.properties[prop.name] = true;
-      this.mdao.addPropertyIndex(prop);
-    },
-    // TODO: mlang comparators should support input collection for
-    //   index-building cases like this
-    function plan(sink, skip, limit, order, predicate) {
-      if ( order ) {
-        // find name of property to order by
-        var name = ( this.Property.isInstance(order) ) ? order.name :
-          ( order.arg1 && order.arg1.name ) || null;
-        // if no index added for it yet, add one
-        if ( name && ! this.properties[name] ) {
-          this.addPropertyIndex(order);
-        }
-      } else if ( predicate ) {
-        // TODO: check for property in predicate
-      }
-      return this.NoPlan.create();
-    },
-    function toString() {
-      return 'AutoIndex()';
     }
   ]
 });

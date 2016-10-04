@@ -18,6 +18,8 @@
 foam.CLASS({
   package: 'test',
   name: 'Indexable',
+  
+  ids: ['int'],
 
   properties: [
     {
@@ -642,8 +644,18 @@ describe('AutoIndex', function() {
   beforeEach(function() {
     mdao = {
       lastIndex: null,
+      lastPropertyIndex: null,
       addPropertyIndex: function(index) {
+        this.lastPropertyIndex = index;
+      },
+      addIndex: function(index) {
         this.lastIndex = index;
+      },
+      idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
+      idIndexFactory: { 
+        create: function() {
+          return this.idIndex;
+        }
       }
     }
     idx = foam.dao.index.AutoIndex.create({
@@ -662,44 +674,76 @@ describe('AutoIndex', function() {
     idx.toString();
   });
 
-  it('supports manual addPropertyIndex()', function() {
+  it('supports manual addIndex()', function() {
     idx.addPropertyIndex(test.Indexable.INT);
 
-    expect(idx.properties['int']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+    expect(idx.existingIndexes[0][0]).toEqual('int');
+    expect(mdao.lastIndex).toBeTruthy();
   });
 
   it('auto indexes on ordering', function() {
     idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
 
-    expect(idx.properties['float']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    expect(idx.existingIndexes[0][0]).toEqual('float');
+    expect(mdao.lastIndex).toBeTruthy();
+    expect(idx.baseAltIndex.delegates[0]).toBe(mdao.idIndex);
+    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
+    mdao.lastIndex = null;
 
     idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.INT));
 
-    expect(idx.properties['int']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+    expect(idx.existingIndexes[1][0]).toEqual('int');
+    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
+    expect(idx.baseAltIndex.delegates[2]).toBeTruthy();
   });
 
   it('skips already auto indexed orderings', function() {
     idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
 
-    expect(idx.properties['float']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
-
+    expect(idx.existingIndexes[0][0]).toEqual('float');
+    expect(mdao.lastIndex).toBeTruthy();
+    expect(idx.baseAltIndex.delegates[0]).toBe(mdao.idIndex);
+    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
     mdao.lastIndex = null;
 
     idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT));
 
-    expect(idx.properties['float']).toEqual(true);
-    expect(mdao.lastIndex).toBe(null);
+    expect(idx.existingIndexes[1]).toBeUndefined();
+    expect(idx.baseAltIndex.delegates[0]).toBe(mdao.idIndex);
+    expect(idx.baseAltIndex.delegates[1]).toBeTruthy();
+    expect(idx.baseAltIndex.delegates[2]).toBeUndefined();
+    
   });
 
-  // it('auto indexes on predicate', function() {
-  //   idx.plan(...)
-  //
-  //   expect(idx.properties['float']).toEqual(true);
-  //   expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
-  // });
+  it('auto indexes on predicate', function() {
+
+    var pred = m.AND(
+      m.OR(
+        m.LT(test.Indexable.INT, 8),
+        m.EQ(test.Indexable.FLOAT, 4)
+      ),
+      m.CONTAINS_IC(test.Indexable.STRING, "we"),
+      m.OR(
+        m.GT(test.Indexable.INT, 8),
+        m.LTE(test.Indexable.FLOAT, 4)
+      )
+    );
+
+    pred = m.OR(
+      pred,
+      m.AND(
+        m.CONTAINS_IC(test.Indexable.STRING, "we"),
+        m.EQ(test.Indexable.DATE, "today")
+      )
+    );
+
+    // TODO: fix if MDAO isn't the one doing DNF xform
+    pred = pred.toDisjunctiveNormalForm();
+
+    idx.plan(sink, undefined, undefined, undefined, pred);
+
+    // TODO expectations
+  });
+
 
 });

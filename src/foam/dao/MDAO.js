@@ -35,7 +35,9 @@ foam.CLASS({
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.True',
-    'foam.mlang.sink.Explain'
+    'foam.mlang.predicate.Or',
+    'foam.mlang.sink.Explain',
+    'foam.dao.index.MergePlan'
   ],
 
   properties: [
@@ -211,7 +213,12 @@ foam.CLASS({
         return Promise.resolve(sink);
       }
 
-      plan = this.index.plan(sink, skip, limit, order, predicate);
+      predicate = predicate && predicate.toDisjunctiveNormalForm();
+      if ( ! predicate || ! this.Or.isInstance(predicate) ) {
+        plan = this.index.plan(sink, skip, limit, order, predicate);
+      } else {
+        plan = this.planForOr(sink, skip, limit, order, predicate);
+      }
 
       var promise = [Promise.resolve()];
       plan.execute(promise, sink, skip, limit, order, predicate);
@@ -225,6 +232,30 @@ foam.CLASS({
           return Promise.reject(err);
         }
       );
+    },
+
+    function planForOr(sink, skip, limit, order, predicate) {
+      // TODO: check how ordering is handled in existing TreeIndex etc.
+      //   compound comparators should be handled better than forcing our
+      //   sink to re-sort.
+
+      // if there's a limit, add skip to make sure we get enough results
+      //   from each subquery. Our sink will throw out the extra results
+      //   after sorting.
+      var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
+
+      // This is an instance of OR, break up into separate queries
+      var args = predicate.args;
+      var plans = [];
+      for ( var i = 0; i < args.length; i++ ) {
+        // NOTE: we pass sink here, but it's not going to be the one eventually
+        // used.
+        plans.push(
+          this.index.plan(sink, undefined, subLimit, undefined, args[i])
+        );
+      }
+
+      return this.MergePlan.create({ subPlans: plans });
     },
 
     function toString() {
