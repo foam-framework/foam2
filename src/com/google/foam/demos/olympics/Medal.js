@@ -65,7 +65,7 @@ foam.CLASS({
     { name: 'discipline', shortName: 'd', hidden: true },
     { name: 'sport', shortName: 's' },
     { name: 'event', shortName: 'e' },
-    { name: 'eventGender', shortName: 'eg', value: 'M' },
+    { name: 'eventGender', shortName: 'eg', value: 'M', hidden: true },
     {
       name: 'gender',
       shortName: 'g',
