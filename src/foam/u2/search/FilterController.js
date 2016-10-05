@@ -26,7 +26,7 @@ foam.CLASS({
     'foam.u2.ViewSpec',
     'foam.u2.tag.Card',
     'foam.u2.tag.Input',
-    'foam.u2.tag.Select',
+    'foam.u2.view.ChoiceView',
     //'foam.u2.search.DateFieldSearchView',
     'foam.u2.search.BooleanRefinement',
     'foam.u2.search.EnumRefinement',
@@ -59,7 +59,9 @@ foam.CLASS({
           min-width: 250px;
         }
         ^adding {
-          border: 1px solid #e0e0e0;
+          border: none;
+          flex-shrink: 0;
+          flex-grow: 0;
           padding: 8px;
         }
         ^add-filter {
@@ -75,7 +77,12 @@ foam.CLASS({
         ^results {
           display: flex;
           flex-grow: 1;
-          overflow: auto;
+          overflow: hidden;
+        }
+
+        ^filter-area {
+          flex-grow: 1;
+          overflow-y: auto;
         }
 
         ^filter-header {
@@ -86,7 +93,7 @@ foam.CLASS({
           flex-grow: 1;
         }
         ^filter-container {
-          margin: 12px;
+          margin: 6px 8px 0px;
         }
       */}
     })
@@ -170,6 +177,31 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Function',
+      name: 'buildFilter',
+      value: function buildFilter(args) {
+        var e = this.Card.create();
+        e.style({
+          'margin-bottom': '0',
+          overflow: 'visible'
+        }).cssClass(this.myCls('filter-container'))
+            .start('div')
+                .cssClass(this.myCls('filter-header'))
+                .add(args.label)
+            .end()
+            .startContext({ data: args.key })
+                .add(args.showRemove ? this.REMOVE_FILTER : undefined)
+            .endContext()
+        .end();
+
+        e.start('div')
+            .cssClass(this.myCls('filter-body'))
+            .add(args.view)
+        .end();
+        return e;
+      }
+    },
+    {
       name: 'searchMgr_',
       factory: function() {
         return this.SearchManager.create({
@@ -182,42 +214,7 @@ foam.CLASS({
       class: 'StringArray',
       name: 'searchFields',
       documentation: 'Property names that are currently selected as filters.',
-      factory: function() { return []; },
-      postSet: function(old, nu) {
-        // Check for every filter that has been removed, and every filter that
-        // is freshly added.
-        // This function is responsible for choosing the view for each property.
-        // Eg. drop-downs for Booleans and Enums, before/after for dates, etc.
-        if ( old ) {
-          for ( var i = 0; i < old.length; i++ ) {
-            if ( ! nu || nu.indexOf(old[i]) < 0 ) {
-              this.searchMgr_.remove(old[i]);
-              this.searchViews_[old[i]].remove();
-              delete this.searchViews_[old[i]];
-            }
-          }
-        }
-
-        if ( nu ) {
-          for ( var i = 0; i < nu.length; i++ ) {
-            if ( ! old || old.indexOf(nu[i]) < 0 ) {
-              var split = this.splitName(nu[i]);
-              var prop = this.data.of.getAxiomByName(split.name);
-              var spec = prop.searchView;
-              // TODO(braden): Bring in date support when it's ready.
-              var options = {
-                inline: true,
-                name: nu[i]
-              };
-              if ( prop.tableSeparator ) {
-                options.split = prop.tableSeparator;
-              }
-              this.addGroup(spec, prop, options);
-              this.renderFilter(nu[i]);
-            }
-          }
-        }
-      }
+      factory: function() { return []; }
     },
     {
       name: 'searchViews_',
@@ -239,14 +236,24 @@ foam.CLASS({
       name: 'filtersE_'
     },
     {
+      class: 'foam.u2.ViewSpec',
+      name: 'tableView',
+      value: { class: 'foam.u2.TableView' }
+    },
+    {
       name: 'table'
     },
+    {
+      name: 'loaded_',
+      value: false
+    },
+    [ 'oldSearchFields_', null ],
     [ 'addingSpec', undefined ]
   ],
 
   methods: [
     function initE() {
-      this.searchMgr_.predicate$.sub(this.onPredicateChange);
+      this.searchMgr_; // Force the factory to run.
       this.filteredDAO$.sub(this.onPredicateChange);
       this.onPredicateChange();
 
@@ -258,8 +265,7 @@ foam.CLASS({
       if ( this.allowAddingFilters ) {
         topPanel.start()
             .cssClass(this.myCls('add-filter'))
-            .start(this.Select, {
-              inline: true,
+            .start(this.ChoiceView, {
               data$: this.filterChoice$,
               choices: this.filters
             }).end()
@@ -281,9 +287,10 @@ foam.CLASS({
       this.endContext();
       searchPanel.end();
 
-      var e = this.start().cssClass(this.myCls('results'));
-      this.tableE(e);
-      e.end();
+      this.start().cssClass(this.myCls('results'))
+          .start(this.tableView, { of: this.data.of, data$: this.filteredDAO$ })
+          .end()
+      .end();
 
       var self = this;
       this.onload.sub(function() {
@@ -296,24 +303,12 @@ foam.CLASS({
           self.searchMgr_.add(self.search);
         }
 
-        // Tickle the searchFields, in case it has a factory or expression.
-        // This ensures that if searchFields is pre-populated, those views get
-        // rendered.
-        self.searchFields;
+        self.loaded_ = true;
       });
-    },
 
-    function tableE(parent) {
-      // NB: This function should render the table into the parent Element, and
-      // should also set this.table to be the TableView.
-      var self = this;
-      parent.start(this.TableView, {
-        data$: this.filteredDAO$,
-        editColumnsEnabled: true,
-        title$: this.title$
-      })
-          .call(function() { self.table = this; })
-      .end();
+      this.data$.sub(this.updateSearchFields);
+      this.loaded_$.sub(this.updateSearchFields);
+      this.searchFields$.sub(this.updateSearchFields);
     },
 
     function addGroup(spec, prop, opt_map) {
@@ -334,28 +329,6 @@ foam.CLASS({
 
       this.searchViews_[view.name] = filterView;
       return filterView;
-    },
-
-    function buildFilter(args) {
-      var e = this.Card.create({ padding: false });
-      e.style({
-        'margin-bottom': '0',
-        overflow: 'visible'
-      }).cssClass(this.myCls('filter-container'))
-          .start('div')
-              .cssClass(this.myCls('filter-header'))
-              .add(args.label)
-          .end()
-          .startContext({ data: args.key })
-          .add(args.showRemove ? this.REMOVE_FILTER : undefined)
-          .endContext()
-      .end();
-
-      e.start('div')
-          .cssClass(this.myCls('filter-body'))
-          .add(args.view)
-      .end();
-      return e;
     },
 
     function renderFilter(key) {
@@ -421,6 +394,51 @@ foam.CLASS({
         this.data.select(this.Count.create()).then(function(c) {
           this.totalCount = c.value;
         }.bind(this));
+        this.onPredicateChange();
+      }
+    },
+    {
+      name: 'updateSearchFields',
+      isFramed: true,
+      code: function() {
+        if ( ! this.loaded_ || ! this.data ) return;
+        var fields = this.searchFields;
+        var oldFields = this.oldSearchFields_;
+
+        // Check for every filter that has been removed, and every filter that
+        // is freshly added.
+        // This function is responsible for choosing the view for each property.
+        // Eg. drop-downs for Booleans and Enums, before/after for dates, etc.
+        if ( oldFields ) {
+          for ( var i = 0; i < oldFields.length; i++ ) {
+            if ( ! fields || fields.indexOf(oldFields[i]) < 0 ) {
+              this.searchMgr_.remove(oldFields[i]);
+              this.searchViews_[oldFields[i]].remove();
+              delete this.searchViews_[oldFields[i]];
+            }
+          }
+        }
+
+        if ( fields ) {
+          for ( var i = 0; i < fields.length; i++ ) {
+            if ( ! oldFields || oldFields.indexOf(fields[i]) < 0 ) {
+              var split = this.splitName(fields[i]);
+              var prop = this.data.of.getAxiomByName(split.name);
+              var spec = prop.searchView;
+              // TODO(braden): Bring in date support when it's ready.
+              var options = {
+                name: fields[i]
+              };
+              if ( prop.tableSeparator ) {
+                options.split = prop.tableSeparator;
+              }
+              this.addGroup(spec, prop, options);
+              this.renderFilter(fields[i]);
+            }
+          }
+        }
+
+        this.oldSearchFields_ = fields;
       }
     }
   ],

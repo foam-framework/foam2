@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   requires: [
     'foam.u2.TableView',
+    'foam.u2.search.FilterController',
     'com.chrome.origintrials.model.Application'
   ],
   imports: [
@@ -36,8 +37,12 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.start(this.APPLY, { data: this }).end().
-        start(this.TableView, { of: this.Application, data: this.data }).end();
+      this.start(this.APPLY, { data: this }).end()
+          .start(this.FilterController, {
+            searchFields: [ 'origin', 'applicantEmail', 'approved' ],
+            data: this.data
+          })
+          .end();
     }
   ],
   actions: [
@@ -58,7 +63,6 @@ foam.CLASS({
     'com.chrome.origintrials.model.Application',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
-    'foam.u2.search.FilterController',
     'com.chrome.origintrials.ui.Browser'
   ],
   exports: [
@@ -75,10 +79,13 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.setNodeName('div').
-        start(this.StackView, { data: this.stack }).end();
+      this.setNodeName('div')
+          .start(this.StackView, { data: this.stack }).end();
 
-      this.stack.push({ class: 'com.chrome.origintrials.ui.Browser', data$: this.data$ });
+      this.stack.push({
+        class: 'com.chrome.origintrials.ui.Browser',
+        data$: this.data$
+      });
     }
   ]
 });

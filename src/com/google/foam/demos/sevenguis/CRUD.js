@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'Person',
 
-  tableProperties: [ 'id', 'surname', 'name' ],
+  tableColumns: [ 'id', 'surname', 'name' ],
 
   properties: [
     { name: 'id', hidden: true },

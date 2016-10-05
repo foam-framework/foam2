@@ -25,8 +25,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { class: 'String', name: 'description', width: 25, label: 'Description: ' },
-    { class: 'String', name: 'url',         width: 50, label: 'URL: ' }
+    { class: 'String', name: 'description', width: 25 },
+    { class: 'String', name: 'url',         width: 50 }
   ]
 });
 
@@ -79,6 +79,9 @@ foam.CLASS({
           height:20px;
           font-size:14px;
         }
+        ^ .foam.u2-ActionView {
+          vertical-align: bottom;
+        }
         button, ^ .foam-u2-ActionView {
           border:none;
           color:#fff;
@@ -98,6 +101,7 @@ foam.CLASS({
         }
         ^ .foam-u2-DetailView tr {
           display: inline;
+          font-size: 16px;
         }
       */}
     })
@@ -111,7 +115,13 @@ foam.CLASS({
     },
     {
       name: 'person',
-      view: 'foam.u2.DetailView',
+      view: {
+        class: 'foam.u2.DetailView',
+        config: {
+          url:         { label: 'URL:' },
+          description: { label: 'Description:' }
+        }
+      },
       factory: function() { return this.Resource.create(); }
     }
   ],
@@ -133,9 +143,11 @@ foam.CLASS({
         */
 
         // Or this to use a DetailView
-        add(this.PERSON).
+        start('span').style({display: "flex"}).
+          add(this.PERSON).
+          add(this.ADD_RESOURCE).
+        end().
 
-        add(this.ADD_RESOURCE).
         start('h3').add('List of Resources').end().
 
         // Use a Standard TableView
