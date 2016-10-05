@@ -26,7 +26,7 @@ foam.CLASS({
     'foam.u2.ViewSpec',
     'foam.u2.tag.Card',
     'foam.u2.tag.Input',
-    'foam.u2.tag.Select',
+    'foam.u2.view.ChoiceView',
     //'foam.u2.search.DateFieldSearchView',
     'foam.u2.search.BooleanRefinement',
     'foam.u2.search.EnumRefinement',
@@ -265,8 +265,7 @@ foam.CLASS({
       if ( this.allowAddingFilters ) {
         topPanel.start()
             .cssClass(this.myCls('add-filter'))
-            .start(this.Select, {
-              inline: true,
+            .start(this.ChoiceView, {
               data$: this.filterChoice$,
               choices: this.filters
             }).end()
@@ -428,7 +427,6 @@ foam.CLASS({
               var spec = prop.searchView;
               // TODO(braden): Bring in date support when it's ready.
               var options = {
-                inline: true,
                 name: fields[i]
               };
               if ( prop.tableSeparator ) {
@@ -440,7 +438,7 @@ foam.CLASS({
           }
         }
 
-        oldFields = fields;
+        this.oldSearchFields_ = fields;
       }
     }
   ],
