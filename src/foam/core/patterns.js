@@ -76,3 +76,132 @@ foam.CLASS({
     function equals(other) { return other === this; }
   ]
 });
+
+
+/**
+  Progenitors spawn many lightweight instances of themselves, sharing
+  properties when indicated. Spawning an instance costs virtually nothing.
+*/
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'Progenitor',
+
+  properties: [
+    {
+      /** An map of functions to apply when spawning each instance.
+        Keys with null will be pulled from args if available. */
+      name: 'protoInits',
+      factory: function() { return Object.create(null); }
+    },
+    {
+      /** The keys of protoInits, to avoid 'for(key in protoInits)' */
+      name: 'protoValidProps_',
+      factory: function() { return []; }
+    },
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var axiom = this;
+
+      cls.installAxioms([
+        foam.core.Method.create({
+          name: 'spawn',
+          code: function create(args) {
+            var c = Object.create(this.getProgenitorProto_());
+            // init or copy properties
+            var props = axiom.protoValidProps_;
+            for ( var i = 0; i < props.length; i++ ) {
+              var prop = props[i];
+              if ( args && ( args[prop] !== undefined ) ) {
+                c[prop] = args[prop];
+              } else if ( axiom.protoInits[prop] ) {
+                c[prop] = axiom.protoInits[prop]();
+              }
+            }
+            // user defined init
+            this.initInstance && this.initInstance.call(c);
+            return c;
+          }
+        }),
+        foam.core.Method.create({
+          name: 'getProgenitorProto_',
+          code: function() {
+            var p = this.getPrivate_('prototype_');
+            if ( ! p ) {
+              p = Object.create(this);
+              // block non-instance functions
+              p.getProgenitorProto_ = null;
+              p.spawn = null;
+              // block non-shared properties
+              var props = axiom.protoValidProps_;
+              for ( var i = 0; i < props.length; i++ ) {
+                p[props[i]] = undefined;
+              }
+            }
+            return p;
+          }
+        }),
+
+        foam.core.Property.create({
+          name: 'progenitor',
+          getter: function() {
+            return this.getPrivate_('prototype_').__proto__;
+          },
+          setter: function() {}
+        })
+      ]);
+    },
+  ]
+
+});
+
+// TODO: "PerInstance" property that installs only into prototype_,
+//   warns about expressions and features not supported, adds
+//   value or factory to initInstance
+foam.CLASS({
+  package: 'foam.pattern',
+  name: 'PerInstance',
+  extends: 'foam.core.Property',
+
+  requires: [ 'foam.pattern.Progenitor' ],
+
+  // handled specially 'value', 'factory'
+  properties: [
+    { name: 'adapt', setter: function() { throw "PerInstance property does not support adapt() in " + this.name; } },
+    { name: 'preSet', setter: function() { throw "PerInstance property does not support preSet() in " + this.name; } },
+    { name: 'assertValue', setter: function() { throw "PerInstance property does not support assertValue() in " + this.name; } },
+    { name: 'postSet', setter: function() { throw "PerInstance property does not support postSet() in " + this.name; } },
+    { name: 'expression', setter: function() { throw "PerInstance property does not support expression() in " + this.name; } },
+    { name: 'getter', setter: function() { throw "PerInstance property does not support getter() in " + this.name; } },
+    { name: 'setter', setter: function() { throw "PerInstance property does not support setter() in " + this.name; } },
+    { name: 'final', setter: function() { throw "PerInstance property does not support final() in " + this.name; } },
+    { name: 'required', setter: function() { throw "PerInstance property does not support required() in " + this.name; } },
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var axiom = this;
+
+      var proAxiom = cls.getAxiomsByClass(this.Progenitor);
+      proAxiom = proAxiom && proAxiom[0];
+      if ( ! proAxiom ) { //TODO: throw instead creating the missing axiom?
+        proAxiom = axiom.Progenitor.create();
+        cls.installAxiom(proAxiom);
+      }
+      // TODO: generate a single function from strings?
+      if ( axiom.factory ) {
+        proAxiom.protoInits[axiom.name] = axiom.factory;
+      } else if ( axiom.value ) {
+        proAxiom.protoInits[axiom.name] = function initProp() {
+          return axiom.value;
+        };
+      }
+      proAxiom.protoValidProps_.push(axiom.name);
+    },
+    function installInProto() {
+      // nop
+    },
+  ]
+});
+
