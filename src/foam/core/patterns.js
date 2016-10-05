@@ -116,7 +116,7 @@ foam.CLASS({
               if ( args && ( args[prop] !== undefined ) ) {
                 c[prop] = args[prop];
               } else if ( axiom.protoInits[prop] ) {
-                c[prop] = axiom.protoInits[prop]();
+                c[prop] = axiom.protoInits[prop].call(this);
               }
             }
             // user defined init
