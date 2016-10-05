@@ -53,6 +53,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+    {
       name: 'actions',
       expression: function(of) {
         return of.getAxiomsByClass(foam.core.Action);
@@ -147,6 +152,15 @@ foam.CLASS({
             cssClass(self.myCls()).
             add(title).
             add(properties.map(function(p) {
+              var config = self.config && self.config[p.name];
+
+              if ( config ) {
+                p = Object.create(p);
+                for ( var key in config ) {
+                  p[key] = config[key];
+                }
+              }
+
               return self.DetailPropertyView.create({prop: p});
             })));
       }, this.of$, this.properties$));

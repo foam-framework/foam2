@@ -1620,8 +1620,7 @@ foam.CLASS({
 
       e.fromProperty && e.fromProperty(this);
 
-      if ( X.data$ &&
-           ! ( args && ( args.data || args.data$ ) ) ) {
+      if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
 
@@ -1731,12 +1730,12 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TableProperties',
+  name: 'TableColumns',
 
   properties: [
-    [ 'name', 'tableProperties' ],
+    [ 'name', 'tableColumns' ],
     {
-      name: 'properties',
+      name: 'columns',
       factory: function() {
         debugger;
       }
@@ -1749,9 +1748,17 @@ foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
+      // TODO: remove when all code ported
       name: 'tableProperties',
-      postSet: function(_, properties) {
-        this.axioms_.push(foam.u2.TableProperties.create({properties: properties}));
+      setter: function(_, ps) {
+        console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");
+        this.tableColumns = ps;
+      }
+    },
+    {
+      name: 'tableColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
       }
     }
   ]

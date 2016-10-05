@@ -95,7 +95,6 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         var t = this.Timer.create();
- t.timeWarp = 10;
         this.seconds$ = t.time$.map(function(t) { return Math.floor(t / 1000); });
         return t;
       }
