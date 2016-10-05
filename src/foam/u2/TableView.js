@@ -229,7 +229,7 @@ foam.CLASS({
 
         return this.of$cls.getAxiomsByClass(foam.core.Property)
             .filter(function(p) { return ! p.hidden; })
-            .map(foam.core.Property.NAME.f)
+            .map(foam.core.Property.NAME.f);
       }
     },
     {
