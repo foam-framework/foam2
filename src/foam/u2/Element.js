@@ -1735,7 +1735,7 @@ foam.CLASS({
   properties: [
     [ 'name', 'tableColumns' ],
     {
-      name: 'properties',
+      name: 'columns',
       factory: function() {
         debugger;
       }
@@ -1757,8 +1757,8 @@ foam.CLASS({
     },
     {
       name: 'tableColumns',
-      postSet: function(_, properties) {
-        this.axioms_.push(foam.u2.TableColumns.create({properties: properties}));
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
       }
     }
   ]
