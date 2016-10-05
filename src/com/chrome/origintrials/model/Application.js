@@ -27,8 +27,7 @@ foam.CLASS({
     {
       class: 'String',
       required: true,
-      name: 'applicantName',
-      label: 'How should we address you?'
+      name: 'applicantName'
     },
     {
       class: 'EMail',
@@ -45,7 +44,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'public',
-      label: 'I agree that this origin may be published as part of a list of origins using this experimental feature.',
+      label: 'Publishing?',
       value: false
     },
     {
@@ -56,7 +55,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'agreedToTerms',
-      label: 'I accept the Google Chrome Terms of Service',
+      label: 'Agreed to Terms',
       required: true,
       value: false
     },

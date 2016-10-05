@@ -41,6 +41,16 @@ foam.CLASS({
       this.setNodeName('div').
         start(this.DetailView, {
           data: this.data,
+          config: {
+            applicantName: { label: 'How should we address you?' },
+            public: {
+              label:  'I agree that this origin may be published as part of ' +
+                  'a list of origins using this experimental feature.'
+            },
+            agreedToTerms: {
+              label:  'I accept the Google Chrome Terms of Service'
+            }
+          },
           properties: [
             this.data.APPLICANT_NAME,
             this.data.APPLICANT_EMAIL,
