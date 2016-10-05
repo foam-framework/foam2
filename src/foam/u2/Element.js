@@ -1620,8 +1620,7 @@ foam.CLASS({
 
       e.fromProperty && e.fromProperty(this);
 
-      if ( X.data$ &&
-           ! ( args && ( args.data || args.data$ ) ) ) {
+      if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
 
