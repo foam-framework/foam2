@@ -1730,10 +1730,10 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TableProperties',
+  name: 'TableColumns',
 
   properties: [
-    [ 'name', 'tableProperties' ],
+    [ 'name', 'tableColumns' ],
     {
       name: 'properties',
       factory: function() {
@@ -1748,9 +1748,17 @@ foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
+      // TODO: remove when all code ported
       name: 'tableProperties',
+      setter: function(_, ps) {
+        console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");
+        this.tableColumns = ps;
+      }
+    },
+    {
+      name: 'tableColumns',
       postSet: function(_, properties) {
-        this.axioms_.push(foam.u2.TableProperties.create({properties: properties}));
+        this.axioms_.push(foam.u2.TableColumns.create({properties: properties}));
       }
     }
   ]
