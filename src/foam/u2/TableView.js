@@ -44,7 +44,7 @@ foam.CLASS({
 
   properties: [
     [ 'nodeName', 'tbody' ],
-    [ 'properties_' ],
+    [ 'columns_' ],
     {
       name: 'rows_',
       factory: function() { return {}; }
@@ -76,8 +76,8 @@ foam.CLASS({
                 return sel === obj;
               }));
 
-      for ( var j = 0 ; j < this.properties_.length ; j++ ) {
-        var prop = this.properties_[j];
+      for ( var j = 0 ; j < this.columns_.length ; j++ ) {
+        var prop = this.columns_[j];
         e = e.start('td').add(prop.tableCellView(obj, e)).end();
       }
       e.end();
@@ -97,10 +97,10 @@ foam.CLASS({
   ],
 
   properties: [
-    'properties_',
+    'columns_',
     {
       name: 'body',
-      factory: function() { return this.TableBody.create({ properties_: this.properties_ }); }
+      factory: function() { return this.TableBody.create({ columns_: this.columns_ }); }
     }
   ],
   methods: [
@@ -127,7 +127,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'properties_',
+      name: 'columns_',
       required: true
     },
     'sortOrder'
@@ -138,14 +138,14 @@ foam.CLASS({
       this.nodeName = 'thead';
 
       var e = this.start('tr');
-      for ( var i = 0 ; i < this.properties_.length ; i++ ) {
+      for ( var i = 0 ; i < this.columns_.length ; i++ ) {
         var sorting$ = this.sortOrder$.map(function(prop, order) {
           if ( ! order ) return '';
           var desc = this.Desc.isInstance(order);
           var baseOrder = desc ? order.arg1 : order;
           return prop.name === baseOrder.name ?
               this.Entity.create({ name: desc ? 'darr' : 'uarr' }) : '';
-        }.bind(this, this.properties_[i]));
+        }.bind(this, this.columns_[i]));
 
         e.start('td')
             .enableCls(this.myCls('sorting'), sorting$)
@@ -153,9 +153,9 @@ foam.CLASS({
                 .cssClass(this.myCls('sort-direction'))
                 .add(sorting$)
             .end()
-            .add(this.properties_[i].label)
+            .add(this.columns_[i].label)
             .on('click', this.tableView.sortBy.bind(this.tableView,
-                  this.properties_[i]))
+                  this.columns_[i]))
             .end();
       }
       e.end();
@@ -204,20 +204,28 @@ foam.CLASS({
     },
     [ 'nodeName', 'table' ],
     {
-      name: 'properties_',
-      expression: function(properties, of) {
+      name: 'columns_',
+      expression: function(columns, of) {
         var cls = this.of$cls;
-        return properties.map(function(p) { return cls.getAxiomByName(p); });
+        return columns.map(function(p) { return cls.getAxiomByName(p); });
       }
     },
     {
+      // TODO: remove when all code ported
       name: 'properties',
+      setter: function(_, ps) {
+        console.warn("Deprecated use of TableView.properties. Use 'columns' instead.");
+        this.columns = ps;
+      }
+    },
+    {
+      name: 'columns',
       expression: function(of) {
         if ( ! this.of$cls ) return undefined;
 
-        var tableProperties = this.of$cls.getAxiomByName('tableProperties');
+        var tableColumns = this.of$cls.getAxiomByName('tableColumns');
 
-        if ( tableProperties ) return tableProperties.properties;
+        if ( tableColumns ) return tableColumns.columns;
 
         return this.of$cls.getAxiomsByClass(foam.core.Property)
             .filter(function(p) { return ! p.hidden; })
@@ -230,9 +238,9 @@ foam.CLASS({
     },
     {
       name: 'header',
-      expression: function(properties_) {
+      expression: function(columns_) {
         return this.TableHeader.create({
-          properties_: properties_,
+          columns_: columns_,
           sortOrder$: this.sortOrder$
         });
       }
@@ -284,7 +292,7 @@ foam.CLASS({
           dao = dao.orderBy(this.sortOrder);
         }
         dao.select(foam.u2.TableBodySink.create({
-          properties_: this.properties_
+          columns_: this.columns_
         }, this)).then(function(a) {
           this.body = a.body;
         }.bind(this));
