@@ -25,8 +25,8 @@ foam.CLASS({
 
   properties: [
     { name: 'id', hidden: true },
-    { class: 'String', name: 'description', width: 25, label: 'Description: ' },
-    { class: 'String', name: 'url',         width: 50, label: 'URL: ' }
+    { class: 'String', name: 'description', width: 25 },
+    { class: 'String', name: 'url',         width: 50 }
   ]
 });
 
@@ -115,7 +115,13 @@ foam.CLASS({
     },
     {
       name: 'person',
-      view: 'foam.u2.DetailView',
+      view: {
+        class: 'foam.u2.DetailView',
+        config: {
+          url:         { label: 'URL:' },
+          description: { label: 'Description:' }
+        }
+      },
       factory: function() { return this.Resource.create(); }
     }
   ],
