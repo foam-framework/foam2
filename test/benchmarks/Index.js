@@ -65,23 +65,18 @@ describe("Index benchmarks", function() {
 
     var M = foam.mlang.ExpressionsSingleton.create();
 
+    var idx1 = Subject.INT_P.toIndex(Subject.BOOL_P.toIndex(Subject.ID.toIndex(
+                  foam.dao.index.ValueIndex.create())));
+    var idx2 = Subject.STRING_P.toIndex(Subject.INT_P.toIndex(Subject.ID.toIndex(
+                  foam.dao.index.ValueIndex.create())));
+
     subjectDAO = foam.dao.MDAO.create({ of: Subject })
       //.addPropertyIndex(Subject.INT_P)
       //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P)
       .addIndex(
         foam.dao.index.AltIndex.create({
-          delegates: [
-            Subject.INT_P.toIndex(
-              Subject.BOOL_P.toIndex(
-                Subject.ID.toIndex(
-                  foam.dao.index.ValueIndex.create()
-            ))),
-            Subject.STRING_P.toIndex(
-              Subject.INT_P.toIndex(
-                Subject.ID.toIndex(
-                  foam.dao.index.ValueIndex.create()
-            ))),
-          ]
+          delegates: [ idx1, idx2 ],
+          instances: [ idx1.spawn(), idx2.spawn() ]
         })
       )
       //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)
