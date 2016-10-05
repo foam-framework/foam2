@@ -207,7 +207,13 @@ foam.CLASS({
       name: 'columns_',
       expression: function(columns, of) {
         var cls = this.of$cls;
-        return columns.map(function(p) { return cls.getAxiomByName(p); });
+        return columns.map(function(p) {
+          // Lookup String values as Axiom names, otherwise,
+          // treat the object as the column object itself.
+          return typeof p === 'string' ?
+              cls.getAxiomByName(p) :
+              p ;
+        });
       }
     },
     {
