@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'test',
   name: 'Indexable',
-  
+
   ids: ['int'],
 
   properties: [
@@ -130,7 +130,7 @@ var callPlan = function callPlan(idx, sink, pred) {
 describe('Index interface', function() {
   it('has enough methods', function() {
     var idxFac = foam.dao.index.Index.create();
-    idxFac.create({ });
+    idxFac.spawn({ });
 
     idxFac.put();
     idxFac.remove();
@@ -257,7 +257,7 @@ describe('ValueIndex (as Plan)', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create();
+    idx = foam.dao.index.ValueIndex.create().spawn();
   });
 
   it('plans for no value', function() {
@@ -304,7 +304,7 @@ describe('TreeIndex', function() {
         prop: test.Indexable.FLOAT,
         tailFactory: foam.dao.index.ValueIndex.create()
       })
-    });
+    }).spawn();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -445,7 +445,7 @@ describe('Case-Insensitive TreeIndex', function() {
         prop: test.Indexable.INT,
         tailFactory: foam.dao.index.ValueIndex.create()
       })
-    });
+    }).spawn();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -504,7 +504,7 @@ describe('SetIndex', function() {
     idx = foam.dao.index.SetIndex.create({
       prop: test.Indexable.ARRAY,
       tailFactory: foam.dao.index.ValueIndex.create()
-    });
+    }).spawn();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -572,18 +572,16 @@ describe('AltIndex', function() {
 
   beforeEach(function() {
     data = createData2();
-    idx = foam.dao.index.AltIndex.create({
-      delegates: [
-        foam.dao.index.TreeIndex.create({
-          prop: test.Indexable.INT,
-          tailFactory: foam.dao.index.ValueIndex.create()
-        }),
-        foam.dao.index.TreeIndex.create({
-          prop: test.Indexable.FLOAT,
-          tailFactory: foam.dao.index.ValueIndex.create()
-        }),
-      ]
-    }).create();
+    idx = foam.dao.index.AltIndex.create().spawn();
+    var fakeRoot = { mapOver: function(fn, ofIndex) { idx = fn(idx); } };
+    idx.addIndex(foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.INT,
+      tailFactory: foam.dao.index.ValueIndex.create()
+    }), fakeRoot );
+    idx.addIndex(foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.FLOAT,
+      tailFactory: foam.dao.index.ValueIndex.create()
+    }), fakeRoot );
     idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
@@ -651,7 +649,7 @@ xdescribe('AutoIndex', function() {
         this.lastIndex = index;
       },
       idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
-      idIndexFactory: { 
+      idIndexFactory: {
         create: function() {
           return this.idIndex;
         }
@@ -711,7 +709,7 @@ xdescribe('AutoIndex', function() {
     expect(idx.baseAltIndex.instances[0]).toBe(mdao.idIndex);
     expect(idx.baseAltIndex.instances[1]).toBeTruthy();
     expect(idx.baseAltIndex.instances[2]).toBeUndefined();
-    
+
   });
 
   it('auto indexes on predicate', function() {

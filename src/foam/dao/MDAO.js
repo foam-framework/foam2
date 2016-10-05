@@ -55,6 +55,7 @@ foam.CLASS({
       name: 'idIndex'
     },
     {
+      /** The spawned root instance of our index. */
       name: 'index'
     }
   ],
@@ -104,15 +105,16 @@ foam.CLASS({
 
     function addIndex(index) {
       if ( ! this.index ) {
-        this.index = index.create();
+        this.index = index.spawn();
         return this;
       }
 
       // Upgrade single Index to an AltIndex if required.
-      if ( ! this.AltIndex.isInstance(this.index) ) {
-        this.index = this.AltIndex
-          .create({ delegates: [ this.index.__proto__ ] }) // create factory
-          .create({ instances: [ this.index ] }); // create an instance
+      if ( ! this.AltIndex.isInstance(this.index.progenitor) ) {
+        this.index = this.AltIndex.create({
+          delegates: [ this.index.progenitor ], // create factory
+          instances: [ this.index ] // create an instance
+        });
       }
 
       this.index.addIndex(index, this.index);

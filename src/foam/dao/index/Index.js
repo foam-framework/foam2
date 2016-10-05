@@ -21,16 +21,9 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
-  methods: [
-    /** JS-prototype based 'Flyweight' constructor. Creates plain
-      javascript objects that are __proto__'d to a modeled instance. */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.initInstance && c.initInstance();
-      return c;
-    },
+  axioms: [ foam.pattern.Progenitor.create() ],
 
+  methods: [
     /** Adds or updates the given value in the index */
     function put(/*o*/) {},
 
@@ -45,11 +38,11 @@ foam.CLASS({
 
     /** executes the given function for each index that was created from the given
       index factory (targetInstance.__proto__ === ofIndex). Function should take an index
-      instance argument and return the index instance to replace it with.  
-    
+      instance argument and return the index instance to replace it with.
+
       NOTE: size() is not allowed to change with this operation,
         since changing the type of index is not actually removing
-        or adding items. 
+        or adding items.
         Therefore: tail.size() == fn(tail).size() must hold.
     */
     function mapOver(fn, ofIndex) {},
@@ -76,7 +69,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Simple',
+      class: 'foam.pattern.PerInstance',
       name: 'delegate'
     }
   ],
@@ -120,7 +113,7 @@ foam.CLASS({
   implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
-    { class: 'Simple',  name: 'value' },
+    { class: 'foam.pattern.PerInstance',  name: 'value' },
     { name: 'cost', value: 1 }
   ],
 
@@ -175,20 +168,15 @@ foam.CLASS({
 
   properties: [
     {
-      /** delegate factories (TODOL: rename) */
+      /** delegate factories (TODO: rename) */
       name: 'delegates',
       factory: function() { return []; }
     },
     {
       /** the delegate instances for each Alt instance */
-      class: 'Simple',
+      class: 'foam.pattern.PerInstance',
       name: 'instances'
     },
-    {
-      /** the parent index for each Alt instance, used to access */
-      class: 'Simple',
-      name: 'parent'
-    }
   ],
 
   methods: [
@@ -200,23 +188,26 @@ foam.CLASS({
         }
       }
     },
-    
+
     function addIndex(index, root) {
       // assert(root)
+      // assert( ! index.progenitor )
       // This should be called on the factory, not an instance
-      var self = this.instances ? this.__proto__ : this;
-      self.delegates.push(index);
-      
-      function addIndexTo(inst) {
-        // Populate the index
-        var a = foam.dao.ArraySink.create();
-        inst.plan(a).execute([], a);
+      var self = this.progenitor || this;
 
-        index.bulkLoad(a);
-        inst.instances.push(index);
-        return inst;
+      self.delegates.push(index);
+
+      function addIndexTo(altInst) {
+        // Populate the index
+        var newSubInst = index.spawn();
+        var a = foam.dao.ArraySink.create();
+        altInst.plan(a).execute([], a);
+        // TODO: is this really faster than just execute([], newSubInst) ?
+        newSubInst.bulkLoad(a);
+        altInst.instances.push(newSubInst);
+        return altInst;
       }
-      
+
       // find all instances created by this factory, addIndexTo them
       root.mapOver(addIndexTo, self);
     },

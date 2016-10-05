@@ -180,7 +180,7 @@ foam.CLASS({
            console.log("Adding sig", newSig);
          }
       }
-      
+
     },
 
     function toString() {

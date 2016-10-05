@@ -30,14 +30,28 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeNode',
 
+  axioms: [ foam.pattern.Progenitor.create() ],
+
   properties: [
     // per node properties
-    { class: 'Simple', name: 'key'   },
-    { class: 'Simple', name: 'value' },
-    { class: 'Simple', name: 'size'  },
-    { class: 'Simple', name: 'level' },
-    { class: 'Simple', name: 'left'  },
-    { class: 'Simple', name: 'right' },
+    { class: 'foam.pattern.PerInstance', name: 'key'   },
+    { class: 'foam.pattern.PerInstance', name: 'value' },
+    { class: 'foam.pattern.PerInstance', name: 'size'  },
+    { class: 'foam.pattern.PerInstance', name: 'level' },
+    {
+      class: 'foam.pattern.PerInstance',
+      name: 'left',
+      factory: function() {
+        return this.nullNode;
+      }
+    },
+    {
+      class: 'foam.pattern.PerInstance',
+      name: 'right',
+      factory: function() {
+        return this.nullNode;
+      }
+    },
 
     // per tree properties
     {
@@ -57,21 +71,9 @@ foam.CLASS({
 
   methods: [
 
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
-
-    function init() {
-      this.left  = this.left  || this.nullNode;
-      this.right = this.right || this.nullNode;
-    },
-
     /** Nodes do a shallow clone */
     function clone() {
-      var c = this.__proto__.create();
+      var c = this.progenitor.spawn();
       c.key   = this.key;
       c.value = this.value;
       c.size  = this.size;
@@ -375,14 +377,14 @@ foam.CLASS({
       copy.right = s.nullNode;
       return copy;
     },
-    
+
     function mapOver(fn, ofIndex) {
       // continue the scan through all tails in this tree
       this.left.mapOver(fn, ofIndex);
-      this.value.mapOver(fn, ofIndex); 
+      this.value.mapOver(fn, ofIndex);
       this.right.mapOver(fn, ofIndex);
     },
-    
+
     function mapTail(fn) {
       // our tails are the targets, so apply the function
       // and keep the new tail
@@ -393,7 +395,7 @@ foam.CLASS({
       this.value = fn(this.value);
       this.right.mapTail(fn);
     },
-    
+
   ]
 });
 
@@ -418,7 +420,7 @@ foam.CLASS({
         The nullNode for a given tree creates all the new nodes, so it needs
         the factory for the tail index to create inside each new node.
       */
-      class: 'Simple',
+      class: 'foam.pattern.PerInstance',
       name: 'tailFactory'
     },
     {
@@ -426,7 +428,7 @@ foam.CLASS({
         The tree node factory is used to create new, empty tree nodes. They
         will be initialized with a new tail index from tailFactory.
       */
-      class: 'Simple',
+      class: 'foam.pattern.PerInstance',
       name: 'treeNodeFactory'
     }
   ],
@@ -449,9 +451,9 @@ foam.CLASS({
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
-      var subIndex = this.tailFactory.create();
+      var subIndex = this.tailFactory.spawn();
       subIndex.put(value);
-      var n = this.treeNodeFactory.create();
+      var n = this.treeNodeFactory.spawn();
       n.key = key;
       n.value = subIndex;
       n.size = 1;
