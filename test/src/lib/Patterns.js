@@ -89,6 +89,45 @@ describe('Progenitor', function() {
     expect(progenitor.progenitor).toBeUndefined();
   });
 
+  it('throws badly configured PerInstance properties', function() {
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        adapt: function() {}
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        preSet: function() {}
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        postSet: function() {}
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        expression: function() {}
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        getter: function() {}
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        setter: function() {}
+      });
+    }).toThrow();
+  });
+
 });
 
 
