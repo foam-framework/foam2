@@ -620,7 +620,6 @@ describe('AltIndex', function() {
 
     plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
     expect(sink.a.length).toEqual(2);
-
   });
 
   it('covers get()', function() {

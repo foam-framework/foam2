@@ -34,16 +34,23 @@ foam.CLASS({
   properties: [
     {
       /** Used to create the delegate ID index for new instances of AutoIndex */
-      name: 'idIndexFactory'
+      name: 'idIndexFactory',
+      required: true
+    },
+    {
+      name: 'delegateFactory_',
+      factory: function() {
+        return this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
+      }
     }
   ],
 
   methods: [
-    function init() {
-      this.delegate = this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
+    function initInstance() {
+      this.delegate = this.delegateFactory_.create();
     },
 
-    function addPropertyIndex(prop) {
+    function addPropertyIndex(prop, root) {
       if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
         prop = prop.arg1;
       }
@@ -57,10 +64,10 @@ foam.CLASS({
 
       this.existingIndexes.push([name]);
       //this.mdao.addPropertyIndex(prop);
-      this.addIndex(prop.toIndex(this.mdao.idIndexFactory));
+      this.addIndex(prop.toIndex(this.idIndexFactory), root);
     },
-    function addIndex(index) {
-      this.baseAltIndex.addIndex(index);
+    function addIndex(index, root) {
+      this.delegate.addIndex(index, root);
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this

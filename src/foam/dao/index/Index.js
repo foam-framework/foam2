@@ -44,12 +44,13 @@ foam.CLASS({
     function get(/*key*/) {},
 
     /** executes the given function for each index that was created from the given
-      index factory (target.__proto__ === ofIndex). Function should take an index
+      index factory (targetInstance.__proto__ === ofIndex). Function should take an index
       instance argument and return the index instance to replace it with.  
     
       NOTE: size() is not allowed to change with this operation,
         since changing the type of index is not actually removing
-        or adding items. Therefore: tail.size() == fn(tail).size();
+        or adding items. 
+        Therefore: tail.size() == fn(tail).size() must hold.
     */
     function mapOver(fn, ofIndex) {},
 
