@@ -99,8 +99,14 @@ foam.CLASS({
           var choice = nu[i];
           if ( value === choice[0] ) {
             this.choice = choice;
-            break;
+            return;
           }
+        }
+
+        // If we're still here, then we didn't have an index, nor a matching
+        // choice. Force selection of the first item.
+        if ( nu && nu.length ) {
+          this.choice = nu[0];
         }
       }
     },
