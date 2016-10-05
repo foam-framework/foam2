@@ -71,12 +71,22 @@ describe('Progenitor', function() {
 
     expect(progenitor.a).toEqual("hideMe");
     expect(progenitor.b).toEqual("defaultMe");
+
+    expect(spawnA.__proto__).toBe(spawnB.__proto__);
   });
 
   it('runs factories', function() {
     var spawn = progenitor.spawn();
 
     expect(spawn.c).toEqual('no');
+  });
+
+  it('gives spawned instance access to the progenitor', function() {
+    var spawn = progenitor.spawn();
+
+    expect(spawn.progenitor).toBe(progenitor);
+
+    expect(progenitor.progenitor).toBeUndefined();
   });
 
 });

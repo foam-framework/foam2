@@ -133,23 +133,17 @@ foam.CLASS({
               // block non-instance functions
               p.getProgenitorProto_ = null;
               p.spawn = null;
+              p.progenitor = this;
               // block non-shared properties
               var props = axiom.protoValidProps_;
               for ( var i = 0; i < props.length; i++ ) {
                 p[props[i]] = undefined;
               }
+              this.setPrivate_('prototype_', p);
             }
             return p;
           }
         }),
-
-        foam.core.Property.create({
-          name: 'progenitor',
-          getter: function() {
-            return this.getPrivate_('prototype_').__proto__;
-          },
-          setter: function() {}
-        })
       ]);
     },
   ]
