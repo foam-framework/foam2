@@ -13,7 +13,6 @@ foam.CLASS({
   actions: [
     {
       name: 'hello',
-      columnLabel: '',
       code: function hello() {
         console.log('Hello', this.firstName + ' ' + this.lastName);
       }

@@ -42,10 +42,8 @@ foam.CLASS({
   refines: 'foam.core.Action',
   properties: [
     {
-      name: 'columnLabel',
-      factory: function() {
-        return this.label;
-      }
+      class: 'String',
+      name: 'columnLabel'
     },
     {
       name: 'tableCellView',
