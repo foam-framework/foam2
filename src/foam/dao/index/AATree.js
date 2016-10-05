@@ -412,7 +412,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
-  extends: 'foam.dao.index.TreeNode',
 
   properties: [
     {
@@ -420,7 +419,6 @@ foam.CLASS({
         The nullNode for a given tree creates all the new nodes, so it needs
         the factory for the tail index to create inside each new node.
       */
-      class: 'foam.pattern.PerInstance',
       name: 'tailFactory'
     },
     {
@@ -428,18 +426,27 @@ foam.CLASS({
         The tree node factory is used to create new, empty tree nodes. They
         will be initialized with a new tail index from tailFactory.
       */
-      class: 'foam.pattern.PerInstance',
       name: 'treeNodeFactory'
+    },
+    {
+      name: 'left',
+      getter: function() { return undefined; }
+    },
+    {
+      name: 'right',
+      getter: function() { return undefined; }
+    },
+    {
+      name: 'size',
+      getter: function() { return 0; }
+    },
+    {
+      name: 'level',
+      getter: function() { return 0; }
     }
   ],
 
   methods: [
-    function init() {
-      this.left  = undefined;
-      this.right = undefined;
-      this.size = 0;
-      this.level = 0;
-    },
 
     function clone()         { return this; },
     function maybeClone()    { return this; },
