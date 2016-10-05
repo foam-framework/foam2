@@ -1,17 +1,4 @@
 foam.CLASS({
-  refines: 'foam.core.Action',
-
-  methods: [
-    function tableCellView(obj, e) {
-//       return foam.u2.ActionView.create({action: this, data: obj});
-
-      return this.toE(null, e.__subContext__.createSubContext({data: obj}));
-    }
-  ]
-});
-
-
-foam.CLASS({
   name: 'Person',
 
   tableColumns: [ 'id', 'firstName', 'lastName', 'hello' ],
