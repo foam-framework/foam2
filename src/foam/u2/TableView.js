@@ -17,13 +17,42 @@
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TableCellRefinement',
+  name: 'TableCellPropertyRefinement',
   refines: 'foam.core.Property',
   properties: [
+    {
+      name: 'columnLabel',
+      factory: function() {
+        return this.label;
+      }
+    },
     {
       name: 'tableCellView',
       value: function(obj) {
         return obj[this.name];
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'TableCellActionRefinement',
+  refines: 'foam.core.Action',
+  properties: [
+    {
+      name: 'columnLabel',
+      factory: function() {
+        return this.label;
+      }
+    },
+    {
+      name: 'tableCellView',
+      value: function(obj, e) {
+        //       return foam.u2.ActionView.create({action: this, data: obj});
+        
+        return this.toE(null, e.__subContext__.createSubContext({data: obj}));
       }
     }
   ]
@@ -153,7 +182,7 @@ foam.CLASS({
                 .cssClass(this.myCls('sort-direction'))
                 .add(sorting$)
             .end()
-            .add(this.columns_[i].label)
+            .add(this.columns_[i].columnLabel)
             .on('click', this.tableView.sortBy.bind(this.tableView,
                   this.columns_[i]))
             .end();
