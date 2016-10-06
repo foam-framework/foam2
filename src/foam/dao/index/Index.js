@@ -175,19 +175,18 @@ foam.CLASS({
     {
       /** the delegate instances for each Alt instance */
       class: 'foam.pattern.PerInstance',
-      name: 'instances'
+      name: 'instances',
+      factory: function() {
+        var instances = [];
+        for ( var i = 0; i < this.delegates.length; i++ ) {
+          instances[i] = this.delegates[i].spawn();
+        }
+        return instances;
+      }
     },
   ],
 
   methods: [
-    function initInstance() {
-      if ( ! this.instances ) {
-        this.instances = [];
-        for ( var i = 0; i < this.delegates.length; i++ ) {
-          this.instances[i] = this.delegates[i].spawn();
-        }
-      }
-    },
 
     function addIndex(index, root) {
       // assert(root)

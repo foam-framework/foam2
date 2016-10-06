@@ -87,36 +87,62 @@ foam.CLASS({
   name: 'Progenitor',
 
   properties: [
-    {
-      /** An map of functions to apply when spawning each instance.
-        Keys with null will be pulled from args if available. */
-      name: 'protoInits',
-      factory: function() { return Object.create(null); }
-    },
-    {
-      /** The keys of protoInits, to avoid 'for(key in protoInits)' */
-      name: 'protoValidProps_',
-      factory: function() { return []; }
-    },
+//     {
+//       /** An map of functions to apply when spawning each instance.
+//         Keys with null will be pulled from args if available. */
+//       name: 'protoFactories',
+//       factory: function() { return Object.create(null); }
+//     },
+//     {
+//       /** An map of functions to apply when spawning each instance.
+//         Keys with null will be pulled from args if available. */
+//       name: 'protoValues',
+//       factory: function() { return Object.create(null); }
+//     },
+//     {
+//       /** The keys of protoInits, to avoid 'for(key in protoInits)' */
+//       name: 'protoValidProps_',
+//       factory: function() { return []; }
+//     },
   ],
 
   methods: [
     function installInClass(cls) {
       var axiom = this;
 
+      var progenitorProps = cls.private_.progenitorProps;
+      if ( ! progenitorProps ) {
+        progenitorProps = {
+          protoFactories: Object.create(null),
+          protoValues:  Object.create(null),
+          protoValidProps_: [].slice(),
+          protoFactoryProps_: [].slice()
+        }
+        cls.private_.progenitorProps = progenitorProps;
+      }
+
       cls.installAxioms([
         foam.core.Method.create({
           name: 'spawn',
           code: function create(args) {
-            var c = Object.create(this.getProgenitorProto_());
+            var c = Object.create(this.progenitorPrototype_ || this.getProgenitorProto_());
             // init or copy properties
-            var props = axiom.protoValidProps_;
-            for ( var i = 0; i < props.length; i++ ) {
-              var prop = props[i];
-              if ( args && ( args[prop] !== undefined ) ) {
-                c[prop] = args[prop];
-              } else if ( axiom.protoInits[prop] ) {
-                c[prop] = axiom.protoInits[prop].call(this);
+            if ( args ) {
+              var props = progenitorProps.protoValidProps_;
+              for ( var i = 0; i < props.length; i++ ) {
+                var prop = props[i];
+                if ( args && ( args[prop] !== undefined ) ) {
+                  c[prop] = args[prop];
+                } else if ( progenitorProps.protoFactories[prop] ) {
+                  c[prop] = progenitorProps.protoFactories[prop].call(this);
+                }
+              }
+            } else {
+              // no args, just run factories
+              var props = progenitorProps.protoFactoryProps_;
+              for ( var i = 0; i < props.length; i++ ) {
+                var prop = props[i];
+                c[prop] = progenitorProps.protoFactories[prop].call(this);
               }
             }
             // user defined init
@@ -127,7 +153,7 @@ foam.CLASS({
         foam.core.Method.create({
           name: 'getProgenitorProto_',
           code: function() {
-            var p = this.getPrivate_('prototype_');
+            var p = this.progenitorPrototype_;
             if ( ! p ) {
               p = Object.create(this);
               // block non-instance functions
@@ -135,13 +161,22 @@ foam.CLASS({
               p.spawn = null;
               p.progenitor = this;
               // block non-shared properties
-              var props = axiom.protoValidProps_;
+              var props = progenitorProps.protoValidProps_;
               for ( var i = 0; i < props.length; i++ ) {
-                p[props[i]] = undefined;
+                var pName = props[i];
+                p[pName] = progenitorProps.protoValues[pName];
               }
-              this.setPrivate_('prototype_', p);
+              this.progenitorPrototype_ = p;
+//console.log("prototype construct: ", this.cls_.name, this.progenitor);
             }
             return p;
+          }
+        }),
+        foam.core.Method.create({
+          name: 'describe',
+          code: function() {
+            if (  this.progenitor ) console.log("Spawn of progenitor", this.progenitor.$UID);
+            this.SUPER();
           }
         }),
       ]);
@@ -183,15 +218,26 @@ foam.CLASS({
         proAxiom = axiom.Progenitor.create();
         cls.installAxiom(proAxiom);
       }
+
+      var progenitorProps = cls.private_.progenitorProps;
+      if ( ! progenitorProps ) {
+        progenitorProps = {
+          protoFactories: Object.create(null),
+          protoValues:  Object.create(null),
+          protoValidProps_: [].slice(),
+          protoFactoryProps_: [].slice()
+        }
+        cls.private_.progenitorProps = progenitorProps;
+      }
+
       // TODO: generate a single function from strings?
       if ( axiom.factory ) {
-        proAxiom.protoInits[axiom.name] = axiom.factory;
+        progenitorProps.protoFactories[axiom.name] = axiom.factory;
+        progenitorProps.protoFactoryProps_.push(axiom.name);
       } else if ( axiom.value ) {
-        proAxiom.protoInits[axiom.name] = function initProp() {
-          return axiom.value;
-        };
+        progenitorProps.protoValues[axiom.name] = axiom.value;
       }
-      proAxiom.protoValidProps_.push(axiom.name);
+      progenitorProps.protoValidProps_.push(axiom.name);
     },
     function installInProto() {
       // nop

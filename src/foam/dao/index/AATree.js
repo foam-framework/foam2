@@ -41,16 +41,10 @@ foam.CLASS({
     {
       class: 'foam.pattern.PerInstance',
       name: 'left',
-      factory: function() {
-        return this.nullNode;
-      }
     },
     {
       class: 'foam.pattern.PerInstance',
       name: 'right',
-      factory: function() {
-        return this.nullNode;
-      }
     },
 
     // per tree properties
@@ -461,6 +455,8 @@ foam.CLASS({
       var subIndex = this.tailFactory.spawn();
       subIndex.put(value);
       var n = this.treeNodeFactory.spawn();
+      n.left = this;
+      n.right = this;
       n.key = key;
       n.value = subIndex;
       n.size = 1;
