@@ -392,7 +392,7 @@ foam.CLASS({
       function(o, n, prop) {
         if ( foam.core.FObject.isInstance(n) ) return n;
 
-        var type = foam.typeOf(nu);
+        var type = foam.typeOf(n);
         var e    = this.__context__.lookup(prop.of);
 
         if ( type === foam.String ) return e[foam.String.constantize(n)];
