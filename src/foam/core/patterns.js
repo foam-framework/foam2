@@ -108,41 +108,31 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var axiom = this;
-
-      var progenitorProps = cls.private_.progenitorProps;
-      if ( ! progenitorProps ) {
-        progenitorProps = {
-          protoFactories: Object.create(null),
-          protoValues:  Object.create(null),
-          protoValidProps_: [].slice(),
-          protoFactoryProps_: [].slice()
-        }
-        cls.private_.progenitorProps = progenitorProps;
-      }
 
       cls.installAxioms([
         foam.core.Method.create({
           name: 'spawn',
           code: function create(args) {
-            var c = Object.create(this.progenitorPrototype_ || this.getProgenitorProto_());
+            var spawnProto = this.getProgenitorProto_();
+            var c = Object.create(spawnProto);
+            var defaults = spawnProto.propertyDefaults_;
             // init or copy properties
             if ( args ) {
-              var props = progenitorProps.protoValidProps_;
+              var props = defaults.protoValidProps_;
               for ( var i = 0; i < props.length; i++ ) {
                 var prop = props[i];
                 if ( args && ( args[prop] !== undefined ) ) {
                   c[prop] = args[prop];
-                } else if ( progenitorProps.protoFactories[prop] ) {
-                  c[prop] = progenitorProps.protoFactories[prop].call(this);
+                } else if ( defaults.protoFactories[prop] ) {
+                  c[prop] = defaults.protoFactories[prop].call(this);
                 }
               }
             } else {
               // no args, just run factories
-              var props = progenitorProps.protoFactoryProps_;
+              var props = defaults.protoFactoryProps_;
               for ( var i = 0; i < props.length; i++ ) {
                 var prop = props[i];
-                c[prop] = progenitorProps.protoFactories[prop].call(this);
+                c[prop] = defaults.protoFactories[prop].call(this);
               }
             }
             // user defined init
@@ -156,15 +146,37 @@ foam.CLASS({
             var p = this.progenitorPrototype_;
             if ( ! p ) {
               p = Object.create(this);
+
+              // grab list of property values and factories
+              var pp = {
+                protoFactories: Object.create(null),
+                protoValues:  Object.create(null),
+                protoValidProps_: [].slice(),
+                protoFactoryProps_: [].slice()
+              }
+              var props = this.cls_.getAxiomsByClass(foam.pattern.PerInstance);
+              for ( var i = 0; i < props.length; i++ ) {
+                var prop = props[i];
+                // TODO: generate a single function from strings?
+                if ( prop.factory ) {
+                  pp.protoFactories[prop.name] = prop.factory;
+                  pp.protoFactoryProps_.push(prop.name);
+                } else if ( prop.value ) {
+                  pp.protoValues[prop.name] = prop.value;
+                }
+                pp.protoValidProps_.push(prop.name);
+              }
+              p.propertyDefaults_ = pp;
+
               // block non-instance functions
               p.getProgenitorProto_ = null;
               p.spawn = null;
               p.progenitor = this;
               // block non-shared properties
-              var props = progenitorProps.protoValidProps_;
+              var props = pp.protoValidProps_;
               for ( var i = 0; i < props.length; i++ ) {
                 var pName = props[i];
-                p[pName] = progenitorProps.protoValues[pName];
+                p[pName] = pp.protoValues[pName];
               }
               this.progenitorPrototype_ = p;
 //console.log("prototype construct: ", this.cls_.name, this.progenitor);
@@ -210,34 +222,7 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var axiom = this;
-
-      var proAxiom = cls.getAxiomsByClass(this.Progenitor);
-      proAxiom = proAxiom && proAxiom[0];
-      if ( ! proAxiom ) { //TODO: throw instead creating the missing axiom?
-        proAxiom = axiom.Progenitor.create();
-        cls.installAxiom(proAxiom);
-      }
-
-      var progenitorProps = cls.private_.progenitorProps;
-      if ( ! progenitorProps ) {
-        progenitorProps = {
-          protoFactories: Object.create(null),
-          protoValues:  Object.create(null),
-          protoValidProps_: [].slice(),
-          protoFactoryProps_: [].slice()
-        }
-        cls.private_.progenitorProps = progenitorProps;
-      }
-
-      // TODO: generate a single function from strings?
-      if ( axiom.factory ) {
-        progenitorProps.protoFactories[axiom.name] = axiom.factory;
-        progenitorProps.protoFactoryProps_.push(axiom.name);
-      } else if ( axiom.value ) {
-        progenitorProps.protoValues[axiom.name] = axiom.value;
-      }
-      progenitorProps.protoValidProps_.push(axiom.name);
+       // nop
     },
     function installInProto() {
       // nop
