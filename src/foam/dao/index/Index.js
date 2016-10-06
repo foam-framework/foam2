@@ -208,8 +208,13 @@ foam.CLASS({
         return altInst;
       }
 
-      // find all instances created by this factory, addIndexTo them
-      root.mapOver(addIndexTo, self);
+      if ( root === this || root.progenitor === this ) {
+        // if we are the root, just call addIndexTo immediately
+        addIndexTo(root);
+      } else {
+        // find all instances created by this factory, addIndexTo them
+        root.mapOver(addIndexTo, self);
+      }
     },
 
     function bulkLoad(a) {
