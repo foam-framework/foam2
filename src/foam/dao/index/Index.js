@@ -184,7 +184,7 @@ foam.CLASS({
       if ( ! this.instances ) {
         this.instances = [];
         for ( var i = 0; i < this.delegates.length; i++ ) {
-          this.instances[i] = this.delegates[i].create();
+          this.instances[i] = this.delegates[i].spawn();
         }
       }
     },
@@ -200,10 +200,10 @@ foam.CLASS({
       function addIndexTo(altInst) {
         // Populate the index
         var newSubInst = index.spawn();
-        var a = foam.dao.ArraySink.create();
-        altInst.plan(a).execute([], a);
+        //var a = foam.dao.ArraySink.create();
+        altInst.plan(newSubInst).execute([], newSubInst);
         // TODO: is this really faster than just execute([], newSubInst) ?
-        newSubInst.bulkLoad(a);
+        //newSubInst.bulkLoad(a);
         altInst.instances.push(newSubInst);
         return altInst;
       }
