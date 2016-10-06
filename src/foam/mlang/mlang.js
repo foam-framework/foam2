@@ -88,7 +88,7 @@ foam.CLASS({
         // TODO: create a NamedProperty which doesn't include class, if possible
         return value && '__Property__' === value.class ?
             foam.lookup(value.source).getAxiomByName(value.name) :
-            value ;
+            foam.json.parse(value, null, opt_ctx) ;
       }
     },
     {
