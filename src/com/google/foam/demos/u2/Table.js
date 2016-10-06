@@ -1,7 +1,7 @@
 foam.CLASS({
   name: 'Person',
 
-  tableColumns: [ 'id', 'firstName', 'lastName', 'hello' ],
+  tableColumns: [ 'id', 'firstName', 'lastName', 'hello', 'remove' ],
 
   properties: [
     { class: 'Int',    name: 'id', hidden: true },
@@ -16,26 +16,63 @@ foam.CLASS({
       code: function hello() {
         console.log('Hello', this.firstName + ' ' + this.lastName);
       }
+    },
+    {
+      name: 'remove',
+      code: function hello(X) {
+        X.dao.remove(this);
+      }
     }
   ]
 });
 
-var dao = foam.dao.EasyDAO.create({
-  of: Person,
-  daoType: 'MDAO',
-  seqNo: true,
-  testData: [
-    { firstName: 'John',  lastName: 'Davis' },
-    { firstName: 'Steve', lastName: 'Howe' },
-    { firstName: 'Andy',  lastName: 'Smith' },
-    { firstName: 'Gary',  lastName: 'Russell' },
-    { firstName: 'Janet', lastName: 'Jones' },
-    { firstName: 'Linda', lastName: 'Fisher' },
-    { firstName: 'Kim',   lastName: 'Erwin' }
+
+foam.CLASS({
+  name: 'Main',
+
+  requires: [
+    'foam.u2.TableView',
+    'foam.dao.EasyDAO'
+  ],
+
+  exports: [ 'dao' ],
+
+  properties: [
+    {
+      name: 'dao',
+      factory: function() {
+        return this.EasyDAO.create({
+          of: Person,
+          daoType: 'MDAO',
+          seqNo: true,
+          testData: [
+            { firstName: 'John',  lastName: 'Davis' },
+            { firstName: 'Steve', lastName: 'Howe' },
+            { firstName: 'Andy',  lastName: 'Smith' },
+            { firstName: 'Gary',  lastName: 'Russell' },
+            { firstName: 'Janet', lastName: 'Jones' },
+            { firstName: 'Linda', lastName: 'Fisher' },
+            { firstName: 'Kim',   lastName: 'Erwin' }
+          ]
+        });
+      }
+    },
+    {
+      name: 'table',
+      factory: function() {
+        return this.TableView.create({
+          of: Person,
+          data: this.dao
+        });
+      }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.table.write();
+    }
   ]
 });
 
-var t = foam.u2.TableView.create({
-  of: Person,
-  data: dao
-}).write();
+var m = Main.create();
