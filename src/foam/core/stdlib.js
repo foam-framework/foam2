@@ -32,7 +32,7 @@
   4. It avoids the proliferation of large ===/typeof/isInstance/instanceof blocks
      throughout the rest of the code.
   5. It provides a consistent method for checking an object's type, since each
-     type flyweight has an .is() method which abstracts the underlying detection
+     type flyweight has an .isInstance() method which abstracts the underlying detection
      mechanism.
   6. It makes the future implementation of multi-methods much easier.
 */
@@ -43,8 +43,8 @@
  * <pre>
  * interface Type {
  *   // Returns true if the given object is of this type.
- *   // example: foam.String.is('hello') -> true
- *   is(o) -> Boolean
+ *   // example: foam.String.isInstance('hello') -> true
+ *   isInstance(o) -> Boolean
  *
  *   // Returns a deep clone of o, if the type supports it.
  *   clone(o);
@@ -66,7 +66,7 @@
 foam.LIB({
   name: 'foam.Undefined',
   methods: [
-    function is(o) { return o === undefined; },
+    function isInstance(o) { return o === undefined; },
     function clone(o) { return o; },
     function equals(_, b) { return b === undefined; },
     function compare(_, b) { return b === undefined ? 0 : 1; },
@@ -78,7 +78,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Null',
   methods: [
-    function is(o) { return o === null; },
+    function isInstance(o) { return o === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
     function compare(_, b) { return b === null ? 0 : b === undefined ? -1 : 1; },
@@ -90,7 +90,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Boolean',
   methods: [
-    function is(o) { return typeof o === 'boolean'; },
+    function isInstance(o) { return typeof o === 'boolean'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
@@ -102,7 +102,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Function',
   methods: [
-    function is(o) { return typeof o === 'function'; },
+    function isInstance(o) { return typeof o === 'function'; },
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
@@ -279,7 +279,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Number',
   methods: [
-    function is(o) { return typeof o === 'number'; },
+    function isInstance(o) { return typeof o === 'number'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -293,7 +293,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.String',
   methods: [
-    function is(o) { return typeof o === 'string'; },
+    function isInstance(o) { return typeof o === 'string'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
@@ -389,7 +389,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Array',
   methods: [
-    function is(o) { return Array.isArray(o); },
+    function isInstance(o) { return Array.isArray(o); },
     function clone(o) {
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(o.length);
@@ -448,7 +448,7 @@ foam.LIB({
 foam.LIB({
   name: 'foam.Date',
   methods: [
-    function is(o) { return o instanceof Date; },
+    function isInstance(o) { return o instanceof Date; },
     function clone(o) { return o; },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
@@ -500,9 +500,12 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'foam.FObject',
+  name: 'foam.AbstractClass',
   methods: [
-    function is(o) { return foam.core.FObject.isInstance(o); },
+    // Can't be an FObject yet because we haven't built the class system yet
+    function isInstance(o) {
+      return false;
+    },
     function clone(o) { return o.clone(); },
     function diff(a, b) { return a.diff(b); },
     function equals(a, b) { return a.equals(b); },
@@ -511,6 +514,7 @@ foam.LIB({
   ]
 });
 
+foam.FObject = foam.AbstractClass;
 
 foam.LIB({
   name: 'foam.Object',
@@ -520,7 +524,7 @@ foam.LIB({
         if ( obj.hasOwnProperty(key) ) f(obj[key], key);
       }
     },
-    function is(o) { return typeof o === 'object' && ! Array.isArray(o); },
+    function isInstance(o) { return typeof o === 'object' && ! Array.isArray(o); },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -550,20 +554,20 @@ foam.typeOf = (function() {
     tBoolean   = foam.Boolean,
     tArray     = foam.Array,
     tDate      = foam.Date,
-    tFObject   = foam.FObject,
+    tFObject   = foam.AbstractClass,
     tFunction  = foam.Function,
     tObject    = foam.Object;
 
   return function typeOf(o) {
-    if ( tNumber.is(o)    ) return tNumber;
-    if ( tString.is(o)    ) return tString;
-    if ( tUndefined.is(o) ) return tUndefined;
-    if ( tNull.is(o)      ) return tNull;
-    if ( tBoolean.is(o)   ) return tBoolean;
-    if ( tArray.is(o)     ) return tArray;
-    if ( tDate.is(o)      ) return tDate;
-    if ( tFunction.is(o)  ) return tFunction;
-    if ( tFObject.is(o)   ) return tFObject;
+    if ( tNumber.isInstance(o)    ) return tNumber;
+    if ( tString.isInstance(o)    ) return tString;
+    if ( tUndefined.isInstance(o) ) return tUndefined;
+    if ( tNull.isInstance(o)      ) return tNull;
+    if ( tBoolean.isInstance(o)   ) return tBoolean;
+    if ( tArray.isInstance(o)     ) return tArray;
+    if ( tDate.isInstance(o)      ) return tDate;
+    if ( tFunction.isInstance(o)  ) return tFunction;
+    if ( tFObject.isInstance(o)   ) return tFObject;
     return tObject;
   }
 })();

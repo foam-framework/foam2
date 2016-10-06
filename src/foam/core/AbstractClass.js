@@ -127,6 +127,12 @@ foam.LIB({
     function isSubClass(c) {
       if ( ! c || ! c.id ) return false;
 
+// TODO: fix, shouldn't be necessary
+if ( this === foam.AbstractClass ) {
+  // regular code doesn't work because AbstractClass doesn't have prototype or id
+  return true;
+}
+
       var cache = this.private_.isSubClassCache ||
         ( this.private_.isSubClassCache = {} );
 

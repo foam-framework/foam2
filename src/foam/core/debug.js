@@ -262,7 +262,7 @@ foam.CLASS({
         } catch (x) {
           value = '-';
         }
-        if ( foam.Array.is(value) ) {
+        if ( foam.Array.isInstance(value) ) {
           // NOP
         } else if ( value && value.toString ) {
           value = value.toString();
