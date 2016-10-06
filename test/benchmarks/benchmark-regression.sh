@@ -11,7 +11,7 @@ cd tmp/regressionBenchmark
 
 # reference revision (TODO: make reference a branch, checkout --depth 1)
 git clone https://github.com/foam-framework/foam2-experimental.git . --no-checkout
-git checkout 5b90c680a93f8b279baa947a7e7ad5647a79c42b
+git checkout 0a6c436d088932235879665269708c2b889dd2f0
 ln -s ../../node_modules
 
 npm run benchmark-regression > ../../bench-regression-reference.log
