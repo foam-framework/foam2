@@ -65,18 +65,6 @@ foam.CLASS({
 
   methods: [
 
-    /** Nodes do a shallow clone */
-    function clone() {
-      var c = this.progenitor.spawn();
-      c.key   = this.key;
-      c.value = this.value;
-      c.size  = this.size;
-      c.level = this.level;
-      c.left  = this.left;
-      c.right = this.right;
-      return c;
-    },
-
     /**
        Clone is only needed if a select() is active in the tree at the
        same time we are updating it.
@@ -413,6 +401,7 @@ foam.CLASS({
         The nullNode for a given tree creates all the new nodes, so it needs
         the factory for the tail index to create inside each new node.
       */
+      class: 'Simple',
       name: 'tailFactory'
     },
     {
@@ -420,27 +409,38 @@ foam.CLASS({
         The tree node factory is used to create new, empty tree nodes. They
         will be initialized with a new tail index from tailFactory.
       */
+      class: 'Simple',
       name: 'treeNodeFactory'
     },
     {
+      class: 'Simple',
       name: 'left',
-      getter: function() { return undefined; }
+      //getter: function() { return undefined; }
     },
     {
+      class: 'Simple',
       name: 'right',
-      getter: function() { return undefined; }
+      //getter: function() { return undefined; }
     },
     {
+      class: 'Simple',
       name: 'size',
-      getter: function() { return 0; }
+      //getter: function() { return 0; }
     },
     {
+      class: 'Simple',
       name: 'level',
-      getter: function() { return 0; }
+      //getter: function() { return 0; }
     }
   ],
 
   methods: [
+    function init() {
+      this.left = undefined;
+      this.right = undefined;
+      this.size = 0;
+      this.level = 0;
+    },
 
     function clone()         { return this; },
     function maybeClone()    { return this; },
@@ -481,7 +481,8 @@ foam.CLASS({
 
       var tree = this;
       var m    = start + Math.floor((end-start+1) / 2);
-      tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
+      var am = a[m];
+      tree = tree.putKeyValue(keyExtractor(am), am);
 
       tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
       tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);

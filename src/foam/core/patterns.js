@@ -172,6 +172,10 @@ foam.CLASS({
               p.getProgenitorProto_ = null;
               p.spawn = null;
               p.progenitor = this;
+              p.clone = function() {
+                return this.progenitor.spawn(this);
+              }
+
               // block non-shared properties
               var props = pp.protoValidProps_;
               for ( var i = 0; i < props.length; i++ ) {
