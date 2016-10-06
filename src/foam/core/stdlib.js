@@ -578,7 +578,7 @@ foam.mmethod = function(map, opt_defaultMethod) {
   }
 
   return function(arg1) {
-    var type = foam.typeOf(arg1)
+    var type = foam.typeOf(arg1);
     if ( ! opt_defaultMethod ) {
       console.assert(type, 'Unknown type: ', arg1, 'and no default method provided');
       console.assert(
