@@ -58,24 +58,6 @@ describe("MDAO benchmarks", function() {
        });
     }
 
-    function atime(name, fn) {
-      var startTime = performance.now();
-      var fn2 = function(arg) {
-        var endTime = performance.now();
-        console.log(name, ", ", endTime - startTime);
-        return arg;
-      };
-      return foam.async.sequence([ fn, fn2 ]);
-    }
-
-    function atest(name, fn) {
-      if ( DEBUG ) console.log("Starting:", name);
-      var fn2 = function() {
-        if ( DEBUG ) console.log(name, 'result: ', arg);
-      };
-      return foam.async.sequence([ atime(name, fn), fn2 ]);
-    }
-
     foam.CLASS({
       name: 'Photo',
       properties: [
@@ -133,7 +115,7 @@ describe("MDAO benchmarks", function() {
 
     function runPhotoBenchmarks() {
     Promise.resolve().then(foam.async.sequence([
-      atest('CreateTestAlbums' + NUM_ALBUMS, foam.async.repeat(NUM_ALBUMS, function ( i) {
+      foam.async.atest('CreateTestAlbums' + NUM_ALBUMS, foam.async.repeat(NUM_ALBUMS, function ( i) {
         albums.put(
           Album.create({
             id: ""+i,
@@ -144,7 +126,7 @@ describe("MDAO benchmarks", function() {
           })
         );
       })),
-      atest('CreateTestPhotos' + NUM_PHOTOS, foam.async.repeat(NUM_PHOTOS, function ( i) {
+      foam.async.atest('CreateTestPhotos' + NUM_PHOTOS, foam.async.repeat(NUM_PHOTOS, function ( i) {
         photos.put(
           Photo.create({
             id: ""+i,
@@ -160,33 +142,33 @@ describe("MDAO benchmarks", function() {
       foam.async.repeat(DEBUG ? 1 : 7,
         foam.async.sequence([
           foam.async.log('Benchmark...'),
-          atest('1a CreateAlbums' + NUM_ALBUMS, function() {
+          foam.async.atest('1a CreateAlbums' + NUM_ALBUMS, function() {
               var dao = foam.dao.ArrayDAO.create({ array: albums.a });
               return AlbumDAO.bulkLoad(dao);
           }),
           foam.async.sleep(1000),
-          atest('1b CreatePhotos' + NUM_PHOTOS, function() {
+          foam.async.atest('1b CreatePhotos' + NUM_PHOTOS, function() {
             var dao = foam.dao.ArrayDAO.create({ array: photos.a });
             return PhotoDAO.bulkLoad(dao);
           }),
           foam.async.sleep(1000),
-          atest('2a SelectAllAlbumsQuery', function() {
+          foam.async.atest('2a SelectAllAlbumsQuery', function() {
             return AlbumDAO.select()
               .then(function(s) { expect(s.a.length).toEqual(NUM_ALBUMS); });
           }),
-          atest('2a SelectAllPhotosQuery', function() {
+          foam.async.atest('2a SelectAllPhotosQuery', function() {
             return PhotoDAO.select()
               .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS); });
           }),
-          atest('2b SingleKeyQuery',       function() {
+          foam.async.atest('2b SingleKeyQuery',       function() {
             return PhotoDAO.find(avgKey);
           }),
-          atest('2b SingleKeyQuery(X100)',
+          foam.async.atest('2b SingleKeyQuery(X100)',
             foam.async.repeat(100, function() {
               return PhotoDAO.find(avgKey);
             })
           ),
-          atest('2c MultiKeyQuery10',   function() {
+          foam.async.atest('2c MultiKeyQuery10',   function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select(asink)
 //               .then(function(s) {
@@ -197,7 +179,7 @@ describe("MDAO benchmarks", function() {
                 expect(s.a.length).toEqual(10);
               });
           }),
-          atest('2c MultiKeyQuery100',  function() {
+          foam.async.atest('2c MultiKeyQuery100',  function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select(asink)
 //               .then(function(s) {
@@ -206,7 +188,7 @@ describe("MDAO benchmarks", function() {
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select()
               .then(function(s) { expect(s.a.length).toEqual(100); });
           }),
-          atest('2c MultiKeyQuery1000', function() {
+          foam.async.atest('2c MultiKeyQuery1000', function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select(asink)
 //               .then(function(s) {
@@ -215,7 +197,7 @@ describe("MDAO benchmarks", function() {
             return PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select()
               .then(function(s) { expect(s.a.length).toEqual(1000); });
           }),
-          atest('2cMultiKeyQuery5000', function() {
+          foam.async.atest('2cMultiKeyQuery5000', function() {
 //             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select(asink)
 //               .then(function(s) {
@@ -225,7 +207,7 @@ describe("MDAO benchmarks", function() {
               .then(function(s) { expect(s.a.length).toEqual(5000); });
           }),
 
-          atest('2d IndexedFieldQuery', function() {
+          foam.async.atest('2d IndexedFieldQuery', function() {
             var asink = foam.dao.ArraySink.create();
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).select(
               M.MAP(Photo.ALBUM_ID, asink)
@@ -233,23 +215,23 @@ describe("MDAO benchmarks", function() {
               expect(asink.a.length).toEqual(10);
             });
           }),
-          atest('2d IndexedFieldQuery(X100)', foam.async.repeat(100, function() {
+          foam.async.atest('2d IndexedFieldQuery(X100)', foam.async.repeat(100, function() {
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).select(
               M.MAP(Photo.ALBUM_ID, foam.dao.ArraySink.create())
             );
           })),
 
-          atest('2e AdHocFieldQuery',  function() {
+          foam.async.atest('2e AdHocFieldQuery',  function() {
             return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
               M.MAP(Photo.HASH, foam.dao.ArraySink.create())
             );
           }),
-//           atest('2e AdHocFieldQuery(x100)', foam.async.repeat(100, function() {
+//           foam.async.atest('2e AdHocFieldQuery(x100)', foam.async.repeat(100, function() {
 //             return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
 //               M.MAP(Photo.HASH, foam.dao.ArraySink.create())
 //             );
 //           })),
-          atest('2f SimpleInnerJoinQuery',  function() {
+          foam.async.atest('2f SimpleInnerJoinQuery',  function() {
             var idsink = foam.dao.ArraySink.create();
             return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID, idsink)).then(function (idsmapsink) {
               return PhotoDAO.where(M.IN(Photo.ALBUM_ID, idsink.a)).select().then(function(csink) {
@@ -257,45 +239,45 @@ describe("MDAO benchmarks", function() {
               });
             })
           }),
-        //  atest('2f SimpleInnerJoinQuery(Simpler+Slower Version)', new Promise( function() {
+        //  foam.async.atest('2f SimpleInnerJoinQuery(Simpler+Slower Version)', new Promise( function() {
         //    AlbumDAO.where(M.EQ(Album.IS_LOCAL, true)).select(M.MAP(JOIN(PhotoDAO, Photo.ALBUM_ID, []), []))(ret);
         //  }),
-      //     atest('2g SimpleInnerJoinAggregationQuery', new Promise( function() {
+      //     foam.async.atest('2g SimpleInnerJoinAggregationQuery', new Promise( function() {
       //       AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID))(function (ids) {
       //         PhotoDAO.where(M.IN(Photo.ALBUM_ID, ids.arg2)).select(M.GROUP_BY(Photo.ALBUM_ID, SUM_PHOTO_COUNT))(ret);
       //     })}),
-        //  atest('2g SimpleInnerJoinAggregationQuery(Simpler+Slower Version', new Promise( function() {
+        //  foam.async.atest('2g SimpleInnerJoinAggregationQuery(Simpler+Slower Version', new Promise( function() {
         //    AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(
         //        M.MAP(JOIN(PhotoDAO, Photo.ALBUM_ID, SUM_PHOTO_COUNT), []))(ret);
         //  }),
-          atest('2h SimpleOrderByQuery', function() {
+          foam.async.atest('2h SimpleOrderByQuery', function() {
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(M.DESC(Photo.TIMESTAMP)).select();
           }),
-          atest('2h SimpleOrderByQuery(X100)', foam.async.repeat(100, function() {
+          foam.async.atest('2h SimpleOrderByQuery(X100)', foam.async.repeat(100, function() {
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(M.DESC(Photo.TIMESTAMP)).select();
           })),
-//           atest('2j AscOrderByQuery', function() {
+//           foam.async.atest('2j AscOrderByQuery', function() {
 //             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(Photo.TIMESTAMP).select();
 //           }),
-//           atest('2j AscOrderByQuery(X100)', foam.async.repeat(100, function() {
+//           foam.async.atest('2j AscOrderByQuery(X100)', foam.async.repeat(100, function() {
 //             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).orderBy(Photo.TIMESTAMP).select();
 //           })),
-      //     atest('2i SimpleOrderAndGroupByQuery', new Promise( function() {
+      //     foam.async.atest('2i SimpleOrderAndGroupByQuery', new Promise( function() {
       //       PhotoDAO
       //         .where(M.AND(GTE(Photo.TIMESTAMP, new Date(96, 0, 1)), M.LT(Photo.TIMESTAMP, new Date(96, 2, 1))))
       //         .orderBy(M.DESC(Photo.TIMESTAMP))
       //         .select(M.GROUP_BY(MONTH(Photo.TIMESTAMP)))(ret);
       //     }),
-      //    atest('2jSimpleAggregationQuery', new Promise( function() { PhotoDAO.select(M.GROUP_BY(Photo.ALBUM_ID))(ret); }),
+      //    foam.async.atest('2jSimpleAggregationQuery', new Promise( function() { PhotoDAO.select(M.GROUP_BY(Photo.ALBUM_ID))(ret); }),
 
-//           atest('3a CreateAndUpdate', atxn(foam.async.repeat(DEBUG ? 10 : 1000, (function ( i) { AlbumDAO.put(randomAlbum(i*2), ret); }))),
-//           atest('3b Setup', atxn(new Promise( function() {
+//           foam.async.atest('3a CreateAndUpdate', atxn(foam.async.repeat(DEBUG ? 10 : 1000, (function ( i) { AlbumDAO.put(randomAlbum(i*2), ret); }))),
+//           foam.async.atest('3b Setup', atxn(new Promise( function() {
 //             AlbumDAO.put(randomAlbum('test')),
 //             foam.async.repeat(DEBUG ? 10 : 1000, function(ret, i) { PhotoDAO.put(randomPhoto('test', i), ret); })(ret);
 //           })),
-//           atest('3b CascadingDelete', atxn(new Promise( function() { AlbumDAO.remove('3', ret); })),
+//           foam.async.atest('3b CascadingDelete', atxn(new Promise( function() { AlbumDAO.remove('3', ret); })),
 
-          atest('Cleanup', function() {
+          foam.async.atest('Cleanup', function() {
             return AlbumDAO.removeAll().then(PhotoDAO.removeAll());
           })
           ,foam.async.sleep(5000)
