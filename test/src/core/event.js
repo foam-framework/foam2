@@ -282,11 +282,11 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
   });
 
   it('pubes correctly after removing first of three', function() {
-    ep.change.sub(listener);
+    var s1 = ep.change.sub(listener);
     ep.change.sub(listener2);
     ep.change.sub(listener3);
 
-    ep.change.unsub(listener);
+    s1.destroy();
     ep.change.pub();
     expect(listener.count).toEqual(0);
     expect(listener2.count).toEqual(1);
@@ -294,10 +294,10 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
   });
    it('pubes correctly after removing middle of three', function() {
     ep.change.sub(listener);
-    ep.change.sub(listener2);
+    var s2 = ep.change.sub(listener2);
     ep.change.sub(listener3);
 
-    ep.change.unsub(listener2);
+    s2.destroy();
     ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(0);
@@ -306,9 +306,9 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
   it('pubes correctly after removing last of three', function() {
     ep.change.sub(listener);
     ep.change.sub(listener2);
-    ep.change.sub(listener3);
+    var s3 = ep.change.sub(listener3);
 
-    ep.change.unsub(listener3);
+    s3.destroy();
     ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(1);

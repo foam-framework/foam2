@@ -226,10 +226,6 @@ foam.CLASS({
       return s;
     },
 
-    function unsub(l) {
-      this.obj.unsub('propertyChange', this.prop.name, l);
-    },
-
     function isDefined() {
       return this.obj.hasOwnProperty(this.prop.name);
     },
@@ -294,10 +290,6 @@ foam.CLASS({
       return this.SUPER('propertyChange', 'value', l);
     },
 
-    function unsub(l) {
-      this.SUPER('propertyChange', 'value', l);
-    },
-
     function isDefined() {
       return this.parent.get().hasOwnProperty(this.name);
     },
@@ -348,9 +340,7 @@ foam.CLASS({
 
     function set() { /* nop */ },
 
-    function sub(l) { /* nop */ },
-
-    function unsub(l) { /* nop */ }
+    function sub(l) { /* nop */ }
   ]
 });
 
@@ -429,12 +419,6 @@ foam.CLASS({
     function set() { /* nop */ },
 
     function sub(l) {
-      return arguments.length === 1 ?
-        this.SUPER('propertyChange', 'value', l) :
-        this.SUPER.apply(this,arguments);
-    },
-
-    function unsub(l) {
       return arguments.length === 1 ?
         this.SUPER('propertyChange', 'value', l) :
         this.SUPER.apply(this,arguments);

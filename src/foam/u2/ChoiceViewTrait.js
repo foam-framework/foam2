@@ -132,11 +132,8 @@ foam.CLASS({
           '[key, value] choice. Required when a DAO is provided.'
     },
     {
-      name: 'dao',
-      postSet: function(old, nu) {
-        old.on.unsub(this.onDAOUpdate);
-        nu.on.sub(this.onDAOUpdate);
-      }
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
     },
     {
       name: 'data',
@@ -157,6 +154,14 @@ foam.CLASS({
           this.warn('ChoiceView data set to invalid choice: ', nu);
         }
       }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+
+      this.dao$proxy.sub('on', this.onDAOUpdate);
     }
   ],
 
