@@ -897,9 +897,6 @@ foam.CLASS({
     {
       name: 'cview',
       postSet: function(o, n) {
-        o && o.invalidated.unsub(this.paint);
-        n && n.invalidated.sub(this.paint);
-
         n.canvas = this;
 
         if ( this.attributeMap.width === undefined || this.attributeMap.height === undefined ) {
@@ -921,6 +918,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.on('load', this.paint);
+      this.cview$.valueSub('invalidated', this.paint);
     },
     function erase() {
       this.el().width = this.el().width;
