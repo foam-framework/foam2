@@ -57,6 +57,16 @@ foam.LIB({
       return obj;
     },
 
+    function createSubClass() {
+      var cls = Object.create(this);
+
+      cls.prototype = Object.create(this.prototype);
+      cls.axiomMap_ = Object.create(this.axiomMap_);
+      cls.private_  = { axiomCache: Object.create(this.axiomMap_) };
+
+      return cls;
+    },
+
     /**
       Install Axioms into the class and prototype.
       Invalidate the axiom-cache, used by getAxiomsByName().
