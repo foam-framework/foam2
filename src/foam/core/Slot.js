@@ -36,6 +36,21 @@ foam.CLASS({
   methods: [
     /**
     */
+    function valueSub() {
+      var self = this;
+      var args = Array.prototype.slice.call(arguments);
+      var s;
+      var l = function() {
+        var v = self.get();
+        if ( s ) s.destroy();
+        if ( v ) s = v.sub.apply(v, args);
+      };
+      l();
+      this.sub(l);
+    },
+
+    /**
+    */
     function dot(name) {
       return foam.core.internal.SubSlot.create({
         parent: this,
