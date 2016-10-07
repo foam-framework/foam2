@@ -117,11 +117,11 @@ foam.CLASS({
 
 
 foam.__context__.assert(
-    ! foam.AbstractClass.describe,
-    'foam.AbstractClass.describe already set.');
+    ! foam.core.FObject.describe,
+    'foam.core.FObject.describe already set.');
 
 /* Add describe() support to classes. */
-foam.AbstractClass.describe = function(opt_name) {
+foam.core.FObject.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
   console.log('Axiom Type           Source Class   Name');
@@ -138,8 +138,8 @@ foam.AbstractClass.describe = function(opt_name) {
 
 
 // Decorate installModel() to verify that axiom names aren't duplicated.
-foam.AbstractClass.installModel = function() {
-  var superInstallModel = foam.AbstractClass.installModel;
+foam.core.FObject.installModel = function() {
+  var superInstallModel = foam.core.FObject.installModel;
 
   return function(m) {
     var names = {};
@@ -193,7 +193,7 @@ foam.AbstractClass.installModel = function() {
   };
 }();
 
-foam.AbstractClass.validate = function() {
+foam.core.FObject.validate = function() {
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     a.validateClass && a.validateClass(this);
@@ -218,9 +218,9 @@ if ( false && global.Proxy ) {
       value: true
     };
 
-    var oldCreate = foam.AbstractClass.create;
+    var oldCreate = foam.core.FObject.create;
 
-    foam.AbstractClass.create = function(args, ctx) {
+    foam.core.FObject.create = function(args, ctx) {
       return new Proxy(oldCreate.call(this, args, ctx), {
         get: function(target, prop, receiver) {
           return Reflect.get(target, prop, receiver);

@@ -38,7 +38,7 @@ foam.CLASS({
               spec.create(args, ctx) :
               ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
 
-          foam.AbstractClass.isSubClass(spec) ?
+          foam.core.FObject.isSubClass(spec) ?
             spec.create(args, ctx) :
 
           // TODO: verify a String

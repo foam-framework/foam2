@@ -27,7 +27,6 @@ FOAM_FILES([
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
   { name: "foam/core/Context" },
-  { name: "foam/core/AbstractClass" },
   { name: "foam/core/Boot" },
   { name: "foam/core/FObject" },
   { name: "foam/core/Model" },

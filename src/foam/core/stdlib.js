@@ -500,12 +500,10 @@ foam.LIB({
 
 
 foam.LIB({
-  name: 'foam.AbstractClass',
+  name: 'foam.core.FObject',
   methods: [
     // Can't be an FObject yet because we haven't built the class system yet
-    function isInstance(o) {
-      return false;
-    },
+    function isInstance(o) { return false; },
     function clone(o) { return o.clone(); },
     function diff(a, b) { return a.diff(b); },
     function equals(a, b) { return a.equals(b); },
@@ -514,7 +512,6 @@ foam.LIB({
   ]
 });
 
-foam.FObject = foam.AbstractClass;
 
 foam.LIB({
   name: 'foam.Object',
@@ -554,7 +551,7 @@ foam.typeOf = (function() {
     tBoolean   = foam.Boolean,
     tArray     = foam.Array,
     tDate      = foam.Date,
-    tFObject   = foam.AbstractClass,
+    tFObject   = foam.core.FObject,
     tFunction  = foam.Function,
     tObject    = foam.Object;
 
@@ -577,7 +574,7 @@ foam.mmethod = function(map, opt_defaultMethod) {
   var uid = '__mmethod__' + foam.next$UID() + '__';
 
   for ( var key in map ) {
-    var type = foam[key];
+    var type = key === 'FObject' ? foam.core.FObject : foam[key];
     type[uid] = map[key];
   }
 
