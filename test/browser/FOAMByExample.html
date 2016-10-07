@@ -781,22 +781,14 @@ o.a = 42;
 o.b = 'bar';
 o.a++;
 
-// There are four ways to unsub a listener
-// 1. Call obj.unsub();
-o = TopicTest.create();
-var l = function() { console.log.apply(console.log, arguments); };
-o.sub(l);
-o.pub('fire');
-o.unsub(l);
-o.pub("fire again, but nobody's listenering");
-
-// 2. Call .destroy() on the Destroyable that sub() returns
+// There are three ways to unsubscribe a listener
+// 1. Call .destroy() on the Destroyable that sub() returns
 var sub = o.sub(l);
 o.pub('fire');
 sub.destroy();
 o.pub("fire again, but nobody's listenering");
 
-// 3. Destroy the subscription, which is supplied to the listener
+// 2. Destroy the subscription, which is supplied to the listener
 var l = function(sub) {
   sub.destroy();
   console.log.apply(console.log, arguments);
@@ -805,7 +797,7 @@ o.sub(l);
 o.pub('fire');
 o.pub("fire again, but nobody's listenering");
 
-// 4. If you only want to receive the first event, decorate your
+// 3. If you only want to receive the first event, decorate your
 // listener with foam.events.oneTime() and it will cancel the subscription
 // when it receives the first event.
 o.sub(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
@@ -1044,7 +1036,7 @@ o.destroy();
 o.destroy();
 o.destroy();
 
-// If an Object is destroyed, it will unsub from any
+// If an Object is destroyed, it will unsubscribe from any
 // subscriptions which subsequently try to deliver events.
 var source = foam.core.FObject.create();
 var sink = foam.CLASS({

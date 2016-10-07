@@ -804,10 +804,10 @@ describe('Slots', function() {
       last_args = Array.prototype.slice.call(arguments);
       last_value = last_args[3].get();
     };
-    t.a$.sub(l);
+    var s = t.a$.sub(l);
     t.a = 999;
 
-    t.a$.unsub(l);
+    s.destroy();
     t.a = 49;
 
     // same as the first time

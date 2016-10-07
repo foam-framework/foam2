@@ -81,7 +81,6 @@ foam.CLASS({
       var ret = {
         pub:   foam.Function.bind(parent.pub,   parent, name),
         sub:   foam.Function.bind(parent.sub,   parent, name),
-        unsub: foam.Function.bind(parent.unsub, parent, name),
         hasListeners: foam.Function.bind(parent.hasListeners, parent, name),
         toString: function() { return 'Topic(' + name + ')'; }
       };
