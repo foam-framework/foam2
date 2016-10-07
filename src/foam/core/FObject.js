@@ -17,11 +17,16 @@
 
 /**
   FObject is the root of FOAM's class hierarchy.
+  
+  We define FObject twice, first as a LIB to install all of
+  the static/class methods in the top-level FObject class,
+  then with a CLASS below to define methods on the FObject
+  prototype.
  */
 foam.LIB({
   name: 'foam.core.FObject',
 
-  // documentation: "Root prototype for all classes.",
+  documentation: "Root prototype for all classes.",
 
   constants: {
     prototype: {},
