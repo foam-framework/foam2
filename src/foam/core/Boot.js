@@ -24,9 +24,7 @@
  This self-modeling system requires some care to bootstrap, but results
  in a very compact, uniform, and powerful system.
 <pre>
-            Abstract Class
-                  ^
-                  |
+
  FObject -> FObject Class                     Prototype
     ^                        +-.prototype---------^
     |                        |                    |
@@ -135,7 +133,7 @@ foam.LIB({
 
         var parent = this.extends      ?
           context.lookup(this.extends) :
-          foam.AbstractClass           ;
+          foam.core.FObject            ;
 
         cls                  = parent.createSubClass();
         cls.prototype.cls_   = cls;
@@ -149,15 +147,14 @@ foam.LIB({
         // We have to do this because classes aren't FObjects.
         // This is used to publish 'installAxiom' events to, so that descendents
         // properties know when they need to be re-installed.
-        cls.pubsub_ =
-          foam.core.FObject &&
-          foam.core.FObject.create &&
-          foam.core.FObject.create();
+        if ( cls !== foam.core.FObject ) {
+          cls.pubsub_ = foam.core.FObject.create();
 
-        // Relay 'installAxiom' events from parent class.
-        parent.pubsub_ && parent.pubsub_.sub(
+          // Relay 'installAxiom' events from parent class.
+          parent.pubsub_ && parent.pubsub_.sub(
             'installAxiom',
             function(_, a1, a2, a3) { cls.pubsub_.pub(a1, a2, a3); });
+        }
       }
 
       cls.installModel(this);
@@ -219,8 +216,8 @@ foam.LIB({
     },
 
     function phase3() {
-      // Substitute AbstractClass.installModel() with simpler axiom-only version.
-      foam.AbstractClass.installModel = function installModel(m) {
+      // Substitute foam.core.installModel() with simpler axiom-only version.
+      foam.core.FObject.installModel = function installModel(m) {
         this.installAxioms(m.axioms_);
       };
     },
