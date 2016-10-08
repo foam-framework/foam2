@@ -49,7 +49,7 @@ foam.CLASS({
       name: 'tableCellView',
       value: function(obj, e) {
         //       return foam.u2.ActionView.create({action: this, data: obj});
-        
+
         return this.toE(null, e.__subContext__.createSubContext({data: obj}));
       }
     }
