@@ -8,7 +8,7 @@ foam.CLASS({
     {
       name: 'shortBeep',
       factory: function() {
-        return this.Beep.create({duration: 150, frequency: 330, type: 'square'});
+        return this.Beep.create({duration: 150, frequency: 330, type: 'triangle'});
       }
     },
     {
