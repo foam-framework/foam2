@@ -85,7 +85,7 @@ foam.CLASS({
       this.SUPER();
 
       var proxy = this.src$proxy;
-      proxy.sub('on', 'put'     this.onSrcPut);
+      proxy.sub('on', 'put',    this.onSrcPut);
       proxy.sub('on', 'remove', this.onSrcRemove);
       proxy.sub('on', 'reset',  this.onSrcReset);
     },

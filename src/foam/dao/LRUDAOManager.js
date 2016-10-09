@@ -77,7 +77,7 @@ foam.CLASS({
       this.SUPER();
 
       var proxy = this.dao$proxy;
-      proxy.sub('on', 'put'     this.onPut);
+      proxy.sub('on', 'put',    this.onPut);
       proxy.sub('on', 'remove', this.onRemove);
       proxy.sub('on', 'reset',  this.onReset);
     },
