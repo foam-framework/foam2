@@ -13,7 +13,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'HTMLValidator',
   extends: 'foam.u2.DefaultValidator',
-  
+
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
