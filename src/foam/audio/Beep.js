@@ -25,6 +25,7 @@ foam.CLASS({
   ],
 
   properties: [
+    [ 'gain', 1.0 ],
     [ 'duration', 200 ],
     {
       name: 'type',
@@ -37,14 +38,24 @@ foam.CLASS({
   actions: [
     function play() {
       var audio = new this.window.AudioContext();
+      var destination = audio.destination;
       var o = audio.createOscillator();
+      var gain;
+      if ( this.gain !== 1 ) {
+        console.log('gain: ', this.gain);
+        gain = audio.createGain();
+        gain.gain.value = this.gain;
+        gain.connect(destination);
+        destination = gain;
+      }
       o.frequency.value = this.frequency;
       o.type = this.type;
-      o.connect(audio.destination);
+      o.connect(destination);
       o.start(0);
       this.setTimeout(function() {
         o.stop(0);
-        o.disconnect(audio.destination);
+        if ( gain ) gain.disconnect(audio.destination);
+        o.disconnect(destination);
         audio.close();
       }, this.duration);
     }
