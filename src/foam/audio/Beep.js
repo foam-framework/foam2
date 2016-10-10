@@ -32,7 +32,14 @@ foam.CLASS({
       value: 'sine',
       view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
     },
-    [ 'frequency' , 220 ]
+    [ 'frequency' , 220 ],
+    [ 'fmFrequency', 0 ],
+    [ 'fmAmplitude', 20 ],
+    {
+      name: 'fmType',
+      value: 'sine',
+      view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
+    },
   ],
 
   actions: [
@@ -40,7 +47,8 @@ foam.CLASS({
       var audio = new this.window.AudioContext();
       var destination = audio.destination;
       var o = audio.createOscillator();
-      var gain;
+      var gain, fm, fmGain;
+
       if ( this.gain !== 1 ) {
         console.log('gain: ', this.gain);
         gain = audio.createGain();
@@ -51,10 +59,24 @@ foam.CLASS({
       o.frequency.value = this.frequency;
       o.type = this.type;
       o.connect(destination);
+
+      if ( this.fmFrequency ) {
+        fmGain = audio.createGain();
+        fmGain.gain.value = this.fmAmplitude;
+        fm = audio.createOscillator();
+        fm.frequency.value = this.fmFrequency;
+        fm.type = this.fmType;
+        fm.connect(fmGain);
+        fmGain.connect(o.frequency);
+        fm.start();
+      }
       o.start(0);
+
       this.setTimeout(function() {
         o.stop(0);
         if ( gain ) gain.disconnect(audio.destination);
+        if ( fmGain ) fmGain.disconnect(o.frequency);
+        if ( fm ) fm.stop(0);
         o.disconnect(destination);
         audio.close();
       }, this.duration);
