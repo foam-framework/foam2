@@ -29,7 +29,7 @@ foam.CLASS({
     [ 'duration', 200 ],
     {
       name: 'type',
-      value: 'sine',
+      value: 'triangle',
       view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
     },
     { name: 'frequency' , value: 220, units: 'Hz' },
@@ -38,7 +38,15 @@ foam.CLASS({
     {
       name: 'fmType',
       label: 'FM Type',
-      value: 'sine',
+      value: 'triangle',
+      view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
+    },
+    { name: 'amFrequency', label: 'AM Frequency', value: 0, units: 'Hz' },
+    { name: 'amAmplitude', label: 'AM Amplitude', value: 20, units: '%' },
+    {
+      name: 'amType',
+      label: 'AM Type',
+      value: 'triangle',
       view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
     },
   ],
@@ -48,10 +56,9 @@ foam.CLASS({
       var audio = new this.window.AudioContext();
       var destination = audio.destination;
       var o = audio.createOscillator();
-      var gain, fm, fmGain;
+      var gain, fm, fmGain, am, amGain;
 
-      if ( this.gain !== 1 ) {
-        console.log('gain: ', this.gain);
+      if ( this.gain !== 1 || this.amFrequency ) {
         gain = audio.createGain();
         gain.gain.value = this.gain;
         gain.connect(destination);
@@ -71,6 +78,18 @@ foam.CLASS({
         fmGain.connect(o.frequency);
         fm.start();
       }
+
+      if ( this.amFrequency ) {
+        amGain = audio.createGain();
+        amGain.gain.value = this.amAmplitude;
+        am = audio.createOscillator();
+        am.frequency.value = this.amFrequency;
+        am.type = this.amType;
+        am.connect(amGain);
+        amGain.connect(gain.gain);
+        am.start();
+      }
+
       o.start(0);
 
       this.setTimeout(function() {
@@ -78,6 +97,8 @@ foam.CLASS({
         if ( gain ) gain.disconnect(audio.destination);
         if ( fmGain ) fmGain.disconnect(o.frequency);
         if ( fm ) fm.stop(0);
+        if ( amGain ) amGain.disconnect(gain.gain);
+        if ( am ) am.stop(0);
         o.disconnect(destination);
         audio.close();
       }, this.duration);
