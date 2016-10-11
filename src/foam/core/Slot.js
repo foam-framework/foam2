@@ -36,6 +36,21 @@ foam.CLASS({
   methods: [
     /**
     */
+    function valueSub() {
+      var self = this;
+      var args = Array.prototype.slice.call(arguments);
+      var s;
+      var l = function() {
+        var v = self.get();
+        if ( s ) s.destroy();
+        if ( v ) s = v.sub.apply(v, args);
+      };
+      l();
+      this.sub(l);
+    },
+
+    /**
+    */
     function dot(name) {
       return foam.core.internal.SubSlot.create({
         parent: this,
@@ -211,10 +226,6 @@ foam.CLASS({
       return s;
     },
 
-    function unsub(l) {
-      this.obj.unsub('propertyChange', this.prop.name, l);
-    },
-
     function isDefined() {
       return this.obj.hasOwnProperty(this.prop.name);
     },
@@ -279,10 +290,6 @@ foam.CLASS({
       return this.SUPER('propertyChange', 'value', l);
     },
 
-    function unsub(l) {
-      this.SUPER('propertyChange', 'value', l);
-    },
-
     function isDefined() {
       return this.parent.get().hasOwnProperty(this.name);
     },
@@ -333,9 +340,7 @@ foam.CLASS({
 
     function set() { /* nop */ },
 
-    function sub(l) { /* nop */ },
-
-    function unsub(l) { /* nop */ }
+    function sub(l) { /* nop */ }
   ]
 });
 
@@ -414,12 +419,6 @@ foam.CLASS({
     function set() { /* nop */ },
 
     function sub(l) {
-      return arguments.length === 1 ?
-        this.SUPER('propertyChange', 'value', l) :
-        this.SUPER.apply(this,arguments);
-    },
-
-    function unsub(l) {
       return arguments.length === 1 ?
         this.SUPER('propertyChange', 'value', l) :
         this.SUPER.apply(this,arguments);

@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -15,25 +15,8 @@
  * limitations under the License.
  */
 
-foam.LIB({
-  name: 'foam.events',
-
-  methods: [
-    function oneTime(listener) {
-      /** Create a "one-time" listener which unsubscribes itself when called. **/
-      return function(subscription) {
-        subscription.destroy();
-        listener.apply(this, Array.from(arguments));
-      };
-    },
-
-    function consoleLog(listener) {
-      /** Log all listener invocations to console. **/
-      return function() {
-        var args = Array.from(arguments);
-        console.log(args);
-        listener && listener.apply(this, args);
-      };
-    }
-  ]
+foam.INTERFACE({
+  package: 'foam.core',
+  name: 'Serializble',
+  documentation: 'Marker interface to indicate that a CLASS is serializble or not.'
 });

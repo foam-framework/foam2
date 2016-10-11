@@ -59,7 +59,7 @@ foam.CLASS({
       class: 'StringArray',
       name: 'implements',
       adapt: function(o, v) {
-        if ( foam.String.is(v) ) return [v];
+        if ( foam.String.isInstance(v) ) return [v];
         return v;
       }
     },

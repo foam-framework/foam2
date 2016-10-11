@@ -33,12 +33,12 @@ foam.CLASS({
           typeof spec === 'function' ?
             spec.call(that, args, ctx) :
 
-          foam.Object.is(spec) ?
+          foam.Object.isInstance(spec) ?
             (spec.create ?
               spec.create(args, ctx) :
               ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
 
-          foam.AbstractClass.isSubClass(spec) ?
+          foam.core.FObject.isSubClass(spec) ?
             spec.create(args, ctx) :
 
           // TODO: verify a String
@@ -54,7 +54,7 @@ foam.CLASS({
 
   properties: [
     [ 'adapt', function(_, spec, prop) {
-      return foam.String.is(spec) ? { class: spec } : spec ;
+      return foam.String.isInstance(spec) ? { class: spec } : spec ;
     } ]
     /*
     [ 'toJSON', function(value) {

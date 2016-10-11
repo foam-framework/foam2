@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'Scroller',
@@ -48,15 +49,9 @@ foam.CLASS({
       expression: function(data) { return data.of; }
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'data',
-      required: true,
-      postSet: function(old, nu) {
-        // TODO(braden): When a better way of reacting to DAOs becomes
-        // available, use it here.
-        if ( old ) old.on.unsub(this.onDAOUpdate);
-        if ( nu ) nu.on.sub(this.onDAOUpdate);
-        this.onDAOUpdate();
-      }
+      required: true
     },
     {
       class: 'Int',
@@ -90,6 +85,9 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
+      this.data$proxy.sub('on', this.onDAOUpdate);
+      this.onDAOUpdate();
 
       this.scrollBar = this.createChild_(this.scrollView, {
         value$: this.scrollValue_$,

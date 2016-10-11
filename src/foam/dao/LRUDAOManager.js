@@ -59,18 +59,8 @@ foam.CLASS({
     },
     {
       /** The DAO to manage. Items will be removed from this DAO as needed. */
-      name: 'dao',
-      postSet: function(old, nu) {
-        if ( old ) {
-          old.on.put.unsub(this.onPut);
-          old.on.remove.unsub(this.onRemove);
-          old.on.reset.unsub(this.onReset);
-        }
-        // TODO: Clear out items not found in trackingDAO? If both DAOs are persisted.
-        nu.on.put.sub(this.onPut);
-        nu.on.remove.sub(this.onRemove);
-        nu.on.reset.sub(this.onReset);
-      }
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
     },
     {
       /** By starting at the current time, this should always be higher
@@ -83,6 +73,15 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.SUPER();
+
+      var proxy = this.dao$proxy;
+      proxy.sub('on', 'put',    this.onPut);
+      proxy.sub('on', 'remove', this.onRemove);
+      proxy.sub('on', 'reset',  this.onReset);
+    },
+
     /** Calculates a timestamp to use in the tracking dao. Override to
       provide a different timestamp calulation. */
     function getTimestamp() {

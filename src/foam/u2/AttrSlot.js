@@ -57,10 +57,6 @@ foam.CLASS({
       this.SUPER('propertyChange', 'value', l);
     },
 
-    function unsub(l) {
-      this.SUPER('propertyChange', 'value', l);
-    },
-
     function toString() {
       return 'AttrSlot(' + this.event + ', ' + this.property + ')';
     }
