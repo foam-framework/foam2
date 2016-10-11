@@ -38,7 +38,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'as filterController'
+    'as filterController',
+    'data as unfilteredDAO'
   ],
 
 

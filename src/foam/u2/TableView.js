@@ -63,15 +63,22 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
+    'foam.mlang.predicate.And',
+    'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.Not',
+    'foam.mlang.predicate.Or',
+    'foam.u2.CheckBox',
     'foam.u2.TableCellRefinement'
   ],
   imports: [
+    'selectionQuery', // Optional. Installed by the TableSelection decorator.
     'tableView'
   ],
 
   properties: [
     [ 'nodeName', 'tbody' ],
     [ 'columns_' ],
+    'selectionFeedback_',
     {
       name: 'rows_',
       factory: function() { return {}; }
@@ -103,12 +110,56 @@ foam.CLASS({
                 return sel === obj;
               }));
 
+      if ( this.selectionQuery ) {
+        var cb;
+        e.start('td')
+            .start(this.CheckBox).call(function() { cb = this; }).end()
+        .end();
+
+        this.selectionQuery$.sub(foam.Function.bind(this.selectionUpdate, this,
+            cb, obj));
+        this.selectionUpdate(cb, obj);
+        cb.data$.sub(foam.Function.bind(this.selectionClick, this, obj));
+      }
+
       for ( var j = 0 ; j < this.columns_.length ; j++ ) {
         var prop = this.columns_[j];
         e = e.start('td').add(prop.tableCellView(obj, e)).end();
       }
       e.end();
       this.rows_[e.id] = obj;
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'selectionUpdate',
+      code: function(checkbox, obj) {
+        var selected = this.selectionQuery.f(obj);
+        if ( selected !== checkbox.data ) {
+          // Need to prevent feedback between these two listeners.
+          this.selectionFeedback_ = true;
+          checkbox.data = selected;
+          this.selectionFeedback_ = false;
+        }
+      }
+    },
+    {
+      name: 'selectionClick',
+      code: function(obj, _, __, ___, slot) {
+        if ( this.selectionFeedback_ ) return;
+
+        var q = this.Eq.create({ arg1: obj.ID, arg2: obj.id });
+        if ( slot.get() ) {
+          this.selectionQuery = this.Or.create({
+            args: [ q, this.selectionQuery ]
+          }).partialEval();
+        } else {
+          this.selectionQuery = this.And.create({
+            args: [ this.Not.create({ arg1: q }), this.selectionQuery ]
+          }).partialEval();
+        }
+      }
     }
   ]
 });
@@ -149,6 +200,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'selectionQuery', // Optional. Exported by TableSelection.
     'tableView'
   ],
 
@@ -162,9 +214,14 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
       this.nodeName = 'thead';
 
       var e = this.start('tr');
+      if ( this.selectionQuery ) {
+        e.start('td').end();
+      }
+
       for ( var i = 0 ; i < this.columns_.length ; i++ ) {
         var sorting$ = this.sortOrder$.map(function(prop, order) {
           if ( ! order ) return '';
@@ -198,6 +255,7 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.order.Desc',
+    'foam.u2.TableBodySink',
     'foam.u2.TableHeader'
   ],
 
@@ -327,9 +385,9 @@ foam.CLASS({
         if ( this.sortOrder ) {
           dao = dao.orderBy(this.sortOrder);
         }
-        dao.select(foam.u2.TableBodySink.create({
+        dao.select(this.TableBodySink.create({
           columns_: this.columns_
-        }, this)).then(function(a) {
+        })).then(function(a) {
           this.body = a.body;
         }.bind(this));
       }
