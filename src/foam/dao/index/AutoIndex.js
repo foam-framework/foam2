@@ -22,7 +22,7 @@ foam.CLASS({
     // TODO: estimate is a class (static) method. Declare as such when possible
     /** Estimates the performance of this index given the number of items
       it will hold and the planned parameters. */
-    function estimate(size, property, sink, skip, limit, order, predicate) {
+    function estimate(size, sink, skip, limit, order, predicate) {
       return Number.MAX_VALUE;
     }
   ]
@@ -32,8 +32,14 @@ foam.CLASS({
   refines: 'foam.dao.index.TreeIndex',
 
   methods: [
-    function estimate(size, property, sink, skip, limit, order, predicate) {
+    function estimate(size, sink, skip, limit, order, predicate) {
+      // small sizes don't matter
+      if ( size <= 8 ) return Math.log(size) / Math.log(2);
+
       predicate = predicate.clone();
+      var property = this.prop;
+      // TODO: validate this assumption:
+      var nodeCount = Math.floor(size * 0.25); // tree node count will be a quarter the total item count
 
       // TODO: unify with TreeIndex.plan, but watch performance if dropping
       //   isExprMatch's closure
@@ -59,17 +65,25 @@ foam.CLASS({
         }
         return undefined;
       };
+      var tailFactory = this.tailFactory;
+      function subEstimate() {
+        return ( tailFactory ) ? 
+          tailFactory.estimate(
+            size / nodeCount,
+            sink, skip, limit, order, predicate
+          ) : 1;  
+      };
 
       var arg2 = isExprMatch(this.In);
       if ( arg2 ) {
         // tree depth * number of compares
-        return ( Math.log(size) / Math.log(2) ) * arg2.length;
+        return ( Math.log(nodeCount) / Math.log(2) + subEstimate() ) * arg2.length;
       }
 
       arg2 = isExprMatch(this.Eq);
       if ( arg2 ) {
         // tree depth
-        return ( Math.log(size) / Math.log(2) );
+        return ( Math.log(size) / Math.log(2) ) + subEstimate();
       }
 
       arg2 = isExprMatch(this.ContainsIC);
@@ -78,7 +92,7 @@ foam.CLASS({
       if ( arg2 ) {
         // TODO: this isn't quite right. Tree depth * query string length?
         // If building a trie to help with this, estimate becomes easier.
-        return ( Math.log(size) / Math.log(2) ) * arg2.f().length;
+        return ( Math.log(nodeCount) / Math.log(2) + subEstimate() ) * arg2.f().length;
       }
 
       // These cases are just slightly better scans, but we can't estimate
@@ -108,7 +122,7 @@ foam.CLASS({
   refines: 'foam.dao.index.ValueIndex',
 
   methods: [
-    function estimate(size, property, sink, skip, limit, order, predicate) {
+    function estimate(size, sink, skip, limit, order, predicate) {
       return 1;
     }
   ]
@@ -121,9 +135,11 @@ foam.CLASS({
   refines: 'foam.dao.index.AltIndex',
 
   methods: [
-    function estimate(size, property, sink, skip, limit, order, predicate) {
+    function estimate(size, sink, skip, limit, order, predicate) {
+      
+      
       return this.delegates[0].estimate(
-        size, property, sink, skip, limit, order, predicate
+        size, sink, skip, limit, order, predicate
       );
     }
   ]
