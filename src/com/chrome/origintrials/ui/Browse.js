@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'Browser',
   extends: 'foam.u2.Element',
   requires: [
+    'foam.u2.TableSelection',
     'foam.u2.TableView',
     'foam.u2.search.FilterController',
     'com.chrome.origintrials.model.Application'
@@ -40,6 +41,10 @@ foam.CLASS({
       this.start(this.APPLY, { data: this }).end()
           .start(this.FilterController, {
             searchFields: [ 'origin', 'applicantEmail', 'approved' ],
+            tableView: {
+              class: 'foam.u2.TableSelection',
+              bulkActions: [ this.BULK_APPROVE ]
+            },
             data: this.data
           })
           .end();
@@ -50,6 +55,19 @@ foam.CLASS({
       name: 'apply',
       code: function() {
         this.stack.push({ class: 'com.chrome.origintrials.ui.Apply' });
+      }
+    },
+    {
+      name: 'bulkApprove',
+      code: function(X) {
+        var self = this;
+        var model = X.lookup('com.chrome.origintrials.model.Application');
+        this.where(X.selectionQuery).select().then(function(sink) {
+          for ( var i = 0; i < sink.a.length; i++ ) {
+            model.APPROVE.maybeCall(X, sink.a[i]);
+            self.put(sink.a[i]);
+          }
+        });
       }
     }
   ]
