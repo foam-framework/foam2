@@ -15,6 +15,75 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  refines: 'foam.dao.index.Index',
+
+  methods: [
+    /** Estimates the performance of this index given the number of items
+      it will hold and the  */
+    function estimate(forSize, forPredicate) {
+      return Number.MAX_VALUE;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.index.TreeIndex',
+
+  methods: [
+    /** Estimates the performance of this index given the number of items
+      it will hold and the  */
+    function estimate(forSize, forPredicate) {
+      predicate = forPredicate.clone();
+
+      var isExprMatch = function(model) {
+        if ( ! model ) return undefined;
+        if ( predicate ) {
+          if ( model.isInstance(predicate) && predicate.arg1 === prop ) {
+            var arg2 = predicate.arg2;
+            predicate = undefined;
+            return arg2;
+          }
+          if ( this.And.isInstance(predicate) ) {
+            for ( var i = 0 ; i < predicate.args.length ; i++ ) {
+              var q = predicate.args[i];
+              if ( model.isInstance(q) && q.arg1 === prop ) {
+                predicate.args[i] = this.True.create();
+                predicate = predicate.partialEval();
+                if (  this.True.isInstance(predicate) ) predicate = undefined;
+                return q.arg2;
+              }
+            }
+          }
+        }
+        return undefined;
+      };
+
+      var arg2 = isExprMatch(this.In);
+      if ( arg2 ) {
+        // tree depth * number of compares
+        return ( Math.log(forSize) / Math.log(2) ) * arg2.length;
+      }
+
+      arg2 = isExprMatch(this.Eq);
+      if ( arg2 ) {
+        // tree depth
+        return ( Math.log(forSize) / Math.log(2) );
+      }
+
+      // These cases are just slightly better scans, but we can't estimate
+      // how much better
+//       arg2 = isExprMatch(this.Gt);
+//       arg2 = isExprMatch(this.Gte);
+//       arg2 = isExprMatch(this.Lt);
+//       arg2 = isExprMatch(this.Lte);
+
+      return forSize;
+    }
+  ]
+});
+
+
 
 /** An Index which adds other indices as needed. **/
 foam.CLASS({

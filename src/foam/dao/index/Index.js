@@ -69,7 +69,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.pattern.PerInstance',
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'delegate'
     }
   ],
@@ -113,7 +113,7 @@ foam.CLASS({
   implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
-    { class: 'foam.pattern.PerInstance',  name: 'value' },
+    { class: 'foam.pattern.progenitor.PerInstance',  name: 'value' },
     { name: 'cost', value: 1 }
   ],
 
@@ -174,7 +174,7 @@ foam.CLASS({
     },
     {
       /** the delegate instances for each Alt instance */
-      class: 'foam.pattern.PerInstance',
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'instances',
       factory: function() {
         var instances = [];

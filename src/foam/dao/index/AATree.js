@@ -34,16 +34,16 @@ foam.CLASS({
 
   properties: [
     // per node properties
-    { class: 'foam.pattern.PerInstance', name: 'key'   },
-    { class: 'foam.pattern.PerInstance', name: 'value' },
-    { class: 'foam.pattern.PerInstance', name: 'size'  },
-    { class: 'foam.pattern.PerInstance', name: 'level' },
+    { class: 'foam.pattern.progenitor.PerInstance', name: 'key'   },
+    { class: 'foam.pattern.progenitor.PerInstance', name: 'value' },
+    { class: 'foam.pattern.progenitor.PerInstance', name: 'size'  },
+    { class: 'foam.pattern.progenitor.PerInstance', name: 'level' },
     {
-      class: 'foam.pattern.PerInstance',
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'left',
     },
     {
-      class: 'foam.pattern.PerInstance',
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'right',
     },
 

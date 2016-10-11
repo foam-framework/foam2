@@ -10,16 +10,16 @@ describe('Progenitor', function() {
       axioms: [foam.pattern.Progenitor.create()],
       properties: [
         {
-          class: 'foam.pattern.PerInstance',
+          class: 'foam.pattern.progenitor.PerInstance',
           name: 'a',
         },
         {
-          class: 'foam.pattern.PerInstance',
+          class: 'foam.pattern.progenitor.PerInstance',
           name: 'b',
           value: 54
         },
         {
-          class: 'foam.pattern.PerInstance',
+          class: 'foam.pattern.progenitor.PerInstance',
           name: 'c',
           factory: function() { return this.normalD; }
         },
@@ -104,7 +104,7 @@ describe('Progenitor', function() {
       extends: 'test.ProgenitorClass',
       properties: [
         {
-          class: 'foam.pattern.PerInstance',
+          class: 'foam.pattern.progenitor.PerInstance',
           name: 'a',
           factory: function() { return 'newA'; }
         },
@@ -120,55 +120,55 @@ describe('Progenitor', function() {
 
   it('throws badly configured PerInstance properties', function() {
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         adapt: function() {}
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         preSet: function() {}
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         postSet: function() {}
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         expression: function() {}
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         getter: function() {}
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         setter: function() {}
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         required: true
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         final: true
       });
     }).toThrow();
     expect(function() {
-      foam.pattern.PerInstance.create({
+      foam.pattern.progenitor.PerInstance.create({
         name: 'hello',
         assertValue: function() {}
       });

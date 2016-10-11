@@ -154,7 +154,7 @@ foam.CLASS({
                 protoValidProps_: [].slice(),
                 protoFactoryProps_: [].slice()
               }
-              var props = this.cls_.getAxiomsByClass(foam.pattern.PerInstance);
+              var props = this.cls_.getAxiomsByClass(foam.pattern.progenitor.PerInstance);
               for ( var i = 0; i < props.length; i++ ) {
                 var prop = props[i];
                 // TODO: generate a single function from strings?
@@ -176,14 +176,14 @@ foam.CLASS({
                 return this.progenitor.spawn(this);
               }
 
-              // block non-shared properties
+              // block per-instance properties that might be accidentally set
+              //   on the progenitor
               var props = pp.protoValidProps_;
               for ( var i = 0; i < props.length; i++ ) {
                 var pName = props[i];
                 p[pName] = pp.protoValues[pName];
               }
               this.setPrivate_('progenitorPrototype_', p);
-//console.log("prototype construct: ", this.cls_.name, this.progenitor);
             }
             return p;
           }
@@ -201,11 +201,14 @@ foam.CLASS({
 
 });
 
-// TODO: "PerInstance" property that installs only into prototype_,
-//   warns about expressions and features not supported, adds
-//   value or factory to initInstance
+/**
+  Indicates properties of a progenitor that belong to each spawned
+  instance. Because these are plain untyped properties, they only have limited
+  features available.
+  'value can be used to set the default value, and factory.
+*/
 foam.CLASS({
-  package: 'foam.pattern',
+  package: 'foam.pattern.progenitor',
   name: 'PerInstance',
   extends: 'foam.core.Property',
 
@@ -213,15 +216,15 @@ foam.CLASS({
 
   // handled specially 'value', 'factory'
   properties: [
-    { name: 'adapt', setter: function() { throw "PerInstance property does not support adapt() in " + this.name; } },
-    { name: 'preSet', setter: function() { throw "PerInstance property does not support preSet() in " + this.name; } },
+    { name: 'adapt',       setter: function() { throw "PerInstance property does not support adapt() in " + this.name; } },
+    { name: 'preSet',      setter: function() { throw "PerInstance property does not support preSet() in " + this.name; } },
     { name: 'assertValue', setter: function() { throw "PerInstance property does not support assertValue() in " + this.name; } },
-    { name: 'postSet', setter: function() { throw "PerInstance property does not support postSet() in " + this.name; } },
-    { name: 'expression', setter: function() { throw "PerInstance property does not support expression() in " + this.name; } },
-    { name: 'getter', setter: function() { throw "PerInstance property does not support getter() in " + this.name; } },
-    { name: 'setter', setter: function() { throw "PerInstance property does not support setter() in " + this.name; } },
-    { name: 'final', setter: function() { throw "PerInstance property does not support final() in " + this.name; } },
-    { name: 'required', setter: function() { throw "PerInstance property does not support required() in " + this.name; } },
+    { name: 'postSet',     setter: function() { throw "PerInstance property does not support postSet() in " + this.name; } },
+    { name: 'expression',  setter: function() { throw "PerInstance property does not support expression() in " + this.name; } },
+    { name: 'getter',      setter: function() { throw "PerInstance property does not support getter() in " + this.name; } },
+    { name: 'setter',      setter: function() { throw "PerInstance property does not support setter() in " + this.name; } },
+    { name: 'final',       setter: function() { throw "PerInstance property does not support final() in " + this.name; } },
+    { name: 'required',    setter: function() { throw "PerInstance property does not support required() in " + this.name; } },
   ],
 
   methods: [

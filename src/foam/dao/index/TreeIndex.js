@@ -104,11 +104,11 @@ foam.CLASS({
       name: 'prop'
     },
     {
-      class: 'foam.pattern.PerInstance',
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'selectCount'
     },
     {
-      class: 'foam.pattern.PerInstance',
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'root'
     },
     {
