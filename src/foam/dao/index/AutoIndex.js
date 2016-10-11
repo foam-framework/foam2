@@ -280,20 +280,19 @@ foam.CLASS({
       }
       // if nothing found, create a new index
       if ( ! newIndex ) {
-         newIndex = predicate.toIndex(this.mdao.idIndexFactory);
-         if ( newIndex ) {
-           this.mdao.addIndex(newIndex);
-           // set a key for each property we index
-           var newSig = [];
-           //newSig.index = newIndex;
-           for ( var key in signature ) {
-             newSig.push(key)
-           }
-           this.existingIndexes.push(newSig);
-           console.log("Adding sig", newSig);
-         }
+        newIndex = predicate.toIndex(this.mdao.idIndexFactory);
+        if ( newIndex ) {
+          this.mdao.addIndex(newIndex);
+          // set a key for each property we index
+          var newSig = [];
+          //newSig.index = newIndex;
+          for ( var key in signature ) {
+            newSig.push(key)
+          }
+          this.existingIndexes.push(newSig);
+          console.log("Adding sig", newSig);
+        }
       }
-
     },
 
     function toString() {

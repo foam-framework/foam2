@@ -107,11 +107,13 @@ foam.CLASS({
     },
     {
       class: 'foam.pattern.progenitor.PerInstance',
-      name: 'selectCount'
+      name: 'selectCount',
+      value: 0
     },
     {
       class: 'foam.pattern.progenitor.PerInstance',
-      name: 'root'
+      name: 'root',
+      factory: function() { return this.nullNode; }
     },
     {
       name: 'nullNode',
@@ -139,16 +141,8 @@ foam.CLASS({
     function init() {
 
       // TODO: replace with bound methods when available
-      this.dedup = this.dedup.bind(this); //foam.Function.bind(this.dedup, this);
+      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.dedup, this);
       //this.compare = foam.Function.bind(this.compare, this);
-    },
-
-    /** Initialize simple properties, since they ignore factories. */
-    function initInstance() {
-
-      this.selectCount = 0;
-      this.root = this.nullNode;
-
     },
 
     /**
@@ -175,8 +169,8 @@ foam.CLASS({
 
     /** Set the value's property to be the same as the key in the index.
         This saves memory by sharing objects. */
-    function dedup(obj, value) {
-      obj[this.prop.name] = value;
+    function dedup(propName, obj, value) {
+      obj[propName] = value;
     },
 
     function put(newValue) {
