@@ -95,6 +95,8 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.In',
+    'foam.mlang.predicate.Contains',
+    'foam.mlang.predicate.ContainsIC',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
   ],
@@ -308,6 +310,44 @@ foam.CLASS({
 
         return index.AltPlan.create({
           subPlans: [subPlan],
+          prop: prop
+        });
+      }
+
+      var ic = false;
+      arg2 = isExprMatch(this.ContainsIC);
+      if ( arg2 !== undefined ) ic = true;
+      arg2 = arg2 || isExprMatch(this.Contains);
+      if ( arg2 !== undefined ) {
+        var key = ic ? arg2.f().toLowerCase() : arg2.f();
+
+        // Substring comparison function:
+        // returns 0 if nodeKey contains masterKey.
+        // returns -1 if nodeKey is shorter than masterKey
+        // returns 1 if nodeKey is longer or equal length, but does not contain masterKey
+        var compareSubstring = function compareSubstring(nodeKey, masterKey) {
+          // nodeKey can't contain masterKey if it's too short
+          if ( nodeKey.length < masterKey.length ) return -1;
+          // iterate over substrings
+          if ( ic ) nodeKey = nodeKey.toLowerCase(); // TODO: handle case-insensitive better
+          for ( var start = 0; start < (nodeKey.length - masterKey.length + 1); start++ ) {
+            if ( nodeKey.substring(start, start + masterKey.length) === masterKey ) {
+              return 0;
+            }
+          }
+          return 1;
+        }
+
+        var indexes = [];
+        this.root.getAll(key, compareSubstring, indexes);
+        var subPlans = [];
+        // iterate over all keys
+        for ( var i = 0; i < indexes.length; i++ ) {
+          subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate));
+        }
+
+        return index.AltPlan.create({
+          subPlans: subPlans,
           prop: prop
         });
       }

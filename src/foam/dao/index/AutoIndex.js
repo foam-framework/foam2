@@ -19,9 +19,10 @@ foam.CLASS({
   refines: 'foam.dao.index.Index',
 
   methods: [
+    // TODO: estimate is a class (static) method. Declare as such when possible
     /** Estimates the performance of this index given the number of items
-      it will hold and the  */
-    function estimate(forSize, forPredicate) {
+      it will hold and the planned parameters. */
+    function estimate(size, property, sink, skip, limit, order, predicate) {
       return Number.MAX_VALUE;
     }
   ]
@@ -31,15 +32,15 @@ foam.CLASS({
   refines: 'foam.dao.index.TreeIndex',
 
   methods: [
-    /** Estimates the performance of this index given the number of items
-      it will hold and the  */
-    function estimate(forSize, forPredicate) {
-      predicate = forPredicate.clone();
+    function estimate(size, property, sink, skip, limit, order, predicate) {
+      predicate = predicate.clone();
 
+      // TODO: unify with TreeIndex.plan, but watch performance if dropping
+      //   isExprMatch's closure
       var isExprMatch = function(model) {
         if ( ! model ) return undefined;
         if ( predicate ) {
-          if ( model.isInstance(predicate) && predicate.arg1 === prop ) {
+          if ( model.isInstance(predicate) && predicate.arg1 === property ) {
             var arg2 = predicate.arg2;
             predicate = undefined;
             return arg2;
@@ -47,7 +48,7 @@ foam.CLASS({
           if ( this.And.isInstance(predicate) ) {
             for ( var i = 0 ; i < predicate.args.length ; i++ ) {
               var q = predicate.args[i];
-              if ( model.isInstance(q) && q.arg1 === prop ) {
+              if ( model.isInstance(q) && q.arg1 === property ) {
                 predicate.args[i] = this.True.create();
                 predicate = predicate.partialEval();
                 if (  this.True.isInstance(predicate) ) predicate = undefined;
@@ -62,13 +63,22 @@ foam.CLASS({
       var arg2 = isExprMatch(this.In);
       if ( arg2 ) {
         // tree depth * number of compares
-        return ( Math.log(forSize) / Math.log(2) ) * arg2.length;
+        return ( Math.log(size) / Math.log(2) ) * arg2.length;
       }
 
       arg2 = isExprMatch(this.Eq);
       if ( arg2 ) {
         // tree depth
-        return ( Math.log(forSize) / Math.log(2) );
+        return ( Math.log(size) / Math.log(2) );
+      }
+
+      arg2 = isExprMatch(this.ContainsIC);
+      if ( arg2 !== undefined ) ic = true;
+      arg2 = arg2 || isExprMatch(this.Contains);
+      if ( arg2 ) {
+        // TODO: this isn't quite right. Tree depth * query string length?
+        // If building a trie to help with this, estimate becomes easier.
+        return ( Math.log(size) / Math.log(2) ) * arg2.f().length;
       }
 
       // These cases are just slightly better scans, but we can't estimate
@@ -78,12 +88,46 @@ foam.CLASS({
 //       arg2 = isExprMatch(this.Lt);
 //       arg2 = isExprMatch(this.Lte);
 
-      return forSize;
+      var cost = size;
+
+      // Ordering
+      if ( order ) {
+        // if sorting required, add the sort cost
+        if ( ! order === prop &&
+             ! ( index.Desc.isInstance(order) && order.arg1 === prop ) ) {
+          if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
+        }
+      }
+
+      return cost;
     }
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.dao.index.ValueIndex',
 
+  methods: [
+    function estimate(size, property, sink, skip, limit, order, predicate) {
+      return 1;
+    }
+  ]
+});
+
+// Note: ProxyIndex can't estimate() statically. Specific types of proxy that
+// know their sub-index factory can implement it.
+
+foam.CLASS({
+  refines: 'foam.dao.index.AltIndex',
+
+  methods: [
+    function estimate(size, property, sink, skip, limit, order, predicate) {
+      return this.delegates[0].estimate(
+        size, property, sink, skip, limit, order, predicate
+      );
+    }
+  ]
+});
 
 /** An Index which adds other indices as needed. **/
 foam.CLASS({
