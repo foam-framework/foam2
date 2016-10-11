@@ -558,7 +558,11 @@ foam.CLASS({
     {
       name: 'eof',
       code: function eof() {
-        this.array.sort(this.comparator.compare || this.comparator);
+        var comparator = this.comparator;
+        this.array.sort(function(o1, o2) {
+          return comparator.compare(o1, o2);
+        });
+
         for ( var i = 0 ; i < this.array.length ; i++ ) {
           this.delegate.put(this.array[i]);
         }
