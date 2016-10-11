@@ -143,7 +143,7 @@ foam.CLASS({
         foam.core.Method.create({
           name: 'getProgenitorProto_',
           code: function() {
-            var p = this.progenitorPrototype_;
+            var p = this.getPrivate_('progenitorPrototype_');
             if ( ! p ) {
               p = Object.create(this);
 
@@ -182,7 +182,7 @@ foam.CLASS({
                 var pName = props[i];
                 p[pName] = pp.protoValues[pName];
               }
-              this.progenitorPrototype_ = p;
+              this.setPrivate_('progenitorPrototype_', p);
 //console.log("prototype construct: ", this.cls_.name, this.progenitor);
             }
             return p;
@@ -225,9 +225,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInClass(cls) {
-       // nop
-    },
     function installInProto() {
       // nop
     },

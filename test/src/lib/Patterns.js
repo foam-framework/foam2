@@ -89,6 +89,35 @@ describe('Progenitor', function() {
     expect(progenitor.progenitor).toBeUndefined();
   });
 
+  it('covers spawn.describe()', function() {
+    var spawn = progenitor.spawn();
+
+    spawn.describe();
+
+
+  });
+
+  it('supports inheritance', function() {
+    foam.CLASS({
+      name: 'ProgenitorInheritorClass',
+      package: 'test',
+      extends: 'test.ProgenitorClass',
+      properties: [
+        {
+          class: 'foam.pattern.PerInstance',
+          name: 'a',
+          factory: function() { return 'newA'; }
+        },
+      ],
+    });
+    progenitor = test.ProgenitorInheritorClass.create();
+
+    spawn = progenitor.spawn();
+
+    expect(spawn.a).toEqual('newA');
+
+  });
+
   it('throws badly configured PerInstance properties', function() {
     expect(function() {
       foam.pattern.PerInstance.create({
@@ -124,6 +153,24 @@ describe('Progenitor', function() {
       foam.pattern.PerInstance.create({
         name: 'hello',
         setter: function() {}
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        required: true
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        final: true
+      });
+    }).toThrow();
+    expect(function() {
+      foam.pattern.PerInstance.create({
+        name: 'hello',
+        assertValue: function() {}
       });
     }).toThrow();
   });
