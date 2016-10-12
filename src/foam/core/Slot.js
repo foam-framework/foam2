@@ -250,7 +250,7 @@ foam.CLASS({
 
 
 /**
-  For internal use only.
+  For internal use only. Is used to implement the Slot.dot() method.
  */
 foam.CLASS({
   package: 'foam.core.internal',
@@ -327,7 +327,7 @@ foam.CLASS({
 });
 
 
-/** Tracks dependencies for a dynamic function and invalidates is they change. */
+/** An immutable constant valued Slot. */
 foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',
@@ -357,28 +357,29 @@ foam.CLASS({
   Tracks dependencies for a dynamic function and invalidates if they change.
 
 <pre>
-foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
-var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.ExpressionSlot.create({
-  args: [ p.fname$, p.lname$ ],
-  code: function(f, l) { return f + ' ' + l; }
-});
-log(e.get());
-e.sub(log);
-p.fname = 'Steve';
-p.lname = 'Jones';
-log(e.get());
-Output:
- > John Smith
- > [object Object] propertyChange value [object Object]
- > [object Object] propertyChange value [object Object]
- > Steve Jones
+  foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
+  var p = Person.create({fname: 'John', lname: 'Smith'});
+  var e = foam.core.ExpressionSlot.create({
+    args: [ p.fname$, p.lname$ ],
+    code: function(f, l) { return f + ' ' + l; }
+  });
+  log(e.get());
+  e.sub(log);
+  p.fname = 'Steve';
+  p.lname = 'Jones';
+  log(e.get());
 
-var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
-var e = foam.core.ExpressionSlot.create({
-  obj: p,
-  code: function(f, l) { return f + ' ' + l; }
-});
+  Output:
+   > John Smith
+   > [object Object] propertyChange value [object Object]
+   > [object Object] propertyChange value [object Object]
+   > Steve Jones
+
+  var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
+  var e = foam.core.ExpressionSlot.create({
+    obj: p,
+    code: function(f, l) { return f + ' ' + l; }
+  });
 </pre>
 */
 foam.CLASS({
