@@ -37,7 +37,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Topic',
 
-  // documentation: 'Topic Axiom',
+  documentation: 'Topic Axiom',
 
   properties: [
     'name',
@@ -56,7 +56,6 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-
       var name      = this.name;
       var topic     = this;
       var makeTopic = this.makeTopic;
@@ -94,6 +93,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
@@ -109,6 +109,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.FObject',
