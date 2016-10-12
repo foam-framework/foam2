@@ -499,6 +499,7 @@ foam.LIB({
 });
 
 
+// An FObject is a FOAM-Object, the root class for all modeled classes.
 foam.LIB({
   name: 'foam.core.FObject',
   methods: [
@@ -513,6 +514,7 @@ foam.LIB({
 });
 
 
+// AN Object is a Javascript Object which is neither an FObject nor an Array.
 foam.LIB({
   name: 'foam.Object',
   methods: [
