@@ -27,7 +27,7 @@
   sub-Context. The object's sub-Context is the context that is used when
   new objects are created by the object.
 
-  Ex.:
+  Ex.
 <pre>
 foam.CLASS({
   name: 'ImportsTest',
