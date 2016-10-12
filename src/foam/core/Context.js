@@ -69,29 +69,31 @@
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
 
-      function doRegister(cache, name) {
-        console.assert(
-          cache.hasOwnProperty(name) === false,
-          cls.id + ' is already registerd in this context.');
-
-        cache[name] = cls;
-      }
-
       if ( opt_id ) {
-        doRegister(this.__cache__, opt_id);
+        this.registerInCache_(cls, this.__cache__, opt_id);
       } else {
         this.assert(
             typeof cls.id === 'string',
             'Must have an .id property to be registered in a context.');
 
-        doRegister(this.__cache__, cls.id);
+        this.registerInCache_(cls, this.__cache__, cls.id);
 
         if ( cls.package === 'foam.core' ) {
-          doRegister(this.__cache__, cls.name);
+          this.registerInCache_(cls, this.__cache__, cls.name);
         }
       }
     },
 
+    /** Internal method to register a context binding in an internal cache **/ 
+    registerInCache_: function registerInCache_(cls, cache, name) {
+      console.assert(
+        ! cache.hasOwnProperty(name),
+        cls.id + ' is already registerd in this context.');
+      
+      cache[name] = cls;
+    },
+
+    /** Internal method to create a slot name for a specified key. **/
     toSlotName_: foam.Function.memoize1(function toSlotName_(key) {
       return key + '$';
     }),
