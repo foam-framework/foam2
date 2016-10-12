@@ -68,6 +68,7 @@ foam.CLASS({
       expression: function(name) { return foam.String.labelize(name); }
     },
 
+    /* Developer-level documentation. */
     'documentation',
 
     /* User-level help. Could/should appear in GUI's as online help. */
@@ -185,7 +186,7 @@ foam.CLASS({
     ],
 
     {
-      // Makes Properties useful as map functions.
+      /** Makes Properties useful as map functions. */
       name: 'f',
       factory: function() {
         var name = this.name;
@@ -194,7 +195,7 @@ foam.CLASS({
     },
 
     {
-      // Makes Properties useful as comparators.
+      /** Makes Properties useful as comparators. */
       name: 'compare',
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
@@ -380,8 +381,6 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
-      // TODO: experiment to see if a simpler setter for Properties which
-      // don't use any of the options is faster.
       var setter = prop.setter ? prop.setter :
         ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ?
         function simplePropSetter(newValue) {
@@ -468,7 +467,7 @@ foam.CLASS({
       });
     },
 
-    /* Validate an object which has this Property. */
+    /** Validate an object which has this Property. */
     function validateInstance(o) {
       if ( this.required && ! o[this.name] ) {
         throw 'Required property ' +
