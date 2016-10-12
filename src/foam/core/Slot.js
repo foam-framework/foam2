@@ -41,7 +41,7 @@ foam.CLASS({
     */
     function valueSub() {
       var self = this;
-      var args = Array.prototype.slice.call(arguments);
+      var args = Array.from(arguments);
       var s;
       var l = function() {
         var v = self.get();
