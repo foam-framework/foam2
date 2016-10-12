@@ -337,18 +337,35 @@ foam.CLASS({
 
   methods: [
     function toIndex(tailFactory) {
-      // Find DNF, if we were already in it, proceed
-      //var self = this.toDisjunctiveNormalForm();
-      //if ( self !== this ) return self.toIndex(tailFactory);
+      // TODO: sort by index uniqueness (put the most indexable first):
+      //   This prevents dropping to scan mode too early, and restricts
+      //   the remaning set more quickly.
+      // EQ, IN,... CONTAINS, ... LT, GT...
 
+      // generate indexes, find costs, toss these initial indexes
+      var sortedArgs = Object.create(null);
       var args = this.args;
-      var tail = tailFactory;
       for (var i = 0; i < args.length; i++ ) {
-        var idx = args[i].toIndex(tail);
-        if ( idx ) {
-          tail = idx;
-        }
+        var arg = args[i];
+        var idx = arg.toIndex(tailFactory);
+        if ( ! idx ) continue;
+
+        var idxCost = Math.floor(idx.estimate(
+           1000, undefined, undefined, undefined, undefined, arg));
+        // make unique with a some extra digits
+        sortedArgs[idxCost + i / 1000] = arg;
       }
+
+      // Sort, build list up starting at the end (most expensive
+      //   will end up deepest in the index)
+      var tail = tailFactory;
+      var keys = Object.keys(sortedArgs).sort();
+      for ( var i = keys.length - 1; i >= 0; i-- ) {
+        var arg = sortedArgs[keys[i]];
+        //assert(arg is a predicate)
+        tail = arg.toIndex(tail);
+      }
+
       return tail;
     },
 

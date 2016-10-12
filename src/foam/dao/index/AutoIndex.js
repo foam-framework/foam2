@@ -36,7 +36,7 @@ foam.CLASS({
       // small sizes don't matter
       if ( size <= 16 ) return Math.log(size) / Math.log(2);
 
-      predicate = predicate.clone();
+      predicate = predicate ? predicate.clone() : null;
       var property = this.prop;
       // TODO: validate this assumption:
       var nodeCount = Math.floor(size * 0.25); // tree node count will be a quarter the total item count
@@ -68,8 +68,8 @@ foam.CLASS({
       var tailFactory = this.tailFactory;
       var subEstimate = ( tailFactory ) ? function() {
           return Math.log(nodeCount) / Math.log(2) +
-            tailFactory.estimate(size / nodeCount, sink, skip, limit, order, predicate);  
-        } : 
+            tailFactory.estimate(size / nodeCount, sink, skip, limit, order, predicate);
+        } :
         function() { return Math.log(nodeCount) / Math.log(2); };
 
       var arg2 = isExprMatch(this.In);
@@ -134,8 +134,8 @@ foam.CLASS({
 
   methods: [
     function estimate(size, sink, skip, limit, order, predicate) {
-      
-      
+
+
       return this.delegates[0].estimate(
         size, sink, skip, limit, order, predicate
       );
@@ -201,7 +201,7 @@ foam.CLASS({
           bestCost = candidateCost;
         }
       }
-      
+
       if ( order ) {
         var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
@@ -210,7 +210,7 @@ foam.CLASS({
           bestCost = candidateCost;
         }
       }
-      
+
       if ( newIndex ) {
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
@@ -225,7 +225,7 @@ foam.CLASS({
           }
         });
       } else {
-        return existingPlan; 
+        return existingPlan;
       }
     },
 
