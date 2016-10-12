@@ -34,7 +34,7 @@ foam.CLASS({
   methods: [
     function estimate(size, sink, skip, limit, order, predicate) {
       // small sizes don't matter
-      if ( size <= 8 ) return Math.log(size) / Math.log(2);
+      if ( size <= 16 ) return Math.log(size) / Math.log(2);
 
       predicate = predicate.clone();
       var property = this.prop;
@@ -66,24 +66,22 @@ foam.CLASS({
         return undefined;
       };
       var tailFactory = this.tailFactory;
-      function subEstimate() {
-        return ( tailFactory ) ? 
-          tailFactory.estimate(
-            size / nodeCount,
-            sink, skip, limit, order, predicate
-          ) : 1;  
-      };
+      var subEstimate = ( tailFactory ) ? function() {
+          return Math.log(nodeCount) / Math.log(2) +
+            tailFactory.estimate(size / nodeCount, sink, skip, limit, order, predicate);  
+        } : 
+        function() { return Math.log(nodeCount) / Math.log(2); };
 
       var arg2 = isExprMatch(this.In);
       if ( arg2 ) {
         // tree depth * number of compares
-        return ( Math.log(nodeCount) / Math.log(2) + subEstimate() ) * arg2.length;
+        return subEstimate() * arg2.length;
       }
 
       arg2 = isExprMatch(this.Eq);
       if ( arg2 ) {
         // tree depth
-        return ( Math.log(size) / Math.log(2) ) + subEstimate();
+        return subEstimate();
       }
 
       arg2 = isExprMatch(this.ContainsIC);
@@ -92,23 +90,23 @@ foam.CLASS({
       if ( arg2 ) {
         // TODO: this isn't quite right. Tree depth * query string length?
         // If building a trie to help with this, estimate becomes easier.
-        return ( Math.log(nodeCount) / Math.log(2) + subEstimate() ) * arg2.f().length;
+        return subEstimate() * arg2.f().length;
       }
 
       // These cases are just slightly better scans, but we can't estimate
-      // how much better
-//       arg2 = isExprMatch(this.Gt);
-//       arg2 = isExprMatch(this.Gte);
-//       arg2 = isExprMatch(this.Lt);
-//       arg2 = isExprMatch(this.Lte);
+      //   how much better...
+      //       arg2 = isExprMatch(this.Gt);
+      //       arg2 = isExprMatch(this.Gte);
+      //       arg2 = isExprMatch(this.Lt);
+      //       arg2 = isExprMatch(this.Lte);
 
       var cost = size;
 
       // Ordering
       if ( order ) {
         // if sorting required, add the sort cost
-        if ( ! order === prop &&
-             ! ( index.Desc.isInstance(order) && order.arg1 === prop ) ) {
+        if ( ! order === property &&
+             ! ( index.Desc.isInstance(order) && order.arg1 === property ) ) {
           if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
         }
       }
@@ -154,6 +152,7 @@ foam.CLASS({
   requires: [
     'foam.core.Property',
     'foam.dao.index.NoPlan',
+    'foam.dao.index.CustomPlan',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Or',
     'foam.dao.index.AltIndex',
@@ -176,7 +175,7 @@ foam.CLASS({
 
   methods: [
     function initInstance() {
-      this.delegate = this.delegateFactory_.create();
+      this.delegate = this.delegateFactory_.spawn();
     },
 
     function addPropertyIndex(prop, root) {
@@ -184,16 +183,8 @@ foam.CLASS({
         prop = prop.arg1;
       }
       var name = prop.name;
-      for ( var j = 0; j < this.existingIndexes.length; j++ ) {
-        if ( this.existingIndexes[j][0] === name ) { // check first item of each existing index
-          return; // the first prop matches, we can rely this index
-        }
-      }
       console.log('Adding 1 sig: ', [name]);
-
-      this.existingIndexes.push([name]);
-      //this.mdao.addPropertyIndex(prop);
-      this.addIndex(prop.toIndex(this.idIndexFactory), root);
+      this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
     },
     function addIndex(index, root) {
       this.delegate.addIndex(index, root);
@@ -201,113 +192,45 @@ foam.CLASS({
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate, root) {
-      if ( predicate ) {
-        if ( this.existingIndexes[predicate] ) {
-          // already seen this exact predicate, nothing to do
-          return this.NoPlan.create();
-        }
-        this.existingIndexes[predicate] = true;
+      var index = this;
+      var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
+      var bestCost = existingPlan.cost;
 
-        // create the index to optimize the predicate, if none existing
-        // from similar predicates
-        var dnf = predicate; //.toDisjunctiveNormalForm(); // TODO: settle on where to do this, or cache it
-        if ( this.Or.isInstance(dnf) ) {
-          for ( var i = 0; i < dnf.args.length; i++ ) {
-            this.dispatchPredicate_(dnf.args[i]);
-          }
-        } else {
-          this.dispatchPredicate_(dnf);
-        }
-      }
-      if ( order ) {
-        // TODO: compound comparator case
-        // find name of property to order by
-        var name = ( this.Property.isInstance(order) ) ? order.name :
-          ( order.arg1 && order.arg1.name ) || null;
-        // if no index added for it yet, add one
-        if ( name ) {
-          this.addPropertyIndex(order);
-        }
-      }
-      return this.NoPlan.create();
-    },
-
-    /** @private */
-    function dispatchPredicate_(dnf) {
-      if ( this.And.isInstance(dnf) ) {
-        this.processAndPredicate_(dnf);
-      } else if ( this.Property.isInstance(dnf) ||
-          dnf.arg1 && this.Property.isInstance(dnf.arg1) ) {
-        this.addPropertyIndex(dnf.arg1 || dnf);
-      } else {
-        console.log("AutoIndex found unknown predicate: " + dnf.toString());
-      }
-    },
-
-    /** @private */
-    function processAndPredicate_(predicate) {
-      // one AND clause. For now make a string for comparison
-      // TODO[meta]: use an index to remember what indexes we made?
-
-      // check for duplicates (different mlangs referencing the same
-      //   property that will create the same index)
-      var args = predicate.args;
-      var dedupedArgs = [];
-      for ( var k = 0; k < args.length; k++ ) {
-        var sig = args[k].toIndexSignature();
-        for ( var l = k+1; l < args.length; l++ ) {
-          // check against remaning items
-          var oSig = args[l].toIndexSignature();//TODO: memoize
-          if ( sig === oSig ) {
-            sig = null;
-            break;
-          }
-        }
-        if ( sig ) dedupedArgs.push(sig);
-      }
-      // // if args were removed, recreate the predicate
-//       if ( dedupedArgs.length !== args.length ) {
-//         predicate = predicate.cls_.create({ args: dedupedArgs });
-//       }
-
-      // Find existing indexes whose prefix contains at least all the properties in our predicate
-      var signature = {};
-      var sigArr = dedupedArgs; //predicate.toIndexSignature();
-      for ( var i = 0; i < sigArr.length; i++ ) {
-        signature[sigArr[i]] = true;
-      }
       var newIndex;
-      for ( var j = 0; j < this.existingIndexes.length; j++ ) {
-        var existing = this.existingIndexes[j];
-        var matched = 0;
-        for ( var i = 0; i < existing.length; i++ ) {
-          var existingProp = existing[i];
-          if ( signature[existingProp] ) {
-            matched++;
-          } else {
-            break; // as soon as we don't want one of the existing props, stop
-          }
-        }
-        // ok if the prefix is exactly our props (in any order, but must be the first props)
-        if ( matched === sigArr.length ) {
-          newIndex = existing;
-          break;
+      if ( predicate ) {
+        var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+        var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+        //TODO: must beat by factor of X? or constant?
+        if ( bestCost > candidateCost ) {
+          newIndex = candidate;
+          bestCost = candidateCost;
         }
       }
-      // if nothing found, create a new index
-      if ( ! newIndex ) {
-        newIndex = predicate.toIndex(this.mdao.idIndexFactory);
-        if ( newIndex ) {
-          this.mdao.addIndex(newIndex);
-          // set a key for each property we index
-          var newSig = [];
-          //newSig.index = newIndex;
-          for ( var key in signature ) {
-            newSig.push(key)
-          }
-          this.existingIndexes.push(newSig);
-          console.log("Adding sig", newSig);
+      
+      if ( order ) {
+        var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+        var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+        if ( bestCost > candidateCost ) {
+          newIndex = candidate;
+          bestCost = candidateCost;
         }
+      }
+      
+      if ( newIndex ) {
+        return this.CustomPlan.create({
+          cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
+          customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
+            // TODO: use promise to async delay when loading slowly
+            // TODO: could be a long operation, PoliteIndex to delay load?
+            index.addIndex(newIndex);
+            // avoid a recursive call by hitting delegate, should pick the new optimal index
+            this.delegate
+              .plan(sink, skip, limit, order, predicate, root)
+              .execute(apromise, asink, askip, alimit, aorder, apredicate);
+          }
+        });
+      } else {
+        return existingPlan; 
       }
     },
 
