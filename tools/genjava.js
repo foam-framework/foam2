@@ -38,7 +38,12 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
-  'foam.mlang.sink.Count'
+  'foam.mlang.sink.Count',
+  'foam.dao.DAODecorator'
+];
+
+var abstractClasses = [
+  'foam.dao.DecoratedDAO'
 ];
 
 var skeletons = [
@@ -96,8 +101,19 @@ function generateClass(cls) {
   require('fs').writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
 }
 
-function generateSkeleton(cls) {
+function generateAbstractClass(cls) {
+  var outfile = outdir + require('path').sep +
+    cls.id.replace(/\./g, require('path').sep) + '.java';
 
+  ensurePath(outfile);
+
+  var javaclass = cls.buildJavaClass();
+  javaclass.abstract = true;
+
+  require('fs').writeFileSync(outfile, javaclass.toJavaSource());
+}
+
+function generateSkeleton(cls) {
   var outfile = outdir + require('path').sep +
     cls.package.replace(/\./g, require('path').sep) +
     require('path').sep + cls.name + 'Skeleton.java';
@@ -134,5 +150,6 @@ function generateProxy(intf) {
 }
 
 classes.forEach(loadClass(generateClass));
+abstractClasses.forEach(loadClass(generateAbstractClass));
 skeletons.forEach(loadClass(generateSkeleton));
 proxies.forEach(loadClass(generateProxy));
