@@ -287,7 +287,7 @@ foam.CLASS({
 
         if ( subPlans.length === 0 ) return index.NotFoundPlan.create();
 
-        return index.AltPlan.create({
+        return index.AltPlan.create({ // TODO: ordering... mergeplan?
           subPlans: subPlans,
           prop: prop
         });
@@ -340,7 +340,7 @@ foam.CLASS({
           subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate));
         }
 
-        return index.AltPlan.create({
+        return index.AltPlan.create({// TODO: ordering... mergeplan?
           subPlans: subPlans,
           prop: prop
         });

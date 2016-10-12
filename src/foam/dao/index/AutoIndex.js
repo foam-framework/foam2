@@ -36,6 +36,7 @@ foam.CLASS({
       // small sizes don't matter
       if ( size <= 16 ) return Math.log(size) / Math.log(2);
 
+      var self = this;
       predicate = predicate ? predicate.clone() : null;
       var property = this.prop;
       // TODO: validate this assumption:
@@ -51,13 +52,13 @@ foam.CLASS({
             predicate = undefined;
             return arg2;
           }
-          if ( this.And.isInstance(predicate) ) {
+          if ( self.And.isInstance(predicate) ) {
             for ( var i = 0 ; i < predicate.args.length ; i++ ) {
               var q = predicate.args[i];
               if ( model.isInstance(q) && q.arg1 === property ) {
-                predicate.args[i] = this.True.create();
+                predicate.args[i] = self.True.create();
                 predicate = predicate.partialEval();
-                if (  this.True.isInstance(predicate) ) predicate = undefined;
+                if (  self.True.isInstance(predicate) ) predicate = undefined;
                 return q.arg2;
               }
             }

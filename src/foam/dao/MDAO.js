@@ -353,8 +353,9 @@ foam.CLASS({
         var idxCost = Math.floor(idx.estimate(
            1000, undefined, undefined, undefined, undefined, arg));
         // make unique with a some extra digits
-        sortedArgs[idxCost + i / 1000] = arg;
+        sortedArgs[idxCost + i / 1000.0] = arg;
       }
+      console.log("Sorted AND args: ", sortedArgs);
 
       // Sort, build list up starting at the end (most expensive
       //   will end up deepest in the index)
@@ -446,10 +447,8 @@ foam.CLASS({
         var index = this.args[i].toIndex(tailFactory);
         index && subIndexes.push(index);
       }
-      return this.OrIndex.create({ delegate:
-        this.AltIndex.create({
-          delegates: subIndexes
-        })
+      return this.AltIndex.create({
+        delegates: subIndexes
       });
     },
 
