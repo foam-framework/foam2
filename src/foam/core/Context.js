@@ -84,12 +84,12 @@
       }
     },
 
-    /** Internal method to register a context binding in an internal cache */ 
+    /** Internal method to register a context binding in an internal cache */
     registerInCache_: function registerInCache_(cls, cache, name) {
       console.assert(
         ! cache.hasOwnProperty(name),
         cls.id + ' is already registerd in this context.');
-      
+
       cache[name] = cls;
     },
 
