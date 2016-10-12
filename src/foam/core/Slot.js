@@ -35,7 +35,7 @@ foam.CLASS({
 
   methods: [
     /**
-      Subscribe to the slot's value, if it has one. If the slot's
+      Subscribe to the Slot's value, if it has one. If the Slot's
       value changes, then unsubscribe from the previous value and
       resubscribe to the new one.
     */
@@ -53,6 +53,11 @@ foam.CLASS({
     },
 
     /**
+      Create a sub-Slot for this Slot's value. If this Slot's
+      value changes, then the sub-Slot becomes the Slot for
+      the new value's sub-Slot instead. Useful for creating
+      Slot paths without having to rebuild whenever a value
+      along the chain changes.
     */
     function dot(name) {
       return foam.core.internal.SubSlot.create({
