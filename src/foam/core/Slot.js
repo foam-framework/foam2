@@ -35,6 +35,9 @@ foam.CLASS({
 
   methods: [
     /**
+      Subscribe to the slot's value, if it has one. If the slot's
+      value changes, then unsubscribe from the previous value and
+      resubscribe to the new one.
     */
     function valueSub() {
       var self = this;
