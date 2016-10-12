@@ -21,7 +21,7 @@
   qualifying their package names. Required classes are automatically
   created in the sub-context of the creating object.
 <pre>
-  Ex.:
+  Ex.
   foam.CLASS({
     package: 'demo.bank',
     name: 'AccountTester',
