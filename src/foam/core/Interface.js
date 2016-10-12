@@ -56,7 +56,7 @@ foam.CLASS({
       class: 'String',
       name: 'id',
       expression: function(package, name) {
-        return package + '.' + name;
+        return package ? (package + '.' + name) : name;
       }
     },
     {
@@ -70,6 +70,16 @@ foam.CLASS({
       // TODO: Should this be a type of property that defines
       // nothing beyond name and type information?
       of: 'foam.core.Property'
+    },
+    {
+      class: 'AxiomArray',
+      name: 'topics',
+      of: 'foam.core.Topic',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string'        ?
+          foam.core.Topic.create({name: o}) :
+          foam.core.Topic.create(o)         ;
+      }
     },
     {
       name: 'axioms_',
