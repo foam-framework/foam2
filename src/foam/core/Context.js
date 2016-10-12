@@ -84,7 +84,7 @@
       }
     },
 
-    /** Internal method to register a context binding in an internal cache **/ 
+    /** Internal method to register a context binding in an internal cache */ 
     registerInCache_: function registerInCache_(cls, cache, name) {
       console.assert(
         ! cache.hasOwnProperty(name),
@@ -93,7 +93,7 @@
       cache[name] = cls;
     },
 
-    /** Internal method to create a slot name for a specified key. **/
+    /** Internal method to create a slot name for a specified key. */
     toSlotName_: foam.Function.memoize1(function toSlotName_(key) {
       return key + '$';
     }),
