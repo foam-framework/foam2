@@ -22,6 +22,8 @@ if ( ! Math.trunc ) {
     return v > 0 ? Math.floor(v) : Math.ceil(v);
   };
 }
+
+
 if ( ! Array.from ) {
   /** Turn array-like objects into real arrays. **/
   Array.from = function(a) {
@@ -70,11 +72,13 @@ if ( ! String.prototype.endsWith ) {
   };
 }
 
+
 if ( ! String.prototype.startsWith ) {
   String.prototype.startsWith = function(str, pos) {
     return this.indexOf(str) === 0;
   };
 }
+
 
 (function() {
   if ( this.WeakMap ) return;
