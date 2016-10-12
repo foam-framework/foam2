@@ -81,7 +81,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Import',
 
-  // documentation: 'Import Context Value Axiom',
+  documentation: 'Import Context Value Axiom',
 
   properties: [
     'name',
@@ -134,7 +134,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Export',
 
-  // documentation: 'Export Sub-Context Value Axiom',
+  documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
     'name',
@@ -199,6 +199,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+
   properties: [
     {
       class: 'AxiomArray',

@@ -15,11 +15,36 @@
  * limitations under the License.
  */
 
+/**
+  The Requires Axiom is used to declare that a class requires/creates objects
+  of a particular class. Required classes can be accessed without fully
+  qualifying their package names. Required classes are automatically
+  created in the sub-context of the creating object.
+<pre>
+  Ex.:
+  foam.CLASS({
+    package: 'demo.bank',
+    name: 'AccountTester',
+    requires: [
+      // Require demo.bank.Account so that it can be accessed as this.Account
+      'demo.bank.Account',
+
+      // Require SavingsAccount and alias it so that it can be accessed
+      // as this.SAccount
+      'demo.bank.SavingsAccount as SAccount'
+    ],
+    methods: [ function init() {
+      var a = this.Account.create();
+      var s = this.SAccount.create();
+    } ]
+  });
+</pre>
+*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Requires',
 
-  // documentation: 'Require Class Axiom',
+  documentation: 'Require Class Axiom',
 
   properties: [ 'name', 'path' ],
 
