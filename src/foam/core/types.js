@@ -183,7 +183,7 @@ foam.CLASS({
   name: 'Reference',
   extends: 'Property',
 
-  // documentation:  'A foreign key reference to another Entity.',
+  documentation:  'A foreign key reference to another Entity.',
   label: 'Reference to another object',
 
   properties: [
@@ -200,10 +200,14 @@ foam.CLASS({
   ],
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Object',
   extends: 'Property',
+
+  documentation: '',
+
   properties: [
     {
       name: 'fromJSON',
@@ -214,11 +218,13 @@ foam.CLASS({
   ]
 });
 
+
 // TODO(adam): Better name for this?
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectProperty',
   extends: 'Property',
+
   properties: [
     {
       name: 'of',
@@ -247,6 +253,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Array',
   extends: 'Property',
+
   properties: [
     {
       name: 'fromJSON',
@@ -256,6 +263,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
