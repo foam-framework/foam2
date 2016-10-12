@@ -179,11 +179,6 @@ foam.CLASS({
     },
 
     function addPropertyIndex(prop, root) {
-      if ( foam.mlang.order.Desc && foam.mlang.order.Desc.isInstance(prop) ) {
-        prop = prop.arg1;
-      }
-      var name = prop.name;
-      console.log('Adding 1 sig: ', [name]);
       this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
     },
     function addIndex(index, root) {
