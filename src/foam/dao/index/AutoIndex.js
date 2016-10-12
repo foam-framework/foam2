@@ -188,8 +188,13 @@ foam.CLASS({
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate, root) {
-      var index = this;
       var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
+      // If plan is cheap enough don't bother
+      if ( existingPlan.cost < this.AltIndex.GOOD_ENOUGH_PLAN ) {
+        return existingPlan;
+      }
+
+      var index = this;
       var bestCost = existingPlan.cost;
 
       var newIndex;

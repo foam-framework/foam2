@@ -435,18 +435,15 @@ foam.CLASS({
 
   methods: [
     function toIndex(tailFactory) {
-      //var self = this.toDisjunctiveNormalForm();
-//console.log("Pre: ", this.toString());
-//console.log("DNF: ", self.toString());
-
       // return an OR index with Alt index spanning each possible index
-      // TODO: this may duplicate indexes for the same set of properties
-      //   Use signature to dedup
       var subIndexes = [];
       for ( var i = 0; i < this.args.length; i++ ) {
         var index = this.args[i].toIndex(tailFactory);
         index && subIndexes.push(index);
       }
+      // TODO: This should be an OrIndex that returns a MergePlan.
+      // Since MDAO does the DNF and handles the Or, this .toIndex() is
+      // not a common case.
       return this.AltIndex.create({
         delegates: subIndexes
       });
