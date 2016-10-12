@@ -19,9 +19,8 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Model',
-  extends: 'FObject', // Isn't the default yet.
 
-  // documentation: 'Class/Prototype description.',
+  documentation: 'Class/Prototype description.',
 
   properties: [
     {
