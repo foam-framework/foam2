@@ -41,7 +41,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Implements',
 
-  // documentation: 'Implements Axiom',
+  documentation: 'Implements Axiom',
 
   properties: [
     { name: 'name', getter: function() { return 'implements_' + this.path; } },
