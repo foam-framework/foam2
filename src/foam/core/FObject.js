@@ -677,6 +677,7 @@ foam.CLASS({
      ************************************************/
 
     function isDestroyed() {
+      /* Returns true iff destroy() has been called on this object. */
       return ! this.instance_;
     },
 
@@ -786,6 +787,9 @@ foam.CLASS({
       return diff;
     },
 
+    /**
+      Create an integer hash code value based on all properties of this object.
+    */
     function hashCode() {
       var hash = 17;
 
