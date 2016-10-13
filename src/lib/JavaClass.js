@@ -442,7 +442,7 @@ foam.CLASS({
 });
 
 foam.LIB({
-  name: 'foam.AbstractClass',
+  name: 'foam.core.FObject',
   methods: [
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
