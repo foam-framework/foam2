@@ -58,7 +58,6 @@ foam.CLASS({
   axioms: [foam.pattern.Singleton.create()],
 
   requires: [
-    'foam.parse.StringPS',
     'foam.parse.ImperativeGrammar as Grammar'
   ],
 
@@ -138,10 +137,10 @@ foam.CLASS({
                 ";out('");
           },
           'single quote': function() {
-            self.pushSimple("\\'");
+            self.push("\\'");
           },
           newline: function() {
-            self.pushSimple('\\n');
+            self.push('\\n');
           },
           text: function(v) {
             self.pushSimple(v);
@@ -157,12 +156,6 @@ foam.CLASS({
     {
       name: 'simple',
       value: true
-    },
-    {
-      name: 'ps',
-      factory: function() {
-        return this.StringPS.create();
-      }
     }
   ],
 
