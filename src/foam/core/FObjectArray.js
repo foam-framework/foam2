@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'FObjectArray',
   extends: 'Property',
 
-  // documentation: "A Property which contains an array of 'of' FObjects.",
+  documentation: "A Property which contains an array of 'of' FObjects.",
 
   properties: [
     { name: 'of', required: true },

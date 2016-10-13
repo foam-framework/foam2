@@ -18,5 +18,7 @@
 foam.INTERFACE({
   package: 'foam.core',
   name: 'Serializble',
-  documentation: 'Marker interface to indicate that a CLASS is serializble or not.'
+
+  documentation:
+      'Marker interface to indicate that a CLASS is serializble or not.'
 });
