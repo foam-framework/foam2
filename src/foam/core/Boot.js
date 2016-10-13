@@ -135,7 +135,7 @@ foam.LIB({
           context.lookup(this.extends) :
           foam.core.FObject            ;
 
-        cls                  = parent.createSubClass();
+        cls                  = parent.createSubClass_();
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
         cls.id               = this.id;

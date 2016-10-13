@@ -72,8 +72,20 @@ foam.LIB({
       return obj;
     },
 
-    function createSubClass() {
-      foam.core.FObject.createSubClass = function() {
+    /**
+      Internal method to create a subclass of this class.
+      Is called from Model.buildClass().
+    */
+    function createSubClass_() {
+      // When called this first time it just returns 'this',
+      // which is foam.core.FObject. This is so that the existing
+      // FObject LIB can be reused/extended into a class as part
+      // of the bootstrap process.
+      // When this version is first called it replaces itself with
+      // the real version (below), which is then used for all
+      // remaining non-FObject classes.
+
+      foam.core.FObject.createSubClass_ = function() {
         var cls = Object.create(this);
 
         cls.prototype = Object.create(this.prototype);
