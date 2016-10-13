@@ -335,6 +335,25 @@ describe('TreeIndex', function() {
     expect(sink.a[2].int).toEqual(2);
   });
 
+  it('optimizes IN with a cloned predicate', function() {
+    var pred = m.IN(test.Indexable.INT, [ 0, 1, 2 ]);
+    pred = pred.clone(); // case where Property INT being cloned too
+
+    plan = idx.plan(sink, undefined, undefined, undefined, pred);
+
+    // Note: this is checking an implementation detail
+    // Each item in the In array produces a plan
+    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
+    expect(plan.subPlans.length).toEqual(3);
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toEqual(3);
+    expect(sink.a[0].int).toEqual(0);
+    expect(sink.a[1].int).toEqual(1);
+    expect(sink.a[2].int).toEqual(2);
+  });
+
   it('optimizes not found IN', function() {
     plan = idx.plan(sink, undefined, undefined, undefined,
       m.IN(test.Indexable.INT, [ 22, 25 ]));
