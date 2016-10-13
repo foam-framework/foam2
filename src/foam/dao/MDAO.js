@@ -344,6 +344,7 @@ foam.CLASS({
 
       // generate indexes, find costs, toss these initial indexes
       var sortedArgs = Object.create(null);
+      var costs = [];
       var args = this.args;
       for (var i = 0; i < args.length; i++ ) {
         var arg = args[i];
@@ -353,16 +354,17 @@ foam.CLASS({
         var idxCost = Math.floor(idx.estimate(
            1000, undefined, undefined, undefined, undefined, arg));
         // make unique with a some extra digits
-        sortedArgs[idxCost + i / 1000.0] = arg;
+        var costKey = idxCost + i / 1000.0;
+        sortedArgs[costKey] = arg;
+        costs.push(costKey);
       }
-      console.log("Sorted AND args: ", sortedArgs);
+      costs = costs.sort(foam.Number.compare);
 
       // Sort, build list up starting at the end (most expensive
       //   will end up deepest in the index)
       var tail = tailFactory;
-      var keys = Object.keys(sortedArgs).sort();
-      for ( var i = keys.length - 1; i >= 0; i-- ) {
-        var arg = sortedArgs[keys[i]];
+      for ( var i = costs.length - 1; i >= 0; i-- ) {
+        var arg = sortedArgs[costs[i]];
         //assert(arg is a predicate)
         tail = arg.toIndex(tail);
       }
