@@ -231,6 +231,7 @@ if ( foam.isServer ) {
 }
 
 
+// Replace top-level Context with one which includes Window's exports.
 foam.__context__ = foam.core.Window.create(
   { window: global },
   foam.__context__

@@ -200,7 +200,6 @@ foam.core.FObject.validate = function() {
   }
 }
 
-global.abc = 0;
 // Change 'false' to 'true' to enable error reporting for setting
 // non-Properties on FObjects.
 // TODO: add 'Did you mean...' support.
@@ -304,8 +303,8 @@ foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
 
-  // documentation: 'Decorated merged() and framed() to have debug friendly
-  // toString() methods.',
+  documentation: 'Decorated merged() and framed() to have debug friendly ' +
+      'toString() methods.',
 
   exports: [ 'merged', 'framed' ],
 
@@ -328,6 +327,7 @@ foam.CLASS({
 });
 
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
+
 
 /** Describes one argument of a function or method. */
 foam.CLASS({
