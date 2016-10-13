@@ -17,7 +17,7 @@
 
 /**
   FObject is the root of FOAM's class hierarchy.
-  
+
   We define FObject twice, first as a LIB to install all of
   the static/class methods in the top-level FObject class,
   then with a CLASS below to define methods on the FObject
@@ -63,11 +63,11 @@ foam.LIB({
     function createSubClass() {
       foam.core.FObject.createSubClass = function() {
         var cls = Object.create(this);
-        
+
         cls.prototype = Object.create(this.prototype);
         cls.axiomMap_ = Object.create(this.axiomMap_);
         cls.private_  = { axiomCache: Object.create(this.axiomMap_) };
-        
+
         return cls;
       }
 
