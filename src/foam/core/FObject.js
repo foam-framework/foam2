@@ -29,8 +29,20 @@ foam.LIB({
   documentation: "Root prototype for all classes.",
 
   constants: {
+    // Each class has a prototype object which is the prototype of all
+    // instances of the class. A classes prototype extends its parent
+    // classes prototype.
     prototype: {},
+
+    // Each class has a map of Axioms added to the class.
+    // May keys are the name of the axiom.
+    // The classes axiomMap_'s extends its parent axiomMap_.
     axiomMap_: {},
+
+    // Each class has a map of "private" variables for use by
+    // axioms. Storing internal data in private_ instead of on the
+    // class directly avoids name conflicts with public features of
+    // the class.
     private_:  { axiomCache: {} }
   },
 
