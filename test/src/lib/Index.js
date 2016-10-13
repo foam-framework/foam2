@@ -713,6 +713,8 @@ describe('AutoIndex', function() {
 
   it('supports manual addIndex()', function() {
     idx.addPropertyIndex(test.Indexable.INT, idxInstance);
+    expect(idxInstance.delegate.instances.length).toEqual(2);
+    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
   });
 
   it('auto indexes on ordering', function() {
@@ -720,9 +722,16 @@ describe('AutoIndex', function() {
       .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
       .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
+    expect(idxInstance.delegate.instances.length).toEqual(2);
+    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+
     idxInstance
       .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
+
+    expect(idxInstance.delegate.instances.length).toEqual(3);
+    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.instances[2].size()).toEqual(1000);
   });
 
   it('skips already auto indexed orderings', function() {
@@ -730,11 +739,15 @@ describe('AutoIndex', function() {
       .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
       .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
+    expect(idxInstance.delegate.instances.length).toEqual(2);
+    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
 
     idxInstance
       .plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined, fakeRoot)
       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined);
 
+    expect(idxInstance.delegate.instances.length).toEqual(2);
+    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
   });
 
   it('auto indexes on predicate', function() {
@@ -759,7 +772,6 @@ describe('AutoIndex', function() {
       )
     );
 
-    // TODO: fix if MDAO isn't the one doing DNF xform
     pred = pred.toDisjunctiveNormalForm();
 
     idxInstance
