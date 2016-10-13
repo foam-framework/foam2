@@ -72,30 +72,9 @@ if ( ! String.prototype.endsWith ) {
   };
 }
 
-
+// Required on IE 11, Android Browser (at least to 5.1).
 if ( ! String.prototype.startsWith ) {
   String.prototype.startsWith = function(str, pos) {
     return this.indexOf(str) === 0;
   };
 }
-
-
-(function() {
-  if ( this.WeakMap ) return;
-  this.WeakMap = function WeakMap() {
-    var id = '__WEAK_MAP__' + this.$UID;
-
-    function del(key) { delete key[id]; }
-    function get(key) { return key[id]; }
-    function set(key, value) { key[id] = value; }
-    function has(key) { return !!key[id]; }
-
-    return {
-      __proto__: this,
-      "delete": del,
-      get: get,
-      set: set,
-      has: has
-    };
-  };
-})();
