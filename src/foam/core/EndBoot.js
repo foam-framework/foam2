@@ -19,7 +19,7 @@
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  // documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
+  documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
 
   properties: [
     {
@@ -76,7 +76,7 @@ foam.boot.phase3();
 foam.CLASS({
   refines: 'foam.core.FObject',
 
-  // documentation: 'Upgrade FObject to fully bootstraped form.',
+  documentation: 'Upgrade FObject to fully bootstraped form.',
 
   axioms: [
     {
@@ -117,7 +117,9 @@ foam.CLASS({
             {
               get: function() { return this.__context__; },
               set: function() {
-                throw new Error('Attempted to set unsettable __subContext__ in ' + this.cls_.id);
+                throw new Error(
+                    'Attempted to set unsettable __subContext__ in ' +
+                    this.cls_.id);
               }
             });
       }
@@ -146,6 +148,7 @@ foam.CLASS({
 
 
 foam.boot.end();
+
 
 /**
  * Map of Property property names to arrays of names of properties that they shadow.
