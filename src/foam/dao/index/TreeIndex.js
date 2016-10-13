@@ -227,10 +227,12 @@ foam.CLASS({
 
       var isExprMatch = function(model) {
         if ( ! model ) return undefined;
-
         if ( predicate ) {
-
-          if ( model.isInstance(predicate) && predicate.arg1 === prop ) {
+          // util.equals catches Properties that were cloned if the predicate has
+          //  been cloned.
+          if ( model.isInstance(predicate) &&
+              ( predicate.arg1 === prop || foam.util.equals(predicate.arg1, prop) )
+          ){
             var arg2 = predicate.arg2;
             predicate = undefined;
             return arg2;

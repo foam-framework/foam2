@@ -225,7 +225,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'of',
       required: true
     },

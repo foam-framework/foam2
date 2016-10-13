@@ -67,7 +67,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'op',
       expression: function(property) {
         // All the numeric types extend from Int, so I'll use that as my base.

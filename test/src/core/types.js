@@ -31,19 +31,11 @@ var createTestProperties = function createTestProperties() {
           name: 'blob',
         },
         {
-          class: 'Reference',
-          name: 'reference',
-        },
-        {
           class: 'StringArray',
           name: 'stringArray',
         },
         {
-          class: 'ReferenceArray',
-          name: 'referenceArray',
-        },
-        {
-          class: 'Class2',
+          class: 'Class',
           name: 'class',
         }
         // TODO: other types, as they gain testable functionality
@@ -74,7 +66,7 @@ var createDateTestProperties = function createDateTestProperties() {
   return test.DateTypeTester.create();
 }
 
-// For tests that rely on asserts firing, make sure they throw so the 
+// For tests that rely on asserts firing, make sure they throw so the
 // assert can be detected in tests.
 var oldAssert;
 beforeAll(function() {
@@ -258,22 +250,6 @@ describe('StringArray', function() {
     ]);
   });
 });
-
-describe('ReferenceArray', function() {
-  var p;
-
-  beforeEach(function() {
-    p = createTestProperties();
-  });
-  afterEach(function() {
-    p = null;
-  });
-
-  it('is empty array by default', function() {
-    expect(p.referenceArray).toEqual([]);
-  });
-});
-
 
 describe('Class property', function() {
   var p;

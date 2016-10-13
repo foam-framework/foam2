@@ -662,7 +662,7 @@ foam.CLASS({
         Set to the name or class instance of the type of object the DAO
         will store.
       */
-      class: 'Class2',
+      class: 'Class',
       name: 'of'
     }
   ],

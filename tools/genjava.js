@@ -38,12 +38,10 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
-  'foam.mlang.sink.Count',
-  'foam.dao.DAODecorator'
+  'foam.mlang.sink.Count'
 ];
 
 var abstractClasses = [
-  'foam.dao.DecoratedDAO'
 ];
 
 var skeletons = [

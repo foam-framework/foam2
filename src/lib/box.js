@@ -1280,11 +1280,11 @@ foam.CLASS({
   properties: [
     'next',
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'server'
     },
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'client'
     }
   ],
