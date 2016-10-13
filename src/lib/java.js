@@ -153,7 +153,7 @@ foam.CLASS({
   name: 'Skeleton',
   properties: [
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'of'
     },
     {
