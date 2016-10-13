@@ -117,9 +117,11 @@ foam.CLASS({
 
       return f;
     },
+
     function createChildMethod_(child) {
       return child;
     },
+
     function installInClass(cls) {
       var method = this;
 
@@ -151,5 +153,6 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.boot.phase2();
