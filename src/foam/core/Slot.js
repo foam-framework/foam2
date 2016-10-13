@@ -249,13 +249,13 @@ foam.CLASS({
 });
 
 
-/**
-  For internal use only. Is used to implement the Slot.dot() method.
- */
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
   implements: [ 'foam.core.Slot' ],
+
+  documentation:
+      'For internal use only. Is used to implement the Slot.dot() method.',
 
   properties: [
     'parent', // parent slot, not parent object
@@ -331,6 +331,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',
+
   implements: [ 'foam.core.Slot' ],
 
   properties: [
