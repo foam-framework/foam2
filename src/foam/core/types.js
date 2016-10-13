@@ -177,29 +177,6 @@ foam.CLASS({
 });
 
 
-// FUTURE: to be used by or replaced by Relationship axiom
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Reference',
-  extends: 'Property',
-
-  // documentation:  'A foreign key reference to another Entity.',
-  label: 'Reference to another object',
-
-  properties: [
-    {
-      name: 'of',
-      value: '',
-      // documentation: 'The FOAM sub-type of this property.'
-    },
-    {
-      name: 'subKey',
-      value: 'ID',
-      // documentation: 'The name of the key (a property of the other object) that this property references.'
-    }
-  ],
-});
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Object',
@@ -355,17 +332,6 @@ foam.CLASS({
         configurable: true
       });
     }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ReferenceArray',
-  extends: 'Reference',
-
-  properties: [
-    [ 'factory', function() { return []; } ]
   ]
 });
 

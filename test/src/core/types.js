@@ -31,16 +31,8 @@ var createTestProperties = function createTestProperties() {
           name: 'blob',
         },
         {
-          class: 'Reference',
-          name: 'reference',
-        },
-        {
           class: 'StringArray',
           name: 'stringArray',
-        },
-        {
-          class: 'ReferenceArray',
-          name: 'referenceArray',
         },
         {
           class: 'Class2',
@@ -74,7 +66,7 @@ var createDateTestProperties = function createDateTestProperties() {
   return test.DateTypeTester.create();
 }
 
-// For tests that rely on asserts firing, make sure they throw so the 
+// For tests that rely on asserts firing, make sure they throw so the
 // assert can be detected in tests.
 var oldAssert;
 beforeAll(function() {
