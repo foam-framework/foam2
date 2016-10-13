@@ -431,7 +431,7 @@ foam.CLASS({
                   undefined ) :
             this[name] ;
 
-          if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
+          if ( adapt ) newValue = adapt.call(this, oldValue, newValue, prop);
 
           if ( assertValue ) assertValue.call(this, newValue, prop);
 
