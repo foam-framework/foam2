@@ -1,4 +1,4 @@
-`/**
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -87,7 +87,6 @@ foam.CLASS({
     function write(X, dao, obj, existing) {
     },
     function remove(X, dao, obj) {
-      obj.
     }
   ]
 });
