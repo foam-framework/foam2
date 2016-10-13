@@ -24,7 +24,6 @@ foam.CLASS({
     'units',
     [ 'value', 0 ],
     [ 'adapt', function adaptInt(_, v) {
-        // FUTURE: replace with Math.trunc() when available everywhere.
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
           0 ;
