@@ -46,8 +46,9 @@ foam.CLASS({
       Map of Property property names to arrays of property names
       that they shadow.
 
-      Ex. When 'setter' is set, it takes precedence over 'adapt',
-      'preSet', and 'postSet', so their values are shadowed.
+      Ex. 'setter' has higher precedence than 'adapt', 'preSet', and 'postSet',
+      so if it is set, then it shadows those other properties if they are set,
+      causing their values to be ignored.
     */
     SHADOW_MAP: {
       setter:     [ 'adapt', 'preSet', 'postSet' ],
