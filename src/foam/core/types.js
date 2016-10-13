@@ -191,7 +191,7 @@ foam.CLASS({
   ]
 });
 
-// TODO(adam): Better name for this?
+
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectProperty',
@@ -278,44 +278,9 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Class',
-  extends: 'Property',
-
-  // documentation: 'Stores a class, and can accept a class name.',
-
-  properties: [
-    {
-      /** FUTURE: adding to the default getter/setter chains is difficult
-        when we want to preserve the existing behavior but add an additional
-        step. This adapt work could be done in a getter that decorates the
-        default getter, but dealing with normal and expression cases is necessary
-        if writing back the looked-up class instance. */
-      name: 'adapt',
-      value: function(old, nu, prop) {
-        if ( typeof nu === 'string' ) {
-          if ( ! nu ) return '';
-          var ret = this.__context__.lookup(nu);
-          this.assert(ret && ret.isSubClass, 'Invalid class name ' +
-             nu + ' specified for ' + prop.name);
-          return ret;
-        }
-        this.assert(typeof nu === 'undefined' || ( nu && nu.isSubClass ),
-          'Invalid class specified for ' +
-          prop.name);
-        return nu;
-      }
-    }
-  ]
-});
-
-
-//TODO(adamvy): Replace Class property with Class2 property.
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Class2',
   extends: 'Property',
 
   methods: [

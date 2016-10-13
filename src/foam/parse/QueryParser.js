@@ -49,7 +49,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'of'
     },
     /** An optional input. If this is defined, 'me' is a keyword in the search
