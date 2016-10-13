@@ -35,7 +35,7 @@ var createTestProperties = function createTestProperties() {
           name: 'stringArray',
         },
         {
-          class: 'Class2',
+          class: 'Class',
           name: 'class',
         }
         // TODO: other types, as they gain testable functionality
@@ -250,22 +250,6 @@ describe('StringArray', function() {
     ]);
   });
 });
-
-describe('ReferenceArray', function() {
-  var p;
-
-  beforeEach(function() {
-    p = createTestProperties();
-  });
-  afterEach(function() {
-    p = null;
-  });
-
-  it('is empty array by default', function() {
-    expect(p.referenceArray).toEqual([]);
-  });
-});
-
 
 describe('Class property', function() {
   var p;
