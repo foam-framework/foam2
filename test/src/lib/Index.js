@@ -631,6 +631,30 @@ describe('AltIndex', function() {
   });
 });
 
+describe('AND', function() {
+  var m;
+
+  beforeEach(function() {
+    m = foam.mlang.Expressions.create();
+
+  });
+
+  it('orders subindexes by cost estimate', function() {
+    var and = m.AND(
+      m.GT(test.Indexable.INT, 5),
+      m.EQ(test.Indexable.FLOAT, 5),
+      m.IN(test.Indexable.STRING, 'he')
+    );
+    var andIndex = and.toIndex(
+      test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
+    );
+
+  });
+
+});
+
+
+
 describe('AutoIndex', function() {
   var idx;
   var plan;

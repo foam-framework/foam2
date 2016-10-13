@@ -47,7 +47,9 @@ foam.CLASS({
       var isExprMatch = function(model) {
         if ( ! model ) return undefined;
         if ( predicate ) {
-          if ( model.isInstance(predicate) && predicate.arg1 === property ) {
+          if ( model.isInstance(predicate) &&
+              ( predicate.arg1 === property || foam.util.equals(predicate.arg1, property) )
+          ){
             var arg2 = predicate.arg2;
             predicate = undefined;
             return arg2;
@@ -76,7 +78,7 @@ foam.CLASS({
       var arg2 = isExprMatch(this.In);
       if ( arg2 ) {
         // tree depth * number of compares
-        return subEstimate() * arg2.length;
+        return subEstimate() * arg2.f().length;
       }
 
       arg2 = isExprMatch(this.Eq);
@@ -160,6 +162,11 @@ foam.CLASS({
     'foam.dao.index.ValueIndex',
   ],
 
+  constants: {
+    /** Maximum cost for a plan which is good enough to not bother looking at the rest. */
+    GOOD_ENOUGH_PLAN: 20
+  },
+
   properties: [
     {
       /** Used to create the delegate ID index for new instances of AutoIndex */
@@ -190,7 +197,7 @@ foam.CLASS({
     function plan(sink, skip, limit, order, predicate, root) {
       var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
       // If plan is cheap enough don't bother
-      if ( existingPlan.cost < this.AltIndex.GOOD_ENOUGH_PLAN ) {
+      if ( existingPlan.cost <= this.GOOD_ENOUGH_PLAN ) {
         return existingPlan;
       }
 
