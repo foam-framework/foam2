@@ -190,7 +190,7 @@ foam.CLASS({
       this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
     },
     function addIndex(index, root) {
-      this.delegate.addIndex(index, root);
+      this.delegateFactory_.addIndex(index, root);
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
@@ -201,7 +201,7 @@ foam.CLASS({
         return existingPlan;
       }
 
-      var index = this;
+      var self = this;
       var bestCost = existingPlan.cost;
 
       var newIndex;
@@ -230,9 +230,9 @@ foam.CLASS({
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
             // TODO: use promise to async delay when loading slowly
             // TODO: could be a long operation, PoliteIndex to delay load?
-            index.addIndex(newIndex);
+            self.addIndex(newIndex, root);
             // avoid a recursive call by hitting delegate, should pick the new optimal index
-            this.delegate
+            self.delegate
               .plan(sink, skip, limit, order, predicate, root)
               .execute(apromise, asink, askip, alimit, aorder, apredicate);
           }

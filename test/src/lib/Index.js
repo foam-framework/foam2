@@ -82,9 +82,9 @@ var createData1 = function createData1() {
 }
 
 
-var createData2 = function createData2() {
+var createData2 = function createData2(dataCount) {
   var arr = [];
-  var count = 20;
+  var count = dataCount || 20;
 
   for (var i = 0; i < count; i++ ) {
     arr.push({
@@ -679,15 +679,30 @@ describe('AND', function() {
 
 describe('AutoIndex', function() {
   var idx;
+  var idxInstance;
   var plan;
   var m;
   var sink;
   var mdao;
+  var fakeRoot;
 
   beforeEach(function() {
     idx = foam.dao.index.AutoIndex.create({
       idIndexFactory: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
-    }).spawn();
+    });
+
+    idxInstance = idx.spawn();
+
+    idxInstance.bulkLoad(createData2(1000));
+
+    fakeRoot = { mapOver: function(fn, ofIndex) {
+      if ( ofIndex === idx ) {
+        idxInstance = fn(idxInstance);
+      } else {
+        idxInstance.mapOver(fn, ofIndex);
+      }
+    }};
+
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
   });
@@ -697,22 +712,28 @@ describe('AutoIndex', function() {
   });
 
   it('supports manual addIndex()', function() {
-    idx.addPropertyIndex(test.Indexable.INT, idx);
-
+    idx.addPropertyIndex(test.Indexable.INT, idxInstance);
   });
 
   it('auto indexes on ordering', function() {
-    idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
+    idxInstance
+      .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-
-    idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.INT));
+    idxInstance
+      .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
   });
 
   it('skips already auto indexed orderings', function() {
-    idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
+    idxInstance
+      .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
 
-    idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT));
+    idxInstance
+      .plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined);
 
   });
 
@@ -741,7 +762,9 @@ describe('AutoIndex', function() {
     // TODO: fix if MDAO isn't the one doing DNF xform
     pred = pred.toDisjunctiveNormalForm();
 
-    idx.plan(sink, undefined, undefined, undefined, pred);
+    idxInstance
+      .plan(sink, undefined, undefined, undefined, pred, fakeRoot)
+      .execute([], sink, undefined, undefined, undefined, pred);
 
     // TODO expectations
   });

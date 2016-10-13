@@ -85,7 +85,13 @@ foam.CLASS({
 
     function get(key) { return this.delegate.get(key); },
 
-    function mapOver(fn, ofIndex) { return this.delegate.mapOver(fn, ofIndex); },
+    function mapOver(fn, ofIndex) {
+      if ( this.delegate.progenitor === ofIndex ) {
+        this.delegate = fn(this.delegate);
+      } else {
+        return this.delegate.mapOver(fn, ofIndex);
+      }
+    },
 
     function size() { return this.delegate.size(); },
 
@@ -228,7 +234,11 @@ foam.CLASS({
 
     function mapOver(fn, ofIndex) {
       for ( var i = 0 ; i < this.instances.length ; i++ ) {
-        this.instances[i].mapOver(fn, ofIndex);
+        if ( this.delegates[i] == ofIndex) {
+          this.instances[i] = fn(this.instances[i]);
+        } else {
+          this.instances[i].mapOver(fn, ofIndex);
+        }
       }
     },
 
