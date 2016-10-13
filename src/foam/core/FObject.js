@@ -213,6 +213,10 @@ foam.LIB({
       return as;
     },
 
+    /**
+      Returns all axioms defined on this class
+      that are instances of the specified class.
+    */
     function getOwnAxiomsByClass(cls) {
       return this.getAxiomsByClass(cls).filter(function(a) {
         return this.hasOwnAxiom(a.name);
@@ -227,6 +231,7 @@ foam.LIB({
       return Object.hasOwnProperty.call(this.axiomMap_, name);
     },
 
+    /** Returns all axioms defined on this class. */
     function getOwnAxioms() {
       return this.getAxioms().filter(function(a) {
         return this.hasOwnAxiom(a.name);
@@ -306,9 +311,9 @@ foam.LIB({
 
           var type = foam.lookup(a.class, true) || foam.core.Property;
           console.assert(
-            type !== a.cls_,
-            'Property', a.name, 'on', m.name,
-            'has already been upgraded to a Property.');
+              type !== a.cls_,
+              'Property', a.name, 'on', m.name,
+              'has already been upgraded to a Property.');
 
           a = type.create(a);
 
