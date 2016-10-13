@@ -16,14 +16,36 @@
  */
 
 /**
+  Classes can have "inner-classes" which are classes which are defined within
+  the scope of a class itself rather than being top-level classes which reside
+  in a package or globally. This helps to avoid polluting namespaces with classes
+  which are only used by a single class.
+
 <pre>
+  Ex.
+  // Classes can have inner-Classes.
+  foam.CLASS({
+    name: 'InnerClassTest',
+    classes: [
+      { name: 'InnerClass1', properties: ['a', 'b'] },
+      { name: 'InnerClass2', properties: ['x', 'y'] }
+    ],
+    methods: [
+      function init() {
+        var ic1 = this.InnerClass1.create({a:1, b:2});
+        var ic2 = this.InnerClass2.create({x:5, y:10});
+        log(ic1.a, ic1.b, ic2.x, ic2.y);
+      }
+    ]
+  });
+  InnerClassTest.create();
 </pre>
 */
 foam.CLASS({
   package: 'foam.core',
   name: 'InnerClass',
 
-  // documentation: 'Inner-Class Axiom',
+  documentation: 'Inner-Class Axiom',
 
   properties: [
     {
@@ -42,6 +64,7 @@ foam.CLASS({
     function installInClass(cls) {
       cls[this.model.name] = this.model.buildClass();
     },
+
     function installInProto(proto) {
       // get class already created in installInClass();
       var name = this.model.name;

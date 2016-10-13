@@ -42,7 +42,7 @@ foam.CLASS({
   name: 'String',
   extends: 'Property',
 
-  // documentation: 'StringProperties coerce their arguments into Strings.',
+  documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
     { class: 'Int', name: 'width' },
@@ -99,7 +99,7 @@ foam.CLASS({
   name: 'DateTime',
   extends: 'Date',
 
-  // documentation: 'Describes properties of type DateTime.',
+  documentation: 'Describes properties of type DateTime.',
   label: 'Date and time'
 });
 
@@ -109,7 +109,7 @@ foam.CLASS({
   name:  'Long',
   extends: 'Int',
 
-  // documentation:  'Describes properties of type Long.',
+  documentation:  'Describes properties of type Long.',
   label: 'Round long numbers'
 });
 
@@ -148,7 +148,7 @@ foam.CLASS({
   name: 'Function',
   extends: 'Property',
 
-  // documentation: 'Describes properties of type Function.',
+  documentation: 'Describes properties of type Function.',
   label: 'Code that can be run',
 
   properties: [
@@ -180,6 +180,9 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Object',
   extends: 'Property',
+
+  documentation: '',
+
   properties: [
     {
       name: 'fromJSON',
@@ -195,6 +198,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'FObjectProperty',
   extends: 'Property',
+
   properties: [
     {
       name: 'of',
@@ -223,6 +227,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Array',
   extends: 'Property',
+
   properties: [
     {
       name: 'fromJSON',
@@ -233,19 +238,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'StringArray',
   extends: 'Property',
 
-  // documentation: 'An array of String values.',
+  documentation: 'An array of String values.',
   label: 'List of text strings',
 
   properties: [
     {
       name: 'of',
       value: 'String',
-      // documentation: 'The FOAM sub-type of this property.'
+      documentation: 'The FOAM sub-type of this property.'
     },
     [
       'adapt',
@@ -267,10 +273,10 @@ foam.CLASS({
       'assertValue',
       function(v, prop) {
         this.assert(Array.isArray(v),
-                    prop.name, 'Tried to set StringArray to non-array type.');
+            prop.name, 'Tried to set StringArray to non-array type.');
         for ( var i = 0 ; i < v.length ; i++ ) {
           this.assert(typeof v[i] === 'string',
-                      prop.name, 'Element', i, 'is not a string', v[i]);
+              prop.name, 'Element', i, 'is not a string', v[i]);
         }
       }
     ]
