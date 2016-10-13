@@ -840,6 +840,22 @@ s.set('George');
 log(p2.name);
 p2.name = 'Ringo';
 
+// Nested subscription
+// Subscribe to the value of the slot data$, removing the
+// subscription and resubscribing to the new value of data$
+// if it changes.
+foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
+var p1 = Person.create({name: 'John'});
+var p2 = Person.create({name: 'Paul'});
+var h = Holder.create({data: p1});
+h.data$.valueSub(function(e) { console.log('sub change: ', e.src.name, Array.from(arguments).join(' ')); });
+p1.name = 'Peter';
+p2.name = 'Mary';
+h.data = p2;
+p1.name = 'James';
+p2.name = 'Ringo';
+p2.pub('test','event');
+
 // Two-Way Data-Binding
 // Slots can be assigned, causing two values to be
 // bound to the same value.
