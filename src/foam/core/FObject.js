@@ -430,7 +430,7 @@ foam.CLASS({
       -----------------------
       next     -> {
         prev: <-,
-        sub: {src: <source object>, destroy: <destructor function> },
+        sub: { src: <source object>, destroy: <destructor function> },
         l: <listener>,
         next: -> },
       children -> {
