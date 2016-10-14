@@ -443,7 +443,7 @@ foam.CLASS({
      ************************************************/
 
     /**
-      This structure represents the head of a doubly-linked list of
+      This structure represents the head of a doubly-linked-list/tree of
       listeners. It contains 'next', a pointer to the first listener,
       and 'children', a map of sub-topic chains.
 
@@ -455,8 +455,8 @@ foam.CLASS({
       'next' property. This simplifies the code because there is no
       special case for handling when the list is empty.
 
-      Listener List Structure
-      -----------------------
+      Listener Tree-List Structure
+      ----------------------------
       next -> {
         prev: <-,
         sub: { src: <source object>, destroy: <destructor function> },
