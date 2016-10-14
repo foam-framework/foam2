@@ -311,9 +311,8 @@ foam.LIB({
     {
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
-if ( ! str ) return str;
         console.assert(typeof str === 'string',
-            'Cannot constantize non-string values. Type provided was:', typeof str, str);
+            'Cannot constantize non-string values. Type provided was:', typeof str);
 
         // switchFromCamelCaseToConstantFormat to
         // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
