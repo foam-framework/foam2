@@ -2128,7 +2128,7 @@ PropertyValidationTest.model_.validate();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 111, str: "" });
+  expect(log_.output).toMatchGolden({ i: 111, str: "warn: Property PropertyValidationTest.t1 \"adapt\" hidden by \"setter\"warn: Property PropertyValidationTest.t1 \"preSet\" hidden by \"setter\"warn: Property PropertyValidationTest.t1 \"postSet\" hidden by \"setter\"warn: Property PropertyValidationTest.t2 \"factory\" hidden by \"getter\"warn: Property PropertyValidationTest.t2 \"expression\" hidden by \"getter\"warn: Property PropertyValidationTest.t2 \"value\" hidden by \"getter\"warn: Property PropertyValidationTest.t2 \"expression\" hidden by \"factory\"warn: Property PropertyValidationTest.t2 \"value\" hidden by \"factory\"warn: Property PropertyValidationTest.t2 \"value\" hidden by \"expression\"warn: Property PropertyValidationTest.t1 \"adapt\" hidden by \"setter\"warn: Property PropertyValidationTest.t1 \"preSet\" hidden by \"setter\"warn: Property PropertyValidationTest.t1 \"postSet\" hidden by \"setter\"warn: Property PropertyValidationTest.t2 \"factory\" hidden by \"getter\"warn: Property PropertyValidationTest.t2 \"expression\" hidden by \"getter\"warn: Property PropertyValidationTest.t2 \"value\" hidden by \"getter\"warn: Property PropertyValidationTest.t2 \"expression\" hidden by \"factory\"warn: Property PropertyValidationTest.t2 \"value\" hidden by \"factory\"warn: Property PropertyValidationTest.t2 \"value\" hidden by \"expression\"" });
 
 
 // Example 112
