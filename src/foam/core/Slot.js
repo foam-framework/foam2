@@ -31,7 +31,6 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Slot', // ???: Rename AbstractSlot or make an Interface
-  extends: null,
 
   methods: [
     /**
