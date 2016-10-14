@@ -160,17 +160,21 @@ foam.LIB({
       console.error('Attempt to foam.Function.bind more than 4 arguments.');
     },
 
+    /**
+     * Decorates the function 'f' to cache the return value of 'f' when called
+     * with a particular value for its first argument.
+     *
+     */
     function memoize1(f) {
-      /**
-       * Decorates the function 'f' to cache the return value of 'f' when called
-       * with a particular value for its first argument.
-       *
-       */
+      console.assert(
+        typeof f === 'function',
+        'Cannot apply memoize to something that is not a function.');
+
       var cache = {};
       return foam.Function.setName(
           function(key) {
             console.assert(
-                arguments.length == 1,
+                arguments.length === 1,
                 "Memoize1'ed functions must take exactly one argument.");
 
             if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
@@ -179,20 +183,24 @@ foam.LIB({
           'memoize1(' + f.name + ')');
     },
 
+    /**
+     * Set a function's name for improved debugging and profiling
+     *
+     * Returns the given function.
+     */
     function setName(f, name) {
-      /** Set a function's name for improved debugging and profiling **/
-      Object.defineProperty(f, 'name', {value: name, configurable: true});
+      Object.defineProperty(f, 'name', { value: name, configurable: true });
       return f;
     },
 
+    /** Convenience method to append 'arguments' onto a real array **/
     function appendArguments(a, args, start) {
-      /** Convenience method to append 'arguments' onto a real array **/
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
     },
 
+    /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      /** Finds the function(...) declaration arguments part. Strips newlines. */
       return f.
           toString().
           replace(/(\r\n|\n|\r)/gm,"").
@@ -218,32 +226,32 @@ foam.LIB({
       return ret;
     },
 
+    /**
+     * Calls fn, and provides the arguments to fn by looking
+     * up their names on source. The 'this' context is either
+     * source, or opt_self if provided.
+     *
+     * If the argument maps to a function on source, it is bound to source.
+     *
+     * Ex.
+     * var a = {
+     *   name: 'adam',
+     *   hello: function() {
+     *     console.blog("Hello " + this.name);
+     *   }
+     * };
+     * function foo(name, hello) {
+     *   console.log("Name is " + name);
+     *   hello();
+     * }
+     * foam.Function.withArgs(foo, a);
+     *
+     * Outputs:
+     * Name is adam
+     * Hello adam
+     *
+     **/
     function withArgs(fn, source, opt_self) {
-      /**
-       * Calls fn, and provides the arguments to fn by looking
-       * up their names on source. The 'this' context is either
-       * source, or opt_self if provided.
-       *
-       * If the argument maps to a function on source, it is bound to source.
-       *
-       * Ex.
-       * var a = {
-       *   name: 'adam',
-       *   hello: function() {
-       *     console.blog("Hello " + this.name);
-       *   }
-       * };
-       * function foo(name, hello) {
-       *   console.log("Name is " + name);
-       *   hello();
-       * }
-       * foam.Function.withArgs(foo, a);
-       *
-       * Outputs:
-       * Name is adam
-       * Hello adam
-       *
-       **/
       var argNames = foam.Function.formalArgs(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
@@ -264,8 +272,8 @@ foam.LIB({
     foam.Function.setName(function() {}, '');
   } catch (x) {
     console.warn('foam.Function.setName is not supported on your platform. ' +
-                 'Stack traces will be harder to decipher, but no functionaly ' +
-                 'will be lost');
+                 'Stack traces will be harder to decipher, but no ' +
+                 'functionality will be lost');
     foam.LIB({
       name: 'foam.Function',
       methods: [
@@ -312,13 +320,10 @@ foam.LIB({
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
-            'Cannot constantize non-string values. Type provided was:', typeof str);
+                       'Cannot constantize non-string values.');
 
-        // switchFromCamelCaseToConstantFormat to
-        // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
-        return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
-          return a.substring(0,1) + '_' + a.substring(1,2);
-        }).toUpperCase();
+        // switches from from camelCase to CAMEL_CASE
+        return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
       })
     },
 
@@ -619,9 +624,13 @@ foam.LIB({
      * If the given class has an id of 'some.package.MyClass'
      * then the class object will be made available globally at
      * global.some.package.MyClass.
-     *
      */
     function registerClass(cls) {
+      console.assert(typeof cls === 'object',
+                     'cls must be an object');
+      console.assert(typeof cls.name === 'string' && cls.name !== '',
+                     'cls must have a non-empty string name');
+
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
     },
@@ -633,6 +642,8 @@ foam.LIB({
      * ensurePackage(global, 'some.dot.separated.path');
      * will ensure that global.some.dot.separated.path exists with
      * each part being a JS object.
+     *
+     * Returns root if path is null or undefined.
      */
     function ensurePackage(root, path) {
       if ( path === null ||
@@ -645,12 +656,13 @@ foam.LIB({
                      'Cannot make a package path of a non-string');
 
       path = path.split('.');
+      var node = root;
 
       for ( var i = 0 ; i < path.length ; i++ ) {
-        root = root[path[i]] || ( root[path[i]] = {} );
+        node = node[path[i]] || ( node[path[i]] = {} );
       }
 
-      return root;
+      return node;
     }
   ]
 });
