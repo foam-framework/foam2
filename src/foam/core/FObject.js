@@ -26,7 +26,7 @@
 foam.LIB({
   name: 'foam.core.FObject',
 
-  documentation: "Root prototype for all classes.",
+  documentation: 'Root prototype for all classes.',
 
   constants: {
     // Each class has a prototype object which is the prototype of all
@@ -337,7 +337,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'FObject',
 
-  // documentation: 'Base model for model hierarchy.',
+  documentation: 'Base model for model hierarchy.',
 
   // Effectively imports the following methods, but imports: isn't available
   // yet, so we add with 'methods:'.
