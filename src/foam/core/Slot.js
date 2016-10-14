@@ -243,7 +243,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'PropertySlot(' + this.prop.name + ')';
+      return 'PropertySlot(' + this.obj.cls_.id + '.' + this.prop.name + ')';
     }
   ]
 });
