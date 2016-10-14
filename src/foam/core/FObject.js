@@ -437,7 +437,6 @@ foam.CLASS({
     function warn() { this.__context__.warn.apply(null, arguments); },
 
 
-
     /************************************************
      * Publish and Subscribe
      ************************************************/
