@@ -896,8 +896,8 @@ foam.CLASS({
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
-          this.cls_.prototype === this ? 'Proto' :
-          this.isDestroyed() ? ':DESTROYED' :
+          this.cls_.prototype === this ? 'Proto'      :
+          this.isDestroyed()           ? ':DESTROYED' :
           '');
     }
   ]
