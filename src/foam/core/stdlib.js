@@ -2,14 +2,14 @@
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -81,7 +81,9 @@ foam.LIB({
     function isInstance(o) { return o === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
-    function compare(_, b) { return b === null ? 0 : b === undefined ? -1 : 1; },
+    function compare(_, b) {
+      return b === null ? 0 : b === undefined ? -1 : 1;
+    },
     function hashCode() { return -2; }
   ]
 });
@@ -175,7 +177,7 @@ foam.LIB({
           function(key) {
             console.assert(
                 arguments.length === 1,
-                "Memoize1'ed functions must take exactly one argument.");
+                'Memoize1\'ed functions must take exactly one argument.');
 
             if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
             return cache[key];
@@ -203,14 +205,14 @@ foam.LIB({
     function argsStr(f) {
       return f.
           toString().
-          replace(/(\r\n|\n|\r)/gm,"").
+          replace(/(\r\n|\n|\r)/gm,'').
           match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
     },
 
     function formalArgs(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. formalArgs(function(a,b) {...}) == ['a', 'b']
+       * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       if ( ! args ) return [];
@@ -220,7 +222,7 @@ foam.LIB({
       // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
       var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
       var typeMatch;
-      while ((typeMatch = argMatcher.exec(args)) !== null) {
+      while ( ( typeMatch = argMatcher.exec(args) ) !== null ) {
         ret.push(typeMatch[2]);
       }
       return ret;
@@ -237,11 +239,11 @@ foam.LIB({
      * var a = {
      *   name: 'adam',
      *   hello: function() {
-     *     console.blog("Hello " + this.name);
+     *     console.blog('Hello ' + this.name);
      *   }
      * };
      * function foo(name, hello) {
-     *   console.log("Name is " + name);
+     *   console.log('Name is ' + name);
      *   hello();
      * }
      * foam.Function.withArgs(foo, a);
@@ -256,7 +258,7 @@ foam.LIB({
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
-        if ( typeof a === "function" ) a = a.bind(source);
+        if ( typeof a === 'function' ) a = a.bind(source);
         args.push(a);
       }
       return fn.apply(opt_self || source, args);
@@ -291,7 +293,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+      return b === null ? 1 : a < b ? -1 : a > b ? 1 : 0;
     },
     function hashCode(n) { return n & n; }
   ]
@@ -308,7 +310,7 @@ foam.LIB({
     function hashCode(s) {
       var hash = 0;
 
-      for ( i = 0 ; i < s.length ; i++ ) {
+      for ( var i = 0 ; i < s.length ; i++ ) {
         var code = s.charCodeAt(i);
         hash = ((hash << 5) - hash) + code;
         hash &= hash;
@@ -331,7 +333,7 @@ foam.LIB({
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
         if ( ! str || str === '' ) return str;
-        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) {
+        return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
       })
@@ -374,7 +376,7 @@ foam.LIB({
       var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
-      return s.substring(start+2, end);
+      return s.substring(start + 2, end);
     },
     function startsWithIC(a, b) {
       return a.toUpperCase().startsWith(b.toUpperCase());
@@ -417,7 +419,7 @@ foam.LIB({
             break;
           }
         }
-        if ( j == added.length ) removed.push(a[i]);
+        if ( j === added.length ) removed.push(a[i]);
       }
       return { added: added, removed: removed };
     },
@@ -465,35 +467,35 @@ foam.LIB({
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
       // FUTURE: make this translatable for i18n
-      var seconds = Math.floor((Date.now() - date.getTime())/1000);
+      var seconds = Math.floor( ( Date.now() - date.getTime() ) / 1000 );
 
       if ( seconds < 60 ) return 'moments ago';
       if ( seconds > 60 ) return 'in moments';
 
-      var minutes = Math.floor((seconds)/60);
+      var minutes = Math.floor((seconds) / 60);
 
-      if ( minutes == 1 ) return '1 minute ago';
-      if ( minutes == -1 ) return 'in 1 minute';
+      if ( minutes === 1 ) return '1 minute ago';
+      if ( minutes === -1 ) return 'in 1 minute';
 
       if ( minutes < 60 ) return minutes + ' minutes ago';
       if ( minutes > 60 ) return 'in ' + minutes + ' minutes';
 
-      var hours = Math.floor(minutes/60);
-      if ( hours == 1 ) return '1 hour ago';
-      if ( hours == -1 ) return 'in 1 hour';
+      var hours = Math.floor(minutes / 60);
+      if ( hours === 1 ) return '1 hour ago';
+      if ( hours === -1 ) return 'in 1 hour';
 
       if ( hours < 24 ) return hours + ' hours ago';
       if ( hours < -24 ) return 'in ' + hours + ' hours';
 
       var days = Math.floor(hours / 24);
-      if ( days == 1 ) return '1 day ago';
-      if ( days == -1 ) return 'in 1 day';
+      if ( days === 1 ) return '1 day ago';
+      if ( days === -1 ) return 'in 1 day';
 
       if ( days < 7 ) return days + ' days ago';
       if ( days < -7 ) return 'in ' + days + ' days';
 
       if ( days < 365 ) {
-        var year = 1900+date.getYear();
+        var year = 1900 + date.getYear();
         var noyear = date.toDateString().replace(' ' + year, '');
         return noyear.substring(4);
       }
@@ -510,11 +512,11 @@ foam.LIB({
   methods: [
     // Can't be an FObject yet because we haven't built the class system yet
     function isInstance(o) { return false; },
-    function clone(o) { return o.clone(); },
-    function diff(a, b) { return a.diff(b); },
-    function equals(a, b) { return a.equals(b); },
+    function clone(o)      { return o.clone(); },
+    function diff(a, b)    { return a.diff(b); },
+    function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
-    function hashCode(o) { return o.hashCode(); }
+    function hashCode(o)   { return o.hashCode(); }
   ]
 });
 
@@ -528,7 +530,9 @@ foam.LIB({
         if ( obj.hasOwnProperty(key) ) f(obj[key], key);
       }
     },
-    function isInstance(o) { return typeof o === 'object' && ! Array.isArray(o); },
+    function isInstance(o) {
+      return typeof o === 'object' && ! Array.isArray(o);
+    },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -546,34 +550,33 @@ foam.LIB({
 
 
 /**
-  Return the flyweight "type object" for the provided object.
+  Return the flyweight 'type object' for the provided object.
   Any value is a valid argument, including null and undefined.
 */
 foam.typeOf = (function() {
-  var
-    tNumber    = foam.Number,
-    tString    = foam.String,
-    tUndefined = foam.Undefined,
-    tNull      = foam.Null,
-    tBoolean   = foam.Boolean,
-    tArray     = foam.Array,
-    tDate      = foam.Date,
-    tFObject   = foam.core.FObject,
-    tFunction  = foam.Function,
-    tObject    = foam.Object;
+  var tNumber    = foam.Number;
+  var tString    = foam.String;
+  var tUndefined = foam.Undefined;
+  var tNull      = foam.Null;
+  var tBoolean   = foam.Boolean;
+  var tArray     = foam.Array;
+  var tDate      = foam.Date;
+  var tFObject   = foam.core.FObject;
+  var tFunction  = foam.Function;
+  var tObject    = foam.Object;
 
   return function typeOf(o) {
-    if ( tNumber.isInstance(o)    ) return tNumber;
-    if ( tString.isInstance(o)    ) return tString;
+    if ( tNumber.isInstance(o) )    return tNumber;
+    if ( tString.isInstance(o) )    return tString;
     if ( tUndefined.isInstance(o) ) return tUndefined;
-    if ( tNull.isInstance(o)      ) return tNull;
-    if ( tBoolean.isInstance(o)   ) return tBoolean;
-    if ( tArray.isInstance(o)     ) return tArray;
-    if ( tDate.isInstance(o)      ) return tDate;
-    if ( tFunction.isInstance(o)  ) return tFunction;
-    if ( tFObject.isInstance(o)   ) return tFObject;
+    if ( tNull.isInstance(o) )      return tNull;
+    if ( tBoolean.isInstance(o) )   return tBoolean;
+    if ( tArray.isInstance(o) )     return tArray;
+    if ( tDate.isInstance(o) )      return tDate;
+    if ( tFunction.isInstance(o) )  return tFunction;
+    if ( tFObject.isInstance(o) )   return tFObject;
     return tObject;
-  }
+  };
 })();
 
 
@@ -588,7 +591,8 @@ foam.mmethod = function(map, opt_defaultMethod) {
   return function(arg1) {
     var type = foam.typeOf(arg1);
     if ( ! opt_defaultMethod ) {
-      console.assert(type, 'Unknown type: ', arg1, 'and no default method provided');
+      console.assert(type, 'Unknown type: ', arg1,
+        'and no default method provided');
       console.assert(
         type[uid],
         'Missing multi-method for type ', arg1, ' map: ', map,
@@ -673,7 +677,8 @@ foam.LIB({
   methods: [
     function randomGUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        var r = Math.random() * 16 | 0;
+        var v = c === 'x' ? r : ( r & 0x3 | 0x8 );
         return v.toString(16);
       });
     }
