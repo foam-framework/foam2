@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.core.internal',
   name: 'InterfaceMethod',
   extends: 'foam.core.Method',
+
   properties: [
     {
       name: 'code',
@@ -30,15 +31,18 @@ foam.CLASS({
       value: true
     }
   ],
+
   methods: [
     function installInProto() {
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Interface',
+
   properties: [
     {
       class: 'String',
@@ -90,25 +94,32 @@ foam.CLASS({
       name: 'documentation'
     }
   ],
+
   methods: [
     function getAxiomByName(name) {
       return this.axioms_.filter(function(a) {
         return a.name === name;
       })[0];
     },
+
     function getAxiomsByClass(cls) {
       return this.axioms_.filter(function(a) {
         return cls.isInstance(a);
       });
     },
+
     function getOwnAxiomsByClass(cls) {
       return this.getAxiomsByClass(cls);
     },
+
     function hasOwnAxiom(name) {
       return this.axioms_.some(function(a) { return a.name === name; });
     },
+
     function isInstance(o) {
-      return !! ( o && o.cls_ && o.cls_.getAxiomByName('implements_' + this.id) );
+      return !! (
+        o && o.cls_ && o.cls_.getAxiomByName('implements_' + this.id)
+      );
     }
   ]
 });
@@ -116,6 +127,7 @@ foam.CLASS({
 
 foam.LIB({
   name: 'foam',
+
   methods: [
     function INTERFACE(m) {
       var model = foam.core.Interface.create(m);

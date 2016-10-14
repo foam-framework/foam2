@@ -41,22 +41,6 @@ foam.CLASS({
   name: 'Property',
   extends: 'FObject',
 
-  constants: {
-    /**
-      Map of Property property names to arrays of property names
-      that they shadow.
-
-      Ex. When 'setter' is set, it takes precedence over 'adapt',
-      'preSet', and 'postSet', so their values are shadowed.
-    */
-    SHADOW_MAP: {
-      setter:     [ 'adapt', 'preSet', 'postSet' ],
-      getter:     [ 'factory', 'expression', 'value' ],
-      factory:    [ 'expression', 'value' ],
-      expression: [ 'value' ]
-    }
-  },
-
   properties: [
     {
       name: 'name',
@@ -552,11 +536,12 @@ foam.CLASS({
     },
 
     function exportAs(obj) {
-      /** Export obj.name$ instead of just obj.name. **/
+      /** Export obj.name$ instead of just obj.name. */
       return this.toSlot(obj);
     },
 
     function toSlot(obj) {
+      /** Create a Slot for this Property. */
       var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
       var slot     = obj.getPrivate_(slotName);
 
