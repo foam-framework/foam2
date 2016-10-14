@@ -294,7 +294,8 @@ foam.LIB({
         Properties can be defined using three formats:
         1. Short-form String: Ex.: 'firstName' or 'sex'
         2. Medium-form Array: Ex.: [ 'firstName', 'John' ] or [ 'sex', 'Male' ]
-           The first element of the array is the name and the second is the default value.
+           The first element of the array is the name and the second is the
+           default value.
         3. Long-form JSON: Ex.: [ name: 'firstName', value: 'John' ] or
            { class: 'String', name: 'sex', value: 'Male' }
            The long-form supports many options, but only 'name' is mandatory.
