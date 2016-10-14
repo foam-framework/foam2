@@ -65,7 +65,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'op',
       value: 'foam.mlang.predicate.Eq'
     },

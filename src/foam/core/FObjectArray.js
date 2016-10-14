@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'FObjectArray',
   extends: 'Property',
 
-  // documentation: "A Property which contains an array of 'of' FObjects.",
+  documentation: "A Property which contains an array of 'of' FObjects.",
 
   properties: [
     { name: 'of', required: true },
@@ -38,7 +38,7 @@ foam.CLASS({
     ],
     [ 'assertValue', function(v, prop) {
         this.assert(Array.isArray(v),
-                       prop.name, 'Attempt to set array property to non-array value', v);
+            prop.name, 'Attempt to set array property to non-array value', v);
       }
     ],
     [ 'adaptArrayElement', function(o, obj) {

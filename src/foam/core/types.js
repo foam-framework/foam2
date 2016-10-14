@@ -24,7 +24,6 @@ foam.CLASS({
     'units',
     [ 'value', 0 ],
     [ 'adapt', function adaptInt(_, v) {
-        // FUTURE: replace with Math.trunc() when available everywhere.
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
           0 ;
@@ -177,30 +176,6 @@ foam.CLASS({
 });
 
 
-// FUTURE: to be used by or replaced by Relationship axiom
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Reference',
-  extends: 'Property',
-
-  documentation:  'A foreign key reference to another Entity.',
-  label: 'Reference to another object',
-
-  properties: [
-    {
-      name: 'of',
-      value: '',
-      documentation: 'The FOAM sub-type of this property.'
-    },
-    {
-      name: 'subKey',
-      value: 'ID',
-      documentation: 'The name of the key (a property of the other object) that this property references.'
-    }
-  ],
-});
-
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Object',
@@ -219,7 +194,6 @@ foam.CLASS({
 });
 
 
-// TODO(adam): Better name for this?
 foam.CLASS({
   package: 'foam.core',
   name: 'FObjectProperty',
@@ -309,44 +283,9 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Class',
-  extends: 'Property',
-
-  documentation: 'Stores a class, and can accept a class name.',
-
-  properties: [
-    {
-      /** FUTURE: adding to the default getter/setter chains is difficult
-        when we want to preserve the existing behavior but add an additional
-        step. This adapt work could be done in a getter that decorates the
-        default getter, but dealing with normal and expression cases is necessary
-        if writing back the looked-up class instance. */
-      name: 'adapt',
-      value: function(old, nu, prop) {
-        if ( typeof nu === 'string' ) {
-          if ( ! nu ) return '';
-          var ret = this.__context__.lookup(nu);
-          this.assert(ret && ret.isSubClass, 'Invalid class name ' +
-             nu + ' specified for ' + prop.name);
-          return ret;
-        }
-        this.assert(typeof nu === 'undefined' || ( nu && nu.isSubClass ),
-          'Invalid class specified for ' +
-          prop.name);
-        return nu;
-      }
-    }
-  ]
-});
-
-
-//TODO(adamvy): Replace Class property with Class2 property.
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Class2',
   extends: 'Property',
 
   methods: [
@@ -363,17 +302,6 @@ foam.CLASS({
         configurable: true
       });
     }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ReferenceArray',
-  extends: 'Reference',
-
-  properties: [
-    [ 'factory', function() { return []; } ]
   ]
 });
 
@@ -437,126 +365,5 @@ foam.CLASS({
   properties: [
     ['factory', function() { return {} }],
     'of'
-  ]
-});
-
-
-// TODO(adamvy): Remove this once I take the class factory stuff out.
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Promised2',
-  extends: 'Property',
-
-  properties: [
-    {
-      name: 'of',
-      required: true
-    },
-    'methods'
-  ],
-
-  methods: [
-    function installInClass(cls) {
-      var propName = this.name;
-
-      var target = foam.lookup(this.of);
-
-      var methods = target.getAxiomsByClass(foam.core.Method)
-          .filter(function(m) { return target.hasOwnAxiom(m.name); });
-
-      if ( this.methods ) {
-        var ms = this.methods;
-        methods = methods.filter(function(m) {
-          return ms.indexOf(m.name) !== -1;
-        });
-      }
-
-      methods.map(function(m) {
-        var name = m.name;
-        var returns = m.returns;
-
-        if ( ! returns ) {
-          var code = function() {
-            var self = this;
-            var args = arguments;
-            this[propName].then(function(a) {
-              a[name].apply(a, args);
-            });
-          };
-        } else if ( returns === 'Promise' ) {
-          code = function() {
-            var self = this;
-            var args = arguments;
-            return this[propName].then(function(a) {
-              return a[name].apply(a, args);
-            });
-          };
-        } else {
-          // TODO(adamvy): Use modelFactories
-
-          var path = m.returns.split('.');
-          path[path.length - 1] = 'Promised' + path[path.length - 1];
-
-          var returnClsId = path.join('.');
-
-          if ( ! foam.lookup(returnClsId) ) {
-            foam.CLASS({
-              package: path.slice(0, path.length - 1).join('.'),
-              name: path[path.length - 1]
-            });
-
-            // Done in two passes to prevent infinite recursion.
-            foam.CLASS({
-              refines: returnClsId,
-              properties: [
-                {
-                  class: 'Promised',
-                  of: m.returns,
-                  name: 'delegate'
-                }
-              ]
-            });
-          }
-
-          code = function() {
-            var self = this;
-            var args = arguments;
-            return foam.lookup(returnClsId).create({
-              delegate: this[propName].then(function(d) {
-                return d[name].apply(d, args);
-              })
-            });
-          };
-        }
-
-        foam.Function.setName(code, name);
-
-        return foam.core.Method.create({
-          name: name,
-          code: code
-        });
-      }).forEach(function(m) {
-        cls.installAxiom(m);
-      });
-
-      cls.installAxiom(foam.core.Method.create({
-        name: 'sub',
-        code: function() {
-          var innerSub = Array.from(arguments);
-          var topic = innerSub.slice(0, innerSub.length-1);
-          innerSub[innerSub.length-1] = foam.Function.bind(function(s) {
-            var args = Array.from(arguments).slice(1);
-            var c = this.pub.apply(this, args);
-            if ( ! c ) s.destroy();
-          }, this);
-
-          this[propName].then(function(d) {
-            d.sub.apply(d, innerSub);
-          });
-
-          return this.SUPER.apply(this, arguments);
-        }
-      }));
-    }
   ]
 });
