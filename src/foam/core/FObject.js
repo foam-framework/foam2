@@ -457,15 +457,16 @@ foam.CLASS({
 
       Listener List Structure
       -----------------------
-      next     -> {
+      next -> {
         prev: <-,
         sub: { src: <source object>, destroy: <destructor function> },
         l: <listener>,
-        next: -> },
-      children -> {
+        next: -> <same structure>,
+        children -> {
           subTopic1: <same structure>,
           ...
           subTopicn: <same structure>
+        }
       }
     */
     function createListenerList_() {
