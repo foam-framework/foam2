@@ -79,7 +79,7 @@ it("", function() {
 
 
 // Example 1
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 
@@ -112,7 +112,7 @@ log(Test);
 
 
 // Example 2
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Use class.describe() to learn about the class
@@ -120,11 +120,11 @@ Test.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Method               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n" });
+  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2anonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toString\n" });
 
 
 // Example 3
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Create an instance of Test
@@ -138,7 +138,7 @@ log(o.a, o.b);
 
 
 // Example 4
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Create an instance with a map argument to initialize properties
@@ -151,7 +151,7 @@ log(o.a, o.b);
 
 
 // Example 5
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Objects have a reference to their class in .cls_
@@ -163,7 +163,7 @@ log(o.cls_.name);
 
 
 // Example 6
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Test Class membership with Class.isInstance()
@@ -175,7 +175,7 @@ log(Test.isInstance(o), Test.isInstance('foo'));
 
 
 // Example 7
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Call Methods
@@ -187,7 +187,7 @@ log(o.f1(), o.f2());
 
 
 // Example 8
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Update Properties
@@ -201,7 +201,7 @@ log(o.a, o.b);
 
 
 // Example 9
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Multiple properties can be updated at once using copyFrom().
@@ -214,7 +214,7 @@ log(o.a, o.b);
 
 
 // Example 10
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Call toString on an object
@@ -226,7 +226,7 @@ log(o.toString());
 
 
 // Example 11
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Call describe() on an object to see its Property values
@@ -238,7 +238,7 @@ o.describe();
 
 
 // Example 12
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Properties and Methods are types of Axioms
@@ -247,11 +247,11 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2Method initArgsMethod initMethod hasOwnPropertyMethod clearPropertyMethod setPrivate_Method getPrivate_Method hasOwnPrivate_Method clearPrivate_Method pubPropertyChange_Method validateMethod lookupMethod assertMethod errorMethod logMethod warnMethod createListenerList_Method listeners_Method notify_Method hasListenersMethod pubMethod pub_Method subMethod slotMethod isDestroyedMethod onDestroyMethod destroyMethod equalsMethod compareToMethod diffMethod hashCodeMethod cloneMethod copyFromMethod toString __context__Method unknownArgTopic propertyChangeMethod describeMethod stringify" });
+  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2 __context__Method initArgsMethod unknownArgTopic propertyChangeMethod describeMethod stringifyMethod toString" });
 
 
 // Example 13
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Find an Axiom for a class using getAxiomByName
@@ -263,7 +263,7 @@ log(Test.getAxiomByName('a'));
 
 
 // Example 14
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Find all Axioms of a particular class using getAxiomsByClass
@@ -271,11 +271,11 @@ log(Test.getAxiomsByClass(foam.core.Method));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method" });
+  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method" });
 
 
 // Example 16
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Property constants contain map functions
@@ -283,11 +283,11 @@ log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,init,hasOwnProperty,clearProperty,setPrivate_,getPrivate_,hasOwnPrivate_,clearPrivate_,pubPropertyChange_,validate,lookup,assert,error,log,warn,createListenerList_,listeners_,notify_,hasListeners,pub,pub_,sub,slot,isDestroyed,onDestroy,destroy,equals,compareTo,diff,hashCode,clone,copyFrom,toString,unknownArg,describe,stringify" });
+  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,unknownArg,describe,stringify,toString" });
 
 
 // Example 17
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Property constants contain comparators
@@ -295,11 +295,11 @@ log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> assert,clearPrivate_,clearProperty,clone,compareTo,copyFrom,createListenerList_,describe,destroy,diff,equals,error,f1,f2,getPrivate_,hashCode,hasListeners,hasOwnPrivate_,hasOwnProperty,init,initArgs,isDestroyed,listeners_,log,lookup,notify_,onDestroy,pub,pub_,pubPropertyChange_,setPrivate_,slot,stringify,sub,toString,unknownArg,validate,warn" });
+  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> describe,f1,f2,initArgs,stringify,toString,unknownArg" });
 
 
 // Example 18
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // If a Class defineds an init() method, itss called
@@ -316,7 +316,7 @@ InitTest.create();
 
 
 // Example 19
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Default Values can be defined for Properties
@@ -337,7 +337,7 @@ log(o.a, o.b, o.c);
 
 
 // Example 20
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // .hasOwnProperty() tells you if a Property has been set
@@ -353,7 +353,7 @@ log(o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
 
 
 // Example 21
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // .clearProperty() reverts a value back to its value
@@ -367,7 +367,7 @@ log(o.hasOwnProperty('a'), o.a);
 
 
 // Example 22
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // factories
@@ -393,7 +393,7 @@ log(o.a);
 
 
 // Example 23
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Factory not called if value supplied in constructor
@@ -406,7 +406,7 @@ log(o.a);
 
 
 // Example 24
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Factory not called if value set before first access
@@ -420,7 +420,7 @@ log(o.a);
 
 
 // Example 25
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Factory called again if clearProperty() called:
@@ -435,7 +435,7 @@ log(o.a);
 
 
 // Example 26
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // getters and setters
@@ -463,7 +463,7 @@ log(o.radius, o.diameter);
 
 
 // Example 27
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Properties can specify an 'adapt' function which is called whenever
@@ -495,7 +495,7 @@ log(o.flag);
 
 
 // Example 28
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Properties can specify a 'preSet' function which is called whenever
@@ -525,7 +525,7 @@ log(o.a);
 
 
 // Example 29
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Properties can specify a 'postSet' function which is called after
@@ -551,7 +551,7 @@ o.a = 'Green';
 
 
 // Example 30
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Properties can define 'adapt', 'preSet', and 'postSet' all at once.
@@ -584,7 +584,7 @@ o.a = 10;
 
 
 // Example 31
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can also define Constnts.
@@ -604,7 +604,7 @@ log(o.MEANING_OF_LIFE, o.FAVOURITE_COLOR);
 
 
 // Example 32
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Constants can also be accessed from the Class
@@ -617,7 +617,7 @@ log(o.cls_.MEANING_OF_LIFE, o.cls_.FAVOURITE_COLOR);
 
 
 // Example 33
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Constants are constant
@@ -630,7 +630,7 @@ log(o.MEANING_OF_LIFE);
 
 
 // Example 34
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can be subclassed with 'extends:'.
@@ -663,7 +663,7 @@ log(e.toString());
 
 
 // Example 35
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Test if one class is a sub-class of another:
@@ -675,7 +675,7 @@ log(Person.isSubClass(Employee), Employee.isSubClass(Person));
 
 
 // Example 36
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // A Class is considered a sub-class of itself:
@@ -687,7 +687,7 @@ log(Person.isSubClass(Person));
 
 
 // Example 37
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // FObject is the root class of all other classes:
@@ -699,7 +699,7 @@ log(foam.core.FObject.isSubClass(Employee), foam.core.FObject.isSubClass(Person)
 
 
 // Example 38
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // isSubClass() isn't confused by classes with the same name in different packages
@@ -716,7 +716,7 @@ log(Person.isSubClass(com.acme.package.Person));
 
 
 // Example 39
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // isSubClass() works for interfaces
@@ -738,7 +738,7 @@ log(test.ThingI.isSubClass(test.C1));
 
 
 // Example 40
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // isSubClass() works for sub-interfaces
@@ -769,7 +769,7 @@ log(test.Thing3I.isSubClass(test.C2));
 
 
 // Example 41
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Larger package and imports/exports demo.
@@ -861,7 +861,7 @@ a.test();
 
 
 // Example 42
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // In addition to being extended, a Class can also be refined.
@@ -891,11 +891,11 @@ log(oldPerson.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
+  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryanonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
 
 
 // Example 43
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Refine a Property
@@ -914,10 +914,9 @@ log(o.salary);
 
 
 // Example 44
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// Currently unsupported and unlikely to be supported.
 // Refine a Property Class
 foam.CLASS({ name: 'Salary', extends: 'Float' });
 foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
@@ -926,11 +925,11 @@ log(Emp.create().salary);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 44, str: " <b>&gt;</b> 0" });
+  expect(log_.output).toMatchGolden({ i: 44, str: " <b>&gt;</b> 30000" });
 
 
 // Example 45
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Refine foam.core Property Class
@@ -944,10 +943,9 @@ log(Emp2.SALARY.javaClass);
 
 
 // Example 46
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// Currently unsupported and unlikely to be supported.
 // Refine a SuperProperty Class
 foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
@@ -956,14 +954,13 @@ log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 46, str: " <b>&gt;</b> super:  42 sub:  " });
+  expect(log_.output).toMatchGolden({ i: 46, str: " <b>&gt;</b> super:  42 sub:  42" });
 
 
 // Example 47
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// Currently unsupported and unlikely to be supported.
 // Refine a SuperProperty Class
 foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
 foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
@@ -973,11 +970,11 @@ log('super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', S
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 47, str: " <b>&gt;</b> super:  42 mid:  42 sub:  " });
+  expect(log_.output).toMatchGolden({ i: 47, str: " <b>&gt;</b> super:  42 mid:  42 sub:  42" });
 
 
 // Example 48
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // TODO: BooleanProperty
@@ -988,7 +985,7 @@ try {
 
 
 // Example 49
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // TODO: IntProperty
@@ -999,7 +996,7 @@ try {
 
 
 // Example 50
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // TODO: StringProperty
@@ -1010,7 +1007,7 @@ try {
 
 
 // Example 51
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // TODO: ArrayProperty
@@ -1021,7 +1018,7 @@ try {
 
 
 // Example 52
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Listeners are pre-bound Methods, suitable for use as callbacks (DOM, or otherwise).
@@ -1041,7 +1038,7 @@ log(o.m1(), o.l1());
 
 
 // Example 53
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // But when called as functions, the method forgets its 'self' and doesn't work,
@@ -1055,7 +1052,7 @@ log(m(), l());
 
 
 // Example 54
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // It's an error to make a listener both isMerged and isFramed.
@@ -1077,7 +1074,7 @@ foam.CLASS({
 
 
 // Example 59
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Listeners, like Methods, have SUPER support.
@@ -1103,7 +1100,7 @@ LongAlarm.create().alarm();
 
 
 // Example 60
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Actions are methods which have extra information to make it easier
@@ -1137,7 +1134,7 @@ o.longForm();
 
 
 // Example 61
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // In addition to class-inheritance, FOAM also supports
@@ -1168,11 +1165,11 @@ tt.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
+  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbaranonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toString\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
 
 
 // Example 62
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Unlike regular inheritance with extends:, classes
@@ -1193,11 +1190,11 @@ ImplementsTest2.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n" });
+  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbaranonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toString\n" });
 
 
 // Example 63
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // FOAM also has Property-Inheritance.
@@ -1219,7 +1216,7 @@ log(PropertyInheritA.SAME_NAME.cls_.id, PropertyInheritB.SAME_NAME.cls_.id);
 
 
 // Example 64
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can have inner-Classes.
@@ -1245,7 +1242,7 @@ InnerClassTest.create();
 
 
 // Example 65
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Inner-classes can also be accessed from the outer-class
@@ -1253,11 +1250,11 @@ InnerClassTest.InnerClass1.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringify\n" });
+  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    banonymous            FObject        __context__Method               FObject        initArgsMethod               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toString\n" });
 
 
 // Example 66
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Inner-classes do not appear in the global namespace
@@ -1269,7 +1266,7 @@ log(! global.InnerClass1);
 
 
 // Example 67
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Objects support pub() for pubing events,
@@ -1290,7 +1287,7 @@ o.pub('lifecycle', 'loaded');
 
 
 // Example 68
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Test publishing with many args
@@ -1312,7 +1309,7 @@ o.pub(1,2,3,4,5,6,7,8,9,10,11);
 
 
 // Example 69
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // A Class can declare 'Topics' that it publishes events for.
@@ -1333,7 +1330,7 @@ o.pub('alarm', 'off');
 
 
 // Example 70
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Objects implicitly pub events on the 'propertyChange' topic when
@@ -1357,11 +1354,28 @@ o.a++;
 
 
 // Example 71
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// There are three ways to unsubscribe a listener
-// 1. Call .destroy() on the Destroyable that sub() returns
+// There are four ways to unsub a listener
+// 1. Call obj.unsub();
+o = TopicTest.create();
+var l = function() { console.log.apply(console.log, arguments); };
+o.sub(l);
+o.pub('fire');
+o.unsub(l);
+o.pub("fire again, but nobody's listenering");
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 71, str: "[object Object] fire" });
+
+
+// Example 72
+foam.__context__ = foam.createSubContext();
+log_.output = "";
+try {
+// 2. Call .destroy() on the Destroyable that sub() returns
 var sub = o.sub(l);
 o.pub('fire');
 sub.destroy();
@@ -1369,14 +1383,14 @@ o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 71, str: "l1 Steve" });
+  expect(log_.output).toMatchGolden({ i: 72, str: "[object Object] fire" });
 
 
-// Example 72
-foam.__context__ = foam.createSubContext({});
+// Example 73
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// 2. Destroy the subscription, which is supplied to the listener
+// 3. Destroy the subscription, which is supplied to the listener
 var l = function(sub) {
   sub.destroy();
   console.log.apply(console.log, arguments);
@@ -1387,14 +1401,14 @@ o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 72, str: "[object Object] fire" });
+  expect(log_.output).toMatchGolden({ i: 73, str: "[object Object] fire" });
 
 
-// Example 73
-foam.__context__ = foam.createSubContext({});
+// Example 74
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// 3. If you only want to receive the first event, decorate your
+// 4. If you only want to receive the first event, decorate your
 // listener with foam.events.oneTime() and it will cancel the subscription
 // when it receives the first event.
 o.sub(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
@@ -1403,11 +1417,11 @@ o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 73, str: "[object Object] fire" });
+  expect(log_.output).toMatchGolden({ i: 74, str: "[object Object] fire" });
 
 
-// Example 74
-foam.__context__ = foam.createSubContext({});
+// Example 75
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Slots are like Object-Oriented pointers.
@@ -1419,11 +1433,11 @@ log(dyn.get());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 74, str: " <b>&gt;</b> Bob" });
+  expect(log_.output).toMatchGolden({ i: 75, str: " <b>&gt;</b> Bob" });
 
 
-// Example 75
-foam.__context__ = foam.createSubContext({});
+// Example 76
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // set() is used to set a Slot's value:
@@ -1432,11 +1446,11 @@ log(p.name, dyn.get());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 75, str: " <b>&gt;</b> John John" });
+  expect(log_.output).toMatchGolden({ i: 76, str: " <b>&gt;</b> John John" });
 
 
-// Example 76
-foam.__context__ = foam.createSubContext({});
+// Example 77
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Calling obj.slot('name') is the same as obj.name$.
@@ -1448,11 +1462,11 @@ log(dyn.get());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 76, str: " <b>&gt;</b> Bob <b>&gt;</b> John" });
+  expect(log_.output).toMatchGolden({ i: 77, str: " <b>&gt;</b> Bob <b>&gt;</b> John" });
 
 
-// Example 77
-foam.__context__ = foam.createSubContext({});
+// Example 78
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Nested slots
@@ -1475,36 +1489,11 @@ p2.name = 'Ringo';
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 77, str: " <b>&gt;</b> Johnchange:  [object Arguments] George <b>&gt;</b> Georgechange:  [object Arguments] Ringo <b>&gt;</b> Setting to p2change:  [object Arguments] Paul <b>&gt;</b> Paulchange:  [object Arguments] George <b>&gt;</b> Georgechange:  [object Arguments] Ringo" });
-
-
-// Example 78
-foam.__context__ = foam.createSubContext({});
-log_.output = "";
-try {
-// Nested subscription
-// Subscribe to the value of the slot data$, removing the
-// subscription and resubscribing to the new value of data$
-// if it changes.
-foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
-var p1 = Person.create({name: 'John'});
-var p2 = Person.create({name: 'Paul'});
-var h = Holder.create({data: p1});
-h.data$.valueSub(function(e) { console.log('sub change: ', e.src.name, Array.from(arguments).join(' ')); });
-p1.name = 'Peter';
-p2.name = 'Mary';
-h.data = p2;
-p1.name = 'James';
-p2.name = 'Ringo';
-p2.pub('test','event');
-} catch(x) {
- log("Exception: ", x);
- }
-  expect(log_.output).toMatchGolden({ i: 78, str: "sub change:  Peter [object Object] propertyChange name PropertySlot(name)sub change:  Ringo [object Object] propertyChange name PropertySlot(name)sub change:  Ringo [object Object] test event" });
+  expect(log_.output).toMatchGolden({ i: 78, str: " <b>&gt;</b> Johnchange:  [object Arguments] George <b>&gt;</b> Georgechange:  [object Arguments] Ringo <b>&gt;</b> Setting to p2change:  [object Arguments] Paul <b>&gt;</b> Paulchange:  [object Arguments] George <b>&gt;</b> Georgechange:  [object Arguments] Ringo" });
 
 
 // Example 79
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Two-Way Data-Binding
@@ -1523,7 +1512,7 @@ log(p1.name, p2.name);
 
 
 // Example 80
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Another way to link two Slots is to call .linkFrom() on one of them.
@@ -1538,7 +1527,7 @@ log(p1.name, p2.name);
 
 
 // Example 81
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // But this style of link can be broken by calling .destroy()
@@ -1553,7 +1542,7 @@ log(p1.name, p2.name);
 
 
 // Example 82
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // linkTo() is the same as linkFrom(), except that the initial value
@@ -1569,7 +1558,7 @@ log(p1.name, p2.name);
 
 
 // Example 83
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Two values can be linked through a relationship,
@@ -1602,7 +1591,7 @@ log(t.stringify());
 
 
 // Example 84
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // One-Way Data-Binding
@@ -1623,7 +1612,7 @@ d.destroy();
 
 
 // Example 85
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Follow copies the initial value.
@@ -1638,7 +1627,7 @@ log(p1.name, p2.name);
 
 
 // Example 86
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // One-Way Data-Binding, with Map function (mapFrom)
@@ -1659,7 +1648,7 @@ d.destroy();
 
 
 // Example 87
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // One-Way Data-Binding, with Map function (mapTo)
@@ -1680,7 +1669,7 @@ d.destroy();
 
 
 // Example 88
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Slots also let you check if the value is defined by calling isDefined().
@@ -1698,7 +1687,7 @@ log(dv.isDefined());
 
 
 // Example 89
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // You can reset a Slot to its default value by calling .clear().
@@ -1712,7 +1701,7 @@ log(dv.get(), dv.isDefined());
 
 
 // Example 90
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // ConstantSlot creates an immutable slot.
@@ -1728,7 +1717,7 @@ log(s.get());
 
 
 // Example 91
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // ExpressionSlot creates a Slot from a list of Slots
@@ -1751,7 +1740,7 @@ log(e.get());
 
 
 // Example 92
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // ExpressionSlot can also be supplied an object to work with, and then takes slots from function argument names.
@@ -1772,7 +1761,7 @@ log(e.get());
 
 
 // Example 93
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Destroy the ExpressionSlot to prevent further updates.
@@ -1786,7 +1775,7 @@ p.lname = 'Jones';
 
 
 // Example 94
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // The same functionality of ExpressionSlot is built into Properties
@@ -1818,7 +1807,7 @@ log(p.fname, p.lname, ' = ', p.name);
 
 
 // Example 95
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Expression properties can also be explicitly set, at which point the
@@ -1835,7 +1824,7 @@ log(p.fname, p.lname, ':', p.name);
 
 
 // Example 96
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Clearing a set expression property has it revert to its expression value.
@@ -1849,7 +1838,7 @@ log(p.name, p.hasOwnProperty('name'));
 
 
 // Example 97
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Destroyables (objects with a destroy() method) or functions
@@ -1867,7 +1856,7 @@ o.destroy();
 
 
 // Example 98
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // It doesn't hurt to try and destroy an object more than once.
@@ -1880,10 +1869,10 @@ o.destroy();
 
 
 // Example 99
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
-// If an Object is destroyed, it will unsubscribe from any
+// If an Object is destroyed, it will unsub from any
 // subscriptions which subsequently try to deliver events.
 var source = foam.core.FObject.create();
 var sink = foam.CLASS({
@@ -1906,7 +1895,7 @@ source.pub('ping');
 
 
 // Example 100
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Model validation, extends and refines are mutually-exclusive
@@ -1923,7 +1912,7 @@ EandRTest.model_.validate();
 
 
 // Example 101
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Model validation, properties must have names
@@ -1941,7 +1930,7 @@ ValidationTest.model_.validate();
 
 
 // Example 102
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Action validation, actions must have names
@@ -1959,7 +1948,7 @@ ActionNameValidation.model_.validate();
 
 
 // Example 103
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Action validation, actions must have code
@@ -1977,7 +1966,7 @@ ActionCodeValidation.model_.validate();
 
 
 // Example 104
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Model validation, properties names must not end with '$'
@@ -1995,7 +1984,7 @@ DollarValidationTest.model_.validate();
 
 
 // Example 105
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Property constants musn't conflict
@@ -2010,7 +1999,7 @@ foam.CLASS({
 
 
 // Example 106
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Properties must not have the same name
@@ -2026,7 +2015,7 @@ AxiomConflict1.create();
 
 
 // Example 107
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Methods must not have the same name
@@ -2042,7 +2031,7 @@ AxiomConflict2.create();
 
 
 // Example 108
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Axioms must not have the same name
@@ -2059,7 +2048,7 @@ AxiomConflict3.create();
 
 
 // Example 109
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Error if attempt to change a Property to a non-Property
@@ -2080,7 +2069,7 @@ AxiomChangeSub.create();
 
 
 // Example 110
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Warn if an Axiom changes its class
@@ -2101,7 +2090,7 @@ AxiomChangeSub2.create();
 
 
 // Example 111
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Property validation, factory and value
@@ -2132,7 +2121,7 @@ PropertyValidationTest.model_.validate();
 
 
 // Example 112
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Required
@@ -2154,7 +2143,7 @@ o.validate();
 
 
 // Example 113
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Unknown Properties, detect unknown Model and Property properties
@@ -2172,7 +2161,7 @@ foam.CLASS({
 
 
 // Example 114
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Contexts can be explicitly created with foam.createSubContext()
@@ -2186,7 +2175,7 @@ console.log(Y1.key, Y1.fn());
 
 
 // Example 115
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Sub-Contexts can be created from other Contexts.
@@ -2199,48 +2188,45 @@ console.log(Y2.key, Y2.fn());
 
 
 // Example 117
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can import values from the Context so that they can be accessed from 'this'.
-var Y = foam.createSubContext({ myLogger: function(msg) { console.log('log:', msg); }});
+var Y = foam.createSubContext({log: function(msg) { console.log('log:', msg); }});
 foam.CLASS({
   name: 'ImportsTest',
-  imports: [ 'myLogger' ],
+  imports: [ 'log', 'warn' ],
   methods: [ function foo() {
-    this.myLogger('log foo from ImportTest');
+    this.log('log foo from ImportTest');
+    this.warn('warn foo from ImportTest');
   } ]
 });
-try {
-  var o = ImportsTest.create();
-  o.foo();
-} catch(e) {
-  log('Could not import "myLogger" since nobody provided it.');
-}
-Y.myLogger('test');
+var o = ImportsTest.create();
+o.foo();
+Y.log('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 117, str: "warn: Access missing import: myLogger <b>&gt;</b> Could not import \"myLogger\" since nobody provided it.log: testlog: log foo from ImportTest" });
+  expect(log_.output).toMatchGolden({ i: 117, str: "log foo from ImportTestwarn: warn foo from ImportTestlog: testlog: log foo from ImportTestwarn: warn foo from ImportTest" });
 
 
 // Example 118
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can export values for use by objects they create.
 foam.CLASS({
   name: 'ExportsTest',
   requires: [ 'ImportsTest' ],
-  exports: [ 'myLogger' ],
+  exports: [ 'log', 'log as warn' ],
   methods: [
     function init() {
       this.ImportsTest.create().foo();
     },
-    function myLogger(msg) {
-      console.log('log from ExportsTest:', msg);
+    function log(msg) {
+      console.log('log:', msg);
     }
   ]
 });
@@ -2248,11 +2234,11 @@ ExportsTest.create();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 118, str: "log from ExportsTest: log foo from ImportTest" });
+  expect(log_.output).toMatchGolden({ i: 118, str: "log: log foo from ImportTestlog: warn foo from ImportTest" });
 
 
 // Example 119
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Packages
@@ -2270,7 +2256,7 @@ com.acme.Test.create().foo();
 
 
 // Example 120
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can requires: other Classes to avoid having to reference them
@@ -2288,7 +2274,7 @@ RequiresTest.create().foo();
 
 
 // Example 121
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Requires can use 'as' to alias required Classes so that they are named something different.
@@ -2305,7 +2291,7 @@ RequiresAliasTest.create().foo();
 
 
 // Example 122
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Classes can have a unique-id or primary-key.
@@ -2323,7 +2309,7 @@ log(o.id);
 
 
 // Example 123
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // But you can also use the 'ids' property to specify that
@@ -2344,7 +2330,7 @@ log(o.id, o.invoiceId);
 
 
 // Example 124
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Multi-part unique identifiers are also supported.
@@ -2364,7 +2350,7 @@ log(o.id, o.customerId, o.invoiceId);
 
 
 // Example 125
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Multi-part ids are comparable
@@ -2390,7 +2376,7 @@ log(Invoice3.ID.compare(
 
 
 // Example 126
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // A Classes 'id' is a combination of its package and name.
@@ -2402,7 +2388,7 @@ log(com.acme.Test.id);
 
 
 // Example 127
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // In addition the the built-in Axiom types, you can also
@@ -2422,7 +2408,7 @@ log(AxiomTest.create() === AxiomTest.create());
 
 
 // Example 128
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2442,7 +2428,7 @@ log(AxiomSubTest.create() === AxiomTest.create());
 
 
 // Example 129
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Stdlib
@@ -2453,7 +2439,7 @@ try {
 
 
 // Example 131
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.events.consoleLog
@@ -2470,7 +2456,7 @@ o.pub('foo','bar');
 
 
 // Example 132
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.Function.memoize1() memozies a one-argument function so that if called again
@@ -2487,7 +2473,7 @@ log(f(4));
 
 
 // Example 133
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // A call to memoize1() with no arguments will trigger a failed assertion.
@@ -2499,7 +2485,7 @@ log(f());
 
 
 // Example 134
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // A call to memoize1() with more than one argument will trigger a failed assertion.
@@ -2511,7 +2497,7 @@ log(f(1,2));
 
 
 // Example 135
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.Function.argsStr() returns a function's arguments an a string.
@@ -2524,7 +2510,7 @@ log(typeof foam.Function.argsStr(function() { }));
 
 
 // Example 136
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.Function.formalArgs() returns a function's arguments an an array.
@@ -2537,7 +2523,7 @@ log(Array.isArray(foam.Function.formalArgs(function() { })));
 
 
 // Example 137
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
@@ -2551,7 +2537,7 @@ log(foam.String.constantize('fooBar12'));
 
 
 // Example 138
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.String.capitalize capitalizes strings
@@ -2564,7 +2550,7 @@ log(foam.String.capitalize('abc def'));
 
 
 // Example 139
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.String.labelize converts from camelCase to labels
@@ -2578,7 +2564,7 @@ log(foam.String.labelize('someLongName'));
 
 
 // Example 140
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.String.multiline lets you build multi-line strings
@@ -2594,7 +2580,7 @@ string*/}));
 
 
 // Example 141
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.String.pad() pads a string to the specified length.
@@ -2607,7 +2593,7 @@ log(s, s.length);
 
 
 // Example 142
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // foam.String.pad() pads a string to the specified length, right justifying if given a negative number.
@@ -2620,7 +2606,7 @@ log(s, s.length);
 
 
 // Example 143
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Basic templates
@@ -2645,7 +2631,7 @@ log(o.hello());
 
 
 // Example 144
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 foam.CLASS({
@@ -2672,7 +2658,7 @@ log(o.greet("Bob"));
 
 
 // Example 145
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 foam.CLASS({
@@ -2700,7 +2686,7 @@ log(o.greet("Alice"));
 
 
 // Example 146
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // More
@@ -2728,7 +2714,7 @@ log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
 
 
 // Example 147
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Multi-line templates can be defined as function comments.
@@ -2757,7 +2743,7 @@ log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
 
 
 // Example 148
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // JSON Support
@@ -2806,7 +2792,7 @@ o.describe();
 
 
 // Example 149
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2843,7 +2829,7 @@ log(foam.json.stringify(o));
 
 
 // Example 150
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Convert to a JSON object (instead of a String)
@@ -2855,7 +2841,7 @@ log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
 
 
 // Example 151
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 // Or as a method on Objects
@@ -2867,7 +2853,7 @@ log(o.stringify());
 
 
 // Example 152
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2879,7 +2865,7 @@ log(foam.json.Pretty.stringify(o));
 
 
 // Example 153
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2891,7 +2877,7 @@ log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
 
 
 // Example 154
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2903,7 +2889,7 @@ log(foam.json.Strict.stringify(o));
 
 
 // Example 155
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2915,7 +2901,7 @@ log(foam.json.PrettyStrict.stringify(o));
 
 
 // Example 156
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2927,7 +2913,7 @@ log(foam.json.Compact.stringify(o));
 
 
 // Example 157
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2939,7 +2925,7 @@ log(foam.json.Short.stringify(o));
 
 
 // Example 158
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
@@ -2951,7 +2937,7 @@ log(foam.json.Network.stringify(o));
 
 
 // Example 159
-foam.__context__ = foam.createSubContext({});
+foam.__context__ = foam.createSubContext();
 log_.output = "";
 try {
 //
