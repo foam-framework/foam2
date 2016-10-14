@@ -130,7 +130,8 @@
 
             (function(v) {
               Object.defineProperty(sub, key, {
-                value: v
+                value: v,
+                enumerable: true
               });
             })(v);
           } else {
