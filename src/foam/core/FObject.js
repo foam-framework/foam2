@@ -29,8 +29,20 @@ foam.LIB({
   documentation: "Root prototype for all classes.",
 
   constants: {
+    // Each class has a prototype object which is the prototype of all
+    // instances of the class. A classes prototype extends its parent
+    // classes prototype.
     prototype: {},
+
+    // Each class has a map of Axioms added to the class.
+    // May keys are the name of the axiom.
+    // The classes axiomMap_'s extends its parent axiomMap_.
     axiomMap_: {},
+
+    // Each class has a map of "private" variables for use by
+    // axioms. Storing internal data in private_ instead of on the
+    // class directly avoids name conflicts with public features of
+    // the class.
     private_:  { axiomCache: {} }
   },
 
@@ -60,8 +72,20 @@ foam.LIB({
       return obj;
     },
 
-    function createSubClass() {
-      foam.core.FObject.createSubClass = function() {
+    /**
+      Internal method to create a subclass of this class.
+      Is called from Model.buildClass().
+    */
+    function createSubClass_() {
+      // When called this first time it just returns 'this',
+      // which is foam.core.FObject. This is so that the existing
+      // FObject LIB can be reused/extended into a class as part
+      // of the bootstrap process.
+      // When this version is first called it replaces itself with
+      // the real version (below), which is then used for all
+      // remaining non-FObject classes.
+
+      foam.core.FObject.createSubClass_ = function() {
         var cls = Object.create(this);
 
         cls.prototype = Object.create(this.prototype);
@@ -189,6 +213,10 @@ foam.LIB({
       return as;
     },
 
+    /**
+      Returns all axioms defined on this class
+      that are instances of the specified class.
+    */
     function getOwnAxiomsByClass(cls) {
       return this.getAxiomsByClass(cls).filter(function(a) {
         return this.hasOwnAxiom(a.name);
@@ -203,6 +231,7 @@ foam.LIB({
       return Object.hasOwnProperty.call(this.axiomMap_, name);
     },
 
+    /** Returns all axioms defined on this class. */
     function getOwnAxioms() {
       return this.getAxioms().filter(function(a) {
         return this.hasOwnAxiom(a.name);
@@ -282,9 +311,9 @@ foam.LIB({
 
           var type = foam.lookup(a.class, true) || foam.core.Property;
           console.assert(
-            type !== a.cls_,
-            'Property', a.name, 'on', m.name,
-            'has already been upgraded to a Property.');
+              type !== a.cls_,
+              'Property', a.name, 'on', m.name,
+              'has already been upgraded to a Property.');
 
           a = type.create(a);
 
@@ -648,6 +677,7 @@ foam.CLASS({
      ************************************************/
 
     function isDestroyed() {
+      /* Returns true iff destroy() has been called on this object. */
       return ! this.instance_;
     },
 
@@ -757,6 +787,9 @@ foam.CLASS({
       return diff;
     },
 
+    /**
+      Create an integer hash code value based on all properties of this object.
+    */
     function hashCode() {
       var hash = 17;
 

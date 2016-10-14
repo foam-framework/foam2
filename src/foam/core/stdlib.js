@@ -312,7 +312,7 @@ foam.LIB({
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
-                       'Cannot constantize non-string values.');
+            'Cannot constantize non-string values. Type provided was:', typeof str);
 
         // switchFromCamelCaseToConstantFormat to
         // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
@@ -499,6 +499,7 @@ foam.LIB({
 });
 
 
+// An FObject is a FOAM-Object, the root class for all modeled classes.
 foam.LIB({
   name: 'foam.core.FObject',
   methods: [
@@ -513,6 +514,7 @@ foam.LIB({
 });
 
 
+// AN Object is a Javascript Object which is neither an FObject nor an Array.
 foam.LIB({
   name: 'foam.Object',
   methods: [

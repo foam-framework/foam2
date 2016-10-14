@@ -38,7 +38,7 @@ foam.CLASS({
     ],
     [ 'assertValue', function(v, prop) {
         this.assert(Array.isArray(v),
-                       prop.name, 'Attempt to set array property to non-array value', v);
+            prop.name, 'Attempt to set array property to non-array value', v);
       }
     ],
     [ 'adaptArrayElement', function(o, obj) {
