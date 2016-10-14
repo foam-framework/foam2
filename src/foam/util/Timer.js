@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.util',
   name: 'Timer',
 
+  documentation: 'Timer object. Useful for creating animations.',
+
   properties: [
     {
       class: 'Int',
