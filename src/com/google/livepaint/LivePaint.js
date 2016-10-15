@@ -24,8 +24,10 @@ foam.CLASS({
 
   requires: [
     'foam.graphics.Circle',
+    'foam.dao.EasyDAO',
     'foam.graphics.Box',
-    'foam.u2.PopupView'
+    'foam.u2.PopupView',
+    'foam.u2.TableView',
   ],
 
   exports: [ 'as data' ],
@@ -72,6 +74,24 @@ foam.CLASS({
 
   properties: [
     'feedback_',
+    'currentTool',
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'tools',
+      view: {
+        class: 'foam.u2.TableView',
+        columns: [ foam.core.Model.NAME ]
+      },
+      factory: function() {
+        var dao = foam.dao.EasyDAO.create({
+          of: 'foam.core.Model',
+          daoType: 'MDAO'
+        });
+        dao.put(foam.graphics.Circle.model_);
+        dao.put(foam.graphics.Box.model_);
+        return dao;
+      }
+    },
     {
       name: 'selected',
       postSet: function(o, n) {
@@ -105,6 +125,7 @@ foam.CLASS({
 
       this.
           cssClass(this.myCls()).
+          start(this.TOOLS, {selection$: this.currentTool$}).end().
           start('center').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
@@ -146,7 +167,12 @@ foam.CLASS({
       if ( c ) {
         this.selected = c;
       } else {
-        this.selected = this.addCircle(x, y);
+        var tool = this.currentTool;
+        if ( ! tool ) return;
+        var cls = this.lookup(tool.id);
+        var o = cls.create({x: x, y: y, width: 25, height: 25, radius: 25});
+        this.canvas.addChildren(o);
+        this.selected = o;
         this.updateMemento();
       }
     },
