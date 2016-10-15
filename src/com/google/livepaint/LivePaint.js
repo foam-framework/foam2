@@ -89,6 +89,7 @@ foam.CLASS({
         });
         dao.put(foam.graphics.Circle.model_);
         dao.put(foam.graphics.Box.model_);
+        dao.put(foam.graphics.Label.model_);
         return dao;
       }
     },
@@ -170,7 +171,14 @@ foam.CLASS({
         var tool = this.currentTool;
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
-        var o = cls.create({x: x, y: y, width: 25, height: 25, radius: 25});
+        var o = cls.create({
+          x: x,
+          y: y,
+          text: 'Text',
+          width: 50,
+          height: 50,
+          radius: 25
+        });
         this.canvas.addChildren(o);
         this.selected = o;
         this.updateMemento();
