@@ -687,7 +687,7 @@ foam.CLASS({
         Register a function or a destroyable to be called
         when this object is destroyed.
       */
-      this.sub('destroy', d.destroy ? d.destroy.bind(d) : d);
+      if ( d ) this.sub('destroy', d.destroy ? d.destroy.bind(d) : d);
       return d;
     },
 
