@@ -682,14 +682,13 @@ foam.CLASS({
       return ! this.instance_;
     },
 
-    function onDestroy(dtor) {
+    function onDestroy(d) {
       /*
         Register a function or a destroyable to be called
         when this object is destroyed.
       */
-      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
-      dtors.push(dtor);
-      return dtor;
+      this.sub('destroy', d.destroy ? d.destroy.bind(d) : d);
+      return d;
     },
 
     function destroy() {
@@ -703,19 +702,7 @@ foam.CLASS({
       // Record that we're currently destroying this object,
       // to prevent infitine recursion.
       this.instance_.destroying_ = true;
-
-      var dtors = this.getPrivate_('dtors');
-      if ( dtors ) {
-        for ( var i = 0 ; i < dtors.length ; i++ ) {
-          var d = dtors[i];
-          if ( typeof d === 'function' ) {
-            d();
-          } else {
-            d.destroy();
-          }
-        }
-      }
-
+      this.pub('destroy');
       this.instance_ = this.private_ = null;
     },
 
