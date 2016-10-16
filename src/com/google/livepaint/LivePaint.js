@@ -26,7 +26,7 @@ foam.CLASS({
       name: 'name'
     },
     [ 'mass',  0 ],
-    [ 'width',  80 ],
+    [ 'width',  100 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
     [ 'color', 'black' ],
