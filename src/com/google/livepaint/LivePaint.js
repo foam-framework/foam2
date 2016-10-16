@@ -128,6 +128,7 @@ foam.CLASS({
     },
     {
       name: 'selected',
+      view: { class: 'foam.u2.DetailView' },
       postSet: function(o, n) {
         if ( o ) { o.shadowBlur = 0; }
         if ( n ) { n.shadowBlur = 10; n.shadowColor = 'red'; }
@@ -168,7 +169,8 @@ foam.CLASS({
               on('click',       this.onClick).
               on('contextmenu', this.onRightClick).
             end().
-          end();
+          end().
+        add(this.SELECTED);
     },
 
     function addCircle(x, y, opt_r) {
