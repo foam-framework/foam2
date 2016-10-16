@@ -17,6 +17,17 @@
 
 foam.CLASS({
   package: 'com.google.livepaint',
+  name: 'Text',
+  extends: 'foam.graphics.Label',
+  properties: [
+    [ 'color', 'black' ],
+    [ 'font', '50px Arial' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.livepaint',
   name: 'LivePaint',
   extends: 'foam.u2.Element',
 
@@ -89,15 +100,15 @@ foam.CLASS({
         });
         dao.put(foam.graphics.Circle.model_);
         dao.put(foam.graphics.Box.model_);
-        dao.put(foam.graphics.Label.model_);
+        dao.put(com.google.livepaint.Text.model_);
         return dao;
       }
     },
     {
       name: 'selected',
       postSet: function(o, n) {
-        if ( o ) o.color = this.UNSELECTED_COLOR;
-        if ( n ) n.color = this.SELECTED_COLOR;
+        if ( o ) { o.shadowBlur = 0; }
+        if ( n ) { n.shadowBlur = 10; n.shadowColor = 'red'; }
       }
     },
     {
