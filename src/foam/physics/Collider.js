@@ -86,6 +86,7 @@ foam.CLASS({
       return p;
     },
 
+    // TODO: Add support for rectangular objects
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
@@ -136,6 +137,8 @@ foam.CLASS({
     },
 
     function collide(c1, c2) {
+      if ( ! c1.mass || ! c2.mass ) return;
+
       var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);
       var m1 =  c1.momentumAtAngle(a);
       var m2 = -c2.momentumAtAngle(a);
