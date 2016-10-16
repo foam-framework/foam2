@@ -1662,7 +1662,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
-  requires: [ 'foam.u2.FloatView' ],
+  requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
   ]
