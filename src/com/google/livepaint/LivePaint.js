@@ -25,6 +25,7 @@ foam.CLASS({
       class: 'String',
       name: 'name'
     },
+    [ 'mass',  0 ],
     [ 'width',  80 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
@@ -43,6 +44,7 @@ foam.CLASS({
       class: 'String',
       name: 'name'
     },
+    [ 'mass',  0 ],
     [ 'radius', 25 ]
   ]
 });
@@ -57,6 +59,7 @@ foam.CLASS({
       class: 'String',
       name: 'name'
     },
+    [ 'mass',  0 ],
     [ 'width',  50 ],
     [ 'height', 50 ]
   ]
