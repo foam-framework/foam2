@@ -664,6 +664,21 @@ foam.CLASS({
         width: this.x + (this.width  || (this.radius + this.arcWidth) * 2),
         height: this.y + (this.height || (this.radius + this.arcWidth) * 2)
       });
+    },
+
+    function intersects(c) {
+      if ( c.radius ) {
+        return ! (
+            this.x + this.width  < c.x - c.radius ||
+            this.y + this.height < c.y - c.radius ||
+            c.x    + c.radius    < this.x ||
+            c.y    + c.radius    < this.y );
+      }
+      return ! (
+          this.x + this.width  < c.x ||
+          this.y + this.height < c.y ||
+          c.x    + c.width  < this.x ||
+          c.y    + c.height < this.y );
     }
   ]
 });
@@ -823,6 +838,7 @@ foam.CLASS({
     },
 
     function intersects(c) {
+      if ( ! c.radius ) return c.intersects(this);
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
       if ( c.border    ) r += c.arcWidth/2-1;
