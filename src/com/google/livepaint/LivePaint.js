@@ -19,7 +19,12 @@ foam.CLASS({
   package: 'com.google.livepaint',
   name: 'Text',
   extends: 'foam.graphics.Label',
+  implements: [ 'foam.physics.Physical' ],
   properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
     [ 'width',  80 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
@@ -32,7 +37,12 @@ foam.CLASS({
   package: 'com.google.livepaint',
   name: 'Circle',
   extends: 'foam.graphics.Circle',
+  implements: [ 'foam.physics.Physical' ],
   properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
     [ 'radius', 25 ]
   ]
 });
@@ -41,7 +51,12 @@ foam.CLASS({
   package: 'com.google.livepaint',
   name: 'Box',
   extends: 'foam.graphics.Box',
+  implements: [ 'foam.physics.Physical' ],
   properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
     [ 'width',  50 ],
     [ 'height', 50 ]
   ]
@@ -56,11 +71,12 @@ foam.CLASS({
   implements: [ 'foam.memento.MementoMgr' ],
 
   requires: [
-    'foam.graphics.Circle',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
+    'foam.graphics.Circle',
+    'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
-    'foam.u2.TableView',
+    'foam.u2.TableView'
   ],
 
   exports: [ 'as data' ],
@@ -107,6 +123,12 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'physics',
+      factory: function() {
+        return this.PhysicsEngine.create();
+      }
+    },
     'feedback_',
     'currentTool',
     {
@@ -171,7 +193,9 @@ foam.CLASS({
               on('contextmenu', this.onRightClick).
             end().
           end().
-        add(this.SELECTED);
+          add(this.SELECTED);
+
+      this.physics.start();
     },
 
     function addCircle(x, y, opt_r) {
@@ -209,6 +233,7 @@ foam.CLASS({
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y});
         this.canvas.addChildren(o);
+        this.physics.add(o);
         this.selected = o;
         this.updateMemento();
       }
