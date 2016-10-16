@@ -20,8 +20,30 @@ foam.CLASS({
   name: 'Text',
   extends: 'foam.graphics.Label',
   properties: [
+    [ 'width',  80 ],
+    [ 'height', 50 ],
+    [ 'text', 'Text' ],
     [ 'color', 'black' ],
     [ 'font', '50px Arial' ]
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.livepaint',
+  name: 'Circle',
+  extends: 'foam.graphics.Circle',
+  properties: [
+    [ 'radius', 25 ]
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.livepaint',
+  name: 'Box',
+  extends: 'foam.graphics.Box',
+  properties: [
+    [ 'width',  50 ],
+    [ 'height', 50 ]
   ]
 });
 
@@ -98,8 +120,8 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'MDAO'
         });
-        dao.put(foam.graphics.Circle.model_);
-        dao.put(foam.graphics.Box.model_);
+        dao.put(com.google.livepaint.Circle.model_);
+        dao.put(com.google.livepaint.Box.model_);
         dao.put(com.google.livepaint.Text.model_);
         return dao;
       }
@@ -182,14 +204,7 @@ foam.CLASS({
         var tool = this.currentTool;
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
-        var o = cls.create({
-          x: x,
-          y: y,
-          text: 'Text',
-          width: 50,
-          height: 50,
-          radius: 25
-        });
+        var o = cls.create({x: x, y: y});
         this.canvas.addChildren(o);
         this.selected = o;
         this.updateMemento();
