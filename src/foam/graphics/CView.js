@@ -747,12 +747,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'width',
-      class: 'Float'
+      class: 'Float',
+      name: 'width'
     },
     {
-      name: 'height',
-      class: 'Float'
+      class: 'Float',
+      name: 'height'
     },
     {
       name: 'border',
