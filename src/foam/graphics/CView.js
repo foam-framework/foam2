@@ -496,6 +496,7 @@ foam.CLASS({
       // an associated Canvas (by calling toE()).
       class: 'Boolean',
       name: 'autoRepaint',
+      hidden: true,
       value: true
     },
     {
