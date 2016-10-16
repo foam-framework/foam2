@@ -454,24 +454,29 @@ foam.CLASS({
       postSet: function(o, n) {
         for ( var i = 0 ; o && i < o.length ; i++ ) this.removeChild_(o[i]);
         for ( var i = 0 ; n && i < n.length ; i++ ) this.addChild_(n[i]);
-      }
+      },
+      hidden: true
     },
     {
       name: 'state',
       value: 'initial'
     },
     {
-      name: 'parent'
+      name: 'parent',
+      hidden: 'true'
     },
     {
-      name: 'canvas'
+      name: 'canvas',
+      hidden: 'true'
     },
     {
       name: 'transform_',
+      hidden: 'true',
       factory: function() { return this.Transform.create(); }
     },
     {
       name: 'transform',
+      hidden: 'true',
       getter: function getTransform() {
         var t = this.transform_.reset();
 
@@ -495,6 +500,7 @@ foam.CLASS({
     },
     {
       name: 'invalidate_',
+      hidden: true,
       factory: function() {
         return this.parent ? this.parent.invalidate_ :
           this.autoRepaint ? this.invalidated.pub   :
