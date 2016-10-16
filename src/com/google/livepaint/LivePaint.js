@@ -161,6 +161,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'children2'
+    },
+    {
       name: 'canvas',
       factory: function() {
         return this.Box.create({width: 600, height: 500, color: '#f3f3f3'});
@@ -171,6 +174,8 @@ foam.CLASS({
   methods: [
 
     function initE() {
+      this.canvas.invalidated.sub(this.onChildrenUpdate);
+
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
@@ -196,7 +201,18 @@ foam.CLASS({
               on('contextmenu', this.onRightClick).
             end().
           end().
-          add(this.SELECTED);
+          add(this.SELECTED, this.slot(function (children2) {
+            var children = children2;
+            if ( ! children ) return;
+            console.log('*************8', children, children.length);
+            var e = this.E('div');
+            for ( var i = 0 ; i < children.length ; i++ ) {
+              var child = children[i];
+              console.log('***', i, child.name);
+              e.start('div').add(child.name).end();
+            }
+            return e;
+          }));
 
       this.physics.start();
     },
@@ -224,6 +240,15 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'onChildrenUpdate',
+      isFramed: true,
+      code: function () {
+        console.log('update children');
+        this.children2 = Array.from(this.canvas.children);
+      }
+    },
+
     function onClick(evt) {
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
