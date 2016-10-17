@@ -117,11 +117,11 @@ foam.CLASS({
 
 
 foam.__context__.assert(
-    ! foam.AbstractClass.describe,
-    'foam.AbstractClass.describe already set.');
+    ! foam.core.FObject.describe,
+    'foam.core.FObject.describe already set.');
 
 /* Add describe() support to classes. */
-foam.AbstractClass.describe = function(opt_name) {
+foam.core.FObject.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
   console.log('Axiom Type           Source Class   Name');
@@ -138,8 +138,8 @@ foam.AbstractClass.describe = function(opt_name) {
 
 
 // Decorate installModel() to verify that axiom names aren't duplicated.
-foam.AbstractClass.installModel = function() {
-  var superInstallModel = foam.AbstractClass.installModel;
+foam.core.FObject.installModel = function() {
+  var superInstallModel = foam.core.FObject.installModel;
 
   return function(m) {
     var names = {};
@@ -193,14 +193,13 @@ foam.AbstractClass.installModel = function() {
   };
 }();
 
-foam.AbstractClass.validate = function() {
+foam.core.FObject.validate = function() {
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     a.validateClass && a.validateClass(this);
   }
 }
 
-global.abc = 0;
 // Change 'false' to 'true' to enable error reporting for setting
 // non-Properties on FObjects.
 // TODO: add 'Did you mean...' support.
@@ -218,9 +217,9 @@ if ( false && global.Proxy ) {
       value: true
     };
 
-    var oldCreate = foam.AbstractClass.create;
+    var oldCreate = foam.core.FObject.create;
 
-    foam.AbstractClass.create = function(args, ctx) {
+    foam.core.FObject.create = function(args, ctx) {
       return new Proxy(oldCreate.call(this, args, ctx), {
         get: function(target, prop, receiver) {
           return Reflect.get(target, prop, receiver);
@@ -262,7 +261,7 @@ foam.CLASS({
         } catch (x) {
           value = '-';
         }
-        if ( foam.Array.is(value) ) {
+        if ( foam.Array.isInstance(value) ) {
           // NOP
         } else if ( value && value.toString ) {
           value = value.toString();
@@ -304,8 +303,8 @@ foam.CLASS({
   package: 'foam.debug',
   name: 'Window',
 
-  // documentation: 'Decorated merged() and framed() to have debug friendly
-  // toString() methods.',
+  documentation: 'Decorated merged() and framed() to have debug friendly ' +
+      'toString() methods.',
 
   exports: [ 'merged', 'framed' ],
 
@@ -328,6 +327,7 @@ foam.CLASS({
 });
 
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
+
 
 /** Describes one argument of a function or method. */
 foam.CLASS({

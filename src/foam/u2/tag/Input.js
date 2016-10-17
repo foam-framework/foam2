@@ -26,7 +26,7 @@ foam.CLASS({
       name: 'data',
       assertValue: function(d) {
         // TODO: put back
-        this.assert(! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.is(d), 'Set Input data to non-primitive.');
+        this.assert(! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d), 'Set Input data to non-primitive.');
       }
     },
     {

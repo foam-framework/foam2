@@ -17,11 +17,14 @@
 
 // Polyfill
 
+// Required on IE 11, Android Browser before 5.1.
 if ( ! Math.trunc ) {
   Math.trunc = function trunc(v) {
     return v > 0 ? Math.floor(v) : Math.ceil(v);
   };
 }
+
+// Required on IE 11, Android Browser (at least to 5.1).
 if ( ! Array.from ) {
   /** Turn array-like objects into real arrays. **/
   Array.from = function(a) {
@@ -31,7 +34,7 @@ if ( ! Array.from ) {
   }
 }
 
-
+// Required on IE 11, Android Browser (at least to 5.1).
 if ( ! Array.prototype.find ) {
   Array.prototype.find = function(predicate) {
     if ( this === null ) {
@@ -53,7 +56,7 @@ if ( ! Array.prototype.find ) {
   };
 }
 
-
+// Required on IE 11, Android Browser (at least to 5.1).
 if ( ! String.prototype.endsWith ) {
   // Official polyfill
   String.prototype.endsWith = function(searchString, position) {
@@ -70,28 +73,9 @@ if ( ! String.prototype.endsWith ) {
   };
 }
 
+// Required on IE 11, Android Browser (at least to 5.1).
 if ( ! String.prototype.startsWith ) {
   String.prototype.startsWith = function(str, pos) {
     return this.indexOf(str) === 0;
   };
 }
-
-(function() {
-  if ( this.WeakMap ) return;
-  this.WeakMap = function WeakMap() {
-    var id = '__WEAK_MAP__' + this.$UID;
-
-    function del(key) { delete key[id]; }
-    function get(key) { return key[id]; }
-    function set(key, value) { key[id] = value; }
-    function has(key) { return !!key[id]; }
-
-    return {
-      __proto__: this,
-      "delete": del,
-      get: get,
-      set: set,
-      has: has
-    };
-  };
-})();

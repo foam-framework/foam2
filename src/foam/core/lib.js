@@ -28,8 +28,10 @@ foam = {
   })()
 };
 
+
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = this;
+
 
 Object.defineProperty(
   Object.prototype,
@@ -48,6 +50,7 @@ Object.defineProperty(
     enumerable: false
   }
 );
+
 
 /**
  * Creates a small library in the foam package. A LIB is a collection of

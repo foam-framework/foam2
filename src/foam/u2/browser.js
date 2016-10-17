@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'DAOController',
   extends: 'foam.u2.View',
+
   // Expects a DAO as its data. Calls listFactory to construct the list, passing
   // it rowFactory.
   // Clicking a row creates a DAOUpdateController to edit the item (lists should
   // publish rowClick, like DAOList does).
   // Also displays a floating action button to create new items, which uses
   // DAOCreateController.
+
   requires: [
     'foam.u2.DAOCreateController',
     'foam.u2.DAOList',
@@ -56,27 +59,6 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    {
-      name: 'rowClick',
-      code: function(sub, _, obj) {
-        this.stack.pushAfter(this,
-            this.buildUpdateController(this.__subContext__, obj));
-      }
-    }
-  ],
-
-  actions: [
-    {
-      name: 'newItem',
-      label: 'New',
-      code: function() {
-        this.stack.pushAfter(this,
-            this.buildCreateController(this.__subContext__));
-      }
-    }
-  ],
-
   methods: [
     function initE() {
       // TODO(braden): Add ViewFactory support to Element.start()
@@ -106,8 +88,30 @@ foam.CLASS({
         dao: this.data
       }, X);
     }
+  ],
+
+  listeners: [
+    {
+      name: 'rowClick',
+      code: function(sub, _, obj) {
+        this.stack.pushAfter(this,
+            this.buildUpdateController(this.__subContext__, obj));
+      }
+    }
+  ],
+
+  actions: [
+    {
+      name: 'newItem',
+      label: 'New',
+      code: function() {
+        this.stack.pushAfter(this,
+            this.buildCreateController(this.__subContext__));
+      }
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -193,6 +197,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -292,6 +297,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'BasicStackView',
@@ -349,10 +355,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'DAOUpdateController',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.DetailView'
   ],
@@ -484,6 +492,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'DAOCreateController',
@@ -504,7 +513,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'of',
       expression: function(dao) {
         return dao.of;

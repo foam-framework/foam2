@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 function createTestListener(doUnsub) {
   // also handles property change, split into separate listener if necessary
   var listener = function(subscription, topic, topic2, dyn) {
@@ -282,11 +299,11 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
   });
 
   it('pubes correctly after removing first of three', function() {
-    ep.change.sub(listener);
+    var s1 = ep.change.sub(listener);
     ep.change.sub(listener2);
     ep.change.sub(listener3);
 
-    ep.change.unsub(listener);
+    s1.destroy();
     ep.change.pub();
     expect(listener.count).toEqual(0);
     expect(listener2.count).toEqual(1);
@@ -294,10 +311,10 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
   });
    it('pubes correctly after removing middle of three', function() {
     ep.change.sub(listener);
-    ep.change.sub(listener2);
+    var s2 = ep.change.sub(listener2);
     ep.change.sub(listener3);
 
-    ep.change.unsub(listener2);
+    s2.destroy();
     ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(0);
@@ -306,9 +323,9 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
   it('pubes correctly after removing last of three', function() {
     ep.change.sub(listener);
     ep.change.sub(listener2);
-    ep.change.sub(listener3);
+    var s3 = ep.change.sub(listener3);
 
-    ep.change.unsub(listener3);
+    s3.destroy();
     ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(1);

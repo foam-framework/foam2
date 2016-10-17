@@ -88,7 +88,7 @@ foam.CLASS({
         // TODO: create a NamedProperty which doesn't include class, if possible
         return value && '__Property__' === value.class ?
             foam.lookup(value.source).getAxiomByName(value.name) :
-            value ;
+            foam.json.parse(value, null, opt_ctx) ;
       }
     },
     {
@@ -954,9 +954,17 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'GroupBy',
-  extends: 'foam.mlang.predicate.Binary',
+  extends: 'foam.dao.AbstractSink',
 
   properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    },
     {
       name: 'groups',
       factory: function() { return {}; }

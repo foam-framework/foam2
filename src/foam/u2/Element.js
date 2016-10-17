@@ -85,7 +85,7 @@ foam.CLASS({
 
         // Install our own CSS, and then all parent models as well.
         if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(cls, axiom.code));
+          X.installCSS(axiom.expandCSS(this, axiom.code));
           axiom.installedDocuments_.set(X.document, true);
         }
 
@@ -98,7 +98,7 @@ foam.CLASS({
       /* Performs expansion of the ^ shorthand on the CSS. */
       // TODO(braden): Parse and validate the CSS.
       // TODO(braden): Add the automatic prefixing once we have the parser.
-      var base = '.' + (cls.CSS_NAME || foam.String.cssClassize(cls.id));
+      var base = '.' + foam.String.cssClassize(cls.id);
       return text.replace(/\^(.)/g, function(match, next) {
         var c = next.charCodeAt(0);
         // Check if the next character is an uppercase or lowercase letter,
@@ -721,7 +721,7 @@ foam.CLASS({
       var f = this.cls_.myCls_;
 
       if ( ! f ) {
-        var base = (this.cls_.CSS_NAME || foam.String.cssClassize(this.cls_.id)).split(/ +/);
+        var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
 
         f = this.cls_.myCls_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
@@ -836,7 +836,7 @@ foam.CLASS({
           this.slotAttr_(name, value);
         } else {
           this.assert(
-              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || foam.Date.is(value),
+              typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || foam.Date.isInstance(value),
               'Attribute value must be a primitive type.');
 
           var attr = this.getAttributeNode(name);
@@ -1239,7 +1239,10 @@ foam.CLASS({
         for ( var key in es ) {
           removeRow(null, null, null, {id: key});
         }
-        dao.select({ put: function(o) { addRow(null, null, null, o); } });
+        dao.select({
+          put: function(o) { addRow(null, null, null, o); },
+          eof: function() {}
+        });
       };
       var addRow = function(_, _, _, o) {
         if ( update ) {
@@ -1256,7 +1259,6 @@ foam.CLASS({
               dao.put(o.clone());
             });
           });
-
         }
         self.endContext();
 
@@ -1620,8 +1622,7 @@ foam.CLASS({
 
       e.fromProperty && e.fromProperty(this);
 
-      if ( X.data$ &&
-           ! ( args && ( args.data || args.data$ ) ) ) {
+      if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
 
@@ -1663,7 +1664,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
-  requires: [ 'foam.u2.FloatView' ],
+  requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
   ]
@@ -1731,12 +1732,12 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TableProperties',
+  name: 'TableColumns',
 
   properties: [
-    [ 'name', 'tableProperties' ],
+    [ 'name', 'tableColumns' ],
     {
-      name: 'properties',
+      name: 'columns',
       factory: function() {
         debugger;
       }
@@ -1749,9 +1750,17 @@ foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
+      // TODO: remove when all code ported
       name: 'tableProperties',
-      postSet: function(_, properties) {
-        this.axioms_.push(foam.u2.TableProperties.create({properties: properties}));
+      setter: function(_, ps) {
+        console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");
+        this.tableColumns = ps;
+      }
+    },
+    {
+      name: 'tableColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
       }
     }
   ]

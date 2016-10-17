@@ -389,19 +389,14 @@ foam.CLASS({
     { name: 'of', required: true },
     [
       'adapt',
-      function(old, nu, prop) {
-        var type = foam.typeOf(nu);
-        if ( type === foam.FObject ) {
-          return nu;
-        }
+      function(o, n, prop) {
+        if ( foam.core.FObject.isInstance(n) ) return n;
 
-        var e = this.__context__.lookup(prop.of);
+        var type = foam.typeOf(n);
+        var e    = this.__context__.lookup(prop.of);
 
-        if ( type === foam.String ) {
-          return e[foam.String.constantize(nu)];
-        } else if ( type === foam.Number ) {
-          return e.create({ ordinal: nu });
-        }
+        if ( type === foam.String ) return e[foam.String.constantize(n)];
+        if ( type === foam.Number ) return e.create({ordinal: n});
       }
     ]
   ]

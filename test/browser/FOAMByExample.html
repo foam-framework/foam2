@@ -781,22 +781,14 @@ o.a = 42;
 o.b = 'bar';
 o.a++;
 
-// There are four ways to unsub a listener
-// 1. Call obj.unsub();
-o = TopicTest.create();
-var l = function() { console.log.apply(console.log, arguments); };
-o.sub(l);
-o.pub('fire');
-o.unsub(l);
-o.pub("fire again, but nobody's listenering");
-
-// 2. Call .destroy() on the Destroyable that sub() returns
+// There are three ways to unsubscribe a listener
+// 1. Call .destroy() on the Destroyable that sub() returns
 var sub = o.sub(l);
 o.pub('fire');
 sub.destroy();
 o.pub("fire again, but nobody's listenering");
 
-// 3. Destroy the subscription, which is supplied to the listener
+// 2. Destroy the subscription, which is supplied to the listener
 var l = function(sub) {
   sub.destroy();
   console.log.apply(console.log, arguments);
@@ -805,7 +797,7 @@ o.sub(l);
 o.pub('fire');
 o.pub("fire again, but nobody's listenering");
 
-// 4. If you only want to receive the first event, decorate your
+// 3. If you only want to receive the first event, decorate your
 // listener with foam.events.oneTime() and it will cancel the subscription
 // when it receives the first event.
 o.sub(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
@@ -847,6 +839,22 @@ log(s.get());
 s.set('George');
 log(p2.name);
 p2.name = 'Ringo';
+
+// Nested subscription
+// Subscribe to the value of the slot data$, removing the
+// subscription and resubscribing to the new value of data$
+// if it changes.
+foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
+var p1 = Person.create({name: 'John'});
+var p2 = Person.create({name: 'Paul'});
+var h = Holder.create({data: p1});
+h.data$.valueSub(function(e) { console.log('sub change: ', e.src.name, Array.from(arguments).join(' ')); });
+p1.name = 'Peter';
+p2.name = 'Mary';
+h.data = p2;
+p1.name = 'James';
+p2.name = 'Ringo';
+p2.pub('test','event');
 
 // Two-Way Data-Binding
 // Slots can be assigned, causing two values to be
@@ -1044,7 +1052,7 @@ o.destroy();
 o.destroy();
 o.destroy();
 
-// If an Object is destroyed, it will unsub from any
+// If an Object is destroyed, it will unsubscribe from any
 // subscriptions which subsequently try to deliver events.
 var source = foam.core.FObject.create();
 var sink = foam.CLASS({

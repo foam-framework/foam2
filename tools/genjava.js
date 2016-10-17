@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 require('../src/foam.js');
 
 var classes = [
@@ -26,6 +43,7 @@ var classes = [
   'foam.box.EchoBox',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
+  'com.chrome.origintrials.model.Application',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',
   'foam.dao.DAO',
@@ -38,6 +56,9 @@ var classes = [
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count'
+];
+
+var abstractClasses = [
 ];
 
 var skeletons = [
@@ -95,8 +116,19 @@ function generateClass(cls) {
   require('fs').writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
 }
 
-function generateSkeleton(cls) {
+function generateAbstractClass(cls) {
+  var outfile = outdir + require('path').sep +
+    cls.id.replace(/\./g, require('path').sep) + '.java';
 
+  ensurePath(outfile);
+
+  var javaclass = cls.buildJavaClass();
+  javaclass.abstract = true;
+
+  require('fs').writeFileSync(outfile, javaclass.toJavaSource());
+}
+
+function generateSkeleton(cls) {
   var outfile = outdir + require('path').sep +
     cls.package.replace(/\./g, require('path').sep) +
     require('path').sep + cls.name + 'Skeleton.java';
@@ -133,5 +165,6 @@ function generateProxy(intf) {
 }
 
 classes.forEach(loadClass(generateClass));
+abstractClasses.forEach(loadClass(generateAbstractClass));
 skeletons.forEach(loadClass(generateSkeleton));
 proxies.forEach(loadClass(generateProxy));

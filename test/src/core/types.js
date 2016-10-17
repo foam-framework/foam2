@@ -1,3 +1,19 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var createTestProperties = function createTestProperties() {
   if ( ! foam.lookup('test.PropTypeTester', true) ) {
@@ -31,19 +47,11 @@ var createTestProperties = function createTestProperties() {
           name: 'blob',
         },
         {
-          class: 'Reference',
-          name: 'reference',
-        },
-        {
           class: 'StringArray',
           name: 'stringArray',
         },
         {
-          class: 'ReferenceArray',
-          name: 'referenceArray',
-        },
-        {
-          class: 'Class2',
+          class: 'Class',
           name: 'class',
         }
         // TODO: other types, as they gain testable functionality
@@ -74,7 +82,7 @@ var createDateTestProperties = function createDateTestProperties() {
   return test.DateTypeTester.create();
 }
 
-// For tests that rely on asserts firing, make sure they throw so the 
+// For tests that rely on asserts firing, make sure they throw so the
 // assert can be detected in tests.
 var oldAssert;
 beforeAll(function() {
@@ -258,22 +266,6 @@ describe('StringArray', function() {
     ]);
   });
 });
-
-describe('ReferenceArray', function() {
-  var p;
-
-  beforeEach(function() {
-    p = createTestProperties();
-  });
-  afterEach(function() {
-    p = null;
-  });
-
-  it('is empty array by default', function() {
-    expect(p.referenceArray).toEqual([]);
-  });
-});
-
 
 describe('Class property', function() {
   var p;

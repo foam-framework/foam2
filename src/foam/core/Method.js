@@ -117,9 +117,15 @@ foam.CLASS({
 
       return f;
     },
+
     function createChildMethod_(child) {
+      /**
+        Template method for use by Method subclasses.
+        (Used by JavaSource.)
+      */
       return child;
     },
+
     function installInClass(cls) {
       var method = this;
 
@@ -151,5 +157,6 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.boot.phase2();

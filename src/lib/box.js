@@ -731,6 +731,7 @@ foam.CLASS({
       class: 'Stub',
       of: 'foam.dao.DAO',
       name: 'delegate',
+      eventProxy: true,
       methods: [
         'put',
         'remove',
@@ -828,6 +829,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Array',
       name: 'args'
     }
   ]
@@ -1278,11 +1280,11 @@ foam.CLASS({
   properties: [
     'next',
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'server'
     },
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'client'
     }
   ],

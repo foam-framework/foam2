@@ -31,10 +31,32 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Slot', // ???: Rename AbstractSlot or make an Interface
-  extends: null,
 
   methods: [
     /**
+      Subscribe to the Slot's value, if it has one. If the Slot's
+      value changes, then unsubscribe from the previous value and
+      resubscribe to the new one.
+    */
+    function valueSub() {
+      var self = this;
+      var args = Array.from(arguments);
+      var s;
+      var l = function() {
+        var v = self.get();
+        if ( s ) s.destroy();
+        if ( v ) s = v.sub.apply(v, args);
+      };
+      l();
+      this.sub(l);
+    },
+
+    /**
+      Create a sub-Slot for this Slot's value. If this Slot's
+      value changes, then the sub-Slot becomes the Slot for
+      the new value's sub-Slot instead. Useful for creating
+      Slot paths without having to rebuild whenever a value
+      along the chain changes.
     */
     function dot(name) {
       return foam.core.internal.SubSlot.create({
@@ -211,10 +233,6 @@ foam.CLASS({
       return s;
     },
 
-    function unsub(l) {
-      this.obj.unsub('propertyChange', this.prop.name, l);
-    },
-
     function isDefined() {
       return this.obj.hasOwnProperty(this.prop.name);
     },
@@ -224,19 +242,19 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'PropertySlot(' + this.prop.name + ')';
+      return 'PropertySlot(' + this.obj.cls_.id + '.' + this.prop.name + ')';
     }
   ]
 });
 
 
-/**
-  For internal use only.
- */
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
   implements: [ 'foam.core.Slot' ],
+
+  documentation:
+      'For internal use only. Is used to implement the Slot.dot() method.',
 
   properties: [
     'parent', // parent slot, not parent object
@@ -279,10 +297,6 @@ foam.CLASS({
       return this.SUPER('propertyChange', 'value', l);
     },
 
-    function unsub(l) {
-      this.SUPER('propertyChange', 'value', l);
-    },
-
     function isDefined() {
       return this.parent.get().hasOwnProperty(this.name);
     },
@@ -312,10 +326,11 @@ foam.CLASS({
 });
 
 
-/** Tracks dependencies for a dynamic function and invalidates is they change. */
+/** An immutable constant valued Slot. */
 foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',
+
   implements: [ 'foam.core.Slot' ],
 
   properties: [
@@ -333,9 +348,7 @@ foam.CLASS({
 
     function set() { /* nop */ },
 
-    function sub(l) { /* nop */ },
-
-    function unsub(l) { /* nop */ }
+    function sub(l) { /* nop */ }
   ]
 });
 
@@ -344,28 +357,29 @@ foam.CLASS({
   Tracks dependencies for a dynamic function and invalidates if they change.
 
 <pre>
-foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
-var p = Person.create({fname: 'John', lname: 'Smith'});
-var e = foam.core.ExpressionSlot.create({
-  args: [ p.fname$, p.lname$ ],
-  code: function(f, l) { return f + ' ' + l; }
-});
-log(e.get());
-e.sub(log);
-p.fname = 'Steve';
-p.lname = 'Jones';
-log(e.get());
-Output:
- > John Smith
- > [object Object] propertyChange value [object Object]
- > [object Object] propertyChange value [object Object]
- > Steve Jones
+  foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
+  var p = Person.create({fname: 'John', lname: 'Smith'});
+  var e = foam.core.ExpressionSlot.create({
+    args: [ p.fname$, p.lname$ ],
+    code: function(f, l) { return f + ' ' + l; }
+  });
+  log(e.get());
+  e.sub(log);
+  p.fname = 'Steve';
+  p.lname = 'Jones';
+  log(e.get());
 
-var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
-var e = foam.core.ExpressionSlot.create({
-  obj: p,
-  code: function(f, l) { return f + ' ' + l; }
-});
+  Output:
+   > John Smith
+   > [object Object] propertyChange value [object Object]
+   > [object Object] propertyChange value [object Object]
+   > Steve Jones
+
+  var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
+  var e = foam.core.ExpressionSlot.create({
+    obj: p,
+    code: function(f, l) { return f + ' ' + l; }
+  });
 </pre>
 */
 foam.CLASS({
@@ -386,7 +400,7 @@ foam.CLASS({
           args[i] = obj.slot(args[i]);
         }
 
-        this.invalidate();
+        // this.invalidate(); // ???: Is this needed?
         this.subToArgs_(args);
 
         return args;
@@ -414,12 +428,6 @@ foam.CLASS({
     function set() { /* nop */ },
 
     function sub(l) {
-      return arguments.length === 1 ?
-        this.SUPER('propertyChange', 'value', l) :
-        this.SUPER.apply(this,arguments);
-    },
-
-    function unsub(l) {
       return arguments.length === 1 ?
         this.SUPER('propertyChange', 'value', l) :
         this.SUPER.apply(this,arguments);

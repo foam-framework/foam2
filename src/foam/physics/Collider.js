@@ -66,13 +66,16 @@ foam.CLASS({
     },
 
     function detectCollisions__(start, end) {
-      /* Simple O(n^2) algorithm, used by more complex algorithm once data is partitioned. */
+      /*
+        Simple O(n^2) algorithm, used by more complex algorithm
+        once data is partitioned.
+      */
       var cs = this.children;
       for ( var i = start ; i <= end ; i++ ) {
         var c1 = cs[i];
         for ( var j = i+1 ; j <= end ; j++ ) {
           var c2 = cs[j];
-          if ( c1.intersects(c2) ) this.collide(c1, c2);
+          if ( c1.intersects && c1.intersects(c2) ) this.collide(c1, c2);
         }
       }
     },
@@ -83,6 +86,7 @@ foam.CLASS({
       return p;
     },
 
+    // TODO: Add support for rectangular objects
     function detectCollisions_(start, end, axis, oneD) {
       if ( start >= end ) return;
 
@@ -133,6 +137,8 @@ foam.CLASS({
     },
 
     function collide(c1, c2) {
+      if ( ! c1.mass || ! c2.mass ) return;
+
       var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);
       var m1 =  c1.momentumAtAngle(a);
       var m2 = -c2.momentumAtAngle(a);

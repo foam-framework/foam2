@@ -30,7 +30,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Constant',
 
-  // documentation: 'Constant Axiom',
+  documentation: 'Constant Axiom',
 
   properties: [ 'name', 'value' ],
 
@@ -49,6 +49,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',

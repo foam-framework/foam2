@@ -354,8 +354,38 @@ foam.CLASS({
   ]
 });
 
-
-
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'AnonymousSink',
+  implements: [ 'foam.dao.Sink' ],
+  properties: [
+    {
+      name: 'sink'
+    }
+  ],
+  methods: [
+    function put(obj, fc) {
+      var s = this.sink;
+      s && s.put && s.put(obj, fc);
+    },
+    function remove(obj, fc) {
+      var s = this.sink;
+      s && s.remove && s.remove(obj, fc);
+    },
+    function eof() {
+      var s = this.sink;
+      s && s.eof && s.eof();
+    },
+    function error() {
+      var s = this.sink;
+      s && s.error && s.error();
+    },
+    function reset() {
+      var s = this.sink;
+      s && s.reset && s.reset();
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -528,7 +558,11 @@ foam.CLASS({
     {
       name: 'eof',
       code: function eof() {
-        this.array.sort(this.comparator.compare || this.comparator);
+        var comparator = this.comparator;
+        this.array.sort(function(o1, o2) {
+          return comparator.compare(o1, o2);
+        });
+
         for ( var i = 0 ; i < this.array.length ; i++ ) {
           this.delegate.put(this.array[i]);
         }
@@ -628,7 +662,7 @@ foam.CLASS({
         Set to the name or class instance of the type of object the DAO
         will store.
       */
-      class: 'Class2',
+      class: 'Class',
       name: 'of'
     }
   ],
@@ -1057,7 +1091,7 @@ foam.CLASS({
   methods: [
     function put(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(obj.id, this.array[i].id) ) {
+        if ( obj.ID.compare(obj, this.array[i]) === 0 ) {
           this.array[i] = obj;
           break;
         }

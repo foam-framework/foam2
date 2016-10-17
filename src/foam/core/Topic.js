@@ -37,7 +37,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Topic',
 
-  // documentation: 'Topic Axiom',
+  documentation: 'Topic Axiom',
 
   properties: [
     'name',
@@ -56,7 +56,6 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-
       var name      = this.name;
       var topic     = this;
       var makeTopic = this.makeTopic;
@@ -81,7 +80,6 @@ foam.CLASS({
       var ret = {
         pub:   foam.Function.bind(parent.pub,   parent, name),
         sub:   foam.Function.bind(parent.sub,   parent, name),
-        unsub: foam.Function.bind(parent.unsub, parent, name),
         hasListeners: foam.Function.bind(parent.hasListeners, parent, name),
         toString: function() { return 'Topic(' + name + ')'; }
       };
@@ -94,6 +92,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -110,6 +109,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.FObject',

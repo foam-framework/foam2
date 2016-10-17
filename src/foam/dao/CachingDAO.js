@@ -40,18 +40,8 @@ foam.CLASS({
       /** The source DAO on which to add caching. Writes go straight
         to the src, and cache is updated to match.
       */
-      name: 'src',
-      postSet: function(old, src) {
-        // FUTURE: clean up this listener swap, forward methods directly
-        if ( old ) {
-          old.on.put.unsub(this.onSrcPut);
-          old.on.remove.unsub(this.onSrcRemove);
-          old.on.reset.unsub(this.onSrcReset);
-        }
-        src.on.put.sub(this.onSrcPut);
-        src.on.remove.sub(this.onSrcRemove);
-        src.on.reset.sub(this.onSrcReset);
-      }
+      class: 'foam.dao.DAOProperty',
+      name: 'src'
     },
     {
       /** The cache to read items quickly. Cache contains a complete
@@ -91,6 +81,15 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.SUPER();
+
+      var proxy = this.src$proxy;
+      proxy.sub('on', 'put',    this.onSrcPut);
+      proxy.sub('on', 'remove', this.onSrcRemove);
+      proxy.sub('on', 'reset',  this.onSrcReset);
+    },
+
     /** Puts are sent to the cache and to the source, ensuring both
       are up to date. */
     function put(o) {

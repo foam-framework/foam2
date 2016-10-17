@@ -19,8 +19,16 @@ foam.CLASS({
   package: 'com.chrome.origintrials.ui',
   name: 'Browser',
   extends: 'foam.u2.Element',
+  requires: [
+    'foam.u2.TableView',
+    'foam.u2.search.FilterController',
+    'com.chrome.origintrials.model.Application'
+  ],
   imports: [
     'stack'
+  ],
+  exports: [
+    'data'
   ],
   properties: [
     {
@@ -29,19 +37,20 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.setNodeName('table').
-        select(this.data, function(r) {
-          var e = this.E('tr').
-            start('td').add(r.applicantName).end().
-            start('td').add(r.applicantEmail).end().
-            start('td').add(r.origin).end().
-            start('td').add(r.requestedFeature).end().
-            start('td').start(r.APPROVE, { data: r }).end().end().
-            on('click', function() {
-              this.stack.push({ class: 'foam.u2.DetailView', data: r.clone() });
-            }.bind(this));
-          return e;
-        });
+      this.start(this.APPLY, { data: this }).end()
+          .start(this.FilterController, {
+            searchFields: [ 'origin', 'applicantEmail', 'approved' ],
+            data: this.data
+          })
+          .end();
+    }
+  ],
+  actions: [
+    {
+      name: 'apply',
+      code: function() {
+        this.stack.push({ class: 'com.chrome.origintrials.ui.Apply' });
+      }
     }
   ]
 });
@@ -54,7 +63,6 @@ foam.CLASS({
     'com.chrome.origintrials.model.Application',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
-    'foam.u2.search.FilterController',
     'com.chrome.origintrials.ui.Browser'
   ],
   exports: [
@@ -71,10 +79,13 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.setNodeName('div').
-        start(this.StackView, { data: this.stack }).end();
+      this.setNodeName('div')
+          .start(this.StackView, { data: this.stack }).end();
 
-      this.stack.push({ class: 'com.chrome.origintrials.ui.Browser', data$: this.data$ });
+      this.stack.push({
+        class: 'com.chrome.origintrials.ui.Browser',
+        data$: this.data$
+      });
     }
   ]
 });

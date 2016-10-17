@@ -26,23 +26,6 @@ public class MapDAO extends AbstractDAO {
     data_ = data;
   }
 
-  private ClassInfo of_ = null;
-  private PropertyInfo primaryKey_ = null;
-
-  public ClassInfo getOf() {
-    return of_;
-  }
-
-  public MapDAO setOf(ClassInfo of) {
-    of_ = of;
-    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
-    return this;
-  }
-  public PropertyInfo getPrimaryKey() {
-    return primaryKey_;
-  }
-
-
   public FObject put(FObject obj) {
     getData().put(getPrimaryKey().get(obj), obj);
     return obj;

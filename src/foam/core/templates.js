@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateOutput',
 
+  documentation:
+      'An object which can be output() to to create a concatenated string.',
+
   properties: [
     {
       name: 'buf',
@@ -55,7 +58,6 @@ foam.CLASS({
   axioms: [foam.pattern.Singleton.create()],
 
   requires: [
-    'foam.parse.StringPS',
     'foam.parse.ImperativeGrammar as Grammar'
   ],
 
@@ -89,7 +91,6 @@ foam.CLASS({
 
               'comment': seq1(1, '<!--', repeat0(not('-->', anyChar())), '-->'),
 
-
               'simple value': seq('%%', repeat(notChars(' ()-"\r\n><:;,')), optional('()')),
 
               'raw values tag': simpleAlt(
@@ -121,25 +122,25 @@ foam.CLASS({
           },
           'simple value': function(v) {
             self.push("',\n self.",
-                      v[1].join(''),
-                      v[2],
-                      ",\n'");
+                v[1].join(''),
+                v[2],
+                ",\n'");
           },
           'raw values tag': function (v) {
             self.push("',\n",
-                      v[1].join(''),
-                      ",\n'");
+                v[1].join(''),
+                ",\n'");
           },
           'code tag': function (v) {
             self.push("');\n",
-                      v[1].join(''),
-                      ";out('");
+                v[1].join(''),
+                ";out('");
           },
           'single quote': function() {
-            self.pushSimple("\\'");
+            self.push("\\'");
           },
           newline: function() {
-            self.pushSimple('\\n');
+            self.push('\\n');
           },
           text: function(v) {
             self.pushSimple(v);
@@ -155,12 +156,6 @@ foam.CLASS({
     {
       name: 'simple',
       value: true
-    },
-    {
-      name: 'ps',
-      factory: function() {
-        return this.StringPS.create();
-      }
     }
   ],
 
@@ -224,7 +219,8 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       proto[this.name] =
-        foam.templates.TemplateUtil.create().lazyCompile(this.template, this.name, this.args || []);
+          foam.templates.TemplateUtil.create().lazyCompile(
+              this.template, this.name, this.args || []);
     }
   ]
 });

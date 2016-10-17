@@ -67,13 +67,10 @@ foam.CLASS({
       /**
         The shared server DAO to synchronize through.
       */
+      class: 'foam.dao.DAOProperty',
       name: 'remoteDAO',
       transient: true,
-      required: true,
-      postSet: function(old, nu) {
-        if ( old ) old.on.unsub(this.onRemoteUpdate);
-        if ( nu ) nu.on.sub(this.onRemoteUpdate);
-      }
+      required: true
     },
     {
       /** The local cache to sync with the server DAO. */
@@ -128,7 +125,12 @@ foam.CLASS({
   methods: [
     /** @private */
     function init() {
+      this.SUPER();
+
+      this.remoteDAO$proxy.sub('on', this.onRemoteUpdate);
+
       this.delegate.on.sub(this.onLocalUpdate);
+
       if ( this.polling ) {
         this.setInterval(function() {
           this.sync();

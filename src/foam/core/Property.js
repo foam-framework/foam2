@@ -41,22 +41,6 @@ foam.CLASS({
   name: 'Property',
   extends: 'FObject',
 
-  constants: {
-    /**
-      Map of Property property names to arrays of property names
-      that they shadow.
-
-      Ex. When 'setter' is set, it takes precedence over 'adapt',
-      'preSet', and 'postSet', so their values are shadowed.
-    */
-    SHADOW_MAP: {
-      setter:     [ 'adapt', 'preSet', 'postSet' ],
-      getter:     [ 'factory', 'expression', 'value' ],
-      factory:    [ 'expression', 'value' ],
-      expression: [ 'value' ]
-    }
-  },
-
   properties: [
     {
       name: 'name',
@@ -68,6 +52,7 @@ foam.CLASS({
       expression: function(name) { return foam.String.labelize(name); }
     },
 
+    /* Developer-level documentation. */
     'documentation',
 
     /* User-level help. Could/should appear in GUI's as online help. */
@@ -185,7 +170,7 @@ foam.CLASS({
     ],
 
     {
-      // Makes Properties useful as map functions.
+      /** Makes Properties useful as map functions. */
       name: 'f',
       factory: function() {
         var name = this.name;
@@ -194,7 +179,7 @@ foam.CLASS({
     },
 
     {
-      // Makes Properties useful as comparators.
+      /** Makes Properties useful as comparators. */
       name: 'compare',
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
@@ -352,14 +337,18 @@ foam.CLASS({
           if ( v !== undefined ) return v;
           // Indicate the Factory In Progress state
           if ( fip > 10 && this.getPrivate_(FIP) ) {
-            console.warn('reentrant factory', name);
+            console.warn('reentrant factory for property:', name);
             return undefined;
           }
 
           var oldFip = fip;
           fip++;
           if ( oldFip === 10 ) this.setPrivate_(FIP, true);
-          this[name] = factory.call(this, prop);
+          var v = factory.call(this, prop);
+          // Convert undefined to null because undefined means that the
+          // value hasn't been set but it has. Setting it to undefined
+          // would prevent propertyChange events if the value were cleared.
+          this[name] = v === undefined ? null : v;
           if ( oldFip === 10 ) this.clearPrivate_(FIP);
           fip--;
 
@@ -376,10 +365,8 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
-      // TODO: experiment to see if a simpler setter for Properties which
-      // don't use any of the options is faster.
       var setter = prop.setter ? prop.setter :
-        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ? 
+        ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ?
         function simplePropSetter(newValue) {
           if ( newValue === undefined ) {
             this.clearProperty(name);
@@ -428,7 +415,7 @@ foam.CLASS({
                   undefined ) :
             this[name] ;
 
-          if ( adapt )  newValue = adapt.call(this, oldValue, newValue, prop);
+          if ( adapt ) newValue = adapt.call(this, oldValue, newValue, prop);
 
           if ( assertValue ) assertValue.call(this, newValue, prop);
 
@@ -464,7 +451,7 @@ foam.CLASS({
       });
     },
 
-    /* Validate an object which has this Property. */
+    /** Validate an object which has this Property. */
     function validateInstance(o) {
       if ( this.required && ! o[this.name] ) {
         throw 'Required property ' +
@@ -549,11 +536,12 @@ foam.CLASS({
     },
 
     function exportAs(obj) {
-      /** Export obj.name$ instead of just obj.name. **/
+      /** Export obj.name$ instead of just obj.name. */
       return this.toSlot(obj);
     },
 
     function toSlot(obj) {
+      /** Create a Slot for this Property. */
       var slotName = this.slotName_ || ( this.slotName_ = this.name + '$' );
       var slot     = obj.getPrivate_(slotName);
 

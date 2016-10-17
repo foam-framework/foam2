@@ -55,8 +55,8 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onDataLoad() {
-      this.data$.unsub(this.onDataLoad);
+    function onDataLoad(s) {
+      s.destroy();
       this.initReadView();
     },
 

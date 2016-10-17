@@ -2,14 +2,25 @@
 <html>
   <head>
     <script src="../../../../../foam.js"></script>
+    <script src="../../../../../foam/audio/Beep.js"></script>
     <script src="Tabata.js"></script>
     <script src="TabataCView.js"></script>
+    <script src="TabataSoundView.js"></script>
   </head>
   <body>
     <script>
       var d = Tabata.create();
       foam.u2.DetailView.create({ data: d, showActions: true }).write();
+//      TabataBarCView.create({ data: d }).write();
       TabataCView.create({ data: d }).write();
+      TabataSoundView.create({ data: d });
+/*
+      foam.u2.DetailView.create({ data: Beep.create(), showActions: true }).write();
+      
+      var d2 = Tabata.create({rounds: 16});
+      foam.u2.DetailView.create({ data: d2, showActions: true }).write();
+      TabataCView.create({ data: d2 }).write();
+*/
     </script>
   </body>
 </html>

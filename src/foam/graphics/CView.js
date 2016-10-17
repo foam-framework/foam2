@@ -454,21 +454,29 @@ foam.CLASS({
       postSet: function(o, n) {
         for ( var i = 0 ; o && i < o.length ; i++ ) this.removeChild_(o[i]);
         for ( var i = 0 ; n && i < n.length ; i++ ) this.addChild_(n[i]);
-      }
+      },
+      hidden: true
     },
     {
       name: 'state',
       value: 'initial'
     },
     {
-      name: 'parent'
+      name: 'parent',
+      hidden: 'true'
+    },
+    {
+      name: 'canvas',
+      hidden: 'true'
     },
     {
       name: 'transform_',
+      hidden: 'true',
       factory: function() { return this.Transform.create(); }
     },
     {
       name: 'transform',
+      hidden: 'true',
       getter: function getTransform() {
         var t = this.transform_.reset();
 
@@ -488,10 +496,12 @@ foam.CLASS({
       // an associated Canvas (by calling toE()).
       class: 'Boolean',
       name: 'autoRepaint',
+      hidden: true,
       value: true
     },
     {
       name: 'invalidate_',
+      hidden: true,
       factory: function() {
         return this.parent ? this.parent.invalidate_ :
           this.autoRepaint ? this.invalidated.pub   :
@@ -619,11 +629,13 @@ foam.CLASS({
 
     function addChild_(c) {
       c.parent = this;
+      c.canvas = this.canvas;
       return c;
     },
 
     function removeChild_(c) {
       c.parent = undefined;
+      c.canvas = undefined;
       this.invalidate();
       return c;
     },
@@ -652,6 +664,21 @@ foam.CLASS({
         width: this.x + (this.width  || (this.radius + this.arcWidth) * 2),
         height: this.y + (this.height || (this.radius + this.arcWidth) * 2)
       });
+    },
+
+    function intersects(c) {
+      if ( c.radius ) {
+        return ! (
+            this.x + this.width  < c.x - c.radius ||
+            this.y + this.height < c.y - c.radius ||
+            c.x    + c.radius    < this.x ||
+            c.y    + c.radius    < this.y );
+      }
+      return ! (
+          this.x + this.width  < c.x ||
+          this.y + this.height < c.y ||
+          c.x    + c.width  < this.x ||
+          c.y    + c.height < this.y );
     }
   ]
 });
@@ -720,12 +747,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'width',
-      class: 'Float'
+      class: 'Float',
+      name: 'width'
     },
     {
-      name: 'height',
-      class: 'Float'
+      class: 'Float',
+      name: 'height'
     },
     {
       name: 'border',
@@ -811,6 +838,7 @@ foam.CLASS({
     },
 
     function intersects(c) {
+      if ( ! c.radius ) return c.intersects(this);
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
       if ( c.border    ) r += c.arcWidth/2-1;
@@ -875,10 +903,6 @@ foam.CLASS({
 
   imports: [ 'getElementById' ],
 
-  exports: [
-    'pointer'
-  ],
-
   properties: [
     [ 'nodeName', 'CANVAS' ],
     {
@@ -896,8 +920,7 @@ foam.CLASS({
     {
       name: 'cview',
       postSet: function(o, n) {
-        o && o.invalidated.unsub(this.paint);
-        n && n.invalidated.sub(this.paint);
+        n.canvas = this;
 
         if ( this.attributeMap.width === undefined || this.attributeMap.height === undefined ) {
           this.setAttribute('width', n.width);
@@ -918,6 +941,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.on('load', this.paint);
+      this.cview$.valueSub('invalidated', this.paint);
     },
     function erase() {
       this.el().width = this.el().width;

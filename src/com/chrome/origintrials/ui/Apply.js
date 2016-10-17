@@ -20,40 +20,59 @@ foam.CLASS({
   name: 'Apply',
   extends: 'foam.u2.Element',
   requires: [
+    'foam.u2.DetailView',
     'com.chrome.origintrials.model.Application'
   ],
   imports: [
-    'applicationDAO'
+    'applicationDAO',
+    'stack'
   ],
+  exports: ['as data'],
   properties: [
     {
       name: 'data',
-      view: { class: 'foam.u2.DetailView' }
-    },
-    {
-      class: 'String',
-      name: 'status'
+      factory: function() {
+        return this.Application.create();
+      }
     }
   ],
   methods: [
     function initE() {
-      this.nodeName = 'div';
-      this.start(this.DATA, { data: this.data }).end().
-        add(this.status$).tag('br').
-        start(this.SUBMIT, { data: this })
+      this.setNodeName('div').
+        start(this.DetailView, {
+          data: this.data,
+          config: {
+            applicantName: { label: 'How should we address you?' },
+            public: {
+              label:  'I agree that this origin may be published as part of ' +
+                  'a list of origins using this experimental feature.'
+            },
+            agreedToTerms: {
+              label:  'I accept the Google Chrome Terms of Service'
+            }
+          },
+          properties: [
+            this.data.APPLICANT_NAME,
+            this.data.APPLICANT_EMAIL,
+            this.data.ORIGIN,
+            this.data.PUBLIC,
+            this.data.REQUESTED_FEATURE,
+            this.data.AGREED_TO_TERMS,
+            this.data.COMMENTS
+          ]
+        }).end().
+        add(this.SUBMIT);
     }
   ],
   actions: [
     {
       name: 'submit',
       code: function() {
-        this.status = 'Submitting...';
-
         var self = this;
         this.applicationDAO.put(this.data).then(function() {
-          self.status = 'Submitted';
+          self.stack.back();
         }, function() {
-          self.status = 'Error submitting, please try again.';
+          // TODO: Better error handling.
         });
       }
     }
