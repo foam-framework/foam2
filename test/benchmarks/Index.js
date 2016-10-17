@@ -42,7 +42,7 @@ describe("Index benchmarks", function() {
     Math.random = oldRandom;
   });
 
-  it("Multi-level index", function(done) {
+  xit("Multi-level index", function(done) {
 
     function atime(name, fn) {
       var startTime;

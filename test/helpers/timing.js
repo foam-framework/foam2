@@ -24,10 +24,10 @@ if ( ! typeof performance !== 'undefined' ) performance = {
 foam.CLASS({
   package: 'test',
   name: 'TestRun',
-  
+
   properties: [
-    { 
-      name: 'name' 
+    {
+      name: 'name'
     },
     {
       name: 'time',
@@ -39,9 +39,37 @@ foam.CLASS({
         }
       }
     },
-    { 
-      name: 'length' 
+    {
+      name: 'length'
     },
+    {
+      name: 'result'
+    },
+  ]
+});
+
+foam.LIB({
+  name: 'foam.testing',
+
+  methods: [
+    function test(name, fn) {
+      var startTime = performance.now();
+
+      var result = fn();
+
+      var endTime = performance.now();
+      var testName = name.replace(/[\,\;\:]/g, '-').replace(/\"/g, '\'');
+
+      console.log("\"" + testName + "\": { name: \"" + testName + "\", time:",
+          endTime - startTime,
+          ( result ? ", result: " + result : ""),
+          "},");
+      return global.test.TestRun.create({
+        name: testName,
+        time: endTime - startTime,
+        result: result
+      });
+    }
   ]
 });
 
@@ -57,11 +85,11 @@ foam.LIB({
       var fn2 = function(arg) {
         var testName = name.replace(/[\,\;\:]/g, '-').replace(/\"/g, '\'');
         var endTime = performance.now();
-        console.log("\"" + testName + "\": { name: \"" + testName + "\", time:", 
-            endTime - startTime, 
-            (( arg && arg.a ) ? ", length: " + arg.a.length : ""), 
+        console.log("\"" + testName + "\": { name: \"" + testName + "\", time:",
+            endTime - startTime,
+            (( arg && arg.a ) ? ", length: " + arg.a.length : ""),
             "},");
-        return test.TestRun.create({ 
+        return test.TestRun.create({
           name: testName,
           time: endTime - startTime,
           length: ( arg && arg.a ) ? arg.a.length : undefined
