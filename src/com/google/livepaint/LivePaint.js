@@ -17,6 +17,29 @@
 
 foam.CLASS({
   package: 'com.google.livepaint',
+  name: 'Property',
+  ids: [ 'name' ],
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    [ 'value',  0 ]
+  ],
+  actions: [
+    {
+      name: 'deleteRow',
+      label: 'X',
+      code: function deleteRow() {
+        debugger;
+      
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.livepaint',
   name: 'Text',
   extends: 'foam.graphics.Label',
   implements: [ 'foam.physics.Physical' ],
@@ -74,9 +97,12 @@ foam.CLASS({
   implements: [ 'foam.memento.MementoMgr' ],
 
   requires: [
+    'com.google.livepaint.Property',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
+    'foam.graphics.CView',
     'foam.graphics.Circle',
+    'foam.physics.Physical',
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
     'foam.u2.TableView'
@@ -90,7 +116,6 @@ foam.CLASS({
   },
 
   axioms: [
-    // TODO: remove '-' after ActionView when CSS naming fixed
     foam.u2.CSS.create({
       code: function() {/*
       ^ { display: flex; }
@@ -98,31 +123,9 @@ foam.CLASS({
       .foam-u2-TableView-selected { background: lightgray; }
       ^ canvas { border: 1px solid black; }
       ^ .foam-u2-ActionView { margin: 10px; }
+      ^properties .foam-u2-ActionView { background: white; padding: 0; }
       */}
     })
-  ],
-
-  classes: [
-    {
-      name: 'DiameterDialog',
-      extends: 'foam.u2.View',
-
-      requires: [
-        'foam.graphics.Circle',
-        'foam.u2.RangeView'
-      ],
-
-      methods: [
-        function initE() {
-          this.nodeName = 'span';
-          this.
-              cssClass(this.myCls()).
-              add('Adjust the diameter of the circle at (', this.data.x$, ', ', this.data.y$, ').').
-              tag('br').
-              add(this.RangeView.create({data$: this.data.radius$, maxValue: 200, onKey: true}));
-        }
-      ]
-    }
   ],
 
   properties: [
@@ -161,7 +164,25 @@ foam.CLASS({
       }
     },
     {
-      name: 'children2'
+      name: 'properties',
+      view: {
+        class: 'foam.u2.TableView',
+        columns: [
+          com.google.livepaint.Property.NAME,
+          com.google.livepaint.Property.DELETE_ROW
+        ]
+      },
+      factory: function() {
+        var dao = foam.dao.EasyDAO.create({
+          of: 'com.google.livepaint.Property',
+          guid: true,
+          seqProperty: this.Property.NAME,
+//          daoType: 'MDAO'
+          daoType: 'ARRAY'
+        });
+        dao.put(this.Property.create({name: 'physics', value: this.physics}));
+        return dao;
+      }
     },
     {
       name: 'canvas',
@@ -174,7 +195,7 @@ foam.CLASS({
   methods: [
 
     function initE() {
-      this.canvas.invalidated.sub(this.onChildrenUpdate);
+      this.properties.on.put.sub(this.onPropertyPut);
 
       this.memento$.sub(function() {
         var m = this.memento;
@@ -201,22 +222,24 @@ foam.CLASS({
               on('contextmenu', this.onRightClick).
             end().
           end().
-          add(this.SELECTED, this.slot(function (children2) {
-            var children = children2;
-            if ( ! children ) return;
-            console.log('*************8', children, children.length);
-            var e = this.E('div');
-            for ( var i = 0 ; i < children.length ; i++ ) {
-              var child = children[i];
-              console.log('***', i, child.name);
-              e.start('div').add(child.name).end();
-            }
-            return e;
-          }));
+        add(this.SELECTED).
+        start('div').
+          cssClass(this.myCls('properties')).
+          add(this.PROPERTIES).
+        end();
 
       this.physics.start();
     },
 
+    function addProperty(value, opt_name) {
+      console.log('addProperty: ', value.cls_.id);
+      this.properties.put(this.Property.create({
+        name: opt_name,
+        value: value
+      }));
+    },
+
+    /*
     function addCircle(x, y, opt_r) {
       var c = this.Circle.create({
         x: x,
@@ -229,6 +252,7 @@ foam.CLASS({
 
       return c;
     },
+    */
 
     function updateMemento() {
       this.feedback_ = true;
@@ -239,13 +263,25 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
+  actions: [
     {
-      name: 'onChildrenUpdate',
-      isFramed: true,
-      code: function () {
-        console.log('update children');
-        this.children2 = Array.from(this.canvas.children);
+      name: 'deleteProperty',
+      label: 'X',
+      code: function() {
+        debugger;
+      }
+    }
+  ],
+
+  listeners: [
+    function onPropertyPut(_, _, _, p) {
+      var o = p.value;
+      if ( this.CView.isInstance(o) ) {
+        this.canvas.addChildren(o);
+
+        if ( this.Physical.isInstance(o) ) {
+          this.physics.add(o);
+        }
       }
     },
 
@@ -260,8 +296,7 @@ foam.CLASS({
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y});
-        this.canvas.addChildren(o);
-        this.physics.add(o);
+        this.addProperty(o);
         this.selected = o;
         this.updateMemento();
       }
@@ -271,19 +306,6 @@ foam.CLASS({
       evt.preventDefault();
 
       if ( ! this.selected ) return;
-
-      var p = this.PopupView.create({
-        width: 450,
-        height: 110
-      }).add(this.DiameterDialog.create({data: this.selected}));
-
-      this.add(p);
-
-      // If the size is changed with the dialog, then create an updated memento
-      var oldRadius = this.selected.radius;
-      p.onunload.sub(function() {
-        if ( this.selected.radius !== oldRadius ) this.updateMemento();
-      }.bind(this));
     }
   ]
 });
