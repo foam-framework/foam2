@@ -1091,7 +1091,8 @@ foam.CLASS({
   methods: [
     function put(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( foam.util.equals(obj.id, this.array[i].id) ) {
+        if ( obj.ID.compare(obj, this.array[i]) === 0 ) {
+          debugger;
           this.array[i] = obj;
           break;
         }
