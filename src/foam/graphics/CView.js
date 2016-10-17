@@ -640,12 +640,18 @@ foam.CLASS({
       return c;
     },
 
-    function addChildren() {
+    function add() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
         this.addChild_(arguments[i]);
       }
       this.invalidate();
+      return this;
+    },
+
+    function addChildren() {
+      console.warn('Deprecated use of CView.addChildren(). Use add() instead.');
+      return this.add.apply(this, arguments);
     },
 
     function paintSelf(x) {},
