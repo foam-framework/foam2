@@ -20,7 +20,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 2400000;
 
 
 
-describe("Index benchmarks", function() {
+xdescribe("Index benchmarks", function() {
   var DEBUG = false;
   var oldRandom;
   var rseed;
