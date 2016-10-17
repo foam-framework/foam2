@@ -1239,7 +1239,10 @@ foam.CLASS({
         for ( var key in es ) {
           removeRow(null, null, null, {id: key});
         }
-        dao.select({ put: function(o) { addRow(null, null, null, o); } });
+        dao.select({
+          put: function(o) { addRow(null, null, null, o); },
+          eof: function() {}
+        });
       };
       var addRow = function(_, _, _, o) {
         if ( update ) {
@@ -1256,7 +1259,6 @@ foam.CLASS({
               dao.put(o.clone());
             });
           });
-
         }
         self.endContext();
 
