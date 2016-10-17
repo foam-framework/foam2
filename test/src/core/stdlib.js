@@ -359,3 +359,27 @@ describe('String.daoize', function() {
     expect(foam.String.daoize('FooBar')).toBe('fooBarDAO');
   });
 });
+
+describe('foam.Undefined', function() {
+  it('isInstance', function() {
+    expect(foam.Undefined.isInstance(undefined)).toBe(true);
+    expect(foam.Undefined.isInstance(null)).toBe(false);
+  });
+  it('clone', function() {
+    expect(foam.Undefined.clone(undefined)).toBe(undefined);
+  });
+  it('equals', function() {
+    expect(foam.Undefined.equals("unused", undefined)).toBe(true);
+    expect(foam.Undefined.equals("unused", "bad")).toBe(false);
+  });
+  it('compare', function() {
+    expect(foam.Undefined.compare("unused", undefined)).toBe(0);
+    expect(foam.Undefined.compare("unused", "defined!")).toBe(1);
+  });
+  it('hashCode', function() {
+    expect(foam.Undefined.hashCode(undefined)).toBe(-1);
+    expect(foam.Undefined.hashCode()).toBe(-1);
+  });
+});
+
+
