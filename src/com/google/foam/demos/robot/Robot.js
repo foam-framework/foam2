@@ -39,8 +39,7 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
-      this.x = this.y = 100;
-      this.width = this.height = 800;
+      this.x = this.y = 50;
 
       var body = this.Rectangle.create({
         width: 20,
