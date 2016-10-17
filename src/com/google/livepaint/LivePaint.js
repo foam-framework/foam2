@@ -277,7 +277,7 @@ foam.CLASS({
     function onPropertyPut(_, _, _, p) {
       var o = p.value;
       if ( this.CView.isInstance(o) ) {
-        this.canvas.addChildren(o);
+        this.canvas.add(o);
 
         if ( this.Physical.isInstance(o) ) {
           this.physics.add(o);
