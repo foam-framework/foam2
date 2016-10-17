@@ -302,11 +302,16 @@ describe('Date', function() {
     var baseDate = new Date(99999 - 60000*60*24*(365+9) - 60000*61*2 - 1000);
     var d =        new Date(99999);
 
+    // account for timezone of the host running this test
+    var dateStrWithYear = d.toDateString().substring(4);
+    var dateStrNoYear = d.toDateString()
+      .replace(' ' + (1900 + d.getYear()), '').substring(4);
+
     jasmine.clock().mockDate(baseDate);
     // future cases
-    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
     jasmine.clock().tick(60000*60*24*365);
-    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31');
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrNoYear);
     jasmine.clock().tick(60000*60*24*7);
     expect(foam.Date.relativeDateString(d)).toEqual('in 2 days');
     jasmine.clock().tick(60000*60*24);
@@ -340,9 +345,9 @@ describe('Date', function() {
     jasmine.clock().tick(60000*60*24);
     expect(foam.Date.relativeDateString(d)).toEqual('2 days ago');
     jasmine.clock().tick(60000*60*24*7);
-    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31');
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrNoYear);
     jasmine.clock().tick(60000*60*24*365);
-    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
 
 
   });
