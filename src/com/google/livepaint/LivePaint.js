@@ -123,7 +123,7 @@ foam.CLASS({
       .foam-u2-TableView-selected { background: lightgray; }
       ^ canvas { border: 1px solid black; }
       ^ .foam-u2-ActionView { margin: 10px; }
-      ^properties .foam-u2-ActionView { background: white; padding: 0; }
+      ^properties .foam-u2-ActionView { background: white; padding: 0; margin: 2px; border: none; }
       */}
     })
   ],
