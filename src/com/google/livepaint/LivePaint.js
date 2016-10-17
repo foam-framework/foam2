@@ -222,11 +222,11 @@ foam.CLASS({
               on('contextmenu', this.onRightClick).
             end().
           end().
-        add(this.SELECTED).
-        start('div').
-          cssClass(this.myCls('properties')).
-          add(this.PROPERTIES).
-        end();
+          start('div').
+            cssClass(this.myCls('properties')).
+            add(this.PROPERTIES).
+          end().
+          add(this.SELECTED);
 
       this.physics.start();
     },
