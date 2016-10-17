@@ -466,35 +466,36 @@ foam.LIB({
     },
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
-      // FUTURE: make this translatable for i18n
-      var seconds = Math.floor( ( Date.now() - date.getTime() ) / 1000 );
+      // FUTURE: make this translatable for i18n, including plurals
+      //   "hours" vs. "hour"
+      var seconds = Math.trunc( ( Date.now() - date.getTime() ) / 1000 );
 
-      if ( seconds < 60 ) return 'moments ago';
-      if ( seconds > 60 ) return 'in moments';
+      if ( seconds >= 0 && seconds < 60 ) return 'moments ago';
+      if ( seconds < 0  && seconds > -60 ) return 'in moments';
 
-      var minutes = Math.floor((seconds) / 60);
+      var minutes = Math.trunc((seconds) / 60);
 
       if ( minutes === 1 ) return '1 minute ago';
       if ( minutes === -1 ) return 'in 1 minute';
 
-      if ( minutes < 60 ) return minutes + ' minutes ago';
-      if ( minutes > 60 ) return 'in ' + minutes + ' minutes';
+      if ( minutes >= 0 && minutes < 60 ) return minutes + ' minutes ago';
+      if ( minutes < 0  && minutes > -60 ) return 'in ' + -minutes + ' minutes';
 
-      var hours = Math.floor(minutes / 60);
+      var hours = Math.trunc(minutes / 60);
       if ( hours === 1 ) return '1 hour ago';
       if ( hours === -1 ) return 'in 1 hour';
 
-      if ( hours < 24 ) return hours + ' hours ago';
-      if ( hours < -24 ) return 'in ' + hours + ' hours';
+      if ( hours >= 0 && hours < 24 ) return hours + ' hours ago';
+      if ( hours <  0 && hours > -24 ) return 'in ' + -hours + ' hours';
 
-      var days = Math.floor(hours / 24);
+      var days = Math.trunc(hours / 24);
       if ( days === 1 ) return '1 day ago';
       if ( days === -1 ) return 'in 1 day';
 
-      if ( days < 7 ) return days + ' days ago';
-      if ( days < -7 ) return 'in ' + days + ' days';
+      if ( days >= 0 && days < 7 ) return days + ' days ago';
+      if ( days <  0 && days > -7 ) return 'in ' + -days + ' days';
 
-      if ( days < 365 ) {
+      if ( days >= 0 && days < 365 || days < 0 && days > -365 ) {
         var year = 1900 + date.getYear();
         var noyear = date.toDateString().replace(' ' + year, '');
         return noyear.substring(4);

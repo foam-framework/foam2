@@ -2,6 +2,9 @@
   "preset": "google",
   "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~"],
   "requireSpaceAfterPrefixUnaryOperators": ["!"],
+  "requireCamelCaseOrUpperCaseIdentifiers": {
+    "allowedSuffixes": ["_", "_$"]
+  },
   "disallowSpacesInsideParentheses": null,
   "disallowSpacesInsideObjectBrackets": null,
   "requireSpacesInsideObjectBrackets": "all",
