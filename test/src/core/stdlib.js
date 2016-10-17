@@ -298,41 +298,54 @@ describe('Date', function() {
     expect(foam.util.compare(date, date)).toEqual(0);
   });
 
-  // TODO: fix time zone
-  // it('correctly generates relative strings', function() {
-  //   var baseDate = new Date(99999);
-  //   var d =        new Date(99999);
-  //
-  //   jasmine.clock().mockDate(baseDate);
-  //
-  //   expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
-  //   jasmine.clock().tick(1000);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
-  //
-  //   jasmine.clock().tick(60000);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('1 minute ago');
-  //
-  //   jasmine.clock().tick(60000);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('2 minutes ago');
-  //
-  //   jasmine.clock().tick(60000*60);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('1 hour ago');
-  //
-  //   jasmine.clock().tick(60000*60);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('2 hours ago');
-  //
-  //   jasmine.clock().tick(60000*60*24);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('1 day ago');
-  //
-  //   jasmine.clock().tick(60000*60*24);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('2 days ago');
-  //
-  //   jasmine.clock().tick(60000*60*24*7);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('Dec 31');
-  //
-  //   jasmine.clock().tick(60000*60*24*365);
-  //   expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
-  // });
+  it('correctly generates relative strings', function() {
+    var baseDate = new Date(99999 - 60000*60*24*(365+9) - 60000*61*2 - 1000);
+    var d =        new Date(99999);
+
+    jasmine.clock().mockDate(baseDate);
+    // future cases
+    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
+    jasmine.clock().tick(60000*60*24*365);
+    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31');
+    jasmine.clock().tick(60000*60*24*7);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 2 days');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 1 day');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 2 hours');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 1 hour');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 2 minutes');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 1 minute');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('in moments');
+
+    // past cases
+    jasmine.clock().tick(1000);
+    expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
+    jasmine.clock().tick(1000);
+    expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('1 minute ago');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('2 minutes ago');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('1 hour ago');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('2 hours ago');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('1 day ago');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('2 days ago');
+    jasmine.clock().tick(60000*60*24*7);
+    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31');
+    jasmine.clock().tick(60000*60*24*365);
+    expect(foam.Date.relativeDateString(d)).toEqual('Dec 31 1969');
+
+
+  });
 });
 
 describe('String.daoize', function() {
