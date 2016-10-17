@@ -3,10 +3,15 @@
   <head>
     <script src="../../../../../foam.js"></script>
     <script src="../../../../../foam/audio/Beep.js"></script>
+    <script src="../../../../../foam/audio/Speak.js"></script>
   </head>
   <body>
     <script>
       foam.u2.DetailView.create({ data: foam.audio.Beep.create(), showActions: true }).write();
+    </script>
+    <br><br>
+    <script>
+      foam.u2.DetailView.create({ data: foam.audio.Speak.create(), showActions: true }).write();
     </script>
   </body>
 </html>
