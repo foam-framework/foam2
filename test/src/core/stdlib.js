@@ -557,5 +557,43 @@ describe('foam.Function', function() {
 
   });
 
+  
+  it('withArgs', function() {
+    // normal case
+    var fn = function(a, /*string?*/b, c /*array*/) { 
+      return [ a + b + c ];
+    };
+    var src = { a: 'A', b: 'B', c: 'C' };
+    
+    expect(foam.Function.withArgs(fn, src)).toEqual(['ABC']);
+    
+    // missing args
+    var src2 = { a: 'A', c: 'C' };
+    
+    expect(foam.Function.withArgs(fn, src2)).toEqual(['AundefinedC']);
+
+    // opt_self
+    var fn2 = function(a) {
+      return this.value + a;
+    };
+    var self = { value: 77 };
+    expect(foam.Function.withArgs(fn2, src2, self)).toEqual('77A');
+    
+    // function args are bound
+    var selfFns = {
+      a: function() { return this.valA; },
+      b: function() { return this.valB; },
+      valA: 5,
+      valB: 100
+    };
+    var selfData = { // will not bind to these values
+      valA: 66,
+      valB: 999
+    };
+    var fnCallthru = function(a, b) {  return a() + b(); }
+    expect(foam.Function.withArgs(fnCallthru, selfFns, selfData))
+      .toEqual(105);
+
+  });
 
 });
