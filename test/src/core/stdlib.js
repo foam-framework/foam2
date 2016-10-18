@@ -596,4 +596,37 @@ describe('foam.Function', function() {
 
   });
 
+  describe('foam.Number', function() {
+    it('isInstance', function() {
+      expect(foam.Number.isInstance(2)).toBe(true);
+      expect(foam.Number.isInstance('2')).toBe(false);
+      expect(foam.Number.isInstance(Math.Infinity)).toBe(false);
+      expect(foam.Number.isInstance(null)).toBe(false);
+    });
+    it('clone', function() {
+      expect(foam.Number.clone(9)).toBe(9);
+    });
+    it('equals', function() {
+      expect(foam.Number.equals(44, 44)).toBe(true);
+      expect(foam.Number.equals(Math.NaN, Math.NaN)).toBe(true);
+      expect(foam.Number.equals(56, '56')).toBe(false);
+      expect(foam.Number.equals(0, false)).toBe(false);
+    });
+    it('compare', function() {
+      expect(foam.Number.compare(3, 4)).toBe(-1);
+      expect(foam.Number.compare(4, 3)).toBe(1);
+      expect(foam.Number.compare(24, 24)).toBe(0);
+      
+      expect(foam.Number.compare(3, null)).toBe(1);
+      expect(foam.Number.compare(3, undefined)).toBe(1);
+      
+    });
+    it('hashCode', function() {
+      expect(foam.Number.hashCode(5)).toBe(5);
+      // caps at 32-bits
+      expect(foam.Number.hashCode(999999999999)).toBe(-727379969);
+    });
+  });
+
+
 });

@@ -297,7 +297,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return b === null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+      return ( b === null || b === undefined ) ? 1 :
+        a < b ? -1 : a > b ? 1 : 0;
     },
     function hashCode(n) { return n & n; }
   ]
