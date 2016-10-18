@@ -29,6 +29,30 @@ foam.CLASS({
       name: 'text'
     },
     {
+      class: 'Float',
+      name: 'volume',
+      value: 0.5,
+      view: { class: 'foam.u2.RangeView', maxValue: 1, step: 0.01 }
+    },
+    {
+      class: 'Float',
+      name: 'rate',
+      value: 1,
+      preSet: function(_, rate) {
+        return Math.max(0.1, Math.min(rate, 10));
+      },
+      view: { class: 'foam.u2.RangeView', maxValue: 10, step: 0.01 }
+    },
+    {
+      class: 'Float',
+      name: 'pitch',
+      value: 1,
+      preSet: function(_, rate) {
+        return Math.max(0, Math.min(rate, 2));
+      },
+      view: { class: 'foam.u2.RangeView', maxValue: 2, step: 0.01 }
+    },
+    {
       name: 'voice',
       view: function(_, X) {
         var synth = X.window.speechSynthesis;
@@ -56,7 +80,10 @@ foam.CLASS({
       var synth = this.window.speechSynthesis;
       var u     = new SpeechSynthesisUtterance(this.text);
 
-      if ( this.voice ) u.voice = this.voice;
+      u.voice  = this.voice;
+      u.volume = this.volume;
+      u.rate   = this.rate;
+      u.pitch  = this.pitch;
 
       synth.speak(u);
     }
