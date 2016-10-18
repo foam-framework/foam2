@@ -382,4 +382,25 @@ describe('foam.Undefined', function() {
   });
 });
 
-
+describe('foam.Null', function() {
+  it('isInstance', function() {
+    expect(foam.Null.isInstance(null)).toBe(true);
+    expect(foam.Null.isInstance(undefined)).toBe(false);
+  });
+  it('clone', function() {
+    expect(foam.Null.clone(undefined)).toBe(undefined);
+  });
+  it('equals', function() {
+    expect(foam.Null.equals("unused", null)).toBe(true);
+    expect(foam.Null.equals("unused", "bad")).toBe(false);
+  });
+  it('compare', function() {
+    expect(foam.Null.compare("unused", undefined)).toBe(-1);
+    expect(foam.Null.compare("unused", "defined!")).toBe(1);
+    expect(foam.Null.compare("unused", null)).toBe(0);
+  });
+  it('hashCode', function() {
+    expect(foam.Null.hashCode(null)).toBe(-2);
+    expect(foam.Null.hashCode()).toBe(-2);
+  });
+});
