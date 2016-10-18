@@ -121,7 +121,7 @@ foam.CLASS({
 
   methods: [
     function deserialize(json) {
-      return foam.json.parse(json, this.of);
+      return foam.json.parse(json, this.of, this.__subContext__);
     },
 
     function serialize(obj) {
