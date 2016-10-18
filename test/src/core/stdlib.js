@@ -492,6 +492,41 @@ describe('foam.Function', function() {
     expect(array2[3]).toBeUndefined();
   });
 
+  it('argsStr', function() {
+    // normal case
+    var str = foam.Function.argsStr(
+      function(a, /*string?*/b, c /*array*/) { 
+        return [ a, b, c ];
+      }
+    );
+    expect(str).toBe('a, /*string?*/b, c /*array*/');
+
+    // string with line break
+    var str2 = foam.Function.argsStr(
+ "function tricky(a, c\r\n /*array*/) { " +
+ "        return [ a, b, c ]; " +
+ "      } "
+    );
+    expect(str2).toBe('a, c /*array*/');
+
+    // empty args
+    var str3 = foam.Function.argsStr(
+      function() { 
+        return 1;
+      }
+    );
+    expect(str3).toBe('');
+
+    // invalid function string
+    expect(function() {
+      foam.Function.argsStr(
+      "  fun ction invalid(a, c\r \p\n  { " +
+      "         return [ a, b, c ]; " +
+      "      } "
+      );
+    }).toThrow();
+
+  });
 
 
 });
