@@ -22,13 +22,15 @@ foam.CLASS({
 
   properties: [
     [ 'type', 'range' ],
+    [ 'step', 0 ],
     [ 'maxValue', 100 ]
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-      this.attrs({max: this.maxValue$});
+      if ( this.step ) this.attrs({step: this.step});
+      this.attrs({max: this.maxValue});
     }
   ]
 });
