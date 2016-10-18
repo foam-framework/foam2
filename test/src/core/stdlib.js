@@ -464,4 +464,34 @@ describe('foam.Function', function() {
     expect(f(null)).toBe(r);
   });
 
+  it('setName', function() {
+    var f = foam.Function.setName(function(a) { return a + 1; }, 
+      'myTestFunction');
+    expect(f.name).toBe('myTestFunction');
+  });
+
+  it('appendArguments', function() {
+    var array1 = ['a'];
+    var array2 = ['b'];
+    (function(a, b, c, d) { 
+      foam.Function.appendArguments(array1, arguments);
+      foam.Function.appendArguments(array2, arguments, 2);
+    })(1, 2, 3, 4);
+
+    // array1 contains all the args
+    expect(array1[0]).toBe('a');
+    expect(array1[1]).toBe(1);
+    expect(array1[2]).toBe(2);
+    expect(array1[3]).toBe(3);
+    expect(array1[4]).toBe(4);
+
+    // array2 starts with arguments[2]
+    expect(array2[0]).toBe('b');
+    expect(array2[1]).toBe(3);
+    expect(array2[2]).toBe(4);
+    expect(array2[3]).toBeUndefined();
+  });
+
+
+
 });
