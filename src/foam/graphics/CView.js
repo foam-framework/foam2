@@ -437,16 +437,21 @@ foam.CLASS({
       value: 1
     },
     {
+      class: 'Color',
       name: 'border'
     },
     {
+      class: 'Color',
       name: 'color'
     },
     {
+      class: 'Color',
       name: 'shadowColor'
     },
     {
-      name: 'shadowBlur'
+      class: 'Int',
+      name: 'shadowBlur',
+      units: 'pixels'
     },
     {
       name: 'children',
