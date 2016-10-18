@@ -404,3 +404,37 @@ describe('foam.Null', function() {
     expect(foam.Null.hashCode()).toBe(-2);
   });
 });
+
+describe('foam.Boolean', function() {
+  it('isInstance', function() {
+    expect(foam.Boolean.isInstance(true)).toBe(true);
+    expect(foam.Boolean.isInstance(1)).toBe(false);
+    expect(foam.Boolean.isInstance(false)).toBe(true);
+    expect(foam.Boolean.isInstance(0)).toBe(false);
+  });
+  it('clone', function() {
+    expect(foam.Boolean.clone(true)).toBe(true);
+  });
+  it('equals', function() {
+    expect(foam.Boolean.equals(true, false)).toBe(false);
+    expect(foam.Boolean.equals(true, 1)).toBe(false);
+    expect(foam.Boolean.equals(false, 0)).toBe(false);
+    expect(foam.Boolean.equals(true, true)).toBe(true);
+    expect(foam.Boolean.equals(false, false)).toBe(true);
+  });
+  it('compare', function() {
+    expect(foam.Boolean.compare(true, false)).toBe(1);
+    expect(foam.Boolean.compare(false, true)).toBe(-1);
+    expect(foam.Boolean.compare(true, true)).toBe(0);
+    expect(foam.Boolean.compare(false, false)).toBe(0);
+
+    expect(foam.Boolean.compare(true, 0)).toBe(1);
+    expect(foam.Boolean.compare(false, 66)).toBe(-1);
+    expect(foam.Boolean.compare(true, 9)).toBe(0);
+    expect(foam.Boolean.compare(false, 0)).toBe(0);
+  });
+  it('hashCode', function() {
+    expect(foam.Boolean.hashCode(true)).toBe(1);
+    expect(foam.Boolean.hashCode(false)).toBe(0);
+  });
+});
