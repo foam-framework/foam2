@@ -108,18 +108,6 @@ describe('Object.$UID', function() {
 
 
 
-describe('string.pad', function() {
-
-  beforeEach(function() {
-  });
-  afterEach(function() {
-  });
-
-  it('pads left', function() {
-    expect(foam.String.pad("wee", -6)).toEqual("   wee");
-  });
-
-});
 
 /*
 describe('String.compareTo', function() {
@@ -336,13 +324,6 @@ describe('Date', function() {
     expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
 
 
-  });
-});
-
-describe('String.daoize', function() {
-  it('should convert "FooBar" to "fooBarDAO"', function() {
-    expect(foam.String.daoize('Foo')).toBe('fooDAO');
-    expect(foam.String.daoize('FooBar')).toBe('fooBarDAO');
   });
 });
 
@@ -662,10 +643,71 @@ describe('foam.Function', function() {
       )).not.toBe(foam.String.hashCode(
         'here is a very very long string' +
         'that could, in theory, be harder to' +
-        'uniquely hash giben that only one character' +
+        'uniquely hash giwen that only one character' +
         'has changed in the slightest.'
       ))
     });
+
+    it('constantize', function() {
+      expect(foam.String.constantize("camelCaseName"))
+        .toBe("CAMEL_CASE_NAME");
+      expect(foam.String.constantize("under_Score"))
+        .toBe("UNDER_SCORE");
+      expect(foam.String.constantize("ALREADY_CONST_NAME"))
+        .toBe("ALREADY_CONST_NAME");
+      expect(function() { 
+        foam.String.constantize(null);
+      }).toThrow();
+    });
+
+    it('capitalize', function() {
+      expect(foam.String.capitalize('lower Case String'))
+        .toBe('Lower Case String');
+      expect(foam.String.capitalize('99$$'))
+        .toBe('99$$');
+      expect(function() { 
+        foam.String.capitalize(null);
+      }).toThrow();
+        
+    });
+
+    it('labelize', function() {
+      expect(foam.String.labelize("camelCaseName"))
+        .toBe("Camel Case Name");
+      expect(foam.String.labelize("CONSTANT_NAME"))
+        .toBe("CONSTANT_NAME");
+      expect(foam.String.labelize(''))
+        .toBe('');
+      expect(function() { 
+        foam.String.labelize(null);
+      }).toThrow();
+    });
+    
+    it('toUpperCase', function() {
+      expect(foam.String.toUpperCase('lower Case String'))
+        .toBe('LOWER CASE STRING');
+      expect(foam.String.toUpperCase('99$$'))
+        .toBe('99$$');
+      expect(function() { 
+        foam.String.toUpperCase(null);
+      }).toThrow();
+        
+    });
+
+
+    it('pad', function() {
+      expect(foam.String.pad("wee", -6)).toEqual("   wee");
+      expect(foam.String.pad("wee", 6)).toEqual("wee   ");
+    });
+
+    it('should convert "FooBar" to "fooBarDAO"', function() {
+      expect(foam.String.daoize('Foo')).toBe('fooDAO');         
+      expect(foam.String.daoize('package.FooBar')).toBe('package.FooBarDAO');
+    });
+
+    
+
+
   });
 
 
