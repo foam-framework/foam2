@@ -204,10 +204,14 @@ foam.LIB({
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      return f.
+      var match = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'').
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+      if ( ! match ) {
+        throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
+      }
+      return match[2] || '';
     },
 
     function formalArgs(f) {
