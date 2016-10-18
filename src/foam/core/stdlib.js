@@ -197,6 +197,7 @@ foam.LIB({
 
     /** Convenience method to append 'arguments' onto a real array **/
     function appendArguments(a, args, start) {
+      start = start || 0;
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
     },
