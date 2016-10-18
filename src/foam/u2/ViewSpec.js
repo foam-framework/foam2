@@ -31,7 +31,7 @@ foam.CLASS({
             spec.toE(args, ctx) :
 
           typeof spec === 'function' ?
-            spec.call(that, args, ctx) :
+            foam.u2.ViewSpec.createView(spec.call(that, args, ctx), args, that, ctx) :
 
           foam.Object.isInstance(spec) ?
             (spec.create ?
