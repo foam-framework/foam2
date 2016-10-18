@@ -337,7 +337,9 @@ foam.LIB({
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
-        if ( ! str || str === '' ) return str;
+        console.assert(typeof str === 'string',
+                       'Cannot labelize non-string values.');
+        if ( str === '' ) return str;
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
@@ -347,6 +349,8 @@ foam.LIB({
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
       })
@@ -355,6 +359,9 @@ foam.LIB({
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot toUpperCase non-string values.');
+                       
         return str.toUpperCase();
       })
     },
