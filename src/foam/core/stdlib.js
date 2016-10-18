@@ -108,7 +108,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
-      return b ? foam.String.compare(a.toString(), a.toString()) :  1;
+      return b ? foam.String.compare(a.toString(), b.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
 
@@ -197,16 +197,21 @@ foam.LIB({
 
     /** Convenience method to append 'arguments' onto a real array **/
     function appendArguments(a, args, start) {
+      start = start || 0;
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
     },
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      return f.
+      var match = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'').
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+      if ( ! match ) {
+        throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
+      }
+      return match[2] || '';
     },
 
     function formalArgs(f) {
@@ -215,7 +220,6 @@ foam.LIB({
        * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
-      if ( ! args ) return [];
       args += ',';
 
       var ret = [];

@@ -106,20 +106,6 @@ describe('Object.$UID', function() {
   });
 });
 
-describe('fn.memoize1', function() {
-
-  beforeEach(function() {
-  });
-  afterEach(function() {
-  });
-
-  it('accepts a null argument', function() {
-    var f = foam.Function.memoize1(function(arg) { return arg; });
-    var r = f(null);
-    expect(f(null)).toBe(r);
-  });
-
-});
 
 
 describe('string.pad', function() {
@@ -382,4 +368,232 @@ describe('foam.Undefined', function() {
   });
 });
 
+describe('foam.Null', function() {
+  it('isInstance', function() {
+    expect(foam.Null.isInstance(null)).toBe(true);
+    expect(foam.Null.isInstance(undefined)).toBe(false);
+  });
+  it('clone', function() {
+    expect(foam.Null.clone(undefined)).toBe(undefined);
+  });
+  it('equals', function() {
+    expect(foam.Null.equals("unused", null)).toBe(true);
+    expect(foam.Null.equals("unused", "bad")).toBe(false);
+  });
+  it('compare', function() {
+    expect(foam.Null.compare("unused", undefined)).toBe(-1);
+    expect(foam.Null.compare("unused", "defined!")).toBe(1);
+    expect(foam.Null.compare("unused", null)).toBe(0);
+  });
+  it('hashCode', function() {
+    expect(foam.Null.hashCode(null)).toBe(-2);
+    expect(foam.Null.hashCode()).toBe(-2);
+  });
+});
 
+describe('foam.Boolean', function() {
+  it('isInstance', function() {
+    expect(foam.Boolean.isInstance(true)).toBe(true);
+    expect(foam.Boolean.isInstance(1)).toBe(false);
+    expect(foam.Boolean.isInstance(false)).toBe(true);
+    expect(foam.Boolean.isInstance(0)).toBe(false);
+  });
+  it('clone', function() {
+    expect(foam.Boolean.clone(true)).toBe(true);
+  });
+  it('equals', function() {
+    expect(foam.Boolean.equals(true, false)).toBe(false);
+    expect(foam.Boolean.equals(true, 1)).toBe(false);
+    expect(foam.Boolean.equals(false, 0)).toBe(false);
+    expect(foam.Boolean.equals(true, true)).toBe(true);
+    expect(foam.Boolean.equals(false, false)).toBe(true);
+  });
+  it('compare', function() {
+    expect(foam.Boolean.compare(true, false)).toBe(1);
+    expect(foam.Boolean.compare(false, true)).toBe(-1);
+    expect(foam.Boolean.compare(true, true)).toBe(0);
+    expect(foam.Boolean.compare(false, false)).toBe(0);
+
+    expect(foam.Boolean.compare(true, 0)).toBe(1);
+    expect(foam.Boolean.compare(false, 66)).toBe(-1);
+    expect(foam.Boolean.compare(true, 9)).toBe(0);
+    expect(foam.Boolean.compare(false, 0)).toBe(0);
+  });
+  it('hashCode', function() {
+    expect(foam.Boolean.hashCode(true)).toBe(1);
+    expect(foam.Boolean.hashCode(false)).toBe(0);
+  });
+});
+
+describe('foam.Function', function() {
+  it('isInstance', function() {
+    expect(foam.Function.isInstance(function() {})).toBe(true);
+    expect(foam.Function.isInstance(9)).toBe(false);
+  });
+  it('clone', function() {
+    var fn = function() {};
+    expect(foam.Function.clone(fn)).toBe(fn);
+  });
+  it('equals', function() {
+    var fn1 = function(a) { return a + 1; }; 
+    var fn2 = function(a) { return a + 1; };
+    var fnNoMatch = function(b) { return b + 1; };
+    expect(foam.Function.equals(fn1, fn2)).toBe(true);
+    expect(foam.Function.equals(fn1, fnNoMatch)).toBe(false);
+    expect(foam.Function.equals(fn1, undefined)).toBe(false);
+  });
+  it('compare', function() {
+    var fn1 = function(a) { return a + 1; }; 
+    var fn2 = function(a) { return a + 1; };
+    var fnNoMatch = function(b) { return b + 1; };
+    expect(foam.Function.compare(fn1, fn2)).toBe(0);
+    expect(foam.Function.compare(fn1, fnNoMatch)).toBe(-1);
+    expect(foam.Function.compare(fnNoMatch, fn1)).toBe(1);
+    expect(foam.Function.compare(fnNoMatch, undefined)).toBe(1);
+  });
+  it('hashCode', function() {
+    var fn1 = function(a) { return a + 1; };
+    var fn2 = function(b) { return b + 2; };
+    expect(foam.Function.hashCode(fn1)).not.toEqual(
+      foam.Function.hashCode(fn2));
+  });
+  
+  it('memoize1 accepts a null argument', function() {
+    var f = foam.Function.memoize1(function(arg) { return arg; });
+    var r = f(null);
+    expect(f(null)).toBe(r);
+  });
+
+  it('setName', function() {
+    var f = foam.Function.setName(function(a) { return a + 1; }, 
+      'myTestFunction');
+    expect(f.name).toBe('myTestFunction');
+  });
+
+  it('appendArguments', function() {
+    var array1 = ['a'];
+    var array2 = ['b'];
+    (function(a, b, c, d) { 
+      foam.Function.appendArguments(array1, arguments);
+      foam.Function.appendArguments(array2, arguments, 2);
+    })(1, 2, 3, 4);
+
+    // array1 contains all the args
+    expect(array1[0]).toBe('a');
+    expect(array1[1]).toBe(1);
+    expect(array1[2]).toBe(2);
+    expect(array1[3]).toBe(3);
+    expect(array1[4]).toBe(4);
+
+    // array2 starts with arguments[2]
+    expect(array2[0]).toBe('b');
+    expect(array2[1]).toBe(3);
+    expect(array2[2]).toBe(4);
+    expect(array2[3]).toBeUndefined();
+  });
+
+  it('argsStr', function() {
+    // normal case
+    var str = foam.Function.argsStr(
+      function(a, /*string?*/b, c /*array*/) { 
+        return [ a, b, c ];
+      }
+    );
+    expect(str).toBe('a, /*string?*/b, c /*array*/');
+
+    // string with line break
+    var str2 = foam.Function.argsStr(
+ "function tricky(a, c\r\n /*array*/) { " +
+ "        return [ a, b, c ]; " +
+ "      } "
+    );
+    expect(str2).toBe('a, c /*array*/');
+
+    // empty args
+    var str3 = foam.Function.argsStr(
+      function() { 
+        return 1;
+      }
+    );
+    expect(str3).toBe('');
+
+    // invalid function string
+    expect(function() {
+      foam.Function.argsStr(
+      "  fun ction invalid(a, c\r \p\n  { " +
+      "         return [ a, b, c ]; " +
+      "      } "
+      );
+    }).toThrow();
+  });
+  
+  it('formalArgs', function() {
+    // normal case
+    var args = foam.Function.formalArgs(
+      function(a, /*string?*/b, c /*array*/) { 
+        return [1];
+      }
+    );   
+    expect(args[0]).toBe('a');
+    expect(args[1]).toBe('b');
+    expect(args[2]).toBe('c');
+    
+    // empty args
+    var args2 = foam.Function.formalArgs(
+      function( ) { 
+        return [1];
+      }
+    );   
+    expect(args2.length).toEqual(0);
+
+    // invalid function string
+    expect(function() {
+      foam.Function.formalArgs(
+      "  fun ction invalid(a, c\r \p\n  { " +
+      "         return [ a, b, c ]; " +
+      "      } "
+      );
+    }).toThrow();
+
+  });
+
+  
+  it('withArgs', function() {
+    // normal case
+    var fn = function(a, /*string?*/b, c /*array*/) { 
+      return [ a + b + c ];
+    };
+    var src = { a: 'A', b: 'B', c: 'C' };
+    
+    expect(foam.Function.withArgs(fn, src)).toEqual(['ABC']);
+    
+    // missing args
+    var src2 = { a: 'A', c: 'C' };
+    
+    expect(foam.Function.withArgs(fn, src2)).toEqual(['AundefinedC']);
+
+    // opt_self
+    var fn2 = function(a) {
+      return this.value + a;
+    };
+    var self = { value: 77 };
+    expect(foam.Function.withArgs(fn2, src2, self)).toEqual('77A');
+    
+    // function args are bound
+    var selfFns = {
+      a: function() { return this.valA; },
+      b: function() { return this.valB; },
+      valA: 5,
+      valB: 100
+    };
+    var selfData = { // will not bind to these values
+      valA: 66,
+      valB: 999
+    };
+    var fnCallthru = function(a, b) {  return a() + b(); }
+    expect(foam.Function.withArgs(fnCallthru, selfFns, selfData))
+      .toEqual(105);
+
+  });
+
+});
