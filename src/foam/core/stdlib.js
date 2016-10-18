@@ -220,7 +220,6 @@ foam.LIB({
        * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
-      if ( ! args ) return [];
       args += ',';
 
       var ret = [];
