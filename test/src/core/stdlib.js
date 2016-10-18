@@ -628,5 +628,45 @@ describe('foam.Function', function() {
     });
   });
 
+  describe('foam.String', function() {
+    it('isInstance', function() {
+      expect(foam.String.isInstance('hello')).toBe(true);
+      expect(foam.String.isInstance('2')).toBe(true);
+      expect(foam.String.isInstance('')).toBe(true);
+      expect(foam.String.isInstance(2)).toBe(false);
+      expect(foam.String.isInstance(null)).toBe(false);
+    });
+    it('clone', function() {
+      expect(foam.String.clone('clone me')).toBe('clone me');
+    });
+    it('equals', function() {
+      expect(foam.String.equals('a string', 'a string')).toBe(true);
+      expect(foam.String.equals('a string', 'not the same')).toBe(false);
+    });
+    it('compare', function() {
+      expect(foam.String.compare('string a', 'string c')).toBeLessThan(0);     
+      expect(foam.String.compare('string b', 'string a')).toBeGreaterThan(0);     
+      expect(foam.String.compare('string d', 'string d')).toBe(0);     
+
+      expect(foam.String.compare('string d', null)).toBe(1);     
+      expect(foam.String.compare('string d', undefined)).toBe(1);     
+    });
+    it('hashCode', function() {
+      expect(foam.String.hashCode('a short string'))
+        .not.toBe(foam.String.hashCode('a shorp string'))
+      expect(foam.String.hashCode(
+        'here is a very very long string' +
+        'that could, in theory, be harder to' +
+        'uniquely hash given that only one character' +
+        'has changed in the slightest.'
+      )).not.toBe(foam.String.hashCode(
+        'here is a very very long string' +
+        'that could, in theory, be harder to' +
+        'uniquely hash giben that only one character' +
+        'has changed in the slightest.'
+      ))
+    });
+  });
+
 
 });
