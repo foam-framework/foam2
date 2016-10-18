@@ -106,20 +106,6 @@ describe('Object.$UID', function() {
   });
 });
 
-describe('fn.memoize1', function() {
-
-  beforeEach(function() {
-  });
-  afterEach(function() {
-  });
-
-  it('accepts a null argument', function() {
-    var f = foam.Function.memoize1(function(arg) { return arg; });
-    var r = f(null);
-    expect(f(null)).toBe(r);
-  });
-
-});
 
 
 describe('string.pad', function() {
@@ -437,4 +423,45 @@ describe('foam.Boolean', function() {
     expect(foam.Boolean.hashCode(true)).toBe(1);
     expect(foam.Boolean.hashCode(false)).toBe(0);
   });
+});
+
+describe('foam.Function', function() {
+  it('isInstance', function() {
+    expect(foam.Function.isInstance(function() {})).toBe(true);
+    expect(foam.Function.isInstance(9)).toBe(false);
+  });
+  it('clone', function() {
+    var fn = function() {};
+    expect(foam.Function.clone(fn)).toBe(fn);
+  });
+  it('equals', function() {
+    var fn1 = function(a) { return a + 1; }; 
+    var fn2 = function(a) { return a + 1; };
+    var fnNoMatch = function(b) { return b + 1; };
+    expect(foam.Function.equals(fn1, fn2)).toBe(true);
+    expect(foam.Function.equals(fn1, fnNoMatch)).toBe(false);
+    expect(foam.Function.equals(fn1, undefined)).toBe(false);
+  });
+  it('compare', function() {
+    var fn1 = function(a) { return a + 1; }; 
+    var fn2 = function(a) { return a + 1; };
+    var fnNoMatch = function(b) { return b + 1; };
+    expect(foam.Function.compare(fn1, fn2)).toBe(0);
+    expect(foam.Function.compare(fn1, fnNoMatch)).toBe(-1);
+    expect(foam.Function.compare(fnNoMatch, fn1)).toBe(1);
+    expect(foam.Function.compare(fnNoMatch, undefined)).toBe(1);
+  });
+  it('hashCode', function() {
+    var fn1 = function(a) { return a + 1; };
+    var fn2 = function(b) { return b + 2; };
+    expect(foam.Function.hashCode(fn1)).not.toEqual(
+      foam.Function.hashCode(fn2));
+  });
+  
+  it('memoize1 accepts a null argument', function() {
+    var f = foam.Function.memoize1(function(arg) { return arg; });
+    var r = f(null);
+    expect(f(null)).toBe(r);
+  });
+
 });
