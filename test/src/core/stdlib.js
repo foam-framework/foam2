@@ -525,6 +525,35 @@ describe('foam.Function', function() {
       "      } "
       );
     }).toThrow();
+  });
+  
+  it('formalArgs', function() {
+    // normal case
+    var args = foam.Function.formalArgs(
+      function(a, /*string?*/b, c /*array*/) { 
+        return [1];
+      }
+    );   
+    expect(args[0]).toBe('a');
+    expect(args[1]).toBe('b');
+    expect(args[2]).toBe('c');
+    
+    // empty args
+    var args2 = foam.Function.formalArgs(
+      function( ) { 
+        return [1];
+      }
+    );   
+    expect(args2.length).toEqual(0);
+
+    // invalid function string
+    expect(function() {
+      foam.Function.formalArgs(
+      "  fun ction invalid(a, c\r \p\n  { " +
+      "         return [ a, b, c ]; " +
+      "      } "
+      );
+    }).toThrow();
 
   });
 
