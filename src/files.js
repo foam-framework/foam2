@@ -93,6 +93,7 @@ FOAM_FILES([
   { name: "foam/dao/ContextualizingDAO" },
   { name: "foam/dao/SyncDAO" },
   { name: "foam/dao/EasyDAO" },
+  { name: "foam/dao/NoSelectAllDAO" },
   { name: "foam/dao/NullDAO" },
   { name: "foam/dao/TimingDAO" },
   { name: "foam/dao/LoggingDAO" },
