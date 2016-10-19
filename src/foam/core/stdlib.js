@@ -471,7 +471,7 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
-    function clone(o) { return o; },
+    function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {

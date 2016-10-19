@@ -106,91 +106,6 @@ describe('Object.$UID', function() {
   });
 });
 
-
-
-
-
-
-
-describe('Date', function() {
-  beforeEach(function() {
-    jasmine.clock().install();
-  });
-  afterEach(function() {
-    jasmine.clock().uninstall();
-  });
-
-  it('correctly reports equals', function() {
-    expect(foam.util.equals(new Date(7487474), new Date(7487474))).toBe(true);
-    expect(foam.util.equals(new Date(7487474), new Date(23423432))).toBe(false);
-
-    expect(foam.util.equals((new Date(7487474), null))).toBe(false);
-    expect(foam.util.equals(new Date(7487474), 7487474)).toBe(true);
-  });
-  it('correctly reports compareTo', function() {
-    expect(foam.util.compare(new Date(7487474), new Date(7487474))).toEqual(0);
-    expect(foam.util.compare(new Date(234324), new Date(23423432))).toEqual(-1);
-
-    expect(foam.util.compare(new Date(234324), null)).toEqual(1);
-    var date = new Date(2423);
-    expect(foam.util.compare(date, date)).toEqual(0);
-  });
-
-  it('correctly generates relative strings', function() {
-    var baseDate = new Date(99999 - 60000*60*24*(365+9) - 60000*61*2 - 1000);
-    var d =        new Date(99999);
-
-    // account for timezone of the host running this test
-    var dateStrWithYear = d.toDateString().substring(4);
-    var dateStrNoYear = d.toDateString()
-      .replace(' ' + (1900 + d.getYear()), '').substring(4);
-
-    jasmine.clock().mockDate(baseDate);
-    // future cases
-    expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
-    jasmine.clock().tick(60000*60*24*365);
-    expect(foam.Date.relativeDateString(d)).toEqual(dateStrNoYear);
-    jasmine.clock().tick(60000*60*24*7);
-    expect(foam.Date.relativeDateString(d)).toEqual('in 2 days');
-    jasmine.clock().tick(60000*60*24);
-    expect(foam.Date.relativeDateString(d)).toEqual('in 1 day');
-    jasmine.clock().tick(60000*60*24);
-    expect(foam.Date.relativeDateString(d)).toEqual('in 2 hours');
-    jasmine.clock().tick(60000*60);
-    expect(foam.Date.relativeDateString(d)).toEqual('in 1 hour');
-    jasmine.clock().tick(60000*60);
-    expect(foam.Date.relativeDateString(d)).toEqual('in 2 minutes');
-    jasmine.clock().tick(60000);
-    expect(foam.Date.relativeDateString(d)).toEqual('in 1 minute');
-    jasmine.clock().tick(60000);
-    expect(foam.Date.relativeDateString(d)).toEqual('in moments');
-
-    // past cases
-    jasmine.clock().tick(1000);
-    expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
-    jasmine.clock().tick(1000);
-    expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
-    jasmine.clock().tick(60000);
-    expect(foam.Date.relativeDateString(d)).toEqual('1 minute ago');
-    jasmine.clock().tick(60000);
-    expect(foam.Date.relativeDateString(d)).toEqual('2 minutes ago');
-    jasmine.clock().tick(60000*60);
-    expect(foam.Date.relativeDateString(d)).toEqual('1 hour ago');
-    jasmine.clock().tick(60000*60);
-    expect(foam.Date.relativeDateString(d)).toEqual('2 hours ago');
-    jasmine.clock().tick(60000*60*24);
-    expect(foam.Date.relativeDateString(d)).toEqual('1 day ago');
-    jasmine.clock().tick(60000*60*24);
-    expect(foam.Date.relativeDateString(d)).toEqual('2 days ago');
-    jasmine.clock().tick(60000*60*24*7);
-    expect(foam.Date.relativeDateString(d)).toEqual(dateStrNoYear);
-    jasmine.clock().tick(60000*60*24*365);
-    expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
-
-
-  });
-});
-
 describe('foam.Undefined', function() {
   it('isInstance', function() {
     expect(foam.Undefined.isInstance(undefined)).toBe(true);
@@ -743,6 +658,102 @@ describe('foam.Array', function() {
 
   });
 
+});
+
+
+describe('foam.Date', function() {
+  beforeEach(function() {
+    jasmine.clock().install();
+  });
+  afterEach(function() {
+    jasmine.clock().uninstall();
+  });
+
+  it('isInstance', function() {
+    expect(foam.Date.isInstance(new Date(040404848))).toBe(true);
+    expect(foam.Date.isInstance((new Date(040404848)).toString())).toBe(false);
+    expect(foam.Date.isInstance(null)).toBe(false);
+  });
+
+  it('clone', function() {
+    var d1 = new Date(040404848);
+    var d2 = foam.Date.clone(d1);
+    d1.setTime(283232323);
+
+    expect(foam.Date.equals(d1, d2)).toBe(false);
+    expect(d1.getTime()).not.toEqual(d2.getTime());
+  });
+
+  it('equals', function() {
+    expect(foam.util.equals(new Date(7487474), new Date(7487474))).toBe(true);
+    expect(foam.util.equals(new Date(7487474), new Date(23423432))).toBe(false);
+
+    expect(foam.util.equals((new Date(7487474), null))).toBe(false);
+    expect(foam.util.equals(new Date(7487474), 7487474)).toBe(true);
+  });
+
+  it('compare', function() {
+    expect(foam.util.compare(new Date(7487474), new Date(7487474))).toEqual(0);
+    expect(foam.util.compare(new Date(234324), new Date(23423432))).toEqual(-1);
+
+    expect(foam.util.compare(new Date(234324), null)).toEqual(1);
+    var date = new Date(2423);
+    expect(foam.util.compare(date, date)).toEqual(0);
+  });
+
+  it('relativeDateString', function() {
+    var baseDate = new Date(99999 - 60000*60*24*(365+9) - 60000*61*2 - 1000);
+    var d =        new Date(99999);
+
+    // account for timezone of the host running this test
+    var dateStrWithYear = d.toDateString().substring(4);
+    var dateStrNoYear = d.toDateString()
+      .replace(' ' + (1900 + d.getYear()), '').substring(4);
+
+    jasmine.clock().mockDate(baseDate);
+    // future cases
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
+    jasmine.clock().tick(60000*60*24*365);
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrNoYear);
+    jasmine.clock().tick(60000*60*24*7);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 2 days');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 1 day');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 2 hours');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 1 hour');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 2 minutes');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('in 1 minute');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('in moments');
+
+    // past cases
+    jasmine.clock().tick(1000);
+    expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
+    jasmine.clock().tick(1000);
+    expect(foam.Date.relativeDateString(d)).toEqual('moments ago');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('1 minute ago');
+    jasmine.clock().tick(60000);
+    expect(foam.Date.relativeDateString(d)).toEqual('2 minutes ago');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('1 hour ago');
+    jasmine.clock().tick(60000*60);
+    expect(foam.Date.relativeDateString(d)).toEqual('2 hours ago');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('1 day ago');
+    jasmine.clock().tick(60000*60*24);
+    expect(foam.Date.relativeDateString(d)).toEqual('2 days ago');
+    jasmine.clock().tick(60000*60*24*7);
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrNoYear);
+    jasmine.clock().tick(60000*60*24*365);
+    expect(foam.Date.relativeDateString(d)).toEqual(dateStrWithYear);
+
+
+  });
 });
 
 
