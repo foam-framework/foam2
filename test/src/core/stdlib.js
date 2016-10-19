@@ -693,6 +693,15 @@ describe('foam.String', function() {
 
   });
 
+  it('startsWithIC', function() {
+    expect(foam.String.startsWithIC('my string', 'MY '))
+      .toBe(true);
+    expect(foam.String.startsWithIC('mY string', 'my '))
+      .toBe(true);
+    expect(foam.String.startsWithIC('my string', 'string'))
+      .toBe(false);
+  });
+
   it('pad', function() {
     expect(foam.String.pad("wee", -6)).toEqual("   wee");
     expect(foam.String.pad("wee", 6)).toEqual("wee   ");
