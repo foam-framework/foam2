@@ -684,6 +684,17 @@ describe('foam.Date', function() {
     expect(d1.getTime()).not.toEqual(d2.getTime());
   });
 
+  it('getTime', function() {
+    expect(foam.Date.getTime(new Date(40404848))).toBe(40404848);
+    expect(foam.Date.getTime(null)).toBe(0);
+    expect(foam.Date.getTime(1231234)).toBe(1231234);
+  });
+
+  it('hashCode', function() {
+    expect(foam.Date.hashCode(new Date(2342346)))
+      .not.toEqual(foam.Date.hashCode(new Date(2342347)));
+  });
+
   it('equals', function() {
     expect(foam.util.equals(new Date(7487474), new Date(7487474))).toBe(true);
     expect(foam.util.equals(new Date(7487474), new Date(23423432))).toBe(false);
