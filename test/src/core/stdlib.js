@@ -831,5 +831,55 @@ describe('foam.Object', function() {
 
 });
 
+describe('foam.mmethod', function() {
+  it('handles primitive types', function() {
+    var mm = foam.mmethod({
+      String: function(val) { return foam.String.isInstance(val); },
+      Number: function(val) { return foam.Number.isInstance(val); },
+      Boolean: function(val) { return foam.Boolean.isInstance(val); },
+      Object: function(val) { return foam.Object.isInstance(val); },
+      Array: function(val) { return foam.Array.isInstance(val); },
+      Date: function(val) { return foam.Date.isInstance(val); },
+    });
+
+    expect(mm("hello")).toBe(true);
+    expect(mm(77)).toBe(true);
+    expect(mm(true)).toBe(true);
+    expect(mm({})).toBe(true);
+    expect(mm([1])).toBe(true);
+    expect(mm(new Date(343434))).toBe(true);
+
+    expect(function() {
+      mm(foam.core.Property.create({ name: 'prop' }));
+    }).toThrow();
+  });
+
+  it('handles FObjects', function() {
+    var mm = foam.mmethod({
+      String: function(val) { return foam.String.isInstance(val); },
+      Number: function(val) { return foam.Number.isInstance(val); },
+      FObject: function(val) { return val.cls_.name; }
+    });
+
+    expect(mm("hello")).toBe(true);
+    expect(mm(77)).toBe(true);
+    expect(mm(foam.core.Property.create({name: 'prop'}))).toEqual("Property");
+  });
+
+  it('uses supplied default method', function() {
+    var mm = foam.mmethod({
+      String: function(val) { return foam.String.isInstance(val); },
+      Number: function(val) { return foam.Number.isInstance(val); },
+    }, function() { return "Default!"; } );
+
+    expect(mm("hello")).toBe(true);
+    expect(mm(77)).toBe(true);
+    expect(mm(foam.core.Property.create({name: 'prop'}))).toEqual("Default!");
+    expect(mm(true)).toEqual("Default!");
+  });
+
+});
+
+
 
 
