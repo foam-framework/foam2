@@ -768,5 +768,68 @@ describe('foam.Date', function() {
 });
 
 
+describe('foam.Object', function() {
+
+  it('forEach', function() {
+    var aProto = { f: 'hello' };
+    var a = {
+      __proto__: aProto,
+      c: 2,
+      d: 3,
+      e: 4,
+      b: 1,
+    };
+    var results = [];
+    foam.Object.forEach(a, function(val) {
+      results.push(val);
+    });
+    expect(results.length).toBe(4);
+    expect(results[0]).toBe(2);
+    expect(results[1]).toBe(3);
+    expect(results[2]).toBe(4);
+    expect(results[3]).toBe(1);
+  });
+
+  it('isInstance', function() {
+    expect(foam.Object.isInstance({})).toBe(true);
+    expect(foam.Object.isInstance([])).toBe(false);
+    expect(foam.Object.isInstance(66)).toBe(false);
+    // NOTE: null counts as an object
+    expect(foam.Object.isInstance(null)).toBe(true);
+  });
+  it('clone', function() {
+    var a = { d: "hello" };
+    expect(foam.Object.clone(a)).toBe(a);
+  });
+  it('equals', function() {
+    var a = { d: "hello" };
+    var b = { d: "hello" };
+    expect(foam.Object.equals(a, b)).toBe(false);
+    expect(foam.Object.equals(a, a)).toBe(true);
+    expect(foam.Object.equals(a, null)).toBe(false);
+  });
+  it('compare', function() {
+    var a = { d: "hello" };
+    var b = { d: "hello" };
+    a.$UID; // UID ordering matters
+    b.$UID;
+    expect(foam.Object.compare(a, b)).toBe(-1);
+    expect(foam.Object.compare(b, a)).toBe(1);
+    expect(foam.Object.compare(a, undefined)).toBe(1);
+  });
+  it('hashCode', function() {
+    expect(foam.Object.hashCode({ key: 'anything' })).toBe(0);
+    expect(foam.Object.hashCode()).toBe(0);
+  });
+  it('freeze', function() {
+    var a = { d: "hello" };
+    foam.Object.freeze(a);
+    expect(a.$UID).toBeGreaterThan(0);
+    a.d = "fail";
+    expect(a.d).toEqual("hello");
+  });
+
+});
+
 
 
