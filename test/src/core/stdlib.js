@@ -677,6 +677,21 @@ describe('foam.String', function() {
 
   });
 
+  it('multiline', function() {
+    expect(foam.String.multiline("already \na string"))
+      .toEqual("already \na string");
+
+    expect(foam.String.multiline(function(
+      ) {/*
+        multiline
+        function
+    */}))
+      .toEqual("\n        multiline\n        function\n    ");
+
+    expect(foam.String.multiline(function() {}))
+      .toEqual('');
+
+  });
 
   it('pad', function() {
     expect(foam.String.pad("wee", -6)).toEqual("   wee");
