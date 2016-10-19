@@ -361,7 +361,7 @@ foam.LIB({
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
                        'Cannot toUpperCase non-string values.');
-                       
+
         return str.toUpperCase();
       })
     },
@@ -390,7 +390,7 @@ foam.LIB({
       var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
-      return s.substring(start + 2, end);
+      return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
       return a.toUpperCase().startsWith(b.toUpperCase());
