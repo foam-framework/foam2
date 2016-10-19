@@ -445,7 +445,7 @@ foam.LIB({
       return true;
     },
     function compare(a, b) {
-      if ( ! b || ! Array.isArray(b) ) return false;
+      if ( ! b || ! Array.isArray(b) ) return 1;
       var l = Math.min(a.length, b.length);
       for ( var i = 0 ; i < l ; i++ ) {
         var c = foam.util.compare(a[i], b[i]);
