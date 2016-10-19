@@ -728,5 +728,23 @@ describe('foam.Array', function() {
     expect(foam.Array.compare([1, 2], null)).toBe(1);
   });
 
+  it('hashCode', function() {
+    // uses hash of each element
+    expect(foam.Array.hashCode(['a string']))
+      .toBe(foam.String.hashCode('a string'));
+
+    // ordering matters
+    expect(foam.Array.hashCode(['a string', 'b string']))
+      .not.toBe(foam.Array.hashCode(['b string', 'a string']));
+
+    // slight change results in different hash
+    expect(foam.Array.hashCode([1,2,3,4,5,6,7,8,9]))
+      .not.toBe(foam.Array.hashCode([1,2,3,3,5,6,7,8,9]));
+
+  });
+
 });
+
+
+
 

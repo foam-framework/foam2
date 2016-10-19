@@ -457,7 +457,8 @@ foam.LIB({
       var hash = 0;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
-        hash = ((hash << 5) - hash) + this.hashCode(a[i]);
+        var ai = a[i];
+        hash = ((hash << 5) - hash) + foam.typeOf(ai).hashCode(ai);
       }
 
       return hash;
