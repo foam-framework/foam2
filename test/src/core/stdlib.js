@@ -694,6 +694,17 @@ describe('foam.Function', function() {
         
     });
 
+    it('cssClassize', function() {
+      expect(foam.String.cssClassize('some.class.Name'))
+        .toBe('some-class-Name');
+      expect(foam.String.cssClassize('99.$$'))
+        .toBe('99-$$');
+      expect(function() { 
+        foam.String.cssClassize(null);
+      }).toThrow();
+        
+    });
+
 
     it('pad', function() {
       expect(foam.String.pad("wee", -6)).toEqual("   wee");
