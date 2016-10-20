@@ -208,7 +208,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 600, height: 500, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 700, height: 700, color: '#f3f3f3'});
       }
     },
   ],
