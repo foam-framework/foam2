@@ -25,21 +25,24 @@ foam.CLASS({
       installInClass: function(cls) {
         cls.createView = function(spec, args, that, ctx) {
           return foam.u2.Element.isInstance(spec) ?
-            spec :
+              spec :
+
+          foam.core.Slot.isInstance(spec) ?
+              spec :
 
           (spec && spec.toE) ?
-            spec.toE(args, ctx) :
+              spec.toE(args, ctx) :
 
           typeof spec === 'function' ?
-            spec.call(that, args, ctx) :
+              foam.u2.ViewSpec.createView(spec.call(that, args, ctx), args, that, ctx) :
 
           foam.Object.isInstance(spec) ?
-            (spec.create ?
-              spec.create(args, ctx) :
-              ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
+              (spec.create ?
+                  spec.create(args, ctx) :
+                  ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
 
           foam.core.FObject.isSubClass(spec) ?
-            spec.create(args, ctx) :
+              spec.create(args, ctx) :
 
           // TODO: verify a String
           foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);

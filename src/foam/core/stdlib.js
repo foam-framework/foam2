@@ -108,7 +108,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
-      return b ? foam.String.compare(a.toString(), a.toString()) :  1;
+      return b ? foam.String.compare(a.toString(), b.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
 
@@ -197,16 +197,21 @@ foam.LIB({
 
     /** Convenience method to append 'arguments' onto a real array **/
     function appendArguments(a, args, start) {
+      start = start || 0;
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
     },
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      return f.
+      var match = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'').
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+      if ( ! match ) {
+        throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
+      }
+      return match[2] || '';
     },
 
     function formalArgs(f) {
@@ -215,7 +220,6 @@ foam.LIB({
        * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
-      if ( ! args ) return [];
       args += ',';
 
       var ret = [];
@@ -293,7 +297,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return b === null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+      return ( b === null || b === undefined ) ? 1 :
+        a < b ? -1 : a > b ? 1 : 0;
     },
     function hashCode(n) { return n & n; }
   ]
@@ -332,7 +337,9 @@ foam.LIB({
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
-        if ( ! str || str === '' ) return str;
+        console.assert(typeof str === 'string',
+                       'Cannot labelize non-string values.');
+        if ( str === '' ) return str;
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
@@ -342,6 +349,8 @@ foam.LIB({
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
       })
@@ -350,6 +359,9 @@ foam.LIB({
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot toUpperCase non-string values.');
+
         return str.toUpperCase();
       })
     },
@@ -357,6 +369,8 @@ foam.LIB({
     {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot cssClassize non-string values.');
         // Turns foam.u2.Foo into foam-u2-Foo
         return str.replace(/\./g, '-');
       })
@@ -376,7 +390,7 @@ foam.LIB({
       var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
-      return s.substring(start + 2, end);
+      return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
       return a.toUpperCase().startsWith(b.toUpperCase());
@@ -431,7 +445,7 @@ foam.LIB({
       return true;
     },
     function compare(a, b) {
-      if ( ! b || ! Array.isArray(b) ) return false;
+      if ( ! b || ! Array.isArray(b) ) return 1;
       var l = Math.min(a.length, b.length);
       for ( var i = 0 ; i < l ; i++ ) {
         var c = foam.util.compare(a[i], b[i]);
@@ -443,7 +457,7 @@ foam.LIB({
       var hash = 0;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
-        hash = ((hash << 5) - hash) + this.hashCode(a[i]);
+        hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
       }
 
       return hash;
@@ -456,7 +470,7 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
-    function clone(o) { return o; },
+    function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
