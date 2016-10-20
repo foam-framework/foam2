@@ -67,7 +67,7 @@ foam.CLASS({
       this.idIndex = this.index;
 
       if ( this.autoIndex ) {
-        this.addIndex(this.AutoIndex.create({ mdao: this }));
+        this.addIndex(this.AutoIndex.create({ idIndexFactory: this.idIndex.progenitor }));
       }
     },
 

@@ -22,7 +22,7 @@ if ( ! typeof performance !== 'undefined' ) performance = {
 
 
 
-describe("Index benchmarks", function() {
+xdescribe("Index benchmarks", function() {
   var DEBUG = false;
   var oldRandom;
   var rseed;

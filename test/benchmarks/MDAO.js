@@ -19,7 +19,7 @@ if ( ! typeof performance !== 'undefined' ) performance = {
   now: function() { return Date.now(); }
 };
 
-describe("MDAO benchmarks", function() {
+xdescribe("MDAO benchmarks", function() {
   it("runs", function(done) {
 
     var NUM_ALBUMS = 1000;

@@ -174,7 +174,7 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'delegateFactory_',
+      name: 'delegateFactory',
       factory: function() {
         return this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
       }
@@ -182,15 +182,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function initInstance() {
-      this.delegate = this.delegateFactory_.spawn();
-    },
 
     function addPropertyIndex(prop, root) {
       this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
     },
     function addIndex(index, root) {
-      this.delegateFactory_.addIndex(index, root);
+      this.delegateFactory.addIndex(index, root);
     },
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this

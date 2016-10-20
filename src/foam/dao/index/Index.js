@@ -69,9 +69,16 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'delegateFactory',
+      required: true,
+    },
+    {
       class: 'foam.pattern.progenitor.PerInstance',
-      name: 'delegate'
-    }
+      name: 'delegate',
+      factory: function() {
+        return this.delegateFactory.spawn();
+      }
+    },
   ],
 
   methods: [

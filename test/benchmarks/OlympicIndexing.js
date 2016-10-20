@@ -138,6 +138,16 @@ describe("Index benchmarks", function() {
       daoType: 'MDAO'
     });
 
+    autodaoOmni = foam.dao.EasyDAO.create({
+      of: Medal,
+      seqNo: true,
+      autoIndex: false,
+      dedup: true,
+      daoType: 'MDAO'
+    });
+    autodaoOmni.addIndex(foam.dao.index.OmniscientAutoIndex.create({
+      mdao: autodaoOmni.mdao
+    }));
 
   });
   afterEach(function() {
@@ -348,6 +358,22 @@ describe("Index benchmarks", function() {
           )
         ),
 
+      ])).then(function() {
+        dao.select(autodaoOmni).then(foam.async.sequence([
+        function() { dao = null; /* allow gc */ },
+        foam.async.sleep(2000),
+        foam.async.atest(
+          'Run predicate set A omni-auto index',
+          foam.async.repeat(SAMPLE_PREDICATES_A.length,
+            function(i) {
+              return foam.async.atest('N-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+                var pred = SAMPLE_PREDICATES_A[i];
+                return autodaoOmni.where(pred).select();
+              })();
+            }
+          )
+        ),
+
       ])).then(done);
     });
   });
@@ -386,8 +412,36 @@ describe("Index benchmarks", function() {
         )
       ])
     ).then(function() {
-      autodao.select(dao).then(foam.async.sequence([
-        function() { autodao = null; /* allow gc */ },
+      autodao.select(autodaoOmni).then(
+        foam.async.sequence([
+          function() { autodao = null; /* allow gc */ },
+          foam.async.atest(
+            'Run predicate set B with AutoIndex 100 times',
+            foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+              function(i) {
+                return foam.async.atest('A-Predicate '+SAMPLE_B[i].toString(), function() {
+                  var pred = SAMPLE_B[i];
+                  return autodaoOmni.where(pred).select();
+                })();
+              }
+            ))
+          ),
+          foam.async.atest(
+            'Run predicate set B with AutoIndex Again(already indexed) 100 times',
+            foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
+              function(i) {
+                return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString(), function() {
+                  var pred = SAMPLE_B[i];
+                  return autodaoOmni.where(pred).select();
+                })();
+              }
+            ))
+          )
+        ])
+      )
+    }).then(function() {
+      autodaoOmni.select(dao).then(foam.async.sequence([
+        function() { autodaoOmni = null; /* allow gc */ },
         foam.async.sleep(2000),
         foam.async.atest(
           'Run predicate set B no index 100 times',
@@ -400,11 +454,10 @@ describe("Index benchmarks", function() {
             }
           ))
         ),
-
-      ])).then(done);
-    });
+      ]))
+    }).then(done);
   });
-
+});
 
 
 });
