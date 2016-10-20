@@ -463,6 +463,13 @@ foam.LIB({
       }
 
       return hash;
+    },
+    function remove(a, o) {
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        if ( foam.util.equals(o, a[i]) ) {
+          a.splice(i, 1);
+        }
+      }
     }
   ]
 });
