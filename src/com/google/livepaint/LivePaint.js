@@ -96,7 +96,10 @@ foam.CLASS({
   name: 'LivePaint',
   extends: 'foam.u2.Element',
 
-  implements: [ 'foam.memento.MementoMgr' ],
+  implements: [
+    'foam.mlang.Expressions',
+    'foam.memento.MementoMgr'
+  ],
 
   requires: [
     'com.google.livepaint.Property',
@@ -192,7 +195,9 @@ foam.CLASS({
 //          daoType: 'MDAO'
           daoType: 'ARRAY'
         });
-        dao.put(this.Property.create({name: 'physics', value: this.physics}));
+        var p = this.Property.create({name: 'physics', value: this.physics});
+        this.physics.setPrivate_('lpp_', p);
+        dao.put(p);
         return dao;
       }
     },
@@ -259,25 +264,11 @@ foam.CLASS({
           name: opt_name,
           value: value
         });
+        value.setPrivate_('lpp_', p);
         this.properties.put(p);
         this.selected = p;
       }
     },
-
-    /*
-    function addCircle(x, y, opt_r) {
-      var c = this.Circle.create({
-        x: x,
-        y: y,
-        radius: opt_r || 25,
-        color: this.UNSELECTED_COLOR,
-        border: '#000'});
-
-      this.canvas.addChildren(c);
-
-      return c;
-    },
-    */
 
     function updateMemento() {
       this.feedback_ = true;
@@ -326,8 +317,8 @@ foam.CLASS({
       var c = this.canvas.findFirstChildAt(x, y);
 
       if ( c ) {
-        // TODO: find
-        this.selected = c;
+        var p = c.getPrivate_('lpp_');
+        this.selected = p;
       } else {
         var tool = this.currentTool;
         if ( ! tool ) return;
