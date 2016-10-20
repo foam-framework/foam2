@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Robot',
   extends: 'foam.graphics.CView',
 
+  implements: [ 'foam.physics.Physical' ],
+
   // author: Sebastian Greer (age 11)
 
   requires: [
@@ -32,6 +34,8 @@ foam.CLASS({
   ],
 
   properties: [
+    [ 'width', 30 ],
+    [ 'height', 50 ],
     { name: 'timer', hidden: true, factory: function() { return this.Timer.create(); } }
   ],
 
