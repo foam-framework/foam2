@@ -629,7 +629,10 @@ foam.mmethod = function(map, opt_defaultMethod) {
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) { return typeOf(a).compare(a, b); },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
-      function diff(a, b)    { return typeOf(a).diff(a, b); }
+      function diff(a, b)    {
+        var t = typeOf(a);
+        return t.diff ? t.diff(a, b) : undefined;
+      },
     ]
   });
 })();
