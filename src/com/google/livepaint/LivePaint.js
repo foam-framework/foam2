@@ -40,6 +40,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.livepaint',
+  name: 'Clock',
+  extends: 'com.google.foam.demos.clock.Clock',
+  implements: [ 'foam.physics.Physical' ],
+  properties: [
+    [ 'mass',  0 ],
+    [ 'radius', 45 ]
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.livepaint',
   name: 'Text',
   extends: 'foam.graphics.Label',
   implements: [ 'foam.physics.Physical' ],
@@ -149,6 +160,7 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'MDAO'
         });
+        dao.put(com.google.livepaint.Clock.model_);
         dao.put(com.google.livepaint.Circle.model_);
         dao.put(com.google.livepaint.Box.model_);
         dao.put(com.google.livepaint.Text.model_);
@@ -187,7 +199,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({width: 600, height: 500, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 600, height: 500, color: '#f3f3f3'});
       }
     },
   ],
