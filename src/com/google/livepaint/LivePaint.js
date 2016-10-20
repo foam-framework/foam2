@@ -245,11 +245,7 @@ foam.CLASS({
         var i = opt_i || 1;
         var prefix = value.cls_.name.toLowerCase();
         this.properties.find(prefix + i).then(function (o) {
-          if ( ! o ) {
-            self.addProperty(value, prefix + i);
-          } else {
-            self.addProperty(value, null, i+1);
-          }
+          self.addProperty(value, null, i+1);
         }).catch(function(x) {
           self.addProperty(value, prefix+i);
         });
