@@ -780,7 +780,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      value: 'black'
+      value: '#000000'
     }
   ],
 
@@ -819,7 +819,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      value: 'black'
+      value: '#000000'
     }
   ],
 
@@ -1062,7 +1062,7 @@ foam.CLASS({
     {
       class: 'Color',
       name:  'color',
-      value: 'black'
+      value: '#000000'
     },
     {
       class: 'Color',
