@@ -44,7 +44,7 @@ foam.CLASS({
   extends: 'com.google.foam.demos.clock.Clock',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    [ 'mass',  0 ],
+    // [ 'mass',  0 ],
     [ 'radius', 45 ]
   ]
 });
@@ -56,7 +56,7 @@ foam.CLASS({
   extends: 'foam.graphics.Label',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    [ 'mass',  0 ],
+    // [ 'mass',  0 ],
     [ 'width',  100 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
@@ -72,7 +72,7 @@ foam.CLASS({
   extends: 'foam.graphics.Circle',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    [ 'mass',  0 ],
+    // [ 'mass',  0 ],
     [ 'radius', 25 ]
   ]
 });
@@ -84,7 +84,7 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    [ 'mass',  0 ],
+    // [ 'mass',  0 ],
     [ 'width',  50 ],
     [ 'height', 50 ]
   ]
@@ -140,7 +140,7 @@ foam.CLASS({
     {
       name: 'physics',
       factory: function() {
-        return this.PhysicsEngine.create();
+        return this.PhysicsEngine.create({enableGravity: false});
       }
     },
     'feedback_',
@@ -167,7 +167,7 @@ foam.CLASS({
     },
     {
       name: 'value',
-      view: { class: 'foam.u2.DetailView' }
+      view: { class: 'foam.u2.DetailView', showActions: true }
     },
     {
       name: 'selected',
@@ -246,7 +246,7 @@ foam.CLASS({
           end().
           add(this.VALUE);
 
-      this.physics.start();
+      // this.physics.start();
     },
 
     function addProperty(value, opt_name, opt_i) {
@@ -264,6 +264,7 @@ foam.CLASS({
           name: opt_name,
           value: value
         });
+        value.gravity = 1;
         value.setPrivate_('lpp_', p);
         this.properties.put(p);
         this.selected = p;
