@@ -361,7 +361,7 @@ foam.LIB({
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
                        'Cannot toUpperCase non-string values.');
-                       
+
         return str.toUpperCase();
       })
     },
@@ -390,7 +390,7 @@ foam.LIB({
       var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
-      return s.substring(start + 2, end);
+      return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
       return a.toUpperCase().startsWith(b.toUpperCase());
@@ -445,7 +445,7 @@ foam.LIB({
       return true;
     },
     function compare(a, b) {
-      if ( ! b || ! Array.isArray(b) ) return false;
+      if ( ! b || ! Array.isArray(b) ) return 1;
       var l = Math.min(a.length, b.length);
       for ( var i = 0 ; i < l ; i++ ) {
         var c = foam.util.compare(a[i], b[i]);
@@ -457,7 +457,7 @@ foam.LIB({
       var hash = 0;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
-        hash = ((hash << 5) - hash) + this.hashCode(a[i]);
+        hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
       }
 
       return hash;
@@ -470,7 +470,7 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
-    function clone(o) { return o; },
+    function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
