@@ -510,6 +510,11 @@ describe('foam.String', function() {
 
   });
 
+  it('intern', function() {
+    expect(foam.String.intern('my '+'string'))
+      .toBe(foam.String.intern('my'+' string'));
+  });
+
   it('startsWithIC', function() {
     expect(foam.String.startsWithIC('my string', 'MY '))
       .toBe(true);
@@ -556,44 +561,44 @@ describe('foam.Array', function() {
 
     it('reports no change correctly', function() {
       var a = ['a', 't', x];
-      expect(foam.util.diff(a, a).added).toEqual([]);
-      expect(foam.util.diff(a, a).removed).toEqual([]);
+      expect(foam.Array.diff(a, a).added).toEqual([]);
+      expect(foam.Array.diff(a, a).removed).toEqual([]);
 
       var b = [];
-      expect(foam.util.diff(b, b).added).toEqual([]);
-      expect(foam.util.diff(b, b).removed).toEqual([]);
+      expect(foam.Array.diff(b, b).added).toEqual([]);
+      expect(foam.Array.diff(b, b).removed).toEqual([]);
     });
     it('finds added primitive elements', function() {
       var a = ['a', 't'];
       var b = ['a', 'r', 't'];
-      expect(foam.util.diff(a, b).added).toEqual(['r']);
+      expect(foam.Array.diff(a, b).added).toEqual(['r']);
     });
     it('finds removed primitive elements', function() {
       var a = ['a', 't'];
       var b = ['a', 'r', 't'];
-      expect(foam.util.diff(b, a).removed).toEqual(['r']);
+      expect(foam.Array.diff(b, a).removed).toEqual(['r']);
     });
     it('finds added object elements', function() {
       var a = [x, 4];
       var b = [y, x, 4];
-      expect(foam.util.diff(a, b).added).toEqual([y]);
+      expect(foam.Array.diff(a, b).added).toEqual([y]);
     });
     it('finds removed object elements', function() {
       var a = [y, 4];
       var b = [y, x, 4];
-      expect(foam.util.diff(b, a).removed).toEqual([x]);
+      expect(foam.Array.diff(b, a).removed).toEqual([x]);
     });
     it('finds swapped elements', function() {
       var a = [y, 4, 8];
       var b = [4, x, 'hello'];
-      expect(foam.util.diff(a, b).added).toEqual([x, 'hello']);
-      expect(foam.util.diff(a, b).removed).toEqual([y, 8]);
+      expect(foam.Array.diff(a, b).added).toEqual([x, 'hello']);
+      expect(foam.Array.diff(a, b).removed).toEqual([y, 8]);
     });
     it('treats multiple copies of an element as separate items', function() {
       var a = [4,5,6,7,8,8];
       var b = [4,4,4,4,8,8];
-      expect(foam.util.diff(a, b).added).toEqual([4,4,4]);
-      expect(foam.util.diff(a, b).removed).toEqual([5,6,7]);
+      expect(foam.Array.diff(a, b).added).toEqual([4,4,4]);
+      expect(foam.Array.diff(a, b).removed).toEqual([5,6,7]);
     });
   });
 
@@ -881,5 +886,80 @@ describe('foam.mmethod', function() {
 });
 
 
+describe('foam.util', function() {
+  it('handles a buffet of types', function() {
+    var types = [
+      99,
+      "hello",
+      function() {},
+      new Date(4843090),
+      foam.core.Property.create({ name: 'prop' }),
+      { a: 'A' },
+      [ 2, 4 ]
+    ];
+    types.forEach(function(t) {
+      expect(foam.util.equals(foam.util.clone(t), t)).toBe(true);
+      expect(foam.util.equals(t, t)).toBe(true);
+      expect(foam.util.compare(t, t)).toBe(0);
+      expect(foam.util.hashCode(t)).not.toBeUndefined();
+      expect(foam.util.hashCode(t)).not.toBeNull();
+      if ( foam.typeOf(t).diff ) {
+        expect(foam.util.diff(t, t)).toBeTruthy();
+      } else {
+        expect(foam.util.diff(t, t)).toBeUndefined();
+      }
+    });
+
+
+  });
+
+});
+
+
+describe('foam.package', function() {
+  it('ensurePackage', function() {
+    var root = { package1: { subPack1: { a: 1 }, subPack2: { a: 2 } }, package2: { a: 3 } };
+
+    expect(foam.package.ensurePackage(root, '')).toBe(root);
+    expect(foam.package.ensurePackage(root)).toBe(root);
+    expect(foam.package.ensurePackage(root, null)).toBe(root);
+
+    expect(function() {
+      foam.package.ensurePackage(root, { bad: 'path' });
+    }).toThrow();
+
+    expect(foam.package.ensurePackage(root, 'package2').a).toBe(3);
+    expect(foam.package.ensurePackage(root, 'package1.subPack1').a).toBe(1);
+    expect(foam.package.ensurePackage(root, 'package1.subPack2').a).toBe(2);
+
+  });
+
+  it('registerClass', function() {
+    expect(function() {
+      foam.package.registerClass("Not an object");
+    }).toThrow();
+    expect(function() {
+      foam.package.registerClass({ name: 88 });
+    }).toThrow();
+    expect(function() {
+      foam.package.registerClass({ name: { not: 'a string' } });
+    }).toThrow();
+
+    foam.package.registerClass({
+      name: "TestClassForPackageTest",
+      package: 'test.packageTest'
+    });
+    expect(test.packageTest.TestClassForPackageTest.name)
+      .toBe("TestClassForPackageTest");
+
+  });
+
+});
+
+describe('foam.uuid', function() {
+  it('randomGUID', function() {
+    expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
+  });
+});
 
 
