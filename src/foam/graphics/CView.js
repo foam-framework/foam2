@@ -394,6 +394,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Float',
+      name: 'width'
+    },
+    {
+      class: 'Float',
+      name: 'height'
+    },
+    {
       name: 'rotation',
       class: 'Float'
     },
@@ -510,7 +518,7 @@ foam.CLASS({
       // TODO: Would be more efficient to be a factory, but doesn't work. Investigate.
       getter: function() {
         return this.parent ? this.parent.invalidate_ :
-          this.autoRepaint ? this.invalidated.pub   :
+          this.autoRepaint ? this.invalidated.pub    :
           null ;
       }
     }
@@ -672,9 +680,8 @@ foam.CLASS({
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({
-        // TODO: better to make Arc compute it's width and height
-        width: this.x + (this.width  || (this.radius + this.arcWidth) * 2),
-        height: this.y + (this.height || (this.radius + this.arcWidth) * 2)
+        width: this.x + this.width,
+        height: this.y + this.height
       });
     },
 
@@ -822,6 +829,13 @@ foam.CLASS({
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
+    },
+
+    function toE(X) {
+      return this.Canvas.create({ cview: this }, X).attrs({
+        width: this.x + this.radius + this.arcWidth,
+        height: this.y + this.radius + this.arcWidth
+      });
     }
   ]
 });
