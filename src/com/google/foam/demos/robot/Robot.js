@@ -39,8 +39,6 @@ foam.CLASS({
     function initCView() {
       this.SUPER();
 
-      this.x = this.y = 50;
-
       var body = this.Rectangle.create({
         width: 20,
         height: 30,
@@ -72,7 +70,7 @@ foam.CLASS({
         radius: 8,
         color:  'red',
         x:      10,
-        y:      30,
+        y:      30.5,
         start:  0,
         end:    Math.PI
       });
