@@ -339,7 +339,7 @@ foam.CLASS({
         var subPlans = [];
         // iterate over all keys
         for ( var i = 0; i < indexes.length; i++ ) {
-          subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate));
+          subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate, root));
         }
 
         return index.AltPlan.create({// TODO: ordering... mergeplan?

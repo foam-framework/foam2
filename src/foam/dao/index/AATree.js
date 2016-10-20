@@ -160,6 +160,16 @@ foam.CLASS({
       return r > 0 ? this.left.get(key, compare) : this.right.get(key, compare);
     },
 
+    /** scans the entire tree and returns all matches */
+    function getAll(key, compare, retArray) {
+      var r = compare(this.key, key);
+
+      if ( r === 0 ) retArray.push(this.value);
+
+      this.left.getAll(key, compare, retArray);
+      this.right.getAll(key, compare, retArray);
+    },
+
     function putKeyValue(key, value, compare, dedup, locked) {
       var s = this.maybeClone(locked);
 
@@ -475,6 +485,8 @@ foam.CLASS({
     function gte()  { return this; },
     function lt()   { return this; },
     function lte()  { return this; },
+
+    function getAll()  { return; },
 
     function bulkLoad_(a, start, end, keyExtractor) {
       if ( end < start ) return this;
