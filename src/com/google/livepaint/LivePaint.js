@@ -30,8 +30,8 @@ foam.CLASS({
     {
       name: 'deleteRow',
       label: 'X',
-      code: function deleteRow() {
-        debugger;
+      code: function deleteRow(X) {
+        X.properties.remove(X.data);
       }
     }
   ]
@@ -122,7 +122,10 @@ foam.CLASS({
     'foam.u2.TableView'
   ],
 
-  exports: [ 'as data' ],
+  exports: [
+    'as data',
+    'properties'
+  ],
 
   constants: {
     SELECTED_COLOR:   '#dddddd',
@@ -212,6 +215,7 @@ foam.CLASS({
 
     function initE() {
       this.properties.on.put.sub(this.onPropertyPut);
+      this.properties.on.remove.sub(this.onPropertyRemove);
 
       this.memento$.sub(function() {
         var m = this.memento;
@@ -297,7 +301,7 @@ foam.CLASS({
     {
       name: 'deleteProperty',
       label: 'X',
-      code: function() {
+      code: function(X) {
         debugger;
       }
     }
@@ -311,6 +315,17 @@ foam.CLASS({
 
         if ( this.Physical.isInstance(o) ) {
           this.physics.add(o);
+        }
+      }
+    },
+
+    function onPropertyRemove(_, _, _, p) {
+      var o = p.value;
+      if ( this.CView.isInstance(o) ) {
+        this.canvas.remove(o);
+
+        if ( this.Physical.isInstance(o) ) {
+          this.physics.remove(o);
         }
       }
     },
