@@ -161,6 +161,8 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'MDAO'
         });
+        dao.put(foam.audio.Speak.model_);
+        dao.put(foam.audio.Beep.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
         dao.put(com.google.livepaint.Clock.model_);
         dao.put(com.google.livepaint.Circle.model_);
