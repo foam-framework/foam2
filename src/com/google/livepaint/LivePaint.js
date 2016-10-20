@@ -32,11 +32,11 @@ foam.CLASS({
       label: 'X',
       code: function deleteRow() {
         debugger;
-      
       }
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.livepaint',
@@ -48,6 +48,7 @@ foam.CLASS({
     [ 'radius', 45 ]
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.livepaint',
@@ -68,6 +69,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.livepaint',
   name: 'Circle',
@@ -82,6 +84,7 @@ foam.CLASS({
     [ 'radius', 25 ]
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.livepaint',
@@ -244,12 +247,26 @@ foam.CLASS({
       this.physics.start();
     },
 
-    function addProperty(value, opt_name) {
-      console.log('addProperty: ', value.cls_.id);
-      this.properties.put(this.Property.create({
-        name: opt_name,
-        value: value
-      }));
+    function addProperty(value, opt_name, opt_i) {
+      var self = this;
+      if ( ! opt_name ) {
+        var i = opt_i || 1;
+        var prefix = value.cls_.name.toLowerCase();
+        this.properties.find(prefix + i).then(function (o) {
+          if ( ! o ) {
+            self.addProperty(value, prefix + i);
+          } else {
+            self.addProperty(value, null, i+1);
+          }
+        }).catch(function(x) {
+          self.addProperty(value, prefix+i);
+        });
+      } else {
+        this.properties.put(this.Property.create({
+          name: opt_name,
+          value: value
+        }));
+      }
     },
 
     /*
