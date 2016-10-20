@@ -21,35 +21,18 @@ foam.CLASS({
   name: 'Collider',
 
   properties: [
-    { name: 'children', factory: function() { return []; } },
-    'stopped_'
-  ],
-
-  listeners: [
     {
-      name: 'tick',
-      isFramed: true,
-      code: function tick() {
-        if ( this.stopped_ ) return;
-        this.detectCollisions();
-        this.updateChildren();
-
-        this.tick();
-      }
+      name: 'children',
+      factory: function() { return []; },
+      hidden: true
+    },
+    {
+      name: 'stopped_',
+      hidden: true
     }
   ],
 
   methods: [
-    function start() {
-      this.stopped_ = false;
-      this.tick();
-      return this;
-    },
-
-    function stop() {
-      this.stopped_ = true;
-    },
-
     function updateChild(child) {
     },
 
@@ -192,6 +175,32 @@ foam.CLASS({
     function destroy() {
       this.stopped_ = true;
       this.children = [];
+    }
+  ],
+
+  actions: [
+    function start() {
+      this.stopped_ = false;
+      this.tick();
+      return this;
+    },
+
+    function stop() {
+      this.stopped_ = true;
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      isFramed: true,
+      code: function tick() {
+        if ( this.stopped_ ) return;
+        this.detectCollisions();
+        this.updateChildren();
+
+        this.tick();
+      }
     }
   ]
 });
