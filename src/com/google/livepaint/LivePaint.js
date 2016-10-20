@@ -242,7 +242,7 @@ foam.CLASS({
           end().
           start('div').
             cssClass(this.myCls('properties')).
-            add(this.PROPERTIES).
+          start(this.PROPERTIES, {selection$: this.selected$}).end().
           end().
           add(this.VALUE);
 
