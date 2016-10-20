@@ -502,7 +502,8 @@ foam.CLASS({
     {
       name: 'invalidate_',
       hidden: true,
-      factory: function() {
+      // TODO: Would be more efficient to be a factory, but doesn't work. Investigate.
+      getter: function() {
         return this.parent ? this.parent.invalidate_ :
           this.autoRepaint ? this.invalidated.pub   :
           null ;
