@@ -1763,3 +1763,67 @@ describe('MultiPartID MDAO support', function() {
 
 });
 
+
+describe('NoSelectAllDAO', function() {
+
+  var dao;
+  var srcdao;
+  var sink;
+  var m;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+    m = foam.mlang.ExpressionsSingleton.create();
+    srcdao  = foam.dao.ArrayDAO.create({ of: test.CompA });
+    sink = foam.dao.ArrayDAO.create({ of: test.CompA });
+    dao = foam.dao.NoSelectAllDAO.create({ of: test.CompA, delegate: srcdao });
+
+    dao.put(test.CompA.create({ id: 0, a: 4 }));
+    dao.put(test.CompA.create({ id: 2, a: 77 }));
+    dao.put(test.CompA.create({ id: 3, a: 8 }));
+    dao.put(test.CompA.create({ id: 4, a: 99 }));
+
+  });
+
+  it('Does not forward select() with no restrictions', function(done) {
+    dao.select(sink).then(function(snk) {
+      expect(snk.array.length).toEqual(0);
+      done();
+    });
+  });
+
+  it('Forwards select() with a predicate', function(done) {
+    dao.where(m.LT(test.CompA.A, 20)).select(sink).then(function(snk) {
+      expect(snk.array.length).toEqual(2);
+      done();
+    });
+  });
+
+  it('Forwards select() with a limit', function(done) {
+    dao.limit(2).select(sink).then(function(snk) {
+      expect(snk.array.length).toEqual(2);
+      done();
+    });
+  });
+
+  it('Forwards select() with a skip', function(done) {
+    dao.skip(1).select(sink).then(function(snk) {
+      expect(snk.array.length).toEqual(3);
+      done();
+    });
+  });
+
+  it('Does not forward select() with an infinite limit', function(done) {
+    dao.limit(Math.Infinity).select(sink).then(function(snk) {
+      expect(snk.array.length).toEqual(0);
+      done();
+    });
+  });
+
+
+
+});

@@ -82,12 +82,19 @@ foam.CLASS({
 
       if ( ! superMethod_ ) {
         var name = this.name;
-        var id = proto.cls_.id;
 
-        super_ = function() {
-          console.warn('Attempted to use SUPER() in',
-            name, 'on', id, 'but no parent method exists.');
-        };
+        // This method itself provides a false-posistive because
+        // it references SUPER(), so ignore.
+        if ( name !== 'override_' ) {
+          super_ = function() {
+            console.warn(
+                'Attempted to use SUPER() in',
+                name, 'on', proto.cls_.id, 'but no parent method exists.');
+          };
+
+          // Generate warning now.
+          super_();
+        }
       } else {
         this.assert(foam.core.AbstractMethod.isInstance(superMethod_),
           'Attempt to override non-method', this.name, 'on', proto.cls_.id);
