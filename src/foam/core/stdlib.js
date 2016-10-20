@@ -112,6 +112,7 @@ foam.LIB({
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
 
+    /* istanbul ignore next */
     function bind(f, that, a1, a2, a3, a4) {
       /**
        * Faster than Function.prototype.bind
@@ -209,6 +210,7 @@ foam.LIB({
           replace(/(\r\n|\n|\r)/gm,'').
           match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
       if ( ! match ) {
+        /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
       }
       return match[2] || '';
@@ -526,6 +528,7 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     // Can't be an FObject yet because we haven't built the class system yet
+    /* istanbul ignore next */
     function isInstance(o) { return false; },
     function clone(o)      { return o.clone(); },
     function diff(a, b)    { return a.diff(b); },
@@ -629,7 +632,10 @@ foam.mmethod = function(map, opt_defaultMethod) {
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) { return typeOf(a).compare(a, b); },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
-      function diff(a, b)    { return typeOf(a).diff(a, b); }
+      function diff(a, b)    {
+        var t = typeOf(a);
+        return t.diff ? t.diff(a, b) : undefined;
+      },
     ]
   });
 })();
