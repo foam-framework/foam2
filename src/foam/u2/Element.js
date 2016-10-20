@@ -1239,7 +1239,10 @@ foam.CLASS({
         for ( var key in es ) {
           removeRow(null, null, null, {id: key});
         }
-        dao.select({ put: function(o) { addRow(null, null, null, o); } });
+        dao.select({
+          put: function(o) { addRow(null, null, null, o); },
+          eof: function() {}
+        });
       };
       var addRow = function(_, _, _, o) {
         if ( update ) {
@@ -1256,7 +1259,6 @@ foam.CLASS({
               dao.put(o.clone());
             });
           });
-
         }
         self.endContext();
 
@@ -1662,7 +1664,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
-  requires: [ 'foam.u2.FloatView' ],
+  requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
   ]
@@ -1674,6 +1676,14 @@ foam.CLASS({
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
     [ 'view', { class: 'foam.u2.CheckBox' } ],
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Color',
+  properties: [
+    [ 'view', { class: 'foam.u2.TextField', type: 'color', onKey: true } ]
   ]
 });
 

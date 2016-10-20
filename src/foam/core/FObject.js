@@ -26,7 +26,7 @@
 foam.LIB({
   name: 'foam.core.FObject',
 
-  documentation: "Root prototype for all classes.",
+  documentation: 'Root prototype for all classes.',
 
   constants: {
     // Each class has a prototype object which is the prototype of all
@@ -294,7 +294,8 @@ foam.LIB({
         Properties can be defined using three formats:
         1. Short-form String: Ex.: 'firstName' or 'sex'
         2. Medium-form Array: Ex.: [ 'firstName', 'John' ] or [ 'sex', 'Male' ]
-           The first element of the array is the name and the second is the default value.
+           The first element of the array is the name and the second is the
+           default value.
         3. Long-form JSON: Ex.: [ name: 'firstName', value: 'John' ] or
            { class: 'String', name: 'sex', value: 'Male' }
            The long-form supports many options, but only 'name' is mandatory.
@@ -337,7 +338,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'FObject',
 
-  // documentation: 'Base model for model hierarchy.',
+  documentation: 'Base model for model hierarchy.',
 
   // Effectively imports the following methods, but imports: isn't available
   // yet, so we add with 'methods:'.
@@ -437,13 +438,12 @@ foam.CLASS({
     function warn() { this.__context__.warn.apply(null, arguments); },
 
 
-
     /************************************************
      * Publish and Subscribe
      ************************************************/
 
     /**
-      This structure represents the head of a doubly-linked list of
+      This structure represents the head of a doubly-linked-list/tree of
       listeners. It contains 'next', a pointer to the first listener,
       and 'children', a map of sub-topic chains.
 
@@ -455,17 +455,18 @@ foam.CLASS({
       'next' property. This simplifies the code because there is no
       special case for handling when the list is empty.
 
-      Listener List Structure
-      -----------------------
-      next     -> {
+      Listener Tree-List Structure
+      ----------------------------
+      next -> {
         prev: <-,
-        sub: {src: <source object>, destroy: <destructor function> },
+        sub: { src: <source object>, destroy: <destructor function> },
         l: <listener>,
-        next: -> },
-      children -> {
+        next: -> <same structure>,
+        children -> {
           subTopic1: <same structure>,
           ...
           subTopicn: <same structure>
+        }
       }
     */
     function createListenerList_() {
@@ -681,14 +682,13 @@ foam.CLASS({
       return ! this.instance_;
     },
 
-    function onDestroy(dtor) {
+    function onDestroy(d) {
       /*
         Register a function or a destroyable to be called
         when this object is destroyed.
       */
-      var dtors = this.getPrivate_('dtors') || this.setPrivate_('dtors', []);
-      dtors.push(dtor);
-      return dtor;
+      if ( d ) this.sub('destroy', d.destroy ? d.destroy.bind(d) : d);
+      return d;
     },
 
     function destroy() {
@@ -702,19 +702,7 @@ foam.CLASS({
       // Record that we're currently destroying this object,
       // to prevent infitine recursion.
       this.instance_.destroying_ = true;
-
-      var dtors = this.getPrivate_('dtors');
-      if ( dtors ) {
-        for ( var i = 0 ; i < dtors.length ; i++ ) {
-          var d = dtors[i];
-          if ( typeof d === 'function' ) {
-            d();
-          } else {
-            d.destroy();
-          }
-        }
-      }
-
+      this.pub('destroy');
       this.instance_ = this.private_ = null;
     },
 
@@ -896,8 +884,8 @@ foam.CLASS({
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
-          this.cls_.prototype === this ? 'Proto' :
-          this.isDestroyed() ? ':DESTROYED' :
+          this.cls_.prototype === this ? 'Proto'      :
+          this.isDestroyed()           ? ':DESTROYED' :
           '');
     }
   ]

@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var reg = test.helpers.ExemplarRegistry.create();
 var exemplars = [];
 var examples = [
@@ -298,7 +315,7 @@ var examples = [
   //     foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
   //   }
   // },
-  
+
   {
     name: 'Selecting with skip and limit',
     description: "A pseudo scroll effect with skip and limit",
@@ -307,16 +324,16 @@ var examples = [
       var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
       var skip = 0;
       var limit = 3;
-      
-      // Change skip value, reassign the proxy's source. 
+
+      // Change skip value, reassign the proxy's source.
       // The table will update automatically.
       setInterval(function() {
         skip = (skip + 1) % 4;
         proxyDAO.delegate = app.customerDAO.skip(skip).limit(limit);
       }, 500);
-      
+
       document.write("Customers with Skip and Limit");
-      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();      
+      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();
     }
   },
 
@@ -327,18 +344,18 @@ var examples = [
     code: function async() {
       return app.accountDAO.find(3).then(function(account) {
         var transactionsDAO = account.transactions;
-        
+
         document.write("Sort by amount, descending");
-        foam.u2.TableView.create({ 
+        foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(M.DESC(app.Transaction.AMOUNT))
-        }).write();              
+        }).write();
 
         document.write("Sort by date");
-        foam.u2.TableView.create({ 
+        foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(app.Transaction.DATE)
-        }).write();              
+        }).write();
       })
     }
   },

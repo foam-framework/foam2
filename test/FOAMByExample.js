@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var customMatchers = {
   toMatchGolden: function(util, customEqualityTesters) {
     return {
@@ -1500,7 +1517,7 @@ p2.pub('test','event');
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 78, str: "sub change:  Peter [object Object] propertyChange name PropertySlot(name)sub change:  Ringo [object Object] propertyChange name PropertySlot(name)sub change:  Ringo [object Object] test event" });
+  expect(log_.output).toMatchGolden({ i: 78, str: "sub change:  Peter [object Object] propertyChange name PropertySlot(Person.name)sub change:  Ringo [object Object] propertyChange name PropertySlot(Person.name)sub change:  Ringo [object Object] test event" });
 
 
 // Example 79
@@ -1747,7 +1764,7 @@ log(e.get());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 91, str: " <b>&gt;</b> John Smith <b>&gt;</b> [object Object] propertyChange value PropertySlot(value) <b>&gt;</b> Steve Jones" });
+  expect(log_.output).toMatchGolden({ i: 91, str: " <b>&gt;</b> John Smith <b>&gt;</b> [object Object] propertyChange value PropertySlot(foam.core.ExpressionSlot.value) <b>&gt;</b> Steve Jones" });
 
 
 // Example 92
@@ -1768,7 +1785,7 @@ log(e.get());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 92, str: " <b>&gt;</b> John Smith <b>&gt;</b> [object Object] propertyChange value PropertySlot(value) <b>&gt;</b> Steve Jones" });
+  expect(log_.output).toMatchGolden({ i: 92, str: " <b>&gt;</b> John Smith <b>&gt;</b> [object Object] propertyChange value PropertySlot(foam.core.ExpressionSlot.value) <b>&gt;</b> Steve Jones" });
 
 
 // Example 93
@@ -1814,7 +1831,7 @@ log(p.fname, p.lname, ' = ', p.name);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 94, str: "Instance of PersonAxiom Type           Name           Value----------------------------------------------------Property             fname          JohnProperty             lname          SmithProperty             name           John Smith\n <b>&gt;</b> [object Object] propertyChange fname PropertySlot(fname) <b>&gt;</b> [object Object] propertyChange name PropertySlot(name) <b>&gt;</b> Steve Smith  =  Steve Smith <b>&gt;</b> [object Object] propertyChange lname PropertySlot(lname) <b>&gt;</b> [object Object] propertyChange name PropertySlot(name) <b>&gt;</b> Steve Jones  =  Steve Jones" });
+  expect(log_.output).toMatchGolden({ i: 94, str: "Instance of PersonAxiom Type           Name           Value----------------------------------------------------Property             fname          JohnProperty             lname          SmithProperty             name           John Smith\n <b>&gt;</b> [object Object] propertyChange fname PropertySlot(Person.fname) <b>&gt;</b> [object Object] propertyChange name PropertySlot(Person.name) <b>&gt;</b> Steve Smith  =  Steve Smith <b>&gt;</b> [object Object] propertyChange lname PropertySlot(Person.lname) <b>&gt;</b> [object Object] propertyChange name PropertySlot(Person.name) <b>&gt;</b> Steve Jones  =  Steve Jones" });
 
 
 // Example 95
@@ -1831,7 +1848,7 @@ log(p.fname, p.lname, ':', p.name);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 95, str: " <b>&gt;</b> Steve Jones false <b>&gt;</b> [object Object] propertyChange name PropertySlot(name) <b>&gt;</b> Kevin Greer true <b>&gt;</b> [object Object] propertyChange fname PropertySlot(fname) <b>&gt;</b> Sebastian Jones : Kevin Greer" });
+  expect(log_.output).toMatchGolden({ i: 95, str: " <b>&gt;</b> Steve Jones false <b>&gt;</b> [object Object] propertyChange name PropertySlot(Person.name) <b>&gt;</b> Kevin Greer true <b>&gt;</b> [object Object] propertyChange fname PropertySlot(Person.fname) <b>&gt;</b> Sebastian Jones : Kevin Greer" });
 
 
 // Example 96
@@ -1845,7 +1862,7 @@ log(p.name, p.hasOwnProperty('name'));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 96, str: " <b>&gt;</b> Kevin Greer true <b>&gt;</b> [object Object] propertyChange name PropertySlot(name) <b>&gt;</b> Steve Jones false" });
+  expect(log_.output).toMatchGolden({ i: 96, str: " <b>&gt;</b> Kevin Greer true <b>&gt;</b> [object Object] propertyChange name PropertySlot(Person.name) <b>&gt;</b> Steve Jones false" });
 
 
 // Example 97

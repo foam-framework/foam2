@@ -1,4 +1,4 @@
-/**
+/*
  * @license
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
@@ -15,22 +15,27 @@
  * limitations under the License.
  */
 
+/**
+  A DAO which does nothing on 'select all' but otherwise acts as a ProxyDAO.
+  A 'select all' contains no query, limit, or skip.
+*/
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'RangeView',
-  extends: 'foam.u2.tag.Input',
+  package: 'foam.dao',
+  name: 'NoSelectAllDAO',
+  extends: 'foam.dao.ProxyDAO',
 
-  properties: [
-    [ 'type', 'range' ],
-    [ 'step', 0 ],
-    [ 'maxValue', 100 ]
-  ],
 
   methods: [
-    function initE() {
-      this.SUPER();
-      if ( this.step ) this.attrs({step: this.step});
-      this.attrs({max: this.maxValue});
+    function select(sink, skip, limit, order, predicate) {
+      if (predicate ||
+          ( foam.Number.isInstance(limit) && Number.isFinite(limit) ) ||
+          ( foam.Number.isInstance(skip) && Number.isFinite(skip) ) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      } else {
+        sink.eof();
+        return Promise.resolve(sink);
+      }
     }
+    // TODO: removeAll?
   ]
 });

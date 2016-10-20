@@ -2,14 +2,14 @@
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an 'AS IS' BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -81,7 +81,9 @@ foam.LIB({
     function isInstance(o) { return o === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
-    function compare(_, b) { return b === null ? 0 : b === undefined ? -1 : 1; },
+    function compare(_, b) {
+      return b === null ? 0 : b === undefined ? -1 : 1;
+    },
     function hashCode() { return -2; }
   ]
 });
@@ -106,10 +108,11 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
-      return b ? foam.String.compare(a.toString(), a.toString()) :  1;
+      return b ? foam.String.compare(a.toString(), b.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
 
+    /* istanbul ignore next */
     function bind(f, that, a1, a2, a3, a4) {
       /**
        * Faster than Function.prototype.bind
@@ -160,18 +163,22 @@ foam.LIB({
       console.error('Attempt to foam.Function.bind more than 4 arguments.');
     },
 
+    /**
+     * Decorates the function 'f' to cache the return value of 'f' when called
+     * with a particular value for its first argument.
+     *
+     */
     function memoize1(f) {
-      /**
-       * Decorates the function 'f' to cache the return value of 'f' when called
-       * with a particular value for its first argument.
-       *
-       */
+      console.assert(
+        typeof f === 'function',
+        'Cannot apply memoize to something that is not a function.');
+
       var cache = {};
       return foam.Function.setName(
           function(key) {
             console.assert(
-                arguments.length == 1,
-                "Memoize1'ed functions must take exactly one argument.");
+                arguments.length === 1,
+                'Memoize1\'ed functions must take exactly one argument.');
 
             if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
             return cache[key];
@@ -179,76 +186,85 @@ foam.LIB({
           'memoize1(' + f.name + ')');
     },
 
+    /**
+     * Set a function's name for improved debugging and profiling
+     *
+     * Returns the given function.
+     */
     function setName(f, name) {
-      /** Set a function's name for improved debugging and profiling **/
-      Object.defineProperty(f, 'name', {value: name, configurable: true});
+      Object.defineProperty(f, 'name', { value: name, configurable: true });
       return f;
     },
 
+    /** Convenience method to append 'arguments' onto a real array **/
     function appendArguments(a, args, start) {
-      /** Convenience method to append 'arguments' onto a real array **/
+      start = start || 0;
       for ( var i = start ; i < args.length ; i++ ) a.push(args[i]);
       return a;
     },
 
+    /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      /** Finds the function(...) declaration arguments part. Strips newlines. */
-      return f.
+      var match = f.
           toString().
-          replace(/(\r\n|\n|\r)/gm,"").
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/)[2] || '';
+          replace(/(\r\n|\n|\r)/gm,'').
+          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+      if ( ! match ) {
+        /* istanbul ignore next */
+        throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
+      }
+      return match[2] || '';
     },
 
     function formalArgs(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. formalArgs(function(a,b) {...}) == ['a', 'b']
+       * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
-      if ( ! args ) return [];
       args += ',';
 
       var ret = [];
       // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
       var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
       var typeMatch;
-      while ((typeMatch = argMatcher.exec(args)) !== null) {
+      while ( ( typeMatch = argMatcher.exec(args) ) !== null ) {
         ret.push(typeMatch[2]);
       }
       return ret;
     },
 
+    /**
+     * Calls fn, and provides the arguments to fn by looking
+     * up their names on source. The 'this' context is either
+     * source, or opt_self if provided.
+     *
+     * If the argument maps to a function on source, it is bound to source.
+     *
+     * Ex.
+     * var a = {
+     *   name: 'adam',
+     *   hello: function() {
+     *     console.blog('Hello ' + this.name);
+     *   }
+     * };
+     * function foo(name, hello) {
+     *   console.log('Name is ' + name);
+     *   hello();
+     * }
+     * foam.Function.withArgs(foo, a);
+     *
+     * Outputs:
+     * Name is adam
+     * Hello adam
+     *
+     **/
     function withArgs(fn, source, opt_self) {
-      /**
-       * Calls fn, and provides the arguments to fn by looking
-       * up their names on source. The 'this' context is either
-       * source, or opt_self if provided.
-       *
-       * If the argument maps to a function on source, it is bound to source.
-       *
-       * Ex.
-       * var a = {
-       *   name: 'adam',
-       *   hello: function() {
-       *     console.blog("Hello " + this.name);
-       *   }
-       * };
-       * function foo(name, hello) {
-       *   console.log("Name is " + name);
-       *   hello();
-       * }
-       * foam.Function.withArgs(foo, a);
-       *
-       * Outputs:
-       * Name is adam
-       * Hello adam
-       *
-       **/
       var argNames = foam.Function.formalArgs(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
-        if ( typeof a === "function" ) a = a.bind(source);
+        if ( typeof a === 'function' ) a = a.bind(source);
         args.push(a);
       }
       return fn.apply(opt_self || source, args);
@@ -264,8 +280,8 @@ foam.LIB({
     foam.Function.setName(function() {}, '');
   } catch (x) {
     console.warn('foam.Function.setName is not supported on your platform. ' +
-                 'Stack traces will be harder to decipher, but no functionaly ' +
-                 'will be lost');
+                 'Stack traces will be harder to decipher, but no ' +
+                 'functionality will be lost');
     foam.LIB({
       name: 'foam.Function',
       methods: [
@@ -283,7 +299,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return b == null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+      return ( b === null || b === undefined ) ? 1 :
+        a < b ? -1 : a > b ? 1 : 0;
     },
     function hashCode(n) { return n & n; }
   ]
@@ -300,7 +317,7 @@ foam.LIB({
     function hashCode(s) {
       var hash = 0;
 
-      for ( i = 0 ; i < s.length ; i++ ) {
+      for ( var i = 0 ; i < s.length ; i++ ) {
         var code = s.charCodeAt(i);
         hash = ((hash << 5) - hash) + code;
         hash &= hash;
@@ -312,21 +329,20 @@ foam.LIB({
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
-            'Cannot constantize non-string values. Type provided was:', typeof str);
+                       'Cannot constantize non-string values.');
 
-        // switchFromCamelCaseToConstantFormat to
-        // SWITCH_FROM_CAMEL_CASE_TO_CONSTANT_FORMAT
-        return str.replace(/[a-z][^0-9a-z_]/g, function(a) {
-          return a.substring(0,1) + '_' + a.substring(1,2);
-        }).toUpperCase();
+        // switches from from camelCase to CAMEL_CASE
+        return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
       })
     },
 
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
-        if ( ! str || str === '' ) return str;
-        return this.capitalize(str.replace(/[a-z][A-Z]/g, function (a) {
+        console.assert(typeof str === 'string',
+                       'Cannot labelize non-string values.');
+        if ( str === '' ) return str;
+        return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
       })
@@ -335,6 +351,8 @@ foam.LIB({
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
       })
@@ -343,6 +361,9 @@ foam.LIB({
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot toUpperCase non-string values.');
+
         return str.toUpperCase();
       })
     },
@@ -350,6 +371,8 @@ foam.LIB({
     {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot cssClassize non-string values.');
         // Turns foam.u2.Foo into foam-u2-Foo
         return str.replace(/\./g, '-');
       })
@@ -369,7 +392,7 @@ foam.LIB({
       var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
-      return s.substring(start+2, end);
+      return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
       return a.toUpperCase().startsWith(b.toUpperCase());
@@ -412,7 +435,7 @@ foam.LIB({
             break;
           }
         }
-        if ( j == added.length ) removed.push(a[i]);
+        if ( j === added.length ) removed.push(a[i]);
       }
       return { added: added, removed: removed };
     },
@@ -424,7 +447,7 @@ foam.LIB({
       return true;
     },
     function compare(a, b) {
-      if ( ! b || ! Array.isArray(b) ) return false;
+      if ( ! b || ! Array.isArray(b) ) return 1;
       var l = Math.min(a.length, b.length);
       for ( var i = 0 ; i < l ; i++ ) {
         var c = foam.util.compare(a[i], b[i]);
@@ -436,10 +459,17 @@ foam.LIB({
       var hash = 0;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
-        hash = ((hash << 5) - hash) + this.hashCode(a[i]);
+        hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
       }
 
       return hash;
+    },
+    function remove(a, o) {
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        if ( foam.util.equals(o, a[i]) ) {
+          a.splice(i, 1);
+        }
+      }
     }
   ]
 });
@@ -449,7 +479,7 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
-    function clone(o) { return o; },
+    function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
@@ -459,36 +489,37 @@ foam.LIB({
     },
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
-      // FUTURE: make this translatable for i18n
-      var seconds = Math.floor((Date.now() - date.getTime())/1000);
+      // FUTURE: make this translatable for i18n, including plurals
+      //   "hours" vs. "hour"
+      var seconds = Math.trunc( ( Date.now() - date.getTime() ) / 1000 );
 
-      if ( seconds < 60 ) return 'moments ago';
-      if ( seconds > 60 ) return 'in moments';
+      if ( seconds >= 0 && seconds < 60 ) return 'moments ago';
+      if ( seconds < 0  && seconds > -60 ) return 'in moments';
 
-      var minutes = Math.floor((seconds)/60);
+      var minutes = Math.trunc((seconds) / 60);
 
-      if ( minutes == 1 ) return '1 minute ago';
-      if ( minutes == -1 ) return 'in 1 minute';
+      if ( minutes === 1 ) return '1 minute ago';
+      if ( minutes === -1 ) return 'in 1 minute';
 
-      if ( minutes < 60 ) return minutes + ' minutes ago';
-      if ( minutes > 60 ) return 'in ' + minutes + ' minutes';
+      if ( minutes >= 0 && minutes < 60 ) return minutes + ' minutes ago';
+      if ( minutes < 0  && minutes > -60 ) return 'in ' + -minutes + ' minutes';
 
-      var hours = Math.floor(minutes/60);
-      if ( hours == 1 ) return '1 hour ago';
-      if ( hours == -1 ) return 'in 1 hour';
+      var hours = Math.trunc(minutes / 60);
+      if ( hours === 1 ) return '1 hour ago';
+      if ( hours === -1 ) return 'in 1 hour';
 
-      if ( hours < 24 ) return hours + ' hours ago';
-      if ( hours < -24 ) return 'in ' + hours + ' hours';
+      if ( hours >= 0 && hours < 24 ) return hours + ' hours ago';
+      if ( hours <  0 && hours > -24 ) return 'in ' + -hours + ' hours';
 
-      var days = Math.floor(hours / 24);
-      if ( days == 1 ) return '1 day ago';
-      if ( days == -1 ) return 'in 1 day';
+      var days = Math.trunc(hours / 24);
+      if ( days === 1 ) return '1 day ago';
+      if ( days === -1 ) return 'in 1 day';
 
-      if ( days < 7 ) return days + ' days ago';
-      if ( days < -7 ) return 'in ' + days + ' days';
+      if ( days >= 0 && days < 7 ) return days + ' days ago';
+      if ( days <  0 && days > -7 ) return 'in ' + -days + ' days';
 
-      if ( days < 365 ) {
-        var year = 1900+date.getYear();
+      if ( days >= 0 && days < 365 || days < 0 && days > -365 ) {
+        var year = 1900 + date.getYear();
         var noyear = date.toDateString().replace(' ' + year, '');
         return noyear.substring(4);
       }
@@ -504,12 +535,13 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     // Can't be an FObject yet because we haven't built the class system yet
+    /* istanbul ignore next */
     function isInstance(o) { return false; },
-    function clone(o) { return o.clone(); },
-    function diff(a, b) { return a.diff(b); },
-    function equals(a, b) { return a.equals(b); },
+    function clone(o)      { return o.clone(); },
+    function diff(a, b)    { return a.diff(b); },
+    function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
-    function hashCode(o) { return o.hashCode(); }
+    function hashCode(o)   { return o.hashCode(); }
   ]
 });
 
@@ -523,7 +555,9 @@ foam.LIB({
         if ( obj.hasOwnProperty(key) ) f(obj[key], key);
       }
     },
-    function isInstance(o) { return typeof o === 'object' && ! Array.isArray(o); },
+    function isInstance(o) {
+      return typeof o === 'object' && ! Array.isArray(o);
+    },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -541,34 +575,33 @@ foam.LIB({
 
 
 /**
-  Return the flyweight "type object" for the provided object.
+  Return the flyweight 'type object' for the provided object.
   Any value is a valid argument, including null and undefined.
 */
 foam.typeOf = (function() {
-  var
-    tNumber    = foam.Number,
-    tString    = foam.String,
-    tUndefined = foam.Undefined,
-    tNull      = foam.Null,
-    tBoolean   = foam.Boolean,
-    tArray     = foam.Array,
-    tDate      = foam.Date,
-    tFObject   = foam.core.FObject,
-    tFunction  = foam.Function,
-    tObject    = foam.Object;
+  var tNumber    = foam.Number;
+  var tString    = foam.String;
+  var tUndefined = foam.Undefined;
+  var tNull      = foam.Null;
+  var tBoolean   = foam.Boolean;
+  var tArray     = foam.Array;
+  var tDate      = foam.Date;
+  var tFObject   = foam.core.FObject;
+  var tFunction  = foam.Function;
+  var tObject    = foam.Object;
 
   return function typeOf(o) {
-    if ( tNumber.isInstance(o)    ) return tNumber;
-    if ( tString.isInstance(o)    ) return tString;
+    if ( tNumber.isInstance(o) )    return tNumber;
+    if ( tString.isInstance(o) )    return tString;
     if ( tUndefined.isInstance(o) ) return tUndefined;
-    if ( tNull.isInstance(o)      ) return tNull;
-    if ( tBoolean.isInstance(o)   ) return tBoolean;
-    if ( tArray.isInstance(o)     ) return tArray;
-    if ( tDate.isInstance(o)      ) return tDate;
-    if ( tFunction.isInstance(o)  ) return tFunction;
-    if ( tFObject.isInstance(o)   ) return tFObject;
+    if ( tNull.isInstance(o) )      return tNull;
+    if ( tBoolean.isInstance(o) )   return tBoolean;
+    if ( tArray.isInstance(o) )     return tArray;
+    if ( tDate.isInstance(o) )      return tDate;
+    if ( tFunction.isInstance(o) )  return tFunction;
+    if ( tFObject.isInstance(o) )   return tFObject;
     return tObject;
-  }
+  };
 })();
 
 
@@ -583,7 +616,8 @@ foam.mmethod = function(map, opt_defaultMethod) {
   return function(arg1) {
     var type = foam.typeOf(arg1);
     if ( ! opt_defaultMethod ) {
-      console.assert(type, 'Unknown type: ', arg1, 'and no default method provided');
+      console.assert(type, 'Unknown type: ', arg1,
+        'and no default method provided');
       console.assert(
         type[uid],
         'Missing multi-method for type ', arg1, ' map: ', map,
@@ -605,7 +639,10 @@ foam.mmethod = function(map, opt_defaultMethod) {
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) { return typeOf(a).compare(a, b); },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
-      function diff(a, b)    { return typeOf(a).diff(a, b); }
+      function diff(a, b)    {
+        var t = typeOf(a);
+        return t.diff ? t.diff(a, b) : undefined;
+      },
     ]
   });
 })();
@@ -619,9 +656,13 @@ foam.LIB({
      * If the given class has an id of 'some.package.MyClass'
      * then the class object will be made available globally at
      * global.some.package.MyClass.
-     *
      */
     function registerClass(cls) {
+      console.assert(typeof cls === 'object',
+                     'cls must be an object');
+      console.assert(typeof cls.name === 'string' && cls.name !== '',
+                     'cls must have a non-empty string name');
+
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
     },
@@ -633,6 +674,8 @@ foam.LIB({
      * ensurePackage(global, 'some.dot.separated.path');
      * will ensure that global.some.dot.separated.path exists with
      * each part being a JS object.
+     *
+     * Returns root if path is null or undefined.
      */
     function ensurePackage(root, path) {
       if ( path === null ||
@@ -645,12 +688,13 @@ foam.LIB({
                      'Cannot make a package path of a non-string');
 
       path = path.split('.');
+      var node = root;
 
       for ( var i = 0 ; i < path.length ; i++ ) {
-        root = root[path[i]] || ( root[path[i]] = {} );
+        node = node[path[i]] || ( node[path[i]] = {} );
       }
 
-      return root;
+      return node;
     }
   ]
 });
@@ -661,7 +705,8 @@ foam.LIB({
   methods: [
     function randomGUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        var r = Math.random() * 16 | 0;
+        var v = c === 'x' ? r : ( r & 0x3 | 0x8 );
         return v.toString(16);
       });
     }

@@ -394,6 +394,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Float',
+      name: 'width'
+    },
+    {
+      class: 'Float',
+      name: 'height'
+    },
+    {
       name: 'rotation',
       class: 'Float'
     },
@@ -437,16 +445,21 @@ foam.CLASS({
       value: 1
     },
     {
+      class: 'Color',
       name: 'border'
     },
     {
+      class: 'Color',
       name: 'color'
     },
     {
+      class: 'Color',
       name: 'shadowColor'
     },
     {
-      name: 'shadowBlur'
+      class: 'Int',
+      name: 'shadowBlur',
+      units: 'pixels'
     },
     {
       name: 'children',
@@ -454,24 +467,29 @@ foam.CLASS({
       postSet: function(o, n) {
         for ( var i = 0 ; o && i < o.length ; i++ ) this.removeChild_(o[i]);
         for ( var i = 0 ; n && i < n.length ; i++ ) this.addChild_(n[i]);
-      }
+      },
+      hidden: true
     },
     {
       name: 'state',
       value: 'initial'
     },
     {
-      name: 'parent'
+      name: 'parent',
+      hidden: 'true'
     },
     {
-      name: 'canvas'
+      name: 'canvas',
+      hidden: 'true'
     },
     {
       name: 'transform_',
+      hidden: 'true',
       factory: function() { return this.Transform.create(); }
     },
     {
       name: 'transform',
+      hidden: 'true',
       getter: function getTransform() {
         var t = this.transform_.reset();
 
@@ -491,13 +509,16 @@ foam.CLASS({
       // an associated Canvas (by calling toE()).
       class: 'Boolean',
       name: 'autoRepaint',
+      hidden: true,
       value: true
     },
     {
       name: 'invalidate_',
-      factory: function() {
+      hidden: true,
+      // TODO: Would be more efficient to be a factory, but doesn't work. Investigate.
+      getter: function() {
         return this.parent ? this.parent.invalidate_ :
-          this.autoRepaint ? this.invalidated.pub   :
+          this.autoRepaint ? this.invalidated.pub    :
           null ;
       }
     }
@@ -610,7 +631,7 @@ foam.CLASS({
       }
     },
 
-    function removeChild(c) {
+    function remove(c) {
       for ( var i = 0 ; i < this.children.length ; i++ ) {
         if ( this.children[i] === c ) {
           this.children.splice(i, 1);
@@ -618,6 +639,11 @@ foam.CLASS({
           return;
         }
       }
+    },
+
+    function removeChild(c) {
+      console.log('Deprecated use of CView.removeChild(). Use .remove() instead.');
+      this.remove(c);
     },
 
     function addChild_(c) {
@@ -633,12 +659,18 @@ foam.CLASS({
       return c;
     },
 
-    function addChildren() {
+    function add() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         this.children.push(arguments[i]);
         this.addChild_(arguments[i]);
       }
       this.invalidate();
+      return this;
+    },
+
+    function addChildren() {
+      console.warn('Deprecated use of CView.addChildren(). Use add() instead.');
+      return this.add.apply(this, arguments);
     },
 
     function paintSelf(x) {},
@@ -653,10 +685,24 @@ foam.CLASS({
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({
-        // TODO: better to make Arc compute it's width and height
-        width: this.x + (this.width  || (this.radius + this.arcWidth) * 2),
-        height: this.y + (this.height || (this.radius + this.arcWidth) * 2)
+        width: this.x + this.width,
+        height: this.y + this.height
       });
+    },
+
+    function intersects(c) {
+      if ( c.radius ) {
+        return ! (
+            this.x + this.width  < c.x - c.radius ||
+            this.y + this.height < c.y - c.radius ||
+            c.x    + c.radius    < this.x ||
+            c.y    + c.radius    < this.y );
+      }
+      return ! (
+          this.x + this.width  < c.x ||
+          this.y + this.height < c.y ||
+          c.x    + c.width  < this.x ||
+          c.y    + c.height < this.y );
     }
   ]
 });
@@ -725,16 +771,16 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'width',
-      class: 'Float'
+      class: 'Float',
+      name: 'width'
     },
     {
-      name: 'height',
-      class: 'Float'
+      class: 'Float',
+      name: 'height'
     },
     {
       name: 'border',
-      value: 'black'
+      value: '#000000'
     }
   ],
 
@@ -773,7 +819,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      value: 'black'
+      value: '#000000'
     }
   ],
 
@@ -788,6 +834,13 @@ foam.CLASS({
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
+    },
+
+    function toE(X) {
+      return this.Canvas.create({ cview: this }, X).attrs({
+        width: this.x + this.radius + this.arcWidth,
+        height: this.y + this.radius + this.arcWidth
+      });
     }
   ]
 });
@@ -816,6 +869,7 @@ foam.CLASS({
     },
 
     function intersects(c) {
+      if ( ! c.radius ) return c.intersects(this);
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
       if ( c.border    ) r += c.arcWidth/2-1;
@@ -1008,7 +1062,7 @@ foam.CLASS({
     {
       class: 'Color',
       name:  'color',
-      value: 'black'
+      value: '#000000'
     },
     {
       class: 'Color',
