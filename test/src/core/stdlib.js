@@ -510,6 +510,11 @@ describe('foam.String', function() {
 
   });
 
+  it('intern', function() {
+    expect(foam.String.intern('my '+'string'))
+      .toBe(foam.String.intern('my'+' string'));
+  });
+
   it('startsWithIC', function() {
     expect(foam.String.startsWithIC('my string', 'MY '))
       .toBe(true);
@@ -910,5 +915,51 @@ describe('foam.util', function() {
 
 });
 
+
+describe('foam.package', function() {
+  it('ensurePackage', function() {
+    var root = { package1: { subPack1: { a: 1 }, subPack2: { a: 2 } }, package2: { a: 3 } };
+
+    expect(foam.package.ensurePackage(root, '')).toBe(root);
+    expect(foam.package.ensurePackage(root)).toBe(root);
+    expect(foam.package.ensurePackage(root, null)).toBe(root);
+
+    expect(function() {
+      foam.package.ensurePackage(root, { bad: 'path' });
+    }).toThrow();
+
+    expect(foam.package.ensurePackage(root, 'package2').a).toBe(3);
+    expect(foam.package.ensurePackage(root, 'package1.subPack1').a).toBe(1);
+    expect(foam.package.ensurePackage(root, 'package1.subPack2').a).toBe(2);
+
+  });
+
+  it('registerClass', function() {
+    expect(function() {
+      foam.package.registerClass("Not an object");
+    }).toThrow();
+    expect(function() {
+      foam.package.registerClass({ name: 88 });
+    }).toThrow();
+    expect(function() {
+      foam.package.registerClass({ name: { not: 'a string' } });
+    }).toThrow();
+
+    foam.package.registerClass({
+      name: "TestClassForPackageTest",
+      package: 'test.packageTest'
+    });
+    expect(test.packageTest.TestClassForPackageTest.name)
+      .toBe("TestClassForPackageTest");
+
+  });
+
+});
+
+describe('foam.uuid', function() {
+  it('randomGUID', function() {
+    expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
+  });
+});
 
 
