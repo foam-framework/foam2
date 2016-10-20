@@ -30,7 +30,7 @@ foam.CLASS({
     [ 'radius', 100 ],
     [ 'x', 120 ],
     [ 'y', 120 ],
-    [ 'color', 'white' ],
+    [ 'color', '#ffffff' ],
     [ 'arcWidth', 5 ],
     {
       class: 'Boolean',

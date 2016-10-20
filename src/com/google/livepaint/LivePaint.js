@@ -63,7 +63,7 @@ foam.CLASS({
     [ 'width',  100 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
-    [ 'color', 'black' ],
+    [ 'color', '#000000' ],
     [ 'font', '50px Arial' ]
   ]
 });
@@ -122,8 +122,8 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   constants: {
-    SELECTED_COLOR:   '#ddd',
-    UNSELECTED_COLOR: 'white'
+    SELECTED_COLOR:   '#dddddd',
+    UNSELECTED_COLOR: '#ffffff'
   },
 
   axioms: [
@@ -173,7 +173,7 @@ foam.CLASS({
       view: { class: 'foam.u2.DetailView' },
       postSet: function(o, n) {
         if ( o ) { o.shadowBlur = 0; }
-        if ( n ) { n.shadowBlur = 10; n.shadowColor = 'red'; }
+        if ( n ) { n.shadowBlur = 10; n.shadowColor = '#ff0000'; }
       }
     },
     {
@@ -259,7 +259,7 @@ foam.CLASS({
         y: y,
         radius: opt_r || 25,
         color: this.UNSELECTED_COLOR,
-        border: 'black'});
+        border: '#000'});
 
       this.canvas.addChildren(c);
 
