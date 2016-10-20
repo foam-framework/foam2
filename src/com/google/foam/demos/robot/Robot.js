@@ -32,7 +32,7 @@ foam.CLASS({
   ],
 
   properties: [
-    { name: 'timer', factory: function() { return this.Timer.create(); } }
+    { name: 'timer', hidden: true, factory: function() { return this.Timer.create(); } }
   ],
 
   methods: [
