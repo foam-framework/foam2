@@ -56,10 +56,6 @@ foam.CLASS({
   extends: 'foam.graphics.Label',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    {
-      class: 'String',
-      name: 'name'
-    },
     [ 'mass',  0 ],
     [ 'width',  100 ],
     [ 'height', 50 ],
@@ -76,10 +72,6 @@ foam.CLASS({
   extends: 'foam.graphics.Circle',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    {
-      class: 'String',
-      name: 'name'
-    },
     [ 'mass',  0 ],
     [ 'radius', 25 ]
   ]
@@ -92,10 +84,6 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    {
-      class: 'String',
-      name: 'name'
-    },
     [ 'mass',  0 ],
     [ 'width',  50 ],
     [ 'height', 50 ]
