@@ -184,7 +184,7 @@ foam.CLASS({
 
     function remove() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
-        this.children.deleteI(arguments[i]);
+        foam.Array.remove(this.children, arguments[i]);
       }
       return this;
     },
