@@ -140,7 +140,11 @@ foam.CLASS({
     {
       name: 'physics',
       factory: function() {
-        return this.PhysicsEngine.create({enableGravity: false});
+        return this.PhysicsEngine.create({
+          enableGravity: false,
+          bounceOnWalls: true,
+          bounds: this.canvas
+        });
       }
     },
     'feedback_',
