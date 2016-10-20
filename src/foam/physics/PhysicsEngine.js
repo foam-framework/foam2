@@ -30,6 +30,8 @@ foam.CLASS({
 
   methods: [
     function updateChild(c) {
+      this.SUPER(c);
+
       var gravity  = c.gravity;
       var friction = c.friction;
 
