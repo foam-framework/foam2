@@ -22,6 +22,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'bounceOnWalls'
+    },
+    'bounds',
+    {
       name: 'children',
       factory: function() { return []; },
       hidden: true
@@ -33,7 +38,13 @@ foam.CLASS({
   ],
 
   methods: [
-    function updateChild(child) {
+    function updateChild(c) {
+      if ( this.bounceOnWalls && this.bounds ) {
+        if ( c.x < this.bounds.x ) c.vx = Math.abs(c.vx);
+        if ( c.y < this.bounds.y ) c.vy = Math.abs(c.vy);
+        if ( c.x > this.bounds.width ) c.vx = -Math.abs(c.vx);
+        if ( c.y > this.bounds.height ) c.vy = -Math.abs(c.vy);
+      }
     },
 
     function updateChildren() {
