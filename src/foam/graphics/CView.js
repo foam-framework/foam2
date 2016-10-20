@@ -631,7 +631,7 @@ foam.CLASS({
       }
     },
 
-    function removeChild(c) {
+    function remove(c) {
       for ( var i = 0 ; i < this.children.length ; i++ ) {
         if ( this.children[i] === c ) {
           this.children.splice(i, 1);
@@ -639,6 +639,11 @@ foam.CLASS({
           return;
         }
       }
+    },
+
+    function removeChild(c) {
+      console.log('Deprecated use of CView.removeChild(). Use .remove() instead.');
+      this.remove(c);
     },
 
     function addChild_(c) {
