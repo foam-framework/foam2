@@ -160,6 +160,7 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'MDAO'
         });
+        dao.put(com.google.foam.demos.robot.Robot.model_);
         dao.put(com.google.livepaint.Clock.model_);
         dao.put(com.google.livepaint.Circle.model_);
         dao.put(com.google.livepaint.Box.model_);
