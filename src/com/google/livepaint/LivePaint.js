@@ -163,11 +163,16 @@ foam.CLASS({
       }
     },
     {
+      name: 'value',
+      view: { class: 'foam.u2.DetailView' }
+    },
+    {
       name: 'selected',
-      view: { class: 'foam.u2.DetailView' },
       postSet: function(o, n) {
-        if ( o ) { o.shadowBlur = 0; }
-        if ( n ) { n.shadowBlur = 10; n.shadowColor = '#ff0000'; }
+        this.value = n && n.value;
+        // TODO: check and only set if a CView
+        if ( o ) { o.value.shadowBlur = 0; }
+        if ( n ) { n.value.shadowBlur = 10; n.value.shadowColor = '#ff0000'; }
       }
     },
     {
@@ -234,7 +239,7 @@ foam.CLASS({
             cssClass(this.myCls('properties')).
             add(this.PROPERTIES).
           end().
-          add(this.SELECTED);
+          add(this.VALUE);
 
       this.physics.start();
     },
@@ -250,10 +255,12 @@ foam.CLASS({
           self.addProperty(value, prefix+i);
         });
       } else {
-        this.properties.put(this.Property.create({
+        var p = this.Property.create({
           name: opt_name,
           value: value
-        }));
+        });
+        this.properties.put(p);
+        this.selected = p;
       }
     },
 
@@ -319,14 +326,14 @@ foam.CLASS({
       var c = this.canvas.findFirstChildAt(x, y);
 
       if ( c ) {
+        // TODO: find
         this.selected = c;
       } else {
         var tool = this.currentTool;
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y});
-        this.addProperty(o);
-        this.selected = o;
+        var p = this.addProperty(o);
         this.updateMemento();
       }
     },
