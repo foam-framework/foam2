@@ -474,6 +474,18 @@ describe('foam.String', function() {
     }).toThrow();
   });
 
+  it('toSlotName', function() {
+    expect(foam.String.toSlotName("name"))
+      .toBe("name$");
+    expect(foam.String.toSlotName("name$"))
+      .toBe("name$$");
+    expect(foam.String.toSlotName(''))
+      .toBe('$');
+    expect(function() {
+      foam.String.toSlotName(null);
+    }).toThrow();
+  });
+
   it('toUpperCase', function() {
     expect(foam.String.toUpperCase('lower Case String'))
       .toBe('LOWER CASE STRING');
@@ -529,11 +541,6 @@ describe('foam.String', function() {
   it('pad', function() {
     expect(foam.String.pad("wee", -6)).toEqual("   wee");
     expect(foam.String.pad("wee", 6)).toEqual("wee   ");
-  });
-
-  it('should convert "FooBar" to "fooBarDAO"', function() {
-    expect(foam.String.daoize('Foo')).toBe('fooDAO');
-    expect(foam.String.daoize('package.FooBar')).toBe('package.FooBarDAO');
   });
 
 });
@@ -615,7 +622,7 @@ describe('foam.Array', function() {
       var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
       var b = foam.util.clone(a);
       expect(a).not.toBe(b);
-      expect(a[1].compareTo(b[1])).toEqual(0);
+      expect(foam.util.compare(a[1], b[1])).toEqual(0);
       expect(a[1]).not.toBe(b[1]);
     });
   });
