@@ -15,15 +15,17 @@
  * limitations under the License.
  */
 
+var oldAssert;
+beforeAll(function() { // make it easy to trap asserts
+  oldAssert = console.assert;
+  console.assert = function(cond) { if ( ! cond ) throw arguments; }
+});
+afterAll(function() {
+  console.assert = oldAssert;
+});
+
+
 describe('foam.LIB type checking:', function() {
-  var oldAssert;
-  beforeEach(function() { // make it easy to trap asserts
-    oldAssert = console.assert;
-    console.assert = function() { throw arguments; }
-  });
-  afterEach(function() {
-    console.assert = oldAssert;
-  });
 
   it('methods must be named', function() {
     expect(function() {
