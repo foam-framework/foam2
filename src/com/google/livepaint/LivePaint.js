@@ -45,7 +45,9 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
   properties: [
     // [ 'mass',  0 ],
-    [ 'radius', 45 ]
+    [ 'radius', 45 ],
+    [ 'width', 90 ],
+    [ 'height', 90 ]
   ]
 });
 
