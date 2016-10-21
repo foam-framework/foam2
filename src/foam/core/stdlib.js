@@ -357,7 +357,21 @@ foam.LIB({
         return str[0].toUpperCase() + str.substring(1);
       })
     },
-
+    {
+      /**
+       * Takes a key and creates a slot name for it.  Generally key -> key + '$'.
+       *
+       * For example, if an object has a property called myProperty, the slot
+       * name for that will be myProperty$.
+       */
+      name: 'toSlotName',
+      code: foam.Function.memoize1(function toSlotName(key) {
+        console.assert(typeof key === 'string',
+               'Cannot toSlotName non-string values.');
+               
+        return key + '$';
+      })
+    },
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
@@ -379,6 +393,9 @@ foam.LIB({
     },
 
     function pad(str, size) {
+      console.assert(typeof str === 'string',
+               'Cannot constantize non-string values.');
+      
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
         (new Array(-size).join(' ') + str).slice(size)       :
@@ -395,6 +412,9 @@ foam.LIB({
       return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
+      console.assert(typeof a === 'string' && typeof b === 'string',
+               'Cannot startsWithIC non-string values.');
+      
       return a.toUpperCase().startsWith(b.toUpperCase());
     },
     (function() {
