@@ -32,7 +32,9 @@ foam.CLASS({
       hidden: true
     },
     {
+      class: 'Boolean',
       name: 'stopped_',
+      value: true,
       hidden: true
     }
   ],
@@ -190,14 +192,19 @@ foam.CLASS({
   ],
 
   actions: [
-    function start() {
-      this.stopped_ = false;
-      this.tick();
-      return this;
+    {
+      name: 'start',
+      isEnabled: function(stopped_) { return stopped_; },
+      code: function start() {
+        this.stopped_ = false;
+        this.tick();
+        return this;
+      }
     },
-
-    function stop() {
-      this.stopped_ = true;
+    {
+      name: 'stop',
+      isEnabled: function(stopped_) { return ! stopped_; },
+      code: function start() { this.stopped_ = true; }
     }
   ],
 
