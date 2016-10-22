@@ -472,7 +472,8 @@ foam.CLASS({
     },
     {
       name: 'state',
-      value: 'initial'
+      value: 'initial',
+      hidden: 'true'
     },
     {
       name: 'parent',
@@ -685,8 +686,8 @@ foam.CLASS({
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({
-        width: this.x + this.width,
-        height: this.y + this.height
+        width:  this.slot(function(x, width,  scaleX) { return x + width*scaleX; }),
+        height: this.slot(function(y, height, scaleY) { return y + height*scaleY; })
       });
     },
 
