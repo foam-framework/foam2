@@ -25,7 +25,7 @@ foam.CLASS({
   requires: [ 'foam.graphics.Box' ],
 
   properties: [
-    [ 'mass', 1000 ],
+    [ 'mass', foam.physics.Physical.INFINITE_MASS ],
     [ 'border', null ],
     [ 'color', 'red' ],
     [ 'start',  Math.PI ],
