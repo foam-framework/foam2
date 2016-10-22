@@ -131,7 +131,7 @@ foam.CLASS({
       ^ { display: flex; }
       ^ > * { padding: 16px; }
       .foam-u2-TableView-selected { background: lightgray; }
-      ^ canvas { border: 1px solid black; }
+      ^ canvas { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
       ^ .foam-u2-ActionView { margin: 10px; }
       ^properties .foam-u2-ActionView { background: white; padding: 0; margin: 2px; border: none; }
       */}
@@ -204,9 +204,15 @@ foam.CLASS({
 //          daoType: 'MDAO'
           daoType: 'ARRAY'
         });
-        var p = this.Property.create({name: 'physics', value: this.physics});
+
+        var p = this.Property.create({name: 'canvas', value: this.canvas});
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
+
+        p = this.Property.create({name: 'physics', value: this.physics});
+        this.physics.setPrivate_('lpp_', p);
+        dao.put(p);
+
         return dao;
       }
     },
