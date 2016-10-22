@@ -25,7 +25,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'bounceOnWalls'
     },
-    'bounds',
+    {
+      name: 'bounds',
+      hidden: true
+    },
     {
       name: 'children',
       factory: function() { return []; },
