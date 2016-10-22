@@ -58,7 +58,7 @@ foam.CLASS({
   extends: 'foam.graphics.Label',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    // [ 'mass',  0 ],
+    [ 'gravity', 1 ],
     [ 'width',  100 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
