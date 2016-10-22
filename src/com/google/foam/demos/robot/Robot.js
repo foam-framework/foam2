@@ -73,6 +73,7 @@ foam.CLASS({
       var engine = this.Circle.create({
         radius: 8,
         color:  'red',
+        border: null,
         x:      10,
         y:      30.5,
         start:  0,
