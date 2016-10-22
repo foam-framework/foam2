@@ -44,7 +44,7 @@ foam.CLASS({
   extends: 'com.google.foam.demos.clock.Clock',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    // [ 'mass',  0 ],
+    [ 'gravity', 1 ],
     [ 'radius', 45 ],
     [ 'width', 90 ],
     [ 'height', 90 ]
@@ -74,8 +74,8 @@ foam.CLASS({
   extends: 'foam.graphics.Circle',
   implements: [ 'foam.physics.Physical' ],
   properties: [
-    // [ 'mass',  0 ],
-    [ 'radius', 25 ]
+    [ 'gravity', 1 ],
+    [ 'radius',  25 ]
   ]
 });
 
@@ -165,6 +165,7 @@ foam.CLASS({
         });
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
+        dao.put(com.google.livepaint.Mushroom.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
         dao.put(com.google.livepaint.Clock.model_);
         dao.put(com.google.livepaint.Circle.model_);
@@ -226,11 +227,11 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.canvas.children = [];
+        this.properties.removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var c = m[i];
-            this.addCircle(c.x, c.y, c.radius);
+            this.properties.put(c);
           }
         }
         this.selected = null;
@@ -272,7 +273,7 @@ foam.CLASS({
           name: opt_name,
           value: value
         });
-        value.gravity = 1;
+//        value.gravity = 1;
         value.setPrivate_('lpp_', p);
         this.properties.put(p);
         this.selected = p;
