@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,61 +34,6 @@ foam.CLASS({
         X.properties.remove(X.data);
       }
     }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'com.google.flow',
-  name: 'Clock',
-  extends: 'com.google.foam.demos.clock.Clock',
-  implements: [ 'foam.physics.Physical' ],
-  properties: [
-    [ 'gravity', 1 ],
-    [ 'radius', 45 ],
-    [ 'width', 90 ],
-    [ 'height', 90 ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'com.google.flow',
-  name: 'Text',
-  extends: 'foam.graphics.Label',
-  implements: [ 'foam.physics.Physical' ],
-  properties: [
-    [ 'gravity', 1 ],
-    [ 'width',  100 ],
-    [ 'height', 50 ],
-    [ 'text', 'Text' ],
-    [ 'color', '#000000' ],
-    [ 'font', '50px Arial' ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'com.google.flow',
-  name: 'Circle',
-  extends: 'foam.graphics.Circle',
-  implements: [ 'foam.physics.Physical' ],
-  properties: [
-    [ 'gravity', 1 ],
-    [ 'radius',  25 ]
-  ]
-});
-
-
-foam.CLASS({
-  package: 'com.google.flow',
-  name: 'Box',
-  extends: 'foam.graphics.Box',
-  implements: [ 'foam.physics.Physical' ],
-  properties: [
-    // [ 'mass',  0 ],
-    [ 'width',  50 ],
-    [ 'height', 50 ]
   ]
 });
 
@@ -136,11 +81,11 @@ foam.CLASS({
       ^tools thead, ^properties thead { display: none }
       ^tools tr { height: 30px }
       .foam-u2-TableView { border-collapse: collapse; }
+      .foam-u2-TableView td { padding-left: 6px; }
       .foam-u2-TableView-selected { outline: 1px solid red; }
-      ^ canvassss { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
-      ^properties .foam-u2-ActionView { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
+      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
       .foam-u2-Tabs { padding-top: 0 !important; }
       */}
     })
@@ -311,16 +256,6 @@ foam.CLASS({
     }
   ],
 
-  actions: [
-    {
-      name: 'deleteProperty',
-      label: 'X',
-      code: function(X) {
-        debugger;
-      }
-    }
-  ],
-
   listeners: [
     function onPropertyPut(_, _, _, p) {
       var o = p.value;
@@ -363,7 +298,6 @@ foam.CLASS({
 
     function onRightClick(evt) {
       evt.preventDefault();
-
       if ( ! this.selected ) return;
     }
   ]

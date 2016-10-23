@@ -38,7 +38,6 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ {
-          padding: 10px;
           display: block;
         }
         ^tabRow { height: 38px; }
