@@ -130,6 +130,8 @@ foam.CLASS({
       code: function() {/*
       ^ { display: flex; }
       ^ > * { padding: 16px; }
+      ^tools { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
+      ^tools thead { display: none }
       .foam-u2-TableView-selected { background: lightgray; }
       ^ canvas { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
       ^ .foam-u2-ActionView { margin: 10px; }
@@ -245,7 +247,7 @@ foam.CLASS({
 
       this.
           cssClass(this.myCls()).
-          start(this.TOOLS, {selection$: this.currentTool$}).end().
+          start(this.TOOLS, {selection$: this.currentTool$}).cssClass(this.myCls('tools')).end().
           start('center').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
