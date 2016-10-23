@@ -46,7 +46,8 @@ foam.CLASS({
         y: -0.5,
         width: 15,
         height: 20,
-        color: 'gray'
+        color: 'gray',
+        border: null
       }));
     }
   ],
