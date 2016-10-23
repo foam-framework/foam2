@@ -17,6 +17,60 @@
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Clock',
+  extends: 'com.google.foam.demos.clock.Clock',
+  implements: [ 'foam.physics.Physical' ],
+  properties: [
+    [ 'gravity', 1 ],
+    [ 'radius', 45 ],
+    [ 'width', 90 ],
+    [ 'height', 90 ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Text',
+  extends: 'foam.graphics.Label',
+  implements: [ 'foam.physics.Physical' ],
+  properties: [
+    [ 'gravity', 1 ],
+    [ 'width',  100 ],
+    [ 'height', 50 ],
+    [ 'text', 'Text' ],
+    [ 'color', '#000000' ],
+    [ 'font', '50px Arial' ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Circle',
+  extends: 'foam.graphics.Circle',
+  implements: [ 'foam.physics.Physical' ],
+  properties: [
+    [ 'gravity', 1 ],
+    [ 'radius',  25 ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Box',
+  extends: 'foam.graphics.Box',
+  implements: [ 'foam.physics.Physical' ],
+  properties: [
+    [ 'width',  50 ],
+    [ 'height', 50 ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
 
