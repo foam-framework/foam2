@@ -24,7 +24,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enableGravity',
-      value: true
+      value: false
     }
   ],
 
