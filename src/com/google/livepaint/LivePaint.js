@@ -249,13 +249,14 @@ foam.CLASS({
           cssClass(this.myCls()).
           start(this.TOOLS, {selection$: this.currentTool$}).cssClass(this.myCls('tools')).end().
           start('center').
-            start(this.BACK,  {label: 'Undo'}).end().
-            start(this.FORTH, {label: 'Redo'}).end().
-            tag('br').
+            style({'padding-top': 0}).
             start(this.canvas).
               on('click',       this.onClick).
               on('contextmenu', this.onRightClick).
             end().
+            tag('br').
+            start(this.BACK,  {label: 'Undo'}).end().
+            start(this.FORTH, {label: 'Redo'}).end().
           end().
           start('div').
             cssClass(this.myCls('properties')).
