@@ -96,7 +96,6 @@ foam.CLASS({
       name: 'physics',
       factory: function() {
         return this.PhysicsEngine.create({
-          enableGravity: false,
           bounceOnWalls: true,
           bounds: this.canvas
         });
@@ -240,7 +239,6 @@ foam.CLASS({
           name: opt_name,
           value: value
         });
-//        value.gravity = 1;
         value.setPrivate_('lpp_', p);
         this.properties.put(p);
         this.selected = p;
