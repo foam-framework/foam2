@@ -163,16 +163,16 @@ foam.CLASS({
       factory: function() {
         var dao = foam.dao.EasyDAO.create({
           of: 'foam.core.Model',
-          daoType: 'MDAO'
+          daoType: 'ARRAY'
         });
-        dao.put(foam.audio.Speak.model_);
-        dao.put(foam.audio.Beep.model_);
+        dao.put(com.google.livepaint.Box.model_);
+        dao.put(com.google.livepaint.Circle.model_);
+        dao.put(com.google.livepaint.Text.model_);
+        dao.put(com.google.livepaint.Clock.model_);
         dao.put(com.google.livepaint.Mushroom.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
-        dao.put(com.google.livepaint.Clock.model_);
-        dao.put(com.google.livepaint.Circle.model_);
-        dao.put(com.google.livepaint.Box.model_);
-        dao.put(com.google.livepaint.Text.model_);
+        dao.put(foam.audio.Speak.model_);
+        dao.put(foam.audio.Beep.model_);
         return dao;
       }
     },
