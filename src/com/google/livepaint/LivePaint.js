@@ -128,9 +128,11 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
+      body { overflow: hidden }
       ^ { display: flex; }
-      ^ > * { padding: 16px; }
-      ^tools, ^properties { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
+      ^ > * { padding-left: 16px; padding-right: 16px; }
+      ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
+      ^sheet { width: 100%; overflow-y: scroll; }
       ^tools thead, ^properties thead { display: none }
       .foam-u2-TableView-selected { background: lightgray; }
       ^ canvas { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
@@ -221,7 +223,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 700, height: 700, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 600, height: 600, color: '#f3f3f3'});
       }
     },
   ],
@@ -262,7 +264,7 @@ foam.CLASS({
             cssClass(this.myCls('properties')).
             start(this.PROPERTIES, {selection$: this.selected$}).end().
           end().
-          add(this.VALUE);
+          start(this.VALUE).cssClass(this.myCls('sheet')).end();
 
       // this.physics.start();
     },
