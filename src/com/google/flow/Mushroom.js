@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.livepaint',
+  package: 'com.google.flow',
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
 
