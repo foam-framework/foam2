@@ -136,10 +136,12 @@ foam.CLASS({
       ^tools thead, ^properties thead { display: none }
       ^tools tr { height: 30px }
       .foam-u2-TableView { border-collapse: collapse; }
-      .foam-u2-TableView-selected { border: 1px solid red; }
-      ^ canvas { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
+      .foam-u2-TableView-selected { outline: 1px solid red; }
+      ^ canvassss { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
+      ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
-      ^properties .foam-u2-ActionView { background: white; padding: 0; margin: 2px; border: none; }
+      ^properties .foam-u2-ActionView { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
+      .foam-u2-Tabs { padding-top: 0 !important; }
       */}
     })
   ],
@@ -211,7 +213,7 @@ foam.CLASS({
           daoType: 'ARRAY'
         });
 
-        var p = this.Property.create({name: 'canvas', value: this.canvas});
+        var p = this.Property.create({name: 'canvas1', value: this.canvas});
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
@@ -256,12 +258,16 @@ foam.CLASS({
             start(this.TOOLS, {selection$: this.currentTool$}).end().
           end().
           start('center').
-            style({'padding-top': 0}).
-            start(this.canvas).
-              on('click',       this.onClick).
-              on('contextmenu', this.onRightClick).
+            start(foam.u2.Tabs).
+              start(foam.u2.Tab, {label: 'canvas1'}).
+                start(this.canvas).
+                  on('click',       this.onClick).
+                  on('contextmenu', this.onRightClick).
+                end().
+              end().
+              start(foam.u2.Tab, {label: '+'}).
+              end().
             end().
-            tag('br').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().
