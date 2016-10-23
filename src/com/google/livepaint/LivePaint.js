@@ -134,7 +134,9 @@ foam.CLASS({
       ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
       ^sheet { width: 100%; overflow-y: scroll; }
       ^tools thead, ^properties thead { display: none }
-      .foam-u2-TableView-selected { background: lightgray; }
+      ^tools tr { height: 30px }
+      .foam-u2-TableView { border-collapse: collapse; }
+      .foam-u2-TableView-selected { border: 1px solid red; }
       ^ canvas { border: 1px solid black; box-shadow: 3px 3px 6px 0 gray; }
       ^ .foam-u2-ActionView { margin: 10px; }
       ^properties .foam-u2-ActionView { background: white; padding: 0; margin: 2px; border: none; }
@@ -249,7 +251,10 @@ foam.CLASS({
 
       this.
           cssClass(this.myCls()).
-          start(this.TOOLS, {selection$: this.currentTool$}).cssClass(this.myCls('tools')).end().
+          start('div').
+            cssClass(this.myCls('tools')).
+            start(this.TOOLS, {selection$: this.currentTool$}).end().
+          end().
           start('center').
             style({'padding-top': 0}).
             start(this.canvas).
