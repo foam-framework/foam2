@@ -292,9 +292,12 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.data$proxy.sub('on', this.onDAOUpdate);
       this.onDAOUpdate();
-      return this.add(this.header$, this.body$);
+      this.data$proxy.sub('on', this.onDAOUpdate);
+
+      return this.
+          cssClass(this.myCls()).
+          add(this.header$, this.body$);
     },
 
     function sortBy(prop) {
