@@ -1049,7 +1049,8 @@ foam.CLASS({
     'height',
     {
       class: 'String',
-      name:  'text'
+      name:  'text',
+      view: { class: 'foam.u2.TextField', onKey: true }
     },
     {
       name:  'align',
