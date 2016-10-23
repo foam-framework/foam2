@@ -32,7 +32,7 @@ foam.CLASS({
     [ 'radius', 20 ],
     [ 'width', 20 ],
     [ 'height', 35 ],
-    'stem'
+    { name: 'stem', view: 'foam.u2.DetailView' }
   ],
 
   methods: [
