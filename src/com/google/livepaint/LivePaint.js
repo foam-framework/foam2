@@ -132,7 +132,7 @@ foam.CLASS({
       ^ { display: flex; }
       ^ > * { padding-left: 16px; padding-right: 16px; }
       ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
-      ^sheet { width: 100%; overflow-y: scroll; }
+      ^sheet { width: 100%; overflow-y: auto; }
       ^tools thead, ^properties thead { display: none }
       ^tools tr { height: 30px }
       .foam-u2-TableView { border-collapse: collapse; }
