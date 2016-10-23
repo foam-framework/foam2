@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.livepaint',
+  package: 'com.google.flow',
   name: 'Property',
   ids: [ 'name' ],
   properties: [
@@ -39,7 +39,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.google.livepaint',
+  package: 'com.google.flow',
   name: 'Clock',
   extends: 'com.google.foam.demos.clock.Clock',
   implements: [ 'foam.physics.Physical' ],
@@ -53,7 +53,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.google.livepaint',
+  package: 'com.google.flow',
   name: 'Text',
   extends: 'foam.graphics.Label',
   implements: [ 'foam.physics.Physical' ],
@@ -69,7 +69,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.google.livepaint',
+  package: 'com.google.flow',
   name: 'Circle',
   extends: 'foam.graphics.Circle',
   implements: [ 'foam.physics.Physical' ],
@@ -81,7 +81,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.google.livepaint',
+  package: 'com.google.flow',
   name: 'Box',
   extends: 'foam.graphics.Box',
   implements: [ 'foam.physics.Physical' ],
@@ -94,8 +94,8 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'com.google.livepaint',
-  name: 'LivePaint',
+  package: 'com.google.flow',
+  name: 'FLOW',
   extends: 'foam.u2.Element',
 
   implements: [
@@ -104,7 +104,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'com.google.livepaint.Property',
+    'com.google.flow.Property',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
     'foam.graphics.CView',
@@ -171,11 +171,11 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'ARRAY'
         });
-        dao.put(com.google.livepaint.Box.model_);
-        dao.put(com.google.livepaint.Circle.model_);
-        dao.put(com.google.livepaint.Text.model_);
-        dao.put(com.google.livepaint.Clock.model_);
-        dao.put(com.google.livepaint.Mushroom.model_);
+        dao.put(com.google.flow.Box.model_);
+        dao.put(com.google.flow.Circle.model_);
+        dao.put(com.google.flow.Text.model_);
+        dao.put(com.google.flow.Clock.model_);
+        dao.put(com.google.flow.Mushroom.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
@@ -200,13 +200,13 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TableView',
         columns: [
-          com.google.livepaint.Property.NAME,
-          com.google.livepaint.Property.DELETE_ROW
+          com.google.flow.Property.NAME,
+          com.google.flow.Property.DELETE_ROW
         ]
       },
       factory: function() {
         var dao = foam.dao.EasyDAO.create({
-          of: 'com.google.livepaint.Property',
+          of: 'com.google.flow.Property',
           guid: true,
           seqProperty: this.Property.NAME,
 //          daoType: 'MDAO'
