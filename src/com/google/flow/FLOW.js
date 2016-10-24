@@ -65,11 +65,6 @@ foam.CLASS({
     'properties'
   ],
 
-  constants: {
-    SELECTED_COLOR:   '#dddddd',
-    UNSELECTED_COLOR: '#ffffff'
-  },
-
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
@@ -87,6 +82,7 @@ foam.CLASS({
       ^ .foam-u2-ActionView { margin: 10px; }
       ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
       .foam-u2-Tabs { padding-top: 0 !important; }
+      input[type="range"] { width: 150px; }
       */}
     })
   ],
@@ -171,7 +167,8 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 600, height: 600, color: '#f3f3f3'});
+//        return this.Box.create({autoRepaint: true, width: 600, height: 600, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
   ],
