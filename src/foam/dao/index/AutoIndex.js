@@ -107,9 +107,10 @@ foam.CLASS({
 
       // Ordering
       if ( order ) {
+        var ordProp = this.Desc.isInstance(order) ? order.arg1 : order;
+
         // if sorting required, add the sort cost
-        if ( ! order === property &&
-             ! ( index.Desc.isInstance(order) && order.arg1 === property ) ) {
+        if ( ordProp !== property ) {
           if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
         }
       }
@@ -213,7 +214,7 @@ foam.CLASS({
 
       var self = this;
       var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-//console.log("AutoEst OLD:", bestCost, this.delegate.toString());
+console.log("AutoEst OLD:", bestCost, this.delegate.toString());
 
       if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
         return this.delegate.plan(sink, skip, limit, order, predicate, root);
@@ -223,7 +224,7 @@ foam.CLASS({
       if ( predicate ) {
         var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-//console.log("AutoEst PRD:", candidateCost, candidate.toString());
+console.log("AutoEst PRD:", candidateCost, candidate.toString());
         //TODO: must beat by factor of X? or constant?
         if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
           newIndex = candidate;
@@ -234,7 +235,7 @@ foam.CLASS({
       if ( order ) {
         var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-//console.log("AutoEst ORD:", candidateCost, candidate.toString());
+console.log("AutoEst ORD:", candidateCost, candidate.toString());
         if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
           newIndex = candidate;
           bestCost = candidateCost;
@@ -242,7 +243,7 @@ foam.CLASS({
       }
 
       if ( newIndex ) {
-//console.log("BUILDING INDEX", newIndex.toString());
+console.log("BUILDING INDEX", newIndex.toString());
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
