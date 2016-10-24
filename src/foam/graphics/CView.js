@@ -495,7 +495,7 @@ foam.CLASS({
       getter: function getTransform() {
         var t = this.transform_.reset();
 
-        t.translate(this.x, this.y);
+        t.translate(this.x+this.originX, this.y+this.originY);
         t.rotate(this.rotation);
         t.skew(this.skewX, this.skewY);
         t.scale(this.scaleX, this.scaleY);
@@ -781,6 +781,10 @@ foam.CLASS({
       name: 'height'
     },
     {
+      class: 'Float',
+      name: 'borderWidth'
+    },
+    {
       name: 'border',
       value: '#000000'
     }
@@ -790,7 +794,10 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.rect(0, 0, this.width, this.height);
-      if ( this.border ) x.stroke();
+      if ( this.border ) {
+        x.lineWidth = this.borderWidth;
+        x.stroke();
+      }
       if ( this.color  ) x.fill();
     }
   ]
