@@ -22,6 +22,9 @@
   the static/class methods in the top-level FObject class,
   then with a CLASS below to define methods on the FObject
   prototype.
+
+  For details on how FObject fits in to the FOAM class system,
+  see the documentation in the top of Boot.js
  */
 foam.LIB({
   name: 'foam.core.FObject',
@@ -35,8 +38,8 @@ foam.LIB({
     prototype: {},
 
     // Each class has a map of Axioms added to the class.
-    // May keys are the name of the axiom.
-    // The classes axiomMap_'s extends its parent axiomMap_.
+    // Map keys are the name of the axiom.
+    // The classes axiomMap_'s extends its parent's axiomMap_.
     axiomMap_: {},
 
     // Each class has a map of "private" variables for use by
@@ -90,10 +93,10 @@ foam.LIB({
 
         cls.prototype = Object.create(this.prototype);
         cls.axiomMap_ = Object.create(this.axiomMap_);
-        cls.private_  = { axiomCache: Object.create(this.axiomMap_) };
+        cls.private_  = { axiomCache: {} };
 
         return cls;
-      }
+      };
 
       return this;
     },
