@@ -26,7 +26,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'text'
+      name: 'text',
+      width: 60
     },
     {
       class: 'Float',
@@ -61,10 +62,13 @@ foam.CLASS({
         }, X);
 
         function updateChoices() {
+          var firstChoice;
           view.choices = synth.getVoices().map(function(v) {
-            if ( ! view.data && v.lang == 'en-US' ) view.data = v;
-            return [v, v.name];
+            var choice = [v, v.name];
+            if ( ! view.data && v.lang === 'en-US' ) firstChoice = choice;
+            return choice;
           });
+          if ( firstChoice ) view.choice = firstChoice;
         }
 
         updateChoices();

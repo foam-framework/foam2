@@ -109,9 +109,6 @@ foam.CLASS({
         function sub(l) {
           return this.SUPER('update', l);
         },
-        function unsub(l) {
-          return this.SUPER('update', l);
-        },
         function toString() {
           return 'StackSlot(' + this.pos + ')';
         }

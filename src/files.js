@@ -98,7 +98,6 @@ FOAM_FILES([
   { name: "foam/dao/TimingDAO" },
   { name: "foam/dao/LoggingDAO" },
   { name: "foam/dao/IDBDAO", flags: ['web'] },
-  { name: "lib/Pooled" },
   { name: "foam/parse/QueryParser" },
   { name: "foam/physics/Physical" },
   { name: "foam/physics/Collider" },

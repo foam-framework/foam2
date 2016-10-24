@@ -315,7 +315,7 @@ var examples = [
   //     foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
   //   }
   // },
-  
+
   {
     name: 'Selecting with skip and limit',
     description: "A pseudo scroll effect with skip and limit",
@@ -324,16 +324,16 @@ var examples = [
       var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
       var skip = 0;
       var limit = 3;
-      
-      // Change skip value, reassign the proxy's source. 
+
+      // Change skip value, reassign the proxy's source.
       // The table will update automatically.
       setInterval(function() {
         skip = (skip + 1) % 4;
         proxyDAO.delegate = app.customerDAO.skip(skip).limit(limit);
       }, 500);
-      
+
       document.write("Customers with Skip and Limit");
-      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();      
+      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();
     }
   },
 
@@ -344,18 +344,18 @@ var examples = [
     code: function async() {
       return app.accountDAO.find(3).then(function(account) {
         var transactionsDAO = account.transactions;
-        
+
         document.write("Sort by amount, descending");
-        foam.u2.TableView.create({ 
+        foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(M.DESC(app.Transaction.AMOUNT))
-        }).write();              
+        }).write();
 
         document.write("Sort by date");
-        foam.u2.TableView.create({ 
+        foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(app.Transaction.DATE)
-        }).write();              
+        }).write();
       })
     }
   },

@@ -53,7 +53,7 @@ foam.CLASS({
       this.cssClass('foam-u2-PropertyView-')
           .start('td').cssClass('foam-u2-PropertyView-label').add(prop.label).end()
           .start('td').cssClass('foam-u2-PropertyView-view').add(
-              this.prop,
+              prop,
               prop.units && this.E('span').cssClass('foam-u2-PropertyView-units').add(' ', prop.units))
           .end();
     }
