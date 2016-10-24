@@ -987,14 +987,14 @@ foam.CLASS({
       isFramed: true,
       code: function paintCanvas() {
         // Only paint after being loaded
-        if ( this.state !== this.LOADED ) return;
+        if ( this.state !== this.LOADED || ! this.cview ) return;
 
-        var context = this.cview.paint3D ? this.context3D : this.context;
-        this.erase(context);
-
-        if ( this.cview ) {
-          if ( this.cview.paint3D ) this.cview.paint3D(context);
-          else this.cview.paint(context);
+        var ctx = this.cview.paint3D ? this.context3D : this.context;
+        this.erase(ctx);
+        if ( this.cview.paint3D ) {
+          this.cview.paint3D(ctx);
+        } else {
+          this.cview.paint(ctx);
         }
       }
     }
