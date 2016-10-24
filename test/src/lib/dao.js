@@ -831,6 +831,22 @@ describe('ArrayDAO', function() {
       expect(dao.array[1].a).toEqual('four');
     }).then(done);
   });
+
+  it('skips and limits with predicate properly on removeAll', function(done) {
+
+    dao.put(test.CompA.create({ id: 1, a: 'one' }));
+    dao.put(test.CompA.create({ id: 2, a: 'two' }));
+    dao.put(test.CompA.create({ id: 3, a: 'three' }));
+    dao.put(test.CompA.create({ id: 4, a: 'four' }));
+
+    dao.skip(1).limit(2).where(
+      foam.mlang.predicate.Gt.create({ arg1: test.CompA.ID, arg2: 1 })
+    ).removeAll().then(function() {
+      expect(dao.array.length).toEqual(2);
+      expect(dao.array[0].a).toEqual('one');
+      expect(dao.array[1].a).toEqual('two');
+    }).then(done);
+  });
 });
 
 describe('ContextualizingDAO', function() {
