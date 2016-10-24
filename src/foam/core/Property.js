@@ -137,6 +137,16 @@ foam.CLASS({
     */
     'setter',
 
+    [ 'cloneProperty', function(
+      /* any // The value to clone */         value,
+      /* object // Add values to this map to
+         have them installed on the clone. */ cloneMap
+      ) {
+        /** Override to provide special deep cloning behavior. */
+        cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
+      }
+    ],
+
     /**
       A final Property can only be set once.
       After being set, its value is final (read-only).
@@ -553,15 +563,6 @@ foam.CLASS({
       }
 
       return slot;
-    },
-
-    function cloneProperty(
-      /* any // The value to clone */         value,
-      /* object // Add values to this map to
-         have them installed on the clone. */ cloneMap
-    ) {
-      /** Override to provide special deep cloning behavior. */
-      cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
     }
   ]
 });
