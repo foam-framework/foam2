@@ -40,7 +40,7 @@ foam.CLASS({
         ^ {
           display: block;
         }
-        ^tabRow { height: 38px; }
+        ^tabRow { height: 37px; }
         ^tab {
           float: left;
           border: 1px solid black;
