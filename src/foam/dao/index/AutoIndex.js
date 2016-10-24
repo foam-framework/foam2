@@ -136,12 +136,17 @@ foam.CLASS({
   refines: 'foam.dao.index.AltIndex',
 
   methods: [
+    /** Returns smallest estimate from the delegates */
     function estimate(size, sink, skip, limit, order, predicate) {
-
-
-      return this.delegates[0].estimate(
-        size, sink, skip, limit, order, predicate
-      );
+      var cost = Number.MAX_VALUE;
+      for ( var i = 0; i < this.delegates.length; i++ ) {
+        cost = Math.min(
+          cost,
+          this.delegates[i].estimate(
+            size, sink, skip, limit, order, predicate)
+        );
+      }
+      return cost;
     }
   ]
 });
@@ -192,21 +197,35 @@ foam.CLASS({
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate, root) {
-      var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
-      // If plan is cheap enough don't bother
-      if ( existingPlan.cost <= this.GOOD_ENOUGH_PLAN ) {
-        return existingPlan;
-      }
+      // NOTE: Using the existing index's plan as its cost when comparing
+      //  against estimates is bad. An optimistic estimate from an index
+      //  will cause it to always appear better than its real world
+      //  performance, leading AutoIndex to keep creating new instances
+      //  of the offending index. Comparing estimates to estimates is much
+      //  more consistent and allows estimate() to be arbitrarily bad
+      //  as long as it is indicative of relative performance of each
+      //  index type.
+
+      // TODO: replace this machanism with some decreasing amortization
+      //  factor to account for index building but take repeated hits into
+      //  account
+      var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
 
       var self = this;
-      var bestCost = existingPlan.cost;
+      var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+//console.log("AutoEst OLD:", bestCost, this.delegate.toString());
+
+      if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
+        return this.delegate.plan(sink, skip, limit, order, predicate, root);
+      }
 
       var newIndex;
       if ( predicate ) {
         var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+//console.log("AutoEst PRD:", candidateCost, candidate.toString());
         //TODO: must beat by factor of X? or constant?
-        if ( bestCost > candidateCost ) {
+        if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
           newIndex = candidate;
           bestCost = candidateCost;
         }
@@ -215,13 +234,15 @@ foam.CLASS({
       if ( order ) {
         var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-        if ( bestCost > candidateCost ) {
+//console.log("AutoEst ORD:", candidateCost, candidate.toString());
+        if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
           newIndex = candidate;
           bestCost = candidateCost;
         }
       }
 
       if ( newIndex ) {
+//console.log("BUILDING INDEX", newIndex.toString());
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
@@ -235,7 +256,7 @@ foam.CLASS({
           }
         });
       } else {
-        return existingPlan;
+        return this.delegate.plan(sink, skip, limit, order, predicate, root);
       }
     },
 
