@@ -20,12 +20,22 @@ foam.CLASS({
   name: 'PhysicsEngine',
   extends: 'foam.physics.Collider',
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'enableGravity',
+      value: false
+    }
+  ],
+
   methods: [
     function updateChild(c) {
+      this.SUPER(c);
+
       var gravity  = c.gravity;
       var friction = c.friction;
 
-      if ( gravity ) c.vy += gravity;
+      if ( gravity && this.enableGravity ) c.vy += gravity;
 
       if ( friction ) {
         c.vx = Math.abs(c.vx) < 0.001 ? 0 : c.vx * friction;

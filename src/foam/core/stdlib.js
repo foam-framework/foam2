@@ -112,6 +112,7 @@ foam.LIB({
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
 
+    /* istanbul ignore next */
     function bind(f, that, a1, a2, a3, a4) {
       /**
        * Faster than Function.prototype.bind
@@ -209,6 +210,7 @@ foam.LIB({
           replace(/(\r\n|\n|\r)/gm,'').
           match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
       if ( ! match ) {
+        /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
       }
       return match[2] || '';
@@ -297,7 +299,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return b === null ? 1 : a < b ? -1 : a > b ? 1 : 0;
+      return ( b === null || b === undefined ) ? 1 :
+        a < b ? -1 : a > b ? 1 : 0;
     },
     function hashCode(n) { return n & n; }
   ]
@@ -336,7 +339,9 @@ foam.LIB({
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
-        if ( ! str || str === '' ) return str;
+        console.assert(typeof str === 'string',
+                       'Cannot labelize non-string values.');
+        if ( str === '' ) return str;
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
@@ -346,14 +351,33 @@ foam.LIB({
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
       })
     },
-
+    {
+      /**
+       * Takes a key and creates a slot name for it.  Generally key -> key + '$'.
+       *
+       * For example, if an object has a property called myProperty, the slot
+       * name for that will be myProperty$.
+       */
+      name: 'toSlotName',
+      code: foam.Function.memoize1(function toSlotName(key) {
+        console.assert(typeof key === 'string',
+               'Cannot toSlotName non-string values.');
+               
+        return key + '$';
+      })
+    },
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot toUpperCase non-string values.');
+
         return str.toUpperCase();
       })
     },
@@ -361,12 +385,17 @@ foam.LIB({
     {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
+        console.assert(typeof str === 'string',
+                       'Cannot cssClassize non-string values.');
         // Turns foam.u2.Foo into foam-u2-Foo
         return str.replace(/\./g, '-');
       })
     },
 
     function pad(str, size) {
+      console.assert(typeof str === 'string',
+               'Cannot constantize non-string values.');
+      
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
         (new Array(-size).join(' ') + str).slice(size)       :
@@ -380,9 +409,12 @@ foam.LIB({
       var s     = f.toString();
       var start = s.indexOf('/*');
       var end   = s.lastIndexOf('*/');
-      return s.substring(start + 2, end);
+      return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
+      console.assert(typeof a === 'string' && typeof b === 'string',
+               'Cannot startsWithIC non-string values.');
+      
       return a.toUpperCase().startsWith(b.toUpperCase());
     },
     (function() {
@@ -435,7 +467,7 @@ foam.LIB({
       return true;
     },
     function compare(a, b) {
-      if ( ! b || ! Array.isArray(b) ) return false;
+      if ( ! b || ! Array.isArray(b) ) return 1;
       var l = Math.min(a.length, b.length);
       for ( var i = 0 ; i < l ; i++ ) {
         var c = foam.util.compare(a[i], b[i]);
@@ -447,10 +479,17 @@ foam.LIB({
       var hash = 0;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
-        hash = ((hash << 5) - hash) + this.hashCode(a[i]);
+        hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
       }
 
       return hash;
+    },
+    function remove(a, o) {
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        if ( foam.util.equals(o, a[i]) ) {
+          a.splice(i, 1);
+        }
+      }
     }
   ]
 });
@@ -460,7 +499,7 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
-    function clone(o) { return o; },
+    function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
@@ -516,6 +555,7 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     // Can't be an FObject yet because we haven't built the class system yet
+    /* istanbul ignore next */
     function isInstance(o) { return false; },
     function clone(o)      { return o.clone(); },
     function diff(a, b)    { return a.diff(b); },
@@ -619,7 +659,10 @@ foam.mmethod = function(map, opt_defaultMethod) {
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) { return typeOf(a).compare(a, b); },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
-      function diff(a, b)    { return typeOf(a).diff(a, b); }
+      function diff(a, b)    {
+        var t = typeOf(a);
+        return t.diff ? t.diff(a, b) : undefined;
+      },
     ]
   });
 })();

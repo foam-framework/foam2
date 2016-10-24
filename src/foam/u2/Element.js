@@ -1680,6 +1680,16 @@ foam.CLASS({
 });
 
 
+/*
+foam.CLASS({
+  refines: 'foam.core.Color',
+  properties: [
+    [ 'view', { class: 'foam.u2.TextField', type: 'color', onKey: true } ]
+  ]
+});
+*/
+
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'View',

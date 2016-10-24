@@ -42,20 +42,20 @@ foam.CLASS({
     },
     {
       name: 'choice',
+      // 'choice' is the canonical source of truth. Updating 'choice' is
+      // responsible for updating 'index', 'data', and 'text'. Updating any
+      // of those properties calls back to updating 'choice'.
       documentation: 'The current choice. (That is, a [value, text] pair.)',
-      getter: function() {
-        var value = this.data;
-        for ( var i = 0 ; i < this.choices.length; i++ ) {
-          var choice = this.choices[i];
-          if ( value === choice[0] ) return choice;
-        }
-        return undefined;
-      },
-      setter: function(nu) {
-        var oldValue = this.choice;
-        this.data = nu[0];
-        this.text = nu[1];
-        this.pubPropertyChange_('choice', oldValue, this.choice);
+      postSet: function(o, n) {
+        if ( o === n || this.feedback_ ) return;
+
+        this.feedback_ = true;
+
+        this.data  = n && n[0];
+        this.text  = n && n[1];
+        this.index = this.findIndexOfChoice(n);
+
+        this.feedback_ = false;
       }
     },
     {
@@ -85,29 +85,11 @@ foam.CLASS({
 
         return nu;
       },
-      postSet: function(old, nu) {
-        var value = this.data;
-
-        // Update the current choice when choices update.
-        if ( this.hasOwnProperty('index') && ! this.hasOwnProperty('data') &&
-            this.index >= 0 && this.index < nu.length ) {
-          this.choice = nu[this.index];
-          return;
-        }
-
-        for ( var i = 0; i < nu.length; i++ ) {
-          var choice = nu[i];
-          if ( value === choice[0] ) {
-            this.choice = choice;
-            return;
-          }
-        }
-
-        // If we're still here, then we didn't have an index, nor a matching
-        // choice. Force selection of the first item.
-        if ( nu && nu.length ) {
-          this.choice = nu[0];
-        }
+      postSet: function() {
+        var c = this.choice;
+        this.choice = c && (
+            this.findChoiceByData(c[0]) ||
+            this.findChoiceByText(c[1]) );
       }
     },
     {
@@ -122,10 +104,8 @@ foam.CLASS({
         if ( nu >= this.choices.length ) return this.choices.length - 1;
         return nu;
       },
-      postSet: function(old, nu) {
-        if ( this.choices.length && this.data !== this.choices[nu][0] ) {
-          this.data = this.choices[nu][0];
-        }
+      postSet: function(o, n) {
+        if ( o !== n ) this.choice = n === -1 ? null : this.choices[n];
       }
     },
     {
@@ -149,23 +129,15 @@ foam.CLASS({
       }
     },
     {
+      name: 'text',
+      postSet: function(o, n) {
+        if ( o !== n ) this.choice = this.findChoiceByText(n);
+      }
+    },
+    {
       name: 'data',
-      postSet: function(old, nu) {
-        for ( var i = 0; i < this.choices.length; i++ ) {
-          if ( this.choices[i][0] === nu ) {
-            if ( this.index !== i ) {
-              this.text = this.choices[i][1];
-              this.index = i;
-            }
-            return;
-          }
-        }
-
-        // If we're still here, we've been ordered to take on a value that isn't
-        // listed. Emit a warning to the console.
-        if ( nu && this.choices.length ) {
-          this.warn('ChoiceView data set to invalid choice: ', nu);
-        }
+      postSet: function(o, n) {
+        if ( o !== n ) this.choice = this.findChoiceByData(n);
       }
     },
     {
@@ -179,7 +151,8 @@ foam.CLASS({
     },
     {
       name: 'view_'
-    }
+    },
+    'feedback_'
   ],
 
   methods: [
@@ -199,6 +172,35 @@ foam.CLASS({
         choices$: this.choices$,
         placeholder$: this.placeholder$
       }).end();
+    },
+
+    function findIndexOfChoice(choice) {
+      var choices = this.choices;
+      var data = choice[0];
+      for ( var i = 0 ; i < choices.length ; i++ ) {
+        if ( choices[i][0] === data ) return i;
+      }
+      var text = choice[1];
+      for ( var i = 0 ; i < choices.length ; i++ ) {
+        if ( choices[i][1] === text ) return i;
+      }
+      return -1;
+    },
+
+    function findChoiceByData(data) {
+      var choices = this.choices;
+      for ( var i = 0 ; i < choices.length ; i++ ) {
+        if ( choices[i][0] === data ) return choices[i];
+      }
+      return null;
+    },
+
+    function findChoiceByText(text) {
+      var choices = this.choices;
+      for ( var i = 0 ; i < choices.length ; i++ ) {
+        if ( choices[i][1] === text ) return choices[i];
+      }
+      return null;
     }
   ],
 

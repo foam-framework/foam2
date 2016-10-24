@@ -394,8 +394,17 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Float',
+      name: 'width'
+    },
+    {
+      class: 'Float',
+      name: 'height'
+    },
+    {
       name: 'rotation',
-      class: 'Float'
+      class: 'Float',
+      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
     },
     {
       name: 'originX',
@@ -437,16 +446,21 @@ foam.CLASS({
       value: 1
     },
     {
+      class: 'Color',
       name: 'border'
     },
     {
+      class: 'Color',
       name: 'color'
     },
     {
+      class: 'Color',
       name: 'shadowColor'
     },
     {
-      name: 'shadowBlur'
+      class: 'Int',
+      name: 'shadowBlur',
+      units: 'pixels'
     },
     {
       name: 'children',
@@ -459,7 +473,8 @@ foam.CLASS({
     },
     {
       name: 'state',
-      value: 'initial'
+      value: 'initial',
+      hidden: 'true'
     },
     {
       name: 'parent',
@@ -502,9 +517,10 @@ foam.CLASS({
     {
       name: 'invalidate_',
       hidden: true,
-      factory: function() {
+      // TODO: Would be more efficient to be a factory, but doesn't work. Investigate.
+      getter: function() {
         return this.parent ? this.parent.invalidate_ :
-          this.autoRepaint ? this.invalidated.pub   :
+          this.autoRepaint ? this.invalidated.pub    :
           null ;
       }
     }
@@ -617,7 +633,7 @@ foam.CLASS({
       }
     },
 
-    function removeChild(c) {
+    function remove(c) {
       for ( var i = 0 ; i < this.children.length ; i++ ) {
         if ( this.children[i] === c ) {
           this.children.splice(i, 1);
@@ -625,6 +641,11 @@ foam.CLASS({
           return;
         }
       }
+    },
+
+    function removeChild(c) {
+      console.log('Deprecated use of CView.removeChild(). Use .remove() instead.');
+      this.remove(c);
     },
 
     function addChild_(c) {
@@ -666,9 +687,8 @@ foam.CLASS({
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({
-        // TODO: better to make Arc compute it's width and height
-        width: this.x + (this.width  || (this.radius + this.arcWidth) * 2),
-        height: this.y + (this.height || (this.radius + this.arcWidth) * 2)
+        width:  this.slot(function(x, width,  scaleX) { return x + width*scaleX; }),
+        height: this.slot(function(y, height, scaleY) { return y + height*scaleY; })
       });
     },
 
@@ -762,7 +782,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      value: 'black'
+      value: '#000000'
     }
   ],
 
@@ -801,7 +821,7 @@ foam.CLASS({
     },
     {
       name: 'border',
-      value: 'black'
+      value: '#000000'
     }
   ],
 
@@ -816,6 +836,13 @@ foam.CLASS({
         x.lineWidth = this.arcWidth;
         x.stroke();
       }
+    },
+
+    function toE(X) {
+      return this.Canvas.create({ cview: this }, X).attrs({
+        width: this.x + this.radius + this.arcWidth,
+        height: this.y + this.radius + this.arcWidth
+      });
     }
   ]
 });
@@ -1023,7 +1050,8 @@ foam.CLASS({
     'height',
     {
       class: 'String',
-      name:  'text'
+      name:  'text',
+      view: { class: 'foam.u2.TextField', onKey: true }
     },
     {
       name:  'align',
@@ -1037,7 +1065,7 @@ foam.CLASS({
     {
       class: 'Color',
       name:  'color',
-      value: 'black'
+      value: '#000000'
     },
     {
       class: 'Color',

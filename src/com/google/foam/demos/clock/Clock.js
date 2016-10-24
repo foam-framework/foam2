@@ -30,7 +30,7 @@ foam.CLASS({
     [ 'radius', 100 ],
     [ 'x', 120 ],
     [ 'y', 120 ],
-    [ 'color', 'white' ],
+    [ 'color', '#ffffff' ],
     [ 'arcWidth', 5 ],
     {
       class: 'Boolean',
@@ -42,18 +42,21 @@ foam.CLASS({
     },
     {
       name: 'minuteHand',
+      hidden: 'true',
       factory: function() {
         return this.Hand.create({radius:this.radius-6, width:5, color: this.GREEN});
       }
     },
     {
       name: 'hourHand',
+      hidden: 'true',
       factory: function() {
         return this.Hand.create({radius:this.radius-15, width:7, color: this.YELLOW});
       }
     },
     {
       name: 'secondHand',
+      hidden: 'true',
       factory: function() {
         return this.Hand.create({radius:this.radius-6, width:3, color: this.RED});
       }
@@ -99,7 +102,7 @@ foam.CLASS({
       name: 'tick',
       isMerged: true,
       mergeDelay: 1000,
-      code: function() { this.invalidated.pub(); this.tick(); }
+      code: function() { this.invalidate(); this.tick(); }
     }
   ],
 
