@@ -25,6 +25,10 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'String',
+      name: 'parent'
+    },
+    {
       name: 'value',
       cloneProperty: function(o, m) {
         console.log('clone: ', this.name, o);
