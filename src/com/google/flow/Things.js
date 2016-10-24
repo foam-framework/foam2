@@ -51,6 +51,7 @@ foam.CLASS({
   extends: 'foam.graphics.Circle',
   implements: [ 'foam.physics.Physical' ],
   properties: [
+    [ 'arcWidth', 1 ],
     [ 'gravity', 1 ],
     [ 'radius',  25 ]
   ]
