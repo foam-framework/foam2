@@ -211,10 +211,12 @@ foam.CLASS({
       //  factor to account for index building but take repeated hits into
       //  account
       var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
+      // TODO: root.size() is the size of the entire DAO, and representative
+      //   of the cost of creating a new index.
 
       var self = this;
       var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-console.log("AutoEst OLD:", bestCost, this.delegate.toString());
+//console.log("AutoEst OLD:", bestCost, this.delegate.toString());
 
       if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
         return this.delegate.plan(sink, skip, limit, order, predicate, root);
@@ -224,7 +226,7 @@ console.log("AutoEst OLD:", bestCost, this.delegate.toString());
       if ( predicate ) {
         var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-console.log("AutoEst PRD:", candidateCost, candidate.toString());
+//console.log("AutoEst PRD:", candidateCost, candidate.toString());
         //TODO: must beat by factor of X? or constant?
         if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
           newIndex = candidate;
@@ -235,7 +237,7 @@ console.log("AutoEst PRD:", candidateCost, candidate.toString());
       if ( order ) {
         var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
         var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-console.log("AutoEst ORD:", candidateCost, candidate.toString());
+//console.log("AutoEst ORD:", candidateCost, candidate.toString());
         if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
           newIndex = candidate;
           bestCost = candidateCost;
@@ -243,12 +245,18 @@ console.log("AutoEst ORD:", candidateCost, candidate.toString());
       }
 
       if ( newIndex ) {
-console.log("BUILDING INDEX", newIndex.toString());
+//console.log("BUILDING INDEX", bestCost, newIndex.toString());
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
             // TODO: use promise to async delay when loading slowly
             // TODO: could be a long operation, PoliteIndex to delay load?
+            //  When ordering, the cost of sorting will depend on the total
+            //  size of the DAO (index create cost) versus the size of the
+            //  result set at this index node. It might be cheap enough to
+            //  async create the index and let the current sort happen the
+            //  hard way, or it could be worthwhile to just wait
+            //  for the new index that supports the sort.
             self.addIndex(newIndex, root);
             // avoid a recursive call by hitting delegate, should pick the new optimal index
             self.delegate

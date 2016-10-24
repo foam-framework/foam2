@@ -155,7 +155,7 @@ describe("Index benchmarks", function() {
   });
 
 
-  xit('benchmarks manual indexes', function(done) {
+  it('benchmarks manual indexes', function(done) {
     loadMedalData(dao).then(
       foam.async.sequence([
         foam.async.atest('Build index on most properties', function() {
@@ -172,7 +172,7 @@ describe("Index benchmarks", function() {
   });
 
 
-  xit('benchmarks sample set A', function(done) {
+  it('benchmarks sample set A', function(done) {
     SAMPLE_PREDICATES_A = [
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
@@ -343,8 +343,10 @@ describe("Index benchmarks", function() {
         )
       ])
     ).then(function() {
-      autodao.select(dao).then(foam.async.sequence([
-        function() { autodao = null; /* allow gc */ },
+      return autodao.select(dao).then(foam.async.sequence([
+        function() {
+          autodao = null; /* allow gc */
+        },
         foam.async.sleep(2000),
         foam.async.atest(
           'Run predicate set A no index',
@@ -359,8 +361,10 @@ describe("Index benchmarks", function() {
         ),
 
       ])).then(function() {
-        dao.select(autodaoOmni).then(foam.async.sequence([
-          function() { dao = null; /* allow gc */ },
+        return dao.select(autodaoOmni).then(foam.async.sequence([
+          function() {
+            dao = null; /* allow gc */
+          },
           foam.async.sleep(2000),
           foam.async.atest(
             'Run predicate set A omni-auto index',
@@ -412,11 +416,13 @@ describe("Index benchmarks", function() {
         )
       ])
     ).then(function() {
-      autodao.select(autodaoOmni).then(
+      return autodao.select(autodaoOmni).then(
         foam.async.sequence([
-          function() { autodao = null; /* allow gc */ },
+          function() {
+            autodao = null; /* allow gc */
+          },
           foam.async.atest(
-            'Run predicate set B with AutoIndex 100 times',
+            'Run predicate set B with omni AutoIndex 100 times',
             foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
               function(i) {
                 return foam.async.atest('O-Predicate '+SAMPLE_B[i].toString(), function() {
@@ -427,7 +433,7 @@ describe("Index benchmarks", function() {
             ))
           ),
           foam.async.atest(
-            'Run predicate set B with AutoIndex Again(already indexed) 100 times',
+            'Run predicate set B with omni AutoIndex Again(already indexed) 100 times',
             foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
               function(i) {
                 return foam.async.atest('OR-Predicate '+SAMPLE_B[i].toString(), function() {
@@ -440,8 +446,10 @@ describe("Index benchmarks", function() {
         ])
       )
     }).then(function() {
-      autodaoOmni.select(dao).then(foam.async.sequence([
-        function() { autodaoOmni = null; /* allow gc */ },
+      return autodaoOmni.select(dao).then(foam.async.sequence([
+        function() {
+          autodaoOmni = null; /* allow gc */
+        },
         foam.async.sleep(2000),
         foam.async.atest(
           'Run predicate set B no index 100 times',
