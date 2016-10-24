@@ -63,12 +63,11 @@ foam.CLASS({
         var v = this.selected.value;
         if ( ! v ) return;
         if ( v.radius ) {
-          this.originX = 0;
-          this.originY = 0;
           this.height = this.width = (v.radius + v.arcWidth ) * 2 + 6;
           this.x        = v.x - v.radius - v.arcWidth - 3 ;
           this.y        = v.y - v.radius - v.arcWidth - 3
-
+          this.originX = v.x-this.x;
+          this.originY = v.y-this.y;
         } else {
           this.originX = 3;
           this.originY = 3;
