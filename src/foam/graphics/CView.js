@@ -572,7 +572,9 @@ foam.CLASS({
     },
 
     // p must be in local coordinates.
-    function hitTest(p) {},
+    function hitTest(p) {
+      return p.x >= 0 && p.y >= 0 && p.x < this.width && p.y < this.height;
+    },
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
