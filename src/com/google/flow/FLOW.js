@@ -18,7 +18,9 @@
 foam.CLASS({
   package: 'com.google.flow',
   name: 'Property',
+
   ids: [ 'name' ],
+
   properties: [
     {
       class: 'String',
@@ -67,6 +69,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.flow.Halo',
     'com.google.flow.Property',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
@@ -148,9 +151,6 @@ foam.CLASS({
       name: 'selected',
       postSet: function(o, n) {
         this.value = n && n.value;
-        // TODO: check and only set if a CView
-        if ( o ) { o.value.shadowBlur = 0; }
-        if ( n ) { n.value.shadowBlur = 10; n.value.shadowColor = '#ff0000'; }
       }
     },
     {
@@ -196,6 +196,10 @@ foam.CLASS({
     function initE() {
       this.properties.on.put.sub(this.onPropertyPut);
       this.properties.on.remove.sub(this.onPropertyRemove);
+
+      var halo = this.Halo.create();
+      halo.selected$.linkFrom(this.selected$);
+      this.canvas.add(halo);
 
       this.memento$.sub(function() {
         var m = this.memento;
