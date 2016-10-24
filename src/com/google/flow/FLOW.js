@@ -24,7 +24,21 @@ foam.CLASS({
       class: 'String',
       name: 'name'
     },
-    [ 'value',  0 ]
+    {
+      name: 'value',
+      cloneProperty: function(o, m) {
+        console.log('clone: ', this.name, o);
+        m[this.name ] = o.cls_.create({
+          x: o.x,
+          y: o.y,
+          width: o.width,
+          height: o.height,
+          radius: o.radius,
+          border: o.radius,
+          color: o.color
+        });
+      }
+    }
   ],
   actions: [
     {
@@ -186,7 +200,7 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.properties.removeAll();
+        this.properties.skip(2).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var c = m[i];
@@ -240,7 +254,6 @@ foam.CLASS({
           name: opt_name,
           value: value
         });
-//        value.gravity = 1;
         value.setPrivate_('lpp_', p);
         this.properties.put(p);
         this.selected = p;
@@ -248,11 +261,12 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.feedback_ = true;
-      this.memento = this.canvas.children.map(function(c) {
-        return {x: c.x, y: c.y, radius: c.radius};
-      });
-      this.feedback_ = false;
+      this.properties.skip(2).select().then(function(s) {
+        console.log('*************** updateMemento: ', s.a.length);
+        this.feedback_ = true;
+//        this.memento = foam.Array.clone(s.a);
+        this.feedback_ = false;
+      }.bind(this));
     }
   ],
 
