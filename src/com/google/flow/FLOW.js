@@ -86,7 +86,7 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-      body { overflow: hidden }
+      body { overflow: hidden; user-select: none; }
       ^ { display: flex; }
       ^ > * { padding-left: 16px; padding-right: 16px; }
       ^tools, ^properties, ^sheet { box-shadow: 3px 3px 6px 0 gray; height: 100%; }
