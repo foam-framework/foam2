@@ -668,7 +668,6 @@ describe('GUIDDAO', function() {
   });
 });
 
-
 describe('LRUDAOManager', function() {
   var mDAO;
   var lruManager;
@@ -784,6 +783,53 @@ describe('LRUDAOManager', function() {
 
 
 
+  });
+});
+
+
+describe('ArrayDAO', function() {
+  var dao;
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'CompA',
+      properties: [ 'id', 'a' ]
+    });
+
+    dao = foam.dao.ArrayDAO.create({ of: test.CompA });
+  });
+  afterEach(function() {
+    dao = null;
+  });
+
+  it('skips properly on removeAll', function(done) {
+
+    dao.put(test.CompA.create({ id: 1, a: 'one' }));
+    dao.put(test.CompA.create({ id: 2, a: 'two' }));
+    dao.put(test.CompA.create({ id: 3, a: 'three' }));
+    dao.put(test.CompA.create({ id: 4, a: 'four' }));
+
+    dao.skip(2).removeAll().then(function() {
+      expect(dao.array.length).toEqual(2);
+      expect(dao.array[0].a).toEqual('one');
+      expect(dao.array[1].a).toEqual('two');
+    }).then(done);
+  });
+
+
+  it('skips and limits properly on removeAll', function(done) {
+
+    dao.put(test.CompA.create({ id: 1, a: 'one' }));
+    dao.put(test.CompA.create({ id: 2, a: 'two' }));
+    dao.put(test.CompA.create({ id: 3, a: 'three' }));
+    dao.put(test.CompA.create({ id: 4, a: 'four' }));
+
+    dao.skip(1).limit(2).removeAll().then(function() {
+      expect(dao.array.length).toEqual(2);
+      expect(dao.array[0].a).toEqual('one');
+      expect(dao.array[1].a).toEqual('four');
+    }).then(done);
   });
 });
 

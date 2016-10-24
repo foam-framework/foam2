@@ -167,9 +167,12 @@ describe('FObject clone', function() {
       name: 'CloneProperty',
       package: 'test',
       extends: 'foam.core.Property',
-      methods: [
-        function cloneProperty(value, map) {
-          map[this.name] = value + 5;
+      properties: [
+        {
+          name: 'cloneProperty',
+          value: function cloneProperty(value, map) {
+            map[this.name] = value + 5;
+          }
         }
       ],
     });

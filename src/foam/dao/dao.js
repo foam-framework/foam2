@@ -1138,11 +1138,17 @@ foam.CLASS({
 
     function removeAll(skip, limit, order, predicate) {
       predicate = predicate || this.True.create();
+      skip = skip || 0;
+      limit = Math.min(
+        (foam.Number.isInstance(limit) ? limit : Number.MAX_VALUE) + skip,
+        this.array.length
+      );
 
-      for ( var i = 0 ; i < this.array.length ; i++ ) {
+      for ( var i = skip ; i < limit ; i++ ) {
         if ( predicate.f(this.array[i]) ) {
           var obj = this.array.splice(i, 1)[0];
           i--;
+          limit--;
           this.on.remove.pub(obj);
         }
       }
