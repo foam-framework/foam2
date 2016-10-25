@@ -535,13 +535,16 @@ foam.CLASS({
       this.invalidate_ && this.invalidate_();
     },
 
-    function toLocalCoordinates(p) {
-      if ( this.parent ) this.parent.toLocalCoordinates(p);
-
+    function parentToLocalCoordinates(p) {
       this.transform.invert().mulP(p);
       p.x /= p.w;
       p.y /= p.w;
       p.w = 1;
+    },
+
+    function globalToLocalCoordinates(p) {
+      if ( this.parent ) this.parent.globalToLocalCoordinates(p);
+      this.parentToLocalCoordinates(p);
     },
 
     function findFirstChildAt(p) {
@@ -553,22 +556,22 @@ foam.CLASS({
         p = tmp;
       }
 
-      this.toLocalCoordinates(p);
+      this.parentToLocalCoordinates(p);
 
-      var p2 = foam.graphics.Point.create();
+      if ( this.children.length ) {
+        var p2 = foam.graphics.Point.create();
 
-      for ( var i = 0 ; i < this.children.length ; i++ ) {
-        p2.x = p.x;
-        p2.y = p.y;
-        p2.w = p.w;
-
-        var c = this.children[i].findFirstChildAt(p2);
-        if ( c ) return c;
+        for ( var i = 0 ; i < this.children.length ; i++ ) {
+          p2.x = p.x;
+          p2.y = p.y;
+          p2.w = p.w;
+          
+          var c = this.children[i].findFirstChildAt(p2);
+          if ( c ) return c;
+        }
       }
 
-      if ( this.hitTest(p) ) {
-        return this;
-      }
+      if ( this.hitTest(p) ) return this;
     },
 
     // p must be in local coordinates.
