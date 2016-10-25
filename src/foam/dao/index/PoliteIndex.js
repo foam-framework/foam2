@@ -36,8 +36,9 @@ foam.CLASS({
     'setTimeout'
   ],
 
+  // TODO: adjust BATCH_SIZE based on how long it takes per batch
   constants: {
-    BATCH_SIZE: 1000,
+    BATCH_SIZE: 250,
     SMALL_ENOUGH_SIZE: 1000,
     BATCH_TIME: 16,
   },
