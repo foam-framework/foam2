@@ -62,7 +62,8 @@ foam.CLASS({
           this.alpha = 0;
         }
       }
-    }
+    },
+    'startX', 'startY', 'mouseStartX', 'mouseStartY' 
   ],
 
   methods: [
@@ -108,6 +109,18 @@ foam.CLASS({
         }
         this.rotation = v.rotation;
       }
+    },
+
+    function onMouseDown(evt) {
+      this.startX = this.selected.value.x;
+      this.startY = this.selected.value.y;
+      this.mouseStartX = evt.offsetX;
+      this.mouseStartY = evt.offsetY;
+    },
+
+    function onMouseMove(evt) {
+      this.selected.value.x = this.startX + evt.offsetX - this.mouseStartX;
+      this.selected.value.y = this.startY + evt.offsetY - this.mouseStartY;
     }
   ]
 });
