@@ -206,8 +206,8 @@ foam.CLASS({
         this.properties.skip(2).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
-            var c = m[i];
-            this.properties.put(c);
+            var p = m[i];
+            this.addProperty(p.value, p.name);
           }
         }
         this.selected = null;
@@ -268,9 +268,9 @@ foam.CLASS({
 
     function updateMemento() {
       this.properties.skip(2).select().then(function(s) {
-//        console.log('*************** updateMemento: ', s.a.length);
+        console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
-//        this.memento = foam.Array.clone(s.a);
+        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
       }.bind(this));
     }
@@ -308,8 +308,12 @@ foam.CLASS({
       this.onClick(evt);
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
-      this.mouseTarget = c;
-      if ( c.onMouseDown ) c.onMouseDown(evt);
+      if ( c === this.canvas ) {
+        this.mouseTarget = null;
+      } else {
+        this.mouseTarget = c;
+        if ( c.onMouseDown ) c.onMouseDown(evt);
+      }
     },
 
     function onMouseUp(evt) {
