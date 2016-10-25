@@ -126,7 +126,7 @@ foam.CLASS({
           p.y = touch.y;
           p.w = 1;
 
-          self.toLocalCoordinates(p);
+          self.globalToLocalCoordinates(p);
 
           self.value = self.yToValue(p.y);
         }
