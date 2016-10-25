@@ -155,7 +155,7 @@ describe("Index benchmarks", function() {
   });
 
 
-  it('benchmarks manual indexes', function(done) {
+  xit('benchmarks manual indexes', function(done) {
     loadMedalData(dao).then(
       foam.async.sequence([
         foam.async.atest('Build index on most properties', function() {
@@ -320,10 +320,10 @@ describe("Index benchmarks", function() {
     loadMedalData(autodao).then(
       foam.async.sequence([
         foam.async.atest(
-          'Run predicate set A with AutoIndex',
+          'Run predicate set A with AutoIndex 1',
           foam.async.repeat(SAMPLE_PREDICATES_A.length,
             function(i) {
-              return foam.async.atest('A-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+              return foam.async.atest('A-Predicate '+SAMPLE_PREDICATES_A[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
                 var pred = SAMPLE_PREDICATES_A[i];
                 return autodao.where(pred).select();
               })();
@@ -331,10 +331,32 @@ describe("Index benchmarks", function() {
           )
         ),
         foam.async.atest(
-          'Run predicate set A with AutoIndex Again(already indexed)',
+          'Run predicate set A with AutoIndex 2',
           foam.async.repeat(SAMPLE_PREDICATES_A.length,
             function(i) {
-              return foam.async.atest('R-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+              return foam.async.atest('A-Predicate '+SAMPLE_PREDICATES_A[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
+                var pred = SAMPLE_PREDICATES_A[i];
+                return autodao.where(pred).select();
+              })();
+            }
+          )
+        ),
+        foam.async.atest(
+          'Run predicate set A with AutoIndex 3',
+          foam.async.repeat(SAMPLE_PREDICATES_A.length,
+            function(i) {
+              return foam.async.atest('R-Predicate '+SAMPLE_PREDICATES_A[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
+                var pred = SAMPLE_PREDICATES_A[i];
+                return autodao.where(pred).select();
+              })();
+            }
+          )
+        ),
+        foam.async.atest(
+          'Run predicate set A with AutoIndex 4',
+          foam.async.repeat(SAMPLE_PREDICATES_A.length,
+            function(i) {
+              return foam.async.atest('R-Predicate '+SAMPLE_PREDICATES_A[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
                 var pred = SAMPLE_PREDICATES_A[i];
                 return autodao.where(pred).select();
               })();
@@ -347,12 +369,12 @@ describe("Index benchmarks", function() {
         function() {
           autodao = null; /* allow gc */
         },
-        foam.async.sleep(2000),
+        foam.async.sleep(4000),
         foam.async.atest(
           'Run predicate set A no index',
           foam.async.repeat(SAMPLE_PREDICATES_A.length,
             function(i) {
-              return foam.async.atest('N-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
+              return foam.async.atest('N-Predicate '+SAMPLE_PREDICATES_A[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
                 var pred = SAMPLE_PREDICATES_A[i];
                 return dao.where(pred).select();
               })();
@@ -360,29 +382,11 @@ describe("Index benchmarks", function() {
           )
         ),
 
-      ])).then(function() {
-        return dao.select(autodaoOmni).then(foam.async.sequence([
-          function() {
-            dao = null; /* allow gc */
-          },
-          foam.async.sleep(2000),
-          foam.async.atest(
-            'Run predicate set A omni-auto index',
-            foam.async.repeat(SAMPLE_PREDICATES_A.length,
-              function(i) {
-                return foam.async.atest('O-Predicate '+SAMPLE_PREDICATES_A[i].toString(), function() {
-                  var pred = SAMPLE_PREDICATES_A[i];
-                  return autodaoOmni.where(pred).select();
-                })();
-              }
-            )
-          )
-        ]))
-      }).then(done);;
+      ])).then(done);;
     });
   });
 
-  it('benchmarks sample set B', function(done) {
+  xit('benchmarks sample set B', function(done) {
     var SAMPLE_B = [
       m.AND(m.CONTAINS_IC(Medal.CITY, "a"), m.CONTAINS_IC(Medal.SPORT, "Boxing"), m.CONTAINS_IC(Medal.EVENT, "71-75kg"), m.CONTAINS_IC(Medal.COUNTRY, "CHI")),
       m.AND(m.CONTAINS_IC(Medal.CITY, "c"), m.CONTAINS_IC(Medal.SPORT, "oot"), m.CONTAINS_IC(Medal.EVENT, "the"), m.CONTAINS_IC(Medal.COUNTRY, "A")),
@@ -396,7 +400,7 @@ describe("Index benchmarks", function() {
           'Run predicate set B with AutoIndex 100 times',
           foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
             function(i) {
-              return foam.async.atest('A-Predicate '+SAMPLE_B[i].toString(), function() {
+              return foam.async.atest('A-Predicate '+SAMPLE_B[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
                 var pred = SAMPLE_B[i];
                 return autodao.where(pred).select();
               })();
@@ -407,7 +411,7 @@ describe("Index benchmarks", function() {
           'Run predicate set B with AutoIndex Again(already indexed) 100 times',
           foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
             function(i) {
-              return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString(), function() {
+              return foam.async.atest('R-Predicate '+SAMPLE_B[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
                 var pred = SAMPLE_B[i];
                 return autodao.where(pred).select();
               })();
@@ -425,7 +429,7 @@ describe("Index benchmarks", function() {
             'Run predicate set B with omni AutoIndex 100 times',
             foam.async.repeat(100, foam.async.repeat(SAMPLE_B.length,
               function(i) {
-                return foam.async.atest('O-Predicate '+SAMPLE_B[i].toString(), function() {
+                return foam.async.atest('O-Predicate '+SAMPLE_B[i].toString().replace(/CONTAINS_IC/g, 'CIC'), function() {
                   var pred = SAMPLE_B[i];
                   return autodaoOmni.where(pred).select();
                 })();

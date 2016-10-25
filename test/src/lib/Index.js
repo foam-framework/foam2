@@ -592,7 +592,10 @@ describe('AltIndex', function() {
   beforeEach(function() {
     data = createData2();
     idx = foam.dao.index.AltIndex.create().spawn();
-    var fakeRoot = { mapOver: function(fn, ofIndex) { idx = fn(idx); } };
+    var fakeRoot = {
+      mapOver: function(fn, ofIndex) { idx = fn(idx); },
+      size: function() { return 1; }
+    };
     idx.addIndex(foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
       tailFactory: foam.dao.index.ValueIndex.create()
@@ -695,13 +698,16 @@ describe('AutoIndex', function() {
 
     idxInstance.bulkLoad(createData2(1000));
 
-    fakeRoot = { mapOver: function(fn, ofIndex) {
-      if ( ofIndex === idx ) {
-        idxInstance = fn(idxInstance);
-      } else {
-        idxInstance.mapOver(fn, ofIndex);
-      }
-    }};
+    fakeRoot = {
+      mapOver: function(fn, ofIndex) {
+        if ( ofIndex === idx ) {
+          idxInstance = fn(idxInstance);
+        } else {
+          idxInstance.mapOver(fn, ofIndex);
+        }
+      },
+      size: function() { return 1; }
+    };
 
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();

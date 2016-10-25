@@ -238,7 +238,7 @@ foam.CLASS({
       }
 
       var ARBITRARY_INDEX_CREATE_FACTOR = 2.0;
-      var ARBITRARY_INDEX_CREATE_CONSTANT = this.inertia;
+      var ARBITRARY_INDEX_CREATE_CONSTANT = 10; // this.inertia;
 
       // TODO: root.size() is the size of the entire DAO, and representative
       //   of the cost of creating a new index.
@@ -285,7 +285,7 @@ foam.CLASS({
         }
       }
 
-      this.inertia /= 2;
+      this.inertia *= 0.75;
 
       if ( newIndex ) {
         return this.CustomPlan.create({
