@@ -52,18 +52,47 @@ foam.CLASS({
       name: 'Anchor',
       extends: 'foam.graphics.Box',
 
-      imports: [ 'anchorRadius' ],
+      imports: [ 'anchorRadius', 'view' ],
 
       properties: [
         [ 'alpha', 0.3 ],
         [ 'color', 'blue' ],
-        [ 'border', null ]
+        [ 'border', null ],
+        'viewStart',
+        'mouseStartX', 'mouseStartY',
+        {
+          class: 'Function',
+          name: 'callback',
+          value: function(view, viewStart, dx, dy) {
+            console.log(viewStart, dx, dy);
+          }
+        }
       ],
 
       methods: [
         function init() {
           this.SUPER();
           this.height = this.width = this.anchorRadius*2 + 1;
+        }
+      ],
+
+      listeners: [
+        function onMouseDown(evt) {
+          console.log('AnchorMouseDown: ', evt);
+          if ( ! this.view ) return;
+          this.viewStart = { x: this.view.x, y: this.view.y, width: this.view.y, height: this.view.height };
+          this.mouseStartX = evt.offsetX;
+          this.mouseStartY = evt.offsetY;
+        },
+        
+        function onMouseMove(evt) {
+          console.log('AnchorMouseMove: ', evt, this.view);
+          if ( ! this.view ) return;
+          this.callback(
+            this.view,
+            this.viewStart,
+            evt.offsetX - this.mouseStartX,
+            evt.offsetY - this.mouseStartY);
         }
       ]
     }
@@ -83,6 +112,8 @@ foam.CLASS({
     {
       name: 'selected',
       postSet: function(_, n) {
+        this.view = n && n.value;
+
         if ( this.selectedSub ) {
           this.selectedSub.destroy();
           this.selectedSub = null;
@@ -98,12 +129,9 @@ foam.CLASS({
         }
       }
     },
-    // TODO: maybe FLOW should do this
+    // TODO: maybe FLOW should bind 'view' instead of 'selected'
     {
-      name: 'view',
-      expression: function(selected) {
-        return selected && selected.value;
-      }
+      name: 'view'
     },
     'startX', 'startY', 'mouseStartX', 'mouseStartY'
   ],
