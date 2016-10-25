@@ -42,7 +42,10 @@ foam.CLASS({
 
   requires: [ 'com.google.flow.HaloBorder' ],
 
-  exports: [ 'anchorRadius' ],
+  exports: [
+    'view',
+    'anchorRadius'
+  ],
 
   classes: [
     {
@@ -95,6 +98,13 @@ foam.CLASS({
         }
       }
     },
+    // TODO: maybe FLOW should do this
+    {
+      name: 'view',
+      expression: function(selected) {
+        return selected && selected.value;
+      }
+    },
     'startX', 'startY', 'mouseStartX', 'mouseStartY'
   ],
 
@@ -120,9 +130,10 @@ foam.CLASS({
     {
       name: 'onSelectedPropertyChange',
       code: function() {
-        var v = this.selected.value;
-        var r = this.anchorRadius;
+        var v = this.view;
         if ( ! v ) return;
+
+        var r = this.anchorRadius;
         if ( v.radius ) {
           this.height = this.width = (v.radius + v.arcWidth + 3 + r*2) * 2;
           this.x        = v.x - v.radius - v.arcWidth - r*2 - 3;
@@ -141,17 +152,17 @@ foam.CLASS({
     },
 
     function onMouseDown(evt) {
-      if ( ! this.selected || ! this.selected.value ) return;
-      this.startX = this.selected.value.x;
-      this.startY = this.selected.value.y;
+      if ( ! this.view ) return;
+      this.startX = this.view.x;
+      this.startY = this.view.y;
       this.mouseStartX = evt.offsetX;
       this.mouseStartY = evt.offsetY;
     },
 
     function onMouseMove(evt) {
-      if ( ! this.selected || ! this.selected.value ) return;
-      this.selected.value.x = this.startX + evt.offsetX - this.mouseStartX;
-      this.selected.value.y = this.startY + evt.offsetY - this.mouseStartY;
+      if ( ! this.view ) return;
+      this.view.x = this.startX + evt.offsetX - this.mouseStartX;
+      this.view.y = this.startY + evt.offsetY - this.mouseStartY;
     }
   ]
 });
