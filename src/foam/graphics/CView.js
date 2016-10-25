@@ -867,11 +867,13 @@ foam.CLASS({
   properties: [
     {
       name: 'start',
-      value: 0
+      value: 0,
+      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
     },
     {
       name: 'end',
-      value: 2*Math.PI
+      value: 2*Math.PI,
+      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
     }
   ],
 
