@@ -145,9 +145,9 @@ describe("Index benchmarks", function() {
       dedup: true,
       daoType: 'MDAO'
     });
-    autodaoOmni.addIndex(foam.dao.index.OmniscientAutoIndex.create({
-      mdao: autodaoOmni.mdao
-    }));
+//     autodaoOmni.addIndex(foam.dao.index.OmniscientAutoIndex.create({
+//       mdao: autodaoOmni.mdao
+//     }));
 
   });
   afterEach(function() {

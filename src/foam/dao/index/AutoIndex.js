@@ -23,7 +23,7 @@ foam.CLASS({
     /** Estimates the performance of this index given the number of items
       it will hold and the planned parameters. */
     function estimate(size, sink, skip, limit, order, predicate) {
-      return Number.MAX_VALUE;
+      return size * 2;
     }
   ]
 });
@@ -166,6 +166,8 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.dao.index.AltIndex',
     'foam.dao.index.ValueIndex',
+    'foam.mlang.predicate.True',
+    'foam.mlang.predicate.False',
   ],
 
   constants: {
@@ -184,10 +186,20 @@ foam.CLASS({
       factory: function() {
         return this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
       }
+    },
+    {
+      name: 'inertia',
+      value: 0,
+      preSet: function(old, nu) {
+        return Math.max(nu, 0);
+      }
     }
   ],
 
   methods: [
+    function estimate(size, sink, skip, limit, order, predicate) {
+      return this.delegateFactory.estimate(size, sink, skip, limit, order, predicate);
+    },
 
     function addPropertyIndex(prop, root) {
       this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
@@ -195,6 +207,15 @@ foam.CLASS({
     function addIndex(index, root) {
       this.delegateFactory.addIndex(index, root);
     },
+    function put(val) {
+      this.inertia++;
+      this.delegate.put(val);
+    },
+    function remove(val) {
+      this.inertia--;
+      this.delegate.remove(val);
+    },
+
     // TODO: mlang comparators should support input collection for
     //   index-building cases like this
     function plan(sink, skip, limit, order, predicate, root) {
@@ -207,15 +228,24 @@ foam.CLASS({
       //  as long as it is indicative of relative performance of each
       //  index type.
 
-      // TODO: replace this machanism with some decreasing amortization
-      //  factor to account for index building but take repeated hits into
-      //  account
-      var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
+      if ( ! order &&
+           ( ! predicate ||
+             this.True.isInstance(predicate) ||
+             this.False.isInstance(predicate)
+           )
+         ) {
+        return this.delegate.plan(sink, skip, limit, order, predicate, root);
+      }
+
+      var ARBITRARY_INDEX_CREATE_FACTOR = 2.0;
+      var ARBITRARY_INDEX_CREATE_CONSTANT = this.inertia;
+
       // TODO: root.size() is the size of the entire DAO, and representative
       //   of the cost of creating a new index.
 
       var self = this;
       var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+//console.log("EXISTING ", this.inertia, root.toString());
 //console.log("AutoEst OLD:", bestCost, this.delegate.toString());
 
       if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
@@ -225,30 +255,43 @@ foam.CLASS({
       var newIndex;
       if ( predicate ) {
         var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
-        var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+        if ( candidate ) {
+          var candidateCost = candidate.estimate(this.delegate.size(), sink,
+            skip, limit, order, predicate)
+            * ARBITRARY_INDEX_CREATE_FACTOR
+            + ARBITRARY_INDEX_CREATE_CONSTANT;
+
 //console.log("AutoEst PRD:", candidateCost, candidate.toString());
-        //TODO: must beat by factor of X? or constant?
-        if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
-          newIndex = candidate;
-          bestCost = candidateCost;
+          //TODO: must beat by factor of X? or constant?
+          if ( bestCost > candidateCost ) {
+            newIndex = candidate;
+            bestCost = candidateCost;
+          }
         }
       }
 
       if ( order ) {
         var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
-        var candidateCost = candidate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+        if ( candidate ) {
+          var candidateCost = candidate.estimate(this.delegate.size(), sink,
+            skip, limit, order, predicate)
+            * ARBITRARY_INDEX_CREATE_FACTOR
+            + ARBITRARY_INDEX_CREATE_CONSTANT;
 //console.log("AutoEst ORD:", candidateCost, candidate.toString());
-        if ( bestCost > candidateCost * ARBITRARY_INDEX_CREATE_FACTOR ) {
-          newIndex = candidate;
-          bestCost = candidateCost;
+          if ( bestCost > candidateCost ) {
+            newIndex = candidate;
+            bestCost = candidateCost;
+          }
         }
       }
 
+      this.inertia /= 2;
+
       if ( newIndex ) {
-//console.log("BUILDING INDEX", bestCost, newIndex.toString());
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
+console.log("BUILDING INDEX", bestCost, self.inertia, newIndex.toString(), "\n\n");
             // TODO: use promise to async delay when loading slowly
             // TODO: could be a long operation, PoliteIndex to delay load?
             //  When ordering, the cost of sorting will depend on the total
@@ -257,6 +300,7 @@ foam.CLASS({
             //  async create the index and let the current sort happen the
             //  hard way, or it could be worthwhile to just wait
             //  for the new index that supports the sort.
+            self.inertia = root.size(); // reset inertia
             self.addIndex(newIndex, root);
             // avoid a recursive call by hitting delegate, should pick the new optimal index
             self.delegate
@@ -270,7 +314,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'AutoIndex()';
+      return 'AutoIndex(' + this.delegateFactory.toString() + ')';
     },
 
   ]

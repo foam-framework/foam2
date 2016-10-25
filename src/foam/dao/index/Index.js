@@ -285,7 +285,7 @@ foam.CLASS({
     function size() { return this.instances[0].size(); },
 
     function toString() {
-      return 'Alt(' + this.delegates.join(',') + ')';
+      return 'Alt([' + this.delegates.join(',') + '])';
     }
   ]
 });
