@@ -239,9 +239,10 @@ foam.CLASS({
             cssClass(this.myCls('properties')).
             start(this.PROPERTIES, {selection$: this.selected$}).end().
           end().
-          start(this.VALUE).cssClass(this.myCls('sheet')).end();
-
-      // this.physics.start();
+          start(this.VALUE).
+            cssClass(this.myCls('sheet')).
+            show(this.slot(function(selected) { return !!selected; })).
+          end();
     },
 
     function addProperty(value, opt_name, opt_i) {
