@@ -168,6 +168,7 @@ foam.CLASS({
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.False',
+    'foam.dao.index.PoliteIndex',
   ],
 
   constants: {
@@ -205,6 +206,10 @@ foam.CLASS({
       this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
     },
     function addIndex(index, root) {
+      // Use PoliteIndex if this DAO is big
+      if ( root.size() > this.PoliteIndex.SMALL_ENOUGH_SIZE ) {
+        index = this.PoliteIndex.create({ delegateFactory: index });
+      }
       this.delegateFactory.addIndex(index, root);
     },
     function put(val) {

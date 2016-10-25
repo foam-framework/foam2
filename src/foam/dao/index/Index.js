@@ -210,12 +210,9 @@ foam.CLASS({
       self.delegates.push(index);
 
       function addIndexTo(altInst) {
-        // Populate the index
+        // Populate the new index
         var newSubInst = index.spawn();
-        //var a = foam.dao.ArraySink.create();
         altInst.plan(newSubInst).execute([], newSubInst);
-        // TODO: is this really faster than just execute([], newSubInst) ?
-        //newSubInst.bulkLoad(a);
         altInst.instances.push(newSubInst);
         return altInst;
       }
