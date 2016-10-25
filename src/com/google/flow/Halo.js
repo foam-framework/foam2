@@ -17,34 +17,66 @@
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'HaloBorder',
+  extends: 'foam.graphics.Box',
+
+  properties: [
+    [ 'border', 'blue' ] 
+  ],
+
+  methods: [
+    function hitTest(p) { return false; },
+
+    function paintSelf(x) {
+      x.setLineDash([4, 4]);
+      this.SUPER(x);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Halo',
   extends: 'foam.graphics.Box',
+
+  requires: [ 'com.google.flow.HaloBorder' ],
+
+  exports: [ 'anchorRadius' ],
 
   classes: [
     {
       name: 'Anchor',
       extends: 'foam.graphics.Box',
 
+      imports: [ 'anchorRadius' ],
+
       properties: [
-        [ 'width', 11 ],
-        [ 'height', 11 ],
         [ 'alpha', 0.3 ],
         [ 'color', 'blue' ],
         [ 'border', null ]
+      ],
+
+      methods: [
+        function init() {
+          this.SUPER();
+          this.height = this.width = this.anchorRadius*2 + 1;
+        }
       ]
     }
   ],
 
   properties: [
+    [ 'anchorRadius', 6 ],
     [ 'alpha', 0 ],
-    [ 'border', 'blue' ],
+    [ 'border', null ],
     'selectedSub',
-    { name: 'x1', expression: function() { return -6; } },
-    { name: 'x2', expression: function(width) { return this.width/2 - 5; } },
-    { name: 'x3', expression: function(width) { return this.width - 5; } },
-    { name: 'y1', expression: function() { return -6; } },
-    { name: 'y2', expression: function(height) { return this.height/2 - 5; } },
-    { name: 'y3', expression: function(height) { return this.height - 5; } },
+    { name: 'x1', expression: function() { return 0; } },
+    { name: 'x2', expression: function(width) { return this.width/2-this.anchorRadius; } },
+    { name: 'x3', expression: function(width) { return this.width-this.anchorRadius*2-1; } },
+    { name: 'y1', expression: function() { return 0; } },
+    { name: 'y2', expression: function(height) { return this.height/2-this.anchorRadius; } },
+    { name: 'y3', expression: function(height) { return this.height-this.anchorRadius*2-1; } },
     {
       name: 'selected',
       postSet: function(_, n) {
@@ -71,6 +103,7 @@ foam.CLASS({
       this.SUPER();
 
       this.add(
+        this.HaloBorder.create({x$: this.x1$, y$: this.y1$, width$: this.width$, height$: this.height$}),
         this.Anchor.create({x$: this.x2$, y: -26}),
         this.Anchor.create({x$: this.x1$, y$: this.y1$}),
         this.Anchor.create({x$: this.x2$, y$: this.y1$}),
@@ -80,11 +113,6 @@ foam.CLASS({
         this.Anchor.create({x$: this.x1$, y$: this.y3$}),
         this.Anchor.create({x$: this.x2$, y$: this.y3$}),
         this.Anchor.create({x$: this.x3$, y$: this.y3$}));
-    },
-
-    function paintSelf(x) {
-      x.setLineDash([4, 4]);
-      this.SUPER(x);
     }
   ],
 
@@ -93,20 +121,20 @@ foam.CLASS({
       name: 'onSelectedPropertyChange',
       code: function() {
         var v = this.selected.value;
+        var r = this.anchorRadius;
         if ( ! v ) return;
         if ( v.radius ) {
-          this.height = this.width = (v.radius + v.arcWidth ) * 2 + 14;
-          this.x        = v.x - v.radius - v.arcWidth - 7 ;
-          this.y        = v.y - v.radius - v.arcWidth - 7
+          this.height = this.width = (v.radius + v.arcWidth + 3 + r*2) * 2;
+          this.x        = v.x - v.radius - v.arcWidth - r*2 - 3;
+          this.y        = v.y - v.radius - v.arcWidth - r*2 - 3;
           this.originX = v.x-this.x;
           this.originY = v.y-this.y;
         } else {
-          this.originX = 7;
-          this.originY = 7;
-          this.x        = v.x-7;
-          this.y        = v.y-7;
-          this.width    = v.width + 14;
-          this.height   = v.height + 14;
+          this.originX = this.originY = r + 3;
+          this.x        = v.x-2*r-4;
+          this.y        = v.y-2*r-4;
+          this.width    = v.width + 2 * ( r * 2 + 4 );
+          this.height   = v.height + 2 * ( r * 2 + 4 );
         }
         this.rotation = v.rotation;
       }
