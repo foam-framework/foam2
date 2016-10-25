@@ -1059,8 +1059,6 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   properties: [
-    'width',
-    'height',
     {
       class: 'String',
       name:  'text',
