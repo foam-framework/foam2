@@ -24,7 +24,7 @@ foam.CLASS({
     {
       name: 'Anchor',
       extends: 'foam.graphics.Box',
-      
+
       properties: [
         [ 'width', 11 ],
         [ 'height', 11 ],
@@ -36,7 +36,7 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'alpha', 0.5 ],
+    [ 'alpha', 0 ],
     [ 'border', 'blue' ],
     'selectedSub',
     { name: 'x1', expression: function() { return -6; } },
@@ -63,7 +63,7 @@ foam.CLASS({
         }
       }
     },
-    'startX', 'startY', 'mouseStartX', 'mouseStartY' 
+    'startX', 'startY', 'mouseStartX', 'mouseStartY'
   ],
 
   methods: [
