@@ -33,7 +33,6 @@ foam.CLASS({
     {
       name: 'value',
       cloneProperty: function(o, m) {
-        console.log('clone: ', this.name, o);
         m[this.name ] = o.cls_.create({
           x: o.x,
           y: o.y,
