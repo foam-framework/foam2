@@ -225,7 +225,7 @@ foam.CLASS({
             start(foam.u2.Tabs).
               start(foam.u2.Tab, {label: 'canvas1'}).
                 start(this.canvas).
-                  on('click',       this.onClick).
+//                  on('click',       this.onClick).
                   on('mousedown',   this.onMouseDown).
                   on('mouseup',     this.onMouseUp).
                   on('mousemove',   this.onMouseMove).
@@ -302,6 +302,7 @@ foam.CLASS({
     },
 
     function onMouseDown(evt) {
+      this.onClick(evt);
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
       this.mouseTarget = c;
