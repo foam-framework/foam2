@@ -77,7 +77,7 @@ foam.CLASS({
           border: null
         });
 
-        this.addChildren(c);
+        this.add(c);
 
         this.timer.i$.sub(foam.Function.bind(function(c, i) {
           c.color = hsl((i*347%180+this.timer.i*2)%360);
