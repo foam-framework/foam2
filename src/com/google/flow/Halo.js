@@ -81,6 +81,7 @@ foam.CLASS({
         this.Anchor.create({x$: this.x2$, y$: this.y3$}),
         this.Anchor.create({x$: this.x3$, y$: this.y3$}));
     },
+
     function paintSelf(x) {
       x.setLineDash([4, 4]);
       this.SUPER(x);
@@ -112,6 +113,7 @@ foam.CLASS({
     },
 
     function onMouseDown(evt) {
+      if ( ! this.selected || ! this.selected.value ) return;
       this.startX = this.selected.value.x;
       this.startY = this.selected.value.y;
       this.mouseStartX = evt.offsetX;
@@ -119,6 +121,7 @@ foam.CLASS({
     },
 
     function onMouseMove(evt) {
+      if ( ! this.selected || ! this.selected.value ) return;
       this.selected.value.x = this.startX + evt.offsetX - this.mouseStartX;
       this.selected.value.y = this.startY + evt.offsetY - this.mouseStartY;
     }
