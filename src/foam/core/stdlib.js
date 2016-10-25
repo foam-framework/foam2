@@ -366,17 +366,19 @@ foam.LIB({
        */
       name: 'toSlotName',
       code: foam.Function.memoize1(function toSlotName(key) {
-        console.assert(typeof key === 'string',
-               'Cannot toSlotName non-string values.');
-               
+        console.assert(
+            typeof key === 'string',
+            'Cannot toSlotName non-string values.');
+
         return key + '$';
       })
     },
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
-                       'Cannot toUpperCase non-string values.');
+        console.assert(
+            typeof str === 'string',
+            'Cannot toUpperCase non-string values.');
 
         return str.toUpperCase();
       })
@@ -486,7 +488,7 @@ foam.LIB({
     },
     function remove(a, o) {
       for ( var i = 0 ; i < a.length ; i++ ) {
-        if ( foam.util.equals(o, a[i]) ) {
+        if ( o === a[i] ) {
           a.splice(i, 1);
         }
       }
