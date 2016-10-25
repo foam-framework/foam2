@@ -34,8 +34,8 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'width', 30 ],
-    [ 'height', 50 ],
+    [ 'width',  25 ],
+    [ 'height', 45 ],
     {
       name: 'timer',
       hidden: true,
