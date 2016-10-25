@@ -149,9 +149,7 @@ foam.CLASS({
     },
     {
       name: 'selected',
-      postSet: function(o, n) {
-        this.value = n && n.value;
-      }
+      postSet: function(o, n) { this.value = n && n.value; }
     },
     {
       name: 'properties',
