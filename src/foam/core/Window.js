@@ -184,14 +184,14 @@ foam.CLASS({
     },
 
     function setTimeout(f, t) {
-      return this.window.setTimeout.apply(this.window, arguments);
+      return this.window.setTimeout(f, t);
     },
     function clearTimeout(id) {
       this.window.clearTimeout(id);
     },
 
     function setInterval(f, t) {
-      return this.window.setInterval.apply(this.window, arguments);
+      return this.window.setInterval(f, t);
     },
     function clearInterval(id) {
       this.window.clearInterval(id);
