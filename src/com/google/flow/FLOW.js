@@ -327,8 +327,9 @@ foam.CLASS({
       if ( c === this.canvas ) {
         this.mouseTarget = null;
       } else {
+        console.log('mouseDown: ', c && c.cls_.name);
         this.mouseTarget = c;
-        if ( c.onMouseDown ) c.onMouseDown(evt);
+        if ( c && c.onMouseDown ) c.onMouseDown(evt);
       }
     },
 
