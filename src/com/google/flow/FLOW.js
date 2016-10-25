@@ -189,6 +189,7 @@ foam.CLASS({
         return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
+    'mouseTarget'
   ],
 
   methods: [
@@ -225,6 +226,9 @@ foam.CLASS({
               start(foam.u2.Tab, {label: 'canvas1'}).
                 start(this.canvas).
                   on('click',       this.onClick).
+                  on('mousedown',   this.onMouseDown).
+                  on('mouseup',     this.onMouseUp).
+                  on('mousemove',   this.onMouseMove).
                   on('contextmenu', this.onRightClick).
                 end().
               end().
@@ -295,6 +299,21 @@ foam.CLASS({
           this.physics.remove(o);
         }
       }
+    },
+
+    function onMouseDown(evt) {
+      var x = evt.offsetX, y = evt.offsetY;
+      var c = this.canvas.findFirstChildAt(x, y);
+      this.mouseTarget = c;
+      if ( c.onMouseDown ) c.onMouseDown(evt);
+    },
+
+    function onMouseUp(evt) {
+      this.mouseTarget = null;
+    },
+
+    function onMouseMove(evt) {
+      if ( this.mouseTarget && this.mouseTarget.onMouseMove ) this.mouseTarget.onMouseMove(evt);
     },
 
     function onClick(evt) {
