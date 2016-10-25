@@ -80,13 +80,17 @@ foam.CLASS({
         function onMouseDown(evt) {
           console.log('AnchorMouseDown: ', evt);
           if ( ! this.view ) return;
-          this.viewStart = { x: this.view.x, y: this.view.y, width: this.view.y, height: this.view.height };
+          this.viewStart = {
+            x: this.view.x,
+            y: this.view.y,
+            width: this.view.width,
+            height: this.view.height
+          };
           this.mouseStartX = evt.offsetX;
           this.mouseStartY = evt.offsetY;
         },
         
         function onMouseMove(evt) {
-          console.log('AnchorMouseMove: ', evt, this.view);
           if ( ! this.view ) return;
           this.callback(
             this.view,
@@ -143,14 +147,40 @@ foam.CLASS({
       this.add(
         this.HaloBorder.create({x$: this.x1$, y$: this.y1$, width$: this.width$, height$: this.height$}),
         this.Anchor.create({x$: this.x2$, y: -26}),
-        this.Anchor.create({x$: this.x1$, y$: this.y1$}),
-        this.Anchor.create({x$: this.x2$, y$: this.y1$}),
-        this.Anchor.create({x$: this.x3$, y$: this.y1$}),
-        this.Anchor.create({x$: this.x1$, y$: this.y2$}),
-        this.Anchor.create({x$: this.x3$, y$: this.y2$}),
-        this.Anchor.create({x$: this.x1$, y$: this.y3$}),
-        this.Anchor.create({x$: this.x2$, y$: this.y3$}),
-        this.Anchor.create({x$: this.x3$, y$: this.y3$}));
+        this.Anchor.create({x$: this.x1$, y$: this.y1$, callback: function(v, vs, dx, dy) {
+          v.x      = vs.x + dx;
+          v.y      = vs.y + dy;
+          v.width  = vs.width  - dx;
+          v.height = vs.height - dy;
+        }}),
+        this.Anchor.create({x$: this.x2$, y$: this.y1$, callback: function(v, vs, dx, dy) {
+          v.y      = vs.y + dy;
+          v.height = vs.height - dy;
+        }}),
+        this.Anchor.create({x$: this.x3$, y$: this.y1$, callback: function(v, vs, dx, dy) {
+          v.y      = vs.y + dy;
+          v.width  = vs.width  + dx;
+          v.height = vs.height - dy;
+        }}),
+        this.Anchor.create({x$: this.x1$, y$: this.y2$, callback: function(v, vs, dx, dy) {
+          v.x      = vs.x + dx;
+          v.width  = vs.width  - dx;
+        }}),
+        this.Anchor.create({x$: this.x3$, y$: this.y2$, callback: function(v, vs, dx, dy) {
+          v.width  = vs.width + dx;
+        }}),
+        this.Anchor.create({x$: this.x1$, y$: this.y3$, callback: function(v, vs, dx, dy) {
+          v.x      = vs.x + dx;
+          v.width  = vs.width  - dx;
+          v.height = vs.height + dy;
+        }}),
+        this.Anchor.create({x$: this.x2$, y$: this.y3$, callback: function(v, vs, dx, dy) {
+          v.height = vs.height + dy;
+        }}),
+        this.Anchor.create({x$: this.x3$, y$: this.y3$, callback: function(v, vs, dx, dy) {
+          v.width  = vs.width  + dx;
+          v.height = vs.height + dy;
+        }}));
     }
   ],
 
