@@ -266,7 +266,7 @@ foam.CLASS({
 
     function updateMemento() {
       this.properties.skip(2).select().then(function(s) {
-        console.log('*************** updateMemento: ', s.a.length);
+//        console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
 //        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
@@ -301,7 +301,9 @@ foam.CLASS({
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
 
-      if ( c ) {
+      if ( this.Halo.isInstance(c) ) return;
+
+      if ( c && c !== this.canvas ) {
         var p = c.getPrivate_('lpp_');
         this.selected = p;
       } else {
