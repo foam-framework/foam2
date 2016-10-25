@@ -292,6 +292,11 @@ foam.CLASS({
 
     function onPropertyRemove(_, _, _, p) {
       var o = p.value;
+
+      if ( p === this.selected ) {
+        this.selected = null;
+      }
+
       if ( this.CView.isInstance(o) ) {
         this.canvas.remove(o);
 
