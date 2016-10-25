@@ -77,10 +77,12 @@ foam.CLASS({
     'foam.physics.Physical',
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
-    'foam.u2.TableView'
+    'foam.u2.TableView',
+    'foam.util.Timer'
   ],
 
   exports: [
+    'timer',
     'as data',
     'properties'
   ],
@@ -115,6 +117,12 @@ foam.CLASS({
           bounceOnWalls: true,
           bounds: this.canvas
         });
+      }
+    },
+    {
+      name: 'timer',
+      factory: function() {
+        return this.Timer.create();
       }
     },
     'feedback_',
@@ -168,7 +176,13 @@ foam.CLASS({
           daoType: 'ARRAY'
         });
 
-        var p = this.Property.create({name: 'canvas1', value: this.canvas});
+        var p;
+
+        p = this.Property.create({name: 'canvas1', value: this.canvas});
+        this.physics.setPrivate_('lpp_', p);
+        dao.put(p);
+
+        p = this.Property.create({name: 'timer', value: this.timer});
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
@@ -192,6 +206,8 @@ foam.CLASS({
   methods: [
 
     function initE() {
+      this.timer.start();
+
       this.properties.on.put.sub(this.onPropertyPut);
       this.properties.on.remove.sub(this.onPropertyRemove);
 
@@ -202,7 +218,7 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.properties.skip(2).removeAll();
+        this.properties.skip(3).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var p = m[i];
@@ -267,7 +283,7 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(2).select().then(function(s) {
+      this.properties.skip(3).select().then(function(s) {
         console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
         this.memento = foam.Array.clone(s.a);
@@ -337,7 +353,7 @@ foam.CLASS({
         var tool = this.currentTool;
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
-        var o = cls.create({x: x, y: y});
+        var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o);
         this.updateMemento();
       }
