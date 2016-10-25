@@ -707,7 +707,9 @@ foam.CLASS({
           this.y + this.height < c.y ||
           c.x    + c.width  < this.x ||
           c.y    + c.height < this.y );
-    }
+    },
+
+    function equals(b) { return this === b; }
   ]
 });
 
