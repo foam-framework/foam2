@@ -134,6 +134,7 @@ FOAM_FILES([
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
+  { name: "foam/u2/view/TreeView", flags: ['web'] },
   { name: "foam/u2/tag/Card", flags: ['web'] },
   { name: "foam/u2/dialog/Popup", flags: ['web'] },
   { name: "foam/u2/Autocompleter", flags: ['web'] },
