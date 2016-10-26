@@ -151,6 +151,9 @@ foam.CLASS({
         dao.put(com.google.flow.Clock.model_);
         dao.put(com.google.flow.Mushroom.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
+        dao.put(com.google.flow.Desk.model_);
+        dao.put(com.google.flow.DuplexDesk.model_);
+        dao.put(com.google.flow.Desks.model_);
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
         return dao;
@@ -343,8 +346,9 @@ foam.CLASS({
       if ( c === this.canvas ) {
         this.mouseTarget = null;
       } else {
+        console.log('mouseDown: ', c && c.cls_.name);
         this.mouseTarget = c;
-        if ( c.onMouseDown ) c.onMouseDown(evt);
+        if ( c && c.onMouseDown ) c.onMouseDown(evt);
       }
     },
 
@@ -362,16 +366,22 @@ foam.CLASS({
 
       if ( this.Halo.isInstance(c) ) return;
 
-      if ( c && c !== this.canvas ) {
-        var p = c.getPrivate_('lpp_');
-        this.selected = p;
-      } else {
+      if ( c === this.canvas ) {
         var tool = this.currentTool;
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o);
         this.updateMemento();
+      } else {
+        for ( ; c !== this.canvas ; c = c.parent ) {
+          var p = c.getPrivate_('lpp_');
+          if ( p ) {
+            this.selected = p;
+            break;
+          }
+        }
+
       }
     },
 
