@@ -148,10 +148,17 @@ foam.CLASS({
       value: com.google.flow.DuplexDesk,
       hidden: true
     },
+    {
+      class: 'Boolean',
+      name: 'feedback_',
+      hidden: true
+    },
     { name: 'cellWidth',  hidden: true },
     { name: 'cellHeight', hidden: true },
-    [ 'rows',    1 ],
-    [ 'columns', 4 ]
+    { name: 'rows',    postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.height  = this.cellHeight * n; this.feedback_ = false; return n;  } },
+    { name: 'columns', postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.width   = this.cellWidth * n; this.feedback_ = false; return n;  } },
+    { name: 'width',   postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.columns = Math.floor(n/this.cellWidth); this.feedback_ = false; return n;  } },
+    { name: 'height',  postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.rows    = Math.floor(n/this.cellHeight); this.feedback_ = false; return n;  } }
   ],
 
   methods: [
@@ -162,8 +169,7 @@ foam.CLASS({
       this.cellWidth  = o.width;
       this.cellHeight = o.height;
 
-      this.width  = o.width * 4;
-      this.height = o.height * 1;
+      this.rows = this.columns = 2;
 
       this.onResize();
       this.propertyChange.sub('width', this.onResize);
@@ -179,11 +185,6 @@ foam.CLASS({
         this.removeAllChildren();
 
         var w = this.cellWidth, h = this.cellHeight;
-
-        this.rows    = Math.max(this.rows, Math.floor(this.height / h));
-        this.columns = Math.max(this.rows, Math.floor(this.width / w));
-        // this.width   = Math.max(this.width,  this.columns * w);
-        // this.height  = Math.max(this.height, this.rows    * h);
 
         for ( var i = 0 ; i < this.rows ; i++ ) {
           for ( var j = 0 ; j < this.columns ; j++ ) {
