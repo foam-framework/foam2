@@ -162,8 +162,12 @@ foam.CLASS({
       this.cellWidth  = o.width;
       this.cellHeight = o.height;
 
+      this.width  = o.width * 4;
+      this.height = o.height * 1;
+
       this.onResize();
-      this.propertyChange.sub(this.onResize);
+      this.propertyChange.sub('width', this.onResize);
+      this.propertyChange.sub('height', this.onResize);
     }
   ],
 
@@ -172,11 +176,14 @@ foam.CLASS({
       name: 'onResize',
       isFramed: true,
       code: function() {
-        this.remove(this.children);
+        this.removeAllChildren();
+
         var w = this.cellWidth, h = this.cellHeight;
 
         this.rows    = Math.max(this.rows, Math.floor(this.height / h));
         this.columns = Math.max(this.rows, Math.floor(this.width / w));
+        // this.width   = Math.max(this.width,  this.columns * w);
+        // this.height  = Math.max(this.height, this.rows    * h);
 
         for ( var i = 0 ; i < this.rows ; i++ ) {
           for ( var j = 0 ; j < this.columns ; j++ ) {
@@ -186,9 +193,6 @@ foam.CLASS({
             this.add(o);
           }
         }
-
-        this.width  = Math.max(this.width,  this.columns * w);
-        this.height = Math.max(this.height, this.rows    * h);
       }
     }
   ]
