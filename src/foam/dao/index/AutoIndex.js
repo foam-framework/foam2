@@ -107,12 +107,15 @@ foam.CLASS({
 
       // Ordering
       if ( order ) {
-        var ordProp = this.Desc.isInstance(order) ? order.arg1 : order;
+        var ordProp = this.Property.isInstance(order) ? order : order.arg1;
 
         // if sorting required, add the sort cost
         if ( ordProp !== property ) {
           if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
         }
+
+        cost += tailFactory.estimate(size / nodeCount, sink, skip, limit,
+          order.popOrdering(), predicate);
       }
 
       return cost;
@@ -325,7 +328,7 @@ foam.CLASS({
 
       if ( newIndex ) {
         return this.CustomPlan.create({
-          cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
+          cost: bestCost,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
 console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");

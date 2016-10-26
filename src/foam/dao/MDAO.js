@@ -328,6 +328,20 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.mlang.order.ThenBy',
+
+  methods: [
+    function toIndex(tailFactory) {
+      if ( this.arg1 && this.arg2 ) {
+        return this.arg1.toIndex(this.arg2.toIndex(tailFactory));
+      } else {
+        return;
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.And',

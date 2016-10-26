@@ -76,6 +76,7 @@ foam.CLASS({
   extends: 'foam.dao.index.Index',
 
   requires: [
+    'foam.core.Property',
     'foam.dao.ArraySink',
     'foam.dao.index.AltPlan',
     'foam.dao.index.CountPlan',
@@ -85,6 +86,8 @@ foam.CLASS({
     'foam.dao.index.TreeNode',
     'foam.dao.index.ValueIndex',
     'foam.mlang.order.Desc',
+    'foam.mlang.order.Comparator',
+    'foam.mlang.order.ThenBy',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.False',
@@ -367,10 +370,15 @@ foam.CLASS({
       var sortRequired = false;
       var reverseSort = false;
 
+      var myOrder;
+      var subOrder;
       if ( order ) {
-        if ( order === prop ) {
+        myOrder = index.ThenBy.isInstance(order) ? order.arg1 : order;
+        subOrder = order.popOrdering();
+
+        if ( index.Property.isInstance(myOrder) && myOrder === prop ) {
           // sort not required
-        } else if ( index.Desc.isInstance(order) && order.arg1 === prop ) {
+        } else if ( index.Desc.isInstance(myOrder) && myOrder.arg1 === prop ) {
           // reverse-sort, sort not required
           reverseSort = true;
         } else {
@@ -405,8 +413,8 @@ foam.CLASS({
           } else {
             index.selectCount++;
             reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-              subTree.selectReverse(sink, [skip], [limit], order, predicate) :
-              subTree.select(sink, [skip], [limit], order, predicate) ;
+              subTree.selectReverse(sink, [skip], [limit], subOrder, predicate) :
+              subTree.select(sink, [skip], [limit], subOrder, predicate) ;
             index.selectCount--;
           }
         },

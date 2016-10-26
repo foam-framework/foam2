@@ -1056,13 +1056,27 @@ foam.INTERFACE({
           javaType: 'Object'
         }
       ]
+    },
+    {
+      /** Removes the first ordering, which may be the only one. */
+      name: 'popOrdering',
     }
   ]
 });
 
+
+
 foam.CLASS({
   refines: 'foam.core.Property',
-  implements: [ 'foam.mlang.order.Comparator' ]
+  implements: [ 'foam.mlang.order.Comparator' ],
+
+  methods: [
+    {
+      name: 'popOrdering',
+      code: function() { return; },
+      javaCode: 'return null;'
+    },
+  ]
 });
 
 foam.CLASS({
@@ -1097,6 +1111,67 @@ foam.CLASS({
         return 'DESC(' + this.arg1.toString() + ')';
       },
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
+    },
+    {
+      name: 'popOrdering',
+      code: function() { return; },
+      javaCode: 'return null;'
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'ThenBy',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
+        // of parameter is an interface rather than a class.
+        return a;
+      },
+      name: 'arg1'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
+        // of parameter is an interface rather than a class.
+        return a;
+      },
+      name: 'arg2'
+    },
+    {
+      name: 'popOrdering',
+      code: function() { return this.arg2; },
+      javaCode: 'return getArg2();'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        // an equals of arg1.compare is falsy, which will then hit arg2
+        return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
+      },
+      javaCode: 'int c = getArg1().compare(o1, o2); ' +
+        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
+        'return c;'
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return 'THEN_BY(' + this.arg1.toString() + ', ' +
+          this.arg2.toString() + ')';
+      },
+      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
+        '"," + getArg1().toString() + ")";'
     }
   ]
 });
@@ -1157,7 +1232,8 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc'
+    'foam.mlang.order.Desc',
+    'foam.mlang.order.ThenBy'
   ],
 
   methods: [
@@ -1194,9 +1270,11 @@ foam.CLASS({
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
+    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); }
+    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
+
   ]
 });
 
