@@ -107,7 +107,10 @@ foam.CLASS({
 
       this.__context__[this.relationship.targetDAOKey].
         find(id).then(function(obj) {
-          return self.data[self.relationship.name].put(obj.clone());
+          self.__context__[self.relationship.targetDAOKey].
+            remove(obj).then(function() {
+              self.data[self.relationship.name].put(obj);
+            });
         });
     },
     function selected() {
