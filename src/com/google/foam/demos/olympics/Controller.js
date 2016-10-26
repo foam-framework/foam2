@@ -41,7 +41,8 @@ foam.CLASS({
           of: this.Medal,
           seqNo: true,
           autoIndex: true,
-          daoType: this.MDAO
+          daoType: this.MDAO,
+          timing: true
         });
 
         var proxy = this.ProxyDAO.create({

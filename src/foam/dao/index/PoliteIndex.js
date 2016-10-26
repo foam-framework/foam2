@@ -91,7 +91,7 @@ foam.CLASS({
 
     function put(o) {
       // if direct operations are small enough, continue in direct mode
-      if ( this.directOperations < this.SMALL_ENOUGH_SIZE ) {
+      if ( ! this.enqueued && this.directOperations < this.SMALL_ENOUGH_SIZE ) {
         this.directOperations++;
         return this.delegate.put(o);
       } else {
@@ -102,7 +102,7 @@ foam.CLASS({
     },
 
     function remove(o) {
-      if ( this.directOperations < this.SMALL_ENOUGH_SIZE ) {
+      if ( ! this.enqueued && this.directOperations < this.SMALL_ENOUGH_SIZE ) {
         this.directOperations++;
         return this.delegate.remove(o);
       } else {
@@ -112,7 +112,7 @@ foam.CLASS({
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
-      if ( this.timerSet ) {
+      if ( this.enqueued ) {
         // we can't plan while the index is not settled
         return this.NoPlan.create();
       }
@@ -122,27 +122,27 @@ foam.CLASS({
     function toString() {
       return 'PoliteIndex('+this.delegate.toString()+')';
     },
-        
+
     function addToQueue(batchSelf) {
       var self = this.progenitor || this;
-      
+
       if ( ! batchSelf.enqueued ) {
         self.workQueue.push(batchSelf);
         batchSelf.enqueued = true;
       }
-      
+
       if ( ! self.timerSet ) {
         self.setTimeout(function() { self.processQueue(); }, self.BATCH_TIME);
         self.timerSet = true;
       }
     },
-    
+
     function processQueue() {
       var self = this.progenitor || this;
 //console.log("Processing ", self.$UID, self.workQueue.length);
       var next = self.workQueue.splice(0, 1)[0];
       var a = next.batch.splice(0, this.BATCH_SIZE);
-      
+
       for ( var i = 0; i < a.length; i++ ) {
         var o = a[i];
         if ( o.__polite_batch_remove__ ) {
@@ -151,7 +151,7 @@ foam.CLASS({
           next.delegate.put(o);
         }
       }
-      
+
       // re-queue if instance not empty yet
       if ( next.batch.length > 0 ) {
         self.workQueue.push(next);
@@ -160,7 +160,7 @@ foam.CLASS({
         next.directOperations = 0;
         next.enqueued = false;
       }
-      
+
       // set up another timer to process more
       if ( self.workQueue.length > 0 ) {
         self.setTimeout(function() { self.processQueue(); }, self.BATCH_TIME);
