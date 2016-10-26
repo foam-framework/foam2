@@ -350,16 +350,22 @@ foam.CLASS({
 
       if ( this.Halo.isInstance(c) ) return;
 
-      if ( c && c !== this.canvas ) {
-        var p = c.getPrivate_('lpp_');
-        this.selected = p;
-      } else {
+      if ( c === this.canvas ) {
         var tool = this.currentTool;
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o);
         this.updateMemento();
+      } else {
+        for ( ; c !== this.canvas ; c = c.parent ) {
+          var p = c.getPrivate_('lpp_');
+          if ( p ) {
+            this.selected = p;
+            break;
+          }
+        }
+
       }
     },
 
