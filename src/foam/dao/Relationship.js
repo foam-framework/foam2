@@ -99,8 +99,8 @@ foam.CLASS({
         var sp = sourceProps[i];
         var tp = targetProps[i];
 
-        source.installAxiom(sp);
-        if ( ! this.oneWay ) target.installAxiom(tp);
+        if ( ! source.getAxiomByName(sp.name) ) source.installAxiom(sp);
+        if ( ! this.oneWay && ! target.getAxiomByName(tp.name) ) target.installAxiom(tp);
       }
 
       var relationship = this;
