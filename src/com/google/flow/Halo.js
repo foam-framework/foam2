@@ -84,7 +84,8 @@ foam.CLASS({
             x: this.view.x,
             y: this.view.y,
             width: this.view.width,
-            height: this.view.height
+            height: this.view.height,
+            rotation: this.view.rotation
           };
           this.mouseStartX = evt.offsetX;
           this.mouseStartY = evt.offsetY;
@@ -148,16 +149,19 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
+      var halo = this;
+
       this.add(
         this.haloBorder,
-        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, dx, dy) {
-          var cx = v.x + v.width  / 2;
-          var cy = v.y + v.height / 2;
-          var startA = Math.atan2(4, cy);
-          v.x      = vs.x + dx;
-          v.y      = vs.y + dy;
-          v.width  = vs.width  - dx;
-          v.height = vs.height - dy;
+          this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, dx, dy) {
+            v.originX = v.width/2;
+            v.originY = v.height/2;
+            halo.originX = halo.width/2;
+            halo.originY = halo.height/2;
+            var x = dx;
+            var y = halo.height/2 + 26 - dy;
+            var startA = Math.atan2(y, x) - Math.PI/2;
+            v.rotation = vs.rotation + startA;
         }}),
         this.Anchor.create({x$: this.x1$, y$: this.y1$, callback: function(v, vs, dx, dy) {
           v.x      = vs.x + dx;
@@ -212,7 +216,7 @@ foam.CLASS({
           this.originX = v.x-this.x;
           this.originY = v.y-this.y;
         } else {
-          this.originX = this.originY = r + 3;
+//          this.originX = this.originY = r + 3;
           this.x        = v.x-2*r-4;
           this.y        = v.y-2*r-4;
           this.width    = v.width + 2 * ( r * 2 + 4 );
