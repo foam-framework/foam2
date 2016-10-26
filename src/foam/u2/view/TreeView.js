@@ -50,11 +50,16 @@ foam.CLASS({
       var self = this;
       this.
         cssClass(this.myCls()).
+        attrs({ draggable: 'true' }).
         start('span').
           add(this.expanded$.map(function(v) { return v ? '-' : '+'; })).
           on('click', this.toggleExpanded).
         end().
         on('click', this.selected).
+        on('dragstart', this.onDragStart).
+        on('dragenter', this.onDragOver).
+        on('dragover', this.onDragOver).
+        on('drop', this.onDrop).
         call(this.formatter).
         end().
         add(this.slot(function(e) {
@@ -73,6 +78,38 @@ foam.CLASS({
     }
   ],
   listeners: [
+    function onDragStart(e) {
+      e.dataTransfer.setData('application/x-foam-obj-id', this.data.id);
+    },
+    function onDragOver(e) {
+      if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
+        return;
+
+      var id = e.dataTransfer.getData('application/x-foam-obj-id');
+
+      if ( foam.util.equals(id, this.data.id) )
+        return;
+
+      e.preventDefault();
+    },
+    function onDrop(e) {
+      if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
+        return;
+
+      var id = e.dataTransfer.getData('application/x-foam-obj-id');
+
+      if ( foam.util.equals(id, this.data.id) )
+        return;
+
+      e.preventDefault();
+
+      var self = this;
+
+      this.__context__[this.relationship.targetDAOKey].
+        find(id).then(function(obj) {
+          return self.data[self.relationship.name].put(obj.clone());
+        });
+    },
     function selected() {
       this.selection = this.data;
     },
