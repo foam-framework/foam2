@@ -27,5 +27,5 @@ public interface X
 
   // Facet manager
   public Object getInstanceOf(Object value, Class type);
-  public <T> create(Class<T> type);
+  public <T> T create(Class<T> type);
 }
