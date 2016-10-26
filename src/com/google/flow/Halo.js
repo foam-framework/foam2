@@ -220,8 +220,8 @@ foam.CLASS({
 //          this.originX = this.originY = r + 3;
           this.x        = v.x-2*r-4;
           this.y        = v.y-2*r-4;
-          this.width    = v.width + 2 * ( r * 2 + 4 );
-          this.height   = v.height + 2 * ( r * 2 + 4 );
+          this.width    = v.scaleX * v.width + 2 * ( r * 2 + 4 );
+          this.height   = v.scaleY * v.height + 2 * ( r * 2 + 4 );
         }
 
         this.haloBorder.x      = r;
