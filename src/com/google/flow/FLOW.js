@@ -114,6 +114,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.dxf.ui.DXFDiagram',
     'com.google.flow.Circle',
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
@@ -222,6 +223,7 @@ foam.CLASS({
         dao.put(com.google.flow.Cursor.model_);
         dao.put(com.google.flow.Script.model_);
         dao.put(foam.core.Model.model_);
+        dao.put(com.google.dxf.ui.DXFDiagram.model_);
         return dao;
       }
     },
