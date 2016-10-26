@@ -144,9 +144,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Class',
       name: 'of',
-      value: com.google.flow.DuplexDesk,
-      hidden: true
+      value: 'com.google.flow.DuplexDesk'
+//      hidden: true
     },
     {
       class: 'Boolean',
@@ -166,15 +167,19 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      var o = this.of.create();
-      this.cellWidth  = o.width;
-      this.cellHeight = o.height;
-
+      this.updateCellSize();
       this.rows = this.columns = 2;
 
       this.onResize();
-      this.propertyChange.sub('width', this.onResize);
+      this.propertyChange.sub('of',     this.onResize);
+      this.propertyChange.sub('width',  this.onResize);
       this.propertyChange.sub('height', this.onResize);
+    },
+
+    function updateCellSize() {
+      var o = this.of$cls.create();
+      this.cellWidth  = o.width;
+      this.cellHeight = o.height;
     }
   ],
 
@@ -185,11 +190,14 @@ foam.CLASS({
       code: function() {
         this.removeAllChildren();
 
+        this.updateCellSize();
+        this.width  = this.width;
+        this.height = this.height;
         var w = this.cellWidth, h = this.cellHeight;
 
         for ( var i = 0 ; i < this.rows ; i++ ) {
           for ( var j = 0 ; j < this.columns ; j++ ) {
-            var o = this.of.create();
+            var o = this.of$cls.create();
             o.x = w  * j;
             o.y = h * i;
             this.add(o);
@@ -216,8 +224,8 @@ foam.CLASS({
     [ 'color', 'red' ],
     [ 'start',  Math.PI ],
     [ 'radius', 20 ],
-    [ 'width', 20 ],
-    [ 'height', 35 ],
+    [ 'width', 42 ],
+    [ 'height', 45 ],
     { name: 'stem', hidden: true/*, view: 'foam.u2.DetailView'*/ }
   ],
 
