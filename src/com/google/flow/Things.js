@@ -97,7 +97,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
       this.add(this.desk, this.person, this.cabinet);
-      this.width = this.desk.width + this.cabinet.width;
+      this.width  = this.desk.width + this.cabinet.width + 2;
       this.height = this.desk.height * 2.75;
     }
   ]
@@ -140,7 +140,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.google.flow',
   name: 'Desks',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   properties: [
     {
@@ -153,10 +153,11 @@ foam.CLASS({
       name: 'feedback_',
       hidden: true
     },
+    [ 'border', null ],
     { name: 'cellWidth',  hidden: true },
     { name: 'cellHeight', hidden: true },
-    { name: 'rows',    postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.height  = this.cellHeight * n; this.feedback_ = false; return n;  } },
-    { name: 'columns', postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.width   = this.cellWidth * n; this.feedback_ = false; return n;  } },
+    { class: 'Int', name: 'rows',    postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.height  = this.cellHeight * n; this.feedback_ = false; return n;  } },
+    { class: 'Int', name: 'columns', postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.width   = this.cellWidth * n; this.feedback_ = false; return n;  } },
     { name: 'width',   postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.columns = Math.floor(n/this.cellWidth); this.feedback_ = false; return n;  } },
     { name: 'height',  postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.rows    = Math.floor(n/this.cellHeight); this.feedback_ = false; return n;  } }
   ],
