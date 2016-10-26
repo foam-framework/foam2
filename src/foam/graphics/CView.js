@@ -648,6 +648,14 @@ foam.CLASS({
       }
     },
 
+    function removeAllChildren() {
+      var children = this.children;
+      this.children = [];
+      for ( var i = 0 ; i < children.length ; i++ ) {
+        this.removeChild_(children[i]);
+      }
+    },
+
     function removeChild(c) {
       console.log('Deprecated use of CView.removeChild(). Use .remove() instead.');
       this.remove(c);
