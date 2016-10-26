@@ -315,10 +315,16 @@ foam.CLASS({
     function onPropertyPut(_, _, _, p) {
       var o = p.value;
       if ( this.CView.isInstance(o) ) {
-        this.canvas.add(o);
+        if ( ! p.parent ) {
+          this.canvas.add(o);
 
-        if ( this.Physical.isInstance(o) ) {
-          this.physics.add(o);
+          if ( this.Physical.isInstance(o) ) {
+            this.physics.add(o);
+          }
+        } else {
+          this.properties.find(p.parent).then(function(p2) {
+            p2.value.add(o);
+          });
         }
       }
     },
@@ -331,10 +337,16 @@ foam.CLASS({
       }
 
       if ( this.CView.isInstance(o) ) {
-        this.canvas.remove(o);
+        if ( ! p.parent ) {
+          this.canvas.remove(o);
 
-        if ( this.Physical.isInstance(o) ) {
-          this.physics.remove(o);
+          if ( this.Physical.isInstance(o) ) {
+            this.physics.remove(o);
+          }
+        } else {
+          this.properties.find(p.parent).then(function(p2) {
+            p2.value.remove(o);
+          });
         }
       }
     },
