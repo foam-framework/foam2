@@ -85,6 +85,7 @@ foam.CLASS({
   listeners: [
     function onDragStart(e) {
       e.dataTransfer.setData('application/x-foam-obj-id', this.data.id);
+      e.stopPropagation();
     },
     function onDragOver(e) {
       if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
