@@ -22,12 +22,12 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Float',
       name: 'width',
       value: 20
     },
     {
-      class: 'Int',
+      class: 'Float',
       name: 'height',
       value: 100
     },
@@ -126,7 +126,7 @@ foam.CLASS({
           p.y = touch.y;
           p.w = 1;
 
-          self.toLocalCoordinates(p);
+          self.globalToLocalCoordinates(p);
 
           self.value = self.yToValue(p.y);
         }

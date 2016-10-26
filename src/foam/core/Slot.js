@@ -257,6 +257,7 @@ foam.CLASS({
       'For internal use only. Is used to implement the Slot.dot() method.',
 
   properties: [
+    'of',
     'parent', // parent slot, not parent object
     'name',
     'value',
@@ -314,6 +315,16 @@ foam.CLASS({
     function parentChange() {
       this.prevSub && this.prevSub.destroy();
       var o = this.parent.get();
+
+      // If the parent object changes class, then don't
+      // update because a new class will have different
+      // sub-slots.
+      if ( this.of ) {
+        if ( ! this.of.isInstance(o) ) return;
+      } else {
+        if ( o ) this.of = o.cls_;
+      }
+
       this.prevSub = o && o.sub('propertyChange', this.name, this.valueChange);
       this.valueChange();
     },

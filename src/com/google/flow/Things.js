@@ -72,6 +72,145 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Desk',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    {
+      name: 'desk',
+      hidden: true,
+      factory: function() { return foam.graphics.Box.create({x:0, y:0, width:28, height:14, color:'gray'}); }
+    },
+    {
+      name: 'cabinet',
+      hidden: true,
+      factory: function() { return foam.graphics.Box.create({x:29, y:0, width:9, height:12, color: 'white'}); }
+    },
+    {
+      name: 'person',
+      hidden: true,
+      factory: function() { return foam.graphics.Circle.create({x:14, y:21, radius:3, border: null, color:'blue'}); }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.add(this.desk, this.person, this.cabinet);
+      this.width  = this.desk.width + this.cabinet.width + 2;
+      this.height = this.desk.height * 2.75;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'DuplexDesk',
+  extends: 'foam.graphics.CView',
+
+  requires: [ 'com.google.flow.Desk' ],
+
+  properties: [
+    {
+      name: 'desk1',
+      hidden: true,
+      factory: function() { return this.Desk.create({}); }
+    },
+    {
+      name: 'desk2',
+      hidden: true,
+      factory: function() { return this.Desk.create({}); }
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.desk1.y = this.desk2.y = this.desk1.height;
+      this.desk1.scaleY = -1;
+      this.width = this.desk1.width;
+      this.height = this.desk1.height * 2;
+      this.add(this.desk1, this.desk2);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Desks',
+  extends: 'foam.graphics.Box',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      value: 'com.google.flow.DuplexDesk'
+//      hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'feedback_',
+      hidden: true
+    },
+    [ 'border', null ],
+    { name: 'cellWidth',  hidden: true },
+    { name: 'cellHeight', hidden: true },
+    { class: 'Int', name: 'rows',    postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.height  = this.cellHeight * n; this.feedback_ = false; return n;  } },
+    { class: 'Int', name: 'columns', postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.width   = this.cellWidth * n; this.feedback_ = false; return n;  } },
+    { name: 'width',   postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.columns = Math.floor(n/this.cellWidth); this.feedback_ = false; return n;  } },
+    { name: 'height',  postSet: function(o, n) { if ( this.feedback_ ) return o; this.feedback_ = true; this.rows    = Math.floor(n/this.cellHeight); this.feedback_ = false; return n;  } }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+
+      this.updateCellSize();
+      this.rows = this.columns = 2;
+
+      this.onResize();
+      this.propertyChange.sub('of',     this.onResize);
+      this.propertyChange.sub('width',  this.onResize);
+      this.propertyChange.sub('height', this.onResize);
+    },
+
+    function updateCellSize() {
+      var o = this.of$cls.create();
+      this.cellWidth  = o.width;
+      this.cellHeight = o.height;
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onResize',
+      isFramed: true,
+      code: function() {
+        this.removeAllChildren();
+
+        this.updateCellSize();
+        this.width  = this.width;
+        this.height = this.height;
+        var w = this.cellWidth, h = this.cellHeight;
+
+        for ( var i = 0 ; i < this.rows ; i++ ) {
+          for ( var j = 0 ; j < this.columns ; j++ ) {
+            var o = this.of$cls.create(null, this.__subContext__);
+            o.x = w  * j;
+            o.y = h * i;
+            this.add(o);
+          }
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
 
@@ -85,8 +224,8 @@ foam.CLASS({
     [ 'color', 'red' ],
     [ 'start',  Math.PI ],
     [ 'radius', 20 ],
-    [ 'width', 20 ],
-    [ 'height', 35 ],
+    [ 'width', 42 ],
+    [ 'height', 45 ],
     { name: 'stem', hidden: true/*, view: 'foam.u2.DetailView'*/ }
   ],
 
@@ -119,3 +258,5 @@ foam.CLASS({
     }
   ]
 });
+
+// foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
