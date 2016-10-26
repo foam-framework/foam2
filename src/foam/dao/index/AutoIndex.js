@@ -196,7 +196,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'debug_lastIndex_'
+      name: 'previousPlanFor',
+      factory: function() { return {}; }
     }
   ],
 
@@ -252,47 +253,75 @@ foam.CLASS({
       //   of the cost of creating a new index.
 
       var self = this;
-      var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20));
-
-      if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
-        return this.delegate.plan(sink, skip, limit, order, predicate, root);
-      }
 
       var newIndex;
-      if ( predicate ) {
-        var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
-        if ( candidate ) {
-          var candidateCost = candidate.estimate(this.delegate.size(), sink,
-            skip, limit, order, predicate)
-            * ARBITRARY_INDEX_CREATE_FACTOR
-            + ARBITRARY_INDEX_CREATE_CONSTANT;
 
-console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().substring(0,20));
-          //TODO: must beat by factor of X? or constant?
-          if ( bestCost > candidateCost ) {
-            newIndex = candidate;
-            bestCost = candidateCost;
+      // NOTE: If this plan() was triggered by an AltPlan, there will
+      //  be multiple concurrent AutoIndex autoIndexAdd plans executing
+      //  to add effectively the same new index.
+
+      // if we haven't been called yet for this particular query
+      // (if our parent is sub-planning, we will be called on to plan
+      //  multiple times for the same query)
+      var prev = this.progenitor.previousPlanFor;
+      if ( ( ! prev.sink && ! prev.skip && ! prev.limit && ! prev.order &&
+            ! prev.predicate && ! prev.root ) ||
+           ( sink      !== prev.sink ||
+             skip      !== prev.skip ||
+             limit     !== prev.limit ||
+             order     !== prev.order ||
+             predicate !== prev.predicate ||
+             root      !== prev.root )
+      ) {
+        prev.sink = sink;
+        prev.skip = skip;
+        prev.limit = limit;
+        prev.order = order;
+        prev.predicate = predicate;
+        prev.root = root;
+
+        var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+//console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20));
+        if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
+          return this.delegate.plan(sink, skip, limit, order, predicate, root);
+        }
+
+        if ( predicate ) {
+          var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+          if ( candidate ) {
+            var candidateCost = candidate.estimate(this.delegate.size(), sink,
+              skip, limit, order, predicate)
+              * ARBITRARY_INDEX_CREATE_FACTOR
+              + ARBITRARY_INDEX_CREATE_CONSTANT;
+
+//console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().substring(0,20));
+            //TODO: must beat by factor of X? or constant?
+            if ( bestCost > candidateCost ) {
+              newIndex = candidate;
+              bestCost = candidateCost;
+            }
+          }
+        }
+
+        if ( order ) {
+          var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+          if ( candidate ) {
+            var candidateCost = candidate.estimate(this.delegate.size(), sink,
+              skip, limit, order, predicate)
+              * ARBITRARY_INDEX_CREATE_FACTOR
+              + ARBITRARY_INDEX_CREATE_CONSTANT;
+//console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().substring(0,20));
+            if ( bestCost > candidateCost ) {
+              newIndex = candidate;
+              bestCost = candidateCost;
+            }
           }
         }
       }
-
-      if ( order ) {
-        var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
-        if ( candidate ) {
-          var candidateCost = candidate.estimate(this.delegate.size(), sink,
-            skip, limit, order, predicate)
-            * ARBITRARY_INDEX_CREATE_FACTOR
-            + ARBITRARY_INDEX_CREATE_CONSTANT;
-console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().substring(0,20));
-          if ( bestCost > candidateCost ) {
-            newIndex = candidate;
-            bestCost = candidateCost;
-          }
-        }
-      }
-
-      this.inertia *= 0.75;
+//       else {
+// console.log(this.$UID, "Dupe reject");
+//       }
+//       this.inertia *= 0.75;
 
       if ( newIndex ) {
         return this.CustomPlan.create({
@@ -300,14 +329,6 @@ console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().subst
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString(), "\n\n");
 
-            // NOTE: If this plan() was triggered by an AltPlan, there will
-            //  be multiple concurrent AutoIndex autoIndexAdd plans executing
-            //  to add effectively the same new index.
-
-            if ( self.debug_lastIndex_ && ( newIndex.toString() == self.debug_lastIndex_.toString())) {
-              console.log("Dup index!", newIndex.toString());
-            }
-            self.debug_lastIndex_ = newIndex;
             // TODO: PoliteIndex sometimes when ordering?
             //  When ordering, the cost of sorting will depend on the total
             //  size of the DAO (index create cost) versus the size of the

@@ -42,7 +42,7 @@ foam.CLASS({
           seqNo: true,
           autoIndex: true,
           daoType: this.MDAO,
-          //timing: true
+          timing: true
         });
 
         var proxy = this.ProxyDAO.create({
