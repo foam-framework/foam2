@@ -113,6 +113,7 @@ foam.CLASS({
       if ( ! this.AltIndex.isInstance(this.index.progenitor) ) {
         this.index = this.AltIndex.create({
           delegates: [ this.index.progenitor ], // create factory
+        }).spawn({
           instances: [ this.index ] // create an instance
         });
       }

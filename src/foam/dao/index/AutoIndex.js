@@ -327,7 +327,8 @@ foam.CLASS({
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
-console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString(), "\n\n");
+console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
+console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
 
             // TODO: PoliteIndex sometimes when ordering?
             //  When ordering, the cost of sorting will depend on the total
