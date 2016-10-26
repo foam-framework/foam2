@@ -154,6 +154,7 @@ foam.CLASS({
       this.add(
         this.haloBorder,
           this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, dx, dy) {
+            // TODO: this assumes we're starting at 0 degrees, make work when we don't.
             v.originX = v.width/2;
             v.originY = v.height/2;
             halo.originX = halo.width/2;
@@ -219,8 +220,8 @@ foam.CLASS({
 //          this.originX = this.originY = r + 3;
           this.x        = v.x-2*r-4;
           this.y        = v.y-2*r-4;
-          this.width    = v.width + 2 * ( r * 2 + 4 );
-          this.height   = v.height + 2 * ( r * 2 + 4 );
+          this.width    = v.scaleX * v.width + 2 * ( r * 2 + 4 );
+          this.height   = v.scaleY * v.height + 2 * ( r * 2 + 4 );
         }
 
         this.haloBorder.x      = r;
