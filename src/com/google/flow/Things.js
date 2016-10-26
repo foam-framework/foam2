@@ -79,17 +79,17 @@ foam.CLASS({
     {
       name: 'desk',
       hidden: true,
-      factory: function() { return foam.graphics.Box.create({x:0, y:0, width:56, height:28, color:'gray'}); }
+      factory: function() { return foam.graphics.Box.create({x:0, y:0, width:28, height:14, color:'gray'}); }
     },
     {
       name: 'cabinet',
       hidden: true,
-      factory: function() { return foam.graphics.Box.create({x:57, y:0, width:18, height:23, color: 'white'}); }
+      factory: function() { return foam.graphics.Box.create({x:29, y:0, width:9, height:12, color: 'white'}); }
     },
     {
       name: 'person',
       hidden: true,
-      factory: function() { return foam.graphics.Circle.create({x:27, y:42, width:-27, height:-22, radius:6, border: null, color:'blue'}); }
+      factory: function() { return foam.graphics.Circle.create({x:14, y:21, radius:3, border: null, color:'blue'}); }
     }
   ],
 
@@ -99,6 +99,97 @@ foam.CLASS({
       this.add(this.desk, this.person, this.cabinet);
       this.width = this.desk.width + this.cabinet.width;
       this.height = this.desk.height * 3;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'DuplexDesk',
+  extends: 'foam.graphics.CView',
+
+  requires: [ 'com.google.flow.Desk' ],
+
+  properties: [
+    {
+      name: 'desk1',
+      hidden: true,
+      factory: function() { return this.Desk.create({}); }
+    },
+    {
+      name: 'desk2',
+      hidden: true,
+      factory: function() { return this.Desk.create({}); }
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.desk1.y = this.desk2.y = this.desk1.height;
+      this.desk1.scaleY = -1;
+      this.width = this.desk1.width;
+      this.height = this.desk1.height * 2;
+      this.add(this.desk1, this.desk2);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Desks',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    {
+      name: 'of',
+      value: com.google.flow.DuplexDesk,
+      hidden: true
+    },
+    { name: 'cellWidth',  hidden: true },
+    { name: 'cellHeight', hidden: true },
+    [ 'rows',    1 ],
+    [ 'columns', 4 ]
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+
+      var o = this.of.create();
+      this.cellWidth  = o.width;
+      this.cellHeight = o.height;
+
+      this.onResize();
+      this.propertyChange.sub(this.onResize);
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onResize',
+      isFramed: true,
+      code: function() {
+        this.remove(this.children);
+        var w = this.cellWidth, h = this.cellHeight;
+
+        this.rows    = Math.max(this.rows, Math.floor(this.height / h));
+        this.columns = Math.max(this.rows, Math.floor(this.width / w));
+
+        for ( var i = 0 ; i < this.rows ; i++ ) {
+          for ( var j = 0 ; j < this.columns ; j++ ) {
+            var o = this.of.create();
+            o.x = w  * j;
+            o.y = h * i;
+            this.add(o);
+          }
+        }
+
+        this.width  = Math.max(this.width,  this.columns * w);
+        this.height = Math.max(this.height, this.rows    * h);
+      }
     }
   ]
 });
