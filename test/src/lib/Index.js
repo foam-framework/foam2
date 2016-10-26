@@ -594,7 +594,8 @@ describe('AltIndex', function() {
     idx = foam.dao.index.AltIndex.create().spawn();
     var fakeRoot = {
       mapOver: function(fn, ofIndex) { idx = fn(idx); },
-      size: function() { return 1; }
+      size: function() { return 1; },
+      progenitor: {}
     };
     idx.addIndex(foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
@@ -706,7 +707,8 @@ describe('AutoIndex', function() {
           idxInstance.mapOver(fn, ofIndex);
         }
       },
-      size: function() { return 1; }
+      size: function() { return 1; },
+      progenitor: {}
     };
 
     m = foam.mlang.Expressions.create();
