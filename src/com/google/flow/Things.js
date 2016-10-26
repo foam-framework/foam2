@@ -98,7 +98,7 @@ foam.CLASS({
       this.SUPER();
       this.add(this.desk, this.person, this.cabinet);
       this.width = this.desk.width + this.cabinet.width;
-      this.height = this.desk.height * 3;
+      this.height = this.desk.height * 2.75;
     }
   ]
 });

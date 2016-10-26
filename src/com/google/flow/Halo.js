@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.graphics.Box',
 
   properties: [
-    [ 'border', 'blue' ] 
+    [ 'border', 'blue' ]
   ],
 
   methods: [
@@ -89,7 +89,7 @@ foam.CLASS({
           this.mouseStartX = evt.offsetX;
           this.mouseStartY = evt.offsetY;
         },
-        
+
         function onMouseMove(evt) {
           if ( ! this.view ) return;
           this.callback(
@@ -107,6 +107,10 @@ foam.CLASS({
     [ 'alpha', 0 ],
     [ 'border', null ],
     'selectedSub',
+    {
+      name: 'haloBorder',
+      factory: function() { return this.HaloBorder.create(); }
+    },
     { name: 'x1', expression: function() { return 0; } },
     { name: 'x2', expression: function(width) { return this.width/2-this.anchorRadius; } },
     { name: 'x3', expression: function(width) { return this.width-this.anchorRadius*2-1; } },
@@ -145,7 +149,7 @@ foam.CLASS({
       this.SUPER();
 
       this.add(
-        this.HaloBorder.create({x$: this.x1$, y$: this.y1$, width$: this.width$, height$: this.height$}),
+        this.haloBorder,
         this.Anchor.create({x$: this.x2$, y: -26}),
         this.Anchor.create({x$: this.x1$, y$: this.y1$, callback: function(v, vs, dx, dy) {
           v.x      = vs.x + dx;
@@ -192,6 +196,7 @@ foam.CLASS({
         if ( ! v ) return;
 
         var r = this.anchorRadius;
+
         if ( v.radius ) {
           this.height = this.width = (v.radius + v.arcWidth + 3 + r*2) * 2;
           this.x        = v.x - v.radius - v.arcWidth - r*2 - 3;
@@ -205,6 +210,12 @@ foam.CLASS({
           this.width    = v.width + 2 * ( r * 2 + 4 );
           this.height   = v.height + 2 * ( r * 2 + 4 );
         }
+
+        this.haloBorder.x      = r;
+        this.haloBorder.y      = r;
+        this.haloBorder.width  = this.width - 2 * r;
+        this.haloBorder.height = this.height - 2 * r;
+
         this.rotation = v.rotation;
       }
     },
