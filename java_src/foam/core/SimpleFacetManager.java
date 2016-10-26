@@ -5,11 +5,11 @@ public class SimpleFacetManager implements FacetManager {
     return create(type, x);
   }
 
-  public <T> create(Class<T> type, X x) {
+  public <T> T create(Class<T> type, X x) {
     try {
       // Automatically load FooImpl if Foo is abstract.
       if ( java.lang.reflect.Modifier.isAbstract(type.getModifiers()) ) {
-        type = Class.forName(type.getName() + "Impl");
+        type = (Class<T>)Class.forName(type.getName() + "Impl");
       }
 
       T obj = type.newInstance();
