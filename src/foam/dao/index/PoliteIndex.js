@@ -49,6 +49,14 @@ foam.CLASS({
       required: true
     },
     {
+      name: 'workQueue',
+      factory: function() { return []; }
+    },
+    {
+      name: 'timerSet',
+      value: false
+    },
+    {
       /** For numbers of puts/removes smaller than one batch,
         allow them directly through to the delegate. Once this
         number of operations is too high, begin batching and reset
@@ -69,7 +77,7 @@ foam.CLASS({
     },
     {
       class: 'foam.pattern.progenitor.PerInstance',
-      name: 'timerSet',
+      name: 'enqueued',
       value: false
     },
   ],
@@ -82,37 +90,25 @@ foam.CLASS({
     },
 
     function put(o) {
-      // if timer is not set, aren't batching yet
-      var self = this;
-      if ( ! this.timerSet ) {
-        // if direct operations are small enough, continue in direct mode
-        if ( this.directOperations < this.SMALL_ENOUGH_SIZE ) {
-          this.directOperations++;
-          return this.delegate.put(o);
-        } else {
-          // otherwise begin batching
-          this.setTimeout(function() { self.loadBatch() }, self.BATCH_TIME);
-          this.timerSet = true;
-        }
+      // if direct operations are small enough, continue in direct mode
+      if ( this.directOperations < this.SMALL_ENOUGH_SIZE ) {
+        this.directOperations++;
+        return this.delegate.put(o);
+      } else {
+        // otherwise begin batching
+        this.batch.push(o);
+        this.addToQueue(this);
       }
-      // get here only in batching mode
-      this.batch.push(o);
-
     },
 
     function remove(o) {
-      var self = this;
-      if ( ! this.timerSet ) {
-        if ( this.directOperations < this.SMALL_ENOUGH_SIZE ) {
-          this.directOperations++;
-          return this.delegate.remove(o);
-        } else {
-          this.setTimeout(function() { self.loadBatch() }, self.BATCH_TIME);
-          this.timerSet = true;
-        }
+      if ( this.directOperations < this.SMALL_ENOUGH_SIZE ) {
+        this.directOperations++;
+        return this.delegate.remove(o);
+      } else {
+        this.batch.push({ __polite_batch_remove__: o });
+        this.addToQueue(this);
       }
-
-      this.batch.push({ __polite_batch_remove__: o });
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
@@ -126,30 +122,49 @@ foam.CLASS({
     function toString() {
       return 'PoliteIndex('+this.delegate.toString()+')';
     },
-    {
-      name: 'loadBatch',
-      code: function() {
-        var self = this;
-        self.timerSet = false;
-        self.directOperations = 0;
-
-        var a = self.batch.splice(0, self.BATCH_SIZE);
-
-        for ( var i = 0; i < a.length; i++ ) {
-          var o = a[i];
-          if ( o.__polite_batch_remove__ ) {
-            self.delegate.remove(o.__polite_batch_remove__);
-          } else {
-            self.delegate.put(o);
-          }
+        
+    function addToQueue(batchSelf) {
+      var self = this.progenitor || this;
+      
+      if ( ! batchSelf.enqueued ) {
+        self.workQueue.push(batchSelf);
+        batchSelf.enqueued = true;
+      }
+      
+      if ( ! self.timerSet ) {
+        self.setTimeout(function() { self.processQueue(); }, self.BATCH_TIME);
+        self.timerSet = true;
+      }
+    },
+    
+    function processQueue() {
+      var self = this.progenitor || this;
+//console.log("Processing ", self.$UID, self.workQueue.length);
+      var next = self.workQueue.splice(0, 1)[0];
+      var a = next.batch.splice(0, this.BATCH_SIZE);
+      
+      for ( var i = 0; i < a.length; i++ ) {
+        var o = a[i];
+        if ( o.__polite_batch_remove__ ) {
+          next.delegate.remove(o.__polite_batch_remove__);
+        } else {
+          next.delegate.put(o);
         }
-//console.log(self.$UID, "PoliteIndex batch load finished", a.length);
-        if ( self.batch.length > 0 ) {
-          // set up another timer to process more
-          self.setTimeout(function() { self.loadBatch(); }, self.BATCH_TIME);
-          this.timerSet = true;
-        }
-
+      }
+      
+      // re-queue if instance not empty yet
+      if ( next.batch.length > 0 ) {
+        self.workQueue.push(next);
+      } else {
+        // re-enter direct mode, as it isn't in the queue anymore
+        next.directOperations = 0;
+        next.enqueued = false;
+      }
+      
+      // set up another timer to process more
+      if ( self.workQueue.length > 0 ) {
+        self.setTimeout(function() { self.processQueue(); }, self.BATCH_TIME);
+        self.timerSet = true;
       }
     }
   ]
