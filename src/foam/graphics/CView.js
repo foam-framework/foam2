@@ -404,7 +404,7 @@ foam.CLASS({
     {
       name: 'rotation',
       class: 'Float',
-      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      view: { class: 'foam.u2.RangeView', minValue: -Math.PI*2, maxValue: Math.PI*2, step: 0.01, onKey: true }
     },
     {
       name: 'originX',
