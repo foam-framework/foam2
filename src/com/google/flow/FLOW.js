@@ -27,10 +27,6 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'String',
-      name: 'parent'
-    },
-    {
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
@@ -56,6 +52,15 @@ foam.CLASS({
   ]
 });
 
+// TODO(adamvy): Remove the need to store this relationship globally.
+var relationship = foam.RELATIONSHIP({
+  name: 'children',
+  inverseName: 'parent',
+  cadinality: '1:*',
+  sourceModel: 'com.google.flow.Property',
+  targetModel: 'com.google.flow.Property',
+  targetDAOKey: 'properties'
+});
 
 foam.CLASS({
   package: 'com.google.flow',
@@ -78,7 +83,8 @@ foam.CLASS({
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
     'foam.u2.TableView',
-    'foam.util.Timer'
+    'foam.util.Timer',
+    'foam.u2.view.TreeView'
   ],
 
   exports: [
@@ -161,6 +167,15 @@ foam.CLASS({
     {
       name: 'properties',
       view: {
+        class: 'foam.u2.view.TreeView',
+        relationship: relationship,
+        formatter: function() {
+          var X = this.__subSubContext__;
+          this.start('span').add(X.data.name).end().
+            start('span').add(com.google.flow.Property.DELETE_ROW).end();
+        }
+      },
+      xview: {
         class: 'foam.u2.TableView',
         columns: [
           com.google.flow.Property.NAME,
@@ -182,11 +197,11 @@ foam.CLASS({
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
-        p = this.Property.create({name: 'timer', value: this.timer});
+        p = this.Property.create({name: 'timer', value: this.timer, parent: 'canvas1'});
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
-        p = this.Property.create({name: 'physics', value: this.physics});
+        p = this.Property.create({name: 'physics', value: this.physics, parent: 'canvas1' });
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
@@ -261,7 +276,7 @@ foam.CLASS({
           end();
     },
 
-    function addProperty(value, opt_name, opt_i) {
+    function addProperty(value, opt_name, opt_i, opt_parent) {
       var self = this;
       if ( ! opt_name ) {
         var i = opt_i || 1;
@@ -276,6 +291,7 @@ foam.CLASS({
           name: opt_name,
           value: value
         });
+        if ( opt_parent ) p.parent = opt_parent;
         value.setPrivate_('lpp_', p);
         this.properties.put(p);
         this.selected = p;
