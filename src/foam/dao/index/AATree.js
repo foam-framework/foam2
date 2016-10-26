@@ -60,6 +60,12 @@ foam.CLASS({
         new nodes.
       */
       name: 'nullNode'
+    },
+    {
+      /** TODO: subSelectMode as a string method name is not great.
+        Build a nested object of bools, strip one each layer:
+        [false, [true, [false, [false]]]] */
+      name: 'subSelectMode',
     }
   ],
 
@@ -266,6 +272,8 @@ foam.CLASS({
       return s;
     },
 
+    /** AATree select takes the sub-ordering to pass to the tail index,
+      since primary ordering is assumed to match this tree. */
     function select(sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
@@ -274,23 +282,42 @@ foam.CLASS({
         return;
       }
 
+      // how to sort (select/selectReverse) the tail index
+      // 'order' is the sub-ordering for the tail, not including this
+      // tree's order.
+      var subSelectMode = this.subSelectMode;
+      if ( ! subSelectMode ) {
+        subSelectMode = this.subSelectMode =
+          ( order && order.arg1 && index.Desc.isInstance(order.arg1) ) ?
+            'selectReverse' : 'select';
+      }
+
       this.left.select(sink, skip, limit, order, predicate);
-      this.value.select(sink, skip, limit, order, predicate);
+      this.value[subSelectMode](sink, skip, limit, order, predicate);
       this.right.select(sink, skip, limit, order, predicate);
     },
 
+    /** AATree selectReverse takes the sub-ordering to pass to the tail index,
+      since primary ordering is assumed to match this tree. */
     function selectReverse(sink, skip, limit, order, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
-
       if ( skip && skip[0] >= this.size && ! predicate ) {
-        console.log('reverse skipping: ', this.key);
+        //console.log('reverse skipping: ', this.key);
         skip[0] -= this.size;
         return;
       }
 
+      // how to sort (select/selectReverse) the tail index
+      var subSelectMode = this.subSelectMode;
+      if ( ! subSelectMode ) {
+        subSelectMode = this.subSelectMode =
+          ( order && order.arg1 && index.Desc.isInstance(order.arg1) ) ?
+            'selectReverse' : 'select';
+      }
+
       this.right.selectReverse(sink, skip, limit, order, predicate);
-      this.value.selectReverse(sink, skip, limit, order, predicate);
+      this.value[subSelectMode](sink, skip, limit, order, predicate);
       this.left.selectReverse(sink,  skip, limit, order, predicate);
     },
 

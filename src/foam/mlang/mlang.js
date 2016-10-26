@@ -1058,8 +1058,12 @@ foam.INTERFACE({
       ]
     },
     {
-      /** Removes the first ordering, which may be the only one. */
-      name: 'popOrdering',
+      /** Returns remaning ordering without the first one, which may be the only one. */
+      name: 'tailOrder',
+    },
+    {
+      /** The property, if any, sorted by this ordering. */
+      name: 'propertyOrdered',
     }
   ]
 });
@@ -1072,9 +1076,14 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'popOrdering',
+      name: 'tailOrder',
       code: function() { return; },
       javaCode: 'return null;'
+    },
+    {
+      name: 'propertyOrdered',
+      code: function() { return this; },
+      javaCode: 'return this;'
     },
   ]
 });
@@ -1113,9 +1122,14 @@ foam.CLASS({
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     },
     {
-      name: 'popOrdering',
+      name: 'tailOrder',
       code: function() { return; },
       javaCode: 'return null;'
+    },
+    {
+      name: 'propertyOrdered',
+      code: function() { return this.arg1; },
+      javaCode: 'return getArg1();'
     },
   ]
 });
@@ -1147,9 +1161,14 @@ foam.CLASS({
       name: 'arg2'
     },
     {
-      name: 'popOrdering',
+      name: 'tailOrder',
       code: function() { return this.arg2; },
       javaCode: 'return getArg2();'
+    },
+    {
+      name: 'propertyOrdered',
+      code: function() { return this.arg1; },
+      javaCode: 'return getArg1();'
     },
   ],
 

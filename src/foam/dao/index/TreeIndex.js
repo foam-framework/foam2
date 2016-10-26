@@ -207,17 +207,35 @@ foam.CLASS({
     },
 
     function select(sink, skip, limit, order, predicate) {
-      this.root.select(sink, skip, limit, order, predicate);
+      this.root.subSelectMode = 'select';
+      this.root.select(sink, skip, limit,
+        order ? order.tailOrder() : undefined, predicate);
+      this.root.subSelectMode = '';
     },
 
     function selectReverse(sink, skip, limit, order, predicate) {
-      this.root.selectReverse(sink, skip, limit, order, predicate);
+      this.root.subSelectMode = 'selectReverse';
+      this.root.selectReverse(sink, skip, limit,
+        order ? order.tailOrder() : undefined, predicate);
+      this.root.subSelectMode = '';
     },
 
     function size() { return this.root.size; },
 
     function compare(o1, o2) {
       return foam.util.compare(o1, o2);
+    },
+
+    function isOrderSelectable(order) {
+      // no ordering, no problem
+      if ( ! order ) return true;
+
+      // if this index can sort, it's up to our tail to sub-sort
+      if ( foam.util.equals(order.propertyOrdered(), this.prop) ) {
+        return this.tailFactory.isOrderSelectable(order.tailOrder());
+      }
+      // can't use select()/selectReverse() with the given ordering
+      return false;
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
@@ -367,29 +385,25 @@ foam.CLASS({
       if ( arg2 ) subTree = subTree.lte(arg2.f(), this.compare);
 
       cost = subTree.size;
-      var sortRequired = false;
+      var sortRequired = ! this.isOrderSelectable(order);
       var reverseSort = false;
 
       var myOrder;
       var subOrder;
-      if ( order ) {
+      if ( order && ! sortRequired ) {
         myOrder = index.ThenBy.isInstance(order) ? order.arg1 : order;
-        subOrder = order.popOrdering();
-
-        if ( index.Property.isInstance(myOrder) && myOrder === prop ) {
-          // sort not required
-        } else if ( index.Desc.isInstance(myOrder) && myOrder.arg1 === prop ) {
+        if ( index.Desc.isInstance(myOrder) && myOrder.arg1 === prop ) {
           // reverse-sort, sort not required
           reverseSort = true;
-        } else {
-          sortRequired = true;
-          if ( cost !== 0 ) cost *= Math.log(cost) / Math.log(2);
         }
       }
 
       if ( ! sortRequired ) {
         if ( skip ) cost -= skip;
         if ( limit ) cost = Math.min(cost, limit);
+      } else {
+        // add sort cost
+        if ( cost !== 0 ) cost *= Math.log(cost) / Math.log(2);
       }
 
       return index.CustomPlan.create({
@@ -398,6 +412,7 @@ foam.CLASS({
           if ( sortRequired ) {
             var arrSink = index.ArraySink.create();
             index.selectCount++;
+            subTree.subSelectMode = 'select';
             subTree.select(arrSink, null, null, null, predicate);
             index.selectCount--;
             var a = arrSink.a;
@@ -412,6 +427,7 @@ foam.CLASS({
               sink.put(a[i]);
           } else {
             index.selectCount++;
+            subTree.subSelectMode = reverseSort ? 'selectReverse' : 'select';
             reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
               subTree.selectReverse(sink, [skip], [limit], subOrder, predicate) :
               subTree.select(sink, [skip], [limit], subOrder, predicate) ;

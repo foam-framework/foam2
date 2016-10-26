@@ -115,7 +115,7 @@ foam.CLASS({
         }
 
         cost += tailFactory.estimate(size / nodeCount, sink, skip, limit,
-          order.popOrdering(), predicate);
+          order.tailOrder(), predicate);
       }
 
       return cost;

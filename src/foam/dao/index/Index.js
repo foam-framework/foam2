@@ -53,6 +53,10 @@ foam.CLASS({
     /** Selects matching items from the index and puts them into sink */
     function select(/*sink, skip, limit, order, predicate*/) { },
 
+    /** Returns true if the given ordering will be respected by a
+      select()/selectReverse() on this index. */
+    function isOrderSelectable(/*order*/) { },
+
     /** Selects matching items in reverse order from the index and puts
       them into sink */
     function selectReverse(/*sink, skip, limit, order, predicate*/) { },
@@ -110,6 +114,10 @@ foam.CLASS({
       return this.delegate.selectReverse(sink, skip, limit, order, predicate);
     },
 
+    function isOrderSelectable(order) {
+      return this.delegateFactory.isOrderSelectable(order);
+    },
+
     function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
   ]
 });
@@ -150,6 +158,7 @@ foam.CLASS({
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function plan() { return this; },
     function mapOver(fn, ofIndex) { },
+    function isOrderSelectable(order) { return true; },
 
     function select(sink, skip, limit, order, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
@@ -239,6 +248,17 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       // scan goes straight to the ID index
       return this.instances[0].select(sink, skip, limit, order, predicate);
+    },
+    function selectReverse(sink, skip, limit, order, predicate) {
+      // scan goes straight to the ID index
+      return this.instances[0].selectReverse(sink, skip, limit, order, predicate);
+    },
+
+    function isOrderSelectable(order) {
+      // NOTE: unless select() is implemented to handle ordering, can't return true
+      // TODO: check delegates, cache which one can handle the ordering for
+      //   use in select()
+      return order ? false : true;
     },
 
     function mapOver(fn, ofIndex) {
