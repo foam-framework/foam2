@@ -111,12 +111,12 @@ foam.CLASS({
       name: 'haloBorder',
       factory: function() { return this.HaloBorder.create(); }
     },
-    { name: 'x1', expression: function() { return 0; } },
-    { name: 'x2', expression: function(width) { return this.width/2-this.anchorRadius; } },
-    { name: 'x3', expression: function(width) { return this.width-this.anchorRadius*2-1; } },
-    { name: 'y1', expression: function() { return 0; } },
-    { name: 'y2', expression: function(height) { return this.height/2-this.anchorRadius; } },
-    { name: 'y3', expression: function(height) { return this.height-this.anchorRadius*2-1; } },
+    { name: 'x1', expression: function() { return -0.5; } },
+    { name: 'x2', expression: function(width) { return this.width/2-this.anchorRadius-0.5; } },
+    { name: 'x3', expression: function(width) { return this.width-this.anchorRadius*2-0.5; } },
+    { name: 'y1', expression: function() { return -0.5; } },
+    { name: 'y2', expression: function(height) { return this.height/2-this.anchorRadius-0.5; } },
+    { name: 'y3', expression: function(height) { return this.height-this.anchorRadius*2-0.5; } },
     {
       name: 'selected',
       postSet: function(_, n) {
@@ -150,7 +150,15 @@ foam.CLASS({
 
       this.add(
         this.haloBorder,
-        this.Anchor.create({x$: this.x2$, y: -26}),
+        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, dx, dy) {
+          var cx = v.x + v.width  / 2;
+          var cy = v.y + v.height / 2;
+          var startA = Math.atan2(4, cy);
+          v.x      = vs.x + dx;
+          v.y      = vs.y + dy;
+          v.width  = vs.width  - dx;
+          v.height = vs.height - dy;
+        }}),
         this.Anchor.create({x$: this.x1$, y$: this.y1$, callback: function(v, vs, dx, dy) {
           v.x      = vs.x + dx;
           v.y      = vs.y + dy;
