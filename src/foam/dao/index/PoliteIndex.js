@@ -120,7 +120,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'PoliteIndex('+this.delegate.toString()+')';
+      return 'PoliteIndex('+this.delegateFactory.toString()+')';
     },
 
     function addToQueue(batchSelf) {

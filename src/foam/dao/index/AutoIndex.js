@@ -194,6 +194,9 @@ foam.CLASS({
       preSet: function(old, nu) {
         return Math.max(nu, 0);
       }
+    },
+    {
+      name: 'debug_lastIndex_'
     }
   ],
 
@@ -250,8 +253,7 @@ foam.CLASS({
 
       var self = this;
       var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-//console.log("EXISTING ", this.inertia, root.toString());
-//console.log("AutoEst OLD:", bestCost, this.delegate.toString());
+console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20));
 
       if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
         return this.delegate.plan(sink, skip, limit, order, predicate, root);
@@ -266,7 +268,7 @@ foam.CLASS({
             * ARBITRARY_INDEX_CREATE_FACTOR
             + ARBITRARY_INDEX_CREATE_CONSTANT;
 
-//console.log("AutoEst PRD:", candidateCost, candidate.toString());
+console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().substring(0,20));
           //TODO: must beat by factor of X? or constant?
           if ( bestCost > candidateCost ) {
             newIndex = candidate;
@@ -282,7 +284,7 @@ foam.CLASS({
             skip, limit, order, predicate)
             * ARBITRARY_INDEX_CREATE_FACTOR
             + ARBITRARY_INDEX_CREATE_CONSTANT;
-//console.log("AutoEst ORD:", candidateCost, candidate.toString());
+console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().substring(0,20));
           if ( bestCost > candidateCost ) {
             newIndex = candidate;
             bestCost = candidateCost;
@@ -296,9 +298,17 @@ foam.CLASS({
         return this.CustomPlan.create({
           cost: bestCost, // TODO: add some construction cost? reduce over time to simulate amortization?
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
-console.log("BUILDING INDEX", bestCost, self.inertia, newIndex.toString(), "\n\n");
-            // TODO: use promise to async delay when loading slowly
-            // TODO: could be a long operation, PoliteIndex to delay load?
+console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString(), "\n\n");
+
+            // NOTE: If this plan() was triggered by an AltPlan, there will
+            //  be multiple concurrent AutoIndex autoIndexAdd plans executing
+            //  to add effectively the same new index.
+
+            if ( self.debug_lastIndex_ && ( newIndex.toString() == self.debug_lastIndex_.toString())) {
+              console.log("Dup index!", newIndex.toString());
+            }
+            self.debug_lastIndex_ = newIndex;
+            // TODO: PoliteIndex sometimes when ordering?
             //  When ordering, the cost of sorting will depend on the total
             //  size of the DAO (index create cost) versus the size of the
             //  result set at this index node. It might be cheap enough to

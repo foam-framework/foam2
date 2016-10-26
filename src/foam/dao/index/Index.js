@@ -236,6 +236,11 @@ foam.CLASS({
       return this.instances[0].get(key);
     },
 
+    function select(sink, skip, limit, order, predicate) {
+      // scan goes straight to the ID index
+      return this.instances[0].select(sink, skip, limit, order, predicate);
+    },
+
     function mapOver(fn, ofIndex) {
       for ( var i = 0 ; i < this.instances.length ; i++ ) {
         if ( this.delegates[i] == ofIndex) {
