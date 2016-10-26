@@ -72,6 +72,40 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Desk',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    {
+      name: 'desk',
+      hidden: true,
+      factory: function() { return foam.graphics.Box.create({x:0, y:0, width:56, height:28, color:'gray'}); }
+    },
+    {
+      name: 'cabinet',
+      hidden: true,
+      factory: function() { return foam.graphics.Box.create({x:57, y:0, width:18, height:23, color: 'white'}); }
+    },
+    {
+      name: 'person',
+      hidden: true,
+      factory: function() { return foam.graphics.Circle.create({x:27, y:42, width:-27, height:-22, radius:6, border: null, color:'blue'}); }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.add(this.desk, this.person, this.cabinet);
+      this.width = this.desk.width + this.cabinet.width;
+      this.height = this.desk.height * 3;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Mushroom',
   extends: 'foam.graphics.Circle',
 
@@ -119,3 +153,5 @@ foam.CLASS({
     }
   ]
 });
+
+// foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
