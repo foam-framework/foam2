@@ -28,6 +28,13 @@ foam.CLASS({
   imports: [
     'selection'
   ],
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+^ { margin-left:4px; }
+*/}
+    })
+  ],
   properties: [
     {
       name: 'data'
@@ -61,10 +68,8 @@ foam.CLASS({
         on('dragover', this.onDragOver).
         on('drop', this.onDrop).
         call(this.formatter).
-        end().
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
-
           var e = this.E('div');
           e.select(this.data[self.relationship.name], function(obj) {
             return self.cls_.create({
@@ -91,6 +96,7 @@ foam.CLASS({
         return;
 
       e.preventDefault();
+      e.stopPropagation();
     },
     function onDrop(e) {
       if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
@@ -102,6 +108,7 @@ foam.CLASS({
         return;
 
       e.preventDefault();
+      e.stopPropagation();
 
       var self = this;
 
@@ -113,8 +120,10 @@ foam.CLASS({
             });
         });
     },
-    function selected() {
+    function selected(e) {
       this.selection = this.data;
+      e.preventDefault();
+      e.stopPropagation();
     },
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
