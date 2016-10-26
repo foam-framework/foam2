@@ -839,6 +839,57 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Line',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    { class: 'Float', name: 'startX' },
+    { class: 'Float', name: 'startY' },
+    { class: 'Float', name: 'endX' },
+    { class: 'Float', name: 'endY' },
+    { class: 'Float', name: 'lineWidth', value: 1 },
+    { class: 'String', name: 'color', value: '#000' }
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      x.beginPath();
+      x.moveTo(this.startX, this.startY);
+      x.lineTo(this.endX, this.endY);
+      x.lineWidth = this.lineWidth;
+      x.strokeStyle = this.color;
+      x.stroke();
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Polygon',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    { class: 'Array', of: 'Float', name: 'xCoordinates' },
+    { class: 'Array', of: 'Float', name: 'yCoordinates' },
+    { class: 'String', name: 'color', value: '#000' },
+    { class: 'Float', name: 'lineWidth', value: 1 }
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      x.beginPath();
+      x.moveTo(this.xCoordinates[0], this.yCoordinates[0]);
+      for ( var i = 1; i < this.xCoordinates.length; i++ ) {
+        x.lineTo(this.xCoordinates[i], this.yCoordinates[i]);
+      }
+      x.lineWidth = this.lineWidth;
+      x.strokeStyle = this.color;
+      x.stroke();
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.graphics',
@@ -1156,3 +1207,15 @@ foam.CLASS({
     }
   ]
 });
+
+/*
+a : 1 // H scale
+b : 0 // V skew
+c : 3821.142407877334 // H move
+d : 0 // H skew
+e : 1 // V scale
+f : -6796.176219640322 // V move
+g : 0
+h : 0
+i : 1
+*/
