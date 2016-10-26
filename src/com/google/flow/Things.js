@@ -197,7 +197,7 @@ foam.CLASS({
 
         for ( var i = 0 ; i < this.rows ; i++ ) {
           for ( var j = 0 ; j < this.columns ; j++ ) {
-            var o = this.of$cls.create();
+            var o = this.of$cls.create(null, this.__subContext__);
             o.x = w  * j;
             o.y = h * i;
             this.add(o);
