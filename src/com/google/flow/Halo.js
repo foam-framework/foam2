@@ -217,7 +217,6 @@ foam.CLASS({
           this.originX = v.x-this.x;
           this.originY = v.y-this.y;
         } else {
-//          this.originX = this.originY = r + 3;
           this.x        = v.x-2*r-4;
           this.y        = v.y-2*r-4;
           this.width    = v.scaleX * v.width + 2 * ( r * 2 + 4 );
