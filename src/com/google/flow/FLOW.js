@@ -163,7 +163,8 @@ foam.CLASS({
     },
     {
       name: 'value',
-      view: { class: 'com.google.flow.ReactiveDetailView', showActions: true }
+//      view: { class: 'com.google.flow.ReactiveDetailView', showActions: true }
+      view: { class: 'foam.u2.DetailView', showActions: true }
     },
     {
       name: 'selected',
