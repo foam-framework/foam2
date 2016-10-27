@@ -1689,14 +1689,19 @@ foam.CLASS({
 });
 
 
-/*
 foam.CLASS({
   refines: 'foam.core.Color',
   properties: [
-    [ 'view', { class: 'foam.u2.TextField', type: 'color', onKey: true } ]
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.DualView',
+        viewa: 'foam.u2.TextField',
+        viewb: { class: 'foam.u2.view.ColorPicker', keyMode: true }
+      }
+    }
   ]
 });
-*/
 
 
 foam.CLASS({
