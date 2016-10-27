@@ -337,20 +337,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Color',
   extends: 'String',
-  label: 'Color',
-  properties: [
-    {
-      name: 'view',
-      value: {
-        class: 'foam.u2.view.DualView',
-        viewa: 'foam.u2.TextField',
-        viewb: {
-          class: 'foam.u2.view.ColorPicker',
-          onKeyMode: true
-        }
-      }
-    }
-  ]
+  label: 'Color'
 });
 
 
