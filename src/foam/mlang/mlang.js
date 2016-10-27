@@ -1089,7 +1089,16 @@ foam.CLASS({
     },
     {
       class: 'foam.pattern.progenitor.PerInstance',
+      name: 'srcOrder'
+    },
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
       name: 'next'
+    },
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'tags',
+      factory: function() { return {}; }
     },
   ],
   methods: [
@@ -1125,6 +1134,7 @@ foam.CLASS({
       code: function() {
         return foam.mlang.order.Direction.create().spawn({
           dir: 1,
+          srcOrder: this
         });
       },
       javaCode: 'return 1;'
@@ -1178,9 +1188,12 @@ foam.CLASS({
     {
       name: 'tailOrderDirection',
       code: function() {
-        return this.arg1.tailOrderDirection().reverse();
+        var ret = this.arg1.tailOrderDirection().reverse();
+        ret.srcOrder = this;
+        return ret;
       },
-      javaCode: 'return getArg1().tailOrderDirection().reverse();'
+      javaCode: 'Object ret = getArg1().tailOrderDirection().reverse();' +
+        'ret.setSrcOrder(this); return ret;'
     }
   ]
 });
@@ -1248,11 +1261,12 @@ foam.CLASS({
       code: function() {
         var ret = this.arg1.tailOrderDirection();
         ret.next = this.arg2.tailOrderDirection();
+        ret.srcOrder = this;
         return ret;
       },
       javaCode: 'Object ret = getArg1().tailOrderDirection();' +
         'ret.next = getArg2.tailOrderDirection();' +
-        'return ret;'
+        'ret.srcOrder = this; return ret;'
     }
   ]
 });

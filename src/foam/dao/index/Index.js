@@ -245,20 +245,45 @@ foam.CLASS({
       return this.instances[0].get(key);
     },
 
+    function getAltForOrderDirs(orderDirs) {
+      var instances = this.instances;
+      if ( ! orderDirs ) return instances[0];
+
+      var t;
+      if ( ! ( t = orderDirs.tags[this] ) ) {
+        t = orderDirs.tags[this] = instances[0];
+        var order = orderDirs.srcOrder;
+        for ( var i = 1 ; i < instances.length ; i++ ) {
+          if ( instances[i].isOrderSelectable(order) ) {
+            t = orderDirs.tags[this] = instances[i];
+            break;
+          }
+        }
+      }
+      return t;
+    },
+
     function select(sink, skip, limit, orderDirs, predicate) {
-      // scan goes straight to the ID index
-      return this.instances[0].select(sink, skip, limit, orderDirs, predicate);
+      // find and cache the correct subindex to use
+      this.getAltForOrderDirs(orderDirs)
+        .select(sink, skip, limit, orderDirs, predicate);
     },
     function selectReverse(sink, skip, limit, orderDirs, predicate) {
-      // scan goes straight to the ID index
-      return this.instances[0].selectReverse(sink, skip, limit, orderDirs, predicate);
+      // find and cache the correct subindex to use
+      this.getAltForOrderDirs(orderDirs)
+        .selectReverse(sink, skip, limit, orderDirs, predicate);
     },
 
     function isOrderSelectable(order) {
-      // NOTE: unless select() is implemented to handle ordering, can't return true
       // TODO: check delegates, cache which one can handle the ordering for
       //   use in select()
-      return order ? false : true;
+
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        if ( this.delegates[i].isOrderSelectable(order) ) {
+          return true;
+        }
+      }
+      return false;
     },
 
     function mapOver(fn, ofIndex) {
