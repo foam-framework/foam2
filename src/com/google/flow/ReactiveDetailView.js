@@ -65,7 +65,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'formula',
-      displayWidth: 50
+      displayWidth: 50,
+      postSet: function(_, f) {
+        if ( ! f ) this.reactive = false;
+      }
     },
     'prop',
     [ 'nodeName', 'tr' ]
@@ -85,7 +88,11 @@ foam.CLASS({
             add(' = ').
           end().
           start('td').cssClass(this.myCls('view')).add(
-            this.slot(function(reactive) { return reactive ? self.FORMULA : prop; }),
+              this.slot(function(reactive) {
+                return reactive ?
+                    self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__) :
+                    prop ;
+              }),
             prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
           end();
     }
