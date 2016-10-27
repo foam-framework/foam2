@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+// TODO: Should have a GUID 'id' instead of name, since now
+// you can't have two properties with the same name but
+// different parents.
 foam.CLASS({
   package: 'com.google.flow',
   name: 'Property',
