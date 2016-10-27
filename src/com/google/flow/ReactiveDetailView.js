@@ -29,14 +29,10 @@ foam.CLASS({
   name: 'DetailPropertyView',
   extends: 'foam.u2.DetailPropertyView',
 
-  properties: [
-    'prop',
-    [ 'nodeName', 'tr' ]
-  ],
-
-  templates: [
-    function CSS() {/*
-      .foam-u2-PropertyView-label {
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+      ^label {
         color: #444;
         display: block;
         float: left;
@@ -46,26 +42,52 @@ foam.CLASS({
         text-align: right;
         vertical-align: top;
       }
-      .foam-u2-PropertyView-units  {
+      ^switch { color: #ccc; }
+      ^ .reactive {
+        font-weight: 600;
+        color: red !important;
+      }
+      ^units  {
         color: #444;
         font-size: 12px;
         padding: 4px;
         text-align: right;
       }
-    */}
+      */}
+    })
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'reactive'
+    },
+    'prop',
+    [ 'nodeName', 'tr' ]
   ],
 
   methods: [
     function initE() {
       var prop = this.prop;
 
-      this.cssClass('foam-u2-PropertyView-').
-          start('td').cssClass('foam-u2-PropertyView-label').add(prop.label).end().
-          start('td').cssClass('foam-u2-PropertyView-label').add(' = ').end().
-          start('td').cssClass('foam-u2-PropertyView-view').add(
+      this.cssClass(this.myCls()).
+          start('td').cssClass(this.myCls('label')).add(prop.label).end().
+          start('td').
+            cssClass(this.myCls('switch')).
+            enableCls('reactive', this.reactive$).
+            on('click', this.toggleMode).
+            add(' = ').
+          end().
+          start('td').cssClass(this.myCls('view')).add(
               prop,
-              prop.units && this.E('span').cssClass('foam-u2-PropertyView-units').add(' ', prop.units)).
+              prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
           end();
+    }
+  ],
+
+  listeners: [
+    function toggleMode() {
+      this.reactive = ! this.reactive;
     }
   ]
 });
