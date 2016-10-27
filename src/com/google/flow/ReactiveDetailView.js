@@ -29,6 +29,8 @@ foam.CLASS({
   name: 'DetailPropertyView',
   extends: 'foam.u2.DetailPropertyView',
 
+  imports: [ 'data', 'requestAnimationFrame' ],
+
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
@@ -60,17 +62,34 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'reactive'
+      name: 'reactive',
+      postSet: function(_, r) {
+        if ( ! r ) {
+          this.clearFormula();
+        }
+      }
     },
     {
       class: 'String',
       name: 'formula',
       displayWidth: 50,
+      factory: function() {
+        return this.getFormula();
+      },
       postSet: function(_, f) {
-        if ( ! f ) this.reactive = false;
+        if ( ! f ) {
+          this.reactive = false;
+        } else {
+          this.reactive = true;
+          this.setFormula(f);
+        }
       }
     },
     'prop',
+    {
+      name: 'privateName',
+      factory: function() { return this.prop.name + 'Formula__'; }
+    },
     [ 'nodeName', 'tr' ]
   ],
 
@@ -78,6 +97,10 @@ foam.CLASS({
     function initE() {
       var prop = this.prop;
       var self = this;
+
+      this.data$.sub(function() {
+        self.formula = self.getFormula();
+      });
 
       this.cssClass(this.myCls()).
           start('td').cssClass(this.myCls('label')).add(prop.label).end().
@@ -95,6 +118,29 @@ foam.CLASS({
               }),
             prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
           end();
+    },
+
+    function setFormula(formula) {
+      var data = this.data;
+      var self = this;
+      var f = new Function('return ' + formula);
+      f.toString = function() { return formula; };
+      var timer = function() {
+        if ( data.isDestroyed() ) return;
+        if ( data.getPrivate_(self.privateName) !== f ) return;
+        data[self.prop.name] = f.call(data);
+        self.requestAnimationFrame(timer);
+      };
+      data.setPrivate_(this.privateName, f);
+      timer();
+    },
+
+    function getFormula() {
+      return this.data.getPrivate_(this.privateName);
+    },
+
+    function clearFormula() {
+      this.data.clearPrivate_(this.privateName);
     }
   ],
 
