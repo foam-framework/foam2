@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableSelection',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.mlang.predicate.False',
@@ -52,7 +54,7 @@ foam.CLASS({
     },
     'daoSub_',
     {
-      class: 'Class2',
+      class: 'Class',
       name: 'of',
       expression: function(data) { return data.of; }
     },
