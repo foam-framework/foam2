@@ -93,11 +93,16 @@ foam.CLASS({
 
         function onMouseMove(evt) {
           if ( ! this.view ) return;
+          console.log('move: ',evt.offsetX, evt.offsetY);
           this.callback(
             this.view,
             this.viewStart,
             evt.offsetX - this.mouseStartX,
-            evt.offsetY - this.mouseStartY);
+            evt.offsetY - this.mouseStartY,
+            evt.offsetX,
+            evt.offsetY,
+            this.mouseStartX,
+            this.mouseStartY);
         }
       ]
     }
@@ -153,16 +158,23 @@ foam.CLASS({
 
       this.add(
         this.haloBorder,
-          this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, dx, dy) {
-            // TODO: this assumes we're starting at 0 degrees, make work when we don't.
-            v.originX = v.width/2;
-            v.originY = v.height/2;
-            halo.originX = halo.width/2;
-            halo.originY = halo.height/2;
-            var x = dx;
-            var y = halo.height/2 + 26 - dy;
-            var startA = Math.atan2(y, x) - Math.PI/2;
-            v.rotation = vs.rotation + startA;
+        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, _, _, x, y, sx, sy) {
+          v.originX    = v.width/2;
+          v.originY    = v.height/2;
+          halo.originX = halo.width/2;
+          halo.originY = halo.height/2;
+
+          function toA(x, y) {
+            var dx = x-vs.x-halo.originX
+            var dy = y-v.y-halo.originY;
+            
+            return Math.atan2(dy, dx);
+          }
+
+          var startA = toA(sx, sy);
+          var a = toA(x, y);
+
+          v.rotation = vs.rotation + startA - a;
         }}),
         this.Anchor.create({x$: this.x1$, y$: this.y1$, callback: function(v, vs, dx, dy) {
           v.x      = vs.x + dx;
@@ -219,13 +231,15 @@ foam.CLASS({
         } else {
           this.x        = v.x-2*r-4;
           this.y        = v.y-2*r-4;
-          this.width    = v.scaleX * v.width + 2 * ( r * 2 + 4 );
+          this.width    = v.scaleX * v.width  + 2 * ( r * 2 + 4 );
           this.height   = v.scaleY * v.height + 2 * ( r * 2 + 4 );
+          this.originX  = v.originX+2*r+4
+          this.originY  = v.originY+2*r+4;
         }
 
         this.haloBorder.x      = r;
         this.haloBorder.y      = r;
-        this.haloBorder.width  = this.width - 2 * r;
+        this.haloBorder.width  = this.width  - 2 * r;
         this.haloBorder.height = this.height - 2 * r;
 
         this.rotation = v.rotation;
