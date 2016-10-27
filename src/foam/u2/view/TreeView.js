@@ -73,8 +73,9 @@ foam.CLASS({
         }, this.selection$, this.data$.dot('id'))).
         attrs({ draggable: 'true' }).
         start('span').
-          add(this.expanded$.map(function(v) { return v ? '-' : '+'; })).
           on('click', this.toggleExpanded).
+          add(this.expanded$.map(function(v) { return v ? '\u25BD' : '\u25B7'; })).
+          entity('nbsp').
         end().
         on('click', this.selected).
         on('dragstart', this.onDragStart).
