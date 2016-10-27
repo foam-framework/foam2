@@ -32,6 +32,7 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
 ^ { margin-left:4px; }
+^selected { outline: 2px solid #dddd00; }
 */}
     })
   ],
@@ -57,6 +58,12 @@ foam.CLASS({
       var self = this;
       this.
         cssClass(this.myCls()).
+        cssClass(this.slot(function(selected, id) {
+          if ( selected && foam.util.equals(selected.id, id) ) {
+            return this.myCls('selected');
+          }
+          return '';
+        }, this.selection$, this.data$.dot('id'))).
         attrs({ draggable: 'true' }).
         start('span').
           add(this.expanded$.map(function(v) { return v ? '-' : '+'; })).
