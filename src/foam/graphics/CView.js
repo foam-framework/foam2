@@ -835,7 +835,8 @@ foam.CLASS({
   properties: [
     {
       name: 'radius',
-      class: 'Float'
+      class: 'Float',
+      preSet: function(_, r) { return Math.max(0, r); }
     },
     {
       name: 'start',
