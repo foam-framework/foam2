@@ -274,7 +274,7 @@ foam.CLASS({
 
     /** AATree select takes the sub-ordering to pass to the tail index,
       since primary ordering is assumed to match this tree. */
-    function select(sink, skip, limit, order, predicate) {
+    function select(sink, skip, limit, orderDirs, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -282,24 +282,22 @@ foam.CLASS({
         return;
       }
 
-      // how to sort (select/selectReverse) the tail index
-      // 'order' is the sub-ordering for the tail, not including this
-      // tree's order.
-      var subSelectMode = this.subSelectMode;
-      if ( ! subSelectMode ) {
-        subSelectMode = this.subSelectMode =
-          ( order && order.arg1 && index.Desc.isInstance(order.arg1) ) ?
-            'selectReverse' : 'select';
+      this.left.select(sink, skip, limit, orderDirs, predicate);
+
+      if ( orderDirs && orderDirs.dir < 0 ) {
+        this.value.selectReverse(sink, skip, limit,
+          orderDirs && orderDirs.next, predicate);
+      } else {
+        this.value.select(sink, skip, limit,
+          orderDirs && orderDirs.next, predicate);
       }
 
-      this.left.select(sink, skip, limit, order, predicate);
-      this.value[subSelectMode](sink, skip, limit, order, predicate);
-      this.right.select(sink, skip, limit, order, predicate);
+      this.right.select(sink, skip, limit, orderDirs, predicate);
     },
 
     /** AATree selectReverse takes the sub-ordering to pass to the tail index,
       since primary ordering is assumed to match this tree. */
-    function selectReverse(sink, skip, limit, order, predicate) {
+    function selectReverse(sink, skip, limit, orderDirs, predicate) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -308,17 +306,17 @@ foam.CLASS({
         return;
       }
 
-      // how to sort (select/selectReverse) the tail index
-      var subSelectMode = this.subSelectMode;
-      if ( ! subSelectMode ) {
-        subSelectMode = this.subSelectMode =
-          ( order && order.arg1 && index.Desc.isInstance(order.arg1) ) ?
-            'selectReverse' : 'select';
+      this.right.selectReverse(sink, skip, limit, orderDirs, predicate);
+
+      if ( orderDirs && orderDirs.dir > 0 ) {
+        this.value.select(sink, skip, limit,
+          orderDirs && orderDirs.next, predicate);
+      } else {
+        this.value.selectReverse(sink, skip, limit,
+          orderDirs && orderDirs.next, predicate);
       }
 
-      this.right.selectReverse(sink, skip, limit, order, predicate);
-      this.value[subSelectMode](sink, skip, limit, order, predicate);
-      this.left.selectReverse(sink,  skip, limit, order, predicate);
+      this.left.selectReverse(sink,  skip, limit, orderDirs, predicate);
     },
 
     function gt(key, compare) {

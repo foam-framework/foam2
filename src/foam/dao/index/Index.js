@@ -106,12 +106,12 @@ foam.CLASS({
 
     function size() { return this.delegate.size(); },
 
-    function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(sink, skip, limit, order, predicate);
+    function select(sink, skip, limit, orderDirs, predicate) {
+      return this.delegate.select(sink, skip, limit, orderDirs, predicate);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
-      return this.delegate.selectReverse(sink, skip, limit, order, predicate);
+    function selectReverse(sink, skip, limit, orderDirs, predicate) {
+      return this.delegate.selectReverse(sink, skip, limit, orderDirs, predicate);
     },
 
     function isOrderSelectable(order) {
@@ -160,15 +160,15 @@ foam.CLASS({
     function mapOver(fn, ofIndex) { },
     function isOrderSelectable(order) { return true; },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select(sink, skip, limit, orderDirs, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;
       sink.put(this.value);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
-      this.select(sink, skip, limit, order, predicate);
+    function selectReverse(sink, skip, limit, orderDirs, predicate) {
+      this.select(sink, skip, limit, orderDirs, predicate);
     }
   ]
 });
@@ -245,13 +245,13 @@ foam.CLASS({
       return this.instances[0].get(key);
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select(sink, skip, limit, orderDirs, predicate) {
       // scan goes straight to the ID index
-      return this.instances[0].select(sink, skip, limit, order, predicate);
+      return this.instances[0].select(sink, skip, limit, orderDirs, predicate);
     },
-    function selectReverse(sink, skip, limit, order, predicate) {
+    function selectReverse(sink, skip, limit, orderDirs, predicate) {
       // scan goes straight to the ID index
-      return this.instances[0].selectReverse(sink, skip, limit, order, predicate);
+      return this.instances[0].selectReverse(sink, skip, limit, orderDirs, predicate);
     },
 
     function isOrderSelectable(order) {

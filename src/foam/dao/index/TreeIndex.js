@@ -206,18 +206,16 @@ foam.CLASS({
       }
     },
 
-    function select(sink, skip, limit, order, predicate) {
-      this.root.subSelectMode = 'select';
-      this.root.select(sink, skip, limit,
-        order ? order.tailOrder() : undefined, predicate);
-      this.root.subSelectMode = '';
+    function select(sink, skip, limit, orderDirs, predicate) {
+      // NOTE: orderDirs has already had this index's direction
+      //  removed, so orderDirs refers to the direction of the tail
+      //  select.
+      // TODO: consider consolidating Index.select/selectReverse
+      this.root.select(sink, skip, limit, orderDirs, predicate);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
-      this.root.subSelectMode = 'selectReverse';
-      this.root.selectReverse(sink, skip, limit,
-        order ? order.tailOrder() : undefined, predicate);
-      this.root.subSelectMode = '';
+    function selectReverse(sink, skip, limit, orderDirs, predicate) {
+      this.root.selectReverse(sink, skip, limit, orderDirs, predicate);
     },
 
     function size() { return this.root.size; },
@@ -388,14 +386,11 @@ foam.CLASS({
       var sortRequired = ! this.isOrderSelectable(order);
       var reverseSort = false;
 
-      var myOrder;
       var subOrder;
+      var orderDirections;
       if ( order && ! sortRequired ) {
-        myOrder = index.ThenBy.isInstance(order) ? order.arg1 : order;
-        if ( index.Desc.isInstance(myOrder) && myOrder.arg1 === prop ) {
-          // reverse-sort, sort not required
-          reverseSort = true;
-        }
+        orderDirections = order.tailOrderDirection();
+        if ( orderDirections.dir < 0 ) reverseSort = true;
       }
 
       if ( ! sortRequired ) {
@@ -429,8 +424,10 @@ foam.CLASS({
             index.selectCount++;
             subTree.subSelectMode = reverseSort ? 'selectReverse' : 'select';
             reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
-              subTree.selectReverse(sink, [skip], [limit], subOrder, predicate) :
-              subTree.select(sink, [skip], [limit], subOrder, predicate) ;
+              subTree.selectReverse(sink, [skip], [limit],
+                orderDirections && orderDirections.next, predicate) :
+              subTree.select(sink, [skip], [limit],
+                orderDirections && orderDirections.next, predicate) ;
             index.selectCount--;
           }
         },

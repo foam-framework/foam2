@@ -1085,6 +1085,21 @@ foam.CLASS({
       code: function() { return this; },
       javaCode: 'return this;'
     },
+    {
+      name: 'tailOrderDirection',
+      code: function() {
+        return { // TODO: model
+          dir: 1,
+          next: undefined,
+          reverse: function() {
+            this.dir *= -1;
+            this.next && this.next.reverse();
+            return this;
+          }
+        };
+      },
+      javaCode: 'return 1;'
+    }
   ]
 });
 
@@ -1131,6 +1146,13 @@ foam.CLASS({
       code: function() { return this.arg1; },
       javaCode: 'return getArg1();'
     },
+    {
+      name: 'tailOrderDirection',
+      code: function() {
+        return this.arg1.tailOrderDirection().reverse();
+      },
+      javaCode: 'return getArg1().tailOrderDirection().reverse();'
+    }
   ]
 });
 
@@ -1160,16 +1182,6 @@ foam.CLASS({
       },
       name: 'arg2'
     },
-    {
-      name: 'tailOrder',
-      code: function() { return this.arg2; },
-      javaCode: 'return getArg2();'
-    },
-    {
-      name: 'propertyOrdered',
-      code: function() { return this.arg1; },
-      javaCode: 'return getArg1();'
-    },
   ],
 
   methods: [
@@ -1191,6 +1203,27 @@ foam.CLASS({
       },
       javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
         '"," + getArg1().toString() + ")";'
+    },
+    {
+      name: 'tailOrder',
+      code: function() { return this.arg2; },
+      javaCode: 'return getArg2();'
+    },
+    {
+      name: 'propertyOrdered',
+      code: function() { return this.arg1; },
+      javaCode: 'return getArg1();'
+    },
+    {
+      name: 'tailOrderDirection',
+      code: function() {
+        var ret = this.arg1.tailOrderDirection();
+        ret.next = this.arg2.tailOrderDirection();
+        return ret;
+      },
+      javaCode: 'Object ret = getArg1().tailOrderDirection();' +
+        'ret.next = getArg2.tailOrderDirection();' +
+        'return ret;'
     }
   ]
 });
