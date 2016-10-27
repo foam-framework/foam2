@@ -246,11 +246,14 @@ foam.CLASS({
       if ( ! orderDirs ) return instances[0];
 
       var t = orderDirs.tags[this];
+      // if no cached index number, check our delegates for one
+      // that works with the given ordering
       if ( ! foam.Number.isInstance(t) ) {
         t = orderDirs.tags[this] = 0;
         var order = orderDirs.srcOrder;
-        for ( var i = 1 ; i < instances.length ; i++ ) {
-          if ( instances[i].isOrderSelectable(order) ) {
+        var delegates = this.delegates;
+        for ( var i = 1 ; i < delegates.length ; i++ ) {
+          if ( delegates[i].isOrderSelectable(order) ) {
             t = orderDirs.tags[this] = i;
             break;
           }
