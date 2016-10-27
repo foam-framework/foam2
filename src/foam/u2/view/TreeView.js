@@ -27,6 +27,7 @@ foam.CLASS({
   exports: [
     'data'
   ],
+
   imports: [
 
     'selection'
