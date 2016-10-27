@@ -111,7 +111,7 @@ foam.CLASS({
                 return sel === obj;
               }));
 
-      if ( this.selectionQuery ) {
+      if ( this.selectionQuery$ ) {
         var cb;
         e.start('td')
             .start(this.CheckBox).call(function() { cb = this; }).end()
@@ -219,7 +219,7 @@ foam.CLASS({
       this.nodeName = 'thead';
 
       var e = this.start('tr');
-      if ( this.selectionQuery ) {
+      if ( this.selectionQuery$ ) {
         e.start('td').end();
       }
 
