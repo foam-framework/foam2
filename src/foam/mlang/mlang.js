@@ -1058,17 +1058,52 @@ foam.INTERFACE({
       ]
     },
     {
-      /** Returns remaning ordering without the first one, which may be the only one. */
+      /** Returns remaning ordering without this first one, which may be the
+        only one. */
       name: 'tailOrder',
     },
     {
       /** The property, if any, sorted by this ordering. */
       name: 'propertyOrdered',
+    },
+    {
+      /** Returns a Direction indicating dir:1/-1 for ascending/descending,
+        and an optional next for sub-ordering. */
+      name: 'tailOrderDirection',
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'Direction',
+  axioms: [
+    foam.pattern.Progenitor.create(),
+    foam.pattern.Singleton.create()
+  ],
+  properties: [
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'dir',
+      value: 1
+    },
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'next'
+    },
+  ],
+  methods: [
+    {
+      name: 'reverse',
+      code: function() {
+        this.dir *= -1;
+        this.next && this.next.reverse();
+        return this;
+      }
+    }
+  ]
 
+});
 
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -1088,15 +1123,9 @@ foam.CLASS({
     {
       name: 'tailOrderDirection',
       code: function() {
-        return { // TODO: model
+        return foam.mlang.order.Direction.create().spawn({
           dir: 1,
-          next: undefined,
-          reverse: function() {
-            this.dir *= -1;
-            this.next && this.next.reverse();
-            return this;
-          }
-        };
+        });
       },
       javaCode: 'return 1;'
     }

@@ -390,6 +390,8 @@ foam.CLASS({
       var orderDirections;
       if ( order && ! sortRequired ) {
         orderDirections = order.tailOrderDirection();
+        // we manage the direction of the first scan directly
+        // and pass orderDirections.next to our tree
         if ( orderDirections.dir < 0 ) reverseSort = true;
       }
 
