@@ -19,22 +19,27 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'TreeViewRow',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.mlang.ExpressionsSingleton'
   ],
+
   exports: [
     'data'
   ],
   imports: [
+
     'selection'
   ],
+
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-^ { margin-left:4px; }
-*/}
+        ^ { margin-left:4px; }
+      */}
     })
   ],
+
   properties: [
     {
       name: 'data'
@@ -52,6 +57,7 @@ foam.CLASS({
       name: 'formatter'
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
@@ -82,11 +88,13 @@ foam.CLASS({
         }, this.expanded$));
     }
   ],
+
   listeners: [
     function onDragStart(e) {
       e.dataTransfer.setData('application/x-foam-obj-id', this.data.id);
       e.stopPropagation();
     },
+
     function onDragOver(e) {
       if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
         return;
@@ -99,6 +107,7 @@ foam.CLASS({
       e.preventDefault();
       e.stopPropagation();
     },
+
     function onDrop(e) {
       if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
         return;
@@ -121,11 +130,13 @@ foam.CLASS({
             });
         });
     },
+
     function selected(e) {
       this.selection = this.data;
       e.preventDefault();
       e.stopPropagation();
     },
+
     function toggleExpanded(e) {
       this.expanded = ! this.expanded;
       e.preventDefault();
@@ -134,17 +145,21 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TreeView',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.mlang.ExpressionsSingleton',
     'foam.u2.view.TreeViewRow'
   ],
+
   exports: [
     'selection'
   ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
@@ -161,6 +176,7 @@ foam.CLASS({
       name: 'formatter'
     }
   ],
+
   methods: [
     function initE() {
       var M = this.ExpressionsSingleton.create();
