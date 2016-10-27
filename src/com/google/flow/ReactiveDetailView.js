@@ -99,7 +99,7 @@ foam.CLASS({
       var self = this;
 
       this.data$.sub(function() {
-        self.formula = self.getFormula();
+        if ( self.data ) self.formula = self.getFormula();
       });
 
       this.cssClass(this.myCls()).
