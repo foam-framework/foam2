@@ -93,7 +93,6 @@ foam.CLASS({
 
         function onMouseMove(evt) {
           if ( ! this.view ) return;
-          console.log('move: ',evt.offsetX, evt.offsetY);
           this.callback(
             this.view,
             this.viewStart,
