@@ -62,6 +62,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'reactive'
     },
+    {
+      class: 'String',
+      name: 'formula',
+      displayWidth: 50
+    },
     'prop',
     [ 'nodeName', 'tr' ]
   ],
@@ -69,6 +74,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var prop = this.prop;
+      var self = this;
 
       this.cssClass(this.myCls()).
           start('td').cssClass(this.myCls('label')).add(prop.label).end().
@@ -79,8 +85,8 @@ foam.CLASS({
             add(' = ').
           end().
           start('td').cssClass(this.myCls('view')).add(
-              prop,
-              prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
+            this.slot(function(reactive) { return reactive ? self.FORMULA : prop; }),
+            prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
           end();
     }
   ],
