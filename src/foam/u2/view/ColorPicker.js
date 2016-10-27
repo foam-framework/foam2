@@ -320,7 +320,7 @@ foam.CLASS({
   methods: [
     function link() {
       var self = this;
-      this.attrSlot().relateTo(this.data$,
+      this.attrSlot(null, this.onKey ? 'input' : null).relateTo(this.data$,
         function(value) {
           if ( typeof value !== 'string' ) return value;
 
