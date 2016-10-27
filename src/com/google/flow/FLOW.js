@@ -84,7 +84,9 @@ foam.CLASS({
     'foam.u2.PopupView',
     'foam.u2.TableView',
     'foam.util.Timer',
-    'foam.u2.view.TreeView'
+    'foam.u2.view.TreeView',
+    'foam.input.Mouse',
+    'com.google.flow.DetailPropertyView'
   ],
 
   exports: [
@@ -161,6 +163,7 @@ foam.CLASS({
     },
     {
       name: 'value',
+//      view: { class: 'com.google.flow.ReactiveDetailView', showActions: true }
       view: { class: 'foam.u2.DetailView', showActions: true }
     },
     {
@@ -208,6 +211,11 @@ foam.CLASS({
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
+        var mouse = this.Mouse.create({target: this.canvas});
+        p = this.Property.create({name: 'mouse', value: mouse, parent: 'canvas1' });
+        mouse.setPrivate_('lpp_', p);
+        dao.put(p);
+
         return dao;
       }
     },
@@ -236,7 +244,7 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.properties.skip(3).removeAll();
+        this.properties.skip(4).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var p = m[i];
@@ -302,7 +310,7 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(3).select().then(function(s) {
+      this.properties.skip(4).select().then(function(s) {
         console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
         this.memento = foam.Array.clone(s.a);
