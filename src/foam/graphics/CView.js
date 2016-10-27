@@ -450,6 +450,7 @@ foam.CLASS({
     {
       name: 'alpha',
       class: 'Float',
+      view: { class: 'foam.u2.RangeView', maxValue: 1, step: 0.0001, onKey: true },
       value: 1
     },
     {
@@ -572,7 +573,7 @@ foam.CLASS({
           p2.x = p.x;
           p2.y = p.y;
           p2.w = p.w;
-          
+
           var c = this.children[i].findFirstChildAt(p2);
           if ( c ) return c;
         }
