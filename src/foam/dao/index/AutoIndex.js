@@ -96,6 +96,10 @@ foam.CLASS({
         return subEstimate() * arg2.f().length;
       }
 
+      // At this point we are going to scan all or part of the tree
+      //  with select() or selectReverse().
+      var cost = size;
+
       // These cases are just slightly better scans, but we can't estimate
       //   how much better...
       //       arg2 = isExprMatch(this.Gt);
@@ -103,19 +107,12 @@ foam.CLASS({
       //       arg2 = isExprMatch(this.Lt);
       //       arg2 = isExprMatch(this.Lte);
 
-      var cost = size;
-
       // Ordering
-      if ( order ) {
-        var ordProp = this.Property.isInstance(order) ? order : order.arg1;
-
-        // if sorting required, add the sort cost
-        if ( ordProp !== property ) {
-          if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
-        }
-
-        cost += tailFactory.estimate(size / nodeCount, sink, skip, limit,
-          order.tailOrder(), predicate);
+      // if sorting required, add the sort cost
+      if ( ! this.isOrderSelectable(order) ) {
+        // this index or a tail index can't sort this ordering,
+        // manual sort required
+        if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
       }
 
       return cost;
