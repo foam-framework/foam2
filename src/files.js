@@ -117,7 +117,6 @@ FOAM_FILES([
   { name: "foam/u2/TableView", flags: ['web'] },
   { name: "foam/u2/Scroller", flags: ['web'] },
   { name: "foam/u2/ActionView", flags: ['web'] },
-  { name: "foam/u2/PropertyView", flags: ['web'] },
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },
   { name: "foam/u2/tag/Image", flags: ['web'] },
