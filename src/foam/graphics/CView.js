@@ -402,9 +402,14 @@ foam.CLASS({
       name: 'height'
     },
     {
-      name: 'rotation',
       class: 'Float',
-      view: { class: 'foam.u2.RangeView', minValue: -Math.PI*2, maxValue: Math.PI*2, step: 0.01, onKey: true }
+      name: 'rotation',
+      preSet: function(_, r) {
+        if ( r > 2 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -2 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*2, maxValue: Math.PI*2, onKey: true }
     },
     {
       name: 'originX',
