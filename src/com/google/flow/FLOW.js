@@ -85,7 +85,8 @@ foam.CLASS({
     'foam.u2.TableView',
     'foam.util.Timer',
     'foam.u2.view.TreeView',
-    'foam.input.Mouse'
+    'foam.input.Mouse',
+    'com.google.flow.DetailPropertyView'
   ],
 
   exports: [
@@ -162,7 +163,7 @@ foam.CLASS({
     },
     {
       name: 'value',
-      view: { class: 'foam.u2.DetailView', showActions: true }
+      view: { class: 'com.google.flow.ReactiveDetailView', showActions: true }
     },
     {
       name: 'selected',
