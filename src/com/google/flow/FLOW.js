@@ -112,7 +112,7 @@ foam.CLASS({
       ^ .foam-u2-ActionView { margin: 10px; }
       ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
       .foam-u2-Tabs { padding-top: 0 !important; }
-      input[type="range"] { width: 150px; }
+      input[type="range"] { width: 150px; height: 15px; }
       input[type="color"] { width: 22px; }
       */}
     })
