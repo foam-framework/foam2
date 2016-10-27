@@ -946,8 +946,18 @@ foam.CLASS({
         Remove this Element from its parent Element.
         Will transition to UNLOADED state.
       */
-      // TODO: remove from parent
       this.state.remove.call(this);
+
+      if ( this.parentNode ) {
+        var cs = this.parentNode.childNodes;
+        for ( var i = 0 ; i < cs.length ; i++ ) {
+          if ( cs[i] === this ) {
+            cs.splice(i, 1);
+            return;
+          }
+        }
+        this.parentNode = undefined;
+      }
     },
 
     function addEventListener(topic, listener) {
