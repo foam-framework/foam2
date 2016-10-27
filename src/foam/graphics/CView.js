@@ -426,11 +426,13 @@ foam.CLASS({
     },
     {
       name: 'skewX',
-      class: 'Float'
+      class: 'Float',
+      hidden: true
     },
     {
       name: 'skewY',
-      class: 'Float'
+      class: 'Float',
+      hidden: true
     },
     {
       name: 'x',
