@@ -226,8 +226,8 @@ foam.CLASS({
       if ( ! order ) return true;
 
       // if this index can sort, it's up to our tail to sub-sort
-      if ( foam.util.equals(order.propertyOrdered(), this.prop) ) {
-        return this.tailFactory.isOrderSelectable(order.tailOrder());
+      if ( foam.util.equals(order.orderPrimaryProperty(), this.prop) ) {
+        return this.tailFactory.isOrderSelectable(order.orderTail());
       }
       // can't use select() with the given ordering
       return false;
@@ -386,7 +386,7 @@ foam.CLASS({
       var subOrder;
       var orderDirections;
       if ( order && ! sortRequired ) {
-        orderDirections = order.tailOrderDirection();
+        orderDirections = order.orderDirection();
         // we manage the direction of the first scan directly
         // and pass orderDirections.next to our tree
         if ( orderDirections.dir < 0 ) reverseSort = true;

@@ -1060,16 +1060,16 @@ foam.INTERFACE({
     {
       /** Returns remaning ordering without this first one, which may be the
         only one. */
-      name: 'tailOrder',
+      name: 'orderTail',
     },
     {
       /** The property, if any, sorted by this ordering. */
-      name: 'propertyOrdered',
+      name: 'orderPrimaryProperty',
     },
     {
       /** Returns a Direction indicating dir:1/-1 for ascending/descending,
         and an optional next for sub-ordering. */
-      name: 'tailOrderDirection',
+      name: 'orderDirection',
     }
   ]
 });
@@ -1120,17 +1120,17 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'tailOrder',
+      name: 'orderTail',
       code: function() { return; },
       javaCode: 'return null;'
     },
     {
-      name: 'propertyOrdered',
+      name: 'orderPrimaryProperty',
       code: function() { return this; },
       javaCode: 'return this;'
     },
     {
-      name: 'tailOrderDirection',
+      name: 'orderDirection',
       code: function() {
         return foam.mlang.order.Direction.create().spawn({
           dir: 1,
@@ -1176,23 +1176,23 @@ foam.CLASS({
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     },
     {
-      name: 'tailOrder',
+      name: 'orderTail',
       code: function() { return; },
       javaCode: 'return null;'
     },
     {
-      name: 'propertyOrdered',
+      name: 'orderPrimaryProperty',
       code: function() { return this.arg1; },
       javaCode: 'return getArg1();'
     },
     {
-      name: 'tailOrderDirection',
+      name: 'orderDirection',
       code: function() {
-        var ret = this.arg1.tailOrderDirection().reverse();
+        var ret = this.arg1.orderDirection().reverse();
         ret.srcOrder = this;
         return ret;
       },
-      javaCode: 'Object ret = getArg1().tailOrderDirection().reverse();' +
+      javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
         'ret.setSrcOrder(this); return ret;'
     }
   ]
@@ -1247,25 +1247,25 @@ foam.CLASS({
         '"," + getArg1().toString() + ")";'
     },
     {
-      name: 'tailOrder',
+      name: 'orderTail',
       code: function() { return this.arg2; },
       javaCode: 'return getArg2();'
     },
     {
-      name: 'propertyOrdered',
+      name: 'orderPrimaryProperty',
       code: function() { return this.arg1; },
       javaCode: 'return getArg1();'
     },
     {
-      name: 'tailOrderDirection',
+      name: 'orderDirection',
       code: function() {
-        var ret = this.arg1.tailOrderDirection();
-        ret.next = this.arg2.tailOrderDirection();
+        var ret = this.arg1.orderDirection();
+        ret.next = this.arg2.orderDirection();
         ret.srcOrder = this;
         return ret;
       },
-      javaCode: 'Object ret = getArg1().tailOrderDirection();' +
-        'ret.next = getArg2.tailOrderDirection();' +
+      javaCode: 'Object ret = getArg1().orderDirection();' +
+        'ret.next = getArg2.orderDirection();' +
         'ret.srcOrder = this; return ret;'
     }
   ]

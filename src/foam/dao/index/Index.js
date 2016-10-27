@@ -53,7 +53,7 @@ foam.CLASS({
     /** Selects matching items from the index and puts them into sink.
 
       <p>Note: orderDirs has replaced selectReverse().
-      myOrder.tailOrderDirection() will provide an orderDirs object for
+      myOrder.orderDirection() will provide an orderDirs object for
       a given foam.mlang.order.Comparator. */
     function select(/*sink, skip, limit, orderDirs, predicate*/) { },
 
