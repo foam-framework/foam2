@@ -259,4 +259,53 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.input',
+  name: 'Mouse',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'x'
+    },
+    {
+      class: 'Int',
+      name: 'y'
+    },
+    {
+      name: 'target',
+      hidden: true
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      
+      // TODO: there should be an easier way to do this
+      if ( this.target.canvas ) {
+        this.onInit();
+      } else {
+        this.target.propertyChange.sub('canvas', this.onInit);
+      }
+    }
+  ],
+
+  listeners: [
+    function onInit(s) {
+      if ( s ) s.destroy();
+      this.target.canvas.on('mousemove', this.onMouseMove);
+    },
+    {
+      name: 'onMouseMove',
+      isFramed: true,
+      code: function(evt) {
+        this.x = evt.offsetX;
+        this.y = evt.offsetY;
+      }
+    }
+  ]
+});
+
 // foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
