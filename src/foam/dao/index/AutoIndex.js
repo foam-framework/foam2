@@ -97,7 +97,7 @@ foam.CLASS({
       }
 
       // At this point we are going to scan all or part of the tree
-      //  with select() or selectReverse().
+      //  with select()
       var cost = size;
 
       // These cases are just slightly better scans, but we can't estimate

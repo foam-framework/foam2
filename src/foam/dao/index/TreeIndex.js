@@ -207,15 +207,12 @@ foam.CLASS({
     },
 
     function select(sink, skip, limit, orderDirs, predicate) {
-      // NOTE: orderDirs has already had this index's direction
-      //  removed, so orderDirs refers to the direction of the tail
-      //  select.
-      // TODO: consider consolidating Index.select/selectReverse
-      this.root.select(sink, skip, limit, orderDirs, predicate);
-    },
-
-    function selectReverse(sink, skip, limit, orderDirs, predicate) {
-      this.root.selectReverse(sink, skip, limit, orderDirs, predicate);
+      // AATree node will extract orderDirs.next for the tail index
+      if ( orderDirs && orderDirs.dir < 0 ) {
+        this.root.selectReverse(sink, skip, limit, orderDirs, predicate);
+      } else {
+        this.root.select(sink, skip, limit, orderDirs, predicate);
+      }
     },
 
     function size() { return this.root.size; },
@@ -232,7 +229,7 @@ foam.CLASS({
       if ( foam.util.equals(order.propertyOrdered(), this.prop) ) {
         return this.tailFactory.isOrderSelectable(order.tailOrder());
       }
-      // can't use select()/selectReverse() with the given ordering
+      // can't use select() with the given ordering
       return false;
     },
 
@@ -424,12 +421,12 @@ foam.CLASS({
               sink.put(a[i]);
           } else {
             index.selectCount++;
-            subTree.subSelectMode = reverseSort ? 'selectReverse' : 'select';
-            reverseSort ? // Note: pass skip and limit by reference, as they are modified in place
+            // Note: pass skip and limit by reference, as they are modified in place
+            reverseSort ?
               subTree.selectReverse(sink, [skip], [limit],
-                orderDirections && orderDirections.next, predicate) :
+                orderDirections, predicate) :
               subTree.select(sink, [skip], [limit],
-                orderDirections && orderDirections.next, predicate) ;
+                orderDirections, predicate) ;
             index.selectCount--;
           }
         },

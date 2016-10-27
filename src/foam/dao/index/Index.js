@@ -50,16 +50,16 @@ foam.CLASS({
     /** @return the integer size of this index. */
     function size() {},
 
-    /** Selects matching items from the index and puts them into sink */
-    function select(/*sink, skip, limit, order, predicate*/) { },
+    /** Selects matching items from the index and puts them into sink.
+
+      <p>Note: orderDirs has replaced selectReverse().
+      myOrder.tailOrderDirection() will provide an orderDirs object for
+      a given foam.mlang.order.Comparator. */
+    function select(/*sink, skip, limit, orderDirs, predicate*/) { },
 
     /** Returns true if the given ordering will be respected by a
-      select()/selectReverse() on this index. */
+      select() on this index. */
     function isOrderSelectable(/*order*/) { },
-
-    /** Selects matching items in reverse order from the index and puts
-      them into sink */
-    function selectReverse(/*sink, skip, limit, order, predicate*/) { },
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},
@@ -108,10 +108,6 @@ foam.CLASS({
 
     function select(sink, skip, limit, orderDirs, predicate) {
       return this.delegate.select(sink, skip, limit, orderDirs, predicate);
-    },
-
-    function selectReverse(sink, skip, limit, orderDirs, predicate) {
-      return this.delegate.selectReverse(sink, skip, limit, orderDirs, predicate);
     },
 
     function isOrderSelectable(order) {
@@ -249,29 +245,24 @@ foam.CLASS({
       var instances = this.instances;
       if ( ! orderDirs ) return instances[0];
 
-      var t;
-      if ( ! ( t = orderDirs.tags[this] ) ) {
-        t = orderDirs.tags[this] = instances[0];
+      var t = orderDirs.tags[this];
+      if ( ! foam.Number.isInstance(t) ) {
+        t = orderDirs.tags[this] = 0;
         var order = orderDirs.srcOrder;
         for ( var i = 1 ; i < instances.length ; i++ ) {
           if ( instances[i].isOrderSelectable(order) ) {
-            t = orderDirs.tags[this] = instances[i];
+            t = orderDirs.tags[this] = i;
             break;
           }
         }
       }
-      return t;
+      return instances[t];
     },
 
     function select(sink, skip, limit, orderDirs, predicate) {
       // find and cache the correct subindex to use
       this.getAltForOrderDirs(orderDirs)
         .select(sink, skip, limit, orderDirs, predicate);
-    },
-    function selectReverse(sink, skip, limit, orderDirs, predicate) {
-      // find and cache the correct subindex to use
-      this.getAltForOrderDirs(orderDirs)
-        .selectReverse(sink, skip, limit, orderDirs, predicate);
     },
 
     function isOrderSelectable(order) {

@@ -284,13 +284,8 @@ foam.CLASS({
 
       this.left.select(sink, skip, limit, orderDirs, predicate);
 
-      if ( orderDirs && orderDirs.dir < 0 ) {
-        this.value.selectReverse(sink, skip, limit,
-          orderDirs && orderDirs.next, predicate);
-      } else {
-        this.value.select(sink, skip, limit,
-          orderDirs && orderDirs.next, predicate);
-      }
+      this.value.select(sink, skip, limit,
+        orderDirs && orderDirs.next, predicate);
 
       this.right.select(sink, skip, limit, orderDirs, predicate);
     },
@@ -308,13 +303,9 @@ foam.CLASS({
 
       this.right.selectReverse(sink, skip, limit, orderDirs, predicate);
 
-      if ( orderDirs && orderDirs.dir > 0 ) {
-        this.value.select(sink, skip, limit,
-          orderDirs && orderDirs.next, predicate);
-      } else {
-        this.value.selectReverse(sink, skip, limit,
-          orderDirs && orderDirs.next, predicate);
-      }
+      // select() will pick reverse or not based on orderDirs
+      this.value.select(sink, skip, limit,
+        orderDirs && orderDirs.next, predicate);
 
       this.left.selectReverse(sink,  skip, limit, orderDirs, predicate);
     },
