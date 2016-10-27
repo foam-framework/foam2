@@ -421,6 +421,103 @@ describe('TreeIndex', function() {
 
   });
 
+  it('orders scans', function() {
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.STRING,
+      tailFactory: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.INT,
+        tailFactory: foam.dao.index.ValueIndex.create()
+      })
+    }).spawn();
+    idx.bulkLoad(data);
+
+    var order = m.THEN_BY(test.Indexable.STRING, test.Indexable.INT);
+
+    plan = idx.plan(sink, undefined, undefined, order);
+
+    plan.execute([], sink, undefined, undefined, order);
+
+    expect(sink.a.length).toEqual(20);
+    expect(sink.a[0].int).toEqual(0);
+    expect(sink.a[1].int).toEqual(5);
+    expect(sink.a[2].int).toEqual(10);
+    expect(sink.a[3].int).toEqual(15);
+
+    expect(sink.a[4].int).toEqual(1);
+    expect(sink.a[5].int).toEqual(6);
+    expect(sink.a[6].int).toEqual(11);
+    expect(sink.a[7].int).toEqual(16);
+
+    expect(sink.a[8].int).toEqual(2);
+    expect(sink.a[9].int).toEqual(7);
+    expect(sink.a[10].int).toEqual(12);
+    expect(sink.a[11].int).toEqual(17);
+
+    expect(sink.a[12].int).toEqual(3);
+    expect(sink.a[13].int).toEqual(8);
+    expect(sink.a[14].int).toEqual(13);
+    expect(sink.a[15].int).toEqual(18);
+
+    expect(sink.a[16].int).toEqual(4);
+    expect(sink.a[17].int).toEqual(9);
+    expect(sink.a[18].int).toEqual(14);
+    expect(sink.a[19].int).toEqual(19);
+  });
+
+  it('orders reverse scans', function() {
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.STRING,
+      tailFactory: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.INT,
+        tailFactory: foam.dao.index.ValueIndex.create()
+      })
+    }).spawn();
+    idx.bulkLoad(data);
+
+    var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
+
+    plan = idx.plan(sink, undefined, undefined, order);
+
+    plan.execute([], sink, undefined, undefined, order);
+
+    // string is generated in groups of 5, so sort by string
+    // then reverse sort int will have reversed groups of 5
+    // ints
+    expect(sink.a.length).toEqual(20);
+
+
+    expect(sink.a[0].string).toEqual('hello0');
+    expect(sink.a[0].int).toEqual(15);
+    expect(sink.a[1].int).toEqual(10);
+    expect(sink.a[2].int).toEqual(5);
+    expect(sink.a[3].int).toEqual(0);
+
+    expect(sink.a[4].string).toEqual('hello1');
+    expect(sink.a[4].int).toEqual(16);
+    expect(sink.a[5].int).toEqual(11);
+    expect(sink.a[6].int).toEqual(6);
+    expect(sink.a[7].int).toEqual(1);
+
+    expect(sink.a[8].string).toEqual('hello2');
+    expect(sink.a[8].int).toEqual(17);
+    expect(sink.a[9].int).toEqual(12);
+    expect(sink.a[10].int).toEqual(7);
+    expect(sink.a[11].int).toEqual(2);
+
+    expect(sink.a[12].string).toEqual('hello3');
+    expect(sink.a[12].int).toEqual(18);
+    expect(sink.a[13].int).toEqual(13);
+    expect(sink.a[14].int).toEqual(8);
+    expect(sink.a[15].int).toEqual(3);
+
+    expect(sink.a[16].string).toEqual('hello4');
+    expect(sink.a[16].int).toEqual(19);
+    expect(sink.a[17].int).toEqual(14);
+    expect(sink.a[18].int).toEqual(9);
+    expect(sink.a[19].int).toEqual(4);
+
+
+  });
 
 //   it('optimizes True', function() {
 //     // not a valid case
@@ -662,7 +759,7 @@ describe('AND', function() {
 
   });
 
-  it('orders subindexes by cost estimate', function() {
+  it('chains subindexes by cost estimate', function() {
     var and = m.AND(
       m.GT(test.Indexable.INT, 5),
       m.EQ(test.Indexable.FLOAT, 5),
