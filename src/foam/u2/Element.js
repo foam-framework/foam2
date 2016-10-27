@@ -1609,7 +1609,6 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   requires: [
-    'foam.u2.PropertyView',
     'foam.u2.TextField'
   ],
 
