@@ -805,7 +805,8 @@ foam.CLASS({
     },
     {
       class: 'Float',
-      name: 'borderWidth'
+      name: 'borderWidth',
+      value: 1
     },
     {
       name: 'border',
@@ -817,7 +818,7 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.rect(0, 0, this.width, this.height);
-      if ( this.border ) {
+      if ( this.border && this.borderWidth ) {
         x.lineWidth = this.borderWidth;
         x.stroke();
       }
