@@ -347,31 +347,38 @@ foam.CLASS({
     {
       name: 'width',
       value: 1,
-      postSet: function(_, w) {
-        this.originX = w/2;
-      }
+      hidden: true,
+      preSet: function() { return 1; }
     },
     {
       name: 'height',
-      value: 50,
-      postSet: function(_, h) {
-        this.originY = h/2;
-      }
+      value: 50
     },
     [ 'mass', 0 ],
     [ 'gravity', 0 ],
+    [ 'border', '#444444' ],
     {
       name: 'circle',
       hidden: true,
       factory: function() {
-        return this.Circle.create({color: 'green', radius: 10});
+        return this.Circle.create({
+          alpha: 0.8,
+          border: null,
+          color: 'green',
+          radius: 10
+        });
       }
     },
     {
       name: 'text',
       hidden: true,
       factory: function() {
-        return this.Label.create({x:-5, y:-5, color: 'white', text$: this.count$});
+        return this.Label.create({
+          align: 'center',
+          y:-7,
+          color: 'white',
+          text$: this.count$
+        });
       }
     },
   ],
@@ -381,7 +388,9 @@ foam.CLASS({
       this.add(this.circle);
       this.circle.add(this.text);
     },
-    function paintSelf(x) {
+    function paint(x) {
+      this.originX = this.width/2;
+      this.originY = this.height/2;
       this.circle.x = this.width/2;
       this.circle.y = this.height/2;
       this.circle.rotation = - this.rotation;
