@@ -136,6 +136,9 @@ foam.CLASS({
     },
 
     function collide(c1, c2) {
+      c1.collideWith && c1.collideWith(c2);
+      c2.collideWith && c2.collideWith(c1);
+
       if ( ! c1.mass || ! c2.mass ) return;
 
       var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);
