@@ -195,13 +195,6 @@ foam.CLASS({
             start('span').add(com.google.flow.Property.DELETE_ROW).end();
         }
       },
-      xview: {
-        class: 'foam.u2.TableView',
-        columns: [
-          com.google.flow.Property.NAME,
-          com.google.flow.Property.DELETE_ROW
-        ]
-      },
       factory: function() {
         var dao = foam.dao.EasyDAO.create({
           of: 'com.google.flow.Property',
