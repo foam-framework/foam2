@@ -186,10 +186,11 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.TreeView',
         relationship: relationship,
+        startExpanded: true,
         formatter: function() {
           var X = this.__subSubContext__;
           this.start('span').add(X.data.name).end().
-            start('span').nbsp().style({ display: 'inline-block', width: '30px' }).end().
+            start('span').nbsp().style({ display: 'inline-block', width: '50px' }).end().
             start('span').add(com.google.flow.Property.DELETE_ROW).end();
         }
       },
