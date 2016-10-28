@@ -95,7 +95,8 @@ foam.CLASS({
   exports: [
     'timer',
     'as data',
-    'properties'
+    'properties',
+    'scope'
   ],
 
   axioms: [
@@ -122,6 +123,11 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'scope',
+      factory: function() { return {a:42}; },
+      documentation: 'Scope to run reactive formulas in.'
+    },
     {
       name: 'physics',
       factory: function() {
@@ -219,6 +225,11 @@ foam.CLASS({
         p = this.Property.create({name: 'mouse', value: mouse, parent: 'canvas1' });
         mouse.setPrivate_('lpp_', p);
         dao.put(p);
+
+        this.scope.canvas1 = this.canvas;
+        this.scope.physics = this.physics;
+        this.scope.timer   = this.timer;
+        this.scope.mouse   = mouse;
 
         return dao;
       }
@@ -326,6 +337,9 @@ foam.CLASS({
   listeners: [
     function onPropertyPut(_, _, _, p) {
       var o = p.value;
+
+      this.scope[p.name] = p.value;
+      console.log('adding: ', p.name);
       if ( this.CView.isInstance(o) ) {
         if ( ! p.parent ) {
           this.canvas.add(o);
@@ -344,9 +358,9 @@ foam.CLASS({
     function onPropertyRemove(_, _, _, p) {
       var o = p.value;
 
-      if ( p === this.selected ) {
-        this.selected = null;
-      }
+      delete this.scope[p.name];
+
+      if ( p === this.selected ) this.selected = null;
 
       if ( this.CView.isInstance(o) ) {
         if ( ! p.parent ) {
