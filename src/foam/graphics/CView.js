@@ -726,7 +726,7 @@ foam.CLASS({
         return ! (
             this.x + this.width  < c.x - c.radius ||
             this.y + this.height < c.y - c.radius ||
-            c.x    + c.radius    < this.x ||
+            c.x    + c.radius    < this.x         ||
             c.y    + c.radius    < this.y );
       }
       return ! (
