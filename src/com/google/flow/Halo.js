@@ -134,7 +134,15 @@ foam.CLASS({
 
         this.parent && this.parent.remove(this);
 
-        if ( n && n.value && foam.graphics.CView.isInstance(n.value) && ( n.value.radius || n.value.width || n.value.height ) ) {
+        if (
+            n && n.value &&
+            // Avoid selecting non CViews
+            foam.graphics.CView.isInstance(n.value) &&
+            // Avoid selecting top-level 'canvas' objects
+            n.value.parent &&
+            // Avoid selecting zero-size objects like Cursor
+           ( n.value.radius || n.value.width || n.value.height )
+        ) {
           var v = n.value;
           v.add(this);
           this.alpha = 1;
