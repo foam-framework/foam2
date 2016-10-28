@@ -249,7 +249,6 @@ foam.CLASS({
 
       var halo = this.Halo.create();
       halo.selected$.linkFrom(this.selected$);
-      this.canvas.add(halo);
 
       this.memento$.sub(function() {
         var m = this.memento;
