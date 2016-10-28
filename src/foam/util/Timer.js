@@ -99,7 +99,7 @@ foam.CLASS({
          cycle(frequency, amplitude)  - cycle between -amplitude and amplitude frequency times a second
          cycle(frequency, start, end) - cycle between start and end frequency times a second
       */
-      var s = Math.sin(this.time/1000/frequency*Math.PI*2);
+      var s = Math.sin(this.time/1000*frequency*Math.PI*2);
       if ( arguments.length === 1 ) return s;
       if ( arguments.length === 2 ) return s * a;
       return a + (1 + s) * (b-a)/2;
