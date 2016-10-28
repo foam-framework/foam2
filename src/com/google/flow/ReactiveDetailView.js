@@ -103,7 +103,10 @@ foam.CLASS({
       var self = this;
 
       this.data$.sub(function() {
-        if ( self.data ) self.formula = self.getFormula();
+        if ( self.data ) {
+          var f = self.getFormula();
+          self.formula = f ? f.toString() : '';
+        }
       });
 
       this.cssClass(this.myCls()).
