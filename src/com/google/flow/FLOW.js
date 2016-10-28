@@ -363,7 +363,7 @@ foam.CLASS({
       if ( p === this.selected ) this.selected = null;
 
       if ( this.CView.isInstance(o) ) {
-        if ( ! p.parent ) {
+        if ( ! p.parent || p.parent === 'canvas1' ) {
           this.canvas.remove(o);
 
           if ( this.Physical.isInstance(o) ) {
