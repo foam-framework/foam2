@@ -887,6 +887,8 @@ foam.CLASS({
       return foam.String.constantize(this.cls_.name) +
           '(' + this.arg1.toString() + ')';
     },
+    /*
+      TODO: this isn't ported to FOAM2 yet.
     function partialEval() {
       return this;
       var newArg = this.arg1.partialEval();
@@ -902,7 +904,7 @@ foam.CLASS({
       if ( GteExpr.isInstance(newArg) ) return LtExpr.create(newArg);
 
       return this.arg1 === newArg ? this : NOT(newArg);
-    }
+    }*/
   ]
 });
 

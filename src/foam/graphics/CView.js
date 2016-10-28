@@ -402,8 +402,14 @@ foam.CLASS({
       name: 'height'
     },
     {
+      class: 'Float',
       name: 'rotation',
-      class: 'Float'
+      preSet: function(_, r) {
+        if ( r > 2 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -2 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*2, maxValue: Math.PI*2, onKey: true }
     },
     {
       name: 'originX',
@@ -425,11 +431,13 @@ foam.CLASS({
     },
     {
       name: 'skewX',
-      class: 'Float'
+      class: 'Float',
+      hidden: true
     },
     {
       name: 'skewY',
-      class: 'Float'
+      class: 'Float',
+      hidden: true
     },
     {
       name: 'x',
@@ -442,6 +450,7 @@ foam.CLASS({
     {
       name: 'alpha',
       class: 'Float',
+      view: { class: 'foam.u2.RangeView', maxValue: 1, step: 0.0001, onKey: true },
       value: 1
     },
     {
@@ -472,7 +481,8 @@ foam.CLASS({
     },
     {
       name: 'state',
-      value: 'initial'
+      value: 'initial',
+      hidden: 'true'
     },
     {
       name: 'parent',
@@ -493,7 +503,7 @@ foam.CLASS({
       getter: function getTransform() {
         var t = this.transform_.reset();
 
-        t.translate(this.x, this.y);
+        t.translate(this.x+this.originX, this.y+this.originY);
         t.rotate(this.rotation);
         t.skew(this.skewX, this.skewY);
         t.scale(this.scaleX, this.scaleY);
@@ -533,13 +543,16 @@ foam.CLASS({
       this.invalidate_ && this.invalidate_();
     },
 
-    function toLocalCoordinates(p) {
-      if ( this.parent ) this.parent.toLocalCoordinates(p);
-
+    function parentToLocalCoordinates(p) {
       this.transform.invert().mulP(p);
       p.x /= p.w;
       p.y /= p.w;
       p.w = 1;
+    },
+
+    function globalToLocalCoordinates(p) {
+      if ( this.parent ) this.parent.globalToLocalCoordinates(p);
+      this.parentToLocalCoordinates(p);
     },
 
     function findFirstChildAt(p) {
@@ -551,26 +564,28 @@ foam.CLASS({
         p = tmp;
       }
 
-      this.toLocalCoordinates(p);
+      this.parentToLocalCoordinates(p);
 
-      var p2 = foam.graphics.Point.create();
+      if ( this.children.length ) {
+        var p2 = foam.graphics.Point.create();
 
-      for ( var i = 0 ; i < this.children.length ; i++ ) {
-        p2.x = p.x;
-        p2.y = p.y;
-        p2.w = p.w;
+        for ( var i = 0 ; i < this.children.length ; i++ ) {
+          p2.x = p.x;
+          p2.y = p.y;
+          p2.w = p.w;
 
-        var c = this.children[i].findFirstChildAt(p2);
-        if ( c ) return c;
+          var c = this.children[i].findFirstChildAt(p2);
+          if ( c ) return c;
+        }
       }
 
-      if ( this.hitTest(p) ) {
-        return this;
-      }
+      if ( this.hitTest(p) ) return this;
     },
 
     // p must be in local coordinates.
-    function hitTest(p) {},
+    function hitTest(p) {
+      return p.x >= 0 && p.y >= 0 && p.x < this.width && p.y < this.height;
+    },
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
@@ -641,6 +656,14 @@ foam.CLASS({
       }
     },
 
+    function removeAllChildren() {
+      var children = this.children;
+      this.children = [];
+      for ( var i = 0 ; i < children.length ; i++ ) {
+        this.removeChild_(children[i]);
+      }
+    },
+
     function removeChild(c) {
       console.log('Deprecated use of CView.removeChild(). Use .remove() instead.');
       this.remove(c);
@@ -685,8 +708,8 @@ foam.CLASS({
 
     function toE(X) {
       return this.Canvas.create({ cview: this }, X).attrs({
-        width: this.x + this.width,
-        height: this.y + this.height
+        width:  this.slot(function(x, width,  scaleX) { return x + width*scaleX; }),
+        height: this.slot(function(y, height, scaleY) { return y + height*scaleY; })
       });
     },
 
@@ -703,7 +726,9 @@ foam.CLASS({
           this.y + this.height < c.y ||
           c.x    + c.width  < this.x ||
           c.y    + c.height < this.y );
-    }
+    },
+
+    function equals(b) { return this === b; }
   ]
 });
 
@@ -779,6 +804,11 @@ foam.CLASS({
       name: 'height'
     },
     {
+      class: 'Float',
+      name: 'borderWidth',
+      value: 1
+    },
+    {
       name: 'border',
       value: '#000000'
     }
@@ -788,7 +818,10 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.rect(0, 0, this.width, this.height);
-      if ( this.border ) x.stroke();
+      if ( this.border && this.borderWidth ) {
+        x.lineWidth = this.borderWidth;
+        x.stroke();
+      }
       if ( this.color  ) x.fill();
     }
   ]
@@ -803,7 +836,8 @@ foam.CLASS({
   properties: [
     {
       name: 'radius',
-      class: 'Float'
+      class: 'Float',
+      preSet: function(_, r) { return Math.max(0, r); }
     },
     {
       name: 'start',
@@ -854,11 +888,13 @@ foam.CLASS({
   properties: [
     {
       name: 'start',
-      value: 0
+      value: 0,
+      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
     },
     {
       name: 'end',
-      value: 2*Math.PI
+      value: 2*Math.PI,
+      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
     }
   ],
 
@@ -985,14 +1021,14 @@ foam.CLASS({
       isFramed: true,
       code: function paintCanvas() {
         // Only paint after being loaded
-        if ( this.state !== this.LOADED ) return;
+        if ( this.state !== this.LOADED || ! this.cview ) return;
 
-        var context = this.cview.paint3D ? this.context3D : this.context;
-        this.erase(context);
-
-        if ( this.cview ) {
-          if ( this.cview.paint3D ) this.cview.paint3D(context);
-          else this.cview.paint(context);
+        var ctx = this.cview.paint3D ? this.context3D : this.context;
+        this.erase(ctx);
+        if ( this.cview.paint3D ) {
+          this.cview.paint3D(ctx);
+        } else {
+          this.cview.paint(ctx);
         }
       }
     }
@@ -1044,11 +1080,10 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   properties: [
-    'width',
-    'height',
     {
       class: 'String',
-      name:  'text'
+      name:  'text',
+      view: { class: 'foam.u2.TextField', onKey: true }
     },
     {
       name:  'align',

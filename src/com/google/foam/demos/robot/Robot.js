@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Robot',
   extends: 'foam.graphics.CView',
 
+  implements: [ 'foam.physics.Physical' ],
+
   // author: Sebastian Greer (age 11)
 
   requires: [
@@ -32,7 +34,15 @@ foam.CLASS({
   ],
 
   properties: [
-    { name: 'timer', hidden: true, factory: function() { return this.Timer.create(); } }
+    [ 'width',  25 ],
+    [ 'height', 45 ],
+    {
+      name: 'timer',
+      hidden: true,
+      factory: function() {
+        return this.__context__.timer || this.Timer.create();
+      }
+    }
   ],
 
   methods: [
@@ -69,6 +79,7 @@ foam.CLASS({
       var engine = this.Circle.create({
         radius: 8,
         color:  'red',
+        border: null,
         x:      10,
         y:      30.5,
         start:  0,
@@ -91,11 +102,12 @@ foam.CLASS({
       // animate
       var timer = this.timer;
       timer.time$.sub(function() {
-        body.y        = 10 * Math.cos(timer.i/9);
-        body.rotation = Math.PI / 8 * Math.cos(timer.i/30);
-        pupil.x       = 4* Math.cos(timer.i/15);
-        neck.height   = 15 + 10 * Math.cos(timer.i/15);
-        neck.y        = -13 - 10* Math.cos(timer.i/15);
+        var t = timer.time/16;
+        body.y        = 10 * Math.cos(t/9);
+        body.rotation = Math.PI / 8 * Math.cos(t/30);
+        pupil.x       = 4* Math.cos(t/15);
+        neck.height   = 15 + 10 * Math.cos(t/15);
+        neck.y        = -13 - 10* Math.cos(t/15);
       });
       timer.start();
     }

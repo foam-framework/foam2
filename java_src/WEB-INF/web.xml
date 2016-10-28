@@ -4,15 +4,23 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   version="2.5">
   <servlet>
-    <servlet-name>hello</servlet-name>
-    <servlet-class>com.google.foam.demos.appengine.HelloServlet</servlet-class>
+    <servlet-name>apply</servlet-name>
+    <servlet-class>com.chrome.origintrials.servlets.ApplyServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>heroes</servlet-name>
-    <servlet-class>com.google.foam.demos.heroes.HeroesServlet</servlet-class>
+    <servlet-name>console</servlet-name>
+    <servlet-class>com.chrome.origintrials.servlets.ConsoleServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>api</servlet-name>
+    <servlet-class>com.chrome.origintrials.servlets.APIServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>heroes</servlet-name>
-    <url-pattern>/heroes</url-pattern>
+    <servlet-name>api</servlet-name>
+    <url-pattern>/api</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>console</servlet-name>
+    <url-pattern>/console/*</url-pattern>
   </servlet-mapping>
 </web-app>

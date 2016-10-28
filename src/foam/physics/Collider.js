@@ -21,36 +21,35 @@ foam.CLASS({
   name: 'Collider',
 
   properties: [
-    { name: 'children', factory: function() { return []; } },
-    'stopped_'
-  ],
-
-  listeners: [
     {
-      name: 'tick',
-      isFramed: true,
-      code: function tick() {
-        if ( this.stopped_ ) return;
-        this.detectCollisions();
-        this.updateChildren();
-
-        this.tick();
-      }
+      class: 'Boolean',
+      name: 'bounceOnWalls'
+    },
+    {
+      name: 'bounds',
+      hidden: true
+    },
+    {
+      name: 'children',
+      factory: function() { return []; },
+      hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'stopped_',
+      value: true,
+      hidden: true
     }
   ],
 
   methods: [
-    function start() {
-      this.stopped_ = false;
-      this.tick();
-      return this;
-    },
-
-    function stop() {
-      this.stopped_ = true;
-    },
-
-    function updateChild(child) {
+    function updateChild(c) {
+      if ( this.bounceOnWalls && this.bounds ) {
+        if ( c.x < this.bounds.x ) c.vx = Math.abs(c.vx);
+        if ( c.y < this.bounds.y ) c.vy = Math.abs(c.vy);
+        if ( c.x > this.bounds.width ) c.vx = -Math.abs(c.vx);
+        if ( c.y > this.bounds.height ) c.vy = -Math.abs(c.vy);
+      }
     },
 
     function updateChildren() {
@@ -192,6 +191,37 @@ foam.CLASS({
     function destroy() {
       this.stopped_ = true;
       this.children = [];
+    }
+  ],
+
+  actions: [
+    {
+      name: 'start',
+      isEnabled: function(stopped_) { return stopped_; },
+      code: function start() {
+        this.stopped_ = false;
+        this.tick();
+        return this;
+      }
+    },
+    {
+      name: 'stop',
+      isEnabled: function(stopped_) { return ! stopped_; },
+      code: function start() { this.stopped_ = true; }
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      isFramed: true,
+      code: function tick() {
+        if ( this.stopped_ ) return;
+        this.detectCollisions();
+        this.updateChildren();
+
+        this.tick();
+      }
     }
   ]
 });

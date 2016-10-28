@@ -12,7 +12,11 @@
   limitations under the License.
 -->
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <application>wat-lobby</application>
+  <application>google.com:astute-harmony-144016</application>
   <version>${appengine.app.version}</version>
   <threadsafe>true</threadsafe>
+  <resource-files>
+    <include path="/resources/**"/>
+    <include path="/resources/*.js"/>
+  </resource-files>
 </appengine-web-app>

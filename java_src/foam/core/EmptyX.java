@@ -36,7 +36,7 @@ abstract class AbstractX implements X {
     return ((FacetManager)get("facetManager")).getInstanceOf(value, type, this);
   }
 
-  public Object create(Class type) {
+  public <T> T create(Class<T> type) {
     return ((FacetManager)get("facetManager")).create(type, this);
   }
 }

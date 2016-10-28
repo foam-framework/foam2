@@ -66,7 +66,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      this.addChildren(this.hourHand, this.minuteHand, this.secondHand);
+      this.add(this.hourHand, this.minuteHand, this.secondHand);
       this.tick();
     },
 
