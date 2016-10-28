@@ -411,8 +411,8 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.view.DualView',
-        viewb: { class: 'foam.u2.TextField', onKey: true },
-        viewa: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*2, maxValue: Math.PI*2, onKey: true }
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*2, maxValue: Math.PI*2, onKey: true }
       }
     },
     {
@@ -456,8 +456,8 @@ foam.CLASS({
       class: 'Float',
       view: {
         class: 'foam.u2.view.DualView',
-        viewb: { class: 'foam.u2.TextField', onKey: true },
-        viewa: { class: 'foam.u2.RangeView', step: 0.0001, maxValue: 1, onKey: true }
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.0001, maxValue: 1, onKey: true }
       },
       value: 1
     },
@@ -899,8 +899,8 @@ foam.CLASS({
       value: 0,
       view: {
         class: 'foam.u2.view.DualView',
-        viewb: { class: 'foam.u2.TextField', onKey: true },
-        viewa: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
       }
     },
     {
@@ -908,8 +908,8 @@ foam.CLASS({
       value: 2*Math.PI,
       view: {
         class: 'foam.u2.view.DualView',
-        viewb: { class: 'foam.u2.TextField', onKey: true },
-        viewa: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
       }
     }
   ],
