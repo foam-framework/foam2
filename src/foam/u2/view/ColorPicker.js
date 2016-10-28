@@ -19,12 +19,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ColorPicker',
   extends: 'foam.u2.tag.Input',
-  properties: [
-    {
-      name: 'type',
-      value: 'color'
-    }
-  ],
+
   constants: {
     NAME_TO_COLOR: {
       black: "#000000",
@@ -317,6 +312,14 @@ foam.CLASS({
       '#ffffff': 'white'
     }
   },
+
+  properties: [
+    {
+      name: 'type',
+      value: 'color'
+    }
+  ],
+
   methods: [
     function link() {
       var self = this;
