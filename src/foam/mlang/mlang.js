@@ -41,6 +41,16 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'NullSink',
+  extends: 'foam.dao.AbstractSink',
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ]
+});
+
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',

@@ -78,6 +78,7 @@ foam.CLASS({
   requires: [
     'foam.core.Property',
     'foam.dao.ArraySink',
+    'foam.mlang.sink.NullSink',
     'foam.dao.index.AltPlan',
     'foam.dao.index.CountPlan',
     'foam.dao.index.CustomPlan',
@@ -227,7 +228,9 @@ foam.CLASS({
 
       // if this index can sort, it's up to our tail to sub-sort
       if ( foam.util.equals(order.orderPrimaryProperty(), this.prop) ) {
-        return this.tailFactory.isOrderSelectable(order.orderTail());
+        // If the subestimate is less than sort cost (N*lg(N) for a dummy size of 1000)
+        return 9965 >
+          this.tailFactory.estimate(1000, this.NullSink.create(), 0, 0, order.orderTail())
       }
       // can't use select() with the given ordering
       return false;
@@ -243,8 +246,6 @@ foam.CLASS({
         //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
         return index.CountPlan.create({ count: count });
       }
-
-      //    if ( limit != null && skip != null && skip + limit > this.size() ) return foam.dao.index.NoPlan.create();
 
       var prop = this.prop;
 
@@ -280,8 +281,12 @@ foam.CLASS({
 
       // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
       // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
-      // TODO:
+      // TODO: allow sink to split up, for GroupBy passing one sub-sink to each tree node
+      //  for grouping. Allow sink to suggest order, if order not defined
+      //    sink.subSink(key) => sink
+      //    sink.defaultOrder() => Comparator
       // }
+      
       var result, subPlan, cost;
 
       var arg2 = isExprMatch(this.In);

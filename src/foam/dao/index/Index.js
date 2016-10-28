@@ -57,10 +57,6 @@ foam.CLASS({
       a given foam.mlang.order.Comparator. */
     function select(/*sink, skip, limit, orderDirs, predicate*/) { },
 
-    /** Returns true if the given ordering will be respected by a
-      select() on this index. */
-    function isOrderSelectable(/*order*/) { },
-
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},
   ]
@@ -110,10 +106,6 @@ foam.CLASS({
       return this.delegate.select(sink, skip, limit, orderDirs, predicate);
     },
 
-    function isOrderSelectable(order) {
-      return this.delegateFactory.isOrderSelectable(order);
-    },
-
     function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
   ]
 });
@@ -154,7 +146,6 @@ foam.CLASS({
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function plan() { return this; },
     function mapOver(fn, ofIndex) { },
-    function isOrderSelectable(order) { return true; },
 
     function select(sink, skip, limit, orderDirs, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
@@ -176,7 +167,8 @@ foam.CLASS({
   extends: 'foam.dao.index.Index',
 
   requires: [
-    'foam.dao.index.NoPlan'
+    'foam.dao.index.NoPlan',
+    'foam.mlang.sink.NullSink',
   ],
 
   constants: {
@@ -246,16 +238,20 @@ foam.CLASS({
       if ( ! orderDirs ) return instances[0];
 
       var t = orderDirs.tags[this];
-      // if no cached index number, check our delegates for one
-      // that works with the given ordering
+      // if no cached index number, check our delegates the best
+      // estimate, considering only ordering
       if ( ! foam.Number.isInstance(t) ) {
-        t = orderDirs.tags[this] = 0;
         var order = orderDirs.srcOrder;
         var delegates = this.delegates;
-        for ( var i = 1 ; i < delegates.length ; i++ ) {
-          if ( delegates[i].isOrderSelectable(order) ) {
+        var bestEst = Number.MAX_VALUE;
+        var nullSink = this.NullSink.create();
+        var est;
+        var t = -1;
+        for ( var i = 0; i < delegates.length; i++ ) {
+          est = delegates[i].estimate(1000, nullSink, undefined, undefined, order);
+          if ( bestEst > est ) {
             t = orderDirs.tags[this] = i;
-            break;
+            bestEst = est;
           }
         }
       }
@@ -266,18 +262,6 @@ foam.CLASS({
       // find and cache the correct subindex to use
       this.getAltForOrderDirs(orderDirs)
         .select(sink, skip, limit, orderDirs, predicate);
-    },
-
-    function isOrderSelectable(order) {
-      // TODO: check delegates, cache which one can handle the ordering for
-      //   use in select()
-
-      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        if ( this.delegates[i].isOrderSelectable(order) ) {
-          return true;
-        }
-      }
-      return false;
     },
 
     function mapOver(fn, ofIndex) {

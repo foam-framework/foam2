@@ -36,6 +36,18 @@ foam.CLASS({
       // small sizes don't matter
       if ( size <= 16 ) return Math.log(size) / Math.log(2);
 
+      // if only estimating by ordering, just check if we can scan it
+      //  otherwise return the sort cost.
+      // NOTE: This is conceptually the right thing to do, but also helps
+      //   speed up isOrderSelectable() calls on this:
+      //   a.isOrderSelectable(o) -> b.estimate(..o) -> b.isOrderSelectable(o) ...
+      //   Which makes it efficient but removes the need for Index to 
+      //   have an isOrderSelectable() method forwarding directly.  
+      if ( order && ! ( predicate || skip || limit ) ) {
+        return this.isOrderSelectable(order) ? size :
+          size * Math.log(size) / Math.log(2);
+      }
+
       var self = this;
       predicate = predicate ? predicate.clone() : null;
       var property = this.prop;
