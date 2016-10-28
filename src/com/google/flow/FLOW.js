@@ -253,7 +253,7 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.properties.skip(3).removeAll();
+        this.properties.skip(2).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var p = m[i];
@@ -319,10 +319,10 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(3).select().then(function(s) {
+      this.properties.skip(2).select().then(function(s) {
         console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
-        this.memento = foam.Array.clone(s.a);
+//        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
       }.bind(this));
     }
@@ -342,6 +342,16 @@ foam.CLASS({
           }
         } else {
           this.properties.find(p.parent).then(function(p2) {
+            // Adjust position of object so that it stays in its current
+            // location. TODO: something better with transforms as this
+            // probably doesn't work with scaling and rotation.
+            var parent = p2.value;
+            while ( parent ) {
+              o.x -= parent.x;
+              o.y -= parent.y;
+              parent = parent.parent;
+            }
+
             p2.value.add(o);
           });
         }
@@ -412,7 +422,6 @@ foam.CLASS({
             break;
           }
         }
-
       }
     },
 
