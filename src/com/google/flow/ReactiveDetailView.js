@@ -29,7 +29,11 @@ foam.CLASS({
   name: 'DetailPropertyView',
   extends: 'foam.u2.DetailPropertyView',
 
-  imports: [ 'data', 'requestAnimationFrame' ],
+  imports: [
+    'data',
+    'requestAnimationFrame',
+    'scope'
+  ],
 
   axioms: [
     foam.u2.CSS.create({
@@ -123,7 +127,10 @@ foam.CLASS({
     function setFormula(formula) {
       var data = this.data;
       var self = this;
-      var f = new Function('return ' + formula);
+      var f;
+      with ( this.scope ) {
+        f = eval('(function() { return  ' + formula + '})');
+      }
       f.toString = function() { return formula; };
       var timer = function() {
         if ( data.isDestroyed() ) return;
