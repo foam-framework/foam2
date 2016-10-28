@@ -120,7 +120,7 @@ foam.CLASS({
           start('td').cssClass(this.myCls('view')).add(
               this.slot(function(reactive) {
                 return reactive ?
-                    self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__) :
+                    self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__).focus() :
                     prop ;
               }),
             prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
