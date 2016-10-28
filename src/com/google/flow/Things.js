@@ -345,8 +345,9 @@ foam.CLASS({
       name: 'count'
     },
     {
+      class: 'Int',
       hidden: true,
-      name: 'lastCollision_'
+      name: 'lastCollision_',
     },
     {
       name: 'width',
