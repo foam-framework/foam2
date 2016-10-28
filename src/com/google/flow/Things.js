@@ -299,13 +299,13 @@ foam.CLASS({
       x.lineWidth   = this.lineWidth;
 
       x.beginPath();
-      x.moveTo(-this.x, 0);
-      x.lineTo(this.parent.width-this.x, 0);
+      x.moveTo(-this.parent.width*2, 0);
+      x.lineTo(this.parent.width*2, 0);
       x.stroke();
 
       x.beginPath();
-      x.moveTo(0, -this.y);
-      x.lineTo(0, this.parent.height-this.y);
+      x.moveTo(0, -this.parent.height*2);
+      x.lineTo(0, this.parent.height*2);
       x.stroke();
     },
   ],
