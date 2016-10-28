@@ -132,7 +132,7 @@ foam.CLASS({
           this.selectedSub = null;
         }
 
-        if ( n && n.value && foam.graphics.CView.isInstance(n.value) ) {
+        if ( n && n.value && foam.graphics.CView.isInstance(n.value) && ( n.value.width || n.value.height ) ) {
           var v = n.value;
           this.alpha = 1;
           this.selectedSub = v.sub('propertyChange', this.onSelectedPropertyChange);

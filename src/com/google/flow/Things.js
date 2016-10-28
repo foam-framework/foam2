@@ -261,45 +261,59 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.input',
-  name: 'Mouse',
+  package: 'com.google.flow',
+  name: 'Cursor',
+  extends: 'foam.graphics.CView',
 
   properties: [
     {
-      class: 'Int',
+      class: 'Float',
+      name: 'lineWidth',
+      view: { class: 'foam.u2.RangeView', minValue: 0, maxValue: 5, step: 1, onKey: true },
+      value: 1
+    },
+    { name: 'width', value: 0, hidden: true },
+    { name: 'height', value: 0, hidden: true },
+    [ 'color', 'red' ],
+    [ 'alpha', 0.5 ],
+    {
       name: 'x'
     },
     {
-      class: 'Int',
       name: 'y'
-    },
-    {
-      name: 'target',
-      hidden: true
     }
   ],
 
   methods: [
-    function init() {
+    function initCView() {
       this.SUPER();
-      
-      // TODO: there should be an easier way to do this
-      if ( this.target.canvas ) {
-        this.onInit();
-      } else {
-        this.target.propertyChange.sub('canvas', this.onInit);
-      }
-    }
+      this.canvas.on('mousemove', this.onMouseMove);
+    },
+
+    function hitTest(p) { return false; },
+
+    function paintSelf(x) {
+      if ( ! this.color || ! this.lineWidth ) return;
+
+      x.strokeStyle = this.color;
+      x.lineWidth   = this.lineWidth;
+
+      x.beginPath();
+      x.moveTo(-this.x, 0);
+      x.lineTo(this.parent.width-this.x, 0);
+      x.stroke();
+
+      x.beginPath();
+      x.moveTo(0, -this.y);
+      x.lineTo(0, this.parent.height-this.y);
+      x.stroke();
+    },
   ],
 
   listeners: [
-    function onInit(s) {
-      if ( s ) s.destroy();
-      this.target.canvas.on('mousemove', this.onMouseMove);
-    },
     {
       name: 'onMouseMove',
-      isFramed: true,
+//      isFramed: true,
       code: function(evt) {
         this.x = evt.offsetX;
         this.y = evt.offsetY;
