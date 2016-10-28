@@ -132,7 +132,7 @@ foam.CLASS({
           this.selectedSub = null;
         }
 
-        if ( n && n.value && foam.graphics.CView.isInstance(n.value) && ( n.value.width || n.value.height ) ) {
+        if ( n && n.value && foam.graphics.CView.isInstance(n.value) && ( n.value.radius || n.value.width || n.value.height ) ) {
           var v = n.value;
           this.alpha = 1;
           this.selectedSub = v.sub('propertyChange', this.onSelectedPropertyChange);
@@ -166,7 +166,6 @@ foam.CLASS({
           function toA(x, y) {
             var dx = x-vs.x-halo.originX
             var dy = y-v.y-halo.originY;
-            
             return Math.atan2(dy, dx);
           }
 
