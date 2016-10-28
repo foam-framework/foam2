@@ -222,9 +222,15 @@ foam.CLASS({
           this.SUPER();
           this.cssClass(this.myCls());
         },
+
         // function isLoaded() { return this.value; },
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
-        function toReadE() { return this.HTMLElement.create({nodeName: 'span'}, this.__subSubContext__).add(this.data$); },
+        function toReadE() {
+          return this.HTMLElement.create(
+              {nodeName: 'span'},
+              this.__subSubContext__).add(this.data$);
+        },
+
         function toWriteE() {
           this.formula$.sub(this.onDataLoad);
           var e = this.Input.create(); //this.E('input');
