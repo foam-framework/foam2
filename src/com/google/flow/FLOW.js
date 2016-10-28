@@ -76,8 +76,10 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
+    'com.google.foam.demos.sevenguis.Cells',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
     'foam.graphics.CView',
@@ -86,9 +88,8 @@ foam.CLASS({
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
     'foam.u2.TableView',
-    'foam.util.Timer',
     'foam.u2.view.TreeView',
-    'com.google.flow.DetailPropertyView'
+    'foam.util.Timer'
   ],
 
   exports: [
@@ -210,6 +211,10 @@ foam.CLASS({
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
+        p = this.Property.create({name: 'sheet1', value: this.sheet});
+        this.physics.setPrivate_('lpp_', p);
+        dao.put(p);
+
         p = this.Property.create({name: 'timer', value: this.timer, parent: 'canvas1'});
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
@@ -231,6 +236,15 @@ foam.CLASS({
       factory: function() {
         return this.Box.create({autoRepaint: true, width: 600, height: 600, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
+      }
+    },
+    {
+      name: 'sheet',
+      factory: function() {
+        this.Cells.getAxiomsByClass(foam.core.Property).forEach(function(p) { p.hidden = true; });
+        this.Cells.ROWS.hidden = this.Cells.COLUMNS.hidden = false;
+
+        return this.Cells.create({rows: 28, columns:10}).style({width:'650px'});
       }
     },
     'mouseTarget'
@@ -275,6 +289,10 @@ foam.CLASS({
                   on('mouseup',     this.onMouseUp).
                   on('mousemove',   this.onMouseMove).
                   on('contextmenu', this.onRightClick).
+                end().
+              end().
+              start(foam.u2.Tab, {label: 'sheet1'}).
+                start(this.sheet).
                 end().
               end().
               start(foam.u2.Tab, {label: '+'}).
