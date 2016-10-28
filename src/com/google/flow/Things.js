@@ -274,7 +274,7 @@ foam.CLASS({
       view: { class: 'foam.u2.RangeView', minValue: 0, maxValue: 5, step: 1, onKey: true },
       value: 1
     },
-    { name: 'width', value: 0, hidden: true },
+    { name: 'width',  value: 0, hidden: true },
     { name: 'height', value: 0, hidden: true },
     [ 'color', 'red' ],
     [ 'alpha', 0.5 ],
