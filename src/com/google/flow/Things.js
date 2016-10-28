@@ -326,4 +326,69 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Gate',
+  extends: 'foam.graphics.Box',
+
+  implements: [ 'foam.physics.Physical' ],
+
+  requires: [
+    'foam.graphics.Circle',
+    'foam.graphics.Label'
+  ],
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'count'
+    },
+    {
+      name: 'width',
+      value: 1,
+      postSet: function(_, w) {
+        this.originX = w/2;
+      }
+    },
+    {
+      name: 'height',
+      value: 50,
+      postSet: function(_, h) {
+        this.originY = h/2;
+      }
+    },
+    [ 'mass', 0 ],
+    [ 'gravity', 0 ],
+    {
+      name: 'circle',
+      hidden: true,
+      factory: function() {
+        return this.Circle.create({color: 'green', radius: 10});
+      }
+    },
+    {
+      name: 'text',
+      hidden: true,
+      factory: function() {
+        return this.Label.create({x:-5, y:-5, color: 'white', text$: this.count$});
+      }
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.add(this.circle);
+      this.circle.add(this.text);
+    },
+    function paintSelf(x) {
+      this.circle.x = this.width/2;
+      this.circle.y = this.height/2;
+      this.circle.rotation = - this.rotation;
+      this.SUPER(x);
+    }
+  ]
+});
+
+
 // foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
