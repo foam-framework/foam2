@@ -113,7 +113,8 @@ foam.CLASS({
       .foam-u2-TableView-selected { outline: 1px solid red; }
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
-      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
+      ^properties .foam-u2-view-TreeViewRow { position: relative; }
+      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 6px 0 0 0; }
       .foam-u2-Tabs { padding-top: 0 !important; }
       input[type="range"] { width: 150px; height: 15px; }
       input[type="color"] { width: 22px; }
@@ -185,9 +186,11 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.TreeView',
         relationship: relationship,
+        startExpanded: true,
         formatter: function() {
           var X = this.__subSubContext__;
           this.start('span').add(X.data.name).end().
+            start('span').nbsp().style({ display: 'inline-block', width: '50px' }).end().
             start('span').add(com.google.flow.Property.DELETE_ROW).end();
         }
       },
@@ -257,7 +260,7 @@ foam.CLASS({
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var p = m[i];
-            this.addProperty(p.value, p.name);
+            this.addProperty(p.value, p.name, null, p.parent);
           }
         }
         this.selected = null;
@@ -302,9 +305,9 @@ foam.CLASS({
         var i = opt_i || 1;
         var prefix = value.cls_.name.toLowerCase();
         this.properties.find(prefix + i).then(function (o) {
-          self.addProperty(value, null, i+1);
+          self.addProperty(value, null, i+1, opt_parent);
         }).catch(function(x) {
-          self.addProperty(value, prefix+i);
+          self.addProperty(value, prefix+i, null, opt_parent);
         });
       } else {
         var p = this.Property.create({
@@ -412,7 +415,7 @@ foam.CLASS({
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
-        var p = this.addProperty(o);
+        var p = this.addProperty(o, null, null, 'canvas1');
         this.updateMemento();
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {
