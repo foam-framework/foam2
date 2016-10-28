@@ -1697,7 +1697,7 @@ foam.CLASS({
       value: {
         class: 'foam.u2.view.DualView',
         viewa: 'foam.u2.TextField',
-        viewb: { class: 'foam.u2.view.ColorPicker', keyMode: true }
+        viewb: { class: 'foam.u2.view.ColorPicker', onKey: true }
       }
     }
   ]
