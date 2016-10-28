@@ -334,7 +334,6 @@ foam.CLASS({
       var o = p.value;
 
       this.scope[p.name] = p.value;
-      console.log('adding: ', p.name);
       if ( this.CView.isInstance(o) ) {
         if ( ! p.parent ) {
           this.canvas.add(o);
