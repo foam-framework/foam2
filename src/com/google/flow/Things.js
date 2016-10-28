@@ -188,7 +188,9 @@ foam.CLASS({
       name: 'onResize',
       isFramed: true,
       code: function() {
-        this.removeAllChildren();
+        this.children.forEach(function(c) {
+          if ( ! com.google.flow.Halo.isInstance(c) ) this.remove(c);
+        }.bind(this));
 
         this.updateCellSize();
         this.width  = this.width;
