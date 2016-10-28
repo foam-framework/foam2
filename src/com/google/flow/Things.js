@@ -345,8 +345,12 @@ foam.CLASS({
       name: 'count'
     },
     {
+      hidden: true,
+      name: 'lastCollision_'
+    },
+    {
       name: 'width',
-      value: 1,
+      value: 2,
       hidden: true,
       preSet: function() { return 1; }
     },
@@ -356,7 +360,11 @@ foam.CLASS({
     },
     [ 'mass', 0 ],
     [ 'gravity', 0 ],
-    [ 'border', '#444444' ],
+    {
+      name: 'border',
+      vale: '#444444',
+      hidden: true
+    },
     {
       name: 'circle',
       hidden: true,
@@ -381,16 +389,43 @@ foam.CLASS({
         });
       }
     },
+    {
+      name: 'collisionSet_',
+      hidden: true
+    },
+    {
+      name: 'lastCollisionSet_',
+      hidden: true
+    },
   ],
 
   methods: [
     function init() {
       this.add(this.circle);
       this.circle.add(this.text);
+      this.collisionSet_ = {};
+      this.lastCollisionSet_ = {};
     },
+
+    function collideWith(c) {
+      this.lastCollision_ = Date.now();
+      var id = c.$UID;
+      if ( ! this.collisionSet_[id] && ! this.lastCollisionSet_[id] ) this.count++;
+      this.collisionSet_[id] = true;
+    },
+
     function paint(x) {
-      this.originX = this.width/2;
-      this.originY = this.height/2;
+      this.lastCollisionSet_ = this.collisionSet_;
+      this.collisionSet_ = {};
+
+      if ( Date.now() - this.lastCollision_ > 250 ) {
+        this.border = this.BORDER.value;
+      } else {
+        this.border = 'orange';
+      }
+
+      this.originX  = this.width/2;
+      this.originY  = this.height/2;
       this.circle.x = this.width/2;
       this.circle.y = this.height/2;
       this.circle.rotation = - this.rotation;
