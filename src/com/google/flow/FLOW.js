@@ -33,13 +33,13 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
-          x: o.x,
-          y: o.y,
-          width: o.width,
+          x:      o.x,
+          y:      o.y,
+          width:  o.width,
           height: o.height,
           radius: o.radius,
           border: o.radius,
-          color: o.color
+          color:  o.color
         });
       }
     }
@@ -323,7 +323,7 @@ foam.CLASS({
 
     function updateMemento() {
       this.properties.skip(2).select().then(function(s) {
-        console.log('*************** updateMemento: ', s.a.length);
+//        console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
 //        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
