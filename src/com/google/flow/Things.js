@@ -23,7 +23,7 @@ foam.CLASS({
   properties: [
     [ 'gravity', 1 ],
     [ 'radius', 45 ],
-    [ 'width', 90 ],
+    [ 'width',  90 ],
     [ 'height', 90 ]
   ]
 });
@@ -36,7 +36,7 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
   properties: [
     [ 'gravity', 1 ],
-    [ 'width',  100 ],
+    [ 'width',  150 ],
     [ 'height', 50 ],
     [ 'text', 'Text' ],
     [ 'color', '#000000' ],
