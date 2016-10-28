@@ -298,6 +298,8 @@ foam.CLASS({
       x.strokeStyle = this.color;
       x.lineWidth   = this.lineWidth;
 
+      // Draw the lines longer than needed in case the
+      // cursor is rotated.
       x.beginPath();
       x.moveTo(-this.parent.width*2, 0);
       x.lineTo(this.parent.width*2, 0);
