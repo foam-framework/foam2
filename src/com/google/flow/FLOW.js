@@ -114,7 +114,7 @@ foam.CLASS({
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
       ^properties .foam-u2-view-TreeViewRow { position: relative; }
-      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 6px 0 0 0; }
+      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
       .foam-u2-Tabs { padding-top: 0 !important; }
       input[type="range"] { width: 60px; height: 15px; }
       input[type="color"] { width: 60px; }
