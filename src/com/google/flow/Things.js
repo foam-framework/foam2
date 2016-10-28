@@ -356,11 +356,17 @@ foam.CLASS({
     },
     [ 'mass', 0 ],
     [ 'gravity', 0 ],
+    [ 'border', '#444444' ],
     {
       name: 'circle',
       hidden: true,
       factory: function() {
-        return this.Circle.create({border: null, color: 'green', radius: 10});
+        return this.Circle.create({
+          alpha: 0.8,
+          border: null,
+          color: 'green',
+          radius: 10
+        });
       }
     },
     {
@@ -368,8 +374,7 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         return this.Label.create({
-          alignment: 'center',
-          x:-3,
+          align: 'center',
           y:-7,
           color: 'white',
           text$: this.count$
