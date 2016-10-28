@@ -113,11 +113,11 @@ foam.CLASS({
       var cost = size;
 
       // These cases are just slightly better scans, but we can't estimate
-      //   how much better...
-      //       arg2 = isExprMatch(this.Gt);
-      //       arg2 = isExprMatch(this.Gte);
-      //       arg2 = isExprMatch(this.Lt);
-      //       arg2 = isExprMatch(this.Lte);
+      //   how much better... maybe half
+      if ( isExprMatch(this.Gt) || isExprMatch(this.Gte) ||
+          isExprMatch(this.Lt) || isExprMatch(this.Lte) ) {
+        cost /= 2;
+      }
 
       // Ordering
       // if sorting required, add the sort cost
@@ -258,7 +258,7 @@ foam.CLASS({
         return this.delegate.plan(sink, skip, limit, order, predicate, root);
       }
 
-      var ARBITRARY_INDEX_CREATE_FACTOR = 2.0;
+      var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
       var ARBITRARY_INDEX_CREATE_CONSTANT = 10; // this.inertia;
 
       // TODO: root.size() is the size of the entire DAO, and representative

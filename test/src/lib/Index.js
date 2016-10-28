@@ -939,11 +939,40 @@ describe('AutoIndex', function() {
 
     pred = pred.toDisjunctiveNormalForm();
 
-    idxInstance
-      .plan(sink, undefined, undefined, undefined, pred, fakeRoot)
-      .execute([], sink, undefined, undefined, undefined, pred);
+    // the results end up small enough that the first index is good enough
+    // for all subpred cases
+    for ( var i = 0; i < pred.args.length; i++ ) {
+      var subpred = pred.args[i];
+      idxInstance
+        .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
+        .execute([], sink, undefined, undefined, undefined, subpred);
+    }    
+    expect(idxInstance.delegate.instances.length).toEqual(2);
+    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+  });
 
-    // TODO expectations
+  it('auto indexes on more predicates', function() {
+
+    var preds = [
+      m.AND(
+        m.LT(test.Indexable.INT, 8),
+        m.EQ(test.Indexable.FLOAT, 4)
+      ),
+      m.CONTAINS_IC(test.Indexable.STRING, "we"),
+      m.LT(test.Indexable.DATE, 8)
+    ];
+
+    // the results end up small enough that the first index is good enough
+    // for all subpred cases
+    for ( var i = 0; i < preds.length; i++ ) {
+      var subpred = preds[i];
+      idxInstance
+        .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
+        .execute([], sink, undefined, undefined, undefined, subpred);
+        
+      expect(idxInstance.delegate.instances.length).toEqual(i+2);
+      expect(idxInstance.delegate.instances[i+1].size()).toEqual(1000);
+    }    
   });
 
 
