@@ -183,6 +183,11 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'formatter'
+    },
+    {
+      class: 'Boolean',
+      name: 'startExpanded',
+      value: false
     }
   ],
 
@@ -200,6 +205,7 @@ foam.CLASS({
           return self.TreeViewRow.create({
             data: obj,
             relationship: self.relationship,
+            expanded: self.startExpanded,
             formatter: self.formatter
           }, this);
         });
