@@ -132,8 +132,11 @@ foam.CLASS({
           this.selectedSub = null;
         }
 
+        this.parent && this.parent.remove(this);
+
         if ( n && n.value && foam.graphics.CView.isInstance(n.value) && ( n.value.radius || n.value.width || n.value.height ) ) {
           var v = n.value;
+          v.add(this);
           this.alpha = 1;
           this.selectedSub = v.sub('propertyChange', this.onSelectedPropertyChange);
           this.onSelectedPropertyChange();
@@ -222,13 +225,12 @@ foam.CLASS({
 
         if ( v.radius ) {
           this.height = this.width = (v.radius + v.arcWidth + 3 + r*2) * 2;
-          this.x        = v.x - v.radius - v.arcWidth - r*2 - 3;
-          this.y        = v.y - v.radius - v.arcWidth - r*2 - 3;
+          this.x        = - v.radius - v.arcWidth - r*2 - 3;
+          this.y        = - v.radius - v.arcWidth - r*2 - 3;
           this.originX = v.x-this.x;
           this.originY = v.y-this.y;
         } else {
-          this.x        = v.x-2*r-4;
-          this.y        = v.y-2*r-4;
+          this.x = this.y = -2*r-4;
           this.width    = v.scaleX * v.width  + 2 * ( r * 2 + 4 );
           this.height   = v.scaleY * v.height + 2 * ( r * 2 + 4 );
           this.originX  = v.originX+2*r+4
@@ -240,7 +242,7 @@ foam.CLASS({
         this.haloBorder.width  = this.width  - 2 * r;
         this.haloBorder.height = this.height - 2 * r;
 
-        this.rotation = v.rotation;
+//        this.rotation = v.rotation;
       }
     },
 
