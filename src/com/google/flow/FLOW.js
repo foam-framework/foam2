@@ -166,6 +166,7 @@ foam.CLASS({
         dao.put(com.google.flow.Desk.model_);
         dao.put(com.google.flow.DuplexDesk.model_);
         dao.put(com.google.flow.Desks.model_);
+        dao.put(com.google.flow.Gate.model_);
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
         dao.put(com.google.flow.Cursor.model_);
