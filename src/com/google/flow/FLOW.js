@@ -224,6 +224,7 @@ foam.CLASS({
         this.scope.canvas1 = this.canvas;
         this.scope.physics = this.physics;
         this.scope.timer   = this.timer;
+        this.scope.cycle   = this.timer.cycle.bind(this.timer);
 
         return dao;
       }
