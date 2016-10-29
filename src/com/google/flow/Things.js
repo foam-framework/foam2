@@ -386,6 +386,7 @@ foam.CLASS({
         return this.Label.create({
           align: 'center',
           color: 'white',
+          font: 'bold 10px sans-serif',
           text$: this.count$,
           y:     -6
         });
