@@ -444,7 +444,8 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   imports: [
-    'scope'
+    'scope',
+    'timer'
   ],
 
   properties: [
@@ -467,8 +468,42 @@ foam.CLASS({
     },
     {
       class: 'Float',
-      name: 'strength',
-      value: 10
+      name: 'compression',
+      value: 0
+    },
+    {
+      class: 'Float',
+      name: 'stretch',
+      value: 4
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.onDestroy(this.timer.time$.sub(this.tick));
+    }
+  ],
+
+  listeners: [
+    function tick() {
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+      if ( ! c1 || ! c2 ) return;
+
+      var l = this.length;
+      var s = this.stretch/1000;
+      var c = this.compression/1000;
+      var d = c1.distanceTo(c2);
+      var a = Math.atan2(c2.y-c1.y, c2.x-c1.x);
+
+      if ( s && d > l ) {
+        c1.applyMomentum( s * (d-l), a);
+        c2.applyMomentum(-s * (d-l), a);
+      } else if ( c && d < l ) {
+        c1.applyMomentum(-c * (l-d), a);
+        c2.applyMomentum( c * (l-d), a);
+      }
     }
   ]
 });
