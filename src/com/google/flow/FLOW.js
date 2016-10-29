@@ -239,7 +239,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 600, height: 600, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 300, height: 600, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
