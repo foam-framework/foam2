@@ -317,7 +317,6 @@ foam.CLASS({
   listeners: [
     {
       name: 'onMouseMove',
-//      isFramed: true,
       code: function(evt) {
         this.x = evt.offsetX;
         this.y = evt.offsetY;
@@ -435,5 +434,40 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Spring',
+  extends: 'foam.graphics.CView',
+
+  imports: [
+    'scope'
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'visible',
+    },
+    {
+      class: 'String',
+      name: 'head'
+    },
+    {
+      class: 'String',
+      name: 'tail'
+    },
+    {
+      class: 'Float',
+      name: 'length',
+      value: 100
+    },
+    {
+      class: 'Float',
+      name: 'strength',
+      value: 10
+    }
+  ]
+});
 
 // foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');

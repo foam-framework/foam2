@@ -170,6 +170,7 @@ foam.CLASS({
         dao.put(com.google.flow.Gate.model_);
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
+        dao.put(com.google.flow.Spring.model_);
         dao.put(com.google.flow.Cursor.model_);
         return dao;
       }
