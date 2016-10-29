@@ -53,7 +53,8 @@ foam.CLASS({
   properties: [
     [ 'arcWidth', 1 ],
     [ 'gravity', 1 ],
-    [ 'radius',  25 ]
+    [ 'radius',  25 ],
+    [ 'friction', 0.98 ]
   ]
 });
 
@@ -475,13 +476,43 @@ foam.CLASS({
       class: 'Float',
       name: 'stretch',
       value: 4
-    }
+    },
+    [ 'color', 'black' ]
   ],
 
   methods: [
     function init() {
       this.SUPER();
       this.onDestroy(this.timer.time$.sub(this.tick));
+      this.propertyChange.sub(this.tick);
+    },
+
+    function paintSelf(x) {
+      if ( ! this.visible ) return;
+
+      this.x = this.y = 0;
+
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+
+      x.strokeStyle = this.color;
+      x.lineWidth   = 1
+
+      x.beginPath();
+
+      if ( c1.r ) {
+        x.moveTo(c1.x, c1.y);
+      } else {
+        x.moveTo(c1.x + c1.width/2, c1.y + c1.height/2);
+      }
+
+      if ( c2.r ) {
+        x.lineTo(c2.x, c2.y);
+      } else {
+        x.lineTo(c2.x + c2.width/2, c2.y + c2.height/2);
+      }
+
+      x.stroke();
     }
   ],
 
