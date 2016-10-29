@@ -373,7 +373,9 @@ foam.CLASS({
           alpha: 0.8,
           border: null,
           color: 'green',
-          radius: 10
+          radius: 10,
+          scaleX: 1.5,
+          scaleY: 1.5
         });
       }
     },
@@ -383,9 +385,9 @@ foam.CLASS({
       factory: function() {
         return this.Label.create({
           align: 'center',
-          y:-7,
           color: 'white',
-          text$: this.count$
+          text$: this.count$,
+          y:     -6
         });
       }
     },
