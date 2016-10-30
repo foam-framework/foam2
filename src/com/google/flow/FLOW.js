@@ -74,6 +74,7 @@ foam.CLASS({
   ]
 });
 
+
 // TODO(adamvy): Remove the need to store this relationship globally.
 var relationship = foam.RELATIONSHIP({
   name: 'children',
@@ -83,6 +84,7 @@ var relationship = foam.RELATIONSHIP({
   targetModel: 'com.google.flow.Property',
   targetDAOKey: 'properties'
 });
+
 
 foam.CLASS({
   package: 'com.google.flow',
@@ -98,6 +100,7 @@ foam.CLASS({
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
+    'com.google.flow.StoredFLOW',
     'com.google.foam.demos.sevenguis.Cells',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
@@ -341,7 +344,7 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.properties.skip(2).removeAll();
+        this.properties.skip(4).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var p = m[i];
@@ -413,10 +416,10 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(2).select().then(function(s) {
-//        console.log('*************** updateMemento: ', s.a.length);
+      this.properties.skip(4).select().then(function(s) {
+        console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
-//        this.memento = foam.Array.clone(s.a);
+        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
       }.bind(this));
     },
@@ -435,8 +438,9 @@ foam.CLASS({
     function saveFlow(opt_name) {
       var name = opt_name || this.name;
       this.name = name;
+      this.updateMemento();
       console.log('memento: ', this.memento);
-      this.flows.create(this.StoredFLOW.create({
+      this.flows.put(this.StoredFLOW.create({
         name: name,
         memento: this.memento
       }));
