@@ -28,13 +28,11 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'rows',
-      attribute: true,
       value: 4
     },
     {
       class: 'Int',
       name: 'cols',
-      attribute: true,
       value: 60
     },
     {
@@ -50,6 +48,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.cssClass(this.myCls());
+      this.attrs({rows: this.rows, cols: this.cols});
       this.attrSlot(
         'value',
         this.onKey ? 'input' : 'change').linkFrom(this.data$);
