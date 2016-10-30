@@ -1406,7 +1406,7 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Parsers',
 
-  axioms: [foam.pattern.Singleton.create()],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
     function seq() {
