@@ -88,9 +88,9 @@ foam.CLASS({
       },
       postSet: function(_, f) {
         if ( ! f ) {
-          this.reactive = false;
+          // this.reactive = false;
         } else {
-          this.reactive = true;
+          // this.reactive = true;
           this.setFormula(f);
         }
       }
@@ -112,6 +112,7 @@ foam.CLASS({
         if ( self.data ) {
           var f = self.getFormula();
           self.formula = f ? f.toString() : '';
+          this.reactive = !! f;
         }
       });
 
@@ -128,6 +129,7 @@ foam.CLASS({
                 return reactive ?
                     self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__).
                       cssClass(this.myCls('formulaInput')).
+                      on('blur', function() { this.reactive = !! this.formula; }).
                       focus() :
                     prop ;
               }),
