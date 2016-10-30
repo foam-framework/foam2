@@ -142,7 +142,7 @@ foam.CLASS({
       var self = this;
       var f;
       with ( this.scope ) {
-        f = eval('(function() { return  ' + formula + '})');
+        f = eval('(function() { return ' + formula + '})');
       }
       f.toString = function() { return formula; };
       var timer = function() {
@@ -167,35 +167,6 @@ foam.CLASS({
   listeners: [
     function toggleMode() {
       this.reactive = ! this.reactive;
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'com.google.flow',
-  name: 'Script',
-
-  imports: [
-    'scope'
-  ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'code',
-      displayWidth: 60
-    },
-    {
-      class: 'String',
-      name: 'output',
-      displayWidth: 60
-    }
-  ],
-
-  actions: [
-    function run() {
-
     }
   ]
 });

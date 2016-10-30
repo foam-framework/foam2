@@ -539,4 +539,41 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Script',
+
+  imports: [
+    'scope'
+  ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code',
+      displayWidth: 60
+    },
+    {
+      class: 'String',
+      name: 'output',
+      transient: true,
+      displayWidth: 60
+    }
+  ],
+
+  actions: [
+    function run() {
+      with ( this.scope ) {
+        this.output += '> ' + this.code + '\n'; 
+        this.output += eval('(function() { return ' + this.code + '})')();
+      }
+    },
+
+    function clearOutput() {
+      this.output = '';
+    }
+  ]
+});
+
 // foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
