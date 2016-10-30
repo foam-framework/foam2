@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: make a StoredFLOW be the root of the tree
 foam.CLASS({
   package: 'com.google.flow',
   name: 'StoredFLOW',
