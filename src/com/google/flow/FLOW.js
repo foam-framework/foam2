@@ -145,7 +145,7 @@ foam.CLASS({
   properties: [
     {
       name: 'scope',
-      factory: function() { return {a:42}; },
+      factory: function() { return {}; },
       documentation: 'Scope to run reactive formulas in.'
     },
     {
