@@ -552,14 +552,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      view: { class: 'foam.u2.tag.TextArea' },
+      view: { class: 'foam.u2.tag.TextArea', rows: 16 },
       displayWidth: 60
     },
     {
       class: 'String',
       name: 'output',
       transient: true,
-      view: { class: 'foam.u2.tag.TextArea' },
+      view: { class: 'foam.u2.tag.TextArea', rows: 16 },
       displayWidth: 60
     }
   ],
