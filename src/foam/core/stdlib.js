@@ -339,9 +339,11 @@ foam.LIB({
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
+        if ( str === '' || str === null || str === undefined ) return '';
+
         console.assert(typeof str === 'string',
-                       'Cannot labelize non-string values.');
-        if ( str === '' ) return str;
+            'Cannot labelize non-string values.');
+
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
