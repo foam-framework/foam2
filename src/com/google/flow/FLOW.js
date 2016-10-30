@@ -28,6 +28,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'description'
+    },
+    {
+      class: 'String',
       name: 'memento'
     }
   ]
