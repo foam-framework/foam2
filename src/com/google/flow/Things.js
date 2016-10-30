@@ -564,11 +564,20 @@ foam.CLASS({
     }
   ],
 
+  methods: [
+    function log() {
+      console.log(arguments);
+      this.output += Array.from(arguments).join(' ') + '\n';
+    }
+  ],
+
   actions: [
     function run() {
       with ( this.scope ) {
-        this.output += '> ' + this.code + '\n'; 
-        this.output += eval('(function() { return ' + this.code + '})')();
+        with ( { log: this.log.bind(this) } ) {
+          this.log('>', this.code);
+          this.log(eval(this.code));
+        }
       }
     },
 
