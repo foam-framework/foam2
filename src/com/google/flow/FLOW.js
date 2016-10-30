@@ -244,7 +244,6 @@ foam.CLASS({
           of: 'com.google.flow.Property',
           guid: true,
           seqProperty: this.Property.NAME,
-//          daoType: 'MDAO'
           daoType: 'ARRAY'
         });
 
@@ -281,7 +280,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 300, height: 600, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 400, height: 400, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
@@ -294,7 +293,38 @@ foam.CLASS({
         return this.Cells.create({rows: 28, columns:8}).style({width:'650px'});
       }
     },
-    'mouseTarget'
+    'mouseTarget',
+    'cmdLineFeedback_',
+    {
+      class: 'String',
+      name: 'cmdLine',
+      value: '>>> ',
+      postSet: function(_, cmd) {
+        if ( this.cmdLineFeedback_ ) return;
+        this.cmdLineFeedback_ = true;
+
+        try {
+          var self = this;
+          function log() {
+            self.cmdLine += Array.from(arguments).join(' ') + '\n';
+          }
+          
+          var i = cmd.lastIndexOf('>>> ');
+          cmd = i === -1 ? cmd : cmd.substring(i+4);
+          
+          with ( this.scope ) {
+            with ( { log: log } ) {
+              log();
+              log(eval(cmd));
+              this.cmdLine += '>>> ';
+            }
+          }
+        } finally {
+          this.cmdLineFeedback_ = false;
+        }
+      },
+      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 48 }
+    }
   ],
 
   methods: [
@@ -345,6 +375,8 @@ foam.CLASS({
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
+            add(this.CMD_LINE).
+            tag('br').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().

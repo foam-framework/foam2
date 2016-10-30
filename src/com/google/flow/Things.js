@@ -566,7 +566,6 @@ foam.CLASS({
 
   methods: [
     function log() {
-      console.log(arguments);
       this.output += Array.from(arguments).join(' ') + '\n';
     }
   ],
