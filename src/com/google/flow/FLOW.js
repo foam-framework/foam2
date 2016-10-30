@@ -15,6 +15,25 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'StoredFLOW',
+
+  ids: [ 'name' ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'memento'
+    }
+  ]
+});
+
+
 // TODO: Should have a GUID 'id' instead of name, since now
 // you can't have two properties with the same name but
 // different parents.
@@ -174,6 +193,17 @@ foam.CLASS({
         dao.put(com.google.flow.Cursor.model_);
         dao.put(com.google.flow.Script.model_);
         return dao;
+      }
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'flows',
+      factory: function() {
+        return foam.dao.EasyDAO.create({
+          of: 'foam.core.Model',
+          cache: true,
+          daoType: 'IDB'
+        });
       }
     },
     {
