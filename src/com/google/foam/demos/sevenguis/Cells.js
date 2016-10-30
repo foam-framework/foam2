@@ -52,7 +52,7 @@ foam.CLASS({
             mod:  seq(literalIC('mod('),  sym('expr'), ',', sym('expr'), ')'),
             sum:  seq1(1, literalIC('sum('),  sym('vargs'), ')'),
             prod: seq1(1, literalIC('prod('), sym('vargs'), ')'),
-            flow: seq(literalIC('flow('),  sym('string'), ',', sym('string'), ')'),
+            flow: seq(literalIC('flow('),  sym('symbol'), ',', sym('symbol'), ')'),
 
             vargs: repeat(alt(sym('range'), sym('expr')), ','),
 
@@ -76,6 +76,10 @@ foam.CLASS({
 
             row: str(repeat(sym('digit'), null, 1, 2)),
 
+            symbol: str(seq(
+              alt(range('a', 'z'), range('A', 'Z')),
+              str(repeat(alt(range('a', 'z'), range('A', 'Z'), range('0', '9')))))),
+
             string: str(repeat(anyChar()))
           };
         }
@@ -87,7 +91,7 @@ foam.CLASS({
     function init() {
       var slot  = this.slot.bind(this);
       var cell  = this.cells.cell.bind(this.cells);
-      var scope = this.scope;
+      var scope = this.cells.scope;
 
       this.addActions({
         add: function(a) { return slot(function() { return a[1].get() + a[3].get(); }, a[1], a[3]); },
@@ -107,7 +111,7 @@ foam.CLASS({
           for ( var i = 0 ; i < a.length ; i++ ) prod *= a[i];
           return prod;
         }); },
-        flow: function(a) { return slot(function() { return scope[a[1]].getSlot(a[3]); }); },
+        flow: function(a) { return slot(function() { return scope[a[1]].slot(a[3]); }); },
         az:  function(c) { return c.toUpperCase(); },
         row: function(c) { return parseInt(c); },
         number: function(s) {

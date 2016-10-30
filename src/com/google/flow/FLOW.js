@@ -280,7 +280,7 @@ foam.CLASS({
         this.Cells.getAxiomsByClass(foam.core.Property).forEach(function(p) { p.hidden = true; });
         this.Cells.ROWS.hidden = this.Cells.COLUMNS.hidden = false;
 
-        return this.Cells.create({rows: 28, columns:10}).style({width:'650px'});
+        return this.Cells.create({rows: 28, columns:8}).style({width:'650px'});
       }
     },
     'mouseTarget'
