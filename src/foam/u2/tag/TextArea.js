@@ -15,24 +15,32 @@
  * limitations under the License.
  */
 
-CLASS({
+foam.CLASS({
   package: 'foam.u2.tag',
   name: 'TextArea',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
 
   properties: [
     [ 'nodeName', 'textarea' ],
     {
       name: 'data',
-      postSet: function(_, d) {
-        if ( this.el() ) this.el().value = d;
-      }
     },
     {
-      type: 'Boolean',
+      class: 'Int',
+      name: 'rows',
+      attribute: true,
+      value: 4
+    },
+    {
+      class: 'Int',
+      name: 'cols',
+      attribute: true,
+      value: 60
+    },
+    {
+      class: 'Boolean',
       name: 'onKey',
       attribute: true,
-      defaultValue: false,
       documentation: 'When true, $$DOC{ref:".data"} is updated on every ' +
           'keystroke, rather than on blur.',
     },
@@ -40,21 +48,11 @@ CLASS({
 
   methods: [
     function initE() {
-      this.cls(this.myCls());
-      this.on(this.onKey ? 'input' : 'change', this.onInput);
-    },
-    function load() {
       this.SUPER();
-      this.data = this.data;
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'onInput',
-      code: function() {
-        if ( this.el() ) this.data = this.el().value;
-      }
+      this.cssClass(this.myCls());
+      this.attrSlot(
+        'value',
+        this.onKey ? 'input' : 'change').linkFrom(this.data$);
     }
   ]
 });
