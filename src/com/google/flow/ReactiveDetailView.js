@@ -112,7 +112,7 @@ foam.CLASS({
         if ( self.data ) {
           var f = self.getFormula();
           self.formula = f ? f.toString() : '';
-          this.reactive = !! f;
+          self.reactive = !! f;
         }
       });
 
@@ -129,7 +129,7 @@ foam.CLASS({
                 return reactive ?
                     self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__).
                       cssClass(this.myCls('formulaInput')).
-                      on('blur', function() { this.reactive = !! this.formula; }).
+                      on('blur', function() { self.reactive = !! self.formula; }).
                       focus() :
                     prop ;
               }),
