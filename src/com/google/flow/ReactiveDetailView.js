@@ -170,3 +170,32 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Script',
+
+  imports: [
+    'scope'
+  ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code',
+      displayWidth: 60
+    },
+    {
+      class: 'String',
+      name: 'output',
+      displayWidth: 60
+    }
+  ],
+
+  actions: [
+    function run() {
+
+    }
+  ]
+});
