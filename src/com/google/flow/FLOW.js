@@ -145,7 +145,12 @@ foam.CLASS({
   properties: [
     {
       name: 'scope',
-      factory: function() { return {}; },
+      factory: function() {
+        return {
+          load: this.loadFlow.bind(this),
+          save: this.saveFlow.bind(this)
+        };
+      },
       documentation: 'Scope to run reactive formulas in.'
     },
     {
@@ -194,6 +199,11 @@ foam.CLASS({
         dao.put(com.google.flow.Script.model_);
         return dao;
       }
+    },
+    {
+      class: 'String',
+      name: 'name',
+      value: 'Untitled1'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -376,6 +386,28 @@ foam.CLASS({
 //        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
       }.bind(this));
+    },
+
+    function loadFlow(name) {
+      console.assert(name, 'Name required.')
+
+      this.name = name;
+      this.flow.find(name).then(function (f) {
+        console.log('loaded: ', name);
+        this.memento = f.memento;
+        console.log('memento: ', this.memento);
+      }.bind(this));
+    },
+
+    function saveFlow(opt_name) {
+      var name = opt_name || this.name;
+      this.name = name;
+      console.log('memento: ', this.memento);
+      this.flows.create(this.StoredFLOW.create({
+        name: name,
+        memento: this.memento
+      }));
+      console.log('saved as:', name);
     }
   ],
 
