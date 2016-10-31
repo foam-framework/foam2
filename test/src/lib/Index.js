@@ -816,7 +816,6 @@ describe('AND', function() {
 
   beforeEach(function() {
     m = foam.mlang.Expressions.create();
-
   });
 
   it('chains subindexes by cost estimate', function() {
@@ -832,6 +831,37 @@ describe('AND', function() {
     expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
     expect(andIndex.tailFactory.prop).toEqual(test.Indexable.STRING);
     expect(andIndex.tailFactory.tailFactory.prop).toEqual(test.Indexable.INT);
+  });
+
+});
+
+describe('OR', function() {
+  var m;
+
+  beforeEach(function() {
+    m = foam.mlang.Expressions.create();
+  });
+
+  it('merges subindexes for toIndex', function() {
+    var or = m.OR(
+      m.GT(test.Indexable.INT, 5),
+      m.EQ(test.Indexable.FLOAT, 5),
+      m.IN(test.Indexable.STRING, 'he')
+    );
+    var tail = test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create());
+    var orIndex = or.toIndex(tail);
+
+    expect(orIndex.delegateFactory.delegateFactories[0])
+      .toEqual(tail);
+
+    expect(orIndex.delegateFactory.delegateFactories[1].prop)
+      .toEqual(test.Indexable.INT);
+
+    expect(orIndex.delegateFactory.delegateFactories[2].prop)
+      .toEqual(test.Indexable.FLOAT);
+
+    expect(orIndex.delegateFactory.delegateFactories[3].prop)
+      .toEqual(test.Indexable.STRING);
   });
 
 });

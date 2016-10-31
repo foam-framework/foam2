@@ -81,6 +81,7 @@ FOAM_FILES([
   { name: "foam/dao/index/TreeIndex" },
   { name: "foam/dao/index/PoliteIndex", flags: ['web'] },
   { name: "foam/dao/index/node/PoliteIndex", flags: ['node'] },
+  { name: "foam/dao/index/OrIndex" },
   { name: "foam/dao/index/AutoIndex" },
   { name: "foam/dao/index/OmniscientAutoIndex" },
   { name: "foam/dao/MDAO" },

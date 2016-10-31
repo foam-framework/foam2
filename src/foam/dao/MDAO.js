@@ -447,22 +447,22 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Or',
 
   requires: [
+    'foam.dao.index.OrIndex',
     'foam.dao.index.AltIndex'
   ],
 
   methods: [
     function toIndex(tailFactory) {
       // return an OR index with Alt index spanning each possible index
-      var subIndexes = [];
+      var subIndexes = [tailFactory];
       for ( var i = 0; i < this.args.length; i++ ) {
         var index = this.args[i].toIndex(tailFactory);
         index && subIndexes.push(index);
       }
-      // TODO: This should be an OrIndex that returns a MergePlan.
-      // Since MDAO does the DNF and handles the Or, this .toIndex() is
-      // not a common case.
-      return this.AltIndex.create({
-        delegates: subIndexes
+      return this.OrIndex.create({
+        delegateFactory: this.AltIndex.create({
+          delegateFactories: subIndexes
+        })
       });
     },
 
