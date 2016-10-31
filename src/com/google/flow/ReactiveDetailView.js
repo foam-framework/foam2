@@ -21,11 +21,11 @@ foam.CLASS({
     {
       name: 'reactions_',
       factory: function() { return {}; },
-      fromJSON: function(value, X, prop) {
-        for ( var key in value ) {
-          this.startReaction(X.scope, key, value[key]);
+      postSet: function(_, rs) {
+        for ( var key in rs ) {
+          this.startReaction_(key, rs[key]);
         }
-        return value;
+        return rs;
       },
       toJSON: function(v) {
         var m = {};
@@ -35,24 +35,28 @@ foam.CLASS({
     }
   ],
   methods: [
-    function startReaction_(scope, name, formula) {
-      var self = this;
-      var f;
+    function startReaction_(name, formula) {
+      // HACK: delay starting reaction in case we're loading a file
+      // and dependent variables haven't loaded yet.
+      window.setTimeout(function() {
+        var self = this;
+        var f;
 
-      with ( scope ) {
-        f = eval('(function() { return ' + formula + '})');
-      }
-      f.toString = function() { return formula; };
+        with ( this.__context__.scope ) {
+          f = eval('(function() { return ' + formula + '})');
+        }
+        f.toString = function() { return formula; };
 
-      var timer = function() {
-        if ( self.isDestroyed() ) return;
-        if ( self.reactions_[name] !== f ) return;
-        self[name] = f.call(self);
-        self.__context__.requestAnimationFrame(timer);
-      };
+        var timer = function() {
+          if ( self.isDestroyed() ) return;
+          if ( self.reactions_[name] !== f ) return;
+          self[name] = f.call(self);
+          self.__context__.requestAnimationFrame(timer);
+        };
 
-      this.reactions_[name] = f;
-      timer();
+        this.reactions_[name] = f;
+        timer();
+      }.bind(this), 10);
     }
   ]
 });
@@ -171,7 +175,7 @@ foam.CLASS({
     },
 
     function setFormula(formula) {
-      this.data.startReaction_(this.scope, this.prop.name, formula);
+      this.data.startReaction_(this.prop.name, formula);
     }
   ],
 
