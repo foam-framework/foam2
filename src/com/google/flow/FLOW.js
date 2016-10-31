@@ -399,6 +399,7 @@ foam.CLASS({
                   self.cmdLine = evt.srcElement.value;
                   evt.preventDefault();
                   evt.srcElement.focus();
+                  evt.srcElement.scrollTop = evt.srcElement.scrollHeight;
                   return false;
                 }
               }).
