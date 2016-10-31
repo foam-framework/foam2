@@ -469,8 +469,10 @@ describe('foam.String', function() {
       .toBe("CONSTANT_NAME");
     expect(foam.String.labelize(''))
       .toBe('');
+    expect(foam.String.labelize(null))
+      .toBe('');
     expect(function() {
-      foam.String.labelize(null);
+      foam.String.labelize({ thing: 'object' });
     }).toThrow();
   });
 
