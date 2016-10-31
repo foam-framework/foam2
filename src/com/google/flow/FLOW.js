@@ -145,9 +145,10 @@ foam.CLASS({
       .foam-u2-TableView-selected { outline: 1px solid red; }
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
+      ^cmd { width: 100%; margin-bottom: 8px; }
       ^properties .foam-u2-view-TreeViewRow { position: relative; }
       ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
-      .foam-u2-Tabs { padding-top: 0 !important; }
+      .foam-u2-Tabs { padding-top: 0 !important; margin-right: -8px; }
       input[type="range"] { width: 60px; height: 15px; }
       input[type="color"] { width: 60px; }
       */}
@@ -292,7 +293,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 800, height: 100, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 800, height: 600, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
@@ -375,6 +376,20 @@ foam.CLASS({
             start(this.TOOLS, {selection$: this.currentTool$}).end().
           end().
           start('center').
+            start(this.CMD_LINE).
+              cssClass(this.myCls('cmd')).
+              // TODO: this should be a feature of TextArea
+              on('keydown', function(evt) {
+                if ( evt.keyCode === 13 ) {
+                  self.cmdLine = evt.srcElement.value;
+                  evt.preventDefault();
+                  evt.srcElement.focus();
+                  evt.srcElement.scrollTop = evt.srcElement.scrollHeight;
+                  return false;
+                }
+              }).
+            end().
+//            tag('br').
             start(foam.u2.Tabs).
               start(foam.u2.Tab, {label: 'canvas1'}).
                 start(this.canvas).
@@ -392,19 +407,6 @@ foam.CLASS({
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
-            start(this.CMD_LINE).
-              // TODO: this should be a feature of TextArea
-              on('keydown', function(evt) {
-                if ( evt.keyCode === 13 ) {
-                  self.cmdLine = evt.srcElement.value;
-                  evt.preventDefault();
-                  evt.srcElement.focus();
-                  evt.srcElement.scrollTop = evt.srcElement.scrollHeight;
-                  return false;
-                }
-              }).
-            end().
-            tag('br').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().
