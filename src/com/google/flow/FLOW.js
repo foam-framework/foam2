@@ -35,14 +35,18 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
-          x:      o.x,
-          y:      o.y,
-          width:  o.width,
-          height: o.height,
-          radius: o.radius,
-          border: o.radius,
-          text:   o.text,
-          color:  o.color
+          x:        o.x,
+          y:        o.y,
+          width:    o.width,
+          height:   o.height,
+          radius:   o.radius,
+          border:   o.radius,
+          text:     o.text,
+          head:     o.head,
+          tail:     o.tail,
+          length:   o.length,
+          strength: o.strength,
+          color:    o.color
         }, o.__context__);
         m[this.name].instance_.reactions_ = o.reactions_;
       }
