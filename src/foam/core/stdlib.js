@@ -339,7 +339,7 @@ foam.LIB({
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
-        if ( str === '' || str === null || str === undefined ) return '';
+        if ( str === '' || str === null ) return '';
 
         console.assert(typeof str === 'string',
             'Cannot labelize non-string values.');
@@ -399,7 +399,7 @@ foam.LIB({
     function pad(str, size) {
       console.assert(typeof str === 'string',
           'Cannot constantize non-string values.');
-      
+
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
         (new Array(-size).join(' ') + str).slice(size)       :
@@ -418,7 +418,7 @@ foam.LIB({
     function startsWithIC(a, b) {
       console.assert(typeof a === 'string' && typeof b === 'string',
           'Cannot startsWithIC non-string values.');
-      
+
       return a.toUpperCase().startsWith(b.toUpperCase());
     },
     (function() {
