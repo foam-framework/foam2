@@ -318,10 +318,10 @@ foam.CLASS({
           function log() {
             self.cmdLine += Array.from(arguments).join(' ') + '\n';
           }
-          
+
           var i = cmd.lastIndexOf('>>> ');
           cmd = i === -1 ? cmd : cmd.substring(i+4);
-          
+
           with ( this.scope ) {
             with ( { log: log } ) {
               log();
