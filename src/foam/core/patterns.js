@@ -85,7 +85,64 @@ foam.CLASS({
 
 /**
   Progenitors spawn many lightweight instances of themselves, sharing
-  properties when indicated. Spawning an instance costs virtually nothing.
+  properties when indicated. Spawning an instance costs virtually nothing,
+  only depending on the number of user defined PerInstance properties
+  with factories.
+
+  To use, add the Progenitor axiom to your class and specify normal (shared)
+  properties and PerInstance properties. Note that you can't set types
+  or other useful postSet/expression/required attributes on PerInstance
+  properties, only 'value' and 'factory' to initialize them:
+
+  <code>
+  foam.CLASS({
+    package: 'myPackage',
+    name: 'ProgClass',
+
+    axioms: [ foam.pattern.Progenitor.create() ],
+
+    properties: [
+      {
+        class: 'foam.pattern.progenitor.PerInstance',
+        name: 'first',
+        value: 0
+      },
+      {
+        class: 'foam.pattern.progenitor.PerInstance',
+        name: 'second',
+        factory: function() { return []; }
+      },
+      {
+        class: 'String',
+        name: 'sharedProp',
+        adapt: function(old, nu) {
+          return nu + "!";
+        }
+      }
+    ]
+  });
+  </code>
+
+  Then create a progenitor instance, and spawn lightweight instances from
+  it:
+
+  <code>
+    // Create the progenitor, which is a full featured FObject:
+    var prog = myPackage.ProgClass.create({ sharedProp: "Hello" });
+
+    // Spawn lightweights quickly, but with limited features:
+    var spawn1 = prog.spawn({ first: 3 });
+    var spawn2 = prog.spawn();
+
+    spawn1.first == 3;
+    spawn2.first == 0;
+
+    assert(spawn1.sharedProp == "Hello!");
+    assert(spawn2.sharedProp == "Hello!");
+
+    spawn1.sharedProp = "Bye";
+    assert(spawn2.sharedProp == "Bye!");
+  </code>
 */
 foam.CLASS({
   package: 'foam.pattern',
@@ -93,24 +150,89 @@ foam.CLASS({
 
   properties: [
     [ 'name', 'Progenitor' ]
-//     {
-//       /** An map of functions to apply when spawning each instance.
-//         Keys with null will be pulled from args if available. */
-//       name: 'protoFactories',
-//       factory: function() { return Object.create(null); }
-//     },
-//     {
-//       /** An map of functions to apply when spawning each instance.
-//         Keys with null will be pulled from args if available. */
-//       name: 'protoValues',
-//       factory: function() { return Object.create(null); }
-//     },
-//     {
-//       /** The keys of protoInits, to avoid 'for(key in protoInits)' */
-//       name: 'protoValidProps_',
-//       factory: function() { return []; }
-//     },
   ],
+
+  constants: {
+    // Avoid "SUPER" conflict by not putting this code inside installInClass
+    DESCRIBE_FUNC: function describeSpawn() {
+      if (  this.progenitor ) console.log("Spawn of progenitor", this.progenitor.$UID);
+      this.SUPER();
+    },
+
+    GET_PROTO_FUNC: function getProgenitorProto_() {
+      var p = this.getPrivate_('progenitorPrototype_');
+      if ( ! p ) {
+        p = Object.create(this);
+
+        // grab list of property values and factories
+        var pp = {
+          protoFactories: Object.create(null),
+          protoValues:  Object.create(null),
+          protoValidProps_: [].slice(),
+          protoFactoryProps_: [].slice()
+        }
+        var props = this.cls_.getAxiomsByClass(foam.pattern.progenitor.PerInstance);
+        for ( var i = 0; i < props.length; i++ ) {
+          var prop = props[i];
+          // TODO: generate a single function from strings?
+          if ( prop.factory ) {
+            pp.protoFactories[prop.name] = prop.factory;
+            pp.protoFactoryProps_.push(prop.name);
+          } else if ( prop.value ) {
+            pp.protoValues[prop.name] = prop.value;
+          }
+          pp.protoValidProps_.push(prop.name);
+        }
+        p.propertyDefaults_ = pp;
+
+        // block non-instance functions
+        p.getProgenitorProto_ = null;
+        p.spawn = null;
+        p.progenitor = this;
+        p.clone = function() {
+          return this.progenitor.spawn(this);
+        }
+
+        // block per-instance properties that might be accidentally set
+        //   on the progenitor
+        var props = pp.protoValidProps_;
+        for ( var i = 0; i < props.length; i++ ) {
+          var pName = props[i];
+          p[pName] = pp.protoValues[pName];
+        }
+        this.setPrivate_('progenitorPrototype_', p);
+      }
+      return p;
+    },
+
+    SPAWN_FUNC: function spawn(args) {
+      var spawnProto = this.getProgenitorProto_();
+      var c = Object.create(spawnProto);
+      var defaults = spawnProto.propertyDefaults_;
+      // copy properties or run factories
+      if ( args ) {
+        var props = defaults.protoValidProps_;
+        for ( var i = 0; i < props.length; i++ ) {
+          var prop = props[i];
+          if ( args && ( args[prop] !== undefined ) ) {
+            c[prop] = args[prop];
+          } else if ( defaults.protoFactories[prop] ) {
+            c[prop] = defaults.protoFactories[prop].call(this);
+          }
+        }
+      } else {
+        // no args, just run factories
+        var props = defaults.protoFactoryProps_;
+        for ( var i = 0; i < props.length; i++ ) {
+          var prop = props[i];
+          c[prop] = defaults.protoFactories[prop].call(this);
+        }
+      }
+      // user defined init
+      this.initInstance && this.initInstance.call(c);
+      return c;
+    }
+  },
 
   methods: [
     function installInClass(cls) {
@@ -118,88 +240,15 @@ foam.CLASS({
       cls.installAxioms([
         foam.core.Method.create({
           name: 'spawn',
-          code: function create(args) {
-            var spawnProto = this.getProgenitorProto_();
-            var c = Object.create(spawnProto);
-            var defaults = spawnProto.propertyDefaults_;
-            // init or copy properties
-            if ( args ) {
-              var props = defaults.protoValidProps_;
-              for ( var i = 0; i < props.length; i++ ) {
-                var prop = props[i];
-                if ( args && ( args[prop] !== undefined ) ) {
-                  c[prop] = args[prop];
-                } else if ( defaults.protoFactories[prop] ) {
-                  c[prop] = defaults.protoFactories[prop].call(this);
-                }
-              }
-            } else {
-              // no args, just run factories
-              var props = defaults.protoFactoryProps_;
-              for ( var i = 0; i < props.length; i++ ) {
-                var prop = props[i];
-                c[prop] = defaults.protoFactories[prop].call(this);
-              }
-            }
-            // user defined init
-            this.initInstance && this.initInstance.call(c);
-            return c;
-          }
+          code: this.SPAWN_FUNC
         }),
         foam.core.Method.create({
           name: 'getProgenitorProto_',
-          code: function() {
-            var p = this.getPrivate_('progenitorPrototype_');
-            if ( ! p ) {
-              p = Object.create(this);
-
-              // grab list of property values and factories
-              var pp = {
-                protoFactories: Object.create(null),
-                protoValues:  Object.create(null),
-                protoValidProps_: [].slice(),
-                protoFactoryProps_: [].slice()
-              }
-              var props = this.cls_.getAxiomsByClass(foam.pattern.progenitor.PerInstance);
-              for ( var i = 0; i < props.length; i++ ) {
-                var prop = props[i];
-                // TODO: generate a single function from strings?
-                if ( prop.factory ) {
-                  pp.protoFactories[prop.name] = prop.factory;
-                  pp.protoFactoryProps_.push(prop.name);
-                } else if ( prop.value ) {
-                  pp.protoValues[prop.name] = prop.value;
-                }
-                pp.protoValidProps_.push(prop.name);
-              }
-              p.propertyDefaults_ = pp;
-
-              // block non-instance functions
-              p.getProgenitorProto_ = null;
-              p.spawn = null;
-              p.progenitor = this;
-              p.clone = function() {
-                return this.progenitor.spawn(this);
-              }
-
-              // block per-instance properties that might be accidentally set
-              //   on the progenitor
-              var props = pp.protoValidProps_;
-              for ( var i = 0; i < props.length; i++ ) {
-                var pName = props[i];
-                p[pName] = pp.protoValues[pName];
-              }
-              this.setPrivate_('progenitorPrototype_', p);
-            }
-            return p;
-          }
+          code: this.GET_PROTO_FUNC
         }),
         foam.core.Method.create({
           name: 'describe',
-          code: function() {
-            if (  this.progenitor ) console.log("Spawn of progenitor", this.progenitor.$UID);
-            this.SUPER();
-          }
+          code: this.DESCRIBE_FUNC
         }),
       ]);
     },
@@ -210,8 +259,12 @@ foam.CLASS({
 /**
   Indicates properties of a progenitor that belong to each spawned
   instance. Because these are plain untyped properties, they only have limited
-  features available.
-  'value can be used to set the default value, and factory.
+  features available. Normal properties of a Progenitor are shared between
+  spawned instances.
+
+  'value' can be used to set the default value on the progenitor's instance
+  prototype, and 'factory' can supply a function to run each time a new
+  instance is spawned.
 */
 foam.CLASS({
   package: 'foam.pattern.progenitor',
@@ -220,7 +273,7 @@ foam.CLASS({
 
   requires: [ 'foam.pattern.Progenitor' ],
 
-  // handled specially 'value', 'factory'
+  // Progenitor only accepts: 'value', 'factory'
   properties: [
     { name: 'adapt',       setter: function() { throw "PerInstance property does not support adapt() in " + this.name; } },
     { name: 'preSet',      setter: function() { throw "PerInstance property does not support preSet() in " + this.name; } },
