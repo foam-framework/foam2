@@ -41,7 +41,8 @@ foam.CLASS({
           height: o.height,
           radius: o.radius,
           border: o.radius,
-          color:  o.color
+          color:  o.color,
+          reactions_: o.reactions_
         });
       }
     }
@@ -291,7 +292,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 700, height: 100, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 800, height: 100, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
@@ -330,11 +331,13 @@ foam.CLASS({
               this.cmdLine += '>>> ';
             }
           }
+        } catch (x) {
+          log('ERROR:', x);
         } finally {
           this.cmdLineFeedback_ = false;
         }
       },
-      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 48 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 80 }
     }
   ],
 
@@ -449,7 +452,7 @@ foam.CLASS({
       this.flows.put(this.FLOW.create({
         name: name,
         memento: this.memento
-      }););
+      }));
       console.log('saved as:', name);
     }
   ],
