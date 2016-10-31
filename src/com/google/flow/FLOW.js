@@ -190,7 +190,7 @@ foam.CLASS({
         columns: [ foam.core.Model.NAME ]
       },
       factory: function() {
-        var dao = foam.dao.EasyDAO.create({
+        var dao = this.EasyDAO.create({
           of: 'foam.core.Model',
           daoType: 'ARRAY'
         });
@@ -222,7 +222,7 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'flows',
       factory: function() {
-        return foam.dao.EasyDAO.create({
+        return this.EasyDAO.create({
           of: com.google.flow.FLOW,
           cache: true,
           daoType: 'IDB'
@@ -252,7 +252,7 @@ foam.CLASS({
         }
       },
       factory: function() {
-        var dao = foam.dao.EasyDAO.create({
+        var dao = this.EasyDAO.create({
           of: 'com.google.flow.Property',
           guid: true,
           seqProperty: this.Property.NAME,
