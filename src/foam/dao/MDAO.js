@@ -112,9 +112,9 @@ foam.CLASS({
       // Upgrade single Index to an AltIndex if required.
       if ( ! this.AltIndex.isInstance(this.index.progenitor) ) {
         this.index = this.AltIndex.create({
-          delegates: [ this.index.progenitor ], // create factory
+          delegateFactories: [ this.index.progenitor ], // create factory
         }).spawn({
-          instances: [ this.index ] // create an instance
+          delegates: [ this.index ] // create an instance
         });
       }
 

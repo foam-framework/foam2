@@ -179,19 +179,19 @@ foam.CLASS({
   properties: [
     {
       /** delegate factories (TODO: rename) */
-      name: 'delegates',
+      name: 'delegateFactories',
       factory: function() { return []; }
     },
     {
       /** the delegate instances for each Alt instance */
       class: 'foam.pattern.progenitor.PerInstance',
-      name: 'instances',
+      name: 'delegates',
       factory: function() {
-        var instances = [];
-        for ( var i = 0; i < this.delegates.length; i++ ) {
-          instances[i] = this.delegates[i].spawn();
+        var delegates = [];
+        for ( var i = 0; i < this.delegateFactories.length; i++ ) {
+          delegates[i] = this.delegateFactories[i].spawn();
         }
-        return instances;
+        return delegates;
       }
     },
   ],
@@ -204,13 +204,13 @@ foam.CLASS({
       // This should be called on the factory, not an instance
       var self = this.progenitor || this;
 
-      self.delegates.push(index);
+      self.delegateFactories.push(index);
 
       function addIndexTo(altInst) {
         // Populate the new index
         var newSubInst = index.spawn();
         altInst.plan(newSubInst).execute([], newSubInst);
-        altInst.instances.push(newSubInst);
+        altInst.delegates.push(newSubInst);
         return altInst;
       }
 
@@ -218,44 +218,44 @@ foam.CLASS({
         // if we are the root, just call addIndexTo immediately
         addIndexTo(root);
       } else {
-        // find all instances created by this factory, addIndexTo them
+        // find all delegates created by this factory, addIndexTo them
         root.mapOver(addIndexTo, self);
       }
     },
 
     function bulkLoad(a) {
-      for ( var i = 0 ; i < this.instances.length ; i++ ) {
-        this.instances[i].bulkLoad(a);
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].bulkLoad(a);
       }
     },
 
     function get(key) {
-      return this.instances[0].get(key);
+      return this.delegates[0].get(key);
     },
 
     function getAltForOrderDirs(orderDirs) {
-      var instances = this.instances;
-      if ( ! orderDirs ) return instances[0];
+      var delegates = this.delegates;
+      if ( ! orderDirs ) return delegates[0];
 
       var t = orderDirs.tags[this];
-      // if no cached index number, check our delegates the best
+      // if no cached index number, check our delegateFactories the best
       // estimate, considering only ordering
       if ( ! foam.Number.isInstance(t) ) {
         var order = orderDirs.srcOrder;
-        var delegates = this.delegates;
+        var delegateFactories = this.delegateFactories;
         var bestEst = Number.MAX_VALUE;
         var nullSink = this.NullSink.create();
         var est;
         var t = -1;
-        for ( var i = 0; i < delegates.length; i++ ) {
-          est = delegates[i].estimate(1000, nullSink, undefined, undefined, order);
+        for ( var i = 0; i < delegateFactories.length; i++ ) {
+          est = delegateFactories[i].estimate(1000, nullSink, undefined, undefined, order);
           if ( bestEst > est ) {
             t = orderDirs.tags[this] = i;
             bestEst = est;
           }
         }
       }
-      return instances[t];
+      return delegates[t];
     },
 
     function select(sink, skip, limit, orderDirs, predicate) {
@@ -265,32 +265,32 @@ foam.CLASS({
     },
 
     function mapOver(fn, ofIndex) {
-      for ( var i = 0 ; i < this.instances.length ; i++ ) {
-        if ( this.delegates[i] == ofIndex) {
-          this.instances[i] = fn(this.instances[i]);
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        if ( this.delegateFactories[i] == ofIndex) {
+          this.delegates[i] = fn(this.delegates[i]);
         } else {
-          this.instances[i].mapOver(fn, ofIndex);
+          this.delegates[i].mapOver(fn, ofIndex);
         }
       }
     },
 
     function put(newValue) {
-      for ( var i = 0 ; i < this.instances.length ; i++ ) {
-        this.instances[i].put(newValue);
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].put(newValue);
       }
     },
 
     function remove(obj) {
-      for ( var i = 0 ; i < this.instances.length ; i++ ) {
-        this.instances[i].remove(obj);
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        this.delegates[i].remove(obj);
       }
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
       var bestPlan;
       //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
-      for ( var i = 0 ; i < this.instances.length ; i++ ) {
-        var plan = this.instances[i].plan(sink, skip, limit, order, predicate, root);
+      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
+        var plan = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
         // console.log('  plan ' + i + ': ' + plan);
         if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
           bestPlan = plan;
@@ -307,10 +307,10 @@ foam.CLASS({
       return bestPlan;
     },
 
-    function size() { return this.instances[0].size(); },
+    function size() { return this.delegates[0].size(); },
 
     function toString() {
-      return 'Alt([' + this.delegates.join(',') + '])';
+      return 'Alt([' + this.delegateFactories.join(',') + '])';
     }
   ]
 });

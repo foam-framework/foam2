@@ -41,8 +41,8 @@ foam.CLASS({
       // NOTE: This is conceptually the right thing to do, but also helps
       //   speed up isOrderSelectable() calls on this:
       //   a.isOrderSelectable(o) -> b.estimate(..o) -> b.isOrderSelectable(o) ...
-      //   Which makes it efficient but removes the need for Index to 
-      //   have an isOrderSelectable() method forwarding directly.  
+      //   Which makes it efficient but removes the need for Index to
+      //   have an isOrderSelectable() method forwarding directly.
       if ( order && ! ( predicate || skip || limit ) ) {
         return this.isOrderSelectable(order) ? size :
           size * Math.log(size) / Math.log(2);
@@ -149,13 +149,13 @@ foam.CLASS({
   refines: 'foam.dao.index.AltIndex',
 
   methods: [
-    /** Returns smallest estimate from the delegates */
+    /** Returns smallest estimate from the delegateFactories */
     function estimate(size, sink, skip, limit, order, predicate) {
       var cost = Number.MAX_VALUE;
-      for ( var i = 0; i < this.delegates.length; i++ ) {
+      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
         cost = Math.min(
           cost,
-          this.delegates[i].estimate(
+          this.delegateFactories[i].estimate(
             size, sink, skip, limit, order, predicate)
         );
       }
@@ -197,7 +197,7 @@ foam.CLASS({
     {
       name: 'delegateFactory',
       factory: function() {
-        return this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
+        return this.AltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
       }
     },
     {

@@ -522,7 +522,7 @@ describe('TreeIndex', function() {
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.STRING,
       tailFactory: foam.dao.index.AltIndex.create({
-        delegates: [
+        delegateFactories: [
           test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
           test.Indexable.INT.toIndex(
             test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
@@ -878,8 +878,8 @@ describe('AutoIndex', function() {
 
   it('supports manual addIndex()', function() {
     idx.addPropertyIndex(test.Indexable.INT, idxInstance);
-    expect(idxInstance.delegate.instances.length).toEqual(2);
-    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
 
   it('auto indexes on ordering', function() {
@@ -887,16 +887,16 @@ describe('AutoIndex', function() {
       .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
       .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-    expect(idxInstance.delegate.instances.length).toEqual(2);
-    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
 
     idxInstance
       .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
 
-    expect(idxInstance.delegate.instances.length).toEqual(3);
-    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
-    expect(idxInstance.delegate.instances[2].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates.length).toEqual(3);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
   });
 
   it('skips already auto indexed orderings', function() {
@@ -904,15 +904,15 @@ describe('AutoIndex', function() {
       .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
       .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-    expect(idxInstance.delegate.instances.length).toEqual(2);
-    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
 
     idxInstance
       .plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined, fakeRoot)
       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined);
 
-    expect(idxInstance.delegate.instances.length).toEqual(2);
-    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
 
   it('auto indexes on predicate', function() {
@@ -946,9 +946,9 @@ describe('AutoIndex', function() {
       idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
         .execute([], sink, undefined, undefined, undefined, subpred);
-    }    
-    expect(idxInstance.delegate.instances.length).toEqual(2);
-    expect(idxInstance.delegate.instances[1].size()).toEqual(1000);
+    }
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
 
   it('auto indexes on more predicates', function() {
@@ -969,10 +969,10 @@ describe('AutoIndex', function() {
       idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
         .execute([], sink, undefined, undefined, undefined, subpred);
-        
-      expect(idxInstance.delegate.instances.length).toEqual(i+2);
-      expect(idxInstance.delegate.instances[i+1].size()).toEqual(1000);
-    }    
+
+      expect(idxInstance.delegate.delegates.length).toEqual(i+2);
+      expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
+    }
   });
 
 
