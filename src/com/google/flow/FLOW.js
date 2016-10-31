@@ -57,10 +57,10 @@ foam.CLASS({
 });
 
 
-// TODO: make a StoredFLOW be the root of the tree
+// TODO: make a FLOW be the root of the tree
 foam.CLASS({
   package: 'com.google.flow',
-  name: 'StoredFLOW',
+  name: 'FLOW',
 
   ids: [ 'name' ],
 
@@ -95,7 +95,7 @@ var relationship = foam.RELATIONSHIP({
 
 foam.CLASS({
   package: 'com.google.flow',
-  name: 'FLOW',
+  name: 'FLOWController',
   extends: 'foam.u2.Element',
 
   implements: [
@@ -107,7 +107,7 @@ foam.CLASS({
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
-    'com.google.flow.StoredFLOW',
+    'com.google.flow.FLOW',
     'com.google.foam.demos.sevenguis.Cells',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
@@ -447,7 +447,7 @@ foam.CLASS({
       this.name = name;
       this.updateMemento();
       console.log('memento: ', this.memento);
-      this.flows.put(this.StoredFLOW.create({
+      this.flows.put(this.FLOW.create({
         name: name,
         memento: this.memento
       }));
