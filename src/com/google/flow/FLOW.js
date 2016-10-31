@@ -31,6 +31,7 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'FObjectProperty',
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
@@ -74,7 +75,7 @@ foam.CLASS({
       name: 'description'
     },
     {
-      class: 'FObjectProperty',
+      class: 'FObjectArray',
       of: 'com.google.flow.Property',
       name: 'memento'
     }
@@ -221,7 +222,7 @@ foam.CLASS({
       name: 'flows',
       factory: function() {
         return foam.dao.EasyDAO.create({
-          of: 'foam.core.Model',
+          of: com.google.flow.FLOW,
           cache: true,
           daoType: 'IDB'
         });
@@ -290,7 +291,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 400, height: 400, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 700, height: 100, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
@@ -438,7 +439,6 @@ foam.CLASS({
       this.flows.find(name).then(function (f) {
         console.log('loaded: ', name);
         this.memento = f.memento;
-        console.log('memento: ', this.memento);
       }.bind(this));
     },
 
@@ -446,11 +446,10 @@ foam.CLASS({
       var name = opt_name || this.name;
       this.name = name;
       this.updateMemento();
-      console.log('memento: ', this.memento);
       this.flows.put(this.FLOW.create({
         name: name,
         memento: this.memento
-      }));
+      }););
       console.log('saved as:', name);
     }
   ],
