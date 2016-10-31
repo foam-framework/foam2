@@ -530,6 +530,10 @@ foam.CLASS({
       hidden: true,
       value: true
     },
+    { name: 'top_',    getter: function() { return this.y; } },
+    { name: 'left_',   getter: function() { return this.x; } },
+    { name: 'bottom_', getter: function() { return this.y+this.height; } },
+    { name: 'right_',  getter: function() { return this.x+this.width; } },
     {
       name: 'invalidate_',
       hidden: true,
@@ -856,19 +860,24 @@ foam.CLASS({
       class: 'Float'
     },
     {
+      // TODO: rename this
       name: 'arcWidth',
       class: 'Float'
     },
     {
       name: 'border',
       value: '#000000'
-    }
+    },
+    { name: 'top_',    getter: function() { return this.y-this.radius; } },
+    { name: 'left_',   getter: function() { return this.x-this.radius; } },
+    { name: 'bottom_', getter: function() { return this.y+this.radius; } },
+    { name: 'right_',  getter: function() { return this.x+this.radius; } }
   ],
 
   methods: [
     function paintSelf(x) {
       x.beginPath();
-      x.arc(0, 0, this.radius, this.start, this.end);
+      x.arc(0, 0, this.radius-this.arcWidth, this.start, this.end);
 
       if ( this.color ) x.fill();
 
