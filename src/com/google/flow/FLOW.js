@@ -310,7 +310,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'cmdLine',
-      value: '>>> ',
+       factory: function() { return 'flow> '; },
       postSet: function(_, cmd) {
         if ( this.cmdLineFeedback_ ) return;
         this.cmdLineFeedback_ = true;
@@ -321,14 +321,16 @@ foam.CLASS({
             self.cmdLine += Array.from(arguments).join(' ') + '\n';
           }
 
-          var i = cmd.lastIndexOf('>>> ');
-          cmd = i === -1 ? cmd : cmd.substring(i+4);
+          var i = cmd.lastIndexOf('flow> ');
+          cmd = i === -1 ? cmd : cmd.substring(i+6);
+
+          if ( ! cmd.trim() ) return;
 
           with ( this.scope ) {
             with ( { log: log } ) {
               log();
               log(eval(cmd));
-              this.cmdLine += '>>> ';
+              this.cmdLine += 'flow> ';
             }
           }
         } catch (x) {
@@ -396,6 +398,7 @@ foam.CLASS({
                 if ( evt.keyCode === 13 ) {
                   self.cmdLine = evt.srcElement.value;
                   evt.preventDefault();
+                  evt.srcElement.focus();
                   return false;
                 }
               }).
