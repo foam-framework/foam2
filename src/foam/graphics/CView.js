@@ -530,10 +530,10 @@ foam.CLASS({
       hidden: true,
       value: true
     },
-    { name: 'top_',    getter: function() { return this.y; } },
-    { name: 'left_',   getter: function() { return this.x; } },
-    { name: 'bottom_', getter: function() { return this.y+this.height; } },
-    { name: 'right_',  getter: function() { return this.x+this.width; } },
+    { name: 'top_',    hidden: true, getter: function() { return this.y; } },
+    { name: 'left_',   hidden: true, getter: function() { return this.x; } },
+    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.height; } },
+    { name: 'right_',  hidden: true, getter: function() { return this.x+this.width; } },
     {
       name: 'invalidate_',
       hidden: true,
@@ -868,10 +868,10 @@ foam.CLASS({
       name: 'border',
       value: '#000000'
     },
-    { name: 'top_',    getter: function() { return this.y-this.radius; } },
-    { name: 'left_',   getter: function() { return this.x-this.radius; } },
-    { name: 'bottom_', getter: function() { return this.y+this.radius; } },
-    { name: 'right_',  getter: function() { return this.x+this.radius; } }
+    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radius; } },
+    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radius; } },
+    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radius; } },
+    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radius; } }
   ],
 
   methods: [
