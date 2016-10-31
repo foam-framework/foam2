@@ -350,6 +350,7 @@ foam.CLASS({
       this.properties.on.remove.sub(this.onPropertyRemove);
 
       var halo = this.Halo.create();
+      var self = this;
       halo.selected$.linkFrom(this.selected$);
 
       this.memento$.sub(function() {
@@ -389,7 +390,16 @@ foam.CLASS({
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
-            add(this.CMD_LINE).
+            start(this.CMD_LINE).
+              // TODO: this should be a feature of TextArea
+              on('keydown', function(evt) {
+                if ( evt.keyCode === 13 ) {
+                  self.cmdLine = evt.srcElement.value;
+                  evt.preventDefault();
+                  return false;
+                }
+              }).
+            end().
             tag('br').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
