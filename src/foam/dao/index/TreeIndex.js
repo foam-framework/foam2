@@ -105,6 +105,36 @@ foam.CLASS({
     'foam.mlang.sink.Explain',
   ],
 
+  constants: {
+    IS_EXPR_MATCH_FN: function isExprMatch(predicate, prop, model) {
+      if ( predicate && model && prop ) {
+        // util.equals catches Properties that were cloned if the predicate has
+        //  been cloned.
+        if ( model.isInstance(predicate) &&
+            ( predicate.arg1 === prop || foam.util.equals(predicate.arg1, prop) )
+        ){
+          var arg2 = predicate.arg2;
+          predicate = undefined;
+          return { arg2: arg2, predicate: predicate };
+        }
+
+        if ( predicate.args && this.And.isInstance(predicate) ) {
+          for ( var i = 0 ; i < predicate.args.length ; i++ ) {
+            var q = predicate.args[i];
+            if ( model.isInstance(q) && q.arg1 === prop ) {
+              predicate = predicate.clone();
+              predicate.args[i] = this.True.create();
+              predicate = predicate.partialEval();
+              if (  this.True.isInstance(predicate) ) predicate = undefined;
+              return { arg2: q.arg2, predicate: predicate };
+            }
+          }
+        }
+      }
+      return undefined;
+    }
+  },
+
   properties: [
     {
       name: 'prop'
@@ -236,6 +266,80 @@ foam.CLASS({
       return false;
     },
 
+    function estimate(size, sink, skip, limit, order, predicate) {
+      // small sizes don't matter
+      if ( size <= 16 ) return Math.log(size) / Math.log(2);
+
+      // if only estimating by ordering, just check if we can scan it
+      //  otherwise return the sort cost.
+      // NOTE: This is conceptually the right thing to do, but also helps
+      //   speed up isOrderSelectable() calls on this:
+      //   a.isOrderSelectable(o) -> b.estimate(..o) -> b.isOrderSelectable(o) ...
+      //   Which makes it efficient but removes the need for Index to
+      //   have an isOrderSelectable() method forwarding directly.
+      if ( order && ! ( predicate || skip || limit ) ) {
+        return this.isOrderSelectable(order) ? size :
+          size * Math.log(size) / Math.log(2);
+      }
+
+      var self = this;
+      predicate = predicate ? predicate.clone() : null;
+      var property = this.prop;
+      // TODO: validate this assumption:
+      var nodeCount = Math.floor(size * 0.25); // tree node count will be a quarter the total item count
+
+      var isExprMatch = this.IS_EXPR_MATCH_FN.bind(this, predicate, property);
+      
+      var tailFactory = this.tailFactory;
+      var subEstimate = ( tailFactory ) ? function() {
+          return Math.log(nodeCount) / Math.log(2) +
+            tailFactory.estimate(size / nodeCount, sink, skip, limit, order, predicate);
+        } :
+        function() { return Math.log(nodeCount) / Math.log(2); };
+
+      var expr = isExprMatch(this.In);
+      if ( expr ) {
+        // tree depth * number of compares
+        return subEstimate() * expr.arg2.f().length;
+      }
+
+      expr = isExprMatch(this.Eq);
+      if ( expr ) {
+        // tree depth
+        return subEstimate();
+      }
+
+      expr = isExprMatch(this.ContainsIC);
+      if ( expr ) ic = true;
+      expr = expr || isExprMatch(this.Contains);
+      if ( expr ) {
+        // TODO: this isn't quite right. Tree depth * query string length?
+        // If building a trie to help with this, estimate becomes easier.
+        return subEstimate() * expr.arg2.f().length;
+      }
+
+      // At this point we are going to scan all or part of the tree
+      //  with select()
+      var cost = size;
+
+      // These cases are just slightly better scans, but we can't estimate
+      //   how much better... maybe half
+      if ( isExprMatch(this.Gt) || isExprMatch(this.Gte) ||
+          isExprMatch(this.Lt) || isExprMatch(this.Lte) ) {
+        cost /= 2;
+      }
+
+      // Ordering
+      // if sorting required, add the sort cost
+      if ( ! this.isOrderSelectable(order) ) {
+        // this index or a tail index can't sort this ordering,
+        // manual sort required
+        if ( cost > 0 ) cost *= Math.log(cost) / Math.log(2);
+      }
+
+      return cost;
+    },
+
     function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
 
@@ -249,36 +353,6 @@ foam.CLASS({
 
       var prop = this.prop;
 
-      var isExprMatch = function(model) {
-        if ( ! model ) return undefined;
-        if ( predicate ) {
-          // util.equals catches Properties that were cloned if the predicate has
-          //  been cloned.
-          if ( model.isInstance(predicate) &&
-              ( predicate.arg1 === prop || foam.util.equals(predicate.arg1, prop) )
-          ){
-            var arg2 = predicate.arg2;
-            predicate = undefined;
-            return arg2;
-          }
-
-          if ( index.And.isInstance(predicate) ) {
-            for ( var i = 0 ; i < predicate.args.length ; i++ ) {
-              var q = predicate.args[i];
-              if ( model.isInstance(q) && q.arg1 === prop ) {
-                predicate = predicate.clone();
-                predicate.args[i] = index.True.create();
-                predicate = predicate.partialEval();
-                if (  index.True.isInstance(predicate) ) predicate = undefined;
-                return q.arg2;
-              }
-            }
-          }
-        }
-
-        return undefined;
-      };
-
       // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
       // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
       // TODO: allow sink to split up, for GroupBy passing one sub-sink to each tree node
@@ -289,36 +363,41 @@ foam.CLASS({
       
       var result, subPlan, cost;
 
-      var arg2 = isExprMatch(this.In);
-      if ( arg2 &&
+      var isExprMatch = this.IS_EXPR_MATCH_FN.bind(this, predicate, prop);
+
+      var expr = isExprMatch(this.In);
+      if ( expr ) {
+        predicate = expr.predicate;
            // Just scan if that would be faster.
-           Math.log(this.size())/Math.log(2) * arg2.length < this.size() ) {
-        var keys = arg2;
-        var subPlans = [];
-        cost = 1;
+        if ( Math.log(this.size())/Math.log(2) * expr.arg2.length < this.size() ) {
+          var keys = expr.arg2;
+          var subPlans = [];
+          cost = 1;
 
-        for ( var i = 0 ; i < keys.length ; ++i) {
-          result = this.get(keys[i]);
+          for ( var i = 0 ; i < keys.length ; ++i) {
+            result = this.get(keys[i]);
 
-          if ( result ) { // TODO: could refactor this subindex recursion into .plan()
-            subPlan = result.plan(sink, skip, limit, order, predicate, root);
+            if ( result ) { // TODO: could refactor this subindex recursion into .plan()
+              subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
-            cost += subPlan.cost;
-            subPlans.push(subPlan);
+              cost += subPlan.cost;
+              subPlans.push(subPlan);
+            }
           }
+
+          if ( subPlans.length === 0 ) return index.NotFoundPlan.create();
+
+          return index.AltPlan.create({ // TODO: ordering... mergeplan?
+            subPlans: subPlans,
+            prop: prop
+          });
         }
-
-        if ( subPlans.length === 0 ) return index.NotFoundPlan.create();
-
-        return index.AltPlan.create({ // TODO: ordering... mergeplan?
-          subPlans: subPlans,
-          prop: prop
-        });
       }
-
-      arg2 = isExprMatch(this.Eq);
-      if ( arg2 !== undefined ) {
-        var key = arg2.f();
+      
+      expr = isExprMatch(this.Eq);
+      if ( expr ) {
+        predicate = expr.predicate;
+        var key = expr.arg2.f();
         result = this.get(key, this.compare);
 
         if ( ! result ) return index.NotFoundPlan.create();
@@ -332,11 +411,12 @@ foam.CLASS({
       }
 
       var ic = false;
-      arg2 = isExprMatch(this.ContainsIC);
-      if ( arg2 !== undefined ) ic = true;
-      arg2 = arg2 || isExprMatch(this.Contains);
-      if ( arg2 !== undefined ) {
-        var key = ic ? arg2.f().toLowerCase() : arg2.f();
+      expr = isExprMatch(this.ContainsIC);
+      if ( expr ) ic = true;
+      expr = expr || isExprMatch(this.Contains);
+      if ( expr ) {
+        predicate = expr.predicate;
+        var key = ic ? expr.arg2.f().toLowerCase() : expr.arg2.f();
 
         // Substring comparison function:
         // returns 0 if nodeKey contains masterKey.
@@ -372,17 +452,17 @@ foam.CLASS({
       // Restrict the subtree to search as necessary
       var subTree = this.root;
 
-      arg2 = isExprMatch(this.Gt);
-      if ( arg2 ) subTree = subTree.gt(arg2.f(), this.compare);
+      expr = isExprMatch(this.Gt);
+      if ( expr ) subTree = subTree.gt(expr.arg2.f(), this.compare);
 
-      arg2 = isExprMatch(this.Gte);
-      if ( arg2 ) subTree = subTree.gte(arg2.f(), this.compare);
+      expr = isExprMatch(this.Gte);
+      if ( expr ) subTree = subTree.gte(expr.arg2.f(), this.compare);
 
-      arg2 = isExprMatch(this.Lt);
-      if ( arg2 ) subTree = subTree.lt(arg2.f(), this.compare);
+      expr = isExprMatch(this.Lt);
+      if ( expr ) subTree = subTree.lt(expr.arg2.f(), this.compare);
 
-      arg2 = isExprMatch(this.Lte);
-      if ( arg2 ) subTree = subTree.lte(arg2.f(), this.compare);
+      expr = isExprMatch(this.Lte);
+      if ( expr ) subTree = subTree.lte(expr.arg2.f(), this.compare);
 
       cost = subTree.size;
       var sortRequired = ! this.isOrderSelectable(order);
