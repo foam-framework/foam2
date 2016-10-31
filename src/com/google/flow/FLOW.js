@@ -15,30 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: make a StoredFLOW be the root of the tree
-foam.CLASS({
-  package: 'com.google.flow',
-  name: 'StoredFLOW',
-
-  ids: [ 'name' ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'name'
-    },
-    {
-      class: 'String',
-      name: 'description'
-    },
-    {
-      class: 'FObject',
-      of: 'com.google.flow.Property',
-      name: 'memento'
-    }
-  ]
-});
-
 
 // TODO: Should have a GUID 'id' instead of name, since now
 // you can't have two properties with the same name but
@@ -76,6 +52,31 @@ foam.CLASS({
       code: function deleteRow(X) {
         X.properties.remove(X.data);
       }
+    }
+  ]
+});
+
+
+// TODO: make a StoredFLOW be the root of the tree
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'StoredFLOW',
+
+  ids: [ 'name' ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'description'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Property',
+      name: 'memento'
     }
   ]
 });
