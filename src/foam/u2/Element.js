@@ -301,10 +301,10 @@ foam.CLASS({
     function remove() { this.unload(); },
     function onSetCls(cls, enabled) {
       var e = this.el();
-      if ( ! e ) {
-        this.warn('Missing Element: ', this.id);
-      } else {
+      if ( e ) {
         e.classList[enabled ? 'add' : 'remove'](cls);
+      } else {
+        this.warn('Missing Element: ', this.id);
       }
     },
     function onFocus() {

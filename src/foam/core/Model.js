@@ -51,11 +51,13 @@ foam.CLASS({
       // etc. and 'axioms'.
       name: 'axioms_',
       transient: true,
+      hidden: true,
       factory: function() { return []; }
     },
     {
       // List of extra axioms. Is added to axioms_.
       name: 'axioms',
+      hidden: true,
       factory: function() { return []; },
       postSet: function(_, a) { this.axioms_.push.apply(this.axioms_, a); }
     },

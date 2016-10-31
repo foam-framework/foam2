@@ -409,7 +409,11 @@ foam.CLASS({
         if ( r < -2 * Math.PI ) return r + 2 * Math.PI;
         return r;
       },
-      view: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*2, maxValue: Math.PI*2, onKey: true }
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*2, maxValue: Math.PI*2, onKey: true }
+      }
     },
     {
       name: 'originX',
@@ -450,7 +454,11 @@ foam.CLASS({
     {
       name: 'alpha',
       class: 'Float',
-      view: { class: 'foam.u2.RangeView', maxValue: 1, step: 0.0001, onKey: true },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.0001, maxValue: 1, onKey: true }
+      },
       value: 1
     },
     {
@@ -718,7 +726,7 @@ foam.CLASS({
         return ! (
             this.x + this.width  < c.x - c.radius ||
             this.y + this.height < c.y - c.radius ||
-            c.x    + c.radius    < this.x ||
+            c.x    + c.radius    < this.x         ||
             c.y    + c.radius    < this.y );
       }
       return ! (
@@ -889,12 +897,20 @@ foam.CLASS({
     {
       name: 'start',
       value: 0,
-      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      }
     },
     {
       name: 'end',
       value: 2*Math.PI,
-      view: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      }
     }
   ],
 

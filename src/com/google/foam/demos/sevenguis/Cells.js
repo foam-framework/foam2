@@ -41,7 +41,8 @@ foam.CLASS({
               sym('div'),
               sym('mod'),
               sym('sum'),
-              sym('prod')
+              sym('prod'),
+              sym('flow')
             ),
 
             add:  seq(literalIC('add('),  sym('expr'), ',', sym('expr'), ')'),
@@ -51,6 +52,7 @@ foam.CLASS({
             mod:  seq(literalIC('mod('),  sym('expr'), ',', sym('expr'), ')'),
             sum:  seq1(1, literalIC('sum('),  sym('vargs'), ')'),
             prod: seq1(1, literalIC('prod('), sym('vargs'), ')'),
+            flow: seq(literalIC('flow('),  sym('symbol'), ',', sym('symbol'), ')'),
 
             vargs: repeat(alt(sym('range'), sym('expr')), ','),
 
@@ -74,6 +76,10 @@ foam.CLASS({
 
             row: str(repeat(sym('digit'), null, 1, 2)),
 
+            symbol: str(seq(
+              alt(range('a', 'z'), range('A', 'Z')),
+              str(repeat(alt(range('a', 'z'), range('A', 'Z'), range('0', '9')))))),
+
             string: str(repeat(anyChar()))
           };
         }
@@ -83,8 +89,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      var slot = this.slot.bind(this);
-      var cell = this.cells.cell.bind(this.cells);
+      var slot  = this.slot.bind(this);
+      var cell  = this.cells.cell.bind(this.cells);
+      var scope = this.cells.scope;
 
       this.addActions({
         add: function(a) { return slot(function() { return a[1].get() + a[3].get(); }, a[1], a[3]); },
@@ -104,6 +111,7 @@ foam.CLASS({
           for ( var i = 0 ; i < a.length ; i++ ) prod *= a[i];
           return prod;
         }); },
+        flow: function(a) { return slot(function() { return scope[a[1]].slot(a[3]); }); },
         az:  function(c) { return c.toUpperCase(); },
         row: function(c) { return parseInt(c); },
         number: function(s) {
@@ -163,7 +171,8 @@ foam.CLASS({
     'foam.u2.tag.Input'
   ],
 
-  exports:  [ 'as cells' ],
+  imports: [ 'scope' ], // Used by flow() function
+  exports: [ 'as cells' ],
 
   classes: [
     {
@@ -222,9 +231,15 @@ foam.CLASS({
           this.SUPER();
           this.cssClass(this.myCls());
         },
+
         // function isLoaded() { return this.value; },
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
-        function toReadE() { return this.HTMLElement.create({nodeName: 'span'}, this.__subSubContext__).add(this.data$); },
+        function toReadE() {
+          return this.HTMLElement.create(
+              {nodeName: 'span'},
+              this.__subSubContext__).add(this.data$);
+        },
+
         function toWriteE() {
           this.formula$.sub(this.onDataLoad);
           var e = this.Input.create(); //this.E('input');

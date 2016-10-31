@@ -45,9 +45,9 @@ foam.CLASS({
   methods: [
     function updateChild(c) {
       if ( this.bounceOnWalls && this.bounds ) {
-        if ( c.x < this.bounds.x ) c.vx = Math.abs(c.vx);
-        if ( c.y < this.bounds.y ) c.vy = Math.abs(c.vy);
-        if ( c.x > this.bounds.width ) c.vx = -Math.abs(c.vx);
+        if ( c.x < this.bounds.x      ) c.vx = Math.abs(c.vx);
+        if ( c.y < this.bounds.y      ) c.vy = Math.abs(c.vy);
+        if ( c.x > this.bounds.width  ) c.vx = -Math.abs(c.vx);
         if ( c.y > this.bounds.height ) c.vy = -Math.abs(c.vy);
       }
     },
@@ -61,7 +61,10 @@ foam.CLASS({
 
     function detectCollisions() {
       /* implicit k-d-tree divide-and-conquer algorithm */
-      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+      //      this.detectCollisions_(0, this.children.length-1, 'x', false, '');
+
+      // TODO: put back above line when properly supports mixing circles and squares
+      this.detectCollisions__(0, this.children.length-1, 'x', false, '');
     },
 
     function detectCollisions__(start, end) {
@@ -136,6 +139,9 @@ foam.CLASS({
     },
 
     function collide(c1, c2) {
+      c1.collideWith && c1.collideWith(c2);
+      c2.collideWith && c2.collideWith(c1);
+
       if ( ! c1.mass || ! c2.mass ) return;
 
       var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);

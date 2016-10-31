@@ -53,7 +53,8 @@ foam.CLASS({
   properties: [
     [ 'arcWidth', 1 ],
     [ 'gravity', 1 ],
-    [ 'radius',  25 ]
+    [ 'radius',  25 ],
+    [ 'friction', 0.98 ]
   ]
 });
 
@@ -274,7 +275,7 @@ foam.CLASS({
       view: { class: 'foam.u2.RangeView', minValue: 0, maxValue: 5, step: 1, onKey: true },
       value: 1
     },
-    { name: 'width', value: 0, hidden: true },
+    { name: 'width',  value: 0, hidden: true },
     { name: 'height', value: 0, hidden: true },
     [ 'color', 'red' ],
     [ 'alpha', 0.5 ],
@@ -317,11 +318,270 @@ foam.CLASS({
   listeners: [
     {
       name: 'onMouseMove',
-//      isFramed: true,
       code: function(evt) {
         this.x = evt.offsetX;
         this.y = evt.offsetY;
       }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Gate',
+  extends: 'foam.graphics.Box',
+
+  implements: [ 'foam.physics.Physical' ],
+
+  requires: [
+    'foam.graphics.Circle',
+    'foam.graphics.Label'
+  ],
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'count'
+    },
+    {
+      class: 'Int',
+      hidden: true,
+      name: 'lastCollision_',
+    },
+    {
+      name: 'width',
+      value: 2,
+      hidden: true,
+      preSet: function() { return 1; }
+    },
+    {
+      name: 'height',
+      value: 50
+    },
+    [ 'mass', 0 ],
+    [ 'gravity', 0 ],
+    {
+      name: 'border',
+      vale: '#444444',
+      hidden: true
+    },
+    {
+      name: 'circle',
+      hidden: true,
+      factory: function() {
+        return this.Circle.create({
+          alpha: 0.8,
+          border: null,
+          color: 'green',
+          radius: 10,
+          scaleX: 1.5,
+          scaleY: 1.5
+        });
+      }
+    },
+    {
+      name: 'text',
+      hidden: true,
+      factory: function() {
+        return this.Label.create({
+          align: 'center',
+          color: 'white',
+          font: 'bold 10px sans-serif',
+          text$: this.count$,
+          y:     -6
+        });
+      }
+    },
+    {
+      name: 'collisionSet_',
+      hidden: true
+    },
+    {
+      name: 'lastCollisionSet_',
+      hidden: true
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.add(this.circle);
+      this.circle.add(this.text);
+      this.collisionSet_ = {};
+      this.lastCollisionSet_ = {};
+    },
+
+    function collideWith(c) {
+      this.lastCollision_ = Date.now();
+      var id = c.$UID;
+      if ( ! this.collisionSet_[id] && ! this.lastCollisionSet_[id] ) this.count++;
+      this.collisionSet_[id] = true;
+    },
+
+    function paint(x) {
+      this.lastCollisionSet_ = this.collisionSet_;
+      this.collisionSet_ = {};
+
+      if ( Date.now() - this.lastCollision_ > 250 ) {
+        this.border = this.BORDER.value;
+      } else {
+        this.border = 'orange';
+      }
+
+      this.originX  = this.width/2;
+      this.originY  = this.height/2;
+      this.circle.x = this.width/2;
+      this.circle.y = this.height/2;
+      this.circle.rotation = - this.rotation;
+      this.SUPER(x);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Spring',
+  extends: 'foam.graphics.CView',
+
+  imports: [
+    'scope',
+    'timer'
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'visible',
+    },
+    {
+      class: 'String',
+      name: 'head'
+    },
+    {
+      class: 'String',
+      name: 'tail'
+    },
+    {
+      class: 'Float',
+      name: 'length',
+      value: 100
+    },
+    {
+      class: 'Float',
+      name: 'compression',
+      value: 0
+    },
+    {
+      class: 'Float',
+      name: 'stretch',
+      value: 4
+    },
+    [ 'color', 'black' ]
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.onDestroy(this.timer.time$.sub(this.tick));
+      this.propertyChange.sub(this.tick);
+    },
+
+    function paintSelf(x) {
+      if ( ! this.visible ) return;
+
+      this.x = this.y = 0;
+
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+
+      x.strokeStyle = this.color;
+      x.lineWidth   = 1
+
+      x.beginPath();
+
+      if ( c1.r ) {
+        x.moveTo(c1.x, c1.y);
+      } else {
+        x.moveTo(c1.x + c1.width/2, c1.y + c1.height/2);
+      }
+
+      if ( c2.r ) {
+        x.lineTo(c2.x, c2.y);
+      } else {
+        x.lineTo(c2.x + c2.width/2, c2.y + c2.height/2);
+      }
+
+      x.stroke();
+    }
+  ],
+
+  listeners: [
+    function tick() {
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+      if ( ! c1 || ! c2 ) return;
+
+      var l = this.length;
+      var s = this.stretch/1000;
+      var c = this.compression/1000;
+      var d = c1.distanceTo(c2);
+      var a = Math.atan2(c2.y-c1.y, c2.x-c1.x);
+
+      if ( s && d > l ) {
+        c1.applyMomentum( s * (d-l), a);
+        c2.applyMomentum(-s * (d-l), a);
+      } else if ( c && d < l ) {
+        c1.applyMomentum(-c * (l-d), a);
+        c2.applyMomentum( c * (l-d), a);
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Script',
+
+  imports: [
+    'scope'
+  ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'code',
+      view: { class: 'foam.u2.tag.TextArea', rows: 16 },
+      displayWidth: 60
+    },
+    {
+      class: 'String',
+      name: 'output',
+      transient: true,
+      view: { class: 'foam.u2.tag.TextArea', rows: 16 },
+      displayWidth: 60
+    }
+  ],
+
+  methods: [
+    function log() {
+      this.output += Array.from(arguments).join(' ') + '\n';
+    }
+  ],
+
+  actions: [
+    function run() {
+      with ( this.scope ) {
+        with ( { log: this.log.bind(this) } ) {
+          this.log('>', this.code);
+          this.log(eval(this.code));
+        }
+      }
+    },
+
+    function clearOutput() {
+      this.output = '';
     }
   ]
 });

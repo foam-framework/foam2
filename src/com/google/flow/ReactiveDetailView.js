@@ -49,9 +49,15 @@ foam.CLASS({
         vertical-align: top;
       }
       ^switch { color: #ccc; }
-      ^ .reactive {
+      ^switch.reactive {
         font-weight: 600;
         color: red !important;
+      }
+      ^formulaInput {
+        width: 270px;
+      }
+      ^formulaInput:focus {
+        outline: 1px solid red;
       }
       ^units  {
         color: #444;
@@ -82,9 +88,9 @@ foam.CLASS({
       },
       postSet: function(_, f) {
         if ( ! f ) {
-          this.reactive = false;
+          // this.reactive = false;
         } else {
-          this.reactive = true;
+          // this.reactive = true;
           this.setFormula(f);
         }
       }
@@ -106,6 +112,7 @@ foam.CLASS({
         if ( self.data ) {
           var f = self.getFormula();
           self.formula = f ? f.toString() : '';
+          self.reactive = !! f;
         }
       });
 
@@ -120,7 +127,10 @@ foam.CLASS({
           start('td').cssClass(this.myCls('view')).add(
               this.slot(function(reactive) {
                 return reactive ?
-                    self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__) :
+                    self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__).
+                      cssClass(this.myCls('formulaInput')).
+                      on('blur', function() { self.reactive = !! self.formula; }).
+                      focus() :
                     prop ;
               }),
             prop.units && this.E('span').cssClass(this.myCls('units')).add(' ', prop.units)).
@@ -132,7 +142,7 @@ foam.CLASS({
       var self = this;
       var f;
       with ( this.scope ) {
-        f = eval('(function() { return  ' + formula + '})');
+        f = eval('(function() { return ' + formula + '})');
       }
       f.toString = function() { return formula; };
       var timer = function() {

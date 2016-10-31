@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+
 // TODO: Should have a GUID 'id' instead of name, since now
 // you can't have two properties with the same name but
 // different parents.
@@ -30,6 +31,7 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'FObjectProperty',
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
@@ -55,6 +57,32 @@ foam.CLASS({
   ]
 });
 
+
+// TODO: make a FLOW be the root of the tree
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'FLOW',
+
+  ids: [ 'name' ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'description'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'com.google.flow.Property',
+      name: 'memento'
+    }
+  ]
+});
+
+
 // TODO(adamvy): Remove the need to store this relationship globally.
 var relationship = foam.RELATIONSHIP({
   name: 'children',
@@ -65,9 +93,10 @@ var relationship = foam.RELATIONSHIP({
   targetDAOKey: 'properties'
 });
 
+
 foam.CLASS({
   package: 'com.google.flow',
-  name: 'FLOW',
+  name: 'FLOWController',
   extends: 'foam.u2.Element',
 
   implements: [
@@ -76,8 +105,11 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
+    'com.google.flow.FLOW',
+    'com.google.foam.demos.sevenguis.Cells',
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
     'foam.graphics.CView',
@@ -86,9 +118,8 @@ foam.CLASS({
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
     'foam.u2.TableView',
-    'foam.util.Timer',
     'foam.u2.view.TreeView',
-    'com.google.flow.DetailPropertyView'
+    'foam.util.Timer'
   ],
 
   exports: [
@@ -113,10 +144,11 @@ foam.CLASS({
       .foam-u2-TableView-selected { outline: 1px solid red; }
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
-      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; padding-left: 18px; margin: 2px; border: none; }
+      ^properties .foam-u2-view-TreeViewRow { position: relative; }
+      ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
       .foam-u2-Tabs { padding-top: 0 !important; }
-      input[type="range"] { width: 150px; height: 15px; }
-      input[type="color"] { width: 22px; }
+      input[type="range"] { width: 60px; height: 15px; }
+      input[type="color"] { width: 60px; }
       */}
     })
   ],
@@ -124,7 +156,12 @@ foam.CLASS({
   properties: [
     {
       name: 'scope',
-      factory: function() { return {a:42}; },
+      factory: function() {
+        return {
+          load: this.loadFlow.bind(this),
+          save: this.saveFlow.bind(this)
+        };
+      },
       documentation: 'Scope to run reactive formulas in.'
     },
     {
@@ -165,10 +202,30 @@ foam.CLASS({
         dao.put(com.google.flow.Desk.model_);
         dao.put(com.google.flow.DuplexDesk.model_);
         dao.put(com.google.flow.Desks.model_);
+        dao.put(com.google.flow.Gate.model_);
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
+        dao.put(com.google.flow.Spring.model_);
         dao.put(com.google.flow.Cursor.model_);
+        dao.put(com.google.flow.Script.model_);
+        dao.put(foam.core.Model.model_);
         return dao;
+      }
+    },
+    {
+      class: 'String',
+      name: 'name',
+      value: 'Untitled1'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'flows',
+      factory: function() {
+        return foam.dao.EasyDAO.create({
+          of: com.google.flow.FLOW,
+          cache: true,
+          daoType: 'IDB'
+        });
       }
     },
     {
@@ -185,31 +242,29 @@ foam.CLASS({
       view: {
         class: 'foam.u2.view.TreeView',
         relationship: relationship,
+        startExpanded: true,
         formatter: function() {
           var X = this.__subSubContext__;
           this.start('span').add(X.data.name).end().
+            start('span').nbsp().style({ display: 'inline-block', width: '50px' }).end().
             start('span').add(com.google.flow.Property.DELETE_ROW).end();
         }
-      },
-      xview: {
-        class: 'foam.u2.TableView',
-        columns: [
-          com.google.flow.Property.NAME,
-          com.google.flow.Property.DELETE_ROW
-        ]
       },
       factory: function() {
         var dao = foam.dao.EasyDAO.create({
           of: 'com.google.flow.Property',
           guid: true,
           seqProperty: this.Property.NAME,
-//          daoType: 'MDAO'
           daoType: 'ARRAY'
         });
 
         var p;
 
         p = this.Property.create({name: 'canvas1', value: this.canvas});
+        this.physics.setPrivate_('lpp_', p);
+        dao.put(p);
+
+        p = this.Property.create({name: 'sheet1', value: this.sheet});
         this.physics.setPrivate_('lpp_', p);
         dao.put(p);
 
@@ -222,6 +277,10 @@ foam.CLASS({
         dao.put(p);
 
         this.scope.canvas1 = this.canvas;
+        var sheet = this.sheet;
+        this.scope.sheet1  = function(cell) {
+          return sheet.cell(cell.toUpperCase()).data;
+        };
         this.scope.physics = this.physics;
         this.scope.timer   = this.timer;
         this.scope.cycle   = this.timer.cycle.bind(this.timer);
@@ -232,11 +291,51 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 600, height: 600, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 700, height: 100, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
-    'mouseTarget'
+    {
+      name: 'sheet',
+      factory: function() {
+        this.Cells.getAxiomsByClass(foam.core.Property).forEach(function(p) { p.hidden = true; });
+        this.Cells.ROWS.hidden = this.Cells.COLUMNS.hidden = false;
+
+        return this.Cells.create({rows: 28, columns:8}).style({width:'650px'});
+      }
+    },
+    'mouseTarget',
+    'cmdLineFeedback_',
+    {
+      class: 'String',
+      name: 'cmdLine',
+      value: '>>> ',
+      postSet: function(_, cmd) {
+        if ( this.cmdLineFeedback_ ) return;
+        this.cmdLineFeedback_ = true;
+
+        try {
+          var self = this;
+          function log() {
+            self.cmdLine += Array.from(arguments).join(' ') + '\n';
+          }
+
+          var i = cmd.lastIndexOf('>>> ');
+          cmd = i === -1 ? cmd : cmd.substring(i+4);
+
+          with ( this.scope ) {
+            with ( { log: log } ) {
+              log();
+              log(eval(cmd));
+              this.cmdLine += '>>> ';
+            }
+          }
+        } finally {
+          this.cmdLineFeedback_ = false;
+        }
+      },
+      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 48 }
+    }
   ],
 
   methods: [
@@ -253,11 +352,11 @@ foam.CLASS({
       this.memento$.sub(function() {
         var m = this.memento;
         if ( this.feedback_ ) return;
-        this.properties.skip(2).removeAll();
+        this.properties.skip(4).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
             var p = m[i];
-            this.addProperty(p.value, p.name);
+            this.addProperty(p.value, p.name, null, p.parent);
           }
         }
         this.selected = null;
@@ -280,9 +379,15 @@ foam.CLASS({
                   on('contextmenu', this.onRightClick).
                 end().
               end().
+              start(foam.u2.Tab, {label: 'sheet1'}).
+                start(this.sheet).
+                end().
+              end().
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
+            add(this.CMD_LINE).
+            tag('br').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().
@@ -302,9 +407,9 @@ foam.CLASS({
         var i = opt_i || 1;
         var prefix = value.cls_.name.toLowerCase();
         this.properties.find(prefix + i).then(function (o) {
-          self.addProperty(value, null, i+1);
+          self.addProperty(value, null, i+1, opt_parent);
         }).catch(function(x) {
-          self.addProperty(value, prefix+i);
+          self.addProperty(value, prefix+i, null, opt_parent);
         });
       } else {
         var p = this.Property.create({
@@ -319,12 +424,33 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(2).select().then(function(s) {
-//        console.log('*************** updateMemento: ', s.a.length);
+      this.properties.skip(4).select().then(function(s) {
+        console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
-//        this.memento = foam.Array.clone(s.a);
+        this.memento = foam.Array.clone(s.a);
         this.feedback_ = false;
       }.bind(this));
+    },
+
+    function loadFlow(name) {
+      console.assert(name, 'Name required.')
+
+      this.name = name;
+      this.flows.find(name).then(function (f) {
+        console.log('loaded: ', name);
+        this.memento = f.memento;
+      }.bind(this));
+    },
+
+    function saveFlow(opt_name) {
+      var name = opt_name || this.name;
+      this.name = name;
+      this.updateMemento();
+      this.flows.put(this.FLOW.create({
+        name: name,
+        memento: this.memento
+      }););
+      console.log('saved as:', name);
     }
   ],
 
@@ -334,7 +460,7 @@ foam.CLASS({
 
       this.scope[p.name] = p.value;
       if ( this.CView.isInstance(o) ) {
-        if ( ! p.parent ) {
+        if ( ! p.parent || p.parent === 'canvas1' ) {
           this.canvas.add(o);
 
           if ( this.Physical.isInstance(o) ) {
@@ -366,7 +492,7 @@ foam.CLASS({
       if ( p === this.selected ) this.selected = null;
 
       if ( this.CView.isInstance(o) ) {
-        if ( ! p.parent ) {
+        if ( ! p.parent || p.parent === 'canvas1' ) {
           this.canvas.remove(o);
 
           if ( this.Physical.isInstance(o) ) {
@@ -412,7 +538,7 @@ foam.CLASS({
         if ( ! tool ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
-        var p = this.addProperty(o);
+        var p = this.addProperty(o, null, null, 'canvas1');
         this.updateMemento();
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {

@@ -329,7 +329,7 @@ foam.LIB({
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
-                       'Cannot constantize non-string values.');
+            'Cannot constantize non-string values.');
 
         // switches from from camelCase to CAMEL_CASE
         return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
@@ -339,9 +339,11 @@ foam.LIB({
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(str) {
+        if ( str === '' || str === null || str === undefined ) return '';
+
         console.assert(typeof str === 'string',
-                       'Cannot labelize non-string values.');
-        if ( str === '' ) return str;
+            'Cannot labelize non-string values.');
+
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
@@ -352,7 +354,7 @@ foam.LIB({
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
-                       'Cannot capitalize non-string values.');
+            'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
       })
@@ -388,7 +390,7 @@ foam.LIB({
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
         console.assert(typeof str === 'string',
-                       'Cannot cssClassize non-string values.');
+            'Cannot cssClassize non-string values.');
         // Turns foam.u2.Foo into foam-u2-Foo
         return str.replace(/\./g, '-');
       })
@@ -396,7 +398,7 @@ foam.LIB({
 
     function pad(str, size) {
       console.assert(typeof str === 'string',
-               'Cannot constantize non-string values.');
+          'Cannot constantize non-string values.');
       
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
@@ -415,7 +417,7 @@ foam.LIB({
     },
     function startsWithIC(a, b) {
       console.assert(typeof a === 'string' && typeof b === 'string',
-               'Cannot startsWithIC non-string values.');
+          'Cannot startsWithIC non-string values.');
       
       return a.toUpperCase().startsWith(b.toUpperCase());
     },
@@ -639,11 +641,11 @@ foam.mmethod = function(map, opt_defaultMethod) {
     var type = foam.typeOf(arg1);
     if ( ! opt_defaultMethod ) {
       console.assert(type, 'Unknown type: ', arg1,
-        'and no default method provided');
+          'and no default method provided');
       console.assert(
-        type[uid],
-        'Missing multi-method for type ', arg1, ' map: ', map,
-        'and no deafult method provided');
+          type[uid],
+          'Missing multi-method for type ', arg1, ' map: ', map,
+          'and no deafult method provided');
     }
     return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
   };
@@ -681,9 +683,9 @@ foam.LIB({
      */
     function registerClass(cls) {
       console.assert(typeof cls === 'object',
-                     'cls must be an object');
+          'cls must be an object');
       console.assert(typeof cls.name === 'string' && cls.name !== '',
-                     'cls must have a non-empty string name');
+          'cls must have a non-empty string name');
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
@@ -707,7 +709,7 @@ foam.LIB({
       }
 
       console.assert(typeof path === 'string',
-                     'Cannot make a package path of a non-string');
+          'Cannot make a package path of a non-string');
 
       path = path.split('.');
       var node = root;

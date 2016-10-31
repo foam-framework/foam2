@@ -33,7 +33,11 @@ foam.CLASS({
       class: 'Float',
       name: 'volume',
       value: 0.5,
-      view: { class: 'foam.u2.RangeView', maxValue: 1, step: 0.01 }
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView' },
+        viewb: { class: 'foam.u2.RangeView', onKey: true, maxValue: 1, step: 0.01 }
+      }
     },
     {
       class: 'Float',
@@ -42,7 +46,11 @@ foam.CLASS({
       preSet: function(_, rate) {
         return Math.max(0.1, Math.min(rate, 10));
       },
-      view: { class: 'foam.u2.RangeView', maxValue: 10, step: 0.01 }
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView' },
+        viewb: { class: 'foam.u2.RangeView', onKey: true, maxValue: 10, step: 0.01 }
+      }
     },
     {
       class: 'Float',
@@ -51,7 +59,11 @@ foam.CLASS({
       preSet: function(_, rate) {
         return Math.max(0, Math.min(rate, 2));
       },
-      view: { class: 'foam.u2.RangeView', maxValue: 2, step: 0.01 }
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView' },
+        viewb: { class: 'foam.u2.RangeView', onKey: true, maxValue: 2, step: 0.01 }
+      }
     },
     {
       name: 'voice',
