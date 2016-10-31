@@ -32,7 +32,8 @@ foam.CLASS({
       name: 'description'
     },
     {
-      class: 'String',
+      class: 'FObject',
+      of: 'com.google.flow.Property',
       name: 'memento'
     }
   ]
@@ -433,7 +434,7 @@ foam.CLASS({
       console.assert(name, 'Name required.')
 
       this.name = name;
-      this.flow.find(name).then(function (f) {
+      this.flows.find(name).then(function (f) {
         console.log('loaded: ', name);
         this.memento = f.memento;
         console.log('memento: ', this.memento);
