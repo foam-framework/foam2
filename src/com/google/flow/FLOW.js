@@ -41,9 +41,10 @@ foam.CLASS({
           height: o.height,
           radius: o.radius,
           border: o.radius,
-          color:  o.color,
-          reactions_: o.reactions_
-        });
+          text:   o.text,
+          color:  o.color
+        }, o.__context__);
+        m[this.name].instance_.reactions_ = o.reactions_;
       }
     }
   ],
