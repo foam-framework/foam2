@@ -453,9 +453,9 @@ foam.CLASS({
 
       this.name = name;
       this.flows.find(name).then(function (f) {
-        console.log('loaded: ', name);
         this.memento = f.memento;
       }.bind(this));
+      return 'loading: ' + name;
     },
 
     function saveFlow(opt_name) {
@@ -466,7 +466,7 @@ foam.CLASS({
         name: name,
         memento: this.memento
       }));
-      console.log('saved as:', name);
+      return 'saved as: ' + name;
     }
   ],
 
