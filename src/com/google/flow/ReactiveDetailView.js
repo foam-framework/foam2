@@ -145,13 +145,8 @@ foam.CLASS({
       var prop = this.prop;
       var self = this;
 
-      this.data$.sub(function() {
-        if ( self.data ) {
-          var f = self.data.reactions_[self.prop.name];
-          self.formula = f ? f.toString() : '';
-          self.reactive = !! f;
-        }
-      });
+      this.data$.sub(this.onDataChange);
+      this.onDataChange();
 
       this.cssClass(this.myCls()).
           start('td').cssClass(this.myCls('label')).add(prop.label).end().
@@ -182,6 +177,14 @@ foam.CLASS({
   listeners: [
     function toggleMode() {
       this.reactive = ! this.reactive;
+    },
+
+    function onDataChange() {
+      if ( this.data ) {
+        var f = this.data.reactions_[this.prop.name];
+        this.formula = f ? f.toString() : '';
+        this.reactive = !! f;
+      }
     }
   ]
 });
