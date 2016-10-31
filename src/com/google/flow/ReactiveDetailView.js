@@ -21,11 +21,38 @@ foam.CLASS({
     {
       name: 'reactions_',
       factory: function() { return {}; },
+      fromJSON: function(value, X, prop) {
+        for ( var key in value ) {
+          this.startReaction(X.scope, key, value[key]);
+        }
+        return value;
+      },
       toJSON: function(v) {
         var m = {};
         for ( key in v ) { m[key] = v[key].toString(); }
         return m;
       }
+    }
+  ],
+  methods: [
+    function startReaction_(scope, name, formula) {
+      var self = this;
+      var f;
+
+      with ( scope ) {
+        f = eval('(function() { return ' + formula + '})');
+      }
+      f.toString = function() { return formula; };
+
+      var timer = function() {
+        if ( self.isDestroyed() ) return;
+        if ( self.reactions_[name] !== f ) return;
+        self[name] = f.call(self);
+        self.__context__.requestAnimationFrame(timer);
+      };
+
+      this.reactions_[name] = f;
+      timer();
     }
   ]
 });
@@ -47,7 +74,6 @@ foam.CLASS({
 
   imports: [
     'data',
-    'requestAnimationFrame',
     'scope'
   ],
 
@@ -145,24 +171,7 @@ foam.CLASS({
     },
 
     function setFormula(formula) {
-      var data = this.data;
-      var self = this;
-      var f;
-
-      with ( this.scope ) {
-        f = eval('(function() { return ' + formula + '})');
-      }
-      f.toString = function() { return formula; };
-
-      var timer = function() {
-        if ( data.isDestroyed() ) return;
-        if ( data.reactions_[self.prop.name] !== f ) return;
-        data[self.prop.name] = f.call(data);
-        self.requestAnimationFrame(timer);
-      };
-
-      data.reactions_[this.prop.name] = f;
-      timer();
+      this.data.startReaction_(this.scope, this.prop.name, formula);
     }
   ],
 
