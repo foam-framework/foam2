@@ -16,6 +16,22 @@
  */
 
 foam.CLASS({
+  refines: 'FObject',
+  properties: [
+    {
+      name: 'reactions_',
+      factory: function() { return {}; },
+      toJSON: function(v) {
+        var m = {};
+        for ( key in v ) { m[key] = v[key].toString(); }
+        return m;
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'com.google.flow',
   name: 'ReactiveDetailView',
   extends: 'foam.u2.DetailView',
@@ -74,8 +90,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'reactive',
       postSet: function(_, r) {
-        if ( ! r ) {
-          this.clearFormula();
+        if ( ! r && this.data ) {
+          delete this.data.reactions_[this.prop.name];
         }
       }
     },
@@ -84,22 +100,13 @@ foam.CLASS({
       name: 'formula',
       displayWidth: 50,
       factory: function() {
-        return this.getFormula();
+        return this.data && this.data.reactions_[this.prop.name];
       },
       postSet: function(_, f) {
-        if ( ! f ) {
-          // this.reactive = false;
-        } else {
-          // this.reactive = true;
-          this.setFormula(f);
-        }
+        if ( f ) this.setFormula(f);
       }
     },
     'prop',
-    {
-      name: 'privateName',
-      factory: function() { return this.prop.name + 'Formula__'; }
-    },
     [ 'nodeName', 'tr' ]
   ],
 
@@ -110,7 +117,7 @@ foam.CLASS({
 
       this.data$.sub(function() {
         if ( self.data ) {
-          var f = self.getFormula();
+          var f = self.data.reactions_[self.prop.name];
           self.formula = f ? f.toString() : '';
           self.reactive = !! f;
         }
@@ -141,26 +148,21 @@ foam.CLASS({
       var data = this.data;
       var self = this;
       var f;
+
       with ( this.scope ) {
         f = eval('(function() { return ' + formula + '})');
       }
       f.toString = function() { return formula; };
+
       var timer = function() {
         if ( data.isDestroyed() ) return;
-        if ( data.getPrivate_(self.privateName) !== f ) return;
+        if ( data.reactions_[self.prop.name] !== f ) return;
         data[self.prop.name] = f.call(data);
         self.requestAnimationFrame(timer);
       };
-      data.setPrivate_(this.privateName, f);
+
+      data.reactions_[this.prop.name] = f;
       timer();
-    },
-
-    function getFormula() {
-      return this.data.getPrivate_(this.privateName);
-    },
-
-    function clearFormula() {
-      this.data.clearPrivate_(this.privateName);
     }
   ],
 
