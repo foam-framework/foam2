@@ -440,7 +440,7 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(4).select().then(function(s) {
+      return this.properties.skip(4).select().then(function(s) {
         console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
         this.memento = foam.Array.clone(s.a);
@@ -461,12 +461,13 @@ foam.CLASS({
     function saveFlow(opt_name) {
       var name = opt_name || this.name;
       this.name = name;
-      this.updateMemento();
-      this.flows.put(this.FLOW.create({
-        name: name,
-        memento: this.memento
-      }));
-      return 'saved as: ' + name;
+      this.updateMemento().then(function() {
+        this.flows.put(this.FLOW.create({
+          name: name,
+          memento: this.memento
+        }));
+      }.bind(this));
+      return 'saving as: ' + name;
     }
   ],
 
