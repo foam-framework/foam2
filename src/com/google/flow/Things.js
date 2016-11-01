@@ -495,23 +495,14 @@ foam.CLASS({
       var c1 = this.scope[this.head];
       var c2 = this.scope[this.tail];
 
+      if ( ! c1 || ! c2 ) return;
+
       x.strokeStyle = this.color;
       x.lineWidth   = 1
 
       x.beginPath();
-
-      if ( c1.r ) {
-        x.moveTo(c1.x, c1.y);
-      } else {
-        x.moveTo(c1.x + c1.width/2, c1.y + c1.height/2);
-      }
-
-      if ( c2.r ) {
-        x.lineTo(c2.x, c2.y);
-      } else {
-        x.lineTo(c2.x + c2.width/2, c2.y + c2.height/2);
-      }
-
+      x.moveTo((c1.left_ + c1.right_)/2, (c1.top_ + c1.bottom_)/2);
+      x.lineTo((c2.left_ + c2.right_)/2, (c2.top_ + c2.bottom_)/2);
       x.stroke();
     }
   ],
