@@ -238,7 +238,7 @@ foam.CLASS({
       factory: function() {
         return this.EasyDAO.create({
           of: com.google.flow.FLOW,
-          cache: true,
+          cache: false,
           daoType: 'IDB'
         });
       }
@@ -580,7 +580,8 @@ foam.CLASS({
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
-        this.updateMemento();
+        // TODO: hack because addProperty is asyn
+        setTimeout(this.updateMemento.bind(this),100);
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {
           var p = c.getPrivate_('lpp_');
