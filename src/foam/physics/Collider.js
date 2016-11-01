@@ -45,10 +45,11 @@ foam.CLASS({
   methods: [
     function updateChild(c) {
       if ( this.bounceOnWalls && this.bounds ) {
-        if ( c.x < this.bounds.x      ) c.vx = Math.abs(c.vx);
-        if ( c.y < this.bounds.y      ) c.vy = Math.abs(c.vy);
-        if ( c.x > this.bounds.width  ) c.vx = -Math.abs(c.vx);
-        if ( c.y > this.bounds.height ) c.vy = -Math.abs(c.vy);
+
+        if ( c.left_   < this.bounds.x      ) { c.vx =  Math.abs(c.vx); c.x++; }
+        if ( c.top_    < this.bounds.y      ) { c.vy =  Math.abs(c.vy); c.y++; }
+        if ( c.right_  > this.bounds.width  ) { c.vx = -Math.abs(c.vx); c.x--; }
+        if ( c.bottom_ > this.bounds.height ) { c.vy = -Math.abs(c.vy); c.y--; }
       }
     },
 

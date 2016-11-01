@@ -35,14 +35,23 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
-          x:      o.x,
-          y:      o.y,
-          width:  o.width,
-          height: o.height,
-          radius: o.radius,
-          border: o.radius,
-          color:  o.color
-        });
+          border:   o.radius,
+          code:     o.code,
+          color:    o.color,
+          head:     o.head,
+          height:   o.height,
+          length:   o.length,
+          name:     o.name,
+          radius:   o.radius,
+          stretch:  o.stretch,
+          tail:     o.tail,
+          text:     o.text,
+          visible:  o.visible,
+          width:    o.width,
+          x:        o.x,
+          y:        o.y
+        }, o.__context__);
+        m[this.name].instance_.reactions_ = o.reactions_;
       }
     }
   ],
@@ -105,6 +114,8 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.dxf.ui.DXFDiagram',
+    'com.google.flow.Circle',
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
@@ -113,7 +124,6 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
     'foam.graphics.CView',
-    'foam.graphics.Circle',
     'foam.physics.Physical',
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
@@ -144,9 +154,10 @@ foam.CLASS({
       .foam-u2-TableView-selected { outline: 1px solid red; }
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
+      ^cmd { width: 100%; margin-bottom: 8px; }
       ^properties .foam-u2-view-TreeViewRow { position: relative; }
       ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
-      .foam-u2-Tabs { padding-top: 0 !important; }
+      .foam-u2-Tabs { padding-top: 0 !important; margin-right: -8px; }
       input[type="range"] { width: 60px; height: 15px; }
       input[type="color"] { width: 60px; }
       */}
@@ -158,6 +169,9 @@ foam.CLASS({
       name: 'scope',
       factory: function() {
         return {
+          add: function(obj, opt_name, opt_parent) {
+            this.addProperty(obj, opt_name, null, opt_parent || 'canvas1');
+          }.bind(this),
           load: this.loadFlow.bind(this),
           save: this.saveFlow.bind(this)
         };
@@ -189,7 +203,7 @@ foam.CLASS({
         columns: [ foam.core.Model.NAME ]
       },
       factory: function() {
-        var dao = foam.dao.EasyDAO.create({
+        var dao = this.EasyDAO.create({
           of: 'foam.core.Model',
           daoType: 'ARRAY'
         });
@@ -209,6 +223,7 @@ foam.CLASS({
         dao.put(com.google.flow.Cursor.model_);
         dao.put(com.google.flow.Script.model_);
         dao.put(foam.core.Model.model_);
+        dao.put(com.google.dxf.ui.DXFDiagram.model_);
         return dao;
       }
     },
@@ -221,9 +236,9 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'flows',
       factory: function() {
-        return foam.dao.EasyDAO.create({
+        return this.EasyDAO.create({
           of: com.google.flow.FLOW,
-          cache: true,
+          cache: false,
           daoType: 'IDB'
         });
       }
@@ -251,7 +266,7 @@ foam.CLASS({
         }
       },
       factory: function() {
-        var dao = foam.dao.EasyDAO.create({
+        var dao = this.EasyDAO.create({
           of: 'com.google.flow.Property',
           guid: true,
           seqProperty: this.Property.NAME,
@@ -291,7 +306,7 @@ foam.CLASS({
     {
       name: 'canvas',
       factory: function() {
-        return this.Box.create({autoRepaint: true, width: 700, height: 100, color: '#f3f3f3'});
+        return this.Box.create({autoRepaint: true, width: 800, height: 600, color: '#f3f3f3'});
 //        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
       }
     },
@@ -309,7 +324,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'cmdLine',
-      value: '>>> ',
+//       factory: function() { return 'flow> '; },
       postSet: function(_, cmd) {
         if ( this.cmdLineFeedback_ ) return;
         this.cmdLineFeedback_ = true;
@@ -320,21 +335,25 @@ foam.CLASS({
             self.cmdLine += Array.from(arguments).join(' ') + '\n';
           }
 
-          var i = cmd.lastIndexOf('>>> ');
-          cmd = i === -1 ? cmd : cmd.substring(i+4);
+          var i = cmd.lastIndexOf('flow> ');
+          cmd = i === -1 ? cmd : cmd.substring(i+6);
+
+          if ( ! cmd.trim() ) return;
 
           with ( this.scope ) {
             with ( { log: log } ) {
               log();
               log(eval(cmd));
-              this.cmdLine += '>>> ';
+              this.cmdLine += 'flow> ';
             }
           }
+        } catch (x) {
+          log('ERROR:', x);
         } finally {
           this.cmdLineFeedback_ = false;
         }
       },
-      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 48 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 3, cols: 80 }
     }
   ],
 
@@ -347,6 +366,7 @@ foam.CLASS({
       this.properties.on.remove.sub(this.onPropertyRemove);
 
       var halo = this.Halo.create();
+      var self = this;
       halo.selected$.linkFrom(this.selected$);
 
       this.memento$.sub(function() {
@@ -369,6 +389,20 @@ foam.CLASS({
             start(this.TOOLS, {selection$: this.currentTool$}).end().
           end().
           start('center').
+            start(this.CMD_LINE).
+              cssClass(this.myCls('cmd')).
+              // TODO: this should be a feature of TextArea
+              on('keydown', function(evt) {
+                if ( evt.keyCode === 13 ) {
+                  self.cmdLine = evt.srcElement.value;
+                  evt.preventDefault();
+                  evt.srcElement.focus();
+                  evt.srcElement.scrollTop = evt.srcElement.scrollHeight;
+                  return false;
+                }
+              }).
+            end().
+//            tag('br').
             start(foam.u2.Tabs).
               start(foam.u2.Tab, {label: 'canvas1'}).
                 start(this.canvas).
@@ -386,8 +420,6 @@ foam.CLASS({
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
-            add(this.CMD_LINE).
-            tag('br').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().
@@ -399,6 +431,14 @@ foam.CLASS({
             cssClass(this.myCls('sheet')).
             show(this.slot(function(selected) { return !!selected; })).
           end();
+
+      // TODO: This is to hack around a bug in TextArea. Fix TextArea and
+      // then remove this.
+      setTimeout(function() {
+        this.cmdLineFeedback_ = true;
+        this.cmdLine = 'flow> ';
+        this.cmdLineFeedback_ = false;
+      }.bind(this),10);
     },
 
     function addProperty(value, opt_name, opt_i, opt_parent) {
@@ -424,7 +464,7 @@ foam.CLASS({
     },
 
     function updateMemento() {
-      this.properties.skip(4).select().then(function(s) {
+      return this.properties.skip(4).select().then(function(s) {
         console.log('*************** updateMemento: ', s.a.length);
         this.feedback_ = true;
         this.memento = foam.Array.clone(s.a);
@@ -437,20 +477,21 @@ foam.CLASS({
 
       this.name = name;
       this.flows.find(name).then(function (f) {
-        console.log('loaded: ', name);
         this.memento = f.memento;
       }.bind(this));
+      return 'loading: ' + name;
     },
 
     function saveFlow(opt_name) {
       var name = opt_name || this.name;
       this.name = name;
-      this.updateMemento();
-      this.flows.put(this.FLOW.create({
-        name: name,
-        memento: this.memento
-      }););
-      console.log('saved as:', name);
+      this.updateMemento().then(function() {
+        this.flows.put(this.FLOW.create({
+          name: name,
+          memento: this.memento
+        }));
+      }.bind(this));
+      return 'saving as: ' + name;
     }
   ],
 
@@ -539,7 +580,8 @@ foam.CLASS({
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
-        this.updateMemento();
+        // TODO: hack because addProperty is asyn
+        setTimeout(this.updateMemento.bind(this),100);
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {
           var p = c.getPrivate_('lpp_');
