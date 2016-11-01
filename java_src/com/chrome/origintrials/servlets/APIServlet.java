@@ -46,16 +46,8 @@ public class APIServlet extends HttpServlet {
     return;
   }
 
-  public void doOptions(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.addHeader("Access-Control-Allow-Origin", "*");
-    resp.setStatus(resp.SC_OK);
-    resp.flushBuffer();
-  }
-
   public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.addHeader("Access-Control-Allow-Origin", "*");
-
-    X requestContext = x.put("httpRequest", req).put("httpResponse", resp);
+    X requestContext = x.put("httpRequest", req).put("httpResponse", resp).put("principal", req.getUserPrincipal());
 
     CharBuffer buffer_ = CharBuffer.allocate(65535);
     Reader reader = req.getReader();
