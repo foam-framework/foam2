@@ -15,26 +15,16 @@ import com.chrome.origintrials.dao.*;
 import com.chrome.origintrials.services.*;
 import com.chrome.origintrials.services.impl.*;
 
+import com.chrome.origintrials.Context;
+
 public class APIServlet extends HttpServlet {
   private X x;
-
-  private DAO applicationDAO;
   private DAOSkeleton applicationDAOSkeleton;
 
   public void init(ServletConfig config) throws ServletException {
-    x = EmptyX.instance();
+    x = Context.instance();
 
-
-    TokenService service = x.create(TestTokenServiceImpl.class);
-
-    x = x.put("tokenService", service);
-
-    applicationDAO = x.create(DatastoreDAO.class).setOf(Application.getOwnClassInfo());
-    applicationDAO = x.create(ApplicationDAO.class).setDelegate(applicationDAO);
-
-    x = x.put("applicationDAO", applicationDAO);
-
-    applicationDAOSkeleton = x.create(DAOSkeleton.class).setDelegate(applicationDAO);
+    applicationDAOSkeleton = x.create(DAOSkeleton.class).setDelegate((DAO)x.get("applicationDAO"));
 
     super.init(config);
   }
