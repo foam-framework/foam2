@@ -37,6 +37,7 @@ foam.CLASS({
         m[this.name ] = o.cls_.create({
           x:        o.x,
           y:        o.y,
+          visible:  o.visible,
           width:    o.width,
           height:   o.height,
           radius:   o.radius,
@@ -45,7 +46,7 @@ foam.CLASS({
           head:     o.head,
           tail:     o.tail,
           length:   o.length,
-          strength: o.strength,
+          stretch:  o.stretch,
           color:    o.color
         }, o.__context__);
         m[this.name].instance_.reactions_ = o.reactions_;
