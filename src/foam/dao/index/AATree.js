@@ -60,12 +60,6 @@ foam.CLASS({
         new nodes.
       */
       name: 'nullNode'
-    },
-    {
-      /** TODO: subSelectMode as a string method name is not great.
-        Build a nested object of bools, strip one each layer:
-        [false, [true, [false, [false]]]] */
-      name: 'subSelectMode',
     }
   ],
 
@@ -509,8 +503,7 @@ foam.CLASS({
 
       var tree = this;
       var m    = start + Math.floor((end-start+1) / 2);
-      var am = a[m];
-      tree = tree.putKeyValue(keyExtractor(am), am);
+      tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
 
       tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
       tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);
