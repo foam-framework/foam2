@@ -865,6 +865,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Polygon',
@@ -890,6 +891,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.graphics',
@@ -928,7 +930,7 @@ foam.CLASS({
   methods: [
     function paintSelf(x) {
       x.beginPath();
-      x.arc(0, 0, this.radius-this.arcWidth, this.start, this.end);
+      x.arc(0, 0, this.radius, this.start, this.end);
 
       if ( this.color ) x.fill();
 
