@@ -114,6 +114,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.flow.Circle',
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
@@ -122,7 +123,6 @@ foam.CLASS({
     'foam.dao.EasyDAO',
     'foam.graphics.Box',
     'foam.graphics.CView',
-    'foam.graphics.Circle',
     'foam.physics.Physical',
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
@@ -168,6 +168,9 @@ foam.CLASS({
       name: 'scope',
       factory: function() {
         return {
+          add: function(obj, opt_name, opt_parent) {
+            this.addProperty(obj, opt_name, null, opt_parent || 'canvas1');
+          }.bind(this),
           load: this.loadFlow.bind(this),
           save: this.saveFlow.bind(this)
         };
