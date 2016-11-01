@@ -315,7 +315,8 @@ foam.CLASS({
         method: this.method,
         headers: headers,
         mode: "cors",
-        redirect: "follow"
+        redirect: "follow",
+        credentials: "same-origin"
       };
 
       if ( this.payload ) {
