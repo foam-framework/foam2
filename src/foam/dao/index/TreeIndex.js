@@ -289,7 +289,7 @@ foam.CLASS({
       var nodeCount = Math.floor(size * 0.25); // tree node count will be a quarter the total item count
 
       var isExprMatch = this.IS_EXPR_MATCH_FN.bind(this, predicate, property);
-      
+
       var tailFactory = this.tailFactory;
       var subEstimate = ( tailFactory ) ? function() {
           return Math.log(nodeCount) / Math.log(2) +
@@ -360,7 +360,7 @@ foam.CLASS({
       //    sink.subSink(key) => sink
       //    sink.defaultOrder() => Comparator
       // }
-      
+
       var result, subPlan, cost;
 
       var isExprMatch = this.IS_EXPR_MATCH_FN.bind(this, predicate, prop);
@@ -387,13 +387,14 @@ foam.CLASS({
 
           if ( subPlans.length === 0 ) return index.NotFoundPlan.create();
 
-          return index.AltPlan.create({ // TODO: ordering... mergeplan?
+          // TODO: If ordering, AltPlan may need to sort like MergePlan.
+          return index.AltPlan.create({
             subPlans: subPlans,
             prop: prop
           });
         }
       }
-      
+
       expr = isExprMatch(this.Eq);
       if ( expr ) {
         predicate = expr.predicate;
@@ -404,6 +405,7 @@ foam.CLASS({
 
         subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
+        // TODO: If ordering, AltPlan may need to sort like MergePlan.
         return index.AltPlan.create({
           subPlans: [subPlan],
           prop: prop
@@ -443,7 +445,8 @@ foam.CLASS({
           subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate, root));
         }
 
-        return index.AltPlan.create({// TODO: ordering... mergeplan?
+        // TODO: If ordering, AltPlan may need to sort like MergePlan.
+        return index.AltPlan.create({
           subPlans: subPlans,
           prop: prop
         });
