@@ -517,7 +517,9 @@ foam.CLASS({
       var s = this.stretch/1000;
       var c = this.compression/1000;
       var d = c1.distanceTo(c2);
-      var a = Math.atan2(c2.y-c1.y, c2.x-c1.x);
+      var a = Math.atan2(
+          (c2.top_  + c2.bottom_ - c1.top_  - c1.bottom_)/2,
+          (c2.left_ + c2.right_  - c1.left_ - c1.right_)/2);
 
       if ( s && d > l ) {
         c1.applyMomentum( s * (d-l), a);
