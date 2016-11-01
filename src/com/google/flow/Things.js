@@ -36,11 +36,11 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
   properties: [
     [ 'gravity', 1 ],
-    [ 'width',  150 ],
-    [ 'height', 50 ],
-    [ 'text', 'Text' ],
-    [ 'color', '#000000' ],
-    [ 'font', '50px Arial' ]
+    [ 'width',   150 ],
+    [ 'height',  50 ],
+    [ 'text',    'Text' ],
+    [ 'color',   '#000000' ],
+    [ 'font',    '50px Arial' ]
   ]
 });
 
@@ -52,8 +52,8 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
   properties: [
     [ 'arcWidth', 1 ],
-    [ 'gravity', 1 ],
-    [ 'radius',  25 ],
+    [ 'gravity',  1 ],
+    [ 'radius',   25 ],
     [ 'friction', 0.98 ]
   ]
 });
@@ -538,6 +538,7 @@ foam.CLASS({
   name: 'Script',
 
   imports: [
+    'data',
     'scope'
   ],
 
@@ -565,12 +566,12 @@ foam.CLASS({
 
   actions: [
     function run() {
-      with ( this.scope ) {
-        with ( { log: this.log.bind(this) } ) {
-          this.log('>', this.code);
-          this.log(eval(this.code));
+        with ( this.scope ) {
+          with ( { log: this.log.bind(this) } ) {
+            this.log('>', this.code);
+            this.log(eval('(function() {' + this.code + '})').call(this.data));
+          }
         }
-      }
     },
 
     function clearOutput() {
