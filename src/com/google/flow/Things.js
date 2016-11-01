@@ -388,7 +388,7 @@ foam.CLASS({
           align: 'center',
           color: 'white',
           font: 'bold 10px sans-serif',
-          text$: this.count$,
+          text$: this.count$.map(function(c) { return c ? c : ''; }),
           y:     -6
         });
       }
