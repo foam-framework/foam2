@@ -192,7 +192,7 @@ foam.CLASS({
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
       if ( this.ValueIndex.isInstance(this.tailFactory) ) {
-        a.sort(toCompare(this.prop));
+        a.sort(this.prop.compare.bind(this.prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f);
       } else {
         for ( var i = 0 ; i < a.length ; i++ ) {
@@ -491,11 +491,10 @@ foam.CLASS({
           if ( sortRequired ) {
             var arrSink = index.ArraySink.create();
             index.selectCount++;
-            subTree.subSelectMode = 'select';
             subTree.select(arrSink, null, null, null, predicate);
             index.selectCount--;
             var a = arrSink.a;
-            a.sort(toCompare(order));
+            a.sort(order.compare.bind(order));
 
             skip = skip || 0;
             limit = Number.isFinite(limit) ? limit : a.length;
@@ -621,32 +620,3 @@ foam.CLASS({
   ]
 });
 
-/** TODO: move to stdlib */
-var toCompare = function toCompare(c) {
-  if ( Array.isArray(c) ) return CompoundComparator.apply(null, c);
-
-  return c.compare ? c.compare.bind(c) : c;
-};
-
-
-/** TODO: move to stdlib */
-var CompoundComparator = function CompoundComparator() {
-  var args = Array.from(arguments);
-  var cs = [];
-
-  // Convert objects with .compare() methods to compare functions.
-  for ( var i = 0 ; i < args.length ; i++ )
-    cs[i] = toCompare(args[i]);
-
-  var f = function(o1, o2) {
-    for ( var i = 0 ; i < cs.length ; i++ ) {
-      var r = cs[i](o1, o2);
-      if ( r !== 0 ) return r;
-    }
-    return 0;
-  };
-
-  f.toString = f.toSQL;
-
-  return f;
-};
