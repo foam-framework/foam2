@@ -36,11 +36,11 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
   properties: [
     [ 'gravity', 1 ],
-    [ 'width',  150 ],
-    [ 'height', 50 ],
-    [ 'text', 'Text' ],
-    [ 'color', '#000000' ],
-    [ 'font', '50px Arial' ]
+    [ 'width',   150 ],
+    [ 'height',  50 ],
+    [ 'text',    'Text' ],
+    [ 'color',   '#000000' ],
+    [ 'font',    '50px Arial' ]
   ]
 });
 
@@ -52,8 +52,8 @@ foam.CLASS({
   implements: [ 'foam.physics.Physical' ],
   properties: [
     [ 'arcWidth', 1 ],
-    [ 'gravity', 1 ],
-    [ 'radius',  25 ],
+    [ 'gravity',  1 ],
+    [ 'radius',   25 ],
     [ 'friction', 0.98 ]
   ]
 });
@@ -189,9 +189,9 @@ foam.CLASS({
       name: 'onResize',
       isFramed: true,
       code: function() {
-        this.children.forEach(function(c) {
-          if ( ! com.google.flow.Halo.isInstance(c) ) this.remove(c);
-        }.bind(this));
+        this.children.
+            filter(function(c) { return ! com.google.flow.Halo.isInstance(c); }).
+            forEach(this.remove.bind(this));
 
         this.updateCellSize();
         this.width  = this.width;
@@ -388,7 +388,7 @@ foam.CLASS({
           align: 'center',
           color: 'white',
           font: 'bold 10px sans-serif',
-          text$: this.count$,
+          text$: this.count$.map(function(c) { return c ? c : ''; }),
           y:     -6
         });
       }
@@ -495,23 +495,14 @@ foam.CLASS({
       var c1 = this.scope[this.head];
       var c2 = this.scope[this.tail];
 
+      if ( ! c1 || ! c2 ) return;
+
       x.strokeStyle = this.color;
       x.lineWidth   = 1
 
       x.beginPath();
-
-      if ( c1.r ) {
-        x.moveTo(c1.x, c1.y);
-      } else {
-        x.moveTo(c1.x + c1.width/2, c1.y + c1.height/2);
-      }
-
-      if ( c2.r ) {
-        x.lineTo(c2.x, c2.y);
-      } else {
-        x.lineTo(c2.x + c2.width/2, c2.y + c2.height/2);
-      }
-
+      x.moveTo((c1.left_ + c1.right_)/2, (c1.top_ + c1.bottom_)/2);
+      x.lineTo((c2.left_ + c2.right_)/2, (c2.top_ + c2.bottom_)/2);
       x.stroke();
     }
   ],
@@ -526,7 +517,9 @@ foam.CLASS({
       var s = this.stretch/1000;
       var c = this.compression/1000;
       var d = c1.distanceTo(c2);
-      var a = Math.atan2(c2.y-c1.y, c2.x-c1.x);
+      var a = Math.atan2(
+          (c2.top_  + c2.bottom_ - c1.top_  - c1.bottom_)/2,
+          (c2.left_ + c2.right_  - c1.left_ - c1.right_)/2);
 
       if ( s && d > l ) {
         c1.applyMomentum( s * (d-l), a);
@@ -545,6 +538,7 @@ foam.CLASS({
   name: 'Script',
 
   imports: [
+    'data',
     'scope'
   ],
 
@@ -572,12 +566,12 @@ foam.CLASS({
 
   actions: [
     function run() {
-      with ( this.scope ) {
-        with ( { log: this.log.bind(this) } ) {
-          this.log('>', this.code);
-          this.log(eval(this.code));
+        with ( this.scope ) {
+          with ( { log: this.log.bind(this) } ) {
+            this.log('>', this.code);
+            this.log(eval('(function() {' + this.code + '})').call(this.data));
+          }
         }
-      }
     },
 
     function clearOutput() {

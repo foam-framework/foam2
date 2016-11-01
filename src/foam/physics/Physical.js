@@ -45,7 +45,7 @@ foam.CLASS({
 
   methods: [
     function distance(dx, dy) {
-      return Math.sqrt(dx*dx, dy*dy);
+      return Math.sqrt(dx*dx + dy*dy);
     },
 
     function applyMomentum(m, a) {
