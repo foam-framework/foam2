@@ -325,7 +325,6 @@ foam.CLASS({
       class: 'String',
       name: 'cmdLine',
       value: 'flow> ',
-//       factory: function() { return 'flow> '; },
       postSet: function(_, cmd) {
         if ( this.cmdLineFeedback_ ) return;
         this.cmdLineFeedback_ = true;
