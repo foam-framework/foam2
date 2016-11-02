@@ -595,4 +595,22 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Turtle',
+  extends: 'foam.graphics.Ellipse',
+
+  implements: [ 'foam.physics.Physical' ],
+
+  properties: [
+    [ 'radiusX', 8 ],
+    [ 'radiusY', 12 ],
+    [ 'color', 'green' ]
+  ],
+
+  methods: [
+  ]
+});
+
 // foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
