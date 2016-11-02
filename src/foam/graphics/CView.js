@@ -1058,7 +1058,7 @@ foam.CLASS({
   methods: [
     function paintSelf(x) {
       x.beginPath();
-      x.ellipse(0, 0, this.radiusX, this.radiusY, 0, this.start, this.end);
+      x.ellipse(this.radiusX, this.radiusY, this.radiusX, this.radiusY, 0, this.start, this.end);
 
       if ( this.color ) x.fill();
 
