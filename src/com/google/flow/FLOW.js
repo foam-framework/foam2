@@ -68,6 +68,8 @@ foam.CLASS({
           mass:        o.mass,
           name:        o.name,
           radius:      o.radius,
+          radiusX:     o.radiusX,
+          radiusY:     o.radiusY,
           stretch:     o.stretch,
           tail:        o.tail,
           text:        o.text,
