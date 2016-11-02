@@ -839,6 +839,59 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Line',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    { class: 'Float', name: 'startX' },
+    { class: 'Float', name: 'startY' },
+    { class: 'Float', name: 'endX' },
+    { class: 'Float', name: 'endY' },
+    { class: 'Float', name: 'lineWidth', value: 1 },
+    { class: 'String', name: 'color', value: '#000' }
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      x.beginPath();
+      x.moveTo(this.startX, this.startY);
+      x.lineTo(this.endX, this.endY);
+      x.lineWidth = this.lineWidth;
+      x.strokeStyle = this.color;
+      x.stroke();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Polygon',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    { class: 'Array', of: 'Float', name: 'xCoordinates' },
+    { class: 'Array', of: 'Float', name: 'yCoordinates' },
+    { class: 'String', name: 'color', value: '#000' },
+    { class: 'Float', name: 'lineWidth', value: 1 }
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      x.beginPath();
+      x.moveTo(this.xCoordinates[0], this.yCoordinates[0]);
+      for ( var i = 1; i < this.xCoordinates.length; i++ ) {
+        x.lineTo(this.xCoordinates[i], this.yCoordinates[i]);
+      }
+      x.lineWidth = this.lineWidth;
+      x.strokeStyle = this.color;
+      x.stroke();
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.graphics',
@@ -877,7 +930,7 @@ foam.CLASS({
   methods: [
     function paintSelf(x) {
       x.beginPath();
-      x.arc(0, 0, this.radius-this.arcWidth, this.start, this.end);
+      x.arc(0, 0, this.radius, this.start, this.end);
 
       if ( this.color ) x.fill();
 
@@ -934,6 +987,97 @@ foam.CLASS({
       var r = this.radius + c.radius;
       if ( this.border ) r += this.arcWidth/2-1;
       if ( c.border    ) r += c.arcWidth/2-1;
+      var dx = this.x-c.x;
+      var dy = this.y-c.y;
+      return dx * dx + dy * dy <= r * r;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Ellipse',
+  extends: 'foam.graphics.CView',
+
+  properties: [
+    {
+      class: 'Float',
+      name: 'radiusX',
+      preSet: function(_, r) { return Math.max(0, r); }
+    },
+    {
+      class: 'Float',
+      name: 'radiusY',
+      preSet: function(_, r) { return Math.max(0, r); }
+    },
+    {
+      name: 'start',
+      value: 0,
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      }
+    },
+    {
+      name: 'end',
+      value: 2*Math.PI,
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', maxValue: Math.PI*2, step: 0.01, onKey: true }
+      }
+    },
+    {
+      name: 'borderWidth',
+      class: 'Float'
+    },
+    {
+      name: 'border',
+      value: '#000000'
+    },
+    {
+      class: 'Float',
+      name: 'width',
+      getter: function() { return 2 * this.radiusX; },
+      setter: function(w) { this.radiusX = w / 2; }
+    },
+    {
+      class: 'Float',
+      name: 'height',
+      getter: function() { return 2 * this.radiusY; },
+      setter: function(h) { this.radiusY = h / 2; }
+    },
+    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radiusY; } },
+    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radiusX; } },
+    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radiusY; } },
+    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radiusX; } },
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      x.beginPath();
+      x.ellipse(0, 0, this.radiusX, this.radiusY, 0, this.start, this.end);
+
+      if ( this.color ) x.fill();
+
+      if ( this.border ) {
+        x.lineWidth = this.borderWidth;
+        x.stroke();
+      }
+    },
+
+    function hitTest(p) {
+      var r = this.radius + this.borderWidth/2 - 1;
+      return p.x*p.x + p.y*p.y <= r*r;
+    },
+
+    function intersects(c) {
+      if ( ! c.radius ) return c.intersects(this);
+      var r = this.radius + c.radius;
+      if ( this.border ) r += this.borderWidth/2-1;
+      if ( c.border    ) r += c.borderWidth/2-1;
       var dx = this.x-c.x;
       var dy = this.y-c.y;
       return dx * dx + dy * dy <= r * r;
@@ -1156,3 +1300,15 @@ foam.CLASS({
     }
   ]
 });
+
+/*
+a : 1 // H scale
+b : 0 // V skew
+c : 3821.142407877334 // H move
+d : 0 // H skew
+e : 1 // V scale
+f : -6796.176219640322 // V move
+g : 0
+h : 0
+i : 1
+*/

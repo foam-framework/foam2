@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>FOAM DXF Viewer</title>
+
+<script src="../../../foam.js"></script>
+<script src="../../../../bower_components/dxf-parser/dist/dxf-parser.js">
+</script>
+
+<!-- Application-specific code -->
+<script src="./dxf.js"></script>
+
+<body>
+  See <tt>window.__ctrl</tt>.
+
+<script>
+var ctrl = com.google.dxf.ui.Controller.create();
+window.document.body.insertAdjacentHTML('beforeend', ctrl.outerHTML);
+ctrl.load();
+</script>
+
+</body>
+
+

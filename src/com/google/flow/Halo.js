@@ -219,6 +219,13 @@ foam.CLASS({
           v.width  = vs.width  + dx;
           v.height = vs.height + dy;
         }}));
+    },
+
+    function paintChildren(x) {
+      var alpha = x.globalAlpha;
+      x.globalAlpha = 1.0
+      this.SUPER(x);
+      x.globalAlpha = alpha;
     }
   ],
 

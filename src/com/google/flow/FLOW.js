@@ -35,21 +35,24 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
-          border:   o.radius,
-          code:     o.code,
-          color:    o.color,
-          head:     o.head,
-          height:   o.height,
-          length:   o.length,
-          name:     o.name,
-          radius:   o.radius,
-          stretch:  o.stretch,
-          tail:     o.tail,
-          text:     o.text,
-          visible:  o.visible,
-          width:    o.width,
-          x:        o.x,
-          y:        o.y
+          border:      o.radius,
+          code:        o.code,
+          color:       o.color,
+          compression: o.compression,
+          gravity:     o.gravity,
+          head:        o.head,
+          height:      o.height,
+          length:      o.length,
+          mass:        o.mass,
+          name:        o.name,
+          radius:      o.radius,
+          stretch:     o.stretch,
+          tail:        o.tail,
+          text:        o.text,
+          visible:     o.visible,
+          width:       o.width,
+          x:           o.x,
+          y:           o.y
         }, o.__context__);
         m[this.name].instance_.reactions_ = o.reactions_;
       }
@@ -114,7 +117,9 @@ foam.CLASS({
   ],
 
   requires: [
+    'com.google.dxf.ui.DXFDiagram',
     'com.google.flow.Circle',
+    'com.google.flow.Ellipse',
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
@@ -153,7 +158,7 @@ foam.CLASS({
       .foam-u2-TableView-selected { outline: 1px solid red; }
       ^ canvas { border: none; }
       ^ .foam-u2-ActionView { margin: 10px; }
-      ^cmd { width: 100%; margin-bottom: 8px; }
+      ^cmd { box-shadow: 3px 3px 6px 0 gray; width: 100%; margin-bottom: 8px; }
       ^properties .foam-u2-view-TreeViewRow { position: relative; }
       ^properties .foam-u2-ActionView, ^properties .foam-u2-ActionView:hover { background: white; padding: 0; position: absolute; right: 2px; border: none; margin: 2px 2px 0 0; }
       .foam-u2-Tabs { padding-top: 0 !important; margin-right: -8px; }
@@ -208,6 +213,7 @@ foam.CLASS({
         });
         dao.put(com.google.flow.Box.model_);
         dao.put(com.google.flow.Circle.model_);
+        dao.put(com.google.flow.Ellipse.model_);
         dao.put(com.google.flow.Text.model_);
         dao.put(com.google.flow.Clock.model_);
         dao.put(com.google.flow.Mushroom.model_);
@@ -222,6 +228,7 @@ foam.CLASS({
         dao.put(com.google.flow.Cursor.model_);
         dao.put(com.google.flow.Script.model_);
         dao.put(foam.core.Model.model_);
+        dao.put(com.google.dxf.ui.DXFDiagram.model_);
         return dao;
       }
     },
@@ -236,7 +243,7 @@ foam.CLASS({
       factory: function() {
         return this.EasyDAO.create({
           of: com.google.flow.FLOW,
-          cache: true,
+          cache: false,
           daoType: 'IDB'
         });
       }
@@ -322,7 +329,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'cmdLine',
-//       factory: function() { return 'flow> '; },
+      value: 'flow> ',
       postSet: function(_, cmd) {
         if ( this.cmdLineFeedback_ ) return;
         this.cmdLineFeedback_ = true;
@@ -429,14 +436,6 @@ foam.CLASS({
             cssClass(this.myCls('sheet')).
             show(this.slot(function(selected) { return !!selected; })).
           end();
-
-      // TODO: This is to hack around a bug in TextArea. Fix TextArea and
-      // then remove this.
-      setTimeout(function() {
-        this.cmdLineFeedback_ = true;
-        this.cmdLine = 'flow> ';
-        this.cmdLineFeedback_ = false;
-      }.bind(this),10);
     },
 
     function addProperty(value, opt_name, opt_i, opt_parent) {
@@ -578,7 +577,8 @@ foam.CLASS({
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
-        this.updateMemento();
+        // TODO: hack because addProperty is asyn
+        setTimeout(this.updateMemento.bind(this),100);
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {
           var p = c.getPrivate_('lpp_');
