@@ -1002,13 +1002,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'radiusX',
       class: 'Float',
+      name: 'radiusX',
       preSet: function(_, r) { return Math.max(0, r); }
     },
     {
-      name: 'radiusY',
       class: 'Float',
+      name: 'radiusY',
       preSet: function(_, r) { return Math.max(0, r); }
     },
     {
@@ -1037,10 +1037,22 @@ foam.CLASS({
       name: 'border',
       value: '#000000'
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radius; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radius; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radius; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radius; } },
+    {
+      class: 'Float',
+      name: 'width',
+      getter: function() { return 2 * this.radiusX; },
+      setter: function(w) { this.radiusX = w / 2; }
+    },
+    {
+      class: 'Float',
+      name: 'height',
+      getter: function() { return 2 * this.radiusY; },
+      setter: function(h) { this.radiusY = h / 2; }
+    },
+    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radiusY; } },
+    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radiusX; } },
+    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radiusY; } },
+    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radiusX; } },
   ],
 
   methods: [
