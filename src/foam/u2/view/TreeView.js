@@ -29,8 +29,8 @@ foam.CLASS({
   ],
 
   imports: [
-
-    'selection'
+    'selection',
+    'onObjDrop'
   ],
 
   axioms: [
@@ -123,21 +123,20 @@ foam.CLASS({
 
       var id = e.dataTransfer.getData('application/x-foam-obj-id');
 
-      if ( foam.util.equals(id, this.data.id) )
-        return;
+      if ( foam.util.equals(id, this.data.id) ) return;
 
       e.preventDefault();
       e.stopPropagation();
 
       var self = this;
-
-      this.__context__[this.relationship.targetDAOKey].
-        find(id).then(function(obj) {
-          self.__context__[self.relationship.targetDAOKey].
-            remove(obj).then(function() {
-              self.data[self.relationship.name].put(obj);
-            });
+      var dao  = this.__context__[this.relationship.targetDAOKey];
+      dao.find(id).then(function(obj) {
+        dao.remove(obj).then(function() {
+          self.data[self.relationship.name].put(obj).then(function(obj) {
+            self.onObjDrop(obj, id);
+          });
         });
+      });
     },
 
     function selected(e) {
@@ -166,6 +165,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'onObjDrop',
     'selection'
   ],
 
@@ -209,6 +209,10 @@ foam.CLASS({
             formatter: self.formatter
           }, this);
         });
+    },
+
+    function onObjDrop(obj, target) {
+      // Template Method
     }
   ]
 });
