@@ -23,9 +23,6 @@ foam.CLASS({
   properties: [
     [ 'nodeName', 'textarea' ],
     {
-      name: 'data',
-    },
-    {
       class: 'Int',
       name: 'rows',
       value: 4
@@ -49,6 +46,12 @@ foam.CLASS({
       this.SUPER();
       this.cssClass(this.myCls());
       this.attrs({rows: this.rows, cols: this.cols});
+
+      // This is required because textarea accepts setting the 'value'
+      // after it's output, but before requires output to be between
+      // the tags when it's first output.
+      this.add(this.data + '');
+
       this.attrSlot(
         'value',
         this.onKey ? 'input' : 'change').linkFrom(this.data$);
