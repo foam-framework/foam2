@@ -61,6 +61,21 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Ellipse',
+  extends: 'foam.graphics.Ellipse',
+  implements: [ 'foam.physics.Physical' ],
+  properties: [
+    [ 'border', 1 ],
+    [ 'gravity',  1 ],
+    [ 'radiusX',   35 ],
+    [ 'radiusY',   20 ],
+    [ 'friction', 0.98 ]
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Box',
   extends: 'foam.graphics.Box',
   implements: [ 'foam.physics.Physical' ],

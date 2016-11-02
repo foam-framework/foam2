@@ -116,6 +116,7 @@ foam.CLASS({
   requires: [
     'com.google.dxf.ui.DXFDiagram',
     'com.google.flow.Circle',
+    'com.google.flow.Ellipse',
     'com.google.flow.DetailPropertyView',
     'com.google.flow.Halo',
     'com.google.flow.Property',
@@ -209,6 +210,7 @@ foam.CLASS({
         });
         dao.put(com.google.flow.Box.model_);
         dao.put(com.google.flow.Circle.model_);
+        dao.put(com.google.flow.Ellipse.model_);
         dao.put(com.google.flow.Text.model_);
         dao.put(com.google.flow.Clock.model_);
         dao.put(com.google.flow.Mushroom.model_);
