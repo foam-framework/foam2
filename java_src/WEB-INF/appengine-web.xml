@@ -15,8 +15,5 @@
   <application>google.com:astute-harmony-144016</application>
   <version>${appengine.app.version}</version>
   <threadsafe>true</threadsafe>
-  <resource-files>
-    <include path="/resources/**"/>
-    <include path="/resources/*.js"/>
-  </resource-files>
+  <public-root>/static</public-root>
 </appengine-web-app>
