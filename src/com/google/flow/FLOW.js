@@ -324,7 +324,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'cmdLine',
-//       factory: function() { return 'flow> '; },
+      value: 'flow> ',
       postSet: function(_, cmd) {
         if ( this.cmdLineFeedback_ ) return;
         this.cmdLineFeedback_ = true;
@@ -431,14 +431,6 @@ foam.CLASS({
             cssClass(this.myCls('sheet')).
             show(this.slot(function(selected) { return !!selected; })).
           end();
-
-      // TODO: This is to hack around a bug in TextArea. Fix TextArea and
-      // then remove this.
-      setTimeout(function() {
-        this.cmdLineFeedback_ = true;
-        this.cmdLine = 'flow> ';
-        this.cmdLineFeedback_ = false;
-      }.bind(this),10);
     },
 
     function addProperty(value, opt_name, opt_i, opt_parent) {
