@@ -15,26 +15,16 @@ import com.chrome.origintrials.dao.*;
 import com.chrome.origintrials.services.*;
 import com.chrome.origintrials.services.impl.*;
 
+import com.chrome.origintrials.Context;
+
 public class APIServlet extends HttpServlet {
   private X x;
-
-  private DAO applicationDAO;
   private DAOSkeleton applicationDAOSkeleton;
 
   public void init(ServletConfig config) throws ServletException {
-    x = EmptyX.instance();
+    x = Context.instance();
 
-
-    TokenService service = x.create(TestTokenServiceImpl.class);
-
-    x = x.put("tokenService", service);
-
-    applicationDAO = x.create(DatastoreDAO.class).setOf(Application.getOwnClassInfo());
-    applicationDAO = x.create(ApplicationDAO.class).setDelegate(applicationDAO);
-
-    x = x.put("applicationDAO", applicationDAO);
-
-    applicationDAOSkeleton = x.create(DAOSkeleton.class).setDelegate(applicationDAO);
+    applicationDAOSkeleton = x.create(DAOSkeleton.class).setDelegate((DAO)x.get("applicationDAO"));
 
     super.init(config);
   }
@@ -46,16 +36,8 @@ public class APIServlet extends HttpServlet {
     return;
   }
 
-  public void doOptions(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.addHeader("Access-Control-Allow-Origin", "*");
-    resp.setStatus(resp.SC_OK);
-    resp.flushBuffer();
-  }
-
   public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    resp.addHeader("Access-Control-Allow-Origin", "*");
-
-    X requestContext = x.put("httpRequest", req).put("httpResponse", resp);
+    X requestContext = x.put("httpRequest", req).put("httpResponse", resp).put("principal", req.getUserPrincipal());
 
     CharBuffer buffer_ = CharBuffer.allocate(65535);
     Reader reader = req.getReader();
