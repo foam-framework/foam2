@@ -169,7 +169,7 @@ foam.CLASS({
       factory: function() {
         return {
           add: function(obj, opt_name, opt_parent) {
-            this.addProperty(obj, opt_name, null, opt_parent || 'canvas1');
+            this.addProperty(obj, opt_name, undefined, opt_parent || 'canvas1');
           }.bind(this),
           load: this.loadFlow.bind(this),
           save: this.saveFlow.bind(this)
