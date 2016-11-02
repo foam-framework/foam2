@@ -241,6 +241,7 @@ foam.CLASS({
         dao.put(com.google.flow.Text.model_);
         dao.put(com.google.flow.Clock.model_);
         dao.put(com.google.flow.Mushroom.model_);
+        dao.put(com.google.flow.Turtle.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
         dao.put(com.google.flow.Desk.model_);
         dao.put(com.google.flow.DuplexDesk.model_);
