@@ -15,6 +15,28 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'TreeView',
+  extends: 'foam.u2.view.TreeView',
+
+  methods: [
+    function onObjDrop(obj, target) {
+      // console.log('***************** target: ', o, target, target.value);
+      // Adjust position of object so that it stays in its current
+      // location. TODO: something better with transforms as this
+      // probably doesn't work with scaling and rotation.
+      var o      = obj.value;
+      var parent = o.parent
+      while ( parent ) {
+        o.x -= parent.x;
+        o.y -= parent.y;
+        parent = parent.parent;
+      }
+    }
+  ]
+});
+
 
 // TODO: Should have a GUID 'id' instead of name, since now
 // you can't have two properties with the same name but
@@ -132,7 +154,7 @@ foam.CLASS({
     'foam.physics.PhysicsEngine',
     'foam.u2.PopupView',
     'foam.u2.TableView',
-    'foam.u2.view.TreeView',
+    'foam.google.flow.TreeView',
     'foam.util.Timer'
   ],
 
@@ -260,7 +282,7 @@ foam.CLASS({
     {
       name: 'properties',
       view: {
-        class: 'foam.u2.view.TreeView',
+        class: 'com.google.flow.TreeView',
         relationship: relationship,
         startExpanded: true,
         formatter: function() {
@@ -505,18 +527,8 @@ foam.CLASS({
             this.physics.add(o);
           }
         } else {
-          this.properties.find(p.parent).then(function(p2) {
-            // Adjust position of object so that it stays in its current
-            // location. TODO: something better with transforms as this
-            // probably doesn't work with scaling and rotation.
-            var parent = p2.value;
-            while ( parent ) {
-              o.x -= parent.x;
-              o.y -= parent.y;
-              parent = parent.parent;
-            }
-
-            p2.value.add(o);
+          this.properties.find(p.parent).then(function(target) {
+            target.value.add(o);
           });
         }
       }
