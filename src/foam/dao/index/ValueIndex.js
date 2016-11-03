@@ -26,7 +26,7 @@ foam.CLASS({
   implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
-    { class: 'Simple',  name: 'value' },
+    { class: 'foam.pattern.progenitor.PerInstance',  name: 'value' },
     { name: 'cost', value: 1 }
   ],
 
@@ -49,16 +49,17 @@ foam.CLASS({
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function plan() { return this; },
+    function mapOver(fn, ofIndex) { },
 
-    function select(sink, skip, limit, order, predicate) {
+    function estimate(/*size, sink, skip, limit, order, predicate*/) {
+      return 1;
+    },
+
+    function select(sink, skip, limit, orderDirs, predicate) {
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;
       sink.put(this.value);
     },
-
-    function selectReverse(sink, skip, limit, order, predicate) {
-      this.select(sink, skip, limit, order, predicate);
-    }
   ]
 });

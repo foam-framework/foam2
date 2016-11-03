@@ -41,6 +41,16 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'NullSink',
+  extends: 'foam.dao.AbstractSink',
+
+  axioms: [
+    foam.pattern.Singleton.create()
+  ]
+});
+
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
@@ -120,6 +130,20 @@ foam.INTERFACE({
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate'
+    },
+    {
+      name: 'toIndex',
+      args: [
+        {
+          name: 'tailFactory',
+          javaType: 'foam.dao.index.Index'
+        }
+      ],
+      javaReturns: 'foam.dao.index.Index'
+    },
+    {
+      name: 'toDisjunctiveNormalForm',
+      javaReturns: 'foam.mlang.predicate.Predicate'
     }
   ]
 });
@@ -178,6 +202,12 @@ foam.CLASS({
   abstract: true,
   implements: ['foam.mlang.predicate.Predicate'],
   methods: [
+    function toIndex(/*tailFactory*/) {
+      return undefined;
+    },
+    function toDisjunctiveNormalForm() {
+      return this;
+    },
     {
       name: 'partialEval',
       javaCode: 'return this;',
@@ -265,6 +295,13 @@ foam.CLASS({
   ],
 
   methods: [
+    function toIndex(tailFactory) {
+      if ( this.arg1 ) {
+        return this.arg1.toIndex(tailFactory);
+      } else {
+        return;
+      }
+    },
     function toString() {
       return foam.String.constantize(this.cls_.name) +
           '(' + this.arg1.toString() + ')';
@@ -292,6 +329,13 @@ foam.CLASS({
   ],
 
   methods: [
+    function toIndex(tailFactory) {
+      if ( this.arg1 ) {
+        return this.arg1.toIndex(tailFactory);
+      } else {
+        return;
+      }
+    },
     function toString() {
       return foam.String.constantize(this.cls_.name) + '(' +
           this.arg1.toString() + ', ' +
@@ -336,7 +380,9 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.predicate.False',
-    'foam.mlang.predicate.True'
+    'foam.mlang.predicate.True',
+    'foam.dao.index.OrIndex',
+    'foam.dao.index.AltIndex'
   ],
 
   methods: [
@@ -402,6 +448,43 @@ foam.CLASS({
       if ( newArgs.length === 1 ) return newArgs[0];
 
       return updated ? this.cls_.create({ args: newArgs }) : this;
+    },
+
+    function toIndex(tailFactory) {
+      // return an OR index with Alt index spanning each possible index
+      var subIndexes = [tailFactory];
+      for ( var i = 0; i < this.args.length; i++ ) {
+        var index = this.args[i].toIndex(tailFactory);
+        index && subIndexes.push(index);
+      }
+      return this.OrIndex.create({
+        delegateFactory: this.AltIndex.create({
+          delegateFactories: subIndexes
+        })
+      });
+    },
+
+    function toDisjunctiveNormalForm() {
+      // TODO: memoization around this process?
+      // DNF our args, note if anything changes
+      var oldArgs = this.args;
+      var newArgs = [];
+      var changed = false;
+      for (var i = 0; i < oldArgs.length; i++ ) {
+        var a = oldArgs[i].toDisjunctiveNormalForm();
+        if ( a !== oldArgs[i] ) changed = true;
+        newArgs[i] = a;
+      }
+
+      // partialEval will take care of nested ORs
+      var self = this;
+      if ( changed ) {
+        self = this.clone();
+        self.args = newArgs;
+        self = self.partialEval();
+      }
+
+      return self;
     }
   ]
 });
@@ -411,6 +494,10 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'And',
   extends: 'foam.mlang.predicate.Nary',
+
+  requires: [
+    'foam.mlang.predicate.Or'
+  ],
 
   methods: [
     {
@@ -476,6 +563,96 @@ foam.CLASS({
       if ( newArgs.length === 1 ) return newArgs[0];
 
       return updated ? this.cls_.create({ args: newArgs }) : this;
+    },
+
+    function toIndex(tailFactory) {
+      // TODO: sort by index uniqueness (put the most indexable first):
+      //   This prevents dropping to scan mode too early, and restricts
+      //   the remaning set more quickly.
+      // EQ, IN,... CONTAINS, ... LT, GT...
+
+      // generate indexes, find costs, toss these initial indexes
+      var sortedArgs = Object.create(null);
+      var costs = [];
+      var args = this.args;
+      for (var i = 0; i < args.length; i++ ) {
+        var arg = args[i];
+        var idx = arg.toIndex(tailFactory);
+        if ( ! idx ) continue;
+
+        var idxCost = Math.floor(idx.estimate(
+           1000, undefined, undefined, undefined, undefined, arg));
+        // make unique with a some extra digits
+        var costKey = idxCost + i / 1000.0;
+        sortedArgs[costKey] = arg;
+        costs.push(costKey);
+      }
+      costs = costs.sort(foam.Number.compare);
+
+      // Sort, build list up starting at the end (most expensive
+      //   will end up deepest in the index)
+      var tail = tailFactory;
+      for ( var i = costs.length - 1; i >= 0; i-- ) {
+        var arg = sortedArgs[costs[i]];
+        //assert(arg is a predicate)
+        tail = arg.toIndex(tail);
+      }
+
+      return tail;
+    },
+
+    function toDisjunctiveNormalForm() {
+      // for each nested OR, multiply:
+      // AND(a,b,OR(c,d),OR(e,f)) -> OR(abce,abcf,abde,abdf)
+
+      var andArgs = [];
+      var orArgs = [];
+      var oldArgs = this.args;
+      for (var i = 0; i < oldArgs.length; i++ ) {
+        var a = oldArgs[i].toDisjunctiveNormalForm();
+        if ( this.Or.isInstance(a) ) {
+          orArgs.push(a);
+        } else {
+          andArgs.push(a);
+        }
+      }
+
+      if ( orArgs.length > 0 ) {
+        var newAndGroups = [];
+        // Generate every combination of the arguments of the OR clauses
+        // orArgsOffsets[g] represents the array index we are lookig at
+        // in orArgs[g].args[offset]
+        var orArgsOffsets = new Array(orArgs.length).fill(0);
+        var active = true;
+        var idx = orArgsOffsets.length - 1;
+        orArgsOffsets[idx] = -1; // compensate for intial ++orArgsOffsets[idx]
+        while ( active ) {
+          while ( ++orArgsOffsets[idx] >= orArgs[idx].args.length ) {
+            // reset array index count, carry the one
+            if ( idx === 0 ) { active = false; break; }
+            orArgsOffsets[idx] = 0;
+            idx--;
+          }
+          idx = orArgsOffsets.length - 1;
+          if ( ! active ) break;
+
+          // for the last group iterated, read back up the indexes
+          // to get the result set
+          var newAndArgs = [];
+          for ( var j = orArgsOffsets.length - 1; j >= 0; j-- ) {
+            newAndArgs.push(orArgs[j].args[orArgsOffsets[j]]);
+          }
+          newAndArgs = newAndArgs.concat(andArgs);
+
+          newAndGroups.push(
+            this.cls_.create({ args: newAndArgs })
+          );
+        }
+        return this.Or.create({ args: newAndGroups }).partialEval();
+      } else {
+        // no OR args, no DNF transform needed
+        return this;
+      }
     }
   ]
 });
@@ -1057,13 +1234,100 @@ foam.INTERFACE({
           javaType: 'Object'
         }
       ]
+    },
+    {
+      name: 'toIndex',
+      args: [
+        {
+          name: 'tailFactory',
+          javaType: 'foam.dao.index.Index'
+        }
+      ],
+      javaReturns: 'foam.dao.index.Index'
+    },
+    {
+      /** Returns remaning ordering without this first one, which may be the
+        only one. */
+      name: 'orderTail',
+    },
+    {
+      /** The property, if any, sorted by this ordering. */
+      name: 'orderPrimaryProperty',
+    },
+    {
+      /** Returns a Direction indicating dir:1/-1 for ascending/descending,
+        and an optional next for sub-ordering. */
+      name: 'orderDirection',
     }
   ]
 });
 
 foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'Direction',
+  axioms: [
+    foam.pattern.Progenitor.create(),
+    foam.pattern.Singleton.create()
+  ],
+  properties: [
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'dir',
+      value: 1
+    },
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'srcOrder'
+    },
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'next'
+    },
+    {
+      class: 'foam.pattern.progenitor.PerInstance',
+      name: 'tags',
+      factory: function() { return {}; }
+    },
+  ],
+  methods: [
+    {
+      name: 'reverse',
+      code: function() {
+        this.dir *= -1;
+        this.next && this.next.reverse();
+        return this;
+      }
+    }
+  ]
+
+});
+
+foam.CLASS({
   refines: 'foam.core.Property',
-  implements: [ 'foam.mlang.order.Comparator' ]
+  implements: [ 'foam.mlang.order.Comparator' ],
+
+  methods: [
+    {
+      name: 'orderTail',
+      code: function() { return; },
+      javaCode: 'return null;'
+    },
+    {
+      name: 'orderPrimaryProperty',
+      code: function() { return this; },
+      javaCode: 'return this;'
+    },
+    {
+      name: 'orderDirection',
+      code: function() {
+        return foam.mlang.order.Direction.create().spawn({
+          dir: 1,
+          srcOrder: this
+        });
+      },
+      javaCode: 'return 1;'
+    }
+  ]
 });
 
 foam.CLASS({
@@ -1098,6 +1362,130 @@ foam.CLASS({
         return 'DESC(' + this.arg1.toString() + ')';
       },
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
+    },
+    {
+      name: 'toIndex',
+      code: function toIndex(tailFactory) {
+        if ( this.arg1 ) {
+          return this.arg1.toIndex(tailFactory);
+        } else {
+          return;
+        }
+      },
+      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
+        'if ( arg1 != null ) {' +
+          'return arg1.toIndex(tailFactory);'+
+        '}'+
+        'return null;'
+    },
+    {
+      name: 'orderTail',
+      code: function() { return; },
+      javaCode: 'return null;'
+    },
+    {
+      name: 'orderPrimaryProperty',
+      code: function() { return this.arg1; },
+      javaCode: 'return getArg1();'
+    },
+    {
+      name: 'orderDirection',
+      code: function() {
+        var ret = this.arg1.orderDirection().reverse();
+        ret.srcOrder = this;
+        return ret;
+      },
+      javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
+        'ret.setSrcOrder(this); return ret;'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'ThenBy',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
+        // of parameter is an interface rather than a class.
+        return a;
+      },
+      name: 'arg1'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
+        // of parameter is an interface rather than a class.
+        return a;
+      },
+      name: 'arg2'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        // an equals of arg1.compare is falsy, which will then hit arg2
+        return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
+      },
+      javaCode: 'int c = getArg1().compare(o1, o2); ' +
+        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
+        'return c;'
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return 'THEN_BY(' + this.arg1.toString() + ', ' +
+          this.arg2.toString() + ')';
+      },
+      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
+        '"," + getArg1().toString() + ")";'
+    },
+    {
+      name: 'toIndex',
+      code: function(tailFactory) {
+        if ( this.arg1 && this.arg2 ) {
+          return this.arg1.toIndex(this.arg2.toIndex(tailFactory));
+        } else {
+          return;
+        }
+      },
+      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
+        'foam.mlang.order.Comparator arg2 = getArg2();' +
+        'if ( arg1 != null && arg2 != null ) {' +
+          'return arg1.toIndex(arg2.toIndex(tailFactory));' +
+        '}' +
+        'return null;'
+    },
+    {
+      name: 'orderTail',
+      code: function() { return this.arg2; },
+      javaCode: 'return getArg2();'
+    },
+    {
+      name: 'orderPrimaryProperty',
+      code: function() { return this.arg1.orderPrimaryProperty(); },
+      javaCode: 'return getArg1().orderPrimaryProperty();'
+    },
+    {
+      name: 'orderDirection',
+      code: function() {
+        var ret = this.arg1.orderDirection();
+        ret.next = this.arg2.orderDirection();
+        ret.srcOrder = this;
+        return ret;
+      },
+      javaCode: 'Object ret = getArg1().orderDirection();' +
+        'ret.next = getArg2.orderDirection();' +
+        'ret.srcOrder = this; return ret;'
     }
   ]
 });
@@ -1170,7 +1558,8 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc'
+    'foam.mlang.order.Desc',
+    'foam.mlang.order.ThenBy'
   ],
 
   methods: [
@@ -1208,9 +1597,10 @@ foam.CLASS({
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
+    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
   ]
 });
 
