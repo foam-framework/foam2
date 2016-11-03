@@ -16,6 +16,53 @@
  */
 
 foam.CLASS({
+  refines: 'FObject',
+  properties: [
+    {
+      name: 'reactions_',
+      factory: function() { return {}; },
+      postSet: function(_, rs) {
+        for ( var key in rs ) {
+          this.startReaction_(key, rs[key]);
+        }
+        return rs;
+      },
+      toJSON: function(v) {
+        var m = {};
+        for ( key in v ) { m[key] = v[key].toString(); }
+        return m;
+      }
+    }
+  ],
+  methods: [
+    function startReaction_(name, formula) {
+      // HACK: delay starting reaction in case we're loading a file
+      // and dependent variables haven't loaded yet.
+      window.setTimeout(function() {
+        var self = this;
+        var f;
+
+        with ( this.__context__.scope ) {
+          f = eval('(function() { return ' + formula + '})');
+        }
+        f.toString = function() { return formula; };
+
+        var timer = function() {
+          if ( self.isDestroyed() ) return;
+          if ( self.reactions_[name] !== f ) return;
+          self[name] = f.call(self);
+          self.__context__.requestAnimationFrame(timer);
+        };
+
+        this.reactions_[name] = f;
+        timer();
+      }.bind(this), 10);
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'com.google.flow',
   name: 'ReactiveDetailView',
   extends: 'foam.u2.DetailView',
@@ -31,7 +78,6 @@ foam.CLASS({
 
   imports: [
     'data',
-    'requestAnimationFrame',
     'scope'
   ],
 
@@ -74,8 +120,8 @@ foam.CLASS({
       class: 'Boolean',
       name: 'reactive',
       postSet: function(_, r) {
-        if ( ! r ) {
-          this.clearFormula();
+        if ( ! r && this.data ) {
+          delete this.data.reactions_[this.prop.name];
         }
       }
     },
@@ -84,22 +130,13 @@ foam.CLASS({
       name: 'formula',
       displayWidth: 50,
       factory: function() {
-        return this.getFormula();
+        return this.data && this.data.reactions_[this.prop.name];
       },
       postSet: function(_, f) {
-        if ( ! f ) {
-          // this.reactive = false;
-        } else {
-          // this.reactive = true;
-          this.setFormula(f);
-        }
+        if ( f ) this.setFormula(f);
       }
     },
     'prop',
-    {
-      name: 'privateName',
-      factory: function() { return this.prop.name + 'Formula__'; }
-    },
     [ 'nodeName', 'tr' ]
   ],
 
@@ -108,13 +145,8 @@ foam.CLASS({
       var prop = this.prop;
       var self = this;
 
-      this.data$.sub(function() {
-        if ( self.data ) {
-          var f = self.getFormula();
-          self.formula = f ? f.toString() : '';
-          self.reactive = !! f;
-        }
-      });
+      this.data$.sub(this.onDataChange);
+      this.onDataChange();
 
       this.cssClass(this.myCls()).
           start('td').cssClass(this.myCls('label')).add(prop.label).end().
@@ -138,35 +170,21 @@ foam.CLASS({
     },
 
     function setFormula(formula) {
-      var data = this.data;
-      var self = this;
-      var f;
-      with ( this.scope ) {
-        f = eval('(function() { return ' + formula + '})');
-      }
-      f.toString = function() { return formula; };
-      var timer = function() {
-        if ( data.isDestroyed() ) return;
-        if ( data.getPrivate_(self.privateName) !== f ) return;
-        data[self.prop.name] = f.call(data);
-        self.requestAnimationFrame(timer);
-      };
-      data.setPrivate_(this.privateName, f);
-      timer();
-    },
-
-    function getFormula() {
-      return this.data.getPrivate_(this.privateName);
-    },
-
-    function clearFormula() {
-      this.data.clearPrivate_(this.privateName);
+      this.data.startReaction_(this.prop.name, formula);
     }
   ],
 
   listeners: [
     function toggleMode() {
       this.reactive = ! this.reactive;
+    },
+
+    function onDataChange() {
+      if ( this.data ) {
+        var f = this.data.reactions_[this.prop.name];
+        this.formula = f ? f.toString() : '';
+        this.reactive = !! f;
+      }
     }
   ]
 });

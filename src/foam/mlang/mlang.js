@@ -931,7 +931,6 @@ foam.CLASS({
   ]
 });
 
-
 /** Binary expression for inequality of two arguments. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1521,6 +1520,17 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Dot',
+  extends: 'foam.mlang.predicate.Binary',
+  methods: [
+    function f(o) {
+      return this.arg2.f(this.arg1.f(o));
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.mlang',
   name: 'Expressions',
 
@@ -1542,6 +1552,7 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.Func',
+    'foam.mlang.expr.Dot',
     'foam.mlang.Constant',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
@@ -1581,6 +1592,7 @@ foam.CLASS({
     function STARTS_WITH(a, b) { return this._binary_("StartsWith", a); },
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
+    function DOT(a, b) { return this._binary_("Dot", a, b); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
@@ -1589,7 +1601,6 @@ foam.CLASS({
 
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
-
   ]
 });
 

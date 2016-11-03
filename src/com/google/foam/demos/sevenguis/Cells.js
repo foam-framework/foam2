@@ -111,7 +111,7 @@ foam.CLASS({
           for ( var i = 0 ; i < a.length ; i++ ) prod *= a[i];
           return prod;
         }); },
-        flow: function(a) { return slot(function() { return scope[a[1]].slot(a[3]); }); },
+        flow: function(a) { return scope[a[1]].slot(a[3]); },
         az:  function(c) { return c.toUpperCase(); },
         row: function(c) { return parseInt(c); },
         number: function(s) {

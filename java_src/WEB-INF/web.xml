@@ -4,23 +4,25 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   version="2.5">
   <servlet>
-    <servlet-name>apply</servlet-name>
-    <servlet-class>com.chrome.origintrials.servlets.ApplyServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>console</servlet-name>
-    <servlet-class>com.chrome.origintrials.servlets.ConsoleServlet</servlet-class>
-  </servlet>
-  <servlet>
     <servlet-name>api</servlet-name>
     <servlet-class>com.chrome.origintrials.servlets.APIServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>tasks</servlet-name>
+    <servlet-class>com.chrome.origintrials.servlets.TaskServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>api</servlet-name>
     <url-pattern>/api</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>console</servlet-name>
-    <url-pattern>/console/*</url-pattern>
+    <servlet-name>tasks</servlet-name>
+    <url-pattern>/tasks</url-pattern>
   </servlet-mapping>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>tasks</web-resource-name>
+      <url-pattern>/tasks</url-pattern>
+    </web-resource-collection>
+  </security-constraint>
 </web-app>

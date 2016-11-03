@@ -53,13 +53,6 @@ foam.CLASS({
       }
     },
     {
-      name: 'inertia',
-      value: 0,
-      preSet: function(old, nu) {
-        return Math.max(nu, 0);
-      }
-    },
-    {
       name: 'previousPlanFor',
       factory: function() { return {}; }
     }
@@ -79,14 +72,6 @@ foam.CLASS({
         index = this.PoliteIndex.create({ delegateFactory: index });
       }
       this.delegateFactory.addIndex(index, root);
-    },
-    function put(val) {
-      this.inertia++;
-      this.delegate.put(val);
-    },
-    function remove(val) {
-      this.inertia--;
-      this.delegate.remove(val);
     },
 
     // TODO: mlang comparators should support input collection for
@@ -182,17 +167,13 @@ foam.CLASS({
           }
         }
       }
-//       else {
-// console.log(this.$UID, "Dupe reject");
-//       }
-//       this.inertia *= 0.75;
 
       if ( newIndex ) {
         return this.CustomPlan.create({
           cost: bestCost,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
-console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
-console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
+//console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
+//console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
 
             // TODO: PoliteIndex sometimes when ordering?
             //  When ordering, the cost of sorting will depend on the total
@@ -201,7 +182,6 @@ console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
             //  async create the index and let the current sort happen the
             //  hard way, or it could be worthwhile to just wait
             //  for the new index that supports the sort.
-            self.inertia = root.size(); // reset inertia
             self.addIndex(newIndex, root);
             // avoid a recursive call by hitting delegate, should pick the new optimal index
             self.delegate

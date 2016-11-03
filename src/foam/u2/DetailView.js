@@ -147,7 +147,7 @@ foam.CLASS({
               var config = self.config && self.config[p.name];
 
               if ( config ) {
-                p = Object.create(p);
+                p = p.clone();
                 for ( var key in config ) {
                   p[key] = config[key];
                 }
