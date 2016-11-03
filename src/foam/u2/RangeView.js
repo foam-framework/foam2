@@ -31,7 +31,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       if ( this.step ) this.attrs({step: this.step});
-      this.attrs({min: this.minValue, max: this.maxValue});
+      this.attrs({min: this.minValue, max: this.maxValue$});
     }
   ]
 });
