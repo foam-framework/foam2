@@ -240,10 +240,6 @@ foam.CLASS({
     },
 
     function planForOr(sink, skip, limit, order, predicate) {
-      // TODO: check how ordering is handled in existing TreeIndex etc.
-      //   compound comparators should be handled better than forcing our
-      //   sink to re-sort.
-
       // if there's a limit, add skip to make sure we get enough results
       //   from each subquery. Our sink will throw out the extra results
       //   after sorting.
