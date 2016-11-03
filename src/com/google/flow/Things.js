@@ -456,6 +456,83 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Strut',
+  extends: 'foam.graphics.CView',
+
+  imports: [
+    'scope',
+    'timer'
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'visible',
+      value: true,
+    },
+    {
+      class: 'String',
+      name: 'head'
+    },
+    {
+      class: 'String',
+      name: 'tail'
+    },
+    {
+      class: 'Float',
+      name: 'length',
+      value: 100,
+    },
+    [ 'color', 'black' ]
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.onDestroy(this.timer.time$.sub(this.tick));
+      this.propertyChange.sub(this.tick);
+    },
+
+    function paintSelf(x) {
+      if ( ! this.visible ) return;
+
+      this.x = this.y = 0;
+
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+
+      if ( ! c1 || ! c2 ) return;
+
+      x.strokeStyle = this.color;
+      x.lineWidth   = 1
+
+      x.beginPath();
+      x.moveTo((c1.left_ + c1.right_)/2, (c1.top_ + c1.bottom_)/2);
+      x.lineTo((c2.left_ + c2.right_)/2, (c2.top_ + c2.bottom_)/2);
+      x.stroke();
+    }
+  ],
+
+  listeners: [
+    function tick() {
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+      if ( ! c1 || ! c2 ) return;
+
+      var l = this.length;
+      var d = c1.distanceTo(c2);
+
+      var lx = c1.x - c2.x;
+      var ly = c1.y - c2.y;
+      var m = Math.sqrt(Math.pow(l, 2) / (Math.pow(lx, 2) + Math.pow(ly, 2)));
+      c2.x = c1.x - (lx * m);
+      c2.y = c1.y - (ly * m);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Spring',
   extends: 'foam.graphics.CView',
 
