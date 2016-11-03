@@ -581,12 +581,12 @@ foam.CLASS({
 
   actions: [
     function run() {
-        with ( this.scope ) {
-          with ( { log: this.log.bind(this) } ) {
-            this.log('>', this.code);
-            this.log(eval('(function() {' + this.code + '})').call(this.data));
-          }
+      with ( this.scope ) {
+        with ( { log: this.log.bind(this) } ) {
+          this.log('>', this.code);
+          this.log(eval('(function() {' + this.code + '})').call(this.data));
         }
+      }
     },
 
     function clearOutput() {

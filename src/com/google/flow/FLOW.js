@@ -57,10 +57,12 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
+          arcWidth:    o.arcWidth,
           border:      o.border,
           code:        o.code,
           color:       o.color,
           compression: o.compression,
+          end:         o.end,
           gravity:     o.gravity,
           head:        o.head,
           height:      o.height,
@@ -70,6 +72,7 @@ foam.CLASS({
           radius:      o.radius,
           radiusX:     o.radiusX,
           radiusY:     o.radiusY,
+          start:       o.start,
           stretch:     o.stretch,
           tail:        o.tail,
           text:        o.text,
@@ -196,7 +199,13 @@ foam.CLASS({
     {
       name: 'scope',
       factory: function() {
+        var self = this;
         return {
+          clear: function() {
+            self.updateMemento().then(function() {
+              self.properties.skip(4).removeAll();
+            });
+          },
           copy: function(obj) {
             var m = {};
             com.google.flow.Property.VALUE.cloneProperty(obj, m);
