@@ -15,52 +15,58 @@
  * limitations under the License.
  */
 
-/* Indexed Memory-based DAO. */
-
-/*
- * TODO:
- *  update(oldValue, newValue)
- *  reuse plans
- *  add ability for indices to pre-populate data
- */
-
 /** The Index interface for an ordering, fast lookup, single value,
   index multiplexer, or any other MDAO select() assistance class. */
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
-  methods: [
-    /** JS-prototype based 'Flyweight' constructor. Creates plain
-      javascript objects that are __proto__'d to a modeled instance. */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
+  axioms: [ foam.pattern.Progenitor.create() ],
 
+  methods: [
     /** Adds or updates the given value in the index */
-    function put() {},
+    function put(/*o*/) {},
 
     /** Removes the given value from the index */
-    function remove() {},
+    function remove(/*o*/) {},
+
+    // TODO: estimate is a class (static) method. Declare as such when possible
+    /** Estimates the performance of this index given the number of items
+      it will hold and the planned parameters. */
+    function estimate(size, sink, skip, limit, order, predicate) {
+      return size * size;
+    },
 
     /** @return a Plan to execute a select with the given parameters */
-    function plan(/*sink, skip, limit, order, predicate*/) {},
+    function plan(/*sink, skip, limit, order, predicate, root*/) {},
 
-    /** @return the stored value for the given key. */
-    function get() {},
+    /** @return the tail index instance for the given key. */
+    function get(/*key*/) {},
+
+    /** executes the given function for each index that was created from the given
+      index factory (targetInstance.__proto__ === ofIndex). Function should take an index
+      instance argument and return the index instance to replace it with.
+
+      NOTE: size() is not allowed to change with this operation,
+        since changing the type of index is not actually removing
+        or adding items.
+        Therefore: tail.size() == fn(tail).size() must hold.
+    */
+    function mapOver(fn, ofIndex) {},
 
     /** @return the integer size of this index. */
     function size() {},
 
-    /** Selects matching items from the index and puts them into sink */
-    function select(/*sink, skip, limit, order, predicate*/) { },
+    /** Selects matching items from the index and puts them into sink.
+      <p>Note: orderDirs has replaced selectReverse().
+      myOrder.orderDirection() will provide an orderDirs object for
+      a given foam.mlang.order.Comparator. */
+    function select(/*sink, skip, limit, orderDirs, predicate*/) { },
 
-    /** Selects matching items in reverse order from the index and puts
-      them into sink */
-    function selectReverse(/*sink, skip, limit, order, predicate*/) { },
+    /** Efficiently (if possible) loads the contents of the given DAO into the index */
+    function bulkLoad(/*dao*/) {},
   ]
 });
+
+
 

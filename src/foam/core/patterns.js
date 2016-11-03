@@ -58,7 +58,7 @@ foam.CLASS({
     {
       // FUTURE: switch to 'properties' to support multiple keys when/if needed.
       name: 'property'
-    }
+    },
   ],
 
   methods: [
@@ -76,3 +76,4 @@ foam.CLASS({
     function equals(other) { return other === this; }
   ]
 });
+
