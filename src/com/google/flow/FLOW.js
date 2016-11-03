@@ -208,13 +208,16 @@ foam.CLASS({
               self.properties.skip(4).removeAll();
             });
           },
-          copy: function(obj) {
-            var m = {};
-            com.google.flow.Property.VALUE.cloneProperty(obj, m);
-            m.value.x += 30;
-            m.value.y += 30;
-            this.add(m.value);
-            return m.name;
+          copy: function(obj, opt_n) {
+            var n = opt_n || 1;
+            for ( var i = 1 ; i <= n ; i++ ) {
+              var m = {};
+              com.google.flow.Property.VALUE.cloneProperty(obj, m);
+              m.value.x += 30*i;
+              m.value.y += 30*i;
+              this.add(m.value);
+            }
+            return 'copied';
           },
           add: function(obj, opt_name, opt_parent) {
             this.addProperty(obj, opt_name, undefined, opt_parent || 'canvas1');
