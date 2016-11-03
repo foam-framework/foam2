@@ -586,6 +586,36 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.dao',
+  name: 'DedupSink',
+  extends: 'foam.dao.ProxySink',
+
+  properties: [
+    {
+      /** @private */
+      name: 'results_',
+      hidden: true,
+      factory: function() { return {}; }
+    },
+  ],
+
+  methods: [
+    {
+      /** If the object to be put() has already been seen by this sink,
+        ignore it */
+      name: 'put',
+      code: function put(obj, fc) {
+        if ( ! this.results_[obj.id] ) {
+          this.results_[obj.id] = true;
+          return this.delegate.put(obj, fc);
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.core',
   name: 'Exception',
   properties: [
@@ -784,7 +814,7 @@ foam.CLASS({
       select() or removeAll() implementation.
       @private
     */
-    function decorateSink_(sink, skip, limit, order, predicate, isListener) {
+    function decorateSink_(sink, skip, limit, order, predicate) {
       if ( limit != undefined ) {
         sink = this.LimitedSink.create({
           limit: limit,
@@ -799,7 +829,7 @@ foam.CLASS({
         });
       }
 
-      if ( order != undefined && ! isListener ) {
+      if ( order != undefined ) {
         sink = this.OrderedSink.create({
           comparator: order,
           delegate: sink
