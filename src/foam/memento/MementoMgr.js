@@ -24,15 +24,27 @@ foam.CLASS({
       name: 'memento'
     },
     {
-      name:  'stack',
+      name: 'stack',
       factory: function() { return []; }
     },
     {
-      name:  'redo',
+      name: 'redo',
       factory: function() { return []; }
     },
+    'posFeedback_',
+    {
+      class: 'Int',
+      name: 'position',
+      postSet: function(_, n) {
+        if ( this.posFeedback_ ) return;
+
+        while ( n < this.stackSize_ ) this.back();
+        while ( n > this.stackSize_ ) this.forth();
+      }
+    },
     'stackSize_',
-    'redoSize_'
+    'redoSize_',
+    'totalSize_'
   ],
 
   methods: [
@@ -41,8 +53,12 @@ foam.CLASS({
     },
 
     function updateSizes() {
+      this.posFeedback_  = true;
       this.stackSize_ = this.stack.length;
       this.redoSize_  = this.redo.length;
+      this.totalSize_ = this.stack.length + this.redo.length;
+      this.position   = this.stack.length;
+      this.posFeedback_  = false;
     },
 
     function remember(memento) {
