@@ -57,7 +57,7 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
-          border:      o.radius,
+          border:      o.border,
           code:        o.code,
           color:       o.color,
           compression: o.compression,
@@ -197,6 +197,14 @@ foam.CLASS({
       name: 'scope',
       factory: function() {
         return {
+          copy: function(obj) {
+            var m = {};
+            com.google.flow.Property.VALUE.cloneProperty(obj, m);
+            m.value.x += 30;
+            m.value.y += 30;
+            this.add(m.value);
+            return m.name;
+          },
           add: function(obj, opt_name, opt_parent) {
             this.addProperty(obj, opt_name, undefined, opt_parent || 'canvas1');
           }.bind(this),
