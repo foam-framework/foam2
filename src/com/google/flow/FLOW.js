@@ -367,6 +367,10 @@ foam.CLASS({
       }
     },
     'mouseTarget',
+    {
+      name: 'position',
+      view: { class: 'foam.u2.RangeView', onKey: true }
+    },
     'cmdLineFeedback_',
     {
       class: 'String',
@@ -405,7 +409,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     function initE() {
       this.timer.start();
 
@@ -416,18 +419,7 @@ foam.CLASS({
       var self = this;
       halo.selected$.linkFrom(this.selected$);
 
-      this.memento$.sub(function() {
-        var m = this.memento;
-        if ( this.feedback_ ) return;
-        this.properties.skip(4).removeAll();
-        if ( m ) {
-          for ( var i = 0 ; i < m.length ; i++ ) {
-            var p = m[i];
-            this.addProperty(p.value, p.name, null, p.parent);
-          }
-        }
-        this.selected = null;
-      }.bind(this));
+      this.memento$.sub(this.onMemento);
 
       this.
           cssClass(this.myCls()).
@@ -467,6 +459,7 @@ foam.CLASS({
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
+            start(this.POSITION, {maxValue: this.totalSize_$}).style({width: '50%'}).end().
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().
@@ -625,6 +618,23 @@ foam.CLASS({
     function onRightClick(evt) {
       evt.preventDefault();
       if ( ! this.selected ) return;
+    },
+
+    {
+      name: 'onMemento',
+      isFramed: true,
+      code: function() {
+        var m = this.memento;
+        if ( this.feedback_ ) return;
+        this.properties.skip(4).removeAll();
+        if ( m ) {
+          for ( var i = 0 ; i < m.length ; i++ ) {
+            var p = m[i];
+            this.addProperty(p.value, p.name, null, p.parent);
+          }
+        }
+        this.selected = null;
+      }
     }
   ]
 });
