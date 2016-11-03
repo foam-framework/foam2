@@ -52,6 +52,7 @@ foam.CLASS({
           proto: repeat(alt(
             sym('message'),
             sym('enum'),
+            sym('extend'),
             sym('import'),
             sym('package'),
             sym('service'),
@@ -62,11 +63,11 @@ foam.CLASS({
               sym('ws'), sym('strLit'), literal(';')),
 
           import: seq(literal('import'), sym('ws1'),
+              optional(seq(literal('public'), sym('ws1'))),
               sym('strLit'), literal(';')),
 
           package: seq(
-              literal('package'), sym('ws1'),
-              sym('ident'), repeat(seq(literal('.'), sym('ident'))),
+              literal('package'), sym('ws1'), sym('dottedIdents'),
               literal(';')),
 
           option: seq(literal('option'), sym('ws'),
@@ -74,10 +75,10 @@ foam.CLASS({
 
           optionBody: seq(
             alt(
-              seq1(2, literal('('), sym('ws'), plus(sym('ident'), literal('.')),
+              seq1(2, literal('('), sym('ws'), sym('dottedIdents'),
                   sym('ws'), literal(')')),
               sym('ident')),
-            repeat(seq(literal('.'), sym('ident'))),
+            repeat(seq(sym('ws'), literal('.'), sym('ws'), sym('ident'))),
             sym('ws'), literal('='), sym('ws'),
             alt(sym('constant'), sym('map'))),
 
@@ -87,21 +88,22 @@ foam.CLASS({
           enum: seq(literal('enum'), sym('ws1'), sym('ident'), sym('ws'),
               literal('{'), sym('ws'),
               repeat(alt(sym('option'), sym('enumField')), sym('ws')),
-              sym('ws'), literal('}')),
+              sym('ws'), literal('}'), optional(literal(';'))),
 
 
           enumField: seq(sym('ident'), sym('ws'), literal('='),
-              sym('ws'), sym('sintLit'), sym('ws'), literal(';')),
+              sym('ws'), sym('sintLit'), sym('ws'),
+              optional(sym('fieldOptions')), sym('ws'), literal(';')),
 
           service: seq(literal('service'), sym('ws1'), sym('ident'), sym('ws'),
               literal('{'), sym('ws'),
               repeat(alt(sym('option'), sym('rpc')), sym('ws')),
               sym('ws'),
-              literal('}')),
+              literal('}'), optional(literal(';'))),
 
-          rpc: seq(literal('rpc'), sym('ws1'), sym('ident'),
+          rpc: seq(literal('rpc'), sym('ws1'), sym('ident'), sym('ws'),
               literal('('), sym('ws'), sym('userType'), sym('ws'), literal(')'),
-              sym('ws1'), literal('returns'), sym('ws'),
+              sym('ws'), literal('returns'), sym('ws'),
               literal('('), sym('ws'), sym('userType'), sym('ws'), literal(')'),
               sym('ws'),
               alt(seq1(2, literal('{'), sym('ws'),
@@ -113,14 +115,21 @@ foam.CLASS({
               literal('{'), sym('ws'),
               repeat(
                   alt(sym('enum'), sym('message'), sym('option'),
-                      sym('reserved'), sym('oneof'), sym('field')),
+                      sym('reserved'), sym('oneof'), sym('extensions'),
+                      sym('field')),
                   sym('ws')),
-              sym('ws'), literal('}')),
+              sym('ws'), literal('}'), optional(literal(';'))),
 
           // tag number must be 2^28-1 or lower
           field: seq(
-              optional(seq(literal('repeated'), sym('ws1'))),
-              sym('type'),
+              optional(seq(alt(
+                  literal('repeated'),
+                  // Even though "optional" and "required" are not supported in
+                  // proto3, some included files may be in proto2 syntax.
+                  literal('required'),
+                  literal('optional')),
+                  sym('ws1'))),
+              sym('fieldType'),
               sym('ws1'),
               sym('ident'),
               sym('ws'),
@@ -128,32 +137,55 @@ foam.CLASS({
               sym('ws'),
               sym('intLit'),
               sym('ws'),
-              optional(seq1(2,
-                  literal('['),
-                  sym('ws'),
-                  repeat(sym('optionBody'),
-                      seq(sym('ws'), literal(','), sym('ws')), 1),
-                  sym('ws'), literal(']'))),
+              optional(sym('fieldOptions')),
               sym('ws'),
               literal(';')),
+
+          fieldOptions: seq1(2, literal('['), sym('ws'),
+              plus(sym('optionBody'), seq(sym('ws'), literal(','), sym('ws'))),
+              sym('ws'), literal(']')),
 
           oneof: seq(literal('oneof'), sym('ws1'), sym('ident'), sym('ws'),
               literal('{'), sym('ws'), repeat(sym('field'), sym('ws')),
               sym('ws'), literal('}')),
 
-          reserved: seq(literal('reserved'), sym('ws1'), sym('intLit'),
+          reserved: seq(literal('reserved'), sym('ws1'),
+              plus(sym('intLit'), seq(sym('ws'), literal(','), sym('ws'))),
               sym('ws'), literal(';')),
 
-          type: alt(
-              literal('double'), literal('float'), literal('int32'),
-              literal('int64'), literal('uint32'), literal('uint64'),
-              literal('sint32'), literal('sint64'), literal('fixed32'),
-              literal('fixed64'), literal('sfixed32'), literal('sfixed64'),
-              literal('bool'), literal('string'), literal('bytes'),
-              sym('userType')),
+          extensions: seq(literal('extensions'), sym('ws1'), sym('decInt'),
+              sym('ws1'), literal('to'), sym('ws1'),
+              alt(literal('max'), sym('decInt')),
+              sym('ws'), literal(';')),
 
-          // leading dot for identifiers means they're fully qualified
-          userType: plus(seq(optional(literal('.')), sym('ident'))),
+          // Even though extends are not in proto3 syntax, some included files
+          // may be in proto2 syntax.
+          extend: seq(literal('extend'), sym('ws1'), sym('dottedIdents'),
+              sym('ws'), sym('messageBody')),
+
+          fieldType: alt(sym('mapType'), sym('type')),
+
+          mapType: seq(literal('map'), sym('ws'), literal('<'),
+              sym('keyType'),
+              sym('ws'), literal(','), sym('ws'),
+              sym('type'), sym('ws'), literal('>')),
+
+          type: alt(
+              sym('keyType'),
+              literal('double'), literal('float'),
+              literal('fixed32'), literal('fixed64'),
+              literal('sfixed32'), literal('sfixed64'),
+              literal('bytes'), sym('userType')),
+
+          // These are the types that are allowed as map keys.
+          keyType: alt(
+              literal('int32'), literal('int64'),
+              literal('uint32'), literal('uint64'),
+              literal('sint32'), literal('sint64'),
+              literal('bool'), literal('string')),
+
+          // Leading dot for identifiers means they're fully qualified
+          userType: seq(optional(literal('.')), sym('dottedIdents')),
 
           constant: alt(sym('ident'), sym('floatLit'), sym('sintLit'),
               sym('strLit'), sym('boolLit')),
@@ -166,6 +198,8 @@ foam.CLASS({
               sym('constant')),
 
           ident: seq(sym('a'), repeat(sym('w'))),
+
+          dottedIdents: plus(sym('ident'), literal('.')),
 
           intLit: alt(sym('decInt'), sym('hexInt'), sym('octInt')),
 
@@ -182,20 +216,27 @@ foam.CLASS({
 
           octInt: seq(literal('/0'), plus(range('0', '7'))),
 
-          floatLit: alt(
+          floatLit: seq(optional(sym('sign')), alt(
             seq(literal('.'), sym('decInt'), optional(sym('exponent'))),
             seq(sym('decInt'), sym('exponent')),
             seq(sym('decInt'), literal('.'), optional(sym('decInt')),
-                optional(sym('exponent')))),
+                optional(sym('exponent'))))),
 
           exponent: seq(literalIC('e'), optional(sym('sign')), sym('decInt')),
 
           boolLit: alt(literal('true'), literal('false')),
 
-          strLit: seq(literal('"'),
+          strLit: alt(sym('doubleQuoteStrLit'), sym('singleQuoteStrLit')),
+
+          doubleQuoteStrLit: seq(literal('"'),
               repeat(alt(sym('hexEscape'), sym('octEscape'), sym('charEscape'),
-                  sym('quoteEscape'), not(literal('"'), anyChar()))),
+                  sym('doubleQuoteEscape'), not(literal('"'), anyChar()))),
               literal('"')),
+
+          singleQuoteStrLit: seq(literal("'"),
+              repeat(alt(sym('hexEscape'), sym('octEscape'), sym('charEscape'),
+                  sym('singleQuoteEscape'), not(literal("'"), anyChar()))),
+              literal("'")),
 
           hexEscape: seq(literalIC('\\x'), repeat(alt(range('A','F'),
                   range('a', 'f'), range('0', '9')), undefined, 1)),
@@ -207,7 +248,8 @@ foam.CLASS({
                 literal('f'), literal('n'), literal('r'), literal('t'),
                 literal('v'), literal('?'))),
 
-          quoteEscape: seq('\\"')
+          doubleQuoteEscape: seq('\\"'),
+          singleQuoteEscape: seq("\\'")
         };
       }
     },
@@ -223,33 +265,31 @@ foam.CLASS({
         g.addActions({
           package: function(a) {
             self.currentPackage = a[2];
-            if ( a[3] && a[3].length ) {
-              self.currentPackage += a[3].map(function(a) {
-                return a.join('');
-              }).join('');
-            }
           },
 
           import: function(a) {
-            // "import" ws strLit ws semi
+            // "import" [public ws] ws strLit ws semi
             return {
               node: 'import',
-              value: a[2]
+              value: a[3],
+              public: (a[2] && a[2][0] === 'public') ? true : undefined
             };
           },
 
           enumField: function(a) {
-            return [ a[0], a[4] ];
+            var obj = { node: 'enumfield', key: a[0], value: a[4] };
+            if ( a[6] ) obj.options = a[6];
+            return obj;
           },
 
           enum: function(a) {
-            var fields = {};
+            var fields = [];
             var options = [];
 
             // The fields are either [key, value] pairs or option nodes.
             a[6].forEach(function(v) {
-              if ( Array.isArray(v) ) {
-                fields[v[0]] = v[1];
+              if ( v.node === 'enumfield' ) {
+                fields.push(v);
               } else if ( v.node === 'option' ) {
                 options.push(v);
               } else {
@@ -276,7 +316,7 @@ foam.CLASS({
             var name = Array.isArray(a[0]) ? a[0].join('.') : a[0];
             // a[1] is an array of extra .ident pairs.
             for ( var i = 0; i < a[1].length; i++ ) {
-              name += '.' + a[1][i][1];
+              name += '.' + a[1][i][3];
             }
             // a[2] is whitespace, a[3] is =, a[4] is whitespace.
             // a[5] is the constant.
@@ -287,10 +327,15 @@ foam.CLASS({
             };
           },
 
-          userType: function(a) {
-            return a[0].join('');
+          mapType: function(a) {
+            var keyType = a[3];
+            var valType = a[7];
+            return { node: 'maptype', keyType: keyType, valueType: valType };
           },
 
+          userType: function(a) {
+            return (a[0] || '') + a[1];
+          },
 
           field: function(a) {
             var field = {
@@ -364,6 +409,10 @@ foam.CLASS({
 
           messageBody: function(a) { return a[2]; },
 
+          extend: function(a) {
+            return null;
+          },
+
           service: function(a) {
             return {
               node: 'service',
@@ -376,10 +425,10 @@ foam.CLASS({
             var ret = {
               node: 'rpc',
               name: a[2],
-              requestType: a[5],
-              responseType: a[13]
+              requestType: a[6],
+              responseType: a[14]
             };
-            if ( Array.isArray(a[17]) ) ret.options = a[17];
+            if ( Array.isArray(a[18]) ) ret.options = a[18];
             return ret;
           },
 
@@ -400,13 +449,28 @@ foam.CLASS({
             return ret;
           },
 
+          dottedIdents: function(a) {
+            return a.join('.');
+          },
+
           decInt: function(a) { return parseInt(a.join('')); },
 
           sintLit: function(a) {
+            // Either [sign, number] or just [number].
+            if ( ! Array.isArray(a) ) {
+              return a;
+            }
+
             return a[0] === '-' ? -a[1] : a[1];
           },
 
           floatLit: function(a) {
+            var negated = false;
+            if ( a[0] && a[0] === '-' ) {
+              negated = true;
+            }
+
+            a = a[1];
             // Several cases:
             // 1. '.' decInt opt(exponent)
             // 2. decInt exponent
