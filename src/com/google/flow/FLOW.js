@@ -91,6 +91,7 @@ foam.CLASS({
       label: 'X',
       code: function deleteRow(X) {
         X.properties.remove(X.data);
+        X.updateMemento();
       }
     }
   ]
@@ -166,6 +167,7 @@ foam.CLASS({
   exports: [
     'timer',
     'as data',
+    'updateMemento',
     'properties',
     'scope'
   ],
@@ -603,7 +605,7 @@ foam.CLASS({
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
         // TODO: hack because addProperty is asyn
-        setTimeout(this.updateMemento.bind(this),100);
+        setTimeout(this.updateMemento.bind(this), 100);
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {
           var p = c.getPrivate_('lpp_');
