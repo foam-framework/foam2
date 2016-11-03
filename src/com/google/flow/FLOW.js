@@ -621,11 +621,11 @@ foam.CLASS({
     },
 
     {
-      name: 'onMemento',
-      isFramed: true,
+      name: 'onMemento_',
+      isMerged: true,
+      mergeDelay: 100,
       code: function() {
         var m = this.memento;
-        if ( this.feedback_ ) return;
         this.properties.skip(4).removeAll();
         if ( m ) {
           for ( var i = 0 ; i < m.length ; i++ ) {
@@ -635,6 +635,11 @@ foam.CLASS({
         }
         this.selected = null;
       }
+    },
+
+    function onMemento() {
+      if ( this.feedback_ ) return;
+      this.onMemento_();
     }
   ]
 });
