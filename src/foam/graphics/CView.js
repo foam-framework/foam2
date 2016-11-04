@@ -1281,7 +1281,9 @@ foam.CLASS({
 
       c.fillText(
         this.text,
-        this.align === 'center' ? this.width/2 : 0,
+          this.align === 'start'  ? 0 :
+          this.align === 'center' ? this.width/2 :
+          this.width,
         this.height/2+10);
 
       if ( this.border ) {
