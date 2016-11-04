@@ -51,7 +51,7 @@ foam.CLASS({
         this.assert(ps, 'Properties required.');
         for ( var i = 0 ; i < ps.length ; i++ ) {
           this.assert(
-              foam.core.Propert.isInstance(ps),
+              foam.core.Property.isInstance(ps[i]),
               "Non-Property in 'properties' list:",
               ps);
         }
