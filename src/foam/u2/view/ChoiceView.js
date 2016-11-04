@@ -89,7 +89,8 @@ foam.CLASS({
         var c = this.choice;
         this.choice = c && (
             this.findChoiceByData(c[0]) ||
-            this.findChoiceByText(c[1]) );
+            this.findChoiceByText(c[1]) ||
+            this.defaultValue );
       }
     },
     {
@@ -152,7 +153,8 @@ foam.CLASS({
     {
       name: 'view_'
     },
-    'feedback_'
+    'feedback_',
+    'defaultValue'
   ],
 
   methods: [
@@ -202,6 +204,10 @@ foam.CLASS({
         if ( choices[i][1] === text ) return choices[i];
       }
       return null;
+    },
+
+    function fromProperty(p) {
+      this.defaultValue = p.value;
     }
   ],
 
