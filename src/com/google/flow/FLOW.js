@@ -61,7 +61,7 @@ foam.CLASS({
           border:      o.border,
           code:        o.code,
           color:       o.color,
-          compression: o.compression,
+          compressionStrength: o.compressionStrength,
           end:         o.end,
           gravity:     o.gravity,
           head:        o.head,
@@ -72,8 +72,9 @@ foam.CLASS({
           radius:      o.radius,
           radiusX:     o.radiusX,
           radiusY:     o.radiusY,
+          springWidth: o.springWidth,
           start:       o.start,
-          stretch:     o.stretch,
+          stretchStrength: o.stretchStrength,
           tail:        o.tail,
           text:        o.text,
           visible:     o.visible,
@@ -166,6 +167,7 @@ foam.CLASS({
 
   exports: [
     'timer',
+    'physics',
     'as data',
     'updateMemento',
     'properties',
