@@ -20,6 +20,8 @@ foam.CLASS({
   package: 'foam.physics',
   name: 'Collider',
 
+  topics: [ 'onTick' ],
+
   properties: [
     {
       class: 'Boolean',
@@ -224,6 +226,7 @@ foam.CLASS({
       isFramed: true,
       code: function tick() {
         if ( this.stopped_ ) return;
+        this.onTick.pub();
         this.detectCollisions();
         this.updateChildren();
 
