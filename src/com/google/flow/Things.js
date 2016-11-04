@@ -461,7 +461,7 @@ foam.CLASS({
 
   imports: [
     'scope',
-    'timer'
+    'physics'
   ],
 
   properties: [
@@ -480,16 +480,26 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'length',
-      value: 100
+      value: 80
     },
     {
       class: 'Float',
-      name: 'compression',
-      value: 0
+      name: 'springWidth',
+      value: 4
     },
     {
       class: 'Float',
       name: 'stretch',
+      units: '%'
+    },
+    {
+      class: 'Float',
+      name: 'compressionStrength',
+      value: 1
+    },
+    {
+      class: 'Float',
+      name: 'stretchStrength',
       value: 4
     },
     [ 'color', 'black' ]
@@ -498,7 +508,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      this.onDestroy(this.timer.time$.sub(this.tick));
+      this.onDestroy(this.physics.onTick.sub(this.tick));
       this.propertyChange.sub(this.tick);
     },
 
@@ -513,7 +523,7 @@ foam.CLASS({
       if ( ! c1 || ! c2 ) return;
 
       x.strokeStyle = this.color;
-      x.lineWidth   = 1
+      x.lineWidth = this.springWidth / this.stretch * 100;
 
       x.beginPath();
       x.moveTo((c1.left_ + c1.right_)/2, (c1.top_ + c1.bottom_)/2);
@@ -529,12 +539,14 @@ foam.CLASS({
       if ( ! c1 || ! c2 ) return;
 
       var l = this.length;
-      var s = this.stretch/1000;
-      var c = this.compression/1000;
+      var s = this.stretchStrength/1000;
+      var c = this.compressionStrength/1000;
       var d = c1.distanceTo(c2);
       var a = Math.atan2(
           (c2.top_  + c2.bottom_ - c1.top_  - c1.bottom_)/2,
           (c2.left_ + c2.right_  - c1.left_ - c1.right_)/2);
+
+      this.stretch = d/this.length*100;
 
       if ( s && d > l ) {
         c1.applyMomentum( s * (d-l), a);
