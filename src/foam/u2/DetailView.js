@@ -46,6 +46,17 @@ foam.CLASS({
     },
     {
       name: 'properties',
+      // TODO: Make an FObjectArray when it validates properly
+      preSet: function(_, ps) {
+        this.assert(ps, 'Properties required.');
+        for ( var i = 0 ; i < ps.length ; i++ ) {
+          this.assert(
+              foam.core.Propert.isInstance(ps),
+              "Non-Property in 'properties' list:",
+              ps);
+        }
+        return ps;
+      },
       expression: function(of) {
         if ( ! of ) return [];
         return of.getAxiomsByClass(foam.core.Property).
@@ -155,7 +166,7 @@ foam.CLASS({
 
               return self.DetailPropertyView.create({prop: p});
             })));
-      }, this.of$, this.properties$));
+      }));
     },
 
     function actionBorder(e) {
