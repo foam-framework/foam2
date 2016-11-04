@@ -1244,7 +1244,11 @@ foam.CLASS({
     {
       name:  'align',
       label: 'Alignment',
-      value: 'start' // values: left, right, center, start, end
+      value: 'start',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [ 'start', /*'left',*/ 'center', /*'right',*/ 'end' ]
+      }
     },
     {
       class: 'String',
