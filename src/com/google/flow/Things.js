@@ -545,6 +545,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'visible',
+      value: true
     },
     {
       class: 'String',
@@ -558,6 +559,16 @@ foam.CLASS({
       class: 'Float',
       name: 'length',
       value: 100
+    },
+    {
+      class: 'Float',
+      name: 'length',
+      value: 100
+    },
+    {
+      class: 'Float',
+      name: 'currentLength',
+      mode: 'read-only'
     },
     {
       class: 'Float',
@@ -612,6 +623,8 @@ foam.CLASS({
       var a = Math.atan2(
           (c2.top_  + c2.bottom_ - c1.top_  - c1.bottom_)/2,
           (c2.left_ + c2.right_  - c1.left_ - c1.right_)/2);
+
+      this.currentLength = d;
 
       if ( s && d > l ) {
         c1.applyMomentum( s * (d-l), a);
