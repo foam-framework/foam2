@@ -34,6 +34,10 @@ foam.CLASS({
           this.dataToText.bind(this));
     },
 
+    function fromProperty(p) {
+      this.precision = p.precision;
+    },
+
     function formatNumber(val) {
       if ( ! val ) return '0';
       val = val.toFixed(this.precision);

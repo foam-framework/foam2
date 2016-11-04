@@ -567,6 +567,7 @@ foam.CLASS({
     },
     {
       class: 'Float',
+      precision: 2,
       name: 'stretch',
       units: '%'
     },
