@@ -141,8 +141,8 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.add(this.slot(function(model, properties) {
-        if ( ! model ) return 'Set model or data.';
+      this.add(this.slot(function(of, properties) {
+        if ( ! of ) return '';
 
         var title = self.title && self.E('tr').
           start('td').cssClass(self.myCls('title')).attrs({colspan: 2}).
