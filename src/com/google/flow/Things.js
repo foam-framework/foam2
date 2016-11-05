@@ -694,10 +694,24 @@ foam.CLASS({
 
   implements: [ 'foam.physics.Physical' ],
 
+  requires: [ 'foam.graphics.Line' ],
+
+  imports: [ 'addProperty' ],
+
   properties: [
     [ 'radiusX', 8 ],
     [ 'radiusY', 12 ],
-    [ 'color', 'green' ]
+    [ 'color', 'green' ],
+    {
+      class: 'Color',
+      name: 'penColor',
+      value: '#000000'
+    },
+    {
+      class: 'Boolean',
+      name: 'penDown',
+      value: true
+    }
   ],
 
   methods: [
@@ -713,7 +727,64 @@ foam.CLASS({
       var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});   head.add(leftEye);
       var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});      head.add(rightEye);
       var turtle2  = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1}); this.add(turtle2);
-    }
+    },
+
+    function pc(color) {
+      this.penColor = color;
+      return this;
+    },
+
+    function pu() {
+      this.penDown = false;
+      return this;
+    },
+
+    function pd() {
+      this.penDown = true;
+      return this;
+    },
+
+    function repeat(n, fn) {
+      for ( var i = 0 ; i < n ; i++ ) fn.call(this);
+      return this;
+    },
+
+    function fd(d) {
+      var x1 = this.x, y1 = this.y;
+      this.x += d * Math.cos(this.rotation+Math.PI/2);
+      this.y -= d * Math.sin(this.rotation+Math.PI/2);
+
+      if ( this.penDown ) {
+        this.addProperty(this.Line.create({
+          startX: x1+this.radiusX,
+          startY: y1+this.radiusY,
+          endX: this.x+this.radiusX,
+          endY: this.y+this.radiusY,
+          color: this.penColor
+        }));
+      }
+
+      return this;
+    },
+
+    function lt(a) {
+      this.rotation += Math.PI*2*a/360;
+      return this;
+    },
+
+    function rt(a) {
+      return this.lt(-a);
+    },
+
+    function st() {
+      this.alpha = 1;
+      var p = this.parent;
+      p.remove(this);
+      p.add(this);
+      return this;
+    },
+
+    function ht() { this.alpha = 0; return this; },
   ]
 });
 
