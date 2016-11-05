@@ -730,16 +730,19 @@ foam.CLASS({
     },
 
     function pc(color) {
+      /* Pen Color */
       this.penColor = color;
       return this;
     },
 
     function pu() {
+      /* Pen Up */
       this.penDown = false;
       return this;
     },
 
     function pd() {
+      /* Pen Down */
       this.penDown = true;
       return this;
     },
@@ -750,6 +753,7 @@ foam.CLASS({
     },
 
     function fd(d) {
+      /* ForwarD */
       var x1 = this.x, y1 = this.y;
       this.x += d * Math.cos(this.rotation+Math.PI/2);
       this.y -= d * Math.sin(this.rotation+Math.PI/2);
@@ -768,15 +772,18 @@ foam.CLASS({
     },
 
     function lt(a) {
+      /* Left Turn */
       this.rotation += Math.PI*2*a/360;
       return this;
     },
 
     function rt(a) {
+      /* Right Turn */
       return this.lt(-a);
     },
 
     function st() {
+      /* Show Turtle */
       this.alpha = 1;
       var p = this.parent;
       p.remove(this);
@@ -784,7 +791,11 @@ foam.CLASS({
       return this;
     },
 
-    function ht() { this.alpha = 0; return this; },
+    function ht() {
+      /* Hide Turtle */
+      this.alpha = 0;
+      return this;
+    },
   ]
 });
 
