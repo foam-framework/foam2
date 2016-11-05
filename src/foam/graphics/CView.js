@@ -839,6 +839,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Line',
@@ -850,7 +851,7 @@ foam.CLASS({
     { class: 'Float', name: 'endX' },
     { class: 'Float', name: 'endY' },
     { class: 'Float', name: 'lineWidth', value: 1 },
-    { class: 'String', name: 'color', value: '#000' }
+    { class: 'String', name: 'color', value: '#000000' }
   ],
 
   methods: [
