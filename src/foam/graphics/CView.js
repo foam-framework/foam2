@@ -846,12 +846,12 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   properties: [
-    { class: 'Float', name: 'startX' },
-    { class: 'Float', name: 'startY' },
-    { class: 'Float', name: 'endX' },
-    { class: 'Float', name: 'endY' },
-    { class: 'Float', name: 'lineWidth', value: 1 },
-    { class: 'String', name: 'color', value: '#000000' }
+    { class: 'Float',  name: 'startX' },
+    { class: 'Float',  name: 'startY' },
+    { class: 'Float',  name: 'endX' },
+    { class: 'Float',  name: 'endY' },
+    { class: 'Float',  name: 'lineWidth', value: 1 },
+    { class: 'String', name: 'color',     value: '#000000' }
   ],
 
   methods: [
