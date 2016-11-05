@@ -468,7 +468,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'visible',
-      value: true,
+      value: true
     },
     {
       class: 'String',
@@ -481,7 +481,7 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'length',
-      value: 100,
+      value: 100
     },
     [ 'color', 'black' ]
   ],
@@ -522,6 +522,8 @@ foam.CLASS({
       var l = this.length;
       var d = c1.distanceTo(c2);
 
+      // TODO: should take into account their relative masses.
+      // TODO: should move both objects.
       var lx = c1.x - c2.x;
       var ly = c1.y - c2.y;
       var m = Math.sqrt(Math.pow(l, 2) / (Math.pow(lx, 2) + Math.pow(ly, 2)));
@@ -530,6 +532,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.flow',
