@@ -818,6 +818,13 @@ foam.CLASS({
       this.alpha = 0;
       return this;
     },
+
+    function lay(obj) {
+      obj.x = this.x;
+      obj.y = this.y;
+      this.addProperty(obj);
+      return this;
+    }
   ]
 });
 
