@@ -605,7 +605,8 @@ foam.CLASS({
       if ( ! c1 || ! c2 ) return;
 
       x.strokeStyle = this.color;
-      x.lineWidth = this.springWidth / this.stretch * 100;
+      x.lineWidth = this.springWidth * Math.min(2, 100 / this.stretch);
+        this.springWidth
 
       x.beginPath();
       x.moveTo((c1.left_ + c1.right_)/2, (c1.top_ + c1.bottom_)/2);
@@ -763,7 +764,7 @@ foam.CLASS({
     },
 
     function repeat(n, fn) {
-      for ( var i = 0 ; i < n ; i++ ) fn.call(this);
+      for ( var i = 1 ; i <= n ; i++ ) fn.call(this, i);
       return this;
     },
 
