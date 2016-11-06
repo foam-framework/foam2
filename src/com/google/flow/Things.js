@@ -700,6 +700,8 @@ foam.CLASS({
 
   requires: [ 'foam.graphics.Line' ],
 
+  // TODO: better to just add to parent and have listeners
+  // then add to physics or other interested parties
   imports: [ 'addProperty' ],
 
   properties: [
@@ -775,7 +777,8 @@ foam.CLASS({
       this.y -= d * Math.sin(this.rotation+Math.PI/2);
 
       if ( this.penDown ) {
-        this.addProperty(this.Line.create({
+        // this.addProperty(this.Line.create({
+        this.parent.add(this.Line.create({
           startX:    x1+this.radiusX,
           startY:    y1+this.radiusY,
           endX:      this.x+this.radiusX,
@@ -824,6 +827,24 @@ foam.CLASS({
       obj.y = this.y;
       this.addProperty(obj);
       return this;
+    },
+
+    function spawn() {
+//      var child = this.clone();
+      var child = this.cls_.create({
+        x: this.x,
+        y: this.y,
+        penColor: this.penColor,
+        penWidth: this.penWidth,
+        penDown: this.pendDown,
+        rotation: this.rotation
+      }, this.__context__);
+      this.parent.add(child);
+      return child;
+    },
+
+    function die() {
+      this.parent && this.parent.remove(this);
     }
   ]
 });
