@@ -114,7 +114,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'onViewUpdate',
-      isMerged: 10,
+      isMerged: true,
+      mergeDelay: 10,
       code: function() {
         this.predicate = this.and(this.views);
         // That will tickle the expression for filteredDAO.
@@ -123,7 +124,8 @@ foam.CLASS({
     },
     {
       name: 'updateViews',
-      isMerged: 20,
+      isMerged: true,
+      mergeDelay: 20,
       code: function() {
         // Deliberately a longer delay than onViewUpdate, since updating the
         // views is less important.
@@ -141,4 +143,3 @@ foam.CLASS({
     }
   ]
 });
-

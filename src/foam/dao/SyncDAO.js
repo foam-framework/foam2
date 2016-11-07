@@ -259,7 +259,8 @@ foam.CLASS({
     {
       /** @private */
       name: 'onLocalUpdate',
-      isMerged: 100,
+      isMerged: true,
+      mergeDelay: 100,
       code: function() {
         this.sync();
       }
