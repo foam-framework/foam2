@@ -67,7 +67,7 @@ for ( var i = 0 ; i < 20 ; i++ )
   setTimeout(function() { t.l5(); }, 100*i);
 
 */
-/*
+
 foam.CLASS({
   name: 'Test2',
   properties: [ 'id', 'fname', 'lname' ]
@@ -79,6 +79,7 @@ var dao = foam.dao.EasyDAO.create({
   seqNo: true,
   cache: true,
   testData: [
+    { fname: 'Madonna' },
     { fname: 'Z', lname: 'Z' },
     { fname: 'A', lname: 'Z' },
     { fname: 'B', lname: 'Z' },
@@ -95,6 +96,19 @@ var dao = foam.dao.EasyDAO.create({
   ]
 });
 
+var e = foam.mlang.Expressions.create();
+
+dao.where(e.EQ(Test2.LNAME, null)).select().then(function (a) {
+  console.log('EQ(null)');
+  a.a.forEach(function (t) { console.log(t.fname); });
+});
+
+dao.where(e.NOT(e.HAS(Test2.LNAME))).select().then(function (a) {
+  console.log('NOT(HAS())');
+  a.a.forEach(function (t) { console.log(t.fname); });
+});
+
+/*
 dao.orderBy(Test2.LNAME).select().then(function (a) {
   console.log('by LNAME');
   a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
@@ -109,10 +123,11 @@ dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
   console.log('by LNAME, FNAME');
   a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
-
-// dao.removeAll();
 */
 
+//dao.removeAll();
+
+/*
 foam.CLASS({
   name: 'Parent',
   properties: [ 'a', 'b' ]
@@ -136,3 +151,4 @@ console.log(c.stringify(), c.clone().stringify());
 
 c = Child.create({a:'a', b:'b', c:'c', d:'d'});
 console.log(c.stringify(), c.clone().stringify());
+*/
