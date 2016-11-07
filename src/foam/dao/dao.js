@@ -719,11 +719,11 @@ foam.CLASS({
         ordering.
       */
       name: 'orderBy',
-      code: function orderBy(/* foam.mlang.order.Comparator */ o
+      code: function orderBy(/* foam.mlang.order.Comparator */
           /* foam.dao.DAO */) {
         return this.OrderedDAO.create({
           delegate: this,
-          comparator: o
+          comparator: foam.compare.toCompare(Array.from(arguments))
         });
       }
     },

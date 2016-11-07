@@ -1069,18 +1069,14 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Desc',
-  implements: ['foam.mlang.order.Comparator'],
+  implements: [ 'foam.mlang.order.Comparator' ],
 
   properties: [
     {
       class: 'FObjectProperty',
+      name: 'comparator',
       of: 'foam.mlang.order.Comparator',
-      adapt: function(_, a) {
-        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
-        // of parameter is an interface rather than a class.
-        return a;
-      },
-      name: 'arg1'
+      adapt: function(c) { return foam.compare.toCompare(c); }
     }
   ],
 
@@ -1088,16 +1084,26 @@ foam.CLASS({
     {
       name: 'compare',
       code: function(o1, o2) {
-        return -1 * this.arg1.compare(o1, o2);
+        return -1 * this.comparator.compare(o1, o2);
       },
-      javaCode: 'return -1 * getArg1().compare(o1, o2);'
+      javaCode: 'return -1 * getComparator().compare(o1, o2);'
     },
     {
       name: 'toString',
       code: function() {
-        return 'DESC(' + this.arg1.toString() + ')';
+        return 'DESC(' + this.comparator.toString() + ')';
       },
-      javaCode: 'return "DESC(" + getArg1().toString() + ")";'
+      javaCode: 'return "DESC(" + getComparator().toString() + ")";'
+    }
+  ]
+});
+
+
+foam.LIB({
+  name: 'foam.compare',
+  methods: [
+    function desc(c) {
+      return foam.mlang.order.Desc.create({comparator: c});
     }
   ]
 });
@@ -1209,7 +1215,7 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
 
-    function DESC(a) { return this._unary_("Desc", a); },
+    function DESC(c) { return this.Desc.create({comparator: c}); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
   ]
 });
