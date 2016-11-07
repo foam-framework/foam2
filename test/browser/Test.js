@@ -67,6 +67,7 @@ for ( var i = 0 ; i < 20 ; i++ )
   setTimeout(function() { t.l5(); }, 100*i);
 
 */
+/*
 foam.CLASS({
   name: 'Test2',
   properties: [ 'id', 'fname', 'lname' ]
@@ -110,3 +111,28 @@ dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
 });
 
 // dao.removeAll();
+*/
+
+foam.CLASS({
+  name: 'Parent',
+  properties: [ 'a', 'b' ]
+});
+
+foam.CLASS({
+  name: 'Child',
+  extends: 'Parent',
+  properties: [ 'c', 'd' ]
+});
+
+var c;
+c = Child.create({});
+console.log(c.stringify(), c.clone().stringify());
+
+c = Child.create({a:'a', b:'b'});
+console.log(c.stringify(), c.clone().stringify());
+
+c = Child.create({c:'c', d:'d'});
+console.log(c.stringify(), c.clone().stringify());
+
+c = Child.create({a:'a', b:'b', c:'c', d:'d'});
+console.log(c.stringify(), c.clone().stringify());
