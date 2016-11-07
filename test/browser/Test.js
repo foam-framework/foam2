@@ -14,20 +14,99 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/*
 foam.CLASS({
-  name: 'Parent',
+  name: 'Test',
+  listeners: [
+    {
+      name: 'l1',
+      code: function() {
+        console.log('l1');
+      }
+    },
+    {
+      name: 'l2',
+      isFramed: true,
+      code: function() {
+        console.log('l2');
+      }
+    },
+    {
+      name: 'l3',
+      isMerged: true,
+      code: function() {
+        console.log('l3');
+      }
+    },
+    {
+      name: 'l4',
+      isMerged: true,
+      mergeDelay: 0,
+      code: function() {
+        console.log('l4');
+      }
+    },
+    {
+      name: 'l5',
+      isMerged: true,
+      mergeDelay: 1000,
+      code: function() {
+        console.log('l5');
+      }
+    },
+  ]
+});
+var t = Test.create();
+
+t.l1();t.l1();t.l1();
+t.l2();t.l2();t.l2();
+t.l3();t.l3();t.l3();
+t.l4();t.l4();t.l4();
+
+for ( var i = 0 ; i < 20 ; i++ )
+  setTimeout(function() { t.l5(); }, 100*i);
+
+*/
+foam.CLASS({
+  name: 'Test2',
+  properties: [ 'id', 'fname', 'lname' ]
 });
 
-foam.CLASS({
-  name: 'Child',
-  extends: 'Parent',
-  methods: [
-    function foo() {
-      this.SUPER();
-      console.log('child');
-    }
+var dao = foam.dao.EasyDAO.create({
+  of: Test2,
+//  daoType: 'MDAO',
+  seqNo: true,
+  cache: true,
+  testData: [
+    { fname: 'Z', lname: 'Z' },
+    { fname: 'A', lname: 'Z' },
+    { fname: 'B', lname: 'Z' },
+    { fname: 'C', lname: 'Z' },
+    { fname: 'A', lname: 'A' },
+    { fname: 'B', lname: 'A' },
+    { fname: 'C', lname: 'A' },
+    { fname: 'A', lname: 'B' },
+    { fname: 'B', lname: 'B' },
+    { fname: 'C', lname: 'B' },
+    { fname: 'A', lname: 'C' },
+    { fname: 'B', lname: 'C' },
+    { fname: 'C', lname: 'C' }
   ]
 });
 
-var c = Child.create();
+dao.orderBy(Test2.LNAME).select().then(function (a) {
+  console.log('by LNAME');
+  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+});
+
+dao.orderBy(Test2.FNAME).select().then(function (a) {
+  console.log('by FNAME');
+  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+});
+
+dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
+  console.log('by LNAME, FNAME');
+  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+});
+
+// dao.removeAll();
