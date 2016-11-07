@@ -74,7 +74,7 @@ foam.CLASS({
 });
 
 var dao = foam.dao.EasyDAO.create({
-  of: Test2,
+  of: 'Test2',
 //  daoType: 'MDAO',
   seqNo: true,
   cache: true,
@@ -108,7 +108,6 @@ dao.where(e.NOT(e.HAS(Test2.LNAME))).select().then(function (a) {
   a.a.forEach(function (t) { console.log(t.fname); });
 });
 
-/*
 dao.orderBy(Test2.LNAME).select().then(function (a) {
   console.log('by LNAME');
   a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
@@ -123,9 +122,8 @@ dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
   console.log('by LNAME, FNAME');
   a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
-*/
 
-//dao.removeAll();
+// dao.removeAll();
 
 /*
 foam.CLASS({
