@@ -157,5 +157,6 @@ FOAM_FILES([
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
-  { name: "lib/node/box", flags: ['node'] }
+  { name: "lib/node/box", flags: ['node'] },
+  { name: "lib/HTTPMethod" }
 ]);
