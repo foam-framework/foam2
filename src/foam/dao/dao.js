@@ -1244,7 +1244,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'updated',
-      isMerged: 100,
+      isMerged: true,
+      mergeDelay: 100,
       code: function() {
         localStorage.setItem(this.name, foam.json.stringify(this.array));
       }
