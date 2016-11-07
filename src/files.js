@@ -136,6 +136,7 @@ FOAM_FILES([
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
+  { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
   { name: "foam/u2/view/DualView", flags: ['web'] },

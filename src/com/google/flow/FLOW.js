@@ -166,12 +166,13 @@ foam.CLASS({
   ],
 
   exports: [
-    'timer',
-    'physics',
+    'addProperty',
     'as data',
-    'updateMemento',
+    'physics',
     'properties',
-    'scope'
+    'scope',
+    'timer',
+    'updateMemento'
   ],
 
   axioms: [
