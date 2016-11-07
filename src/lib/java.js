@@ -654,3 +654,12 @@ foam.CLASS({
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Reference',
+  properties: [
+    ['javaType', 'Object'],
+    ['javaJSONParser', 'foam.lib.json.AnyParser'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+  ]
+});
