@@ -123,6 +123,7 @@ foam.CLASS({
   label: 'Decimal numbers',
 
   properties: [
+    'precision',
     [
       'adapt',
       function (_, v) {

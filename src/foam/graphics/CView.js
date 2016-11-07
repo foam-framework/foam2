@@ -839,18 +839,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Line',
   extends: 'foam.graphics.CView',
 
   properties: [
-    { class: 'Float', name: 'startX' },
-    { class: 'Float', name: 'startY' },
-    { class: 'Float', name: 'endX' },
-    { class: 'Float', name: 'endY' },
-    { class: 'Float', name: 'lineWidth', value: 1 },
-    { class: 'String', name: 'color', value: '#000' }
+    { class: 'Float',  name: 'startX' },
+    { class: 'Float',  name: 'startY' },
+    { class: 'Float',  name: 'endX' },
+    { class: 'Float',  name: 'endY' },
+    { class: 'Float',  name: 'lineWidth', value: 1 },
+    { class: 'String', name: 'color',     value: '#000000' }
   ],
 
   methods: [
@@ -1244,7 +1245,11 @@ foam.CLASS({
     {
       name:  'align',
       label: 'Alignment',
-      value: 'start' // values: left, right, center, start, end
+      value: 'start',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [ 'start', /*'left',*/ 'center', /*'right',*/ 'end' ]
+      }
     },
     {
       class: 'String',
@@ -1277,7 +1282,9 @@ foam.CLASS({
 
       c.fillText(
         this.text,
-        this.align === 'center' ? this.width/2 : 0,
+          this.align === 'start'  ? 0 :
+          this.align === 'center' ? this.width/2 :
+          this.width,
         this.height/2+10);
 
       if ( this.border ) {

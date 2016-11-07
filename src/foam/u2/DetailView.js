@@ -46,6 +46,17 @@ foam.CLASS({
     },
     {
       name: 'properties',
+      // TODO: Make an FObjectArray when it validates properly
+      preSet: function(_, ps) {
+        this.assert(ps, 'Properties required.');
+        for ( var i = 0 ; i < ps.length ; i++ ) {
+          this.assert(
+              foam.core.Property.isInstance(ps[i]),
+              "Non-Property in 'properties' list:",
+              ps);
+        }
+        return ps;
+      },
       expression: function(of) {
         if ( ! of ) return [];
         return of.getAxiomsByClass(foam.core.Property).
@@ -130,8 +141,8 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.add(this.slot(function(model, properties) {
-        if ( ! model ) return 'Set model or data.';
+      this.add(this.slot(function(of, properties) {
+        if ( ! of ) return '';
 
         var title = self.title && self.E('tr').
           start('td').cssClass(self.myCls('title')).attrs({colspan: 2}).
@@ -155,7 +166,7 @@ foam.CLASS({
 
               return self.DetailPropertyView.create({prop: p});
             })));
-      }, this.of$, this.properties$));
+      }));
     },
 
     function actionBorder(e) {
