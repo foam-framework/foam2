@@ -56,7 +56,7 @@ foam.CLASS({
             this.data.APPLICANT_EMAIL,
             this.data.ORIGIN,
             this.data.PUBLIC,
-            this.data.REQUESTED_FEATURE,
+            this.data.EXPERIMENT,
             this.data.AGREED_TO_TERMS,
             this.data.COMMENTS
           ]
