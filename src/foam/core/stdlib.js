@@ -736,3 +736,31 @@ foam.LIB({
     }
   ]
 });
+
+
+foam.LIB({
+  name: 'foam.compare',
+  methods: [
+    function toCompare(c) {
+      return foam.Array.isInstance(c)    ? foam.compare.compound(c) :
+             foam.Function.isInstance(c) ? { compare: c} :
+             c ;
+    },
+
+    function compound(args) {
+      var cs = args.map(foam.compare.toCompare);
+
+      if ( cs.lengh === 1 ) return cs[0];
+
+      var f = function(o1, o2) {
+        for ( var i = 0 ; i < cs.length ; i++ ) {
+          var r = cs[i].compare(o1, o2);
+          if ( r != 0 ) return r;
+        }
+        return 0;
+      };
+
+      return f;
+    }
+  ]
+});
