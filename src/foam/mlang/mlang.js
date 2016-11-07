@@ -1080,7 +1080,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'comparator',
       of: 'foam.mlang.order.Comparator',
-      adapt: function(c) { return foam.compare.toCompare(c); }
+      adapt: function(_, c) { return foam.compare.toCompare(c); }
     }
   ],
 
