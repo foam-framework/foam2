@@ -371,3 +371,30 @@ foam.CLASS({
     'of'
   ]
 });
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Reference',
+  extends: 'Property',
+  properties: [
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      class: 'String',
+      name: 'targetDAOKey',
+      expression: function(of) {
+        return of + 'DAO';
+      }
+    },
+    {
+      name: 'adapt',
+      value: function(oldValue, newValue, prop) {
+        return prop.of$cls.isInstance(newValue) ?
+          newValue.id :
+          newValue;
+      }
+    }
+  ]
+});

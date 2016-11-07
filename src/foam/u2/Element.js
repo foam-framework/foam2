@@ -1703,6 +1703,18 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Reference',
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.ReferenceView'
+      }
+    }
+  ]
+})
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -1750,7 +1762,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 // TODO: make a tableProperties property on AbstractClass
 
