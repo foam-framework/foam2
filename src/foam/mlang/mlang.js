@@ -74,7 +74,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( o === null ) return foam.mlang.Constant.create({ value: o });
+        if ( o === null ) return foam.mlang.Constant.create({ value: null });
         if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== 'object' ) return foam.mlang.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
@@ -746,7 +746,11 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+        var v1 = this.arg1.f(o);
+        var v2 = this.arg2.f(o);
+
+        // First check is so that EQ(Class.PROPERTY, null | undefined) works.
+        return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       },
       // TODO(adamvy): Better optional than all the Comparable casts?
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
