@@ -31,6 +31,11 @@ foam.CLASS({
       required: true
     },
     {
+      class: 'Boolean',
+      name: 'forward',
+      value: true
+    },
+    {
       name: 'query',
       factory: function() {
         return this.relationship.targetDAOQuery();
@@ -45,14 +50,17 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-        return this.__context__[this.relationship.targetDAOKey];
+        return this.__context__[
+          this.forward ?
+            this.relationship.targetDAOKey :
+            this.relationship.sourceDAOKey ];
       }
     }
   ],
 
   methods: [
     function put(obj, sink) {
-      this.relationship.adaptTarget(this.obj, obj);
+      this.relationship.adaptTarget(this.obj, obj, this.forward);
 
       return this.SUPER(obj, sink);
     },
