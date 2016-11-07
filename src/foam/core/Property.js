@@ -499,7 +499,8 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
-          subs.push(this.slot(argNames[i]).sub(l));
+          var s = this.slot(argNames[i]).sub(l);
+          s && subs.push(s);
           args[i] = this[argNames[i]];
         }
         return e.apply(this, args);
