@@ -279,7 +279,6 @@ foam.CLASS({
       name: 'headers'
     },
     {
-      class: 'String',
       name: 'payload'
     },
     {
