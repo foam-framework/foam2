@@ -30,10 +30,23 @@ function tree(t, size) {
 tree(turtle1.pc('black'), 600);
 
 
+
+
 function triangle(t, size) {
-  if ( size > 1 ) t.repeat(3, function() {
-    triangle(t, size/2); t.fd(size).rt(120);
+  if ( size > 5 ) t.repeat(5, () => {
+    triangle(t, size*0.379); t.fd(size).rt(360/5);
   });
 }
 
-triangle(turtle1.pc('black'), 300);
+triangle(turtle1.pc('black'), 200);
+
+
+
+
+function pent(t, size) {
+  if ( size > 5 ) t.repeat(5, () => {
+    pent(t, size*0.379); t.fd(size).rt(360/5);
+  });
+}
+
+turtle1.pc('black').repeat(5, () => { pent(turtle1.rt(360/5), 200); });
