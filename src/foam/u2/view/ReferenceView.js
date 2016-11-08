@@ -35,15 +35,15 @@ foam.CLASS({
       if ( ! this.hasOwnProperty('objToChoice') ) {
         var of = prop.of$cls;
 
-        var props = obj.cls_.getAxiomsByClass(foam.core.String);
+        var props = of.getAxiomsByClass(foam.core.String);
         var f;
 
         // Find the first non-hidden string property.
         for ( var i = 0 ; i < props.length ; i++ ) {
-          var prop = props[i];
-          if ( ! prop.hidden ) {
+          var p = props[i];
+          if ( ! p.hidden ) {
             this.objToChoice = function(obj) {
-              return [prop.f(obj), obj.id];
+              return [p.f(obj), obj.id];
             };
             break;
           }
