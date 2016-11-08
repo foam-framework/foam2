@@ -145,6 +145,12 @@ foam.CLASS({
         ) {
           var v = n.value;
           v.add(this);
+
+          // Make the halo be the first child so that it will
+          // get mouse touch and move events. Replace with
+          // z-index when supported.
+          v.children.pop(); v.children.unshift(this);
+
           this.alpha = 1;
           this.selectedSub = v.sub('propertyChange', this.onSelectedPropertyChange);
           this.onSelectedPropertyChange();
