@@ -228,6 +228,11 @@ foam.CLASS({
       name: 'visibility',
       value: 'public'
     },
+    {
+      class: 'Boolean',
+      name: 'static',
+      value: false
+    },
     'abstract',
     'extends',
     {
@@ -242,10 +247,21 @@ foam.CLASS({
       name: 'fields',
       factory: function() { return []; }
     },
+    {
+      class: 'FObjectArray',
+      of: 'foam.java.Class',
+      name: 'classes',
+      factory: function() { return []; }
+    },
     'imports',
     {
       class: 'Boolean',
       name: 'anonymous',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'innerClass',
       value: false
     }
   ],
@@ -275,7 +291,7 @@ foam.CLASS({
     function outputJava(o) {
       if ( this.anonymous ) {
         o.out('new ', this.extends, '()');
-      } else {
+      } else if ( ! this.innerClass ) {
         o.out('// DO NOT MODIFY BY HAND.\n');
         o.out('// GENERATED CODE (adamvy@google.com)\n');
         o.out('package ', this.package, ';\n\n');
@@ -285,7 +301,13 @@ foam.CLASS({
         });
 
         o.out('\n');
-        o.out(this.visibility, ' ', this.abstract ? 'abstract ' : '', 'class ', this.name);
+      } else {
+        o.indent();
+      }
+
+      if ( ! this.anonymous ) {
+        o.out(this.visibility, ' ', this.static ? 'static ' : '');
+        o.out(this.abstract ? 'abstract ' : '', 'class ', this.name);
 
         if ( this.extends ) {
           o.out(' extends ', this.extends);
@@ -307,6 +329,7 @@ foam.CLASS({
         return o2.order < o1.order
       }).forEach(function(f) { o.out(f, '\n'); });
       this.methods.forEach(function(f) { o.out(f, '\n'); });
+      this.classes.forEach(function(c) { o.out(c, '\n'); });
       o.decreaseIndent();
       o.indent();
       o.out('}');
@@ -437,6 +460,20 @@ foam.CLASS({
   methods: [
     function buildJavaClass(cls) {
       cls.implements = (cls.implements || []).concat(this.path);
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.InnerClass',
+  methods: [
+    function buildJavaClass(cls) {
+      var innerClass = this.model.buildClass().buildJavaClass();
+      innerClass.innerClass = true;
+      innerClass.static = true;
+      cls.classes.push(innerClass);
+
+      return innerClass;
     }
   ]
 });
