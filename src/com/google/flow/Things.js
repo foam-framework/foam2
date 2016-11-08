@@ -722,6 +722,28 @@ foam.CLASS({
       class: 'Boolean',
       name: 'penDown',
       value: true
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          x: this.x,
+          y: this.y,
+          penColor: this.penColor,
+          penWidth: this.penWidth,
+          penDown: this.pendDown,
+          rotation: this.rotation
+        };
+      },
+      setter: function(m) {
+        this.copyFrom(m);
+      }
+    },
+    {
+      name: 'mementoStack_',
+      hidden: true,
+      factory: function() { return []; }
     }
   ],
 
@@ -738,7 +760,16 @@ foam.CLASS({
       var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});      head.add(rightEye);
       var shell    = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1}); this.add(shell);
       var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6}); this.add(tail);
+    },
 
+    function ss() {
+      this.mementoStack_.push(this.memento);
+      return this;
+    },
+
+    function rs() {
+      this.memento = this.mementoStack_.pop();
+      return this;
     },
 
     function pc(color) {
