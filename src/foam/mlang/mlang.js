@@ -1262,6 +1262,9 @@ foam.INTERFACE({
   ]
 });
 
+// TODO: Drop this and just use the ordering mlangs themselves
+//  orderDirection() can return 1, -1 to indicate direction of top
+//  ordering.
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Direction',
