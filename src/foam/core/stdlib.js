@@ -753,7 +753,7 @@ foam.LIB({
       if ( cs.lengh === 1 ) return cs[0];
 
       var f = {
-        compound: function(o1, o2) {
+        compare: function(o1, o2) {
           for ( var i = 0 ; i < cs.length ; i++ ) {
             var r = cs[i].compare(o1, o2);
             if ( r != 0 ) return r;
