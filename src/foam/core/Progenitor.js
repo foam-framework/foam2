@@ -15,7 +15,22 @@
  * limitations under the License.
  */
 
-// TODO: this will change, LightweightFactory? Potential changes to proto and management thereof
+// TODO: this will change, LightweightFactory? Potential changes to proto
+//   and management thereof. In the end this just models native javascript
+//   objects in a one-level proto heirarchy.
+
+// NOTE the requirements of these lightweights:
+
+// - A factory that can create them at close to zero cost
+
+// - Each instance needs a reference to its factory (important for
+//     hetergeneous indexes) even if it is changed to not inherit from it
+
+// - Using a different name for the factory's creation method (such as spawn())
+//     eliminates confusion when dealing with both:
+//       someFac.create().spawn() -> definitely a spawned instance
+//       someFac.create().create() -> confusing
+//       classOrFactory.create() -> what did I just make
 
 /**
   Progenitors spawn many lightweight instances of themselves, sharing
