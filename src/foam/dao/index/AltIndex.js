@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: Implement Hetergenious AltIndex to allow incomplete AutoIndexing
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
