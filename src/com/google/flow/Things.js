@@ -698,7 +698,7 @@ foam.CLASS({
 
   implements: [ 'foam.physics.Physical' ],
 
-  requires: [ 'foam.graphics.Line' ],
+  requires: [ 'foam.graphics.Line', 'foam.graphics.CView' ],
 
   // TODO: better to just add to parent and have listeners
   // then add to physics or other interested parties
@@ -744,6 +744,15 @@ foam.CLASS({
       name: 'mementoStack_',
       hidden: true,
       factory: function() { return []; }
+    },
+    {
+      name: 'childLayer',
+      hidden: true,
+      factory: function() {
+        var l = this.CView.create();
+        this.parent.add(l);
+        return l;
+      }
     }
   ],
 
@@ -812,7 +821,7 @@ foam.CLASS({
 
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
-        this.parent.add(this.Line.create({
+        this.childLayer.add(this.Line.create({
           startX:    x1+this.radiusX,
           startY:    y1+this.radiusY,
           endX:      this.x+this.radiusX,
@@ -879,6 +888,10 @@ foam.CLASS({
 
     function die() {
       this.parent && this.parent.remove(this);
+    },
+
+    function cs() {
+      this.childLayer.removeAllChildren();
     }
   ]
 });
