@@ -152,6 +152,7 @@ foam.CLASS({
           }
         }
 
+        // TODO: order cost will always be the same, don't bother asking!
         if ( order ) {
           var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
           if ( candidate ) {
