@@ -52,6 +52,7 @@ foam.CLASS({
         or adding items.
         Therefore: tail.size() == fn(tail).size() must hold.
     */
+    // TODO: won't need if not allowing index structure changes, AltIndex heterogenious
     function mapOver(fn, ofIndex) {},
 
     /** @return the integer size of this index. */
