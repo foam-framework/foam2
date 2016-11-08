@@ -49,3 +49,25 @@ function triangle(t, size) {
 //  go half way
 
 triangle(turtle1.pc('black'), 300);
+
+
+
+function triangle(t, size) {
+  if ( size < 5 ) return;
+
+  t.ss();
+  triangle(t, size/2);
+  t.fd(size/2);
+  triangle(t, size/2);
+  t.fd(size/2).rt(120).fd(size/2);
+  triangle(t, size/2);
+//  t.fd(size/2).rt(120).fd(size/2);
+  t.rs();
+}
+
+// t0, t1, t2
+// for each point
+//  pick random point
+//  go half way
+
+triangle(turtle1.pc('black'), 300);
