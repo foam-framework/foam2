@@ -1078,7 +1078,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      name: 'comparator',
+      name: 'arg1',
       of: 'foam.mlang.order.Comparator',
       adapt: function(_, c) { return foam.compare.toCompare(c); }
     }
@@ -1088,29 +1088,122 @@ foam.CLASS({
     {
       name: 'compare',
       code: function(o1, o2) {
-        return -1 * this.comparator.compare(o1, o2);
+        return -1 * this.arg1.compare(o1, o2);
       },
-      javaCode: 'return -1 * getComparator().compare(o1, o2);'
+      javaCode: 'return -1 * getArg1().compare(o1, o2);'
     },
     {
       name: 'toString',
       code: function() {
-        return 'DESC(' + this.comparator.toString() + ')';
+        return 'DESC(' + this.arg1.toString() + ')';
       },
-      javaCode: 'return "DESC(" + getComparator().toString() + ")";'
+      javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'ThenBy',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        return a;
+      },
+      name: 'arg1'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        return a;
+      },
+      name: 'arg2'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        // an equals of arg1.compare is falsy, which will then hit arg2
+        return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
+      }
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return 'THEN_BY(' + this.arg1.toString() + ', ' +
+          this.arg2.toString() + ')';
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'CustomComparator',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'Function',
+      name: 'compareFn'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        return this.compareFn(o1, o2);
+      }
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return 'CUSTOM_COMPARE(' + this.arg1.toString() + ')';
+      }
+    }
+  ]
+});
 
 foam.LIB({
   name: 'foam.compare',
   methods: [
     function desc(c) {
-      return foam.mlang.order.Desc.create({comparator: c});
+      return foam.mlang.order.Desc.create({ arg1: c });
+    },
+
+    function toCompare(c /*foam.mlang.order.Comparator*/) {
+      var ret = foam.Array.isInstance(c) ? foam.compare.compound(c) :
+        foam.Function.isInstance(c) ? foam.mlang.order.CustomComparator.create({ compareFn: c }) :
+        c ;
+      return ret;
+    },
+
+    function compound(/*array*/ args) {
+      var cs = args.map(foam.compare.toCompare);
+
+      if ( cs.length === 0 ) return;
+      if ( cs.length === 1 ) return cs[0];
+
+      var ret = foam.mlang.order.ThenBy.create({
+        arg1: cs[cs.length - 1],
+        arg2: cs[cs.length - 2]
+      });
+      for ( var i = cs.length - 3; i >= 0; i-- ) {
+        ret = foam.mlang.order.ThenBy.create({ arg1: cs[i], arg2: ret });
+      }
+      return ret;
     }
   ]
 });
+
 
 
 foam.CLASS({
@@ -1219,7 +1312,7 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
 
-    function DESC(c) { return this.Desc.create({comparator: c}); },
+    function DESC(c) { return this.Desc.create({ arg1: c }); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
   ]
 });
