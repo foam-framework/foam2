@@ -31,43 +31,9 @@ tree(turtle1.pc('black'), 600);
 
 
 function triangle(t, size) {
-  if ( size < 2 ) return;
-
-  t.ss();
-  triangle(t, size/2);
-  t.fd(size/2);
-  triangle(t, size/2);
-  t.rt(240).fd(size/2).lt(240);
-  triangle(t, size/2);
-  t.rt(120).fd(size/2);
-  t.rs();
+  if ( size > 1 ) t.repeat(3, function() {
+    triangle(t, size/2); t.fd(size).rt(120);
+  });
 }
-
-// t0, t1, t2
-// for each point
-//  pick random point
-//  go half way
-
-triangle(turtle1.pc('black'), 300);
-
-
-
-function triangle(t, size) {
-  if ( size < 5 ) return;
-
-  t.ss();
-  triangle(t, size/2);
-  t.fd(size/2);
-  triangle(t, size/2);
-  t.fd(size/2).rt(120).fd(size/2);
-  triangle(t, size/2);
-//  t.fd(size/2).rt(120).fd(size/2);
-  t.rs();
-}
-
-// t0, t1, t2
-// for each point
-//  pick random point
-//  go half way
 
 triangle(turtle1.pc('black'), 300);
