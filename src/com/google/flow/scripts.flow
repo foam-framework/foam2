@@ -13,23 +13,20 @@ fern(turtle1.pc('green'), 800)
 
 
 
-function tree(t, a, size) {
+function tree(t, size) {
   if ( size < 40 ) {
     t.lay(foam.graphics.Circle.create({border: null, color: 'green', alpha: 0.07, radius: 30}));
     return;
   }
 
   t.ss();
-  t.rt(a);
   t.pw(size/20);
   t.fd(size*0.25).bk(7);
-  tree(t, 20+Math.random()*40, size*0.75);
-  tree(t, -20-Math.random()*40, size*0.75);
+  tree(t.rt(20+Math.random()*40), size*0.75);
+  tree(t.lt(40+Math.random()*40), size*0.75);
   t.rs();
 }
 
 
 turtle1.pc('black');
-tree(turtle1, 0, 600);
-tree(turtle1, 0, 600);
 tree(turtle1, 0, 600);
