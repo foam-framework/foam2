@@ -152,7 +152,9 @@ foam.CLASS({
           }
         }
 
-        // TODO: order cost will always be the same, don't bother asking!
+        // TODO: order cost will always be the same, don't bother asking!...
+        //  Except: the order index.estimate gets the order AND predicate,
+        //   so the predicate might make this index worse
         if ( order ) {
           var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
           if ( candidate ) {
