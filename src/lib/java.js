@@ -395,7 +395,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaJSONParser',
-      value: 'foam.lib.json.AnyPArser'
+      value: 'foam.lib.json.AnyParser'
     },
     {
       class: 'String',
