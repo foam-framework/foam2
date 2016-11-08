@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: this will change, LightweightFactory? Potential changes to proto and management thereof
+
 /**
   Progenitors spawn many lightweight instances of themselves, sharing
   properties when indicated. Spawning an instance costs virtually nothing,

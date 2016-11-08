@@ -24,6 +24,8 @@
   combines the results. Typically an AltIndex will be used under the ORIndex
   to optimize the various sub-queries the OR executes.
 */
+// TODO: leave out
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'OrIndex',
