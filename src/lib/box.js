@@ -281,7 +281,10 @@ foam.CLASS({
   ],
 
   properties: [
-    'name'
+    {
+      class: 'String',
+      name: 'name'
+    }
   ],
 
   methods: [
@@ -332,21 +335,56 @@ foam.CLASS({
   properties: [
     {
       name: 'registry',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      javaType: 'java.util.Map',
       factory: function() { return {}; }
+    }
+  ],
+
+  classes: [
+    {
+      name: 'Registration',
+      properties: [
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.Box',
+          name: 'exportBox'
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.Box',
+          name: 'localBox'
+        }
+      ]
     }
   ],
 
   methods: [
     {
+      name: 'init',
+      javaCode: 'setRegistry(getX().create(java.util.HashMap.class));',
+      code: function(){}
+    },
+    {
       name: 'doLookup',
       returns: 'foam.box.Box',
+      javaReturns: 'foam.box.Box',
       code: function doLookup(name) {
         if ( this.registry[name] &&
              this.registry[name].exportBox )
           return this.registry[name].exportBox;
 
         throw this.NoSuchNameException.create({ name: name });
-      }
+      },
+      args: [
+        {
+          name: 'name',
+          javaType: 'String'
+        }
+      ],
+      javaCode: 'Registration r = (Registration)getRegistry().get(name);\n'
+                + 'if ( r == null ) return null;\n'
+                + 'return r.getExportBox();'
     },
     {
       name: 'register',
@@ -370,6 +408,7 @@ foam.CLASS({
     {
       name: 'register2',
       returns: 'foam.box.Box',
+      javaReturns: 'foam.box.Box',
       code: function(name, service, localBox) {
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
         exportBox = service ? service.clientBox(exportBox) : exportBox;
@@ -380,14 +419,39 @@ foam.CLASS({
         };
 
         return this.registry[name].exportBox;
-      }
+      },
+      args: [
+        {
+          name: 'name',
+          javaType: 'String'
+        },
+        {
+          name: 'service',
+          javaType: 'Object'
+        },
+        {
+          name: 'box',
+          javaType: 'foam.box.Box'
+        }
+      ],
+      javaCode: 'foam.box.Box exportBox = getX().create(foam.box.SubBox.class).setName(name).setDelegate((foam.box.Box)getMe());\n'
+                + '// TODO(adamvy): Apply service policy\n'
+                + 'getRegistry().put(name, getX().create(Registration.class).setExportBox(exportBox).setLocalBox(box));\n'
+                + 'return exportBox;'
     },
     {
       name: 'unregister',
       returns: '',
       code: function(name) {
         delete this.registry[name];
-      }
+      },
+      args: [
+        {
+          name: 'name',
+          javaType: 'String'
+        }
+      ],
+      javaCode: 'getRegistry().remove(name);'
     }
   ]
 });
@@ -427,7 +491,13 @@ foam.CLASS({
         } else {
           this.registrySkeleton.send(msg);
         }
-      }
+      },
+      javaCode: 'if ( message instanceof foam.box.SubBoxMessage ) {\n'
+              + '  foam.box.SubBoxMessage subBoxMessage = (foam.box.SubBoxMessage)message;\n'
+              + '  ((Registration)getRegistry().get(subBoxMessage.getName())).getLocalBox().send(subBoxMessage.getMessage());\n'
+              + '} else {\n'
+              + '  throw new RuntimeException("Invalid message type" + message.getClass().getName());\n'
+              + '}'
     },
 
     function toRemote() {
@@ -1278,7 +1348,6 @@ foam.CLASS({
   package: 'foam.box',
   name: 'BoxService',
   properties: [
-    'next',
     {
       class: 'Class',
       name: 'server'
