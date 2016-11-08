@@ -23,10 +23,29 @@ function tree(t, size) {
   t.pw(size/20);
   t.fd(size*0.25).bk(7);
   tree(t.rt(20+Math.random()*40), size*0.75);
-  tree(t.lt(40+Math.random()*40), size*0.75);
+  tree(t.lt(60+Math.random()*40), size*0.75);
   t.rs();
 }
 
+tree(turtle1.pc('black'), 600);
 
-turtle1.pc('black');
-tree(turtle1, 0, 600);
+
+function triangle(t, size) {
+  if ( size < 2 ) return;
+
+  t.ss();
+  triangle(t, size/2);
+  t.fd(size/2);
+  triangle(t, size/2);
+  t.rt(240).fd(size/2).lt(240);
+  triangle(t, size/2);
+  t.rt(120).fd(size/2);
+  t.rs();
+}
+
+// t0, t1, t2
+// for each point
+//  pick random point
+//  go half way
+
+triangle(turtle1.pc('black'), 300);
