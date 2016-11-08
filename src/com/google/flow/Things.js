@@ -732,7 +732,7 @@ foam.CLASS({
           y: this.y,
           penColor: this.penColor,
           penWidth: this.penWidth,
-          penDown: this.pendDown,
+          penDown:  this.pendDown,
           rotation: this.rotation
         };
       },
@@ -751,15 +751,18 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      var leg1     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:11,y:1});  this.add(leg1);
-      var leg2     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:10,y:16}); this.add(leg2);
-      var leg3     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-4,y:17}); this.add(leg3);
-      var leg4     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-5,y:2});  this.add(leg4);
-      var head     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:6,radiusX:4,x:4,y:-10}); this.add(head);
-      var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});   head.add(leftEye);
-      var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});      head.add(rightEye);
-      var shell    = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1}); this.add(shell);
-      var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6}); this.add(tail);
+      var leg1     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:11,y:1});
+      var leg2     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:10,y:16});
+      var leg3     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-4,y:17});
+      var leg4     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-5,y:2});
+      var head     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:6,radiusX:4,x:4,y:-10});
+      var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});
+      var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});
+      var shell    = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1});
+      var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6});
+
+      head.add(leftEye, rightEye);
+      this.add(leg1, leg2, leg3, leg4, head, shell, tail);
     },
 
     function ss() {
