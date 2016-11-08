@@ -50,3 +50,24 @@ function pent(t, size) {
 }
 
 turtle1.pc('black').repeat(5, () => { pent(turtle1.rt(360/5), 200); });
+
+
+
+function pent(t, size) {
+  if ( size > 10 ) t.repeat(7, () => {
+    pent(t, size*0.45); t.fd(size).rt(360/7);
+  });
+}
+
+turtle1.pc('black').repeat(7, () => { pent(turtle1.rt(360/7), 150); });
+
+
+
+
+function pent(t, size) {
+  if ( size > 10 ) t.repeat(7, () => {
+    pent(t, size*0.41); t.fd(size).rt(360/7);
+  });
+}
+
+turtle1.pc('red').repeat(7, () => { pent(turtle1.rt(360/7), 150); });
