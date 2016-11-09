@@ -892,6 +892,7 @@ foam.CLASS({
 
     function cs() {
       this.childLayer.removeAllChildren();
+      return this;
     }
   ]
 });
