@@ -87,7 +87,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.table.write();
+      var table = this.table;
+      table.write();
+      table.selection$.sub(function() { console.log('selection: ', arguments, table.selection); });
     }
   ]
 });
