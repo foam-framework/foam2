@@ -97,15 +97,14 @@ foam.CLASS({
       return this.delegates[0].get(key);
     },
 
-    function getAltForOrderDirs(orderDirs) {
+    function getAltForOrderDirs(order, cache) {
       var delegates = this.delegates;
-      if ( ! orderDirs ) return delegates[0];
+      if ( ! order ) return delegates[0];
 
-      var t = orderDirs.tags[this];
+      var t = cache[this];
       // if no cached index number, check our delegateFactories the best
       // estimate, considering only ordering
       if ( ! foam.Number.isInstance(t) ) {
-        var order = orderDirs.srcOrder;
         var delegateFactories = this.delegateFactories;
         var bestEst = Number.MAX_VALUE;
         var nullSink = this.NullSink.create();
@@ -114,7 +113,7 @@ foam.CLASS({
         for ( var i = 0; i < delegateFactories.length; i++ ) {
           est = delegateFactories[i].estimate(1000, nullSink, undefined, undefined, order);
           if ( bestEst > est ) {
-            t = orderDirs.tags[this] = i;
+            t = cache[this] = i;
             bestEst = est;
           }
         }
@@ -122,10 +121,10 @@ foam.CLASS({
       return delegates[t];
     },
 
-    function select(sink, skip, limit, orderDirs, predicate) {
+    function select(sink, skip, limit, order, predicate, cache) {
       // find and cache the correct subindex to use
-      this.getAltForOrderDirs(orderDirs)
-        .select(sink, skip, limit, orderDirs, predicate);
+      this.getAltForOrderDirs(order, cache)
+        .select(sink, skip, limit, order, predicate, cache);
     },
 
     function mapOver(fn, ofIndex) {
