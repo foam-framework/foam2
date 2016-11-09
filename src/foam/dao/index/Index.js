@@ -59,10 +59,10 @@ foam.CLASS({
     function size() {},
 
     /** Selects matching items from the index and puts them into sink.
-      <p>Note: orderDirs has replaced selectReverse().
-      myOrder.orderDirection() will provide an orderDirs object for
-      a given foam.mlang.order.Comparator. */
-    function select(/*sink, skip, limit, orderDirs, predicate*/) { },
+        cache allows indexes to store query state that is discarded once
+        the select() is complete.
+      <p>Note: order checking has replaced selectReverse().  */
+    function select(/*sink, skip, limit, order, predicate, cache*/) { },
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},

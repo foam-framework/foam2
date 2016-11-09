@@ -1259,54 +1259,10 @@ foam.INTERFACE({
       name: 'orderPrimaryProperty',
     },
     {
-      /** Returns a Direction indicating dir:1/-1 for ascending/descending,
-        and an optional next for sub-ordering. */
+      /** Returns 1 or -1 for ascending/descending */
       name: 'orderDirection',
     }
   ]
-});
-
-// TODO: Drop this and just use the ordering mlangs themselves
-//  orderDirection() can return 1, -1 to indicate direction of top
-//  ordering.
-foam.CLASS({
-  package: 'foam.mlang.order',
-  name: 'Direction',
-  axioms: [
-    foam.pattern.Progenitor.create(),
-    foam.pattern.Singleton.create()
-  ],
-  properties: [
-    {
-      class: 'foam.pattern.progenitor.PerInstance',
-      name: 'dir',
-      value: 1
-    },
-    {
-      class: 'foam.pattern.progenitor.PerInstance',
-      name: 'srcOrder'
-    },
-    {
-      class: 'foam.pattern.progenitor.PerInstance',
-      name: 'next'
-    },
-    {
-      class: 'foam.pattern.progenitor.PerInstance',
-      name: 'tags',
-      factory: function() { return {}; }
-    },
-  ],
-  methods: [
-    {
-      name: 'reverse',
-      code: function() {
-        this.dir *= -1;
-        this.next && this.next.reverse();
-        return this;
-      }
-    }
-  ]
-
 });
 
 foam.CLASS({
@@ -1326,12 +1282,7 @@ foam.CLASS({
     },
     {
       name: 'orderDirection',
-      code: function() {
-        return foam.mlang.order.Direction.create().spawn({
-          dir: 1,
-          srcOrder: this
-        });
-      },
+      code: function() { return 1; },
       javaCode: 'return 1;'
     }
   ]
@@ -1394,9 +1345,7 @@ foam.CLASS({
     {
       name: 'orderDirection',
       code: function() {
-        var ret = this.arg1.orderDirection().reverse();
-        ret.srcOrder = this;
-        return ret;
+        return -1 * this.arg1.orderDirection();
       },
       javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
         'ret.setSrcOrder(this); return ret;'
@@ -1481,14 +1430,9 @@ foam.CLASS({
     {
       name: 'orderDirection',
       code: function() {
-        var ret = this.arg1.orderDirection();
-        ret.next = this.arg2.orderDirection();
-        ret.srcOrder = this;
-        return ret;
+        return this.arg1.orderDirection();
       },
-      javaCode: 'Object ret = getArg1().orderDirection();' +
-        'ret.next = getArg2.orderDirection();' +
-        'ret.srcOrder = this; return ret;'
+      javaCode: 'return getArg1().orderDirection();'
     }
   ]
 });
@@ -1515,8 +1459,24 @@ foam.CLASS({
     {
       name: 'toString',
       code: function() {
-        return 'CUSTOM_COMPARE(' + this.arg1.toString() + ')';
+        return 'CUSTOM_COMPARE(' + this.compareFn.toString() + ')';
       }
+    },
+    {
+      name: 'orderTail',
+      code: function() { return undefined; },
+      javaCode: 'return null;'
+    },
+    {
+      /** TODO: allow user to set this to match the given function */
+      name: 'orderPrimaryProperty',
+      code: function() { return undefined; },
+      javaCode: 'return null;'
+    },
+    {
+      name: 'orderDirection',
+      code: function() { return 1; },
+      javaCode: 'return 1;'
     }
   ]
 });

@@ -237,12 +237,12 @@ foam.CLASS({
       }
     },
 
-    function select(sink, skip, limit, orderDirs, predicate) {
+    function select(sink, skip, limit, order, predicate, cache) {
       // AATree node will extract orderDirs.next for the tail index
-      if ( orderDirs && orderDirs.dir < 0 ) {
-        this.root.selectReverse(sink, skip, limit, orderDirs, predicate);
+      if ( order && order.orderDirection() < 0 ) {
+        this.root.selectReverse(sink, skip, limit, order, predicate, cache);
       } else {
-        this.root.select(sink, skip, limit, orderDirs, predicate);
+        this.root.select(sink, skip, limit, order, predicate, cache);
       }
     },
 
@@ -474,10 +474,9 @@ foam.CLASS({
       var subOrder;
       var orderDirections;
       if ( order && ! sortRequired ) {
-        orderDirections = order.orderDirection();
-        // we manage the direction of the first scan directly
-        // and pass orderDirections.next to our tree
-        if ( orderDirections.dir < 0 ) reverseSort = true;
+        // we manage the direction of the first scan directly,
+        // tail indexes will use the order.orderTail()
+        if ( order.orderDirection() < 0 ) reverseSort = true;
       }
 
       if ( ! sortRequired ) {
@@ -494,7 +493,7 @@ foam.CLASS({
           if ( sortRequired ) {
             var arrSink = index.ArraySink.create();
             index.selectCount++;
-            subTree.select(arrSink, null, null, null, predicate);
+            subTree.select(arrSink, null, null, null, predicate, {});
             index.selectCount--;
             var a = arrSink.a;
             a.sort(order.compare.bind(order));
@@ -511,9 +510,9 @@ foam.CLASS({
             // Note: pass skip and limit by reference, as they are modified in place
             reverseSort ?
               subTree.selectReverse(sink, [skip], [limit],
-                orderDirections, predicate) :
+                order, predicate, {}) :
               subTree.select(sink, [skip], [limit],
-                orderDirections, predicate) ;
+                order, predicate, {}) ;
             index.selectCount--;
           }
         },

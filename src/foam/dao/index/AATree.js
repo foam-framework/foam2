@@ -266,9 +266,8 @@ foam.CLASS({
       return s;
     },
 
-    /** AATree select takes the sub-ordering to pass to the tail index,
-      since primary ordering is assumed to match this tree. */
-    function select(sink, skip, limit, orderDirs, predicate) {
+  
+    function select(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -276,17 +275,16 @@ foam.CLASS({
         return;
       }
 
-      this.left.select(sink, skip, limit, orderDirs, predicate);
+      this.left.select(sink, skip, limit, order, predicate, cache);
 
       this.value.select(sink, skip, limit,
-        orderDirs && orderDirs.next, predicate);
+        order && order.orderTail(), predicate, cache);
 
-      this.right.select(sink, skip, limit, orderDirs, predicate);
+      this.right.select(sink, skip, limit, order, predicate, cache);
     },
 
-    /** AATree selectReverse takes the sub-ordering to pass to the tail index,
-      since primary ordering is assumed to match this tree. */
-    function selectReverse(sink, skip, limit, orderDirs, predicate) {
+   
+    function selectReverse(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -295,13 +293,13 @@ foam.CLASS({
         return;
       }
 
-      this.right.selectReverse(sink, skip, limit, orderDirs, predicate);
+      this.right.selectReverse(sink, skip, limit, order, predicate, cache);
 
-      // select() will pick reverse or not based on orderDirs
+      // select() will pick reverse or not based on order
       this.value.select(sink, skip, limit,
-        orderDirs && orderDirs.next, predicate);
+        order && order.orderTail(), predicate, cache);
 
-      this.left.selectReverse(sink,  skip, limit, orderDirs, predicate);
+      this.left.selectReverse(sink,  skip, limit, order, predicate, cache);
     },
 
     function gt(key, compare) {

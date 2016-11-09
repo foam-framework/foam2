@@ -91,7 +91,7 @@ foam.CLASS({
       return this.delegates[0].get(key);
     },
 
-    function getAltForOrderDirs(orderDirs) {
+    function getAltForOrderDirs(order, cache) {
       // NOTE: this assumes one of the delegates is capable of ordering
       //  properly for a scan. We should not be asked for a select unless
       //  a previous estimate indicated one of our options was sorted properly.
@@ -99,13 +99,12 @@ foam.CLASS({
       //  one of the Alt factories supports it. But if that delegate is missing on
       //  some of the results, they will fall back to ID index and not sort...
       var delegates = this.delegates;
-      if ( ! orderDirs ) return delegates[0];
+      if ( ! order ) return delegates[0];
 
-      var cache = orderDirs.tags[this];
+      var c = cache[this];
       // if no cached index estimates, generate estimates
       // for each factory for this ordering
-      if ( ! cache ) {
-        var order = orderDirs.srcOrder;
+      if ( ! c ) {
         var nullSink = this.NullSink.create();
         var dfs = this.delegateFactories;
         var bestEst = Number.MAX_VALUE;
@@ -113,11 +112,11 @@ foam.CLASS({
         for ( var i = 0; i < dfs.length; i++ ) {
           var est = dfs[i].estimate(1000, nullSink, undefined, undefined, order);
           if ( est < bestEst ) {
-            cache = dfs[i];
+            c = dfs[i];
             bestEst = est;
           }
         }
-        orderDirs.tags[this] = cache;
+        cache[this] = c;
       }
 
       // check if we have a delegate instance for the best factory
@@ -135,10 +134,10 @@ foam.CLASS({
       return newSubInst;
     },
 
-    function select(sink, skip, limit, orderDirs, predicate) {
+    function select(sink, skip, limit, order, predicate, cache) {
       // find and cache the correct subindex to use
-      this.getAltForOrderDirs(orderDirs)
-        .select(sink, skip, limit, orderDirs, predicate);
+      this.getAltForOrderDirs(order, cache)
+        .select(sink, skip, limit, order, predicate, cache);
     },
 
     function mapOver(fn, ofIndex) {

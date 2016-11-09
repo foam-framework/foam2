@@ -55,7 +55,7 @@ foam.CLASS({
       return 1;
     },
 
-    function select(sink, skip, limit, orderDirs, predicate) {
+    function select(sink, skip, limit, order, predicate, cache) {
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;

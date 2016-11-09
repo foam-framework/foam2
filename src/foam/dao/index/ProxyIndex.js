@@ -55,8 +55,8 @@ foam.CLASS({
 
     function size() { return this.delegate.size(); },
 
-    function select(sink, skip, limit, orderDirs, predicate) {
-      return this.delegate.select(sink, skip, limit, orderDirs, predicate);
+    function select(sink, skip, limit, order, predicate, cache) {
+      return this.delegate.select(sink, skip, limit, order, predicate, cache);
     },
 
     function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
