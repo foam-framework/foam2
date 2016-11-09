@@ -282,3 +282,53 @@ repeat(36, (i) => {
   });
   turtle1.rt(360/36);
 });
+
+
+
+
+canvas1.color = 'black';
+turtle1.cs();
+turtle1.ss();
+turtle1.pw(4);
+
+
+repeat(36, (i) => {
+  repeat(36, () => {
+    turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
+    turtle1.fd(26).rt(10);
+  });
+  turtle1.rt(360/36);
+});
+
+
+turtle1.rs();
+
+
+
+
+canvas1.color = 'black'
+turtle1.cs();
+turtle1.ss();
+turtle1.pw(3);
+
+repeat(36*2, (i) => {
+  repeat(36, () => {
+    turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
+    turtle1.fd(26).rt(10);
+  });
+  turtle1.rt(360/36/2);
+});
+
+turtle1.rs();
+
+
+
+
+canvas1.color = 'black';
+turtle1.cs();
+turtle1.ht();
+
+repeat(360, (i) => {
+  turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
+  turtle1.rt(1).ss().pu().fd(20+Math.random()*20).pd().fd(Math.random()*400).rs();
+});
