@@ -78,7 +78,10 @@ foam.CLASS({
       var targetProps = this.targetProperties || [];
 
       if ( ! sourceProps.length ) {
-        sourceProps = [ foam.core.Property.create({name: this.name}) ];
+        sourceProps = [ foam.core.Property.create({
+          name: this.name,
+          transient: true
+        }) ];
       }
 
       if ( ! targetProps.length ) {
