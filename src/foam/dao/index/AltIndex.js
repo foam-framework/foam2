@@ -17,6 +17,14 @@
 
 // TODO: Implement Hetergenious AltIndex to allow incomplete AutoIndexing
 
+// TODO: Consider giving predicates an estimate as well: if an index arrives at
+//   ValueIndex, and still must evaluate remaining predicates on each value, the 
+//   estimated cost may be greater than one for things like CONTAINS, spatial
+//   mlangs like WITHIN_RADIUS, or full-text searching. If an index had processed
+//   those predicates earlier in the chain, the cost would be much less than a 
+//   scan-and-filter-all. Default estimate of 1 would be fine for most simple
+//   comparison predicates.
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
@@ -34,7 +42,7 @@ foam.CLASS({
 
   properties: [
     {
-      /** delegate factories (TODO: rename) */
+      /** delegate factories */
       name: 'delegateFactories',
       factory: function() { return []; }
     },
