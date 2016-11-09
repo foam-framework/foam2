@@ -86,10 +86,10 @@ foam.CLASS({
         return nu;
       },
       postSet: function() {
-        var c = this.choice;
-        this.choice = c && (
-            this.findChoiceByData(c[0]) ||
-            this.findChoiceByText(c[1]) );
+        var d = this.data;
+        if ( this.choices.length ) {
+          this.choice = ( d && this.findChoiceByData(d) ) || this.defaultValue;
+        }
       }
     },
     {
@@ -137,7 +137,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n);
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [ n, n ];
       }
     },
     {
@@ -152,7 +152,8 @@ foam.CLASS({
     {
       name: 'view_'
     },
-    'feedback_'
+    'feedback_',
+    'defaultValue'
   ],
 
   methods: [
@@ -202,6 +203,10 @@ foam.CLASS({
         if ( choices[i][1] === text ) return choices[i];
       }
       return null;
+    },
+
+    function fromProperty(p) {
+      this.defaultValue = p.value;
     }
   ],
 

@@ -23,8 +23,13 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'enableGravity',
+      name: 'gravity',
       value: false
+    },
+    {
+      class: 'Float',
+      name: 'gravityStrength',
+      value: 1
     }
   ],
 
@@ -35,7 +40,9 @@ foam.CLASS({
       var gravity  = c.gravity;
       var friction = c.friction;
 
-      if ( gravity && this.enableGravity ) c.vy += gravity;
+      if ( gravity && this.gravity ) {
+        c.vy += gravity * this.gravityStrength;
+      }
 
       if ( friction ) {
         c.vx = Math.abs(c.vx) < 0.001 ? 0 : c.vx * friction;

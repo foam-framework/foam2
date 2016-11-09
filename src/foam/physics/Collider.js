@@ -20,6 +20,8 @@ foam.CLASS({
   package: 'foam.physics',
   name: 'Collider',
 
+  topics: [ 'onTick' ],
+
   properties: [
     {
       class: 'Boolean',
@@ -148,13 +150,15 @@ foam.CLASS({
       var a  = Math.atan2(c2.y-c1.y, c2.x-c1.x);
       var m1 =  c1.momentumAtAngle(a);
       var m2 = -c2.momentumAtAngle(a);
-      var m  = 2 * ( m1 + m2 );
+      var m  = ( m1 + m2 )/2;
 
       // ensure a minimum amount of momentum so that objects don't overlap
-      m = Math.max(1, m);
-      var tMass = c1.mass + c2.mass;
-      c1.applyMomentum(-m * c2.mass/tMass, a);
-      c2.applyMomentum(m * c1.mass/tMass, a);
+      if ( m >= 0 ) {
+        m = Math.max(1, m);
+        var tMass = c1.mass + c2.mass;
+        c1.applyMomentum(-m * c2.mass/tMass, a);
+        c2.applyMomentum( m * c1.mass/tMass, a);
+      }
     },
 
     // add one or more components to be monitored for collisions
@@ -224,6 +228,7 @@ foam.CLASS({
       isFramed: true,
       code: function tick() {
         if ( this.stopped_ ) return;
+        this.onTick.pub();
         this.detectCollisions();
         this.updateChildren();
 

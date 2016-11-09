@@ -57,10 +57,12 @@ foam.CLASS({
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
+          arcWidth:    o.arcWidth,
           border:      o.border,
           code:        o.code,
           color:       o.color,
-          compression: o.compression,
+          compressionStrength: o.compressionStrength,
+          end:         o.end,
           gravity:     o.gravity,
           head:        o.head,
           height:      o.height,
@@ -70,7 +72,9 @@ foam.CLASS({
           radius:      o.radius,
           radiusX:     o.radiusX,
           radiusY:     o.radiusY,
-          stretch:     o.stretch,
+          springWidth: o.springWidth,
+          start:       o.start,
+          stretchStrength: o.stretchStrength,
           tail:        o.tail,
           text:        o.text,
           visible:     o.visible,
@@ -88,6 +92,7 @@ foam.CLASS({
       label: 'X',
       code: function deleteRow(X) {
         X.properties.remove(X.data);
+        X.updateMemento();
       }
     }
   ]
@@ -161,10 +166,13 @@ foam.CLASS({
   ],
 
   exports: [
-    'timer',
+    'addProperty',
     'as data',
+    'physics',
     'properties',
-    'scope'
+    'scope',
+    'timer',
+    'updateMemento'
   ],
 
   axioms: [
@@ -196,14 +204,23 @@ foam.CLASS({
     {
       name: 'scope',
       factory: function() {
+        var self = this;
         return {
-          copy: function(obj) {
-            var m = {};
-            com.google.flow.Property.VALUE.cloneProperty(obj, m);
-            m.value.x += 30;
-            m.value.y += 30;
-            this.add(m.value);
-            return m.name;
+          clear: function() {
+            self.updateMemento().then(function() {
+              self.properties.skip(4).removeAll();
+            });
+          },
+          copy: function(obj, opt_n) {
+            var n = opt_n || 1;
+            for ( var i = 1 ; i <= n ; i++ ) {
+              var m = {};
+              com.google.flow.Property.VALUE.cloneProperty(obj, m);
+              m.value.x += 30*i;
+              m.value.y += 30*i;
+              this.add(m.value);
+            }
+            return 'copied';
           },
           add: function(obj, opt_name, opt_parent) {
             this.addProperty(obj, opt_name, undefined, opt_parent || 'canvas1');
@@ -258,6 +275,7 @@ foam.CLASS({
         dao.put(foam.audio.Speak.model_);
         dao.put(foam.audio.Beep.model_);
         dao.put(com.google.flow.Spring.model_);
+        dao.put(com.google.flow.Strut.model_);
         dao.put(com.google.flow.Cursor.model_);
         dao.put(com.google.flow.Script.model_);
         dao.put(foam.core.Model.model_);
@@ -358,6 +376,10 @@ foam.CLASS({
       }
     },
     'mouseTarget',
+    {
+      name: 'position',
+      view: { class: 'foam.u2.RangeView', onKey: true }
+    },
     'cmdLineFeedback_',
     {
       class: 'String',
@@ -396,7 +418,6 @@ foam.CLASS({
   ],
 
   methods: [
-
     function initE() {
       this.timer.start();
 
@@ -407,18 +428,7 @@ foam.CLASS({
       var self = this;
       halo.selected$.linkFrom(this.selected$);
 
-      this.memento$.sub(function() {
-        var m = this.memento;
-        if ( this.feedback_ ) return;
-        this.properties.skip(4).removeAll();
-        if ( m ) {
-          for ( var i = 0 ; i < m.length ; i++ ) {
-            var p = m[i];
-            this.addProperty(p.value, p.name, null, p.parent);
-          }
-        }
-        this.selected = null;
-      }.bind(this));
+      this.memento$.sub(this.onMemento);
 
       this.
           cssClass(this.myCls()).
@@ -458,6 +468,7 @@ foam.CLASS({
               start(foam.u2.Tab, {label: '+'}).
               end().
             end().
+            start(this.POSITION, {maxValue: this.totalSize_$}).style({width: '50%'}).end().
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().
           end().
@@ -601,7 +612,7 @@ foam.CLASS({
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
         // TODO: hack because addProperty is asyn
-        setTimeout(this.updateMemento.bind(this),100);
+        setTimeout(this.updateMemento.bind(this), 100);
       } else {
         for ( ; c !== this.canvas ; c = c.parent ) {
           var p = c.getPrivate_('lpp_');
@@ -616,6 +627,28 @@ foam.CLASS({
     function onRightClick(evt) {
       evt.preventDefault();
       if ( ! this.selected ) return;
+    },
+
+    {
+      name: 'onMemento_',
+      isMerged: true,
+      mergeDelay: 100,
+      code: function() {
+        var m = this.memento;
+        this.properties.skip(4).removeAll();
+        if ( m ) {
+          for ( var i = 0 ; i < m.length ; i++ ) {
+            var p = m[i];
+            this.addProperty(p.value, p.name, null, p.parent);
+          }
+        }
+        this.selected = null;
+      }
+    },
+
+    function onMemento() {
+      if ( this.feedback_ ) return;
+      this.onMemento_();
     }
   ]
 });

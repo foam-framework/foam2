@@ -456,7 +456,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.flow',
-  name: 'Spring',
+  name: 'Strut',
   extends: 'foam.graphics.CView',
 
   imports: [
@@ -468,6 +468,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'visible',
+      value: true
     },
     {
       class: 'String',
@@ -481,16 +482,6 @@ foam.CLASS({
       class: 'Float',
       name: 'length',
       value: 100
-    },
-    {
-      class: 'Float',
-      name: 'compression',
-      value: 0
-    },
-    {
-      class: 'Float',
-      name: 'stretch',
-      value: 4
     },
     [ 'color', 'black' ]
   ],
@@ -529,12 +520,116 @@ foam.CLASS({
       if ( ! c1 || ! c2 ) return;
 
       var l = this.length;
-      var s = this.stretch/1000;
-      var c = this.compression/1000;
+      var d = c1.distanceTo(c2);
+
+      // TODO: should take into account their relative masses.
+      // TODO: should move both objects.
+      var lx = c1.x - c2.x;
+      var ly = c1.y - c2.y;
+      var m = Math.sqrt(Math.pow(l, 2) / (Math.pow(lx, 2) + Math.pow(ly, 2)));
+      c2.x = c1.x - (lx * m);
+      c2.y = c1.y - (ly * m);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Spring',
+  extends: 'foam.graphics.CView',
+
+  imports: [
+    'scope',
+    'physics'
+  ],
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'visible',
+      value: true
+    },
+    {
+      class: 'String',
+      name: 'head'
+    },
+    {
+      class: 'String',
+      name: 'tail'
+    },
+    {
+      class: 'Float',
+      name: 'length',
+      value: 80
+    },
+    {
+      class: 'Float',
+      name: 'springWidth',
+      value: 4
+    },
+    {
+      class: 'Float',
+      precision: 2,
+      name: 'stretch',
+      units: '%'
+    },
+    {
+      class: 'Float',
+      name: 'compressionStrength',
+      value: 1
+    },
+    {
+      class: 'Float',
+      name: 'stretchStrength',
+      value: 4
+    },
+    [ 'color', 'black' ]
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.onDestroy(this.physics.onTick.sub(this.tick));
+      this.propertyChange.sub(this.tick);
+    },
+
+    function paintSelf(x) {
+      if ( ! this.visible ) return;
+
+      this.x = this.y = 0;
+
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+
+      if ( ! c1 || ! c2 ) return;
+
+      x.strokeStyle = this.color;
+      x.lineWidth = this.springWidth * Math.min(2, 100 / this.stretch);
+        this.springWidth
+
+      x.beginPath();
+      x.moveTo((c1.left_ + c1.right_)/2, (c1.top_ + c1.bottom_)/2);
+      x.lineTo((c2.left_ + c2.right_)/2, (c2.top_ + c2.bottom_)/2);
+      x.stroke();
+    }
+  ],
+
+  listeners: [
+    function tick() {
+      var c1 = this.scope[this.head];
+      var c2 = this.scope[this.tail];
+      if ( ! c1 || ! c2 ) return;
+
+      var l = this.length;
+      var s = this.stretchStrength/1000;
+      var c = this.compressionStrength/1000;
       var d = c1.distanceTo(c2);
       var a = Math.atan2(
           (c2.top_  + c2.bottom_ - c1.top_  - c1.bottom_)/2,
           (c2.left_ + c2.right_  - c1.left_ - c1.right_)/2);
+
+      this.stretch = d/this.length*100;
 
       if ( s && d > l ) {
         c1.applyMomentum( s * (d-l), a);
@@ -581,12 +676,12 @@ foam.CLASS({
 
   actions: [
     function run() {
-        with ( this.scope ) {
-          with ( { log: this.log.bind(this) } ) {
-            this.log('>', this.code);
-            this.log(eval('(function() {' + this.code + '})').call(this.data));
-          }
+      with ( this.scope ) {
+        with ( { log: this.log.bind(this) } ) {
+          this.log('>', this.code);
+          this.log(eval('(function() {' + this.code + '})').call(this.data));
         }
+      }
     },
 
     function clearOutput() {
@@ -603,25 +698,200 @@ foam.CLASS({
 
   implements: [ 'foam.physics.Physical' ],
 
+  requires: [ 'foam.graphics.Line', 'foam.graphics.CView' ],
+
+  // TODO: better to just add to parent and have listeners
+  // then add to physics or other interested parties
+  imports: [ 'addProperty' ],
+
   properties: [
     [ 'radiusX', 8 ],
     [ 'radiusY', 12 ],
-    [ 'color', 'green' ]
+    [ 'color', 'green' ],
+    {
+      class: 'Color',
+      name: 'penColor',
+      value: '#000000'
+    },
+    {
+      class: 'Float',
+      name: 'penWidth',
+      value: '1'
+    },
+    {
+      class: 'Boolean',
+      name: 'penDown',
+      value: true
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          x: this.x,
+          y: this.y,
+          penColor: this.penColor,
+          penWidth: this.penWidth,
+          penDown:  this.pendDown,
+          rotation: this.rotation
+        };
+      },
+      setter: function(m) {
+        this.copyFrom(m);
+      }
+    },
+    {
+      name: 'mementoStack_',
+      hidden: true,
+      factory: function() { return []; }
+    },
+    {
+      name: 'childLayer',
+      hidden: true,
+      factory: function() {
+        var l = this.CView.create();
+        this.parent.add(l);
+        return l;
+      }
+    }
   ],
 
   methods: [
     function init() {
       this.SUPER();
 
-      var ellipse1 = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:11,y:1});  this.add(ellipse1);
-      var ellipse2 = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:10,y:16}); this.add(ellipse2);
-      var ellipse3 = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-4,y:17}); this.add(ellipse3);
-      var ellipse4 = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-5,y:2});  this.add(ellipse4);
-      var head     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:6,radiusX:4,x:4,y:-10});     this.add(head);
-      var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6}); this.add(tail);
-      var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});   head.add(leftEye);
-      var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});      head.add(rightEye);
-      var turtle2  = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1}); this.add(turtle2);
+      var leg1     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:11,y:1});
+      var leg2     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:10,y:16});
+      var leg3     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-4,y:17});
+      var leg4     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-5,y:2});
+      var head     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:6,radiusX:4,x:4,y:-10});
+      var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});
+      var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});
+      var shell    = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1});
+      var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6});
+
+      head.add(leftEye, rightEye);
+      this.add(leg1, leg2, leg3, leg4, head, shell, tail);
+    },
+
+    function ss() {
+      this.mementoStack_.push(this.memento);
+      return this;
+    },
+
+    function rs() {
+      this.memento = this.mementoStack_.pop();
+      return this;
+    },
+
+    function pc(color) {
+      /* Pen Color */
+      this.penColor = color;
+      return this;
+    },
+
+    function pw(w) {
+      /* Pen Width */
+      this.penWidth = w;
+      return this;
+    },
+
+    function pu() {
+      /* Pen Up */
+      this.penDown = false;
+      return this;
+    },
+
+    function pd() {
+      /* Pen Down */
+      this.penDown = true;
+      return this;
+    },
+
+    function repeat(n, fn) {
+      for ( var i = 1 ; i <= n ; i++ ) fn.call(this, i);
+      return this;
+    },
+
+    function fd(d) {
+      /* ForwarD */
+      var x1 = this.x, y1 = this.y;
+      this.x += d * Math.cos(this.rotation+Math.PI/2);
+      this.y -= d * Math.sin(this.rotation+Math.PI/2);
+
+      if ( this.penDown ) {
+        // this.addProperty(this.Line.create({
+        this.childLayer.add(this.Line.create({
+          startX:    x1+this.radiusX,
+          startY:    y1+this.radiusY,
+          endX:      this.x+this.radiusX,
+          endY:      this.y+this.radiusY,
+          color:     this.penColor,
+          lineWidth: this.penWidth
+        }));
+      }
+
+      return this;
+    },
+
+    function bk(d) {
+      /* BacK */
+      return this.fd(-d);
+    },
+
+    function lt(a) {
+      /* Left Turn */
+      this.rotation += Math.PI*2*a/360;
+      return this;
+    },
+
+    function rt(a) {
+      /* Right Turn */
+      return this.lt(-a);
+    },
+
+    function st() {
+      /* Show Turtle */
+      this.alpha = 1;
+      var p = this.parent;
+      p.remove(this);
+      p.add(this);
+      return this;
+    },
+
+    function ht() {
+      /* Hide Turtle */
+      this.alpha = 0;
+      return this;
+    },
+
+    function lay(obj) {
+      obj.x = this.x;
+      obj.y = this.y;
+      this.addProperty(obj);
+      return this;
+    },
+
+    function spawn() {
+//      var child = this.clone();
+      var child = this.cls_.create({
+        x: this.x,
+        y: this.y,
+        penColor: this.penColor,
+        penWidth: this.penWidth,
+        penDown: this.pendDown,
+        rotation: this.rotation
+      }, this.__context__);
+      this.parent.add(child);
+      return child;
+    },
+
+    function die() {
+      this.parent && this.parent.remove(this);
+    },
+
+    function cs() {
+      this.childLayer.removeAllChildren();
     }
   ]
 });
