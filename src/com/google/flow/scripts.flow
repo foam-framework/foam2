@@ -351,3 +351,23 @@ repeat(360, (i) => {
   fd2(Math.random()*400);
   turtle1.rs();
 });
+
+
+
+
+canvas1.color = 'black';
+turtle1.cs();
+turtle1.ht();
+
+function fd2(s) {
+  repeat(s, () => turtle1.fd(1).rt(0.4));
+}
+
+repeat(360, (i) => {
+  turtle1.pw(1+Math.random()*2);
+  turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
+  turtle1.rt(1).ss().pu().fd(20+Math.random()*20);
+  turtle1.pd();
+  fd2(Math.random()*400);
+  turtle1.rs();
+});
