@@ -32,8 +32,11 @@ foam.CLASS({
   properties: [
     {
       name: 'data',
-      postSet: function(_, data) {
-        if ( data && data.cls_ !== this.of ) this.of = data.cls_;
+      preSet: function(_, data) {
+        if ( data && data.cls_ !== this.of ) {
+          this.of = data.cls_;
+        }
+        return data;
       }
     },
     {
