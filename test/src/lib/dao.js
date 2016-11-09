@@ -937,7 +937,7 @@ describe('SyncDAO', function() {
   function doSyncThen(fn) {
     syncDAO.sync();
     // let promises settle
-    setTimeout(fn, 100);
+    setTimeout(fn, 250);
   }
 
   function preloadRemote() {
