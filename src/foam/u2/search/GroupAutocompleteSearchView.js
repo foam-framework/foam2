@@ -131,7 +131,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'updateDAO',
-      isMerged: 100,
+      isMerged: true,
+      mergeDelay: 100,
       code: function() {
         // Makes a select query, grouping by the value of this.property.
         // That builds the this.groups list, which is what we're autocompleting

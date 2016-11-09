@@ -116,7 +116,8 @@ foam.CLASS({
   listeners: [
     {
       name: 'updateDAO',
-      isMerged: 100,
+      isMerged: true,
+      mergeDelay: 100,
       code: function() {
         var self = this;
         this.dao.select(this.GroupBy.create({

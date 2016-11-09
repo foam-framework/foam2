@@ -123,6 +123,7 @@ foam.CLASS({
   label: 'Decimal numbers',
 
   properties: [
+    'precision',
     [
       'adapt',
       function (_, v) {
@@ -299,8 +300,8 @@ foam.CLASS({
 
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
-          if ( typeof this[name] !== 'string' ) return this[name];
-          return this.__context__.lookup(this[name], true);
+          return typeof this[name] !== 'string' ? this[name] :
+            this.__context__.lookup(this[name], true);
         },
         configurable: true
       });

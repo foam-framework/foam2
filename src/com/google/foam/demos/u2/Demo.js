@@ -285,6 +285,18 @@ foam.CLASS({
     { class: 'Int', name: 'i' },
     'field1',
     'field2',
+    {
+      name: 'choices',
+      view: {
+//        class: 'foam.u2.view.ChoiceView',
+        class: 'foam.u2.view.RadioView',
+        choices: [
+          'ABC',
+          'DEF',
+          'XYZ'
+        ]
+      }
+    },
     'flip'
   ],
 
@@ -331,6 +343,8 @@ foam.CLASS({
               this.E('br'),
               this.FIELD1, ' ',
               this.FIELD2, ' ',
+              this.CHOICES, ' ',
+              this.CHOICES, ' ',
               this.E('br'),
               this.SAY_HELLO, ' ',
               this.RESET,
@@ -342,6 +356,8 @@ foam.CLASS({
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD1).attrs({onKey: true}).end().
           start(this.FIELD2).attrs({onKey: true}).end().
+          start(this.CHOICES).end().
+          start(this.CHOICES).end().
           tag('br').
 
           start(this.FIELD1, {data$: o2.field1$}).end().

@@ -839,18 +839,19 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Line',
   extends: 'foam.graphics.CView',
 
   properties: [
-    { class: 'Float', name: 'startX' },
-    { class: 'Float', name: 'startY' },
-    { class: 'Float', name: 'endX' },
-    { class: 'Float', name: 'endY' },
-    { class: 'Float', name: 'lineWidth', value: 1 },
-    { class: 'String', name: 'color', value: '#000' }
+    { class: 'Float',  name: 'startX' },
+    { class: 'Float',  name: 'startY' },
+    { class: 'Float',  name: 'endX' },
+    { class: 'Float',  name: 'endY' },
+    { class: 'Float',  name: 'lineWidth', value: 1 },
+    { class: 'String', name: 'color',     value: '#000000' }
   ],
 
   methods: [
@@ -1049,10 +1050,10 @@ foam.CLASS({
       getter: function() { return 2 * this.radiusY; },
       setter: function(h) { this.radiusY = h / 2; }
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radiusY; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radiusX; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radiusY; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radiusX; } },
+    { name: 'top_',    hidden: true, getter: function() { return this.y; } },
+    { name: 'left_',   hidden: true, getter: function() { return this.x; } },
+    { name: 'bottom_', hidden: true, getter: function() { return this.y+2*this.radiusY; } },
+    { name: 'right_',  hidden: true, getter: function() { return this.x+2*this.radiusX; } },
   ],
 
   methods: [
@@ -1066,22 +1067,9 @@ foam.CLASS({
         x.lineWidth = this.borderWidth;
         x.stroke();
       }
-    },
-
-    function hitTest(p) {
-      var r = this.radius + this.borderWidth/2 - 1;
-      return p.x*p.x + p.y*p.y <= r*r;
-    },
-
-    function intersects(c) {
-      if ( ! c.radius ) return c.intersects(this);
-      var r = this.radius + c.radius;
-      if ( this.border ) r += this.borderWidth/2-1;
-      if ( c.border    ) r += c.borderWidth/2-1;
-      var dx = this.x-c.x;
-      var dy = this.y-c.y;
-      return dx * dx + dy * dy <= r * r;
     }
+
+    // TODO: implement intersects()
   ]
 });
 
@@ -1257,7 +1245,11 @@ foam.CLASS({
     {
       name:  'align',
       label: 'Alignment',
-      value: 'start' // values: left, right, center, start, end
+      value: 'start',
+      view: {
+        class: 'foam.u2.view.RadioView',
+        choices: [ 'start', /*'left',*/ 'center', /*'right',*/ 'end' ]
+      }
     },
     {
       class: 'String',
@@ -1290,7 +1282,9 @@ foam.CLASS({
 
       c.fillText(
         this.text,
-        this.align === 'center' ? this.width/2 : 0,
+          this.align === 'start'  ? 0 :
+          this.align === 'center' ? this.width/2 :
+          this.width,
         this.height/2+10);
 
       if ( this.border ) {
