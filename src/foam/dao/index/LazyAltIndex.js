@@ -62,8 +62,7 @@ foam.CLASS({
 
   methods: [
 
-    function addIndex(index, root) {
-      // assert(root)
+    function addIndex(index) {
       // assert( ! index.progenitor )
       // This method should be called on an instance
       
@@ -109,25 +108,31 @@ foam.CLASS({
         var order = orderDirs.srcOrder;
         var nullSink = this.NullSink.create();
         var dfs = this.delegateFactories;
-
-        // sort by estimates, order the delegate cache, forget estimates
-        var estimates = dfs.map(function(df, i) { 
-          return { pos: i, df: df, est: df.estimate(1000, nullSink, undefined, undefined, order); }
-        });
-        estimates.sort(function(a,b) { return a.est - b.est; });
-        orderDirs.tags[this] = cache = estimates.map(function(est) { return est.df; });
+        var bestEst = Number.MAX_VALUE;
+        // Pick the best factory for the ordering, cache it
+        for ( var i = 0; i < dfs.length; i++ ) {
+          var est = dfs[i].estimate(1000, nullSink, undefined, undefined, order);
+          if ( est < bestEst ) {
+            cache = dfs[i];
+            bestEst = est;
+          }
+        }
+        orderDirs.tags[this] = cache;
       }
 
-      // for each factory, in order of speed
-      for ( var f = 0; f < cache.length; f++ ) {
-        // check if we have a delegate instance for it
-        for ( var i = 0; i < delegates.length; i++ ) {
-          // if we do, it's the best one
-          if ( delegates[i].progenitor === cache[f] ) return delegates[i];
-        }
+      // check if we have a delegate instance for the best factory
+      for ( var i = 0; i < delegates.length; i++ ) {
+        // if we do, it's the best one
+        if ( delegates[i].progenitor === cache ) return delegates[i];
       }
       
-      return delegates[0];
+      // we didn't have the right delegate generated, so add and populate it
+      // as per addIndex, but we skip checking the factory as we know it's stored
+      var newSubInst = cache.spawn();
+      this.plan(newSubInst).execute([], newSubInst);
+      this.delegates.push(newSubInst);
+      
+      return newSubInst;
     },
 
     function select(sink, skip, limit, orderDirs, predicate) {
