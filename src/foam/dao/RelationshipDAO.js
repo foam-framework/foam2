@@ -36,15 +36,9 @@ foam.CLASS({
       value: true
     },
     {
-      name: 'query',
-      factory: function() {
-        return this.relationship.targetDAOQuery();
-      }
-    },
-    {
       name: 'predicate',
       getter: function() {
-        return this.relationship.targetQueryFromSource(this.obj);
+        return this.relationship.targetQueryFromSource(this.obj, this.forward);
       }
     },
     {
