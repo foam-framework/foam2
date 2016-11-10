@@ -561,7 +561,7 @@ foam.LIB({
     // Can't be an FObject yet because we haven't built the class system yet
     /* istanbul ignore next */
     function isInstance(o) { return false; },
-    function clone(o)      { return o.clone(); },
+    function clone(o)      { return o ? o.clone() : this; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
