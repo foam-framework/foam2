@@ -27,10 +27,6 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'owner'
-    },
-    {
-      class: 'DateTime',
-      name: 'startTime'
     }
   ]
 });
