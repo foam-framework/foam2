@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.view',
+  package: 'foam.comics',
   name: 'DAOCreateController',
   imports: [
     'stack'

@@ -143,7 +143,6 @@ FOAM_FILES([
   { name: "foam/u2/view/DualView", flags: ['web'] },
   { name: "foam/u2/view/ColorPicker", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
-  { name: "foam/u2/view/DAOCreateController", flags: ['web'] },
   { name: "foam/u2/tag/Card", flags: ['web'] },
   { name: "foam/u2/dialog/Popup", flags: ['web'] },
   { name: "foam/u2/Autocompleter", flags: ['web'] },
@@ -159,6 +158,7 @@ FOAM_FILES([
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
+  { name: "foam/comics/DAOCreateController" },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] }
 ]);
