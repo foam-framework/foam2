@@ -570,28 +570,61 @@ foam.CLASS({
       //   This prevents dropping to scan mode too early, and restricts
       //   the remaning set more quickly.
       // EQ, IN,... CONTAINS, ... LT, GT...
+      var lazy = ( global.window && global.window.location.href.indexOf('lazy') > -1 );
 
-      // generate indexes, find costs, run with one or a few of the best
-      var bestCost = Number.MAX_VALUE;
-      var bestIndex;
-      var args = this.args;
-      for (var i = 0; i < args.length; i++ ) {
-        var arg = args[i];
-        var idx = arg.toIndex(tailFactory);
-        if ( ! idx ) continue;
+      if ( lazy ) {
+        // generate indexes, find costs, run with one or a few of the best
+        var bestCost = Number.MAX_VALUE;
+        var bestIndex;
+        var args = this.args;
+        for (var i = 0; i < args.length; i++ ) {
+          var arg = args[i];
+          var idx = arg.toIndex(tailFactory);
+          if ( ! idx ) continue;
 
-        var idxCost = Math.floor(idx.estimate(
-           1000, undefined, undefined, undefined, undefined, arg));
+          var idxCost = Math.floor(idx.estimate(
+             1000, undefined, undefined, undefined, undefined, arg));
 
-        if ( bestCost > idxCost ) {
-          bestIndex = idx;
-          bestCost = idxCost;
+          if ( bestCost > idxCost ) {
+            bestIndex = idx;
+            bestCost = idxCost;
+          }
         }
-      }
-      // TODO: consider chaining a few together if they are extremely
-      //  cheap.
+        // TODO: consider chaining a few together if they are extremely
+        //  cheap.
+        return bestIndex;
 
-      return bestIndex;
+      } else {
+        // non-lazy complete index
+        var sortedArgs = Object.create(null);
+        var costs = [];
+        var args = this.args;
+        for (var i = 0; i < args.length; i++ ) {
+          var arg = args[i];
+          var idx = arg.toIndex(tailFactory);
+          if ( ! idx ) continue;
+
+          var idxCost = Math.floor(idx.estimate(
+             1000, undefined, undefined, undefined, undefined, arg));
+          // make unique with a some extra digits
+          var costKey = idxCost + i / 1000.0;
+          sortedArgs[costKey] = arg;
+          costs.push(costKey);
+        }
+        costs = costs.sort(foam.Number.compare);
+
+        // Sort, build list up starting at the end (most expensive
+        //   will end up deepest in the index)
+        var tail = tailFactory;
+        for ( var i = costs.length - 1; i >= 0; i-- ) {
+          var arg = sortedArgs[costs[i]];
+          //assert(arg is a predicate)
+          tail = arg.toIndex(tail);
+        }
+
+        return tail;
+      }
+
     },
 
     function toDisjunctiveNormalForm() {

@@ -76,11 +76,11 @@ foam.CLASS({
         // ensure all tails are using the same factory instance
         index = this.delegateFactoryMap_[indexKey];
       }
-
-console.log("LazyAltIndex building ordering size", this.size());
+var start = Date.now();
       var newSubInst = index.spawn();
       this.plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
+console.log("LazyAltIndex building ordering size", this.size(), "in", Date.now() - start, "ms");
     },
 
     function bulkLoad(a) {
@@ -202,6 +202,16 @@ console.log("LazyAltIndex building ordering size", this.size());
 
     function toString() {
       return 'Alt([' + this.delegateFactories.join(',') + '])';
+    },
+
+    function toPrettyString(indent) {
+      var ret = "";
+      //ret += "  ".repeat(indent) + this.cls_.name + "([\n";
+      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
+          ret += this.delegateFactories[i].toPrettyString(indent + 1);
+      }
+      //ret += "  ".repeat(indent) + "])\n";
+      return ret;
     }
   ]
 });

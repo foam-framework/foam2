@@ -526,6 +526,17 @@ foam.CLASS({
 
     function toString() {
       return 'TreeIndex(' + this.prop.name + ', ' + this.tailFactory + ')';
+    },
+
+    function toPrettyString(indent) {
+      var ret = "";
+      //ret += "  ".repeat(indent) + this.cls_.name + "( " + this.prop.name + "\n";
+      //ret += this.tailFactory.toPrettyString(indent + 1);
+      //ret += "  ".repeat(indent) + ")\n";
+      var tail = this.tailFactory.toPrettyString(indent + 1);
+      ret = "  ".repeat(indent) + this.prop.name + "\n";
+      if ( tail.trim().length > 0 ) ret += tail;
+      return ret;
     }
   ]
 });
@@ -618,7 +629,8 @@ foam.CLASS({
       } else {
         this.root = this.root.removeKeyValue('', value, this.compare);
       }
-    }
+    },
+
   ]
 });
 

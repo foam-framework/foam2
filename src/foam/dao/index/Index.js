@@ -66,6 +66,8 @@ foam.CLASS({
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},
+
+    function toPrettyString(indent) {},
   ]
 });
 

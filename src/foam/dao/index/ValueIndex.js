@@ -43,6 +43,10 @@ foam.CLASS({
       return "ValueIndex_Plan(cost=1, value:" + this.value + ")";
     },
 
+    function toPrettyString(indent) {
+      return "";
+    },
+
     // from Index
     function put(s) { this.value = s; },
     function remove() { this.value = undefined; },

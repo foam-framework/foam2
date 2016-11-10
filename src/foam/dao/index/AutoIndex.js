@@ -147,7 +147,7 @@ foam.CLASS({
         prev.root = root;
 
         var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20));
+console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20), this.size());
         if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
           return this.delegate.plan(sink, skip, limit, order, predicate, root);
         }
@@ -161,7 +161,7 @@ console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substr
               * ARBITRARY_INDEX_CREATE_FACTOR
               + ARBITRARY_INDEX_CREATE_CONSTANT;
 
-console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().substring(0,20));
+//console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().substring(0,20));
             //TODO: must beat by factor of X? or constant?
             if ( bestCost > candidateCost ) {
               newIndex = candidate;
@@ -181,7 +181,7 @@ console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().subst
               skip, limit, order, predicate)
               * ARBITRARY_INDEX_CREATE_FACTOR
               + ARBITRARY_INDEX_CREATE_CONSTANT;
-console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().substring(0,20));
+//console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().substring(0,20));
             if ( bestCost > candidateCost ) {
               newIndex = candidate;
               bestCost = candidateCost;
@@ -195,8 +195,10 @@ console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().subst
           cost: bestCost,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 
-console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
-console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
+console.log(self.$UID, "BUILDING INDEX", bestCost);
+console.log(newIndex.toPrettyString(0));
+console.log(self.$UID, "ROOT          ");
+console.log(root.progenitor.toPrettyString(0));
 
             // TODO: PoliteIndex sometimes when ordering?
             //  NOTE: revise this note in case of LazyAltIndex
