@@ -907,7 +907,7 @@ describe('AutoIndex', function() {
   });
 
   it('supports manual addIndex()', function() {
-    idx.addPropertyIndex(test.Indexable.INT, idxInstance);
+    idxInstance.addPropertyIndex(test.Indexable.INT, idxInstance);
     expect(idxInstance.delegate.delegates.length).toEqual(2);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
@@ -927,6 +927,7 @@ describe('AutoIndex', function() {
     expect(idxInstance.delegate.delegates.length).toEqual(3);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
     expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
+
   });
 
   it('skips already auto indexed orderings', function() {

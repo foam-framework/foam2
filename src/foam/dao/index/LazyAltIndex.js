@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/** 
+/**
   Provides for hetergenious indexes, where not all potential delegates
   of this AltIndex actually get populated for each instance. Each instance
   always populates an ID index, so it can serve queries even if no
@@ -63,9 +63,10 @@ foam.CLASS({
   methods: [
 
     function addIndex(index) {
-      // assert( ! index.progenitor )
+      console.assert( ! index.progenitor );
+      console.assert( this.progenitor );
       // This method should be called on an instance
-      
+
       // check for existing factory
       var indexKey = index.toString();
       if ( ! this.delegateFactoryMap_[indexKey] ) {
@@ -73,9 +74,10 @@ foam.CLASS({
         this.delegateFactoryMap_[indexKey] = index;
       } else {
         // ensure all tails are using the same factory instance
-        index = this.delegateFactoryMap_[indexKey];        
+        index = this.delegateFactoryMap_[indexKey];
       }
 
+console.log("LazyAltIndex building ordering size", this.size());
       var newSubInst = index.spawn();
       this.plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
@@ -124,13 +126,13 @@ foam.CLASS({
         // if we do, it's the best one
         if ( delegates[i].progenitor === cache ) return delegates[i];
       }
-      
+
       // we didn't have the right delegate generated, so add and populate it
       // as per addIndex, but we skip checking the factory as we know it's stored
       var newSubInst = cache.spawn();
       this.plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
-      
+
       return newSubInst;
     },
 

@@ -29,6 +29,7 @@ foam.CLASS({
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Or',
     'foam.dao.index.AltIndex',
+    'foam.dao.index.LazyAltIndex',
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.False',
@@ -49,12 +50,21 @@ foam.CLASS({
     {
       name: 'delegateFactory',
       factory: function() {
-        return this.AltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
+        if ( this.lazy ) {
+          return this.LazyAltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
+        } else {
+          return this.AltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
+        }
       }
     },
     {
       name: 'previousPlanFor',
       factory: function() { return {}; }
+    },
+    {
+      class: 'Boolean',
+      name: 'lazy',
+      value: true
     }
   ],
 
@@ -68,10 +78,15 @@ foam.CLASS({
     },
     function addIndex(index, root) {
       // Use PoliteIndex if this DAO is big
-      if ( root.size() > this.PoliteIndex.SMALL_ENOUGH_SIZE ) {
-        index = this.PoliteIndex.create({ delegateFactory: index });
+      if ( ! this.lazy ) {
+        if ( root.size() > this.PoliteIndex.SMALL_ENOUGH_SIZE ) {
+          index = this.PoliteIndex.create({ delegateFactory: index });
+        }
+        this.delegateFactory.addIndex(index, root);
+      } else {
+        console.assert(this.progenitor, "Must call addIndex() on AutoIndex instance if in lazy mode");
+        this.delegate.addIndex(index, root);
       }
-      this.delegateFactory.addIndex(index, root);
     },
 
     // TODO: mlang comparators should support input collection for
@@ -113,7 +128,8 @@ foam.CLASS({
       // (if our parent is sub-planning, we will be called on to plan
       //  multiple times for the same query)
       var prev = this.progenitor.previousPlanFor;
-      if ( ( ! prev.sink && ! prev.skip && ! prev.limit && ! prev.order &&
+      if ( this.lazy ||
+           ( ! prev.sink && ! prev.skip && ! prev.limit && ! prev.order &&
             ! prev.predicate && ! prev.root ) ||
            ( sink      !== prev.sink ||
              skip      !== prev.skip ||
@@ -175,8 +191,8 @@ foam.CLASS({
         return this.CustomPlan.create({
           cost: bestCost,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
-//console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
-//console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
+console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
+console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
 
             // TODO: PoliteIndex sometimes when ordering?
             //  When ordering, the cost of sorting will depend on the total
