@@ -64,7 +64,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'lazy',
-      value: true
+      value: ( global.window && global.window.location.href.indexOf('lazy') > -1 ) //HACK remove
     }
   ],
 
@@ -152,7 +152,8 @@ foam.CLASS({
         }
 
         if ( predicate ) {
-          var candidate = predicate.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+          var candidate = predicate.toIndex(this.lazy ? this.idIndexFactory :
+            this.cls_.create({ idIndexFactory: this.idIndexFactory }));
           if ( candidate ) {
             var candidateCost = candidate.estimate(this.delegate.size(), sink,
               skip, limit, order, predicate)
@@ -172,7 +173,8 @@ foam.CLASS({
         //  Except: the order index.estimate gets the order AND predicate,
         //   so the predicate might make this index worse
         if ( order ) {
-          var candidate = order.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+          var candidate = order.toIndex( this.lazy ? this.idIndexFactory :
+            this.cls_.create({ idIndexFactory: this.idIndexFactory }));
           if ( candidate ) {
             var candidateCost = candidate.estimate(this.delegate.size(), sink,
               skip, limit, order, predicate)
@@ -194,7 +196,31 @@ foam.CLASS({
 console.log(self.$UID, "BUILDING INDEX", bestCost, newIndex.toString());
 console.log(self.$UID, "ROOT          ", root.progenitor.toString(), "\n\n");
 
+            // HACK instead change And.toIndex to be more thrifty
+            // Insert auto indexes into the chain
+            //  this will be bad... no standard for chaining yet
+            if ( this.lazy ) {
+              function insertAutos(idx) {
+                if ( idx.delegateFactory ) {
+                  insertAutos(currIdx.delegateFactory);
+                } else if ( idx.delegateFactories ) {
+                  for ( var i = 0; i < idx.delegateFactories.length; i++ ) {
+                    insertAutos(idx.delegateFactories[i]);
+                  }
+                } else if ( idx.tailFactory ) {
+                  // Throw out old tail, only a single level is kept, plus an Auto
+                  idx.tailFactory = self.cls_.create({
+                    idIndexFactory: self.idIndexFactory
+                  });
+                }
+              };
+              insertAutos(newIndex);
+            }
+
+console.log(self.$UID, "      ACTUAL::", bestCost, newIndex.toString());
+
             // TODO: PoliteIndex sometimes when ordering?
+            //  NOTE: revise this note in case of LazyAltIndex
             //  When ordering, the cost of sorting will depend on the total
             //  size of the DAO (index create cost) versus the size of the
             //  result set at this index node. It might be cheap enough to

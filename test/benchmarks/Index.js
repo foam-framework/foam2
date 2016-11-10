@@ -42,7 +42,7 @@ xdescribe("Index benchmarks", function() {
     Math.random = oldRandom;
   });
 
-  it("Multi-level index", function(done) {
+  xit("Multi-level index", function(done) {
 
     foam.CLASS({
       name: 'Subject',
