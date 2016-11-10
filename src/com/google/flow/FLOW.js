@@ -206,6 +206,10 @@ foam.CLASS({
       factory: function() {
         var self = this;
         return {
+          repeat: function(n, fn) {
+            for ( var i = 1 ; i <= n ; i++ ) fn.call(this, i);
+            return this;
+          },
           clear: function() {
             self.updateMemento().then(function() {
               self.properties.skip(4).removeAll();

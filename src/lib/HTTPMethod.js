@@ -35,7 +35,11 @@ foam.CLASS({
   ],
 
   constants: {
-    OUTPUTTER: { __proto__: foam.json.Strict, outputDefaultValues: false },
+    OUTPUTTER: { 
+      __proto__: foam.json.Strict, 
+      outputDefaultValues: false, 
+      outputClassNames: false 
+    },
   },
 
   properties: [
@@ -54,6 +58,12 @@ foam.CLASS({
       of: 'foam.net.HTTPArgument',
       factory: function() { return []; }
     },
+    {
+      /** If the request should build a request body object and fill in the 
+        supplied args, the request object's Class is specified here. */
+      class: 'Class',
+      name: 'buildRequestType',
+    },    
     {
       /** HTTPMethods will always return a Promise, but the Promise will pass
         along a parameter of the type specified here. */
@@ -119,6 +129,9 @@ foam.CLASS({
       var query = "";
       var request = host[this.HTTPRequestFactoryName]();
 
+      // if building a request object, start with an empty instance
+      var requestObject = self.buildRequestType ? self.buildRequestType$cls.create() : null;
+
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {
         var val = opt_args[param.name];
@@ -129,18 +142,27 @@ foam.CLASS({
         if ( param.location === 'body' ) {
           // set the request body content
           // TODO: assert it's the first param, no more than one body
+          if ( requestObject ) {
+            throw "Can't set both RequestObject " +
+              self.buildRequestType + " and param.location==body for " + pname;
+          }
           request.payload = self.OUTPUTTER.stringify(val);
         } else if ( param.location === 'path' ) {
           // find the placeholder and replace it
           path = path.replace("{"+pname+"}", val.toString());
+          if ( requestObject ) requestObject[pname] = val;
         } else if ( param.location === 'query' ) {
           // add to query string
           query += "&" + pname + "=" + val.toString();
+          if ( requestObject ) requestObject[pname] = val;
         }
       });
       path = path + ( query ? "?" + query.substring(1) : "" );
       request.path += path;
       request.method = self.httpMethod;
+      if ( requestObject ) {
+        request.payload = self.OUTPUTTER.stringify(requestObject);
+      }
 
       return request.send().then(function(response) {
         if ( response.status >= 400 ) {

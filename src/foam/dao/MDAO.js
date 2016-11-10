@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /* Indexed Memory-based DAO. */
 foam.CLASS({
   package: 'foam.dao',
