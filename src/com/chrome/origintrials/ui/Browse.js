@@ -45,6 +45,8 @@ foam.CLASS({
       this.
         start(this.APPLY, { data: this }).
         end().
+        start(this.CREATE_EXPERIMENT, { data: this }).
+        end().
         start(this.Tabs).
           start(this.Tab, { label: 'Applications' }).
             start(this.FilterController, {
@@ -59,7 +61,7 @@ foam.CLASS({
           end().
           start(this.Tab, { label: 'Experiments' }).
             start(this.FilterController, {
-              searchFields: [ 'name' ],
+              searchFields: [ 'name', 'owner' ],
               data: this.experimentDAO
             }).
             end().
@@ -71,7 +73,19 @@ foam.CLASS({
     {
       name: 'apply',
       code: function() {
-        this.stack.push({ class: 'com.chrome.origintrials.ui.Apply' });
+        this.stack.push({
+          class: 'foam.u2.view.DAOCreateController',
+          of: 'com.chrome.origintrials.model.Application'
+        });
+      }
+    },
+    {
+      name: 'createExperiment',
+      code: function() {
+        this.stack.push({
+          class: 'foam.u2.view.DAOCreateController',
+          of: 'com.chrome.origintrials.model.Experiment'
+        });
       }
     },
     {
