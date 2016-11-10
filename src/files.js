@@ -160,5 +160,6 @@ FOAM_FILES([
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
   { name: "foam/comics/DAOCreateController" },
   { name: "lib/node/net", flags: ['node'] },
-  { name: "lib/node/box", flags: ['node'] }
+  { name: "lib/node/box", flags: ['node'] },
+  { name: "lib/HTTPMethod" }
 ]);

@@ -74,7 +74,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( o === null ) return foam.mlang.Constant.create({ value: o });
+        if ( o === null ) return foam.mlang.Constant.create({ value: null });
         if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== 'object' ) return foam.mlang.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
@@ -746,7 +746,11 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        return foam.util.equals(this.arg1.f(o), this.arg2.f(o));
+        var v1 = this.arg1.f(o);
+        var v2 = this.arg2.f(o);
+
+        // First check is so that EQ(Class.PROPERTY, null | undefined) works.
+        return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       },
       // TODO(adamvy): Better optional than all the Comparable casts?
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
@@ -1069,18 +1073,14 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Desc',
-  implements: ['foam.mlang.order.Comparator'],
+  implements: [ 'foam.mlang.order.Comparator' ],
 
   properties: [
     {
       class: 'FObjectProperty',
+      name: 'arg1',
       of: 'foam.mlang.order.Comparator',
-      adapt: function(_, a) {
-        // TODO(adamvy): We should fix FObjectProperty's default adapt when the
-        // of parameter is an interface rather than a class.
-        return a;
-      },
-      name: 'arg1'
+      adapt: function(_, c) { return foam.compare.toCompare(c); }
     }
   ],
 
@@ -1101,6 +1101,109 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'ThenBy',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        return a;
+      },
+      name: 'arg1'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.order.Comparator',
+      adapt: function(_, a) {
+        return a;
+      },
+      name: 'arg2'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        // an equals of arg1.compare is falsy, which will then hit arg2
+        return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
+      }
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return 'THEN_BY(' + this.arg1.toString() + ', ' +
+          this.arg2.toString() + ')';
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.order',
+  name: 'CustomComparator',
+  implements: ['foam.mlang.order.Comparator'],
+
+  properties: [
+    {
+      class: 'Function',
+      name: 'compareFn'
+    },
+  ],
+
+  methods: [
+    {
+      name: 'compare',
+      code: function(o1, o2) {
+        return this.compareFn(o1, o2);
+      }
+    },
+    {
+      name: 'toString',
+      code: function() {
+        return 'CUSTOM_COMPARE(' + this.arg1.toString() + ')';
+      }
+    }
+  ]
+});
+
+foam.LIB({
+  name: 'foam.compare',
+  methods: [
+    function desc(c) {
+      return foam.mlang.order.Desc.create({ arg1: c });
+    },
+
+    function toCompare(c /*foam.mlang.order.Comparator*/) {
+      var ret = foam.Array.isInstance(c) ? foam.compare.compound(c) :
+        foam.Function.isInstance(c) ? foam.mlang.order.CustomComparator.create({ compareFn: c }) :
+        c ;
+      return ret;
+    },
+
+    function compound(/*array*/ args) {
+      var cs = args.map(foam.compare.toCompare);
+
+      if ( cs.length === 0 ) return;
+      if ( cs.length === 1 ) return cs[0];
+
+      var ret = foam.mlang.order.ThenBy.create({
+        arg1: cs[cs.length - 1],
+        arg2: cs[cs.length - 2]
+      });
+      for ( var i = cs.length - 3; i >= 0; i-- ) {
+        ret = foam.mlang.order.ThenBy.create({ arg1: cs[i], arg2: ret });
+      }
+      return ret;
+    }
+  ]
+});
+
 
 
 foam.CLASS({
@@ -1209,7 +1312,7 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
 
-    function DESC(a) { return this._unary_("Desc", a); },
+    function DESC(c) { return this.Desc.create({ arg1: c }); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
   ]
 });

@@ -120,7 +120,6 @@ foam.CLASS({
             })
           ];
         }
-
       }
 
       if ( ! targetProps.length ) {
