@@ -22,6 +22,19 @@ public class Context {
 
     x = x.put("applicationDAO", applicationDAO);
 
+    DAO experimentDAO = x.create(DatastoreDAO.class).setOf(Experiment.getOwnClassInfo());
+
+    x = x.put("experimentDAO", experimentDAO);
+
+    foam.box.ProxyBox me = x.create(foam.box.ProxyBox.class);
+    x = x.put("me", me);
+
+    foam.box.BoxRegistryBox registry = x.create(foam.box.BoxRegistryBox.class);
+
+    me.setDelegate(registry);
+
+    x = x.put("registry", registry);
+
     x_ = x;
 
     return x_;
