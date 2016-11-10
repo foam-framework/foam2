@@ -18,10 +18,10 @@
 // TODO: Implement Hetergenious AltIndex to allow incomplete AutoIndexing
 
 // TODO: Consider giving predicates an estimate as well: if an index arrives at
-//   ValueIndex, and still must evaluate remaining predicates on each value, the 
+//   ValueIndex, and still must evaluate remaining predicates on each value, the
 //   estimated cost may be greater than one for things like CONTAINS, spatial
 //   mlangs like WITHIN_RADIUS, or full-text searching. If an index had processed
-//   those predicates earlier in the chain, the cost would be much less than a 
+//   those predicates earlier in the chain, the cost would be much less than a
 //   scan-and-filter-all. Default estimate of 1 would be fine for most simple
 //   comparison predicates.
 
@@ -187,6 +187,16 @@ foam.CLASS({
 
     function toString() {
       return 'Alt([' + this.delegateFactories.join(',') + '])';
+    },
+
+    function toPrettyString(indent) {
+      var ret = "";
+      //ret += "  ".repeat(indent) + this.cls_.name + "([\n";
+      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
+          ret += this.delegateFactories[i].toPrettyString(indent + 1);
+      }
+      //ret += "  ".repeat(indent) + "])\n";
+      return ret;
     }
   ]
 });

@@ -60,5 +60,13 @@ foam.CLASS({
     },
 
     function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
+
+    function toPrettyString(indent) {
+//       var ret = "  ".repeat(indent) + this.cls_.name + "(\n";
+//       ret += this.delegateFactory.toPrettyString(indent + 1);
+//       ret += "  ".repeat(indent) + ")\n";
+//       return ret;
+      return this.delegateFactory.toPrettyString(indent);
+    }
   ]
 });
