@@ -74,7 +74,7 @@ foam.CLASS({
       name: 'apply',
       code: function() {
         this.stack.push({
-          class: 'foam.u2.view.DAOCreateController',
+          class: 'foam.comics.DAOCreateController',
           of: 'com.chrome.origintrials.model.Application'
         });
       }
@@ -83,7 +83,7 @@ foam.CLASS({
       name: 'createExperiment',
       code: function() {
         this.stack.push({
-          class: 'foam.u2.view.DAOCreateController',
+          class: 'foam.comics.DAOCreateController',
           of: 'com.chrome.origintrials.model.Experiment'
         });
       }
