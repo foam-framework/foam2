@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/dao/index/Index" },
   { name: "foam/dao/index/ProxyIndex" },
   { name: "foam/dao/index/AltIndex" },
+  { name: "foam/dao/index/LazyAltIndex" },
   { name: "foam/dao/index/ValueIndex" },
   { name: "foam/dao/index/AATree" },
   { name: "foam/dao/index/TreeIndex" },
