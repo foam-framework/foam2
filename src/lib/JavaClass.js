@@ -263,6 +263,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'innerClass',
       value: false
+    },
+    {
+      name: 'extras',
+      factory: function() { return []; }
     }
   ],
   methods: [
@@ -330,6 +334,7 @@ foam.CLASS({
       }).forEach(function(f) { o.out(f, '\n'); });
       this.methods.forEach(function(f) { o.out(f, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });
+      this.extras.forEach(function(c) { o.out(c, '\n'); });
       o.decreaseIndent();
       o.indent();
       o.out('}');

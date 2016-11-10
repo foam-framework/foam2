@@ -359,12 +359,28 @@ foam.CLASS({
     }
   ],
 
-  methods: [
+  axioms: [
     {
-      name: 'init',
-      javaCode: 'setRegistry(getX().create(java.util.HashMap.class));',
-      code: function(){}
-    },
+      name: 'javaInit',
+      buildJavaClass: function(cls) {
+        // TODO(adamvy): Remove this once we have java factory support.
+        cls.extras.push({
+          outputJava: function(o) {
+            o.indent();
+            o.out('{\n');
+            o.increaseIndent();
+            o.indent();
+            o.out('setRegistry(getX().create(java.util.HashMap.class));\n');
+            o.decreaseIndent();
+            o.indent();
+            o.out('}');
+          }
+        });
+      }
+    }
+  ],
+
+  methods: [
     {
       name: 'doLookup',
       returns: 'foam.box.Box',
