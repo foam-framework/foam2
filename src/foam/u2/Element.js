@@ -48,7 +48,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function output(out) { out('&', this.name, ';'); }
+    function output(out) { out('&', this.name, ';'); },
+    function toE() { return this; }
   ]
 });
 
@@ -1142,6 +1143,10 @@ foam.CLASS({
       return this;
     },
 
+    function toE() {
+      return this;
+    },
+
     function add_(cs, parentNode) {
       /* Add Children to this Element. */
       var es = [];
@@ -1604,6 +1609,35 @@ foam.CLASS({
 
 foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+  methods: [
+    function toE(args, X) {
+      return foam.u2.ViewSpec.createView(
+        { class: 'foam.u2.DetailView', showActions: true, data: this },
+        args, this, X);
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Slot',
+  methods: [
+    function toE() {
+      return this;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.ExpressionSlot',
+  methods: [
+    function toE() {
+      return this;
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Property',
