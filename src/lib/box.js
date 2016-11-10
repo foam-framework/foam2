@@ -1418,10 +1418,17 @@ foam.CLASS({
         var replyBox = msg.replyBox;
         var errorBox = msg.errorBox;
 
+        // TODO(adamvy): Replace this nonsense with context aware json serialization
+        // that will serialize the ME box as a reply box, and leave the others untouched.
+
         if ( replyBox ) {
           msg.replyBox = this.HTTPReplyBox.create();
         }
-        // TODO: set error box as well?
+
+        if ( foam.box.WrappedMessage.isInstance(msg) && msg.message.replyBox ) {
+          if ( ! replyBox ) replyBox = msg.message.replyBox;
+          msg.message.replyBox = this.HTTPReplyBox.create();
+        }
 
         var req = this.HTTPRequest.create({
           url: this.url,
