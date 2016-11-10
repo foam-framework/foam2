@@ -392,3 +392,9 @@ repeat(360, (i) => {
   turtle1.rs();
 });
 
+
+
+
+turtle1.cs().home().ht().pw(1.5).repeat(360*4, (i) => {
+  turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)').rt(1/4).fd(550).bk(550);
+});
