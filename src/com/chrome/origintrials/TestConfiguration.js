@@ -32,7 +32,7 @@ foam.CLASS({
   methods: [
     function genTestData() {
       var data = [];
-      for ( var i = 0 ; i < 100 ; i++ ) {
+      for ( var i = 0 ; i < 10 ; i++ ) {
         data.push(this.genApplication());
       }
       return data;
@@ -53,7 +53,7 @@ foam.CLASS({
         applicantEmail: this.rand(emails),
         origin: this.rand(origins),
         public: this.bool(),
-        requestedFeature: this.rand(features),
+        experiment: this.rand(features),
         agreedToTerms: this.bool(),
         comments: this.rand(comments)
       };
