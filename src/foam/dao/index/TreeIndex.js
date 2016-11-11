@@ -534,7 +534,7 @@ foam.CLASS({
       //ret += this.tailFactory.toPrettyString(indent + 1);
       //ret += "  ".repeat(indent) + ")\n";
       var tail = this.tailFactory.toPrettyString(indent + 1);
-      ret = "  ".repeat(indent) + this.prop.name + "\n";
+      ret = "  ".repeat(indent) + this.prop.name + "(" + this.$UID + ")\n";
       if ( tail.trim().length > 0 ) ret += tail;
       return ret;
     }
