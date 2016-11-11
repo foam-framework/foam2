@@ -497,3 +497,56 @@ function waves(r) {
 }
 
 waves(200);
+
+
+
+// inspired by: http://www.mrcolson.com/2015/12/09/Python-Art.html
+var t = turtle1;
+t.cs();
+t.pw(8);
+
+function sind(d) {
+  return Math.sin(d * Math.PI * 2 / 360);
+}
+
+function waves(r) {
+  repeat(r, (i) => {
+    var y = i * t.parent.height / r;
+    t.pc(hsl(i/r*720%360+180,70,15+i/r*45));
+    t.pu();
+    repeat(t.parent.width/10, (x) => {
+      x *= 10;
+      var a = (10+i/r*50) * sind(1000*x/(y+150) + y*2);
+      t.gt(x, y + a);
+      t.pd();
+    });
+  });
+}
+
+waves(600);
+
+
+// Grayscale version:
+var t = turtle1;
+t.cs();
+t.pw(8);
+
+function sind(d) {
+  return Math.sin(d * Math.PI * 2 / 360);
+}
+
+function waves(r) {
+  repeat(r, (i) => {
+    var y = i * t.parent.height / r;
+    t.pc(hsl(i/r*720%360+180,0,15+i/r*45));
+    t.pu();
+    repeat(t.parent.width/10, (x) => {
+      x *= 10;
+      var a = (10+i/r*50) * sind(1000*x/(y+150) + y*2);
+      t.gt(x, y + a);
+      t.pd();
+    });
+  });
+}
+
+waves(600);
