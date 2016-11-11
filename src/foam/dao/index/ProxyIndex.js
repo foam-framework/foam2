@@ -29,7 +29,7 @@ foam.CLASS({
       class: 'foam.pattern.progenitor.PerInstance',
       name: 'delegate',
       factory: function() {
-        return this.delegateFactory.spawn();
+        return this.progenitor.delegateFactory.spawn();
       }
     },
   ],

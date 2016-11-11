@@ -21,7 +21,7 @@ describe('Progenitor', function() {
         {
           class: 'foam.pattern.progenitor.PerInstance',
           name: 'c',
-          factory: function() { return this.normalD; }
+          factory: function() { return this.progenitor.normalD; }
         },
         {
           name: 'normalD',
@@ -33,21 +33,6 @@ describe('Progenitor', function() {
   });
   afterEach(function() {
     progenitor = null;
-  });
-
-  it('blanks per instance properties', function() {
-    progenitor.a = "hideMe";
-    progenitor.b = "defaultMe";
-
-    var spawn = progenitor.spawn();
-
-    expect(spawn.a).toBeUndefined();
-    expect(spawn.b).toEqual(54);
-
-    expect(progenitor.a).toEqual("hideMe");
-    expect(progenitor.b).toEqual("defaultMe");
-
-    expect(spawn.spawn).toEqual(null);
   });
 
   it('instances are separate', function() {
@@ -87,14 +72,6 @@ describe('Progenitor', function() {
     expect(spawn.progenitor).toBe(progenitor);
 
     expect(progenitor.progenitor).toBeUndefined();
-  });
-
-  it('covers spawn.describe()', function() {
-    var spawn = progenitor.spawn();
-
-    spawn.describe();
-
-
   });
 
   it('supports inheritance', function() {

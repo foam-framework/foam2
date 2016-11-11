@@ -107,6 +107,7 @@ foam.CLASS({
 
   constants: {
     IS_EXPR_MATCH_FN: function isExprMatch(predicate, prop, model) {
+      var self = this.progenitor || this;
       if ( predicate && model && prop ) {
         // util.equals catches Properties that were cloned if the predicate has
         //  been cloned.
@@ -118,14 +119,14 @@ foam.CLASS({
           return { arg2: arg2, predicate: predicate };
         }
 
-        if ( predicate.args && this.And.isInstance(predicate) ) {
+        if ( predicate.args && self.And.isInstance(predicate) ) {
           for ( var i = 0 ; i < predicate.args.length ; i++ ) {
             var q = predicate.args[i];
             if ( model.isInstance(q) && q.arg1 === prop ) {
               predicate = predicate.clone();
-              predicate.args[i] = this.True.create();
+              predicate.args[i] = self.True.create();
               predicate = predicate.partialEval();
-              if (  this.True.isInstance(predicate) ) predicate = undefined;
+              if (  self.True.isInstance(predicate) ) predicate = undefined;
               return { arg2: q.arg2, predicate: predicate };
             }
           }
@@ -147,7 +148,9 @@ foam.CLASS({
     {
       class: 'foam.pattern.progenitor.PerInstance',
       name: 'root',
-      factory: function() { return this.nullNode; }
+      factory: function() { 
+        return this.progenitor.nullNode; 
+      }
     },
     {
       name: 'nullNode',
@@ -175,7 +178,7 @@ foam.CLASS({
     function init() {
 
       // TODO: replace with bound methods when available
-      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.dedup, this);
+      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.progenitor.dedup, this);
       //this.compare = foam.Function.bind(this.compare, this);
     },
 
@@ -185,15 +188,16 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.nullNode;
+      this.root = this.progenitor.nullNode;
 
       // Only safe if children aren't themselves trees
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.ValueIndex.isInstance(this.tailFactory) ) {
-        a.sort(this.prop.compare.bind(this.prop));
-        this.root = this.root.bulkLoad_(a, 0, a.length-1, this.prop.f);
+      if ( this.progenitor.ValueIndex.isInstance(this.tailFactory) ) {
+        var prop = this.progenitor.prop;
+        a.sort(prop.compare.bind(prop));
+        this.root = this.root.bulkLoad_(a, 0, a.length-1, prop.f);
       } else {
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.put(a[i]);
@@ -209,16 +213,16 @@ foam.CLASS({
 
     function put(newValue) {
       this.root = this.root.putKeyValue(
-          this.prop.f(newValue),
+          this.progenitor.prop.f(newValue),
           newValue,
           this.compare,
-          this.dedup,
+          this.progenitor.dedup,
           this.selectCount > 0);
     },
 
     function remove(value) {
       this.root = this.root.removeKeyValue(
-          this.prop.f(value),
+          this.progenitor.prop.f(value),
           value,
           this.compare,
           this.selectCount > 0);
@@ -334,16 +338,18 @@ foam.CLASS({
 
     function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
+      var m = this.progenitor;
 
-      if ( index.False.isInstance(predicate) ) return this.NotFoundPlan.create();
 
-      if ( ! predicate && index.Count.isInstance(sink) ) {
+      if ( m.False.isInstance(predicate) ) return m.NotFoundPlan.create();
+
+      if ( ! predicate && m.Count.isInstance(sink) ) {
         var count = this.size();
         //        console.log('**************** COUNT SHORT-CIRCUIT ****************', count, this.toString());
-        return index.CountPlan.create({ count: count });
+        return m.CountPlan.create({ count: count });
       }
 
-      var prop = this.prop;
+      var prop = m.prop;
 
       // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
       // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
@@ -355,9 +361,9 @@ foam.CLASS({
 
       var result, subPlan, cost;
 
-      var isExprMatch = this.IS_EXPR_MATCH_FN.bind(this, predicate, prop);
+      var isExprMatch = m.IS_EXPR_MATCH_FN.bind(this, predicate, prop);
 
-      var expr = isExprMatch(this.In);
+      var expr = isExprMatch(m.In);
       if ( expr ) {
         predicate = expr.predicate;
            // Just scan if that would be faster.
@@ -377,37 +383,37 @@ foam.CLASS({
             }
           }
 
-          if ( subPlans.length === 0 ) return index.NotFoundPlan.create();
+          if ( subPlans.length === 0 ) return m.NotFoundPlan.create();
 
           // TODO: If ordering, AltPlan may need to sort like MergePlan.
-          return index.AltPlan.create({
+          return m.AltPlan.create({
             subPlans: subPlans,
             prop: prop
           });
         }
       }
 
-      expr = isExprMatch(this.Eq);
+      expr = isExprMatch(m.Eq);
       if ( expr ) {
         predicate = expr.predicate;
         var key = expr.arg2.f();
         result = this.get(key, this.compare);
 
-        if ( ! result ) return index.NotFoundPlan.create();
+        if ( ! result ) return m.NotFoundPlan.create();
 
         subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
         // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return index.AltPlan.create({
+        return m.AltPlan.create({
           subPlans: [subPlan],
           prop: prop
         });
       }
 
       var ic = false;
-      expr = isExprMatch(this.ContainsIC);
+      expr = isExprMatch(m.ContainsIC);
       if ( expr ) ic = true;
-      expr = expr || isExprMatch(this.Contains);
+      expr = expr || isExprMatch(m.Contains);
       if ( expr ) {
         predicate = expr.predicate;
         var key = ic ? expr.arg2.f().toLowerCase() : expr.arg2.f();
@@ -438,7 +444,7 @@ foam.CLASS({
         }
 
         // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return index.AltPlan.create({
+        return m.AltPlan.create({
           subPlans: subPlans,
           prop: prop
         });
@@ -447,20 +453,20 @@ foam.CLASS({
       // Restrict the subtree to search as necessary
       var subTree = this.root;
 
-      expr = isExprMatch(this.Gt);
+      expr = isExprMatch(m.Gt);
       if ( expr ) subTree = subTree.gt(expr.arg2.f(), this.compare);
 
-      expr = isExprMatch(this.Gte);
+      expr = isExprMatch(m.Gte);
       if ( expr ) subTree = subTree.gte(expr.arg2.f(), this.compare);
 
-      expr = isExprMatch(this.Lt);
+      expr = isExprMatch(m.Lt);
       if ( expr ) subTree = subTree.lt(expr.arg2.f(), this.compare);
 
-      expr = isExprMatch(this.Lte);
+      expr = isExprMatch(m.Lte);
       if ( expr ) subTree = subTree.lte(expr.arg2.f(), this.compare);
 
       cost = subTree.size;
-      var sortRequired = ! this.isOrderSelectable(order);
+      var sortRequired = ! this.progenitor.isOrderSelectable(order);
       var reverseSort = false;
 
       var subOrder;
@@ -479,11 +485,11 @@ foam.CLASS({
         if ( cost !== 0 ) cost *= Math.log(cost) / Math.log(2);
       }
 
-      return index.CustomPlan.create({
+      return m.CustomPlan.create({
         cost: cost,
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           if ( sortRequired ) {
-            var arrSink = index.ArraySink.create();
+            var arrSink = m.ArraySink.create();
             index.selectCount++;
             subTree.select(arrSink, null, null, null, predicate, {});
             index.selectCount--;
@@ -517,7 +523,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'TreeIndex(' + this.prop.name + ', ' + this.tailFactory + ')';
+      return 'TreeIndex(' + (this.progenitor || this).prop.name + ', ' + (this.progenitor || this).tailFactory + ')';
     },
 
     function toPrettyString(indent) {
@@ -543,16 +549,16 @@ foam.CLASS({
   methods: [
     function put(newValue) {
       this.root = this.root.putKeyValue(
-          this.prop.f(newValue).toLowerCase(),
+          this.progenitor.prop.f(newValue).toLowerCase(),
           newValue,
           this.compare,
-          this.dedup,
+          this.progenitor.dedup,
           this.selectCount > 0);
     },
 
     function remove(value) {
       this.root = this.root.removeKeyValue(
-          this.prop.f(value).toLowerCase(),
+          this.progenitor.prop.f(value).toLowerCase(),
           value,
           this.compare,
           this.selectCount > 0);
@@ -563,7 +569,7 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.nullNode;
+      this.root = this.progenitor.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
       }
@@ -589,14 +595,14 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.nullNode;
+      this.root = this.progenitor.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
       }
     },
 
     function put(newValue) {
-      var a = this.prop.f(newValue);
+      var a = this.progenitor.prop.f(newValue);
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
@@ -604,15 +610,15 @@ foam.CLASS({
               a[i],
               newValue,
               this.compare,
-              this.dedup);
+              this.progenitor.dedup);
         }
       } else {
-        this.root = this.root.putKeyValue('', newValue, this.compare, this.dedup);
+        this.root = this.root.putKeyValue('', newValue, this.compare, this.progenitor.dedup);
       }
     },
 
     function remove(value) {
-      var a = this.prop.f(value);
+      var a = this.progenitor.prop.f(value);
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {

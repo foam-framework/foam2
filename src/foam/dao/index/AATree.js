@@ -72,6 +72,10 @@ foam.CLASS({
     function maybeClone(locked) {
       return locked ? this.clone() : this;
     },
+    
+    function clone() {
+      return this.progenitor.spawn(this);
+    },
 
     function updateSize() {
       this.size = this.left.size + this.right.size + this.value.size();
@@ -210,7 +214,7 @@ foam.CLASS({
 
         // If we're a leaf, easy, otherwise reduce to leaf case.
         if ( ! s.left.level && ! s.right.level ) {
-          return this.nullNode;
+          return this.progenitor.nullNode;
         }
 
         side = s.left.level ? 'left' : 'right';
@@ -336,7 +340,7 @@ foam.CLASS({
 
       copy = s.clone();
       copy.size = s.size - s.left.size,
-      copy.left = s.nullNode;
+      copy.left = s.progenitor.nullNode;
       return copy;
     },
 
@@ -374,7 +378,7 @@ foam.CLASS({
 
       copy = s.clone();
       copy.size = s.size - s.right.size;
-      copy.right = s.nullNode;
+      copy.right = s.progenitor.nullNode;
       return copy;
     },
 
