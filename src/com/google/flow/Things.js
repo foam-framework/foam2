@@ -823,9 +823,16 @@ foam.CLASS({
 
     function fd(d) {
       /* ForwarD */
+      return this.gt(
+          this.x + d * Math.cos(this.rotation+Math.PI/2),
+          this.y - d * Math.sin(this.rotation+Math.PI/2));
+    },
+
+    function gt(x, y) {
+      /* Go To */
       var x1 = this.x, y1 = this.y;
-      this.x += d * Math.cos(this.rotation+Math.PI/2);
-      this.y -= d * Math.sin(this.rotation+Math.PI/2);
+      this.x = x;
+      this.y = y;
 
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
