@@ -418,3 +418,82 @@ repeat(360, (i) => {
 turtle1.cs().home().ht().pw(1.5).repeat(360*4, (i) => {
   turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)').rt(1/4).fd(550).bk(550);
 });
+
+
+
+
+var t = turtle1;
+t.cs();
+t.pw(5);
+
+function sind(d) {
+  return Math.sin(d * Math.PI * 2 / 360);
+}
+
+function waves(r) {
+  repeat(r, (i) => {
+    var y = i * t.parent.height / r;
+    t.pc('rgba(0,0,0,0.1)');
+    t.pu();
+    repeat(t.parent.width, (x) => {
+      var a = 35 * sind(1000*x/(y+150) + y*3);
+      t.gt(x, y + a);
+      t.pd();
+    });
+  });
+}
+
+waves(140);
+
+
+
+
+var t = turtle1;
+t.cs();
+t.pw(4);
+
+function sind(d) {
+  return Math.sin(d * Math.PI * 2 / 360);
+}
+
+function waves(r) {
+  repeat(r, (i) => {
+    var y = i * t.parent.height / r;
+    t.pc('rgba(0,0,0,0.1)');
+    t.pu();
+    repeat(t.parent.width/4, (x) => {
+      x *= 4;
+      var a = 35 * sind(1000*x/(y+150) + y*3);
+      t.gt(x, y + a);
+      t.pd();
+    });
+  });
+}
+
+waves(200);
+
+
+
+var t = turtle1;
+t.cs();
+t.pw(2);
+
+function sind(d) {
+  return Math.sin(d * Math.PI * 2 / 360);
+}
+
+function waves(r) {
+  repeat(r, (i) => {
+    var y = i * t.parent.height / r;
+    t.pc('rgba(0,0,0,0.1)');
+    t.pu();
+    repeat(t.parent.width/4, (x) => {
+      x *= 4;
+      var a = (10+i/r*50) * sind(1000*x/(y+150) + y*2);
+      t.gt(x, y + a);
+      t.pd();
+    });
+  });
+}
+
+waves(200);
