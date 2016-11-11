@@ -641,15 +641,19 @@ foam.LIB({
     function mmethod(map, opt_defaultMethod) {
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
-      for ( var key in map ) {
-        var type = key === 'FObject' ?
-            foam.core.FObject :
-            foam[key] || foam.lookup(key);
-
-        type[uid] = map[key];
-      }
-      
+      var first = true;
       return function(arg1) {
+        if ( first ) {
+          for ( var key in map ) {
+            var type = key === 'FObject' ?
+                foam.core.FObject :
+                foam[key] || foam.lookup(key);
+
+            type[uid] = map[key];
+          }
+          first = false;
+        }
+
         var type = arg1 && arg1.cls_ && arg1.cls_[uid] ? arg1.cls_ : foam.typeOf(arg1);
         if ( ! opt_defaultMethod ) {
           console.assert(type, 'Unknown type: ', arg1,
