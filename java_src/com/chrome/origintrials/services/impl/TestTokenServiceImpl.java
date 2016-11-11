@@ -13,7 +13,7 @@ public class TestTokenServiceImpl implements TokenService {
 
     try {
       mail.send(new MailService.Message("adamvy@google.com", app.getApplicantEmail(),
-                                        "Your token for running " + app.getRequestedFeature() + " on " + app.getOrigin(),
+                                        "Your token for running " + app.getExperiment() + " on " + app.getOrigin(),
                                         "Hello " + app.getApplicantName() + "\n\n" +
                                         "Your token is: \"" + token + "\""));
     } catch(java.io.IOException e) {
