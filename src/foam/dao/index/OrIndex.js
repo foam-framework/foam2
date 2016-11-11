@@ -62,7 +62,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'OrIndex('+this.delegateFactory.toString()+')';
+      return 'OrIndex('+(this.progenitor || this).delegateFactory.toString()+')';
     }
 
   ]

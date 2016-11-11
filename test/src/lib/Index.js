@@ -762,7 +762,7 @@ describe('AltIndex', function() {
       prop: test.Indexable.FLOAT,
       tailFactory: foam.dao.index.ValueIndex.create()
     }), fakeRoot );
-    idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
+    idx.progenitor.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();

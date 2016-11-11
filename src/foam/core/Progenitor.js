@@ -111,7 +111,7 @@ foam.CLASS({
     GET_PROTO_FUNC: function getProgenitorProto_() {
       var p = this.getPrivate_('progenitorPrototype_');
       if ( ! p ) {
-        p = Object.create(this);
+        p = { progenitor: this };
 
         // grab list of property values and factories
         var pp = {
@@ -134,21 +134,12 @@ foam.CLASS({
         }
         p.propertyDefaults_ = pp;
 
-        // block non-instance functions
-        p.getProgenitorProto_ = null;
-        p.spawn = null;
-        p.progenitor = this;
-        p.clone = function() {
-          return this.progenitor.spawn(this);
+        // TODO: separate the spawn methods from normal ones
+        var methods = this.cls_.getAxiomsByClass(foam.core.Method);
+        for ( var i = 0; i < methods.length; i++ ) {
+          p[methods[i].name] = methods[i].code;
         }
 
-        // block per-instance properties that might be accidentally set
-        //   on the progenitor
-        var props = pp.protoValidProps_;
-        for ( var i = 0; i < props.length; i++ ) {
-          var pName = props[i];
-          p[pName] = pp.protoValues[pName];
-        }
         this.setPrivate_('progenitorPrototype_', p);
       }
       return p;
@@ -166,7 +157,7 @@ foam.CLASS({
           if ( args && ( args[prop] !== undefined ) ) {
             c[prop] = args[prop];
           } else if ( defaults.protoFactories[prop] ) {
-            c[prop] = defaults.protoFactories[prop].call(this);
+            c[prop] = defaults.protoFactories[prop].call(c);
           }
         }
       } else {
@@ -174,7 +165,7 @@ foam.CLASS({
         var props = defaults.protoFactoryProps_;
         for ( var i = 0; i < props.length; i++ ) {
           var prop = props[i];
-          c[prop] = defaults.protoFactories[prop].call(this);
+          c[prop] = defaults.protoFactories[prop].call(c);
         }
       }
       // user defined init

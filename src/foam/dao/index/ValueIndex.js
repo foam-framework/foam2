@@ -23,11 +23,11 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndex',
   extends: 'foam.dao.index.Index',
-  implements: [ 'foam.dao.index.Plan' ],
+  //implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
-    { class: 'foam.pattern.progenitor.PerInstance',  name: 'value' },
-    { name: 'cost', value: 1 }
+    { class: 'foam.pattern.progenitor.PerInstance', name: 'value' },
+    { class: 'foam.pattern.progenitor.PerInstance', name: 'cost', value: 1 }
   ],
 
   methods: [
@@ -52,7 +52,7 @@ foam.CLASS({
     function remove() { this.value = undefined; },
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
-    function plan() { return this; },
+    function plan() { this.cost = 1; return this; },
 
     function estimate(/*size, sink, skip, limit, order, predicate*/) {
       return 1;
