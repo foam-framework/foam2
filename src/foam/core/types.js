@@ -372,10 +372,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Reference',
   extends: 'Property',
+
   properties: [
     {
       class: 'Class',
@@ -393,7 +395,7 @@ foam.CLASS({
       value: function(oldValue, newValue, prop) {
         return prop.of$cls.isInstance(newValue) ?
           newValue.id :
-          newValue;
+          newValue ;
       }
     }
   ]
