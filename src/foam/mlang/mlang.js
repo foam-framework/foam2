@@ -599,10 +599,16 @@ foam.CLASS({
         var sortedArgs = Object.create(null);
         var costs = [];
         var args = this.args;
+        var dupes = {}; // avoid duplicate indexes
         for (var i = 0; i < args.length; i++ ) {
           var arg = args[i];
           var idx = arg.toIndex(tailFactory);
           if ( ! idx ) continue;
+
+          // duplicate check
+          var idxString = idx.toString();
+          if ( dupes[idxString] ) continue;
+          dupes[idxString] = true;
 
           var idxCost = Math.floor(idx.estimate(
              1000, undefined, undefined, undefined, undefined, arg));
