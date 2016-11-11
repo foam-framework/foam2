@@ -14,6 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+foam.CLASS({
+  name: 'Square',
+  properties: [ 'side' ]
+});
+
+foam.CLASS({
+  name: 'Circle',
+  properties: [ 'radius' ]
+});
+
+foam.CLASS({
+  name: 'Test',
+  methods: [
+    {
+      name: 'sizeOf',
+      code: foam.mmethod({
+        Null: function() { return 0; },
+//        Int: function() { return 1; },
+        String: function(o) { return o.length; },
+        Square: function(o) { return o.side * o.side; },
+        Circle: function(o) { return Math.PI * o.radius * o.radius; }
+      })
+    }
+  ]
+});
+
+var t = Test.create();
+console.log(
+  t.sizeOf(null),
+//  t.sizeOf(42),
+  t.sizeOf('Hello'),
+  t.sizeOf(Square.create({side: 4})),
+  t.sizeOf(Circle.create({radius: 1}))
+);
+
+
 /*
 foam.CLASS({
   name: 'Test',
