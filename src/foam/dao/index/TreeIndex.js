@@ -229,14 +229,6 @@ foam.CLASS({
       return this.root.get(key, this.compare);
     },
 
-    function mapOver(fn, ofIndex) {
-      if ( this.tailFactory === ofIndex ) {
-        return this.root.mapTail(fn);
-      } else {
-        return this.root.mapOver(fn, ofIndex);
-      }
-    },
-
     function select(sink, skip, limit, order, predicate, cache) {
       // AATree node will extract orderDirs.next for the tail index
       if ( order && order.orderDirection() < 0 ) {

@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-// TODO: Implement Hetergenious AltIndex to allow incomplete AutoIndexing
+/**
+  Provides for hetergenious indexes, where not all potential delegates
+  of this AltIndex actually get populated for each instance. Each instance
+  always populates an ID index, so it can serve queries even if no
+  delegate indexes are explicitly added.
 
-// TODO: Consider giving predicates an estimate as well: if an index arrives at
-//   ValueIndex, and still must evaluate remaining predicates on each value, the
-//   estimated cost may be greater than one for things like CONTAINS, spatial
-//   mlangs like WITHIN_RADIUS, or full-text searching. If an index had processed
-//   those predicates earlier in the chain, the cost would be much less than a
-//   scan-and-filter-all. Default estimate of 1 would be fine for most simple
-//   comparison predicates.
-
+  Factory: Alt[ID, TreeA, TreeB]
+  instances: [id, a,b], [id, a], [id, b], [id, a], [id]
+*/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'AltIndex',
@@ -47,44 +46,41 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
+      /** factory quick lookup*/
+      name: 'delegateFactoryMap_',
+      factory: function() { return {}; }
+    },
+    {
       /** the delegate instances for each Alt instance */
       class: 'foam.pattern.progenitor.PerInstance',
       name: 'delegates',
       factory: function() {
-        var delegates = [];
-        for ( var i = 0; i < this.delegateFactories.length; i++ ) {
-          delegates[i] = this.delegateFactories[i].spawn();
-        }
-        return delegates;
+        return [ this.delegateFactories[0].spawn() ];
       }
     },
   ],
 
   methods: [
 
-    function addIndex(index, root) {
-      // assert(root)
-      // assert( ! index.progenitor )
-      // This should be called on the factory, not an instance
-      var self = this.progenitor || this;
+    function addIndex(index) {
+      console.assert( ! index.progenitor );
+      console.assert( this.progenitor );
+      // This method should be called on an instance
 
-      self.delegateFactories.push(index);
-
-      function addIndexTo(altInst) {
-        // Populate the new index
-        var newSubInst = index.spawn();
-        altInst.delegates[0].plan(newSubInst).execute([], newSubInst);
-        altInst.delegates.push(newSubInst);
-        return altInst;
-      }
-
-      if ( root === this || root.progenitor === this ) {
-        // if we are the root, just call addIndexTo immediately
-        addIndexTo(root);
+      // check for existing factory
+      var indexKey = index.toString();
+      if ( ! this.delegateFactoryMap_[indexKey] ) {
+        this.delegateFactories.push(index);
+        this.delegateFactoryMap_[indexKey] = index;
       } else {
-        // find all delegates created by this factory, addIndexTo them
-        root.mapOver(addIndexTo, self);
+        // ensure all tails are using the same factory instance
+        index = this.delegateFactoryMap_[indexKey];
       }
+//var start = Date.now();
+      var newSubInst = index.spawn();
+      this.delegates[0].plan(newSubInst).execute([], newSubInst);
+      this.delegates.push(newSubInst);
+//console.log("AltIndex building ordering size", this.size(), "in", Date.now() - start, "ms");
     },
 
     function bulkLoad(a) {
@@ -98,43 +94,52 @@ foam.CLASS({
     },
 
     function getAltForOrderDirs(order, cache) {
+      // NOTE: this assumes one of the delegates is capable of ordering
+      //  properly for a scan. We should not be asked for a select unless
+      //  a previous estimate indicated one of our options was sorted properly.
+      // TODO: will this even work? Tree asks for estimate to determine sortability,
+      //  one of the Alt factories supports it. But if that delegate is missing on
+      //  some of the results, they will fall back to ID index and not sort...
       var delegates = this.delegates;
       if ( ! order ) return delegates[0];
 
-      var t = cache[this];
-      // if no cached index number, check our delegateFactories the best
-      // estimate, considering only ordering
-      if ( ! foam.Number.isInstance(t) ) {
-        var delegateFactories = this.delegateFactories;
-        var bestEst = Number.MAX_VALUE;
+      var c = cache[this];
+      // if no cached index estimates, generate estimates
+      // for each factory for this ordering
+      if ( ! c ) {
         var nullSink = this.NullSink.create();
-        var est;
-        var t = -1;
-        for ( var i = 0; i < delegateFactories.length; i++ ) {
-          est = delegateFactories[i].estimate(1000, nullSink, undefined, undefined, order);
-          if ( bestEst > est ) {
-            t = cache[this] = i;
+        var dfs = this.delegateFactories;
+        var bestEst = Number.MAX_VALUE;
+        // Pick the best factory for the ordering, cache it
+        for ( var i = 0; i < dfs.length; i++ ) {
+          var est = dfs[i].estimate(1000, nullSink, undefined, undefined, order);
+          if ( est < bestEst ) {
+            c = dfs[i];
             bestEst = est;
           }
         }
+        cache[this] = c;
       }
-      return delegates[t];
+
+      // check if we have a delegate instance for the best factory
+      for ( var i = 0; i < delegates.length; i++ ) {
+        // if we do, it's the best one
+        if ( delegates[i].progenitor === c ) return delegates[i];
+      }
+
+      // we didn't have the right delegate generated, so add and populate it
+      // as per addIndex, but we skip checking the factory as we know it's stored
+      var newSubInst = c.spawn();
+      this.delegates[0].plan(newSubInst).execute([], newSubInst);
+      this.delegates.push(newSubInst);
+
+      return newSubInst;
     },
 
     function select(sink, skip, limit, order, predicate, cache) {
       // find and cache the correct subindex to use
       this.getAltForOrderDirs(order, cache)
         .select(sink, skip, limit, order, predicate, cache);
-    },
-
-    function mapOver(fn, ofIndex) {
-      for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        if ( this.delegateFactories[i] == ofIndex) {
-          this.delegates[i] = fn(this.delegates[i]);
-        } else {
-          this.delegates[i].mapOver(fn, ofIndex);
-        }
-      }
     },
 
     function put(newValue) {
@@ -163,11 +168,9 @@ foam.CLASS({
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
-      var bestPlan;
-      //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
+      var bestPlan;      
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         var plan = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
-//console.log('plan ' + this.delegates[i].cls_.name + ': ' + plan);
         if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
           bestPlan = plan;
           break;
@@ -176,7 +179,6 @@ foam.CLASS({
           bestPlan = plan;
         }
       }
-      //    console.log('Best Plan: ' + bestPlan);
       if ( ! bestPlan ) {
         return this.NoPlan.create();
       }
@@ -191,11 +193,9 @@ foam.CLASS({
 
     function toPrettyString(indent) {
       var ret = "";
-      //ret += "  ".repeat(indent) + this.cls_.name + "([\n";
       for ( var i = 0; i < this.delegateFactories.length; i++ ) {
           ret += this.delegateFactories[i].toPrettyString(indent + 1);
       }
-      //ret += "  ".repeat(indent) + "])\n";
       return ret;
     }
   ]

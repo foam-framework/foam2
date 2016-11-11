@@ -751,7 +751,6 @@ describe('AltIndex', function() {
       delegateFactories: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
     }).spawn();
     var fakeRoot = {
-      mapOver: function(fn, ofIndex) { idx = fn(idx); },
       size: function() { return 1; },
       progenitor: { toPrettyString: function() { return ""; }}
     };
@@ -889,13 +888,6 @@ describe('AutoIndex', function() {
     idxInstance.bulkLoad(createData2(1000));
 
     fakeRoot = {
-      mapOver: function(fn, ofIndex) {
-        if ( ofIndex === idx ) {
-          idxInstance = fn(idxInstance);
-        } else {
-          idxInstance.mapOver(fn, ofIndex);
-        }
-      },
       size: function() { return 1; },
       progenitor: { toPrettyString: function() { return ""; }}
     };
