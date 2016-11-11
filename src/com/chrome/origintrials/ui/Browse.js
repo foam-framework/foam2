@@ -20,13 +20,17 @@ foam.CLASS({
   name: 'Browser',
   extends: 'foam.u2.Element',
   requires: [
+    'foam.u2.Tab',
+    'foam.u2.Tabs',
     'foam.u2.TableSelection',
     'foam.u2.TableView',
     'foam.u2.search.FilterController',
     'com.chrome.origintrials.model.Application'
   ],
   imports: [
-    'stack'
+    'stack',
+    'applicationDAO',
+    'experimentDAO'
   ],
   exports: [
     'data'
@@ -38,23 +42,50 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.start(this.APPLY, { data: this }).end()
-          .start(this.FilterController, {
-            searchFields: [ 'origin', 'applicantEmail', 'approved' ],
-            tableView: {
-              class: 'foam.u2.TableSelection',
-              bulkActions: [ this.BULK_APPROVE ]
-            },
-            data: this.data
-          })
-          .end();
+      this.
+        start(this.APPLY, { data: this }).
+        end().
+        start(this.CREATE_EXPERIMENT, { data: this }).
+        end().
+        start(this.Tabs).
+          start(this.Tab, { label: 'Applications' }).
+            start(this.FilterController, {
+              searchFields: [ 'origin', 'applicantEmail', 'approved' ],
+              tableView: {
+                class: 'foam.u2.TableSelection',
+                bulkActions: [ this.BULK_APPROVE ]
+              },
+              data: this.applicationDAO
+            }).
+            end().
+          end().
+          start(this.Tab, { label: 'Experiments' }).
+            start(this.FilterController, {
+              searchFields: [ 'name', 'owner' ],
+              data: this.experimentDAO
+            }).
+            end().
+          end().
+        end();
     }
   ],
   actions: [
     {
       name: 'apply',
       code: function() {
-        this.stack.push({ class: 'com.chrome.origintrials.ui.Apply' });
+        this.stack.push({
+          class: 'foam.comics.DAOCreateController',
+          of: 'com.chrome.origintrials.model.Application'
+        });
+      }
+    },
+    {
+      name: 'createExperiment',
+      code: function() {
+        this.stack.push({
+          class: 'foam.comics.DAOCreateController',
+          of: 'com.chrome.origintrials.model.Experiment'
+        });
       }
     },
     {

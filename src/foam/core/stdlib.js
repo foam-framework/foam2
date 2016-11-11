@@ -561,7 +561,7 @@ foam.LIB({
     // Can't be an FObject yet because we haven't built the class system yet
     /* istanbul ignore next */
     function isInstance(o) { return false; },
-    function clone(o)      { return o.clone(); },
+    function clone(o)      { return o ? o.clone() : this; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
@@ -629,27 +629,33 @@ foam.typeOf = (function() {
 })();
 
 
-foam.mmethod = function(map, opt_defaultMethod) {
-  var uid = '__mmethod__' + foam.next$UID() + '__';
+foam.LIB({
+  name: 'foam',
 
-  for ( var key in map ) {
-    var type = key === 'FObject' ? foam.core.FObject : foam[key];
-    type[uid] = map[key];
-  }
+  methods: [
+    function mmethod(map, opt_defaultMethod) {
+      var uid = '__mmethod__' + foam.next$UID() + '__';
 
-  return function(arg1) {
-    var type = foam.typeOf(arg1);
-    if ( ! opt_defaultMethod ) {
-      console.assert(type, 'Unknown type: ', arg1,
-          'and no default method provided');
-      console.assert(
-          type[uid],
-          'Missing multi-method for type ', arg1, ' map: ', map,
-          'and no deafult method provided');
+      for ( var key in map ) {
+        var type = key === 'FObject' ? foam.core.FObject : foam[key];
+        type[uid] = map[key];
+      }
+      
+      return function(arg1) {
+        var type = foam.typeOf(arg1);
+        if ( ! opt_defaultMethod ) {
+          console.assert(type, 'Unknown type: ', arg1,
+                         'and no default method provided');
+          console.assert(
+            type[uid],
+            'Missing multi-method for type ', arg1, ' map: ', map,
+            'and no deafult method provided');
+        }
+        return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
+      };
     }
-    return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
-  };
-};
+  ]
+});
 
 
 (function() {

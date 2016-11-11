@@ -774,6 +774,14 @@ foam.CLASS({
       this.add(leg1, leg2, leg3, leg4, head, shell, tail);
     },
 
+    function home() {
+      this.x = this.parent.width / 2;
+      this.y = this.parent.height / 2;
+      this.rotation = 0;
+
+      return this;
+    },
+
     function ss() {
       this.mementoStack_.push(this.memento);
       return this;
