@@ -29,11 +29,9 @@ foam.CLASS({
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Or',
     'foam.dao.index.AltIndex',
-    'foam.dao.index.LazyAltIndex',
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.False',
-    'foam.dao.index.PoliteIndex',
   ],
 
   constants: {
@@ -50,22 +48,13 @@ foam.CLASS({
     {
       name: 'delegateFactory',
       factory: function() {
-        if ( this.lazy ) {
-          return this.LazyAltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
-        } else {
-          return this.AltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
-        }
+        return this.AltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
       }
     },
     {
       name: 'previousPlanFor',
       factory: function() { return {}; }
     },
-    {
-      class: 'Boolean',
-      name: 'lazy',
-      value: ( global.window && global.window.location.href.indexOf('lazy') > -1 ) //HACK remove
-    }
   ],
 
   methods: [
@@ -77,16 +66,8 @@ foam.CLASS({
       this.addIndex(prop.toIndex(this.cls_.create({ idIndexFactory: this.idIndexFactory })), root);
     },
     function addIndex(index, root) {
-      // Use PoliteIndex if this DAO is big
-      if ( ! this.lazy ) {
-        if ( root.size() > this.PoliteIndex.SMALL_ENOUGH_SIZE ) {
-          index = this.PoliteIndex.create({ delegateFactory: index });
-        }
-        this.delegateFactory.addIndex(index, root);
-      } else {
-        console.assert(this.progenitor, "Must call addIndex() on AutoIndex instance if in lazy mode");
-        this.delegate.addIndex(index, root);
-      }
+      console.assert(this.progenitor, "Must call addIndex() on AutoIndex spawned instance.");
+      this.delegate.addIndex(index, root);
     },
 
     // TODO: mlang comparators should support input collection for
@@ -100,110 +81,87 @@ foam.CLASS({
       //  more consistent and allows estimate() to be arbitrarily bad
       //  as long as it is indicative of relative performance of each
       //  index type.
-
-      if ( this.size() < this.GOOD_ENOUGH_PLAN ||
+      var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
+      var thisSize = this.size();
+      
+      // No need to try to auto-index if: 
+      //  The existing plan is better than scanning already TODO: how much better?  
+      //  We are too small to matter
+      //  There are no order/predicate constraints to optimize for
+      if ( existingPlan.cost < thisSize ||
+           thisSize < this.GOOD_ENOUGH_PLAN ||
            ! order &&
            ( ! predicate ||
              this.True.isInstance(predicate) ||
              this.False.isInstance(predicate)
            )
-         ) {
-        return this.delegate.plan(sink, skip, limit, order, predicate, root);
+      ) {
+        return existingPlan;
       }
+
+      // add autoindex overhead
+      existingPlan.cost += 10; 
 
       var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
-      var ARBITRARY_INDEX_CREATE_CONSTANT = 20; // this.inertia;
-
-      // TODO: root.size() is the size of the entire DAO, and representative
-      //   of the cost of creating a new index.
+      var ARBITRARY_INDEX_CREATE_CONSTANT = 20;
 
       var self = this;
-
       var newIndex;
+      
+      var bestEstimate = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+//console.log(self.$UID, "AutoEst OLD:", bestEstimate, this.delegate.toString().substring(0,20), this.size());
+      if ( bestEstimate < this.GOOD_ENOUGH_PLAN ) {
+        return existingPlan;
+      }
+      
+      // Base planned cost on the old cost for the plan, to avoid underestimating and making this
+      //  index build look too good
+      var existingEstimate = bestEstimate;
 
-      // NOTE: If this plan() was triggered by an AltPlan, there will
-      //  be multiple concurrent AutoIndex autoIndexAdd plans executing
-      //  to add effectively the same new index.
+      if ( predicate ) {
+        var candidate = predicate.toIndex(
+          this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+        if ( candidate ) {
+          var candidateEst = candidate.estimate(this.delegate.size(), sink,
+            skip, limit, order, predicate)
+            * ARBITRARY_INDEX_CREATE_FACTOR
+            + ARBITRARY_INDEX_CREATE_CONSTANT;
 
-      // if we haven't been called yet for this particular query
-      // (if our parent is sub-planning, we will be called on to plan
-      //  multiple times for the same query)
-      var prev = this.progenitor.previousPlanFor;
-      if ( this.lazy ||
-           ( ! prev.sink && ! prev.skip && ! prev.limit && ! prev.order &&
-            ! prev.predicate && ! prev.root ) ||
-           ( sink      !== prev.sink ||
-             skip      !== prev.skip ||
-             limit     !== prev.limit ||
-             order     !== prev.order ||
-             predicate !== prev.predicate ||
-             root      !== prev.root )
-      ) {
-        prev.sink = sink;
-        prev.skip = skip;
-        prev.limit = limit;
-        prev.order = order;
-        prev.predicate = predicate;
-        prev.root = root;
-
-        var thisSize = this.size();
-
-        var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
-        existingPlan.cost += 10; // autoindex overhead
-        if ( existingPlan.cost < thisSize - 10 ) {
-          return existingPlan; // don't build anything if we're already better than scanning
-        }
-        
-        var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-//console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20), this.size());
-        if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
-          return existingPlan; //this.delegate.plan(sink, skip, limit, order, predicate, root);
-        }
-        // Return the old cost for the plan, to avoid underestimating and making this
-        //  index build look too good
-        var existingEstimate = bestCost;
-
-        if ( predicate ) {
-          var candidate = predicate.toIndex(
-            this.cls_.create({ idIndexFactory: this.idIndexFactory }));
-          if ( candidate ) {
-            var candidateCost = candidate.estimate(this.delegate.size(), sink,
-              skip, limit, order, predicate)
-              * ARBITRARY_INDEX_CREATE_FACTOR
-              + ARBITRARY_INDEX_CREATE_CONSTANT;
-
-//console.log(self.$UID, "AutoEst PRD:", candidateCost, candidate.toString().substring(0,20));
-            //TODO: must beat by factor of X? or constant?
-            if ( bestCost > candidateCost ) {
-              newIndex = candidate;
-              bestCost = candidateCost;
-            }
-          }
-        }
-
-        // TODO: order cost will always be the same, don't bother asking!...
-        //  Except: the order index.estimate gets the order AND predicate,
-        //   so the predicate might make this index worse
-        if ( order ) {
-          var candidate = order.toIndex(
-            this.cls_.create({ idIndexFactory: this.idIndexFactory }));
-          if ( candidate ) {
-            var candidateCost = candidate.estimate(this.delegate.size(), sink,
-              skip, limit, order, predicate)
-              * ARBITRARY_INDEX_CREATE_FACTOR
-              + ARBITRARY_INDEX_CREATE_CONSTANT;
-//console.log(self.$UID, "AutoEst ORD:", candidateCost, candidate.toString().substring(0,20));
-            if ( bestCost > candidateCost ) {
-              newIndex = candidate;
-              bestCost = candidateCost;
-            }
+//console.log(self.$UID, "AutoEst PRD:", candidateEst, candidate.toString().substring(0,20));
+          //TODO: must beat by factor of X? or constant?
+          if ( bestEstimate > candidateEst ) {
+            newIndex = candidate;
+            bestEstimate = candidateEst;
           }
         }
       }
 
+      // TODO: order cost will always be the same, don't bother asking!...
+      //  Except: the order index.estimate gets the order AND predicate,
+      //   so the predicate might make this index worse
+      if ( order ) {
+        var candidate = order.toIndex(
+          this.cls_.create({ idIndexFactory: this.idIndexFactory }));
+        if ( candidate ) {
+          var candidateEst = candidate.estimate(this.delegate.size(), sink,
+            skip, limit, order, predicate)
+            * ARBITRARY_INDEX_CREATE_FACTOR
+            + ARBITRARY_INDEX_CREATE_CONSTANT;
+//console.log(self.$UID, "AutoEst ORD:", candidateEst, candidate.toString().substring(0,20));
+          if ( bestEstimate > candidateEst ) {
+            newIndex = candidate;
+            bestEstimate = candidateEst;
+          }
+        }
+      }
+      
+
       if ( newIndex ) {
-        var existingPlanCost = existingPlan.cost; //this.delegate.plan(sink, skip, limit, order, predicate, root).cost;
-        var estimateRatio = bestCost / existingEstimate;
+        // Since estimates are only valid compared to other estimates, find the ratio
+        //  of our existing index's estimate to our new estimate, and apply that ratio
+        //  to the actual cost of the old plan to determine our new index's assumed cost.
+        var existingPlanCost = existingPlan.cost;
+        var estimateRatio = bestEstimate / existingEstimate;
         
         return this.CustomPlan.create({
           cost: existingPlanCost * estimateRatio,
@@ -214,16 +172,9 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
 //console.log(self.$UID, "ROOT          ");
 //console.log(root.progenitor.toPrettyString(0));
 
-            // TODO: PoliteIndex sometimes when ordering?
-            //  NOTE: revise this note in case of LazyAltIndex
-            //  When ordering, the cost of sorting will depend on the total
-            //  size of the DAO (index create cost) versus the size of the
-            //  result set at this index node. It might be cheap enough to
-            //  async create the index and let the current sort happen the
-            //  hard way, or it could be worthwhile to just wait
-            //  for the new index that supports the sort.
             self.addIndex(newIndex, root);
-            // avoid a recursive call by hitting delegate, should pick the new optimal index
+            // Avoid a recursive call by hitting our delegate.
+            // It should pick the new optimal index.
             self.delegate
               .plan(sink, skip, limit, order, predicate, root)
               .execute(apromise, asink, askip, alimit, aorder, apredicate);
@@ -231,7 +182,7 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
           customToString: function() { return "AutoIndexAdd cost=" + this.cost + ", " + newIndex.cls_.name; }
         });
       } else {
-        return existingPlan || this.delegate.plan(sink, skip, limit, order, predicate, root);
+        return existingPlan;
       }
     },
 

@@ -378,24 +378,6 @@ foam.CLASS({
       return copy;
     },
 
-    function mapOver(fn, ofIndex) {
-      // continue the scan through all tails in this tree
-      this.left.mapOver(fn, ofIndex);
-      this.value.mapOver(fn, ofIndex);
-      this.right.mapOver(fn, ofIndex);
-    },
-
-    function mapTail(fn) {
-      // our tails are the targets, so apply the function
-      // and keep the new tail
-      // NOTE: size is not allowed to change with this operation,
-      //   since changing the type of index is not actually removing
-      //   or adding items.
-      this.left.mapTail(fn);
-      this.value = fn(this.value);
-      this.right.mapTail(fn);
-    },
-
   ]
 });
 
@@ -486,8 +468,6 @@ foam.CLASS({
     function removeNode()     { return this; },
     function select()         { },
     function selectReverse()  { },
-    function mapOver()  { },
-    function mapTail()  { },
 
     function gt()   { return this; },
     function gte()  { return this; },

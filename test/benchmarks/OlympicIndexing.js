@@ -17,10 +17,6 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 2400000;
 
 
-//global.window = global.window || {};
-//global.window.location = global.window.location || {};
-//global.window.location.href = global.window.location.href || "lazy";
-
 
 describe("Index benchmarks", function() {
   var DEBUG = false;

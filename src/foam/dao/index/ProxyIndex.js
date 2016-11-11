@@ -45,14 +45,6 @@ foam.CLASS({
 
     function get(key) { return this.delegate.get(key); },
 
-    function mapOver(fn, ofIndex) {
-      if ( this.delegate.progenitor === ofIndex ) {
-        this.delegate = fn(this.delegate);
-      } else {
-        return this.delegate.mapOver(fn, ofIndex);
-      }
-    },
-
     function size() { return this.delegate.size(); },
 
     function select(sink, skip, limit, order, predicate, cache) {

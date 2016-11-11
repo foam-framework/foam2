@@ -53,7 +53,6 @@ foam.CLASS({
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
     function plan() { return this; },
-    function mapOver(fn, ofIndex) { },
 
     function estimate(/*size, sink, skip, limit, order, predicate*/) {
       return 1;
