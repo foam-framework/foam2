@@ -637,19 +637,22 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       for ( var key in map ) {
-        var type = key === 'FObject' ? foam.core.FObject : foam[key];
+        var type = key === 'FObject' ?
+            foam.core.FObject :
+            foam[key] || foam.lookup(key);
+
         type[uid] = map[key];
       }
       
       return function(arg1) {
-        var type = foam.typeOf(arg1);
+        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ? arg1.cls_ : foam.typeOf(arg1);
         if ( ! opt_defaultMethod ) {
           console.assert(type, 'Unknown type: ', arg1,
-                         'and no default method provided');
+              'and no default method provided');
           console.assert(
-            type[uid],
-            'Missing multi-method for type ', arg1, ' map: ', map,
-            'and no deafult method provided');
+              type[uid],
+              'Missing multi-method for type ', arg1, ' map: ', map,
+              'and no deafult method provided');
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
