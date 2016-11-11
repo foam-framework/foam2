@@ -143,7 +143,7 @@ foam.CLASS({
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
 
-      if ( c ) {
+      if ( c && c !== this.canvas ) {
         this.selected = c;
       } else {
         this.selected = this.addCircle(x, y);
