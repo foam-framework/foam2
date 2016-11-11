@@ -747,7 +747,9 @@ describe('AltIndex', function() {
 
   beforeEach(function() {
     data = createData2();
-    idx = foam.dao.index.AltIndex.create().spawn();
+    idx = foam.dao.index.AltIndex.create({
+      delegateFactories: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
+    }).spawn();
     var fakeRoot = {
       mapOver: function(fn, ofIndex) { idx = fn(idx); },
       size: function() { return 1; },

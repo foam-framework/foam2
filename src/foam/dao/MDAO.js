@@ -209,7 +209,7 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var plan;
-
+//console.log("----select");
       if ( this.Explain.isInstance(sink) ) {
         plan = this.index.plan(sink.arg1, skip, limit, order, predicate, this.index);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
