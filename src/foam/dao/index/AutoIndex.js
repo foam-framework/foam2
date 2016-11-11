@@ -203,16 +203,16 @@ foam.CLASS({
 
       if ( newIndex ) {
         var existingPlanCost = existingPlan.cost; //this.delegate.plan(sink, skip, limit, order, predicate, root).cost;
-        var estimateRatio = 0.9; existingEstimate / bestCost;
+        var estimateRatio = bestCost / existingEstimate;
         
         return this.CustomPlan.create({
           cost: existingPlanCost * estimateRatio,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 
 console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.cost, predicate && predicate.toString());
-console.log(newIndex.toPrettyString(0));
-console.log(self.$UID, "ROOT          ");
-console.log(root.progenitor.toPrettyString(0));
+//console.log(newIndex.toPrettyString(0));
+//console.log(self.$UID, "ROOT          ");
+//console.log(root.progenitor.toPrettyString(0));
 
             // TODO: PoliteIndex sometimes when ordering?
             //  NOTE: revise this note in case of LazyAltIndex

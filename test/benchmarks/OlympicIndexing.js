@@ -17,7 +17,9 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 2400000;
 
 
-
+//global.window = global.window || {};
+//global.window.location = global.window.location || {};
+//global.window.location.href = global.window.location.href || "lazy";
 
 
 describe("Index benchmarks", function() {
@@ -28,36 +30,47 @@ describe("Index benchmarks", function() {
   var Medal;
   var SAMPLE_PREDICATES_A;
   var dao;
+  var rawData;
 
   function loadMedalData(dao) { // resolves when dao is filled
 
-    var xhr = ((foam.net.node && foam.net.node.HTTPRequest) ||
-        foam.net.HTTPRequest).create({
-      responseType: 'json',
-      method: 'GET'
-    });
-    if ( foam.net.node )
-      xhr.fromUrl('http://localhost:8888/MedalData.json');
-    else
-      xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
-               'master/js/foam/demos/olympics/MedalData.json');
-    var self = this;
-    return xhr.send().then(function(res) {
-      console.log("XHR started");
-      return res.payload;
-    }).then(function(json) {
-      console.log("XHR complete, parsing...");
-      if ( ! Array.isArray(json) ) {
-        json = foam.json.parseString(json);
-      }
+    if ( ! rawData ) {
+      var xhr = ((foam.net.node && foam.net.node.HTTPRequest) ||
+          foam.net.HTTPRequest).create({
+        responseType: 'json',
+        method: 'GET'
+      });
+      if ( foam.net.node )
+        xhr.fromUrl('http://localhost:8888/MedalData.json');
+      else
+        xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
+                 'master/js/foam/demos/olympics/MedalData.json');
+      var self = this;
+      return xhr.send().then(function(res) {
+        console.log("XHR started");
+        return res.payload;
+      }).then(function(json) {
+        console.log("XHR complete, parsing...");
+        rawData = json;
+        if ( ! Array.isArray(json) ) {
+          rawData = foam.json.parseString(json);
+        }
 
+        var p = [];
+        for ( var i = 0; i < rawData.length; i++ ) {
+          p.push(dao.put(Medal.create(rawData[i])));
+        }
+        console.log("Loaded ", rawData.length, ".");
+        return Promise.all(p);
+      });
+    } else {
       var p = [];
-      for ( var i = 0; i < json.length; i++ ) {
-        p.push(dao.put(Medal.create(json[i])));
+      for ( var i = 0; i < rawData.length; i++ ) {
+        p.push(dao.put(Medal.create(rawData[i])));
       }
-      console.log("Loaded ", json.length, ".");
+      console.log("Reloaded ", rawData.length, ".");
       return Promise.all(p);
-    });
+    }
   }
 
 
@@ -138,17 +151,6 @@ describe("Index benchmarks", function() {
       daoType: 'MDAO'
     });
 
-    autodaoOmni = foam.dao.EasyDAO.create({
-      of: Medal,
-      seqNo: true,
-      autoIndex: false,
-      dedup: true,
-      daoType: 'MDAO'
-    });
-//     autodaoOmni.addIndex(foam.dao.index.OmniscientAutoIndex.create({
-//       mdao: autodaoOmni.mdao
-//     }));
-
   });
   afterEach(function() {
     Math.random = oldRandom;
@@ -174,6 +176,7 @@ describe("Index benchmarks", function() {
 
   it('benchmarks sample set A', function(done) {
     SAMPLE_PREDICATES_A = [
+      foam.mlang.predicate.True.create(),
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "c"), m.EQ(Medal.GENDER, "Men")),
       m.AND(m.CONTAINS_IC(Medal.COUNTRY, "CHI"), m.EQ(Medal.GENDER, "Men")),
@@ -365,10 +368,9 @@ describe("Index benchmarks", function() {
         )
       ])
     ).then(function() {
-      return autodao.select(dao).then(foam.async.sequence([
-        function() {
-          autodao = null; /* allow gc */
-        },
+      autodao = null;
+      return foam.async.sequence([
+        function() { return loadMedalData(dao); },
         foam.async.sleep(4000),
         foam.async.atest(
           'Run predicate set A no index',
@@ -380,10 +382,9 @@ describe("Index benchmarks", function() {
               })();
             }
           )
-        ),
-
-      ])).then(done);;
-    });
+        )
+      ]);
+    }).then(done);
   });
 
   xit('benchmarks sample set B', function(done) {
