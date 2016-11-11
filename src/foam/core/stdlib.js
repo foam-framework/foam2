@@ -166,22 +166,27 @@ foam.LIB({
     /**
      * Decorates the function 'f' to cache the return value of 'f' when called
      * with a particular value for its first argument.
-     *
      */
     function memoize1(f) {
       console.assert(
         typeof f === 'function',
         'Cannot apply memoize to something that is not a function.');
 
-      var cache = {};
+      var cache = {}, nullCache, undefinedCache;
       return foam.Function.setName(
           function(key) {
             console.assert(
                 arguments.length === 1,
                 'Memoize1\'ed functions must take exactly one argument.');
 
-            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
-            return cache[key];
+            var mKey =
+                key === null      ? '___null___'      :
+                key === undefined ? '___undefined___' :
+                key ;
+
+            if ( ! cache.hasOwnProperty(mKey) ) cache[mKey] = f.call(this, key);
+
+            return cache[mKey];
           },
           'memoize1(' + f.name + ')');
     },
