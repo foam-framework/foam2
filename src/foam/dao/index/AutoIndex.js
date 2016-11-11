@@ -224,6 +224,13 @@ console.log(root.progenitor.toPrettyString(0));
       return 'AutoIndex(' + this.delegateFactory.toString() + ')';
     },
 
+    function toPrettyString(indent) {
+      var ret = "";
+      ret = "  ".repeat(indent) + "Auto(" + this.$UID + ")\n";
+      ret += this.delegateFactory.toPrettyString(indent + 1);
+      return ret;
+    }
+
   ]
 });
 
