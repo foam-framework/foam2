@@ -22,12 +22,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'graphics',
-  name: 'Circle',
-  properties: [ 'radius' ]
-});
-
-foam.CLASS({
   name: 'Test',
   methods: [
     {
@@ -41,6 +35,12 @@ foam.CLASS({
       })
     }
   ]
+});
+
+foam.CLASS({
+  package: 'graphics',
+  name: 'Circle',
+  properties: [ 'radius' ]
 });
 
 var t = Test.create();
