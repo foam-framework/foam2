@@ -229,6 +229,9 @@ foam.CLASS({
           add: function(obj, opt_name, opt_parent) {
             this.addProperty(obj, opt_name, undefined, opt_parent || 'canvas1');
           }.bind(this),
+          hsl: function(h, s, l) {
+            return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
+          },
           load: this.loadFlow.bind(this),
           save: this.saveFlow.bind(this)
         };
