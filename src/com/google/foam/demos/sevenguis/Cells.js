@@ -232,6 +232,8 @@ foam.CLASS({
           this.cssClass(this.myCls());
         },
 
+        function isLoaded() { return true; },
+
         // function isLoaded() { return this.value; },
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
         function toReadE() {
