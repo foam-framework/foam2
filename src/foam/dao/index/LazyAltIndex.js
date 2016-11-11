@@ -130,7 +130,7 @@ console.log("LazyAltIndex building ordering size", this.size(), "in", Date.now()
       // we didn't have the right delegate generated, so add and populate it
       // as per addIndex, but we skip checking the factory as we know it's stored
       var newSubInst = cache.spawn();
-      this.plan(newSubInst).execute([], newSubInst);
+      this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
 
       return newSubInst;
@@ -179,10 +179,13 @@ console.log("LazyAltIndex building ordering size", this.size(), "in", Date.now()
 
     function plan(sink, skip, limit, order, predicate, root) {
       var bestPlan;
+//debug
+//global.altPlanIndent_ = global.altPlanIndent_ + 1 || 1;
+      
       //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         var plan = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
-        // console.log('  plan ' + i + ': ' + plan);
+//console.log('  '.repeat(global.altPlanIndent_) + '  plan ' + this.delegates[i].cls_.name + ': ' + plan);
         if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
           bestPlan = plan;
           break;
@@ -191,6 +194,8 @@ console.log("LazyAltIndex building ordering size", this.size(), "in", Date.now()
           bestPlan = plan;
         }
       }
+//global.altPlanIndent_ = global.altPlanIndent_ - 1;
+
       //    console.log('Best Plan: ' + bestPlan);
       if ( ! bestPlan ) {
         return this.NoPlan.create();

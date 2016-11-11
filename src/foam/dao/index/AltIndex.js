@@ -73,7 +73,7 @@ foam.CLASS({
       function addIndexTo(altInst) {
         // Populate the new index
         var newSubInst = index.spawn();
-        altInst.plan(newSubInst).execute([], newSubInst);
+        altInst.delegates[0].plan(newSubInst).execute([], newSubInst);
         altInst.delegates.push(newSubInst);
         return altInst;
       }
@@ -167,7 +167,7 @@ foam.CLASS({
       //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         var plan = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
-        // console.log('  plan ' + i + ': ' + plan);
+//console.log('plan ' + this.delegates[i].cls_.name + ': ' + plan);
         if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
           bestPlan = plan;
           break;

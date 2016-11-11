@@ -112,7 +112,7 @@ foam.CLASS({
       }
 
       var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
-      var ARBITRARY_INDEX_CREATE_CONSTANT = 10; // this.inertia;
+      var ARBITRARY_INDEX_CREATE_CONSTANT = 20; // this.inertia;
 
       // TODO: root.size() is the size of the entire DAO, and representative
       //   of the cost of creating a new index.
@@ -146,11 +146,22 @@ foam.CLASS({
         prev.predicate = predicate;
         prev.root = root;
 
-        var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
-console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20), this.size());
-        if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
-          return this.delegate.plan(sink, skip, limit, order, predicate, root);
+        var thisSize = this.size();
+
+        var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
+        existingPlan.cost += 10; // autoindex overhead
+        if ( existingPlan.cost < thisSize - 10 ) {
+          return existingPlan; // don't build anything if we're already better than scanning
         }
+        
+        var bestCost = this.delegate.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+//console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substring(0,20), this.size());
+        if ( bestCost < this.GOOD_ENOUGH_PLAN ) {
+          return existingPlan; //this.delegate.plan(sink, skip, limit, order, predicate, root);
+        }
+        // Return the old cost for the plan, to avoid underestimating and making this
+        //  index build look too good
+        var existingEstimate = bestCost;
 
         if ( predicate ) {
           var candidate = predicate.toIndex(
@@ -191,11 +202,14 @@ console.log(self.$UID, "AutoEst OLD:", bestCost, this.delegate.toString().substr
       }
 
       if ( newIndex ) {
+        var existingPlanCost = existingPlan.cost; //this.delegate.plan(sink, skip, limit, order, predicate, root).cost;
+        var estimateRatio = 0.9; existingEstimate / bestCost;
+        
         return this.CustomPlan.create({
-          cost: bestCost,
+          cost: existingPlanCost * estimateRatio,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 
-console.log(self.$UID, "BUILDING INDEX", bestCost);
+console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.cost, predicate && predicate.toString());
 console.log(newIndex.toPrettyString(0));
 console.log(self.$UID, "ROOT          ");
 console.log(root.progenitor.toPrettyString(0));
@@ -213,10 +227,11 @@ console.log(root.progenitor.toPrettyString(0));
             self.delegate
               .plan(sink, skip, limit, order, predicate, root)
               .execute(apromise, asink, askip, alimit, aorder, apredicate);
-          }
+          },
+          customToString: function() { return "AutoIndexAdd cost=" + this.cost + ", " + newIndex.cls_.name; }
         });
       } else {
-        return this.delegate.plan(sink, skip, limit, order, predicate, root);
+        return existingPlan || this.delegate.plan(sink, skip, limit, order, predicate, root);
       }
     },
 
