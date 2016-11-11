@@ -395,6 +395,26 @@ repeat(360, (i) => {
 
 
 
+canvas1.color = 'black';
+turtle1.cs();
+turtle1.ht();
+
+function fd2(s) {
+  repeat(s, () => turtle1.fd(1).rt(0.4));
+}
+
+repeat(360, (i) => {
+  turtle1.pw(1+Math.random()*24);
+  turtle1.pc('hsla(' + (turtle1.rotation*360/Math.PI) + ',90%,70%,0.45)');
+  turtle1.rt(1).ss().pu().fd(40);
+  turtle1.pd();
+  fd2(400);
+  turtle1.rs();
+});
+
+
+
+
 turtle1.cs().home().ht().pw(1.5).repeat(360*4, (i) => {
   turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)').rt(1/4).fd(550).bk(550);
 });
