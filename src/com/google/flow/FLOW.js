@@ -239,6 +239,8 @@ foam.CLASS({
           hsl: function(h, s, l) {
             return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
           },
+          degToRad: function(d) { return d * Math.PI / 180; },
+          radToDeg: function(r) { return r * 180 / Math.PI; },
           load: this.loadFlow.bind(this),
           save: this.saveFlow.bind(this)
         };
