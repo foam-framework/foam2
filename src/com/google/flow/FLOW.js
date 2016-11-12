@@ -239,6 +239,9 @@ foam.CLASS({
           hsl: function(h, s, l) {
             return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
           },
+          hsla: function(h, s, l, a) {
+            return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%,' + a + ')';
+          },
           log: function() {
             var o = this.cmdLineFeedback_;
             if ( ! o ) self.cmdLineFeedback_ = true;
