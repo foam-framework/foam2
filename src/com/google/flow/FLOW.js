@@ -17,6 +17,13 @@
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Select',
+  documentation: 'Dummy Model to represent selection mode in FLOW.'
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'TreeView',
   extends: 'foam.u2.view.TreeView',
 
@@ -254,7 +261,10 @@ foam.CLASS({
       }
     },
     'feedback_',
-    'currentTool',
+    {
+      name: 'currentTool',
+      value: com.google.flow.Select.model_
+    },
     {
       class: 'foam.dao.DAOProperty',
       name: 'tools',
@@ -267,6 +277,7 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'ARRAY'
         });
+        dao.put(com.google.flow.Select.model_);
         dao.put(com.google.flow.Box.model_);
         dao.put(com.google.flow.Circle.model_);
         dao.put(com.google.flow.Ellipse.model_);
@@ -589,6 +600,7 @@ foam.CLASS({
       this.onClick(evt);
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
+
       if ( c === this.canvas ) {
         this.mouseTarget = null;
       } else {
@@ -614,7 +626,7 @@ foam.CLASS({
 
       if ( c === this.canvas ) {
         var tool = this.currentTool;
-        if ( ! tool ) return;
+        if ( tool === this.CURRENT_TOOL.value ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');
