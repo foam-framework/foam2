@@ -239,10 +239,31 @@ foam.CLASS({
           hsl: function(h, s, l) {
             return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
           },
+          log: function() {
+            var o = this.cmdLineFeedback_;
+            if ( ! o ) self.cmdLineFeedback_ = true;
+            self.cmdLine += Array.from(arguments).join(' ') + '\n';
+            if ( ! o ) self.cmdLineFeedback_ = false;
+          },
           degToRad: function(d) { return d * Math.PI / 180; },
           radToDeg: function(r) { return r * 180 / Math.PI; },
           load: this.loadFlow.bind(this),
-          save: this.saveFlow.bind(this)
+          save: this.saveFlow.bind(this),
+          dir: function() {
+            // TODO: Better to allow commands to return promises and have
+            // the cmdLinewait for them to finish
+            var log = this.log;
+            var first = true;
+            self.flows.select({
+              put: function(o) {
+                if ( first ) {
+                  first = false;
+                  log('\n');
+                }
+                log(o.name);
+              }
+            }).then(function() { if ( ! first ) log('\nflow> '); });
+          }
         };
       },
       documentation: 'Scope to run reactive formulas in.'
@@ -411,21 +432,15 @@ foam.CLASS({
 
         try {
           var self = this;
-          function log() {
-            self.cmdLine += Array.from(arguments).join(' ') + '\n';
-          }
-
           var i = cmd.lastIndexOf('flow> ');
           cmd = i === -1 ? cmd : cmd.substring(i+6);
 
           if ( ! cmd.trim() ) return;
 
           with ( this.scope ) {
-            with ( { log: log } ) {
-              log();
-              log(eval(cmd));
-              this.cmdLine += 'flow> ';
-            }
+            log();
+            log(eval(cmd));
+            this.cmdLine += 'flow> ';
           }
         } catch (x) {
           log('ERROR:', x);
