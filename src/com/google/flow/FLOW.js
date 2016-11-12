@@ -248,6 +248,9 @@ foam.CLASS({
             self.cmdLine += Array.from(arguments).join(' ') + '\n';
             if ( ! o ) self.cmdLineFeedback_ = false;
           },
+          sin: Math.sin,
+          cos: Math.cos,
+          PI: Math.PI,
           degToRad: function(d) { return d * Math.PI / 180; },
           radToDeg: function(r) { return r * 180 / Math.PI; },
           load: this.loadFlow.bind(this),
