@@ -729,6 +729,29 @@ InnerClassTest.InnerClass1.describe();
 // Inner-classes do not appear in the global namespace
 log(! global.InnerClass1);
 
+// Similar to Inner-classes, there's also Inner-enums
+foam.CLASS({
+  name: 'InnerEnumTest',
+  enums: [
+    { name: 'InnerEnum', values: [
+    { name: 'OPEN',   label: 'Open'   },
+    { name: 'CLOSED', label: 'Closed' }
+    ] }
+  ],
+  methods: [
+    function init() {
+      log(this.InnerEnum.OPEN, this.InnerEnum.CLOSED)
+    }
+  ]
+});
+InnerEnumTest.create();
+
+// Inner-enums can also be accessed from the outer-class
+InnerEnumTest.InnerEnum.describe();
+
+// Inner-enums do not appear in the global namespace
+log(! global.InnerEnum);
+
 // Objects support pub() for pubing events,
 // and sub() for listening for pubed events.
 foam.CLASS({
