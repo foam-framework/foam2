@@ -624,3 +624,48 @@ t.ss(); frac(170, 22, 165); t.rs();
 
 
 t=turtle1.cs().home().ht().lt(180).pc('rgba(255,0,0,0.7)');function f(s,w,a,c){if(s<5)return;t.pw(w).fd(5).rt(a*5/s/2);c&&c(s);f(s-5,(s-5)/s*w,a,c)}function g(d){return function(s){t.ss().lt(90*d);f(s/1.8,s/8,d*50);t.rs();};}t.ss();f(800,22,450);t.rs().lt(180).pw(22).fd(30).ss().lt(90);f(270,10,180,g(1));t.rs().ss().rt(90);f(270,10,-180,g(-1));t.rs().pc('rgba(255,0,0,0.5)').ss();f(180,22,175);t.rs();f(170,22,165)
+
+
+
+
+var t = turtle1.cs().home().pu().ht();
+
+t.lt(90).fd(100).rt(90);
+
+repeat(10, () => {
+  var c = com.google.flow.Circle.create({
+    radius: 90,
+    arcWidth: 4,
+    border: 'white',
+    color: hsl(radToDeg(t.rotation), 70, 80),
+    alpha: 0.25
+  });
+  t.fd(80).rt(360/10).lay(c);
+});
+
+
+
+
+var t = turtle1.cs().home().pu().ht();
+canvas1.color = 'black'
+
+function circles(r) {
+  repeat(10, (i) => {
+    var c = com.google.flow.Circle.create({
+      radius: r,
+      arcWidth: 4,
+      border: 'white',
+      color: hsl(i*36, 100, 80),
+      alpha: 0.3,
+      originX: t.x-400,
+      originY: t.y-400
+    }, flow);
+
+    c.addReaction('rotation', "0.003 * timer.time * " + (0.1 + i/10));
+
+    t.lay(c);
+  });
+}
+
+circles(90);
+circles(50);
