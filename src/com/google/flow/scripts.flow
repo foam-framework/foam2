@@ -623,4 +623,4 @@ t.ss(); frac(170, 22, 165); t.rs();
 
 
 
-t=turtle1.cs().pw(1).home().ht().lt(180).pc('rgba(255,0,0,0.7)');function f(s,w,a,c){if(s<5)return;t.pw(w).fd(5).rt(a*5/s/2);c&&c(s);f(s-5,(s-5)/s*w,a,c)}function g(d){return function(s){t.ss().lt(90*d);f(s/1.8,s/8,d*50);t.rs();};}t.ss();f(800,22,450);t.rs().lt(180).pw(22).fd(30).ss().lt(90);f(270,10,180,g(1));t.rs().ss().rt(90);f(270,10,-180,g(-1));t.rs().pc('rgba(255,0,0,0.5)').ss();f(180,22,175);t.rs();f(170,22,165)
+t=turtle1.cs().home().ht().lt(180).pc('rgba(255,0,0,0.7)');function f(s,w,a,c){if(s<5)return;t.pw(w).fd(5).rt(a*5/s/2);c&&c(s);f(s-5,(s-5)/s*w,a,c)}function g(d){return function(s){t.ss().lt(90*d);f(s/1.8,s/8,d*50);t.rs();};}t.ss();f(800,22,450);t.rs().lt(180).pw(22).fd(30).ss().lt(90);f(270,10,180,g(1));t.rs().ss().rt(90);f(270,10,-180,g(-1));t.rs().pc('rgba(255,0,0,0.5)').ss();f(180,22,175);t.rs();f(170,22,165)
