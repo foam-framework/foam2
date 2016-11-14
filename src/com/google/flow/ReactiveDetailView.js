@@ -35,6 +35,11 @@ foam.CLASS({
     }
   ],
   methods: [
+    function addReaction(name, formula) {
+      // TODO: stop any previous reaction
+      this.reactions_[name] = formula;
+      this.startReaction_(name, formula);
+    },
     function startReaction_(name, formula) {
       // HACK: delay starting reaction in case we're loading a file
       // and dependent variables haven't loaded yet.
