@@ -71,10 +71,10 @@ foam.CLASS({
           ! this.name.endsWith('$'),
           'Illegal Property Name: Can\'t end with "$": ', this.name);
 
+      // Either refines or id is required, other assertions enforce that.
       var mName =
         model.id      ? model.id + '.'      :
-        model.refines ? model.refines + '.' :
-        '' ;
+        model.refines + '.';
 
       var es = foam.core.Property.SHADOW_MAP || {};
       for ( var key in es ) {
@@ -200,9 +200,9 @@ foam.core.FObject.validate = function() {
   }
 }
 
-// Change 'false' to 'true' to enable error reporting for setting
-// non-Properties on FObjects.
+// Uncomment to enable error reporting for setting non-Properties on FObjects.
 // TODO: add 'Did you mean...' support.
+/*
 if ( false && global.Proxy ) {
   (function() {
 
@@ -236,6 +236,7 @@ if ( false && global.Proxy ) {
     };
   })();
 }
+*/
 
 
 /* Add describe() support to objects. */
@@ -267,7 +268,7 @@ foam.CLASS({
           value = value.toString();
         }
         console.log(
-          foam.String.pad(p.cls_ ? p.cls_.name : 'anonymous', 20),
+          foam.String.pad(p.cls_.name, 20),
           foam.String.pad(p.name, 14),
           value);
       }
@@ -312,7 +313,7 @@ foam.CLASS({
     function merged(l, opt_delay) {
       var f = this.__context__.merged(l, opt_delay);
       f.toString = function() {
-        return 'MERGED(' + opt_delay + ', ' + listener.$UID + ', ' + listener + ')';
+        return 'MERGED(' + opt_delay + ', ' + l.$UID + ', ' + l + ')';
       };
       return f;
     },
@@ -467,7 +468,7 @@ foam.LIB({
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
           optional:      typeMatch[3] == '?',
-          repeats:       typeMatch[3] == '*',
+          repeats:       typeMatch[4] == '*',
           index:         argIdx++,
           documentation: typeMatch[6],
         }));
