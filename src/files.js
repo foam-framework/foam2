@@ -40,6 +40,7 @@ FOAM_FILES([
   { name: "foam/core/types" },
   { name: "foam/core/Topic" },
   { name: "foam/core/InnerClass" },
+  { name: "foam/core/InnerEnum" },
   { name: "foam/core/Implements" },
   { name: "foam/core/ImportsExports" },
   { name: "foam/core/Listener" },
