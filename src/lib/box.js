@@ -76,6 +76,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'WrappedMessage',
@@ -588,6 +589,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'NamedBox',
@@ -638,10 +640,12 @@ foam.CLASS({
   ]
 });
 
+
 // Retry on local errors.
 foam.CLASS({
   package: 'foam.box',
   name: 'RetryBox',
+
   properties: [
     'attempts',
     'errorBox',
@@ -666,7 +670,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 
 foam.CLASS({
@@ -829,10 +832,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'EventlessClientDAO',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Stub',
@@ -850,6 +855,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PollingClientDAO',
@@ -862,6 +868,7 @@ foam.CLASS({
         return o;
       });
     },
+
     function remove(obj) {
       var self = this;
       return this.SUPER(obj).then(function(o) {
@@ -869,6 +876,7 @@ foam.CLASS({
         return o;
       });
     },
+
     function select(sink, skip, limit, order, predicate) {
       // TODO: Determine which sinks are serializable.
       var self = this;
@@ -890,6 +898,7 @@ foam.CLASS({
         return sink;
       });
     },
+
     function removeAll(skip, limit, order, predicate) {
       this.SUPER(skip, limit, order, predicate);
       this.on.reset.pub();
@@ -951,6 +960,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1058,11 +1068,13 @@ foam.CLASS({
   requires: [
     'foam.box.SocketConnectBox'
   ],
+
   axioms: [
     foam.pattern.Multiton.create({
       property: 'address'
     })
   ],
+
   properties: [
     {
       name: 'address'
@@ -1077,6 +1089,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1107,15 +1120,18 @@ foam.CLASS({
       }
     }
   ],
+
   axioms: [
     foam.pattern.Multiton.create({
       property: 'address'
     })
   ],
+
   methods: [
     function send(m) {
     }
   ],
+
   listeners: [
     function onConnect() {
       this.socketService.addSocket(this);
@@ -1128,6 +1144,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1170,10 +1187,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SendFailedError',
   extends: 'foam.box.Message',
+
   properties: [
     {
       name: 'original'
@@ -1183,6 +1202,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1197,12 +1217,15 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
+
   properties: [
     'socket'
   ],
+
   methods: [
     function send(msg) {
       try {
@@ -1213,6 +1236,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1258,6 +1282,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function send(msg) {
       this.socket.then(function(s) {
@@ -1278,7 +1303,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 
 foam.CLASS({
@@ -1360,9 +1384,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'BoxService',
+
   properties: [
     {
       class: 'Class',
@@ -1378,6 +1404,7 @@ foam.CLASS({
       box = this.next ? this.next.serverBox(box) : box;
       return this.server$cls.create({ delegate: box })
     },
+
     function clientBox(box) {
       box = this.client$cls.create({ delegate: box });
       return this.next ?
@@ -1387,13 +1414,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'HTTPReplyBox',
   implements: ['foam.box.Box'],
+
   imports: [
     'httpResponse'
   ],
+
   methods: [
     {
       name: 'send',
@@ -1411,14 +1441,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'HTTPBox',
+
   implements: ['foam.box.Box'],
+
   requires: [
     'foam.net.HTTPRequest',
     'foam.box.HTTPReplyBox'
   ],
+
   properties: [
     {
       name: 'url'
@@ -1427,6 +1461,7 @@ foam.CLASS({
       name: 'method'
     }
   ],
+
   methods: [
     {
       name: 'send',
