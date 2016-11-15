@@ -1400,8 +1400,10 @@ foam.CLASS({
   name: 'HTTPBox',
   implements: ['foam.box.Box'],
   requires: [
-    'foam.net.HTTPRequest',
-    'foam.box.HTTPReplyBox'
+    'foam.net.HTTPRequest'
+  ],
+  imports: [
+    'me'
   ],
   properties: [
     {
@@ -1411,40 +1413,43 @@ foam.CLASS({
       name: 'method'
     }
   ],
+  classes: [
+    {
+      name: 'JSONOutputter',
+      extends: 'foam.json.Outputer',
+      requires: [
+        'foam.box.HTTPReplyBox'
+      ],
+      imports: [
+        'me'
+      ],
+      methods: [
+        function output(o) {
+          if ( o === this.me ) {
+            return this.SUPER(this.HTTPReplyBox.create());
+          }
+          return this.SUPER(o);
+        }
+      ]
+    }
+  ],
   methods: [
     {
       name: 'send',
       code: function(msg) {
-        var replyBox = msg.replyBox;
-        var errorBox = msg.errorBox;
-
-        // TODO(adamvy): Replace this nonsense with context aware json serialization
-        // that will serialize the ME box as a reply box, and leave the others untouched.
-
-        if ( replyBox ) {
-          msg.replyBox = this.HTTPReplyBox.create();
-        }
-
-        if ( foam.box.WrappedMessage.isInstance(msg) && msg.message.replyBox ) {
-          if ( ! replyBox ) replyBox = msg.message.replyBox;
-          msg.message.replyBox = this.HTTPReplyBox.create();
-        }
+        var outputter = this.JSONOutputter.create().copyFrom(foam.json.Network);
 
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: foam.json.Network.stringify(msg)
+          payload: outputter.stringify(msg)
         }).send();
 
-        if ( replyBox ) {
-          req.then(function(resp) {
-            return resp.payload;
-          }).then(function(p) {
-            replyBox.send(foam.json.parse(foam.json.parseString(p, null, this)));
-          }, function(e) {
-            errorBox.send(e);
-          });
-        }
+        req.then(function(resp) {
+          return resp.payload;
+        }).then(function(p) {
+          this.me.send(foam.json.parse(foam.json.parseString(p, null, this)));
+        }.bind(this));
       }
     }
   ]
