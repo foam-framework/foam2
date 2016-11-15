@@ -368,6 +368,13 @@ foam.CLASS({
       return this.instance_[name] !== undefined;
     },
 
+    function hasDefaultValue(name) {
+      if ( ! this.hasOwnProperty(name) ) return true;
+
+      var axiom = this.cls_.getAxiomByName(obj);
+      return axiom.isDefaultValue(this[name]);
+    },
+
     /**
       Undefine a Property's value.
       The value will revert to either the Property's 'value' or

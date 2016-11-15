@@ -107,6 +107,7 @@ for ( var i = 0 ; i < 20 ; i++ )
 
 */
 
+/*
 foam.CLASS({
   name: 'Test2',
   properties: [ 'id', 'fname', 'lname' ]
@@ -164,6 +165,8 @@ dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
 
 // dao.removeAll();
 
+*/
+
 /*
 foam.CLASS({
   name: 'Parent',
@@ -189,3 +192,22 @@ console.log(c.stringify(), c.clone().stringify());
 c = Child.create({a:'a', b:'b', c:'c', d:'d'});
 console.log(c.stringify(), c.clone().stringify());
 */
+
+foam.CLASS({
+  name: 'JTest',
+  properties: [
+    'a',
+    { class: 'Boolean', name: 'b' },
+    { class: 'Int', name: 'c' },
+    { class: 'Float', name: 'd' },
+    { class: 'String', name: 'e' },
+    { class: 'Array', name: 'f' },
+  ]
+});
+
+var t = JTest.create();
+var t2 = JTest.create({b: true, c: 42, d: 4.5, e: 'foobar', f: []});
+var t3 = JTest.create({b: true, c: 42, d: 4.5, e: 'foobar', f: [1,2,3]});
+console.log(foam.json.Storage.stringify(t));
+console.log(foam.json.Storage.stringify(t2));
+console.log(foam.json.Storage.stringify(t3));
