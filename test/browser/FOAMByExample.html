@@ -1256,7 +1256,8 @@ foam.CLASS({
   } ]
 });
 try {
-  var o = ImportsTest.create();
+  var o = ImportsTest.create(); // should fail here, on object creation
+  log('test created');
   o.foo();
 } catch(e) {
   log('Could not import "myLogger" since nobody provided it.');
@@ -1264,6 +1265,21 @@ try {
 Y.myLogger('test');
 var o = ImportsTest.create(null, Y);
 o.foo();
+
+foam.CLASS({
+  name: 'OptionalImportsTest',
+  imports: [ 'myLogger?' ],
+  methods: [ function foo() {
+    this.myLogger('log foo from ImportTest');
+  } ]
+});
+try {
+  var o = OptionalImportsTest.create();
+  log('test created');
+  o.foo(); // should fail here, on import use
+} catch(e) {
+  log('Could not import "myLogger" since nobody provided it.');
+}
 
 // Classes can export values for use by objects they create.
 foam.CLASS({
