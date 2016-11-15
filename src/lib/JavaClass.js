@@ -37,6 +37,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'CodeProperty',
@@ -56,6 +57,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.java',
   name: 'Outputter',
+
   properties: [
     {
       name: 'indentLevel_',
@@ -70,11 +72,13 @@ foam.CLASS({
       name: 'buf_'
     }
   ],
+
   methods: [
     function indent() {
       for ( var i = 0 ; i < this.indentLevel_ ; i++ ) this.buf_ += this.indentStr;
       return this;
     },
+
     function out() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
         if ( arguments[i] != null && arguments[i].outputJava ) { arguments[i].outputJava(this); }
@@ -82,22 +86,27 @@ foam.CLASS({
       }
       return this;
     },
+
     function increaseIndent() {
       this.indentLevel_++;
     },
+
     function decreaseIndent() {
       this.indentLevel_--;
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Argument',
+
   properties: [
     'type',
     'name'
   ],
+
   methods: [
     function outputJava(o) {
       o.out(this.type, ' ', this.name);
@@ -105,9 +114,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'InterfaceMethod',
+
   properties: [
     {
       class: 'String',
@@ -130,6 +141,7 @@ foam.CLASS({
       getter: function() {}
     }
   ],
+
   methods: [
     function outputJava(o) {
       o.indent();
@@ -146,9 +158,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Method',
+
   properties: [
     'name',
     { class: 'String', name: 'visibility' },
@@ -161,6 +175,7 @@ foam.CLASS({
     },
     { class: 'foam.java.CodeProperty', name: 'body' }
   ],
+
   methods: [
     function outputJava(o) {
       o.indent();
@@ -183,9 +198,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Field',
+
   properties: [
     'name',
     { class: 'String', name: 'visibility' },
@@ -199,6 +216,7 @@ foam.CLASS({
     },
     { class: 'foam.java.CodeProperty', name: 'initializer' }
   ],
+
   methods: [
     function outputJava(o) {
       o.indent();
@@ -216,9 +234,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Class',
+
   properties: [
     'name',
     'package',
@@ -269,6 +289,7 @@ foam.CLASS({
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function getField(name) {
       for ( var i  = 0 ; this.fields && i < this.fields.length ; i++ ) {
@@ -288,10 +309,12 @@ foam.CLASS({
       this.fields.push(f);
       return this;
     },
+
     function method(m) {
       this.methods.push(foam.java.Method.create(m));
       return this;
     },
+
     function outputJava(o) {
       if ( this.anonymous ) {
         o.out('new ', this.extends, '()');
@@ -347,9 +370,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Interface',
+
   properties: [
     {
       class: 'String',
@@ -375,21 +400,26 @@ foam.CLASS({
       factory: function() { return []; }
     }
   ],
+
   methods: [
     function method(m) {
       this.methods.push(foam.java.InterfaceMethod.create(m));
       return this;
     },
+
     function getMethod(name) {
       return this.methods.find(function(m) { return m.name == name; });
     },
+
     function field() {
     },
+
     function toJavaSource() {
       var output = foam.java.Outputter.create();
       output.out(this);
       return output.buf_;
     },
+
     function outputJava(o) {
       if ( this.package ) { o.out('package ', this.package, ';\n\n'); }
 
@@ -419,9 +449,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'ClassInfo',
+
   properties: [
     {
       name: 'name',
@@ -439,10 +471,12 @@ foam.CLASS({
       value: 1
     }
   ],
+
   methods: [
     function addProperty(id) {
       this.properties.push(id);
     },
+
     function outputJava(o) {
       o.indent();
       o.out('private static final foam.core.ClassInfo classInfo_ = new foam.core.ClassInfoImpl()\n')
@@ -460,6 +494,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Implements',
   methods: [
@@ -468,6 +503,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.InnerClass',
@@ -482,6 +518,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.LIB({
   name: 'foam.core.FObject',
@@ -520,10 +557,12 @@ foam.LIB({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'PropertyInfo',
   extends: 'foam.java.Class',
+
   properties: [
     ['anonymous', true],
     'propName',
@@ -612,6 +651,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
   methods: [
@@ -625,6 +665,7 @@ foam.CLASS({
         transient: this.transient
       })
     },
+
     function buildJavaClass(cls) {
       // Use javaInfoType as an indicator that this property should be generated to java code.
       if ( ! this.javaInfoType ) return;
@@ -673,6 +714,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
   properties: [
@@ -688,6 +730,7 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractPropertyInfo']
   ],
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
@@ -703,6 +746,7 @@ foam.CLASS({
       return info;
     }
   ],
+
   templates: [
     {
       name: 'compareTemplate',
@@ -723,13 +767,16 @@ return 0;
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Array',
+
   properties: [
     ['javaType', 'Object[]'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
   ],
+
   templates: [
     {
       name: 'compareTemplate',
@@ -747,6 +794,7 @@ foam.CLASS({
         return 0;*/}
     }
   ],
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
@@ -761,10 +809,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.java',
   name: 'MultiPartGetter',
+
   properties: [
     'props',
     'clsName'
   ],
+
   methods: [
     function outputJava(o) {
       var props = this.props;
@@ -800,13 +850,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'MultiPartSetter',
+
   properties: [
     'props',
     'clsName'
   ],
+
   methods: [
     function outputJava(o) {
       var props = this.props;
@@ -830,13 +883,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.MultiPartID',
+
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.parse.Fail'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ],
+
   methods: [
     function buildJavaClass(cls) {
       this.SUPER(cls);
@@ -857,6 +913,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.ProxiedMethod',
@@ -885,13 +942,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Int',
+
   properties: [
     ['javaType', 'int'],
     ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser']
   ],
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
