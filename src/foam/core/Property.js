@@ -179,6 +179,11 @@ foam.CLASS({
       function(o1, o2) { return foam.util.compare(o1, o2); }
     ],
 
+    [
+      'isDefaultValue',
+      function(v) { return ! this.comparePropertyValues(this.value, v); }
+    ],
+
     {
       /** Makes Properties useful as map functions. */
       name: 'f',
