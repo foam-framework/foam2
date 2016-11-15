@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 require('../../../foam');
 require('./ProtobufParser');
 var fs = require('fs');
@@ -36,4 +37,3 @@ for ( var i = 3 ; i < process.argv.length ; i++ ) {
 }
 
 fs.writeFileSync(outfile, 'var FOAM_PROTOS = ' + JSON.stringify(files) + ';');
-
