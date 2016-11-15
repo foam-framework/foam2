@@ -544,3 +544,24 @@ foam.LIB({
     }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+
+  documentation: 'Assert that all required imports are provided.',
+
+  methods: [
+    function init() {
+      var is = this.cls_.getAxiomsByClass(foam.core.Import);
+      for ( var i = 0 ; i < is.length ; i++ ) {
+        var imp = is[i];
+
+        if ( imp.required && ! this.__context__[imp.key + '$'] ) {
+          var m = 'Missing required import: ' + imp.key + ' in ' + this.cls_.id;
+          this.assert(false, m);
+        }
+      }
+    }
+  ]
+});
