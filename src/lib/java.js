@@ -148,9 +148,11 @@ for ( var i = 0 ; i < a.length; i++ ) {
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Skeleton',
+
   properties: [
     {
       class: 'Class',
@@ -175,6 +177,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
@@ -200,6 +203,7 @@ foam.CLASS({
       return cls;
     }
   ],
+
   templates: [
     {
       name: 'sendMethodCode',
@@ -241,6 +245,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
 
@@ -269,6 +274,7 @@ foam.CLASS({
       m.sourceCls_ = child.sourceCls_;
       return m;
     },
+
     function buildJavaClass(cls) {
       if ( ! this.javaCode && ! this.abstract ) return;
 
@@ -317,6 +323,7 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Method',
   properties: [
@@ -328,8 +335,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Import',
+
   methods: [
     function buildJavaClass(cls) {
       cls.method({
@@ -340,6 +349,7 @@ foam.CLASS({
       });
     }
   ],
+
   templates: [
     {
       name: 'axiomJavaSource',
@@ -384,8 +394,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
+
   properties: [
     {
       class: 'String',
@@ -473,6 +485,7 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
@@ -500,11 +513,13 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Array',
+
   properties: [
     ['javaType', 'Object[]'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
   ],
+
   templates: [
     {
       name: 'axiomClassInfo',
@@ -560,6 +575,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
+
   properties: [
     {
       name: 'javaType',
@@ -573,6 +589,7 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractPropertyInfo']
   ],
+
   templates: [
     {
       name: 'axiomClassInfo',
@@ -625,6 +642,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Boolean',
   properties: [
@@ -634,6 +652,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Object',
   properties: [
@@ -642,6 +661,7 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Proxy',
@@ -654,6 +674,7 @@ foam.CLASS({
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Reference',
