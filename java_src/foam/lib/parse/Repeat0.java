@@ -28,12 +28,12 @@ public class Repeat0 implements Parser {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    ArrayList values = new ArrayList();
+    boolean first = true;
     PStream result;
     int i;
 
     for ( i = 0 ; max == -1 || i < max ; i++ ) {
-      if ( delim != null && values.size() != 0 ) {
+      if ( delim != null && ! first ) {
         result = delim.parse(ps, x);
         if ( result == null ) break;
         ps = result;
@@ -42,6 +42,7 @@ public class Repeat0 implements Parser {
       result = p.parse(ps, x);
       if ( result == null ) break;
       ps = result;
+      first = false;
     }
 
     if ( min != -1 && i < min ) return null;
