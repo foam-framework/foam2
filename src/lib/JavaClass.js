@@ -614,6 +614,12 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Property',
+  properties: [
+    {
+      class: 'String',
+      name: 'javaFactory'
+    }
+  ],
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
@@ -632,20 +638,32 @@ foam.CLASS({
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
+      var isSet = this.name + 'IsSet_';
+      var factoryName = capitalized + 'Factory_';
 
-      cls
-        .field({
+      cls.
+        field({
           name: privateName,
           type: this.javaType,
           visibility: 'private'
-        })
-        .method({
+        }).
+        field({
+          name: isSet,
+          type: 'boolean',
+          visibility: 'private',
+          initializer: 'false;'
+        }).
+        method({
           name: 'get' + capitalized,
           type: this.javaType,
           visibility: 'public',
-          body: 'return ' + privateName + ';'
-        })
-        .method({
+          body: ( this.hasOwnProperty('javaFactory') ?
+              'if ( ! ' + isSet + ' ) {\n' +
+              '  set' + capitalized + '(' + factoryName + '());\n' +
+              '}\n' : '' ) +
+            'return ' + privateName + ';'
+        }).
+        method({
           name: 'set' + capitalized,
           visibility: 'public',
           args: [
@@ -656,9 +674,18 @@ foam.CLASS({
           ],
           type: cls.name,
           body: privateName + ' = val;\n'
-            + 'return this;'
+              + isSet + ' = true;\n'
+              + 'return this;'
         });
 
+      if ( this.hasOwnProperty('javaFactory') ) {
+        cls.method({
+          name: factoryName,
+          visibility: 'protected',
+          type: this.javaType,
+          body: this.javaFactory
+        });
+      }
 
       cls.field({
         name: constantize,
