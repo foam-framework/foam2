@@ -84,8 +84,16 @@ foam.CLASS({
   documentation: 'Import Context Value Axiom',
 
   properties: [
-    'name',
+    {
+      class: 'String',
+      name: 'name'
+    },
     'key',
+    {
+      class: 'Boolean',
+      name: 'required',
+      value: true
+    },
     {
       name: 'slotName_',
       factory: function() { return this.name + '$'; }
@@ -137,7 +145,10 @@ foam.CLASS({
   documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
-    'name',
+    {
+      class: 'String',
+      name: 'name'
+    },
     {
       name: 'exportName',
       postSet: function(_, name) {
@@ -207,8 +218,11 @@ foam.CLASS({
       name: 'imports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var a = o.split(' as ');
-          return foam.core.Import.create({name: a[1] || a[0], key: a[0]});
+          var a        = o.split(' as ');
+          var key      = a[0];
+          var optional = key.endsWith('?');
+          if ( optional ) key = key.slice(0, key.length-1);
+          return foam.core.Import.create({name: a[1] || key, key, required: ! optional});
         }
 
         return foam.core.Import.create(o);

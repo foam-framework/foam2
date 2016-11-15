@@ -18,6 +18,7 @@
 foam.INTERFACE({
   package: 'foam.dao',
   name: 'DAODecorator',
+
   methods: [
     {
       name: 'write',
@@ -91,10 +92,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DecoratedDAO',
   extends: 'foam.dao.ProxyDAO',
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -102,6 +105,7 @@ foam.CLASS({
       name: 'decorator'
     }
   ],
+
   methods: [
     {
       name: 'put',
