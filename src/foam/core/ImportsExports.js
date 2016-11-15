@@ -87,6 +87,11 @@ foam.CLASS({
     'name',
     'key',
     {
+      class: 'Boolean',
+      name: 'required',
+      value: true
+    },
+    {
       name: 'slotName_',
       factory: function() { return this.name + '$'; }
     }
@@ -207,8 +212,11 @@ foam.CLASS({
       name: 'imports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var a = o.split(' as ');
-          return foam.core.Import.create({name: a[1] || a[0], key: a[0]});
+          var a        = o.split(' as ');
+          var key      = a[0];
+          var required = key.endsWith('?');
+          if ( required ) key = key.slice(0, key.length-1);
+          return foam.core.Import.create({name: a[1] || a[0], key});
         }
 
         return foam.core.Import.create(o);
