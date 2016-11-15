@@ -538,7 +538,7 @@ function sind(d) {
 function waves(r) {
   repeat(r, (i) => {
     var y = i * t.parent.height / r;
-    t.pc(hsl(i/r*720%360+180,0,15+i/r*45));
+    t.pc(hsl(i/r*720%360+180,0,5+i/r*65));
     t.pu();
     repeat(t.parent.width/10, (x) => {
       x *= 10;
