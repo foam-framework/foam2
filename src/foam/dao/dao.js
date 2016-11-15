@@ -970,7 +970,7 @@ foam.CLASS({
           self.delegateSub_ = null;
         });
       }
-      this.SUPER.apply(this, arguments);
+      return this.SUPER.apply(this, arguments);
     },
 
     function select(sink, skip, limit, order, predicate) {
