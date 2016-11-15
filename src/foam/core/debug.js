@@ -582,6 +582,17 @@ foam.CLASS({
         }
       }
     }
+  ],
+
+  methods: [
+    function installInClass(c) {
+      // Produce warning for duplicate imports
+      if ( c.getSuperAxiomByName(this.name) ) {
+        this.warn(
+          'Import "' + this.name + '" already exists in ancestor class of ' +
+          c.id + '.');
+      }
+    }
   ]
 });
 
