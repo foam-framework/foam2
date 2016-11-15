@@ -565,3 +565,39 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'foam.core.Import',
+
+  properties: [
+    {
+      name: 'name',
+      assertValue: function(n) {
+        if ( ! /^[a-zA-Z][a-zA-Z0-9_]*?$/.test(n) ) {
+          var m = 'Import name "' + n + '" must be a valid variable name.';
+          if ( n.indexOf('.') !== -1 ) m += ' Did you mean requires:?';
+
+          this.assert(false, m);
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Export',
+
+  properties: [
+    {
+      name: 'name',
+      assertValue: function(n) {
+        if ( ! /^[a-zA-Z][a-zA-Z0-9_]*?$/.test(n) ) {
+          var m = 'Export name "' + n + '" must be a valid variable name.';
+          this.assert(false, m);
+        }
+      }
+    }
+  ]
+});
