@@ -60,15 +60,7 @@ public class APIServlet extends HttpServlet {
     }
 
     foam.box.Message msg = (foam.box.Message)request;
-    System.out.println("Got request " + msg.getClass().getName());
 
     registry.send(msg);
-
-    if ( ! ( msg.getReplyBox() instanceof foam.box.HTTPReplyBox ) ) {
-      resp.setStatus(resp.SC_BAD_REQUEST);
-      PrintWriter out = resp.getWriter();
-      out.println("Not an HTTPReplyBox");
-      out.flush();
-    }
   }
 }
