@@ -288,13 +288,17 @@ foam.CLASS({
   ],
 
   methods: [
-    function send(msg) {
-      this.delegate.send(this.SubBoxMessage.create({
-        name: this.name,
-        message: msg,
-        errorBox: msg.errorBox,
-        replyBox: msg.replyBox
-      }));
+    {
+      name: 'send',
+      code: function(msg) {
+        this.delegate.send(this.SubBoxMessage.create({
+          name: this.name,
+          message: msg
+        }));
+      },
+      javaCode: 'getDelegate().send(getX().create(foam.box.SubBoxMessage.class)\n'
+                + '  .setName(getName())\n'
+                + '  .setMessage(message));\n'
     }
   ]
 });
