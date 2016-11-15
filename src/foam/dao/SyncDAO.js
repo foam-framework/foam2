@@ -37,6 +37,7 @@ foam.CLASS({
   ]
 });
 
+
 /**
   SyncDAO synchronizes data between multiple client's offline caches and a server.
   When syncronizing, each client tracks the last-seen version of each object,
