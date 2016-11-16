@@ -70,6 +70,7 @@ foam.CLASS({
           color:       o.color,
           compressionStrength: o.compressionStrength,
           end:         o.end,
+          friction:    o.friction,
           gravity:     o.gravity,
           head:        o.head,
           height:      o.height,
