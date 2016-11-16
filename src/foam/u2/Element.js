@@ -174,8 +174,8 @@ foam.CLASS({
     function output(out) {},
     function load() {},
     function unload() {},
-    function remove() {},
-    function destroy() {},
+    function onRemove() {},
+    // function destroy() {},
     function onSetCls() {},
     function onFocus() {},
     function onAddListener() {},
@@ -299,7 +299,7 @@ foam.CLASS({
       this.state = this.UNLOADED;
       this.visitChildren('unload');
     },
-    function remove() { this.unload(); },
+    function onRemove() { this.unload(); },
     function onSetCls(cls, enabled) {
       var e = this.el();
       if ( e ) {
@@ -651,6 +651,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.state = this.UNLOADED;
+      this.onDestroy(this.visitChildren.bind(this, 'destroy'));
     },
 
     function initE() {
@@ -947,7 +948,7 @@ foam.CLASS({
         Remove this Element from its parent Element.
         Will transition to UNLOADED state.
       */
-      this.state.remove.call(this);
+      this.onRemove();
 
       if ( this.parentNode ) {
         var cs = this.parentNode.childNodes;
@@ -1389,11 +1390,16 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) { return e.toE ? e.toE(null, Y) : e; });
+      children = children.map(function(e) {
+        e = e.toE ? e.toE(null, Y) : e;
+        e.parentNode = this;
+        return e;
+      }.bind(this));
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes,
           [ index, 0 ].concat(children));
+
       this.state.onInsertChildren.call(
         this,
         children,
@@ -1480,9 +1486,9 @@ foam.CLASS({
         var e2 = nextE();
         self.insertBefore(e2, first);
         if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) e[i].remove();
+          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].destroy(); }
         } else {
-          if ( e.state === e.LOADED ) e.remove();
+          if ( e.state === e.LOADED ) { e.remove(); e.destroy(); }
         }
         e = e2;
       };
