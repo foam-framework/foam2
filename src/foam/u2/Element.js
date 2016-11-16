@@ -1621,23 +1621,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Slot',
   methods: [
-    function toE() {
-      return this;
-    }
+    function toE() { return this; }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.ExpressionSlot',
   methods: [
-    function toE() {
-      return this;
-    }
+    function toE() { return this; }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -1736,6 +1735,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Reference',
