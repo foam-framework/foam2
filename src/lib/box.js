@@ -289,13 +289,17 @@ foam.CLASS({
   ],
 
   methods: [
-    function send(msg) {
-      this.delegate.send(this.SubBoxMessage.create({
-        name: this.name,
-        message: msg,
-        errorBox: msg.errorBox,
-        replyBox: msg.replyBox
-      }));
+    {
+      name: 'send',
+      code: function(msg) {
+        this.delegate.send(this.SubBoxMessage.create({
+          name: this.name,
+          message: msg
+        }));
+      },
+      javaCode: 'getDelegate().send(getX().create(foam.box.SubBoxMessage.class)\n'
+                + '  .setName(getName())\n'
+                + '  .setMessage(message));\n'
     }
   ]
 });
@@ -338,6 +342,7 @@ foam.CLASS({
       name: 'registry',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       javaType: 'java.util.Map',
+      javaFactory: 'return getX().create(java.util.HashMap.class);',
       factory: function() { return {}; }
     }
   ],
@@ -357,27 +362,6 @@ foam.CLASS({
           name: 'localBox'
         }
       ]
-    }
-  ],
-
-  axioms: [
-    {
-      name: 'javaInit',
-      buildJavaClass: function(cls) {
-        // TODO(adamvy): Remove this once we have java factory support.
-        cls.extras.push({
-          outputJava: function(o) {
-            o.indent();
-            o.out('{\n');
-            o.increaseIndent();
-            o.indent();
-            o.out('setRegistry(getX().create(java.util.HashMap.class));\n');
-            o.decreaseIndent();
-            o.indent();
-            o.out('}');
-          }
-        });
-      }
     }
   ],
 
@@ -1449,8 +1433,11 @@ foam.CLASS({
   implements: ['foam.box.Box'],
 
   requires: [
-    'foam.net.HTTPRequest',
-    'foam.box.HTTPReplyBox'
+    'foam.net.HTTPRequest'
+  ],
+
+  imports: [
+    'me'
   ],
 
   properties: [
@@ -1462,40 +1449,44 @@ foam.CLASS({
     }
   ],
 
+  classes: [
+    {
+      name: 'JSONOutputter',
+      extends: 'foam.json.Outputer',
+      requires: [
+        'foam.box.HTTPReplyBox'
+      ],
+      imports: [
+        'me'
+      ],
+      methods: [
+        function output(o) {
+          if ( o === this.me ) {
+            return this.SUPER(this.HTTPReplyBox.create());
+          }
+          return this.SUPER(o);
+        }
+      ]
+    }
+  ],
+
   methods: [
     {
       name: 'send',
       code: function(msg) {
-        var replyBox = msg.replyBox;
-        var errorBox = msg.errorBox;
-
-        // TODO(adamvy): Replace this nonsense with context aware json serialization
-        // that will serialize the ME box as a reply box, and leave the others untouched.
-
-        if ( replyBox ) {
-          msg.replyBox = this.HTTPReplyBox.create();
-        }
-
-        if ( foam.box.WrappedMessage.isInstance(msg) && msg.message.replyBox ) {
-          if ( ! replyBox ) replyBox = msg.message.replyBox;
-          msg.message.replyBox = this.HTTPReplyBox.create();
-        }
+        var outputter = this.JSONOutputter.create().copyFrom(foam.json.Network);
 
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: foam.json.Network.stringify(msg)
+          payload: outputter.stringify(msg)
         }).send();
 
-        if ( replyBox ) {
-          req.then(function(resp) {
-            return resp.payload;
-          }).then(function(p) {
-            replyBox.send(foam.json.parse(foam.json.parseString(p, null, this)));
-          }, function(e) {
-            errorBox.send(e);
-          });
-        }
+        req.then(function(resp) {
+          return resp.payload;
+        }).then(function(p) {
+          this.me.send(foam.json.parse(foam.json.parseString(p, null, this)));
+        }.bind(this));
       }
     }
   ]
