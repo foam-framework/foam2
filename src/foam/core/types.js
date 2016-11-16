@@ -238,7 +238,11 @@ foam.CLASS({
       value: function(value, opt_ctx) {
         return foam.json.parse(value, null, opt_ctx);
       }
-    }
+    },
+    [
+      'isDefaultValue',
+      function(v) { return ! v || ! v.length; }
+    ],
   ]
 });
 
