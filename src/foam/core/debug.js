@@ -612,3 +612,31 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+
+  documentation: '.',
+
+  methods: [
+    function describeListeners() {
+      var self  = this;
+      var count = 0;
+      function show(ls, path) {
+        var next = ls.next;
+        for ( var next = ls.next ; next ; next = next.next ) {
+          count++;
+          self.log(path, {l:next.l});
+        }
+
+        for ( var key in ls.children ) {
+          show(ls.children[key], path ? path + '.' + key : key);
+        }
+      }
+
+      show(this.getPrivate_('listeners'));
+      this.log(count, 'subscriptions');
+    }
+  ]
+});
