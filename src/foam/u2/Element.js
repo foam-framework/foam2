@@ -523,9 +523,10 @@ foam.CLASS({
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED && oldState == undefined ) {
-          // Check oldState == undefined so that we don't publish onunload
-          // when we've never been loaded.
+        } else if ( state === this.UNLOADED && oldState ) {
+          // When state is first set from the factory oldState will be undefined
+          // but we don't want to publish that we're unloaded since we haven't
+          // actually been loaded yet.
           this.pub('onunload');
         }
       }
@@ -650,7 +651,6 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.state = this.UNLOADED;
       this.onDestroy(this.visitChildren.bind(this, 'destroy'));
     },
 
@@ -1482,6 +1482,10 @@ foam.CLASS({
 
       var e = nextE();
       var l = function() {
+        if ( self.isDestroyed() || self.state !== self.LOADED ) {
+          s && s.destroy();
+          return;
+        }
         var first = Array.isArray(e) ? e[0] : e;
         var e2 = nextE();
         self.insertBefore(e2, first);
