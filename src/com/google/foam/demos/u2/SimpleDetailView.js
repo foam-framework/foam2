@@ -17,14 +17,16 @@
 
 foam.CLASS({
   name: 'Test1',
+  label: 'Test 1',
 
-  properties: [ 'a', 'b' ]
+  properties: [ { class: 'Int', name: 'a' }, 'b' ]
 });
 
 foam.CLASS({
   name: 'Test2',
+  label: 'Test 2',
 
-  properties: [ 'a', 'b', 'c', 'd' ]
+  properties: [ { class: 'Boolean', name: 'a' }, 'b', 'c', 'd' ]
 });
 
 var timer = foam.util.Timer.create();
@@ -33,13 +35,14 @@ timer.start();
 var E = foam.__context__.E.bind(foam.__context__);
 
 var os = [
-  Test1.create({a: 1, b: 2}), Test2.create({a: 3, b: 4, c: 5, d: 6})
+  Test1.create({a: 1, b: 2}), Test1.create({a: 3, b: 4}), Test2.create({a: 3, b: 4, c: 5, d: 6})
 ];
 
-foam.u2.DetailView.create({data: os[0]}).write();
-foam.u2.DetailView.create({data: os[1]}).write();
+//foam.u2.DetailView.create({data: os[0]}).write();
+//foam.u2.DetailView.create({data: os[1]}).write();
+//foam.u2.DetailView.create({data: os[2]}).write();
 
 var dv = foam.u2.DetailView.create({data$: timer.second$.map(function(s) {
-  return os[s % 2];
+  return os[s % 3];
 })});
 dv.write();
