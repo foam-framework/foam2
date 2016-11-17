@@ -177,12 +177,6 @@ foam.CLASS({
 
       return this.E().add(e).
         start('div').cssClass(this.myCls('toolbar')).add(this.actions).end();
-    },
-
-    function elementForFeature(fName) {
-      debugger;
-      var f = this.cls_.getFeature(fName) || this.X.data.model_.getFeature(fName);
-      return f ? f.toE(this.Y) : this.E('Unknown feature: ' + fName).style({color: 'red'});
     }
   ]
 });
