@@ -312,15 +312,17 @@ foam.CLASS({
   ],
 
   listeners: [
-    function parentChange() {
+    function parentChange(s) {
       this.prevSub && this.prevSub.destroy();
       var o = this.parent.get();
 
-      // If the parent object changes class, then don't
-      // update because a new class will have different
-      // sub-slots.
+      // If the parent object changes class, then don't update
+      // because a new class will have different sub-slots.
       if ( this.of ) {
-        if ( ! this.of.isInstance(o) ) return;
+        if ( this.of !== ( o && o.cls_ ) ) {
+          s.destroy();
+          return;
+        }
       } else {
         if ( o ) this.of = o.cls_;
       }
