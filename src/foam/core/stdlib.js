@@ -164,6 +164,28 @@ foam.LIB({
     },
 
     /**
+     * Decorates the function 'f' to cache the return value of 'f' when
+     * called in the future. Also known as a 'thunk'.
+     */
+    function memoize0(f) {
+      console.assert(
+        typeof f === 'function',
+        'Cannot apply memoize to something that is not a function.');
+
+      var set = false, cache;
+
+      return foam.Function.setName(
+          function() {
+            if ( ! set ) {
+              set = true;
+              cache = f();
+            }
+            return cache;
+          },
+          'memoize0(' + f.name + ')');
+    },
+
+    /**
      * Decorates the function 'f' to cache the return value of 'f' when called
      * with a particular value for its first argument.
      */
@@ -707,6 +729,16 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
+    },
+
+    /**
+     * Register a class lazily in the global namespace.
+     * The class is not created until accessed the first time.
+     * The provided factory function creates the class.
+     */
+    function registerClassFactory(m, factory) {
+      var pkg = foam.package.ensurePackage(global, m.package);
+      Object.defineProperty(pkg, m.name, {get: factory, configurable: true});
     },
 
     /**
