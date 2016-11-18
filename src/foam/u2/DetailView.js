@@ -33,7 +33,7 @@ foam.CLASS({
     {
       name: 'data',
       preSet: function(_, data) {
-        if ( data && data.cls_ !== this.of ) {
+        if ( data && data.cls_ !== this.of$cls ) {
           this.of = data.cls_;
         }
         return data;
@@ -84,7 +84,7 @@ foam.CLASS({
     {
       name: 'title',
       attribute: true,
-      expression: function(of) { return this.of$cls.label; },
+      expression: function(of) { return this.of$cls.model_.label; },
       // documentation: function() {/*
       //  <p>The display title for the $$DOC{ref:'foam.ui.View'}.
       //  </p>
@@ -177,11 +177,6 @@ foam.CLASS({
 
       return this.E().add(e).
         start('div').cssClass(this.myCls('toolbar')).add(this.actions).end();
-    },
-
-    function elementForFeature(fName) {
-      var f = this.cls_.getFeature(fName) || this.X.data.model_.getFeature(fName);
-      return f ? f.toE(this.Y) : this.E('Unknown feature: ' + fName).style({color: 'red'});
     }
   ]
 });
