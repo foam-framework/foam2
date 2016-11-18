@@ -29,7 +29,7 @@ foam.CLASS({
       name: 'dao',
       hidden: true,
       factory: function() {
-        return this.__context__[this.of$cls.id + 'DAO'];
+        return this.__context__[this.of.id + 'DAO'];
       }
     },
     {
@@ -42,7 +42,7 @@ foam.CLASS({
       label: '',
       view: { class: 'foam.u2.DetailView' },
       factory: function() {
-        return this.of$cls.create(null, this);
+        return this.of.create(null, this);
       }
     }
   ],

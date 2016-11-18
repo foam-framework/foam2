@@ -149,7 +149,7 @@ foam.CLASS({
       name: 'updatePredicate',
       code: function(sub, _, __, slot) {
         var str = slot.get();
-        this.predicate = str ? this.op$cls.create({
+        this.predicate = str ? this.op.create({
           arg1: this.property,
           arg2: this.property.fromString ? this.property.fromString(str) : str
         }) : this.True.create();
