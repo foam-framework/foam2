@@ -20,11 +20,10 @@
   var isServer = typeof process === 'object';
   var isWorker = typeof importScripts !== 'undefined';
 
-  var flags = {
-    'web': ! isServer,
-    'debug': true,
-    'node': isServer
-  };
+  var flags = this.FOAM_FLAGS || {};
+  flags.web = ! isServer,
+  flags.node = isServer;
+  flags.debug = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
