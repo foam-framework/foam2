@@ -33,7 +33,7 @@ foam.CLASS({
     {
       name: 'data',
       preSet: function(_, data) {
-        if ( data && data.cls_ !== this.of$cls ) {
+        if ( data && data.cls_ !== this.of ) {
           this.of = data.cls_;
         }
         return data;
@@ -62,7 +62,7 @@ foam.CLASS({
       },
       expression: function(of) {
         if ( ! of ) return [];
-        return this.of$cls.getAxiomsByClass(foam.core.Property).
+        return this.of.getAxiomsByClass(foam.core.Property).
             filter(function(p) { return ! p.hidden; });
       }
     },
@@ -74,7 +74,7 @@ foam.CLASS({
     {
       name: 'actions',
       expression: function(of) {
-        return this.of$cls.getAxiomsByClass(foam.core.Action);
+        return this.of.getAxiomsByClass(foam.core.Action);
       }
     },
     {
@@ -84,7 +84,7 @@ foam.CLASS({
     {
       name: 'title',
       attribute: true,
-      expression: function(of) { return this.of$cls.model_.label; },
+      expression: function(of) { return this.of.model_.label; },
       // documentation: function() {/*
       //  <p>The display title for the $$DOC{ref:'foam.ui.View'}.
       //  </p>
