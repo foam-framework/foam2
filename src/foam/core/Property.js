@@ -293,6 +293,7 @@ foam.CLASS({
       var preSet      = prop.preSet;
       var postSet     = prop.postSet;
       var factory     = prop.factory;
+      var getter      = prop.getter;
       var value       = prop.value;
       var hasValue    = typeof value !== 'undefined';
       var slotName    = name + '$';
@@ -345,8 +346,8 @@ foam.CLASS({
       // Call 'getter' if provided, else return value from instance_ if set.
       // If not set, return value from 'factory', 'expression', or
       // (default) 'value', if provided.
-      var getter =
-        prop.getter ? prop.getter :
+      var get =
+        getter ? function() { return getter.call(this, prop); } :
         factory ? function factoryGetter() {
           var v = this.instance_[name];
           if ( v !== undefined ) return v;
@@ -380,7 +381,7 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
-      var setter = prop.setter ? prop.setter :
+      var set = prop.setter ? prop.setter :
         ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ?
         function simplePropSetter(newValue) {
           if ( newValue === undefined ) {
@@ -460,8 +461,8 @@ foam.CLASS({
         };
 
       Object.defineProperty(proto, name, {
-        get: getter,
-        set: setter,
+        get: get,
+        set: set,
         configurable: true
       });
     },
