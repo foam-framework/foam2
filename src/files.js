@@ -53,7 +53,7 @@ FOAM_FILES([
   { name: "foam/core/Interface" },
   { name: "foam/core/ContextMethod" },
   { name: "foam/core/Window" },
-  { name: "foam/core/debug" },
+  { name: "foam/core/debug", flags: ['debug'] },
   { name: "foam/core/patterns" },
   { name: "foam/core/JSON" },
   { name: "foam/parse/parse" },
