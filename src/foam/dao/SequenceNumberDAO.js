@@ -69,7 +69,7 @@ foam.CLASS({
       name: 'property_',
       hidden: true,
       expression: function(property, of) {
-        var a = this.of$cls.getAxiomByName(property);
+        var a = this.of.getAxiomByName(property);
         if ( ! a ) {
           throw this.InternalException.create({message:
               'SequenceNumberDAO specified with invalid property ' +

@@ -33,7 +33,7 @@ foam.CLASS({
   methods: [
     function fromProperty(prop) {
       if ( ! this.hasOwnProperty('objToChoice') ) {
-        var of = prop.of$cls;
+        var of = prop.of;
 
         var props = of.getAxiomsByClass(foam.core.String);
         var f;

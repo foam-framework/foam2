@@ -1386,11 +1386,11 @@ foam.CLASS({
   methods: [
     function serverBox(box) {
       box = this.next ? this.next.serverBox(box) : box;
-      return this.server$cls.create({ delegate: box })
+      return this.server.create({ delegate: box })
     },
 
     function clientBox(box) {
-      box = this.client$cls.create({ delegate: box });
+      box = this.client.create({ delegate: box });
       return this.next ?
         this.next.clientBox(box) :
         box;
