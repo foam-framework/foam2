@@ -22,6 +22,7 @@
 
   var flags = {
     'web': ! isServer,
+    'debug': true,
     'node': isServer
   };
 
