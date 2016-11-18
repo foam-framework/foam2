@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+// enable FOAM java support.
+global.FOAM_FLAGS = { 'java': true };
+
 require('../src/foam.js');
 
 var classes = [
