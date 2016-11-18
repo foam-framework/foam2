@@ -30,6 +30,7 @@ foam.CLASS({
   listeners: [
     function onLoad() {
       var els = this.document.getElementsByTagName('foam');
+      this.window.removeEventListener('load', this.onLoad);
 
       // Install last to first to avoid messing up the 'els' list.
       for ( var i = els.length-1 ; i >= 0 ; i-- ) {
