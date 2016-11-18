@@ -312,7 +312,7 @@ foam.CLASS({
 
       // Upgrade Strings to actual classes, if available.
       if ( foam.String.isInstance(c) ) {
-        c = this.lookup(c);
+        c = this.lookup(c, true);
         if ( c ) this.instance_[prop.name] = c;
       }
 
