@@ -64,11 +64,12 @@
     createLoadBrowser();
 
   this.FOAM_FILES = function(files) {
-    files.filter(function(f) {
-      return f.flags ? flags[f.flags] : true;
-    })
-    .map(function(f) { return f.name; })
-    .forEach(load);
+    files.
+        filter(function(f) {
+          return f.flags ? flags[f.flags] : true;
+        }).
+        map(function(f) { return f.name; }).
+        forEach(load);
 
     delete this.FOAM_FILES;
   };
