@@ -24,10 +24,18 @@ foam.CLASS({
     [ 'nodeName', 'input' ],
     {
       name: 'data',
-      assertValue: function(d) {
-        // TODO: put back
-        this.assert(! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d), 'Set Input data to non-primitive.');
+      preSet: function(o, d) {
+        var f = ! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d);
+        if ( ! f ) {
+          this.warn('Set Input data to non-primitive:' + d);
+          return o;
+        }
+        return d;
       }
+      /*
+      assertValue: function(d) {
+        this.assert(! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d), 'Set Input data to non-primitive.');
+      }*/
     },
     {
       class: 'Boolean',
