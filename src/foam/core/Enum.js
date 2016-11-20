@@ -398,7 +398,13 @@ foam.CLASS({
         if ( type === foam.String ) return e[foam.String.constantize(n)];
         if ( type === foam.Number ) return e.create({ordinal: n});
       }
-    ]
+    ],
+    {
+      name: 'toJSON',
+      value: function(value) {
+        return value.ordinal;
+      }
+    }
   ]
 });
 
