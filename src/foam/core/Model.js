@@ -25,6 +25,7 @@ foam.CLASS({
   properties: [
     {
       name: 'id',
+      hidden: true,
       getter: function() {
         return this.package ? this.package + '.' + this.name : this.name;
       }
