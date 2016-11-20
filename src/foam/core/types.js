@@ -298,27 +298,33 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    [ 'getter', function(prop) {
-      var c = this.instance_[prop.name];
+    {
+      name: 'getter',
+      value: function(prop) {
+        var c = this.instance_[prop.name];
 
-      // Implement value and factory support.
-      if ( ! c ) {
-        if ( prop.value ) {
-          c = prop.value;
-        } else if ( prop.factory ) {
-          c = this.instance_[prop.name] = prop.factory.call(this, prop);
+        // Implement value and factory support.
+        if ( ! c ) {
+          if ( prop.value ) {
+            c = prop.value;
+          } else if ( prop.factory ) {
+            c = this.instance_[prop.name] = prop.factory.call(this, prop);
+          }
         }
-      }
 
-      // Upgrade Strings to actual classes, if available.
-      if ( foam.String.isInstance(c) ) {
-        c = this.lookup(c, true);
-        if ( c ) this.instance_[prop.name] = c;
-      }
+        // Upgrade Strings to actual classes, if available.
+        if ( foam.String.isInstance(c) ) {
+          c = this.lookup(c, true);
+          if ( c ) this.instance_[prop.name] = c;
+        }
 
-      return c;
-    } ]
-    // TODO: Add support to output JSON as just class id
+        return c;
+      }
+    },
+    {
+      name: 'toJSON',
+      value: function(value) { return value.id; }
+    }
   ],
 
   methods: [
