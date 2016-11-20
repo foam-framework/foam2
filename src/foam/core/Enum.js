@@ -217,10 +217,6 @@ foam.CLASS({
               return this.name;
             }
           }),
-          foam.core.Boolean.create({
-            name: 'implements_foam.core.EnumModel',
-            value: true,
-          }),
           {
             name: 'enum_create',
             installInClass: function(cls) {
