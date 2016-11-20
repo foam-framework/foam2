@@ -436,3 +436,14 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  documentation: 'Update Model Property types.',
+
+  properties: [
+    { class: 'String',  name: 'name' },
+    { class: 'Boolean', name: 'abstract' }
+  ]
+});
