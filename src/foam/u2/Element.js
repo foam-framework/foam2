@@ -1748,6 +1748,19 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.EnumView'
+      }
+    }
+  ]
+})
+
+
+foam.CLASS({
   refines: 'foam.core.Reference',
   properties: [
     {
