@@ -43,7 +43,7 @@ foam.CLASS({
           var p = props[i];
           if ( ! p.hidden ) {
             this.objToChoice = function(obj) {
-              return [p.f(obj), obj.id];
+              return [obj.id, p.f(obj)];
             };
             break;
           }
