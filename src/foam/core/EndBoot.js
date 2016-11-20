@@ -216,7 +216,6 @@ foam.CLASS({
  * Replace foam.CLASS() with a lazy version which only
  * build the class when first accessed.
  */
-/*
 (function() {
   // List of unused Models in the system.
   foam.UNUSED = {};
@@ -236,4 +235,3 @@ foam.CLASS({
     foam.package.registerClassFactory(m, f);
   };
 })();
-*/
