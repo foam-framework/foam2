@@ -78,6 +78,7 @@ foam.CLASS({
         if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
         if ( typeof o !== 'object' ) return foam.mlang.Constant.create({ value: o });
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
+        if ( foam.core.EnumModel.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
         if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
         console.error('Invalid expression value: ', o);
       }
