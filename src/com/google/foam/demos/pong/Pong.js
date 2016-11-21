@@ -188,7 +188,7 @@ foam.CLASS({
         width: 200,
         height: 70});
 
-      this.addChildren(
+      this.add(
           this.Box.create({x: this.width/2-5, width:10, height: this.height, border:'rgba(0,0,0,0)' , color: 'white'}),
           this.ball,
           lScoreLabel,

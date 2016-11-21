@@ -1130,8 +1130,6 @@ foam.CLASS({
     'foam.input.Pointer'
   ],
 
-  imports: [ 'getElementById' ],
-
   properties: [
     [ 'nodeName', 'CANVAS' ],
     {
