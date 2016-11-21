@@ -59,15 +59,13 @@ foam.CLASS({
 
   properties: [
     {
-      name:  'of',
+      name: 'of',
       required: true
     },
     {
       name:  'name',
       label: 'Store Name',
-      expression: function() {
-        return this.of.id;
-      }
+      factory: function() { return this.of.id; }
     },
     {
       name: 'indicies',

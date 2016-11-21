@@ -130,7 +130,7 @@ foam.CLASS({
       var request = host[this.HTTPRequestFactoryName]();
 
       // if building a request object, start with an empty instance
-      var requestObject = self.buildRequestType ? self.buildRequestType$cls.create() : null;
+      var requestObject = self.buildRequestType ? self.buildRequestType.create() : null;
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {

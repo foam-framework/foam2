@@ -75,7 +75,7 @@ foam.CLASS({
       var props = Array.from(arguments);
 
       // Add ID to make each sure the object is uniquely identified
-      props.push(this.of$cls.ID);
+      props.push(this.of.ID);
 
       return this.addUniqueIndex_.apply(this, props);
     },

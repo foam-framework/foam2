@@ -292,7 +292,7 @@ foam.CLASS({
     {
       name: 'columns_',
       expression: function(columns, of) {
-        var cls = this.of$cls;
+        var cls = this.of;
         return columns.map(function(p) {
           // Lookup String values as Axiom names, otherwise,
           // treat the object as the column object itself.
@@ -313,13 +313,13 @@ foam.CLASS({
     {
       name: 'columns',
       expression: function(of) {
-        if ( ! this.of$cls ) return undefined;
+        if ( ! this.of ) return undefined;
 
-        var tableColumns = this.of$cls.getAxiomByName('tableColumns');
+        var tableColumns = this.of.getAxiomByName('tableColumns');
 
         if ( tableColumns ) return tableColumns.columns;
 
-        return this.of$cls.getAxiomsByClass(foam.core.Property)
+        return this.of.getAxiomsByClass(foam.core.Property)
             .filter(function(p) { return ! p.hidden; })
             .map(foam.core.Property.NAME.f);
       }

@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'DetailView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
 
   requires: [
     'foam.core.Property',
@@ -26,19 +26,25 @@ foam.CLASS({
   ],
 
   exports: [
+    'currentData as data',
     'controllerMode'
   ],
 
   properties: [
     {
       name: 'data',
+      attribute: true,
       preSet: function(_, data) {
-        if ( data && data.cls_ !== this.of$cls ) {
-          this.of = data.cls_;
+        var of = data && data.cls_;
+        if ( of !== this.of ) {
+          this.of = of;
+        } else {
+          this.currentData = data;
         }
         return data;
       }
     },
+    'currentData',
     {
       class: 'Class',
       name: 'of'
@@ -62,7 +68,7 @@ foam.CLASS({
       },
       expression: function(of) {
         if ( ! of ) return [];
-        return this.of$cls.getAxiomsByClass(foam.core.Property).
+        return this.of.getAxiomsByClass(foam.core.Property).
             filter(function(p) { return ! p.hidden; });
       }
     },
@@ -74,7 +80,7 @@ foam.CLASS({
     {
       name: 'actions',
       expression: function(of) {
-        return this.of$cls.getAxiomsByClass(foam.core.Action);
+        return this.of.getAxiomsByClass(foam.core.Action);
       }
     },
     {
@@ -84,7 +90,7 @@ foam.CLASS({
     {
       name: 'title',
       attribute: true,
-      expression: function(of) { return this.of$cls.model_.label; },
+      expression: function(of) { return this.of.model_.label; },
       // documentation: function() {/*
       //  <p>The display title for the $$DOC{ref:'foam.ui.View'}.
       //  </p>
@@ -146,6 +152,13 @@ foam.CLASS({
       var self = this;
       this.add(this.slot(function(of, properties) {
         if ( ! of ) return '';
+
+        // Binds view to currentData instead of data because there
+        // is a delay from when data is updated until when the UI
+        // is rebuilt if the data's class changes. Binding directly
+        // to data causes views and actions from the old class to get
+        // bound to data of a new class, which causes problems.
+        self.currentData = self.data;
 
         var title = self.title && self.E('tr').
           start('td').cssClass(self.myCls('title')).attrs({colspan: 2}).

@@ -33,7 +33,7 @@ foam.CLASS({
   methods: [
     function fromProperty(prop) {
       if ( ! this.hasOwnProperty('objToChoice') ) {
-        var of = prop.of$cls;
+        var of = prop.of;
 
         var props = of.getAxiomsByClass(foam.core.String);
         var f;
@@ -43,7 +43,7 @@ foam.CLASS({
           var p = props[i];
           if ( ! p.hidden ) {
             this.objToChoice = function(obj) {
-              return [p.f(obj), obj.id];
+              return [obj.id, p.f(obj)];
             };
             break;
           }
