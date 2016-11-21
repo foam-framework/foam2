@@ -480,8 +480,8 @@ foam.LIB({
       }, function(o) { return o; })
     },
 
-    function parseString(jsonStr) {
-      return this.parse(eval('(' + jsonStr + ')'));
+    function parseString(jsonStr, opt_ctx) {
+      return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
     },
 
     function stringify(o) {

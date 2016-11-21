@@ -66,7 +66,7 @@ foam.CLASS({
     function initCView() {
       for ( var i = 0 ; i < this.nx ; i++ )
         for ( var j = 0 ; j < this.ny ; j++ )
-          this.addChildren(this.Cell.create({row: j, col: i}));
+          this.add(this.Cell.create({row: j, col: i}));
       this.tick();
     }
   ],

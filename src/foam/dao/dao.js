@@ -1234,7 +1234,7 @@ foam.CLASS({
   methods: [
     function init() {
       var objs = localStorage.getItem(this.name);
-      if ( objs ) this.array = foam.json.parse(foam.json.parseString(objs));
+      if ( objs ) this.array = foam.json.parseString(objs, this);
 
       this.on.put.sub(this.updated);
       this.on.remove.sub(this.updated);
