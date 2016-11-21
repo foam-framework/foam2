@@ -59,7 +59,7 @@ foam.CLASS({
       Object.defineProperty(proto, name, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
-            var cls    = foam.lookup(path);
+            var cls    = this.__context__.lookup(path);
             var parent = this;
 
             this.assert(cls, 'Requires: Unknown class: ', path);

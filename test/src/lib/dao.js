@@ -1417,8 +1417,7 @@ describe('EasyDAO-permutations', function() {
       package: 'test',
       name: 'HTTPBoxMocker',
       exports: [
-        'httpResponse',
-        
+        'httpResponse'     
       ],
       properties: [
         'httpResponse'
@@ -1426,9 +1425,8 @@ describe('EasyDAO-permutations', function() {
     });
 
     var env = test.HTTPBoxMocker.create();
-    // TODO: Replace with a valid way to replace HTTPBox with MockHTTPBox in env's subcontext.
-    //env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
-    env.__context__.__cache__['foam.box.HTTPBox'] = test.helpers.MockHTTPBox;
+    // TODO: dependency injection reistering is a bit awkward:
+    env.__subContext__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
 
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
