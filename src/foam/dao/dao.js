@@ -1263,6 +1263,7 @@ foam.LIB({
       name: 'daoize',
       code: foam.Function.memoize1(function(str) {
         // Turns SomeClassName into someClassNameDAO.
+        str = str.replace(/\./g, '_');
         return str.substring(0, 1).toLowerCase() + str.substring(1) + 'DAO';
       })
     }

@@ -1711,7 +1711,7 @@ describe('String.daoize', function() {
     expect(foam.String.daoize('MyModel')).toEqual('myModelDAO');
   });
   it('handles a model name with package', function() {
-    expect(foam.String.daoize('test.package.PkgModel')).toEqual('test.package.PkgModelDAO');
+    expect(foam.String.daoize('test.package.PkgModel')).toEqual('test_package_PkgModelDAO');
   });
 
 });
@@ -1737,8 +1737,8 @@ describe('Relationship', function() {
     package: 'test',
     name: 'relEnv',
     exports: [
-      'test.RelADAO',
-      'test.RelBDAO'
+      'test_RelADAO',
+      'test_RelBDAO'
     ],
     properties: [
       {
