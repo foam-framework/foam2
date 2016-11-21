@@ -869,7 +869,7 @@ describe('ContextualizingDAO', function() {
     foam.CLASS({
       package: 'test',
       name: 'ImporterA',
-      imports: [ 'exp' ],
+      imports: [ 'exp?' ],
       properties: [ 'id' ]
     });
 
