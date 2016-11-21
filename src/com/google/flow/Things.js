@@ -193,7 +193,7 @@ foam.CLASS({
     },
 
     function updateCellSize() {
-      var o = this.of$cls.create();
+      var o = this.of.create();
       this.cellWidth  = o.width;
       this.cellHeight = o.height;
     }
@@ -215,7 +215,7 @@ foam.CLASS({
 
         for ( var i = 0 ; i < this.rows ; i++ ) {
           for ( var j = 0 ; j < this.columns ; j++ ) {
-            var o = this.of$cls.create(null, this.__subContext__);
+            var o = this.of.create(null, this.__subContext__);
             o.x = w  * j;
             o.y = h * i;
             this.add(o);
@@ -774,6 +774,14 @@ foam.CLASS({
       this.add(leg1, leg2, leg3, leg4, head, shell, tail);
     },
 
+    function home() {
+      this.x = this.parent.width / 2;
+      this.y = this.parent.height / 2;
+      this.rotation = 0;
+
+      return this;
+    },
+
     function ss() {
       this.mementoStack_.push(this.memento);
       return this;
@@ -815,9 +823,16 @@ foam.CLASS({
 
     function fd(d) {
       /* ForwarD */
+      return this.gt(
+          this.x + d * Math.cos(this.rotation+Math.PI/2),
+          this.y - d * Math.sin(this.rotation+Math.PI/2));
+    },
+
+    function gt(x, y) {
+      /* Go To */
       var x1 = this.x, y1 = this.y;
-      this.x += d * Math.cos(this.rotation+Math.PI/2);
-      this.y -= d * Math.sin(this.rotation+Math.PI/2);
+      this.x = x;
+      this.y = y;
 
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
@@ -892,6 +907,7 @@ foam.CLASS({
 
     function cs() {
       this.childLayer.removeAllChildren();
+      return this;
     }
   ]
 });

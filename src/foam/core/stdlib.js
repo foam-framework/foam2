@@ -164,24 +164,51 @@ foam.LIB({
     },
 
     /**
+     * Decorates the function 'f' to cache the return value of 'f' when
+     * called in the future. Also known as a 'thunk'.
+     */
+    function memoize0(f) {
+      console.assert(
+        typeof f === 'function',
+        'Cannot apply memoize to something that is not a function.');
+
+      var set = false, cache;
+
+      return foam.Function.setName(
+          function() {
+            if ( ! set ) {
+              set = true;
+              cache = f();
+            }
+            return cache;
+          },
+          'memoize0(' + f.name + ')');
+    },
+
+    /**
      * Decorates the function 'f' to cache the return value of 'f' when called
      * with a particular value for its first argument.
-     *
      */
     function memoize1(f) {
       console.assert(
         typeof f === 'function',
         'Cannot apply memoize to something that is not a function.');
 
-      var cache = {};
+      var cache = {}, nullCache, undefinedCache;
       return foam.Function.setName(
           function(key) {
             console.assert(
                 arguments.length === 1,
                 'Memoize1\'ed functions must take exactly one argument.');
 
-            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
-            return cache[key];
+            var mKey =
+                key === null      ? '___null___'      :
+                key === undefined ? '___undefined___' :
+                key ;
+
+            if ( ! cache.hasOwnProperty(mKey) ) cache[mKey] = f.call(this, key);
+
+            return cache[mKey];
           },
           'memoize1(' + f.name + ')');
     },
@@ -561,7 +588,7 @@ foam.LIB({
     // Can't be an FObject yet because we haven't built the class system yet
     /* istanbul ignore next */
     function isInstance(o) { return false; },
-    function clone(o)      { return o.clone(); },
+    function clone(o)      { return o ? o.clone() : this; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
@@ -629,27 +656,40 @@ foam.typeOf = (function() {
 })();
 
 
-foam.mmethod = function(map, opt_defaultMethod) {
-  var uid = '__mmethod__' + foam.next$UID() + '__';
+foam.LIB({
+  name: 'foam',
 
-  for ( var key in map ) {
-    var type = key === 'FObject' ? foam.core.FObject : foam[key];
-    type[uid] = map[key];
-  }
+  methods: [
+    function mmethod(map, opt_defaultMethod) {
+      var uid = '__mmethod__' + foam.next$UID() + '__';
 
-  return function(arg1) {
-    var type = foam.typeOf(arg1);
-    if ( ! opt_defaultMethod ) {
-      console.assert(type, 'Unknown type: ', arg1,
-          'and no default method provided');
-      console.assert(
-          type[uid],
-          'Missing multi-method for type ', arg1, ' map: ', map,
-          'and no deafult method provided');
+      var first = true;
+      return function(arg1) {
+        if ( first ) {
+          for ( var key in map ) {
+            var type = key === 'FObject' ?
+                foam.core.FObject :
+                foam[key] || foam.lookup(key);
+
+            type[uid] = map[key];
+          }
+          first = false;
+        }
+
+        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ? arg1.cls_ : foam.typeOf(arg1);
+        if ( ! opt_defaultMethod ) {
+          console.assert(type, 'Unknown type: ', arg1,
+              'and no default method provided');
+          console.assert(
+              type[uid],
+              'Missing multi-method for type ', arg1, ' map: ', map,
+              'and no deafult method provided');
+        }
+        return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
+      };
     }
-    return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
-  };
-};
+  ]
+});
 
 
 (function() {
@@ -689,6 +729,16 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
+    },
+
+    /**
+     * Register a class lazily in the global namespace.
+     * The class is not created until accessed the first time.
+     * The provided factory function creates the class.
+     */
+    function registerClassFactory(m, thunk) {
+      var pkg = foam.package.ensurePackage(global, m.package);
+      Object.defineProperty(pkg, m.name, {get: thunk, configurable: true});
     },
 
     /**

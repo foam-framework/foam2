@@ -368,6 +368,13 @@ foam.CLASS({
       return this.instance_[name] !== undefined;
     },
 
+    function hasDefaultValue(name) {
+      if ( ! this.hasOwnProperty(name) ) return true;
+
+      var axiom = this.cls_.getAxiomByName(obj);
+      return axiom.isDefaultValue(this[name]);
+    },
+
     /**
       Undefine a Property's value.
       The value will revert to either the Property's 'value' or
@@ -500,19 +507,21 @@ foam.CLASS({
         // Like l.apply(l, [s].concat(Array.from(a))), but faster.
         // FUTURE: add benchmark to justify
         // ???: optional exception trapping, benchmark
-        switch ( a.length ) {
-          case 0: l(s); break;
-          case 1: l(s, a[0]); break;
-          case 2: l(s, a[0], a[1]); break;
-          case 3: l(s, a[0], a[1], a[2]); break;
-          case 4: l(s, a[0], a[1], a[2], a[3]); break;
-          case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
-          case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
-          case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
-          case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
-          case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
-          default: l.apply(l, [s].concat(Array.from(a)));
-        }
+        try {
+          switch ( a.length ) {
+            case 0: l(s); break;
+            case 1: l(s, a[0]); break;
+            case 2: l(s, a[0], a[1]); break;
+            case 3: l(s, a[0], a[1], a[2]); break;
+            case 4: l(s, a[0], a[1], a[2], a[3]); break;
+            case 5: l(s, a[0], a[1], a[2], a[3], a[4]); break;
+            case 6: l(s, a[0], a[1], a[2], a[3], a[4], a[5]); break;
+            case 7: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
+            case 8: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
+            case 9: l(s, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]); break;
+            default: l.apply(l, [s].concat(Array.from(a)));
+          }
+        } catch (x) {}
         count++;
       }
       return count;

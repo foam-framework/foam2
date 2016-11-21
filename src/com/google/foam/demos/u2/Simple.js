@@ -16,25 +16,45 @@
  */
 
 foam.CLASS({
-  package: 'com.chrome.origintrials.model',
-  name: 'Experiment',
-  ids: [ 'name' ],
+  name: 'Something',
+
+  requires: [
+    'foam.util.Timer'
+  ],
+
   properties: [
     {
-      class: 'String',
-      name: 'name'
+      name: 'value',
+      value: 'aaaa'
     },
     {
-      class: 'EMail',
-      name: 'owner'
+      name: 'timer',
+      factory: function() {
+        return this.Timer.create();
+      }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.timer.start();
+      this.timer.propertyChange.sub('second', this.onTimer);
+    }
+  ],
+
+  listeners: [
+    function onTimer() {
+      this.value = this.value === 'aaaa' ? 'bbbb' : 'aaaa';
     }
   ]
 });
 
-foam.RELATIONSHIP({
-  name: 'experiment',
-  cardinality: '*:1',
-  sourceModel: 'com.chrome.origintrials.model.Application',
-  targetModel: 'com.chrome.origintrials.model.Experiment',
-  oneWay: true
-});
+
+var timer = foam.util.Timer.create();
+timer.start();
+
+var E = foam.__context__.E.bind(foam.__context__);
+
+var e13 = E('div').add(
+  'dynamic value: ', timer.i$);
+e13.write();

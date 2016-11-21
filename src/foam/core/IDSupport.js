@@ -39,6 +39,7 @@ foam.CLASS({
   properties: [
     [ 'name', 'id' ],
     [ 'transient', true ],
+    [ 'hidden', true ],
     'propNames',
     'props',
     [ 'getter', function multiPartGetter() {

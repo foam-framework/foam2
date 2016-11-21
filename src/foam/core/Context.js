@@ -54,7 +54,7 @@
             'Could not find any registered class for ' + id);
       }
 
-      return ret;
+      return foam.Function.isInstance(ret) ? ret() : ret;
     },
 
     /**
@@ -84,11 +84,29 @@
       }
     },
 
+    /**
+     * Register a class factory into the given context.
+     * When the class is first accessed the factory is used
+     * to create the value which is used.
+     */
+    registerFactory: function(m, factory) {
+      this.registerInCache_(factory, this.__cache__, m.id);
+
+      if ( m.package === 'foam.core' ) {
+        this.registerInCache_(factory, this.__cache__, m.name);
+      }
+    },
+
     /** Internal method to register a context binding in an internal cache */
     registerInCache_: function registerInCache_(cls, cache, name) {
+      var old = cache[name];
+
+      // Okay to replace a function with an actual class.
+      // This happens after a lazy class is initialized.
       console.assert(
-        ! cache.hasOwnProperty(name),
-        cls.id + ' is already registerd in this context.');
+          ! old ||
+              (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
+          cls.id + ' is already registerd in this context.');
 
       cache[name] = cls;
     },

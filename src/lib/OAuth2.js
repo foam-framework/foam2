@@ -32,7 +32,6 @@ foam.CLASS({
     'clientId',
     'cookiePolicy',
     'scopes',
-
     'auth2',
     'authToken'
   ],
@@ -116,15 +115,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.net',
   name: 'GoogleOAuth2XHRHTTPRequest',
-
   extends: 'foam.net.XHRHTTPRequest',
+
   implements: [
     'foam.net.GoogleOAuth2HTTPRequestDecorator'
-  ],
-
-
+  ]
 });
-

@@ -36,7 +36,7 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        ^ { margin-left:16px; }
+        ^ { white-space: nowrap; margin-left:16px; }
         ^selected { outline: 2px solid #dddd00; }
       */}
     })
