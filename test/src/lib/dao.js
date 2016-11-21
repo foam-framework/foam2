@@ -1416,10 +1416,19 @@ describe('EasyDAO-permutations', function() {
     foam.CLASS({
       package: 'test',
       name: 'HTTPBoxMocker',
+      exports: [
+        'httpResponse',
+        
+      ],
+      properties: [
+        'httpResponse'
+      ]
     });
 
     var env = test.HTTPBoxMocker.create();
-    env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
+    // TODO: Replace with a valid way to replace HTTPBox with MockHTTPBox in env's subcontext.
+    //env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
+    env.__context__.__cache__['foam.box.HTTPBox'] = test.helpers.MockHTTPBox;
 
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
