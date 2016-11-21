@@ -736,9 +736,9 @@ foam.LIB({
      * The class is not created until accessed the first time.
      * The provided factory function creates the class.
      */
-    function registerClassFactory(m, factory) {
+    function registerClassFactory(m, thunk) {
       var pkg = foam.package.ensurePackage(global, m.package);
-      Object.defineProperty(pkg, m.name, {get: factory, configurable: true});
+      Object.defineProperty(pkg, m.name, {get: thunk, configurable: true});
     },
 
     /**

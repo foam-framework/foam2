@@ -110,13 +110,13 @@ foam.CLASS({
     {
       name:  'start',
       help:  'Start the timer.',
-      isEnabled:   function(isStarted) { return ! isStarted; },
-      code:        function() { this.isStarted = true; this.tick(); }
+      isEnabled: function(isStarted) { return ! isStarted; },
+      code:      function() { this.isStarted = true; this.tick(); }
     },
     {
       name:  'step',
       help:  'Step the timer.',
-      code: function()      {
+      code: function() {
         this.i++;
         this.time  += this.interval * this.timeWarp;
         this.second = this.time /    1000 % 60 << 0;
@@ -127,8 +127,8 @@ foam.CLASS({
     {
       name:  'stop',
       help:  'Stop the timer.',
-      isEnabled:   function(isStarted) { return isStarted; },
-      code:        function() { this.isStarted = false; }
+      isEnabled: function(isStarted) { return isStarted; },
+      code:      function() { this.isStarted = false; }
     }
   ],
 

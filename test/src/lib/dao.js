@@ -869,7 +869,7 @@ describe('ContextualizingDAO', function() {
     foam.CLASS({
       package: 'test',
       name: 'ImporterA',
-      imports: [ 'exp' ],
+      imports: [ 'exp?' ],
       properties: [ 'id' ]
     });
 
@@ -1416,10 +1416,19 @@ describe('EasyDAO-permutations', function() {
     foam.CLASS({
       package: 'test',
       name: 'HTTPBoxMocker',
+      exports: [
+        'httpResponse',
+        
+      ],
+      properties: [
+        'httpResponse'
+      ]
     });
 
     var env = test.HTTPBoxMocker.create();
-    env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
+    // TODO: Replace with a valid way to replace HTTPBox with MockHTTPBox in env's subcontext.
+    //env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
+    env.__context__.__cache__['foam.box.HTTPBox'] = test.helpers.MockHTTPBox;
 
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
@@ -1702,7 +1711,7 @@ describe('String.daoize', function() {
     expect(foam.String.daoize('MyModel')).toEqual('myModelDAO');
   });
   it('handles a model name with package', function() {
-    expect(foam.String.daoize('test.package.PkgModel')).toEqual('test.package.PkgModelDAO');
+    expect(foam.String.daoize('test.package.PkgModel')).toEqual('test_package_PkgModelDAO');
   });
 
 });
@@ -1728,8 +1737,8 @@ describe('Relationship', function() {
     package: 'test',
     name: 'relEnv',
     exports: [
-      'test.RelADAO',
-      'test.RelBDAO'
+      'test_RelADAO',
+      'test_RelBDAO'
     ],
     properties: [
       {

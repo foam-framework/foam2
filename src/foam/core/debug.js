@@ -545,6 +545,7 @@ foam.LIB({
   ]
 });
 
+foam.core.Import;
 
 foam.CLASS({
   refines: 'foam.core.FObject',

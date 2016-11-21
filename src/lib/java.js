@@ -161,13 +161,13 @@ foam.CLASS({
     {
       name: 'name',
       expression: function(of) {
-        return this.of$cls.name + 'Skeleton';
+        return this.of.name + 'Skeleton';
       }
     },
     {
       name: 'package',
       expression: function(of) {
-        return this.of$cls.package;
+        return this.of.package;
       }
     },
     {
@@ -189,7 +189,7 @@ foam.CLASS({
 
       foam.core.Object.create({
         name: 'delegate',
-        javaType: this.of$cls.id
+        javaType: this.of.id
       }).buildJavaClass(cls);
 
       cls.method({
@@ -217,7 +217,7 @@ foam.CLASS({
     Object result = null;
 
     switch ( rpc.getName() ) {<%
-  var methods = this.of$cls.getAxiomsByClass(foam.core.Method);
+  var methods = this.of.getAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
       case "<%= m.name %>":

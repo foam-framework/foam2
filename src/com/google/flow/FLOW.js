@@ -241,7 +241,7 @@ foam.CLASS({
             return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
           },
           hsla: function(h, s, l, a) {
-            return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%,' + a + ')';
+            return 'hsla(' + (h%360) + ',' + s + '%,' + l + '%,' + a + ')';
           },
           log: function() {
             var o = this.cmdLineFeedback_;
