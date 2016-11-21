@@ -53,6 +53,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'CSS',
@@ -1404,9 +1405,8 @@ foam.CLASS({
         this,
         children,
         reference,
-        before ?
-          'beforebegin' :
-          'afterend');
+        before ? 'beforebegin' : 'afterend');
+
       return this;
     },
 
@@ -1487,13 +1487,16 @@ foam.CLASS({
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
-        var e2 = nextE();
-        self.insertBefore(e2, first);
+        var tmp = self.E();
+        self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
           for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].destroy(); }
         } else {
           if ( e.state === e.LOADED ) { e.remove(); e.destroy(); }
         }
+        var e2 = nextE();
+        self.insertBefore(e2, tmp);
+        tmp.remove();
         e = e2;
       };
 
