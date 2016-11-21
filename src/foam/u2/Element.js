@@ -48,9 +48,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function output(out) { out('&', this.name, ';'); }
+    function output(out) { out('&', this.name, ';'); },
+    function toE() { return this; }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -173,8 +175,8 @@ foam.CLASS({
     function output(out) {},
     function load() {},
     function unload() {},
-    function remove() {},
-    function destroy() {},
+    function onRemove() {},
+    // function destroy() {},
     function onSetCls() {},
     function onFocus() {},
     function onAddListener() {},
@@ -298,7 +300,7 @@ foam.CLASS({
       this.state = this.UNLOADED;
       this.visitChildren('unload');
     },
-    function remove() { this.unload(); },
+    function onRemove() { this.unload(); },
     function onSetCls(cls, enabled) {
       var e = this.el();
       if ( e ) {
@@ -522,9 +524,10 @@ foam.CLASS({
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED && oldState == undefined ) {
-          // Check oldState == undefined so that we don't publish onunload
-          // when we've never been loaded.
+        } else if ( state === this.UNLOADED && oldState ) {
+          // When state is first set from the factory oldState will be undefined
+          // but we don't want to publish that we're unloaded since we haven't
+          // actually been loaded yet.
           this.pub('onunload');
         }
       }
@@ -649,7 +652,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.state = this.UNLOADED;
+      this.onDestroy(this.visitChildren.bind(this, 'destroy'));
     },
 
     function initE() {
@@ -946,7 +949,7 @@ foam.CLASS({
         Remove this Element from its parent Element.
         Will transition to UNLOADED state.
       */
-      this.state.remove.call(this);
+      this.onRemove();
 
       if ( this.parentNode ) {
         var cs = this.parentNode.childNodes;
@@ -1139,6 +1142,10 @@ foam.CLASS({
       } else {
         this.add_(arguments, this);
       }
+      return this;
+    },
+
+    function toE() {
       return this;
     },
 
@@ -1384,18 +1391,22 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) { return e.toE ? e.toE(null, Y) : e; });
+      children = children.map(function(e) {
+        e = e.toE ? e.toE(null, Y) : e;
+        e.parentNode = this;
+        return e;
+      }.bind(this));
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes,
           [ index, 0 ].concat(children));
+
       this.state.onInsertChildren.call(
         this,
         children,
         reference,
-        before ?
-          'beforebegin' :
-          'afterend');
+        before ? 'beforebegin' : 'afterend');
+
       return this;
     },
 
@@ -1471,14 +1482,21 @@ foam.CLASS({
 
       var e = nextE();
       var l = function() {
-        var first = Array.isArray(e) ? e[0] : e;
-        var e2 = nextE();
-        self.insertBefore(e2, first);
-        if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) e[i].remove();
-        } else {
-          if ( e.state === e.LOADED ) e.remove();
+        if ( self.isDestroyed() || self.state !== self.LOADED ) {
+          s && s.destroy();
+          return;
         }
+        var first = Array.isArray(e) ? e[0] : e;
+        var tmp = self.E();
+        self.insertBefore(tmp, first);
+        if ( Array.isArray(e) ) {
+          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].destroy(); }
+        } else {
+          if ( e.state === e.LOADED ) { e.remove(); e.destroy(); }
+        }
+        var e2 = nextE();
+        self.insertBefore(e2, tmp);
+        tmp.remove();
         e = e2;
       };
 
@@ -1606,6 +1624,34 @@ foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 
 foam.CLASS({
+  refines: 'foam.core.FObject',
+  methods: [
+    function toE(args, X) {
+      return foam.u2.ViewSpec.createView(
+        { class: 'foam.u2.DetailView', showActions: true, data: this },
+        args, this, X);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Slot',
+  methods: [
+    function toE() { return this; }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.ExpressionSlot',
+  methods: [
+    function toE() { return this; }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Property',
 
   requires: [
@@ -1705,6 +1751,19 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Reference',
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.ReferenceView'
+      }
+    }
+  ]
+})
+
+
+foam.CLASS({
   package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
@@ -1750,7 +1809,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 // TODO: make a tableProperties property on AbstractClass
 

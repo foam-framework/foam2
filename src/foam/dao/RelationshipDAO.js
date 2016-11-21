@@ -31,28 +31,30 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'query',
-      factory: function() {
-        return this.relationship.targetDAOQuery();
-      }
+      class: 'Boolean',
+      name: 'forward',
+      value: true
     },
     {
       name: 'predicate',
       getter: function() {
-        return this.relationship.targetQueryFromSource(this.obj);
+        return this.relationship.targetQueryFromSource(this.obj, this.forward);
       }
     },
     {
       name: 'delegate',
       factory: function() {
-        return this.__context__[this.relationship.targetDAOKey];
+        return this.__context__[
+          this.forward ?
+            this.relationship.targetDAOKey :
+            this.relationship.sourceDAOKey ];
       }
     }
   ],
 
   methods: [
     function put(obj, sink) {
-      this.relationship.adaptTarget(this.obj, obj);
+      this.relationship.adaptTarget(this.obj, obj, this.forward);
 
       return this.SUPER(obj, sink);
     },

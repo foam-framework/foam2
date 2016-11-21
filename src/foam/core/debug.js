@@ -544,3 +544,100 @@ foam.LIB({
     }
   ]
 });
+
+foam.core.Import;
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+
+  documentation: 'Assert that all required imports are provided.',
+
+  methods: [
+    function init() {
+      var is = this.cls_.getAxiomsByClass(foam.core.Import);
+      for ( var i = 0 ; i < is.length ; i++ ) {
+        var imp = is[i];
+
+        if ( imp.required && ! this.__context__[imp.key + '$'] ) {
+          var m = 'Missing required import: ' + imp.key + ' in ' + this.cls_.id;
+          this.assert(false, m);
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Import',
+
+  properties: [
+    {
+      name: 'name',
+      assertValue: function(n) {
+        if ( ! /^[a-zA-Z][a-zA-Z0-9_]*?$/.test(n) ) {
+          var m = 'Import name "' + n + '" must be a valid variable name.';
+          if ( n.indexOf('.') !== -1 ) m += ' Did you mean requires:?';
+
+          this.assert(false, m);
+        }
+      }
+    }
+  ],
+
+  methods: [
+    function installInClass(c) {
+      // Produce warning for duplicate imports
+      if ( c.getSuperAxiomByName(this.name) ) {
+        this.warn(
+          'Import "' + this.name + '" already exists in ancestor class of ' +
+          c.id + '.');
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Export',
+
+  properties: [
+    {
+      name: 'name',
+      assertValue: function(n) {
+        if ( ! /^[a-zA-Z][a-zA-Z0-9_]*?$/.test(n) ) {
+          var m = 'Export name "' + n + '" must be a valid variable name.';
+          this.assert(false, m);
+        }
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+
+  documentation: '.',
+
+  methods: [
+    function describeListeners() {
+      var self  = this;
+      var count = 0;
+      function show(ls, path) {
+        var next = ls.next;
+        for ( var next = ls.next ; next ; next = next.next ) {
+          count++;
+          self.log(path, {l:next.l});
+        }
+
+        for ( var key in ls.children ) {
+          show(ls.children[key], path ? path + '.' + key : key);
+        }
+      }
+
+      show(this.getPrivate_('listeners'));
+      this.log(count, 'subscriptions');
+    }
+  ]
+});

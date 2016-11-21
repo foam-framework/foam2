@@ -210,3 +210,28 @@ foam.CLASS({
     }
   ]
 });
+
+
+/**
+ * Replace foam.CLASS() with a lazy version which only
+ * build the class when first accessed.
+ */
+(function() {
+  // List of unused Models in the system.
+  foam.UNUSED = {};
+
+  var CLASS = foam.CLASS;
+
+  foam.CLASS = function(m) {
+    if ( m.refines ) return CLASS(m);
+
+    m.id = m.package ? m.package + '.' + m.name : m.name;
+    foam.UNUSED[m.id] = true;
+    var f = foam.Function.memoize0(function() {
+      delete foam.UNUSED[m.id];
+      return CLASS(m);
+    });
+    foam.__context__.registerFactory(m, f);
+    foam.package.registerClassFactory(m, f);
+  };
+})();

@@ -238,7 +238,11 @@ foam.CLASS({
       value: function(value, opt_ctx) {
         return foam.json.parse(value, null, opt_ctx);
       }
-    }
+    },
+    [
+      'isDefaultValue',
+      function(v) { return ! v || ! v.length; }
+    ],
   ]
 });
 
@@ -287,10 +291,41 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Class',
   extends: 'Property',
+
+  properties: [
+    {
+      name: 'getter',
+      value: function(prop) {
+        var c = this.instance_[prop.name];
+
+        // Implement value and factory support.
+        if ( ! c ) {
+          if ( prop.value ) {
+            c = prop.value;
+          } else if ( prop.factory ) {
+            c = this.instance_[prop.name] = prop.factory.call(this, prop);
+          }
+        }
+
+        // Upgrade Strings to actual classes, if available.
+        if ( foam.String.isInstance(c) ) {
+          c = this.lookup(c, true);
+          if ( c ) this.instance_[prop.name] = c;
+        }
+
+        return c;
+      }
+    },
+    {
+      name: 'toJSON',
+      value: function(value) { return value.id; }
+    }
+  ],
 
   methods: [
     function installInProto(proto) {
@@ -300,6 +335,7 @@ foam.CLASS({
 
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
+          console.warn("Deprecated use of 'cls.$cls'. Just use 'cls' instead.");
           return typeof this[name] !== 'string' ? this[name] :
             this.__context__.lookup(this[name], true);
         },
@@ -369,5 +405,45 @@ foam.CLASS({
   properties: [
     ['factory', function() { return {} }],
     'of'
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Reference',
+  extends: 'Property',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      class: 'String',
+      name: 'targetDAOKey',
+      expression: function(of) {
+        return of + 'DAO';
+      }
+    },
+    {
+      name: 'adapt',
+      value: function(oldValue, newValue, prop) {
+        return prop.of.isInstance(newValue) ?
+          newValue.id :
+          newValue ;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  documentation: 'Update Model Property types.',
+
+  properties: [
+    { class: 'String',  name: 'name' },
+    { class: 'Boolean', name: 'abstract' }
   ]
 });

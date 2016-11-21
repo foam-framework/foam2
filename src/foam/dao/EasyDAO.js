@@ -286,7 +286,7 @@ foam.CLASS({
         dao = this.GUIDDAO.create(args);
       }
 
-      var cls = this.of$cls;
+      var cls = this.of;
 
       if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
 

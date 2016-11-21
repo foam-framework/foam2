@@ -271,6 +271,7 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractSink',
@@ -652,6 +653,7 @@ foam.CLASS({
   ]
 });
 
+
 /**
   The base class for most DAOs, defining basic DAO behavior.
 */
@@ -886,11 +888,6 @@ foam.CLASS({
     },
     {
       name: 'of',
-      adapt: function(_, o) {
-        return foam.String.isInstance(o) ?
-          this.lookup(o) : 
-          o ;
-      },
       expression: function(delegate) {
         return delegate.of;
       }
@@ -970,7 +967,7 @@ foam.CLASS({
           self.delegateSub_ = null;
         });
       }
-      this.SUPER.apply(this, arguments);
+      return this.SUPER.apply(this, arguments);
     },
 
     function select(sink, skip, limit, order, predicate) {

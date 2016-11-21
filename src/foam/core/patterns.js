@@ -24,6 +24,8 @@ foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
 
+  properties: [ [ 'name', 'create' ] ],
+
   methods: [
     function installInClass(cls) {
       var oldCreate = cls.create;
@@ -55,8 +57,10 @@ foam.CLASS({
   name: 'Multiton',
 
   properties: [
+    [ 'name', 'create' ],
     {
       // FUTURE: switch to 'properties' to support multiple keys when/if needed.
+      class: 'String',
       name: 'property'
     }
   ],

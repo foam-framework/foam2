@@ -148,9 +148,11 @@ for ( var i = 0 ; i < a.length; i++ ) {
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.java',
   name: 'Skeleton',
+
   properties: [
     {
       class: 'Class',
@@ -159,13 +161,13 @@ foam.CLASS({
     {
       name: 'name',
       expression: function(of) {
-        return this.of$cls.name + 'Skeleton';
+        return this.of.name + 'Skeleton';
       }
     },
     {
       name: 'package',
       expression: function(of) {
-        return this.of$cls.package;
+        return this.of.package;
       }
     },
     {
@@ -175,6 +177,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
@@ -186,7 +189,7 @@ foam.CLASS({
 
       foam.core.Object.create({
         name: 'delegate',
-        javaType: this.of$cls.id
+        javaType: this.of.id
       }).buildJavaClass(cls);
 
       cls.method({
@@ -200,6 +203,7 @@ foam.CLASS({
       return cls;
     }
   ],
+
   templates: [
     {
       name: 'sendMethodCode',
@@ -213,7 +217,7 @@ foam.CLASS({
     Object result = null;
 
     switch ( rpc.getName() ) {<%
-  var methods = this.of$cls.getAxiomsByClass(foam.core.Method);
+  var methods = this.of.getAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
       case "<%= m.name %>":
@@ -240,6 +244,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
@@ -269,6 +274,7 @@ foam.CLASS({
       m.sourceCls_ = child.sourceCls_;
       return m;
     },
+
     function buildJavaClass(cls) {
       if ( ! this.javaCode && ! this.abstract ) return;
 
@@ -317,6 +323,7 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Method',
   properties: [
@@ -328,8 +335,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Import',
+
   methods: [
     function buildJavaClass(cls) {
       cls.method({
@@ -340,6 +349,7 @@ foam.CLASS({
       });
     }
   ],
+
   templates: [
     {
       name: 'axiomJavaSource',
@@ -384,8 +394,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
+
   properties: [
     {
       class: 'String',
@@ -395,7 +407,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaJSONParser',
-      value: 'foam.lib.json.AnyPArser'
+      value: 'foam.lib.json.AnyParser'
     },
     {
       class: 'String',
@@ -473,6 +485,7 @@ public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.java
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
@@ -500,11 +513,13 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Array',
+
   properties: [
     ['javaType', 'Object[]'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
   ],
+
   templates: [
     {
       name: 'axiomClassInfo',
@@ -560,6 +575,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
+
   properties: [
     {
       name: 'javaType',
@@ -573,6 +589,7 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractPropertyInfo']
   ],
+
   templates: [
     {
       name: 'axiomClassInfo',
@@ -625,6 +642,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Boolean',
   properties: [
@@ -633,6 +651,7 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Object',
@@ -643,6 +662,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Proxy',
   properties: [
@@ -652,5 +672,15 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Reference',
+  properties: [
+    ['javaType', 'Object'],
+    ['javaJSONParser', 'foam.lib.json.AnyParser'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });
