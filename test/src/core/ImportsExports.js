@@ -22,7 +22,7 @@ describe('imports/exports tests', function() {
       imports: [
         'a',
         'b',
-        'c'
+        'c?' // not required, so will not throw error when missing
       ]
     });
 
