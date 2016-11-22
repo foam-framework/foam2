@@ -39,7 +39,7 @@ describe('JSONFileDAO', function() {
     var dao = foam.dao.node.JSONFileDAO.create({
       path: 'test.json',
       of: 'test.dao.node.json_file.TestModel',
-    }, foam.__context__);
+    });
 
     Promise.all([
       dao.put(test.dao.node.json_file.TestModel.create({ id: 1, name: 'foo' }, foam.__context__)),
@@ -55,7 +55,7 @@ describe('JSONFileDAO', function() {
       var dao2 = foam.dao.node.JSONFileDAO.create({
         path: 'test.json',
         of: 'test.dao.node.json_file.TestModel',
-      }, foam.__context__);
+      });
 
       return dao2.select();
     }).then(function(a) {
