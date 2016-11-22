@@ -118,7 +118,7 @@ foam.CLASS({
     /**
      * Bulk load data from another DAO.
      * Any data already loaded into this DAO will be lost.
-     * @arg sink (optional) eof is called when loading is complete.
+     * @param sink (optional) eof is called when loading is complete.
      **/
     function bulkLoad(dao) {
       var self = this;

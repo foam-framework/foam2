@@ -191,12 +191,12 @@ var insertIntoComment = function insertIntoComment(comment, tag) {
 }
 
 var replaceCommentArg = function replaceCommentArg(comment, name, type, optional, repeats, docs) {
-  // if the @arg is defined in the comment, add the type, otherwise insert
-  // the @arg directive. Documentation (if any) from the argument declaration
-  // is only used if the @arg is not specified in the original comment.
+  // if the @param is defined in the comment, add the type, otherwise insert
+  // the @param directive. Documentation (if any) from the argument declaration
+  // is only used if the @param is not specified in the original comment.
   var found = false;
   var ret = comment.replace(
-    new RegExp('(@param|@arg)\\s*({.*?})?\\s*'+name+'\\s', 'gm'),
+    new RegExp('@param\\s*({.*?})?\\s*'+name+'\\s', 'gm'),
     function(match, p1, p2) {
       found = true;
       if ( p2 ) return match; // a type was specified, abort
@@ -206,7 +206,7 @@ var replaceCommentArg = function replaceCommentArg(comment, name, type, optional
   );
 
   if ( found ) return ret;
-  return insertIntoComment(comment, "\n@arg {"+ (repeats?"...":"") +
+  return insertIntoComment(comment, "\n@param {"+ (repeats?"...":"") +
     type+ (optional?"=":"") + "} "+name+" "+docs);
 }
 
