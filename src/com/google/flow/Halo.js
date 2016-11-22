@@ -174,7 +174,7 @@ foam.CLASS({
 
       this.add(
         this.haloBorder,
-        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, _, _, x, y, sx, sy) {
+        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, _, __, x, y, sx, sy) {
           v.originX    = v.width/2;
           v.originY    = v.height/2;
           halo.originX = halo.width/2;
