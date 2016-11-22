@@ -63,7 +63,7 @@ foam.CLASS({
         if ( name && ! this.properties[name] ) {
           this.addPropertyIndex(order);
         }
-      } else if ( predicate ) {
+        // } else if ( predicate ) {
         // TODO: check for property in predicate
       }
       return this.NoPlan.create();
