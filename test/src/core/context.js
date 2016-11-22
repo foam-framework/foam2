@@ -67,7 +67,7 @@ describe('ConteXt object', function() {
       package: 'test',
       properties: [ 'a' ]
     });
-    var testa = test.Tester.create({ a: 3 });
+    var testa = test.Tester.create({ a: 3 }, foam.__context__);
     var sub = foam.createSubContext({ hello: testa.a$ });
 
     expect(sub.hello).toEqual(3);
@@ -78,7 +78,7 @@ describe('ConteXt object', function() {
 
   it('describes', function() {
     foam.createSubContext({}).describe();
-    foam.createSubContext({ hello: 'thing', wee: foam.core.Property.create() }, 'namey').describe();
+    foam.createSubContext({ hello: 'thing', wee: foam.core.Property.create(undefined, foam.__context__) }, 'namey').describe();
   });
 });
 
@@ -110,7 +110,7 @@ describe('Context Import/Export', function() {
         {
           name: 'foo',
           factory: function() {
-            return this.XUser.create();
+            return this.XUser.create(undefined, foam.__context__);
           }
         },
         ['bar', 99],
@@ -119,6 +119,6 @@ describe('Context Import/Export', function() {
   });
 
   it("factories not so lazy that things created in them cause infinite loops grabbing the context", function() {
-    expect(function() { test.ContextBase.create().foo; }).not.toThrow();
+    expect(function() { test.ContextBase.create(undefined, foam.__context__).foo; }).not.toThrow();
   });
 });

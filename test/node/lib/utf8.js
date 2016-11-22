@@ -17,7 +17,7 @@
 
 describe('UTF-8 decoder', function() {
   it('test decoding sample string', function() {
-    var decoder = foam.encodings.UTF8.create();
+    var decoder = foam.encodings.UTF8.create(undefined, foam.__context__);
     var string = "Hello world! 23048alsdf alskl234";
 
     var buffer = new Buffer(string, 'utf8');

@@ -45,13 +45,13 @@ foam.CLASS({
       name: 'properties',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var p = foam.core.Property.create();
+          var p = foam.core.Property.create(undefined, this);
           p.name = o;
           return p;
         }
 
         if ( Array.isArray(o) ) {
-          var p = foam.core.Property.create();
+          var p = foam.core.Property.create(undefined, this);
           p.name  = o[0];
           p.value = o[1];
           return p;
@@ -60,10 +60,10 @@ foam.CLASS({
         if ( o.class ) {
           var m = foam.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
-          return m.create(o);
+          return m.create(o, this);
         }
 
-        return foam.core.Property.isInstance(o) ? o : foam.core.Property.create(o);
+        return foam.core.Property.isInstance(o) ? o : foam.core.Property.create(o, this);
       }
     },
     {
@@ -73,14 +73,14 @@ foam.CLASS({
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
           console.assert(o.name, 'Method must be named');
-          var m = foam.core.Method.create();
+          var m = foam.core.Method.create(undefined, this);
           m.name = o.name;
           m.code = o;
           return m;
         }
         if ( foam.core.Method.isInstance(o) ) return o;
-        if ( o.class ) return this.lookup(o.class).create(o);
-        return foam.core.Method.create(o);
+        if ( o.class ) return this.lookup(o.class).create(o, this);
+        return foam.core.Method.create(o, this);
       }
     }
   ]

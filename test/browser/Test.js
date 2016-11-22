@@ -136,7 +136,7 @@ var dao = foam.dao.EasyDAO.create({
   ]
 });
 
-var e = foam.mlang.Expressions.create();
+var e = foam.mlang.Expressions.create(undefined, foam.__context__);
 
 dao.where(e.EQ(Test2.LNAME, null)).select().then(function (a) {
   console.log('EQ(null)');

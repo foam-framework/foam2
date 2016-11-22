@@ -18,12 +18,12 @@
 describe('HTTPMethod', function() {
 
   it('creates request objects when required', function(done) {
-    
+
     foam.CLASS({ name: 'Hello', properties: [ 'a', 'b' ] });
-    
-    foam.CLASS({ 
+
+    foam.CLASS({
       name: 'MockRequest',
-      
+
       methods: [
         function send() {
           return Promise.resolve({
@@ -32,64 +32,63 @@ describe('HTTPMethod', function() {
             payload: Promise.resolve("response")
           });
         }
-      ]    
+      ]
     });
     var mockRequests = [];
-    
+
     foam.CLASS({
-    	name: "ExportAllServices",
-    	properties: [
-    		{
-    			class: "foam.core.Property",
-    			name: "HTTPRequestFactory",
-    			factory: function () {
+      name: "ExportAllServices",
+      properties: [
+        {
+          class: "foam.core.Property",
+          name: "HTTPRequestFactory",
+          factory: function () {
             var self = this;
             return function(opt_args, opt_X) {
               // TODO: locked into one kind of auth.
-              var ret = MockRequest.create();
+              var ret = MockRequest.create(undefined, foam.__context__);
               mockRequests.push(ret);
               if ( opt_args ) ret.copyFrom(opt_args);
               return ret;
             }
           }
-    		},
-    	],
-    	exports: [
+        },
+      ],
+      exports: [
         "HTTPRequestFactory"
-    	],
+      ],
     });
-    var serviceContext = ExportAllServices.create();
-    
+    var serviceContext = ExportAllServices.create(undefined, foam.__context__);
+
     var httpMethod = foam.net.HTTPMethod.create({
       name: 'wee',
       args: [
         foam.net.HTTPArgument.create({
           name: 'a',
           typeName: 'number'
-        }),
+        }, foam.__context__),
         foam.net.HTTPArgument.create({
           name: 'b',
           typeName: 'string'
-        }),
+        }, foam.__context__),
       ],
       buildRequestType: 'Hello',
     }, serviceContext);
-    
+
     foam.CLASS({
       name: 'MethodUser',
       imports: [ 'HTTPRequestFactory' ],
       axioms: [ httpMethod ]
     });
-    
+
     var m = MethodUser.create(undefined, serviceContext);
-    
+
     m.wee(4, 5);
-    
+
     expect(mockRequests[0].payload).toEqual("{\"a\":4,\"b\":5}");
-    
+
     done();
-    
+
   })
 
 });
-        

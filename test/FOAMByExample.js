@@ -37,7 +37,7 @@ var customMatchers = {
 };
 
 
-describe("FOAM By Example", function() {
+xdescribe("FOAM By Example", function() {
 var log_ = function log_(o) {
   log_.output += o;
 };
@@ -1766,7 +1766,7 @@ foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
 // ConstantSlot creates an immutable slot.
-var s = foam.core.ConstantSlot.create({value: 42});
+var s = foam.core.ConstantSlot.create({value: 42}, foam.__context__);
 log(s.get());
 s.value = 66;
 s.set(66);
@@ -1904,8 +1904,8 @@ log_.output = "";
 try {
 // Destroyables (objects with a destroy() method) or functions
 // can be registered to be called when an object is destroyed.
-var o = foam.core.FObject.create();
-var o2 = foam.core.FObject.create();
+var o = foam.core.FObject.create(undefined, foam.__context__);
+var o2 = foam.core.FObject.create(undefined, foam.__context__);
 o.onDestroy(function() { log('destroy 1'); });
 o2.onDestroy(function() { log('destroy 2'); });
 o.onDestroy(o2);
@@ -1935,7 +1935,7 @@ log_.output = "";
 try {
 // If an Object is destroyed, it will unsubscribe from any
 // subscriptions which subsequently try to deliver events.
-var source = foam.core.FObject.create();
+var source = foam.core.FObject.create(undefined, foam.__context__);
 var sink = foam.CLASS({
   name: 'Sink',
   listeners: [
@@ -2459,7 +2459,7 @@ try {
 // specify arbitrary Axioms with axioms:
 foam.CLASS({
   name: 'AxiomTest',
-  axioms: [ foam.pattern.Singleton.create() ],
+  axioms: [ foam.pattern.Singleton.create(undefined, foam.__context__) ],
   methods: [ function init() { log('Creating AxiomTest'); } ]
 });
 AxiomTest.create();
@@ -2897,7 +2897,7 @@ foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
 // Convert to a JSON object (instead of a String)
-log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
+log(foam.json.stringify(JSONTest.create(foam.json.objectify(o, foam.__context__))));
 } catch(x) {
  log("Exception: ", x);
  }

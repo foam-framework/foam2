@@ -172,7 +172,7 @@ foam.CLASS({
         {
           configurable: true,
           get: function() {
-            return cls.create({ ordinal: ordinal });
+            return cls.create({ ordinal: ordinal }, foam.__context__);
           }
         });
     },
@@ -396,7 +396,7 @@ foam.CLASS({
         var e    = this.__context__.lookup(prop.of);
 
         if ( type === foam.String ) return e[foam.String.constantize(n)];
-        if ( type === foam.Number ) return e.create({ordinal: n});
+        if ( type === foam.Number ) return e.create({ordinal: n}, foam.__context__);
       }
     ]
   ]
@@ -408,7 +408,7 @@ foam.LIB({
 
   methods: [
     function ENUM(m) {
-      var model = foam.core.EnumModel.create(m);
+      var model = foam.core.EnumModel.create(m, foam.__context__);
       model.validate();
       var cls = model.buildClass();
       cls.validate();

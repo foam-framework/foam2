@@ -30,7 +30,7 @@ describe('Method', function() {
           function foo() { this.SUPER(); } // need SUPER to trigger override
         ]
       });
-      Child.create();
+      Child.create(undefined, foam.__context__);
     }).toThrow();
   });
 });
