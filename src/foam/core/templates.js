@@ -177,11 +177,11 @@ foam.CLASS({
           ( result[0] ? t : result[1] )
           + this.FOOTER;
 
-      var args = ['opt_outputter'].concat(args);
+      var newArgs = ['opt_outputter'].concat(args);
       var f = eval(
         '(function() { ' +
           'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
-          'var f = function(' + args.join(',') + '){' + code + '};' +
+          'var f = function(' + newArgs.join(',') + '){' + code + '};' +
           'return function() { '+
           'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(Array.from(arguments)));' +
           'return f.apply(this, arguments);};})()');

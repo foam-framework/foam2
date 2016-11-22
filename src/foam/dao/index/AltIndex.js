@@ -75,14 +75,14 @@ foam.CLASS({
       var bestPlan;
       //    console.log('Planning: ' + (predicate && predicate.toSQL && predicate.toSQL()));
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        var plan = this.delegates[i].plan(sink, skip, limit, order, predicate);
+        var p = this.delegates[i].plan(sink, skip, limit, order, predicate);
         // console.log('  plan ' + i + ': ' + plan);
-        if ( plan.cost <= this.GOOD_ENOUGH_PLAN ) {
-          bestPlan = plan;
+        if ( p.cost <= this.GOOD_ENOUGH_PLAN ) {
+          bestPlan = p;
           break;
         }
-        if ( ! bestPlan || plan.cost < bestPlan.cost ) {
-          bestPlan = plan;
+        if ( ! bestPlan || p.cost < bestPlan.cost ) {
+          bestPlan = p;
         }
       }
       //    console.log('Best Plan: ' + bestPlan);
