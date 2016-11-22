@@ -47,4 +47,4 @@ foam.INTERFACE({
   ]
 });
 
-foam.u2.Element.create(undefined, foam.__context__).setNodeName('pre').add(foam.box.RPCMessage.buildJavaClass().toJavaSource()).write()
+foam.u2.Element.create().setNodeName('pre').add(foam.box.RPCMessage.buildJavaClass().toJavaSource()).write()

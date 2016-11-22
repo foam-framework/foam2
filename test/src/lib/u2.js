@@ -50,9 +50,9 @@ describe('U2', function() {
       package: 'test.css',
       name: 'C',
       axioms: [
-        foam.u2.CSS.create({ code: 'c1' }, foam.__context__),
-        foam.u2.CSS.create({ code: 'c2' }, foam.__context__),
-        foam.u2.CSS.create({ code: 'c3' }, foam.__context__)
+        foam.u2.CSS.create({ code: 'c1' }),
+        foam.u2.CSS.create({ code: 'c2' }),
+        foam.u2.CSS.create({ code: 'c3' })
       ]
     });
 
@@ -63,7 +63,7 @@ describe('U2', function() {
     });
 
     it('should install CSS when the first instance is created', function() {
-      var X = foam.core.Window.create(undefined, foam.__context__);
+      var X = foam.core.Window.create();
       var allCSS = '';
       X.installCSS = function(text) {
         allCSS += text;
@@ -76,7 +76,7 @@ describe('U2', function() {
     });
 
     it('should recursively install CSS from parent classes', function() {
-      var X = foam.core.Window.create(undefined, foam.__context__);
+      var X = foam.core.Window.create();
       var allCSS = '';
       X.installCSS = function(text) { allCSS += text; };
       X.document = {};
@@ -88,7 +88,7 @@ describe('U2', function() {
     });
 
     it('should not reinstall CSS when more instances are created', function() {
-      var X = foam.core.Window.create(undefined, foam.__context__);
+      var X = foam.core.Window.create();
       var allCSS = '';
       X.installCSS = function(text) { allCSS += text; };
       X.document = {};
@@ -108,7 +108,7 @@ describe('U2', function() {
     });
 
     it('should handle multiple CSS axioms on one class', function() {
-      var X = foam.core.Window.create(undefined, foam.__context__);
+      var X = foam.core.Window.create();
       var seenCSS = [];
       X.installCSS = function(text) {
         seenCSS.push(text);
@@ -123,7 +123,7 @@ describe('U2', function() {
     });
 
     it('should install a parent\'s CSS even when I have none', function() {
-      var X = foam.core.Window.create(undefined, foam.__context__);
+      var X = foam.core.Window.create();
       var seenCSS = [];
       X.installCSS = function(text) {
         seenCSS.push(text);
@@ -155,7 +155,7 @@ describe('U2', function() {
       });
 
       it('should expand properly', function() {
-        var X = foam.core.Window.create(undefined, foam.__context__);
+        var X = foam.core.Window.create();
         X.document = {};
         var css = '';
         X.installCSS = function(text) {

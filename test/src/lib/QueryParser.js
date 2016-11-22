@@ -81,7 +81,7 @@ describe('Query parser', function() {
     timestamp: new Date(2016, 0, 26)
   }, foam.__context__));
 
-  var parser = foam.parse.QueryParser.create({ of: 'test.query.Item' }, foam.__context__);
+  var parser = foam.parse.QueryParser.create({ of: 'test.query.Item' });
 
   var expectMatches = function(expected) {
     return function(actual) {

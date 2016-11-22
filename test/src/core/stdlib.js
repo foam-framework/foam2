@@ -621,7 +621,7 @@ describe('foam.Array', function() {
       expect(a).toEqual(b);
     });
     it('clones instances', function() {
-      var a = [2, foam.core.Property.create({ name: 'hello' }, foam.__context__), 4];
+      var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
       var b = foam.util.clone(a);
       expect(a).not.toBe(b);
       expect(foam.util.compare(a[1], b[1])).toEqual(0);
@@ -866,7 +866,7 @@ describe('foam.mmethod', function() {
     expect(mm(new Date(343434))).toBe(true);
 
     expect(function() {
-      mm(foam.core.Property.create({ name: 'prop' }, foam.__context__));
+      mm(foam.core.Property.create({ name: 'prop' }));
     }).toThrow();
   });
 
@@ -879,7 +879,7 @@ describe('foam.mmethod', function() {
 
     expect(mm("hello")).toBe(true);
     expect(mm(77)).toBe(true);
-    expect(mm(foam.core.Property.create({name: 'prop'}, foam.__context__))).toEqual("Property");
+    expect(mm(foam.core.Property.create({name: 'prop'}))).toEqual("Property");
   });
 
   it('uses supplied default method', function() {
@@ -890,7 +890,7 @@ describe('foam.mmethod', function() {
 
     expect(mm("hello")).toBe(true);
     expect(mm(77)).toBe(true);
-    expect(mm(foam.core.Property.create({name: 'prop'}, foam.__context__))).toEqual("Default!");
+    expect(mm(foam.core.Property.create({name: 'prop'}))).toEqual("Default!");
     expect(mm(true)).toEqual("Default!");
   });
 
@@ -904,7 +904,7 @@ describe('foam.util', function() {
       "hello",
       function() {},
       new Date(4843090),
-      foam.core.Property.create({ name: 'prop' }, foam.__context__),
+      foam.core.Property.create({ name: 'prop' }),
       { a: 'A' },
       [ 2, 4 ]
     ];

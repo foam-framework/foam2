@@ -91,11 +91,11 @@ describe("Index benchmarks", function() {
     var INT_SPREAD = NUM_SUBJECTS / 20;
 
     var subjectDAO;
-    var subjects = foam.dao.ArrayDAO.create(undefined, foam.__context__);
+    var subjects = foam.dao.ArrayDAO.create();
 
-    var M = foam.mlang.ExpressionsSingleton.create(undefined, foam.__context__);
+    var M = foam.mlang.ExpressionsSingleton.create();
 
-    subjectDAO = foam.dao.MDAO.create({ of: Subject }, foam.__context__)
+    subjectDAO = foam.dao.MDAO.create({ of: Subject })
       .addPropertyIndex(Subject.INT_P, Subject.BOOL_P)
       .addPropertyIndex(Subject.STRING_P, Subject.INT_P)
       .addPropertyIndex(Subject.STRING_P, Subject.BOOL_P);

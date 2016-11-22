@@ -18,7 +18,7 @@
 describe('JSONFileDAO', function() {
   genericDAOTestBattery(function(model) {
     try { require('fs').unlinkSync('test.json'); } catch(e) {}
-    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model }, foam.__context__));
+    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model }));
   });
 
   afterAll(function() {

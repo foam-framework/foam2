@@ -408,7 +408,7 @@ foam.LIB({
 
   methods: [
     function ENUM(m) {
-      var model = foam.core.EnumModel.create(m, foam.__context__);
+      var model = foam.core.EnumModel.create(m);
       model.validate();
       var cls = model.buildClass();
       cls.validate();

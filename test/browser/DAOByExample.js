@@ -22,7 +22,7 @@ var examples = [
     name: 'Load MLangs',
     description: "Loads the mlang query langauage",
     code: function() {
-      var M = foam.mlang.ExpressionsSingleton.create(undefined, foam.__context__);
+      var M = foam.mlang.ExpressionsSingleton.create();
     }
   },
   {
@@ -243,7 +243,7 @@ var examples = [
     description: "Finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
-      var tsink = foam.dao.ArrayDAO.create(undefined, foam.__context__);
+      var tsink = foam.dao.ArrayDAO.create();
 
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
@@ -269,13 +269,13 @@ var examples = [
     description: "Without using Relationships, finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
-      var tsink = foam.dao.ArrayDAO.create(undefined, foam.__context__);
+      var tsink = foam.dao.ArrayDAO.create();
 
       // to store intermediate reuslts for matching customer IDs
-      var customerIds = foam.dao.ArraySink.create(undefined, foam.__context__);
+      var customerIds = foam.dao.ArraySink.create();
 
       // to store intermediate results for matching account IDs
-      var accountIds = foam.dao.ArraySink.create(undefined, foam.__context__);
+      var accountIds = foam.dao.ArraySink.create();
 
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
@@ -321,7 +321,7 @@ var examples = [
     description: "A pseudo scroll effect with skip and limit",
     dependencies: [ 'Load Customers' ],
     code: function() {
-      var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO }, foam.__context__);
+      var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
       var skip = 0;
       var limit = 3;
 

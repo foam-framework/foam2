@@ -183,7 +183,7 @@ describe('Property default comparators', function() {
   var c;
 
   beforeEach(function() {
-    c = foam.core.Property.create(undefined, foam.__context__).comparePropertyValues;
+    c = foam.core.Property.create().comparePropertyValues;
   });
   afterEach(function() {
     c = null;

@@ -56,8 +56,8 @@ describe('MDAO with TreeIndex', function() {
   var NOW = 1461778131578; // reasonable Date.now() substitute
   var MS_PER_DAY = 1000*60*60*24;
 
-  albums = foam.dao.ArrayDAO.create(undefined, foam.__context__);
-  photos = foam.dao.ArrayDAO.create(undefined, foam.__context__);
+  albums = foam.dao.ArrayDAO.create();
+  photos = foam.dao.ArrayDAO.create();
   for ( var i = 0; i < NUM_ALBUMS; ++i ) {
     albums.put(
       test.Album.create({
@@ -95,18 +95,18 @@ describe('MDAO with TreeIndex', function() {
     return a;
   }
 
-  var M = foam.mlang.Expressions.create(undefined, foam.__context__);
+  var M = foam.mlang.Expressions.create();
 
   var KEYS_SINGLE = makeMultiPartKeys(1);
   var KEYS_A_FEW = makeMultiPartKeys(10);
   var KEYS_LOTS = makeMultiPartKeys(100);
 
   beforeEach(function(done) {
-    PhotoDAO = foam.dao.MDAO.create({of: test.Photo}, foam.__context__)
+    PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
       .addPropertyIndex(test.Photo.ALBUM_ID)
       .addPropertyIndex(test.Photo.TIMESTAMP)
       .addPropertyIndex(test.Photo.IS_LOCAL);
-    AlbumDAO = foam.dao.MDAO.create({of: test.Album}, foam.__context__)
+    AlbumDAO = foam.dao.MDAO.create({of: test.Album})
      .addPropertyIndex(test.Album.IS_LOCAL)
      .addPropertyIndex(test.Album.TIMESTAMP);
 
@@ -141,7 +141,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it('innner joins', function(done) {
-    var idsink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var idsink = foam.dao.ArraySink.create();
     return AlbumDAO.where(M.EQ(test.Album.IS_LOCAL, false)).select(M.MAP(test.Album.ID, idsink))
       .then(function (idsmapsink) {
         return PhotoDAO.where(M.IN(test.Photo.ALBUM_ID, idsink.a)).select().then(function(csink) {
@@ -151,7 +151,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('orders', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     PhotoDAO.where(M.EQ(test.Photo.ALBUM_ID, avgAlbumKey))
       .orderBy(M.DESC(test.Photo.TIMESTAMP)).select(asink).then(function() {
         var a = asink.a;
@@ -164,7 +164,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('orders and filters gt/desc', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
@@ -181,7 +181,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('orders and filters gt/asc', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
@@ -198,7 +198,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('orders and filters lt/desc', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
@@ -215,7 +215,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('orders and filters lt/asc', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var cutOff = NOW - MS_PER_DAY * 10;
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
@@ -232,7 +232,7 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('orders and filters a range', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var lower = NOW - MS_PER_DAY * 100;
     var upper = NOW - MS_PER_DAY * 20;
     PhotoDAO
@@ -251,11 +251,11 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('order, range, limit', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var lower = NOW - MS_PER_DAY * 100;
     var upper = NOW - MS_PER_DAY * 20;
 
-    var countSink = foam.mlang.sink.Count.create(undefined, foam.__context__);
+    var countSink = foam.mlang.sink.Count.create();
     PhotoDAO
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
@@ -279,11 +279,11 @@ describe('MDAO with TreeIndex', function() {
   });
 
   it ('order, range, skip', function(done) {
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var lower = NOW - MS_PER_DAY * 100;
     var upper = NOW - MS_PER_DAY * 20;
 
-    var countSink = foam.mlang.sink.Count.create(undefined, foam.__context__);
+    var countSink = foam.mlang.sink.Count.create();
     PhotoDAO
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
@@ -308,7 +308,7 @@ describe('MDAO with TreeIndex', function() {
 
   it ('filters inverted range', function(done) {
     // Pick the items NOT in the range
-    var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var asink = foam.dao.ArraySink.create();
     var lower = NOW - MS_PER_DAY * 100;
     var upper = NOW - MS_PER_DAY * 20;
     PhotoDAO

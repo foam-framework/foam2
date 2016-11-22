@@ -21,13 +21,13 @@
 //     foam.CLASS({
 //       name: 'PooledClass',
 //       package: 'test',
-//       axioms: [foam.pattern.Pooled.create(undefined, foam.__context__)],
+//       axioms: [foam.pattern.Pooled.create()],
 //       properties: [ 'a', 'b' ],
 //     });
 //     foam.CLASS({
 //       name: 'PooledDestroyClass',
 //       package: 'test',
-//       axioms: [foam.pattern.Pooled.create(undefined, foam.__context__)],
+//       axioms: [foam.pattern.Pooled.create()],
 //       properties: [
 //         [ 'a', 55 ],
 //         [ 'b', 99 ],
@@ -91,8 +91,8 @@
 //   });
 
 //   it('remembers pooled classes', function() {
-//     expect(foam.pattern.Pooled.create(undefined, foam.__context__).pooledClasses[test.PooledClass]).toEqual(true);
-//     foam.pattern.Pooled.create(undefined, foam.__context__).clearPools();
+//     expect(foam.pattern.Pooled.create().pooledClasses[test.PooledClass]).toEqual(true);
+//     foam.pattern.Pooled.create().clearPools();
 //   });
 
 
