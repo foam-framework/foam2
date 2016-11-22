@@ -17,6 +17,20 @@
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Canvas',
+  extends: 'foam.graphics.Box',
+
+  properties: [
+    [ 'autoRepaint', true ],
+    [ 'width', 800 ],
+    [ 'height', 600 ],
+    [ 'color', '#f3f3f3' ],
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Select',
   documentation: 'Dummy Model to represent selection mode in FLOW.'
 });
@@ -155,6 +169,7 @@ foam.CLASS({
 
   requires: [
     'com.google.dxf.ui.DXFDiagram',
+    'com.google.flow.Canvas',
     'com.google.flow.Circle',
     'com.google.flow.Ellipse',
     'com.google.flow.DetailPropertyView',
@@ -409,10 +424,7 @@ foam.CLASS({
     },
     {
       name: 'canvas',
-      factory: function() {
-        return this.Box.create({autoRepaint: true, width: 800, height: 600, color: '#f3f3f3'});
-//        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
-      }
+      factory: function() { return this.Canvas.create(); }
     },
     {
       name: 'sheet',
