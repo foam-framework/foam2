@@ -433,7 +433,7 @@ foam.LIB({
   methods: [
     function getFunctionArgs(fn) {
       /** Extracts the arguments and their types from the given function.
-        * @arg fn The function to extract from. The toString() of the function
+        * @param fn The function to extract from. The toString() of the function
         *     must be accurate.
         * @return An array of Argument objects.
         */
