@@ -31,7 +31,7 @@ function makeTestFn() {
   foam.CLASS({  name: 'package.TypeC' });
   foam.CLASS({  name: 'RetType' });
   return function test(/* TypeA // docs for, pA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
-    return (RetType.create());
+    return (RetType.create(undefined, foam.__context__));
   }
 }
 function makePrimitiveTestFn() { // multiline parsing, ha
@@ -126,24 +126,24 @@ describe('Argument.validate', function() {
   it('checks modelled types', function() {
     var params = foam.types.getFunctionArgs(fn);
 
-    expect(function() { params[0].validate(TypeA.create()); }).not.toThrow();
-    expect(function() { params[1].validate(TypeB.create()); }).not.toThrow();
-    expect(function() { params[1].validate(TypeBB.create()); }).not.toThrow(); //subclass should be ok
-    expect(function() { params[2].validate(global['package.TypeC'].create()); }).not.toThrow();
+    expect(function() { params[0].validate(TypeA.create(undefined, foam.__context__)); }).not.toThrow();
+    expect(function() { params[1].validate(TypeB.create(undefined, foam.__context__)); }).not.toThrow();
+    expect(function() { params[1].validate(TypeBB.create(undefined, foam.__context__)); }).not.toThrow(); //subclass should be ok
+    expect(function() { params[2].validate(global['package.TypeC'].create(undefined, foam.__context__)); }).not.toThrow();
 
-    expect(function() { params[3].validate(TypeA.create()); }).not.toThrow(); // arg 3 not typed
+    expect(function() { params[3].validate(TypeA.create(undefined, foam.__context__)); }).not.toThrow(); // arg 3 not typed
     expect(function() { params[3].validate(99); }).not.toThrow();
 
-    expect(function() { params.returnType.validate(RetType.create()); }).not.toThrow();
+    expect(function() { params.returnType.validate(RetType.create(undefined, foam.__context__)); }).not.toThrow();
   });
   it('rejects wrong modelled types', function() {
     var params = foam.types.getFunctionArgs(fn);
 
-    expect(function() { params[0].validate(TypeB.create()); }).toThrow();
-    expect(function() { params[1].validate(TypeA.create()); }).toThrow();
-    expect(function() { params[2].validate(RetType.create()); }).toThrow();
+    expect(function() { params[0].validate(TypeB.create(undefined, foam.__context__)); }).toThrow();
+    expect(function() { params[1].validate(TypeA.create(undefined, foam.__context__)); }).toThrow();
+    expect(function() { params[2].validate(RetType.create(undefined, foam.__context__)); }).toThrow();
 
-    expect(function() { params.returnType.validate(global['package.TypeC'].create()); }).toThrow();
+    expect(function() { params.returnType.validate(global['package.TypeC'].create(undefined, foam.__context__)); }).toThrow();
   });
   it('checks primitive types', function() {
     var params = foam.types.getFunctionArgs(makePrimitiveTestFn());
@@ -196,25 +196,45 @@ describe('foam.types.typeCheck', function() {
   });
 
   it('allows valid args', function() {
-    expect(function() { fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99); }).not.toThrow();
+    expect(function() { fn(
+      TypeA.create(undefined, foam.__context__),
+      TypeB.create(undefined, foam.__context__),
+      global['package.TypeC'].create(undefined, foam.__context__),
+      99
+    ); }).not.toThrow();
   });
   it('allows extra args', function() {
     expect(function() {
-        fn(TypeA.create(), TypeB.create(), global['package.TypeC'].create(), 99,
+        fn(
+          TypeA.create(undefined, foam.__context__),
+          TypeB.create(undefined, foam.__context__),
+          global['package.TypeC'].create(undefined, foam.__context__),
+          99,
           "extra", 8, 'arg');
     }).not.toThrow();
   });
   it('fails missing args', function() {
-    expect(function() { fn(TypeA.create(), TypeB.create()); }).toThrow();
+    expect(function() { fn(
+      TypeA.create(undefined, foam.__context__),
+      TypeB.create(undefined, foam.__context__)
+    ); }).toThrow();
   });
   it('fails bad primitive args', function() {
     expect(function() {
-      fn(TypeA.create(), 3, global['package.TypeC'].create(), 99);
+      fn(
+        TypeA.create(undefined, foam.__context__),
+        3,
+        global['package.TypeC'].create(undefined, foam.__context__),
+        99);
     }).toThrow();
   });
   it('fails bad model args', function() {
     expect(function() {
-      fn(TypeA.create(), TypeB.create(), TypeA.create(), 99);
+      fn(
+        TypeA.create(undefined, foam.__context__),
+        TypeB.create(undefined, foam.__context__),
+        TypeA.create(undefined, foam.__context__),
+        99);
     }).toThrow();
   });
 

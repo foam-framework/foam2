@@ -563,8 +563,8 @@ describe('foam.Array', function() {
         name: 'CompB',
         properties: [ 'b', 'c' ]
       });
-      x = test.CompA.create();
-      y = test.CompB.create();
+      x = test.CompA.create(undefined, foam.__context__);
+      y = test.CompB.create(undefined, foam.__context__);
     });
     afterEach(function() {
       x = y = null;

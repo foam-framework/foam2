@@ -61,7 +61,6 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(name) ) {
             var cls    = (this.__context__ || foam).lookup(path);
             var parent = this;
-
             this.assert(cls, 'Requires: Unknown class: ', path);
 
             var c = Object.create(cls);

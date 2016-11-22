@@ -59,7 +59,7 @@ var createTestProperties = function createTestProperties() {
     });
   }
 
-  return test.PropTypeTester.create();
+  return test.PropTypeTester.create(undefined, foam.__context__);
 }
 var createDateTestProperties = function createDateTestProperties() {
   if ( ! foam.lookup('test.DateTypeTester', true) ) {
@@ -79,7 +79,7 @@ var createDateTestProperties = function createDateTestProperties() {
       ]
     });
   }
-  return test.DateTypeTester.create();
+  return test.DateTypeTester.create(undefined, foam.__context__);
 }
 
 // For tests that rely on asserts firing, make sure they throw so the

@@ -38,7 +38,7 @@ function modelWithTopic() {
       { name: 'other' },
     ],
   });
-  return test.TopicModel.create();
+  return test.TopicModel.create(undefined, foam.__context__);
 }
 function modelWithProperty() {
   foam.CLASS({
@@ -49,7 +49,7 @@ function modelWithProperty() {
       { name: 'propB', value: 4 }
     ],
   });
-  return test.PropModel.create();
+  return test.PropModel.create(undefined, foam.__context__);
 }
 
 describe('foam.events.oneTime', function() {

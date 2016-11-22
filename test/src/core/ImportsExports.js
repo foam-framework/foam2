@@ -51,7 +51,7 @@ describe('imports/exports tests', function() {
       ]
     });
 
-    var def      = Def.create();
+    var def      = Def.create(undefined, foam.__context__);
     var importer = def.createImporter();
 
 
