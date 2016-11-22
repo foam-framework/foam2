@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -433,7 +433,7 @@ foam.LIB({
   methods: [
     function getFunctionArgs(fn) {
       /** Extracts the arguments and their types from the given function.
-        * @arg fn The function to extract from. The toString() of the function
+        * @param fn The function to extract from. The toString() of the function
         *     must be accurate.
         * @return An array of Argument objects.
         */
@@ -596,24 +596,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  refines: 'foam.core.Export',
-
-  properties: [
-    {
-      name: 'name',
-      assertValue: function(n) {
-        if ( ! /^[a-zA-Z][a-zA-Z0-9_]*?$/.test(n) ) {
-          var m = 'Export name "' + n + '" must be a valid variable name.';
-          this.assert(false, m);
-        }
-      }
-    }
-  ]
-});
-
 
 foam.CLASS({
   refines: 'foam.core.FObject',

@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -187,6 +187,7 @@ foam.CLASS({
     {
       /** Makes Properties useful as map functions. */
       name: 'f',
+      transient: true,
       factory: function() {
         var name = this.name;
         return function f(o) { return o[name]; }
@@ -196,12 +197,13 @@ foam.CLASS({
     {
       /** Makes Properties useful as comparators. */
       name: 'compare',
+      transient: true,
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
         var f = this.f;
         return function compare(o1, o2) {
           return comparePropertyValues(f(o1), f(o2));
-        }
+        };
       }
     }
   ],

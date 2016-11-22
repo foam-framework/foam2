@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -1129,8 +1129,6 @@ foam.CLASS({
   requires: [
     'foam.input.Pointer'
   ],
-
-  imports: [ 'getElementById' ],
 
   properties: [
     [ 'nodeName', 'CANVAS' ],

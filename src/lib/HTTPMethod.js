@@ -35,10 +35,10 @@ foam.CLASS({
   ],
 
   constants: {
-    OUTPUTTER: { 
-      __proto__: foam.json.Strict, 
-      outputDefaultValues: false, 
-      outputClassNames: false 
+    OUTPUTTER: {
+      __proto__: foam.json.Strict,
+      outputDefaultValues: false,
+      outputClassNames: false
     },
   },
 
@@ -59,11 +59,11 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
-      /** If the request should build a request body object and fill in the 
+      /** If the request should build a request body object and fill in the
         supplied args, the request object's Class is specified here. */
       class: 'Class',
       name: 'buildRequestType',
-    },    
+    },
     {
       /** HTTPMethods will always return a Promise, but the Promise will pass
         along a parameter of the type specified here. */
@@ -130,7 +130,8 @@ foam.CLASS({
       var request = host[this.HTTPRequestFactoryName]();
 
       // if building a request object, start with an empty instance
-      var requestObject = self.buildRequestType ? self.buildRequestType.create() : null;
+      var requestObject = self.buildRequestType ?
+        self.buildRequestType.create(undefined, foam.__context__) : null;
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {

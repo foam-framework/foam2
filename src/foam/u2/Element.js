@@ -53,6 +53,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'CSS',
@@ -1260,7 +1261,7 @@ foam.CLASS({
           eof: function() {}
         });
       };
-      var addRow = function(_, _, _, o) {
+      var addRow = function(_, __, ___, o) {
         if ( update ) {
           o = o.clone();
         }
@@ -1271,7 +1272,7 @@ foam.CLASS({
         if ( update ) {
           // ???: Why is it necessary to delay this until after load?
           e.onload.sub(function() {
-            o.propertyChange.sub(function(_,_,prop,slot) {
+            o.propertyChange.sub(function(_,__,prop,slot) {
               dao.put(o.clone());
             });
           });
@@ -1285,7 +1286,7 @@ foam.CLASS({
         }
         es[o.id] = e;
       };
-      var removeRow = function(_, _, _, o) {
+      var removeRow = function(_, __, ___, o) {
         var e = es[o.id];
         if ( e ) {
           e.remove();
@@ -1404,9 +1405,8 @@ foam.CLASS({
         this,
         children,
         reference,
-        before ?
-          'beforebegin' :
-          'afterend');
+        before ? 'beforebegin' : 'afterend');
+
       return this;
     },
 
@@ -1487,13 +1487,16 @@ foam.CLASS({
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
-        var e2 = nextE();
-        self.insertBefore(e2, first);
+        var tmp = self.E();
+        self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
           for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].destroy(); }
         } else {
           if ( e.state === e.LOADED ) { e.remove(); e.destroy(); }
         }
+        var e2 = nextE();
+        self.insertBefore(e2, tmp);
+        tmp.remove();
         e = e2;
       };
 

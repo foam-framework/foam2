@@ -104,7 +104,7 @@ foam.CLASS({
      for ( var r = 0 ; r < d.rounds ; r++ ) {
        var n = d.workTime + d.restTime;
        for ( var i = r ? 0 : d.restTime - d.setupTime ; i < n ; i++ ) {
-         this.addChildren(this.Tick.create({
+         this.add(this.Tick.create({
            x: this.width/2,
            y: this.height/2,
            maxRadius: R,
@@ -124,7 +124,7 @@ foam.CLASS({
 
      var color$ = d.action$.map(function(s) { return colors[s]; });
 
-     this.addChildren(
+     this.add(
        /*
        this.Circle.create({
          border$: d.action$.map(function(s) { return colors[s]; }),
@@ -209,7 +209,7 @@ foam.CLASS({
      for ( var r = 0 ; r < d.rounds ; r++ ) {
        var restTime = r ? d.restTime : d.setupTime;
 
-       this.addChildren(
+       this.add(
          this.Box.create({
            color: r ? '#f00' : 'yellow',
            x: 30,
