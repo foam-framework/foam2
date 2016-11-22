@@ -86,7 +86,7 @@ describe('PredicatedSink', function() {
     var sink = foam.dao.PredicatedSink.create({
       predicate: fakePredicate,
       delegate: foam.dao.ArraySink.create()
-    }, foam.__context__);
+    });
 
     var a = test.CompA.create({ id: 0, a: 3 }, foam.__context__);
     var b = test.CompA.create({ id: 1, a: 5 }, foam.__context__);
@@ -110,7 +110,7 @@ describe('PredicatedSink', function() {
     var sink = foam.dao.PredicatedSink.create({
       predicate: fakePredicate,
       delegate: foam.dao.ArrayDAO.create()
-    }, foam.__context__);
+    });
 
     var a = test.CompA.create({ id: 0, a: 3 }, foam.__context__);
     var b = test.CompA.create({ id: 1, a: 5 }, foam.__context__);
@@ -235,7 +235,7 @@ describe('LimitedSink', function() {
     var sink = foam.dao.LimitedSink.create({
       limit: 3,
       delegate: foam.dao.ArrayDAO.create()
-    }, foam.__context__);
+    });
     var fc = foam.dao.FlowControl.create();
 
     var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
@@ -257,7 +257,7 @@ describe('LimitedSink', function() {
     var sink = foam.dao.LimitedSink.create({
       limit: 3,
       delegate: foam.dao.ArrayDAO.create()
-    }, foam.__context__);
+    });
     var fc = foam.dao.FlowControl.create();
 
     var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
@@ -298,7 +298,7 @@ describe('SkipSink', function() {
     var sink = foam.dao.SkipSink.create({
       skip: 2,
       delegate: foam.dao.ArrayDAO.create()
-    }, foam.__context__);
+    });
 
     var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
     var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
@@ -320,7 +320,7 @@ describe('SkipSink', function() {
     var sink = foam.dao.SkipSink.create({
       skip: 2,
       delegate: foam.dao.ArrayDAO.create()
-    }, foam.__context__);
+    });
 
     var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
     var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
@@ -461,14 +461,14 @@ describe('LazyCacheDAO-cacheOnSelect', function() {
   // test caching against an IDBDAO remote and MDAO cache.
   genericDAOTestBattery(function(model) {
     var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
-      .create({ name: '_test_lazyCache_', of: model }, foam.__context__);
+      .create({ name: '_test_lazyCache_', of: model });
     return idbDAO.removeAll().then(function() {
       var mDAO = foam.dao.MDAO.create({ of: model });
       return foam.dao.LazyCacheDAO.create({
         delegate: idbDAO,
         cache: mDAO,
         cacheOnSelect: true
-      }, foam.__context__);
+      });
     });
   });
 });
@@ -477,14 +477,14 @@ describe('LazyCacheDAO', function() {
   // test caching against an IDBDAO remote and MDAO cache.
   genericDAOTestBattery(function(model) {
     var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
-      .create({ name: '_test_lazyCache_', of: model }, foam.__context__);
+      .create({ name: '_test_lazyCache_', of: model });
     return idbDAO.removeAll().then(function() {
       var mDAO = foam.dao.MDAO.create({ of: model });
       return foam.dao.LazyCacheDAO.create({
         delegate: idbDAO,
         cache: mDAO,
         cacheOnSelect: false
-      }, foam.__context__);
+      });
     });
   });
 });
@@ -492,7 +492,7 @@ describe('LazyCacheDAO', function() {
 describe('CachingDAO', function() {
   genericDAOTestBattery(function(model) {
     var idbDAO = ( foam.dao.IDBDAO || foam.dao.LocalStorageDAO )
-      .create({ name: '_test_readCache_', of: model }, foam.__context__);
+      .create({ name: '_test_readCache_', of: model });
     return idbDAO.removeAll().then(function() {
       var mDAO = foam.dao.MDAO.create({ of: model });
       return foam.dao.CachingDAO.create({ src: idbDAO, cache: mDAO });
@@ -533,7 +533,7 @@ describe('SequenceNumberDAO', function() {
     return Promise.resolve(foam.dao.SequenceNumberDAO.create({
       delegate: mDAO,
       of: model
-    }, foam.__context__));
+    }));
   });
 
   beforeEach(function() {
@@ -547,7 +547,7 @@ describe('SequenceNumberDAO', function() {
     sDAO = foam.dao.SequenceNumberDAO.create({
       delegate: mDAO,
       of: test.CompA
-    }, foam.__context__);
+    });
   });
 
   it('assigns sequence numbers to objects missing the value', function(done) {
@@ -648,7 +648,7 @@ describe('GUIDDAO', function() {
     return Promise.resolve(foam.dao.GUIDDAO.create({
       delegate: mDAO,
       of: model
-    }, foam.__context__));
+    }));
   });
 
   beforeEach(function() {
@@ -698,7 +698,7 @@ describe('LRUDAOManager', function() {
     lruManager = foam.dao.LRUDAOManager.create({
       dao: mDAO,
       maxSize: 4
-    }, foam.__context__);
+    });
   });
   afterEach(function() {
     mDAO = null;
@@ -955,7 +955,7 @@ describe('SyncDAO', function() {
       delegate: cacheDAO,
       syncRecordDAO: syncRecordDAO,
       polling: false, // Polling simulated by invasive calls to sync()
-    }, foam.__context__);
+    });
   });
 
   // isolate sync/timeout call code, as it may change with SyncDAO's implementation
@@ -1105,8 +1105,8 @@ describe('JournalDAO', function() {
       journal: foam.dao.SequenceNumberDAO.create({
           of: foam.dao.JournalEntry,
           delegate: journalDAO
-      }, foam.__context__)
-    }, foam.__context__);
+      })
+    });
 
   });
 
@@ -1183,7 +1183,7 @@ describe('TimingDAO', function() {
       delegate: mDAO,
       of: model,
       name: 'timingtest',
-    }, foam.__context__));
+    }));
   });
 
 });
@@ -1199,7 +1199,7 @@ describe('LoggingDAO', function() {
       logger: function() { },
       name: 'loggingtest',
       logReads: true
-    }, foam.__context__));
+    }));
   });
 
 });
@@ -1422,7 +1422,7 @@ describe('EasyDAO-permutations', function() {
         daoType: 'MDAO',
         seqNo: true,
         guid: true,
-      }, foam.__context__);
+      });
     }).toThrow();
   });
 
@@ -1430,7 +1430,7 @@ describe('EasyDAO-permutations', function() {
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
       daoType: foam.dao.MDAO
-    }, foam.__context__);
+    });
     // TODO: mock MDAO, check that these get called through
     dao.addPropertyIndex(test.CompA.A);
     dao.addIndex(test.CompA.A.toIndex(dao.mdao.idIndex));
