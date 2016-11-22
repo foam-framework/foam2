@@ -595,7 +595,7 @@ foam.CLASS({
 
       // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
-        var listeners = listeners.children && listeners.children[args[i]];
+        listeners = listeners.children && listeners.children[args[i]];
         if ( ! listeners ) break;
         count += this.notify_(listeners.next, args);
       }
@@ -761,7 +761,7 @@ foam.CLASS({
      * </pre>
      */
     function diff(other) {
-      var diff = {};
+      var d = {};
 
       this.assert(other, 'Attempt to diff against null.');
       this.assert(other.cls_ === this.cls_, 'Attempt to diff objects with different classes.', this, other);
@@ -776,15 +776,15 @@ foam.CLASS({
         if ( Array.isArray(value) ) {
           var subdiff = foam.Array.diff(value, otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
-            diff[property.name] = subdiff;
+            d[property.name] = subdiff;
           }
         } else if ( ! foam.util.equals(value, otherVal) ) {
           // if the primary value is undefined, use the compareTo of the other
-          diff[property.name] = otherVal;
+          d[property.name] = otherVal;
         }
       }
 
-      return diff;
+      return d;
     },
 
     /**

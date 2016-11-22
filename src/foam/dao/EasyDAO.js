@@ -223,7 +223,7 @@ foam.CLASS({
         <p>This process is transparent to the developer, and you can use your
         EasyDAO like any other DAO.</p>
       */
-      this.SUPER(args);
+      this.SUPER.apply(this, arguments);
 
       var daoType = typeof this.daoType === 'string' ?
         this.ALIASES[this.daoType] || this.daoType :
