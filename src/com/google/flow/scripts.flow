@@ -705,3 +705,41 @@ grid(function(x, y) {
   var d = Math.sqrt(x*x + y*y);
   return 150*Math.cos(d/25)*(200-d)/200;
 });
+
+
+
+
+var t = turtle1;
+t.cs().pw(12);
+
+
+function gotoXYZ(x, y, z) {
+  t.pc(hsl(z*2,0,z+50));
+  t.gt(
+    canvas1.width/2-x/Math.SQRT2+y/Math.SQRT2,
+    canvas1.height/2+x/Math.SQRT2+y/Math.SQRT2-z);
+}
+
+
+function grid(f, opt_inc) {
+  var inc = opt_inc || 10;
+  for ( var x = -200 ; x <= 200 ; x += inc ) {
+    t.pu();
+    for ( var y = -200 ; y <= 200 ; y += inc ) {
+      gotoXYZ(x, y, f(x,y));
+      t.pd();
+    }
+  }
+  for ( var y = -200 ; y <= 200 ; y += inc ) {
+    t.pu();
+    for ( var x = -200 ; x <= 200 ; x += inc ) {
+      gotoXYZ(x, y, f(x,y));
+      t.pd();
+    }
+  }
+}
+
+grid(function(x, y) {
+  var d = Math.sqrt(x*x + y*y);
+  return 150*Math.cos(d/25)*(200-d)/200;
+}, 1);
