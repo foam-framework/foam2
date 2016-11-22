@@ -61,7 +61,6 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(name) ) {
             var cls    = (this.__context__ || foam).lookup(path);
             var parent = this;
-console.assert(this.__context__, "Requires with no context!"); // TODO: remove
             this.assert(cls, 'Requires: Unknown class: ', path);
 
             var c = Object.create(cls);
