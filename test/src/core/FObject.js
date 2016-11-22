@@ -40,7 +40,7 @@ describe('copyFrom', function() {
       ]
     });
 
-    var obj = SomeClass.create();
+    var obj = SomeClass.create(undefined, foam.__context__);
     obj.copyFrom({
       a: 2,
       c: 3,
@@ -87,11 +87,11 @@ describe('copyFrom', function() {
 
     var obj = SomeClass.create({
       a: 2
-    });
+    }, foam.__context__);
 
     var obj2 = SomeClass.create({
       c: 3
-    });
+    }, foam.__context__);
 
     obj.copyFrom(obj2);
 
@@ -155,8 +155,8 @@ describe('copyFrom', function() {
       ]
     });
 
-    var obj1 = ClassA.create({ a: 2, c: 4, d: false });
-    var obj2 = ClassB.create({ c: 5, d: 'true', e: 6 });
+    var obj1 = ClassA.create({ a: 2, c: 4, d: false }, foam.__context__);
+    var obj2 = ClassB.create({ c: 5, d: 'true', e: 6 }, foam.__context__);
 
     obj1.copyFrom(obj2);
 
@@ -202,7 +202,7 @@ describe('copyFrom', function() {
       a: 1,
       c: 2,
       d: false
-    });
+    }, foam.__context__);
 
     obj.copyFrom(someObj);
 

@@ -212,7 +212,6 @@ foam.CLASS({
       code: function start() {
         this.stopped_ = false;
         this.tick();
-        return this;
       }
     },
     {

@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -99,14 +99,15 @@
 
     /** Internal method to register a context binding in an internal cache */
     registerInCache_: function registerInCache_(cls, cache, name) {
+      var hasOld = Object.prototype.hasOwnProperty.call(cache, name);
       var old = cache[name];
 
       // Okay to replace a function with an actual class.
       // This happens after a lazy class is initialized.
       console.assert(
-          ! old ||
+          ! hasOld ||
               (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
-          cls.id + ' is already registerd in this context.');
+          cls.id + ' is already registered in this context.');
 
       cache[name] = cls;
     },

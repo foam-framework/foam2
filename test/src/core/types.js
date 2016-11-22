@@ -59,7 +59,7 @@ var createTestProperties = function createTestProperties() {
     });
   }
 
-  return test.PropTypeTester.create();
+  return test.PropTypeTester.create(undefined, foam.__context__);
 }
 var createDateTestProperties = function createDateTestProperties() {
   if ( ! foam.lookup('test.DateTypeTester', true) ) {
@@ -79,7 +79,7 @@ var createDateTestProperties = function createDateTestProperties() {
       ]
     });
   }
-  return test.DateTypeTester.create();
+  return test.DateTypeTester.create(undefined, foam.__context__);
 }
 
 // For tests that rely on asserts firing, make sure they throw so the
@@ -288,16 +288,13 @@ describe('Class property', function() {
   });
   it('looks up a model from a string name', function() {
     p.class = 'test.DateTypeTester';
-    expect(p.class).toBe('test.DateTypeTester');
     expect(p.class).toBe(test.DateTypeTester);
   });
   it('accepts undefined', function() {
     p.class = 'test.DateTypeTester';
-    expect(p.class).toBe('test.DateTypeTester');
     expect(p.class).toBe(test.DateTypeTester);
 
     p.class = undefined;
-    expect(p.class).toBeUndefined();
     expect(p.class).toBeUndefined();
   });
 

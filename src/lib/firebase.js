@@ -323,7 +323,7 @@ foam.CLASS({
       }
     },
 
-    function onPatch(s, _, _, data) {
+    function onPatch(s, _, __, data) {
           // TODO: What does a patch even look like?
       debugger;
     }

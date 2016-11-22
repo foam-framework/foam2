@@ -245,7 +245,7 @@ describe('basic parsers', function() {
           two: anyChar()
         };
       }
-    });
+    }, foam.__context__);
 
     it('should include other rules in the grammar by name', function() {
       var res = grammar.parseString('abc!');

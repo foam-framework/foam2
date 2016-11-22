@@ -79,7 +79,7 @@ foam.CLASS({
   methods: [
     function initCView() {
       this.SUPER();
-      for ( var i = 0 ; i < this.n ; i++ ) this.addChildren(this.Point.create());
+      for ( var i = 0 ; i < this.n ; i++ ) this.add(this.Point.create());
     },
     function paint(x) {
       this.SUPER(x);

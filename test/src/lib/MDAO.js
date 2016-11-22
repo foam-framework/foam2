@@ -66,7 +66,7 @@ describe('MDAO with TreeIndex', function() {
         byAction: !! ( 1 - (i % 2) ),
         timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_ALBUMS) * MS_PER_DAY * 300),
         jspb: [ 'nothing!' ],
-      })
+      }, foam.__context__)
     );
   }
   for ( var i = 0; i < NUM_PHOTOS; ++i ) {
@@ -79,7 +79,7 @@ describe('MDAO with TreeIndex', function() {
         albumId: ""+(i % NUM_ALBUMS),
         isCoverPhoto: ( i % 3 ) > 0,
         jspb: [ 'nothing!' ],
-      })
+      }, foam.__context__)
     );
   }
 

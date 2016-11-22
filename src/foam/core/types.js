@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -434,5 +434,16 @@ foam.CLASS({
           newValue ;
       }
     }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  documentation: 'Update Model Property types.',
+
+  properties: [
+    { class: 'String',  name: 'name' },
+    { class: 'Boolean', name: 'abstract' }
   ]
 });
