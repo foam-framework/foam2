@@ -41,9 +41,9 @@ foam.CLASS({
     function formatNumber(val) {
       if ( ! val ) return '0';
       val = val.toFixed(this.precision);
-      var i = val.length-1;
-      for ( ; i > 0 && val.charAt(i) === '0' ; i-- );
-      return val.substring(0, val.charAt(i) === '.' ? i : i+1);
+      var i = val.length - 1;
+      for ( ; i > 0 && val.charAt(i) === '0' ; i-- ) {}
+      return val.substring(0, val.charAt(i) === '.' ? i : i + 1);
     },
 
     function dataToText(val) {

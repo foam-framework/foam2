@@ -137,13 +137,13 @@ foam.CLASS({
 
     function predecessor() {
       if ( ! this.left.level ) return this;
-      for ( var s = this.left ; s.right.level ; s = s.right );
+      for ( var s = this.left ; s.right.level ; s = s.right ) {}
       return s;
     },
 
     function successor() {
       if ( ! this.right.level ) return this;
-      for ( var s = this.right ; s.left.level ; s = s.left );
+      for ( var s = this.right ; s.left.level ; s = s.left ) {}
       return s;
     },
 
