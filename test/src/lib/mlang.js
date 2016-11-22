@@ -50,7 +50,7 @@ describe('MLang', function() {
       ],
     });
 
-    dao = foam.dao.ArrayDAO.create({ array: [] }, foam.__context__);
+    dao = foam.dao.ArrayDAO.create({ array: [] });
     dao.put(test.mlang.Person.create({
       id: 1,
       name: 'Jimi Hendrix',
@@ -118,7 +118,7 @@ describe('MLang', function() {
   describe('EQ()', function() {
     var EQ;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       EQ = expr.EQ.bind(expr);
     });
 
@@ -154,7 +154,7 @@ describe('MLang', function() {
           .toBe('EQ(name, "Carlos Santana")');
       expect(EQ(7, 7).toString())
           .toBe('EQ(7, 7)');
-      expect(EQ(foam.mlang.predicate.Not.create({ arg1: 7 }, foam.__context__), 7).toString())
+      expect(EQ(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('EQ(NOT(7), 7)');
     });
   });
@@ -162,7 +162,7 @@ describe('MLang', function() {
   describe('NEQ()', function() {
     var NEQ;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       NEQ = expr.NEQ.bind(expr);
     });
 
@@ -198,7 +198,7 @@ describe('MLang', function() {
           .toBe('NEQ(name, "Carlos Santana")');
       expect(NEQ(7, 7).toString())
           .toBe('NEQ(7, 7)');
-      expect(NEQ(foam.mlang.predicate.Not.create({ arg1: 7 }, foam.__context__), 7).toString())
+      expect(NEQ(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('NEQ(NOT(7), 7)');
     });
   });
@@ -206,7 +206,7 @@ describe('MLang', function() {
   describe('LT()', function() {
     var LT;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       LT = expr.LT.bind(expr);
     });
 
@@ -239,7 +239,7 @@ describe('MLang', function() {
           .toBe('LT(name, "Carlos Santana")');
       expect(LT(7, 7).toString())
           .toBe('LT(7, 7)');
-      expect(LT(foam.mlang.predicate.Not.create({ arg1: 7 }, foam.__context__), 7).toString())
+      expect(LT(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('LT(NOT(7), 7)');
     });
   });
@@ -247,7 +247,7 @@ describe('MLang', function() {
   describe('LTE()', function() {
     var LTE;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       LTE = expr.LTE.bind(expr);
     });
 
@@ -281,7 +281,7 @@ describe('MLang', function() {
           .toBe('LTE(name, "Carlos Santana")');
       expect(LTE(7, 7).toString())
           .toBe('LTE(7, 7)');
-      expect(LTE(foam.mlang.predicate.Not.create({ arg1: 7 }, foam.__context__), 7).toString())
+      expect(LTE(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('LTE(NOT(7), 7)');
     });
   });
@@ -289,7 +289,7 @@ describe('MLang', function() {
   describe('GT()', function() {
     var GT;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       GT = expr.GT.bind(expr);
     });
 
@@ -322,7 +322,7 @@ describe('MLang', function() {
           .toBe('GT(name, "Carlos Santana")');
       expect(GT(7, 7).toString())
           .toBe('GT(7, 7)');
-      expect(GT(foam.mlang.predicate.Not.create({ arg1: 7 }, foam.__context__), 7).toString())
+      expect(GT(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('GT(NOT(7), 7)');
     });
   });
@@ -330,7 +330,7 @@ describe('MLang', function() {
   describe('GTE()', function() {
     var GTE;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       GTE = expr.GTE.bind(expr);
     });
 
@@ -364,7 +364,7 @@ describe('MLang', function() {
           .toBe('GTE(name, "Carlos Santana")');
       expect(GTE(7, 7).toString())
           .toBe('GTE(7, 7)');
-      expect(GTE(foam.mlang.predicate.Not.create({ arg1: 7 }, foam.__context__), 7).toString())
+      expect(GTE(foam.mlang.predicate.Not.create({ arg1: 7 }), 7).toString())
           .toBe('GTE(NOT(7), 7)');
     });
   });
@@ -373,7 +373,7 @@ describe('MLang', function() {
     var NOT;
     var EQ;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       NOT = expr.NOT.bind(expr);
       EQ = expr.EQ.bind(expr);
     });
@@ -415,7 +415,7 @@ describe('MLang', function() {
   describe('HAS()', function() {
     var HAS;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       HAS = expr.HAS.bind(expr);
     });
 
@@ -443,7 +443,7 @@ describe('MLang', function() {
   describe('CONTAINS()', function() {
     var CONTAINS;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       CONTAINS = expr.CONTAINS.bind(expr);
     });
 
@@ -472,7 +472,7 @@ describe('MLang', function() {
   describe('CONTAINS_IC()', function() {
     var CONTAINS_IC;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       CONTAINS_IC = expr.CONTAINS_IC.bind(expr);
     });
 
@@ -494,7 +494,7 @@ describe('MLang', function() {
     var OR;
     var FUNC;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       OR = expr.OR.bind(expr);
       FUNC = expr.FUNC.bind(expr);
     });
@@ -534,7 +534,7 @@ describe('MLang', function() {
     var AND;
     var FUNC;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       AND = expr.AND.bind(expr);
       FUNC = expr.FUNC.bind(expr);
     });
@@ -574,7 +574,7 @@ describe('MLang', function() {
   describe('IN()', function() {
     var IN;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       IN = expr.IN.bind(expr);
     });
 
@@ -608,13 +608,13 @@ describe('MLang', function() {
   describe('MAP()', function() {
     var MAP;
     beforeEach(function() {
-      var expr = foam.mlang.Expressions.create(undefined, foam.__context__);
+      var expr = foam.mlang.Expressions.create();
       MAP = expr.MAP.bind(expr);
     });
 
     it('accepts properties', function(done) {
       dao.select(
-        MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create(undefined, foam.__context__))
+        MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create())
       ).then(function(sink) {
         var a = sink.delegate.a;
         expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
@@ -632,7 +632,7 @@ describe('MLang', function() {
       dao.select(
         MAP(function(o) {
           return o.name;
-        }, foam.dao.ArraySink.create(undefined, foam.__context__))
+        }, foam.dao.ArraySink.create())
       ).then(function(sink) {
         var a = sink.delegate.a;
         expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
@@ -648,7 +648,7 @@ describe('MLang', function() {
 
     it('accepts constants', function(done) {
       dao.select(
-        MAP(55, foam.dao.ArraySink.create(undefined, foam.__context__))
+        MAP(55, foam.dao.ArraySink.create())
       ).then(function(sink) {
         var a = sink.delegate.a;
         expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
@@ -663,7 +663,7 @@ describe('MLang', function() {
     });
 
     it('toString()s nicely', function() {
-      expect(MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create(undefined, foam.__context__)).toString()).toBe(
+      expect(MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create()).toString()).toBe(
           'MAP(name)');
     });
   });
@@ -671,7 +671,7 @@ describe('MLang', function() {
   describe('Keyword()', function() {
     var KEYWORD;
     beforeEach(function() {
-      var expr = foam.mlang.ExpressionsSingleton.create(undefined, foam.__context__);
+      var expr = foam.mlang.ExpressionsSingleton.create();
       KEYWORD = expr.KEYWORD.bind(expr);
     });
 

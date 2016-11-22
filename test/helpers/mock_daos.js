@@ -80,7 +80,7 @@ foam.CLASS({
   constants: {
     OFFLINE_FUNC_BODY: function() {
       if ( this.offline )
-        return Promise.reject(foam.dao.InternalException.create({ message: 'offline mode' }, foam.__context__));
+        return Promise.reject(foam.dao.InternalException.create({ message: 'offline mode' }));
       else
         return this.SUPER.apply(this, arguments);
     }

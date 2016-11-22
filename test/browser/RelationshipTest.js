@@ -46,11 +46,11 @@ foam.CLASS({
   properties: [
     {
       name: 'parents',
-      factory: function() { return foam.dao.MDAO.create({of: 'Parent1'}, foam.__context__); }
+      factory: function() { return foam.dao.MDAO.create({of: 'Parent1'}); }
     },
     {
       name: 'children',
-      factory: function() { return foam.dao.MDAO.create({of: 'Child1'}, foam.__context__); }
+      factory: function() { return foam.dao.MDAO.create({of: 'Child1'}); }
     }
   ],
 

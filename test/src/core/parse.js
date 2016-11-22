@@ -18,7 +18,7 @@
 // These tests are for the "interpretive", non-compiled parsers.
 
 describe('basic parsers', function() {
-  var parsers = foam.parse.Parsers.create(undefined, foam.__context__);
+  var parsers = foam.parse.Parsers.create();
   var seq = parsers.seq;
   var repeat0 = parsers.repeat0;
   var simpleAlt = parsers.simpleAlt;
@@ -35,7 +35,7 @@ describe('basic parsers', function() {
   var anyChar = parsers.anyChar;
 
   var mkStream = function(str) {
-    var ps = foam.parse.StringPS.create(undefined, foam.__context__);
+    var ps = foam.parse.StringPS.create();
     ps.setString(str);
     return ps;
   };

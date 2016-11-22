@@ -127,7 +127,7 @@ var callPlan = function callPlan(idx, sink, pred) {
 
 describe('Index interface', function() {
   it('has enough methods', function() {
-    var idxFac = foam.dao.index.Index.create(undefined, foam.__context__);
+    var idxFac = foam.dao.index.Index.create();
     idxFac.create({ });
 
     idxFac.put();
@@ -149,7 +149,7 @@ describe('ValueIndex', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create(undefined, foam.__context__);
+    idx = foam.dao.index.ValueIndex.create();
   });
 
   it('stores a value', function() {
@@ -255,7 +255,7 @@ describe('ValueIndex (as Plan)', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create(undefined, foam.__context__);
+    idx = foam.dao.index.ValueIndex.create();
   });
 
   it('plans for no value', function() {
@@ -300,12 +300,12 @@ describe('TreeIndex', function() {
       prop: test.Indexable.INT,
       tailFactory: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.FLOAT,
-        tailFactory: foam.dao.index.ValueIndex.create(undefined, foam.__context__)
+        tailFactory: foam.dao.index.ValueIndex.create()
       })
     });
     idx.bulkLoad(data);
-    m = foam.mlang.Expressions.create(undefined, foam.__context__);
-    sink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
   });
 
   it('covers toString()', function() {
@@ -390,7 +390,7 @@ describe('TreeIndex', function() {
 
   it('optimizes False', function() {
     plan = idx.plan(sink, undefined, undefined, undefined,
-      foam.mlang.predicate.False.create(undefined, foam.__context__));
+      foam.mlang.predicate.False.create());
 
     expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
 
@@ -426,7 +426,7 @@ describe('TreeIndex', function() {
 //     var fakePredicate = {
 //       __proto__: baseEq,
 //       f: function() { return true; },
-//       partialEval: function() { return foam.mlang.predicate.True.create(undefined, foam.__context__); }
+//       partialEval: function() { return foam.mlang.predicate.True.create(); }
 //     }
 
 //     plan = idx.plan(sink, undefined, undefined, undefined,
@@ -460,12 +460,12 @@ describe('Case-Insensitive TreeIndex', function() {
       prop: test.Indexable.STRING,
       tailFactory: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.INT,
-        tailFactory: foam.dao.index.ValueIndex.create(undefined, foam.__context__)
+        tailFactory: foam.dao.index.ValueIndex.create()
       })
     });
     idx.bulkLoad(data);
-    m = foam.mlang.Expressions.create(undefined, foam.__context__);
-    sink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
   });
 
   it('puts case-insensitive', function() {
@@ -520,11 +520,11 @@ describe('SetIndex', function() {
     data = createData3();
     idx = foam.dao.index.SetIndex.create({
       prop: test.Indexable.ARRAY,
-      tailFactory: foam.dao.index.ValueIndex.create(undefined, foam.__context__)
+      tailFactory: foam.dao.index.ValueIndex.create()
     });
     idx.bulkLoad(data);
-    m = foam.mlang.Expressions.create(undefined, foam.__context__);
-    sink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
   });
 
   it('finds based on array values', function() {
@@ -570,12 +570,12 @@ describe('SetIndex', function() {
 
 describe('Plan', function() {
   it('covers toString()', function() {
-    foam.dao.index.Plan.create(undefined, foam.__context__).toString();
-    foam.dao.index.NotFoundPlan.create(undefined, foam.__context__).toString();
-    foam.dao.index.NoPlan.create(undefined, foam.__context__).toString();
-    foam.dao.index.CustomPlan.create(undefined, foam.__context__).toString();
-    foam.dao.index.CountPlan.create(undefined, foam.__context__).toString();
-    foam.dao.index.AltPlan.create(undefined, foam.__context__).toString();
+    foam.dao.index.Plan.create().toString();
+    foam.dao.index.NotFoundPlan.create().toString();
+    foam.dao.index.NoPlan.create().toString();
+    foam.dao.index.CustomPlan.create().toString();
+    foam.dao.index.CountPlan.create().toString();
+    foam.dao.index.AltPlan.create().toString();
   });
 });
 
@@ -593,18 +593,18 @@ describe('AltIndex', function() {
       delegates: [
         foam.dao.index.TreeIndex.create({
           prop: test.Indexable.INT,
-          tailFactory: foam.dao.index.ValueIndex.create(undefined, foam.__context__)
+          tailFactory: foam.dao.index.ValueIndex.create()
         }),
         foam.dao.index.TreeIndex.create({
           prop: test.Indexable.FLOAT,
-          tailFactory: foam.dao.index.ValueIndex.create(undefined, foam.__context__)
+          tailFactory: foam.dao.index.ValueIndex.create()
         }),
       ]
     });
     idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
     idx.bulkLoad(data);
-    m = foam.mlang.Expressions.create(undefined, foam.__context__);
-    sink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
   });
 
   it('Picks correct index for query', function() {
@@ -668,8 +668,8 @@ describe('AutoIndex', function() {
     idx = foam.dao.index.AutoIndex.create({
       mdao: mdao
     }, foam.__context__);
-    m = foam.mlang.Expressions.create(undefined, foam.__context__);
-    sink = foam.dao.ArraySink.create(undefined, foam.__context__);
+    m = foam.mlang.Expressions.create();
+    sink = foam.dao.ArraySink.create();
   });
 
   it('covers unimplemented put(), remove(), buldLoad()', function() {

@@ -989,7 +989,7 @@ dv.clear();
 log(dv.get(), dv.isDefined());
 
 // ConstantSlot creates an immutable slot.
-var s = foam.core.ConstantSlot.create({value: 42}, foam.__context__);
+var s = foam.core.ConstantSlot.create({value: 42});
 log(s.get());
 s.value = 66;
 s.set(66);
@@ -1064,8 +1064,8 @@ log(p.name, p.hasOwnProperty('name'));
 
 // Destroyables (objects with a destroy() method) or functions
 // can be registered to be called when an object is destroyed.
-var o = foam.core.FObject.create(undefined, foam.__context__);
-var o2 = foam.core.FObject.create(undefined, foam.__context__);
+var o = foam.core.FObject.create();
+var o2 = foam.core.FObject.create();
 o.onDestroy(function() { log('destroy 1'); });
 o2.onDestroy(function() { log('destroy 2'); });
 o.onDestroy(o2);
@@ -1077,7 +1077,7 @@ o.destroy();
 
 // If an Object is destroyed, it will unsubscribe from any
 // subscriptions which subsequently try to deliver events.
-var source = foam.core.FObject.create(undefined, foam.__context__);
+var source = foam.core.FObject.create();
 var sink = foam.CLASS({
   name: 'Sink',
   listeners: [
@@ -1379,7 +1379,7 @@ log(com.acme.Test.id);
 // specify arbitrary Axioms with axioms:
 foam.CLASS({
   name: 'AxiomTest',
-  axioms: [ foam.pattern.Singleton.create(undefined, foam.__context__) ],
+  axioms: [ foam.pattern.Singleton.create() ],
   methods: [ function init() { log('Creating AxiomTest'); } ]
 });
 AxiomTest.create();
@@ -1625,7 +1625,7 @@ o = JSONTest.create({
 log(foam.json.stringify(o));
 
 // Convert to a JSON object (instead of a String)
-log(foam.json.stringify(JSONTest.create(foam.json.objectify(o, foam.__context__))));
+log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
 
 // Or as a method on Objects
 log(o.stringify());

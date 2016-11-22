@@ -33,7 +33,7 @@ describe('Run MDAO tests with foam.promise', function() {
   });
 
   genericDAOTestBattery(function(model) {
-    return Promise.resolve(foam.dao.MDAO.create({ of: model }, foam.__context__));
+    return Promise.resolve(foam.dao.MDAO.create({ of: model }));
   });
 
   afterAll(function() {

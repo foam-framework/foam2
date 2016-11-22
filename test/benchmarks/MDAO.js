@@ -102,8 +102,8 @@ describe("MDAO benchmarks", function() {
     });
 
     var AlbumDAO, PhotoDAO;
-    var albums = foam.dao.ArraySink.create(undefined, foam.__context__);
-    var photos = foam.dao.ArraySink.create(undefined, foam.__context__);
+    var albums = foam.dao.ArraySink.create();
+    var photos = foam.dao.ArraySink.create();
 
     function makeMultiPartKeys(n) {
       var a = [];
@@ -113,18 +113,18 @@ describe("MDAO benchmarks", function() {
       return a;
     }
 
-    var M = foam.mlang.Expressions.create(undefined, foam.__context__);
+    var M = foam.mlang.Expressions.create();
 
     var KEYS_10 = makeMultiPartKeys(10);
     var KEYS_100 = makeMultiPartKeys(100);
     var KEYS_1000 = makeMultiPartKeys(1000);
     var KEYS_5000 = makeMultiPartKeys(5000);
 
-    PhotoDAO = foam.dao.MDAO.create({of: Photo}, foam.__context__)
+    PhotoDAO = foam.dao.MDAO.create({of: Photo})
       .addPropertyIndex(Photo.ALBUM_ID)
       .addPropertyIndex(Photo.TIMESTAMP)
       .addPropertyIndex(Photo.IS_LOCAL);
-    AlbumDAO = foam.dao.MDAO.create({of: Album}, foam.__context__)
+    AlbumDAO = foam.dao.MDAO.create({of: Album})
      .addPropertyIndex(Album.IS_LOCAL)
      .addPropertyIndex(Album.TIMESTAMP);
 
@@ -161,12 +161,12 @@ describe("MDAO benchmarks", function() {
         foam.async.sequence([
           foam.async.log('Benchmark...'),
           atest('1a CreateAlbums' + NUM_ALBUMS, function() {
-              var dao = foam.dao.ArrayDAO.create({ array: albums.a }, foam.__context__);
+              var dao = foam.dao.ArrayDAO.create({ array: albums.a });
               return AlbumDAO.bulkLoad(dao);
           }),
           foam.async.sleep(1000),
           atest('1b CreatePhotos' + NUM_PHOTOS, function() {
-            var dao = foam.dao.ArrayDAO.create({ array: photos.a }, foam.__context__);
+            var dao = foam.dao.ArrayDAO.create({ array: photos.a });
             return PhotoDAO.bulkLoad(dao);
           }),
           foam.async.sleep(1000),
@@ -187,7 +187,7 @@ describe("MDAO benchmarks", function() {
             })
           ),
           atest('2c MultiKeyQuery10',   function() {
-//             var asink = M.EXPLAIN(foam.dao.ArraySink.create(undefined, foam.__context__));
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_10)).select(asink)
 //               .then(function(s) {
 //                 //console.log("2c10 Explain:", asink.toString());
@@ -198,7 +198,7 @@ describe("MDAO benchmarks", function() {
               });
           }),
           atest('2c MultiKeyQuery100',  function() {
-//             var asink = M.EXPLAIN(foam.dao.ArraySink.create(undefined, foam.__context__));
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_100)).select(asink)
 //               .then(function(s) {
 //                 //console.log("2c100 Explain:", asink.toString());
@@ -207,7 +207,7 @@ describe("MDAO benchmarks", function() {
               .then(function(s) { expect(s.a.length).toEqual(100); });
           }),
           atest('2c MultiKeyQuery1000', function() {
-//             var asink = M.EXPLAIN(foam.dao.ArraySink.create(undefined, foam.__context__));
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_1000)).select(asink)
 //               .then(function(s) {
 //                 //console.log("2c1000 Explain:", asink.toString());
@@ -216,7 +216,7 @@ describe("MDAO benchmarks", function() {
               .then(function(s) { expect(s.a.length).toEqual(1000); });
           }),
           atest('2cMultiKeyQuery5000', function() {
-//             var asink = M.EXPLAIN(foam.dao.ArraySink.create(undefined, foam.__context__));
+//             var asink = M.EXPLAIN(foam.dao.ArraySink.create());
 //             PhotoDAO.where(M.IN(Photo.ID, KEYS_5000)).select(asink)
 //               .then(function(s) {
 //                 //console.log("2c5000 Explain:", asink.toString());
@@ -226,7 +226,7 @@ describe("MDAO benchmarks", function() {
           }),
 
           atest('2d IndexedFieldQuery', function() {
-            var asink = foam.dao.ArraySink.create(undefined, foam.__context__);
+            var asink = foam.dao.ArraySink.create();
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).select(
               M.MAP(Photo.ALBUM_ID, asink)
             ).then(function() {
@@ -235,22 +235,22 @@ describe("MDAO benchmarks", function() {
           }),
           atest('2d IndexedFieldQuery(X100)', foam.async.repeat(100, function() {
             return PhotoDAO.where(M.EQ(Photo.ALBUM_ID, avgAlbumKey)).select(
-              M.MAP(Photo.ALBUM_ID, foam.dao.ArraySink.create(undefined, foam.__context__))
+              M.MAP(Photo.ALBUM_ID, foam.dao.ArraySink.create())
             );
           })),
 
           atest('2e AdHocFieldQuery',  function() {
             return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
-              M.MAP(Photo.HASH, foam.dao.ArraySink.create(undefined, foam.__context__))
+              M.MAP(Photo.HASH, foam.dao.ArraySink.create())
             );
           }),
 //           atest('2e AdHocFieldQuery(x100)', foam.async.repeat(100, function() {
 //             return PhotoDAO.where(M.EQ(Photo.IS_LOCAL, true)).select(
-//               M.MAP(Photo.HASH, foam.dao.ArraySink.create(undefined, foam.__context__))
+//               M.MAP(Photo.HASH, foam.dao.ArraySink.create())
 //             );
 //           })),
           atest('2f SimpleInnerJoinQuery',  function() {
-            var idsink = foam.dao.ArraySink.create(undefined, foam.__context__);
+            var idsink = foam.dao.ArraySink.create();
             return AlbumDAO.where(M.EQ(Album.IS_LOCAL, false)).select(M.MAP(Album.ID, idsink)).then(function (idsmapsink) {
               return PhotoDAO.where(M.IN(Photo.ALBUM_ID, idsink.a)).select().then(function(csink) {
                 expect(csink.a.length).toEqual(NUM_PHOTOS / 2);

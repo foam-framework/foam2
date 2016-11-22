@@ -107,7 +107,7 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function(p4) {
             expect(p4.id).toBe(p.id);
             expect(p4.firstName).toBe('Neil');
-            return dao.select(foam.mlang.sink.Count.create(undefined, foam.__context__));
+            return dao.select(foam.mlang.sink.Count.create());
           }).then(function(c) {
             expect(c.value).toBe(1);
           }).catch(function(e) {
@@ -175,7 +175,7 @@ global.genericDAOTestBattery = function(daoFactory) {
     describe('removeAll()', function() {
       it('should only remove that which matches the predicate', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
-          var exprs = foam.mlang.Expressions.create(undefined, foam.__context__);
+          var exprs = foam.mlang.Expressions.create();
           var p = mkPerson1();
           var pid = p.id;
           p.deceased = true;
@@ -336,7 +336,7 @@ global.genericDAOTestBattery = function(daoFactory) {
 
       describe('filtering', function() {
         var dao;
-        var exprs = foam.mlang.Expressions.create(undefined, foam.__context__);
+        var exprs = foam.mlang.Expressions.create();
         beforeEach(function(done) {
           daoFactory(test.dao.generic.Person).then(function(idao) {
             dao = idao;
@@ -375,8 +375,8 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
 
         it('should honour skip()', function(done) {
-          var first = foam.dao.ArraySink.create(undefined, foam.__context__);
-          var second = foam.dao.ArraySink.create(undefined, foam.__context__);
+          var first = foam.dao.ArraySink.create();
+          var second = foam.dao.ArraySink.create();
           Promise.all([
             dao.limit(1).select(first),
             dao.skip(1).limit(1).select(second)
