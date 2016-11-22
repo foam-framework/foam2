@@ -1272,7 +1272,7 @@ foam.CLASS({
         if ( update ) {
           // ???: Why is it necessary to delay this until after load?
           e.onload.sub(function() {
-            o.propertyChange.sub(function(_,_,prop,slot) {
+            o.propertyChange.sub(function(_,__,prop,slot) {
               dao.put(o.clone());
             });
           });
