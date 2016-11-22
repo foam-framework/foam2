@@ -1261,7 +1261,7 @@ foam.CLASS({
           eof: function() {}
         });
       };
-      var addRow = function(_, _, _, o) {
+      var addRow = function(_, __, ___, o) {
         if ( update ) {
           o = o.clone();
         }
@@ -1286,7 +1286,7 @@ foam.CLASS({
         }
         es[o.id] = e;
       };
-      var removeRow = function(_, _, _, o) {
+      var removeRow = function(_, __, ___, o) {
         var e = es[o.id];
         if ( e ) {
           e.remove();

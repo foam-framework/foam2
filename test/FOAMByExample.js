@@ -1387,9 +1387,9 @@ foam.CLASS({
   topics: [ 'alarm' ]
 });
 var o = TopicTest.create();
-o.sub('alarm', function(_, _, state) { console.log('alarm: ', state); });
+o.sub('alarm', function(_, __, state) { console.log('alarm: ', state); });
 // The next line uses the Topic and is slightly shorter than the equivalent above.
-o.alarm.sub(function(_, _, state) { console.log('alarm (topic): ', state); });
+o.alarm.sub(function(_, __, state) { console.log('alarm (topic): ', state); });
 o.alarm.pub('on');
 o.pub('alarm', 'off');
 } catch(x) {

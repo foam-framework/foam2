@@ -134,7 +134,7 @@ foam.CLASS({
 });
 DaoTest.create({ dao: dao }).go();
 
-dao.on.sub(function(_, _, type, o) {
+dao.on.sub(function(_, __, type, o) {
   console.log("On event", type, o && o.id);
 });
 dao.on.remove.sub(function(_,_,_,o) {

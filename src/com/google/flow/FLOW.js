@@ -579,7 +579,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onPropertyPut(_, _, _, p) {
+    function onPropertyPut(_, __, ___, p) {
       var o = p.value;
 
       this.scope[p.name] = p.value;
@@ -598,7 +598,7 @@ foam.CLASS({
       }
     },
 
-    function onPropertyRemove(_, _, _, p) {
+    function onPropertyRemove(_, __, ___, p) {
       var o = p.value;
 
       delete this.scope[p.name];
