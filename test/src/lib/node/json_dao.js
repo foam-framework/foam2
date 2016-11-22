@@ -42,9 +42,9 @@ describe('JSONFileDAO', function() {
     });
 
     Promise.all([
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 1, name: 'foo' })),
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 2, name: 'bar' })),
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 3, name: 'baz' }))
+      dao.put(test.dao.node.json_file.TestModel.create({ id: 1, name: 'foo' }, foam.__context__)),
+      dao.put(test.dao.node.json_file.TestModel.create({ id: 2, name: 'bar' }, foam.__context__)),
+      dao.put(test.dao.node.json_file.TestModel.create({ id: 3, name: 'baz' }, foam.__context__))
     ]).then(function() {
       // Wait 150ms to ensure the file has really been written.
       return new Promise(function(res) { setTimeout(res, 150); });

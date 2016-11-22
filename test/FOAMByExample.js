@@ -53,7 +53,7 @@ var customMatchers = {
 };
 
 
-describe("FOAM By Example", function() {
+xdescribe("FOAM By Example", function() {
 var log_ = function log_(o) {
   log_.output += o;
 };

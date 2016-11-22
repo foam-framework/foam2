@@ -68,7 +68,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         lastName: 'Young',
         deceased: false,
         //tags: ['guitar','70s', '80s'],
-      });
+      }, foam.__context__);
     };
 
     var mkPerson2 = function() {
@@ -78,7 +78,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         lastName: 'Bonham',
         deceased: true,
         //tags: ['drums','70s'],
-      });
+      }, foam.__context__);
     };
 
     describe('put()', function() {

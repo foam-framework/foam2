@@ -467,7 +467,7 @@ foam.LIB({
               }
             }
 
-            return c.create(json, opt_ctx);
+            return c.create(json, opt_ctx || foam.__context__);
           }
 
           for ( var key in json ) {
