@@ -31,9 +31,9 @@ describe('FObject compareTo', function() {
       name: 'CompB',
       properties: [ 'b' ]
     });
-    a = test.CompA.create();
-    a2 = test.CompA.create();
-    b = test.CompB.create();
+    a = test.CompA.create(undefined, foam.__context__);
+    a2 = test.CompA.create(undefined, foam.__context__);
+    b = test.CompB.create(undefined, foam.__context__);
   });
   afterEach(function() {
     a = a2 = b = null;
@@ -93,8 +93,8 @@ describe('FObject diff', function() {
       package: 'test',
       properties: [ 'b', 'c' ]
     });
-    a = test.CompA.create();
-    b = test.CompA.create();
+    a = test.CompA.create(undefined, foam.__context__);
+    b = test.CompA.create(undefined, foam.__context__);
     oldAssert = foam.core.FObject.prototype.assert;
     foam.core.FObject.prototype.assert = function(c) { if ( ! c ) throw Array.from(arguments); }
   });
@@ -107,7 +107,7 @@ describe('FObject diff', function() {
     expect(a.diff(a)).toEqual({});
   });
   it("Exception if classes don't match", function() {
-    expect(function() { a.diff(foam.core.Int.create()); }).toThrow();
+    expect(function() { a.diff(foam.core.Int.create(undefined, foam.__context__)); }).toThrow();
   });
   it("Exception if diffing null", function() {
     expect(function() { a.diff(null); }).toThrow();
@@ -138,7 +138,7 @@ describe('FObject hashCode', function() {
       package: 'test',
       properties: [ 'a', 'b' ]
     });
-    a = test.CompA.create();
+    a = test.CompA.create(undefined, foam.__context__);
   });
   afterEach(function() {
     a = null;
@@ -155,7 +155,7 @@ describe('FObject hashCode', function() {
     expect(a.hashCode()).toEqual(-1106880431);
   });
   it('regression 3: model instance', function() {
-    a.a = test.CompA.create({ a: 4 });
+    a.a = test.CompA.create({ a: 4 }, foam.__context__);
     expect(a.hashCode()).toEqual(526596);
   });
 });
@@ -190,7 +190,7 @@ describe('FObject clone', function() {
       ]
     });
 
-    a = test.CompA.create();
+    a = test.CompA.create(undefined, foam.__context__);
   });
   afterEach(function() {
     a = null;
@@ -206,7 +206,7 @@ describe('FObject clone', function() {
 
   });
   it('clones nested instances', function() {
-    a.ordinary = test.CompA.create({ ordinary: [3,4,5], special: 88 });
+    a.ordinary = test.CompA.create({ ordinary: [3,4,5], special: 88 }, foam.__context__);
     a.special = 77;
 
     var clone = a.clone();

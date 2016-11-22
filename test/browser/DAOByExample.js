@@ -22,7 +22,7 @@ var examples = [
     name: 'Load MLangs',
     description: "Loads the mlang query langauage",
     code: function() {
-      var M = foam.mlang.ExpressionsSingleton.create();
+      var M = foam.mlang.ExpressionsSingleton.create(undefined, foam.__context__);
     }
   },
   {
@@ -163,7 +163,7 @@ var examples = [
       // Generate accounts for each customer. Select into an in-line
       // sink to process results as they come in.
       return app.customerDAO.select(foam.dao.QuickSink.create({
-        putFn: function(customer) {
+        putFn: function(customer, foam.__context__) {
           // create accounts, add to accountDAO, save the promises for later
           // so we know all the puts have completed.
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
@@ -243,7 +243,7 @@ var examples = [
     description: "Finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
-      var tsink = foam.dao.ArrayDAO.create();
+      var tsink = foam.dao.ArrayDAO.create(undefined, foam.__context__);
 
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
@@ -251,7 +251,7 @@ var examples = [
         .then(function(customer) {
           var transactionSelectPromises = [];
           return customer.accounts.select(foam.dao.QuickSink.create({
-            putFn: function(account) {
+            putFn: function(account, foam.__context__) {
               // no route to return promise here, since Sink.put doesn't return a promise...
               transactionSelectPromises.push(account.transactions.select(tsink));
             }
@@ -269,13 +269,13 @@ var examples = [
     description: "Without using Relationships, finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     code: function async() {
-      var tsink = foam.dao.ArrayDAO.create();
+      var tsink = foam.dao.ArrayDAO.create(undefined, foam.__context__);
 
       // to store intermediate reuslts for matching customer IDs
-      var customerIds = foam.dao.ArraySink.create();
+      var customerIds = foam.dao.ArraySink.create(undefined, foam.__context__);
 
       // to store intermediate results for matching account IDs
-      var accountIds = foam.dao.ArraySink.create();
+      var accountIds = foam.dao.ArraySink.create(undefined, foam.__context__);
 
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
@@ -321,7 +321,7 @@ var examples = [
     description: "A pseudo scroll effect with skip and limit",
     dependencies: [ 'Load Customers' ],
     code: function() {
-      var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
+      var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO }, foam.__context__);
       var skip = 0;
       var limit = 3;
 

@@ -18,7 +18,7 @@
 describe('JSONFileDAO', function() {
   genericDAOTestBattery(function(model) {
     try { require('fs').unlinkSync('test.json'); } catch(e) {}
-    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model }));
+    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model }, foam.__context__));
   });
 
   afterAll(function() {
@@ -39,12 +39,12 @@ describe('JSONFileDAO', function() {
     var dao = foam.dao.node.JSONFileDAO.create({
       path: 'test.json',
       of: 'test.dao.node.json_file.TestModel',
-    });
+    }, foam.__context__);
 
     Promise.all([
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 1, name: 'foo' })),
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 2, name: 'bar' })),
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 3, name: 'baz' }))
+      dao.put(test.dao.node.json_file.TestModel.create({ id: 1, name: 'foo' }, foam.__context__)),
+      dao.put(test.dao.node.json_file.TestModel.create({ id: 2, name: 'bar' }, foam.__context__)),
+      dao.put(test.dao.node.json_file.TestModel.create({ id: 3, name: 'baz' }, foam.__context__))
     ]).then(function() {
       // Wait 150ms to ensure the file has really been written.
       return new Promise(function(res) { setTimeout(res, 150); });
@@ -55,7 +55,7 @@ describe('JSONFileDAO', function() {
       var dao2 = foam.dao.node.JSONFileDAO.create({
         path: 'test.json',
         of: 'test.dao.node.json_file.TestModel',
-      });
+      }, foam.__context__);
 
       return dao2.select();
     }).then(function(a) {

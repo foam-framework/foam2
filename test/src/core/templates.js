@@ -136,14 +136,14 @@ describe('Template benchmark', function() {
   });
 
   it('simple template', function() {
-    var f = foam.templates.TemplateUtil.create().compile(
+    var f = foam.templates.TemplateUtil.create(undefined, foam.__context__).compile(
       'hello world', 'simple', []);
     expect(f).toBeDefined();
     expect(f()).toEqual('hello world');
   });
 
   it('throws if given a bad template', function() {
-    var t = foam.templates.TemplateUtil.create();
+    var t = foam.templates.TemplateUtil.create(undefined, foam.__context__);
     // Hack: The template parser is extremely permissive, and doesn't actually
     // every fail so far as I can tell. So we override its grammar for testing.
     var oldGrammar = t.grammar;
@@ -153,27 +153,27 @@ describe('Template benchmark', function() {
   });
 
   it('handles embedded newlines', function() {
-    var t = foam.templates.TemplateUtil.create();
+    var t = foam.templates.TemplateUtil.create(undefined, foam.__context__);
     var f = t.compile('foo\nbar', 'newlines', []);
     expect(f()).toBe('foo\nbar');
   });
 
   it('handles embedded code and values', function() {
-    var t = foam.templates.TemplateUtil.create();
+    var t = foam.templates.TemplateUtil.create(undefined, foam.__context__);
     var f = t.compile('<% var foo = "bar"; %>%%foo <%= foo %>', 'code and values', []);
     expect(typeof f).toBe('function');
     expect(f.call({ foo: 'baz' })).toBe('baz bar');
   });
 
   it('handles embedded single quotes', function() {
-    var t = foam.templates.TemplateUtil.create();
+    var t = foam.templates.TemplateUtil.create(undefined, foam.__context__);
     var f = t.compile("foo 'bar'", 'embedded quotes', []);
     expect(typeof f).toBe('function');
     expect(f()).toBe("foo 'bar'");
   });
 
   it('calls toString on output objects', function() {
-    var t = foam.templates.TemplateUtil.create();
+    var t = foam.templates.TemplateUtil.create(undefined, foam.__context__);
     var f = t.compile("%%foo", 'toString', []);
     expect(typeof f).toBe('function');
     var self = { foo: { toString: function() { return 'bar'; } } };
@@ -181,12 +181,12 @@ describe('Template benchmark', function() {
   });
 
   it('handles empty output gracefully', function() {
-    var o = foam.templates.TemplateOutput.create();
+    var o = foam.templates.TemplateOutput.create(undefined, foam.__context__);
     expect(o.toString()).toBe('');
   });
 
   it('supports lazy compilation', function() {
-    var t = foam.templates.TemplateUtil.create();
+    var t = foam.templates.TemplateUtil.create(undefined, foam.__context__);
     var f = t.lazyCompile("%%foo", 'toString', []);
     expect(typeof f).toBe('function');
     var self = { foo: { toString: function() { return 'bar'; } } };
