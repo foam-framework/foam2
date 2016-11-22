@@ -27,7 +27,7 @@ describe('U2', function() {
               display: flex;
             }
           */}
-        }, foam.__context__)
+        })
       ]
     });
 
@@ -42,7 +42,7 @@ describe('U2', function() {
               display: flex;
             }
           */}
-        }, foam.__context__)
+        })
       ]
     });
 
@@ -150,7 +150,7 @@ describe('U2', function() {
               ^bar {}
               ^ ^foo^bar {}
             */}
-          }, foam.__context__)
+          })
         ]
       });
 
