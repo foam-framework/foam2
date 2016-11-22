@@ -254,7 +254,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.searchMgr_; // Force the factory to run.
+      // Assigning to unused variable to keep Closure happy.
+      var _ = this.searchMgr_; // Force the factory to run.
       this.filteredDAO$.sub(this.onPredicateChange);
       this.onPredicateChange();
 
