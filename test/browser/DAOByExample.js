@@ -58,19 +58,19 @@ var examples = [
       // relate with foreign key relationships
       foam.RELATIONSHIP({
         sourceModel: 'example.Bank',
-        name: 'customers', // adds a 'customers' property to Bank
+        forwardName: 'customers', // adds a 'customers' property to Bank
         targetModel: 'example.Customer',
         inverseName: 'bank' // adds 'bank' property to Customer
       });
       foam.RELATIONSHIP({
         sourceModel: 'example.Customer',
-        name: 'accounts',
+        forwardName: 'accounts',
         targetModel: 'example.Account',
         inverseName: 'owner'
       });
       foam.RELATIONSHIP({
         sourceModel: 'example.Account',
-        name: 'transactions',
+        forwardName: 'transactions',
         targetModel: 'example.Transaction',
         inverseName: 'account'
       });
