@@ -251,7 +251,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation:
       'For internal use only. Is used to implement the Slot.dot() method.',
