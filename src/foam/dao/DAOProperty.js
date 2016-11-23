@@ -25,7 +25,7 @@ foam.CLASS({
   documentation: 'Property for storing a reference to a DAO.',
 
   properties: [
-    [ 'view', 'foam.u2.DAOListView' ]
+    [ 'view', 'foam.u2.DAOList' ]
   ],
 
   methods: [
