@@ -26,6 +26,7 @@ foam.CLASS({
     {
       name: 'id',
       hidden: true,
+      transient: true,
       getter: function() {
         return this.package ? this.package + '.' + this.name : this.name;
       }
