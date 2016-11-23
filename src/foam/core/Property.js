@@ -362,7 +362,7 @@ foam.CLASS({
           var oldFip = fip;
           fip++;
           if ( oldFip === 10 ) this.setPrivate_(FIP, true);
-          var v = factory.call(this, prop);
+          v = factory.call(this, prop);
           // Convert undefined to null because undefined means that the
           // value hasn't been set but it has. Setting it to undefined
           // would prevent propertyChange events if the value were cleared.

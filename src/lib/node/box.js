@@ -14,3 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+foam.CLASS({
+  refines: 'foam.box.SocketBox2',
+  properties: [
+    {
+      name: 'socket',
+      transient: true,
+      factory: function() {
+        return new require('net').Socket();
+      },
+      postSet: function(_, socket) {
+        socket.on('connect', this.onConnect);
+        socket.on('error', this.onError);
+      }
+    }
+  ]
+});
