@@ -65,28 +65,19 @@ foam.CLASS({
       of: 'Property',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
-    /*
-      // Not used yet.
-    {
-      name: 'sourceDAOKey',
-      expression: function(sourceModel) {
-        return sourceModel.id + 'DAO';
-      }
-    },
-    */
     {
       name: 'targetModel'
     },
     {
       name: 'targetDAOKey',
       expression: function(targetModel) {
-        return targetModel + 'DAO';
+        return foam.String.daoize(targetModel);
       }
     },
     {
       name: 'sourceDAOKey',
       expression: function(sourceModel) {
-        return sourceModel + 'DAO';
+        return foam.String.daoize(sourceModel);
       }
     },
     {
