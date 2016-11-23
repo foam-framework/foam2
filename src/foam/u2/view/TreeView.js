@@ -85,15 +85,15 @@ foam.CLASS({
         call(this.formatter).
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
-          var e = this.E('div');
-          e.select(this.data[self.relationship.name], function(obj) {
+          var e2 = this.E('div');
+          e2.select(this.data[self.relationship.name], function(obj) {
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
               relationship: self.relationship
             }, this);
           });
-          return e;
+          return e2;
         }, this.expanded$));
     }
   ],

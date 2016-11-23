@@ -234,11 +234,11 @@ foam.CLASS({
                 });
 
                 foam.__context__.assert(enumValue, 'No enum value found with ordinal', key);
-                var args = enumValue.values;
-                args.ordinal = key;
-                args.name = enumValue.name;
+                var newArgs = enumValue.values;
+                newArgs.ordinal = key;
+                newArgs.name = enumValue.name;
 
-                return instances[key] = oldCreate.call(this, args, ctx);
+                return instances[key] = oldCreate.call(this, newArgs, ctx);
               };
             }
           }

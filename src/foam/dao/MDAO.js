@@ -173,10 +173,10 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      var obj = this.find_(id);
-      if ( obj ) {
-        self.index.remove(obj);
-        self.pub('on', 'remove', obj);
+      var found = this.find_(id);
+      if ( found ) {
+        self.index.remove(found);
+        self.pub('on', 'remove', found);
         return Promise.resolve();
       } else {
         // object not found is ok, remove post-condition still met
