@@ -54,10 +54,22 @@ foam.CLASS({
       class: 'String',
       name: 'code',
       adapt: function(old, nu) {
-        if ( foam.Function.is(nu) ) {
+        if ( foam.Function.isInstance(nu) ) {
           var matches = nu.toString().match(/function\s*(async)?\(\s*\)\s*\{((?:.|\n)*)\}/);
           if ( matches[1] ) this.isAsync = true;
-          return matches[2];
+          return matches[2].replace('\t', '  ');
+        }
+        return nu.replace('\t', '  ');
+      }
+    },
+    {
+      /** Unit test expectations to run after the main code. */
+      class: 'String',
+      name: 'postTestCode',
+      adapt: function(old, nu) {
+        if ( foam.Function.isInstance(nu) ) {
+          var matches = nu.toString().match(/function\s*\(\s*\)\s*\{((?:.|\n)*)\}/);
+          return matches[1].replace('\t', '  ');
         }
         return nu.replace('\t', '  ');
       }
@@ -126,10 +138,25 @@ foam.CLASS({
       return ret;
     },
 
+    function generateTest() {
+      var exampleCode = this.generateExample();
+
+      if ( this.hasAsyncDeps_ ) {
+        exampleCode += ".then(function() {\n";
+        indent.level += 1;
+      }
+
+      exampleCode += this.outputIndentedCode(indent, this.postTestCode);
+
+      if ( this.hasAsyncDeps_ ) {
+        exampleCode += "})\n";
+      }
+
+    },
+
     function outputSelf(indent) {
 
       var ret = "\n";
-      var lines = this.code.split('\n');
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
@@ -137,6 +164,19 @@ foam.CLASS({
       ret += tabs + '// ' + this.name + '\n';
       ret += tabs + '// ' + this.description + '\n';
       ret += tabs + '//=====================================================\n';
+
+      ret += this.outputIndentedCode(indent, this.code);
+
+      ret += "\n";
+
+      return ret;
+    },
+
+    function outputIndentedCode(indent, code) {
+      var ret = "";
+      var lines = code.split('\n');
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       // only keep source indent relative to first line
       var firstLineIndent = -1;
@@ -153,8 +193,6 @@ foam.CLASS({
         }
         ret += tabs + line + '\n';
       });
-
-      ret += "\n";
 
       return ret;
     },
