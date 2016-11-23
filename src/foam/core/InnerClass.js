@@ -55,12 +55,20 @@ foam.CLASS({
     {
       name: 'model',
       adapt: function(_, m) {
-        return foam.core.Model.isInstance(m) ? m : foam.core.Model.create(m);
+        return this.modelAdapt_(m);
       }
     }
   ],
 
   methods: [
+    function modelAdapt_(m) {
+      return foam.core.Model.isInstance(m) ? m :
+          foam.core.EnumModel.isInstance(m) ? m :
+          foam.core.InnerClass.isInstance(m) ? this.modelAdapt_(m.model) :
+          m.class ? this.modelAdapt_(foam.json.parse(m)) :
+          foam.core.Model.create(m);
+    },
+
     function installInClass(cls) {
       cls[this.model.name] = this.model.buildClass();
     },

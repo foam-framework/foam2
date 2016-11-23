@@ -162,5 +162,6 @@ FOAM_FILES([
   { name: "foam/comics/DAOCreateController" },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] },
-  { name: "lib/HTTPMethod" }
+  { name: "lib/HTTPMethod" },
+  { name: "lib/OAuth2" }
 ]);
