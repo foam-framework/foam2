@@ -90,7 +90,7 @@ foam.CLASS({
     {
       name: 'title',
       attribute: true,
-      expression: function(of) { return this.of.model_.label; },
+      expression: function(of) { return this.of ? this.of.model_.label : ''; },
       // documentation: function() {/*
       //  <p>The display title for the $$DOC{ref:'foam.ui.View'}.
       //  </p>
