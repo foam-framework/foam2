@@ -148,7 +148,7 @@ foam.CLASS({
 
 // TODO(adamvy): Remove the need to store this relationship globally.
 var relationship = foam.RELATIONSHIP({
-  name: 'children',
+  forwardName: 'children',
   inverseName: 'parent',
   cadinality: '1:*',
   sourceModel: 'com.google.flow.Property',
