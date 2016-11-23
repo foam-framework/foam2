@@ -22,6 +22,28 @@ foam.CLASS({
 
   documentation: 'Adapts a DAO based on a Relationship.',
 
+  classes: [
+    {
+      /** A simple default view to display the ID of
+        an object referenced by this RelationshipDAO */
+      name: 'IDView',
+      extends: 'foam.u2.Element',
+
+      properties: [
+        'data',
+        [ 'nodeName', 'span' ],
+      ],
+
+      methods: [
+       function initE() {
+          this.SUPER();
+          this.add(this.data$.dot('id')).add(' ');
+        }
+      ]
+    }
+
+  ],
+
   properties: [
     {
       name: 'obj'
@@ -62,6 +84,14 @@ foam.CLASS({
     function clone() {
       // Prevent cloneing
       return this;
+    },
+
+    function toE(args, ctx) {
+      args = args || {};
+      args.data = this;
+      args.rowView = this.IDView;
+      return foam.u2.DAOList.create(args, ctx);
     }
   ]
 });
+
