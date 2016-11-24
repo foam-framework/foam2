@@ -30,9 +30,6 @@ foam.CLASS({
     'foam.net.HTTPArgument',
     'foam.core.Imports',
   ],
-  imports: [
-    'assert',
-  ],
 
   constants: {
     OUTPUTTER: {
@@ -108,7 +105,7 @@ foam.CLASS({
 
       // May have many HTTPMethods in a host class, but only do service import once.
       var existing = c.getAxiomByName(this.HTTPRequestFactoryName);
-      this.assert( existing,
+      foam.assert( existing,
         "HTTPMethod installInClass did not find an import or property", this.HTTPRequestFactoryName, ".",
         "Provide one, or set HTTPMethod.HTTPRequestFactoryName to the name of your request factory function.");
     },
@@ -119,7 +116,7 @@ foam.CLASS({
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
-      this.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
+      foam.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
         "HTTPMethod call can't find HTTPRequestFactory",
         this.HTTPRequestFactoryName, "on", host);
 
@@ -169,7 +166,7 @@ foam.CLASS({
         if ( response.status >= 400 ) {
           throw "HTTP error status: " + response.status;
         }
-        self.assert(response.responseType === 'json', "HTTPMethod given a request not configured to return JSON", request);
+        foam.assert(response.responseType === 'json', "HTTPMethod given a request not configured to return JSON", request);
         return response.payload.then(function(json) {
           if ( ! self.promisedType ) {
             // no return

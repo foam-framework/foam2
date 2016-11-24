@@ -125,7 +125,7 @@ foam.CLASS({
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);
-        foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
+        foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
         return m;
       }
 

@@ -35,9 +35,6 @@
 
 (function() {
   var __context__ = {
-    // Temporary: gets replaced in Window.js.
-    assert: function(b) { console.assert.apply(console, arguments); return b; },
-
     /**
      * Lookup a class in the context.  Throws an exception if the value
      * couldn't be found, unless opt_suppress is true.
@@ -49,7 +46,7 @@
       var ret = typeof id === 'string' && this.__cache__[id];
 
       if ( ! opt_suppress ) {
-        this.assert(
+        foam.assert(
             ret,
             'Could not find any registered class for ' + id);
       }
@@ -65,14 +62,14 @@
      * @param opt_id Optional id under which to register class.
      */
     register: function(cls, opt_id) {
-      this.assert(
+      foam.assert(
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
 
       if ( opt_id ) {
         this.registerInCache_(cls, this.__cache__, opt_id);
       } else {
-        this.assert(
+        foam.assert(
             typeof cls.id === 'string',
             'Must have an .id property to be registered in a context.');
 
@@ -104,7 +101,7 @@
 
       // Okay to replace a function with an actual class.
       // This happens after a lazy class is initialized.
-      console.assert(
+      foam.assert(
           ! hasOld ||
               (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
           cls.id + ' is already registered in this context.');
@@ -125,7 +122,7 @@
     createSubContext: function createSubContext(opt_args, opt_name) {
       if ( ! opt_args ) return this;
 
-      this.assert(
+      foam.assert(
           opt_name === undefined || typeof opt_name === 'string',
           'opt_name must be left undefined or be a string.');
 

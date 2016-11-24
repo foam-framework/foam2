@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 
-var oldAssert;
-beforeAll(function() { // make it easy to trap asserts
-  oldAssert = console.assert;
-  console.assert = function(cond) { if ( ! cond ) throw arguments; }
-});
-afterAll(function() {
-  console.assert = oldAssert;
-});
-
-
 describe('foam.LIB type checking:', function() {
 
   it('methods must be named', function() {
@@ -972,5 +962,3 @@ describe('foam.uuid', function() {
     expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
   });
 });
-
-
