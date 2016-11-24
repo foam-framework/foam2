@@ -269,11 +269,115 @@ var FBE = [
       expect(o.a).toEqual('just born!');
     }
   },
+  {
+    name: 'Create default values',
+    description: 'Default Values can be defined for Properties',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'DefaultValueTest',
+        properties: [
+          { name: 'a', value: 42 },
+          { name: 'b', value: 'foo' },
+          { name: 'c' }
+        ]
+      });
+      var o = DefaultValueTest.create();
+      console.log("Values:", o.a, o.b, o.c);
+    },
+    postTestCode: function() {
+      expect(o.a).toEqual(42);
+      expect(o.b).toEqual('foo');
+      expect(o.c).toBeUndefined();
+    }
+  },
+  {
+    name: 'Test hasOwnProperty',
+    description: 'FObject.hasOwnProperty() tells you if a Property has been set',
+    dependencies: [ 'Create default values' ],
+    code: function() {
+      console.log("Before setting:", o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
+      o.a = 99;
+      o.c = 'test';
+      console.log("After setting a, c:", o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
+    },
+    postTestCode: function() {
+      expect(o.hasOwnProperty('a')).toBe(true);
+      expect(o.hasOwnProperty('b')).toBe(false);
+      expect(o.hasOwnProperty('c')).toBe(true);
+    }
+  },
+  {
+    name: 'Test clearProperty',
+    description: 'FObject.clearProperty() reverts a value back to its value',
+    dependencies: [ 'Test hasOwnProperty' ],
+    code: function() {
+      console.log("Before clearing:", o.hasOwnProperty('a'), o.a);
+      o.clearProperty('a');
+      console.log("After clearing:", o.hasOwnProperty('a'), o.a);
+    },
+    postTestCode: function() {
+      expect(o.hasOwnProperty('a')).toBe(false);
+      expect(o.a).toEqual(42);
+    }
+  },
+  {
+    name: 'Create factory test',
+    description: 'Properties can have factory methods which create their initial value when they are first accessed.',
+    dependencies: [ ],
+    code: function() {
+      var factoryCount = 0;
+      foam.CLASS({
+        name: 'FactoryTest',
+        properties: [
+          {
+            name: 'a',
+            factory: function() { factoryCount++; return 42; }
+          }
+        ]
+      });
+      var o = FactoryTest.create();
+    },
+    postTestCode: function() {
+    }
+  },
+  {
+    name: 'Test factory running',
+    description: 'Factories run once when the property is first accessed',
+    dependencies: [ 'Create factory test' ],
+    code: function() {
+      console.log("Before:    factory run count:", factoryCount);
+      console.log("Value:", o.a, " factory run count:", factoryCount);
+      // Factory not called value accessed second time:
+      console.log("Again:", o.a, " factory run count:", factoryCount);
+    },
+    postTestCode: function() {
+      expect(factoryCount).toEqual(1);
+    }
+  },
+  {
+    name: 'Test factory not run',
+    description: 'Factories do not run if the value is set before being accessed',
+    dependencies: [ 'Create factory test' ],
+    code: function() {
+      // Value supplied in create()
+      o = FactoryTest.create({a: 42});
+      console.log("Value:", o.a, " factory run count:", factoryCount);
+
+      // Value set before first access
+      o = FactoryTest.create();
+      o.a = 99;
+      console.log("Value:", o.a, " factory run count:", factoryCount);
+    },
+    postTestCode: function() {
+      expect(factoryCount).toEqual(0);
+    }
+  },
 
   {
     name: '',
     description: '',
-    dependencies: [  ],
+    dependencies: [ ],
     code: function() {
     },
     postTestCode: function() {
@@ -287,56 +391,6 @@ var FBE = FBE.map(function(def) {
   return test.helpers.Exemplar.create(def, reg);
 });
 
-
-// // Default Values can be defined for Properties
-// foam.CLASS({
-//   name: 'DefaultValueTest',
-//   properties: [
-//     { name: 'a', value: 42 },
-//     { name: 'b', value: 'foo' },
-//     { name: 'c' }
-//   ]
-// });
-// var o = DefaultValueTest.create();
-// log(o.a, o.b, o.c);
-
-// // .hasOwnProperty() tells you if a Property has been set
-// log(o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
-// o.a = 99;
-// o.b = 'bar';
-// o.c = 'test';
-// log(o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
-
-// // .clearProperty() reverts a value back to its value
-// log(o.hasOwnProperty('a'), o.a);
-// o.clearProperty('a');
-// log(o.hasOwnProperty('a'), o.a);
-
-// // factories
-// // Properties can have factory methods which create their initial value
-// // when they are first accessed.
-// foam.CLASS({
-//   name: 'FactoryTest',
-//   properties: [
-//     {
-//       name: 'a',
-//       factory: function() { log('creating value'); return 42; }
-//     }
-//   ]
-// });
-// var o = FactoryTest.create();
-// log(o.a);
-// // Factory not called value accessed second time:
-// log(o.a);
-
-// // Factory not called if value supplied in constructor
-// var o = FactoryTest.create({a: 42});
-// log(o.a);
-
-// // Factory not called if value set before first access
-// var o = FactoryTest.create();
-// o.a = 42;
-// log(o.a);
 
 // // Factory called again if clearProperty() called:
 // var o = FactoryTest.create();
