@@ -242,13 +242,13 @@ foam.CLASS({
 
             case 2:
               // Export 'this'
-              console.assert(
+              foam.assert(
                   a[0] === 'as',
                   'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[1], key: null});
 
             case 3:
-              console.assert(
+              foam.assert(
                   a[1] === 'as',
                   'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[2], key: a[0]});

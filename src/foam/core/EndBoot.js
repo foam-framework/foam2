@@ -72,7 +72,7 @@ foam.CLASS({
       name: 'methods',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Method must be named');
+          foam.assert(o.name, 'Method must be named');
           var m = foam.core.Method.create();
           m.name = o.name;
           m.code = o;
