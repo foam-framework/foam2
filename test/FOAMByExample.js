@@ -1,20 +1,3 @@
-/**
- * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 var customMatchers = {
   toMatchGolden: function(util, customEqualityTesters) {
     return {
@@ -54,7 +37,7 @@ var customMatchers = {
 };
 
 
-xdescribe("FOAM By Example", function() {
+describe("FOAM By Example", function() {
 var log_ = function log_(o) {
   log_.output += o;
 };
@@ -137,7 +120,7 @@ Test.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Method               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Method               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        hasDefaultValueMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        describeListenersMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 3
@@ -264,7 +247,7 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2Method initArgsMethod initMethod hasOwnPropertyMethod clearPropertyMethod setPrivate_Method getPrivate_Method hasOwnPrivate_Method clearPrivate_Method pubPropertyChange_Method validateMethod lookupMethod assertMethod errorMethod logMethod warnMethod createListenerList_Method listeners_Method notify_Method hasListenersMethod pubMethod pub_Method subMethod slotMethod isDestroyedMethod onDestroyMethod destroyMethod equalsMethod compareToMethod diffMethod hashCodeMethod cloneMethod copyFromMethod toString __context__Method unknownArgTopic propertyChangeMethod describeMethod stringifyMethod toE" });
+  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2Method initArgsMethod initMethod hasOwnPropertyMethod hasDefaultValueMethod clearPropertyMethod setPrivate_Method getPrivate_Method hasOwnPrivate_Method clearPrivate_Method pubPropertyChange_Method validateMethod lookupMethod assertMethod errorMethod logMethod warnMethod createListenerList_Method listeners_Method notify_Method hasListenersMethod pubMethod pub_Method subMethod slotMethod isDestroyedMethod onDestroyMethod destroyMethod equalsMethod compareToMethod diffMethod hashCodeMethod cloneMethod copyFromMethod toString __context__Method unknownArgTopic propertyChangeMethod describeMethod describeListenersMethod stringifyMethod toE" });
 
 
 // Example 13
@@ -288,7 +271,7 @@ log(Test.getAxiomsByClass(foam.core.Method));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method" });
+  expect(log_.output).toMatchGolden({ i: 14, str: " <b>&gt;</b> foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method,foam.core.Method" });
 
 
 // Example 16
@@ -300,7 +283,7 @@ log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,init,hasOwnProperty,clearProperty,setPrivate_,getPrivate_,hasOwnPrivate_,clearPrivate_,pubPropertyChange_,validate,lookup,assert,error,log,warn,createListenerList_,listeners_,notify_,hasListeners,pub,pub_,sub,slot,isDestroyed,onDestroy,destroy,equals,compareTo,diff,hashCode,clone,copyFrom,toString,unknownArg,describe,stringify,toE" });
+  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,init,hasOwnProperty,hasDefaultValue,clearProperty,setPrivate_,getPrivate_,hasOwnPrivate_,clearPrivate_,pubPropertyChange_,validate,lookup,assert,error,log,warn,createListenerList_,listeners_,notify_,hasListeners,pub,pub_,sub,slot,isDestroyed,onDestroy,destroy,equals,compareTo,diff,hashCode,clone,copyFrom,toString,unknownArg,describe,describeListeners,stringify,toE" });
 
 
 // Example 17
@@ -312,7 +295,7 @@ log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> assert,clearPrivate_,clearProperty,clone,compareTo,copyFrom,createListenerList_,describe,destroy,diff,equals,error,f1,f2,getPrivate_,hashCode,hasListeners,hasOwnPrivate_,hasOwnProperty,init,initArgs,isDestroyed,listeners_,log,lookup,notify_,onDestroy,pub,pub_,pubPropertyChange_,setPrivate_,slot,stringify,sub,toE,toString,unknownArg,validate,warn" });
+  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> assert,clearPrivate_,clearProperty,clone,compareTo,copyFrom,createListenerList_,describe,describeListeners,destroy,diff,equals,error,f1,f2,getPrivate_,hasDefaultValue,hashCode,hasListeners,hasOwnPrivate_,hasOwnProperty,init,initArgs,isDestroyed,listeners_,log,lookup,notify_,onDestroy,pub,pub_,pubPropertyChange_,setPrivate_,slot,stringify,sub,toE,toString,unknownArg,validate,warn" });
 
 
 // Example 18
@@ -908,7 +891,7 @@ log(oldPerson.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
+  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        hasDefaultValueMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        describeListenersMethod               FObject        stringifyMethod               FObject        toE\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
 
 
 // Example 43
@@ -943,7 +926,7 @@ log(Emp.create().salary);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 44, str: " <b>&gt;</b> 0" });
+  expect(log_.output).toMatchGolden({ i: 44, str: " <b>&gt;</b> 30000" });
 
 
 // Example 45
@@ -973,7 +956,7 @@ log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 46, str: " <b>&gt;</b> super:  42 sub:  " });
+  expect(log_.output).toMatchGolden({ i: 46, str: " <b>&gt;</b> super:  42 sub:  42" });
 
 
 // Example 47
@@ -990,7 +973,7 @@ log('super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', S
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 47, str: " <b>&gt;</b> super:  42 mid:  42 sub:  " });
+  expect(log_.output).toMatchGolden({ i: 47, str: " <b>&gt;</b> super:  42 mid:  42 sub:  42" });
 
 
 // Example 48
@@ -1090,7 +1073,7 @@ foam.CLASS({
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 54, str: " <b>&gt;</b> Assertion failed: Listener can't be both isMerged and isFramed:  l <b>&gt;</b> Exception:  assert" });
+  expect(log_.output).toMatchGolden({ i: 54, str: "" });
 
 
 // Example 59
@@ -1185,7 +1168,7 @@ tt.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
+  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        hasDefaultValueMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        describeListenersMethod               FObject        stringifyMethod               FObject        toE\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
 
 
 // Example 62
@@ -1210,7 +1193,7 @@ ImplementsTest2.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        hasDefaultValueMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        describeListenersMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 63
@@ -1270,7 +1253,7 @@ InnerClassTest.InnerClass1.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        hasDefaultValueMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        describeListenersMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 66
@@ -1320,7 +1303,7 @@ InnerEnumTest.InnerEnum.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 68, str: "CLASS:   InnerEnumextends: Axiom Type           Source Class   Name----------------------------------------------------Int                  InnerEnum      ordinalString               InnerEnum      nameString               InnerEnum      labelMethod               InnerEnum      toStringanonymous            InnerEnum      enum_createEnumValue            InnerEnum      OPENEnumValue            InnerEnum      CLOSEDMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 68, str: "CLASS:   InnerEnumextends: Axiom Type           Source Class   Name----------------------------------------------------Int                  InnerEnum      ordinalString               InnerEnum      nameString               InnerEnum      labelMethod               InnerEnum      toStringanonymous            InnerEnum      enum_createEnumValue            InnerEnum      OPENEnumValue            InnerEnum      CLOSEDMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        hasDefaultValueMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        describeListenersMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 69
@@ -1835,7 +1818,7 @@ log(e.get());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 95, str: " <b>&gt;</b> John Smith <b>&gt;</b> [object Object] propertyChange value PropertySlot(foam.core.ExpressionSlot.value) <b>&gt;</b> Steve Jones" });
+  expect(log_.output).toMatchGolden({ i: 95, str: " <b>&gt;</b> Exception:  TypeError: Cannot read property 'create' of undefined" });
 
 
 // Example 96
@@ -1969,7 +1952,7 @@ source.pub('ping');
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 102, str: " <b>&gt;</b> ping <b>&gt;</b> pingwarn: Destroying stale subscription for Sink" });
+  expect(log_.output).toMatchGolden({ i: 102, str: " <b>&gt;</b> Exception:  TypeError: Cannot read property 'create' of undefined" });
 
 
 // Example 103
@@ -2073,7 +2056,7 @@ foam.CLASS({
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 108, str: " <b>&gt;</b> Exception:  Class constant conflict: ConstantConflictTest.FIRST_NAME from: FirstName and firstName" });
+  expect(log_.output).toMatchGolden({ i: 108, str: "" });
 
 
 // Example 109
@@ -2235,7 +2218,7 @@ foam.CLASS({
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 116, str: "warn: Unknown property foam.core.Model.unknown: foobarwarn: Unknown property foam.core.Property.unknown: foobar" });
+  expect(log_.output).toMatchGolden({ i: 116, str: "" });
 
 
 // Example 117
@@ -2279,7 +2262,8 @@ foam.CLASS({
   } ]
 });
 try {
-  var o = ImportsTest.create();
+  var o = ImportsTest.create(); // should fail here, on object creation
+  log('test created');
   o.foo();
 } catch(e) {
   log('Could not import "myLogger" since nobody provided it.');
@@ -2290,10 +2274,34 @@ o.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 120, str: "warn: Access missing import: myLogger <b>&gt;</b> Could not import \"myLogger\" since nobody provided it.log: testlog: log foo from ImportTest" });
+  expect(log_.output).toMatchGolden({ i: 120, str: " <b>&gt;</b> Assertion failed: Missing required import: myLogger in ImportsTest <b>&gt;</b> Could not import \"myLogger\" since nobody provided it.log: testlog: log foo from ImportTest" });
 
 
 // Example 121
+foam.__context__ = foam.createSubContext({});
+log_.output = "";
+try {
+foam.CLASS({
+  name: 'OptionalImportsTest',
+  imports: [ 'myLogger?' ],
+  methods: [ function foo() {
+    this.myLogger('log foo from ImportTest');
+  } ]
+});
+try {
+  var o = OptionalImportsTest.create();
+  log('test created');
+  o.foo(); // should fail here, on import use
+} catch(e) {
+  log('Could not import "myLogger" since nobody provided it.');
+}
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 121, str: " <b>&gt;</b> test createdwarn: Access missing import: myLogger <b>&gt;</b> Could not import \"myLogger\" since nobody provided it." });
+
+
+// Example 122
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2315,10 +2323,10 @@ ExportsTest.create();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 121, str: "log from ExportsTest: log foo from ImportTest" });
+  expect(log_.output).toMatchGolden({ i: 122, str: "log from ExportsTest: log foo from ImportTest" });
 
 
-// Example 122
+// Example 123
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2333,10 +2341,10 @@ com.acme.Test.create().foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 122, str: "foo from com.acme.Test" });
+  expect(log_.output).toMatchGolden({ i: 123, str: "foo from com.acme.Test" });
 
 
-// Example 123
+// Example 124
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2351,10 +2359,10 @@ RequiresTest.create().foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 123, str: "foo from com.acme.Test" });
+  expect(log_.output).toMatchGolden({ i: 124, str: "foo from com.acme.Test" });
 
 
-// Example 124
+// Example 125
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2368,10 +2376,10 @@ RequiresAliasTest.create().foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 124, str: "foo from com.acme.Test" });
+  expect(log_.output).toMatchGolden({ i: 125, str: "foo from com.acme.Test" });
 
 
-// Example 125
+// Example 126
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2386,10 +2394,10 @@ log(o.id);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 125, str: " <b>&gt;</b> 1" });
+  expect(log_.output).toMatchGolden({ i: 126, str: " <b>&gt;</b> 1" });
 
 
-// Example 126
+// Example 127
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2407,10 +2415,10 @@ log(o.id, o.invoiceId);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 126, str: " <b>&gt;</b> 1 1" });
+  expect(log_.output).toMatchGolden({ i: 127, str: " <b>&gt;</b> 1 1" });
 
 
-// Example 127
+// Example 128
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2427,10 +2435,10 @@ log(o.id, o.customerId, o.invoiceId);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 127, str: " <b>&gt;</b> 1,1 1 1 <b>&gt;</b> 2,3 2 3" });
+  expect(log_.output).toMatchGolden({ i: 128, str: " <b>&gt;</b> 1,1 1 1 <b>&gt;</b> 2,3 2 3" });
 
 
-// Example 128
+// Example 129
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2453,10 +2461,10 @@ log(Invoice3.ID.compare(
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 128, str: " <b>&gt;</b> 1 <b>&gt;</b> -1 <b>&gt;</b> 0 <b>&gt;</b> 1 <b>&gt;</b> -1" });
+  expect(log_.output).toMatchGolden({ i: 129, str: " <b>&gt;</b> 1 <b>&gt;</b> -1 <b>&gt;</b> 0 <b>&gt;</b> 1 <b>&gt;</b> -1" });
 
 
-// Example 129
+// Example 130
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2465,15 +2473,18 @@ log(com.acme.Test.id);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 129, str: " <b>&gt;</b> com.acme.Test" });
+  expect(log_.output).toMatchGolden({ i: 130, str: " <b>&gt;</b> com.acme.Test" });
 
 
-// Example 130
+// Example 131
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
 // In addition the the built-in Axiom types, you can also
-// specify arbitrary Axioms with axioms:
+// specify arbitrary Axioms with 'axioms:'.
+// This example adds the 'Singleton' axiom to make a class
+// implement the Singleton patter (ie. there can only be
+// one instance)
 foam.CLASS({
   name: 'AxiomTest',
   axioms: [ foam.pattern.Singleton.create() ],
@@ -2485,10 +2496,10 @@ log(AxiomTest.create() === AxiomTest.create());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 130, str: " <b>&gt;</b> Creating AxiomTest <b>&gt;</b> true" });
+  expect(log_.output).toMatchGolden({ i: 131, str: " <b>&gt;</b> Creating AxiomTest <b>&gt;</b> true" });
 
 
-// Example 131
+// Example 132
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2505,10 +2516,32 @@ log(AxiomSubTest.create() === AxiomTest.create());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 131, str: " <b>&gt;</b> Creating AxiomSubTest <b>&gt;</b> true <b>&gt;</b> false" });
+  expect(log_.output).toMatchGolden({ i: 132, str: " <b>&gt;</b> Creating AxiomSubTest <b>&gt;</b> true <b>&gt;</b> false" });
 
 
-// Example 132
+// Example 133
+foam.__context__ = foam.createSubContext({});
+log_.output = "";
+try {
+// Or add the Multion axiom to implement the Multiton pattern.
+foam.CLASS({
+  name: 'Color',
+  axioms: [ foam.pattern.Multiton.create({property: 'color'}) ],
+  properties: [ 'color' ],
+  methods: [ function init() { log('Creating Color:', this.color); } ]
+});
+var red1 = Color.create({color: 'red'});
+var red2 = Color.create({color: 'red'});
+var blue = Color.create({color: 'blue'});
+log(red1 === red2);
+log(red1 === blue);
+} catch(x) {
+ log("Exception: ", x);
+ }
+  expect(log_.output).toMatchGolden({ i: 133, str: " <b>&gt;</b> Creating Color: red <b>&gt;</b> Creating Color: blue <b>&gt;</b> true <b>&gt;</b> false" });
+
+
+// Example 134
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2516,10 +2549,10 @@ try {
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 132, str: "" });
+  expect(log_.output).toMatchGolden({ i: 134, str: "" });
 
 
-// Example 134
+// Example 136
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2533,10 +2566,10 @@ o.pub('foo','bar');
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 134, str: "[object Object][object Object],foo[object Object],foo,bar" });
+  expect(log_.output).toMatchGolden({ i: 136, str: "[object Object][object Object],foo[object Object],foo,bar" });
 
 
-// Example 135
+// Example 137
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2550,10 +2583,10 @@ log(f(4));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 135, str: " <b>&gt;</b> calculating  2 <b>&gt;</b> 4 <b>&gt;</b> 4 <b>&gt;</b> calculating  4 <b>&gt;</b> 16" });
+  expect(log_.output).toMatchGolden({ i: 137, str: " <b>&gt;</b> calculating  2 <b>&gt;</b> 4 <b>&gt;</b> 4 <b>&gt;</b> calculating  4 <b>&gt;</b> 16" });
 
 
-// Example 136
+// Example 138
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2562,10 +2595,10 @@ log(f());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 136, str: " <b>&gt;</b> Assertion failed: Memoize1'ed functions must take exactly one argument. <b>&gt;</b> Exception:  assert" });
+  expect(log_.output).toMatchGolden({ i: 138, str: " <b>&gt;</b> Assertion failed: Memoize1'ed functions must take exactly one argument. <b>&gt;</b> Exception:  assert" });
 
 
-// Example 137
+// Example 139
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2574,10 +2607,10 @@ log(f(1,2));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 137, str: " <b>&gt;</b> Assertion failed: Memoize1'ed functions must take exactly one argument. <b>&gt;</b> Exception:  assert" });
+  expect(log_.output).toMatchGolden({ i: 139, str: " <b>&gt;</b> Assertion failed: Memoize1'ed functions must take exactly one argument. <b>&gt;</b> Exception:  assert" });
 
 
-// Example 138
+// Example 140
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2587,10 +2620,10 @@ log(typeof foam.Function.argsStr(function() { }));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 138, str: " <b>&gt;</b> a,b,fooBar <b>&gt;</b> string" });
+  expect(log_.output).toMatchGolden({ i: 140, str: " <b>&gt;</b> a,b,fooBar <b>&gt;</b> string" });
 
 
-// Example 139
+// Example 141
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2600,10 +2633,10 @@ log(Array.isArray(foam.Function.formalArgs(function() { })));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 139, str: " <b>&gt;</b> a,b,fooBar <b>&gt;</b> true" });
+  expect(log_.output).toMatchGolden({ i: 141, str: " <b>&gt;</b> a,b,fooBar <b>&gt;</b> true" });
 
 
-// Example 140
+// Example 142
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2614,10 +2647,10 @@ log(foam.String.constantize('fooBar12'));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 140, str: " <b>&gt;</b> FOO <b>&gt;</b> FOO_BAR <b>&gt;</b> FOO_BAR12" });
+  expect(log_.output).toMatchGolden({ i: 142, str: " <b>&gt;</b> FOO <b>&gt;</b> FOO_BAR <b>&gt;</b> FOO_BAR12" });
 
 
-// Example 141
+// Example 143
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2627,10 +2660,10 @@ log(foam.String.capitalize('abc def'));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 141, str: " <b>&gt;</b> Abc def <b>&gt;</b> Abc def" });
+  expect(log_.output).toMatchGolden({ i: 143, str: " <b>&gt;</b> Abc def <b>&gt;</b> Abc def" });
 
 
-// Example 142
+// Example 144
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2641,10 +2674,10 @@ log(foam.String.labelize('someLongName'));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 142, str: " <b>&gt;</b> Camel Case <b>&gt;</b> First Name <b>&gt;</b> Some Long Name" });
+  expect(log_.output).toMatchGolden({ i: 144, str: " <b>&gt;</b> Camel Case <b>&gt;</b> First Name <b>&gt;</b> Some Long Name" });
 
 
-// Example 143
+// Example 145
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2657,10 +2690,10 @@ string*/}));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 143, str: " <b>&gt;</b> This is\na\nmulti-line\nstring" });
+  expect(log_.output).toMatchGolden({ i: 145, str: " <b>&gt;</b> This is\na\nmulti-line\nstring" });
 
 
-// Example 144
+// Example 146
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2670,10 +2703,10 @@ log(s, s.length);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 144, str: " <b>&gt;</b> foobar     10" });
+  expect(log_.output).toMatchGolden({ i: 146, str: " <b>&gt;</b> foobar     10" });
 
 
-// Example 145
+// Example 147
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2683,10 +2716,10 @@ log(s, s.length);
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 145, str: " <b>&gt;</b>     foobar 10" });
+  expect(log_.output).toMatchGolden({ i: 147, str: " <b>&gt;</b>     foobar 10" });
 
 
-// Example 146
+// Example 148
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2708,10 +2741,10 @@ log(o.hello());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 146, str: " <b>&gt;</b> Hello, my name is Adam." });
+  expect(log_.output).toMatchGolden({ i: 148, str: " <b>&gt;</b> Hello, my name is Adam." });
 
 
-// Example 147
+// Example 149
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2735,10 +2768,10 @@ log(o.greet("Bob"));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 147, str: " <b>&gt;</b> Hello Bob, my name is Adam." });
+  expect(log_.output).toMatchGolden({ i: 149, str: " <b>&gt;</b> Hello Bob, my name is Adam." });
 
 
-// Example 148
+// Example 150
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2763,10 +2796,10 @@ log(o.greet("Alice"));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 148, str: " <b>&gt;</b> Hello Alice, my name is Adam" });
+  expect(log_.output).toMatchGolden({ i: 150, str: " <b>&gt;</b> Hello Alice, my name is Adam" });
 
 
-// Example 149
+// Example 151
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2791,10 +2824,10 @@ log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 149, str: " <b>&gt;</b> Use raw JS code for loops and control structures\ni is: \"0\"  which is even!\ni is: \"1\" \ni is: \"2\"  which is even!\ni is: \"3\" \ni is: \"4\"  which is even!\ni is: \"5\" \ni is: \"6\"  which is even!\ni is: \"7\" \ni is: \"8\"  which is even!\ni is: \"9\" \n\nUse percent signs to shortcut access to local properties\nFor instance, my name is Adam\n" });
+  expect(log_.output).toMatchGolden({ i: 151, str: " <b>&gt;</b> Use raw JS code for loops and control structures\ni is: \"0\"  which is even!\ni is: \"1\" \ni is: \"2\"  which is even!\ni is: \"3\" \ni is: \"4\"  which is even!\ni is: \"5\" \ni is: \"6\"  which is even!\ni is: \"7\" \ni is: \"8\"  which is even!\ni is: \"9\" \n\nUse percent signs to shortcut access to local properties\nFor instance, my name is Adam\n" });
 
 
-// Example 150
+// Example 152
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2820,10 +2853,10 @@ log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 150, str: " <b>&gt;</b> \n        Use raw JS code for loops and control structures\n        \n        i is: \"0\"  which is even!\n        i is: \"1\" \n        i is: \"2\"  which is even!\n        i is: \"3\" \n        i is: \"4\"  which is even!\n        i is: \"5\" \n        i is: \"6\"  which is even!\n        i is: \"7\" \n        i is: \"8\"  which is even!\n        i is: \"9\" \n        Use percent signs to shortcut access to local properties\n        For instance, my name is Adam\n      " });
+  expect(log_.output).toMatchGolden({ i: 152, str: " <b>&gt;</b> \n        Use raw JS code for loops and control structures\n        \n        i is: \"0\"  which is even!\n        i is: \"1\" \n        i is: \"2\"  which is even!\n        i is: \"3\" \n        i is: \"4\"  which is even!\n        i is: \"5\" \n        i is: \"6\"  which is even!\n        i is: \"7\" \n        i is: \"8\"  which is even!\n        i is: \"9\" \n        Use percent signs to shortcut access to local properties\n        For instance, my name is Adam\n      " });
 
 
-// Example 151
+// Example 153
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2869,10 +2902,10 @@ o.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 151, str: "Instance of JSONTestAxiom Type           Name           Value----------------------------------------------------Property             name           JohnInt                  age            42StringArray          children       Peter,PaulProperty             name That Need Property             undefined      Property             defined        String               undefinedStrin String               definedString  String               defaultString  defaultInt                  undefinedInt   0Int                  definedInt     0Int                  defaultInt     3Float                undefinedFloat 0Float                definedFloat   0Float                defaultFloat   3.14Boolean              undefinedBoole falseBoolean              trueBoolean    falseBoolean              falseBoolean   falseBoolean              defaultBoolean trueFunction             undefinedFunct function () {}Function             definedFunctio function () {}Property             undefinedFObje Property             definedFObject Property             transient      Property             networkTransie Property             storageTransie \n" });
+  expect(log_.output).toMatchGolden({ i: 153, str: "Instance of JSONTestAxiom Type           Name           Value----------------------------------------------------Property             name           JohnInt                  age            42StringArray          children       Peter,PaulProperty             name That Need Property             undefined      Property             defined        String               undefinedStrin String               definedString  String               defaultString  defaultInt                  undefinedInt   0Int                  definedInt     0Int                  defaultInt     3Float                undefinedFloat 0Float                definedFloat   0Float                defaultFloat   3.14Boolean              undefinedBoole falseBoolean              trueBoolean    falseBoolean              falseBoolean   falseBoolean              defaultBoolean trueFunction             undefinedFunct function () {}Function             definedFunctio function () {}Property             undefinedFObje Property             definedFObject Property             transient      Property             networkTransie Property             storageTransie \n" });
 
 
-// Example 152
+// Example 154
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2906,10 +2939,10 @@ log(foam.json.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 152, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",name:\"Janet\",age:32,children:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 154, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",name:\"Janet\",age:32,children:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
 
 
-// Example 153
+// Example 155
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2918,10 +2951,10 @@ log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 153, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",name:\"Janet\",age:32,children:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 155, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",name:\"Janet\",age:32,children:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
 
 
-// Example 154
+// Example 156
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2930,10 +2963,10 @@ log(o.stringify());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 154, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedFunction: function () {},\n	definedFunction: function plus(a, b) { return a + b; },\n	undefinedFObject: null,\n	definedFObject: {\n		class: \"JSONTest\",\n		name: \"Janet\",\n		age: 32,\n		children: [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		undefined: null,\n		defined: null,\n		undefinedString: \"\",\n		definedString: \"\",\n		defaultString: \"default\",\n		undefinedInt: 0,\n		definedInt: 0,\n		defaultInt: 3,\n		undefinedFloat: 0,\n		definedFloat: 0,\n		defaultFloat: 3.14,\n		undefinedBoolean: false,\n		trueBoolean: false,\n		falseBoolean: false,\n		defaultBoolean: true,\n		undefinedFunction: function () {},\n		definedFunction: function () {},\n		undefinedFObject: null,\n		definedFObject: null,\n		networkTransient: null,\n		storageTransient: null\n	},\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+  expect(log_.output).toMatchGolden({ i: 156, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedFunction: function () {},\n	definedFunction: function plus(a, b) { return a + b; },\n	undefinedFObject: null,\n	definedFObject: {\n		class: \"JSONTest\",\n		name: \"Janet\",\n		age: 32,\n		children: [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		undefined: null,\n		defined: null,\n		undefinedString: \"\",\n		definedString: \"\",\n		defaultString: \"default\",\n		undefinedInt: 0,\n		definedInt: 0,\n		defaultInt: 3,\n		undefinedFloat: 0,\n		definedFloat: 0,\n		defaultFloat: 3.14,\n		undefinedBoolean: false,\n		trueBoolean: false,\n		falseBoolean: false,\n		defaultBoolean: true,\n		undefinedFunction: function () {},\n		definedFunction: function () {},\n		undefinedFObject: null,\n		definedFObject: null,\n		networkTransient: null,\n		storageTransient: null\n	},\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
 
 
-// Example 155
+// Example 157
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2942,10 +2975,10 @@ log(foam.json.Pretty.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 155, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedFunction: function () {},\n	definedFunction: function plus(a, b) { return a + b; },\n	undefinedFObject: null,\n	definedFObject: {\n		class: \"JSONTest\",\n		name: \"Janet\",\n		age: 32,\n		children: [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		undefined: null,\n		defined: null,\n		undefinedString: \"\",\n		definedString: \"\",\n		defaultString: \"default\",\n		undefinedInt: 0,\n		definedInt: 0,\n		defaultInt: 3,\n		undefinedFloat: 0,\n		definedFloat: 0,\n		defaultFloat: 3.14,\n		undefinedBoolean: false,\n		trueBoolean: false,\n		falseBoolean: false,\n		defaultBoolean: true,\n		undefinedFunction: function () {},\n		definedFunction: function () {},\n		undefinedFObject: null,\n		definedFObject: null,\n		networkTransient: null,\n		storageTransient: null\n	},\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+  expect(log_.output).toMatchGolden({ i: 157, str: " <b>&gt;</b> {\n	class: \"JSONTest\",\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedFunction: function () {},\n	definedFunction: function plus(a, b) { return a + b; },\n	undefinedFObject: null,\n	definedFObject: {\n		class: \"JSONTest\",\n		name: \"Janet\",\n		age: 32,\n		children: [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		undefined: null,\n		defined: null,\n		undefinedString: \"\",\n		definedString: \"\",\n		defaultString: \"default\",\n		undefinedInt: 0,\n		definedInt: 0,\n		defaultInt: 3,\n		undefinedFloat: 0,\n		definedFloat: 0,\n		defaultFloat: 3.14,\n		undefinedBoolean: false,\n		trueBoolean: false,\n		falseBoolean: false,\n		defaultBoolean: true,\n		undefinedFunction: function () {},\n		definedFunction: function () {},\n		undefinedFObject: null,\n		definedFObject: null,\n		networkTransient: null,\n		storageTransient: null\n	},\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
 
 
-// Example 156
+// Example 158
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2954,10 +2987,10 @@ log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 156, str: " <b>&gt;</b> {\n	\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedFunction: function () {},\n	definedFunction: function plus(a, b) { return a + b; },\n	undefinedFObject: null,\n	definedFObject: {\n		\n		name: \"Janet\",\n		age: 32,\n		children: [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		undefined: null,\n		defined: null,\n		undefinedString: \"\",\n		definedString: \"\",\n		defaultString: \"default\",\n		undefinedInt: 0,\n		definedInt: 0,\n		defaultInt: 3,\n		undefinedFloat: 0,\n		definedFloat: 0,\n		defaultFloat: 3.14,\n		undefinedBoolean: false,\n		trueBoolean: false,\n		falseBoolean: false,\n		defaultBoolean: true,\n		undefinedFunction: function () {},\n		definedFunction: function () {},\n		undefinedFObject: null,\n		definedFObject: null,\n		networkTransient: null,\n		storageTransient: null\n	},\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
+  expect(log_.output).toMatchGolden({ i: 158, str: " <b>&gt;</b> {\n	\n	name: \"John\",\n	age: 42,\n	children: [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	undefined: null,\n	defined: \"value\",\n	undefinedString: \"\",\n	definedString: \"stringValue\",\n	defaultString: \"default\",\n	undefinedInt: 0,\n	definedInt: 42,\n	defaultInt: 3,\n	undefinedFloat: 0,\n	definedFloat: 42.42,\n	defaultFloat: 3.14,\n	undefinedBoolean: false,\n	trueBoolean: true,\n	falseBoolean: false,\n	defaultBoolean: true,\n	undefinedFunction: function () {},\n	definedFunction: function plus(a, b) { return a + b; },\n	undefinedFObject: null,\n	definedFObject: {\n		\n		name: \"Janet\",\n		age: 32,\n		children: [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		undefined: null,\n		defined: null,\n		undefinedString: \"\",\n		definedString: \"\",\n		defaultString: \"default\",\n		undefinedInt: 0,\n		definedInt: 0,\n		defaultInt: 3,\n		undefinedFloat: 0,\n		definedFloat: 0,\n		defaultFloat: 3.14,\n		undefinedBoolean: false,\n		trueBoolean: false,\n		falseBoolean: false,\n		defaultBoolean: true,\n		undefinedFunction: function () {},\n		definedFunction: function () {},\n		undefinedFObject: null,\n		definedFObject: null,\n		networkTransient: null,\n		storageTransient: null\n	},\n	networkTransient: \"network transient value\",\n	storageTransient: \"storage transient value\"\n}" });
 
 
-// Example 157
+// Example 159
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2966,10 +2999,10 @@ log(foam.json.Strict.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 157, str: " <b>&gt;</b> {\"class\":\"JSONTest\",\"name\":\"John\",\"age\":42,\"children\":[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,\"undefined\":null,\"defined\":\"value\",\"undefinedString\":\"\",\"definedString\":\"stringValue\",\"defaultString\":\"default\",\"undefinedInt\":0,\"definedInt\":42,\"defaultInt\":3,\"undefinedFloat\":0,\"definedFloat\":42.42,\"defaultFloat\":3.14,\"undefinedBoolean\":false,\"trueBoolean\":true,\"falseBoolean\":false,\"defaultBoolean\":true,\"undefinedFunction\":\"function () {}\",\"definedFunction\":\"function plus(a, b) { return a + b; }\",\"undefinedFObject\":null,\"definedFObject\":{\"class\":\"JSONTest\",\"name\":\"Janet\",\"age\":32,\"children\":[\"Kim\",\"Kathy\"],\"name That Needs Quoting\":null,\"undefined\":null,\"defined\":null,\"undefinedString\":\"\",\"definedString\":\"\",\"defaultString\":\"default\",\"undefinedInt\":0,\"definedInt\":0,\"defaultInt\":3,\"undefinedFloat\":0,\"definedFloat\":0,\"defaultFloat\":3.14,\"undefinedBoolean\":false,\"trueBoolean\":false,\"falseBoolean\":false,\"defaultBoolean\":true,\"undefinedFunction\":\"function () {}\",\"definedFunction\":\"function () {}\",\"undefinedFObject\":null,\"definedFObject\":null,\"networkTransient\":null,\"storageTransient\":null},\"networkTransient\":\"network transient value\",\"storageTransient\":\"storage transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 159, str: " <b>&gt;</b> {\"class\":\"JSONTest\",\"name\":\"John\",\"age\":42,\"children\":[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,\"undefined\":null,\"defined\":\"value\",\"undefinedString\":\"\",\"definedString\":\"stringValue\",\"defaultString\":\"default\",\"undefinedInt\":0,\"definedInt\":42,\"defaultInt\":3,\"undefinedFloat\":0,\"definedFloat\":42.42,\"defaultFloat\":3.14,\"undefinedBoolean\":false,\"trueBoolean\":true,\"falseBoolean\":false,\"defaultBoolean\":true,\"undefinedFunction\":\"function () {}\",\"definedFunction\":\"function plus(a, b) { return a + b; }\",\"undefinedFObject\":null,\"definedFObject\":{\"class\":\"JSONTest\",\"name\":\"Janet\",\"age\":32,\"children\":[\"Kim\",\"Kathy\"],\"name That Needs Quoting\":null,\"undefined\":null,\"defined\":null,\"undefinedString\":\"\",\"definedString\":\"\",\"defaultString\":\"default\",\"undefinedInt\":0,\"definedInt\":0,\"defaultInt\":3,\"undefinedFloat\":0,\"definedFloat\":0,\"defaultFloat\":3.14,\"undefinedBoolean\":false,\"trueBoolean\":false,\"falseBoolean\":false,\"defaultBoolean\":true,\"undefinedFunction\":\"function () {}\",\"definedFunction\":\"function () {}\",\"undefinedFObject\":null,\"definedFObject\":null,\"networkTransient\":null,\"storageTransient\":null},\"networkTransient\":\"network transient value\",\"storageTransient\":\"storage transient value\"}" });
 
 
-// Example 158
+// Example 160
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2978,10 +3011,10 @@ log(foam.json.PrettyStrict.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 158, str: " <b>&gt;</b> {\n	\"class\": \"JSONTest\",\n	\"name\": \"John\",\n	\"age\": 42,\n	\"children\": [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	\"undefined\": null,\n	\"defined\": \"value\",\n	\"undefinedString\": \"\",\n	\"definedString\": \"stringValue\",\n	\"defaultString\": \"default\",\n	\"undefinedInt\": 0,\n	\"definedInt\": 42,\n	\"defaultInt\": 3,\n	\"undefinedFloat\": 0,\n	\"definedFloat\": 42.42,\n	\"defaultFloat\": 3.14,\n	\"undefinedBoolean\": false,\n	\"trueBoolean\": true,\n	\"falseBoolean\": false,\n	\"defaultBoolean\": true,\n	\"undefinedFunction\": \"function () {}\",\n	\"definedFunction\": \"function plus(a, b) { return a + b; }\",\n	\"undefinedFObject\": null,\n	\"definedFObject\": {\n		\"class\": \"JSONTest\",\n		\"name\": \"Janet\",\n		\"age\": 32,\n		\"children\": [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		\"undefined\": null,\n		\"defined\": null,\n		\"undefinedString\": \"\",\n		\"definedString\": \"\",\n		\"defaultString\": \"default\",\n		\"undefinedInt\": 0,\n		\"definedInt\": 0,\n		\"defaultInt\": 3,\n		\"undefinedFloat\": 0,\n		\"definedFloat\": 0,\n		\"defaultFloat\": 3.14,\n		\"undefinedBoolean\": false,\n		\"trueBoolean\": false,\n		\"falseBoolean\": false,\n		\"defaultBoolean\": true,\n		\"undefinedFunction\": \"function () {}\",\n		\"definedFunction\": \"function () {}\",\n		\"undefinedFObject\": null,\n		\"definedFObject\": null,\n		\"networkTransient\": null,\n		\"storageTransient\": null\n	},\n	\"networkTransient\": \"network transient value\",\n	\"storageTransient\": \"storage transient value\"\n}" });
+  expect(log_.output).toMatchGolden({ i: 160, str: " <b>&gt;</b> {\n	\"class\": \"JSONTest\",\n	\"name\": \"John\",\n	\"age\": 42,\n	\"children\": [\n		\"Peter\",\n		\"Paul\"\n	],\n	\"name That Needs Quoting\": 42,\n	\"undefined\": null,\n	\"defined\": \"value\",\n	\"undefinedString\": \"\",\n	\"definedString\": \"stringValue\",\n	\"defaultString\": \"default\",\n	\"undefinedInt\": 0,\n	\"definedInt\": 42,\n	\"defaultInt\": 3,\n	\"undefinedFloat\": 0,\n	\"definedFloat\": 42.42,\n	\"defaultFloat\": 3.14,\n	\"undefinedBoolean\": false,\n	\"trueBoolean\": true,\n	\"falseBoolean\": false,\n	\"defaultBoolean\": true,\n	\"undefinedFunction\": \"function () {}\",\n	\"definedFunction\": \"function plus(a, b) { return a + b; }\",\n	\"undefinedFObject\": null,\n	\"definedFObject\": {\n		\"class\": \"JSONTest\",\n		\"name\": \"Janet\",\n		\"age\": 32,\n		\"children\": [\n			\"Kim\",\n			\"Kathy\"\n		],\n		\"name That Needs Quoting\": null,\n		\"undefined\": null,\n		\"defined\": null,\n		\"undefinedString\": \"\",\n		\"definedString\": \"\",\n		\"defaultString\": \"default\",\n		\"undefinedInt\": 0,\n		\"definedInt\": 0,\n		\"defaultInt\": 3,\n		\"undefinedFloat\": 0,\n		\"definedFloat\": 0,\n		\"defaultFloat\": 3.14,\n		\"undefinedBoolean\": false,\n		\"trueBoolean\": false,\n		\"falseBoolean\": false,\n		\"defaultBoolean\": true,\n		\"undefinedFunction\": \"function () {}\",\n		\"definedFunction\": \"function () {}\",\n		\"undefinedFObject\": null,\n		\"definedFObject\": null,\n		\"networkTransient\": null,\n		\"storageTransient\": null\n	},\n	\"networkTransient\": \"network transient value\",\n	\"storageTransient\": \"storage transient value\"\n}" });
 
 
-// Example 159
+// Example 161
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -2990,10 +3023,10 @@ log(foam.json.Compact.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 159, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",name:\"Janet\",age:32,children:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 161, str: " <b>&gt;</b> {class:\"JSONTest\",name:\"John\",age:42,children:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",name:\"Janet\",age:32,children:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
 
 
-// Example 160
+// Example 162
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -3002,10 +3035,10 @@ log(foam.json.Short.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 160, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",n:\"Janet\",a:32,cs:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 162, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",n:\"Janet\",a:32,cs:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\",storageTransient:\"storage transient value\"}" });
 
 
-// Example 161
+// Example 163
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -3014,10 +3047,10 @@ log(foam.json.Network.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 161, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",n:\"Janet\",a:32,cs:[\"Kim\",\"Kathy\"]},storageTransient:\"storage transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 163, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",n:\"Janet\",a:32,cs:[\"Kim\",\"Kathy\"]},storageTransient:\"storage transient value\"}" });
 
 
-// Example 162
+// Example 164
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
@@ -3026,7 +3059,7 @@ log(foam.json.Storage.stringify(o));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 162, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",n:\"Janet\",a:32,cs:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\"}" });
+  expect(log_.output).toMatchGolden({ i: 164, str: " <b>&gt;</b> {class:\"JSONTest\",n:\"John\",a:42,cs:[\"Peter\",\"Paul\"],\"name That Needs Quoting\":42,defined:\"value\",definedString:\"stringValue\",definedInt:42,definedFloat:42.42,trueBoolean:true,definedFunction:function plus(a, b) { return a + b; },definedFObject:{class:\"JSONTest\",n:\"Janet\",a:32,cs:[\"Kim\",\"Kathy\"]},networkTransient:\"network transient value\"}" });
 
 
 });
