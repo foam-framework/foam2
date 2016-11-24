@@ -82,17 +82,6 @@ var createDateTestProperties = function createDateTestProperties() {
   return test.DateTypeTester.create(undefined, foam.__context__);
 }
 
-// For tests that rely on asserts firing, make sure they throw so the
-// assert can be detected in tests.
-var oldAssert;
-beforeAll(function() {
-  oldAssert = foam.core.FObject.prototype.assert;
-  foam.core.FObject.prototype.assert = function(c) { if ( ! c ) throw Array.from(arguments); }
-});
-afterAll(function() {
-  foam.core.FObject.prototype.assert = oldAssert;
-})
-
 describe('Date', function() {
   var p;
   var p2;

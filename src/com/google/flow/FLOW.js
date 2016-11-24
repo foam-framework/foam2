@@ -568,7 +568,7 @@ foam.CLASS({
     },
 
     function loadFlow(name) {
-      console.assert(name, 'Name required.')
+      foam.assert(name, 'Name required.')
 
       this.name = name;
       this.flows.find(name).then(function (f) {

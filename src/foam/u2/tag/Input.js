@@ -34,7 +34,7 @@ foam.CLASS({
       }
       /*
       assertValue: function(d) {
-        this.assert(! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d), 'Set Input data to non-primitive.');
+        foam.assert(! d || typeof d === 'string' || typeof d === 'number' || typeof d === 'boolean' || foam.Date.isInstance(d), 'Set Input data to non-primitive.');
       }*/
     },
     {
