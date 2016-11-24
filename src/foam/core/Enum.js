@@ -233,7 +233,7 @@ foam.CLASS({
                   return o.ordinal === key;
                 });
 
-                foam.__context__.assert(enumValue, 'No enum value found with ordinal', key);
+                foam.assert(enumValue, 'No enum value found with ordinal', key);
                 var newArgs = enumValue.values;
                 newArgs.ordinal = key;
                 newArgs.name = enumValue.name;
@@ -293,7 +293,7 @@ foam.CLASS({
       name: 'methods',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Method must be named');
+          foam.assert(o.name, 'Method must be named');
           var m = foam.core.Method.create();
           m.name = o.name;
           m.code = o;
@@ -328,7 +328,7 @@ foam.CLASS({
         for ( var i = 0 ; i < v.length ; i++ ) {
           if ( ! v[i].hasOwnProperty('ordinal') ) v[i].ordinal = next++;
           else next = v[i].ordinal + 1;
-          this.assert(
+          foam.assert(
             ! used[v[i].ordinal],
             this.id,
             'Enum error: duplicate ordinal found', v[i].name,

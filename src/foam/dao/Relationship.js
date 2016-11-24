@@ -51,7 +51,7 @@ foam.CLASS({
       // TODO: Support many to many relationships (cardinality of '*:*')
       name: 'cardinality',
       assertValue: function(value) {
-        this.assert(value == '1:1' || value == '1:*' || value == '*:1',
+        foam.assert(value == '1:1' || value == '1:*' || value == '*:1',
           'Current supported cardinalities are 1:1 1:* and *:1');
       },
       value: '1:*'
@@ -164,15 +164,15 @@ foam.CLASS({
         }
       }
 
-      this.assert(
+      foam.assert(
           sourceProps.length === targetProps.length,
           'Relationship source/target property list length mismatch.');
 
       var source = this.lookup(this.sourceModel);
       var target = this.lookup(this.targetModel);
 
-      this.assert(source, 'Unknown sourceModel: ', this.sourceModel);
-      this.assert(target, 'Unknown targetModel: ', this.targetModel);
+      foam.assert(source, 'Unknown sourceModel: ', this.sourceModel);
+      foam.assert(target, 'Unknown targetModel: ', this.targetModel);
 
       for ( var i = 0 ; i < sourceProps.length ; i++ ) {
         var sp = sourceProps[i];
