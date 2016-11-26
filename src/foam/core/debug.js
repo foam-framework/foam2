@@ -50,7 +50,7 @@ foam.CLASS({
 
   methods: [
     function validate() {
-      this.assert(
+      foam.assert(
         ! this.isMerged || ! this.isFramed,
         "Listener can't be both isMerged and isFramed: ",
         this.name);
@@ -67,7 +67,7 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
-      this.assert(
+      foam.assert(
           ! this.name.endsWith('$'),
           'Illegal Property Name: Can\'t end with "$": ', this.name);
 
@@ -103,10 +103,10 @@ foam.CLASS({
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);
 
-          this.assert(
+          foam.assert(
               axiom,
               'Unknown argument "', name, '" in ', pName, expression);
-          this.assert(
+          foam.assert(
               axiom.toSlot,
               'Non-Slot argument "', name, '" in ', pName, expression);
         }
@@ -116,7 +116,7 @@ foam.CLASS({
 });
 
 
-foam.__context__.assert(
+foam.assert(
     ! foam.core.FObject.describe,
     'foam.core.FObject.describe already set.');
 
@@ -147,7 +147,7 @@ foam.core.FObject.installModel = function() {
     for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
       var a = m.axioms_[i];
 
-      foam.__context__.assert(
+      foam.assert(
         ! names.hasOwnProperty(a.name),
         'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
@@ -225,7 +225,7 @@ if ( false && global.Proxy ) {
           return Reflect.get(target, prop, receiver);
         },
         set: function(target, prop, value, receiver) {
-          foam.__context__.assert(
+          foam.assert(
               IGNORE[prop] || target.cls_.getAxiomByName(
                 prop.endsWith('$') ? prop.substring(0, prop.length-1) : prop),
               'Invalid Set: ', target.cls_.id, prop, value);
@@ -560,7 +560,7 @@ foam.CLASS({
 
         if ( imp.required && ! this.__context__[imp.key + '$'] ) {
           var m = 'Missing required import: ' + imp.key + ' in ' + this.cls_.id;
-          this.assert(false, m);
+          foam.assert(false, m);
         }
       }
     }
@@ -579,7 +579,7 @@ foam.CLASS({
           var m = 'Import name "' + n + '" must be a valid variable name.';
           if ( n.indexOf('.') !== -1 ) m += ' Did you mean requires:?';
 
-          this.assert(false, m);
+          foam.assert(false, m);
         }
       }
     }

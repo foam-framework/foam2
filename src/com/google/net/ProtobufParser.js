@@ -68,7 +68,7 @@ foam.CLASS({
               sym('strLit'), literal(';')),
 
           package: seq(
-              literal('package'), sym('ws1'), sym('dottedIdents'),
+              literal('package'), sym('ws1'), sym('dottedIdents'), sym('ws'),
               literal(';')),
 
           option: seq(literal('option'), sym('ws'),

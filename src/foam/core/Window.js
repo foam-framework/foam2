@@ -22,7 +22,7 @@
   services that foam.core.Window exports:, and then access them as this.name,
   rather than as console.name or document.name.
 
-  All FObjects already import: [ 'assert', 'error', 'log', 'warn' ], meaning
+  All FObjects already import: [ 'error', 'log', 'warn' ], meaning
   that these do not need to be explicitly imported.
 
   This is done to remove dependency on the globals 'document' and 'window',
@@ -45,7 +45,6 @@ foam.CLASS({
   exports: [
     'getElementsByClassName',
     'getElementById',
-    'assert',
     'async',
     'cancelAnimationFrame',
     'clearInterval',
@@ -86,18 +85,6 @@ foam.CLASS({
 
     function getElementsByClassName(cls) {
       return this.document.getElementsByClassName(cls);
-    },
-
-    /**
-      Like console.assert(), but faster and context-dependent.
-      Returns the first argument, so that it can be nested as a sub-expression.
-     */
-    function assert(b /*, args */) {
-      /* Like console.assert() except that it takes more than one argument. */
-      if ( ! b ) {
-        this.console.assert(false, Array.prototype.slice.call(arguments, 1).join(' '));
-      }
-      return b;
     },
 
     function error() {

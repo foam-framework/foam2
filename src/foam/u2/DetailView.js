@@ -57,9 +57,9 @@ foam.CLASS({
       name: 'properties',
       // TODO: Make an FObjectArray when it validates properly
       preSet: function(_, ps) {
-        this.assert(ps, 'Properties required.');
+        foam.assert(ps, 'Properties required.');
         for ( var i = 0 ; i < ps.length ; i++ ) {
-          this.assert(
+          foam.assert(
               foam.core.Property.isInstance(ps[i]),
               "Non-Property in 'properties' list:",
               ps);

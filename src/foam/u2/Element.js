@@ -838,7 +838,7 @@ foam.CLASS({
         if ( foam.core.Slot.isInstance(value) ) {
           this.slotAttr_(name, value);
         } else {
-          this.assert(
+          foam.assert(
               typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || foam.Date.isInstance(value),
               'Attribute value must be a primitive type.');
 

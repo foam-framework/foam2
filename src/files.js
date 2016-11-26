@@ -130,6 +130,7 @@ FOAM_FILES([
   { name: "foam/u2/IntView", flags: ['web'] },
   { name: "foam/u2/FloatView", flags: ['web'] },
   { name: "foam/u2/CheckBox", flags: ['web'] },
+  { name: "foam/u2/CitationView", flags: ['web'] },
   { name: "foam/u2/PopupView", flags: ['web'] },
   { name: "foam/u2/DateView", flags: ['web'] },
   { name: "foam/u2/RangeView", flags: ['web'] },
@@ -162,5 +163,6 @@ FOAM_FILES([
   { name: "foam/comics/DAOCreateController" },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] },
-  { name: "lib/HTTPMethod" }
+  { name: "lib/HTTPMethod" },
+  { name: "lib/OAuth2" }
 ]);

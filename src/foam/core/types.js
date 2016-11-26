@@ -160,7 +160,7 @@ foam.CLASS({
     [
       'assertValue',
       function(value, prop) {
-        this.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
+        foam.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
       }
     ]
   ]
@@ -280,10 +280,10 @@ foam.CLASS({
     [
       'assertValue',
       function(v, prop) {
-        this.assert(Array.isArray(v),
+        foam.assert(Array.isArray(v),
             prop.name, 'Tried to set StringArray to non-array type.');
         for ( var i = 0 ; i < v.length ; i++ ) {
-          this.assert(typeof v[i] === 'string',
+          foam.assert(typeof v[i] === 'string',
               prop.name, 'Element', i, 'is not a string', v[i]);
         }
       }

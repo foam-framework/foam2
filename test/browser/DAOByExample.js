@@ -87,10 +87,10 @@ var examples = [
           'foam.dao.EasyDAO'
         ],
         exports: [ // by default, DAOs are looked up by class name
-          'bankDAO as example.BankDAO',
-          'customerDAO as example.CustomerDAO',
-          'accountDAO as example.AccountDAO',
-          'transactionDAO as example.TransactionDAO',
+          'bankDAO as example_BankDAO',
+          'customerDAO as example_CustomerDAO',
+          'accountDAO as example_AccountDAO',
+          'transactionDAO as example_TransactionDAO',
         ],
         properties: [
           { name: 'bankDAO', factory: function() {
@@ -319,7 +319,7 @@ var examples = [
   {
     name: 'Selecting with skip and limit',
     description: "A pseudo scroll effect with skip and limit",
-    dependencies: [ 'Load Customers' ],
+    dependencies: [ 'Load Customers', 'Create Accounts' ],
     code: function() {
       var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
       var skip = 0;

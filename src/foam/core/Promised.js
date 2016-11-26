@@ -111,7 +111,7 @@ foam.CLASS({
       var methods = this.methods ?
           this.methods.map(function(f) {
             var m = delegate.getAxiomByName(f);
-            foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
+            foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
             return m;
           }) :
           delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
