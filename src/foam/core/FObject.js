@@ -256,6 +256,25 @@ foam.LIB({
     // NOP, is replaced if debug.js is loaded
     function validate() { },
 
+    function validateObject() {
+      var ret = null;
+
+      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+      
+      // TODO: cache properties with validate defined
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        var p = ps[i];
+        if ( p.validate ) {
+          var e = p.validate.call(this);
+          if ( e ) (ret || (ret = [])).push([p,e]);
+        }
+      }
+
+      return ret;
+    },
+
+    function isValid() { return ! this.validateObject(); },
+    
     function toString() { return this.name + 'Class'; },
 
     /**
