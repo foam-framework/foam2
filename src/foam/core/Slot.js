@@ -130,7 +130,7 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      console.assert(other, 'Slot.follow requires Slot argument.');
+      foam.assert(other, 'Slot.follow requires Slot argument.');
       var self = this;
       var l = function() {
         if ( ! foam.util.equals(self.get(), other.get()) ) {
@@ -251,7 +251,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation:
       'For internal use only. Is used to implement the Slot.dot() method.',
@@ -406,7 +406,7 @@ foam.CLASS({
     {
       name: 'args',
       expression: function(obj) {
-        this.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
+        foam.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
 
         var args = foam.Function.formalArgs(this.code);
         for ( var i = 0 ; i < args.length ; i++ ) {

@@ -1781,7 +1781,7 @@ describe('Relationship', function() {
   });
 
   foam.RELATIONSHIP({
-    name: 'children',
+    forwardName: 'children',
     inverseName: 'parent',
     sourceModel: 'test.RelA',
     //sourceProperties: [ 'bRef' ],

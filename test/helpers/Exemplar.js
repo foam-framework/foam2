@@ -40,7 +40,15 @@ foam.CLASS({
       /** Examplars to load and execute before this one. Output code will
         be the merged result of all dependencies. */
       class: 'StringArray',
-      name: 'dependencies'
+      name: 'dependencies',
+      preSet: function(old, nu) {
+        // NOTE: this will also cause not-yet-declared dependencies to fail
+        if ( this.dependsOn(nu, this.name) ) {
+          throw "Cannot have self as a dependency!" + name;
+          return old;
+        }
+        return nu;
+      }
     },
     {
       /** Set to true if your code is a function that returns a promise */
@@ -54,10 +62,22 @@ foam.CLASS({
       class: 'String',
       name: 'code',
       adapt: function(old, nu) {
-        if ( foam.Function.is(nu) ) {
+        if ( foam.Function.isInstance(nu) ) {
           var matches = nu.toString().match(/function\s*(async)?\(\s*\)\s*\{((?:.|\n)*)\}/);
           if ( matches[1] ) this.isAsync = true;
-          return matches[2];
+          return matches[2].replace('\t', '  ');
+        }
+        return nu.replace('\t', '  ');
+      }
+    },
+    {
+      /** Unit test expectations to run after the main code. */
+      class: 'String',
+      name: 'postTestCode',
+      adapt: function(old, nu) {
+        if ( foam.Function.isInstance(nu) ) {
+          var matches = nu.toString().match(/function\s*\(\s*\)\s*\{((?:.|\n)*)\}/);
+          return matches[1].replace('\t', '  ');
         }
         return nu.replace('\t', '  ');
       }
@@ -88,18 +108,34 @@ foam.CLASS({
       this.registry.register(this);
     },
 
-    function generateExample() {
+    function dependsOn(deps, name) {
+      var self = this;
+      deps && deps.forEach(function(depName) {
+        if ( depName === name ) return true;
+
+        var dep = self.registry.lookup(depName);
+        if ( dep.dependsOn(dep.dependencies, name) ) return true;
+      });
+      return false;
+    },
+
+    function generateCode(selfOutputMethod, noDeps) {
       var indent = { level: 0 };
       var ret = "";
       var self = this;
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
+      if ( noDeps ) {
+        ret += self[selfOutputMethod](indent);
+        return ret;
+      }
+
       // flatten dependencies
       var deps = this.flattenDependencies();
 
       deps.sync.forEach(function(dep) {
-        ret += dep.outputSelf(indent);
+        ret += dep.outputSelfTest(indent, true);
       });
 
 
@@ -115,7 +151,7 @@ foam.CLASS({
         ret += tabs + "}).then(function() {\n";
       }
 
-      ret += self.outputSelf(indent);
+      ret += self[selfOutputMethod](indent);
 
       // inner enclosing end
       if ( deps.async.length ) {
@@ -126,10 +162,35 @@ foam.CLASS({
       return ret;
     },
 
-    function outputSelf(indent) {
+    function generateExample(noDeps) {
+      return this.generateCode('outputSelfExample', noDeps);
+    },
+
+    function generateTest() {
+      return this.generateCode('outputSelfTest');
+    },
+
+    function outputSelfTest(indent, noTests) {
 
       var ret = "\n";
-      var lines = this.code.split('\n');
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
+
+      ret += tabs + '// ' + this.name + '\n';
+      ret += tabs + '// ' + this.description + '\n';
+
+      ret += this.outputIndentedCode(indent, this.code);
+
+      if ( ! noTests ) {
+        ret += "\n// Post conditions:\n";
+        ret += this.outputIndentedCode(indent, this.postTestCode);
+      }
+      return ret;
+    },
+
+    function outputSelfExample(indent) {
+
+      var ret = "\n";
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
@@ -137,6 +198,17 @@ foam.CLASS({
       ret += tabs + '// ' + this.name + '\n';
       ret += tabs + '// ' + this.description + '\n';
       ret += tabs + '//=====================================================\n';
+
+      ret += this.outputIndentedCode(indent, this.code);
+
+      return ret;
+    },
+
+    function outputIndentedCode(indent, code) {
+      var ret = "";
+      var lines = code.split('\n');
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       // only keep source indent relative to first line
       var firstLineIndent = -1;
@@ -153,8 +225,6 @@ foam.CLASS({
         }
         ret += tabs + line + '\n';
       });
-
-      ret += "\n";
 
       return ret;
     },
