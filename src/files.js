@@ -37,6 +37,7 @@ FOAM_FILES([
   { name: "foam/core/EndBoot" },
   { name: "foam/core/FObjectArray" },
   { name: "foam/core/Constant" },
+  { name: "foam/core/Validation" },
   { name: "foam/core/types" },
   { name: "foam/core/Topic" },
   { name: "foam/core/InnerClass" },
