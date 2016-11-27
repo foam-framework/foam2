@@ -16,6 +16,32 @@
  */
 
 foam.CLASS({
+  name: 'ValidateTest',
+  properties: [
+    {
+      name: 'gt10',
+      validateObj: function(gt10) {
+        if ( gt10 <= 10 ) return 'Value must be >10.';
+      }
+    },
+    {
+      name: 'lt10',
+      validateObj: function(lt10) {
+        if ( lt10 >= 10 ) return 'Value must be <10.';
+      }
+    }
+  ]
+});
+
+var vt = ValidateTest.create({gt10: 11, lt10: 9});
+console.log('error: ', vt.errors_);
+vt.errors_$.sub(function(_,_,_,errs) { console.log('Error_$.sub::', errs.get());});
+vt.gt10 = 9;
+vt.lt10 = 11;
+console.log('error: ', vt.errors_);
+
+/*
+foam.CLASS({
   package: 'graphics',
   name: 'Square',
   properties: [ 'side' ]
@@ -51,7 +77,7 @@ console.log(
   t.sizeOf(graphics.Square.create({side: 4})),
   t.sizeOf(graphics.Circle.create({radius: 1}))
 );
-
+*/
 
 /*
 foam.CLASS({
@@ -192,7 +218,7 @@ console.log(c.stringify(), c.clone().stringify());
 c = Child.create({a:'a', b:'b', c:'c', d:'d'});
 console.log(c.stringify(), c.clone().stringify());
 */
-
+/*
 foam.CLASS({
   name: 'JTest',
   properties: [
@@ -211,3 +237,4 @@ var t3 = JTest.create({b: true, c: 42, d: 4.5, e: 'foobar', f: [1,2,3]});
 console.log(foam.json.Storage.stringify(t));
 console.log(foam.json.Storage.stringify(t2));
 console.log(foam.json.Storage.stringify(t3));
+*/
