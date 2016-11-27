@@ -256,25 +256,6 @@ foam.LIB({
     // NOP, is replaced if debug.js is loaded
     function validate() { },
 
-    function validateObject() {
-      var ret = null;
-
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
-      
-      // TODO: cache properties with validate defined
-      for ( var i = 0 ; i < ps.length ; i++ ) {
-        var p = ps[i];
-        if ( p.validate ) {
-          var e = p.validate.call(this);
-          if ( e ) (ret || (ret = [])).push([p,e]);
-        }
-      }
-
-      return ret;
-    },
-
-    function isValid() { return ! this.validateObject(); },
-    
     function toString() { return this.name + 'Class'; },
 
     /**
@@ -695,7 +676,7 @@ foam.CLASS({
 
       var axiom = this.cls_.getAxiomByName(obj);
 
-      foam.assert(axiom, 'Unknown axiom:', obj);
+      foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
       foam.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
 
       return axiom.toSlot(this);
