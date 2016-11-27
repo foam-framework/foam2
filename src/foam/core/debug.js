@@ -194,6 +194,7 @@ foam.core.FObject.installModel = function() {
 }();
 
 foam.core.FObject.validate = function() {
+  // TODO: Why doesn't this call super or also validateInstance?
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     a.validateClass && a.validateClass(this);
