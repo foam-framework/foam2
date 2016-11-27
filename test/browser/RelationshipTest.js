@@ -39,8 +39,8 @@ foam.CLASS({
   requires: [ 'Parent1', 'Child1' ],
 
   exports: [
-    'parents as Parent1DAO',
-    'children as Child1DAO'
+    'parents as parent1DAO',
+    'children as child1DAO'
   ],
 
   properties: [
