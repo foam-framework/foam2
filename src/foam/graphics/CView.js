@@ -723,7 +723,7 @@ foam.CLASS({
       return this.toE().write();
     },
 
-    function toE(X) {
+    function toE(args, X) {
       return this.Canvas.create({ cview: this }, X).attrs({
         width:  this.slot(function(x, width,  scaleX) { return x + width*scaleX; }),
         height: this.slot(function(y, height, scaleY) { return y + height*scaleY; })
@@ -1167,6 +1167,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
       this.on('load', this.paint);
       this.cview$.valueSub('invalidated', this.paint);
     },

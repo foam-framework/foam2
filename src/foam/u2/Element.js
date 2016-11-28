@@ -404,7 +404,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
-  // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
+  documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
     'foam.u2.AttrSlot',
@@ -494,6 +494,16 @@ foam.CLASS({
 
     NEXT_ID: function() {
       return 'v' + this.__ID__[ 0 ]++;
+    },
+
+    // Keys which respond to keydown but not keypress
+    KEYPRESS_CODES: { 8: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+
+    NAMED_CODES: {
+      '37': 'left',
+      '38': 'up',
+      '39': 'right',
+      '40': 'down'
     }
   },
 
@@ -647,7 +657,8 @@ foam.CLASS({
     {
       name: '__subSubContext__',
       factory: function() { return this.__subContext__; }
-    }
+    },
+    'keyMap_'
   ],
 
   methods: [
@@ -656,10 +667,76 @@ foam.CLASS({
     },
 
     function initE() {
+      this.initKeyboardShortcuts();
       /*
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function evtToCharCode(evt) {
+      /* Maps an event keycode to a string */
+      var s = '';
+      if ( evt.altKey   ) s += 'alt-';
+      if ( evt.ctrlKey  ) s += 'ctrl-';
+      if ( evt.shiftKey && evt.type === 'keydown' ) s += 'shift-';
+      if ( evt.metaKey  ) s += 'meta-';
+      s += evt.type === 'keydown' ?
+          this.NAMED_CODES[evt.which] || String.fromCharCode(evt.which) :
+          String.fromCharCode(evt.charCode);
+      return s;
+    },
+
+    function initKeyMap_(keyMap, cls) {
+      var count = 0;
+
+      var as = cls.getAxiomsByClass(foam.core.Action);
+
+      for ( var i = 0 ; i < as.length ; i++ ) {
+        var a = as[i];
+
+        for ( var j = 0 ; j < a.keyboardShortcuts.length ; j++, count++ ) {
+          var key = a.keyboardShortcuts[j];
+
+          // First, lookup named codes, then convert numbers to char codes,
+          // otherwise, assume we have a single character string treated as
+          // a character to be recognized.
+          if ( this.NAMED_CODES[key] ) {
+            key = this.NAMED_CODES[key];
+          } else if ( typeof key === 'number' ) {
+            key = String.fromCharCode(key);
+          }
+
+          keyMap[key] = a.maybeCall.bind(a, this.__subContext__, this);
+          /*
+          keyMap[key] = opt_value ?
+            function() { a.maybeCall(this.__subContext__, opt_value.get()); } :
+            a.maybeCall.bind(action, self.X, self) ;
+          */
+        }
+      }
+
+      return count;
+    },
+    
+    function initKeyboardShortcuts() {
+      /* Initializes keyboard shortcuts. */
+      var keyMap = {}
+      var count = this.initKeyMap_(keyMap, this.cls_);
+
+      //      if ( this.of ) count += this.initKeyMap_(keyMap, this.of);
+
+      if ( count ) {
+        this.keyMap_ = keyMap;
+        var target = this.parentNode || this;
+
+        // Ensure that target is focusable, and therefore will capture keydown
+        // and keypress events.
+        target.setAttribute('tabindex', target.tabIndex || 1);
+
+        target.on('keydown',  this.onKeyboardShortcut);
+        target.on('keypress', this.onKeyboardShortcut);
+      }
     },
 
     function el() {
@@ -1573,6 +1650,26 @@ foam.CLASS({
       }
 
       out('>');
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onKeyboardShortcut',
+      documentation: function() {/*
+          Automatic mapping of keyboard events to $$DOC{ref:'Action'} trigger.
+          To handle keyboard shortcuts, create and attach $$DOC{ref:'Action',usePlural:true}
+          to your $$DOC{ref:'foam.ui.View'}.
+      */},
+      code: function(evt) {
+        if ( evt.type === 'keydown' && ! this.KEYPRESS_CODES[evt.which] ) return;
+        var action = this.keyMap_[this.evtToCharCode(evt)];
+        if ( action ) {
+          action();
+          evt.preventDefault();
+          evt.stopPropagation();
+        }
+      }
     }
   ]
 });
