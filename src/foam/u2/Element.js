@@ -695,7 +695,7 @@ foam.CLASS({
       for ( var i = 0 ; i < as.length ; i++ ) {
         var a = as[i];
 
-        for ( var j = 0 ; j < a.keyboardShortcuts.length ; j++, count++ ) {
+        for ( var j = 0 ; a.keyboardShortcuts && j < a.keyboardShortcuts.length ; j++, count++ ) {
           var key = a.keyboardShortcuts[j];
 
           // First, lookup named codes, then convert numbers to char codes,
