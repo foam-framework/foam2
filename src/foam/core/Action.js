@@ -52,6 +52,10 @@ foam.CLASS({
       name: 'icon'
     },
     {
+      class: 'Array',
+      name: 'keyboardShortcuts'
+    },
+    {
       class: 'String',
       name: 'help'
     },
