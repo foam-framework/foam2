@@ -98,22 +98,38 @@ function reverseMapType(property) {
 }
 
 // Properties and Method arguments are typed things
-function getTypedThing(name, prop, pkg) {
+function getTypedThing(name, prop, pkg, parent) {
   var p = {
     class: mapType(prop.type, prop),
     name: name
   };
 
+  var ofName = pkg + '.' + prop.type;
+  if ( parent.subMessages && parent.subMessages.length ) {
+    for ( var i = 0; i < parent.subMessages.length; i++ ) {
+      if ( parent.subMessages[i].name === prop.type ) {
+        ofName = pkg + '.' + parent.name + '.' + prop.type;
+        break;
+      }
+    }
+  }
+
   // detect class references
   if ( p.class === prop.type ) {
     // no capitalization required, therefore this was already a class name
     p.class = 'foam.core.FObjectProperty';
-    p.of =  pkg + '.' + prop.type;
+    p.of = ofName;
+    p.toJSON = function(value) {
+      return value.toJSON ? value.toJSON() : value;
+    };
   }
 
   if ( prop.repeated ) {
     p.class = 'foam.core.FObjectArray';
-    p.of =  pkg + '.' + prop.type;
+    p.of = ofName;
+    p.toJSON = function(value) {
+      return value.map(function(x) { return x.toJSON ? x.toJSON() : x; });
+    };
   }
   return p;
 }
@@ -134,7 +150,7 @@ function processFields(model, message, pkg) {
     var name = prop.name;
     var camelName = camelize(name);
     var capName = foam.String.capitalize(camelName);
-    var p = getTypedThing(camelName, prop, pkg);
+    var p = getTypedThing(camelName, prop, pkg, message);
 
     if ( p.class === 'foam.core.FObjectArray' ) {
       p.factory = function() { return []; };
@@ -433,13 +449,12 @@ function buildMessage(pkg, message) {
   // Collect any nested entities.
   // Can be nested messages or enums (or options, which we're ignoring).
   if ( message.subMessages && message.subMessages.length ) {
-    newModel.classes = [];
     for ( var i = 0; i < message.subMessages.length; i++ ) {
       var m = message.subMessages[i];
       if ( m.node === 'message' ) {
-        newModel.classes.push(buildMessage(pkg, m));
+        readMessage(pkg + '.' + message.name, m);
       } else if ( m.node === 'enum' ) {
-        newModel.classes.push(buildEnum(m));
+        readEnum(pkg + '.' + message.name, m);
       }
     }
   }
@@ -479,7 +494,12 @@ function buildEnum(enuma) {
         });  // TODO: enumdescription
       }
       return ret;
-    })()
+    })(),
+    methods: [
+      function toJSON() {
+        return this.name;
+      }
+    ]
   };
 }
 
@@ -488,7 +508,7 @@ fs.appendFileSync(outfile, 'goog.provide("proto.gen");\n\n' +
     'var __foam_loaded = false;\n' +
     'function prepareFOAM() {\n' +
     'if (__foam_loaded) return;\n' +
-    '__foam_loaded = true;');
+    '__foam_loaded = true;\n')
 apiToModels(files);
 fs.appendFileSync(outfile, '\n}\n');
 
