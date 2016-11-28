@@ -373,6 +373,540 @@ var FBE = [
       expect(factoryCount).toEqual(0);
     }
   },
+  {
+    name: 'FactoryTest',
+    description: 'Factory is called again if clearProperty() called',
+    dependencies: [ 'Create factory test' ],
+    code: function() {
+      var o = FactoryTest.create();
+      console.log("Run factory: ", o.a);
+      console.log(" factory run count:", factoryCount);
+      o.clearProperty('a');
+      console.log("Again:       ", o.a);
+      console.log(" factory run count:", factoryCount);
+    },
+    postTestCode: function() {
+      expect(factoryCount).toEqual(2);
+    }
+  },
+  {
+    name: 'Property Getters and Setters',
+    description: 'Properties can define their own getter and setter functions',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({
+        name: 'GetterSetter',
+        properties: [
+          'radius',
+          {
+            name: 'diameter',
+            getter: function() {
+              return this.radius * 2;
+            },
+            setter: function(diameter) {
+              this.radius = diameter / 2;
+            }
+          }
+        ]
+      });
+      var o = GetterSetter.create();
+
+      o.diameter = 10;
+      console.log("r:", o.radius, "d:", o.diameter);
+
+      o.radius = 10;
+      console.log("r:", o.radius, "d:", o.diameter);
+
+    },
+    postTestCode: function() {
+      expect(o.diameter).toEqual(20);
+      expect(o.radius).toEqual(10);
+    }
+  },
+  {
+    name: 'Property Adapt',
+    description: 'The adapt function is called on a property value update',
+    dependencies: [ ],
+    code: function() {
+      // Properties can specify an 'adapt' function which is called whenever
+      // the properties' value is updated. It's the adapt function's responsibility
+      // to convert or coerce the type if necessary.
+
+      // Both the previous value of the property and the proposed new value are
+      // passed to adapt.  Adapt returns the desired new value, which may be different
+      // from the newValue it's provided.
+      foam.CLASS({
+        name: 'AdaptTest',
+        properties: [
+          {
+            name: 'flag',
+            adapt: function(oldValue, newValue) {
+              console.log('Adapt old:', oldValue, "to new:", newValue);
+              // adapt to a boolean
+              return !! newValue;
+            }
+          }
+        ]
+      });
+      // adapt called once from the flag:true initializer here
+      var o = AdaptTest.create({ flag: true });
+
+      // adapt called again to adapt null
+      o.flag = null;
+      console.log("Adapted value:", o.flag);
+    },
+    postTestCode: function() {
+      expect(o.flag).toBe(false);
+    }
+  },
+  {
+    name: 'Property preSet',
+    description: 'The preSet function is called on a property update, after adapt',
+    dependencies: [ ],
+    code: function() {
+      // Properties can specify a 'preSet' function which is called whenever
+      // the properties' value is updated, just after 'adapt', if present.
+
+      // Both the previous value of the property and the proposed new value are
+      // passed to preSet.  PreSet returns the desired new value, which may be different
+      // from the newValue it's provided.
+      foam.CLASS({
+        name: 'PreSetTest',
+        properties: [
+          {
+            name: 'a',
+            preSet: function(oldValue, newValue) {
+              console.log('preSet p1');
+              return newValue + "y";
+            }
+          }
+        ]
+      });
+      var o = PreSetTest.create({ a: 'Smith' });
+      console.log(o.a);
+
+      o.a = 'Jones';
+      console.log(o.a);
+    },
+    postTestCode: function() {
+      expect(o.a).toEqual('Jonesy');
+    }
+  },
+  {
+    name: 'Property postSet',
+    description: 'The postSet function is called after a property update',
+    dependencies: [ ],
+    code: function() {
+      // Properties can specify a 'postSet' function which is called after
+      // the properties' value is updated.  PostSet has no return value and
+      // cannot stop the newValue from taking effect, since postSet it is
+      // called after the value has been set.
+      var lastPostSetValue;
+      foam.CLASS({
+        name: 'PostSetTest',
+        properties: [
+          {
+            name: 'a',
+            postSet: function(oldValue, newValue) {
+              console.log('postSet old:', oldValue, "new:", newValue);
+              // this.a will match the newValue, since the set is already
+              // complete
+              lastPostSetValue = this.a;
+            }
+          }
+        ]
+      });
+      var o = PostSetTest.create({ a: 'Smith' });
+      o.a = 'Jones';
+      o.a = 'Green';
+    },
+    postTestCode: function() {
+      expect(lastPostSetValue).toEqual('Green');
+    }
+  },
+  {
+    name: 'Property adapt pre post',
+    description: 'Properties can define adapt, preSet, and postSet all at once',
+    dependencies: [ ],
+    code: function() {
+      var lastPostSetValue;
+      foam.CLASS({
+        name: 'AdaptPrePostTest',
+        properties: [
+          {
+            name: 'a',
+            adapt: function(oldValue, newValue) {
+              console.log('adapt old:', oldValue, 'new:', newValue);
+              return newValue + 1;
+            },
+            preSet: function(oldValue, newValue) {
+              console.log('preSet old:', oldValue, 'new:', newValue);
+              return newValue + 2;
+            },
+            postSet: function(oldValue, newValue) {
+              console.log('postSet old:', oldValue, 'new:', newValue);
+              lastPostSetValue = this.a;
+            }
+          }
+        ]
+      });
+      var o = AdaptPrePostTest.create();
+      o.a = 1;
+      o.a = 10;
+    },
+    postTestCode: function() {
+      expect(lastPostSetValue).toEqual(13);
+    }
+  },
+  {
+    name: 'Create constant test',
+    description: 'Classes can define Constants',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({
+        name: 'ConstantTest',
+        constants: {
+          MEANING_OF_LIFE: 42,
+          FAVOURITE_COLOR: 'green'
+        }
+      });
+      var o = ConstantTest.create();
+      console.log("Constant values:", o.MEANING_OF_LIFE, o.FAVOURITE_COLOR);
+    },
+    postTestCode: function() {
+      expect(o.MEANING_OF_LIFE).toEqual(42);
+      expect(o.FAVOURITE_COLOR).toEqual('green');
+    }
+  },
+  {
+    name: 'Constants Class access',
+    description: 'Constants can also be accessed from the Class',
+    dependencies: [ 'Create constant test' ],
+    code: function() {
+      console.log("ConstantTest constants:", ConstantTest.MEANING_OF_LIFE, ConstantTest.FAVOURITE_COLOR);
+      console.log("o.cls_ constants:", o.cls_.MEANING_OF_LIFE, o.cls_.FAVOURITE_COLOR);
+    },
+    postTestCode: function() {
+      expect(ContantTest.MEANING_OF_LIFE).toEqual(42);
+      expect(ContantTest.FAVOURITE_COLOR).toEqual('green');
+    }
+  },
+  {
+    name: 'Constants are constant',
+    description: 'Constants are constant, and cannot be assigned',
+    dependencies: [ 'Create constant test' ],
+    code: function() {
+      o.MEANING_OF_LIFE = 43;
+      console.log("Constant after setting to 43:", o.MEANING_OF_LIFE);
+    },
+    postTestCode: function() {
+      expect(o.MEANING_OF_LIFE).toEqual(42);
+    }
+  },
+  {
+    name: 'Create Person and Employee',
+    description: 'Classes can be subclassed with extends',
+    dependencies: [ ],
+    code: function() {
+      // Methods in subclasses can override methods from ancestor classes, as is
+      // done below with toString().  Employee.toString() calls its parent classes
+      // toString() method by calling 'this.SUPER()'.
+      foam.CLASS({
+        name: 'Person',
+        properties: [ 'name', 'sex' ],
+        methods: [
+          function toString() { return this.name + ' ' + this.sex; }
+        ]
+      });
+      foam.CLASS({
+        name: 'Employee',
+        extends: 'Person',
+        properties: [ 'salary' ],
+        methods: [
+          function toString() { return this.SUPER() + ' ' + this.salary; }
+        ]
+      });
+      var p = Person.create({name: 'John', sex: 'M'});
+      console.log("Person:", p.toString());
+      var e = Employee.create({name: 'Jane', sex: 'F', salary: 50000});
+      console.log("Employee:", e.toString());
+    },
+    postTestCode: function() {
+      expect(Employee.NAME).not.toBeUndefined();
+      expect(Person.SALARY).toBeUndefined();
+      expect(e.toString()).toEqual('Jane F 50000');
+    }
+  },
+  {
+    name: 'Test SubClass',
+    description: 'Test if one class is a sub-class of another',
+    dependencies: [ 'Create Person and Employee' ],
+    code: function() {
+      console.log("Is Employee a subclass of Person?", Person.isSubClass(Employee));
+      console.log("Is Person a subclass of Employee?", Employee.isSubClass(Person));
+    },
+    postTestCode: function() {
+      expect(Person.isSubClass(Employee)).toBe(true);
+      expect(Employee.isSubClass(Person)).toBe(false);
+    }
+  },
+  {
+    name: 'Test SubClass self',
+    description: 'A Class is considered a sub-class of itself',
+    dependencies: [ 'Create Person and Employee' ],
+    code: function() {
+      console.log("Is Person a subclass of Person?", Person.isSubClass(Person));
+    },
+    postTestCode: function() {
+      expect(Person.isSubClass(Person)).toBe(true);
+    }
+  },
+  {
+    name: 'Test FObject SubClass',
+    description: 'FObject is the root class of all other classes',
+    dependencies: [ 'Create Person and Employee' ],
+    code: function() {
+      console.log("Is Employee an FObject?", foam.core.FObject.isSubClass(Employee));
+      console.log("Is Person an FObject?", foam.core.FObject.isSubClass(Person));
+    },
+    postTestCode: function() {
+      expect(foam.core.FObject.isSubClass(Employee)).toBe(true);
+      expect(foam.core.FObject.isSubClass(Person)).toBe(true);
+    }
+  },
+  {
+    name: 'Test isSubClass and package',
+    description: 'isSubClass() isn\'t confused by classes with the same name in different packages',
+    dependencies: [ 'Create Person and Employee' ],
+    code: function() {
+      foam.CLASS({
+        package: 'com.acme.package',
+        name: 'Person'
+      });
+      // The two Person classes are independent of each other
+      console.log("Is Person a packaged-Person?", com.acme.package.Person.isSubClass(Person));
+      console.log("Is packaged-Person a Person?", Person.isSubClass(com.acme.package.Person));
+    },
+    postTestCode: function() {
+      expect(com.acme.package.Person.isSubClass(Person)).toBe(false);
+      expect(Person.isSubClass(com.acme.package.Person)).toBe(false);
+    }
+  },
+  {
+    name: 'Test isSubClass and interfaces',
+    description: 'isSubClass() works for interfaces',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({
+        package: 'test',
+        name: 'ThingI',
+        methods: [ function foo() { console.log('Called ThingI.foo()'); } ]
+      });
+      foam.CLASS({
+        package: 'test',
+        name: 'C1',
+        implements: [ 'test.ThingI' ]
+      });
+      console.log("Is C1 a ThingI?", test.ThingI.isSubClass(test.C1));
+    },
+    postTestCode: function() {
+      expect(test.ThingI.isSubClass(test.C1)).toBe(true)
+    }
+  },
+  {
+    name: 'Test isSubClass sub interfaces',
+    description: 'isSubClass() works for sub-interfaces',
+    dependencies: [ 'Test isSubClass and interfaces' ],
+    code: function() {
+      foam.CLASS({
+        package: 'test',
+        name: 'Thing2I',
+        implements: [ 'test.ThingI' ]
+      });
+      foam.CLASS({
+        package: 'test',
+        name: 'Thing3I',
+        implements: [ 'test.ThingI' ]
+      });
+      foam.CLASS({
+        package: 'test',
+        name: 'C2',
+        implements: [ 'test.Thing2I' ]
+      });
+      var o = test.C2.create();
+      o.foo();
+
+      console.log("Is C2 a ThingI?", test.ThingI.isSubClass(test.C2));
+      console.log("Is C2 a Thing2I?", test.Thing2I.isSubClass(test.C2));
+      console.log("Is C2 a Thing3I?", test.Thing3I.isSubClass(test.C2));
+    },
+    postTestCode: function() {
+      expect(test.ThingI.isSubClass(test.C2)).toBe(true);
+      expect(test.Thing2I.isSubClass(test.C2)).toBe(true);
+      expect(test.Thing3I.isSubClass(test.C2)).toBe(false);
+    }
+  },
+  {
+    name: 'Test isInstance sub interfaces',
+    description: 'isInstance() works for sub-interfaces',
+    dependencies: [ 'Test isSubClass sub interfaces' ],
+    code: function() {
+      console.log("Is o a ThingI?", test.ThingI.isInstance(o));
+      console.log("Is o a Thing2I?", test.Thing2I.isInstance(o));
+      console.log("Is o a Thing3I?", test.Thing3I.isInstance(o));
+      console.log("Is o a C2?", test.C2.isInstance(o));
+    },
+    postTestCode: function() {
+      expect(test.ThingI.isInstance(o)).toBe(true);
+      expect(test.Thing2I.isInstance(o)).toBe(true);
+      expect(test.Thing3I.isInstance(o)).toBe(false);
+      expect(test.C2.isInstance(o)).toBe(true);
+    }
+  },
+  {
+    name: 'Package imports exports demo',
+    description: 'Package and imports/exports demo',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({
+        package: 'demo.bank',
+        name: 'Account',
+        imports: [ 'reportDeposit' ],
+        properties: [
+          { name: 'id'      },
+          { name: 'status'  },
+          { name: 'balance', value: 0 }
+        ],
+        methods: [
+          {
+            name: "setStatus",
+            code: function (status) {
+              this.status = status;
+            }
+          },
+          {
+            name: "deposit",
+            code: function (amount) {
+              this.balance += amount;
+              this.reportDeposit(this.id, amount, this.balance);
+              console.log('Bank: ', this.__context__.Bank);
+              return this.balance;
+            }
+          },
+          {
+            name: "withdraw",
+            code: function (amount) {
+              this.balance -= amount;
+              return this.balance;
+            }
+          }
+        ]
+      });
+      foam.CLASS({
+        package: 'demo.bank',
+        name: 'SavingsAccount',
+        extends: 'demo.bank.Account',
+        methods: [
+          {
+            name: "withdraw",
+            code: function (amount) {
+              // charge a fee
+              this.balance -= 0.05;
+              return this.SUPER(amount);
+            }
+          }
+        ]
+      });
+      foam.CLASS({
+        package: 'demo.bank',
+        name: 'AccountTester',
+        requires: [
+          'demo.bank.Account as A',
+          'demo.bank.SavingsAccount'
+        ],
+        imports: [ 'log as l' ],
+        exports: [
+          'reportDeposit',
+          'as Bank' // exports 'this'
+        ],
+        methods: [
+          function reportDeposit(id, amount, bal) {
+            this.l('Deposit: ', id, amount, bal);
+          },
+          function test() {
+            var a = this.A.create({id: 42});
+            a.setStatus(true);
+            a.deposit(100);
+            a.withdraw(10);
+            a.describe();
+            var s = this.SavingsAccount.create({id: 43});
+            s.setStatus(true);
+            s.deposit(100);
+            s.withdraw(10);
+            s.describe();
+          }
+        ]
+      });
+      var a = demo.bank.AccountTester.create(null);
+      a.test();
+    },
+    postTestCode: function() {
+      expect(a.balance).toEqual(90);
+      expect(s.balance).toEqual(89.95);
+    }
+  },
+  {
+    name: 'Class Refinement',
+    description: 'Refinement upgrades the existing class rather than create a new sub-class',
+    dependencies: [ 'Create Person and Employee' ],
+    code: function() {
+      // In addition to being extended, a Class can also be refined.
+      // Refinement upgrades the existing class rather than create a
+      // new sub-class. In the following example we add 'salary' to
+      // the person class, rather than creating a new Employee sub-class.
+      foam.CLASS({
+        refines: 'Person',
+        properties: [ { class: 'Float', name: 'salary', value: 0 } ],
+        methods: [
+          function toString() { return this.name + ' ' + this.sex + ' ' + this.salary; }
+        ]
+      });
+      var n = Person.create({name: 'Bob', sex: 'M', salary: 40000});
+      console.log("New person after refinement:", n.toString());
+      // The already created person, John, now has a salary too!
+      console.log("Old person after refinement:", p.toString());
+    },
+    postTestCode: function() {
+      expect(Person.SALARY).not.toBeUndefined();
+      expect(n.salary).toEqual(40000);
+      expect(p.salary).toEqual(0);
+    }
+  },
+  {
+    name: 'Refine a Property',
+    description: 'Properties in classes can be changed in a refinement',
+    dependencies: [ 'Class Refinement' ],
+    code: function() {
+      console.log("Old type of Person.salary:", Person.SALARY.cls_.name);
+
+      // Change the salary property type, add a default value
+      foam.CLASS({
+        refines: 'Person',
+        properties: [ { name: 'salary', value: 30000 } ]
+      });
+
+      console.log("New type of Person.salary:", Person.SALARY.cls_.name);
+
+      var o = Person.create({name:'John'});
+      console.log("Now with default value:", o.salary);
+      console.log("And original person gets the default too:", p.salary);
+    },
+    postTestCode: function() {
+      expect(o.salary).toEqual(30000);
+      expect(p.salary).toEqual(30000);
+      expect(Person.SALARY.cls_).toBe(foam.core.Property);
+    }
+  },
 
   {
     name: '',
@@ -392,328 +926,9 @@ var FBE = FBE.map(function(def) {
 });
 
 
-// // Factory called again if clearProperty() called:
-// var o = FactoryTest.create();
-// log(o.a);
-// o.clearProperty('a');
-// log(o.a);
 
-// // getters and setters
-// // Properties can define their own getter and setter functions.
-// foam.CLASS({
-//   name: 'GetterSetter',
-//   properties: [
-//     'radius',
-//     {
-//       name: 'diameter',
-//       getter: function() { return this.radius * 2; },
-//       setter: function(diameter) { this.radius = diameter / 2; }
-//     }
-//   ]
-// });
-// var o = GetterSetter.create();
-// o.diameter = 10;
-// log(o.radius, o.diameter);
-// o.radius = 10;
-// log(o.radius, o.diameter);
 
-// // Properties can specify an 'adapt' function which is called whenever
-// // the properties' value is updated. It's the adapt function's responsibility
-// // to convert or coerce the type if necessary.
-// // Both the previous value of the property and the proposed new value are
-// // passed to adapt.  Adapt returns the desired new value, which may be different
-// // from the newValue it's provided.
-// foam.CLASS({
-//   name: 'AdaptTest',
-//   properties: [
-//     {
-//       name: 'flag',
-//       adapt: function(oldValue, newValue) {
-//         log('adapt ', oldValue, newValue);
-//         // adapt to a boolean
-//         return !! newValue;
-//       }
-//     }
-//   ]
-// });
-// var o = AdaptTest.create({flag:true});
-// o.flag = null;
-// log(o.flag);
 
-// // Properties can specify a 'preSet' function which is called whenever
-// // the properties' value is updated, just after 'adpat', if present.
-// // Both the previous value of the property and the proposed new value are
-// // passed to preSet.  PreSet returns the desired new value, which may be different
-// // from the newValue it's provided.
-// foam.CLASS({
-//   name: 'PreSetTest',
-//   properties: [
-//     {
-//       name: 'a',
-//       preSet: function(oldValue, newValue) {
-//         log('preSet p1');
-//         return 'Mr. ' + newValue;
-//       }
-//     }
-//   ]
-// });
-// var o = PreSetTest.create({a: 'Smith'});
-// o.a = 'Jones';
-// log(o.a);
-
-// // Properties can specify a 'postSet' function which is called after
-// // the properties' value is updated.  PostSet has no return value.
-// foam.CLASS({
-//   name: 'PostSetTest',
-//   properties: [
-//     {
-//       name: 'a',
-//       postSet: function(oldValue, newValue) {
-//         log('postSet', oldValue, newValue);
-//       }
-//     }
-//   ]
-// });
-// var o = PostSetTest.create({a: 'Smith'});
-// o.a = 'Jones';
-// o.a = 'Green';
-
-// // Properties can define 'adapt', 'preSet', and 'postSet' all at once.
-// foam.CLASS({
-//   name: 'AdaptPrePostTest',
-//   properties: [
-//     {
-//       name: 'a',
-//       adapt: function(oldValue, newValue) {
-//         log('adapt: ', oldValue, newValue);
-//         return newValue + 1;
-//       },
-//       preSet: function(oldValue, newValue) {
-//         log('preSet: ', oldValue, newValue);
-//         return newValue + 1;
-//       },
-//       postSet: function(oldValue, newValue) {
-//         log('postSet: ', oldValue, newValue);
-//       }
-//     }
-//   ]
-// });
-// var o = AdaptPrePostTest.create();
-// o.a = 1;
-// o.a = 10;
-
-// // Classes can also define Constnts.
-// foam.CLASS({
-//   name: 'ConstantTest',
-//   constants: {
-//     MEANING_OF_LIFE: 42,
-//     FAVOURITE_COLOR: 'green'
-//   }
-// });
-// var o = ConstantTest.create();
-// log(o.MEANING_OF_LIFE, o.FAVOURITE_COLOR);
-
-// // Constants can also be accessed from the Class
-// log(ConstantTest.MEANING_OF_LIFE, ConstantTest.FAVOURITE_COLOR);
-// log(o.cls_.MEANING_OF_LIFE, o.cls_.FAVOURITE_COLOR);
-
-// // Constants are constant
-// o.MEANING_OF_LIFE = 43;
-// log(o.MEANING_OF_LIFE);
-
-// // Classes can be subclassed with 'extends:'.
-// // Methods in subclasses can override methods from ancestor classes, as is
-// // done below with toString().  Employee.toString() calls its parent classes
-// // toString() method by calling 'this.SUPER()'.
-// foam.CLASS({
-//   name: 'Person',
-//   properties: [ 'name', 'sex' ],
-//   methods: [
-//     function toString() { return this.name + ' ' + this.sex; }
-//   ]
-// });
-// foam.CLASS({
-//   name: 'Employee',
-//   extends: 'Person',
-//   properties: [ 'salary' ],
-//   methods: [
-//     function toString() { return this.SUPER() + ' ' + this.salary; }
-//   ]
-// });
-// var p = Person.create({name: 'John', sex: 'M'});
-// log(p.toString());
-// var e = Employee.create({name: 'Jane', sex: 'F', salary: 50000});
-// log(e.toString());
-
-// // Test if one class is a sub-class of another:
-// log(Person.isSubClass(Employee), Employee.isSubClass(Person));
-
-// // A Class is considered a sub-class of itself:
-// log(Person.isSubClass(Person));
-
-// // FObject is the root class of all other classes:
-// log(foam.core.FObject.isSubClass(Employee), foam.core.FObject.isSubClass(Person));
-
-// // isSubClass() isn't confused by classes with the same name in different packages
-// foam.CLASS({
-//   package: 'com.acme.package',
-//   name: 'Person'
-// });
-// log(com.acme.package.Person.isSubClass(Person));
-// log(Person.isSubClass(com.acme.package.Person));
-
-// // isSubClass() works for interfaces
-// foam.CLASS({
-//   package: 'test',
-//   name: 'ThingI',
-//   methods: [ function foo() { log('foo'); } ]
-// });
-// foam.CLASS({
-//   package: 'test',
-//   name: 'C1',
-//   implements: [ 'test.ThingI' ]
-// });
-// log(test.ThingI.isSubClass(test.C1));
-
-// // isSubClass() works for sub-interfaces
-// foam.CLASS({
-//   package: 'test',
-//   name: 'Thing2I',
-//   implements: [ 'test.ThingI' ]
-// });
-// foam.CLASS({
-//   package: 'test',
-//   name: 'Thing3I',
-//   implements: [ 'test.ThingI' ]
-// });
-// foam.CLASS({
-//   package: 'test',
-//   name: 'C2',
-//   implements: [ 'test.Thing2I' ]
-// });
-// var o = test.C2.create();
-// o.foo();
-// log(test.ThingI.isSubClass(test.C2));
-// log(test.Thing2I.isSubClass(test.C2));
-// log(test.Thing3I.isSubClass(test.C2));
-
-// // Larger package and imports/exports demo.
-// foam.CLASS({
-//   package: 'demo.bank',
-//   name: 'Account',
-//   imports: [ 'reportDeposit' ],
-//   properties: [
-//     { name: 'id'      },
-//     { name: 'status'  },
-//     { name: 'balance', value: 0 }
-//   ],
-//   methods: [
-//     {
-//       name: "setStatus",
-//       code: function (status) {
-//         this.status = status;
-//       }
-//     },
-//     {
-//       name: "deposit",
-//       code: function (amount) {
-//         this.balance += amount;
-//         this.reportDeposit(this.id, amount, this.balance);
-//         console.log('Bank: ', this.__context__.Bank);
-//         return this.balance;
-//       }
-//     },
-//     {
-//       name: "withdraw",
-//       code: function (amount) {
-//         this.balance -= amount;
-//         return this.balance;
-//       }
-//     }
-//   ]
-// });
-// foam.CLASS({
-//   package: 'demo.bank',
-//   name: 'SavingsAccount',
-//   extends: 'demo.bank.Account',
-//   methods: [
-//     {
-//       name: "withdraw",
-//       code: function (amount) {
-//         // charge a fee
-//         this.balance -= 0.05;
-//         return this.SUPER(amount);
-//       }
-//     }
-//   ]
-// });
-// foam.CLASS({
-//   package: 'demo.bank',
-//   name: 'AccountTester',
-//   requires: [
-//     'demo.bank.Account as A',
-//     'demo.bank.SavingsAccount'
-//   ],
-//   imports: [ 'log as l' ],
-//   exports: [
-//     'reportDeposit',
-//     'as Bank' // exports 'this'
-//   ],
-//   methods: [
-//     function reportDeposit(id, amount, bal) {
-//       this.l('Deposit: ', id, amount, bal);
-//     },
-//     function test() {
-//       var a = this.A.create({id: 42});
-//       a.setStatus(true);
-//       a.deposit(100);
-//       a.withdraw(10);
-//       a.describe();
-//       var s = this.SavingsAccount.create({id: 43});
-//       s.setStatus(true);
-//       s.deposit(100);
-//       s.withdraw(10);
-//       s.describe();
-//     }
-//   ]
-// });
-// var a = demo.bank.AccountTester.create(null);
-// a.test();
-
-// // In addition to being extended, a Class can also be refined.
-// // Refinement upgrades the existing class rather than create a
-// // new sub-class. In the following example we add 'salary' to
-// // the person class, rather than creating a new Employee sub-class.
-// foam.CLASS({
-//   name: 'Person',
-//   properties: [ 'name', 'sex' ],
-//   methods: [
-//     function toString() { return this.name + ' ' + this.sex; }
-//   ]
-// });
-// var oldPerson = Person.create({name: 'John', sex: 'M'});
-// log(oldPerson.toString());
-// foam.CLASS({
-//   refines: 'Person',
-//   properties: [ { class: 'Float', name: 'salary', value: 0 } ],
-//   methods: [
-//     function toString() { return this.name + ' ' + this.sex + ' ' + this.salary; }
-//   ]
-// });
-// Person.describe();
-// var e = Person.create({name: 'Jane', sex: 'F', salary: 50000});
-// log(e.toString());
-// log(oldPerson.toString());
-
-// // Refine a Property
-// log(Person.SALARY.cls_.name);
-// foam.CLASS({
-//   refines: 'Person',
-//   properties: [ { name: 'salary', value: 30000 } ]
-// });
-// log(Person.SALARY.cls_.name);
-// var o = Person.create({name:'John'});
-// log(o.salary);
 
 // // Currently unsupported and unlikely to be supported.
 // // Refine a Property Class
@@ -1616,7 +1831,10 @@ var FBE = FBE.map(function(def) {
 // log(com.acme.Test.id);
 
 // // In addition the the built-in Axiom types, you can also
-// // specify arbitrary Axioms with axioms:
+// // specify arbitrary Axioms with 'axioms:'.
+// // This example adds the 'Singleton' axiom to make a class
+// // implement the Singleton patter (ie. there can only be
+// // one instance)
 // foam.CLASS({
 //   name: 'AxiomTest',
 //   axioms: [ foam.pattern.Singleton.create() ],
@@ -1636,6 +1854,20 @@ var FBE = FBE.map(function(def) {
 // AxiomSubTest.create();
 // log(AxiomSubTest.create() === AxiomSubTest.create());
 // log(AxiomSubTest.create() === AxiomTest.create());
+
+// // Or add the Multion axiom to implement the Multiton pattern.
+// foam.CLASS({
+//   name: 'Color',
+//   axioms: [ foam.pattern.Multiton.create({property: 'color'}) ],
+//   properties: [ 'color' ],
+//   methods: [ function init() { log('Creating Color:', this.color); } ]
+// });
+// var red1 = Color.create({color: 'red'});
+// var red2 = Color.create({color: 'red'});
+// var blue = Color.create({color: 'blue'});
+// log(red1 === red2);
+// log(red1 === blue);
+
 
 // // Stdlib
 
