@@ -43,7 +43,7 @@ var FBE = [
       });
     },
     postTestCode: function() {
-      expect(Test).not.toBeUndefined();
+      //toBeAssertedThat(Test).not.toBeUndefined();
     }
   },
   {
@@ -66,8 +66,8 @@ var FBE = [
       console.log('a: ' + o.a + ', b: ' + o.b);
     },
     postTestCode: function() {
-      expect(o.a).toBeUndefined();
-      expect(o.b).toBeUndefined();
+      //toBeAssertedThat(o.a).toBeUndefined();
+      //toBeAssertedThat(o.b).toBeUndefined();
     }
   },
   {
@@ -80,8 +80,8 @@ var FBE = [
       console.log('a: ' + o.a + ', b: ' + o.b);
     },
     postTestCode: function() {
-      expect(o.a).toEqual(3);
-      expect(o.b).toEqual('hello');
+      //toBeAssertedThat(o.a).toEqual(3);
+      //toBeAssertedThat(o.b).toEqual('hello');
     }
   },
   {
@@ -92,7 +92,7 @@ var FBE = [
       console.log("Class object:", o.cls_);
     },
     postTestCode: function() {
-      expect(o.cls_.name).toEqual('Test');
+      //toBeAssertedThat(o.cls_.name).toEqual('Test');
     }
   },
   {
@@ -104,8 +104,8 @@ var FBE = [
       console.log('Test.isInstance("foo")?', Test.isInstance("Test"));
     },
     postTestCode: function() {
-      expect(Test.isInstance(o)).toBe(true);
-      expect(Test.isInstance("Test")).toBe(false);
+      //toBeAssertedThat(Test.isInstance(o)).toBe(true);
+      //toBeAssertedThat(Test.isInstance("Test")).toBe(false);
     }
   },
   {
@@ -116,8 +116,8 @@ var FBE = [
       console.log("Methods return: ", o.f1(), o.f2());
     },
     postTestCode: function() {
-      expect(o.f1()).toEqual(1);
-      expect(o.f2()).toEqual(2);
+      //toBeAssertedThat(o.f1()).toEqual(1);
+      //toBeAssertedThat(o.f2()).toEqual(2);
     }
   },
   {
@@ -130,8 +130,8 @@ var FBE = [
       console.log('New values: a: ' + o.a + ', b: ' + o.b);
     },
     postTestCode: function() {
-      expect(o.a).toEqual(4);
-      expect(o.b).toEqual('bye');
+      //toBeAssertedThat(o.a).toEqual(4);
+      //toBeAssertedThat(o.b).toEqual('bye');
     }
   },
   {
@@ -143,8 +143,8 @@ var FBE = [
       console.log('New values: a: ' + o.a + ', b: ' + o.b);
     },
     postTestCode: function() {
-      expect(o.a).toEqual(42);
-      expect(o.b).toEqual('rosebud');
+      //toBeAssertedThat(o.a).toEqual(42);
+      //toBeAssertedThat(o.b).toEqual('rosebud');
     }
   },
   {
@@ -155,7 +155,7 @@ var FBE = [
       console.log("toString:", o.toString());
     },
     postTestCode: function() {
-      expect(o.toString()).toEqual('Test');
+      //toBeAssertedThat(o.toString()).toEqual('Test');
     }
   },
   {
@@ -179,7 +179,7 @@ var FBE = [
     },
     postTestCode: function() {
       // TODO: improve this, maybe search for some that should be present
-      expect(Test.getAxioms().length).toBeGreaterThan(4);
+      //toBeAssertedThat(Test.getAxioms().length).toBeGreaterThan(4);
     }
   },
   {
@@ -214,7 +214,7 @@ var FBE = [
       foam.core.Method.CODE.describe();
     },
     postTestCode: function() {
-      expect(foam.core.Method.CODE.name).toEqual("code");
+      //toBeAssertedThat(foam.core.Method.CODE.name).toEqual("code");
     }
   },
   {
@@ -231,7 +231,7 @@ var FBE = [
       );
     },
     postTestCode: function() {
-      expect(foam.core.Method.NAME.f).not.toBeUndefined();
+      //toBeAssertedThat(foam.core.Method.NAME.f).not.toBeUndefined();
     }
   },
   {
@@ -266,7 +266,7 @@ var FBE = [
       console.log("Initialized value:", o.a);
     },
     postTestCode: function() {
-      expect(o.a).toEqual('just born!');
+      //toBeAssertedThat(o.a).toEqual('just born!');
     }
   },
   {
@@ -286,9 +286,9 @@ var FBE = [
       console.log("Values:", o.a, o.b, o.c);
     },
     postTestCode: function() {
-      expect(o.a).toEqual(42);
-      expect(o.b).toEqual('foo');
-      expect(o.c).toBeUndefined();
+      //toBeAssertedThat(o.a).toEqual(42);
+      //toBeAssertedThat(o.b).toEqual('foo');
+      //toBeAssertedThat(o.c).toBeUndefined();
     }
   },
   {
@@ -302,9 +302,9 @@ var FBE = [
       console.log("After setting a, c:", o.hasOwnProperty('a'), o.hasOwnProperty('b'), o.hasOwnProperty('c'));
     },
     postTestCode: function() {
-      expect(o.hasOwnProperty('a')).toBe(true);
-      expect(o.hasOwnProperty('b')).toBe(false);
-      expect(o.hasOwnProperty('c')).toBe(true);
+      //toBeAssertedThat(o.hasOwnProperty('a')).toBe(true);
+      //toBeAssertedThat(o.hasOwnProperty('b')).toBe(false);
+      //toBeAssertedThat(o.hasOwnProperty('c')).toBe(true);
     }
   },
   {
@@ -317,8 +317,8 @@ var FBE = [
       console.log("After clearing:", o.hasOwnProperty('a'), o.a);
     },
     postTestCode: function() {
-      expect(o.hasOwnProperty('a')).toBe(false);
-      expect(o.a).toEqual(42);
+      //toBeAssertedThat(o.hasOwnProperty('a')).toBe(false);
+      //toBeAssertedThat(o.a).toEqual(42);
     }
   },
   {
@@ -352,7 +352,7 @@ var FBE = [
       console.log("Again:", o.a, " factory run count:", factoryCount);
     },
     postTestCode: function() {
-      expect(factoryCount).toEqual(1);
+      //toBeAssertedThat(factoryCount).toEqual(1);
     }
   },
   {
@@ -370,7 +370,7 @@ var FBE = [
       console.log("Value:", o.a, " factory run count:", factoryCount);
     },
     postTestCode: function() {
-      expect(factoryCount).toEqual(0);
+      //toBeAssertedThat(factoryCount).toEqual(0);
     }
   },
   {
@@ -386,7 +386,7 @@ var FBE = [
       console.log(" factory run count:", factoryCount);
     },
     postTestCode: function() {
-      expect(factoryCount).toEqual(2);
+      //toBeAssertedThat(factoryCount).toEqual(2);
     }
   },
   {
@@ -419,8 +419,8 @@ var FBE = [
 
     },
     postTestCode: function() {
-      expect(o.diameter).toEqual(20);
-      expect(o.radius).toEqual(10);
+      //toBeAssertedThat(o.diameter).toEqual(20);
+      //toBeAssertedThat(o.radius).toEqual(10);
     }
   },
   {
@@ -456,7 +456,7 @@ var FBE = [
       console.log("Adapted value:", o.flag);
     },
     postTestCode: function() {
-      expect(o.flag).toBe(false);
+      //toBeAssertedThat(o.flag).toBe(false);
     }
   },
   {
@@ -489,7 +489,7 @@ var FBE = [
       console.log(o.a);
     },
     postTestCode: function() {
-      expect(o.a).toEqual('Jonesy');
+      //toBeAssertedThat(o.a).toEqual('Jonesy');
     }
   },
   {
@@ -521,7 +521,7 @@ var FBE = [
       o.a = 'Green';
     },
     postTestCode: function() {
-      expect(lastPostSetValue).toEqual('Green');
+      //toBeAssertedThat(lastPostSetValue).toEqual('Green');
     }
   },
   {
@@ -555,7 +555,7 @@ var FBE = [
       o.a = 10;
     },
     postTestCode: function() {
-      expect(lastPostSetValue).toEqual(13);
+      //toBeAssertedThat(lastPostSetValue).toEqual(13);
     }
   },
   {
@@ -574,8 +574,8 @@ var FBE = [
       console.log("Constant values:", o.MEANING_OF_LIFE, o.FAVOURITE_COLOR);
     },
     postTestCode: function() {
-      expect(o.MEANING_OF_LIFE).toEqual(42);
-      expect(o.FAVOURITE_COLOR).toEqual('green');
+      //toBeAssertedThat(o.MEANING_OF_LIFE).toEqual(42);
+      //toBeAssertedThat(o.FAVOURITE_COLOR).toEqual('green');
     }
   },
   {
@@ -587,8 +587,8 @@ var FBE = [
       console.log("o.cls_ constants:", o.cls_.MEANING_OF_LIFE, o.cls_.FAVOURITE_COLOR);
     },
     postTestCode: function() {
-      expect(ContantTest.MEANING_OF_LIFE).toEqual(42);
-      expect(ContantTest.FAVOURITE_COLOR).toEqual('green');
+      //toBeAssertedThat(ContantTest.MEANING_OF_LIFE).toEqual(42);
+      //toBeAssertedThat(ContantTest.FAVOURITE_COLOR).toEqual('green');
     }
   },
   {
@@ -600,7 +600,7 @@ var FBE = [
       console.log("Constant after setting to 43:", o.MEANING_OF_LIFE);
     },
     postTestCode: function() {
-      expect(o.MEANING_OF_LIFE).toEqual(42);
+      //toBeAssertedThat(o.MEANING_OF_LIFE).toEqual(42);
     }
   },
   {
@@ -632,9 +632,9 @@ var FBE = [
       console.log("Employee:", e.toString());
     },
     postTestCode: function() {
-      expect(Employee.NAME).not.toBeUndefined();
-      expect(Person.SALARY).toBeUndefined();
-      expect(e.toString()).toEqual('Jane F 50000');
+      //toBeAssertedThat(Employee.NAME).not.toBeUndefined();
+      //toBeAssertedThat(Person.SALARY).toBeUndefined();
+      //toBeAssertedThat(e.toString()).toEqual('Jane F 50000');
     }
   },
   {
@@ -646,8 +646,8 @@ var FBE = [
       console.log("Is Person a subclass of Employee?", Employee.isSubClass(Person));
     },
     postTestCode: function() {
-      expect(Person.isSubClass(Employee)).toBe(true);
-      expect(Employee.isSubClass(Person)).toBe(false);
+      //toBeAssertedThat(Person.isSubClass(Employee)).toBe(true);
+      //toBeAssertedThat(Employee.isSubClass(Person)).toBe(false);
     }
   },
   {
@@ -658,7 +658,7 @@ var FBE = [
       console.log("Is Person a subclass of Person?", Person.isSubClass(Person));
     },
     postTestCode: function() {
-      expect(Person.isSubClass(Person)).toBe(true);
+      //toBeAssertedThat(Person.isSubClass(Person)).toBe(true);
     }
   },
   {
@@ -670,8 +670,8 @@ var FBE = [
       console.log("Is Person an FObject?", foam.core.FObject.isSubClass(Person));
     },
     postTestCode: function() {
-      expect(foam.core.FObject.isSubClass(Employee)).toBe(true);
-      expect(foam.core.FObject.isSubClass(Person)).toBe(true);
+      //toBeAssertedThat(foam.core.FObject.isSubClass(Employee)).toBe(true);
+      //toBeAssertedThat(foam.core.FObject.isSubClass(Person)).toBe(true);
     }
   },
   {
@@ -688,8 +688,8 @@ var FBE = [
       console.log("Is packaged-Person a Person?", Person.isSubClass(com.acme.package.Person));
     },
     postTestCode: function() {
-      expect(com.acme.package.Person.isSubClass(Person)).toBe(false);
-      expect(Person.isSubClass(com.acme.package.Person)).toBe(false);
+      //toBeAssertedThat(com.acme.package.Person.isSubClass(Person)).toBe(false);
+      //toBeAssertedThat(Person.isSubClass(com.acme.package.Person)).toBe(false);
     }
   },
   {
@@ -710,7 +710,7 @@ var FBE = [
       console.log("Is C1 a ThingI?", test.ThingI.isSubClass(test.C1));
     },
     postTestCode: function() {
-      expect(test.ThingI.isSubClass(test.C1)).toBe(true)
+      //toBeAssertedThat(test.ThingI.isSubClass(test.C1)).toBe(true)
     }
   },
   {
@@ -741,9 +741,9 @@ var FBE = [
       console.log("Is C2 a Thing3I?", test.Thing3I.isSubClass(test.C2));
     },
     postTestCode: function() {
-      expect(test.ThingI.isSubClass(test.C2)).toBe(true);
-      expect(test.Thing2I.isSubClass(test.C2)).toBe(true);
-      expect(test.Thing3I.isSubClass(test.C2)).toBe(false);
+      //toBeAssertedThat(test.ThingI.isSubClass(test.C2)).toBe(true);
+      //toBeAssertedThat(test.Thing2I.isSubClass(test.C2)).toBe(true);
+      //toBeAssertedThat(test.Thing3I.isSubClass(test.C2)).toBe(false);
     }
   },
   {
@@ -757,10 +757,10 @@ var FBE = [
       console.log("Is o a C2?", test.C2.isInstance(o));
     },
     postTestCode: function() {
-      expect(test.ThingI.isInstance(o)).toBe(true);
-      expect(test.Thing2I.isInstance(o)).toBe(true);
-      expect(test.Thing3I.isInstance(o)).toBe(false);
-      expect(test.C2.isInstance(o)).toBe(true);
+      //toBeAssertedThat(test.ThingI.isInstance(o)).toBe(true);
+      //toBeAssertedThat(test.Thing2I.isInstance(o)).toBe(true);
+      //toBeAssertedThat(test.Thing3I.isInstance(o)).toBe(false);
+      //toBeAssertedThat(test.C2.isInstance(o)).toBe(true);
     }
   },
   {
@@ -851,8 +851,8 @@ var FBE = [
       a.test();
     },
     postTestCode: function() {
-      expect(a.balance).toEqual(90);
-      expect(s.balance).toEqual(89.95);
+      //toBeAssertedThat(a.balance).toEqual(90);
+      //toBeAssertedThat(s.balance).toEqual(89.95);
     }
   },
   {
@@ -877,9 +877,9 @@ var FBE = [
       console.log("Old person after refinement:", p.toString());
     },
     postTestCode: function() {
-      expect(Person.SALARY).not.toBeUndefined();
-      expect(n.salary).toEqual(40000);
-      expect(p.salary).toEqual(0);
+      //toBeAssertedThat(Person.SALARY).not.toBeUndefined();
+      //toBeAssertedThat(n.salary).toEqual(40000);
+      //toBeAssertedThat(p.salary).toEqual(0);
     }
   },
   {
@@ -902,9 +902,9 @@ var FBE = [
       console.log("And original person gets the default too:", p.salary);
     },
     postTestCode: function() {
-      expect(o.salary).toEqual(30000);
-      expect(p.salary).toEqual(30000);
-      expect(Person.SALARY.cls_).toBe(foam.core.Property);
+      //toBeAssertedThat(o.salary).toEqual(30000);
+      //toBeAssertedThat(p.salary).toEqual(30000);
+      //toBeAssertedThat(Person.SALARY.cls_).toBe(foam.core.Property);
     }
   },
   {
@@ -923,7 +923,7 @@ var FBE = [
       console.log("Emp.salary refined:", Emp.create().salary);
     },
     postTestCode: function() {
-      expect(Emp.create().salary).toEqual(0);
+      //toBeAssertedThat(Emp.create().salary).toEqual(0);
     }
   },
   {
@@ -938,7 +938,7 @@ var FBE = [
       console.log(Emp.SALARY.javaClass);
     },
     postTestCode: function() {
-      expect(Emp.SALARY.javaClass).toEqual('Float');
+      //toBeAssertedThat(Emp.SALARY.javaClass).toEqual('Float');
     }
   },
   {
@@ -954,8 +954,8 @@ var FBE = [
       console.log('Refined: super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
     },
     postTestCode: function() {
-      expect(SuperClass.create().p1).toEqual(42);
-      expect(SubClass.create().p1).toBeUndefined();
+      //toBeAssertedThat(SuperClass.create().p1).toEqual(42);
+      //toBeAssertedThat(SubClass.create().p1).toBeUndefined();
     }
   },
   {
@@ -975,9 +975,9 @@ var FBE = [
       console.log('Refined: super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
     },
     postTestCode: function() {
-      expect(SuperClass.create().p1).toEqual(42);
-      expect(MidClass.create().p1).toEqual(42);
-      expect(SubClass.create().p1).toBeUndefined();
+      //toBeAssertedThat(SuperClass.create().p1).toEqual(42);
+      //toBeAssertedThat(MidClass.create().p1).toEqual(42);
+      //toBeAssertedThat(SubClass.create().p1).toBeUndefined();
     }
   },
   {
@@ -1010,8 +1010,8 @@ var FBE = [
       o.l1();
     },
     postTestCode: function() {
-      expect(o.m1()).toEqual('M1Steve');
-      expect(o.l1()).toEqual('L1Steve');
+      //toBeAssertedThat(o.m1()).toEqual('M1Steve');
+      //toBeAssertedThat(o.l1()).toEqual('L1Steve');
     }
   },
   {
@@ -1027,8 +1027,8 @@ var FBE = [
       l();
     },
     postTestCode: function() {
-      expect(o.m1()).toEqual('M1');
-      expect(o.l1()).toEqual('L1Steve');
+      //toBeAssertedThat(o.m1()).toEqual('M1');
+      //toBeAssertedThat(o.l1()).toEqual('L1Steve');
     }
   },
   {
@@ -1050,9 +1050,9 @@ var FBE = [
       MergedAndFramedTest.create();
     },
     postTestCode: function() {
-      expect(function() {
-        MergedAndFramedTest.create();
-      }).toThrow();
+      //toBeAssertedThat(function() {
+      //  MergedAndFramedTest.create();
+      //}).toThrow();
     }
   },
   {
@@ -1103,7 +1103,7 @@ var FBE = [
       });
     },
     postTestCode: function() {
-      expect(mergedCalls).toEqual(1);
+      //toBeAssertedThat(mergedCalls).toEqual(1);
     }
   },
   {
@@ -1140,7 +1140,7 @@ var FBE = [
       });
     },
     postTestCode: function() {
-      expect(framedCalls).toEqual(1);
+      //toBeAssertedThat(framedCalls).toEqual(1);
     }
   },
   {
@@ -1172,7 +1172,7 @@ var FBE = [
 
     },
     postTestCode: function() {
-      expect(callOrder).toEqual('l2l2l1l1');
+      //toBeAssertedThat(callOrder).toEqual('l2l2l1l1');
     }
   },
   {
@@ -1200,7 +1200,7 @@ var FBE = [
       });
     },
     postTestCode: function() {
-      expect(callOrder).toEqual('d2d2d1d1');
+      //toBeAssertedThat(callOrder).toEqual('d2d2d1d1');
     }
   },
   {
@@ -1229,7 +1229,7 @@ var FBE = [
       console.log(alarms);
     },
     postTestCode: function() {
-      expect(alarms).toEqual('LongAlarm: alarm!alarm!alarm!')
+      //toBeAssertedThat(alarms).toEqual('LongAlarm: alarm!alarm!alarm!')
     }
   },
   {
@@ -1268,7 +1268,7 @@ var FBE = [
       o.longForm(); // Finally able to be called
     },
     postTestCode: function() {
-      expect(longCalls).toEqual(1);
+      //toBeAssertedThat(longCalls).toEqual(1);
     }
   },
   {
@@ -1303,7 +1303,7 @@ var FBE = [
       console.log("Properties p1:", tt.p1, "t1:", tt.t1);
     },
     postTestCode: function() {
-      expect(callOrder).toEqual('tfoofoo');
+      //toBeAssertedThat(callOrder).toEqual('tfoofoo');
     }
   },
   {
@@ -1332,8 +1332,8 @@ var FBE = [
         ImplementsTest2.getAxiomsByClass(foam.core.Property));
     },
     postTestCode: function() {
-      expect(ImplementsTest2.TB1).not.toBeUndefined();
-      expect(ImplementsTest2.T1).not.toBeUndefined();
+      //toBeAssertedThat(ImplementsTest2.TB1).not.toBeUndefined();
+      //toBeAssertedThat(ImplementsTest2.T1).not.toBeUndefined();
     }
   },
   {
@@ -1383,7 +1383,7 @@ var FBE = [
       console.log(results);
     },
     postTestCode: function() {
-      expect(results).toEqual("1, 2, 5, 10");
+      //toBeAssertedThat(results).toEqual("1, 2, 5, 10");
     }
   },
   {
@@ -1397,8 +1397,8 @@ var FBE = [
       console.log("Available globally?", !! global.InnerClass1);
     },
     postTestCode: function() {
-      expect(InnerClassTest.InnerClass1).not.toBeUndefined();
-      expect(global.InnerClass1).toBeUndefined();
+      //toBeAssertedThat(InnerClassTest.InnerClass1).not.toBeUndefined();
+      //toBeAssertedThat(global.InnerClass1).toBeUndefined();
     }
   },
   {
@@ -1426,7 +1426,7 @@ var FBE = [
       console.log(result);
     },
     postTestCode: function() {
-      expect(result).toEqual("OPEN / CLOSED");
+      //toBeAssertedThat(result).toEqual("OPEN / CLOSED");
     }
   },
   {
@@ -1440,8 +1440,8 @@ var FBE = [
       console.log("Available globally?", !! global.InnerEnum);
     },
     postTestCode: function() {
-      expect(InnerEnumTest.InnerEnum).not.toBeUndefined();
-      expect(global.InnerEnum).toBeUndefined();
+      //toBeAssertedThat(InnerEnumTest.InnerEnum).not.toBeUndefined();
+      //toBeAssertedThat(global.InnerEnum).toBeUndefined();
     }
   },
   {
@@ -1457,12 +1457,14 @@ var FBE = [
       var o = PubSubTest.create();
       var globalCalls = 0;
       var alarmCalls = 0;
+      var globalResult = '';
       // Install a listener that listens to all events
       // Listeners are called with a subscription object and the given
       //   arguments from pub().
       o.sub(function() {
         console.log('  global listener: ', [].join.call(arguments, ' '));
         globalCalls += 1;
+        globalResult += ' a' + arguments.length;
       });
       // This listener will only fire if the first argument matches 'alarm'
       o.sub('alarm', function() {
@@ -1475,8 +1477,62 @@ var FBE = [
       o.pub('lifecycle', 'loaded');
     },
     postTestCode: function() {
-      expect(globalCalls).toEqual(2);
-      expect(alarmCalls).toEqual(1);
+      //toBeAssertedThat(globalCalls).toEqual(2);
+      //toBeAssertedThat(alarmCalls).toEqual(1);
+    }
+  },
+  {
+    name: 'Publish arguments',
+    description: '',
+    dependencies: [ 'Pub Sub' ],
+    code: function() {
+      // Test publishing with many args
+      console.log("Pub many arguments:");
+      o.pub(1);
+      o.pub(1,2);
+      o.pub(1,2,3);
+      o.pub(1,2,3,4);
+      o.pub(1,2,3,4,5);
+      o.pub(1,2,3,4,5,6);
+      o.pub(1,2,3,4,5,6,7);
+      o.pub(1,2,3,4,5,6,7,8);
+      o.pub(1,2,3,4,5,6,7,8,9);
+      o.pub(1,2,3,4,5,6,7,8,9,10);
+      o.pub(1,2,3,4,5,6,7,8,9,10,11);
+      console.log(globalResult);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(globalResult).toEqual(' a3 a3 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12');
+    }
+  },
+  {
+    name: 'Topics',
+    description: 'A Class can declare Topics that it publishes events for',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TopicTest',
+        topics: [ 'alarm' ]
+      });
+      var o = TopicTest.create();
+      var normalCalls = 0;
+      var topicCalls = 0;
+      
+      o.sub('alarm', function(_, __, state) { 
+        console.log('alarm: ', state);
+        normalCalls += 1;
+      });
+      // The next line uses the Topic and is slightly shorter than the equivalent above.
+      o.alarm.sub(function(_, __, state) { 
+        console.log('alarm (topic): ', state); 
+        topicCalls += 1;
+      });
+      o.alarm.pub('on');
+      o.pub('alarm', 'off');
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(normalCalls).toEqual(2);
+      //toBeAssertedThat(topicCalls).toEqual(2);
     }
   },
 
@@ -1510,30 +1566,7 @@ var FBE = FBE.map(function(def) {
 
 // // TODO: ArrayProperty
 
-// // Test publishing with many args
-// o.pub(1);
-// o.pub(1,2);
-// o.pub(1,2,3);
-// o.pub(1,2,3,4);
-// o.pub(1,2,3,4,5);
-// o.pub(1,2,3,4,5,6);
-// o.pub(1,2,3,4,5,6,7);
-// o.pub(1,2,3,4,5,6,7,8);
-// o.pub(1,2,3,4,5,6,7,8,9);
-// o.pub(1,2,3,4,5,6,7,8,9,10);
-// o.pub(1,2,3,4,5,6,7,8,9,10,11);
 
-// // A Class can declare 'Topics' that it publishes events for.
-// foam.CLASS({
-//   name: 'TopicTest',
-//   topics: [ 'alarm' ]
-// });
-// var o = TopicTest.create();
-// o.sub('alarm', function(_, __, state) { console.log('alarm: ', state); });
-// // The next line uses the Topic and is slightly shorter than the equivalent above.
-// o.alarm.sub(function(_, __, state) { console.log('alarm (topic): ', state); });
-// o.alarm.pub('on');
-// o.pub('alarm', 'off');
 
 // // Objects implicitly pub events on the 'propertyChange' topic when
 // // property values change.
