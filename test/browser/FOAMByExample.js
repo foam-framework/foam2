@@ -1059,7 +1059,7 @@ var FBE = [
     name: 'Test isMerged',
     description: 'isMerged will merge multiple events',
     dependencies: [ ],
-    code: function async() {
+    code: function async() { // TODO: for all async, pass things for postTestCode in promise resolve
       // If a listener has isMerged: true, it will merge multiple
       // events received withing 'mergeDelay' milliseconds into
       // a single event. 'mergeDelay' is optional and defaults to
@@ -1106,19 +1106,216 @@ var FBE = [
       expect(mergedCalls).toEqual(1);
     }
   },
+  {
+    name: 'Framed Listener Test',
+    description: 'isFramed will merge multiple events within an animation frame',
+    dependencies: [ ],
+    code: function async() {
+      // If a listener has isFramed: true, it will merge multiple
+      // events received withing one animation frame to a single
+      // event delivered at the next animationFrame.
+      var framedCalls = 0;
+      foam.CLASS({
+        name: 'FramedListenerTest',
+        listeners: [
+          {
+            name: 'framed',
+            isFramed: true,
+            code: function() { 
+              console.log('framed listener ' + framedCalls);
+              framedCalls += 1;
+            }
+          }
+        ]
+      });
+      var o = FramedListenerTest.create();
+      o.framed();
+      o.framed();
+      o.framed();
+      o.framed();
+      
+      // delay for more than one frame to ensure the listener runs
+      return new Promise(function(res) {
+        setTimeout(res, 32);
+      });
+    },
+    postTestCode: function() {
+      expect(framedCalls).toEqual(1);
+    }
+  },
+  {
+    name: 'Listener delayed',
+    description: 'Decorate a listener with delayed() to delay the execution without merging',
+    dependencies: [ ],
+    code: function async() {
+      // You can decorate a listener with delayed() to delay the
+      // execution of the listener. Unlike merged(), which also delays
+      // results, delayed() does not merge results.
+      var callOrder = '';
+      var l1 = foam.__context__.delayed(function() { 
+        console.log('l1');
+        callOrder += 'l1'; 
+      }, 10);
+      var l2 = foam.__context__.delayed(function() { 
+        console.log('l2'); 
+        callOrder += 'l2';
+      }, 5);
+      l1();
+      l2();
+      l1();
+      l2();
+      
+      // delay to ensure the listener runs
+      return new Promise(function(res) {
+        setTimeout(res, 16);
+      });
+      
+    },
+    postTestCode: function() {
+      expect(callOrder).toEqual('l2l2l1l1');
+    }
+  },
+  {
+    name: 'Listener async',
+    description: 'async(l) is the same as delayed(l, 0)',
+    dependencies: [ ],
+    code: function() {
+      var callOrder = '';
+      var d1 = foam.__context__.async(function() { 
+        console.log('d1'); 
+        callOrder += 'd1';
+      });
+      var d2 = function() { 
+        console.log('d2'); 
+        callOrder += 'd2';
+      };
+      d1();
+      d2();
+      d1();
+      d2();
 
-
+      // delay to ensure the listener runs
+      return new Promise(function(res) {
+        setTimeout(res, 16);
+      });
+    },
+    postTestCode: function() {
+      expect(callOrder).toEqual('d2d2d1d1');
+    }
+  },
+  {
+    name: 'Listener SUPER',
+    description: 'Listeners, like Methods, have SUPER support.',
+    dependencies: [  ],
+    code: function() {
+      var alarms = '';
+      foam.CLASS({
+        name: 'Alarm',
+        listeners: [
+          function alarm() { alarms += 'alarm!'; }
+        ]
+      });
+      foam.CLASS({
+        name: 'LongAlarm',
+        extends: 'Alarm',
+        listeners: [
+          function alarm() { 
+            alarms += 'LongAlarm: ';
+            this.SUPER(); this.SUPER(); this.SUPER();
+          }
+        ]
+      });
+      LongAlarm.create().alarm();
+      console.log(alarms);
+    },
+    postTestCode: function() {
+      expect(alarms).toEqual('LongAlarm: alarm!alarm!alarm!')
+    }
+  },
+  {
+    name: 'Test Actions',
+    description: 'Actions are methods which have extra information for GUIs',
+    dependencies: [  ],
+    code: function() {
+      // Actions are methods which have extra information to make it easier
+      // to call them from GUIs. Extra information includes things like:
+      // a label, speech label, functions to determine if the action is currently
+      // available and enabled, user help text, etc.
+      var longCalls = 0;
+      foam.CLASS({
+        name: 'ActionTest',
+        properties: [ 'enabled', 'available' ],
+        actions: [
+          function shortForm() { console.log('short action!'); },
+          {
+            name: 'longForm',
+            isAvailable: function() { return this.available; },
+            isEnabled: function() { return this.enabled; },
+            code: function() { 
+              console.log('long action!'); 
+              longCalls += 1;
+            }
+          }
+        ]
+      });
+      var o = ActionTest.create();
+      o.shortForm();
+      
+      o.longForm(); // Won't be called because is not enabled or available yet
+      o.enabled = true;
+      o.longForm(); // Won't be called because is not available yet
+      o.available = true;
+      o.longForm(); // Finally able to be called
+    },
+    postTestCode: function() {
+      expect(longCalls).toEqual(1);
+    }
+  },
+  {
+    name: 'Interface inheritance',
+    description: 'Interfaces copy Axioms from another class',
+    dependencies: [  ],
+    code: function() {
+      // In addition to class-inheritance, FOAM also supports
+      // interfaces, which are a form of multiple-inheritance which
+      // copy Axioms from another model.
+      var callOrder = '';
+      foam.CLASS({
+        name: 'SampleI',
+        properties: [ 't1', 't2', 't3' ],
+        methods: [
+          function tfoo() { console.log('ffoo'); callOrder += 'tfoo'; },
+          function tbar() { console.log('tbar'); callOrder += 'tbar'; }
+        ]
+      });
+      foam.CLASS({
+        name: 'ImplementsTest',
+        implements: ['SampleI'],
+        properties: [ 'p1', 'p2', 'p3' ],
+        methods: [
+          function foo() { console.log('foo'); callOrder += 'foo'; },
+          function bar() { console.log('bar'); callOrder += 'bar'; }
+        ]
+      });
+      var tt = ImplementsTest.create({p1:1, t1:2});
+      tt.tfoo(); // From SampleI
+      tt.foo();
+      tt.describe();
+    },
+    postTestCode: function() {
+      expect(callOrder).toEqual('tfoofoo');
+    }
+  },
 
   {
     name: '',
     description: '',
-    dependencies: [ ],
+    dependencies: [  ],
     code: function() {
     },
     postTestCode: function() {
     }
   },
-
 ];
 
 var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
@@ -1137,113 +1334,9 @@ var FBE = FBE.map(function(def) {
 
 // // TODO: ArrayProperty
 
-// //:NOTEST
-// // If a listener has isFramed: true, it will merge multiple
-// // events received withing one animation frame to a single
-// // event delivered at the next animationFrame.
-// foam.CLASS({
-//   name: 'FramedListenerTest',
-//   listeners: [
-//     {
-//       name: 'framed',
-//       isFramed: true,
-//       code: function() { log('framed listener'); }
-//     }
-//   ]
-// });
-// var o = FramedListenerTest.create();
-// o.framed();
-// o.framed();
-// o.framed();
-// o.framed();
 
-// //:NOTEST
-// // You can decorate a listener with delayed() to delay the
-// // execution of the listener. Unlike merged(), which also delays
-// // results, delayed() does not merge results.
-// var l1 = foam.__context__.delayed(function() { console.log('l1'); }, 10);
-// var l2 = foam.__context__.delayed(function() { console.log('l2'); }, 5);
-// l1();
-// l2();
-// l1();
-// l2();
 
-// //:NOTEST
-// // async(l) is the same as delayed(l, 0)
-// var d1 = foam.__context__.async(function() { console.log('d1'); });
-// var d2 = function() { console.log('d2'); };
-// d1();
-// d2();
-// d1();
-// d2();
 
-// // Listeners, like Methods, have SUPER support.
-// foam.CLASS({
-//   name: 'Alarm',
-//   listeners: [
-//     function alarm() { console.log('alarm'); }
-//   ]
-// });
-// foam.CLASS({
-//   name: 'LongAlarm',
-//   extends: 'Alarm',
-//   listeners: [
-//     function alarm() { console.log('LongAlarm:'); this.SUPER(); this.SUPER(); this.SUPER(); }
-//   ]
-// });
-// Alarm.create().alarm();
-// LongAlarm.create().alarm();
-
-// // Actions are methods which have extra information to make it easier
-// // to call them from GUI's. Extra information includes things like:
-// // a label, speech label, functions to determine if the action is currently
-// // available and enabled, user help text, etc.
-// foam.CLASS({
-//   name: 'ActionTest',
-//   properties: [ 'enabled', 'available' ],
-//   actions: [
-//     function shortForm() { log('short action'); },
-//     {
-//       name: 'longForm',
-//       isAvailable: function() { return this.available; },
-//       isEnabled: function() { return this.enabled; },
-//       code: function() { log('long action'); }
-//     }
-//   ]
-// });
-// var o = ActionTest.create();
-// o.shortForm();
-// o.longForm(); // Won't be called because is not enabled or available yet
-// log(o.enabled = true);
-// o.longForm(); // Won't be called because is not available yet
-// log(o.available = true);
-// o.longForm();
-
-// // In addition to class-inheritance, FOAM also supports
-// // interfaces, which are a form of multiple-inheritance which
-// // copy Axioms from another model.
-// foam.CLASS({
-//   name: 'SampleI',
-//   properties: [ 't1', 't2', 't3' ],
-//   methods: [
-//     function tfoo() { console.log('ffoo'); },
-//     function tbar() { console.log('tbar'); }
-//   ]
-// });
-// foam.CLASS({
-//   name: 'ImplementsTest',
-//   implements: ['SampleI'],
-//   properties: [ 'p1', 'p2', 'p3' ],
-//   methods: [
-//     function foo() { console.log('foo'); },
-//     function bar() { console.log('bar'); }
-//   ]
-// });
-// ImplementsTest.describe();
-// var tt = ImplementsTest.create({p1:1, t1:2});
-// tt.describe();
-// tt.tfoo(); // From SampleI
-// tt.foo();
 
 // // Unlike regular inheritance with extends:, classes
 // // can implement: from multiple sources.
