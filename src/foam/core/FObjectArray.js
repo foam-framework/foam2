@@ -24,6 +24,10 @@ foam.CLASS({
 
   properties: [
     { name: 'of', required: true },
+    [
+      'factory',
+      function() { return []; }
+    ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
         // If not an array, allow assertValue to assert the type-check.
