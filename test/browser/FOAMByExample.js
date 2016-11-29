@@ -604,8 +604,8 @@ var FBE = [
     }
   },
   {
-    name: 'Create Person and Employee',
-    description: 'Classes can be subclassed with extends',
+    name: 'Person Class',
+    description: 'A basic Person class',
     dependencies: [ ],
     code: function() {
       // Methods in subclasses can override methods from ancestor classes, as is
@@ -618,6 +618,16 @@ var FBE = [
           function toString() { return this.name + ' ' + this.sex; }
         ]
       });
+    }
+  },
+  {
+    name: 'Create Person and Employee',
+    description: 'Classes can be subclassed with extends',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      // Methods in subclasses can override methods from ancestor classes, as is
+      // done below with toString().  Employee.toString() calls its parent classes
+      // toString() method by calling 'this.SUPER()'.
       foam.CLASS({
         name: 'Employee',
         extends: 'Person',
@@ -626,8 +636,10 @@ var FBE = [
           function toString() { return this.SUPER() + ' ' + this.salary; }
         ]
       });
+
       var p = Person.create({name: 'John', sex: 'M'});
       console.log("Person:", p.toString());
+
       var e = Employee.create({name: 'Jane', sex: 'F', salary: 50000});
       console.log("Employee:", e.toString());
     },
@@ -1447,14 +1459,21 @@ var FBE = [
   {
     name: 'Pub Sub',
     description: 'Objects can publish events and subscribe to other objects',
-    dependencies: [  ],
+    dependencies: [ ],
     code: function() {
-      // Objects support pub() for publishing events,
-      // and sub() for subscribing to published events.
       foam.CLASS({
         name: 'PubSubTest'
       });
       var o = PubSubTest.create();
+    }
+  },
+  {
+    name: 'Subscribing',
+    description: 'Objects can publish events and subscribe to other objects',
+    dependencies: [ 'Pub Sub' ],
+    code: function() {
+      // Objects support pub() for publishing events,
+      // and sub() for subscribing to published events.
       var globalCalls = 0;
       var alarmCalls = 0;
       var globalResult = '';
@@ -1483,8 +1502,8 @@ var FBE = [
   },
   {
     name: 'Publish arguments',
-    description: '',
-    dependencies: [ 'Pub Sub' ],
+    description: 'Any number of arguments can be published',
+    dependencies: [ 'Subscribing' ],
     code: function() {
       // Test publishing with many args
       console.log("Pub many arguments:");
@@ -1517,14 +1536,14 @@ var FBE = [
       var o = TopicTest.create();
       var normalCalls = 0;
       var topicCalls = 0;
-      
-      o.sub('alarm', function(_, __, state) { 
+
+      o.sub('alarm', function(_, __, state) {
         console.log('alarm: ', state);
         normalCalls += 1;
       });
       // The next line uses the Topic and is slightly shorter than the equivalent above.
-      o.alarm.sub(function(_, __, state) { 
-        console.log('alarm (topic): ', state); 
+      o.alarm.sub(function(_, __, state) {
+        console.log('alarm (topic): ', state);
         topicCalls += 1;
       });
       o.alarm.pub('on');
@@ -1535,7 +1554,491 @@ var FBE = [
       //toBeAssertedThat(topicCalls).toEqual(2);
     }
   },
+  {
+    name: 'propertyChange',
+    description: 'Objects implicitly pub events on the propertyChange topic when property values change',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'PropertyChangeTest',
+        properties: [ 'a', 'b' ]
+      });
+      o = PropertyChangeTest.create();
+      // propertyChange event listeners are called with:
+      //   sub  - the subscription object, which can be destroy()ed to end
+      //            the subscription
+      //   p    - the string 'propertyChange'
+      //   name - the name of the changed property
+      //   dyn  - a dynamic access object to .get() the current value and
+      //            getPrev() the pre-change value
 
+      var anyChangeCalls = 0;
+      var propAChangeCalls = 0;
+      // Listen for all propertyChange events:
+      o.propertyChange.sub(function(sub, p, name, dyn) {
+        console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get());
+        anyChangeCalls += 1;
+      });
+
+      // Listen for only changes to the 'a' Property:
+      o.propertyChange.sub('a', function(sub, p, name, dyn) {
+        console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get());
+        propAChangeCalls += 1;
+      });
+
+      o.a = 42;
+      o.b = 'bar';
+      o.a++;
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(anyChangeCalls).toEqual(3);
+      //toBeAssertedThat(propAChangeCalls).toEqual(1);
+    }
+  },
+  {
+    name: 'Unsubscribe from subscriber',
+    description: '1. Call .destroy() on the Destroyable that sub() returns',
+    dependencies: [ 'Pub Sub' ],
+    code: function() {
+
+      var calls = 0;
+      var l = function(sub, name) {
+        console.log('Event:', name);
+        calls += 1;
+      };
+
+      var sub = o.sub(l);
+      o.pub('fire');
+      sub.destroy();
+      o.pub("fire again, but nobody's listenering");
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(1);
+    }
+  },
+  {
+    name: 'Unsubscribe from listener',
+    description: '2. Destroy the subscription, which is supplied to the listener',
+    dependencies: [ 'Pub Sub' ],
+    code: function() {
+      var once = function(sub, name) {
+        console.log('Event:', name);
+        calls += 1;
+        // stop listening
+        sub.destroy();
+      };
+
+      o.sub(once);
+      o.pub('fire');
+      o.pub("fire again, but nobody's listening");
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(1);
+    }
+  },
+  {
+    name: 'Unsubscribe with oneTime helper',
+    description: '3. If you only want to receive the first event, use foam.events.oneTime()',
+    dependencies: [ 'Pub Sub' ],
+    code: function() {
+      // If you only want to receive the first event, decorate your
+      // listener with foam.events.oneTime() and it will cancel the subscription
+      // when it receives the first event.
+      o.sub(foam.events.oneTime(function() {
+        console.log.apply(console.log, arguments);
+      }));
+
+      o.pub('fire');
+      o.pub("fire again, but nobody's listenering");
+    },
+    postTestCode: function() {
+
+    }
+  },
+  {
+    name: 'Slot get',
+    description: 'Slots are like Object-Oriented pointers',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      // A property's slot is accessed as 'name'$.
+      // get() is used to dereference the value of a slot
+      var p = Person.create({ name: 'Bob' });
+      var dyn = p.name$;
+      console.log("Person name:", dyn.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(dyn.get()).toEqual('Bob');
+    }
+  },
+  {
+    name: 'Slot set',
+    description: 'set() is used to set a Slot\'s value',
+    dependencies: [ 'Slot get' ],
+    code: function() {
+      dyn.set('John'); // sets p.name implicitly
+      console.log("Name after set:", p.name, "get():", dyn.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p.name).toEqual('John');
+    }
+  },
+  {
+    name: 'Slot get with slot method',
+    description: 'Calling obj.slot(\'name\') is the same as obj.name$',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      var p = Person.create({name: 'Bob'});
+
+      var dyn = p.slot('name'); // same as p.name$
+      console.log("slot value:", dyn.get());
+
+      dyn.set('John');
+      console.log("after set:", dyn.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p.name).toEqual('John');
+    }
+  },
+  {
+    name: 'Slot nesting',
+    description: 'Slots can be nested with dot() to bind to a sub-property of a property value',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      // Nested slots
+      foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
+      var p1 = Person.create({name: 'John'});
+      var p2 = Person.create({name: 'Paul'});
+      var h = Holder.create({data: p1});
+      // Bind to the 'name' of whatever h.data will be, even if it changes
+      var s = h.data$.dot('name');
+
+      // Note that this listener is called when we swap p2 for p1, since
+      //  p2.name is not the same as p1.name.
+      var changes = "";
+      s.sub(function() {
+        console.log('    h.data.name change: ', h.data.name);
+        changes += h.data.name + " ";
+      });
+
+      console.log('Set to p1:');
+
+      console.log("  Initial s:", s.get());
+
+      s.set('George');
+      console.log("  After setting s, p1.name:", p1.name);
+
+      p1.name = 'Ringo';
+      console.log("  After setting p1.name, s:", s.get());
+
+      console.log('Setting to p2, which has a different name:');
+
+      h.data = p2;
+      console.log("  Initial s:", s.get());
+
+      s.set('George');
+      console.log("  After setting s, p2.name:", p2.name);
+
+      p2.name = 'Ringo';
+      console.log("  After setting p2.name, s:", s.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(changes).toEqual("George Ringo Paul George Ringo ");
+    }
+  },
+  {
+    name: 'Subscription nesting',
+    description: 'Subscribe using valueSub() of the slot, automatically resubscribed as the value changes',
+    dependencies: [  ],
+    code: function() {
+      // Subscribe to the value of the slot data$, removing the
+      // subscription and resubscribing to the new value of data$
+      // if it changes.
+      foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
+      var p1 = Person.create({name: 'John'});
+      var p2 = Person.create({name: 'Paul'});
+      var h = Holder.create({data: p1});
+      var changes = "";
+      h.data$.valueSub(function(e, topic, name, dyn) {
+        console.log('sub change: ', e.src.name, topic, name);
+        changes += topic + ':' + (dyn && dyn.get()) + ' ';
+      });
+
+      p1.name = 'Peter';
+      p2.name = 'Mary';
+      h.data = p2;
+      p1.name = 'James';
+      p2.name = 'Ringo';
+      p2.pub('test','event');
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(changes).toEqual("propertyChange:Peter propertyChange:Ringo test:undefined ");
+    }
+  },
+  {
+    name: 'Data Binding two way',
+    description: 'Assiging one slot to another binds their values',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      // Two-Way Data-Binding
+      // Slots can be assigned, causing two values to be
+      // bound to the same value.
+      var p1 = Person.create(), p2 = Person.create();
+
+      p1.name$ = p2.name$;
+      p1.name = 'John'; // also sets p2.name
+      console.log("Assigned first:", p1.name, p2.name);
+
+      p2.name = 'Steve'; // also sets p1.name
+      console.log("Assigned second: ", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual(p2.name);
+    }
+  },
+  {
+    name: 'Data Binding linkFrom',
+    description: 'Another way to link two Slots is to call .linkFrom() on one of them',
+    dependencies: [  ],
+    code: function() {
+      var p1 = Person.create({ name: 'p1' });
+      var p2 = Person.create({ name: 'p2' });
+      var d = p1.name$.linkFrom(p2.name$);
+      p1.name = 'John';
+      console.log("Assigned first:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual(p2.name);
+    }
+  },
+  {
+    name: 'Data Binding linkFrom unbind',
+    description: 'linkFrom/To() returns a destroyable that unbinds the slots',
+    dependencies: [ 'Data Binding linkFrom' ],
+    code: function() {
+      // But this style of link can be broken by calling .destroy()
+      // on the object return from .linkFrom/To().
+      d.destroy();
+      p2.name = 'Steve';
+      console.log("No longer bound:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).not.toEqual(p2.name);
+    }
+  },
+  {
+    name: 'Data Binding linkTo',
+    description: 'linkTo() is the same as linkFrom(), except that the initial value is taken from \'this\' instead of the other object',
+    dependencies: [  ],
+    code: function() {
+      // linkTo() is the same as linkFrom(), except that the initial value
+      // is taken from 'this' instead of the other object.
+      var p1 = Person.create({ name:'p1' }), p2 = Person.create({ name:'p2' });
+      var d = p1.name$.linkTo(p2.name$);
+      console.log("After linkTo:", p1.name, p2.name);
+      var name2 = p2.name;
+
+      p1.name = 'John';
+      console.log("Assigned first:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual(p2.name);
+      //toBeAssertedThat(name2).toEqual('p1');
+    }
+  },
+  {
+    name: 'Data Binding relateTo',
+    description: 'Two values can be linked through relateTo',
+    dependencies: [  ],
+    code: function() {
+      // Two values can be linked through a relationship,
+      // which provides functions to adapt between the two values.
+      foam.CLASS({
+        name: 'Temperature',
+        properties: [
+          { class: 'Float', name: 'f' },
+          { class: 'Float', name: 'c' }
+        ],
+        methods: [
+          function init() {
+            this.f$.relateTo(
+              this.c$,
+              function f2c(c) {
+                console.log('f2c', c); return 5/9 * ( c - 32 );
+              },
+              function c2f(f) {
+                console.log('c2f', f); return 9/5 * f + 32;
+              }
+            );
+          }
+        ]
+      });
+
+      var t = Temperature.create();
+      console.log("Initial     f:", t.f, " c:", t.c);
+      t.f = 100;
+      console.log("Set(f=100)  f:", t.f, " c:", t.c);
+      t.c = 100;
+      console.log("Set(c=100)  f:", t.f, " c:", t.c);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(t.c).toEqual(100);
+      //toBeAssertedThat(t.f).toEqual(212);
+    }
+  },
+  {
+    name: 'Data Binding one way',
+    description: 'The .follow() method binds in one direction only',
+    dependencies: [  ],
+    code: function() {
+      // Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a change in either
+      // value is reflected in the other.  But FOAM supports one-way data-binding as well.
+      // To do this, use the .follow() method.
+      var p1 = Person.create({ name:'p1' }), p2 = Person.create({ name:'p2' });
+      var d = p1.name$.follow(p2.name$);
+
+      p2.name = 'Ringo'; // Will update p1 and p2
+      p2.name = 'Paul'; // Will update p1 and p2
+      console.log('Assigned p2:', p1.name, p2.name);
+      p1.name = 'George'; // Will only update p1
+      console.log('Assigned p1:', p1.name, p2.name);
+      d.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('George');
+      //toBeAssertedThat(p2.name).toEqual('Paul');
+    }
+  },
+  {
+    name: 'Data Binding one way initialization',
+    description: 'Follow copies the initial value of the followed slot',
+    dependencies: [  ],
+    code: function() {
+      p1 = Person.create();
+      p2 = Person.create({name:'John'});
+      console.log("Initial:", p1.name, p2.name);
+
+      p1.name$.follow(p2.name$);
+      console.log("After follow:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('John');
+    }
+  },
+  {
+    name: 'Data Binding one way mapFrom',
+    description: 'One-Way Data-Binding, with Map function (mapFrom)',
+    dependencies: [  ],
+    code: function() {
+      var p1 = Person.create(), p2 = Person.create();
+      var d = p1.name$.mapFrom(p2.name$, function(n) {
+        return n + "es";
+      });
+
+      p2.name = 'Ringo'; // Will update p1 and p2
+      console.log('Assigned second:', p1.name, p2.name);
+      p1.name = 'George'; // Will only update p1
+      console.log('Assigned first:', p1.name, p2.name);
+      d.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('George');
+      //toBeAssertedThat(p2.name).toEqual('Ringo');
+    }
+  },
+  {
+    name: 'Data Binding one way mapTo',
+    description: 'One-Way Data-Binding, with Map function (mapTo)',
+    dependencies: [  ],
+    code: function() {
+      // The reverse of mapFrom(), mapTo() takes the value of this,
+      // mapping it and assigning to the target.
+      var p1 = Person.create(), p2 = Person.create();
+      var d = p2.name$.mapTo(p1.name$, function(n) {
+        return 'One' + n;
+      });
+
+      p2.name = 'Ringo'; // Will update p1 and p2
+      console.log("Assigned second:", p1.name, p2.name);
+      p1.name = 'George'; // Will only update p1
+      console.log("Assigned first:", p1.name, p2.name);
+      d.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('George');
+      //toBeAssertedThat(p2.name).toEqual('Ringo');
+    }
+  },
+  {
+    name: 'Slot isDefined',
+    description: 'Slots also let you check if the value is defined by calling isDefined()',
+    dependencies: [  ],
+    code: function() {
+      // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
+      foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', value: 42 } ]});
+      var o = IsDefinedTest.create();
+      var dv = o.a$;
+      console.log("Default value only, isDefined?", dv.isDefined());
+      dv.set(99);
+      console.log("Set to 99, isDefined?", dv.isDefined());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(dv.isDefined()).toBe(true);
+    }
+  },
+  {
+    name: 'Slot clear',
+    description: 'You can reset a Slot to its default value by calling .clear()',
+    dependencies: [ 'Slot isDefined' ],
+    code: function() {
+      // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
+      dv.clear();
+      console.log("After clearing:", dv.get(), dv.isDefined());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(dv.isDefined()).toBe(false);
+    }
+  },
+  {
+    name: 'ConstantSlot',
+    description: 'ConstantSlot creates an immutable slot',
+    dependencies: [  ],
+    code: function() {
+      var s = foam.core.ConstantSlot.create({ value: 42 });
+      console.log("Intial value:", s.get());
+      s.value = 66;
+      s.set(66);
+      console.log("After set to 66:", s.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(s.get()).toEqual(42);
+    }
+  },
+  {
+    name: 'Expression Slots',
+    description: 'ExpressionSlot creates a Slot from a list of Slots and a function to comine them',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({ name: 'Person', properties: ['fname', 'lname'] });
+      var p = Person.create({ fname: 'John', lname: 'Smith' });
+      // When fname or lname changes, the new values are fed into the function
+      // to produce a new value for ExpressionSlot e
+      var e = foam.core.ExpressionSlot.create({
+        args: [ p.fname$, p.lname$ ],
+        code: function(f, l) { return f + ' ' + l; }
+      });
+
+      console.log("Intial e:", e.get());
+      e.sub(function() {
+        console.log("e changed:", e.get());
+      });
+      p.fname = 'Steve';
+      p.lname = 'Jones';
+      console.log("Final e:", e.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(e.get()).toEqual('Steve Jones');
+    }
+  },
 
 
 
@@ -1555,9 +2058,6 @@ var FBE = FBE.map(function(def) {
   return test.helpers.Exemplar.create(def, reg);
 });
 
-//
-//
-
 // // TODO: BooleanProperty
 
 // // TODO: IntProperty
@@ -1568,225 +2068,7 @@ var FBE = FBE.map(function(def) {
 
 
 
-// // Objects implicitly pub events on the 'propertyChange' topic when
-// // property values change.
-// foam.CLASS({
-//   name: 'PropertyChangeTest',
-//   properties: [ 'a', 'b' ]
-// });
-// o = PropertyChangeTest.create();
-// // Listen for all propertyChange events:
-// o.propertyChange.sub(function(sub, p, name, dyn) { console.log('propertyChange: ', p, name, dyn.getPrev(), dyn.get()); });
-// // Listen for only changes to the 'a' Property:
-// o.propertyChange.sub('a', function(sub, p, name, dyn) { console.log('propertyChange.a: ', p, name, dyn.getPrev(), dyn.get()); });
-// o.a = 42;
-// o.b = 'bar';
-// o.a++;
 
-// // There are three ways to unsubscribe a listener
-// // 1. Call .destroy() on the Destroyable that sub() returns
-// var sub = o.sub(l);
-// o.pub('fire');
-// sub.destroy();
-// o.pub("fire again, but nobody's listenering");
-
-// // 2. Destroy the subscription, which is supplied to the listener
-// var l = function(sub) {
-//   sub.destroy();
-//   console.log.apply(console.log, arguments);
-// };
-// o.sub(l);
-// o.pub('fire');
-// o.pub("fire again, but nobody's listenering");
-
-// // 3. If you only want to receive the first event, decorate your
-// // listener with foam.events.oneTime() and it will cancel the subscription
-// // when it receives the first event.
-// o.sub(foam.events.oneTime(function() { console.log.apply(console.log, arguments); }));
-// o.pub('fire');
-// o.pub("fire again, but nobody's listenering");
-
-// // Slots are like Object-Oriented pointers.
-// // A property's slot is accessed as 'name'$.
-// // get() is used to dereference the value of a slot
-// var p = Person.create({name: 'Bob'});
-// var dyn = p.name$;
-// log(dyn.get());
-
-// // set() is used to set a Slot's value:
-// dyn.set('John');
-// log(p.name, dyn.get());
-
-// // Calling obj.slot('name') is the same as obj.name$.
-// var p = Person.create({name: 'Bob'});
-// var dyn = p.slot('name');
-// log(dyn.get());
-// dyn.set('John');
-// log(dyn.get());
-
-// // Nested slots
-// foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
-// var p1 = Person.create({name: 'John'});
-// var p2 = Person.create({name: 'Paul'});
-// var h = Holder.create({data: p1});
-// var s = h.data$.dot('name');
-// s.sub(function() { console.log('change: ', arguments, h.data.name); });
-// log(s.get());
-// s.set('George');
-// log(p1.name);
-// p1.name = 'Ringo';
-// log('Setting to p2');
-// h.data = p2;
-// log(s.get());
-// s.set('George');
-// log(p2.name);
-// p2.name = 'Ringo';
-
-// // Nested subscription
-// // Subscribe to the value of the slot data$, removing the
-// // subscription and resubscribing to the new value of data$
-// // if it changes.
-// foam.CLASS({ name: 'Holder', properties: [ 'data' ] });
-// var p1 = Person.create({name: 'John'});
-// var p2 = Person.create({name: 'Paul'});
-// var h = Holder.create({data: p1});
-// h.data$.valueSub(function(e) { console.log('sub change: ', e.src.name, Array.from(arguments).join(' ')); });
-// p1.name = 'Peter';
-// p2.name = 'Mary';
-// h.data = p2;
-// p1.name = 'James';
-// p2.name = 'Ringo';
-// p2.pub('test','event');
-
-// // Two-Way Data-Binding
-// // Slots can be assigned, causing two values to be
-// // bound to the same value.
-// var p1 = Person.create(), p2 = Person.create();
-// p1.name$ = p2.name$;
-// p1.name = 'John';
-// log(p1.name, p2.name);
-// p2.name = 'Steve';
-// log(p1.name, p2.name);
-
-// // Another way to link two Slots is to call .linkFrom() on one of them.
-// var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
-// var d = p1.name$.linkFrom(p2.name$);
-// p1.name = 'John';
-// log(p1.name, p2.name);
-
-// // But this style of link can be broken by calling .destroy()
-// // on the object return from .linkFrom/To().
-// d.destroy();
-// p2.name = 'Steve';
-// log(p1.name, p2.name);
-
-// // linkTo() is the same as linkFrom(), except that the initial value
-// // is taken from 'this' instead of the other object.
-// var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
-// var d = p1.name$.linkTo(p2.name$);
-// p1.name = 'John';
-// log(p1.name, p2.name);
-
-// // Two values can be linked through a relationship,
-// // which provides functions to adapt between the two values.
-// foam.CLASS({
-//   name: 'Temperature',
-//   properties: [
-//     { class: 'Float', name: 'f' },
-//     { class: 'Float', name: 'c' }
-//   ],
-//   methods: [
-//     function init() {
-//       this.f$.relateTo(
-//         this.c$,
-//         function c2f(f) { log('f', f); return 9/5 * f + 32; },
-//         function f2c(c) { log('fp', c); return 5/9 * ( c - 32 ); });
-//     }
-//   ]
-// });
-// var t = Temperature.create();
-// log(t.stringify());
-// t.f = 100;
-// log(t.stringify());
-// t.c = 100;
-// log(t.stringify());
-
-// // One-Way Data-Binding
-// // Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a change in either
-// // value is reflected in the other.  But FOAM supports one-way data-binding as well.
-// // To do this, use the .follow() method.
-// var d = p1.name$.follow(p2.name$);
-// p2.name = 'Ringo'; // Will update p1 and p2
-// p2.name = 'Paul'; // Will update p1 and p2
-// log(p1.name, p2.name);
-// p1.name = 'George'; // Will only update p1
-// log(p1.name, p2.name);
-// d.destroy();
-
-// // Follow copies the initial value.
-// p1 = Person.create();
-// p2 = Person.create({name:'John'});
-// p1.name$.follow(p2.name$);
-// log(p1.name, p2.name);
-
-// // One-Way Data-Binding, with Map function (mapFrom)
-// var d = p1.name$.mapFrom(p2.name$, function(n) {
-//   return "Mr. " + n;
-// });
-// p1.name$.clear();
-// p2.name$.clear();
-// p2.name = 'Ringo'; // Will update p1 and p2
-// log(p1.name, p2.name);
-// p1.name = 'George'; // Will only update p1
-// log(p1.name, p2.name);
-// d.destroy();
-
-// // One-Way Data-Binding, with Map function (mapTo)
-// var d = p2.name$.mapTo(p1.name$, function(n) {
-//   return "Mr. " + n;
-// });
-// p1.name$.clear();
-// p2.name$.clear();
-// p2.name = 'Ringo'; // Will update p1 and p2
-// log(p1.name, p2.name);
-// p1.name = 'George'; // Will only update p1
-// log(p1.name, p2.name);
-// d.destroy();
-
-// // Slots also let you check if the value is defined by calling isDefined().
-// // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
-// foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', value: 42 } ]});
-// var o = IsDefinedTest.create();
-// var dv = o.a$;
-// log(dv.isDefined());
-// dv.set(99);
-// log(dv.isDefined());
-
-// // You can reset a Slot to its default value by calling .clear().
-// // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
-// dv.clear();
-// log(dv.get(), dv.isDefined());
-
-// // ConstantSlot creates an immutable slot.
-// var s = foam.core.ConstantSlot.create({value: 42});
-// log(s.get());
-// s.value = 66;
-// s.set(66);
-// log(s.get());
-
-// // ExpressionSlot creates a Slot from a list of Slots
-// // and a function which combines them into a new value.
-// foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
-// var p = Person.create({fname: 'John', lname: 'Smith'});
-// var e = foam.core.ExpressionSlot.create({
-//   args: [ p.fname$, p.lname$],
-//   code: function(f, l) { return f + ' ' + l; }
-// });
-// log(e.get());
-// e.sub(log);
-// p.fname = 'Steve';
-// p.lname = 'Jones';
-// log(e.get());
 
 // // ExpressionSlot can also be supplied an object to work with, and then takes slots from function argument names.
 // var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Smith'});

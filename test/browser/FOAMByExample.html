@@ -25,7 +25,13 @@
       // TODO: make log output pretty, put in a div
       var output = [];
       var logger = function() {
-        output.push(Array.prototype.join.call(arguments, ' '));
+        var strArgs = Array.prototype.slice.call(arguments);
+        strArgs.map(function(o) {
+          return
+            foam.Undefined.isInstance(o) ? 'undefined' :
+            foam.Null.isInstance(o) ? 'null' : o.toString();
+        });
+        output.push(strArgs.join(' '));
       };
       var writeOutput = function() {
         // write log output
