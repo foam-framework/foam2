@@ -1774,6 +1774,271 @@ var FBE = [
       //toBeAssertedThat(changes).toEqual("propertyChange:Peter propertyChange:Ringo test:undefined ");
     }
   },
+  {
+    name: 'Data Binding two way',
+    description: 'Assiging one slot to another binds their values',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      // Two-Way Data-Binding
+      // Slots can be assigned, causing two values to be
+      // bound to the same value.
+      var p1 = Person.create(), p2 = Person.create();
+
+      p1.name$ = p2.name$;
+      p1.name = 'John'; // also sets p2.name
+      console.log("Assigned first:", p1.name, p2.name);
+
+      p2.name = 'Steve'; // also sets p1.name
+      console.log("Assigned second: ", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual(p2.name);
+    }
+  },
+  {
+    name: 'Data Binding linkFrom',
+    description: 'Another way to link two Slots is to call .linkFrom() on one of them',
+    dependencies: [  ],
+    code: function() {
+      var p1 = Person.create({ name: 'p1' });
+      var p2 = Person.create({ name: 'p2' });
+      var d = p1.name$.linkFrom(p2.name$);
+      p1.name = 'John';
+      console.log("Assigned first:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual(p2.name);
+    }
+  },
+  {
+    name: 'Data Binding linkFrom unbind',
+    description: 'linkFrom/To() returns a destroyable that unbinds the slots',
+    dependencies: [ 'Data Binding linkFrom' ],
+    code: function() {
+      // But this style of link can be broken by calling .destroy()
+      // on the object return from .linkFrom/To().
+      d.destroy();
+      p2.name = 'Steve';
+      console.log("No longer bound:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).not.toEqual(p2.name);
+    }
+  },
+  {
+    name: 'Data Binding linkTo',
+    description: 'linkTo() is the same as linkFrom(), except that the initial value is taken from \'this\' instead of the other object',
+    dependencies: [  ],
+    code: function() {
+      // linkTo() is the same as linkFrom(), except that the initial value
+      // is taken from 'this' instead of the other object.
+      var p1 = Person.create({ name:'p1' }), p2 = Person.create({ name:'p2' });
+      var d = p1.name$.linkTo(p2.name$);
+      console.log("After linkTo:", p1.name, p2.name);
+      var name2 = p2.name;
+
+      p1.name = 'John';
+      console.log("Assigned first:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual(p2.name);
+      //toBeAssertedThat(name2).toEqual('p1');
+    }
+  },
+  {
+    name: 'Data Binding relateTo',
+    description: 'Two values can be linked through relateTo',
+    dependencies: [  ],
+    code: function() {
+      // Two values can be linked through a relationship,
+      // which provides functions to adapt between the two values.
+      foam.CLASS({
+        name: 'Temperature',
+        properties: [
+          { class: 'Float', name: 'f' },
+          { class: 'Float', name: 'c' }
+        ],
+        methods: [
+          function init() {
+            this.f$.relateTo(
+              this.c$,
+              function f2c(c) {
+                console.log('f2c', c); return 5/9 * ( c - 32 );
+              },
+              function c2f(f) {
+                console.log('c2f', f); return 9/5 * f + 32;
+              }
+            );
+          }
+        ]
+      });
+
+      var t = Temperature.create();
+      console.log("Initial     f:", t.f, " c:", t.c);
+      t.f = 100;
+      console.log("Set(f=100)  f:", t.f, " c:", t.c);
+      t.c = 100;
+      console.log("Set(c=100)  f:", t.f, " c:", t.c);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(t.c).toEqual(100);
+      //toBeAssertedThat(t.f).toEqual(212);
+    }
+  },
+  {
+    name: 'Data Binding one way',
+    description: 'The .follow() method binds in one direction only',
+    dependencies: [  ],
+    code: function() {
+      // Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a change in either
+      // value is reflected in the other.  But FOAM supports one-way data-binding as well.
+      // To do this, use the .follow() method.
+      var p1 = Person.create({ name:'p1' }), p2 = Person.create({ name:'p2' });
+      var d = p1.name$.follow(p2.name$);
+
+      p2.name = 'Ringo'; // Will update p1 and p2
+      p2.name = 'Paul'; // Will update p1 and p2
+      console.log('Assigned p2:', p1.name, p2.name);
+      p1.name = 'George'; // Will only update p1
+      console.log('Assigned p1:', p1.name, p2.name);
+      d.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('George');
+      //toBeAssertedThat(p2.name).toEqual('Paul');
+    }
+  },
+  {
+    name: 'Data Binding one way initialization',
+    description: 'Follow copies the initial value of the followed slot',
+    dependencies: [  ],
+    code: function() {
+      p1 = Person.create();
+      p2 = Person.create({name:'John'});
+      console.log("Initial:", p1.name, p2.name);
+
+      p1.name$.follow(p2.name$);
+      console.log("After follow:", p1.name, p2.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('John');
+    }
+  },
+  {
+    name: 'Data Binding one way mapFrom',
+    description: 'One-Way Data-Binding, with Map function (mapFrom)',
+    dependencies: [  ],
+    code: function() {
+      var p1 = Person.create(), p2 = Person.create();
+      var d = p1.name$.mapFrom(p2.name$, function(n) {
+        return n + "es";
+      });
+
+      p2.name = 'Ringo'; // Will update p1 and p2
+      console.log('Assigned second:', p1.name, p2.name);
+      p1.name = 'George'; // Will only update p1
+      console.log('Assigned first:', p1.name, p2.name);
+      d.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('George');
+      //toBeAssertedThat(p2.name).toEqual('Ringo');
+    }
+  },
+  {
+    name: 'Data Binding one way mapTo',
+    description: 'One-Way Data-Binding, with Map function (mapTo)',
+    dependencies: [  ],
+    code: function() {
+      // The reverse of mapFrom(), mapTo() takes the value of this,
+      // mapping it and assigning to the target.
+      var p1 = Person.create(), p2 = Person.create();
+      var d = p2.name$.mapTo(p1.name$, function(n) {
+        return 'One' + n;
+      });
+
+      p2.name = 'Ringo'; // Will update p1 and p2
+      console.log("Assigned second:", p1.name, p2.name);
+      p1.name = 'George'; // Will only update p1
+      console.log("Assigned first:", p1.name, p2.name);
+      d.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p1.name).toEqual('George');
+      //toBeAssertedThat(p2.name).toEqual('Ringo');
+    }
+  },
+  {
+    name: 'Slot isDefined',
+    description: 'Slots also let you check if the value is defined by calling isDefined()',
+    dependencies: [  ],
+    code: function() {
+      // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
+      foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', value: 42 } ]});
+      var o = IsDefinedTest.create();
+      var dv = o.a$;
+      console.log("Default value only, isDefined?", dv.isDefined());
+      dv.set(99);
+      console.log("Set to 99, isDefined?", dv.isDefined());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(dv.isDefined()).toBe(true);
+    }
+  },
+  {
+    name: 'Slot clear',
+    description: 'You can reset a Slot to its default value by calling .clear()',
+    dependencies: [ 'Slot isDefined' ],
+    code: function() {
+      // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
+      dv.clear();
+      console.log("After clearing:", dv.get(), dv.isDefined());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(dv.isDefined()).toBe(false);
+    }
+  },
+  {
+    name: 'ConstantSlot',
+    description: 'ConstantSlot creates an immutable slot',
+    dependencies: [  ],
+    code: function() {
+      var s = foam.core.ConstantSlot.create({ value: 42 });
+      console.log("Intial value:", s.get());
+      s.value = 66;
+      s.set(66);
+      console.log("After set to 66:", s.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(s.get()).toEqual(42);
+    }
+  },
+  {
+    name: 'Expression Slots',
+    description: 'ExpressionSlot creates a Slot from a list of Slots and a function to comine them',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({ name: 'Person', properties: ['fname', 'lname'] });
+      var p = Person.create({ fname: 'John', lname: 'Smith' });
+      // When fname or lname changes, the new values are fed into the function
+      // to produce a new value for ExpressionSlot e
+      var e = foam.core.ExpressionSlot.create({
+        args: [ p.fname$, p.lname$ ],
+        code: function(f, l) { return f + ' ' + l; }
+      });
+
+      console.log("Intial e:", e.get());
+      e.sub(function() {
+        console.log("e changed:", e.get());
+      });
+      p.fname = 'Steve';
+      p.lname = 'Jones';
+      console.log("Final e:", e.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(e.get()).toEqual('Steve Jones');
+    }
+  },
 
 
 
@@ -1801,135 +2066,9 @@ var FBE = FBE.map(function(def) {
 
 // // TODO: ArrayProperty
 
-// // Two-Way Data-Binding
-// // Slots can be assigned, causing two values to be
-// // bound to the same value.
-// var p1 = Person.create(), p2 = Person.create();
-// p1.name$ = p2.name$;
-// p1.name = 'John';
-// log(p1.name, p2.name);
-// p2.name = 'Steve';
-// log(p1.name, p2.name);
 
-// // Another way to link two Slots is to call .linkFrom() on one of them.
-// var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
-// var d = p1.name$.linkFrom(p2.name$);
-// p1.name = 'John';
-// log(p1.name, p2.name);
 
-// // But this style of link can be broken by calling .destroy()
-// // on the object return from .linkFrom/To().
-// d.destroy();
-// p2.name = 'Steve';
-// log(p1.name, p2.name);
 
-// // linkTo() is the same as linkFrom(), except that the initial value
-// // is taken from 'this' instead of the other object.
-// var p1 = Person.create({name:'p1'}), p2 = Person.create({name:'p2'});
-// var d = p1.name$.linkTo(p2.name$);
-// p1.name = 'John';
-// log(p1.name, p2.name);
-
-// // Two values can be linked through a relationship,
-// // which provides functions to adapt between the two values.
-// foam.CLASS({
-//   name: 'Temperature',
-//   properties: [
-//     { class: 'Float', name: 'f' },
-//     { class: 'Float', name: 'c' }
-//   ],
-//   methods: [
-//     function init() {
-//       this.f$.relateTo(
-//         this.c$,
-//         function c2f(f) { log('f', f); return 9/5 * f + 32; },
-//         function f2c(c) { log('fp', c); return 5/9 * ( c - 32 ); });
-//     }
-//   ]
-// });
-// var t = Temperature.create();
-// log(t.stringify());
-// t.f = 100;
-// log(t.stringify());
-// t.c = 100;
-// log(t.stringify());
-
-// // One-Way Data-Binding
-// // Calling .linkFrom()/.linkTo() creates a two-way data-binding, meaning a change in either
-// // value is reflected in the other.  But FOAM supports one-way data-binding as well.
-// // To do this, use the .follow() method.
-// var d = p1.name$.follow(p2.name$);
-// p2.name = 'Ringo'; // Will update p1 and p2
-// p2.name = 'Paul'; // Will update p1 and p2
-// log(p1.name, p2.name);
-// p1.name = 'George'; // Will only update p1
-// log(p1.name, p2.name);
-// d.destroy();
-
-// // Follow copies the initial value.
-// p1 = Person.create();
-// p2 = Person.create({name:'John'});
-// p1.name$.follow(p2.name$);
-// log(p1.name, p2.name);
-
-// // One-Way Data-Binding, with Map function (mapFrom)
-// var d = p1.name$.mapFrom(p2.name$, function(n) {
-//   return "Mr. " + n;
-// });
-// p1.name$.clear();
-// p2.name$.clear();
-// p2.name = 'Ringo'; // Will update p1 and p2
-// log(p1.name, p2.name);
-// p1.name = 'George'; // Will only update p1
-// log(p1.name, p2.name);
-// d.destroy();
-
-// // One-Way Data-Binding, with Map function (mapTo)
-// var d = p2.name$.mapTo(p1.name$, function(n) {
-//   return "Mr. " + n;
-// });
-// p1.name$.clear();
-// p2.name$.clear();
-// p2.name = 'Ringo'; // Will update p1 and p2
-// log(p1.name, p2.name);
-// p1.name = 'George'; // Will only update p1
-// log(p1.name, p2.name);
-// d.destroy();
-
-// // Slots also let you check if the value is defined by calling isDefined().
-// // Calling obj.name$.isDefined() is equivalent to obj.hasOwnProperty('name');
-// foam.CLASS({name: 'IsDefinedTest', properties: [ { name: 'a', value: 42 } ]});
-// var o = IsDefinedTest.create();
-// var dv = o.a$;
-// log(dv.isDefined());
-// dv.set(99);
-// log(dv.isDefined());
-
-// // You can reset a Slot to its default value by calling .clear().
-// // Calling obj.name$.clear() is equivalent to obj.clearProperty('name');
-// dv.clear();
-// log(dv.get(), dv.isDefined());
-
-// // ConstantSlot creates an immutable slot.
-// var s = foam.core.ConstantSlot.create({value: 42});
-// log(s.get());
-// s.value = 66;
-// s.set(66);
-// log(s.get());
-
-// // ExpressionSlot creates a Slot from a list of Slots
-// // and a function which combines them into a new value.
-// foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
-// var p = Person.create({fname: 'John', lname: 'Smith'});
-// var e = foam.core.ExpressionSlot.create({
-//   args: [ p.fname$, p.lname$],
-//   code: function(f, l) { return f + ' ' + l; }
-// });
-// log(e.get());
-// e.sub(log);
-// p.fname = 'Steve';
-// p.lname = 'Jones';
-// log(e.get());
 
 // // ExpressionSlot can also be supplied an object to work with, and then takes slots from function argument names.
 // var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Smith'});
