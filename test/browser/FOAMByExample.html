@@ -29,14 +29,21 @@
       };
       var writeOutput = function() {
         // write log output
-        document.write("<pre>" + output.join('\n') + "</pre>");
+        document.body.innerHTML += ("<pre>" + output.join('\n') + "</pre>");
       }
       console = {
         __proto__: oldConsole,
         log: logger,
         warn: logger,
         error: logger,
-        debug: logger
+        debug: logger,
+        assert: function(cond) {
+          if ( ! cond ) {
+            var args = Array.prototype.slice.call(arguments);
+            args[0] = "Assertion failed: ";
+            logger.apply(null, args);
+          }
+        }
       }
 
       // Note: eval() for each exemplar may be async, so don't
@@ -53,11 +60,11 @@
       var code = ex.generateExample();
       // TODO: offer expandable view of complete dependencies
       // Write the code with deps omitted
-      document.write("<hr><code>" + ex.generateExample(true) + "</code>");
+      document.body.innerHTML += ("<hr><code>" + ex.generateExample(true) + "</code>");
       // TODO: capture eval's document modifications the way foam1 flow.FBE did
       var result = eval("(function runExemplar___() { " + code + " })();");
 
-      // if not async
+      // if async
       if ( result && result.then ) {
         return result.then(writeOutput);
       } else {

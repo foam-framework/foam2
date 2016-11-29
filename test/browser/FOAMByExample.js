@@ -907,6 +907,207 @@ var FBE = [
       expect(Person.SALARY.cls_).toBe(foam.core.Property);
     }
   },
+  {
+    name: 'Cannot Refine a Property Class',
+    description: 'Refining Properties is currently unsupported and unlikely to be supported.',
+    dependencies: [ ],
+    code: function() {
+      // Refining a type of Property after classes have already been created using
+      // the old version will not propagate the changes to those existing classes.
+      foam.CLASS({ name: 'Salary', extends: 'Float' });
+      foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
+      // Since Classes are not constructed until used, we create an instance to force
+      // Emp to be loaded (otherwise the refinement will appear to work):
+      console.log("Emp.salary before:", Emp.create().salary);
+      foam.CLASS({ refines: 'Salary', properties: [ { name: 'value', value: 30000 } ]});
+      console.log("Emp.salary refined:", Emp.create().salary);
+    },
+    postTestCode: function() {
+      expect(Emp.create().salary).toEqual(0);
+    }
+  },
+  {
+    name: 'Refine Property',
+    description: 'Refine foam.core.Property Class',
+    dependencies: [ ],
+    code: function() {
+      // Property has special support for refinement or existing Property instances
+      foam.CLASS({ name: 'Emp', properties: [ { class: 'Float', name: 'salary' } ] });
+      Emp.create();
+      foam.CLASS({ refines: 'Float', properties: [ [ 'javaClass', 'Float' ] ]});
+      console.log(Emp.SALARY.javaClass);
+    },
+    postTestCode: function() {
+      expect(Emp.SALARY.javaClass).toEqual('Float');
+    }
+  },
+  {
+    name: 'Cannot Refine a SuperProperty Class',
+    description: 'Currently unsupported and unlikely to be supported',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+      foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
+      console.log('Before: super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
+      
+      foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+      console.log('Refined: super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
+    },
+    postTestCode: function() {
+      expect(SuperClass.create().p1).toEqual(42);
+      expect(SubClass.create().p1).toBeUndefined();      
+    }
+  },
+  {
+    name: 'Cannot Refine a DoubleSuperProperty Class',
+    description: 'Currently unsupported and unlikely to be supported. Two inheritance levels.',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
+      foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
+      foam.CLASS({ name: 'SubClass', extends: 'MidClass', properties: [ 'p1' ]});
+      console.log('Before: super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
+      
+      // MidClass will see the refinement since it does not redefine the p1 property, so it
+      // uses SuperClass' directly. SubClass keeps its own definition, and doesn't see the changes
+      // to SuperClass.p1
+      foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
+      console.log('Refined: super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
+    },
+    postTestCode: function() {
+      expect(SuperClass.create().p1).toEqual(42);
+      expect(MidClass.create().p1).toEqual(42);
+      expect(SubClass.create().p1).toBeUndefined();
+    }
+  },
+  {
+    name: 'Create Listeners',
+    description: 'Listeners are pre-bound Methods, suitable for use as callbacks (DOM, or otherwise).',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({
+        name: 'ListenerTest',
+        properties: [ 'name' ],
+        methods: [ function m1() { 
+          console.log('m1', this.name);
+          return 'M1' + this.name;
+        } ],
+        listeners: [ function l1() { 
+          console.log('l1', this.name); 
+          return 'L1' + this.name; // listener return value is ignored by most callers
+        } ]
+      });
+      var o = ListenerTest.create({ name: 'Steve' });
+    }
+  },
+  {
+    name: 'Test Listeners as methods',
+    description: 'Listeners are pre-bound Methods, suitable for use as callbacks (DOM, or otherwise).',
+    dependencies: [ 'Create Listeners' ],
+    code: function() {
+      // When called as methods, the same as Methods.
+      o.m1();
+      o.l1();
+    },
+    postTestCode: function() {
+      expect(o.m1()).toEqual('M1Steve');
+      expect(o.l1()).toEqual('L1Steve');      
+    }
+  },
+  {
+    name: 'Test Listener binding',
+    description: 'Listeners remember their self, binding "this" automatically',
+    dependencies: [ 'Create Listeners' ],
+    code: function() {
+      // When called as functions, the method forgets its 'self' and doesn't work,
+      // but the listener works.
+      var m = o.m1;
+      var l = o.l1;
+      m()
+      l();
+    },
+    postTestCode: function() {
+      expect(o.m1()).toEqual('M1');
+      expect(o.l1()).toEqual('L1Steve');      
+    }
+  },
+  {
+    name: 'Test Merged and Framed validation',
+    description: 'It\'s an error to make a listener both isMerged and isFramed',
+    dependencies: [ ],
+    code: function() {
+      foam.CLASS({
+        name: 'MergedAndFramedTest',
+        listeners: [
+          {
+            name: 'l',
+            isMerged: true,
+            isFramed: true,
+            code: function() { console.log('listener'); }
+          }
+        ]
+      });
+      MergedAndFramedTest.create();
+    },
+    postTestCode: function() {
+      expect(function() {
+        MergedAndFramedTest.create();
+      }).toThrow();
+    }
+  },
+  {
+    name: 'Test isMerged',
+    description: 'isMerged will merge multiple events',
+    dependencies: [ ],
+    code: function async() {
+      // If a listener has isMerged: true, it will merge multiple
+      // events received withing 'mergeDelay' milliseconds into
+      // a single event. 'mergeDelay' is optional and defaults to
+      // 16ms.
+      var mergedCalls = 0;
+
+      foam.CLASS({
+        name: 'MergedListenerTest',
+        listeners: [
+          {
+            name: 'notMerged',
+            isMerged: false, // the default
+            code: function() { 
+              console.log('not merged listener'); 
+            }
+          },
+          {
+            name: 'merged',
+            isMerged: true,
+            mergeDelay: 1, // 1ms
+            code: function() { 
+              console.log('merged listener ' + mergedCalls); 
+              mergedCalls += 1;
+            }
+          }
+        ]
+      });
+      
+      var o = MergedListenerTest.create();
+      o.merged(); o.notMerged();
+      o.merged(); o.notMerged();
+      o.merged(); o.notMerged();
+      o.merged(); o.notMerged();
+      o.merged(); o.notMerged();
+      o.merged(); o.notMerged();
+      o.merged(); o.notMerged();
+      
+      // stop this test after one frame
+      return new Promise(function(res) { 
+        setTimeout(res, 16);
+      });
+    },
+    postTestCode: function() {
+      expect(mergedCalls).toEqual(1);
+    }
+  },
+
+
 
   {
     name: '',
@@ -925,37 +1126,8 @@ var FBE = FBE.map(function(def) {
   return test.helpers.Exemplar.create(def, reg);
 });
 
-
-
-
-
-
-// // Currently unsupported and unlikely to be supported.
-// // Refine a Property Class
-// foam.CLASS({ name: 'Salary', extends: 'Float' });
-// foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
-// foam.CLASS({ refines: 'Salary', properties: [ {name: 'value', value: 30000} ]});
-// log(Emp.create().salary);
-
-// // Refine foam.core Property Class
-// foam.CLASS({ name: 'Emp2', properties: [ { class: 'Float', name: 'salary' } ] });
-// foam.CLASS({ refines: 'Float', properties: [ [ 'javaClass', 'Float' ] ]});
-// log(Emp2.SALARY.javaClass);
-
-// // Currently unsupported and unlikely to be supported.
-// // Refine a SuperProperty Class
-// foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
-// foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
-// foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
-// log('super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
-
-// // Currently unsupported and unlikely to be supported.
-// // Refine a SuperProperty Class
-// foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
-// foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
-// foam.CLASS({ name: 'SubClass', extends: 'MidClass', properties: [ 'p1' ]});
-// foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
-// log('super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
+// 
+// 
 
 // // TODO: BooleanProperty
 
@@ -964,65 +1136,6 @@ var FBE = FBE.map(function(def) {
 // // TODO: StringProperty
 
 // // TODO: ArrayProperty
-
-// // Listeners are pre-bound Methods, suitable for use as callbacks (DOM, or otherwise).
-// foam.CLASS({
-//   name: 'ListenerTest',
-//   properties: [ 'name' ],
-//   methods: [ function m1() { console.log('m1', this.name); } ],
-//   listeners: [ function l1() { console.log('l1', this.name); } ]
-// });
-// var o = ListenerTest.create({name: 'Steve'});
-// // When called as methods, the same as Methods.
-// log(o.m1(), o.l1());
-
-// // But when called as functions, the method forgets its 'self' and doesn't work,
-// // but the listener does.
-// var m = o.m1, l = o.l1;
-// log(m(), l());
-
-// // It's an error to make a listener both isMerged and isFramed.
-// foam.CLASS({
-//   name: 'MergedAndFramedTest',
-//   listeners: [
-//     {
-//       name: 'l',
-//       isMerged: true,
-//       isFramed: true,
-//       code: function() { log('listener'); }
-//     }
-//   ]
-// });
-
-// //:NOTEST
-// // If a listener has isMerged: true, it will merge multiple
-// // events received withing 'mergeDelay' milliseconds into
-// // a single event. 'mergeDelay' is optional and defaults to
-// // 16ms.
-// foam.CLASS({
-//   name: 'MergedListenerTest',
-//   listeners: [
-//     {
-//       name: 'notMerged',
-//       isMerged: false, // the default
-//       code: function() { log('not merged listener'); }
-//     },
-//     {
-//       name: 'merged',
-//       isMerged: true,
-//       mergeDelay: 1, // 1ms
-//       code: function() { log('merged listener'); }
-//     }
-//   ]
-// });
-// var o = MergedListenerTest.create();
-// o.merged(); o.notMerged();
-// o.merged(); o.notMerged();
-// o.merged(); o.notMerged();
-// o.merged(); o.notMerged();
-// o.merged(); o.notMerged();
-// o.merged(); o.notMerged();
-// o.merged(); o.notMerged();
 
 // //:NOTEST
 // // If a listener has isFramed: true, it will merge multiple
