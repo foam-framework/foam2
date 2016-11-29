@@ -949,13 +949,13 @@ var FBE = [
       foam.CLASS({ name: 'SuperClass', properties: [ 'p1' ]});
       foam.CLASS({ name: 'SubClass', extends: 'SuperClass', properties: [ 'p1' ]});
       console.log('Before: super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
-      
+
       foam.CLASS({ refines: 'SuperClass', properties: [ { name: 'p1', value: 42 } ]});
       console.log('Refined: super: ', SuperClass.create().p1, 'sub: ', SubClass.create().p1);
     },
     postTestCode: function() {
       expect(SuperClass.create().p1).toEqual(42);
-      expect(SubClass.create().p1).toBeUndefined();      
+      expect(SubClass.create().p1).toBeUndefined();
     }
   },
   {
@@ -967,7 +967,7 @@ var FBE = [
       foam.CLASS({ name: 'MidClass', extends: 'SuperClass' });
       foam.CLASS({ name: 'SubClass', extends: 'MidClass', properties: [ 'p1' ]});
       console.log('Before: super: ', SuperClass.create().p1, 'mid: ', MidClass.create().p1, 'sub: ', SubClass.create().p1);
-      
+
       // MidClass will see the refinement since it does not redefine the p1 property, so it
       // uses SuperClass' directly. SubClass keeps its own definition, and doesn't see the changes
       // to SuperClass.p1
@@ -988,12 +988,12 @@ var FBE = [
       foam.CLASS({
         name: 'ListenerTest',
         properties: [ 'name' ],
-        methods: [ function m1() { 
+        methods: [ function m1() {
           console.log('m1', this.name);
           return 'M1' + this.name;
         } ],
-        listeners: [ function l1() { 
-          console.log('l1', this.name); 
+        listeners: [ function l1() {
+          console.log('l1', this.name);
           return 'L1' + this.name; // listener return value is ignored by most callers
         } ]
       });
@@ -1011,7 +1011,7 @@ var FBE = [
     },
     postTestCode: function() {
       expect(o.m1()).toEqual('M1Steve');
-      expect(o.l1()).toEqual('L1Steve');      
+      expect(o.l1()).toEqual('L1Steve');
     }
   },
   {
@@ -1028,7 +1028,7 @@ var FBE = [
     },
     postTestCode: function() {
       expect(o.m1()).toEqual('M1');
-      expect(o.l1()).toEqual('L1Steve');      
+      expect(o.l1()).toEqual('L1Steve');
     }
   },
   {
@@ -1072,22 +1072,22 @@ var FBE = [
           {
             name: 'notMerged',
             isMerged: false, // the default
-            code: function() { 
-              console.log('not merged listener'); 
+            code: function() {
+              console.log('not merged listener');
             }
           },
           {
             name: 'merged',
             isMerged: true,
             mergeDelay: 1, // 1ms
-            code: function() { 
-              console.log('merged listener ' + mergedCalls); 
+            code: function() {
+              console.log('merged listener ' + mergedCalls);
               mergedCalls += 1;
             }
           }
         ]
       });
-      
+
       var o = MergedListenerTest.create();
       o.merged(); o.notMerged();
       o.merged(); o.notMerged();
@@ -1096,9 +1096,9 @@ var FBE = [
       o.merged(); o.notMerged();
       o.merged(); o.notMerged();
       o.merged(); o.notMerged();
-      
+
       // stop this test after one frame
-      return new Promise(function(res) { 
+      return new Promise(function(res) {
         setTimeout(res, 16);
       });
     },
@@ -1121,7 +1121,7 @@ var FBE = [
           {
             name: 'framed',
             isFramed: true,
-            code: function() { 
+            code: function() {
               console.log('framed listener ' + framedCalls);
               framedCalls += 1;
             }
@@ -1133,7 +1133,7 @@ var FBE = [
       o.framed();
       o.framed();
       o.framed();
-      
+
       // delay for more than one frame to ensure the listener runs
       return new Promise(function(res) {
         setTimeout(res, 32);
@@ -1152,24 +1152,24 @@ var FBE = [
       // execution of the listener. Unlike merged(), which also delays
       // results, delayed() does not merge results.
       var callOrder = '';
-      var l1 = foam.__context__.delayed(function() { 
+      var l1 = foam.__context__.delayed(function() {
         console.log('l1');
-        callOrder += 'l1'; 
+        callOrder += 'l1';
       }, 10);
-      var l2 = foam.__context__.delayed(function() { 
-        console.log('l2'); 
+      var l2 = foam.__context__.delayed(function() {
+        console.log('l2');
         callOrder += 'l2';
       }, 5);
       l1();
       l2();
       l1();
       l2();
-      
+
       // delay to ensure the listener runs
       return new Promise(function(res) {
         setTimeout(res, 16);
       });
-      
+
     },
     postTestCode: function() {
       expect(callOrder).toEqual('l2l2l1l1');
@@ -1181,12 +1181,12 @@ var FBE = [
     dependencies: [ ],
     code: function() {
       var callOrder = '';
-      var d1 = foam.__context__.async(function() { 
-        console.log('d1'); 
+      var d1 = foam.__context__.async(function() {
+        console.log('d1');
         callOrder += 'd1';
       });
-      var d2 = function() { 
-        console.log('d2'); 
+      var d2 = function() {
+        console.log('d2');
         callOrder += 'd2';
       };
       d1();
@@ -1219,7 +1219,7 @@ var FBE = [
         name: 'LongAlarm',
         extends: 'Alarm',
         listeners: [
-          function alarm() { 
+          function alarm() {
             alarms += 'LongAlarm: ';
             this.SUPER(); this.SUPER(); this.SUPER();
           }
@@ -1251,8 +1251,8 @@ var FBE = [
             name: 'longForm',
             isAvailable: function() { return this.available; },
             isEnabled: function() { return this.enabled; },
-            code: function() { 
-              console.log('long action!'); 
+            code: function() {
+              console.log('long action!');
               longCalls += 1;
             }
           }
@@ -1260,7 +1260,7 @@ var FBE = [
       });
       var o = ActionTest.create();
       o.shortForm();
-      
+
       o.longForm(); // Won't be called because is not enabled or available yet
       o.enabled = true;
       o.longForm(); // Won't be called because is not available yet
@@ -1300,12 +1300,188 @@ var FBE = [
       var tt = ImplementsTest.create({p1:1, t1:2});
       tt.tfoo(); // From SampleI
       tt.foo();
-      tt.describe();
+      console.log("Properties p1:", tt.p1, "t1:", tt.t1);
     },
     postTestCode: function() {
       expect(callOrder).toEqual('tfoofoo');
     }
   },
+  {
+    name: 'Interface multiple inheritance',
+    description: 'Implements allows multiple inheritance, unlike extends',
+    dependencies: [ 'Interface inheritance' ],
+    code: function() {
+      // Unlike regular inheritance with extends:, classes
+      // can implement: from multiple sources. However,
+      // implements only takes axioms from the class you reference,
+      // not anything it extends or implements.
+      foam.CLASS({
+        name: 'Sample2I',
+        properties: [ 'tb1', 'tb2', 'tb3' ],
+        methods: [
+          function tbfoo() { console.log('ffoo'); },
+          function tbbar() { console.log('tbar'); }
+        ]
+      });
+      foam.CLASS({
+        name: 'ImplementsTest2',
+        implements: ['SampleI', 'Sample2I']
+      });
+
+      console.log("ImplementsTest2 properties:",
+        ImplementsTest2.getAxiomsByClass(foam.core.Property));
+    },
+    postTestCode: function() {
+      expect(ImplementsTest2.TB1).not.toBeUndefined();
+      expect(ImplementsTest2.T1).not.toBeUndefined();
+    }
+  },
+  {
+    name: 'Property Inheritance',
+    description: 'Properties in subclasses inherit from the parent\'s Properties',
+    dependencies: [  ],
+    code: function() {
+      // FOAM also has Property-Inheritance.
+      // Test that a sub-class Property inherits its parent Property's class
+      foam.CLASS({
+        name: 'PropertyInheritA',
+        properties: [ {class: 'Boolean', name: 'sameName'} ]
+      });
+      foam.CLASS({
+        name: 'PropertyInheritB',
+        extends: 'PropertyInheritA',
+        properties: [ 'sameName' ]
+      });
+      console.log(PropertyInheritA.SAME_NAME.cls_.id, PropertyInheritB.SAME_NAME.cls_.id);
+    },
+    postTestCode: function() {
+    }
+  },
+  {
+    name: 'Inner Classes',
+    description: 'Inner classes are defined inside another class, not directly available in the global namespace.',
+    dependencies: [  ],
+    code: function() {
+      // Classes can have inner-Classes.
+      var results = '';
+      foam.CLASS({
+        name: 'InnerClassTest',
+        classes: [
+          { name: 'InnerClass1', properties: ['a', 'b'] },
+          { name: 'InnerClass2', properties: ['x', 'y'] }
+        ],
+        methods: [
+          function init() {
+            // access from within the outer class
+            var ic1 = this.InnerClass1.create({a:1, b:2});
+            var ic2 = this.InnerClass2.create({x:5, y:10});
+            results += ic1.a + ", " + ic1.b + ", " + ic2.x + ", " + ic2.y;
+          }
+        ]
+      });
+      InnerClassTest.create();
+      console.log(results);
+    },
+    postTestCode: function() {
+      expect(results).toEqual("1, 2, 5, 10");
+    }
+  },
+  {
+    name: 'Inner Class access',
+    description: 'Inner classes are only accessible through their outer class',
+    dependencies: [ 'Inner Classes' ],
+    code: function() {
+      console.log("Access through outer:", InnerClassTest.InnerClass1.name);
+
+      // Inner-classes do not appear in the global namespace
+      console.log("Available globally?", !! global.InnerClass1);
+    },
+    postTestCode: function() {
+      expect(InnerClassTest.InnerClass1).not.toBeUndefined();
+      expect(global.InnerClass1).toBeUndefined();
+    }
+  },
+  {
+    name: 'Inner Enums',
+    description: 'Similar to Inner-classes, there\'s also Inner-enums',
+    dependencies: [  ],
+    code: function() {
+      var result = '';
+      foam.CLASS({
+        name: 'InnerEnumTest',
+        enums: [
+          { name: 'InnerEnum', values: [
+          { name: 'OPEN',   label: 'Open'   },
+          { name: 'CLOSED', label: 'Closed' }
+          ] }
+        ],
+        methods: [
+          function init() {
+            // access from within the outer class
+            result += this.InnerEnum.OPEN + " / " + this.InnerEnum.CLOSED;
+          }
+        ]
+      });
+      InnerEnumTest.create();
+      console.log(result);
+    },
+    postTestCode: function() {
+      expect(result).toEqual("OPEN / CLOSED");
+    }
+  },
+  {
+    name: 'Inner Enum access',
+    description: 'Inner-enums can only be accessed through the outer-class',
+    dependencies: [  ],
+    code: function() {
+      console.log("Access through outer:", InnerEnumTest.InnerEnum.name);
+
+      // Inner-enums do not appear in the global namespace
+      console.log("Available globally?", !! global.InnerEnum);
+    },
+    postTestCode: function() {
+      expect(InnerEnumTest.InnerEnum).not.toBeUndefined();
+      expect(global.InnerEnum).toBeUndefined();
+    }
+  },
+  {
+    name: 'Pub Sub',
+    description: 'Objects can publish events and subscribe to other objects',
+    dependencies: [  ],
+    code: function() {
+      // Objects support pub() for publishing events,
+      // and sub() for subscribing to published events.
+      foam.CLASS({
+        name: 'PubSubTest'
+      });
+      var o = PubSubTest.create();
+      var globalCalls = 0;
+      var alarmCalls = 0;
+      // Install a listener that listens to all events
+      // Listeners are called with a subscription object and the given
+      //   arguments from pub().
+      o.sub(function() {
+        console.log('  global listener: ', [].join.call(arguments, ' '));
+        globalCalls += 1;
+      });
+      // This listener will only fire if the first argument matches 'alarm'
+      o.sub('alarm', function() {
+        console.log('  alarm: ', [].join.call(arguments, ' '));
+        alarmCalls += 1;
+      });
+      console.log("Pub alarm:");
+      o.pub('alarm', 'on');
+      console.log("Pub lifecycle:");
+      o.pub('lifecycle', 'loaded');
+    },
+    postTestCode: function() {
+      expect(globalCalls).toEqual(2);
+      expect(alarmCalls).toEqual(1);
+    }
+  },
+
+
+
 
   {
     name: '',
@@ -1323,8 +1499,8 @@ var FBE = FBE.map(function(def) {
   return test.helpers.Exemplar.create(def, reg);
 });
 
-// 
-// 
+//
+//
 
 // // TODO: BooleanProperty
 
@@ -1333,97 +1509,6 @@ var FBE = FBE.map(function(def) {
 // // TODO: StringProperty
 
 // // TODO: ArrayProperty
-
-
-
-
-
-// // Unlike regular inheritance with extends:, classes
-// // can implement: from multiple sources.
-// foam.CLASS({
-//   name: 'Sample2I',
-//   properties: [ 'tb1', 'tb2', 'tb3' ],
-//   methods: [
-//     function tbfoo() { console.log('ffoo'); },
-//     function tbbar() { console.log('tbar'); }
-//   ]
-// });
-// foam.CLASS({
-//   name: 'ImplementsTest2',
-//   implements: ['SampleI', 'Sample2I']
-// });
-// ImplementsTest2.describe();
-
-// // FOAM also has Property-Inheritance.
-// // Test that a sub-class Property inherits its parent Property's class
-// foam.CLASS({
-//   name: 'PropertyInheritA',
-//   properties: [ {class: 'Boolean', name: 'sameName'} ]
-// });
-// foam.CLASS({
-//   name: 'PropertyInheritB',
-//   extends: 'PropertyInheritA',
-//   properties: [ 'sameName' ]
-// });
-// log(PropertyInheritA.SAME_NAME.cls_.id, PropertyInheritB.SAME_NAME.cls_.id);
-
-// // Classes can have inner-Classes.
-// foam.CLASS({
-//   name: 'InnerClassTest',
-//   classes: [
-//     { name: 'InnerClass1', properties: ['a', 'b'] },
-//     { name: 'InnerClass2', properties: ['x', 'y'] }
-//   ],
-//   methods: [
-//     function init() {
-//       var ic1 = this.InnerClass1.create({a:1, b:2});
-//       var ic2 = this.InnerClass2.create({x:5, y:10});
-//       log(ic1.a, ic1.b, ic2.x, ic2.y);
-//     }
-//   ]
-// });
-// InnerClassTest.create();
-
-// // Inner-classes can also be accessed from the outer-class
-// InnerClassTest.InnerClass1.describe();
-
-// // Inner-classes do not appear in the global namespace
-// log(! global.InnerClass1);
-
-// // Similar to Inner-classes, there's also Inner-enums
-// foam.CLASS({
-//   name: 'InnerEnumTest',
-//   enums: [
-//     { name: 'InnerEnum', values: [
-//     { name: 'OPEN',   label: 'Open'   },
-//     { name: 'CLOSED', label: 'Closed' }
-//     ] }
-//   ],
-//   methods: [
-//     function init() {
-//       log(this.InnerEnum.OPEN, this.InnerEnum.CLOSED)
-//     }
-//   ]
-// });
-// InnerEnumTest.create();
-
-// // Inner-enums can also be accessed from the outer-class
-// InnerEnumTest.InnerEnum.describe();
-
-// // Inner-enums do not appear in the global namespace
-// log(! global.InnerEnum);
-
-// // Objects support pub() for pubing events,
-// // and sub() for listening for pubed events.
-// foam.CLASS({
-//   name: 'PubSubTest'
-// });
-// var o = PubSubTest.create();
-// // Install a listener that listens to all events
-// o.sub(function() { console.log('global listener: ', [].join.call(arguments, ' ')); });
-// o.sub('alarm', function() { console.log('alarm: ', [].join.call(arguments, ' ')); });
-// o.pub('alarm', 'on');
-// o.pub('lifecycle', 'loaded');
 
 // // Test publishing with many args
 // o.pub(1);
