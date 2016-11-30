@@ -18,6 +18,7 @@
 /* global window */
 /* jshint evil: true */
 require('../../../foam');
+require('./OAuth2');
 require('./ProtobufParser');
 var fs = require('fs');
 var path = require('path');
@@ -303,7 +304,7 @@ function outputServiceExporter(services, pkg, baseUrl) {
   ];
 
   // http request factory
-  requires.push('foam.net.GoogleOAuth2XHRHTTPRequest');
+  requires.push('com.google.net.GoogleOAuth2XHRHTTPRequest');
   exports.push('HTTPRequestFactory');
   properties.push({
     name: 'HTTPRequestFactory',

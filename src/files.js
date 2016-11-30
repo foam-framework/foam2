@@ -63,7 +63,6 @@ FOAM_FILES([
   { name: "foam/core/Serializable" },
   { name: "lib/java", flags: ['java'] },
   { name: "lib/JavaClass", flags: ['java'] },
-  { name: "lib/Promise" },
   { name: "foam/util/Timer" },
   { name: "foam/memento/MementoMgr" },
   { name: "lib/input", flags: ['web'] },
@@ -116,7 +115,7 @@ FOAM_FILES([
   { name: "lib/fcm" },
   { name: "lib/Stub" },
   { name: "lib/box" },
-  { name: "lib/async" },
+  { name: "foam/core/async" },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
   { name: "foam/u2/daos", flags: ['web'] },
   { name: "foam/u2/TableView", flags: ['web'] },
@@ -164,6 +163,5 @@ FOAM_FILES([
   { name: "foam/comics/DAOCreateController" },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] },
-  { name: "lib/HTTPMethod" },
-  { name: "lib/OAuth2" }
+  { name: "foam/net/HTTPMethod" },
 ]);

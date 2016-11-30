@@ -37,7 +37,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
   name: 'Paddle',
-  extends: 'foam.graphics.Circle',
+  extends: 'foam.graphics.Box',
 
   implements: [
     'foam.physics.Physical',
@@ -46,7 +46,8 @@ foam.CLASS({
 
   properties: [
     [ 'color', 'white' ],
-    [ 'radius', 30 ],
+    [ 'width', 20 ],
+    [ 'height', 80 ],
     {
       name: 'mass',
       factory: function() { return this.INFINITE_MASS; }
@@ -80,7 +81,7 @@ foam.CLASS({
     },
     {
       name: 'ball',
-      factory: function() { return this.Ball.create({color: 'white', radius: 20}); }
+      factory: function() { return this.Ball.create({border: null, color: 'white', radius: 20}); }
     },
     {
       name: 'lPaddle',
@@ -206,9 +207,9 @@ foam.CLASS({
           this.rPaddle);
 
       // Position Paddles
-      this.lPaddle.x = 25+this.lPaddle.radius;
-      this.rPaddle.x = this.canvas.width-25-this.rPaddle.radius;
-      this.lPaddle.y = this.rPaddle.y = this.canvas.height/2-this.rPaddle.radius;
+      this.lPaddle.x = 25;
+      this.rPaddle.x = this.canvas.width-25-this.rPaddle.width;
+      this.lPaddle.y = this.rPaddle.y = (this.canvas.height-this.rPaddle.height)/2;
 
       // Setup Ball
       this.ball.x  = 110;
