@@ -2534,16 +2534,12 @@ var FBE = [
       //toBeAssertedThat(Y2.describe).not.toBeUndefined();
     }
   },
+
   {
-    name: 'Import context values',
-    description: 'Classes can import values from the Context so that they can be accessed from this',
+    name: 'Imports Test Class',
+    description: 'Imports are pulled from the context when an instance is created',
     dependencies: [  ],
     code: function() {
-      var lastLogMsg = "";
-      var Y = foam.createSubContext({ myLogger: function(msg) {
-        console.log('log:', msg);
-        lastLogMsg = msg;
-      }});
       foam.CLASS({
         name: 'ImportsTest',
         imports: [ 'myLogger' ],
@@ -2551,6 +2547,14 @@ var FBE = [
           this.myLogger('log foo from ImportTest');
         } ]
       });
+    }
+  },
+  {
+    name: 'Import context values',
+    description: 'Classes can import values from the Context so that they can be accessed from this',
+    dependencies: [ 'Imports Test Class' ],
+    code: function() {
+      // First try the import with no 'myLogger' in its context
       try {
         var o = ImportsTest.create(); // should fail here, on object creation
         console.log('test created');
@@ -2558,8 +2562,18 @@ var FBE = [
       } catch(e) {
         console.log('Could not import "myLogger" since nobody provided it.');
       }
+
+      var lastLogMsg = "";
+      // Provide a 'myLogger' on a context
+      var Y = foam.createSubContext({ myLogger: function(msg) {
+        console.log('log:', msg);
+        lastLogMsg = msg;
+      }});
+
       Y.myLogger('test');
-      var o = ImportsTest.create(null, Y);
+      // Using 'requires' supplies the context automatically, but for this
+      // example we supply the context explicitly.
+      var o = ImportsTest.create(null, Y); // create with context Y
       o.foo();
     },
     postTestCode: function() {
@@ -2591,6 +2605,287 @@ var FBE = [
        //toBeAssertedThat(o.myLogger).toBeUndefined();
     }
   },
+  {
+    name: 'Export context values',
+    description: 'Classes can export values for use by objects they create',
+    dependencies: [ 'Imports Test Class' ],
+    code: function() {
+      var calls = 0;
+      foam.CLASS({
+        name: 'ExportsTest',
+        requires: [ 'ImportsTest' ],
+        exports: [ 'myLogger' ],
+        methods: [
+          function init() {
+            this.ImportsTest.create().foo();
+          },
+          function myLogger(msg) {
+            // this function is exported, thus available to object we create
+            // (like ImportsTest in our init)
+            console.log('ExportsTest logger call:', msg);
+            calls += 1;
+          }
+        ]
+      });
+      ExportsTest.create();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(1);
+    }
+  },
+  {
+    name: 'Packages',
+    description: 'Classes can specify a package',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        package: 'com.acme',
+        name: 'Test',
+        methods: [ function foo() {
+          console.log('Hello, I am foo() from com.acme.Test');
+        } ]
+      });
+      com.acme.Test.create().foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(com.acme.Test).not.toBeUndefined()
+      //toBeAssertedThat(foam.lookup('com.acme.Test', true)).toBe(com.acme.Test);
+    }
+  },
+  {
+    name: 'Requires',
+    description: 'Classes should requires: other Classes they need to use',
+    dependencies: [ 'Packages' ],
+    code: function() {
+      // Classes can requires: other Classes to avoid having to reference them
+      // by their fully-qualified names. The creation context (and thus our
+      // exports) is also automatically provided.
+      foam.CLASS({
+        name: 'RequiresTest',
+        requires: ['com.acme.Test' ],
+        methods: [ function foo() {
+          this.Test.create().foo();
+        } ]
+      });
+
+      console.log("When required:");
+      RequiresTest.create().foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { RequiresTest.create().foo(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Requires as',
+    description: 'Requires can use as to alias required Classes',
+    dependencies: [ 'Packages' ],
+    code: function() {
+      // Use 'as' to pick the name to use on 'this'. If a required
+      // class is named the same as one of your properties or methods,
+      // or two required classes have the same name, you may be forced
+      // to specify the name with 'as':
+      foam.CLASS({
+        name: 'RequiresAliasTest',
+        requires: ['com.acme.Test as NotTest' ],
+        methods: [ function foo() {
+          this.NotTest.create().foo();
+        } ]
+      });
+
+      console.log("Required as NotTest:");
+      RequiresAliasTest.create().foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { RequiresAliasTest.create().foo(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Primary Key',
+    description: 'Classes can have a unique-id or primary-key',
+    dependencies: [  ],
+    code: function() {
+      // By default, this is simply the field named 'id'.
+      foam.CLASS({
+        name: 'Invoice',
+        properties: [ 'id', 'desc', 'amount' ]
+      });
+      var o = Invoice.create({ id: 1, desc: 'Duct Cleaning', amount: 99.99 });
+      console.log(o.id);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.id).toEqual(1);
+    }
+  },
+  {
+    name: 'Primary Key ids',
+    description: 'Use the ids property to specify that the primary key be something other than id',
+    dependencies: [  ],
+    code: function() {
+      // You can also use the 'ids' property to specify that
+      // the primary key be something other than 'id'.
+      // In this case, 'id' will become an psedo-property for
+      // accessing the real 'invoiceId' property.
+      foam.CLASS({
+        name: 'Invoice2',
+        ids: [ 'invoiceId' ],
+        properties: [ 'invoiceId', 'desc', 'amount' ]
+      });
+      var o = Invoice2.create({ invoiceId: 23, desc: 'Duct Cleaning', amount: 99.99 });
+      console.log("Id:", o.id, "invoiceId:", o.invoiceId);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.id).toEqual(23);
+    }
+  },
+  {
+    name: 'Primary Key multipart Class',
+    description: 'Multi-part unique identifiers are also supported by setting ids',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'Invoice3',
+        ids: [ 'customerId', 'invoiceId' ],
+        properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ]
+      });
+    }
+  },
+  {
+    name: 'Primary Key multipart',
+    description: 'Multi-part unique identifiers are also supported by setting ids',
+    dependencies: [ 'Primary Key multipart Class' ],
+    code: function() {
+      var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
+      console.log("initial           id:", o.id, "customerId:", o.customerId, "invoiceId:", o.invoiceId);
+      // setting id propagates the changes to the properties that make up the
+      // multipart id:
+      o.id = [2, 3];
+      console.log("after setting id, id:", o.id, "customerId:", o.customerId, "invoiceId:", o.invoiceId);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.customerId).toEqual(2);
+      //toBeAssertedThat(o.invoiceId).toEqual(3);
+    }
+  },
+  {
+    name: 'Primary Key multipart comparison',
+    description: 'Multi-part ids are comparable',
+    dependencies: [ 'Primary Key multipart Class' ],
+    code: function() {
+      var results = '';
+      results += Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 2}),
+        Invoice3.create({customerId: 1, invoiceId: 1}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 1}),
+        Invoice3.create({customerId: 1, invoiceId: 2}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 1}),
+        Invoice3.create({customerId: 1, invoiceId: 1}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 2, invoiceId: 1}),
+        Invoice3.create({customerId: 1, invoiceId: 1}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 1}),
+        Invoice3.create({customerId: 2, invoiceId: 1}));
+
+      console.log("Comparison results:", results);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(results).toEqual('1, -1, 0, 1, -1');
+    }
+  },
+  {
+    name: 'Class Id',
+    description: 'A Class\' id is a combination of its package and name',
+    dependencies: [ 'Packages' ],
+    code: function() {
+      console.log("Test class id:", com.acme.Test.id);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(com.acme.Test.id).toEqual('com.acme.Test');
+    }
+  },
+  {
+    name: 'Custom Axioms',
+    description: 'Specify arbitrary Axioms for a Class with axioms:',
+    dependencies: [  ],
+    code: function() {
+      // In addition the the built-in Axiom types, you can also
+      // specify arbitrary Axioms with 'axioms:'.
+      // This example adds the 'Singleton' axiom to make a class
+      // implement the Singleton patter (ie. there can only be
+      // one instance)
+      foam.CLASS({
+        name: 'AxiomTest',
+        axioms: [ foam.pattern.Singleton.create() ],
+        methods: [ function init() {
+          console.log('Creating AxiomTest');
+        } ]
+      });
+
+      AxiomTest.create();
+      AxiomTest.create();
+      console.log("Same instance?", AxiomTest.create() === AxiomTest.create());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(AxiomTest.create()).toBe(AxiomTest.create());
+    }
+  },
+  {
+    name: 'Custom Axioms inherit',
+    description: 'Gain the custom axioms of a Class you extend',
+    dependencies: [ 'Custom Axioms' ],
+    code: function() {
+      //
+      foam.CLASS({
+        name: 'AxiomSubTest',
+        extends: 'AxiomTest',
+        methods: [ function init() {
+          console.log('Creating AxiomSubTest');
+        } ]
+      });
+      AxiomSubTest.create();
+      AxiomSubTest.create();
+      console.log("sub is same instance?", AxiomSubTest.create() === AxiomSubTest.create());
+      console.log("sub same as super?", AxiomSubTest.create() === AxiomTest.create());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(AxiomSubTest.create()).toBe(AxiomSubTest.create());
+      //toBeAssertedThat(AxiomSubTest.create()).not.toBe(AxiomTest.create());
+    }
+  },
+  {
+    name: 'Mutliton',
+    description: 'Add the Multion axiom to implement the Multiton pattern',
+    dependencies: [  ],
+    code: function() {
+      // Multitons create one shared instance per value, based on the given
+      // property.
+      foam.CLASS({
+        name: 'Color',
+        axioms: [ foam.pattern.Multiton.create({ property: 'color' }) ],
+        properties: [ 'color' ],
+        methods: [ function init() {
+          console.log('Creating Color:', this.color);
+        } ]
+      });
+
+      var red1 = Color.create({color: 'red'});
+      var red2 = Color.create({color: 'red'});
+      var blue = Color.create({color: 'blue'});
+
+      console.log('reds same?', red1 === red2);
+      console.log('red same as blue?', red1 === blue);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(red1).toBe(red2);
+      //toBeAssertedThat(red1).not.toBe(blue);
+    }
+  },
 
   {
     name: '',
@@ -2601,7 +2896,6 @@ var FBE = [
     postTestCode: function() {
     }
   },
-
 ];
 
 var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
@@ -2618,138 +2912,6 @@ var FBE = FBE.map(function(def) {
 // // TODO: ArrayProperty
 
 
-
-// // Classes can export values for use by objects they create.
-// foam.CLASS({
-//   name: 'ExportsTest',
-//   requires: [ 'ImportsTest' ],
-//   exports: [ 'myLogger' ],
-//   methods: [
-//     function init() {
-//       this.ImportsTest.create().foo();
-//     },
-//     function myLogger(msg) {
-//       console.log('log from ExportsTest:', msg);
-//     }
-//   ]
-// });
-// ExportsTest.create();
-
-// // Packages
-// // Classes can specify a 'package'.
-// foam.CLASS({
-//   package: 'com.acme',
-//   name: 'Test',
-//   methods: [ function foo() { console.log('foo from com.acme.Test'); } ]
-// });
-// com.acme.Test.create().foo();
-
-// // Classes can requires: other Classes to avoid having to reference them
-// // by their fully-qualified names.
-// foam.CLASS({
-//   name: 'RequiresTest',
-//   requires: ['com.acme.Test' ],
-//   methods: [ function foo() { this.Test.create().foo(); } ]
-// });
-// RequiresTest.create().foo();
-
-// // Requires can use 'as' to alias required Classes so that they are named something different.
-// foam.CLASS({
-//   name: 'RequiresAliasTest',
-//   requires: ['com.acme.Test as NotTest' ],
-//   methods: [ function foo() { this.NotTest.create().foo(); } ]
-// });
-// RequiresAliasTest.create().foo();
-
-// // Classes can have a unique-id or primary-key.
-// // By default, this is simply the field named 'id'.
-// foam.CLASS({
-//   name: 'Invoice',
-//   properties: [ 'id', 'desc', 'amount' ]
-// });
-// var o = Invoice.create({id: 1, desc: 'Duct Cleaning', amount: 99.99});
-// log(o.id);
-
-// // But you can also use the 'ids' property to specify that
-// // the primary key be something other than 'id'.
-// // In this case, 'id' will become an psedo-property for
-// // accessing the real 'invoiceId' property.
-// foam.CLASS({
-//   name: 'Invoice2',
-//   ids: [ 'invoiceId' ],
-//   properties: [ 'invoiceId', 'desc', 'amount' ]
-// });
-// var o = Invoice2.create({invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
-// log(o.id, o.invoiceId);
-
-// // Multi-part unique identifiers are also supported.
-// foam.CLASS({
-//   name: 'Invoice3',
-//   ids: [ 'customerId', 'invoiceId' ],
-//   properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ]
-// });
-// var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
-// log(o.id, o.customerId, o.invoiceId);
-// o.id = [2, 3];
-// log(o.id, o.customerId, o.invoiceId);
-
-// // Multi-part ids are comparable
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 2}),
-//   Invoice3.create({customerId: 1, invoiceId: 1})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 1}),
-//   Invoice3.create({customerId: 1, invoiceId: 2})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 1}),
-//   Invoice3.create({customerId: 1, invoiceId: 1})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 2, invoiceId: 1}),
-//   Invoice3.create({customerId: 1, invoiceId: 1})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 1}),
-//   Invoice3.create({customerId: 2, invoiceId: 1})));
-
-// // A Classes 'id' is a combination of its package and name.
-// log(com.acme.Test.id);
-
-// // In addition the the built-in Axiom types, you can also
-// // specify arbitrary Axioms with 'axioms:'.
-// // This example adds the 'Singleton' axiom to make a class
-// // implement the Singleton patter (ie. there can only be
-// // one instance)
-// foam.CLASS({
-//   name: 'AxiomTest',
-//   axioms: [ foam.pattern.Singleton.create() ],
-//   methods: [ function init() { log('Creating AxiomTest'); } ]
-// });
-// AxiomTest.create();
-// AxiomTest.create();
-// log(AxiomTest.create() === AxiomTest.create());
-
-// //
-// foam.CLASS({
-//   name: 'AxiomSubTest',
-//   extends: 'AxiomTest',
-//   methods: [ function init() { log('Creating AxiomSubTest'); } ]
-// });
-// AxiomSubTest.create();
-// AxiomSubTest.create();
-// log(AxiomSubTest.create() === AxiomSubTest.create());
-// log(AxiomSubTest.create() === AxiomTest.create());
-
-// // Or add the Multion axiom to implement the Multiton pattern.
-// foam.CLASS({
-//   name: 'Color',
-//   axioms: [ foam.pattern.Multiton.create({property: 'color'}) ],
-//   properties: [ 'color' ],
-//   methods: [ function init() { log('Creating Color:', this.color); } ]
-// });
-// var red1 = Color.create({color: 'red'});
-// var red2 = Color.create({color: 'red'});
-// var blue = Color.create({color: 'blue'});
-// log(red1 === red2);
-// log(red1 === blue);
 
 
 // // Stdlib
