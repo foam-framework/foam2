@@ -37,6 +37,8 @@
         // write log output
         document.body.innerHTML += ("<pre>" + output.join('\n') + "</pre>");
       }
+      // TODO: settle on logging strategy. Probably not using console but may want to
+      //   override it to catch unfixed calls.
       console = {
         __proto__: oldConsole,
         log: logger,
@@ -57,9 +59,12 @@
       if ( oldContext) foam.__context__ = oldContext;
 
       oldContext = foam.__context__;
-      // TODO: make consistent for assert, warn, error, etc.
       foam.__context__ = foam.createSubContext({
-        log: logger
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        debug: console.debug,
+        assert: console.assert,
       });
 
 
@@ -68,7 +73,11 @@
       // Write the code with deps omitted
       document.body.innerHTML += ("<hr><code>" + ex.generateExample(true) + "</code>");
       // TODO: capture eval's document modifications the way foam1 flow.FBE did
-      var result = eval("(function runExemplar___() { " + code + " })();");
+      try {
+        var result = eval("(function runExemplar___() { " + code + " })();");
+      } catch(e) {
+        console.error("Exception thrown: ", e);
+      }
 
       // if async
       if ( result && result.then ) {
