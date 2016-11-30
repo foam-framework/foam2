@@ -1862,6 +1862,21 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'ControllerViewTrait',
+
+  exports: [ 'controllerMode' ],
+
+  properties: [
+    {
+      name: 'controllerMode',
+      choices: [ 'create', 'view', 'edit' ],
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
 
@@ -1869,8 +1884,60 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'controllerMode',
+      factory: function() { return this.__context__.controllerMode || 'create'; },
+      choices: [ 'create', 'view', 'edit' ],
+    },
+    {
       name: 'data',
       attribute: true
+    },
+    {
+      name: 'visibility',
+      choices: [ 'rw', 'final', 'disabled', 'ro', 'hidden' ],
+      postSet: function() {
+        this.updateMode_(this.mode);
+      },
+      attribute: true,
+      defaultValue: 'rw'
+    },
+    {
+      name: 'mode',
+      choices: [ 'rw', 'disabled', 'ro', 'hidden' ],
+      postSet: function(_, mode) { this.updateMode_(mode); },
+      expression: function(visibility, controllerMode) {
+        if ( visibility === 'ro' ) return 'ro';
+        if ( visibility === 'final' && controllerMode !== 'create' ) return 'ro';
+        return controllerMode === 'view' ? 'ro' : 'rw';
+      },
+      attribute: true
+    }/*,
+    {
+      type: 'Boolean',
+      name: 'showValidation',
+      documentation: 'Set to false if you want to ignore any ' +
+          '$$DOC{ref:"Property.validate"} calls. On by default.',
+      defaultValue: true
+    },
+    {
+      type: 'String',
+      name: 'validationError_',
+      documentation: 'The actual error message. Null or the empty string ' +
+          'when there is no error.',
+    }
+    */
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.updateMode_(this.mode);
+    },
+    function updateMode_() {
+      // Template method, to be implemented in sub-models
+    },
+    function fromProperty(p) {
+      this.visibility = p.visibility;
     }
   ]
 });
