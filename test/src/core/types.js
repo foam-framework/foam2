@@ -228,7 +228,7 @@ describe('StringArray', function() {
     expect(function() { p.stringArray = {}; }).toThrow();
   });
   it('is empty array by default', function() {
-    expect(p.stringArray).toEqual(undefined);
+    expect(p.stringArray).toEqual([]);
   });
   it('accepts string in an array', function() {
     p.stringArray = [ "Hello", "I see", "Well" ];

@@ -240,6 +240,10 @@ foam.CLASS({
       }
     },
     [
+      'factory',
+      function() { return []; }
+    ],
+    [
       'isDefaultValue',
       function(v) { return ! v || ! v.length; }
     ],
@@ -261,6 +265,10 @@ foam.CLASS({
       value: 'String',
       documentation: 'The FOAM sub-type of this property.'
     },
+    [
+      'factory',
+      function() { return []; }
+    ],
     [
       'adapt',
       function(_, v, prop) {
