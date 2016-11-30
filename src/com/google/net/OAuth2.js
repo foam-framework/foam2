@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'com.google.net',
   name: 'GoogleOAuth2HTTPRequestDecorator',
 
   imports: [
@@ -117,11 +117,11 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'com.google.net',
   name: 'GoogleOAuth2XHRHTTPRequest',
   extends: 'foam.net.XHRHTTPRequest',
 
   implements: [
-    'foam.net.GoogleOAuth2HTTPRequestDecorator'
+    'com.google.net.GoogleOAuth2HTTPRequestDecorator'
   ]
 });

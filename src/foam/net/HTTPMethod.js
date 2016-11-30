@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-/** A method that is configured to call a service over HTTP. No code or
+/**
+  A method that is configured to call a service over HTTP. No code or
   function body is required here, as the actual body is generated to call
   the remote service. This will always return a promise that supplies the
   return value of the service call.
+
   <p>Overriding by an HTTPMethod is not supported. You can override an
   HTTPMethod with a normal one.
-  <p>FUTURE: Generalize. */
+*/
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPMethod',
