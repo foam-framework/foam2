@@ -2083,8 +2083,8 @@ var FBE = [
       //toBeAssertedThat(calls).toEqual(0);
     }
   },
-  
-  
+
+
   {
     name: 'Property Expression Class',
     description: 'The same functionality of ExpressionSlot is built into Properties',
@@ -2155,7 +2155,443 @@ var FBE = [
       //toBeAssertedThat(p.name).toEqual('John Smith');
     }
   },
-  
+  {
+    name: 'Destroyables',
+    description: 'Destroyables or functions can be registered to be called when an object is destroyed.',
+    dependencies: [  ],
+    code: function() {
+      // Destroyables are objects with a destroy() method, such as FObjects
+      // and sub()-returned subscriptions.
+      var o = foam.core.FObject.create();
+      var o2 = foam.core.FObject.create();
+      var destroys = '';
+
+      // onDestroy adds a function to be called when the object is destroyed
+      o.onDestroy(function() {
+        console.log('destroy 1');
+        destroys += '1 ';
+      });
+      o2.onDestroy(function() {
+        console.log('destroy 2');
+        destroys += '2 ';
+      });
+
+      // cause o2 to be destroyed when o is destroyed
+      o.onDestroy(o2);
+      o.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(destroys).toEqual('1 2 ');
+    }
+  },
+  {
+    name: 'Destroyables idempotent',
+    description: 'It doesn\'t hurt to try and destroy an object more than once',
+    dependencies: [  ],
+    code: function() {
+      var o = foam.core.FObject.create();
+      o.destroy();
+      o.destroy();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { o.destroy(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Destroyables unsubscribe',
+    description: '',
+    dependencies: [  ],
+    code: function() {
+      // If an Object is destroyed, it will unsubscribe from any
+      // subscriptions which subsequently try to deliver events.
+      var source = foam.core.FObject.create();
+      var calls = 0;
+      foam.CLASS({
+        name: 'Sink',
+        listeners: [
+          function l() {
+            calls += 1;
+            console.log('ping:', calls);
+          }
+        ]
+      });
+      var sink = Sink.create();
+      source.sub(sink.l);
+      source.pub('ping');
+      source.pub('ping');
+      sink.destroy();
+      source.pub('ping');
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(2);
+    }
+  },
+  {
+    name: 'Model validation extends refines',
+    description: 'Extends and refines are mutually-exclusive',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'EandRTest',
+        extends: 'FObject',
+        refines: 'Model'
+      });
+      EandRTest.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { EandRTest.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Model validation property name exists',
+    description: 'Properties must have names',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'ValidationTest',
+        properties: [
+          { name: '' }
+        ]
+      });
+      ValidationTest.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { ValidationTest.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Action validation names',
+    description: 'Actions must have a name',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'ActionNameValidation',
+        actions: [
+          { name: '', code: function() {} }
+        ]
+      });
+      ActionNameValidation.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { ActionNameValidation.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Action validation code',
+    description: 'Actions must have code',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'ActionCodeValidation',
+        actions: [
+          { name: 'test' }
+        ]
+      });
+      ActionCodeValidation.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { ActionCodeValidation.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Model validation property slot name',
+    description: 'Properties names must not end with $',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'DollarValidationTest',
+        properties: [
+          { name: 'name$' }
+        ]
+      });
+      DollarValidationTest.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { DollarValidationTest.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Model validation property constants',
+    description: 'Property constants must not conflict',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'ConstantConflictTest',
+        properties: [ 'firstName', 'FirstName' ]
+      });
+      ConstantConflictTest.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { ConstantConflictTest.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Model validation property same name',
+    description: 'Properties must not have the same name',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'AxiomConflict1',
+        properties: [ 'sameName', 'sameName' ]
+      });
+      AxiomConflict1.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { AxiomConflict1.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'a',
+    description: '',
+    dependencies: [  ],
+    code: function() {
+      // Methods must not have the same name
+      foam.CLASS({
+        name: 'AxiomConflict2',
+        methods: [ function sameName() {}, function sameName() {} ]
+      });
+      AxiomConflict2.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { AxiomConflict2.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Axiom validation same name',
+    description: 'Axioms must not have the same name',
+    dependencies: [  ],
+    code: function() {
+      //
+      foam.CLASS({
+        name: 'AxiomConflict3',
+        properties: [ 'sameName' ],
+        methods: [ function sameName() {} ]
+      });
+      AxiomConflict3.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { AxiomConflict3.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Axiom validation sub property type',
+    description: 'A Property cannot be changed to a non-Property',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'AxiomChangeSuper',
+        properties: [ 'sameName' ] // property
+      });
+      foam.CLASS({
+        name: 'AxiomChangeSub',
+        extends: 'AxiomChangeSuper',
+        methods: [ function sameName() {} ] // now it's a method? no!
+      });
+      AxiomChangeSub.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { AxiomChangeSub.model_.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Axiom validation class change',
+    description: 'Warn if an Axiom changes its class',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'AxiomChangeSuper2',
+        methods: [ function sameName() {} ]
+      });
+      foam.CLASS({
+        name: 'AxiomChangeSub2',
+        extends: 'AxiomChangeSuper2',
+        properties: [ 'sameName' ]
+      });
+      AxiomChangeSub2.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { AxiomChangeSub2.model_.validate(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Property validation single accessor',
+    description: 'Properties may only have one of factory, value, expression, or getter; one of setter or adapt+preset+postset',
+    dependencies: [  ],
+    code: function() {
+      var setTo;
+      foam.CLASS({
+        name: 'PropertyValidationTest',
+        properties: [
+          {
+            name: 't1',
+            setter: function() { setTo = 1; this.instance_.t1 = 1; },
+            adapt: function(_,v) { return v + 1; },
+            preSet: function(_,v) { return v + 1; },
+            postSet: function(_,v) { setTo = v + 1; }
+          },
+          {
+            name: 't2',
+            getter: function() { return 42; },
+            factory: function() { return 43; },
+            expression: function() { return 44; },
+            value: 45
+          }
+        ]
+      });
+      PropertyValidationTest.model_.validate();
+    },
+    postTestCode: function() {
+      var testPV = PropertyValidationTest.create();
+      //toBeAssertedThat(function() { PropertyValidationTest.model_.validate(); }).not.toThrow();
+      //toBeAssertedThat(testPV.t2).toEqual(42);
+      testPV.t1 = 10;
+      //toBeAssertedThat(testPV.t1).toEqual(1);
+    }
+  },
+  {
+    name: 'Property required',
+    description: 'Properties marked required must have values supplied to create()',
+    dependencies: [  ],
+    code: function() {
+      // Required
+      foam.CLASS({
+        name: 'ValidationTest',
+        properties: [
+          { name: 'test', required: true }
+        ]
+      });
+
+      var o = ValidationTest.create({test: '42'});
+      o.validate();
+      console.log('-');
+      var o = ValidationTest.create();
+      o.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { o.validate(); }).toThrow();
+    }
+  },
+  {
+    name: 'Unknown Properties',
+    description: 'Unknown Model and Property properties are detected',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'ValidationTest',
+        unknown: 'foobar',
+        properties: [
+          { name: 'test', unknown: 'foobar' }
+        ]
+      });
+      ValidationTest.model_.validate();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { ValidationTest.model_.validate(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Context create sub context',
+    description: 'Contexts can be explicitly created with foam.createSubContext()',
+    dependencies: [  ],
+    code: function() {
+      // The second argument of createSubContext() is an optional name for the Context
+      var Y1 = foam.createSubContext({
+        key: 'value',
+        fn: function() {
+          return 'here';
+        }
+      }, 'SubContext');
+      console.log("Y1:", Y1.key, Y1.fn());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(Y1.key).toEqual('value');
+      //toBeAssertedThat(Y1.fn()).toEqual('here');
+    }
+  },
+  {
+    name: 'Context context sub context',
+    description: 'Sub-Contexts can be created from other Contexts',
+    dependencies: [ 'Context create sub context' ],
+    code: function() {
+      var Y2 = Y1.createSubContext({ key: 'value2' });
+      console.log("Y2:", Y2.key, Y2.fn());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(Y2.key).toEqual('value2');
+      //toBeAssertedThat(Y2.fn()).toEqual('here');
+    }
+  },
+  {
+    name: 'Context sub context describe',
+    description: 'A Context\'s contents can be inspected with .describe()',
+    dependencies: [ 'Context context sub context' ],
+    code: function() {
+      Y1.describe();
+      Y2.describe();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(Y1.describe).not.toBeUndefined();
+      //toBeAssertedThat(Y2.describe).not.toBeUndefined();
+    }
+  },
+  {
+    name: 'Import context values',
+    description: 'Classes can import values from the Context so that they can be accessed from this',
+    dependencies: [  ],
+    code: function() {
+      var lastLogMsg = "";
+      var Y = foam.createSubContext({ myLogger: function(msg) {
+        console.log('log:', msg);
+        lastLogMsg = msg;
+      }});
+      foam.CLASS({
+        name: 'ImportsTest',
+        imports: [ 'myLogger' ],
+        methods: [ function foo() {
+          this.myLogger('log foo from ImportTest');
+        } ]
+      });
+      try {
+        var o = ImportsTest.create(); // should fail here, on object creation
+        console.log('test created');
+        o.foo();
+      } catch(e) {
+        console.log('Could not import "myLogger" since nobody provided it.');
+      }
+      Y.myLogger('test');
+      var o = ImportsTest.create(null, Y);
+      o.foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(lastLogMsg).toEqual('log foo from ImportTest');
+    }
+  },
+  {
+    name: 'Imports optional',
+    description: 'Optional imports, marked with a ?, don\'t warn if not found',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'OptionalImportsTest',
+        imports: [ 'myLogger?' ],
+        methods: [ function foo() {
+          this.myLogger('log foo from ImportTest');
+        } ]
+      });
+      try {
+        var o = OptionalImportsTest.create();
+        console.log('Test created ok');
+        console.log('Trying to use missing import...');
+        o.foo(); // should fail here, on import use
+      } catch(e) {
+        console.log('As expected, could not import "myLogger" since nobody provided it.');
+      }
+    },
+    postTestCode: function() {
+       //toBeAssertedThat(o.myLogger).toBeUndefined();
+    }
+  },
+
   {
     name: '',
     description: '',
@@ -2165,7 +2601,7 @@ var FBE = [
     postTestCode: function() {
     }
   },
-  
+
 ];
 
 var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
@@ -2181,224 +2617,7 @@ var FBE = FBE.map(function(def) {
 
 // // TODO: ArrayProperty
 
-// // Destroyables (objects with a destroy() method) or functions
-// // can be registered to be called when an object is destroyed.
-// var o = foam.core.FObject.create();
-// var o2 = foam.core.FObject.create();
-// o.onDestroy(function() { log('destroy 1'); });
-// o2.onDestroy(function() { log('destroy 2'); });
-// o.onDestroy(o2);
-// o.destroy();
 
-// // It doesn't hurt to try and destroy an object more than once.
-// o.destroy();
-// o.destroy();
-
-// // If an Object is destroyed, it will unsubscribe from any
-// // subscriptions which subsequently try to deliver events.
-// var source = foam.core.FObject.create();
-// var sink = foam.CLASS({
-//   name: 'Sink',
-//   listeners: [
-//     function l() {
-//       log('ping');
-//     }
-//   ]
-// }).create();
-// source.sub(sink.l);
-// source.pub('ping');
-// source.pub('ping');
-// sink.destroy();
-// source.pub('ping');
-
-// // Model validation, extends and refines are mutually-exclusive
-// foam.CLASS({
-//   name: 'EandRTest',
-//   extends: 'FObject',
-//   refines: 'Model'
-// });
-// EandRTest.model_.validate();
-
-// // Model validation, properties must have names
-// foam.CLASS({
-//   name: 'ValidationTest',
-//   properties: [
-//     { name: '' }
-//   ]
-// });
-// ValidationTest.model_.validate();
-
-// // Action validation, actions must have names
-// foam.CLASS({
-//   name: 'ActionNameValidation',
-//   actions: [
-//     { name: '', code: function() {} }
-//   ]
-// });
-// ActionNameValidation.model_.validate();
-
-// // Action validation, actions must have code
-// foam.CLASS({
-//   name: 'ActionCodeValidation',
-//   actions: [
-//     { name: 'test' }
-//   ]
-// });
-// ActionCodeValidation.model_.validate();
-
-// // Model validation, properties names must not end with '$'
-// foam.CLASS({
-//   name: 'DollarValidationTest',
-//   properties: [
-//     { name: 'name$' }
-//   ]
-// });
-// DollarValidationTest.model_.validate();
-
-// // Property constants musn't conflict
-// foam.CLASS({
-//   name: 'ConstantConflictTest',
-//   properties: [ 'firstName', 'FirstName' ]
-// });
-
-// // Properties must not have the same name
-// foam.CLASS({
-//   name: 'AxiomConflict1',
-//   properties: [ 'sameName', 'sameName' ]
-// });
-// AxiomConflict1.create();
-
-// // Methods must not have the same name
-// foam.CLASS({
-//   name: 'AxiomConflict2',
-//   methods: [ function sameName() {}, function sameName() {} ]
-// });
-// AxiomConflict2.create();
-
-// // Axioms must not have the same name
-// foam.CLASS({
-//   name: 'AxiomConflict3',
-//   properties: [ 'sameName' ],
-//   methods: [ function sameName() {} ]
-// });
-// AxiomConflict3.create();
-
-// // Error if attempt to change a Property to a non-Property
-// foam.CLASS({
-//   name: 'AxiomChangeSuper',
-//   properties: [ 'sameName' ]
-// });
-// foam.CLASS({
-//   name: 'AxiomChangeSub',
-//   extends: 'AxiomChangeSuper',
-//   methods: [ function sameName() {} ]
-// });
-// AxiomChangeSub.create();
-
-// // Warn if an Axiom changes its class
-// foam.CLASS({
-//   name: 'AxiomChangeSuper2',
-//   methods: [ function sameName() {} ]
-// });
-// foam.CLASS({
-//   name: 'AxiomChangeSub2',
-//   extends: 'AxiomChangeSuper2',
-//   properties: [ 'sameName' ]
-// });
-// AxiomChangeSub2.create();
-
-// // Property validation, factory and value
-// foam.CLASS({
-//   name: 'PropertyValidationTest',
-//   properties: [
-//     {
-//       name: 't1',
-//       setter: function() {},
-//       adapt: function(_,v) { return v; },
-//       preSet: function(_,v) { return v; },
-//       postSet: function() {}
-//     },
-//     {
-//       name: 't2',
-//       getter: function() { return 42; },
-//       factory: function() { return 42; },
-//       expression: function() { return 42; },
-//       value: 42
-//     }
-//   ]
-// });
-// PropertyValidationTest.model_.validate();
-
-// // Required
-// foam.CLASS({
-//   name: 'ValidationTest',
-//   properties: [
-//     { name: 'test', required: true }
-//   ]
-// });
-// var o = ValidationTest.create({test: '42'});
-// o.validate();
-// log('-');
-// var o = ValidationTest.create();
-// o.validate();
-
-// // Unknown Properties, detect unknown Model and Property properties
-// foam.CLASS({
-//   name: 'ValidationTest',
-//   unknown: 'foobar',
-//   properties: [
-//     { name: 'test', unknown: 'foobar' }
-//   ]
-// });
-
-// // Contexts can be explicitly created with foam.createSubContext()
-// // The second argument of createSubContext() is an optional name for the Context
-// var Y1 = foam.createSubContext({key: 'value', fn: function() { console.log('here'); }}, 'SubContext');
-// console.log(Y1.key, Y1.fn());
-
-// // Sub-Contexts can be created from other Contexts.
-// var Y2 = Y1.createSubContext({key: 'value2'});
-// console.log(Y2.key, Y2.fn());
-
-// //:NOTEST
-// // A Context's contents can be inspected with .describe();
-// Y1.describe();
-// Y2.describe();
-
-// // Classes can import values from the Context so that they can be accessed from 'this'.
-// var Y = foam.createSubContext({ myLogger: function(msg) { console.log('log:', msg); }});
-// foam.CLASS({
-//   name: 'ImportsTest',
-//   imports: [ 'myLogger' ],
-//   methods: [ function foo() {
-//     this.myLogger('log foo from ImportTest');
-//   } ]
-// });
-// try {
-//   var o = ImportsTest.create(); // should fail here, on object creation
-//   log('test created');
-//   o.foo();
-// } catch(e) {
-//   log('Could not import "myLogger" since nobody provided it.');
-// }
-// Y.myLogger('test');
-// var o = ImportsTest.create(null, Y);
-// o.foo();
-
-// foam.CLASS({
-//   name: 'OptionalImportsTest',
-//   imports: [ 'myLogger?' ],
-//   methods: [ function foo() {
-//     this.myLogger('log foo from ImportTest');
-//   } ]
-// });
-// try {
-//   var o = OptionalImportsTest.create();
-//   log('test created');
-//   o.foo(); // should fail here, on import use
-// } catch(e) {
-//   log('Could not import "myLogger" since nobody provided it.');
-// }
 
 // // Classes can export values for use by objects they create.
 // foam.CLASS({
