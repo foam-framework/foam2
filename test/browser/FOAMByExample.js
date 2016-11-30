@@ -1621,6 +1621,7 @@ var FBE = [
     description: '2. Destroy the subscription, which is supplied to the listener',
     dependencies: [ 'Pub Sub' ],
     code: function() {
+      var calls = 0;
       var once = function(sub, name) {
         console.log('Event:', name);
         calls += 1;
@@ -2028,8 +2029,10 @@ var FBE = [
       });
 
       console.log("Intial e:", e.get());
+      var calls = 0;
       e.sub(function() {
         console.log("e changed:", e.get());
+        calls += 1;
       });
       p.fname = 'Steve';
       p.lname = 'Jones';
@@ -2037,11 +2040,122 @@ var FBE = [
     },
     postTestCode: function() {
       //toBeAssertedThat(e.get()).toEqual('Steve Jones');
+      //toBeAssertedThat(calls).toEqual(2);
     }
   },
-
-
-
+  {
+    name: 'Expression Slot with object',
+    description: 'ExpressionSlot can use an object to supply the source slots',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({ name: 'Person', properties: [ 'f', 'l' ] });
+      var p = Person.create({ f:'John', l: 'Smith' });
+      // function arguments 'f' and 'l' are treated as property names on obj
+      var e = foam.core.ExpressionSlot.create({
+        obj: p,
+        code: function(f, l) { return f + ' ' + l; }
+      });
+      console.log("Initial e:", e.get());
+      e.sub(function() {
+        console.log("e changed:", e.get());
+      });
+      p.f = 'Steve';
+      p.l = 'Jones';
+      console.log("Final e:", e.get());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(e.get()).toEqual('Steve Jones');
+    }
+  },
+  {
+    name: 'Expression Slot unbinding',
+    description: 'Destroy the ExpressionSlot to prevent further updates',
+    dependencies: [ 'Expression Slots' ],
+    code: function() {
+      calls = 0;
+      e.destroy();
+      console.log("e destroyed, setting f and l again...");
+      p.f = 'Bob';
+      p.l = 'Roberts';
+      console.log("Updates since destroy:", calls);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(0);
+    }
+  },
+  
+  
+  {
+    name: 'Property Expression Class',
+    description: 'The same functionality of ExpressionSlot is built into Properties',
+    dependencies: [  ],
+    code: function() {
+      // Properties have the 'expression' feature
+      foam.CLASS({
+        name: 'Person',
+        properties: [
+          'fname',
+          'lname',
+          {
+            name: 'name',
+            expression: function(fname, lname) { return fname + ' ' + lname; }
+          }
+        ]
+      });
+      var p = Person.create({ fname: 'John', lname: 'Smith' });
+    }
+  },
+  {
+    name: 'Property Expressions',
+    description: 'Expression properties are invalidated whenever of their listed source values change',
+    dependencies: [ 'Property Expression Class' ],
+    code: function() {
+      // Expression properties are invalidated
+      // whenever of their listed source values change, but are only recalculated
+      // when their value is accessed.
+      p.describe();
+      p.sub(function(sub, propChg, name) {
+        console.log("Event:", propChg, name);
+      });
+      p.fname = 'Steve';
+      console.log(p.fname, p.lname, '=', p.name);
+      p.lname = 'Jones';
+      console.log(p.fname, p.lname, '=', p.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p.name).toEqual('Steve Jones');
+    }
+  },
+  {
+    name: 'Property Expression setting',
+    description: 'Expression properties can also be explicitly set, disabling the dynamic expression',
+    dependencies: [ 'Property Expression Class' ],
+    code: function() {
+      console.log(p.name, p.hasOwnProperty('name'));
+      p.name = 'Kevin Greer';
+      console.log(p.name, p.hasOwnProperty('name'));
+      p.fname = 'Sebastian';
+      console.log(p.fname, p.lname, ':', p.name);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p.name).toEqual('Kevin Greer');
+    }
+  },
+  {
+    name: 'Property Expression ',
+    description: 'Clearing a set expression property reverts it to expression mode',
+    dependencies: [ 'Property Expression Class' ],
+    code: function() {
+      p.name = "Joe"
+      console.log("Set directly:", p.name, "hasOwnProperty(name)?", p.hasOwnProperty('name'));
+      p.clearProperty('name');
+      console.log("After clearing:", p.name, "hasOwnProperty(name)?", p.hasOwnProperty('name'));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(p.name).toEqual('John Smith');
+    }
+  },
+  
   {
     name: '',
     description: '',
@@ -2051,6 +2165,7 @@ var FBE = [
     postTestCode: function() {
     }
   },
+  
 ];
 
 var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
@@ -2065,63 +2180,6 @@ var FBE = FBE.map(function(def) {
 // // TODO: StringProperty
 
 // // TODO: ArrayProperty
-
-
-
-
-
-// // ExpressionSlot can also be supplied an object to work with, and then takes slots from function argument names.
-// var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Smith'});
-// var e = foam.core.ExpressionSlot.create({
-//   obj: p,
-//   code: function(f, l) { return f + ' ' + l; }
-// });
-// log(e.get());
-// e.sub(log);
-// p.f = 'Steve';
-// p.l = 'Jones';
-// log(e.get());
-
-// // Destroy the ExpressionSlot to prevent further updates.
-// e.destroy();
-// p.fname = 'Steve';
-// p.lname = 'Jones';
-
-// // The same functionality of ExpressionSlot is built into Properties
-// // with the 'expression' feature. Expression properties are invalidated
-// // whenever of their listed source values change, but are only recalculated
-// // when their value is accessed.
-// foam.CLASS({
-//   name: 'Person',
-//   properties: [
-//     'fname',
-//     'lname',
-//     {
-//       name: 'name',
-//       expression: function(fname, lname) { return fname + ' ' + lname; }
-//     }
-//   ]
-// });
-// var p = Person.create({fname: 'John', lname: 'Smith'});
-// p.describe();
-// p.sub(log);
-// p.fname = 'Steve';
-// log(p.fname, p.lname, ' = ', p.name);
-// p.lname = 'Jones';
-// log(p.fname, p.lname, ' = ', p.name);
-
-// // Expression properties can also be explicitly set, at which point the
-// // dynamic expression no longer holds.
-// log(p.name, p.hasOwnProperty('name'));
-// p.name = 'Kevin Greer';
-// log(p.name, p.hasOwnProperty('name'));
-// p.fname = 'Sebastian';
-// log(p.fname, p.lname, ':', p.name);
-
-// // Clearing a set expression property has it revert to its expression value.
-// log(p.name, p.hasOwnProperty('name'));
-// p.clearProperty('name');
-// log(p.name, p.hasOwnProperty('name'));
 
 // // Destroyables (objects with a destroy() method) or functions
 // // can be registered to be called when an object is destroyed.
