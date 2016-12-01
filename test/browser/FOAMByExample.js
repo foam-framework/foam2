@@ -2341,11 +2341,10 @@ var FBE = [
     }
   },
   {
-    name: 'a',
-    description: '',
+    name: 'Model validation same method name',
+    description: 'Methods must not have the same name',
     dependencies: [  ],
     code: function() {
-      // Methods must not have the same name
       foam.CLASS({
         name: 'AxiomConflict2',
         methods: [ function sameName() {}, function sameName() {} ]
@@ -2886,6 +2885,281 @@ var FBE = [
       //toBeAssertedThat(red1).not.toBe(blue);
     }
   },
+  {
+    name: 'Object UID',
+    description: 'All Objects have a unique identifier, accessible with the .$UID property',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      var a = {}, b = [], c = Person.create();
+      console.log(a.$UID, b.$UID, c.$UID);
+      console.log(a.$UID, b.$UID, c.$UID);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(a.$UID).not.toEqual(b.$UID);
+      //toBeAssertedThat(b.$UID).not.toEqual(c.$UID);
+    }
+  },
+  {
+    name: 'Console log listener',
+    description: 'foam.events.consoleLog() returns a convenient listener that logs',
+    dependencies: [  ],
+    code: function() {
+      // foam.events.consoleLog
+      foam.CLASS({name: 'ConsoleLogTest'});
+      var o = ConsoleLogTest.create();
+      o.sub(foam.events.consoleLog());
+      o.pub();
+      o.pub('foo');
+      o.pub('foo','bar');
+    },
+  },
+  {
+    name: 'Function memoize1',
+    description: 'foam.Function.memoize1() memozies a one-argument function',
+    dependencies: [  ],
+    code: function() {
+      // if called again with the same argument, the previously generated
+      // value will be returned rather than calling the function again.
+      var calls = 0;
+      var f = foam.Function.memoize1(function(x) {
+        console.log('calculating ', x, "=>", x*x); return x*x;
+        calls += 1;
+      });
+
+      console.log(f(2));
+      console.log(f(2));
+      console.log(f(4));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(2);
+    }
+  },
+  {
+    name: 'Function memoize1 one arg only',
+    description: 'A call to memoize1() with no arguments will trigger a failed assertion',
+    dependencies: [ 'Function memoize1' ],
+    code: function() {
+      f();
+      f(1, 2);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { f(); }).toThrow();
+      //toBeAssertedThat(function() { f(1, 2); }).toThrow();
+    }
+  },
+  {
+    name: 'Function argsStr',
+    description: 'foam.Function.argsStr() returns a function\'s arguments as a string',
+    dependencies: [  ],
+    code: function() {
+      var f = function(a, b, fooBar) { };
+      var argsAsStr = foam.Function.argsStr(f);
+      console.log('Function args:', argsAsStr);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(argsAsStr).toEqual('a, b, fooBar');
+      //toBeAssertedThat(foam.String.isInstance(argsAsStr)).toBe(true);
+    }
+  },
+  {
+    name: 'Function formalArgs',
+    description: 'foam.Function.formalArgs() returns a function\'s arguments an an array',
+    dependencies: [  ],
+    code: function() {
+      var f = function(a, b, fooBar) { };
+      var argsAsArray = foam.Function.formalArgs(f);
+      console.log('Function args array:', argsAsArray);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(argsAsArray).toEqual(['a', 'b', 'fooBar']);
+      //toBeAssertedThat(foam.Array.isInstance(argsAsArray)).toBe(true);
+    }
+  },
+  {
+    name: 'String constantize',
+    description: 'foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT',
+    dependencies: [  ],
+    code: function() {
+      console.log('foo      =>', foam.String.constantize('foo'));
+      console.log('fooBar   =>', foam.String.constantize('fooBar'));
+      console.log('fooBar12 =>', foam.String.constantize('fooBar12'));
+    },
+  },
+  {
+    name: 'String capitalize',
+    description: 'foam.String.capitalize capitalizes the first letter of a string',
+    dependencies: [  ],
+    code: function() {
+      console.log(foam.String.capitalize('Abc def'));
+      console.log(foam.String.capitalize('abc def'));
+    },
+  },
+  {
+    name: 'String labelize',
+    description: 'foam.String.labelize converts from camelCase to labels',
+    dependencies: [  ],
+    code: function() {
+      console.log(foam.String.labelize('camelCase'));
+      console.log(foam.String.labelize('firstName'));
+      console.log(foam.String.labelize('someLongName'));
+    },
+    postTestCode: function() {
+    }
+  },
+  {
+    name: 'String multiline',
+    description: 'foam.String.multiline lets you build multi-line strings from function comments',
+    dependencies: [  ],
+    code: function() {
+      console.log(foam.String.multiline(function(){/*This is
+      a
+      multi-line
+      string*/}));
+    },
+  },
+  {
+    name: 'String pad',
+    description: 'foam.String.pad() pads a string to the specified length',
+    dependencies: [  ],
+    code: function() {
+      var s = foam.String.pad('foobar', 10);
+      console.log("padded  10:", '"' + s + '"', s.length);
+
+      // pad() is right justifying if given a negative number
+      var s = foam.String.pad('foobar', -10);
+      console.log("padded -10:", '"' + s + '"', s.length);
+    },
+  },
+  {
+    name: 'Template basics',
+    description: 'Templates use a JSP syntax to insert properties and code',
+    dependencies: [  ],
+    code: function() {
+      //
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [
+          'name'
+        ],
+        templates: [
+          {
+            name: 'hello',
+            template: 'Hello, my name is <%= this.name %>.'
+          }
+        ]
+      });
+
+      var o = TemplateTest.create({ name: 'Adam' });
+      console.log(o.hello());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.hello()).toEqual('Hello, my name is Adam.');
+    }
+  },
+  {
+    name: 'Template arguments',
+    description: 'Templates can be declared to accept arguments',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [
+          'name'
+        ],
+        templates: [
+          {
+            name: 'greet',
+            args: [
+              'stranger'
+            ],
+            template: 'Hello <%= stranger %>, my name is <%= this.name %>.'
+          }
+        ]
+      });
+
+      var o = TemplateTest.create({ name: 'Adam' });
+      console.log(o.greet("Bob"));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.greet("Bob")).toEqual('Hello Bob, my name is Adam.');
+    }
+  },
+  {
+    name: 'Template nesting',
+    description: 'Templates can be called from other templates. Include output as the first argument.',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [ 'name' ],
+        templates: [
+          {
+            name: 'greeter',
+            args: [ 'stranger' ],
+            template: 'Hello <%= stranger %>'
+          },
+          {
+            name: 'greet',
+            args: ['stranger'],
+            // 'output' is an implicit argument you must pass when calling one template
+            // from another.
+            template: '<% this.greeter(output, stranger); %>, my name is <%= this.name %>'
+          }
+        ]
+      });
+
+      var o = TemplateTest.create({ name: 'Adam' });
+      console.log(o.greet("Alice"));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.greet("Alice")).toEqual('Hello Alice, my name is Adam');
+    }
+  },
+  {
+    name: 'Template code',
+    description: 'Template can use raw JS code for loops and control structures',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [ 'name' ],
+        templates: [
+          {
+            name: 'complexTemplate',
+            template: 'Use raw JS code for loops and control structures' +
+              '<% for ( var i = 0 ; i < 10; i++ ) { %>\n' +
+              'i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% } '+
+              '} %>' +
+              '\n\n' +
+              'Use percent signs to shortcut access to local properties\n' +
+              'For instance, my name is %%name\n'
+          }
+        ]
+      });
+
+      console.log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
+    },
+    postTestCode: function() {
+
+      //toBeAssertedThat(TemplateTest.create({ name: 'Adam' }).complexTemplate()).toEqual(
+//         'Use raw JS code for loops and control structures\n' +
+//         'i is: "0"  which is even!\n' +
+//         'i is: "1" \n' +
+//         'i is: "2"  which is even!\n' +
+//         'i is: "3" \n' +
+//         'i is: "4"  which is even!\n' +
+//         'i is: "5" \n' +
+//         'i is: "6"  which is even!\n' +
+//         'i is: "7" \n' +
+//         'i is: "8"  which is even!\n' +
+//         'i is: "9"\n' +
+//         '\n' +
+//         'Use percent signs to shortcut access to local properties\n' +
+//         'For instance, my name is Adam\n');
+
+
+    }
+  },
 
   {
     name: '',
@@ -2903,155 +3177,7 @@ var FBE = FBE.map(function(def) {
   return test.helpers.Exemplar.create(def, reg);
 });
 
-// // TODO: BooleanProperty
 
-// // TODO: IntProperty
-
-// // TODO: StringProperty
-
-// // TODO: ArrayProperty
-
-
-
-
-// // Stdlib
-
-// //:NOTEST
-// // All Objects have a unique identifier, accessible with the .$UID property.
-// var a = {}, b = [], c = Person.create();
-// log(a.$UID, b.$UID, c.$UID);
-// log(a.$UID, b.$UID, c.$UID);
-
-// // foam.events.consoleLog
-// foam.CLASS({name: 'ConsoleLogTest'});
-// var o = ConsoleLogTest.create();
-// o.sub(foam.events.consoleLog());
-// o.pub();
-// o.pub('foo');
-// o.pub('foo','bar');
-
-// // foam.Function.memoize1() memozies a one-argument function so that if called again
-// // with the same argument, the previously generated value will be returned
-// // rather than calling the function again.
-// var f = foam.Function.memoize1(function(x) { log('calculating ', x); return x*x; });
-// log(f(2));
-// log(f(2));
-// log(f(4));
-
-// // A call to memoize1() with no arguments will trigger a failed assertion.
-// log(f());
-
-// // A call to memoize1() with more than one argument will trigger a failed assertion.
-// log(f(1,2));
-
-// // foam.Function.argsStr() returns a function's arguments an a string.
-// log(foam.Function.argsStr(function(a,b,fooBar) { }));
-// log(typeof foam.Function.argsStr(function() { }));
-
-// // foam.Function.formalArgs() returns a function's arguments an an array.
-// log(foam.Function.formalArgs(function(a,b,fooBar) { }));
-// log(Array.isArray(foam.Function.formalArgs(function() { })));
-
-// // foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
-// log(foam.String.constantize('foo'));
-// log(foam.String.constantize('fooBar'));
-// log(foam.String.constantize('fooBar12'));
-
-// // foam.String.capitalize capitalizes strings
-// log(foam.String.capitalize('Abc def'));
-// log(foam.String.capitalize('abc def'));
-
-// // foam.String.labelize converts from camelCase to labels
-// log(foam.String.labelize('camelCase'));
-// log(foam.String.labelize('firstName'));
-// log(foam.String.labelize('someLongName'));
-
-// // foam.String.multiline lets you build multi-line strings
-// // from function comments.
-// log(foam.String.multiline(function(){/*This is
-// a
-// multi-line
-// string*/}));
-
-// // foam.String.pad() pads a string to the specified length.
-// var s = foam.String.pad('foobar', 10);
-// log(s, s.length);
-
-// // foam.String.pad() pads a string to the specified length, right justifying if given a negative number.
-// var s = foam.String.pad('foobar', -10);
-// log(s, s.length);
-
-// // Basic templates
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [
-//     'name'
-//   ],
-//   templates: [
-//     {
-//       name: 'hello',
-//       template: 'Hello, my name is <%= this.name %>.'
-//     }
-//   ]
-// });
-// var o = TemplateTest.create({ name: 'Adam' });
-// log(o.hello());
-
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [
-//     'name'
-//   ],
-//   templates: [
-//     {
-//       name: 'greet',
-//       args: [
-//         'stranger'
-//       ],
-//       template: 'Hello <%= stranger %>, my name is <%= this.name %>.'
-//     }
-//   ]
-// });
-// var o = TemplateTest.create({ name: 'Adam' });
-// log(o.greet("Bob"));
-
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [ 'name' ],
-//   templates: [
-//     {
-//       name: 'greeter',
-//       args: [ 'stranger' ],
-//       template: 'Hello <%= stranger %>'
-//     },
-//     {
-//       name: 'greet',
-//       args: ['stranger'],
-//       template: '<% this.greeter(output, stranger); %>, my name is <%= this.name %>'
-//     }
-//   ]
-// });
-// var o = TemplateTest.create({ name: 'Adam' });
-// log(o.greet("Alice"));
-
-// // More
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [ 'name' ],
-//   templates: [
-//     {
-//       name: 'complexTemplate',
-//       template: 'Use raw JS code for loops and control structures' +
-//         '<% for ( var i = 0 ; i < 10; i++ ) { %>\n' +
-//         'i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% } '+
-//         '} %>' +
-//         '\n\n' +
-//         'Use percent signs to shortcut access to local properties\n' +
-//         'For instance, my name is %%name\n'
-//     }
-//   ]
-// });
-// log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
 
 // // Multi-line templates can be defined as function comments.
 // foam.CLASS({
@@ -3292,4 +3418,13 @@ var FBE = FBE.map(function(def) {
 // var g = GraphicsDemo.create();
 // g.write();
 // g.step();
+
+
+// // TODO: BooleanProperty
+
+// // TODO: IntProperty
+
+// // TODO: StringProperty
+
+// // TODO: ArrayProperty
 
