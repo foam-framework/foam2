@@ -66,8 +66,8 @@ foam.CLASS({
 
     function updateMode_(mode) {
       // TODO: make sure that DOM is updated if values don't change
-      this.setAttribute('readonly', mode === 'ro');
-      this.setAttribute('disabled', mode === 'disabled');
+      this.setAttribute('readonly', mode === foam.u2.DisplayMode.RO);
+      this.setAttribute('disabled', mode === foam.u2.DisplayMode.DISABLED);
     }
   ]
 });
