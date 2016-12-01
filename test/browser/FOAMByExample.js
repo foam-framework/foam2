@@ -16,7 +16,7 @@
  */
 
 /** Foam By Example */
-var FBE = [
+var examples = [
   {
     name: 'Test Class',
     description: 'Define a new class with foam.CLASS',
@@ -3445,14 +3445,11 @@ For instance, my name is %%name
   }
 ];
 
-var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
-var FBE = FBE.map(function(def) {
-  return test.helpers.Exemplar.create(def, reg);
+global.FBEreg = global.FBEreg || test.helpers.ExemplarRegistry.create();
+global.FBE = global.FBE || [];
+examples.forEach(function(def) {
+  FBE.push(test.helpers.Exemplar.create(def, FBEreg));
 });
-
-
-
-
 
 
 

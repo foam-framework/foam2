@@ -5,6 +5,7 @@
   <script>console.timeEnd('boot');</script>
   <script language="javascript" src="../helpers/Exemplar.js"></script>
   <script language="javascript" src="FOAMByExample.js"></script>
+  <script language="javascript" src="DAOByExample.js"></script>
   <title>FOAM By Example</title>
   <style>
     body { white-space: pre-wrap; }
@@ -54,6 +55,12 @@
         }
       }
 
+      // prep iframe for document output
+      var domID = ex.name.replace(/\s/g, '_');
+      var domFrame = document.createElement('div');
+      domFrame.id = domID;
+      document.body.appendChild(domFrame);
+
       // Note: eval() for each exemplar may be async, so don't
       // nuke the context without waiting for the promise to resolve
       if ( oldContext) foam.__context__ = oldContext;
@@ -65,8 +72,13 @@
         error: console.error,
         debug: console.debug,
         assert: console.assert,
+        document: {
+          body: domFrame,
+          write: function(text) {
+            document.body.innerHTML += text;
+          }
+        }
       });
-
 
       var code = ex.generateExample();
       // TODO: offer expandable view of complete dependencies
@@ -75,6 +87,7 @@
       // TODO: capture eval's document modifications the way foam1 flow.FBE did
       try {
         var result = eval("(function runExemplar___() { " + code + " })();");
+        // TODO: if using an iframe, can pass document this way: var result = eval("function runExemplar___(document) { " + code + " }")(foam.__context__.document);
       } catch(e) {
         console.error("Exception thrown: ", e);
       }

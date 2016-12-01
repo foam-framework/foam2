@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-var reg = test.helpers.ExemplarRegistry.create();
-var exemplars = [];
 var examples = [
   {
     name: 'Load MLangs',
@@ -87,10 +85,10 @@ var examples = [
           'foam.dao.EasyDAO'
         ],
         exports: [ // by default, DAOs are looked up by class name
-          'bankDAO as example_BankDAO',
-          'customerDAO as example_CustomerDAO',
-          'accountDAO as example_AccountDAO',
-          'transactionDAO as example_TransactionDAO',
+          'bankDAO as example.BankDAO',
+          'customerDAO as example.CustomerDAO',
+          'accountDAO as example.AccountDAO',
+          'transactionDAO as example.TransactionDAO',
         ],
         properties: [
           { name: 'bankDAO', factory: function() {
@@ -302,16 +300,16 @@ var examples = [
   //   description: "Outputs Banking DAOs into simple tables",
   //   dependencies: [ 'Create Transactions' ],
   //   code: function() {
-  //     document.write("Banks");
+  //     foam.__context__.document.write("Banks");
   //     foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
   //
-  //     document.write("Customers");
+  //     foam.__context__.document.write("Customers");
   //     foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
   //
-  //     document.write("Accounts");
+  //     foam.__context__.document.write("Accounts");
   //     foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
   //
-  //     document.write("Transactions");
+  //     foam.__context__.document.write("Transactions");
   //     foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
   //   }
   // },
@@ -332,7 +330,7 @@ var examples = [
         proxyDAO.delegate = app.customerDAO.skip(skip).limit(limit);
       }, 500);
 
-      document.write("Customers with Skip and Limit");
+      foam.__context__.document.write("Customers with Skip and Limit");
       foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();
     }
   },
@@ -345,13 +343,13 @@ var examples = [
       return app.accountDAO.find(3).then(function(account) {
         var transactionsDAO = account.transactions;
 
-        document.write("Sort by amount, descending");
+        foam.__context__.document.write("Sort by amount, descending");
         foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(M.DESC(app.Transaction.AMOUNT))
         }).write();
 
-        document.write("Sort by date");
+        foam.__context__.document.write("Sort by date");
         foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(app.Transaction.DATE)
@@ -359,24 +357,27 @@ var examples = [
       })
     }
   },
+];
 
-
-].forEach(function(def) {
-  exemplars.push(test.helpers.Exemplar.create(def, reg));
+global.FBEreg = global.FBEreg || test.helpers.ExemplarRegistry.create();
+global.FBE = global.FBE || [];
+examples.forEach(function(def) {
+  FBE.push(test.helpers.Exemplar.create(def, FBEreg));
 });
 
-var oldContext;
-foam.async.repeat(exemplars.length, function runExemplar(index) {
-  var ex = exemplars[index];
-  // Note: eval() for each exemplar may be async, so don't
-  // nuke the context without waiting for the promise to resolve
-  if ( oldContext) foam.__context__ = oldContext;
 
-  oldContext = foam.__context__;
-  foam.__context__ = foam.createSubContext({});
+// var oldContext;
+// foam.async.repeat(exemplars.length, function runExemplar(index) {
+//   var ex = exemplars[index];
+//   // Note: eval() for each exemplar may be async, so don't
+//   // nuke the context without waiting for the promise to resolve
+//   if ( oldContext) foam.__context__ = oldContext;
 
-  var code = ex.generateExample();
-  document.write("<hr><pre>"+code+"</pre>");
-  var result = eval("(function runExemplar___() { " + code + " })();");
-  return result;
-})();
+//   oldContext = foam.__context__;
+//   foam.__context__ = foam.createSubContext({});
+
+//   var code = ex.generateExample();
+//   foam.__context__.document.write("<hr><pre>"+code+"</pre>");
+//   var result = eval("(function runExemplar___() { " + code + " })();");
+//   return result;
+// })();
