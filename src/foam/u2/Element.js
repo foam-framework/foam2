@@ -718,7 +718,7 @@ foam.CLASS({
 
       return count;
     },
-    
+
     function initKeyboardShortcuts() {
       /* Initializes keyboard shortcuts. */
       var keyMap = {}
@@ -1903,6 +1903,7 @@ foam.CLASS({
     },
     {
       name: 'mode',
+      attribute: true,
       choices: [ 'rw', 'disabled', 'ro', 'hidden' ],
       postSet: function(_, mode) { this.updateMode_(mode); },
       expression: function(visibility, controllerMode) {
@@ -1933,9 +1934,11 @@ foam.CLASS({
       this.SUPER();
       this.updateMode_(this.mode);
     },
+
     function updateMode_() {
       // Template method, to be implemented in sub-models
     },
+
     function fromProperty(p) {
       this.visibility = p.visibility;
     }
