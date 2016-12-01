@@ -428,6 +428,7 @@ foam.CLASS({
 
 
 /** The types library deals with type safety. */
+// ???: Should this go in foam.Function along with formalArgs() and be renamed just functionArgs?
 foam.LIB({
   name: 'foam.types',
 
