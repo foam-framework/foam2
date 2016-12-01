@@ -3160,16 +3160,289 @@ var FBE = [
 
     }
   },
-
   {
-    name: '',
-    description: '',
+    name: 'Template mutliline',
+    description: 'Multi-line templates can be defined as function comments',
     dependencies: [  ],
     code: function() {
+      foam.CLASS({
+        name: 'MultiLineTemplateTest',
+        properties: [ 'name' ],
+        templates: [
+          {
+            name: 'complexTemplate',
+            template: function() {/*
+Use raw JS code for loops and control structures
+<% for ( var i = 0 ; i < 10; i++ ) { %>
+i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% }
+} %>
+Use percent signs to shortcut access to local properties
+For instance, my name is %%name
+            */}
+          }
+        ]
+      });
+      console.log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
+    },
+  },
+  {
+    name: 'Create JSON Class',
+    description: 'Conversion to and from JSON is supported',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'JSONTest',
+        properties: [
+          { name: 'name', shortName: 'n' },
+          { class: 'Int', name: 'age', shortName: 'a' },
+          { class: 'StringArray', name: 'children', shortName: 'cs' },
+          { name: 'name That Needs Quoting' },
+          { name: 'undefined' },
+          { name: 'defined' },
+          { class: 'String', name: 'undefinedString' },
+          { class: 'String', name: 'definedString' },
+          { class: 'String', name: 'defaultString', value: 'default' },
+          { class: 'Int', name: 'undefinedInt' },
+          { class: 'Int', name: 'definedInt' },
+          { class: 'Int', name: 'defaultInt', value: 3 },
+          { class: 'Float', name: 'undefinedFloat' },
+          { class: 'Float', name: 'definedFloat' },
+          { class: 'Float', name: 'defaultFloat', value: 3.14 },
+          { class: 'Boolean', name: 'undefinedBoolean' },
+          { class: 'Boolean', name: 'trueBoolean' },
+          { class: 'Boolean', name: 'falseBoolean' },
+          { class: 'Boolean', name: 'defaultBoolean', value: true },
+          { class: 'Function', name: 'undefinedFunction' },
+          { class: 'Function', name: 'definedFunction' },
+          { name: 'undefinedFObject' },
+          { name: 'definedFObject' },
+          { name: 'transient', transient: true },
+          { name: 'networkTransient', networkTransient: true },
+          { name: 'storageTransient', storageTransient: true },
+      //    { name: '' },
+        ]
+      });
+    },
+  },
+  {
+    name: 'JSON parse',
+    description: 'Use foam.json.parse(someJSONobject) to convert to an FObject',
+    dependencies: [ 'Create JSON Class' ],
+    code: function() {
+      var o = foam.json.parse({
+        class: 'JSONTest',
+        name: 'John',
+        age: 42,
+        children: ['Peter', 'Paul']});
+      o.describe();
+    },
+  },
+  {
+    name: 'JSON output',
+    description: 'Use foam.json.stringify(fobject) to serialize an FObject to a JSON string',
+    dependencies: [ 'Create JSON Class' ],
+    code: function() {
+      o = JSONTest.create({
+        name: 'John',
+        age: 42,
+        children: ['Peter', 'Paul'],
+        "name That Needs Quoting": 42,
+        defined: 'value',
+        definedString: 'stringValue',
+        definedInt: 42,
+        defaultInt: 3,
+        definedFloat: 42.42,
+        defaultFloat: 3.14,
+        trueBoolean: true,
+        falseBoolean: false,
+        defaultBoolean: true,
+        definedFunction: function plus(a, b) { return a + b; },
+        definedFObject: JSONTest.create({
+          name: 'Janet',
+          age: 32,
+          children: [ 'Kim', 'Kathy' ]
+        }),
+        transient: 'transient value',
+        networkTransient: 'network transient value',
+        storageTransient: 'storage transient value'
+      });
+      // Default JSON formatting
+      console.log(foam.json.stringify(o));
+
+    },
+  },
+  {
+    name: 'JSON output modes',
+    description: 'Different outputters support suppressing properties, transients, and other options',
+    dependencies: [ 'JSON output' ],
+    code: function() {
+      // Outputters have different defaults for formatting, which properties
+      // to output, etc. You can clone one and change these settings on the
+      // outputter to customize your JSON output.
+
+      console.log('\nConvert to a JSON object (instead of a String):');
+      console.log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
+
+      console.log('\nAs a method on Objects:');
+      console.log(o.stringify());
+
+      console.log('\nPretty-printed output:');
+      console.log(foam.json.Pretty.stringify(o));
+
+      console.log('\nDisable class name output by cloning your own outputter:');
+      console.log(foam.json.Pretty.clone().copyFrom({ outputClassNames: false }).stringify(o));
+
+      console.log('\nStrict output:');
+      console.log(foam.json.Strict.stringify(o));
+
+      console.log('\nStrict-but-still-readable output:');
+      console.log(foam.json.PrettyStrict.stringify(o));
+
+      console.log('\nCompact output:');
+      console.log(foam.json.Compact.stringify(o));
+
+      console.log('\nShort-name (very compact) output:');
+      console.log(foam.json.Short.stringify(o));
+
+      console.log('\nNetwork (network-transient properties omitted) output:');
+      console.log(foam.json.Network.stringify(o));
+
+      console.log('\nStorage (storage-transient properties omitted) output:');
+      console.log(foam.json.Storage.stringify(o));
     },
     postTestCode: function() {
+      //toBeAssertedThat(foam.json.Network.stringify(o).indexOf('networkTransient').toEqual(-1);
+      //toBeAssertedThat(foam.json.Storage.stringify(o).indexOf('storageTransient').toEqual(-1);
     }
   },
+  {
+    name: 'Graphics Support',
+    description: 'CViews enable canvas rendering',
+    dependencies: [  ],
+    code: function() {
+
+      foam.CLASS({
+        name: 'GraphicsDemo',
+        extends: 'foam.graphics.CView',
+        requires: [
+          'foam.graphics.Arc',
+          'foam.graphics.Box',
+          'foam.graphics.Circle',
+          'foam.graphics.CView',
+          'foam.graphics.Gradient'
+        ],
+        properties: [
+          [ 'width', 500 ],
+          [ 'height', 500 ],
+          {
+            name: 'children',
+            factory: function() {
+              var objects = [
+                this.Arc.create({
+                  start: 0,
+                  end: 1.5*Math.PI,
+                  radius: 40
+                }),
+                this.Circle.create({
+                  color: this.Gradient.create({
+                    radial: true,
+                    x0: 0, y0: 0, r0: 10,
+                    x1: 0, y1: 0, r1: 100,
+                    colors: [
+                      [0, 'green'],
+                      [0.4, 'blue'],
+                      [0.6, 'red'],
+                      [1, 'white']
+                    ]
+                  }),
+                  border: '',
+                  radius: 100,
+                  x: 300,
+                  y: 300
+                }),
+                this.Box.create({
+                  color: this.Gradient.create({
+                    radial: false,
+                    x0: 0, y0: 0,
+                    x1: 100, y1: 100,
+                    colors: [
+                      [0, 'black'],
+                      [1, 'white']
+                    ]
+                  }),
+                  width: 100,
+                  height: 100,
+                  originX: 50,
+                  originY: 50,
+                  x: 100,
+                  y: 400,
+                  children: [
+                    this.Circle.create({
+                      color: 'red',
+                      x: 30,
+                      y: 30,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 70,
+                      y: 30,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 30,
+                      y: 70,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 70,
+                      y: 70,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 50,
+                      y: 50,
+                      radius: 10
+                    })
+                  ]
+                })
+              ];
+              return objects;
+            }
+          },
+          {
+            name: 'counter',
+            value: 0
+          }
+        ],
+        listeners: [
+          {
+            name: 'step',
+            isFramed: true,
+            code: function() {
+              this.counter += 0.01
+              this.children[0].rotation += 0.1;
+              this.children[0].x = 150 + 50 * Math.cos(this.counter);
+              this.children[0].y = 150 + 50 * Math.sin(this.counter);
+              this.children[1].skewX = Math.sin(this.counter);
+              this.children[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
+              this.children[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
+              this.children[2].rotation += 0.01;
+              this.step();
+              this.invalidated.pub();
+            }
+          }
+        ]
+      });
+      var g = GraphicsDemo.create();
+      g.write();
+      g.step();
+
+    }
+  }
 ];
 
 var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
@@ -3179,245 +3452,8 @@ var FBE = FBE.map(function(def) {
 
 
 
-// // Multi-line templates can be defined as function comments.
-// foam.CLASS({
-//   name: 'MultiLineTemplateTest',
-//   properties: [ 'name' ],
-//   templates: [
-//     {
-//       name: 'complexTemplate',
-//       template: function() {/*
-//         Use raw JS code for loops and control structures
-//         <% for ( var i = 0 ; i < 10; i++ ) { %>
-//         i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% }
-//         } %>
-//         Use percent signs to shortcut access to local properties
-//         For instance, my name is %%name
-//       */}
-//     }
-//   ]
-// });
-// log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
 
-// // JSON Support
-// foam.CLASS({
-//   name: 'JSONTest',
-//   properties: [
-//     { name: 'name', shortName: 'n' },
-//     { class: 'Int', name: 'age', shortName: 'a' },
-//     { class: 'StringArray', name: 'children', shortName: 'cs' },
-//     { name: 'name That Needs Quoting' },
-//     { name: 'undefined' },
-//     { name: 'defined' },
-//     { class: 'String', name: 'undefinedString' },
-//     { class: 'String', name: 'definedString' },
-//     { class: 'String', name: 'defaultString', value: 'default' },
-//     { class: 'Int', name: 'undefinedInt' },
-//     { class: 'Int', name: 'definedInt' },
-//     { class: 'Int', name: 'defaultInt', value: 3 },
-//     { class: 'Float', name: 'undefinedFloat' },
-//     { class: 'Float', name: 'definedFloat' },
-//     { class: 'Float', name: 'defaultFloat', value: 3.14 },
-//     { class: 'Boolean', name: 'undefinedBoolean' },
-//     { class: 'Boolean', name: 'trueBoolean' },
-//     { class: 'Boolean', name: 'falseBoolean' },
-//     { class: 'Boolean', name: 'defaultBoolean', value: true },
-//     { class: 'Function', name: 'undefinedFunction' },
-//     { class: 'Function', name: 'definedFunction' },
-//     { name: 'undefinedFObject' },
-//     { name: 'definedFObject' },
-//     { name: 'transient', transient: true },
-//     { name: 'networkTransient', networkTransient: true },
-//     { name: 'storageTransient', storageTransient: true },
-// //    { name: '' },
-//   ]
-// });
-// var o = foam.json.parse({
-//   class: 'JSONTest',
-//   name: 'John',
-//   age: 42,
-//   children: ['Peter', 'Paul']});
-// o.describe();
 
-// //
-// o = JSONTest.create({
-//   name: 'John',
-//   age: 42,
-//   children: ['Peter', 'Paul'],
-//   "name That Needs Quoting": 42,
-//   defined: 'value',
-//   definedString: 'stringValue',
-//   definedInt: 42,
-//   defaultInt: 3,
-//   definedFloat: 42.42,
-//   defaultFloat: 3.14,
-//   trueBoolean: true,
-//   falseBoolean: false,
-//   defaultBoolean: true,
-//   definedFunction: function plus(a, b) { return a + b; },
-//   definedFObject: JSONTest.create({
-//     name: 'Janet',
-//     age: 32,
-//     children: [ 'Kim', 'Kathy' ]
-//   }),
-//   transient: 'transient value',
-//   networkTransient: 'network transient value',
-//   storageTransient: 'storage transient value'
-// });
-// // Default JSON formatting
-// log(foam.json.stringify(o));
-
-// // Convert to a JSON object (instead of a String)
-// log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
-
-// // Or as a method on Objects
-// log(o.stringify());
-
-// //
-// log(foam.json.Pretty.stringify(o));
-
-// //
-// log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
-
-// //
-// log(foam.json.Strict.stringify(o));
-
-// //
-// log(foam.json.PrettyStrict.stringify(o));
-
-// //
-// log(foam.json.Compact.stringify(o));
-
-// //
-// log(foam.json.Short.stringify(o));
-
-// //
-// log(foam.json.Network.stringify(o));
-
-// //
-// log(foam.json.Storage.stringify(o));
-
-// //:NOTEST
-// // Graphics Support
-// foam.CLASS({
-//   name: 'GraphicsDemo',
-//   extends: 'foam.graphics.CView',
-//   requires: [
-//     'foam.graphics.Arc',
-//     'foam.graphics.Box',
-//     'foam.graphics.Circle',
-//     'foam.graphics.CView',
-//     'foam.graphics.Gradient'
-//   ],
-//   properties: [
-//     [ 'width', 500 ],
-//     [ 'height', 500 ],
-//     {
-//       name: 'children',
-//       factory: function() {
-//         var objects = [
-//           this.Arc.create({
-//             start: 0,
-//             end: 1.5*Math.PI,
-//             radius: 40
-//           }),
-//           this.Circle.create({
-//             color: this.Gradient.create({
-//               radial: true,
-//               x0: 0, y0: 0, r0: 10,
-//               x1: 0, y1: 0, r1: 100,
-//               colors: [
-//                 [0, 'green'],
-//                 [0.4, 'blue'],
-//                 [0.6, 'red'],
-//                 [1, 'white']
-//               ]
-//             }),
-//             border: '',
-//             radius: 100,
-//             x: 300,
-//             y: 300
-//           }),
-//           this.Box.create({
-//             color: this.Gradient.create({
-//               radial: false,
-//               x0: 0, y0: 0,
-//               x1: 100, y1: 100,
-//               colors: [
-//                 [0, 'black'],
-//                 [1, 'white']
-//               ]
-//             }),
-//             width: 100,
-//             height: 100,
-//             originX: 50,
-//             originY: 50,
-//             x: 100,
-//             y: 400,
-//             children: [
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 30,
-//                 y: 30,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 70,
-//                 y: 30,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 30,
-//                 y: 70,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 70,
-//                 y: 70,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 50,
-//                 y: 50,
-//                 radius: 10
-//               })
-//             ]
-//           })
-//         ];
-//         return objects;
-//       }
-//     },
-//     {
-//       name: 'counter',
-//       value: 0
-//     }
-//   ],
-//   listeners: [
-//     {
-//       name: 'step',
-//       isFramed: true,
-//       code: function() {
-//         this.counter += 0.01
-//         this.children[0].rotation += 0.1;
-//         this.children[0].x = 150 + 50 * Math.cos(this.counter);
-//         this.children[0].y = 150 + 50 * Math.sin(this.counter);
-//         this.children[1].skewX = Math.sin(this.counter);
-//         this.children[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
-//         this.children[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
-//         this.children[2].rotation += 0.01;
-//         this.step();
-//         this.invalidated.pub();
-//       }
-//     }
-//   ]
-// });
-// var g = GraphicsDemo.create();
-// g.write();
-// g.step();
 
 
 // // TODO: BooleanProperty
