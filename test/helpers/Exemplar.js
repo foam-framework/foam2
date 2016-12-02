@@ -145,7 +145,7 @@ foam.CLASS({
       }
       deps.async.forEach(function(dep) {
         ret += tabs + "}).then(function() {\n";
-        ret += dep.outputSelf(indent);
+        ret += dep.outputSelfTest(indent);
       });
       if ( deps.async.length ) {
         ret += tabs + "}).then(function() {\n";
