@@ -63,6 +63,7 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
   var domFrame = document.createElement('div');
   domFrame.id = domID;
   domFrame.style.width = '90%';
+  domFrame.style.clear = 'both';
   document.body.appendChild(domFrame);
 
   // Note: eval() for each exemplar may be async, so don't
@@ -81,6 +82,7 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
     getElementsByClassName: function(cls) { return this.document.getElementsByClassName(cls); },
   });
   foam.__context__ = { __proto__: foam.__context__ }; //unseal
+  var exampleContext = foam.__context__;
 
   // construct iFrame lazily
   function getIFrameDoc() {
@@ -121,7 +123,7 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
   // TODO: offer expandable view of complete dependencies
   // Write the code with deps omitted
   var exampleHTML = document.createElement('div');
-  exampleHTML.innerHTML = ("<hr><code>" + ex.generateExample(true) + "</code>");
+  exampleHTML.innerHTML = ('<hr><code>' + ex.generateExample(true) + "</code>");
   document.getElementById(domID).appendChild(exampleHTML);
   try {
     var result = eval("(function runExemplar___() { " + code + " })();");
