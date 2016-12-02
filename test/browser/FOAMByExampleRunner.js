@@ -15,7 +15,11 @@
  * limitations under the License.
  */
 
-
+// TODO: This content should be modelled, with a special context setup to run
+// each example and views for code and output formatting. Example code will also
+// be exportable on its own as unit tests or standalone examples, so changes that
+// require users to write their examples a certain way (such as logging style and
+// root context access) must be compatible with different output modes.
 
 // Run FBE Exemplars in browser
 var oldContext;
