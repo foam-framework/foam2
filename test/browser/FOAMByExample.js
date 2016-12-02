@@ -2962,12 +2962,12 @@ var examples = [
     }
   },
   {
-    name: 'Function formalArgs',
-    description: 'foam.Function.formalArgs() returns a function\'s arguments an an array',
+    name: 'Function argNames',
+    description: 'foam.Function.argNames() returns a function\'s arguments an an array',
     dependencies: [  ],
     code: function() {
       var f = function(a, b, fooBar) { };
-      var argsAsArray = foam.Function.formalArgs(f);
+      var argsAsArray = foam.Function.argNames(f);
       console.log('Function args array:', argsAsArray);
     },
     postTestCode: function() {
