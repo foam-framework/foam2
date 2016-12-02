@@ -27,7 +27,9 @@ foam.LIB({
         */
       // strip newlines and find the function(...) declaration
       var args = foam.Function.argsStr(fn);
+
       if ( ! args ) return [];
+
       args += ','; // easier matching
 
       var ret = [];
@@ -39,6 +41,7 @@ foam.LIB({
       var argIdx = 0;
       var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?(\*)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
       var typeMatch;
+
       while ( typeMatch = argMatcher.exec(args) ) {
         // if can't match from start of string, fail
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
@@ -57,7 +60,7 @@ foam.LIB({
           optional:      typeMatch[3] == '?',
           repeats:       typeMatch[3] == '*',
           index:         argIdx++,
-          documentation: typeMatch[6],
+          documentation: typeMatch[6]
         }));
 
         // if present, record return type (if not the last arg, we fail on the
@@ -97,7 +100,7 @@ foam.CLASS({
   name: 'Argument',
 
   constants: {
-    PREFIX: 'Argument',
+    PREFIX: 'Argument'
   },
 
   properties: [
@@ -148,9 +151,9 @@ foam.CLASS({
           throw new TypeError(
               this.PREFIX + i + this.name +
               ', is not optional, but was undefined in a function call');
-        } else {
-          return; // value is undefined, but ok with that
         }
+
+        return; // value is undefined, but ok with that
       }
 
       // type this for non-modelled types (no model, but a type name specified)
