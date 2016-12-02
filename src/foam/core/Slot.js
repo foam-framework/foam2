@@ -408,7 +408,7 @@ foam.CLASS({
       expression: function(obj) {
         foam.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
 
-        var args = foam.Function.formalArgs(this.code);
+        var args = foam.Function.argNames(this.code);
         for ( var i = 0 ; i < args.length ; i++ ) {
           args[i] = obj.slot(args[i]);
         }
