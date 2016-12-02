@@ -95,28 +95,28 @@ var examples = [
             return this.EasyDAO.create({
               name: 'banks',
               of: this.Bank, daoType: 'MDAO'
-            });
+            }, foam.__context__);
           }},
           { name: 'customerDAO', factory: function() {
             return this.EasyDAO.create({
               name: 'customers',
               seqNo: true,
               of: this.Customer, daoType: 'MDAO'
-            });
+            }, foam.__context__);
           }},
           { name: 'accountDAO', factory: function() {
             return this.EasyDAO.create({
               name: 'accounts',
               seqNo: true,
               of: this.Account, daoType: 'MDAO'
-            });
+            }, foam.__context__);
           }},
           { name: 'transactionDAO', factory: function() {
             return this.EasyDAO.create({
               name: 'transactions',
               seqNo: true,
               of: this.Transaction, daoType: 'MDAO'
-            });
+            }, foam.__context__);
           }},
         ]
       });
@@ -257,7 +257,7 @@ var examples = [
             return Promise.all(transactionSelectPromises);
           })
         }).then(function() {
-          foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
+          foam.u2.TableView.create({ of: app.Transaction, data: tsink }, foam.__context__).write();
         });
     }
   },
@@ -290,7 +290,7 @@ var examples = [
                   .select(tsink) // could dedup, but no duplicates in this case
             });
         }).then(function(results) {
-          foam.u2.TableView.create({ of: app.Transaction, data: results }).write();
+          foam.u2.TableView.create({ of: app.Transaction, data: results }, foam.__context__).write();
         });
     }
   },
@@ -301,16 +301,16 @@ var examples = [
   //   dependencies: [ 'Create Transactions' ],
   //   code: function() {
   //     foam.__context__.document.write("Banks");
-  //     foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }).write();
+  //     foam.u2.TableView.create({ of: app.Bank, data: app.bankDAO }, foam.__context__).write();
   //
   //     foam.__context__.document.write("Customers");
-  //     foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }).write();
+  //     foam.u2.TableView.create({ of: app.Customer, data: app.customerDAO }, foam.__context__).write();
   //
   //     foam.__context__.document.write("Accounts");
-  //     foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }).write();
+  //     foam.u2.TableView.create({ of: app.Account, data: app.accountDAO }, foam.__context__).write();
   //
   //     foam.__context__.document.write("Transactions");
-  //     foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }).write();
+  //     foam.u2.TableView.create({ of: app.Transaction, data: app.transactionDAO }, foam.__context__).write();
   //   }
   // },
 
@@ -331,7 +331,7 @@ var examples = [
       }, 500);
 
       foam.__context__.document.write("Customers with Skip and Limit");
-      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }).write();
+      foam.u2.TableView.create({ of: app.Customer, data: proxyDAO }, foam.__context__).write();
     }
   },
 
@@ -347,13 +347,13 @@ var examples = [
         foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(M.DESC(app.Transaction.AMOUNT))
-        }).write();
+        }, foam.__context__).write();
 
         foam.__context__.document.write("Sort by date");
         foam.u2.TableView.create({
           of: app.Transaction,
           data: transactionsDAO.orderBy(app.Transaction.DATE)
-        }).write();
+        }, foam.__context__).write();
       })
     }
   },
