@@ -280,13 +280,13 @@ describe('foam.Function', function() {
   });
 
 
-  describe('formalArgs', function() {
+  describe('argNames', function() {
 
     it('handles an empty arg list', function() {
       var fn = function( ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([]);
     });
 
@@ -295,7 +295,7 @@ describe('foam.Function', function() {
          func, obj, num,  arr ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
     });
 
@@ -304,7 +304,7 @@ describe('foam.Function', function() {
         /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
     });
 
@@ -313,7 +313,7 @@ describe('foam.Function', function() {
           /* // a comment here */ name, another /* return // comment */) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'arg', 'more', 'name', 'another' ]);
     });
 

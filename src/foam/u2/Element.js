@@ -26,6 +26,45 @@ TODO:
  - Properly handle insertBefore_ of an element that's already been inserted?
 */
 
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'ControllerMode',
+
+  values: [
+    { name: 'CREATE', label: 'Create' },
+    { name: 'VIEW',   label: 'View'   },
+    { name: 'EDIT',   label: 'Edit'   }
+  ]
+});
+
+
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'Visibility',
+
+  values: [
+    { name: 'RW',       label: 'Read-Write' },
+    { name: 'FINAL',    label: 'Final'      },
+    { name: 'DISABLED', label: 'Disabled'   },
+    { name: 'RO',       label: 'Read-Only'  },
+    { name: 'HIDDEN',   label: 'Hidden'     }
+  ]
+});
+
+
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'DisplayMode',
+
+  values: [
+    { name: 'RW',       label: 'Read-Write' },
+    { name: 'DISABLED', label: 'Disabled'   },
+    { name: 'RO',       label: 'Read-Only'  },
+    { name: 'HIDDEN',   label: 'Hidden'     }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'Entity',
@@ -718,7 +757,7 @@ foam.CLASS({
 
       return count;
     },
-    
+
     function initKeyboardShortcuts() {
       /* Initializes keyboard shortcuts. */
       var keyMap = {}
@@ -1868,8 +1907,9 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'controllerMode',
-      choices: [ 'create', 'view', 'edit' ],
+      class: 'Enum',
+      of: 'foam.uw.ControllerMode',
+      name: 'controllerMode'
     }
   ]
 });
@@ -1884,31 +1924,42 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Enum',
+      of: 'foam.u2.ControllerMode',
       name: 'controllerMode',
-      factory: function() { return this.__context__.controllerMode || 'create'; },
-      choices: [ 'create', 'view', 'edit' ],
+      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
     },
     {
       name: 'data',
       attribute: true
     },
     {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
       name: 'visibility',
-      choices: [ 'rw', 'final', 'disabled', 'ro', 'hidden' ],
-      postSet: function() {
-        this.updateMode_(this.mode);
-      },
+      postSet: function() { this.updateMode_(this.mode); },
       attribute: true,
-      defaultValue: 'rw'
+      value: foam.u2.Visibility.RW
     },
     {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
       name: 'mode',
-      choices: [ 'rw', 'disabled', 'ro', 'hidden' ],
+      attribute: true,
       postSet: function(_, mode) { this.updateMode_(mode); },
       expression: function(visibility, controllerMode) {
-        if ( visibility === 'ro' ) return 'ro';
-        if ( visibility === 'final' && controllerMode !== 'create' ) return 'ro';
-        return controllerMode === 'view' ? 'ro' : 'rw';
+        if ( visibility === foam.u2.Visibility.RO ) {
+          return foam.u2.DisplayMode.RO;
+        }
+
+        if ( visibility === foam.u2.Visibility.FINAL &&
+             controllerMode !== foam.u2.ControllerMode.CREATE ) {
+          return foam.u2.DisplayMode.RO;
+        }
+
+        return controllerMode === foam.u2.ControllerMode.VIEW ?
+          foam.u2.DisplayMode.RO :
+          foam.u2.DisplayMode.RW ;
       },
       attribute: true
     }/*,
@@ -1933,9 +1984,11 @@ foam.CLASS({
       this.SUPER();
       this.updateMode_(this.mode);
     },
+
     function updateMode_() {
       // Template method, to be implemented in sub-models
     },
+
     function fromProperty(p) {
       this.visibility = p.visibility;
     }

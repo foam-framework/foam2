@@ -48,13 +48,6 @@ for ( var i = 3 ; i < process.argv.length ; i++ ) {
 //     passes the parameter into the path as normal at runtime.
 
 
-
-
-
-require('../../../lib/HTTPMethod');
-
-var http = require('http');
-var https = require('https');
 var url = require('url');
 
 function mapType(typeStr, obj) {

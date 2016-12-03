@@ -5,6 +5,7 @@
   <script>console.timeEnd('boot');</script>
   <script language="javascript" src="../helpers/Exemplar.js"></script>
   <script language="javascript" src="FOAMByExample.js"></script>
+  <script language="javascript" src="DAOByExample.js"></script>
   <title>FOAM By Example</title>
   <style>
     body { white-space: pre-wrap; }
@@ -15,78 +16,6 @@
  <body>
   <h1>FOAM By Example</h1>
 
-  <script>
-    // Run FBE Exemplars in browser
-    var oldContext;
-    var oldConsole = console;
-    foam.async.repeat(FBE.length, function runExemplar(index) {
-      var ex = FBE[index];
-
-      // TODO: make log output pretty, put in a div
-      var output = [];
-      var logger = function() {
-        var strArgs = Array.prototype.slice.call(arguments);
-        strArgs.map(function(o) {
-          return
-            foam.Undefined.isInstance(o) ? 'undefined' :
-            foam.Null.isInstance(o) ? 'null' : o.toString();
-        });
-        output.push(strArgs.join(' '));
-      };
-      var writeOutput = function() {
-        // write log output
-        document.body.innerHTML += ("<pre>" + output.join('\n') + "</pre>");
-      }
-      // TODO: settle on logging strategy. Probably not using console but may want to
-      //   override it to catch unfixed calls.
-      console = {
-        __proto__: oldConsole,
-        log: logger,
-        warn: logger,
-        error: logger,
-        debug: logger,
-        assert: function(cond) {
-          if ( ! cond ) {
-            var args = Array.prototype.slice.call(arguments);
-            args[0] = "Assertion failed: ";
-            logger.apply(null, args);
-          }
-        }
-      }
-
-      // Note: eval() for each exemplar may be async, so don't
-      // nuke the context without waiting for the promise to resolve
-      if ( oldContext) foam.__context__ = oldContext;
-
-      oldContext = foam.__context__;
-      foam.__context__ = foam.createSubContext({
-        log: console.log,
-        warn: console.warn,
-        error: console.error,
-        debug: console.debug,
-        assert: console.assert,
-      });
-
-
-      var code = ex.generateExample();
-      // TODO: offer expandable view of complete dependencies
-      // Write the code with deps omitted
-      document.body.innerHTML += ("<hr><code>" + ex.generateExample(true) + "</code>");
-      // TODO: capture eval's document modifications the way foam1 flow.FBE did
-      try {
-        var result = eval("(function runExemplar___() { " + code + " })();");
-      } catch(e) {
-        console.error("Exception thrown: ", e);
-      }
-
-      // if async
-      if ( result && result.then ) {
-        return result.then(writeOutput);
-      } else {
-        writeOutput();
-        return result;
-      }
-    })();
-  </script>
+  <script language="javascript" src="FOAMByExampleRunner.js"></script>
  </body>
 </html>

@@ -236,17 +236,19 @@ foam.LIB({
           toString().
           replace(/(\r\n|\n|\r)/gm,'').
           match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
       }
+
       return match[2] || '';
     },
 
-    function formalArgs(f) {
+    function argNames(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
+       * Ex. argNames(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       args += ',';
@@ -287,7 +289,7 @@ foam.LIB({
      *
      **/
     function withArgs(fn, source, opt_self) {
-      var argNames = foam.Function.formalArgs(fn);
+      var argNames = foam.Function.argNames(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];

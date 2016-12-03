@@ -41,7 +41,7 @@ return function(/* string */ str, /*boolean*/ bool ,
   }
 }
 
-describe('foam.types.getFunctionArgs', function() {
+describe('foam.Function.args', function() {
   var fn;
 
   beforeEach(function() {
@@ -52,7 +52,7 @@ describe('foam.types.getFunctionArgs', function() {
   });
 
   it('returns the types of arguments', function() {
-    var params = foam.types.getFunctionArgs(fn);
+    var params = foam.Function.args(fn);
 
     expect(params[0].name).toEqual('paramA');
     expect(params[0].typeName).toEqual('TypeA');
@@ -75,7 +75,7 @@ describe('foam.types.getFunctionArgs', function() {
 
   });
   it('accepts a return with no args', function() {
-    var params = foam.types.getFunctionArgs(function(/*RetType*/){});
+    var params = foam.Function.args(function(/*RetType*/){});
 
     expect(params.returnType.typeName).toEqual('RetType');
   });
@@ -84,25 +84,25 @@ describe('foam.types.getFunctionArgs', function() {
     fn = function(/*RetType*/){};
     fn.toString = function() { return "some garbage string!"; };
 
-    expect(function() { foam.types.getFunctionArgs(fn); }).toThrow();
+    expect(function() { foam.Function.args(fn); }).toThrow();
   });
   it('reports arg parse failures', function() {
     fn = function(/* */ arg){};
-    expect(function() { foam.types.getFunctionArgs(fn); }).toThrow();
+    expect(function() { foam.Function.args(fn); }).toThrow();
   });
   it('reports return parse failures', function() {
     fn = function(/* */){};
-    expect(function() { foam.types.getFunctionArgs(fn); }).toThrow();
+    expect(function() { foam.Function.args(fn); }).toThrow();
   });
   it('parses no args', function() {
     fn = function(){};
 
-    expect(function() { foam.types.getFunctionArgs(fn); }).not.toThrow();
+    expect(function() { foam.Function.args(fn); }).not.toThrow();
   });
   it('fails a return before the last arg', function() {
     fn = function(arg1 /* RetType */, arg2){};
 
-    expect(function() { foam.types.getFunctionArgs(fn); }).toThrow();
+    expect(function() { foam.Function.args(fn); }).toThrow();
   });
 
 });
@@ -118,13 +118,13 @@ describe('Argument.validate', function() {
   });
 
   it('allows optional args to be omitted', function() {
-    var params = foam.types.getFunctionArgs(fn);
+    var params = foam.Function.args(fn);
 
     expect(function() { params[1].validate(undefined); }).not.toThrow();
     expect(function() { params[2].validate(undefined); }).toThrow();
   });
   it('checks modelled types', function() {
-    var params = foam.types.getFunctionArgs(fn);
+    var params = foam.Function.args(fn);
 
     expect(function() { params[0].validate(TypeA.create(undefined, foam.__context__)); }).not.toThrow();
     expect(function() { params[1].validate(TypeB.create(undefined, foam.__context__)); }).not.toThrow();
@@ -137,7 +137,7 @@ describe('Argument.validate', function() {
     expect(function() { params.returnType.validate(RetType.create(undefined, foam.__context__)); }).not.toThrow();
   });
   it('rejects wrong modelled types', function() {
-    var params = foam.types.getFunctionArgs(fn);
+    var params = foam.Function.args(fn);
 
     expect(function() { params[0].validate(TypeB.create(undefined, foam.__context__)); }).toThrow();
     expect(function() { params[1].validate(TypeA.create(undefined, foam.__context__)); }).toThrow();
@@ -146,7 +146,7 @@ describe('Argument.validate', function() {
     expect(function() { params.returnType.validate(global['package.TypeC'].create(undefined, foam.__context__)); }).toThrow();
   });
   it('checks primitive types', function() {
-    var params = foam.types.getFunctionArgs(makePrimitiveTestFn());
+    var params = foam.Function.args(makePrimitiveTestFn());
 
     // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
     expect(function() { params[0].validate('hello'); }).not.toThrow();
@@ -157,7 +157,7 @@ describe('Argument.validate', function() {
     expect(function() { params[5].validate(['hello']); }).not.toThrow();
   });
   it('rejects wrong primitive types', function() {
-    var params = foam.types.getFunctionArgs(makePrimitiveTestFn());
+    var params = foam.Function.args(makePrimitiveTestFn());
 
     // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
     expect(function() { params[0].validate(78); }).toThrow();
@@ -169,7 +169,7 @@ describe('Argument.validate', function() {
   });
 
   it('parses empty args list with tricky function body', function() {
-    var params = foam.types.getFunctionArgs(function() { (3+4); return (1); });
+    var params = foam.Function.args(function() { (3+4); return (1); });
 
     // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
     expect(function() { params[0].validate(78); }).toThrow();

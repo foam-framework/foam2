@@ -16,7 +16,7 @@
  */
 
 /** Foam By Example */
-var FBE = [
+var examples = [
   {
     name: 'Test Class',
     description: 'Define a new class with foam.CLASS',
@@ -2341,11 +2341,10 @@ var FBE = [
     }
   },
   {
-    name: 'a',
-    description: '',
+    name: 'Model validation same method name',
+    description: 'Methods must not have the same name',
     dependencies: [  ],
     code: function() {
-      // Methods must not have the same name
       foam.CLASS({
         name: 'AxiomConflict2',
         methods: [ function sameName() {}, function sameName() {} ]
@@ -2534,16 +2533,12 @@ var FBE = [
       //toBeAssertedThat(Y2.describe).not.toBeUndefined();
     }
   },
+
   {
-    name: 'Import context values',
-    description: 'Classes can import values from the Context so that they can be accessed from this',
+    name: 'Imports Test Class',
+    description: 'Imports are pulled from the context when an instance is created',
     dependencies: [  ],
     code: function() {
-      var lastLogMsg = "";
-      var Y = foam.createSubContext({ myLogger: function(msg) {
-        console.log('log:', msg);
-        lastLogMsg = msg;
-      }});
       foam.CLASS({
         name: 'ImportsTest',
         imports: [ 'myLogger' ],
@@ -2551,6 +2546,14 @@ var FBE = [
           this.myLogger('log foo from ImportTest');
         } ]
       });
+    }
+  },
+  {
+    name: 'Import context values',
+    description: 'Classes can import values from the Context so that they can be accessed from this',
+    dependencies: [ 'Imports Test Class' ],
+    code: function() {
+      // First try the import with no 'myLogger' in its context
       try {
         var o = ImportsTest.create(); // should fail here, on object creation
         console.log('test created');
@@ -2558,8 +2561,18 @@ var FBE = [
       } catch(e) {
         console.log('Could not import "myLogger" since nobody provided it.');
       }
+
+      var lastLogMsg = "";
+      // Provide a 'myLogger' on a context
+      var Y = foam.createSubContext({ myLogger: function(msg) {
+        console.log('log:', msg);
+        lastLogMsg = msg;
+      }});
+
       Y.myLogger('test');
-      var o = ImportsTest.create(null, Y);
+      // Using 'requires' supplies the context automatically, but for this
+      // example we supply the context explicitly.
+      var o = ImportsTest.create(null, Y); // create with context Y
       o.foo();
     },
     postTestCode: function() {
@@ -2591,23 +2604,854 @@ var FBE = [
        //toBeAssertedThat(o.myLogger).toBeUndefined();
     }
   },
-
   {
-    name: '',
-    description: '',
+    name: 'Export context values',
+    description: 'Classes can export values for use by objects they create',
+    dependencies: [ 'Imports Test Class' ],
+    code: function() {
+      var calls = 0;
+      foam.CLASS({
+        name: 'ExportsTest',
+        requires: [ 'ImportsTest' ],
+        exports: [ 'myLogger' ],
+        methods: [
+          function init() {
+            this.ImportsTest.create().foo();
+          },
+          function myLogger(msg) {
+            // this function is exported, thus available to object we create
+            // (like ImportsTest in our init)
+            console.log('ExportsTest logger call:', msg);
+            calls += 1;
+          }
+        ]
+      });
+      ExportsTest.create();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(1);
+    }
+  },
+  {
+    name: 'Packages',
+    description: 'Classes can specify a package',
     dependencies: [  ],
     code: function() {
+      foam.CLASS({
+        package: 'com.acme',
+        name: 'Test',
+        methods: [ function foo() {
+          console.log('Hello, I am foo() from com.acme.Test');
+        } ]
+      });
+      com.acme.Test.create().foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(com.acme.Test).not.toBeUndefined()
+      //toBeAssertedThat(foam.lookup('com.acme.Test', true)).toBe(com.acme.Test);
+    }
+  },
+  {
+    name: 'Requires',
+    description: 'Classes should requires: other Classes they need to use',
+    dependencies: [ 'Packages' ],
+    code: function() {
+      // Classes can requires: other Classes to avoid having to reference them
+      // by their fully-qualified names. The creation context (and thus our
+      // exports) is also automatically provided.
+      foam.CLASS({
+        name: 'RequiresTest',
+        requires: ['com.acme.Test' ],
+        methods: [ function foo() {
+          this.Test.create().foo();
+        } ]
+      });
+
+      console.log("When required:");
+      RequiresTest.create().foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { RequiresTest.create().foo(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Requires as',
+    description: 'Requires can use as to alias required Classes',
+    dependencies: [ 'Packages' ],
+    code: function() {
+      // Use 'as' to pick the name to use on 'this'. If a required
+      // class is named the same as one of your properties or methods,
+      // or two required classes have the same name, you may be forced
+      // to specify the name with 'as':
+      foam.CLASS({
+        name: 'RequiresAliasTest',
+        requires: ['com.acme.Test as NotTest' ],
+        methods: [ function foo() {
+          this.NotTest.create().foo();
+        } ]
+      });
+
+      console.log("Required as NotTest:");
+      RequiresAliasTest.create().foo();
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { RequiresAliasTest.create().foo(); }).not.toThrow();
+    }
+  },
+  {
+    name: 'Primary Key',
+    description: 'Classes can have a unique-id or primary-key',
+    dependencies: [  ],
+    code: function() {
+      // By default, this is simply the field named 'id'.
+      foam.CLASS({
+        name: 'Invoice',
+        properties: [ 'id', 'desc', 'amount' ]
+      });
+      var o = Invoice.create({ id: 1, desc: 'Duct Cleaning', amount: 99.99 });
+      console.log(o.id);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.id).toEqual(1);
+    }
+  },
+  {
+    name: 'Primary Key ids',
+    description: 'Use the ids property to specify that the primary key be something other than id',
+    dependencies: [  ],
+    code: function() {
+      // You can also use the 'ids' property to specify that
+      // the primary key be something other than 'id'.
+      // In this case, 'id' will become an psedo-property for
+      // accessing the real 'invoiceId' property.
+      foam.CLASS({
+        name: 'Invoice2',
+        ids: [ 'invoiceId' ],
+        properties: [ 'invoiceId', 'desc', 'amount' ]
+      });
+      var o = Invoice2.create({ invoiceId: 23, desc: 'Duct Cleaning', amount: 99.99 });
+      console.log("Id:", o.id, "invoiceId:", o.invoiceId);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.id).toEqual(23);
+    }
+  },
+  {
+    name: 'Primary Key multipart Class',
+    description: 'Multi-part unique identifiers are also supported by setting ids',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'Invoice3',
+        ids: [ 'customerId', 'invoiceId' ],
+        properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ]
+      });
+    }
+  },
+  {
+    name: 'Primary Key multipart',
+    description: 'Multi-part unique identifiers are also supported by setting ids',
+    dependencies: [ 'Primary Key multipart Class' ],
+    code: function() {
+      var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
+      console.log("initial           id:", o.id, "customerId:", o.customerId, "invoiceId:", o.invoiceId);
+      // setting id propagates the changes to the properties that make up the
+      // multipart id:
+      o.id = [2, 3];
+      console.log("after setting id, id:", o.id, "customerId:", o.customerId, "invoiceId:", o.invoiceId);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.customerId).toEqual(2);
+      //toBeAssertedThat(o.invoiceId).toEqual(3);
+    }
+  },
+  {
+    name: 'Primary Key multipart comparison',
+    description: 'Multi-part ids are comparable',
+    dependencies: [ 'Primary Key multipart Class' ],
+    code: function() {
+      var results = '';
+      results += Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 2}),
+        Invoice3.create({customerId: 1, invoiceId: 1}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 1}),
+        Invoice3.create({customerId: 1, invoiceId: 2}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 1}),
+        Invoice3.create({customerId: 1, invoiceId: 1}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 2, invoiceId: 1}),
+        Invoice3.create({customerId: 1, invoiceId: 1}));
+
+      results += ", " + Invoice3.ID.compare(
+        Invoice3.create({customerId: 1, invoiceId: 1}),
+        Invoice3.create({customerId: 2, invoiceId: 1}));
+
+      console.log("Comparison results:", results);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(results).toEqual('1, -1, 0, 1, -1');
+    }
+  },
+  {
+    name: 'Class Id',
+    description: 'A Class\' id is a combination of its package and name',
+    dependencies: [ 'Packages' ],
+    code: function() {
+      console.log("Test class id:", com.acme.Test.id);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(com.acme.Test.id).toEqual('com.acme.Test');
+    }
+  },
+  {
+    name: 'Custom Axioms',
+    description: 'Specify arbitrary Axioms for a Class with axioms:',
+    dependencies: [  ],
+    code: function() {
+      // In addition the the built-in Axiom types, you can also
+      // specify arbitrary Axioms with 'axioms:'.
+      // This example adds the 'Singleton' axiom to make a class
+      // implement the Singleton patter (ie. there can only be
+      // one instance)
+      foam.CLASS({
+        name: 'AxiomTest',
+        axioms: [ foam.pattern.Singleton.create() ],
+        methods: [ function init() {
+          console.log('Creating AxiomTest');
+        } ]
+      });
+
+      AxiomTest.create();
+      AxiomTest.create();
+      console.log("Same instance?", AxiomTest.create() === AxiomTest.create());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(AxiomTest.create()).toBe(AxiomTest.create());
+    }
+  },
+  {
+    name: 'Custom Axioms inherit',
+    description: 'Gain the custom axioms of a Class you extend',
+    dependencies: [ 'Custom Axioms' ],
+    code: function() {
+      //
+      foam.CLASS({
+        name: 'AxiomSubTest',
+        extends: 'AxiomTest',
+        methods: [ function init() {
+          console.log('Creating AxiomSubTest');
+        } ]
+      });
+      AxiomSubTest.create();
+      AxiomSubTest.create();
+      console.log("sub is same instance?", AxiomSubTest.create() === AxiomSubTest.create());
+      console.log("sub same as super?", AxiomSubTest.create() === AxiomTest.create());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(AxiomSubTest.create()).toBe(AxiomSubTest.create());
+      //toBeAssertedThat(AxiomSubTest.create()).not.toBe(AxiomTest.create());
+    }
+  },
+  {
+    name: 'Mutliton',
+    description: 'Add the Multion axiom to implement the Multiton pattern',
+    dependencies: [  ],
+    code: function() {
+      // Multitons create one shared instance per value, based on the given
+      // property.
+      foam.CLASS({
+        name: 'Color',
+        axioms: [ foam.pattern.Multiton.create({ property: 'color' }) ],
+        properties: [ 'color' ],
+        methods: [ function init() {
+          console.log('Creating Color:', this.color);
+        } ]
+      });
+
+      var red1 = Color.create({color: 'red'});
+      var red2 = Color.create({color: 'red'});
+      var blue = Color.create({color: 'blue'});
+
+      console.log('reds same?', red1 === red2);
+      console.log('red same as blue?', red1 === blue);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(red1).toBe(red2);
+      //toBeAssertedThat(red1).not.toBe(blue);
+    }
+  },
+  {
+    name: 'Object UID',
+    description: 'All Objects have a unique identifier, accessible with the .$UID property',
+    dependencies: [ 'Person Class' ],
+    code: function() {
+      var a = {}, b = [], c = Person.create();
+      console.log(a.$UID, b.$UID, c.$UID);
+      console.log(a.$UID, b.$UID, c.$UID);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(a.$UID).not.toEqual(b.$UID);
+      //toBeAssertedThat(b.$UID).not.toEqual(c.$UID);
+    }
+  },
+  {
+    name: 'Console log listener',
+    description: 'foam.events.consoleLog() returns a convenient listener that logs',
+    dependencies: [  ],
+    code: function() {
+      // foam.events.consoleLog
+      foam.CLASS({name: 'ConsoleLogTest'});
+      var o = ConsoleLogTest.create();
+      o.sub(foam.events.consoleLog());
+      o.pub();
+      o.pub('foo');
+      o.pub('foo','bar');
+    },
+  },
+  {
+    name: 'Function memoize1',
+    description: 'foam.Function.memoize1() memozies a one-argument function',
+    dependencies: [  ],
+    code: function() {
+      // if called again with the same argument, the previously generated
+      // value will be returned rather than calling the function again.
+      var calls = 0;
+      var f = foam.Function.memoize1(function(x) {
+        console.log('calculating ', x, "=>", x*x); return x*x;
+        calls += 1;
+      });
+
+      console.log(f(2));
+      console.log(f(2));
+      console.log(f(4));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(calls).toEqual(2);
+    }
+  },
+  {
+    name: 'Function memoize1 one arg only',
+    description: 'A call to memoize1() with no arguments will trigger a failed assertion',
+    dependencies: [ 'Function memoize1' ],
+    code: function() {
+      f();
+      f(1, 2);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(function() { f(); }).toThrow();
+      //toBeAssertedThat(function() { f(1, 2); }).toThrow();
+    }
+  },
+  {
+    name: 'Function argsStr',
+    description: 'foam.Function.argsStr() returns a function\'s arguments as a string',
+    dependencies: [  ],
+    code: function() {
+      var f = function(a, b, fooBar) { };
+      var argsAsStr = foam.Function.argsStr(f);
+      console.log('Function args:', argsAsStr);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(argsAsStr).toEqual('a, b, fooBar');
+      //toBeAssertedThat(foam.String.isInstance(argsAsStr)).toBe(true);
+    }
+  },
+  {
+    name: 'Function argNames',
+    description: 'foam.Function.argNames() returns a function\'s arguments an an array',
+    dependencies: [  ],
+    code: function() {
+      var f = function(a, b, fooBar) { };
+      var argsAsArray = foam.Function.argNames(f);
+      console.log('Function args array:', argsAsArray);
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(argsAsArray).toEqual(['a', 'b', 'fooBar']);
+      //toBeAssertedThat(foam.Array.isInstance(argsAsArray)).toBe(true);
+    }
+  },
+  {
+    name: 'String constantize',
+    description: 'foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT',
+    dependencies: [  ],
+    code: function() {
+      console.log('foo      =>', foam.String.constantize('foo'));
+      console.log('fooBar   =>', foam.String.constantize('fooBar'));
+      console.log('fooBar12 =>', foam.String.constantize('fooBar12'));
+    },
+  },
+  {
+    name: 'String capitalize',
+    description: 'foam.String.capitalize capitalizes the first letter of a string',
+    dependencies: [  ],
+    code: function() {
+      console.log(foam.String.capitalize('Abc def'));
+      console.log(foam.String.capitalize('abc def'));
+    },
+  },
+  {
+    name: 'String labelize',
+    description: 'foam.String.labelize converts from camelCase to labels',
+    dependencies: [  ],
+    code: function() {
+      console.log(foam.String.labelize('camelCase'));
+      console.log(foam.String.labelize('firstName'));
+      console.log(foam.String.labelize('someLongName'));
     },
     postTestCode: function() {
     }
   },
+  {
+    name: 'String multiline',
+    description: 'foam.String.multiline lets you build multi-line strings from function comments',
+    dependencies: [  ],
+    code: function() {
+      console.log(foam.String.multiline(function(){/*This is
+      a
+      multi-line
+      string*/}));
+    },
+  },
+  {
+    name: 'String pad',
+    description: 'foam.String.pad() pads a string to the specified length',
+    dependencies: [  ],
+    code: function() {
+      var s = foam.String.pad('foobar', 10);
+      console.log("padded  10:", '"' + s + '"', s.length);
 
+      // pad() is right justifying if given a negative number
+      var s = foam.String.pad('foobar', -10);
+      console.log("padded -10:", '"' + s + '"', s.length);
+    },
+  },
+  {
+    name: 'Template basics',
+    description: 'Templates use a JSP syntax to insert properties and code',
+    dependencies: [  ],
+    code: function() {
+      //
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [
+          'name'
+        ],
+        templates: [
+          {
+            name: 'hello',
+            template: 'Hello, my name is <%= this.name %>.'
+          }
+        ]
+      });
+
+      var o = TemplateTest.create({ name: 'Adam' });
+      console.log(o.hello());
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.hello()).toEqual('Hello, my name is Adam.');
+    }
+  },
+  {
+    name: 'Template arguments',
+    description: 'Templates can be declared to accept arguments',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [
+          'name'
+        ],
+        templates: [
+          {
+            name: 'greet',
+            args: [
+              'stranger'
+            ],
+            template: 'Hello <%= stranger %>, my name is <%= this.name %>.'
+          }
+        ]
+      });
+
+      var o = TemplateTest.create({ name: 'Adam' });
+      console.log(o.greet("Bob"));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.greet("Bob")).toEqual('Hello Bob, my name is Adam.');
+    }
+  },
+  {
+    name: 'Template nesting',
+    description: 'Templates can be called from other templates. Include output as the first argument.',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [ 'name' ],
+        templates: [
+          {
+            name: 'greeter',
+            args: [ 'stranger' ],
+            template: 'Hello <%= stranger %>'
+          },
+          {
+            name: 'greet',
+            args: ['stranger'],
+            // 'output' is an implicit argument you must pass when calling one template
+            // from another.
+            template: '<% this.greeter(output, stranger); %>, my name is <%= this.name %>'
+          }
+        ]
+      });
+
+      var o = TemplateTest.create({ name: 'Adam' });
+      console.log(o.greet("Alice"));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(o.greet("Alice")).toEqual('Hello Alice, my name is Adam');
+    }
+  },
+  {
+    name: 'Template code',
+    description: 'Template can use raw JS code for loops and control structures',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'TemplateTest',
+        properties: [ 'name' ],
+        templates: [
+          {
+            name: 'complexTemplate',
+            template: 'Use raw JS code for loops and control structures' +
+              '<% for ( var i = 0 ; i < 10; i++ ) { %>\n' +
+              'i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% } '+
+              '} %>' +
+              '\n\n' +
+              'Use percent signs to shortcut access to local properties\n' +
+              'For instance, my name is %%name\n'
+          }
+        ]
+      });
+
+      console.log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
+    },
+    postTestCode: function() {
+
+      //toBeAssertedThat(TemplateTest.create({ name: 'Adam' }).complexTemplate()).toEqual(
+//         'Use raw JS code for loops and control structures\n' +
+//         'i is: "0"  which is even!\n' +
+//         'i is: "1" \n' +
+//         'i is: "2"  which is even!\n' +
+//         'i is: "3" \n' +
+//         'i is: "4"  which is even!\n' +
+//         'i is: "5" \n' +
+//         'i is: "6"  which is even!\n' +
+//         'i is: "7" \n' +
+//         'i is: "8"  which is even!\n' +
+//         'i is: "9"\n' +
+//         '\n' +
+//         'Use percent signs to shortcut access to local properties\n' +
+//         'For instance, my name is Adam\n');
+
+
+    }
+  },
+  {
+    name: 'Template mutliline',
+    description: 'Multi-line templates can be defined as function comments',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'MultiLineTemplateTest',
+        properties: [ 'name' ],
+        templates: [
+          {
+            name: 'complexTemplate',
+            template: function() {/*
+Use raw JS code for loops and control structures
+<% for ( var i = 0 ; i < 10; i++ ) { %>
+i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% }
+} %>
+Use percent signs to shortcut access to local properties
+For instance, my name is %%name
+            */}
+          }
+        ]
+      });
+      console.log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
+    },
+  },
+  {
+    name: 'Create JSON Class',
+    description: 'Conversion to and from JSON is supported',
+    dependencies: [  ],
+    code: function() {
+      foam.CLASS({
+        name: 'JSONTest',
+        properties: [
+          { name: 'name', shortName: 'n' },
+          { class: 'Int', name: 'age', shortName: 'a' },
+          { class: 'StringArray', name: 'children', shortName: 'cs' },
+          { name: 'name That Needs Quoting' },
+          { name: 'undefined' },
+          { name: 'defined' },
+          { class: 'String', name: 'undefinedString' },
+          { class: 'String', name: 'definedString' },
+          { class: 'String', name: 'defaultString', value: 'default' },
+          { class: 'Int', name: 'undefinedInt' },
+          { class: 'Int', name: 'definedInt' },
+          { class: 'Int', name: 'defaultInt', value: 3 },
+          { class: 'Float', name: 'undefinedFloat' },
+          { class: 'Float', name: 'definedFloat' },
+          { class: 'Float', name: 'defaultFloat', value: 3.14 },
+          { class: 'Boolean', name: 'undefinedBoolean' },
+          { class: 'Boolean', name: 'trueBoolean' },
+          { class: 'Boolean', name: 'falseBoolean' },
+          { class: 'Boolean', name: 'defaultBoolean', value: true },
+          { class: 'Function', name: 'undefinedFunction' },
+          { class: 'Function', name: 'definedFunction' },
+          { name: 'undefinedFObject' },
+          { name: 'definedFObject' },
+          { name: 'transient', transient: true },
+          { name: 'networkTransient', networkTransient: true },
+          { name: 'storageTransient', storageTransient: true },
+      //    { name: '' },
+        ]
+      });
+    },
+  },
+  {
+    name: 'JSON parse',
+    description: 'Use foam.json.parse(someJSONobject) to convert to an FObject',
+    dependencies: [ 'Create JSON Class' ],
+    code: function() {
+      var o = foam.json.parse({
+        class: 'JSONTest',
+        name: 'John',
+        age: 42,
+        children: ['Peter', 'Paul']});
+      o.describe();
+    },
+  },
+  {
+    name: 'JSON output',
+    description: 'Use foam.json.stringify(fobject) to serialize an FObject to a JSON string',
+    dependencies: [ 'Create JSON Class' ],
+    code: function() {
+      o = JSONTest.create({
+        name: 'John',
+        age: 42,
+        children: ['Peter', 'Paul'],
+        "name That Needs Quoting": 42,
+        defined: 'value',
+        definedString: 'stringValue',
+        definedInt: 42,
+        defaultInt: 3,
+        definedFloat: 42.42,
+        defaultFloat: 3.14,
+        trueBoolean: true,
+        falseBoolean: false,
+        defaultBoolean: true,
+        definedFunction: function plus(a, b) { return a + b; },
+        definedFObject: JSONTest.create({
+          name: 'Janet',
+          age: 32,
+          children: [ 'Kim', 'Kathy' ]
+        }),
+        transient: 'transient value',
+        networkTransient: 'network transient value',
+        storageTransient: 'storage transient value'
+      });
+      // Default JSON formatting
+      console.log(foam.json.stringify(o));
+
+    },
+  },
+  {
+    name: 'JSON output modes',
+    description: 'Different outputters support suppressing properties, transients, and other options',
+    dependencies: [ 'JSON output' ],
+    code: function() {
+      // Outputters have different defaults for formatting, which properties
+      // to output, etc. You can clone one and change these settings on the
+      // outputter to customize your JSON output.
+
+      console.log('\nConvert to a JSON object (instead of a String):');
+      console.log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
+
+      console.log('\nAs a method on Objects:');
+      console.log(o.stringify());
+
+      console.log('\nPretty-printed output:');
+      console.log(foam.json.Pretty.stringify(o));
+
+      console.log('\nDisable class name output by cloning your own outputter:');
+      console.log(foam.json.Pretty.clone().copyFrom({ outputClassNames: false }).stringify(o));
+
+      console.log('\nStrict output:');
+      console.log(foam.json.Strict.stringify(o));
+
+      console.log('\nStrict-but-still-readable output:');
+      console.log(foam.json.PrettyStrict.stringify(o));
+
+      console.log('\nCompact output:');
+      console.log(foam.json.Compact.stringify(o));
+
+      console.log('\nShort-name (very compact) output:');
+      console.log(foam.json.Short.stringify(o));
+
+      console.log('\nNetwork (network-transient properties omitted) output:');
+      console.log(foam.json.Network.stringify(o));
+
+      console.log('\nStorage (storage-transient properties omitted) output:');
+      console.log(foam.json.Storage.stringify(o));
+    },
+    postTestCode: function() {
+      //toBeAssertedThat(foam.json.Network.stringify(o).indexOf('networkTransient').toEqual(-1);
+      //toBeAssertedThat(foam.json.Storage.stringify(o).indexOf('storageTransient').toEqual(-1);
+    }
+  },
+  {
+    name: 'Graphics Support',
+    description: 'CViews enable canvas rendering',
+    dependencies: [  ],
+    code: function() {
+
+      foam.CLASS({
+        name: 'GraphicsDemo',
+        extends: 'foam.graphics.CView',
+        requires: [
+          'foam.graphics.Arc',
+          'foam.graphics.Box',
+          'foam.graphics.Circle',
+          'foam.graphics.CView',
+          'foam.graphics.Gradient'
+        ],
+        properties: [
+          [ 'width', 500 ],
+          [ 'height', 500 ],
+          {
+            name: 'children',
+            factory: function() {
+              var objects = [
+                this.Arc.create({
+                  start: 0,
+                  end: 1.5*Math.PI,
+                  radius: 40
+                }),
+                this.Circle.create({
+                  color: this.Gradient.create({
+                    radial: true,
+                    x0: 0, y0: 0, r0: 10,
+                    x1: 0, y1: 0, r1: 100,
+                    colors: [
+                      [0, 'green'],
+                      [0.4, 'blue'],
+                      [0.6, 'red'],
+                      [1, 'white']
+                    ]
+                  }),
+                  border: '',
+                  radius: 100,
+                  x: 300,
+                  y: 300
+                }),
+                this.Box.create({
+                  color: this.Gradient.create({
+                    radial: false,
+                    x0: 0, y0: 0,
+                    x1: 100, y1: 100,
+                    colors: [
+                      [0, 'black'],
+                      [1, 'white']
+                    ]
+                  }),
+                  width: 100,
+                  height: 100,
+                  originX: 50,
+                  originY: 50,
+                  x: 100,
+                  y: 400,
+                  children: [
+                    this.Circle.create({
+                      color: 'red',
+                      x: 30,
+                      y: 30,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 70,
+                      y: 30,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 30,
+                      y: 70,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 70,
+                      y: 70,
+                      radius: 10
+                    }),
+                    this.Circle.create({
+                      color: 'red',
+                      x: 50,
+                      y: 50,
+                      radius: 10
+                    })
+                  ]
+                })
+              ];
+              return objects;
+            }
+          },
+          {
+            name: 'counter',
+            value: 0
+          }
+        ],
+        listeners: [
+          {
+            name: 'step',
+            isFramed: true,
+            code: function() {
+              this.counter += 0.01
+              this.children[0].rotation += 0.1;
+              this.children[0].x = 150 + 50 * Math.cos(this.counter);
+              this.children[0].y = 150 + 50 * Math.sin(this.counter);
+              this.children[1].skewX = Math.sin(this.counter);
+              this.children[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
+              this.children[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
+              this.children[2].rotation += 0.01;
+              this.step();
+              this.invalidated.pub();
+            }
+          }
+        ]
+      });
+      var g = GraphicsDemo.create();
+      g.write();
+      g.step();
+
+    }
+  }
 ];
 
-var reg = test.helpers.ExemplarRegistry.create(undefined, foam.__context__);
-var FBE = FBE.map(function(def) {
-  return test.helpers.Exemplar.create(def, reg);
+global.FBEreg = global.FBEreg || test.helpers.ExemplarRegistry.create();
+global.FBE = global.FBE || [];
+examples.forEach(function(def) {
+  FBE.push(test.helpers.Exemplar.create(def, FBEreg));
 });
+
+
 
 // // TODO: BooleanProperty
 
@@ -2616,518 +3460,4 @@ var FBE = FBE.map(function(def) {
 // // TODO: StringProperty
 
 // // TODO: ArrayProperty
-
-
-
-// // Classes can export values for use by objects they create.
-// foam.CLASS({
-//   name: 'ExportsTest',
-//   requires: [ 'ImportsTest' ],
-//   exports: [ 'myLogger' ],
-//   methods: [
-//     function init() {
-//       this.ImportsTest.create().foo();
-//     },
-//     function myLogger(msg) {
-//       console.log('log from ExportsTest:', msg);
-//     }
-//   ]
-// });
-// ExportsTest.create();
-
-// // Packages
-// // Classes can specify a 'package'.
-// foam.CLASS({
-//   package: 'com.acme',
-//   name: 'Test',
-//   methods: [ function foo() { console.log('foo from com.acme.Test'); } ]
-// });
-// com.acme.Test.create().foo();
-
-// // Classes can requires: other Classes to avoid having to reference them
-// // by their fully-qualified names.
-// foam.CLASS({
-//   name: 'RequiresTest',
-//   requires: ['com.acme.Test' ],
-//   methods: [ function foo() { this.Test.create().foo(); } ]
-// });
-// RequiresTest.create().foo();
-
-// // Requires can use 'as' to alias required Classes so that they are named something different.
-// foam.CLASS({
-//   name: 'RequiresAliasTest',
-//   requires: ['com.acme.Test as NotTest' ],
-//   methods: [ function foo() { this.NotTest.create().foo(); } ]
-// });
-// RequiresAliasTest.create().foo();
-
-// // Classes can have a unique-id or primary-key.
-// // By default, this is simply the field named 'id'.
-// foam.CLASS({
-//   name: 'Invoice',
-//   properties: [ 'id', 'desc', 'amount' ]
-// });
-// var o = Invoice.create({id: 1, desc: 'Duct Cleaning', amount: 99.99});
-// log(o.id);
-
-// // But you can also use the 'ids' property to specify that
-// // the primary key be something other than 'id'.
-// // In this case, 'id' will become an psedo-property for
-// // accessing the real 'invoiceId' property.
-// foam.CLASS({
-//   name: 'Invoice2',
-//   ids: [ 'invoiceId' ],
-//   properties: [ 'invoiceId', 'desc', 'amount' ]
-// });
-// var o = Invoice2.create({invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
-// log(o.id, o.invoiceId);
-
-// // Multi-part unique identifiers are also supported.
-// foam.CLASS({
-//   name: 'Invoice3',
-//   ids: [ 'customerId', 'invoiceId' ],
-//   properties: [ 'customerId', 'invoiceId', 'desc', 'amount' ]
-// });
-// var o = Invoice3.create({customerId: 1, invoiceId: 1, desc: 'Duct Cleaning', amount: 99.99});
-// log(o.id, o.customerId, o.invoiceId);
-// o.id = [2, 3];
-// log(o.id, o.customerId, o.invoiceId);
-
-// // Multi-part ids are comparable
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 2}),
-//   Invoice3.create({customerId: 1, invoiceId: 1})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 1}),
-//   Invoice3.create({customerId: 1, invoiceId: 2})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 1}),
-//   Invoice3.create({customerId: 1, invoiceId: 1})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 2, invoiceId: 1}),
-//   Invoice3.create({customerId: 1, invoiceId: 1})));
-// log(Invoice3.ID.compare(
-//   Invoice3.create({customerId: 1, invoiceId: 1}),
-//   Invoice3.create({customerId: 2, invoiceId: 1})));
-
-// // A Classes 'id' is a combination of its package and name.
-// log(com.acme.Test.id);
-
-// // In addition the the built-in Axiom types, you can also
-// // specify arbitrary Axioms with 'axioms:'.
-// // This example adds the 'Singleton' axiom to make a class
-// // implement the Singleton patter (ie. there can only be
-// // one instance)
-// foam.CLASS({
-//   name: 'AxiomTest',
-//   axioms: [ foam.pattern.Singleton.create() ],
-//   methods: [ function init() { log('Creating AxiomTest'); } ]
-// });
-// AxiomTest.create();
-// AxiomTest.create();
-// log(AxiomTest.create() === AxiomTest.create());
-
-// //
-// foam.CLASS({
-//   name: 'AxiomSubTest',
-//   extends: 'AxiomTest',
-//   methods: [ function init() { log('Creating AxiomSubTest'); } ]
-// });
-// AxiomSubTest.create();
-// AxiomSubTest.create();
-// log(AxiomSubTest.create() === AxiomSubTest.create());
-// log(AxiomSubTest.create() === AxiomTest.create());
-
-// // Or add the Multion axiom to implement the Multiton pattern.
-// foam.CLASS({
-//   name: 'Color',
-//   axioms: [ foam.pattern.Multiton.create({property: 'color'}) ],
-//   properties: [ 'color' ],
-//   methods: [ function init() { log('Creating Color:', this.color); } ]
-// });
-// var red1 = Color.create({color: 'red'});
-// var red2 = Color.create({color: 'red'});
-// var blue = Color.create({color: 'blue'});
-// log(red1 === red2);
-// log(red1 === blue);
-
-
-// // Stdlib
-
-// //:NOTEST
-// // All Objects have a unique identifier, accessible with the .$UID property.
-// var a = {}, b = [], c = Person.create();
-// log(a.$UID, b.$UID, c.$UID);
-// log(a.$UID, b.$UID, c.$UID);
-
-// // foam.events.consoleLog
-// foam.CLASS({name: 'ConsoleLogTest'});
-// var o = ConsoleLogTest.create();
-// o.sub(foam.events.consoleLog());
-// o.pub();
-// o.pub('foo');
-// o.pub('foo','bar');
-
-// // foam.Function.memoize1() memozies a one-argument function so that if called again
-// // with the same argument, the previously generated value will be returned
-// // rather than calling the function again.
-// var f = foam.Function.memoize1(function(x) { log('calculating ', x); return x*x; });
-// log(f(2));
-// log(f(2));
-// log(f(4));
-
-// // A call to memoize1() with no arguments will trigger a failed assertion.
-// log(f());
-
-// // A call to memoize1() with more than one argument will trigger a failed assertion.
-// log(f(1,2));
-
-// // foam.Function.argsStr() returns a function's arguments an a string.
-// log(foam.Function.argsStr(function(a,b,fooBar) { }));
-// log(typeof foam.Function.argsStr(function() { }));
-
-// // foam.Function.formalArgs() returns a function's arguments an an array.
-// log(foam.Function.formalArgs(function(a,b,fooBar) { }));
-// log(Array.isArray(foam.Function.formalArgs(function() { })));
-
-// // foam.String.constantize converts strings from camelCase to CONSTANT_FORMAT
-// log(foam.String.constantize('foo'));
-// log(foam.String.constantize('fooBar'));
-// log(foam.String.constantize('fooBar12'));
-
-// // foam.String.capitalize capitalizes strings
-// log(foam.String.capitalize('Abc def'));
-// log(foam.String.capitalize('abc def'));
-
-// // foam.String.labelize converts from camelCase to labels
-// log(foam.String.labelize('camelCase'));
-// log(foam.String.labelize('firstName'));
-// log(foam.String.labelize('someLongName'));
-
-// // foam.String.multiline lets you build multi-line strings
-// // from function comments.
-// log(foam.String.multiline(function(){/*This is
-// a
-// multi-line
-// string*/}));
-
-// // foam.String.pad() pads a string to the specified length.
-// var s = foam.String.pad('foobar', 10);
-// log(s, s.length);
-
-// // foam.String.pad() pads a string to the specified length, right justifying if given a negative number.
-// var s = foam.String.pad('foobar', -10);
-// log(s, s.length);
-
-// // Basic templates
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [
-//     'name'
-//   ],
-//   templates: [
-//     {
-//       name: 'hello',
-//       template: 'Hello, my name is <%= this.name %>.'
-//     }
-//   ]
-// });
-// var o = TemplateTest.create({ name: 'Adam' });
-// log(o.hello());
-
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [
-//     'name'
-//   ],
-//   templates: [
-//     {
-//       name: 'greet',
-//       args: [
-//         'stranger'
-//       ],
-//       template: 'Hello <%= stranger %>, my name is <%= this.name %>.'
-//     }
-//   ]
-// });
-// var o = TemplateTest.create({ name: 'Adam' });
-// log(o.greet("Bob"));
-
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [ 'name' ],
-//   templates: [
-//     {
-//       name: 'greeter',
-//       args: [ 'stranger' ],
-//       template: 'Hello <%= stranger %>'
-//     },
-//     {
-//       name: 'greet',
-//       args: ['stranger'],
-//       template: '<% this.greeter(output, stranger); %>, my name is <%= this.name %>'
-//     }
-//   ]
-// });
-// var o = TemplateTest.create({ name: 'Adam' });
-// log(o.greet("Alice"));
-
-// // More
-// foam.CLASS({
-//   name: 'TemplateTest',
-//   properties: [ 'name' ],
-//   templates: [
-//     {
-//       name: 'complexTemplate',
-//       template: 'Use raw JS code for loops and control structures' +
-//         '<% for ( var i = 0 ; i < 10; i++ ) { %>\n' +
-//         'i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% } '+
-//         '} %>' +
-//         '\n\n' +
-//         'Use percent signs to shortcut access to local properties\n' +
-//         'For instance, my name is %%name\n'
-//     }
-//   ]
-// });
-// log(TemplateTest.create({ name: 'Adam' }).complexTemplate());
-
-// // Multi-line templates can be defined as function comments.
-// foam.CLASS({
-//   name: 'MultiLineTemplateTest',
-//   properties: [ 'name' ],
-//   templates: [
-//     {
-//       name: 'complexTemplate',
-//       template: function() {/*
-//         Use raw JS code for loops and control structures
-//         <% for ( var i = 0 ; i < 10; i++ ) { %>
-//         i is: "<%= i %>" <% if ( i % 2 == 0 ) { %> which is even!<% }
-//         } %>
-//         Use percent signs to shortcut access to local properties
-//         For instance, my name is %%name
-//       */}
-//     }
-//   ]
-// });
-// log(MultiLineTemplateTest.create({ name: 'Adam' }).complexTemplate());
-
-// // JSON Support
-// foam.CLASS({
-//   name: 'JSONTest',
-//   properties: [
-//     { name: 'name', shortName: 'n' },
-//     { class: 'Int', name: 'age', shortName: 'a' },
-//     { class: 'StringArray', name: 'children', shortName: 'cs' },
-//     { name: 'name That Needs Quoting' },
-//     { name: 'undefined' },
-//     { name: 'defined' },
-//     { class: 'String', name: 'undefinedString' },
-//     { class: 'String', name: 'definedString' },
-//     { class: 'String', name: 'defaultString', value: 'default' },
-//     { class: 'Int', name: 'undefinedInt' },
-//     { class: 'Int', name: 'definedInt' },
-//     { class: 'Int', name: 'defaultInt', value: 3 },
-//     { class: 'Float', name: 'undefinedFloat' },
-//     { class: 'Float', name: 'definedFloat' },
-//     { class: 'Float', name: 'defaultFloat', value: 3.14 },
-//     { class: 'Boolean', name: 'undefinedBoolean' },
-//     { class: 'Boolean', name: 'trueBoolean' },
-//     { class: 'Boolean', name: 'falseBoolean' },
-//     { class: 'Boolean', name: 'defaultBoolean', value: true },
-//     { class: 'Function', name: 'undefinedFunction' },
-//     { class: 'Function', name: 'definedFunction' },
-//     { name: 'undefinedFObject' },
-//     { name: 'definedFObject' },
-//     { name: 'transient', transient: true },
-//     { name: 'networkTransient', networkTransient: true },
-//     { name: 'storageTransient', storageTransient: true },
-// //    { name: '' },
-//   ]
-// });
-// var o = foam.json.parse({
-//   class: 'JSONTest',
-//   name: 'John',
-//   age: 42,
-//   children: ['Peter', 'Paul']});
-// o.describe();
-
-// //
-// o = JSONTest.create({
-//   name: 'John',
-//   age: 42,
-//   children: ['Peter', 'Paul'],
-//   "name That Needs Quoting": 42,
-//   defined: 'value',
-//   definedString: 'stringValue',
-//   definedInt: 42,
-//   defaultInt: 3,
-//   definedFloat: 42.42,
-//   defaultFloat: 3.14,
-//   trueBoolean: true,
-//   falseBoolean: false,
-//   defaultBoolean: true,
-//   definedFunction: function plus(a, b) { return a + b; },
-//   definedFObject: JSONTest.create({
-//     name: 'Janet',
-//     age: 32,
-//     children: [ 'Kim', 'Kathy' ]
-//   }),
-//   transient: 'transient value',
-//   networkTransient: 'network transient value',
-//   storageTransient: 'storage transient value'
-// });
-// // Default JSON formatting
-// log(foam.json.stringify(o));
-
-// // Convert to a JSON object (instead of a String)
-// log(foam.json.stringify(JSONTest.create(foam.json.objectify(o))));
-
-// // Or as a method on Objects
-// log(o.stringify());
-
-// //
-// log(foam.json.Pretty.stringify(o));
-
-// //
-// log(foam.json.Pretty.clone().copyFrom({outputClassNames: false}).stringify(o));
-
-// //
-// log(foam.json.Strict.stringify(o));
-
-// //
-// log(foam.json.PrettyStrict.stringify(o));
-
-// //
-// log(foam.json.Compact.stringify(o));
-
-// //
-// log(foam.json.Short.stringify(o));
-
-// //
-// log(foam.json.Network.stringify(o));
-
-// //
-// log(foam.json.Storage.stringify(o));
-
-// //:NOTEST
-// // Graphics Support
-// foam.CLASS({
-//   name: 'GraphicsDemo',
-//   extends: 'foam.graphics.CView',
-//   requires: [
-//     'foam.graphics.Arc',
-//     'foam.graphics.Box',
-//     'foam.graphics.Circle',
-//     'foam.graphics.CView',
-//     'foam.graphics.Gradient'
-//   ],
-//   properties: [
-//     [ 'width', 500 ],
-//     [ 'height', 500 ],
-//     {
-//       name: 'children',
-//       factory: function() {
-//         var objects = [
-//           this.Arc.create({
-//             start: 0,
-//             end: 1.5*Math.PI,
-//             radius: 40
-//           }),
-//           this.Circle.create({
-//             color: this.Gradient.create({
-//               radial: true,
-//               x0: 0, y0: 0, r0: 10,
-//               x1: 0, y1: 0, r1: 100,
-//               colors: [
-//                 [0, 'green'],
-//                 [0.4, 'blue'],
-//                 [0.6, 'red'],
-//                 [1, 'white']
-//               ]
-//             }),
-//             border: '',
-//             radius: 100,
-//             x: 300,
-//             y: 300
-//           }),
-//           this.Box.create({
-//             color: this.Gradient.create({
-//               radial: false,
-//               x0: 0, y0: 0,
-//               x1: 100, y1: 100,
-//               colors: [
-//                 [0, 'black'],
-//                 [1, 'white']
-//               ]
-//             }),
-//             width: 100,
-//             height: 100,
-//             originX: 50,
-//             originY: 50,
-//             x: 100,
-//             y: 400,
-//             children: [
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 30,
-//                 y: 30,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 70,
-//                 y: 30,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 30,
-//                 y: 70,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 70,
-//                 y: 70,
-//                 radius: 10
-//               }),
-//               this.Circle.create({
-//                 color: 'red',
-//                 x: 50,
-//                 y: 50,
-//                 radius: 10
-//               })
-//             ]
-//           })
-//         ];
-//         return objects;
-//       }
-//     },
-//     {
-//       name: 'counter',
-//       value: 0
-//     }
-//   ],
-//   listeners: [
-//     {
-//       name: 'step',
-//       isFramed: true,
-//       code: function() {
-//         this.counter += 0.01
-//         this.children[0].rotation += 0.1;
-//         this.children[0].x = 150 + 50 * Math.cos(this.counter);
-//         this.children[0].y = 150 + 50 * Math.sin(this.counter);
-//         this.children[1].skewX = Math.sin(this.counter);
-//         this.children[2].scaleX = 0.5 + 0.5 * Math.abs(Math.cos(this.counter));
-//         this.children[2].scaleY = 0.5 + 0.5 * Math.abs(Math.sin(this.counter));
-//         this.children[2].rotation += 0.01;
-//         this.step();
-//         this.invalidated.pub();
-//       }
-//     }
-//   ]
-// });
-// var g = GraphicsDemo.create();
-// g.write();
-// g.step();
 
