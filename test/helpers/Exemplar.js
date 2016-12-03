@@ -145,7 +145,7 @@ foam.CLASS({
       }
       deps.async.forEach(function(dep) {
         ret += tabs + "}).then(function() {\n";
-        ret += dep.outputSelf(indent);
+        ret += dep.outputSelfTest(indent);
       });
       if ( deps.async.length ) {
         ret += tabs + "}).then(function() {\n";
@@ -221,7 +221,13 @@ foam.CLASS({
           firstLineIndent = line.indexOf(trimmed);
           line = trimmed;
         } else {
-          line = line.slice(firstLineIndent);
+          // if non-whitespace characters in the indent region
+          // (negative indent on some lines)
+          if ( line.substring(0, firstLineIndent).trim() !== '' ) {
+            //nop
+          } else {
+            line = line.slice(firstLineIndent);
+          }
         }
         ret += tabs + line + '\n';
       });

@@ -23,7 +23,7 @@ foam.LIB({
 
   methods: [
     function animate(obj, f, duration) {
-      var argNames = foam.Function.formalArgs(f);
+      var argNames = foam.Function.argNames(f);
       var janitor  = foam.FObject.create();
       var l        = function() {
         console.log(arguments);

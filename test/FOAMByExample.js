@@ -2594,9 +2594,9 @@ log(typeof foam.Function.argsStr(function() { }));
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// foam.Function.formalArgs() returns a function's arguments an an array.
-log(foam.Function.formalArgs(function(a,b,fooBar) { }));
-log(Array.isArray(foam.Function.formalArgs(function() { })));
+// foam.Function.argNames() returns a function's arguments an an array.
+log(foam.Function.argNames(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.argNames(function() { })));
 } catch(x) {
  log("Exception: ", x);
  }
