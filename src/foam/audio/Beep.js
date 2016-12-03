@@ -68,9 +68,9 @@ foam.CLASS({
 
   actions: [
     function play() {
-      var audio = new this.window.AudioContext();
+      var audio       = new this.window.AudioContext();
       var destination = audio.destination;
-      var o = audio.createOscillator();
+      var o           = audio.createOscillator();
       var gain, fm, fmGain, am, amGain;
 
       if ( this.gain !== 1 || this.amFrequency ) {
@@ -79,6 +79,7 @@ foam.CLASS({
         gain.connect(destination);
         destination = gain;
       }
+
       o.frequency.value = this.frequency;
       o.type = this.type;
       o.connect(destination);
@@ -109,11 +110,11 @@ foam.CLASS({
 
       this.setTimeout(function() {
         o.stop(0);
-        if ( gain ) gain.disconnect(audio.destination);
+        if ( gain   ) gain.disconnect(audio.destination);
         if ( fmGain ) fmGain.disconnect(o.frequency);
-        if ( fm ) fm.stop(0);
+        if ( fm     ) fm.stop(0);
         if ( amGain ) amGain.disconnect(gain.gain);
-        if ( am ) am.stop(0);
+        if ( am     ) am.stop(0);
         o.disconnect(destination);
         audio.close();
       }, this.duration);
