@@ -108,8 +108,10 @@ foam.CLASS({
 
       o.start(0);
 
+      o.stop(audio.currentTime + this.duration/1000);
+
+      // There should be a better way to know when to cleanup.
       this.setTimeout(function() {
-        o.stop(0);
         if ( gain   ) gain.disconnect(audio.destination);
         if ( fmGain ) fmGain.disconnect(o.frequency);
         if ( fm     ) fm.stop(0);
@@ -117,7 +119,7 @@ foam.CLASS({
         if ( am     ) am.stop(0);
         o.disconnect(destination);
         audio.close();
-      }, this.duration);
+      }, this.duration+1000);
     }
   ]
 });
