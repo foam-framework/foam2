@@ -55,6 +55,10 @@ foam.CLASS({
       view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
     },
     {
+      class: 'Boolean',
+      name: 'envelope'
+    },
+    {
       class: 'Int',
       name: 'attack',
       units: 'ms'
@@ -62,6 +66,16 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'decay',
+      units: 'ms'
+    },
+    {
+      class: 'Float',
+      name: 'sustain',
+      units: '%'
+    },
+    {
+      class: 'Int',
+      name: 'release',
       units: 'ms'
     }
   ],
