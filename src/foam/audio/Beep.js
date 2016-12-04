@@ -111,7 +111,7 @@ foam.CLASS({
 
       if ( this.amFrequency ) {
         amGain = audio.createGain();
-        amGain.gain.value = this.amAmplitude;
+        amGain.gain.value = this.amAmplitude / 100;
         am = audio.createOscillator();
         am.frequency.value = this.amFrequency;
         am.type = this.amType;
