@@ -238,3 +238,10 @@ console.log(foam.json.Storage.stringify(t));
 console.log(foam.json.Storage.stringify(t2));
 console.log(foam.json.Storage.stringify(t3));
 */
+
+function foo(/* Int */ i, /* String */ s, /* FObject */ o) {
+  console.log('foo');
+}
+
+console.log(foam.Function.argNames(foo));
+console.log(foam.Function.args(foo));
