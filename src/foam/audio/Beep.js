@@ -61,21 +61,25 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'attack',
+      value: 100,
       units: 'ms'
     },
     {
       class: 'Int',
       name: 'decay',
+      value: 100,
       units: 'ms'
     },
     {
       class: 'Float',
       name: 'sustain',
+      value: 50,
       units: '%'
     },
     {
       class: 'Int',
       name: 'release',
+      value: 100,
       units: 'ms'
     }
   ],
@@ -83,15 +87,27 @@ foam.CLASS({
   actions: [
     function play() {
       var audio       = new this.window.AudioContext();
+      var now         = audio.currentTime;
       var destination = audio.destination;
       var o           = audio.createOscillator();
-      var gain, fm, fmGain, am, amGain;
+      var gain, fm, fmGain, am, amGain, env;
 
       if ( this.gain !== 1 || this.amFrequency ) {
         gain = audio.createGain();
         gain.gain.value = this.gain;
         gain.connect(destination);
         destination = gain;
+      }
+
+      if ( this.envelope ) {
+        env = audio.createGain();
+        env.gain.cancelScheduledValues(0);
+        env.gain.setValueAtTime(0, now);
+        env.gain.linearRampToValueAtTime(1, now+this.attack/1000);
+        env.gain.linearRampToValueAtTime(this.sustain/100, now+(this.attack+this.decay)/1000);
+        env.gain.linearRampToValueAtTime(0, now+this.duration/1000);
+        env.connect(destination);
+        destination = env;
       }
 
       o.frequency.value = this.frequency;
@@ -122,11 +138,12 @@ foam.CLASS({
 
       o.start(0);
 
-      o.stop(audio.currentTime + this.duration/1000);
+      o.stop(now + this.duration/1000);
 
       // There should be a better way to know when to cleanup.
       this.setTimeout(function() {
         if ( gain   ) gain.disconnect(audio.destination);
+        if ( env    ) env.disconnect(audio.destination);
         if ( fmGain ) fmGain.disconnect(o.frequency);
         if ( fm     ) fm.stop(0);
         if ( amGain ) amGain.disconnect(gain.gain);
