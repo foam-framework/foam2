@@ -58,7 +58,6 @@ FOAM_FILES([
   { name: "foam/core/MultiMethod" },
   { name: "foam/core/debug", flags: ['debug'] },
   { name: "foam/core/patterns" },
-  { name: "foam/core/Progenitor" },
   { name: "foam/core/JSON" },
   { name: "foam/parse/parse" },
   { name: "foam/core/templates" },

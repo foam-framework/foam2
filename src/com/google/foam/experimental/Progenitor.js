@@ -24,7 +24,7 @@
 // - A factory that can create them at close to zero cost
 
 // - Each instance needs a reference to its factory (important for
-//     hetergeneous indexes) even if it is changed to not inherit from it
+//     hetergeneous indexes)
 
 // - Using a different name for the factory's creation method (such as spawn())
 //     eliminates confusion when dealing with both:
