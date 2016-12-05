@@ -84,6 +84,7 @@ foam.CLASS({
 
         var sync = this.SyncDAO.create({
           delegate: dao,
+          of: this.Application,
           network: this.networkApplicationDAO
         });
 
@@ -120,6 +121,7 @@ foam.CLASS({
 
         var sync = this.SyncDAO.create({
           delegate: dao,
+          of: this.Experiment,
           network: this.networkExperimentDAO
         });
 
