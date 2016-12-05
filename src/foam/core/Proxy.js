@@ -96,12 +96,16 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'forwards'
+      name: 'forwards',
+      factory: null,
+      value: null
       //documentation: 'Methods that are forwarded to the proxies object.'
     },
     {
       class: 'StringArray',
-      name: 'delegates'
+      name: 'delegates',
+      factory: null,
+      value: null
       //documentation: 'Methods that are delegated to the proxied object.'
     },
     {
@@ -121,7 +125,7 @@ foam.CLASS({
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);
-        foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
+        foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
         return m;
       }
 

@@ -16,13 +16,26 @@
  */
 
 foam.CLASS({
-  package: 'com.chrome.origintrials',
+  package: 'com.chrome.origintrials.model',
   name: 'Experiment',
   ids: [ 'name' ],
   properties: [
     {
       class: 'String',
       name: 'name'
+    },
+    {
+      class: 'EMail',
+      name: 'owner'
     }
   ]
+});
+
+
+foam.RELATIONSHIP({
+  forwardName: 'experiment',
+  cardinality: '*:1',
+  sourceModel: 'com.chrome.origintrials.model.Application',
+  targetModel: 'com.chrome.origintrials.model.Experiment',
+  oneWay: true
 });

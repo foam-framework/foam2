@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -270,6 +270,7 @@ foam.INTERFACE({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -652,6 +653,7 @@ foam.CLASS({
   ]
 });
 
+
 /**
   The base class for most DAOs, defining basic DAO behavior.
 */
@@ -886,11 +888,6 @@ foam.CLASS({
     },
     {
       name: 'of',
-      adapt: function(_, o) {
-        return foam.String.isInstance(o) ?
-          this.lookup(o) : 
-          o ;
-      },
       expression: function(delegate) {
         return delegate.of;
       }
@@ -970,7 +967,7 @@ foam.CLASS({
           self.delegateSub_ = null;
         });
       }
-      this.SUPER.apply(this, arguments);
+      return this.SUPER.apply(this, arguments);
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -1237,7 +1234,7 @@ foam.CLASS({
   methods: [
     function init() {
       var objs = localStorage.getItem(this.name);
-      if ( objs ) this.array = foam.json.parse(foam.json.parseString(objs));
+      if ( objs ) this.array = foam.json.parseString(objs, this);
 
       this.on.put.sub(this.updated);
       this.on.remove.sub(this.updated);
@@ -1265,7 +1262,8 @@ foam.LIB({
     {
       name: 'daoize',
       code: foam.Function.memoize1(function(str) {
-        // Turns SomeClassName into someClassNameDAO.
+        // Turns SomeClassName into someClassNameDAO,
+        // of package.ClassName into package.ClassNameDAO
         return str.substring(0, 1).toLowerCase() + str.substring(1) + 'DAO';
       })
     }

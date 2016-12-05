@@ -50,36 +50,36 @@ describe('Query parser', function() {
 
   var dao = foam.dao.ArrayDAO.create({
     of: Item
-  });
+  }, foam.__context__);
   dao.put(Item.create({
     id: 1,
     name: 'first item',
     timestamp: new Date(2011, 4, 18),
     deleted: true
-  }));
+  }, foam.__context__));
   dao.put(Item.create({
     id: 2,
     name: 'second item',
     timestamp: new Date(2013, 9, 2),
     optional: 'abc'
-  }));
+  }, foam.__context__));
   dao.put(Item.create({
     id: 3,
     name: 'third item',
     timestamp: new Date(2016, 3, 21)
-  }));
+  }, foam.__context__));
   dao.put(Item.create({
     id: 4,
     name: 'FOAM 1',
     timestamp: new Date(2011, 7, 2),
     deleted: true,
     optional: 'def'
-  }));
+  }, foam.__context__));
   dao.put(Item.create({
     id: 5,
     name: 'FOAM 2',
     timestamp: new Date(2016, 0, 26)
-  }));
+  }, foam.__context__));
 
   var parser = foam.parse.QueryParser.create({ of: 'test.query.Item' });
 
@@ -239,7 +239,7 @@ describe('Query parser', function() {
   describe('relative dates', function() {
     var dao2 = foam.dao.ArrayDAO.create({
       of: Item
-    });
+    }, foam.__context__);
     dao.select(dao2);
 
     var todayItem = Item.create({
@@ -247,7 +247,7 @@ describe('Query parser', function() {
       name: 'today item',
       optional: true,
       timestamp: new Date()
-    });
+    }, foam.__context__);
     dao2.put(todayItem);
 
     var d = new Date();
@@ -256,7 +256,7 @@ describe('Query parser', function() {
       id: 7,
       name: 'yesterday item',
       timestamp: d
-    });
+    }, foam.__context__);
     dao2.put(yesterdayItem);
 
     it('should recognize the keyword "today"',

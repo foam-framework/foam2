@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'com.google.dxf.model',
   name: 'Point2',
@@ -23,6 +24,7 @@ foam.CLASS({
     { class: 'Float', name: 'y' }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.dxf.model',
@@ -34,6 +36,7 @@ foam.CLASS({
     { class: 'Float', name: 'z' }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.dxf.model',
@@ -77,6 +80,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.dxf.model',
@@ -137,6 +141,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.dxf.model',
   name: 'Line',
@@ -182,6 +187,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.dxf.model',
   name: 'Arc',
@@ -222,6 +228,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'com.google.dxf.model',
@@ -267,10 +274,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'com.google.dxf.ui',
   name: 'DXFDiagram',
   extends: 'foam.graphics.CView',
+
   requires: [
     'com.google.dxf.model.Entity',
     'foam.dao.MDAO',
@@ -516,4 +525,3 @@ foam.CLASS({
     }
   ]
 });
-

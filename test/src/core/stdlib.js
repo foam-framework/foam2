@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 
-var oldAssert;
-beforeAll(function() { // make it easy to trap asserts
-  oldAssert = console.assert;
-  console.assert = function(cond) { if ( ! cond ) throw arguments; }
-});
-afterAll(function() {
-  console.assert = oldAssert;
-});
-
-
 describe('foam.LIB type checking:', function() {
 
   it('methods must be named', function() {
@@ -290,13 +280,13 @@ describe('foam.Function', function() {
   });
 
 
-  describe('formalArgs', function() {
+  describe('argNames', function() {
 
     it('handles an empty arg list', function() {
       var fn = function( ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([]);
     });
 
@@ -305,7 +295,7 @@ describe('foam.Function', function() {
          func, obj, num,  arr ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
     });
 
@@ -314,7 +304,7 @@ describe('foam.Function', function() {
         /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
     });
 
@@ -323,7 +313,7 @@ describe('foam.Function', function() {
           /* // a comment here */ name, another /* return // comment */) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'arg', 'more', 'name', 'another' ]);
     });
 
@@ -563,8 +553,8 @@ describe('foam.Array', function() {
         name: 'CompB',
         properties: [ 'b', 'c' ]
       });
-      x = test.CompA.create();
-      y = test.CompB.create();
+      x = test.CompA.create(undefined, foam.__context__);
+      y = test.CompB.create(undefined, foam.__context__);
     });
     afterEach(function() {
       x = y = null;
@@ -972,5 +962,3 @@ describe('foam.uuid', function() {
     expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
   });
 });
-
-

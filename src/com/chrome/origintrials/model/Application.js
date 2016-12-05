@@ -48,11 +48,6 @@ foam.CLASS({
       value: false
     },
     {
-      class: 'String',
-      required: true,
-      name: 'requestedFeature'
-    },
-    {
       class: 'Boolean',
       name: 'agreedToTerms',
       label: 'Agreed to Terms',

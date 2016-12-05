@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -130,7 +130,7 @@ foam.CLASS({
       Returns a Destroyable which can be used to cancel the binding.
     */
     function follow(other) {
-      console.assert(other, 'Slot.follow requires Slot argument.');
+      foam.assert(other, 'Slot.follow requires Slot argument.');
       var self = this;
       var l = function() {
         if ( ! foam.util.equals(self.get(), other.get()) ) {
@@ -251,7 +251,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation:
       'For internal use only. Is used to implement the Slot.dot() method.',
@@ -312,15 +312,17 @@ foam.CLASS({
   ],
 
   listeners: [
-    function parentChange() {
+    function parentChange(s) {
       this.prevSub && this.prevSub.destroy();
       var o = this.parent.get();
 
-      // If the parent object changes class, then don't
-      // update because a new class will have different
-      // sub-slots.
+      // If the parent object changes class, then don't update
+      // because a new class will have different sub-slots.
       if ( this.of ) {
-        if ( ! this.of.isInstance(o) ) return;
+        if ( this.of !== ( o && o.cls_ ) ) {
+          s.destroy();
+          return;
+        }
       } else {
         if ( o ) this.of = o.cls_;
       }
@@ -404,9 +406,9 @@ foam.CLASS({
     {
       name: 'args',
       expression: function(obj) {
-        this.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
+        foam.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
 
-        var args = foam.Function.formalArgs(this.code);
+        var args = foam.Function.argNames(this.code);
         for ( var i = 0 ; i < args.length ; i++ ) {
           args[i] = obj.slot(args[i]);
         }

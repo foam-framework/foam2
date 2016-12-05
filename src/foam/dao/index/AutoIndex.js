@@ -59,8 +59,8 @@ foam.CLASS({
     },
 
     function addPropertyIndex(prop, root) {
-      this.addIndex(prop.toIndex(this.progenitor.cls_.create({ 
-        idIndexFactory: this.progenitor.idIndexFactory 
+      this.addIndex(prop.toIndex(this.progenitor.cls_.create({
+        idIndexFactory: this.progenitor.idIndexFactory
       })), root);
     },
     function addIndex(index, root) {
@@ -81,9 +81,9 @@ foam.CLASS({
       //  index type.
       var existingPlan = this.delegate.plan(sink, skip, limit, order, predicate, root);
       var thisSize = this.size();
-      
-      // No need to try to auto-index if: 
-      //  The existing plan is better than scanning already TODO: how much better?  
+
+      // No need to try to auto-index if:
+      //  The existing plan is better than scanning already TODO: how much better?
       //  We are too small to matter
       //  There are no order/predicate constraints to optimize for
       if ( existingPlan.cost < thisSize ||
@@ -98,20 +98,20 @@ foam.CLASS({
       }
 
       // add autoindex overhead
-      existingPlan.cost += 10; 
+      existingPlan.cost += 10;
 
       var ARBITRARY_INDEX_CREATE_FACTOR = 1.5;
       var ARBITRARY_INDEX_CREATE_CONSTANT = 20;
 
       var self = this;
       var newIndex;
-      
+
       var bestEstimate = this.delegate.progenitor.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
 //console.log(self.$UID, "AutoEst OLD:", bestEstimate, this.delegate.toString().substring(0,20), this.size());
       if ( bestEstimate < this.progenitor.GOOD_ENOUGH_PLAN ) {
         return existingPlan;
       }
-      
+
       // Base planned cost on the old cost for the plan, to avoid underestimating and making this
       //  index build look too good
       var existingEstimate = bestEstimate;
@@ -153,7 +153,7 @@ foam.CLASS({
           }
         }
       }
-      
+
 
       if ( newIndex ) {
         // Since estimates are only valid compared to other estimates, find the ratio
@@ -161,7 +161,7 @@ foam.CLASS({
         //  to the actual cost of the old plan to determine our new index's assumed cost.
         var existingPlanCost = existingPlan.cost;
         var estimateRatio = bestEstimate / existingEstimate;
-        
+
         return this.progenitor.CustomPlan.create({
           cost: existingPlanCost * estimateRatio,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {

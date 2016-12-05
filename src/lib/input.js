@@ -243,8 +243,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.mouseInput;
-      this.touchInput;
+      // Assigning to unused variables to make Closure happy.
+      var mi = this.mouseInput;
+      var ti = this.touchInput;
     }
   ],
 

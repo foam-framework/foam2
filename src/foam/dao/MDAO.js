@@ -78,7 +78,7 @@ foam.CLASS({
       var props = Array.from(arguments);
 
       // Add ID to make each sure the object is uniquely identified
-      props.push(this.of$cls.ID);
+      props.push(this.of.ID);
 
       return this.addUniqueIndex_.apply(this, props);
     },
@@ -125,7 +125,7 @@ foam.CLASS({
     /**
      * Bulk load data from another DAO.
      * Any data already loaded into this DAO will be lost.
-     * @arg sink (optional) eof is called when loading is complete.
+     * @param sink (optional) eof is called when loading is complete.
      **/
     function bulkLoad(dao) {
       var self = this;
@@ -180,10 +180,10 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      var obj = this.find_(id);
-      if ( obj ) {
-        self.index.remove(obj);
-        self.pub('on', 'remove', obj);
+      var found = this.find_(id);
+      if ( found ) {
+        self.index.remove(found);
+        self.pub('on', 'remove', found);
         return Promise.resolve();
       } else {
         // object not found is ok, remove post-condition still met
