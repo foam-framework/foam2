@@ -687,10 +687,10 @@ foam.CLASS({
      * Destruction
      ************************************************/
 
-    function isDestroyed() {
-      /* Returns true iff destroy() has been called on this object. */
-      return ! this.instance_;
-    },
+//    function isDestroyed() {
+//      /* Returns true iff destroy() has been called on this object. */
+//      return ! this.instance_;
+//    },
 
     function onDestroy(d) {
       /*
@@ -707,13 +707,15 @@ foam.CLASS({
         Free any referenced objects and destroy any registered destroyables.
         This object is completely unusable after being destroyed.
        */
-      if ( this.isDestroyed() || this.instance_.destroying_ ) return;
+      if ( /* this.isDestroyed() ||*/ this.instance_.destroying_ ) return;
 
       // Record that we're currently destroying this object,
       // to prevent infitine recursion.
       this.instance_.destroying_ = true;
       this.pub('destroy');
-      this.instance_ = this.private_ = null;
+      this.instance_.destroying_ = false;
+      this.clearPrivate_('listeners');
+      // this.instance_ = this.private_ = null;
     },
 
 
@@ -895,7 +897,7 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto'      :
-          this.isDestroyed()           ? ':DESTROYED' :
+//          this.isDestroyed()           ? ':DESTROYED' :
           '');
     }
   ]
