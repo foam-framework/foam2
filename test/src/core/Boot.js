@@ -28,7 +28,7 @@ describe('Untyped Property', function() {
         },
       ]
     });
-    t = test.PropTest.create({});
+    t = test.PropTest.create({}, foam.__context__);
   });
   afterEach(function() {
     t = null;
@@ -99,7 +99,7 @@ describe('Property Getter and Setter', function() {
         }
       ]
     });
-    t = test.GetterSetterTest.create({});
+    t = test.GetterSetterTest.create({}, foam.__context__);
     p = "";
   });
   afterEach(function() {
@@ -155,7 +155,7 @@ describe('Property Factory', function() {
         }
       ]
     });
-    t = test.FactoryTest.create({});
+    t = test.FactoryTest.create({}, foam.__context__);
   });
   afterEach(function() {
     t = null;
@@ -237,7 +237,7 @@ describe('Property default value', function() {
         }
       ]
     });
-    t= test.DefaultValue.create({});
+    t= test.DefaultValue.create({}, foam.__context__);
   });
   afterEach(function() {
     t = null;
@@ -277,13 +277,13 @@ describe('Final property', function() {
   });
 
   it('create with final set', function() {
-    var abc = test.Abc.create({ a: 1 });
+    var abc = test.Abc.create({ a: 1 }, foam.__context__);
     expect(abc.a).toBe(1);
     abc.a = 2;
     expect(abc.a).toBe(1);
   });
   it('create unset and set after', function() {
-    var abc = test.Abc.create();
+    var abc = test.Abc.create(undefined, foam.__context__);
     abc.a = 1;
     expect(abc.a).toBe(1);
     abc.a = 2;
@@ -306,7 +306,7 @@ describe('Constants', function() {
         }
       ]
     });
-    t = test.ConstantTest.create({});
+    t = test.ConstantTest.create({}, foam.__context__);
     foam.CLASS({
       name: 'ConstantTest2',
       package: 'test',
@@ -316,7 +316,7 @@ describe('Constants', function() {
       }
 
     });
-    t2 = test.ConstantTest2.create({});
+    t2 = test.ConstantTest2.create({}, foam.__context__);
   });
   afterEach(function() {
     t = null;
@@ -374,7 +374,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         function sayGoodbye() { this.result = "bye "+this.name; }
       ]
     });
-    person = test.Person.create({name: 'Adam', age: 0});
+    person = test.Person.create({name: 'Adam', age: 0}, foam.__context__);
 
     foam.CLASS({
       package: 'test',
@@ -392,7 +392,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         }
       ]
     });
-    employee = test.Employee.create({name: 'Jane', age: 30, salary: 50000});
+    employee = test.Employee.create({name: 'Jane', age: 30, salary: 50000}, foam.__context__);
 
     foam.CLASS({
       package: 'test',
@@ -406,7 +406,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
         }
       ]
     });
-    personReq = test.PersonRequirer.create();
+    personReq = test.PersonRequirer.create(undefined, foam.__context__);
   });
   afterEach(function() {
     person = null;
@@ -440,7 +440,7 @@ describe('Model.extends inheritance, isInstance(), isSubClass(), getAxioms()', f
     expect(test.Person.isInstance(employee)).toBe(true);
 
     foam.CLASS({ name: 'Fake', package: 'test' });
-    expect(test.Person.isInstance(test.Fake.create({}))).toBe(false);
+    expect(test.Person.isInstance(test.Fake.create({}, foam.__context__))).toBe(false);
   });
 
   it('reports correct subclass checks in required classes', function() {
@@ -525,7 +525,7 @@ describe('Model.implements', function() {
         },
       ]
     });
-    person = test.Person.create();
+    person = test.Person.create(undefined, foam.__context__);
   });
   afterEach(function() {
     person = null;
@@ -591,7 +591,7 @@ describe('Model.classes', function() {
       me: 43,
       myself: 'hello',
       i: ''
-    });
+    }, foam.__context__);
     expect(innerSelf.me).toEqual(43);
     expect(innerSelf.myself).toEqual('hello');
     expect(innerSelf.i).toEqual('');
@@ -621,28 +621,28 @@ describe('FObject white box test', function() {
   });
 
   it('inits from null', function() {
-    var o = test.Person.create();
+    var o = test.Person.create(undefined, foam.__context__);
     expect(o.name).toEqual('');
   });
   it('inits from a POJSO', function() {
-    var o = test.Person.create({ name: 'prop1' });
+    var o = test.Person.create({ name: 'prop1' }, foam.__context__);
 
     expect(o.name).toEqual('prop1');
   });
   it('inits from another FObject', function() {
-    var o = test.Person.create({ name: 'prop1' });
-    var o2 = test.Person.create(o);
+    var o = test.Person.create({ name: 'prop1' }, foam.__context__);
+    var o2 = test.Person.create(o, foam.__context__);
 
     expect(o2.name).toEqual('prop1');
   });
   it('covers init from another FObject with no instance_', function() {
     var prot = { name: 'prop1' };
-    var o = test.Person.create(Object.create(prot));
+    var o = test.Person.create(Object.create(prot), foam.__context__);
 
     expect(o.name).toEqual('prop1');
   });
   it('toString()s nicely', function() {
-    var o = test.Person.create();
+    var o = test.Person.create(undefined, foam.__context__);
     o.toString();
   });
 
@@ -683,8 +683,8 @@ describe('Method overrides and SUPER', function() {
         }
       ]
     });
-    m = test.SubClass.create();
-    s = test.SubSubClass.create();
+    m = test.SubClass.create(undefined, foam.__context__);
+    s = test.SubSubClass.create(undefined, foam.__context__);
   });
   afterEach(function() {
     BaseClass = undefined;
@@ -722,7 +722,7 @@ describe('Property Mlang interop', function() {
         },
       ]
     });
-    t = test.MTest.create({});
+    t = test.MTest.create({}, foam.__context__);
   });
   afterEach(function() {
     t = null;
@@ -732,7 +732,7 @@ describe('Property Mlang interop', function() {
     expect(test.MTest.A.f(t)).toEqual(45); // extracts 'a' property of instance t
   });
   it('compare support works', function() {
-    var t2 = test.MTest.create({ a: 45 });
+    var t2 = test.MTest.create({ a: 45 }, foam.__context__);
     expect(test.MTest.A.compare(t, t2)).toEqual(0);
     t2.a = 2;
     expect(test.MTest.A.compare(t, t2)).toEqual(1);
@@ -757,8 +757,8 @@ describe('Slots', function() {
         },
       ]
     });
-    t = test.MTest.create();
-    t2 = test.MTest.create();
+    t = test.MTest.create(undefined, foam.__context__);
+    t2 = test.MTest.create(undefined, foam.__context__);
   });
   afterEach(function() {
     t = null;
@@ -851,7 +851,7 @@ describe('Listeners', function() {
         }
       ]
     });
-    t = test.Sprinkler.create({});
+    t = test.Sprinkler.create({}, foam.__context__);
   });
   afterEach(function() {
     t = null;

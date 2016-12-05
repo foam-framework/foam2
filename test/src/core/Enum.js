@@ -66,7 +66,7 @@ describe('Enum tests', function() {
       ]
     });
 
-    var todo = Todo.create();
+    var todo = Todo.create(undefined, foam.__context__);
 
     expect(todo.status).toBe(TodoStatus.OPEN);
     expect(todo.status.toString()).toBe('OPEN');

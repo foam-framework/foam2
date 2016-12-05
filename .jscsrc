@@ -3,7 +3,8 @@
   "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~"],
   "requireSpaceAfterPrefixUnaryOperators": ["!"],
   "requireCamelCaseOrUpperCaseIdentifiers": {
-    "allowedSuffixes": ["_", "_$"]
+    "allowedPrefixes": ["__", "opt_"],
+    "allowedSuffixes": ["_", "_$", "__"]
   },
   "disallowSpacesInsideParentheses": null,
   "disallowSpacesInsideObjectBrackets": null,

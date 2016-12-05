@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -31,28 +31,32 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'query',
-      factory: function() {
-        return this.relationship.targetDAOQuery();
-      }
+      class: 'Boolean',
+      name: 'forward',
+      value: true
     },
     {
       name: 'predicate',
       getter: function() {
-        return this.relationship.targetQueryFromSource(this.obj);
+        return this.relationship.targetQueryFromSource(this.obj, this.forward);
       }
     },
     {
       name: 'delegate',
       factory: function() {
-        return this.__context__[this.relationship.targetDAOKey];
+        var key = this.relationship[this.forward ? 'targetDAOKey' : ' sourceDAOKey']; 
+        var delegate = this.__context__[key];
+
+        foam.assert(delegate, 'Missing relationship DAO:', key);
+        
+        return delegate;
       }
     }
   ],
 
   methods: [
     function put(obj, sink) {
-      this.relationship.adaptTarget(this.obj, obj);
+      this.relationship.adaptTarget(this.obj, obj, this.forward);
 
       return this.SUPER(obj, sink);
     },
@@ -63,3 +67,4 @@ foam.CLASS({
     }
   ]
 });
+

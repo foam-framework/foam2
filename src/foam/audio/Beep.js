@@ -55,23 +55,42 @@ foam.CLASS({
       view: { class: 'foam.u2.view.ChoiceView', choices: [ 'sine', 'square', 'sawtooth', 'triangle' ] },
     },
     {
+      class: 'Boolean',
+      name: 'envelope'
+    },
+    {
       class: 'Int',
       name: 'attack',
+      value: 100,
       units: 'ms'
     },
     {
       class: 'Int',
       name: 'decay',
+      value: 100,
+      units: 'ms'
+    },
+    {
+      class: 'Float',
+      name: 'sustain',
+      value: 50,
+      units: '%'
+    },
+    {
+      class: 'Int',
+      name: 'release',
+      value: 100,
       units: 'ms'
     }
   ],
 
   actions: [
     function play() {
-      var audio = new this.window.AudioContext();
+      var audio       = new this.window.AudioContext();
+      var now         = audio.currentTime;
       var destination = audio.destination;
-      var o = audio.createOscillator();
-      var gain, fm, fmGain, am, amGain;
+      var o           = audio.createOscillator();
+      var gain, fm, fmGain, am, amGain, env;
 
       if ( this.gain !== 1 || this.amFrequency ) {
         gain = audio.createGain();
@@ -79,6 +98,18 @@ foam.CLASS({
         gain.connect(destination);
         destination = gain;
       }
+
+      if ( this.envelope ) {
+        env = audio.createGain();
+        env.gain.cancelScheduledValues(0);
+        env.gain.setValueAtTime(0, now);
+        env.gain.linearRampToValueAtTime(1, now+this.attack/1000);
+        env.gain.linearRampToValueAtTime(this.sustain/100, now+(this.attack+this.decay)/1000);
+        env.gain.linearRampToValueAtTime(0, now+this.duration/1000);
+        env.connect(destination);
+        destination = env;
+      }
+
       o.frequency.value = this.frequency;
       o.type = this.type;
       o.connect(destination);
@@ -96,7 +127,7 @@ foam.CLASS({
 
       if ( this.amFrequency ) {
         amGain = audio.createGain();
-        amGain.gain.value = this.amAmplitude;
+        amGain.gain.value = this.amAmplitude / 100;
         am = audio.createOscillator();
         am.frequency.value = this.amFrequency;
         am.type = this.amType;
@@ -107,16 +138,19 @@ foam.CLASS({
 
       o.start(0);
 
+      o.stop(now + this.duration/1000);
+
+      // There should be a better way to know when to cleanup.
       this.setTimeout(function() {
-        o.stop(0);
-        if ( gain ) gain.disconnect(audio.destination);
+        if ( gain   ) gain.disconnect(audio.destination);
+        if ( env    ) env.disconnect(audio.destination);
         if ( fmGain ) fmGain.disconnect(o.frequency);
-        if ( fm ) fm.stop(0);
+        if ( fm     ) fm.stop(0);
         if ( amGain ) amGain.disconnect(gain.gain);
-        if ( am ) am.stop(0);
+        if ( am     ) am.stop(0);
         o.disconnect(destination);
         audio.close();
-      }, this.duration);
+      }, this.duration+1000);
     }
   ]
 });

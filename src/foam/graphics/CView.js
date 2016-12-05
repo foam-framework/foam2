@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -490,19 +490,23 @@ foam.CLASS({
     {
       name: 'state',
       value: 'initial',
-      hidden: 'true'
+      hidden: 'true',
+      transient: true
     },
     {
       name: 'parent',
-      hidden: 'true'
+      hidden: 'true',
+      transient: true
     },
     {
       name: 'canvas',
-      hidden: 'true'
+      hidden: 'true',
+      transient: true
     },
     {
       name: 'transform_',
       hidden: 'true',
+      transient: true,
       factory: function() { return this.Transform.create(); }
     },
     {
@@ -530,12 +534,13 @@ foam.CLASS({
       hidden: true,
       value: true
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.height; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+this.width; } },
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.height; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+this.width; } },
     {
       name: 'invalidate_',
+      transient: true,
       hidden: true,
       // TODO: Would be more efficient to be a factory, but doesn't work. Investigate.
       getter: function() {
@@ -718,7 +723,7 @@ foam.CLASS({
       return this.toE().write();
     },
 
-    function toE(X) {
+    function toE(args, X) {
       return this.Canvas.create({ cview: this }, X).attrs({
         width:  this.slot(function(x, width,  scaleX) { return x + width*scaleX; }),
         height: this.slot(function(y, height, scaleY) { return y + height*scaleY; })
@@ -922,10 +927,10 @@ foam.CLASS({
       name: 'border',
       value: '#000000'
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radius; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radius; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radius; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radius; } }
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y-this.radius; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x-this.radius; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.radius; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+this.radius; } }
   ],
 
   methods: [
@@ -1050,10 +1055,10 @@ foam.CLASS({
       getter: function() { return 2 * this.radiusY; },
       setter: function(h) { this.radiusY = h / 2; }
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+2*this.radiusY; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+2*this.radiusX; } },
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+2*this.radiusY; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+2*this.radiusX; } },
   ],
 
   methods: [
@@ -1125,8 +1130,6 @@ foam.CLASS({
     'foam.input.Pointer'
   ],
 
-  imports: [ 'getElementById' ],
-
   properties: [
     [ 'nodeName', 'CANVAS' ],
     {
@@ -1164,6 +1167,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
       this.on('load', this.paint);
       this.cview$.valueSub('invalidated', this.paint);
     },

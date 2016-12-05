@@ -67,7 +67,7 @@ foam.CLASS({
 
 ### Method Arguments
 
-Method arguments can either be listed in your main comment using @arg or @param,
+Method arguments can either be listed in your main comment using @param,
 or you can use FOAM's type system to declare their types and add comments.
 
 ```javascript

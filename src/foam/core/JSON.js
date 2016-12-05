@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -243,12 +243,6 @@ foam.CLASS({
       return this;
     },
 
-    function isDefaultValue(o, p) {
-      var noValue = ! o.hasOwnProperty(p.name);
-      if ( typeof p.value === 'undefined' ) return noValue;
-      return noValue || foam.util.equals(p.value, p.get(o));
-    },
-
     function outputPropertyName(p) {
       this.out(this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name));
       return this;
@@ -256,10 +250,9 @@ foam.CLASS({
 
     function outputProperty(o, p, includeComma) {
       if ( ! this.propertyPredicate(o, p ) ) return;
-      if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) return;
+      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
 
       var v = o[p.name];
-      if ( Array.isArray(v) && ! v.length ) return;
 
       if ( includeComma ) this.out(',');
 
@@ -367,7 +360,7 @@ foam.CLASS({
           for ( var i = 0 ; i < ps.length ; i++ ) {
             var p = ps[i];
             if ( ! this.propertyPredicate(o, p) ) continue;
-            if ( ! this.outputDefaultValues && this.isDefaultValue(o, p) ) continue;
+            if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) continue;
 
             m[p.name] = this.objectify(p.toJSON(o[p.name]));
           }
@@ -474,7 +467,7 @@ foam.LIB({
               }
             }
 
-            return c.create(json, opt_ctx);
+            return c.create(json, opt_ctx || foam.__context__);
           }
 
           for ( var key in json ) {
@@ -487,8 +480,8 @@ foam.LIB({
       }, function(o) { return o; })
     },
 
-    function parseString(jsonStr) {
-      return this.parse(eval('(' + jsonStr + ')'));
+    function parseString(jsonStr, opt_ctx) {
+      return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
     },
 
     function stringify(o) {

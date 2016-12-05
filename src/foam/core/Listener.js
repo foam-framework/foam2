@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -59,7 +59,7 @@ foam.CLASS({
     function installInProto(proto) {
       var superAxiom = proto.cls_.getSuperAxiomByName(this.name);
 
-      this.assert(
+      foam.assert(
         ! superAxiom ||
           foam.core.Listener.isInstance(superAxiom),
         'Attempt to override non-listener', this.name);
@@ -115,7 +115,7 @@ foam.CLASS({
       name: 'listeners',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Listener must be named');
+          foam.assert(o.name, 'Listener must be named');
           return foam.core.Listener.create({name: o.name, code: o});
         }
 

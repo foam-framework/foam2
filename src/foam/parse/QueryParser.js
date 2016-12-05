@@ -193,7 +193,7 @@ foam.CLASS({
     {
       name: 'grammar_',
       factory: function() {
-        var cls = this.of$cls;
+        var cls = this.of;
         var fields = [];
         var properties = cls.getAxiomsByClass(foam.core.Property);
         for ( var i = 0; i < properties.length; i++ ) {
@@ -492,6 +492,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',

@@ -141,6 +141,7 @@ foam.CLASS({
       }
     },
 
+    // TODO: add support for rectangles
     function collide(c1, c2) {
       c1.collideWith && c1.collideWith(c2);
       c2.collideWith && c2.collideWith(c1);
@@ -212,7 +213,6 @@ foam.CLASS({
       code: function start() {
         this.stopped_ = false;
         this.tick();
-        return this;
       }
     },
     {
