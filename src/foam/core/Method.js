@@ -56,7 +56,6 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'AbstractMethod',
-  extends: 'FObject',
 
   properties: [
     { name: 'name', required: true },
