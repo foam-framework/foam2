@@ -371,7 +371,7 @@ foam.CLASS({
     function hasDefaultValue(name) {
       if ( ! this.hasOwnProperty(name) ) return true;
 
-      var axiom = this.cls_.getAxiomByName(obj);
+      var axiom = this.cls_.getAxiomByName(name);
       return axiom.isDefaultValue(this[name]);
     },
 
