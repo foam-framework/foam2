@@ -51,7 +51,7 @@ public class APIServlet extends HttpServlet {
     int count = reader.read(buffer_);
     buffer_.rewind();
 
-    FObject request = new JSONParser(requestContext).parseString(buffer_.toString());
+    FObject request = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
     if ( request == null || ! ( request instanceof foam.box.Message ) ) {
       resp.setStatus(resp.SC_BAD_REQUEST);
