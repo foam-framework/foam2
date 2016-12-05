@@ -426,7 +426,7 @@ foam.CLASS({
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 
-      if ( this.extends ) {
+      if ( this.hasDefaultValue('extends') ) {
         o.out(' extends ');
         for ( var i = 0 ; i < this.extends.length ; i++ ) {
           o.out(this.extends[i]);
