@@ -990,3 +990,17 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      if ( ! this.hasDefaultValue('javaJSONParser') ) {
+        var m = info.getMethod('jsonParser');
+        m.body = 'return new foam.lib.json.FObjectParser(' + this.of + '.class);';
+      }
+      return info;
+    }
+  ]
+});
