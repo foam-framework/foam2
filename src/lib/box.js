@@ -1394,14 +1394,15 @@ foam.CLASS({
   implements: ['foam.box.Box'],
 
   imports: [
-    'httpResponse'
+    // Optional import.
+    //    'httpResponse'
   ],
 
   methods: [
     {
       name: 'send',
       javaCode: 'try {\n'
-              + '  java.io.PrintWriter writer = ((javax.servlet.ServletResponse)getHttpResponse()).getWriter();\n'
+              + '  java.io.PrintWriter writer = ((javax.servlet.ServletResponse)getX().get("httpResponse")).getWriter();\n'
               + '  writer.print(new foam.lib.json.Outputter().stringify(message));\n'
               + '  writer.flush();\n'
               + '} catch(java.io.IOException e) {\n'

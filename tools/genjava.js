@@ -16,7 +16,7 @@
  */
 
 // enable FOAM java support.
-global.FOAM_FLAGS = { 'java': true };
+global.FOAM_FLAGS = { 'java': true, 'debug': true };
 
 require('../src/foam.js');
 
@@ -49,6 +49,9 @@ var classes = [
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.chrome.origintrials.model.Application',
+  'com.chrome.origintrials.model.CreateTokenRequest',
+  'com.chrome.origintrials.model.CreateTokenResponse',
+  'com.chrome.origintrials.model.Token',
   'com.chrome.origintrials.model.Experiment',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',
@@ -67,6 +70,7 @@ var classes = [
 ];
 
 var abstractClasses = [
+//  'foam.json.Outputer'
 ];
 
 var skeletons = [
