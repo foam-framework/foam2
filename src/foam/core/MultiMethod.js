@@ -28,15 +28,16 @@
 */
 
 foam.CLASS({
-  name: 'foam.core.MultiMethod',
+  package: 'foam.core',
+  name: 'MultiMethod',
   extends: 'foam.core.AbstractMethod',
 
   properties: [
     {
       name: 'name',
       factory: function() {
-        // TODO: replace with type signature
-        return this.name + ':' + this.$UID;
+        return this.methodName +
+          this.args.map(function(a) { return a.typeName; }).join(':');
       }
     },
     {
@@ -47,7 +48,26 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
-      proto[this.name] = this.override_(proto, this.code);
+      var key = this.cls_.id.replace(/\./g,':') + ':' + this.methodName;
+      console.log('Installing: ' + key);
+      var dispath = this.createDispatch(proto, key, 0, this.args);
+      displatch.code = this.code;
+    },
+
+    function createDispatch(proto, prefix, pos, args) {
+      var d = proto[prefix];
+
+      if ( ! d ) {
+        var prefix2 = prefix + ':' + args[pos] + typeName;
+        proto[prefix] = function dispatch() {
+          if ( arguments.length === pos ) return arguments.callee.code.apply(this, arguments);
+          var t = foam.typeOf(arguments[pos]);
+          var f = t[prefix2];
+          return f.apply(this, arguments);
+        };
+      }
+
+      if ( pos === args.length ) return proto[prefix];
     },
 
     function exportAs(obj) {
