@@ -220,6 +220,7 @@ foam.CLASS({
           delegate: foam.dao.ArraySink.create()
         })).then(function(map) {
           this.choices = map.delegate.a;
+          if ( ! this.data && this.index === -1 ) this.index = 0;
         }.bind(this));
       }
     }
