@@ -64,7 +64,7 @@ foam.CLASS({
     'returns',
     {
       name: 'args',
-      factory: function() { return foam.Function.args(this.code); }
+      factory: function() { return this.code ? foam.Function.args(this.code) : []; }
     }
   ],
 
