@@ -1598,7 +1598,7 @@ foam.CLASS({
 
       var e = nextE();
       var l = function() {
-        if ( self.isDestroyed() || self.state !== self.LOADED ) {
+        if ( self.state !== self.LOADED ) {
           s && s.destroy();
           return;
         }

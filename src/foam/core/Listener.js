@@ -77,14 +77,9 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(name) ) {
             var self = this;
             var l = function(sub) {
-              if ( self.isDestroyed() ) {
-                if ( sub ) {
-                  console.warn('Destroying stale subscription for', self.cls_.id);
-                  sub.destroy();
-                }
-              } else {
-                code.apply(self, arguments);
-              }
+              // Is it possible to detect stale subscriptions?
+              // ie. after an object has been destroyed.
+              code.apply(self, arguments);
             };
 
             if ( isMerged ) {
