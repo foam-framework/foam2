@@ -21,6 +21,25 @@
 // require users to write their examples a certain way (such as logging style and
 // root context access) must be compatible with different output modes.
 
+// Hack up Model.create() to not be lazy with foam.__context__ lookup,
+// which is vital for this runner where foam.__context__ changes for
+// each example.
+
+
+var oldInitArgs = foam.core.FObject.prototype.initArgs;
+foam.CLASS({
+    refines: 'foam.core.FObject',
+
+    methods: [
+      function initArgs(args, ctx) {
+        // Lock in the current default context, if needed
+        ctx = ctx || foam.__context__;
+        return oldInitArgs.call(this, args, ctx);
+      }
+    ]
+});
+
+
 // Run FBE Exemplars in browser
 var oldContext;
 var oldConsole = console;
@@ -86,12 +105,11 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
     getElementsByClassName: function(cls) { return this.document.getElementsByClassName(cls); },
   });
   foam.__context__ = { __proto__: foam.__context__ }; //unseal
-  var exampleContext = foam.__context__;
 
   // construct iFrame lazily
   function getIFrameDoc() {
     var iFrame = document.getElementById(domID + "_frame");
-    if ( ! iFrame ) {        
+    if ( ! iFrame ) {
       iFrame = document.createElement('iframe');
       iFrame.id = domID + "_frame";
       iFrame.src = "about:blank";
@@ -122,7 +140,7 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
       return getIFrameDoc();
     }
   });
-  
+
   var code = ex.generateExample();
   // TODO: offer expandable view of complete dependencies
   // Write the code with deps omitted
