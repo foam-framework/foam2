@@ -15,11 +15,45 @@
  * limitations under the License.
  */
 
-foam.LIB({
-  name: 'foam.Function',
+/*
+  A -> foo(C)
+       foo(D)
+  B -> foo(C)
+
+  How does B.foo(D) work?
+  Copy methods? Then what if A gets refined?
+  Lookup B.foo, otherwise lookup A.foo()?
+    Then what about FObject vs. particular class lookup?
+  What about treating 'this' as first argument?
+*/
+
+foam.CLASS({
+  name: 'foam.core.MultiMethod',
+  extends: 'foam.core.AbstractMethod',
+
+  properties: [
+    {
+      name: 'name',
+      factory: function() {
+        // TODO: replace with type signature
+        return this.name + ':' + this.$UID;
+      }
+    },
+    {
+      name: 'methodName',
+      required: true
+    }
+  ],
 
   methods: [
-    function mmethod2(fn) {
+    function installInProto(proto) {
+      proto[this.name] = this.override_(proto, this.code);
+    },
+
+    function exportAs(obj) {
+      var m = obj[this.name];
+      /** Bind the method to 'this' when exported so that it still works. **/
+      return function exportedMethod() { return m.apply(obj, arguments); };
     }
   ]
 });
