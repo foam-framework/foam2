@@ -889,7 +889,7 @@ foam.CLASS({
       if ( opt_shown === undefined ) {
         this.show = true;
       } else if ( foam.core.Slot.isInstance(opt_shown) ) {
-        this.shown$ = opt_shown;
+        this.shown$.follow(opt_shown);
       } else {
         this.shown = !! opt_shown;
       }
