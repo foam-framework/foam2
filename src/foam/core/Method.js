@@ -62,7 +62,10 @@ foam.CLASS({
     { name: 'code', required: true },
     'documentation',
     'returns',
-    'args'
+    {
+      name: 'args',
+      factory: function() { return foam.Function.args(this.code); }
+    }
   ],
 
   methods: [
