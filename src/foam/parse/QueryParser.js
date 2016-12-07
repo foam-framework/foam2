@@ -19,7 +19,11 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'QueryParser',
 
+  documentation:
+      'Create a query strings to MLangs parser for a particular class.',
+
   axioms: [
+    // Reuse parsers if created for same 'of' class.
     foam.pattern.Multiton.create({ property: 'of' })
   ],
 
