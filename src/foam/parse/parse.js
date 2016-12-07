@@ -195,9 +195,7 @@ foam.CLASS({
       name: 'step'
     },
     */
-    function partialEval() {
-      return this;
-    }
+    function partialEval() { return this; }
   ]
 });
 
@@ -269,6 +267,7 @@ foam.CLASS({
       this.next.ps = this.ps;
       return this.next;
     },
+
     function partialEval() {
       return this.next.partialEval();
     }
@@ -391,7 +390,7 @@ foam.CLASS({
   methods: [
     function step() {
       var ps1 = this.ps;
-      var ps = this.ps;
+      var ps  = this.ps;
       var str = this.s;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( str.charAt(i) !== ps.head ) {
@@ -428,7 +427,7 @@ foam.CLASS({
   methods: [
     function step() {
       var ps1 = this.ps;
-      var ps = this.ps;
+      var ps  = this.ps;
       var str = this.lower;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
         if ( ! ps.head || str.charAt(i) !== ps.head.toLowerCase() ) {
@@ -837,6 +836,7 @@ foam.CLASS({
         fail: fail
       });
     },
+
     function parse(ps) {
       var str = this.lower;
       for ( var i = 0 ; i < str.length ; i++, ps = ps.tail ) {
@@ -961,6 +961,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'String',
@@ -1064,7 +1065,7 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'AnyChar',
 
-  axioms: [foam.pattern.Singleton.create()],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
     function compile(success, fail) {
@@ -1137,7 +1138,8 @@ foam.CLASS({
     function parse(ps) {
       if ( ! ps.head ) return undefined;
       return ( this.from <= ps.head && ps.head <= this.to ) ?
-          ps.tail.setValue(ps.head) : undefined;
+          ps.tail.setValue(ps.head) :
+          undefined;
     }
   ]
 });
@@ -1247,14 +1249,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Plus',
   extends: 'foam.parse.Repeat',
+
   properties: [
     ['minimum', 1]
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
