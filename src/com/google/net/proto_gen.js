@@ -24,14 +24,23 @@ var fs = require('fs');
 var path = require('path');
 /* globals process */
 
-// Usage: output file is argv[2], input .proto files in argv[3+].
+// Usage: node this-file [--whitelist foo,bar,baz] outfile protofiles...
 var parser = foam.lookup('com.google.net.ProtobufParser').create();
 
+var whitelist = null;
+var outIndex = 2;
+if ( process.argv[2] === '--whitelist' ) {
+  outIndex = 4;
+  whitelist = process.argv[3].split(',');
+}
+
 // Expects the input filename to be on the command line.
-var outfile = process.argv[2];
+var outfile = process.argv[outIndex];
+
+console.log('whitelist = ' + whitelist);
 
 var files = {};
-for ( var i = 3 ; i < process.argv.length ; i++ ) {
+for ( var i = outIndex + 1 ; i < process.argv.length ; i++ ) {
   if ( process.argv[i].endsWith('.proto') ) {
     console.log(process.argv[i]);
     files[process.argv[i]] =
@@ -236,7 +245,10 @@ function getServiceMethods(service) {
 }
 
 function outputModel(pkg, name) {
-  var m = foam.lookup(pkg + '.' + name);
+  var id = pkg + '.' + name;
+  if ( ! checkWhitelist(id) ) return;
+
+  var m = foam.lookup(id);
 
   pkg = pkg.replace(/\./g, '/');
 
@@ -257,6 +269,11 @@ function outputModel(pkg, name) {
 }
 
 function outputServiceExporter(services, pkg, baseUrl) {
+  // Need to force the service exporter onto the whitelist, if one exists.
+  if ( whitelist ) {
+    whitelist.push('serviceExporters');
+  }
+
   var u = baseUrl;
 
   var requires = [];
@@ -497,12 +514,14 @@ function buildEnum(enuma) {
   };
 }
 
+function checkWhitelist(id) {
+  if ( ! whitelist ) return true;
 
-fs.appendFileSync(outfile, 'goog.provide("proto.gen");\n\n' +
-    'var __foam_loaded = false;\n' +
-    'function prepareFOAM() {\n' +
-    'if (__foam_loaded) return;\n' +
-    '__foam_loaded = true;\n')
+  for ( var i = 0; i < whitelist.length; i++ ) {
+    if ( id.startsWith(whitelist[i]) ) return true;
+  }
+  return false;
+}
+
 apiToModels(files);
-fs.appendFileSync(outfile, '\n}\n');
 
