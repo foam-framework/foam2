@@ -15,9 +15,40 @@
  * limitations under the License.
  */
 
+/**
+  Parse combinator library.
+
+  Create complex parsers by composing simple parsers.s
+
+  A PStream is a "Parser Stream", the input format accepted by
+  FOAM parsers.  
+
+  PStreams have the following interface:
+    get int     pos   - The character position in the input stream. 
+
+    get Char    head  - The first character in the stream.
+
+    get PStream tail  - A PStream for the next position in the input steam.
+
+    get Object  value - 'Value' associated with this PStream.
+
+    PStream setValue(Object value) - Create a new PStream at the same position
+        but with a new 'value'.
+
+  PStreams are immutable, this greatly simplifies backtracking.
+
+  A parser has the following interface:
+    PStream parse(PStream stream);
+
+  It takes as input a PStream, and returns either a PStream
+  advanced to the point after all input consumed by the parser,
+  or undefined if the parse failed.
+ */
 foam.CLASS({
   package: 'foam.parse',
   name: 'StringPS',
+
+  documentation: 'A String-backed PStream implementation.',
 
   properties: [
     {
