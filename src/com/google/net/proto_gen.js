@@ -307,7 +307,6 @@ function outputServiceExporter(services, pkg, baseUrl) {
     'oauth2CookiePolicy',
     'oauth2Scopes',
     {
-      class: 'Class',
       name: 'requestClass',
       factory: function() { return this.GoogleOAuth2XHRHTTPRequest; }
     }
