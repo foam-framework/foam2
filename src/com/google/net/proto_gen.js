@@ -282,6 +282,7 @@ function getServiceMethods(service, pkg) {
     });
     var indent = '        ';
     // create url and body builder code
+    // TODO: generalize this
     var urlBuilder = indent + 'var path = this.mobilesdkBaseUrl + ' + pathOutput + ';\n';
     var bodyBuilder = '';
     var paramsBuilder = '';
@@ -325,6 +326,7 @@ function getServiceMethods(service, pkg) {
           urlBuilder +
           bodyBuilder +
           paramsBuilder +
+          // TODO: generalize this
           indent + 'return this.mobilesdkBackendService.sendGapiRequest({\n' +
           indent + '  method: \'' + method + '\',\n' +
           indent + '  path: path,\n' +
@@ -425,6 +427,7 @@ function outputServiceExporter(services, pkg, baseUrl) {
   var imports = [];
   var properties = [];
 
+  // TODO: generalize this
   properties.push({ name: 'mobilesdkBackendService' });
   exports.push('mobilesdkBackendService');
   properties.push({ name: 'mobilesdkBaseUrl' });
@@ -474,6 +477,7 @@ function readService(pkg, service, services) {
   var newModel = {
     package: pkg,
     name: service.name,
+    // TODO: generalize this
     imports: [ 'mobilesdkBaseUrl', 'mobilesdkBackendService' ],
     methods: getServiceMethods(service, pkg),
     constants: getServiceMappings(service, pkg),
@@ -520,6 +524,7 @@ function apiToModels(proto) {
     }
   }
 
+  // TODO: generalize this
   outputServiceExporter(services, 'serviceExporters',
       url.parse('https://test-mobilesdk-pa.sandbox.googleapis.com'));
 }
