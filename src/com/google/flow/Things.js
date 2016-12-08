@@ -912,6 +912,104 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Line3D',
+  extends: 'foam.graphics.Line',
+
+  properties: [
+    { class: 'Float',  name: 'startZ' },
+    { class: 'Float',  name: 'endZ' }
+  ],
+
+  methods: [
+    function xyzToX(x, y, z) {
+      return this.parent.parent.width/2 - x + y;
+    },
+
+    function xyzToY(x, y, z) {
+      return this.parent.parent.height/2 + x + y - z;
+    },
+
+    function paintSelf(x) {
+      x.beginPath();
+
+      x.moveTo(
+          this.xyzToX(this.startX, this.startY, this.startZ),
+          this.xyzToY(this.startX, this.startY, this.startZ));
+
+      console.log('start: ', this.startX, this.startY, this.startZ,
+          this.xyzToX(this.startX, this.startY, this.startZ),
+          this.xyzToY(this.startX, this.startY, this.startZ));
+
+      x.lineTo(
+          this.xyzToX(this.endX, this.endY, this.endZ),
+          this.xyzToY(this.endX, this.endY, this.endZ));
+
+      console.log('end: ', this.startX, this.startY, this.startZ,
+          this.xyzToX(this.endX, this.endY, this.endZ),
+          this.xyzToY(this.endX, this.endY, this.endZ));
+
+      x.lineWidth = this.lineWidth;
+      x.strokeStyle = this.color;
+      x.stroke();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Turtle3D',
+  extends: 'com.google.flow.Turtle',
+
+  requires: [
+    'com.google.flow.Line3D'
+  ],
+
+  properties: [
+    {
+      class: 'Float',
+      name: 'z'
+    }
+  ],
+
+  methods: [
+    function fd(d) {
+      /* ForwarD */
+      return this.gt(
+          this.x + d * Math.cos(this.rotation+Math.PI/2),
+          this.y - d * Math.sin(this.rotation+Math.PI/2),
+          this.z);
+    },
+
+    function gt(x, y, z) {
+      /* Go To */
+      var x1 = this.x, y1 = this.y, z1 = this.z;
+      this.x = x;
+      this.y = y;
+      this.z = z;
+
+      if ( this.penDown ) {
+        // this.addProperty(this.Line.create({
+        this.childLayer.add(this.Line3D.create({
+          startX:    x1+this.radiusX,
+          startY:    y1+this.radiusY,
+          startZ:    z1,
+          endX:      this.x+this.radiusX,
+          endY:      this.y+this.radiusY,
+          endZ:      this.z,
+          color:     this.penColor,
+          lineWidth: this.penWidth
+        }));
+      }
+
+      return this;
+    }
+  ]
+});
+
 // foam.json.stringify(flow.memento.map(function(o) { var v = o.value; var r = {name: o.name, factory: 'function() { return ' + v.cls_.id + '.create(' + foam.json.stringify(v.instance_) + ')}'};  return r;})).replace(/\"/g,"'").replace(/\\/g,'');
 
 // flow.memento.map(function(o) { return 'var ' + o.name + ' = ' + o.value.cls_.id + '.create(' + foam.json.stringify(o.value.instance_) + '); ' + o.parent + '.add(' + o.name+ ');'; }).join('\n');
