@@ -221,14 +221,13 @@ function getServiceMethods(service, pkg) {
         // A sub-message?
         var subType = foam.lookup(prop.of);
         subType.getAxiomsByClass(foam.core.Property).forEach(function(subProp) {
-          // if a model type, but not an Enum, don't include it
+          // if a model type, but not an Enum, don't include it, since we
+          // can't use it for path/{replacement}/ or query params
           if ( foam.core.FObjectProperty.isInstance(subProp)
               || foam.core.FObjectArray.isInstance(subProp) ) {
             var subSubType = foam.lookup(subProp.of, true);
             if ( subSubType &&
                  ! foam.core.EnumModel.isInstance(subSubType.model_) ) {
-              console.log('Ignoring subSubType:', subSubType.id,
-                  'in', requestType);
               return;
             }
           }
@@ -473,6 +472,7 @@ function readService(pkg, service, services) {
 
 function apiToModels(proto) {
   var services = [];
+  // pass one loads models
   for ( var file in proto ) {
     var pkg = '';
     for ( var i = 0; i < proto[file].length; i++ ) {
@@ -482,7 +482,23 @@ function apiToModels(proto) {
         if ( p.node === 'package' ) {
           pkg = pkg || p.value;
         } else {
-          readBlock(pkg, p, services);
+          readBlockMessagesOnly(pkg, p, services);
+        }
+      }
+    }
+  }
+
+  // pass two loads services
+  for ( var file in proto ) {
+    var pkg = '';
+    for ( var i = 0; i < proto[file].length; i++ ) {
+      var p = proto[file][i];
+      // ignore arrays and null
+      if ( foam.Object.isInstance(p) && p !== null ) {
+        if ( p.node === 'package' ) {
+          pkg = pkg || p.value;
+        } else {
+          readBlockNotMessage(pkg, p, services);
         }
       }
     }
@@ -492,13 +508,20 @@ function apiToModels(proto) {
       url.parse('https://test-mobilesdk-pa.sandbox.googleapis.com'));
 }
 
-function readBlock(pkg, ast, services) {
+function readBlockNotMessage(pkg, ast, services) {
+  switch ( ast.node ) {
+    case 'service':
+      readService(pkg, ast, services);
+      break;
+    default:
+      break;
+  }
+}
+
+function readBlockMessagesOnly(pkg, ast, services) {
   switch ( ast.node ) {
     case 'message':
       readMessage(pkg, ast);
-      break;
-    case 'service':
-      readService(pkg, ast, services);
       break;
     case 'enum':
       readEnum(pkg, ast);
