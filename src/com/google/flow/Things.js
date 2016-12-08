@@ -939,17 +939,17 @@ foam.CLASS({
           this.xyzToX(this.startX, this.startY, this.startZ),
           this.xyzToY(this.startX, this.startY, this.startZ));
 
-      console.log('start: ', this.startX, this.startY, this.startZ,
-          this.xyzToX(this.startX, this.startY, this.startZ),
-          this.xyzToY(this.startX, this.startY, this.startZ));
+//      console.log('start: ', this.startX, this.startY, this.startZ,
+//          this.xyzToX(this.startX, this.startY, this.startZ),
+//          this.xyzToY(this.startX, this.startY, this.startZ));
 
       x.lineTo(
           this.xyzToX(this.endX, this.endY, this.endZ),
           this.xyzToY(this.endX, this.endY, this.endZ));
 
-      console.log('end: ', this.startX, this.startY, this.startZ,
-          this.xyzToX(this.endX, this.endY, this.endZ),
-          this.xyzToY(this.endX, this.endY, this.endZ));
+//     console.log('end: ', this.startX, this.startY, this.startZ,
+//          this.xyzToX(this.endX, this.endY, this.endZ),
+//          this.xyzToY(this.endX, this.endY, this.endZ));
 
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
@@ -972,16 +972,59 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'z'
+    },
+    {
+      class: 'Float',
+      name: 'pitch'
+    },
+    {
+      class: 'Float',
+      name: 'roll'
     }
   ],
 
   methods: [
+    function pitchUp(a) {
+      this.pitch += Math.PI * a / 180;
+      return this;
+    },
+
+    function pitchDown(a) {
+      return this.pitchUp(-a);
+    },
+
+    function rollRight(a) {
+      this.roll += Math.PI * a / 180;
+      return this;
+    },
+
+    function rollLeft(a) {
+      return this.rollRight(-a);
+    },
+
     function fd(d) {
       /* ForwarD */
+      var v = d * Math.sin(this.pitch);
+      var h = d * Math.cos(this.pitch);
+
       return this.gt(
-          this.x + d * Math.cos(this.rotation+Math.PI/2),
-          this.y - d * Math.sin(this.rotation+Math.PI/2),
-          this.z);
+          this.x + h * Math.cos(this.rotation+Math.PI/2),
+          this.y - h * Math.sin(this.rotation+Math.PI/2),
+          this.z + v);
+    },
+
+    function up(d) {
+      var v = d * Math.sin(this.pitch);
+      var h = d * Math.cos(this.pitch);
+
+      return this.gt(
+          this.x + h * Math.cos(this.rotation+Math.PI/2),
+          this.y - h * Math.sin(this.rotation+Math.PI/2),
+          this.z + v);
+    },
+
+    function down(d) {
+      return this.up(-d);
     },
 
     function gt(x, y, z) {

@@ -749,12 +749,67 @@ grid(function(x, y) {
 
 
 var t = turtle3d1;
+t.cs();
 
 t.x = t.y = t.z = 0;
+t.pitch = 0;
+t.pitchUp(2);
 
-repeat(10, () => {
+repeat(360, (i) => {
+  t.fd(10-i/36).rt(10)
+});
+
+t.x = t.y = t.z = 0;
+t.pitch = 0;
+t.pitchUp(-2);
+
+repeat(360, (i) => {
+  t.fd(10-i/36).rt(10)
+});
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.x = t.y = t.z = 0;
+t.rt(-45);
+// t.fd(100);
+
+repeat(18, () => {
   repeat(36, () => {
-    t.fd(10).rt(10);
+    t.fd(10).pitchUp(10);
   });
-  t.z += 10;
+
+  t.rt(10);
+});
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.x = t.y = t.z = 0;
+t.rt(-45);
+// t.fd(100);
+t.pw(2);
+
+repeat(18, (i) => {
+  t.pc(hsl(i/18*100,70,70));
+
+  repeat(36, () => {
+    t.fd(10).pitchDown(10);
+  });
+  t.z = 0;
+  t.pitch = 0;
+  t.rt(10);
 });
