@@ -734,3 +734,27 @@ grid(function(x, y) {
   var d = Math.sqrt(x*x + y*y);
   return 150*Math.cos(d/25)*(200-d)/200;
 }, 1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var t = turtle3d1;
+
+t.x = t.y = t.z = 0;
+
+repeat(10, () => {
+  repeat(36, () => {
+    t.fd(10).rt(10);
+  });
+  t.z += 10;
+});
