@@ -316,6 +316,7 @@ function getServiceMethods(service, pkg) {
         bodyBuilder += indent + '  ' + pname + ': undefined,\n';
       });
       bodyBuilder += indent + '};\n';
+      bodyBuilder += indent + 'body = this.OUTPUTTER.stringify(body);\n';
     }
     urlBuilder += '\n';
 
@@ -401,10 +402,9 @@ function outputModel(pkg, name) {
 
   foam.json.Pretty.outputDefaultValues = false;
 
-  o += '(function() { var c = window.foam.json.parse(';
+  o += ( foam.core.EnumModel.isInstance(m.model_) ) ? 'foam.ENUM(' : 'foam.CLASS(';
   o += foam.json.Pretty.stringify(m.model_);
-  o += ').buildClass(); window.foam.register(c); ' +
-      'window.foam.package.registerClass(c); })();\n\n';
+  o += ');\n\n';
 
   fs.appendFileSync(outfile, o);
 }
@@ -455,13 +455,29 @@ function outputServiceExporter(services, pkg, baseUrl) {
 
 }
 
+function getServiceProperties(service, pkg) {
+  return [
+    {
+      name: 'OUTPUTTER',
+      factory: function() {
+        return {
+          __proto__: foam.json.Strict,
+          outputDefaultValues: false,
+          outputClassNames: false
+        };
+      }
+    }
+  ];
+}
+
 function readService(pkg, service, services) {
   var newModel = {
     package: pkg,
     name: service.name,
     imports: [ 'mobilesdkBaseUrl', 'mobilesdkBackendService' ],
     methods: getServiceMethods(service, pkg),
-    constants: getServiceMappings(service, pkg)
+    constants: getServiceMappings(service, pkg),
+    properties: getServiceProperties(service, pkg)
   };
 
   foam.CLASS(newModel);
