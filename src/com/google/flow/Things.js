@@ -980,6 +980,26 @@ foam.CLASS({
     {
       class: 'Float',
       name: 'roll'
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          x: this.x,
+          y: this.y,
+          z: this.z,
+          penColor: this.penColor,
+          penWidth: this.penWidth,
+          penDown:  this.pendDown,
+          rotation: this.rotation,
+          pitch:    this.pitch,
+          roll:     this.roll
+        };
+      },
+      setter: function(m) {
+        this.copyFrom(m);
+      }
     }
   ],
 
