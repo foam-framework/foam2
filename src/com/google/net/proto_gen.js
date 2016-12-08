@@ -191,45 +191,17 @@ function processFields(model, message, pkg) {
   }
 }
 
-function getServiceMethods(service) {
+function getServiceMethods(service, pkg) {
   var ret = [];
   if ( ! service.rpcs ) return ret;
 
-//   function getFactory(path) {
-//     var f = function() {};
-//     f.toString = function() {
-//       return 'function() {\n' +
-//           '  return this.mobilesdkBackendService.sendGapiRequest({\n' +
-//           '    method: \'GET\',\n' +
-//           '    path: this.mobilesdkBaseUrl + \'' +
-//                   path + '\'\n' +
-//           '  });\n' +
-//           '}\n';
-//     };
-//     return f;
-//   }
-
-//   function postFactory(path) {
-//     var f = function() {};
-//     f.toString = function() {
-//       return 'function(body) {\n' +
-//           '  return this.mobilesdkBackendService.sendGapiRequest({\n' +
-//           '    method: \'POST\',\n' +
-//           '    path: this.mobilesdkBaseUrl + \'' +
-//                   path + '\',\n' +
-//           '    body: body\n' +
-//           '  });\n' +
-//           '}\n';
-//     };
-//     return f;
-//   }
-
+  // TODO: refactor into smaller chunks
   function generateRPC(requestType, responseType, options) {
     var method = options.value.get ? 'GET' : 'POST';
     var path = options.value.get || options.value.post;
     // in build mode, add fields to the body instead of the query params
     var bodyBuilderMode = ( options.value.body === '*' );
-    var bodyKey = options.value.body;
+    var bodyKey = bodyBuilderMode ? undefined : options.value.body;
 
     var reqType = foam.lookup(requestType);
     var reqProps = reqType.getAxiomsByClass(foam.core.Property);
@@ -263,6 +235,14 @@ function getServiceMethods(service) {
         fieldNames[prop.name] = prop;
       }
     });
+    
+    // Remove bodyKey from fieldNames, if set, since it is used
+    // as the body content, never a query parameter
+    if ( bodyKey ) {
+      // assert !repeatedNames[bodyKey];
+      delete fieldNames[bodyKey];
+    }
+
 
     // Call req(name) when outputting field names into the output function
     var req = function toRequestParamName(fieldName) {
@@ -275,9 +255,10 @@ function getServiceMethods(service) {
     // scan path to find path parameters
     var pathFieldNames = [];
     var matches;
-    var pathRE = /\{(.*?)\}/;
+    var pathRE = /\{(.*?)\}/g;
     var pathOutput = '\'' + path + '\'';
-    pathOutput.replace(pathRE, function(match, pname) {
+    pathOutput = pathOutput.replace(pathRE, function(match, p_name) {
+      var pname = foam.String.camelize(p_name);
       if ( fieldNames[pname] ) {
         // move name to path names list
         pathFieldNames.push(pname);
@@ -286,15 +267,17 @@ function getServiceMethods(service) {
         if ( repeatedNames[pname] ) {
           throw "proto_gen: Can't use repeated field in path: " + pname;
         }
-        throw "proto_gen: Undefined field \"" + pname + "\" in path: " + path;
+        throw "proto_gen: Undefined field \"" + pname + "\" in path: " + 
+          path + " -- Request: " + reqType.toString() + "[" + reqProps + "]";
       }
+      // replace the {name} with code output ' + req.name + '
       return '\' + ' + req(pname) + '.toString() + \'';
     });
 
-    // create url builder code
-    var urlBuilder = 'var path = this.mobilesdkBaseUrl + ' + pathOutput;
-
-console.log("URLBUILDER:", urlBuilder);
+    var indent = '        ';
+    // create url and body builder code
+    var urlBuilder = indent + 'var path = this.mobilesdkBaseUrl + ' + pathOutput;
+    var bodyBuilder = '';
 
     // Add query params. Primitive fields and repeated fields are valid.
     if ( ! bodyBuilderMode ) {
@@ -309,15 +292,48 @@ console.log("URLBUILDER:", urlBuilder);
       for ( var key in repeatedNames ) {
         var fname = repeatedNames[key];
         urlBuilder += '\';\n';
-        urlBuilder += req(fname) + '.forEach(function(n) {\n';
-        urlBuilder += '  path += \'' + fname + '=\' + n.toString() + \'&';
-        urlBuilder += '});\n';
+        urlBuilder += indent +  req(fname) + '.forEach(function(n) {\n';
+        urlBuilder += indent + '  path += \'' + fname + '=\' + n.toString() + \'&';
+        urlBuilder += indent + '});\n';
       }
+      
+      // assign body if required
+      if ( bodyKey ) {
+        // TODO: outputter to stringify this object
+        bodyBuilder = indent + 'var body = ' + req(bodyKey) + ';\n';
+      }
+      // else bodyBuilder empty
+    } else {
+      // Build the body content from the remaining fields
+      
+      // Since we have a request object with all the fields in it,
+      // remove the ones we used already and stringify it.
+      bodyBuilder = indent + 'var body = { __proto__: req,\n';
+      pathFieldNames.forEach(function(pname) {
+        bodyBuilder += indent + '  ' + pname + ': undefined,\n';
+      });
+      bodyBuilder += indent + '};\n';
     }
+    urlBuilder += '\n';
 
-
+    // create the generated rpc function
+    var fstr = 'function(req) {\n' +
+          urlBuilder +
+          bodyBuilder +
+          indent + 'return this.mobilesdkBackendService.sendGapiRequest({\n' +
+          indent + '  method: \'' + method + '\',\n' +
+          indent + '  path: path,\n' +
+          (bodyBuilder ? indent + '  body: body,\n' : '') +
+          indent + '});\n' +
+          '      }\n';
+    var f = function() {};
+    f.toString = function() {
+      return fstr;
+    };
+    return f;
   };
 
+  var pkgPrefix = pkg ? pkg + '.' : '';
   for ( var i = 0; i < service.rpcs.length; i++ ) {
     var m = service.rpcs[i];
 
@@ -325,7 +341,10 @@ console.log("URLBUILDER:", urlBuilder);
       if ( m.options[j].name === 'google.api.http' ) {
         ret.push({
           name: m.name,
-          code: generateRPC(m.requestType, m.responseType, m.options[j])
+          code: generateRPC(
+            pkgPrefix + m.requestType,
+            pkgPrefix + m.responseType,
+            m.options[j])
         });
       }
     }
@@ -333,7 +352,7 @@ console.log("URLBUILDER:", urlBuilder);
   return ret;
 }
 
-function getServiceMappings(service) {
+function getServiceMappings(service, pkg) {
   var ret = {
     REQUEST_TYPES: {},
     RESPONSE_TYPES: {}
@@ -341,12 +360,13 @@ function getServiceMappings(service) {
 
   if ( ! service.rpcs ) return ret;
 
+  var pkgPrefix = pkg ? pkg + '.' : '';
   for ( var i = 0; i < service.rpcs.length; i++ ) {
     var m = service.rpcs[i];
 
     for ( var j = 0; j < m.options.length; j++ ) {
-      ret.REQUEST_TYPES[m.name] = m.requestType;
-      ret.RESPONSE_TYPES[m.name] = m.responseType
+      ret.REQUEST_TYPES[m.name] = pkgPrefix + m.requestType;
+      ret.RESPONSE_TYPES[m.name] = pkgPrefix + m.responseType
     }
   }
   return ret;
@@ -390,6 +410,7 @@ function outputServiceExporter(services, pkg, baseUrl) {
   var requires = [];
   var exports = [];
   var imports = [];
+  var properties = [];
 
   properties.push({ name: 'mobilesdkBackendService' });
   exports.push('mobilesdkBackendService');
@@ -426,8 +447,8 @@ function readService(pkg, service, services) {
     package: pkg,
     name: service.name,
     imports: [ 'mobilesdkBaseUrl', 'mobilesdkBackendService' ],
-    methods: getServiceMethods(service),
-    constants: getServiceMappings(service)
+    methods: getServiceMethods(service, pkg),
+    constants: getServiceMappings(service, pkg)
   };
 
   foam.CLASS(newModel);
