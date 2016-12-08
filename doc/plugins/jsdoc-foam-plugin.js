@@ -154,7 +154,8 @@ var getDefinitionType = function getDefinitionType(node) {
 
 var getCLASSPackage = function getCLASSPackage(node) {
 
-  var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
+  var pkg = getNodePropertyNamed(node, 'package');
+  
   if ( ! pkg ) {
     if ( getDefinitionType(node) === 'LIB' ) {
       pkg = getNodePropertyNamed(node, 'name').replace(/\./g, '/');
@@ -162,6 +163,12 @@ var getCLASSPackage = function getCLASSPackage(node) {
     } else {
       pkg = 'foam/core';
     }
+  } else {
+    if ( ! pkg.replace ) {
+      console.log("Package invalid: ", pkg);
+      return;
+    }
+    pkg = pkg.replace(/\./g, '/');
   }
 
   return pkg;
@@ -259,7 +266,7 @@ var processArgs = function processArgs(e, node) {
   if ( ! node ) return;
   var src = getSourceString(e.filename, node.range[0], node.range[1]);
   try {
-    var args = foam.types.getFunctionArgs(src);
+    var args = foam.Function.argsStr(src);
     for ( var i = 0; i < args.length; ++i ) {
       var arg = args[i];
       if ( arg.typeName ) {
