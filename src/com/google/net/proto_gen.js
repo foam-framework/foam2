@@ -190,8 +190,20 @@ function getServiceMethods(service, pkg) {
 
   // TODO: refactor into smaller chunks
   function generateRPC(requestType, responseType, options) {
-    var method = options.value.get ? 'GET' : 'POST';
-    var path = options.value.get || options.value.post;
+    var method =
+      options.value.get ? 'GET' :
+      options.value.post? 'POST':
+      options.value.delete ? 'DELETE':
+      options.value.put ? 'PUT':
+      options.value.patch ? 'PATCH' : 'CUSTOM';
+    var path =
+      options.value.get ||
+      options.value.post ||
+      options.value.delete ||
+      options.value.put ||
+      options.value.patch ||
+      options.value.custom;
+
     // in build mode, add fields to the body instead of the query params
     var bodyBuilderMode = ( options.value.body === '*' );
     var bodyKey = bodyBuilderMode ? undefined : options.value.body;
@@ -207,19 +219,22 @@ function getServiceMethods(service, pkg) {
     reqProps.forEach(function(prop) {
       if ( foam.core.FObjectProperty.isInstance(prop) ) {
         // A sub-message?
-        if ( prop.of.indexOf(reqType.id) === 0 ) {
-          // property type starts with our request class, so it's an inner
-          // class and therefore a sub-message
-          var subType = foam.lookup(prop.of);
-          subType.getAxiomsByClass(foam.core.Property).forEach(function(subProp) {
-              // TODO: assert subprop must be a primitive type
-            // Field name becomes "thing.subField"
-            fieldNames[prop.name + '.' + subProp.name] = subProp;
-          });
-        } else {
-          // a normal FObject, don't explode it
-          fieldNames[prop.name] = prop;
-        }
+        var subType = foam.lookup(prop.of);
+        subType.getAxiomsByClass(foam.core.Property).forEach(function(subProp) {
+          // if a model type, but not an Enum, don't include it
+          if ( foam.core.FObjectProperty.isInstance(subProp)
+              || foam.core.FObjectArray.isInstance(subProp) ) {
+            var subSubType = foam.lookup(subProp.of, true);
+            if ( subSubType &&
+                 ! foam.core.EnumModel.isInstance(subSubType.model_) ) {
+              console.log('Ignoring subSubType:', subSubType.id,
+                  'in', requestType);
+              return;
+            }
+          }
+          // Field name becomes "thing.subField"
+          fieldNames[prop.name + '.' + subProp.name] = subProp;
+        });
       } else if ( foam.core.FObjectArray.isInstance(prop) ) { // TODO: plain array?
         // Can't use a repeated field in the path
         repeatedNames[prop.name] = prop;
@@ -249,7 +264,7 @@ function getServiceMethods(service, pkg) {
     var pathFieldNames = [];
     var matches;
     var pathRE = /\{(.*?)\}/g;
-    var pathOutput = '\'' + path + '\'';
+    var pathOutput = path ? '\'' + path + '\'' : '\'\'';
     pathOutput = pathOutput.replace(pathRE, function(match, p_name) {
       var pname = foam.String.camelize(p_name);
       if ( fieldNames[pname] ) {
@@ -266,10 +281,9 @@ function getServiceMethods(service, pkg) {
       // replace the {name} with code output ' + req.name + '
       return '\' + ' + req(pname) + '.toString() + \'';
     });
-
     var indent = '        ';
     // create url and body builder code
-    var urlBuilder = indent + 'var path = this.mobilesdkBaseUrl + ' + pathOutput;
+    var urlBuilder = indent + 'var path = this.mobilesdkBaseUrl + ' + pathOutput + ';\n';
     var bodyBuilder = '';
     var paramsBuilder = '';
 
@@ -329,14 +343,17 @@ function getServiceMethods(service, pkg) {
   for ( var i = 0; i < service.rpcs.length; i++ ) {
     var m = service.rpcs[i];
 
+    // add current package if no package specified on request/response types
+    var reqType = m.requestType.indexOf('.') < 0 ?
+      pkgPrefix + m.requestType : m.requestType;
+    var respType = m.responseType.indexOf('.') < 0 ?
+      pkgPrefix + m.responseType : m.responseType;
+
     for ( var j = 0; j < m.options.length; j++ ) {
       if ( m.options[j].name === 'google.api.http' ) {
         ret.push({
           name: m.name,
-          code: generateRPC(
-            pkgPrefix + m.requestType,
-            pkgPrefix + m.responseType,
-            m.options[j])
+          code: generateRPC(reqType, respType, m.options[j])
         });
       }
     }
@@ -356,9 +373,14 @@ function getServiceMappings(service, pkg) {
   for ( var i = 0; i < service.rpcs.length; i++ ) {
     var m = service.rpcs[i];
 
+    var reqType = m.requestType.indexOf('.') < 0 ?
+      pkgPrefix + m.requestType : m.requestType;
+    var respType = m.responseType.indexOf('.') < 0 ?
+      pkgPrefix + m.responseType : m.responseType;
+
     for ( var j = 0; j < m.options.length; j++ ) {
-      ret.REQUEST_TYPES[m.name] = pkgPrefix + m.requestType;
-      ret.RESPONSE_TYPES[m.name] = pkgPrefix + m.responseType
+      ret.REQUEST_TYPES[m.name] = reqType;
+      ret.RESPONSE_TYPES[m.name] = respType;
     }
   }
   return ret;
