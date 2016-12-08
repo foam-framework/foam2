@@ -404,7 +404,7 @@ function outputModel(pkg, name) {
 
   foam.json.Pretty.outputDefaultValues = false;
 
-  o += ( foam.core.EnumModel.isInstance(m.model_) ) ? 'foam.ENUM(' : 'foam.CLASS(';
+  o += ( foam.core.EnumModel.isInstance(m.model_) ) ? 'window.foam.ENUM(' : 'window.foam.CLASS(';
   o += foam.json.Pretty.stringify(m.model_);
   o += ');\n\n';
 
@@ -464,7 +464,7 @@ function getServiceProperties(service, pkg) {
       name: 'OUTPUTTER',
       factory: function() {
         return {
-          __proto__: foam.json.Strict,
+          __proto__: window.foam.json.Strict,
           outputDefaultValues: false,
           outputClassNames: false
         };
