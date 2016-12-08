@@ -50,13 +50,6 @@ for ( var i = outIndex + 1 ; i < process.argv.length ; i++ ) {
 
 // TODO(braden): Oneof is not handled by the generated methods.
 
-// TODO(braden): Request objects provide parameters to the GET request, so need
-// to unpack those to get types for the HTTPMethod to generate:
-// - RequestObj.proj_id > provides proj_id to > /v1/project/{proj_id}:byId
-// - gen.ListProjects(PType proj_id) gets PType from RequestObj, otherwise
-//     passes the parameter into the path as normal at runtime.
-
-
 var url = require('url');
 
 function mapType(typeStr, obj) {
@@ -235,7 +228,7 @@ function getServiceMethods(service, pkg) {
         fieldNames[prop.name] = prop;
       }
     });
-    
+
     // Remove bodyKey from fieldNames, if set, since it is used
     // as the body content, never a query parameter
     if ( bodyKey ) {
@@ -267,7 +260,7 @@ function getServiceMethods(service, pkg) {
         if ( repeatedNames[pname] ) {
           throw "proto_gen: Can't use repeated field in path: " + pname;
         }
-        throw "proto_gen: Undefined field \"" + pname + "\" in path: " + 
+        throw "proto_gen: Undefined field \"" + pname + "\" in path: " +
           path + " -- Request: " + reqType.toString() + "[" + reqProps + "]";
       }
       // replace the {name} with code output ' + req.name + '
@@ -278,25 +271,22 @@ function getServiceMethods(service, pkg) {
     // create url and body builder code
     var urlBuilder = indent + 'var path = this.mobilesdkBaseUrl + ' + pathOutput;
     var bodyBuilder = '';
+    var paramsBuilder = '';
 
     // Add query params. Primitive fields and repeated fields are valid.
     if ( ! bodyBuilderMode ) {
-      urlBuilder += '?';
+      paramsBuilder = indent + 'var params = {\n';
 
       // output each field as a query param
-      for ( var key in fieldNames ) {
-        var fname = fieldNames[key];
-        urlBuilder += fname + '=\' + ' + req(fname) + '.toString() + \'&';
+      for ( var fname in fieldNames ) {
+        paramsBuilder += indent + '  \"' + fname + '\": ' + req(fname) + '.toString(),\n';
       }
-      // output a loop for each array, adding multiple copies of params
-      for ( var key in repeatedNames ) {
-        var fname = repeatedNames[key];
-        urlBuilder += '\';\n';
-        urlBuilder += indent +  req(fname) + '.forEach(function(n) {\n';
-        urlBuilder += indent + '  path += \'' + fname + '=\' + n.toString() + \'&';
-        urlBuilder += indent + '});\n';
+      // output each array, gapi.client.request params arg will handle it
+      for ( var fname in repeatedNames ) {
+        paramsBuilder += indent + '  \"' + fname + '\": ' + req(fname) + '.toString(),\n';
       }
-      
+      paramsBuilder += indent + '};\n';
+
       // assign body if required
       if ( bodyKey ) {
         // TODO: outputter to stringify this object
@@ -305,9 +295,9 @@ function getServiceMethods(service, pkg) {
       // else bodyBuilder empty
     } else {
       // Build the body content from the remaining fields
-      
+
       // Since we have a request object with all the fields in it,
-      // remove the ones we used already and stringify it.
+      // remove the ones we used already and pass it along.
       bodyBuilder = indent + 'var body = { __proto__: req,\n';
       pathFieldNames.forEach(function(pname) {
         bodyBuilder += indent + '  ' + pname + ': undefined,\n';
@@ -320,10 +310,12 @@ function getServiceMethods(service, pkg) {
     var fstr = 'function(req) {\n' +
           urlBuilder +
           bodyBuilder +
+          paramsBuilder +
           indent + 'return this.mobilesdkBackendService.sendGapiRequest({\n' +
           indent + '  method: \'' + method + '\',\n' +
           indent + '  path: path,\n' +
           (bodyBuilder ? indent + '  body: body,\n' : '') +
+          (paramsBuilder ? indent + '  params: params,\n' : '') +
           indent + '});\n' +
           '      }\n';
     var f = function() {};
