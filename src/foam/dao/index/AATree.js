@@ -30,37 +30,20 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'TreeNode',
 
-  axioms: [ foam.pattern.Progenitor.create() ],
-
   properties: [
     // per node properties
-    { class: 'foam.pattern.progenitor.PerInstance', name: 'key'   },
-    { class: 'foam.pattern.progenitor.PerInstance', name: 'value' },
-    { class: 'foam.pattern.progenitor.PerInstance', name: 'size'  },
-    { class: 'foam.pattern.progenitor.PerInstance', name: 'level' },
+    { class: 'Simple', name: 'key'   },
+    { class: 'Simple', name: 'value' },
+    { class: 'Simple', name: 'size'  },
+    { class: 'Simple', name: 'level' },
     {
-      class: 'foam.pattern.progenitor.PerInstance',
+      class: 'Simple',
       name: 'left',
     },
     {
-      class: 'foam.pattern.progenitor.PerInstance',
+      class: 'Simple',
       name: 'right',
     },
-
-    // per tree properties
-    {
-      /**
-        The null node guards the leaves of the tree. It is a single shared
-        instance per tree, set by TreeIndex when setting up the tree node
-        factory. Every partial or empty node is marked by setting its
-        left and/or right to the nullNode.
-        <p>
-        TreeNodes use the nullNode reference to clear their left/right
-        references, and NullTreeNode uses the tree node factory to create
-        new nodes.
-      */
-      name: 'nullNode'
-    }
   ],
 
   methods: [
@@ -74,7 +57,14 @@ foam.CLASS({
     },
     
     function clone() {
-      return this.progenitor.spawn(this);
+      var c = this.cls_.create();
+      c.key = this.key;
+      c.value = this.value;
+      c.size = this.size;
+      c.level = this.level;
+      c.left = this.left;
+      c.right = this.right;
+      return c;
     },
 
     function updateSize() {
@@ -196,7 +186,7 @@ foam.CLASS({
       return s.split(locked).skew(locked);
     },
 
-    function removeKeyValue(key, value, compare, locked) {
+    function removeKeyValue(key, value, compare, locked, nullNode) {
       var s = this.maybeClone(locked);
       var side;
       var r = compare(s.key, key);
@@ -214,7 +204,7 @@ foam.CLASS({
 
         // If we're a leaf, easy, otherwise reduce to leaf case.
         if ( ! s.left.level && ! s.right.level ) {
-          return this.progenitor.nullNode;
+          return nullNode;
         }
 
         side = s.left.level ? 'left' : 'right';
@@ -234,7 +224,7 @@ foam.CLASS({
         side = r > 0 ? 'left' : 'right';
 
         s.size -= s[side].size;
-        s[side] = s[side].removeKeyValue(key, value, compare, locked);
+        s[side] = s[side].removeKeyValue(key, value, compare, locked, nullNode);
         s.size += s[side].size;
       }
 
@@ -323,24 +313,24 @@ foam.CLASS({
       return s.right;
     },
 
-    function gte(key, compare) {
+    function gte(key, compare, nullNode) {
       var s = this;
       var copy;
       var r = compare(key, s.key);
 
       if ( r < 0 ) {
-        var l = s.left.gte(key, compare);
+        var l = s.left.gte(key, compare, nullNode);
         copy = s.clone();
         copy.size = s.size - s.left.size + l.size,
         copy.left = l;
         return copy;
       }
 
-      if ( r > 0 ) return s.right.gte(key, compare);
+      if ( r > 0 ) return s.right.gte(key, compare, nullNode);
 
       copy = s.clone();
       copy.size = s.size - s.left.size,
-      copy.left = s.progenitor.nullNode;
+      copy.left = nullNode;
       return copy;
     },
 
@@ -361,24 +351,24 @@ foam.CLASS({
       return s.left;
     },
 
-    function lte(key, compare) {
+    function lte(key, compare, nullNode) {
       var s = this;
       var copy;
       var r = compare(key, s.key);
 
       if ( r > 0 ) {
-        var rt = s.right.lte(key, compare);
+        var rt = s.right.lte(key, compare, nullNode);
         copy = s.clone();
         copy.size = s.size - s.right.size + rt.size;
         copy.right = rt;
         return copy;
       }
 
-      if ( r < 0 ) return s.right.lte(key, compare);
+      if ( r < 0 ) return s.right.lte(key, compare, nullNode);
 
       copy = s.clone();
       copy.size = s.size - s.right.size;
-      copy.right = s.progenitor.nullNode;
+      copy.right = nullNode;
       return copy;
     },
 

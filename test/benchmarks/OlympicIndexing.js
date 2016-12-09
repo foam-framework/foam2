@@ -142,7 +142,7 @@ describe("Index benchmarks", function() {
     autodao = foam.dao.EasyDAO.create({
       of: Medal,
       seqNo: true,
-      autoIndex: true,
+      autoIndex: false,
       dedup: true,
       daoType: 'MDAO'
     });

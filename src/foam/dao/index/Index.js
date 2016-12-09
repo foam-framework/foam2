@@ -23,20 +23,15 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
-  imports: [
-    'lookup'
-  ],
   properties: [
     {
       class: 'Class',
       name: 'tailClass',
-      factory: function() {
-        // Supply an IndexTail Class for each Index subclass
-        return 'foam.dao.index.IndexTail';
-      }
+      // TODO: a factory would be better, but Class getter overrides it
     }
   ],
   methods: [
+    
     function estimate(size, sink, skip, limit, order, predicate) {
       /** Estimates the performance of this index given the number of items
         it will hold and the planned parameters. */
@@ -50,8 +45,10 @@ foam.CLASS({
     },
 
     function spawn(args) {
-      var cls = this.tailClass;
-      return cls.create(args, this); // TODO: third arg for proto?
+      if ( ! this.tailClass ) this.tailClass = this.cls_.id + 'Tail';
+      args = args || {};
+      args.progenitor = this;
+      return this.tailClass.create(args, this);
     }
   ]
 });
@@ -60,6 +57,10 @@ foam.CLASS({
   The index tail interface represents a piece of the index that actually
   holds data. A tree will create a tail for each node, so one Index will
   create many tail instances, each operating on part of the data in the DAO.
+
+  For creation speed, do not require or import anything in a tail class.
+  Use the 'progenitor' property to access requires and imports on the
+  Index that created the tail instance.
 */
 foam.CLASS({
   package: 'foam.dao.index',
@@ -68,6 +69,13 @@ foam.CLASS({
 //   axioms: [
 //     'foam.dao.index.SharedProto?', // create(args, ctx, proto)?
 //   ],
+
+  properties: [
+    {
+      class: 'Simple',
+      name: 'progenitor'
+    }
+  ],
 
   methods: [
     /** Adds or updates the given value in the index */
