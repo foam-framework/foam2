@@ -990,6 +990,44 @@ foam.CLASS({
       factory: function() {
         return { x: 0, y: 0, z: 1, w: 1 };
       }
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          upX: this.up_.x,
+          upY: this.up_.y,
+          upZ: this.up_.z,
+          upW: this.up_.w,
+          fdX: this.fd_.x,
+          fdY: this.fd_.y,
+          fdZ: this.fd_.z,
+          fdW: this.fd_.w,
+          rightX: this.right_.x,
+          rightY: this.right_.y,
+          rightZ: this.right_.z,
+          rightW: this.right_.w,
+          penColor: this.penColor,
+          penWidth: this.penWidth,
+          penDown:  this.pendDown
+        };
+      },
+      setter: function(m) {
+        this.copyFrom(m);
+        this.up_.x = m.upX;
+        this.up_.y = m.upY;
+        this.up_.z = m.upZ;
+        this.up_.w = m.upW;
+        this.fd_.x = m.fdX;
+        this.fd_.y = m.fdY;
+        this.fd_.z = m.fdZ;
+        this.fd_.w = m.fdW;
+        this.right_.x = m.rightX;
+        this.right_.y = m.rightY;
+        this.right_.z = m.rightZ;
+        this.right_.w = m.rightW;
+      }
     }
   ],
 
