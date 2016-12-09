@@ -66,7 +66,7 @@ foam.CLASS({
       this.idIndex = this.index;
 
       if ( this.autoIndex ) {
-        this.addIndex(this.AutoIndex.create({ idIndexFactory: this.idIndex.creator }));
+        this.addIndex(this.AutoIndex.create({ idIndex: this.idIndex.creator }));
       }
     },
 

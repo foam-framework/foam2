@@ -21,8 +21,8 @@
   always populates an ID index, so it can serve queries even if no
   delegate indexes are explicitly added.
 
-  Factory: Alt[ID, TreeA, TreeB]
-  instances: [id, a,b], [id, a], [id, b], [id, a], [id]
+  Index: Alt[ID, TreeA, TreeB]
+  IndexNodes: [id, a,b], [id, a], [id, b], [id, a], [id]
 */
 foam.CLASS({
   package: 'foam.dao.index',

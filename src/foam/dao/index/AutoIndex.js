@@ -42,13 +42,13 @@ foam.CLASS({
   properties: [
     {
       /** Used to create the delegate ID index for new instances of AutoIndex */
-      name: 'idIndexFactory',
+      name: 'idIndex',
       required: true
     },
     {
       name: 'delegate',
       factory: function() {
-        return this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
+        return this.AltIndex.create({ delegates: [ this.idIndex ] });
       }
     }
   ],
@@ -77,7 +77,7 @@ foam.CLASS({
   methods: [
     function addPropertyIndex(prop, root) {
       this.addIndex(prop.toIndex(this.creator.cls_.create({
-        idIndexFactory: this.creator.idIndexFactory
+        idIndex: this.creator.idIndex
       })), root);
     },
     
@@ -132,11 +132,11 @@ foam.CLASS({
       // Base planned cost on the old cost for the plan, to avoid underestimating and making this
       //  index build look too good
       var existingEstimate = bestEstimate;
-      var idIndexFactory = this.creator.idIndexFactory;
+      var idIndex = this.creator.idIndex;
 
       if ( predicate ) {
         var candidate = predicate.toIndex(
-          this.creator.cls_.create({ idIndexFactory: idIndexFactory }), 1); // depth 1
+          this.creator.cls_.create({ idIndex: idIndex }), 1); // depth 1
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
@@ -156,7 +156,7 @@ foam.CLASS({
       //   so the predicate might make this index worse
       if ( order ) {
         var candidate = order.toIndex(
-          this.creator.cls_.create({ idIndexFactory: idIndexFactory }), 1); // depth 1
+          this.creator.cls_.create({ idIndex: idIndex }), 1); // depth 1
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
