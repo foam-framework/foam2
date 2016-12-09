@@ -889,7 +889,7 @@ foam.CLASS({
       if ( opt_shown === undefined ) {
         this.show = true;
       } else if ( foam.core.Slot.isInstance(opt_shown) ) {
-        this.shown$ = opt_shown;
+        this.shown$.follow(opt_shown);
       } else {
         this.shown = !! opt_shown;
       }
@@ -1598,7 +1598,7 @@ foam.CLASS({
 
       var e = nextE();
       var l = function() {
-        if ( self.isDestroyed() || self.state !== self.LOADED ) {
+        if ( self.state !== self.LOADED ) {
           s && s.destroy();
           return;
         }

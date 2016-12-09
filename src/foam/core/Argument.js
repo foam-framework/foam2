@@ -47,7 +47,7 @@ foam.LIB({
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
         if ( ret.returnType ) {
-          throw new SyntaxError("foam.types.getFunctionArgs return type '" +
+          throw new SyntaxError("foam.types.args return type '" +
             ret.returnType.typeName +
             "' must appear after the last argument only: " + args.toString());
         }
@@ -83,7 +83,7 @@ foam.LIB({
           });
         } else {
           throw new SyntaxError(
-              'foam.types.getFunctionArgs argument parsing error: ' +
+              'foam.types.args argument parsing error: ' +
               args.toString());
         }
       }

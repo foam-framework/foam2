@@ -71,13 +71,13 @@ foam.CLASS({
     {
       name: 'targetDAOKey',
       expression: function(targetModel) {
-        return foam.String.daoize(targetModel);
+        return foam.String.daoize(foam.lookup(targetModel).name);
       }
     },
     {
       name: 'sourceDAOKey',
       expression: function(sourceModel) {
-        return foam.String.daoize(sourceModel);
+        return foam.String.daoize(foam.lookup(sourceModel).name);
       }
     },
     {

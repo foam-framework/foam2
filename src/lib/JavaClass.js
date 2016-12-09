@@ -426,7 +426,7 @@ foam.CLASS({
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 
-      if ( this.extends ) {
+      if ( this.hasDefaultValue('extends') ) {
         o.out(' extends ');
         for ( var i = 0 ; i < this.extends.length ; i++ ) {
           o.out(this.extends[i]);
@@ -986,6 +986,20 @@ foam.CLASS({
       m.body = 'return ( o instanceof Long ) ?'
              + '((Long)o).intValue() :'
              + '(int)o;'
+      return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      if ( ! this.hasDefaultValue('javaJSONParser') ) {
+        var m = info.getMethod('jsonParser');
+        m.body = 'return new foam.lib.json.FObjectParser(' + this.of + '.class);';
+      }
       return info;
     }
   ]

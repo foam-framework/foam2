@@ -72,7 +72,7 @@ public class HelloServlet extends HttpServlet {
 
     X requestContext = x.put("httpRequest", req).put("httpResponse", resp);
 
-    FObject result = new JSONParser(requestContext).parseString(buffer_.toString());
+    FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
     if ( result == null ) {
       resp.setStatus(resp.SC_BAD_REQUEST);

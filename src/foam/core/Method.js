@@ -56,14 +56,16 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'AbstractMethod',
-  extends: 'FObject',
 
   properties: [
     { name: 'name', required: true },
     { name: 'code', required: true },
     'documentation',
     'returns',
-    'args'
+    {
+      name: 'args',
+      factory: function() { return this.code ? foam.Function.args(this.code) : []; }
+    }
   ],
 
   methods: [

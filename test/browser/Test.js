@@ -245,3 +245,30 @@ function foo(/* Int */ i, /* String */ s, /* FObject */ o) {
 
 console.log(foam.Function.argNames(foo));
 console.log(foam.Function.args(foo));
+
+foam.CLASS({
+  name: 'Test',
+
+  axioms: [
+    foam.core.MultiMethod.create({
+      methodName: 'foo',
+      code: function() {
+        return 'NoArgs';
+      }
+    }),
+    foam.core.MultiMethod.create({
+      methodName: 'foo',
+      code: function(/*String*/ str) {
+        return 'String: ' + str;
+      }
+    }),
+    foam.core.MultiMethod.create({
+      methodName: 'foo',
+      code: function(/*Float*/ f) {
+        return 'Float: ' + f;
+      }
+    })
+  ]
+});
+
+var t = Test.create();

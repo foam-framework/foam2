@@ -27,7 +27,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(/*promise, state, sink, skip, limit, order, predicate*/) {},
+    function execute(promise, state, sink, skip, limit, order, predicate) {},
     function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
   ]
 });
@@ -166,7 +166,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 /**
   Merges results from multiple sub-plans and deduplicates, sorts, and

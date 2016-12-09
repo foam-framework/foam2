@@ -13,11 +13,7 @@ ToDo:
  Future:
   - predicate support for getAxioms() methods.
   - cascading object property change events
-  - should destroyables be a linked list for fast removal?
-    - should onDestroy be merged with listener support?
   - multi-methods?
   - Topic listener relay
-  - Should String be the default property type with no way to create an untype property?
+  - Should String be the default property type with no way to create an untyped property?
   - Design by Contract
-
-An ExpressionSlot's sub() method is overloaded since it is both an FObject and a Slot.
