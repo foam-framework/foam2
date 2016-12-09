@@ -921,3 +921,228 @@ repeat(8, () => {
   t.fd(100).pitchUp(90);
   t.rt(360/16).fd(20).rt(360/16);
 });
+
+
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = -50;
+t.x = 80;
+t.y = 80;
+ t.rt(-45);
+t.pw(5);
+
+t.ss();
+repeat(8, () => {
+  t.pitchUp(90).fd(100);
+  repeat(18, () => {
+    t.fd(8).pitchDown(10);
+  });
+  t.fd(100).pitchUp(90);
+  t.rt(360/16).fd(20).rt(360/16);
+});
+
+t.rs();
+t.z += 210;
+
+repeat(16, () => {
+  t.pitchUp(90).fd(50);
+  repeat(18, () => {
+    t.fd(4).pitchDown(10);
+  });
+  t.fd(50).pitchUp(90);
+  t.rt(360/32).fd(10).rt(360/32);
+});
+
+t.z += 50;
+
+repeat(32, () => {
+  t.pitchUp(90).fd(25);
+  repeat(18, () => {
+    t.fd(2).pitchDown(10);
+  });
+  t.fd(25).pitchUp(90);
+  t.rt(360/64).fd(5).rt(360/64);
+});
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = -50;
+t.x = 80;
+t.y = 80;
+ t.rt(-45);
+t.pw(5);
+
+function archRing(n, height, size) {
+  t.ss();
+  repeat(n, () => {
+    t.pitchUp(90).fd(height);
+    repeat(18, () => {
+      t.fd(size/100*8/n).pitchDown(10);
+    });
+    t.fd(height).pitchUp(90);
+    t.rt(180/n).fd(20*8/n).rt(180/n);
+  });
+  t.rs();
+}
+
+archRing(6, 100, 800);
+t.z += 220;
+archRing(8, 100, 800);
+t.z += 210;
+archRing(16, 50, 800);
+t.z += 110;
+archRing(32, 30, 800);
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = -50;
+t.x = 80;
+t.y = 80;
+t.rt(-45);
+
+function archRing(n, height, size) {
+  t.ss();
+  repeat(n, () => {
+    var x = t.x, y = t.y, z = t.z;
+    t.pitchUp(90).fd(height);
+    repeat(18, () => {
+      t.fd(size/100*8/n).pitchDown(10);
+    });
+    t.fd(height).pitchUp(90);
+    t.ss().gt(x, y, z).rs();
+    t.rt(180/n).fd(20*8/n).rt(180/n);
+  });
+  t.rs();
+}
+
+t.pw(5);
+archRing(8, 80, 800);
+
+t.pw(4);
+t.z += 200;
+archRing(10, 80, 800);
+
+t.pw(3);
+t.z += 160;
+archRing(16, 50, 800);
+
+t.pw(2.5);
+t.z += 100;
+archRing(24, 30, 800);
+t.z += 70;
+archRing(360, 0, 800);
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = -50;
+t.x = 80;
+t.y = 80;
+ t.rt(-45);
+t.pw(2.5);
+
+function archRing(n, height, size) {
+  t.ss();
+  repeat(n, (i) => {
+    t.pitchUp(90).fd(height);
+    repeat(18, () => {
+      t.fd(size/100*8/n).pitchDown(10);
+    });
+    t.fd(height).pitchUp(90);
+    var a = Math.abs(1.5*180/n * Math.sin(i/n*Math.PI*2));
+    t.rt(a).fd(20*8/n).rt(a);
+  });
+  t.rs();
+}
+
+archRing(360, 0, 800);
+archRing(14, 100/2, 800);
+t.z += 90;
+archRing(360, 0, 800);
+archRing(28, 100/2, 800);
+t.z += 80;
+archRing(360, 0, 800);
+archRing(2*28, 30, 800);
+t.z += 50;
+archRing(360, 0, 800);
+archRing(2*28, 25, 800);
+t.z += 50;
+archRing(360, 0, 800);
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = -50;
+t.x = 80;
+t.y = 80;
+ t.rt(-45);
+t.pw(2.5);
+t.pc('rgba(0,0,0,0.5)');
+
+function arch(height, size) {
+  t.pitchUp(90).fd(height);
+  repeat(18, () => {
+    t.fd(size/100*8).pitchDown(10);
+  });
+  t.fd(height).pitchUp(90);
+}
+
+function archRing(n, height, size) {
+  t.ss();
+  repeat(n, (i) => {
+    arch(height,size/n);
+    var a = Math.abs(1.5*180/n * Math.sin(i/n*Math.PI*2));
+    t.rt(a).fd(20*8/n);
+    t.ss().rt(90).pu().fd(10).pd();arch(height, size/n);t.rs();
+    t.rt(a);
+  });
+  t.rs();
+}
+
+archRing(360, 0, 800);
+archRing(14, 100/2, 800);
+t.z += 90;
+archRing(360, 0, 800);
+archRing(28, 100/2, 800);
+t.z += 80;
+archRing(360, 0, 800);
+archRing(2*28, 30, 800);
+t.z += 50;
+archRing(360, 0, 800);
+archRing(2*28, 25, 800);
+t.z += 50;
+archRing(360, 0, 800);
