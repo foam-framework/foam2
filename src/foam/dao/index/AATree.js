@@ -404,7 +404,7 @@ foam.CLASS({
         will be initialized with a new tail index from tailFactory.
       */
       class: 'Simple',
-      name: 'treeNodeFactory'
+      name: 'treeNode'
     },
     {
       class: 'Simple',
@@ -446,9 +446,9 @@ foam.CLASS({
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
-      var subIndex = this.tailFactory.spawn();
+      var subIndex = this.tailFactory.createTail();
       subIndex.put(value);
-      var n = this.treeNodeFactory.spawn();
+      var n = this.treeNode.create();
       n.left = this;
       n.right = this;
       n.key = key;

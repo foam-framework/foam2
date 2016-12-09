@@ -54,7 +54,7 @@ foam.CLASS({
       name: 'idIndex'
     },
     {
-      /** The spawned root instance of our index. */
+      /** The createTailed root instance of our index. */
       name: 'index'
     }
   ],
@@ -66,7 +66,7 @@ foam.CLASS({
       this.idIndex = this.index;
 
       if ( this.autoIndex ) {
-        this.addIndex(this.AutoIndex.create({ idIndexFactory: this.idIndex.progenitor }));
+        this.addIndex(this.AutoIndex.create({ idIndexFactory: this.idIndex.creator }));
       }
     },
 
@@ -104,15 +104,15 @@ foam.CLASS({
 
     function addIndex(index) {
       if ( ! this.index ) {
-        this.index = index.spawn();
+        this.index = index.createTail();
         return this;
       }
 
       // Upgrade single Index to an AltIndex if required.
-      if ( ! this.AltIndex.isInstance(this.index.progenitor) ) {
+      if ( ! this.AltIndex.isInstance(this.index.creator) ) {
         this.index = this.AltIndex.create({
-          delegateFactories: [ this.index.progenitor ], // create factory
-        }).spawn({
+          delegateFactories: [ this.index.creator ], // create factory
+        }).createTail({
           delegates: [ this.index ] // create an instance
         });
       }

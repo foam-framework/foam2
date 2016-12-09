@@ -62,7 +62,7 @@
 //     },
 //
 //     function toString() {
-//       return 'OrIndex('+(this.progenitor || this).delegateFactory.toString()+')';
+//       return 'OrIndex('+(this.creator || this).delegateFactory.toString()+')';
 //     }
 //
 //   ]

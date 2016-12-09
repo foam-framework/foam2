@@ -96,22 +96,22 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegates = this.delegates || [ this.progenitor.delegateFactories[0].spawn() ];
+      this.delegates = this.delegates || [ this.creator.delegateFactories[0].createTail() ];
     },
 
     function addIndex(index) {
       // check for existing factory
-      var dfmap = this.progenitor.delegateFactoryMap_;
+      var dfmap = this.creator.delegateFactoryMap_;
       var indexKey = index.toString();
       if ( ! dfmap[indexKey] ) {
-        this.progenitor.delegateFactories.push(index);
+        this.creator.delegateFactories.push(index);
         dfmap[indexKey] = index;
       } else {
         // ensure all tails are using the same factory instance
         index = dfmap[indexKey];
       }
       
-      var newSubInst = index.spawn();
+      var newSubInst = index.createTail();
       this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
     },
@@ -139,8 +139,8 @@ foam.CLASS({
       // if no cached index estimates, generate estimates
       // for each factory for this ordering
       if ( ! c ) {
-        var nullSink = this.progenitor.NullSink.create();
-        var dfs = this.progenitor.delegateFactories;
+        var nullSink = this.creator.NullSink.create();
+        var dfs = this.creator.delegateFactories;
         var bestEst = Number.MAX_VALUE;
         // Pick the best factory for the ordering, cache it
         for ( var i = 0; i < dfs.length; i++ ) {
@@ -156,12 +156,12 @@ foam.CLASS({
       // check if we have a delegate instance for the best factory
       for ( var i = 0; i < delegates.length; i++ ) {
         // if we do, it's the best one
-        if ( delegates[i].progenitor === c ) return delegates[i];
+        if ( delegates[i].creator === c ) return delegates[i];
       }
 
       // we didn't have the right delegate generated, so add and populate it
       // as per addIndex, but we skip checking the factory as we know it's stored
-      var newSubInst = c.spawn();
+      var newSubInst = c.createTail();
       this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
 
@@ -191,7 +191,7 @@ foam.CLASS({
       var bestPlan;
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         var p = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
-        if ( p.cost <= this.progenitor.GOOD_ENOUGH_PLAN ) {
+        if ( p.cost <= this.creator.GOOD_ENOUGH_PLAN ) {
           bestPlan = p;
           break;
         }
@@ -200,7 +200,7 @@ foam.CLASS({
         }
       }
       if ( ! bestPlan ) {
-        return this.progenitor.NoPlan.create();
+        return this.creator.NoPlan.create();
       }
       return bestPlan;
     },
@@ -208,7 +208,7 @@ foam.CLASS({
     function size() { return this.delegates[0].size(); },
 
     function toString() {
-      return 'Alt([' + (this.progenitor.delegateFactories.join(',')) + this.size() + '])';
+      return 'Alt([' + (this.creator.delegateFactories.join(',')) + this.size() + '])';
     },
   ]
 });

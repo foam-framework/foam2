@@ -55,7 +55,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegate = this.delegate || this.progenitor.delegateFactory.spawn();
+      this.delegate = this.delegate || this.creator.delegateFactory.createTail();
     },
     
     function put(o) { return this.delegate.put(o); },
