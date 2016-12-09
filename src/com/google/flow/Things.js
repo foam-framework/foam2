@@ -974,40 +974,20 @@ foam.CLASS({
       name: 'z'
     },
     {
-      name: 'fd_',
-      factory: function() {
-        return { x: 1, y: 0, z: 0, w: 1 };
-      }
-    },
-    {
-      name: 'up_',
-      factory: function() {
-        return { x: 0, y: 1, z: 0, w: 1 };
-      }
-    },
-    {
-      name: 'right_',
-      factory: function() {
-        return { x: 0, y: 0, z: 1, w: 1 };
-      }
+      class: 'Float',
+      name: 'pitch'
     },
     {
       name: 'memento',
       hidden: true,
       getter: function() {
         return {
-          upX: this.up_.x,
-          upY: this.up_.y,
-          upZ: this.up_.z,
-          upW: this.up_.w,
-          fdX: this.fd_.x,
-          fdY: this.fd_.y,
-          fdZ: this.fd_.z,
-          fdW: this.fd_.w,
-          rightX: this.right_.x,
-          rightY: this.right_.y,
-          rightZ: this.right_.z,
-          rightW: this.right_.w,
+          x: this.x,
+          y: this.y,
+          z: this.z,
+          pitch: this.pitch,
+          roll: this.roll,
+          rotation: this.rotation,
           penColor: this.penColor,
           penWidth: this.penWidth,
           penDown:  this.pendDown
@@ -1015,40 +995,17 @@ foam.CLASS({
       },
       setter: function(m) {
         this.copyFrom(m);
-        this.up_.x = m.upX;
-        this.up_.y = m.upY;
-        this.up_.z = m.upZ;
-        this.up_.w = m.upW;
-        this.fd_.x = m.fdX;
-        this.fd_.y = m.fdY;
-        this.fd_.z = m.fdZ;
-        this.fd_.w = m.fdW;
-        this.right_.x = m.rightX;
-        this.right_.y = m.rightY;
-        this.right_.z = m.rightZ;
-        this.right_.w = m.rightW;
       }
+    },
+    {
+      class: 'Float',
+      name: 'roll'
     }
   ],
 
   methods: [
-    function home() {
-      this.SUPER();
-      this.x = 0;
-      this.y = 0;
-      this.z = 0;
-      this.fd_ = undefined;
-      this.up_ = undefined;
-      this.right_ = undefined;
-      return this;
-    },
-
     function pitchUp(a) {
-      a = a * Math.PI / 180;
-      var t = foam.graphics.Transform3D.create();
-      t.rotate(this.right_.x, this.right_.y, this.right_.z, a);
-      t.mulP(this.fd_);
-      t.mulP(this.up_);
+      this.pitch += Math.PI * a / 180;
       return this;
     },
 
@@ -1057,11 +1014,7 @@ foam.CLASS({
     },
 
     function rollRight(a) {
-      a = a * Math.PI / 180;
-      var t = foam.graphics.Transform3D.create();
-      t.rotate(this.fd_.x, this.fd_.y, this.fd_.z, a);
-      t.mulP(this.right_);
-      t.mulP(this.up_);
+      this.roll += Math.PI * a / 180;
       return this;
     },
 
@@ -1069,50 +1022,29 @@ foam.CLASS({
       return this.rollRight(-a);
     },
 
-    function rt(a) {
-      a = a * Math.PI / 180;
-      var t = foam.graphics.Transform3D.create();
-      t.rotate(this.up_.x, this.up_.y, this.up_.z, a);
-      t.mulP(this.fd_);
-      t.mulP(this.right_);
-      return this;
-    },
-
-    function lt(a) {
-      return this.rt(-a);
-    },
-
     function fd(d) {
-      var x = this.x + this.fd_.x * d;
-      var y = this.y + this.fd_.y * d;
-      var z = this.z + this.fd_.z * d;
-      return this.gt(x, y, z);
-    },
+      /* ForwarD */
+      var v = d * Math.sin(this.pitch);
+      var h = d * Math.cos(this.pitch);
 
-    function bt(d) {
-      return this.fd(-d);
+      return this.gt(
+          this.x + h * Math.cos(this.rotation+Math.PI/2),
+          this.y - h * Math.sin(this.rotation+Math.PI/2),
+          this.z + v);
     },
 
     function up(d) {
-      var x = this.x + this.up_.x * d;
-      var y = this.y + this.up_.y * d;
-      var z = this.z + this.up_.z * d;
-      return this.gt(x, y, z);
+      var v = d * Math.sin(this.pitch);
+      var h = d * Math.cos(this.pitch);
+
+      return this.gt(
+          this.x + h * Math.cos(this.rotation+Math.PI/2),
+          this.y - h * Math.sin(this.rotation+Math.PI/2),
+          this.z + v);
     },
 
     function down(d) {
       return this.up(-d);
-    },
-
-    function right(d) {
-      var x = this.x + this.right_.x * d;
-      var y = this.y + this.right_.y * d;
-      var z = this.z + this.right_.z * d;
-      return this.gt(x, y, z);
-    },
-
-    function left(d) {
-      return this.right(-d);
     },
 
     function gt(x, y, z) {
