@@ -46,27 +46,60 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
-      /** factory quick lookup*/
+      /** factory quick lookup */
       name: 'delegateFactoryMap_',
       factory: function() { return {}; }
-    },
-    {
-      /** the delegate instances for each Alt instance */
-      class: 'foam.pattern.progenitor.PerInstance',
-      name: 'delegates',
-      factory: function() {
-        return [ this.progenitor.delegateFactories[0].spawn() ];
-      }
     },
   ],
 
   methods: [
 
-    function addIndex(index) {
-      console.assert( ! index.progenitor );
-      console.assert( this.progenitor );
-      // This method should be called on an instance
+    /** Returns smallest estimate from the delegateFactories */
+    function estimate(size, sink, skip, limit, order, predicate) {
+      var cost = Number.MAX_VALUE;
+      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
+        cost = Math.min(
+          cost,
+          this.delegateFactories[i].estimate(
+            size, sink, skip, limit, order, predicate)
+        );
+      }
+      return cost;
+    },
 
+    function toPrettyString(indent) {
+      var ret = "";
+      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
+          ret += this.delegateFactories[i].toPrettyString(indent + 1);
+      }
+      return ret;
+    },
+    
+    function toString() {
+      return 'Alt([' + (this.delegateFactories.join(',')) + '])';
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'AltIndexTail',
+  extends: 'foam.dao.index.IndexTail',
+
+  properties: [
+    {
+      /** the delegate instances for each Alt instance */
+      class: 'Simple',
+      name: 'delegates'
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.delegates = this.delegates || [ this.progenitor.delegateFactories[0].spawn() ];
+    },
+
+    function addIndex(index) {
       // check for existing factory
       var dfmap = this.progenitor.delegateFactoryMap_;
       var indexKey = index.toString();
@@ -77,11 +110,10 @@ foam.CLASS({
         // ensure all tails are using the same factory instance
         index = dfmap[indexKey];
       }
-//var start = Date.now();
+      
       var newSubInst = index.spawn();
       this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
-//console.log("AltIndex building ordering size", this.size(), "in", Date.now() - start, "ms");
     },
 
     function bulkLoad(a) {
@@ -93,14 +125,13 @@ foam.CLASS({
     function get(key) {
       return this.delegates[0].get(key);
     },
-
+    
     function getAltForOrderDirs(order, cache) {
       // NOTE: this assumes one of the delegates is capable of ordering
       //  properly for a scan. We should not be asked for a select unless
       //  a previous estimate indicated one of our options was sorted properly.
-      // TODO: will this even work? Tree asks for estimate to determine sortability,
-      //  one of the Alt factories supports it. But if that delegate is missing on
-      //  some of the results, they will fall back to ID index and not sort...
+      // NOTE: unbuilt portions of the index will be built immediately 
+      //  if picked for ordering.
       var delegates = this.delegates;
       if ( ! order ) return delegates[0];
 
@@ -137,6 +168,7 @@ foam.CLASS({
       return newSubInst;
     },
 
+
     function select(sink, skip, limit, order, predicate, cache) {
       // find and cache the correct subindex to use
       this.getAltForOrderDirs(order, cache)
@@ -153,19 +185,6 @@ foam.CLASS({
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         this.delegates[i].remove(obj);
       }
-    },
-
-    /** Returns smallest estimate from the delegateFactories */
-    function estimate(size, sink, skip, limit, order, predicate) {
-      var cost = Number.MAX_VALUE;
-      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
-        cost = Math.min(
-          cost,
-          this.delegateFactories[i].estimate(
-            size, sink, skip, limit, order, predicate)
-        );
-      }
-      return cost;
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
@@ -189,15 +208,7 @@ foam.CLASS({
     function size() { return this.delegates[0].size(); },
 
     function toString() {
-      return 'Alt([' + (this.progenitor || this).delegateFactories.join(',') + '])';
+      return 'Alt([' + (this.progenitor.delegateFactories.join(',')) + this.size() + '])';
     },
-
-    function toPrettyString(indent) {
-      var ret = "";
-      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
-          ret += this.delegateFactories[i].toPrettyString(indent + 1);
-      }
-      return ret;
-    }
   ]
 });

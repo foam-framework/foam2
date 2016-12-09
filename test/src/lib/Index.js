@@ -130,14 +130,15 @@ var callPlan = function callPlan(idx, sink, pred) {
 describe('Index interface', function() {
   it('has enough methods', function() {
     var idxFac = foam.dao.index.Index.create();
-    idxFac.spawn({ });
+    idxFac.estimate();
 
-    idxFac.put();
-    idxFac.remove();
-    idxFac.plan(/*sink, skip, limit, order, predicate*/);
-    idxFac.get();
-    idxFac.size();
-    idxFac.select(/*sink, skip, limit, order, predicate*/);
+    var tail = idxFac.spawn({ });
+    tail.put();
+    tail.remove();
+    tail.plan(/*sink, skip, limit, order, predicate*/);
+    tail.get();
+    tail.size();
+    tail.select(/*sink, skip, limit, order, predicate*/);
   });
 
 });
@@ -150,7 +151,7 @@ describe('ValueIndex', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create();
+    idx = foam.dao.index.ValueIndex.create().spawn();
   });
 
   it('stores a value', function() {
@@ -836,36 +837,6 @@ describe('AND', function() {
 
 });
 
-describe('OR', function() {
-  var m;
-
-  beforeEach(function() {
-    m = foam.mlang.Expressions.create();
-  });
-
-  it('merges subindexes for toIndex', function() {
-    var or = m.OR(
-      m.GT(test.Indexable.INT, 5),
-      m.EQ(test.Indexable.FLOAT, 5),
-      m.IN(test.Indexable.STRING, 'he')
-    );
-    var tail = test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create());
-    var orIndex = or.toIndex(tail);
-
-    expect(orIndex.delegateFactory.delegateFactories[0])
-      .toEqual(tail);
-
-    expect(orIndex.delegateFactory.delegateFactories[1].prop)
-      .toEqual(test.Indexable.INT);
-
-    expect(orIndex.delegateFactory.delegateFactories[2].prop)
-      .toEqual(test.Indexable.FLOAT);
-
-    expect(orIndex.delegateFactory.delegateFactories[3].prop)
-      .toEqual(test.Indexable.STRING);
-  });
-
-});
 
 
 

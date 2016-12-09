@@ -24,17 +24,40 @@ foam.CLASS({
     {
       name: 'delegateFactory',
       required: true,
+    }
+  ],
+  methods: [
+    function estimate(size, sink, skip, limit, order, predicate) {
+      return this.delegateFactory.estimate(size, sink, skip, limit, order, predicate);
     },
+
+    function toPrettyString(indent) {
+      return this.delegateFactory.toPrettyString(indent);
+    },
+    
+    function toString() {
+      return '[' + this.cls_.name + ': ' + this.delegateFactory.toString() + ']'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'ProxyIndexTail',
+  extends: 'foam.dao.index.IndexTail',
+
+  properties: [
     {
-      class: 'foam.pattern.progenitor.PerInstance',
+      class: 'Simple',
       name: 'delegate',
-      factory: function() {
-        return this.progenitor.delegateFactory.spawn();
-      }
     },
   ],
 
   methods: [
+    function init() {
+      this.delegate = this.delegate || this.progenitor.delegateFactory.spawn();
+    },
+    
     function put(o) { return this.delegate.put(o); },
 
     function remove(o) { return this.delegate.remove(o); },
@@ -53,12 +76,6 @@ foam.CLASS({
 
     function bulkLoad(dao) { return this.delegate.bulkLoad(dao); },
 
-    function toPrettyString(indent) {
-//       var ret = "  ".repeat(indent) + this.cls_.name + "(\n";
-//       ret += this.delegateFactory.toPrettyString(indent + 1);
-//       ret += "  ".repeat(indent) + ")\n";
-//       return ret;
-      return this.delegateFactory.toPrettyString(indent);
-    }
   ]
 });
+

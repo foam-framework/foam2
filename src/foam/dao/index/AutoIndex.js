@@ -58,11 +58,29 @@ foam.CLASS({
       return this.delegateFactory.estimate(size, sink, skip, limit, order, predicate);
     },
 
+    function toPrettyString(indent) {
+      var ret = "";
+      ret = "  ".repeat(indent) + "Auto(" + this.$UID + ")\n";
+      ret += this.delegateFactory.toPrettyString(indent + 1);
+      return ret;
+    }
+
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'AutoIndexTail',
+  extends: 'foam.dao.index.ProxyIndexTail',
+
+  methods: [
     function addPropertyIndex(prop, root) {
       this.addIndex(prop.toIndex(this.progenitor.cls_.create({
         idIndexFactory: this.progenitor.idIndexFactory
       })), root);
     },
+    
     function addIndex(index, root) {
       console.assert(this.progenitor, "Must call addIndex() on AutoIndex spawned instance.");
       this.delegate.addIndex(index, root);
@@ -189,15 +207,6 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
       return 'AutoIndex(' + (this.progenitor || this).delegateFactory.toString() + ')';
     },
 
-    function toPrettyString(indent) {
-      var ret = "";
-      ret = "  ".repeat(indent) + "Auto(" + this.$UID + ")\n";
-      ret += this.delegateFactory.toPrettyString(indent + 1);
-      return ret;
-    }
-
   ]
 });
-
-
 
