@@ -45,7 +45,7 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'expryTime'
+      name: 'expiryTime'
     },
     {
       class: 'String',
