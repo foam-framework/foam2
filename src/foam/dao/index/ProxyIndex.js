@@ -22,21 +22,21 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'delegateFactory',
+      name: 'delegate',
       required: true,
     }
   ],
   methods: [
     function estimate(size, sink, skip, limit, order, predicate) {
-      return this.delegateFactory.estimate(size, sink, skip, limit, order, predicate);
+      return this.delegate.estimate(size, sink, skip, limit, order, predicate);
     },
 
     function toPrettyString(indent) {
-      return this.delegateFactory.toPrettyString(indent);
+      return this.delegate.toPrettyString(indent);
     },
     
     function toString() {
-      return '[' + this.cls_.name + ': ' + this.delegateFactory.toString() + ']'
+      return '[' + this.cls_.name + ': ' + this.delegate.toString() + ']'
     }
   ]
 });
@@ -55,7 +55,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegate = this.delegate || this.creator.delegateFactory.createTail();
+      this.delegate = this.delegate || this.creator.delegate.createTail();
     },
     
     function put(o) { return this.delegate.put(o); },
