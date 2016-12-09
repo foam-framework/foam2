@@ -168,7 +168,7 @@ foam.LIB({
      * called in the future. Also known as a 'thunk'.
      */
     function memoize0(f) {
-      console.assert(
+      foam.assert(
         typeof f === 'function',
         'Cannot apply memoize to something that is not a function.');
 
@@ -190,14 +190,14 @@ foam.LIB({
      * with a particular value for its first argument.
      */
     function memoize1(f) {
-      console.assert(
+      foam.assert(
         typeof f === 'function',
         'Cannot apply memoize to something that is not a function.');
 
       var cache = {}, nullCache, undefinedCache;
       return foam.Function.setName(
           function(key) {
-            console.assert(
+            foam.assert(
                 arguments.length === 1,
                 'Memoize1\'ed functions must take exactly one argument.');
 
@@ -236,17 +236,19 @@ foam.LIB({
           toString().
           replace(/(\r\n|\n|\r)/gm,'').
           match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
       }
+
       return match[2] || '';
     },
 
-    function formalArgs(f) {
+    function argNames(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
+       * Ex. argNames(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       args += ',';
@@ -287,7 +289,7 @@ foam.LIB({
      *
      **/
     function withArgs(fn, source, opt_self) {
-      var argNames = foam.Function.formalArgs(fn);
+      var argNames = foam.Function.argNames(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
@@ -355,7 +357,7 @@ foam.LIB({
     {
       name: 'constantize',
       code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
+        foam.assert(typeof str === 'string',
             'Cannot constantize non-string values.');
 
         // switches from from camelCase to CAMEL_CASE
@@ -368,7 +370,7 @@ foam.LIB({
       code: foam.Function.memoize1(function(str) {
         if ( str === '' || str === null ) return '';
 
-        console.assert(typeof str === 'string',
+        foam.assert(typeof str === 'string',
             'Cannot labelize non-string values.');
 
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
@@ -380,7 +382,7 @@ foam.LIB({
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
+        foam.assert(typeof str === 'string',
             'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
@@ -395,7 +397,7 @@ foam.LIB({
        */
       name: 'toSlotName',
       code: foam.Function.memoize1(function toSlotName(key) {
-        console.assert(
+        foam.assert(
             typeof key === 'string',
             'Cannot toSlotName non-string values.');
 
@@ -405,7 +407,7 @@ foam.LIB({
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
-        console.assert(
+        foam.assert(
             typeof str === 'string',
             'Cannot toUpperCase non-string values.');
 
@@ -416,7 +418,7 @@ foam.LIB({
     {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
+        foam.assert(typeof str === 'string',
             'Cannot cssClassize non-string values.');
         // Turns foam.u2.Foo into foam-u2-Foo
         return str.replace(/\./g, '-');
@@ -424,7 +426,7 @@ foam.LIB({
     },
 
     function pad(str, size) {
-      console.assert(typeof str === 'string',
+      foam.assert(typeof str === 'string',
           'Cannot constantize non-string values.');
 
       // Right pads to size if size > 0, Left pads to -size if size < 0
@@ -443,7 +445,7 @@ foam.LIB({
       return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
-      console.assert(typeof a === 'string' && typeof b === 'string',
+      foam.assert(typeof a === 'string' && typeof b === 'string',
           'Cannot startsWithIC non-string values.');
 
       return a.toUpperCase().startsWith(b.toUpperCase());
@@ -678,9 +680,9 @@ foam.LIB({
 
         var type = arg1 && arg1.cls_ && arg1.cls_[uid] ? arg1.cls_ : foam.typeOf(arg1);
         if ( ! opt_defaultMethod ) {
-          console.assert(type, 'Unknown type: ', arg1,
+          foam.assert(type, 'Unknown type: ', arg1,
               'and no default method provided');
-          console.assert(
+          foam.assert(
               type[uid],
               'Missing multi-method for type ', arg1, ' map: ', map,
               'and no deafult method provided');
@@ -722,9 +724,9 @@ foam.LIB({
      * global.some.package.MyClass.
      */
     function registerClass(cls) {
-      console.assert(typeof cls === 'object',
+      foam.assert(typeof cls === 'object',
           'cls must be an object');
-      console.assert(typeof cls.name === 'string' && cls.name !== '',
+      foam.assert(typeof cls.name === 'string' && cls.name !== '',
           'cls must have a non-empty string name');
 
       var pkg = foam.package.ensurePackage(global, cls.package);
@@ -758,7 +760,7 @@ foam.LIB({
         return root;
       }
 
-      console.assert(typeof path === 'string',
+      foam.assert(typeof path === 'string',
           'Cannot make a package path of a non-string');
 
       path = path.split('.');

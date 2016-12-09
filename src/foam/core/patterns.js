@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -51,6 +51,21 @@ foam.CLASS({
   the Multiton Pattern, meaning that calls to create() with
   the same value for the specified 'property', will return the
   same instance.
+
+  Ex.:
+  foam.CLASS({
+    name: 'Color',
+    axioms: [ foam.pattern.Multiton.create({property: 'color'}) ],
+    properties: [ 'color' ],
+    methods: [ function init() { log('Creating Color:', this.color); } ]
+  });
+
+  var red1 = Color.create({color: 'red'});
+  var red2 = Color.create({color: 'red'});
+  var blue = Color.create({color: 'blue'});
+
+  log(red1 === red2); // true, same object
+  log(red1 === blue); // false, different objects
 */
 foam.CLASS({
   package: 'foam.pattern',

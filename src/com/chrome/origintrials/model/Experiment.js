@@ -31,8 +31,9 @@ foam.CLASS({
   ]
 });
 
+
 foam.RELATIONSHIP({
-  name: 'experiment',
+  forwardName: 'experiment',
   cardinality: '*:1',
   sourceModel: 'com.chrome.origintrials.model.Application',
   targetModel: 'com.chrome.origintrials.model.Experiment',

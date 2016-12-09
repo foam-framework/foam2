@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -50,6 +50,10 @@ foam.CLASS({
     },
     {
       name: 'icon'
+    },
+    {
+      class: 'Array',
+      name: 'keyboardShortcuts'
     },
     {
       class: 'String',

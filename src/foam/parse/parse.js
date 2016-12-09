@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -1660,7 +1660,7 @@ foam.CLASS({
 
       this.ps.setString(str);
       var start = this.getSymbol(opt_name);
-      console.assert(start, 'No symbol found for', opt_name);
+      foam.assert(start, 'No symbol found for', opt_name);
 
       var result = start.parse(this.ps, this);
       return result && result.value;

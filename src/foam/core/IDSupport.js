@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -79,8 +79,8 @@ foam.CLASS({
     function installInClass(c) {
       this.props = this.propNames.map(function(n) {
         var prop = c.getAxiomByName(n);
-        foam.__context__.assert(prop, 'Unknown ids property:', c.id + '.' + n);
-        foam.__context__.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
+        foam.assert(prop, 'Unknown ids property:', c.id + '.' + n);
+        foam.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
         return prop;
       });
 
@@ -96,8 +96,8 @@ foam.CLASS({
     {
       name: 'ids',
       postSet: function(_, ids) {
-        this.assert(Array.isArray(ids), 'Ids must be an array.');
-        this.assert(ids.length, 'Ids must contain at least one property.');
+        foam.assert(Array.isArray(ids), 'Ids must be an array.');
+        foam.assert(ids.length, 'Ids must contain at least one property.');
 
         this.axioms_.push(foam.core.MultiPartID.create({propNames: ids}));
       }

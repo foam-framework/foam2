@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -281,7 +281,7 @@ foam.LIB({
           }
 
           if ( foam.core.Method ) {
-            console.assert(a.cls_ !== foam.core.Method,
+            foam.assert(a.cls_ !== foam.core.Method,
               'Method', a.name, 'on', m.name,
               'has already been upgraded to a Method');
 
@@ -314,7 +314,7 @@ foam.LIB({
           }
 
           var type = foam.lookup(a.class, true) || foam.core.Property;
-          console.assert(
+          foam.assert(
               type !== a.cls_,
               'Property', a.name, 'on', m.name,
               'has already been upgraded to a Property.');
@@ -346,7 +346,7 @@ foam.CLASS({
   // Effectively imports the following methods, but imports: isn't available
   // yet, so we add with 'methods:'.
   //
-  // imports: [ 'assert', 'error', 'log', 'warn' ],
+  // imports: [ 'error', 'log', 'warn' ],
 
   methods: [
     /**
@@ -438,8 +438,6 @@ foam.CLASS({
     //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
 
     function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
-
-    function assert(f) { if ( ! f ) (this.__context__ || foam.__context__).assert.apply(null, arguments); },
 
     function error() { this.__context__.error.apply(null, arguments); },
 
@@ -595,7 +593,7 @@ foam.CLASS({
 
       // Walk the arguments, notifying more specific listeners.
       for ( var i = 0 ; i < args.length; i++ ) {
-        var listeners = listeners.children && listeners.children[args[i]];
+        listeners = listeners.children && listeners.children[args[i]];
         if ( ! listeners ) break;
         count += this.notify_(listeners.next, args);
       }
@@ -624,7 +622,7 @@ foam.CLASS({
     function sub() { /* args..., l */
       var l = arguments[arguments.length-1];
 
-      this.assert(typeof l === 'function', 'Listener must be a function');
+      foam.assert(typeof l === 'function', 'Listener must be a function');
 
       var listeners = this.listeners_();
 
@@ -678,8 +676,8 @@ foam.CLASS({
 
       var axiom = this.cls_.getAxiomByName(obj);
 
-      this.assert(axiom, 'Unknown axiom:', obj);
-      this.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
+      foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
+      foam.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
 
       return axiom.toSlot(this);
     },
@@ -761,10 +759,10 @@ foam.CLASS({
      * </pre>
      */
     function diff(other) {
-      var diff = {};
+      var d = {};
 
-      this.assert(other, 'Attempt to diff against null.');
-      this.assert(other.cls_ === this.cls_, 'Attempt to diff objects with different classes.', this, other);
+      foam.assert(other, 'Attempt to diff against null.');
+      foam.assert(other.cls_ === this.cls_, 'Attempt to diff objects with different classes.', this, other);
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
@@ -776,15 +774,15 @@ foam.CLASS({
         if ( Array.isArray(value) ) {
           var subdiff = foam.Array.diff(value, otherVal);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
-            diff[property.name] = subdiff;
+            d[property.name] = subdiff;
           }
         } else if ( ! foam.util.equals(value, otherVal) ) {
           // if the primary value is undefined, use the compareTo of the other
-          diff[property.name] = otherVal;
+          d[property.name] = otherVal;
         }
       }
 
-      return diff;
+      return d;
     },
 
     /**

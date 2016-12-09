@@ -85,15 +85,15 @@ foam.CLASS({
         call(this.formatter).
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
-          var e = this.E('div');
-          e.select(this.data[self.relationship.name], function(obj) {
+          var e2 = this.E('div');
+          e2.select(this.data[self.relationship.forwardName], function(obj) {
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
               relationship: self.relationship
             }, this);
           });
-          return e;
+          return e2;
         }, this.expanded$));
     }
   ],
@@ -132,7 +132,7 @@ foam.CLASS({
       var dao  = this.__context__[this.relationship.targetDAOKey];
       dao.find(id).then(function(obj) {
         dao.remove(obj).then(function() {
-          self.data[self.relationship.name].put(obj).then(function(obj) {
+          self.data[self.relationship.forwardName].put(obj).then(function(obj) {
             self.onObjDrop(obj, id);
           });
         });

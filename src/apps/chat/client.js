@@ -267,11 +267,11 @@ client.messageDAO.select().then(function(a) {
   a.a.map(onMessage);
 });
 
-client.messageDAO.on.put.sub(function(s, _, _, m) {
+client.messageDAO.on.put.sub(function(s, _, __, m) {
   onMessage(m);
 });
 
-client.messageDAO.on.remove.sub(function(s, _, _, m) {
+client.messageDAO.on.remove.sub(function(s, _, __, m) {
   confirmedMsgs.onRemove(m);
 });
 

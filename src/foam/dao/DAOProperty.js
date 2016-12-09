@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -25,7 +25,7 @@ foam.CLASS({
   documentation: 'Property for storing a reference to a DAO.',
 
   properties: [
-    [ 'view', 'foam.u2.DAOListView' ]
+    [ 'view', 'foam.u2.DAOList' ]
   ],
 
   methods: [
@@ -40,7 +40,7 @@ foam.CLASS({
           var proxy = prop.ProxyDAO.create({delegate: this[name]});
           this[name + '$proxy'] = proxy;
 
-          this.sub('propertyChange', name, function(_, _, _, s) {
+          this.sub('propertyChange', name, function(_, __, ___, s) {
             proxy.delegate = s.get();
           });
 

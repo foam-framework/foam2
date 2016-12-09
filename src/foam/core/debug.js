@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -50,7 +50,7 @@ foam.CLASS({
 
   methods: [
     function validate() {
-      this.assert(
+      foam.assert(
         ! this.isMerged || ! this.isFramed,
         "Listener can't be both isMerged and isFramed: ",
         this.name);
@@ -67,7 +67,7 @@ foam.CLASS({
     function validate(model) {
       this.SUPER();
 
-      this.assert(
+      foam.assert(
           ! this.name.endsWith('$'),
           'Illegal Property Name: Can\'t end with "$": ', this.name);
 
@@ -98,15 +98,15 @@ foam.CLASS({
         var expression = this.expression;
         var pName = cls.id + '.' + this.name + '.expression: ';
 
-        var argNames = foam.Function.formalArgs(expression);
+        var argNames = foam.Function.argNames(expression);
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);
 
-          this.assert(
+          foam.assert(
               axiom,
               'Unknown argument "', name, '" in ', pName, expression);
-          this.assert(
+          foam.assert(
               axiom.toSlot,
               'Non-Slot argument "', name, '" in ', pName, expression);
         }
@@ -116,7 +116,7 @@ foam.CLASS({
 });
 
 
-foam.__context__.assert(
+foam.assert(
     ! foam.core.FObject.describe,
     'foam.core.FObject.describe already set.');
 
@@ -147,7 +147,7 @@ foam.core.FObject.installModel = function() {
     for ( var i = 0 ; i < m.axioms_.length ; i++ ) {
       var a = m.axioms_[i];
 
-      foam.__context__.assert(
+      foam.assert(
         ! names.hasOwnProperty(a.name),
         'Axiom name conflict in', m.id || m.refines, ':', a.name);
 
@@ -194,6 +194,7 @@ foam.core.FObject.installModel = function() {
 }();
 
 foam.core.FObject.validate = function() {
+  // TODO: Why doesn't this call super or also validateInstance?
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     a.validateClass && a.validateClass(this);
@@ -225,7 +226,7 @@ if ( false && global.Proxy ) {
           return Reflect.get(target, prop, receiver);
         },
         set: function(target, prop, value, receiver) {
-          foam.__context__.assert(
+          foam.assert(
               IGNORE[prop] || target.cls_.getAxiomByName(
                 prop.endsWith('$') ? prop.substring(0, prop.length-1) : prop),
               'Invalid Set: ', target.cls_.id, prop, value);
@@ -329,91 +330,6 @@ foam.CLASS({
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
 
 
-/** Describes one argument of a function or method. */
-foam.CLASS({
-  package: 'foam.core',
-  name: 'Argument',
-
-  constants: {
-    PREFIX: 'Argument',
-  },
-
-  properties: [
-    {
-      /** The name of the argument */
-      name: 'name'
-    },
-    {
-      /**
-        The string name of the type
-        (either a model name or javascript typeof name)
-      */
-      name: 'typeName'
-    },
-    {
-      /** If set, this holds the actual Model represented by typeName. */
-      name: 'type'
-    },
-    {
-      /** If true, indicates that this argument is optional. */
-      name: 'optional', value: false
-    },
-    {
-      /** If true, indicates a variable number of arguments. */
-      name: 'repeats', value: false
-    },
-    {
-      /** The index of the argument (the first argument is at index 0). */
-      name: 'index', value: -1
-    },
-    {
-      /** The documentation associated with the argument (denoted by a // ) */
-      name: 'documentation', value: ''
-    }
-  ],
-
-  methods: [
-    /**
-      Validates the given argument against this type information.
-      If any type checks are failed, a TypeError is thrown.
-     */
-    function validate(/* any // the argument value to validate. */ arg) {
-      i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
-
-      // optional check
-      if ( ( ! arg ) && typeof arg === 'undefined' ) {
-        if ( ! this.optional ) {
-          throw new TypeError(
-              this.PREFIX + i + this.name +
-              ', is not optional, but was undefined in a function call');
-        } else {
-          return; // value is undefined, but ok with that
-        }
-      }
-
-      // type this for non-modelled types (no model, but a type name specified)
-      if ( ! this.type ) {
-        if ( this.typeName
-            && typeof arg !== this.typeName
-            && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
-          throw new TypeError(
-              this.PREFIX + i + this.name +
-              ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
-        } // else no this: no type, no typeName
-      } else {
-        // have a modelled type
-        if ( ! this.type.isInstance(arg) ) {
-          var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
-          throw new TypeError(
-              this.PREFIX + i + this.name +
-              ', expected type ' + this.typeName + ' but passed ' + gotType);
-        }
-      }
-    }
-  ]
-});
-
-
 /** Describes a function return type. */
 foam.CLASS({
   package: 'foam.core',
@@ -427,77 +343,11 @@ foam.CLASS({
 
 
 /** The types library deals with type safety. */
+// ???: Should this go in foam.Function along with formalArgs() and be renamed just functionArgs?
 foam.LIB({
   name: 'foam.types',
 
   methods: [
-    function getFunctionArgs(fn) {
-      /** Extracts the arguments and their types from the given function.
-        * @arg fn The function to extract from. The toString() of the function
-        *     must be accurate.
-        * @return An array of Argument objects.
-        */
-      // strip newlines and find the function(...) declaration
-      var args = foam.Function.argsStr(fn);
-      if ( ! args ) return [];
-      args += ','; // easier matching
-
-      var ret = [];
-      // check each arg for types
-      // Optional commented type(incl. dots for packages), argument name,
-      // optional commented return type
-      // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
-      //console.log('-----------------');
-      var argIdx = 0;
-      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?(\*)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
-      var typeMatch;
-      while ( typeMatch = argMatcher.exec(args) ) {
-        // if can't match from start of string, fail
-        if ( argIdx == 0 && typeMatch.index > 0 ) break;
-
-        if ( ret.returnType ) {
-          throw new SyntaxError("foam.types.getFunctionArgs return type '" +
-            ret.returnType.typeName +
-            "' must appear after the last argument only: " + args.toString());
-        }
-
-        // record the argument
-        ret.push(foam.core.Argument.create({
-          name:          typeMatch[7],
-          typeName:      typeMatch[2],
-          type:          global[typeMatch[2]],
-          optional:      typeMatch[3] == '?',
-          repeats:       typeMatch[3] == '*',
-          index:         argIdx++,
-          documentation: typeMatch[6],
-        }));
-        // if present, record return type (if not the last arg, we fail on the
-        // next iteration)
-        if ( typeMatch[9] ) {
-          ret.returnType = foam.core.ReturnValue.create({
-            typeName: typeMatch[9],
-            type: global[typeMatch[9]]
-          });
-        }
-      }
-      if ( argIdx == 0 ) {
-        // check for bare return type with no args
-        typeMatch = args.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
-        if ( typeMatch && typeMatch[1] ) {
-          ret.returnType = foam.core.ReturnValue.create({
-            typeName: typeMatch[1],
-            type: global[typeMatch[1]]
-          });
-        } else {
-          throw new SyntaxError(
-              'foam.types.getFunctionArgs argument parsing error: ' +
-              args.toString());
-        }
-      }
-
-      return ret;
-    },
-
     /** Decorates the given function with a runtime type checker.
       * Types should be denoted before each argument:
       * <code>function(\/\*TypeA\*\/ argA, \/\*string\*\/ argB) { ... }</code>
@@ -513,7 +363,7 @@ foam.LIB({
       */
     function typeCheck(fn) {
       // parse out the arguments and their types
-      var args = foam.types.getFunctionArgs(fn);
+      var args = foam.Function.args(fn);
       var ret = function() {
         // check each declared argument, arguments[i] can be undefined for
         // missing optional args, extra arguments are ok
@@ -545,6 +395,8 @@ foam.LIB({
   ]
 });
 
+
+// Access Import now to avoid circular reference because of lazy model building.
 foam.core.Import;
 
 foam.CLASS({
@@ -560,7 +412,7 @@ foam.CLASS({
 
         if ( imp.required && ! this.__context__[imp.key + '$'] ) {
           var m = 'Missing required import: ' + imp.key + ' in ' + this.cls_.id;
-          this.assert(false, m);
+          foam.assert(false, m);
         }
       }
     }
@@ -579,7 +431,7 @@ foam.CLASS({
           var m = 'Import name "' + n + '" must be a valid variable name.';
           if ( n.indexOf('.') !== -1 ) m += ' Did you mean requires:?';
 
-          this.assert(false, m);
+          foam.assert(false, m);
         }
       }
     }
@@ -596,24 +448,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  refines: 'foam.core.Export',
-
-  properties: [
-    {
-      name: 'name',
-      assertValue: function(n) {
-        if ( ! /^[a-zA-Z][a-zA-Z0-9_]*?$/.test(n) ) {
-          var m = 'Export name "' + n + '" must be a valid variable name.';
-          this.assert(false, m);
-        }
-      }
-    }
-  ]
-});
-
 
 foam.CLASS({
   refines: 'foam.core.FObject',

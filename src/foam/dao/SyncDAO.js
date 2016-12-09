@@ -223,7 +223,7 @@ foam.CLASS({
             var deleted = record.deleted;
 
             if ( deleted ) {
-              var obj = self.of.create();
+              var obj = self.of.create(undefined, self);
               obj.id = id;
               self.remoteDAO.remove(obj);
             } else {

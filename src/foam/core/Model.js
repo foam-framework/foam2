@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -26,6 +26,7 @@ foam.CLASS({
     {
       name: 'id',
       hidden: true,
+      transient: true,
       getter: function() {
         return this.package ? this.package + '.' + this.name : this.name;
       }

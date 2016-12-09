@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -96,7 +96,7 @@ foam.CLASS({
           super_();
         }
       } else {
-        this.assert(foam.core.AbstractMethod.isInstance(superMethod_),
+        foam.assert(foam.core.AbstractMethod.isInstance(superMethod_),
           'Attempt to override non-method', this.name, 'on', proto.cls_.id);
 
         // Fetch the super method from the proto, as the super method axiom
