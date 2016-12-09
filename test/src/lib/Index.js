@@ -866,7 +866,7 @@ describe('AutoIndex', function() {
 
   beforeEach(function() {
     idx = foam.dao.index.AutoIndex.create({
-      idIndexFactory: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
+      idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
     });
 
     idxInstance = idx.createNode();

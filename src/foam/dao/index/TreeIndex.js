@@ -138,7 +138,8 @@ foam.CLASS({
   
   properties: [
     {
-      name: 'prop'
+      name: 'prop',
+      required: true
     },
     {
       name: 'nullNode',
@@ -157,7 +158,8 @@ foam.CLASS({
       }
     },
     {
-      name: 'tail'
+      name: 'tail',
+      required: true
     }
   ],
   
