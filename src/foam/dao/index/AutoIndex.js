@@ -46,22 +46,22 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'delegateFactory',
+      name: 'delegate',
       factory: function() {
-        return this.AltIndex.create({ delegateFactories: [ this.idIndexFactory ] });
+        return this.AltIndex.create({ delegates: [ this.idIndexFactory ] });
       }
     }
   ],
 
   methods: [
     function estimate(size, sink, skip, limit, order, predicate) {
-      return this.delegateFactory.estimate(size, sink, skip, limit, order, predicate);
+      return this.delegate.estimate(size, sink, skip, limit, order, predicate);
     },
 
     function toPrettyString(indent) {
       var ret = "";
       ret = "  ".repeat(indent) + "Auto(" + this.$UID + ")\n";
-      ret += this.delegateFactory.toPrettyString(indent + 1);
+      ret += this.delegate.toPrettyString(indent + 1);
       return ret;
     }
 
@@ -204,7 +204,7 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
     },
 
     function toString() {
-      return 'AutoIndex(' + (this.creator || this).delegateFactory.toString() + ')';
+      return 'AutoIndex(' + (this.creator || this).delegate.toString() + ')';
     },
 
   ]

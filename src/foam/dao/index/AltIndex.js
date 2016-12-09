@@ -42,25 +42,25 @@ foam.CLASS({
   properties: [
     {
       /** delegate factories */
-      name: 'delegateFactories',
+      name: 'delegates',
       factory: function() { return []; }
     },
     {
       /** factory quick lookup */
-      name: 'delegateFactoryMap_',
+      name: 'delegateMap_',
       factory: function() { return {}; }
     },
   ],
 
   methods: [
 
-    /** Returns smallest estimate from the delegateFactories */
+    /** Returns smallest estimate from the delegates */
     function estimate(size, sink, skip, limit, order, predicate) {
       var cost = Number.MAX_VALUE;
-      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
+      for ( var i = 0; i < this.delegates.length; i++ ) {
         cost = Math.min(
           cost,
-          this.delegateFactories[i].estimate(
+          this.delegates[i].estimate(
             size, sink, skip, limit, order, predicate)
         );
       }
@@ -69,14 +69,14 @@ foam.CLASS({
 
     function toPrettyString(indent) {
       var ret = "";
-      for ( var i = 0; i < this.delegateFactories.length; i++ ) {
-          ret += this.delegateFactories[i].toPrettyString(indent + 1);
+      for ( var i = 0; i < this.delegates.length; i++ ) {
+          ret += this.delegates[i].toPrettyString(indent + 1);
       }
       return ret;
     },
     
     function toString() {
-      return 'Alt([' + (this.delegateFactories.join(',')) + '])';
+      return 'Alt([' + (this.delegates.join(',')) + '])';
     },
   ]
 });
@@ -96,15 +96,15 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegates = this.delegates || [ this.creator.delegateFactories[0].createTail() ];
+      this.delegates = this.delegates || [ this.creator.delegates[0].createTail() ];
     },
 
     function addIndex(index) {
       // check for existing factory
-      var dfmap = this.creator.delegateFactoryMap_;
+      var dfmap = this.creator.delegateMap_;
       var indexKey = index.toString();
       if ( ! dfmap[indexKey] ) {
-        this.creator.delegateFactories.push(index);
+        this.creator.delegates.push(index);
         dfmap[indexKey] = index;
       } else {
         // ensure all tails are using the same factory instance
@@ -140,7 +140,7 @@ foam.CLASS({
       // for each factory for this ordering
       if ( ! c ) {
         var nullSink = this.creator.NullSink.create();
-        var dfs = this.creator.delegateFactories;
+        var dfs = this.creator.delegates;
         var bestEst = Number.MAX_VALUE;
         // Pick the best factory for the ordering, cache it
         for ( var i = 0; i < dfs.length; i++ ) {
@@ -208,7 +208,7 @@ foam.CLASS({
     function size() { return this.delegates[0].size(); },
 
     function toString() {
-      return 'Alt([' + (this.creator.delegateFactories.join(',')) + this.size() + '])';
+      return 'Alt([' + (this.creator.delegates.join(',')) + this.size() + '])';
     },
   ]
 });

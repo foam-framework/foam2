@@ -523,7 +523,7 @@ describe('TreeIndex', function() {
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.STRING,
       tailFactory: foam.dao.index.AltIndex.create({
-        delegateFactories: [
+        delegates: [
           test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
           test.Indexable.INT.toIndex(
             test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
@@ -749,7 +749,7 @@ describe('AltIndex', function() {
   beforeEach(function() {
     data = createData2();
     idx = foam.dao.index.AltIndex.create({
-      delegateFactories: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
+      delegates: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
     }).createTail();
     var fakeRoot = {
       size: function() { return 1; },
