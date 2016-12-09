@@ -269,7 +269,8 @@ foam.CLASS({
     function createChildMethod_(child) {
       var m = child.clone();
       m.returns = this.returns;
-      m.args = this.args;
+      // Avoid forcing arguments to be parsed if they haven't already been
+      m.args = this.hasOwnProperty('args') ? this.args : [];
       m.javaReturns = this.javaReturns;
       m.sourceCls_ = child.sourceCls_;
       return m;

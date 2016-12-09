@@ -46,10 +46,12 @@ foam.CLASS({
     'type'
   ],
 
-  templates: [
-    function CSS() {/*
-      ^:read-only { border-width: 0; }
-    */}
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^:read-only { border-width: 0; }
+      */}
+    })
   ],
 
   methods: [

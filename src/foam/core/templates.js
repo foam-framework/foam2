@@ -55,7 +55,7 @@ foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
 
-  axioms: [foam.pattern.Singleton.create()],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   requires: [
     'foam.parse.ImperativeGrammar as Grammar'
@@ -111,7 +111,9 @@ foam.CLASS({
             }
           }
         });
+
         var self = this;
+
         g.addActions({
           markup: function(v) {
             var wasSimple = self.simple;
@@ -174,8 +176,8 @@ foam.CLASS({
       if ( ! result ) throw "Error parsing template " + name;
 
       var code = this.HEADER +
-          ( result[0] ? t : result[1] )
-          + this.FOOTER;
+          ( result[0] ? t : result[1] ) +
+          this.FOOTER;
 
       var newArgs = ['opt_outputter'].concat(args);
       var f = eval(

@@ -69,7 +69,7 @@ foam.CLASS({
       var args = [];
       var ps   = obj.cls_.getAxiomsByClass(foam.core.Property).
         filter(function(a) { return a.validateObj; });
-      
+
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
         args.push(obj.slot(p.validateObj));
@@ -77,13 +77,13 @@ foam.CLASS({
 
       function validateObject() {
         var ret;
-        
+
         for ( var i = 0 ; i < ps.length ; i++ ) {
           var p = ps[i];
           var err = args[i].get();
           if ( err ) (ret || (ret = [])).push([p, err]);
         }
-        
+
         return ret;
       }
 

@@ -135,7 +135,6 @@ TODO(adamvy):
  * issue.status === IssueStatus.ASSIGNED; // is true
  * </pre>
  */
-
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'EnumValue',

@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+/**
+ * Event listener utilities.
+ */
 foam.LIB({
   name: 'foam.events',
 

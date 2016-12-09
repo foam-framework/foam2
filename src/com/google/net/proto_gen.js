@@ -24,14 +24,23 @@ var fs = require('fs');
 var path = require('path');
 /* globals process */
 
-// Usage: output file is argv[2], input .proto files in argv[3+].
+// Usage: node this-file [--whitelist foo,bar,baz] outfile protofiles...
 var parser = foam.lookup('com.google.net.ProtobufParser').create();
 
+var whitelist = null;
+var outIndex = 2;
+if ( process.argv[2] === '--whitelist' ) {
+  outIndex = 4;
+  whitelist = process.argv[3].split(',');
+}
+
 // Expects the input filename to be on the command line.
-var outfile = process.argv[2];
+var outfile = process.argv[outIndex];
+
+console.log('whitelist = ' + whitelist);
 
 var files = {};
-for ( var i = 3 ; i < process.argv.length ; i++ ) {
+for ( var i = outIndex + 1 ; i < process.argv.length ; i++ ) {
   if ( process.argv[i].endsWith('.proto') ) {
     console.log(process.argv[i]);
     files[process.argv[i]] =
@@ -40,13 +49,6 @@ for ( var i = 3 ; i < process.argv.length ; i++ ) {
 }
 
 // TODO(braden): Oneof is not handled by the generated methods.
-
-// TODO(braden): Request objects provide parameters to the GET request, so need
-// to unpack those to get types for the HTTPMethod to generate:
-// - RequestObj.proj_id > provides proj_id to > /v1/project/{proj_id}:byId
-// - gen.ListProjects(PType proj_id) gets PType from RequestObj, otherwise
-//     passes the parameter into the path as normal at runtime.
-
 
 var url = require('url');
 
@@ -118,6 +120,7 @@ function getTypedThing(name, prop, pkg, parent) {
     };
   }
 
+  // TODO: plain array for primitive repeats?
   if ( prop.repeated ) {
     p.class = 'foam.core.FObjectArray';
     p.of = ofName;
@@ -146,6 +149,7 @@ function processFields(model, message, pkg) {
     var capName = foam.String.capitalize(camelName);
     var p = getTypedThing(camelName, prop, pkg, message);
 
+    // TODO: plain arrays for primitive repeats?
     if ( p.class === 'foam.core.FObjectArray' ) {
       p.factory = function() { return []; };
       model.methods.push({
@@ -180,63 +184,215 @@ function processFields(model, message, pkg) {
   }
 }
 
-function getServiceMethods(service) {
+function getServiceMethods(service, pkg) {
   var ret = [];
   if ( ! service.rpcs ) return ret;
 
-  function getFactory(path) {
+  // TODO: refactor into smaller chunks
+  function generateRPC(requestType, responseType, options) {
+    var method =
+      options.value.get ? 'GET' :
+      options.value.post? 'POST':
+      options.value.delete ? 'DELETE':
+      options.value.put ? 'PUT':
+      options.value.patch ? 'PATCH' : 'CUSTOM';
+    var path =
+      options.value.get ||
+      options.value.post ||
+      options.value.delete ||
+      options.value.put ||
+      options.value.patch ||
+      options.value.custom;
+
+    // in build mode, add fields to the body instead of the query params
+    var bodyBuilderMode = ( options.value.body === '*' );
+    var bodyKey = bodyBuilderMode ? undefined : options.value.body;
+
+    var reqType = foam.lookup(requestType);
+    var reqProps = reqType.getAxiomsByClass(foam.core.Property);
+
+    var respType = foam.lookup(responseType);
+
+    // identify parameter names
+    var fieldNames = Object.create(null);
+    var repeatedNames = Object.create(null);
+    reqProps.forEach(function(prop) {
+      if ( foam.core.FObjectProperty.isInstance(prop) ) {
+        // A sub-message?
+        var subType = foam.lookup(prop.of);
+        subType.getAxiomsByClass(foam.core.Property).forEach(function(subProp) {
+          // if a model type, but not an Enum, don't include it, since we
+          // can't use it for path/{replacement}/ or query params
+          if ( foam.core.FObjectProperty.isInstance(subProp)
+              || foam.core.FObjectArray.isInstance(subProp) ) {
+            var subSubType = foam.lookup(subProp.of, true);
+            if ( subSubType &&
+                 ! foam.core.EnumModel.isInstance(subSubType.model_) ) {
+              return;
+            }
+          }
+          // Field name becomes "thing.subField"
+          fieldNames[prop.name + '.' + subProp.name] = subProp;
+        });
+      } else if ( foam.core.FObjectArray.isInstance(prop) ) { // TODO: plain array?
+        // Can't use a repeated field in the path
+        repeatedNames[prop.name] = prop;
+      } else {
+        // TODO: assert prop is be a primitive type
+        fieldNames[prop.name] = prop;
+      }
+    });
+
+    // Remove bodyKey from fieldNames, if set, since it is used
+    // as the body content, never a query parameter
+    if ( bodyKey ) {
+      // assert !repeatedNames[bodyKey];
+      delete fieldNames[bodyKey];
+    }
+
+
+    // Call req(name) when outputting field names into the output function
+    var req = function toRequestParamName(fieldName) {
+      // this is for outputting a function that takes
+      // a request object as its single argument. Each
+      // field is accessed as a property of the req object:
+      return 'req.' + fieldName;
+    };
+
+    // scan path to find path parameters
+    var pathFieldNames = [];
+    var matches;
+    var pathRE = /\{(.*?)\}/g;
+    var pathOutput = path ? '\'' + path + '\'' : '\'\'';
+    pathOutput = pathOutput.replace(pathRE, function(match, p_name) {
+      var pname = foam.String.camelize(p_name);
+      if ( fieldNames[pname] ) {
+        // move name to path names list
+        pathFieldNames.push(pname);
+        delete fieldNames[pname];
+      } else {
+        if ( repeatedNames[pname] ) {
+          throw "proto_gen: Can't use repeated field in path: " + pname;
+        }
+        throw "proto_gen: Undefined field \"" + pname + "\" in path: " +
+          path + " -- Request: " + reqType.toString() + "[" + reqProps + "]";
+      }
+      // replace the {name} with code output ' + req.name + '
+      return '\' + ' + req(pname) + '.toString() + \'';
+    });
+    var indent = '        ';
+    // create url and body builder code
+    // TODO: generalize this
+    var urlBuilder = indent + 'var path = this.mobilesdkBaseUrl + ' + pathOutput + ';\n';
+    var bodyBuilder = '';
+    var paramsBuilder = '';
+
+    // Add query params. Primitive fields and repeated fields are valid.
+    if ( ! bodyBuilderMode ) {
+      paramsBuilder = indent + 'var params = {\n';
+
+      // output each field as a query param
+      for ( var fname in fieldNames ) {
+        paramsBuilder += indent + '  \"' + fname + '\": ' + req(fname) + '.toString(),\n';
+      }
+      // output each array, gapi.client.request params arg will handle it
+      for ( var fname in repeatedNames ) {
+        paramsBuilder += indent + '  \"' + fname + '\": ' + req(fname) + '.toString(),\n';
+      }
+      paramsBuilder += indent + '};\n';
+
+      // assign body if required
+      if ( bodyKey ) {
+        // TODO: outputter to stringify this object
+        bodyBuilder = indent + 'var body = ' + req(bodyKey) + ';\n';
+      }
+      // else bodyBuilder empty
+    } else {
+      // Build the body content from the remaining fields
+
+      // Since we have a request object with all the fields in it,
+      // remove the ones we used already and pass it along.
+      bodyBuilder = indent + 'var body = { __proto__: req,\n';
+      pathFieldNames.forEach(function(pname) {
+        bodyBuilder += indent + '  ' + pname + ': undefined,\n';
+      });
+      bodyBuilder += indent + '};\n';
+      bodyBuilder += indent + 'body = this.OUTPUTTER.stringify(body);\n';
+    }
+    urlBuilder += '\n';
+
+    // create the generated rpc function
+    var fstr = 'function(req) {\n' +
+          urlBuilder +
+          bodyBuilder +
+          paramsBuilder +
+          // TODO: generalize this
+          indent + 'return this.mobilesdkBackendService.sendGapiRequest({\n' +
+          indent + '  method: \'' + method + '\',\n' +
+          indent + '  path: path,\n' +
+          (bodyBuilder ? indent + '  body: body,\n' : '') +
+          (paramsBuilder ? indent + '  params: params,\n' : '') +
+          indent + '});\n' +
+          '      }\n';
     var f = function() {};
     f.toString = function() {
-      return 'function() {\n' +
-          '  return this.mobilesdkBackendService.sendGapiRequest({\n' +
-          '    method: \'GET\',\n' +
-          '    path: this.mobilesdkBaseUrl + \'' +
-                  path + '\'\n' +
-          '  });\n' +
-          '}\n';
+      return fstr;
     };
     return f;
-  }
+  };
 
-  function postFactory(path) {
-    var f = function() {};
-    f.toString = function() {
-      return 'function(body) {\n' +
-          '  return this.mobilesdkBackendService.sendGapiRequest({\n' +
-          '    method: \'POST\',\n' +
-          '    path: this.mobilesdkBaseUrl + \'' +
-                  path + '\',\n' +
-          '    body: body\n' +
-          '  });\n' +
-          '}\n';
-    };
-    return f;
-  }
-
+  var pkgPrefix = pkg ? pkg + '.' : '';
   for ( var i = 0; i < service.rpcs.length; i++ ) {
     var m = service.rpcs[i];
 
+    // add current package if no package specified on request/response types
+    var reqType = m.requestType.indexOf('.') < 0 ?
+      pkgPrefix + m.requestType : m.requestType;
+    var respType = m.responseType.indexOf('.') < 0 ?
+      pkgPrefix + m.responseType : m.responseType;
+
     for ( var j = 0; j < m.options.length; j++ ) {
       if ( m.options[j].name === 'google.api.http' ) {
-        if ( m.options[j].value.get ) {
-          ret.push({
-            name: m.name,
-            code: getFactory(m.options[j].value.get)
-          });
-        } else if ( m.options[j].value.post ) {
-          ret.push({
-            name: m.name,
-            code: postFactory(m.options[j].value.post)
-          });
-        }
+        ret.push({
+          name: m.name,
+          code: generateRPC(reqType, respType, m.options[j])
+        });
       }
     }
   }
   return ret;
 }
 
+function getServiceMappings(service, pkg) {
+  var ret = {
+    REQUEST_TYPES: {},
+    RESPONSE_TYPES: {}
+  };
+
+  if ( ! service.rpcs ) return ret;
+
+  var pkgPrefix = pkg ? pkg + '.' : '';
+  for ( var i = 0; i < service.rpcs.length; i++ ) {
+    var m = service.rpcs[i];
+
+    var reqType = m.requestType.indexOf('.') < 0 ?
+      pkgPrefix + m.requestType : m.requestType;
+    var respType = m.responseType.indexOf('.') < 0 ?
+      pkgPrefix + m.responseType : m.responseType;
+
+    for ( var j = 0; j < m.options.length; j++ ) {
+      ret.REQUEST_TYPES[m.name] = reqType;
+      ret.RESPONSE_TYPES[m.name] = respType;
+    }
+  }
+  return ret;
+}
+
 function outputModel(pkg, name) {
-  var m = foam.lookup(pkg + '.' + name);
+  var id = pkg + '.' + name;
+  if ( ! checkWhitelist(id) ) return;
+
+  var m = foam.lookup(id);
 
   pkg = pkg.replace(/\./g, '/');
 
@@ -248,81 +404,30 @@ function outputModel(pkg, name) {
 
   foam.json.Pretty.outputDefaultValues = false;
 
-  o += '(function() { var c = window.foam.json.parse(';
+  o += ( foam.core.EnumModel.isInstance(m.model_) ) ? 'window.foam.ENUM(' : 'window.foam.CLASS(';
   o += foam.json.Pretty.stringify(m.model_);
-  o += ').buildClass(); window.foam.register(c); ' +
-      'window.foam.package.registerClass(c); })();\n\n';
+  o += ');\n\n';
 
   fs.appendFileSync(outfile, o);
 }
 
 function outputServiceExporter(services, pkg, baseUrl) {
+  // TODO: services as singletons, eliminate this exporter
+
+
+  // Need to force the service exporter onto the whitelist, if one exists.
+  if ( whitelist ) {
+    whitelist.push('serviceExporters');
+  }
+
   var u = baseUrl;
 
   var requires = [];
   var exports = [];
   var imports = [];
-  var properties = [
-    {
-      name: 'hostname',
-      value: u.hostname
-    },
-    {
-      name: 'path',
-      value: u.path
-    },
-    {
-      name: 'port',
-      value: u.port
-    },
-    {
-      name: 'protocol',
-      value: u.protocol
-    },
-    {
-      name: 'headers'
-    },
-    {
-      name: 'responseType',
-      value: 'json'
-    },
-    'oauth2ClientId',
-    'oauth2CookiePolicy',
-    'oauth2Scopes',
-    {
-      class: 'Class',
-      name: 'requestClass',
-      factory: function() { return this.GoogleOAuth2XHRHTTPRequest; }
-    }
-  ];
+  var properties = [];
 
-  // http request factory
-  requires.push('com.google.net.GoogleOAuth2XHRHTTPRequest');
-  exports.push('HTTPRequestFactory');
-  properties.push({
-    name: 'HTTPRequestFactory',
-    factory: function() {
-      var self = this;
-      return function(opt_args, opt_X) {
-        // TODO: locked into one kind of auth.
-        var ret = self.requestClass.create({
-          hostname: self.hostname,
-          path: self.path,
-          port: self.port,
-          protocol: self.protocol,
-          headers: self.headers,
-          responseType: self.responseType,
-
-          clientId: self.oauth2ClientId,
-          cookiePolicy: self.oauth2CookiePolicy,
-          scopes: self.oauth2Scopes
-        }, opt_X);
-        if ( opt_args ) ret.copyFrom(opt_args);
-        return ret;
-      };
-    }
-  });
-
+  // TODO: generalize this
   properties.push({ name: 'mobilesdkBackendService' });
   exports.push('mobilesdkBackendService');
   properties.push({ name: 'mobilesdkBaseUrl' });
@@ -353,12 +458,30 @@ function outputServiceExporter(services, pkg, baseUrl) {
 
 }
 
+function getServiceProperties(service, pkg) {
+  return [
+    {
+      name: 'OUTPUTTER',
+      factory: function() {
+        return {
+          __proto__: window.foam.json.Strict,
+          outputDefaultValues: false,
+          outputClassNames: false
+        };
+      }
+    }
+  ];
+}
+
 function readService(pkg, service, services) {
   var newModel = {
     package: pkg,
     name: service.name,
+    // TODO: generalize this
     imports: [ 'mobilesdkBaseUrl', 'mobilesdkBackendService' ],
-    methods: getServiceMethods(service)
+    methods: getServiceMethods(service, pkg),
+    constants: getServiceMappings(service, pkg),
+    properties: getServiceProperties(service, pkg)
   };
 
   foam.CLASS(newModel);
@@ -369,6 +492,7 @@ function readService(pkg, service, services) {
 
 function apiToModels(proto) {
   var services = [];
+  // pass one loads models
   for ( var file in proto ) {
     var pkg = '';
     for ( var i = 0; i < proto[file].length; i++ ) {
@@ -378,23 +502,47 @@ function apiToModels(proto) {
         if ( p.node === 'package' ) {
           pkg = pkg || p.value;
         } else {
-          readBlock(pkg, p, services);
+          readBlockMessagesOnly(pkg, p, services);
         }
       }
     }
   }
 
+  // pass two loads services
+  for ( var file in proto ) {
+    var pkg = '';
+    for ( var i = 0; i < proto[file].length; i++ ) {
+      var p = proto[file][i];
+      // ignore arrays and null
+      if ( foam.Object.isInstance(p) && p !== null ) {
+        if ( p.node === 'package' ) {
+          pkg = pkg || p.value;
+        } else {
+          readBlockNotMessage(pkg, p, services);
+        }
+      }
+    }
+  }
+
+  // TODO: generalize this
   outputServiceExporter(services, 'serviceExporters',
       url.parse('https://test-mobilesdk-pa.sandbox.googleapis.com'));
 }
 
-function readBlock(pkg, ast, services) {
+function readBlockNotMessage(pkg, ast, services) {
+  switch ( ast.node ) {
+    case 'service':
+      readService(pkg, ast, services);
+      break;
+    default:
+      break;
+  }
+}
+
+function readBlockMessagesOnly(pkg, ast, services) {
   switch ( ast.node ) {
     case 'message':
       readMessage(pkg, ast);
-      break;
-    case 'service':
-      readService(pkg, ast, services);
       break;
     case 'enum':
       readEnum(pkg, ast);
@@ -497,12 +645,14 @@ function buildEnum(enuma) {
   };
 }
 
+function checkWhitelist(id) {
+  if ( ! whitelist ) return true;
 
-fs.appendFileSync(outfile, 'goog.provide("proto.gen");\n\n' +
-    'var __foam_loaded = false;\n' +
-    'function prepareFOAM() {\n' +
-    'if (__foam_loaded) return;\n' +
-    '__foam_loaded = true;\n')
+  for ( var i = 0; i < whitelist.length; i++ ) {
+    if ( id.startsWith(whitelist[i]) ) return true;
+  }
+  return false;
+}
+
 apiToModels(files);
-fs.appendFileSync(outfile, '\n}\n');
 
