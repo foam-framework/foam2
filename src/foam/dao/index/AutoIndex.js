@@ -76,13 +76,13 @@ foam.CLASS({
 
   methods: [
     function addPropertyIndex(prop, root) {
-      this.addIndex(prop.toIndex(this.progenitor.cls_.create({
-        idIndexFactory: this.progenitor.idIndexFactory
+      this.addIndex(prop.toIndex(this.creator.cls_.create({
+        idIndexFactory: this.creator.idIndexFactory
       })), root);
     },
     
     function addIndex(index, root) {
-      console.assert(this.progenitor, "Must call addIndex() on AutoIndex spawned instance.");
+      console.assert(this.creator, "Must call addIndex() on AutoIndex createTailed instance.");
       this.delegate.addIndex(index, root);
     },
 
@@ -105,11 +105,11 @@ foam.CLASS({
       //  We are too small to matter
       //  There are no order/predicate constraints to optimize for
       if ( existingPlan.cost < thisSize ||
-           thisSize < this.progenitor.GOOD_ENOUGH_PLAN ||
+           thisSize < this.creator.GOOD_ENOUGH_PLAN ||
            ! order &&
            ( ! predicate ||
-             this.progenitor.True.isInstance(predicate) ||
-             this.progenitor.False.isInstance(predicate)
+             this.creator.True.isInstance(predicate) ||
+             this.creator.False.isInstance(predicate)
            )
       ) {
         return existingPlan;
@@ -124,20 +124,20 @@ foam.CLASS({
       var self = this;
       var newIndex;
 
-      var bestEstimate = this.delegate.progenitor.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+      var bestEstimate = this.delegate.creator.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
 //console.log(self.$UID, "AutoEst OLD:", bestEstimate, this.delegate.toString().substring(0,20), this.size());
-      if ( bestEstimate < this.progenitor.GOOD_ENOUGH_PLAN ) {
+      if ( bestEstimate < this.creator.GOOD_ENOUGH_PLAN ) {
         return existingPlan;
       }
 
       // Base planned cost on the old cost for the plan, to avoid underestimating and making this
       //  index build look too good
       var existingEstimate = bestEstimate;
-      var idIndexFactory = this.progenitor.idIndexFactory;
+      var idIndexFactory = this.creator.idIndexFactory;
 
       if ( predicate ) {
         var candidate = predicate.toIndex(
-          this.progenitor.cls_.create({ idIndexFactory: idIndexFactory }));
+          this.creator.cls_.create({ idIndexFactory: idIndexFactory }));
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
@@ -158,7 +158,7 @@ foam.CLASS({
       //   so the predicate might make this index worse
       if ( order ) {
         var candidate = order.toIndex(
-          this.progenitor.cls_.create({ idIndexFactory: idIndexFactory }));
+          this.creator.cls_.create({ idIndexFactory: idIndexFactory }));
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
@@ -180,14 +180,14 @@ foam.CLASS({
         var existingPlanCost = existingPlan.cost;
         var estimateRatio = bestEstimate / existingEstimate;
 
-        return this.progenitor.CustomPlan.create({
+        return this.creator.CustomPlan.create({
           cost: existingPlanCost * estimateRatio,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 
 console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.cost, predicate && predicate.toString());
 //console.log(newIndex.toPrettyString(0));
 //console.log(self.$UID, "ROOT          ");
-//console.log(root.progenitor.toPrettyString(0));
+//console.log(root.creator.toPrettyString(0));
 
             self.addIndex(newIndex, root);
             // Avoid a recursive call by hitting our delegate.
@@ -204,7 +204,7 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
     },
 
     function toString() {
-      return 'AutoIndex(' + (this.progenitor || this).delegateFactory.toString() + ')';
+      return 'AutoIndex(' + (this.creator || this).delegateFactory.toString() + ')';
     },
 
   ]

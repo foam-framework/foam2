@@ -132,7 +132,7 @@ describe('Index interface', function() {
     var idxFac = foam.dao.index.Index.create();
     idxFac.estimate();
 
-    var tail = idxFac.spawn({ });
+    var tail = idxFac.createTail({ });
     tail.put();
     tail.remove();
     tail.plan(/*sink, skip, limit, order, predicate*/);
@@ -151,7 +151,7 @@ describe('ValueIndex', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create().spawn();
+    idx = foam.dao.index.ValueIndex.create().createTail();
   });
 
   it('stores a value', function() {
@@ -257,7 +257,7 @@ describe('ValueIndex (as Plan)', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create().spawn();
+    idx = foam.dao.index.ValueIndex.create().createTail();
   });
 
   it('plans for no value', function() {
@@ -304,7 +304,7 @@ describe('TreeIndex', function() {
         prop: test.Indexable.FLOAT,
         tailFactory: foam.dao.index.ValueIndex.create()
       })
-    }).spawn();
+    }).createTail();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -428,7 +428,7 @@ describe('TreeIndex', function() {
         prop: test.Indexable.INT,
         tailFactory: foam.dao.index.ValueIndex.create()
       })
-    }).spawn();
+    }).createTail();
     idx.bulkLoad(data);
 
     var order = m.THEN_BY(test.Indexable.STRING, test.Indexable.INT);
@@ -471,7 +471,7 @@ describe('TreeIndex', function() {
         prop: test.Indexable.INT,
         tailFactory: foam.dao.index.ValueIndex.create()
       })
-    }).spawn();
+    }).createTail();
     idx.bulkLoad(data);
 
     var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
@@ -530,7 +530,7 @@ describe('TreeIndex', function() {
           )
         ]
       })
-    }).spawn();
+    }).createTail();
     idx.bulkLoad(data);
 
     var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
@@ -621,7 +621,7 @@ describe('Case-Insensitive TreeIndex', function() {
         prop: test.Indexable.INT,
         tailFactory: foam.dao.index.ValueIndex.create()
       })
-    }).spawn();
+    }).createTail();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -680,7 +680,7 @@ describe('SetIndex', function() {
     idx = foam.dao.index.SetIndex.create({
       prop: test.Indexable.ARRAY,
       tailFactory: foam.dao.index.ValueIndex.create()
-    }).spawn();
+    }).createTail();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -750,10 +750,10 @@ describe('AltIndex', function() {
     data = createData2();
     idx = foam.dao.index.AltIndex.create({
       delegateFactories: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
-    }).spawn();
+    }).createTail();
     var fakeRoot = {
       size: function() { return 1; },
-      progenitor: { toPrettyString: function() { return ""; }}
+      creator: { toPrettyString: function() { return ""; }}
     };
     idx.addIndex(foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
@@ -763,7 +763,7 @@ describe('AltIndex', function() {
       prop: test.Indexable.FLOAT,
       tailFactory: foam.dao.index.ValueIndex.create()
     }), fakeRoot );
-    idx.progenitor.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
+    idx.creator.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -854,13 +854,13 @@ describe('AutoIndex', function() {
       idIndexFactory: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
     });
 
-    idxInstance = idx.spawn();
+    idxInstance = idx.createTail();
 
     idxInstance.bulkLoad(createData2(1000));
 
     fakeRoot = {
       size: function() { return 1; },
-      progenitor: { toPrettyString: function() { return ""; }}
+      creator: { toPrettyString: function() { return ""; }}
     };
 
     m = foam.mlang.Expressions.create();
