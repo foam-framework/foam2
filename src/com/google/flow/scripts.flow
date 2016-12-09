@@ -813,3 +813,111 @@ repeat(18, (i) => {
   t.pitch = 0;
   t.rt(10);
 });
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.x = t.y = t.z = 0;
+t.rt(-45);
+t.pw(5);
+
+repeat(72*4, (i) => {
+  t.pc(hsl(i/72*100,70,70));
+
+  t.ss();
+  repeat(36, () => {
+    t.fd(10).pitchDown(10);
+  });
+  t.rs();
+  t.z = 0;
+  t.pitch = 0;
+  t.rt(2.5/4);
+});
+
+
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = 0;
+t.x = t.y = -60;
+t.rt(-45);
+t.pw(3);
+
+repeat(72*2, (i) => {
+  t.pc(hsl(i/72*180,70,70));
+
+  repeat(36, () => {
+    t.fd(10).pitchUp(10);
+  });
+
+  t.pu().rt(90).fd(360/72).pitchDown(360/72).lt(90).pd();
+  t.z = 0;
+  t.pitch = 0;
+  t.rt(2.5);
+});
+
+
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = 0;
+t.x = t.y = 0;
+t.rt(-45);
+t.pw(3);
+
+repeat(3, () => {
+  t.ss().pc('red').rt(30).pitchUp(60).fd(115).rs();
+  t.fd(100).rt(360/3);
+});
+
+
+
+
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = 0;
+t.x = t.y = 0;
+// t.rt(-45);
+t.pw(5);
+
+
+repeat(8, () => {
+  t.pitchUp(90).fd(100);
+  repeat(18, () => {
+    t.fd(8).pitchDown(10);
+  });
+  t.fd(100).pitchUp(90);
+  t.rt(360/16).fd(20).rt(360/16);
+});
