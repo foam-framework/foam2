@@ -21,10 +21,10 @@ foam.CLASS({
     'foam.dao.index.TreeIndex',
   ],
   methods: [
-    function toIndex(tailFactory) {
+    function toIndex(tail) {
       /** Creates the correct type of index for this property, passing in the
           tail factory (sub-index) provided. */
-      return this.TreeIndex.create({ prop: this, tailFactory: tailFactory });
+      return this.TreeIndex.create({ prop: this, tail: tail });
     }
   ]
 });
@@ -36,8 +36,8 @@ foam.CLASS({
     'foam.dao.index.SetIndex',
   ],
   methods: [
-    function toIndex(tailFactory) {
-       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+    function toIndex(tail) {
+       return this.SetIndex.create({ prop: this, tail: tail });
     }
   ]
 });
@@ -49,8 +49,8 @@ foam.CLASS({
     'foam.dao.index.SetIndex',
   ],
   methods: [
-    function toIndex(tailFactory) {
-       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+    function toIndex(tail) {
+       return this.SetIndex.create({ prop: this, tail: tail });
     }
   ]
 });
@@ -62,8 +62,8 @@ foam.CLASS({
     'foam.dao.index.SetIndex',
   ],
   methods: [
-    function toIndex(tailFactory) {
-       return this.SetIndex.create({ prop: this, tailFactory: tailFactory });
+    function toIndex(tail) {
+       return this.SetIndex.create({ prop: this, tail: tail });
     }
   ]
 });
@@ -144,7 +144,7 @@ foam.CLASS({
       name: 'nullNode',
       factory: function() {
         var nn = this.NullTreeNode.create({
-          tailFactory: this.tailFactory,
+          tail: this.tail,
           treeNode: this.treeNode
         });
         return nn;
@@ -157,7 +157,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'tailFactory'
+      name: 'tail'
     }
   ],
   
@@ -187,7 +187,7 @@ foam.CLASS({
       if ( foam.util.equals(order.orderPrimaryProperty(), this.prop) ) {
         // If the subestimate is less than sort cost (N*lg(N) for a dummy size of 1000)
         return 9965 >
-          this.tailFactory.estimate(1000, this.NullSink.create(), 0, 0, order.orderTail())
+          this.tail.estimate(1000, this.NullSink.create(), 0, 0, order.orderTail())
       }
       // can't use select() with the given ordering
       return false;
@@ -217,10 +217,10 @@ foam.CLASS({
 
       var isExprMatch = this.IS_EXPR_MATCH_FN.bind(this, predicate, property);
 
-      var tailFactory = this.tailFactory;
-      var subEstimate = ( tailFactory ) ? function() {
+      var tail = this.tail;
+      var subEstimate = ( tail ) ? function() {
           return Math.log(nodeCount) / Math.log(2) +
-            tailFactory.estimate(size / nodeCount, sink, skip, limit, order, predicate);
+            tail.estimate(size / nodeCount, sink, skip, limit, order, predicate);
         } :
         function() { return Math.log(nodeCount) / Math.log(2); };
 
@@ -268,15 +268,15 @@ foam.CLASS({
     },
     
     function toString() {
-      return '[' + this.cls_.name + ': ' + this.prop.name + ' ' + this.tailFactory.toString() + ']';
+      return '[' + this.cls_.name + ': ' + this.prop.name + ' ' + this.tail.toString() + ']';
     },
     
     function toPrettyString(indent) {
       var ret = "";
       //ret += "  ".repeat(indent) + this.cls_.name + "( " + this.prop.name + "\n";
-      //ret += this.tailFactory.toPrettyString(indent + 1);
+      //ret += this.tail.toPrettyString(indent + 1);
       //ret += "  ".repeat(indent) + ")\n";
-      var tail = this.tailFactory.toPrettyString(indent + 1);
+      var tail = this.tail.toPrettyString(indent + 1);
       ret = "  ".repeat(indent) + this.prop.name + "(" + this.$UID + ")\n";
       if ( tail.trim().length > 0 ) ret += tail;
       return ret;
@@ -289,8 +289,8 @@ foam.CLASS({
 /** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'TreeIndexTail',
-  extends: 'foam.dao.index.IndexTail',
+  name: 'TreeIndexNode',
+  extends: 'foam.dao.index.IndexNode',
 
   properties: [
     {
@@ -321,7 +321,7 @@ foam.CLASS({
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.creator.ValueIndex.isInstance(this.tailFactory) ) {
+      if ( this.creator.ValueIndex.isInstance(this.tail) ) {
         var prop = this.creator.prop;
         a.sort(prop.compare.bind(prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1, prop.f);
@@ -555,7 +555,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'TreeIndex(' + (this.creator || this).prop.name + ', ' + (this.creator || this).tailFactory + ')';
+      return 'TreeIndex(' + (this.creator || this).prop.name + ', ' + (this.creator || this).tail + ')';
     },
 
   ]
@@ -570,8 +570,8 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'CITreeIndexTail',
-  extends: 'foam.dao.index.TreeIndexTail',
+  name: 'CITreeIndexNode',
+  extends: 'foam.dao.index.TreeIndexNode',
 
   methods: [
     function put(newValue) {
@@ -614,8 +614,8 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'SetIndexTail',
-  extends: 'foam.dao.index.TreeIndexTail',
+  name: 'SetIndexNode',
+  extends: 'foam.dao.index.TreeIndexNode',
 
   methods: [
     // TODO: see if this can be done some other way

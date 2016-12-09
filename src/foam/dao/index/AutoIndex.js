@@ -71,8 +71,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'AutoIndexTail',
-  extends: 'foam.dao.index.ProxyIndexTail',
+  name: 'AutoIndexNode',
+  extends: 'foam.dao.index.ProxyIndexNode',
 
   methods: [
     function addPropertyIndex(prop, root) {
@@ -82,7 +82,6 @@ foam.CLASS({
     },
     
     function addIndex(index, root) {
-      console.assert(this.creator, "Must call addIndex() on AutoIndex createTailed instance.");
       this.delegate.addIndex(index, root);
     },
 
@@ -101,9 +100,9 @@ foam.CLASS({
       var thisSize = this.size();
 
       // No need to try to auto-index if:
-      //  The existing plan is better than scanning already TODO: how much better?
-      //  We are too small to matter
-      //  There are no order/predicate constraints to optimize for
+      //  - The existing plan is better than scanning already TODO: how much better?
+      //  - We are too small to matter
+      //  - There are no order/predicate constraints to optimize for
       if ( existingPlan.cost < thisSize ||
            thisSize < this.creator.GOOD_ENOUGH_PLAN ||
            ! order &&
@@ -137,7 +136,7 @@ foam.CLASS({
 
       if ( predicate ) {
         var candidate = predicate.toIndex(
-          this.creator.cls_.create({ idIndexFactory: idIndexFactory }));
+          this.creator.cls_.create({ idIndexFactory: idIndexFactory }), 1); // depth 1
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
@@ -153,12 +152,11 @@ foam.CLASS({
         }
       }
 
-      // TODO: order cost will always be the same, don't bother asking!...
-      //  Except: the order index.estimate gets the order AND predicate,
+      //  The order index.estimate gets the order AND predicate,
       //   so the predicate might make this index worse
       if ( order ) {
         var candidate = order.toIndex(
-          this.creator.cls_.create({ idIndexFactory: idIndexFactory }));
+          this.creator.cls_.create({ idIndexFactory: idIndexFactory }), 1); // depth 1
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)

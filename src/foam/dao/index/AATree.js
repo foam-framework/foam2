@@ -396,12 +396,12 @@ foam.CLASS({
         the factory for the tail index to create inside each new node.
       */
       class: 'Simple',
-      name: 'tailFactory'
+      name: 'tail'
     },
     {
       /**
         The tree node factory is used to create new, empty tree nodes. They
-        will be initialized with a new tail index from tailFactory.
+        will be initialized with a new tail index from tail.
       */
       class: 'Simple',
       name: 'treeNode'
@@ -446,7 +446,7 @@ foam.CLASS({
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
-      var subIndex = this.tailFactory.createTail();
+      var subIndex = this.tail.createNode();
       subIndex.put(value);
       var n = this.treeNode.create();
       n.left = this;

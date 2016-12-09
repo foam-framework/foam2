@@ -83,8 +83,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'AltIndexTail',
-  extends: 'foam.dao.index.IndexTail',
+  name: 'AltIndexNode',
+  extends: 'foam.dao.index.IndexNode',
 
   properties: [
     {
@@ -96,7 +96,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegates = this.delegates || [ this.creator.delegates[0].createTail() ];
+      this.delegates = this.delegates || [ this.creator.delegates[0].createNode() ];
     },
 
     function addIndex(index) {
@@ -111,7 +111,7 @@ foam.CLASS({
         index = dfmap[indexKey];
       }
       
-      var newSubInst = index.createTail();
+      var newSubInst = index.createNode();
       this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
     },
@@ -161,7 +161,7 @@ foam.CLASS({
 
       // we didn't have the right delegate generated, so add and populate it
       // as per addIndex, but we skip checking the factory as we know it's stored
-      var newSubInst = c.createTail();
+      var newSubInst = c.createNode();
       this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
 

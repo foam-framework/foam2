@@ -135,7 +135,7 @@ foam.INTERFACE({
       name: 'toIndex',
       args: [
         {
-          name: 'tailFactory',
+          name: 'tail',
           javaType: 'foam.dao.index.Index'
         }
       ],
@@ -202,7 +202,7 @@ foam.CLASS({
   abstract: true,
   implements: ['foam.mlang.predicate.Predicate'],
   methods: [
-    function toIndex(/*tailFactory*/) {
+    function toIndex(/*tail*/) {
       return undefined;
     },
     function toDisjunctiveNormalForm() {
@@ -295,9 +295,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function toIndex(tailFactory) {
+    function toIndex(tail) {
       if ( this.arg1 ) {
-        return this.arg1.toIndex(tailFactory);
+        return this.arg1.toIndex(tail);
       } else {
         return;
       }
@@ -329,9 +329,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function toIndex(tailFactory) {
+    function toIndex(tail) {
       if ( this.arg1 ) {
-        return this.arg1.toIndex(tailFactory);
+        return this.arg1.toIndex(tail);
       } else {
         return;
       }
@@ -448,7 +448,7 @@ foam.CLASS({
       return updated ? this.cls_.create({ args: newArgs }) : this;
     },
 
-    function toIndex(tailFactory) {
+    function toIndex(tail) {
       return undefined;
     },
 
@@ -553,21 +553,24 @@ foam.CLASS({
       return updated ? this.cls_.create({ args: newArgs }) : this;
     },
 
-    function toIndex(tailFactory) {
-      // TODO: sort by index uniqueness (put the most indexable first):
-      //   This prevents dropping to scan mode too early, and restricts
-      //   the remaning set more quickly.
-      // EQ, IN,... CONTAINS, ... LT, GT...
-      var lazy = ( global.window && global.window.location.href.indexOf('lazy') > -1 );
-
-      if ( lazy ) {
-        // generate indexes, find costs, run with one or a few of the best
+    function toIndex(tail, depth) {
+      /** Builds the ideal index for this predicate. The indexes will be chained
+          in order of index uniqueness (put the most indexable first):
+          This prevents dropping to scan mode too early, and restricts
+          the remaning set more quickly.
+           i.e. EQ, IN,... CONTAINS, ... LT, GT...
+        @param depth {number} The maximum number of sub-indexes to chain.
+      */
+      depth = depth || 99;
+      
+      if ( depth === 1 ) {
+        // generate indexes, find costs, use the fastest
         var bestCost = Number.MAX_VALUE;
         var bestIndex;
         var args = this.args;
         for (var i = 0; i < args.length; i++ ) {
           var arg = args[i];
-          var idx = arg.toIndex(tailFactory);
+          var idx = arg.toIndex(tail);
           if ( ! idx ) continue;
 
           var idxCost = Math.floor(idx.estimate(
@@ -578,19 +581,17 @@ foam.CLASS({
             bestCost = idxCost;
           }
         }
-        // TODO: consider chaining a few together if they are extremely
-        //  cheap.
         return bestIndex;
 
       } else {
-        // non-lazy complete index
+        // generate indexes, sort by estimate, chain as requested
         var sortedArgs = Object.create(null);
         var costs = [];
         var args = this.args;
         var dupes = {}; // avoid duplicate indexes
         for (var i = 0; i < args.length; i++ ) {
           var arg = args[i];
-          var idx = arg.toIndex(tailFactory);
+          var idx = arg.toIndex(tail);
           if ( ! idx ) continue;
 
           // duplicate check
@@ -609,14 +610,15 @@ foam.CLASS({
 
         // Sort, build list up starting at the end (most expensive
         //   will end up deepest in the index)
-        var tail = tailFactory;
-        for ( var i = costs.length - 1; i >= 0; i-- ) {
+        var tailRet = tail;
+        var chainDepth = Math.min(costs.length - 1, depth - 1);
+        for ( var i = chainDepth; i >= 0; i-- ) {
           var arg = sortedArgs[costs[i]];
           //assert(arg is a predicate)
-          tail = arg.toIndex(tail);
+          tailRet = arg.toIndex(tailRet);
         }
 
-        return tail;
+        return tailRet;
       }
 
     },
@@ -1263,7 +1265,7 @@ foam.INTERFACE({
       name: 'toIndex',
       args: [
         {
-          name: 'tailFactory',
+          name: 'tail',
           javaType: 'foam.dao.index.Index'
         }
       ],
@@ -1339,16 +1341,16 @@ foam.CLASS({
     },
     {
       name: 'toIndex',
-      code: function toIndex(tailFactory) {
+      code: function toIndex(tail) {
         if ( this.arg1 ) {
-          return this.arg1.toIndex(tailFactory);
+          return this.arg1.toIndex(tail);
         } else {
           return;
         }
       },
       javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
         'if ( arg1 != null ) {' +
-          'return arg1.toIndex(tailFactory);'+
+          'return arg1.toIndex(tail);'+
         '}'+
         'return null;'
     },
@@ -1423,9 +1425,9 @@ foam.CLASS({
     },
     {
       name: 'toIndex',
-      code: function(tailFactory) {
+      code: function(tail) {
         if ( this.arg1 && this.arg2 ) {
-          return this.arg1.toIndex(this.arg2.toIndex(tailFactory));
+          return this.arg1.toIndex(this.arg2.toIndex(tail));
         } else {
           return;
         }
@@ -1433,7 +1435,7 @@ foam.CLASS({
       javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
         'foam.mlang.order.Comparator arg2 = getArg2();' +
         'if ( arg1 != null && arg2 != null ) {' +
-          'return arg1.toIndex(arg2.toIndex(tailFactory));' +
+          'return arg1.toIndex(arg2.toIndex(tail));' +
         '}' +
         'return null;'
     },
