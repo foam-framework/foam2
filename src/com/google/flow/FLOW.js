@@ -17,6 +17,20 @@
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Canvas',
+  extends: 'foam.graphics.Box',
+
+  properties: [
+    [ 'autoRepaint', true ],
+    [ 'width', 800 ],
+    [ 'height', 600 ],
+    [ 'color', '#f3f3f3' ],
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'Select',
   documentation: 'Dummy Model to represent selection mode in FLOW.'
 });
@@ -134,7 +148,7 @@ foam.CLASS({
 
 // TODO(adamvy): Remove the need to store this relationship globally.
 var relationship = foam.RELATIONSHIP({
-  name: 'children',
+  forwardName: 'children',
   inverseName: 'parent',
   cadinality: '1:*',
   sourceModel: 'com.google.flow.Property',
@@ -155,6 +169,7 @@ foam.CLASS({
 
   requires: [
     'com.google.dxf.ui.DXFDiagram',
+    'com.google.flow.Canvas',
     'com.google.flow.Circle',
     'com.google.flow.Ellipse',
     'com.google.flow.DetailPropertyView',
@@ -409,10 +424,7 @@ foam.CLASS({
     },
     {
       name: 'canvas',
-      factory: function() {
-        return this.Box.create({autoRepaint: true, width: 800, height: 600, color: '#f3f3f3'});
-//        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
-      }
+      factory: function() { return this.Canvas.create(); }
     },
     {
       name: 'sheet',
@@ -556,7 +568,7 @@ foam.CLASS({
     },
 
     function loadFlow(name) {
-      console.assert(name, 'Name required.')
+      foam.assert(name, 'Name required.')
 
       this.name = name;
       this.flows.find(name).then(function (f) {
@@ -579,7 +591,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onPropertyPut(_, _, _, p) {
+    function onPropertyPut(_, __, ___, p) {
       var o = p.value;
 
       this.scope[p.name] = p.value;
@@ -598,7 +610,7 @@ foam.CLASS({
       }
     },
 
-    function onPropertyRemove(_, _, _, p) {
+    function onPropertyRemove(_, __, ___, p) {
       var o = p.value;
 
       delete this.scope[p.name];

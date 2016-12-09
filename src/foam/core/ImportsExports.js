@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -222,7 +222,7 @@ foam.CLASS({
           var key      = a[0];
           var optional = key.endsWith('?');
           if ( optional ) key = key.slice(0, key.length-1);
-          return foam.core.Import.create({name: a[1] || key, key, required: ! optional});
+          return foam.core.Import.create({name: a[1] || key, key: key, required: ! optional});
         }
 
         return foam.core.Import.create(o);
@@ -242,13 +242,13 @@ foam.CLASS({
 
             case 2:
               // Export 'this'
-              console.assert(
+              foam.assert(
                   a[0] === 'as',
                   'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[1], key: null});
 
             case 3:
-              console.assert(
+              foam.assert(
                   a[1] === 'as',
                   'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[2], key: a[0]});

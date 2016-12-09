@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -187,6 +187,7 @@ foam.CLASS({
     {
       /** Makes Properties useful as map functions. */
       name: 'f',
+      transient: true,
       factory: function() {
         var name = this.name;
         return function f(o) { return o[name]; }
@@ -196,12 +197,13 @@ foam.CLASS({
     {
       /** Makes Properties useful as comparators. */
       name: 'compare',
+      transient: true,
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
         var f = this.f;
         return function compare(o1, o2) {
           return comparePropertyValues(f(o1), f(o2));
-        }
+        };
       }
     }
   ],
@@ -360,7 +362,7 @@ foam.CLASS({
           var oldFip = fip;
           fip++;
           if ( oldFip === 10 ) this.setPrivate_(FIP, true);
-          var v = factory.call(this, prop);
+          v = factory.call(this, prop);
           // Convert undefined to null because undefined means that the
           // value hasn't been set but it has. Setting it to undefined
           // would prevent propertyChange events if the value were cleared.
@@ -483,7 +485,7 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var argNames = foam.Function.formalArgs(e);
+      var argNames = foam.Function.argNames(e);
       var name     = this.name;
 
       // FUTURE: determine how often the value is being invalidated,

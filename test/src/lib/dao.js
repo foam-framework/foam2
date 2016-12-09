@@ -81,15 +81,15 @@ describe('PredicatedSink', function() {
       calledWith: null,
       allow: false,
       f: function(o) { this.calledWith = o; if ( this.allow ) return true; }
-    });
+    }, foam.__context__);
 
     var sink = foam.dao.PredicatedSink.create({
       predicate: fakePredicate,
       delegate: foam.dao.ArraySink.create()
     });
 
-    var a = test.CompA.create({ id: 0, a: 3 });
-    var b = test.CompA.create({ id: 1, a: 5 });
+    var a = test.CompA.create({ id: 0, a: 3 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 5 }, foam.__context__);
 
     sink.put(a);
     expect(fakePredicate.calledWith).toEqual(a);
@@ -105,15 +105,15 @@ describe('PredicatedSink', function() {
       calledWith: null,
       allow: false,
       f: function(o) { this.calledWith = o; if ( this.allow ) return true; }
-    });
+    }, foam.__context__);
 
     var sink = foam.dao.PredicatedSink.create({
       predicate: fakePredicate,
       delegate: foam.dao.ArrayDAO.create()
     });
 
-    var a = test.CompA.create({ id: 0, a: 3 });
-    var b = test.CompA.create({ id: 1, a: 5 });
+    var a = test.CompA.create({ id: 0, a: 3 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 5 }, foam.__context__);
 
     fakePredicate.allow = true;
     sink.put(a);
@@ -188,10 +188,10 @@ describe('LimitedSink', function() {
       delegate: foam.dao.ArrayDAO.create()
     });
 
-    var a = test.CompA.create({ id: 0, a: 9 });
-    var b = test.CompA.create({ id: 1, a: 7 });
-    var c = test.CompA.create({ id: 2, a: 5 });
-    var d = test.CompA.create({ id: 3, a: 3 });
+    var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 5 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 3 }, foam.__context__);
 
     sink.put(a);
     sink.put(b);
@@ -211,10 +211,10 @@ describe('LimitedSink', function() {
       delegate: foam.dao.ArrayDAO.create()
     });
 
-    var a = test.CompA.create({ id: 0, a: 9 });
-    var b = test.CompA.create({ id: 1, a: 7 });
-    var c = test.CompA.create({ id: 2, a: 5 });
-    var d = test.CompA.create({ id: 3, a: 3 });
+    var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 5 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 3 }, foam.__context__);
 
     sink.delegate.put(a);
     sink.delegate.put(b);
@@ -238,10 +238,10 @@ describe('LimitedSink', function() {
     });
     var fc = foam.dao.FlowControl.create();
 
-    var a = test.CompA.create({ id: 0, a: 9 });
-    var b = test.CompA.create({ id: 1, a: 7 });
-    var c = test.CompA.create({ id: 2, a: 5 });
-    var d = test.CompA.create({ id: 3, a: 3 });
+    var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 5 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 3 }, foam.__context__);
 
     sink.put(a, fc);
     expect(fc.stopped).toEqual(false);
@@ -260,10 +260,10 @@ describe('LimitedSink', function() {
     });
     var fc = foam.dao.FlowControl.create();
 
-    var a = test.CompA.create({ id: 0, a: 9 });
-    var b = test.CompA.create({ id: 1, a: 7 });
-    var c = test.CompA.create({ id: 2, a: 5 });
-    var d = test.CompA.create({ id: 3, a: 3 });
+    var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 5 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 3 }, foam.__context__);
 
     sink.delegate.put(a);
     sink.delegate.put(b);
@@ -300,10 +300,10 @@ describe('SkipSink', function() {
       delegate: foam.dao.ArrayDAO.create()
     });
 
-    var a = test.CompA.create({ id: 0, a: 9 });
-    var b = test.CompA.create({ id: 1, a: 7 });
-    var c = test.CompA.create({ id: 2, a: 5 });
-    var d = test.CompA.create({ id: 3, a: 3 });
+    var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 5 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 3 }, foam.__context__);
 
     sink.put(a);
     sink.put(b);
@@ -322,10 +322,10 @@ describe('SkipSink', function() {
       delegate: foam.dao.ArrayDAO.create()
     });
 
-    var a = test.CompA.create({ id: 0, a: 9 });
-    var b = test.CompA.create({ id: 1, a: 7 });
-    var c = test.CompA.create({ id: 2, a: 5 });
-    var d = test.CompA.create({ id: 3, a: 3 });
+    var a = test.CompA.create({ id: 0, a: 9 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 7 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 5 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 3 }, foam.__context__);
 
     sink.delegate.put(a);
     sink.delegate.put(b);
@@ -367,9 +367,9 @@ describe('LocalStorageDAO', function() {
       name: 'CompB',
       properties: [ 'id', 'b' ]
     });
-    a = test.CompA.create({id: 4, a:1, b:2});
-    a2 = test.CompA.create({id: 6, a:'hello', b:6});
-    b = test.CompB.create({id: 8, b:a2});
+    a = test.CompA.create({id: 4, a:1, b:2}, foam.__context__);
+    a2 = test.CompA.create({id: 6, a:'hello', b:6}, foam.__context__);
+    b = test.CompB.create({id: 8, b:a2}, foam.__context__);
   });
   afterEach(function() {
     a = a2 = b = null;
@@ -502,9 +502,15 @@ describe('CachingDAO', function() {
 
 describe('CachingDAO-async', function() {
   genericDAOTestBattery(function(model) {
-    var idbDAO = test.helpers.RandomDelayDAO.create({ of: model, delays: [ 30, 5, 20, 1, 10, 20, 5, 20 ] });
+    var idbDAO = test.helpers.RandomDelayDAO.create({
+      of: model,
+      delays: [ 30, 5, 20, 1, 10, 20, 5, 20 ]
+    }, foam.__context__);
     return idbDAO.removeAll().then(function() {
-      var mDAO = test.helpers.RandomDelayDAO.create({ of: model, delays: [ 5, 20, 1, 10, 20, 5, 20 ] });
+      var mDAO = test.helpers.RandomDelayDAO.create({
+        of: model,
+        delays: [ 5, 20, 1, 10, 20, 5, 20 ]
+      }, foam.__context__);
       return foam.dao.CachingDAO.create({ src: idbDAO, cache: mDAO });
     });
   });
@@ -524,7 +530,10 @@ describe('SequenceNumberDAO', function() {
 
   genericDAOTestBattery(function(model) {
     mDAO = foam.dao.MDAO.create({ of: model });
-    return Promise.resolve(foam.dao.SequenceNumberDAO.create({ delegate: mDAO, of: model }));
+    return Promise.resolve(foam.dao.SequenceNumberDAO.create({
+      delegate: mDAO,
+      of: model
+    }));
   });
 
   beforeEach(function() {
@@ -535,16 +544,19 @@ describe('SequenceNumberDAO', function() {
     });
 
     mDAO = foam.dao.MDAO.create({ of: test.CompA });
-    sDAO = foam.dao.SequenceNumberDAO.create({ delegate: mDAO, of: test.CompA });
+    sDAO = foam.dao.SequenceNumberDAO.create({
+      delegate: mDAO,
+      of: test.CompA
+    });
   });
 
   it('assigns sequence numbers to objects missing the value', function(done) {
-    var a = test.CompA.create({ a: 4 }); // id not set
+    var a = test.CompA.create({ a: 4 }, foam.__context__); // id not set
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toEqual(1);
-        a = test.CompA.create({ a: 6 }); // id not set
+        a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             expect(sink.a.length).toEqual(2);
@@ -560,12 +572,12 @@ describe('SequenceNumberDAO', function() {
   });
 
   it('skips sequence numbers to objects with an existing value', function(done) {
-    var a = test.CompA.create({ id: 3, a: 4 });
+    var a = test.CompA.create({ id: 3, a: 4 }, foam.__context__);
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toEqual(3);
-        a = test.CompA.create({ id: 2, a: 6 });
+        a = test.CompA.create({ id: 2, a: 6 }, foam.__context__);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             expect(sink.a.length).toEqual(2);
@@ -581,12 +593,12 @@ describe('SequenceNumberDAO', function() {
   });
 
   it('does not reuse sequence numbers from objects with an existing value', function(done) {
-    var a = test.CompA.create({ id: 1, a: 4 });
+    var a = test.CompA.create({ id: 1, a: 4 }, foam.__context__);
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toEqual(1);
-        a = test.CompA.create({ a: 6 }); // id not set
+        a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             expect(sink.a.length).toEqual(2);
@@ -603,17 +615,17 @@ describe('SequenceNumberDAO', function() {
 
   it('starts from the existing max value', function(done) {
 
-    mDAO.put(test.CompA.create({ id: 568, a: 4 }));
-    mDAO.put(test.CompA.create({ id: 45, a: 5 }));
+    mDAO.put(test.CompA.create({ id: 568, a: 4 }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 45, a: 5 }, foam.__context__));
 
-    var a = test.CompA.create({ a: 6 }); // id not set
+    var a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(3);
         expect(sink.a[0].id).toEqual(45);
         expect(sink.a[1].id).toEqual(568);
         expect(sink.a[2].id).toEqual(569);
-        a = test.CompA.create({ a: 6 }); // id not set
+        a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             expect(sink.a.length).toEqual(4);
@@ -633,7 +645,10 @@ describe('GUIDDAO', function() {
 
   genericDAOTestBattery(function(model) {
     mDAO = foam.dao.MDAO.create({ of: model });
-    return Promise.resolve(foam.dao.GUIDDAO.create({ delegate: mDAO, of: model }));
+    return Promise.resolve(foam.dao.GUIDDAO.create({
+      delegate: mDAO,
+      of: model
+    }));
   });
 
   beforeEach(function() {
@@ -648,13 +663,13 @@ describe('GUIDDAO', function() {
   });
 
   it('assigns GUIDs to objects missing the value', function(done) {
-    var a = test.CompA.create({ a: 4 }); // id not set
+    var a = test.CompA.create({ a: 4 }, foam.__context__); // id not set
     gDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id.length).toBeGreaterThan(8);
         // id set, not a GUID character for predictable sorting in this test
-        a = test.CompA.create({ id: '!!!', a: 6 });
+        a = test.CompA.create({ id: '!!!', a: 6 }, foam.__context__);
         return gDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             expect(sink.a.length).toEqual(2);
@@ -680,7 +695,10 @@ describe('LRUDAOManager', function() {
     });
 
     mDAO = foam.dao.MDAO.create({ of: test.CompA });
-    lruManager = foam.dao.LRUDAOManager.create({ dao: mDAO, maxSize: 4 });
+    lruManager = foam.dao.LRUDAOManager.create({
+      dao: mDAO,
+      maxSize: 4
+    });
   });
   afterEach(function() {
     mDAO = null;
@@ -690,43 +708,45 @@ describe('LRUDAOManager', function() {
   it('accepts items up to its max size', function(done) {
     // Note that MDAO and LRU do not go async for this test
 
-    mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
-    mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
-    mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
-    mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
+    mDAO.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
 
-    mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
-      expect(counter.value).toEqual(4);
-      done();
-    });
+    mDAO.select(foam.mlang.sink.Count.create())
+      .then(function(counter) {
+        expect(counter.value).toEqual(4);
+        done();
+      });
   });
 
   it('clears old items to maintain its max size', function(done) {
 
 
-    mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
-    mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
-    mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
-    mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
-    mDAO.put(test.CompA.create({ id: 5, a: 'five' }));
+    mDAO.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 5, a: 'five' }, foam.__context__));
 
     // LRU updates the dao slighly asynchronously, so give the notifies a
     // frame to propagate (relevant for browser only, node promises are sync-y
     // enough to get by)
     setTimeout(function() {
-      mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
-        expect(counter.value).toEqual(4);
-      }).then(function() {
-        mDAO.find(1).then(function() {
-          fail("Expected no item 1 to be found");
-          done();
-        },
-        function(err) {
-          //expected not to find it
-          done();
-        });
+      mDAO.select(foam.mlang.sink.Count.create())
+        .then(function(counter) {
+          expect(counter.value).toEqual(4);
+        }).then(function() {
+          mDAO.find(1).then(function() {
+            fail("Expected no item 1 to be found");
+            done();
+          },
+          function(err) {
+            //expected not to find it
+            done();
+          });
 
-      });
+        });
     }, 100);
   });
 
@@ -739,46 +759,48 @@ describe('LRUDAOManager', function() {
     lruManager.dao = mDAO2;
 
     // original dao should not be managed
-    mDAO.put(test.CompA.create({ id: 1, a: 'one' }));
-    mDAO.put(test.CompA.create({ id: 2, a: 'two' }));
-    mDAO.put(test.CompA.create({ id: 3, a: 'three' }));
-    mDAO.put(test.CompA.create({ id: 4, a: 'four' }));
-    mDAO.put(test.CompA.create({ id: 5, a: 'five' }));
+    mDAO.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
+    mDAO.put(test.CompA.create({ id: 5, a: 'five' }, foam.__context__));
 
     // LRU updates the dao slighly asynchronously, so give the notifies a
     // frame to propagate (relevant for browser only, node promises are sync-y
     // enough to get by)
     setTimeout(function() {
-      mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
-        expect(counter.value).toEqual(5);
-      });
+      mDAO.select(foam.mlang.sink.Count.create())
+        .then(function(counter) {
+          expect(counter.value).toEqual(5);
+        });
     }, 100);
 
 
     //////// new dao should be managed.
-    mDAO2.put(test.CompA.create({ id: 1, a: 'one' }));
-    mDAO2.put(test.CompA.create({ id: 2, a: 'two' }));
-    mDAO2.put(test.CompA.create({ id: 3, a: 'three' }));
-    mDAO2.put(test.CompA.create({ id: 4, a: 'four' }));
-    mDAO2.put(test.CompA.create({ id: 5, a: 'five' }));
+    mDAO2.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    mDAO2.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    mDAO2.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    mDAO2.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
+    mDAO2.put(test.CompA.create({ id: 5, a: 'five' }, foam.__context__));
 
     // LRU updates the dao slighly asynchronously, so give the notifies a
     // frame to propagate (relevant for browser only, node promises are sync-y
     // enough to get by)
     setTimeout(function() {
-      mDAO2.select(foam.mlang.sink.Count.create()).then(function(counter) {
-        expect(counter.value).toEqual(4);
-      }).then(function() {
-        mDAO2.find(1).then(function() {
-          fail("Expected no item 1 to be found");
-          done();
-        },
-        function(err) {
-          //expected not to find it
-          done();
-        });
+      mDAO2.select(foam.mlang.sink.Count.create())
+        .then(function(counter) {
+          expect(counter.value).toEqual(4);
+        }).then(function() {
+          mDAO2.find(1).then(function() {
+            fail("Expected no item 1 to be found");
+            done();
+          },
+          function(err) {
+            //expected not to find it
+            done();
+          });
 
-      });
+        });
     }, 100);
 
 
@@ -805,10 +827,10 @@ describe('ArrayDAO', function() {
 
   it('skips properly on removeAll', function(done) {
 
-    dao.put(test.CompA.create({ id: 1, a: 'one' }));
-    dao.put(test.CompA.create({ id: 2, a: 'two' }));
-    dao.put(test.CompA.create({ id: 3, a: 'three' }));
-    dao.put(test.CompA.create({ id: 4, a: 'four' }));
+    dao.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
 
     dao.skip(2).removeAll().then(function() {
       expect(dao.array.length).toEqual(2);
@@ -820,10 +842,10 @@ describe('ArrayDAO', function() {
 
   it('skips and limits properly on removeAll', function(done) {
 
-    dao.put(test.CompA.create({ id: 1, a: 'one' }));
-    dao.put(test.CompA.create({ id: 2, a: 'two' }));
-    dao.put(test.CompA.create({ id: 3, a: 'three' }));
-    dao.put(test.CompA.create({ id: 4, a: 'four' }));
+    dao.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
 
     dao.skip(1).limit(2).removeAll().then(function() {
       expect(dao.array.length).toEqual(2);
@@ -834,10 +856,10 @@ describe('ArrayDAO', function() {
 
   it('skips and limits with predicate properly on removeAll', function(done) {
 
-    dao.put(test.CompA.create({ id: 1, a: 'one' }));
-    dao.put(test.CompA.create({ id: 2, a: 'two' }));
-    dao.put(test.CompA.create({ id: 3, a: 'three' }));
-    dao.put(test.CompA.create({ id: 4, a: 'four' }));
+    dao.put(test.CompA.create({ id: 1, a: 'one' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 2, a: 'two' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 3, a: 'three' }, foam.__context__));
+    dao.put(test.CompA.create({ id: 4, a: 'four' }, foam.__context__));
 
     dao.skip(1).limit(2).where(
       foam.mlang.predicate.Gt.create({ arg1: test.CompA.ID, arg2: 1 })
@@ -856,7 +878,10 @@ describe('ContextualizingDAO', function() {
 
   genericDAOTestBattery(function(model) {
     mDAO = foam.dao.MDAO.create({ of: model });
-    return Promise.resolve(foam.dao.ContextualizingDAO.create({ delegate: mDAO, of: model }));
+    return Promise.resolve(foam.dao.ContextualizingDAO.create({
+      delegate: mDAO,
+      of: model
+    }));
   });
 
   beforeEach(function() {
@@ -869,11 +894,11 @@ describe('ContextualizingDAO', function() {
     foam.CLASS({
       package: 'test',
       name: 'ImporterA',
-      imports: [ 'exp' ],
+      imports: [ 'exp?' ],
       properties: [ 'id' ]
     });
 
-    var env = test.Environment.create({ exp: 66 });
+    var env = test.Environment.create({ exp: 66 }, foam.__context__);
 
     mDAO = foam.dao.MDAO.create({ of: test.ImporterA });
     cDAO = foam.dao.ContextualizingDAO.create({
@@ -883,7 +908,7 @@ describe('ContextualizingDAO', function() {
 
   it('swaps context so find() result objects see ContextualizingDAO context', function(done) {
 
-    var a = test.ImporterA.create({ id: 1 });
+    var a = test.ImporterA.create({ id: 1 }, foam.__context__);
 
     expect(a.exp).toBeUndefined();
 
@@ -919,7 +944,7 @@ describe('SyncDAO', function() {
       properties: [ 'id', 'version', 'source' ]
     });
 
-    remoteDAO = test.helpers.OfflineableDAO.create({ of: test.SyncModel });
+    remoteDAO = test.helpers.OfflineableDAO.create({ of: test.SyncModel }, foam.__context__);
     cacheDAO = foam.dao.ArrayDAO.create({ of: test.SyncModel });
     syncRecordDAO = foam.dao.ArrayDAO.create({ of: foam.dao.SyncRecord });
 
@@ -942,19 +967,19 @@ describe('SyncDAO', function() {
 
   function preloadRemote() {
     remoteDAO.array = [
-      test.SyncModel.create({ id: 0, source: 'server' }),
-      test.SyncModel.create({ id: 1, version: 3, source: 'server' }),
-      test.SyncModel.create({ id: 2, version: 3, source: 'server' }),
-      test.SyncModel.create({ id: 3, source: 'server' }),
-      test.SyncModel.create({ id: 4, version: 2, source: 'server' }),
+      test.SyncModel.create({ id: 0, source: 'server' }, foam.__context__),
+      test.SyncModel.create({ id: 1, version: 3, source: 'server' }, foam.__context__),
+      test.SyncModel.create({ id: 2, version: 3, source: 'server' }, foam.__context__),
+      test.SyncModel.create({ id: 3, source: 'server' }, foam.__context__),
+      test.SyncModel.create({ id: 4, version: 2, source: 'server' }, foam.__context__),
     ];
   }
 
   function loadSync() {
-    syncDAO.put(test.SyncModel.create({ id: 2, source: 'client' }));
-    syncDAO.put(test.SyncModel.create({ id: 3, source: 'client' }));
-    syncDAO.put(test.SyncModel.create({ id: 4, source: 'client' }));
-    syncDAO.put(test.SyncModel.create({ id: 5, source: 'client' }));
+    syncDAO.put(test.SyncModel.create({ id: 2, source: 'client' }, foam.__context__));
+    syncDAO.put(test.SyncModel.create({ id: 3, source: 'client' }, foam.__context__));
+    syncDAO.put(test.SyncModel.create({ id: 4, source: 'client' }, foam.__context__));
+    syncDAO.put(test.SyncModel.create({ id: 5, source: 'client' }, foam.__context__));
   }
 
   it('syncs from remote on first connect', function(done) {
@@ -1087,18 +1112,18 @@ describe('JournalDAO', function() {
 
   function loadItems1() {
     return Promise.all([
-      dao.put(test.JournalModel.create({ id: 0, value: 1 })),
-      dao.put(test.JournalModel.create({ id: 1, value: 'one' })),
-      dao.put(test.JournalModel.create({ id: 2, value: 'a' }))
+      dao.put(test.JournalModel.create({ id: 0, value: 1 }, foam.__context__)),
+      dao.put(test.JournalModel.create({ id: 1, value: 'one' }, foam.__context__)),
+      dao.put(test.JournalModel.create({ id: 2, value: 'a' }, foam.__context__))
     ]);
   }
   function removeItems2() {
-    return dao.remove(test.JournalModel.create({ id: 1, value: 'two' }));
+    return dao.remove(test.JournalModel.create({ id: 1, value: 'two' }, foam.__context__));
   }
   function loadItems3() {
     return Promise.all([
-      dao.put(test.JournalModel.create({ id: 0, value: 3 })),
-      dao.put(test.JournalModel.create({ id: 2, value: 'c' }))
+      dao.put(test.JournalModel.create({ id: 0, value: 3 }, foam.__context__)),
+      dao.put(test.JournalModel.create({ id: 2, value: 'c' }, foam.__context__))
     ]);
   }
 
@@ -1265,13 +1290,13 @@ describe('TimestampDAO', function() {
   it('assigns timestamps to objects missing the value', function(done) {
     jasmine.clock().mockDate(new Date(0));
     jasmine.clock().tick(2000);
-    var a = test.CompA.create({ a: 4 }); // id not set
+    var a = test.CompA.create({ a: 4 }, foam.__context__); // id not set
     sDAO.put(a).then(function() {
       jasmine.clock().tick(2000);
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toBeGreaterThan(0);
-        a = test.CompA.create({ a: 6 }); // id not set
+        a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         jasmine.clock().tick(2000);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
@@ -1291,13 +1316,13 @@ describe('TimestampDAO', function() {
   it('skips assigning to objects with an existing value', function(done) {
     jasmine.clock().mockDate(new Date(0));
     jasmine.clock().tick(2000);
-    var a = test.CompA.create({ id: 3, a: 4 });
+    var a = test.CompA.create({ id: 3, a: 4 }, foam.__context__);
     sDAO.put(a).then(function() {
       jasmine.clock().tick(2000);
       return mDAO.select().then(function (sink) {
         expect(sink.a.length).toEqual(1);
         expect(sink.a[0].id).toEqual(3);
-        a = test.CompA.create({ id: 2, a: 6 });
+        a = test.CompA.create({ id: 2, a: 6 }, foam.__context__);
         jasmine.clock().tick(2000);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
@@ -1416,10 +1441,17 @@ describe('EasyDAO-permutations', function() {
     foam.CLASS({
       package: 'test',
       name: 'HTTPBoxMocker',
+      exports: [
+        'httpResponse'
+      ],
+      properties: [
+        'httpResponse'
+      ]
     });
 
-    var env = test.HTTPBoxMocker.create();
-    env.__context__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
+    var env = test.HTTPBoxMocker.create(undefined, foam.__context__);
+    // TODO: dependency injection reistering is a bit awkward:
+    env.__subContext__.register(test.helpers.MockHTTPBox, 'foam.box.HTTPBox');
 
     var dao = foam.dao.EasyDAO.create({
       of: test.CompA,
@@ -1450,8 +1482,8 @@ describe('DAO.listen', function() {
   });
 
   it('forwards puts', function() {
-    var a = test.CompA.create({ id: 0, a: 4 });
-    var b = test.CompA.create({ id: 4, a: 8 });
+    var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
+    var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
     dao.listen(sink);
     dao.put(a);
@@ -1465,8 +1497,8 @@ describe('DAO.listen', function() {
   });
 
   it('forwards removes', function() {
-    var a = test.CompA.create({ id: 0, a: 4 });
-    var b = test.CompA.create({ id: 4, a: 8 });
+    var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
+    var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
     sink.put(a);
     sink.put(b);
@@ -1489,8 +1521,8 @@ describe('DAO.listen', function() {
   });
 
   it('filters puts with predicate', function() {
-    var a = test.CompA.create({ id: 0, a: 4 });
-    var b = test.CompA.create({ id: 4, a: 8 });
+    var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
+    var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
     var pred = foam.mlang.predicate.Eq.create({ arg1: test.CompA.A, arg2: 4 });
 
     dao.where(pred).listen(sink);
@@ -1505,10 +1537,10 @@ describe('DAO.listen', function() {
   });
 
   it('terminates on flow control stop', function() {
-    var a = test.CompA.create({ id: 0, a: 8 });
-    var b = test.CompA.create({ id: 1, a: 6 });
-    var c = test.CompA.create({ id: 2, a: 4 });
-    var d = test.CompA.create({ id: 3, a: 2 });
+    var a = test.CompA.create({ id: 0, a: 8 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 6 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 4 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 2 }, foam.__context__);
 
     var obj;
     var fcSink = foam.dao.QuickSink.create({
@@ -1528,10 +1560,10 @@ describe('DAO.listen', function() {
 
   });
   it('terminates on flow control error', function() {
-    var a = test.CompA.create({ id: 0, a: 8 });
-    var b = test.CompA.create({ id: 1, a: 6 });
-    var c = test.CompA.create({ id: 2, a: 4 });
-    var d = test.CompA.create({ id: 3, a: 2 });
+    var a = test.CompA.create({ id: 0, a: 8 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 6 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 4 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 2 }, foam.__context__);
 
     var obj;
     var fcSink = foam.dao.QuickSink.create({
@@ -1552,10 +1584,10 @@ describe('DAO.listen', function() {
   });
 
   it('and pipe() listens', function(done) {
-    var a = test.CompA.create({ id: 0, a: 8 });
-    var b = test.CompA.create({ id: 1, a: 6 });
-    var c = test.CompA.create({ id: 2, a: 4 });
-    var d = test.CompA.create({ id: 3, a: 2 });
+    var a = test.CompA.create({ id: 0, a: 8 }, foam.__context__);
+    var b = test.CompA.create({ id: 1, a: 6 }, foam.__context__);
+    var c = test.CompA.create({ id: 2, a: 4 }, foam.__context__);
+    var d = test.CompA.create({ id: 3, a: 2 }, foam.__context__);
 
     dao.put(a);
     dao.put(b);
@@ -1614,8 +1646,8 @@ describe('FilteredDAO', function() {
   });
 
   it('filters put events', function() {
-    var a = test.CompA.create({ id: 0, a: 4 });
-    var b = test.CompA.create({ id: 4, a: 8 });
+    var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
+    var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
@@ -1637,8 +1669,8 @@ describe('FilteredDAO', function() {
   });
 
   it('does not filter remove events', function() {
-    var a = test.CompA.create({ id: 0, a: 4 });
-    var b = test.CompA.create({ id: 4, a: 8 });
+    var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
+    var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
     dao.put(a);
     dao.put(b);
@@ -1656,8 +1688,8 @@ describe('FilteredDAO', function() {
   });
 
   it('handles a delegate swap', function() {
-    var a = test.CompA.create({ id: 0, a: 4 });
-    var b = test.CompA.create({ id: 4, a: 8 });
+    var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
+    var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
     dao = dao.where(m.EQ(test.CompA.A, 4));
     dao.on.sub(l);
@@ -1728,8 +1760,8 @@ describe('Relationship', function() {
     package: 'test',
     name: 'relEnv',
     exports: [
-      'test.RelADAO',
-      'test.RelBDAO'
+      'test_RelADAO',
+      'test_RelBDAO'
     ],
     properties: [
       {
@@ -1749,7 +1781,7 @@ describe('Relationship', function() {
   });
 
   foam.RELATIONSHIP({
-    name: 'children',
+    forwardName: 'children',
     inverseName: 'parent',
     sourceModel: 'test.RelA',
     //sourceProperties: [ 'bRef' ],
@@ -1759,7 +1791,7 @@ describe('Relationship', function() {
   });
 
   it('has relationship DAOs', function() {
-    var env = test.relEnv.create();
+    var env = test.relEnv.create(undefined, foam.__context__);
     var relObjA = test.RelA.create(undefined, env);
 
     var relDAO = relObjA.children;
@@ -1791,13 +1823,13 @@ describe('MultiPartID MDAO support', function() {
 
   it('generates a proper ID index', function(done) {
 
-    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 })); // add
-    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 1 })); // add
-    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 2 })); // update
-    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 })); // update
-    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 1 })); // add
-    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 1 })); // add
-    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 2 })); // update
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 1 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 2 }, foam.__context__)); // update
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 }, foam.__context__)); // update
+    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 1 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 1 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 2 }, foam.__context__)); // update
 
     mDAO.select(foam.mlang.sink.Count.create()).then(function(counter) {
       expect(counter.value).toEqual(4);
@@ -1807,15 +1839,15 @@ describe('MultiPartID MDAO support', function() {
 
   it('finds by multipart ID array', function(done) {
 
-    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 })); // add
-    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 })); // add
-    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 3 })); // add
-    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 4 })); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 1, c: 1 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 1, b: 2, c: 2 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 1, c: 3 }, foam.__context__)); // add
+    mDAO.put(test.Mpid.create({ a: 2, b: 2, c: 4 }, foam.__context__)); // add
 
     mDAO.find([ 2, 1 ]).then(function(obj) { // with array key
       expect(obj.c).toEqual(3);
 
-      mDAO.find(test.Mpid.create({ a: 2, b: 2 }).id) // array from MultiPartID
+      mDAO.find(test.Mpid.create({ a: 2, b: 2 }, foam.__context__).id) // array from MultiPartID
         .then(function(obj2) {
           expect(obj2.c).toEqual(4);
           done();
@@ -1844,10 +1876,10 @@ describe('NoSelectAllDAO', function() {
     sink = foam.dao.ArrayDAO.create({ of: test.CompA });
     dao = foam.dao.NoSelectAllDAO.create({ of: test.CompA, delegate: srcdao });
 
-    dao.put(test.CompA.create({ id: 0, a: 4 }));
-    dao.put(test.CompA.create({ id: 2, a: 77 }));
-    dao.put(test.CompA.create({ id: 3, a: 8 }));
-    dao.put(test.CompA.create({ id: 4, a: 99 }));
+    dao.put(test.CompA.create({ id: 0, a: 4 }, foam.__context__));
+    dao.put(test.CompA.create({ id: 2, a: 77 }, foam.__context__));
+    dao.put(test.CompA.create({ id: 3, a: 8 }, foam.__context__));
+    dao.put(test.CompA.create({ id: 4, a: 99 }, foam.__context__));
 
   });
 

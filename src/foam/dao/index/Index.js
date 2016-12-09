@@ -15,13 +15,59 @@
  * limitations under the License.
  */
 
-/** The Index interface for an ordering, fast lookup, single value,
-  index multiplexer, or any other MDAO select() assistance class. */
+/**
+  The Index interface for an ordering, fast lookup, single value,
+  index multiplexer, or any other MDAO select() assistance class.
+*/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
-  axioms: [ foam.pattern.Progenitor.create() ],
+  imports: [
+    'lookup'
+  ],
+  properties: [
+    {
+      class: 'Class',
+      name: 'tailClass',
+      factory: function() {
+        // Supply an IndexTail Class for each Index subclass
+        return 'foam.dao.index.IndexTail';
+      }
+    }
+  ],
+  methods: [
+    function estimate(size, sink, skip, limit, order, predicate) {
+      /** Estimates the performance of this index given the number of items
+        it will hold and the planned parameters. */
+      return size * size; // n^2 is a good worst-case estimate by default
+    },
+
+
+    function toPrettyString(indent) {
+      /** Output a minimal, human readable, indented (2 spaces per level)
+        description of the index structure */
+    },
+
+    function spawn(args) {
+      var cls = this.tailClass;
+      return cls.create(args, this); // TODO: third arg for proto?
+    }
+  ]
+});
+
+/**
+  The index tail interface represents a piece of the index that actually
+  holds data. A tree will create a tail for each node, so one Index will
+  create many tail instances, each operating on part of the data in the DAO.
+*/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'IndexTail',
+
+//   axioms: [
+//     'foam.dao.index.SharedProto?', // create(args, ctx, proto)?
+//   ],
 
   methods: [
     /** Adds or updates the given value in the index */
@@ -29,13 +75,6 @@ foam.CLASS({
 
     /** Removes the given value from the index */
     function remove(/*o*/) {},
-
-    // TODO: estimate is a class (static) method. Declare as such when possible
-    /** Estimates the performance of this index given the number of items
-      it will hold and the planned parameters. */
-    function estimate(size, sink, skip, limit, order, predicate) {
-      return size * size;
-    },
 
     /** @return a Plan to execute a select with the given parameters */
     function plan(/*sink, skip, limit, order, predicate, root*/) {},
@@ -54,8 +93,6 @@ foam.CLASS({
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},
-
-    function toPrettyString(indent) {},
   ]
 });
 

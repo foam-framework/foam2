@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var customMatchers = {
   toMatchGolden: function(util, customEqualityTesters) {
     return {
@@ -37,7 +54,7 @@ var customMatchers = {
 };
 
 
-describe("FOAM By Example", function() {
+xdescribe("FOAM By Example", function() {
 var log_ = function log_(o) {
   log_.output += o;
 };
@@ -1371,9 +1388,9 @@ foam.CLASS({
   topics: [ 'alarm' ]
 });
 var o = TopicTest.create();
-o.sub('alarm', function(_, _, state) { console.log('alarm: ', state); });
+o.sub('alarm', function(_, __, state) { console.log('alarm: ', state); });
 // The next line uses the Topic and is slightly shorter than the equivalent above.
-o.alarm.sub(function(_, _, state) { console.log('alarm (topic): ', state); });
+o.alarm.sub(function(_, __, state) { console.log('alarm (topic): ', state); });
 o.alarm.pub('on');
 o.pub('alarm', 'off');
 } catch(x) {
@@ -2577,9 +2594,9 @@ log(typeof foam.Function.argsStr(function() { }));
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// foam.Function.formalArgs() returns a function's arguments an an array.
-log(foam.Function.formalArgs(function(a,b,fooBar) { }));
-log(Array.isArray(foam.Function.formalArgs(function() { })));
+// foam.Function.argNames() returns a function's arguments an an array.
+log(foam.Function.argNames(function(a,b,fooBar) { }));
+log(Array.isArray(foam.Function.argNames(function() { })));
 } catch(x) {
  log("Exception: ", x);
  }

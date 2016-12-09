@@ -36,10 +36,20 @@ tree(turtle1.pc('black'), 600);
 
 
 
+function triangle(t, size) {
+  if ( size > 5 ) t.repeat(3, () => {
+    triangle(t, size/2); t.fd(size).rt(360/3);
+  });
+}
+
+triangle(turtle1.pc('black'), 500);
+
+
+
 
 function triangle(t, size) {
-  if ( size > 5 ) t.repeat(5, () => {
-    triangle(t, size*0.379); t.fd(size).rt(360/5);
+  if ( size > 5 ) t.repeat(3, () => {
+    triangle(t, size/2); t.fd(size).rt(360/3);
   });
 }
 
@@ -80,7 +90,9 @@ turtle1.pc('red').repeat(7, () => { pent(turtle1.rt(360/7), 150); });
 
 
 
-repeat(450, (i) => {turtle1.pc('hsl(' + (turtle1.rotation *180 / Math.PI )+ ',70%,70%)').fd(i).rt(89)})
+repeat(450, (i) => {
+  turtle1.pc(hsl(radToDeg(turtle1.rotation),70,70)).fd(i).rt(89)
+})
 
 
 
@@ -108,7 +120,6 @@ turtle1.y = 500;
 turtle1.rotation = 0;
 turtle1.ht();
 turtle1.pc('rgba(0,0,0,0.2');
-
 
 repeat(20, (j) => {
   j += 5;
@@ -229,16 +240,10 @@ star(turtle1, 200);
 
 
 
-turtle1.cs();
-canvas1.width = canvas1.height = 800;
-turtle1.x = 400;
-turtle1.y = 400;
-turtle1.rotation = 0;
-turtle1.ht();
-turtle1.pw(4);
+turtle1.cs().ht().pwd(4).home();
 
 repeat(18, (i) => {
-  turtle1.pc('hsl(' + (i/18*360) + ',90%,70%)');
+  turtle1.pc(hsl(i/18*360,90%,70%));
   repeat(36, () => {
     turtle1.fd(30).rt(10);
   });
@@ -291,7 +296,6 @@ turtle1.cs();
 turtle1.ss();
 turtle1.pw(4);
 
-
 repeat(36, (i) => {
   repeat(36, () => {
     turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
@@ -299,7 +303,6 @@ repeat(36, (i) => {
   });
   turtle1.rt(360/36);
 });
-
 
 turtle1.rs();
 
@@ -325,27 +328,24 @@ turtle1.rs();
 
 
 canvas1.color = 'black';
-turtle1.cs();
-turtle1.ht();
+turtle1.cs().ht().home();
 
 repeat(360, (i) => {
-  turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
+  turtle1.pc(hsl(turtle1.rotation*360/Math.PI,90,70));
   turtle1.rt(1).ss().pu().fd(20+Math.random()*20).pd().fd(Math.random()*400).rs();
 });
 
 
 
-
 canvas1.color = 'black';
-turtle1.cs();
-turtle1.ht();
+turtle1.cs().ht().home();
 
 function fd2(s) {
   repeat(s, () => turtle1.fd(1).rt(0.4));
 }
 
 repeat(360, (i) => {
-  turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)');
+  turtle1.pc(hsl(turtle1.rotation*360/Math.PI,90,70));
   turtle1.rt(1).ss().pu().fd(20+Math.random()*20);
   turtle1.pd();
   fd2(Math.random()*400);
@@ -416,9 +416,8 @@ repeat(360, (i) => {
 
 
 turtle1.cs().home().ht().pw(1.5).repeat(360*4, (i) => {
-  turtle1.pc('hsl(' + (turtle1.rotation*360/Math.PI) + ',90%,70%)').rt(1/4).fd(550).bk(550);
+  turtle1.pc(hsl(turtle1.rotation*360/Math.PI,90,70)).rt(1/4).fd(550).bk(550);
 });
-
 
 
 
@@ -501,9 +500,7 @@ waves(200);
 
 
 // inspired by: http://www.mrcolson.com/2015/12/09/Python-Art.html
-var t = turtle1;
-t.cs();
-t.pw(8);
+var t = turtle1.cs().pw(8);
 
 function sind(d) {
   return Math.sin(d * Math.PI * 2 / 360);
@@ -527,13 +524,7 @@ waves(600);
 
 
 // Grayscale version:
-var t = turtle1;
-t.cs();
-t.pw(8);
-
-function sind(d) {
-  return Math.sin(d * Math.PI * 2 / 360);
-}
+var t = turtle1.cs().pw(8);
 
 function waves(r) {
   repeat(r, (i) => {
@@ -542,7 +533,7 @@ function waves(r) {
     t.pu();
     repeat(t.parent.width/10, (x) => {
       x *= 10;
-      var a = (10+i/r*50) * sind(1000*x/(y+150) + y*2);
+      var a = (10+i/r*50) * sin(degToRad(1000*x/(y+150) + y*2));
       t.gt(x, y + a);
       t.pd();
     });
@@ -705,3 +696,41 @@ grid(function(x, y) {
   var d = Math.sqrt(x*x + y*y);
   return 150*Math.cos(d/25)*(200-d)/200;
 });
+
+
+
+
+var t = turtle1;
+t.cs().pw(12);
+
+
+function gotoXYZ(x, y, z) {
+  t.pc(hsl(z*2,0,z+50));
+  t.gt(
+    canvas1.width/2-x/Math.SQRT2+y/Math.SQRT2,
+    canvas1.height/2+x/Math.SQRT2+y/Math.SQRT2-z);
+}
+
+
+function grid(f, opt_inc) {
+  var inc = opt_inc || 10;
+  for ( var x = -200 ; x <= 200 ; x += inc ) {
+    t.pu();
+    for ( var y = -200 ; y <= 200 ; y += inc ) {
+      gotoXYZ(x, y, f(x,y));
+      t.pd();
+    }
+  }
+  for ( var y = -200 ; y <= 200 ; y += inc ) {
+    t.pu();
+    for ( var x = -200 ; x <= 200 ; x += inc ) {
+      gotoXYZ(x, y, f(x,y));
+      t.pd();
+    }
+  }
+}
+
+grid(function(x, y) {
+  var d = Math.sqrt(x*x + y*y);
+  return 150*Math.cos(d/25)*(200-d)/200;
+}, 1);

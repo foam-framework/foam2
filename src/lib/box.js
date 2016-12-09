@@ -1083,17 +1083,6 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'socket',
-      transient: true,
-      factory: function() {
-        return new require('net').Socket();
-      },
-      postSet: function(_, socket) {
-        socket.on('connect', this.onConnect);
-        socket.on('error', this.onError);
-      }
-    },
-    {
       class: 'String',
       name: 'address'
     },

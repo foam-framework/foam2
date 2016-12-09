@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -60,7 +60,7 @@ foam.CLASS({
         if ( o.class ) {
           var m = foam.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
-          return m.create(o);
+          return m.create(o, this);
         }
 
         return foam.core.Property.isInstance(o) ? o : foam.core.Property.create(o);
@@ -72,14 +72,14 @@ foam.CLASS({
       name: 'methods',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Method must be named');
+          foam.assert(o.name, 'Method must be named');
           var m = foam.core.Method.create();
           m.name = o.name;
           m.code = o;
           return m;
         }
         if ( foam.core.Method.isInstance(o) ) return o;
-        if ( o.class ) return this.lookup(o.class).create(o);
+        if ( o.class ) return this.lookup(o.class).create(o, this);
         return foam.core.Method.create(o);
       }
     }

@@ -77,7 +77,7 @@ var createData1 = function createData1() {
       date: new Date(1),
     },
   ].map(function(cfg) {
-    return test.Indexable.create(cfg);
+    return test.Indexable.create(cfg, foam.__context__);
   });
 }
 
@@ -96,7 +96,7 @@ var createData2 = function createData2(dataCount) {
   }
 
   return arr.map(function(cfg) {
-    return test.Indexable.create(cfg);
+    return test.Indexable.create(cfg, foam.__context__);
   });
 }
 
@@ -117,7 +117,7 @@ var createData3 = function createData3() {
       array: ['apple', 'banana','kiwi']
     },
   ].map(function(cfg) {
-    return test.Indexable.create(cfg);
+    return test.Indexable.create(cfg, foam.__context__);
   });
 }
 

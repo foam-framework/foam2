@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'oneWay',
       value: true,
       view: {
-        class: 'foam.u2.tag.Select',
+        class: 'foam.u2.view.ChoiceView',
         choices: [
           [ true,  'one-way flight' ],
           [ false, 'return flight'  ]
@@ -56,18 +56,18 @@ foam.CLASS({
       class: 'Date',
       name: 'departDate',
       factory: function() { return new Date(Date.now()+3600000*24); },
-      validate: function(departDate) {
+      validateObj: function(departDate) {
         var today = new Date();
         today.setHours(0,0,0,0);
-        if ( departDate.compareTo(today) < 0 ) return 'Must not be in the past.';
+        if ( foam.Date.compare(departDate, today) < 0 ) return 'Must not be in the past.';
       }
     },
     {
       class: 'Date',
       name: 'returnDate',
       factory: function() { return new Date(Date.now()+2*3600000*24); },
-      validate: function(oneWay, returnDate, departDate) {
-        if ( ! oneWay && returnDate.compareTo(departDate) < 0 ) return 'Must not be before depart date.';
+      validateObj: function(oneWay, returnDate, departDate) {
+        if ( ! oneWay && foam.Date.compare(returnDate, departDate) < 0 ) return 'Must not be before depart date.';
       }
     },
     {
@@ -92,7 +92,7 @@ foam.CLASS({
   actions: [
     {
       name: 'book',
-      // isEnabled: function() { return this.isValid(); },
+      isEnabled: function(errors_) { return ! errors_; },
       code: function() {
         var depart = this.departDate.toLocaleDateString();
 

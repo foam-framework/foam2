@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -467,7 +467,7 @@ foam.LIB({
               }
             }
 
-            return c.create(json, opt_ctx);
+            return c.create(json, opt_ctx || foam.__context__);
           }
 
           for ( var key in json ) {
@@ -480,8 +480,8 @@ foam.LIB({
       }, function(o) { return o; })
     },
 
-    function parseString(jsonStr) {
-      return this.parse(eval('(' + jsonStr + ')'));
+    function parseString(jsonStr, opt_ctx) {
+      return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
     },
 
     function stringify(o) {

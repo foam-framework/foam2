@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-/** A method that is configured to call a service over HTTP. No code or
+/**
+  A method that is configured to call a service over HTTP. No code or
   function body is required here, as the actual body is generated to call
   the remote service. This will always return a promise that supplies the
   return value of the service call.
+
   <p>Overriding by an HTTPMethod is not supported. You can override an
   HTTPMethod with a normal one.
-  <p>FUTURE: Generalize. */
+*/
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPMethod',
@@ -30,15 +32,12 @@ foam.CLASS({
     'foam.net.HTTPArgument',
     'foam.core.Imports',
   ],
-  imports: [
-    'assert',
-  ],
 
   constants: {
-    OUTPUTTER: { 
-      __proto__: foam.json.Strict, 
-      outputDefaultValues: false, 
-      outputClassNames: false 
+    OUTPUTTER: {
+      __proto__: foam.json.Strict,
+      outputDefaultValues: false,
+      outputClassNames: false
     },
   },
 
@@ -59,11 +58,11 @@ foam.CLASS({
       factory: function() { return []; }
     },
     {
-      /** If the request should build a request body object and fill in the 
+      /** If the request should build a request body object and fill in the
         supplied args, the request object's Class is specified here. */
       class: 'Class',
       name: 'buildRequestType',
-    },    
+    },
     {
       /** HTTPMethods will always return a Promise, but the Promise will pass
         along a parameter of the type specified here. */
@@ -108,7 +107,7 @@ foam.CLASS({
 
       // May have many HTTPMethods in a host class, but only do service import once.
       var existing = c.getAxiomByName(this.HTTPRequestFactoryName);
-      this.assert( existing,
+      foam.assert( existing,
         "HTTPMethod installInClass did not find an import or property", this.HTTPRequestFactoryName, ".",
         "Provide one, or set HTTPMethod.HTTPRequestFactoryName to the name of your request factory function.");
     },
@@ -119,7 +118,7 @@ foam.CLASS({
     },
 
     function callRemote_(/* object */ opt_args, host /* Promise */) {
-      this.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
+      foam.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
         "HTTPMethod call can't find HTTPRequestFactory",
         this.HTTPRequestFactoryName, "on", host);
 
@@ -130,7 +129,8 @@ foam.CLASS({
       var request = host[this.HTTPRequestFactoryName]();
 
       // if building a request object, start with an empty instance
-      var requestObject = self.buildRequestType ? self.buildRequestType.create() : null;
+      var requestObject = self.buildRequestType ?
+        self.buildRequestType.create(undefined, foam.__context__) : null;
 
       // add on args passed as part of the path or query
       self.args.forEach(function(param) {
@@ -168,7 +168,7 @@ foam.CLASS({
         if ( response.status >= 400 ) {
           throw "HTTP error status: " + response.status;
         }
-        self.assert(response.responseType === 'json', "HTTPMethod given a request not configured to return JSON", request);
+        foam.assert(response.responseType === 'json', "HTTPMethod given a request not configured to return JSON", request);
         return response.payload.then(function(json) {
           if ( ! self.promisedType ) {
             // no return

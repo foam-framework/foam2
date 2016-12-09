@@ -112,31 +112,6 @@ foam.CLASS({
     }
   ],
 
-  listeners: [
-    {
-      name: 'onTouch',
-      code: function(s, _, touch) {
-        var self = this;
-        var p = foam.graphics.Point.create();
-
-        touch.claimed = true;
-
-        function updateValue() {
-          p.x = touch.x;
-          p.y = touch.y;
-          p.w = 1;
-
-          self.globalToLocalCoordinates(p);
-
-          self.value = self.yToValue(p.y);
-        }
-
-        touch.onDestroy(touch.sub('propertyChange', updateValue));
-        updateValue();
-      }
-    }
-  ],
-
   methods: [
     function initCView() {
       this.canvas.pointer.touch.sub(this.onTouch);
@@ -168,6 +143,31 @@ foam.CLASS({
         this.valueToY(this.value),
         this.width - 11,
         this.handleSize);
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onTouch',
+      code: function(s, _, touch) {
+        var self = this;
+        var p = foam.graphics.Point.create();
+
+        touch.claimed = true;
+
+        function updateValue() {
+          p.x = touch.x;
+          p.y = touch.y;
+          p.w = 1;
+
+          self.globalToLocalCoordinates(p);
+
+          self.value = self.yToValue(p.y);
+        }
+
+        touch.onDestroy(touch.sub('propertyChange', updateValue));
+        updateValue();
+      }
     }
   ]
 });

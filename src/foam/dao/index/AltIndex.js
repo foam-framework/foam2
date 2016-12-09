@@ -169,15 +169,15 @@ foam.CLASS({
     },
 
     function plan(sink, skip, limit, order, predicate, root) {
-      var bestPlan;      
+      var bestPlan;
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
-        var plan = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
-        if ( plan.cost <= this.progenitor.GOOD_ENOUGH_PLAN ) {
-          bestPlan = plan;
+        var p = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
+        if ( p.cost <= this.progenitor.GOOD_ENOUGH_PLAN ) {
+          bestPlan = p;
           break;
         }
-        if ( ! bestPlan || plan.cost < bestPlan.cost ) {
-          bestPlan = plan;
+        if ( ! bestPlan || p.cost < bestPlan.cost ) {
+          bestPlan = p;
         }
       }
       if ( ! bestPlan ) {

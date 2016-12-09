@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -1234,7 +1234,7 @@ foam.CLASS({
   methods: [
     function init() {
       var objs = localStorage.getItem(this.name);
-      if ( objs ) this.array = foam.json.parse(foam.json.parseString(objs));
+      if ( objs ) this.array = foam.json.parseString(objs, this);
 
       this.on.put.sub(this.updated);
       this.on.remove.sub(this.updated);
@@ -1262,7 +1262,8 @@ foam.LIB({
     {
       name: 'daoize',
       code: foam.Function.memoize1(function(str) {
-        // Turns SomeClassName into someClassNameDAO.
+        // Turns SomeClassName into someClassNameDAO,
+        // of package.ClassName into package.ClassNameDAO
         return str.substring(0, 1).toLowerCase() + str.substring(1) + 'DAO';
       })
     }
