@@ -76,7 +76,7 @@ xdescribe("Index benchmarks", function() {
       .addIndex(
         foam.dao.index.AltIndex.create({
           delegates: [ idx1, idx2 ],
-          delegates: [ idx1.createTail(), idx2.createTail() ]
+          delegates: [ idx1.createNode(), idx2.createNode() ]
         })
       )
       //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)

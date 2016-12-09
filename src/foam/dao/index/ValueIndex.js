@@ -37,8 +37,8 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'ValueIndexTail',
-  extends: 'foam.dao.index.IndexTail',
+  name: 'ValueIndexNode',
+  extends: 'foam.dao.index.IndexNode',
   implements: [ 'foam.dao.index.Plan' ],
 
   properties: [

@@ -43,8 +43,8 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'ProxyIndexTail',
-  extends: 'foam.dao.index.IndexTail',
+  name: 'ProxyIndexNode',
+  extends: 'foam.dao.index.IndexNode',
 
   properties: [
     {
@@ -55,7 +55,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegate = this.delegate || this.creator.delegate.createTail();
+      this.delegate = this.delegate || this.creator.delegate.createNode();
     },
     
     function put(o) { return this.delegate.put(o); },

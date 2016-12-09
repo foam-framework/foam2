@@ -132,7 +132,7 @@ describe('Index interface', function() {
     var idxFac = foam.dao.index.Index.create();
     idxFac.estimate();
 
-    var tail = idxFac.createTail({ });
+    var tail = idxFac.createNode({ });
     tail.put();
     tail.remove();
     tail.plan(/*sink, skip, limit, order, predicate*/);
@@ -151,7 +151,7 @@ describe('ValueIndex', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create().createTail();
+    idx = foam.dao.index.ValueIndex.create().createNode();
   });
 
   it('stores a value', function() {
@@ -257,7 +257,7 @@ describe('ValueIndex (as Plan)', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create().createTail();
+    idx = foam.dao.index.ValueIndex.create().createNode();
   });
 
   it('plans for no value', function() {
@@ -300,11 +300,11 @@ describe('TreeIndex', function() {
     data = createData2();
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
-      tailFactory: foam.dao.index.TreeIndex.create({
+      tail: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.FLOAT,
-        tailFactory: foam.dao.index.ValueIndex.create()
+        tail: foam.dao.index.ValueIndex.create()
       })
-    }).createTail();
+    }).createNode();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -424,11 +424,11 @@ describe('TreeIndex', function() {
   it('orders scans', function() {
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.STRING,
-      tailFactory: foam.dao.index.TreeIndex.create({
+      tail: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.INT,
-        tailFactory: foam.dao.index.ValueIndex.create()
+        tail: foam.dao.index.ValueIndex.create()
       })
-    }).createTail();
+    }).createNode();
     idx.bulkLoad(data);
 
     var order = m.THEN_BY(test.Indexable.STRING, test.Indexable.INT);
@@ -467,11 +467,11 @@ describe('TreeIndex', function() {
   it('orders reverse scans', function() {
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.STRING,
-      tailFactory: foam.dao.index.TreeIndex.create({
+      tail: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.INT,
-        tailFactory: foam.dao.index.ValueIndex.create()
+        tail: foam.dao.index.ValueIndex.create()
       })
-    }).createTail();
+    }).createNode();
     idx.bulkLoad(data);
 
     var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
@@ -522,7 +522,7 @@ describe('TreeIndex', function() {
   it('orders reverse scans with an AltIndex', function() {
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.STRING,
-      tailFactory: foam.dao.index.AltIndex.create({
+      tail: foam.dao.index.AltIndex.create({
         delegates: [
           test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
           test.Indexable.INT.toIndex(
@@ -530,7 +530,7 @@ describe('TreeIndex', function() {
           )
         ]
       })
-    }).createTail();
+    }).createNode();
     idx.bulkLoad(data);
 
     var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
@@ -617,11 +617,11 @@ describe('Case-Insensitive TreeIndex', function() {
     data = createData1();
     idx = foam.dao.index.CITreeIndex.create({
       prop: test.Indexable.STRING,
-      tailFactory: foam.dao.index.TreeIndex.create({
+      tail: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.INT,
-        tailFactory: foam.dao.index.ValueIndex.create()
+        tail: foam.dao.index.ValueIndex.create()
       })
-    }).createTail();
+    }).createNode();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -679,8 +679,8 @@ describe('SetIndex', function() {
     data = createData3();
     idx = foam.dao.index.SetIndex.create({
       prop: test.Indexable.ARRAY,
-      tailFactory: foam.dao.index.ValueIndex.create()
-    }).createTail();
+      tail: foam.dao.index.ValueIndex.create()
+    }).createNode();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -750,18 +750,18 @@ describe('AltIndex', function() {
     data = createData2();
     idx = foam.dao.index.AltIndex.create({
       delegates: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
-    }).createTail();
+    }).createNode();
     var fakeRoot = {
       size: function() { return 1; },
       creator: { toPrettyString: function() { return ""; }}
     };
     idx.addIndex(foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
-      tailFactory: foam.dao.index.ValueIndex.create()
+      tail: foam.dao.index.ValueIndex.create()
     }), fakeRoot );
     idx.addIndex(foam.dao.index.TreeIndex.create({
       prop: test.Indexable.FLOAT,
-      tailFactory: foam.dao.index.ValueIndex.create()
+      tail: foam.dao.index.ValueIndex.create()
     }), fakeRoot );
     idx.creator.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
     idx.bulkLoad(data);
@@ -831,8 +831,23 @@ describe('AND', function() {
     );
 
     expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
-    //expect(andIndex.tailFactory.prop).toEqual(test.Indexable.STRING);
-    //expect(andIndex.tailFactory.tailFactory.prop).toEqual(test.Indexable.INT);
+    expect(andIndex.tail.prop).toEqual(test.Indexable.STRING);
+    expect(andIndex.tail.tail.prop).toEqual(test.Indexable.INT);
+  });
+
+  it('returns best by cost estimate when depth == 1', function() {
+    var and = m.AND(
+      m.GT(test.Indexable.INT, 5),
+      m.EQ(test.Indexable.FLOAT, 5),
+      m.IN(test.Indexable.STRING, 'he')
+    );
+    var andIndex = and.toIndex(
+      test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
+      1
+    );
+    
+    expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
+    
   });
 
 });
@@ -854,7 +869,7 @@ describe('AutoIndex', function() {
       idIndexFactory: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
     });
 
-    idxInstance = idx.createTail();
+    idxInstance = idx.createNode();
 
     idxInstance.bulkLoad(createData2(1000));
 

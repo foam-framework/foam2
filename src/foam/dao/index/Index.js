@@ -19,23 +19,23 @@
   The Index interface for an ordering, fast lookup, single value,
   index multiplexer, or any other MDAO select() assistance class.
 
-  Each Index subclass also defines an IndexTail class. Index defines
+  Each Index subclass also defines an IndexNode class. Index defines
   the structure of the index, including estimate() to gauge its 
-  probable performance for a query, while IndexTail implements the
+  probable performance for a query, while IndexNode implements the
   data nodes that hold the indexed items and plan and execute 
   queries. For any particular operational Index, there may be 
-  many IndexTail instances:
+  many IndexNode instances:
 
 <pre>
                  1---------> TreeIndex(id)
   MDAO: AltIndex 2---------> TreeIndex(propA) ---> TreeIndex(id) -------------> ValueIndex
-        | 1x AltIndexTail    | 1x TreeIndexTail    | 14x TreeIndexTails         | (DAO size)x ValueIndexTails
+        | 1x AltIndexNode    | 1x TreeIndexNode    | 14x TreeIndexNodes         | (DAO size)x ValueIndexNodes
            (2 alt subindexes)     (14 nodes)             (each has 0-5 nodes)    
 </pre>
   The base AltIndex has two complete subindexes (each holds the entire DAO).
-  The The TreeIndex on property A has created one TreeIndexTail, holding one tree of 14 nodes.
+  The The TreeIndex on property A has created one TreeIndexNode, holding one tree of 14 nodes.
   Each tree node contains a tail instance of the next level down, thus
-  the TreeIndex on id has created 14 TreeIndexTails. Each of those contains some number
+  the TreeIndex on id has created 14 TreeIndexNodes. Each of those contains some number
   of tree nodes, each holding one tail instance of the ValueIndex at the end of the chain.
 
 */
@@ -64,8 +64,8 @@ foam.CLASS({
         description of the index structure */
     },
 
-    function createTail(args) {
-      if ( ! this.tailClass ) this.tailClass = this.cls_.id + 'Tail';
+    function createNode(args) {
+      if ( ! this.tailClass ) this.tailClass = this.cls_.id + 'Node';
       args = args || {};
       args.creator = this;
       return this.tailClass.create(args, this);
@@ -84,7 +84,7 @@ foam.CLASS({
 */
 foam.CLASS({
   package: 'foam.dao.index',
-  name: 'IndexTail',
+  name: 'IndexNode',
 
 //   axioms: [
 //     'foam.dao.index.SharedProto?', // create(args, ctx, proto)?

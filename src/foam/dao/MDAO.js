@@ -54,7 +54,7 @@ foam.CLASS({
       name: 'idIndex'
     },
     {
-      /** The createTailed root instance of our index. */
+      /** The createNodeed root instance of our index. */
       name: 'index'
     }
   ],
@@ -104,7 +104,7 @@ foam.CLASS({
 
     function addIndex(index) {
       if ( ! this.index ) {
-        this.index = index.createTail();
+        this.index = index.createNode();
         return this;
       }
 
@@ -112,7 +112,7 @@ foam.CLASS({
       if ( ! this.AltIndex.isInstance(this.index.creator) ) {
         this.index = this.AltIndex.create({
           delegates: [ this.index.creator ], // create factory
-        }).createTail({
+        }).createNode({
           delegates: [ this.index ] // create an instance
         });
       }
