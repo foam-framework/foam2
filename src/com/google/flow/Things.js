@@ -929,7 +929,7 @@ foam.CLASS({
     },
 
     function xyzToY(x, y, z) {
-      return this.parent.parent.height/2 + x + y - z;
+      return this.parent.parent.height/2 + x + y - z / Math.SQRT2;
     },
 
     function paintSelf(x) {
