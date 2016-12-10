@@ -978,10 +978,6 @@ foam.CLASS({
       name: 'pitch'
     },
     {
-      class: 'Float',
-      name: 'roll'
-    },
-    {
       name: 'memento',
       hidden: true,
       getter: function() {
@@ -989,17 +985,21 @@ foam.CLASS({
           x: this.x,
           y: this.y,
           z: this.z,
+          pitch: this.pitch,
+          roll: this.roll,
+          rotation: this.rotation,
           penColor: this.penColor,
           penWidth: this.penWidth,
-          penDown:  this.pendDown,
-          rotation: this.rotation,
-          pitch:    this.pitch,
-          roll:     this.roll
+          penDown:  this.pendDown
         };
       },
       setter: function(m) {
         this.copyFrom(m);
       }
+    },
+    {
+      class: 'Float',
+      name: 'roll'
     }
   ],
 
