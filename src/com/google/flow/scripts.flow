@@ -1164,3 +1164,59 @@ repeat(36*3, () => {
   });
   t.pitchUp(10/3);
 });
+
+
+
+var t = turtle3d1;
+
+t.cs().home();
+t.x = t.y = t.z = 0;
+
+t.pc('rgba(255,255,255,0.1');
+// t.pc('red');
+t.pw(2);
+
+repeat(10000, () => {
+t.rt(Math.random()*360).pitchUp(Math.random()*360).ss().pu().fd(120).pd().fd(120*Math.random()).rs().rt(10/3);
+});
+
+
+
+// dandylion
+var t = turtle3d1;
+
+t.cs().home();
+t.x = t.y = t.z = 0;
+
+t.pc('rgba(255,255,255,0.1');
+// t.pc('red');
+t.pw(2);
+
+repeat(10000, () => {
+t.ss().rt(Math.random()*180).pitchUp(Math.random()*180);
+t.pc(hsla(radToDeg(t.pitch*2), 50, 90, 0.4));
+t.pu().fd(120).pd().fd(80*Math.random()).rs().rt(10/3);
+});
+
+
+
+
+var t = turtle3d1;
+
+t.cs().home();
+t.x = t.y = t.z = t.pitch = 0;
+
+t.pc('rgba(255,255,255,0.5');
+t.pc('white');
+t.pw(1);
+
+function circle(s) {
+  repeat(36, () => { t.fd(s).rt(10); });
+}
+
+repeat(36*6, (i) => {
+  t.ss().pu().fd(i).pd();
+  circle(i/7);
+ t.rs();
+ t.rt(40); // change to 10 or more
+});
