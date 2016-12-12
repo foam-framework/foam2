@@ -358,7 +358,7 @@ foam.CLASS({
 
           var slot = self.parser.parseString(formula$.get());
           cancel && cancel.destroy();
-          s = cell.data$.linkFrom(slot);
+          s = cell.data$.follow(slot)
         });
       }
 
