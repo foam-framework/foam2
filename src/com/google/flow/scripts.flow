@@ -1273,3 +1273,27 @@ t.z += 50;
 archRing(2*28, 25, 800);
 t.z += 50;
 archRing(360*4, 0, 800);
+
+
+
+
+// tree
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = 350;
+t.x = 80;
+t.y = 80;
+t.rt(-45);
+t.pw(20);
+//t.pc('green');
+t.pc("rgba(0,255,0,0.1)");
+
+t.rt(1);
+t.pitchDown(0.125);
+
+repeat(3600*2, (i) => {
+  t.fd(i/200).rt(10);
+});
