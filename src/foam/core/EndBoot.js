@@ -229,9 +229,10 @@ foam.CLASS({
     m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = true;
     var f = foam.Function.memoize0(function() {
-      foam.USED[m.id] = m;
       delete foam.UNUSED[m.id];
-      return CLASS(m);
+      var c = CLASS(m);
+      foam.USED[m.id] = c;
+      return c;
     });
     foam.__context__.registerFactory(m, f);
     foam.package.registerClassFactory(m, f);
