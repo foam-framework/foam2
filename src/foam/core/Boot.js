@@ -138,6 +138,7 @@ foam.LIB({
         cls                  = parent.createSubClass_();
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
+        cls.count_           = 0;
         cls.id               = this.id;
         cls.package          = this.package;
         cls.name             = this.name;

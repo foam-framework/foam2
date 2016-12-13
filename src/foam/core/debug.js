@@ -475,3 +475,24 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.LIB({
+  name: 'foam.debug',
+
+  methods: [
+    function showCreates() {
+      console.log('Class                                         Count');
+      console.log('------------------------------------------------------');
+      for ( var key in foam.USED ) {
+        var c = foam.USED[key];
+
+        if ( c.count_ ) {
+          console.log(
+              foam.String.pad(c.id, 45),
+              c.count_);
+        }
+      }
+    }
+  ]
+});
