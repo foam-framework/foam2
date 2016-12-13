@@ -200,7 +200,7 @@ foam.CLASS({
       return this;
     },
 
-    function destroy() {
+    function detach() {
       this.stopped_ = true;
       this.children = [];
     }

@@ -215,7 +215,7 @@ foam.CLASS({
     function load() {},
     function unload() {},
     function onRemove() {},
-    // function destroy() {},
+    // function detach() {},
     function onSetCls() {},
     function onFocus() {},
     function onAddListener() {},
@@ -702,7 +702,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.onDestroy(this.visitChildren.bind(this, 'destroy'));
+      this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
     function initE() {
@@ -1365,7 +1365,7 @@ foam.CLASS({
     },
 
     function select(dao, f, update) {
-      // TODO: cleanup on destroy
+      // TODO: cleanup on detach
       var es   = {};
       var self = this;
       var reset = function() {
@@ -1599,16 +1599,16 @@ foam.CLASS({
       var e = nextE();
       var l = function() {
         if ( self.state !== self.LOADED ) {
-          s && s.destroy();
+          s && s.detach();
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
         var tmp = self.E();
         self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].destroy(); }
+          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
         } else {
-          if ( e.state === e.LOADED ) { e.remove(); e.destroy(); }
+          if ( e.state === e.LOADED ) { e.remove(); e.detach(); }
         }
         var e2 = nextE();
         self.insertBefore(e2, tmp);
@@ -1617,7 +1617,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.destroy, s));
+      this.sub('onunload', foam.Function.bind(s.detach, s));
 
       return e;
     },

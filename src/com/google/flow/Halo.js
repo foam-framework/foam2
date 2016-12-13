@@ -128,7 +128,7 @@ foam.CLASS({
         this.view = n && n.value;
 
         if ( this.selectedSub ) {
-          this.selectedSub.destroy();
+          this.selectedSub.detach();
           this.selectedSub = null;
         }
 

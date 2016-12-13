@@ -122,8 +122,8 @@ foam.CLASS({
       }.bind(this));
 
       socket.disconnected.sub(function(s) {
-        s.destroy();
-        sub1.destroy();
+        s.detach();
+        sub1.detach();
       });
     }
   ]

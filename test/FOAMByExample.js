@@ -137,7 +137,7 @@ Test.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Method               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 2, str: "CLASS:   Testextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Test           aProperty             Test           bMethod               Test           f1Method               Test           f2Method               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDetachedMethod               FObject        onDetachMethod               FObject        detachMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 3
@@ -264,7 +264,7 @@ Test.getAxioms().forEach(function(a) { console.log(a.cls_ && a.cls_.name, a.name
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2Method initArgsMethod initMethod hasOwnPropertyMethod clearPropertyMethod setPrivate_Method getPrivate_Method hasOwnPrivate_Method clearPrivate_Method pubPropertyChange_Method validateMethod lookupMethod assertMethod errorMethod logMethod warnMethod createListenerList_Method listeners_Method notify_Method hasListenersMethod pubMethod pub_Method subMethod slotMethod isDestroyedMethod onDestroyMethod destroyMethod equalsMethod compareToMethod diffMethod hashCodeMethod cloneMethod copyFromMethod toString __context__Method unknownArgTopic propertyChangeMethod describeMethod stringifyMethod toE" });
+  expect(log_.output).toMatchGolden({ i: 12, str: "Property aProperty bMethod f1Method f2Method initArgsMethod initMethod hasOwnPropertyMethod clearPropertyMethod setPrivate_Method getPrivate_Method hasOwnPrivate_Method clearPrivate_Method pubPropertyChange_Method validateMethod lookupMethod assertMethod errorMethod logMethod warnMethod createListenerList_Method listeners_Method notify_Method hasListenersMethod pubMethod pub_Method subMethod slotMethod isDetachedMethod onDetachMethod detachMethod equalsMethod compareToMethod diffMethod hashCodeMethod cloneMethod copyFromMethod toString __context__Method unknownArgTopic propertyChangeMethod describeMethod stringifyMethod toE" });
 
 
 // Example 13
@@ -300,7 +300,7 @@ log(Test.getAxiomsByClass(foam.core.Method).map(foam.core.Method.NAME.f));
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,init,hasOwnProperty,clearProperty,setPrivate_,getPrivate_,hasOwnPrivate_,clearPrivate_,pubPropertyChange_,validate,lookup,assert,error,log,warn,createListenerList_,listeners_,notify_,hasListeners,pub,pub_,sub,slot,isDestroyed,onDestroy,destroy,equals,compareTo,diff,hashCode,clone,copyFrom,toString,unknownArg,describe,stringify,toE" });
+  expect(log_.output).toMatchGolden({ i: 16, str: " <b>&gt;</b> f1,f2,initArgs,init,hasOwnProperty,clearProperty,setPrivate_,getPrivate_,hasOwnPrivate_,clearPrivate_,pubPropertyChange_,validate,lookup,assert,error,log,warn,createListenerList_,listeners_,notify_,hasListeners,pub,pub_,sub,slot,isDetached,onDetach,detach,equals,compareTo,diff,hashCode,clone,copyFrom,toString,unknownArg,describe,stringify,toE" });
 
 
 // Example 17
@@ -312,7 +312,7 @@ log(Test.getAxiomsByClass(foam.core.Method).sort(foam.core.Method.NAME.compare).
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> assert,clearPrivate_,clearProperty,clone,compareTo,copyFrom,createListenerList_,describe,destroy,diff,equals,error,f1,f2,getPrivate_,hashCode,hasListeners,hasOwnPrivate_,hasOwnProperty,init,initArgs,isDestroyed,listeners_,log,lookup,notify_,onDestroy,pub,pub_,pubPropertyChange_,setPrivate_,slot,stringify,sub,toE,toString,unknownArg,validate,warn" });
+  expect(log_.output).toMatchGolden({ i: 17, str: " <b>&gt;</b> assert,clearPrivate_,clearProperty,clone,compareTo,copyFrom,createListenerList_,describe,detach,diff,equals,error,f1,f2,getPrivate_,hashCode,hasListeners,hasOwnPrivate_,hasOwnProperty,init,initArgs,isDetached,listeners_,log,lookup,notify_,onDetach,pub,pub_,pubPropertyChange_,setPrivate_,slot,stringify,sub,toE,toString,unknownArg,validate,warn" });
 
 
 // Example 18
@@ -908,7 +908,7 @@ log(oldPerson.toString());
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
+  expect(log_.output).toMatchGolden({ i: 42, str: " <b>&gt;</b> John MCLASS:   Personextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             Person         nameProperty             Person         sexMethod               Person         toStringFloat                Person         salaryMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDetachedMethod               FObject        onDetachMethod               FObject        detachMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n <b>&gt;</b> Jane F 50000 <b>&gt;</b> John M 0" });
 
 
 // Example 43
@@ -1185,7 +1185,7 @@ tt.foo();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
+  expect(log_.output).toMatchGolden({ i: 61, str: "CLASS:   ImplementsTestextends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIProperty             ImplementsTest p1Property             ImplementsTest p2Property             ImplementsTest p3Method               ImplementsTest fooMethod               ImplementsTest barProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDetachedMethod               FObject        onDetachMethod               FObject        detachMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\nInstance of ImplementsTestAxiom Type           Name           Value----------------------------------------------------Property             p1             1Property             p2             Property             p3             Property             t1             2Property             t2             Property             t3             \nffoofoo" });
 
 
 // Example 62
@@ -1210,7 +1210,7 @@ ImplementsTest2.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 62, str: "CLASS:   ImplementsTest2extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Implements           ImplementsTest implements_SampleIImplements           ImplementsTest implements_Sample2IProperty             ImplementsTest tb1Property             ImplementsTest tb2Property             ImplementsTest tb3Method               ImplementsTest tbfooMethod               ImplementsTest tbbarProperty             ImplementsTest t1Property             ImplementsTest t2Property             ImplementsTest t3Method               ImplementsTest tfooMethod               ImplementsTest tbarMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDetachedMethod               FObject        onDetachMethod               FObject        detachMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 63
@@ -1270,7 +1270,7 @@ InnerClassTest.InnerClass1.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 65, str: "CLASS:   InnerClass1extends: FObjectAxiom Type           Source Class   Name----------------------------------------------------Property             InnerClass1    aProperty             InnerClass1    bMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDetachedMethod               FObject        onDetachMethod               FObject        detachMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromMethod               FObject        toStringanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 66
@@ -1320,7 +1320,7 @@ InnerEnumTest.InnerEnum.describe();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 68, str: "CLASS:   InnerEnumextends: Axiom Type           Source Class   Name----------------------------------------------------Int                  InnerEnum      ordinalString               InnerEnum      nameString               InnerEnum      labelMethod               InnerEnum      toStringanonymous            InnerEnum      enum_createEnumValue            InnerEnum      OPENEnumValue            InnerEnum      CLOSEDMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDestroyedMethod               FObject        onDestroyMethod               FObject        destroyMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
+  expect(log_.output).toMatchGolden({ i: 68, str: "CLASS:   InnerEnumextends: Axiom Type           Source Class   Name----------------------------------------------------Int                  InnerEnum      ordinalString               InnerEnum      nameString               InnerEnum      labelMethod               InnerEnum      toStringanonymous            InnerEnum      enum_createEnumValue            InnerEnum      OPENEnumValue            InnerEnum      CLOSEDMethod               FObject        initArgsMethod               FObject        initMethod               FObject        hasOwnPropertyMethod               FObject        clearPropertyMethod               FObject        setPrivate_Method               FObject        getPrivate_Method               FObject        hasOwnPrivate_Method               FObject        clearPrivate_Method               FObject        pubPropertyChange_Method               FObject        validateMethod               FObject        lookupMethod               FObject        assertMethod               FObject        errorMethod               FObject        logMethod               FObject        warnMethod               FObject        createListenerList_Method               FObject        listeners_Method               FObject        notify_Method               FObject        hasListenersMethod               FObject        pubMethod               FObject        pub_Method               FObject        subMethod               FObject        slotMethod               FObject        isDetachedMethod               FObject        onDetachMethod               FObject        detachMethod               FObject        equalsMethod               FObject        compareToMethod               FObject        diffMethod               FObject        hashCodeMethod               FObject        cloneMethod               FObject        copyFromanonymous            FObject        __context__Method               FObject        unknownArgTopic                FObject        propertyChangeMethod               FObject        describeMethod               FObject        stringifyMethod               FObject        toE\n" });
 
 
 // Example 69
@@ -1428,10 +1428,10 @@ foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
 // There are three ways to unsubscribe a listener
-// 1. Call .destroy() on the Destroyable that sub() returns
+// 1. Call .detach() on the Detachable that sub() returns
 var sub = o.sub(l);
 o.pub('fire');
-sub.destroy();
+sub.detach();
 o.pub("fire again, but nobody's listenering");
 } catch(x) {
  log("Exception: ", x);
@@ -1443,9 +1443,9 @@ o.pub("fire again, but nobody's listenering");
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// 2. Destroy the subscription, which is supplied to the listener
+// 2. Detach the subscription, which is supplied to the listener
 var l = function(sub) {
-  sub.destroy();
+  sub.detach();
   console.log.apply(console.log, arguments);
 };
 o.sub(l);
@@ -1608,9 +1608,9 @@ log(p1.name, p2.name);
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// But this style of link can be broken by calling .destroy()
+// But this style of link can be broken by calling .detach()
 // on the object return from .linkFrom/To().
-d.destroy();
+d.detach();
 p2.name = 'Steve';
 log(p1.name, p2.name);
 } catch(x) {
@@ -1682,7 +1682,7 @@ p2.name = 'Paul'; // Will update p1 and p2
 log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
-d.destroy();
+d.detach();
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1718,7 +1718,7 @@ p2.name = 'Ringo'; // Will update p1 and p2
 log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
-d.destroy();
+d.detach();
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1739,7 +1739,7 @@ p2.name = 'Ringo'; // Will update p1 and p2
 log(p1.name, p2.name);
 p1.name = 'George'; // Will only update p1
 log(p1.name, p2.name);
-d.destroy();
+d.detach();
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1842,8 +1842,8 @@ log(e.get());
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// Destroy the ExpressionSlot to prevent further updates.
-e.destroy();
+// Detach the ExpressionSlot to prevent further updates.
+e.detach();
 p.fname = 'Steve';
 p.lname = 'Jones';
 } catch(x) {
@@ -1919,27 +1919,27 @@ log(p.name, p.hasOwnProperty('name'));
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// Destroyables (objects with a destroy() method) or functions
-// can be registered to be called when an object is destroyed.
+// Detachables (objects with a detach() method) or functions
+// can be registered to be called when an object is detached.
 var o = foam.core.FObject.create();
 var o2 = foam.core.FObject.create();
-o.onDestroy(function() { log('destroy 1'); });
-o2.onDestroy(function() { log('destroy 2'); });
-o.onDestroy(o2);
-o.destroy();
+o.onDetach(function() { log('detach 1'); });
+o2.onDetach(function() { log('detach 2'); });
+o.onDetach(o2);
+o.detach();
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 100, str: " <b>&gt;</b> destroy 2 <b>&gt;</b> destroy 1" });
+  expect(log_.output).toMatchGolden({ i: 100, str: " <b>&gt;</b> detach 2 <b>&gt;</b> detach 1" });
 
 
 // Example 101
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// It doesn't hurt to try and destroy an object more than once.
-o.destroy();
-o.destroy();
+// It doesn't hurt to try and detach an object more than once.
+o.detach();
+o.detach();
 } catch(x) {
  log("Exception: ", x);
  }
@@ -1950,7 +1950,7 @@ o.destroy();
 foam.__context__ = foam.createSubContext({});
 log_.output = "";
 try {
-// If an Object is destroyed, it will unsubscribe from any
+// If an Object is detached, it will unsubscribe from any
 // subscriptions which subsequently try to deliver events.
 var source = foam.core.FObject.create();
 var sink = foam.CLASS({
@@ -1964,12 +1964,12 @@ var sink = foam.CLASS({
 source.sub(sink.l);
 source.pub('ping');
 source.pub('ping');
-sink.destroy();
+sink.detach();
 source.pub('ping');
 } catch(x) {
  log("Exception: ", x);
  }
-  expect(log_.output).toMatchGolden({ i: 102, str: " <b>&gt;</b> ping <b>&gt;</b> pingwarn: Destroying stale subscription for Sink" });
+  expect(log_.output).toMatchGolden({ i: 102, str: " <b>&gt;</b> ping <b>&gt;</b> pingwarn: Detaching stale subscription for Sink" });
 
 
 // Example 103

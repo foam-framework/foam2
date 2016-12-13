@@ -51,7 +51,7 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
       function initialStart() {
         if ( ! $scope.dao ) return;
         $scope.dao.find($scope.key).then(hookUpObject);
-        daoSub && daoSub.destroy();
+        daoSub && daoSub.detach();
         daoSub = $scope.dao.on.sub(function(sub, _, operation, obj) {
           if ( operation === 'reset' ) {
             initialStart();
@@ -73,9 +73,9 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
       function hookUpObject(o) {
         innerScope[as] = obj = o.clone();
 
-        objSub && objSub.destroy();
+        objSub && objSub.detach();
         objSub = obj.propertyChange.sub(foam.X.merged(function(sub) {
-          sub.destroy();
+          sub.detach();
           $scope.dao.put(obj).then(hookUpObject);
         }, delay));
       }
@@ -85,7 +85,7 @@ angular.module('foam', [ 'ngMaterial' ]).directive('foamView', function() {
         initialStart();
         element.after(clone);
       });
-      // TODO: Do I need to add something extra to destroy that scope?
+      // TODO: Do I need to add something extra to detach that scope?
     }
   };
 });
@@ -123,7 +123,7 @@ angular.module('foam').directive('foamRepeat', [ '$timeout',
 
       function attachObject(obj) {
         obj.propertyChange.sub(foam.X.merged(function(sub) {
-          sub.destroy();
+          sub.detach();
           $scope.dao.put(obj);
         }, delay));
       }
