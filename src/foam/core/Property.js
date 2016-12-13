@@ -504,7 +504,7 @@ foam.CLASS({
               self.pub('propertyChange', name, self.slot(name));
             }
           }
-          for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
+          for ( var i = 0 ; i < subs.length ; i++ ) subs[i].detach();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var s = this.slot(argNames[i]).sub(l);

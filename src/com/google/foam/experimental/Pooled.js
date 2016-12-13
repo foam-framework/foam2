@@ -16,7 +16,7 @@
  */
 
 /** Causes an class to pool its instances. create() will pull from the pool,
- and destroy() will return instances to the pool. Object pools can be found
+ and detach() will return instances to the pool. Object pools can be found
  in <code>foam.__objectPools__</code>. */
 foam.CLASS({
   package: 'foam.pattern',
@@ -58,7 +58,7 @@ foam.CLASS({
         if ( pool.length ) {
           nu = pool[pool.length - 1];
           --pool.length
-          nu.destroyed = false;
+          nu.detached = false;
           nu.initArgs(args, X);
           nu.init && nu.init();
         } else {
@@ -67,14 +67,14 @@ foam.CLASS({
         return nu;
       }
 
-      // TODO: ordering matters here. User defined destroy() should override.
-      // Or just have the user define reset() or pooledDestroy() instead?
+      // TODO: ordering matters here. User defined detach() should override.
+      // Or just have the user define reset() or pooledDetach() instead?
       cls.installAxiom(this.Method.create({
-        name: 'destroy',
+        name: 'detach',
         code: function() {
-          if ( this.isDestroyed() || this.instance_.destroying_ ) return;
+          if ( this.isDetached() || this.instance_.detaching_ ) return;
 
-          // Run destroy process on the object, but leave its privates empty but intact
+          // Run detach process on the object, but leave its privates empty but intact
           // to avoid reallocating them
           var inst_ = this.instance_;
           var priv_ = this.private_;
@@ -84,8 +84,8 @@ foam.CLASS({
           this.private_ = priv_;
           this.instance_ = inst_;
 
-          if ( typeof this.pooledDestroy === 'function' ) {
-            this.pooledDestroy();
+          if ( typeof this.pooledDetach === 'function' ) {
+            this.pooledDetach();
           } else {
             // by default, clear out instance_ and private_
             for ( var ikey in inst_ ) delete inst_[ikey];
@@ -94,9 +94,9 @@ foam.CLASS({
 
           // return to pool
           this.cls_.__objectPool__.push(this);
-          // ensure we don't retain the destroying_ indicator
-          if ( this.instance_ && this.instance_.destroying_ ) {
-            delete this.instance_.destroying_;
+          // ensure we don't retain the detaching_ indicator
+          if ( this.instance_ && this.instance_.detaching_ ) {
+            delete this.instance_.detaching_;
           }
         }
       }));

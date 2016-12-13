@@ -393,7 +393,7 @@ foam.CLASS({
       },
       postSet: function(old, nu) {
         if ( old === nu ) return;
-        if ( this.dataSub_ ) this.dataSub_.destroy();
+        if ( this.dataSub_ ) this.dataSub_.detach();
         this.dataSub_ = nu.propertyChange.sub(this.onDataChange);
         this.onDataChange();
       }
