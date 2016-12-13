@@ -138,7 +138,7 @@ foam.CLASS({
     function listen(
       /* foam.dao.Sink */                   sink,
       /* foam.mlang.predicate.Predicate? */ predicate
-        /* object // The subscription object, with a .destroy() to clean up. */
+        /* object // The subscription object, with a .detach() to clean up. */
     ) {
       var mySink = this.decorateSink_(sink, undefined, undefined, undefined, predicate);
 
@@ -147,9 +147,9 @@ foam.CLASS({
 
       fc.propertyChange.sub(function(s, _, pname) {
         if ( pname == "stopped") {
-          if ( sub ) sub.destroy();
+          if ( sub ) sub.detach();
         } else if ( pname === "errorEvt" ) {
-          if ( sub ) sub.destroy();
+          if ( sub ) sub.detach();
           mySink.error(fc.errorEvt);
         }
       });
@@ -302,7 +302,7 @@ foam.CLASS({
         // TODO: replace this with a manually installed ProxySub,
         //   or implement interceptors in Proxy
         if ( this.delegateSub_ ) {
-          this.delegateSub_.destroy();
+          this.delegateSub_.detach();
           this.delegateSub_ = nu.on.sub(this.onEvent);
         }
       }
@@ -332,8 +332,8 @@ foam.CLASS({
       if ( arg1 === 'on' && ! this.delegateSub_ ) {
         var self = this;
         this.delegateSub_ = this.delegate.on.sub(this.onEvent);
-        this.onDestroy(function() {
-          self.delegateSub_ && self.delegateSub_.destroy();
+        this.onDetach(function() {
+          self.delegateSub_ && self.delegateSub_.detach();
           self.delegateSub_ = null;
         });
       }
