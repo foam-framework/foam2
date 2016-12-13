@@ -76,6 +76,7 @@ FOAM_FILES([
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/dao/Sink" },
   { name: "foam/dao/dao" },
+  { name: "foam/dao/daoUtils" },
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/mlang/mlang" },
