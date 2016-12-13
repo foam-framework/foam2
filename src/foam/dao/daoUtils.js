@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
@@ -45,6 +44,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArraySink',
@@ -67,6 +67,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
@@ -82,6 +83,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -119,6 +121,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.LIB({
   name: 'foam.String',
