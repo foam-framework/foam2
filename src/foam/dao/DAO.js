@@ -19,7 +19,7 @@ foam.INTERFACE({
   package: 'foam.dao',
   name: 'DAO',
 
-  // documentation: 'DAO Interface',
+  documentation: 'DAO Interface',
 
   methods: [
     {
@@ -162,4 +162,3 @@ foam.INTERFACE({
     }
   ]
 });
-
