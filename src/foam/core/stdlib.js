@@ -370,17 +370,6 @@ foam.LIB({
     },
 
     {
-      name: 'camelize',
-      code: foam.Function.memoize1(function(/* foam.String */ str) {
-        if ( str === '' || str === null ) return '';
-
-        return str.replace(/([a-zA-Z0-9][^a-zA-Z0-9][a-zA-Z0-9])/g, function(a, c) {
-          return a.charAt(0) + a.charAt(2).toUpperCase();
-        });
-      })
-    },
-
-    {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
         foam.assert(typeof str === 'string',
