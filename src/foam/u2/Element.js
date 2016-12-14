@@ -1131,7 +1131,7 @@ foam.CLASS({
 
     // Was renamed from cls() in FOAM1, current name seems
     // out of place.  Maybe renamed addClass().
-    function cssClass(/* Slot | String */ cls) {
+    function cssClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
@@ -1322,7 +1322,7 @@ foam.CLASS({
       return this;
     },
 
-    function addBefore(reference/*, vargs */) {
+    function addBefore(reference) { /*, vargs */
       /* Add a variable number of children before the reference element. */
       var children = [];
       for ( var i = 1 ; i < arguments.length ; i++ ) {

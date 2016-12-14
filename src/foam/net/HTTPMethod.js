@@ -117,7 +117,7 @@ foam.CLASS({
       p[this.name] = this.code;
     },
 
-    function callRemote_(/* object */ opt_args, host /* Promise */) {
+    function callRemote_(opt_args, host) {
       foam.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
         "HTTPMethod call can't find HTTPRequestFactory",
         this.HTTPRequestFactoryName, "on", host);

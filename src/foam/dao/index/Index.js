@@ -47,7 +47,7 @@ foam.CLASS({
     function remove() {},
 
     /** @return a Plan to execute a select with the given parameters */
-    function plan(/*sink, skip, limit, order, predicate*/) {},
+    function plan(sink, skip, limit, order, predicate) {},
 
     /** @return the stored value for the given key. */
     function get() {},
@@ -56,11 +56,11 @@ foam.CLASS({
     function size() {},
 
     /** Selects matching items from the index and puts them into sink */
-    function select(/*sink, skip, limit, order, predicate*/) { },
+    function select(sink, skip, limit, order, predicate) { },
 
     /** Selects matching items in reverse order from the index and puts
       them into sink */
-    function selectReverse(/*sink, skip, limit, order, predicate*/) { },
+    function selectReverse(sink, skip, limit, order, predicate) { },
   ]
 });
 
