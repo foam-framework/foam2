@@ -167,14 +167,9 @@ foam.LIB({
      * Decorates the function 'f' to cache the return value of 'f' when
      * called in the future. Also known as a 'thunk'.
      */
-    function memoize0(f) {
-      foam.assert(
-        typeof f === 'function',
-        'Cannot apply memoize to something that is not a function.');
-
+    function memoize0(/* function */ f) {
       var set = false, cache;
-
-      return foam.Function.setName(
+      var ret = foam.Function.setName(
           function() {
             if ( ! set ) {
               set = true;
@@ -183,19 +178,18 @@ foam.LIB({
             return cache;
           },
           'memoize0(' + f.name + ')');
+        ret.toString = function() { return f.toString(); };
+        return ret;
+        
     },
 
     /**
      * Decorates the function 'f' to cache the return value of 'f' when called
      * with a particular value for its first argument.
      */
-    function memoize1(f) {
-      foam.assert(
-        typeof f === 'function',
-        'Cannot apply memoize to something that is not a function.');
-
+    function memoize1(/* function */ f) {
       var cache = {}, nullCache, undefinedCache;
-      return foam.Function.setName(
+      var ret = foam.Function.setName(
           function(key) {
             foam.assert(
                 arguments.length === 1,
@@ -211,6 +205,8 @@ foam.LIB({
             return cache[mKey];
           },
           'memoize1(' + f.name + ')');
+        ret.toString = function() { return f.toString(); };
+        return ret;
     },
 
     /**
@@ -356,10 +352,7 @@ foam.LIB({
     },
     {
       name: 'constantize',
-      code: foam.Function.memoize1(function(str) {
-        foam.assert(typeof str === 'string',
-            'Cannot constantize non-string values.');
-
+      code: foam.Function.memoize1(function(/* string */ str) {
         // switches from from camelCase to CAMEL_CASE
         return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
       })
@@ -367,11 +360,8 @@ foam.LIB({
 
     {
       name: 'labelize',
-      code: foam.Function.memoize1(function(str) {
-        if ( str === '' || str === null ) return '';
-
-        foam.assert(typeof str === 'string',
-            'Cannot labelize non-string values.');
+      code: foam.Function.memoize1(function(/* string? */ str) {
+        if ( str === '' || str === null || foam.Undefined.isInstance(str) ) return '';
 
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
@@ -381,11 +371,8 @@ foam.LIB({
 
     {
       name: 'camelize',
-      code: foam.Function.memoize1(function(str) {
+      code: foam.Function.memoize1(function(/* string */ str) {
         if ( str === '' || str === null ) return '';
-
-        foam.assert(typeof str === 'string',
-            'Cannot camelize non-string values.');
 
         return str.replace(/([a-zA-Z0-9][^a-zA-Z0-9][a-zA-Z0-9])/g, function(a, c) {
           return a.charAt(0) + a.charAt(2).toUpperCase();

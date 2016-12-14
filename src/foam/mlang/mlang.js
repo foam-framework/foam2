@@ -1179,14 +1179,14 @@ foam.LIB({
       return foam.mlang.order.Desc.create({ arg1: c });
     },
 
-    function toCompare(c /*foam.mlang.order.Comparator*/) {
+    function toCompare(c) {
       var ret = foam.Array.isInstance(c) ? foam.compare.compound(c) :
         foam.Function.isInstance(c) ? foam.mlang.order.CustomComparator.create({ compareFn: c }) :
         c ;
       return ret;
     },
 
-    function compound(/*array*/ args) {
+    function compound(args) {
       var cs = args.map(foam.compare.toCompare);
 
       if ( cs.length === 0 ) return;
