@@ -998,7 +998,8 @@ foam.CLASS({
       var info = this.SUPER(cls);
       if ( this.hasDefaultValue('javaJSONParser') ) {
         var m = info.getMethod('jsonParser');
-        m.body = 'return new foam.lib.json.FObjectParser(' + this.of + '.class);';
+        var of = this.of === 'FObject' ? 'foam.core.FObject' : this.of;
+        m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
       return info;
     }
