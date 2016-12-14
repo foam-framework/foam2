@@ -452,20 +452,6 @@ describe('foam.String', function() {
 
   });
 
-  it('camelize', function() {
-    expect(foam.String.camelize('lower Case String'))
-      .toBe('lowerCaseString');
-    expect(foam.String.camelize('css-string'))
-      .toBe('cssString');
-    expect(foam.String.camelize('snake_case_string'))
-      .toBe('snakeCaseString');
-    expect(foam.String.camelize('CONST_SUPPORT_LACKING'))
-      .toBe('CONSTSUPPORTLACKING');
-    expect(foam.String.camelize('99$$'))
-      .toBe('99$$');
-
-  });
-
   it('labelize', function() {
     expect(foam.String.labelize("camelCaseName"))
       .toBe("Camel Case Name");
