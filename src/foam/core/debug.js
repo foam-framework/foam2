@@ -330,22 +330,11 @@ foam.CLASS({
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
 
 
-/** Describes a function return type. */
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ReturnValue',
-  extends: 'foam.core.Argument',
-
-  constants: {
-    PREFIX: 'Return'
-  }
-});
-
 
 /** The types library deals with type safety. */
 // ???: Should this go in foam.Function along with formalArgs() and be renamed just functionArgs?
 foam.LIB({
-  name: 'foam.types',
+  name: 'foam.Function',
 
   methods: [
     /** Decorates the given function with a runtime type checker.
@@ -394,6 +383,30 @@ foam.LIB({
     }
   ]
 });
+
+// // -- Uncomment to enable type checking on all methods --
+// // Access Argument now to avoid circular reference because of lazy model building.
+// foam.core.Argument;
+//
+// /* Methods gain type checking. */
+// foam.CLASS({
+//   refines: 'foam.core.Method',
+//
+//   properties: [
+//     {
+//       name: 'code',
+//       adapt: function(old, nu) {
+//         if ( nu )
+//           return foam.Function.typeCheck(nu);
+//
+//         return nu;
+//       }
+//     }
+//
+//   ]
+// });
+
+
 
 
 // Access Import now to avoid circular reference because of lazy model building.

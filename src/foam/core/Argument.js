@@ -57,7 +57,7 @@ foam.LIB({
           name:          typeMatch[7],
           typeName:      typeMatch[2],
           type:          global[typeMatch[2]],
-          optional:      typeMatch[3] == '?',
+          optional:      true, //typeMatch[3] == '?',
           repeats:       typeMatch[3] == '*',
           index:         argIdx++,
           documentation: typeMatch[6]
@@ -66,7 +66,8 @@ foam.LIB({
         // if present, record return type (if not the last arg, we fail on the
         // next iteration)
         if ( typeMatch[9] ) {
-          ret.returnType = foam.core.ReturnValue.create({
+          ret.returnType = foam.core.Argument.create({
+            name: 'ReturnValue',
             typeName: typeMatch[9],
             type: global[typeMatch[9]]
           });
@@ -77,7 +78,8 @@ foam.LIB({
         // check for bare return type with no args
         typeMatch = args.match(/^\s*\/\*\s*([\w._$]+)\s*\*\/\s*/);
         if ( typeMatch && typeMatch[1] ) {
-          ret.returnType = foam.core.ReturnValue.create({
+          ret.returnType = foam.core.Argument.create({
+            name: 'ReturnValue',
             typeName: typeMatch[1],
             type: global[typeMatch[1]]
           });
