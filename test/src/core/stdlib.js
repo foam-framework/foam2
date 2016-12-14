@@ -300,8 +300,8 @@ describe('foam.Function', function() {
     });
 
     it('grabs typed argument names', function() {
-      var fn = function(/* string */ str, /*boolean*/ bool ,
-        /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+      var fn = function(/* foam.String */ str, /*boolean*/ bool ,
+        /* foam.Function */ func, /*object*/obj, /* number */num, /* array*/ arr ) {
         return (true);
       }
       var args = foam.Function.argNames(fn);
