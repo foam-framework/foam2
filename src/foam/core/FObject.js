@@ -365,7 +365,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return this.instance_[name] !== undefined;
+      return ! foam.Undefined.isInstance(this.instance_[name]);
     },
 
     function hasDefaultValue(name) {
@@ -692,20 +692,28 @@ foam.CLASS({
 //      return ! this.instance_;
 //    },
 
+    /**
+     * Register a function or a destroyable to be called when this object is
+     * destroyed.
+     *
+     * A destroyable is any object with a destroy() method.
+     *
+     * Does nothing is the argument is falsy.
+     *
+     * Returns the input object, which can be useful for chaining.
+     */
     function onDestroy(d) {
-      /*
-        Register a function or a destroyable to be called
-        when this object is destroyed.
-      */
+      foam.assert(! d || foam.Function.isInstance(d.destroy) ||
+          foam.Function.isInstance(d),
+          'Argument to onDestroy() must be callable or destroyable.');
       if ( d ) this.sub('destroy', d.destroy ? d.destroy.bind(d) : d);
       return d;
     },
 
     function destroy() {
-      /*
+      /**
         Destroy this object.
         Free any referenced objects and destroy any registered destroyables.
-        This object is completely unusable after being destroyed.
        */
       if ( /* this.isDestroyed() ||*/ this.instance_.destroying_ ) return;
 
