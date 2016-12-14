@@ -1565,7 +1565,7 @@ var examples = [
       });
       o = PropertyChangeTest.create();
       // propertyChange event listeners are called with:
-      //   sub  - the subscription object, which can be destroy()ed to end
+      //   sub  - the subscription object, which can be detach()ed to end
       //            the subscription
       //   p    - the string 'propertyChange'
       //   name - the name of the changed property
@@ -1597,7 +1597,7 @@ var examples = [
   },
   {
     name: 'Unsubscribe from subscriber',
-    description: '1. Call .destroy() on the Destroyable that sub() returns',
+    description: '1. Call .detach() on the Detachable that sub() returns',
     dependencies: [ 'Pub Sub' ],
     code: function() {
 
@@ -1609,7 +1609,7 @@ var examples = [
 
       var sub = o.sub(l);
       o.pub('fire');
-      sub.destroy();
+      sub.detach();
       o.pub("fire again, but nobody's listenering");
     },
     postTestCode: function() {
@@ -1618,7 +1618,7 @@ var examples = [
   },
   {
     name: 'Unsubscribe from listener',
-    description: '2. Destroy the subscription, which is supplied to the listener',
+    description: '2. Detach the subscription, which is supplied to the listener',
     dependencies: [ 'Pub Sub' ],
     code: function() {
       var calls = 0;
@@ -1626,7 +1626,7 @@ var examples = [
         console.log('Event:', name);
         calls += 1;
         // stop listening
-        sub.destroy();
+        sub.detach();
       };
 
       o.sub(once);
@@ -1813,12 +1813,12 @@ var examples = [
   },
   {
     name: 'Data Binding linkFrom unbind',
-    description: 'linkFrom/To() returns a destroyable that unbinds the slots',
+    description: 'linkFrom/To() returns a detachable that unbinds the slots',
     dependencies: [ 'Data Binding linkFrom' ],
     code: function() {
-      // But this style of link can be broken by calling .destroy()
+      // But this style of link can be broken by calling .detach()
       // on the object return from .linkFrom/To().
-      d.destroy();
+      d.detach();
       p2.name = 'Steve';
       console.log("No longer bound:", p1.name, p2.name);
     },
@@ -1902,7 +1902,7 @@ var examples = [
       console.log('Assigned p2:', p1.name, p2.name);
       p1.name = 'George'; // Will only update p1
       console.log('Assigned p1:', p1.name, p2.name);
-      d.destroy();
+      d.detach();
     },
     postTestCode: function() {
       //toBeAssertedThat(p1.name).toEqual('George');
@@ -1939,7 +1939,7 @@ var examples = [
       console.log('Assigned second:', p1.name, p2.name);
       p1.name = 'George'; // Will only update p1
       console.log('Assigned first:', p1.name, p2.name);
-      d.destroy();
+      d.detach();
     },
     postTestCode: function() {
       //toBeAssertedThat(p1.name).toEqual('George');
@@ -1962,7 +1962,7 @@ var examples = [
       console.log("Assigned second:", p1.name, p2.name);
       p1.name = 'George'; // Will only update p1
       console.log("Assigned first:", p1.name, p2.name);
-      d.destroy();
+      d.detach();
     },
     postTestCode: function() {
       //toBeAssertedThat(p1.name).toEqual('George');
@@ -2069,15 +2069,15 @@ var examples = [
   },
   {
     name: 'Expression Slot unbinding',
-    description: 'Destroy the ExpressionSlot to prevent further updates',
+    description: 'Detach the ExpressionSlot to prevent further updates',
     dependencies: [ 'Expression Slots' ],
     code: function() {
       calls = 0;
-      e.destroy();
-      console.log("e destroyed, setting f and l again...");
+      e.detach();
+      console.log("e detached, setting f and l again...");
       p.f = 'Bob';
       p.l = 'Roberts';
-      console.log("Updates since destroy:", calls);
+      console.log("Updates since detach:", calls);
     },
     postTestCode: function() {
       //toBeAssertedThat(calls).toEqual(0);
@@ -2156,53 +2156,53 @@ var examples = [
     }
   },
   {
-    name: 'Destroyables',
-    description: 'Destroyables or functions can be registered to be called when an object is destroyed.',
+    name: 'Detachables',
+    description: 'Detachables or functions can be registered to be called when an object is detached.',
     dependencies: [  ],
     code: function() {
-      // Destroyables are objects with a destroy() method, such as FObjects
+      // Detachables are objects with a detach() method, such as FObjects
       // and sub()-returned subscriptions.
       var o = foam.core.FObject.create();
       var o2 = foam.core.FObject.create();
-      var destroys = '';
+      var detachs = '';
 
-      // onDestroy adds a function to be called when the object is destroyed
-      o.onDestroy(function() {
-        console.log('destroy 1');
-        destroys += '1 ';
+      // onDetach adds a function to be called when the object is detached
+      o.onDetach(function() {
+        console.log('detach 1');
+        detachs += '1 ';
       });
-      o2.onDestroy(function() {
-        console.log('destroy 2');
-        destroys += '2 ';
+      o2.onDetach(function() {
+        console.log('detach 2');
+        detachs += '2 ';
       });
 
-      // cause o2 to be destroyed when o is destroyed
-      o.onDestroy(o2);
-      o.destroy();
+      // cause o2 to be detached when o is detached
+      o.onDetach(o2);
+      o.detach();
     },
     postTestCode: function() {
-      //toBeAssertedThat(destroys).toEqual('1 2 ');
+      //toBeAssertedThat(detachs).toEqual('1 2 ');
     }
   },
   {
-    name: 'Destroyables idempotent',
-    description: 'It doesn\'t hurt to try and destroy an object more than once',
+    name: 'Detachables idempotent',
+    description: 'It doesn\'t hurt to try and detach an object more than once',
     dependencies: [  ],
     code: function() {
       var o = foam.core.FObject.create();
-      o.destroy();
-      o.destroy();
+      o.detach();
+      o.detach();
     },
     postTestCode: function() {
-      //toBeAssertedThat(function() { o.destroy(); }).not.toThrow();
+      //toBeAssertedThat(function() { o.detach(); }).not.toThrow();
     }
   },
   {
-    name: 'Destroyables unsubscribe',
+    name: 'Detachables unsubscribe',
     description: '',
     dependencies: [  ],
     code: function() {
-      // If an Object is destroyed, it will unsubscribe from any
+      // If an Object is detached, it will unsubscribe from any
       // subscriptions which subsequently try to deliver events.
       var source = foam.core.FObject.create();
       var calls = 0;
@@ -2219,7 +2219,7 @@ var examples = [
       source.sub(sink.l);
       source.pub('ping');
       source.pub('ping');
-      sink.destroy();
+      sink.detach();
       source.pub('ping');
     },
     postTestCode: function() {

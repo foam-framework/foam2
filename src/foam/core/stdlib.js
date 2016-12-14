@@ -439,14 +439,11 @@ foam.LIB({
       })
     },
 
-    function pad(str, size) {
-      foam.assert(typeof str === 'string',
-          'Cannot constantize non-string values.');
-
+    function pad(obj, size) {
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
-        (new Array(-size).join(' ') + str).slice(size)       :
-        (str + new Array(size).join(' ')).substring(0, size) ;
+        (new Array(-size).join(' ') + obj).slice(size)       :
+        (obj + new Array(size).join(' ')).substring(0, size) ;
     },
 
     function multiline(f) {

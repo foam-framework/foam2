@@ -22,7 +22,7 @@ function createTestListener(doUnsub) {
     listener.last_args = arguments;
     listener.last_old = dyn && dyn.getPrev();
     listener.last_nu = dyn && dyn.get();
-    if (doUnsub) subscription.destroy();
+    if (doUnsub) subscription.detach();
     listener.count += 1;
   };
   listener.count = 0;
@@ -303,7 +303,7 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
     ep.change.sub(listener2);
     ep.change.sub(listener3);
 
-    s1.destroy();
+    s1.detach();
     ep.change.pub();
     expect(listener.count).toEqual(0);
     expect(listener2.count).toEqual(1);
@@ -314,7 +314,7 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
     var s2 = ep.change.sub(listener2);
     ep.change.sub(listener3);
 
-    s2.destroy();
+    s2.detach();
     ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(0);
@@ -325,7 +325,7 @@ describe('foam.__context__.Observable.sub()/.pub()', function() {
     ep.change.sub(listener2);
     var s3 = ep.change.sub(listener3);
 
-    s3.destroy();
+    s3.detach();
     ep.change.pub();
     expect(listener.count).toEqual(1);
     expect(listener2.count).toEqual(1);

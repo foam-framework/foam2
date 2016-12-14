@@ -1243,7 +1243,7 @@ foam.CLASS({
         return ws.connect().then(function(ws) {
 
           ws.disconnected.sub(function(sub) {
-            sub.destroy();
+            sub.detach();
             this.socket = undefined;
           }.bind(this));
 

@@ -85,11 +85,11 @@ foam.CLASS({
         this.down.pub();
 
         if ( this.touch.hasListeners() ) {
-          if ( this.lastTouch ) this.lastTouch.destroy();
+          if ( this.lastTouch ) this.lastTouch.detach();
 
           this.lastTouch = foam.input.TouchEvent.create();
-          this.lastTouch.onDestroy(this.lastTouch.x$.follow(this.x$));
-          this.lastTouch.onDestroy(this.lastTouch.y$.follow(this.y$));
+          this.lastTouch.onDetach(this.lastTouch.x$.follow(this.x$));
+          this.lastTouch.onDetach(this.lastTouch.y$.follow(this.y$));
 
           this.touch.pub(this.lastTouch);
 
@@ -103,7 +103,7 @@ foam.CLASS({
         this.up.pub();
 
         if ( this.lastTouch ) {
-          this.lastTouch.destroy();
+          this.lastTouch.detach();
           this.lastTouch = undefined;
         }
       }
@@ -197,7 +197,7 @@ foam.CLASS({
       for ( var i = 0 ; i < changed.length ; i++ ) {
         var touch = changed.item(i);
 
-        this.touches[touch.identifier].destroy();
+        this.touches[touch.identifier].detach();
         delete this.touches[touch.identifier];
       }
     }
@@ -227,16 +227,16 @@ foam.CLASS({
       name: 'mouseInput',
       factory: function() {
         var m = this.Mouse.create();
-        this.onDestroy(m.element$.follow(this.element$));
-        this.onDestroy(m.touch.sub(this.onTouch));
+        this.onDetach(m.element$.follow(this.element$));
+        this.onDetach(m.touch.sub(this.onTouch));
       }
     },
     {
       name: 'touchInput',
       factory: function() {
         var t = this.Touch.create();
-        this.onDestroy(t.element$.follow(this.element$));
-        this.onDestroy(t.touch.sub(this.onTouch));
+        this.onDetach(t.element$.follow(this.element$));
+        this.onDetach(t.touch.sub(this.onTouch));
       }
     }
   ],

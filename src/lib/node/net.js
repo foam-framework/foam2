@@ -448,7 +448,7 @@ foam.CLASS({
       }.bind(this));
 
       socket.disconnect.sub(function() {
-        s1.destroy();
+        s1.detach();
       }.bind(this));
     }
   ],
