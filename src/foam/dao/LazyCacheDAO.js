@@ -60,7 +60,7 @@ foam.CLASS({
         @private */
       name: 'cacheSyncSub_',
       postSet: function(old, nu) {
-        if ( old && old.destroy ) old.destroy();
+        if ( old && old.detach ) old.detach();
       }
     },
     {

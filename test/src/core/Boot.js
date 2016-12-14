@@ -776,21 +776,21 @@ describe('Slots', function() {
     t.a = 999;
     expect(t2.a).toEqual(999);
   });
-  it('allows links to be destroyed', function() {
+  it('allows links to be detached', function() {
     var b = t.a$.link(t2.a$);
     t.a = 999;
 
-    b.destroy();
+    b.detach();
 
     t.a = 4;
     expect(t.a).toEqual(4);
     expect(t2.a).toEqual(999);
   });
-  it('allows follows to be destroyed', function() {
+  it('allows follows to be detached', function() {
     var b = t2.a$.follow(t.a$);
     t.a = 999;
 
-    b.destroy();
+    b.detach();
 
     t.a = 4;
     expect(t.a).toEqual(4);
@@ -824,7 +824,7 @@ describe('Slots', function() {
     var s = t.a$.sub(l);
     t.a = 999;
 
-    s.destroy();
+    s.detach();
     t.a = 49;
 
     // same as the first time

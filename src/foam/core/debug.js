@@ -475,3 +475,29 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.LIB({
+  name: 'foam.debug',
+
+  methods: [
+    function showCreates() {
+      var lastCounts_ = this.lastCounts_ || ( this.lastCounts_ = {} );
+
+      console.log('Class                                         Count      Delta');
+      console.log('-----------------------------------------------------------------');
+      for ( var key in foam.USED ) {
+        var c = foam.USED[key];
+
+        if ( c.count_ ) {
+          var lc = lastCounts_[key] || 0;
+          lastCounts_[key] = c.count_;
+          console.log(
+              foam.String.pad(c.id, 45),
+              foam.String.pad(c.count_ + '', 10),
+              c.count_-lc);
+        }
+      }
+    }
+  ]
+});

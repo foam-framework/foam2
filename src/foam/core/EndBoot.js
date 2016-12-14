@@ -218,6 +218,7 @@ foam.CLASS({
  */
 (function() {
   // List of unused Models in the system.
+  foam.USED = {};
   foam.UNUSED = {};
 
   var CLASS = foam.CLASS;
@@ -229,7 +230,9 @@ foam.CLASS({
     foam.UNUSED[m.id] = true;
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
-      return CLASS(m);
+      var c = CLASS(m);
+      foam.USED[m.id] = c;
+      return c;
     });
     foam.__context__.registerFactory(m, f);
     foam.package.registerClassFactory(m, f);

@@ -642,8 +642,8 @@ foam.CLASS({
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
-        this.initCView(x);
         this.state = 'initailized'
+        this.initCView(x);
       }
     },
 
@@ -1207,6 +1207,7 @@ foam.CLASS({
       this.on('load', this.paint);
       this.cview$.valueSub('invalidated', this.paint);
     },
+
     function erase() {
       this.el().width = this.el().width;
     }

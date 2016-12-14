@@ -489,7 +489,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      this.onDestroy(this.timer.time$.sub(this.tick));
+      this.onDetach(this.timer.time$.sub(this.tick));
       this.propertyChange.sub(this.tick);
     },
 
@@ -590,7 +590,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      this.onDestroy(this.physics.onTick.sub(this.tick));
+      this.onDetach(this.physics.onTick.sub(this.tick));
       this.propertyChange.sub(this.tick);
     },
 
@@ -929,7 +929,7 @@ foam.CLASS({
     },
 
     function xyzToY(x, y, z) {
-      return this.parent.parent.height/2 + x + y - z;
+      return this.parent.parent.height/2 + x + y - z * Math.SQRT2;
     },
 
     function paintSelf(x) {

@@ -53,7 +53,7 @@ foam.CLASS({
         f.toString = function() { return formula; };
 
         var timer = function() {
-          if ( self.isDestroyed() ) return;
+          if ( self.isDetached() ) return;
           if ( self.reactions_[name] !== f ) return;
           self[name] = f.call(self);
           self.__context__.requestAnimationFrame(timer);
