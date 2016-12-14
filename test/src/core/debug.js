@@ -35,8 +35,8 @@ function makeTestFn() {
   }
 }
 function makePrimitiveTestFn() { // multiline parsing, ha
-return function(/* string */ str, /*boolean*/ bool ,
-  /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+return function(/* foam.String */ str, /*foam.Boolean*/ bool ,
+  /* foam.Function */ func, /*foam.Object*/obj, /* foam.Number */num, /* []*/ arr ) {
     return (true);
   }
 }
@@ -148,7 +148,7 @@ describe('Argument.validate', function() {
   it('checks primitive types', function() {
     var params = foam.Function.args(makePrimitiveTestFn());
 
-    // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
+    // /* foam.String */ str, /*foam.Boolean*/ bool , /* foam.Function */ func, /*foam.Object*/obj, /* foam.Number */num
     expect(function() { params[0].validate('hello'); }).not.toThrow();
     expect(function() { params[1].validate(true); }).not.toThrow();
     expect(function() { params[2].validate(function() {}); }).not.toThrow();
@@ -159,7 +159,7 @@ describe('Argument.validate', function() {
   it('rejects wrong primitive types', function() {
     var params = foam.Function.args(makePrimitiveTestFn());
 
-    // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
+    // /* foam.String */ str, /*foam.Boolean*/ bool , /* foam.Function */ func, /*foam.Object*/obj, /* foam.Number */num
     expect(function() { params[0].validate(78); }).toThrow();
     expect(function() { params[1].validate('nice'); }).toThrow();
     expect(function() { params[2].validate({}); }).toThrow();
@@ -171,7 +171,7 @@ describe('Argument.validate', function() {
   it('parses empty args list with tricky function body', function() {
     var params = foam.Function.args(function() { (3+4); return (1); });
 
-    // /* string */ str, /*boolean*/ bool , /* function*/ func, /*object*/obj, /* number */num
+    // /* foam.String */ str, /*foam.Boolean*/ bool , /* foam.Function */ func, /*foam.Object*/obj, /* foam.Number */num
     expect(function() { params[0].validate(78); }).toThrow();
     expect(function() { params[1].validate('nice'); }).toThrow();
     expect(function() { params[2].validate({}); }).toThrow();
@@ -239,7 +239,7 @@ describe('foam.Function.typeCheck', function() {
   });
 
   it('fails bad return type', function() {
-   var rfn = foam.Function.typeCheck(function(arg /* object */) { return arg; });
+   var rfn = foam.Function.typeCheck(function(arg /* foam.Object */) { return arg; });
    expect(function() { rfn({}); }).not.toThrow();
    expect(function() { rfn(99); }).toThrow();
   });

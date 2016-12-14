@@ -1252,7 +1252,7 @@ foam.CLASS({
       return this.parentNode;
     },
 
-    function add(/* vargs */) {
+    function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
       } else {
