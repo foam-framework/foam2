@@ -44,7 +44,7 @@ foam.LIB({
       })
     }
   ]
-};
+});
 // TODO: tests
 // it('camelize', function() {
 //   expect(foam.String.camelize('lower Case String'))
