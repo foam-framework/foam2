@@ -331,8 +331,6 @@ foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext
 
 
 
-/** The types library deals with type safety. */
-// ???: Should this go in foam.Function along with formalArgs() and be renamed just functionArgs?
 foam.LIB({
   name: 'foam.Function',
 
@@ -395,7 +393,7 @@ foam.LIB({
         // If nothing threw an exception, we are free to run the function
         var typeCheckerVal = fn.apply(this, arguments);
 
-        // check the typeCheckerurn value
+        // check the return value
         if ( args.returnType ) args.returnType.validate(typeCheckerVal);
 
         return typeCheckerVal;

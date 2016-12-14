@@ -148,7 +148,7 @@ foam.LIB({
       };
     },
 
-    function sleep(/* number */ time) {
+    function sleep(/* foam.Number */ time) {
       /** Returns a function that returns a promise that delays by the given
         time before resolving. */
       return function() {

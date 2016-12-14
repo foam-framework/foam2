@@ -37,10 +37,32 @@ foam.LIB({
       // Optional commented type(incl. dots for packages), argument name,
       // optional commented return type
       // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
-      //console.log('-----------------');
       var argIdx = 0;
-      var argMatcher = /(\s*\/\*\s*([\w._$]+)(\?)?(\*)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
+      var argMatcher = /(\s*\/\*\s*([\w._$\[\]]+)(\?)?(\*)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*([\w_$]+)\s*(\/\*\s*([\w._$]+)\s*\*\/)?\s*\,+/g;
       var typeMatch;
+
+      function resolveType(typeStr) {
+        // TODO: core foam to have a warning here, if no typeName specified
+        // User code should be allowed to omit types.
+        if ( ! typeStr ) return undefined;
+        
+        typeStr = typeStr.trim();
+        if ( typeStr.substring(typeStr.length - 2) === '[]' ) {
+          return foam.Array;
+        }
+
+        var cls = foam.lookup(typeStr, true);
+        if ( cls ) return cls;
+        
+        // otherwise look for foam.<primitive> type
+        if ( typeStr.indexOf('foam.') === 0 ) {
+          cls = foam[typeStr.split('.')[1]];
+          if ( cls ) return cls;
+        }
+        
+        // could not resolve
+        throw new TypeError("foam.Function.args could not resolve type " + typeStr);
+      };
 
       while ( typeMatch = argMatcher.exec(args) ) {
         // if can't match from start of string, fail
@@ -56,7 +78,7 @@ foam.LIB({
         ret.push(foam.core.Argument.create({
           name:          typeMatch[7],
           typeName:      typeMatch[2],
-          type:          global[typeMatch[2]],
+          type:          resolveType(typeMatch[2]),
           optional:      true, //typeMatch[3] == '?',
           repeats:       typeMatch[3] == '*',
           index:         argIdx++,
@@ -69,7 +91,7 @@ foam.LIB({
           ret.returnType = foam.core.Argument.create({
             name: 'ReturnValue',
             typeName: typeMatch[9],
-            type: global[typeMatch[9]]
+            type: resolveType(typeMatch[9])
           });
         }
       }
@@ -81,7 +103,7 @@ foam.LIB({
           ret.returnType = foam.core.Argument.create({
             name: 'ReturnValue',
             typeName: typeMatch[1],
-            type: global[typeMatch[1]]
+            type: resolveType(typeMatch[1])
           });
         } else {
           throw new SyntaxError(
@@ -113,7 +135,7 @@ foam.CLASS({
     {
       /**
         The string name of the type
-        (either a model name or javascript typeof name)
+        (either a model name or foam.String, foam.Function, etc. or [])
       */
       name: 'typeName'
     },
@@ -145,36 +167,30 @@ foam.CLASS({
         Validates the given argument against this type information.
         If any type checks are failed, a TypeError is thrown.
        */
+      if ( ! this.type ) {
+        // no type, no check to perform
+        return;
+      }
+      
       i = ( this.index >= 0 ) ? ' ' + this.index + ', ' : ', ';
 
       // optional check
       if ( foam.Null.isInstance(arg) || foam.Undefined.isInstance(arg) ) {
         if ( ! this.optional ) {
           throw new TypeError(
-              this.PREFIX + i + this.name +
+              'Argument ' + i + this.name +
               ', is not optional, but was undefined in a function call');
         }
 
         return; // value is undefined, but ok with that
       }
 
-      // type this for non-modelled types (no model, but a type name specified)
-      if ( ! this.type ) {
-        if ( this.typeName
-            && typeof arg !== this.typeName
-            && ! ( this.typeName === 'array' && Array.isArray(arg) ) ) {
-          throw new TypeError(
-              this.PREFIX + i + this.name +
-              ', expected type ' + this.typeName + ' but passed ' + (typeof arg));
-        } // else no this: no type, no typeName
-      } else {
-        // have a modelled type
-        if ( ! this.type.isInstance(arg) ) {
-          var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
-          throw new TypeError(
-              this.PREFIX + i + this.name +
-              ', expected type ' + this.typeName + ' but passed ' + gotType);
-        }
+      // have a modelled type
+      if ( ! this.type.isInstance(arg) ) {
+        var gotType = (arg.cls_) ? arg.cls_.name : typeof arg;
+        throw new TypeError(
+            'Argument ' + i + this.name +
+            ', expected type ' + this.typeName + ' but passed ' + gotType);
       }
     }
   ]
