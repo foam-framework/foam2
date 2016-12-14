@@ -359,7 +359,9 @@ foam.CLASS({
 
     function get() { return this.value; },
 
-    function set() { /* nop */ },
+    function set() {
+      throw new Error('Tried to mutate immutable ConstantSlot.');
+    },
 
     function sub(l) { /* nop */ }
   ]

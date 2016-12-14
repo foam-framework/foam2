@@ -367,7 +367,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return this.instance_[name] !== undefined;
+      return ! foam.Undefined.isInstance(this.instance_[name]);
     },
 
     function hasDefaultValue(name) {
