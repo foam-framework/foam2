@@ -703,7 +703,6 @@ grid(function(x, y) {
 var t = turtle1;
 t.cs().pw(12);
 
-
 function gotoXYZ(x, y, z) {
   t.pc(hsl(z*2,0,z+50));
   t.gt(
@@ -1183,20 +1182,23 @@ t.rt(Math.random()*360).pitchUp(Math.random()*360).ss().pu().fd(120).pd().fd(120
 
 
 // dandylion
+canvas1.color = 'black';
 var t = turtle3d1;
+t.ht();
 
 t.cs().home();
 t.x = t.y = t.z = 0;
+t.rt(90);
+//t.pitchUp(45);
 
 t.pc('rgba(255,255,255,0.1');
-// t.pc('red');
 t.pw(2);
 
 repeat(10000, () => {
-t.ss().rt(Math.random()*180).pitchUp(Math.random()*180);
-t.pc(hsla(radToDeg(t.pitch*2), 50, 90, 0.4));
-t.pu().fd(120).pd().fd(80*Math.random()).rs().rt(10/3);
+t.ss().rt(Math.random()*360).pitchUp(Math.random()*360);
+t.pu().fd(120).pd().fd(80*Math.random()).rs();
 });
+
 
 
 
@@ -1297,3 +1299,70 @@ t.pitchDown(0.125);
 repeat(3600*2, (i) => {
   t.fd(i/200).rt(10);
 });
+
+
+
+
+
+
+var t = turtle3d1;
+t.cs().pw(12);
+
+function gotoXYZ(x, y, z) {
+  t.pc(hsl(z*2,0,z*0.5+50));
+  t.gt(x,y,z);
+}
+
+
+function grid(f, opt_inc) {
+  var inc = opt_inc || 10;
+  for ( var x = -200 ; x <= 200 ; x += inc ) {
+    t.pu();
+    for ( var y = -200 ; y <= 200 ; y += inc ) {
+      gotoXYZ(x, y, f(x,y));
+      t.pd();
+    }
+  }
+  for ( var y = -200 ; y <= 200 ; y += inc ) {
+    t.pu();
+    for ( var x = -200 ; x <= 200 ; x += inc ) {
+      gotoXYZ(x, y, f(x,y));
+      t.pd();
+    }
+  }
+}
+
+grid(function(x, y) {
+  var d = Math.sqrt(x*x + y*y);
+  return 150*Math.cos(d/25)*(200-d)/200;
+}, 1);
+
+
+
+circle1.x = 150;
+
+global.hsl = hsl;
+
+function tree(t, size) {
+  if ( size < 40 ) return;
+
+  if ( size > 45 && size < 55 ) {
+    var leaf = com.google.flow.Circle.create({border: null, color: 'green', radius: 15}, flow);
+
+    var h = Math.random()*20;
+    var s = 80+Math.random()*20;
+    var l = Math.random()*10+30;
+
+    leaf.addReaction('color', "hsl(Math.min(150,Math.max(20,circle1.x))+" + h + ", " + s + "," + l +")");
+    t.lay(leaf);
+  }
+
+  t.ss();
+  t.pw(size/20);
+  t.fd(size*0.25).bk(7);
+  tree(t.rt(20+Math.random()*40), size*0.75);
+  tree(t.lt(60+Math.random()*40), size*0.75);
+  t.rs();
+}
+
+tree(turtle1.pc('black'), 600);
