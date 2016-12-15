@@ -259,6 +259,20 @@ foam.LIB({
       return ret;
     },
 
+    /** Finds the function(...) declaration and finds the first block comment
+      in the function body. */
+    function functionComment(f) {
+      var match = f.
+          toString().
+          replace(/\n/g, '_#_%_%_'). // fake newlines
+          match(/^function(\s+[_$\w]+|\s*)\(.*?\)(?:\_\#\_\%\_\%\_|\s)*\{(?:\_\#\_\%\_\%\_|\s)*\/\*\*?\s*(.*?)\*?\*\/.*\}/);
+      if ( ! match ) {
+        return '';
+      } else {
+        return match[2] && match[2].replace(/_#_%_%_/g, '\n') || '';
+      }
+    },
+
     /**
      * Calls fn, and provides the arguments to fn by looking
      * up their names on source. The 'this' context is either

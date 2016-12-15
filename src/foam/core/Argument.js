@@ -33,6 +33,7 @@ foam.LIB({
       args += ','; // easier matching
 
       var ret = [];
+      var retMapByName = {};
       // check each arg for types
       // Optional commented type(incl. dots for packages), argument name,
       // optional commented return type
@@ -84,7 +85,7 @@ foam.LIB({
         }
 
         // record the argument
-        ret.push(foam.core.Argument.create({
+        var arg = foam.core.Argument.create({
           name:          typeMatch[7],
           typeName:      typeMatch[2],
           type:          resolveType(typeMatch[2]),
@@ -92,7 +93,9 @@ foam.LIB({
           repeats:       typeMatch[3] == '*',
           index:         argIdx++,
           documentation: typeMatch[6]
-        }));
+        });
+        ret.push(arg);
+        retMapByName[arg.name] = arg;
 
         // if present, record return type (if not the last arg, we fail on the
         // next iteration)
@@ -123,6 +126,58 @@ foam.LIB({
           );
         }
       }
+
+      // Also pull args out of the documentation comment (if inside the body
+      // so we can access it)
+      var comment = foam.Function.functionComment(fn);
+      if ( comment ) {
+        // match @arg or @param {opt_type} arg_name
+        var commentMatcher = /.*(\@arg|\@param|\@return)\s+(?:\{(.*?)\}\s+)?(.*?)\s+(?:([^\@]*))?/g;
+        var commentMatch;
+        while ( commentMatch = commentMatcher.exec(comment) ) {
+          var name = commentMatch[3];
+          var type = commentMatch[2];
+          var docs = commentMatch[4] && commentMatch[4].trim();
+
+          if ( commentMatch[1] === '@return' ) {
+            if ( ret.returnType ) {
+              throw new SyntaxError(
+                  'foam.types.getFunctionArgs duplicate return type ' +
+                  'definition in block comment: \"' +
+                  type + '\" from \:\n' + fn.toString());
+            }
+            ret.returnType = foam.core.Argument.create({
+              name: 'ReturnValue',
+              typeName: type,
+              type: foam.lookup(type, true),
+              documentation: docs
+            });
+          } else {
+            // check existing args
+            if ( retMapByName[name] ) {
+              if ( retMapByName[name].typeName ) {
+                throw new SyntaxError(
+                    'foam.types.getFunctionArgs duplicate argument ' +
+                    'definition in block comment: \"' +
+                    name + '\" from:\n' + fn.toString());
+              }
+              retMapByName[name].typeName = type;
+              retMapByName[name].documentation = docs;
+            } else {
+              var arg = foam.core.Argument.create({
+                name:          name,
+                typeName:      type,
+                type:          foam.lookup(type, true),
+                index:         argIdx++,
+                documentation: docs
+              });
+              ret.push(arg);
+              retMapByName[arg.name] = arg;
+            }
+          }
+        }
+      }
+      
 
       return ret;
     }

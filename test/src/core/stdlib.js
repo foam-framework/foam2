@@ -279,6 +279,34 @@ describe('foam.Function', function() {
     }).toThrow();
   });
 
+  it('functionComment', function() {
+    expect(foam.Function.functionComment(function() { })).toEqual('');
+    expect(foam.Function.functionComment(function() {/**/ })).toEqual('');
+    expect(foam.Function.functionComment(function() {/* hello */ })).toEqual('hello ');
+
+    /* jshint -W014 */
+    /* jshint laxcomma:true */
+    // jscs:disable
+
+    expect(foam.Function.functionComment(
+      function() {//hello
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(
+      function() {
+        var x;
+        /** hello */
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(function() /* hello */ {})).toEqual('');
+    // jscs:enable
+    /* jshint laxcomma:false */
+    /* jshint +W014 */
+
+  });
+
 
   describe('argNames', function() {
 
