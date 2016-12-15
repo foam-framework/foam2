@@ -235,7 +235,7 @@ foam.LIB({
 
       if ( ! match ) {
         /* istanbul ignore next */
-        throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
+        throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
       return match[2] || '';
