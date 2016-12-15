@@ -61,7 +61,11 @@ foam.LIB({
         }
         
         // could not resolve
-        throw new TypeError("foam.Function.args could not resolve type " + typeStr);
+        throw new TypeError(
+          'foam.Function.args could not resolve type ' + typeStr+ '\n' +
+          'For function:\n' +
+          fn.toString() + '\n'
+        );
       };
 
       while ( typeMatch = argMatcher.exec(args) ) {
@@ -69,9 +73,14 @@ foam.LIB({
         if ( argIdx == 0 && typeMatch.index > 0 ) break;
 
         if ( ret.returnType ) {
-          throw new SyntaxError("foam.types.args return type '" +
+          throw new SyntaxError('foam.Function.args return type \'' +
             ret.returnType.typeName +
-            "' must appear after the last argument only: " + args.toString());
+            '\' must appear after the last argument only: ' + 
+            args.toString() + '\n' +
+            'For function:\n' +
+            fn.toString() + '\n'
+          
+          );
         }
 
         // record the argument
@@ -107,8 +116,11 @@ foam.LIB({
           });
         } else {
           throw new SyntaxError(
-              'foam.types.args argument parsing error: ' +
-              args.toString());
+              'foam.Function.args argument parsing error:\n' +
+              args.toString() + '\n' +
+            'For function:\n' +
+            fn.toString() + '\n'
+          );
         }
       }
 

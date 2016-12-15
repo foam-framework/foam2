@@ -408,7 +408,7 @@ foam.LIB({
   ]
 });
 
-// -- Uncomment to enable type checking on all methods --
+
 // Access Argument now to avoid circular reference because of lazy model building.
 foam.core.Argument;
 
@@ -420,9 +420,14 @@ foam.CLASS({
     {
       name: 'code',
       adapt: function(old, nu) {
-        if ( nu )
-          return foam.Function.typeCheck(nu);
-
+        if ( nu ) {
+          try {
+            return foam.Function.typeCheck(nu);
+          } catch (e) {
+            this.warn('Method: Failed to add type checking to method ' + this.name + ':\n' + nu.toString());
+            throw e;
+          }
+        }
         return nu;
       }
     }
