@@ -57,6 +57,7 @@ foam.LIB({
     function create(args, opt_parent) {
       var obj = Object.create(this.prototype);
 
+      // Increment number of objects created of this class.
       this.count_++;
 
       // Properties have their values stored in instance_ instead
