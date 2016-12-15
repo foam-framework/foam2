@@ -424,8 +424,9 @@ foam.CLASS({
           try {
             return foam.Function.typeCheck(nu);
           } catch (e) {
-            this.warn('Method: Failed to add type checking to method ' + this.name + ':\n' + nu.toString());
-            throw e;
+            this.warn('Method: Failed to add type checking to method ' + 
+              this.name + ':\n' + nu.toString() + '\n', e);
+            //throw e; //TODO: throw?
           }
         }
         return nu;
