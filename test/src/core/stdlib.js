@@ -279,6 +279,34 @@ describe('foam.Function', function() {
     }).toThrow();
   });
 
+  it('functionComment', function() {
+    expect(foam.Function.functionComment(function() { })).toEqual('');
+    expect(foam.Function.functionComment(function() {/**/ })).toEqual('');
+    expect(foam.Function.functionComment(function() {/* hello */ })).toEqual('hello ');
+
+    /* jshint -W014 */
+    /* jshint laxcomma:true */
+    // jscs:disable
+
+    expect(foam.Function.functionComment(
+      function() {//hello
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(
+      function() {
+        var x;
+        /** hello */
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(function() /* hello */ {})).toEqual('');
+    // jscs:enable
+    /* jshint laxcomma:false */
+    /* jshint +W014 */
+
+  });
+
 
   describe('argNames', function() {
 
@@ -300,8 +328,8 @@ describe('foam.Function', function() {
     });
 
     it('grabs typed argument names', function() {
-      var fn = function(/* string */ str, /*boolean*/ bool ,
-        /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+      var fn = function(/* foam.String */ str, /*boolean*/ bool ,
+        /* foam.Function */ func, /*object*/obj, /* number */num, /* array*/ arr ) {
         return (true);
       }
       var args = foam.Function.argNames(fn);
@@ -449,20 +477,6 @@ describe('foam.String', function() {
     expect(function() {
       foam.String.capitalize(null);
     }).toThrow();
-
-  });
-
-  it('camelize', function() {
-    expect(foam.String.camelize('lower Case String'))
-      .toBe('lowerCaseString');
-    expect(foam.String.camelize('css-string'))
-      .toBe('cssString');
-    expect(foam.String.camelize('snake_case_string'))
-      .toBe('snakeCaseString');
-    expect(foam.String.camelize('CONST_SUPPORT_LACKING'))
-      .toBe('CONSTSUPPORTLACKING');
-    expect(foam.String.camelize('99$$'))
-      .toBe('99$$');
 
   });
 
