@@ -249,7 +249,7 @@ console.log(foam.Function.args(foo));
 foam.CLASS({
   name: 'Test',
 
-  axioms: [
+  xxxaxioms: [
     foam.core.MultiMethod.create({
       methodName: 'foo',
       code: function() {
@@ -272,3 +272,17 @@ foam.CLASS({
 });
 
 var t = Test.create();
+
+
+foam.CLASS({
+  name: 'RefTest',
+});
+foam.CLASS({
+  refines: 'RefTest',
+});
+console.log('1: ', RefTest.create());
+foam.CLASS({
+  refines: 'RefTest',
+  properties: ['f1']
+});
+console.log('2: ', RefTest.create());
