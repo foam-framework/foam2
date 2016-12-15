@@ -1004,6 +1004,25 @@ foam.CLASS({
   ],
 
   methods: [
+    function home() {
+      this.x = this.y = this.z = 0;
+      this.pitch = 0;
+      this.rotation = 0;
+      return this;
+    },
+
+    function paint(ctx) {
+      // Transform so that turtle appears in the right spot.
+      var x  = this.x, y = this.y, z = this.z;
+      var x2 = this.parent.width/2 - x + y;
+      var y2 = this.parent.height/2 + x + y - z * Math.SQRT2;
+
+      ctx.save();
+      ctx.translate(x2-x, y2-y);
+      this.SUPER(ctx);
+      ctx.restore();
+    },
+
     function pitchUp(a) {
       this.pitch += Math.PI * a / 180;
       return this;
