@@ -15,12 +15,6 @@
  * limitations under the License.
  */
 
-/*
-TODO(adamvy):
-- Only serialize the ordinal?
-- Freeze the instances?
-*/
-
 /**
  * For those familiar with Java, FOAM Enums are very similar to Java enums in
  * design.
@@ -35,9 +29,9 @@ TODO(adamvy):
  * Enums extend from FObject, so they inherit FObject features such as
  * pub/sub events, diffing, hashCode, etc.
  *
- * Enums also have a few built-in properties by default.  Every Enum has an
+ * Enums also have a few built-in properties by default. Every Enum has an
  * 'ordinal' property, which is a integer unique to all the Enum Values of a
- * particular Enum.  Each enum also has a 'name' property, which is the name
+ * particular Enum. Each enum also has a 'name' property, which is the name
  * given to each Enum Value.
  *
  * Example usage:
@@ -55,6 +49,7 @@ TODO(adamvy):
  *       value: true
  *     }
  *   ],
+ *
  *   methods: [
  *     function foo() {
  *       return this.label + ( this.consideredOpen ? ' is' : ' is not' ) +
@@ -66,17 +61,17 @@ TODO(adamvy):
  *   // want to exist.
  *   values: [
  *     {
- *       name: 'OPEN',
+ *       name: 'OPEN'
  *     },
  *     {
  *       // The ordinal can be specified explicitly.
  *       name: 'CLOSED',
- *       ordinal: 100,
+ *       ordinal: 100
  *     },
  *     {
  *       // If the ordinal isn't given explicitly it is auto assigned as
  *       // the previous ordinal + 1
- *       name: 'ASSIGNED',
+ *       name: 'ASSIGNED'
  *     },
  *     {
  *       // You can specify the label, which will be used when rendering in a
@@ -426,3 +421,10 @@ foam.LIB({
     }
   ]
 });
+
+
+/*
+TODO(adamvy):
+  - Only serialize the ordinal.
+  - Freeze the instances.
+*/
