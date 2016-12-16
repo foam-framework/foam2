@@ -138,6 +138,8 @@ foam.CLASS({
   package: 'foam.core.internal',
   name: 'EnumValue',
 
+  documentation: 'A single value of an Enum.',
+
   properties: [
     {
       class: 'String',
@@ -190,6 +192,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'EnumModel',
+
+  documentation: 'A complete Enum specification.',
 
   properties: [
     {
@@ -381,6 +385,8 @@ foam.CLASS({
   name: 'Enum',
   extends: 'Property',
 
+  documentation: 'A Property type for storing enum values.',
+
   properties: [
     { name: 'of', required: true },
     [
@@ -411,6 +417,7 @@ foam.LIB({
     function ENUM(m) {
       var model = foam.core.EnumModel.create(m);
       model.validate();
+
       var cls = model.buildClass();
       cls.validate();
 
