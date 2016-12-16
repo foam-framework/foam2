@@ -42,6 +42,7 @@ foam.CLASS({
 // We only need one Singleton, so make it a Singleton.
 foam.CLASS({
   refines: 'foam.pattern.Singleton',
+  flags: { noWarnOnRefinesAfterCreate: true },
   axioms: [ foam.pattern.Singleton.create() ]
 });
 
