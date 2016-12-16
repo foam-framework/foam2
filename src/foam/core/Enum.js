@@ -343,25 +343,22 @@ foam.CLASS({
 
   methods: [
     function buildClass() {
-      var cls;
+      var parent = foam.core.FObject, cls;
 
-      var parent = foam.core.FObject;
-
-      cls = Object.create(parent);
-      cls.prototype = Object.create(parent.prototype);
-      cls.prototype.cls_ = cls;
+      cls                  = Object.create(parent);
+      cls.prototype        = Object.create(parent.prototype);
+      cls.prototype.cls_   = cls;
       cls.prototype.model_ = this;
-      cls.private_ = { axiomCache: {} };
-      cls.axiomMap_ = Object.create(parent.axiomMap_);
-      cls.id = this.id;
-      cls.package = this.package;
-      cls.name = this.name;
-      cls.model_ = this;
+      cls.private_         = { axiomCache: {} };
+      cls.axiomMap_        = Object.create(parent.axiomMap_);
+      cls.id               = this.id;
+      cls.package          = this.package;
+      cls.name             = this.name;
+      cls.model_           = this;
 
       cls.installModel(this);
 
-      var values;
-      var model = this;
+      var values, model = this;
 
       cls.getValues = function() {
         if ( ! values ) {

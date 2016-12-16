@@ -47,8 +47,7 @@ foam.CLASS({
             for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
               var a = this.axioms_[i];
               if ( ! foam.core.Property.isInstance(a) &&
-                   ! foam.core.Method.isInstance(a) )
-              {
+                   ! foam.core.Method.isInstance(a) ) {
                 context.warn(
                     'Refining class "' +
                     this.refines +
@@ -60,8 +59,9 @@ foam.CLASS({
         }
       }
 
-      for ( var i = 0 ; i < this.axioms_.length ; i++ )
+      for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
         this.axioms_[i].validate && this.axioms_[i].validate(this);
+      }
     }
   ]
 });
