@@ -180,7 +180,7 @@ foam.LIB({
           'memoize0(' + f.name + ')');
         ret.toString = function() { return f.toString(); };
         return ret;
-        
+
     },
 
     /**
@@ -231,14 +231,14 @@ foam.LIB({
       var match = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'').
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+          match(/^(function)?(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return match[2] || '';
+      return match[3] || '';
     },
 
     function argNames(f) {
