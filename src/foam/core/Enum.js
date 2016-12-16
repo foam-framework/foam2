@@ -392,7 +392,9 @@ foam.CLASS({
     [
       'adapt',
       function(o, n, prop) {
-        if ( foam.core.FObject.isInstance(n) ) return n;
+        // FUTURE: make into a mmethod()
+
+        if ( foam.core.internal.EnumValue.isInstance(n) ) return n;
 
         var type = foam.typeOf(n);
         var e    = this.__context__.lookup(prop.of);
