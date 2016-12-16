@@ -697,6 +697,7 @@ foam.CLASS({
       },
       javaCode: 'return getValue();'
     },
+
     function toString_(x) {
       return typeof x === 'number' ? '' + x :
         typeof x === 'string' ? '"' + x + '"' :
@@ -704,9 +705,11 @@ foam.CLASS({
         x.toString ? x.toString() :
         x;
     },
+
     function toString() {
       return this.toString_(this.value);
     },
+
     // TODO(adamvy): Re-enable when we can parse this in java more correctly.
     function xxoutputJSON(os) {
       os.output(this.value);
@@ -1247,6 +1250,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',
