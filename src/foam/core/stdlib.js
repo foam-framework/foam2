@@ -228,17 +228,25 @@ foam.LIB({
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      var match = f.
+      var str = f.
           toString().
-          replace(/(\r\n|\n|\r)/gm,'').
-          match(/^(function)?(\s+[_$\w]+|\s*)\((.*?)\)/);
+          replace(/(\r\n|\n|\r)/gm,'');
+      var isArrowFunction = str.indexOf('function') !== 0;
+
+      var match = isArrowFunction ?
+          // (...args...) => ...
+          // or
+          // arg => ...
+          match = str.match(/^(\(([^)]*)\)|([^=]*))/) :
+          // function (...args...) { ...body... }
+          match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return match[3] || '';
+      return match[2] || '';
     },
 
     function argNames(f) {
