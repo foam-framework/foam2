@@ -34,6 +34,7 @@ foam.CLASS({
     'package',
     'abstract',
     'name',
+    { name: 'flags', factory: function() { return {}; } },
     {
       // Just discard documentation.
       // If it's needed, a real 'documentation' property will

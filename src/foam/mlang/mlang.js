@@ -1065,10 +1065,13 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: { noWarnOnRefinesAfterCreate: true },
   implements: [ 'foam.mlang.order.Comparator' ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.order',

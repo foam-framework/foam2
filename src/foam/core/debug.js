@@ -39,19 +39,22 @@ foam.CLASS({
           throw this.id + ': "extends" and "refines" are mutually exclusive.';
         }
 
-        var context = this.__context__ || foam.__context__;
-        var cls     = context.lookup(this.refines);
+        if ( ! this.flags.noWarnOnRefinesAfterCreate ) {
+          var context = this.__context__ || foam.__context__;
+          var cls     = context.lookup(this.refines);
 
-        if ( cls.count_ ) {
-          for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
-            var a = this.axioms_[i];
-            if ( ! foam.core.Property.isInstance(a) && ! foam.core.Method.isInstance(a) && ! foam.core.Requires.isInstance(a) ) {
-              console.log(a.cls_.id);
-              context.warn(
-                  'Refining class "' +
-                      this.refines +
-                      '", which has already created instances.');
-              break;
+          if ( cls.count_ ) {
+            for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
+              var a = this.axioms_[i];
+              if ( ! foam.core.Property.isInstance(a) &&
+                   ! foam.core.Method.isInstance(a) )
+              {
+                context.warn(
+                    'Refining class "' +
+                    this.refines +
+                    '", which has already created instances.');
+                break;
+              }
             }
           }
         }
@@ -372,14 +375,14 @@ foam.LIB({
       // Multiple definitions of LIBs may trigger this multiple times
       // on the same function
       if ( fn.isTypeChecker__ ) return fn;
-      
+
       // parse out the arguments and their types
       var args = foam.Function.args(fn);
-      
+
       // check if no checkable arguments
       var checkable = false;
       function isArgUncheckable(a) {
-        return ( ( a.typeName === '' || a.typeName === 'any' || foam.Undefined.isInstance(a.typeName) ) && 
+        return ( ( a.typeName === '' || a.typeName === 'any' || foam.Undefined.isInstance(a.typeName) ) &&
           ( a.optional || a.repeated ) );
       }
       for ( var i = 0 ; i < args.length ; i++ ) {
@@ -395,7 +398,7 @@ foam.LIB({
         // nothing to check, don't decorate
         return fn;
       }
-      
+
       var typeChecker = function() {
         // check each declared argument, arguments[i] can be undefined for
         // missing optional args, extra arguments are ok
@@ -444,7 +447,7 @@ foam.CLASS({
           try {
             return foam.Function.typeCheck(nu);
           } catch (e) {
-            this.warn('Method: Failed to add type checking to method ' + 
+            this.warn('Method: Failed to add type checking to method ' +
               this.name + ':\n' + nu.toString() + '\n', e);
             //throw e; //TODO: throw?
           }
