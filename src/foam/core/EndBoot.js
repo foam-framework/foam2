@@ -218,7 +218,7 @@ foam.CLASS({
  */
 (function() {
   // List of unused Models in the system.
-  foam.USED = {};
+  foam.USED   = {};
   foam.UNUSED = {};
 
   var CLASS = foam.CLASS;
