@@ -1053,8 +1053,8 @@ foam.CLASS({
     },
 
     function up(d) {
-      var v = d * Math.sin(this.pitch);
-      var h = d * Math.cos(this.pitch);
+      var v = d * Math.cos(this.pitch);
+      var h = d * Math.sin(this.pitch);
 
       return this.gt(
           this.x + h * Math.cos(this.rotation+Math.PI/2),
