@@ -1366,3 +1366,20 @@ function tree(t, size) {
 }
 
 tree(turtle1.pc('black'), 600);
+
+
+
+
+var t = turtle3d1;
+
+t.cs();
+t.home();
+t.pc(hsla(50, 50, 0, 0.05));
+t.pw(6);
+
+repeat(360, () => {
+  repeat(36, () => {
+    t.fd(15).rt(10);
+  });
+  t.rollLeft(1);
+});
