@@ -96,9 +96,9 @@ foam.CLASS({
   ],
 
   imports: [
+    'doTransform',
     'dxfBlocks',
-    'inflateEntity',
-    'doTransform'
+    'inflateEntity'
   ],
 
   properties: [
@@ -294,12 +294,12 @@ foam.CLASS({
 
   exports: [
     'as data',
+    'doTransform',
     'dxfBlocks',
     'dxfScale',
     'inflateEntity',
     'layerColors',
-    'layers',
-    'doTransform'
+    'layers'
   ],
 
   constants: {
@@ -310,6 +310,18 @@ foam.CLASS({
       LWPOLYLINE: 'com.google.dxf.model.Polygon'
     }
   },
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^layers {
+          display: inline-block;
+        }
+        ^ canvas {
+        }
+      */}
+    })
+  ],
 
   properties: [
     {
@@ -429,6 +441,7 @@ foam.CLASS({
         });
       }
     },
+
     function doTransform(pos) {
       // Converts the coordinates in pos based on dxfScale and translateX/Y.
       // Negating the scale for Y-coordinates, to convert +Y from up (CAD) to
@@ -436,22 +449,11 @@ foam.CLASS({
       pos.x = (pos.x + this.translateX) * this.dxfScale;
       pos.y = (pos.y + this.translateY) * (-this.dxfScale);
     },
+
     function inflateEntity(entity) {
       var model = foam.lookup(this.ENTITY_TYPES[entity.type]);
       return foam.json.parse(entity, model, this.__subContext__);
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^layers {
-          display: inline-block;
-        }
-        ^ canvas {
-        }
-      */}
-    })
   ],
 
   listeners: [
