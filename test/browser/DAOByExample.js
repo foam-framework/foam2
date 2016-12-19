@@ -85,10 +85,10 @@ var examples = [
           'foam.dao.EasyDAO'
         ],
         exports: [ // by default, DAOs are looked up by class name
-          'bankDAO as example.BankDAO',
-          'customerDAO as example.CustomerDAO',
-          'accountDAO as example.AccountDAO',
-          'transactionDAO as example.TransactionDAO',
+          'bankDAO',
+          'customerDAO',
+          'accountDAO',
+          'transactionDAO',
         ],
         properties: [
           { name: 'bankDAO', factory: function() {
