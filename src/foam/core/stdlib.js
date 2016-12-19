@@ -233,11 +233,13 @@ foam.LIB({
           replace(/(\r\n|\n|\r)/gm,'');
       var isArrowFunction = str.indexOf('function') !== 0;
 
+      console.log(str);
+
       var match = isArrowFunction ?
           // (...args...) => ...
           // or
           // arg => ...
-          match = str.match(/^(\(([^)]*)\)|([^=]*))/) :
+          match = str.match(/^(\(([^)]*)\)[^=]*|([^=]+))=>/) :
           // function (...args...) { ...body... }
           match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
@@ -246,7 +248,7 @@ foam.LIB({
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return match[2] || '';
+      return isArrowFunction ? (match[2] || match[1] || '') : (match[2] || '');
     },
 
     function argNames(f) {

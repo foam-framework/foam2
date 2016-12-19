@@ -277,6 +277,18 @@ describe('foam.Function', function() {
       "      } "
       );
     }).toThrow();
+
+    // arrow-function: single-arg
+    var str4 = foam.Function.argsStr(
+      foo => foo.length
+    );
+    expect(str4).toBe('foo ');
+    // arrow-function: multiple args
+
+    var str5 = foam.Function.argsStr(
+        (/*string?*/foo, /*array*/bar, /*string*/baz) => foo.length
+    );
+    expect(str5).toBe('/*string?*/foo, /*array*/bar, /*string*/baz');
   });
 
   it('functionComment', function() {
