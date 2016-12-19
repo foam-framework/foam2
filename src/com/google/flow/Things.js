@@ -774,6 +774,10 @@ foam.CLASS({
       this.add(leg1, leg2, leg3, leg4, head, shell, tail);
     },
 
+    function degToRad(deg) {
+      return Math.PI * deg / 180;
+    },
+
     function home() {
       this.x = this.parent.width / 2;
       this.y = this.parent.height / 2;
@@ -856,7 +860,7 @@ foam.CLASS({
 
     function lt(a) {
       /* Left Turn */
-      this.rotation += Math.PI*2*a/360;
+      this.rotation += this.degToRad(a);
       return this;
     },
 
@@ -1127,10 +1131,6 @@ foam.CLASS({
     function home() {
       this.position = this.heading = this.normal = undefined;
       return this;
-    },
-
-    function degToRad(deg) {
-      return Math.PI * deg / 180;
     },
 
     function paint(ctx) {
