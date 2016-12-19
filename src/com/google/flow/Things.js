@@ -1175,7 +1175,7 @@ foam.CLASS({
     },
 
     function fd(d) {
-      return this.gt(this.position.add(this.heading.mul(d)));
+      return this.gtV(this.position.add(this.heading.mul(d)));
     },
 
     function up(d) {
@@ -1192,10 +1192,16 @@ foam.CLASS({
       return this.up(-d);
     },
 
-    function gt(v) {
+    function gtV(v) {
+      return this.gt(v.x, v.y, v.z);
+    },
+
+    function gt(x, y, z) {
       /* Go To */
       var x1 = this.position.x, y1 = this.position.y, z1 = this.position.z;
-      this.position.set(v);
+      this.position.x = x;
+      this.position.y = y;
+      this.position.z = z;
 
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
