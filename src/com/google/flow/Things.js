@@ -936,6 +936,28 @@ foam.CLASS({
       return this.parent.parent.height/2 + x + y - z / Math.SQRT2;
     },
 
+    /*
+    function xyzToX(x, y, z) {
+      var s = 1 - z/600
+      return this.parent.parent.width/2 + x * s;
+    },
+
+    function xyzToY(x, y, z) {
+      var s = 1 - z/600
+      return this.parent.parent.height/2 + y * s;
+    },
+    */
+
+    /*
+    function xyzToX(x, y, z) {
+      return this.parent.parent.width/2 - x;
+    },
+
+    function xyzToY(x, y, z) {
+      return this.parent.parent.height/2 -y;
+    },
+    */
+
     function paintSelf(x) {
       x.beginPath();
 
@@ -1149,7 +1171,6 @@ foam.CLASS({
       a = this.degToRad(a);
 
       var pitchAxis = this.heading.cross(this.normal).normalize();
-      console.log(pitchAxis.length());
       this.heading.rotateAbout(pitchAxis, a).normalize();
       this.normal.rotateAbout(pitchAxis, a).normalize();
 
