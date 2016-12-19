@@ -939,17 +939,9 @@ foam.CLASS({
           this.xyzToX(this.startX, this.startY, this.startZ),
           this.xyzToY(this.startX, this.startY, this.startZ));
 
-//      console.log('start: ', this.startX, this.startY, this.startZ,
-//          this.xyzToX(this.startX, this.startY, this.startZ),
-//          this.xyzToY(this.startX, this.startY, this.startZ));
-
       x.lineTo(
           this.xyzToX(this.endX, this.endY, this.endZ),
           this.xyzToY(this.endX, this.endY, this.endZ));
-
-//     console.log('end: ', this.startX, this.startY, this.startZ,
-//          this.xyzToX(this.endX, this.endY, this.endZ),
-//          this.xyzToY(this.endX, this.endY, this.endZ));
 
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
@@ -961,22 +953,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.google.flow',
-  name: 'Turtle3D',
-  extends: 'com.google.flow.Turtle',
-
-  requires: [
-    'com.google.flow.Line3D'
-  ],
+  name: 'Vector3',
 
   properties: [
     {
-      class: 'Float',
-      name: 'z'
+      name: 'result_',
+      hidden: true,
+      factory: function() { return this.cls_.create(); }
     },
-    {
-      class: 'Float',
-      name: 'pitch'
-    },
+    { class: 'Float', name: 'x' },
+    { class: 'Float', name: 'y' },
+    { class: 'Float', name: 'z' },
     {
       name: 'memento',
       hidden: true,
@@ -984,10 +971,147 @@ foam.CLASS({
         return {
           x: this.x,
           y: this.y,
-          z: this.z,
-          pitch: this.pitch,
-          roll: this.roll,
-          rotation: this.rotation,
+          z: this.z
+        };
+      },
+      setter: function(m) {
+        this.copyFrom(m);
+      }
+    }
+  ],
+
+  methods: [
+    function result(x, y, z) {
+      var r = this.result_;
+      r.x = x;
+      r.y = y;
+      r.z = z;
+      return r;
+    },
+
+    function set(v) {
+      this.x = v.x;
+      this.y = v.y;
+      this.z = v.z;
+      return this;
+    },
+
+    function length() {
+      var x = this.x, y = this.y, z = this.z;
+      return Math.sqrt(x*x + y*y + z*z);
+    },
+
+    function cross(v) {
+      var x = this.x, y = this.y, z = this.z;
+
+      return this.result(
+        y * v.z - z * v.y,
+        z * v.x - x * v.z,
+        x * v.y - y * v.x);
+    },
+
+    function add(v) {
+      return this.result(this.x + v.x, this.y + v.y, this.z + v.z);
+    },
+
+    function mul(s) {
+      return this.result(s * this.x, s * this.y, s * this.z);
+    },
+
+    function rotateAbout(v, a) {
+      var halfAngle = a / 2;
+      var s = Math.sin(halfAngle);
+
+      var qx = v.x * s;
+      var qy = v.y * s;
+      var qz = v.z * s;
+      var qw = Math.cos(halfAngle);
+
+      var x = this.x;
+      var y = this.y;
+      var z = this.z;
+
+      // calculate quat * vector
+
+      var ix =  qw * x + qy * z - qz * y;
+      var iy =  qw * y + qz * x - qx * z;
+      var iz =  qw * z + qx * y - qy * x;
+      var iw = -qx * x - qy * y - qz * z;
+
+      // calculate result * inverse quat
+
+      this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+      this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+      this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+
+      return this;
+    },
+
+    function normalize() {
+      var l = this.length();
+
+      this.x /= l;
+      this.y /= l;
+      this.z /= l;
+
+      return this;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Turtle3D',
+  extends: 'com.google.flow.Turtle',
+
+  requires: [
+    'com.google.flow.Vector3',
+    'com.google.flow.Line3D'
+  ],
+
+  properties: [
+    {
+      name: 'x',
+      getter: function() { return this.position.x; },
+      setter: function(x) { this.position.x = x; }
+    },
+    {
+      name: 'y',
+      getter: function() { return this.position.y; },
+      setter: function(y) { this.position.y = y; }
+    },
+    {
+      name: 'z',
+      getter: function() { return this.position.z; },
+      setter: function(z) { this.position.z = z; }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Vector3',
+      name: 'position',
+      factory: function() { return this.Vector3.create(); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Vector3',
+      name: 'heading',
+      factory: function() { return this.Vector3.create({x:1}); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Vector3',
+      name: 'normal',
+      factory: function() { return this.Vector3.create({z:1}); }
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          position: this.position.memento,
+          heading:  this.heading.memento,
+          normal:   this.normal.memento,
           penColor: this.penColor,
           penWidth: this.penWidth,
           penDown:  this.pendDown
@@ -996,24 +1120,22 @@ foam.CLASS({
       setter: function(m) {
         this.copyFrom(m);
       }
-    },
-    {
-      class: 'Float',
-      name: 'roll'
     }
   ],
 
   methods: [
     function home() {
-      this.x = this.y = this.z = 0;
-      this.pitch = 0;
-      this.rotation = 0;
+      this.position = this.heading = this.normal = undefined;
       return this;
+    },
+
+    function degToRad(deg) {
+      return Math.PI * deg / 180;
     },
 
     function paint(ctx) {
       // Transform so that turtle appears in the right spot.
-      var x  = this.x, y = this.y, z = this.z;
+      var x  = this.position.x, y = this.position.y, z = this.position.z;
       var x2 = this.parent.width/2 - x + y;
       var y2 = this.parent.height/2 + x + y - z * Math.SQRT2;
 
@@ -1024,7 +1146,13 @@ foam.CLASS({
     },
 
     function pitchUp(a) {
-      this.pitch += Math.PI * a / 180;
+      a = this.degToRad(a);
+
+      var pitchAxis = this.heading.cross(this.normal).normalize();
+      console.log(pitchAxis.length());
+      this.heading.rotateAbout(pitchAxis, a).normalize();
+      this.normal.rotateAbout(pitchAxis, a).normalize();
+
       return this;
     },
 
@@ -1033,7 +1161,7 @@ foam.CLASS({
     },
 
     function rollRight(a) {
-      this.roll += Math.PI * a / 180;
+      this.normal.rotateAbout(this.heading, this.degToRad(a));
       return this;
     },
 
@@ -1041,15 +1169,13 @@ foam.CLASS({
       return this.rollRight(-a);
     },
 
-    function fd(d) {
-      /* ForwarD */
-      var v = d * Math.sin(this.pitch);
-      var h = d * Math.cos(this.pitch);
+    function lt(a) {
+      this.heading.rotateAbout(this.normal, this.degToRad(a));
+      return this;
+    },
 
-      return this.gt(
-          this.x + h * Math.cos(this.rotation+Math.PI/2),
-          this.y - h * Math.sin(this.rotation+Math.PI/2),
-          this.z + v);
+    function fd(d) {
+      return this.gt(this.position.add(this.heading.mul(d)));
     },
 
     function up(d) {
@@ -1066,12 +1192,10 @@ foam.CLASS({
       return this.up(-d);
     },
 
-    function gt(x, y, z) {
+    function gt(v) {
       /* Go To */
-      var x1 = this.x, y1 = this.y, z1 = this.z;
-      this.x = x;
-      this.y = y;
-      this.z = z;
+      var x1 = this.position.x, y1 = this.position.y, z1 = this.position.z;
+      this.position.set(v);
 
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
