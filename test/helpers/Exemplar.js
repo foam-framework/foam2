@@ -135,7 +135,7 @@ foam.CLASS({
       var deps = this.flattenDependencies();
 
       deps.sync.forEach(function(dep) {
-        ret += dep.outputSelfTest(indent, true);
+        ret += dep[selfOutputMethod](indent, true);
       });
 
 
@@ -145,7 +145,7 @@ foam.CLASS({
       }
       deps.async.forEach(function(dep) {
         ret += tabs + "}).then(function() {\n";
-        ret += dep.outputSelfTest(indent);
+        ret += dep[selfOutputMethod](indent);
       });
       if ( deps.async.length ) {
         ret += tabs + "}).then(function() {\n";
