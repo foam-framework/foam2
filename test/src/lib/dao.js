@@ -1603,7 +1603,7 @@ describe('DAO.listen', function() {
       expect(sink.array[2]).toEqual(c);
 
       // subscription allows disconnect
-      sub.destroy();
+      sub.detach();
       dao.put(d); // no longer listening
       expect(sink.array.length).toEqual(3);
 
@@ -1724,7 +1724,7 @@ describe('FilteredDAO', function() {
     expect(l.obj).toBeUndefined();
 
     // cover destructor
-    dao.destroy();
+    dao.detach();
   });
 });
 

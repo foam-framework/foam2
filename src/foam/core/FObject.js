@@ -57,6 +57,9 @@ foam.LIB({
     function create(args, opt_parent) {
       var obj = Object.create(this.prototype);
 
+      // Increment number of objects created of this class.
+      this.count_++;
+
       // Properties have their values stored in instance_ instead
       // of on the object directly. This lets us defineProperty on
       // the object itself so that we can add extra behaviour
@@ -365,7 +368,7 @@ foam.CLASS({
     },
 
     function hasOwnProperty(name) {
-      return this.instance_[name] !== undefined;
+      return ! foam.Undefined.isInstance(this.instance_[name]);
     },
 
     function hasDefaultValue(name) {
@@ -467,7 +470,7 @@ foam.CLASS({
       ----------------------------
       next -> {
         prev: <-,
-        sub: { src: <source object>, destroy: <destructor function> },
+        sub: { src: <source object>, detach: <destructor function> },
         l: <listener>,
         next: -> <same structure>,
         children -> {
@@ -614,10 +617,10 @@ foam.CLASS({
       <p>sub(l) will match all events.
       l - the listener to call with notifications.
        <p> The first argument supplied to the listener is the "subscription",
-        which contains the "src" of the event and a destroy() method for
+        which contains the "src" of the event and a detach() method for
         cancelling the subscription.
       <p>Returns a "subscrition" which can be cancelled by calling
-        its .destroy() method.
+        its .detach() method.
     */
     function sub() { /* args..., l */
       var l = arguments[arguments.length-1];
@@ -638,11 +641,11 @@ foam.CLASS({
         prev: listeners,
         l:    l
       };
-      node.sub.destroy = function() {
+      node.sub.detach = function() {
         if ( node.next ) node.next.prev = node.prev;
         if ( node.prev ) node.prev.next = node.next;
 
-        // Disconnect so that calling destroy more than once is harmless
+        // Disconnect so that calling detach more than once is harmless
         node.next = node.prev = null;
       };
 
@@ -687,35 +690,28 @@ foam.CLASS({
      * Destruction
      ************************************************/
 
-//    function isDestroyed() {
-//      /* Returns true iff destroy() has been called on this object. */
-//      return ! this.instance_;
-//    },
-
-    function onDestroy(d) {
+    function onDetach(d) {
       /*
-        Register a function or a destroyable to be called
-        when this object is destroyed.
+        Register a function or a detachable to be called
+        when this object is detached.
       */
-      if ( d ) this.sub('destroy', d.destroy ? d.destroy.bind(d) : d);
+      if ( d ) this.sub('detach', d.detach ? d.detach.bind(d) : d);
       return d;
     },
 
-    function destroy() {
+    function detach() {
       /*
-        Destroy this object.
-        Free any referenced objects and destroy any registered destroyables.
-        This object is completely unusable after being destroyed.
+        Detach this object.
+        Free any referenced objects and detach any registered detachables.
        */
-      if ( /* this.isDestroyed() ||*/ this.instance_.destroying_ ) return;
+      if ( this.instance_.detaching_ ) return;
 
-      // Record that we're currently destroying this object,
+      // Record that we're currently detaching this object,
       // to prevent infitine recursion.
-      this.instance_.destroying_ = true;
-      this.pub('destroy');
-      this.instance_.destroying_ = false;
+      this.instance_.detaching_ = true;
+      this.pub('detach');
+      this.instance_.detaching_ = false;
       this.clearPrivate_('listeners');
-      // this.instance_ = this.private_ = null;
     },
 
 
@@ -896,9 +892,7 @@ foam.CLASS({
     function toString() {
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
-          this.cls_.prototype === this ? 'Proto'      :
-//          this.isDestroyed()           ? ':DESTROYED' :
-          '');
+          this.cls_.prototype === this ? 'Proto' : '');
     }
   ]
 });

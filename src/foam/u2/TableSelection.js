@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'data',
       postSet: function(old, nu) {
         if ( this.daoSub_ ) {
-          this.daoSub_.destroy();
+          this.daoSub_.detach();
           this.daoSub_ = null;
         }
         if ( nu ) this.daoSub_ = nu.on.sub(this.updateCounts);

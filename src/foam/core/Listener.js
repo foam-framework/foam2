@@ -78,7 +78,7 @@ foam.CLASS({
             var self = this;
             var l = function(sub) {
               // Is it possible to detect stale subscriptions?
-              // ie. after an object has been destroyed.
+              // ie. after an object has been detached.
               code.apply(self, arguments);
             };
 

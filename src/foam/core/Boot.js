@@ -138,6 +138,7 @@ foam.LIB({
         cls                  = parent.createSubClass_();
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
+        cls.count_           = 0;            // Number of instances created
         cls.id               = this.id;
         cls.package          = this.package;
         cls.name             = this.name;
@@ -192,7 +193,8 @@ foam.LIB({
           @method CLASS
           @memberof module:foam */
       foam.CLASS = function(m) {
-        var model = foam.core.Model.create(m);
+        var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
+        var model = cls.create(m);
         model.validate();
         var cls = model.buildClass();
         cls.validate();

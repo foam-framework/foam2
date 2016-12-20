@@ -165,7 +165,7 @@ foam.CLASS({
           self.value = self.yToValue(p.y);
         }
 
-        touch.onDestroy(touch.sub('propertyChange', updateValue));
+        touch.onDetach(touch.sub('propertyChange', updateValue));
         updateValue();
       }
     }

@@ -27,6 +27,43 @@ var path = require('path');
 // Usage: node this-file [--whitelist foo,bar,baz] outfile protofiles...
 var parser = foam.lookup('com.google.net.ProtobufParser').create();
 
+foam.LIB({
+  name: 'foam.String',
+  methods: [
+    {
+      name: 'camelize',
+      code: foam.Function.memoize1(function(str) {
+        if ( str === '' || str === null ) return '';
+
+        foam.assert(typeof str === 'string',
+            'Cannot camelize non-string values.');
+
+        return str.replace(/([a-zA-Z0-9][^a-zA-Z0-9][a-zA-Z0-9])/g, function(a, c) {
+          return a.charAt(0) + a.charAt(2).toUpperCase();
+        });
+      })
+    }
+  ]
+});
+// TODO: tests
+// it('camelize', function() {
+//   expect(foam.String.camelize('lower Case String'))
+//     .toBe('lowerCaseString');
+//   expect(foam.String.camelize('css-string'))
+//     .toBe('cssString');
+//   expect(foam.String.camelize('snake_case_string'))
+//     .toBe('snakeCaseString');
+//   expect(foam.String.camelize('CONST_SUPPORT_LACKING'))
+//     .toBe('CONSTSUPPORTLACKING');
+//   expect(foam.String.camelize('99$$'))
+//     .toBe('99$$');
+//
+// });
+
+
+
+
+
 var whitelist = null;
 var outIndex = 2;
 if ( process.argv[2] === '--whitelist' ) {

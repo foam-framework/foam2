@@ -42,7 +42,7 @@ foam.CLASS({
     { name: 'engine',   factory: function() {
       var e = this.PhysicsEngine.create({gravity: true});
       e.start();
-      return this.onDestroy(e);
+      return this.onDetach(e);
     }}
   ],
 
