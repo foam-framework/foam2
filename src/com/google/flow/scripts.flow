@@ -1386,6 +1386,20 @@ repeat(360, () => {
 
 
 
+// 2d to 3d, good version
+var t = turtle3d1;
+t.cs().home();
+
+repeat(36, () => {
+  repeat(36, () => {
+//    t.rt(180/36).fd(20).rt(180/36);
+    t.pitchUp(180/36).fd(20).pitchUp(180/36);
+  });
+  t.lt(10);
+});
+
+
+
 // collasium, good version
 var t = turtle3d1;
 t.cs();
@@ -1476,13 +1490,11 @@ archRing(360, 0, 800);
 var t = turtle3d1;
 t.cs().home();
 
-repeat(36, () => {
-  t.ss();
-  repeat(19, () => {
-    t.fd(20).pitchUp(10);
+repeat(18, () => {
+  repeat(36, () => {
+    t.pitchUp(5).fd(20).pitchUp(5);
   });
-  t.rs();
-  t.rt(10);
+  t.lt(10);
 });
 
 
