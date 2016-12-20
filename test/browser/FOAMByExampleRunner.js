@@ -144,13 +144,36 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
     }
   });
 
+  // output the code
   var code = ex.generateExample();
   // TODO: offer expandable view of complete dependencies
-  // Write the code with deps omitted
+  // Write the displayed code with deps omitted
   var exampleHTML = document.createElement('div');
   exampleHTML.className = 'example-code-view';
   exampleHTML.innerHTML = ex.generateExampleHTML(true);
   domFrame.insertBefore(exampleHTML, domFrame.firstElementChild);
+
+  // Create a download link with the full code
+  var downloadableCode =
+    "// include 'src/foam.js' and this code in your test page:\n" +
+    "// <html>\n" +
+    "//   <head>\n" +
+    "//     <script src='../../src/foam.js'></script> \n" +
+    "//     <script src='thisExample.js'></script> \n" +
+    "//   </head>\n" +
+    "//   ...\n" +
+    "// </html>\n" +
+    code;
+
+  var downloadButton = document.createElement('a');
+  downloadButton.href = URL.createObjectURL(
+    new Blob([downloadableCode], { type: 'application/javascript' })
+  );
+  downloadButton.textContent = 'Download Full Javascript';
+  downloadButton.className = 'example-download-link';
+  exampleHTML.appendChild(downloadButton);
+
+  // execute the example
   try {
     var result = eval("(function runExemplar___() { " + code + " })();");
     // TODO: if using an iframe, can pass document this way: var result = eval("function runExemplar___(document) { " + code + " }")(foam.__context__.document);
