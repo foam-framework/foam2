@@ -1227,11 +1227,11 @@ foam.CLASS({
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
         this.childLayer.add(this.Line3D.create({
-          startX:    x1+this.radiusX,
-          startY:    y1+this.radiusY,
+          startX:    x1/*+this.radiusX*/,
+          startY:    y1/*+this.radiusY*/,
           startZ:    z1,
-          endX:      this.x+this.radiusX,
-          endY:      this.y+this.radiusY,
+          endX:      this.x/*+this.radiusX*/,
+          endY:      this.y/*+this.radiusY*/,
           endZ:      this.z,
           color:     this.penColor,
           lineWidth: this.penWidth
