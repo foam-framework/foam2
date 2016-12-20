@@ -144,11 +144,9 @@
               value: foam.core.ConstantSlot.create({ value: v })
             });
 
-            (function(v) {
-              Object.defineProperty(sub, key, {
-                value: v
-              });
-            })(v);
+            Object.defineProperty(sub, key, {
+              value: v
+            });
           } else {
             Object.defineProperty(sub, this.toSlotName_(key), {
               value: v

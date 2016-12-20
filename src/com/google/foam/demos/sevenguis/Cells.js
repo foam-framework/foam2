@@ -354,11 +354,11 @@ foam.CLASS({
         cell = this.cells[name] = this.Cell.create();
         var s;
         cell.formula$.sub(function(_, __, ___, formula$) {
-          s && s.destroy();
+          s && s.detach();
 
           var slot = self.parser.parseString(formula$.get());
-          cancel && cancel.destroy();
-          s = cell.data$.linkFrom(slot);
+          cancel && cancel.detach();
+          s = cell.data$.follow(slot)
         });
       }
 

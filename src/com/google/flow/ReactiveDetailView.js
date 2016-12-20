@@ -52,8 +52,10 @@ foam.CLASS({
         }
         f.toString = function() { return formula; };
 
+        var detached = false;
+        self.onDetach(function() { detached = true; });
         var timer = function() {
-          if ( self.isDestroyed() ) return;
+          if ( detached ) return;
           if ( self.reactions_[name] !== f ) return;
           self[name] = f.call(self);
           self.__context__.requestAnimationFrame(timer);

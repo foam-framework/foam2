@@ -15,28 +15,24 @@
  * limitations under the License.
  */
 
-/*
-TODO(adamvy):
-- Only serialize the ordinal?
-- Freeze the instances?
-*/
-
 /**
- * For those familiar with Java, FOAM Enums are very similar to Java enums in design.
+ * For those familiar with Java, FOAM Enums are very similar to Java enums in
+ * design.
  *
- * An Enum is essentially a class with a fixed number of named instances.  The instances
- * are frequently referred to as Enum Values, or the 'values' of an Enum.
+ * An Enum is essentially a class with a fixed number of named instances.
+ * The instances are frequently referred to as Enum Values, or the 'values'
+ * of an Enum.
  *
- * Enums have most of the features available to FOAM classes, including properties, methods,
- * constants, templates, and listeners.
+ * Enums have most of the features available to FOAM classes, including
+ * properties, methods, constants, templates, and listeners.
  *
- * Enums extend from FObject, so they inherit FObject features such as pub/sub events,
- * diffing, hashCode, etc.
+ * Enums extend from FObject, so they inherit FObject features such as
+ * pub/sub events, diffing, hashCode, etc.
  *
- * Enums also have a few built-in properties by default.  Every Enum has an 'ordinal'
- * property, which is a integer unique to all the Enum Values of a a particular Enum.  Each
- * enum also has a 'name' property, which is the name given to each Enum Value.
- *
+ * Enums also have a few built-in properties by default. Every Enum has an
+ * 'ordinal' property, which is a integer unique to all the Enum Values of a
+ * particular Enum. Each enum also has a 'name' property, which is the name
+ * given to each Enum Value.
  *
  * Example usage:
  * <pre>
@@ -53,6 +49,7 @@ TODO(adamvy):
  *       value: true
  *     }
  *   ],
+ *
  *   methods: [
  *     function foo() {
  *       return this.label + ( this.consideredOpen ? ' is' : ' is not' ) +
@@ -60,20 +57,21 @@ TODO(adamvy):
  *     }
  *   ],
  *
- *   // Use the values: key to define the actual Enum Values that we want to exist.
+ *   // Use the values: key to define the actual Enum Values that we
+ *   // want to exist.
  *   values: [
  *     {
- *       name: 'OPEN',
+ *       name: 'OPEN'
  *     },
  *     {
  *       // The ordinal can be specified explicitly.
  *       name: 'CLOSED',
- *       ordinal: 100,
+ *       ordinal: 100
  *     },
  *     {
- *       // If the ordinal isn't given explicitly it is auto assigned as the previous
- *       // ordinal + 1
- *       name: 'ASSIGNED',
+ *       // If the ordinal isn't given explicitly it is auto assigned as
+ *       // the previous ordinal + 1
+ *       name: 'ASSIGNED'
  *     },
  *     {
  *       // You can specify the label, which will be used when rendering in a
@@ -100,7 +98,8 @@ TODO(adamvy):
  * console.log(IssueStatus.ASSIGNED.ordinal); // outputs 101
  *
  * // Methods can be called on the enum values.
- * console.log(IssueStatus.FIXED.foo()); // outputs "Fixed is not considered open.")
+ * // outputs "Fixed is not considered open."
+ * console.log(IssueStatus.FIXED.foo());
  *
  * // To store enums on a class, it is recommended to use the Enum property
  * // type.
@@ -138,6 +137,8 @@ TODO(adamvy):
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'EnumValue',
+
+  documentation: 'A single value of an Enum.',
 
   properties: [
     {
@@ -192,6 +193,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'EnumModel',
 
+  documentation: 'A complete Enum specification.',
+
   properties: [
     {
       name: 'axioms_',
@@ -225,7 +228,8 @@ foam.CLASS({
               cls.create = function(args, ctx) {
                 var key = args.ordinal || 0; // use default if not specified
 
-                // Short-circuit if we already create the instance for this ordinal.
+                // Short-circuit if we already create the instance for
+                // this ordinal.
                 if ( instances[key] ) return instances[key];
 
                 var enumValue = cls.model_.values.find(function(o) {
@@ -343,25 +347,22 @@ foam.CLASS({
 
   methods: [
     function buildClass() {
-      var cls;
+      var parent = foam.core.FObject, cls;
 
-      var parent = foam.core.FObject;
-
-      cls = Object.create(parent);
-      cls.prototype = Object.create(parent.prototype);
-      cls.prototype.cls_ = cls;
+      cls                  = Object.create(parent);
+      cls.prototype        = Object.create(parent.prototype);
+      cls.prototype.cls_   = cls;
       cls.prototype.model_ = this;
-      cls.private_ = { axiomCache: {} };
-      cls.axiomMap_ = Object.create(parent.axiomMap_);
-      cls.id = this.id;
-      cls.package = this.package;
-      cls.name = this.name;
-      cls.model_ = this;
+      cls.private_         = { axiomCache: {} };
+      cls.axiomMap_        = Object.create(parent.axiomMap_);
+      cls.id               = this.id;
+      cls.package          = this.package;
+      cls.name             = this.name;
+      cls.model_           = this;
 
       cls.installModel(this);
 
-      var values;
-      var model = this;
+      var values, model = this;
 
       cls.getValues = function() {
         if ( ! values ) {
@@ -384,18 +385,27 @@ foam.CLASS({
   name: 'Enum',
   extends: 'Property',
 
+  documentation: 'A Property type for storing enum values.',
+
   properties: [
     { name: 'of', required: true },
     [
       'adapt',
       function(o, n, prop) {
-        if ( foam.core.FObject.isInstance(n) ) return n;
+        // FUTURE: make into a mmethod()
+
+        if ( foam.core.internal.EnumValue.isInstance(n) ) return n;
 
         var type = foam.typeOf(n);
         var e    = this.__context__.lookup(prop.of);
 
-        if ( type === foam.String ) return e[foam.String.constantize(n)];
-        if ( type === foam.Number ) return e.create({ordinal: n}, foam.__context__);
+        if ( type === foam.String ) {
+          return e[foam.String.constantize(n)];
+        }
+
+        if ( type === foam.Number ) {
+          return e.create({ordinal: n}, foam.__context__);
+        }
       }
     ]
   ]
@@ -409,6 +419,7 @@ foam.LIB({
     function ENUM(m) {
       var model = foam.core.EnumModel.create(m);
       model.validate();
+
       var cls = model.buildClass();
       cls.validate();
 
@@ -419,3 +430,10 @@ foam.LIB({
     }
   ]
 });
+
+
+/*
+TODO(adamvy):
+  - Only serialize the ordinal.
+  - Freeze the instances.
+*/

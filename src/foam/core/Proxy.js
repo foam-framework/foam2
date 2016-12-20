@@ -268,8 +268,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.onDestroy(foam.Function.bind(function() {
-        this.subscription && this.subscription.destroy();
+      this.onDetach(foam.Function.bind(function() {
+        this.subscription && this.subscription.detach();
 
         if ( this.parent ) {
           this.parent.removeChild(this);
@@ -279,7 +279,7 @@ foam.CLASS({
     },
 
     function doSub() {
-      if ( this.subscription ) this.subscription.destroy();
+      if ( this.subscription ) this.subscription.detach();
 
       if ( ! this.src ) return;
 
@@ -289,7 +289,7 @@ foam.CLASS({
     },
 
     function doUnsub() {
-      if ( this.subscription ) this.subscription.destroy();
+      if ( this.subscription ) this.subscription.detach();
     },
 
     function removeChild(c) {
@@ -330,7 +330,7 @@ foam.CLASS({
       if ( this.active ) {
         var args = foam.Function.appendArguments([], arguments, 1);
         var c = this.dest.pub.apply(this.dest, args);
-        if ( ! c ) this.destroy();
+        if ( ! c ) this.detach();
       }
     }
   ]

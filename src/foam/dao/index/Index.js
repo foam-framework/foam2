@@ -20,17 +20,17 @@
   index multiplexer, or any other MDAO select() assistance class.
 
   Each Index subclass also defines an IndexNode class. Index defines
-  the structure of the index, including estimate() to gauge its 
+  the structure of the index, including estimate() to gauge its
   probable performance for a query, while IndexNode implements the
-  data nodes that hold the indexed items and plan and execute 
-  queries. For any particular operational Index, there may be 
+  data nodes that hold the indexed items and plan and execute
+  queries. For any particular operational Index, there may be
   many IndexNode instances:
 
 <pre>
                  1---------> TreeIndex(id)
   MDAO: AltIndex 2---------> TreeIndex(propA) ---> TreeIndex(id) -------------> ValueIndex
         | 1x AltIndexNode    | 1x TreeIndexNode    | 14x TreeIndexNodes         | (DAO size)x ValueIndexNodes
-           (2 alt subindexes)     (14 nodes)             (each has 0-5 nodes)    
+           (2 alt subindexes)     (14 nodes)             (each has 0-5 nodes)
 </pre>
   The base AltIndex has two complete subindexes (each holds the entire DAO).
   The The TreeIndex on property A has created one TreeIndexNode, holding one tree of 14 nodes.
@@ -51,7 +51,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    
+
     function estimate(size, sink, skip, limit, order, predicate) {
       /** Estimates the performance of this index given the number of items
         it will hold and the planned parameters. */
@@ -105,7 +105,7 @@ foam.CLASS({
     function remove(/*o*/) {},
 
     /** @return a Plan to execute a select with the given parameters */
-    function plan(/*sink, skip, limit, order, predicate, root*/) {},
+    function plan(sink, skip, limit, order, predicate, root) {},
 
     /** @return the tail index instance for the given key. */
     function get(/*key*/) {},
@@ -117,7 +117,7 @@ foam.CLASS({
         cache allows indexes to store query state that is discarded once
         the select() is complete.
       <p>Note: order checking has replaced selectReverse().  */
-    function select(/*sink, skip, limit, order, predicate, cache*/) { },
+    function select(sink, skip, limit, order, predicate, cache) { },
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
     function bulkLoad(/*dao*/) {},

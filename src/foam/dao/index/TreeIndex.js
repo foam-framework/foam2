@@ -17,6 +17,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [
     'foam.dao.index.TreeIndex',
   ],
@@ -32,6 +33,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [
     'foam.dao.index.SetIndex',
   ],
@@ -45,6 +47,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.AxiomArray',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [
     'foam.dao.index.SetIndex',
   ],
@@ -58,6 +61,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.StringArray',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [
     'foam.dao.index.SetIndex',
   ],

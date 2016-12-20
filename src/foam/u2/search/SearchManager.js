@@ -93,7 +93,7 @@ foam.CLASS({
       if ( ! this.views[name] ) return;
 
       view.clear();
-      this.subs_[name].destroy();
+      this.subs_[name].detach();
       delete this.views[name];
       delete this.subs_[name];
     },
@@ -101,7 +101,7 @@ foam.CLASS({
     function removeAll() {
       this.clear();
       foam.Object.forEach(this.subs_, function(sub) {
-        sub.destroy();
+        sub.detach();
       });
       this.views = {};
       this.subs_ = {};

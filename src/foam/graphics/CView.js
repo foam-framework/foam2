@@ -202,6 +202,25 @@ foam.CLASS({
         o.m, o.n, o.o, o.p);
     },
 
+    function mulP(p) {
+      var ta = this.a, tb = this.b, tc = this.c, td = this.d,
+          te = this.e, tf = this.f, tg = this.g, th = this.h,
+          ti = this.i, tj = this.j, tk = this.k, tl = this.l,
+          tm = this.m, tn = this.n, to = this.o, tp = this.p;
+
+      var a = p.x;
+      var b = p.y;
+      var c = p.z
+      var d = p.w;
+
+      p.x = ta * a + tb * b + tc * c + td * d;
+      p.y = te * a + tf * b + tg * c + th * d;
+      p.z = ti * a + tj * b + tk * c + tl * d;
+      p.w = tm * a + tn * b + to * c + tp * d;
+
+      return this;
+    },
+
     function mul(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) {
       var ta = this.a, tb = this.b, tc = this.c, td = this.d,
           te = this.e, tf = this.f, tg = this.g, th = this.h,
@@ -331,6 +350,23 @@ foam.CLASS({
         s,  c,  0,  0,
         0,  0,  1,  0,
         0,  0,  0,  1);
+    },
+
+    function rotate(x, y, z, r) {
+      var d = Math.sqrt(x*x + y*y + z*z);
+      x /= d;
+      y /= d;
+      z /= d;
+
+      var cos = Math.cos(r);
+      var sin = Math.sin(r);
+
+      this.mul(
+        cos + x*x*(1 - cos),     x*y*(1 - cos) - z*sin,   x*z*(1 - cos) + y*sin,  0,
+        y*x*(1 - cos) + z*sin,   cos + y*y*(1-cos),       y*z*(1 - cos) - x*sin,  0,
+        z*x*(1 - cos) - y*sin,   z*y*(1 - cos) + x*sin,   cos + z*z*(1 - cos),    0,
+        0,                       0,                       0,                      1);
+
     }
   ]
 });
@@ -606,8 +642,8 @@ foam.CLASS({
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
-        this.initCView(x);
         this.state = 'initailized'
+        this.initCView(x);
       }
     },
 
@@ -1171,6 +1207,7 @@ foam.CLASS({
       this.on('load', this.paint);
       this.cview$.valueSub('invalidated', this.paint);
     },
+
     function erase() {
       this.el().width = this.el().width;
     }

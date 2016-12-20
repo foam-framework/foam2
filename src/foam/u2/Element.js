@@ -215,7 +215,7 @@ foam.CLASS({
     function load() {},
     function unload() {},
     function onRemove() {},
-    // function destroy() {},
+    // function detach() {},
     function onSetCls() {},
     function onFocus() {},
     function onAddListener() {},
@@ -702,7 +702,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.onDestroy(this.visitChildren.bind(this, 'destroy'));
+      this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
     function initE() {
@@ -1131,7 +1131,7 @@ foam.CLASS({
 
     // Was renamed from cls() in FOAM1, current name seems
     // out of place.  Maybe renamed addClass().
-    function cssClass(/* Slot | String */ cls) {
+    function cssClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
@@ -1252,7 +1252,7 @@ foam.CLASS({
       return this.parentNode;
     },
 
-    function add(/* vargs */) {
+    function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
       } else {
@@ -1322,7 +1322,7 @@ foam.CLASS({
       return this;
     },
 
-    function addBefore(reference/*, vargs */) {
+    function addBefore(reference) { /*, vargs */
       /* Add a variable number of children before the reference element. */
       var children = [];
       for ( var i = 1 ; i < arguments.length ; i++ ) {
@@ -1365,7 +1365,7 @@ foam.CLASS({
     },
 
     function select(dao, f, update) {
-      // TODO: cleanup on destroy
+      // TODO: cleanup on detach
       var es   = {};
       var self = this;
       var reset = function() {
@@ -1599,16 +1599,16 @@ foam.CLASS({
       var e = nextE();
       var l = function() {
         if ( self.state !== self.LOADED ) {
-          s && s.destroy();
+          s && s.detach();
           return;
         }
         var first = Array.isArray(e) ? e[0] : e;
         var tmp = self.E();
         self.insertBefore(tmp, first);
         if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].destroy(); }
+          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
         } else {
-          if ( e.state === e.LOADED ) { e.remove(); e.destroy(); }
+          if ( e.state === e.LOADED ) { e.remove(); e.detach(); }
         }
         var e2 = nextE();
         self.insertBefore(e2, tmp);
@@ -1617,7 +1617,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.destroy, s));
+      this.sub('onunload', foam.Function.bind(s.detach, s));
 
       return e;
     },
@@ -1761,6 +1761,7 @@ foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 foam.CLASS({
   refines: 'foam.core.FObject',
+  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE(args, X) {
       return foam.u2.ViewSpec.createView(
@@ -1773,6 +1774,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Slot',
+  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1781,6 +1783,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ExpressionSlot',
+  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1789,6 +1792,8 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Property',
+
+  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.TextField'
@@ -1825,6 +1830,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       class: 'Int',
@@ -1837,6 +1843,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Date',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
@@ -1846,6 +1853,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Float',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
@@ -1855,6 +1863,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
@@ -1864,6 +1873,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
     [ 'view', { class: 'foam.u2.CheckBox' } ],
@@ -1873,6 +1883,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Color',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -1888,6 +1899,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Reference',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -2007,6 +2019,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Action',
+  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.ActionView'
@@ -2047,6 +2060,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       // TODO: remove when all code ported
