@@ -202,7 +202,7 @@ foam.CLASS({
   abstract: true,
   implements: ['foam.mlang.predicate.Predicate'],
   methods: [
-    function toIndex(/*tail*/) {
+    function toIndex() {
       return undefined;
     },
     function toDisjunctiveNormalForm() {

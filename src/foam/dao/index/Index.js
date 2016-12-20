@@ -99,16 +99,16 @@ foam.CLASS({
 
   methods: [
     /** Adds or updates the given value in the index */
-    function put(/*o*/) {},
+    function put(obj) {},
 
     /** Removes the given value from the index */
-    function remove(/*o*/) {},
+    function remove(obj) {},
 
     /** @return a Plan to execute a select with the given parameters */
     function plan(sink, skip, limit, order, predicate, root) {},
 
     /** @return the tail index instance for the given key. */
-    function get(/*key*/) {},
+    function get(key) {},
 
     /** @return the integer size of this index. */
     function size() {},
@@ -120,7 +120,7 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate, cache) { },
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
-    function bulkLoad(/*dao*/) {},
+    function bulkLoad(dao) {},
   ]
 });
 
