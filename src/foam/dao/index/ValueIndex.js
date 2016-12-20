@@ -23,16 +23,16 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndex',
   extends: 'foam.dao.index.Index',
-  
+
   methods: [
-    function estimate(/*size, sink, skip, limit, order, predicate*/) {
+    function estimate(size, sink, skip, limit, order, predicate) {
       return 1;
     },
-    
+
     function toPrettyString(indent) {
       return "";
     },
-    
+
   ]
 });
 foam.CLASS({
