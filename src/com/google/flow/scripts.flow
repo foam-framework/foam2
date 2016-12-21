@@ -1539,12 +1539,12 @@ grid(function(x, y) {
 // 3D Fern
 var t = turtle3d1;
 
-t.cs().home().rt(135).pu().bk(180).pd().rollLeft(55);
+t.cs().pc('black').home().pitchUp(90).pu().bk(200).pd().ht().pitchDown(20);
 
 function fern(t, size) {
-  if ( size < 5 ) return;
+  if ( size < 10 ) return;
   t.ss();
-  t.fd(size*0.1).rt(3).pitchUp(6);
+  t.fd(size*0.1).lt(3).pitchUp(6);
   fern(t.lt(80),  size*0.35);
   fern(t.rt(160), size*0.35);
   fern(t.lt(80),  size*0.85);
@@ -1552,6 +1552,7 @@ function fern(t, size) {
 }
 
 fern(t.pc('green'), 600)
+t.addReaction('zRotation', "timer.time/1000");
 
 
 // 3D Tree
@@ -1574,11 +1575,31 @@ function tree(t, size) {
 tree(t, 400);
 
 t.addReaction('zRotation', "timer.time/1000");
-
-
-
-
 // 3D Tree
+var t = turtle3d1;
+
+t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
+
+function tree(t, size) {
+  if ( size < 60 ) return;
+
+  t.ss();
+  t.pw(size/20);
+  t.fd(size*0.25);
+  t.rollLeft(Math.random()*180);
+  tree(t.rt(20+Math.random()*30), size*0.8);
+  tree(t.lt(50+Math.random()*30), size*0.8);
+  t.rs();
+}
+
+tree(t, 400);
+
+t.addReaction('zRotation', "timer.time/1000");
+
+
+
+
+// 3D Tree, another version
 var t = turtle3d1;
 
 t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
