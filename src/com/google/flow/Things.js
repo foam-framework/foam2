@@ -922,19 +922,14 @@ foam.CLASS({
   name: 'Line3D',
   extends: 'foam.graphics.Line',
 
+  imports: [ 'xyzToX', 'xyzToY' ],
+
   properties: [
     { class: 'Float',  name: 'startZ' },
     { class: 'Float',  name: 'endZ' }
   ],
 
   methods: [
-    function xyzToX(x, y, z) {
-      return this.parent.parent.width/2 - x + y;
-    },
-
-    function xyzToY(x, y, z) {
-      return this.parent.parent.height/2 + x + y - z / Math.SQRT2;
-    },
 
     /*
     function xyzToX(x, y, z) {
@@ -994,14 +989,12 @@ foam.CLASS({
       name: 'memento',
       hidden: true,
       getter: function() {
-        return {
-          x: this.x,
-          y: this.y,
-          z: this.z
-        };
+        return [ this.x, this.y, this.z ];
       },
       setter: function(m) {
-        this.copyFrom(m);
+        this.x = m[0];
+        this.y = m[1];
+        this.z = m[2];
       }
     }
   ],
@@ -1096,7 +1089,23 @@ foam.CLASS({
     'com.google.flow.Line3D'
   ],
 
+  exports: [ 'xyzToX', 'xyzToY' ],
+
   properties: [
+    {
+      class: 'Float',
+      name: 'zRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
     {
       name: 'x',
       getter: function() { return this.position.x; },
@@ -1144,12 +1153,39 @@ foam.CLASS({
         };
       },
       setter: function(m) {
-        this.copyFrom(m);
+        this.position.memento = m.position;
+        this.heading.memento  = m.heading;
+        this.normal.memento   = m.normal;
+        this.penColor         = m.penColor;
+        this.penWidth         = m.penWidth;
+        this.penDown          = m.penDown;
       }
     }
   ],
 
   methods: [
+    function xyzToX(x, y, z) {
+      if ( this.zRotation ) {
+        var d = Math.sqrt(x*x + y*y);
+        var a = Math.atan2(y, x);
+        a += this.zRotation;
+        x = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+      return this.parent.width/2 - x + y;
+    },
+
+    function xyzToY(x, y, z) {
+      if ( this.zRotation ) {
+        var d = Math.sqrt(x*x + y*y);
+        var a = Math.atan2(y, x);
+        a += this.zRotation;
+        x = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+      return this.parent.height/2 + x + y - z / Math.SQRT2;
+    },
+
     function home() {
       this.position = this.heading = this.normal = undefined;
       return this;
