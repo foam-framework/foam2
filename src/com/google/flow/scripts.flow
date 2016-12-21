@@ -1534,3 +1534,74 @@ grid(function(x, y) {
   var d = Math.sqrt(x*x + y*y);
   return 250*Math.cos(d/25)*(200-d)/200;
 }, 1);
+
+
+// 3D Fern
+var t = turtle3d1;
+
+t.cs().home().rt(135).pu().bk(180).pd().rollLeft(55);
+
+function fern(t, size) {
+  if ( size < 5 ) return;
+  t.ss();
+  t.fd(size*0.1).rt(3).pitchUp(6);
+  fern(t.lt(80),  size*0.35);
+  fern(t.rt(160), size*0.35);
+  fern(t.lt(80),  size*0.85);
+  t.rs();
+}
+
+fern(t.pc('green'), 600)
+
+
+// 3D Tree
+var t = turtle3d1;
+
+t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
+
+function tree(t, size) {
+  if ( size < 60 ) return;
+
+  t.ss();
+  t.pw(size/20);
+  t.fd(size*0.25).bk(7);
+  t.rollLeft(Math.random()*180);
+  tree(t.rt(20+Math.random()*30), size*0.8);
+  tree(t.lt(50+Math.random()*30), size*0.8);
+  t.rs();
+}
+
+tree(t, 400);
+
+t.addReaction('zRotation', "timer.time/1000");
+
+
+
+
+// 3D Tree
+var t = turtle3d1;
+
+t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
+
+function tree(size) {
+  if ( size < 50 ) return;
+
+  t.ss();
+  t.rollLeft(80+Math.random()*20);
+  t.pw(size/30);
+  t.fd(size*0.28);
+
+  tree(size*0.7);
+
+  t.rt(30);
+  tree(size*2/3);
+
+  t.lt(50+Math.random()*20);
+  tree(size*2/3);
+
+  t.rs();
+}
+
+tree(500);
+
+t.addReaction('zRotation', "timer.time/1000");
