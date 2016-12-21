@@ -928,6 +928,7 @@ var examples = [
       // the old version will not propagate the changes to those existing classes.
       foam.CLASS({ name: 'Salary', extends: 'Float' });
       foam.CLASS({ name: 'Emp', properties: [ { class: 'Salary', name: 'salary' } ] });
+
       // Since Classes are not constructed until used, we create an instance to force
       // Emp to be loaded (otherwise the refinement will appear to work):
       console.log("Emp.salary before:", Emp.create().salary);
@@ -1071,7 +1072,8 @@ var examples = [
     name: 'Test isMerged',
     description: 'isMerged will merge multiple events',
     dependencies: [ ],
-    code: function async() { // TODO: for all async, pass things for postTestCode in promise resolve
+    code: function async() {
+      // TODO: for all async, pass things for postTestCode in promise resolve
       // If a listener has isMerged: true, it will merge multiple
       // events received withing 'mergeDelay' milliseconds into
       // a single event. 'mergeDelay' is optional and defaults to
