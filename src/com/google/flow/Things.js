@@ -922,7 +922,7 @@ foam.CLASS({
   name: 'Line3D',
   extends: 'foam.graphics.Line',
 
-  imports: [ 'xyzToX', 'xyzToY' ],
+  imports: [ 'xyzToXY' ],
 
   properties: [
     { class: 'Float',  name: 'startZ' },
@@ -930,39 +930,15 @@ foam.CLASS({
   ],
 
   methods: [
-
-    /*
-    function xyzToX(x, y, z) {
-      var s = 1 - z/600
-      return this.parent.parent.width/2 + x * s;
-    },
-
-    function xyzToY(x, y, z) {
-      var s = 1 - z/600
-      return this.parent.parent.height/2 + y * s;
-    },
-    */
-
-    /*
-    function xyzToX(x, y, z) {
-      return this.parent.parent.width/2 - x;
-    },
-
-    function xyzToY(x, y, z) {
-      return this.parent.parent.height/2 -y;
-    },
-    */
-
     function paintSelf(x) {
+      var xy;
       x.beginPath();
 
-      x.moveTo(
-          this.xyzToX(this.startX, this.startY, this.startZ),
-          this.xyzToY(this.startX, this.startY, this.startZ));
+      xy = this.xyzToXY(this.startX, this.startY, this.startZ);
+      x.moveTo(xy[0], xy[1]);
 
-      x.lineTo(
-          this.xyzToX(this.endX, this.endY, this.endZ),
-          this.xyzToY(this.endX, this.endY, this.endZ));
+      xy = this.xyzToXY(this.endX, this.endY, this.endZ);
+      x.lineTo(xy[0], xy[1]);
 
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
@@ -1089,7 +1065,7 @@ foam.CLASS({
     'com.google.flow.Line3D'
   ],
 
-  exports: [ 'xyzToX', 'xyzToY' ],
+  exports: [ 'xyzToXY' ],
 
   properties: [
     {
@@ -1160,11 +1136,16 @@ foam.CLASS({
         this.penWidth         = m.penWidth;
         this.penDown          = m.penDown;
       }
+    },
+    {
+      name: 'xy_',
+      hidden: true,
+      factory: function() { return []; }
     }
   ],
 
   methods: [
-    function xyzToX(x, y, z) {
+    function xyzToXY(x, y, z) {
       if ( this.zRotation ) {
         var d = Math.sqrt(x*x + y*y);
         var a = Math.atan2(y, x);
@@ -1172,18 +1153,11 @@ foam.CLASS({
         x = d * Math.cos(a);
         y = d * Math.sin(a);
       }
-      return this.parent.width/2 - x + y;
-    },
 
-    function xyzToY(x, y, z) {
-      if ( this.zRotation ) {
-        var d = Math.sqrt(x*x + y*y);
-        var a = Math.atan2(y, x);
-        a += this.zRotation;
-        x = d * Math.cos(a);
-        y = d * Math.sin(a);
-      }
-      return this.parent.height/2 + x + y - z / Math.SQRT2;
+      var xy = this.xy_;
+      xy[0] = this.parent.width/2 - x + y;
+      xy[1] = this.parent.height/2 + x + y - z / Math.SQRT2;
+      return xy;
     },
 
     function home() {
