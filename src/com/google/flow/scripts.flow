@@ -1555,26 +1555,7 @@ fern(t.pc('green'), 600)
 t.addReaction('zRotation', "timer.time/1000");
 
 
-// 3D Tree
-var t = turtle3d1;
 
-t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
-
-function tree(t, size) {
-  if ( size < 60 ) return;
-
-  t.ss();
-  t.pw(size/20);
-  t.fd(size*0.25).bk(7);
-  t.rollLeft(Math.random()*180);
-  tree(t.rt(20+Math.random()*30), size*0.8);
-  tree(t.lt(50+Math.random()*30), size*0.8);
-  t.rs();
-}
-
-tree(t, 400);
-
-t.addReaction('zRotation', "timer.time/1000");
 // 3D Tree
 var t = turtle3d1;
 
