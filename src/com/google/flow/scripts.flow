@@ -1607,3 +1607,53 @@ function tree(size) {
 tree(500);
 
 t.addReaction('zRotation', "timer.time/1000");
+
+
+
+// 3D Shell
+var t = turtle3d1;
+
+var fib = [ 1, 0, 1, 1, 2, 3, 5, 8 ];
+
+t.cs().home().pw(1).ht();
+t.pc(hsla(50, 50, 0, 0.4));
+
+t.pitchUp(90);
+
+repeat(360, (j) => {
+  t.ss();
+  repeat(4, (i) => {
+    repeat(18, () => {
+      t.pitchDown(5).fd((fib[i]+fib[i-1]*j/360)*2).pitchDown(5);
+    });
+    t.pitchDown(180);
+  });
+  t.rs();
+  t.rollLeft(1);
+});
+
+
+
+// 3D Shell, v2
+var t = turtle3d1;
+
+var fib = [ 1, 0, 1, 1, 2, 3, 5, 8 ];
+
+t.cs().home().pw(2).ht();
+
+t.pitchUp(90);
+
+repeat(360/4, (j) => {
+  j*=4;
+  t.ss();
+  repeat(4, (i) => {
+//    t.pw((i+j/360)*4);
+    repeat(36, (k) => {
+      t.pc(hsl(70,0,20+80*Math.sin(k/36*Math.PI)));
+      t.pitchDown(2.5).fd(1.2*(fib[i]+fib[i-1]*j/360)).pitchDown(2.5);
+    });
+    t.pitchUp(180);
+  });
+  t.rs();
+  t.rollLeft(1*4);
+});
