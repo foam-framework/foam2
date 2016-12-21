@@ -135,7 +135,7 @@ foam.CLASS({
       var deps = this.flattenDependencies();
 
       deps.sync.forEach(function(dep) {
-        ret += dep.outputSelfTest(indent, true);
+        ret += dep[selfOutputMethod](indent, true);
       });
 
 
@@ -145,7 +145,7 @@ foam.CLASS({
       }
       deps.async.forEach(function(dep) {
         ret += tabs + "}).then(function() {\n";
-        ret += dep.outputSelfTest(indent);
+        ret += dep[selfOutputMethod](indent);
       });
       if ( deps.async.length ) {
         ret += tabs + "}).then(function() {\n";
@@ -164,6 +164,9 @@ foam.CLASS({
 
     function generateExample(noDeps) {
       return this.generateCode('outputSelfExample', noDeps);
+    },
+    function generateExampleHTML(noDeps) {
+      return this.generateCode('outputSelfHTML', noDeps);
     },
 
     function generateTest() {
@@ -200,6 +203,21 @@ foam.CLASS({
       ret += tabs + '//=====================================================\n';
 
       ret += this.outputIndentedCode(indent, this.code);
+
+      return ret;
+    },
+
+    function outputSelfHTML(indent) {
+
+      var ret = "\n";
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
+
+      ret += tabs + '<div class="example-title">' + this.name + '</div>\n';
+      ret += tabs + '<div class="example-description">' + this.description + '</div>\n';
+      ret += '<div class="example-code"><code>\n';
+      ret += this.outputIndentedCode(indent, this.code);
+      ret += '</code></div>\n';
 
       return ret;
     },
