@@ -255,6 +255,20 @@ foam.CLASS({
           hsl: function(h, s, l) {
             return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
           },
+          fib: (function() {
+            var fib_ = foam.Function.memoize1(function(n) {
+              if ( n < 1 ) return 0;
+              if ( n < 3 ) return 1;
+              return fib_(n-1) + fib_(n-2);
+            });
+
+            return function(i) {
+              if ( i < 0 ) return 0;
+              var floor = Math.floor(i);
+              var frac  = i-floor;
+              return fib_(floor) + frac * ( floor < 1 ? 1 : fib_(floor-1));
+            };
+          })(),
           hsla: function(h, s, l, a) {
             return 'hsla(' + (h%360) + ',' + s + '%,' + l + '%,' + a + ')';
           },
