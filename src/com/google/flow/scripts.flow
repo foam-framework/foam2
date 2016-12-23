@@ -1793,3 +1793,53 @@ repeat(36 * 5, (i) => {
   t.ss().pu();arc(1.2*fib(a));t.pd();arc(1.2*fib(a+1));t.rs();
   t.rt(10);
 });
+
+
+
+// 3D Shell, simple version
+var t = turtle3d1;
+
+t.cs().home().pw(2).ht().pc('red');
+
+function arc(s) {
+  t.pitchUp(90);
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, .2 + 0.8*Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s/Math.PI/8).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 5, (i) => {
+  var a = i / 36;
+  t.ss().pu().fd(19*(fib(a+1)-1)).pd();
+  arc(20*fib(a));
+  t.rs().rt(10);
+//  t.rs().rollLeft(10);
+});
+
+
+
+
+// 3D Spiral Shell
+var t = turtle3d1;
+t.zRotation = -5.17;
+
+t.cs().home().pw(2).ht().pc('red');
+
+function arc(s) {
+  t.pitchUp(90);
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, .2 + 0.8*Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s/Math.PI/8).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 9, (i) => {
+  var a = i / 36;
+  t.ss().pu().fd(19*(fib(a+1)-1)).pd();
+  arc(20*fib(a));
+  t.rs().rt(10);
+  t.pitchUp(10);
+});
+
+
