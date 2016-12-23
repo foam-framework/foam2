@@ -1686,3 +1686,110 @@ repeat(360/4, (j) => {
   t.rs();
   t.rollLeft(1*4);
 });
+
+
+
+// 3D Shell, v3
+var t = turtle3d1;
+
+var fib = (function() {
+  var fib_ = [ 1, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+
+  return function(i) {
+    var floor = Math.floor(i);
+    var frac  = i-floor;
+    return fib_[floor+1] + frac * fib_[floor];
+  };
+})();
+
+t.cs().home().pw(2).ht().pc('white');
+
+// t.pitchUp(90);
+
+function arc(s) {
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 5, (i) => {
+  var a = i / 34 ;
+console.log(a);
+  t.ss().pu().fd(fib(a)).pd();arc(1.2*fib(a+1));t.rs();
+  t.rt(10);
+});
+
+
+
+
+
+
+
+// 3D Jellyfish, v2
+var t = turtle3d1;
+
+var fib = (function() {
+  var fib_ = [ 1, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+
+  return function(i) {
+    var floor = Math.floor(i);
+    var frac  = i-floor;
+    return fib_[floor+1] + frac * fib_[floor];
+  };
+})();
+
+t.cs().home().pw(2.5).ht().pc('white');
+
+//t.pitchUp(45);
+t.rt(100);
+
+function arc(s) {
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 6 + 9, (i) => {
+  var a = i / 36 ;
+  t.ss().pu().fd(fib(a)).pd();arc(1.2*fib(a+1));t.rs();
+  t.rollLeft(10);
+});
+
+
+
+
+
+// 3D Long Shell, v2
+var t = turtle3d1;
+
+var fib = (function() {
+  var fib_ = [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+
+  return function(i) {
+    var floor = Math.floor(i);
+    var frac  = i-floor;
+    return fib_[floor] + frac * (fib_[floor+1] - fib_[floor]);
+  };
+})();
+
+t.cs().home().pw(2).ht().pc('white');
+
+//t.pitchUp(90);
+
+function arc(s) {
+  t.pitchUp(180);
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s).pitchDown(2.5);
+  });
+}
+
+t.rollLeft(90);
+
+repeat(36 * 5, (i) => {
+  var a = i / 36 ;
+  t.ss().pu();arc(1.2*fib(a));t.pd();arc(1.2*fib(a+1));t.rs();
+  t.rt(10);
+});
