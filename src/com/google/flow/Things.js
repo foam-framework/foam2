@@ -1210,13 +1210,7 @@ foam.CLASS({
     },
 
     function up(d) {
-      var v = d * Math.cos(this.pitch);
-      var h = d * Math.sin(this.pitch);
-
-      return this.gt(
-          this.x + h * Math.cos(this.rotation+Math.PI/2),
-          this.y - h * Math.sin(this.rotation+Math.PI/2),
-          this.z + v);
+      return this.gtV(this.position.add(this.normal.mul(d)));
     },
 
     function down(d) {
