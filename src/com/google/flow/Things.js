@@ -1083,6 +1083,20 @@ foam.CLASS({
       }
     },
     {
+      class: 'Float',
+      name: 'xRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
+    {
       name: 'x',
       getter: function() { return this.position.x; },
       setter: function(x) { this.position.x = x; }
@@ -1151,6 +1165,14 @@ foam.CLASS({
         var a = Math.atan2(y, x);
         a += this.zRotation;
         x = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+
+      if ( this.xRotation ) {
+        var d = Math.sqrt(z*z + y*y);
+        var a = Math.atan2(y, z);
+        a += this.xRotation;
+        z = d * Math.cos(a);
         y = d * Math.sin(a);
       }
 
