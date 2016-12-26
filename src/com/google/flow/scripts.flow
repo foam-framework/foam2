@@ -1843,3 +1843,35 @@ repeat(36 * 9, (i) => {
 });
 
 
+
+
+// DNA
+var t = turtle3d1;
+
+t.cs().home().pw(3).ht().pc('white').pu().down(200).pd();
+
+
+t.rt(45).pitchUp(45);
+
+repeat(20, () => {
+  t.ss().pu().fd(80).pd().bk(160).rs();
+  t.pu().up(15).pd().rt(15);
+})
+
+
+
+// Tile
+var t = turtle3d1;
+
+t.home().cs().pc('white').pw(1);
+
+function circle(c) {
+  t.repeat(36, (i) => {
+    t.rt(360/36/2).fd(2);
+    if ( c && i % 9 === 0 ) { t.ss().lt(85); circle(c-1); t.rs(); }
+    t.fd(2).rt(360/36/2);
+  });
+}
+
+circle(5);
+
