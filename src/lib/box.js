@@ -996,7 +996,7 @@ foam.CLASS({
       }
 
       throw this.InvalidMessageException.create({
-        messageType: message.cls_.id
+        messageType: message.cls_ && message.cls_.id
       });
     }
   ]
@@ -1475,7 +1475,7 @@ foam.CLASS({
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          this.me.send(foam.json.parse(foam.json.parseString(p, null, this)));
+          this.me.send(foam.json.parse(foam.json.parseString(p, this, this)));
         }.bind(this));
       }
     }
