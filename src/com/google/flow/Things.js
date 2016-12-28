@@ -1183,7 +1183,7 @@ foam.CLASS({
       }
 
       if ( this.yRotation ) {
-        var d = Math.sqrt(z*z + y*y);
+        var d = Math.sqrt(z*z + x*x);
         var a = Math.atan2(x, z);
         a += this.yRotation;
         z = d * Math.cos(a);
