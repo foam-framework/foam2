@@ -1689,6 +1689,7 @@ repeat(360/4, (j) => {
 
 
 
+
 // 3D Shell, v3
 var t = turtle3d1;
 
@@ -1875,3 +1876,28 @@ function circle(c) {
 
 circle(5);
 
+
+
+
+// Cells
+var t = turtle3d1;
+
+t.home().cs().pw(1);
+
+function hex(s) {
+  repeat(6, (i) => {
+    t.fd(20).rt(360/6);
+    if ( s && i == 2 ) {
+      t.ss().lt(120);
+      hex(s-1);
+      t.rs();
+    }
+    if ( s && i == 4 ) {
+      t.ss().rt(120);
+      hex(s-1);
+      t.rs();
+    }
+  });
+}
+
+hex(5);
