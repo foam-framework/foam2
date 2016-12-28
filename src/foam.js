@@ -17,8 +17,11 @@
 
 (function() {
 
-  var isServer = typeof process === 'object';
-  var isWorker = typeof importScripts !== 'undefined';
+  var isServer = typeof process === 'object' &&
+    ! ( typeof SIMULATE_WEB !== 'undefined' ||
+        typeof SIMULATE_WORKER !== 'undefined' );
+  var isWorker = typeof importScripts !== 'undefined' ||
+    typeof SIMULATE_WORKER !== 'undefined';
 
   var flags = this.FOAM_FLAGS || {};
   flags.web = ! isServer,
