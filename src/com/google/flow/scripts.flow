@@ -1901,3 +1901,35 @@ function hex(s) {
 }
 
 hex(5);
+
+
+
+// 3D Cells
+var t = turtle3d1;
+
+t.home().cs().pw(1).pc(hsla(0,0,0,0.2));
+
+function fd(s, w) {
+  repeat(s, () => {
+    t.fd(1).ss().pitchUp(86).fd(w).rs();
+  });
+}
+
+function hex(w, h) {
+  repeat(6, (i) => {
+    fd(12, 15);
+    t.rt(360/6);
+    if ( w && i == 2 ) {
+      t.ss().lt(120);
+      hex(w-1, h);
+      t.rs();
+    }
+    if ( h && i == 4 ) {
+      t.ss().rt(120);
+      hex(0, h-1);
+      t.rs();
+    }
+  });
+}
+
+hex(6,6);
