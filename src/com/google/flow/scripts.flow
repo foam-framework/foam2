@@ -1933,3 +1933,24 @@ function hex(w, h) {
 }
 
 hex(6,6);
+
+
+
+// 3D Christmas Tree
+var t = turtle3d1;
+
+t.cs().pc('black').pu().home().pitchUp(90).bk(110).pd().ht();
+
+function fern(t, size) {
+  if ( size < 10 ) return;
+  t.ss();
+  t.fd(size*0.005/16).rollLeft(30+Math.random()*40);
+  t.ss().lt(80).fd((1-Math.random()/10)*size*0.1).rs();
+  fern(t, size*0.99825);
+  t.rs();
+}
+
+fern(t.pc('green'), 1900);
+
+
+//t.addReaction('zRotation', "timer.time/1000");
