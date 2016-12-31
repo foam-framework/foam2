@@ -1974,3 +1974,43 @@ repeat(20, (i) => {
   });
   t.lt(90);
 });
+
+
+// 3D Dome, V2
+var t = turtle3d1;
+var prev = [];
+
+t.home().cs().pw(1).pc('black');
+
+repeat(20, (i) => {
+  t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI/4)).fd(10).rt(90).pd();
+  repeat(36, (j) => {
+    t.fd(i).rt(10);
+    var p = prev[j];
+    if ( p ) {
+      t.ss().gt(p[0], p[1], p[2]).rs();
+    }
+    prev[j] = [t.x, t.y, t.z];
+  });
+  t.lt(90);
+});
+
+
+// 3D thing
+var t = turtle3d1;
+var prev = [];
+
+t.home().cs().pw(1).pc('black');
+
+repeat(20, (i) => {
+  t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI*4)).fd(10).rt(90).pd();
+  repeat(36, (j) => {
+    t.fd(i).rt(10);
+    var p = prev[j];
+    if ( p ) {
+      t.ss().gt(p[0], p[1], p[2]).rs();
+    }
+    prev[j] = [t.x, t.y, t.z];
+  });
+  t.lt(90);
+});
