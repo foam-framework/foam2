@@ -1935,11 +1935,10 @@ function hex(w, h) {
 hex(6,6);
 
 
-
 // 3D Christmas Tree
 var t = turtle3d1;
 
-t.cs().pc('black').pu().home().pitchUp(90).bk(110).pd().ht();
+t.cs().pc('black').pw(2).pu().home().pitchUp(90).bk(110).pd().ht();
 
 function fern(t, size) {
   if ( size < 10 ) return;
@@ -1953,4 +1952,25 @@ function fern(t, size) {
 fern(t.pc('green'), 1900);
 
 
-//t.addReaction('zRotation', "timer.time/1000");
+t.pw(4);
+t.home().pc('red').fd(300).bk(600);
+t.home().pc('black').rt(90).fd(300).bk(600);
+t.home().pc('blue').up(300).down(600);
+
+
+// t.addReaction('zRotation', "timer.time/1000");
+t.clearReaction('zRotation');
+
+
+// 3D Dome
+var t = turtle3d1;
+
+t.home().cs().pw(2).pc('black');
+
+repeat(20, (i) => {
+  t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI/4)).fd(10).rt(90).pd();
+  repeat(18, () => {
+    t.fd(i*2).rt(20);
+  });
+  t.lt(90);
+});
