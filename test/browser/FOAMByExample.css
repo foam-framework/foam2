@@ -82,3 +82,20 @@ pre {
   color: grey;
   font: 12px Roboto;
 }
+
+@media only screen and (max-width: 500px) {
+  .example-container {
+    padding: 10px 5px;
+    margin: 20px 0px;
+  }
+
+  body {
+    padding: 2px;
+    margin: 2px;
+  }
+
+
+}
+
+
+
