@@ -33,7 +33,7 @@ foam.CLASS({
         var B         = Math.atan(trigH / ((.5+lean) * w));
 
         this.add(
-            this.cls_.create({
+            nextLeft > 1 && this.cls_.create({
               x: 0,
               y: -nextLeft,
               w: nextLeft,
@@ -43,7 +43,7 @@ foam.CLASS({
               heightFactor: this.heightFactor,
               lean: this.lean
             }),
-            this.cls_.create({
+            nextRight > 1 && this.cls_.create({
               x: Math.cos(A)*nextLeft,
               y: -nextRight - Math.sin(A)*nextLeft,
               w: nextRight,
@@ -61,5 +61,47 @@ foam.CLASS({
 });
 
 
-var tree = PyTree.create();
-foam.__context__.E('svg').style({padding: 500}).add(tree).write();
+foam.CLASS({
+  name: 'PyTreeController',
+  extends: 'foam.u2.Element',
+
+  requires: [ 'PyTree' ],
+
+  properties: [
+    { name: 'heightFactor', value: 0.55 },
+    { name: 'lean', value: 0 }
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      this.setNodeName('svg').
+        attrs({width: 1600, height: 800}).
+        on('mousemove', this.onMouseMove).
+        add(this.slot(function(heightFactor, lean) {
+          return this.PyTree.create({x: 800, y: 500, heightFactor: heightFactor, lean: lean});
+        }));
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onMouseMove',
+      isFramed: true,
+      code: function(e) {
+        var x = e.clientX, y = e.clientY;
+        this.heightFactor = y / this.getAttribute('height') * 0.8;
+        this.lean         = x / this.getAttribute('width') - 0.5;
+      }
+    }
+  ]
+});
+
+
+//var tree = PyTree.create();
+//foam.__context__.E('svg').style({padding: 500}).add(tree).write();
+
+var treeCtrl = PyTreeController.create();
+treeCtrl.write();
+
