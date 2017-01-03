@@ -922,52 +922,23 @@ foam.CLASS({
   name: 'Line3D',
   extends: 'foam.graphics.Line',
 
+  imports: [ 'xyzToXY' ],
+
   properties: [
     { class: 'Float',  name: 'startZ' },
     { class: 'Float',  name: 'endZ' }
   ],
 
   methods: [
-    function xyzToX(x, y, z) {
-      return this.parent.parent.width/2 - x + y;
-    },
-
-    function xyzToY(x, y, z) {
-      return this.parent.parent.height/2 + x + y - z / Math.SQRT2;
-    },
-
-    /*
-    function xyzToX(x, y, z) {
-      var s = 1 - z/600
-      return this.parent.parent.width/2 + x * s;
-    },
-
-    function xyzToY(x, y, z) {
-      var s = 1 - z/600
-      return this.parent.parent.height/2 + y * s;
-    },
-    */
-
-    /*
-    function xyzToX(x, y, z) {
-      return this.parent.parent.width/2 - x;
-    },
-
-    function xyzToY(x, y, z) {
-      return this.parent.parent.height/2 -y;
-    },
-    */
-
     function paintSelf(x) {
+      var xy;
       x.beginPath();
 
-      x.moveTo(
-          this.xyzToX(this.startX, this.startY, this.startZ),
-          this.xyzToY(this.startX, this.startY, this.startZ));
+      xy = this.xyzToXY(this.startX, this.startY, this.startZ);
+      x.moveTo(xy[0], xy[1]);
 
-      x.lineTo(
-          this.xyzToX(this.endX, this.endY, this.endZ),
-          this.xyzToY(this.endX, this.endY, this.endZ));
+      xy = this.xyzToXY(this.endX, this.endY, this.endZ);
+      x.lineTo(xy[0], xy[1]);
 
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
@@ -994,14 +965,12 @@ foam.CLASS({
       name: 'memento',
       hidden: true,
       getter: function() {
-        return {
-          x: this.x,
-          y: this.y,
-          z: this.z
-        };
+        return [ this.x, this.y, this.z ];
       },
       setter: function(m) {
-        this.copyFrom(m);
+        this.x = m[0];
+        this.y = m[1];
+        this.z = m[2];
       }
     }
   ],
@@ -1096,7 +1065,51 @@ foam.CLASS({
     'com.google.flow.Line3D'
   ],
 
+  exports: [ 'xyzToXY' ],
+
   properties: [
+    {
+      class: 'Float',
+      name: 'zRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
+    {
+      class: 'Float',
+      name: 'xRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
+    {
+      class: 'Float',
+      name: 'yRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
     {
       name: 'x',
       getter: function() { return this.position.x; },
@@ -1144,12 +1157,53 @@ foam.CLASS({
         };
       },
       setter: function(m) {
-        this.copyFrom(m);
+        this.position.memento = m.position;
+        this.heading.memento  = m.heading;
+        this.normal.memento   = m.normal;
+        this.penColor         = m.penColor;
+        this.penWidth         = m.penWidth;
+        this.penDown          = m.penDown;
       }
+    },
+    {
+      name: 'xy_',
+      hidden: true,
+      factory: function() { return []; }
     }
   ],
 
   methods: [
+    function xyzToXY(x, y, z) {
+      if ( this.xRotation ) {
+        var d = Math.sqrt(z*z + y*y);
+        var a = Math.atan2(y, z);
+        a += this.xRotation;
+        z = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+
+      if ( this.yRotation ) {
+        var d = Math.sqrt(z*z + x*x);
+        var a = Math.atan2(x, z);
+        a += this.yRotation;
+        z = d * Math.cos(a);
+        x = d * Math.sin(a);
+      }
+
+      if ( this.zRotation ) {
+        var d = Math.sqrt(x*x + y*y);
+        var a = Math.atan2(y, x);
+        a += this.zRotation;
+        x = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+
+      var xy = this.xy_;
+      xy[0] = this.parent.width/2 - x + y;
+      xy[1] = this.parent.height/2 + x + y - z / Math.SQRT2;
+      return xy;
+    },
+
     function home() {
       this.position = this.heading = this.normal = undefined;
       return this;
@@ -1200,13 +1254,7 @@ foam.CLASS({
     },
 
     function up(d) {
-      var v = d * Math.cos(this.pitch);
-      var h = d * Math.sin(this.pitch);
-
-      return this.gt(
-          this.x + h * Math.cos(this.rotation+Math.PI/2),
-          this.y - h * Math.sin(this.rotation+Math.PI/2),
-          this.z + v);
+      return this.gtV(this.position.add(this.normal.mul(d)));
     },
 
     function down(d) {

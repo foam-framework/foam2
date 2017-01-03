@@ -23,7 +23,7 @@ foam.CLASS({
   label: 'Cascading Remove DAO',
   help: "Removes children from relationship",
 
-  documentation: {
+  documentation: foam.String.multiline(function(){
     /**
        On object DAO remove, also remove any relationship objects.
 
@@ -34,7 +34,7 @@ foam.CLASS({
        just contain a reference to the Relationship. EasyDAO could make use
        of this as could a Relationship-Aware DAOController. - Kevin
     */
-  },
+  }),
 
   properties: [
     {

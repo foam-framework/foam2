@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'IPromise',
 
   methods: [
-    function then(/*success, fail*/) {},
+    function then(success, fail) {},
     { name: "catch", code: function(fail) { return this.then(null, fail); } },
     function fulfill_() {},
     function reject_() {}
@@ -300,7 +300,7 @@ foam.LIB({
     },
     {
       name: "all",
-      code: function (/* array */ promises) {
+      code: function (/* foam.Array */ promises) {
         var results = [];
         var p = Promise.resolve();
 
