@@ -233,8 +233,6 @@ foam.LIB({
           replace(/(\r\n|\n|\r)/gm,'');
       var isArrowFunction = str.indexOf('function') !== 0;
 
-      console.log(str);
-
       var match = isArrowFunction ?
           // (...args...) => ...
           // or
