@@ -59,10 +59,12 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
   };
   var writeOutput = function() {
     // write log output
+    var consDiv = document.createElement('div');
+    consDiv.className = 'example-console';
     var pre = document.createElement('pre');
-    pre.className = 'example-console';
     pre.innerHTML = output.join('\n');
-    document.getElementById(domOutputID).appendChild(pre);
+    document.getElementById(domOutputID).appendChild(consDiv);
+    consDiv.appendChild(pre);
   }
   // TODO: settle on logging strategy. Probably not using console but may want to
   //   override it to catch unfixed calls.
