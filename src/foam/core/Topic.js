@@ -37,8 +37,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Topic',
 
-  documentation: 'Topic Axiom',
-
   properties: [
     'name',
     'description',
