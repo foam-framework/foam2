@@ -88,7 +88,7 @@ foam.CLASS({
   listeners: [
     {
       name: 'onMouseMove',
-      isFramed: true,
+//      isFramed: true,
       code: function(e) {
         var x = e.clientX, y = e.clientY;
         this.heightFactor = y / this.getAttribute('height') * 0.8;
@@ -104,4 +104,3 @@ foam.CLASS({
 
 var treeCtrl = PyTreeController.create();
 treeCtrl.write();
-
