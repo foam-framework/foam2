@@ -75,25 +75,30 @@ var getNodeNamed = function getNodeNamed(node, propName) {
 
 var getLeadingComment = function getLeadingComment(node) {
   // climb up the tree and look for a docs comment
+  var foundComment = '';
+
   if ( node.leadingComments ) {
-    return node.leadingComments[0].raw;
-  }
-  if ( node.parent ) {
+    foundComment = node.leadingComments[0].raw;
+  } else if ( node.parent ) {
     if ( node.parent.leadingComments ) {
-      return node.parent.leadingComments[0].raw;
-    }
-    if ( node.parent.callee ) {
+      foundComment = node.parent.leadingComments[0].raw;
+    } else if ( node.parent.callee ) {
       if ( node.parent.callee.leadingComments ) {
-        return node.parent.callee.leadingComments[0].raw;
-      }
-      if ( node.parent.callee.parent ) {
+        foundComment = node.parent.callee.leadingComments[0].raw;
+      } else if ( node.parent.callee.parent ) {
         if ( node.parent.callee.parent.leadingComments ) {
-          return node.parent.callee.parent.leadingComments[0].raw;
+          foundComment = node.parent.callee.parent.leadingComments[0].raw;
         }
       }
     }
   }
-  return '';
+
+  // ignore license headers
+  if ( foundComment.indexOf('@license') >= 0 ) {
+    foundComment = '';
+  }
+
+  return foundComment;
 };
 
 var getFuncBodyComment = function getFuncBodyComment(node, filename) {
@@ -270,7 +275,14 @@ var getSourceString = function getSourceString(filename, start, end) {
   // HACK to support memoize1'd function bodies
   if ( ! source.startsWith('function') ) {
     // assume anything not starting with function must have a wrapper around it
-    source = source.substring(source.indexOf('(') + 1, source.lastIndexOf(')'));
+    source = source
+      .substring(source.indexOf('(') + 1, source.lastIndexOf(')'))
+      .trim();
+    if ( ! source.startsWith('function') ) {
+      // try again, fail if no function
+      // NOTE: mmethod trips this case
+      return 'function(){}';
+    }
   }
   return source;
 };
