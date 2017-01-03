@@ -134,60 +134,6 @@
  * issue.status === IssueStatus.ASSIGNED; // is true
  * </pre>
  */
-foam.CLASS({
-  package: 'foam.core.internal',
-  name: 'EnumValue',
-
-  documentation: 'A single value of an Enum.',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'name',
-      preSet: function(_, s) {
-        return foam.String.constantize(s);
-      }
-    },
-    {
-      class: 'String',
-      name: 'label'
-    },
-    {
-      class: 'Int',
-      name: 'ordinal'
-    },
-    {
-      name: 'values'
-    }
-  ],
-
-  methods: [
-    function installInClass(cls) {
-      var name    = this.name;
-      var ordinal = this.ordinal;
-
-      Object.defineProperty(
-        cls,
-        name,
-        {
-          configurable: true,
-          get: function() {
-            return cls.create({ ordinal: ordinal }, foam.__context__);
-          }
-        });
-    },
-
-    function installInProto(proto) {
-      this.installInClass(proto);
-    },
-
-    function initArgs(args, ctx) {
-      this.values = args;
-      this.SUPER(args, ctx);
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.core',
@@ -374,6 +320,60 @@ foam.CLASS({
       }
 
       return cls;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core.internal',
+  name: 'EnumValue',
+
+  documentation: 'A single value of an Enum.',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name',
+      preSet: function(_, s) {
+        return foam.String.constantize(s);
+      }
+    },
+    {
+      class: 'String',
+      name: 'label'
+    },
+    {
+      class: 'Int',
+      name: 'ordinal'
+    },
+    {
+      name: 'values'
+    }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var name    = this.name;
+      var ordinal = this.ordinal;
+
+      Object.defineProperty(
+        cls,
+        name,
+        {
+          configurable: true,
+          get: function() {
+            return cls.create({ ordinal: ordinal }, foam.__context__);
+          }
+        });
+    },
+
+    function installInProto(proto) {
+      this.installInClass(proto);
+    },
+
+    function initArgs(args, ctx) {
+      this.values = args;
+      this.SUPER(args, ctx);
     }
   ]
 });

@@ -31,8 +31,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      expression: function(name, package) {
-        return package + '.' + name;
+      expression: function(name, pkg) {
+        return pkg + '.' + name;
       }
     },
     {
@@ -172,8 +172,8 @@ foam.CLASS({
     },
     {
       name: 'id',
-      expression: function(name, package) {
-        return package + '.' + name;
+      expression: function(name, pkg) {
+        return pkg + '.' + name;
       }
     }
   ],

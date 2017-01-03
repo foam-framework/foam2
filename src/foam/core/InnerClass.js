@@ -45,8 +45,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'InnerClass',
 
-  documentation: 'Inner-Class Axiom',
-
   properties: [
     {
       name: 'name',
