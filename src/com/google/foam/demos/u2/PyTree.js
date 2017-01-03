@@ -6,7 +6,7 @@ foam.CLASS({
     { class: 'Float', name: 'w', value: 80 },
     { class: 'Float', name: 'x' },
     { class: 'Float', name: 'y' },
-    { name: 'rotate' },
+    { class: 'String', name: 'rotate' },
     { name: 'heightFactor', value: 0.55 },
     { name: 'lean', value: 0 },
     { name: 'lvl', value: 1 },
@@ -29,32 +29,34 @@ foam.CLASS({
         var trigH     = this.heightFactor * w;
         var nextRight = Math.sqrt(trigH**2 + (w * (.5+lean))**2);
         var nextLeft  = Math.sqrt(trigH**2 + (w * (.5-lean))**2);
-        var A         = Math.atan(trigH / ((.5-lean) * w))*180/Math.PI;
-        var B         = Math.atan(trigH / ((.5+lean) * w))*180/Math.PI;
+        var A         = Math.atan(trigH / ((.5-lean) * w));
+        var B         = Math.atan(trigH / ((.5+lean) * w));
 
         this.add(
             this.cls_.create({
               x: 0,
               y: -nextLeft,
               w: nextLeft,
-              rotate: 'rotate(' + -A + ' 0 ' + nextLeft + ')',
+              rotate: 'rotate(' + this.radToDeg(-A) + ' 0 ' + nextLeft + ')',
               lvl: this.lvl+1,
               maxlvl: this.maxlvl,
               heightFactor: this.heightFactor,
               lean: this.lean
             }),
             this.cls_.create({
-              x: Math.cos(A*Math.PI/180)*nextLeft,
-              y: -nextRight - Math.sin(A*Math.PI/180)*nextLeft,
+              x: Math.cos(A)*nextLeft,
+              y: -nextRight - Math.sin(A)*nextLeft,
               w: nextRight,
-              rotate: 'rotate(' + B + ' ' + 0*nextRight + ' ' + nextRight + ')',
+              rotate: 'rotate(' + this.radToDeg(B) + ' 0 ' + nextRight + ')',
               lvl: this.lvl+1,
               maxlvl: this.maxlvl,
               heightFactor: this.heightFactor,
               lean: this.lean
             }));
       }
-    }
+    },
+
+    function radToDeg(r) { return 180*r/Math.PI; }
   ]
 });
 
