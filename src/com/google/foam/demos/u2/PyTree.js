@@ -7,10 +7,10 @@ foam.CLASS({
     { class: 'Float', name: 'x' },
     { class: 'Float', name: 'y' },
     { name: 'rotate' },
-    { name: 'heightFactor', value: 0.6 },
+    { name: 'heightFactor', value: 0.55 },
     { name: 'lean', value: 0 },
     { name: 'lvl', value: 1 },
-    { name: 'maxlvl', value: 9 }
+    { name: 'maxlvl', value: 11 }
   ],
 
   methods: [
@@ -21,7 +21,7 @@ foam.CLASS({
           attrs({transform: 'translate(' + this.x + ' ' + this.y + ') ' + this.rotate}).
           start('rect').
             attrs({width: this.w, height: this.w, x: 0, y: 0}).
-            style({fill: 'hsl(' + this.lvl/this.maxlvl*360 + ',70%,70%)'}).
+            style({fill: 'hsl(' + this.lvl/this.maxlvl*180 + ',70%,70%)'}).
           end();
 
       if ( this.lvl < this.maxlvl ) {
@@ -32,7 +32,6 @@ foam.CLASS({
         var A         = Math.atan(trigH / ((.5-lean) * w))*180/Math.PI;
         var B         = Math.atan(trigH / ((.5+lean) * w))*180/Math.PI;
 
-//        console.log('****', nextRight, nextLeft, A, B);
         this.add(
             this.cls_.create({
               x: 0,
@@ -45,10 +44,10 @@ foam.CLASS({
               lean: this.lean
             }),
             this.cls_.create({
-              x: 0,
-              y: -nextRight,
+              x: Math.cos(A*Math.PI/180)*nextLeft,
+              y: -nextRight - Math.sin(A*Math.PI/180)*nextLeft,
               w: nextRight,
-              rotate: 'rotate(' + B + ' ' + nextRight + ' ' + nextRight + ')',
+              rotate: 'rotate(' + B + ' ' + 0*nextRight + ' ' + nextRight + ')',
               lvl: this.lvl+1,
               maxlvl: this.maxlvl,
               heightFactor: this.heightFactor,
