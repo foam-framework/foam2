@@ -50,8 +50,6 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'StringPS',
 
-  documentation: 'A String-backed PStream implementation.',
-
   properties: [
     {
       name: 'str',

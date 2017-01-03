@@ -44,8 +44,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Requires',
 
-  documentation: 'Require Class Axiom',
-
   properties: [ 'name', 'path' ],
 
   methods: [
