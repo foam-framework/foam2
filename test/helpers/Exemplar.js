@@ -215,9 +215,9 @@ foam.CLASS({
 
       ret += tabs + '<div class="example-title">' + this.name + '</div>\n';
       ret += tabs + '<div class="example-description">' + this.description + '</div>\n';
-      ret += '<div class="example-code"><code>\n';
+      ret += '<div class="example-code"><pre>\n';
       ret += this.outputIndentedCode(indent, this.code);
-      ret += '</code></div>\n';
+      ret += '</pre></div>\n';
 
       return ret;
     },
