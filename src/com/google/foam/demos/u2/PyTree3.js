@@ -10,8 +10,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.SUPER();
-
       this.setNodeName('g').
         attrs({transform: this.transform}).
         start('rect').
@@ -20,10 +18,10 @@ foam.CLASS({
           style({fill: this.fillColor(this.lvl)}).
         end();
 
-      if ( this.lvl < this.maxLvl && this.w > 5 ) {
-        this.add(
-          this.PyBranch.create({w: this.w * this.lScale, lvl: this.lvl+1, transform: this.lTransform}),
-          this.PyBranch.create({w: this.w * this.rScale, lvl: this.lvl+1, transform: this.rTransform}));
+      if ( this.lvl < this.maxLvl ) {
+        var lW = this.w * this.lScale, rW = this.w * this.rScale;
+        if ( lW > 1 ) this.add(this.PyBranch.create({w: lW, lvl: this.lvl+1, transform: this.lTransform}));
+        if ( rW > 1 ) this.add(this.PyBranch.create({w: rW, lvl: this.lvl+1, transform: this.rTransform}));
       }
     },
     {
@@ -46,8 +44,8 @@ foam.CLASS({
 
   properties: [
     { name: 'heightFactor', value: 0.55 },
-    { name: 'lean', value: 0 },
-    { name: 'maxLvl', value: 11 },
+    { name: 'lean',         value: 0 },
+    { name: 'maxLvl',       value: 11 },
     'lScale',
     'rScale',
     'lTransform',
@@ -56,8 +54,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.SUPER();
-
       this.setNodeName('svg').
         style({border: '1px solid lightgray'}).
         attrs({width: 1200, height: 600}).
