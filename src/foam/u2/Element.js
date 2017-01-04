@@ -1634,7 +1634,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
