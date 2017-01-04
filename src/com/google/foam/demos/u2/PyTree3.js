@@ -4,7 +4,7 @@ foam.CLASS({
 
   requires: [ 'PyBranch' ],
 
-  imports: [ 'ltScale', 'rtScale', 'ltTransform', 'rtTransform', 'maxLvl' ],
+  imports: [ 'lScale', 'rScale', 'lTransform', 'rTransform', 'maxLvl' ],
 
   properties: [ 'w', 'transform', 'lvl' ],
 
@@ -19,10 +19,10 @@ foam.CLASS({
             style({fill: 'hsl(' + this.lvl/this.maxLvl*180 + ',70%,70%)'}).
           end();
 
-      if ( this.lvl < this.maxLvl ) {
+      if ( this.lvl < this.maxLvl && this.w > 5 ) {
         this.add(
-          this.PyBranch.create({w: this.w * this.ltScale, lvl: this.lvl+1, transform: this.ltTransform}),
-          this.PyBranch.create({w: this.w * this.rtScale, lvl: this.lvl+1, transform: this.rtTransform}));
+          this.PyBranch.create({w: this.w * this.lScale, lvl: this.lvl+1, transform: this.lTransform}),
+          this.PyBranch.create({w: this.w * this.rScale, lvl: this.lvl+1, transform: this.rTransform}));
       }
     }
   ]
@@ -35,16 +35,16 @@ foam.CLASS({
 
   requires: [ 'PyBranch' ],
 
-  exports: [ 'ltScale', 'rtScale', 'ltTransform', 'rtTransform', 'maxLvl' ],
+  exports: [ 'lScale', 'rScale', 'lTransform', 'rTransform', 'maxLvl' ],
 
   properties: [
     { name: 'heightFactor', value: 0.55 },
     { name: 'lean', value: 0 },
     { name: 'maxLvl', value: 11 },
-    'ltScale',
-    'rtScale',
-    'ltTransform',
-    'rtTransform'
+    'lScale',
+    'rScale',
+    'lTransform',
+    'rTransform'
   ],
 
   methods: [
@@ -55,14 +55,14 @@ foam.CLASS({
         attrs({width: 1600, height: 800}).
         on('mousemove', this.onMouseMove).
         add(this.slot(function(heightFactor, lean) {
-          var hf      = this.heightFactor;
-          var a       = Math.atan2(hf, .5-lean);
-          var b       = Math.atan2(hf, .5+lean);
-          var ltScale = this.rtScale = Math.sqrt(hf**2 + (.5+lean)**2);
-          var rtScale = this.ltScale = Math.sqrt(hf**2 + (.5-lean)**2);
+          var a = Math.atan2(heightFactor, .5-lean);
+          var b = Math.atan2(heightFactor, .5+lean);
 
-          this.ltTransform = 'translate(0 ' + (-ltScale) + ') rotate(' + this.radToDeg(-a) + ' 0 ' + ltScale + ') scale(' + ltScale + ')';
-          this.rtTransform = 'translate(' + Math.cos(a)*ltScale + ' ' + (-rtScale - Math.sin(a)*ltScale) + ') rotate(' + this.radToDeg(b) + ' 0 ' + rtScale + ') scale(' + rtScale + ')';
+          this.lScale = Math.sqrt(heightFactor**2 + (.5-lean)**2);
+          this.rScale = Math.sqrt(heightFactor**2 + (.5+lean)**2);
+
+          this.lTransform = 'scale(' + this.lScale + ') translate(0 -1) rotate(' + this.radToDeg(-a) + ' 0 1)';
+          this.rTransform = 'translate(1 0) scale(' + this.rScale + ') translate(-1 -1) rotate(' + this.radToDeg(b) + ' 1 1)';
 
           return this.PyBranch.create({lvl: 1, w: 80, transform: 'translate(760 500) scale(80)'});
         }));
