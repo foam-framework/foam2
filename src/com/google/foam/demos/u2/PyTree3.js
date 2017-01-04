@@ -13,15 +13,15 @@ foam.CLASS({
       this.setNodeName('g').
         attrs({transform: this.transform}).
         start('rect').
-          setID('').
+          setID(null).
           attrs({width: 1, height: 1}).
           style({fill: this.fillColor(this.lvl)}).
         end();
 
       if ( this.lvl < this.maxLvl ) {
         var lW = this.w * this.lScale, rW = this.w * this.rScale;
-        if ( lW > 1 ) this.add(this.PyBranch.create({w: lW, lvl: this.lvl+1, transform: this.lTransform}));
-        if ( rW > 1 ) this.add(this.PyBranch.create({w: rW, lvl: this.lvl+1, transform: this.rTransform}));
+        if ( lW > 1 ) this.add(this.PyBranch.create({id: null, w: lW, lvl: this.lvl+1, transform: this.lTransform}));
+        if ( rW > 1 ) this.add(this.PyBranch.create({id: null, w: rW, lvl: this.lvl+1, transform: this.rTransform}));
       }
     },
     {
@@ -45,7 +45,7 @@ foam.CLASS({
   properties: [
     { name: 'heightFactor', value: 0.55 },
     { name: 'lean',         value: 0 },
-    { name: 'maxLvl',       value: 11 },
+    { name: 'maxLvl',       value: 10 },
     'lScale',
     'rScale',
     'lTransform',
@@ -88,4 +88,3 @@ foam.CLASS({
 
 
 PyTree.create().write();
-
