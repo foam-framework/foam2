@@ -13,17 +13,23 @@ foam.CLASS({
       this.SUPER();
 
       this.setNodeName('g').
-          attrs({transform: this.transform}).
-          start('rect').
-            attrs({width: 1, height: 1}).
-            style({fill: 'hsl(' + this.lvl/this.maxLvl*180 + ',70%,70%)'}).
-          end();
+        attrs({transform: this.transform}).
+        start('rect').
+          attrs({width: 1, height: 1}).
+          style({fill: this.fillColor(this.lvl)}).
+        end();
 
       if ( this.lvl < this.maxLvl && this.w > 5 ) {
         this.add(
           this.PyBranch.create({w: this.w * this.lScale, lvl: this.lvl+1, transform: this.lTransform}),
           this.PyBranch.create({w: this.w * this.rScale, lvl: this.lvl+1, transform: this.rTransform}));
       }
+    },
+    {
+      name: 'fillColor',
+      code: foam.Function.memoize1(function(lvl) {
+        return 'hsl(' + lvl/this.maxLvl*180 + ',70%,70%)';
+      })
     }
   ]
 });
