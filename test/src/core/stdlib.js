@@ -912,6 +912,23 @@ describe('foam.mmethod', function() {
     expect(mm(true)).toEqual("Default!");
   });
 
+  it('handles subclasses', function() {
+    var mm = foam.mmethod({
+      'foam.core.StringArray': function() { return 'stringarray'; },
+      'foam.core.Property': function() { return 'prop'; },
+      'foam.core.FObject': function() { return 'FObject'; }
+    });
+
+    expect(mm(foam.core.StringArray.create({name:'n'})))
+      .toBe('stringarray');
+    expect(mm(foam.core.String.create({name:'n'})))
+      .toBe('prop');
+    expect(mm(foam.core.Property.create({name:'n'})))
+      .toBe('prop');
+    expect(mm(foam.core.Method.create({name:'n'})))
+      .toBe('FObject');
+
+  });
 });
 
 
@@ -990,3 +1007,4 @@ describe('foam.uuid', function() {
     expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
   });
 });
+
