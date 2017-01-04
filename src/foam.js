@@ -23,7 +23,7 @@
   var flags = this.FOAM_FLAGS || {};
   flags.web = ! isServer,
   flags.node = isServer;
-  flags.debug = true;
+  if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
