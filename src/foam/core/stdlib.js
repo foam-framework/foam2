@@ -180,7 +180,7 @@ foam.LIB({
           'memoize0(' + f.name + ')');
         ret.toString = function() { return f.toString(); };
         return ret;
-        
+
     },
 
     /**
@@ -374,7 +374,7 @@ foam.LIB({
 
     {
       name: 'labelize',
-      code: foam.Function.memoize1(function(/* foam.String? */ str) {
+      code: foam.Function.memoize1(function(/* foam.String= */ str) {
         if ( str === '' || str === null || foam.Undefined.isInstance(str) ) return '';
 
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {

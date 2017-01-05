@@ -314,7 +314,7 @@ var processArgs = function processArgs(e, node) {
   if ( ! node ) return;
   var src = getSourceString(e.filename, node.range[0], node.range[1]);
   try {
-    var args = foam.Function.args(src);
+    var args = foam.Function.args(eval('(' + src + ')'));
     for ( var i = 0; i < args.length; ++i ) {
       var arg = args[i];
       if ( arg.typeName ) {
