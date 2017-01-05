@@ -180,7 +180,7 @@ foam.LIB({
           'memoize0(' + f.name + ')');
         ret.toString = function() { return f.toString(); };
         return ret;
-        
+
     },
 
     /**
@@ -679,7 +679,10 @@ foam.LIB({
           first = false;
         }
 
-        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ? arg1.cls_ : foam.typeOf(arg1);
+        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ?
+            arg1.cls_ :
+            foam.typeOf(arg1) ;
+
         if ( ! opt_defaultMethod ) {
           foam.assert(type, 'Unknown type: ', arg1,
               'and no default method provided');
