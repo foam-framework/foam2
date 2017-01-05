@@ -1445,6 +1445,8 @@ foam.CLASS({
       */
       var self = this;
       var buf = [];
+      var Element = foam.u2.Element;
+      var Entity  = self.Entity;
       var f = function templateOut(/* arguments */) {
         for ( var i = 0 ; i < arguments.length ; i++ ) {
           var o = arguments[i];
@@ -1454,8 +1456,7 @@ foam.CLASS({
             buf.push(o);
           } else if ( typeof o === 'number' ) {
             buf.push(o);
-          } else if ( foam.u2.Element.isInstance(o) ||
-              self.Entity.isInstance(o) ) {
+          } else if ( Element.isInstance(o) || Entity.isInstance(o) ) {
             o.output(f);
           } else if ( o === null || o === undefined ) {
             buf.push(o);
