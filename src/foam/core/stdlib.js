@@ -250,8 +250,8 @@ foam.LIB({
       args += ',';
 
       var ret = [];
-      // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
-      var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
+      // [ ws /* anything */ ] ws [...]arg_name ws [ /* anything */ ],
+      var argMatcher = /(\s*\/\*.*?\*\/)?\s*((?:\.\.\.)?[\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
       var typeMatch;
       while ( ( typeMatch = argMatcher.exec(args) ) !== null ) {
         ret.push(typeMatch[2]);
@@ -374,7 +374,7 @@ foam.LIB({
 
     {
       name: 'labelize',
-      code: foam.Function.memoize1(function(/* foam.String? */ str) {
+      code: foam.Function.memoize1(function(/* foam.String= */ str) {
         if ( str === '' || str === null || foam.Undefined.isInstance(str) ) return '';
 
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
