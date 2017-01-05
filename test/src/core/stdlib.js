@@ -247,11 +247,11 @@ describe('foam.Function', function() {
   it('argsStr', function() {
     // normal case
     var str = foam.Function.argsStr(
-      function(a, /*string?*/b, c /*array*/) {
+      function(a, /*string=*/b, c /*array*/) {
         return [ a, b, c ];
       }
     );
-    expect(str).toBe('a, /*string?*/b, c /*array*/');
+    expect(str).toBe('a, /*string=*/b, c /*array*/');
 
     // string with line break
     var str2 = foam.Function.argsStr(
@@ -328,8 +328,8 @@ describe('foam.Function', function() {
     });
 
     it('grabs typed argument names', function() {
-      var fn = function(/* foam.String */ str, /*boolean*/ bool ,
-        /* foam.Function */ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+      var fn = function(/* foam.String */ str, /*foam.Boolean*/ bool ,
+        /* foam.Function */ func, /*foam.Object*/obj, /* foam.Number */num, /* foam.Array*/ arr ) {
         return (true);
       }
       var args = foam.Function.argNames(fn);
@@ -349,7 +349,7 @@ describe('foam.Function', function() {
 
   it('withArgs', function() {
     // normal case
-    var fn = function(a, /*string?*/b, c /*array*/) {
+    var fn = function(a, /*string=*/b, c /*array*/) {
       return [ a + b + c ];
     };
     var src = { a: 'A', b: 'B', c: 'C' };

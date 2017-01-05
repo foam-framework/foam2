@@ -30,7 +30,7 @@ function makeTestFn() {
   foam.CLASS({  name: 'TypeBB', extends: 'TypeB' });
   foam.CLASS({  name: 'package.TypeC' });
   foam.CLASS({  name: 'RetType' });
-  return function test(/* TypeA // docs for, pA */ paramA, /*TypeB?*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
+  return function test(/* TypeA // docs for, pA */ paramA, /*TypeB=*/ paramB , /* package.TypeC*/ paramC, noType /* RetType */ ) {
     return (RetType.create(undefined, foam.__context__));
   }
 }
