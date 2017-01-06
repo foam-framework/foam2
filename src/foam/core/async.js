@@ -59,8 +59,8 @@ foam.LIB({
         <p>Or call it directly:
         <pre>(foam.async.sequence(...))().then(...);</pre>
 
-        @param {foam.Array} s An array of functions that return Promises
-        @returns {foam.Function}  A function that returns a promise that will
+        @param {Array} s An array of functions that return Promises
+        @returns {Function}  A function that returns a promise that will
                        resolve after the last function's return is resolved.
       */
       return function() {
@@ -90,9 +90,9 @@ foam.LIB({
         <p>Or call it directly:
         <pre>(foam.async.repeat(...))().then(...);</pre>
 
-        @param {foam.Number} times number of times to repeat in sequence.
-        @param {foam.Function} fn Function that returns a Promise.
-        @returns {foam.Function}  A function that returns a Promise that will resolve
+        @param {Number} times number of times to repeat in sequence.
+        @param {Function} fn Function that returns a Promise.
+        @returns {Function}  A function that returns a Promise that will resolve
                        after the last repetition's return resolves.
       */
       return function() {
@@ -123,9 +123,9 @@ foam.LIB({
       <pre>(foam.async.repeatParallel(...))().then(...);</pre>
 
 
-      @param {foam.Number} times number of times to repeat in sequence.
-      @param {foam.Function} fn Function that returns a Promise.
-      @returns {foam.Function}  A function that returns a Promise that will resolve
+      @param {Number} times number of times to repeat in sequence.
+      @param {Function} fn Function that returns a Promise.
+      @returns {Function}  A function that returns a Promise that will resolve
                    after every repetition's return resolves
     */
     function repeatParallel(times, fn) {
@@ -148,7 +148,7 @@ foam.LIB({
       };
     },
 
-    function sleep(/* foam.Number */ time) {
+    function sleep(/* Number */ time) {
       /** Returns a function that returns a promise that delays by the given
         time before resolving. */
       return function() {
