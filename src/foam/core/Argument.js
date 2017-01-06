@@ -21,7 +21,7 @@ foam.LIB({
   methods: [
     (function() {
       var ret = function resolveTypeString(typeStr) {
-        /** Looks up a type as a FOAM class, stdlib foam.String, foam.Number, etc., or 'any' */
+        /** Looks up a type as a FOAM class, stdlib String, Number, etc., or 'any' */
         // missing types are checked for _after_ the body comment is checked
         if ( ! typeStr ) return undefined;
 
@@ -33,14 +33,12 @@ foam.LIB({
           return undefined;
         }
 
-        var cls = foam.lookup(typeStr, true);
+        // otherwise look for foam.<primitive> type
+        cls = foam[typeStr];
         if ( cls ) return cls;
 
-        // otherwise look for foam.<primitive> type
-        if ( typeStr.indexOf('foam.') === 0 ) {
-          cls = foam[typeStr.split('.')[1]];
-          if ( cls ) return cls;
-        }
+        var cls = foam.lookup(typeStr, true);
+        if ( cls ) return cls;
 
         // could not resolve
         throw new TypeError('foam.Function.args could not resolve type ' +
@@ -53,9 +51,9 @@ foam.LIB({
     function args(fn) {
       /**
        * Extracts the arguments and their types from the given function.
-       * @param {foam.Function} fn The function to extract from. The toString() of the function
+       * @param {Function} fn The function to extract from. The toString() of the function
        *     must be accurate.
-       * @return {foam.Array} An array of Argument objects.
+       * @return {Array} An array of Argument objects.
        */
       // strip newlines and find the function(...) declaration
       var args = foam.Function.argsStr(fn);
@@ -108,8 +106,7 @@ foam.LIB({
           ret.returnType = foam.core.Argument.create({
             name: 'ReturnValue',
             optional: typeMatch[11],
-            typeName: typeMatch[10],
-            type: this.resolveTypeString(typeMatch[10])
+            typeName: typeMatch[10]
           });
         }
       }
@@ -123,8 +120,7 @@ foam.LIB({
           ret.returnType = foam.core.Argument.create({
             name: 'ReturnValue',
             optional: typeMatch[2] === '=',
-            typeName: typeMatch[1],
-            type: this.resolveTypeString(typeMatch[1])
+            typeName: typeMatch[1]
           });
         } else {
           throw new SyntaxError(
@@ -184,7 +180,6 @@ foam.LIB({
                 optional:      optional,
                 repeats:       repeats,
                 typeName:      type,
-                type:          this.resolveTypeString(type),
                 index:         argIdx++,
                 documentation: docs
               });

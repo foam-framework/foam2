@@ -328,8 +328,8 @@ describe('foam.Function', function() {
     });
 
     it('grabs typed argument names', function() {
-      var fn = function(/* foam.String */ str, /*foam.Boolean*/ bool ,
-        /* foam.Function */ func, /*foam.Object*/obj, /* foam.Number */num, /* foam.Array*/ arr ) {
+      var fn = function(/* String */ str, /*Boolean*/ bool ,
+        /* Function */ func, /*Object*/obj, /* Number */num, /* Array*/ arr ) {
         return (true);
       }
       var args = foam.Function.argNames(fn);
