@@ -97,7 +97,7 @@ foam.CLASS({
         on a select()
       */
       name: 'skip',
-      code: function skip(/* foam.Number */ s) {
+      code: function skip(/* Number */ s) {
         return this.SkipDAO.create({
           delegate: this,
           skip_: s
@@ -111,7 +111,7 @@ foam.CLASS({
         given count on a select().
       */
       name: 'limit',
-      code: function limit(/* foam.Number */ l) {
+      code: function limit(/* Number */ l) {
         return this.LimitedDAO.create({
           delegate: this,
           limit_: l
