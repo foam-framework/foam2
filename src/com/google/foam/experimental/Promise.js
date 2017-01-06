@@ -300,7 +300,7 @@ foam.LIB({
     },
     {
       name: "all",
-      code: function (/* foam.Array */ promises) {
+      code: function (/* Array */ promises) {
         var results = [];
         var p = Promise.resolve();
 
