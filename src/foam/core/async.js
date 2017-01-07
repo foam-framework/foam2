@@ -57,10 +57,10 @@ foam.LIB({
         <p>You can use sequence's returned function directly in a then call:
         <pre>promise.then(foam.async.sequence(...));</pre>
         <p>Or call it directly:
-        <pre>(foam.async.sequence(...))().then(...);</pre> 
-    
-        @param {array} s An array of functions that return Promises 
-        @returns {function}  A function that returns a promise that will
+        <pre>(foam.async.sequence(...))().then(...);</pre>
+
+        @param {Array} s An array of functions that return Promises
+        @returns {Function}  A function that returns a promise that will
                        resolve after the last function's return is resolved.
       */
       return function() {
@@ -88,11 +88,11 @@ foam.LIB({
         <p>You can use repeat's returned function directly in a then call:
         <pre>promise.then(foam.async.repeat(...));</pre>
         <p>Or call it directly:
-        <pre>(foam.async.repeat(...))().then(...);</pre> 
-    
-        @param {number} times number of times to repeat in sequence.
-        @param {function} fn Function that returns a Promise.
-        @returns {function}  A function that returns a Promise that will resolve
+        <pre>(foam.async.repeat(...))().then(...);</pre>
+
+        @param {Number} times number of times to repeat in sequence.
+        @param {Function} fn Function that returns a Promise.
+        @returns {Function}  A function that returns a Promise that will resolve
                        after the last repetition's return resolves.
       */
       return function() {
@@ -121,12 +121,12 @@ foam.LIB({
       <pre>promise.then(foam.async.repeatParallel(...));</pre>
       <p>Or call it directly:
       <pre>(foam.async.repeatParallel(...))().then(...);</pre>
-    
 
-      @param {number} times number of times to repeat in sequence.
-      @param {function} fn Function that returns a Promise.
-      @returns {function}  A function that returns a Promise that will resolve
-                   after every repetition's return resolves    
+
+      @param {Number} times number of times to repeat in sequence.
+      @param {Function} fn Function that returns a Promise.
+      @returns {Function}  A function that returns a Promise that will resolve
+                   after every repetition's return resolves
     */
     function repeatParallel(times, fn) {
       return function() {
@@ -148,7 +148,7 @@ foam.LIB({
       };
     },
 
-    function sleep(/* foam.Number */ time) {
+    function sleep(/* Number */ time) {
       /** Returns a function that returns a promise that delays by the given
         time before resolving. */
       return function() {
