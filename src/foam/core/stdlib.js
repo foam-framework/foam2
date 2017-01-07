@@ -167,7 +167,7 @@ foam.LIB({
      * Decorates the function 'f' to cache the return value of 'f' when
      * called in the future. Also known as a 'thunk'.
      */
-    function memoize0(/* foam.Function */ f) {
+    function memoize0(/* Function */ f) {
       var set = false, cache;
       var ret = foam.Function.setName(
           function() {
@@ -180,14 +180,14 @@ foam.LIB({
           'memoize0(' + f.name + ')');
         ret.toString = function() { return f.toString(); };
         return ret;
-        
+
     },
 
     /**
      * Decorates the function 'f' to cache the return value of 'f' when called
      * with a particular value for its first argument.
      */
-    function memoize1(/* foam.Function */ f) {
+    function memoize1(/* Function */ f) {
       var cache = {}, nullCache, undefinedCache;
       var ret = foam.Function.setName(
           function(key) {
@@ -250,8 +250,8 @@ foam.LIB({
       args += ',';
 
       var ret = [];
-      // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
-      var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
+      // [ ws /* anything */ ] ws [...]arg_name ws [ /* anything */ ],
+      var argMatcher = /(\s*\/\*.*?\*\/)?\s*((?:\.\.\.)?[\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
       var typeMatch;
       while ( ( typeMatch = argMatcher.exec(args) ) !== null ) {
         ret.push(typeMatch[2]);
@@ -366,7 +366,7 @@ foam.LIB({
     },
     {
       name: 'constantize',
-      code: foam.Function.memoize1(function(/* foam.String */ str) {
+      code: foam.Function.memoize1(function(/* String */ str) {
         // switches from from camelCase to CAMEL_CASE
         return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
       })
@@ -374,7 +374,7 @@ foam.LIB({
 
     {
       name: 'labelize',
-      code: foam.Function.memoize1(function(/* foam.String? */ str) {
+      code: foam.Function.memoize1(function(/* String= */ str) {
         if ( str === '' || str === null || foam.Undefined.isInstance(str) ) return '';
 
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
@@ -679,7 +679,10 @@ foam.LIB({
           first = false;
         }
 
-        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ? arg1.cls_ : foam.typeOf(arg1);
+        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ?
+            arg1.cls_ :
+            foam.typeOf(arg1) ;
+
         if ( ! opt_defaultMethod ) {
           foam.assert(type, 'Unknown type: ', arg1,
               'and no default method provided');
