@@ -45,7 +45,7 @@ foam.CLASS({
   properties: [
     { name: 'heightFactor', value: 0.55 },
     { name: 'lean',         value: 0 },
-    { name: 'maxLvl',       value: 10 },
+    { name: 'maxLvl',       value: 11 },
     'lScale',
     'rScale',
     'lTransform',
@@ -59,11 +59,11 @@ foam.CLASS({
         attrs({width: 1200, height: 600}).
         on('mousemove', this.onMouseMove).
         add(this.slot(function(heightFactor, lean) {
-          var a = Math.atan2(heightFactor, .5-lean);
-          var b = Math.atan2(heightFactor, .5+lean);
+          var a = Math.atan2(heightFactor, .5+lean);
+          var b = Math.atan2(heightFactor, .5-lean);
 
-          this.lScale = Math.sqrt(heightFactor**2 + (.5-lean)**2);
-          this.rScale = Math.sqrt(heightFactor**2 + (.5+lean)**2);
+          this.lScale = Math.sqrt(heightFactor**2 + (.5+lean)**2);
+          this.rScale = Math.sqrt(heightFactor**2 + (.5-lean)**2);
 
           this.lTransform = 'scale(' + this.lScale.toFixed(2) + ') translate(0 -1) rotate(' + this.radToDeg(-a) + ' 0 1)';
           this.rTransform = 'translate(1 0) scale(' + this.rScale.toFixed(2) + ') translate(-1 -1) rotate(' + this.radToDeg(b) + ' 1 1)';
