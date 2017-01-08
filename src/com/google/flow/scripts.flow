@@ -1445,6 +1445,8 @@ archRing(360, 0, 800);
 archRing(2*28, 25, 800);
 t.z += 50;
 archRing(360, 0, 800);
+
+
 var t = turtle3d1;
 
 t.cs().home().rt(-35).pw(2.5).pc('rgba(0,0,0,0.5)');
@@ -1756,6 +1758,7 @@ repeat(36 * 6 + 9, (i) => {
   var a = i / 36 ;
   t.ss().pu().fd(fib(a)).pd();arc(1.2*fib(a+1));t.rs();
   t.rollLeft(10);
+  // t.lt(10); // instead of line above gives a snail
 });
 
 
@@ -1994,6 +1997,34 @@ repeat(20, (i) => {
   });
   t.lt(90);
 });
+
+
+
+// 3D Interactive Dome
+var t = turtle3d1;
+
+t.ht();
+
+function f() {
+  var prev = [];
+
+  t.home().cs().pw(1).pc('black');
+  repeat(20, (i) => {
+    t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI*((circle1.x-100)/100))).fd(10).rt(90).pd();
+    repeat(36, (j) => {
+      t.fd(i).rt(10);
+      var p = prev[j];
+      if ( p ) {
+        t.ss().gt(p[0], p[1], p[2]).rs();
+      }
+      prev[j] = [t.x, t.y, t.z];
+    });
+    t.lt(90);
+  });
+}
+
+circle1.x$.sub(f);
+
 
 
 // 3D thing

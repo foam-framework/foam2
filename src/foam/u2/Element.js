@@ -332,10 +332,11 @@ foam.CLASS({
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
-      var e = this.el();
-      if ( e ) {
-        e.remove();
+      if ( this.parentNode && this.parentNode.state === this.LOADED ) {
+        var e = this.el();
+        if ( e ) e.remove();
       }
+
       this.state = this.UNLOADED;
       this.visitChildren('unload');
     },
@@ -1445,6 +1446,8 @@ foam.CLASS({
       */
       var self = this;
       var buf = [];
+      var Element = foam.u2.Element;
+      var Entity  = self.Entity;
       var f = function templateOut(/* arguments */) {
         for ( var i = 0 ; i < arguments.length ; i++ ) {
           var o = arguments[i];
@@ -1454,8 +1457,7 @@ foam.CLASS({
             buf.push(o);
           } else if ( typeof o === 'number' ) {
             buf.push(o);
-          } else if ( foam.u2.Element.isInstance(o) ||
-              self.Entity.isInstance(o) ) {
+          } else if ( Element.isInstance(o) || Entity.isInstance(o) ) {
             o.output(f);
           } else if ( o === null || o === undefined ) {
             buf.push(o);
@@ -1465,7 +1467,7 @@ foam.CLASS({
 
       f.toString = function() {
         if ( buf.length === 0 ) return '';
-        if ( buf.length > 1 ) buf = [ buf.join('') ];
+        if ( buf.length > 1 ) return buf.join('');
         return buf[0];
       };
 
@@ -1634,7 +1636,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {

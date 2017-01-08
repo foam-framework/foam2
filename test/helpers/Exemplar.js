@@ -186,7 +186,7 @@ foam.CLASS({
 
       if ( ! noTests ) {
         ret += "\n// Post conditions:\n";
-        ret += this.outputIndentedCode(indent, this.postTestCode);
+        ret += this.outputIndentedCode(indent, this.postTestCode) + '\n';
       }
       return ret;
     },
@@ -202,7 +202,7 @@ foam.CLASS({
       ret += tabs + '// ' + this.description + '\n';
       ret += tabs + '//=====================================================\n';
 
-      ret += this.outputIndentedCode(indent, this.code);
+      ret += this.outputIndentedCode(indent, this.code) + '\n';
 
       return ret;
     },
@@ -215,9 +215,9 @@ foam.CLASS({
 
       ret += tabs + '<div class="example-title">' + this.name + '</div>\n';
       ret += tabs + '<div class="example-description">' + this.description + '</div>\n';
-      ret += '<div class="example-code"><code>\n';
+      ret += '<div class="example-code"><pre><code>';
       ret += this.outputIndentedCode(indent, this.code);
-      ret += '</code></div>\n';
+      ret += '</code></pre></div>\n';
 
       return ret;
     },
@@ -250,7 +250,8 @@ foam.CLASS({
         ret += tabs + line + '\n';
       });
 
-      return ret;
+      // trim last newline
+      return ret.trim();
     },
 
     function flattenDependencies(depsLoaded) {
