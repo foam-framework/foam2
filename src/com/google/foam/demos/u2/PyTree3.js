@@ -79,8 +79,8 @@ foam.CLASS({
     {
       name: 'onMouseMove',
       code: function(e) {
-        this.heightFactor = (1 - e.clientY / this.getAttribute('height')) * 0.8;
-        this.lean         = e.clientX / this.getAttribute('width') - 0.5;
+        this.heightFactor = (1 - e.offsetY / this.getAttribute('height')) * 0.8;
+        this.lean         = e.offsetX / this.getAttribute('width') - 0.5;
       }
     }
   ]
