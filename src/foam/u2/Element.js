@@ -1467,7 +1467,7 @@ foam.CLASS({
 
       f.toString = function() {
         if ( buf.length === 0 ) return '';
-        if ( buf.length > 1 ) buf = [ buf.join('') ];
+        if ( buf.length > 1 ) return buf.join('');
         return buf[0];
       };
 
