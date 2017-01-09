@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: Make extend Model so can override methods (or do some other way).
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'EnumValueAxiom',
@@ -23,32 +24,17 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
       name: 'name',
-      preSet: function(_, s) {
-        return foam.String.constantize(s);
-      }
+      getter: function() { return this.definition.name; }
     },
-    {
-      class: 'String',
-      name: 'label'
-    },
-    {
-      class: 'Int',
-      name: 'ordinal'
-    }
+    'definition'
   ],
 
   methods: [
     function installInClass(cls) {
-      var name = this.name;
-
       cls.installConstant(
-          name,
-          cls.create({
-              name: name,
-              label: label,
-              ordinal: this.ordinal}, foam.__context__));
+          this.name,
+          cls.create(this.definition, foam.__context__));
     }
   ]
 });
@@ -66,23 +52,26 @@ foam.CLASS({
       of: 'foam.core.internal.EnumValueAxiom',
       name: 'values',
       preSet: function(_, v) {
-        var used = {};
+        var used = {}; // map of ordinals used to check for duplicates
 
         var next = 0;
         for ( var i = 0 ; i < v.length ; i++ ) {
-          if ( ! v[i].hasOwnProperty('ordinal') ) {
-            v[i].ordinal = next++;
+          var def = v[i].definition;
+          def.name = foam.String.constantize(def.name);
+
+          if ( ! def.hasOwnProperty('ordinal') ) {
+            def.ordinal = next++;
           } else {
-            next = v[i].ordinal + 1;
+            next = def.ordinal + 1;
           }
 
           foam.assert(
-            ! used[v[i].ordinal],
+            ! used[def.ordinal],
             this.id,
-            'Enum error: duplicate ordinal found', v[i].name,
-            used[v[i].ordinal], 'both have an ordinal of', v[i].ordinal);
+            'Enum error: duplicate ordinal found', def.name,
+            used[def.ordinal], 'both have an ordinal of', def.ordinal);
 
-          used[v[i].ordinal] = v[i].name;
+          used[def.ordinal] = def.name;
         }
 
         return v;
@@ -117,7 +106,7 @@ foam.CLASS({
       final: true
     },
     {
-      name: 'values',
+      name: 'VALUES',
       getter: function() { return this.cls_.values; }
     }
   ],
