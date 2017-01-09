@@ -42,7 +42,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'EnumModel',
+  name: 'EnumModel2',
   extends: 'Model',
 
   properties: [
@@ -56,8 +56,9 @@ foam.CLASS({
 
         var next = 0;
         for ( var i = 0 ; i < v.length ; i++ ) {
-          var def = v[i].definition;
+          var def = v[i];
           def.name = foam.String.constantize(def.name);
+          v[i] = foam.core.internal.EnumValueAxiom.create({definition: def});
 
           if ( ! def.hasOwnProperty('ordinal') ) {
             def.ordinal = next++;
@@ -148,7 +149,7 @@ foam.LIB({
 
   methods: [
     function ENUM2(m) {
-      m.class = m.class || foam.core.Enum2;
+      m.class = m.class || 'foam.core.EnumModel2';
       return foam.CLASS(m);
     }
   ]
