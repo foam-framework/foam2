@@ -380,7 +380,7 @@ foam.CLASS({
        for a query over all specified properties together.
        @param var_args specify any number of Properties to be indexed.
     */
-    function addPropertyIndex(/* foam.core.Property* */ var_args) {
+    function addPropertyIndex() {
       this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
       return this;
     },
@@ -390,7 +390,7 @@ foam.CLASS({
       to the MDAO.
       @param index The index to add.
     */
-    function addIndex(/* foam.dao.index.Index */ index) {
+    function addIndex(index) {
       this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
       return this;
     }

@@ -332,10 +332,11 @@ foam.CLASS({
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
-      var e = this.el();
-      if ( e ) {
-        e.remove();
+      if ( this.parentNode && this.parentNode.state === this.LOADED ) {
+        var e = this.el();
+        if ( e ) e.remove();
       }
+
       this.state = this.UNLOADED;
       this.visitChildren('unload');
     },
@@ -887,7 +888,7 @@ foam.CLASS({
 
     function show(opt_shown) {
       if ( opt_shown === undefined ) {
-        this.show = true;
+        this.shown = true;
       } else if ( foam.core.Slot.isInstance(opt_shown) ) {
         this.shown$.follow(opt_shown);
       } else {
@@ -1131,7 +1132,7 @@ foam.CLASS({
 
     // Was renamed from cls() in FOAM1, current name seems
     // out of place.  Maybe renamed addClass().
-    function cssClass(/* Slot | String */ cls) {
+    function cssClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
@@ -1252,7 +1253,7 @@ foam.CLASS({
       return this.parentNode;
     },
 
-    function add(/* vargs */) {
+    function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
       } else {
@@ -1322,7 +1323,7 @@ foam.CLASS({
       return this;
     },
 
-    function addBefore(reference/*, vargs */) {
+    function addBefore(reference) { /*, vargs */
       /* Add a variable number of children before the reference element. */
       var children = [];
       for ( var i = 1 ; i < arguments.length ; i++ ) {
@@ -1445,6 +1446,8 @@ foam.CLASS({
       */
       var self = this;
       var buf = [];
+      var Element = foam.u2.Element;
+      var Entity  = self.Entity;
       var f = function templateOut(/* arguments */) {
         for ( var i = 0 ; i < arguments.length ; i++ ) {
           var o = arguments[i];
@@ -1454,8 +1457,7 @@ foam.CLASS({
             buf.push(o);
           } else if ( typeof o === 'number' ) {
             buf.push(o);
-          } else if ( foam.u2.Element.isInstance(o) ||
-              self.Entity.isInstance(o) ) {
+          } else if ( Element.isInstance(o) || Entity.isInstance(o) ) {
             o.output(f);
           } else if ( o === null || o === undefined ) {
             buf.push(o);
@@ -1465,7 +1467,7 @@ foam.CLASS({
 
       f.toString = function() {
         if ( buf.length === 0 ) return '';
-        if ( buf.length > 1 ) buf = [ buf.join('') ];
+        if ( buf.length > 1 ) return buf.join('');
         return buf[0];
       };
 
@@ -1634,7 +1636,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
@@ -1761,6 +1763,7 @@ foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 foam.CLASS({
   refines: 'foam.core.FObject',
+  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE(args, X) {
       return foam.u2.ViewSpec.createView(
@@ -1773,6 +1776,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Slot',
+  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1781,6 +1785,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ExpressionSlot',
+  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1789,6 +1794,8 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Property',
+
+  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.TextField'
@@ -1825,6 +1832,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       class: 'Int',
@@ -1837,6 +1845,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Date',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
@@ -1846,6 +1855,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Float',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
@@ -1855,6 +1865,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
@@ -1864,6 +1875,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
     [ 'view', { class: 'foam.u2.CheckBox' } ],
@@ -1873,6 +1885,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Color',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -1888,6 +1901,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Reference',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -2007,6 +2021,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Action',
+  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.ActionView'
@@ -2047,6 +2062,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       // TODO: remove when all code ported

@@ -247,11 +247,11 @@ describe('foam.Function', function() {
   it('argsStr', function() {
     // normal case
     var str = foam.Function.argsStr(
-      function(a, /*string?*/b, c /*array*/) {
+      function(a, /*string=*/b, c /*array*/) {
         return [ a, b, c ];
       }
     );
-    expect(str).toBe('a, /*string?*/b, c /*array*/');
+    expect(str).toBe('a, /*string=*/b, c /*array*/');
 
     // string with line break
     var str2 = foam.Function.argsStr(
@@ -279,6 +279,34 @@ describe('foam.Function', function() {
     }).toThrow();
   });
 
+  it('functionComment', function() {
+    expect(foam.Function.functionComment(function() { })).toEqual('');
+    expect(foam.Function.functionComment(function() {/**/ })).toEqual('');
+    expect(foam.Function.functionComment(function() {/* hello */ })).toEqual('hello ');
+
+    /* jshint -W014 */
+    /* jshint laxcomma:true */
+    // jscs:disable
+
+    expect(foam.Function.functionComment(
+      function() {//hello
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(
+      function() {
+        var x;
+        /** hello */
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(function() /* hello */ {})).toEqual('');
+    // jscs:enable
+    /* jshint laxcomma:false */
+    /* jshint +W014 */
+
+  });
+
 
   describe('argNames', function() {
 
@@ -300,8 +328,8 @@ describe('foam.Function', function() {
     });
 
     it('grabs typed argument names', function() {
-      var fn = function(/* string */ str, /*boolean*/ bool ,
-        /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+      var fn = function(/* String */ str, /*Boolean*/ bool ,
+        /* Function */ func, /*Object*/obj, /* Number */num, /* Array*/ arr ) {
         return (true);
       }
       var args = foam.Function.argNames(fn);
@@ -321,7 +349,7 @@ describe('foam.Function', function() {
 
   it('withArgs', function() {
     // normal case
-    var fn = function(a, /*string?*/b, c /*array*/) {
+    var fn = function(a, /*string=*/b, c /*array*/) {
       return [ a + b + c ];
     };
     var src = { a: 'A', b: 'B', c: 'C' };
@@ -449,20 +477,6 @@ describe('foam.String', function() {
     expect(function() {
       foam.String.capitalize(null);
     }).toThrow();
-
-  });
-
-  it('camelize', function() {
-    expect(foam.String.camelize('lower Case String'))
-      .toBe('lowerCaseString');
-    expect(foam.String.camelize('css-string'))
-      .toBe('cssString');
-    expect(foam.String.camelize('snake_case_string'))
-      .toBe('snakeCaseString');
-    expect(foam.String.camelize('CONST_SUPPORT_LACKING'))
-      .toBe('CONSTSUPPORTLACKING');
-    expect(foam.String.camelize('99$$'))
-      .toBe('99$$');
 
   });
 
@@ -898,6 +912,23 @@ describe('foam.mmethod', function() {
     expect(mm(true)).toEqual("Default!");
   });
 
+  it('handles subclasses', function() {
+    var mm = foam.mmethod({
+      'foam.core.StringArray': function() { return 'stringarray'; },
+      'foam.core.Property': function() { return 'prop'; },
+      'foam.core.FObject': function() { return 'FObject'; }
+    });
+
+    expect(mm(foam.core.StringArray.create({name:'n'})))
+      .toBe('stringarray');
+    expect(mm(foam.core.String.create({name:'n'})))
+      .toBe('prop');
+    expect(mm(foam.core.Property.create({name:'n'})))
+      .toBe('prop');
+    expect(mm(foam.core.Method.create({name:'n'})))
+      .toBe('FObject');
+
+  });
 });
 
 
@@ -976,3 +1007,4 @@ describe('foam.uuid', function() {
     expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
   });
 });
+

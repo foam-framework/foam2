@@ -2,5 +2,5 @@ instrumentation:
   root: ./src/
   include-all-sources: true
   default-excludes: true
-  excludes: [ '**/IDBDAO.js', 'foam/core/poly.js', '**/bower_components/**' ]
+  excludes: [ '**/IDBDAO.js', 'foam/core/poly.js', '**/bower_components/**', '**/demos/**' ]
 

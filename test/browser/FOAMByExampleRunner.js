@@ -59,9 +59,12 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
   };
   var writeOutput = function() {
     // write log output
+    var consDiv = document.createElement('div');
+    consDiv.className = 'example-console';
     var pre = document.createElement('pre');
     pre.innerHTML = output.join('\n');
-    document.getElementById(domID).appendChild(pre);
+    document.getElementById(domOutputID).appendChild(consDiv);
+    consDiv.appendChild(pre);
   }
   // TODO: settle on logging strategy. Probably not using console but may want to
   //   override it to catch unfixed calls.
@@ -82,12 +85,17 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
 
   // TODO: this should all be views :P
   // prep iframe for document output
-  var domID = ex.name.replace(/\s/g, '_') + "_Output";
+  var domID = ex.name.replace(/\s/g, '_') + "_Container";
   var domFrame = document.createElement('div');
   domFrame.id = domID;
-  domFrame.style.width = '90%';
-  domFrame.style.clear = 'both';
+  domFrame.className = 'example-container';
   document.body.appendChild(domFrame);
+
+  var domOutputID = ex.name.replace(/\s/g, '_') + "_Output";
+  var domOutputFrame = document.createElement('div');
+  domOutputFrame.id = domOutputID;
+  domOutputFrame.className = 'example-output-container';
+  domFrame.appendChild(domOutputFrame);
 
   // Note: eval() for each exemplar may be async, so don't
   // nuke the context without waiting for the promise to resolve
@@ -113,12 +121,8 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
       iFrame = document.createElement('iframe');
       iFrame.id = domID + "_frame";
       iFrame.src = "about:blank";
-      iFrame.style.float = 'right';
-      iFrame.style.width = '50%';
-      iFrame.style.height = '50%';
-      oldConsole.log("Adding iFrame for ", domID);
-      var domContainer = document.getElementById(domID);
-      domContainer.insertBefore(iFrame, domContainer.firstElementChild);
+      iFrame.className = 'example-iframe';
+      domOutputFrame.appendChild(iFrame);
     }
     return iFrame.contentDocument;
   }
@@ -129,7 +133,8 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
     }
     return iFrameSlot;
   }
-
+  // TODO: define a slot to use its get() to return the doc,
+  //  then put the slot into the subContext directly without 'unsealing'
   Object.defineProperty(foam.__context__, 'document$', {
     get: function() {
       return getIFrameSlot();
@@ -141,12 +146,36 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
     }
   });
 
+  // output the code
   var code = ex.generateExample();
   // TODO: offer expandable view of complete dependencies
-  // Write the code with deps omitted
+  // Write the displayed code with deps omitted
   var exampleHTML = document.createElement('div');
-  exampleHTML.innerHTML = ('<hr><code>' + ex.generateExample(true) + "</code>");
-  document.getElementById(domID).appendChild(exampleHTML);
+  exampleHTML.className = 'example-code-view';
+  exampleHTML.innerHTML = ex.generateExampleHTML(true);
+  domFrame.insertBefore(exampleHTML, domFrame.firstElementChild);
+
+  // Create a download link with the full code
+  var downloadableCode =
+    "// include 'src/foam.js' and this code in your test page:\n" +
+    "// <html>\n" +
+    "//   <head>\n" +
+    "//     <script src='../../src/foam.js'></script> \n" +
+    "//     <script src='thisExample.js'></script> \n" +
+    "//   </head>\n" +
+    "//   ...\n" +
+    "// </html>\n" +
+    code;
+
+  var downloadButton = document.createElement('a');
+  downloadButton.href = URL.createObjectURL(
+    new Blob([downloadableCode], { type: 'application/javascript' })
+  );
+  downloadButton.textContent = 'Download Full Javascript';
+  downloadButton.className = 'example-download-link';
+  exampleHTML.appendChild(downloadButton);
+
+  // execute the example
   try {
     var result = eval("(function runExemplar___() { " + code + " })();");
     // TODO: if using an iframe, can pass document this way: var result = eval("function runExemplar___(document) { " + code + " }")(foam.__context__.document);

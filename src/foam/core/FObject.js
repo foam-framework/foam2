@@ -56,6 +56,7 @@ foam.LIB({
 
       var obj = Object.create(this.prototype);
 
+      // Increment number of objects created of this class.
       this.count_++;
 
       // Properties have their values stored in instance_ instead
@@ -372,8 +373,6 @@ foam.LIB({
 foam.CLASS({
   package: 'foam.core',
   name: 'FObject',
-
-  documentation: 'Base model for model hierarchy.',
 
   // Effectively imports the following methods, but imports: isn't available
   // yet, so we add with 'methods:'.

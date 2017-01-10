@@ -83,8 +83,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Import',
 
-  documentation: 'Import Context Value Axiom',
-
   properties: [
     {
       class: 'String',
