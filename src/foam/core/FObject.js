@@ -87,7 +87,7 @@ foam.LIB({
        *
        * So instead of actually creating a subClass, we will just return "this"
        * and replace createSubClass() on FObject to actually create real
-       * sub-classes for all subsequence uses of FObject.createSubClass()
+       * sub-classes for all subsequent uses of FObject.createSubClass()
        */
       foam.core.FObject.createSubClass_ = function() {
         var cls = Object.create(this);
@@ -733,7 +733,7 @@ foam.CLASS({
       var axiom = this.cls_.getAxiomByName(obj);
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
-      foam.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
+      foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
       return axiom.toSlot(this);
     },
