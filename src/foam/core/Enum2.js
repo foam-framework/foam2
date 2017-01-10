@@ -51,14 +51,17 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'foam.core.internal.EnumValueAxiom',
       name: 'values',
-      preSet: function(_, v) {
+      adapt: function(_, v) {
         var used = {}; // map of ordinals used to check for duplicates
 
         var next = 0;
         for ( var i = 0 ; i < v.length ; i++ ) {
           var def = v[i];
-          def.name = foam.String.constantize(def.name);
-          v[i] = foam.core.internal.EnumValueAxiom.create({definition: def});
+
+          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
+            console.log('***************88 :', def);
+            v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
+          }
 
           if ( ! def.hasOwnProperty('ordinal') ) {
             def.ordinal = next++;
@@ -66,11 +69,13 @@ foam.CLASS({
             next = def.ordinal + 1;
           }
 
-          foam.assert(
-            ! used[def.ordinal],
-            this.id,
-            'Enum error: duplicate ordinal found', def.name,
-            used[def.ordinal], 'both have an ordinal of', def.ordinal);
+          if ( used[def.ordinal] ) {
+            foam.assert(
+                false,
+                this.id,
+                'Enum error: duplicate ordinal found', def.name,
+                used[def.ordinal], 'both have an ordinal of', def.ordinal);
+          }
 
           used[def.ordinal] = def.name;
         }
@@ -128,18 +133,23 @@ foam.CLASS({
 
   properties: [
     { name: 'of', required: true },
-    {
-      name: 'adapt',
-      code: foam.mmethod({
-        AbstractEnum: function(o) { return o; },
-        String:       function(o, n, prop) {
-          return this.__context__.lookup(prop.of)[foam.String.constantize(n)];
-        },
-        Number:       function(o, n, prop) {
-          return this.__context__.lookup(prop.of).create({ordinal: n});
+    [
+      'adapt',
+      function(o, n, prop) {
+        if ( foam.core.AbstractEnum.isInstance(n) ) return n;
+
+        var type = foam.typeOf(n);
+        var e    = this.__context__.lookup(prop.of);
+
+        if ( type === foam.String ) {
+          return e[foam.String.constantize(n)];
         }
-      })
-    }
+
+        if ( type === foam.Number ) {
+          return e.create({ordinal: n}, foam.__context__);
+        }
+      }
+    ]
   ]
 });
 
