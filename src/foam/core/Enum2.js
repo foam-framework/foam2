@@ -15,6 +15,130 @@
  * limitations under the License.
  */
 
+/**
+ * For those familiar with Java, FOAM Enums are very similar to Java enums in
+ * design.
+ *
+ * An Enum is essentially a class with a fixed number of named instances.
+ * The instances are frequently referred to as Enum Values, or the 'values'
+ * of an Enum.
+ *
+ * Enums have most of the features available to FOAM classes, including
+ * properties, methods, constants, templates, and listeners.
+ *
+ * Enums extend from FObject, so they inherit FObject features such as
+ * pub/sub events, diffing, hashCode, etc.
+ *
+ * Enums also have a few built-in properties by default. Every Enum has an
+ * 'ordinal' property, which is a integer unique to all the Enum Values of a
+ * particular Enum. Each enum also has a 'name' property, which is the name
+ * given to each Enum Value.
+ *
+ * Example usage:
+ * <pre>
+ * // To define an enum we use the foam.ENUM() function.
+ * foam.ENUM({
+ *   name: 'IssueStatus',
+ *
+ *   // Enums share many features with regular classes, the properties
+ *   // and methods we want our enums to have are defined as follows.
+ *   properties: [
+ *     {
+ *       class: 'Boolean',
+ *       name: 'consideredOpen',
+ *       value: true
+ *     }
+ *   ],
+ *
+ *   methods: [
+ *     function foo() {
+ *       return this.label + ( this.consideredOpen ? ' is' : ' is not' ) +
+ *           ' considered open.';
+ *     }
+ *   ],
+ *
+ *   // Use the values: key to define the actual Enum Values that we
+ *   // want to exist.
+ *   values: [
+ *     {
+ *       name: 'OPEN'
+ *     },
+ *     {
+ *       // The ordinal can be specified explicitly.
+ *       name: 'CLOSED',
+ *       ordinal: 100
+ *     },
+ *     {
+ *       // If the ordinal isn't given explicitly it is auto assigned as
+ *       // the previous ordinal + 1
+ *       name: 'ASSIGNED'
+ *     },
+ *     {
+ *       // You can specify the label, which will be used when rendering in a
+ *       // combo box or similar
+ *       name: 'UNVERIFIED',
+ *       label: 'Unverified'
+ *     },
+ *     {
+ *       // Values for additional properties to your enum are also defined
+ *       // inline.
+ *       name: 'FIXED',
+ *       label: 'Fixed',
+ *       consideredOpen: false
+ *     }
+ *   ]
+ * });
+ *
+ * console.log(IssueStatus.OPEN.name); // outputs "OPEN"
+ * console.log(IssueStatus.ASSIGNED.consideredOpen); // outputs "true"
+ *
+ * // Enum value ordinals can be specified.
+ * console.log(IssueStatus.CLOSED.ordinal); // outputs 100
+ * // values without specified ordinals get auto assigned.
+ * console.log(IssueStatus.ASSIGNED.ordinal); // outputs 101
+ *
+ * // Methods can be called on the enum values.
+ * // outputs "Fixed is not considered open."
+ * console.log(IssueStatus.FIXED.foo());
+ *
+ * // To store enums on a class, it is recommended to use the Enum property
+ * // type.
+ * foam.CLASS({
+ *   name: 'Issue',
+ *   properties: [
+ *     {
+ *       class: 'Enum',
+ *       of: 'IssueStatus',
+ *       name: 'status'
+ *     }
+ *   ]
+ * });
+ *
+ * var issue = Issue.create({ status: IssueStatus.UNVERIFIED });
+ * console.log(issue.status.label); // outputs "Unverified"
+ *
+ * // Enum properties give you some convenient adapting.
+ * // You can set the property to the ordinal or the
+ * // name of an enum, and it will set the property
+ * // to the correct Enum value.
+ *
+ * issue.status = 100;
+ *
+ * issue.status === IssueStatus.CLOSED; // is true
+ *
+ * // Enum properties also allow you to assign them via the name
+ * // of the enum.
+ *
+ * issue.status = "ASSIGNED"
+ *
+ * issue.status === IssueStatus.ASSIGNED; // is true
+ *
+ * The extent of all Enum values can be accessed from either the collection or from any
+ * individual Enum value:
+ * console.log(IssueStatus.VALUES, IssueStatus.CLOSED.VALUES);
+ *
+ * </pre>
+ */
 // TODO: Make extend Model so can override methods (or do some other way).
 foam.CLASS({
   package: 'foam.core.internal',
@@ -24,6 +148,11 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'ordinal',
+      getter: function() { return this.definition.name; },
+      setter: function(o) { this.definition.ordinal = o; }
+    },
+    {
       name: 'name',
       getter: function() { return this.definition.name; }
     },
@@ -32,9 +161,9 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      cls.installConstant(
-          this.name,
-          cls.create(this.definition, foam.__context__));
+      var e = cls.create(this.definition);
+      cls.installConstant(this.name, e);
+      cls.VALUES[this.name] = e;
     }
   ]
 });
@@ -58,15 +187,13 @@ foam.CLASS({
         for ( var i = 0 ; i < v.length ; i++ ) {
           var def = v[i];
 
-          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
-            console.log('***************88 :', def);
-            v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
-          }
-
           if ( ! def.hasOwnProperty('ordinal') ) {
             def.ordinal = next++;
           } else {
             next = def.ordinal + 1;
+          }
+          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
+            v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
           }
 
           if ( used[def.ordinal] ) {
@@ -93,7 +220,13 @@ foam.CLASS({
 
   documentation: 'Abstract base class for all Enum classes.',
 
-  axioms: [ foam.pattern.Multiton.create({property: 'ordinal'}) ],
+  axioms: [
+    foam.pattern.Multiton.create({property: 'ordinal'}),
+    {
+      installInClass: function(cls) { cls.VALUES = []; },
+      installInProto: function(p) { p.VALUES = p.cls_.VALUES; }
+    }
+  ],
 
   properties: [
     {
@@ -110,10 +243,6 @@ foam.CLASS({
       class: 'String',
       name: 'label',
       final: true
-    },
-    {
-      name: 'VALUES',
-      getter: function() { return this.cls_.values; }
     }
   ],
 
