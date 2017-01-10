@@ -20,8 +20,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Model',
 
-  documentation: 'Class/Prototype description.',
-
   properties: [
     {
       name: 'id',
@@ -34,6 +32,10 @@ foam.CLASS({
     'package',
     'abstract',
     'name',
+    {
+      name: 'flags',
+      factory: function() { return {}; }
+    },
     {
       // Just discard documentation.
       // If it's needed, a real 'documentation' property will

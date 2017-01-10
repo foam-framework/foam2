@@ -697,6 +697,7 @@ foam.CLASS({
       },
       javaCode: 'return getValue();'
     },
+
     function toString_(x) {
       return typeof x === 'number' ? '' + x :
         typeof x === 'string' ? '"' + x + '"' :
@@ -704,9 +705,11 @@ foam.CLASS({
         x.toString ? x.toString() :
         x;
     },
+
     function toString() {
       return this.toString_(this.value);
     },
+
     // TODO(adamvy): Re-enable when we can parse this in java more correctly.
     function xxoutputJSON(os) {
       os.output(this.value);
@@ -1065,10 +1068,13 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: { noWarnOnRefinesAfterCreate: true },
   implements: [ 'foam.mlang.order.Comparator' ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.order',
@@ -1179,14 +1185,14 @@ foam.LIB({
       return foam.mlang.order.Desc.create({ arg1: c });
     },
 
-    function toCompare(c /*foam.mlang.order.Comparator*/) {
+    function toCompare(c) {
       var ret = foam.Array.isInstance(c) ? foam.compare.compound(c) :
         foam.Function.isInstance(c) ? foam.mlang.order.CustomComparator.create({ compareFn: c }) :
         c ;
       return ret;
     },
 
-    function compound(/*array*/ args) {
+    function compound(args) {
       var cs = args.map(foam.compare.toCompare);
 
       if ( cs.length === 0 ) return;
@@ -1244,6 +1250,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',

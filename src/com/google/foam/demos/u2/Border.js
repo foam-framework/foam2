@@ -238,3 +238,30 @@ var split = SampleSplitContainer.create();
 split.write();
 split.leftPanel.add('leftContent');
 split.rightPanel.add('rightContent');
+
+
+foam.CLASS({
+  name: 'Blink',
+  extends: 'foam.u2.Element',
+
+  methods: [ function init() { this.blinkOn(); } ],
+
+  listeners: [
+    {
+      name: 'blinkOn',
+      isMerged: true,
+      mergeDelay: 250,
+      code: function() { this.style({visibility: 'visible'}); this.blinkOff(); }
+    },
+    {
+      name: 'blinkOff',
+      isMerged: true,
+      mergeDelay: 750,
+      code: function() { this.style({visibility: 'hidden'}); this.blinkOn(); }
+    }
+  ]
+});
+
+var blink = Blink.create();
+blink.add('blinking');
+blink.write();

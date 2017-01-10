@@ -127,9 +127,6 @@ foam.LIB({
       if ( this.refines ) {
         cls = context.lookup(this.refines);
         foam.assert(cls, 'Unknown refinement class: ' + this.refines);
-        if ( cls.count_ && foam.__context__.warn ) {
-          foam.__context__.warn('Refining class "' + this.refines + '", which has already created instances.');
-        }
       } else {
         foam.assert(this.id, 'Missing id name.', this.name);
         foam.assert(this.name, 'Missing class name.');
@@ -192,11 +189,12 @@ foam.LIB({
     /** Start second phase of bootstrap process. */
     function phase2() {
       // Upgrade to final CLASS() definition.
-      /** Creates a Foam class from a plain-old-object definition.
+      /* Creates a Foam class from a plain-old-object definition.
           @method CLASS
           @memberof module:foam */
       foam.CLASS = function(m) {
-        var model = foam.core.Model.create(m);
+        var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
+        var model = cls.create(m);
         model.validate();
         var cls = model.buildClass();
         cls.validate();

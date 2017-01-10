@@ -21,10 +21,10 @@
   Create complex parsers by composing simple parsers.s
 
   A PStream is a "Parser Stream", the input format accepted by
-  FOAM parsers.  
+  FOAM parsers.
 
   PStreams have the following interface:
-    get int     pos   - The character position in the input stream. 
+    get int     pos   - The character position in the input stream.
 
     get Char    head  - The first character in the stream.
 
@@ -49,8 +49,6 @@
 foam.CLASS({
   package: 'foam.parse',
   name: 'StringPS',
-
-  documentation: 'A String-backed PStream implementation.',
 
   properties: [
     {

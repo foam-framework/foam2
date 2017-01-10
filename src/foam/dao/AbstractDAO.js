@@ -69,8 +69,7 @@ foam.CLASS({
         given predicate.
       */
       name: 'where',
-      code: function where(/* foam.mlang.predicate.Predicate */ p
-          /* foam.dao.DAO */) {
+      code: function where(p) {
         return this.FilteredDAO.create({
           delegate: this,
           predicate: p
@@ -84,8 +83,7 @@ foam.CLASS({
         ordering.
       */
       name: 'orderBy',
-      code: function orderBy(/* foam.mlang.order.Comparator */
-          /* foam.dao.DAO */) {
+      code: function orderBy() {
         return this.OrderedDAO.create({
           delegate: this,
           comparator: foam.compare.toCompare(Array.from(arguments))
@@ -99,7 +97,7 @@ foam.CLASS({
         on a select()
       */
       name: 'skip',
-      code: function skip(/* number */ s /* foam.dao.DAO */ ) {
+      code: function skip(/* Number */ s) {
         return this.SkipDAO.create({
           delegate: this,
           skip_: s
@@ -113,7 +111,7 @@ foam.CLASS({
         given count on a select().
       */
       name: 'limit',
-      code: function limit(/* number */ l /* foam.dao.DAO */) {
+      code: function limit(/* Number */ l) {
         return this.LimitedDAO.create({
           delegate: this,
           limit_: l
@@ -125,7 +123,7 @@ foam.CLASS({
       Selects the contents of this DAO into a sink, then listens to keep
       the sink up to date. Returns a promise that resolves with the subscription.
     */
-    function pipe(/* foam.dao.Sink */ sink /* Promise */) {
+    function pipe(sink) {
       var self = this;
       return self.select(sink).then(function() {
         return self.listen(sink);
@@ -135,9 +133,7 @@ foam.CLASS({
     /**
       Keeps the given sink up to date with changes to this DAO.
     */
-    function listen(
-      /* foam.dao.Sink */                   sink,
-      /* foam.mlang.predicate.Predicate? */ predicate
+    function listen(sink, predicate
         /* object // The subscription object, with a .detach() to clean up. */
     ) {
       var mySink = this.decorateSink_(sink, undefined, undefined, undefined, predicate);

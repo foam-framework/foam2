@@ -34,11 +34,34 @@ foam.CLASS({
     function validate() {
       this.SUPER();
 
-      if ( this.hasOwnProperty('extends') && this.refines )
-        throw this.id + ': "extends" and "refines" are mutually exclusive.';
+      if ( this.refines ) {
+        if ( this.hasOwnProperty('extends') ) {
+          throw this.id + ': "extends" and "refines" are mutually exclusive.';
+        }
 
-      for ( var i = 0 ; i < this.axioms_.length ; i++ )
+        if ( ! this.flags.noWarnOnRefinesAfterCreate ) {
+          var context = this.__context__ || foam.__context__;
+          var cls     = context.lookup(this.refines);
+
+          if ( cls.count_ ) {
+            for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
+              var a = this.axioms_[i];
+              if ( ! foam.core.Property.isInstance(a) &&
+                   ! foam.core.Method.isInstance(a) ) {
+                context.warn(
+                    'Refining class "' +
+                    this.refines +
+                    '", which has already created instances.');
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
         this.axioms_[i].validate && this.axioms_[i].validate(this);
+      }
     }
   ]
 });
@@ -330,22 +353,9 @@ foam.CLASS({
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
 
 
-/** Describes a function return type. */
-foam.CLASS({
-  package: 'foam.core',
-  name: 'ReturnValue',
-  extends: 'foam.core.Argument',
 
-  constants: {
-    PREFIX: 'Return'
-  }
-});
-
-
-/** The types library deals with type safety. */
-// ???: Should this go in foam.Function along with formalArgs() and be renamed just functionArgs?
 foam.LIB({
-  name: 'foam.types',
+  name: 'foam.Function',
 
   methods: [
     /** Decorates the given function with a runtime type checker.
@@ -362,9 +372,34 @@ foam.LIB({
       *         then type check the returned value.
       */
     function typeCheck(fn) {
+      // Multiple definitions of LIBs may trigger this multiple times
+      // on the same function
+      if ( fn.isTypeChecker__ ) return fn;
+
       // parse out the arguments and their types
       var args = foam.Function.args(fn);
-      var ret = function() {
+
+      // check if no checkable arguments
+      var checkable = false;
+      function isArgUncheckable(a) {
+        return ( ( a.typeName === '' || a.typeName === 'any' || foam.Undefined.isInstance(a.typeName) ) &&
+          ( a.optional || a.repeated ) );
+      }
+      for ( var i = 0 ; i < args.length ; i++ ) {
+        if ( ! isArgUncheckable(args[i]) ) {
+          checkable = true;
+          break;
+        }
+      }
+      if ( ! checkable && args.returnType ) {
+        checkable = ! isArgUncheckable(args.returnType);
+      }
+      if ( ! checkable ) {
+        // nothing to check, don't decorate
+        return fn;
+      }
+
+      var typeChecker = function() {
         // check each declared argument, arguments[i] can be undefined for
         // missing optional args, extra arguments are ok
         for ( var i = 0 ; i < args.length ; i++ )
@@ -379,21 +414,85 @@ foam.LIB({
         }
 
         // If nothing threw an exception, we are free to run the function
-        var retVal = fn.apply(this, arguments);
+        var typeCheckerVal = fn.apply(this, arguments);
 
         // check the return value
-        if ( args.returnType ) args.returnType.validate(retVal);
+        if ( args.returnType ) args.returnType.validate(typeCheckerVal);
 
-        return retVal;
+        return typeCheckerVal;
       }
 
       // keep the old value of toString (hide the decorator)
-      ret.toString = function() { return fn.toString(); }
+      typeChecker.toString = function() { return fn.toString(); }
+      typeChecker.isTypeChecker__ = true;
 
-      return ret;
+      return typeChecker;
     }
   ]
 });
+
+
+// Access Argument now to avoid circular reference because of lazy model building.
+foam.core.Argument;
+
+/* Methods gain type checking. */
+foam.CLASS({
+  refines: 'foam.core.Method',
+
+  properties: [
+    {
+      name: 'code',
+      adapt: function(old, nu) {
+        if ( nu ) {
+          try {
+            return foam.Function.typeCheck(nu);
+          } catch (e) {
+            this.warn('Method: Failed to add type checking to method ' +
+              this.name + ':\n' + nu.toString() + '\n', e);
+            //throw e; //TODO: throw?
+          }
+        }
+        return nu;
+      }
+    }
+
+  ]
+});
+// Upgrade a LIBs
+var upgradeLib = function upgradeLib(lib) {
+  for ( var key in lib ) {
+    var func = lib[key];
+    if ( foam.Function.isInstance(func) ) {
+      lib[key] = foam.Function.typeCheck(func);
+    }
+  }
+};
+
+// Upgrade each existing LIB
+for ( var name in foam.__LIBS__ ) {
+  upgradeLib(foam.__LIBS__[name]);
+}
+foam.__LIBS__ = null;
+
+// Decorate foam.LIB to typeCheck new libs
+var oldLIB = foam.LIB;
+foam.LIB = function typeCheckedLIB(model) {
+  // Create the lib normally
+  oldLIB(model);
+
+  // Find the created LIB
+  var root = global;
+  var path = model.name.split('.');
+  var i;
+  for ( i = 0 ; i < path.length ; i++ ) {
+    root = root[path[i]];
+  }
+  if ( ! root ) {
+    throw 'debug.js: type checking for LIB ' + model.name + ', LIB not created.';
+  }
+  upgradeLib(root);
+}
+
 
 
 // Access Import now to avoid circular reference because of lazy model building.

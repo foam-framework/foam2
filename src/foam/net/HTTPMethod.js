@@ -28,9 +28,10 @@ foam.CLASS({
   package: 'foam.net',
   name: 'HTTPMethod',
   extends: 'foam.core.Method',
+
   requires: [
     'foam.net.HTTPArgument',
-    'foam.core.Imports',
+    'foam.core.Imports'
   ],
 
   constants: {
@@ -38,7 +39,7 @@ foam.CLASS({
       __proto__: foam.json.Strict,
       outputDefaultValues: false,
       outputClassNames: false
-    },
+    }
   },
 
   properties: [
@@ -117,7 +118,7 @@ foam.CLASS({
       p[this.name] = this.code;
     },
 
-    function callRemote_(/* object */ opt_args, host /* Promise */) {
+    function callRemote_(opt_args, host) {
       foam.assert( typeof host[this.HTTPRequestFactoryName] === 'function',
         "HTTPMethod call can't find HTTPRequestFactory",
         this.HTTPRequestFactoryName, "on", host);
@@ -185,22 +186,21 @@ foam.CLASS({
           return json;
         });
       });
-    },
-
+    }
   ]
-
 });
+
 
 foam.CLASS({
   package: 'foam.net',
   name: 'HTTPArgument',
   extends: 'foam.core.Argument',
+
   properties: [
     {
       /** The location to put this value in the request: 'query', 'path', or 'body' */
       name: 'location',
       value: 'query',
-    },
-    // optional
-  ],
- });
+    }
+  ]
+});

@@ -21,8 +21,6 @@ foam.CLASS({
   name: 'AxiomArray',
   extends: 'Property',
 
-  documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
-
   properties: [
     {
       name: 'of',
