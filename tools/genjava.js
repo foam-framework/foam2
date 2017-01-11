@@ -20,6 +20,13 @@ global.FOAM_FLAGS = { 'java': true, 'debug': true };
 
 require('../src/foam.js');
 
+require('../src/com/chrome/origintrials/model/Application.js');
+require('../src/com/chrome/origintrials/model/User.js');
+require('../src/com/chrome/origintrials/model/Token.js');
+require('../src/com/chrome/origintrials/model/Experiment.js');
+require('../src/com/chrome/origintrials/model/Origin.js');
+require('../src/com/chrome/origintrials/model/Relationships.js');
+
 var classes = [
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
@@ -52,6 +59,8 @@ var classes = [
   'com.chrome.origintrials.model.CreateTokenRequest',
   'com.chrome.origintrials.model.CreateTokenResponse',
   'com.chrome.origintrials.model.Token',
+  'com.chrome.origintrials.model.User',
+  'com.chrome.origintrials.model.Origin',
   'com.chrome.origintrials.model.Experiment',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',
