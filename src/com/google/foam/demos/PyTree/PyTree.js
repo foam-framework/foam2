@@ -31,14 +31,15 @@ foam.CLASS({
     function initE() {
       this.setNodeName('g').
         start('rect').
-          attrs({width: 1, height: 1}).
+          setID(null).
+        attrs({width: 1, height: 1}).
           style({fill: this.fillColor(this.lvl)}).
         end();
 
       if ( this.lvl < this.maxLvl ) {
         this.add(
-            this.PyBranch.create({lvl: this.lvl+1}).cssClass('l'),
-            this.PyBranch.create({lvl: this.lvl+1}).cssClass('r'));
+            this.PyBranch.create({lvl: this.lvl+1}).setID(null).cssClass('l'),
+            this.PyBranch.create({lvl: this.lvl+1}).setID(null).cssClass('r'));
       }
     },
     {
@@ -63,8 +64,8 @@ foam.CLASS({
 
   properties: [
     { name: 'heightFactor', value: 0.55 },
-    { name: 'lean', value: 0 },
-    { name: 'maxLvl', value: 11 },
+    { name: 'lean',         value: 0 },
+    { name: 'maxLvl',       value: 11 },
     'css',
   ],
 
@@ -77,10 +78,12 @@ foam.CLASS({
         style({border: '1px solid lightgray'}).
         attrs({width: 1200, height: 600}).
         on('mousemove', this.onMouseMove).
-        add(this.PyBranch.create({lvl: 1, w: 80}).attrs({transform: 'translate(560 510) scale(80)'}));
+        add(this.PyBranch.create({lvl: 1}).attrs({transform: 'translate(560 510) scale(80)'}));
 
       this.redraw();
-    }
+    },
+
+    function distance(x, y) { return Math.sqrt(x*x + y*y); }
   ],
 
   listeners: [
@@ -91,8 +94,8 @@ foam.CLASS({
         var heightFactor = this.heightFactor, lean = this.lean;
         var a = Math.atan2(heightFactor, .5+lean);
         var b = Math.atan2(heightFactor, .5-lean);
-        var lScale = Math.sqrt(heightFactor**2 + (.5+lean)**2);
-        var rScale = Math.sqrt(heightFactor**2 + (.5-lean)**2);
+        var lScale = this.distance(heightFactor, .5+lean);
+        var rScale = this.distance(heightFactor, .5-lean);
 
         this.css.innerText =
           '.l { transform: scale(' + lScale + ') rotate(' + -a + 'rad) translate(0, -1px) }\n' +
