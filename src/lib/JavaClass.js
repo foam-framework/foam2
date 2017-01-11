@@ -924,7 +924,12 @@ foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
-    ['javaType', 'Object'],
+    {
+      name: 'javaType',
+      expression: function(props) {
+        return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
+      }
+    },
     ['javaJSONParser', 'foam.lib.parse.Fail'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ],
