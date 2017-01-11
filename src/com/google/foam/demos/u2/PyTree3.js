@@ -4,24 +4,21 @@ foam.CLASS({
 
   requires: [ 'PyBranch' ],
 
-  imports: [ 'lScale', 'rScale', 'lTransform', 'rTransform', 'maxLvl' ],
+  imports: [ 'maxLvl' ],
 
-  properties: [ 'w', 'transform', 'lvl' ],
+  properties: [ 'lvl' ],
 
   methods: [
     function initE() {
       this.setNodeName('g').
-        attrs({transform: this.transform}).
         start('rect').
-          setID(null).
           attrs({width: 1, height: 1}).
           style({fill: this.fillColor(this.lvl)}).
         end();
 
       if ( this.lvl < this.maxLvl ) {
-        var lW = this.w * this.lScale, rW = this.w * this.rScale;
-        if ( lW > 1 ) this.add(this.PyBranch.create({id: null, w: lW, lvl: this.lvl+1, transform: this.lTransform}));
-        if ( rW > 1 ) this.add(this.PyBranch.create({id: null, w: rW, lvl: this.lvl+1, transform: this.rTransform}));
+        this.add(this.PyBranch.create({lvl: this.lvl+1}).cssClass('l'));
+        this.add(this.PyBranch.create({lvl: this.lvl+1}).cssClass('r'));
       }
     },
     {
@@ -40,48 +37,51 @@ foam.CLASS({
 
   requires: [ 'PyBranch' ],
 
-  exports: [ 'lScale', 'rScale', 'lTransform', 'rTransform', 'maxLvl' ],
+  imports: [ 'document', 'installCSS' ],
+
+  exports: [ 'maxLvl' ],
 
   properties: [
-    { name: 'heightFactor', value: 0.55 },
-    { name: 'lean',         value: 0 },
-    { name: 'maxLvl',       value: 11 },
-    'lScale',
-    'rScale',
-    'lTransform',
-    'rTransform'
+    'heightFactory', 'lean', 'css',
+    { name: 'maxLvl', value: 11 },
   ],
 
   methods: [
     function initE() {
+      this.installCSS('');
+      this.css = this.document.head.lastChild;
+
       this.setNodeName('svg').
         style({border: '1px solid lightgray'}).
         attrs({width: 1200, height: 600}).
         on('mousemove', this.onMouseMove).
-        add(this.slot(function(heightFactor, lean) {
-          var a = Math.atan2(heightFactor, .5+lean);
-          var b = Math.atan2(heightFactor, .5-lean);
+        add(this.PyBranch.create({lvl: 1, w: 80}).attrs({transform: 'translate(560 510) scale(80)'}));
 
-          this.lScale = Math.sqrt(heightFactor**2 + (.5+lean)**2);
-          this.rScale = Math.sqrt(heightFactor**2 + (.5-lean)**2);
-
-          this.lTransform = 'scale(' + this.lScale.toFixed(2) + ') translate(0 -1) rotate(' + this.radToDeg(-a) + ' 0 1)';
-          this.rTransform = 'translate(1 0) scale(' + this.rScale.toFixed(2) + ') translate(-1 -1) rotate(' + this.radToDeg(b) + ' 1 1)';
-
-          return this.PyBranch.create({lvl: 1, w: 80, transform: 'translate(560 510) scale(80)'});
-        }));
-    },
-
-    function radToDeg(r) { return Math.floor(180*r/Math.PI); }
+      this.redraw();
+    }
   ],
 
   listeners: [
+    {
+      name: 'redraw',
+      isFramed: true,
+      code: function() {
+        var heightFactor = this.heightFactor, lean = this.lean;
+        var a = Math.atan2(heightFactor, .5+lean);
+        var b = Math.atan2(heightFactor, .5-lean);
+        var lScale = Math.sqrt(heightFactor**2 + (.5+lean)**2);
+        var rScale = Math.sqrt(heightFactor**2 + (.5-lean)**2);
+
+        this.css.innerText =
+          '.l { transform: scale(' + lScale + ') rotate(' + -a + 'rad) translate(0, -1px) }\n' +
+          '.r { transform: translate(1px, 0) scale(' + rScale + ') rotate(' + b + 'rad) translate(-1px, -1px) }';
+      }
+    },
+
     function onMouseMove(e) {
       this.heightFactor = (1 - e.offsetY / this.getAttribute('height')) * 0.8;
       this.lean         = e.offsetX / this.getAttribute('width') - 0.5;
+      this.redraw();
     }
-]
+  ]
 });
-
-
-PyTree.create().write();
