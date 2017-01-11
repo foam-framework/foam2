@@ -42,7 +42,7 @@ public class DatastoreDAO extends AbstractDAO {
   }
 
   public FObject put(FObject obj) {
-    getData().put(serialize(obj));
+    getData().put(serializeFObject(obj));
     return obj;
   }
 
@@ -62,24 +62,38 @@ public class DatastoreDAO extends AbstractDAO {
     return deserialize(result);
   }
 
-  private Entity serialize(FObject o) {
-    Entity entity = new Entity(keyFromFObject(o));
-
-    ClassInfo info = o.getClassInfo();
+  private PropertyContainer serialize(PropertyContainer target, FObject obj) {
+    ClassInfo info = obj.getClassInfo();
 
     List<PropertyInfo> properties = getProperties(info);
 
-    // TODO: Is cls_ a reserved work for properties?
-    entity.setProperty("cls_", info.getId());
+    // TODO: Is cls_ a reserved word for properties?
+    target.setProperty("cls_", info.getId());
 
     for ( PropertyInfo prop : properties ) {
-      entity.setProperty(prop.getName(), prop.get(o));
+      Object value = prop.get(obj);
+
+      if ( value instanceof FObject ) {
+        EmbeddedEntity subEntity = new EmbeddedEntity();
+        serialize(subEntity, (FObject)value);
+        value = subEntity;
+      }
+
+      target.setProperty(prop.getName(), value);
     }
+
+    return target;
+  }
+
+  private Entity serializeFObject(FObject o) {
+    Entity entity = new Entity(keyFromFObject(o));
+
+    serialize(entity, o);
 
     return entity;
   }
 
-  private FObject deserialize(Entity e) {
+  private FObject deserialize(PropertyContainer e) {
     String classId = (String)e.getProperty("cls_");
 
     FObject obj;
@@ -93,7 +107,17 @@ public class DatastoreDAO extends AbstractDAO {
     List<PropertyInfo> props = getProperties(obj.getClassInfo());
 
     for ( PropertyInfo prop : props ) {
-      prop.set(obj, e.getProperty(prop.getName()));
+      if ( ! e.hasProperty(prop.getName()) ) {
+        continue;
+      }
+
+      Object value = e.getProperty(prop.getName());
+
+      if ( value instanceof EmbeddedEntity ) {
+        value = deserialize((EmbeddedEntity)value);
+      }
+
+      prop.set(obj, value);
     }
 
     return obj;
