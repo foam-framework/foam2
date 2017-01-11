@@ -57,6 +57,14 @@ foam.CLASS({
       value: false
     },
     {
+      /**
+       * A map of platform names this example supports, such as 'node'
+       * and 'web'.
+       */
+      name: 'platforms',
+      factory: function() { return { node: true, web: true }; }
+    },
+    {
       /** The code for this example. This should be either bare code, or a
         function that returns a promise if async. */
       class: 'String',

@@ -45,6 +45,7 @@ var oldContext;
 var oldConsole = console;
 foam.async.repeat(FBE.length, function runExemplar(index) {
   var ex = FBE[index];
+  if ( ! ex.platforms.web ) return Promise.resolve();
 
   // TODO: make log output pretty, put in a div
   var output = [];

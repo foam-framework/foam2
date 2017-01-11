@@ -48,7 +48,13 @@ foam.CLASS({
 
       //code += 'describe(\'' + this.filename + '\', function() {\n';
 
-      exemplars.forEach((e) => code += this.outputTest(e, indent));
+      exemplars.forEach(
+        (e) => {
+          if ( e.platforms.node ) {
+            code += this.outputTest(e, indent);
+          }
+        }
+      );
 
       //code += '});\n';
 
