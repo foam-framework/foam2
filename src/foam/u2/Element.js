@@ -1854,6 +1854,16 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.DateTime',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  requires: [ 'foam.u2.DateTimeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Float',
   flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.FloatView' ],
