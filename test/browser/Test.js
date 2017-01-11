@@ -289,6 +289,7 @@ console.log('2: ', RefTest.create());
 
 
 
+console.log('-------------');
 
 foam.ENUM2({
   name: 'IssueStatus',
@@ -342,13 +343,13 @@ foam.ENUM2({
   ]
 });
 
-console.log(IssueStatus.OPEN.name); // outputs "OPEN"
-console.log(IssueStatus.ASSIGNED.consideredOpen); // outputs "true"
+console.log('open', IssueStatus.OPEN.name); // outputs "OPEN"
+console.log(true, IssueStatus.ASSIGNED.consideredOpen); // outputs "true"
 
 // Enum value ordinals can be specified.
-console.log(IssueStatus.CLOSED.ordinal); // outputs 100
+console.log(100, IssueStatus.CLOSED.ordinal); // outputs 100
 // values without specified ordinals get auto assigned.
-console.log(IssueStatus.ASSIGNED.ordinal); // outputs 101
+console.log(101, IssueStatus.ASSIGNED.ordinal); // outputs 101
 
 // Methods can be called on the enum values.
 // outputs "Fixed is not considered open."
@@ -361,14 +362,14 @@ foam.CLASS({
   properties: [
     {
       class: 'Enum2',
-      of: 'Status',
+      of: 'IssueStatus',
       name: 'status'
     }
   ]
 });
 
 var issue = Issue.create({ status: IssueStatus.UNVERIFIED });
-console.log(issue.status.label); // outputs "Unverified"
+console.log('unverified: ', issue.status, issue.status.cls_.id, 'label: ', issue.status.label); // outputs "Unverified"
 
 // Enum properties give you some convenient adapting.
 // You can set the property to the ordinal or the
@@ -377,10 +378,34 @@ console.log(issue.status.label); // outputs "Unverified"
 
 issue.status = 100;
 
-console.log(issue.status === IssueStatus.CLOSED); // is true
+console.log(true, issue.status === IssueStatus.CLOSED); // is true
 
 // Enum properties also allow you to assign them via the name
 // of the enum.
 
 issue.status = "ASSIGNED"
-console.log(issue.status === IssueStatus.ASSIGNED); // is true
+console.log(true, issue.status === IssueStatus.ASSIGNED); // is true
+
+console.log(IssueStatus.VALUES, IssueStatus.CLOSED.VALUES);
+
+
+
+
+foam.CLASS({
+  name: 'DateTimeTest',
+  properties: [
+    'id',
+    {
+      class: 'Date',
+      name: 'date'
+    },
+    {
+      class: 'DateTime',
+      name: 'dateTime'
+    }
+  ]
+});
+
+var dt = DateTimeTest.create();
+foam.u2.DetailView.create({data: dt}).write();
+foam.u2.DetailView.create({data: dt}).write();
