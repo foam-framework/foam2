@@ -32,7 +32,7 @@ foam.CLASS({
       this.setNodeName('g').
         start('rect').
           setID(null).
-        attrs({width: 1, height: 1}).
+          attrs({width: 1, height: 1}).
           style({fill: this.fillColor(this.lvl)}).
         end();
 
@@ -66,13 +66,13 @@ foam.CLASS({
     { name: 'heightFactor', value: 0.55 },
     { name: 'lean',         value: 0 },
     { name: 'maxLvl',       value: 11 },
-    'css',
+    'cssEl',
   ],
 
   methods: [
     function initE() {
       this.installCSS('');
-      this.css = this.document.head.lastChild;
+      this.cssEl = this.document.head.lastChild;
 
       this.setNodeName('svg').
         style({border: '1px solid lightgray'}).
@@ -97,7 +97,7 @@ foam.CLASS({
         var lScale = this.distance(heightFactor, .5+lean);
         var rScale = this.distance(heightFactor, .5-lean);
 
-        this.css.innerText =
+        this.cssEl.innerText =
           '.l { transform: scale(' + lScale + ') rotate(' + -a + 'rad) translate(0, -1px) }\n' +
           '.r { transform: translate(1px, 0) scale(' + rScale + ') rotate(' + b + 'rad) translate(-1px, -1px) }';
       }
