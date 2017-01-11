@@ -68,7 +68,8 @@ describe('copyFrom', function() {
           }
         },
         {
-          name: 'c'
+          name: 'c',
+          value: 33
         },
         {
           name: 'd',
@@ -90,7 +91,7 @@ describe('copyFrom', function() {
     }, foam.__context__);
 
     var obj2 = SomeClass.create({
-      c: 3
+      c: 33
     }, foam.__context__);
 
     obj.copyFrom(obj2);
@@ -105,12 +106,15 @@ describe('copyFrom', function() {
     expect(obj.b).toBe(4);
     expect(obj2.b).toBe(2);
 
-    expect(obj.c).toBe(3);
-    expect(obj2.c).toBe(3);
+    // default values are detected and not copied
+    expect(obj.hasOwnProperty('c')).toBe(false);
+    expect(obj2.hasOwnProperty('c')).toBe(true);
+    expect(obj.c).toBe(33);
+    expect(obj2.c).toBe(33);
 
     expect(obj.hasOwnProperty('d')).toBe(false);
-    expect(obj.d).toBe(5);
-    expect(obj2.d).toBe(5);
+    expect(obj.d).toBe(35);
+    expect(obj2.d).toBe(35);
 
     // Factory runs independently
     expect(obj.e).not.toBe(obj2.e);

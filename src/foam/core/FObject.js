@@ -862,7 +862,14 @@ foam.CLASS({
           // for each object since they are of the exact same
           // type.
           if ( o.hasOwnProperty(name) ) {
-            this[name] = o[name];
+            // if the source object has a value set that happens to be
+            // exactly the default value, clear the target's property
+            // instead of storing the redundant value.
+            if ( props[i].isDefaultValue(o[name]) ) {
+              this.clearProperty(name);
+            } else {
+              this[name] = o[name];
+            }
           }
         }
         return this;
