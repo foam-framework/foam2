@@ -805,32 +805,38 @@ foam.CLASS({
       return this.cls_.create(m, opt_X || this.__context__);
     },
 
-    /**
-      Copy property values from the supplied object or map.
-
-      Ex.
-<pre>
-  person.copyFrom({fName: 'John', lName: 'Smith', age: 42})
-  or
-  person.copyFrom(otherPerson);
-</pre>
-     The first example is short-form for:
-<pre>
-  person.fName = 'John';
-  person.lName = 'Smith';
-  person.age   = 42;
-</pre>
-     If an FObject is supplied, it doesn't need to be the same class as 'this'.
-     Only properties that the two classes have in common will be copied.
-     */
     function copyFrom(o, opt_warn) {
-      // When copying from a plain map, just enumerate the keys
+      /**
+       * Copy property values from the supplied object or map.
+       *
+       *  Ex.
+       * <pre>
+       *   person.copyFrom({fName: 'John', lName: 'Smith', age: 42})
+       *   or
+       *   person.copyFrom(otherPerson);
+       * </pre>
+       *      The first example is short-form for:
+       * <pre>
+       *   person.fName = 'John';
+       *   person.lName = 'Smith';
+       *   person.age   = 42;
+       * </pre>
+       * If an FObject is supplied, it doesn't need to be the same class as 'this'.
+       * Only properties that the two classes have in common will be copied.
+       *
+       * @param {AnyMap}  o        The source object
+       * @param {Boolean} opt_warn If true, warns when unknown arguments are
+       *                           present in the source object
+       */
+
+      // Case 1: Optimized map case.
+      //   When copying from a plain, non-inheriting map, just enumerate
+      //   the keys.
       if ( o.__proto__ === Object.prototype || ! o.__proto__ ) {
         for ( var key in o ) {
           var name = key.endsWith('$') ?
               key.substring(0, key.length - 1) :
               key ;
-
           var a = this.cls_.getAxiomByName(name);
           if ( a && foam.core.Property.isInstance(a) ) {
             this[key] = o[key];
@@ -841,28 +847,35 @@ foam.CLASS({
         return this;
       }
 
-      // When copying from an object of the same class
-      // We don't copy default values or the values of expressions
-      // so that the unset state of those properties is preserved
       var props = this.cls_.getAxiomsByClass(foam.core.Property);
 
-      if ( o.cls_ && ( o.cls_ === this.cls_ || o.cls_.isSubClass(this.cls_) ) ) {
+      // Case 2: Exact same type
+      //   When copying from an object of the same class
+      //   We don't copy default values or the values of expressions
+      //   so that the unset state of those properties is preserved
+      if ( o.cls_ && ( o.cls_ === this.cls_ ) ) {
         for ( var i = 0 ; i < props.length ; i++ ) {
           var name = props[i].name;
 
-          // Only copy values that are set or have a factory.
+          // Only copy values that are set.
           // Any default values or expressions will be the same
           // for each object since they are of the exact same
           // type.
-          if ( o.hasOwnProperty(name) || props[i].factory ) {
+          if ( o.hasOwnProperty(name) ) {
             this[name] = o[name];
           }
         }
         return this;
       }
 
-      // If the source is an FObject, copy any properties
-      // that we have in common.
+      // Case 3: Different FOAM types
+      //   If the source is an FObject, copy any properties
+      //   that we have in common. Execute expressions, factories,
+      //   and copy default values, and set those on the destination
+      //   object.
+      // Note: factories and expressions for copied values on the
+      //   destination object WILL NOT BE ACTIVE any longer. Clear
+      //   them later to re-enable expressions and factories, if desired.
       if ( foam.core.FObject.isInstance(o) ) {
         for ( var i = 0 ; i < props.length ; i++ ) {
           var name = props[i].name;
@@ -874,11 +887,12 @@ foam.CLASS({
         return this;
       }
 
-      // If the source is some unknown object, we do our best
-      // to copy any values that are not undefined.
+      // Case 4: Plain JS objects with complex proto structures
+      //   If the source is some unknown object, we do our best
+      //   to copy any values that are not undefined.
       for ( var i = 0 ; i < props.length ; i++ ) {
         var name = props[i].name;
-        if ( typeof o[name] !== 'undefined' ) {
+        if ( ! foam.Undefined.isInstance(o[name]) ) {
           this[name] = o[name];
         }
       }

@@ -112,8 +112,8 @@ describe('copyFrom', function() {
     expect(obj.d).toBe(5);
     expect(obj2.d).toBe(5);
 
-    // Factory was not run twice
-    expect(obj.e).toBe(obj2.e);
+    // Factory runs independently
+    expect(obj.e).not.toBe(obj2.e);
   });
 
   it('different class', function() {
