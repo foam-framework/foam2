@@ -658,6 +658,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaFactory'
+    },
+    {
+      class: 'String',
+      name: 'javaValue',
+      expression: function(value) {
+        return foam.typeOf(value) === foam.String ? '"' + value + '"' :
+          foam.typeOf(value) === foam.Undefined ? 'null' :
+          value;
+      }
     }
   ],
   methods: [
@@ -698,10 +707,10 @@ foam.CLASS({
           name: 'get' + capitalized,
           type: this.javaType,
           visibility: 'public',
-          body: ( this.hasOwnProperty('javaFactory') ?
-              'if ( ! ' + isSet + ' ) {\n' +
-              '  set' + capitalized + '(' + factoryName + '());\n' +
-              '}\n' : '' ) +
+          body: 'if ( ! ' + isSet + ' ) {\n' +
+            ( this.hasOwnProperty('javaFactory') ? '  set' + capitalized + '(' + factoryName + '());\n' :
+                ' return ' + this.javaValue  + ';\n' ) +
+            '}\n' +
             'return ' + privateName + ';'
         }).
         method({
