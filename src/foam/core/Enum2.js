@@ -149,7 +149,7 @@ foam.CLASS({
   properties: [
     {
       name: 'ordinal',
-      getter: function() { return this.definition.name; },
+      getter: function() { return this.definition.ordinal; },
       setter: function(o) { this.definition.ordinal = o; }
     },
     {

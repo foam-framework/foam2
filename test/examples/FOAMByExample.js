@@ -3321,6 +3321,7 @@ For instance, my name is %%name
     name: 'Graphics Support',
     description: 'CViews enable canvas rendering',
     dependencies: [  ],
+    platforms: { web: true },
     code: function() {
 
       foam.CLASS({
