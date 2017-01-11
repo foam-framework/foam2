@@ -65,7 +65,13 @@ foam.CLASS({
   properties: [
     { name: 'heightFactor', value: 0.55 },
     { name: 'lean',         value: 0 },
-    { name: 'maxLvl',       value: 11 },
+    { name: 'maxLvl',       factory: function() {
+      // Firefox has a bug which causes it to crash when svg is too deeply
+      // nested, so dial it back to 9 on Firefox until fixed.
+      //
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=943243
+      return navigator.userAgent.indexOf('Firefox') == -1 ? 11 : 9;
+    }},
     'cssEl',
   ],
 
@@ -104,8 +110,8 @@ foam.CLASS({
     },
 
     function onMouseMove(e) {
-      this.heightFactor = (1 - e.offsetY / this.getAttribute('height')) * 0.8;
-      this.lean         = e.offsetX / this.getAttribute('width') - 0.5;
+      this.heightFactor = (1 - e.clientY / this.getAttribute('height')) * 0.8;
+      this.lean         = e.clientX / this.getAttribute('width') - 0.5;
       this.redraw();
     }
   ]
