@@ -30,3 +30,4 @@
     foam.__context__ = oldContext;
   });
 })();
+

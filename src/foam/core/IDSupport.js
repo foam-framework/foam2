@@ -96,7 +96,7 @@ foam.CLASS({
     {
       name: 'ids',
       postSet: function(_, ids) {
-        foam.assert(Array.isArray(ids), 'Ids must be an array.');
+        foam.assert(foam.Array.isInstance(ids), 'Ids must be an array.');
         foam.assert(ids.length, 'Ids must contain at least one property.');
 
         this.axioms_.push(foam.core.MultiPartID.create({propNames: ids}));

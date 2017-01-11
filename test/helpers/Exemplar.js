@@ -83,17 +83,15 @@ foam.CLASS({
       }
     },
     {
-      /** Is true if any dependencies are async.
-        @private */
+      /** Is true if this or any dependencies are async. */
       class: 'Boolean',
-      name: 'hasAsyncDeps_',
-      hidden: true,
+      name: 'runsAsync',
       expression: function(dependencies) {
         var self = this;
         var ret = false;
         self.dependencies && self.dependencies.forEach(function(depName) {
           var dep = self.registry.lookup(depName);
-          if ( dep.hasAsyncDeps_ || dep.isAsync ) {
+          if ( dep.runsAsync || dep.isAsync ) {
             ret = true;
             return true;
           }
@@ -119,8 +117,8 @@ foam.CLASS({
       return false;
     },
 
-    function generateCode(selfOutputMethod, noDeps) {
-      var indent = { level: 0 };
+    function generateCode(selfOutputMethod, depOutputMethod, noDeps, indent) {
+      indent = indent || { level: 0 };
       var ret = "";
       var self = this;
       var tabs = "";
@@ -135,7 +133,7 @@ foam.CLASS({
       var deps = this.flattenDependencies();
 
       deps.sync.forEach(function(dep) {
-        ret += dep[selfOutputMethod](indent, true);
+        ret += dep[selfOutputMethod](indent, true) + '\n';
       });
 
 
@@ -145,13 +143,13 @@ foam.CLASS({
       }
       deps.async.forEach(function(dep) {
         ret += tabs + "}).then(function() {\n";
-        ret += dep[selfOutputMethod](indent);
+        ret += dep[depOutputMethod](indent) + '\n';
       });
       if ( deps.async.length ) {
         ret += tabs + "}).then(function() {\n";
       }
 
-      ret += self[selfOutputMethod](indent);
+      ret += self[selfOutputMethod](indent) + '\n';
 
       // inner enclosing end
       if ( deps.async.length ) {
@@ -162,38 +160,42 @@ foam.CLASS({
       return ret;
     },
 
-    function generateExample(noDeps) {
-      return this.generateCode('outputSelfExample', noDeps);
+    function generateExample(noDeps, indent) {
+      indent = indent || { level: 0 };
+      return this.generateCode('outputSelfExample', 'outputSelfExample',
+        noDeps, indent);
     },
-    function generateExampleHTML(noDeps) {
-      return this.generateCode('outputSelfHTML', noDeps);
+    function generateExampleHTML(noDeps, indent) {
+      indent = indent || { level: 0 };
+      return this.generateCode('outputSelfHTML', 'outputSelfHTML',
+        noDeps, indent);
     },
 
-    function generateTest() {
-      return this.generateCode('outputSelfTest');
+    function generateTest(indent) {
+      indent = indent || { level: 0 };
+      return this.generateCode('outputSelfTest', 'outputSelfExample',
+        false, indent);
     },
 
-    function outputSelfTest(indent, noTests) {
-
-      var ret = "\n";
+    function outputSelfTest(indent) {
+      var ret = "";
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       ret += tabs + '// ' + this.name + '\n';
       ret += tabs + '// ' + this.description + '\n';
 
-      ret += this.outputIndentedCode(indent, this.code);
+      ret += this.outputIndentedCode(indent, this.code) + '\n';
 
-      if ( ! noTests ) {
-        ret += "\n// Post conditions:\n";
-        ret += this.outputIndentedCode(indent, this.postTestCode) + '\n';
-      }
+      ret += tabs + '// Post conditions:\n';
+      ret += this.outputIndentedCode(indent, this.postTestCode) + '\n';
+
       return ret;
     },
 
     function outputSelfExample(indent) {
 
-      var ret = "\n";
+      var ret = "";
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
@@ -251,7 +253,7 @@ foam.CLASS({
       });
 
       // trim last newline
-      return ret.trim();
+      return tabs + ret.trim();
     },
 
     function flattenDependencies(depsLoaded) {
@@ -278,7 +280,7 @@ foam.CLASS({
 
           depsLoaded[dep.name] = true;
 
-          if ( dep.hasAsyncDeps_ || dep.isAsync ) {
+          if ( dep.runsAsync || dep.isAsync ) {
             asyncDeps.push(dep);
           } else {
             syncDeps.push(dep);
