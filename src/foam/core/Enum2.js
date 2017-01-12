@@ -137,6 +137,22 @@
  * individual Enum value:
  * console.log(IssueStatus.VALUES, IssueStatus.CLOSED.VALUES);
  *
+ * Values can be specified as just Strings if you don't want to explicitly set the label
+ * or ordinal. Ex.:
+ *
+ * foam.ENUM({
+ *  name: 'DaysOfWeek',
+ *  values: [
+ *    'SUNDAY',
+ *    'MONDAY',
+ *    'TUESDAY',
+ *    'WEDNESDAY',
+ *    'THURSDAY',
+ *    'FRIDAY',
+ *    'SATURDAY'
+ *  ]
+ * });
+ *
  * </pre>
  */
 // TODO: Make extend Model so can override methods (or do some other way).
@@ -228,8 +244,23 @@ foam.CLASS({
   axioms: [
     foam.pattern.Multiton.create({property: 'ordinal'}),
     {
-      installInClass: function(cls) { cls.VALUES = []; },
-      installInProto: function(p) { p.VALUES = p.cls_.VALUES; }
+      installInClass: function(cls) {
+        // Each sub-class of AbstractEnum gets it's own VALUES array.
+        Object.defineProperty(cls, 'VALUES', {
+          get: function() {
+            return this.private_.VALUES || ( this.private_.VALUES = [] );
+          },
+          configurable: true,
+          enumerable: false
+        });
+      },
+      installInProto: function(p) {
+        Object.defineProperty(p, 'VALUES', {
+          get: function() { return this.cls_.VALUES; },
+          configurable: true,
+          enumerable: false
+        });
+      }
     }
   ],
 
