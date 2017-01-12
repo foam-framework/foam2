@@ -368,6 +368,7 @@ foam.CLASS({
   ]
 });
 
+
 var issue = Issue.create({ status: IssueStatus.UNVERIFIED });
 console.log('unverified: ', issue.status, issue.status.cls_.id, 'label: ', issue.status.label); // outputs "Unverified"
 
@@ -409,3 +410,18 @@ foam.CLASS({
 var dt = DateTimeTest.create();
 foam.u2.DetailView.create({data: dt}).write();
 foam.u2.DetailView.create({data: dt}).write();
+
+foam.ENUM2({
+  name: 'DaysOfWeek',
+  values: [
+    'SUNDAY',
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY'
+  ]
+});
+
+console.log(DaysOfWeek.VALUES);
