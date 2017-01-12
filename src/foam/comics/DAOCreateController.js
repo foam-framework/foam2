@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'dao',
       hidden: true,
       factory: function() {
-        return this.__context__[this.of.id + 'DAO'];
+        return this.__context__[foam.String.daoize(this.of.name)];
       }
     },
     {
@@ -54,7 +54,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var stack = self.stack;
+        var stack = this.stack;
 
         this.dao.put(this.data).then(function() {
           if ( stack ) stack.back();
