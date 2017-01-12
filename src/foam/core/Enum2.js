@@ -187,11 +187,16 @@ foam.CLASS({
         for ( var i = 0 ; i < v.length ; i++ ) {
           var def = v[i];
 
+          if ( foam.String.isInstance(def) ) {
+            def = { name: def };
+          }
+
           if ( ! def.hasOwnProperty('ordinal') ) {
             def.ordinal = next++;
           } else {
             next = def.ordinal + 1;
           }
+
           if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
             v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
           }
