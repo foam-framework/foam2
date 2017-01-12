@@ -261,22 +261,32 @@ foam.CLASS({
   documentation: 'A Property type for storing enum values.',
 
   properties: [
-    { name: 'of', required: true },
+    {
+      class: 'Class',
+      name: 'of',
+      required: true,
+      assertValue: function(of) {
+        if ( ! this.lookup(of, true) ) throw 'Unknown Enum: ' + of;
+      }
+    },
     [
       'adapt',
       function(o, n, prop) {
-        if ( foam.core.AbstractEnum.isInstance(n) ) return n;
+        var of = prop.of;
 
-        var type = foam.typeOf(n);
-        var e    = this.__context__.lookup(prop.of);
+        if ( n && n.cls_ === of ) return n;
+
+        var type = foam.typeOf(n), ret;
 
         if ( type === foam.String ) {
-          return e[foam.String.constantize(n)];
+          ret = of[foam.String.constantize(n)];
+        } else if ( type === foam.Number ) {
+          ret = of.create({ordinal: n}, foam.__context__);
         }
 
-        if ( type === foam.Number ) {
-          return e.create({ordinal: n}, foam.__context__);
-        }
+        if ( ret ) return ret;
+
+        throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
     ]
   ]
