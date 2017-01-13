@@ -137,6 +137,22 @@
  * individual Enum value:
  * console.log(IssueStatus.VALUES, IssueStatus.CLOSED.VALUES);
  *
+ * Values can be specified as just Strings if you don't want to explicitly set the label
+ * or ordinal. Ex.:
+ *
+ * foam.ENUM({
+ *  name: 'DaysOfWeek',
+ *  values: [
+ *    'SUNDAY',
+ *    'MONDAY',
+ *    'TUESDAY',
+ *    'WEDNESDAY',
+ *    'THURSDAY',
+ *    'FRIDAY',
+ *    'SATURDAY'
+ *  ]
+ * });
+ *
  * </pre>
  */
 // TODO: Make extend Model so can override methods (or do some other way).
@@ -187,11 +203,16 @@ foam.CLASS({
         for ( var i = 0 ; i < v.length ; i++ ) {
           var def = v[i];
 
+          if ( foam.String.isInstance(def) ) {
+            def = { name: def };
+          }
+
           if ( ! def.hasOwnProperty('ordinal') ) {
             def.ordinal = next++;
           } else {
             next = def.ordinal + 1;
           }
+
           if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
             v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
           }
@@ -223,8 +244,23 @@ foam.CLASS({
   axioms: [
     foam.pattern.Multiton.create({property: 'ordinal'}),
     {
-      installInClass: function(cls) { cls.VALUES = []; },
-      installInProto: function(p) { p.VALUES = p.cls_.VALUES; }
+      installInClass: function(cls) {
+        // Each sub-class of AbstractEnum gets it's own VALUES array.
+        Object.defineProperty(cls, 'VALUES', {
+          get: function() {
+            return this.private_.VALUES || ( this.private_.VALUES = [] );
+          },
+          configurable: true,
+          enumerable: false
+        });
+      },
+      installInProto: function(p) {
+        Object.defineProperty(p, 'VALUES', {
+          get: function() { return this.cls_.VALUES; },
+          configurable: true,
+          enumerable: false
+        });
+      }
     }
   ],
 
@@ -261,22 +297,32 @@ foam.CLASS({
   documentation: 'A Property type for storing enum values.',
 
   properties: [
-    { name: 'of', required: true },
+    {
+      class: 'Class',
+      name: 'of',
+      required: true,
+      assertValue: function(of) {
+        if ( ! this.lookup(of, true) ) throw 'Unknown Enum: ' + of;
+      }
+    },
     [
       'adapt',
       function(o, n, prop) {
-        if ( foam.core.AbstractEnum.isInstance(n) ) return n;
+        var of = prop.of;
 
-        var type = foam.typeOf(n);
-        var e    = this.__context__.lookup(prop.of);
+        if ( n && n.cls_ === of ) return n;
+
+        var type = foam.typeOf(n), ret;
 
         if ( type === foam.String ) {
-          return e[foam.String.constantize(n)];
+          ret = of[foam.String.constantize(n)];
+        } else if ( type === foam.Number ) {
+          ret = of.create({ordinal: n}, foam.__context__);
         }
 
-        if ( type === foam.Number ) {
-          return e.create({ordinal: n}, foam.__context__);
-        }
+        if ( ret ) return ret;
+
+        throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
     ]
   ]
