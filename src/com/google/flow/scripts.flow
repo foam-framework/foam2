@@ -1383,3 +1383,665 @@ repeat(360, () => {
   });
   t.rollLeft(1);
 });
+
+
+
+// 2d to 3d, good version
+var t = turtle3d1;
+t.cs().home();
+
+repeat(36, () => {
+  repeat(36, () => {
+//    t.rt(180/36).fd(20).rt(180/36);
+    t.pitchUp(180/36).fd(20).pitchUp(180/36);
+  });
+  t.lt(10);
+});
+
+
+
+// collasium, good version
+var t = turtle3d1;
+t.cs();
+
+t.pitch = 0;
+t.home();
+t.z = 50;
+t.x = 60;
+t.y = 100;
+t.rt(-35);
+t.pw(2.5);
+t.pc('rgba(0,0,0,0.5)');
+
+function arch(height, size) {
+  t.pitchUp(90).fd(height);
+  repeat(18, () => {
+    t.fd(size/100*8).pitchDown(10);
+  });
+  t.fd(height).pitchUp(90);
+}
+
+function archRing(n, height, size) {
+  t.ss();
+  repeat(n, (i) => {
+    arch(height,size/n);
+    var a = Math.abs(1.5*180/n * Math.sin(i/n*Math.PI*2));
+    t.rt(a).fd(20*8/n);
+    t.rt(a);
+  });
+  t.rs();
+}
+
+archRing(360, 0, 800);
+archRing(14, 100/2, 800);
+t.z += 100;
+archRing(360, 0, 800);
+archRing(28, 100/2, 800);
+t.z += 80;
+archRing(360, 0, 800);
+archRing(2*28, 30, 800);
+t.z += 50;
+archRing(360, 0, 800);
+archRing(2*28, 25, 800);
+t.z += 50;
+archRing(360, 0, 800);
+
+
+var t = turtle3d1;
+
+t.cs().home().rt(-35).pw(2.5).pc('rgba(0,0,0,0.5)');
+
+t.z = 50;
+t.x = 60;
+t.y = 100;
+
+function arch(height, size) {
+  var x = t.x, y = t.y, z = t.z;
+  t.pitchUp(90).fd(height);
+  repeat(18, () => {
+    t.fd(size/100*8).pitchDown(10);
+  });
+  t.fd(height).pitchUp(90);
+  t.ss().gt(x, y, z).rs();
+}
+
+function archRing(n, height, size) {
+  t.ss();
+  repeat(n, (i) => {
+    arch(height,size/n);
+    var a = Math.abs(1.5*180/n * Math.sin(i/n*Math.PI*2));
+    t.rt(a).fd(20*8/n);
+    t.rt(a);
+  });
+  t.rs();
+}
+
+archRing(14, 100/2, 800);
+t.z += 100;
+archRing(28, 100/2, 800);
+t.z += 80;
+archRing(2*28, 30, 800);
+t.z += 50;
+archRing(2*28, 25, 800);
+t.z += 50;
+archRing(360, 0, 800);
+
+
+
+// sphere, good version
+var t = turtle3d1;
+t.cs().home();
+
+repeat(18, () => {
+  repeat(36, () => {
+    t.pitchUp(5).fd(20).pitchUp(5);
+  });
+  t.lt(10);
+});
+
+
+
+// dandylion, good version
+var t = turtle3d1;
+
+t.ht().cs().home().pw(2).pc('rgba(255,255,255,0.1');
+
+repeat(10000, () => {
+  t.ss();
+  t.rt(Math.random()*360).pitchUp(Math.random()*360);
+  t.pu().fd(100).pd().fd(80*Math.random());
+  t.rs();
+});
+
+
+
+// grid, good version
+var t = turtle3d1;
+t.cs().pw(12);
+
+function grid(f, opt_inc) {
+  var inc = opt_inc || 10;
+  for ( var y = -200 ; y <= 200 ; y += inc ) {
+    t.pu();
+    for ( var x = -200 ; x <= 200 ; x += inc ) {
+      var z = f(x,y);
+      t.pc(hsl(50,0,z*0.5+50));
+      t.gt(x,y,z);
+      t.pd();
+    }
+  }
+}
+
+grid(function(x, y) {
+  var d = Math.sqrt(x*x + y*y);
+  return 250*Math.cos(d/25)*(200-d)/200;
+}, 1);
+
+
+// 3D Fern
+var t = turtle3d1;
+
+t.cs().pc('black').home().pitchUp(90).pu().bk(200).pd().ht().pitchDown(20);
+
+function fern(t, size) {
+  if ( size < 10 ) return;
+  t.ss();
+  t.fd(size*0.1).lt(3).pitchUp(6);
+  fern(t.lt(80),  size*0.35);
+  fern(t.rt(160), size*0.35);
+  fern(t.lt(80),  size*0.85);
+  t.rs();
+}
+
+fern(t.pc('green'), 600)
+t.addReaction('zRotation', "timer.time/1000");
+
+
+
+// 3D Tree
+var t = turtle3d1;
+
+t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
+
+function tree(t, size) {
+  if ( size < 60 ) return;
+
+  t.ss();
+  t.pw(size/20);
+  t.fd(size*0.25);
+  t.rollLeft(Math.random()*180);
+  tree(t.rt(20+Math.random()*30), size*0.8);
+  tree(t.lt(50+Math.random()*30), size*0.8);
+  t.rs();
+}
+
+tree(t, 400);
+
+t.addReaction('zRotation', "timer.time/1000");
+
+
+
+
+// 3D Tree, another version
+var t = turtle3d1;
+
+t.cs().pc('black').home().pitchUp(90).pu().bk(300).pd().ht();
+
+function tree(size) {
+  if ( size < 50 ) return;
+
+  t.ss();
+  t.rollLeft(80+Math.random()*20);
+  t.pw(size/30);
+  t.fd(size*0.28);
+
+  tree(size*0.7);
+
+  t.rt(30);
+  tree(size*2/3);
+
+  t.lt(50+Math.random()*20);
+  tree(size*2/3);
+
+  t.rs();
+}
+
+tree(500);
+
+t.addReaction('zRotation', "timer.time/1000");
+
+
+
+// 3D Shell
+var t = turtle3d1;
+
+var fib = [ 1, 0, 1, 1, 2, 3, 5, 8 ];
+
+t.cs().home().pw(1).ht();
+t.pc(hsla(50, 50, 0, 0.4));
+
+t.pitchUp(90);
+
+repeat(360, (j) => {
+  t.ss();
+  repeat(4, (i) => {
+    repeat(18, (k) => {
+      t.pc(hsla(70,0,100,Math.sin(k/18*Math.PI)));
+      t.pitchDown(5).fd((fib[i]+fib[i-1]*j/360)*2).pitchDown(5);
+    });
+    t.pitchDown(180);
+  });
+  t.rs();
+  t.rollLeft(1);
+});
+
+
+
+// 3D Shell, 1.1
+var t = turtle3d1;
+
+var fib = [ 1, 0, 1, 1, 2, 3, 5, 8 ];
+
+t.cs().home().pw(1).ht().pw(6);
+
+t.pitchUp(90);
+
+repeat(360*2, (j) => {
+  j /= 2;
+  t.ss();
+  repeat(4, (i) => {
+    repeat(36, (k) => {
+      t.pc(hsla(
+        70,
+        0,
+        100*Math.sin(k/36*Math.PI),
+        Math.sin(k/36*Math.PI)/2));
+      t.pitchDown(2.5).fd((fib[i]+fib[i-1]*j/360)).pitchDown(2.5);
+    });
+    t.pitchDown(180);
+  });
+  t.rs();
+  t.rollLeft(0.5);
+});
+
+
+// 3D Shell, v2
+var t = turtle3d1;
+
+var fib = [ 1, 0, 1, 1, 2, 3, 5, 8 ];
+
+t.cs().home().pw(2).ht();
+
+t.pitchUp(100).rt(35).rollRight(-10);
+
+repeat(360/4, (j) => {
+  j*=4;
+  t.ss();
+  repeat(5, (i) => {
+    t.pw(0.4+1.5*i/4);
+    repeat(36, (k) => {
+      t.pc(hsla(70,0,100,Math.sin(k/36*Math.PI)));
+      t.pitchDown(2.5).fd(1.2*(fib[i]+fib[i-1]*j/360)).pitchDown(2.5);
+    });
+    t.pitchUp(180);
+  });
+  t.rs();
+  t.rollLeft(1*4);
+});
+
+
+
+
+// 3D Shell, v3
+var t = turtle3d1;
+
+var fib = (function() {
+  var fib_ = [ 1, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+
+  return function(i) {
+    var floor = Math.floor(i);
+    var frac  = i-floor;
+    return fib_[floor+1] + frac * fib_[floor];
+  };
+})();
+
+t.cs().home().pw(2).ht().pc('white');
+
+// t.pitchUp(90);
+
+function arc(s) {
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 5, (i) => {
+  var a = i / 34 ;
+console.log(a);
+  t.ss().pu().fd(fib(a)).pd();arc(1.2*fib(a+1));t.rs();
+  t.rt(10);
+});
+
+
+
+
+
+
+
+// 3D Jellyfish, v2
+var t = turtle3d1;
+
+var fib = (function() {
+  var fib_ = [ 1, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+
+  return function(i) {
+    var floor = Math.floor(i);
+    var frac  = i-floor;
+    return fib_[floor+1] + frac * fib_[floor];
+  };
+})();
+
+t.cs().home().pw(2.5).ht().pc('white');
+
+//t.pitchUp(45);
+t.rt(100);
+
+function arc(s) {
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 6 + 9, (i) => {
+  var a = i / 36 ;
+  t.ss().pu().fd(fib(a)).pd();arc(1.2*fib(a+1));t.rs();
+  t.rollLeft(10);
+  // t.lt(10); // instead of line above gives a snail
+});
+
+
+
+
+
+// 3D Long Shell, v2
+var t = turtle3d1;
+
+var fib = (function() {
+  var fib_ = [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+
+  return function(i) {
+    var floor = Math.floor(i);
+    var frac  = i-floor;
+    return fib_[floor] + frac * (fib_[floor+1] - fib_[floor]);
+  };
+})();
+
+t.cs().home().pw(2).ht().pc('white');
+
+//t.pitchUp(90);
+
+function arc(s) {
+  t.pitchUp(180);
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s).pitchDown(2.5);
+  });
+}
+
+t.rollLeft(90);
+
+repeat(36 * 5, (i) => {
+  var a = i / 36 ;
+  t.ss().pu();arc(1.2*fib(a));t.pd();arc(1.2*fib(a+1));t.rs();
+  t.rt(10);
+});
+
+
+
+// 3D Shell, simple version
+var t = turtle3d1;
+
+t.cs().home().pw(2).ht().pc('red');
+
+function arc(s) {
+  t.pitchUp(90);
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, .2 + 0.8*Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s/Math.PI/8).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 5, (i) => {
+  var a = i / 36;
+  t.ss().pu().fd(19*(fib(a+1)-1)).pd();
+  arc(20*fib(a));
+  t.rs().rt(10);
+//  t.rs().rollLeft(10);
+});
+
+
+
+
+// 3D Spiral Shell
+var t = turtle3d1;
+t.zRotation = -5.17;
+
+t.cs().home().pw(2).ht().pc('red');
+
+function arc(s) {
+  t.pitchUp(90);
+  repeat(36, (i) => {
+    t.pc(hsla(70,0,100, .2 + 0.8*Math.sin((i-1)/35*Math.PI)));
+    t.pitchDown(2.5).fd(s/Math.PI/8).pitchDown(2.5);
+  });
+}
+
+repeat(36 * 9, (i) => {
+  var a = i / 36;
+  t.ss().pu().fd(19*(fib(a+1)-1)).pd();
+  arc(20*fib(a));
+  t.rs().rt(10);
+  t.pitchUp(10);
+});
+
+
+
+
+// DNA
+var t = turtle3d1;
+
+t.cs().home().pw(3).ht().pc('white').pu().down(200).pd();
+
+
+t.rt(45).pitchUp(45);
+
+repeat(20, () => {
+  t.ss().pu().fd(80).pd().bk(160).rs();
+  t.pu().up(15).pd().rt(15);
+})
+
+
+
+// Tile
+var t = turtle3d1;
+
+t.home().cs().pc('white').pw(1);
+
+function circle(c) {
+  t.repeat(36, (i) => {
+    t.rt(360/36/2).fd(2);
+    if ( c && i % 9 === 0 ) { t.ss().lt(85); circle(c-1); t.rs(); }
+    t.fd(2).rt(360/36/2);
+  });
+}
+
+circle(5);
+
+
+
+
+// Cells
+var t = turtle3d1;
+
+t.home().cs().pw(1);
+
+function hex(s) {
+  repeat(6, (i) => {
+    t.fd(20).rt(360/6);
+    if ( s && i == 2 ) {
+      t.ss().lt(120);
+      hex(s-1);
+      t.rs();
+    }
+    if ( s && i == 4 ) {
+      t.ss().rt(120);
+      hex(s-1);
+      t.rs();
+    }
+  });
+}
+
+hex(5);
+
+
+
+// 3D Cells
+var t = turtle3d1;
+
+t.home().cs().pw(1).pc(hsla(0,0,0,0.2));
+
+function fd(s, w) {
+  repeat(s, () => {
+    t.fd(1).ss().pitchUp(86).fd(w).rs();
+  });
+}
+
+function hex(w, h) {
+  repeat(6, (i) => {
+    fd(12, 15);
+    t.rt(360/6);
+    if ( w && i == 2 ) {
+      t.ss().lt(120);
+      hex(w-1, h);
+      t.rs();
+    }
+    if ( h && i == 4 ) {
+      t.ss().rt(120);
+      hex(0, h-1);
+      t.rs();
+    }
+  });
+}
+
+hex(6,6);
+
+
+// 3D Christmas Tree
+var t = turtle3d1;
+
+t.cs().pc('black').pw(2).pu().home().pitchUp(90).bk(110).pd().ht();
+
+function fern(t, size) {
+  if ( size < 10 ) return;
+  t.ss();
+  t.fd(size*0.005/16).rollLeft(30+Math.random()*40);
+  t.ss().lt(80).fd((1-Math.random()/10)*size*0.1).rs();
+  fern(t, size*0.99825);
+  t.rs();
+}
+
+fern(t.pc('green'), 1900);
+
+
+t.pw(4);
+t.home().pc('red').fd(300).bk(600);
+t.home().pc('black').rt(90).fd(300).bk(600);
+t.home().pc('blue').up(300).down(600);
+
+
+// t.addReaction('zRotation', "timer.time/1000");
+t.clearReaction('zRotation');
+
+
+// 3D Dome
+var t = turtle3d1;
+
+t.home().cs().pw(2).pc('black');
+
+repeat(20, (i) => {
+  t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI/4)).fd(10).rt(90).pd();
+  repeat(18, () => {
+    t.fd(i*2).rt(20);
+  });
+  t.lt(90);
+});
+
+
+// 3D Dome, V2
+var t = turtle3d1;
+var prev = [];
+
+t.home().cs().pw(1).pc('black');
+
+repeat(20, (i) => {
+  t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI/4)).fd(10).rt(90).pd();
+  repeat(36, (j) => {
+    t.fd(i).rt(10);
+    var p = prev[j];
+    if ( p ) {
+      t.ss().gt(p[0], p[1], p[2]).rs();
+    }
+    prev[j] = [t.x, t.y, t.z];
+  });
+  t.lt(90);
+});
+
+
+
+// 3D Interactive Dome
+var t = turtle3d1;
+
+t.ht();
+
+function f() {
+  var prev = [];
+
+  t.home().cs().pw(1).pc('black');
+  repeat(20, (i) => {
+    t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI*((circle1.x-100)/100))).fd(10).rt(90).pd();
+    repeat(36, (j) => {
+      t.fd(i).rt(10);
+      var p = prev[j];
+      if ( p ) {
+        t.ss().gt(p[0], p[1], p[2]).rs();
+      }
+      prev[j] = [t.x, t.y, t.z];
+    });
+    t.lt(90);
+  });
+}
+
+circle1.x$.sub(f);
+
+
+
+// 3D thing
+var t = turtle3d1;
+var prev = [];
+
+t.home().cs().pw(1).pc('black');
+
+repeat(20, (i) => {
+  t.pu().fd(-5).down(10*Math.sin(i/20*Math.PI*4)).fd(10).rt(90).pd();
+  repeat(36, (j) => {
+    t.fd(i).rt(10);
+    var p = prev[j];
+    if ( p ) {
+      t.ss().gt(p[0], p[1], p[2]).rs();
+    }
+    prev[j] = [t.x, t.y, t.z];
+  });
+  t.lt(90);
+});

@@ -36,8 +36,6 @@ foam.core.Property.SHADOW_MAP = {
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
-
   properties: [
     {
       class: 'AxiomArray',

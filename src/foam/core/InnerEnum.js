@@ -45,8 +45,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'InnerEnum',
 
-  documentation: 'Inner-Enum Axiom',
-
   properties: [
     {
       name: 'name',

@@ -60,7 +60,9 @@ foam.CLASS({
       if ( ! d ) {
         var prefix2 = prefix + ':' + args[pos] + typeName;
         proto[prefix] = function dispatch() {
-          if ( arguments.length === pos ) return arguments.callee.code.apply(this, arguments);
+          if ( arguments.length === pos ) {
+            return arguments.callee.code.apply(this, arguments);
+          }
           var t = foam.typeOf(arguments[pos]);
           var f = t[prefix2];
           return f.apply(this, arguments);

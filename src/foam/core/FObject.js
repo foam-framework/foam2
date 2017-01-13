@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/**
+/*
   FObject is the root of FOAM's class hierarchy.
 
   We define FObject twice, first as a LIB to install all of
@@ -28,8 +28,6 @@
  */
 foam.LIB({
   name: 'foam.core.FObject',
-
-  documentation: 'Root prototype for all classes.',
 
   constants: {
     // Each class has a prototype object which is the prototype of all
@@ -50,11 +48,12 @@ foam.LIB({
   },
 
   methods: [
-    /**
-      Create a new instance of this class.
-      Configured from values taken from 'args', if supplifed.
-    */
     function create(args, opt_parent) {
+      /**
+       * Create a new instance of this class.
+       * Configured from values taken from 'args', if supplifed.
+       */
+
       var obj = Object.create(this.prototype);
 
       // Increment number of objects created of this class.
@@ -70,27 +69,27 @@ foam.LIB({
       // initArgs() is the standard argument extraction method.
       obj.initArgs(args, opt_parent);
 
-      // init(), if defined, is called when object is created.
-      // This is where class specific initialization code should
+      // init() is called when object is created.
+      // This is where class-specific initialization code should
       // be put (not in initArgs).
       obj.init();
 
       return obj;
     },
 
-    /**
-      Internal method to create a subclass of this class.
-      Is called from Model.buildClass().
-    */
     function createSubClass_() {
-      // When called this first time it just returns 'this',
-      // which is foam.core.FObject. This is so that the existing
-      // FObject LIB can be reused/extended into a class as part
-      // of the bootstrap process.
-      // When this version is first called it replaces itself with
-      // the real version (below), which is then used for all
-      // remaining non-FObject classes.
-
+      /**
+       * Used to create a sub-class of this class.  Sets up the appropriate
+       * prototype chains for the class, class.prototype and axiomMap_
+       *
+       * The very first "subClass" that we create will be FObject itself, when
+       * we define the FObject class rather than the FObject lib that we are
+       * currently defining.
+       *
+       * So instead of actually creating a subClass, we will just return "this"
+       * and replace createSubClass() on FObject to actually create real
+       * sub-classes for all subsequent uses of FObject.createSubClass()
+       */
       foam.core.FObject.createSubClass_ = function() {
         var cls = Object.create(this);
 
@@ -104,16 +103,16 @@ foam.LIB({
       return this;
     },
 
-    /**
-      Install Axioms into the class and prototype.
-      Invalidate the axiom-cache, used by getAxiomsByName().
-
-      FUTURE: Wait for first object to be created before creating prototype.
-      Currently it installs axioms into the protoype immediately, but in should
-      wait until the first object is created. This will provide
-      better startup performance.
-    */
     function installAxioms(axs) {
+      /**
+       * Install Axioms into the class and prototype.
+       * Invalidate the axiom-cache, used by getAxiomsByName().
+       *
+       * FUTURE: Wait for first object to be created before creating prototype.
+       * Currently it installs axioms into the protoype immediately, but in should
+       * wait until the first object is created. This will provide
+       * better startup performance.
+       */
       this.private_.axiomCache = {};
 
       // We install in two passes to avoid ordering issues from Axioms which
@@ -159,19 +158,21 @@ foam.LIB({
       this.prototype[cName] = this[cName] = value;
     },
 
-    /**
-      Determine if an object is an instance of this class
-      or one of its sub-classes.
-    */
     function isInstance(o) {
+      /**
+       * Determine if an object is an instance of this class
+       * or one of its sub-classes.
+       */
+
       return !! ( o && o.cls_ && this.isSubClass(o.cls_) );
     },
 
-    /**
-      Determine if a class is either this class, a sub-class, or
-      if it implements this class (directly or indirectly).
-    */
     function isSubClass(c) {
+      /**
+       * Determine if a class is either this class, a sub-class, or
+       * if it implements this class (directly or indirectly).
+       */
+
       if ( ! c || ! c.id ) return false;
 
       // Optimize most common case and avoid creating cache
@@ -189,21 +190,19 @@ foam.LIB({
       return cache[c.id];
     },
 
-    /** Find an axiom by the specified name from either this class or an ancestor. */
     function getAxiomByName(name) {
+      /**
+       * Find an axiom by the specified name from either this class or an
+       * ancestor.
+       */
       return this.axiomMap_[name];
     },
 
-    /** Find an axiom by the specified name from an ancestor. */
-    function getSuperAxiomByName(name) {
-      return this.axiomMap_.__proto__[name];
-    },
-
-    /**
-      Returns all axioms defined on this class or its parent classes
-      that are instances of the specified class.
-    */
     function getAxiomsByClass(cls) {
+      /**
+       * Returns all axioms defined on this class or its parent classes
+       * that are instances of the specified class.
+       */
       // FUTURE: Add efficient support for:
       //    .where() .orderBy() .groupBy()
       var as = this.private_.axiomCache[cls.id];
@@ -219,33 +218,49 @@ foam.LIB({
       return as;
     },
 
-    /**
-      Returns all axioms defined on this class
-      that are instances of the specified class.
-    */
+    function getSuperAxiomByName(name) {
+      /**
+       * Find an axiom by the specified name from an ancestor.
+       */
+      return this.axiomMap_.__proto__[name];
+    },
+
+    function hasOwnAxiom(name) {
+      /**
+       * Return true if an axiom named "name" is defined on this class
+       * directly, regardless of what parent classes define.
+       */
+      return Object.hasOwnProperty.call(this.axiomMap_, name);
+    },
+
     function getOwnAxiomsByClass(cls) {
+      /**
+       * Returns all axioms defined on this class that are instances of the
+       * specified class.
+       */
       return this.getAxiomsByClass(cls).filter(function(a) {
         return this.hasOwnAxiom(a.name);
       }.bind(this));
     },
 
-    /**
-      Return true if an axiom named "name" is defined on this class
-      directly, regardless of what parent classes define.
-    */
     function hasOwnAxiom(name) {
+      /**
+       * Return true if an axiom named "name" is defined on this class
+       * directly, regardless of what parent classes define.
+       */
       return Object.hasOwnProperty.call(this.axiomMap_, name);
     },
 
-    /** Returns all axioms defined on this class. */
     function getOwnAxioms() {
+      /** Returns all axioms defined on this class. */
       return this.getAxioms().filter(function(a) {
         return this.hasOwnAxiom(a.name);
       }.bind(this));
     },
 
-    /** Returns all axioms defined on this class or its parent classes. */
     function getAxioms() {
+      /** Returns all axioms defined on this class or its parent classes. */
+
       // The full axiom list is stored in the regular cache with '' as a key.
       var as = this.private_.axiomCache[''];
       if ( ! as ) {
@@ -261,28 +276,46 @@ foam.LIB({
 
     function toString() { return this.name + 'Class'; },
 
-    /**
-      Temporary Bootstrap Implementation
-
-      This is a temporary version of installModel.
-      When the bootstrap is finished, it will be replaced by a
-      version that only knows how to install axioms.
-
-      It is easier to start with hard-coded method and property
-      support because Axioms need methods to install themselves
-      and Property Axioms themselves have properties.
-
-      However, once we've bootstrapped proper Property and Method
-      Axioms, we can remove this support and just install Axioms.
-    */
     function installModel(m) {
+      /**
+       * Temporary Bootstrap Implementation
+       *
+       * This is a temporary version of installModel.
+       * When the bootstrap is finished, it will be replaced by a
+       * version that only knows how to install axioms in Boot.js phase3().
+       *
+       * It is easier to start with hard-coded method and property
+       * support because Axioms need methods to install themselves
+       * and Property Axioms themselves have properties.
+       *
+       * However, once we've bootstrapped proper Property and Method
+       * Axioms, we can remove this support and just install Axioms.
+       */
+
+
+      /*
+        Methods can be defined using two formats.
+        1. Short-form function literal:
+             function foo() {
+               console.log('bar');
+             }
+
+        3. Long-form JSON:
+             {
+               name: 'foo',
+               code: function() {
+                 console.log('bar');
+               }
+             }
+           The long-form will support many options (many of which are defined
+           in Method.js), but only 'name' and 'code' are mandatory.
+       */
       if ( m.methods ) {
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
-          if ( typeof a === 'function' ) {
+          if ( foam.Function.isInstance(a) ) {
             m.methods[i] = a = { name: a.name, code: a };
           }
-
           if ( foam.core.Method ) {
             foam.assert(a.cls_ !== foam.core.Method,
               'Method', a.name, 'on', m.name,
@@ -298,13 +331,15 @@ foam.LIB({
 
       /*
         Properties can be defined using three formats:
-        1. Short-form String: Ex.: 'firstName' or 'sex'
-        2. Medium-form Array: Ex.: [ 'firstName', 'John' ] or [ 'sex', 'Male' ]
+        1. Short-form String:  'firstName' or 'sex'
+
+        2. Medium-form Array:  [ 'firstName', 'John' ] or [ 'sex', 'Male' ]
            The first element of the array is the name and the second is the
            default value.
-        3. Long-form JSON: Ex.: [ name: 'firstName', value: 'John' ] or
-           { class: 'String', name: 'sex', value: 'Male' }
-           The long-form supports many options, but only 'name' is mandatory.
+
+        3. Long-form JSON:     { class: 'String', name: 'sex', value: 'Male' }
+           The long-form will support many options (many of which are defined
+           in Property.js), but only 'name' is mandatory.
        */
       if ( foam.core.Property && m.properties ) {
         for ( var i = 0 ; i < m.properties.length ; i++ ) {
@@ -312,15 +347,15 @@ foam.LIB({
 
           if ( Array.isArray(a) ) {
             m.properties[i] = a = { name: a[0], value: a[1] };
-          } else if ( typeof a === 'string' ) {
+          } else if ( foam.String.isInstance(a) ) {
             m.properties[i] = a = { name: a };
           }
 
           var type = foam.lookup(a.class, true) || foam.core.Property;
           foam.assert(
-              type !== a.cls_,
-              'Property', a.name, 'on', m.name,
-              'has already been upgraded to a Property.');
+            type !== a.cls_,
+            'Property', a.name, 'on', m.name,
+            'has already been upgraded to a Property.');
 
           a = type.create(a);
 
@@ -331,20 +366,13 @@ foam.LIB({
   ]
 });
 
-
-// TODO: Methods defined here, like copyFrom() and toString() don't appear
-// in describe() because they aren't added as method axioms, but as bootstrap
-// methods instead. Fix.
-
-/** The implicit base model for the model heirarchy. If you do not
- *  explicitly extend another model, FObject is used. Most models will
- *  extend FObject and inherit its methods.
+/**
+ * The implicit base class for the FOAM class hierarchy. If you do not
+ * explicitly extend another class, FObject is used.
  */
 foam.CLASS({
   package: 'foam.core',
   name: 'FObject',
-
-  documentation: 'Base model for model hierarchy.',
 
   // Effectively imports the following methods, but imports: isn't available
   // yet, so we add with 'methods:'.
@@ -352,22 +380,31 @@ foam.CLASS({
   // imports: [ 'error', 'log', 'warn' ],
 
   methods: [
-    /**
-      This is a temporary version of initArgs.
-      When the bootstrap is finished, it will be replaced by a version
-      that knows about a classes Properties, so it can do a better job.
-     */
+    function init() {
+      /**
+       * Template init() method, basic FObject this is a no-op, but classes
+       * can override this to do their own per-instance initialization
+       */
+    },
+
     function initArgs(args) {
+      /**
+       * This is a temporary version of initArgs.
+       * When the bootstrap is finished, it will be replaced by a version
+       * that knows about a classes Properties, so it can do a better job.
+       */
+
       if ( ! args ) return;
 
       for ( var key in args ) this[key] = args[key];
     },
 
-    function init() {
-      /* Template method to do on creation initialization */
-    },
-
     function hasOwnProperty(name) {
+      /**
+       * Returns true if this object is storing a value for a property
+       * named by the 'name' parameter.
+       */
+
       return ! foam.Undefined.isInstance(this.instance_[name]);
     },
 
@@ -378,32 +415,35 @@ foam.CLASS({
       return axiom.isDefaultValue(this[name]);
     },
 
-    /**
-      Undefine a Property's value.
-      The value will revert to either the Property's 'value' or
-      'expression' value, if they're defined or undefined if they aren't.
-      A propertyChange event will be fired, even if the value doesn't change.
-    */
     function clearProperty(name) {
+      /**
+       * Undefine a Property's value.
+       * The value will revert to either the Property's 'value' or
+       * 'expression' value, if they're defined or undefined if they aren't.
+       * A propertyChange event will be fired, even if the value doesn't change.
+       */
+
+      var prop = this.cls_.getAxiomByName(name);
+      foam.assert(prop && foam.core.Property.isInstance(prop),
+                    'Attempted to clear non-property', name);
+
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
-        this.instance_[name] = undefined
+        this.instance_[name] = undefined;
 
-        // Avoid creating slot and publishing event if no listeners
+        // Avoid creating slot and publishing event if nobody is listening.
         if ( this.hasListeners('propertyChange', name) ) {
           this.pub('propertyChange', name, this.slot(name));
         }
       }
     },
 
-    /**
-      Private support is used to store per-object values that are not
-      instance variables.  Things like listeners and topics.
-    */
     function setPrivate_(name, value) {
-      var p = this.private_;
-      if ( ! p ) p = this.private_ = {};
-      p[name] = value;
+      /**
+       * Private support is used to store per-object values that are not
+       * instance variables.  Things like listeners and topics.
+       */
+      ( this.private_ || ( this.private_ = {} ) )[name] = value;
       return value;
     },
 
@@ -412,22 +452,17 @@ foam.CLASS({
     },
 
     function hasOwnPrivate_(name) {
-      return this.private_ && typeof this.private_[name] !== 'undefined';
+      return this.private_ && ! foam.Undefined.isInstance(this.private_[name]);
     },
 
     function clearPrivate_(name) {
-      this.private_[name] = undefined;
-    },
-
-    function pubPropertyChange_() {
-      // NOP - to be added later
+      if ( this.private_ ) this.private_[name] = undefined;
     },
 
     function validate() {
       var as = this.cls_.getAxioms();
       for ( var i = 0 ; i < as.length ; i++ ) {
         var a = as[i];
-//        a.validate && a.validate();
         a.validateInstance && a.validateInstance(this);
       }
     },
@@ -453,49 +488,55 @@ foam.CLASS({
      * Publish and Subscribe
      ************************************************/
 
-    /**
-      This structure represents the head of a doubly-linked-list/tree of
-      listeners. It contains 'next', a pointer to the first listener,
-      and 'children', a map of sub-topic chains.
-
-      Nodes in the list contain 'next' and 'prev' links, which lets
-      removing subscriptions be done quickly by connecting next to prev
-      and prev to next.
-
-      Note that both the head structure and the nodes themselves have a
-      'next' property. This simplifies the code because there is no
-      special case for handling when the list is empty.
-
-      Listener Tree-List Structure
-      ----------------------------
-      next -> {
-        prev: <-,
-        sub: { src: <source object>, detach: <destructor function> },
-        l: <listener>,
-        next: -> <same structure>,
-        children -> {
-          subTopic1: <same structure>,
-          ...
-          subTopicn: <same structure>
-        }
-      }
-    */
     function createListenerList_() {
+      /**
+       * This structure represents the head of a doubly-linked list of
+       * listeners. It contains 'next', a pointer to the first listener,
+       * and 'children', a map of sub-topic chains.
+       *
+       * Nodes in the list contain 'next' and 'prev' links, which lets
+       * removing subscriptions be done quickly by connecting next to prev
+       * and prev to next.
+       *
+       * Note that both the head structure and the nodes themselves have a
+       * 'next' property. This simplifies the code because there is no
+       * special case for handling when the list is empty.
+       *
+       * Listener List Structure
+       * -----------------------
+       * next     -> {
+       *   prev: <-,
+       *   sub: {src: <source object>, detach: <destructor function> },
+       *   l: <listener>,
+       *   next: -> <same structure>,
+       *   children -> {
+       *     subTopic1: <same structure>,
+       *     ...
+       *     subTopicn: <same structure>
+       *   }
+       * }
+       *
+       * TODO: Move this structure to a foam.LIB, and add a benchmark
+       * to show why we are using plain javascript objects rather than
+       * modeled objects for this structure.
+    */
       return { next: null };
     },
 
-    /** Return the top-level listener list, creating if necessary. */
     function listeners_() {
+      /**
+       * Return the top-level listener list, creating if necessary.
+       */
       return this.getPrivate_('listeners') ||
         this.setPrivate_('listeners', this.createListenerList_());
     },
 
-    /**
-      Notify all of the listeners in a listener list.
-      Pass 'a' arguments to listeners.
-      Returns the number of listeners notified.
-    */
     function notify_(listeners, a) {
+      /**
+       * Notify all of the listeners in a listener list.
+       * Pass 'a' arguments to listeners.
+       * Returns the number of listeners notified.
+       */
       var count = 0;
       while ( listeners ) {
         var l = listeners.l;
@@ -529,7 +570,10 @@ foam.CLASS({
     },
 
     function hasListeners(/* args */) {
-      /** Return true iff there are listeners for the supplied message. **/
+      /**
+       * Return true iff there are listeners for the supplied message.
+       */
+
       var listeners = this.getPrivate_('listeners');
 
       for ( var i = 0 ; listeners ; i++ ) {
@@ -541,44 +585,44 @@ foam.CLASS({
       return false;
     },
 
-    /**
-      Publish a message to all matching sub()'ed listeners.
+    function pub(a1, a2, a3, a4, a5, a6, a7, a8) {
+      /**
+       * Publish a message to all matching sub()'ed listeners.
+       *
+       * All sub()'ed listeners whose specified pattern match the
+       * pub()'ed arguments will be notified.
+       * Ex.
+       * <pre>
+       *   var obj  = foam.core.FObject.create();
+       *   var sub1 = obj.sub(               function(a,b,c) { console.log(a,b,c); });
+       *   var sub2 = obj.sub('alarm',       function(a,b,c) { console.log(a,b,c); });
+       *   var sub3 = obj.sub('alarm', 'on', function(a,b,c) { console.log(a,b,c); });
+       *
+       *   obj.pub('alarm', 'on');  // notifies sub1, sub2 and sub3
+       *   obj.pub('alarm', 'off'); // notifies sub1 and sub2
+       *   obj.pub();               // only notifies sub1
+       *   obj.pub('foobar');       // only notifies sub1
+       * </pre>
+       *
+       * Note how FObjects can be used as generic pub/subs.
+       *
+       * Returns the number of listeners notified.
+       */
 
-      All sub()'ed listeners whose specified pattern match the
-      pub()'ed arguments will be notified.
-      Ex.
-<pre>
-  var obj  = foam.core.FObject.create();
-  var sub1 = obj.sub(               function(a,b,c) { console.log(a,b,c); });
-  var sub2 = obj.sub('alarm',       function(a,b,c) { console.log(a,b,c); });
-  var sub3 = obj.sub('alarm', 'on', function(a,b,c) { console.log(a,b,c); });
-
-  obj.pub('alarm', 'on');  // notifies sub1, sub2 and sub3
-  obj.pub('alarm', 'off'); // notifies sub1 and sub2
-  obj.pub();               // only notifies sub1
-  obj.pub('foobar');       // only notifies sub1
-</pre>
-
-      Note how FObjects can be used as generic pub/subs.
-
-      Returns the number of listeners notified.
-    */
-    function pub(a1, a2, a3, a4, a5, a6, a7, a8, a9) {
       // This method prevents this function not being JIT-ed because
       // of the use of 'arguments'. Doesn't generate any garbage ([]'s
       // don't appear to be garbage in V8).
       // FUTURE: benchmark
       switch ( arguments.length ) {
         case 0:  return this.pub_([]);
-        case 1:  return this.pub_([a1]);
-        case 2:  return this.pub_([a1, a2]);
-        case 3:  return this.pub_([a1, a2, a3]);
-        case 4:  return this.pub_([a1, a2, a3, a4]);
-        case 5:  return this.pub_([a1, a2, a3, a4, a5]);
-        case 6:  return this.pub_([a1, a2, a3, a4, a5, a6]);
-        case 7:  return this.pub_([a1, a2, a3, a4, a5, a6, a7]);
-        case 8:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8]);
-        case 9:  return this.pub_([a1, a2, a3, a4, a5, a6, a7, a8, a9]);
+        case 1:  return this.pub_([ a1 ]);
+        case 2:  return this.pub_([ a1, a2 ]);
+        case 3:  return this.pub_([ a1, a2, a3 ]);
+        case 4:  return this.pub_([ a1, a2, a3, a4 ]);
+        case 5:  return this.pub_([ a1, a2, a3, a4, a5 ]);
+        case 6:  return this.pub_([ a1, a2, a3, a4, a5, a6 ]);
+        case 7:  return this.pub_([ a1, a2, a3, a4, a5, a6, a7 ]);
+        case 8:  return this.pub_([ a1, a2, a3, a4, a5, a6, a7, a8 ]);
         default: return this.pub_(arguments);
       }
     },
@@ -604,32 +648,34 @@ foam.CLASS({
       return count;
     },
 
-    /**
-      Subscribe to pub()'ed events.
-      args - zero or more values which specify the pattern of pub()'ed
-             events to match.
-      <p>For example:
-<pre>
-   sub('propertyChange', l) will match:
-   pub('propertyChange', 'age', 18, 19), but not:
-   pub('stateChange', 'active');
-</pre>
-      <p>sub(l) will match all events.
-      l - the listener to call with notifications.
-       <p> The first argument supplied to the listener is the "subscription",
-        which contains the "src" of the event and a detach() method for
-        cancelling the subscription.
-      <p>Returns a "subscrition" which can be cancelled by calling
-        its .detach() method.
-    */
     function sub() { /* args..., l */
-      var l = arguments[arguments.length-1];
+      /**
+       * Subscribe to pub()'ed events.
+       * args - zero or more values which specify the pattern of pub()'ed
+       * events to match.
+       * <p>For example:
+       * <pre>
+       *   sub('propertyChange', l) will match:
+       *   pub('propertyChange', 'age', 18, 19), but not:
+       *   pub('stateChange', 'active');
+       * </pre>
+       * <p>sub(l) will match all events.
+       *   l - the listener to call with notifications.
+       * <p> The first argument supplied to the listener is the "subscription",
+       *   which contains the "src" of the event and a detach() method for
+       *   cancelling the subscription.
+       * <p>Returns a "subscrition" which can be cancelled by calling
+       *   its .detach() method.
+       */
 
-      foam.assert(typeof l === 'function', 'Listener must be a function');
+      var l = arguments[arguments.length - 1];
+
+      foam.assert(foam.Function.isInstance(l),
+          'Listener must be a function');
 
       var listeners = this.listeners_();
 
-      for ( var i = 0 ; i < arguments.length-1 ; i++ ) {
+      for ( var i = 0 ; i < arguments.length - 1 ; i++ ) {
         var children = listeners.children || ( listeners.children = {} );
         listeners = children[arguments[i]] ||
             ( children[arguments[i]] = this.createListenerList_() );
@@ -655,8 +701,11 @@ foam.CLASS({
       return node.sub;
     },
 
-    /** Publish to this.propertyChange topic if oldValue and newValue are different. */
     function pubPropertyChange_(prop, oldValue, newValue) {
+      /**
+       * Publish to this.propertyChange topic if oldValue and newValue are
+       * different.
+       */
       if ( Object.is(oldValue, newValue) ) return;
       if ( ! this.hasListeners('propertyChange', prop.name) ) return;
 
@@ -665,22 +714,25 @@ foam.CLASS({
       this.pub('propertyChange', prop.name, slot);
     },
 
-    /**
-      Creates a Slot for an Axiom.
-    */
     function slot(obj) {
+      /**
+       * Creates a Slot for an Axiom.
+       */
       if ( typeof obj === 'function' ) {
         return foam.core.ExpressionSlot.create(
-          arguments.length == 1 ?
-            { code: obj, obj: this } :
-            { code: obj, obj: this, args: Array.prototype.slice.call(arguments, 1) }
-        );
+            arguments.length === 1 ?
+                { code: obj, obj: this } :
+                {
+                  code: obj,
+                  obj: this,
+                  args: Array.prototype.slice.call(arguments, 1)
+                });
       }
 
       var axiom = this.cls_.getAxiomByName(obj);
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
-      foam.assert(axiom.toSlot, 'Called slot() on unslotable axiom:', obj);
+      foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
       return axiom.toSlot(this);
     },
@@ -691,23 +743,32 @@ foam.CLASS({
      ************************************************/
 
     function onDetach(d) {
-      /*
-        Register a function or a detachable to be called
-        when this object is detached.
-      */
+      /**
+       * Register a function or a detachable to be called when this object is
+       * detached.
+       *
+       * A detachable is any object with a detach() method.
+       *
+       * Does nothing is the argument is falsy.
+       *
+       * Returns the input object, which can be useful for chaining.
+       */
+      foam.assert(! d || foam.Function.isInstance(d.detach) ||
+          foam.Function.isInstance(d),
+          'Argument to onDetach() must be callable or detachable.');
       if ( d ) this.sub('detach', d.detach ? d.detach.bind(d) : d);
       return d;
     },
 
     function detach() {
-      /*
-        Detach this object.
-        Free any referenced objects and detach any registered detachables.
+      /**
+       * Detach this object. Free any referenced objects and destory
+       * any registered detroyables.
        */
       if ( this.instance_.detaching_ ) return;
 
       // Record that we're currently detaching this object,
-      // to prevent infitine recursion.
+      // to prevent infinite recursion.
       this.instance_.detaching_ = true;
       this.pub('detach');
       this.instance_.detaching_ = false;
@@ -799,8 +860,8 @@ foam.CLASS({
       return hash;
     },
 
-    /** Create a deep copy of this object. **/
     function clone(opt_X) {
+      /** Create a deep copy of this object. **/
       var m = {};
       for ( var key in this.instance_ ) {
         var value = this[key];

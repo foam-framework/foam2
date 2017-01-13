@@ -286,3 +286,142 @@ foam.CLASS({
   properties: ['f1']
 });
 console.log('2: ', RefTest.create());
+
+
+
+console.log('-------------');
+
+foam.ENUM2({
+  name: 'IssueStatus',
+
+  // Enums share many features with regular classes, the properties
+  // and methods we want our enums to have are defined as follows.
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'consideredOpen',
+      value: true
+    }
+  ],
+
+  methods: [
+    function foo() {
+      return this.label + ( this.consideredOpen ? ' is' : ' is not' ) +
+          ' considered open.';
+    }
+  ],
+
+  // Use the values: key to define the actual Enum Values that we
+  // want to exist.
+  values: [
+    {
+      name: 'OPEN'
+    },
+    {
+      // The ordinal can be specified explicitly.
+      name: 'CLOSED',
+      ordinal: 100
+    },
+    {
+      // If the ordinal isn't given explicitly it is auto assigned as
+      // the previous ordinal + 1
+      name: 'ASSIGNED'
+    },
+    {
+      // You can specify the label, which will be used when rendering in a
+      // combo box or similar
+      name: 'UNVERIFIED',
+      label: 'Unverified'
+    },
+    {
+      // Values for additional properties to your enum are also defined
+      // inline.
+      name: 'FIXED',
+      label: 'Fixed',
+      consideredOpen: false
+    }
+  ]
+});
+
+console.log('open', IssueStatus.OPEN.name); // outputs "OPEN"
+console.log(true, IssueStatus.ASSIGNED.consideredOpen); // outputs "true"
+
+// Enum value ordinals can be specified.
+console.log(100, IssueStatus.CLOSED.ordinal); // outputs 100
+// values without specified ordinals get auto assigned.
+console.log(101, IssueStatus.ASSIGNED.ordinal); // outputs 101
+
+// Methods can be called on the enum values.
+// outputs "Fixed is not considered open."
+console.log(IssueStatus.FIXED.foo());
+
+// To store enums on a class, it is recommended to use the Enum property
+// type.
+foam.CLASS({
+  name: 'Issue',
+  properties: [
+    {
+      class: 'Enum2',
+      of: 'IssueStatus',
+      name: 'status'
+    }
+  ]
+});
+
+
+var issue = Issue.create({ status: IssueStatus.UNVERIFIED });
+console.log('unverified: ', issue.status, issue.status.cls_.id, 'label: ', issue.status.label); // outputs "Unverified"
+
+// Enum properties give you some convenient adapting.
+// You can set the property to the ordinal or the
+// name of an enum, and it will set the property
+// to the correct Enum value.
+
+issue.status = 100;
+
+console.log(true, issue.status === IssueStatus.CLOSED); // is true
+
+// Enum properties also allow you to assign them via the name
+// of the enum.
+
+issue.status = "ASSIGNED"
+console.log(true, issue.status === IssueStatus.ASSIGNED); // is true
+
+console.log(IssueStatus.VALUES, IssueStatus.CLOSED.VALUES);
+
+
+
+
+foam.CLASS({
+  name: 'DateTimeTest',
+  properties: [
+    'id',
+    {
+      class: 'Date',
+      name: 'date'
+    },
+    {
+      class: 'DateTime',
+      name: 'dateTime'
+    }
+  ]
+});
+
+var dt = DateTimeTest.create();
+foam.u2.DetailView.create({data: dt}).write();
+foam.u2.DetailView.create({data: dt}).write();
+
+foam.ENUM2({
+  name: 'DaysOfWeek',
+  values: [
+    'SUNDAY',
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY'
+  ]
+});
+
+console.log(DaysOfWeek.VALUES);

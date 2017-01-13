@@ -45,6 +45,7 @@ require("../../src/foam.js");
 
 var modelComments = {};
 
+/** Returns the content of the named property of the given node */
 var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   if ( node.properties ) {
     for ( var i = 0; i < node.properties.length; ++i ) {
@@ -60,6 +61,7 @@ var getNodePropertyNamed = function getNodePropertyNamed(node, propName) {
   return '';
 };
 
+/** Finds the subnode of the named property of the given node  */
 var getNodeNamed = function getNodeNamed(node, propName) {
   if ( node.properties ) {
     for ( var i = 0; i < node.properties.length; ++i ) {
@@ -72,30 +74,38 @@ var getNodeNamed = function getNodeNamed(node, propName) {
   return '';
 };
 
-
+/** Looks up the AST to find a leading comment ahead of the
+  given node. */
 var getLeadingComment = function getLeadingComment(node) {
   // climb up the tree and look for a docs comment
+  var foundComment = '';
+
   if ( node.leadingComments ) {
-    return node.leadingComments[0].raw;
-  }
-  if ( node.parent ) {
+    foundComment = node.leadingComments[0].raw;
+  } else if ( node.parent ) {
     if ( node.parent.leadingComments ) {
-      return node.parent.leadingComments[0].raw;
-    }
-    if ( node.parent.callee ) {
+      foundComment = node.parent.leadingComments[0].raw;
+    } else if ( node.parent.callee ) {
       if ( node.parent.callee.leadingComments ) {
-        return node.parent.callee.leadingComments[0].raw;
-      }
-      if ( node.parent.callee.parent ) {
+        foundComment = node.parent.callee.leadingComments[0].raw;
+      } else if ( node.parent.callee.parent ) {
         if ( node.parent.callee.parent.leadingComments ) {
-          return node.parent.callee.parent.leadingComments[0].raw;
+          foundComment = node.parent.callee.parent.leadingComments[0].raw;
         }
       }
     }
   }
-  return '';
+
+  // ignore license headers
+  if ( foundComment.indexOf('@license') >= 0 ) {
+    foundComment = '';
+  }
+
+  return foundComment;
 };
 
+/** Loads the source for a function node and finds a body comment
+  inside, if any. */
 var getFuncBodyComment = function getFuncBodyComment(node, filename) {
   // try to pull a comment from the function body
   var src = getSourceString(filename, node.range[0], node.range[1]);
@@ -115,6 +125,8 @@ var getFuncBodyComment = function getFuncBodyComment(node, filename) {
   }
 };
 
+/** Looks for a comment for the given node in a variety
+  of poential styles. Warns if more than one found. */
 var getComment = function getComment(node, filename) {
   var propComment;
   var bodyComment;
@@ -161,6 +173,7 @@ var getComment = function getComment(node, filename) {
   return propComment || bodyComment || objComment || leadingComment;
 };
 
+/** Gets the type of the definition, either: CLASS, LIB, ENUM, or INTERFACE */
 var getDefinitionType = function getDefinitionType(node) {
   if ( node.type === 'ObjectExpression' &&
       node.parent && node.parent.type === 'CallExpression' &&
@@ -173,6 +186,8 @@ var getDefinitionType = function getDefinitionType(node) {
   return '';
 };
 
+/** gets the package of a FOAM class
+  given the node of the CLASS call */
 var getCLASSPackage = function getCLASSPackage(node) {
 
   var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
@@ -188,6 +203,8 @@ var getCLASSPackage = function getCLASSPackage(node) {
   return pkg;
 };
 
+/** gets the name from a FOAM class
+  given the node of the CLASS call */
 var getCLASSName = function getCLASSName(node) {
   var name = getNodePropertyNamed(node, 'name');
   var pkg = getCLASSPackage(node);
@@ -213,6 +230,8 @@ var getCLASSName = function getCLASSName(node) {
   return ( pkg ? 'module:' + pkg + '.' : '' ) + name;
 };
 
+/** gets the JSDoc compatible module path from a FOAM package
+  given the node of the CLASS call and class name */
 var getCLASSPath = function getCLASSPath(node, name) {
   var ext = getNodePropertyNamed(node, name);
   if ( ext ) {
@@ -228,11 +247,14 @@ var getCLASSPath = function getCLASSPath(node, name) {
   return ext;
 };
 
+/** Adds a tag into the end of a comment */
 var insertIntoComment = function insertIntoComment(comment, tag) {
   var idx = comment.lastIndexOf('*/');
   return comment.slice(0, idx) + ' ' + tag + ' ' + comment.slice(idx);
 };
 
+/** Replaces an @arg/@param in a function comment with the given
+  type and docs, or adds it if not present. */
 var replaceCommentArg = function replaceCommentArg(
     comment, name, type, optional, repeats, docs
   ) {
@@ -256,6 +278,9 @@ var replaceCommentArg = function replaceCommentArg(
 };
 
 
+/** Loads a source file and extracts the given substring from it.
+  Used to load comments that may have been stripped from the AST
+  and get functions in their original text form. */
 var files = {};
 var getSourceString = function getSourceString(filename, start, end) {
   // Load the given file and find the original unparsed source
@@ -270,17 +295,26 @@ var getSourceString = function getSourceString(filename, start, end) {
   // HACK to support memoize1'd function bodies
   if ( ! source.startsWith('function') ) {
     // assume anything not starting with function must have a wrapper around it
-    source = source.substring(source.indexOf('(') + 1, source.lastIndexOf(')'));
+    source = source
+      .substring(source.indexOf('(') + 1, source.lastIndexOf(')'))
+      .trim();
+    if ( ! source.startsWith('function') ) {
+      // try again, fail if no function
+      // NOTE: mmethod trips this case
+      return 'function(){}';
+    }
   }
   return source;
 };
 
+/** Extracts argument types from a function, pulling the original
+  code from the source file */
 var processArgs = function processArgs(e, node) {
   // extract arg types using FOAM
   if ( ! node ) return;
   var src = getSourceString(e.filename, node.range[0], node.range[1]);
   try {
-    var args = foam.Function.args(src);
+    var args = foam.Function.args(eval('(' + src + ')'));
     for ( var i = 0; i < args.length; ++i ) {
       var arg = args[i];
       if ( arg.typeName ) {
@@ -293,6 +327,24 @@ var processArgs = function processArgs(e, node) {
   }
 };
 
+/** For a Method declaration, axtracts arguments from the 'args' node,
+  which should be an array */
+var processExplicitArgs = function processExplicitArgs(e, node) {
+  if ( ! node ) return;
+
+  node.elements.forEach(function(elementNode) {
+    e.comment = replaceCommentArg(
+      e.comment,
+      getNodePropertyNamed(elementNode, 'name'),
+      getNodePropertyNamed(elementNode, 'typeName'),
+      !! getNodePropertyNamed(elementNode, 'optional'),
+      !! getNodePropertyNamed(elementNode, 'repeats'),
+      getComment(elementNode, e.filename)
+    );
+  });
+};
+
+/** gets an array of 'implements' entries from a class node */
 var getImplements = function getImplements(node) {
   var ret = [];
   var nodes = getNodePropertyNamed(node, 'implements');
@@ -302,7 +354,7 @@ var getImplements = function getImplements(node) {
   return ret;
 };
 
-// Looks up existing results (already had their comment processed)
+/** Looks up existing results (already had their comment processed) */
 var getResult = function getResult(parser, longname) {
   // also update .description on a result, to change the output text.
   if ( ! parser._resultBuffer ) return null;
@@ -314,6 +366,7 @@ var getResult = function getResult(parser, longname) {
   return null;
 };
 
+/** Ensures the given package name has one JSDoc module created for it. */
 var checkForPackageModule = function checkForPackageModule(parser, pkg) {
 
   if ( ! pkg ) return;
@@ -332,6 +385,8 @@ var checkForPackageModule = function checkForPackageModule(parser, pkg) {
   }
 };
 
+/** returns true if the given array property name contains methods
+  when found in a class */
 var isMethod = function isMethod(containerName) {
   return containerName === 'methods' || containerName === 'listeners';
 };
@@ -514,6 +569,7 @@ exports.astNodeVisitor = {
 
       if ( node.parent.parent.key.name === 'methods' ) {
         processArgs(e, getNodeNamed(node, 'code'));
+        processExplicitArgs(e, getNodeNamed(node, 'args'));
       }
     }
   }
