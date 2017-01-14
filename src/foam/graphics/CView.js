@@ -159,6 +159,10 @@ foam.CLASS({
       if ( ! a ) return;
       this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
       return this;
+    },
+
+    function rotateAround(a, x, y) {
+      return this.translate(-x, -y).rotate(a).translate(x, y);
     }
   ]
 });
