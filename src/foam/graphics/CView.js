@@ -150,6 +150,7 @@ foam.CLASS({
     },
 
     function scale(x, y) {
+      if ( y === undefined ) y = x;
       if ( x === 1 && y === 1 ) return;
       this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
       return this;
@@ -556,14 +557,14 @@ foam.CLASS({
     {
       name: 'transform',
       hidden: 'true',
-      getter: function getTransform() {
+      expression: function getTransform(x, originX, y, originY, rotation, skewX, skewY, scaleX, scaleY) {
         var t = this.transform_.reset();
 
-        t.translate(this.x+this.originX, this.y+this.originY);
-        t.rotate(this.rotation);
-        t.skew(this.skewX, this.skewY);
-        t.scale(this.scaleX, this.scaleY);
-        t.translate(-this.originX, -this.originY);
+        t.translate(x+originX, y+originY);
+        t.rotate(rotation);
+        t.skew(skewX, skewY);
+        t.scale(scaleX, scaleY);
+        t.translate(-originX, -originY);
 
         return t;
       }
