@@ -63,9 +63,9 @@ foam.CLASS({
   exports: [ 'maxLvl' ],
 
   properties: [
-    { name: 'heightFactor', value: 0.55 },
-    { name: 'lean',         value: 0 },
-    { name: 'maxLvl',       factory: function() {
+    [ 'heightFactor', 0.55 ],
+    [ 'lean', 0 ],
+    { name: 'maxLvl', factory: function() {
       // Firefox has a bug which causes it to crash when svg is too deeply
       // nested, so dial it back to 9 on Firefox until fixed.
       //
@@ -98,8 +98,8 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var heightFactor = this.heightFactor, lean = this.lean;
-        var a = Math.atan2(heightFactor, .5+lean);
-        var b = Math.atan2(heightFactor, .5-lean);
+        var a      = Math.atan2(heightFactor,    .5+lean);
+        var b      = Math.atan2(heightFactor,    .5-lean);
         var lScale = this.distance(heightFactor, .5+lean);
         var rScale = this.distance(heightFactor, .5-lean);
 
