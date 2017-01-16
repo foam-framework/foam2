@@ -924,7 +924,12 @@ foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
-    ['javaType', 'Object'],
+    {
+      name: 'javaType',
+      expression: function(props) {
+        return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
+      }
+    },
     ['javaJSONParser', 'foam.lib.parse.Fail'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ],
@@ -1005,7 +1010,7 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-      if ( this.hasDefaultValue('javaJSONParser') ) {
+      if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
         var of = this.of === 'FObject' ? 'foam.core.FObject' : this.of;
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
