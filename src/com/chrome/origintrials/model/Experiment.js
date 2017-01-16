@@ -27,15 +27,27 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'owner'
+    },
+    {
+      class: 'Boolean',
+      name: 'active'
+    }
+  ],
+  actions: [
+    {
+      name: 'cancel',
+      code: function() {
+      }
+    },
+    {
+      name: 'revokeAllKeys',
+      code: function() {
+      }
+    },
+    {
+      name: 'suspend',
+      code: function() {
+      }
     }
   ]
-});
-
-
-foam.RELATIONSHIP({
-  forwardName: 'experiment',
-  cardinality: '*:1',
-  sourceModel: 'com.chrome.origintrials.model.Application',
-  targetModel: 'com.chrome.origintrials.model.Experiment',
-  oneWay: true
 });
