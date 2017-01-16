@@ -26,9 +26,9 @@ foam.CLASS({
   imports: [ 'lTransform', 'rTransform', 'maxLvl' ],
 
   properties: [
-    [ 'width', 1 ],
+    [ 'width',  1 ],
     [ 'height', 1 ],
-    [ 'borderWidth', 0 ],
+    [ 'border', null ],
     { name: 'color', factory: function() { return this.fillColor(this.lvl); } },
     'lvl'
   ],
