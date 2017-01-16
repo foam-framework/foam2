@@ -5,4 +5,5 @@ Ported from: https://swizec.com/blog/animating-svg-nodes-react-preact-inferno-vu
 There are two versions: one which uses SVG and one which uses Canvas.
 
 Live Demo (SVG): http://codepen.io/kgr/full/XpXqOm/
+
 Live Demo (Canvas): http://codepen.io/kgr/full/VPKNdZ/
