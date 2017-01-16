@@ -95,7 +95,7 @@ describe('Enum tests', function() {
     expect(todo.status.isOpen).toBe(false);
 
 
-    var values = TodoStatus.getValues();
+    var values = TodoStatus.VALUES;
     expect(values[0]).toBe(TodoStatus.OPEN);
     expect(values[1]).toBe(TodoStatus.CLOSED);
     expect(values[2]).toBe(TodoStatus.ASSIGNED);
