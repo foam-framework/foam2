@@ -140,21 +140,30 @@ foam.CLASS({
     function translate(dx, dy) {
       if ( ! dx && ! dy ) return;
       this.mul(1, 0, dx, 0, 1, dy, 0, 0, 1);
+      return this;
     },
 
     function skew(x, y) {
       if ( ! x && ! y ) return;
       this.mul(1, x, 0, y, 1, 0, 0, 0, 1);
+      return this;
     },
 
     function scale(x, y) {
+      if ( y === undefined ) y = x;
       if ( x === 1 && y === 1 ) return;
       this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
+      return this;
     },
 
     function rotate(a) {
       if ( ! a ) return;
       this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
+      return this;
+    },
+
+    function rotateAround(a, x, y) {
+      return this.translate(-x, -y).rotate(a).translate(x, y);
     }
   ]
 });
@@ -548,14 +557,14 @@ foam.CLASS({
     {
       name: 'transform',
       hidden: 'true',
-      getter: function getTransform() {
+      expression: function getTransform(x, originX, y, originY, rotation, skewX, skewY, scaleX, scaleY) {
         var t = this.transform_.reset();
 
-        t.translate(this.x+this.originX, this.y+this.originY);
-        t.rotate(this.rotation);
-        t.skew(this.skewX, this.skewY);
-        t.scale(this.scaleX, this.scaleY);
-        t.translate(-this.originX, -this.originY);
+        t.translate(x+originX, y+originY);
+        t.rotate(rotation);
+        t.skew(skewX, skewY);
+        t.scale(scaleX, scaleY);
+        t.translate(-originX, -originY);
 
         return t;
       }
