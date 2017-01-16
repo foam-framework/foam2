@@ -74,7 +74,7 @@ foam.CLASS({
       }
       return ret;
     },
-    
+
     function toString() {
       return 'Alt([' + (this.delegates.join(',')) + '])';
     },
@@ -110,7 +110,7 @@ foam.CLASS({
         // ensure all tails are using the same factory instance
         index = dfmap[indexKey];
       }
-      
+
       var newSubInst = index.createNode();
       this.delegates[0].plan(newSubInst).execute([], newSubInst);
       this.delegates.push(newSubInst);
@@ -125,12 +125,12 @@ foam.CLASS({
     function get(key) {
       return this.delegates[0].get(key);
     },
-    
-    function getAltForOrderDirs(order, cache) {
+
+    function pickDelegate(order, cache) {
       // NOTE: this assumes one of the delegates is capable of ordering
       //  properly for a scan. We should not be asked for a select unless
       //  a previous estimate indicated one of our options was sorted properly.
-      // NOTE: unbuilt portions of the index will be built immediately 
+      // NOTE: unbuilt portions of the index will be built immediately
       //  if picked for ordering.
       var delegates = this.delegates;
       if ( ! order ) return delegates[0];
@@ -171,7 +171,7 @@ foam.CLASS({
 
     function select(sink, skip, limit, order, predicate, cache) {
       // find and cache the correct subindex to use
-      this.getAltForOrderDirs(order, cache)
+      this.pickDelegate(order, cache)
         .select(sink, skip, limit, order, predicate, cache);
     },
 
