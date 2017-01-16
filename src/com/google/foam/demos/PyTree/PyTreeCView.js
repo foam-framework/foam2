@@ -56,7 +56,7 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'PyTreeCView',
-  extends: 'foam.graphics.CView',
+  extends: 'foam.graphics.Box',
 
   requires: [ 'PyBranch', 'foam.graphics.Transform' ],
 
@@ -66,8 +66,10 @@ foam.CLASS({
     [ 'heightFactor', 0.55 ],
     [ 'lean', 0 ],
     [ 'maxLvl', 11 ],
-    [ 'width', 1600 ],
+    [ 'width', 1200 ],
     [ 'height', 600 ],
+    [ 'border', 'lightgray' ],
+    [ 'borderWidth', 1 ],
     'lTransform',
     'rTransform'
   ],
