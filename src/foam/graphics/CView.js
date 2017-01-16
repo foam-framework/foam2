@@ -28,7 +28,13 @@ foam.CLASS({
     { class: 'Simple', name: 'f' },
     { class: 'Simple', name: 'g' },
     { class: 'Simple', name: 'h' },
-    { class: 'Simple', name: 'i' }
+    { class: 'Simple', name: 'i' },
+    {
+      name: 'inverse_',
+      factory: function() {
+        return this.cls_.create();
+      }
+    }
   ],
 
   methods: [
@@ -108,19 +114,21 @@ foam.CLASS({
       var det = ta*(te*ti  - tf*th) - tb*(td*ti - tf*tg) + tc*(td*th-te*tg);
       var detinv = 1 / det;
 
-      this.a = detinv * (te*ti - tf*th);
-      this.b = detinv * (tc*th - tb*ti);
-      this.c = detinv * (tb*tf - tc*te);
+      var inv = this.inverse_;
 
-      this.d = detinv * (tf*tg - td*ti);
-      this.e = detinv * (ta*ti - tc*tg);
-      this.f = detinv * (tc*td - ta*tf);
+      inv.a = detinv * (te*ti - tf*th);
+      inv.b = detinv * (tc*th - tb*ti);
+      inv.c = detinv * (tb*tf - tc*te);
 
-      this.g = detinv * (td*th - te*tg);
-      this.h = detinv * (tb*tg - ta*th);
-      this.i = detinv * (ta*te - tb*td);
+      inv.d = detinv * (tf*tg - td*ti);
+      inv.e = detinv * (ta*ti - tc*tg);
+      inv.f = detinv * (tc*td - ta*tf);
 
-      return this;
+      inv.g = detinv * (td*th - te*tg);
+      inv.h = detinv * (tb*tg - ta*th);
+      inv.i = detinv * (ta*te - tb*td);
+
+      return inv;
     },
 
     function det() {
