@@ -179,7 +179,7 @@ foam.CLASS({
     function installInClass(cls) {
       var e = cls.create(this.definition);
       cls.installConstant(this.name, e);
-      cls.VALUES[this.name] = e;
+      cls.VALUES.push(e);
     }
   ]
 });
