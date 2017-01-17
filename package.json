@@ -1,6 +1,7 @@
 {
-  "name": "vjlofvhjfgm",
+  "name": "foam2-experimental",
   "version": "0.0.1",
+  "main": "src/foam.js",
   "devDependencies": {
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
