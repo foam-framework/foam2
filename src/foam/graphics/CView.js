@@ -31,9 +31,9 @@ foam.CLASS({
     { class: 'Simple', name: 'i' },
     {
       name: 'inverse_',
-      factory: function() {
-        return this.cls_.create();
-      }
+      factory: function() { return this.cls_.create(); },
+      // Exclude from compareTo()
+      compare: function() { return 0; }
     }
   ],
 
