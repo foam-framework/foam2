@@ -934,23 +934,33 @@ foam.CLASS({
     function hitTest(p) {
       // There is probably a better way to do this.
       // This checks if the given point is
-      var abx = this.endX - this.startX;
-      var aby = this.endY - this.startY;
-      var abl = Math.sqrt(abx * abx + aby * aby);
 
-      var apx = p.x - this.startX;
-      var apy = p.y - this.startY;
-      var apl = Math.sqrt(apx * apx + apy * apy);
+      // A is the vector from the start of the line to point p
+      var ax = p.x - this.startX;
+      var ay = p.y - this.startY;
 
-      var asl = ( abx * apx + aby * apy ) / abl;
-      var asx = abx / abl * asl;
-      var asy = aby / abl * asl;
+      // B a vector representing the line (from start to end).
+      var bx = this.endX - this.startX;
+      var by = this.endY - this.startY;
+      var blen = Math.sqrt(bx * bx + by * by);
 
-      var psx = asx - apx;
-      var psy = asy - apy;
-      var d = Math.sqrt(psx * psx + psy * psy);
+      // Project A onto B
+      var scalarProj = (ax * bx + ay * by ) / blen;
+      var factor = scalarProj / blen;
+      var projX = bx * factor;
+      var projY = by * factor;
 
-      if ( d < 5 ) return true;
+      // Calculate vector rejection "perpendicular distance"
+      var rejX = ax - projX;
+      var rejY = ay - projY;
+
+      // Hit's if the perpendicular distance is less than some factor,
+      // and the point is within some factor of the line start/finish
+
+      var distance = Math.sqrt(rejX * rejX + rejY * rejY);
+      var pos = scalarProj;
+
+      return distance < 5 && pos > -5 && pos < (blen + 5)
 
       return false;
     }
