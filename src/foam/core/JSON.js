@@ -323,8 +323,15 @@ foam.CLASS({
             o.outputJSON(this)
           } else {
             this.start('{');
+            var keys = [];
+            var key;
+            for ( key in o ) {
+              keys.push(key);
+            }
+            keys.sort();
             var first = true;
-            for ( var key in o ) {
+            for ( var i = 0 ; i < keys.length; i++ ) {
+              key = keys[i];
               if ( ! first ) this.out(',').nl();
               this.indent().out(this.maybeEscapeKey(key), ':').output(o[key]);
               first = false;
