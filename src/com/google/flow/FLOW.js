@@ -337,6 +337,7 @@ foam.CLASS({
           daoType: 'ARRAY'
         });
         dao.put(com.google.flow.Select.model_);
+        dao.put(com.google.flow.Line.model_);
         dao.put(com.google.flow.Box.model_);
         dao.put(com.google.flow.Circle.model_);
         dao.put(com.google.flow.Ellipse.model_);
