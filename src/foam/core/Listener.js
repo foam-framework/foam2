@@ -79,7 +79,7 @@ foam.CLASS({
             var l = function(sub) {
               // Is it possible to detect stale subscriptions?
               // ie. after an object has been detached.
-              code.apply(self, arguments);
+              return code.apply(self, arguments);
             };
 
             if ( isMerged ) {
