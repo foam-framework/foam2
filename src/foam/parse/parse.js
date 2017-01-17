@@ -1454,7 +1454,7 @@ foam.CLASS({
     function repeat0(p, delim, min) {
       return foam.lookup('foam.parse.Repeat0').create({
         p: p,
-        minimum: min,
+        minimum: min || 0,
         delimiter: delim
       });
     },
@@ -1487,7 +1487,7 @@ foam.CLASS({
     function repeat(p, delim, min) {
       return foam.lookup('foam.parse.Repeat').create({
         p: p,
-        minimum: min,
+        minimum: min || 0,
         delimiter: delim
       });
     },
