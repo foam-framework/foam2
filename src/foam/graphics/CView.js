@@ -146,27 +146,23 @@ foam.CLASS({
     },
 
     function translate(dx, dy) {
-      if ( ! dx && ! dy ) return;
-      this.mul(1, 0, dx, 0, 1, dy, 0, 0, 1);
+      if ( dx || dy ) this.mul(1, 0, dx, 0, 1, dy, 0, 0, 1);
       return this;
     },
 
     function skew(x, y) {
-      if ( ! x && ! y ) return;
-      this.mul(1, x, 0, y, 1, 0, 0, 0, 1);
+      if ( x || y ) this.mul(1, x, 0, y, 1, 0, 0, 0, 1);
       return this;
     },
 
     function scale(x, y) {
       if ( y === undefined ) y = x;
-      if ( x === 1 && y === 1 ) return;
-      this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
+      if ( x != 1 || y != 1 ) this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
       return this;
     },
 
     function rotate(a) {
-      if ( ! a ) return;
-      this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
+      if ( a ) this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
       return this;
     },
 
