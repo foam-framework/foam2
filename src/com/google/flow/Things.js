@@ -85,6 +85,11 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Line',
+  extends: 'foam.graphics.Line'
+});
 
 foam.CLASS({
   package: 'com.google.flow',
