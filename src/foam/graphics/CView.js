@@ -904,8 +904,18 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   properties: [
-    { class: 'Float',  name: 'startX' },
-    { class: 'Float',  name: 'startY' },
+    {
+      class: 'Float',
+      name: 'startX',
+      getter: function() { return this.x; },
+      setter: function(v) { this.x = v; }
+    },
+    {
+      class: 'Float',
+      name: 'startY',
+      getter: function() { return this.y; },
+      setter: function(v) { this.y = v; }
+    },
     { class: 'Float',  name: 'endX' },
     { class: 'Float',  name: 'endY' },
     { class: 'Float',  name: 'lineWidth', value: 1 },
@@ -920,6 +930,29 @@ foam.CLASS({
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
       x.stroke();
+    },
+    function hitTest(p) {
+      // There is probably a better way to do this.
+      // This checks if the given point is
+      var abx = this.endX - this.startX;
+      var aby = this.endY - this.startY;
+      var abl = Math.sqrt(abx * abx + aby * aby);
+
+      var apx = p.x - this.startX;
+      var apy = p.y - this.startY;
+      var apl = Math.sqrt(apx * apx + apy * apy);
+
+      var asl = ( abx * apx + aby * apy ) / abl;
+      var asx = abx / abl * asl;
+      var asy = aby / abl * asl;
+
+      var psx = asx - apx;
+      var psy = asy - apy;
+      var d = Math.sqrt(psx * psx + psy * psy);
+
+      if ( d < 5 ) return true;
+
+      return false;
     }
   ]
 });
