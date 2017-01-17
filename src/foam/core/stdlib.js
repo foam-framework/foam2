@@ -693,6 +693,15 @@ foam.LIB({
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
+    },
+    function localMMethod(packageName, localMap,
+        opt_defaultMethod, opt_baseMap) {
+      var map = opt_baseMap || {};
+      for ( var key in localMap) {
+        if (localMap.hasOwnProperty(key))
+          map[packageName + '.' + key] = localMap[key];
+      }
+      return foam.mmethod(map, opt_defaultMethod);
     }
   ]
 });
