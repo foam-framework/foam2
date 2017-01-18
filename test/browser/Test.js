@@ -291,7 +291,7 @@ console.log('2: ', RefTest.create());
 
 console.log('-------------');
 
-foam.ENUM2({
+foam.ENUM({
   name: 'IssueStatus',
 
   // Enums share many features with regular classes, the properties
@@ -361,7 +361,7 @@ foam.CLASS({
   name: 'Issue',
   properties: [
     {
-      class: 'Enum2',
+      class: 'Enum',
       of: 'IssueStatus',
       name: 'status'
     }
@@ -411,13 +411,26 @@ var dt = DateTimeTest.create();
 foam.u2.DetailView.create({data: dt}).write();
 foam.u2.DetailView.create({data: dt}).write();
 
-foam.ENUM2({
+      foam.ENUM({
+        name: 'BadEnum',
+        values: [
+          {
+            name: 'a',
+          },
+          {
+            name: 'b',
+            ordinal: 0
+          }
+        ]
+      });
+
+foam.ENUM({
   name: 'DaysOfWeek',
   values: [
     'SUNDAY',
     'MONDAY',
     'TUESDAY',
-    'WEDNESDAY',
+    { name: 'WEDNESDAY', ordinal: 1 },
     'THURSDAY',
     'FRIDAY',
     'SATURDAY'
