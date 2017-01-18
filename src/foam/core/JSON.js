@@ -402,7 +402,7 @@ foam.CLASS({
         }
       },
       function(o) { return o; })
-    },
+    }
   ]
 });
 
