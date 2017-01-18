@@ -25,24 +25,24 @@ describe('Singleton axiom', function() {
     });
     var a = Test.create();
     var b = Test.create();
-    expect(a === b);
+    expect(a).toBe(b);
   });
 
   it('cloneing is disabled', function() {
     var a = Test.create();
-    expect(a === a.clone());
+    expect(a).toBe(a.clone());
   });
 
   it('equals works', function() {
     var a = Test.create();
     var b = Test.create();
-    expect(a.equals(b));
-    expect(b.equals(a));
+    expect(a).toEqual(b);
+    expect(b).toEqual(a);
   });
 
   it('Singleton to be a Singleton', function() {
     var a = foam.pattern.Singleton.create();
     var b = foam.pattern.Singleton.create();
-    expect(a === b);
+    expect(a).toBe(b);
   });
 });
