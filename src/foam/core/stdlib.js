@@ -722,9 +722,9 @@ foam.LIB({
         opt_defaultMethod, opt_globalMap) {
       var map = opt_globalMap || {};
       for ( var key in localMap ) {
-        if (localMap.hasOwnProperty(key)) {
+        if ( localMap.hasOwnProperty(key) ) {
           var mapKey = packageName + '.' + key;
-          foam.assert(!map.hasOwnProperty(mapKey),
+          foam.assert( ! map.hasOwnProperty(mapKey),
               'localMMethod: Duplicate local/global entries for "' + mapKey +
               '"');
           map[packageName + '.' + key] = localMap[key];
