@@ -27,25 +27,25 @@ describe('Multiton axiom', function() {
     var a1 = Test.create({id: 'a'});
     var a2 = Test.create({id: 'a'});
     var b  = Test.create({id: 'b'});
-    expect(a1.id === 'a');
-    expect(a2.id === 'a');
-    expect(b.id === 'a');
-    expect(a1 === a2);
-    expect(a1 !== b);
+    expect(a1.id).toEqual('a');
+    expect(a2.id).toEqual('a');
+    expect(b.id).toEqual('b');
+    expect(a1 === a2).toBe(true);
+    expect(a1 === b).toBe(false);
   });
 
   it('cloneing is disabled', function() {
     var a1 = Test.create({id: 'a'});
-    expect(a1 === a1.clone());
+    expect(a1).toBe(a1.clone());
   });
 
   it('equals works', function() {
     var a1 = Test.create({id: 'a'});
     var a2 = Test.create({id: 'a'});
     var b  = Test.create({id: 'b'});
-    expect(a1.equals(a2));
-    expect(a2.equals(a1));
-    expect(! a1.equals(b));
-    expect(! b.equals(a1));
+    expect(a1).toEqual(a2);
+    expect(a2).toEqual(a1);
+    expect(a1.equals(b)).toBe(false);
+    expect(b.equals(a1).toBe(false);
   });
 });
