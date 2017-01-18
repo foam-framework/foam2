@@ -207,10 +207,10 @@ foam.CLASS({
             def = { name: def };
           }
 
-          if ( ! def.hasOwnProperty('ordinal') ) {
-            def.ordinal = next++;
-          } else {
+          if ( def.ordinal || def.ordinal === 0 ) {
             next = def.ordinal + 1;
+          } else {
+            def.ordinal = next++;
           }
 
           if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
@@ -218,11 +218,9 @@ foam.CLASS({
           }
 
           if ( used[def.ordinal] ) {
-            foam.assert(
-                false,
-                this.id,
-                'Enum error: duplicate ordinal found', def.name,
-                used[def.ordinal], 'both have an ordinal of', def.ordinal);
+            throw this.id +
+                ' Enum error: duplicate ordinal found ' + def.name + ' ' +
+                used[def.ordinal] + ' both have an ordinal of ' + def.ordinal;
           }
 
           used[def.ordinal] = def.name;
