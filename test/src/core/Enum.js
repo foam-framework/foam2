@@ -113,6 +113,7 @@ describe('Enum tests', function() {
           }
         ]
       });
+      BadEnum.A;
     }).toThrow();
   })
 });
