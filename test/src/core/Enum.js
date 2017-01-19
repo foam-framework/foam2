@@ -138,5 +138,5 @@ describe('Enum tests', function() {
       });
       BadTodo;
     }).toThrow();
-})
+  });
 });
