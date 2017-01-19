@@ -44,7 +44,7 @@ foam.CLASS({
     'width',
     'height',
     'maxWidth',
-    'maxHeight'
+    'maxHeight',
   ],
 
   methods: [
@@ -53,7 +53,7 @@ foam.CLASS({
       var parent   = this.parentNode;
       var close    = function() {
         self.remove();
-        bg.remove();
+        //bg.remove();
       };
 
       if ( ! this.y       ) this.y = (parent.el().clientHeight - this.height)/2;
@@ -65,17 +65,17 @@ foam.CLASS({
 
       // Make a full-screen transparent background, which when clicked,
       // closes this Popup
-      var bg = this.E('div').
-        style({
-          position: 'absolute',
-          width: '10000px',
-          height: '10000px',
-          opacity: 0,
-          top: 0,
-          zIndex: 998
-        }).
-        on('click', close).
-        write();
+      // var bg = this.E('div').
+      //   style({
+      //     position: 'absolute',
+      //     width: '10000px',
+      //     height: '10000px',
+      //     opacity: 0,
+      //     top: 0,
+      //     zIndex: 998
+      //   }).
+      //   on('click', close).
+      //   write();
 
       this.
         cssClass(this.myCls()).
@@ -86,6 +86,6 @@ foam.CLASS({
         onunload.sub(close);
 
       parent.style({position: 'relative'});
-    }
+    },
   ]
 });
