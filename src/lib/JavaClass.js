@@ -998,8 +998,33 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Long ) ?'
-             + '((Long)o).intValue() :'
-             + '(int)o;'
+            + '((Long)o).intValue() :'
+            + '(o instanceof Double ) ?'
+            + '((Double)o).intValue() :'
+            + '(int)o;';
+      return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Long',
+
+  properties: [
+    ['javaType', 'long'],
+    ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.LongParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Long ) ?'
+            + '((Long)o).longValue() :'
+            + '(o instanceof Double ) ?'
+            + '((Double)o).longValue() :'
+            + '(long)o;';
       return info;
     }
   ]
