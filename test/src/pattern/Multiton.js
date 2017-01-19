@@ -46,6 +46,6 @@ describe('Multiton axiom', function() {
     expect(a1).toEqual(a2);
     expect(a2).toEqual(a1);
     expect(a1.equals(b)).toBe(false);
-    expect(b.equals(a1).toBe(false);
+    expect(b.equals(a1)).toBe(false);
   });
 });
