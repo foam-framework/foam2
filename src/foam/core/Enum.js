@@ -165,7 +165,8 @@ foam.CLASS({
   properties: [
     {
       name: 'ordinal',
-      getter: function() { return this.definition.ordinal; }
+      getter: function() { return this.definition.ordinal; },
+      setter: function(o) { this.definition.ordinal = o; }
     },
     {
       name: 'name',
