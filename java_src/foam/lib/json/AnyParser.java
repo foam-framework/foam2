@@ -7,8 +7,8 @@ public class AnyParser extends ProxyParser {
     super(new Alt(
                   new NullParser(),
                   new StringParser(),
-                  new IntParser(),
                   new LongParser(),
+                  new IntParser(),
                   new FloatParser(),
                   new BooleanParser(),
                   new FObjectParser()));
