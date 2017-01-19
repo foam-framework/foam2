@@ -430,7 +430,7 @@ foam.ENUM({
     'SUNDAY',
     'MONDAY',
     'TUESDAY',
-    { name: 'WEDNESDAY', ordinal: 1 },
+    'WEDNESDAY',
     'THURSDAY',
     'FRIDAY',
     'SATURDAY'
