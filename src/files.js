@@ -81,6 +81,7 @@ FOAM_FILES([
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/mlang/mlang" },
+  { name: "foam/mlang/sql" },
   { name: "foam/mlang/LabeledValue" },
   { name: "foam/dao/index/Plan" },
   { name: "foam/dao/index/Index" },
