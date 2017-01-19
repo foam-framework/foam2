@@ -113,6 +113,7 @@ FOAM_FILES([
   { name: "foam/physics/Physical" },
   { name: "foam/physics/Collider" },
   { name: "foam/physics/PhysicsEngine" },
+  { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
   { name: "lib/net" },
