@@ -33,10 +33,9 @@ describe('Enum tests', function() {
       ],
 
       values: [
-        {
-          name: 'OPEN',
-          label: 'Open'
-        },
+        foam.core.internal.EnumValueAxiom.create({
+          definition: { name: 'OPEN', label: 'Open' }
+        }),
         {
           ordinal: 100,
           name: 'CLOSED',
@@ -75,6 +74,10 @@ describe('Enum tests', function() {
 
     expect(function() {
       todo.status = 'invalid enum value';
+    }).toThrow();
+
+    expect(function() {
+      todo.status = new Date();
     }).toThrow();
 
     expect(
@@ -135,6 +138,5 @@ describe('Enum tests', function() {
       });
       BadTodo;
     }).toThrow();
-
 })
 });
