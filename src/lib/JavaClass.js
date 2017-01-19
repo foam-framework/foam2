@@ -1068,26 +1068,16 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.Date',
+  refines: 'foam.core.DateTime',
   properties: [
-    ['javaType', 'int'],
-    ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.IntParser']
-  ],
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-        var m = info.getMethod('cast');
-        m.body = 'return ( o instanceof Long ) ?'
-            + '((Long)o).intValue() :'
-            + '(int)o;';
-      return info;
-    }
+    ['javaType', 'java.util.Date'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.DateParser']
   ]
 });
 
 foam.CLASS({
-  refines: 'foam.core.DateTime',
+  refines: 'foam.core.Date',
   properties: [
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
