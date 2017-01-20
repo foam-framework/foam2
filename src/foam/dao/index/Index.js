@@ -45,9 +45,17 @@ foam.CLASS({
 
   properties: [
     {
+      /**
+       * The class type of the data nodes this index creates with
+       * createNode(). By default it will be the Index class' name
+       * with Node appended:
+       * <p><code>MyIndex => MyIndexNode</code>
+       */
       class: 'Class',
-      name: 'tailClass',
-      // TODO: a factory would be better, but Class getter overrides it
+      name: 'nodeClass',
+      factory: function() {
+        return this.cls_.id + 'Node';
+      }
     }
   ],
   methods: [
@@ -65,10 +73,9 @@ foam.CLASS({
     },
 
     function createNode(args) {
-      if ( ! this.tailClass ) this.tailClass = this.cls_.id + 'Node';
       args = args || {};
       args.creator = this;
-      return this.tailClass.create(args, this);
+      return this.nodeClass.create(args, this);
     }
   ]
 });
