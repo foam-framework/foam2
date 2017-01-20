@@ -33,7 +33,7 @@
            (2 alt subindexes)     (14 nodes)             (each has 0-5 nodes)
 </pre>
   The base AltIndex has two complete subindexes (each holds the entire DAO).
-  The The TreeIndex on property A has created one TreeIndexNode, holding one tree of 14 nodes.
+  The TreeIndex on property A has created one TreeIndexNode, holding one tree of 14 nodes.
   Each tree node contains a tail instance of the next level down, thus
   the TreeIndex on id has created 14 TreeIndexNodes. Each of those contains some number
   of tree nodes, each holding one tail instance of the ValueIndex at the end of the chain.
