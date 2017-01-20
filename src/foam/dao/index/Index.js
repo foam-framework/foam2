@@ -81,21 +81,18 @@ foam.CLASS({
 });
 
 /**
-  The index tail interface represents a piece of the index that actually
-  holds data. A tree will create a tail for each node, so one Index will
-  create many tail instances, each operating on part of the data in the DAO.
+  The IndexNode interface represents a piece of the index that actually
+  holds data. A tree will create an index-node for each tree-node, so one
+  Index will manage many IndexNode instances, each operating on part of
+  the data in the DAO.
 
-  For creation speed, do not require or import anything in a tail class.
+  For creation speed, do not require or import anything in a node class.
   Use the 'creator' property to access requires and imports on the
-  Index that created the tail instance.
+  Index that created the node instance.
 */
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'IndexNode',
-
-//   axioms: [
-//     'foam.dao.index.SharedProto?', // create(args, ctx, proto)?
-//   ],
 
   properties: [
     {
