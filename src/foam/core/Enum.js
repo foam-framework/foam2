@@ -204,7 +204,7 @@ foam.CLASS({
           var def = v[i];
 
           if ( foam.String.isInstance(def) ) {
-            def = { name: def };
+            def = { label: def, name: foam.String.constantize(def) };
           }
 
           if ( def.ordinal || def.ordinal === 0 ) {
