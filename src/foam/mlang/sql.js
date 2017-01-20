@@ -1,5 +1,5 @@
 /**
-   toSQL operations for mlang predicates
+   tosql operations for mlang predicates
 */
 
 foam.CLASS({
@@ -12,13 +12,19 @@ foam.CLASS({
     package: 'foam.mlang.predicate',
     name: 'SQLSupport',
 
+    //
+    // NOTE: use as Singleton rather than implements to avoid
+    // implements complications with Java
+    //
+    axioms: [ foam.pattern.Singleton.create() ],
+
     methods: [
         {
             name: 'values',
-            code: function() {
+            code: function(arg1, arg2) {
                 return {
-                    v1: this.arg1.toSQL && this.arg1.toSQL(this.arg2) || this.arg1.toString(),
-                    v2: this.arg2 && ( this.arg2.toSQL && this.arg2.toSQL(this.arg1) || this.arg2.toString() ) || null
+                    v1: arg1.toSQL && arg1.toSQL(arg2) || arg1.toString(),
+                    v2: arg2 && ( arg2.toSQL && arg2.toSQL(arg1) || arg2.toString() ) || null
                 };
             }
         }
@@ -119,14 +125,14 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Has',
-    implements: ['foam.mlang.predicate.SQLSupport'],
+    requires: ['foam.mlang.predicate.SQLSupport'],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
-                return this.values().v1 + ' IS NOT NULL';
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+                return values().v1 + ' IS NOT NULL';
             }
         }
     ]
@@ -146,13 +152,13 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Eq',
-    implements: ['foam.mlang.predicate.SQLSupport'],
+    requires: ['foam.mlang.predicate.SQLSupport'],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null) {
                     return values.v1 + ' IS NULL';
                 }
@@ -164,13 +170,13 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Neq',
-    implements: ['foam.mlang.predicate.SQLSupport'],
+    requires: ['foam.mlang.predicate.SQLSupport'],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null) {
                     return values.v1 + ' IS NOT NULL';
                 }
@@ -182,8 +188,10 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Gt',
-    implements: ['foam.mlang.predicate.SQLSupport'],
-    requires: ['foam.dao.SQLException'],
+    requires: [
+        'foam.mlang.predicate.SQLSupport',
+        'foam.dao.SQLException'
+    ],
     methods: [
         {
             name: 'toSQL',
@@ -194,7 +202,7 @@ foam.CLASS({
                 // if (v2 === null ) {
                 //     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+v2});
                 // }
-                var values = this.values();
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null ) {
                     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
                 }
@@ -206,14 +214,16 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Gte',
-    implements: ['foam.mlang.predicate.SQLSupport'],
-    requires: ['foam.dao.SQLException'],
+    requires: [
+        'foam.mlang.predicate.SQLSupport',
+        'foam.dao.SQLException'
+    ],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null ) {
                     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
                 }
@@ -225,14 +235,16 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Lt',
-    implements: ['foam.mlang.predicate.SQLSupport'],
-    requires: ['foam.dao.SQLException'],
+    requires: [
+        'foam.mlang.predicate.SQLSupport',
+        'foam.dao.SQLException'
+    ],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null ) {
                     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
                 }
@@ -244,14 +256,16 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.Lte',
-    implements: ['foam.mlang.predicate.SQLSupport'],
-    requires: ['foam.dao.SQLException'],
+    requires: [
+        'foam.mlang.predicate.SQLSupport',
+        'foam.dao.SQLException'
+    ],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null ) {
                     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
                 }
@@ -304,14 +318,13 @@ foam.CLASS({
 
 foam.CLASS({
     refines: 'foam.mlang.predicate.In',
-    implements: ['foam.mlang.predicate.SQLSupport'],
+    requires: ['foam.mlang.predicate.SQLSupport'],
     methods: [
         {
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var values = this.values();
-                var s = values.v1;
+                var s = this.SQLSupport.create().values(this.arg1, this.arg2).v1;
                 s += ' IN ( \'';
                 if ( Array.isArray(this.arg2) ) {
                     s += this.arg2.join('\', \'');
