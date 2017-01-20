@@ -332,7 +332,7 @@ foam.CLASS({
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
-      if ( this.parentNode && this.parentNode.state === this.LOADED ) {
+      if ( ! this.parentNode || this.parentNode.state === this.LOADED ) {
         var e = this.el();
         if ( e ) e.remove();
       }

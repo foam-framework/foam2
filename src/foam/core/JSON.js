@@ -138,6 +138,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'sortObjectKeys',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'pretty',
       value: true,
       postSet: function(_, p) {
@@ -276,6 +281,33 @@ foam.CLASS({
       }
     },
 
+    function outputObjectKeyValue_(key, value, first) {
+        if ( ! first ) this.out(',').nl();
+      this.indent().out(this.maybeEscapeKey(key), ':').output(value);
+    },
+
+    function outputObjectKeyValues_(o) {
+      var first = true;
+      for ( var key in o ) {
+        this.outputObjectKeyValue_(key, o[key], first);
+        first = false;
+      }
+    },
+
+    function outputSortedObjectKeyValues_(o) {
+      var key, keys = [];
+
+      for ( key in o ) keys.push(key);
+      keys.sort();
+
+      var first = true;
+      for ( var i = 0 ; i < keys.length; i++ ) {
+        key = keys[i];
+        this.outputObjectKeyValue_(key, o[key], first);
+        first = false;
+      }
+    },
+
     {
       name: 'output',
       code: foam.mmethod({
@@ -316,18 +348,17 @@ foam.CLASS({
             if ( i < o.length -1 ) this.out(',').nl().indent();
           }
           this.nl();
-          this.end(']')
+          this.end(']');
         },
         Object: function(o) {
           if ( o.outputJSON ) {
-            o.outputJSON(this)
+            o.outputJSON(this);
           } else {
             this.start('{');
-            var first = true;
-            for ( var key in o ) {
-              if ( ! first ) this.out(',').nl();
-              this.indent().out(this.maybeEscapeKey(key), ':').output(o[key]);
-              first = false;
+            if (this.sortObjectKeys) {
+              this.outputSortedObjectKeyValues_(o);
+            } else {
+              this.outputObjectKeyValues_(o);
             }
             this.end('}');
           }
