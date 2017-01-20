@@ -281,28 +281,29 @@ foam.CLASS({
       }
     },
 
+    function outputObjectKeyValue_(key, value, first) {
+        if ( ! first ) this.out(',').nl();
+      this.indent().out(this.maybeEscapeKey(key), ':').output(value);
+    },
 
-    function outputObjectKeyValues(o) {
+    function outputObjectKeyValues_(o) {
       var first = true;
       for ( var key in o ) {
-        if ( ! first ) this.out(',').nl();
-        this.indent().out(this.maybeEscapeKey(key), ':').output(o[key]);
+        this.outputObjectKeyValue_(key, o[key], first);
         first = false;
       }
     },
 
-    function outputSortedObjectKeyValues(o) {
-      var keys = [];
-      var key;
-      for ( key in o ) {
-        keys.push(key);
-      }
+    function outputSortedObjectKeyValues_(o) {
+      var key, keys = [];
+
+      for ( key in o ) keys.push(key);
       keys.sort();
+
       var first = true;
       for ( var i = 0 ; i < keys.length; i++ ) {
         key = keys[i];
-        if ( ! first ) this.out(',').nl();
-        this.indent().out(this.maybeEscapeKey(key), ':').output(o[key]);
+        this.outputObjectKeyValue_(key, o[key], first);
         first = false;
       }
     },
@@ -354,8 +355,11 @@ foam.CLASS({
             o.outputJSON(this);
           } else {
             this.start('{');
-            if (this.sortObjectKeys) this.outputSortedObjectKeyValues(o);
-            else this.outputObjectKeyValues(o);
+            if (this.sortObjectKeys) {
+              this.outputSortedObjectKeyValues_(o);
+            } else {
+              this.outputObjectKeyValues_(o);
+            }
             this.end('}');
           }
         }
