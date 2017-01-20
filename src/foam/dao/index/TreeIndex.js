@@ -139,7 +139,7 @@ foam.CLASS({
       return undefined;
     }
   },
-  
+
   properties: [
     {
       name: 'prop',
@@ -166,7 +166,7 @@ foam.CLASS({
       required: true
     }
   ],
-  
+
   methods: [
     function init() {
 
@@ -174,13 +174,13 @@ foam.CLASS({
       this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.creator.dedup, this);
       //this.compare = foam.Function.bind(this.compare, this);
     },
-    
+
     /** Set the value's property to be the same as the key in the index.
         This saves memory by sharing objects. */
     function dedup(propName, obj, value) {
       obj[propName] = value;
     },
-    
+
     function compare(o1, o2) {
       return foam.util.compare(o1, o2);
     },
@@ -198,7 +198,7 @@ foam.CLASS({
       // can't use select() with the given ordering
       return false;
     },
-    
+
     function estimate(size, sink, skip, limit, order, predicate) {
       // small sizes don't matter
       if ( size <= 16 ) return Math.log(size) / Math.log(2);
@@ -272,24 +272,24 @@ foam.CLASS({
 
       return cost;
     },
-    
+
     function toString() {
       return '[' + this.cls_.name + ': ' + this.prop.name + ' ' + this.tail.toString() + ']';
     },
-    
+
     function toPrettyString(indent) {
-      var ret = "";
+      var ret = '';
       //ret += "  ".repeat(indent) + this.cls_.name + "( " + this.prop.name + "\n";
       //ret += this.tail.toPrettyString(indent + 1);
       //ret += "  ".repeat(indent) + ")\n";
       var tail = this.tail.toPrettyString(indent + 1);
-      ret = "  ".repeat(indent) + this.prop.name + "(" + this.$UID + ")\n";
+      ret = '  '.repeat(indent) + this.prop.name + '(' + this.$UID + ')\n';
       if ( tail.trim().length > 0 ) ret += tail;
       return ret;
     }
-    
+
   ]
-  
+
 });
 
 /** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
@@ -311,7 +311,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.root = this.root || this.creator.nullNode; 
+      this.root = this.root || this.creator.nullNode;
       this.selectCount = this.selectCount || 0;
     },
 

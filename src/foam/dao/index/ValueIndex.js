@@ -30,7 +30,7 @@ foam.CLASS({
     },
 
     function toPrettyString(indent) {
-      return "";
+      return '';
     },
 
   ]
@@ -56,7 +56,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return "ValueIndex_Plan(cost=1, value:" + this.value + ")";
+      return 'ValueIndex_Plan(cost=1, value:' + this.value + ')';
     },
 
     // from Index

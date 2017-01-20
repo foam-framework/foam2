@@ -159,9 +159,9 @@ foam.CLASS({
 
     function toString() {
       return ( ! this.subPlans || this.subPlans.length <= 1 ) ?
-        'IN(key=' + ( this.prop && this.prop.name ) + ', cost=' + this.cost + ", " +
+        'IN(key=' + ( this.prop && this.prop.name ) + ', cost=' + this.cost + ', ' +
           ', size=' + ( this.subPlans ? this.subPlans.length : 0 ) + ')' :
-        'lookup(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ", " +
+        'lookup(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ', ' +
           this.subPlans[0].toString();
     }
   ]

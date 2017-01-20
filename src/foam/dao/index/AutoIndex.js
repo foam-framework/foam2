@@ -59,8 +59,8 @@ foam.CLASS({
     },
 
     function toPrettyString(indent) {
-      var ret = "";
-      ret = "  ".repeat(indent) + "Auto(" + this.$UID + ")\n";
+      var ret = '';
+      ret = '  '.repeat(indent) + 'Auto(' + this.$UID + ')\n';
       ret += this.delegate.toPrettyString(indent + 1);
       return ret;
     }
@@ -80,7 +80,7 @@ foam.CLASS({
         idIndex: this.creator.idIndex
       })), root);
     },
-    
+
     function addIndex(index, root) {
       this.delegate.addIndex(index, root);
     },
@@ -194,7 +194,7 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
               .plan(sink, skip, limit, order, predicate, root)
               .execute(apromise, asink, askip, alimit, aorder, apredicate);
           },
-          customToString: function() { return "AutoIndexAdd cost=" + this.cost + ", " + newIndex.cls_.name; }
+          customToString: function() { return 'AutoIndexAdd cost=' + this.cost + ', ' + newIndex.cls_.name; }
         });
       } else {
         return existingPlan;
