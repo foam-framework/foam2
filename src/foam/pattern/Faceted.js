@@ -51,15 +51,15 @@ foam.CLASS({
 
         var facets = this.private_.facets || ( this.private_.facets = {} );
 
-        if ( ! facets.hasOwnProperty(of) ) {
+        if ( ! facets.hasOwnProperty(of.name) ) {
           var id = this.package ?
-            this.package + '.' + of + this.name :
-            of + this.name ;
+            this.package + '.' + of.name + this.name :
+            of.name + this.name ;
           console.log('loooking: ', id);
-          facets[of] = X.lookup(id, true) || this;
+          facets[of.name] = X.lookup(id, true) || this;
         }
 
-        return facets[of];
+        return facets[of.name];
       };
 
       var oldCreate = cls.create;
