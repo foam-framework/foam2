@@ -50,6 +50,7 @@ foam.CLASS({
     function initE() {
       var prop = this.prop;
 
+      // TODO: hide this element if the prop changes it's mode to HIDDEN.
       this.
         cssClass('foam-u2-PropertyView-').
         start('td').cssClass('foam-u2-PropertyView-label').add(prop.label).end().
