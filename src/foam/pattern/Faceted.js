@@ -55,7 +55,6 @@ foam.CLASS({
           var id = this.package ?
             this.package + '.' + of.name + this.name :
             of.name + this.name ;
-          console.log('loooking: ', id);
           facets[of.name] = X.lookup(id, true) || this;
         }
 
@@ -64,12 +63,15 @@ foam.CLASS({
 
       var oldCreate = cls.create;
 
-      cls.create = function(args, X) {
+      // ignoreFacets is set to true when called to prevent a second-level
+      // of facet checking
+      cls.create = function(args, X, ignoreFacets) {
+        if ( ignoreFacets) return oldCreate.apply(this, arguments);
         var facetCls = this.getFacetOf(args && args.of, X);
 
         return facetCls === this ?
           oldCreate.apply(this, arguments) :
-          facetCls.create(args, X) ;
+          facetCls.create(args, X, true)   ;
       }
     }
   ]
