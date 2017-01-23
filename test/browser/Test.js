@@ -438,3 +438,22 @@ foam.ENUM({
 });
 
 console.log(DaysOfWeek.VALUES);
+
+
+
+  foam.CLASS({
+    name: 'View',
+    axioms: [ foam.pattern.Faceted.create() ],
+    properties: [ 'of' ],
+    methods: [ function view() { return 'default' } ]
+  });
+
+  foam.CLASS({name: 'A'});
+  foam.CLASS({name: 'B'});
+  foam.CLASS({name: 'C'});
+  foam.CLASS({name: 'BView', extends: 'View', methods: [function view() { return 'BView'; }]});
+  foam.CLASS({name: 'CView', extends: 'View', methods: [function view() { return 'CView'; }]});
+
+console.log(View.create({of: A}).view());
+console.log(View.create({of: B}).view());
+console.log(View.create({of: C}).view());
