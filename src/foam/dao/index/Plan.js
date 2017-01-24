@@ -191,32 +191,78 @@ foam.CLASS({
       removes duplicates, sorts, skips, and limits.
     */
     function execute(promise, sink, skip, limit, order, predicate) {
-      // TODO: Investigate pre-sorted results from subqueries being
-      //   zipped together quickly
+      // quick linked list
+      var NodeProto = { next: null, data: null };
 
-      var resultSink = this.DedupSink.create({
-        delegate: this.decorateSink_(sink, skip, limit, order)
-      });
+      var head = Object.create(NodeProto);
+      // TODO: track list size, cut off if above skip+limit
 
       var sp = this.subPlans;
       var predicates = predicate.args;
       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
       //console.assert(predicates.length == sp.length);
+
+      // Each plan inserts into the list
       for ( var i = 0 ; i < sp.length ; ++i) {
+        // reset new insert position to head
+        var insertAfter = head;
+        // TODO: refactor with insertAfter as a property of a new class
+        var insertPlanSink = foam.dao.QuickSink.create({
+          putFn: function(o) {
+            // o may be larger or equal to insertAfter.data. If o is equal,
+            //   this loop will ignore it, which deduplicates.
+            while ( order.compare(o, insertAfter.data) > 0 ) {
+              var next = insertAfter.next;
+              // if end-of-list or found a larger item, insert
+              if ( ( ! next ) || order.compare(o, next.data) < 0 ) {
+                var nu = Object.create(NodeProto);
+                nu.next = insertAfter.next;
+                nu.data = o;
+                insertAfter.next = nu;
+                insertAfter = nu;
+                break; // insert done, next new item will put() again
+              } else {
+                // New item is larger, move forward in the list and
+                //   try again
+                insertAfter = next;
+              }
+            }
+          }
+        });
         sp[i].execute(
           promise,
-          resultSink,
+          insertPlanSink,
           undefined,
           subLimit,
           order,
           predicates[i]
         );
       }
+
+      function scanResults() {
+        // The list starting at head now contains the results plus possible
+        //  overflow of skip+limit
+        var resultSink = this.decorateSink_(sink, skip, limit);
+        var fc = foam.core.dao.FlowControl.create();
+        var node = head.next;
+        while ( node && ( ! fc.stopped ) ) {
+          resultSink.put(node.data, fc);
+          node = node.next;
+        }
+      }
+
+      // if there is an async index in the above, wait for it to finish
+      //   before reading out the results.
+      if ( promise[0] ) {
+        promise[0].then(scanResults);
+      } else {
+        scanResults();
+      }
     },
 
     /** TODO: Share with AbstractDAO. We never need to use predicate.
       @private */
-    function decorateSink_(sink, skip, limit, order) {
+    function decorateSink_(sink, skip, limit) {
       if ( limit != undefined ) {
         sink = this.LimitedSink.create({
           limit: limit,
@@ -226,12 +272,6 @@ foam.CLASS({
       if ( skip != undefined ) {
         sink = this.SkipSink.create({
           skip: skip,
-          delegate: sink
-        });
-      }
-      if ( order != undefined ) {
-        sink = this.OrderedSink.create({
-          comparator: order,
           delegate: sink
         });
       }
