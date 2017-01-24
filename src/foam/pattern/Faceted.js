@@ -39,6 +39,7 @@
   console.log(View.create({of: B}));
   console.log(View.create({of: C}));
 */
+// TODO: add createOriginal() method.
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Faceted',
