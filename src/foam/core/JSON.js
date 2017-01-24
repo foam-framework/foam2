@@ -512,7 +512,18 @@ foam.LIB({
     },
 
     function parseString(jsonStr, opt_ctx) {
-      return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
+        console.debug('parseString: '+jsonStr);
+        try {
+            return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
+        } catch  (e) {
+            console.warn('failed eval of: '+jsonStr+'\nerror: '+e.message, e);
+            try {
+                return this.parse(jsonStr, undefined, opt_ctx);
+            } catch (e) {
+                console.error('failed parse of: '+jsonStr+'\nerror: '+e.message, e);
+                throw e;
+            }
+        }
     },
 
     function stringify(o) {
@@ -520,7 +531,7 @@ foam.LIB({
     },
 
     function objectify(o) {
-      return foam.json.Compact.objectify(o)
+      return foam.json.Compact.objectify(o);
     }
   ]
 });
