@@ -37,9 +37,6 @@ foam.CLASS({
         {
             name: 'toSQL',
             code: function() {
-                //if (this.value === null || this.value === undefined) {
-                //    return 'IS NULL';
-                //}
                 if (isNaN(this.value)) {
                     var v = this.value.toString().toLowerCase();
                     if (v === 'true' || v === 'yes') {
@@ -197,11 +194,6 @@ foam.CLASS({
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                // var v1 = this.arg1.toSQL ? this.arg1.toSQL() : this.arg1.toString();
-                // var v2 = this.arg2.toSQL ? this.arg2.toSQL(this.arg1) : this.arg2.toString();
-                // if (v2 === null ) {
-                //     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+v2});
-                // }
                 var values = this.SQLSupport.create().values(this.arg1, this.arg2);
                 if (values.v2 === null ) {
                     throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
@@ -299,7 +291,6 @@ foam.CLASS({
     refines: 'foam.mlang.predicate.Or',
     methods: [
         {
-            // AND has a higher precedence than OR so doesn't need paranthesis
             name: 'toSQL',
             code: function() {
                 var s = ' ( ';
@@ -324,7 +315,8 @@ foam.CLASS({
             name: 'toSQL',
             code: function() {
                 this.SUPER();
-                var s = this.SQLSupport.create().values(this.arg1, this.arg2).v1;
+                var values = this.SQLSupport.create().values(this.arg1, this.arg2).v1;
+                var s = values.v1;
                 s += ' IN ( \'';
                 if ( Array.isArray(this.arg2) ) {
                     s += this.arg2.join('\', \'');
