@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@
  *   properties: [
  *     {
  *       class: 'Enum',
- *       of: 'Status',
+ *       of: 'IssueStatus',
  *       name: 'status'
  *     }
  *   ]
@@ -132,249 +132,156 @@
  * issue.status = "ASSIGNED"
  *
  * issue.status === IssueStatus.ASSIGNED; // is true
+ *
+ * The extent of all Enum values can be accessed from either the collection or from any
+ * individual Enum value:
+ * console.log(IssueStatus.VALUES, IssueStatus.CLOSED.VALUES);
+ *
+ * Values can be specified as just Strings if you don't want to explicitly set the label
+ * or ordinal. Ex.:
+ *
+ * foam.ENUM({
+ *  name: 'DaysOfWeek',
+ *  values: [
+ *    'SUNDAY',
+ *    'MONDAY',
+ *    'TUESDAY',
+ *    'WEDNESDAY',
+ *    'THURSDAY',
+ *    'FRIDAY',
+ *    'SATURDAY'
+ *  ]
+ * });
+ *
  * </pre>
  */
+// TODO: Make extend Model so can override methods (or do some other way).
+foam.CLASS({
+  package: 'foam.core.internal',
+  name: 'EnumValueAxiom',
+
+  documentation: 'The definition of a single Enum value.',
+
+  properties: [
+    {
+      name: 'ordinal',
+      getter: function() { return this.definition.ordinal; },
+      setter: function(o) { this.definition.ordinal = o; }
+    },
+    {
+      name: 'name',
+      getter: function() { return this.definition.name; }
+    },
+    'definition'
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var e = cls.create(this.definition);
+      cls.installConstant(this.name, e);
+      cls.VALUES.push(e);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'EnumModel',
-
-  documentation: 'A complete Enum specification.',
+  extends: 'Model',
 
   properties: [
-    {
-      name: 'axioms_',
-      transient: true,
-      factory: function() {
-        return [
-          foam.core.Int.create({
-            name: 'ordinal',
-            final: true
-          }),
-          foam.core.String.create({
-            name: 'name',
-            final: true
-          }),
-          foam.core.String.create({
-            name: 'label',
-            final: true
-          }),
-          foam.core.Method.create({
-            name: 'toString',
-            code: function() {
-              return this.name;
-            }
-          }),
-          {
-            name: 'enum_create',
-            installInClass: function(cls) {
-              var instances = {};
-              var oldCreate = cls.create;
-
-              cls.create = function(args, ctx) {
-                var key = args.ordinal || 0; // use default if not specified
-
-                // Short-circuit if we already create the instance for
-                // this ordinal.
-                if ( instances[key] ) return instances[key];
-
-                var enumValue = cls.model_.values.find(function(o) {
-                  return o.ordinal === key;
-                });
-
-                foam.assert(enumValue, 'No enum value found with ordinal', key);
-                var newArgs = enumValue.values;
-                newArgs.ordinal = key;
-                newArgs.name = enumValue.name;
-
-                return instances[key] = oldCreate.call(this, newArgs, ctx);
-              };
-            }
-          }
-        ];
-      }
-    },
-    {
-      class: 'String',
-      name: 'name'
-    },
-    {
-      class: 'String',
-      name: 'package'
-    },
-    {
-      class: 'String',
-      name: 'id',
-      expression: function(name, package) {
-        return package ? package + '.' + name : name;
-      }
-    },
+    [ 'extends', 'foam.core.AbstractEnum' ],
     {
       class: 'AxiomArray',
-      of: 'foam.core.Property',
-      name: 'properties',
-      adaptArrayElement: function(o) {
-        if ( typeof o === 'string' ) {
-          var p = foam.core.Property.create();
-          p.name = o;
-          return p;
-        }
-
-        if ( Array.isArray(o) ) {
-          var p = foam.core.Property.create();
-          p.name  = o[0];
-          p.value = o[1];
-          return p;
-        }
-
-        if ( o.class ) {
-          var m = foam.lookup(o.class);
-          if ( ! m ) throw 'Unknown class : ' + o.class;
-          return m.create(o);
-        }
-
-        return foam.core.Property.create(o);
-      }
-    },
-    {
-      class: 'AxiomArray',
-      of: 'foam.core.Method',
-      name: 'methods',
-      adaptArrayElement: function(o) {
-        if ( typeof o === 'function' ) {
-          foam.assert(o.name, 'Method must be named');
-          var m = foam.core.Method.create();
-          m.name = o.name;
-          m.code = o;
-          return m;
-        }
-        return foam.core.Method.create(o);
-      }
-    },
-    {
-      class: 'AxiomArray',
-      of: 'foam.core.Constant',
-      name: 'constants'
-    },
-    {
-      class: 'AxiomArray',
-      of: 'foam.core.Listener',
-      name: 'listeners'
-    },
-    {
-      class: 'AxiomArray',
-      of: 'foam.core.Action',
-      name: 'actions'
-    },
-    {
-      class: 'AxiomArray',
-      of: 'foam.core.internal.EnumValue',
+      of: 'foam.core.internal.EnumValueAxiom',
       name: 'values',
-      preSet: function(_, v) {
-        var used = {};
+      adapt: function(_, v) {
+        var used = {}; // map of ordinals used to check for duplicates
 
         var next = 0;
         for ( var i = 0 ; i < v.length ; i++ ) {
-          if ( ! v[i].hasOwnProperty('ordinal') ) v[i].ordinal = next++;
-          else next = v[i].ordinal + 1;
-          foam.assert(
-            ! used[v[i].ordinal],
-            this.id,
-            'Enum error: duplicate ordinal found', v[i].name,
-            used[v[i].ordinal], 'both have an ordinal of', v[i].ordinal);
+          var def = v[i];
 
-          used[v[i].ordinal] = v[i].name;
+          if ( foam.String.isInstance(def) ) {
+            def = { label: def, name: foam.String.constantize(def) };
+          }
+
+          if ( def.ordinal || def.ordinal === 0 ) {
+            next = def.ordinal + 1;
+          } else {
+            def.ordinal = next++;
+          }
+
+          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
+            v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
+          }
+
+          if ( used[def.ordinal] ) {
+            throw this.id +
+                ' Enum error: duplicate ordinal found ' + def.name + ' ' +
+                used[def.ordinal] + ' both have an ordinal of ' + def.ordinal;
+          }
+
+          used[def.ordinal] = def.name;
         }
 
         return v;
       }
     }
-  ],
-
-  methods: [
-    function buildClass() {
-      var parent = foam.core.FObject, cls;
-
-      cls                  = Object.create(parent);
-      cls.prototype        = Object.create(parent.prototype);
-      cls.prototype.cls_   = cls;
-      cls.prototype.model_ = this;
-      cls.private_         = { axiomCache: {} };
-      cls.axiomMap_        = Object.create(parent.axiomMap_);
-      cls.id               = this.id;
-      cls.package          = this.package;
-      cls.name             = this.name;
-      cls.model_           = this;
-
-      cls.installModel(this);
-
-      var values, model = this;
-
-      cls.getValues = function() {
-        if ( ! values ) {
-          values = model.values.map(function(m) {
-            return cls[m.name];
-          });
-        }
-        return values;
-      }
-
-      return cls;
-    }
   ]
 });
 
-foam.CLASS({
-  package: 'foam.core.internal',
-  name: 'EnumValue',
 
-  documentation: 'A single value of an Enum.',
+foam.CLASS({
+  package: 'foam.core',
+  name: 'AbstractEnum',
+
+  documentation: 'Abstract base class for all Enum classes.',
+
+  axioms: [
+    foam.pattern.Multiton.create({property: 'ordinal'}),
+    {
+      installInClass: function(cls) {
+        // Each sub-class of AbstractEnum gets it's own VALUES array.
+        Object.defineProperty(cls, 'VALUES', {
+          get: function() {
+            return this.private_.VALUES || ( this.private_.VALUES = [] );
+          },
+          configurable: true,
+          enumerable: false
+        });
+      },
+      installInProto: function(p) {
+        Object.defineProperty(p, 'VALUES', {
+          get: function() { return this.cls_.VALUES; },
+          configurable: true,
+          enumerable: false
+        });
+      }
+    }
+  ],
 
   properties: [
     {
+      class: 'Int',
+      name: 'ordinal',
+      final: true
+    },
+    {
       class: 'String',
       name: 'name',
-      preSet: function(_, s) {
-        return foam.String.constantize(s);
-      }
+      final: true
     },
     {
       class: 'String',
-      name: 'label'
-    },
-    {
-      class: 'Int',
-      name: 'ordinal'
-    },
-    {
-      name: 'values'
+      name: 'label',
+      final: true
     }
   ],
 
   methods: [
-    function installInClass(cls) {
-      var name    = this.name;
-      var ordinal = this.ordinal;
-
-      Object.defineProperty(
-        cls,
-        name,
-        {
-          configurable: true,
-          get: function() {
-            return cls.create({ ordinal: ordinal }, foam.__context__);
-          }
-        });
-    },
-
-    function installInProto(proto) {
-      this.installInClass(proto);
-    },
-
-    function initArgs(args, ctx) {
-      this.values = args;
-      this.SUPER(args, ctx);
-    }
+    function toString() { return this.name; }
   ]
 });
 
@@ -388,24 +295,32 @@ foam.CLASS({
   documentation: 'A Property type for storing enum values.',
 
   properties: [
-    { name: 'of', required: true },
+    {
+      class: 'Class',
+      name: 'of',
+      required: true,
+      assertValue: function(of) {
+        if ( ! this.lookup(of, true) ) throw 'Unknown Enum: ' + of;
+      }
+    },
     [
       'adapt',
       function(o, n, prop) {
-        // FUTURE: make into a mmethod()
+        var of = prop.of;
 
-        if ( foam.core.internal.EnumValue.isInstance(n) ) return n;
+        if ( n && n.cls_ === of ) return n;
 
-        var type = foam.typeOf(n);
-        var e    = this.__context__.lookup(prop.of);
+        var type = foam.typeOf(n), ret;
 
         if ( type === foam.String ) {
-          return e[foam.String.constantize(n)];
+          ret = of[foam.String.constantize(n)];
+        } else if ( type === foam.Number ) {
+          ret = of.create({ordinal: n}, foam.__context__);
         }
 
-        if ( type === foam.Number ) {
-          return e.create({ordinal: n}, foam.__context__);
-        }
+        if ( ret ) return ret;
+
+        throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
     ]
   ]
@@ -417,23 +332,8 @@ foam.LIB({
 
   methods: [
     function ENUM(m) {
-      var model = foam.core.EnumModel.create(m);
-      model.validate();
-
-      var cls = model.buildClass();
-      cls.validate();
-
-      foam.register(cls);
-      foam.package.registerClass(cls);
-
-      return cls;
+      m.class = m.class || 'foam.core.EnumModel';
+      return foam.CLASS(m);
     }
   ]
 });
-
-
-/*
-TODO(adamvy):
-  - Only serialize the ordinal.
-  - Freeze the instances.
-*/

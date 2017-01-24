@@ -21,13 +21,15 @@ foam.CLASS({
   requires: [
     'foam.dao.EasyDAO',
     'com.chrome.origintrials.model.Application',
+    'com.chrome.origintrials.model.User',
+    'com.chrome.origintrials.model.Token',
     'com.chrome.origintrials.model.Experiment'
   ],
   exports: [
     'applicationDAO',
     'experimentDAO',
-    'applicationDAO as com.chrome.origintrials.model.ApplicationDAO',
-    'experimentDAO as com.chrome.origintrials.model.ExperimentDAO'
+    'userDAO',
+    'tokenDAO'
   ],
   methods: [
     function genTestData() {
@@ -86,6 +88,30 @@ foam.CLASS({
           guid: true,
           daoType: 'MDAO',
           testData: this.genTestData()
+        });
+
+        return dao;
+      }
+    },
+    {
+      name: 'userDAO',
+      factory: function() {
+        var dao = this.EasyDAO.create({
+          of: this.User,
+          guid: true,
+          daoType: 'MDAO'
+        });
+
+        return dao;
+      }
+    },
+    {
+      name: 'tokenDAO',
+      factory: function() {
+        var dao = this.EasyDAO.create({
+          of: this.Token,
+          guid: true,
+          daoType: 'MDAO'
         });
 
         return dao;

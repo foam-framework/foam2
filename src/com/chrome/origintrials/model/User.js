@@ -17,47 +17,15 @@
 
 foam.CLASS({
   package: 'com.chrome.origintrials.model',
-  name: 'Token',
-  ids: [ 'origin', 'feature' ],
+  name: 'User',
   properties: [
     {
-      class: 'String',
-      name: 'origin'
-    },
-    {
-      class: 'String',
-      name: 'feature'
-    },
-    {
-      class: 'String',
-      name: 'emailAddress'
+      class: 'EMail',
+      name: 'email'
     },
     {
       class: 'String',
       name: 'name'
-    },
-    {
-      class: 'String',
-      name: 'rowNumber'
-    },
-    {
-      class: 'String',
-      name: 'token'
-    },
-    {
-      class: 'DateTime',
-      name: 'expiryTime'
-    },
-    {
-      class: 'Boolean',
-      name: 'isSubdomain'
-    }
-  ],
-  actions: [
-    {
-      name: 'renew',
-      code: function() {
-      }
     }
   ]
 });

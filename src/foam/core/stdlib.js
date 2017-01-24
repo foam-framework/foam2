@@ -178,9 +178,8 @@ foam.LIB({
             return cache;
           },
           'memoize0(' + f.name + ')');
-        ret.toString = function() { return f.toString(); };
-        return ret;
-
+      ret.toString = function() { return f.toString(); };
+      return ret;
     },
 
     /**
@@ -228,17 +227,25 @@ foam.LIB({
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      var match = f.
+      var str = f.
           toString().
-          replace(/(\r\n|\n|\r)/gm,'').
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+          replace(/(\r\n|\n|\r)/gm,'');
+      var isArrowFunction = str.indexOf('function') !== 0;
+
+      var match = isArrowFunction ?
+          // (...args...) => ...
+          // or
+          // arg => ...
+          match = str.match(/^(\(([^)]*)\)[^=]*|([^=]+))=>/) :
+          // function (...args...) { ...body... }
+          match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return match[2] || '';
+      return isArrowFunction ? (match[2] || match[1] || '') : (match[2] || '');
     },
 
     function argNames(f) {
@@ -371,7 +378,6 @@ foam.LIB({
         return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
       })
     },
-
     {
       name: 'labelize',
       code: foam.Function.memoize1(function(/* String= */ str) {
@@ -382,7 +388,6 @@ foam.LIB({
         }));
       })
     },
-
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
@@ -418,7 +423,6 @@ foam.LIB({
         return str.toUpperCase();
       })
     },
-
     {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
@@ -428,14 +432,12 @@ foam.LIB({
         return str.replace(/\./g, '-');
       })
     },
-
     function pad(obj, size) {
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
         (new Array(-size).join(' ') + obj).slice(size)       :
         (obj + new Array(size).join(' ')).substring(0, size) ;
     },
-
     function multiline(f) {
       // Function for returning multi-line strings from commented functions.
       // Ex. var str = multiline(function() { /* multi-line string here */ });
@@ -712,7 +714,7 @@ foam.LIB({
       function diff(a, b)    {
         var t = typeOf(a);
         return t.diff ? t.diff(a, b) : undefined;
-      },
+      }
     ]
   });
 })();

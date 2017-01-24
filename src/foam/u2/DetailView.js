@@ -69,7 +69,8 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return ! p.hidden; });
+          // TODO: this is a temporary fix, but Visibility.HIDDEN should be included and could be switched
+          filter(function(p) { return ! ( p.hidden || p.visibility === foam.u2.Visibility.HIDDEN ); });
       }
     },
     {
