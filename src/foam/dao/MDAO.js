@@ -34,7 +34,9 @@ foam.CLASS({
     'foam.dao.index.ValueIndex',
     'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.True',
-    'foam.mlang.sink.Explain'
+    'foam.mlang.predicate.Or',
+    'foam.mlang.sink.Explain',
+    'foam.dao.index.MergePlan'
   ],
 
   properties: [
@@ -52,6 +54,7 @@ foam.CLASS({
       name: 'idIndex'
     },
     {
+      /** The createNodeed root instance of our index. */
       name: 'index'
     }
   ],
@@ -63,7 +66,7 @@ foam.CLASS({
       this.idIndex = this.index;
 
       if ( this.autoIndex ) {
-        this.addIndex(this.AutoIndex.create({ mdao: this }));
+        this.addIndex(this.AutoIndex.create({ idIndex: this.idIndex.creator }));
       }
     },
 
@@ -101,16 +104,20 @@ foam.CLASS({
 
     function addIndex(index) {
       if ( ! this.index ) {
-        this.index = index;
+        this.index = index.createNode();
         return this;
       }
 
       // Upgrade single Index to an AltIndex if required.
-      if ( ! this.AltIndex.isInstance(this.index) ) {
-        this.index = this.AltIndex.create({ delegates: [this.index] });
+      if ( ! this.AltIndex.isInstance(this.index.creator) ) {
+        this.index = this.AltIndex.create({
+          delegates: [ this.index.creator ], // create factory
+        }).createNode({
+          delegates: [ this.index ] // create an instance
+        });
       }
 
-      this.index.addIndex(index);
+      this.index.addIndex(index, this.index);
 
       return this;
     },
@@ -202,15 +209,20 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var plan;
-
+//console.log("----select");
       if ( this.Explain.isInstance(sink) ) {
-        plan = this.index.plan(sink.arg1, skip, limit, order, predicate);
+        plan = this.index.plan(sink.arg1, skip, limit, order, predicate, this.index);
         sink.plan = 'cost: ' + plan.cost + ', ' + plan.toString();
         sink && sink.eof && sink.eof();
         return Promise.resolve(sink);
       }
 
-      plan = this.index.plan(sink, skip, limit, order, predicate);
+      predicate = predicate && predicate.toDisjunctiveNormalForm();
+      if ( ! predicate || ! this.Or.isInstance(predicate) ) {
+        plan = this.index.plan(sink, skip, limit, order, predicate, this.index);
+      } else {
+        plan = this.planForOr(sink, skip, limit, order, predicate);
+      }
 
       var promise = [Promise.resolve()];
       plan.execute(promise, sink, skip, limit, order, predicate);
@@ -226,8 +238,31 @@ foam.CLASS({
       );
     },
 
+    function planForOr(sink, skip, limit, order, predicate) {
+      // if there's a limit, add skip to make sure we get enough results
+      //   from each subquery. Our sink will throw out the extra results
+      //   after sorting.
+      var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
+
+      // This is an instance of OR, break up into separate queries
+      var args = predicate.args;
+      var plans = [];
+      for ( var i = 0; i < args.length; i++ ) {
+        // NOTE: we pass sink here, but it's not going to be the one eventually
+        // used.
+        plans.push(
+          this.index.plan(sink, undefined, subLimit, undefined, args[i], this.index)
+        );
+      }
+
+      return this.MergePlan.create({ subPlans: plans });
+    },
+
     function toString() {
       return 'MDAO(' + this.cls_.name + ',' + this.index + ')';
     }
   ]
 });
+
+
+

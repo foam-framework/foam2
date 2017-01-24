@@ -36,50 +36,17 @@ foam.CLASS({
     { class: 'Simple', name: 'value' },
     { class: 'Simple', name: 'size'  },
     { class: 'Simple', name: 'level' },
-    { class: 'Simple', name: 'left'  },
-    { class: 'Simple', name: 'right' },
-
-    // per tree properties
     {
-      /**
-        The null node guards the leaves of the tree. It is a single shared
-        instance per tree, set by TreeIndex when setting up the tree node
-        factory. Every partial or empty node is marked by setting its
-        left and/or right to the nullNode.
-        <p>
-        TreeNodes use the nullNode reference to clear their left/right
-        references, and NullTreeNode uses the tree node factory to create
-        new nodes.
-      */
-      name: 'nullNode'
-    }
+      class: 'Simple',
+      name: 'left',
+    },
+    {
+      class: 'Simple',
+      name: 'right',
+    },
   ],
 
   methods: [
-
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
-    },
-
-    function init() {
-      this.left  = this.left  || this.nullNode;
-      this.right = this.right || this.nullNode;
-    },
-
-    /** Nodes do a shallow clone */
-    function clone() {
-      var c = this.__proto__.create();
-      c.key   = this.key;
-      c.value = this.value;
-      c.size  = this.size;
-      c.level = this.level;
-      c.left  = this.left;
-      c.right = this.right;
-      return c;
-    },
 
     /**
        Clone is only needed if a select() is active in the tree at the
@@ -87,6 +54,17 @@ foam.CLASS({
     */
     function maybeClone(locked) {
       return locked ? this.clone() : this;
+    },
+    
+    function clone() {
+      var c = this.cls_.create();
+      c.key = this.key;
+      c.value = this.value;
+      c.size = this.size;
+      c.level = this.level;
+      c.left = this.left;
+      c.right = this.right;
+      return c;
     },
 
     function updateSize() {
@@ -176,6 +154,16 @@ foam.CLASS({
       return r > 0 ? this.left.get(key, compare) : this.right.get(key, compare);
     },
 
+    /** scans the entire tree and returns all matches */
+    function getAll(key, compare, retArray) {
+      var r = compare(this.key, key);
+
+      if ( r === 0 ) retArray.push(this.value);
+
+      this.left.getAll(key, compare, retArray);
+      this.right.getAll(key, compare, retArray);
+    },
+
     function putKeyValue(key, value, compare, dedup, locked) {
       var s = this.maybeClone(locked);
 
@@ -198,7 +186,7 @@ foam.CLASS({
       return s.split(locked).skew(locked);
     },
 
-    function removeKeyValue(key, value, compare, locked) {
+    function removeKeyValue(key, value, compare, locked, nullNode) {
       var s = this.maybeClone(locked);
       var side;
       var r = compare(s.key, key);
@@ -216,7 +204,7 @@ foam.CLASS({
 
         // If we're a leaf, easy, otherwise reduce to leaf case.
         if ( ! s.left.level && ! s.right.level ) {
-          return this.nullNode;
+          return nullNode;
         }
 
         side = s.left.level ? 'left' : 'right';
@@ -236,7 +224,7 @@ foam.CLASS({
         side = r > 0 ? 'left' : 'right';
 
         s.size -= s[side].size;
-        s[side] = s[side].removeKeyValue(key, value, compare, locked);
+        s[side] = s[side].removeKeyValue(key, value, compare, locked, nullNode);
         s.size += s[side].size;
       }
 
@@ -272,7 +260,8 @@ foam.CLASS({
       return s;
     },
 
-    function select(sink, skip, limit, order, predicate) {
+  
+    function select(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
       if ( skip && skip[0] >= this.size && ! predicate ) {
@@ -280,24 +269,31 @@ foam.CLASS({
         return;
       }
 
-      this.left.select(sink, skip, limit, order, predicate);
-      this.value.select(sink, skip, limit, order, predicate);
-      this.right.select(sink, skip, limit, order, predicate);
+      this.left.select(sink, skip, limit, order, predicate, cache);
+
+      this.value.select(sink, skip, limit,
+        order && order.orderTail(), predicate, cache);
+
+      this.right.select(sink, skip, limit, order, predicate, cache);
     },
 
-    function selectReverse(sink, skip, limit, order, predicate) {
+   
+    function selectReverse(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
-
       if ( skip && skip[0] >= this.size && ! predicate ) {
-        console.log('reverse skipping: ', this.key);
+        //console.log('reverse skipping: ', this.key);
         skip[0] -= this.size;
         return;
       }
 
-      this.right.selectReverse(sink, skip, limit, order, predicate);
-      this.value.selectReverse(sink, skip, limit, order, predicate);
-      this.left.selectReverse(sink,  skip, limit, order, predicate);
+      this.right.selectReverse(sink, skip, limit, order, predicate, cache);
+
+      // select() will pick reverse or not based on order
+      this.value.select(sink, skip, limit,
+        order && order.orderTail(), predicate, cache);
+
+      this.left.selectReverse(sink,  skip, limit, order, predicate, cache);
     },
 
     function gt(key, compare) {
@@ -317,24 +313,24 @@ foam.CLASS({
       return s.right;
     },
 
-    function gte(key, compare) {
+    function gte(key, compare, nullNode) {
       var s = this;
       var copy;
       var r = compare(key, s.key);
 
       if ( r < 0 ) {
-        var l = s.left.gte(key, compare);
+        var l = s.left.gte(key, compare, nullNode);
         copy = s.clone();
         copy.size = s.size - s.left.size + l.size,
         copy.left = l;
         return copy;
       }
 
-      if ( r > 0 ) return s.right.gte(key, compare);
+      if ( r > 0 ) return s.right.gte(key, compare, nullNode);
 
       copy = s.clone();
       copy.size = s.size - s.left.size,
-      copy.left = s.nullNode;
+      copy.left = nullNode;
       return copy;
     },
 
@@ -355,26 +351,27 @@ foam.CLASS({
       return s.left;
     },
 
-    function lte(key, compare) {
+    function lte(key, compare, nullNode) {
       var s = this;
       var copy;
       var r = compare(key, s.key);
 
       if ( r > 0 ) {
-        var rt = s.right.lte(key, compare);
+        var rt = s.right.lte(key, compare, nullNode);
         copy = s.clone();
         copy.size = s.size - s.right.size + rt.size;
         copy.right = rt;
         return copy;
       }
 
-      if ( r < 0 ) return s.right.lte(key, compare);
+      if ( r < 0 ) return s.right.lte(key, compare, nullNode);
 
       copy = s.clone();
       copy.size = s.size - s.right.size;
-      copy.right = s.nullNode;
+      copy.right = nullNode;
       return copy;
-    }
+    },
+
   ]
 });
 
@@ -391,7 +388,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'NullTreeNode',
-  extends: 'foam.dao.index.TreeNode',
 
   properties: [
     {
@@ -400,21 +396,41 @@ foam.CLASS({
         the factory for the tail index to create inside each new node.
       */
       class: 'Simple',
-      name: 'tailFactory'
+      name: 'tail'
     },
     {
       /**
         The tree node factory is used to create new, empty tree nodes. They
-        will be initialized with a new tail index from tailFactory.
+        will be initialized with a new tail index from tail.
       */
       class: 'Simple',
-      name: 'treeNodeFactory'
+      name: 'treeNode'
+    },
+    {
+      class: 'Simple',
+      name: 'left',
+      //getter: function() { return undefined; }
+    },
+    {
+      class: 'Simple',
+      name: 'right',
+      //getter: function() { return undefined; }
+    },
+    {
+      class: 'Simple',
+      name: 'size',
+      //getter: function() { return 0; }
+    },
+    {
+      class: 'Simple',
+      name: 'level',
+      //getter: function() { return 0; }
     }
   ],
 
   methods: [
     function init() {
-      this.left  = undefined;
+      this.left = undefined;
       this.right = undefined;
       this.size = 0;
       this.level = 0;
@@ -430,9 +446,11 @@ foam.CLASS({
 
     /** Add a new value to the tree */
     function putKeyValue(key, value) {
-      var subIndex = this.tailFactory.create();
+      var subIndex = this.tail.createNode();
       subIndex.put(value);
-      var n = this.treeNodeFactory.create();
+      var n = this.treeNode.create();
+      n.left = this;
+      n.right = this;
       n.key = key;
       n.value = subIndex;
       n.size = 1;
@@ -449,6 +467,8 @@ foam.CLASS({
     function gte()  { return this; },
     function lt()   { return this; },
     function lte()  { return this; },
+
+    function getAll()  { return; },
 
     function bulkLoad_(a, start, end, keyExtractor) {
       if ( end < start ) return this;
