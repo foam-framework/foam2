@@ -240,6 +240,7 @@ var examples = [
     name: 'Join',
     description: "Finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
+    platforms: { web: true },
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
       foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
@@ -265,6 +266,7 @@ var examples = [
     name: 'Manual Join',
     description: "Without using Relationships, finds all transactions for a given customer",
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
+    platforms: { web: true },
     code: function async() {
       var tsink = foam.dao.ArrayDAO.create();
       foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
@@ -316,6 +318,7 @@ var examples = [
     name: 'Selecting with skip and limit',
     description: "A pseudo scroll effect with skip and limit",
     dependencies: [ 'Load Customers', 'Create Accounts' ],
+    platforms: { web: true },
     code: function() {
       var proxyDAO = foam.dao.ProxyDAO.create({ delegate: app.customerDAO });
       var skip = 0;
@@ -337,6 +340,7 @@ var examples = [
     name: 'Ordering',
     description: "Sorting results",
     dependencies: [ 'Create Transactions' ],
+    platforms: { web: true },
     code: function async() {
       return app.accountDAO.find(3).then(function(account) {
         var transactionsDAO = account.transactions;

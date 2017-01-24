@@ -658,6 +658,15 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaFactory'
+    },
+    {
+      class: 'String',
+      name: 'javaValue',
+      expression: function(value) {
+        return foam.typeOf(value) === foam.String ? '"' + value + '"' :
+          foam.typeOf(value) === foam.Undefined ? 'null' :
+          value;
+      }
     }
   ],
   methods: [
@@ -698,10 +707,10 @@ foam.CLASS({
           name: 'get' + capitalized,
           type: this.javaType,
           visibility: 'public',
-          body: ( this.hasOwnProperty('javaFactory') ?
-              'if ( ! ' + isSet + ' ) {\n' +
-              '  set' + capitalized + '(' + factoryName + '());\n' +
-              '}\n' : '' ) +
+          body: 'if ( ! ' + isSet + ' ) {\n' +
+            ( this.hasOwnProperty('javaFactory') ? '  set' + capitalized + '(' + factoryName + '());\n' :
+                ' return ' + this.javaValue  + ';\n' ) +
+            '}\n' +
             'return ' + privateName + ';'
         }).
         method({
@@ -915,7 +924,12 @@ foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
-    ['javaType', 'Object'],
+    {
+      name: 'javaType',
+      expression: function(props) {
+        return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
+      }
+    },
     ['javaJSONParser', 'foam.lib.parse.Fail'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ],
@@ -996,7 +1010,7 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-      if ( this.hasDefaultValue('javaJSONParser') ) {
+      if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
         var of = this.of === 'FObject' ? 'foam.core.FObject' : this.of;
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';

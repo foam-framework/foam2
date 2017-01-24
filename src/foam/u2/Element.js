@@ -332,7 +332,7 @@ foam.CLASS({
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
-      if ( this.parentNode && this.parentNode.state === this.LOADED ) {
+      if ( ! this.parentNode || this.parentNode.state === this.LOADED ) {
         var e = this.el();
         if ( e ) e.remove();
       }
@@ -1811,6 +1811,11 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
+      name: 'visibility'
     }
   ],
 
@@ -1849,6 +1854,16 @@ foam.CLASS({
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  requires: [ 'foam.u2.DateTimeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
   ]
 });
 

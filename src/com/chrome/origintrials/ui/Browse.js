@@ -25,7 +25,8 @@ foam.CLASS({
     'foam.u2.TableSelection',
     'foam.u2.TableView',
     'foam.u2.search.FilterController',
-    'com.chrome.origintrials.model.Application'
+    'com.chrome.origintrials.model.Application',
+    'com.chrome.origintrials.ui.Admin'
   ],
   imports: [
     'stack',
@@ -66,6 +67,9 @@ foam.CLASS({
             }).
             end().
           end().
+          start(this.Tab, { label: 'Admin' }).
+            start(this.Admin).end().
+          end().
         end();
     }
   ],
@@ -98,6 +102,34 @@ foam.CLASS({
             model.APPROVE.maybeCall(X, sink.a[i]);
             self.put(sink.a[i]);
           }
+        });
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.chrome.origintrials.ui',
+  name: 'Admin',
+  extends: 'foam.u2.Element',
+  imports: [
+    'stack'
+  ],
+  exports: [
+    'as data'
+  ],
+  methods: [
+    function initE() {
+      this.add(this.ADD_USER);
+    }
+  ],
+  actions: [
+    {
+      name: 'addUser',
+      code: function() {
+        this.stack.push({
+          class: 'foam.comics.DAOCreateController',
+          of: 'com.chrome.origintrials.model.User'
         });
       }
     }

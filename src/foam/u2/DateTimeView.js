@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,29 @@
  * limitations under the License.
  */
 
+// TODO: Add datalist support.
+
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TextField',
+  name: 'DateTimeView',
   extends: 'foam.u2.tag.Input',
-
-  properties: [
-    {
-      class: 'Int',
-      name: 'displayWidth'
-    },
-    'type'
-  ],
 
   methods: [
     function initE() {
       this.SUPER();
-
-      if ( this.type         ) this.setAttribute('type', this.type);
-      if ( this.displayWidth ) this.setAttribute('size', this.displayWidth);
+      this.setAttribute('type', 'datetime-local');
     },
 
-    function fromProperty(prop) {
-      this.SUPER(prop);
-
-      if ( ! this.displayWidth ) {
-        this.displayWidth = prop.displayWidth;
-      }
-
-      if ( prop.visibility ) {
-        this.visibility = prop.visibility;
-      }
+    function link() {
+      this.data$.relateTo(
+          this.attrSlot(null, this.onKey ? 'input' : null),
+          function(date) {
+            return date ? date.toISOString().substring(0,16) : date;
+          },
+          function(value) {
+            return new Date(value);
+          }
+      );
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^:read-only { border-width: 0; }
-      */}
-    })
   ]
 });
