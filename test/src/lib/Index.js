@@ -1008,7 +1008,7 @@ describe('MergePlan', function() {
     for ( var i = count / 2; i < count * 1.5; i++ ) {
       ret.setB.push(test.MergePlanTestData.create({
         a: i,
-        b: count * 1.5 - i
+        b: count - i
       }));
     }
 
@@ -1166,31 +1166,72 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, undefined, undefined, ordering);
 
+    expect(sink.a.length).toBe(15);
+
+    expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
+    expect(sink.a[1].a).toBe(13); expect(sink.a[1].b).toBe(-3);
+    expect(sink.a[2].a).toBe(12); expect(sink.a[2].b).toBe(-2);
+    expect(sink.a[3].a).toBe(11); expect(sink.a[3].b).toBe(-1);
+    expect(sink.a[4].a).toBe(10); expect(sink.a[4].b).toBe(0);
+    expect(sink.a[5].a).toBe(9); expect(sink.a[5].b).toBe(1);
+    expect(sink.a[6].a).toBe(8); expect(sink.a[6].b).toBe(2);
+    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(3);
+    expect(sink.a[8].a).toBe(6); expect(sink.a[8].b).toBe(4);
+    expect(sink.a[9].a).toBe(5); expect(sink.a[9].b).toBe(5);
+    expect(sink.a[10].a).toBe(4); expect(sink.a[10].b).toBe(6);
+    expect(sink.a[11].a).toBe(3); expect(sink.a[11].b).toBe(7);
+    expect(sink.a[12].a).toBe(2); expect(sink.a[12].b).toBe(8);
+    expect(sink.a[13].a).toBe(1); expect(sink.a[13].b).toBe(9);
+    expect(sink.a[14].a).toBe(0); expect(sink.a[14].b).toBe(10);
+
+
+  });
+
+  it('merges results (reverse input order)', function() {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setB[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+
     for (var j =0; j<sink.a.length;j++) {
       var item = sink.a[j];
       console.log("item", j, item.a, item.b);
     }
 
-//     expect(sink.a.length).toBe(20);
-//     expect(sink.a[0].b).toBe(1);
-//     expect(sink.a[1].b).toBe(2);
-//       expect(sink.a[0].a).toBe(9);
-//       expect(sink.a[1].a).toBe(8);
+    expect(sink.a.length).toBe(15);
 
-//     expect(sink.a[5].b).toBe(6); // 5 items overlap...
-//     expect(sink.a[6].b).toBe(6);
-//       expect(sink.a[5].a).toBe(4); // dupe B value at setA:a=4 and setB:a=9
-//       expect(sink.a[6].a).toBe(9);
-
-//     expect(sink.a[9].b).toBe(8);
-//     expect(sink.a[10].b).toBe(8);
-//     expect(sink.a[11].b).toBe(9);
-//     expect(sink.a[12].b).toBe(9); // ... overlap ends
-
-//     expect(sink.a[18].b).toBe(14);
-//     expect(sink.a[19].b).toBe(15);
-//       expect(sink.a[18].a).toBe(1);
-//       expect(sink.a[19].a).toBe(0);
+    expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
+    expect(sink.a[1].a).toBe(13); expect(sink.a[1].b).toBe(-3);
+    expect(sink.a[2].a).toBe(12); expect(sink.a[2].b).toBe(-2);
+    expect(sink.a[3].a).toBe(11); expect(sink.a[3].b).toBe(-1);
+    expect(sink.a[4].a).toBe(10); expect(sink.a[4].b).toBe(0);
+    expect(sink.a[5].a).toBe(9); expect(sink.a[5].b).toBe(1);
+    expect(sink.a[6].a).toBe(8); expect(sink.a[6].b).toBe(2);
+    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(3);
+    expect(sink.a[8].a).toBe(6); expect(sink.a[8].b).toBe(4);
+    expect(sink.a[9].a).toBe(5); expect(sink.a[9].b).toBe(5);
+    expect(sink.a[10].a).toBe(4); expect(sink.a[10].b).toBe(6);
+    expect(sink.a[11].a).toBe(3); expect(sink.a[11].b).toBe(7);
+    expect(sink.a[12].a).toBe(2); expect(sink.a[12].b).toBe(8);
+    expect(sink.a[13].a).toBe(1); expect(sink.a[13].b).toBe(9);
+    expect(sink.a[14].a).toBe(0); expect(sink.a[14].b).toBe(10);
 
   });
 
