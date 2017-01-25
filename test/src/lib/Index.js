@@ -1210,11 +1210,6 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, undefined, undefined, ordering);
 
-    for (var j =0; j<sink.a.length;j++) {
-      var item = sink.a[j];
-      console.log("item", j, item.a, item.b);
-    }
-
     expect(sink.a.length).toBe(15);
 
     expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
@@ -1235,9 +1230,91 @@ describe('MergePlan', function() {
 
   });
 
+  it('merges with skip and limit', function() {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
 
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setB[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, 3, 5, ordering);
+
+    expect(sink.a.length).toBe(5);
+
+    expect(sink.a[0].a).toBe(11); expect(sink.a[0].b).toBe(-1);
+    expect(sink.a[1].a).toBe(10); expect(sink.a[1].b).toBe(0);
+    expect(sink.a[2].a).toBe(9); expect(sink.a[2].b).toBe(1);
+    expect(sink.a[3].a).toBe(8); expect(sink.a[3].b).toBe(2);
+    expect(sink.a[4].a).toBe(7); expect(sink.a[4].b).toBe(3);
+
+  });
+
+
+  it('handles async indexes', function(done) {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
+    var resolve;
+    var promiseRef = [new Promise(function(res, rej) {
+      resolve = res;
+    })];
+    var innerResolve;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          promise[0] = Promise.resolve().then(function() {
+            for ( var i = 9; i >= 0; i-- ) {
+              sink.put(data.setB[i]);
+            }
+          });
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          promise[0] = new Promise(function(res, rej) {
+            innerResolve = res; // intermediate promise we control
+          }).then(function() {
+            for ( var i = 9; i >= 0; i-- ) { // do final work
+              sink.put(data.setA[i]);
+            }
+          });
+        }
+      }),
+    ];
+
+    plan.execute(promiseRef, sink, undefined, undefined, ordering);
+    // Nothing resloved, no sink putting actually done by our customExecutes
+    for (var j =0; j<sink.a.length;j++) {
+      var item = sink.a[j];
+      console.log("item1", j, item.a, item.b);
+    }
+    expect(sink.a.length).toBe(0);
+
+    promiseRef[0].then(function() {
+      // all resolved, all sinks dumped to result sink
+      expect(sink.a.length).toBe(15);
+    }).then(done);
+
+    // release both the first and second promises in the chain
+    resolve();
+    innerResolve();
+
+  });
 });
-
 
 
 
