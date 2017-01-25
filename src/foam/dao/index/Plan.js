@@ -139,6 +139,7 @@ foam.CLASS({
   properties: [
     {
       name: 'subPlans',
+      factory: function() { return []; },
       postSet: function(o, nu) {
         this.cost = 1;
         for ( var i = 0; i < nu.length; ++i ) {
@@ -183,6 +184,7 @@ foam.CLASS({
     'foam.dao.LimitedSink',
     'foam.dao.SkipSink',
     'foam.dao.OrderedSink',
+    'foam.dao.FlowControl'
   ],
 
   methods: [
@@ -198,8 +200,10 @@ foam.CLASS({
       // TODO: track list size, cut off if above skip+limit
 
       var sp = this.subPlans;
-      var predicates = predicate.args;
+      var predicates = predicate ? predicate.args : [];
       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
+      var compare = order ? order.compare.bind(order) : foam.util.compare;
+      var promises = []; // track any async subplans
       //console.assert(predicates.length == sp.length);
 
       // Each plan inserts into the list
@@ -209,12 +213,16 @@ foam.CLASS({
         // TODO: refactor with insertAfter as a property of a new class
         var insertPlanSink = foam.dao.QuickSink.create({
           putFn: function(o) {
-            // o may be larger or equal to insertAfter.data. If o is equal,
-            //   this loop will ignore it, which deduplicates.
-            while ( order.compare(o, insertAfter.data) > 0 ) {
+            // o may be larger or equal to insertAfter.data. Equality is only
+            //  checked on the property being ordered, so a deduplicating
+            //  FObject.equals check ensures the exact same object is not
+            //  inserted twice.
+            while ( ( ! insertAfter.data ) ||
+                    ( compare(o, insertAfter.data) >= 0 &&
+                       ! foam.core.FObject.equals(o, insertAfter.data) ) ) {
               var next = insertAfter.next;
               // if end-of-list or found a larger item, insert
-              if ( ( ! next ) || order.compare(o, next.data) < 0 ) {
+              if ( ( ! next ) || compare(o, next.data) < 0 ) {
                 var nu = Object.create(NodeProto);
                 nu.next = insertAfter.next;
                 nu.data = o;
@@ -229,21 +237,25 @@ foam.CLASS({
             }
           }
         });
+        // restart the promise chain, if a promise is added we collect it
+        var nuPromiseRef = [];
         sp[i].execute(
-          promise,
+          nuPromiseRef,
           insertPlanSink,
           undefined,
           subLimit,
           order,
           predicates[i]
         );
+        if ( nuPromiseRef[0] ) promises.push(nuPromiseRef[0]);
       }
 
+      // result reading may by async, so define it but don't call it yet
+      var resultSink = this.decorateSink_(sink, skip, limit);
+      var fc = this.FlowControl.create();
       function scanResults() {
         // The list starting at head now contains the results plus possible
         //  overflow of skip+limit
-        var resultSink = this.decorateSink_(sink, skip, limit);
-        var fc = foam.core.dao.FlowControl.create();
         var node = head.next;
         while ( node && ( ! fc.stopped ) ) {
           resultSink.put(node.data, fc);
@@ -253,14 +265,19 @@ foam.CLASS({
 
       // if there is an async index in the above, wait for it to finish
       //   before reading out the results.
-      if ( promise[0] ) {
-        promise[0].then(scanResults);
+      if ( promises.length ) {
+        var thisPromise = Promise.all(promises).then(scanResults);
+        // if an index above us is also async, chain ourself on
+        promise[0] = promise[0] ? promise[0].then(thisPromise) : thisPromise;
       } else {
+        // In the syncrhonous case we don't have to wait on our subplans,
+        //  and can ignore promise[0] as someone else is responsible for
+        //  waiting on it if present.
         scanResults();
       }
     },
 
-    /** TODO: Share with AbstractDAO. We never need to use predicate.
+    /** TODO: Share with AbstractDAO? We never need to use predicate or order
       @private */
     function decorateSink_(sink, skip, limit) {
       if ( limit != undefined ) {

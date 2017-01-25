@@ -845,9 +845,9 @@ describe('AND', function() {
       test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
       1
     );
-    
+
     expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
-    
+
   });
 
 });
@@ -988,3 +988,192 @@ describe('AutoIndex', function() {
 
 
 });
+
+
+
+describe('MergePlan', function() {
+  var plan;
+  var sink;
+
+  function generateData(count) {
+    foam.CLASS({
+      package: 'test',
+      name: 'MergePlanTestData',
+      ids: ['a'],
+      properties: [
+        { name: 'a' },
+        { name: 'b' }
+      ]
+    });
+
+    // prop 'a' values overlap, prop 'b' half-overlaps and is reversed
+    var ret = { setA: [], setB: [] };
+
+    for ( var i = 0; i < count; i++ ) {
+      ret.setA.push(test.MergePlanTestData.create({ a: i, b: count - i }));
+      ret.setB.push(test.MergePlanTestData.create({ a: i, b: count * 1.5 - i }));
+    }
+
+    return ret;
+  };
+
+  beforeEach(function() {
+    plan = foam.dao.index.MergePlan.create();
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('handles empty input', function() {
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(0);
+  });
+
+  it('handles a single subplan', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 10; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      })
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+  });
+
+  it('handles a single subplan with ordering', function() {
+    var data = generateData(10);
+
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 10; i++ ) {
+            sink.put(data.setA[9 - i]);
+          }
+        }
+      })
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].b).toBe(1); // should be ordered by 'b'
+    expect(sink.a[9].b).toBe(10);
+  });
+
+  it('deduplicates', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
+  it('deduplicates clones (different object, but same id and values)', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put cloned dupes of first 5
+            sink.put(data.setA[i].clone());
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
+
+  it('deduplicates clones (different object, but same id and values)', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put cloned dupes of first 5
+            sink.put(data.setA[i].clone());
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
+
+});
+
+
+
+
