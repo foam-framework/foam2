@@ -187,6 +187,14 @@ foam.CLASS({
     'foam.dao.FlowControl'
   ],
 
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      required: true
+    }
+  ],
+
   methods: [
     /**
       Executes sub-plans, limiting results from each, then merges results,
@@ -204,7 +212,7 @@ foam.CLASS({
       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
       var compare = order ? order.compare.bind(order) : foam.util.compare;
       var promises = []; // track any async subplans
-      //console.assert(predicates.length == sp.length);
+      var dedupCompare = this.of.ID.compare.bind(this.of.ID);
 
       // Each plan inserts into the list
       for ( var i = 0 ; i < sp.length ; ++i) {
@@ -215,11 +223,11 @@ foam.CLASS({
           putFn: function(o) {
             // o may be larger or equal to insertAfter.data. Equality is only
             //  checked on the property being ordered, so a deduplicating
-            //  FObject.equals check ensures the exact same object is not
+            //  check ensures the same object (by matching id) is not
             //  inserted twice.
             while ( ( ! insertAfter.data ) ||
                     ( compare(o, insertAfter.data) >= 0 &&
-                       ! foam.core.FObject.equals(o, insertAfter.data) ) ) {
+                       dedupCompare(o, insertAfter.data) !== 0 ) ) {
               var next = insertAfter.next;
               // if end-of-list or found a larger item, insert
               if ( ( ! next ) || compare(o, next.data) < 0 ) {

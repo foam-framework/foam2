@@ -996,6 +996,26 @@ describe('MergePlan', function() {
   var sink;
 
   function generateData(count) {
+    // prop 'a' values overlap, prop 'b' half-overlaps and is reversed
+    var ret = { setA: [], setB: [] };
+
+    for ( var i = 0; i < count; i++ ) {
+      ret.setA.push(test.MergePlanTestData.create({
+        a: i,
+        b: count - i
+      }));
+    }
+    for ( var i = count / 2; i < count * 1.5; i++ ) {
+      ret.setB.push(test.MergePlanTestData.create({
+        a: i,
+        b: count * 1.5 - i
+      }));
+    }
+
+    return ret;
+  };
+
+  beforeEach(function() {
     foam.CLASS({
       package: 'test',
       name: 'MergePlanTestData',
@@ -1006,19 +1026,7 @@ describe('MergePlan', function() {
       ]
     });
 
-    // prop 'a' values overlap, prop 'b' half-overlaps and is reversed
-    var ret = { setA: [], setB: [] };
-
-    for ( var i = 0; i < count; i++ ) {
-      ret.setA.push(test.MergePlanTestData.create({ a: i, b: count - i }));
-      ret.setB.push(test.MergePlanTestData.create({ a: i, b: count * 1.5 - i }));
-    }
-
-    return ret;
-  };
-
-  beforeEach(function() {
-    plan = foam.dao.index.MergePlan.create();
+    plan = foam.dao.index.MergePlan.create({ of: 'test.MergePlanTestData' });
     sink = foam.dao.ArraySink.create();
   });
 
@@ -1135,40 +1143,55 @@ describe('MergePlan', function() {
     expect(sink.a[9].a).toBe(9);
   });
 
-
-  it('deduplicates clones (different object, but same id and values)', function() {
+  it('merges results', function() {
     var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
 
     plan.subPlans = [
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
-          for ( var i = 0; i < 5; i++ ) {
+          for ( var i = 9; i >= 0; i-- ) {
             sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
-          for ( var i = 0; i < 5; i++ ) { // put cloned dupes of first 5
-            sink.put(data.setA[i].clone());
-          }
-        }
-      }),
-      foam.dao.index.CustomPlan.create({
-        customExecute: function(promise, sink, skip, limit, order, predicate) {
-          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(data.setA[i]);
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setB[i]);
           }
         }
       }),
     ];
 
-    plan.execute([], sink);
-    expect(sink.a.length).toBe(10);
-    expect(sink.a[0].a).toBe(0);
-    expect(sink.a[1].a).toBe(1);
-    expect(sink.a[2].a).toBe(2);
-    expect(sink.a[9].a).toBe(9);
+    plan.execute([], sink, undefined, undefined, ordering);
+
+    for (var j =0; j<sink.a.length;j++) {
+      var item = sink.a[j];
+      console.log("item", j, item.a, item.b);
+    }
+
+//     expect(sink.a.length).toBe(20);
+//     expect(sink.a[0].b).toBe(1);
+//     expect(sink.a[1].b).toBe(2);
+//       expect(sink.a[0].a).toBe(9);
+//       expect(sink.a[1].a).toBe(8);
+
+//     expect(sink.a[5].b).toBe(6); // 5 items overlap...
+//     expect(sink.a[6].b).toBe(6);
+//       expect(sink.a[5].a).toBe(4); // dupe B value at setA:a=4 and setB:a=9
+//       expect(sink.a[6].a).toBe(9);
+
+//     expect(sink.a[9].b).toBe(8);
+//     expect(sink.a[10].b).toBe(8);
+//     expect(sink.a[11].b).toBe(9);
+//     expect(sink.a[12].b).toBe(9); // ... overlap ends
+
+//     expect(sink.a[18].b).toBe(14);
+//     expect(sink.a[19].b).toBe(15);
+//       expect(sink.a[18].a).toBe(1);
+//       expect(sink.a[19].a).toBe(0);
+
   });
 
 
