@@ -324,6 +324,23 @@ for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.internal.InterfaceMethod',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'javaSupport',
+      value: true
+    }
+  ],
+  methods: [
+    function buildJavaClass(cls) {
+      if ( ! this.javaSupport ) return;
+      return this.SUPER(cls);
+    }
+  ]
+});
+
 
 foam.CLASS({
   refines: 'foam.core.Method',
