@@ -224,7 +224,9 @@ foam.CLASS({
             // o may be larger or equal to insertAfter.data. Equality is only
             //  checked on the property being ordered, so a deduplicating
             //  check ensures the same object (by matching id) is not
-            //  inserted twice.
+            //  inserted twice. This assumes duplicates have the same
+            //  property values (or are the same object) and will fall in
+            //  the same place in the output list.
             while ( ( ! insertAfter.data ) ||
                     ( compare(o, insertAfter.data) >= 0 &&
                        dedupCompare(o, insertAfter.data) !== 0 ) ) {
