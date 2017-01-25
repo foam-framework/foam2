@@ -23,24 +23,40 @@ foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndex',
   extends: 'foam.dao.index.Index',
+
+  methods: [
+    function estimate(size, sink, skip, limit, order, predicate) {
+      return 1;
+    },
+
+    function toPrettyString(indent) {
+      return '';
+    },
+
+  ]
+});
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'ValueIndexNode',
+  extends: 'foam.dao.index.IndexNode',
   implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
-    { class: 'Simple',  name: 'value' },
-    { name: 'cost', value: 1 }
+    { class: 'Simple', name: 'value' },
+    { class: 'Simple', name: 'cost' }
   ],
 
   methods: [
     // from plan
     function execute(promise, sink) {
       /** Note that this will put(undefined) if you remove() the item but
-        leave this ValueIndex intact. Most usages of ValueIndex will clean up
+        leave this ValueIndex intact. Usages of ValueIndex should clean up
         the ValueIndex itself when the value is removed. */
       sink.put(this.value);
     },
 
     function toString() {
-      return "ValueIndex_Plan(cost=1, value:" + this.value + ")";
+      return 'ValueIndex_Plan(cost=1, value:' + this.value + ')';
     },
 
     // from Index
@@ -48,17 +64,13 @@ foam.CLASS({
     function remove() { this.value = undefined; },
     function get() { return this.value; },
     function size() { return typeof this.value === 'undefined' ? 0 : 1; },
-    function plan() { return this; },
+    function plan() { this.cost = 1; return this; },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select(sink, skip, limit, order, predicate, cache) {
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;
       sink.put(this.value);
     },
-
-    function selectReverse(sink, skip, limit, order, predicate) {
-      this.select(sink, skip, limit, order, predicate);
-    }
   ]
 });
