@@ -278,7 +278,9 @@ foam.CLASS({
       if ( promises.length ) {
         var thisPromise = Promise.all(promises).then(scanResults);
         // if an index above us is also async, chain ourself on
-        promise[0] = promise[0] ? promise[0].then(thisPromise) : thisPromise;
+        promise[0] = promise[0] ? promise[0].then(function() {
+          return thisPromise;
+        }) : thisPromise;
       } else {
         // In the syncrhonous case we don't have to wait on our subplans,
         //  and can ignore promise[0] as someone else is responsible for
