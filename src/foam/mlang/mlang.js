@@ -133,6 +133,7 @@ foam.INTERFACE({
     },
     {
       name: 'toIndex',
+      javaSupport: false,
       args: [
         {
           name: 'tail',
@@ -143,6 +144,7 @@ foam.INTERFACE({
     },
     {
       name: 'toDisjunctiveNormalForm',
+      javaSupport: false,
       javaReturns: 'foam.mlang.predicate.Predicate'
     }
   ]
@@ -1266,13 +1268,12 @@ foam.INTERFACE({
     },
     {
       name: 'toIndex',
+      javaSupport: false,
       args: [
         {
-          name: 'tail',
-          javaType: 'foam.dao.index.Index'
+          name: 'tail'
         }
-      ],
-      javaReturns: 'foam.dao.index.Index'
+      ]
     },
     {
       /** Returns remaning ordering without this first one, which may be the
