@@ -1015,6 +1015,21 @@ describe('MergePlan', function() {
     return ret;
   };
 
+  function generateDupeData(count) {
+    // generates
+    var ret = { setA: [] };
+
+    for ( var i = 0; i < count; i++ ) {
+      ret.setA.push(test.MergePlanTestData.create({
+        a: i,
+        b: Math.trunc(i / 4)
+      }));
+    }
+
+    return ret;
+  };
+
+
   beforeEach(function() {
     foam.CLASS({
       package: 'test',
@@ -1312,8 +1327,45 @@ describe('MergePlan', function() {
     // release both the first and second promises in the chain
     resolve();
     innerResolve();
+  });
+
+
+  it('deduplicates when ordered by non-unique values', function() {
+    var data = generateDupeData(8);
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 8; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 8; i++ ) {
+            sink.put(data.setA[i].clone());
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+
+    expect(sink.a.length).toBe(8);
+
+    expect(sink.a[0].a).toBe(0); expect(sink.a[0].b).toBe(0);
+    expect(sink.a[1].a).toBe(1); expect(sink.a[1].b).toBe(0);
+    expect(sink.a[2].a).toBe(2); expect(sink.a[2].b).toBe(0);
+    expect(sink.a[3].a).toBe(3); expect(sink.a[3].b).toBe(0);
+    expect(sink.a[4].a).toBe(4); expect(sink.a[4].b).toBe(1);
+    expect(sink.a[5].a).toBe(5); expect(sink.a[5].b).toBe(1);
+    expect(sink.a[6].a).toBe(6); expect(sink.a[6].b).toBe(1);
+    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(1);
 
   });
+
 });
 
 
