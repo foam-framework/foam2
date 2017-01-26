@@ -214,6 +214,11 @@ foam.CLASS({
       var promises = []; // track any async subplans
       var dedupCompare = this.of.ID.compare.bind(this.of.ID);
 
+      // TODO: FIX ID dedup must look through all the values with equal order,
+      //   since we don't know where a potential dupe might be in that range
+      // TODO: FIX In the case of no external ordering, a sort must be imposed
+      //   (fall back to old dedupe sink impl?)
+
       // Each plan inserts into the list
       for ( var i = 0 ; i < sp.length ; ++i) {
         // reset new insert position to head
