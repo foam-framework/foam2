@@ -1029,3 +1029,13 @@ foam.CLASS({
     ['javaJSONParser', 'foam.lib.json.DateParser']
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Map',
+  properties: [
+    ['javaType', 'java.util.Map'],
+    ['javaJSONParser', 'foam.lib.json.MapParser'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaFactory', 'return new java.util.HashMap();']
+  ]
+});
