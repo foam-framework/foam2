@@ -201,6 +201,17 @@ foam.CLASS({
       removes duplicates, sorts, skips, and limits.
     */
     function execute(promise, sink, skip, limit, order, predicate) {
+      if ( order ) return this.executeOrdered.apply(this, arguments);
+      return this.executeFallback.apply(this, arguments);
+    },
+
+    function executeOrdered(promise, sink, skip, limit, order, predicate) {
+      /**
+       * Executes a merge where ordering is specified, therefore
+       * results from the subPlans are also sorted, and can be merged
+       * efficiently.
+       */
+
       // quick linked list
       var NodeProto = { next: null, data: null };
 
@@ -315,9 +326,42 @@ foam.CLASS({
       }
     },
 
-    /** TODO: Share with AbstractDAO? We never need to use predicate or order
-      @private */
+    function executeFallback(promise, sink, skip, limit, unusedOrder, predicate) {
+       /**
+        * Executes a merge where ordering is unknown, therefore no
+        * sorting is done and deduplication must be done separately.
+        */
+       var resultSink = this.DedupSink.create({
+         delegate: this.decorateSink_(sink, skip, limit)
+       });
+
+       var sp = this.subPlans;
+       var predicates = predicate ? predicate.args : [];
+       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
+
+       for ( var i = 0 ; i < sp.length ; ++i) {
+         sp[i].execute(
+           promise,
+           resultSink,
+           undefined,
+           subLimit,
+           undefined,
+           predicates[i]
+         );
+       }
+       // Since this execute doesn't collect results into a temporary
+       // storage list, we don't need to worry about the promises. Any
+       // async subplans will add their promise on, and when they are
+       // resolved their results will have already put() straight into
+       // the resultSink. Only the MDAO calling the first execute() needs
+       // to respect the referenced promise chain.
+    },
+
     function decorateSink_(sink, skip, limit) {
+      /**
+       * TODO: Share with AbstractDAO? We never need to use predicate or order
+       * @private
+       */
       if ( limit != undefined ) {
         sink = this.LimitedSink.create({
           limit: limit,
