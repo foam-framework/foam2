@@ -457,3 +457,35 @@ console.log(DaysOfWeek.VALUES);
 console.log(View.create({of: A}).view());
 console.log(View.create({of: B}).view());
 console.log(View.create({of: C}).view());
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'IntProperty',
+  extends: 'foam.core.Int'
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StringProperty',
+  extends: 'foam.core.String'
+});
+
+foam.CLASS({
+  name: 'FacetTest',
+
+  properties: [
+    {
+      name: 'anInt',
+      of: 'Int'
+    },
+    {
+      name: 'aString',
+      of: 'String'
+    }
+  ]
+});
+
+FacetTest.describe();
+
+console.log(foam.core.Property.create({of: 'String'}).cls_.id);
