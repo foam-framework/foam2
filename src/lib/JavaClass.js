@@ -426,7 +426,7 @@ foam.CLASS({
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 
-      if ( this.hasDefaultValue('extends') ) {
+      if ( this.extends.length > 0 ) {
         o.out(' extends ');
         for ( var i = 0 ; i < this.extends.length ; i++ ) {
           o.out(this.extends[i]);
@@ -538,7 +538,8 @@ foam.LIB({
         type: 'foam.core.ClassInfo',
         visibility: 'public',
         body: 'return classInfo_;'
-      })
+      });
+
       cls.method({
         name: 'getOwnClassInfo',
         visibility: 'public',
