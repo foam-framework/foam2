@@ -217,7 +217,7 @@ foam.CLASS({
     Object result = null;
 
     switch ( rpc.getName() ) {<%
-  var methods = this.of.getAxiomsByClass(foam.core.Method);
+  var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
       case "<%= m.name %>":
@@ -269,8 +269,10 @@ foam.CLASS({
     function createChildMethod_(child) {
       var m = child.clone();
       m.returns = this.returns;
-      // Avoid forcing arguments to be parsed if they haven't already been
-      m.args = this.hasOwnProperty('args') ? this.args : [];
+      m.args = child.hasOwnProperty('args') ?
+        child.args :
+        ( this.args || [] );
+
       m.javaReturns = this.javaReturns;
       m.sourceCls_ = child.sourceCls_;
       return m;
@@ -394,20 +396,26 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.core.Interface',
-  methods: [
-    function buildJavaClass(cls) {
-      cls = cls || foam.java.Interface.create();
+  refines: 'foam.core.AbstractInterface',
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.Interface.create();
 
-      cls.name = this.name;
-      cls.package = this.package;
-      cls.extends = this.extends;
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
 
-      for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
-        this.axioms_[i].buildJavaClass && this.axioms_[i].buildJavaClass(cls);
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
       }
-
-      return cls;
     }
   ]
 });
