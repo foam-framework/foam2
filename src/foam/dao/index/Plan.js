@@ -216,9 +216,6 @@ foam.CLASS({
       //   (fall back to old dedupe sink impl?)
       var compare = order ? order.compare.bind(order) : foam.util.compare;
 
-      // TODO: FIX ID dedup must look through all the values with equal order,
-      //   since we don't know where a potential dupe might be in that range
-
       // Each plan inserts into the list
       for ( var i = 0 ; i < sp.length ; ++i) {
         var insertPlanSink;
