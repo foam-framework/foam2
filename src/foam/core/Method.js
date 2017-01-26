@@ -135,11 +135,12 @@ foam.CLASS({
       return child;
     },
 
-    function installInClass(cls, superMethod) {
+    function installInClass(cls, superMethod, existingMethod) {
       var method = this;
 
-      if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
-        method = superMethod.createChildMethod_(method);
+      var parent = existingMethod || superMethod;
+      if ( parent && foam.core.AbstractMethod.isInstance(parent) ) {
+        method = parent.createChildMethod_(method);
       }
 
       cls.axiomMap_[method.name] = method;
