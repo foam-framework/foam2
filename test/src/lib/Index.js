@@ -1050,6 +1050,13 @@ describe('MergePlan', function() {
     expect(sink.a.length).toBe(0);
   });
 
+  it('handles empty input with ordering', function() {
+    var ordering = test.MergePlanTestData.B;
+
+    plan.execute([], sink, undefined, undefined, ordering);
+    expect(sink.a.length).toBe(0);
+  });
+
   it('handles a single subplan', function() {
     var data = generateData(10);
 
@@ -1088,6 +1095,43 @@ describe('MergePlan', function() {
     expect(sink.a[9].b).toBe(10);
   });
 
+  it('deduplicates with ordering', function() {
+    var data = generateData(10);
+
+    var ordering = test.MergePlanTestData.A;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
   it('deduplicates', function() {
     var data = generateData(10);
 
@@ -1122,6 +1166,7 @@ describe('MergePlan', function() {
     expect(sink.a[2].a).toBe(2);
     expect(sink.a[9].a).toBe(9);
   });
+
 
   it('deduplicates clones (different object, but same id and values)', function() {
     var data = generateData(10);
@@ -1365,6 +1410,52 @@ describe('MergePlan', function() {
     expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(1);
 
   });
+
+  it('deduplicates when not ordered, randomized input order', function() {
+    var data = generateDupeData(8);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          sink.put(data.setA[1]);
+          sink.put(data.setA[0]);
+          sink.put(data.setA[3]);
+          sink.put(data.setA[2]);
+          sink.put(data.setA[6]);
+          sink.put(data.setA[7]);
+          sink.put(data.setA[4]);
+          sink.put(data.setA[5]);
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          sink.put(data.setA[0]);
+          sink.put(data.setA[3]);
+          sink.put(data.setA[1]);
+          sink.put(data.setA[2]);
+          sink.put(data.setA[6]);
+          sink.put(data.setA[5]);
+          sink.put(data.setA[7]);
+          sink.put(data.setA[4]);
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toBe(8);
+
+    // The first set of items remains, in the order inserted
+    expect(sink.a[0].a).toBe(1);
+    expect(sink.a[1].a).toBe(0);
+    expect(sink.a[2].a).toBe(3);
+    expect(sink.a[3].a).toBe(2);
+    expect(sink.a[4].a).toBe(6);
+    expect(sink.a[5].a).toBe(7);
+    expect(sink.a[6].a).toBe(4);
+    expect(sink.a[7].a).toBe(5);
+  });
+
 
 });
 
