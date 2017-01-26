@@ -233,7 +233,7 @@ foam.CLASS({
                 nu.next = insertAfter.next;
                 nu.data = o;
                 insertAfter.next = nu;
-                insertAfter = nu;
+                //insertAfter = nu;
               }
 
               // Skip past items that are less than our new item
