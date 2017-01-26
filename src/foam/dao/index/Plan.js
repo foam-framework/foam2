@@ -210,48 +210,72 @@ foam.CLASS({
       var sp = this.subPlans;
       var predicates = predicate ? predicate.args : [];
       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
-      var compare = order ? order.compare.bind(order) : foam.util.compare;
       var promises = []; // track any async subplans
       var dedupCompare = this.of.ID.compare.bind(this.of.ID);
+      // TODO: FIX In the case of no external ordering, a sort must be imposed
+      //   (fall back to old dedupe sink impl?)
+      var compare = order ? order.compare.bind(order) : foam.util.compare;
 
       // TODO: FIX ID dedup must look through all the values with equal order,
       //   since we don't know where a potential dupe might be in that range
-      // TODO: FIX In the case of no external ordering, a sort must be imposed
-      //   (fall back to old dedupe sink impl?)
 
       // Each plan inserts into the list
       for ( var i = 0 ; i < sp.length ; ++i) {
-        // reset new insert position to head
-        var insertAfter = head;
-        // TODO: refactor with insertAfter as a property of a new class
-        var insertPlanSink = foam.dao.QuickSink.create({
-          putFn: function(o) {
-            // o may be larger or equal to insertAfter.data. Equality is only
-            //  checked on the property being ordered, so a deduplicating
-            //  check ensures the same object (by matching id) is not
-            //  inserted twice. This assumes duplicates have the same
-            //  property values (or are the same object) and will fall in
-            //  the same place in the output list.
-            while ( ( ! insertAfter.data ) ||
-                    ( compare(o, insertAfter.data) >= 0 &&
-                       dedupCompare(o, insertAfter.data) !== 0 ) ) {
-              var next = insertAfter.next;
-              // if end-of-list or found a larger item, insert
-              if ( ( ! next ) || compare(o, next.data) < 0 ) {
+        var insertPlanSink;
+        (function() { // capture new insertAfter for each sink
+          // set new insert position to head
+          var insertAfter = head;
+          // TODO: refactor with insertAfter as a property of a new class
+          insertPlanSink = foam.dao.QuickSink.create({
+            putFn: function(o) {
+              function insert() {
                 var nu = Object.create(NodeProto);
                 nu.next = insertAfter.next;
                 nu.data = o;
                 insertAfter.next = nu;
                 insertAfter = nu;
-                break; // insert done, next new item will put() again
-              } else {
-                // New item is larger, move forward in the list and
-                //   try again
-                insertAfter = next;
+              }
+
+              // Skip past items that are less than our new item
+              while ( insertAfter.next &&
+                      compare(o, insertAfter.next.data) > 0 ) {
+                 insertAfter = insertAfter.next;
+              }
+
+              if ( ! insertAfter.next ) {
+                // end of list case, no equal items, so just append
+                insert();
+                return;
+              } else if ( compare(o, insertAfter.next.data) === 0 ) {
+                // equal items case, check for dupes
+                // scan through any items that are equal, dupe check each
+                var dupeAfter = insertAfter;
+                while ( dupeAfter.next &&
+                        compare(o, dupeAfter.next.data) === 0 ) {
+                  if ( dedupCompare(o, dupeAfter.next.data) === 0 ) {
+                    // duplicate found, ignore the new item
+                    return;
+                  }
+                  dupeAfter = dupeAfter.next;
+                }
+                // No dupes found, so insert at position dupeAfter
+                // dupeAfter.next is either end-of-list or a larger item
+                var nu = Object.create(NodeProto);
+                nu.next = dupeAfter.next;
+                nu.data = o;
+                dupeAfter.next = nu;
+                dupeAfter = null;
+                // do not reset insertafter, since we want the next item
+                // to scan the same set of equal items to check if it is a
+                // dupe.
+                return;
+              } else { // comp < 0
+                 // existing-is-greater-than case, insert before
+                 insert();
               }
             }
-          }
-        });
+          });
+        })();
         // restart the promise chain, if a promise is added we collect it
         var nuPromiseRef = [];
         sp[i].execute(
