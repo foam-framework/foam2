@@ -231,9 +231,15 @@ foam.CLASS({
       for ( var i = 0 ; i < sp.length ; ++i) {
         var insertPlanSink;
         (function() { // capture new insertAfter for each sink
-          // set new insert position to head
+          // set new insert position to head.
+          // Only bump insertAfter forward when the next item is smaller,
+          //   since we need to scan all equal items every time a new item
+          //   comes in.
+          // If the next item is larger, we insert before it
+          //   and leave the insertion point where it is, so the next
+          //   item can check if it is equal to the just-inserted item.
           var insertAfter = head;
-          // TODO: refactor with insertAfter as a property of a new class
+          // TODO: refactor with insertAfter as a property of a new class?
           insertPlanSink = foam.dao.QuickSink.create({
             putFn: function(o) {
               function insert() {
@@ -241,7 +247,6 @@ foam.CLASS({
                 nu.next = insertAfter.next;
                 nu.data = o;
                 insertAfter.next = nu;
-                //insertAfter = nu;
               }
 
               // Skip past items that are less than our new item
@@ -273,12 +278,9 @@ foam.CLASS({
                 nu.data = o;
                 dupeAfter.next = nu;
                 dupeAfter = null;
-                // do not reset insertafter, since we want the next item
-                // to scan the same set of equal items to check if it is a
-                // dupe.
                 return;
               } else { // comp < 0
-                 // existing-is-greater-than case, insert before
+                 // existing-is-greater-than-new case, insert before it
                  insert();
               }
             }
