@@ -39,40 +39,42 @@
   console.log(View.create({of: B}));
   console.log(View.create({of: C}));
 */
-// TODO: add createOriginal() method.
+// FUTURE: add createOriginal() (or similar) method.
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Faceted',
 
   methods: [
     function installInClass(cls) {
+      var oldCreate = cls.create;
+
       cls.getFacetOf = function(of, X) {
         if ( ! of ) return this;
         X = X || foam.__context__;
 
+        var name   = foam.String.isInstance(of) ? of : of.name;
         var facets = this.private_.facets || ( this.private_.facets = {} );
 
-        if ( ! facets.hasOwnProperty(of.name) ) {
+        if ( ! facets.hasOwnProperty(name) ) {
           var id = this.package ?
-            this.package + '.' + of.name + this.name :
-            of.name + this.name ;
-          facets[of.name] = X.lookup(id, true) || this;
+            this.package + '.' + name + this.name :
+            name + this.name ;
+          facets[name] = X.lookup(id, true) || this;
         }
 
-        return facets[of.name];
+        return facets[name];
       };
-
-      var oldCreate = cls.create;
 
       // ignoreFacets is set to true when called to prevent a second-level
       // of facet checking
       cls.create = function(args, X, ignoreFacets) {
-        if ( ignoreFacets) return oldCreate.apply(this, arguments);
-        var facetCls = this.getFacetOf(args && args.of, X);
+        if ( ! ignoreFacets ) {
+          var facetCls = this.getFacetOf(args && args.of, X);
 
-        return facetCls === this ?
-          oldCreate.apply(this, arguments) :
-          facetCls.create(args, X, true)   ;
+          if ( facetCls ) return facetCls.create(args, X, true);
+        }
+
+        return oldCreate.apply(this, arguments);
       }
     }
   ]
