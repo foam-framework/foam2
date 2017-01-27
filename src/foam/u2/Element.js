@@ -1915,6 +1915,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Class',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  properties: [
+    [ 'view', { class: 'foam.u2.ClassView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Reference',
   flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
