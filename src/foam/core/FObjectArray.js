@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -24,6 +24,10 @@ foam.CLASS({
 
   properties: [
     { name: 'of', required: true },
+    [
+      'factory',
+      function() { return []; }
+    ],
     [ 'adapt', function(_, /* array? */ a, prop) {
         if ( ! a ) return [];
         // If not an array, allow assertValue to assert the type-check.
@@ -37,14 +41,14 @@ foam.CLASS({
       }
     ],
     [ 'assertValue', function(v, prop) {
-        this.assert(Array.isArray(v),
+        foam.assert(Array.isArray(v),
             prop.name, 'Attempt to set array property to non-array value', v);
       }
     ],
     [ 'adaptArrayElement', function(o, obj) {
       // FUTURE: replace 'foam.' with '(this.__subContext__ || foam).' ?
       var cls = foam.lookup(this.of);
-      this.assert(cls, 'Unknown array "of": ', this.of);
+      foam.assert(cls, 'Unknown array "of": ', this.of);
       return cls.isInstance(o) ? o : cls.create(o, obj);
       }
     ]

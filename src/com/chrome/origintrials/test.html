@@ -3,14 +3,19 @@
   <head>
     <script src="../../../foam.js"></script>
     <script src="model/Application.js"></script>
-    <script src="ui/Apply.js"></script>
+    <script src="model/Experiment.js"></script>
+    <script src="model/User.js"></script>
+    <script src="model/Token.js"></script>
+    <script src="model/Origin.js"></script>
+    <script src="model/Relationships.js"></script>
     <script src="ui/Browse.js"></script>
     <script src="TestConfiguration.js"></script>
+    <script src="Configuration.js"></script>
   </head>
   <body>
     <script>
       var env = com.chrome.origintrials.TestConfiguration.create();
-      var controller = com.chrome.origintrials.ui.Browse.create({ data: env.applicationDAO }, env).write();
+      var controller = com.chrome.origintrials.ui.Browse.create(null, env).write();
     </script>
   </body>
 </html>

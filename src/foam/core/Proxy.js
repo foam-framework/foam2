@@ -96,12 +96,16 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'forwards'
+      name: 'forwards',
+      factory: null,
+      value: null
       //documentation: 'Methods that are forwarded to the proxies object.'
     },
     {
       class: 'StringArray',
-      name: 'delegates'
+      name: 'delegates',
+      factory: null,
+      value: null
       //documentation: 'Methods that are delegated to the proxied object.'
     },
     {
@@ -121,7 +125,7 @@ foam.CLASS({
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);
-        foam.__context__.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
+        foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
         return m;
       }
 
@@ -264,8 +268,8 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.onDestroy(foam.Function.bind(function() {
-        this.subscription && this.subscription.destroy();
+      this.onDetach(foam.Function.bind(function() {
+        this.subscription && this.subscription.detach();
 
         if ( this.parent ) {
           this.parent.removeChild(this);
@@ -275,7 +279,7 @@ foam.CLASS({
     },
 
     function doSub() {
-      if ( this.subscription ) this.subscription.destroy();
+      if ( this.subscription ) this.subscription.detach();
 
       if ( ! this.src ) return;
 
@@ -285,7 +289,7 @@ foam.CLASS({
     },
 
     function doUnsub() {
-      if ( this.subscription ) this.subscription.destroy();
+      if ( this.subscription ) this.subscription.detach();
     },
 
     function removeChild(c) {
@@ -326,7 +330,7 @@ foam.CLASS({
       if ( this.active ) {
         var args = foam.Function.appendArguments([], arguments, 1);
         var c = this.dest.pub.apply(this.dest, args);
-        if ( ! c ) this.destroy();
+        if ( ! c ) this.detach();
       }
     }
   ]

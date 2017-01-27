@@ -19,12 +19,19 @@ import com.chrome.origintrials.Context;
 
 public class APIServlet extends HttpServlet {
   private X x;
-  private DAOSkeleton applicationDAOSkeleton;
+  private BoxRegistryBox registry;
 
   public void init(ServletConfig config) throws ServletException {
     x = Context.instance();
 
-    applicationDAOSkeleton = x.create(DAOSkeleton.class).setDelegate((DAO)x.get("applicationDAO"));
+    Box applicationDAOSkeleton = x.create(DAOSkeleton.class).setDelegate((DAO)x.get("applicationDAO"));
+    Box experimentDAOSkeleton = x.create(DAOSkeleton.class).setDelegate((DAO)x.get("experimentDAO"));
+
+
+    registry = (BoxRegistryBox)x.get("registry");
+
+    registry.register2("applications", null, applicationDAOSkeleton);
+    registry.register2("experiments", null, experimentDAOSkeleton);
 
     super.init(config);
   }
@@ -44,8 +51,7 @@ public class APIServlet extends HttpServlet {
     int count = reader.read(buffer_);
     buffer_.rewind();
 
-
-    FObject request = new JSONParser(requestContext).parseString(buffer_.toString());
+    FObject request = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
     if ( request == null || ! ( request instanceof foam.box.Message ) ) {
       resp.setStatus(resp.SC_BAD_REQUEST);
@@ -54,11 +60,7 @@ public class APIServlet extends HttpServlet {
     }
 
     foam.box.Message msg = (foam.box.Message)request;
-    applicationDAOSkeleton.send(msg);
 
-    if ( ! ( msg.getReplyBox() instanceof foam.box.HTTPReplyBox ) ) {
-      resp.setStatus(resp.SC_OK);
-      resp.flushBuffer();
-    }
+    registry.send(msg);
   }
 }

@@ -117,3 +117,22 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.dao.RelationshipDAO',
+  
+  requires: [
+    'foam.u2.CitationView',
+    'foam.u2.DAOList'
+  ],
+  
+  methods: [
+    function toE(args, ctx) {
+      args = args || {};
+      args.data = this;
+      args.rowView = this.CitationView;
+      return this.DAOList.create(args, ctx);
+    }    
+  ]
+  
+})

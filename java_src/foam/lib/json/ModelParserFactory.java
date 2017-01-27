@@ -46,9 +46,10 @@ public class ModelParserFactory {
 
     // TODO: Don't fail to parse if we find an unknown property.
 
-    return new Repeat0(new Seq0(new Whitespace(),
-                                new Literal(","),
+    return new Repeat0(
+                       new Seq0(
                                 new Whitespace(),
-                                new Alt(propertyParsers)));
+                                new Alt(propertyParsers)),
+                       new Literal(","));
   }
 }

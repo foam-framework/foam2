@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'com.google.net',
   name: 'ProtobufParser',
@@ -67,7 +68,7 @@ foam.CLASS({
               sym('strLit'), literal(';')),
 
           package: seq(
-              literal('package'), sym('ws1'), sym('dottedIdents'),
+              literal('package'), sym('ws1'), sym('dottedIdents'), sym('ws'),
               literal(';')),
 
           option: seq(literal('option'), sym('ws'),
@@ -253,7 +254,6 @@ foam.CLASS({
         };
       }
     },
-    [ 'currentPackage', '' ],
     {
       name: 'parser',
       factory: function() {
@@ -264,7 +264,7 @@ foam.CLASS({
 
         g.addActions({
           package: function(a) {
-            self.currentPackage = a[2];
+            return { node: 'package', value: a[2] };
           },
 
           import: function(a) {
@@ -303,7 +303,6 @@ foam.CLASS({
               fields: fields
             };
             if ( options.length ) ret.options = options;
-            if ( self.currentPackage ) ret.package = self.currentPackage;
             return ret;
           },
 
@@ -403,7 +402,6 @@ foam.CLASS({
             if ( fields.length ) ret.fields = fields;
             if ( subMessages.length ) ret.subMessages = subMessages;
             if ( Object.keys(oneofMap).length ) ret.oneofMap = oneofMap;
-            if ( self.currentPackage ) ret.package = self.currentPackage;
             return ret;
           },
 
@@ -526,7 +524,6 @@ foam.CLASS({
 
   methods: [
     function parseString(str, opt_start) {
-      this.currentPackage = '';
       return this.parser.parseString(str, opt_start);
     }
   ]

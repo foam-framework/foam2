@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -44,8 +44,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Requires',
 
-  documentation: 'Require Class Axiom',
-
   properties: [ 'name', 'path' ],
 
   methods: [
@@ -59,10 +57,9 @@ foam.CLASS({
       Object.defineProperty(proto, name, {
         get: function requiresGetter() {
           if ( ! this.hasOwnPrivate_(name) ) {
-            var cls    = foam.lookup(path);
+            var cls    = (this.__context__ || foam).lookup(path);
             var parent = this;
-
-            this.assert(cls, 'Requires: Unknown class: ', path);
+            foam.assert(cls, 'Requires: Unknown class: ', path);
 
             var c = Object.create(cls);
             c.create = function requiresCreate(args, ctx) { return cls.create(args, ctx || parent); };

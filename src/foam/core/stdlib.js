@@ -164,26 +164,48 @@ foam.LIB({
     },
 
     /**
+     * Decorates the function 'f' to cache the return value of 'f' when
+     * called in the future. Also known as a 'thunk'.
+     */
+    function memoize0(/* Function */ f) {
+      var set = false, cache;
+      var ret = foam.Function.setName(
+          function() {
+            if ( ! set ) {
+              set = true;
+              cache = f();
+            }
+            return cache;
+          },
+          'memoize0(' + f.name + ')');
+      ret.toString = function() { return f.toString(); };
+      return ret;
+    },
+
+    /**
      * Decorates the function 'f' to cache the return value of 'f' when called
      * with a particular value for its first argument.
-     *
      */
-    function memoize1(f) {
-      console.assert(
-        typeof f === 'function',
-        'Cannot apply memoize to something that is not a function.');
-
-      var cache = {};
-      return foam.Function.setName(
+    function memoize1(/* Function */ f) {
+      var cache = {}, nullCache, undefinedCache;
+      var ret = foam.Function.setName(
           function(key) {
-            console.assert(
+            foam.assert(
                 arguments.length === 1,
                 'Memoize1\'ed functions must take exactly one argument.');
 
-            if ( ! cache.hasOwnProperty(key) ) cache[key] = f.call(this, key);
-            return cache[key];
+            var mKey =
+                key === null      ? '___null___'      :
+                key === undefined ? '___undefined___' :
+                key ;
+
+            if ( ! cache.hasOwnProperty(mKey) ) cache[mKey] = f.call(this, key);
+
+            return cache[mKey];
           },
           'memoize1(' + f.name + ')');
+        ret.toString = function() { return f.toString(); };
+        return ret;
     },
 
     /**
@@ -205,33 +227,57 @@ foam.LIB({
 
     /** Finds the function(...) declaration arguments part. Strips newlines. */
     function argsStr(f) {
-      var match = f.
+      var str = f.
           toString().
-          replace(/(\r\n|\n|\r)/gm,'').
-          match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+          replace(/(\r\n|\n|\r)/gm,'');
+      var isArrowFunction = str.indexOf('function') !== 0;
+
+      var match = isArrowFunction ?
+          // (...args...) => ...
+          // or
+          // arg => ...
+          match = str.match(/^(\(([^)]*)\)[^=]*|([^=]+))=>/) :
+          // function (...args...) { ...body... }
+          match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+
       if ( ! match ) {
         /* istanbul ignore next */
-        throw new TypeError("foam.Function.argsStr could not parse input function" + f ? f.toString() : 'undefined');
+        throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
-      return match[2] || '';
+
+      return isArrowFunction ? (match[2] || match[1] || '') : (match[2] || '');
     },
 
-    function formalArgs(f) {
+    function argNames(f) {
       /**
        * Return a function's arguments as an array.
-       * Ex. formalArgs(function(a,b) {...}) === ['a', 'b']
+       * Ex. argNames(function(a,b) {...}) === ['a', 'b']
        **/
       var args = foam.Function.argsStr(f);
       args += ',';
 
       var ret = [];
-      // [ ws /* anything */ ] ws arg_name ws [ /* anything */ ],
-      var argMatcher = /(\s*\/\*.*?\*\/)?\s*([\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
+      // [ ws /* anything */ ] ws [...]arg_name ws [ /* anything */ ],
+      var argMatcher = /(\s*\/\*.*?\*\/)?\s*((?:\.\.\.)?[\w_$]+)\s*(\/\*.*?\*\/)?\s*\,+/g;
       var typeMatch;
       while ( ( typeMatch = argMatcher.exec(args) ) !== null ) {
         ret.push(typeMatch[2]);
       }
       return ret;
+    },
+
+    /** Finds the function(...) declaration and finds the first block comment
+      in the function body. */
+    function functionComment(f) {
+      var match = f.
+          toString().
+          replace(/\n/g, '_#_%_%_'). // fake newlines
+          match(/^function(\s+[_$\w]+|\s*)\(.*?\)(?:\_\#\_\%\_\%\_|\s)*\{(?:\_\#\_\%\_\%\_|\s)*\/\*\*?\s*(.*?)\*?\*\/.*\}/);
+      if ( ! match ) {
+        return '';
+      } else {
+        return match[2] && match[2].replace(/_#_%_%_/g, '\n') || '';
+      }
     },
 
     /**
@@ -260,7 +306,7 @@ foam.LIB({
      *
      **/
     function withArgs(fn, source, opt_self) {
-      var argNames = foam.Function.formalArgs(fn);
+      var argNames = foam.Function.argNames(fn);
       var args = [];
       for ( var i = 0 ; i < argNames.length ; i++ ) {
         var a = source[argNames[i]];
@@ -327,33 +373,25 @@ foam.LIB({
     },
     {
       name: 'constantize',
-      code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
-            'Cannot constantize non-string values.');
-
+      code: foam.Function.memoize1(function(/* String */ str) {
         // switches from from camelCase to CAMEL_CASE
         return str.replace(/([a-z])([^0-9a-z_])/g, '$1_$2').toUpperCase();
       })
     },
-
     {
       name: 'labelize',
-      code: foam.Function.memoize1(function(str) {
-        if ( str === '' || str === null ) return '';
-
-        console.assert(typeof str === 'string',
-            'Cannot labelize non-string values.');
+      code: foam.Function.memoize1(function(/* String= */ str) {
+        if ( str === '' || str === null || foam.Undefined.isInstance(str) ) return '';
 
         return this.capitalize(str.replace(/[a-z][A-Z]/g, function(a) {
           return a.charAt(0) + ' ' + a.charAt(1);
         }));
       })
     },
-
     {
       name: 'capitalize',
       code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
+        foam.assert(typeof str === 'string',
             'Cannot capitalize non-string values.');
         // switchFromProperyName to //SwitchFromPropertyName
         return str[0].toUpperCase() + str.substring(1);
@@ -368,7 +406,7 @@ foam.LIB({
        */
       name: 'toSlotName',
       code: foam.Function.memoize1(function toSlotName(key) {
-        console.assert(
+        foam.assert(
             typeof key === 'string',
             'Cannot toSlotName non-string values.');
 
@@ -378,34 +416,28 @@ foam.LIB({
     {
       name: 'toUpperCase',
       code: foam.Function.memoize1(function(str) {
-        console.assert(
+        foam.assert(
             typeof str === 'string',
             'Cannot toUpperCase non-string values.');
 
         return str.toUpperCase();
       })
     },
-
     {
       name: 'cssClassize',
       code: foam.Function.memoize1(function(str) {
-        console.assert(typeof str === 'string',
+        foam.assert(typeof str === 'string',
             'Cannot cssClassize non-string values.');
         // Turns foam.u2.Foo into foam-u2-Foo
         return str.replace(/\./g, '-');
       })
     },
-
-    function pad(str, size) {
-      console.assert(typeof str === 'string',
-          'Cannot constantize non-string values.');
-
+    function pad(obj, size) {
       // Right pads to size if size > 0, Left pads to -size if size < 0
       return size < 0 ?
-        (new Array(-size).join(' ') + str).slice(size)       :
-        (str + new Array(size).join(' ')).substring(0, size) ;
+        (new Array(-size).join(' ') + obj).slice(size)       :
+        (obj + new Array(size).join(' ')).substring(0, size) ;
     },
-
     function multiline(f) {
       // Function for returning multi-line strings from commented functions.
       // Ex. var str = multiline(function() { /* multi-line string here */ });
@@ -416,7 +448,7 @@ foam.LIB({
       return ( start >= 0 && end >= 0 ) ? s.substring(start + 2, end) : '';
     },
     function startsWithIC(a, b) {
-      console.assert(typeof a === 'string' && typeof b === 'string',
+      foam.assert(typeof a === 'string' && typeof b === 'string',
           'Cannot startsWithIC non-string values.');
 
       return a.toUpperCase().startsWith(b.toUpperCase());
@@ -561,7 +593,7 @@ foam.LIB({
     // Can't be an FObject yet because we haven't built the class system yet
     /* istanbul ignore next */
     function isInstance(o) { return false; },
-    function clone(o)      { return o.clone(); },
+    function clone(o)      { return o ? o.clone() : this; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
@@ -629,27 +661,43 @@ foam.typeOf = (function() {
 })();
 
 
-foam.mmethod = function(map, opt_defaultMethod) {
-  var uid = '__mmethod__' + foam.next$UID() + '__';
+foam.LIB({
+  name: 'foam',
 
-  for ( var key in map ) {
-    var type = key === 'FObject' ? foam.core.FObject : foam[key];
-    type[uid] = map[key];
-  }
+  methods: [
+    function mmethod(map, opt_defaultMethod) {
+      var uid = '__mmethod__' + foam.next$UID() + '__';
 
-  return function(arg1) {
-    var type = foam.typeOf(arg1);
-    if ( ! opt_defaultMethod ) {
-      console.assert(type, 'Unknown type: ', arg1,
-          'and no default method provided');
-      console.assert(
-          type[uid],
-          'Missing multi-method for type ', arg1, ' map: ', map,
-          'and no deafult method provided');
+      var first = true;
+      return function(arg1) {
+        if ( first ) {
+          for ( var key in map ) {
+            var type = key === 'FObject' ?
+                foam.core.FObject :
+                foam[key] || foam.lookup(key);
+
+            type[uid] = map[key];
+          }
+          first = false;
+        }
+
+        var type = arg1 && arg1.cls_ && arg1.cls_[uid] ?
+            arg1.cls_ :
+            foam.typeOf(arg1) ;
+
+        if ( ! opt_defaultMethod ) {
+          foam.assert(type, 'Unknown type: ', arg1,
+              'and no default method provided');
+          foam.assert(
+              type[uid],
+              'Missing multi-method for type ', arg1, ' map: ', map,
+              'and no deafult method provided');
+        }
+        return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
+      };
     }
-    return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
-  };
-};
+  ]
+});
 
 
 (function() {
@@ -666,7 +714,7 @@ foam.mmethod = function(map, opt_defaultMethod) {
       function diff(a, b)    {
         var t = typeOf(a);
         return t.diff ? t.diff(a, b) : undefined;
-      },
+      }
     ]
   });
 })();
@@ -682,13 +730,23 @@ foam.LIB({
      * global.some.package.MyClass.
      */
     function registerClass(cls) {
-      console.assert(typeof cls === 'object',
+      foam.assert(typeof cls === 'object',
           'cls must be an object');
-      console.assert(typeof cls.name === 'string' && cls.name !== '',
+      foam.assert(typeof cls.name === 'string' && cls.name !== '',
           'cls must have a non-empty string name');
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
+    },
+
+    /**
+     * Register a class lazily in the global namespace.
+     * The class is not created until accessed the first time.
+     * The provided factory function creates the class.
+     */
+    function registerClassFactory(m, thunk) {
+      var pkg = foam.package.ensurePackage(global, m.package);
+      Object.defineProperty(pkg, m.name, {get: thunk, configurable: true});
     },
 
     /**
@@ -708,7 +766,7 @@ foam.LIB({
         return root;
       }
 
-      console.assert(typeof path === 'string',
+      foam.assert(typeof path === 'string',
           'Cannot make a package path of a non-string');
 
       path = path.split('.');
@@ -752,12 +810,14 @@ foam.LIB({
 
       if ( cs.lengh === 1 ) return cs[0];
 
-      var f = function(o1, o2) {
-        for ( var i = 0 ; i < cs.length ; i++ ) {
-          var r = cs[i].compare(o1, o2);
-          if ( r != 0 ) return r;
+      var f = {
+        compare: function(o1, o2) {
+          for ( var i = 0 ; i < cs.length ; i++ ) {
+            var r = cs[i].compare(o1, o2);
+            if ( r != 0 ) return r;
+          }
+          return 0;
         }
-        return 0;
       };
 
       return f;

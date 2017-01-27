@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -56,14 +56,16 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'AbstractMethod',
-  extends: 'FObject',
 
   properties: [
     { name: 'name', required: true },
     { name: 'code', required: true },
     'documentation',
     'returns',
-    'args'
+    {
+      name: 'args',
+      factory: function() { return this.code ? foam.Function.args(this.code) : []; }
+    }
   ],
 
   methods: [
@@ -71,7 +73,7 @@ foam.CLASS({
       Decorate a method so that it can call the
       method it overrides with this.SUPER().
     */
-    function override_(proto, method) {
+    function override_(proto, method, superMethod) {
       if ( ! method ) return;
 
       // Not using SUPER, so just return original method
@@ -96,7 +98,7 @@ foam.CLASS({
           super_();
         }
       } else {
-        this.assert(foam.core.AbstractMethod.isInstance(superMethod_),
+        foam.assert(foam.core.AbstractMethod.isInstance(superMethod_),
           'Attempt to override non-method', this.name, 'on', proto.cls_.id);
 
         // Fetch the super method from the proto, as the super method axiom
@@ -133,12 +135,12 @@ foam.CLASS({
       return child;
     },
 
-    function installInClass(cls) {
+    function installInClass(cls, superMethod, existingMethod) {
       var method = this;
 
-      var superMethod = cls.getSuperAxiomByName(method.name);
-      if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
-        method = superMethod.createChildMethod_(method);
+      var parent = existingMethod || superMethod;
+      if ( parent && foam.core.AbstractMethod.isInstance(parent) ) {
+        method = parent.createChildMethod_(method);
       }
 
       cls.axiomMap_[method.name] = method;
@@ -153,8 +155,8 @@ foam.CLASS({
   extends: 'foam.core.AbstractMethod',
 
   methods: [
-    function installInProto(proto) {
-      proto[this.name] = this.override_(proto, this.code);
+    function installInProto(proto, superAxiom) {
+      proto[this.name] = this.override_(proto, this.code, superAxiom);
     },
 
     function exportAs(obj) {

@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'data',
       postSet: function(old, nu) {
         if ( this.daoSub_ ) {
-          this.daoSub_.destroy();
+          this.daoSub_.detach();
           this.daoSub_ = null;
         }
         if ( nu ) this.daoSub_ = nu.on.sub(this.updateCounts);
@@ -137,11 +137,11 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.data.select(this.Map.create({
-          arg1: this.of$cls.ID,
+          arg1: this.of.ID,
           delegate: this.ArraySink.create()
         })).then(function(array) {
           var q = self.In.create({
-            arg1: self.of$cls.ID,
+            arg1: self.of.ID,
             arg2: array.delegate.a
           });
 

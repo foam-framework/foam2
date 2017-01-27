@@ -76,7 +76,7 @@ foam.CLASS({
       for ( var x = 0 ; x < 7 ; x++ ) {
         for ( var y = 0 ; y < 7 ; y++ ) {
           for ( var z = 0 ; z < 7 ; z++ ) {
-            this.addChildren(this.Point.create({
+            this.add(this.Point.create({
               x: x * 50 - 150,
               y: y * 50 - 150,
               z: z * 50 - 150
@@ -85,7 +85,7 @@ foam.CLASS({
         }
       }
 
-      this.addChildren(this.ball);
+      this.add(this.ball);
       this.tick();
     }
   ],

@@ -15,16 +15,6 @@
  * limitations under the License.
  */
 
-var oldAssert;
-beforeAll(function() { // make it easy to trap asserts
-  oldAssert = console.assert;
-  console.assert = function(cond) { if ( ! cond ) throw arguments; }
-});
-afterAll(function() {
-  console.assert = oldAssert;
-});
-
-
 describe('foam.LIB type checking:', function() {
 
   it('methods must be named', function() {
@@ -257,11 +247,11 @@ describe('foam.Function', function() {
   it('argsStr', function() {
     // normal case
     var str = foam.Function.argsStr(
-      function(a, /*string?*/b, c /*array*/) {
+      function(a, /*string=*/b, c /*array*/) {
         return [ a, b, c ];
       }
     );
-    expect(str).toBe('a, /*string?*/b, c /*array*/');
+    expect(str).toBe('a, /*string=*/b, c /*array*/');
 
     // string with line break
     var str2 = foam.Function.argsStr(
@@ -287,16 +277,56 @@ describe('foam.Function', function() {
       "      } "
       );
     }).toThrow();
+
+    // arrow-function: single-arg
+    var str4 = foam.Function.argsStr(
+      foo => foo.length
+    );
+    expect(str4).toBe('foo ');
+    // arrow-function: multiple args
+
+    var str5 = foam.Function.argsStr(
+        (/*string?*/foo, /*array*/bar, /*string*/baz) => foo.length
+    );
+    expect(str5).toBe('/*string?*/foo, /*array*/bar, /*string*/baz');
+  });
+
+  it('functionComment', function() {
+    expect(foam.Function.functionComment(function() { })).toEqual('');
+    expect(foam.Function.functionComment(function() {/**/ })).toEqual('');
+    expect(foam.Function.functionComment(function() {/* hello */ })).toEqual('hello ');
+
+    /* jshint -W014 */
+    /* jshint laxcomma:true */
+    // jscs:disable
+
+    expect(foam.Function.functionComment(
+      function() {//hello
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(
+      function() {
+        var x;
+        /** hello */
+      }
+    )).toEqual('');
+
+    expect(foam.Function.functionComment(function() /* hello */ {})).toEqual('');
+    // jscs:enable
+    /* jshint laxcomma:false */
+    /* jshint +W014 */
+
   });
 
 
-  describe('formalArgs', function() {
+  describe('argNames', function() {
 
     it('handles an empty arg list', function() {
       var fn = function( ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([]);
     });
 
@@ -305,16 +335,16 @@ describe('foam.Function', function() {
          func, obj, num,  arr ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
     });
 
     it('grabs typed argument names', function() {
-      var fn = function(/* string */ str, /*boolean*/ bool ,
-        /* function*/ func, /*object*/obj, /* number */num, /* array*/ arr ) {
+      var fn = function(/* String */ str, /*Boolean*/ bool ,
+        /* Function */ func, /*Object*/obj, /* Number */num, /* Array*/ arr ) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'str', 'bool', 'func', 'obj', 'num', 'arr' ]);
     });
 
@@ -323,7 +353,7 @@ describe('foam.Function', function() {
           /* // a comment here */ name, another /* return // comment */) {
         return (true);
       }
-      var args = foam.Function.formalArgs(fn);
+      var args = foam.Function.argNames(fn);
       expect(args).toEqual([ 'arg', 'more', 'name', 'another' ]);
     });
 
@@ -331,7 +361,7 @@ describe('foam.Function', function() {
 
   it('withArgs', function() {
     // normal case
-    var fn = function(a, /*string?*/b, c /*array*/) {
+    var fn = function(a, /*string=*/b, c /*array*/) {
       return [ a + b + c ];
     };
     var src = { a: 'A', b: 'B', c: 'C' };
@@ -563,8 +593,8 @@ describe('foam.Array', function() {
         name: 'CompB',
         properties: [ 'b', 'c' ]
       });
-      x = test.CompA.create();
-      y = test.CompB.create();
+      x = test.CompA.create(undefined, foam.__context__);
+      y = test.CompB.create(undefined, foam.__context__);
     });
     afterEach(function() {
       x = y = null;
@@ -894,6 +924,23 @@ describe('foam.mmethod', function() {
     expect(mm(true)).toEqual("Default!");
   });
 
+  it('handles subclasses', function() {
+    var mm = foam.mmethod({
+      'foam.core.StringArray': function() { return 'stringarray'; },
+      'foam.core.Property': function() { return 'prop'; },
+      'foam.core.FObject': function() { return 'FObject'; }
+    });
+
+    expect(mm(foam.core.StringArray.create({name:'n'})))
+      .toBe('stringarray');
+    expect(mm(foam.core.String.create({name:'n'})))
+      .toBe('prop');
+    expect(mm(foam.core.Property.create({name:'n'})))
+      .toBe('prop');
+    expect(mm(foam.core.Method.create({name:'n'})))
+      .toBe('FObject');
+
+  });
 });
 
 
@@ -972,5 +1019,4 @@ describe('foam.uuid', function() {
     expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
   });
 });
-
 

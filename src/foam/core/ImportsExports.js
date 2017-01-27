@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -34,10 +34,12 @@ foam.CLASS({
 
   imports: [ 'log', 'warn' ],
 
-  methods: [ function foo() {
-    this.log('log foo from ImportTest');
-    this.warn('warn foo from ImportTest');
-  } ]
+  methods: [
+    function foo() {
+      this.log('log foo from ImportTest');
+      this.warn('warn foo from ImportTest');
+    }
+  ]
 });
 
 foam.CLASS({
@@ -81,21 +83,29 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Import',
 
-  documentation: 'Import Context Value Axiom',
-
   properties: [
-    'name',
+    {
+      class: 'String',
+      name: 'name'
+    },
     'key',
     {
+      class: 'Boolean',
+      name: 'required',
+      value: true
+    },
+    {
       name: 'slotName_',
-      factory: function() { return this.name + '$'; }
+      factory: function() {
+        return foam.String.toSlotName(this.name);
+      }
     }
   ],
 
   methods: [
     function installInProto(proto) {
       var name     = this.name;
-      var key      = this.key + '$';
+      var key      = foam.String.toSlotName(this.key);
       var slotName = this.slotName_;
 
       Object.defineProperty(proto, slotName, {
@@ -137,7 +147,10 @@ foam.CLASS({
   documentation: 'Export Sub-Context Value Axiom',
 
   properties: [
-    'name',
+    {
+      class: 'String',
+      name: 'name'
+    },
     {
       name: 'exportName',
       postSet: function(_, name) {
@@ -156,7 +169,7 @@ foam.CLASS({
       Object.defineProperty(proto, '__subContext__', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('__subContext__') ) {
-            var ctx = this.__context__ || foam.__context__;
+            var ctx = this.__context__;
             var m = {};
             var bs = proto.cls_.getAxiomsByClass(foam.core.Export);
             for ( var i = 0 ; i < bs.length ; i++ ) {
@@ -165,13 +178,8 @@ foam.CLASS({
               if ( b.key ) {
                 var a = this.cls_.getAxiomByName(b.key);
 
-                if ( ! a ) {
-                  console.error(
-                    'Unknown export: "' +
-                      b.key +
-                      '" in model: ' +
-                      this.cls_.id);
-                }
+                foam.assert(!!a, 'Unknown export: "', b.key, '" in model: ',
+                    this.cls_.id);
 
                 // Axioms have an option of wrapping a value for export.
                 // This could be used to bind a method to 'this', for example.
@@ -207,8 +215,11 @@ foam.CLASS({
       name: 'imports',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var a = o.split(' as ');
-          return foam.core.Import.create({name: a[1] || a[0], key: a[0]});
+          var a        = o.split(' as ');
+          var key      = a[0];
+          var optional = key.endsWith('?');
+          if ( optional ) key = key.slice(0, key.length-1);
+          return foam.core.Import.create({name: a[1] || key, key: key, required: ! optional});
         }
 
         return foam.core.Import.create(o);
@@ -228,19 +239,19 @@ foam.CLASS({
 
             case 2:
               // Export 'this'
-              console.assert(
+              foam.assert(
                   a[0] === 'as',
                   'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[1], key: null});
 
             case 3:
-              console.assert(
+              foam.assert(
                   a[1] === 'as',
                   'Invalid export syntax: key [as value] | as value');
               return foam.core.Export.create({exportName: a[2], key: a[0]});
 
             default:
-              console.error(
+              foam.assert(false,
                   'Invalid export syntax: key [as value] | as value');
           }
         }

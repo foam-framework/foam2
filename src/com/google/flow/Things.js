@@ -85,6 +85,11 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Line',
+  extends: 'foam.graphics.Line'
+});
 
 foam.CLASS({
   package: 'com.google.flow',
@@ -193,7 +198,7 @@ foam.CLASS({
     },
 
     function updateCellSize() {
-      var o = this.of$cls.create();
+      var o = this.of.create();
       this.cellWidth  = o.width;
       this.cellHeight = o.height;
     }
@@ -215,7 +220,7 @@ foam.CLASS({
 
         for ( var i = 0 ; i < this.rows ; i++ ) {
           for ( var j = 0 ; j < this.columns ; j++ ) {
-            var o = this.of$cls.create(null, this.__subContext__);
+            var o = this.of.create(null, this.__subContext__);
             o.x = w  * j;
             o.y = h * i;
             this.add(o);
@@ -489,7 +494,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      this.onDestroy(this.timer.time$.sub(this.tick));
+      this.onDetach(this.timer.time$.sub(this.tick));
       this.propertyChange.sub(this.tick);
     },
 
@@ -590,7 +595,7 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
-      this.onDestroy(this.physics.onTick.sub(this.tick));
+      this.onDetach(this.physics.onTick.sub(this.tick));
       this.propertyChange.sub(this.tick);
     },
 
@@ -698,7 +703,7 @@ foam.CLASS({
 
   implements: [ 'foam.physics.Physical' ],
 
-  requires: [ 'foam.graphics.Line' ],
+  requires: [ 'foam.graphics.Line', 'foam.graphics.CView' ],
 
   // TODO: better to just add to parent and have listeners
   // then add to physics or other interested parties
@@ -722,6 +727,37 @@ foam.CLASS({
       class: 'Boolean',
       name: 'penDown',
       value: true
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          x: this.x,
+          y: this.y,
+          penColor: this.penColor,
+          penWidth: this.penWidth,
+          penDown:  this.pendDown,
+          rotation: this.rotation
+        };
+      },
+      setter: function(m) {
+        this.copyFrom(m);
+      }
+    },
+    {
+      name: 'mementoStack_',
+      hidden: true,
+      factory: function() { return []; }
+    },
+    {
+      name: 'childLayer',
+      hidden: true,
+      factory: function() {
+        var l = this.CView.create();
+        this.parent.add(l);
+        return l;
+      }
     }
   ],
 
@@ -729,16 +765,40 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      var leg1     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:11,y:1});  this.add(leg1);
-      var leg2     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:10,y:16}); this.add(leg2);
-      var leg3     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-4,y:17}); this.add(leg3);
-      var leg4     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-5,y:2});  this.add(leg4);
-      var head     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:6,radiusX:4,x:4,y:-10}); this.add(head);
-      var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});   head.add(leftEye);
-      var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});      head.add(rightEye);
-      var shell    = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1}); this.add(shell);
-      var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6}); this.add(tail);
+      var leg1     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:11,y:1});
+      var leg2     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:10,y:16});
+      var leg3     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-4,y:17});
+      var leg4     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:5,radiusX:5,x:-5,y:2});
+      var head     = com.google.flow.Ellipse.create({border:"1",color:"green",radiusY:6,radiusX:4,x:4,y:-10});
+      var leftEye  = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:-0.5,y:1});
+      var rightEye = com.google.flow.Ellipse.create({border:"",color:"red",radiusY:2,radiusX:2,x:4,y:1});
+      var shell    = com.google.flow.Ellipse.create({border:"#000000",color:"green",radiusY:12,radiusX:8,x:0,y:1});
+      var tail     = com.google.flow.Ellipse.create({border:"",color:"green",radiusY:6,radiusX:4,x:7.5,y:19,start:1.7,end:4.6});
 
+      head.add(leftEye, rightEye);
+      this.add(leg1, leg2, leg3, leg4, head, shell, tail);
+    },
+
+    function degToRad(deg) {
+      return Math.PI * deg / 180;
+    },
+
+    function home() {
+      this.x = this.parent.width / 2;
+      this.y = this.parent.height / 2;
+      this.rotation = 0;
+
+      return this;
+    },
+
+    function ss() {
+      this.mementoStack_.push(this.memento);
+      return this;
+    },
+
+    function rs() {
+      this.memento = this.mementoStack_.pop();
+      return this;
     },
 
     function pc(color) {
@@ -772,13 +832,20 @@ foam.CLASS({
 
     function fd(d) {
       /* ForwarD */
+      return this.gt(
+          this.x + d * Math.cos(this.rotation+Math.PI/2),
+          this.y - d * Math.sin(this.rotation+Math.PI/2));
+    },
+
+    function gt(x, y) {
+      /* Go To */
       var x1 = this.x, y1 = this.y;
-      this.x += d * Math.cos(this.rotation+Math.PI/2);
-      this.y -= d * Math.sin(this.rotation+Math.PI/2);
+      this.x = x;
+      this.y = y;
 
       if ( this.penDown ) {
         // this.addProperty(this.Line.create({
-        this.parent.add(this.Line.create({
+        this.childLayer.add(this.Line.create({
           startX:    x1+this.radiusX,
           startY:    y1+this.radiusY,
           endX:      this.x+this.radiusX,
@@ -798,7 +865,7 @@ foam.CLASS({
 
     function lt(a) {
       /* Left Turn */
-      this.rotation += Math.PI*2*a/360;
+      this.rotation += this.degToRad(a);
       return this;
     },
 
@@ -845,6 +912,386 @@ foam.CLASS({
 
     function die() {
       this.parent && this.parent.remove(this);
+    },
+
+    function cs() {
+      this.childLayer.removeAllChildren();
+      return this;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Line3D',
+  extends: 'foam.graphics.Line',
+
+  imports: [ 'xyzToXY' ],
+
+  properties: [
+    { class: 'Float',  name: 'startZ' },
+    { class: 'Float',  name: 'endZ' }
+  ],
+
+  methods: [
+    function paintSelf(x) {
+      var xy;
+      x.beginPath();
+
+      xy = this.xyzToXY(this.startX, this.startY, this.startZ);
+      x.moveTo(xy[0], xy[1]);
+
+      xy = this.xyzToXY(this.endX, this.endY, this.endZ);
+      x.lineTo(xy[0], xy[1]);
+
+      x.lineWidth = this.lineWidth;
+      x.strokeStyle = this.color;
+      x.stroke();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Vector3',
+
+  properties: [
+    {
+      name: 'result_',
+      hidden: true,
+      factory: function() { return this.cls_.create(); }
+    },
+    { class: 'Float', name: 'x' },
+    { class: 'Float', name: 'y' },
+    { class: 'Float', name: 'z' },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return [ this.x, this.y, this.z ];
+      },
+      setter: function(m) {
+        this.x = m[0];
+        this.y = m[1];
+        this.z = m[2];
+      }
+    }
+  ],
+
+  methods: [
+    function result(x, y, z) {
+      var r = this.result_;
+      r.x = x;
+      r.y = y;
+      r.z = z;
+      return r;
+    },
+
+    function set(v) {
+      this.x = v.x;
+      this.y = v.y;
+      this.z = v.z;
+      return this;
+    },
+
+    function length() {
+      var x = this.x, y = this.y, z = this.z;
+      return Math.sqrt(x*x + y*y + z*z);
+    },
+
+    function cross(v) {
+      var x = this.x, y = this.y, z = this.z;
+
+      return this.result(
+        y * v.z - z * v.y,
+        z * v.x - x * v.z,
+        x * v.y - y * v.x);
+    },
+
+    function add(v) {
+      return this.result(this.x + v.x, this.y + v.y, this.z + v.z);
+    },
+
+    function mul(s) {
+      return this.result(s * this.x, s * this.y, s * this.z);
+    },
+
+    function rotateAbout(v, a) {
+      var halfAngle = a / 2;
+      var s = Math.sin(halfAngle);
+
+      var qx = v.x * s;
+      var qy = v.y * s;
+      var qz = v.z * s;
+      var qw = Math.cos(halfAngle);
+
+      var x = this.x;
+      var y = this.y;
+      var z = this.z;
+
+      // calculate quat * vector
+
+      var ix =  qw * x + qy * z - qz * y;
+      var iy =  qw * y + qz * x - qx * z;
+      var iz =  qw * z + qx * y - qy * x;
+      var iw = -qx * x - qy * y - qz * z;
+
+      // calculate result * inverse quat
+
+      this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+      this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+      this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+
+      return this;
+    },
+
+    function normalize() {
+      var l = this.length();
+
+      this.x /= l;
+      this.y /= l;
+      this.z /= l;
+
+      return this;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Turtle3D',
+  extends: 'com.google.flow.Turtle',
+
+  requires: [
+    'com.google.flow.Vector3',
+    'com.google.flow.Line3D'
+  ],
+
+  exports: [ 'xyzToXY' ],
+
+  properties: [
+    {
+      class: 'Float',
+      name: 'zRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
+    {
+      class: 'Float',
+      name: 'xRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
+    {
+      class: 'Float',
+      name: 'yRotation',
+      preSet: function(_, r) {
+        if ( r > 4 * Math.PI  ) return r - 2 * Math.PI;
+        if ( r < -4 * Math.PI ) return r + 2 * Math.PI;
+        return r;
+      },
+      view: {
+        class: 'foam.u2.view.DualView',
+        viewa: { class: 'foam.u2.FloatView', precision: 4, onKey: true },
+        viewb: { class: 'foam.u2.RangeView', step: 0.00001, minValue: -Math.PI*4, maxValue: Math.PI*4, onKey: true }
+      }
+    },
+    {
+      name: 'x',
+      getter: function() { return this.position.x; },
+      setter: function(x) { this.position.x = x; }
+    },
+    {
+      name: 'y',
+      getter: function() { return this.position.y; },
+      setter: function(y) { this.position.y = y; }
+    },
+    {
+      name: 'z',
+      getter: function() { return this.position.z; },
+      setter: function(z) { this.position.z = z; }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Vector3',
+      name: 'position',
+      factory: function() { return this.Vector3.create(); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Vector3',
+      name: 'heading',
+      factory: function() { return this.Vector3.create({x:1}); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'com.google.flow.Vector3',
+      name: 'normal',
+      factory: function() { return this.Vector3.create({z:1}); }
+    },
+    {
+      name: 'memento',
+      hidden: true,
+      getter: function() {
+        return {
+          position: this.position.memento,
+          heading:  this.heading.memento,
+          normal:   this.normal.memento,
+          penColor: this.penColor,
+          penWidth: this.penWidth,
+          penDown:  this.pendDown
+        };
+      },
+      setter: function(m) {
+        this.position.memento = m.position;
+        this.heading.memento  = m.heading;
+        this.normal.memento   = m.normal;
+        this.penColor         = m.penColor;
+        this.penWidth         = m.penWidth;
+        this.penDown          = m.penDown;
+      }
+    },
+    {
+      name: 'xy_',
+      hidden: true,
+      factory: function() { return []; }
+    }
+  ],
+
+  methods: [
+    function xyzToXY(x, y, z) {
+      if ( this.xRotation ) {
+        var d = Math.sqrt(z*z + y*y);
+        var a = Math.atan2(y, z);
+        a += this.xRotation;
+        z = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+
+      if ( this.yRotation ) {
+        var d = Math.sqrt(z*z + x*x);
+        var a = Math.atan2(x, z);
+        a += this.yRotation;
+        z = d * Math.cos(a);
+        x = d * Math.sin(a);
+      }
+
+      if ( this.zRotation ) {
+        var d = Math.sqrt(x*x + y*y);
+        var a = Math.atan2(y, x);
+        a += this.zRotation;
+        x = d * Math.cos(a);
+        y = d * Math.sin(a);
+      }
+
+      var xy = this.xy_;
+      xy[0] = this.parent.width/2 - x + y;
+      xy[1] = this.parent.height/2 + x + y - z / Math.SQRT2;
+      return xy;
+    },
+
+    function home() {
+      this.position = this.heading = this.normal = undefined;
+      return this;
+    },
+
+    function paint(ctx) {
+      // Transform so that turtle appears in the right spot.
+      var x  = this.position.x, y = this.position.y, z = this.position.z;
+      var x2 = this.parent.width/2 - x + y;
+      var y2 = this.parent.height/2 + x + y - z * Math.SQRT2;
+
+      ctx.save();
+      ctx.translate(x2-x, y2-y);
+      this.SUPER(ctx);
+      ctx.restore();
+    },
+
+    function pitchUp(a) {
+      a = this.degToRad(a);
+
+      var pitchAxis = this.heading.cross(this.normal).normalize();
+      this.heading.rotateAbout(pitchAxis, a).normalize();
+      this.normal.rotateAbout(pitchAxis, a).normalize();
+
+      return this;
+    },
+
+    function pitchDown(a) {
+      return this.pitchUp(-a);
+    },
+
+    function rollRight(a) {
+      this.normal.rotateAbout(this.heading, this.degToRad(a));
+      return this;
+    },
+
+    function rollLeft(a) {
+      return this.rollRight(-a);
+    },
+
+    function lt(a) {
+      this.heading.rotateAbout(this.normal, this.degToRad(a));
+      return this;
+    },
+
+    function fd(d) {
+      return this.gtV(this.position.add(this.heading.mul(d)));
+    },
+
+    function up(d) {
+      return this.gtV(this.position.add(this.normal.mul(d)));
+    },
+
+    function down(d) {
+      return this.up(-d);
+    },
+
+    function gtV(v) {
+      return this.gt(v.x, v.y, v.z);
+    },
+
+    function gt(x, y, z) {
+      /* Go To */
+      var x1 = this.position.x, y1 = this.position.y, z1 = this.position.z;
+      this.position.x = x;
+      this.position.y = y;
+      this.position.z = z;
+
+      if ( this.penDown ) {
+        // this.addProperty(this.Line.create({
+        this.childLayer.add(this.Line3D.create({
+          startX:    x1/*+this.radiusX*/,
+          startY:    y1/*+this.radiusY*/,
+          startZ:    z1,
+          endX:      this.x/*+this.radiusX*/,
+          endY:      this.y/*+this.radiusY*/,
+          endZ:      this.z,
+          color:     this.penColor,
+          lineWidth: this.penWidth
+        }));
+      }
+
+      return this;
     }
   ]
 });

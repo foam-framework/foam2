@@ -20,40 +20,63 @@ foam.CLASS({
   name: 'TestConfiguration',
   requires: [
     'foam.dao.EasyDAO',
-    'com.chrome.origintrials.model.Application'
+    'com.chrome.origintrials.model.Application',
+    'com.chrome.origintrials.model.User',
+    'com.chrome.origintrials.model.Token',
+    'com.chrome.origintrials.model.Experiment'
   ],
   exports: [
-    'applicationDAO'
+    'applicationDAO',
+    'experimentDAO',
+    'userDAO',
+    'tokenDAO'
   ],
   methods: [
     function genTestData() {
       var data = [];
-      for ( var i = 0 ; i < 100 ; i++ ) {
+      for ( var i = 0 ; i < 10 ; i++ ) {
         data.push(this.genApplication());
       }
       return data;
     },
+    function rand(a) {
+      return a[Math.floor(Math.random() * a.length)]
+    },
+    function bool() { return Math.random() < 0.5; },
     function genApplication() {
       var names = [ 'Adam', 'Alex', 'Kevin', 'Braden', 'Jackson' ];
       var emails = [ 'adamvy@google.com', 'kgr@google.com', 'foo@example.com', 'unknown@somehwere.asdfasdf' ];
       var origins = [ '127.0.0.1:8888', 'google.com', 'chrome.com', 'some.sub.domain.at.example.com' ];
-      var features = [ 'bluetooth', 'usb', 'sockets', 'storage', 'other' ];
+      var features = ['bluetooth', 'usb', 'sockets', 'storage', 'other'];
       var comments = [ 'this is sweet', 'can i have access pls?', "I'm not sure what I'm doing." ];
 
-      function rand(a) {
-        return a[Math.floor(Math.random() * a.length)]
-      }
-      function bool() { return Math.random() < 0.5; }
-
       return {
-        applicantName: rand(names),
-        applicantEmail: rand(emails),
-        origin: rand(origins),
-        public: bool(),
-        requestedFeature: rand(features),
-        agreedToTerms: bool(),
-        comments: rand(comments)
+        applicantName: this.rand(names),
+        applicantEmail: this.rand(emails),
+        origin: this.rand(origins),
+        public: this.bool(),
+        experiment: this.rand(features),
+        agreedToTerms: this.bool(),
+        comments: this.rand(comments)
       };
+    },
+    function genExperiments() {
+      var names = ['bluetooth', 'usb', 'sockets', 'storage', 'other'];
+      var owners = ['adamvy@google.com', 'kgrgreer@gmail.com'];
+      var data = [];
+
+      for ( var i = 0 ; i < names.length ; i++ ) {
+        var start = new Date();
+        start.setMonth(Math.floor(Math.random() * 12));
+
+        data[i] = {
+          name: names[i],
+          owner: this.rand(owners),
+          startTime: start
+        };
+      }
+
+      return data;
     }
   ],
   properties: [
@@ -65,6 +88,42 @@ foam.CLASS({
           guid: true,
           daoType: 'MDAO',
           testData: this.genTestData()
+        });
+
+        return dao;
+      }
+    },
+    {
+      name: 'userDAO',
+      factory: function() {
+        var dao = this.EasyDAO.create({
+          of: this.User,
+          guid: true,
+          daoType: 'MDAO'
+        });
+
+        return dao;
+      }
+    },
+    {
+      name: 'tokenDAO',
+      factory: function() {
+        var dao = this.EasyDAO.create({
+          of: this.Token,
+          guid: true,
+          daoType: 'MDAO'
+        });
+
+        return dao;
+      }
+    },
+    {
+      name: 'experimentDAO',
+      factory: function() {
+        var dao = this.EasyDAO.create({
+          of: this.Experiment,
+          daoType: 'MDAO',
+          testData: this.genExperiments()
         });
 
         return dao;

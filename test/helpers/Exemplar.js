@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -40,7 +40,15 @@ foam.CLASS({
       /** Examplars to load and execute before this one. Output code will
         be the merged result of all dependencies. */
       class: 'StringArray',
-      name: 'dependencies'
+      name: 'dependencies',
+      preSet: function(old, nu) {
+        // NOTE: this will also cause not-yet-declared dependencies to fail
+        if ( this.dependsOn(nu, this.name) ) {
+          throw "Cannot have self as a dependency!" + name;
+          return old;
+        }
+        return nu;
+      }
     },
     {
       /** Set to true if your code is a function that returns a promise */
@@ -49,31 +57,49 @@ foam.CLASS({
       value: false
     },
     {
+      /**
+       * A map of platform names this example supports, such as 'node'
+       * and 'web'.
+       */
+      name: 'platforms',
+      factory: function() { return { node: true, web: true }; }
+    },
+    {
       /** The code for this example. This should be either bare code, or a
         function that returns a promise if async. */
       class: 'String',
       name: 'code',
       adapt: function(old, nu) {
-        if ( foam.Function.is(nu) ) {
+        if ( foam.Function.isInstance(nu) ) {
           var matches = nu.toString().match(/function\s*(async)?\(\s*\)\s*\{((?:.|\n)*)\}/);
           if ( matches[1] ) this.isAsync = true;
-          return matches[2];
+          return matches[2].replace('\t', '  ');
         }
         return nu.replace('\t', '  ');
       }
     },
     {
-      /** Is true if any dependencies are async.
-        @private */
+      /** Unit test expectations to run after the main code. */
+      class: 'String',
+      name: 'postTestCode',
+      adapt: function(old, nu) {
+        if ( foam.Function.isInstance(nu) ) {
+          var matches = nu.toString().match(/function\s*\(\s*\)\s*\{((?:.|\n)*)\}/);
+          return matches[1].replace('\t', '  ');
+        }
+        return nu.replace('\t', '  ');
+      }
+    },
+    {
+      /** Is true if this or any dependencies are async. */
       class: 'Boolean',
-      name: 'hasAsyncDeps_',
-      hidden: true,
+      name: 'runsAsync',
       expression: function(dependencies) {
         var self = this;
         var ret = false;
         self.dependencies && self.dependencies.forEach(function(depName) {
           var dep = self.registry.lookup(depName);
-          if ( dep.hasAsyncDeps_ || dep.isAsync ) {
+          if ( dep.runsAsync || dep.isAsync ) {
             ret = true;
             return true;
           }
@@ -88,34 +114,50 @@ foam.CLASS({
       this.registry.register(this);
     },
 
-    function generateExample() {
-      var indent = { level: 0 };
+    function dependsOn(deps, name) {
+      var self = this;
+      deps && deps.forEach(function(depName) {
+        if ( depName === name ) return true;
+
+        var dep = self.registry.lookup(depName);
+        if ( dep.dependsOn(dep.dependencies, name) ) return true;
+      });
+      return false;
+    },
+
+    function generateCode(selfOutputMethod, depOutputMethod, noDeps, indent) {
+      indent = indent || { level: 0 };
       var ret = "";
       var self = this;
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
+      if ( noDeps ) {
+        ret += self[selfOutputMethod](indent);
+        return ret;
+      }
+
       // flatten dependencies
       var deps = this.flattenDependencies();
 
       deps.sync.forEach(function(dep) {
-        ret += dep.outputSelf(indent);
+        ret += dep[selfOutputMethod](indent, true) + '\n';
       });
 
 
       if ( deps.async.length ) {
         indent.level += 1;
-        ret += tabs + "Promise.resolve({\n";
+        ret += tabs + "return Promise.resolve({\n";
       }
       deps.async.forEach(function(dep) {
         ret += tabs + "}).then(function() {\n";
-        ret += dep.outputSelf(indent);
+        ret += dep[depOutputMethod](indent) + '\n';
       });
       if ( deps.async.length ) {
         ret += tabs + "}).then(function() {\n";
       }
 
-      ret += self.outputSelf(indent);
+      ret += self[selfOutputMethod](indent) + '\n';
 
       // inner enclosing end
       if ( deps.async.length ) {
@@ -126,10 +168,42 @@ foam.CLASS({
       return ret;
     },
 
-    function outputSelf(indent) {
+    function generateExample(noDeps, indent) {
+      indent = indent || { level: 0 };
+      return this.generateCode('outputSelfExample', 'outputSelfExample',
+        noDeps, indent);
+    },
+    function generateExampleHTML(noDeps, indent) {
+      indent = indent || { level: 0 };
+      return this.generateCode('outputSelfHTML', 'outputSelfHTML',
+        noDeps, indent);
+    },
 
-      var ret = "\n";
-      var lines = this.code.split('\n');
+    function generateTest(indent) {
+      indent = indent || { level: 0 };
+      return this.generateCode('outputSelfTest', 'outputSelfExample',
+        false, indent);
+    },
+
+    function outputSelfTest(indent) {
+      var ret = "";
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
+
+      ret += tabs + '// ' + this.name + '\n';
+      ret += tabs + '// ' + this.description + '\n';
+
+      ret += this.outputIndentedCode(indent, this.code) + '\n';
+
+      ret += tabs + '// Post conditions:\n';
+      ret += this.outputIndentedCode(indent, this.postTestCode) + '\n';
+
+      return ret;
+    },
+
+    function outputSelfExample(indent) {
+
+      var ret = "";
       var tabs = "";
       for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
@@ -137,6 +211,32 @@ foam.CLASS({
       ret += tabs + '// ' + this.name + '\n';
       ret += tabs + '// ' + this.description + '\n';
       ret += tabs + '//=====================================================\n';
+
+      ret += this.outputIndentedCode(indent, this.code) + '\n';
+
+      return ret;
+    },
+
+    function outputSelfHTML(indent) {
+
+      var ret = "\n";
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
+
+      ret += tabs + '<div class="example-title">' + this.name + '</div>\n';
+      ret += tabs + '<div class="example-description">' + this.description + '</div>\n';
+      ret += '<div class="example-code"><pre><code>';
+      ret += this.outputIndentedCode(indent, this.code);
+      ret += '</code></pre></div>\n';
+
+      return ret;
+    },
+
+    function outputIndentedCode(indent, code) {
+      var ret = "";
+      var lines = code.split('\n');
+      var tabs = "";
+      for ( var i = 0; i < indent.level; i++) { tabs += '  '; }
 
       // only keep source indent relative to first line
       var firstLineIndent = -1;
@@ -149,14 +249,19 @@ foam.CLASS({
           firstLineIndent = line.indexOf(trimmed);
           line = trimmed;
         } else {
-          line = line.slice(firstLineIndent);
+          // if non-whitespace characters in the indent region
+          // (negative indent on some lines)
+          if ( line.substring(0, firstLineIndent).trim() !== '' ) {
+            //nop
+          } else {
+            line = line.slice(firstLineIndent);
+          }
         }
         ret += tabs + line + '\n';
       });
 
-      ret += "\n";
-
-      return ret;
+      // trim last newline
+      return tabs + ret.trim();
     },
 
     function flattenDependencies(depsLoaded) {
@@ -183,7 +288,7 @@ foam.CLASS({
 
           depsLoaded[dep.name] = true;
 
-          if ( dep.hasAsyncDeps_ || dep.isAsync ) {
+          if ( dep.runsAsync || dep.isAsync ) {
             asyncDeps.push(dep);
           } else {
             syncDeps.push(dep);

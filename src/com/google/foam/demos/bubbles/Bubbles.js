@@ -40,7 +40,9 @@ foam.CLASS({
     [ 'height',     600 ],
     [ 'background', '#ccf' ],
     { name: 'engine',   factory: function() {
-      return this.onDestroy(this.PhysicsEngine.create().start());
+      var e = this.PhysicsEngine.create({gravity: true});
+      e.start();
+      return this.onDetach(e);
     }}
   ],
 
@@ -62,7 +64,7 @@ foam.CLASS({
             border: this.hsl(x/N*100, (70+y/N*30), 60)
           });
           this.engine.add(c);
-          this.addChildren(c);
+          this.add(c);
 
           this.timer.i$.sub(foam.Function.bind(function circleBoundOnWalls(c) {
             if ( c.y > 1/this.scaleY*this.height+50 ) {
@@ -87,7 +89,7 @@ foam.CLASS({
           mass: 0.3
         });
         this.engine.add(b);
-        this.addChildren(b);
+        this.add(b);
 
         this.timer.i$.sub(foam.Function.bind(function bubbleWrap(b) {
           if ( b.y < 1 ) {

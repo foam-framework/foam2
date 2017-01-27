@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -20,10 +20,10 @@
   var isServer = typeof process === 'object';
   var isWorker = typeof importScripts !== 'undefined';
 
-  var flags = {
-    'web': ! isServer,
-    'node': isServer
-  };
+  var flags = this.FOAM_FLAGS || {};
+  flags.web = ! isServer,
+  flags.node = isServer;
+  if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
@@ -64,11 +64,12 @@
     createLoadBrowser();
 
   this.FOAM_FILES = function(files) {
-    files.filter(function(f) {
-      return f.flags ? flags[f.flags] : true;
-    })
-    .map(function(f) { return f.name; })
-    .forEach(load);
+    files.
+        filter(function(f) {
+          return f.flags ? flags[f.flags] : true;
+        }).
+        map(function(f) { return f.name; }).
+        forEach(load);
 
     delete this.FOAM_FILES;
   };

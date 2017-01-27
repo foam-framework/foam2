@@ -33,106 +33,46 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInProto() {
-    }
+    function installInProto() { }
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.core',
-  name: 'Interface',
+  name: 'InterfaceModel',
+  extends: 'foam.core.Model',
 
   properties: [
-    {
-      class: 'String',
-      name: 'package'
-    },
-    {
-      class: 'String',
-      name: 'name'
-    },
-    {
-      class: 'StringArray',
-      name: 'extends'
-    },
-    {
-      class: 'String',
-      name: 'id',
-      expression: function(package, name) {
-        return package ? (package + '.' + name) : name;
-      }
-    },
+    ['extends', 'foam.core.AbstractInterface'],
     {
       class: 'AxiomArray',
       name: 'methods',
       of: 'foam.core.internal.InterfaceMethod'
-    },
-    {
-      class: 'AxiomArray',
-      name: 'properties',
-      // TODO: Should this be a type of property that defines
-      // nothing beyond name and type information?
-      of: 'foam.core.Property'
-    },
-    {
-      class: 'AxiomArray',
-      name: 'topics',
-      of: 'foam.core.Topic',
-      adaptArrayElement: function(o) {
-        return typeof o === 'string'        ?
-          foam.core.Topic.create({name: o}) :
-          foam.core.Topic.create(o)         ;
-      }
-    },
-    {
-      name: 'axioms_',
-      factory: function() { return []; }
-    },
-    {
-      class: 'String',
-      name: 'documentation'
-    }
-  ],
-
-  methods: [
-    function getAxiomByName(name) {
-      return this.axioms_.filter(function(a) {
-        return a.name === name;
-      })[0];
-    },
-
-    function getAxiomsByClass(cls) {
-      return this.axioms_.filter(function(a) {
-        return cls.isInstance(a);
-      });
-    },
-
-    function getOwnAxiomsByClass(cls) {
-      return this.getAxiomsByClass(cls);
-    },
-
-    function hasOwnAxiom(name) {
-      return this.axioms_.some(function(a) { return a.name === name; });
-    },
-
-    function isInstance(o) {
-      return !! (
-        o && o.cls_ && o.cls_.getAxiomByName('implements_' + this.id)
-      );
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'AbstractInterface',
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.create = function() {
+          throw new Error("Cannot instantiate an Interface.");
+        };
+      }
+    }
+  ]
+});
 
 foam.LIB({
   name: 'foam',
 
   methods: [
     function INTERFACE(m) {
-      var model = foam.core.Interface.create(m);
-      foam.register(model);
-      foam.package.registerClass(model);
+      m.class = m.class || 'foam.core.InterfaceModel';
+      foam.CLASS(m);
     }
   ]
 });

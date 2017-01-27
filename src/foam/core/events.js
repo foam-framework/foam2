@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+/**
+ * Event listener utilities.
+ */
 foam.LIB({
   name: 'foam.events',
 
@@ -22,7 +25,7 @@ foam.LIB({
     function oneTime(listener) {
       /** Create a "one-time" listener which unsubscribes itself when called. **/
       return function(subscription) {
-        subscription.destroy();
+        subscription.detach();
         listener.apply(this, Array.from(arguments));
       };
     },

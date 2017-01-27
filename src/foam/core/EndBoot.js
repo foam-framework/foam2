@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -36,8 +36,6 @@ foam.core.Property.SHADOW_MAP = {
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  documentation: 'Add new Axiom types (Implements, Constants, Topics, Properties, Methods and Listeners) to Model.',
-
   properties: [
     {
       class: 'AxiomArray',
@@ -60,7 +58,7 @@ foam.CLASS({
         if ( o.class ) {
           var m = foam.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
-          return m.create(o);
+          return m.create(o, this);
         }
 
         return foam.core.Property.isInstance(o) ? o : foam.core.Property.create(o);
@@ -70,17 +68,17 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Method',
       name: 'methods',
-      adaptArrayElement: function(o) {
+      adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Method must be named');
-          var m = foam.core.Method.create();
+          foam.assert(o.name, 'Method must be named');
+          var m = foam.lookup(prop.of).create();
           m.name = o.name;
           m.code = o;
           return m;
         }
-        if ( foam.core.Method.isInstance(o) ) return o;
-        if ( o.class ) return this.lookup(o.class).create(o);
-        return foam.core.Method.create(o);
+        if ( foam.lookup(prop.of).isInstance(o) ) return o;
+        if ( o.class ) return this.lookup(o.class).create(o, this);
+        return foam.lookup(prop.of).create(o);
       }
     }
   ]
@@ -210,3 +208,31 @@ foam.CLASS({
     }
   ]
 });
+
+
+/**
+ * Replace foam.CLASS() with a lazy version which only
+ * build the class when first accessed.
+ */
+(function() {
+  // List of unused Models in the system.
+  foam.USED   = {};
+  foam.UNUSED = {};
+
+  var CLASS = foam.CLASS;
+
+  foam.CLASS = function(m) {
+    if ( m.refines ) return CLASS(m);
+
+    m.id = m.package ? m.package + '.' + m.name : m.name;
+    foam.UNUSED[m.id] = true;
+    var f = foam.Function.memoize0(function() {
+      delete foam.UNUSED[m.id];
+      var c = CLASS(m);
+      foam.USED[m.id] = c;
+      return c;
+    });
+    foam.__context__.registerFactory(m, f);
+    foam.package.registerClassFactory(m, f);
+  };
+})();

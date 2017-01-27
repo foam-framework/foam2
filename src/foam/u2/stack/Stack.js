@@ -98,7 +98,7 @@ foam.CLASS({
       ],
       methods: [
         function init() {
-          this.onDestroy(this.stack.pos$.sub(this.onStackChange));
+          this.onDetach(this.stack.pos$.sub(this.onStackChange));
         },
         function get() {
           return this.stack.at(this.pos);

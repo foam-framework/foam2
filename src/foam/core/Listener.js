@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -56,16 +56,14 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInProto(proto) {
-      var superAxiom = proto.cls_.getSuperAxiomByName(this.name);
-
-      this.assert(
+    function installInProto(proto, superAxiom) {
+      foam.assert(
         ! superAxiom ||
           foam.core.Listener.isInstance(superAxiom),
         'Attempt to override non-listener', this.name);
 
       var name       = this.name;
-      var code       = this.override_(proto, foam.Function.setName(this.code, name));
+      var code       = this.override_(proto, foam.Function.setName(this.code, name), superAxiom);
       var isMerged   = this.isMerged;
       var isFramed   = this.isFramed;
       var mergeDelay = this.mergeDelay;
@@ -77,14 +75,9 @@ foam.CLASS({
           if ( ! this.hasOwnPrivate_(name) ) {
             var self = this;
             var l = function(sub) {
-              if ( self.isDestroyed() ) {
-                if ( sub ) {
-                  console.warn('Destroying stale subscription for', self.cls_.id);
-                  sub.destroy();
-                }
-              } else {
-                code.apply(self, arguments);
-              }
+              // Is it possible to detect stale subscriptions?
+              // ie. after an object has been detached.
+              return code.apply(self, arguments);
             };
 
             if ( isMerged ) {
@@ -115,7 +108,7 @@ foam.CLASS({
       name: 'listeners',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          console.assert(o.name, 'Listener must be named');
+          foam.assert(o.name, 'Listener must be named');
           return foam.core.Listener.create({name: o.name, code: o});
         }
 

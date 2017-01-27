@@ -26,6 +26,45 @@ TODO:
  - Properly handle insertBefore_ of an element that's already been inserted?
 */
 
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'ControllerMode',
+
+  values: [
+    { name: 'CREATE', label: 'Create' },
+    { name: 'VIEW',   label: 'View'   },
+    { name: 'EDIT',   label: 'Edit'   }
+  ]
+});
+
+
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'Visibility',
+
+  values: [
+    { name: 'RW',       label: 'Read-Write' },
+    { name: 'FINAL',    label: 'Final'      },
+    { name: 'DISABLED', label: 'Disabled'   },
+    { name: 'RO',       label: 'Read-Only'  },
+    { name: 'HIDDEN',   label: 'Hidden'     }
+  ]
+});
+
+
+foam.ENUM({
+  package: 'foam.u2',
+  name: 'DisplayMode',
+
+  values: [
+    { name: 'RW',       label: 'Read-Write' },
+    { name: 'DISABLED', label: 'Disabled'   },
+    { name: 'RO',       label: 'Read-Only'  },
+    { name: 'HIDDEN',   label: 'Hidden'     }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'Entity',
@@ -48,9 +87,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function output(out) { out('&', this.name, ';'); }
+    function output(out) { out('&', this.name, ';'); },
+    function toE() { return this; }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -173,8 +214,8 @@ foam.CLASS({
     function output(out) {},
     function load() {},
     function unload() {},
-    function remove() {},
-    function destroy() {},
+    function onRemove() {},
+    // function detach() {},
     function onSetCls() {},
     function onFocus() {},
     function onAddListener() {},
@@ -291,14 +332,15 @@ foam.CLASS({
     },
     function load() { this.error('Duplicate load.'); },
     function unload() {
-      var e = this.el();
-      if ( e ) {
-        e.remove();
+      if ( ! this.parentNode || this.parentNode.state === this.LOADED ) {
+        var e = this.el();
+        if ( e ) e.remove();
       }
+
       this.state = this.UNLOADED;
       this.visitChildren('unload');
     },
-    function remove() { this.unload(); },
+    function onRemove() { this.unload(); },
     function onSetCls(cls, enabled) {
       var e = this.el();
       if ( e ) {
@@ -402,7 +444,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
-  // documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
+  documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
 
   requires: [
     'foam.u2.AttrSlot',
@@ -492,6 +534,16 @@ foam.CLASS({
 
     NEXT_ID: function() {
       return 'v' + this.__ID__[ 0 ]++;
+    },
+
+    // Keys which respond to keydown but not keypress
+    KEYPRESS_CODES: { 8: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+
+    NAMED_CODES: {
+      '37': 'left',
+      '38': 'up',
+      '39': 'right',
+      '40': 'down'
     }
   },
 
@@ -522,9 +574,10 @@ foam.CLASS({
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED && oldState == undefined ) {
-          // Check oldState == undefined so that we don't publish onunload
-          // when we've never been loaded.
+        } else if ( state === this.UNLOADED && oldState ) {
+          // When state is first set from the factory oldState will be undefined
+          // but we don't want to publish that we're unloaded since we haven't
+          // actually been loaded yet.
           this.pub('onunload');
         }
       }
@@ -644,19 +697,86 @@ foam.CLASS({
     {
       name: '__subSubContext__',
       factory: function() { return this.__subContext__; }
-    }
+    },
+    'keyMap_'
   ],
 
   methods: [
     function init() {
-      this.state = this.UNLOADED;
+      this.onDetach(this.visitChildren.bind(this, 'detach'));
     },
 
     function initE() {
+      this.initKeyboardShortcuts();
       /*
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function evtToCharCode(evt) {
+      /* Maps an event keycode to a string */
+      var s = '';
+      if ( evt.altKey   ) s += 'alt-';
+      if ( evt.ctrlKey  ) s += 'ctrl-';
+      if ( evt.shiftKey && evt.type === 'keydown' ) s += 'shift-';
+      if ( evt.metaKey  ) s += 'meta-';
+      s += evt.type === 'keydown' ?
+          this.NAMED_CODES[evt.which] || String.fromCharCode(evt.which) :
+          String.fromCharCode(evt.charCode);
+      return s;
+    },
+
+    function initKeyMap_(keyMap, cls) {
+      var count = 0;
+
+      var as = cls.getAxiomsByClass(foam.core.Action);
+
+      for ( var i = 0 ; i < as.length ; i++ ) {
+        var a = as[i];
+
+        for ( var j = 0 ; a.keyboardShortcuts && j < a.keyboardShortcuts.length ; j++, count++ ) {
+          var key = a.keyboardShortcuts[j];
+
+          // First, lookup named codes, then convert numbers to char codes,
+          // otherwise, assume we have a single character string treated as
+          // a character to be recognized.
+          if ( this.NAMED_CODES[key] ) {
+            key = this.NAMED_CODES[key];
+          } else if ( typeof key === 'number' ) {
+            key = String.fromCharCode(key);
+          }
+
+          keyMap[key] = a.maybeCall.bind(a, this.__subContext__, this);
+          /*
+          keyMap[key] = opt_value ?
+            function() { a.maybeCall(this.__subContext__, opt_value.get()); } :
+            a.maybeCall.bind(action, self.X, self) ;
+          */
+        }
+      }
+
+      return count;
+    },
+
+    function initKeyboardShortcuts() {
+      /* Initializes keyboard shortcuts. */
+      var keyMap = {}
+      var count = this.initKeyMap_(keyMap, this.cls_);
+
+      //      if ( this.of ) count += this.initKeyMap_(keyMap, this.of);
+
+      if ( count ) {
+        this.keyMap_ = keyMap;
+        var target = this.parentNode || this;
+
+        // Ensure that target is focusable, and therefore will capture keydown
+        // and keypress events.
+        target.setAttribute('tabindex', target.tabIndex || 1);
+
+        target.on('keydown',  this.onKeyboardShortcut);
+        target.on('keypress', this.onKeyboardShortcut);
+      }
     },
 
     function el() {
@@ -768,9 +888,9 @@ foam.CLASS({
 
     function show(opt_shown) {
       if ( opt_shown === undefined ) {
-        this.show = true;
+        this.shown = true;
       } else if ( foam.core.Slot.isInstance(opt_shown) ) {
-        this.shown$ = opt_shown;
+        this.shown$.follow(opt_shown);
       } else {
         this.shown = !! opt_shown;
       }
@@ -835,7 +955,7 @@ foam.CLASS({
         if ( foam.core.Slot.isInstance(value) ) {
           this.slotAttr_(name, value);
         } else {
-          this.assert(
+          foam.assert(
               typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || foam.Date.isInstance(value),
               'Attribute value must be a primitive type.');
 
@@ -946,7 +1066,7 @@ foam.CLASS({
         Remove this Element from its parent Element.
         Will transition to UNLOADED state.
       */
-      this.state.remove.call(this);
+      this.onRemove();
 
       if ( this.parentNode ) {
         var cs = this.parentNode.childNodes;
@@ -1012,7 +1132,7 @@ foam.CLASS({
 
     // Was renamed from cls() in FOAM1, current name seems
     // out of place.  Maybe renamed addClass().
-    function cssClass(/* Slot | String */ cls) {
+    function cssClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
@@ -1133,12 +1253,16 @@ foam.CLASS({
       return this.parentNode;
     },
 
-    function add(/* vargs */) {
+    function add() {
       if ( this.content ) {
         this.content.add_(arguments, this);
       } else {
         this.add_(arguments, this);
       }
+      return this;
+    },
+
+    function toE() {
       return this;
     },
 
@@ -1199,7 +1323,7 @@ foam.CLASS({
       return this;
     },
 
-    function addBefore(reference/*, vargs */) {
+    function addBefore(reference) { /*, vargs */
       /* Add a variable number of children before the reference element. */
       var children = [];
       for ( var i = 1 ; i < arguments.length ; i++ ) {
@@ -1242,7 +1366,7 @@ foam.CLASS({
     },
 
     function select(dao, f, update) {
-      // TODO: cleanup on destroy
+      // TODO: cleanup on detach
       var es   = {};
       var self = this;
       var reset = function() {
@@ -1254,7 +1378,7 @@ foam.CLASS({
           eof: function() {}
         });
       };
-      var addRow = function(_, _, _, o) {
+      var addRow = function(_, __, ___, o) {
         if ( update ) {
           o = o.clone();
         }
@@ -1265,7 +1389,7 @@ foam.CLASS({
         if ( update ) {
           // ???: Why is it necessary to delay this until after load?
           e.onload.sub(function() {
-            o.propertyChange.sub(function(_,_,prop,slot) {
+            o.propertyChange.sub(function(_,__,prop,slot) {
               dao.put(o.clone());
             });
           });
@@ -1279,7 +1403,7 @@ foam.CLASS({
         }
         es[o.id] = e;
       };
-      var removeRow = function(_, _, _, o) {
+      var removeRow = function(_, __, ___, o) {
         var e = es[o.id];
         if ( e ) {
           e.remove();
@@ -1322,6 +1446,8 @@ foam.CLASS({
       */
       var self = this;
       var buf = [];
+      var Element = foam.u2.Element;
+      var Entity  = self.Entity;
       var f = function templateOut(/* arguments */) {
         for ( var i = 0 ; i < arguments.length ; i++ ) {
           var o = arguments[i];
@@ -1331,8 +1457,7 @@ foam.CLASS({
             buf.push(o);
           } else if ( typeof o === 'number' ) {
             buf.push(o);
-          } else if ( foam.u2.Element.isInstance(o) ||
-              self.Entity.isInstance(o) ) {
+          } else if ( Element.isInstance(o) || Entity.isInstance(o) ) {
             o.output(f);
           } else if ( o === null || o === undefined ) {
             buf.push(o);
@@ -1342,7 +1467,7 @@ foam.CLASS({
 
       f.toString = function() {
         if ( buf.length === 0 ) return '';
-        if ( buf.length > 1 ) buf = [ buf.join('') ];
+        if ( buf.length > 1 ) return buf.join('');
         return buf[0];
       };
 
@@ -1384,18 +1509,22 @@ foam.CLASS({
       if ( ! Array.isArray(children) ) children = [ children ];
 
       var Y = this.__subSubContext__;
-      children = children.map(function(e) { return e.toE ? e.toE(null, Y) : e; });
+      children = children.map(function(e) {
+        e = e.toE ? e.toE(null, Y) : e;
+        e.parentNode = this;
+        return e;
+      }.bind(this));
 
       var index = before ? i : (i + 1);
       this.childNodes.splice.apply(this.childNodes,
           [ index, 0 ].concat(children));
+
       this.state.onInsertChildren.call(
         this,
         children,
         reference,
-        before ?
-          'beforebegin' :
-          'afterend');
+        before ? 'beforebegin' : 'afterend');
+
       return this;
     },
 
@@ -1471,19 +1600,26 @@ foam.CLASS({
 
       var e = nextE();
       var l = function() {
-        var first = Array.isArray(e) ? e[0] : e;
-        var e2 = nextE();
-        self.insertBefore(e2, first);
-        if ( Array.isArray(e) ) {
-          for ( var i = 0 ; i < e.length ; i++ ) e[i].remove();
-        } else {
-          if ( e.state === e.LOADED ) e.remove();
+        if ( self.state !== self.LOADED ) {
+          s && s.detach();
+          return;
         }
+        var first = Array.isArray(e) ? e[0] : e;
+        var tmp = self.E();
+        self.insertBefore(tmp, first);
+        if ( Array.isArray(e) ) {
+          for ( var i = 0 ; i < e.length ; i++ ) { e[i].remove(); e[i].detach(); }
+        } else {
+          if ( e.state === e.LOADED ) { e.remove(); e.detach(); }
+        }
+        var e2 = nextE();
+        self.insertBefore(e2, tmp);
+        tmp.remove();
         e = e2;
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.destroy, s));
+      this.sub('onunload', foam.Function.bind(s.detach, s));
 
       return e;
     },
@@ -1500,7 +1636,7 @@ foam.CLASS({
     function output_(out) {
       /** Output the element without transitioning to the OUTPUT state. **/
       out('<', this.nodeName);
-      out(' id="', this.id, '"');
+      if ( this.id !== null ) out(' id="', this.id, '"');
 
       var first = true;
       if ( this.hasOwnProperty('classes') ) {
@@ -1556,6 +1692,26 @@ foam.CLASS({
 
       out('>');
     }
+  ],
+
+  listeners: [
+    {
+      name: 'onKeyboardShortcut',
+      documentation: function() {/*
+          Automatic mapping of keyboard events to $$DOC{ref:'Action'} trigger.
+          To handle keyboard shortcuts, create and attach $$DOC{ref:'Action',usePlural:true}
+          to your $$DOC{ref:'foam.ui.View'}.
+      */},
+      code: function(evt) {
+        if ( evt.type === 'keydown' && ! this.KEYPRESS_CODES[evt.which] ) return;
+        var action = this.keyMap_[this.evtToCharCode(evt)];
+        if ( action ) {
+          action();
+          evt.preventDefault();
+          evt.stopPropagation();
+        }
+      }
+    }
   ]
 });
 
@@ -1606,7 +1762,40 @@ foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 
 foam.CLASS({
+  refines: 'foam.core.FObject',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  methods: [
+    function toE(args, X) {
+      return foam.u2.ViewSpec.createView(
+        { class: 'foam.u2.DetailView', showActions: true, data: this },
+        args, this, X);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Slot',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  methods: [
+    function toE() { return this; }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.ExpressionSlot',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  methods: [
+    function toE() { return this; }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Property',
+
+  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.TextField'
@@ -1622,6 +1811,11 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
+      name: 'visibility'
     }
   ],
 
@@ -1643,6 +1837,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       class: 'Int',
@@ -1655,6 +1850,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Date',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
@@ -1663,7 +1859,18 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.DateTime',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  requires: [ 'foam.u2.DateTimeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.DateTimeView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Float',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
@@ -1673,6 +1880,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
@@ -1682,6 +1890,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
+  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
     [ 'view', { class: 'foam.u2.CheckBox' } ],
@@ -1691,6 +1900,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Color',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -1705,6 +1915,45 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Class',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  properties: [
+    [ 'view', { class: 'foam.u2.ClassView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Reference',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  properties: [
+    {
+      name: 'view',
+      value: {
+        class: 'foam.u2.view.ReferenceView'
+      }
+    }
+  ]
+})
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ControllerViewTrait',
+
+  exports: [ 'controllerMode' ],
+
+  properties: [
+    {
+      class: 'Enum',
+      of: 'foam.uw.ControllerMode',
+      name: 'controllerMode'
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
@@ -1713,8 +1962,73 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Enum',
+      of: 'foam.u2.ControllerMode',
+      name: 'controllerMode',
+      factory: function() { return this.__context__.controllerMode || foam.u2.ControllerMode.CREATE; }
+    },
+    {
       name: 'data',
       attribute: true
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
+      name: 'visibility',
+      postSet: function() { this.updateMode_(this.mode); },
+      attribute: true,
+      value: foam.u2.Visibility.RW
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.DisplayMode',
+      name: 'mode',
+      attribute: true,
+      postSet: function(_, mode) { this.updateMode_(mode); },
+      expression: function(visibility, controllerMode) {
+        if ( visibility === foam.u2.Visibility.RO ) {
+          return foam.u2.DisplayMode.RO;
+        }
+
+        if ( visibility === foam.u2.Visibility.FINAL &&
+             controllerMode !== foam.u2.ControllerMode.CREATE ) {
+          return foam.u2.DisplayMode.RO;
+        }
+
+        return controllerMode === foam.u2.ControllerMode.VIEW ?
+          foam.u2.DisplayMode.RO :
+          foam.u2.DisplayMode.RW ;
+      },
+      attribute: true
+    }/*,
+    {
+      type: 'Boolean',
+      name: 'showValidation',
+      documentation: 'Set to false if you want to ignore any ' +
+          '$$DOC{ref:"Property.validate"} calls. On by default.',
+      defaultValue: true
+    },
+    {
+      type: 'String',
+      name: 'validationError_',
+      documentation: 'The actual error message. Null or the empty string ' +
+          'when there is no error.',
+    }
+    */
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+      this.updateMode_(this.mode);
+    },
+
+    function updateMode_() {
+      // Template method, to be implemented in sub-models
+    },
+
+    function fromProperty(p) {
+      this.visibility = p.visibility;
     }
   ]
 });
@@ -1731,6 +2045,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Action',
+  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.ActionView'
@@ -1750,7 +2065,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 // TODO: make a tableProperties property on AbstractClass
 
@@ -1772,6 +2086,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       // TODO: remove when all code ported

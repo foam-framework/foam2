@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -24,6 +24,8 @@ foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
 
+  properties: [ [ 'name', 'create' ] ],
+
   methods: [
     function installInClass(cls) {
       var oldCreate = cls.create;
@@ -40,6 +42,7 @@ foam.CLASS({
 // We only need one Singleton, so make it a Singleton.
 foam.CLASS({
   refines: 'foam.pattern.Singleton',
+  flags: { noWarnOnRefinesAfterCreate: true },
   axioms: [ foam.pattern.Singleton.create() ]
 });
 
@@ -49,14 +52,31 @@ foam.CLASS({
   the Multiton Pattern, meaning that calls to create() with
   the same value for the specified 'property', will return the
   same instance.
+
+  Ex.:
+  foam.CLASS({
+    name: 'Color',
+    axioms: [ foam.pattern.Multiton.create({property: 'color'}) ],
+    properties: [ 'color' ],
+    methods: [ function init() { log('Creating Color:', this.color); } ]
+  });
+
+  var red1 = Color.create({color: 'red'});
+  var red2 = Color.create({color: 'red'});
+  var blue = Color.create({color: 'blue'});
+
+  log(red1 === red2); // true, same object
+  log(red1 === blue); // false, different objects
 */
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Multiton',
 
   properties: [
+    [ 'name', 'create' ],
     {
       // FUTURE: switch to 'properties' to support multiple keys when/if needed.
+      class: 'String',
       name: 'property'
     }
   ],

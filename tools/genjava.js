@@ -15,13 +15,24 @@
  * limitations under the License.
  */
 
+// enable FOAM java support.
+global.FOAM_FLAGS = { 'java': true, 'debug': true };
+
 require('../src/foam.js');
+
+require('../src/com/chrome/origintrials/model/Application.js');
+require('../src/com/chrome/origintrials/model/User.js');
+require('../src/com/chrome/origintrials/model/Token.js');
+require('../src/com/chrome/origintrials/model/Experiment.js');
+require('../src/com/chrome/origintrials/model/Origin.js');
+require('../src/com/chrome/origintrials/model/Relationships.js');
 
 var classes = [
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
   'foam.mlang.predicate.And',
+  'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Or',
   'foam.mlang.predicate.AbstractPredicate',
   'foam.mlang.predicate.Nary',
@@ -34,18 +45,27 @@ var classes = [
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
   'foam.box.Box',
+  'foam.box.ProxyBox',
+  'foam.box.SubBox',
   'foam.box.Message',
-  'foam.box.WrappedMessage',
-  'foam.box.TextMessage',
   'foam.box.SubBoxMessage',
   'com.google.foam.demos.appengine.TestModel',
   'foam.box.HTTPReplyBox',
-  'foam.box.EchoBox',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.chrome.origintrials.model.Application',
+  'com.chrome.origintrials.model.CreateTokenRequest',
+  'com.chrome.origintrials.model.CreateTokenResponse',
+  'com.chrome.origintrials.model.Token',
+  'com.chrome.origintrials.model.User',
+  'com.chrome.origintrials.model.Origin',
+  'com.chrome.origintrials.model.Experiment',
+  'com.google.auth.TokenVerifier',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',
+  'foam.box.BoxRegistry',
+  'foam.box.BoxRegistryBox',
+  'foam.box.CheckAuthenticationBox',
   'foam.dao.DAO',
   'foam.dao.Sink',
   'foam.dao.AbstractSink',
@@ -59,6 +79,7 @@ var classes = [
 ];
 
 var abstractClasses = [
+//  'foam.json.Outputer'
 ];
 
 var skeletons = [
@@ -97,17 +118,15 @@ function ensurePath(p) {
   }
 }
 
-function loadClass(next) {
-  return function(c) {
-    // Poor mans class loader.
-    if ( ! foam.lookup(c, true) ) require('../src/' + c.replace(/\./g, '/') + '.js');
-    var cls = foam.lookup(c);
-    return next(cls);
-  };
+function loadClass(c) {
+  if ( ! foam.lookup(c, true) ) require('../src/' + c.replace(/\./g, '/') + '.js');
+  return foam.lookup(c);
 }
 
-
 function generateClass(cls) {
+  if ( typeof cls === 'string' )
+    cls = foam.lookup(cls);
+
   var outfile = outdir + require('path').sep +
     cls.id.replace(/\./g, require('path').sep) + '.java';
 
@@ -117,6 +136,8 @@ function generateClass(cls) {
 }
 
 function generateAbstractClass(cls) {
+  cls = foam.lookup(cls);
+
   var outfile = outdir + require('path').sep +
     cls.id.replace(/\./g, require('path').sep) + '.java';
 
@@ -129,6 +150,8 @@ function generateAbstractClass(cls) {
 }
 
 function generateSkeleton(cls) {
+  cls = foam.lookup(cls);
+
   var outfile = outdir + require('path').sep +
     cls.package.replace(/\./g, require('path').sep) +
     require('path').sep + cls.name + 'Skeleton.java';
@@ -141,10 +164,12 @@ function generateSkeleton(cls) {
 }
 
 function generateProxy(intf) {
+  intf = foam.lookup(intf);
+
   var existing = foam.lookup(intf.package + '.Proxy' + intf.name, true);
 
   if ( existing ) {
-    generateClass(existing);
+    generateClass(existing.id);
     return;
   }
 
@@ -164,7 +189,13 @@ function generateProxy(intf) {
   generateClass(proxy.buildClass());
 }
 
-classes.forEach(loadClass(generateClass));
-abstractClasses.forEach(loadClass(generateAbstractClass));
-skeletons.forEach(loadClass(generateSkeleton));
-proxies.forEach(loadClass(generateProxy));
+classes.forEach(loadClass);
+abstractClasses.forEach(loadClass);
+skeletons.forEach(loadClass);
+proxies.forEach(loadClass);
+
+
+classes.forEach(generateClass);
+abstractClasses.forEach(generateAbstractClass);
+skeletons.forEach(generateSkeleton);
+proxies.forEach(generateProxy);

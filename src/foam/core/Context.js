@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -35,9 +35,6 @@
 
 (function() {
   var __context__ = {
-    // Temporary: gets replaced in Window.js.
-    assert: function(b) { console.assert.apply(console, arguments); return b; },
-
     /**
      * Lookup a class in the context.  Throws an exception if the value
      * couldn't be found, unless opt_suppress is true.
@@ -49,12 +46,12 @@
       var ret = typeof id === 'string' && this.__cache__[id];
 
       if ( ! opt_suppress ) {
-        this.assert(
+        foam.assert(
             ret,
             'Could not find any registered class for ' + id);
       }
 
-      return ret;
+      return foam.Function.isInstance(ret) ? ret() : ret;
     },
 
     /**
@@ -65,14 +62,14 @@
      * @param opt_id Optional id under which to register class.
      */
     register: function(cls, opt_id) {
-      this.assert(
+      foam.assert(
         typeof cls === 'object',
         'Cannot register non-objects into a context.');
 
       if ( opt_id ) {
         this.registerInCache_(cls, this.__cache__, opt_id);
       } else {
-        this.assert(
+        foam.assert(
             typeof cls.id === 'string',
             'Must have an .id property to be registered in a context.');
 
@@ -84,11 +81,30 @@
       }
     },
 
+    /**
+     * Register a class factory into the given context.
+     * When the class is first accessed the factory is used
+     * to create the value which is used.
+     */
+    registerFactory: function(m, factory) {
+      this.registerInCache_(factory, this.__cache__, m.id);
+
+      if ( m.package === 'foam.core' ) {
+        this.registerInCache_(factory, this.__cache__, m.name);
+      }
+    },
+
     /** Internal method to register a context binding in an internal cache */
     registerInCache_: function registerInCache_(cls, cache, name) {
-      console.assert(
-        ! cache.hasOwnProperty(name),
-        cls.id + ' is already registerd in this context.');
+      var hasOld = Object.prototype.hasOwnProperty.call(cache, name);
+      var old = cache[name];
+
+      // Okay to replace a function with an actual class.
+      // This happens after a lazy class is initialized.
+      foam.assert(
+          ! hasOld ||
+              (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
+          cls.id + ' is already registered in this context.');
 
       cache[name] = cls;
     },
@@ -106,7 +122,7 @@
     createSubContext: function createSubContext(opt_args, opt_name) {
       if ( ! opt_args ) return this;
 
-      this.assert(
+      foam.assert(
           opt_name === undefined || typeof opt_name === 'string',
           'opt_name must be left undefined or be a string.');
 
@@ -128,11 +144,9 @@
               value: foam.core.ConstantSlot.create({ value: v })
             });
 
-            (function(v) {
-              Object.defineProperty(sub, key, {
-                value: v
-              });
-            })(v);
+            Object.defineProperty(sub, key, {
+              value: v
+            });
           } else {
             Object.defineProperty(sub, this.toSlotName_(key), {
               value: v

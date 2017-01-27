@@ -232,6 +232,8 @@ foam.CLASS({
           this.cssClass(this.myCls());
         },
 
+        function isLoaded() { return true; },
+
         // function isLoaded() { return this.value; },
         // function listenForLoad() { this.value$.sub(this.onDataLoad); },
         function toReadE() {
@@ -352,11 +354,11 @@ foam.CLASS({
         cell = this.cells[name] = this.Cell.create();
         var s;
         cell.formula$.sub(function(_, __, ___, formula$) {
-          s && s.destroy();
+          s && s.detach();
 
           var slot = self.parser.parseString(formula$.get());
-          cancel && cancel.destroy();
-          s = cell.data$.linkFrom(slot);
+          cancel && cancel.detach();
+          s = cell.data$.follow(slot)
         });
       }
 
