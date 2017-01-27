@@ -207,13 +207,13 @@ foam.CLASS({
   templates: [
     {
       name: 'sendMethodCode',
-      template: function() {/*if ( ! ( message instanceof foam.box.RPCMessage) ) {
+      template: function() {/*if ( ! ( message.getObject() instanceof foam.box.RPCMessage) ) {
       // TODO error to errorBox
       return;
     }
 
-    foam.box.RPCMessage rpc = (foam.box.RPCMessage)message;
-    foam.box.Box replyBox = message.getReplyBox();
+    foam.box.RPCMessage rpc = (foam.box.RPCMessage)message.getObject();
+    foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
     Object result = null;
 
     switch ( rpc.getName() ) {<%
@@ -239,7 +239,7 @@ foam.CLASS({
       foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
       reply.setData(result);
 
-      replyBox.send(reply);
+      replyBox.send(getX().create(foam.box.Message.class).setObject(reply));
     }*/}
     }
   ]
