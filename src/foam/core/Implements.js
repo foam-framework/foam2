@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -41,8 +41,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Implements',
 
-  documentation: 'Implements Axiom',
-
   properties: [
     { name: 'name', getter: function() { return 'implements_' + this.path; } },
     'path'
@@ -76,14 +74,7 @@ foam.CLASS({
       // mixin axioms get installed into it.
       cls.axiomMap_ = sMap;
 
-      // TODO(adamvy): Remove this code path when all usages of implements
-      // use modeled interfaces instead of classes.
-
-      if ( foam.core.Interface && foam.core.Interface.isInstance(m) ) {
-        cls.installModel(m);
-      } else {
-        cls.installModel(m.model_);
-      }
+      cls.installAxioms(m.getOwnAxioms());
 
       // Put the original AxiomMap back, with the inserted parent.
       cls.axiomMap_ = aMap;

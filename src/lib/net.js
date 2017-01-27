@@ -49,6 +49,7 @@ foam.CLASS({
       msg = msg.clone().toRemote();
       this.socket.send(foam.json.Network.stringify(msg));
     },
+
     function connect() {
       var socket = this.socket = new WebSocket(this.uri);
       var self = this;
@@ -75,6 +76,7 @@ foam.CLASS({
       });
     }
   ],
+
   listeners: [
     {
       name: 'onMessage',
@@ -120,8 +122,8 @@ foam.CLASS({
       }.bind(this));
 
       socket.disconnected.sub(function(s) {
-        s.destroy();
-        sub1.destroy();
+        s.detach();
+        sub1.detach();
       });
     }
   ]

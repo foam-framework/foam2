@@ -15,52 +15,118 @@
  * limitations under the License.
  */
 
-/* Indexed Memory-based DAO. */
+/**
+  The Index interface for an ordering, fast lookup, single value,
+  index multiplexer, or any other MDAO select() assistance class.
 
-/*
- * TODO:
- *  update(oldValue, newValue)
- *  reuse plans
- *  add ability for indices to pre-populate data
- */
+  Each Index subclass also defines an IndexNode class. Index defines
+  the structure of the index, including estimate() to gauge its
+  probable performance for a query, while IndexNode implements the
+  data nodes that hold the indexed items and plan and execute
+  queries. For any particular operational Index, there may be
+  many IndexNode instances:
 
-/** The Index interface for an ordering, fast lookup, single value,
-  index multiplexer, or any other MDAO select() assistance class. */
+<pre>
+                 1---------> TreeIndex(id)
+  MDAO: AltIndex 2---------> TreeIndex(propA) ---> TreeIndex(id) -------------> ValueIndex
+        | 1x AltIndexNode    | 1x TreeIndexNode    | 14x TreeIndexNodes         | (DAO size)x ValueIndexNodes
+           (2 alt subindexes)     (14 nodes)             (each has 0-5 nodes)
+</pre>
+  The base AltIndex has two complete subindexes (each holds the entire DAO).
+  The TreeIndex on property A has created one TreeIndexNode, holding one tree of 14 nodes.
+  Each tree node contains a tail instance of the next level down, thus
+  the TreeIndex on id has created 14 TreeIndexNodes. Each of those contains some number
+  of tree nodes, each holding one tail instance of the ValueIndex at the end of the chain.
+
+*/
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'Index',
 
+  properties: [
+    {
+      /**
+       * The class type of the data nodes this index creates with
+       * createNode(). By default it will be the Index class' name
+       * with Node appended:
+       * <p><code>MyIndex => MyIndexNode</code>
+       */
+      class: 'Class',
+      name: 'nodeClass',
+      factory: function() {
+        return this.cls_.id + 'Node';
+      }
+    }
+  ],
   methods: [
-    /** JS-prototype based 'Flyweight' constructor. Creates plain
-      javascript objects that are __proto__'d to a modeled instance. */
-    function create(args) {
-      var c = Object.create(this);
-      args && c.copyFrom(args);
-      c.init && c.init();
-      return c;
+
+    function estimate(size, sink, skip, limit, order, predicate) {
+      /** Estimates the performance of this index given the number of items
+        it will hold and the planned parameters. */
+      return size * size; // n^2 is a good worst-case estimate by default
     },
 
+
+    function toPrettyString(indent) {
+      /** Output a minimal, human readable, indented (2 spaces per level)
+        description of the index structure */
+    },
+
+    function createNode(args) {
+      args = args || {};
+      args.creator = this;
+      return this.nodeClass.create(args, this);
+    }
+  ]
+});
+
+/**
+  The IndexNode interface represents a piece of the index that actually
+  holds data. A tree will create an index-node for each tree-node, so one
+  Index will manage many IndexNode instances, each operating on part of
+  the data in the DAO.
+
+  For creation speed, do not require or import anything in a node class.
+  Use the 'creator' property to access requires and imports on the
+  Index that created the node instance.
+*/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'IndexNode',
+
+  properties: [
+    {
+      class: 'Simple',
+      name: 'creator'
+    }
+  ],
+
+  methods: [
     /** Adds or updates the given value in the index */
-    function put() {},
+    function put(obj) {},
 
     /** Removes the given value from the index */
-    function remove() {},
+    function remove(obj) {},
 
     /** @return a Plan to execute a select with the given parameters */
-    function plan(/*sink, skip, limit, order, predicate*/) {},
+    function plan(sink, skip, limit, order, predicate, root) {},
 
-    /** @return the stored value for the given key. */
-    function get() {},
+    /** @return the tail index instance for the given key. */
+    function get(key) {},
 
     /** @return the integer size of this index. */
     function size() {},
 
-    /** Selects matching items from the index and puts them into sink */
-    function select(/*sink, skip, limit, order, predicate*/) { },
+    /** Selects matching items from the index and puts them into sink.
+        cache allows indexes to store query state that is discarded once
+        the select() is complete.
+      <p>Note: order checking has replaced selectReverse().  */
+    function select(sink, skip, limit, order, predicate, cache) { },
 
-    /** Selects matching items in reverse order from the index and puts
-      them into sink */
-    function selectReverse(/*sink, skip, limit, order, predicate*/) { },
+    /** Efficiently (if possible) loads the contents of the given DAO into the index */
+    function bulkLoad(dao) {},
   ]
 });
+
+
 

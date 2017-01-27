@@ -223,7 +223,7 @@ foam.CLASS({
         <p>This process is transparent to the developer, and you can use your
         EasyDAO like any other DAO.</p>
       */
-      this.SUPER(args);
+      this.SUPER.apply(this, arguments);
 
       var daoType = typeof this.daoType === 'string' ?
         this.ALIASES[this.daoType] || this.daoType :
@@ -286,7 +286,7 @@ foam.CLASS({
         dao = this.GUIDDAO.create(args);
       }
 
-      var cls = this.of$cls;
+      var cls = this.of;
 
       if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
 
@@ -378,9 +378,9 @@ foam.CLASS({
     /** Only relevant if cache is true or if daoType
        was set to MDAO, but harmless otherwise. Generates an index
        for a query over all specified properties together.
-       @arg var_args specify any number of Properties to be indexed.
+       @param var_args specify any number of Properties to be indexed.
     */
-    function addPropertyIndex(/* foam.core.Property* */ var_args) {
+    function addPropertyIndex() {
       this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
       return this;
     },
@@ -388,9 +388,9 @@ foam.CLASS({
     /** Only relevant if cache is true or if daoType
       was set to MDAO, but harmless otherwise. Adds an existing index
       to the MDAO.
-      @arg index The index to add.
+      @param index The index to add.
     */
-    function addIndex(/* foam.dao.index.Index */ index) {
+    function addIndex(index) {
       this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
       return this;
     }

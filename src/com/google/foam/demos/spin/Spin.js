@@ -34,7 +34,7 @@ foam.CLASS({
         arc.start += Math.cos(time$.get() / 4000) * (a+1)/100;
         arc.end    = arc.start + Math.PI;
       });
-      this.addChildren(arc);
+      this.add(arc);
     },
 
     function initCView() {

@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -179,9 +179,15 @@ foam.CLASS({
       function(o1, o2) { return foam.util.compare(o1, o2); }
     ],
 
+    [
+      'isDefaultValue',
+      function(v) { return ! this.comparePropertyValues(this.value, v); }
+    ],
+
     {
       /** Makes Properties useful as map functions. */
       name: 'f',
+      transient: true,
       factory: function() {
         var name = this.name;
         return function f(o) { return o[name]; }
@@ -191,12 +197,13 @@ foam.CLASS({
     {
       /** Makes Properties useful as comparators. */
       name: 'compare',
+      transient: true,
       factory: function() {
         var comparePropertyValues = this.comparePropertyValues;
         var f = this.f;
         return function compare(o1, o2) {
           return comparePropertyValues(f(o1), f(o2));
-        }
+        };
       }
     }
   ],
@@ -206,9 +213,8 @@ foam.CLASS({
       Handle overriding of Property definition from parent class by
       copying undefined values from parent Property, if it exists.
     */
-    function installInClass(c) {
+    function installInClass(c, superProp, existingProp) {
       var prop      = this;
-      var superProp = c.getSuperAxiomByName(prop.name);
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);
@@ -288,6 +294,7 @@ foam.CLASS({
       var preSet      = prop.preSet;
       var postSet     = prop.postSet;
       var factory     = prop.factory;
+      var getter      = prop.getter;
       var value       = prop.value;
       var hasValue    = typeof value !== 'undefined';
       var slotName    = name + '$';
@@ -340,8 +347,8 @@ foam.CLASS({
       // Call 'getter' if provided, else return value from instance_ if set.
       // If not set, return value from 'factory', 'expression', or
       // (default) 'value', if provided.
-      var getter =
-        prop.getter ? prop.getter :
+      var get =
+        getter ? function() { return getter.call(this, prop); } :
         factory ? function factoryGetter() {
           var v = this.instance_[name];
           if ( v !== undefined ) return v;
@@ -354,7 +361,7 @@ foam.CLASS({
           var oldFip = fip;
           fip++;
           if ( oldFip === 10 ) this.setPrivate_(FIP, true);
-          var v = factory.call(this, prop);
+          v = factory.call(this, prop);
           // Convert undefined to null because undefined means that the
           // value hasn't been set but it has. Setting it to undefined
           // would prevent propertyChange events if the value were cleared.
@@ -375,7 +382,7 @@ foam.CLASS({
         } :
         function simpleGetter() { return this.instance_[name]; };
 
-      var setter = prop.setter ? prop.setter :
+      var set = prop.setter ? prop.setter :
         ! ( postSet || factory || eFactory || adapt || assertValue || preSet || isFinal ) ?
         function simplePropSetter(newValue) {
           if ( newValue === undefined ) {
@@ -455,8 +462,8 @@ foam.CLASS({
         };
 
       Object.defineProperty(proto, name, {
-        get: getter,
-        set: setter,
+        get: get,
+        set: set,
         configurable: true
       });
     },
@@ -477,7 +484,7 @@ foam.CLASS({
     function exprFactory(e) {
       if ( ! e ) return null;
 
-      var argNames = foam.Function.formalArgs(e);
+      var argNames = foam.Function.argNames(e);
       var name     = this.name;
 
       // FUTURE: determine how often the value is being invalidated,
@@ -496,7 +503,7 @@ foam.CLASS({
               self.pub('propertyChange', name, self.slot(name));
             }
           }
-          for ( var i = 0 ; i < subs.length ; i++ ) subs[i].destroy();
+          for ( var i = 0 ; i < subs.length ; i++ ) subs[i].detach();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var s = this.slot(argNames[i]).sub(l);

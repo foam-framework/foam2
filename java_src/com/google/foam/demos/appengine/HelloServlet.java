@@ -72,7 +72,7 @@ public class HelloServlet extends HttpServlet {
 
     X requestContext = x.put("httpRequest", req).put("httpResponse", resp);
 
-    FObject result = new JSONParser(requestContext).parseString(buffer_.toString());
+    FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
     if ( result == null ) {
       resp.setStatus(resp.SC_BAD_REQUEST);
@@ -94,7 +94,7 @@ public class HelloServlet extends HttpServlet {
 
     daoSkeleton.send(msg);
 
-    if ( ! ( msg.getReplyBox() instanceof foam.box.HTTPReplyBox ) ) {
+    if ( ! ( msg.getAttributes().get("replyBox") instanceof foam.box.HTTPReplyBox ) ) {
       resp.setStatus(resp.SC_OK);
       resp.flushBuffer();
     }

@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -53,6 +53,24 @@ Object.defineProperty(
 
 
 /**
+ * Define an assertion function that is significantly faster and more
+ * compatible than console.assert.  Also allows us to turn off assertions
+ * in a production scenario.
+ *
+ * Usage of console.assert directly is slow, and not all platforms agree
+ * on what to do with extra arguments, some ignore them, some join them
+ * to the message.
+ */
+foam.assert = function assert(cond) {
+  if ( ! cond ) {
+    console.assert(false, Array.from(arguments).slice(1).join(' '));
+  }
+
+  return cond;
+};
+
+
+/**
  * Creates a small library in the foam package. A LIB is a collection of
  * constants and static methods.
  * <pre>
@@ -81,8 +99,11 @@ foam.LIB = function LIB(model) {
     root = root[path[i]] || ( root[path[i]] = {} );
   }
 
+  // During boot, keep a list of created LIBs
+  if ( global.foam.__LIBS__ ) global.foam.__LIBS__[model.name] = root;
+
   if ( model.constants ) {
-    console.assert(
+    foam.assert(
       typeof model.constants === 'object',
       'Constants must be a map.');
 
@@ -90,20 +111,20 @@ foam.LIB = function LIB(model) {
   }
 
   if ( model.methods ) {
-    console.assert(Array.isArray(model.methods), 'Methods must be an array.');
+    foam.assert(Array.isArray(model.methods), 'Methods must be an array.');
 
     for ( i = 0 ; i < model.methods.length ; i++ ) {
       var m = model.methods[i];
 
-      console.assert(
+      foam.assert(
         typeof m === 'object' || typeof m === 'function',
         'Methods must be a map of a function');
 
-      console.assert(
+      foam.assert(
          typeof m !== 'object' || typeof m.code === 'function',
         'Methods must have a code key which is a function');
 
-      console.assert(
+      foam.assert(
         typeof m.name === 'string' && m.name !== '',
         'Methods must be named with a non-empty string');
 
@@ -111,3 +132,4 @@ foam.LIB = function LIB(model) {
     }
   }
 };
+global.foam.__LIBS__ = Object.create(null);

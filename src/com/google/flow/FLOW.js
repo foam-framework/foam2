@@ -17,6 +17,27 @@
 
 foam.CLASS({
   package: 'com.google.flow',
+  name: 'Canvas',
+  extends: 'foam.graphics.Box',
+
+  properties: [
+    [ 'autoRepaint', true ],
+    [ 'width', 800 ],
+    [ 'height', 600 ],
+    [ 'color', '#f3f3f3' ],
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
+  name: 'Select',
+  documentation: 'Dummy Model to represent selection mode in FLOW.'
+});
+
+
+foam.CLASS({
+  package: 'com.google.flow',
   name: 'TreeView',
   extends: 'foam.u2.view.TreeView',
 
@@ -63,6 +84,7 @@ foam.CLASS({
           color:       o.color,
           compressionStrength: o.compressionStrength,
           end:         o.end,
+          friction:    o.friction,
           gravity:     o.gravity,
           head:        o.head,
           height:      o.height,
@@ -126,7 +148,7 @@ foam.CLASS({
 
 // TODO(adamvy): Remove the need to store this relationship globally.
 var relationship = foam.RELATIONSHIP({
-  name: 'children',
+  forwardName: 'children',
   inverseName: 'parent',
   cadinality: '1:*',
   sourceModel: 'com.google.flow.Property',
@@ -147,6 +169,7 @@ foam.CLASS({
 
   requires: [
     'com.google.dxf.ui.DXFDiagram',
+    'com.google.flow.Canvas',
     'com.google.flow.Circle',
     'com.google.flow.Ellipse',
     'com.google.flow.DetailPropertyView',
@@ -206,6 +229,10 @@ foam.CLASS({
       factory: function() {
         var self = this;
         return {
+          repeat: function(n, fn) {
+            for ( var i = 1 ; i <= n ; i++ ) fn.call(this, i);
+            return this;
+          },
           clear: function() {
             self.updateMemento().then(function() {
               self.properties.skip(4).removeAll();
@@ -225,8 +252,54 @@ foam.CLASS({
           add: function(obj, opt_name, opt_parent) {
             this.addProperty(obj, opt_name, undefined, opt_parent || 'canvas1');
           }.bind(this),
+          hsl: function(h, s, l) {
+            return 'hsl(' + (h%360) + ',' + s + '%,' + l + '%)';
+          },
+          fib: (function() {
+            var fib_ = foam.Function.memoize1(function(n) {
+              if ( n < 1 ) return 0;
+              if ( n < 3 ) return 1;
+              return fib_(n-1) + fib_(n-2);
+            });
+
+            return function(i) {
+              if ( i < 0 ) return 0;
+              var floor = Math.floor(i);
+              var frac  = i-floor;
+              return fib_(floor) + frac * ( floor < 1 ? 1 : fib_(floor-1));
+            };
+          })(),
+          hsla: function(h, s, l, a) {
+            return 'hsla(' + (h%360) + ',' + s + '%,' + l + '%,' + a + ')';
+          },
+          log: function() {
+            var o = this.cmdLineFeedback_;
+            if ( ! o ) self.cmdLineFeedback_ = true;
+            self.cmdLine += Array.from(arguments).join(' ') + '\n';
+            if ( ! o ) self.cmdLineFeedback_ = false;
+          },
+          sin: Math.sin,
+          cos: Math.cos,
+          PI: Math.PI,
+          degToRad: function(d) { return d * Math.PI / 180; },
+          radToDeg: function(r) { return r * 180 / Math.PI; },
           load: this.loadFlow.bind(this),
-          save: this.saveFlow.bind(this)
+          save: this.saveFlow.bind(this),
+          dir: function() {
+            // TODO: Better to allow commands to return promises and have
+            // the cmdLinewait for them to finish
+            var log = this.log;
+            var first = true;
+            self.flows.select({
+              put: function(o) {
+                if ( first ) {
+                  first = false;
+                  log('\n');
+                }
+                log(o.name);
+              }
+            }).then(function() { if ( ! first ) log('\nflow> '); });
+          }
         };
       },
       documentation: 'Scope to run reactive formulas in.'
@@ -247,7 +320,10 @@ foam.CLASS({
       }
     },
     'feedback_',
-    'currentTool',
+    {
+      name: 'currentTool',
+      value: com.google.flow.Select.model_
+    },
     {
       class: 'foam.dao.DAOProperty',
       name: 'tools',
@@ -260,6 +336,8 @@ foam.CLASS({
           of: 'foam.core.Model',
           daoType: 'ARRAY'
         });
+        dao.put(com.google.flow.Select.model_);
+        dao.put(com.google.flow.Line.model_);
         dao.put(com.google.flow.Box.model_);
         dao.put(com.google.flow.Circle.model_);
         dao.put(com.google.flow.Ellipse.model_);
@@ -267,6 +345,7 @@ foam.CLASS({
         dao.put(com.google.flow.Clock.model_);
         dao.put(com.google.flow.Mushroom.model_);
         dao.put(com.google.flow.Turtle.model_);
+        dao.put(com.google.flow.Turtle3D.model_);
         dao.put(com.google.foam.demos.robot.Robot.model_);
         dao.put(com.google.flow.Desk.model_);
         dao.put(com.google.flow.DuplexDesk.model_);
@@ -361,10 +440,7 @@ foam.CLASS({
     },
     {
       name: 'canvas',
-      factory: function() {
-        return this.Box.create({autoRepaint: true, width: 800, height: 600, color: '#f3f3f3'});
-//        return this.Box.create({autoRepaint: true, width: 900, height: 870, color: '#f3f3f3'});
-      }
+      factory: function() { return this.Canvas.create(); }
     },
     {
       name: 'sheet',
@@ -391,21 +467,15 @@ foam.CLASS({
 
         try {
           var self = this;
-          function log() {
-            self.cmdLine += Array.from(arguments).join(' ') + '\n';
-          }
-
           var i = cmd.lastIndexOf('flow> ');
           cmd = i === -1 ? cmd : cmd.substring(i+6);
 
           if ( ! cmd.trim() ) return;
 
           with ( this.scope ) {
-            with ( { log: log } ) {
-              log();
-              log(eval(cmd));
-              this.cmdLine += 'flow> ';
-            }
+            log();
+            log(eval(cmd));
+            this.cmdLine += 'flow> ';
           }
         } catch (x) {
           log('ERROR:', x);
@@ -514,7 +584,7 @@ foam.CLASS({
     },
 
     function loadFlow(name) {
-      console.assert(name, 'Name required.')
+      foam.assert(name, 'Name required.')
 
       this.name = name;
       this.flows.find(name).then(function (f) {
@@ -537,7 +607,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onPropertyPut(_, _, _, p) {
+    function onPropertyPut(_, __, ___, p) {
       var o = p.value;
 
       this.scope[p.name] = p.value;
@@ -556,7 +626,7 @@ foam.CLASS({
       }
     },
 
-    function onPropertyRemove(_, _, _, p) {
+    function onPropertyRemove(_, __, ___, p) {
       var o = p.value;
 
       delete this.scope[p.name];
@@ -582,6 +652,7 @@ foam.CLASS({
       this.onClick(evt);
       var x = evt.offsetX, y = evt.offsetY;
       var c = this.canvas.findFirstChildAt(x, y);
+
       if ( c === this.canvas ) {
         this.mouseTarget = null;
       } else {
@@ -607,7 +678,7 @@ foam.CLASS({
 
       if ( c === this.canvas ) {
         var tool = this.currentTool;
-        if ( ! tool ) return;
+        if ( tool === this.CURRENT_TOOL.value ) return;
         var cls = this.lookup(tool.id);
         var o = cls.create({x: x, y: y}, this.__subContext__);
         var p = this.addProperty(o, null, null, 'canvas1');

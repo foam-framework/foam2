@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -20,8 +20,6 @@ foam.CLASS({
   package: 'foam.core',
   name: 'AxiomArray',
   extends: 'Property',
-
-  documentation: 'An Array whose elements are Axioms and are added to this.axioms.',
 
   properties: [
     {
@@ -48,19 +46,19 @@ foam.CLASS({
     {
       name: 'assertValue',
       value: function(v, prop) {
-        console.assert(Array.isArray(v),
+        foam.assert(Array.isArray(v),
             'Tried to set', prop.name, 'to non array value');
 
         // FUTURE: Use __context__.lookup ?
         var of = foam.lookup(prop.of, true);
-        console.assert(
+        foam.assert(
             of,
             'Unknown "of" Model in AxiomArray: property=',
             prop.name,
             ' of=',
             prop.of);
         for ( var i = 0 ; i < v.length ; i++ ) {
-          console.assert(of.isInstance(v[i]),
+          foam.assert(of.isInstance(v[i]),
               'Element', i, 'of', prop.name, 'is not an instance of',
               prop.of);
         }

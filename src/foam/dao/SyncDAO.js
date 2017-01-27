@@ -37,6 +37,7 @@ foam.CLASS({
   ]
 });
 
+
 /**
   SyncDAO synchronizes data between multiple client's offline caches and a server.
   When syncronizing, each client tracks the last-seen version of each object,
@@ -222,7 +223,7 @@ foam.CLASS({
             var deleted = record.deleted;
 
             if ( deleted ) {
-              var obj = self.of.create();
+              var obj = self.of.create(undefined, self);
               obj.id = id;
               self.remoteDAO.remove(obj);
             } else {

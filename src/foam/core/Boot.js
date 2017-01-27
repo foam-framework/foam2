@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -126,10 +126,10 @@ foam.LIB({
 
       if ( this.refines ) {
         cls = context.lookup(this.refines);
-        console.assert(cls, 'Unknown refinement class: ' + this.refines);
+        foam.assert(cls, 'Unknown refinement class: ' + this.refines);
       } else {
-        console.assert(this.id, 'Missing id name.', this.name);
-        console.assert(this.name, 'Missing class name.');
+        foam.assert(this.id, 'Missing id name.', this.name);
+        foam.assert(this.name, 'Missing class name.');
 
         var parent = this.extends      ?
           context.lookup(this.extends) :
@@ -138,6 +138,7 @@ foam.LIB({
         cls                  = parent.createSubClass_();
         cls.prototype.cls_   = cls;
         cls.prototype.model_ = this;
+        cls.count_           = 0;            // Number of instances created
         cls.id               = this.id;
         cls.package          = this.package;
         cls.name             = this.name;
@@ -172,7 +173,7 @@ foam.LIB({
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
-        console.assert(
+        foam.assert(
           ! m.refines,
           'Refines is not supported in early bootstrap');
 
@@ -188,11 +189,12 @@ foam.LIB({
     /** Start second phase of bootstrap process. */
     function phase2() {
       // Upgrade to final CLASS() definition.
-      /** Creates a Foam class from a plain-old-object definition.
+      /* Creates a Foam class from a plain-old-object definition.
           @method CLASS
           @memberof module:foam */
       foam.CLASS = function(m) {
-        var model = foam.core.Model.create(m);
+        var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
+        var model = cls.create(m);
         model.validate();
         var cls = model.buildClass();
         cls.validate();

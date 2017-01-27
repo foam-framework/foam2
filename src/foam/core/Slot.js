@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -44,7 +44,7 @@ foam.CLASS({
       var s;
       var l = function() {
         var v = self.get();
-        if ( s ) s.destroy();
+        if ( s ) s.detach();
         if ( v ) s = v.sub.apply(v, args);
       };
       l();
@@ -73,7 +73,7 @@ foam.CLASS({
 
     /**
       Link two Slots together, setting both to other's value.
-      Returns a Destroyable which can be used to break the link.
+      Returns a Detachable which can be used to break the link.
       After copying a value from one slot to the other, this implementation
       then copies the value back in case the target slot rejected the value.
     */
@@ -113,9 +113,9 @@ foam.CLASS({
       l2();
 
       return {
-        destroy: function() {
-          sub1 && sub1.destroy();
-          sub2 && sub2.destroy();
+        detach: function() {
+          sub1 && sub1.detach();
+          sub2 && sub2.detach();
           sub1 = sub2 = null;
         }
       };
@@ -127,10 +127,10 @@ foam.CLASS({
 
     /**
       Have this Slot dynamically follow other's value.
-      Returns a Destroyable which can be used to cancel the binding.
+      Returns a Detachable which can be used to cancel the binding.
     */
     function follow(other) {
-      console.assert(other, 'Slot.follow requires Slot argument.');
+      foam.assert(other, 'Slot.follow requires Slot argument.');
       var self = this;
       var l = function() {
         if ( ! foam.util.equals(self.get(), other.get()) ) {
@@ -182,8 +182,8 @@ foam.CLASS({
         feedback = false;
       };
 
-      sub.onDestroy(this.sub(l1));
-      sub.onDestroy(other.sub(l2));
+      sub.onDetach(this.sub(l1));
+      sub.onDetach(other.sub(l2));
 
       l1();
 
@@ -251,7 +251,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'SubSlot',
-  implements: [ 'foam.core.Slot' ],
+  extends: 'foam.core.Slot',
 
   documentation:
       'For internal use only. Is used to implement the Slot.dot() method.',
@@ -312,15 +312,17 @@ foam.CLASS({
   ],
 
   listeners: [
-    function parentChange() {
-      this.prevSub && this.prevSub.destroy();
+    function parentChange(s) {
+      this.prevSub && this.prevSub.detach();
       var o = this.parent.get();
 
-      // If the parent object changes class, then don't
-      // update because a new class will have different
-      // sub-slots.
+      // If the parent object changes class, then don't update
+      // because a new class will have different sub-slots.
       if ( this.of ) {
-        if ( ! this.of.isInstance(o) ) return;
+        if ( this.of !== ( o && o.cls_ ) ) {
+          s.detach();
+          return;
+        }
       } else {
         if ( o ) this.of = o.cls_;
       }
@@ -357,7 +359,9 @@ foam.CLASS({
 
     function get() { return this.value; },
 
-    function set() { /* nop */ },
+    function set() {
+      throw new Error('Tried to mutate immutable ConstantSlot.');
+    },
 
     function sub(l) { /* nop */ }
   ]
@@ -404,9 +408,9 @@ foam.CLASS({
     {
       name: 'args',
       expression: function(obj) {
-        this.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
+        foam.assert(obj, 'ExpressionSlot: "obj" or "args" required.');
 
-        var args = foam.Function.formalArgs(this.code);
+        var args = foam.Function.argNames(this.code);
         for ( var i = 0 ; i < args.length ; i++ ) {
           args[i] = obj.slot(args[i]);
         }
@@ -428,11 +432,11 @@ foam.CLASS({
         }));
       }
     },
-    'cleanup_', // destroyable to cleanup old subs when obj changes
+    'cleanup_', // detachable to cleanup old subs when obj changes
   ],
 
   methods: [
-    function init() { this.onDestroy(this.cleanup); },
+    function init() { this.onDetach(this.cleanup); },
 
     function get() { return this.value; },
 
@@ -450,7 +454,7 @@ foam.CLASS({
       var cleanup = foam.core.FObject.create();
 
       for ( var i = 0 ; i < args.length ; i++ ) {
-        cleanup.onDestroy(args[i].sub(this.invalidate));
+        cleanup.onDetach(args[i].sub(this.invalidate));
       }
 
       this.cleanup_ = cleanup;
@@ -458,7 +462,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function cleanup() { this.cleanup_ && this.cleanup_.destroy(); },
+    function cleanup() { this.cleanup_ && this.cleanup_.detach(); },
     function invalidate() { this.clearProperty('value'); }
   ]
 });

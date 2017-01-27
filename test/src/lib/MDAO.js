@@ -66,7 +66,7 @@ describe('MDAO with TreeIndex', function() {
         byAction: !! ( 1 - (i % 2) ),
         timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_ALBUMS) * MS_PER_DAY * 300),
         jspb: [ 'nothing!' ],
-      })
+      }, foam.__context__)
     );
   }
   for ( var i = 0; i < NUM_PHOTOS; ++i ) {
@@ -79,7 +79,7 @@ describe('MDAO with TreeIndex', function() {
         albumId: ""+(i % NUM_ALBUMS),
         isCoverPhoto: ( i % 3 ) > 0,
         jspb: [ 'nothing!' ],
-      })
+      }, foam.__context__)
     );
   }
 
@@ -324,6 +324,19 @@ describe('MDAO with TreeIndex', function() {
           prev = a[i];
         }
       }).then(done);
+  });
+
+  it('selects negated queries', function(done) {
+    PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_SINGLE))).select()
+      .then(
+        function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_SINGLE.length); }
+      ).then(
+        PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_A_FEW))).select()
+          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_A_FEW.length); })
+      ).then(
+        PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_LOTS))).select()
+          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_LOTS.length); })
+      ).then(done);
   });
 
 

@@ -16,13 +16,38 @@
  */
 
 foam.CLASS({
-  package: 'com.chrome.origintrials',
+  package: 'com.chrome.origintrials.model',
   name: 'Experiment',
   ids: [ 'name' ],
   properties: [
     {
       class: 'String',
       name: 'name'
+    },
+    {
+      class: 'EMail',
+      name: 'owner'
+    },
+    {
+      class: 'Boolean',
+      name: 'active'
+    }
+  ],
+  actions: [
+    {
+      name: 'cancel',
+      code: function() {
+      }
+    },
+    {
+      name: 'revokeAllKeys',
+      code: function() {
+      }
+    },
+    {
+      name: 'suspend',
+      code: function() {
+      }
     }
   ]
 });

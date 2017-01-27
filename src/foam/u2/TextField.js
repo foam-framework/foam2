@@ -37,15 +37,23 @@ foam.CLASS({
     },
 
     function fromProperty(prop) {
+      this.SUPER(prop);
+
       if ( ! this.displayWidth ) {
         this.displayWidth = prop.displayWidth;
+      }
+
+      if ( prop.visibility ) {
+        this.visibility = prop.visibility;
       }
     }
   ],
 
-  templates: [
-    function CSS() {/*
-      ^:read-only { border-width: 0; }
-    */}
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^:read-only { border-width: 0; }
+      */}
+    })
   ]
 });

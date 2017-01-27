@@ -27,9 +27,10 @@ describe('Method', function() {
         name: 'Child',
         extends: 'Parent',
         methods: [
-          function foo() {}
+          function foo() { this.SUPER(); } // need SUPER to trigger override
         ]
       });
+      Child.create(undefined, foam.__context__);
     }).toThrow();
   });
 });

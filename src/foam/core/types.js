@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -160,7 +160,7 @@ foam.CLASS({
     [
       'assertValue',
       function(value, prop) {
-        this.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
+        foam.assert(typeof value === 'function', prop.name, 'Cannot set to non function type.');
       }
     ]
   ]
@@ -214,6 +214,9 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, v, prop) {
+        // All FObjects may be null.
+        if (v === null) return v;
+
         var of = foam.lookup(prop.of);
 
         return of.isInstance(v) ?
@@ -238,7 +241,15 @@ foam.CLASS({
       value: function(value, opt_ctx) {
         return foam.json.parse(value, null, opt_ctx);
       }
-    }
+    },
+    [
+      'factory',
+      function() { return []; }
+    ],
+    [
+      'isDefaultValue',
+      function(v) { return ! v || ! v.length; }
+    ],
   ]
 });
 
@@ -258,6 +269,10 @@ foam.CLASS({
       documentation: 'The FOAM sub-type of this property.'
     },
     [
+      'factory',
+      function() { return []; }
+    ],
+    [
       'adapt',
       function(_, v, prop) {
         if ( ! Array.isArray(v) ) return v;
@@ -276,10 +291,10 @@ foam.CLASS({
     [
       'assertValue',
       function(v, prop) {
-        this.assert(Array.isArray(v),
+        foam.assert(Array.isArray(v),
             prop.name, 'Tried to set StringArray to non-array type.');
         for ( var i = 0 ; i < v.length ; i++ ) {
-          this.assert(typeof v[i] === 'string',
+          foam.assert(typeof v[i] === 'string',
               prop.name, 'Element', i, 'is not a string', v[i]);
         }
       }
@@ -287,10 +302,41 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Class',
   extends: 'Property',
+
+  properties: [
+    {
+      name: 'getter',
+      value: function(prop) {
+        var c = this.instance_[prop.name];
+
+        // Implement value and factory support.
+        if ( ! c ) {
+          if ( prop.value ) {
+            c = prop.value;
+          } else if ( prop.factory ) {
+            c = this.instance_[prop.name] = prop.factory.call(this, prop);
+          }
+        }
+
+        // Upgrade Strings to actual classes, if available.
+        if ( foam.String.isInstance(c) ) {
+          c = this.lookup(c, true);
+          if ( c ) this.instance_[prop.name] = c;
+        }
+
+        return c;
+      }
+    },
+    {
+      name: 'toJSON',
+      value: function(value) { return value.id; }
+    }
+  ],
 
   methods: [
     function installInProto(proto) {
@@ -300,8 +346,9 @@ foam.CLASS({
 
       Object.defineProperty(proto, name + '$cls', {
         get: function classGetter() {
-          if ( typeof this[name] !== 'string' ) return this[name];
-          return this.__context__.lookup(this[name], true);
+          console.warn("Deprecated use of 'cls.$cls'. Just use 'cls' instead.");
+          return typeof this[name] !== 'string' ? this[name] :
+            this.__context__.lookup(this[name], true);
         },
         configurable: true
       });
@@ -369,5 +416,45 @@ foam.CLASS({
   properties: [
     ['factory', function() { return {} }],
     'of'
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Reference',
+  extends: 'Property',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      class: 'String',
+      name: 'targetDAOKey',
+      expression: function(of) {
+        return of + 'DAO';
+      }
+    },
+    {
+      name: 'adapt',
+      value: function(oldValue, newValue, prop) {
+        return prop.of.isInstance(newValue) ?
+          newValue.id :
+          newValue ;
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  documentation: 'Update Model Property types.',
+
+  properties: [
+    { class: 'String',  name: 'name' },
+    { class: 'Boolean', name: 'abstract' }
   ]
 });

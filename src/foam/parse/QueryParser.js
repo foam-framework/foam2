@@ -19,7 +19,11 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'QueryParser',
 
+  documentation:
+      'Create a query strings to MLangs parser for a particular class.',
+
   axioms: [
+    // Reuse parsers if created for same 'of' class.
     foam.pattern.Multiton.create({ property: 'of' })
   ],
 
@@ -193,7 +197,7 @@ foam.CLASS({
     {
       name: 'grammar_',
       factory: function() {
-        var cls = this.of$cls;
+        var cls = this.of;
         var fields = [];
         var properties = cls.getAxiomsByClass(foam.core.Property);
         for ( var i = 0; i < properties.length; i++ ) {
@@ -264,24 +268,31 @@ foam.CLASS({
               arg2: v
             });
           },
+
           or: function(v) {
             return self.Or.create({ args: v });
           },
+
           and: function(v) {
             return self.And.create({ args: v });
           },
+
           negate: function(v) {
             return self.Not.create({ arg1: v[1] });
           },
+
           number: function(v) {
             return parseInt(compactToString(v));
           },
+
           me: function() {
             return self.me || '';
           },
+
           has: function(v) {
             return self.Has.create({ arg1: v[1] });
           },
+
           is: function(v) {
             return self.Eq.create({
               arg1: v[1],
@@ -425,7 +436,7 @@ foam.CLASS({
             // We fix that by using a fixed starting date that won't get
             // adjusted like that.
             start = new Date(2000, 0, 1);
-            end = new Date(2000, 0, 1);
+            end   = new Date(2000, 0, 1);
             var ops = [ 'FullYear', 'Month', 'Date', 'Hours', 'Minutes',
                 'Seconds' ];
             var defaults = [ 0, 1, 1, 0, 0, 0 ];
@@ -492,6 +503,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',

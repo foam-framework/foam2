@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -20,11 +20,11 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Model',
 
-  documentation: 'Class/Prototype description.',
-
   properties: [
     {
       name: 'id',
+      hidden: true,
+      transient: true,
       getter: function() {
         return this.package ? this.package + '.' + this.name : this.name;
       }
@@ -32,6 +32,10 @@ foam.CLASS({
     'package',
     'abstract',
     'name',
+    {
+      name: 'flags',
+      factory: function() { return {}; }
+    },
     {
       // Just discard documentation.
       // If it's needed, a real 'documentation' property will

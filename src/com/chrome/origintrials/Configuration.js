@@ -52,17 +52,21 @@ foam.CLASS({
   requires: [
     'foam.dao.ClientDAO',
     'com.chrome.origintrials.SyncDAO',
+    'foam.box.SubBox',
     'foam.box.HTTPBox'
   ],
   properties: [
     {
-      name: 'networkDAO',
+      name: 'networkApplicationDAO',
       factory: function() {
         var dao = this.ClientDAO.create({
           of: this.Application,
-          delegate: this.HTTPBox.create({
-            url: document.location.origin + '/api',
-            method: 'POST'
+          delegate: this.SubBox.create({
+            name: 'applications',
+            delegate: this.HTTPBox.create({
+              url: document.location.origin + '/api',
+              method: 'POST'
+            })
           })
         });
 
@@ -80,10 +84,48 @@ foam.CLASS({
 
         var sync = this.SyncDAO.create({
           delegate: dao,
-          network: this.networkDAO
+          of: this.Application,
+          network: this.networkApplicationDAO
         });
 
-        this.networkDAO.select().then(function(objs) {
+        this.networkApplicationDAO.select().then(function(objs) {
+          objs.a.map(function(o) { dao.put(o); });
+        });
+
+        return sync;
+      }
+    },
+    {
+      name: 'networkExperimentDAO',
+      factory: function() {
+        var dao = this.ClientDAO.create({
+          of: this.Experiment,
+          delegate: this.SubBox.create({
+            name: 'experiments',
+            delegate: this.HTTPBox.create({
+              url: document.location.origin + '/api',
+              method: 'POST'
+            })
+          })
+        });
+        return dao;
+      }
+    },
+    {
+      name: 'experimentDAO',
+      factory: function() {
+        var dao = this.EasyDAO.create({
+          of: this.Experiment,
+          daoType: 'MDAO'
+        });
+
+        var sync = this.SyncDAO.create({
+          delegate: dao,
+          of: this.Experiment,
+          network: this.networkExperimentDAO
+        });
+
+        this.networkExperimentDAO.select().then(function(objs) {
           objs.a.map(function(o) { dao.put(o); });
         });
 

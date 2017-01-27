@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -28,7 +28,13 @@ foam.CLASS({
     { class: 'Simple', name: 'f' },
     { class: 'Simple', name: 'g' },
     { class: 'Simple', name: 'h' },
-    { class: 'Simple', name: 'i' }
+    { class: 'Simple', name: 'i' },
+    {
+      name: 'inverse_',
+      factory: function() { return this.cls_.create(); },
+      // Exclude from compareTo()
+      compare: function() { return 0; }
+    }
   ],
 
   methods: [
@@ -108,19 +114,21 @@ foam.CLASS({
       var det = ta*(te*ti  - tf*th) - tb*(td*ti - tf*tg) + tc*(td*th-te*tg);
       var detinv = 1 / det;
 
-      this.a = detinv * (te*ti - tf*th);
-      this.b = detinv * (tc*th - tb*ti);
-      this.c = detinv * (tb*tf - tc*te);
+      var inv = this.inverse_;
 
-      this.d = detinv * (tf*tg - td*ti);
-      this.e = detinv * (ta*ti - tc*tg);
-      this.f = detinv * (tc*td - ta*tf);
+      inv.a = detinv * (te*ti - tf*th);
+      inv.b = detinv * (tc*th - tb*ti);
+      inv.c = detinv * (tb*tf - tc*te);
 
-      this.g = detinv * (td*th - te*tg);
-      this.h = detinv * (tb*tg - ta*th);
-      this.i = detinv * (ta*te - tb*td);
+      inv.d = detinv * (tf*tg - td*ti);
+      inv.e = detinv * (ta*ti - tc*tg);
+      inv.f = detinv * (tc*td - ta*tf);
 
-      return this;
+      inv.g = detinv * (td*th - te*tg);
+      inv.h = detinv * (tb*tg - ta*th);
+      inv.i = detinv * (ta*te - tb*td);
+
+      return inv;
     },
 
     function det() {
@@ -138,23 +146,28 @@ foam.CLASS({
     },
 
     function translate(dx, dy) {
-      if ( ! dx && ! dy ) return;
-      this.mul(1, 0, dx, 0, 1, dy, 0, 0, 1);
+      if ( dx || dy ) this.mul(1, 0, dx, 0, 1, dy, 0, 0, 1);
+      return this;
     },
 
     function skew(x, y) {
-      if ( ! x && ! y ) return;
-      this.mul(1, x, 0, y, 1, 0, 0, 0, 1);
+      if ( x || y ) this.mul(1, x, 0, y, 1, 0, 0, 0, 1);
+      return this;
     },
 
     function scale(x, y) {
-      if ( x === 1 && y === 1 ) return;
-      this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
+      if ( y === undefined ) y = x;
+      if ( x != 1 || y != 1 ) this.mul(x, 0, 0, 0, y, 0, 0, 0, 1);
+      return this;
     },
 
     function rotate(a) {
-      if ( ! a ) return;
-      this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
+      if ( a ) this.mul(Math.cos(a), Math.sin(a), 0, -Math.sin(a), Math.cos(a), 0, 0, 0, 1);
+      return this;
+    },
+
+    function rotateAround(a, x, y) {
+      return this.translate(-x, -y).rotate(a).translate(x, y);
     }
   ]
 });
@@ -200,6 +213,25 @@ foam.CLASS({
         o.e, o.f, o.h, o.i,
         o.j, o.j, o.k, o.l,
         o.m, o.n, o.o, o.p);
+    },
+
+    function mulP(p) {
+      var ta = this.a, tb = this.b, tc = this.c, td = this.d,
+          te = this.e, tf = this.f, tg = this.g, th = this.h,
+          ti = this.i, tj = this.j, tk = this.k, tl = this.l,
+          tm = this.m, tn = this.n, to = this.o, tp = this.p;
+
+      var a = p.x;
+      var b = p.y;
+      var c = p.z
+      var d = p.w;
+
+      p.x = ta * a + tb * b + tc * c + td * d;
+      p.y = te * a + tf * b + tg * c + th * d;
+      p.z = ti * a + tj * b + tk * c + tl * d;
+      p.w = tm * a + tn * b + to * c + tp * d;
+
+      return this;
     },
 
     function mul(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) {
@@ -331,6 +363,23 @@ foam.CLASS({
         s,  c,  0,  0,
         0,  0,  1,  0,
         0,  0,  0,  1);
+    },
+
+    function rotate(x, y, z, r) {
+      var d = Math.sqrt(x*x + y*y + z*z);
+      x /= d;
+      y /= d;
+      z /= d;
+
+      var cos = Math.cos(r);
+      var sin = Math.sin(r);
+
+      this.mul(
+        cos + x*x*(1 - cos),     x*y*(1 - cos) - z*sin,   x*z*(1 - cos) + y*sin,  0,
+        y*x*(1 - cos) + z*sin,   cos + y*y*(1-cos),       y*z*(1 - cos) - x*sin,  0,
+        z*x*(1 - cos) - y*sin,   z*y*(1 - cos) + x*sin,   cos + z*z*(1 - cos),    0,
+        0,                       0,                       0,                      1);
+
     }
   ]
 });
@@ -490,32 +539,36 @@ foam.CLASS({
     {
       name: 'state',
       value: 'initial',
-      hidden: 'true'
+      hidden: 'true',
+      transient: true
     },
     {
       name: 'parent',
-      hidden: 'true'
+      hidden: 'true',
+      transient: true
     },
     {
       name: 'canvas',
-      hidden: 'true'
+      hidden: 'true',
+      transient: true
     },
     {
       name: 'transform_',
       hidden: 'true',
+      transient: true,
       factory: function() { return this.Transform.create(); }
     },
     {
       name: 'transform',
       hidden: 'true',
-      getter: function getTransform() {
+      expression: function getTransform(x, originX, y, originY, rotation, skewX, skewY, scaleX, scaleY) {
         var t = this.transform_.reset();
 
-        t.translate(this.x+this.originX, this.y+this.originY);
-        t.rotate(this.rotation);
-        t.skew(this.skewX, this.skewY);
-        t.scale(this.scaleX, this.scaleY);
-        t.translate(-this.originX, -this.originY);
+        t.translate(x+originX, y+originY);
+        t.rotate(rotation);
+        t.skew(skewX, skewY);
+        t.scale(scaleX, scaleY);
+        t.translate(-originX, -originY);
 
         return t;
       }
@@ -530,12 +583,13 @@ foam.CLASS({
       hidden: true,
       value: true
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.height; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+this.width; } },
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.height; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+this.width; } },
     {
       name: 'invalidate_',
+      transient: true,
       hidden: true,
       // TODO: Would be more efficient to be a factory, but doesn't work. Investigate.
       getter: function() {
@@ -601,8 +655,8 @@ foam.CLASS({
 
     function maybeInitCView(x) {
       if ( this.state === 'initial' ) {
-        this.initCView(x);
         this.state = 'initailized'
+        this.initCView(x);
       }
     },
 
@@ -718,7 +772,7 @@ foam.CLASS({
       return this.toE().write();
     },
 
-    function toE(X) {
+    function toE(args, X) {
       return this.Canvas.create({ cview: this }, X).attrs({
         width:  this.slot(function(x, width,  scaleX) { return x + width*scaleX; }),
         height: this.slot(function(y, height, scaleY) { return y + height*scaleY; })
@@ -846,8 +900,18 @@ foam.CLASS({
   extends: 'foam.graphics.CView',
 
   properties: [
-    { class: 'Float',  name: 'startX' },
-    { class: 'Float',  name: 'startY' },
+    {
+      class: 'Float',
+      name: 'startX',
+      getter: function() { return this.x; },
+      setter: function(v) { this.x = v; }
+    },
+    {
+      class: 'Float',
+      name: 'startY',
+      getter: function() { return this.y; },
+      setter: function(v) { this.y = v; }
+    },
     { class: 'Float',  name: 'endX' },
     { class: 'Float',  name: 'endY' },
     { class: 'Float',  name: 'lineWidth', value: 1 },
@@ -862,6 +926,39 @@ foam.CLASS({
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
       x.stroke();
+    },
+    function hitTest(p) {
+      // There is probably a better way to do this.
+      // This checks if the given point is
+
+      // A is the vector from the start of the line to point p
+      var ax = p.x - this.startX;
+      var ay = p.y - this.startY;
+
+      // B a vector representing the line (from start to end).
+      var bx = this.endX - this.startX;
+      var by = this.endY - this.startY;
+      var blen = Math.sqrt(bx * bx + by * by);
+
+      // Project A onto B
+      var scalarProj = (ax * bx + ay * by ) / blen;
+      var factor = scalarProj / blen;
+      var projX = bx * factor;
+      var projY = by * factor;
+
+      // Calculate vector rejection "perpendicular distance"
+      var rejX = ax - projX;
+      var rejY = ay - projY;
+
+      // Hit's if the perpendicular distance is less than some factor,
+      // and the point is within some factor of the line start/finish
+
+      var distance = Math.sqrt(rejX * rejX + rejY * rejY);
+      var pos = scalarProj;
+
+      return distance < 5 && pos > -5 && pos < (blen + 5)
+
+      return false;
     }
   ]
 });
@@ -922,10 +1019,10 @@ foam.CLASS({
       name: 'border',
       value: '#000000'
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y-this.radius; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x-this.radius; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+this.radius; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+this.radius; } }
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y-this.radius; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x-this.radius; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+this.radius; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+this.radius; } }
   ],
 
   methods: [
@@ -1050,10 +1147,10 @@ foam.CLASS({
       getter: function() { return 2 * this.radiusY; },
       setter: function(h) { this.radiusY = h / 2; }
     },
-    { name: 'top_',    hidden: true, getter: function() { return this.y; } },
-    { name: 'left_',   hidden: true, getter: function() { return this.x; } },
-    { name: 'bottom_', hidden: true, getter: function() { return this.y+2*this.radiusY; } },
-    { name: 'right_',  hidden: true, getter: function() { return this.x+2*this.radiusX; } },
+    { name: 'top_',    hidden: true, transient: true, getter: function() { return this.y; } },
+    { name: 'left_',   hidden: true, transient: true, getter: function() { return this.x; } },
+    { name: 'bottom_', hidden: true, transient: true, getter: function() { return this.y+2*this.radiusY; } },
+    { name: 'right_',  hidden: true, transient: true, getter: function() { return this.x+2*this.radiusX; } },
   ],
 
   methods: [
@@ -1125,8 +1222,6 @@ foam.CLASS({
     'foam.input.Pointer'
   ],
 
-  imports: [ 'getElementById' ],
-
   properties: [
     [ 'nodeName', 'CANVAS' ],
     {
@@ -1164,9 +1259,11 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.SUPER();
       this.on('load', this.paint);
       this.cview$.valueSub('invalidated', this.paint);
     },
+
     function erase() {
       this.el().width = this.el().width;
     }

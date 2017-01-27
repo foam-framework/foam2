@@ -30,7 +30,7 @@ foam.CLASS({
 foam.RELATIONSHIP({
   sourceModel: 'Parent1',
   targetModel: 'Child1',
-  name: 'children',
+  forwardName: 'children',
   inverseName: 'parent'
 });
 
@@ -39,8 +39,8 @@ foam.CLASS({
   requires: [ 'Parent1', 'Child1' ],
 
   exports: [
-    'parents as Parent1DAO',
-    'children as Child1DAO'
+    'parents as parent1DAO',
+    'children as child1DAO'
   ],
 
   properties: [
@@ -110,3 +110,23 @@ foam.CLASS({
 });
 
 RealWorld.create();
+
+foam.CLASS({
+  package: 'com.acme',
+  name: 'Parent1',
+  ids: [ 'name' ],
+  properties: [ 'name' ]
+});
+foam.CLASS({
+  package: 'com.acme',
+  name: 'Child1',
+  ids: [ 'name' ],
+  properties: [ 'name' ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'com.acme.Parent1',
+  targetModel: 'com.acme.Child1',
+  forwardName: 'children',
+  inverseName: 'parent'
+});

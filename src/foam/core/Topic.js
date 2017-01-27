@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -36,8 +36,6 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Topic',
-
-  documentation: 'Topic Axiom',
 
   properties: [
     'name',
@@ -78,8 +76,8 @@ foam.CLASS({
       var topics = topic.topics || [];
 
       var ret = {
-        pub:   foam.Function.bind(parent.pub,   parent, name),
-        sub:   foam.Function.bind(parent.sub,   parent, name),
+        pub: foam.Function.bind(parent.pub, parent, name),
+        sub: foam.Function.bind(parent.sub, parent, name),
         hasListeners: foam.Function.bind(parent.hasListeners, parent, name),
         toString: function() { return 'Topic(' + name + ')'; }
       };

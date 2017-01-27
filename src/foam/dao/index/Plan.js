@@ -27,7 +27,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(/*promise, state, sink, skip, limit, order, predicate*/) {},
+    function execute(promise, state, sink, skip, limit, order, predicate) {},
     function toString() { return this.cls_.name+"(cost="+this.cost+")"; }
   ]
 });
@@ -159,12 +159,86 @@ foam.CLASS({
 
     function toString() {
       return ( ! this.subPlans || this.subPlans.length <= 1 ) ?
-        'IN(key=' + ( this.prop && this.prop.name ) + ', cost=' + this.cost + ", " +
+        'IN(key=' + ( this.prop && this.prop.name ) + ', cost=' + this.cost + ', ' +
           ', size=' + ( this.subPlans ? this.subPlans.length : 0 ) + ')' :
-        'lookup(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ", " +
+        'lookup(key=' + this.prop && this.prop.name + ', cost=' + this.cost + ', ' +
           this.subPlans[0].toString();
     }
   ]
 });
 
+/**
+  Merges results from multiple sub-plans and deduplicates, sorts, and
+  filters the results.
+
+  TODO: account for result sorting in cost?
+*/
+foam.CLASS({
+  package: 'foam.dao.index',
+  name: 'MergePlan',
+  extends: 'foam.dao.index.AltPlan',
+
+  requires: [
+    'foam.dao.DedupSink',
+    'foam.dao.LimitedSink',
+    'foam.dao.SkipSink',
+    'foam.dao.OrderedSink',
+  ],
+
+  methods: [
+    /**
+      Executes sub-plans, limiting results from each, then merges results,
+      removes duplicates, sorts, skips, and limits.
+    */
+    function execute(promise, sink, skip, limit, order, predicate) {
+      // TODO: Investigate pre-sorted results from subqueries being
+      //   zipped together quickly
+
+      var resultSink = this.DedupSink.create({
+        delegate: this.decorateSink_(sink, skip, limit, order)
+      });
+
+      var sp = this.subPlans;
+      var predicates = predicate.args;
+      var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
+      //console.assert(predicates.length == sp.length);
+      for ( var i = 0 ; i < sp.length ; ++i) {
+        sp[i].execute(
+          promise,
+          resultSink,
+          undefined,
+          subLimit,
+          order,
+          predicates[i]
+        );
+      }
+    },
+
+    /** TODO: Share with AbstractDAO. We never need to use predicate.
+      @private */
+    function decorateSink_(sink, skip, limit, order) {
+      if ( limit != undefined ) {
+        sink = this.LimitedSink.create({
+          limit: limit,
+          delegate: sink
+        });
+      }
+      if ( skip != undefined ) {
+        sink = this.SkipSink.create({
+          skip: skip,
+          delegate: sink
+        });
+      }
+      if ( order != undefined ) {
+        sink = this.OrderedSink.create({
+          comparator: order,
+          delegate: sink
+        });
+      }
+
+      return sink;
+    },
+
+  ]
+});
 

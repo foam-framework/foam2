@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -55,7 +55,7 @@ foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
 
-  axioms: [foam.pattern.Singleton.create()],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   requires: [
     'foam.parse.ImperativeGrammar as Grammar'
@@ -111,7 +111,9 @@ foam.CLASS({
             }
           }
         });
+
         var self = this;
+
         g.addActions({
           markup: function(v) {
             var wasSimple = self.simple;
@@ -174,14 +176,14 @@ foam.CLASS({
       if ( ! result ) throw "Error parsing template " + name;
 
       var code = this.HEADER +
-          ( result[0] ? t : result[1] )
-          + this.FOOTER;
+          ( result[0] ? t : result[1] ) +
+          this.FOOTER;
 
-      var args = ['opt_outputter'].concat(args);
+      var newArgs = ['opt_outputter'].concat(args);
       var f = eval(
         '(function() { ' +
           'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
-          'var f = function(' + args.join(',') + '){' + code + '};' +
+          'var f = function(' + newArgs.join(',') + '){' + code + '};' +
           'return function() { '+
           'if ( arguments.length && arguments[0] && ! arguments[0].output ) return f.apply(this, [undefined].concat(Array.from(arguments)));' +
           'return f.apply(this, arguments);};})()');

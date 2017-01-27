@@ -56,46 +56,46 @@ describe('MLang', function() {
       name: 'Jimi Hendrix',
       deceased: true,
       birthday: '1942-11-27',
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 2,
       name: 'Carlos Santana',
       birthday: '1947-07-20',
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 3,
       name: 'Ritchie Blackmore',
       birthday: '1945-04-14',
       someArray: [1, 2, 4, 6],
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 4,
       name: 'Mark Knopfler',
       birthday: '1949-08-12',
       someArray: [1, 6, 3],
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 5,
       name: 'Eric Clapton',
       birthday: '1945-03-30',
       someArray: [1, 4],
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 6,
       name: 'Jimmy Page',
       birthday: '1944-01-09',
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 7,
       name: 'David Bowie',
       birthday: '1947-01-08',
       deceased: true,
-    }));
+    }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 8,
       name: 'Tom Scholz',
-      birthday: '1947-03-10',
-    }));
+      birthday: '1947-03-10'
+    }, foam.__context__));
   });
 
   afterEach(function() {
@@ -414,15 +414,33 @@ describe('MLang', function() {
 
   describe('HAS()', function() {
     var HAS;
+    var NOT;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       HAS = expr.HAS.bind(expr);
+      NOT = expr.NOT.bind(expr);
     });
 
     it('returns true for set values, even false', function(done) {
       dao.where(HAS(test.mlang.Person.DECEASED)).select()
       .then(function(sink) {
         expect(sink.a.length).toBe(8);
+        done();
+      });
+    });
+
+    it('returns true for set values, even empty arrays', function(done) {
+      dao.where(HAS(test.mlang.Person.SOME_ARRAY)).select()
+      .then(function(sink) {
+        expect(sink.a.length).toBe(3);
+        done();
+      });
+    });
+
+    it('returns NOT(true for set values, even empty arrays)', function(done) {
+      dao.where(NOT(HAS(test.mlang.Person.SOME_ARRAY))).select()
+      .then(function(sink) {
+        expect(sink.a.length).toBe(5);
         done();
       });
     });

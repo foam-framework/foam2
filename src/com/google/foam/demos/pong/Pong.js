@@ -37,7 +37,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
   name: 'Paddle',
-  extends: 'foam.graphics.Circle',
+  extends: 'foam.graphics.Box',
 
   implements: [
     'foam.physics.Physical',
@@ -46,7 +46,8 @@ foam.CLASS({
 
   properties: [
     [ 'color', 'white' ],
-    [ 'radius', 30 ],
+    [ 'width', 20 ],
+    [ 'height', 80 ],
     {
       name: 'mass',
       factory: function() { return this.INFINITE_MASS; }
@@ -58,7 +59,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'com.google.foam.demos.pong',
   name: 'Pong',
-  extends: 'foam.graphics.Box',
+  extends: 'foam.u2.Element',
 
   requires: [
     'com.google.foam.demos.pong.Ball',
@@ -74,12 +75,13 @@ foam.CLASS({
   },
 
   properties: [
-    [ 'color', 'lightgray' ],
-    [ 'width',  800 ],
-    [ 'height', 300 ],
+    {
+      name: 'canvas',
+      factory: function() { return this.Box.create({width: 800, height: 300, color: 'lightgray'}); }
+    },
     {
       name: 'ball',
-      factory: function() { return this.Ball.create({color: 'white', radius: 20}); }
+      factory: function() { return this.Ball.create({border: null, color: 'white', radius: 20}); }
     },
     {
       name: 'lPaddle',
@@ -118,7 +120,7 @@ foam.CLASS({
           ball.vy = Math.abs(ball.vy);
         }
         // Bounce off of bottom wall
-        if ( ball.y + ball.radius >= this.height ) {
+        if ( ball.y + ball.radius >= this.canvas.height ) {
           ball.vy = -Math.abs(ball.vy);
         }
         // Bounce off of left wall
@@ -128,9 +130,9 @@ foam.CLASS({
           ball.vx *= -1;
         }
         // Bounce off of right wall
-        if ( ball.x >= this.width ) {
+        if ( ball.x >= this.canvas.width ) {
           this.lScore++;
-          ball.x = this.width - 150;
+          ball.x = this.canvas.width - 150;
           ball.vx *= -1;
         }
         // Reset scores
@@ -144,34 +146,42 @@ foam.CLASS({
   actions: [
     {
       name: 'lUp',
-//      keyboardShortcuts: [ 'q' ],
+      keyboardShortcuts: [ 'q' ],
       code: function() { this.lPaddle.y -= this.PADDLE_SPEED; }
     },
     {
       name: 'lDown',
-//      keyboardShortcuts: [ 'a' ],
+      keyboardShortcuts: [ 'a' ],
       code: function() { this.lPaddle.y += this.PADDLE_SPEED; }
     },
     {
       name: 'rUp',
-//      keyboardShortcuts: [ 38 /* up arrow */ ],
+      keyboardShortcuts: [ 38 /* up arrow */ ],
       code: function() { this.rPaddle.y -= this.PADDLE_SPEED; }
     },
     {
       name: 'rDown',
-//      keyboardShortcuts: [ 40 /* down arrow */ ],
+      keyboardShortcuts: [ 40 /* down arrow */ ],
       code: function() { this.rPaddle.y += this.PADDLE_SPEED; }
     }
   ],
 
   methods: [
+    function initE() {
+      // TODO: CViews don't attach keyboard listeners yet, so
+      // we wrap canvas in an Element. This extra level can
+      // be removed when it's supported.
+      this.SUPER();
+      this.style({outline: 'none'}).focus().add(this.canvas);
+    },
+
     function init() {
       this.SUPER();
 
       var lScoreLabel = this.Label.create({
         text$: this.lScore$,
         align: 'center',
-        x: this.width/4,
+        x: this.canvas.width/4,
         y: 25,
         color: 'white',
         font: '70px Arial',
@@ -181,15 +191,15 @@ foam.CLASS({
       var rScoreLabel = this.Label.create({
         text$: this.rScore$,
         align: 'center',
-        x: this.width/2,
+        x: this.canvas.width/2,
         y: 25,
         color: 'white',
         font: '70px Arial',
         width: 200,
         height: 70});
 
-      this.addChildren(
-          this.Box.create({x: this.width/2-5, width:10, height: this.height, border:'rgba(0,0,0,0)' , color: 'white'}),
+      this.canvas.add(
+          this.Box.create({x: this.canvas.width/2-5, width:10, height: this.canvas.height, border:'rgba(0,0,0,0)' , color: 'white'}),
           this.ball,
           lScoreLabel,
           rScoreLabel,
@@ -197,9 +207,9 @@ foam.CLASS({
           this.rPaddle);
 
       // Position Paddles
-      this.lPaddle.x = 25+this.lPaddle.radius;
-      this.rPaddle.x = this.width-25-this.rPaddle.radius;
-      this.lPaddle.y = this.rPaddle.y = this.height/2-this.rPaddle.radius;
+      this.lPaddle.x = 25;
+      this.rPaddle.x = this.canvas.width-25-this.rPaddle.width;
+      this.lPaddle.y = this.rPaddle.y = (this.canvas.height-this.rPaddle.height)/2;
 
       // Setup Ball
       this.ball.x  = 110;

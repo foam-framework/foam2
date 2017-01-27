@@ -20,7 +20,7 @@ describe('Listener', function() {
     foam.CLASS({
       name: 'Parent',
       methods: [
-        function foo() {}
+        function foo() { this.SUPER(); } // need SUPER to trigger override
       ]
     });
 
@@ -32,6 +32,7 @@ describe('Listener', function() {
           function foo() {}
         ]
       });
+      Child.create(undefined, foam.__context__);
     }).toThrow();
   });
 });
@@ -62,7 +63,7 @@ describe('Listener', function() {
       ]
     });
 
-    Child.create().foo();
+    Child.create(undefined, foam.__context__).foo();
 
     expect(parentCalled).toBe(true);
     expect(childCalled).toBe(true);

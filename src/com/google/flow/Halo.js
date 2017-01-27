@@ -128,7 +128,7 @@ foam.CLASS({
         this.view = n && n.value;
 
         if ( this.selectedSub ) {
-          this.selectedSub.destroy();
+          this.selectedSub.detach();
           this.selectedSub = null;
         }
 
@@ -145,6 +145,12 @@ foam.CLASS({
         ) {
           var v = n.value;
           v.add(this);
+
+          // Make the halo be the first child so that it will
+          // get mouse touch and move events. Replace with
+          // z-index when supported.
+          v.children.pop(); v.children.unshift(this);
+
           this.alpha = 1;
           this.selectedSub = v.sub('propertyChange', this.onSelectedPropertyChange);
           this.onSelectedPropertyChange();
@@ -168,7 +174,7 @@ foam.CLASS({
 
       this.add(
         this.haloBorder,
-        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, _, _, x, y, sx, sy) {
+        this.Anchor.create({x$: this.x2$, y: -26, callback: function(v, vs, _, __, x, y, sx, sy) {
           v.originX    = v.width/2;
           v.originY    = v.height/2;
           halo.originX = halo.width/2;

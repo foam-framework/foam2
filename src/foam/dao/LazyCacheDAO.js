@@ -60,7 +60,7 @@ foam.CLASS({
         @private */
       name: 'cacheSyncSub_',
       postSet: function(old, nu) {
-        if ( old && old.destroy ) old.destroy();
+        if ( old && old.detach ) old.detach();
       }
     },
     {
@@ -142,7 +142,9 @@ foam.CLASS({
     */
     function find(id) {
       var self = this;
-      self.cacheSync_; // ensures listeners are set TODO: express this better
+      // TODO: Express this better.
+      // Assigning to unused variable to keep Closure happy.
+      var _ = self.cacheSync_; // ensures listeners are set
       // TODO: stale timeout on find?
 
       // Check the in-flight remote finds_
@@ -206,7 +208,9 @@ foam.CLASS({
       sink = sink || this.ArraySink.create();
       var key = this.selectKey(sink, skip, limit, order, predicate);
       var self = this;
-      self.cacheSync_; // ensures listeners are set TODO: express this better
+      // Assigning to unused variable to keep Closure happy.
+      // TODO: Express this better.
+      var _ = self.cacheSync_; // Ensures listeners are set.
 
       // Check for missing or stale remote request. If needed, immediately
       // start a new one that will trigger a reset of this when complete.

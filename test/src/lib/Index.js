@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'test',
   name: 'Indexable',
 
+  ids: ['int'],
+
   properties: [
     {
       class: 'Int',
@@ -75,14 +77,14 @@ var createData1 = function createData1() {
       date: new Date(1),
     },
   ].map(function(cfg) {
-    return test.Indexable.create(cfg);
+    return test.Indexable.create(cfg, foam.__context__);
   });
 }
 
 
-var createData2 = function createData2() {
+var createData2 = function createData2(dataCount) {
   var arr = [];
-  var count = 20;
+  var count = dataCount || 20;
 
   for (var i = 0; i < count; i++ ) {
     arr.push({
@@ -94,7 +96,7 @@ var createData2 = function createData2() {
   }
 
   return arr.map(function(cfg) {
-    return test.Indexable.create(cfg);
+    return test.Indexable.create(cfg, foam.__context__);
   });
 }
 
@@ -115,7 +117,7 @@ var createData3 = function createData3() {
       array: ['apple', 'banana','kiwi']
     },
   ].map(function(cfg) {
-    return test.Indexable.create(cfg);
+    return test.Indexable.create(cfg, foam.__context__);
   });
 }
 
@@ -128,15 +130,15 @@ var callPlan = function callPlan(idx, sink, pred) {
 describe('Index interface', function() {
   it('has enough methods', function() {
     var idxFac = foam.dao.index.Index.create();
-    idxFac.create({ });
+    idxFac.estimate();
 
-    idxFac.put();
-    idxFac.remove();
-    idxFac.plan(/*sink, skip, limit, order, predicate*/);
-    idxFac.get();
-    idxFac.size();
-    idxFac.select(/*sink, skip, limit, order, predicate*/);
-    idxFac.selectReverse(/*sink, skip, limit, order, predicate*/);
+    var tail = idxFac.createNode({ });
+    tail.put();
+    tail.remove();
+    tail.plan(/*sink, skip, limit, order, predicate*/);
+    tail.get();
+    tail.size();
+    tail.select(/*sink, skip, limit, order, predicate*/);
   });
 
 });
@@ -149,7 +151,7 @@ describe('ValueIndex', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create();
+    idx = foam.dao.index.ValueIndex.create().createNode();
   });
 
   it('stores a value', function() {
@@ -255,7 +257,7 @@ describe('ValueIndex (as Plan)', function() {
 
   beforeEach(function() {
     data = createData1();
-    idx = foam.dao.index.ValueIndex.create();
+    idx = foam.dao.index.ValueIndex.create().createNode();
   });
 
   it('plans for no value', function() {
@@ -298,11 +300,11 @@ describe('TreeIndex', function() {
     data = createData2();
     idx = foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
-      tailFactory: foam.dao.index.TreeIndex.create({
+      tail: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.FLOAT,
-        tailFactory: foam.dao.index.ValueIndex.create()
+        tail: foam.dao.index.ValueIndex.create()
       })
-    });
+    }).createNode();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -419,6 +421,163 @@ describe('TreeIndex', function() {
 
   });
 
+  it('orders scans', function() {
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.STRING,
+      tail: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.INT,
+        tail: foam.dao.index.ValueIndex.create()
+      })
+    }).createNode();
+    idx.bulkLoad(data);
+
+    var order = m.THEN_BY(test.Indexable.STRING, test.Indexable.INT);
+
+    plan = idx.plan(sink, undefined, undefined, order);
+
+    plan.execute([], sink, undefined, undefined, order);
+
+    expect(sink.a.length).toEqual(20);
+    expect(sink.a[0].int).toEqual(0);
+    expect(sink.a[1].int).toEqual(5);
+    expect(sink.a[2].int).toEqual(10);
+    expect(sink.a[3].int).toEqual(15);
+
+    expect(sink.a[4].int).toEqual(1);
+    expect(sink.a[5].int).toEqual(6);
+    expect(sink.a[6].int).toEqual(11);
+    expect(sink.a[7].int).toEqual(16);
+
+    expect(sink.a[8].int).toEqual(2);
+    expect(sink.a[9].int).toEqual(7);
+    expect(sink.a[10].int).toEqual(12);
+    expect(sink.a[11].int).toEqual(17);
+
+    expect(sink.a[12].int).toEqual(3);
+    expect(sink.a[13].int).toEqual(8);
+    expect(sink.a[14].int).toEqual(13);
+    expect(sink.a[15].int).toEqual(18);
+
+    expect(sink.a[16].int).toEqual(4);
+    expect(sink.a[17].int).toEqual(9);
+    expect(sink.a[18].int).toEqual(14);
+    expect(sink.a[19].int).toEqual(19);
+  });
+
+  it('orders reverse scans', function() {
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.STRING,
+      tail: foam.dao.index.TreeIndex.create({
+        prop: test.Indexable.INT,
+        tail: foam.dao.index.ValueIndex.create()
+      })
+    }).createNode();
+    idx.bulkLoad(data);
+
+    var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
+
+    plan = idx.plan(sink, undefined, undefined, order);
+
+    plan.execute([], sink, undefined, undefined, order);
+
+    // string is generated in groups of 5, so sort by string
+    // then reverse sort int will have reversed groups of 5
+    // ints
+    expect(sink.a.length).toEqual(20);
+
+
+    expect(sink.a[0].string).toEqual('hello0');
+    expect(sink.a[0].int).toEqual(15);
+    expect(sink.a[1].int).toEqual(10);
+    expect(sink.a[2].int).toEqual(5);
+    expect(sink.a[3].int).toEqual(0);
+
+    expect(sink.a[4].string).toEqual('hello1');
+    expect(sink.a[4].int).toEqual(16);
+    expect(sink.a[5].int).toEqual(11);
+    expect(sink.a[6].int).toEqual(6);
+    expect(sink.a[7].int).toEqual(1);
+
+    expect(sink.a[8].string).toEqual('hello2');
+    expect(sink.a[8].int).toEqual(17);
+    expect(sink.a[9].int).toEqual(12);
+    expect(sink.a[10].int).toEqual(7);
+    expect(sink.a[11].int).toEqual(2);
+
+    expect(sink.a[12].string).toEqual('hello3');
+    expect(sink.a[12].int).toEqual(18);
+    expect(sink.a[13].int).toEqual(13);
+    expect(sink.a[14].int).toEqual(8);
+    expect(sink.a[15].int).toEqual(3);
+
+    expect(sink.a[16].string).toEqual('hello4');
+    expect(sink.a[16].int).toEqual(19);
+    expect(sink.a[17].int).toEqual(14);
+    expect(sink.a[18].int).toEqual(9);
+    expect(sink.a[19].int).toEqual(4);
+
+
+  });
+
+  it('orders reverse scans with an AltIndex', function() {
+    idx = foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.STRING,
+      tail: foam.dao.index.AltIndex.create({
+        delegates: [
+          test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
+          test.Indexable.INT.toIndex(
+            test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
+          )
+        ]
+      })
+    }).createNode();
+    idx.bulkLoad(data);
+
+    var order = m.THEN_BY(test.Indexable.STRING, m.DESC(test.Indexable.INT));
+
+    plan = idx.plan(sink, undefined, undefined, order);
+
+    plan.execute([], sink, undefined, undefined, order);
+
+    // string is generated in groups of 5, so sort by string
+    // then reverse sort int will have reversed groups of 5
+    // ints
+    expect(sink.a.length).toEqual(20);
+
+
+    expect(sink.a[0].string).toEqual('hello0');
+    expect(sink.a[0].int).toEqual(15);
+    expect(sink.a[1].int).toEqual(10);
+    expect(sink.a[2].int).toEqual(5);
+    expect(sink.a[3].int).toEqual(0);
+
+    expect(sink.a[4].string).toEqual('hello1');
+    expect(sink.a[4].int).toEqual(16);
+    expect(sink.a[5].int).toEqual(11);
+    expect(sink.a[6].int).toEqual(6);
+    expect(sink.a[7].int).toEqual(1);
+
+    expect(sink.a[8].string).toEqual('hello2');
+    expect(sink.a[8].int).toEqual(17);
+    expect(sink.a[9].int).toEqual(12);
+    expect(sink.a[10].int).toEqual(7);
+    expect(sink.a[11].int).toEqual(2);
+
+    expect(sink.a[12].string).toEqual('hello3');
+    expect(sink.a[12].int).toEqual(18);
+    expect(sink.a[13].int).toEqual(13);
+    expect(sink.a[14].int).toEqual(8);
+    expect(sink.a[15].int).toEqual(3);
+
+    expect(sink.a[16].string).toEqual('hello4');
+    expect(sink.a[16].int).toEqual(19);
+    expect(sink.a[17].int).toEqual(14);
+    expect(sink.a[18].int).toEqual(9);
+    expect(sink.a[19].int).toEqual(4);
+
+
+  });
+
 
 //   it('optimizes True', function() {
 //     // not a valid case
@@ -458,11 +617,11 @@ describe('Case-Insensitive TreeIndex', function() {
     data = createData1();
     idx = foam.dao.index.CITreeIndex.create({
       prop: test.Indexable.STRING,
-      tailFactory: foam.dao.index.TreeIndex.create({
+      tail: foam.dao.index.TreeIndex.create({
         prop: test.Indexable.INT,
-        tailFactory: foam.dao.index.ValueIndex.create()
+        tail: foam.dao.index.ValueIndex.create()
       })
-    });
+    }).createNode();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -520,8 +679,8 @@ describe('SetIndex', function() {
     data = createData3();
     idx = foam.dao.index.SetIndex.create({
       prop: test.Indexable.ARRAY,
-      tailFactory: foam.dao.index.ValueIndex.create()
-    });
+      tail: foam.dao.index.ValueIndex.create()
+    }).createNode();
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -590,18 +749,21 @@ describe('AltIndex', function() {
   beforeEach(function() {
     data = createData2();
     idx = foam.dao.index.AltIndex.create({
-      delegates: [
-        foam.dao.index.TreeIndex.create({
-          prop: test.Indexable.INT,
-          tailFactory: foam.dao.index.ValueIndex.create()
-        }),
-        foam.dao.index.TreeIndex.create({
-          prop: test.Indexable.FLOAT,
-          tailFactory: foam.dao.index.ValueIndex.create()
-        }),
-      ]
-    });
-    idx.GOOD_ENOUGH_PLAN = 100; // don't short circuit for test
+      delegates: [ test.Indexable.INT.toIndex(foam.dao.index.ValueIndex.create()) ]
+    }).createNode();
+    var fakeRoot = {
+      size: function() { return 1; },
+      creator: { toPrettyString: function() { return ""; }}
+    };
+    idx.addIndex(foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.INT,
+      tail: foam.dao.index.ValueIndex.create()
+    }), fakeRoot );
+    idx.addIndex(foam.dao.index.TreeIndex.create({
+      prop: test.Indexable.FLOAT,
+      tail: foam.dao.index.ValueIndex.create()
+    }), fakeRoot );
+    idx.creator.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -637,7 +799,6 @@ describe('AltIndex', function() {
 
     plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
     expect(sink.a.length).toEqual(2);
-
   });
 
   it('covers get()', function() {
@@ -649,76 +810,180 @@ describe('AltIndex', function() {
   it('covers toString()', function() {
     idx.toString();
   });
+
 });
+
+describe('AND', function() {
+  var m;
+
+  beforeEach(function() {
+    m = foam.mlang.Expressions.create();
+  });
+
+  it('chains subindexes by cost estimate', function() {
+    var and = m.AND(
+      m.GT(test.Indexable.INT, 5),
+      m.EQ(test.Indexable.FLOAT, 5),
+      m.IN(test.Indexable.STRING, 'he')
+    );
+    var andIndex = and.toIndex(
+      test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
+    );
+
+    expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
+    expect(andIndex.tail.prop).toEqual(test.Indexable.STRING);
+    expect(andIndex.tail.tail.prop).toEqual(test.Indexable.INT);
+  });
+
+  it('returns best by cost estimate when depth == 1', function() {
+    var and = m.AND(
+      m.GT(test.Indexable.INT, 5),
+      m.EQ(test.Indexable.FLOAT, 5),
+      m.IN(test.Indexable.STRING, 'he')
+    );
+    var andIndex = and.toIndex(
+      test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
+      1
+    );
+
+    expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
+
+  });
+
+});
+
+
+
 
 describe('AutoIndex', function() {
   var idx;
+  var idxInstance;
   var plan;
   var m;
   var sink;
   var mdao;
+  var fakeRoot;
 
   beforeEach(function() {
-    mdao = {
-      lastIndex: null,
-      addPropertyIndex: function(index) {
-        this.lastIndex = index;
-      }
-    }
     idx = foam.dao.index.AutoIndex.create({
-      mdao: mdao
+      idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
     });
+
+    idxInstance = idx.createNode();
+
+    idxInstance.bulkLoad(createData2(1000));
+
+    fakeRoot = {
+      size: function() { return 1; },
+      creator: { toPrettyString: function() { return ""; }}
+    };
+
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
   });
 
-  it('covers unimplemented put(), remove(), buldLoad()', function() {
-    idx.put();
-    idx.remove();
-    idx.bulkLoad();
-  });
   it('covers toString()', function() {
     idx.toString();
   });
 
-  it('supports manual addPropertyIndex()', function() {
-    idx.addPropertyIndex(test.Indexable.INT);
-
-    expect(idx.properties['int']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+  it('supports manual addIndex()', function() {
+    idxInstance.addPropertyIndex(test.Indexable.INT, idxInstance);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
 
   it('auto indexes on ordering', function() {
-    idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
+    idxInstance
+      .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-    expect(idx.properties['float']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
 
-    idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.INT));
+    idxInstance
+      .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
 
-    expect(idx.properties['int']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.INT);
+    expect(idxInstance.delegate.delegates.length).toEqual(3);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
+
   });
 
   it('skips already auto indexed orderings', function() {
-    idx.plan(sink, undefined, undefined, test.Indexable.FLOAT);
+    idxInstance
+      .plan(sink, undefined, undefined, test.Indexable.FLOAT, undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, test.Indexable.FLOAT, undefined);
 
-    expect(idx.properties['float']).toEqual(true);
-    expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
 
-    mdao.lastIndex = null;
+    idxInstance
+      .plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined, fakeRoot)
+      .execute([], sink, undefined, undefined, m.DESC(test.Indexable.FLOAT), undefined);
 
-    idx.plan(sink, undefined, undefined, m.DESC(test.Indexable.FLOAT));
-
-    expect(idx.properties['float']).toEqual(true);
-    expect(mdao.lastIndex).toBe(null);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
 
-  // it('auto indexes on predicate', function() {
-  //   idx.plan(...)
-  //
-  //   expect(idx.properties['float']).toEqual(true);
-  //   expect(mdao.lastIndex).toBe(test.Indexable.FLOAT);
-  // });
+  it('auto indexes on predicate', function() {
+
+    var pred = m.AND(
+      m.OR(
+        m.LT(test.Indexable.INT, 8),
+        m.EQ(test.Indexable.FLOAT, 4)
+      ),
+      m.CONTAINS_IC(test.Indexable.STRING, "we"),
+      m.OR(
+        m.GT(test.Indexable.INT, 8),
+        m.LTE(test.Indexable.FLOAT, 4)
+      )
+    );
+
+    pred = m.OR(
+      pred,
+      m.AND(
+        m.CONTAINS_IC(test.Indexable.STRING, "we"),
+        m.EQ(test.Indexable.DATE, "today")
+      )
+    );
+
+    pred = pred.toDisjunctiveNormalForm();
+
+    // the results end up small enough that the first index is good enough
+    // for all subpred cases
+    for ( var i = 0; i < pred.args.length; i++ ) {
+      var subpred = pred.args[i];
+      idxInstance
+        .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
+        .execute([], sink, undefined, undefined, undefined, subpred);
+    }
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+  });
+
+  it('auto indexes on more predicates', function() {
+
+    var preds = [
+      m.AND(
+        m.LT(test.Indexable.INT, 8),
+        m.EQ(test.Indexable.FLOAT, 4)
+      ),
+      m.CONTAINS_IC(test.Indexable.STRING, "we"),
+      m.LT(test.Indexable.DATE, 8)
+    ];
+
+    // the results end up small enough that the first index is good enough
+    // for all subpred cases
+    for ( var i = 0; i < preds.length; i++ ) {
+      var subpred = preds[i];
+      idxInstance
+        .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
+        .execute([], sink, undefined, undefined, undefined, subpred);
+
+      expect(idxInstance.delegate.delegates.length).toEqual(i+2);
+      expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
+    }
+  });
 
 });

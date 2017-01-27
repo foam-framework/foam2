@@ -1,4 +1,4 @@
-/*
+/**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
  *
@@ -29,8 +29,6 @@
 foam.CLASS({
   package: 'foam.core',
   name: 'Constant',
-
-  documentation: 'Constant Axiom',
 
   properties: [ 'name', 'value' ],
 

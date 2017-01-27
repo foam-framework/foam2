@@ -33,20 +33,16 @@ describe('Enum tests', function() {
       ],
 
       values: [
-        {
-          name: 'OPEN',
-          label: 'Open'
-        },
+        foam.core.internal.EnumValueAxiom.create({
+          definition: { name: 'OPEN', label: 'Open' }
+        }),
         {
           ordinal: 100,
           name: 'CLOSED',
           label: 'Closed',
           isOpen: false
         },
-        {
-          name: 'ASSIGNED',
-          label: 'Assigned'
-        }
+        'Assigned'
       ]
     });
 
@@ -66,12 +62,23 @@ describe('Enum tests', function() {
       ]
     });
 
-    var todo = Todo.create();
+    var todo = Todo.create(undefined, foam.__context__);
 
     expect(todo.status).toBe(TodoStatus.OPEN);
     expect(todo.status.toString()).toBe('OPEN');
     expect(todo.status.name).toBe('OPEN');
     expect(todo.status.label).toBe('Open');
+
+    todo.status = TodoStatus.CLOSED;
+    expect(todo.status).toBe(TodoStatus.CLOSED);
+
+    expect(function() {
+      todo.status = 'invalid enum value';
+    }).toThrow();
+
+    expect(function() {
+      todo.status = new Date();
+    }).toThrow();
 
     expect(
       foam.json.parse(
@@ -95,10 +102,12 @@ describe('Enum tests', function() {
     expect(todo.status.isOpen).toBe(false);
 
 
-    var values = TodoStatus.getValues();
+    var values = TodoStatus.VALUES;
     expect(values[0]).toBe(TodoStatus.OPEN);
     expect(values[1]).toBe(TodoStatus.CLOSED);
     expect(values[2]).toBe(TodoStatus.ASSIGNED);
+
+    expect(TodoStatus.VALUES).toBe(TodoStatus.OPEN.VALUES);
 
     expect(function() {
       foam.ENUM({
@@ -113,6 +122,21 @@ describe('Enum tests', function() {
           }
         ]
       });
+      BadEnum;
     }).toThrow();
-  })
+
+    expect(function() {
+      foam.CLASS({
+        name: 'BadTodo',
+        properties: [
+        {
+          class: 'Enum',
+          name: 'status',
+          of: 'BadTodoStatus'
+        }
+        ]
+      });
+      BadTodo;
+    }).toThrow();
+  });
 });

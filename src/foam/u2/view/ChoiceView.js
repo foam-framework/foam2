@@ -86,11 +86,10 @@ foam.CLASS({
         return nu;
       },
       postSet: function() {
-        var c = this.choice;
-        this.choice = c && (
-            this.findChoiceByData(c[0]) ||
-            this.findChoiceByText(c[1]) ||
-            this.defaultValue );
+        var d = this.data;
+        if ( this.choices.length ) {
+          this.choice = ( d && this.findChoiceByData(d) ) || this.defaultValue;
+        }
       }
     },
     {
@@ -138,7 +137,7 @@ foam.CLASS({
     {
       name: 'data',
       postSet: function(o, n) {
-        if ( o !== n ) this.choice = this.findChoiceByData(n);
+        if ( o !== n ) this.choice = this.findChoiceByData(n) || [ n, n ];
       }
     },
     {
@@ -221,6 +220,7 @@ foam.CLASS({
           delegate: foam.dao.ArraySink.create()
         })).then(function(map) {
           this.choices = map.delegate.a;
+          if ( ! this.data && this.index === -1 ) this.index = 0;
         }.bind(this));
       }
     }
