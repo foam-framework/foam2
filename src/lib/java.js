@@ -262,19 +262,29 @@ foam.CLASS({
       class: 'Boolean',
       name: 'abstract',
       value: true
+    },
+    {
+      class: 'StringArray',
+      name: 'javaThrows'
     }
   ],
 
   methods: [
     function createChildMethod_(child) {
       var m = child.clone();
-      m.returns = this.returns;
+      m.returns = child.hasOwnProperty('returns') ?
+        child.returns :
+        this.returns;
+
       m.args = child.hasOwnProperty('args') ?
         child.args :
         ( this.args || [] );
 
-      m.javaReturns = this.javaReturns;
+      m.javaReturns = child.hasOwnProperty('javaReturns') ?
+        child.javaReturns : this.javaReturns;
       m.sourceCls_ = child.sourceCls_;
+
+      child.throws = this.throws;
       return m;
     },
 
@@ -285,6 +295,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
             name: a.name,
