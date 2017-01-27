@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'dao',
       hidden: true,
       factory: function() {
-        return this.__context__[this.of.id + 'DAO'];
+        return this.__context__[foam.String.daoize(this.of.name)];
       }
     },
     {
