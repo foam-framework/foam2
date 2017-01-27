@@ -460,6 +460,18 @@ console.log(View.create({of: C}).view());
 
 
 foam.CLASS({
+  name: 'ClassTest',
+  properties: [
+    { name: 'cls', class: 'Class' },
+    { name: 'str', class: 'String' }
+  ]
+});
+var ct = ClassTest.create();
+foam.u2.DetailView.create({data: ct}).write();
+foam.u2.DetailView.create({data: ct}).write();
+
+/*
+foam.CLASS({
   package: 'foam.core',
   name: 'IntProperty',
   extends: 'foam.core.Int'
@@ -489,3 +501,4 @@ foam.CLASS({
 FacetTest.describe();
 
 console.log(foam.core.Property.create({of: 'String'}).cls_.id);
+*/
