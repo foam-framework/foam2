@@ -326,6 +326,19 @@ describe('MDAO with TreeIndex', function() {
       }).then(done);
   });
 
+  it('selects negated queries', function(done) {
+    PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_SINGLE))).select()
+      .then(
+        function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_SINGLE.length); }
+      ).then(
+        PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_A_FEW))).select()
+          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_A_FEW.length); })
+      ).then(
+        PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_LOTS))).select()
+          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_LOTS.length); })
+      ).then(done);
+  });
+
 
 });
 
