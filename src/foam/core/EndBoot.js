@@ -68,17 +68,17 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'Method',
       name: 'methods',
-      adaptArrayElement: function(o) {
+      adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
           foam.assert(o.name, 'Method must be named');
-          var m = foam.core.Method.create();
+          var m = foam.lookup(prop.of).create();
           m.name = o.name;
           m.code = o;
           return m;
         }
-        if ( foam.core.Method.isInstance(o) ) return o;
+        if ( foam.lookup(prop.of).isInstance(o) ) return o;
         if ( o.class ) return this.lookup(o.class).create(o, this);
-        return foam.core.Method.create(o);
+        return foam.lookup(prop.of).create(o);
       }
     }
   ]

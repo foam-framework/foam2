@@ -56,16 +56,14 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInProto(proto) {
-      var superAxiom = proto.cls_.getSuperAxiomByName(this.name);
-
+    function installInProto(proto, superAxiom) {
       foam.assert(
         ! superAxiom ||
           foam.core.Listener.isInstance(superAxiom),
         'Attempt to override non-listener', this.name);
 
       var name       = this.name;
-      var code       = this.override_(proto, foam.Function.setName(this.code, name));
+      var code       = this.override_(proto, foam.Function.setName(this.code, name), superAxiom);
       var isMerged   = this.isMerged;
       var isFramed   = this.isFramed;
       var mergeDelay = this.mergeDelay;

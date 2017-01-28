@@ -155,6 +155,7 @@ FOAM_FILES([
   { name: "foam/u2/view/TreeView", flags: ['web'] },
   { name: "foam/u2/view/DualView", flags: ['web'] },
   { name: "foam/u2/view/ColorPicker", flags: ['web'] },
+  { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
   { name: "foam/u2/tag/Card", flags: ['web'] },
   { name: "foam/u2/dialog/Popup", flags: ['web'] },
