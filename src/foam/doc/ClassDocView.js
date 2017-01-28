@@ -9,7 +9,10 @@ foam.CLASS({
     },
     {
       name: 'cls',
-      label: 'Source Class'
+      label: 'Source Class',
+      tableCellView: function(o, e) {
+        return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
+      }
     },
     {
       name: 'name'
@@ -24,6 +27,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.doc.Link',
     'foam.doc.AxiomInfo',
     'foam.u2.TableView',
     'foam.dao.ArrayDAO'
@@ -44,7 +48,10 @@ foam.CLASS({
         var a = data.axiomMap_[key];
         var ai = foam.doc.AxiomInfo.create({
           type: a.cls_ ? a.cls_.name : 'anonymous',
-          cls: a.sourceCls_.name,
+          cls: this.Link.create({
+            path: a.sourceCls_.id,
+            label: a.sourceCls_.name
+          }),
           name: a.name
         });
         axs.push(ai);
@@ -60,6 +67,44 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.doc',
+  name: 'Link',
+
+  properties: [
+    'path',
+    'label'
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.doc',
+  name: 'LinkView',
+  extends: 'foam.u2.View',
+
+  imports: [ 'browserPath' ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      this.setNodeName('a').
+        on('click', this.click).
+        attrs({href: this.data.path}).
+        add(this.data.label);
+    }
+  ],
+
+  listeners: [
+    function click(e) {
+      this.browserPath$.set(this.data.path);
+      e.preventDefault();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.doc',
   name: 'DocBrowser',
   extends: 'foam.u2.Element',
 
@@ -68,7 +113,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'as data'
+    'as data',
+    'path as browserPath'
   ],
 
   properties: [
@@ -79,10 +125,10 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.add('Path: ', this.PATH).br();
+      this.add('Path: ', this.PATH).br().br();
 
       this.add(this.slot(function(path) {
-        var o = foam.lookup(path);
+        var o = foam.lookup(path, true);
         if ( ! o ) return '';
         return this.ClassDocView.create({data: o});
       }));
