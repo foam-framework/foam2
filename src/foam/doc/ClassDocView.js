@@ -5,7 +5,12 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'type'
+      name: 'type',
+      tableCellView: function(o, e) {
+        return o.type ?
+          foam.doc.LinkView.create({data: foam.doc.Link.create({path: o.type.id, label: o.type.name})}, e.__subSubContext__) :
+          'anonymous';
+      }
     },
     {
       name: 'cls',
@@ -47,7 +52,7 @@ foam.CLASS({
       for ( var key in data.axiomMap_ ) {
         var a = data.axiomMap_[key];
         var ai = foam.doc.AxiomInfo.create({
-          type: a.cls_ ? a.cls_.name : 'anonymous',
+          type: a.cls_, //a.cls_ ? a.cls_.name : 'anonymous',
           cls: this.Link.create({
             path: a.sourceCls_.id,
             label: a.sourceCls_.name
