@@ -1,3 +1,4 @@
+
 foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomInfo',
@@ -57,4 +58,38 @@ foam.CLASS({
   ]
 });
 
-foam.doc.ClassDocView.create({data: foam.core.Property}).write();
+foam.CLASS({
+  package: 'foam.doc',
+  name: 'DocBrowser',
+  extends: 'foam.u2.Element',
+
+  requires: [
+    'foam.doc.ClassDocView'
+  ],
+
+  exports: [
+    'as data'
+  ],
+
+  properties: [
+    'path'
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      this.add('Path: ', this.PATH).br();
+
+      this.add(this.slot(function(path) {
+        var o = foam.lookup(path);
+        if ( ! o ) return '';
+        return this.ClassDocView.create({data: o});
+      }));
+    }
+  ]
+});
+
+// foam.doc.ClassDocView.create({data: foam.core.Property}).write();
+
+foam.doc.DocBrowser.create({path: 'foam.core.Property'}).write();
