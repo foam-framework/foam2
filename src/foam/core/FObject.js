@@ -118,6 +118,8 @@ foam.LIB({
       // We install in two passes to avoid ordering issues from Axioms which
       // need to access other axioms, like ids: and exports:.
 
+      var existing = new Array(axs.length);
+
       for ( var i = 0 ; i < axs.length ; i++ ) {
         var a = axs[i];
 
@@ -126,14 +128,20 @@ foam.LIB({
         // reused without corrupting the sourceCls_.
         a.sourceCls_ = this;
 
+        if ( Object.prototype.hasOwnProperty.call(this.axiomMap_, a.name) ) {
+          existing[i] = this.axiomMap_[a.name];
+        }
+
         this.axiomMap_[a.name] = a;
       }
 
       for ( var i = 0 ; i < axs.length ; i++ ) {
         var a = axs[i];
 
-        a.installInClass && a.installInClass(this);
-        a.installInProto && a.installInProto(this.prototype);
+        var superAxiom = this.getSuperAxiomByName(a.name);
+
+        a.installInClass && a.installInClass(this,           superAxiom, existing[i]);
+        a.installInProto && a.installInProto(this.prototype, superAxiom, existing[i]);
 
         if ( a.name ) {
           this.pubsub_ && this.pubsub_.pub('installAxiom', a.name, a);

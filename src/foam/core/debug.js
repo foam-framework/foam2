@@ -537,9 +537,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInClass(c) {
+    function installInClass(c, superImport) {
       // Produce warning for duplicate imports
-      if ( c.getSuperAxiomByName(this.name) ) {
+      if ( superImport ) {
         this.warn(
           'Import "' + this.name + '" already exists in ancestor class of ' +
           c.id + '.');

@@ -213,9 +213,8 @@ foam.CLASS({
       Handle overriding of Property definition from parent class by
       copying undefined values from parent Property, if it exists.
     */
-    function installInClass(c) {
+    function installInClass(c, superProp, existingProp) {
       var prop      = this;
-      var superProp = c.getSuperAxiomByName(prop.name);
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);

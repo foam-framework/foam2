@@ -139,7 +139,8 @@ foam.CLASS({
       documentation: 'Dummy property to silence warnings',
       setter: function() {},
       getter: function() {}
-    }
+    },
+    { class: 'StringArray', name: 'throws' }
   ],
 
   methods: [
@@ -153,7 +154,17 @@ foam.CLASS({
         if ( i != this.args.length - 1 ) o.out(', ');
       }
 
-      o.out(');\n');
+      o.out(')');
+
+      if ( this.throws.length > 0 ) {
+        o.out(" throws ");
+        for ( var i = 0 ; i < this.throws.length ; i++ ) {
+          o.out(this.throws[i]);
+          if ( i < this.throws.length - 1 ) o.out(", ");
+        }
+      }
+
+      o.out(';\n');
     }
   ]
 });
@@ -173,6 +184,7 @@ foam.CLASS({
       of: 'foam.java.Argument',
       name: 'args'
     },
+    { class: 'StringArray', name: 'throws' },
     { class: 'foam.java.CodeProperty', name: 'body' }
   ],
 
@@ -187,7 +199,17 @@ foam.CLASS({
         o.out(this.args[i]);
         if ( i != this.args.length - 1 ) o.out(', ');
       }
-      o.out(')', ' {\n');
+      o.out(')');
+
+      if ( this.throws.length > 0 ) {
+        o.out(" throws ");
+        for ( var i = 0 ; i < this.throws.length ; i++ ) {
+          o.out(this.throws[i]);
+          if ( i < this.throws.length - 1 ) o.out(", ");
+        }
+      }
+
+      o.out(' {\n');
 
       o.increaseIndent();
       o.out(this.body);
@@ -426,7 +448,7 @@ foam.CLASS({
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
 
-      if ( this.hasDefaultValue('extends') ) {
+      if ( this.extends.length > 0 ) {
         o.out(' extends ');
         for ( var i = 0 ; i < this.extends.length ; i++ ) {
           o.out(this.extends[i]);
@@ -538,7 +560,8 @@ foam.LIB({
         type: 'foam.core.ClassInfo',
         visibility: 'public',
         body: 'return classInfo_;'
-      })
+      });
+
       cls.method({
         name: 'getOwnClassInfo',
         visibility: 'public',
@@ -1027,5 +1050,15 @@ foam.CLASS({
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DateParser']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Map',
+  properties: [
+    ['javaType', 'java.util.Map'],
+    ['javaJSONParser', 'foam.lib.json.MapParser'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaFactory', 'return new java.util.HashMap();']
   ]
 });
