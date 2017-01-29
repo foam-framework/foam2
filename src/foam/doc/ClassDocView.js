@@ -5,6 +5,10 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'axiom',
+      hidden: true
+    },
+    {
       name: 'type',
       tableCellView: function(o, e) {
         return o.type ?
@@ -52,6 +56,7 @@ foam.CLASS({
       for ( var key in data.axiomMap_ ) {
         var a = data.axiomMap_[key];
         var ai = foam.doc.AxiomInfo.create({
+          axiom: a,
           type: a.cls_, //a.cls_ ? a.cls_.name : 'anonymous',
           cls: this.Link.create({
             path: a.sourceCls_.id,
@@ -123,7 +128,11 @@ foam.CLASS({
   ],
 
   properties: [
-    'path'
+    'path',
+    {
+      class: 'FObjectProperty',
+      name: 'axiom'
+    }
   ],
 
   methods: [
@@ -132,11 +141,21 @@ foam.CLASS({
 
       this.add('Path: ', this.PATH).br().br();
 
-      this.add(this.slot(function(path) {
-        var o = foam.lookup(path, true);
-        if ( ! o ) return '';
-        return this.ClassDocView.create({data: o});
-      }));
+      this.
+        start('table').
+          start('tr').
+            start('td').
+              add(this.slot(function(path) {
+                var o = foam.lookup(path, true);
+                if ( ! o ) return '';
+                return this.ClassDocView.create({data: o});
+              })).
+            end().
+            start('td').
+              add(this.AXIOM).
+            end().
+          end().
+        end();
     }
   ]
 });
