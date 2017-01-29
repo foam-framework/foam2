@@ -1,4 +1,3 @@
-
 foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomInfo',
@@ -37,6 +36,7 @@ foam.CLASS({
 
   requires: [
     'foam.doc.Link',
+    'foam.doc.ClassLink',
     'foam.doc.AxiomInfo',
     'foam.u2.TableView',
     'foam.dao.ArrayDAO'
@@ -49,7 +49,7 @@ foam.CLASS({
       var data = this.data;
 
       this.add('CLASS: ', data.name).br();
-      this.add('extends: ', data.model_.extends).br();
+      this.add('extends: ').start(this.ClassLink, {data: data.model_.extends}).end().br();
       this.add(data.documentation);
 
       var axs = [];
@@ -57,7 +57,7 @@ foam.CLASS({
         var a = data.axiomMap_[key];
         var ai = foam.doc.AxiomInfo.create({
           axiom: a,
-          type: a.cls_, //a.cls_ ? a.cls_.name : 'anonymous',
+          type: a.cls_,
           cls: this.Link.create({
             path: a.sourceCls_.id,
             label: a.sourceCls_.name
@@ -74,6 +74,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.doc',
@@ -107,6 +108,40 @@ foam.CLASS({
   listeners: [
     function click(e) {
       this.browserPath$.set(this.data.path);
+      e.preventDefault();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.doc',
+  name: 'ClassLink',
+  extends: 'foam.u2.View',
+
+  imports: [ 'browserPath' ],
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'data'
+    }
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      this.setNodeName('a').
+        on('click', this.click).
+        attrs({href: this.data.id}).
+        add(this.data.name);
+    }
+  ],
+
+  listeners: [
+    function click(e) {
+      this.browserPath$.set(this.data.id);
       e.preventDefault();
     }
   ]
