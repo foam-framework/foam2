@@ -8,18 +8,18 @@ foam.CLASS({
       hidden: true
     },
     {
+      name: 'cls',
+      label: 'Source Class',
+      tableCellView: function(o, e) {
+        return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
+      }
+    },
+    {
       name: 'type',
       tableCellView: function(o, e) {
         return o.type ?
           foam.doc.LinkView.create({data: foam.doc.Link.create({path: o.type.id, label: o.type.name})}, e.__subSubContext__) :
           'anonymous';
-      }
-    },
-    {
-      name: 'cls',
-      label: 'Source Class',
-      tableCellView: function(o, e) {
-        return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
       }
     },
     {
