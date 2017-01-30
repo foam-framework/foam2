@@ -207,17 +207,17 @@ foam.CLASS({
   templates: [
     {
       name: 'sendMethodCode',
-      template: function() {/*if ( ! ( message instanceof foam.box.RPCMessage) ) {
+      template: function() {/*if ( ! ( message.getObject() instanceof foam.box.RPCMessage) ) {
       // TODO error to errorBox
       return;
     }
 
-    foam.box.RPCMessage rpc = (foam.box.RPCMessage)message;
-    foam.box.Box replyBox = message.getReplyBox();
+    foam.box.RPCMessage rpc = (foam.box.RPCMessage)message.getObject();
+    foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
     Object result = null;
 
     switch ( rpc.getName() ) {<%
-  var methods = this.of.getAxiomsByClass(foam.core.Method);
+  var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
       case "<%= m.name %>":
@@ -239,7 +239,7 @@ foam.CLASS({
       foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
       reply.setData(result);
 
-      replyBox.send(reply);
+      replyBox.send(getX().create(foam.box.Message.class).setObject(reply));
     }*/}
     }
   ]
@@ -262,17 +262,29 @@ foam.CLASS({
       class: 'Boolean',
       name: 'abstract',
       value: true
+    },
+    {
+      class: 'StringArray',
+      name: 'javaThrows'
     }
   ],
 
   methods: [
     function createChildMethod_(child) {
       var m = child.clone();
-      m.returns = this.returns;
-      // Avoid forcing arguments to be parsed if they haven't already been
-      m.args = this.hasOwnProperty('args') ? this.args : [];
-      m.javaReturns = this.javaReturns;
+      m.returns = child.hasOwnProperty('returns') ?
+        child.returns :
+        this.returns;
+
+      m.args = child.hasOwnProperty('args') ?
+        child.args :
+        ( this.args || [] );
+
+      m.javaReturns = child.hasOwnProperty('javaReturns') ?
+        child.javaReturns : this.javaReturns;
       m.sourceCls_ = child.sourceCls_;
+
+      child.throws = this.throws;
       return m;
     },
 
@@ -283,6 +295,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
             name: a.name,
@@ -394,20 +407,26 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.core.Interface',
-  methods: [
-    function buildJavaClass(cls) {
-      cls = cls || foam.java.Interface.create();
+  refines: 'foam.core.AbstractInterface',
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.Interface.create();
 
-      cls.name = this.name;
-      cls.package = this.package;
-      cls.extends = this.extends;
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
 
-      for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
-        this.axioms_[i].buildJavaClass && this.axioms_[i].buildJavaClass(cls);
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
       }
-
-      return cls;
     }
   ]
 });

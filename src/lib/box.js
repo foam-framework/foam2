@@ -34,7 +34,6 @@ foam.INTERFACE({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.box',
   name: 'PromisedBox',
@@ -48,54 +47,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'Message',
-
-  properties: [
-    {
-      class: 'FObjectProperty',
-      name: 'replyBox',
-      of: 'foam.box.Box'
-    },
-    {
-      class: 'FObjectProperty',
-      name: 'errorBox',
-      of: 'foam.box.Box'
-    }
-  ],
-
-  methods: [
-    function toRemote() {
-      this.replyBox = ( this.replyBox && this.replyBox.exportBox ) ? this.replyBox.exportBox() : this.replyBox;
-      this.errorBox = ( this.errorBox && this.errorBox.exportBox ) ? this.errorBox.exportBox() : this.errorBox;
-      return this;
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'WrappedMessage',
-  extends: 'foam.box.Message',
-  properties: [
-    {
-      class: 'FObjectProperty',
-      name: 'message',
-      of: 'foam.box.Message'
-    }
-  ],
-  methods: [
-    function toRemote() {
-      this.message = this.message && this.message.toRemote();
-      return this.SUPER();
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.box',
@@ -111,166 +62,38 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.box',
-  name: 'MessagePortBox',
-  extends: 'foam.box.ProxyBox',
-
-  requires: [
-    'foam.box.MessagePortConnectBox',
-    'foam.box.RawMessagePortBox',
-    'foam.box.RegisterSelfMessage'
-  ],
-
-  imports: [
-    'messagePortService',
-    'me'
-  ],
+  name: 'Message',
 
   properties: [
     {
-      name: 'port'
+      class: 'Map',
+      name: 'attributes'
     },
     {
-      name: 'delegate',
-      factory: function() {
-        var delegate = this.RawMessagePortBox.create({
-          port: this.port
-        });
-
-        this.messagePortService.addPort(this.port);
-        delegate.send(this.RegisterSelfMessage.create({ name: this.me.name }));
-
-        return delegate;
-      }
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject',
+      name: 'object'
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'RawMessagePortBox',
-  implements: ['foam.box.Box'],
-
-  properties: [
-    {
-      name: 'port'
-    }
-  ],
-
-  methods: [
-    function send(msg) {
-      this.port.postMessage(foam.json.Network.stringify(msg));
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'EchoBox',
-
-  implements: [ 'foam.box.Box' ],
-
-  methods: [
-    {
-      name: 'send',
-      code: function (msg) {
-        if ( msg.replyBox ) {
-          var reply = msg.replyBox;
-          msg.clearProperty('replyBox');
-          reply.send(msg);
-        }
-      },
-      javaCode: 'foam.box.Box b = message.getReplyBox();\n'
-                + 'if ( b != null ) {\n'
-                + '  message.setReplyBox(null);\n'
-                + '  b.send(message);\n'
-                + '}'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'ForwardMessage',
-  extends: 'foam.box.WrappedMessage',
-
-  properties: [
-    {
-      name: 'nextBox'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'ForwardBox',
-  requires: [
-    'foam.box.ForwardMessage'
-  ],
-
-  methods: [
-    function send(msg) {
-      if ( this.ForwardMessage.isInstance(msg) ) {
-        msg.nextBox.send(msg.msg);
-      }
-    }
-  ]
-});
-
-
-/*
-TODO:
--Figure out correct serialization of messages.  JSON isn't quite right.
-
--figure out how to serialize a postMessage.  How do we encode the
-"address" of a window object, we can't pass them around, can we?
-We _could_ pass message channels, but they have to be transferred, that's complicated
-We could have some registry of known "windows"
-
-Windows can be nammed with window.open(url, name), we can keep a registry of known names.
-On open, register opener.name.  Names could be GUIDs.
-
-Worker's can't be named.  But the first thing we can do when creating a worker is to register.
-
-When booting FOAM, we pick a name
-
-Current solution:
-MessagePortService has a .start() and .connect() methods.
-.start() puts the service in server mode,
-.connect() connects to another service in server mode.
-
-In server mode, when other services connect, it assigns them a unique id and tells
-them what it is.  This way every MessagePortService gets its own unique id assuming
-there's only one operating in server mode.
-
-The server will usually be placed in a SharedWorker or similar.
-
-HTTP Box?
-
-WebSocket Box
-
-*/
-
 
 foam.CLASS({
   package: 'foam.box',
   name: 'SubBoxMessage',
-  extends: 'foam.box.WrappedMessage',
-
   properties: [
     {
       class: 'String',
       name: 'name'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject',
+      name: 'object'
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.box',
@@ -292,14 +115,18 @@ foam.CLASS({
     {
       name: 'send',
       code: function(msg) {
-        this.delegate.send(this.SubBoxMessage.create({
+        msg.object = this.SubBoxMessage.create({
           name: this.name,
-          message: msg
-        }));
+          object: msg.object
+        });
+        this.delegate.send(msg);
       },
-      javaCode: 'getDelegate().send(getX().create(foam.box.SubBoxMessage.class)\n'
-                + '  .setName(getName())\n'
-                + '  .setMessage(message));\n'
+      javaCode: function() {/*
+getDelegate().send(message.setObject(
+    getX().create(foam.box.SubBoxMessage.class)
+        .setName(getName())
+        .setObject(message.getObject())));
+*/}
     }
   ]
 });
@@ -310,7 +137,10 @@ foam.CLASS({
   name: 'NameAlreadyRegisteredException',
 
   properties: [
-    'name'
+    {
+      class: 'Stirng',
+      name: 'name'
+    }
   ]
 });
 
@@ -319,7 +149,12 @@ foam.CLASS({
   package: 'foam.box',
   name: 'NoSuchNameException',
 
-  properties: [ 'name' ]
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    }
+  ]
 });
 
 
@@ -483,9 +318,9 @@ foam.CLASS({
     {
       name: 'send',
       code: function(msg) {
-        if ( this.SubBoxMessage.isInstance(msg) ) {
-          if ( this.registry[msg.name].localBox ) {
-            this.registry[msg.name].localBox.send(msg.message);
+        if ( this.SubBoxMessage.isInstance(msg.object) ) {
+          if ( this.registry[msg.object.name].localBox ) {
+            this.registry[msg.object.name].localBox.send(msg.object.object);
           } else {
             // TODO: Error case if no sub box found
           }
@@ -493,16 +328,15 @@ foam.CLASS({
           this.registrySkeleton.send(msg);
         }
       },
-      javaCode: 'if ( message instanceof foam.box.SubBoxMessage ) {\n'
-              + '  foam.box.SubBoxMessage subBoxMessage = (foam.box.SubBoxMessage)message;\n'
-              + '  ((Registration)getRegistry().get(subBoxMessage.getName())).getLocalBox().send(subBoxMessage.getMessage());\n'
-              + '} else {\n'
-              + '  throw new RuntimeException("Invalid message type" + message.getClass().getName());\n'
-              + '}'
-    },
-
-    function toRemote() {
-      return this.me;
+      javaCode: function() {/*
+if ( message.getObject() instanceof foam.box.SubBoxMessage ) {
+  foam.box.SubBoxMessage subBoxMessage = (foam.box.SubBoxMessage)message.getObject();
+  message.setObject(subBoxMessage.getObject());
+  ((Registration)getRegistry().get(subBoxMessage.getName())).getLocalBox().send(message);
+} else {
+  throw new RuntimeException("Invalid message type " + message.getClass().getName());
+}
+*/}
     }
   ]
 });
@@ -648,9 +482,6 @@ foam.CLASS({
       }
 
       this.delegate.send(this.message);
-    },
-    function toRemote() {
-      return this.errorBox;
     }
   ]
 });
@@ -689,7 +520,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCReturnMessage',
-  extends: 'foam.box.Message',
   properties: [
     {
       class: 'Object',
@@ -702,7 +532,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'SubscribeMessage',
-  extends: 'foam.box.Message',
   properties: [
     {
       name: 'topic'
@@ -754,12 +583,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCMessage',
-  extends: 'foam.box.Message',
-
-  requires: [
-    'foam.box.RPCReturnMessage'
-  ],
-
   properties: [
     {
       class: 'String',
@@ -768,27 +591,6 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'args'
-    }
-  ],
-
-  methods: [
-    function call(obj) {
-      var p = obj[this.name].apply(obj, this.args);
-      if ( ! this.replyBox ) return;
-
-      if ( p instanceof Promise ) {
-        p.then(
-          function(data) {
-            // Do we need to package data into a message?
-            this.replyBox.send(
-              this.RPCReturnMessage.create({ data: data }));
-          }.bind(this),
-          function(error) {
-            // TODO
-          }.bind(this));
-      } else {
-        this.replyBox.send(this.RPCReturnMessage.create({ data: p }));
-      }
     }
   ]
 });
@@ -904,7 +706,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'EventMessage',
-  extends: 'foam.box.Message',
 
   properties: [
     {
@@ -934,33 +735,26 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      if ( ! this.EventMessage.isInstance(msg) ) {
+      if ( ! this.EventMessage.isInstance(msg.object) ) {
         throw this.InvalidMessageException.create({
           messageType: message.cls_.id
         });
       }
 
-      this.target.pub.apply(this.target, msg.args);
+      this.target.pub.apply(this.target, msg.object.args);
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'DiscoverMessage',
-  extends: 'foam.box.Message'
-});
-
 
 foam.CLASS({
   package: 'foam.box',
   name: 'SkeletonBox',
 
   requires: [
+    'foam.box.Message',
     'foam.box.SubscribeMessage',
+    'foam.box.EventMessage',
     'foam.box.RPCMessage',
-    'foam.box.DiscoverMessage',
     'foam.box.InvalidMessageException'
   ],
 
@@ -971,14 +765,38 @@ foam.CLASS({
   ],
 
   methods: [
+    function call(obj) {
+      var p = obj[this.name].apply(obj, this.args);
+      if ( ! this.replyBox ) return;
+
+      if ( p instanceof Promise ) {
+        p.then(
+          function(data) {
+            // Do we need to package data into a message?
+            this.replyBox.send(this.Message.create({
+              object: this.RPCReturnMessage.create({ data: data })
+            }));
+          }.bind(this),
+          function(error) {
+            // TODO
+          }.bind(this));
+      } else {
+        this.replyBox.send(this.Message.create({
+          object: this.RPCReturnMessage.create({ data: p })
+        }));
+      }
+    },
+
     function send(message) {
-      if ( this.RPCMessage.isInstance(message) ) {
-        message.call(this.data);
+      if ( this.RPCMessage.isInstance(message.object) ) {
+        this.call(this.data);
         return;
-      } else if ( this.SubscribeMessage.isInstance(message) ) {
+      } else if ( this.SubscribeMessage.isInstance(message.object) ) {
         // TODO: Unsub support
-        var dest = message.replyBox;
-        var args = message.topic.slice();
+        var dest = message.attributes.replyBox;
+        var args = message.object.topic.slice();
+
+        var self = this;
 
         args.push(function() {
           var args = Array.from(arguments);
@@ -986,8 +804,10 @@ foam.CLASS({
           // Cannot serialize the subscription object.
           args.shift();
 
-          dest.send(foam.box.EventMessage.create({
-            args: args
+          dest.send(self.Message.create({
+            object: self.EventMessage.create({
+              args: args
+            })
           }));
         });
 
@@ -1002,48 +822,20 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  package: 'foam.box',
-  name: 'LoggingBox',
-
-  extends: 'foam.box.ProxyBox',
-
-  properties: [
-    'name'
-  ],
-
-  methods: [
-    function send(msg) {
-      this.log(this.name, ":", foam.json.Network.stringify(msg));
-      this.delegate && this.delegate.send(msg);
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.box',
   name: 'NullBox',
 
-  implements: ['foam.box.Box']
-});
+  implements: ['foam.box.Box'],
 
-
-// Various messages
-foam.CLASS({
-  package: 'foam.box',
-  name: 'TextMessage',
-  extends: 'foam.box.Message',
-
-  properties: [
+  methods: [
     {
-      class: 'String',
-      name: 'data'
+      name: 'send',
+      code: function() {},
+      javaCode: 'return;'
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.box',
@@ -1411,6 +1203,55 @@ foam.CLASS({
       code: function(m) {
         throw 'unimplemented';
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'AuthenticatedBox',
+  extends: 'foam.box.ProxyBox',
+  imports: [
+    'idToken'
+  ],
+  methods: [
+    function send(m) {
+      m.attributes.idToken = this.idToken;
+      this.SUPER(m);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'CheckAuthenticationBox',
+  extends: 'foam.box.ProxyBox',
+  imports: [
+    'tokenVerifier'
+  ],
+  methods: [
+    {
+      name: 'send',
+      code: function send() {
+        throw new Error('Unimplemented.');
+      },
+      javaCode: function() {/*
+try {
+  String token = (String)message.getAttributes().get("idToken");
+
+  if ( token == null ) {
+    throw new java.security.GeneralSecurityException("No ID Token present.");
+  }
+
+  String principal = ((com.google.auth.TokenVerifier)getTokenVerifier()).verify(token);
+
+  message.getAttributes().put("principal", principal);
+
+  super.send(message);
+} catch ( java.security.GeneralSecurityException e) {
+  throw new RuntimeException("Failed to verify token.", e);
+}
+*/}
     }
   ]
 });

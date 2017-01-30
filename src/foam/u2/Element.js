@@ -515,19 +515,19 @@ foam.CLASS({
     // Used to generate valid HTML output.
     // Used by ElementParser for valid HTML parsing.
     ILLEGAL_CLOSE_TAGS: {
-      area: true,
-      base: true,
-      basefont: true,
-      br: true,
-      col: true,
-      frame: true,
-      hr: true,
-      img: true,
-      input: true,
-      isindex: true,
-      link: true,
-      meta: true,
-      param: true
+      AREA: true,
+      BASE: true,
+      BASEFONT: true,
+      BR: true,
+      COL: true,
+      FRAME: true,
+      HR: true,
+      IMG: true,
+      INPUT: true,
+      ISINDEX: true,
+      LINK: true,
+      META: true,
+      PARAM: true
     },
 
     __ID__: [ 0 ],
@@ -1910,6 +1910,15 @@ foam.CLASS({
         viewb: { class: 'foam.u2.view.ColorPicker', onKey: true }
       }
     }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Class',
+  flags: { noWarnOnRefinesAfterCreate: true },
+  properties: [
+    [ 'view', { class: 'foam.u2.ClassView' } ]
   ]
 });
 

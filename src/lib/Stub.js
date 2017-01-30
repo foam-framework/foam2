@@ -86,11 +86,14 @@ foam.CLASS({
                   }
                 }
 
-                var msg = this.RPCMessage.create({
-                  name: m.name,
-                  args: Array.from(arguments)
+                var msg = this.Message.create({
+                  object: this.RPCMessage.create({
+                    name: m.name,
+                    args: Array.from(arguments)
+                  })
                 });
-                if ( exportBox ) msg.replyBox = exportBox;
+
+                if ( exportBox ) msg.attributes.replyBox = exportBox;
 
                 this[propName].send(msg);
 
@@ -110,6 +113,7 @@ foam.CLASS({
         'foam.box.RPCReturnBox',
         'foam.box.ReplyBox',
         'foam.box.RPCMessage',
+        'foam.box.Message'
       ].map(function(s) {
         var path = s.split('.');
         return foam.core.Requires.create({

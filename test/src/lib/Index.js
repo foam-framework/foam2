@@ -845,9 +845,9 @@ describe('AND', function() {
       test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create()),
       1
     );
-    
+
     expect(andIndex.prop).toEqual(test.Indexable.FLOAT);
-    
+
   });
 
 });
@@ -985,6 +985,5 @@ describe('AutoIndex', function() {
       expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
     }
   });
-
 
 });

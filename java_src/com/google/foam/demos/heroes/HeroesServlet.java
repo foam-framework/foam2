@@ -85,7 +85,7 @@ public class HeroesServlet extends HttpServlet {
 
     daoSkeleton.send(msg);
 
-    if ( ! ( msg.getReplyBox() instanceof foam.box.HTTPReplyBox ) ) {
+    if ( ! ( msg.getAttributes().get("replyBox") instanceof foam.box.HTTPReplyBox ) ) {
       resp.setStatus(resp.SC_OK);
       resp.flushBuffer();
     }

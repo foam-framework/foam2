@@ -33,15 +33,6 @@ describe('FlowControl', function() {
 
 });
 
-describe('Sink Interface', function() {
-
-  it('covers empty methods', function() {
-    var sinkMethods = foam.dao.Sink.getAxiomsByClass(foam.core.Method).map(
-      function(m) { return m.code(); } );
-  });
-
-});
-
 describe('AbstractSink', function() {
   it('covers empty methods', function() {
     var sink = foam.dao.AbstractSink.create();
