@@ -962,6 +962,20 @@ describe('AutoIndex', function() {
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
   });
 
+  it('dnf works with NOT', function() {
+
+    var pred = m.OR(
+      m.NOT(m.HAS(test.Indexable.STRING)),
+      m.EQ(test.Indexable.STRING, 'none')
+    );
+
+    pred = pred.toDisjunctiveNormalForm();
+
+    console.log("NOT pred", pred);
+  });
+
+
+
   it('auto indexes on more predicates', function() {
 
     var preds = [
