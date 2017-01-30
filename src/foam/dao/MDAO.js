@@ -43,7 +43,12 @@ foam.CLASS({
     {
       class: 'Class',
       name:  'of',
-      required: true
+      required: true,
+      postSet: function() {
+        foam.assert(this.of.ID, "MDAO.of must be assigned a FOAM Class " +
+          "with an 'id' Property or 'ids' array specified. Missing id in " +
+          "class: " + ( this.of && this.of.id ));
+      }
     },
     {
       class: 'Boolean',
@@ -54,7 +59,7 @@ foam.CLASS({
       name: 'idIndex'
     },
     {
-      /** The createNodeed root instance of our index. */
+      /** The root IndexNode of our index. */
       name: 'index'
     }
   ],
@@ -255,7 +260,7 @@ foam.CLASS({
         );
       }
 
-      return this.MergePlan.create({ subPlans: plans });
+      return this.MergePlan.create({ of: this.of, subPlans: plans });
     },
 
     function toString() {
