@@ -48,7 +48,7 @@ foam.CLASS({
 
       var data = this.data;
 
-      this.add('CLASS: ', data.name).br();
+      this.add('CLASS: ', data.name, ' (', data.count_, ')').br();
       this.add('extends: ');
       var cls = data;
       for ( var i = 0 ; cls ; i++ ) {
