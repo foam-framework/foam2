@@ -49,7 +49,15 @@ foam.CLASS({
       var data = this.data;
 
       this.add('CLASS: ', data.name).br();
-      this.add('extends: ').start(this.ClassLink, {data: data.model_.extends}).end().br();
+      this.add('extends: ');
+      var cls = data;
+      for ( var i = 0 ; cls ; i++ ) {
+        cls = this.lookup(cls.model_.extends, true);
+        if ( i ) this.add(' : ');
+        this.start(this.ClassLink, {data: cls}).end();
+        if ( cls === foam.core.FObject ) break;
+      }
+      this.br();
       this.add(data.documentation);
 
       var axs = [];
