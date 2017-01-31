@@ -33,6 +33,7 @@ var classes = [
   'foam.mlang.predicate.False',
   'foam.mlang.predicate.And',
   'foam.mlang.predicate.Gt',
+  'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Or',
   'foam.mlang.predicate.AbstractPredicate',
   'foam.mlang.predicate.Nary',
@@ -40,8 +41,8 @@ var classes = [
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.Contains',
   'foam.mlang.predicate.StartsWithIC',
-  'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Lt',
+  'foam.mlang.predicate.Lte',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
@@ -78,7 +79,9 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
-  'foam.mlang.sink.Count'
+  'foam.mlang.sink.Count',
+  'foam.core.AbstractEnum',
+  'foam.core.Enum'
 ];
 
 var abstractClasses = [
