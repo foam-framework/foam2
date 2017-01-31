@@ -24,6 +24,9 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.createView = function(spec, args, that, ctx) {
+          if ( spec === undefined || spec === null )
+            return undefined;
+
           if ( foam.u2.Element.isInstance(spec) )
             return spec;
 
