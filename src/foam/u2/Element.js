@@ -1946,7 +1946,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Enum',
-      of: 'foam.uw.ControllerMode',
+      of: 'foam.u2.ControllerMode',
       name: 'controllerMode'
     }
   ]
