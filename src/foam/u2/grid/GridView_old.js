@@ -9,8 +9,8 @@ foam.CLASS
 
     requires:
     [
-        "foam.u2.grid.GridCell",
-        'foam.u2.grid.GridHeaderCell', 
+        "com.serviceecho.ui.grid.GridCell",
+        'com.serviceecho.ui.grid.GridHeaderCell', 
     ],
 
     imports: [
