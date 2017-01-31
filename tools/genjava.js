@@ -43,6 +43,7 @@ var classes = [
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
+  //'foam.mlang.predicate.Has',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
@@ -80,6 +81,7 @@ var classes = [
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count',
+  //'foam.core.Property',
   'foam.core.AbstractEnum',
   'foam.core.Enum'
 ];
