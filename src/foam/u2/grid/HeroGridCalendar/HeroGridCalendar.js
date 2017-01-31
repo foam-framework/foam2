@@ -38,11 +38,10 @@ foam.CLASS({
     'Team',
     'Hero', 
     'foam.u2.TableView',
-    'com.serviceecho.ui.grid.GridView',
+    'foam.u2.grid.GridView',
     'foam.u2.ViewSpec',
     'foam.u2.search.FilterController',
     
-    'foam.u2.search.WeekSearchView', 
     ],
   
   imports: [
@@ -55,49 +54,13 @@ foam.CLASS({
         name: 'searchDateArray',
         value: [],
     },
-    {
-        name: 'dateSearchView',
-        factory: function() {
-        return this.WeekSearchView.create({
-            dao$: this.HeroDAO$,
-            of: this.Hero.lastSeenAlive});
-        }
-    },
-    {
-        name: 'dateSearchViewPred',
-        expression: function(dateSearchView){
-        return dateSearchView.predicate;
-        },
-        postSet: function(old, nu){
-            this.dateFilteredDAO = this.HeroDAO.where(nu);
-        }, 
-    },
-    
-    {
-      name: 'dateFilteredDAO',
-      factory: function(){
-        return this.HeroDAO; 
-      }
-    },
+
     
     'gridView',
      {
             class: 'foam.u2.ViewSpec',
             name: "filterController",
-            factory:  function(){
-                    return this.FilterController.create({
-                        of: this.Hero, 
-                        data$: this.dateFilteredDAO$, 
-                        textSearch: true,
-                        rowHeight: 64,
-                        allowAddingFilters: false,
-                        searchFields: [
-                          'name',
-                          'status',
-                          'organization',
-                        ]
-                });
-            }
+
           },
   ],
 
@@ -105,9 +68,7 @@ foam.CLASS({
     
     function initE(){
        this.start(this.STOP, {data: this}).end();
-       this.start("h3").add("Using PropertiesDAO: ").end("h3");
-        this.start(this.CLEAR, {data: this}).end();
-        this.add(this.dateSearchView); 
+       this.start("h3").add("GridView + FilterController: ").end("h3");
        this.add(this.filterController);
        
        //this.start("h3").add("Using PropertiesArray: ").end("h3");
@@ -116,8 +77,20 @@ foam.CLASS({
     
     function init() {
         
-        //var weekDateArray = SE.util.getWeekDateArray(new Date(), 1);
-        this.searchDateArray$ = this.dateSearchView.dateArray$; 
+        this.searchDateArray= SE.util.getWeekDateArray(new Date(), 1);
+        
+        this.filterController = this.FilterController.create({
+                        of: this.Hero, 
+                        data$: this.HeroDAO$,
+                        textSearch: false,
+                        rowHeight: 64,
+                        allowAddingFilters: false,
+                        searchFields: [
+                          'name',
+                          'status',
+                          'organization',
+                        ]
+                });
         
         this.gridView = this.GridView.create({
                 of: this.Hero,
@@ -127,7 +100,7 @@ foam.CLASS({
                 rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
                 matchRowId: true,
                 colProperty: this.Hero.LAST_SEEN_ALIVE, 
-                colPropertiesArray$: this.searchDateArray$, //or pass in colDAO
+                colPropertiesArray: this.searchDateArray, //or pass in colDAO
                 rowDAOMatchUndefined: true,
         });
         
@@ -147,13 +120,7 @@ foam.CLASS({
                 debugger;
             }
         }, 
-        {
-            name: "clear",
-            code: function(){
-                this.filterController.clear();
-                this.dateSearchView.clear();
-            }
-        }
+
     ],
     
     listeners: [

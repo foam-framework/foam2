@@ -177,13 +177,15 @@ foam.CLASS
             factory: function(){
                 return foam.u2.Element.create().setNodeName("div");
             }
-        }
+        },
+        "contextSource", 
         
       ], 
     methods: [
         function init(){
             if (this.wrapperClass){
-                this.wrapper = this.wrapperClass.create({cell: this}); 
+                var c = this.contextSource?this.contextSource:this;
+                this.wrapper = this.wrapperClass.create({cell: this}, c); 
             }
             this.refreshCell();
             //the cell will be redrawn on data update anyways. 

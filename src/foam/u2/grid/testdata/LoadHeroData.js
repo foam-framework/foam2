@@ -188,13 +188,102 @@ foam.CLASS({
     
   ],
   
+    
     listeners: [
         {
             name: "onDataUpdate",
             code: function(){
-                this.makeCellView();
+              this.makeCellView();
             }
         },
+    ],
+  
+});
+  
+  
+foam.CLASS({
+  name: 'NewHeroWrapperView',
+  extends: 'foam.u2.Element', 
+  
+  requires: [
+    'Team',
+    'Hero', ],
+  
+  imports: [
+    
+    'HeroDAO',
+    'TeamDAO',
+  ], 
+  
+  properties: [
+    "of",
+
+    {
+        name: 'wrapperView',
+        factory: function(){
+            return foam.u2.Element.create();
+        }
+    },
+    "status",
+    "team",
+    "cell", 
+    ],
+  
+  methods: [
+    function initE(){
+        this.cssClass(this.myCls()).
+          start('div', null, this.content$).
+            cssClass(this.myCls('content')).
+          end()
+          .add(this.wrapperView$); 
+    },
+    
+    function makeWrapper(){
+        var div = foam.u2.Element.create("div");
+        
+        div.start(this.NEW, {data: this}).end() ;
+          
+        this.wrapperView = div; 
+    }, 
+    
+    function init(){
+      this.team$ = this.cell.rowMatch$;
+      this.status$ = this.cell.colMatch$; 
+        this.onDAOUpdate();
+    },
+    
+
+    
+  ],
+  
+  
+  
+    listeners: [
+        {
+            name: "onDAOUpdate",
+            code: function(){
+              this.makeWrapper();
+            }
+        },
+    ],
+    
+    actions: [
+      {
+        name: 'new',
+        label: '+',
+        code: function(){
+          this.HeroDAO.select().then(function(result){
+            if (result && result.a ) {
+              console.log("HeroDAO present.");
+              console.log(result.a.length + " Hero found.");
+              console.log("Code here to add Hero of  " + this.team.name + ", " + this.status); 
+            }else {
+              console.log("Error while getting HeroDAO"); 
+            }
+          }.bind(this)); 
+        }
+      }
+      
     ]
 });
 

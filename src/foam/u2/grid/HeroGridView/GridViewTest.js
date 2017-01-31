@@ -66,12 +66,14 @@ foam.CLASS({
                         of: this.Hero,
                         data$: this.HeroDAO$, 
                         rowProperty: this.Hero.ORGANIZATION, //eq(rowProperty, rowProperties[i])
-                        cellView: 'HeroCellView', 
+                        cellView: 'HeroCellView',
+                        cellWrapperClass: 'NewHeroWrapperView',  
                         colProperty: this.Hero.STATUS, 
                         rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
                         matchRowId: true, 
                         colPropertiesArray: ['alive', 'dead', 'MIA', undefined], //or pass in colDAO
                         rowDAOMatchUndefined: true,
+                        contextSource: this, 
                 });
         
         /*     
