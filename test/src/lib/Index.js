@@ -987,3 +987,476 @@ describe('AutoIndex', function() {
   });
 
 });
+
+
+
+describe('MergePlan', function() {
+  var plan;
+  var sink;
+
+  function generateData(count) {
+    // prop 'a' values overlap, prop 'b' half-overlaps and is reversed
+    var ret = { setA: [], setB: [] };
+
+    for ( var i = 0; i < count; i++ ) {
+      ret.setA.push(test.MergePlanTestData.create({
+        a: i,
+        b: count - i
+      }));
+    }
+    for ( var i = count / 2; i < count * 1.5; i++ ) {
+      ret.setB.push(test.MergePlanTestData.create({
+        a: i,
+        b: count - i
+      }));
+    }
+
+    return ret;
+  };
+
+  function generateDupeData(count) {
+    // generates
+    var ret = { setA: [] };
+
+    for ( var i = 0; i < count; i++ ) {
+      ret.setA.push(test.MergePlanTestData.create({
+        a: i,
+        b: Math.trunc(i / 4)
+      }));
+    }
+
+    return ret;
+  };
+
+
+  beforeEach(function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'MergePlanTestData',
+      ids: ['a'],
+      properties: [
+        { name: 'a' },
+        { name: 'b' }
+      ]
+    });
+
+    plan = foam.dao.index.MergePlan.create({ of: 'test.MergePlanTestData' });
+    sink = foam.dao.ArraySink.create();
+  });
+
+  it('handles empty input', function() {
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(0);
+  });
+
+  it('handles empty input with ordering', function() {
+    var ordering = test.MergePlanTestData.B;
+
+    plan.execute([], sink, undefined, undefined, ordering);
+    expect(sink.a.length).toBe(0);
+  });
+
+  it('handles a single subplan', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 10; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      })
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+  });
+
+  it('handles a single subplan with ordering', function() {
+    var data = generateData(10);
+
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 10; i++ ) {
+            sink.put(data.setA[9 - i]);
+          }
+        }
+      })
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].b).toBe(1); // should be ordered by 'b'
+    expect(sink.a[9].b).toBe(10);
+  });
+
+  it('deduplicates with ordering', function() {
+    var data = generateData(10);
+
+    var ordering = test.MergePlanTestData.A;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
+  it('deduplicates', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
+
+  it('deduplicates clones (different object, but same id and values)', function() {
+    var data = generateData(10);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 5; i++ ) { // put cloned dupes of first 5
+            sink.put(data.setA[i].clone());
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 5; i < 10; i++ ) { // finish last 5 items
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+    expect(sink.a.length).toBe(10);
+    expect(sink.a[0].a).toBe(0);
+    expect(sink.a[1].a).toBe(1);
+    expect(sink.a[2].a).toBe(2);
+    expect(sink.a[9].a).toBe(9);
+  });
+
+  it('merges results', function() {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setB[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+
+    expect(sink.a.length).toBe(15);
+
+    expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
+    expect(sink.a[1].a).toBe(13); expect(sink.a[1].b).toBe(-3);
+    expect(sink.a[2].a).toBe(12); expect(sink.a[2].b).toBe(-2);
+    expect(sink.a[3].a).toBe(11); expect(sink.a[3].b).toBe(-1);
+    expect(sink.a[4].a).toBe(10); expect(sink.a[4].b).toBe(0);
+    expect(sink.a[5].a).toBe(9); expect(sink.a[5].b).toBe(1);
+    expect(sink.a[6].a).toBe(8); expect(sink.a[6].b).toBe(2);
+    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(3);
+    expect(sink.a[8].a).toBe(6); expect(sink.a[8].b).toBe(4);
+    expect(sink.a[9].a).toBe(5); expect(sink.a[9].b).toBe(5);
+    expect(sink.a[10].a).toBe(4); expect(sink.a[10].b).toBe(6);
+    expect(sink.a[11].a).toBe(3); expect(sink.a[11].b).toBe(7);
+    expect(sink.a[12].a).toBe(2); expect(sink.a[12].b).toBe(8);
+    expect(sink.a[13].a).toBe(1); expect(sink.a[13].b).toBe(9);
+    expect(sink.a[14].a).toBe(0); expect(sink.a[14].b).toBe(10);
+
+
+  });
+
+  it('merges results (reverse input order)', function() {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setB[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+
+    expect(sink.a.length).toBe(15);
+
+    expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
+    expect(sink.a[1].a).toBe(13); expect(sink.a[1].b).toBe(-3);
+    expect(sink.a[2].a).toBe(12); expect(sink.a[2].b).toBe(-2);
+    expect(sink.a[3].a).toBe(11); expect(sink.a[3].b).toBe(-1);
+    expect(sink.a[4].a).toBe(10); expect(sink.a[4].b).toBe(0);
+    expect(sink.a[5].a).toBe(9); expect(sink.a[5].b).toBe(1);
+    expect(sink.a[6].a).toBe(8); expect(sink.a[6].b).toBe(2);
+    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(3);
+    expect(sink.a[8].a).toBe(6); expect(sink.a[8].b).toBe(4);
+    expect(sink.a[9].a).toBe(5); expect(sink.a[9].b).toBe(5);
+    expect(sink.a[10].a).toBe(4); expect(sink.a[10].b).toBe(6);
+    expect(sink.a[11].a).toBe(3); expect(sink.a[11].b).toBe(7);
+    expect(sink.a[12].a).toBe(2); expect(sink.a[12].b).toBe(8);
+    expect(sink.a[13].a).toBe(1); expect(sink.a[13].b).toBe(9);
+    expect(sink.a[14].a).toBe(0); expect(sink.a[14].b).toBe(10);
+
+  });
+
+  it('merges with skip and limit', function() {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setB[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 9; i >= 0; i-- ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, 3, 5, ordering);
+
+    expect(sink.a.length).toBe(5);
+
+    expect(sink.a[0].a).toBe(11); expect(sink.a[0].b).toBe(-1);
+    expect(sink.a[1].a).toBe(10); expect(sink.a[1].b).toBe(0);
+    expect(sink.a[2].a).toBe(9); expect(sink.a[2].b).toBe(1);
+    expect(sink.a[3].a).toBe(8); expect(sink.a[3].b).toBe(2);
+    expect(sink.a[4].a).toBe(7); expect(sink.a[4].b).toBe(3);
+
+  });
+
+
+  it('handles async indexes', function(done) {
+    var data = generateData(10);
+    var ordering = test.MergePlanTestData.B;
+    var resolve;
+    var promiseRef = [new Promise(function(res, rej) {
+      resolve = res;
+    })];
+    var innerResolve;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          promise[0] = Promise.resolve().then(function() {
+            for ( var i = 9; i >= 0; i-- ) {
+              sink.put(data.setB[i]);
+            }
+          });
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          promise[0] = new Promise(function(res, rej) {
+            innerResolve = res; // intermediate promise we control
+          }).then(function() {
+            for ( var i = 9; i >= 0; i-- ) { // do final work
+              sink.put(data.setA[i]);
+            }
+          });
+        }
+      }),
+    ];
+
+    plan.execute(promiseRef, sink, undefined, undefined, ordering);
+    // Nothing resloved, no sink putting actually done by our customExecutes
+    for (var j =0; j<sink.a.length;j++) {
+      var item = sink.a[j];
+      console.log("item1", j, item.a, item.b);
+    }
+    expect(sink.a.length).toBe(0);
+
+    promiseRef[0].then(function() {
+      // all resolved, all sinks dumped to result sink
+      expect(sink.a.length).toBe(15);
+    }).then(done);
+
+    // release both the first and second promises in the chain
+    resolve();
+    innerResolve();
+  });
+
+
+  it('deduplicates when ordered by non-unique values', function() {
+    var data = generateDupeData(8);
+    var ordering = test.MergePlanTestData.B;
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 8; i++ ) {
+            sink.put(data.setA[i]);
+          }
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          for ( var i = 0; i < 8; i++ ) {
+            sink.put(data.setA[i].clone());
+          }
+        }
+      }),
+    ];
+
+    plan.execute([], sink, undefined, undefined, ordering);
+
+    expect(sink.a.length).toBe(8);
+
+    expect(sink.a[0].a).toBe(0); expect(sink.a[0].b).toBe(0);
+    expect(sink.a[1].a).toBe(1); expect(sink.a[1].b).toBe(0);
+    expect(sink.a[2].a).toBe(2); expect(sink.a[2].b).toBe(0);
+    expect(sink.a[3].a).toBe(3); expect(sink.a[3].b).toBe(0);
+    expect(sink.a[4].a).toBe(4); expect(sink.a[4].b).toBe(1);
+    expect(sink.a[5].a).toBe(5); expect(sink.a[5].b).toBe(1);
+    expect(sink.a[6].a).toBe(6); expect(sink.a[6].b).toBe(1);
+    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(1);
+
+  });
+
+  it('deduplicates when not ordered, randomized input order', function() {
+    var data = generateDupeData(8);
+
+    plan.subPlans = [
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          sink.put(data.setA[1]);
+          sink.put(data.setA[0]);
+          sink.put(data.setA[3]);
+          sink.put(data.setA[2]);
+          sink.put(data.setA[6]);
+          sink.put(data.setA[7]);
+          sink.put(data.setA[4]);
+          sink.put(data.setA[5]);
+        }
+      }),
+      foam.dao.index.CustomPlan.create({
+        customExecute: function(promise, sink, skip, limit, order, predicate) {
+          sink.put(data.setA[0]);
+          sink.put(data.setA[3]);
+          sink.put(data.setA[1]);
+          sink.put(data.setA[2]);
+          sink.put(data.setA[6]);
+          sink.put(data.setA[5]);
+          sink.put(data.setA[7]);
+          sink.put(data.setA[4]);
+        }
+      }),
+    ];
+
+    plan.execute([], sink);
+
+    expect(sink.a.length).toBe(8);
+
+    // The first set of items remains, in the order inserted
+    expect(sink.a[0].a).toBe(1);
+    expect(sink.a[1].a).toBe(0);
+    expect(sink.a[2].a).toBe(3);
+    expect(sink.a[3].a).toBe(2);
+    expect(sink.a[4].a).toBe(6);
+    expect(sink.a[5].a).toBe(7);
+    expect(sink.a[6].a).toBe(4);
+    expect(sink.a[7].a).toBe(5);
+  });
+
+
+});
+
+
+
