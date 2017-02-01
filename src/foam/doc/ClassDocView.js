@@ -46,6 +46,8 @@ foam.CLASS({
 
       var self = this;
 
+      this.add('(', this.data.length, ')').br();
+
       this.data.forEach(function(cls) {
         self.start(self.ClassLink, {data: cls, showPackage: true}).end().br();
       });
@@ -218,10 +220,11 @@ foam.CLASS({
         start('table').
           start('tr').
             start('td').
-              style({'vertical-align': 'top', background: '#eee' }).
-              start(this.ClassList, {data: Object.values(foam.USED).sort()}).
+              style({'vertical-align': 'top', background: '#f5f5ea' }).
+              start(this.ClassList, {data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
             end().
             start('td').
+              style({'vertical-align': 'top', background: '#f5f5ea' }).
               add(this.slot(function(path) {
                 var o = foam.lookup(path, true);
                 if ( ! o ) return '';
@@ -229,6 +232,7 @@ foam.CLASS({
               })).
             end().
             start('td').
+              style({'vertical-align': 'top', background: '#f5f5ea' }).
               add(this.AXIOM).
             end().
           end().
