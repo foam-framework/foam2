@@ -24,9 +24,6 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.createView = function(spec, args, that, ctx) {
-          if ( spec === undefined || spec === null )
-            return undefined;
-
           if ( foam.u2.Element.isInstance(spec) )
             return spec;
 
@@ -44,7 +41,7 @@ foam.CLASS({
                 spec.create(args, ctx) :
                 ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {}) ;
 
-            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec result must extend foam.u2.Element.');
+            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
@@ -52,12 +49,12 @@ foam.CLASS({
           if ( foam.core.FObject.isSubClass(spec) ) {
             var ret = spec.create(args, ctx);
 
-            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec class must extend foam.u2.Element.');
+            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec class must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
 
-          if ( foam.String.isInstance(spec) )
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
             return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
 
           throw 'Invalid ViewSpec, must provide an Element, Slot, toE()-able, Function, {create: function() {}}, {class: \'name\'}, Class, or String, but received: ' + spec;
