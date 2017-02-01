@@ -38,7 +38,7 @@ foam.CLASS({
     'Team',
     'Hero', 
     'foam.u2.TableView',
-    'com.serviceecho.ui.grid.GridView',
+    'foam.u2.grid.GridView',
     'foam.u2.ViewSpec',
     'foam.u2.search.FilterController', 
     ],

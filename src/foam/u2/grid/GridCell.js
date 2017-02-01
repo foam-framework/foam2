@@ -158,7 +158,7 @@ foam.CLASS
         
         {
             name: 'resultArr',
-            value: [], 
+            factory: function() { return []; }, 
         }, 
         
         {

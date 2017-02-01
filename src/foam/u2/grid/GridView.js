@@ -50,11 +50,11 @@ foam.CLASS
     }, 
     {
         name: 'cellArray',
-        value: [],
-    },
+        factory: function(){return []; },
+    }, 
     {
         name: 'rowArray',
-        value: [], 
+        factory: function(){return []; },  
     }, 
     {
         name: 'data',
