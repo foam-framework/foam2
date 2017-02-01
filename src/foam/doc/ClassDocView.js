@@ -238,7 +238,18 @@ foam.CLASS({
               add(this.slot(function(path) {
                 var o = foam.lookup(path, true);
                 if ( ! o ) return '';
-                return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
+                return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
+              })).
+            end().
+            start('td').
+              add('Required-by:').
+              style({'vertical-align': 'top', background: '#f5f5ea' }).
+              add(this.slot(function(path) {
+                var o = foam.lookup(path, true);
+                if ( ! o ) return '';
+                // TODO: this could be done more efficiently, and memoized
+                return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) {
+                  return cls.model_.requires && cls.model_.requires.map(function(r) { return r.path; }).includes(path); }).sort(foam.core.Model.ID.compare)});
               })).
             end().
             start('td').
