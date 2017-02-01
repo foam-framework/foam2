@@ -138,7 +138,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Stirng',
+      class: 'String',
       name: 'name'
     }
   ]
