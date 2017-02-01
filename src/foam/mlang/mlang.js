@@ -1156,7 +1156,20 @@ foam.CLASS({
     },
     function put(o) {
       this.delegate.put( this.f(o) );
-    },
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Mul',
+  implements: [
+    'foam.mlang.predicate.Binary'
+  ],
+  methods: [
+    function f(o) {
+      return this.arg1.f(o) * this.arg2.f(o);
+    }
   ]
 });
 
@@ -1572,6 +1585,26 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Sum',
+  extends: 'foam.dao.AbstractSink',
+  implements: [
+    'foam.mlang.predicate.Unary'
+  ],
+  properties: [
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+  methods: [
+    function put(obj) {
+      this.value += this.arg1.f(obj);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -1607,10 +1640,12 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.Func',
+    'foam.mlang.expr.Mul',
     'foam.mlang.expr.Dot',
     'foam.mlang.Constant',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
+    'foam.mlang.sink.Sum',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
@@ -1648,11 +1683,13 @@ foam.CLASS({
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
+    function MUL(a, b) { return this._binary_("Mul", a, b); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
