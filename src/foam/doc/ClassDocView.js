@@ -31,6 +31,29 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.doc',
+  name: 'ClassList',
+  extends: 'foam.u2.View',
+
+  requires: [
+    'foam.doc.ClassLink'
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      var self = this;
+
+      this.data.forEach(function(cls) {
+        self.start(self.ClassLink, {data: cls, showPackage: true}).end().br();
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.doc',
   name: 'ClassDocView',
   extends: 'foam.u2.View',
 
@@ -133,6 +156,10 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'data'
+    },
+    {
+      class: 'Boolean',
+      name: 'showPackage'
     }
   ],
 
@@ -143,7 +170,7 @@ foam.CLASS({
       this.setNodeName('a').
         on('click', this.click).
         attrs({href: this.data.id}).
-        add(this.data.name);
+        add(this.showPackage ? this.data.id : this.data.name);
     }
   ],
 
@@ -162,6 +189,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
+    'foam.doc.ClassList',
     'foam.doc.ClassDocView'
   ],
 
@@ -187,6 +215,10 @@ foam.CLASS({
       this.
         start('table').
           start('tr').
+            start('td').
+        style({'vertical-align': 'top', background: '#eee' }).
+              start(this.ClassList, {data: Object.values(foam.USED)}).
+            end().
             start('td').
               add(this.slot(function(path) {
                 var o = foam.lookup(path, true);
