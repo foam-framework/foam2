@@ -1,3 +1,5 @@
+for ( var key in foam.UNUSED ) { foam.lookup(key); }
+
 foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomInfo',
@@ -216,8 +218,8 @@ foam.CLASS({
         start('table').
           start('tr').
             start('td').
-        style({'vertical-align': 'top', background: '#eee' }).
-              start(this.ClassList, {data: Object.values(foam.USED)}).
+              style({'vertical-align': 'top', background: '#eee' }).
+              start(this.ClassList, {data: Object.values(foam.USED).sort()}).
             end().
             start('td').
               add(this.slot(function(path) {
