@@ -36,9 +36,9 @@ describe("Index benchmarks", function() {
         responseType: 'json',
         method: 'GET'
       });
-      if ( foam.net.node )
-        xhr.fromUrl('http://localhost:8888/MedalData.json');
-      else
+      //if ( foam.net.node ) // local option for medal data file
+      //  xhr.fromUrl('http://localhost:8888/MedalData.json');
+      //else
         xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
                  'master/js/foam/demos/olympics/MedalData.json');
       var self = this;
@@ -87,13 +87,16 @@ describe("Index benchmarks", function() {
       name: 'MedalColor',
       values: [
         {
-          name: 'GOLD', label: 'Gold'
+          name: 'GOLD',
+          label: 'Gold'
         },
         {
-          name: 'SILVER', label: 'Silver'
+          name: 'SILVER',
+          label: 'Silver'
         },
         {
-          name: 'BRONZE', label: 'Bronze'
+          name: 'BRONZE',
+          label: 'Bronze'
         }
       ]
     });
