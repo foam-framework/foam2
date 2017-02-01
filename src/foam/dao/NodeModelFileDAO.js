@@ -30,7 +30,8 @@ foam.CLASS({
   methods: [
     function find(id) {
       if ( ! this.lookup(id, true) ) {
-        var path = this.classpath + '/' + id.replace(/\./g, '/') + '.js';
+        var sep = require('path').sep;
+        var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
         try {
           require(path);
         } catch(e) {
