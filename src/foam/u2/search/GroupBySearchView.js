@@ -136,7 +136,7 @@ foam.CLASS({
             var subKey = ('' + key)
                 .substring(0, self.width - count.length - 3);
             var cleanKey = foam.core.Enum.isInstance(self.property) ?
-                self.lookup(self.property.of)[key].label :
+                self.property.of[key].label :
                 subKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;');
 
