@@ -69,7 +69,7 @@ foam.CLASS({
     function initE(){
        this.start(this.STOP, {data: this}).end();
        this.start("h3").add("GridView + FilterController: ").end("h3");
-       this.add(this.filterController);
+       this.add(this.filterController$);
        
        //this.start("h3").add("Using PropertiesArray: ").end("h3");
        //this.add(this.arrGridView$);

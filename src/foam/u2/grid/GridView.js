@@ -1,15 +1,15 @@
 foam.CLASS
 ({
-    package: "foam.u2.grid",
-    name: "GridView",
-    extends: "foam.u2.Element",
+    package: 'foam.u2.grid',
+    name: 'GridView',
+    extends: 'foam.u2.Element',
 
     implements: [
     ],
 
     requires:
     [
-        "foam.u2.grid.GridCell",
+        'foam.u2.grid.GridCell',
         'foam.u2.grid.GridHeaderCell', 
     ],
 
@@ -38,10 +38,10 @@ foam.CLASS
 
     properties: [
     {
-        name: "body",
+        name: 'body',
         factory: function(){
             var b  = foam.u2.Element.create();
-            b.setNodeName("tbody");
+            b.setNodeName('tbody');
             return b; 
         }
     },
@@ -49,11 +49,11 @@ foam.CLASS
         name: 'headerRow', 
     }, 
     {
-        name: "cellArray",
+        name: 'cellArray',
         value: [],
     },
     {
-        name: "rowArray",
+        name: 'rowArray',
         value: [], 
     }, 
     {
@@ -93,10 +93,12 @@ foam.CLASS
     }, 
     {
         name: 'matchRowId',
+        class: 'Boolean', 
         value: false, 
     },
     {
         name: 'matchColId',
+        class: 'Boolean', 
         value: false, 
     }, 
     {
@@ -111,10 +113,12 @@ foam.CLASS
     },
     {
         name: 'rowDAOMatchUndefined',
+        class: 'Boolean', 
         value: false, 
     }, 
     {
         name: 'colDAOMatchUndefined',
+        class: 'Boolean', 
         value: false, 
     }, 
     {
@@ -147,6 +151,7 @@ foam.CLASS
     }, 
     {
         name: 'hideRows',
+        class: 'Boolean', 
         value: false, 
     },
     {
@@ -162,7 +167,7 @@ foam.CLASS
         // returns rue for showing, flase for hidden
         value: function(match){
             //if undefined is selected, show all. 
-            if (!match && match!=="") return true;
+            if (!match && match!=='') return true;
             // can match string or obj.id. input must be a string. 
             // if visible rows not specified, then show everything. 
             if (!this.visibleRows || this.visibleRows.length  === 0) return true;
@@ -172,17 +177,17 @@ foam.CLASS
         }
     }, 
     
-    "selectedEntry",
-    "contextSource", 
+    'selectedEntry',
+    'contextSource', 
 
     ],
 
     methods:
     [
         function initE() {
-            this.setNodeName("table");
+            this.setNodeName('table');
             
-            this.cssClass(this.myCls("grid-table"));
+            this.cssClass(this.myCls('grid-table'));
             this.add(this.body$);
 
         },
@@ -207,7 +212,7 @@ foam.CLASS
 
         function makeBody(){
             var b  = foam.u2.Element.create();
-            b.setNodeName("tbody");
+            b.setNodeName('tbody');
             this.cellArray = [];
             this.rowArray = []; 
             
@@ -215,7 +220,7 @@ foam.CLASS
             for (var i=-1; i< this.rowPropertiesArray.length; i++){
                 var r = foam.u2.Element.create();
                 var currCellRow = []; 
-                r.setNodeName("tr");
+                r.setNodeName('tr');
                 for (var j=-1; j< this.colPropertiesArray.length; j++){
                     if (i == -1 && j ==-1){
                         var rowCorner = this.GridHeaderCell.create({
@@ -243,8 +248,8 @@ foam.CLASS
                     }else {
                         /*
                         var bcell  = foam.u2.Element.create();
-                        bcell.setNodeName("td");
-                        bcell.add("body");
+                        bcell.setNodeName('td');
+                        bcell.add('body');
                         r.add(bcell);
                         */
                         var currCell = this.GridCell.create({
@@ -260,8 +265,8 @@ foam.CLASS
                             wrapperClass: this.cellWrapperClass,
                             contextSource: this.contextSource,
                         });
-                        currCell.sub("CELL_CLICK", this.onCellClick);
-                        currCell.sub("ENTRY_SELECTION", this.onEntrySelection); 
+                        currCell.sub('CELL_CLICK', this.onCellClick);
+                        currCell.sub('ENTRY_SELECTION', this.onEntrySelection); 
                         r.add(currCell);
                         currCellRow.push(currCell); 
                     }
@@ -278,7 +283,7 @@ foam.CLASS
                         if (this.rowPropertiesArray[i]){
                             key = this.rowPropertiesArray[i].id;
                         }else {
-                            key = ""; 
+                            key = ''; 
                         }
                     }else {
                         key = this.rowPropertiesArray[i];
@@ -303,9 +308,9 @@ foam.CLASS
                 var currRowProp = this.rowArray[i][0];
                 var currRow = this.rowArray[i][1]; 
                 if (! this.rowVisibilityFunction(currRowProp)){
-                    currRow.enableCls(this.myCls("hidden"), true); 
+                    currRow.enableCls(this.myCls('hidden'), true); 
                 }else {
-                    currRow.enableCls(this.myCls("hidden"), false); 
+                    currRow.enableCls(this.myCls('hidden'), false); 
                 }
             }
         }
@@ -320,7 +325,7 @@ foam.CLASS
                 var src = arguments[0].src;
                 this.currColProperty = src.colMatch;
                 this.currRowProperty = src.rowMatch;
-                this.pub("CELL_CLICK");
+                this.pub('CELL_CLICK');
                 
             console.log('cell clicked');
             }
@@ -331,7 +336,7 @@ foam.CLASS
             code: function(){
                 var src = arguments[0].src;
                 this.selectedEntry = src.selectedEntry;
-                console.log("yepie, shit works"); 
+                console.log('yepie, shit works'); 
             }
         }, 
         {
@@ -347,7 +352,7 @@ foam.CLASS
             name: 'onDataUpdate',
             isFramed: true, 
             code: function() {
-                console.log("Data updated in GridView");
+                console.log('Data updated in GridView');
                 this.refreshGrid();
             }
           },
@@ -359,7 +364,7 @@ foam.CLASS
                 if (this.rowPropertiesDAO){
                     this.rowPropertiesDAO.select().then(function(result){
                         if (!result || ! result.a || !result.a.length){
-                            console.log("no Column Property detected");
+                            console.log('no Column Property detected');
                             return;
                         }else {
                             var arr = [];
@@ -382,7 +387,7 @@ foam.CLASS
                 if (this.colPropertiesDAO){
                     this.colPropertiesDAO.select().then(function(result){
                         if (!result || ! result.a || !result.a.length){
-                            console.log("no Column Property detected");
+                            console.log('no Column Property detected');
                             return;
                         }else {
                             var arr = [];
@@ -402,7 +407,7 @@ foam.CLASS
             name: 'onRowSelect',
             isFramed: true,
             code: function(s){
-                console.log("row Selected");
+                console.log('row Selected');
                 var row = s.src;
                 this.cellArray[row.rowIndex].forEach(function(c){
                     c.toggleRowHighlight();
@@ -414,7 +419,7 @@ foam.CLASS
             name: 'onColSelect',
             isFramed: true,
             code: function(s){
-                console.log("col Selected");
+                console.log('col Selected');
                 var col = s.src;
                 this.cellArray.forEach(function(r){
                     r[col.colIndex].toggleColHighlight();

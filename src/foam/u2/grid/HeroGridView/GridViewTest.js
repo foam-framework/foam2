@@ -30,7 +30,7 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'DCWorldController',
-  extends: "foam.u2.Element",
+  extends: 'foam.u2.Element',
 
   
   requires:
@@ -55,9 +55,9 @@ foam.CLASS({
     function initE(){
        this.
        start(this.STOP, {data: this}).end();
-       this.start("h3").add("Using PropertiesDAO: ").end("h3");
+       this.start('h3').add('Using PropertiesDAO: ').end('h3');
        this.add(this.gridView);
-       //this.start("h3").add("Using PropertiesArray: ").end("h3");
+       //this.start('h3').add('Using PropertiesArray: ').end('h3');
        //this.add(this.arrGridView$);
        }, 
     
@@ -95,26 +95,26 @@ foam.CLASS({
     [
 
         {
-            name: "stop",
+            name: 'stop',
             code: function(){
                 debugger;
                 
                 
                 this.TeamDAO.select().then(function(c){
-                    console.log("--------------- Team List --------");
+                    console.log('--------------- Team List --------');
                     for (var i=0; i<c.a.length; i++){
                         var d = c.a[i];
-                        console.log(d.id + ", " + d.name);
+                        console.log(d.id + ', ' + d.name);
                     } });
                 
 
                 this.daoGridView.data.select().then(function(c){
-                    console.log("--------------- Hero List --------");
+                    console.log('--------------- Hero List --------');
                     for (var i=0; i<c.a.length; i++){
                         var d = c.a[i];
                         var orgStr = d.organizationId ;
                         if (d.organization && d.organization.name) orgStr = d.organization.name; 
-                        console.log(d.name + ", " + orgStr);
+                        console.log(d.name + ', ' + orgStr);
                     } });
             }
         }
