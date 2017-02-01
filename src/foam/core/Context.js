@@ -170,7 +170,34 @@
       foam.Object.freeze(sub);
 
       return sub;
-    }
+    },
+
+    arequire: function(modelId, modelDao) {
+      return new Promise(function(resolve, reject) {
+        var inited = {};
+        var numLoaded = 0;
+          var loadModelAndDeps = function(modelId) {
+          inited[modelId] = 1;
+          modelDao.find(modelId).then(function(model) {
+            numLoaded++;
+            var requires = model.model_.requires || [];
+            requires.map(function(require) {
+              return require.path;
+            }).filter(function(require) {
+              return !inited[require];
+            }).forEach(function(require) {
+              loadModelAndDeps(require);
+            });
+            if (Object.keys(inited).length == numLoaded) {
+              resolve();
+            }
+          });
+        };
+        loadModelAndDeps(modelId);
+      }).then(function() {
+        return foam.lookup(modelId);
+      });
+    },
   };
 
   Object.defineProperty(__context__, '__cache__', {
@@ -186,6 +213,9 @@
   foam.register = function(cls) { foam.__context__.register(cls); };
   foam.createSubContext = function(opt_args, opt_name) {
     return foam.__context__.createSubContext(opt_args, opt_name);
+  };
+  foam.arequire = function(id, modelDao) {
+    return foam.__context__.arequire(id, modelDao);
   };
 
   foam.__context__ = __context__;
