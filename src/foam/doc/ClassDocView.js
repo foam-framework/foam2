@@ -220,6 +220,7 @@ foam.CLASS({
         start('table').
           start('tr').
             start('td').
+            add('Classes:').
               style({'vertical-align': 'top', background: '#f5f5ea' }).
               start(this.ClassList, {data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
             end().
@@ -229,6 +230,15 @@ foam.CLASS({
                 var o = foam.lookup(path, true);
                 if ( ! o ) return '';
                 return this.ClassDocView.create({data: o});
+              })).
+            end().
+            start('td').
+              add('Sub-Classes:').
+              style({'vertical-align': 'top', background: '#f5f5ea' }).
+              add(this.slot(function(path) {
+                var o = foam.lookup(path, true);
+                if ( ! o ) return '';
+                return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
               })).
             end().
             start('td').
