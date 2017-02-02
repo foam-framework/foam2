@@ -462,19 +462,20 @@ foam.CLASS({
         // returns 1 if nodeKey is longer or equal length, but does not contain masterKey
         var compareSubstring = function compareSubstring(nodeKey, masterKey) {
           // nodeKey can't contain masterKey if it's too short
-          if ( nodeKey.length < masterKey.length ) return -1;
-          // iterate over substrings
+          if ( ( ! nodeKey ) || ( ! nodeKey.indexOf ) || ( nodeKey.length < masterKey.length ) ) return -1;
+
           if ( ic ) nodeKey = nodeKey.toLowerCase(); // TODO: handle case-insensitive better
-          for ( var start = 0; start < (nodeKey.length - masterKey.length + 1); start++ ) {
-            if ( nodeKey.substring(start, start + masterKey.length) === masterKey ) {
-              return 0;
-            }
-          }
-          return 1;
+
+          return nodeKey.indexOf(masterKey) > -1 ? 0 : 1;
         }
 
         var indexes = [];
-        this.root.getAll(key, compareSubstring, indexes);
+        if ( ! key || key.length === 0 ) {
+          // everything contains 'nothing'
+          this.root.getAll('', function() { return 0; }, indexes);
+        } else {
+          this.root.getAll(key, compareSubstring, indexes);
+        }
         var subPlans = [];
         // iterate over all keys
         for ( var i = 0; i < indexes.length; i++ ) {

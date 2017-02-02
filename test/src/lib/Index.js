@@ -970,8 +970,6 @@ describe('AutoIndex', function() {
     );
 
     pred = pred.toDisjunctiveNormalForm();
-
-    console.log("NOT pred", pred);
   });
 
 
