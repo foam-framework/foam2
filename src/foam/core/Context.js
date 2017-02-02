@@ -170,7 +170,7 @@
       foam.Object.freeze(sub);
 
       return sub;
-    },
+    }
   };
 
   Object.defineProperty(__context__, '__cache__', {
