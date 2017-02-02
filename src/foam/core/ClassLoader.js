@@ -47,11 +47,15 @@ foam.CLASS({
               if (Object.keys(inited).length == numLoaded) {
                 resolve();
               }
+            }).catch(function(err) {
+              reject(err);
             });
           };
           loadModelAndDeps(modelId);
         }).then(function() {
-          return foam.lookup(modelId);
+          return X.lookup(modelId);
+        }).catch(function(err) {
+          console.log(err.stack);
         });
       },
     },
