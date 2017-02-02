@@ -96,15 +96,15 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegates = this.delegates || [ this.creator.delegates[0].createNode() ];
+      this.delegates = this.delegates || [ this.index.delegates[0].createNode() ];
     },
 
     function addIndex(index) {
       // check for existing factory
-      var dfmap = this.creator.delegateMap_;
+      var dfmap = this.index.delegateMap_;
       var indexKey = index.toString();
       if ( ! dfmap[indexKey] ) {
-        this.creator.delegates.push(index);
+        this.index.delegates.push(index);
         dfmap[indexKey] = index;
       } else {
         // ensure all tails are using the same factory instance
@@ -139,8 +139,8 @@ foam.CLASS({
       // if no cached index estimates, generate estimates
       // for each factory for this ordering
       if ( ! c ) {
-        var nullSink = this.creator.NullSink.create();
-        var dfs = this.creator.delegates;
+        var nullSink = this.index.NullSink.create();
+        var dfs = this.index.delegates;
         var bestEst = Number.MAX_VALUE;
         // Pick the best factory for the ordering, cache it
         for ( var i = 0; i < dfs.length; i++ ) {
@@ -156,7 +156,7 @@ foam.CLASS({
       // check if we have a delegate instance for the best factory
       for ( var i = 0; i < delegates.length; i++ ) {
         // if we do, it's the best one
-        if ( delegates[i].creator === c ) return delegates[i];
+        if ( delegates[i].index === c ) return delegates[i];
       }
 
       // we didn't have the right delegate generated, so add and populate it
@@ -191,7 +191,7 @@ foam.CLASS({
       var bestPlan;
       for ( var i = 0 ; i < this.delegates.length ; i++ ) {
         var p = this.delegates[i].plan(sink, skip, limit, order, predicate, root);
-        if ( p.cost <= this.creator.GOOD_ENOUGH_PLAN ) {
+        if ( p.cost <= this.index.GOOD_ENOUGH_PLAN ) {
           bestPlan = p;
           break;
         }
@@ -200,7 +200,7 @@ foam.CLASS({
         }
       }
       if ( ! bestPlan ) {
-        return this.creator.NoPlan.create();
+        return this.index.NoPlan.create();
       }
       return bestPlan;
     },
@@ -208,7 +208,7 @@ foam.CLASS({
     function size() { return this.delegates[0].size(); },
 
     function toString() {
-      return 'Alt([' + (this.creator.delegates.join(',')) + this.size() + '])';
+      return 'Alt([' + (this.index.delegates.join(',')) + this.size() + '])';
     },
   ]
 });
