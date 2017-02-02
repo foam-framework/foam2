@@ -753,7 +753,7 @@ describe('AltIndex', function() {
     }).createNode();
     var fakeRoot = {
       size: function() { return 1; },
-      creator: { toPrettyString: function() { return ""; }}
+      index: { toPrettyString: function() { return ""; }}
     };
     idx.addIndex(foam.dao.index.TreeIndex.create({
       prop: test.Indexable.INT,
@@ -763,7 +763,7 @@ describe('AltIndex', function() {
       prop: test.Indexable.FLOAT,
       tail: foam.dao.index.ValueIndex.create()
     }), fakeRoot );
-    idx.creator.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
+    idx.index.GOOD_ENOUGH_PLAN = 1; // don't short circuit for test
     idx.bulkLoad(data);
     m = foam.mlang.Expressions.create();
     sink = foam.dao.ArraySink.create();
@@ -875,7 +875,7 @@ describe('AutoIndex', function() {
 
     fakeRoot = {
       size: function() { return 1; },
-      creator: { toPrettyString: function() { return ""; }}
+      index: { toPrettyString: function() { return ""; }}
     };
 
     m = foam.mlang.Expressions.create();

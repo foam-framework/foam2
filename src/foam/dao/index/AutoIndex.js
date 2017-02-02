@@ -76,8 +76,8 @@ foam.CLASS({
 
   methods: [
     function addPropertyIndex(prop, root) {
-      this.addIndex(prop.toIndex(this.creator.cls_.create({
-        idIndex: this.creator.idIndex
+      this.addIndex(prop.toIndex(this.index.cls_.create({
+        idIndex: this.index.idIndex
       })), root);
     },
 
@@ -104,11 +104,11 @@ foam.CLASS({
       //  - We are too small to matter
       //  - There are no order/predicate constraints to optimize for
       if ( existingPlan.cost < thisSize ||
-           thisSize < this.creator.GOOD_ENOUGH_PLAN ||
+           thisSize < this.index.GOOD_ENOUGH_PLAN ||
            ! order &&
            ( ! predicate ||
-             this.creator.True.isInstance(predicate) ||
-             this.creator.False.isInstance(predicate)
+             this.index.True.isInstance(predicate) ||
+             this.index.False.isInstance(predicate)
            )
       ) {
         return existingPlan;
@@ -123,20 +123,20 @@ foam.CLASS({
       var self = this;
       var newIndex;
 
-      var bestEstimate = this.delegate.creator.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
+      var bestEstimate = this.delegate.index.estimate(this.delegate.size(), sink, skip, limit, order, predicate);
 //console.log(self.$UID, "AutoEst OLD:", bestEstimate, this.delegate.toString().substring(0,20), this.size());
-      if ( bestEstimate < this.creator.GOOD_ENOUGH_PLAN ) {
+      if ( bestEstimate < this.index.GOOD_ENOUGH_PLAN ) {
         return existingPlan;
       }
 
       // Base planned cost on the old cost for the plan, to avoid underestimating and making this
       //  index build look too good
       var existingEstimate = bestEstimate;
-      var idIndex = this.creator.idIndex;
+      var idIndex = this.index.idIndex;
 
       if ( predicate ) {
         var candidate = predicate.toIndex(
-          this.creator.cls_.create({ idIndex: idIndex }), 1); // depth 1
+          this.index.cls_.create({ idIndex: idIndex }), 1); // depth 1
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
@@ -156,7 +156,7 @@ foam.CLASS({
       //   so the predicate might make this index worse
       if ( order ) {
         var candidate = order.toIndex(
-          this.creator.cls_.create({ idIndex: idIndex }), 1); // depth 1
+          this.index.cls_.create({ idIndex: idIndex }), 1); // depth 1
         if ( candidate ) {
           var candidateEst = candidate.estimate(this.delegate.size(), sink,
             skip, limit, order, predicate)
@@ -178,14 +178,14 @@ foam.CLASS({
         var existingPlanCost = existingPlan.cost;
         var estimateRatio = bestEstimate / existingEstimate;
 
-        return this.creator.CustomPlan.create({
+        return this.index.CustomPlan.create({
           cost: existingPlanCost * estimateRatio,
           customExecute: function autoIndexAdd(apromise, asink, askip, alimit, aorder, apredicate) {
 
 console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.cost, predicate && predicate.toString());
 //console.log(newIndex.toPrettyString(0));
 //console.log(self.$UID, "ROOT          ");
-//console.log(root.creator.toPrettyString(0));
+//console.log(root.index.toPrettyString(0));
 
             self.addIndex(newIndex, root);
             // Avoid a recursive call by hitting our delegate.
@@ -202,7 +202,7 @@ console.log(self.$UID, "BUILDING INDEX", existingPlanCost, estimateRatio, this.c
     },
 
     function toString() {
-      return 'AutoIndex(' + (this.creator || this).delegate.toString() + ')';
+      return 'AutoIndex(' + (this.index || this).delegate.toString() + ')';
     },
 
   ]
