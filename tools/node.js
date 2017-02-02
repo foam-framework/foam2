@@ -44,6 +44,12 @@ foam.CLASS({
     {
       name: 'modelArgs',
     },
+    {
+      name: 'locale',
+      postSet: function(_, n) {
+        foam.locale = n;
+      },
+    },
 
     {
       name: foam.String.daoize(foam.core.Model.name),
@@ -55,7 +61,7 @@ foam.CLASS({
           modelDao = this.OrDAO.create({
             delegate: modelDao,
             primary: this.NodeModelFileDAO.create({
-              classpath: classpath, 
+              classpath: classpath,
             }),
           });
         }
@@ -66,8 +72,11 @@ foam.CLASS({
   methods: [
     function execute() {
       var modelArgs = this.modelArgs;
-      return this.__subContext__.arequire(this.modelId).then(function(model) {
-        return model.create(modelArgs).execute();
+      var X = this.__subContext__;
+      return X.arequire(this.modelId).then(function(model) {
+        return model.create(modelArgs, X).execute();
+      }).catch(function(err) {
+        console.log(err.stack);
       });
     }
   ],
