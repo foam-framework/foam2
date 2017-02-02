@@ -19,11 +19,21 @@ foam.CLASS({
   package: 'nodetooldemo',
   name: 'Test',
   properties: ['name'],
+  messages: [
+    {
+      name: 'MY_STRING',
+      messageMap: {
+        en: 'English',
+        fr: 'Francais',
+      }
+    }
+  ],
   methods: [
     {
       name: 'execute',
       code: function() {
         console.log('Hello', this.name);
+        console.log('Hello', this.MY_STRING);
       },
     },
   ]
