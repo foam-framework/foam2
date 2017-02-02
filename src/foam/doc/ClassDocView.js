@@ -69,6 +69,14 @@ foam.CLASS({
     'foam.dao.ArrayDAO'
   ],
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'showInherited',
+      value: true
+    }
+  ],
+
   methods: [
     function initE() {
       this.SUPER();
@@ -87,24 +95,31 @@ foam.CLASS({
       this.br();
       this.add(data.documentation);
 
-      var axs = [];
-      for ( var key in data.axiomMap_ ) {
-        var a = data.axiomMap_[key];
-        var ai = foam.doc.AxiomInfo.create({
-          axiom: a,
-          type: a.cls_,
-          cls: this.Link.create({
-            path: a.sourceCls_.id,
-            label: a.sourceCls_.name
-          }),
-          name: a.name
-        });
-        axs.push(ai);
-      }
+      this.add('Show Inherited: ').start(this.SHOW_INHERITED, {data$: this.showInherited$}).end();
 
-      this.add(this.TableView.create({
-        of: this.AxiomInfo,
-        data: this.ArrayDAO.create({array: axs})
+      this.add(this.slot(function (showInherited) {
+        // TODO: hide 'Source Class' column if showInherited is false
+        var axs = [];
+        for ( var key in data.axiomMap_ ) {
+          if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
+            var a  = data.axiomMap_[key];
+            var ai = foam.doc.AxiomInfo.create({
+              axiom: a,
+              type: a.cls_,
+              cls: this.Link.create({
+                path: a.sourceCls_.id,
+                label: a.sourceCls_.name
+              }),
+              name: a.name
+            });
+            axs.push(ai);
+          }
+        }
+
+        return this.TableView.create({
+          of: this.AxiomInfo,
+          data: this.ArrayDAO.create({array: axs})
+        });
       }));
     }
   ]
