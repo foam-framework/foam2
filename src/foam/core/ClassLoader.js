@@ -28,6 +28,8 @@ foam.CLASS({
       name: 'arequire',
       class: 'foam.core.ContextMethod',
       code: function(X, modelId) {
+        // TODO: This method only adds requires. Make it add extends,
+        // properties, and anything else that might be needed.
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
         return new Promise(function(resolve, reject) {
           var inited = {};
