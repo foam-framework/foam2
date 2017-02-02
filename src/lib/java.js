@@ -17,140 +17,6 @@
 
 foam.CLASS({
   package: 'foam.java',
-  name: 'JavaClass',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'name'
-    },
-    {
-      class: 'String',
-      name: 'package'
-    },
-    {
-      class: 'String',
-      name: 'id',
-      expression: function(name, package) {
-        return package + '.' + name;
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'abstract',
-      value: false
-    },
-    {
-      class: 'String',
-      name: 'extends',
-      preSet: function(_, a) {
-        if ( a === 'FObject' ) return 'AbstractFObject';
-        return a;
-      }
-    },
-    {
-      class: 'StringArray',
-      name: 'imports',
-      value: [
-        'foam.core.*'
-      ]
-    },
-    {
-      class: 'StringArray',
-      name: 'implements',
-      adapt: function(o, v) {
-        if ( foam.String.isInstance(v) ) return [v];
-        return v;
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'generateClassInfo',
-      value: true
-    },
-    {
-      class: 'Array',
-      name: 'axioms'
-    }
-  ],
-
-  methods: [
-    function fromClass(cls) {
-      this.package = cls.model_.package;
-      this.name = cls.model_.name;
-      this.extends = cls.model_.extends;
-      this.implements = cls.getAxiomsByClass(foam.core.Implements).map(function(a) {
-        return a.path;
-      });
-      this.abstract = cls.model_.abstract;
-      this.axioms = cls.getAxioms();
-      return this;
-    }
-  ],
-
-  templates: [
-    {
-      name: 'code',
-      template: function() {/*<%
-%>// GENERATED CODE
-// adamvy@google.com
-package <%= this.package %>;
-
-<% for ( var i = 0 ; this.imports && i < this.imports.length ; i++ ) {
-%>import <%= this.imports[i] %>;
-<% } %>
-
-public <%= this.abstract ? 'abstract ' : '' %>class <%= this.name %> extends <%= this.extends %><%
-  if ( this.implements && this.implements.length > 0 ) { %> implements <%
-    for ( var i = 0 ; i < this.implements.length ; i++ ) {
-      %><%= this.implements[i] %><%
-      if ( i < this.implements.length - 1 ) { %>,<% }
-      %> <%
-    }
-  }
-%> {
-<% if ( this.generateClassInfo ) { %>
-  private static ClassInfo classInfo_ = new ClassInfo()
-    .setId("<%= this.id %>")
-<%
-  var a = this.axioms;
-  for ( var i = 0 ; i < a.length ; i++ ) {
-    if ( ! a[i].axiomClassInfo ) continue;
-    a[i].axiomClassInfo(output, this);
-%>
-  <%
-  }
-%>;
-
-  public ClassInfo getClassInfo() {
-    return classInfo_;
-  }
-
-  public static ClassInfo getOwnClassInfo() {
-    return classInfo_;
-  }
-
-<%
-  }
-
-  var a = this.axioms;
-
-for ( var i = 0 ; i < a.length; i++ ) {
-  if ( ! a[i].axiomJavaSource ) continue;
-  a[i].axiomJavaSource(output, this); %>
-<%
-}
-
-%>
-}
-*/}
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.java',
   name: 'Skeleton',
 
   properties: [
@@ -305,35 +171,6 @@ foam.CLASS({
         body: this.javaCode ? this.javaCode : ''
       });
     }
-  ],
-
-  templates: [
-    {
-      name: 'axiomJavaInterfaceSource',
-      template: function() {/*
-  public <%= this.javaReturns || 'void' %> <%= this.name %>(<%
-for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
-  var arg = this.args[i];
-  %><%= arg.javaType || 'Object' %> <%= arg.name %><%
-  if ( i != this.args.length - 1 ) { %>, <% }
-}
-%>);
-*/}
-    },
-    {
-      name: 'axiomJavaSource',
-      template: function() {/*<% if ( ! this.javaCode ) { return opt_outputter || ''; } %>
-  public <%= this.javaReturns || 'void' %> <%= this.name %>(<%
-for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
-  var arg = this.args[i];
-  %><%= arg.javaType || 'Object' %> <%= arg.name %><%
-  if ( i != this.args.length - 1 ) { %>, <% }
-}
-%>) {
-  <%= this.javaCode %>
-  }
-*/}
-    }
   ]
 });
 
@@ -379,17 +216,6 @@ foam.CLASS({
         visibility: 'protected'
       });
     }
-  ],
-
-  templates: [
-    {
-      name: 'axiomJavaSource',
-      template: function() {/*
-  public Object get<%= foam.String.capitalize(this.name) %>() {
-    return getX().get("<%= this.key %>");
-  }
-*/}
-     }
   ]
 });
 
@@ -454,71 +280,6 @@ foam.CLASS({
       class: 'String',
       name: 'javaToJSON'
     }
-  ],
-
-  templates: [
-    {
-      name: 'axiomJavaInterfaceSource',
-      template: function() {/*<% var cls = arguments[1] %>
-  public <%= this.javaType %> get<%= foam.String.capitalize(this.name) %>();
-  public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.javaType %> val);
-*/}
-    },
-    {
-      name: 'axiomJavaSource',
-      template: function() {/*<% var cls = arguments[1]; if ( this.javaType ) { %>
-private <%= this.javaType %> <%= this.name %>;
-
-public <%= this.javaType %> get<%= foam.String.capitalize(this.name) %>() {
-  return <%= this.name %>;
-}
-
-public <%= cls.name %> set<%= foam.String.capitalize(this.name) %>(<%= this.javaType %> val) {
-  <%= this.name %> = val;
-  return this;
-}
-<% } %>*/}
-    },
-    {
-      name: 'axiomClassInfo',
-      template: function() {/*<% var cls = arguments[1]; %>
-  .addProperty(
-    new <%= this.javaInfoType %>() {
-      @Override
-      public String getName() { return "<%= this.name %>"; }
-
-      @Override
-      public Object get(Object o) {
-        return get_(o);
-      }
-
-      public <%= this.javaType %> get_(Object obj) {
-        return ((<%= cls.name %>)obj).get<%= foam.String.capitalize(this.name) %>();
-      }
-
-      @Override
-      public void set(Object obj, Object value) {
-        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
-      }
-
-<% if ( this.javaToJSON ) { %>
-      @Override
-      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
-<%= this.javaToJSON %>
-      }
-<% } %>
-
-      @Override
-      public int compare(Object o1, Object o2) {
-        return compareValues((<%= this.javaType %>)get(o1), (<%= this.javaType %>)get(o2));
-      }
-
-      @Override
-      public foam.lib.parse.Parser jsonParser() {
-        return new <%= this.javaJSONParser %>();
-      }})
-*/}
-    }
   ]
 });
 
@@ -555,57 +316,6 @@ foam.CLASS({
     ['javaType', 'Object[]'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
-  ],
-
-  templates: [
-    {
-      name: 'axiomClassInfo',
-      template: function() {/*<% var cls = arguments[1]; %>
-  .addProperty(
-    new <%= this.javaInfoType %>() {
-      @Override
-      public String getName() { return "<%= this.name %>"; }
-
-      @Override
-      public Object get(Object o) {
-        return get_(o);
-      }
-
-      public <%= this.javaType %> get_(Object obj) {
-        return ((<%= cls.name %>)obj).get<%= foam.String.capitalize(this.name) %>();
-      }
-
-      @Override
-      public void set(Object obj, Object value) {
-        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
-      }
-
-<% if ( this.javaToJSON ) { %>
-      @Override
-      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
-<%= this.javaToJSON %>
-      }
-<% } %>
-
-      public int compare(Object o1, Object o2) {
-        <%= this.javaType %> values1 = get_(o1);
-        <%= this.javaType %> values2 = get_(o2);
-        if ( values1.length > values2.length ) return 1;
-        if ( values1.length < values2.length ) return -1;
-
-        int result;
-        for ( int i = 0 ; i < values1.length ; i++ ) {
-          result = ((Comparable)values1[i]).compareTo(values2[i]);
-          if ( result != 0 ) return result;
-        }
-        return 0;
-      }
-
-      @Override
-      public foam.lib.parse.Parser jsonParser() {
-        return new <%= this.javaJSONParser %>();
-      }})*/}
-    }
   ]
 });
 
@@ -625,57 +335,6 @@ foam.CLASS({
       value: 'foam.lib.json.FObjectArrayParser'
     },
     ['javaInfoType', 'foam.core.AbstractPropertyInfo']
-  ],
-
-  templates: [
-    {
-      name: 'axiomClassInfo',
-      template: function() {/*<% var cls = arguments[1]; %>
-  .addProperty(
-    new <%= this.javaInfoType %>() {
-      @Override
-      public String getName() { return "<%= this.name %>"; }
-
-      @Override
-      public Object get(Object o) {
-        return get_(o);
-      }
-
-      public <%= this.javaType %> get_(Object obj) {
-        return ((<%= cls.name %>)obj).get<%= foam.String.capitalize(this.name) %>();
-      }
-
-      @Override
-      public void set(Object obj, Object value) {
-        ((<%= cls.name %>)obj).set<%= foam.String.capitalize(this.name) %>((<%= this.javaType %>)value);
-      }
-
-<% if ( this.javaToJSON ) { %>
-      @Override
-      public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
-<%= this.javaToJSON %>
-      }
-<% } %>
-
-      public int compare(Object o1, Object o2) {
-        <%= this.javaType %> values1 = get_(o1);
-        <%= this.javaType %> values2 = get_(o2);
-        if ( values1.length > values2.length ) return 1;
-        if ( values1.length < values2.length ) return -1;
-
-        int result;
-        for ( int i = 0 ; i < values1.length ; i++ ) {
-          result = ((Comparable)values1[i]).compareTo(values2[i]);
-          if ( result != 0 ) return result;
-        }
-        return 0;
-      }
-
-      @Override
-      public foam.lib.parse.Parser jsonParser() {
-        return new <%= this.javaJSONParser %>();
-      }})*/}
-    }
   ]
 });
 

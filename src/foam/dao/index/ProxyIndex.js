@@ -34,7 +34,7 @@ foam.CLASS({
     function toPrettyString(indent) {
       return this.delegate.toPrettyString(indent);
     },
-    
+
     function toString() {
       return '[' + this.cls_.name + ': ' + this.delegate.toString() + ']'
     }
@@ -55,9 +55,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.delegate = this.delegate || this.creator.delegate.createNode();
+      this.delegate = this.delegate || this.index.delegate.createNode();
     },
-    
+
     function put(o) { return this.delegate.put(o); },
 
     function remove(o) { return this.delegate.remove(o); },

@@ -74,7 +74,7 @@ foam.CLASS({
 
     function createNode(args) {
       args = args || {};
-      args.creator = this;
+      args.index = this;
       return this.nodeClass.create(args, this);
     }
   ]
@@ -87,7 +87,7 @@ foam.CLASS({
   the data in the DAO.
 
   For creation speed, do not require or import anything in a node class.
-  Use the 'creator' property to access requires and imports on the
+  Use the 'index' property to access requires and imports on the
   Index that created the node instance.
 */
 foam.CLASS({
@@ -97,7 +97,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Simple',
-      name: 'creator'
+      name: 'index'
     }
   ],
 

@@ -386,7 +386,8 @@ foam.CLASS({
 
     }
   ]
-}).create().write();
+});
+foam.lookup('CustomDetailView').create().write();
 
 
 // Converted from Angular2 demo:
@@ -398,7 +399,8 @@ foam.CLASS({
   methods: [ function initE() {
     this.start('h1').add("Bound Textbox").end().start(this.TEXT, {onKey: true}).end().add(this.text$);
   }]
-}).create().write();
+});
+foam.lookup('BoundTextbox').create().write();
 
 
 foam.CLASS({

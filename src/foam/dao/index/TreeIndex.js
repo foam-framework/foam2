@@ -111,7 +111,7 @@ foam.CLASS({
 
   constants: {
     IS_EXPR_MATCH_FN: function isExprMatch(predicate, prop, model) {
-      var self = this.creator || this;
+      var self = this.index || this;
       if ( predicate && model && prop ) {
         // util.equals catches Properties that were cloned if the predicate has
         //  been cloned.
@@ -171,7 +171,7 @@ foam.CLASS({
     function init() {
 
       // TODO: replace with bound methods when available
-      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.creator.dedup, this);
+      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.index.dedup, this);
       //this.compare = foam.Function.bind(this.compare, this);
     },
 
@@ -311,7 +311,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.root = this.root || this.creator.nullNode;
+      this.root = this.root || this.index.nullNode;
       this.selectCount = this.selectCount || 0;
     },
 
@@ -321,14 +321,14 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.creator.nullNode;
+      this.root = this.index.nullNode;
 
       // Only safe if children aren't themselves trees
       // TODO: should this be !TreeIndex.isInstance? or are we talking any
       // non-simple index, and is ValueIndex the only simple index?
       // It's the default, so ok for now
-      if ( this.creator.ValueIndex.isInstance(this.tail) ) {
-        var prop = this.creator.prop;
+      if ( this.index.ValueIndex.isInstance(this.tail) ) {
+        var prop = this.index.prop;
         a.sort(prop.compare.bind(prop));
         this.root = this.root.bulkLoad_(a, 0, a.length-1, prop.f);
       } else {
@@ -341,25 +341,25 @@ foam.CLASS({
 
     function put(newValue) {
       this.root = this.root.putKeyValue(
-          this.creator.prop.f(newValue),
+          this.index.prop.f(newValue),
           newValue,
-          this.creator.compare,
-          this.creator.dedup,
+          this.index.compare,
+          this.index.dedup,
           this.selectCount > 0);
     },
 
     function remove(value) {
       this.root = this.root.removeKeyValue(
-          this.creator.prop.f(value),
+          this.index.prop.f(value),
           value,
-          this.creator.compare,
+          this.index.compare,
           this.selectCount > 0,
-          this.creator.nullNode);
+          this.index.nullNode);
     },
 
     function get(key) {
       // does not delve into sub-indexes
-      return this.root.get(key, this.creator.compare);
+      return this.root.get(key, this.index.compare);
     },
 
     function select(sink, skip, limit, order, predicate, cache) {
@@ -376,7 +376,7 @@ foam.CLASS({
 
     function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
-      var m = this.creator;
+      var m = this.index;
 
 
       if ( m.False.isInstance(predicate) ) return m.NotFoundPlan.create();
@@ -435,7 +435,7 @@ foam.CLASS({
       if ( expr ) {
         predicate = expr.predicate;
         var key = expr.arg2.f();
-        result = this.get(key, this.creator.compare);
+        result = this.get(key, this.index.compare);
 
         if ( ! result ) return m.NotFoundPlan.create();
 
@@ -492,19 +492,19 @@ foam.CLASS({
       var subTree = this.root;
 
       expr = isExprMatch(m.Gt);
-      if ( expr ) subTree = subTree.gt(expr.arg2.f(), this.creator.compare);
+      if ( expr ) subTree = subTree.gt(expr.arg2.f(), this.index.compare);
 
       expr = isExprMatch(m.Gte);
-      if ( expr ) subTree = subTree.gte(expr.arg2.f(), this.creator.compare, this.creator.nullNode);
+      if ( expr ) subTree = subTree.gte(expr.arg2.f(), this.index.compare, this.index.nullNode);
 
       expr = isExprMatch(m.Lt);
-      if ( expr ) subTree = subTree.lt(expr.arg2.f(), this.creator.compare);
+      if ( expr ) subTree = subTree.lt(expr.arg2.f(), this.index.compare);
 
       expr = isExprMatch(m.Lte);
-      if ( expr ) subTree = subTree.lte(expr.arg2.f(), this.creator.compare, this.creator.nullNode);
+      if ( expr ) subTree = subTree.lte(expr.arg2.f(), this.index.compare, this.index.nullNode);
 
       cost = subTree.size;
-      var sortRequired = ! this.creator.isOrderSelectable(order);
+      var sortRequired = ! this.index.isOrderSelectable(order);
       var reverseSort = false;
 
       var subOrder;
@@ -561,7 +561,7 @@ foam.CLASS({
     },
 
     function toString() {
-      return 'TreeIndex(' + (this.creator || this).prop.name + ', ' + (this.creator || this).tail + ')';
+      return 'TreeIndex(' + (this.index || this).prop.name + ', ' + (this.index || this).tail + ')';
     },
 
   ]
@@ -582,20 +582,20 @@ foam.CLASS({
   methods: [
     function put(newValue) {
       this.root = this.root.putKeyValue(
-          this.creator.prop.f(newValue).toLowerCase(),
+          this.index.prop.f(newValue).toLowerCase(),
           newValue,
-          this.creator.compare,
-          this.creator.dedup,
+          this.index.compare,
+          this.index.dedup,
           this.selectCount > 0);
     },
 
     function remove(value) {
       this.root = this.root.removeKeyValue(
-          this.creator.prop.f(value).toLowerCase(),
+          this.index.prop.f(value).toLowerCase(),
           value,
-          this.creator.compare,
+          this.index.compare,
           this.selectCount > 0,
-          this.creator.nullNode);
+          this.index.nullNode);
     },
 
     /**
@@ -603,7 +603,7 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.creator.nullNode;
+      this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
       }
@@ -634,37 +634,37 @@ foam.CLASS({
      **/
     function bulkLoad(a) {
       a = a.a || a;
-      this.root = this.creator.nullNode;
+      this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
       }
     },
 
     function put(newValue) {
-      var a = this.creator.prop.f(newValue);
+      var a = this.index.prop.f(newValue);
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.root = this.root.putKeyValue(
               a[i],
               newValue,
-              this.creator.compare,
-              this.creator.dedup);
+              this.index.compare,
+              this.index.dedup);
         }
       } else {
-        this.root = this.root.putKeyValue('', newValue, this.creator.compare, this.creator.dedup);
+        this.root = this.root.putKeyValue('', newValue, this.index.compare, this.index.dedup);
       }
     },
 
     function remove(value) {
-      var a = this.creator.prop.f(value);
+      var a = this.index.prop.f(value);
 
       if ( a.length ) {
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.root = this.root.removeKeyValue(a[i], value, this.creator.compare, this.creator.nullNode);
+          this.root = this.root.removeKeyValue(a[i], value, this.index.compare, this.index.nullNode);
         }
       } else {
-        this.root = this.root.removeKeyValue('', value, this.creator.compare, this.creator.nullNode);
+        this.root = this.root.removeKeyValue('', value, this.index.compare, this.index.nullNode);
       }
     },
 
