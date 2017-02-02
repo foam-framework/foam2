@@ -64,6 +64,7 @@ FOAM_FILES([
   { name: "foam/core/JSON" },
   { name: "foam/parse/parse" },
   { name: "foam/core/templates" },
+  { name: "foam/i18n/Messages" },
   { name: "foam/core/Action" },
   { name: "foam/core/Serializable" },
   { name: "lib/java", flags: ['java'] },
