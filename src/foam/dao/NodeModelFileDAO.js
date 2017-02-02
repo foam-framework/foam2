@@ -35,7 +35,8 @@ foam.CLASS({
         try {
           require(path);
         } catch(e) {
-          return Promise.reject('Unable to find ' + path);
+          return Promise.reject(
+              'Unable to load at ' + path + '. Error: ' + e.stack);
         }
       }
       return Promise.resolve(this.lookup(id));
