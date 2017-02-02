@@ -8,6 +8,7 @@ read -r -d '' ARGS << EOM
     '$DIR/../../src',
     '$DIR/js'
   ],
+  locale: 'fr',
   modelId: 'nodetooldemo.Test',
   modelArgs: {
     name: 'Joe',
