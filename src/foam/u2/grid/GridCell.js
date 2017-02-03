@@ -192,7 +192,7 @@ foam.CLASS
             this.cssClass(this.myCls('grid-cell'));
             this.on('click', this.onClick);
             this.setNodeName('td');
-            this.start(this.wrapper).add(this.cell$).end(); 
+            this.start(this.wrapper).add(this.cell$).end();
             //this.add(this.cell$);
         },
         

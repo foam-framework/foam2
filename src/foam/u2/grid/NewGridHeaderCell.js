@@ -1,11 +1,11 @@
 foam.CLASS
 ({
-    package: "foam.u2.grid",
-    name: "GridHeaderCell",
-    extends: "foam.u2.Element",
+    package: 'foam.u2.grid',
+    name: 'GridHeaderCell',
+    extends: 'foam.u2.Element',
 
     imports: [
-    ], 
+    ],
     
     axioms: [
       foam.u2.CSS.create({
@@ -32,10 +32,10 @@ foam.CLASS
     properties: [
         'of',
         {
-            name: "cell",
+            name: 'cell',
             factory: function(){
                 var b  = foam.u2.Element.create();
-                b.setNodeName("div");
+                b.setNodeName('div');
                 return b; 
             }
         }, 
@@ -53,7 +53,7 @@ foam.CLASS
         {
             name: 'name',
             expression: function(data){
-                if (typeof data == "string"){
+                if (typeof data == 'string'){
                     return data; 
                 }else if (data && data.name){
                     return data.name; 
@@ -61,23 +61,20 @@ foam.CLASS
                 return undefined; 
             }
         },
-        {
-            name: "M",
-            factory: function() { return foam.mlang.Expressions.create();},
-        }, 
-        
+
         {
             name: 'isSelected',
-            value: false, 
+            value: false,
+            class: 'Boolean', 
         }, 
         {
             name: 'headerHighlightCSSClass',
             expression: function(isSelected, rowIndex, colIndex){
                 if (isSelected){
                     if (rowIndex >-1){
-                        return this.myCls("row-header-highlight");
+                        return this.myCls('row-header-highlight');
                     }else if (colIndex >-1){
-                        return this.myCls("col-header-highlight");
+                        return this.myCls('col-header-highlight');
                     }
                 }
             }
@@ -86,11 +83,11 @@ foam.CLASS
       ], 
     methods: [
         function initE() {
-            this.cell.cssClass(this.myCls("cell-header"));
+            this.cell.cssClass(this.myCls('cell-header'));
             this.cssClass(this.headerHighlightCSSClass$);
-            this.on("click", this.onClick);
-            this.setNodeName("td");
-            this.cssClass(this.myCls("grid-header-cell"));
+            this.on('click', this.onClick);
+            this.setNodeName('td');
+            this.cssClass(this.myCls('grid-header-cell'));
             this.add(this.cell$);
         },
         
@@ -104,13 +101,13 @@ foam.CLASS
         },
         
         function makeCell(){
-            var p = foam.u2.Element.create("span");
+            var p = foam.u2.Element.create('span');
             if (this.property && this.property.gridHeaderView){
                 p.add(this.property.gridHeaderView(this.data));
             }else if (this.name){
                 p.add(this.name);
             } else {
-            p.add("N/A");
+            p.add('N/A');
             } 
             this.cell = p;
             
@@ -124,9 +121,9 @@ foam.CLASS
             name: 'onClick',
             isFramed: true,
             code: function(){
-                console.log("Gridheadercell clicked");
+                console.log('Gridheadercell clicked');
                 this.isSelected = !this.isSelected; 
-                this.pub("selected");
+                this.pub('selected');
                 }
                 
         },

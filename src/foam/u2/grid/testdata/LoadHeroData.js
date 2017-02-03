@@ -1,3 +1,45 @@
+foam.CLASS({
+    refines: 'foam.core.Property',
+    properties: [
+        {
+            class: 'Function',
+            name: 'validator',
+        },
+        {
+            class: 'Function',
+            name: 'tableFormatter',
+            factory: function() { return function(value, obj, t){return value; }; },
+        },
+        {
+            class: 'Function',
+            name: 'gridHeaderView',
+            factory: function() { return function(value, obj, t){return value; }; },
+        },
+        {
+            name: 'sortable',
+            class: 'Boolean',
+            value: true, 
+        },
+        {
+            name: 'groupByProperty',
+            class: 'String',
+            value: 'id',
+        },
+        {
+            name: 'groupByLabel',
+            class: 'String',
+            value: 'label',
+        },
+        /*{
+            name: 'salesforceType',
+            class: 'String'
+        },*/
+    ],
+
+});
+
+
+
 // Relationship Test
 foam.CLASS({
   name: 'Team',
@@ -145,7 +187,7 @@ foam.CLASS({
   name: 'HeroCellView',
   extends: 'foam.u2.Element', 
   
-  requires: ['Team', 'Hero'],
+  requires: ['Team', 'Hero', 'foam.u2.Element'],
   
   imports: [
   ], 
@@ -161,7 +203,7 @@ foam.CLASS({
     {
         name: 'cellView',
         factory: function(){
-            return foam.u2.Element.create();
+            return this.Element.create(null, this);
         }
     }
     
@@ -169,7 +211,9 @@ foam.CLASS({
   
   methods: [
     function initE(){
-        this.add(this.cellView$); 
+        this.add(this.cellView$);
+        this.attrs({ draggable: 'true' });
+        this.on('dragstart', this.onDragStart); 
     },
     
     function init(){
@@ -196,7 +240,14 @@ foam.CLASS({
               this.makeCellView();
             }
         },
-    ],
+        {
+          name: 'onDragStart',
+          code: function(e) {
+          e.dataTransfer.setData('application/x-foam-obj-id', this.data.id);
+          e.stopPropagation();
+          }
+        },
+      ],
   
 });
   
@@ -231,11 +282,22 @@ foam.CLASS({
   
   methods: [
     function initE(){
-        this.cssClass(this.myCls()).
+        //this.cssClass(this.myCls()).
+        this.
+          style({
+            'border': '2px solid red', 
+            'height':'100%',
+            'width':'100%',
+            'display':'inline-block',
+            }).
           start('div', null, this.content$).
             cssClass(this.myCls('content')).
-          end()
-          .add(this.wrapperView$); 
+          end().
+          add(this.wrapperView$);
+          
+        this.on('dragenter', this.onDragOver).
+          on('dragover', this.onDragOver).
+          on('drop', this.onDrop); 
     },
     
     function makeWrapper(){
@@ -265,6 +327,45 @@ foam.CLASS({
               this.makeWrapper();
             }
         },
+         {
+            name: 'onDragOver',
+            code: function(e){
+                console.log("something is dragged over this shit. ");
+                  e.preventDefault();
+                  e.stopPropagation();
+                
+            }
+        },
+        
+        {
+            name: 'onDrop',
+            code: function(e){
+                console.log('something is dumped here. ');
+                
+                      if ( ! e.dataTransfer.types.some(function(m) { return m === 'application/x-foam-obj-id'; }) )
+                    return;
+            
+                  var id = e.dataTransfer.getData('application/x-foam-obj-id');
+                  if (!id ) return;
+                  //if ( foam.util.equals(id, this.id) ) return;
+            
+                  e.preventDefault();
+                  e.stopPropagation();
+            
+                  var self = this; 
+                  this.HeroDAO.find(id).then(function(hero){
+                      if (! hero){
+                        console.log("no valid hero found");
+                        return; 
+                      }
+                      hero.status = self.status;
+                      hero.team = self.team;
+                      self.HeroDAO.put(hero).then(function(hero){
+                        console.log("Current hero: " + hero.name + ", " + hero.status + ", " + hero.team.name); 
+                      }); 
+                  }); 
+            }
+        }
     ],
     
     actions: [

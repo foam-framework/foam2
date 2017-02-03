@@ -20,6 +20,8 @@ foam.CLASS
       foam.u2.CSS.create({
           code: function() {/*
             ^grid-table {
+                border-collapse: collapse;
+                max-height: 2000px;
                 border: 1px solid black;
                 border-collapse: collapse;
             }
@@ -40,7 +42,7 @@ foam.CLASS
     {
         name: 'body',
         factory: function(){
-            var b  = foam.u2.Element.create();
+            var b  = foam.u2.Element.create(null, this);
             b.setNodeName('tbody');
             return b; 
         }
@@ -211,14 +213,14 @@ foam.CLASS
         },
 
         function makeBody(){
-            var b  = foam.u2.Element.create();
+            var b  = foam.u2.Element.create(null, this);
             b.setNodeName('tbody');
             this.cellArray = [];
             this.rowArray = []; 
             
             
             for (var i=-1; i< this.rowPropertiesArray.length; i++){
-                var r = foam.u2.Element.create();
+                var r = foam.u2.Element.create(null, this);
                 var currCellRow = []; 
                 r.setNodeName('tr');
                 for (var j=-1; j< this.colPropertiesArray.length; j++){
