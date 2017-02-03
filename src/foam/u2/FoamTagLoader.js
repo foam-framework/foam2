@@ -57,4 +57,4 @@ foam.CLASS({
   ]
 });
 
-//foam.u2.FoamTagLoader.create();
+foam.u2.FoamTagLoader.create();
