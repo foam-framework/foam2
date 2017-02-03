@@ -1419,8 +1419,16 @@ foam.CLASS({
       return this;
     },
 
-    function call(f) {
-      f.call(this);
+    function call(f, args) {
+      f.apply(this, args);
+
+      return this;
+    },
+
+    function forEach(a, f) {
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        f.call(this, a[i], i);
+      }
 
       return this;
     },
