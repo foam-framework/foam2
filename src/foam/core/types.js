@@ -458,3 +458,18 @@ foam.CLASS({
     { class: 'Boolean', name: 'abstract' }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'Property',
+
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
+  properties: [
+    {
+      name: 'of'
+    }
+  ]
+});
