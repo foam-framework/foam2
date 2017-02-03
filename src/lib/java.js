@@ -151,6 +151,7 @@ foam.CLASS({
       m.sourceCls_ = child.sourceCls_;
 
       child.throws = this.throws;
+      child.code = child.code || this.code;
       return m;
     },
 
