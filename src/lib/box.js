@@ -1321,7 +1321,7 @@ foam.CLASS({
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          this.me.send(foam.json.parse(foam.json.parseString(p, null, this)));
+          this.me.send(foam.json.parseString(p, this));
         }.bind(this));
       }
     }
