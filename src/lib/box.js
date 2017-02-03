@@ -646,6 +646,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'PollingClientDAO',
   extends: 'foam.dao.EventlessClientDAO',
+  requires: [
+    'foam.dao.ArraySink'
+  ],
   methods: [
     function put(obj) {
       var self = this;
@@ -665,6 +668,8 @@ foam.CLASS({
 
     function select(sink, skip, limit, order, predicate) {
       // TODO: Determine which sinks are serializable.
+      sink = sink || this.ArraySink.create();
+
       var self = this;
       return this.SUPER(null, skip, limit, order, predicate).then(function(a) {
         var fc = self.FlowControl.create();
