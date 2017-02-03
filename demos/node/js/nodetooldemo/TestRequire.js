@@ -17,38 +17,6 @@
 
 foam.CLASS({
   package: 'nodetooldemo',
-  name: 'Test',
+  name: 'TestRequire',
   extends: 'nodetooldemo.TestBaseClass',
-  requires: [
-    'nodetooldemo.TestRequire',
-  ],
-  messages: [
-    {
-      name: 'MY_STRING',
-      messageMap: {
-        en: 'English',
-        fr: 'Francais',
-      }
-    }
-  ],
-  properties: [
-    'name',
-/* TODO: Custom property classes need to be handled properly.
-    {
-      class: 'nodetooldemo.TestCustomProperty',
-      name: 'customProp',
-    },
-*/
-  ],
-  methods: [
-    {
-      name: 'execute',
-      code: function() {
-        console.log('Hello', this.name);
-        console.log('Hello', this.customProp);
-        console.log('Hello', this.MY_STRING);
-        console.log(this.TestRequire.model_.id);
-      },
-    },
-  ]
 });
