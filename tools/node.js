@@ -73,11 +73,13 @@ foam.CLASS({
     function execute() {
       var modelArgs = this.modelArgs;
       var X = this.__subContext__;
-      return X.arequire(this.modelId).then(function(model) {
-        return model.create(modelArgs, X).execute();
-      }).catch(function(err) {
-        console.log(err.stack);
-      });
+      var modelId = this.modelId;
+      return X.arequire(modelId)
+        .catch(console.log)
+        .then(function() {
+          return foam.lookup(modelId).create(modelArgs, X).execute();
+        })
+        .catch(console.log);
     }
   ],
 });
