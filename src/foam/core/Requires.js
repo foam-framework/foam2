@@ -88,10 +88,11 @@ foam.CLASS({
           var path  = a[0];
           var parts = path.split('.');
           var name  = a[1] || parts[parts.length-1];
-          return foam.core.Requires.create({name: name, path: path});
+          return foam.core.Requires.create(
+              {name: name, path: path}, this.__subContext__);
         }
 
-        return foam.core.Requires.create(o);
+        return foam.core.Requires.create(o, this.__subContext__);
       }
     }
   ]
