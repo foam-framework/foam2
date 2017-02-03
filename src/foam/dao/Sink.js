@@ -15,36 +15,6 @@
  * limitations under the License.
  */
 
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'FlowControl',
-
-  properties: [
-    {
-      class: 'Boolean',
-      name: 'stopped'
-    },
-    {
-      class: 'Object',
-      name: 'errorEvt'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'stop',
-      code: function() { this.stopped = true; },
-      javaCode: 'setStopped(true);'
-    },
-    {
-      name: 'error',
-      code: function error(e) { this.errorEvt = e; }
-    }
-  ]
-});
-
-
 foam.INTERFACE({
   package: 'foam.dao',
   name: 'Sink',
@@ -53,53 +23,36 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: '',
-      javaReturns: 'void',
       args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        },
-        {
-          name: 'fc',
-          javaType: 'foam.dao.FlowControl'
-        }
+        'obj',
+        'fc'
       ],
       code: function() {}
     },
     {
       name: 'remove',
       returns: '',
-      javaReturns: 'void',
       args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        },
-        {
-          name: 'fc',
-          javaType: 'foam.dao.FlowControl'
-        }
+        'obj',
+        'fc'
       ],
       code: function() {}
     },
     {
       name: 'eof',
       returns: '',
-      javaReturns: 'void',
       args: [],
       code: function() {}
     },
     {
       name: 'error',
       returns: '',
-      javaReturns: 'void',
       args: [],
       code: function() {}
     },
     {
       name: 'reset',
       returns: '',
-      javaReturns: 'void',
       args: [],
       code: function() {}
     }
@@ -131,28 +84,23 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function() {},
-      javaCode: 'return;'
+      code: function() {}
     },
     {
       name: 'remove',
-      code: function() {},
-      javaCode: 'return;'
+      code: function() {}
     },
     {
       name: 'eof',
-      code: function() {},
-      javaCode: 'return;'
+      code: function() {}
     },
     {
       name: 'error',
-      code: function() {},
-      javaCode: 'return;'
+      code: function() {}
     },
     {
       name: 'reset',
-      code: function() {},
-      javaCode: 'return;'
+      code: function() {}
     }
   ]
 });
@@ -256,15 +204,13 @@ foam.CLASS({
       name: 'put',
       code: function put(obj, fc) {
         if ( this.predicate.f(obj) ) this.delegate.put(obj, fc);
-      },
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(obj, fc);'
+      }
     },
     {
       name: 'remove',
       code:     function remove(obj, fc) {
         if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc);
-      },
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(obj, fc);'
+      }
     }
   ]
 });
@@ -296,13 +242,7 @@ foam.CLASS({
         } else {
           this.delegate.put(obj, fc);
         }
-      },
-      javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  fc.stop();\n'
-              + '} else {\n'
-              + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(obj, fc);\n'
-              + '}\n'
+      }
     },
     {
       name: 'remove',
@@ -312,13 +252,7 @@ foam.CLASS({
         } else {
           this.delegate.remove(obj, fc);
         }
-      },
-      javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  fc.stop();\n'
-              + '} else {'
-              + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(obj, fc);\n'
-              + '}\n'
+      }
     }
   ]
 });
@@ -351,12 +285,7 @@ foam.CLASS({
         }
 
         this.delegate.put(obj, fc);
-      },
-      javaCode: 'if ( getCount() < getSkip() ) {\n'
-              + '  setCount(getCount() + 1);\n'
-              + '  return;'
-              + '}\n'
-              + 'getDelegate().put(obj, fc);'
+      }
     },
     {
       name: 'remove',
@@ -366,12 +295,7 @@ foam.CLASS({
           return;
         }
         this.delegate.remove(obj, fc);
-      },
-      javaCode: 'if ( getCount() < getSkip() ) {\n'
-              + '  setCount(getCount() + 1);\n'
-              + '  return;'
-              + '}\n'
-              + 'getDelegate().remove(obj, fc);'
+      }
     }
   ]
 });
@@ -389,10 +313,8 @@ foam.CLASS({
       name: 'comparator'
     },
     {
-      class: 'Object',
+      class: 'List',
       name: 'array',
-      javaType: 'java.util.List',
-      // TODO(adamvy): Java factory
       factory: function() { return []; }
     }
   ],
@@ -402,9 +324,7 @@ foam.CLASS({
       name: 'put',
       code: function put(obj, fc) {
         this.array.push(obj);
-      },
-      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
-                + 'getArray().add(obj);'
+      }
     },
     {
       name: 'eof',
@@ -417,16 +337,7 @@ foam.CLASS({
         for ( var i = 0 ; i < this.array.length ; i++ ) {
           this.delegate.put(this.array[i]);
         }
-      },
-      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
-                + 'java.util.Collections.sort(getArray());\n'
-                + 'foam.dao.FlowControl fc = (foam.dao.FlowControl)getX().create(foam.dao.FlowControl.class);\n'
-                + 'for ( Object o : getArray() ) {\n'
-                + '  if ( fc.getStopped() || fc.getErrorEvt() != null ) {\n'
-                + '    break;\n'
-                + '  }\n'
-                + '  getDelegate().put((foam.core.FObject)o, fc);\n'
-                + '}'
+      }
     },
 
     function remove(obj, fc) {
@@ -464,5 +375,3 @@ foam.CLASS({
     }
   ]
 });
-
-

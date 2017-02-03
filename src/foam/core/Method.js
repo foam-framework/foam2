@@ -59,7 +59,7 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
-    { name: 'code', required: true },
+    { name: 'code', required: false },
     'documentation',
     'returns',
     {
