@@ -1020,10 +1020,8 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Long ) ?'
-            + '((Long)o).intValue() :'
-            + '(o instanceof Double ) ?'
-            + '((Double)o).intValue() :'
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).intValue() :'
             + '(int)o;';
       return info;
     }
@@ -1043,10 +1041,8 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Long ) ?'
-            + '((Long)o).longValue() :'
-            + '(o instanceof Double ) ?'
-            + '((Double)o).longValue() :'
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).longValue() :'
             + '(long)o;';
       return info;
     }
@@ -1065,11 +1061,10 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
-        var m = info.getMethod('cast');
-        m.body = 'if ( o instanceof Double ) return ((Double)o).doubleValue();\n'
-            + 'if ( o instanceof Long ) return ((Long)o).doubleValue();\n'
-            + 'if ( o instanceof Integer ) return ((Integer)o).doubleValue();\n'
-            + 'return (double)o;';
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).doubleValue() :'
+            + '(double)o;';
       return info;
     }
   ]
