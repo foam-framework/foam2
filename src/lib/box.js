@@ -672,7 +672,6 @@ foam.CLASS({
 
       var self = this;
       return this.SUPER(null, skip, limit, order, predicate).then(function(a) {
-        var sink = sink || this.ArraySink.create();
         var fc = self.FlowControl.create();
 
         for ( var i = 0 ; i < a.a.length ; i++ ) {
