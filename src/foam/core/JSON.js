@@ -512,18 +512,7 @@ foam.LIB({
     },
 
     function parseString(jsonStr, opt_ctx) {
-        console.debug('parseString: '+jsonStr);
-        try {
-            return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
-        } catch  (e) {
-            console.warn('failed eval of: '+jsonStr+'\nerror: '+e.message, e);
-            try {
-                return this.parse(jsonStr, undefined, opt_ctx);
-            } catch (e) {
-                console.error('failed parse of: '+jsonStr+'\nerror: '+e.message, e);
-                throw e;
-            }
-        }
+      return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
     },
 
     function stringify(o) {
