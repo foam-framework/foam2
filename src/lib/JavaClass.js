@@ -1117,3 +1117,10 @@ foam.CLASS({
     ['javaFactory', 'return new java.util.HashMap();']
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.List',
+  properties: [
+    ['javaType', 'java.util.List']
+  ]
+});

@@ -1,0 +1,171 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+foam.INTERFACE({
+  refines: 'foam.dao.Sink',
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'fc',
+          javaType: 'foam.dao.FlowControl'
+        }
+      ]
+    },
+    {
+      name: 'remove',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'fc',
+          javaType: 'foam.dao.FlowControl'
+        }
+      ]
+    },
+    {
+      name: 'eof',
+      javaReturns: 'void'
+    },
+    {
+      name: 'error',
+      javaReturns: 'void'
+    },
+    {
+      name: 'reset',
+      javaReturns: 'void'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.AbstractSink',
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'return;'
+    },
+    {
+      name: 'remove',
+      javaCode: 'return;'
+    },
+    {
+      name: 'eof',
+      javaCode: 'return;'
+    },
+    {
+      name: 'error',
+      javaCode: 'return;'
+    },
+    {
+      name: 'reset',
+      javaCode: 'return;'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.PredicatedSink',
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(obj, fc);'
+    },
+    {
+      name: 'remove',
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(obj, fc);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.LimitedSink',
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'if ( getCount() >= getLimit() ) {\n'
+              + '  fc.stop();\n'
+              + '} else {\n'
+              + '  setCount(getCount() + 1);\n'
+              + '  getDelegate().put(obj, fc);\n'
+              + '}\n'
+    },
+    {
+      name: 'remove',
+      javaCode: 'if ( getCount() >= getLimit() ) {\n'
+              + '  fc.stop();\n'
+              + '} else {'
+              + '  setCount(getCount() + 1);\n'
+              + '  getDelegate().put(obj, fc);\n'
+              + '}\n'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.SkipSink',
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'if ( getCount() < getSkip() ) {\n'
+              + '  setCount(getCount() + 1);\n'
+              + '  return;'
+              + '}\n'
+              + 'getDelegate().put(obj, fc);'
+    },
+    {
+      name: 'remove',
+      javaCode: 'if ( getCount() < getSkip() ) {\n'
+              + '  setCount(getCount() + 1);\n'
+              + '  return;'
+              + '}\n'
+              + 'getDelegate().remove(obj, fc);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.OrderedSink',
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+                + 'getArray().add(obj);'
+    },
+    {
+      name: 'eof',
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+                + 'java.util.Collections.sort(getArray());\n'
+                + 'foam.dao.FlowControl fc = (foam.dao.FlowControl)getX().create(foam.dao.FlowControl.class);\n'
+                + 'for ( Object o : getArray() ) {\n'
+                + '  if ( fc.getStopped() || fc.getErrorEvt() != null ) {\n'
+                + '    break;\n'
+                + '  }\n'
+                + '  getDelegate().put((foam.core.FObject)o, fc);\n'
+                + '}'
+    }
+  ]
+});

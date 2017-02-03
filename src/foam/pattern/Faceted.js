@@ -77,5 +77,9 @@ foam.CLASS({
         return oldCreate.apply(this, arguments);
       }
     }
+  ],
+
+  properties: [
+    ['name', 'foam.pattern.Faceted']
   ]
 });

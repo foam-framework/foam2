@@ -259,6 +259,11 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'List',
+  extends: 'foam.core.Object'
+});
 
 foam.CLASS({
   package: 'foam.core',
