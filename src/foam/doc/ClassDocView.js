@@ -3,6 +3,7 @@ for ( var key in foam.UNUSED ) { foam.lookup(key); }
 foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomInfo',
+  ids: ['name'],
 
   properties: [
     {
@@ -14,6 +15,9 @@ foam.CLASS({
       label: 'Source Class',
       tableCellView: function(o, e) {
         return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
+      },
+      tableCellFormatter: function(value, obj, axiom) {
+        this.tag(foam.doc.LinkView, { data: value });
       }
     },
     {
@@ -22,6 +26,13 @@ foam.CLASS({
         return o.type ?
           foam.doc.LinkView.create({data: foam.doc.Link.create({path: o.type.id, label: o.type.name})}, e.__subSubContext__) :
           'anonymous';
+      },
+      tableCellFormatter: function(value, obj, axiom) {
+        if ( value ) {
+          this.tag(foam.doc.LinkView, { data: foam.doc.Link.create({ path: value.id, label: value.name }) });
+          return;
+        }
+        this.add('anonymous');
       }
     },
     {
@@ -65,7 +76,7 @@ foam.CLASS({
     'foam.doc.Link',
     'foam.doc.ClassLink',
     'foam.doc.AxiomInfo',
-    'foam.u2.TableView',
+    'foam.u2.view.TableView',
     'foam.dao.ArrayDAO'
   ],
 
