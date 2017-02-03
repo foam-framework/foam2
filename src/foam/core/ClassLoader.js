@@ -17,10 +17,53 @@
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'ModelARequireExtension',
+  refines: 'foam.core.Model',
+
+  methods: [
+    function arequire() {
+      var p = Promise.resolve();
+      if (this.extends) {
+        p = p.then(this.__subContext__.arequire(this.extends));
+      }
+      for (var i = 0, a; a = this.axioms_[i]; i++) {
+        if (a.arequire) {
+          p = p.then(a.arequire());
+        }
+      };
+      return p;
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'RequiresARequireExtension',
+  refines: 'foam.core.Requires',
+
+  methods: [
+    function arequire() {
+      return this.__subContext__.arequire(this.path);
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'ClassLoader',
 
   exports: [
     'arequire',
+  ],
+
+  properties: [
+    {
+      name: 'pending',
+      class: 'Object',
+      factory: function() {
+        return {};
+      },
+    },
   ],
 
   methods: [
@@ -28,37 +71,38 @@ foam.CLASS({
       name: 'arequire',
       class: 'foam.core.ContextMethod',
       code: function(X, modelId) {
-        // TODO: This method only adds requires. Make it add extends,
-        // properties, and anything else that might be needed.
+        if (this.__subContext__.isRegistered(modelId)) return Promise.resolve();
+        if (this.pending[modelId]) return this.pending[modelId];
+
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
-        return new Promise(function(resolve, reject) {
-          var inited = {};
-          var numLoaded = 0;
-          var loadModelAndDeps = function(modelId) {
-            inited[modelId] = true;
-            modelDao.find(modelId).then(function(model) {
-              numLoaded++;
-              var requires = model.model_.requires || [];
-              requires.map(function(require) {
-                return require.path;
-              }).filter(function(require) {
-                return !inited[require];
-              }).forEach(function(require) {
-                loadModelAndDeps(require);
-              });
-              if (Object.keys(inited).length == numLoaded) {
-                resolve();
-              }
-            }).catch(function(err) {
-              reject(err);
-            });
-          };
-          loadModelAndDeps(modelId);
-        }).then(function() {
-          return X.lookup(modelId);
-        }).catch(function(err) {
-          console.log(err.stack);
+        this.pending[modelId] = modelDao.find(modelId).then(function(m) {
+          m.validate();
+          if ( m.refines ) {
+            foam.CLASS(m);
+            return m;
+          }
+          m.id = m.package ? m.package + '.' + m.name : m.name;
+          foam.UNUSED[m.id] = true;
+          var f = foam.Function.memoize0(function() {
+            delete foam.UNUSED[m.id];
+            var c = m.buildClass();
+            c.validate();
+            foam.USED[m.id] = c;
+            return c;
+          });
+          foam.__context__.registerFactory(m, f);
+          foam.package.registerClassFactory(m, f);
+          return m;
+        }).then(function(m) {
+          return m.arequire();
         });
+
+        var self = this;
+        this.pending[modelId].then(function() {
+          delete self.pending[modelId];
+        });
+
+        return this.pending[modelId];
       },
     },
   ]
