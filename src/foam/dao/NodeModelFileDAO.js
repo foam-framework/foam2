@@ -29,17 +29,25 @@ foam.CLASS({
 
   methods: [
     function find(id) {
-      if ( ! this.lookup(id, true) ) {
-        var sep = require('path').sep;
-        var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
-        try {
-          require(path);
-        } catch(e) {
-          return Promise.reject(
-              'Unable to load at ' + path + '. Error: ' + e.stack);
-        }
+      var foamCLASS = foam.CLASS;
+      var X = this.__subContext__;
+
+      var model;
+      foam.CLASS = function(m) {
+        var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
+        model = cls.create(m, X);
       }
-      return Promise.resolve(this.lookup(id));
+      var sep = require('path').sep;
+      var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
+      try {
+        require(path);
+      } catch(e) {
+        return Promise.reject(
+            'Unable to load at ' + path + '. Error: ' + e.stack);
+      } finally {
+        foam.CLASS = foamCLASS;
+      }
+      return Promise.resolve(model);
     }
   ]
 });
