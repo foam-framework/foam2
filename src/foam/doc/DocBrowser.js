@@ -1,5 +1,3 @@
-for ( var key in foam.UNUSED ) { foam.lookup(key); }
-
 foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomInfo',
@@ -324,7 +322,11 @@ foam.CLASS({
 });
 
 
-foam.debug.doc = function(opt_obj) {
+foam.debug.doc = function(opt_obj, showUnused) {
+  if ( showUnused ) {
+    for ( var key in foam.UNUSED ) foam.lookup(key);
+  }
+
   foam.doc.DocBrowserWindow.create({
     initialClass: foam.core.FObject.isSubClass(opt_obj) ?
       opt_obj.id :
