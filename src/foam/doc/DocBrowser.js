@@ -294,3 +294,40 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.doc',
+  name: 'DocBrowserWindow',
+
+  requires: [
+    'foam.doc.DocBrowser',
+    'foam.core.Window'
+  ],
+
+  imports: [ 'window' ],
+
+  properties: [
+    'initialClass'
+  ],
+
+  methods: [
+    function init() {
+      // TODO: There should be some helper support to make this easier
+      var w = this.window.open(null, null, {width: 700, heigh: 1000});
+      var window = foam.core.Window.create({window: w});
+      var browser = this.DocBrowser.create({path: this.initialClass}, window.__subContext__);
+      w.document.body.insertAdjacentHTML('beforeend', browser.outerHTML);
+      browser.load();
+    }
+  ]
+});
+
+
+foam.debug.doc = function(opt_obj) {
+  foam.doc.DocBrowserWindow.create({
+    initialClass: foam.core.FObject.isSubClass(opt_obj) ?
+      opt_obj.id :
+      ( opt_obj && opt_obj.cls_ ) ? opt_obj.cls_.id :
+      'foam.core.FObject' });
+};
