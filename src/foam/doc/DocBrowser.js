@@ -1,5 +1,37 @@
 foam.CLASS({
   package: 'foam.doc',
+  name: 'DocBorder',
+  extends: 'foam.u2.Element',
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ { background: gray; padding: 10px; display: inline-block; }
+        ^title { padding: 6px; align-content: center; background: aliceblue; }
+        ^content { padding: 6px; min-width: 220px; height: 100%; background: white; }
+      */}
+    })
+  ],
+
+  properties: [
+    'title'
+  ],
+
+  methods: [
+    function init() {
+      this.
+        cssClass(this.myCls()).
+        start('div').cssClass(this.myCls('title')).add(this.title$).end().
+        start('div', null, this.content$).
+          cssClass(this.myCls('content')).
+        end();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.doc',
   name: 'AxiomInfo',
   ids: ['name'],
 
@@ -222,6 +254,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
+    'foam.doc.DocBorder',
     'foam.doc.ClassList',
     'foam.doc.ClassDocView'
   ],
@@ -245,47 +278,54 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.add('Path: ', this.PATH).br().br();
+      this.tag(this.PATH, {displayWidth: 80}).br().br();
 
       this.
         start('table').
           start('tr').
             start('td').
-            add('Classes:').
-              style({'vertical-align': 'top', background: '#f5f5ea' }).
-              start(this.ClassList, {data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+              style({'vertical-align': 'top'}).
+              start(this.DocBorder, {title: 'Class List'}).
+                start(this.ClassList, {data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+              end().
             end().
             start('td').
-              style({'vertical-align': 'top', background: '#f5f5ea' }).
-              add(this.slot(function(path) {
-                var o = foam.lookup(path, true);
-                if ( ! o ) return '';
-                return this.ClassDocView.create({data: o});
-              })).
+              style({'vertical-align': 'top'}).
+              start(this.DocBorder, {title: 'Sub-Classes'}).
+                add(this.slot(function(path) {
+                  var o = foam.lookup(path, true);
+                  if ( ! o ) return '';
+                  return this.ClassDocView.create({data: o});
+                })).
+              end().
             end().
             start('td').
-              add('Sub-Classes:').
-              style({'vertical-align': 'top', background: '#f5f5ea' }).
-              add(this.slot(function(path) {
-                var o = foam.lookup(path, true);
-                if ( ! o ) return '';
-                return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
-              })).
+              style({'vertical-align': 'top'}).
+              start(this.DocBorder, {title: 'Sub-Classes'}).
+                add(this.slot(function(path) {
+                  var o = foam.lookup(path, true);
+                  if ( ! o ) return '';
+                  return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
+                })).
+              end().
             end().
             start('td').
-              add('Required-by:').
-              style({'vertical-align': 'top', background: '#f5f5ea' }).
-              add(this.slot(function(path) {
-                var o = foam.lookup(path, true);
-                if ( ! o ) return '';
-                // TODO: this could be done more efficiently, and memoized
-                return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) {
-                  return cls.model_.requires && cls.model_.requires.map(function(r) { return r.path; }).includes(path); }).sort(foam.core.Model.ID.compare)});
-              })).
+              style({'vertical-align': 'top'}).
+              start(this.DocBorder, {title: 'Required-By'}).
+                add(this.slot(function(path) {
+                  var o = foam.lookup(path, true);
+                  if ( ! o ) return '';
+                  // TODO: this could be done more efficiently, and memoized
+                  return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) {
+                    return cls.model_.requires && cls.model_.requires.map(function(r) { return r.path; }).includes(path); }).sort(foam.core.Model.ID.compare)});
+                })).
+              end().
             end().
             start('td').
-              style({'vertical-align': 'top', background: '#f5f5ea' }).
-              add(this.slot(function (axiom) { return axiom && foam.u2.DetailView.create({data: axiom.axiom}); })).
+              style({'vertical-align': 'top'}).
+              start(this.DocBorder, {title: 'Axiom Definition'}).
+                add(this.slot(function (axiom) { return axiom && foam.u2.DetailView.create({data: axiom.axiom}); })).
+              end().
             end().
           end().
         end();

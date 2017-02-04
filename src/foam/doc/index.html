@@ -2,8 +2,9 @@
   <head>
     <script language="javascript" src="../../foam.js"></script>
   </head>
-  <body>
+  <body style="font-family: roboto, arial">
     <script>
+      for ( var key in foam.UNUSED ) foam.lookup(key);
       foam.doc.DocBrowser.create({path: 'foam.core.Property'}).write();
     </script>
   </body>
