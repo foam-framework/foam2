@@ -291,7 +291,7 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              start(this.DocBorder, {title: 'Sub-Classes'}).
+              start(this.DocBorder, {title: 'Class Definition'}).
                 add(this.slot(function(path) {
                   var o = foam.lookup(path, true);
                   if ( ! o ) return '';
