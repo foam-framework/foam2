@@ -80,6 +80,10 @@ foam.CLASS({
     'foam.dao.ArrayDAO'
   ],
 
+  imports: [
+    'selectedAxiom'
+  ],
+
   properties: [
     {
       class: 'Boolean',
@@ -129,7 +133,8 @@ foam.CLASS({
 
         return this.TableView.create({
           of: this.AxiomInfo,
-          data: this.ArrayDAO.create({array: axs})
+          data: this.ArrayDAO.create({array: axs}),
+          hoverSelection$: this.selectedAxiom$
         });
       }));
     }
@@ -225,14 +230,16 @@ foam.CLASS({
 
   exports: [
     'as data',
-    'path as browserPath'
+    'path as browserPath',
+    'axiom as selectedAxiom'
   ],
 
   properties: [
     'path',
     {
       class: 'FObjectProperty',
-      name: 'axiom'
+      name: 'axiom',
+      view: { class: 'foam.u2.DetailView' }
     }
   ],
 
@@ -280,14 +287,12 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top', background: '#f5f5ea' }).
-              add(this.AXIOM).
+              add(this.slot(function (axiom) { return axiom && foam.u2.DetailView.create({data: axiom.axiom}); })).
             end().
           end().
         end();
     }
   ]
 });
-
-// foam.doc.ClassDocView.create({data: foam.core.Property}).write();
 
 foam.doc.DocBrowser.create({path: 'foam.core.Property'}).write();
