@@ -294,5 +294,3 @@ foam.CLASS({
     }
   ]
 });
-
-foam.doc.DocBrowser.create({path: 'foam.core.Property'}).write();
