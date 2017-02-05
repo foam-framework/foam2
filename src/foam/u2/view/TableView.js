@@ -66,6 +66,8 @@ foam.CLASS({
   name: 'TableView',
   extends: 'foam.u2.Element',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   exports: [
     'columns',
     'selection',
@@ -85,7 +87,7 @@ foam.CLASS({
           background: #eee;
           outline: 1px solid #f00;
         }
-      */}
+    */}
     })
   ],
 
@@ -97,6 +99,16 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'data'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'orderedDAO',
+      expression: function(data, order) {
+        return data.orderBy(order);
+      }
+    },
+    {
+      name: 'order'
     },
     {
       name: 'columns_',
@@ -128,6 +140,11 @@ foam.CLASS({
     'hoverSelection'
   ],
   methods: [
+    function sortBy(column) {
+      this.order = this.order === column ?
+        this.DESC(column) :
+        column;
+    },
     function initE() {
       var view = this;
 
@@ -139,6 +156,12 @@ foam.CLASS({
             forEach(columns_, function(column) {
               this.
                 start('th').
+                add(this.slot(function(order) {
+                  return column === order ? this.Entity.create({ name: '#9651' }) :
+                      (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
+                      ''
+                }, view.order$)).
+                on('click', function(e) { view.sortBy(column); }).
                 call(column.tableHeaderFormatter, [column]).
                 end();
             });
@@ -146,7 +169,7 @@ foam.CLASS({
         add(this.slot(function(columns_) {
           return this.
             E('tbody').
-            select(this.data$proxy, function(obj) {
+            select(this.orderedDAO$proxy, function(obj) {
               return this.
                 E('tr').
                 start('tr').
