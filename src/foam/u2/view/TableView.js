@@ -139,12 +139,14 @@ foam.CLASS({
     'selection',
     'hoverSelection'
   ],
+
   methods: [
     function sortBy(column) {
       this.order = this.order === column ?
         this.DESC(column) :
         column;
     },
+
     function initE() {
       var view = this;
 
