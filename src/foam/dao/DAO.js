@@ -25,140 +25,52 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
-      ]
+      args: [ 'obj' ]
     },
     {
       name: 'remove',
       returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
-      ]
+      args: [ 'obj' ]
     },
     {
       name: 'find',
       returns: 'Promise',
-      javaReturns: 'foam.core.FObject',
-      args: [
-        {
-          name: 'id',
-          javaType: 'Object'
-        }
-      ]
+      args: [ 'id' ]
     },
     {
       name: 'select',
       returns: 'Promise',
-      javaReturns: 'foam.dao.Sink',
-      args: [
-        {
-          name: 'sink',
-          javaType: 'foam.dao.Sink'
-        },
-        {
-          name: 'skip',
-          javaType: 'Integer'
-        },
-        {
-          name: 'limit',
-          javaType: 'Integer'
-        },
-        {
-          name: 'order',
-          javaType: 'foam.mlang.order.Comparator'
-        },
-        {
-          name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate'
-        }
-      ]
+      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'removeAll',
       returns: '',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'skip',
-          javaType: 'Integer'
-        },
-        {
-          name: 'limit',
-          javaType: 'Integer'
-        },
-        {
-          name: 'order',
-          javaType: 'foam.mlang.order.Comparator'
-        },
-        {
-          name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate'
-        }
-      ]
+      args: [ 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'sink',
-          javaType: 'foam.dao.Sink'
-        }
-      ]
+      args: [ 'sink' ]
     },
     {
       name: 'where',
       returns: 'foam.dao.DAO',
-      javaReturns: 'foam.dao.DAO',
-      args: [
-        {
-          name: 'predicate',
-          javaType: 'foam.mlang.predicate.Predicate'
-        }
-      ]
+      args: [ 'predicate' ]
     },
     {
       name: 'orderBy',
       returns: 'foam.dao.DAO',
-      javaReturns: 'foam.dao.DAO',
-      args: [
-        {
-          name: 'comparator',
-          javaType: 'foam.mlang.order.Comparator'
-        }
-      ]
+      args: [ 'comparator' ]
     },
     {
       name: 'skip',
       returns: 'foam.dao.DAO',
-      javaReturns: 'foam.dao.DAO',
-      args: [
-        {
-          name: 'count',
-          javaType: 'int'
-        }
-      ]
+      args: [ 'count' ]
     },
     {
       name: 'limit',
       returns: 'foam.dao.DAO',
-      javaReturns: 'foam.dao.DAO',
-      args: [
-        {
-          name: 'count',
-          javaType: 'int'
-        }
-      ]
+      args: [ 'count' ]
     }
   ]
 });
