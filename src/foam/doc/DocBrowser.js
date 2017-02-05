@@ -6,7 +6,11 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        ^ { background: gray; padding: 10px; display: inline-block; }
+        ^ {
+             display: inline-block;
+             border-radius: 3px;
+             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+        }
         ^title { padding: 6px; align-content: center; background: aliceblue; }
         ^content { padding: 6px; min-width: 220px; height: 100%; background: white; }
       */}
