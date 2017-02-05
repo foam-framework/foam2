@@ -40,6 +40,6 @@ public class FloatParser implements Parser {
       ps = ps.tail();
     }
 
-    return ps.setValue(n.length() > 0 ? Float.valueOf(n.toString()) : 0.0);
+    return ps.setValue(n.length() > 0 ? Float.valueOf(n.toString()) : null);
   }
 }
