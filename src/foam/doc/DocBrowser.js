@@ -315,8 +315,10 @@ foam.CLASS({
                   return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
                 })).
               end().
-            end().
-            start('td').
+//            end().
+                    //            start('td').
+                    br().
+                    br().
               style({'vertical-align': 'top'}).
               start(this.DocBorder, {title: 'Required-By'}).
                 add(this.slot(function(path) {
