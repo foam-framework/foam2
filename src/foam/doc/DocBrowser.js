@@ -327,6 +327,13 @@ foam.CLASS({
                     return cls.model_.requires && cls.model_.requires.map(function(r) { return r.path; }).includes(path); }).sort(foam.core.Model.ID.compare)});
                 })).
               end().
+              br().
+              br().
+              start(this.DocBorder, {title: 'Relationships'}).
+                add(this.slot(function(path) {
+                      return '';
+                })).
+              end().
             end().
             start('td').
               style({'vertical-align': 'top'}).
