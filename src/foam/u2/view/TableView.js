@@ -18,7 +18,9 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableCellPropertyRefinement',
+
   refines: 'foam.core.Property',
+
   properties: [
     {
       name: 'tableHeaderFormatter',
@@ -35,8 +37,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Action',
+
   properties: [
     {
       name: 'tableCellFormatter',
@@ -56,19 +60,25 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
+
   implements: [ 'foam.mlang.Expressions' ],
+
   exports: [
     'columns',
     'selection',
     'hoverSelection'
   ],
+
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
+        ^ th { white-space: nowrap; }
+
         ^row:hover {
           background: #eee;
         }
@@ -80,6 +90,7 @@ foam.CLASS({
     */}
     })
   ],
+
   properties: [
     {
       class: 'Class',
@@ -128,12 +139,14 @@ foam.CLASS({
     'selection',
     'hoverSelection'
   ],
+
   methods: [
     function sortBy(column) {
       this.order = this.order === column ?
         this.DESC(column) :
         column;
     },
+
     function initE() {
       var view = this;
 
