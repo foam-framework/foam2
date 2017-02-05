@@ -18,6 +18,7 @@
 foam.CLASS({
   name: 'WebModelExecutor',
   requires: [
+    'foam.dao.OrDAO',
     'foam.dao.WebModelFileDAO',
   ],
   imports: [
@@ -40,11 +41,26 @@ foam.CLASS({
         foam.locale = n;
       },
     },
+    {
+      name: 'classpath',
+    },
 
     {
       name: foam.String.daoize(foam.core.Model.name),
-      factory: function() {
-        var modelDao = this.WebModelFileDAO.create();
+      expression: function(classpath) {
+        var prefix = this.window.location.protocol + '//' + this.window.location.host;
+        var paths = classpath.split(',');
+        var modelDao = this.WebModelFileDAO.create({
+          url: prefix + paths[0],
+        });
+        for (var i = 1, classpath; classpath = paths[i]; i++) {
+          modelDao = this.OrDAO.create({
+            delegate: modelDao,
+            primary: this.WebModelFileDAO.create({
+              url: prefix + classpath,
+            }),
+          });
+        }
         return modelDao;
       },
     },
@@ -81,6 +97,7 @@ while (match = search.exec(query)) {
 
 if (params.model) {
   var executor = foam.lookup('WebModelExecutor').create({
+    classpath: params.classpath || '/src/',
     model: params.model,
     view: params.view || 'foam.u2.DetailView',
   });
