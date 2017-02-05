@@ -71,13 +71,14 @@ foam.CLASS({
   ],
   methods: [
     function execute() {
+      var self = this;
       var modelArgs = this.modelArgs;
       var X = this.__subContext__;
       var modelId = this.modelId;
       return X.arequire(modelId)
         .catch(console.log)
         .then(function() {
-          return foam.lookup(modelId).create(modelArgs, X).execute();
+          return foam.lookup(modelId).create(modelArgs, self).execute();
         })
         .catch(console.log);
     }
