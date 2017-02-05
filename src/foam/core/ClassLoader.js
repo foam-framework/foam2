@@ -22,16 +22,13 @@ foam.CLASS({
 
   methods: [
     function arequire() {
-      var p = Promise.resolve();
-      if (this.extends) {
-        p = p.then(this.__subContext__.arequire(this.extends));
-      }
+      var X = this.__subContext__;
+      var promises = [];
+      if ( this.extends ) promises.push(X.arequire(this.extends));
       for (var i = 0, a; a = this.axioms_[i]; i++) {
-        if (a.arequire) {
-          p = p.then(a.arequire());
-        }
-      };
-      return p;
+        if ( a.arequire ) promises.push(a.arequire());
+      }
+      return Promise.all(promises);
     },
   ],
 });
