@@ -22,13 +22,8 @@ foam.INTERFACE({
   methods: [
     {
       name: 'send',
-      returns: '',
       args: [
-        {
-          name: 'message',
-          type: 'foam.box.Message',
-          javaType: 'foam.box.Message'
-        }
+        'message'
       ]
     }
   ]
@@ -120,13 +115,7 @@ foam.CLASS({
           object: msg.object
         });
         this.delegate.send(msg);
-      },
-      javaCode: function() {/*
-getDelegate().send(message.setObject(
-    getX().create(foam.box.SubBoxMessage.class)
-        .setName(getName())
-        .setObject(message.getObject())));
-*/}
+      }
     }
   ]
 });
@@ -175,9 +164,6 @@ foam.CLASS({
   properties: [
     {
       name: 'registry',
-      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      javaType: 'java.util.Map',
-      javaFactory: 'return getX().create(java.util.HashMap.class);',
       factory: function() { return {}; }
     }
   ],
@@ -204,7 +190,6 @@ foam.CLASS({
     {
       name: 'doLookup',
       returns: 'foam.box.Box',
-      javaReturns: 'foam.box.Box',
       code: function doLookup(name) {
         if ( this.registry[name] &&
              this.registry[name].exportBox )
@@ -213,14 +198,8 @@ foam.CLASS({
         throw this.NoSuchNameException.create({ name: name });
       },
       args: [
-        {
-          name: 'name',
-          javaType: 'String'
-        }
-      ],
-      javaCode: 'Registration r = (Registration)getRegistry().get(name);\n'
-                + 'if ( r == null ) return null;\n'
-                + 'return r.getExportBox();'
+        'name'
+      ]
     },
     {
       name: 'register',
@@ -244,7 +223,6 @@ foam.CLASS({
     {
       name: 'register2',
       returns: 'foam.box.Box',
-      javaReturns: 'foam.box.Box',
       code: function(name, service, localBox) {
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
         exportBox = service ? service.clientBox(exportBox) : exportBox;
@@ -256,24 +234,7 @@ foam.CLASS({
 
         return this.registry[name].exportBox;
       },
-      args: [
-        {
-          name: 'name',
-          javaType: 'String'
-        },
-        {
-          name: 'service',
-          javaType: 'Object'
-        },
-        {
-          name: 'box',
-          javaType: 'foam.box.Box'
-        }
-      ],
-      javaCode: 'foam.box.Box exportBox = getX().create(foam.box.SubBox.class).setName(name).setDelegate((foam.box.Box)getMe());\n'
-                + '// TODO(adamvy): Apply service policy\n'
-                + 'getRegistry().put(name, getX().create(Registration.class).setExportBox(exportBox).setLocalBox(box));\n'
-                + 'return exportBox;'
+      args: [ 'name', 'service', 'box' ]
     },
     {
       name: 'unregister',
@@ -282,12 +243,8 @@ foam.CLASS({
         delete this.registry[name];
       },
       args: [
-        {
-          name: 'name',
-          javaType: 'String'
-        }
-      ],
-      javaCode: 'getRegistry().remove(name);'
+        'name'
+      ]
     }
   ]
 });
@@ -327,16 +284,7 @@ foam.CLASS({
         } else {
           this.registrySkeleton.send(msg);
         }
-      },
-      javaCode: function() {/*
-if ( message.getObject() instanceof foam.box.SubBoxMessage ) {
-  foam.box.SubBoxMessage subBoxMessage = (foam.box.SubBoxMessage)message.getObject();
-  message.setObject(subBoxMessage.getObject());
-  ((Registration)getRegistry().get(subBoxMessage.getName())).getLocalBox().send(message);
-} else {
-  throw new RuntimeException("Invalid message type " + message.getClass().getName());
-}
-*/}
+      }
     }
   ]
 });
@@ -836,8 +784,7 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      code: function() {},
-      javaCode: 'return;'
+      code: function() {}
     }
   ]
 });
@@ -1198,13 +1145,6 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      javaCode: 'try {\n'
-              + '  java.io.PrintWriter writer = ((javax.servlet.ServletResponse)getX().get("httpResponse")).getWriter();\n'
-              + '  writer.print(new foam.lib.json.Outputter().stringify(message));\n'
-              + '  writer.flush();\n'
-              + '} catch(java.io.IOException e) {\n'
-              + '  throw new RuntimeException(e);\n'
-              + '}',
       code: function(m) {
         throw 'unimplemented';
       }
@@ -1239,24 +1179,7 @@ foam.CLASS({
       name: 'send',
       code: function send() {
         throw new Error('Unimplemented.');
-      },
-      javaCode: function() {/*
-try {
-  String token = (String)message.getAttributes().get("idToken");
-
-  if ( token == null ) {
-    throw new java.security.GeneralSecurityException("No ID Token present.");
-  }
-
-  String principal = ((com.google.auth.TokenVerifier)getTokenVerifier()).verify(token);
-
-  message.getAttributes().put("principal", principal);
-
-  super.send(message);
-} catch ( java.security.GeneralSecurityException e) {
-  throw new RuntimeException("Failed to verify token.", e);
-}
-*/}
+      }
     }
   ]
 });
