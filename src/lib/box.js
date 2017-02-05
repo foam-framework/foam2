@@ -821,7 +821,7 @@ foam.CLASS({
       }
 
       throw this.InvalidMessageException.create({
-        messageType: message.cls_.id
+        messageType: message.cls_ && message.cls_.id
       });
     }
   ]
