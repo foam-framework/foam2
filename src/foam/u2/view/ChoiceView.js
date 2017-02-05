@@ -51,10 +51,15 @@ foam.CLASS({
 
         this.feedback_ = true;
 
-        this.data  = n && n[0];
-        this.text  = n && n[1];
-        this.index = this.findIndexOfChoice(n);
-
+        if ( ! n && this.optional ) {
+          this.data = null;
+          this.text = this.placeholder;
+          this.index = -1;
+        } else {
+          this.data  = n && n[0];
+          this.text  = n && n[1];
+          this.index = this.findIndexOfChoice(n);
+        }
         this.feedback_ = false;
       }
     },
@@ -100,6 +105,7 @@ foam.CLASS({
       value: -1,
       preSet: function(old, nu) {
         if ( this.choices.length === 0 && this.dao ) return nu;
+        if ( nu < 0 && this.optional ) return nu;
         if ( nu < 0 || this.choices.length === 0 ) return 0;
         if ( nu >= this.choices.length ) return this.choices.length - 1;
         return nu;
@@ -112,7 +118,13 @@ foam.CLASS({
       class: 'String',
       name: 'placeholder',
       value: '',
-      documentation: 'Default entry that is "selected" when data is empty.'
+      documentation: 'Default entry that is "selected" when data is empty or the ChoiceView is optional'
+    },
+    {
+      class: 'Boolean',
+      name: 'optional',
+      value: false,
+      documentation: 'The ChoiceView does not required a valid selection. The placeholder will be initially selected and the ChoiceView will return null for the placeholder selection.'
     },
     {
       class: 'Function',
@@ -171,7 +183,8 @@ foam.CLASS({
         label$: this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
         choices$: this.choices$,
-        placeholder$: this.placeholder$
+        placeholder$: this.placeholder$,
+        optional$: this.optional$
       }).end();
     },
 
@@ -220,7 +233,7 @@ foam.CLASS({
           delegate: foam.dao.ArraySink.create()
         })).then(function(map) {
           this.choices = map.delegate.a;
-          if ( ! this.data && this.index === -1 ) this.index = 0;
+          if ( ! this.data && this.index === -1 ) this.index = this.optional ? -1 : 0;
         }.bind(this));
       }
     }
