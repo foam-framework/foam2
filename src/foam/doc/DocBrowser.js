@@ -11,7 +11,7 @@ foam.CLASS({
              border-radius: 3px;
              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
         }
-        ^title { padding: 6px; align-content: center; background: aliceblue; }
+        ^title { padding: 6px; align-content: center; background: #c8e2f9; }
         ^content { padding: 6px; min-width: 220px; height: 100%; background: white; }
       */}
     })
@@ -115,9 +115,10 @@ foam.CLASS({
   ],
 
   imports: [
-    'selectedAxiom'
+    'selectedAxiom',
+    'showInherited'
   ],
-
+/*
   properties: [
     {
       class: 'Boolean',
@@ -125,7 +126,7 @@ foam.CLASS({
       value: true
     }
   ],
-
+*/
   methods: [
     function initE() {
       this.SUPER();
@@ -146,8 +147,6 @@ foam.CLASS({
       }
       this.br();
       this.add(data.documentation);
-
-      this.add('Show Inherited: ').start(this.SHOW_INHERITED, {data$: this.showInherited$}).end();
 
       this.add(this.slot(function (showInherited) {
         // TODO: hide 'Source Class' column if showInherited is false
@@ -269,11 +268,17 @@ foam.CLASS({
   exports: [
     'as data',
     'path as browserPath',
-    'axiom as selectedAxiom'
+    'axiom as selectedAxiom',
+    'showInherited'
   ],
 
   properties: [
     'path',
+    {
+      class: 'Boolean',
+      name: 'showInherited',
+      value: true
+    },
     {
       class: 'FObjectProperty',
       name: 'axiom',
@@ -285,9 +290,10 @@ foam.CLASS({
     function initE() {
       this.SUPER();
 
-      this.tag(this.PATH, {displayWidth: 80}).br().br();
-
       this.
+        tag(this.PATH, {displayWidth: 80}).
+        add('  Show Inherited Axioms: ').tag(this.SHOW_INHERITED, {data$: this.showInherited$}).
+        br().br().
         start('table').
           start('tr').
             start('td').
@@ -315,8 +321,10 @@ foam.CLASS({
                   return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
                 })).
               end().
-            end().
-            start('td').
+//            end().
+                    //            start('td').
+                    br().
+                    br().
               style({'vertical-align': 'top'}).
               start(this.DocBorder, {title: 'Required-By'}).
                 add(this.slot(function(path) {
@@ -325,6 +333,13 @@ foam.CLASS({
                   // TODO: this could be done more efficiently, and memoized
                   return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) {
                     return cls.model_.requires && cls.model_.requires.map(function(r) { return r.path; }).includes(path); }).sort(foam.core.Model.ID.compare)});
+                })).
+              end().
+              br().
+              br().
+              start(this.DocBorder, {title: 'Relationships'}).
+                add(this.slot(function(path) {
+                      return '';
                 })).
               end().
             end().
