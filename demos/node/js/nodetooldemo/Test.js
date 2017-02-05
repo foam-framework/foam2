@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'Test',
   extends: 'nodetooldemo.TestBaseClass',
   requires: [
+    'nodetooldemo.TestCircular',
     'nodetooldemo.TestRequire',
   ],
   messages: [
@@ -40,7 +41,7 @@ foam.CLASS({
     },
 */
   ],
-  methods: [
+  actions: [
     {
       name: 'execute',
       code: function() {
@@ -48,7 +49,8 @@ foam.CLASS({
         console.log('Hello', this.customProp);
         console.log('Hello', this.MY_STRING);
         console.log(this.TestRequire.model_.id);
+        console.log(this.TestCircular.model_.id);
       },
     },
-  ]
+  ],
 });
