@@ -84,12 +84,17 @@ foam.CLASS({
 });
 
 
+/**
+   The base models Unary and Binary are used to validate the arguments
+   and throw a SQLException when invalid.
+   Each child model shall call SUPER() to validate.
+ */
 foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
   requires: [ 'foam.dao.SQLException' ],
   methods: [
     function toSQL() {
-      var v1 = this.arg1.toSQL ? v1 = this.arg1.toSQL() :
+      var v1 = this.arg1.toSQL ? this.arg1.toSQL() :
           this.arg1.toString ? this.arg1.toString() :
           this.arg1;
 
@@ -107,14 +112,14 @@ foam.CLASS({
   requires: [ 'foam.dao.SQLException' ],
   methods: [
     function toSQL() {
-      var v1 = this.arg1.toSQL ? v1 = this.arg1.toSQL() :
+      var v1 = this.arg1.toSQL ? this.arg1.toSQL() :
           this.arg1.toString ? this.arg1.toString() :
           this.arg1;
 
       if ( v1 === undefined || v1 === null )
         throw this.SQLException.create({message: this.cls_.name + '.arg1 is ' + v1});
 
-      // TODO: this looks wrong, since it doesn't return anything
+      return v1;
     }
   ]
 });
@@ -125,7 +130,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER(); // ???: Why is SUPER called?
+      this.SUPER();
       var values = this.SQLSupport.create().values(this.arg1, this.arg2);
 
       return values().v1 + ' IS NOT NULL';
@@ -147,7 +152,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER(); // ???: Why is SUPER called?
+      this.SUPER();
 
       var values = this.SQLSupport.create().values(this.arg1, this.arg2);
 
@@ -164,7 +169,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER(); // ???
+      this.SUPER();
 
       var values = this.SQLSupport.create().values(this.arg1, this.arg2);
 
@@ -184,7 +189,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER(); // ???
+      this.SUPER();
       var values = this.SQLSupport.create().values(this.arg1, this.arg2);
 
       if ( values.v2 === null )
@@ -204,7 +209,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER(); // ???
+      this.SUPER();
       var values = this.SQLSupport.create().values(this.arg1, this.arg2);
 
       if ( values.v2 === null )
@@ -224,7 +229,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER(); // ???
+      this.SUPER();
       var values = this.SQLSupport.create().values(this.arg1, this.arg2);
 
       if ( values.v2 === null )
