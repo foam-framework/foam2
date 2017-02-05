@@ -40,6 +40,7 @@ foam.CLASS({
 
   methods: [
     function find(id) {
+      var self = this;
       var X = this.__subContext__;
       var url = this.url + '/' + id.replace(/\./g, '/') + '.js';
       var req = this.HTTPRequest.create({
@@ -53,7 +54,7 @@ foam.CLASS({
         var foamCLASS = foam.CLASS;
         foam.CLASS = function(m) {
           var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-          model = cls.create(m, X);
+          model = cls.create(m, self);
         }
         try {
           eval(js);
