@@ -132,8 +132,11 @@ foam.CLASS({
 
       var data = this.data;
 
-      this.add('CLASS: ', data.name, ' (', data.count_, ')').br();
-      this.add('extends: ');
+      this.
+          start('b').add(data.id).end().
+          start('span').style({float:'right'}).add(' (', data.count_, ' created)').end().br().
+          add('extends: ');
+
       var cls = data;
       for ( var i = 0 ; cls ; i++ ) {
         cls = this.lookup(cls.model_.extends, true);
