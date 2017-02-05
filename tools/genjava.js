@@ -40,6 +40,10 @@ var classes = [
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.Contains',
   'foam.mlang.predicate.StartsWithIC',
+  'foam.mlang.predicate.Gt',
+  'foam.mlang.predicate.Gte',
+  'foam.mlang.predicate.Lt',
+  'foam.mlang.predicate.Lte',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
@@ -49,6 +53,7 @@ var classes = [
   'foam.box.SubBox',
   'foam.box.Message',
   'foam.box.SubBoxMessage',
+  'foam.box.SubscribeMessage',
   'com.google.foam.demos.appengine.TestModel',
   'foam.box.HTTPReplyBox',
   'com.google.foam.demos.appengine.TestService',
@@ -75,7 +80,7 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
-  'foam.mlang.sink.Count'
+  'foam.mlang.sink.Count',
 ];
 
 var abstractClasses = [

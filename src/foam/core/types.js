@@ -89,6 +89,12 @@ foam.CLASS({
 
         return foam.Date.compare(o1, o2);
       }
+    },
+    {
+      name: 'toJSON',
+      value: function(o) {
+        return o && o.toISOString();
+      }
     }
   ]
 });

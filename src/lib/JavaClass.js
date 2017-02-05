@@ -1020,9 +1020,51 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Long ) ?'
-             + '((Long)o).intValue() :'
-             + '(int)o;'
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).intValue() :'
+            + '(int)o;';
+      return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Long',
+
+  properties: [
+    ['javaType', 'long'],
+    ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.LongParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).longValue() :'
+            + '(long)o;';
+      return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Float',
+
+  properties: [
+    ['javaType', 'double'],
+    ['javaInfoType', 'foam.core.AbstractDoublePropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FloatParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).doubleValue() :'
+            + '(double)o;';
       return info;
     }
   ]
@@ -1043,9 +1085,17 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   refines: 'foam.core.DateTime',
+  properties: [
+    ['javaType', 'java.util.Date'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.DateParser']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Date',
   properties: [
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
