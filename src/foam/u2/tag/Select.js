@@ -29,9 +29,11 @@ foam.CLASS({
       }
     },
     ['placeholder', ''],
+    ['optional', false],
     {
       name: 'size'
-    }
+    },
+
   ],
 
   methods: [
@@ -45,8 +47,15 @@ foam.CLASS({
       this.setChildren(this.slot(function(choices, placeholder) {
         var cs = [];
 
-        if ( placeholder ) {
-          cs.push(self.E('option').attrs({disabled: 'disabled'}).add(self.placeholder));
+          if ( placeholder ) {
+            if (this.optional) {
+              cs.push(self.E('option').attrs({
+                selected: self.data == -1 ? true : undefined,
+                value: -1
+            }).add(self.placeholder));
+          } else {
+            cs.push(self.E('option').attrs({disabled: 'disabled'}).add(self.placeholder));
+          }
         }
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
