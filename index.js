@@ -59,8 +59,8 @@ foam.CLASS({
         X.arequire(viewId),
         X.arequire(modelId),
       ]).then(function() {
-        var model = X.lookup(modelId).create({}, X);
-        var view = X.lookup(viewId).create({}, X);
+        var model = X.lookup(modelId).create({}, self);
+        var view = X.lookup(viewId).create({showActions: true}, self);
         view.data = model;
         view.write();
       })
