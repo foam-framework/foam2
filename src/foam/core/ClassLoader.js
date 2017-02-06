@@ -68,13 +68,13 @@ foam.CLASS({
       name: 'arequire',
       class: 'foam.core.ContextMethod',
       code: function(X, modelId) {
-        if (X.isRegistered(modelId)) return Promise.resolve();
-        if (this.pending[modelId]) return this.pending[modelId];
+        if ( X.isRegistered(modelId) ) return Promise.resolve();
+        if ( this.pending[modelId] ) return this.pending[modelId];
 
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
         this.pending[modelId] = modelDao.find(modelId).then(function(m) {
           m.validate();
-          if (X.isRegistered(modelId)) return m;
+          if ( X.isRegistered(modelId) ) return m;
           if ( m.refines ) {
             foam.CLASS(m);
             return m;
