@@ -872,6 +872,8 @@ foam.CLASS({
       /** Create a deep copy of this object. **/
       var m = {};
       for ( var key in this.instance_ ) {
+        if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
+
         var value = this[key];
         this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
