@@ -22,7 +22,7 @@ foam.CLASS({
   properties: [
     {
       name: 'value',
-      value: 'This is the custom property default value.',
-    },
-  ],
+      value: 'This is the custom property default value.'
+    }
+  ]
 });
