@@ -42,14 +42,15 @@ foam.CLASS({
         console.log('ERROR: outfile not specified');
         process.exit(1);
       }
-      var p = Promise.resolve();
+      var promises = [];
       for (var i = 0; i < this.models.length; i++) {
-        p = p.then(this.arequire(this.models[i])) 
+        promises.push(this.arequire(this.models[i]));
       }
+      var p = Promise.all(promises);
       p.then(function() {
         var resources = [];
         for (var i = 0; i < self.models.length; i++) {
-          var model = self.lookup(self.models[i], self.__subContext__);
+          var model = self.lookup(self.models[i], self);
           resources = resources.concat(self.modelToResources(model));
         }
         self.fs.writeFileSync(
