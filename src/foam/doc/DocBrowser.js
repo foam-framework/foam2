@@ -351,7 +351,7 @@ foam.CLASS({
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              start(this.DocBorder, {title: 'Class Definition'}).
+          start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
                 add(this.slot(function(selectedClass) {
                   if ( ! selectedClass ) return '';
                   return this.ClassDocView.create({data: selectedClass});
