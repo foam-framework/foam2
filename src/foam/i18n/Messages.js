@@ -38,9 +38,14 @@ foam.CLASS({
     {
       name: 'message',
       class: 'String',
-      expression: function(messageMap) {
-        return messageMap[foam.locale];
+      getter: function() {
+        return this.message_ || this.messageMap[foam.locale];
       },
+      setter: function(m) { this.message_ = m; },
+    },
+    {
+      name: 'message_',
+      class: 'Simple',
     },
   ],
   methods: [
