@@ -60,7 +60,7 @@ foam.CLASS({
     },
     {
       name: 'cls',
-      label: 'Source Class',
+      label: 'Source',
       tableCellView: function(o, e) {
         return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
       },
@@ -109,6 +109,17 @@ foam.CLASS({
     'foam.doc.ClassLink'
   ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ a {
+          display: block;
+          padding: 2px;
+        }
+      */}
+    })
+  ],
+
   properties: [
     'title',
     {
@@ -124,10 +135,11 @@ foam.CLASS({
       this.SUPER();
       var self = this;
       this.
+        cssClass(this.myCls()).
         start(this.DocBorder, {title: this.title, info$: this.info$}).
           start('div').
             add(this.slot(function (data) {
-              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}).br(); });
+              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}); });
             })).
           end().
         end();
@@ -299,6 +311,23 @@ foam.CLASS({
     'showInherited'
   ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ {
+          font-family: roboto, arial;
+          color: #555;
+        }
+        ^ th {
+          color: #555;
+        }
+        ^ td {
+          padding-right: 12px;
+        }
+      */}
+    })
+  ],
+
   properties: [
     'path',
     {
@@ -350,6 +379,7 @@ foam.CLASS({
       this.SUPER();
 
       this.
+        cssClass(this.myCls()).
         tag(this.PATH, {displayWidth: 80}).
           start('span').
             style({'margin-left': '12px', 'font-size':'small'}).
@@ -432,3 +462,7 @@ foam.debug.doc = function(opt_obj, showUnused) {
       ( opt_obj && opt_obj.cls_ ) ? opt_obj.cls_.id :
       'foam.core.FObject' });
 };
+
+
+// TODO:
+//    remove LinkView

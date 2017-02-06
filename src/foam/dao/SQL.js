@@ -17,7 +17,16 @@
 
 /**
  * Refine mLang predicates with toSQL() support.
- **/
+ *
+ * TODO/REVIEW
+ *  The use of SUPER for validation, and validation in general, is concerning
+ *  as it causes excessive SQL generation as well as redundent checks for
+ *  the existance of arg1, arg2...
+
+ *  An alternative solution is to refine toSQL() on all things that can be
+ *  in an expression (Properties and all mlangs) then we can reliably call
+ *  toSQL() on all arguments.
+ */
 
 foam.CLASS({
   package: 'foam.dao',
