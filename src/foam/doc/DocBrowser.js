@@ -7,9 +7,10 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ {
-             display: inline-block;
              border-radius: 3px;
              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+             display: inline-block;
+             width:100%;
         }
         ^title { padding: 6px; align-content: center; background: #c8e2f9; }
         ^info { float: right; font-size: smaller; }
