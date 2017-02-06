@@ -50,7 +50,7 @@ foam.CLASS({
         var resources = [];
         for (var i = 0; i < self.models.length; i++) {
           var model = self.lookup(self.models[i], self);
-          resources = resources.concat(self.modelToResources(model));
+          resources = resources.concat(self.classToResources(model));
         }
         self.fs.writeFileSync(
             self.outfile,
@@ -59,7 +59,7 @@ foam.CLASS({
         console.log('Error', err);
       });
     },
-    function modelToResources(model) { foam.assert(false, 'Implement') },
+    function classToResources(cls) { foam.assert(false, 'Implement') },
   ],
   templates: [
     {

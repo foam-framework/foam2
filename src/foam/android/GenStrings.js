@@ -58,10 +58,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function modelToResources(model) {
+    function classToResources(cls) {
       var resources = [];
-      var prefix = model.model_.id.replace('.', '_');
-      for (var i = 0, message; message = model.model_.messages[i]; i++) {
+      var prefix = cls.model_.id.replace('.', '_');
+      for (var i = 0, message; message = cls.model_.messages[i]; i++) {
         this.parser.value = message.message;
         this.parser.translationHint = message.description;
         resources.push(this.StringResource.create({
