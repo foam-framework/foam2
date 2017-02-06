@@ -31,8 +31,6 @@ foam.CLASS({
     function find(id) {
       var foamCLASS = foam.CLASS;
       var self = this;
-      var X = this.__subContext__;
-
       var model;
       foam.CLASS = function(m) {
         var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
