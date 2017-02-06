@@ -22,7 +22,7 @@ foam.CLASS({
 
   methods: [
     function arequire() {
-      var X = this.__subContext__;
+      var X = this.__context__;
       var promises = [];
       if ( this.extends ) promises.push(X.arequire(this.extends));
       for (var i = 0, a; a = this.axioms_[i]; i++) {
