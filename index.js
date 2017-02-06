@@ -66,42 +66,44 @@ foam.CLASS({
     },
   ],
   methods: [
+    function fromQuery(query) {
+      var search = /([^&=]+)=?([^&]*)/g;
+      var query = window.location.search.substring(1);
+      var decode = function(s) {
+        return decodeURIComponent(s.replace(/\+/g, ' '));
+      };
+      var params = {};
+      var match;
+      while (match = search.exec(query)) {
+        params[decode(match[1])] = decode(match[2]);
+      }
+
+      if (params.model) {
+        this.copyFrom({
+          classpath: params.classpath || '/src/',
+          model: params.model,
+          view: params.view
+        });
+      } else {
+        alert('Please specify model');
+      }
+    },
     function execute() {
       var self = this;
       var X = this.__subContext__;
-      var modelId = this.model;
-      var viewId = this.view;
-      Promise.all([
-        X.arequire(viewId),
-        X.arequire(modelId),
-      ]).then(function() {
-        var model = X.lookup(modelId).create({}, self);
-        var view = X.lookup(viewId).create({showActions: true}, self);
-        view.data = model;
+      var promises = [X.arequire(this.model)];
+      if (this.view) promises.push(X.arequire(this.view));
+      Promise.all(promises).then(function() {
+        var model = X.lookup(self.model).create(null, self);
+        var view = self.view ?
+            X.lookup(self.view).create({data: model}, self) :
+            model.toE(null, self);
         view.write();
       })
     }
   ],
 });
 
-var search = /([^&=]+)=?([^&]*)/g;
-var query = window.location.search.substring(1);
-var decode = function(s) {
-  return decodeURIComponent(s.replace(/\+/g, ' '));
-};
-var params = {};
-var match;
-while (match = search.exec(query)) {
-  params[decode(match[1])] = decode(match[2]);
-}
-
-if (params.model) {
-  var executor = foam.lookup('WebModelExecutor').create({
-    classpath: params.classpath || '/src/',
-    model: params.model,
-    view: params.view || 'foam.u2.DetailView',
-  });
-  executor.execute();
-} else {
-  alert('Please specify model');
-}
+var executor = foam.lookup('WebModelExecutor').create()
+executor.fromQuery(this.window.location.search.substring(1));
+executor.execute();
