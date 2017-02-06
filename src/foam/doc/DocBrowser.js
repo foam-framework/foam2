@@ -109,6 +109,17 @@ foam.CLASS({
     'foam.doc.ClassLink'
   ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ a {
+          display: block;
+          padding: 2px;
+        }
+      */}
+    })
+  ],
+
   properties: [
     'title',
     {
@@ -124,10 +135,11 @@ foam.CLASS({
       this.SUPER();
       var self = this;
       this.
+        cssClass(this.myCls()).
         start(this.DocBorder, {title: this.title, info$: this.info$}).
           start('div').
             add(this.slot(function (data) {
-              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}).br(); });
+              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}); });
             })).
           end().
         end();
@@ -306,6 +318,12 @@ foam.CLASS({
           font-family: roboto, arial;
           color: #555;
         }
+        ^ th {
+          color: #555;
+        }
+        ^ td {
+          padding-right: 12px;
+        }
       */}
     })
   ],
@@ -447,5 +465,4 @@ foam.debug.doc = function(opt_obj, showUnused) {
 
 
 // TODO:
-//    more padding
 //    remove LinkView
