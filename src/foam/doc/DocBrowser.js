@@ -48,6 +48,10 @@ foam.CLASS({
   name: 'AxiomInfo',
   ids: ['name'],
 
+  requires: [
+    'foam.doc.ClassLink'
+  ],
+
   properties: [
     {
       name: 'axiom',
@@ -79,7 +83,16 @@ foam.CLASS({
       }
     },
     {
-      name: 'name'
+      name: 'name',
+      tableCellFormatter: function(value, obj, axiom) {
+        if ( obj.type === foam.core.Requires ) {
+          this.tag(obj.ClassLink, {data: obj.axiom.path, showPackage: true});
+        } else if ( obj.type === foam.core.Implements ) {
+          this.tag(obj.ClassLink, {data: obj.axiom.path, showPackage: true});
+        } else {
+          this.add(value);
+        }
+      }
     }
   ]
 });
@@ -361,9 +374,9 @@ foam.CLASS({
             start('td').
               style({'vertical-align': 'top'}).
               tag(this.ClassList, {title: 'Sub-Classes', data$: this.subClasses$}).
-              br().br().
+              br().
               tag(this.ClassList, {title: 'Required-By', data$: this.requiredByClasses$}).
-              br().br().
+              br().
               tag(this.ClassList, {title: 'Relationships', data$: this.relationshipClasses$}).
             end().
             start('td').
