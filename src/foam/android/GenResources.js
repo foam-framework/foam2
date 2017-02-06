@@ -46,8 +46,7 @@ foam.CLASS({
       for (var i = 0; i < this.models.length; i++) {
         promises.push(this.arequire(this.models[i]));
       }
-      var p = Promise.all(promises);
-      p.then(function() {
+      return Promise.all(promises).then(function() {
         var resources = [];
         for (var i = 0; i < self.models.length; i++) {
           var model = self.lookup(self.models[i], self);
@@ -56,8 +55,7 @@ foam.CLASS({
         self.fs.writeFileSync(
             self.outfile,
             self.genResource(resources));
-      })
-      p = p.catch(function(err) {
+      }).catch(function(err) {
         console.log('Error', err);
       });
     },
