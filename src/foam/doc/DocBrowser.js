@@ -60,7 +60,7 @@ foam.CLASS({
     },
     {
       name: 'cls',
-      label: 'Source Class',
+      label: 'Source',
       tableCellView: function(o, e) {
         return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
       },
@@ -299,6 +299,17 @@ foam.CLASS({
     'showInherited'
   ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ {
+          font-family: roboto, arial;
+          color: #555;
+        }
+      */}
+    })
+  ],
+
   properties: [
     'path',
     {
@@ -350,6 +361,7 @@ foam.CLASS({
       this.SUPER();
 
       this.
+        cssClass(this.myCls()).
         tag(this.PATH, {displayWidth: 80}).
           start('span').
             style({'margin-left': '12px', 'font-size':'small'}).
@@ -432,3 +444,8 @@ foam.debug.doc = function(opt_obj, showUnused) {
       ( opt_obj && opt_obj.cls_ ) ? opt_obj.cls_.id :
       'foam.core.FObject' });
 };
+
+
+// TODO:
+//    more padding
+//    remove LinkView
