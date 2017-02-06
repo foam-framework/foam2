@@ -40,7 +40,7 @@ foam.CLASS({
 
   methods: [
     function arequire() {
-      return this.__subContext__.arequire(this.path);
+      return this.__context__.arequire(this.path);
     },
   ],
 });
