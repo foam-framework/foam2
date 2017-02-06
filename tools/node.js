@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-eval('var FOAMargs = ' + process.argv.slice(2)[0]);
-
 require('../src/foam.js');
 require('../src/foam/dao/OrDAO.js');
 require('../src/foam/dao/NodeModelFileDAO.js');
@@ -43,12 +41,6 @@ foam.CLASS({
     },
     {
       name: 'modelArgs',
-    },
-    {
-      name: 'locale',
-      postSet: function(_, n) {
-        foam.locale = n;
-      },
     },
 
     {
@@ -84,6 +76,3 @@ foam.CLASS({
     }
   ],
 });
-
-var executor = foam.lookup('NodeModelExecutor').create(FOAMargs);
-executor.execute();
