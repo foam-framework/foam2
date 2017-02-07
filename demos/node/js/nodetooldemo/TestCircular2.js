@@ -17,9 +17,8 @@
 
 foam.CLASS({
   package: 'nodetooldemo',
-  name: 'TestCircular',
+  name: 'TestCircular2',
   requires: [
     'nodetooldemo.Test',
-    'nodetooldemo.TestCircular2',
   ],
 });
