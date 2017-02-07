@@ -1,8 +1,13 @@
 <html>
   <body>
     <script src="src/foam.js"></script>
-    <script src="src/foam/dao/OrDAO.js"></script>
-    <script src="src/foam/dao/WebModelFileDAO.js"></script>
-    <script src="index.js"></script>
+    <script src="src/foam/classloader/OrDAO.js"></script>
+    <script src="src/foam/classloader/WebModelFileDAO.js"></script>
+    <script src="src/foam/classloader/WebModelDisplayer.js"></script>
+    <script>
+      var executor = foam.classloader.WebModelDisplayer.create()
+      executor.fromQuery(this.window.location.search.substring(1));
+      executor.execute();
+    </script>
   </body>
 </html>

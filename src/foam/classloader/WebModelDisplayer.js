@@ -16,10 +16,11 @@
  */
 
 foam.CLASS({
-  name: 'WebModelExecutor',
+  package: 'foam.classloader',
+  name: 'WebModelDisplayer',
   requires: [
-    'foam.dao.OrDAO',
-    'foam.dao.WebModelFileDAO',
+    'foam.classloader.OrDAO',
+    'foam.classloader.WebModelFileDAO',
   ],
   imports: [
     'arequire',
@@ -103,7 +104,3 @@ foam.CLASS({
     }
   ],
 });
-
-var executor = foam.lookup('WebModelExecutor').create()
-executor.fromQuery(this.window.location.search.substring(1));
-executor.execute();

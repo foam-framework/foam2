@@ -15,25 +15,38 @@
  * limitations under the License.
  */
 
+
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'OrDAO',
-  extends: 'foam.dao.ProxyDAO',
+  package: 'foam.classloader',
+  name: 'NodeModelFileDAO',
+  extends: 'foam.dao.AbstractDAO',
 
   properties: [
     {
-      name: 'primary',
-      help: 'This is the DAO to look things up in first.'
+      name: 'classpath',
     },
   ],
 
   methods: [
     function find(id) {
+      var foamCLASS = foam.CLASS;
       var self = this;
-      return this.primary.find(id)
-          .then(undefined, function() {
-            return self.delegate.find(id);
-          });
+      var model;
+      foam.CLASS = function(m) {
+        var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
+        model = cls.create(m, self);
+      }
+      var sep = require('path').sep;
+      var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
+      try {
+        require(path);
+      } catch(e) {
+        return Promise.reject(
+            'Unable to load at ' + path + '. Error: ' + e.stack);
+      } finally {
+        foam.CLASS = foamCLASS;
+      }
+      return Promise.resolve(model);
     }
   ]
 });

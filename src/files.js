@@ -54,7 +54,7 @@ FOAM_FILES([
   { name: "foam/core/Interface" },
   { name: "foam/core/ContextMethod" },
   { name: "foam/core/Window" },
-  { name: "foam/core/ClassLoader" },
+  { name: "foam/classloader/ClassLoader" },
   { name: "foam/core/Argument" },
   { name: "foam/core/MultiMethod" },
   { name: "foam/core/debug", flags: ['debug'] },
