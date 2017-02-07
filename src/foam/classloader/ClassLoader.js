@@ -21,12 +21,12 @@ foam.CLASS({
   refines: 'foam.core.Model',
 
   methods: [
-    function arequire(deps) {
+    function arequire(opt_deps) {
       var X = this.__context__;
       var promises = [];
-      if ( this.extends ) promises.push(X.arequire(this.extends, deps));
+      if ( this.extends ) promises.push(X.arequire(this.extends, opt_deps));
       for (var i = 0, a; a = this.axioms_[i]; i++) {
-        if ( a.arequire ) promises.push(a.arequire(deps));
+        if ( a.arequire ) promises.push(a.arequire(opt_deps));
       }
       return Promise.all(promises);
     },
@@ -39,8 +39,8 @@ foam.CLASS({
   refines: 'foam.core.Requires',
 
   methods: [
-    function arequire(deps) {
-      return this.__context__.arequire(this.path, deps);
+    function arequire(opt_deps) {
+      return this.__context__.arequire(this.path, opt_deps);
     },
   ],
 });
@@ -67,11 +67,11 @@ foam.CLASS({
     {
       name: 'arequire',
       class: 'foam.core.ContextMethod',
-      code: function(X, modelId, deps) {
+      code: function(X, modelId, opt_deps) {
         // Contains models that depend on the modelId and have already been
         // arequired. Used to avoid circular dependencies from waiting on
         // eachother.
-        deps = deps || {};
+        deps = opt_deps || {};
 
         if ( X.isRegistered(modelId) ) return Promise.resolve();
         if ( deps[modelId] ) return Promise.resolve();
