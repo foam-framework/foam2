@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.classloader',
   name: 'ModelARequireExtension',
   refines: 'foam.core.Model',
 
@@ -34,7 +34,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.classloader',
   name: 'RequiresARequireExtension',
   refines: 'foam.core.Requires',
 
@@ -46,7 +46,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.classloader',
   name: 'ClassLoader',
 
   exports: [
@@ -115,7 +115,7 @@ foam.CLASS({
   ]
 });
 
-foam.__context__ = foam.core.ClassLoader.create(
+foam.__context__ = foam.classloader.ClassLoader.create(
   {},
   foam.__context__
 ).__subContext__;

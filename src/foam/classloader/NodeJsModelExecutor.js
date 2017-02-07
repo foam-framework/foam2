@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-require('../src/foam.js');
-require('../src/foam/dao/OrDAO.js');
-require('../src/foam/dao/NodeModelFileDAO.js');
-
 foam.CLASS({
-  name: 'NodeModelExecutor',
+  package: 'foam.classloader',
+  name: 'NodeJsModelExecutor',
   requires: [
-    'foam.dao.OrDAO',
-    'foam.dao.NodeModelFileDAO',
+    'foam.classloader.OrDAO',
+    'foam.classloader.NodeModelFileDAO',
   ],
   imports: [
     'arequire',

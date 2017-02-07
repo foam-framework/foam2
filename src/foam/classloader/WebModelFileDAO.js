@@ -17,7 +17,7 @@
 
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.classloader',
   name: 'WebModelFileDAO',
   extends: 'foam.dao.AbstractDAO',
 
