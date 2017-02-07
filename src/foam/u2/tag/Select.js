@@ -47,11 +47,11 @@ foam.CLASS({
       this.setChildren(this.slot(function(choices, placeholder) {
         var cs = [];
 
-          if ( placeholder ) {
-            if (this.optional) {
-              cs.push(self.E('option').attrs({
-                selected: self.data == -1 ? true : undefined,
-                value: -1
+        if ( placeholder ) {
+          if (this.optional) {
+            cs.push(self.E('option').attrs({
+              selected: self.data == -1 ? true : undefined,
+              value: -1
             }).add(self.placeholder));
           } else {
             cs.push(self.E('option').attrs({disabled: 'disabled'}).add(self.placeholder));
