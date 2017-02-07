@@ -21,12 +21,12 @@ foam.CLASS({
   refines: 'foam.core.Model',
 
   methods: [
-    function arequire() {
+    function arequire(deps) {
       var X = this.__context__;
       var promises = [];
-      if ( this.extends ) promises.push(X.arequire(this.extends));
+      if ( this.extends ) promises.push(X.arequire(this.extends, deps));
       for (var i = 0, a; a = this.axioms_[i]; i++) {
-        if ( a.arequire ) promises.push(a.arequire());
+        if ( a.arequire ) promises.push(a.arequire(deps));
       }
       return Promise.all(promises);
     },
@@ -39,8 +39,8 @@ foam.CLASS({
   refines: 'foam.core.Requires',
 
   methods: [
-    function arequire() {
-      return this.__context__.arequire(this.path);
+    function arequire(deps) {
+      return this.__context__.arequire(this.path, deps);
     },
   ],
 });
@@ -67,13 +67,24 @@ foam.CLASS({
     {
       name: 'arequire',
       class: 'foam.core.ContextMethod',
-      code: function(X, modelId) {
+      code: function(X, modelId, deps) {
+        // Contains models that depend on the modelId and have already been
+        // arequired. Used to avoid circular dependencies from waiting on
+        // eachother.
+        deps = deps || {};
+
         if ( X.isRegistered(modelId) ) return Promise.resolve();
+        if ( deps[modelId] ) return Promise.resolve();
         if ( this.pending[modelId] ) return this.pending[modelId];
+        deps[modelId] = true;
 
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
-        this.pending[modelId] = modelDao.find(modelId).then(function(m) {
+        var m;
+        this.pending[modelId] = modelDao.find(modelId).then(function(model) {
+          m = model;
           m.validate();
+          return m.arequire(deps);
+        }).then(function() {
           if ( X.isRegistered(modelId) ) return m;
           if ( m.refines ) {
             foam.CLASS(m);
@@ -91,8 +102,6 @@ foam.CLASS({
           foam.__context__.registerFactory(m, f);
           foam.package.registerClassFactory(m, f);
           return m;
-        }).then(function(m) {
-          return m.arequire();
         });
 
         var self = this;
