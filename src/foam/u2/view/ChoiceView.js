@@ -111,7 +111,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
-      value: '',
       documentation: 'Default entry that is "selected" when data is empty.'
     },
     {
