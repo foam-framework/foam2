@@ -38,7 +38,7 @@ foam.CLASS({
   methods: [
     function execute() {
       var self = this;
-      if (!this.outfile) {
+      if ( !this.outfile ) {
         console.log('ERROR: outfile not specified');
         process.exit(1);
       }
