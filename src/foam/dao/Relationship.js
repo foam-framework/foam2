@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+// TODO: have a way customize installed properties.
 foam.CLASS({
   package: 'foam.dao',
   name: 'Relationship',
