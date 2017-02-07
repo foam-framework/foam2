@@ -6,7 +6,7 @@
     <script src="src/foam/classloader/WebModelDisplayer.js"></script>
     <script>
       var executor = foam.classloader.WebModelDisplayer.create()
-      executor.fromQuery(this.window.location.search.substring(1));
+      executor.fromQuery(window.location.search.substring(1));
       executor.execute();
     </script>
   </body>
