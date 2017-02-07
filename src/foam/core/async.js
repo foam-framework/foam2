@@ -74,6 +74,24 @@ foam.LIB({
       }
     },
 
+    function awhile(condition, afunc) {
+      /** Takes a condition function and runs the afunc while the condition
+        returns true.
+      */
+      return function() {
+        return new Promise(function(resolve, reject) {
+          var awhile = function() {
+            if (!condition()) {
+              resolve();
+              return;
+            }
+            return afunc().then(awhile);
+          };
+          awhile();
+        });
+      };
+    },
+
     function repeat(times, fn) {
       /** Takes a function (that may return a promise) and runs it multiple
         times. A function that returns a promise will have that
