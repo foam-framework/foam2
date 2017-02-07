@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-// TODO: have a way customize installed properties.
 foam.CLASS({
   package: 'foam.dao',
   name: 'Relationship',
@@ -90,7 +89,17 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'oneWay'
-    }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'Property',
+      name: 'sourcePropertyConfig'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'Property',
+      name: 'targetPropertyConfig'
+    },
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -103,13 +112,13 @@ foam.CLASS({
     function init() {
       var sourceProps  = this.sourceProperties || [];
       var targetProps  = this.targetProperties || [];
-      var cardinality  = this.cardinality.split(":");
+      var cardinality  = this.cardinality.split(':');
       var forwardName  = this.forwardName;
       var inverseName  = this.inverseName;
       var relationship = this;
 
       if ( ! sourceProps.length ) {
-        if ( cardinality[1] == '*' ) {
+        if ( cardinality[1] === '*' ) {
           sourceProps = [
             foam.core.Property.create({
               name: forwardName,
@@ -123,7 +132,7 @@ foam.CLASS({
                     relationship: relationship
                   }, this)
               }
-            })
+            }).copyFrom(this.sourceProperty)
           ];
         } else {
           sourceProps = [
@@ -131,7 +140,7 @@ foam.CLASS({
               name: forwardName,
               of: this.targetModel,
               targetDAOKey: this.targetDAOKey
-            })
+            }).copyFrom(this.sourceProperty)
           ];
         }
       }
@@ -152,7 +161,7 @@ foam.CLASS({
                     relationship: relationship
                   }, this)
               }
-            })
+            }).copyFrom(this.targetProperty)
           ];
         } else {
           targetProps = [
@@ -160,7 +169,7 @@ foam.CLASS({
               name: inverseName,
               of: this.sourceModel,
               targetDAOKey: this.sourceDAOKey
-            })
+            }).copyFrom(this.targetProperty)
           ];
         }
       }
