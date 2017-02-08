@@ -51,8 +51,8 @@ foam.CLASS({
 
         this.feedback_ = true;
 
-        if ( ! n && this.optional ) {
-          this.data = null;
+        if ( ! n && this.placeholder ) {
+          this.data = undefined;
           this.text = this.placeholder;
           this.index = -1;
         } else {
@@ -105,7 +105,7 @@ foam.CLASS({
       value: -1,
       preSet: function(old, nu) {
         if ( this.choices.length === 0 && this.dao ) return nu;
-        if ( nu < 0 && this.optional ) return nu;
+        if ( nu < 0 && this.placeholder ) return nu;
         if ( nu < 0 || this.choices.length === 0 ) return 0;
         if ( nu >= this.choices.length ) return this.choices.length - 1;
         return nu;
@@ -117,14 +117,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
-      value: '',
-      documentation: 'Default entry that is "selected" when data is empty or the ChoiceView is optional'
-    },
-    {
-      class: 'Boolean',
-      name: 'optional',
-      value: false,
-      documentation: 'The ChoiceView does not required a valid selection. The placeholder will be initially selected and the ChoiceView will return null for the placeholder selection.'
+      factory: function() { return undefined; },
+      documentation: 'When provided the placeholder will be prepended to the selection list, and selected if the choices array is empty or no choice in the choices array is selected.'
     },
     {
       class: 'Function',
@@ -183,8 +177,7 @@ foam.CLASS({
         label$: this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
         choices$: this.choices$,
-        placeholder$: this.placeholder$,
-        optional$: this.optional$
+        placeholder$: this.placeholder$
       }).end();
     },
 
@@ -233,7 +226,7 @@ foam.CLASS({
           delegate: foam.dao.ArraySink.create()
         })).then(function(map) {
           this.choices = map.delegate.a;
-          if ( ! this.data && this.index === -1 ) this.index = this.optional ? -1 : 0;
+          if ( ! this.data && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
     }
