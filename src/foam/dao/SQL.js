@@ -28,8 +28,8 @@ foam.CLASS({
   methods: [
     function sqlValue(argName) {
       var arg = this[argName];
-      var v = arg.toSQL ? arg.toSQL() :
-        arg.toString ? arg.toString() :
+      var v = arg && arg.toSQL ? arg.toSQL() :
+        arg && arg.toString ? arg.toString() :
         arg;
 
       if ( v === undefined || v === null )
