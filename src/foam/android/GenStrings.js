@@ -38,8 +38,6 @@ foam.CLASS({
       },
     },
   ],
-  classes: [
-  ],
   methods: [
     function classToResources(cls) {
       var resources = cls.model_.toAndroidStringResources();
