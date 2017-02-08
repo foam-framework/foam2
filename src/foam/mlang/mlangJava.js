@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.mlang.Expr',
+
   methods: [
     {
       name: 'f',
@@ -35,8 +36,10 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.ExprProperty',
+
   properties: [
     ['javaType', 'foam.mlang.Expr'],
     ['javaJSONParser', 'foam.lib.json.ExprParser']
@@ -46,6 +49,7 @@ foam.CLASS({
 
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
+
   methods: [
     {
       name: 'f',
@@ -83,6 +87,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.PredicateProperty',
+
   properties: [
     ['javaType', 'foam.mlang.predicate.Predicate']
   ]
@@ -91,13 +96,16 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.PredicateArray',
+
   properties: [
     ['javaType', 'foam.mlang.predicate.Predicate[]']
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
+
   methods: [
     {
       name: 'partialEval',
@@ -111,8 +119,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.AbstractExpr',
+
   methods: [
     {
       name: 'partialEval',
@@ -123,8 +133,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.True',
+
   methods: [
     {
       name: 'f',
@@ -133,8 +145,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.False',
+
   methods: [
     {
       name: 'f',
@@ -143,8 +157,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Or',
+
   methods: [
     {
       name: 'f',
@@ -159,6 +175,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.And',
+
   methods: [
     {
       name: 'f',
@@ -173,6 +190,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Contains',
+
   methods: [
     {
       name: 'f',
@@ -183,8 +201,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.StartsWithIC',
+
   methods: [
     {
       name: 'f',
@@ -205,8 +225,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.Constant',
+
   methods: [
     {
       name: 'f',
@@ -215,8 +237,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Eq',
+
   methods: [
     {
       name: 'f',
@@ -226,8 +250,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Neq',
+
   methods: [
     {
       name: 'f',
@@ -236,8 +262,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Lt',
+
   methods: [
     {
       name: 'f',
@@ -246,8 +274,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Lte',
+
   methods: [
     {
       name: 'f',
@@ -256,8 +286,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Gt',
+
   methods: [
     {
       name: 'f',
@@ -266,8 +298,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Gte',
+
   methods: [
     {
       name: 'f',
@@ -276,8 +310,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.Not',
+
   methods: [
     {
       name: 'f',
@@ -286,8 +322,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.INTERFACE({
   refines: 'foam.mlang.order.Comparator',
+
   methods: [
     {
       name: 'compare',
@@ -314,9 +352,10 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   methods: [
     {
       name: 'orderTail',
@@ -333,8 +372,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.order.Desc',
+
   methods: [
     {
       name: 'compare',
@@ -368,8 +409,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.order.ThenBy',
+
   methods: [
     {
       name: 'compare',
@@ -406,8 +449,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.order.CustomComparator',
+
   methods: [
     {
       name: 'orderTail',
