@@ -36,8 +36,7 @@ foam.CLASS({
     },
     {
       name: 'size'
-    },
-
+    }
   ],
 
   methods: [
