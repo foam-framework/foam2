@@ -17,6 +17,64 @@
 
 foam.CLASS({
   package: 'foam.android',
+  name: 'GenStrings',
+  extends: 'foam.android.GenResources',
+  requires: [
+    'foam.i18n.TranslationFormatStringParser',
+  ],
+  properties: [
+    {
+      name: 'locale',
+      postSet: function(_, n) {
+        foam.i18n = n;
+      },
+    },
+    {
+      name: 'parser',
+      factory: function() {
+        return this.TranslationFormatStringParser.create({
+          stringSymbol: 's',
+        });
+      },
+    },
+  ],
+  classes: [
+  ],
+  methods: [
+    function classToResources(cls) {
+      var resources = cls.model_.toAndroidStringResources();
+      var p = this.parser;
+      for (var i = 0, r; r = resources[i]; i++) {
+        p.copyFrom({value: r.message, translationHint: r.description})
+        r.copyFrom({
+          name: cls.model_.id.replace(/\./g, '_') + '_' + r.name,
+          message: p.parsedValue,
+          description: p.parsedTranslationHint,
+        });
+      }
+      return resources;
+    },
+  ],
+  templates: [
+    {
+      name: 'genResource',
+      args: ['resources'],
+      template: function(resources) {/*
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<% for (var i = 0, r; r = resources[i]; i++) { %>
+  <string name="<%= r.name %>" description="<%= r.description %>">
+    <%= r.message %>
+  </string>
+<% } %>
+</resources>
+      */},
+    }
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.android',
   name: 'StringResource',
   properties: [
     {
@@ -106,63 +164,5 @@ foam.CLASS({
       }));
       return resources;
     },
-  ],
-});
-
-foam.CLASS({
-  package: 'foam.android',
-  name: 'GenStrings',
-  extends: 'foam.android.GenResources',
-  requires: [
-    'foam.i18n.TranslationFormatStringParser',
-  ],
-  properties: [
-    {
-      name: 'locale',
-      postSet: function(_, n) {
-        foam.i18n = n;
-      },
-    },
-    {
-      name: 'parser',
-      factory: function() {
-        return this.TranslationFormatStringParser.create({
-          stringSymbol: 's',
-        });
-      },
-    },
-  ],
-  classes: [
-  ],
-  methods: [
-    function classToResources(cls) {
-      var resources = cls.model_.toAndroidStringResources();
-      var p = this.parser;
-      for (var i = 0, r; r = resources[i]; i++) {
-        p.copyFrom({value: r.message, translationHint: r.description})
-        r.copyFrom({
-          name: cls.model_.id.replace(/\./g, '_') + '_' + r.name,
-          message: p.parsedValue,
-          description: p.parsedTranslationHint,
-        });
-      }
-      return resources;
-    },
-  ],
-  templates: [
-    {
-      name: 'genResource',
-      args: ['resources'],
-      template: function(resources) {/*
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-<% for (var i = 0, r; r = resources[i]; i++) { %>
-  <string name="<%= r.name %>" description="<%= r.description %>">
-    <%= r.message %>
-  </string>
-<% } %>
-</resources>
-      */},
-    }
   ],
 });
