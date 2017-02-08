@@ -8261,10 +8261,7 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of',
-      required: true,
-      assertValue: function(of) {
-        if ( ! this.lookup(of, true) ) throw 'Unknown Enum: ' + of;
-      }
+      required: true
     },
     [
       'adapt',
@@ -11590,9 +11587,6 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.createView = function(spec, args, that, ctx) {
-          if ( spec === undefined || spec === null )
-            return undefined;
-
           if ( foam.u2.Element.isInstance(spec) )
             return spec;
 
@@ -11610,7 +11604,7 @@ foam.CLASS({
                 spec.create(args, ctx) :
                 ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {}) ;
 
-            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec result must extend foam.u2.Element.');
+            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
@@ -11618,12 +11612,12 @@ foam.CLASS({
           if ( foam.core.FObject.isSubClass(spec) ) {
             var ret = spec.create(args, ctx);
 
-            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec class must extend foam.u2.Element.');
+            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec class must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
 
-          if ( foam.String.isInstance(spec) )
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
             return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
 
           throw 'Invalid ViewSpec, must provide an Element, Slot, toE()-able, Function, {create: function() {}}, {class: \'name\'}, Class, or String, but received: ' + spec;
@@ -16230,7 +16224,20 @@ foam.CLASS({
     },
     function put(o) {
       this.delegate.put( this.f(o) );
-    },
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang.expr',
+  name: 'Mul',
+  implements: [
+    'foam.mlang.predicate.Binary'
+  ],
+  methods: [
+    function f(o) {
+      return this.arg1.f(o) * this.arg2.f(o);
+    }
   ]
 });
 
@@ -16646,6 +16653,26 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Sum',
+  extends: 'foam.dao.AbstractSink',
+  implements: [
+    'foam.mlang.predicate.Unary'
+  ],
+  properties: [
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+  methods: [
+    function put(obj) {
+      this.value += this.arg1.f(obj);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.expr',
@@ -16681,10 +16708,12 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.Func',
+    'foam.mlang.expr.Mul',
     'foam.mlang.expr.Dot',
     'foam.mlang.Constant',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Max',
+    'foam.mlang.sink.Sum',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
     'foam.mlang.order.Desc',
@@ -16722,11 +16751,13 @@ foam.CLASS({
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
+    function MUL(a, b) { return this._binary_("Mul", a, b); },
 
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
@@ -30193,7 +30224,7 @@ foam.CLASS({
             var subKey = ('' + key)
                 .substring(0, self.width - count.length - 3);
             var cleanKey = foam.core.Enum.isInstance(self.property) ?
-                self.lookup(self.property.of)[key].label :
+                self.property.of[key].label :
                 subKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;');
 

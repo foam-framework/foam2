@@ -49,47 +49,34 @@ foam.CLASS({
   ], 
 
   properties: [
-    'gridView', 
+    'redHood',
+    'echoIsland',
+    {
+        name: 'redHoodId',
+        value: 'RH', 
+    },
+    {
+        name: 'echoIslandId',
+        value: 'EI',
+    }, 
   ],
 
   methods: [
     
     function initE(){
        this.
-       start(this.STOP, {data: this}).end();
-       this.start('h3').add('Using PropertiesDAO: ').end('h3');
-       this.add(this.gridView);
-       //this.start('h3').add('Using PropertiesArray: ').end('h3');
-       //this.add(this.arrGridView$);
+       start(this.STOP, {data: this}).end().
+       start(this.SET_OBJ, {data: this}).end().
+       start(this.SET_ID, {data: this}).end();
+       this.start('h3').add('see dev console : ').end('h3');
        }, 
     
     function init() {
-        this.gridView = this.NewGridView.create({
-                        of: this.Hero,
-                        data$: this.HeroDAO$, 
-                        rowProperty: this.Hero.ORGANIZATION, //eq(rowProperty, rowProperties[i])
-                        cellView: 'HeroCellView',
-                        cellWrapperClass: 'NewHeroWrapperView',  
-                        colProperty: this.Hero.STATUS, 
-                        rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
-                        matchRowId: true, 
-                        colPropertiesArray: ['alive', 'dead', 'MIA', undefined], //or pass in colDAO
-                        rowDAOMatchUndefined: true,
-                        contextSource: this, 
-                });
-        
-        /*     
-      this.arrGridView = this.GridView.create({
-        data$: this.HeroDAO$,
-        of: this.Hero, 
-        rowProperty: this.Hero.ORGANIZATIONID, //eq(rowProperty, rowProperties[i])
-        colProperty: this.Hero.STATUS, 
-        rowPropertiesArray: ['TS', 'B'], // or pass in rowDAO //make it dao based.
-        colPropertiesArray: ['dead','alive'], //or pass in colDAO
-      });
-      */
-      
-
+        var self = this; 
+         this.TeamDAO.find(this.echoIslandId).then(function(team){
+            self.echoIsland = team;
+         });
+    
     }
   ],
   
@@ -118,6 +105,47 @@ foam.CLASS({
                         if (d.organization && d.organization.name) orgStr = d.organization.name; 
                         console.log(d.name + ', ' + orgStr);
                     } });
+            }
+        },
+        
+        {
+            label: 'set organization Object',
+            name: 'setObj',
+            code: function(){
+                var self = this; 
+                this.HeroDAO.find(this.redHoodId).then(function(hero){
+                 if (! hero){
+                   console.log("no valid hero found");
+                   return; 
+                 }
+                 
+                 hero.organization = self.echoIsland; 
+                 self.HeroDAO.put(hero).then(function(hero){
+                   console.log("RedHood should be in Echo Island now. "); 
+                   console.log(hero.name + ", " + hero.status + ", " + hero.organization.name); 
+                 }); 
+             });
+            }
+        },
+        
+        {
+            label: 'set organization Id',
+            name: 'setId',
+            code: function(){
+                var self = this; 
+                this.HeroDAO.find(this.redHoodId).then(function(hero){
+                 if (! hero){
+                   console.log("no valid hero found");
+                   return; 
+                 }
+                 
+                 //hero.organizationId = self.echoIslandId;
+                 hero.organizationId = null; 
+                 self.HeroDAO.put(hero).then(function(newHero){
+                   console.log("RedHood should be in Echo Island now. "); 
+                   console.log(newHero.name + ", " + newHero.status + ", " + newHero.organizationId); 
+                 }); 
+             });
             }
         }
     ], 

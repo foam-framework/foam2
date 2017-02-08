@@ -98,15 +98,21 @@ foam.CLASS({
     },
     {
         name: 'organizationId',
+        documentation: 'organizationId should always be the one set, instead of organization object.', 
         //hidden: true, 
         postSet: function(old, nu){
             console.log(this.name + " orgainizationId is set. " + nu);
+            if (!nu){
+                this.clearProperty(this.ORGANIZATION); 
+            }
             if (nu && old!=nu){
               this.TeamDAO.find(nu).then(function(organization) {
+                if (this.organizationId != organization.id){
+                    console.log("error. organization should be set after the organizationId, ids should match."); 
+                }
                   this.organization = organization;
+                
               }.bind(this));
-            }else {
-              this.organization = null; 
             }
         }
     },
@@ -127,15 +133,17 @@ foam.CLASS({
         },
         tableFormatter: function(value, data, t){
           return value; 
-        }, 
+        },
+        /*
+         * postset should NOT exist. organization should only be changed when organizationid is. 
         postSet: function(old, nu){
-          if (old != nu){
-              console.log(this.name + " orgainization is set. " + nu?nu.name:"");
-              if (nu && this.organizationId != nu.Id){
-                this.organizaitonId = nu.id; 
-              }
+            if(! nu || ! nu.id){
+                this.clearProperty(this.ORGANIZATION_ID); 
+            }else if (! old || !old.id || (old.id != nu.id)){
+                this.organizationId = nu.id; 
             }
         },
+        */
         gridHeaderView: function(value, obj, t){
             return value?value.name:"N/A"; 
         },
@@ -276,7 +284,7 @@ foam.CLASS({
         }
     },
     "status",
-    "team",
+    "organizationId",
     "cell", 
     ],
   
@@ -309,7 +317,8 @@ foam.CLASS({
     }, 
     
     function init(){
-      this.team$ = this.cell.rowMatch$;
+      //this.organizationId$ = this.cell.rowMatchId$;
+      this.organizationId$ = this.cell.rowMatchId$;
       this.status$ = this.cell.colMatch$; 
         this.onDAOUpdate();
     },
@@ -358,11 +367,20 @@ foam.CLASS({
                         console.log("no valid hero found");
                         return; 
                       }
+                      
+                      
                       hero.status = self.status;
-                      hero.team = self.team;
-                      self.HeroDAO.put(hero).then(function(hero){
-                        console.log("Current hero: " + hero.name + ", " + hero.status + ", " + hero.team.name); 
-                      }); 
+                      
+                      hero.organizationId = self.organizationId?self.organizationId:null;
+                      
+                      self.HeroDAO.put(hero).then(function(newHero){
+                        console.log("Current hero: " + newHero.name + ", " + newHero.status + ", " + newHero.organizationId); 
+                      }).then(function(){
+                        self.HeroDAO.find(id).then(function(h){
+                           console.log(h.name + ", " + h.organizationId);  
+                        });
+                        
+                      });
                   }); 
             }
         }

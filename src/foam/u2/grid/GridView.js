@@ -21,7 +21,6 @@ foam.CLASS
           code: function() {/*
             ^grid-table {
                 border-collapse: collapse;
-                max-height: 2000px;
                 border: 1px solid black;
                 border-collapse: collapse;
             }
@@ -225,11 +224,7 @@ foam.CLASS
                 r.setNodeName('tr');
                 for (var j=-1; j< this.colPropertiesArray.length; j++){
                     if (i == -1 && j ==-1){
-                        var rowCorner = this.GridHeaderCell.create({
-                            //name: 'corner',
-                            name: '--', 
-                        });
-                        r.add(rowCorner);
+                        r.start(this.GridHeaderCell, {name: '--'}).end(); 
                     }else if (j==-1){ //head row or head column
                         var rowHeaderCell = this.GridHeaderCell.create({
                             data: this.rowPropertiesArray[i],
@@ -374,7 +369,9 @@ foam.CLASS
                             this.rowPropertiesArray = arr; 
                         }
                         if (this.rowDAOMatchUndefined){
-                            this.rowPropertiesArray.push(undefined); 
+                            // very important to use null instead of undefined.
+                            // posetSet is not triggered for FOAM if undefined is used. 
+                            this.rowPropertiesArray.push(null); 
                         }
                         this.refreshGrid();
                     }.bind(this));
@@ -397,7 +394,7 @@ foam.CLASS
                             this.colPropertiesArray = arr; 
                         }
                         if (this.colDAOMatchUndefined){
-                            this.colPropertiesArray.push(undefined); 
+                            this.colPropertiesArray.push(null); 
                         }
                         this.refreshGrid();
                     }.bind(this));
