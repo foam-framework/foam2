@@ -124,11 +124,9 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Eq',
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      return values.v2 === null ?
-          values.v1 + ' IS NULL' :
-          values.v1 + " = " + values.v2 ;
+      return this.arg2 === null ?
+        this.sqlValue('arg1') + ' IS NULL' :
+        this.sqlValue('arg1') + " = " + this.sqlValue('arg2');
     }
   ]
 });
