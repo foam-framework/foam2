@@ -872,6 +872,8 @@ foam.CLASS({
       /** Create a deep copy of this object. **/
       var m = {};
       for ( var key in this.instance_ ) {
+        if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
+
         var value = this[key];
         this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
@@ -895,8 +897,11 @@ foam.CLASS({
 </pre>
      If an FObject is supplied, it doesn't need to be the same class as 'this'.
      Only properties that the two classes have in common will be copied.
+     Null or undefined values are ignored.
      */
     function copyFrom(o, opt_warn) {
+      if ( ! o ) return this;
+
       // When copying from a plain map, just enumerate the keys
       if ( o.__proto__ === Object.prototype || ! o.__proto__ ) {
         for ( var key in o ) {
