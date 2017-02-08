@@ -49,16 +49,12 @@ foam.CLASS({
       return req.send().then(function(payload) {
         return payload.resp.text();
       }).then(function(js) {
-        var modelToReturn;
+        var model;
         var foamCLASS = foam.CLASS;
         foam.CLASS = function(m) {
           var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-          var model = cls.create(m, self);
-          if ( model.id != id ) {
-            foamCLASS(m);
-          } else {
-            modelToReturn = model;
-          }
+          model = cls.create(m, self);
+          foam.CLASS = foamCLASS;
         }
         try {
           eval(js);
@@ -68,8 +64,7 @@ foam.CLASS({
         } finally {
           foam.CLASS = foamCLASS;
         }
-        if ( modelToReturn ) return Promise.resolve(modelToReturn);
-        return Promise.reject('Unable to find ' + id + ' at ' + url);
+        return Promise.resolve(model);
       });
     }
   ]
