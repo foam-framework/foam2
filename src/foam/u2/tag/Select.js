@@ -48,14 +48,10 @@ foam.CLASS({
         var cs = [];
 
         if ( placeholder ) {
-          if (this.optional) {
             cs.push(self.E('option').attrs({
-              selected: self.data == -1 ? true : undefined,
-              value: -1
+              value: -1,
+              selected: self.data == -1 ? true : undefined
             }).add(self.placeholder));
-          } else {
-            cs.push(self.E('option').attrs({disabled: 'disabled'}).add(self.placeholder));
-          }
         }
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
