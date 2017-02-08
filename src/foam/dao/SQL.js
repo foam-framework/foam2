@@ -15,19 +15,6 @@
  * limitations under the License.
  */
 
-/**
- * Refine mLang predicates with toSQL() support.
- *
- * TODO/REVIEW
- *  The use of SUPER for validation, and validation in general, is concerning
- *  as it causes excessive SQL generation as well as redundent checks for
- *  the existance of arg1, arg2...
-
- *  An alternative solution is to refine toSQL() on all things that can be
- *  in an expression (Properties and all mlangs) then we can reliably call
- *  toSQL() on all arguments.
- */
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'SQLException',
@@ -46,10 +33,17 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
-    function values(arg1, arg2) {
+    function values(obj) {
+      var v1 = obj.arg1.toSQL ? obj.arg1.toSQL() :
+        obj.arg1.toString ? obj.arg1.toString() :
+        obj.arg1;
+
+      if ( v1 === undefined || v1 === null )
+        throw this.SQLException.create({message: obj.cls_.name + '.arg1 ' + v1});
+
       return {
-        v1: arg1.toSQL && arg1.toSQL(arg2) || arg1.toString(),
-        v2: arg2 && ( arg2.toSQL && arg2.toSQL(arg1) || arg2.toString() ) || null
+        v1: v1,
+        v2: obj.arg2 && ( obj.arg2.toSQL && obj.arg2.toSQL(obj.arg1) || obj.arg2.toString() ) || null
       };
     }
   ]
@@ -93,24 +87,12 @@ foam.CLASS({
 });
 
 
-/**
-   The base models Unary and Binary are used to validate the arguments
-   and throw a SQLException when invalid.
-   Each child model shall call SUPER() to validate.
- */
 foam.CLASS({
   refines: 'foam.mlang.predicate.Unary',
   requires: [ 'foam.dao.SQLException' ],
   methods: [
     function toSQL() {
-      var v1 = this.arg1.toSQL ? this.arg1.toSQL() :
-          this.arg1.toString ? this.arg1.toString() :
-          this.arg1;
-
-      if ( v1 === undefined || v1 === null )
-        throw this.SQLException.create({message: this.cls_.name + '.arg1 is ' + v1});
-
-      return v1;
+      throw this.SQLException.create({message: this.cls_.name + '.toSQL() not implemented'});
     }
   ]
 });
@@ -121,14 +103,7 @@ foam.CLASS({
   requires: [ 'foam.dao.SQLException' ],
   methods: [
     function toSQL() {
-      var v1 = this.arg1.toSQL ? this.arg1.toSQL() :
-          this.arg1.toString ? this.arg1.toString() :
-          this.arg1;
-
-      if ( v1 === undefined || v1 === null )
-        throw this.SQLException.create({message: this.cls_.name + '.arg1 is ' + v1});
-
-      return v1;
+      throw this.SQLException.create({message: this.cls_.name + '.toSQL() not implemented'});
     }
   ]
 });
@@ -139,8 +114,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER();
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       return values().v1 + ' IS NOT NULL';
     }
@@ -161,9 +135,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER();
-
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       return values.v2 === null ?
           values.v1 + ' IS NULL' :
@@ -178,9 +150,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER();
-
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       return values.v2 === null ?
           values.v1 + ' IS NOT NULL' :
@@ -198,8 +168,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER();
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       if ( values.v2 === null )
         throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
@@ -218,8 +187,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER();
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       if ( values.v2 === null )
           throw this.SQLException.create({message: this.cls_.name + '.arg2 is ' + values.v2});
@@ -238,8 +206,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER();
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       if ( values.v2 === null )
         throw this.SQLException.create({message: this.cls_.name + '.arg2 is ' + values.v2});
@@ -258,8 +225,7 @@ foam.CLASS({
   ],
   methods: [
     function toSQL() {
-      this.SUPER();
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2);
+      var values = this.SQLSupport.create().values(this);
 
       if (values.v2 === null )
         throw this.SQLException.create({message: this.cls_.name + '.arg2 is ' + values.v2});
@@ -311,8 +277,7 @@ foam.CLASS({
   requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      this.SUPER();
-      var values = this.SQLSupport.create().values(this.arg1, this.arg2).v1;
+      var values = this.SQLSupport.create().values(this).v1;
       var s = values.v1;
       s += ' IN ( \'';
       if ( Array.isArray(this.arg2) ) {
