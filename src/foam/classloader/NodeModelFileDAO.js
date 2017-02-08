@@ -31,10 +31,15 @@ foam.CLASS({
     function find(id) {
       var foamCLASS = foam.CLASS;
       var self = this;
-      var model;
+      var modelToReturn;
       foam.CLASS = function(m) {
         var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-        model = cls.create(m, self);
+        var model = cls.create(m, self);
+        if ( model.id != id ) {
+          foamCLASS(m);
+        } else {
+          modelToReturn = model;
+        }
       }
       var sep = require('path').sep;
       var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
@@ -46,7 +51,8 @@ foam.CLASS({
       } finally {
         foam.CLASS = foamCLASS;
       }
-      return Promise.resolve(model);
+      if ( modelToReturn ) return Promise.resolve(modelToReturn);
+      return Promise.reject('Unable to find ' + id + ' in ' + path);
     }
   ]
 });
