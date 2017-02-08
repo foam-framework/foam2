@@ -10,7 +10,7 @@ require(root + '/src/foam/classloader/NodeJsModelExecutor.js');
 
 var execSync = require('child_process').execSync
 execSync('rm -rf ' + dir + '/gen');
-execSync('mkdir -p ' + dir + '/gen/*');
+execSync('mkdir -p ' + dir + '/gen');
 
 var executor = foam.classloader.NodeJsModelExecutor.create({
   classpaths: [

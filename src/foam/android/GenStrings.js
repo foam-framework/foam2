@@ -17,6 +17,100 @@
 
 foam.CLASS({
   package: 'foam.android',
+  name: 'StringResource',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'description'
+    },
+    {
+      class: 'String',
+      name: 'message'
+    },
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.android',
+  name: 'ModelStringExtension',
+  refines: 'foam.core.Model',
+  methods: [
+    function toAndroidStringResources(opt_resources) {
+      var resources = opt_resources || [];
+      for (var i = 0, a; a = this.axioms_[i]; i++) {
+        if ( a.toAndroidStringResources ) a.toAndroidStringResources(resources);
+      }
+      return resources;
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.android',
+  name: 'PropertyStringExtension',
+  refines: 'foam.core.Property',
+  requires: [
+    'foam.android.StringResource',
+  ],
+  methods: [
+    function toAndroidStringResources(opt_resources) {
+      var resources = opt_resources || [];
+      resources.push(this.StringResource.create({
+        name: this.name + '_label',
+        description: this.help || '',
+        message: this.label,
+      }));
+      return resources;
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.android',
+  name: 'ActionStringExtension',
+  refines: 'foam.core.Action',
+  requires: [
+    'foam.android.StringResource',
+  ],
+  methods: [
+    function toAndroidStringResources(opt_resources) {
+      var resources = opt_resources || [];
+      resources.push(this.StringResource.create({
+        name: this.name + '_label',
+        description: this.help || '',
+        message: this.label,
+      }));
+      return resources;
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.android',
+  name: 'MessageStringExtension',
+  refines: 'foam.i18n.MessageAxiom',
+  requires: [
+    'foam.android.StringResource',
+  ],
+  methods: [
+    function toAndroidStringResources(opt_resources) {
+      var resources = opt_resources || [];
+      resources.push(this.StringResource.create({
+        name: this.name,
+        description: this.description,
+        message: this.message,
+      }));
+      return resources;
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.android',
   name: 'GenStrings',
   extends: 'foam.android.GenResources',
   requires: [
@@ -39,36 +133,18 @@ foam.CLASS({
     },
   ],
   classes: [
-    {
-      name: 'StringResource',
-      properties: [
-        {
-          class: 'String',
-          name: 'name'
-        },
-        {
-          class: 'String',
-          name: 'description'
-        },
-        {
-          class: 'String',
-          name: 'message'
-        },
-      ]
-    }
   ],
   methods: [
     function classToResources(cls) {
-      var resources = [];
-      var prefix = cls.model_.id.replace('.', '_');
-      for (var i = 0, message; message = cls.model_.messages[i]; i++) {
-        this.parser.value = message.message;
-        this.parser.translationHint = message.description;
-        resources.push(this.StringResource.create({
-          name: prefix + '_' + message.name,
-          description: this.parser.parsedTranslationHint,
-          message: this.parser.parsedValue,
-        }));
+      var resources = cls.model_.toAndroidStringResources();
+      var p = this.parser;
+      for (var i = 0, r; r = resources[i]; i++) {
+        p.copyFrom({value: r.message, translationHint: r.description})
+        r.copyFrom({
+          name: cls.model_.id.replace(/\./g, '_') + '_' + r.name,
+          message: p.parsedValue,
+          description: p.parsedTranslationHint,
+        });
       }
       return resources;
     },
@@ -80,11 +156,11 @@ foam.CLASS({
       template: function(resources) {/*
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<% resources.forEach(function(o) { %>
-  <string name="<%= o.name %>" description="<%= o.description %>">
-    <%= o.message %>
+<% for (var i = 0, r; r = resources[i]; i++) { %>
+  <string name="<%= r.name %>" description="<%= r.description %>">
+    <%= r.message %>
   </string>
-<% }); %>
+<% } %>
 </resources>
       */},
     }
