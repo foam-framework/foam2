@@ -23,28 +23,21 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.mlang.predicate',
-  name: 'SQLSupport',
+  refines: 'foam.mlang.predicate.AbstractPredicate',
 
-  //
-  // NOTE: use as Singleton rather than implements to avoid
-  // implements complications with Java
-  //
-  axioms: [ foam.pattern.Singleton.create() ],
+  requires: [ 'foam.dao.SQLException' ],
 
   methods: [
-    function values(obj) {
-      var v1 = obj.arg1.toSQL ? obj.arg1.toSQL() :
-        obj.arg1.toString ? obj.arg1.toString() :
-        obj.arg1;
+    function sqlValue(argName) {
+      var arg = this[argName];
+      var v = arg && arg.toSQL ? arg.toSQL() :
+        arg && arg.toString ? arg.toString() :
+        arg;
 
-      if ( v1 === undefined || v1 === null )
-        throw this.SQLException.create({message: obj.cls_.name + '.arg1 ' + v1});
+      if ( v === undefined || v === null )
+        throw this.SQLException.create({message: this.cls_.name + '.' + argName +': '+ v});
 
-      return {
-        v1: v1,
-        v2: obj.arg2 && ( obj.arg2.toSQL && obj.arg2.toSQL(obj.arg1) || obj.arg2.toString() ) || null
-      };
+      return v;
     }
   ]
 });
@@ -111,12 +104,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Has',
-  requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      return values().v1 + ' IS NOT NULL';
+      return this.sqlValue('arg1') + ' IS NOT NULL';
     }
   ]
 });
@@ -132,14 +122,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Eq',
-  requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      return values.v2 === null ?
-          values.v1 + ' IS NULL' :
-          values.v1 + " = " + values.v2 ;
+      return this.arg2 === null ?
+        this.sqlValue('arg1') + ' IS NULL' :
+        this.sqlValue('arg1') + " = " + this.sqlValue('arg2');
     }
   ]
 });
@@ -147,14 +134,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Neq',
-  requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      return values.v2 === null ?
-          values.v1 + ' IS NOT NULL' :
-          values.v1 + " <> " + values.v2 ;
+      return this.arg2 === null ?
+        this.sqlValue('arg1') + ' IS NOT NULL' :
+        this.sqlValue('arg1') + " <> " + this.sqlValue('arg2');
     }
   ]
 });
@@ -162,18 +146,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Gt',
-  requires: [
-    'foam.mlang.predicate.SQLSupport',
-    'foam.dao.SQLException'
-  ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      if ( values.v2 === null )
-        throw this.SQLException.create({message: this.cls_.name+'.arg2 is '+values.v2});
-
-      return values.v1 + ' > ' + values.v2;
+      return this.sqlValue('arg1') + ' > ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -181,18 +156,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Gte',
-  requires: [
-    'foam.mlang.predicate.SQLSupport',
-    'foam.dao.SQLException'
-  ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      if ( values.v2 === null )
-          throw this.SQLException.create({message: this.cls_.name + '.arg2 is ' + values.v2});
-
-      return values.v1 + ' >= ' + values.v2;
+      return this.sqlValue('arg1') + ' >= ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -200,18 +166,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Lt',
-  requires: [
-    'foam.mlang.predicate.SQLSupport',
-    'foam.dao.SQLException'
-  ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      if ( values.v2 === null )
-        throw this.SQLException.create({message: this.cls_.name + '.arg2 is ' + values.v2});
-
-      return values.v1 + ' < ' + values.v2;
+      return this.sqlValue('arg1') + ' < ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -219,18 +176,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Lte',
-  requires: [
-    'foam.mlang.predicate.SQLSupport',
-    'foam.dao.SQLException'
-  ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this);
-
-      if (values.v2 === null )
-        throw this.SQLException.create({message: this.cls_.name + '.arg2 is ' + values.v2});
-
-      return values.v1 + ' <= ' + values.v2;
+      return this.sqlValue('arg1') + ' <= ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -274,16 +222,14 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.In',
-  requires: [ 'foam.mlang.predicate.SQLSupport' ],
   methods: [
     function toSQL() {
-      var values = this.SQLSupport.create().values(this).v1;
-      var s = values.v1;
+      var s = this.sqlValue('arg1');
       s += ' IN ( \'';
       if ( Array.isArray(this.arg2) ) {
         s += this.arg2.join('\', \'');
       } else {
-        s += values.v2;
+        s += this.sqlValue('arg2');
       }
       s += '\')';
       return s;
