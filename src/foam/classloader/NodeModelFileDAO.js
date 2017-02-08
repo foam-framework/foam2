@@ -35,6 +35,7 @@ foam.CLASS({
       foam.CLASS = function(m) {
         var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
         model = cls.create(m, self);
+        foam.CLASS = foamCLASS;
       }
       var sep = require('path').sep;
       var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
