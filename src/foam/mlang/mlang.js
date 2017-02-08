@@ -1266,7 +1266,6 @@ foam.INTERFACE({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  flags: { noWarnOnRefinesAfterCreate: true },
   implements: [ 'foam.mlang.order.Comparator' ],
 
   methods: [
