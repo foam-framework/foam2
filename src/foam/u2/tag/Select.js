@@ -28,8 +28,12 @@ foam.CLASS({
         return [];
       }
     },
-    ['placeholder', ''],
-    ['optional', false],
+    {
+      name: 'placeholder',
+      factory: function() {
+        return undefined;
+      }
+    },
     {
       name: 'size'
     },
