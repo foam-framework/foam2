@@ -51,10 +51,10 @@ foam.CLASS({
         var cs = [];
 
         if ( placeholder ) {
-            cs.push(self.E('option').attrs({
-              value: -1,
-              selected: self.data == -1 ? true : undefined
-            }).add(self.placeholder));
+          cs.push(self.E('option').attrs({
+            value: -1,
+            selected: self.data == -1 ? true : undefined
+          }).add(self.placeholder));
         }
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
