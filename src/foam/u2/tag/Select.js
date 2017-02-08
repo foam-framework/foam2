@@ -28,7 +28,12 @@ foam.CLASS({
         return [];
       }
     },
-    ['placeholder', ''],
+    {
+      name: 'placeholder',
+      factory: function() {
+        return undefined;
+      }
+    },
     {
       name: 'size'
     }
@@ -46,7 +51,10 @@ foam.CLASS({
         var cs = [];
 
         if ( placeholder ) {
-          cs.push(self.E('option').attrs({disabled: 'disabled'}).add(self.placeholder));
+          cs.push(self.E('option').attrs({
+            value: -1,
+            selected: self.data == -1 ? true : undefined
+          }).add(self.placeholder));
         }
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
