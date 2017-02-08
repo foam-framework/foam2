@@ -7,25 +7,35 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ {
-             display: inline-block;
              border-radius: 3px;
              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+             display: inline-block;
+             width:100%;
         }
-        ^title { padding: 6px; align-content: center; background: aliceblue; }
+        ^title { padding: 6px; align-content: center; background: #c8e2f9; }
+        ^info { float: right; font-size: smaller; }
         ^content { padding: 6px; min-width: 220px; height: 100%; background: white; }
       */}
     })
   ],
 
   properties: [
-    'title'
+    'title',
+    'info'
   ],
 
   methods: [
     function init() {
       this.
         cssClass(this.myCls()).
-        start('div').cssClass(this.myCls('title')).add(this.title$).end().
+        start('div').
+          cssClass(this.myCls('title')).
+          add(this.title$).
+          start('span').
+            cssClass(this.myCls('info')).
+            add(this.info$).
+          end().
+        end().
         start('div', null, this.content$).
           cssClass(this.myCls('content')).
         end();
@@ -39,6 +49,10 @@ foam.CLASS({
   name: 'AxiomInfo',
   ids: ['name'],
 
+  requires: [
+    'foam.doc.ClassLink'
+  ],
+
   properties: [
     {
       name: 'axiom',
@@ -46,7 +60,7 @@ foam.CLASS({
     },
     {
       name: 'cls',
-      label: 'Source Class',
+      label: 'Source',
       tableCellView: function(o, e) {
         return foam.doc.LinkView.create({data: o.cls}, e.__subSubContext__);
       },
@@ -70,7 +84,16 @@ foam.CLASS({
       }
     },
     {
-      name: 'name'
+      name: 'name',
+      tableCellFormatter: function(value, obj, axiom) {
+        if ( obj.type === foam.core.Requires ) {
+          this.tag(obj.ClassLink, {data: obj.axiom.path, showPackage: true});
+        } else if ( obj.type === foam.core.Implements ) {
+          this.tag(obj.ClassLink, {data: obj.axiom.path, showPackage: true});
+        } else {
+          this.add(value);
+        }
+      }
     }
   ]
 });
@@ -82,20 +105,44 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.doc.DocBorder',
     'foam.doc.ClassLink'
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ a {
+          display: block;
+          padding: 2px;
+        }
+      */}
+    })
+  ],
+
+  properties: [
+    'title',
+    {
+      name: 'info',
+      expression: function (data) {
+        return data && data.length;
+      }
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-
       var self = this;
-
-      this.add('(', this.data.length, ')').br();
-
-      this.data.forEach(function(cls) {
-        self.start(self.ClassLink, {data: cls, showPackage: true}).end().br();
-      });
+      this.
+        cssClass(this.myCls()).
+        start(this.DocBorder, {title: this.title, info$: this.info$}).
+          start('div').
+            add(this.slot(function (data) {
+              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}); });
+            })).
+          end().
+        end();
     }
   ]
 });
@@ -115,15 +162,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'selectedAxiom'
-  ],
-
-  properties: [
-    {
-      class: 'Boolean',
-      name: 'showInherited',
-      value: true
-    }
+    'selectedAxiom',
+    'showInherited'
   ],
 
   methods: [
@@ -134,7 +174,7 @@ foam.CLASS({
 
       this.
           start('b').add(data.id).end().
-          start('span').style({float:'right'}).add(' (', data.count_, ' created)').end().br().
+          start('span').style({float:'right','font-size':'smaller'}).add(data.count_, ' created').end().br().
           add('extends: ');
 
       var cls = data;
@@ -146,8 +186,6 @@ foam.CLASS({
       }
       this.br();
       this.add(data.documentation);
-
-      this.add('Show Inherited: ').start(this.SHOW_INHERITED, {data$: this.showInherited$}).end();
 
       this.add(this.slot(function (showInherited) {
         // TODO: hide 'Source Class' column if showInherited is false
@@ -269,64 +307,108 @@ foam.CLASS({
   exports: [
     'as data',
     'path as browserPath',
-    'axiom as selectedAxiom'
+    'axiom as selectedAxiom',
+    'showInherited'
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^ {
+          font-family: roboto, arial;
+          color: #555;
+        }
+        ^ th {
+          color: #555;
+        }
+        ^ td {
+          padding-right: 12px;
+        }
+      */}
+    })
   ],
 
   properties: [
     'path',
     {
+      name: 'selectedClass',
+      expression: function (path) {
+        return foam.lookup(path, true);
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'showInherited',
+      value: true
+    },
+    {
       class: 'FObjectProperty',
       name: 'axiom',
       view: { class: 'foam.u2.DetailView' }
-    }
+    },
+    {
+      name: 'subClasses',
+      expression: function (path) {
+        return Object.values(foam.USED).
+            filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).
+            sort(foam.core.Model.ID.compare);
+      }
+    },
+    {
+      name: 'requiredByClasses',
+      expression: function (path) {
+        return Object.values(foam.USED).
+            filter(function(cls) {
+              return cls.model_.requires && cls.model_.requires.map(
+                  function(r) { return r.path; }).includes(path);
+            }).
+            sort(foam.core.Model.ID.compare);
+      }
+    },
+    {
+      name: 'relationshipClasses',
+      expression: function (path) {
+        return [];
+      }
+    },
+    'subClassCount'
   ],
 
   methods: [
     function initE() {
       this.SUPER();
 
-      this.tag(this.PATH, {displayWidth: 80}).br().br();
-
       this.
+        cssClass(this.myCls()).
+        tag(this.PATH, {displayWidth: 80}).
+          start('span').
+            style({'margin-left': '12px', 'font-size':'small'}).
+            add('  Show Inherited Axioms: ').
+          end().
+          tag(this.SHOW_INHERITED, {data$: this.showInherited$}).
+        br().br().
         start('table').
           start('tr').
             start('td').
               style({'vertical-align': 'top'}).
-              start(this.DocBorder, {title: 'Class List'}).
-                start(this.ClassList, {data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
-              end().
+              tag(this.ClassList, {title: 'Class List', data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              start(this.DocBorder, {title: 'Class Definition'}).
-                add(this.slot(function(path) {
-                  var o = foam.lookup(path, true);
-                  if ( ! o ) return '';
-                  return this.ClassDocView.create({data: o});
+          start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
+                add(this.slot(function(selectedClass) {
+                  if ( ! selectedClass ) return '';
+                  return this.ClassDocView.create({data: selectedClass});
                 })).
               end().
             end().
             start('td').
               style({'vertical-align': 'top'}).
-              start(this.DocBorder, {title: 'Sub-Classes'}).
-                add(this.slot(function(path) {
-                  var o = foam.lookup(path, true);
-                  if ( ! o ) return '';
-                  return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).sort(foam.core.Model.ID.compare)});
-                })).
-              end().
-            end().
-            start('td').
-              style({'vertical-align': 'top'}).
-              start(this.DocBorder, {title: 'Required-By'}).
-                add(this.slot(function(path) {
-                  var o = foam.lookup(path, true);
-                  if ( ! o ) return '';
-                  // TODO: this could be done more efficiently, and memoized
-                  return this.ClassList.create({data: Object.values(foam.USED).filter(function(cls) {
-                    return cls.model_.requires && cls.model_.requires.map(function(r) { return r.path; }).includes(path); }).sort(foam.core.Model.ID.compare)});
-                })).
-              end().
+              tag(this.ClassList, {title: 'Sub-Classes', data$: this.subClasses$}).
+              br().
+              tag(this.ClassList, {title: 'Required-By', data$: this.requiredByClasses$}).
+              br().
+              tag(this.ClassList, {title: 'Relationships', data$: this.relationshipClasses$}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
@@ -380,3 +462,7 @@ foam.debug.doc = function(opt_obj, showUnused) {
       ( opt_obj && opt_obj.cls_ ) ? opt_obj.cls_.id :
       'foam.core.FObject' });
 };
+
+
+// TODO:
+//    remove LinkView
