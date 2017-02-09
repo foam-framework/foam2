@@ -205,6 +205,36 @@ foam.CLASS({
           return comparePropertyValues(f(o1), f(o2));
         };
       }
+    },
+    {
+      name: 'diffPropertyValues',
+      transient: true,
+      factory: function() {
+        var name = this.name;
+        return function(v1, v2, diff) {
+          if ( Array.isArray(v1) ) {
+            var subdiff = foam.Array.diff(v1, v2);
+            if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
+              diff[name] = subdiff;
+            }
+          } else if ( ! foam.util.equals(v1, v2) ) {
+            // if the primary value is undefined, use the compareTo of the other
+            diff[name] = v2;
+          }
+          return diff;
+        };
+      }
+    },
+    {
+      name: 'diffProperty',
+      transient: true,
+      factory: function() {
+        var diffPropertyValues = this.diffPropertyValues;
+        var f = this.f;
+        return function diffProperty(o1, o2, diff) {
+          return diffPropertyValues(f(o1), f(o2), diff);
+        };
+      }
     }
   ],
 
