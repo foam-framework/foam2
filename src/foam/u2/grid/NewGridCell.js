@@ -11,6 +11,10 @@ foam.CLASS
         'foam.mlang.Expressions', 
     ], 
     
+    requires: [
+        'com.serviceecho.dao.ContexualizingSink',     
+    ],
+    
     axioms: [
       foam.u2.CSS.create({
           code: function() {/*
@@ -236,8 +240,9 @@ foam.CLASS
                 if (this.order){
                     d = d.orderBy(this.order);
                 }
-                d.select().
-                then(function(result){
+                var result = this.ContexualizingSink.create(); 
+                d.select(result).
+                then(function(bareResult){
                     var div = foam.u2.Element.create('div');
                     console.log('CELL: row:' + this.rowMatchId + ' col:' + this.colMatchId + ', ' + result.a.length);
                     if (! result || !result.a || !result.a.length){

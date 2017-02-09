@@ -66,7 +66,6 @@ foam.CLASS({
     function initE(){
        this.
        start(this.STOP, {data: this}).end().
-       start(this.SET_OBJ, {data: this}).end().
        start(this.SET_ID, {data: this}).end();
        this.start('h3').add('see dev console : ').end('h3');
        }, 
@@ -107,29 +106,10 @@ foam.CLASS({
                     } });
             }
         },
+    
         
         {
-            label: 'set organization Object',
-            name: 'setObj',
-            code: function(){
-                var self = this; 
-                this.HeroDAO.find(this.redHoodId).then(function(hero){
-                 if (! hero){
-                   console.log("no valid hero found");
-                   return; 
-                 }
-                 
-                 hero.organization = self.echoIsland; 
-                 self.HeroDAO.put(hero).then(function(hero){
-                   console.log("RedHood should be in Echo Island now. "); 
-                   console.log(hero.name + ", " + hero.status + ", " + hero.organization.name); 
-                 }); 
-             });
-            }
-        },
-        
-        {
-            label: 'set organization Id',
+            label: 'set organization Id to null',
             name: 'setId',
             code: function(){
                 var self = this; 
@@ -141,10 +121,16 @@ foam.CLASS({
                  
                  //hero.organizationId = self.echoIslandId;
                  hero.organizationId = null; 
-                 self.HeroDAO.put(hero).then(function(newHero){
-                   console.log("RedHood should be in Echo Island now. "); 
-                   console.log(newHero.name + ", " + newHero.status + ", " + newHero.organizationId); 
-                 }); 
+                      self.HeroDAO.put(hero).then(function(newHero){
+                        console.log("Current hero: " + newHero.name + ", " + newHero.status + ", " + newHero.organizationId); 
+                      }).then(function(){
+                        self.HeroDAO.find(self.redHoodId).then(function(h){
+                           console.log("find again: " + h.name + ", " + h.organizationId);  
+                        });
+                        
+                      });
+                
+                
              });
             }
         }

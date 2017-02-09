@@ -7,6 +7,10 @@ foam.CLASS
     imports: [
     ],
     
+    requires: [
+        'com.serviceecho.dao.ContextualizingSink', 
+    ], 
+    
     implements: [
         'foam.mlang.Expressions', 
     ], 
@@ -236,10 +240,12 @@ foam.CLASS
                 if (this.order){
                     d = d.orderBy(this.order);
                 }
+                //var result = this.ContextualizingSink.create(); 
                 d.select().
                 then(function(result){
                     var div = foam.u2.Element.create('div');
-                    console.log('CELL: row:' + this.rowMatchId + ' col:' + this.colMatchId + ', ' + result.a.length);
+                    console.log('CELL: row:' + this.rowMatchId + ' col:' +
+                                this.colMatchId + ', ' + result.a.length);
                     if (! result || !result.a || !result.a.length){
                         console.log('no result found');
                     }
