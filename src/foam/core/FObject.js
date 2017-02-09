@@ -837,7 +837,7 @@ foam.CLASS({
         // FUTURE: add patch() method?
 
         // Property adds its difference(s) to "d".
-        property.diffProperty(this, other, d);
+        property.diffProperty(this, other, d, property);
       }
 
       return d;
