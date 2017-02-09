@@ -69,6 +69,8 @@ FOAM_FILES([
   { name: "foam/core/Serializable" },
   { name: "lib/java", flags: ['java'] },
   { name: "lib/JavaClass", flags: ['java'] },
+  { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
+  { name: "foam/swift/Refines", flags: ['swift'] },
   { name: "foam/util/Timer" },
   { name: "foam/memento/MementoMgr" },
   { name: "lib/input", flags: ['web'] },
@@ -186,4 +188,7 @@ FOAM_FILES([
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
   { name: "foam/doc/DocBrowser", flags: ['debug'] },
+  { name: "foam/classloader/OrDAO", flags: ['node'] },
+  { name: "foam/classloader/NodeModelFileDAO", flags: ['node'] },
+  { name: "foam/classloader/NodeJsModelExecutor", flags: ['node'] },
 ]);
