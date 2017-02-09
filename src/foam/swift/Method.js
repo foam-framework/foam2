@@ -17,39 +17,46 @@
 
 foam.CLASS({
   package: 'foam.swift',
-  name: 'Field',
+  name: 'Method',
 
   properties: [
     'name',
-    'type',
+    'returnType',
     'static',
-    'final',
-    'lazy',
-    'defaultValue',
-    'initializer',
+    'body',
+    {
+      class: 'FObjectArray',
+      of: 'foam.swift.Argument',
+      name: 'args'
+    },
   ],
 
   methods: [
     function outputSwift(o) {
       o.indent();
+
       o.out(
         this.static ? 'static ' : '',
-        this.lazy ? 'lazy ' : '',
-        this.final ? 'let ' : 'var ',
+        'func ',
         this.name,
-        ': ',
-        this.type);
-      if (this.initializer) {
-        o.out(' = {\n');
-        o.increaseIndent();
-        o.indent();
-        o.out(this.initializer, '\n');
-        o.decreaseIndent();
-        o.indent();
-        o.out('}()');
-      } else if (this.defaultValue) {
-        o.out(' = ', this.defaultValue);
+        '(');
+
+      for (var i = 0, arg; arg = this.args[i]; i++) {
+        o.out(i > 0 ? ', ' : '');
+        arg.outputSwift(o);
       }
+
+      o.out(
+        ')',
+        this.returnType ? ' -> ' + this.returnType : '',
+        ' {\n');
+
+      o.increaseIndent();
+      o.indent();
+      o.out(this.body, '\n');
+      o.decreaseIndent();
+      o.indent();
+      o.out('}');
     }
   ]
 });
