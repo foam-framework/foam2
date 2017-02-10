@@ -298,7 +298,7 @@ foam.CLASS({
 
   methods: [
     function write(msg) {
-      var serialized = foam.json.Network.stringify(msg.clone().toRemote());
+      var serialized = foam.json.Network.stringify(msg);
       var size = Buffer.byteLength(serialized);
       var packet = new Buffer(size + 4);
       packet.writeInt32LE(size);
@@ -431,7 +431,7 @@ foam.CLASS({
 
     function addSocket(socket) {
       var s1 = socket.message.sub(function(s, _, m) {
-        var m = foam.json.parse(foam.json.parseString(m), null, this);
+        var m = foam.json.parseString(m, this);
 
         if ( this.RegisterSelfMessage.isInstance(m) ) {
           var named = foam.box.NamedBox.create({
@@ -501,7 +501,6 @@ foam.CLASS({
   methods: [
     function send(data) {
       if ( foam.box.Message.isInstance(data) ) {
-        data = data.clone().toRemote();
         data = foam.json.Network.stringify(data);
       }
 
