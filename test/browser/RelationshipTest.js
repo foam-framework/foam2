@@ -128,5 +128,10 @@ foam.RELATIONSHIP({
   sourceModel: 'com.acme.Parent1',
   targetModel: 'com.acme.Child1',
   forwardName: 'children',
-  inverseName: 'parent'
+  inverseName: 'parent',
+  sourceProperty: { hidden: true },
+  targetProperty: { hidden: true }
 });
+
+foam.u2.DetailView.create({data: com.acme.Parent1.create()}).write();
+foam.u2.DetailView.create({data: com.acme.Child1.create()}).write();

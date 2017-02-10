@@ -77,7 +77,10 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
-        ^ th { white-space: nowrap; }
+        ^ th {
+          text-align: left;
+          white-space: nowrap;
+        }
 
         ^row:hover {
           background: #eee;
@@ -151,6 +154,7 @@ foam.CLASS({
       var view = this;
 
       this.
+        cssClass(this.myCls()).
         setNodeName('table').
         start('thead').
         add(this.slot(function(columns_) {
@@ -158,13 +162,13 @@ foam.CLASS({
             forEach(columns_, function(column) {
               this.
                 start('th').
-                add(this.slot(function(order) {
+                on('click', function(e) { view.sortBy(column); }).
+                call(column.tableHeaderFormatter, [column]).
+                add(' ', this.slot(function(order) {
                   return column === order ? this.Entity.create({ name: '#9651' }) :
                       (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
                       ''
                 }, view.order$)).
-                on('click', function(e) { view.sortBy(column); }).
-                call(column.tableHeaderFormatter, [column]).
                 end();
             });
         })).
