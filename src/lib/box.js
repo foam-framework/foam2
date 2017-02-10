@@ -204,25 +204,6 @@ foam.CLASS({
     {
       name: 'register',
       returns: 'foam.box.Box',
-      code: function(name, exportBox, localBox) {
-        // TODO: Verification
-        // TODO: Only register exportBox from external registrations, maybe?
-        // TODO: Only register localBox from local registrations, maybe?
-
-        this.registry[name] = {
-          exportBox: exportBox || this.SubBox.create({
-            name: name,
-            delegate: this.me
-          }),
-          localBox: localBox
-        };
-
-        return this.registry[name].exportBox;
-      }
-    },
-    {
-      name: 'register2',
-      returns: 'foam.box.Box',
       code: function(name, service, localBox) {
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
         exportBox = service ? service.clientBox(exportBox) : exportBox;
