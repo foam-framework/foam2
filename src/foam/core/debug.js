@@ -38,25 +38,6 @@ foam.CLASS({
         if ( this.hasOwnProperty('extends') ) {
           throw this.id + ': "extends" and "refines" are mutually exclusive.';
         }
-
-        if ( ! this.flags.noWarnOnRefinesAfterCreate ) {
-          var context = this.__context__ || foam.__context__;
-          var cls     = context.lookup(this.refines);
-
-          if ( cls.count_ ) {
-            for ( var i = 0 ; i < this.axioms_.length ; i++ ) {
-              var a = this.axioms_[i];
-              if ( ! foam.core.Property.isInstance(a) &&
-                   ! foam.core.Method.isInstance(a) ) {
-                context.warn(
-                    'Refining class "' +
-                    this.refines +
-                    '", which has already created instances.');
-                break;
-              }
-            }
-          }
-        }
       }
 
       for ( var i = 0 ; i < this.axioms_.length ; i++ ) {

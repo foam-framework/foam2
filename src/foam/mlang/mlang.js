@@ -41,6 +41,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'NullSink',
@@ -50,6 +51,7 @@ foam.CLASS({
     foam.pattern.Singleton.create()
   ]
 });
+
 
 foam.INTERFACE({
   package: 'foam.mlang',
@@ -109,6 +111,7 @@ foam.CLASS({
 foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
+
   methods: [
     {
       name: 'f',
@@ -136,6 +139,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'PredicateProperty',
   extends: 'FObjectProperty',
+
   properties: [
     ['of', 'foam.mlang.predicate.Predicate'],
     {
@@ -181,20 +185,25 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'AbstractPredicate',
   abstract: true,
+
   implements: ['foam.mlang.predicate.Predicate'],
+
   methods: [
     function toIndex() {
       return undefined;
     },
+
     function toDisjunctiveNormalForm() {
       return this;
     },
+
     {
       name: 'partialEval',
       code: function() {
         return this;
       }
     },
+
     {
       name: 'toString',
       code: function() {
@@ -209,13 +218,13 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'AbstractExpr',
   abstract: true,
+
   implements: ['foam.mlang.Expr'],
+
   methods: [
     {
       name: 'partialEval',
-      code: function() {
-        return this;
-      }
+      code: function() { return this; }
     }
   ]
 });
@@ -274,6 +283,7 @@ foam.CLASS({
         return;
       }
     },
+
     function toString() {
       return foam.String.constantize(this.cls_.name) +
           '(' + this.arg1.toString() + ')';
@@ -308,6 +318,7 @@ foam.CLASS({
         return;
       }
     },
+
     function toString() {
       return foam.String.constantize(this.cls_.name) + '(' +
           this.arg1.toString() + ', ' +
@@ -365,6 +376,7 @@ foam.CLASS({
         return false;
       }
     },
+
     function partialEval() {
       var newArgs = [];
       var updated = false;
@@ -465,6 +477,7 @@ foam.CLASS({
         return true;
       }
     },
+
     function partialEval() {
       var newArgs = [];
       var updated = false;
@@ -680,6 +693,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'StartsWith',
@@ -703,6 +717,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -905,6 +920,7 @@ foam.CLASS({
   ]
 });
 
+
 /** Binary expression for inequality of two arguments. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
@@ -1027,10 +1043,12 @@ foam.CLASS({
         return ! this.arg1.f(obj);
       }
     },
+
     function toString() {
       return foam.String.constantize(this.cls_.name) +
           '(' + this.arg1.toString() + ')';
     },
+
     /*
       TODO: this isn't ported to FOAM2 yet.
     function partialEval() {
@@ -1052,14 +1070,17 @@ foam.CLASS({
   ]
 });
 
+
 /** Unary expression for a generic keyword search. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Keyword',
   extends: 'foam.mlang.predicate.Unary',
+
   requires: [
     'foam.core.String'
   ],
+
   methods: [
     function f(obj) {
       var arg = this.arg1.f(obj);
@@ -1091,24 +1112,29 @@ foam.CLASS({
     function f(o) {
       return this.arg1.f(o);
     },
+
     function put(o) {
       this.delegate.put( this.f(o) );
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Mul',
+
   implements: [
     'foam.mlang.predicate.Binary'
   ],
+
   methods: [
     function f(o) {
       return this.arg1.f(o) * this.arg2.f(o);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -1140,6 +1166,7 @@ foam.CLASS({
       this.groupKeys.sort(opt_comparator || this.arg1.comparePropertyValues);
       return this.groupKeys;
     },
+
     function putInGroup_(key, obj) {
       var group = this.groups.hasOwnProperty(key) && this.groups[key];
       if ( ! group ) {
@@ -1149,6 +1176,7 @@ foam.CLASS({
       }
       group.put(obj);
     },
+
     function put(obj) {
       var key = this.arg1.f(obj);
       if ( Array.isArray(key) ) {
@@ -1165,12 +1193,14 @@ foam.CLASS({
         this.putInGroup_(key, obj);
       }
     },
-    function eof() {
-    },
+
+    function eof() { },
+
     function clone() {
       // Don't use the default clone because we don't want to copy 'groups'.
       return this.cls_.create({ arg1: this.arg1, arg2: this.arg2 });
     },
+
     function toString() {
       return this.groups.toString();
     }
@@ -1236,7 +1266,6 @@ foam.INTERFACE({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  flags: { noWarnOnRefinesAfterCreate: true },
   implements: [ 'foam.mlang.order.Comparator' ],
 
   methods: [
@@ -1310,9 +1339,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'ThenBy',
+
   implements: ['foam.mlang.order.Comparator'],
 
   properties: [
@@ -1335,7 +1366,7 @@ foam.CLASS({
         return a;
       },
       name: 'arg2'
-    },
+    }
   ],
 
   methods: [
@@ -1380,6 +1411,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'CustomComparator',
@@ -1389,7 +1421,7 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'compareFn'
-    },
+    }
   ],
 
   methods: [
@@ -1421,8 +1453,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.LIB({
   name: 'foam.compare',
+
   methods: [
     function desc(c) {
       return foam.mlang.order.Desc.create({ arg1: c });
@@ -1454,7 +1488,6 @@ foam.LIB({
 });
 
 
-
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Max',
@@ -1482,19 +1515,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Sum',
   extends: 'foam.dao.AbstractSink',
+
   implements: [
     'foam.mlang.predicate.Unary'
   ],
+
   properties: [
     {
       name: 'value',
       value: 0
     }
   ],
+
   methods: [
     function put(obj) {
       this.value += this.arg1.f(obj);
@@ -1507,6 +1544,7 @@ foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Dot',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       return this.arg2.f(this.arg1.f(o));
@@ -1592,6 +1630,7 @@ foam.CLASS({
     function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',

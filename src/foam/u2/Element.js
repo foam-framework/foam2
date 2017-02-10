@@ -1771,7 +1771,6 @@ foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 foam.CLASS({
   refines: 'foam.core.FObject',
-  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE(args, X) {
       return foam.u2.ViewSpec.createView(
@@ -1784,7 +1783,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Slot',
-  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1793,7 +1791,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ExpressionSlot',
-  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1803,7 +1800,6 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.TextField'
@@ -1845,7 +1841,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       class: 'Int',
@@ -1858,7 +1853,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Date',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
@@ -1868,7 +1862,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateTimeView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateTimeView' } ]
@@ -1878,7 +1871,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Float',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
@@ -1888,7 +1880,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
@@ -1898,7 +1889,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
     [ 'view', { class: 'foam.u2.CheckBox' } ],
@@ -1908,7 +1898,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Color',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -1924,7 +1913,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Class',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     [ 'view', { class: 'foam.u2.ClassView' } ]
   ]
@@ -1933,7 +1921,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Reference',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -2053,7 +2040,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Action',
-  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.ActionView'
@@ -2094,7 +2080,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       // TODO: remove when all code ported
