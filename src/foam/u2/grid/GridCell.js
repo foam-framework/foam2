@@ -8,7 +8,8 @@ foam.CLASS
     ],
     
     requires: [
-        'com.serviceecho.dao.ContextualizingSink', 
+        'com.serviceecho.dao.ReferenceSink',
+        'com.serviceecho.dao.ReferenceDAO', 
     ], 
     
     implements: [
@@ -235,12 +236,14 @@ foam.CLASS
         function makeCell(){
             //var pred = this.AND(this.colPredicate, this.rowPredicate);
 
+            var d;
             if(this.predicate && this.data){
-                var d = this.data.where(this.predicate);
+                    d = this.data.where(this.predicate);
                 if (this.order){
                     d = d.orderBy(this.order);
                 }
-                //var result = this.ContextualizingSink.create(); 
+
+                d = this.ReferenceDAO.create({delegate: d}, this); 
                 d.select().
                 then(function(result){
                     var div = foam.u2.Element.create('div');

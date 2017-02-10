@@ -40,7 +40,8 @@ foam.CLASS({
     'foam.u2.TableView',
     'foam.u2.grid.GridView',
     
-    'foam.u2.grid.NewGridView', 
+    'foam.u2.grid.NewGridView',
+    'com.serviceecho.dao.ReferenceDAO', 
     ],
   
   imports: [
@@ -66,6 +67,8 @@ foam.CLASS({
     function initE(){
        this.
        start(this.STOP, {data: this}).end().
+       start(this.FIND_BUTTON, {data: this}).end().
+       start(this.PRINT_ALL_INFO, {data: this}).end().
        start(this.SET_ID, {data: this}).end();
        this.start('h3').add('see dev console : ').end('h3');
        }, 
@@ -76,6 +79,11 @@ foam.CLASS({
             self.echoIsland = team;
          });
     
+    },
+    
+    function printHeroInfo(hero){
+        console.log("Name: " + hero.name + ", Org:" + hero.organization, + " -- " +
+                    hero.organization && hero.organization.name); 
     }
   ],
   
@@ -107,6 +115,21 @@ foam.CLASS({
             }
         },
     
+           {
+            label: 'find RH',
+            name: 'findButton',
+            code: function(){
+                var self = this;
+                var d = this.ReferenceDAO.create({delegate: this.HeroDAO}, this);
+                d.find(this.redHoodId).then(function(hero){
+                    if (hero) self.printHeroInfo(hero); 
+                });
+                
+                
+             }
+            }, 
+            
+            
         
         {
             label: 'set organization Id to null',
@@ -122,18 +145,31 @@ foam.CLASS({
                  //hero.organizationId = self.echoIslandId;
                  hero.organizationId = null; 
                       self.HeroDAO.put(hero).then(function(newHero){
-                        console.log("Current hero: " + newHero.name + ", " + newHero.status + ", " + newHero.organizationId); 
-                      }).then(function(){
-                        self.HeroDAO.find(self.redHoodId).then(function(h){
-                           console.log("find again: " + h.name + ", " + h.organizationId);  
-                        });
-                        
+                        self.printHeroInfo(newhero);                        
                       });
                 
                 
              });
             }
-        }
+        },
+        
+         {
+            label: 'printAllInfo',
+            name: 'printAllInfo',
+            code: function(){
+                var self = this; 
+                var d = this.ReferenceDAO.create({delegate: this.HeroDAO}, this);
+                d.select().then(function(result){
+                    let arr = result.a;
+                    for (var i=0; i<arr.length; i++){
+                        var hero = arr[i];
+                        if (hero) self.printHeroInfo(hero); 
+                    }
+                    
+                });
+            }
+        }, 
+        
     ], 
   
   

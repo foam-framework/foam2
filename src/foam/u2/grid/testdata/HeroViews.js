@@ -2,7 +2,11 @@ foam.CLASS({
   name: 'HeroCellView',
   extends: 'foam.u2.Element', 
   
-  requires: ['Team', 'Hero', 'foam.u2.Element'],
+  requires: [
+        'Team',
+        'Hero',
+        'foam.u2.Element',
+        ],
   
   imports: [
   ], 
@@ -74,7 +78,6 @@ foam.CLASS({
   requires: [
     'Team',
     'Hero',
-    'foam.dao.AbstractSink'
     ],
   
   imports: [

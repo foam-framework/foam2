@@ -2,8 +2,14 @@ foam.CLASS({
     refines: 'foam.core.Property',
     properties: [
         {
-           name: 'referenceDAOKey',
-           documentation: 'get the property object from property Id through DAO', 
+            class: 'String', 
+            name: 'referenceDAOKey',
+            documentation: 'get the property object from property Id through DAO', 
+        },
+        {
+            class: 'String', 
+            name: 'referenceProperty',
+            documentation: 'the property object gotten from DAO specifed by referenceDAOKey', 
         }, 
         {
             class: 'Function',
@@ -108,14 +114,18 @@ foam.CLASS({
     },
     {
         name: 'organizationId',
-        documentation: 'organizationId should always be the one set, instead of organization object.', 
-        //hidden: true, 
+        documentation: 'organizationId should always be the one set, instead of organization object.',
+        transient: true, 
+        referenceDAOKey: 'TeamDAO',
+        referenceProperty: 'organization', 
+        //hidden: true,
+        /*
         postSet: function(old, nu){
             console.log(this.name + " orgainizationId is set. " + nu);
             if (!nu){
                 this.clearProperty(this.ORGANIZATION); 
             }
-            if (nu && old!=nu){
+            if (nu && old!=nu || (this.organization && nu!= this.organization.id)){
               this.TeamDAO.find(nu).then(function(organization) {
                 if (this.organizationId != organization.id){
                     console.log("error. organization should be set after the organizationId, ids should match."); 
@@ -124,7 +134,7 @@ foam.CLASS({
                 
               }.bind(this));
             }
-        }
+        }*/
     },
     
     {
