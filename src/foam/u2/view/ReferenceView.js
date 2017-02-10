@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'ReferenceView',
   extends: 'foam.u2.view.ChoiceView',
+
   properties: [
     {
       name: 'objToChoice',
@@ -30,6 +31,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function fromProperty(prop) {
       if ( ! this.hasOwnProperty('objToChoice') ) {
