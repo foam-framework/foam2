@@ -228,7 +228,10 @@ foam.CLASS
                             };
                         return this.EQ(p, currMatchId);
                     }else {
-                        return this.EQ(currProperty, currMatchId);
+                        var match; 
+                        if (currMatchId && currMatchId.id) match = currMatchId.id;
+                        else match = currMatchId;
+                        return this.EQ(currProperty, match);
                     }
                 }
         }, 
@@ -236,14 +239,15 @@ foam.CLASS
         function makeCell(){
             //var pred = this.AND(this.colPredicate, this.rowPredicate);
 
-            var d;
+            var d; 
             if(this.predicate && this.data){
                     d = this.data.where(this.predicate);
                 if (this.order){
                     d = d.orderBy(this.order);
                 }
+                
+                d = this.ReferenceDAO.create({delegate: d}, this);
 
-                d = this.ReferenceDAO.create({delegate: d}, this); 
                 d.select().
                 then(function(result){
                     var div = foam.u2.Element.create('div');

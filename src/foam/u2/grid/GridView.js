@@ -11,6 +11,7 @@ foam.CLASS
     [
         'foam.u2.grid.GridCell',
         'foam.u2.grid.GridHeaderCell', 
+    'com.serviceecho.dao.ReferenceDAO', 
     ],
 
     imports: [
@@ -250,7 +251,7 @@ foam.CLASS
                         r.add(bcell);
                         */
                         var currCell = this.GridCell.create({
-                            data$: this.data$,
+                            data: this.data,
                             cellView$: this.cellView$, 
                             rowMatch: this.rowPropertiesArray[i],
                             colMatch: this.colPropertiesArray[j],

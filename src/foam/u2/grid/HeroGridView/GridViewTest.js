@@ -40,12 +40,15 @@ foam.CLASS({
     'foam.u2.TableView',
     'foam.u2.grid.GridView',
     
-    'foam.u2.grid.NewGridView', 
+    'foam.u2.grid.NewGridView',
+    
+    'com.serviceecho.dao.ReferenceDAO', 
     ],
   
   imports: [
     'TeamDAO',
-    'HeroDAO', 
+    'HeroDAO',
+    
   ], 
 
   properties: [
@@ -67,12 +70,12 @@ foam.CLASS({
         this.gridView = this.NewGridView.create({
                         of: this.Hero,
                         data$: this.HeroDAO$, 
-                        rowProperty: this.Hero.ORGANIZATION, //eq(rowProperty, rowProperties[i])
+                        rowProperty: this.Hero.ORGANIZATION_ID, //eq(rowProperty, rowProperties[i])
                         cellView: 'HeroCellView',
                         cellWrapperClass: 'NewHeroWrapperView',  
                         colProperty: this.Hero.STATUS, 
                         rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
-                        matchRowId: true, 
+                        matchRowId: false, 
                         colPropertiesArray: ['alive', 'dead', 'MIA', undefined], //or pass in colDAO
                         rowDAOMatchUndefined: true,
                         contextSource: this, 

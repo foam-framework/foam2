@@ -113,6 +113,7 @@ foam.CLASS({
         },
     },
     {
+        class: 'String', 
         name: 'organizationId',
         documentation: 'organizationId should always be the one set, instead of organization object.',
         transient: true, 
