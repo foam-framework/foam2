@@ -7,6 +7,9 @@ foam.CLASS
     implements: [
     ],
 
+    imports: [
+    ],
+    
     requires:
     [
         'foam.u2.Element', 
@@ -162,6 +165,11 @@ foam.CLASS
             name: 'cellView', 
         },
         {
+            class: 'Class',
+            documentation: 'wrapperDAO to load extra property objects for the data, if necessary. e.g., ReferenceDAO. ', 
+            name: 'wrapperDAO', 
+        }, 
+        {
             name: 'cellWrapperClass',
             class: 'Class', 
         }, 
@@ -177,8 +185,34 @@ foam.CLASS
         {
             name: 'cellArray',
             factory: function(){return []; },
+        },
+        {
+            name: 'rowArray',
+            factory: function(){return []; },
         }, 
-
+        {
+            name: 'visibleRowIds',
+            documentation: 'toggles the visibility of Rows. ', 
+            factory: function(){return []; },
+            postSet: function(old, nu){
+                // if old and nu are both not arrays, show everything. 
+                if (!foam.Array.isInstance(nu) && !foam.Array.isInstance(old)) return;
+                // if array of visibleRowIds are unchanged, do nothing. 
+                if (foam.Array.isInstance(nu) && foam.Array.isInstance(old) && foam.Array.compare(nu, old) === 0) return;
+                // if new is not an array, assume the default of showing everything. 
+                if (! foam.Array.isInstance(nu)){
+                    if (! foam.Array.isInstance(this.rowArray) || !this.rowArray.length) return;
+                    this.rowArray.forEach(function(row){
+                        // upon the change of visibility
+                        if ((nu.indexOf(row[0]) == -1) || (old.indexOf(row[0]) == -1 )){
+                            row[1].enableCls(this.myCls('hidden'), (nu.indexOf(row[0]==-1)?true:false)); 
+                        }
+                    }); 
+                }
+                
+            }
+        },
+        
     ],
 
     methods:
@@ -214,7 +248,7 @@ foam.CLASS
                             data: this.rowPropertiesArray[i],
                             property: this.rowProperty,
                             rowIndex : i, 
-                            });
+                            }); 
                         rowHeaderCell.sub('selected', this.onRowSelect);
                         r.add(rowHeaderCell);
                     }else if (i==-1){ //header column
@@ -227,27 +261,22 @@ foam.CLASS
                         r.add(colHeaderCell);
 
                     }else {
-                        /*
-                        var bcell  = foam.u2.Element.create();
-                        bcell.setNodeName('td');
-                        bcell.add('body');
-                        r.add(bcell);
-                        */
                         var currCell = this.GridCell.create({
-                            data$: this.data$,
-                            cellView$: this.cellView$, 
-                            rowMatch: this.rowPropertiesArray[i],
-                            colMatch: this.colPropertiesArray[j],
-                            matchRowId: this.matchRowId,
-                            matchColId: this.matchColId, 
-                            rowProperty: this.rowProperty, 
-                            colProperty: this.colProperty,
-                            order: this.order,
-                            wrapperClass: this.cellWrapperClass,
-                            contextSource: this.contextSource,
-                        });
-                        currCell.sub('CELL_CLICK', this.onCellClick);
-                        currCell.sub('ENTRY_SELECTION', this.onEntrySelection); 
+                                data$: this.data$,
+                                cellView$: this.cellView$, 
+                                rowMatch: this.rowPropertiesArray[i],
+                                colMatch: this.colPropertiesArray[j],
+                                matchRowId: this.matchRowId,
+                                matchColId: this.matchColId, 
+                                rowProperty: this.rowProperty, 
+                                colProperty: this.colProperty,
+                                order: this.order,
+                                wrapperClass: this.cellWrapperClass,
+                                wrapperDAO: this.wrapperDAO, 
+                                contextSource: this.contextSource,
+                            });
+                            currCell.sub('CELL_CLICK', this.onCellClick);
+                            currCell.sub('ENTRY_SELECTION', this.onEntrySelection); 
                         r.add(currCell);
                         currCellRow.push(currCell); 
                     }
@@ -258,20 +287,9 @@ foam.CLASS
                 if (i == -1) {
                     this.headerRow = r;
                 } else {
-                    var tmparr = new Array();
-                    var key;
-                    if (this.matchRowId){
-                        if (this.rowPropertiesArray[i]){
-                            key = this.rowPropertiesArray[i].id;
-                        }else {
-                            key = ''; 
-                        }
-                    }else {
-                        key = this.rowPropertiesArray[i];
-                    }
-                    tmparr[0] = key; 
-                    tmparr[1] = r; 
-                    //this.rowArray.push([key, r]); 
+                    this.rowArray.push([
+                        this.matchRowId?this.rowPropertiesArray[i].id:this.rowPropertiesArray[i],
+                        r]); 
                 }
                 if (i!=-1){
                     this.cellArray.push(currCellRow); 

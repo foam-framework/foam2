@@ -182,8 +182,7 @@ foam.CLASS
     methods: [
         function init(){
             if (this.wrapperClass){
-                var c = this.contextSource?this.contextSource:this;
-                this.wrapper = this.wrapperClass.create({cell: this}, c); 
+                this.wrapper = this.wrapperClass.create({cell: this}, this); 
             }
             this.refreshCell();
             //the cell will be redrawn on data update anyways. 

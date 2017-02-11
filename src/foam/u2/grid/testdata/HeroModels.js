@@ -118,7 +118,11 @@ foam.CLASS({
         documentation: 'organizationId should always be the one set, instead of organization object.',
         transient: true, 
         referenceDAOKey: 'TeamDAO',
-        referenceProperty: 'organization', 
+        referenceProperty: 'organization',
+        gridHeaderView: function(value, obj, t){
+            if (! value) return '--'; 
+            return value.name || value.id; 
+        },
         //hidden: true,
         /*
         postSet: function(old, nu){

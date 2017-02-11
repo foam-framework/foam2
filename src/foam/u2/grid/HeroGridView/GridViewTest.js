@@ -104,7 +104,7 @@ foam.CLASS({
             code: function(){
                 debugger;
                 
-                
+                /*
                 this.TeamDAO.select().then(function(c){
                     console.log('--------------- Team List --------');
                     for (var i=0; i<c.a.length; i++){
@@ -121,6 +121,7 @@ foam.CLASS({
                         if (d.organization && d.organization.name) orgStr = d.organization.name; 
                         console.log(d.name + ', ' + orgStr);
                     } });
+                    */
             }
         }
     ], 

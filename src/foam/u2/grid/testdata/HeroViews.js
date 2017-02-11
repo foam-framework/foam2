@@ -96,7 +96,7 @@ foam.CLASS({
         }
     },
     "status",
-    "organizationId",
+    "organization",
     "cell", 
     ],
   
@@ -130,7 +130,7 @@ foam.CLASS({
     
     function init(){
       //this.organizationId$ = this.cell.rowMatchId$;
-      this.organizationId$ = this.cell.rowMatchId$;
+      this.organization$ = this.cell.rowMatchId$;
       this.status$ = this.cell.colMatch$; 
         this.onDAOUpdate();
     },
@@ -183,7 +183,7 @@ foam.CLASS({
                       
                       hero.status = self.status;
                       
-                      hero.organizationId = self.organizationId; 
+                      hero.organizationId = self.organization?self.organization.id:null; 
                       
                         self.HeroDAO.put(hero); 
                       }).then(function(){
