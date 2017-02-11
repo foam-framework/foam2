@@ -207,14 +207,19 @@ foam.CLASS
                     return;
                 }
                 if (foam.Array.isInstance(nu)){
-                    if (! foam.Array.isInstance(this.rowArray) || !this.rowArray.length) return;
-                    this.rowArray.forEach(function(row){
-                        // upon the change of visibility
-                        if ((nu.indexOf(row[0]) == -1) || (!old || old.indexOf(row[0]) == -1 )){
-                            console.log("changing visibility of " + row[0]); 
-                            row[1].enableCls(this.myCls('hidden'), (nu.indexOf(row[0])==-1)?true:false); 
-                        }
-                    }.bind(this)); 
+                    if (! foam.Array.isInstance(this.rowArray)) return;
+                    if (!nu.length){
+                        this.rowArray.forEach(function(row){row[1].enableCls(this.myCls('hidden'), false);}.bind(this));
+                    }else {
+                        this.rowArray.forEach(function(row){
+                            // upon the change of visibility
+                            var key = row[0]?row[0]:""; 
+                            if ((nu.indexOf(key) == -1) || (!old || old.indexOf(key) == -1 )){
+                                console.log("changing visibility of " + key); 
+                                row[1].enableCls(this.myCls('hidden'), (nu.indexOf(key)==-1)?true:false); 
+                            }
+                        }.bind(this));
+                    }
                 }
                 
                 
@@ -227,7 +232,7 @@ foam.CLASS
     [
         function initE() {
             this.refreshGrid();
-            this.start(this.STOP, {data:this}).end(); 
+            this.start(this.STOP, {data:this}).end();
             this.cssClass(this.myCls('grid-table')).
             start('table').
                 add(this.body$).
@@ -311,22 +316,6 @@ foam.CLASS
 
         },
         
-        // need to be removed/absorbed
-        function redrawRows(){
-            if (!this.hideRows) return;
-            if (! this.headerRow || !this.rowArray || !this.rowArray.length) return; 
-
-            for (var i=0; i< this.rowArray.length; i++){
-                var currRowProp = this.rowArray[i][0];
-                var currRow = this.rowArray[i][1]; 
-                if (! this.rowVisibilityFunction(currRowProp)){
-                    currRow.enableCls(this.myCls('hidden'), true); 
-                }else {
-                    currRow.enableCls(this.myCls('hidden'), false); 
-                }
-            }
-        },
-        
         function populateRowPropertiesArray()
         {
             if (this.rowPropertiesDAO){
@@ -376,7 +365,8 @@ foam.CLASS
             code: function(){
                 debugger;
             }
-        }
+        },
+        
     ], 
 
     listeners: [

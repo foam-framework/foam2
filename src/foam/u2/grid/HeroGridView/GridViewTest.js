@@ -60,6 +60,7 @@ foam.CLASS({
     function initE(){
        this.
        start(this.STOP, {data: this}).end();
+       this.start(this.TOGGLE_ROWS, {data:this}).end(); 
        this.start('h3').add('Using PropertiesDAO: ').end('h3');
        this.add(this.gridView);
        //this.start('h3').add('Using PropertiesArray: ').end('h3');
@@ -123,7 +124,19 @@ foam.CLASS({
                     } });
                     */
             }
+        },
+        
+          {
+            name: 'toggleRows',
+            code: function(){
+                if (! this.gridView.visibleRowIds || this.gridView.visibleRowIds.length <=0 ){
+                    this.gridView.visibleRowIds = ["B", "EI", ""]; 
+                }else {
+                    this.gridView.visibleRowIds = []; 
+                }
+            }
         }
+        
     ], 
   
   
