@@ -93,7 +93,10 @@ foam.CLASS({
                   })
                 });
 
-                if ( exportBox ) msg.attributes.replyBox = exportBox;
+                if ( replyBox ) {
+                  msg.attributes.replyBox = replyBox;
+                  msg.attributes.errorBox = replyBox;
+                }
 
                 this[propName].send(msg);
 
