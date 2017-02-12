@@ -22,7 +22,7 @@ if ( ! typeof performance !== 'undefined' ) performance = {
 
 
 
-describe("Index benchmarks", function() {
+xdescribe("Index benchmarks", function() {
   var DEBUG = false;
   var oldRandom;
   var rseed;
@@ -42,37 +42,7 @@ describe("Index benchmarks", function() {
     Math.random = oldRandom;
   });
 
-  it("Multi-level index", function(done) {
-
-    function atime(name, fn) {
-      var startTime;
-      var fn1 = function() {
-        startTime = performance.now();
-      }
-      var fn2 = function(arg) {
-        var endTime = performance.now();
-        console.log(name.replace(/\,/g, ';'), ", ", endTime - startTime);
-        return arg;
-      };
-      return foam.async.sequence([ fn1, fn, fn2 ]);
-    }
-
-    function atest(name, fn) {
-      var fn1 = function() {
-        if ( DEBUG ) console.log("Starting:", name);
-      }
-      return foam.async.sequence([ fn1, atime(name, fn) ]);
-    }
-
-    function atestSelect(name, fn) {
-      var fn1 = function() {
-        if ( DEBUG ) console.log("Starting:", name);
-      }
-      var fn2 = function(arg) {
-        if ( DEBUG ) console.log(name, 'result size: ', arg.a.length);
-      };
-      return foam.async.sequence([ fn1, atime(name, fn), fn2 ]);
-    }
+  xit("Multi-level index", function(done) {
 
     foam.CLASS({
       name: 'Subject',
@@ -95,9 +65,20 @@ describe("Index benchmarks", function() {
 
     var M = foam.mlang.ExpressionsSingleton.create();
 
+    var idx1 = Subject.INT_P.toIndex(Subject.BOOL_P.toIndex(Subject.ID.toIndex(
+                  foam.dao.index.ValueIndex.create())));
+    var idx2 = Subject.STRING_P.toIndex(Subject.INT_P.toIndex(Subject.ID.toIndex(
+                  foam.dao.index.ValueIndex.create())));
+
     subjectDAO = foam.dao.MDAO.create({ of: Subject })
-      .addPropertyIndex(Subject.INT_P, Subject.BOOL_P)
-      .addPropertyIndex(Subject.STRING_P, Subject.INT_P)
+      //.addPropertyIndex(Subject.INT_P)
+      //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P)
+      .addIndex(
+        foam.dao.index.AltIndex.create({
+          delegates: [ idx1, idx2 ]
+        })
+      )
+      //.addPropertyIndex(Subject.INT_P, Subject.BOOL_P, Subject.STRING_P)
       .addPropertyIndex(Subject.STRING_P, Subject.BOOL_P);
 
     function cloneSubjects() {
@@ -111,7 +92,7 @@ describe("Index benchmarks", function() {
 
     return Promise.resolve().then(foam.async.sequence([
       foam.async.sleep(100),
-      atest('CreateSubjects' + NUM_SUBJECTS, foam.async.repeat(NUM_SUBJECTS, function (i) {
+      foam.async.atest('CreateSubjects' + NUM_SUBJECTS, foam.async.repeat(NUM_SUBJECTS, function (i) {
         subjects.array.push(
           Subject.create({
             id: ""+i,
@@ -121,40 +102,40 @@ describe("Index benchmarks", function() {
           })
         );
       })),
-      foam.async.repeat(5,
+      foam.async.repeat(10,
         foam.async.sequence([
           foam.async.log('Benchmark...'),
           resetRandomizer,
           cloneSubjects,
-          atest('Bulk Load ' + NUM_SUBJECTS, function() {
+          foam.async.atest('Bulk Load ' + NUM_SUBJECTS, function() {
             return subjectDAO.bulkLoad(subjects);
           }),
-          atestSelect('Select EQ By Index(Int, Bool)', function() {
+          foam.async.atestSelect('Select EQ By Index(Int, Bool)', function() {
             return subjectDAO.where(M.AND(
               M.EQ(Subject.INT_P,  subjects.array[SUBJECT_EQ].intP),
               M.EQ(Subject.BOOL_P, subjects.array[SUBJECT_EQ].boolP)
             )).select();
           }),
-          atestSelect('Select GT By Index(Int: '+MEAN_INT_VALUE+', Bool:true)', function() {
+          foam.async.atestSelect('Select GT By Index(Int: '+MEAN_INT_VALUE+', Bool:true)', function() {
             return subjectDAO.where(M.AND(
               M.GT(Subject.INT_P,  MEAN_INT_VALUE),
               M.EQ(Subject.BOOL_P, true)
             )).select();
           }),
-          atestSelect('Select GT By Index(Int: '+MEAN_INT_VALUE+
+          foam.async.atestSelect('Select GT By Index(Int: '+MEAN_INT_VALUE+
               ', String: for '+SUBJECT_EQ+' )', function() {
             return subjectDAO.where(M.AND(
               M.GT(Subject.INT_P,  MEAN_INT_VALUE),
               M.EQ(Subject.STRING_P, subjects.array[SUBJECT_EQ].stringP)
             )).select();
           }),
-          atestSelect('Select LT/GT By Index(String: for '+SUBJECT_EQ+', Int: '+MEAN_INT_VALUE+' )', function() {
+          foam.async.atestSelect('Select LT/GT By Index(String: for '+SUBJECT_EQ+', Int: '+MEAN_INT_VALUE+' )', function() {
             return subjectDAO.where(M.AND(
               M.LT(Subject.STRING_P, subjects.array[SUBJECT_EQ].stringP),
               M.GT(Subject.INT_P,  MEAN_INT_VALUE)
             )).select();
           }),
-          atestSelect('Select OR By Index(Int: range(20), Bool:true || Int: range(20), Bool:false)', function() {
+          foam.async.atestSelect('Select OR By Index(Int: range(20), Bool:true || Int: range(20), Bool:false)', function() {
             return subjectDAO.where(
               M.OR(
                 M.AND(
@@ -172,7 +153,7 @@ describe("Index benchmarks", function() {
           }),
           foam.async.sleep(2000), // pause to let GC run
           cloneSubjects,
-          atest('Update some 100', function() {
+          foam.async.atest('Update some 100', function() {
             var p = [];
             for ( var i = 200; i < 300; i++ ) {
               // change every property
@@ -187,7 +168,7 @@ describe("Index benchmarks", function() {
             return Promise.all(p);
           }),
           cloneSubjects,
-          atest('Update many ' + NUM_SUBJECTS/10, function() {
+          foam.async.atest('Update many ' + NUM_SUBJECTS/10, function() {
             var p = [];
             for ( var i = 0; i < subjects.array.length/10; i++ ) {
               // change every property
@@ -202,7 +183,7 @@ describe("Index benchmarks", function() {
             //return Promise.all(p); // on node this makes a difference
           }),
 
-          atest('Cleanup', function() {
+          foam.async.atest('Cleanup', function() {
             return subjectDAO.removeAll();
           }),
           foam.async.sleep(5000) // pause to let GC run

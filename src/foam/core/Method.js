@@ -59,7 +59,7 @@ foam.CLASS({
 
   properties: [
     { name: 'name', required: true },
-    { name: 'code', required: true },
+    { name: 'code', required: false },
     'documentation',
     'returns',
     {
@@ -73,7 +73,7 @@ foam.CLASS({
       Decorate a method so that it can call the
       method it overrides with this.SUPER().
     */
-    function override_(proto, method) {
+    function override_(proto, method, superMethod) {
       if ( ! method ) return;
 
       // Not using SUPER, so just return original method
@@ -135,12 +135,12 @@ foam.CLASS({
       return child;
     },
 
-    function installInClass(cls) {
+    function installInClass(cls, superMethod, existingMethod) {
       var method = this;
 
-      var superMethod = cls.getSuperAxiomByName(method.name);
-      if ( superMethod && foam.core.AbstractMethod.isInstance(superMethod) ) {
-        method = superMethod.createChildMethod_(method);
+      var parent = existingMethod || superMethod;
+      if ( parent && foam.core.AbstractMethod.isInstance(parent) ) {
+        method = parent.createChildMethod_(method);
       }
 
       cls.axiomMap_[method.name] = method;
@@ -155,8 +155,8 @@ foam.CLASS({
   extends: 'foam.core.AbstractMethod',
 
   methods: [
-    function installInProto(proto) {
-      proto[this.name] = this.override_(proto, this.code);
+    function installInProto(proto, superAxiom) {
+      proto[this.name] = this.override_(proto, this.code, superAxiom);
     },
 
     function exportAs(obj) {

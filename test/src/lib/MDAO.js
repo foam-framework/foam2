@@ -21,87 +21,91 @@ describe('MDAO with TreeIndex', function() {
   var NUM_ALBUMS = 10;
   var NUM_PHOTOS = 100;
 
-  foam.CLASS({
-    package: 'test',
-    name: 'Photo',
-    properties: [
-      { name: 'id' },
-      { name: 'hash' },
-      { class: 'Boolean', name: 'isLocal' },
-      { class: 'Boolean', name: 'byAction' },
-      { class: 'Date', name: 'timestamp' },
-      { name: 'albumId' },
-      { class: 'Boolean', name: 'isCoverPhoto' },
-      { name: 'jspb', hidden: true }
-    ]
-  });
-
-  foam.CLASS({
-    package: 'test',
-    name: 'Album',
-    properties: [
-      { name: 'id', name: 'id' },
-      { class: 'Boolean', name: 'isLocal' },
-      { class: 'Boolean', name: 'byAction' },
-      { class: 'Date', name: 'timestamp' },
-      { name: 'jspb', hidden: true }
-    ],
-    relationships: [
-      { model_: 'Relationship', relatedModel: 'Photo', relatedProperty: 'albumId' }
-    ]
-  });
-
-
   var AlbumDAO, PhotoDAO, PhotoDetailDAO, albums, photos;
   var NOW = 1461778131578; // reasonable Date.now() substitute
   var MS_PER_DAY = 1000*60*60*24;
 
-  albums = foam.dao.ArrayDAO.create();
-  photos = foam.dao.ArrayDAO.create();
-  for ( var i = 0; i < NUM_ALBUMS; ++i ) {
-    albums.put(
-      test.Album.create({
-        id: ""+i,
-        isLocal: !! ( i % 2 ),
-        byAction: !! ( 1 - (i % 2) ),
-        timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_ALBUMS) * MS_PER_DAY * 300),
-        jspb: [ 'nothing!' ],
-      }, foam.__context__)
-    );
-  }
-  for ( var i = 0; i < NUM_PHOTOS; ++i ) {
-    photos.put(
-      test.Photo.create({
-        id: ""+i,
-        timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_PHOTOS) * MS_PER_DAY * 300),
-        isLocal: !! ( i % 2 ),
-        byAction: !! ( 1 - (i % 2) ),
-        albumId: ""+(i % NUM_ALBUMS),
-        isCoverPhoto: ( i % 3 ) > 0,
-        jspb: [ 'nothing!' ],
-      }, foam.__context__)
-    );
-  }
-
-
   var avgKey = ""+Math.floor(NUM_PHOTOS/2)/*.toString()*/;
   var avgAlbumKey = ""+Math.floor(NUM_ALBUMS/2)/*.toString()*/;
 
-  function makeMultiPartKeys(n) {
-    var a = [];
-    for ( var i = 0 ; i < n ; i++ ) {
-      a.push(""+(Math.floor(NUM_PHOTOS/n)*i));
-    }
-    return a;
-  }
+  var M;
 
-  var M = foam.mlang.Expressions.create();
-
-  var KEYS_SINGLE = makeMultiPartKeys(1);
-  var KEYS_A_FEW = makeMultiPartKeys(10);
-  var KEYS_LOTS = makeMultiPartKeys(100);
+  var KEYS_SINGLE;
+  var KEYS_A_FEW;
+  var KEYS_LOTS;
 
   beforeEach(function(done) {
+    foam.CLASS({
+      package: 'test',
+      name: 'Photo',
+      properties: [
+        { name: 'id' },
+        { name: 'hash' },
+        { class: 'Boolean', name: 'isLocal' },
+        { class: 'Boolean', name: 'byAction' },
+        { class: 'Date', name: 'timestamp' },
+        { name: 'albumId' },
+        { class: 'Boolean', name: 'isCoverPhoto' },
+        { name: 'jspb', hidden: true }
+      ]
+    });
+
+    foam.CLASS({
+      package: 'test',
+      name: 'Album',
+      properties: [
+        { name: 'id', name: 'id' },
+        { class: 'Boolean', name: 'isLocal' },
+        { class: 'Boolean', name: 'byAction' },
+        { class: 'Date', name: 'timestamp' },
+        { name: 'jspb', hidden: true }
+      ],
+      relationships: [
+        { model_: 'Relationship', relatedModel: 'Photo', relatedProperty: 'albumId' }
+      ]
+    });
+
+    albums = foam.dao.ArrayDAO.create();
+    photos = foam.dao.ArrayDAO.create();
+    for ( var i = 0; i < NUM_ALBUMS; ++i ) {
+      albums.put(
+        test.Album.create({
+          id: ""+i,
+          isLocal: !! ( i % 2 ),
+          byAction: !! ( 1 - (i % 2) ),
+          timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_ALBUMS) * MS_PER_DAY * 300),
+          jspb: [ 'nothing!' ],
+        }, foam.__context__)
+      );
+    }
+    for ( var i = 0; i < NUM_PHOTOS; ++i ) {
+      photos.put(
+        test.Photo.create({
+          id: ""+i,
+          timestamp: new Date( ( NOW - MS_PER_DAY * 300 ) + (1 - i/NUM_PHOTOS) * MS_PER_DAY * 300),
+          isLocal: !! ( i % 2 ),
+          byAction: !! ( 1 - (i % 2) ),
+          albumId: ""+(i % NUM_ALBUMS),
+          isCoverPhoto: ( i % 3 ) > 0,
+          jspb: [ 'nothing!' ],
+        }, foam.__context__)
+      );
+    }
+
+    function makeMultiPartKeys(n) {
+      var a = [];
+      for ( var i = 0 ; i < n ; i++ ) {
+        a.push(""+(Math.floor(NUM_PHOTOS/n)*i));
+      }
+      return a;
+    }
+
+    M = foam.mlang.Expressions.create();
+
+    KEYS_SINGLE = makeMultiPartKeys(1);
+    KEYS_A_FEW = makeMultiPartKeys(10);
+    KEYS_LOTS = makeMultiPartKeys(100);
+
     PhotoDAO = foam.dao.MDAO.create({of: test.Photo})
       .addPropertyIndex(test.Photo.ALBUM_ID)
       .addPropertyIndex(test.Photo.TIMESTAMP)
@@ -324,6 +328,19 @@ describe('MDAO with TreeIndex', function() {
           prev = a[i];
         }
       }).then(done);
+  });
+
+  it('selects negated queries', function(done) {
+    PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_SINGLE))).select()
+      .then(
+        function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_SINGLE.length); }
+      ).then(
+        PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_A_FEW))).select()
+          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_A_FEW.length); })
+      ).then(
+        PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_LOTS))).select()
+          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_LOTS.length); })
+      ).then(done);
   });
 
 

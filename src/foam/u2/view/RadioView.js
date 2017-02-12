@@ -20,9 +20,6 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  properties: [
-  ],
-
   methods: [
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th
@@ -55,6 +52,6 @@ foam.CLASS({
             }).
             add(c[1]);
       }.bind(this)));
-    },
+    }
   ]
 });

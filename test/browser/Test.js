@@ -457,3 +457,69 @@ console.log(DaysOfWeek.VALUES);
 console.log(View.create({of: A}).view());
 console.log(View.create({of: B}).view());
 console.log(View.create({of: C}).view());
+
+
+foam.CLASS({
+  name: 'ClassTest',
+  properties: [
+    { name: 'cls', class: 'Class' },
+    { name: 'str', class: 'String' }
+  ]
+});
+var ct = ClassTest.create();
+foam.u2.DetailView.create({data: ct}).write();
+foam.u2.DetailView.create({data: ct}).write();
+
+/*
+foam.CLASS({
+  package: 'foam.core',
+  name: 'IntProperty',
+  extends: 'foam.core.Int'
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StringProperty',
+  extends: 'foam.core.String'
+});
+
+foam.CLASS({
+  name: 'FacetTest',
+
+  properties: [
+    {
+      name: 'anInt',
+      of: 'Int'
+    },
+    {
+      name: 'aString',
+      of: 'String'
+    }
+  ]
+});
+
+FacetTest.describe();
+
+console.log(foam.core.Property.create({of: 'String'}).cls_.id);
+*/
+
+
+foam.CLASS({
+  name: 'EOne',
+  extends: 'foam.u2.Element',
+  properties: [
+    'title',
+  ],
+  requires: ['foam.u2.Element'],
+  methods: [
+    function init(){
+      this.start('h3').add(this.title$).end()
+          .start('div', null, this.content$)
+            .style({ 'border': '2px solid black' })
+          .end();
+    }
+  ]
+});
+
+var e  = foam.u2.Element.create().add("hello world content").add('foobar');
+EOne.create({title: "hello world title"}).add(e).write();

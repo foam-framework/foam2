@@ -56,7 +56,10 @@ foam.CLASS({
     },
     {
       name: 'property',
-      required: true
+      required: true,
+      postSet: function(o, property) {
+        if ( ! this.op ) this.op = foam.core.Int.isInstance(property) ? foam.mlang.predicate.Eq : foam.mlang.predicate.ContainsIC;
+      }
     },
     {
       name: 'name',
@@ -68,12 +71,13 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'op',
+      name: 'op'/*,
       expression: function(property) {
+        // TODO: broken by CLASS, fix
         // All the numeric types extend from Int, so I'll use that as my base.
-        return foam.core.Int.isInstance(property) ? 'foam.mlang.predicate.Eq' :
-            'foam.mlang.predicate.ContainsIC';
-      }
+        return foam.core.Int.isInstance(property) ? foam.mlang.predicate.Eq :
+            foam.mlang.predicate.ContainsIC;
+      }*/
     },
     {
       name: 'predicate',

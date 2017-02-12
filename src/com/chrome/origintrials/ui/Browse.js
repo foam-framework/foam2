@@ -138,18 +138,59 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'com.chrome.origintrials.ui',
+  name: 'GoogleSignIn',
+  extends: 'foam.u2.Element',
+  imports: [
+    'idToken'
+  ],
+  methods: [
+    function initE() {
+      this.setNodeName('div');
+
+      this.onload.sub(this.render);
+    }
+  ],
+  listeners: [
+    function render() {
+      gapi.signin2.render(this.id, {
+        scope: 'profile email',
+        width: 240,
+        height: 50,
+        longtitle: true,
+        theme: 'dark',
+        onsuccess: this.onSuccess,
+        onfailure: this.onFailure
+      });
+    },
+    function onSuccess(e) {
+      this.idToken$.set(e.getAuthResponse().id_token);
+    },
+    function onFailure() {
+      // TODO
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'com.chrome.origintrials.ui',
   name: 'Browse',
   extends: 'foam.u2.Element',
   requires: [
     'com.chrome.origintrials.model.Application',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
-    'com.chrome.origintrials.ui.Browser'
+    'com.chrome.origintrials.ui.Browser',
+    'com.chrome.origintrials.ui.GoogleSignIn'
   ],
   exports: [
-    'stack'
+    'stack',
+    'idToken',
+    'as data'
   ],
   properties: [
+    {
+      name: 'idToken'
+    },
     {
       name: 'stack',
       factory: function() { return this.Stack.create(); }
@@ -160,8 +201,9 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.setNodeName('div')
-          .start(this.StackView, { data: this.stack }).end();
+      this.setNodeName('div').
+        start(this.GoogleSignIn).end().
+        start(this.StackView, { data: this.stack }).end();
 
       this.stack.push({
         class: 'com.chrome.origintrials.ui.Browser',

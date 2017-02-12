@@ -20,7 +20,7 @@ if ( ! typeof performance !== 'undefined' ) performance = {
 };
 
 describe("MDAO benchmarks", function() {
-  it("runs", function(done) {
+  xit("runs", function(done) {
 
     var NUM_ALBUMS = 1000;
     var NUM_PHOTOS = 10000;

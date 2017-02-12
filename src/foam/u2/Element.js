@@ -515,19 +515,19 @@ foam.CLASS({
     // Used to generate valid HTML output.
     // Used by ElementParser for valid HTML parsing.
     ILLEGAL_CLOSE_TAGS: {
-      area: true,
-      base: true,
-      basefont: true,
-      br: true,
-      col: true,
-      frame: true,
-      hr: true,
-      img: true,
-      input: true,
-      isindex: true,
-      link: true,
-      meta: true,
-      param: true
+      AREA: true,
+      BASE: true,
+      BASEFONT: true,
+      BR: true,
+      COL: true,
+      FRAME: true,
+      HR: true,
+      IMG: true,
+      INPUT: true,
+      ISINDEX: true,
+      LINK: true,
+      META: true,
+      PARAM: true
     },
 
     __ID__: [ 0 ],
@@ -1419,8 +1419,16 @@ foam.CLASS({
       return this;
     },
 
-    function call(f) {
-      f.call(this);
+    function call(f, args) {
+      f.apply(this, args);
+
+      return this;
+    },
+
+    function forEach(a, f) {
+      for ( var i = 0 ; i < a.length ; i++ ) {
+        f.call(this, a[i], i);
+      }
 
       return this;
     },
@@ -1763,7 +1771,6 @@ foam.__context__ = foam.u2.U2Context.create().__subContext__;
 
 foam.CLASS({
   refines: 'foam.core.FObject',
-  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE(args, X) {
       return foam.u2.ViewSpec.createView(
@@ -1776,7 +1783,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Slot',
-  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1785,7 +1791,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ExpressionSlot',
-  flags: { noWarnOnRefinesAfterCreate: true },
   methods: [
     function toE() { return this; }
   ]
@@ -1795,7 +1800,6 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.TextField'
@@ -1811,6 +1815,11 @@ foam.CLASS({
       class: 'foam.u2.ViewSpec',
       name: 'view',
       value: { class: 'foam.u2.TextField' }
+    },
+    {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
+      name: 'visibility'
     }
   ],
 
@@ -1832,7 +1841,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       class: 'Int',
@@ -1845,7 +1853,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Date',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateView' } ]
@@ -1855,7 +1862,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.DateTimeView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateTimeView' } ]
@@ -1865,7 +1871,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Float',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.FloatView' ],
   properties: [
     [ 'view', { class: 'foam.u2.FloatView' } ]
@@ -1875,7 +1880,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.IntView' ],
   properties: [
     [ 'view', { class: 'foam.u2.IntView' } ]
@@ -1885,7 +1889,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
-  flags: { noWarnOnRefinesAfterCreate: true },
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
     [ 'view', { class: 'foam.u2.CheckBox' } ],
@@ -1895,7 +1898,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Color',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -1910,8 +1912,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Class',
+  properties: [
+    [ 'view', { class: 'foam.u2.ClassView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Reference',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       name: 'view',
@@ -1932,7 +1941,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Enum',
-      of: 'foam.uw.ControllerMode',
+      of: 'foam.u2.ControllerMode',
       name: 'controllerMode'
     }
   ]
@@ -2031,7 +2040,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Action',
-  flags: { noWarnOnRefinesAfterCreate: true },
 
   requires: [
     'foam.u2.ActionView'
@@ -2072,7 +2080,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
-  flags: { noWarnOnRefinesAfterCreate: true },
   properties: [
     {
       // TODO: remove when all code ported
