@@ -253,6 +253,11 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'List',
+  extends: 'foam.core.Object'
+});
 
 foam.CLASS({
   package: 'foam.core',
@@ -456,5 +461,20 @@ foam.CLASS({
   properties: [
     { class: 'String',  name: 'name' },
     { class: 'Boolean', name: 'abstract' }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'Property',
+
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
+  properties: [
+    {
+      name: 'of'
+    }
   ]
 });

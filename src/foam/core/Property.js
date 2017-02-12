@@ -205,6 +205,31 @@ foam.CLASS({
           return comparePropertyValues(f(o1), f(o2));
         };
       }
+    },
+    // FUTURE: Move to refinement?
+    {
+      name: 'diffPropertyValues',
+      transient: true,
+      value: function(v1, v2, diff) {
+        // TODO: instead of array check, have different implementation in ArrayProperty
+        if ( Array.isArray(v1) ) {
+          var subdiff = foam.Array.diff(v1, v2);
+          if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
+            diff[this.name] = subdiff;
+          }
+        } else if ( ! foam.util.equals(v1, v2) ) {
+          // if the primary value is undefined, use the compareTo of the other
+          diff[this.name] = v2;
+        }
+        return diff;
+      }
+    },
+    {
+      name: 'diffProperty',
+      transient: true,
+      value: function diffProperty(o1, o2, diff, prop) {
+        return prop.diffPropertyValues(prop.f(o1), prop.f(o2), diff);
+      }
     }
   ],
 
@@ -213,9 +238,8 @@ foam.CLASS({
       Handle overriding of Property definition from parent class by
       copying undefined values from parent Property, if it exists.
     */
-    function installInClass(c) {
+    function installInClass(c, superProp, existingProp) {
       var prop      = this;
-      var superProp = c.getSuperAxiomByName(prop.name);
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);

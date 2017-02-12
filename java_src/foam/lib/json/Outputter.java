@@ -54,6 +54,19 @@ public class Outputter {
     out.append("]");
   }
 
+  protected void outputMap(StringBuilder out, java.util.Map map) {
+    out.append("{");
+    java.util.Iterator keys = map.keySet().iterator();
+    while ( keys.hasNext() ) {
+      Object key = keys.next();
+      Object value = map.get(key);
+      outputString(out, key.toString());
+      out.append(":");
+      output(out, value);
+      if ( keys.hasNext() ) out.append(",");
+    }
+  }
+
   protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p) {
     out.append(beforeKey_());
     out.append(p.getName());
@@ -77,13 +90,15 @@ public class Outputter {
       outputBoolean(out, (Boolean)value);
     } else if ( value instanceof java.util.Date ) {
       outputDate(out, (java.util.Date)value);
+    } else if ( value instanceof java.util.Map ) {
+      outputMap(out, (java.util.Map)value);
     }
   }
 
   protected void outputDate(StringBuilder out, java.util.Date date) {
     java.text.DateFormat formatter = new java.text.SimpleDateFormat("YYYY-MM-dd'T'kk:hh:ss.S'Z'");
     formatter.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-    out.append(formatter.format(date));
+    outputString(out, formatter.format(date));
   }
 
   protected void outputFObject(StringBuilder out, FObject o) {

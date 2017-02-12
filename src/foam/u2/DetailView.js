@@ -69,7 +69,8 @@ foam.CLASS({
       expression: function(of) {
         if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return ! p.hidden; });
+          // TODO: this is a temporary fix, but Visibility.HIDDEN should be included and could be switched
+          filter(function(p) { return ! ( p.hidden || p.visibility === foam.u2.Visibility.HIDDEN ); });
       }
     },
     {
@@ -160,17 +161,17 @@ foam.CLASS({
         // bound to data of a new class, which causes problems.
         self.currentData = self.data;
 
-        var title = self.title && self.E('tr').
-          start('td').cssClass(self.myCls('title')).attrs({colspan: 2}).
-            add(this.title$).
+        var title = self.title && this.E('tr').
+          start('td').cssClass(this.myCls('title')).attrs({colspan: 2}).
+            add(self.title$).
           end();
 
         return self.actionBorder(
-          self.
+          this.
             E('table').
-            cssClass(self.myCls()).
+            cssClass(this.myCls()).
             add(title).
-            add(properties.map(function(p) {
+            forEach(properties, function(p) {
               var config = self.config && self.config[p.name];
 
               if ( config ) {
@@ -180,8 +181,8 @@ foam.CLASS({
                 }
               }
 
-              return self.DetailPropertyView.create({prop: p});
-            })));
+              this.tag(self.DetailPropertyView, { prop: p });
+            }));
       }));
     },
 

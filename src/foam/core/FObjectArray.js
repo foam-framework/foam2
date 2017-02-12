@@ -51,6 +51,12 @@ foam.CLASS({
       foam.assert(cls, 'Unknown array "of": ', this.of);
       return cls.isInstance(o) ? o : cls.create(o, obj);
       }
-    ]
+    ],
+    {
+      name: 'fromJSON',
+      value: function(value, ctx, prop) {
+        return foam.json.parse(value, prop.of, ctx);
+      }
+    }
   ]
 });

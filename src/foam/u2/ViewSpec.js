@@ -24,28 +24,40 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.createView = function(spec, args, that, ctx) {
-          return foam.u2.Element.isInstance(spec) ?
-              spec :
+          if ( foam.u2.Element.isInstance(spec) )
+            return spec;
 
-          foam.core.Slot.isInstance(spec) ?
-              spec :
+          if ( foam.core.Slot.isInstance(spec) )
+            return spec;
 
-          (spec && spec.toE) ?
-              spec.toE(args, ctx) :
+          if ( spec && spec.toE )
+            return spec.toE(args, ctx);
 
-          typeof spec === 'function' ?
-              foam.u2.ViewSpec.createView(spec.call(that, args, ctx), args, that, ctx) :
+          if ( foam.Function.isInstance(spec) )
+            return foam.u2.ViewSpec.createView(spec.call(that, args, ctx), args, that, ctx);
 
-          foam.Object.isInstance(spec) ?
-              (spec.create ?
-                  spec.create(args, ctx) :
-                  ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {})) :
+          if ( foam.Object.isInstance(spec) ) {
+            var ret = spec.create ?
+                spec.create(args, ctx) :
+                ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {}) ;
 
-          foam.core.FObject.isSubClass(spec) ?
-              spec.create(args, ctx) :
+            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
-          // TODO: verify a String
-          foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
+            return ret;
+          }
+
+          if ( foam.core.FObject.isSubClass(spec) ) {
+            var ret = spec.create(args, ctx);
+
+            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec class must extend foam.u2.Element or be toE()-able.');
+
+            return ret;
+          }
+
+          if ( foam.String.isInstance(spec) || spec === undefined || spec === null )
+            return foam.u2.Element.create({ nodeName: spec || 'div' }, ctx);
+
+          throw 'Invalid ViewSpec, must provide an Element, Slot, toE()-able, Function, {create: function() {}}, {class: \'name\'}, Class, or String, but received: ' + spec;
         };
       }
     }

@@ -94,7 +94,7 @@ describe('MLang', function() {
     dao.put(test.mlang.Person.create({
       id: 8,
       name: 'Tom Scholz',
-      birthday: '1947-03-10',
+      birthday: '1947-03-10'
     }, foam.__context__));
   });
 
@@ -414,15 +414,33 @@ describe('MLang', function() {
 
   describe('HAS()', function() {
     var HAS;
+    var NOT;
     beforeEach(function() {
       var expr = foam.mlang.Expressions.create();
       HAS = expr.HAS.bind(expr);
+      NOT = expr.NOT.bind(expr);
     });
 
     it('returns true for set values, even false', function(done) {
       dao.where(HAS(test.mlang.Person.DECEASED)).select()
       .then(function(sink) {
         expect(sink.a.length).toBe(8);
+        done();
+      });
+    });
+
+    it('returns true for set values, even empty arrays', function(done) {
+      dao.where(HAS(test.mlang.Person.SOME_ARRAY)).select()
+      .then(function(sink) {
+        expect(sink.a.length).toBe(3);
+        done();
+      });
+    });
+
+    it('returns NOT(true for set values, even empty arrays)', function(done) {
+      dao.where(NOT(HAS(test.mlang.Person.SOME_ARRAY))).select()
+      .then(function(sink) {
+        expect(sink.a.length).toBe(5);
         done();
       });
     });
