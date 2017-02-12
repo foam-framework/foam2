@@ -106,12 +106,14 @@ foam.CLASS({
 
       var delegate = foam.lookup(this.of);
 
+      function resolveName(name) {
+        var m = delegate.getAxiomByName(name);
+        foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', name);
+        return m;
+      }
+
       var methods = this.methods ?
-          this.methods.map(function(f) {
-            var m = delegate.getAxiomByName(f);
-            foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
-            return m;
-          }) :
+          this.methods.map(resolveName) :
           delegate.getOwnAxiomsByClass(foam.core.Method);
 
       var methodNames = methods.map(function(m) { return m.name; });
