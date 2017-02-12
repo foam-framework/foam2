@@ -79,3 +79,9 @@ if ( ! String.prototype.startsWith ) {
     return this.indexOf(str) === 0;
   };
 }
+
+if ( ! Object.values ) {
+  Object.values = function(obj) {
+    return Object.keys(obj).map(function(k) { return obj[k]; });
+  };
+}
