@@ -74,11 +74,9 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'methods'
-    },
-    {
-      class: 'StringArray',
-      name: 'topics'
+      name: 'methods',
+      value: null,
+      factory: null
     },
     {
       name: 'postSet',
@@ -114,12 +112,8 @@ foam.CLASS({
             foam.assert(foam.core.Method.isInstance(m), 'Cannot proxy non-method', f);
             return m;
           }) :
-          delegate.getAxiomsByClass(foam.core.Method).filter(function(m) {
-            // TODO(adamvy): This isn't the right check, but we need some sort of filter.
-            // We dont' want to proxy all FObject methods, only those defined in the interface
-            // and possibly its parent interfaces?
-            return delegate.hasOwnAxiom(m.name);
-          });
+          delegate.getOwnAxiomsByClass(foam.core.Method);
+
       var methodNames = methods.map(function(m) { return m.name; });
 
       var myAxioms = [
@@ -137,10 +131,6 @@ foam.CLASS({
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
           }
-        }),
-        foam.core.ProxySub.create({
-          topics: this.topics,
-          prop:   delegateName
         })
       ];
 
