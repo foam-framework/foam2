@@ -1105,10 +1105,14 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'myname'
+    },
+    {
       name: 'me',
       factory: function() {
         var me = this.NamedBox.create({
-          name: '/com/foamdev/anonymous/' + foam.uuid.randomGUID()
+          name: this.myname || ( '/com/foamdev/anonymous/' + foam.uuid.randomGUID() )
         });
         me.delegate = this.registry;
         return me;
