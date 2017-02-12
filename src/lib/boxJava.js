@@ -71,7 +71,7 @@ foam.CLASS({
                 + 'return r.getExportBox();'
     },
     {
-      name: 'register2',
+      name: 'register',
       javaReturns: 'foam.box.Box',
       args: [
         {
