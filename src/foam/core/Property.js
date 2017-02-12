@@ -206,10 +206,12 @@ foam.CLASS({
         };
       }
     },
+    // FUTURE: Move to refinement?
     {
       name: 'diffPropertyValues',
       transient: true,
       value: function(v1, v2, diff) {
+        // TODO: instead of array check, have different implementation in ArrayProperty
         if ( Array.isArray(v1) ) {
           var subdiff = foam.Array.diff(v1, v2);
           if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {

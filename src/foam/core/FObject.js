@@ -833,6 +833,7 @@ foam.CLASS({
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
+        // FUTURE: move this to a refinement in case not needed?
         // FUTURE: add nested Object support
         // FUTURE: add patch() method?
 
