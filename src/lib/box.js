@@ -142,6 +142,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'message',
+      expression: function(name) {
+        return 'Could not find registration for ' + name;
+      }
     }
   ]
 });
