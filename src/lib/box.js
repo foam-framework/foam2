@@ -954,6 +954,22 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'RawMessagePortBox',
+  implements: [ 'foam.box.Box' ],
+  properties: [
+    {
+      name: 'port'
+    }
+  ],
+  methods: [
+    function send(m) {
+      this.port.postMessage(foam.json.Network.stringify(m));
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.box',
