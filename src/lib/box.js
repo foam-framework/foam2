@@ -1270,3 +1270,36 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'MessagePortBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.RawMessagePortBox',
+    'foam.box.RegisterSelfMessage',
+    'foam.box.Message'
+  ],
+  imports: [ 'messagePortService', 'me' ],
+  properties: [
+    {
+      name: 'target'
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+	var channel = new MessageChannel();
+	this.messagePortService.addPort(channel.port1);
+
+	this.target.postMessage('', '*', [channel.port2]);
+
+        channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
+          object: this.RegisterSelfMessage.create({ name: this.me.name })
+        })));
+
+	return this.RawMessagePortBox.create({ port: channel.port1 });
+      }
+    }
+  ]
+});
