@@ -18,17 +18,21 @@
 foam.CLASS({
   package: 'foam.classloader',
   name: 'WebModelDisplayer',
+
   requires: [
     'foam.classloader.OrDAO',
-    'foam.classloader.WebModelFileDAO',
+    'foam.classloader.WebModelFileDAO'
   ],
+
   imports: [
     'arequire',
-    'window',
+    'window'
   ],
+
   exports: [
-    foam.String.daoize(foam.core.Model.name),
+    foam.String.daoize(foam.core.Model.name)
   ],
+
   properties: [
     {
       name: 'model',
@@ -63,9 +67,10 @@ foam.CLASS({
           });
         }
         return modelDao;
-      },
-    },
+      }
+    }
   ],
+
   methods: [
     function fromQuery(query) {
       var search = /([^&=]+)=?([^&]*)/g;
@@ -89,6 +94,7 @@ foam.CLASS({
         alert('Please specify model');
       }
     },
+
     function execute() {
       var self = this;
       var X = this.__subContext__;
@@ -102,5 +108,5 @@ foam.CLASS({
         view.write();
       })
     }
-  ],
+  ]
 });

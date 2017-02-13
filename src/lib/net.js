@@ -46,7 +46,6 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      msg = msg.clone().toRemote();
       this.socket.send(foam.json.Network.stringify(msg));
     },
 
@@ -94,7 +93,8 @@ foam.CLASS({
 
   requires: [
     'foam.net.WebSocket',
-    'foam.box.RegisterSelfMessage'
+    'foam.box.RegisterSelfMessage',
+    'foam.box.Message'
   ],
 
   properties: [
@@ -106,11 +106,15 @@ foam.CLASS({
   methods: [
     function addSocket(socket) {
       var sub1 = socket.message.sub(function onMessage(s, _, msg) {
-        msg = foam.json.parse(foam.json.parseString(msg), null, this);
+        msg = foam.json.parseString(msg, this);
 
-        if ( this.RegisterSelfMessage.isInstance(msg) ) {
+        if ( ! this.Message.isInstance(msg) ) {
+          console.warn("Got non-message object.", msg);
+        }
+
+        if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
           var named = foam.box.NamedBox.create({
-            name: msg.name
+            name: msg.object.name
           });
 
           named.delegate = foam.box.RawWebSocketBox.create({
