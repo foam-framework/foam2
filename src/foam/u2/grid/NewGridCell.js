@@ -98,9 +98,23 @@ foam.CLASS
         {
             name: 'predicate',
             expression: function(rowPredicate, colPredicate){
-                return this.AND(rowPredicate, colPredicate);
+                if (!rowPredicate && colPredicate) return;
+                else if (rowPredicate && colPredicate) return this.AND(rowPredicate, colPredicate);
+                else if (rowPredicate) return rowPredicate;
+                else if (colPredicate) return colPredicate;
             }
         },
+        {
+            name: 'makeRowPredicate',
+            documentation: 'custom functions for generating predicates',
+            //easier to test for funciton not set.
+            //class: 'Function',
+        },
+        {
+            name: 'makeColPredicate',
+            documentation: 'custom functions for generating predicates',
+            //class: 'Function',
+        }, 
         
 
         
@@ -168,7 +182,6 @@ foam.CLASS
       ], 
     methods: [
         function init(){
-            this.refreshCell();
             this.propertyChange.sub("rowHeaderSelectionProperty", this.refreshSelection);
             this.propertyChange.sub("colHeaderSelectionProperty", this.refreshSelection);
             //the cell will be redrawn on data update anyways. 
@@ -177,7 +190,7 @@ foam.CLASS
         
         
         function initE() {
-            //sets the row/col highlighting behaviour.
+            this.refreshCell();
             this.cssClass(this.myCls('grid-cell'));
             this.on('click', this.onClick);
             this.setNodeName('td');
@@ -186,29 +199,28 @@ foam.CLASS
         },        
 
         
-        function makePredicate(currProperty, currMatchId, matchCurrId){
-                if (currMatchId === null || currMatchId === undefined){
-                    return this.NOT(this.HAS(currProperty));
-                }else if (currProperty.cls_.name == 'Date'){
-                   return Query.util.inDay(currProperty, currMatchId);
+        function makePredicate(prop, match){
+                if (match === null || match === undefined){
+                    return this.NOT(this.HAS(prop));
+                }else if (prop.cls_.name == 'Date'){
+                   return Query.util.inDay(prop, currMatchId);
                 } else {
-                    if (matchCurrId){
-                        var p = currProperty.clone();
+                    if (typeof(match) === typeof(prop) && typeof(prop)!== "object"){
+                        // if both are say, object, string or numbers
+                        return this.EQ(prop, match); 
+                    }else {
+                        // easy match configuration, if match is an object.
+                        //for anything complicated, please override makeRowPredicate and makeColPredicate. 
                         /*
+                        var p = currProperty.clone();
                         var pname = currProperty.name; 
                         p.f = function (o) { //p.f == p['f']
                             var obj = o[pname];
                             return obj?obj['id']:obj; 
                             };
-                            */
-                        return this.EQ(p, currMatchId);
-                    }else {
-                        var match; 
-                        //if (currMatchId && currMatchId.id) match = currMatchId.id;
-                        //else
-                        match = currMatchId;
-                        return currProperty.compare(currProperty, match); 
-                        //return this.EQ(currProperty, match);
+                        */
+                        return this.EQ(prop, match.id?match.id:match);
+                    
                     }
                 }
         }, 

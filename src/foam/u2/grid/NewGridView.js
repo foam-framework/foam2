@@ -305,7 +305,6 @@ foam.CLASS
                                 order: this.order,
                                 wrapperClass: this.cellWrapperClass,
                                 wrapperDAOClass: this.wrapperDAOClass, 
-                                contextSource: this.contextSource,
                             });
                         r.add(currCell);
                         currCellRow.push(currCell); 

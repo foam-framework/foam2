@@ -130,7 +130,7 @@ foam.CLASS({
     
     function init(){
       //this.organizationId$ = this.cell.rowMatchId$;
-      this.organization$ = this.cell.rowMatchId$;
+      this.organization$ = this.cell.rowMatch$;
       this.status$ = this.cell.colMatch$; 
         this.onDAOUpdate();
     },
