@@ -1,8 +1,12 @@
 foam.CLASS({
   name: 'Test',
   requires: [
+    'foam.core.Slot',
+    'foam.core.Model',
     'foam.swift.SwiftClass',
     'foam.swift.Field',
+    'foam.swift.Method',
+    'foam.swift.ui.DetailViewGenerator',
   ],
   messages: [
     {
@@ -38,8 +42,20 @@ foam.CLASS({
   ],
   methods: [
     function execute() {
-      var cls = this.model_.toSwiftClass();
-      console.log(cls.toSwiftSource());
+      var cls = this.SwiftClass.create({
+        name: 'Test',
+        methods: [
+          this.Method.create({
+            name: 'getName',
+            body: 'return "hello"',
+          })
+        ],
+      });
+      for (var i = 0; i < 1000; i++) {
+        cls.name = 'Test' + i;
+        cls.methods[0].body = 'return "Hello'+i+'"';
+        console.log(cls.toSwiftSource());
+      }
     },
     {
       name: 'myMethod',

@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'Argument',
 
   properties: [
-    'externalName',
+    ['externalName', '_'],
     'localName',
     'type',
     'defaultValue',
