@@ -70,6 +70,7 @@ FOAM_FILES([
   { name: "lib/java", flags: ['java'] },
   { name: "lib/JavaClass", flags: ['java'] },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
+  { name: "foam/swift/Argument", flags: ['swift'] },
   { name: "foam/swift/Refines", flags: ['swift'] },
   { name: "foam/util/Timer" },
   { name: "foam/memento/MementoMgr" },
