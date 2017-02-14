@@ -47,6 +47,7 @@ foam.CLASS({
 
       this.add(a).nbsp().add(b);
     },
+
     function fromProperty(prop) {
       this.prop  = prop;
     }
