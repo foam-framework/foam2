@@ -5,14 +5,18 @@ foam.CLASS
     extends: 'foam.u2.Element',
 
     imports: [
+        "entrySelection",
+        "rowSelectionProperty",
+        "colSelectionProperty",
+        "rowHeaderSelectionProperty",
+        "colHeaderSelectionProperty", 
     ],
     
     implements: [
         'foam.mlang.Expressions', 
     ], 
     
-    requires: [
-        'com.serviceecho.dao.ContexualizingSink',     
+    requires: [  
     ],
     
     axioms: [
@@ -40,23 +44,84 @@ foam.CLASS
       ],
     
     properties: [
-        'of',
-        'selectedEntry',
+        /*
+         * ---------------------------- data -----------------------
+         */
         {
-            name: 'entrySelectable',
-            class: 'Boolean',
-            value: false, 
+          class: 'Class',
+          name: 'of', 
+        },
+        {
+            name: 'data',
+            documentation: 'data is not the dao, but the modeled entry it self.',
+        },
+        
+        /*
+         * ----------------------- properties to match for cells ----------------------------
+         */
+        {
+            class: 'Class',
+            name: 'colProperty',
+        },
+        {
+            class: 'Class',
+            name: 'rowProperty',
         }, 
         {
-            name: 'cell',
-            factory: function(){
-                var b  = foam.u2.Element.create();
-                b.setNodeName('div');
-                return b; 
+            name: 'colMatch',
+            documentation: 'can be an object', 
+        }, 
+        {
+            name: 'rowMatch',
+            documentation: 'can be an object', 
+        },
+
+        /*
+         *----------------- predicate generation for search -------------------
+         */
+        
+        
+        {
+            name: 'rowPredicate',
+            expression: function(rowProperty, rowMatch, makeRowPredicate){
+                if (makeRowPredicate) return makeRowPredicate();
+                return this.makePredicate(rowProperty, rowMatch);
             }
         },
         {
-            name: 'cellBottom',
+            name: 'colPredicate',
+            expression: function(colProperty, colMatch, makeColPredicate){
+                if (makeColPredicate) return makeColPredicate();
+                return this.makePredicate(colProperty, colMatch);
+            }
+        },
+        {
+            name: 'predicate',
+            expression: function(rowPredicate, colPredicate){
+                return this.AND(rowPredicate, colPredicate);
+            }
+        },
+        
+
+        
+        /*
+         *------------------- display properties: order, selection, etc. ------------
+         */
+        {
+            name: 'order', 
+        },
+        {
+            name: 'selected',
+            class: 'Boolean',
+            value: false, 
+        },
+            
+         /*
+         *----------------------------------- Display Elements and Wrappers -----------------------------------
+         */
+        
+        {
+            name: 'cell',
             factory: function(){
                 var b  = foam.u2.Element.create();
                 b.setNodeName('div');
@@ -67,45 +132,7 @@ foam.CLASS
             class: 'Class', //e.g.WorkorderCellView
             name: 'cellView',  
         },
-        {
-            name: 'order', 
-        }, 
-    
-        'colProperty',
-        'rowProperty',
-        'colMatch',
-        'rowMatch',
-        //might not be an id, might be an object, date, etc. 
-        {
-            name: 'colMatchId',
-            expression: function(colMatch, matchColId){
-               if (matchColId && colMatch ) return colMatch.id; 
-                return colMatch; 
-               
-            }
-        }, 
-        {
-            name: 'rowMatchId',
-            expression: function(rowMatch, matchRowId){
-               if (matchRowId && rowMatch ) return rowMatch.id; 
-               return rowMatch; 
-            }
-        }, 
-        {
-            name: 'selected',
-            class: 'Boolean',
-            value: false, 
-        },
-        {
-            name: 'matchRowId',
-            class: 'Boolean',
-            value: false, 
-        },
-        {
-            name: 'matchColId',
-            class: 'Boolean',
-            value: false, 
-        }, 
+
         {
             name: 'inSelectedRow',
             class: 'Boolean',
@@ -116,75 +143,34 @@ foam.CLASS
             class: 'Boolean',
             value: false,
         },
-        {
-            name: 'selectedCSSClass',
-            expression: function(selected){
-                return selected?this.myCls('selected'):'';
-            }
-        },
-        {
-            name: 'rowHighlightCSSClass',
-            expression: function(inSelectedRow, inSelectedCol){
-                if (inSelectedCol) return inSelectedRow?this.myCls('intersection-highlight'):'';
-                return inSelectedRow?this.myCls('row-highlight'):'';
-            }
-        },
-        {
-            name: 'colHighlightCSSClass',
-            expression: function(inSelectedCol, inSelectedRow){
-                if (inSelectedRow) return inSelectedCol?this.myCls('intersection-highlight'):'';
-                return inSelectedCol?this.myCls('col-highlight'):'';
-            }
-        },
+
         
-        {
-            name: 'rowPredicate',
-            expression: function(rowProperty, rowMatchId, matchRowId){
-              return this.makePredicate(rowProperty, rowMatchId, matchRowId);
-            }
-        },
-        {
-            name: 'colPredicate',
-            expression: function(colProperty, colMatchId, matchColId){
-              return this.makePredicate(colProperty, colMatchId, matchColId);
-            }
-        },
-        {
-            name: 'predicate',
-            expression: function(rowPredicate, colPredicate){
-                return this.AND(rowPredicate, colPredicate);
-            }
-        },
-        
-        {
-            name: 'data',
-        },
-        
-        {
-            name: 'resultArr',
-            factory: function() { return []; }, 
-        }, 
         
         {
             name: 'wrapperClass',
             class: 'Class', 
+        },
+        {
+            name: 'wrapperDAOClass',
+            class: 'Class', 
         }, 
         {
             name: 'wrapper',
-            factory: function(){
-                return foam.u2.Element.create().setNodeName('div');
-            }
+            expression: function(wrapperClass){
+                if (wrapperClass){
+                   return wrapperClass.create({cell: this}, this); 
+               }
+               return foam.u2.Element.create().setNodeName('div');
+            }, 
+            
         },
-        'contextSource', 
         
       ], 
     methods: [
         function init(){
-            if (this.wrapperClass){
-                var c = this.contextSource?this.contextSource:this;
-                this.wrapper = this.wrapperClass.create({cell: this}, c); 
-            }
             this.refreshCell();
+            this.propertyChange.sub("rowHeaderSelectionProperty", this.refreshSelection);
+            this.propertyChange.sub("colHeaderSelectionProperty", this.refreshSelection);
             //the cell will be redrawn on data update anyways. 
             //this.data.on.sub(this.onDataUpdate);
         },
@@ -192,25 +178,13 @@ foam.CLASS
         
         function initE() {
             //sets the row/col highlighting behaviour.
-            this.setCSSClass();
             this.cssClass(this.myCls('grid-cell'));
             this.on('click', this.onClick);
             this.setNodeName('td');
             this.start(this.wrapper).add(this.cell$).end(); 
             //this.add(this.cell$);
-        },
-        
-        function setCSSClass(){
-            this.cssClass(this.selectedCSSClass$);
-            this.cssClass(this.rowHighlightCSSClass$);
-            this.cssClass(this.colHighlightCSSClass$); 
-        }, 
-        
+        },        
 
-        
-        function refreshCell(){
-            this.makeCell();
-        },
         
         function makePredicate(currProperty, currMatchId, matchCurrId){
                 if (currMatchId === null || currMatchId === undefined){
@@ -220,42 +194,52 @@ foam.CLASS
                 } else {
                     if (matchCurrId){
                         var p = currProperty.clone();
+                        /*
                         var pname = currProperty.name; 
                         p.f = function (o) { //p.f == p['f']
                             var obj = o[pname];
                             return obj?obj['id']:obj; 
                             };
+                            */
                         return this.EQ(p, currMatchId);
                     }else {
-                        return this.EQ(currProperty, currMatchId);
+                        var match; 
+                        //if (currMatchId && currMatchId.id) match = currMatchId.id;
+                        //else
+                        match = currMatchId;
+                        return currProperty.compare(currProperty, match); 
+                        //return this.EQ(currProperty, match);
                     }
                 }
         }, 
         
-        function makeCell(){
-            //var pred = this.AND(this.colPredicate, this.rowPredicate);
+        
+        function refreshCell(){
 
+            var d; 
             if(this.predicate && this.data){
-                var d = this.data.where(this.predicate);
+                    d = this.data.where(this.predicate);
                 if (this.order){
                     d = d.orderBy(this.order);
                 }
-                var result = this.ContexualizingSink.create(); 
-                d.select(result).
-                then(function(bareResult){
+                
+                if (this.wrapperDAOClass) d = this.wrapperDAOClass.create({delegate: d}, this);
+
+                d.select().then(function(result){
+                    
                     var div = foam.u2.Element.create('div');
-                    console.log('CELL: row:' + this.rowMatchId + ' col:' + this.colMatchId + ', ' + result.a.length);
+                    console.log('CELL: row:' + this.rowProperty + ' col:' + this.colProperty + ', ' + result.a.length);
                     if (! result || !result.a || !result.a.length){
                         console.log('no result found');
                     }
-                    var a = result.a;
-                    for (var i=0; i<a.length; i++){
-                        var entry = a[i];
+                    result.a.forEach(function(entry){
                         var v = this.getEntryView(entry); 
-                        v.sub('CELL_ENTRY_SELECTED', this.onEntrySelection)
+                            v.on('click',  function(){
+                            console.log('entry selected in GridCel.js');
+                            this.entrySelection = entry; 
+                        }.bind(this)); 
                         div.add(v); 
-                    }
-                    div.add(this.cellBottom); 
+                    }.bind(this)); 
                     this.cell = div;
                 }.bind(this));
             }else {
@@ -270,7 +254,7 @@ foam.CLASS
             var v = this.getCellView(entry);
             if (self.entrySelectable){
                 v.sub('SELECTED', function(e){
-                    self.selectedEntry = e.src.data; 
+                    self.entrySelection = e.src.data; 
                     self.pub('ENTRY_SELECTION');
                     }.bind(this));
             }
@@ -286,20 +270,46 @@ foam.CLASS
             d.add(foam.u2.Element.create('p').add(a.name));
             d.add(foam.u2.Element.create('p').add(a.lastSeenAlive));
             return d; 
-        }, 
-        
-        function toggleRowHighlight(){
-            this.inSelectedRow = ! this.inSelectedRow;
         },
         
-        
-        function toggleColHighlight(){
-            this.inSelectedCol = ! this.inSelectedCol;
+        function refreshSelection(){
+            var rowSelected = this.isRowSelected();
+            var colSelected = this.isColSelected();
+            if (rowSelected && colSelected){
+                this.enableCls(this.myCls('intersection-highlight'), true);
+            }else {
+                this.enableCls(this.myCls('intersection-highlight'), false);
+            if (rowSelected){
+                this.enableCls(this.myCls('row-highlight'), true);
+                }else {
+                    this.enableCls(this.myCls('row-highlight'), false);
+                }
+                
+                if (colSelected){
+                    this.enableCls(this.myCls('col-highlight'), true);
+                }else {
+                    this.enableCls(this.myCls('col-highlight'), false);
+                }                
+            }
+            
+            if (this.isCellSelected()){
+                this.enableCls(this.myCls('selected'), true);
+            }else {
+                this.enableCls(this.myCls('selected'), false);
+            }
+            
         },
         
-        function clearCSS(){
-        }, 
+        function isRowSelected(){
+            
+        },
         
+        function isColSelected(){
+            
+        },
+        
+        function isCellSelected(){
+        }
         
     ],
     
@@ -308,7 +318,14 @@ foam.CLASS
             name: 'onClick',
             code: function(){
                 this.selected = !this.selected;
-                this.pub('CELL_CLICK');
+                if (this.selected){
+                    this.colSelectionProperty = this.colProperty;
+                    this.rowSelectionProperty = this.rowProperty; 
+                }else {
+                    this.colSelectionProperty = null; 
+                    this.rowSelectionProperty = null; 
+                }
+                
             }
                 
         },
@@ -320,7 +337,7 @@ foam.CLASS
                 this.pub('ENTRY_SELECTION');
                 console.log('entry selected in GridCel.js');
                 if (a.src && a.src.data){
-                    this.selectedEntry = a.src.data;
+                    this.entrySelection = a.src.data;
                     this.pub('ENTRY_SELECTION'); 
                 }
             }

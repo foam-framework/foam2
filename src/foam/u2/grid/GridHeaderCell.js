@@ -5,6 +5,8 @@ foam.CLASS
     extends: 'foam.u2.Element',
 
     imports: [
+        'rowHeaderSelectionProperty',
+        'colHeaderSelectionProperty', 
     ],
     
     axioms: [
@@ -30,7 +32,38 @@ foam.CLASS
       ],
     
     properties: [
+        /*
+         * ---------------  data and property display-----------------------
+         */
+        
         'of',
+        {
+            name: 'data',
+            documentaiton: 'the property, e.g., an instance of ORGANIZATION_ID', 
+        },
+        {
+            name: 'property',
+            documentation: 'the property object it self or string, i.e., ORGANIZATION_ID', 
+        },
+        {
+            name: 'isRowHeader',
+            value: false, 
+            class: 'Boolean', 
+        },
+        {
+            name: 'isColHeader',
+            value: false, 
+            class: 'Boolean', 
+        },
+        {
+            name: 'selected',
+            value: false,
+            class: 'Boolean', 
+        }, 
+        
+        /*
+         * ------------------------ display elements, e.g., view and css  -------------------------
+         */
         {
             name: 'cell',
             factory: function(){
@@ -39,41 +72,26 @@ foam.CLASS
                 return b; 
             }
         }, 
-        'property',
-        'data', 
-        //rowIndex and colIndex keeps track of if it's row or col header, and which row/col it is. 
-        {
-            name: 'rowIndex',
-            value: -1, 
-        },
-        {
-            name: 'colIndex',
-            value: -1, 
-        }, 
         {
             name: 'name',
+            documentation: 'name of the property, e.g., organizationId', 
             expression: function(data){
+                if (!data ) return; 
                 if (typeof data == 'string'){
                     return data; 
-                }else if (data && data.name){
-                    return data.name; 
+                }else {
+                    return data.label?data.label:data.name;
                 }
-                return undefined; 
             }
         },
 
         {
-            name: 'isSelected',
-            value: false,
-            class: 'Boolean', 
-        }, 
-        {
             name: 'headerHighlightCSSClass',
-            expression: function(isSelected, rowIndex, colIndex){
-                if (isSelected){
-                    if (rowIndex >-1){
+            expression: function(selected, isRowHeader, isColHeader){
+                if (selected){
+                    if (isRowHeader){
                         return this.myCls('row-header-highlight');
-                    }else if (colIndex >-1){
+                    }else if (isColHeader >-1){
                         return this.myCls('col-header-highlight');
                     }
                 }
@@ -122,7 +140,10 @@ foam.CLASS
             isFramed: true,
             code: function(){
                 console.log('Gridheadercell clicked');
-                this.isSelected = !this.isSelected; 
+                if (this.isRowHeader) this.rowHeaderSelectionProperty = this.property;
+                else if (this.isColHeader) this.colHeaderSelectionProperty = this.property;
+                
+                this.selected = !this.selected;
                 this.pub('selected');
                 }
                 

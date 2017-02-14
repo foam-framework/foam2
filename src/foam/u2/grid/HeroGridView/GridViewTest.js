@@ -38,7 +38,6 @@ foam.CLASS({
     'Team',
     'Hero', 
     'foam.u2.TableView',
-    'foam.u2.grid.GridView',
     
     'foam.u2.grid.NewGridView',
     
@@ -76,10 +75,9 @@ foam.CLASS({
                         cellWrapperClass: 'NewHeroWrapperView',  
                         colProperty: this.Hero.STATUS, 
                         rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
-                        matchRowId: false, 
                         colPropertiesArray: ['alive', 'dead', 'MIA', undefined], //or pass in colDAO
                         rowDAOMatchUndefined: true,
-                        contextSource: this, 
+                        wrapperDAOClass: 'com.serviceecho.dao.ReferenceDAO', 
                 });
         
         /*     

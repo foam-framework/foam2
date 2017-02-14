@@ -18,12 +18,14 @@ foam.CLASS
     ],
 
     exports: [
-        //single selection of cell, row, or column.
-        //if a cell is selected, double click of the cell will
-        //highlight the row and column the cell is in. 
-        'selection',
-        'selectedRowproperty',
-        'seletedColumnProperty', 
+        // the data entry being selected, not the cell. 
+        'entrySelection',
+        //the row and clumn properties the cell corresponds to
+        'rowSelectionProperty',
+        'colSelectionProperty',
+        //for row and column seletion
+        'rowHeaderSelectionProperty',
+        'colHeaderSelectionProperty', 
         
     ],
     
@@ -88,16 +90,14 @@ foam.CLASS
         */
         
         {
-            //TODO: to change from matching Id to any other property of your choice. 
-            name: 'matchRowId',
-            class: 'Boolean', 
-            value: false, 
+            //TODO: 
+            name: 'makeRowPredicate',
+            class: 'Function', 
         },
         
         {
-            name: 'matchColId',
-            class: 'Boolean', 
-            value: false, 
+            name: 'makeColPredicate',
+            class: 'Function', 
         }, 
 
         {
@@ -152,9 +152,29 @@ foam.CLASS
         /*
          *----------------------------------- cell, row and column Selection -----------------
          */
-        'selection',
-        'selectedRowproperty',
-        'seletedColumnProperty', 
+        {
+            name: 'entrySelection',
+            postSet: function(old, nu){
+                var oldName = old?old.name:old;
+                var nuName = nu?nu.name:nu; 
+                console.log("entrySelection changed from " + oldName + " to " + nuName); 
+            }
+        },
+        {
+            name: 'rowHeaderSelectionProperty',
+            documentation: 'for row header selection', 
+        }, 
+        {
+            name: 'colHeaderSelectionProperty',
+            documentation: 'for column header selection',
+        }, 
+        {
+            name: 'rowSelectionProperty',
+            documentation: 'for normal cell selection', 
+        },
+        {
+            name: 'colSelectionProperty', 
+        }, 
         
         /*
          *---------------------------------- Cell and Cell wrapper ------------------------------
@@ -167,7 +187,7 @@ foam.CLASS
         {
             class: 'Class',
             documentation: 'wrapperDAO to load extra property objects for the data, if necessary. e.g., ReferenceDAO. ', 
-            name: 'wrapperDAO', 
+            name: 'wrapperDAOClass', 
         }, 
         {
             name: 'cellWrapperClass',
@@ -261,7 +281,7 @@ foam.CLASS
                         var rowHeaderCell = this.GridHeaderCell.create({
                             data: this.rowPropertiesArray[i],
                             property: this.rowProperty,
-                            rowIndex : i, 
+                            isRowHeader: true, 
                             }); 
                         rowHeaderCell.sub('selected', this.onRowSelect);
                         r.add(rowHeaderCell);
@@ -269,7 +289,7 @@ foam.CLASS
                         var colHeaderCell = this.GridHeaderCell.create({
                             data: this.colPropertiesArray[j],
                             property: this.colProperty,
-                            colIndex: j,
+                            isColHeader: true, 
                             });
                         colHeaderCell.sub('selected', this.onColSelect);
                         r.add(colHeaderCell);
@@ -280,17 +300,13 @@ foam.CLASS
                                 cellView$: this.cellView$, 
                                 rowMatch: this.rowPropertiesArray[i],
                                 colMatch: this.colPropertiesArray[j],
-                                matchRowId: this.matchRowId,
-                                matchColId: this.matchColId, 
                                 rowProperty: this.rowProperty, 
                                 colProperty: this.colProperty,
                                 order: this.order,
                                 wrapperClass: this.cellWrapperClass,
-                                wrapperDAO: this.wrapperDAO, 
+                                wrapperDAOClass: this.wrapperDAOClass, 
                                 contextSource: this.contextSource,
                             });
-                            currCell.sub('CELL_CLICK', this.onCellClick);
-                            currCell.sub('ENTRY_SELECTION', this.onEntrySelection); 
                         r.add(currCell);
                         currCellRow.push(currCell); 
                     }
@@ -370,27 +386,6 @@ foam.CLASS
     ], 
 
     listeners: [
-        {
-            name: 'onCellClick',
-            isFramed: true,
-            code: function(){
-                var src = arguments[0].src;
-                this.currColProperty = src.colMatch;
-                this.currRowProperty = src.rowMatch;
-                this.pub('CELL_CLICK');
-                
-            console.log('cell clicked');
-            }
-        },
-        {
-            name: 'onEntrySelection',
-            isFramed: true,
-            code: function(){
-                var src = arguments[0].src;
-                this.selectedEntry = src.selectedEntry;
-                console.log('yepie, shit works'); 
-            }
-        }, 
         {
             name: 'onSortUpdate',
             isFramed: true,

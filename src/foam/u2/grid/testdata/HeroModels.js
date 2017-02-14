@@ -123,6 +123,17 @@ foam.CLASS({
             if (! value) return '--'; 
             return value.name || value.id; 
         },
+        compare: function(o1, o2){
+            var id1, id2; 
+            if (typeof(o1) === "string" )id1 = o1;
+            else if (o1.id) id1 = o1.id;
+            else id1 = o1; 
+            if (typeof(o2) === "string" )id2 = o2;
+            else if (o2.id) id1 = o2.id;
+            else id2 = o2;
+            
+            return foam.util.compare(id1, id2); 
+        },
         //hidden: true,
         /*
         postSet: function(old, nu){
@@ -159,6 +170,7 @@ foam.CLASS({
         tableFormatter: function(value, data, t){
           return value; 
         },
+            
         /*
          * postset should NOT exist. organization should only be changed when organizationid is. 
         postSet: function(old, nu){

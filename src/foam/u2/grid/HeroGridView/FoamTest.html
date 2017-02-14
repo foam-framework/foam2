@@ -13,7 +13,13 @@
 
      <script language="javascript">
        foam.CLASS({
-        name: 'myClass', 
+        name: 'myClass',
+        exports: [
+         "selection", 
+        ],
+        
+        requires:["myImportClass"], 
+        
         properties: [
          {
           name: 'testArr',
@@ -21,17 +27,41 @@
           postSet: function(old, nu){
            console.log("testArr post set: " + old + " --> " + nu); 
           }
+         },
+         
+         {
+          name: 'selection',
+          postSet: function(old, nu){
+           console.log("selection changed from " + old + " to  " + nu); 
+          }
+         },
+         {
+          name: 'myProp',
          }
         ],
+
         
         methods: [
          function init(){
+          this.myProp = this.myImportClass.create();
          }
         ]
        });
        
-       var c = this.myClass.create();
-       c.testArr = ["B"];
+               
+        foam.CLASS({
+         name: 'myImportClass',
+         imports: ["selection"], 
+         methods: [
+          function init(){
+           this.selection = "I'm in myImportClass"; 
+          }
+         ], 
+        });
+        
+       
+       var a = this.myClass.create();
+       a.myProp.selection = "hi, there"; 
        
      </script>
     
