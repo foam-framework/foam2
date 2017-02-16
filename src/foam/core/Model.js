@@ -37,11 +37,13 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
+      name: 'documentation'
       // Just discard documentation.
       // If it's needed, a real 'documentation' property will
       // be refined in.
-      name: 'documentation',
-      setter: function() { }
+      // TODO: Don't bother removing, if a production system,
+      // documentation should have already been stripped.
+      // setter: function() { }
     },
     {
       name: 'label',
