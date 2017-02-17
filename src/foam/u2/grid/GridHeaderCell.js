@@ -6,8 +6,11 @@ foam.CLASS
 
     imports: [
         'rowHeaderSelectionProperty',
-        'colHeaderSelectionProperty', 
+        'colHeaderSelectionProperty',
+        'colHeaderUndefinedMatch',
+        'rowHeaderUndefinedMatch', 
     ],
+
     
     axioms: [
       foam.u2.CSS.create({
@@ -39,7 +42,14 @@ foam.CLASS
         'of',
         {
             name: 'data',
-            documentaiton: 'the property, e.g., an instance of ORGANIZATION_ID', 
+            documentaiton: 'the property, e.g., an instance of ORGANIZATION_ID',
+            /*
+            postSet: function(old, nu){
+                if (nu === undefined){
+                    if (this.isRowHeader)return this.rowHeaderUndefinedMatch;
+                    if (this.isColHeader) return this.colHeaderUndefinedMatch; 
+                }
+            }*/
         },
         {
             name: 'property',
@@ -85,24 +95,10 @@ foam.CLASS
             }
         },
 
-        {
-            name: 'headerHighlightCSSClass',
-            expression: function(selected, isRowHeader, isColHeader){
-                if (selected){
-                    if (isRowHeader){
-                        return this.myCls('row-header-highlight');
-                    }else if (isColHeader >-1){
-                        return this.myCls('col-header-highlight');
-                    }
-                }
-            }
-        },
-
       ], 
     methods: [
         function initE() {
             this.cell.cssClass(this.myCls('cell-header'));
-            this.cssClass(this.headerHighlightCSSClass$);
             this.on('click', this.onClick);
             this.setNodeName('td');
             this.cssClass(this.myCls('grid-header-cell'));
@@ -110,22 +106,30 @@ foam.CLASS
         },
         
         function init(){
+            this.selected$.sub(this.refreshSelection);
+            this.rowHeaderSelectionProperty$.sub(this.refreshSelection);
+            this.colHeaderSelectionProperty$.sub(this.refreshSelection);
+            
             this.refreshCell();
             //this.property.on.sub(this.onPropertyUpdate); 
         }, 
         
         function refreshCell(){
-            this.makeCell();
-        },
-        
-        function makeCell(){
             var p = foam.u2.Element.create('span');
             if (this.property && this.property.gridHeaderView){
-                p.add(this.property.gridHeaderView(this.data));
+                if (this.isRowHeader )
+                    if (foam.util.compare(this.rowHeaderUndefinedMatch, this.data) === 0)
+                        p.add(this.property.gridHeaderView(undefined));
+                    else p.add(this.property.gridHeaderView(this.data));
+                if (this.isColHeader )
+                    if (foam.util.compare(this.colHeaderUndefinedMatch, this.data) === 0)
+                        p.add(this.property.gridHeaderView(undefined));
+                    else p.add(this.property.gridHeaderView(this.data));
+                
             }else if (this.name){
                 p.add(this.name);
             } else {
-            p.add('N/A');
+                p.add('N/A');
             } 
             this.cell = p;
             
@@ -140,14 +144,46 @@ foam.CLASS
             isFramed: true,
             code: function(){
                 console.log('Gridheadercell clicked');
-                if (this.isRowHeader) this.rowHeaderSelectionProperty = this.property;
-                else if (this.isColHeader) this.colHeaderSelectionProperty = this.property;
-                
-                this.selected = !this.selected;
-                this.pub('selected');
+                if (! this.selected){
+                    this.selected = true;
+                    if (this.isRowHeader) this.rowHeaderSelectionProperty = this.data;
+                    else if (this.isColHeader) this.colHeaderSelectionProperty = this.data;
+                } else {
+                    this.selected = false; 
+                    if (this.isRowHeader) this.rowHeaderSelectionProperty = undefined;
+                    else if (this.isColHeader) this.colHeaderSelectionProperty = undefined;
                 }
                 
+                
+            }
+                
         },
+        
+        {
+            name: 'refreshSelection',
+            isFramed: true, 
+            code: function (){
+                if ( this.isRowHeader){
+                    if( foam.util.compare(this.rowHeaderSelectionProperty, this.data) === 0)
+                        this.selected = true;
+                    else this.selected = false;
+                }
+                if ( this.isColHeader){
+                    if( foam.util.compare(this.colHeaderSelectionProperty, this.data) === 0)
+                        this.selected = true;
+                    else this.selected = false;
+                }
+                
+                if (this.selected){
+                    if (this.isRowHeader) this.enableCls(this.myCls('row-header-highlight'), true);
+                    if (this.isColHeader) this.enableCls(this.myCls('col-header-highlight'), true);
+                    
+                }else {
+                    this.enableCls(this.myCls('row-header-highlight'), false); 
+                    this.enableCls(this.myCls('col-header-highlight'), false);
+                }
+            }
+        }, 
         
         {
             name: 'onPropertyUpdate',

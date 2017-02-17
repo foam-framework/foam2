@@ -121,7 +121,7 @@ foam.CLASS({
         referenceProperty: 'organization',
         gridHeaderView: function(value, obj, t){
             if (! value) return '--'; 
-            return value.name || value.id; 
+            return value.name || value.id || value; 
         },
         compare: function(o1, o2){
             var id1, id2; 

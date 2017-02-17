@@ -6,10 +6,14 @@ foam.CLASS
 
     imports: [
         "entrySelection",
+        //cell selectoin is currently disabled, because it conflicts with entry selection.
+        
         "rowSelectionProperty",
         "colSelectionProperty",
         "rowHeaderSelectionProperty",
-        "colHeaderSelectionProperty", 
+        "colHeaderSelectionProperty",
+        'colHeaderUndefinedMatch',
+        'rowHeaderUndefinedMatch', 
     ],
     
     implements: [
@@ -36,7 +40,7 @@ foam.CLASS
                     background-color:rgba(255, 255, 0, 0.4);
                 }
                 ^selected{
-                   border: 2px solid #f00;
+                   border: 3px solid #f00;
                     padding: 2px;
                 }
           */}
@@ -129,7 +133,7 @@ foam.CLASS
             class: 'Boolean',
             value: false, 
         },
-            
+
          /*
          *----------------------------------- Display Elements and Wrappers -----------------------------------
          */
@@ -146,18 +150,6 @@ foam.CLASS
             class: 'Class', //e.g.WorkorderCellView
             name: 'cellView',  
         },
-
-        {
-            name: 'inSelectedRow',
-            class: 'Boolean',
-            value: false,
-        },
-        {
-            name: 'inSelectedCol',
-            class: 'Boolean',
-            value: false,
-        },
-
         
         
         {
@@ -182,8 +174,14 @@ foam.CLASS
       ], 
     methods: [
         function init(){
-            this.propertyChange.sub("rowHeaderSelectionProperty", this.refreshSelection);
-            this.propertyChange.sub("colHeaderSelectionProperty", this.refreshSelection);
+            /*
+            this.rowSelectionProperty$.sub(this.refreshSelection);
+            this.colSelectionProperty$.sub(this.refreshSelection);
+            */
+            
+            this.rowHeaderSelectionProperty$.sub(this.refreshSelection);
+            this.colHeaderSelectionProperty$.sub(this.refreshSelection);
+            
             //the cell will be redrawn on data update anyways. 
             //this.data.on.sub(this.onDataUpdate);
         },
@@ -227,20 +225,20 @@ foam.CLASS
         
         
         function refreshCell(){
-
+            
             var d; 
             if(this.predicate && this.data){
                     d = this.data.where(this.predicate);
                 if (this.order){
                     d = d.orderBy(this.order);
                 }
-                
+                //wrapper class to get additional properties from the result
                 if (this.wrapperDAOClass) d = this.wrapperDAOClass.create({delegate: d}, this);
 
                 d.select().then(function(result){
                     
                     var div = foam.u2.Element.create('div');
-                    console.log('CELL: row:' + this.rowProperty + ' col:' + this.colProperty + ', ' + result.a.length);
+                    console.log('CELL: row:' + this.rowMatch + ' col:' + this.colMatch + ', ' + result.a.length);
                     if (! result || !result.a || !result.a.length){
                         console.log('no result found');
                     }
@@ -255,9 +253,7 @@ foam.CLASS
                     this.cell = div;
                 }.bind(this));
             }else {
-                var p = foam.u2.Element.create('div');
-                p.add('---');
-                this.cell = p;
+                this.cell = foam.u2.Element.create('div').add('---');
             }
         },
         
@@ -284,43 +280,35 @@ foam.CLASS
             return d; 
         },
         
-        function refreshSelection(){
-            var rowSelected = this.isRowSelected();
-            var colSelected = this.isColSelected();
-            if (rowSelected && colSelected){
-                this.enableCls(this.myCls('intersection-highlight'), true);
-            }else {
-                this.enableCls(this.myCls('intersection-highlight'), false);
-            if (rowSelected){
-                this.enableCls(this.myCls('row-highlight'), true);
-                }else {
-                    this.enableCls(this.myCls('row-highlight'), false);
-                }
-                
-                if (colSelected){
-                    this.enableCls(this.myCls('col-highlight'), true);
-                }else {
-                    this.enableCls(this.myCls('col-highlight'), false);
-                }                
-            }
-            
-            if (this.isCellSelected()){
-                this.enableCls(this.myCls('selected'), true);
-            }else {
-                this.enableCls(this.myCls('selected'), false);
-            }
-            
-        },
+
         
         function isRowSelected(){
-            
+            if (! this.rowHeaderSelectionProperty) return false; 
+            if (foam.util.compare(this.rowHeaderSelectionProperty, this.rowHeaderUndefinedMatch) === 0 ){
+                if (this.rowMatch === undefined ) return true;
+                return false; 
+            }
+            if (foam.util.compare(this.rowHeaderSelectionProperty, this.rowMatch) === 0)
+                return true;
+            return false; 
         },
         
         function isColSelected(){
-            
+            if (! this.colHeaderSelectionProperty) return false; 
+            if (foam.util.compare(this.colHeaderSelectionProperty, this.colHeaderUndefinedMatch) === 0 ){
+                if (this.colMatch === undefined ) return true;
+                return false; 
+            }
+            if (foam.util.compare(this.colHeaderSelectionProperty, this.colMatch) === 0)
+                return true;
+            return false; 
         },
         
         function isCellSelected(){
+            if (foam.util.compare(this.colSelectionProperty, this.colProperty)!== 0 || foam.util.compare(this.rowSelectionProperty, this.rowProperty)!== 0)
+                return false;
+            
+            return true;
         }
         
     ],
@@ -334,13 +322,44 @@ foam.CLASS
                     this.colSelectionProperty = this.colProperty;
                     this.rowSelectionProperty = this.rowProperty; 
                 }else {
-                    this.colSelectionProperty = null; 
-                    this.rowSelectionProperty = null; 
+                    this.colSelectionProperty = undefined; 
+                    this.rowSelectionProperty = undefined; 
                 }
                 
             }
                 
         },
+        
+        {
+            name: 'refreshSelection', 
+            code: function (){
+                var rowSelected = this.isRowSelected();
+                var colSelected = this.isColSelected();
+                if (rowSelected && colSelected){
+                    this.enableCls(this.myCls('intersection-highlight'), true);
+                }else {
+                    this.enableCls(this.myCls('intersection-highlight'), false);
+                if (rowSelected){
+                    this.enableCls(this.myCls('row-highlight'), true);
+                    }else {
+                        this.enableCls(this.myCls('row-highlight'), false);
+                    }
+                    
+                    if (colSelected){
+                        this.enableCls(this.myCls('col-highlight'), true);
+                    }else {
+                        this.enableCls(this.myCls('col-highlight'), false);
+                    }                
+                }
+                /*
+                if (this.isCellSelected()){
+                    this.enableCls(this.myCls('selected'), true);
+                }else {
+                    this.enableCls(this.myCls('selected'), false);
+                }*/
+                
+            },
+        }, 
         
         {
             name: 'onEntrySelection',

@@ -3,12 +3,6 @@ foam.CLASS
     package: 'foam.u2.grid',
     name: 'NewGridView',
     extends: 'foam.u2.Element',
-
-    implements: [
-    ],
-
-    imports: [
-    ],
     
     requires:
     [
@@ -25,7 +19,9 @@ foam.CLASS
         'colSelectionProperty',
         //for row and column seletion
         'rowHeaderSelectionProperty',
-        'colHeaderSelectionProperty', 
+        'colHeaderSelectionProperty',
+        'rowHeaderUndefinedMatch',
+        'colHeaderUndefinedMatch',
         
     ],
     
@@ -111,6 +107,15 @@ foam.CLASS
             class: 'Boolean', 
             value: false, 
         },
+        {
+            name:'colHeaderUndefinedMatch',
+            value: '_col',
+        },
+        {
+            name:'rowHeaderUndefinedMatch',
+            value: '_row',
+        },
+
         /*
          *---------------------------------- Row and Column generation : data source -----------------------
          */
@@ -279,7 +284,7 @@ foam.CLASS
                         r.add(cornerCell);
                     }else if (j==-1){ //header row 
                         var rowHeaderCell = this.GridHeaderCell.create({
-                            data: this.rowPropertiesArray[i],
+                            data: this.rowPropertiesArray[i]!==undefined?this.rowPropertiesArray[i]:this.rowHeaderUndefinedMatch,
                             property: this.rowProperty,
                             isRowHeader: true, 
                             }); 
@@ -287,7 +292,7 @@ foam.CLASS
                         r.add(rowHeaderCell);
                     }else if (i==-1){ //header column
                         var colHeaderCell = this.GridHeaderCell.create({
-                            data: this.colPropertiesArray[j],
+                            data: this.colPropertiesArray[j]!==undefined?this.colPropertiesArray[j]:this.colHeaderUndefinedMatch,
                             property: this.colProperty,
                             isColHeader: true, 
                             });
@@ -410,9 +415,6 @@ foam.CLASS
             code: function(s){
                 console.log('row Selected');
                 var row = s.src;
-                this.cellArray[row.rowIndex].forEach(function(c){
-                    c.toggleRowHighlight();
-                }.bind(this));
             }
           },
           
@@ -422,9 +424,6 @@ foam.CLASS
             code: function(s){
                 console.log('col Selected');
                 var col = s.src;
-                this.cellArray.forEach(function(r){
-                    r[col.colIndex].toggleColHighlight();
-                }.bind(this));
             }
           },
           
