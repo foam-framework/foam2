@@ -29,13 +29,25 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'visibility'
+    },
+    {
+      class: 'String',
       name: 'name'
+    },
+    {
+      class: 'StringArray',
+      name: 'implements'
     },
     {
       class: 'FObjectArray',
       of: 'foam.swift.Field',
       name: 'fields',
-      factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.swift.SwiftClass',
+      name: 'classes',
     },
     {
       class: 'FObjectArray',
@@ -47,14 +59,23 @@ foam.CLASS({
 
   methods: [
     function outputSwift(o) {
+      o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');
-      o.out('class ', this.name, ' {\n');
+      o.indent();
+      o.out(this.visibility ? this.visibility + ' ' : '');
+      o.out('class ', this.name);
+      if (this.implements.length) o.out(': ', this.implements.join(', '));
+      o.out(' {\n');
+      o.indent();
+
       o.increaseIndent();
 
       this.fields.forEach(function(f) { o.out('\n', f, '\n'); });
       this.methods.forEach(function(f) { o.out('\n', f, '\n'); });
+      this.classes.forEach(function(f) { o.out('\n', f, '\n'); });
 
       o.decreaseIndent();
+      o.indent();
       o.out('}');
     },
     function toSwiftSource() {
@@ -64,4 +85,3 @@ foam.CLASS({
     }
   ]
 });
-

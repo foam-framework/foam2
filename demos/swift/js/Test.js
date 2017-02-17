@@ -6,7 +6,6 @@ foam.CLASS({
     'foam.swift.SwiftClass',
     'foam.swift.Field',
     'foam.swift.Method',
-    'foam.swift.ui.DetailViewGenerator',
   ],
   messages: [
     {
@@ -25,6 +24,9 @@ foam.CLASS({
       class: 'String',
       name: 'lastName',
       value: 'Carcasole',
+      swiftPostSet: function() {/*
+NSLog("Hi there %@", newValue)
+      */},
     },
     {
       name: 'factoryProp',
@@ -42,8 +44,12 @@ foam.CLASS({
   ],
   methods: [
     function execute() {
+      var cls = this.lookup(this.model_.id);
+      console.log(cls.toSwiftClass().toSwiftSource());
+      /*
       var cls = this.SwiftClass.create({
         name: 'Test',
+        implements: ['FObject'],
         methods: [
           this.Method.create({
             name: 'getName',
@@ -51,11 +57,12 @@ foam.CLASS({
           })
         ],
       });
-      for (var i = 0; i < 1000; i++) {
+      for (var i = 0; i < 1; i++) {
         cls.name = 'Test' + i;
         cls.methods[0].body = 'return "Hello'+i+'"';
         console.log(cls.toSwiftSource());
       }
+      */
     },
     {
       name: 'myMethod',
