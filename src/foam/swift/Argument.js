@@ -30,8 +30,7 @@ foam.CLASS({
     function outputSwift(o) {
       o.out(
         this.externalName,
-        ' ',
-        this.localName,
+        this.externalName != this.localName ? ' ' + this.localName : '',
         ': ',
         this.type,
         this.defaultValue ? ' = ' + this.defaultValue : '');

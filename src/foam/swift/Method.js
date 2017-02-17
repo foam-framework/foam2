@@ -21,9 +21,11 @@ foam.CLASS({
 
   properties: [
     'name',
+    'visibility',
     'returnType',
     'static',
     'body',
+    'override',
     {
       class: 'FObjectArray',
       of: 'foam.swift.Argument',
@@ -36,8 +38,10 @@ foam.CLASS({
       o.indent();
 
       o.out(
+        this.visibility ? this.visibility + ' ' : '',
+        this.override ? 'override ' : '',
         this.static ? 'static ' : '',
-        'func ',
+        this.name != 'init' ? 'func ' : '',
         this.name,
         '(');
 
