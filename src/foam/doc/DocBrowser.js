@@ -161,6 +161,8 @@ foam.CLASS({
                 this.start(self.ClassLink, {data: d, showPackage: this.showPackage}).
                   cssClass(this.showPackage ? null : self.myCls('indent')).
                 end();
+                // TODO: fix formatting
+                this.add(d.model_.documentation);
               });
             })).
           end().
