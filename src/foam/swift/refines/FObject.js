@@ -83,6 +83,4 @@ super.set(key: key, value: value)
       return cls;
     },
   ],
-  templates: [
-  ],
 });
