@@ -55,6 +55,10 @@ foam.CLASS({
     }
   ],
   methods: [
+    function isOverride() {
+      return !!foam.lookup(this.sourceCls_.model_.extends)
+          .getAxiomByName(this.name);
+    },
     function writeToSwiftClass(cls) {
       if ( !this.swiftCode ) return;
       cls.methods.push(this.Method.create({
@@ -63,6 +67,7 @@ foam.CLASS({
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
         visibility: 'public',
+        override: this.isOverride(),
       }));
     },
   ]

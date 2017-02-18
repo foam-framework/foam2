@@ -24,10 +24,10 @@ foam.LIB({
         imports: [
           'Foundation',
         ],
-        implements: ['AbstractFObject'],
+        implements: [this.model_.swiftExtends],
         visibility: 'public',
       });
-      this.getAxioms().forEach(function(axiom) {
+      this.getOwnAxioms().forEach(function(axiom) {
         if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls);
       });
       cls.methods.push(foam.swift.Method.create({
@@ -37,7 +37,7 @@ foam.LIB({
         // TODO Actually make class info.
         body: 'return EmptyClassInfo()',
       }));
-      var properties = this.getAxiomsByClass(foam.core.Property);
+      var properties = this.getOwnAxiomsByClass(foam.core.Property);
 
       var getterBody = foam.templates.TemplateUtil.create().compile(
           foam.String.multiline(function(properties) {/*

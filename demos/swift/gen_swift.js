@@ -24,6 +24,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
   modelArgs: {
     models: [
       'Test',
+      'TestExtended',
     ],
     outdir: genDir,
   },
