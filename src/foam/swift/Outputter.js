@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.swift', // Copied from java. Move some central?
+  package: 'foam.swift', // TODO: Copied from java. Move somewhere central.
   name: 'Outputter',
 
   properties: [
