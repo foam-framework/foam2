@@ -7,14 +7,19 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftCode',
-    }
+    },
+    {
+      name: 'code',
+      value: function() {},
+    },
   ],
   methods: [
     function writeToSwiftClass(cls) {
       if ( !this.swiftCode ) return;
       cls.methods.push(this.Method.create({
         name: this.name,
-        body: this.swiftCode
+        body: this.swiftCode,
+        visibility: 'public',
       }));
     },
   ]

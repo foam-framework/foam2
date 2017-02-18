@@ -4,6 +4,9 @@ foam.LIB({
     function toSwiftClass() {
       var cls = foam.lookup('foam.swift.SwiftClass').create({
         name: this.model_.swiftName,
+        imports: [
+          'Foundation',
+        ],
         implements: ['AbstractFObject'],
         visibility: 'public',
       });
