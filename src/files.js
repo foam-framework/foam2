@@ -79,7 +79,6 @@ FOAM_FILES([
   { name: "foam/swift/refines/Method", flags: ['swift'] },
   { name: "foam/swift/refines/Model", flags: ['swift'] },
   { name: "foam/swift/refines/Property", flags: ['swift'] },
-  { name: "foam/swift/refines/Slot", flags: ['swift'] },
   { name: "foam/swift/refines/String", flags: ['swift'] },
 
   { name: "foam/util/Timer" },

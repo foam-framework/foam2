@@ -45,6 +45,7 @@ foam.CLASS({
         body: this.swiftCode,
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
+        visibility: 'public',
       }));
     },
   ]

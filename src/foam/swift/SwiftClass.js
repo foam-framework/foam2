@@ -40,6 +40,10 @@ foam.CLASS({
       name: 'implements'
     },
     {
+      class: 'StringArray',
+      name: 'imports'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.swift.Field',
       name: 'fields',
@@ -61,6 +65,7 @@ foam.CLASS({
     function outputSwift(o) {
       o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');
+      this.imports.forEach(function(i) { o.out('import ', i, '\n') });
       o.indent();
       o.out(this.visibility ? this.visibility + ' ' : '');
       o.out('class ', this.name);
