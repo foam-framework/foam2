@@ -103,6 +103,10 @@ foam.CLASS({
     },
   ],
   methods: [
+    function isOverride() {
+      return !!foam.lookup(this.sourceCls_.model_.extends)
+          .getAxiomByName(this.name);
+    },
     function writeToSwiftClass(cls) {
       cls.fields.push(this.Field.create({
         visibility: 'private',
@@ -118,18 +122,21 @@ foam.CLASS({
       }));
       cls.fields.push(this.Field.create({
         visibility: 'public',
+        override: this.isOverride(),
         name: this.swiftName,
         type: this.swiftType,
         getter: this.swiftGetter(),
         setter: 'self.set(key: "'+this.swiftName+'", value: value)',
       }));
-      cls.fields.push(this.Field.create({
-        visibility: 'public',
-        name: this.swiftSlotName,
-        type: 'PropertySlot',
-        lazy: true,
-        initializer: this.swiftSlotInitializer()
-      }));
+      if ( !this.isOverride() ) {
+        cls.fields.push(this.Field.create({
+          visibility: 'public',
+          name: this.swiftSlotName,
+          type: 'PropertySlot',
+          lazy: true,
+          initializer: this.swiftSlotInitializer()
+        }));
+      }
       if (this.swiftFactory) {
         cls.methods.push(this.Method.create({
           visibility: 'private',

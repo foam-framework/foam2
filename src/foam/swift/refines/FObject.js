@@ -37,7 +37,10 @@ foam.LIB({
         // TODO Actually make class info.
         body: 'return EmptyClassInfo()',
       }));
-      var properties = this.getOwnAxiomsByClass(foam.core.Property);
+      var properties = this.getOwnAxiomsByClass(foam.core.Property)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
 
       var getterBody = foam.templates.TemplateUtil.create().compile(
           foam.String.multiline(function(properties) {/*
