@@ -26,5 +26,15 @@ foam.CLASS({
       name: 'swiftName',
       expression: function(name) { return name; },
     },
+    {
+      class: 'String',
+      name: 'swiftExtends',
+      factory: function() {
+        // TODO: This should be an expression on extends but putting extends in
+        // the args makes js unhappy.
+        if ( this.extends == 'FObject' ) return 'AbstractFObject';
+        return this.extends.split('.').pop();
+      },
+    },
   ],
 });
