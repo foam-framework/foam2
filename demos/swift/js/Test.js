@@ -34,7 +34,6 @@ return ["Hello", "World"]
     {
       name: 'sayHi',
       swiftCode: 'NSLog(type(of: self).greeting, firstName, lastName)',
-      code: function() {}, // To suppress warning.
     },
   ],
   methods: [

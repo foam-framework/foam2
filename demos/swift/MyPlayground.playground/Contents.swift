@@ -31,3 +31,5 @@ XCTAssertEqual(numPubs2, 2)
 XCTAssertEqual(numPubs3, 1)
 
 sub.detach() // Should do nothing.
+
+test.factoryProp
