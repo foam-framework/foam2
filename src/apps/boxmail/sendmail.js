@@ -17,7 +17,6 @@
 
 require('./bootFOAMNode.js');
 
-
 if ( process.argv.length < 4 ) {
   console.log('USAGE: node sendmail.js "Subject" "Body"');
   process.exit();

@@ -75,7 +75,6 @@ foam.CLASS({
         }
         authLoad();
       });
-
     },
 
     function onSignIn(user) {
