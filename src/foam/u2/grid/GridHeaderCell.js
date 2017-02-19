@@ -143,7 +143,7 @@ foam.CLASS
             name: 'onClick',
             isFramed: true,
             code: function(){
-                console.log('Gridheadercell clicked');
+                //console.log('Gridheadercell clicked');
                 if (! this.selected){
                     this.selected = true;
                     if (this.isRowHeader) this.rowHeaderSelectionProperty = this.data;

@@ -128,7 +128,7 @@ foam.CLASS({
             name: 'toggleRows',
             code: function(){
                 if (! this.gridView.visibleRowIds || this.gridView.visibleRowIds.length <=0 ){
-                    this.gridView.visibleRowIds = ["B", "EI", ""]; 
+                    this.gridView.visibleRowIds = ['B', 'EI', '']; 
                 }else {
                     this.gridView.visibleRowIds = []; 
                 }

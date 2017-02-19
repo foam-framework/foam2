@@ -39,12 +39,10 @@ foam.CLASS({
                     return self.ArraySink.create({a: r}); 
                 }); 
             });
-        
         },
         
         function getReferenceObjects(obj){
             var self = this; 
-            
             obj = obj.cls_.create(obj, this);
             let props = obj.cls_.getAxiomsByClass(foam.core.Property).filter(function(c){return c.transient; });
             var promises = [];
@@ -57,11 +55,11 @@ foam.CLASS({
                     obj[prop.referenceProperty] = null; 
                 }else {
                     var referencePropName = prop.referenceProperty; 
-                    var p = 
+                    promises.push(
                         dao.find(prop.f(obj)).then(function(result){
                             obj[referencePropName] = result; 
-                        });
-                    promises.push(p); 
+                        })
+                    );
                 }
             }
             return Promise.resolve(Promise.all(promises)).then(function(result){

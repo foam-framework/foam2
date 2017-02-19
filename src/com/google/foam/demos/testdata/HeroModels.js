@@ -160,7 +160,7 @@ foam.CLASS({
         groupByLabel: "name",
         transient: true, 
         searchView: {
-            class: 'com.serviceecho.ui.search.GroupByIdSearchView',
+            class: 'foam.u2.search.GroupByIdSearchView',
             of: 'Team', 
             showAllChoices: true,
         },

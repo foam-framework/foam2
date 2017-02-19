@@ -162,7 +162,7 @@ foam.CLASS
             postSet: function(old, nu){
                 var oldName = old?old.name:old;
                 var nuName = nu?nu.name:nu; 
-                console.log("entrySelection changed from " + oldName + " to " + nuName); 
+                console.log('entrySelection changed from ' + oldName + ' to ' + nuName); 
             }
         },
         {
@@ -220,15 +220,15 @@ foam.CLASS
             documentation: 'toggles the visibility of Rows. ', 
             factory: function(){return []; },
             postSet: function(old, nu){
-                console.log("visibleRowIds post set: " + old + " --> " + nu); 
+                console.log('visibleRowIds post set: ' + old + ' --> ' + nu); 
                 // if old and nu are both not arrays, show everything. 
                 if (!foam.Array.isInstance(nu) && !foam.Array.isInstance(old)){
-                    console.log("old and nu both not arrays"); 
+                    console.log('old and nu both not arrays'); 
                     return;
                 }
                 // if array of visibleRowIds are unchanged, do nothing. 
                 if (foam.Array.isInstance(nu) && foam.Array.isInstance(old) && foam.Array.compare(nu, old) === 0){
-                    console.log("old and nu are the same"); 
+                    console.log('old and nu are the same'); 
                     return;
                 }
                 if (foam.Array.isInstance(nu)){
@@ -238,9 +238,9 @@ foam.CLASS
                     }else {
                         this.rowArray.forEach(function(row){
                             // upon the change of visibility
-                            var key = row[0]?row[0]:""; 
+                            var key = row[0]?row[0]:''; 
                             if ((nu.indexOf(key) == -1) || (!old || old.indexOf(key) == -1 )){
-                                console.log("changing visibility of " + key); 
+                                console.log('changing visibility of ' + key); 
                                 row[1].enableCls(this.myCls('hidden'), (nu.indexOf(key)==-1)?true:false); 
                             }
                         }.bind(this));
@@ -261,7 +261,7 @@ foam.CLASS
             this.cssClass(this.myCls('grid-table')).
             start('table').
                 add(this.body$).
-            end("table");
+            end('table');
 
         },
         
@@ -322,7 +322,7 @@ foam.CLASS
                     this.headerRow = r;
                 } else {
                     var key;
-                    if (! this.rowPropertiesArray[i]) key = "";
+                    if (! this.rowPropertiesArray[i]) key = '';
                     else {
                         key = (this.matchRowId || this.rowPropertiesArray[i].id)?this.rowPropertiesArray[i].id:this.rowPropertiesArray[i]; 
                     }

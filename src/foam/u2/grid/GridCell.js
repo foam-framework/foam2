@@ -5,13 +5,13 @@ foam.CLASS
     extends: 'foam.u2.Element',
 
     imports: [
-        "entrySelection",
+        'entrySelection',
         //cell selectoin is currently disabled, because it conflicts with entry selection.
         
-        "rowSelectionProperty",
-        "colSelectionProperty",
-        "rowHeaderSelectionProperty",
-        "colHeaderSelectionProperty",
+        'rowSelectionProperty',
+        'colSelectionProperty',
+        'rowHeaderSelectionProperty',
+        'colHeaderSelectionProperty',
         'colHeaderUndefinedMatch',
         'rowHeaderUndefinedMatch', 
     ],
@@ -203,7 +203,7 @@ foam.CLASS
                 }else if (prop.cls_.name == 'Date'){
                    return Query.util.inDay(prop, currMatchId);
                 } else {
-                    if (typeof(match) === typeof(prop) && typeof(prop)!== "object"){
+                    if (typeof(match) === typeof(prop) && typeof(prop)!== 'object'){
                         // if both are say, object, string or numbers
                         return this.EQ(prop, match); 
                     }else {
@@ -238,14 +238,14 @@ foam.CLASS
                 d.select().then(function(result){
                     
                     var div = foam.u2.Element.create('div');
-                    console.log('CELL: row:' + this.rowMatch + ' col:' + this.colMatch + ', ' + result.a.length);
+                    //console.log('CELL: row:' + this.rowMatch + ' col:' + this.colMatch + ', ' + result.a.length);
                     if (! result || !result.a || !result.a.length){
-                        console.log('no result found');
+                        //console.log('no result found');
                     }
                     result.a.forEach(function(entry){
                         var v = this.getEntryView(entry); 
                             v.on('click',  function(){
-                            console.log('entry selected in GridCel.js');
+                            //console.log('entry selected in GridCel.js');
                             this.entrySelection = entry; 
                         }.bind(this)); 
                         div.add(v); 
@@ -258,7 +258,7 @@ foam.CLASS
         },
         
         function getEntryView(entry){
-            console.log(entry);
+            //console.log(entry);
             var v = this.getCellView(entry);
             if (self.entrySelectable){
                 v.sub('SELECTED', function(e){
@@ -366,7 +366,7 @@ foam.CLASS
             isFramed: true,
             code: function(a, b, c){
                 this.pub('ENTRY_SELECTION');
-                console.log('entry selected in GridCel.js');
+                //console.log('entry selected in GridCel.js');
                 if (a.src && a.src.data){
                     this.entrySelection = a.src.data;
                     this.pub('ENTRY_SELECTION'); 
@@ -380,7 +380,7 @@ foam.CLASS
             isFramed: true,
             mergeDelay: 1000, 
             code: function(){
-                console.log('GridCell refreshed');
+                //console.log('GridCell refreshed');
                 this.refreshCell();
                 }
                 
