@@ -248,6 +248,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.SubBoxMessage',
+    'foam.box.Message',
     'foam.box.SkeletonBox'
   ],
 
@@ -265,10 +266,19 @@ foam.CLASS({
       name: 'send',
       code: function(msg) {
         if ( this.SubBoxMessage.isInstance(msg.object) ) {
-          if ( this.registry[msg.object.name].localBox ) {
-            this.registry[msg.object.name].localBox.send(msg.object.object);
+          var name = msg.object.name;
+
+          if ( this.registry[name].localBox ) {
+            // Unpack sub box object... is this right?
+            msg.object = msg.object.object;
+            this.registry[name].localBox.send(msg);
           } else {
-            // TODO: Error case if no sub box found
+            if ( msg.attributes.errorBox ) {
+              msg.attributes.errorBox.send(
+                this.Message.create({
+                  object: this.NoSuchNameException.create({ name: name })
+                }));
+            }
           }
         } else {
           this.registrySkeleton.send(msg);
@@ -754,18 +764,18 @@ foam.CLASS({
 
       var replyBox = message.attributes.replyBox;
 
+      var self = this;
+
       if ( p instanceof Promise ) {
         p.then(
           function(data) {
-            // Do we need to package data into a message?
-            replyBox.send(this.Message.create({
-              object: this.RPCReturnMessage.create({ data: data })
+            replyBox.send(self.Message.create({
+              object: self.RPCReturnMessage.create({ data: data })
             }));
           },
           function(error) {
-            // TODO
             message.attributes.errorBox && message.attributes.errorBox.send(
-              this.Message.create({
+              self.Message.create({
                 object: error
               }));
           });
