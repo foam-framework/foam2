@@ -507,11 +507,11 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      if ( this.RPCReturnMessage.isInstance(msg) ) {
-        this.resolve_(msg.data);
+      if ( this.RPCReturnMessage.isInstance(msg.object) ) {
+        this.resolve_(msg.object.data);
         return;
       }
-      this.reject_(msg);
+      this.reject_(msg.object);
     }
   ]
 });
