@@ -41,6 +41,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'NullSink',
@@ -51,6 +52,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
@@ -58,16 +60,11 @@ foam.INTERFACE({
     {
       name: 'f',
       args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
-      ],
-      javaReturns: 'Object'
+        'obj'
+      ]
     },
     {
-      name: 'partialEval',
-      javaReturns: 'foam.mlang.Expr'
+      name: 'partialEval'
     }
   ]
 });
@@ -79,8 +76,6 @@ foam.CLASS({
   extends: 'FObjectProperty',
 
   properties: [
-    ['javaType', 'foam.mlang.Expr'],
-    ['javaJSONParser', 'foam.lib.json.ExprParser'],
     {
       name: 'adapt',
       value: function(_, o) {
@@ -116,36 +111,25 @@ foam.CLASS({
 foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
+
   methods: [
     {
       name: 'f',
       args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
-      ],
-      javaReturns: 'boolean'
+        'obj'
+      ]
     },
     {
-      name: 'partialEval',
-      javaReturns: 'foam.mlang.predicate.Predicate'
+      name: 'partialEval'
     },
     {
       name: 'toIndex',
-      javaSupport: false,
       args: [
-        {
-          name: 'tail',
-          javaType: 'foam.dao.index.Index'
-        }
-      ],
-      javaReturns: 'foam.dao.index.Index'
+        'tail'
+      ]
     },
     {
-      name: 'toDisjunctiveNormalForm',
-      javaSupport: false,
-      javaReturns: 'foam.mlang.predicate.Predicate'
+      name: 'toDisjunctiveNormalForm'
     }
   ]
 });
@@ -155,8 +139,8 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'PredicateProperty',
   extends: 'FObjectProperty',
+
   properties: [
-    ['javaType', 'foam.mlang.predicate.Predicate'],
     ['of', 'foam.mlang.predicate.Predicate'],
     {
       name: 'adapt',
@@ -175,7 +159,6 @@ foam.CLASS({
   extends: 'FObjectArray',
 
   properties: [
-    [ 'javaType', 'foam.mlang.predicate.Predicate[]' ],
     {
       name: 'of',
       value: 'foam.mlang.predicate.Predicate'
@@ -202,26 +185,27 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'AbstractPredicate',
   abstract: true,
+
   implements: ['foam.mlang.predicate.Predicate'],
+
   methods: [
     function toIndex() {
       return undefined;
     },
+
     function toDisjunctiveNormalForm() {
       return this;
     },
+
     {
       name: 'partialEval',
-      javaCode: 'return this;',
-      // Return this javaReturns when it is inherited properly. (Traits are fixed).
-      javaReturns: 'foam.mlang.predicate.Predicate',
       code: function() {
         return this;
       }
     },
+
     {
       name: 'toString',
-      javaCode: 'return classInfo_.getId();',
       code: function() {
         return this.cls_.name;
       }
@@ -234,16 +218,13 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'AbstractExpr',
   abstract: true,
+
   implements: ['foam.mlang.Expr'],
+
   methods: [
     {
       name: 'partialEval',
-      javaCode: 'return this;',
-      // Return this javaReturns when it is inherited properly. (Traits are fixed).
-      javaReturns: 'foam.mlang.Expr',
-      code: function() {
-        return this;
-      }
+      code: function() { return this; }
     }
   ]
 });
@@ -259,8 +240,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      code: function() { return true; },
-      javaCode: 'return true;'
+      code: function() { return true; }
     }
   ]
 });
@@ -276,7 +256,6 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return false;',
       code: function() { return false; }
     }
   ]
@@ -304,6 +283,7 @@ foam.CLASS({
         return;
       }
     },
+
     function toString() {
       return foam.String.constantize(this.cls_.name) +
           '(' + this.arg1.toString() + ')';
@@ -338,6 +318,7 @@ foam.CLASS({
         return;
       }
     },
+
     function toString() {
       return foam.String.constantize(this.cls_.name) + '(' +
           this.arg1.toString() + ', ' +
@@ -393,12 +374,9 @@ foam.CLASS({
           if ( this.args[i].f(o) ) return true;
         }
         return false;
-      },
-      javaCode: 'for ( int i = 0 ; i < getArgs().length ; i++ ) {\n'
-                + '  if ( getArgs()[i].f(obj) ) return true;\n'
-                + '}\n'
-                + 'return false;\n'
+      }
     },
+
     function partialEval() {
       var newArgs = [];
       var updated = false;
@@ -497,12 +475,9 @@ foam.CLASS({
           if ( ! this.args[i].f(o) ) return false;
         }
         return true;
-      },
-      javaCode: 'for ( int i = 0 ; i < getArgs().length ; i++ ) {\n'
-                + '  if ( ! getArgs()[i].f(obj) ) return false;\n'
-                + '}\n'
-                + 'return true;'
+      }
     },
+
     function partialEval() {
       var newArgs = [];
       var updated = false;
@@ -690,9 +665,6 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'String s1 = (String)getArg1().f(obj);\n'
-                + 'String s2 = (String)getArg2().f(obj);\n'
-                + 'return s1 != null ? s1.indexOf(s2) != -1 : false;\n',
       code: function(o) {
         var s1 = this.arg1.f(o);
         return s1 ? s1.indexOf(this.arg2.f(o)) !== -1 : false;
@@ -721,6 +693,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'StartsWith',
@@ -745,6 +718,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'StartsWithIC',
@@ -764,20 +738,7 @@ foam.CLASS({
         }
 
         return foam.String.startsWithIC(arg1, arg2);
-      },
-      javaCode: 'String arg2 = ((String)getArg2().f(obj)).toUpperCase();\n'
-                + 'Object arg1 = getArg1().f(obj);\n'
-                + 'if ( arg1 instanceof Object[] ) {\n'
-                + '  Object[] values = (Object[])arg1;\n'
-                + '  for ( int i = 0 ; i < values.length ; i++ ) {\n'
-                + '    if ( ((String)values[i]).toUpperCase().startsWith(arg2) ) {\n'
-                + '      return true;\n'
-                + '    }\n'
-                + '  }\n'
-                + '  return false;'
-                + '}'
-                + 'String value = (String)arg1;\n'
-                + 'return value.toUpperCase().startsWith(arg2);\n'
+      }
     }
   ]
 });
@@ -895,8 +856,7 @@ foam.CLASS({
       name: 'f',
       code: function() {
         return this.value;
-      },
-      javaCode: 'return getValue();'
+      }
     },
 
     function toString_(x) {
@@ -955,12 +915,11 @@ foam.CLASS({
 
         // First check is so that EQ(Class.PROPERTY, null | undefined) works.
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
-      },
-      // TODO(adamvy): Better optional than all the Comparable casts?
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
+      }
     }
   ]
 });
+
 
 /** Binary expression for inequality of two arguments. */
 foam.CLASS({
@@ -973,8 +932,7 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
-      },
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) != 0;'
+      }
     }
   ]
 });
@@ -991,8 +949,7 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) < 0;
-      },
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) < 0;'
+      }
     }
   ]
 });
@@ -1009,8 +966,7 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) <= 0;
-      },
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) <= 0;'
+      }
     }
   ]
 });
@@ -1027,8 +983,7 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) > 0;
-      },
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) > 0;'
+      }
     }
   ]
 });
@@ -1045,8 +1000,7 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         return foam.util.compare(this.arg1.f(o), this.arg2.f(o)) >= 0;
-      },
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) >= 0;'
+      }
     }
   ]
 });
@@ -1087,13 +1041,14 @@ foam.CLASS({
       name: 'f',
       code: function(obj) {
         return ! this.arg1.f(obj);
-      },
-      javaCode: 'return ! getArg1().f(obj);'
+      }
     },
+
     function toString() {
       return foam.String.constantize(this.cls_.name) +
           '(' + this.arg1.toString() + ')';
     },
+
     /*
       TODO: this isn't ported to FOAM2 yet.
     function partialEval() {
@@ -1115,14 +1070,17 @@ foam.CLASS({
   ]
 });
 
+
 /** Unary expression for a generic keyword search. */
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Keyword',
   extends: 'foam.mlang.predicate.Unary',
+
   requires: [
     'foam.core.String'
   ],
+
   methods: [
     function f(obj) {
       var arg = this.arg1.f(obj);
@@ -1154,24 +1112,29 @@ foam.CLASS({
     function f(o) {
       return this.arg1.f(o);
     },
+
     function put(o) {
       this.delegate.put( this.f(o) );
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Mul',
+
   implements: [
     'foam.mlang.predicate.Binary'
   ],
+
   methods: [
     function f(o) {
       return this.arg1.f(o) * this.arg2.f(o);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -1203,6 +1166,7 @@ foam.CLASS({
       this.groupKeys.sort(opt_comparator || this.arg1.comparePropertyValues);
       return this.groupKeys;
     },
+
     function putInGroup_(key, obj) {
       var group = this.groups.hasOwnProperty(key) && this.groups[key];
       if ( ! group ) {
@@ -1212,6 +1176,7 @@ foam.CLASS({
       }
       group.put(obj);
     },
+
     function put(obj) {
       var key = this.arg1.f(obj);
       if ( Array.isArray(key) ) {
@@ -1228,12 +1193,14 @@ foam.CLASS({
         this.putInGroup_(key, obj);
       }
     },
-    function eof() {
-    },
+
+    function eof() { },
+
     function clone() {
       // Don't use the default clone because we don't want to copy 'groups'.
       return this.cls_.create({ arg1: this.arg1, arg2: this.arg2 });
     },
+
     function toString() {
       return this.groups.toString();
     }
@@ -1269,37 +1236,28 @@ foam.INTERFACE({
     {
       name: 'compare',
       args: [
-        {
-          name: 'o1',
-          javaType: 'Object'
-        },
-        {
-          name: 'o2',
-          javaType: 'Object'
-        }
+        'o1',
+        'o2'
       ]
     },
     {
       name: 'toIndex',
-      javaSupport: false,
       args: [
-        {
-          name: 'tail'
-        }
+        'tail'
       ]
     },
     {
       /** Returns remaning ordering without this first one, which may be the
         only one. */
-      name: 'orderTail',
+      name: 'orderTail'
     },
     {
       /** The property, if any, sorted by this ordering. */
-      name: 'orderPrimaryProperty',
+      name: 'orderPrimaryProperty'
     },
     {
       /** Returns 1 or -1 for ascending/descending */
-      name: 'orderDirection',
+      name: 'orderDirection'
     }
   ]
 });
@@ -1308,24 +1266,20 @@ foam.INTERFACE({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  flags: { noWarnOnRefinesAfterCreate: true },
   implements: [ 'foam.mlang.order.Comparator' ],
 
   methods: [
     {
       name: 'orderTail',
-      code: function() { return; },
-      javaCode: 'return null;'
+      code: function() { return; }
     },
     {
       name: 'orderPrimaryProperty',
-      code: function() { return this; },
-      javaCode: 'return this;'
+      code: function() { return this; }
     },
     {
       name: 'orderDirection',
-      code: function() { return 1; },
-      javaCode: 'return 1;'
+      code: function() { return 1; }
     }
   ]
 });
@@ -1350,15 +1304,13 @@ foam.CLASS({
       name: 'compare',
       code: function(o1, o2) {
         return -1 * this.arg1.compare(o1, o2);
-      },
-      javaCode: 'return -1 * getArg1().compare(o1, o2);'
+      }
     },
     {
       name: 'toString',
       code: function() {
         return 'DESC(' + this.arg1.toString() + ')';
-      },
-      javaCode: 'return "DESC(" + getArg1().toString() + ")";'
+      }
     },
     {
       name: 'toIndex',
@@ -1368,37 +1320,30 @@ foam.CLASS({
         } else {
           return;
         }
-      },
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
-        'if ( arg1 != null ) {' +
-          'return arg1.toIndex(tail);'+
-        '}'+
-        'return null;'
+      }
     },
     {
       name: 'orderTail',
-      code: function() { return; },
-      javaCode: 'return null;'
+      code: function() { return; }
     },
     {
       name: 'orderPrimaryProperty',
-      code: function() { return this.arg1; },
-      javaCode: 'return getArg1();'
+      code: function() { return this.arg1; }
     },
     {
       name: 'orderDirection',
       code: function() {
         return -1 * this.arg1.orderDirection();
-      },
-      javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
-        'ret.setSrcOrder(this); return ret;'
+      }
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'ThenBy',
+
   implements: ['foam.mlang.order.Comparator'],
 
   properties: [
@@ -1421,7 +1366,7 @@ foam.CLASS({
         return a;
       },
       name: 'arg2'
-    },
+    }
   ],
 
   methods: [
@@ -1430,19 +1375,14 @@ foam.CLASS({
       code: function(o1, o2) {
         // an equals of arg1.compare is falsy, which will then hit arg2
         return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
-      },
-      javaCode: 'int c = getArg1().compare(o1, o2); ' +
-        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
-        'return c;'
+      }
     },
     {
       name: 'toString',
       code: function() {
         return 'THEN_BY(' + this.arg1.toString() + ', ' +
           this.arg2.toString() + ')';
-      },
-      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
-        '"," + getArg1().toString() + ")";'
+      }
     },
     {
       name: 'toIndex',
@@ -1452,33 +1392,25 @@ foam.CLASS({
         } else {
           return;
         }
-      },
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
-        'foam.mlang.order.Comparator arg2 = getArg2();' +
-        'if ( arg1 != null && arg2 != null ) {' +
-          'return arg1.toIndex(arg2.toIndex(tail));' +
-        '}' +
-        'return null;'
+      }
     },
     {
       name: 'orderTail',
-      code: function() { return this.arg2; },
-      javaCode: 'return getArg2();'
+      code: function() { return this.arg2; }
     },
     {
       name: 'orderPrimaryProperty',
-      code: function() { return this.arg1.orderPrimaryProperty(); },
-      javaCode: 'return getArg1().orderPrimaryProperty();'
+      code: function() { return this.arg1.orderPrimaryProperty(); }
     },
     {
       name: 'orderDirection',
       code: function() {
         return this.arg1.orderDirection();
-      },
-      javaCode: 'return getArg1().orderDirection();'
+      }
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.order',
@@ -1489,7 +1421,7 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'compareFn'
-    },
+    }
   ],
 
   methods: [
@@ -1507,25 +1439,24 @@ foam.CLASS({
     },
     {
       name: 'orderTail',
-      code: function() { return undefined; },
-      javaCode: 'return null;'
+      code: function() { return undefined; }
     },
     {
       /** TODO: allow user to set this to match the given function */
       name: 'orderPrimaryProperty',
-      code: function() { return undefined; },
-      javaCode: 'return null;'
+      code: function() { return undefined; }
     },
     {
       name: 'orderDirection',
-      code: function() { return 1; },
-      javaCode: 'return 1;'
+      code: function() { return 1; }
     }
   ]
 });
 
+
 foam.LIB({
   name: 'foam.compare',
+
   methods: [
     function desc(c) {
       return foam.mlang.order.Desc.create({ arg1: c });
@@ -1557,7 +1488,6 @@ foam.LIB({
 });
 
 
-
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Max',
@@ -1585,19 +1515,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Sum',
   extends: 'foam.dao.AbstractSink',
+
   implements: [
     'foam.mlang.predicate.Unary'
   ],
+
   properties: [
     {
       name: 'value',
       value: 0
     }
   ],
+
   methods: [
     function put(obj) {
       this.value += this.arg1.f(obj);
@@ -1610,6 +1544,7 @@ foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Dot',
   extends: 'foam.mlang.predicate.Binary',
+
   methods: [
     function f(o) {
       return this.arg2.f(this.arg1.f(o));
@@ -1695,6 +1630,7 @@ foam.CLASS({
     function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang',

@@ -833,20 +833,12 @@ foam.CLASS({
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0, property ; property = ps[i] ; i++ ) {
-        var value    = property.f(this);
-        var otherVal = property.f(other);
-
+        // FUTURE: move this to a refinement in case not needed?
         // FUTURE: add nested Object support
         // FUTURE: add patch() method?
-        if ( Array.isArray(value) ) {
-          var subdiff = foam.Array.diff(value, otherVal);
-          if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
-            d[property.name] = subdiff;
-          }
-        } else if ( ! foam.util.equals(value, otherVal) ) {
-          // if the primary value is undefined, use the compareTo of the other
-          d[property.name] = otherVal;
-        }
+
+        // Property adds its difference(s) to "d".
+        property.diffProperty(this, other, d, property);
       }
 
       return d;
@@ -872,6 +864,8 @@ foam.CLASS({
       /** Create a deep copy of this object. **/
       var m = {};
       for ( var key in this.instance_ ) {
+        if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
+
         var value = this[key];
         this.cls_.getAxiomByName(key).cloneProperty(value, m);
       }
@@ -895,8 +889,11 @@ foam.CLASS({
 </pre>
      If an FObject is supplied, it doesn't need to be the same class as 'this'.
      Only properties that the two classes have in common will be copied.
+     Null or undefined values are ignored.
      */
     function copyFrom(o, opt_warn) {
+      if ( ! o ) return this;
+
       // When copying from a plain map, just enumerate the keys
       if ( o.__proto__ === Object.prototype || ! o.__proto__ ) {
         for ( var key in o ) {

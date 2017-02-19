@@ -253,6 +253,11 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'List',
+  extends: 'foam.core.Object'
+});
 
 foam.CLASS({
   package: 'foam.core',
@@ -414,6 +419,12 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
+    [
+      'fromJSON',
+      function(value, opt_ctx) {
+        return foam.json.parse(value, null, opt_ctx);
+      }
+    ],
     ['factory', function() { return {} }],
     'of'
   ]
@@ -456,5 +467,20 @@ foam.CLASS({
   properties: [
     { class: 'String',  name: 'name' },
     { class: 'Boolean', name: 'abstract' }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'Property',
+
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
+  properties: [
+    {
+      name: 'of'
+    }
   ]
 });

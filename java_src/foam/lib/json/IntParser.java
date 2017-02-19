@@ -4,7 +4,7 @@ import foam.lib.parse.*;
 
 public class IntParser implements Parser {
   public PStream parse(PStream ps, ParserContext x) {
-    int n = 0;
+    long n = 0;
 
     boolean negate = false;
 
@@ -29,6 +29,9 @@ public class IntParser implements Parser {
       if ( Character.isDigit(c) ) {
         n *= 10;
         n += Character.digit(c, 10);
+        if (n > Integer.MAX_VALUE) {
+            return null;
+        }
       } else {
         break;
       }
@@ -37,6 +40,6 @@ public class IntParser implements Parser {
 
     if ( negate ) n *= -1;
 
-    return ps.setValue(n);
+    return ps.setValue((int)n);
   }
 }
