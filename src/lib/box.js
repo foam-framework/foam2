@@ -146,6 +146,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message',
+      transient: true,
       expression: function(name) {
         return 'Could not find registration for ' + name;
       }
