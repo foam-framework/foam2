@@ -532,29 +532,60 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.dao',
-  name: 'ClientDAO',
+  name: 'BaseClientDAO',
   extends: 'foam.dao.AbstractDAO',
-
   properties: [
     {
       class: 'Stub',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      eventProxy: true,
       methods: [
         'put',
         'remove',
-        'select',
         'removeAll',
+        'select',
         'find'
       ]
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ClientDAO',
+  extends: 'foam.dao.BaseClientDAO',
+  requires: [
+    'foam.core.Serializable'
+  ],
+  methods: [
+    function select(sink, skip, limit, order, predicate) {
+      if ( ! this.Serializable.isInstance(sink) ) {
+        var self = this;
+
+        return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
+          var items = result.a;
+          var fc = self.FlowControl.create();
+
+          for ( var i = 0 ; i < items.length ; i++ ) {
+            if ( fc.stopped ) break;
+            if ( fc.errorEvt ) {
+              sink.error(fc.errorEvt);
+              return Promise.reject(fc.errorEvt);
+            }
+
+            sink.put(items[i], fc);
+          }
+
+          sink.eof();
+
+          return sink;
+        });
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
