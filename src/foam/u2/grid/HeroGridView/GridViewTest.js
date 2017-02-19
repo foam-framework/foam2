@@ -39,9 +39,9 @@ foam.CLASS({
     'Hero', 
     'foam.u2.TableView',
     
-    'foam.u2.grid.NewGridView',
+    'foam.u2.grid.GridView',
     
-    'com.serviceecho.dao.ReferenceDAO', 
+    'foam.dao.ReferenceDAO', 
     ],
   
   imports: [
@@ -67,7 +67,7 @@ foam.CLASS({
        }, 
     
     function init() {
-        this.gridView = this.NewGridView.create({
+        this.gridView = this.GridView.create({
                         of: this.Hero,
                         data$: this.HeroDAO$, 
                         rowProperty: this.Hero.ORGANIZATION_ID, //eq(rowProperty, rowProperties[i])

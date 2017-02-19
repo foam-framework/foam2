@@ -1,6 +1,6 @@
 foam.CLASS({
+    package: 'foam.dao',
     name: 'ReferenceDAO',
-    package: 'com.serviceecho.dao',
     extends: 'foam.dao.ProxyDAO',
     
     documentation: {

@@ -82,18 +82,20 @@ foam.CLASS({
        }, 
     
     function init() {
-        
-        this.gridView = this.GridView.create({
-                of: this.Hero,
-                cellView: 'HeroCellView', 
-                data$: this.filterController.filteredDAO$, 
-                rowProperty: this.Hero.ORGANIZATION, //eq(rowProperty, rowProperties[i])
-                colProperty: this.Hero.STATUS, 
-                rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
-                matchRowId: true, 
-                colPropertiesArray: ['alive', 'dead', 'MIA', undefined], //or pass in colDAO
-                rowDAOMatchUndefined: true,
-        });
+                this.gridView = this.GridView.create({
+                        of: this.Hero,
+                        //data$: this.HeroDAO$,
+                        data$: this.filterController.filteredDAO$, 
+                        rowProperty: this.Hero.ORGANIZATION_ID, //eq(rowProperty, rowProperties[i])
+                        cellView: 'HeroCellView',
+                        cellWrapperClass: 'NewHeroWrapperView',  
+                        colProperty: this.Hero.STATUS, 
+                        rowPropertiesDAO: this.TeamDAO, // or pass in rowDAO //make it dao based.
+                        colPropertiesArray: ['alive', 'dead', 'MIA', undefined], //or pass in colDAO
+                        rowDAOMatchUndefined: true,
+                        wrapperDAOClass: 'com.serviceecho.dao.ReferenceDAO', 
+                });
+                
         
         this.filterController.tableView$ = this.gridView$;
         

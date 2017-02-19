@@ -90,7 +90,7 @@ foam.CLASS({
         searchView: 'foam.u2.search.WeekSearchView',
         //searchView: 'foam.u2.DateView',  
         factory: function(){
-            return SE.util.startOfToday();
+            return foam.DateTime.startOfToday();
         },
         validator: function(obj) {
                 if (  obj.lastSeenAlive && obj.birthDate && (obj.lastSeenAlive < obj.birthDate) ) return 'Must be after birth date, unless you are a time traveller';
@@ -98,9 +98,9 @@ foam.CLASS({
         gridHeaderView: function(value, obj, t){
             var d = new Date(value);
             var p1 = foam.u2.Element.create('p');
-            p1.add(SE.util.getDayName(d));
+            p1.add(foam.DateTime.getDayName(d));
             var p2 = foam.u2.Element.create('p');
-            p2.add(d.getDate() + "" + SE.util.getDayCardinal(d) + " " + SE.util.getShortMonthName(d));
+            p2.add(d.getDate() + "" + foam.DateTime.getDayCardinal(d) + " " + foam.DateTime.getShortMonthName(d));
             return foam.u2.Element.create('div').add(p1).add(p2); 
         },
     },
