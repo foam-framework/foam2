@@ -213,41 +213,14 @@ foam.CLASS
         },
         {
             name: 'rowArray',
-            factory: function(){return []; }
+            factory: function(){return []; },
         }, 
         {
             name: 'visibleRowIds',
             documentation: 'toggles the visibility of Rows. ', 
             factory: function(){return []; },
             postSet: function(old, nu){
-                console.log('visibleRowIds post set: ' + old + ' --> ' + nu); 
-                // if old and nu are both not arrays, show everything. 
-                if (!foam.Array.isInstance(nu) && !foam.Array.isInstance(old)){
-                    console.log('old and nu both not arrays'); 
-                    return;
-                }
-                // if array of visibleRowIds are unchanged, do nothing. 
-                if (foam.Array.isInstance(nu) && foam.Array.isInstance(old) && foam.Array.compare(nu, old) === 0){
-                    console.log('old and nu are the same'); 
-                    return;
-                }
-                if (foam.Array.isInstance(nu)){
-                    if (! foam.Array.isInstance(this.rowArray)) return;
-                    if (!nu.length){
-                        this.rowArray.forEach(function(row){row[1].enableCls(this.myCls('hidden'), false);}.bind(this));
-                    }else {
-                        this.rowArray.forEach(function(row){
-                            // upon the change of visibility
-                            var key = row[0]?row[0]:''; 
-                            if ((nu.indexOf(key) == -1) || (!old || old.indexOf(key) == -1 )){
-                                console.log('changing visibility of ' + key); 
-                                row[1].enableCls(this.myCls('hidden'), (nu.indexOf(key)==-1)?true:false); 
-                            }
-                        }.bind(this));
-                    }
-                }
-                
-                
+                this.updateRowVisibility(old, nu); 
             }
         }
         
@@ -332,8 +305,8 @@ foam.CLASS
                     this.cellArray.push(currCellRow); 
                 }
             }
-            this.body = b; 
-
+            this.body = b;
+            this.updateRowVisibility(); 
         },
         
         function populateRowPropertiesArray()
@@ -373,7 +346,53 @@ foam.CLASS
                     this.refreshGrid();
                 }.bind(this));
             }
+        },
+        
+        // if no old,nu specified, then up date everything.
+        //else only toggle the visibility of rows that are changed. 
+        function updateRowVisibility(old, nu){
+            // if no arguments, redraw everything: i.e., pretend old is undefined, nu is what ever it is now. 
+            if (arguments.length ===0){
+                if (!this.visibleRowIds.length){
+                    this.rowArray.forEach(function(row){row[1].enableCls(this.myCls('hidden'), false);}.bind(this));
+                }else {
+                    this.rowArray.forEach(function(row){
+                        // upon the change of visibility
+                        var key = row[0]?row[0]:''; 
+                        row[1].enableCls(this.myCls('hidden'), (this.visibleRowIds.indexOf(key)==-1)?true:false); 
+                    }.bind(this));
+                }
+                return; 
+            }
+            
+            console.log('visibleRowIds post set: ' + old + ' --> ' + nu); 
+            // if old and nu are both not arrays, show everything. 
+            if (!foam.Array.isInstance(nu) && !foam.Array.isInstance(old)){
+                console.log('old and nu both not arrays'); 
+                return;
+            }
+            // if array of visibleRowIds are unchanged, do nothing. 
+            if (foam.Array.isInstance(nu) && foam.Array.isInstance(old) && foam.Array.compare(nu, old) === 0){
+                console.log('old and nu are the same'); 
+                return;
+            }
+            if (foam.Array.isInstance(nu)){
+                if (! foam.Array.isInstance(this.rowArray)) return;
+                if (!nu.length){
+                    this.rowArray.forEach(function(row){row[1].enableCls(this.myCls('hidden'), false);}.bind(this));
+                }else {
+                    this.rowArray.forEach(function(row){
+                        // upon the change of visibility
+                        var key = row[0]?row[0]:''; 
+                        if ((nu.indexOf(key) == -1) || (!old || old.indexOf(key) == -1 )){
+                            console.log('changing visibility of ' + key + ", " + row[1].id); 
+                            row[1].enableCls(this.myCls('hidden'), (nu.indexOf(key)==-1)?true:false); 
+                        }
+                    }.bind(this));
+                }
+            }   
         }
+        
         
     ],
     
@@ -444,6 +463,6 @@ foam.CLASS
                 if (this.colPropertiesDAO)
                 this.populateColPropertiesArray(); 
             }
-        }
-    ]
+        },
+        ]
 });
