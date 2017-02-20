@@ -122,6 +122,8 @@ foam.CLASS({
     /**
       Selects the contents of this DAO into a sink, then listens to keep
       the sink up to date. Returns a promise that resolves with the subscription.
+      TODO: This will probably miss events that happen during the select but before the
+      listen call.  We should check if this is the case and fix it if so.
     */
     function pipe(sink) {
       var self = this;
@@ -444,5 +446,3 @@ foam.CLASS({
     }
   ]
 });
-
-
