@@ -8,7 +8,7 @@ foam.CLASS
     [
         'foam.u2.Element', 
         'foam.u2.grid.GridCell',
-        'foam.u2.grid.GridHeaderCell', 
+        'foam.u2.grid.GridHeaderCell' 
     ],
 
     exports: [
@@ -21,7 +21,7 @@ foam.CLASS
         'rowHeaderSelectionProperty',
         'colHeaderSelectionProperty',
         'rowHeaderUndefinedMatch',
-        'colHeaderUndefinedMatch',
+        'colHeaderUndefinedMatch'
         
     ],
     
@@ -59,7 +59,7 @@ foam.CLASS
         },
         {
           class: 'Class',
-          name: 'of', 
+          name: 'of' 
         },
 
         /*
@@ -70,11 +70,11 @@ foam.CLASS
             //a PROPERTY object from foam2
             //e.g. myFieldworker.STATUS
             name: 'colProperty',
-            documentation: 'foam.core.Property Object or string. ', 
+            documentation: 'foam.core.Property Object or string. '
         },
         {
             name: 'rowProperty',
-            documentation: 'foam.core.Property Object or string. ', 
+            documentation: 'foam.core.Property Object or string. '
         },
         /*
         //implement later. order rows by some property, up or down.
@@ -88,32 +88,32 @@ foam.CLASS
         {
             //TODO: 
             name: 'makeRowPredicate',
-            class: 'Function', 
+            class: 'Function'
         },
         
         {
             name: 'makeColPredicate',
-            class: 'Function', 
+            class: 'Function'
         }, 
 
         {
             name: 'rowDAOMatchUndefined',
             documentation: 'allowing match for null or undefined. \n the alternative is to have a staging area.', 
             class: 'Boolean', 
-            value: false, 
+            value: false
         }, 
         {
             name: 'colDAOMatchUndefined',
             class: 'Boolean', 
-            value: false, 
+            value: false
         },
         {
             name:'colHeaderUndefinedMatch',
-            value: '_col',
+            value: '_col'
         },
         {
             name:'rowHeaderUndefinedMatch',
-            value: '_row',
+            value: '_row'
         },
 
         /*
@@ -167,18 +167,18 @@ foam.CLASS
         },
         {
             name: 'rowHeaderSelectionProperty',
-            documentation: 'for row header selection', 
+            documentation: 'for row header selection'
         }, 
         {
             name: 'colHeaderSelectionProperty',
-            documentation: 'for column header selection',
+            documentation: 'for column header selection'
         }, 
         {
             name: 'rowSelectionProperty',
-            documentation: 'for normal cell selection', 
+            documentation: 'for normal cell selection'
         },
         {
-            name: 'colSelectionProperty', 
+            name: 'colSelectionProperty'
         }, 
         
         /*
@@ -187,16 +187,16 @@ foam.CLASS
         {
             class: 'Class',
             documentation: 'rendering of each entry of the cell. ', 
-            name: 'cellView', 
+            name: 'cellView'
         },
         {
             class: 'Class',
             documentation: 'wrapperDAO to load extra property objects for the data, if necessary. e.g., ReferenceDAO. ', 
-            name: 'wrapperDAOClass', 
+            name: 'wrapperDAOClass'
         }, 
         {
             name: 'cellWrapperClass',
-            class: 'Class', 
+            class: 'Class'
         }, 
         
         /*
@@ -205,15 +205,15 @@ foam.CLASS
         
         {
             name: 'body',
-            factory: function(){this.Element.create().setNodeName('tbody');}, 
+            factory: function(){this.Element.create().setNodeName('tbody');}
         }, 
         {
             name: 'cellArray',
-            factory: function(){return []; },
+            factory: function(){return []; }
         },
         {
             name: 'rowArray',
-            factory: function(){return []; },
+            factory: function(){return []; }
         }, 
         {
             name: 'visibleRowIds',
@@ -249,7 +249,7 @@ foam.CLASS
                 
                 
             }
-        },
+        }
         
     ],
 
@@ -444,12 +444,6 @@ foam.CLASS
                 if (this.colPropertiesDAO)
                 this.populateColPropertiesArray(); 
             }
-        }, 
-                    
-
-
-    ],
-
-
-
+        }
+    ]
 });

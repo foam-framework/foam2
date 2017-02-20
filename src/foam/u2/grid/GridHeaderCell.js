@@ -8,7 +8,7 @@ foam.CLASS
         'rowHeaderSelectionProperty',
         'colHeaderSelectionProperty',
         'colHeaderUndefinedMatch',
-        'rowHeaderUndefinedMatch', 
+        'rowHeaderUndefinedMatch'
     ],
 
     
@@ -42,7 +42,7 @@ foam.CLASS
         'of',
         {
             name: 'data',
-            documentaiton: 'the property, e.g., an instance of ORGANIZATION_ID',
+            documentaiton: 'the property, e.g., an instance of ORGANIZATION_ID'
             /*
             postSet: function(old, nu){
                 if (nu === undefined){
@@ -53,22 +53,22 @@ foam.CLASS
         },
         {
             name: 'property',
-            documentation: 'the property object it self or string, i.e., ORGANIZATION_ID', 
+            documentation: 'the property object it self or string, i.e., ORGANIZATION_ID'
         },
         {
             name: 'isRowHeader',
             value: false, 
-            class: 'Boolean', 
+            class: 'Boolean' 
         },
         {
             name: 'isColHeader',
             value: false, 
-            class: 'Boolean', 
+            class: 'Boolean' 
         },
         {
             name: 'selected',
             value: false,
-            class: 'Boolean', 
+            class: 'Boolean'
         }, 
         
         /*
@@ -93,7 +93,7 @@ foam.CLASS
                     return data.label?data.label:data.name;
                 }
             }
-        },
+        }
 
       ], 
     methods: [
@@ -132,9 +132,7 @@ foam.CLASS
                 p.add('N/A');
             } 
             this.cell = p;
-            
-        },
-        
+        }
         
     ],
     
@@ -153,8 +151,6 @@ foam.CLASS
                     if (this.isRowHeader) this.rowHeaderSelectionProperty = undefined;
                     else if (this.isColHeader) this.colHeaderSelectionProperty = undefined;
                 }
-                
-                
             }
                 
         },
@@ -191,10 +187,7 @@ foam.CLASS
             code: function(){
                 this.refreshCell();
                 }
-                
-        },       
+        }    
     ]
-    
-    
-    
+
 }); 

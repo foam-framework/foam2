@@ -8,11 +8,11 @@ foam.CLASS ((function() {
   
     requires: [
       "foam.dao.EasyDAO",
-      "foam.dao.PromisedDAO",
+      "foam.dao.PromisedDAO"
       ],
     
   implements: [
-            'foam.box.Context',
+            'foam.box.Context'
     ],
   
   properties: [
@@ -57,7 +57,7 @@ foam.CLASS ((function() {
             {name: "Elvis Parsley", id: "EP",
             lastSeenAlive: (new Date()).setDate( d.getDate() + 3)}, 
             {name: "Harry Potter", id:"HP", status: "alive", lastSeenAlive: null},
-            {name: "Snape", id: "S", status: "dead", lastSeenAlive: null}, 
+            {name: "Snape", id: "S", status: "dead", lastSeenAlive: null}
             
         ];
     
@@ -110,9 +110,6 @@ foam.CLASS ((function() {
     var heroFactory = factoryFct.apply(this, [Hero, "HeroDAO", heroes, heroTestData]);
     c.exports.push('HeroDAO');
     c.properties.push({name: 'HeroDAO', factory: heroFactory});
-    
 
-
-    
     return c;
 })());

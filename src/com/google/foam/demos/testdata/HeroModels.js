@@ -4,41 +4,41 @@ foam.CLASS({
         {
             class: 'String', 
             name: 'referenceDAOKey',
-            documentation: 'get the property object from property Id through DAO', 
+            documentation: 'get the property object from property Id through DAO' 
         },
         {
             class: 'String', 
             name: 'referenceProperty',
-            documentation: 'the property object gotten from DAO specifed by referenceDAOKey', 
+            documentation: 'the property object gotten from DAO specifed by referenceDAOKey'
         }, 
         {
             class: 'Function',
-            name: 'validator',
+            name: 'validator'
         },
         {
             class: 'Function',
             name: 'tableFormatter',
-            factory: function() { return function(value, obj, t){return value; }; },
+            factory: function() { return function(value, obj, t){return value; }; }
         },
         {
             class: 'Function',
             name: 'gridHeaderView',
-            factory: function() { return function(value, obj, t){return value; }; },
+            factory: function() { return function(value, obj, t){return value; }; }
         },
         {
             name: 'sortable',
             class: 'Boolean',
-            value: true, 
+            value: true
         },
         {
             name: 'groupByProperty',
             class: 'String',
-            value: 'id',
+            value: 'id'
         },
         {
             name: 'groupByLabel',
             class: 'String',
-            value: 'label',
+            value: 'label'
         },
         /*{
             name: 'salesforceType',
@@ -71,7 +71,7 @@ foam.CLASS({
     {
         name: 'fieldworker',
         referenceProperty: 'fieldworkerId',
-        referenceDAO: 'fieldworkerDAO', 
+        referenceDAO: 'fieldworkerDAO'
     },
     
     {
@@ -82,7 +82,7 @@ foam.CLASS({
     },
     {
         class: 'Date', 
-        name: 'birthDate',
+        name: 'birthDate'
     },
     {
         class: 'Date', 
@@ -102,7 +102,7 @@ foam.CLASS({
             var p2 = foam.u2.Element.create('p');
             p2.add(d.getDate() + "" + foam.DateTime.getDayCardinal(d) + " " + foam.DateTime.getShortMonthName(d));
             return foam.u2.Element.create('div').add(p1).add(p2); 
-        },
+        }
     },
     
     {
@@ -110,7 +110,7 @@ foam.CLASS({
         searchView: 'foam.u2.search.GroupBySearchView',
         gridHeaderView: function(value, obj, t){
             return value; 
-        },
+        }
     },
     {
         class: 'String', 
@@ -134,23 +134,6 @@ foam.CLASS({
             
             return foam.util.compare(id1, id2); 
         },
-        //hidden: true,
-        /*
-        postSet: function(old, nu){
-            console.log(this.name + " orgainizationId is set. " + nu);
-            if (!nu){
-                this.clearProperty(this.ORGANIZATION); 
-            }
-            if (nu && old!=nu || (this.organization && nu!= this.organization.id)){
-              this.TeamDAO.find(nu).then(function(organization) {
-                if (this.organizationId != organization.id){
-                    console.log("error. organization should be set after the organizationId, ids should match."); 
-                }
-                  this.organization = organization;
-                
-              }.bind(this));
-            }
-        }*/
     },
     
     {
@@ -170,43 +153,13 @@ foam.CLASS({
         tableFormatter: function(value, data, t){
           return value; 
         },
-            
-        /*
-         * postset should NOT exist. organization should only be changed when organizationid is. 
-        postSet: function(old, nu){
-            if(! nu || ! nu.id){
-                this.clearProperty(this.ORGANIZATION_ID); 
-            }else if (! old || !old.id || (old.id != nu.id)){
-                this.organizationId = nu.id; 
-            }
-        },
-        */
         gridHeaderView: function(value, obj, t){
             return value?value.name:"N/A"; 
-        },
+        }
     }
-    
-    
-
     ],
   
   methods: [
-    /*
-    function init(){
-        this.name$.sub(this.nameUpdate); 
-        this.organizationId$.sub(this.orgUpdate);
-        
-        if (this.organizationId && this.TeamDAO) {
-            this.TeamDAO.find(this.organizationId).then(function(organization) {
-                this.organization = organization;
-            }.bind(this));
-        }
-    },
-    */
-    
-    function validate(){
-      
-    }
   ],
   
   listeners: [
@@ -222,7 +175,7 @@ foam.CLASS({
         code: function(){
             console.log("name Updated. ");
         }
-    },
+    }
 
   ]
   

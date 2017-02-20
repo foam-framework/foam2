@@ -13,11 +13,11 @@ foam.CLASS
         'rowHeaderSelectionProperty',
         'colHeaderSelectionProperty',
         'colHeaderUndefinedMatch',
-        'rowHeaderUndefinedMatch', 
+        'rowHeaderUndefinedMatch'
     ],
     
     implements: [
-        'foam.mlang.Expressions', 
+        'foam.mlang.Expressions'
     ], 
     
     requires: [  
@@ -53,11 +53,11 @@ foam.CLASS
          */
         {
           class: 'Class',
-          name: 'of', 
+          name: 'of' 
         },
         {
             name: 'data',
-            documentation: 'data is not the dao, but the modeled entry it self.',
+            documentation: 'data is not the dao, but the modeled entry it self.'
         },
         
         /*
@@ -65,19 +65,19 @@ foam.CLASS
          */
         {
             class: 'Class',
-            name: 'colProperty',
+            name: 'colProperty'
         },
         {
             class: 'Class',
-            name: 'rowProperty',
+            name: 'rowProperty'
         }, 
         {
             name: 'colMatch',
-            documentation: 'can be an object', 
+            documentation: 'can be an object' 
         }, 
         {
             name: 'rowMatch',
-            documentation: 'can be an object', 
+            documentation: 'can be an object'
         },
 
         /*
@@ -110,13 +110,13 @@ foam.CLASS
         },
         {
             name: 'makeRowPredicate',
-            documentation: 'custom functions for generating predicates',
+            documentation: 'custom functions for generating predicates'
             //easier to test for funciton not set.
             //class: 'Function',
         },
         {
             name: 'makeColPredicate',
-            documentation: 'custom functions for generating predicates',
+            documentation: 'custom functions for generating predicates'
             //class: 'Function',
         }, 
         
@@ -131,7 +131,7 @@ foam.CLASS
         {
             name: 'selected',
             class: 'Boolean',
-            value: false, 
+            value: false 
         },
 
          /*
@@ -148,17 +148,15 @@ foam.CLASS
         },
         {
             class: 'Class', //e.g.WorkorderCellView
-            name: 'cellView',  
+            name: 'cellView'  
         },
-        
-        
         {
             name: 'wrapperClass',
-            class: 'Class', 
+            class: 'Class' 
         },
         {
             name: 'wrapperDAOClass',
-            class: 'Class', 
+            class: 'Class' 
         }, 
         {
             name: 'wrapper',
@@ -167,11 +165,11 @@ foam.CLASS
                    return wrapperClass.create({cell: this}, this); 
                }
                return foam.u2.Element.create().setNodeName('div');
-            }, 
+            }
             
-        },
-        
-      ], 
+        }    
+    ],
+    
     methods: [
         function init(){
             /*
@@ -364,7 +362,7 @@ foam.CLASS
         {
             name: 'onEntrySelection',
             isFramed: true,
-            code: function(a, b, c){
+            code: function(a){
                 this.pub('ENTRY_SELECTION');
                 //console.log('entry selected in GridCel.js');
                 if (a.src && a.src.data){
@@ -382,9 +380,8 @@ foam.CLASS
             code: function(){
                 //console.log('GridCell refreshed');
                 this.refreshCell();
-                }
-                
-        },       
+            }
+        }      
     ]
     
     
