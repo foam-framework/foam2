@@ -5,7 +5,7 @@ foam.CLASS({
   requires: [
         'Team',
         'Hero',
-        'foam.u2.Element',
+        'foam.u2.Element'
         ],
   
   imports: [
@@ -17,7 +17,7 @@ foam.CLASS({
         name: 'data',
         postSet: function(old ,nu){
             nu && nu.sub && nu.sub(this.onDataUpdate);
-        }, 
+        }
     },
     {
         name: 'cellView',
@@ -48,7 +48,6 @@ foam.CLASS({
         //return div;
         this.cellView = div; 
     }
-    
   ],
   
     
@@ -65,8 +64,8 @@ foam.CLASS({
           e.dataTransfer.setData('application/x-foam-obj-id', this.data.id);
           e.stopPropagation();
           }
-        },
-      ],
+        }
+      ]
   
 });
   
@@ -77,18 +76,16 @@ foam.CLASS({
   
   requires: [
     'Team',
-    'Hero',
+    'Hero'
     ],
   
   imports: [
-    
     'HeroDAO',
-    'TeamDAO',
+    'TeamDAO'
   ], 
   
   properties: [
     "of",
-
     {
         name: 'wrapperView',
         factory: function(){
@@ -97,8 +94,8 @@ foam.CLASS({
     },
     "status",
     "organization",
-    "cell", 
-    ],
+    "cell"
+  ],
   
   methods: [
     function initE(){
@@ -133,13 +130,8 @@ foam.CLASS({
       this.organization$ = this.cell.rowMatch$;
       this.status$ = this.cell.colMatch$; 
         this.onDAOUpdate();
-    },
-    
-
-    
+    }
   ],
-  
-  
   
     listeners: [
         {
@@ -151,7 +143,7 @@ foam.CLASS({
          {
             name: 'onDragOver',
             code: function(e){
-                console.log("something is dragged over this shit. ");
+                console.log("something is dragged over the cell. ");
                   e.preventDefault();
                   e.stopPropagation();
                 
@@ -210,7 +202,6 @@ foam.CLASS({
             }
           }.bind(this)); 
         }
-      }
-      
+      }  
     ]
 });
