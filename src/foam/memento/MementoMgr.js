@@ -54,10 +54,10 @@ foam.CLASS({
 
     function updateSizes() {
       this.posFeedback_  = true;
-      this.stackSize_ = this.stack.length;
-      this.redoSize_  = this.redo.length;
-      this.totalSize_ = this.stack.length + this.redo.length;
-      this.position   = this.stack.length;
+      this.stackSize_    = this.stack.length;
+      this.redoSize_     = this.redo.length;
+      this.totalSize_    = this.stack.length + this.redo.length;
+      this.position      = this.stack.length;
       this.posFeedback_  = false;
     },
 

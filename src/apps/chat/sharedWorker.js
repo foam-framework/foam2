@@ -17,7 +17,6 @@
 
 importScripts('bootFOAMWorker.js');
 
-
 foam.CLASS({
   name: 'SharedWorker',
   extends: 'foam.apps.chat.SharedWorkerI',
@@ -78,6 +77,7 @@ foam.CLASS({
 
       this.sync();
     },
+
     function sync() {
       this.syncAgent.sync.sync();
     }
