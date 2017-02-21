@@ -365,7 +365,7 @@ foam.CLASS
                 return; 
             }
             
-            console.log('visibleRowIds post set: ' + old + ' --> ' + nu); 
+            console.log('visibleRowIds post set: ' + old || "" + ' --> ' + nu||""); 
             // if old and nu are both not arrays, show everything. 
             if (!foam.Array.isInstance(nu) && !foam.Array.isInstance(old)){
                 console.log('old and nu both not arrays'); 

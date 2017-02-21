@@ -199,7 +199,7 @@ foam.CLASS
                 if (match === null || match === undefined){
                     return this.NOT(this.HAS(prop));
                 }else if (prop.cls_.name == 'Date'){
-                   return Query.util.inDay(prop, currMatchId);
+                   return Query.util.inDay(prop, match);
                 } else {
                     if (typeof(match) === typeof(prop) && typeof(prop)!== 'object'){
                         // if both are say, object, string or numbers
