@@ -29,6 +29,7 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'PromisedBox',
@@ -43,6 +44,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ProxyBox',
@@ -56,6 +58,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -74,9 +77,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SubBoxMessage',
+
   properties: [
     {
       class: 'String',
@@ -89,6 +94,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -582,9 +588,11 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'PollingClientDAO',
   extends: 'foam.dao.EventlessClientDAO',
+
   requires: [
     'foam.dao.ArraySink'
   ],
+
   methods: [
     function put(obj) {
       var self = this;
@@ -687,6 +695,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SkeletonBox',
@@ -779,6 +788,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'NullBox',
@@ -793,10 +803,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'SocketBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.SocketConnectBox'
   ],
@@ -826,9 +838,17 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.box',
   name: 'SocketBox2',
+
   imports: [
     'socketService',
   ],
+
+  axioms: [
+    foam.pattern.Multiton.create({
+      property: 'address'
+    })
+  ],
+
   properties: [
     {
       class: 'String',
@@ -840,12 +860,6 @@ foam.CLASS({
       factory: function() {
       }
     }
-  ],
-
-  axioms: [
-    foam.pattern.Multiton.create({
-      property: 'address'
-    })
   ],
 
   methods: [
@@ -1124,6 +1138,7 @@ foam.CLASS({
       name: 'client'
     }
   ],
+
   methods: [
     function serverBox(box) {
       box = this.next ? this.next.serverBox(box) : box;
@@ -1160,13 +1175,16 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'AuthenticatedBox',
   extends: 'foam.box.ProxyBox',
+
   imports: [
     'idToken'
   ],
+
   methods: [
     function send(m) {
       m.attributes.idToken = this.idToken;
@@ -1179,9 +1197,11 @@ foam.CLASS({
   package: 'foam.box',
   name: 'CheckAuthenticationBox',
   extends: 'foam.box.ProxyBox',
+
   imports: [
     'tokenVerifier'
   ],
+
   methods: [
     {
       name: 'send',

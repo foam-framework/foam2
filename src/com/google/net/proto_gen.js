@@ -45,6 +45,7 @@ foam.LIB({
     }
   ]
 });
+
 // TODO: tests
 // it('camelize', function() {
 //   expect(foam.String.camelize('lower Case String'))
@@ -59,9 +60,6 @@ foam.LIB({
 //     .toBe('99$$');
 //
 // });
-
-
-
 
 
 var whitelist = null;
@@ -692,4 +690,3 @@ function checkWhitelist(id) {
 }
 
 apiToModels(files);
-

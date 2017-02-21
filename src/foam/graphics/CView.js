@@ -921,8 +921,8 @@ foam.CLASS({
   methods: [
     function paintSelf(x) {
       x.beginPath();
-      x.moveTo(this.startX, this.startY);
-      x.lineTo(this.endX, this.endY);
+      x.moveTo(0, 0);
+      x.lineTo(this.endX-this.x, this.endY-this.y);
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
       x.stroke();

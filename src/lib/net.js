@@ -19,6 +19,12 @@ foam.CLASS({
   package: 'foam.net',
   name: 'WebSocket',
 
+  topics: [
+    'message',
+    'connected',
+    'disconnected'
+  ],
+
   properties: [
     {
       name: 'uri'
@@ -27,12 +33,6 @@ foam.CLASS({
       name: 'socket',
       transient: true
     }
-  ],
-
-  topics: [
-    'message',
-    'connected',
-    'disconnected'
   ],
 
   methods: [
@@ -498,7 +498,7 @@ foam.CLASS({
       }
 
       this.grammar.parseString(line);
-    },
+    }
   ],
 
   listeners: [

@@ -161,6 +161,8 @@ foam.CLASS({
                 this.start(self.ClassLink, {data: d, showPackage: this.showPackage}).
                   cssClass(this.showPackage ? null : self.myCls('indent')).
                 end();
+                // TODO: fix formatting
+                this.add(d.model_.documentation);
               });
             })).
           end().
@@ -207,7 +209,7 @@ foam.CLASS({
         if ( cls === foam.core.FObject ) break;
       }
       this.br();
-      this.add(data.documentation);
+      this.add(data.model_.documentation);
 
       this.add(this.slot(function (showInherited) {
         // TODO: hide 'Source Class' column if showInherited is false
@@ -319,6 +321,8 @@ foam.CLASS({
   package: 'foam.doc',
   name: 'DocBrowser',
   extends: 'foam.u2.Element',
+
+  documentation: 'FOAM documentation browser.',
 
   requires: [
     'foam.doc.DocBorder',
