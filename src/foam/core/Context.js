@@ -87,6 +87,10 @@
      * to create the value which is used.
      */
     registerFactory: function(m, factory) {
+      foam.assert(
+        typeof m.id === 'string',
+        'Must have an .id property to be registered in a context.');
+
       this.registerInCache_(factory, this.__cache__, m.id);
 
       if ( m.package === 'foam.core' ) {
@@ -111,7 +115,7 @@
       foam.assert(
           ! hasOld ||
               (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
-          cls.id + ' is already registered in this context.');
+          name + ' is already registered in this context.');
 
       cache[name] = cls;
     },
