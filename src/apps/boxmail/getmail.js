@@ -17,7 +17,6 @@
 
 require('./bootFOAMNode.js');
 
-
 var env = foam.box.Context.create();
 
 var dst = foam.box.SocketBox.create({
