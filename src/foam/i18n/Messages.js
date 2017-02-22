@@ -73,10 +73,7 @@ foam.CLASS({
     {
       name: 'messages',
       class: 'AxiomArray',
-      of: 'foam.i18n.MessageAxiom',
-      adaptArrayElement: function(o, prop) {
-        return foam.lookup(prop.of).create(o);
-      }
+      of: 'foam.i18n.MessageAxiom'
     }
   ]
 });

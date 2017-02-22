@@ -16,9 +16,9 @@
  */
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'GenStrings',
-  extends: 'foam.android.GenResources',
+  extends: 'foam.android.tools.GenResources',
   requires: [
     'foam.i18n.TranslationFormatStringParser',
   ],
@@ -72,7 +72,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'StringResource',
   properties: [
     {
@@ -91,7 +91,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'ModelStringExtension',
   refines: 'foam.core.Model',
   methods: [
@@ -106,11 +106,11 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'PropertyStringExtension',
   refines: 'foam.core.Property',
   requires: [
-    'foam.android.StringResource',
+    'foam.android.tools.StringResource',
   ],
   methods: [
     function toAndroidStringResources(opt_resources) {
@@ -126,11 +126,11 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'ActionStringExtension',
   refines: 'foam.core.Action',
   requires: [
-    'foam.android.StringResource',
+    'foam.android.tools.StringResource',
   ],
   methods: [
     function toAndroidStringResources(opt_resources) {
@@ -146,11 +146,11 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'MessageStringExtension',
   refines: 'foam.i18n.MessageAxiom',
   requires: [
-    'foam.android.StringResource',
+    'foam.android.tools.StringResource',
   ],
   methods: [
     function toAndroidStringResources(opt_resources) {

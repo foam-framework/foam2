@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.android',
+  package: 'foam.android.tools',
   name: 'GenResources',
   imports: [
     'arequire',
