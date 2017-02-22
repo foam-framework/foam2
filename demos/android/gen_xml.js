@@ -17,7 +17,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
     dir + '/../../src',
     dir + '/js'
   ],
-  modelId: 'foam.android.GenStrings',
+  modelId: 'foam.android.tools.GenStrings',
   modelArgs: {
     models: [
       'nodetooldemo.Test',
