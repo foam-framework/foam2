@@ -17,6 +17,16 @@
 
 foam.CLASS({
   name: 'Test',
+  requires: [
+    'somepackage.RequiredClass',
+  ],
+  imports: [
+    'testImport',
+    'testImport2 as testImportTwo',
+  ],
+  exports: [
+    'firstName',
+  ],
   messages: [
     {
       name: 'greeting',

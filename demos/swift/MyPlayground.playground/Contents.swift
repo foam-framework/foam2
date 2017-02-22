@@ -33,3 +33,10 @@ XCTAssertEqual(numPubs3, 1)
 sub.detach() // Should do nothing.
 
 test.factoryProp
+
+test.__context__["firstName"]
+test.__subContext__["firstName"]
+
+test.firstName
+let o = test.RequiredClass_create()
+o.firstName

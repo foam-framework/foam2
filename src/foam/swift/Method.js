@@ -24,6 +24,7 @@ foam.CLASS({
     'visibility',
     'returnType',
     'static',
+    'class',
     'body',
     'override',
     {
@@ -41,6 +42,7 @@ foam.CLASS({
         this.visibility ? this.visibility + ' ' : '',
         this.override ? 'override ' : '',
         this.static ? 'static ' : '',
+        this.class ? 'class ' : '',
         this.name != 'init' ? 'func ' : '',
         this.name,
         '(');

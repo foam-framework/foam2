@@ -2,6 +2,15 @@ import Foundation
 
 public typealias Listener = (Subscription, [Any]) -> Void
 
+public protocol Initializable {
+  init()
+}
+
+protocol ContextAware {
+  var __context__: Context { get set }
+  var __subContext__: Context { get }
+}
+
 public protocol Slot {
   func get() -> Any?
   func set(value: Any?)
@@ -14,10 +23,10 @@ public class PropertySlot: Slot {
   init(object: FObject, propertyName: String) {
     self.object = object
     self.propertyName = propertyName
-    NSLog("Creating Slot")
+    NSLog("Creating PropertySlot")
   }
   deinit {
-    NSLog("Destroying Slot")
+    NSLog("Destroying PropertySlot")
   }
   public func get() -> Any? {
     return object.get(key: propertyName)
@@ -27,6 +36,22 @@ public class PropertySlot: Slot {
   }
   public func sub(listener: @escaping Listener) -> Subscription {
     return object.sub(topics: ["propertyChange", propertyName], listener: listener)
+  }
+}
+
+public class ConstantSlot: Slot {
+  let value: Any?
+  init(value: Any?) {
+    self.value = value
+    NSLog("Creating ConstantSlot")
+  }
+  deinit {
+    NSLog("Destroying ConstantSlot")
+  }
+  public func get() -> Any? { return value }
+  public func set(value: Any?) { fatalError("Cannot mutate constant slot") }
+  public func sub(listener: @escaping Listener) -> Subscription {
+    fatalError("Cannot subscribe to constant slot")
   }
 }
 
@@ -62,6 +87,45 @@ public class EmptyPropertyInfo: PropertyInfo {
   public let name: String = ""
 }
 
+public class Context {
+  public static let GLOBAL = Context()
+  public func create(type: Any) -> Any? {
+    var o: Any? = nil
+    if let t = type as? Initializable.Type {
+      o = t.init()
+    }
+    if var o = o as? ContextAware {
+      o.__context__ = self
+    }
+    return o
+  }
+  private var slotMap: [String:Slot] = [:]
+  public subscript(key: String) -> Any? {
+    if let slot = slotMap[key] {
+      return slot
+    } else if let slot = slotMap[toSlotName(name: key)] {
+      return slot.get()
+    }
+    return nil
+  }
+  private func toSlotName(name: String) -> String { return name + "$" }
+  public func createSubContext(args: [String:Any] = [:]) -> Context {
+    var slotMap = self.slotMap
+    for (key, value) in args {
+      let slotName = toSlotName(name: key)
+      if let slot = value as AnyObject as? Slot {
+        slotMap[slotName] = slot
+      } else {
+        slotMap[slotName] = ConstantSlot(value: value)
+      }
+    }
+
+    let subContext = Context()
+    subContext.slotMap = slotMap
+    return subContext
+  }
+}
+
 public protocol ClassInfo {
   var id: String { get }
   var parent: ClassInfo { get }
@@ -93,18 +157,33 @@ public class Subscription {
 
 public protocol FObject {
   func sub(topics: [Any], listener l: @escaping Listener) -> Subscription
-  var classInfo: ClassInfo { get }
+  static var classInfo: ClassInfo { get }
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
 }
 
-public class AbstractFObject: FObject {
+public class AbstractFObject: FObject, Initializable, ContextAware {
+
+  public var __context__: Context = Context.GLOBAL {
+    didSet {
+      self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())
+    }
+  }
+  lazy private(set) public var __subContext__: Context = {
+    return self.__context__.createSubContext(args: self._createExports_())
+  }()
+
+  func _createExports_() -> [String:Any?] {
+    return [:]
+  }
 
   lazy var listeners: ListenerList = ListenerList()
 
-  private(set) lazy public var classInfo: ClassInfo = { return self.createClassInfo_() }()
+  public static var classInfo: ClassInfo = {
+    return createClassInfo_()
+  }()
 
-  func createClassInfo_() -> ClassInfo { fatalError() }
+  class func createClassInfo_() -> ClassInfo { fatalError() }
 
   public func set(key: String, value: Any?) {}
 
@@ -168,7 +247,7 @@ public class AbstractFObject: FObject {
     return count
   }
 
-  public init() {
+  public required init() {
     NSLog("FObject created")
   }
 

@@ -33,6 +33,7 @@ foam.LIB({
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'createClassInfo_',
+        class: true,
         returnType: 'ClassInfo',
         // TODO Actually make class info.
         body: 'return EmptyClassInfo()',
@@ -102,6 +103,26 @@ super.set(key: key, value: value)
 	],
         body: setterBody,
       }));
+      var exports = this.getOwnAxiomsByClass(foam.core.Export)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
+      if (exports.length) {
+        var exportsBody = foam.templates.TemplateUtil.create().compile(
+            foam.String.multiline(function(exports) {/*
+var args = super._createExports_()
+<% for (var i = 0, p; p = exports[i]; i++) { %>
+args["<%=p.exportName%>"] = <%=p.exportName%>$
+<% } %>
+return args
+            */}), '', ['exports']).apply(this, [exports]).trim();
+        cls.methods.push(foam.swift.Method.create({
+          override: true,
+          name: '_createExports_',
+          body: exportsBody,
+          returnType: '[String:Any?]',
+        }));
+      }
 
       return cls;
     },
