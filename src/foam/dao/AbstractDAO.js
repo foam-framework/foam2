@@ -278,8 +278,8 @@ foam.CLASS({
     },
     {
       name: 'of',
-      expression: function(delegate) {
-        return delegate.of;
+      factory: function() {
+        return this.delegate.of;
       }
     },
     {
@@ -444,5 +444,3 @@ foam.CLASS({
     }
   ]
 });
-
-
