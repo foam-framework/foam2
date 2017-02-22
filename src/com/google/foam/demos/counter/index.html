@@ -1,0 +1,26 @@
+<html>
+ <head>
+    <script language="javascript" src="../../../../../foam.js"></script>
+    <script>
+      foam.CLASS({
+        name: 'Counter',
+        properties: [
+          {
+            class: 'Int',
+            name: 'count',
+            label: '',
+            visibility: foam.u2.Visibility.RO
+          }
+        ],
+        actions: [
+          function increment() { this.count++; },
+          function decrement() { this.count--; }
+        ]
+      });
+    </script>
+  <title>Counter</title>
+ </head>
+ <body>
+  <foam class='Counter' title=''/>
+ </body>
+</html>
