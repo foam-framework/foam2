@@ -262,9 +262,9 @@ foam.CLASS({
 
   
     function select(sink, skip, limit, order, predicate, cache) {
-      if ( limit[0] && limit[0] <= 0 ) return;
+      if ( limit && limit[0] <= 0 ) return;
 
-      if ( skip[0] && skip[0] >= this.size && ! predicate ) {
+      if ( skip && skip[0] >= this.size && ! predicate ) {
         skip[0] -= this.size;
         return;
       }
@@ -279,9 +279,9 @@ foam.CLASS({
 
    
     function selectReverse(sink, skip, limit, order, predicate, cache) {
-      if ( limit[0] && limit[0] <= 0 ) return;
+      if ( limit && limit[0] <= 0 ) return;
 
-      if ( skip[0] && skip[0] >= this.size && ! predicate ) {
+      if ( skip && skip[0] >= this.size && ! predicate ) {
         //console.log('reverse skipping: ', this.key);
         skip[0] -= this.size;
         return;
