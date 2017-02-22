@@ -534,7 +534,7 @@ foam.CLASS({
           if ( sortRequired ) {
             var arrSink = m.ArraySink.create();
             index.selectCount++;
-            subTree.select(arrSink, null, null, null, predicate, {});
+            subTree.select(arrSink, [null], [null], null, predicate, {});
             index.selectCount--;
             var a = arrSink.a;
             a.sort(order.compare.bind(order));
@@ -675,4 +675,3 @@ foam.CLASS({
 
   ]
 });
-
