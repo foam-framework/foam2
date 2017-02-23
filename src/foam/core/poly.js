@@ -79,3 +79,12 @@ if ( ! String.prototype.startsWith ) {
     return this.indexOf(str) === 0;
   };
 }
+
+// Required for IE 11.
+if ( ! Number.isInteger ) {
+  Number.isInteger = function(value) {
+    return typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value;
+  };
+}

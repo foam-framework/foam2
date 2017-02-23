@@ -230,21 +230,6 @@ foam.CLASS({
       value: function diffProperty(o1, o2, diff, prop) {
         return prop.diffPropertyValues(prop.f(o1), prop.f(o2), diff);
       }
-    },
-    // FUTURE: Move to refinement?
-    {
-      name: 'hashPropertyValue',
-      transient: true,
-      value: function(value) {
-        return foam.util.hashCode(value);
-      }
-    },
-    {
-      name: 'hashProperty',
-      transient: true,
-      value: function hashProperty(o, prop) {
-        return prop.hashPropertyValue(prop.f(o));
-      }
     }
   ],
 

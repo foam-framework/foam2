@@ -852,7 +852,8 @@ foam.CLASS({
 
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
       for ( var i = 0 ; i < ps.length ; i++ ) {
-        hash = foam.util.hashTogether(hash, ps[i].hashProperty(this, ps[i]));
+        var prop = this[ps[i].name];
+        hash = ((hash << 5) - hash) + foam.util.hashCode(prop);
         hash &= hash; // forces 'hash' back to a 32-bit int
       }
 

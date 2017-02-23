@@ -354,8 +354,11 @@ foam.LIB({
             a < b ? -1 : a > b ? 1 : 0;
       },
       function hashCode(n) {
+        if (Number.isInteger(n)) return n;
+
         floatArrayForHash[0] = n;
-        return foam.util.hashTogether(intArrayForHash[0], intArrayForHash[1]);
+        return ((intArrayForHash[0] << 5) - intArrayForHash[0]) +
+            intArrayForHash[1];
       }
     ]
   });
@@ -374,7 +377,7 @@ foam.LIB({
 
       for ( var i = 0 ; i < s.length ; i++ ) {
         var code = s.charCodeAt(i);
-        hash = foam.util.hashTogether(hash, code);
+        hash = ((hash << 5) - hash) + code;
       }
 
       return hash;
@@ -523,7 +526,7 @@ foam.LIB({
       var hash = 0;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
-        hash = foam.util.hashTogether(hash, foam.util.hashCode(a[i]));
+        hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
       }
 
       return hash;
@@ -719,9 +722,6 @@ foam.LIB({
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) { return typeOf(a).compare(a, b); },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
-      function hashTogether(h1, h2) {
-        return ((h1 << 5) - h1) + h2;
-      },
       function diff(a, b)    {
         var t = typeOf(a);
         return t.diff ? t.diff(a, b) : undefined;
