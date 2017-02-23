@@ -55,7 +55,7 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testMemLeaks() {
-    for _ in 1...20000 {
+    for _ in 1...1000 {
       testFollow()
       testListen()
     }
