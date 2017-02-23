@@ -16,29 +16,23 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.Model',
-  requires: [
-    'foam.swift.SwiftClass',
+  package: 'foam.swift.ui',
+  name: 'FOAMUILabel',
+  swiftImports: [
+    'UIKit',
   ],
   properties: [
     {
-      class: 'String',
-      name: 'swiftName',
-      expression: function(name) { return name; },
-    },
-    {
-      class: 'StringArray',
-      name: 'swiftImports',
+      name: 'view',
+      swiftType: 'UILabel',
+      swiftFactory: 'return UILabel()',
     },
     {
       class: 'String',
-      name: 'swiftExtends',
-      factory: function() {
-        // TODO: This should be an expression on extends but putting extends in
-        // the args makes js unhappy.
-        if ( this.extends == 'FObject' ) return 'AbstractFObject';
-        return this.extends.split('.').pop();
-      },
+      name: 'data',
+      swiftPostSet: function() {/*
+self.view.text = newValue
+      */},
     },
   ],
 });
