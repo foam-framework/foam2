@@ -24,6 +24,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.window.addEventListener('load', this.onLoad, false);
+    },
+
+    function findPropertyIC(cls, name) {
+      var ps = cls.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        if ( name === ps[i].name.toLowerCase() ) return ps[i];
+      }
     }
   ],
 
@@ -35,7 +42,7 @@ foam.CLASS({
       // Install last to first to avoid messing up the 'els' list.
       for ( var i = els.length-1 ; i >= 0 ; i-- ) {
         var el = els[i];
-        var modelName = els[i].getAttribute('class');
+        var modelName = el.getAttribute('class');
         var cls = foam.lookup(modelName, true);
 
         if ( cls ) {
@@ -45,6 +52,12 @@ foam.CLASS({
             view = view.toE({}, foam.__context__);
           } else if ( ! foam.u2.Element.isInstance(view) )  {
             view = foam.u2.DetailView.create({data: view, showActions: true});
+          }
+
+          for ( var j = 0 ; j < el.attributes.length ; j++ ) {
+            var attr = el.attributes[j];
+            var p = this.findPropertyIC(view.cls_, attr.name);
+            if ( p ) p.set(view, attr.value);
           }
 
           el.outerHTML = view.outerHTML;
