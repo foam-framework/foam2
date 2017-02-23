@@ -240,6 +240,7 @@ if <%=this.swiftInitedName%> {
 <% if ( this.swiftFactory ) { %>
 let factoryValue = <%=this.swiftFactoryName%>()
 <%=this.swiftValueName%> = factoryValue
+<%=this.swiftInitedName%> = true
 return factoryValue
 <% } else if ( this.swiftValue ) { %>
 return <%=this.swiftValue%>
