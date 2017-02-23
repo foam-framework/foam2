@@ -14,10 +14,11 @@
 		105984181E5E859A0063941D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 105984161E5E859A0063941D /* LaunchScreen.storyboard */; };
 		105984231E5E859A0063941D /* SwiftTestsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984221E5E859A0063941D /* SwiftTestsTests.swift */; };
 		1059842E1E5E859A0063941D /* SwiftTestsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059842D1E5E859A0063941D /* SwiftTestsUITests.swift */; };
-		105984521E5F466A0063941D /* somepackage_RequiredClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059844F1E5F466A0063941D /* somepackage_RequiredClass.swift */; };
-		105984531E5F466A0063941D /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984501E5F466A0063941D /* Test.swift */; };
-		105984541E5F466A0063941D /* TestExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984511E5F466A0063941D /* TestExtended.swift */; };
 		105984571E5F46750063941D /* FOAMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984561E5F46750063941D /* FOAMSupport.swift */; };
+		105984641E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984601E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift */; };
+		105984651E5F71930063941D /* somepackage_RequiredClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984611E5F71930063941D /* somepackage_RequiredClass.swift */; };
+		105984661E5F71930063941D /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984621E5F71930063941D /* Test.swift */; };
+		105984671E5F71930063941D /* TestExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984631E5F71930063941D /* TestExtended.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,10 +52,11 @@
 		105984291E5E859A0063941D /* SwiftTestsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftTestsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1059842D1E5E859A0063941D /* SwiftTestsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestsUITests.swift; sourceTree = "<group>"; };
 		1059842F1E5E859A0063941D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1059844F1E5F466A0063941D /* somepackage_RequiredClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = somepackage_RequiredClass.swift; sourceTree = "<group>"; };
-		105984501E5F466A0063941D /* Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
-		105984511E5F466A0063941D /* TestExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestExtended.swift; sourceTree = "<group>"; };
 		105984561E5F46750063941D /* FOAMSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FOAMSupport.swift; sourceTree = "<group>"; };
+		105984601E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_FOAMUILabel.swift; sourceTree = "<group>"; };
+		105984611E5F71930063941D /* somepackage_RequiredClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = somepackage_RequiredClass.swift; sourceTree = "<group>"; };
+		105984621E5F71930063941D /* Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
+		105984631E5F71930063941D /* TestExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestExtended.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,9 +140,10 @@
 		1059844E1E5F466A0063941D /* gen */ = {
 			isa = PBXGroup;
 			children = (
-				1059844F1E5F466A0063941D /* somepackage_RequiredClass.swift */,
-				105984501E5F466A0063941D /* Test.swift */,
-				105984511E5F466A0063941D /* TestExtended.swift */,
+				105984601E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift */,
+				105984611E5F71930063941D /* somepackage_RequiredClass.swift */,
+				105984621E5F71930063941D /* Test.swift */,
+				105984631E5F71930063941D /* TestExtended.swift */,
 			);
 			name = gen;
 			path = ../../gen;
@@ -289,12 +292,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				105984521E5F466A0063941D /* somepackage_RequiredClass.swift in Sources */,
-				105984541E5F466A0063941D /* TestExtended.swift in Sources */,
 				105984571E5F46750063941D /* FOAMSupport.swift in Sources */,
-				105984531E5F466A0063941D /* Test.swift in Sources */,
+				105984671E5F71930063941D /* TestExtended.swift in Sources */,
 				105984101E5E859A0063941D /* ViewController.swift in Sources */,
+				105984651E5F71930063941D /* somepackage_RequiredClass.swift in Sources */,
+				105984641E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift in Sources */,
 				1059840E1E5E859A0063941D /* AppDelegate.swift in Sources */,
+				105984661E5F71930063941D /* Test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
