@@ -31,11 +31,10 @@ class SwiftTestsTests: XCTestCase {
 
     test.firstName = "1"
     test.lastName = "2"
-    test.sayHi()
-    NSLog(test.methodWithAnArgAndReturn("3"))
+    XCTAssertEqual(test.methodWithAnArgAndReturn("3"), "Hello there 3 LASTNAME")
 
     XCTAssertEqual(numPubs, 1)
-    XCTAssertEqual(numPubs2, 2)
+    XCTAssertEqual(numPubs2, 4) // Each set to first or last name triggers another set.
     XCTAssertEqual(numPubs3, 1)
 
     sub.detach() // Should do nothing.
@@ -55,9 +54,17 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testMemLeaks() {
-    for _ in 1...1000 {
+    for _ in 1...5000 {
       testFollow()
       testListen()
+    }
+  }
+
+  func testObjectCreationPerformance() {
+    self.measure {
+      for _ in 1...1000 {
+        _ = Test()
+      }
     }
   }
 
