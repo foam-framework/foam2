@@ -36,11 +36,17 @@ foam.CLASS({
   ],
   properties: [
     {
+      name: 'prevFirstName',
+    },
+    {
+      name: 'prevLastName',
+    },
+    {
       class: 'String',
       name: 'firstName',
       value: 'John',
       swiftPreSet: function() {/*
-NSLog("You're about to change your first name to %@", newValue)
+self.prevFirstName = oldValue
 return newValue
       */},
     },
@@ -48,7 +54,7 @@ return newValue
       class: 'String',
       name: 'lastName',
       value: 'Smith',
-      swiftPostSet: 'NSLog("Thanks for changing your last name %@", newValue)'
+      swiftPostSet: 'self.prevLastName = oldValue'
     },
     {
       name: 'factoryProp',
@@ -60,7 +66,9 @@ return ["Hello", "World"]
   actions: [
     {
       name: 'sayHi',
-      swiftCode: 'NSLog(type(of: self).greeting, firstName, lastName)',
+      swiftCode: function() {/*
+NSLog(type(of: self).greeting, firstName, lastName)
+      */},
     },
   ],
   methods: [

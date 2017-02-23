@@ -304,7 +304,6 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
   }
 
   public required init() {
-    NSLog("FObject created")
   }
 
   private func detachListeners(listeners: ListenerList?) {
@@ -320,7 +319,6 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
 
   deinit {
     detachListeners(listeners: listeners)
-    NSLog("FObject destroyed")
   }
 }
 
