@@ -26,6 +26,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'Test',
       'TestExtended',
       'somepackage.RequiredClass',
+      'foam.swift.ui.FOAMUILabel',
     ],
     outdir: genDir,
   },

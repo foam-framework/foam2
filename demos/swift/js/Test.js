@@ -65,9 +65,11 @@ return ["Hello", "World"]
   ],
   actions: [
     {
-      name: 'sayHi',
+      name: 'swapFirstAndLast',
       swiftCode: function() {/*
-NSLog(type(of: self).greeting, firstName, lastName)
+let firstName = self.firstName
+self.firstName = self.lastName
+self.lastName = firstName
       */},
     },
   ],
