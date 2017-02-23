@@ -32,13 +32,7 @@ foam.CLASS({
     [ 'fromString', function intFromString(str) {
         return str ? parseInt(str) : 0;
       }
-    ],
-    [
-      'hashPropertyValue',
-      function(value) {
-        return value & value;
-      }
-    ],
+    ]
   ]
 });
 
@@ -120,7 +114,6 @@ foam.CLASS({
 });
 
 
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Float',
@@ -135,12 +128,6 @@ foam.CLASS({
       'adapt',
       function (_, v) {
         return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
-      }
-    ],
-    [
-      'hashPropertyValue',
-      function(value) {
-        return foam.Number.hashCode(value);
       }
     ]
   ]
