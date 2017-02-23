@@ -621,9 +621,9 @@ foam.LIB({
     },
     function hashCode(o) {
       var hash = 19;
-      var keys = Object.keys(o);
-      for (var i = 0; i < keys.length; i++) {
-        hash = ((hash << 5) - hash) + foam.util.hashCode(o[keys[i]]);
+      for (var key in o) {
+        if (!o.hasOwnProperty(key)) continue;
+        hash = ((hash << 5) - hash) + foam.util.hashCode(o[key]);
       }
       return hash;
     },
