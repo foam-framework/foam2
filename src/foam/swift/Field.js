@@ -26,6 +26,7 @@ foam.CLASS({
     'static',
     'final',
     'lazy',
+    'weak',
     'override',
     'defaultValue',
     {
@@ -50,6 +51,7 @@ foam.CLASS({
         this.visibility ? this.visibility + ' ' : '',
         this.static ? 'static ' : '',
         this.lazy ? 'lazy ' : '',
+        this.weak ? 'weak ' : '',
         this.final ? 'let ' : 'var ',
         this.name);
       if (this.type) o.out(': ', this.type);
