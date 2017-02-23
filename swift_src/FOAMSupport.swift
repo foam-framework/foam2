@@ -17,16 +17,81 @@ public protocol Slot {
   func sub(listener: @escaping Listener) -> Subscription
 }
 
+extension Slot {
+  public func linkFrom(_ s2: Slot) -> Subscription {
+
+    let s1 = self
+    var feedback1 = false
+    var feedback2 = false
+
+    let l1 = { () -> Void in
+      if feedback1 { return }
+
+      if !FOAM_utils.equals(s1.get(), s2.get()) {
+        feedback1 = true
+        s2.set(value: s1.get())
+        if !FOAM_utils.equals(s1.get(), s2.get()) { s1.set(value: s2.get()) }
+        feedback1 = false
+      }
+    }
+
+    let l2 = { () -> Void in
+      if feedback2 { return }
+
+      if !FOAM_utils.equals(s1.get(), s2.get()) {
+        feedback2 = true
+        s1.set(value: s2.get())
+        if !FOAM_utils.equals(s1.get(), s2.get()) { s2.set(value: s1.get()) }
+        feedback2 = false
+      }
+    }
+
+    var sub1: Subscription? = s1.sub { (_, _) in l1() }
+    var sub2: Subscription? = s2.sub { (_, _) in l2() }
+
+    l2()
+
+    return Subscription {
+      sub1?.detach()
+      sub2?.detach()
+      sub1 = nil
+      sub2 = nil
+    }
+  }
+
+  public func linkTo(_ other: Slot) -> Subscription {
+    return other.linkFrom(self)
+  }
+
+  public func follow(_ other: Slot) -> Subscription {
+    let l = { () -> Void in
+      if !FOAM_utils.equals(self.get(), other.get()) {
+        self.set(value: other.get())
+      }
+    }
+    l()
+    return other.sub { (_, _) in l() }
+  }
+
+  public func mapFrom(_ other: Slot, _ f: @escaping (Any?) -> Any?) -> Subscription {
+    let l = { () -> Void in
+      self.set(value: f(other.get()))
+    }
+    l()
+    return other.sub { (_, _) in l() }
+  }
+
+  public func mapTo(_ other: Slot, _ f: @escaping (Any?) -> Any?) -> Subscription {
+    return other.mapFrom(self, f)
+  }
+}
+
 public class PropertySlot: Slot {
-  let object: FObject
+  weak var object: FObject!
   let propertyName: String
   init(object: FObject, propertyName: String) {
     self.object = object
     self.propertyName = propertyName
-    NSLog("Creating PropertySlot")
-  }
-  deinit {
-    NSLog("Destroying PropertySlot")
   }
   public func get() -> Any? {
     return object.get(key: propertyName)
@@ -43,10 +108,6 @@ public class ConstantSlot: Slot {
   let value: Any?
   init(value: Any?) {
     self.value = value
-    NSLog("Creating ConstantSlot")
-  }
-  deinit {
-    NSLog("Destroying ConstantSlot")
   }
   public func get() -> Any? { return value }
   public func set(value: Any?) { fatalError("Cannot mutate constant slot") }
@@ -61,12 +122,6 @@ class ListenerList {
   lazy var children: [String:ListenerList] = [:]
   var listener: Listener?
   var sub: Subscription?
-  init() {
-    NSLog("Creating ListenerList")
-  }
-  deinit {
-    NSLog("Destroying ListenerList")
-  }
 }
 
 public protocol PropertyInfo {
@@ -145,17 +200,17 @@ public class EmptyClassInfo: ClassInfo {
 }
 
 public class Subscription {
-  public let detach: () -> Void
+  private var detach_: (() -> Void)?
   init(detach: @escaping () ->Void) {
-    self.detach = detach
-    NSLog("Subscription created")
+    self.detach_ = detach
   }
-  deinit {
-    NSLog("Subscription destroyed")
+  func detach() {
+    detach_?()
+    detach_ = nil
   }
 }
 
-public protocol FObject {
+public protocol FObject: class {
   func sub(topics: [Any], listener l: @escaping Listener) -> Subscription
   static var classInfo: ClassInfo { get }
   func set(key: String, value: Any?)
@@ -190,8 +245,8 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
   public func get(key: String) -> Any? { return nil }
 
   public func sub(
-      topics: [Any] = [],
-      listener l: @escaping Listener) -> Subscription {
+    topics: [Any] = [],
+    listener l: @escaping Listener) -> Subscription {
 
     var listeners = self.listeners
     for i in 0..<topics.count {
@@ -211,6 +266,7 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
     node.sub = Subscription(detach: {
       node.next?.prev = node.prev
       node.prev?.next = node.next
+      node.listener = nil
       node.next = nil
       node.prev = nil
       node.sub = nil
@@ -265,5 +321,15 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
   deinit {
     detachListeners(listeners: listeners)
     NSLog("FObject destroyed")
+  }
+}
+
+struct FOAM_utils {
+  public static func equals(_ o1: Any?, _ o2: Any?) -> Bool {
+    let a = o1 as AnyObject?
+    let b = o2 as AnyObject?
+    if a === b { return true }
+    if a != nil { return a!.isEqual(b) }
+    return false
   }
 }

@@ -31,6 +31,16 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftSlotLinkSubName',
+      expression: function(swiftName) { return swiftName + '_Value_Sub_'; },
+    },
+    {
+      class: 'String',
+      name: 'swiftSlotValueName',
+      expression: function(swiftName) { return swiftName + '_Value_'; },
+    },
+    {
+      class: 'String',
       name: 'swiftSlotName',
       expression: function(swiftName) { return swiftName + '$'; },
     },
@@ -130,11 +140,23 @@ foam.CLASS({
       }));
       if ( !this.isOverride() ) {
         cls.fields.push(this.Field.create({
-          visibility: 'public',
-          name: this.swiftSlotName,
+          visibility: 'private',
+          name: this.swiftSlotValueName,
           type: 'PropertySlot',
           lazy: true,
           initializer: this.swiftSlotInitializer()
+        }));
+        cls.fields.push(this.Field.create({
+          visibility: 'private(set) public',
+          name: this.swiftSlotLinkSubName,
+          type: 'Subscription?',
+        }));
+        cls.fields.push(this.Field.create({
+          visibility: 'public',
+          name: this.swiftSlotName,
+          type: 'PropertySlot',
+          getter: 'return self.' + this.swiftSlotValueName,
+          setter: this.swiftSlotSetter(),
         }));
       }
       if (this.swiftFactory) {
@@ -224,6 +246,14 @@ return <%=this.swiftValue%>
 <% } else { %>
 fatalError("No default value for <%=this.swiftName%>")
 <% } %>
+      */},
+    },
+    {
+      name: 'swiftSlotSetter',
+      args: [],
+      template: function() {/*
+self.<%=this.swiftSlotLinkSubName%>?.detach()
+self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(value)
       */},
     }
   ],
