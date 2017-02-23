@@ -180,6 +180,16 @@ describe('Float', function() {
     p.float = undefined;
     expect(p.float).toEqual(0);
   });
+
+  it('has different hashes for f1 != f2, round(f1) == round(f2)', function() {
+    // Hash code should be deterministic.
+    expect(foam.util.hashCode(p)).toBe(foam.util.hashCode(p));
+    p.float = 0.01;
+    var hashPsFloat0_01 = foam.util.hashCode(p);
+    p.float = 0.001;
+    var hashPsFloat0_001 = foam.util.hashCode(p);
+    expect(hashPsFloat0_01).not.toEqual(hashPsFloat0_001);
+  });
 });
 
 describe('Function', function() {
