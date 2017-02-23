@@ -338,19 +338,28 @@ foam.LIB({
 })();
 
 
-foam.LIB({
-  name: 'foam.Number',
-  methods: [
-    function isInstance(o) { return typeof o === 'number'; },
-    function clone(o) { return o; },
-    function equals(a, b) { return a === b; },
-    function compare(a, b) {
-      return ( b === null || b === undefined ) ? 1 :
-        a < b ? -1 : a > b ? 1 : 0;
-    },
-    function hashCode(n) { return n & n; }
-  ]
-});
+(function() {
+  var bufForHash = new ArrayBuffer(8);
+  var floatArrayForHash = new Float64Array(bufForHash);
+  var intArrayForHash = new Int32Array(bufForHash);
+
+  foam.LIB({
+    name: 'foam.Number',
+    methods: [
+      function isInstance(o) { return typeof o === 'number'; },
+      function clone(o) { return o; },
+      function equals(a, b) { return a === b; },
+      function compare(a, b) {
+        return ( b === null || b === undefined ) ? 1 :
+            a < b ? -1 : a > b ? 1 : 0;
+      },
+      function hashCode(n) {
+        floatArrayForHash[0] = n;
+        return foam.util.hashTogether(intArrayForHash[0], intArrayForHash[1]);
+      }
+    ]
+  });
+})();
 
 
 foam.LIB({

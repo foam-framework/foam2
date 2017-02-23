@@ -32,7 +32,13 @@ foam.CLASS({
     [ 'fromString', function intFromString(str) {
         return str ? parseInt(str) : 0;
       }
-    ]
+    ],
+    [
+      'hashPropertyValue',
+      function(value) {
+        return value & value;
+      }
+    ],
   ]
 });
 
@@ -134,28 +140,9 @@ foam.CLASS({
     [
       'hashPropertyValue',
       function(value) {
-        this.float64Array[0] = value;
-        return foam.util.hashTogether(
-            foam.util.hashCode(this.int32Array[0]),
-            foam.util.hashCode(this.int32Array[1]));
+        return foam.Number.hashCode(value);
       }
-    ],
-    [
-      'arrayBuffer',
-      new ArrayBuffer(8)
-    ],
-    {
-      name: 'float64Array',
-      factory: function() {
-        return new Float64Array(this.arrayBuffer);
-      },
-    },
-    {
-      name: 'int32Array',
-      factory: function() {
-        return new Int32Array(this.arrayBuffer);
-      },
-    }
+    ]
   ]
 });
 
