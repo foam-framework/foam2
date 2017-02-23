@@ -114,6 +114,7 @@ foam.CLASS({
 });
 
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Float',
@@ -129,7 +130,32 @@ foam.CLASS({
       function (_, v) {
         return typeof v === 'number' ? v : v ? parseFloat(v) : 0.0 ;
       }
-    ]
+    ],
+    [
+      'hashPropertyValue',
+      function(value) {
+        this.float64Array[0] = value;
+        return foam.util.hashTogether(
+            foam.util.hashCode(this.int32Array[0]),
+            foam.util.hashCode(this.int32Array[1]));
+      }
+    ],
+    [
+      'arrayBuffer',
+      new ArrayBuffer(8)
+    ],
+    {
+      name: 'float64Array',
+      factory: function() {
+        return new Float64Array(this.arrayBuffer);
+      },
+    },
+    {
+      name: 'int32Array',
+      factory: function() {
+        return new Int32Array(this.arrayBuffer);
+      },
+    }
   ]
 });
 
