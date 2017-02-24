@@ -354,11 +354,12 @@ foam.LIB({
       var intArrayForHash = new Int32Array(bufForHash);
 
       return function hashCode(n) {
-        if (Number.isInteger(n)) return n;
+        if (Number.isInteger(n)) return n & n; // Truncate to 32 bits.
 
         floatArrayForHash[0] = n;
-        return ((intArrayForHash[0] << 5) - intArrayForHash[0]) +
+        var hash = ((intArrayForHash[0] << 5) - intArrayForHash[0]) +
             intArrayForHash[1];
+        return hash & hash; // Truncate to 32 bits.
       };
     })()
   ]
@@ -378,6 +379,7 @@ foam.LIB({
       for ( var i = 0 ; i < s.length ; i++ ) {
         var code = s.charCodeAt(i);
         hash = ((hash << 5) - hash) + code;
+        hash &= hash; // Truncate to 32 bits.
       }
 
       return hash;
@@ -554,6 +556,7 @@ foam.LIB({
       b = this.getTime(b);
       return a < b ? -1 : a > b ? 1 : 0;
     },
+    // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
       // FUTURE: make this translatable for i18n, including plurals
