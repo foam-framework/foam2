@@ -42,15 +42,45 @@ foam.CLASS({
     { class: 'String', name: 'shortName' },
     {
       name: 'fromJSON',
-      value: function fromJSON(value, opt_ctx, prop, json) { return value; }
+      value: function fromJSON(value, ctx, prop, json) {
+        return foam.json.parse(value, null, ctx);
+      }
     },
     {
       name: 'toJSON',
       value: function toJSON(value, outputter) { return value; }
     }
+  ],
+
+  methods: [
+    function outputJSON(o) {
+      o.output({ class: '__Property__', forClass_: this.forClass_ });
+    }
   ]
 });
 
+foam.CLASS({
+  name: '__Property__',
+  package: 'foam.core',
+  axioms: [
+    {
+      name: 'create',
+      installInClass: function(c) {
+        var oldCreate = c.create;
+        c.create = function(args, X) {
+          var cls = args.forClass_.substring(0, args.forClass_.lastIndexOf('.'));
+          var name = args.forClass_.substring(args.forClass_.lastIndexOf('.') + 1);
+
+          var prop = X.lookup(cls).getAxiomByName(name);
+
+          foam.assert(prop, 'Could not find property "', args.forClass_, '"');
+
+          return prop;
+        };
+      }
+    }
+  ]
+});
 
 /** Add toJSON() method to FObject. **/
 foam.CLASS({
