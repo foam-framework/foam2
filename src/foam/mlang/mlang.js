@@ -86,23 +86,6 @@ foam.CLASS({
         if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
         console.error('Invalid expression value: ', o);
       }
-    },
-    {
-      name: 'fromJSON',
-      value: function(value, opt_ctx) {
-        // TODO: create a NamedProperty which doesn't include class, if possible
-        return value && '__Property__' === value.class ?
-            foam.lookup(value.source).getAxiomByName(value.name) :
-            foam.json.parse(value, null, opt_ctx) ;
-      }
-    },
-    {
-      name: 'toJSON',
-      value: function(value) {
-        return foam.core.Property.isInstance(value) ?
-            { class: '__Property__', source: value.sourceCls_.id, name: value.name } :
-            value ;
-      }
     }
   ]
 });
