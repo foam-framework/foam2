@@ -136,10 +136,10 @@ public extension PropertyInfo {
   }
 }
 
-public class EmptyPropertyInfo: PropertyInfo {
-  public let classInfo: ClassInfo = EmptyClassInfo()
-  public let transient: Bool = false
-  public let name: String = ""
+public class PropertyInfoImpl: PropertyInfo {
+  public lazy var classInfo: ClassInfo = EmptyClassInfo()
+  public lazy var transient: Bool = false
+  public lazy var name: String = ""
 }
 
 public class Context {
