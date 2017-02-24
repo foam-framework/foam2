@@ -111,6 +111,11 @@ foam.CLASS({
       name: 'swiftAdaptFuncName',
       expression: function(swiftName) { return '_' + swiftName + '_adapt_'; },
     },
+    {
+      class: 'String',
+      name: 'swiftPropertyInfoName',
+      expression: function(swiftName) { return foam.String.constantize(swiftName); },
+    },
   ],
   methods: [
     function isOverride() {
@@ -139,6 +144,14 @@ foam.CLASS({
         setter: 'self.set(key: "'+this.swiftName+'", value: value)',
       }));
       if ( !this.isOverride() ) {
+        cls.fields.push(this.Field.create({
+          visibility: 'public',
+          static: true,
+          final: true,
+          name: this.swiftPropertyInfoName,
+          type: 'PropertyInfo',
+          initializer: this.swiftPropertyInfoInit(),
+        }));
         cls.fields.push(this.Field.create({
           visibility: 'private',
           name: this.swiftSlotValueName,
@@ -255,6 +268,17 @@ fatalError("No default value for <%=this.swiftName%>")
       template: function() {/*
 self.<%=this.swiftSlotLinkSubName%>?.detach()
 self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(value)
+      */},
+    },
+    {
+      name: 'swiftPropertyInfoInit',
+      args: [],
+      template: function() {/*
+let pi = PropertyInfoImpl()
+pi.classInfo = classInfo
+pi.transient = <%=!!this.transient%>
+pi.name = "<%=this.swiftName%>"
+return pi
       */},
     }
   ],
