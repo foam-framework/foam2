@@ -79,6 +79,12 @@ foam.CLASS({
       factory: null
     },
     {
+      class: 'StringArray',
+      name: 'topics',
+      value: null,
+      factory: null
+    },
+    {
       name: 'postSet',
       expression: function(name) {
         var stateName    = name + 'State';
@@ -133,6 +139,10 @@ foam.CLASS({
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
           }
+        }),
+        foam.core.ProxySub.create({
+          topics: this.topics,
+          prop:   delegateName
         })
       ];
 
