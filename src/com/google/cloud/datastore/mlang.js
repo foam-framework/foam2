@@ -73,8 +73,6 @@ foam.CLASS({
   ]
 });
 
-
-
 (function() {
   var ops = [
     ['Eq', 'EQUAL'],
@@ -100,3 +98,29 @@ foam.CLASS({
     });
   }
 })();
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  methods: [
+    function toDatastoreOrder() {
+      return this.orderDirection === 1 ?
+          { property: { name: this.name } } :
+          { property: { name: this.name }, direction: 'DESCENDING' };
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.order.ThenBy',
+
+  methods: [
+    function toDatastoreOrder() {
+      var order1 = this.arg1.toDatastoreOrder();
+      var order2 = this.arg2.toDatastoreOrder();
+      if ( ! Array.isArray(order1) ) order1 = [ order1 ];
+      if ( ! Array.isArray(order2) ) order2 = [ order2 ];
+      return order1.concat(order2);
+    }
+  ]
+});
