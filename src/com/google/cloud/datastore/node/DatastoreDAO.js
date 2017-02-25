@@ -46,11 +46,11 @@ foam.CLASS({
 
   methods: [
     function put(o) {
-      console.log('REQ');
       var self = this;
       var req = this.http.request({
         protocol: this.protocol,
         host: this.host,
+        port: this.port,
         method: 'POST',
         path: '/v1/projects/' + this.projectId + ':commit',
         headers: {
@@ -60,26 +60,19 @@ foam.CLASS({
       });
       return new Promise(function(resolve, reject) {
         req.on('aborted', self.onPutAborted.bind(self, reject));
-        req.on('connect', function() { console.log('CONNECTED'); });
         req.on('response', self.onPutResponse.bind(self, resolve, reject, o));
-        console.log(JSON.stringify({
-          mode: 'NON_TRANSACTIONAL',
-          mutations: [ { upsert: foam.util.datastoreValue(o) } ]
-        }, null, 2));
         req.write(JSON.stringify({
           mode: 'NON_TRANSACTIONAL',
-          mutations: [ { upsert: foam.util.datastoreValue(o) } ]
+          mutations: [ { upsert: o.toDatastoreEntity() } ]
         }));
         req.end();
       });
     },
 
     function onPutAborted(reject) {
-      console.log('ABORTED');
       reject(new Error('Cloud Datastore endpoint aborted HTTP request'));
     },
     function onPutResponse(resolve, reject, o, message) {
-      console.log('RESPONSE');
       if ( message.statusCode !== 200 ) {
         console.error('Unexpected response code from Cloud Datastore ' +
             'endpoint: ' + message.statusCode);
@@ -96,7 +89,6 @@ foam.CLASS({
       });
     },
     function processPutResponse(resolve, reject, o, jsonText) {
-      console.log('PROCESS_RESPONSE');
       var json;
       try {
         json = JSON.parse(jsonText);
