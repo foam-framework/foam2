@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-
-
 /**
   The base class for most DAOs, defining basic DAO behavior.
 */
@@ -159,14 +157,14 @@ foam.CLASS({
       return this.on.sub(function(s, on, e, obj) {
         sub = s;
         switch(e) {
-        case 'put':
-          mySink.put(obj, fc);
+          case 'put':
+            mySink.put(obj, fc);
           break;
-        case 'remove':
-          mySink.remove(obj, fc);
+          case 'remove':
+            mySink.remove(obj, fc);
           break;
-        case 'reset':
-          mySink.reset();
+          case 'reset':
+            mySink.reset();
           break;
         }
       });
@@ -219,8 +217,10 @@ foam.CLASS({
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
+
     /** @private */
     function error() {},
+
     /** @private */
     function reset() {}
   ]
@@ -234,6 +234,7 @@ foam.CLASS({
     'message'
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -280,8 +281,8 @@ foam.CLASS({
     },
     {
       name: 'of',
-      expression: function(delegate) {
-        return delegate.of;
+      factory: function() {
+        return this.delegate.of;
       }
     },
     {
@@ -322,7 +323,7 @@ foam.CLASS({
       } else {
         this.pub(on, putRemoveReset, obj);
       }
-    },
+    }
   ],
 
   methods: [
