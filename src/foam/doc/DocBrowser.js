@@ -174,9 +174,6 @@ foam.CLASS({
                     }
                   }).
                 end();
-
-                // TODO: fix formatting
-//                this.add(self.showSummary && self.summarize(d.model_.documentation));
               });
             })).
           end().
@@ -186,7 +183,7 @@ foam.CLASS({
     function summarize(txt) {
       if ( ! txt ) return null;
       var i = txt.indexOf('.');
-      if ( i < 60 ) return txt.substring(0, i);
+      if ( i < 60 ) return txt.substring(0, i+1);
       return txt.substring(0, 56) + ' ...';
     }
   ]
