@@ -113,8 +113,9 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ a {
-          display: block;
+          display: inline-block;
           padding: 2px;
+          width: 200px;
         }
         ^package {
           font-weight: 700;
@@ -141,8 +142,7 @@ foam.CLASS({
     },
     {
       of: 'Boolean',
-      name: 'showSummary',
-      value: false
+      name: 'showSummary'
     }
   ],
 
@@ -163,15 +163,31 @@ foam.CLASS({
                     this.start('div').cssClass(self.myCls('package')).add(pkg).end();
                   }
                 }
-                this.start(self.ClassLink, {data: d, showPackage: this.showPackage}).
-                  cssClass(this.showPackage ? null : self.myCls('indent')).
+
+                this.start('div')
+                  .start(self.ClassLink, {data: d, showPackage: this.showPackage}).
+                    cssClass(this.showPackage ? null : self.myCls('indent')).
+                  end().
+                  call(function(f) {
+                    if ( self.showSummary ) {
+                      this.add(' ', self.summarize(d.model_.documentation));
+                    }
+                  }).
                 end();
+
                 // TODO: fix formatting
-                this.add(self.showSummary && d.model_.documentation);
+//                this.add(self.showSummary && self.summarize(d.model_.documentation));
               });
             })).
           end().
         end();
+    },
+
+    function summarize(txt) {
+      if ( ! txt ) return null;
+      var i = txt.indexOf('.');
+      if ( i < 60 ) return txt.substring(0, i);
+      return txt.substring(0, 56) + ' ...';
     }
   ]
 });
