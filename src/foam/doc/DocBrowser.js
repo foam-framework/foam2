@@ -138,6 +138,11 @@ foam.CLASS({
       of: 'Boolean',
       name: 'showPackage',
       value: true
+    },
+    {
+      of: 'Boolean',
+      name: 'showSummary',
+      value: false
     }
   ],
 
@@ -162,7 +167,7 @@ foam.CLASS({
                   cssClass(this.showPackage ? null : self.myCls('indent')).
                 end();
                 // TODO: fix formatting
-                this.add(d.model_.documentation);
+                this.add(self.showSummary && d.model_.documentation);
               });
             })).
           end().
@@ -417,7 +422,7 @@ foam.CLASS({
           start('tr').
             start('td').
               style({'vertical-align': 'top'}).
-        tag(this.ClassList, {title: 'Class List', showPackages: false, data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
