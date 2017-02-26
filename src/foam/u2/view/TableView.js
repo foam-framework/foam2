@@ -101,7 +101,10 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data'
+      name: 'data',
+      postSet: function(_, data) {
+        if ( ! this.of ) this.of = data.of;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
