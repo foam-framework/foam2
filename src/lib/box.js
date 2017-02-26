@@ -70,9 +70,7 @@ foam.CLASS({
       name: 'attributes'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.FObject',
-      name: 'object'
+      name: 'object',
     }
   ]
 });
@@ -570,10 +568,95 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'DAOEvent',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'obj'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'BoxDAOListener',
+  implements: [
+    'foam.dao.Sink'
+  ],
+  requires: [
+    'foam.dao.DAOEvent'
+  ],
+  properties: [
+    {
+      class: 'FObjectProperty',
+      name: 'box'
+    }
+  ],
+  methods: [
+    function put(obj) {
+      this.box.send(this.DAOEvent.create({
+        name: 'put', obj: obj
+      }));
+    },
+    function remove(obj) {
+      this.box.send(this.DAOEvent.create({
+        name: 'remove', obj: obj
+      }));
+    },
+    function reset() {
+      this.box.send(this.DAOEvent.create({
+        name: 'reset'
+      }));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'MergeBox',
+  extends: 'foam.box.ProxyBox',
+  properties: [
+    {
+      class: 'Int',
+      name: 'delay',
+      value: 100
+    },
+    {
+      name: 'msg',
+      transient: true
+    },
+    {
+      class: 'Array',
+      name: 'queue',
+      transient: true
+    }
+  ],
+  methods: [
+    function send(m) {
+      if ( ! this.timeout ) {
+      }
+    }
+  ],
+  listeners: [
+    function doSend() {
+      var queue = this.queue;
+      this.queue = undefined;
+      this.timeout = undefined;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
   name: 'ClientDAO',
   extends: 'foam.dao.BaseClientDAO',
   requires: [
-    'foam.core.Serializable'
+    'foam.core.Serializable',
+    'foam.dao.BoxDAOListener'
   ],
   methods: [
     function select(sink, skip, limit, order, predicate) {
@@ -599,6 +682,31 @@ foam.CLASS({
           return sink;
         });
       }
+
+      return this.SUPER(sink, skip, limit, order, predicate);
+    },
+    function listen(sink, predicate) {
+      // TODO: This should probably just be handled automatically via a RemoteSink/Listener
+      var id = foam.next$UID();
+      var replyBox = this.__context__.registry.register(
+        id,
+        this.delegateReplyPolicy,
+        {
+          send: function(m) {
+            switch(m.object.name) {
+              case 'put':
+              case 'remove':
+                sink[m.object.name](m.object.obj);
+              break;
+              case 'reset':
+                sink.reset();
+            }
+          }
+        });
+
+      this.SUPER(this.BoxDAOListener({
+        box: replyBox
+      }), predicate);
     }
   ]
 });

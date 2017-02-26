@@ -181,17 +181,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Object',
   extends: 'Property',
-
-  documentation: '',
-
-  properties: [
-    {
-      name: 'fromJSON',
-      value: function(value, ctx) {
-        return foam.json.parse(value, null, ctx);
-      }
-    }
-  ]
+  documentation: ''
 });
 
 
@@ -236,12 +226,6 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    {
-      name: 'fromJSON',
-      value: function(value, opt_ctx) {
-        return foam.json.parse(value, null, opt_ctx);
-      }
-    },
     [
       'factory',
       function() { return []; }
@@ -419,12 +403,6 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    [
-      'fromJSON',
-      function(value, opt_ctx) {
-        return foam.json.parse(value, null, opt_ctx);
-      }
-    ],
     ['factory', function() { return {} }],
     'of'
   ]
