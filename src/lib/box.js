@@ -70,7 +70,8 @@ foam.CLASS({
       name: 'attributes'
     },
     {
-      name: 'object',
+      class: 'Object',
+      name: 'object'
     }
   ]
 });
@@ -86,8 +87,7 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.FObject',
+      class: 'Object',
       name: 'object'
     }
   ]
