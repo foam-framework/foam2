@@ -280,6 +280,8 @@ foam.CLASS({
     [
       'assertValue',
       function(v, prop) {
+        if ( v === null ) return;
+
         foam.assert(Array.isArray(v),
             prop.name, 'Tried to set StringArray to non-array type.');
         for ( var i = 0 ; i < v.length ; i++ ) {
