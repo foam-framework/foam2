@@ -15,10 +15,15 @@
  * limitations under the License.
  */
 
-/**
+foam.CLASS({
+  package: 'foam.core',
+  name: 'MultiPartID',
+  extends: 'foam.core.Property',
+
+  documentation: function() {/*
   An Identity Axiom which installs a psedo-property to use as an id.
   Use when you want a multi-part primary-key.
-<pre>
+  <pre>
   Ex.
   foam.CLASS({
     name: 'Person',
@@ -29,12 +34,8 @@
   > var p = Person.create({firstName: 'Kevin', lastName: 'Greer'});
   > p.id;
   ["Kevin", "Greer"]
-</pre>
-*/
-foam.CLASS({
-  package: 'foam.core',
-  name: 'MultiPartID',
-  extends: 'foam.core.Property',
+  </pre>
+  */},
 
   properties: [
     [ 'name', 'id' ],
