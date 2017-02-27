@@ -32,6 +32,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Action',
 
+  documentation: 'An Action is a method with extra GUI support.',
+
   properties: [
     {
       class: 'String',
