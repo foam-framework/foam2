@@ -17,54 +17,46 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOCreateController',
+  name: 'DAOController',
 
   imports: [
     'stack'
   ],
 
-  exports: [
-    'data'
-  ],
-
   properties: [
     {
-      name: 'dao',
+      name: 'data',
       hidden: true,
       factory: function() {
         return this.__context__[foam.String.daoize(this.of.name)];
       }
     },
     {
+      name: 'predicate',
+      view: 'foam.u2.view.RecipricalSearch'
+    },
+    {
+      name: 'filteredDAO',
+      view: 'foam.u2.view.TableView',
+      expression: function(data, predicate) {
+        return predicate ? data.where(predicate) : data;
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       hidden: true
-    },
-    {
-      name: 'data',
-      label: '',
-      view: { class: 'foam.u2.DetailView' },
-      factory: function() {
-        return this.of.create(null, this);
-      }
     }
   ],
 
   actions: [
     {
-      name: 'save',
+      name: 'create',
       code: function() {
-        var stack = this.stack;
-
-        this.dao.put(this.data).then(function() {
-          if ( stack ) stack.back();
+        this.stack.push({
+          class: 'foam.comics.DAOCreateController',
+          of: this.of
         });
-      }
-    },
-    {
-      name: 'cancel',
-      code: function() {
-        this.stack && this.stack.back();
       }
     }
   ]
