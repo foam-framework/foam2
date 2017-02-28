@@ -109,7 +109,7 @@ foam.CLASS({
         }
       }
 
-      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
+      return Promise.resolve(null);
     }
   ]
 });
