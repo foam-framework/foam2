@@ -186,4 +186,7 @@ FOAM_FILES([
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
   { name: "foam/doc/DocBrowser", flags: ['debug'] },
+  { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
+  { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
+  { name: "com/google/cloud/datastore/node/DatastoreDAO", flags: ['gcloud'] },
 ]);

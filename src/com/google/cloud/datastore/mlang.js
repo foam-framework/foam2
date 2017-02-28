@@ -67,7 +67,7 @@ foam.CLASS({
       return {
         property: this.arg1.toDatastoreProperty(),
         op: this.datastoreOpName,
-        value: foam.util.datastoreValue(this.arg2)
+        value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
       };
     }
   ]
