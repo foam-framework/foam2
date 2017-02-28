@@ -19,8 +19,7 @@ foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateOutput',
 
-  documentation:
-      'An object which can be output() to to create a concatenated string.',
+  documentation: 'A buffer for storing Template output.',
 
   properties: [
     {
@@ -54,6 +53,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.templates',
   name: 'TemplateUtil',
+
+  documentation: 'Utility methods for working with Templates. Mostly just for internal use.',
 
   axioms: [ foam.pattern.Singleton.create() ],
 

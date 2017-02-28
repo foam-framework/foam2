@@ -113,8 +113,9 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ a {
-          display: block;
+          display: inline-block;
           padding: 2px;
+          width: 200px;
         }
         ^package {
           font-weight: 700;
@@ -138,6 +139,10 @@ foam.CLASS({
       of: 'Boolean',
       name: 'showPackage',
       value: true
+    },
+    {
+      of: 'Boolean',
+      name: 'showSummary'
     }
   ],
 
@@ -158,13 +163,28 @@ foam.CLASS({
                     this.start('div').cssClass(self.myCls('package')).add(pkg).end();
                   }
                 }
-                this.start(self.ClassLink, {data: d, showPackage: this.showPackage}).
-                  cssClass(this.showPackage ? null : self.myCls('indent')).
+
+                this.start('div')
+                  .start(self.ClassLink, {data: d, showPackage: this.showPackage}).
+                    cssClass(this.showPackage ? null : self.myCls('indent')).
+                  end().
+                  call(function(f) {
+                    if ( self.showSummary ) {
+                      this.add(' ', self.summarize(d.model_.documentation));
+                    }
+                  }).
                 end();
               });
             })).
           end().
         end();
+    },
+
+    function summarize(txt) {
+      if ( ! txt ) return null;
+      var i = txt.indexOf('.');
+      if ( i < 60 ) return txt.substring(0, i+1);
+      return txt.substring(0, 56) + ' ...';
     }
   ]
 });
@@ -207,7 +227,7 @@ foam.CLASS({
         if ( cls === foam.core.FObject ) break;
       }
       this.br();
-      this.add(data.documentation);
+      this.add(data.model_.documentation);
 
       this.add(this.slot(function (showInherited) {
         // TODO: hide 'Source Class' column if showInherited is false
@@ -320,6 +340,8 @@ foam.CLASS({
   name: 'DocBrowser',
   extends: 'foam.u2.Element',
 
+  documentation: 'FOAM documentation browser.',
+
   requires: [
     'foam.doc.DocBorder',
     'foam.doc.ClassList',
@@ -413,7 +435,7 @@ foam.CLASS({
           start('tr').
             start('td').
               style({'vertical-align': 'top'}).
-        tag(this.ClassList, {title: 'Class List', showPackages: false, data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).

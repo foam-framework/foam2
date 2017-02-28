@@ -21,6 +21,7 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Count',
   extends: 'foam.dao.AbstractSink',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -46,6 +47,7 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'NullSink',
   extends: 'foam.dao.AbstractSink',
+  implements: ['foam.core.Serializable'],
 
   axioms: [
     foam.pattern.Singleton.create()
@@ -85,23 +87,6 @@ foam.CLASS({
         if ( o instanceof Date ) return foam.mlang.Constant.create({ value: o });
         if ( foam.core.FObject.isInstance(o) || Array.isArray(o) ) return o;
         console.error('Invalid expression value: ', o);
-      }
-    },
-    {
-      name: 'fromJSON',
-      value: function(value, opt_ctx) {
-        // TODO: create a NamedProperty which doesn't include class, if possible
-        return value && '__Property__' === value.class ?
-            foam.lookup(value.source).getAxiomByName(value.name) :
-            foam.json.parse(value, null, opt_ctx) ;
-      }
-    },
-    {
-      name: 'toJSON',
-      value: function(value) {
-        return foam.core.Property.isInstance(value) ?
-            { class: '__Property__', source: value.sourceCls_.id, name: value.name } :
-            value ;
       }
     }
   ]
@@ -234,6 +219,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'True',
   extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: ['foam.core.Serializable'],
 
   axioms: [ foam.pattern.Singleton.create() ],
 
@@ -250,6 +236,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'False',
   extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: ['foam.core.Serializable'],
 
   axioms: [ foam.pattern.Singleton.create() ],
 
@@ -360,6 +347,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Or',
   extends: 'foam.mlang.predicate.Nary',
+  implements: ['foam.core.Serializable'],
 
   requires: [
     'foam.mlang.predicate.False',
@@ -462,6 +450,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'And',
   extends: 'foam.mlang.predicate.Nary',
+  implements: ['foam.core.Serializable'],
 
   requires: [
     'foam.mlang.predicate.Or'
@@ -661,6 +650,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Contains',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -678,6 +668,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ContainsIC',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     function f(o) {
@@ -698,6 +689,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'StartsWith',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -723,6 +715,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'StartsWithIC',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -748,6 +741,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'In',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -802,6 +796,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'InIC',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -843,6 +838,7 @@ foam.CLASS({
   package: 'foam.mlang',
   name: 'Constant',
   extends: 'foam.mlang.AbstractExpr',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -905,6 +901,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Eq',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -926,6 +923,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Neq',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -943,6 +941,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Lt',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -960,6 +959,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Lte',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -977,6 +977,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gt',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -994,6 +995,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gte',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     {
@@ -1011,6 +1013,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Has',
   extends: 'foam.mlang.predicate.Unary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     function f(obj) {
@@ -1028,6 +1031,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
   extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -1076,6 +1080,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Keyword',
   extends: 'foam.mlang.predicate.Unary',
+  implements: ['foam.core.Serializable'],
 
   requires: [
     'foam.core.String'
@@ -1105,7 +1110,8 @@ foam.CLASS({
   extends: 'foam.dao.ProxySink',
 
   implements: [
-    'foam.mlang.predicate.Unary'
+    'foam.mlang.predicate.Unary',
+    'foam.core.Serializable'
   ],
 
   methods: [
@@ -1125,7 +1131,8 @@ foam.CLASS({
   name: 'Mul',
 
   implements: [
-    'foam.mlang.predicate.Binary'
+    'foam.mlang.predicate.Binary',
+    'foam.core.Serializable'
   ],
 
   methods: [
@@ -1140,6 +1147,7 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'GroupBy',
   extends: 'foam.dao.AbstractSink',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -1214,6 +1222,7 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Explain',
   extends: 'foam.dao.ProxySink',
+  implements: ['foam.core.Serializable'],
 
   properties: [
     {
@@ -1288,7 +1297,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Desc',
-  implements: [ 'foam.mlang.order.Comparator' ],
+  implements: [
+    'foam.mlang.order.Comparator',
+    'foam.core.Serializable'
+  ],
 
   properties: [
     {
@@ -1344,7 +1356,10 @@ foam.CLASS({
   package: 'foam.mlang.order',
   name: 'ThenBy',
 
-  implements: ['foam.mlang.order.Comparator'],
+  implements: [
+    'foam.mlang.order.Comparator',
+    'foam.core.Serializable'
+  ],
 
   properties: [
     {
@@ -1494,7 +1509,8 @@ foam.CLASS({
   extends: 'foam.dao.AbstractSink',
 
   implements: [
-    'foam.mlang.predicate.Unary'
+    'foam.mlang.predicate.Unary',
+    'foam.core.Serializable'
   ],
 
   properties: [
@@ -1522,7 +1538,8 @@ foam.CLASS({
   extends: 'foam.dao.AbstractSink',
 
   implements: [
-    'foam.mlang.predicate.Unary'
+    'foam.mlang.predicate.Unary',
+    'foam.core.Serializable',
   ],
 
   properties: [
@@ -1544,6 +1561,7 @@ foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Dot',
   extends: 'foam.mlang.predicate.Binary',
+  implements: ['foam.core.Serializable'],
 
   methods: [
     function f(o) {

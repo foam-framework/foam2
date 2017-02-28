@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,23 @@
  */
 
 foam.CLASS({
-  package: 'foam.mlang',
-  name: 'LabeledValue',
-
-  documentation: 'A basic model for any id-label-value triple. This is ' +
-      'useful when you need essentially a DAO of strings, and need to wrap ' +
-      'those strings into a modeled object.',
+  refines: 'foam.blob.Buffer',
 
   properties: [
     {
-      name: 'id',
-      expression: function(label) { return label; }
-    },
-    {
-      class: 'String',
-      name: 'label',
-      required: true
-    },
-    {
-      name: 'value'
+      name: 'buffer',
+      factory: function() {
+        return new Buffer(this.length);
+      }
+    }
+  ],
+
+  methods: [
+    function slice(start, end) {
+      return foam.blob.Buffer.create({
+        length: end - start,
+        buffer: this.buffer.slice(start, end)
+      });
     }
   ]
 });

@@ -37,19 +37,12 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
-      // Just discard documentation.
-      // If it's needed, a real 'documentation' property will
-      // be refined in.
-      name: 'documentation',
-      setter: function() { }
-    },
-    {
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
     [ 'extends', 'FObject' ],
     'refines',
-    'documentation',
+    { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       // List of all axioms, including methods, properties, listeners,
       // etc. and 'axioms'.

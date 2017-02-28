@@ -550,10 +550,15 @@ foam.CLASS({
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place
             reverseSort ?
-              subTree.selectReverse(sink, [skip], [limit],
-                order, predicate, {}) :
-              subTree.select(sink, [skip], [limit],
-                order, predicate, {}) ;
+              subTree.selectReverse(
+                sink,
+                skip != null ? [skip] : null,
+                limit != null ? [limit] : null,
+                order, predicate, {}) : subTree.select(
+                  sink,
+                  skip != null ? [skip] : null,
+                  limit != null ? [limit] : null,
+                  order, predicate, {}) ;
             index.selectCount--;
           }
         },
@@ -675,4 +680,3 @@ foam.CLASS({
 
   ]
 });
-

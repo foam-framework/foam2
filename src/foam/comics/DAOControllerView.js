@@ -16,25 +16,20 @@
  */
 
 foam.CLASS({
-  package: 'foam.mlang',
-  name: 'LabeledValue',
+  package: 'foam.comics',
+  name: 'DAOControllerView',
+  extends: 'foam.u2.View',
 
-  documentation: 'A basic model for any id-label-value triple. This is ' +
-      'useful when you need essentially a DAO of strings, and need to wrap ' +
-      'those strings into a modeled object.',
+  requires: [
+    'foam.comics.DAOController'
+  ],
 
-  properties: [
-    {
-      name: 'id',
-      expression: function(label) { return label; }
-    },
-    {
-      class: 'String',
-      name: 'label',
-      required: true
-    },
-    {
-      name: 'value'
+  methods: [
+    function initE() {
+      this.add(
+        this.DAOController.PREDICATE,
+        this.DAOController.FILTERED_DAO
+      );
     }
   ]
 });
