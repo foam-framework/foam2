@@ -37,7 +37,7 @@ foam.CLASS({
     },
 
     function find(id) {
-      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
+      return Promise.resolve(null);
     },
 
     function select(sink) {
