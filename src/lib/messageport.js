@@ -53,10 +53,10 @@ foam.CLASS({
     },
 
     function onMessage(port, e) {
-      var msg = foam.json.parse(foam.json.parseString(e.data));
+      var msg = foam.json.parseString(e.data, this);
 
-      if ( this.RegisterSelfMessage.isInstance(msg) ) {
-        var named = this.NamedBox.create({ name: msg.name });
+      if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
+        var named = this.NamedBox.create({ name: msg.object.name });
         named.delegate = this.RawMessagePortBox.create({
           port: port
         });

@@ -40,7 +40,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Window',
 
-  // documentation: 'Encapsulates top-level window/document features.',
+  documentation: 'Encapsulates top-level window/document features.',
 
   exports: [
     'getElementsByClassName',

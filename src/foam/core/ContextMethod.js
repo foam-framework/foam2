@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-/**
- * A Method which has the call-site context added as the first argument
- * when exported.
- * See use in foam.u2.U2Context.E
- */
 foam.CLASS({
   package: 'foam.core',
   name: 'ContextMethod',
   extends: 'foam.core.Method',
+
+  documentation: 'A Method which has the call-site context added as the first argument when exported. See use in foam.u2.U2Context.E',
 
   methods: [
     function exportAs(obj) {

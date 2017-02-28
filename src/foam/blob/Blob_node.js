@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,24 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
-  package: 'foam.core',
-  name: 'Serializable',
+foam.CLASS({
+  refines: 'foam.blob.Buffer',
 
-  documentation:
-      'Marker interface to indicate that a CLASS is serializble or not.'
+  properties: [
+    {
+      name: 'buffer',
+      factory: function() {
+        return new Buffer(this.length);
+      }
+    }
+  ],
+
+  methods: [
+    function slice(start, end) {
+      return foam.blob.Buffer.create({
+        length: end - start,
+        buffer: this.buffer.slice(start, end)
+      });
+    }
+  ]
 });
