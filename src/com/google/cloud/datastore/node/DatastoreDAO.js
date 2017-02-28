@@ -40,11 +40,35 @@ foam.CLASS({
     },
     {
       name: 'http',
-      factory: function() { return require('http'); }
+      factory: function() {
+        return this.protocol === 'https:' ? require('https') : require('http');
+      }
     }
   ],
 
   methods: [
+    function find(id) {
+      var self = this;
+      var key = foam.core.FObject.isInstance(id) ?
+          id.getDatastoreKey() : this.getDatastoreKeyFromId(id);
+      var req = this.http.request({
+        protocol: this.protocol,
+        host: this.host,
+        port: this.port,
+        method: 'POST',
+        path: '/v1/projects/' + this.projectId + ':lookup',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      return new Promise(function(resolve, reject) {
+        req.on('aborted', self.onFindAborted.bind(self, reject));
+        req.on('response', self.onFindResponse.bind(self, resolve, reject));
+        req.write(JSON.stringify({ keys: [ key ] }));
+        req.end();
+      });
+    },
     function put(o) {
       var self = this;
       var req = this.http.request({
@@ -67,6 +91,51 @@ foam.CLASS({
         }));
         req.end();
       });
+    },
+
+    function getDatastoreKeyFromId(id) {
+      return { path: [ { kind: this.of.id, name: id } ] };
+    },
+
+    function onFindAborted(reject) {
+      reject(new Error('Cloud Datastore endpoint aborted HTTP request'));
+    },
+    function onFindResponse(resolve, reject, message) {
+      if ( message.statusCode !== 200 ) {
+        console.error('Unexpected response code from Cloud Datastore ' +
+            'endpoint: ' + message.statusCode);
+        reject(new Error('Unexpected response code from Cloud Datastore ' +
+            'endpoint: ' + message.statusCode));
+        return;
+      }
+
+      var self = this;
+      var jsonText = '';
+      message.on('data', function(data) { jsonText += data.toString(); });
+      message.on('end', function() {
+        self.processFindResponse(resolve, reject, jsonText);
+      });
+    },
+    function processFindResponse(resolve, reject, jsonText) {
+      var json;
+      try {
+        json = JSON.parse(jsonText);
+      } catch (err) {
+        reject(err);
+        return;
+      }
+
+      if ( ! ( json.found && json.found[0] && json.found[0].entity ) ) {
+        reject(new Error('Cloud Datastore entity not found'));
+        return;
+      }
+      if ( json.found.length > 1 ) {
+        reject(new Error('Multiple Cloud Datastore entities match unique id'));
+        return;
+      }
+
+      resolve(com.google.cloud.datastore.fromDatastoreEntity(
+          json.found[0].entity));
     },
 
     function onPutAborted(reject) {
