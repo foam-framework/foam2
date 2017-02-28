@@ -45,6 +45,7 @@ var classes = [
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
+  'foam.mlang.predicate.Has',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',

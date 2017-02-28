@@ -323,6 +323,17 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Has',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: 'return getArg1().f(obj) != null && getArg1().f(obj) != "";'
+    }
+  ]
+});
+
 foam.INTERFACE({
   refines: 'foam.mlang.order.Comparator',
 
