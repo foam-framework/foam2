@@ -15,22 +15,20 @@
  * limitations under the License.
  */
 
-/**
-    <p>If you don't know which DAO implementation to choose, EasyDAO is
-    ready to help. Simply require foam.dao.EasyDAO and create() with the flags
-    to indicate what behavior you're looking for. Under the hood, EasyDAO
-    will create one or more DAO instances to service your requirements.
-    </p>
-    <p>Since EasyDAO is a proxy, just use it like you would any other
-    DAO, without worrying about the internal DAO doing the work.
-    </p>
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
-
   implements: [ 'foam.mlang.Expressions' ],
+
+  documentation: function() {/*
+    Facade for easily creating decorated DAOs.
+    <p>
+    Most DAOs are most easily created and configured with EasyDAO.
+    Simply require foam.dao.EasyDAO and create() with the flags
+    to indicate what behavior you're looking for. Under the hood, EasyDAO
+    will create one or more DAO instances to service your requirements and then
+  */},
 
   requires: [
     'foam.dao.MDAO',

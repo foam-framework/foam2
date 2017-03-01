@@ -21,6 +21,8 @@ foam.CLASS({
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: 'DAO implementation backed by an array.',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.mlang.predicate.True'
