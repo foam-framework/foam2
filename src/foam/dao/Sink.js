@@ -65,6 +65,8 @@ foam.CLASS({
   name: 'ProxySink',
   implements: [ 'foam.dao.Sink' ],
 
+  documentation: 'Proxy for Sink interface.',
+
   properties: [
     {
       class: 'Proxy',
@@ -78,8 +80,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractSink',
-
   implements: [ 'foam.dao.Sink' ],
+
+  documentation: 'Abstract base class for implementing Sink interface.',
 
   methods: [
     {
@@ -104,6 +107,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -131,60 +135,68 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'resetFn'
-    },
+    }
   ],
 
   methods: [
     function put() {
       return this.putFn && this.putFn.apply(this, arguments);
     },
+
     function remove() {
       return this.removeFn && this.removeFn.apply(this, arguments);
     },
+
     function eof() {
       return this.eofFn && this.eofFn.apply(this, arguments);
     },
+
     function error() {
       return this.errorFn && this.errorFn.apply(this, arguments);
     },
+
     function reset() {
       return this.resetFn && this.resetFn.apply(this, arguments);
-    },
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'AnonymousSink',
   implements: [ 'foam.dao.Sink' ],
-  properties: [
-    {
-      name: 'sink'
-    }
-  ],
+
+  properties: [ 'sink' ],
+
   methods: [
     function put(obj, fc) {
       var s = this.sink;
       s && s.put && s.put(obj, fc);
     },
+
     function remove(obj, fc) {
       var s = this.sink;
       s && s.remove && s.remove(obj, fc);
     },
+
     function eof() {
       var s = this.sink;
       s && s.eof && s.eof();
     },
+
     function error() {
       var s = this.sink;
       s && s.error && s.error();
     },
+
     function reset() {
       var s = this.sink;
       s && s.reset && s.reset();
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -358,7 +370,7 @@ foam.CLASS({
       name: 'results_',
       hidden: true,
       factory: function() { return {}; }
-    },
+    }
   ],
 
   methods: [
