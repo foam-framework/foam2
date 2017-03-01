@@ -34,4 +34,74 @@ describe('DatastoreDAO', function() {
 
   // From helpers/generic_dao.js.
   global.genericDAOTestBattery(daoFactory);
+
+  function unreliableDAOFactory(cls) {
+    return global.clearCDS().then(function() {
+      return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+          .create({
+            of: cls,
+            protocol: env.UNRELIABLE_CDS_EMULATOR_PROTOCOL,
+            host: env.UNRELIABLE_CDS_EMULATOR_HOST,
+            port: env.UNRELIABLE_CDS_EMULATOR_PORT
+          }, foam.__context__.createSubContext({
+            projectId: env.CDS_PROJECT_ID
+          }));
+    });
+  }
+  describe('unreliable server', function() {
+    beforeEach(function() {
+      foam.CLASS({
+        package: 'test.dao.unreliable',
+        name: 'Place',
+
+        properties: [
+          {
+            class: 'String',
+            name: 'id'
+          },
+          {
+            class: 'Float',
+            name: 'long'
+          },
+          {
+            class: 'Float',
+            name: 'lat'
+          },
+        ]
+      });
+    });
+
+    var mkCentre = function() {
+      return test.dao.unreliable.Place.create({
+        id: 'centre:0:0',
+        name: 'Centre',
+        long: 0.0,
+        lat: 0.0
+      });
+    };
+
+    describe('put()', function() {
+      it('should reject promise', function() {
+        unreliableDAOFactory(test.dao.unreliable.Place).then(function(dao) {
+          dao.put(mkCentre()).then(function() {
+            fail('put() should fail on unreliable DAO');
+          }).catch(function() {
+            expect(1).toBe(1);
+          });
+        });
+      });
+    });
+
+    describe('find()', function() {
+      it('should reject promise',  function() {
+        unreliableDAOFactory(test.dao.unreliable.Place).then(function(dao) {
+          dao.find('centre:0:0').then(function() {
+            fail('find() should fail on unreliable DAO');
+          }).catch(function() {
+            expect(1).toBe(1);
+          });
+        });
+      });
+    });
+  });
 });
