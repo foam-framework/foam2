@@ -23,9 +23,8 @@ foam.CLASS({
   label: 'Cascading Remove DAO',
   help: "Removes children from relationship",
 
-  documentation: foam.String.multiline(function(){
-    /**
-       On object DAO remove, also remove any relationship objects.
+  documentation: function(){/*
+       DAO Decorator which cascades removes to relationship DAOs.
 
        TODO:
        Perhaps the Relationship should be stored as an Axiom on the source
@@ -33,8 +32,7 @@ foam.CLASS({
        types: RelationshiipTarget and RelationshipSource, both of which
        just contain a reference to the Relationship. EasyDAO could make use
        of this as could a Relationship-Aware DAOController. - Kevin
-    */
-  }),
+  */},
 
   properties: [
     {
