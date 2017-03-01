@@ -1,11 +1,6 @@
-language: java
+language: node_js
 node_js:
   - "6"
   - "5"
   - "4"
-install:
-  - npm install
-  - test/third_party/install.sh
-script:
-  - npm test
-  - test/third_party/run.sh
+
