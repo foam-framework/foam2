@@ -28,11 +28,19 @@ foam.CLASS({
   requires: [ 'foam.dao.SQLException' ],
 
   methods: [
+    function sqlName(argName) {
+      var arg = this[argName];
+      var name = arg && arg.name;
+
+      if ( name === undefined || name === null )
+        throw this.SQLException.create({message: this.cls_.name + '.' + argName +': '+ name});
+
+      return name;
+    },
     function sqlValue(argName) {
       var arg = this[argName];
       var v = arg && arg.toSQL ? arg.toSQL() :
-        arg && arg.toString ? arg.toString() :
-        arg;
+          arg && arg.value;
 
       if ( v === undefined || v === null )
         throw this.SQLException.create({message: this.cls_.name + '.' + argName +': '+ v});
@@ -106,7 +114,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Has',
   methods: [
     function toSQL() {
-      return this.sqlValue('arg1') + ' IS NOT NULL';
+      return this.sqlName('arg1') + ' IS NOT NULL';
     }
   ]
 });
@@ -115,7 +123,7 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.predicate.Not',
   methods: [
-    function toSQL() { return 'NOT ('+ this.arg1.toSQL()+')'; }
+    function toSQL() { return 'NOT ('+ this.sqlValue('arg1')+')'; }
   ]
 });
 
@@ -125,8 +133,8 @@ foam.CLASS({
   methods: [
     function toSQL() {
       return this.arg2 === null ?
-        this.sqlValue('arg1') + ' IS NULL' :
-        this.sqlValue('arg1') + " = " + this.sqlValue('arg2');
+        this.sqlName('arg1') + ' IS NULL' :
+        this.sqlName('arg1') + " = " + this.sqlValue('arg2');
     }
   ]
 });
@@ -137,8 +145,8 @@ foam.CLASS({
   methods: [
     function toSQL() {
       return this.arg2 === null ?
-        this.sqlValue('arg1') + ' IS NOT NULL' :
-        this.sqlValue('arg1') + " <> " + this.sqlValue('arg2');
+        this.sqlName('arg1') + ' IS NOT NULL' :
+        this.sqlName('arg1') + " <> " + this.sqlValue('arg2');
     }
   ]
 });
@@ -148,7 +156,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Gt',
   methods: [
     function toSQL() {
-      return this.sqlValue('arg1') + ' > ' + this.sqlValue('arg2');
+      return this.sqlName('arg1') + ' > ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -158,7 +166,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Gte',
   methods: [
     function toSQL() {
-      return this.sqlValue('arg1') + ' >= ' + this.sqlValue('arg2');
+      return this.sqlName('arg1') + ' >= ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -168,7 +176,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Lt',
   methods: [
     function toSQL() {
-      return this.sqlValue('arg1') + ' < ' + this.sqlValue('arg2');
+      return this.sqlName('arg1') + ' < ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -178,7 +186,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Lte',
   methods: [
     function toSQL() {
-      return this.sqlValue('arg1') + ' <= ' + this.sqlValue('arg2');
+      return this.sqlName('arg1') + ' <= ' + this.sqlValue('arg2');
     }
   ]
 });
@@ -187,12 +195,12 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.predicate.And',
   methods: [
-    // AND has a higher precedence than OR so doesn't need paranthesis
+    // AND has a higher precedence than OR so doesn't need parenthesis
     function toSQL() {
       var s = '';
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a = this.args[i];
-        s += a.toSQL();
+          s += a.toSQL();
         if ( i < this.args.length - 1 )
         s += ' AND ';
       }
@@ -224,7 +232,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.In',
   methods: [
     function toSQL() {
-      var s = this.sqlValue('arg1');
+      var s = this.sqlName('arg1');
       s += ' IN ( \'';
       if ( Array.isArray(this.arg2) ) {
         s += this.arg2.join('\', \'');
