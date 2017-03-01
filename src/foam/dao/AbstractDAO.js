@@ -249,22 +249,6 @@ foam.CLASS({
   extends: 'Exception'
 })
 
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'ObjectNotFoundException',
-  extends: 'foam.dao.ExternalException',
-
-  properties: [
-    'id',
-    {
-      name: 'message',
-      expression: function(id) { return "No record found for id: " + id; }
-    }
-  ]
-});
-
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',

@@ -295,7 +295,7 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
 	require('fs').open(this.sha256 + require('path').sep + id, function(err, fd) {
 	  if ( err ) {
-	    reject(err);
+            resolve(null);
 	    return;
 	  }
 	  resolve(foam.blob.FdBlob.create({ fd: fd }));
