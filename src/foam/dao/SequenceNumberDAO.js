@@ -15,11 +15,6 @@
  * limitations under the License.
  */
 
-/**
-  Set a specified properties value with an auto-increment
-  sequence number on DAO.put() if the properties value
-  is set to the properties default value.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'SequenceNumberDAO',
@@ -28,6 +23,8 @@ foam.CLASS({
   implements: [
     'foam.mlang.Expressions'
   ],
+
+  documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
 
   requires: [
     'foam.dao.InternalException'
