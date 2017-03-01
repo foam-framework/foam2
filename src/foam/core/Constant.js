@@ -30,6 +30,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Constant',
 
+  documentation: 'An Axiom for defining class constants.',
+
   properties: [ 'name', 'value' ],
 
   methods: [

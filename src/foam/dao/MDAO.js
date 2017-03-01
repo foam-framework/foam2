@@ -159,12 +159,7 @@ foam.CLASS({
         return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
       }
 
-      var obj = this.find_(key);
-
-      if ( obj )
-        return Promise.resolve(obj);
-      else
-        return Promise.reject(this.ObjectNotFoundException.create({ id: key }));
+      return Promise.resolve(this.find_(key));
     },
 
     /** internal, synchronous version of find, does not throw */
@@ -174,7 +169,7 @@ foam.CLASS({
 
       if ( index && index.get() ) return index.get();
 
-      return;
+      return null;
     },
 
     function remove(obj) {
@@ -189,11 +184,9 @@ foam.CLASS({
       if ( found ) {
         self.index.remove(found);
         self.pub('on', 'remove', found);
-        return Promise.resolve();
-      } else {
-        // object not found is ok, remove post-condition still met
-        return Promise.resolve();
       }
+
+      return Promise.resolve();
     },
 
     function removeAll(skip, limit, order, predicate) {
@@ -268,6 +261,3 @@ foam.CLASS({
     }
   ]
 });
-
-
-

@@ -16,37 +16,20 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'NullDAO',
-  extends: 'foam.dao.AbstractDAO',
+  package: 'foam.comics',
+  name: 'DAOControllerView',
+  extends: 'foam.u2.View',
 
   requires: [
-    'foam.dao.ExternalException',
-    'foam.dao.ObjectNotFoundException'
+    'foam.comics.DAOController'
   ],
 
   methods: [
-    function put(obj) {
-      return Promise.reject(this.ExternalException.create({
-        message: 'NullDAO: Cannot handle put()'
-      }));
-    },
-
-    function remove(obj) {
-      return Promise.resolve();
-    },
-
-    function find(id) {
-      return Promise.resolve(null);
-    },
-
-    function select(sink) {
-      sink.eof();
-      return Promise.resolve(sink);
-    },
-
-    function removeAll() {
-      return Promise.resolve();
+    function initE() {
+      this.add(
+        this.DAOController.PREDICATE,
+        this.DAOController.FILTERED_DAO
+      );
     }
   ]
 });

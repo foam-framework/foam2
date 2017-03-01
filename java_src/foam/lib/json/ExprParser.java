@@ -18,7 +18,7 @@ public class ExprParser extends foam.lib.parse.ProxyParser {
                                                        new Whitespace(),
                                                        new Literal(","),
                                                        new Whitespace(),
-                                                       new KeyParser("source"),
+                                                       new KeyParser("forClass_"),
                                                        new Whitespace(),
                                                        new Literal(":"),
                                                        new Whitespace(),
@@ -27,40 +27,27 @@ public class ExprParser extends foam.lib.parse.ProxyParser {
                         public PStream parse(PStream ps, ParserContext x) {
                           ps = delegate.parse(ps, x);
                           if ( ps != null ) {
-                            x.set("classId", ps.value());
+                            x.set("forClass_", ps.value());
                           }
                           return ps;
                         }
                       },
                                                        new Whitespace(),
-                                                       new Literal(","),
-                                                       new Whitespace(),
-                                                       new KeyParser("name"),
-                                                       new Literal(":"),
-                                                       new Whitespace(),
-                                                       new Parser() {
-                                                         private Parser delegate = new StringParser();
-                                                         public PStream parse(PStream ps, ParserContext x) {
-                                                           ps = delegate.parse(ps, x);
-                                                           if ( ps != null ) {
-                                                             x.set("propName", ps.value());
-                                                           }
-                                                           return ps;
-                                                         }
-                                                       },
-                                                       new Whitespace(),
                                                        new Literal("}"));
                     public PStream parse(PStream ps, ParserContext x) {
                       ps = delegate.parse(ps, x);
+                      String forClass = (String)x.get("forClass_");
+                      String classId = forClass.substring(0, forClass.lastIndexOf("."));
+                      String propName = forClass.substring(forClass.lastIndexOf(".") + 1);
+
                       if ( ps != null ) {
                         Class cls;
                         try {
-                          cls = Class.forName((String)x.get("classId"));
+                          cls = Class.forName(classId);
                         } catch(ClassNotFoundException e) {
                           throw new RuntimeException(e);
                         }
 
-                        String prop = (String)x.get("propName");
                         // TODO(adamvy): Use the context to resolve the class rather than reflection
                         // TODO(adamvy): Better handle errors.
 
@@ -71,7 +58,7 @@ public class ExprParser extends foam.lib.parse.ProxyParser {
                           throw new RuntimeException(e);
                         }
 
-                        return ps.setValue(info.getAxiomByName(prop));
+                        return ps.setValue(info.getAxiomByName(propName));
                       }
                       return null;
                     }

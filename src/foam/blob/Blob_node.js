@@ -16,25 +16,23 @@
  */
 
 foam.CLASS({
-  package: 'foam.classloader',
-  name: 'OrDAO',
-  extends: 'foam.dao.ProxyDAO',
+  refines: 'foam.blob.Buffer',
 
   properties: [
     {
-      name: 'primary',
-      help: 'This is the DAO to look things up in first.'
+      name: 'buffer',
+      factory: function() {
+        return new Buffer(this.length);
+      }
     }
   ],
 
   methods: [
-    function find(id) {
-      var self = this;
-      return this.primary.find(id)
-          .then(function(o) {
-            if ( o == null ) return self.delegate.find(id);
-            return o;
-          });
+    function slice(start, end) {
+      return foam.blob.Buffer.create({
+        length: end - start,
+        buffer: this.buffer.slice(start, end)
+      });
     }
   ]
 });
