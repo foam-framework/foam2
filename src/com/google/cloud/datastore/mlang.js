@@ -34,7 +34,7 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.And',
 
   methods: [
-    function toDatastoreFilter() {
+    function toOwnDatastoreFilter() {
       var filters = new Array(this.args.length);
 
       for ( var i = 0; i < this.args.length; i++ ) {
@@ -42,6 +42,9 @@ foam.CLASS({
       }
 
       return { op: 'AND', filters: filters };
+    },
+    function toDatastoreFilter() {
+      return { compositeFilter: this.toOwnDatastoreFilter() };
     }
   ]
 });
@@ -58,7 +61,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function toDatastoreFilter() {
+    function toOwnDatastoreFilter() {
       foam.assert(foam.core.Property.isInstance(this.arg1),
           'Left-hand-side of datastore binary op is not a property');
       foam.assert(this.datastoreOpName,
@@ -69,6 +72,9 @@ foam.CLASS({
         op: this.datastoreOpName,
         value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
       };
+    },
+    function toDatastoreFilter() {
+      return { propertyFilter: this.toOwnDatastoreFilter };
     }
   ]
 });
