@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Relationship',
   implements: [ 'foam.mlang.Expressions' ],
 
+  documentation: 'An Axiom for defining Relationships between models.',
+
   properties: [
     {
       name: 'id',

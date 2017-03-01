@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'NullDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: 'A Null pattern (do-nothing) DAO implementation.',
+
   requires: [
     'foam.dao.ExternalException',
     'foam.dao.ObjectNotFoundException'
