@@ -34,8 +34,6 @@ global.clearCDS = function() {
     var results = [];
 
     function deleteResults() {
-      console.log('deleteResults', results);
-
       var req = http.request({
         protocol: env.CDS_EMULATOR_PROTOCOL,
         host: env.CDS_EMULATOR_HOST,
@@ -47,8 +45,6 @@ global.clearCDS = function() {
           'Content-Type': 'application/json'
         }
       });
-
-      debugger;
 
       req.on('aborted', function() {
         reject(new Error('Request aborted by server'));
@@ -92,7 +88,6 @@ global.clearCDS = function() {
     }
 
     function getMoreResults() {
-      console.log('getMoreResults', nextCursor);
       if ( nextCursor ) resultsReqData.query.startCursor = nextCursor;
 
       var req = http.request({
@@ -106,8 +101,6 @@ global.clearCDS = function() {
           'Content-Type': 'application/json'
         }
       });
-
-      debugger;
 
       req.on('aborted', function() {
         reject(new Error('Request aborted by server'));
@@ -128,8 +121,6 @@ global.clearCDS = function() {
             reject(err);
             return;
           }
-
-          debugger;
 
           var moreResults =
               // TODO(markdittmer): entityResults check should be

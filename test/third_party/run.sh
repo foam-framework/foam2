@@ -5,10 +5,6 @@ set -v
 BASE_DIR=$(readlink -f $(dirname "$0"))
 export PATH="$BASE_DIR/google-cloud-sdk/bin:$PATH"
 
-GCLOUD_SDK_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-145.0.0-linux-x86_64.tar.gz"
-GCLOUD_SDK_TGZ="$BASE_DIR/google-cloud-sdk.tar.gz"
-GCLOUD_PATH="$(which gcloud)"
-
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
@@ -25,6 +21,11 @@ function warn() {
 function error() {
     printf "\n${RED}$1${NC}\n"
 }
+
+if [ "$(which gcloud)" == "" ]; then
+  error "gcloud is not installed"
+  exit 1
+fi
 
 CDS_EMULATOR_PID=""
 UNRELIABLE_CDS_EMULATOR_PID=""
@@ -60,14 +61,6 @@ function stop() {
 }
 
 trap stop INT
-
-if [ "$GCLOUD_PATH" == "" ]; then
-  curl -o "$GCLOUD_SDK_TGZ" "$GCLOUD_SDK_URL"
-  pushd "$BASE_DIR"
-  tar xzvf "$GCLOUD_SDK_TGZ"
-  "./google-cloud-sdk/install.sh" -q --override-components cloud-datastore-emulator
-  popd
-fi
 
 GCLOUD_BIN_DIR=$(readlink -f $(dirname $(which gcloud)))
 CDS_EMULATOR_JAR="$GCLOUD_BIN_DIR/../platform/cloud-datastore-emulator/CloudDatastore.jar"
