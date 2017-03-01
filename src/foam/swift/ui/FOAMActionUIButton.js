@@ -16,15 +16,35 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.ui',
+  name: 'FOAMActionUIButton',
+  swiftImports: [
+    'UIKit',
+  ],
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
+      name: 'view',
+      swiftType: 'UIButton',
+      swiftFactory: 'return UIButton()',
+      swiftPostSet: function() {/*
+newValue.addTarget(self, action: #selector(onButtonClick), for: .touchUpInside)
+newValue.setTitle(self.action?.label, for: .normal)
+      */},
     },
     {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
+      swiftType: 'FObject?',
+      name: 'fobj',
+    },
+    {
+      swiftType: 'Action?',
+      name: 'action',
+    },
+  ],
+  methods: [
+    {
+      name: 'onButtonClick',
+      swiftCode: 'if fobj != nil { action?.call(fobj!) }',
+      swiftAnnotations: ['@objc'],
     },
   ],
 });

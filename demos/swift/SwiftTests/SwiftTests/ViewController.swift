@@ -1,51 +1,26 @@
-//
-//  ViewController.swift
-//  SwiftTests
-//
-//  Created by Michael Carcasole on 2017-02-22.
-//  Copyright © 2017 FOAM. All rights reserved.
-//
-
 import UIKit
 
 class ViewController: UIViewController {
-  let o = Context.GLOBAL.create(type: Test.self) as! Test
-  let firstNameLabel = FOAMUILabel()
-  func swapFirstAndLast() {
-    o.swapFirstAndLast()
-  }
+  lazy var detailView: DetailView = {
+    let v = DetailView()
+    v.data = Context.GLOBAL.create(type: Test.self) as! Test
+    return v
+  }()
   override func viewDidLoad() {
     super.viewDidLoad()
-
-    firstNameLabel.data$ = o.firstName$
-
-    let b = UIButton()
-    b.backgroundColor = UIColor.green
-    b.setTitle("swapFirstAndLast", for: .normal)
-    b.addTarget(self, action: #selector(swapFirstAndLast), for: .touchUpInside)
-
-    let views: [String:UIView] = [
-      "firstName": firstNameLabel.view,
-      "button": b,
-    ]
-
+    detailView.initAllViews()
+    let views: [String:UIView] = ["v": detailView.view]
     for (_, v) in views {
       v.translatesAutoresizingMaskIntoConstraints = false
       view.addSubview(v)
     }
-
     view.addConstraints(NSLayoutConstraint.constraints(
-      withVisualFormat: "V:|-[firstName]-[button]-|",
+      withVisualFormat: "V:|-[v]-|",
       options: NSLayoutFormatOptions.init(rawValue: 0),
       metrics: nil,
       views: views))
     view.addConstraints(NSLayoutConstraint.constraints(
-      withVisualFormat: "H:|-[firstName]-|",
-      options: NSLayoutFormatOptions.init(rawValue: 0),
-      metrics: nil,
-      views: views))
-    view.addConstraints(NSLayoutConstraint.constraints(
-      withVisualFormat: "H:|-[button]-|",
+      withVisualFormat: "H:|-[v]-|",
       options: NSLayoutFormatOptions.init(rawValue: 0),
       metrics: nil,
       views: views))

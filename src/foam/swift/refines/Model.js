@@ -40,5 +40,13 @@ foam.CLASS({
         return this.extends.split('.').pop();
       },
     },
+    {
+      class: 'StringArray',
+      name: 'swiftImplements',
+    },
+    {
+      class: 'String',
+      name: 'swiftCode',
+    },
   ],
 });

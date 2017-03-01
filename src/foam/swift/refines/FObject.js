@@ -19,27 +19,49 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     function toSwiftClass() {
+      var initImports = function(model) {
+        if (!model) return [];
+        var parent = foam.lookup(model.extends).model_;
+        if (parent.id == model.id) return [];
+        return model.swiftImports.concat(initImports(parent));
+      };
+
       var cls = foam.lookup('foam.swift.SwiftClass').create({
         name: this.model_.swiftName,
-        imports: ['Foundation'].concat(this.model_.swiftImports),
-        implements: [this.model_.swiftExtends],
+        imports: ['Foundation'].concat(initImports(this.model_)),
+        implements: [this.model_.swiftExtends].concat(this.model_.swiftImplements),
         visibility: 'public',
+        code: this.model_.swiftCode,
       });
       this.getOwnAxioms().forEach(function(axiom) {
         if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls);
       });
+
+      var createClassInfoBody = foam.templates.TemplateUtil.create().compile(
+          foam.String.multiline(function(properties, id) {/*
+let classInfo = ClassInfoImpl()
+classInfo.id = "<%=id%>"
+classInfo.parent = (class_getSuperclass(self) as! FObject.Type).classInfo()
+classInfo.ownAxioms = [
+<% for (var i = 0, p; p = axioms[i]; i++) { if (!p.swiftAxiomName) continue; %>
+<%=p.swiftAxiomName%>,
+<% } %>
+]
+return classInfo
+          */}), '', ['axioms', 'id']).apply(this, [this.getOwnAxioms(), this.model_.id]).trim();
+
+      var properties = this.getOwnAxiomsByClass(foam.core.Property)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
+
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'createClassInfo_',
         class: true,
         returnType: 'ClassInfo',
-        // TODO Actually make class info.
-        body: 'return EmptyClassInfo()',
+        body: createClassInfoBody,
       }));
-      var properties = this.getOwnAxiomsByClass(foam.core.Property)
-          .filter(function(p) {
-            return !this.getSuperAxiomByName(p.name);
-          }.bind(this));
 
       var getterBody = foam.templates.TemplateUtil.create().compile(
           foam.String.multiline(function(properties) {/*
@@ -66,6 +88,30 @@ switch key {
         body: getterBody,
       }));
 
+      var slotGetterBody = foam.templates.TemplateUtil.create().compile(
+          foam.String.multiline(function(properties) {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
+<% } %>
+  default:
+    return super.getSlot(key: key)
+}
+          */}), '', ['properties']).apply(this, [properties]).trim();
+      cls.methods.push(foam.swift.Method.create({
+        override: true,
+        name: 'getSlot',
+        visibility: 'public',
+	args: [
+          {
+            externalName: 'key',
+            localName: 'key',
+            type: 'String',
+          },
+	],
+        returnType: 'Slot?',
+        body: slotGetterBody,
+      }));
 
       var setterBody = foam.templates.TemplateUtil.create().compile(
           foam.String.multiline(function(properties) {/*
@@ -101,6 +147,38 @@ super.set(key: key, value: value)
 	],
         body: setterBody,
       }));
+
+      var actions = this.getOwnAxiomsByClass(foam.core.Action)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
+
+      var callActionBody = foam.templates.TemplateUtil.create().compile(
+          foam.String.multiline(function(actions) {/*
+switch key {
+<% for (var i = 0, p; p = actions[i]; i++) { %>
+  case "<%=p.swiftName%>":
+    <%=p.swiftName%>()
+    break
+<% } %>
+  default:
+    super.callAction(key: key)
+}
+          */}), '', ['actions']).apply(this, [actions]).trim();
+      cls.methods.push(foam.swift.Method.create({
+        override: true,
+        name: 'callAction',
+        visibility: 'public',
+	args: [
+          {
+            externalName: 'key',
+            localName: 'key',
+            type: 'String',
+          },
+	],
+        body: callActionBody,
+      }));
+
       var exports = this.getOwnAxiomsByClass(foam.core.Export)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);

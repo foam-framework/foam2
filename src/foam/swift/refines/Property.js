@@ -31,6 +31,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftView',
+    },
+    {
+      class: 'String',
       name: 'swiftSlotLinkSubName',
       expression: function(swiftName) { return swiftName + '_Value_Sub_'; },
     },
@@ -113,7 +117,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'swiftPropertyInfoName',
+      name: 'swiftAxiomName',
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
   ],
@@ -148,7 +152,7 @@ foam.CLASS({
           visibility: 'public',
           static: true,
           final: true,
-          name: this.swiftPropertyInfoName,
+          name: this.swiftAxiomName,
           type: 'PropertyInfo',
           initializer: this.swiftPropertyInfoInit(),
         }));
@@ -251,10 +255,8 @@ if <%=this.swiftInitedName%> {
   return <%=this.swiftValueName%><% if ( this.swiftType != 'Any?' ) { %> as! <%=this.swiftType %><% } %>
 }
 <% if ( this.swiftFactory ) { %>
-let factoryValue = <%=this.swiftFactoryName%>()
-<%=this.swiftValueName%> = factoryValue
-<%=this.swiftInitedName%> = true
-return factoryValue
+self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
+return self.get(key: "<%=this.swiftName%>")<% if ( this.swiftType != 'Any?' ) { %> as! <%=this.swiftType %><% } %>
 <% } else if ( this.swiftValue ) { %>
 return <%=this.swiftValue%>
 <% } else { %>
@@ -275,9 +277,13 @@ self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(valu
       args: [],
       template: function() {/*
 let pi = PropertyInfoImpl()
-pi.classInfo = classInfo
+pi.classInfo = classInfo()
 pi.transient = <%=!!this.transient%>
 pi.name = "<%=this.swiftName%>"
+pi.label = "<%=this.label%>" // TODO localize
+<% if (this.swiftView) { %>
+pi.view = <%=this.swiftView.split('.').pop()%>.self
+<% } %>
 return pi
       */},
     }

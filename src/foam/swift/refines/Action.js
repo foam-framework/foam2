@@ -18,12 +18,25 @@
 foam.CLASS({
   refines: 'foam.core.Action',
   requires: [
+    'foam.swift.Field',
     'foam.swift.Method',
   ],
   properties: [
     {
       class: 'String',
+      name: 'swiftName',
+      expression: function(name) { return name; },
+    },
+    {
+      class: 'String',
       name: 'swiftCode',
+    },
+    {
+      class: 'String',
+      name: 'swiftAxiomName',
+      expression: function(name) {
+        return foam.String.constantize(name);
+      },
     },
     {
       name: 'code',
@@ -34,10 +47,30 @@ foam.CLASS({
     function writeToSwiftClass(cls) {
       if ( !this.swiftCode ) return;
       cls.methods.push(this.Method.create({
-        name: this.name,
+        name: this.swiftName,
         body: this.swiftCode,
         visibility: 'public',
       }));
+      cls.fields.push(this.Field.create({
+        visibility: 'public',
+        static: true,
+        final: true,
+        name: this.swiftAxiomName,
+        type: 'Action',
+        initializer: this.swiftAxiomInit(),
+      }));
     },
-  ]
+  ],
+  templates: [
+    {
+      name: 'swiftAxiomInit',
+      args: [],
+      template: function() {/*
+let a = Action()
+a.name = "<%=this.swiftName%>"
+a.label = "<%=this.label%>" // TODO localize
+return a
+      */},
+    }
+  ],
 });
