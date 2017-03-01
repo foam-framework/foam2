@@ -93,12 +93,12 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'sourcePropertyConfig'
+      name: 'sourceProperty'
     },
     {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'targetPropertyConfig'
+      name: 'targetProperty'
     },
     /* FUTURE:
     {
