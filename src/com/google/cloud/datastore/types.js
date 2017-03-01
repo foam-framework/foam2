@@ -166,6 +166,12 @@ foam.LIB({
       }
 
       return o;
+    },
+    function getOwnClassDatastoreKind() {
+      return this.id;
+    },
+    function getClassDatastoreKind() {
+      return { name: this.getOwnClassDatastoreKind() };
     }
   ]
 });
@@ -227,8 +233,11 @@ foam.CLASS({
   refines: 'foam.core.FObject',
 
   methods: [
+    function getOwnDatastoreKind() {
+      return this.cls_.getOwnClassDatastoreKind();
+    },
     function getDatastoreKind() {
-      return this.cls_.id;
+      return this.cls_.getClassDatastoreKind();
     },
     function getOwnDatastoreKey() {
       if ( ! ( this.model_.ids || this.id ) ) {
@@ -237,13 +246,13 @@ foam.CLASS({
       }
       var ids = this.model_.ids;
       if ( ! ids )
-        return { kind: this.getDatastoreKind(), name: this.id.toString() };
+        return { kind: this.getOwnDatastoreKind(), name: this.id.toString() };
 
       var name = new Array(ids.length);
       for ( var i = 0; i < ids.length; i++ ) {
         name = ids[i] + ( i < ids.length - 1 ? ':' : '' );
       }
-      return { kind: this.getDatastoreKind(), name: name };
+      return { kind: this.getOwnDatastoreKind(), name: name };
     },
     function getDatastoreKey(opt_propertyPath) {
       if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
