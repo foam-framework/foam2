@@ -113,8 +113,6 @@ foam.CLASS({
         var self = this;
         return this.delegate.find(obj.id).then(function(existing) {
           return self.decorator.write(obj, existing);
-        }, function() {
-          return self.decorator.write(obj, null);
         }).then(function(newObj) {
           return self.delegate.put(newObj);
         });
@@ -130,7 +128,7 @@ foam.CLASS({
       code: function(id) {
         var self = this;
         return this.SUPER(id).then(function(o) {
-          return self.decorator.read(o);
+          return o && self.decorator.read(o);
         });
       }
     }
