@@ -329,7 +329,10 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return getArg1().f(obj) != null && getArg1().f(obj) != "";'
+      javaCode: 'Object value = getArg1().f(obj); '+
+        'return ! (value == null || '+
+          'value.isEmpty() || '+
+          'value.toString() == "[]");'
     }
   ]
 });
