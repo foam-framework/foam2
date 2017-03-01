@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
-# set -ev
+set -v
 
 BASE_DIR=$(readlink -f $(dirname "$0"))
+export PATH="$BASE_DIR/google-cloud-sdk/bin:$PATH"
+
 GCLOUD_SDK_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-145.0.0-linux-x86_64.tar.gz"
 GCLOUD_SDK_TGZ="$BASE_DIR/google-cloud-sdk.tar.gz"
 GCLOUD_PATH="$(which gcloud)"
@@ -25,7 +27,7 @@ function error() {
 }
 
 CDS_EMULATOR_PID=""
-CDS_EMULATOR_DIR=""
+UNRELIABLE_CDS_EMULATOR_PID=""
 JASMINE_PID=""
 JASMINE_CODE=""
 
@@ -36,16 +38,17 @@ function stop() {
   fi
   win "JASMINE STOPPED"
 
-  if [ "$CDS_EMULATORWP_PID" != "" ]; then
+  if [ "$CDS_EMULATOR_PID" != "" ]; then
     warn "STOPPING CLOUD DATASTORE EMULATOR (PID=$CDS_EMULATOR_PID)"
-    kill $CDS_EMULATORWP_PID
+    kill $CDS_EMULATOR_PID
   fi
   win "CLOUD DATASTORE EMULATOR STOPPED"
 
-  if [ "$CDS_EMULATOR_DIR" != "" ]; then
-    warn "DELETING CLOUD DATASTORE EMULATOR DIR: $CDS_EMULATOR_DIR"
-    rm -rf "$CDS_EMULATOR_DIR"
+  if [ "$UNRELIABLE_CDS_EMULATOR_PID" != "" ]; then
+    warn "STOPPING UNRELIABLE CLOUD DATASTORE EMULATOR (PID=$UNRELIABLE_CDS_EMULATOR_PID)"
+    kill $UNRELIABLE_CDS_EMULATOR_PID
   fi
+  win "UNRELIABLE CLOUD DATASTORE EMULATOR STOPPED"
 
   if [ "$JASMINE_CODE" != "" ]; then
     warn "EXIT CODE $JASMINE_CODE"
@@ -56,18 +59,18 @@ function stop() {
   fi
 }
 
-# trap stop INT
+trap stop INT
 
 if [ "$GCLOUD_PATH" == "" ]; then
   curl -o "$GCLOUD_SDK_TGZ" "$GCLOUD_SDK_URL"
   pushd "$BASE_DIR"
   tar xzvf "$GCLOUD_SDK_TGZ"
   "./google-cloud-sdk/install.sh" -q --override-components cloud-datastore-emulator
-  export PATH="$(pwd)/google-cloud-sdk/bin:$PATH"
   popd
 fi
 
 GCLOUD_BIN_DIR=$(readlink -f $(dirname $(which gcloud)))
+CDS_EMULATOR_JAR="$GCLOUD_BIN_DIR/../platform/cloud-datastore-emulator/CloudDatastore.jar"
 CDS_EMULATOR="$GCLOUD_BIN_DIR/../platform/cloud-datastore-emulator/cloud_datastore_emulator"
 
 if [ ! -f "$CDS_EMULATOR" ]; then
@@ -80,16 +83,30 @@ export CDS_PROJECT_ID="test-project-$RANDOM"
 export CDS_EMULATOR_PROTOCOL="http:"
 export CDS_EMULATOR_HOST="localhost"
 export CDS_EMULATOR_PORT=$((($RANDOM % 1000) + 8000))
-export CDS_EMULATOR_DIR="$BASE_DIR/.cds-$CDS_EMULATOR_PORT"
 
-mkdir "$CDS_EMULATOR_DIR"
-"$CDS_EMULATOR" create --project_id=$CDS_PROJECT_ID "$CDS_EMULATOR_DIR"
-"$CDS_EMULATOR" start --host=$CDS_EMULATOR_HOST --port=$CDS_EMULATOR_PORT --store_on_disk=True --consistency=0.9 --allow_remote_shutdown "$CDS_EMULATOR_DIR" &
+${JAVA:="java"} -cp "$CDS_EMULATOR_JAR" \
+                com.google.cloud.datastore.emulator.CloudDatastore \
+                "$CDS_EMULATOR" start --host=$CDS_EMULATOR_HOST \
+                --port=$CDS_EMULATOR_PORT --testing &
 export CDS_EMULATOR_PID=$!
 
-# JASMINE_CONFIG_PATH="$BASE_DIR/../../jasmine_gcloud.json" node --inspect "$BASE_DIR/inspect.es6.js" "$BASE_DIR/../../node_modules/.bin/jasmine" &
-# JASMINE_PID=$!
-# wait $JASMINE_PID
-# JASMINE_CODE=$?
+export UNRELIABLE_CDS_EMULATOR_PROTOCOL="http:"
+export UNRELIABLE_CDS_EMULATOR_HOST="localhost"
+export UNRELIABLE_CDS_EMULATOR_PORT=$((($RANDOM % 1000) + 8000))
 
-# stop
+${JAVA:="java"} -cp "$CDS_EMULATOR_JAR" \
+                com.google.cloud.datastore.emulator.CloudDatastore \
+                "$CDS_EMULATOR" start --host=$UNRELIABLE_CDS_EMULATOR_HOST \
+                --port=$UNRELIABLE_CDS_EMULATOR_PORT --store_on_disk=false \
+                --store_index_configuration_on_disk=false --consistency=0.0 &
+export UNRELIABLE_CDS_EMULATOR_PID=$!
+
+sleep 5
+
+export JASMINE_CONFIG_PATH="$BASE_DIR/../../jasmine_gcloud.json"
+node "$BASE_DIR/../../node_modules/.bin/jasmine" &
+JASMINE_PID=$!
+wait $JASMINE_PID
+JASMINE_CODE=$?
+
+stop
