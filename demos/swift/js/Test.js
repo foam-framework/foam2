@@ -36,9 +36,11 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'String',
       name: 'prevFirstName',
     },
     {
+      class: 'String',
       name: 'prevLastName',
     },
     {
@@ -46,7 +48,7 @@ foam.CLASS({
       name: 'firstName',
       value: 'John',
       swiftPreSet: function() {/*
-self.prevFirstName = oldValue
+self.prevFirstName = oldValue as? String ?? ""
 return newValue
       */},
     },
@@ -54,7 +56,7 @@ return newValue
       class: 'String',
       name: 'lastName',
       value: 'Smith',
-      swiftPostSet: 'self.prevLastName = oldValue'
+      swiftPostSet: 'self.prevLastName = oldValue as? String ?? ""'
     },
     {
       name: 'factoryProp',

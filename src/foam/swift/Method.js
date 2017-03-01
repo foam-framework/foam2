@@ -32,6 +32,10 @@ foam.CLASS({
       of: 'foam.swift.Argument',
       name: 'args'
     },
+    {
+      class: 'StringArray',
+      name: 'annotations'
+    },
   ],
 
   methods: [
@@ -39,6 +43,7 @@ foam.CLASS({
       o.indent();
 
       o.out(
+        this.annotations.length ? this.annotations.join('\n') + '\n' : '',
         this.visibility ? this.visibility + ' ' : '',
         this.override ? 'override ' : '',
         this.static ? 'static ' : '',

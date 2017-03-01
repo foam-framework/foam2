@@ -6,9 +6,13 @@ public protocol Initializable {
   init()
 }
 
-protocol ContextAware {
+public protocol ContextAware {
   var __context__: Context { get set }
   var __subContext__: Context { get }
+}
+
+public protocol Axiom {
+  var name: String { get }
 }
 
 public protocol Slot {
@@ -124,10 +128,11 @@ class ListenerList {
   var sub: Subscription?
 }
 
-public protocol PropertyInfo {
+public protocol PropertyInfo: Axiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
-  var name: String { get }
+  var view: FObject.Type? { get }
+  var label: String { get }
 }
 
 public extension PropertyInfo {
@@ -137,9 +142,19 @@ public extension PropertyInfo {
 }
 
 public class PropertyInfoImpl: PropertyInfo {
-  public lazy var classInfo: ClassInfo = EmptyClassInfo()
+  public lazy var classInfo: ClassInfo = ClassInfoImpl()
   public lazy var transient: Bool = false
   public lazy var name: String = ""
+  public var view: FObject.Type? = nil
+  public var label: String = ""
+}
+
+public class Action: Axiom {
+  public var name: String = ""
+  public var label: String = ""
+  public func call(_ obj: FObject) {
+    obj.callAction(key: name)
+  }
 }
 
 public class Context {
@@ -164,7 +179,7 @@ public class Context {
     return nil
   }
   private func toSlotName(name: String) -> String { return name + "$" }
-  public func createSubContext(args: [String:Any] = [:]) -> Context {
+  public func createSubContext(args: [String:Any?] = [:]) -> Context {
     var slotMap = self.slotMap
     for (key, value) in args {
       let slotName = toSlotName(name: key)
@@ -184,19 +199,51 @@ public class Context {
 public protocol ClassInfo {
   var id: String { get }
   var parent: ClassInfo { get }
-  var axioms: [FObject] { get }
-  func addProperty(_ p: PropertyInfo)
-  func axiom(withName name: String) -> FObject?
-  func axioms(withClass cls: FObject.Type) -> [FObject]
+  var ownAxioms: [Axiom] { get }
 }
 
-public class EmptyClassInfo: ClassInfo {
-  public let id: String = "EmptyClassInfo"
-  public var parent: ClassInfo { get { return self } }
-  public let axioms: [FObject] = []
-  public func addProperty(_ p: PropertyInfo) {}
-  public func axiom(withName name: String) -> FObject? { return nil }
-  public func axioms(withClass cls: FObject.Type) -> [FObject] { return [] }
+extension ClassInfo {
+  var axioms: [Axiom] {
+    get {
+      var curCls: ClassInfo = self
+      var axioms: [Axiom] = []
+      while curCls.parent.id != curCls.id {
+        axioms += curCls.ownAxioms
+        curCls = curCls.parent
+      }
+      return axioms
+    }
+  }
+  func ownAxioms<T>(byType type: T.Type) -> [T] {
+    var axs: [T] = []
+    for axiom in ownAxioms {
+      if let axiom = axiom as? T {
+        axs.append(axiom)
+      }
+    }
+    return axs
+  }
+  func axioms<T>(byType type: T.Type) -> [T] {
+    var axs: [T] = []
+    for axiom in axioms {
+      if let axiom = axiom as? T {
+        axs.append(axiom)
+      }
+    }
+    return axs
+  }
+  func axiom(byName name: String) -> Axiom? {
+    for axiom in axioms {
+      if axiom.name == name { return axiom }
+    }
+    return nil
+  }
+}
+
+public class ClassInfoImpl: ClassInfo {
+  public lazy var id: String = "FObject"
+  public lazy var parent: ClassInfo = self
+  public lazy var ownAxioms: [Axiom] = []
 }
 
 public class Subscription {
@@ -212,12 +259,14 @@ public class Subscription {
 
 public protocol FObject: class {
   func sub(topics: [Any], listener l: @escaping Listener) -> Subscription
-  static var classInfo: ClassInfo { get }
+  static func classInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
+  func getSlot(key: String) -> Slot?
+  func callAction(key: String)
 }
 
-public class AbstractFObject: FObject, Initializable, ContextAware {
+public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
 
   public var __context__: Context = Context.GLOBAL {
     didSet {
@@ -234,15 +283,23 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
 
   lazy var listeners: ListenerList = ListenerList()
 
-  public static var classInfo: ClassInfo = {
-    return createClassInfo_()
-  }()
+  private static var classInfo_: ClassInfo! = nil
+  public class func classInfo() -> ClassInfo {
+    if classInfo_ == nil { classInfo_ = createClassInfo_() }
+    return classInfo_
+  }
 
-  class func createClassInfo_() -> ClassInfo { fatalError() }
+  class func createClassInfo_() -> ClassInfo {
+    let classInfo = ClassInfoImpl()
+    classInfo.parent = classInfo
+    classInfo.id = "FObject"
+    return classInfo
+  }
 
   public func set(key: String, value: Any?) {}
 
   public func get(key: String) -> Any? { return nil }
+  public func getSlot(key: String) -> Slot? { return nil }
 
   public func sub(
     topics: [Any] = [],
@@ -303,7 +360,9 @@ public class AbstractFObject: FObject, Initializable, ContextAware {
     return count
   }
 
-  public required init() {
+  public func callAction(key: String) { }
+
+  public required override init() {
   }
 
   private func detachListeners(listeners: ListenerList?) {

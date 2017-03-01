@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		10071BCC1E61FBA800903C61 /* foam_swift_ui_DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10071BCB1E61FBA800903C61 /* foam_swift_ui_DetailView.swift */; };
 		1059840E1E5E859A0063941D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840D1E5E859A0063941D /* AppDelegate.swift */; };
 		105984101E5E859A0063941D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840F1E5E859A0063941D /* ViewController.swift */; };
 		105984131E5E859A0063941D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 105984111E5E859A0063941D /* Main.storyboard */; };
@@ -19,6 +20,8 @@
 		105984651E5F71930063941D /* somepackage_RequiredClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984611E5F71930063941D /* somepackage_RequiredClass.swift */; };
 		105984661E5F71930063941D /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984621E5F71930063941D /* Test.swift */; };
 		105984671E5F71930063941D /* TestExtended.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984631E5F71930063941D /* TestExtended.swift */; };
+		1060AE1F1E661395007DC401 /* foam_swift_ui_FOAMActionUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1060AE1E1E661395007DC401 /* foam_swift_ui_FOAMActionUIButton.swift */; };
+		1060AE211E662EF7007DC401 /* foam_swift_ui_FOAMUITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1060AE201E662EF7007DC401 /* foam_swift_ui_FOAMUITextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		10071BCB1E61FBA800903C61 /* foam_swift_ui_DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_DetailView.swift; sourceTree = "<group>"; };
 		1059840A1E5E859A0063941D /* SwiftTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1059840D1E5E859A0063941D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1059840F1E5E859A0063941D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -57,6 +61,8 @@
 		105984611E5F71930063941D /* somepackage_RequiredClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = somepackage_RequiredClass.swift; sourceTree = "<group>"; };
 		105984621E5F71930063941D /* Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		105984631E5F71930063941D /* TestExtended.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestExtended.swift; sourceTree = "<group>"; };
+		1060AE1E1E661395007DC401 /* foam_swift_ui_FOAMActionUIButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_FOAMActionUIButton.swift; sourceTree = "<group>"; };
+		1060AE201E662EF7007DC401 /* foam_swift_ui_FOAMUITextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_FOAMUITextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +148,9 @@
 			children = (
 				105984601E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift */,
 				105984611E5F71930063941D /* somepackage_RequiredClass.swift */,
+				1060AE201E662EF7007DC401 /* foam_swift_ui_FOAMUITextField.swift */,
+				1060AE1E1E661395007DC401 /* foam_swift_ui_FOAMActionUIButton.swift */,
+				10071BCB1E61FBA800903C61 /* foam_swift_ui_DetailView.swift */,
 				105984621E5F71930063941D /* Test.swift */,
 				105984631E5F71930063941D /* TestExtended.swift */,
 			);
@@ -294,9 +303,12 @@
 			files = (
 				105984571E5F46750063941D /* FOAMSupport.swift in Sources */,
 				105984671E5F71930063941D /* TestExtended.swift in Sources */,
+				1060AE1F1E661395007DC401 /* foam_swift_ui_FOAMActionUIButton.swift in Sources */,
+				10071BCC1E61FBA800903C61 /* foam_swift_ui_DetailView.swift in Sources */,
 				105984101E5E859A0063941D /* ViewController.swift in Sources */,
 				105984651E5F71930063941D /* somepackage_RequiredClass.swift in Sources */,
 				105984641E5F71930063941D /* foam_swift_ui_FOAMUILabel.swift in Sources */,
+				1060AE211E662EF7007DC401 /* foam_swift_ui_FOAMUITextField.swift in Sources */,
 				1059840E1E5E859A0063941D /* AppDelegate.swift in Sources */,
 				105984661E5F71930063941D /* Test.swift in Sources */,
 			);
@@ -543,6 +555,7 @@
 				105984341E5E859A0063941D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		105984351E5E859A0063941D /* Build configuration list for PBXNativeTarget "SwiftTestsTests" */ = {
 			isa = XCConfigurationList;
@@ -551,6 +564,7 @@
 				105984371E5E859A0063941D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		105984381E5E859A0063941D /* Build configuration list for PBXNativeTarget "SwiftTestsUITests" */ = {
 			isa = XCConfigurationList;
@@ -559,6 +573,7 @@
 				1059843A1E5E859A0063941D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

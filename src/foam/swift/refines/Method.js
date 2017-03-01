@@ -52,6 +52,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftReturnType',
+    },
+    {
+      class: 'StringArray',
+      name: 'swiftAnnotations',
     }
   ],
   methods: [
@@ -68,6 +72,7 @@ foam.CLASS({
         args: this.swiftArgs,
         visibility: 'public',
         override: this.isOverride(),
+        annotations: this.swiftAnnotations,
       }));
     },
   ]

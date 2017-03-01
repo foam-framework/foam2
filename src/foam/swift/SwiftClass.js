@@ -59,6 +59,10 @@ foam.CLASS({
       name: 'methods',
       factory: function() { return []; }
     },
+    {
+      class: 'String',
+      name: 'code',
+    },
   ],
 
   methods: [
@@ -78,6 +82,7 @@ foam.CLASS({
       this.fields.forEach(function(f) { o.out('\n', f, '\n'); });
       this.methods.forEach(function(f) { o.out('\n', f, '\n'); });
       this.classes.forEach(function(f) { o.out('\n', f, '\n'); });
+      o.out(this.code, '\n');
 
       o.decreaseIndent();
       o.indent();
