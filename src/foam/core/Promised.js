@@ -74,11 +74,15 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'methods'
+      name: 'methods',
+      value: null,
+      factory: null
     },
     {
       class: 'StringArray',
-      name: 'topics'
+      name: 'topics',
+      value: null,
+      factory: null
     },
     {
       name: 'postSet',
@@ -116,9 +120,7 @@ foam.CLASS({
 
       var methods = this.methods ?
           this.methods.map(resolveName) :
-          // TODO(adamvy): This isn't the right check.  Once we have modeled interfaces
-          // we can proxy only that which is defined in the interface.
-          delegate.getOwnAxiomsByClass(foam.core.AbstractMethod);
+          delegate.getOwnAxiomsByClass(foam.core.Method);
 
       var methodNames = methods.map(function(m) { return m.name; });
 

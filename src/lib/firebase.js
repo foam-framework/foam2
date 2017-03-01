@@ -25,6 +25,12 @@ ones who can write to it.
 
 foam.CLASS({
   package: 'com.firebase',
+  name: 'ExpectedObjectNotFound',
+  extends: 'foam.dao.InternalException'
+});
+
+foam.CLASS({
+  package: 'com.firebase',
   name: 'FirebaseDAO',
   extends: 'foam.dao.AbstractDAO',
 
@@ -134,7 +140,7 @@ foam.CLASS({
         return resp.payload;
       }).then(function(data) {
         if ( data == "null" ) {
-          return Promise.reject(foam.dao.ObjectNotFoundException.create({ id: id }));
+          return Promise.resolve(null);
         }
         try {
           data = JSON.parse(data);
@@ -304,6 +310,7 @@ foam.CLASS({
         var id = path.substring(1);
         id = id.substring(0, id.indexOf('/'));
         this.find(id).then(function(obj) {
+          if ( ! obj ) throw com.firebase.ExpectedObjectNotFound.create();
           this.on.put.pub(obj);
         }.bind(this));
 
@@ -318,6 +325,7 @@ foam.CLASS({
         var id = path.substring(1);
         id = id.substring(0, id.indexOf('/'));
         this.find(id).then(function(obj) {
+          if ( ! obj ) throw com.firebase.ExpectedObjectNotFound.create();
           this.on.put.pub(obj);
         }.bind(this));
       }

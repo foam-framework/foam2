@@ -149,13 +149,11 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      it('should return a rejected Promise when the object cannot be found', function(done) {
+      it('should resolve with null if not found', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();
-          dao.find(p.id).then(function() {
-            fail('find() should fail when the ID is not found');
-          }).catch(function() {
-            expect(1).toBe(1);
+          dao.find(p.id).then(function(obj) {
+            expect(obj).toBe(null);
           }).then(function() {
             return dao.put(p);
           }).then(function() {
@@ -163,11 +161,9 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function(p2) {
             expect(p2.id).toBe(p.id);
             return dao.find(74);
-          }).then(function() {
-            fail('find() should fail when the ID is not found');
-          }).catch(function() {
-            expect(1).toBe(1);
-          }).then(done);
+          }).then(function(obj) {
+            expect(obj).toBe(null);
+          }).then(done, fail);
         });
       });
     });
@@ -203,14 +199,11 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function() {
             return dao.find(pid)
           }).then(function(p) {
-            fail('fail() should fail since person was removed');
-          }, function(e) {
-            expect(e).toBeDefined();
-            expect(foam.dao.ObjectNotFoundException.isInstance(e)).toBe(true);
+            expect(p).toBe(null);
             return dao.find(p2id);
           }).then(function(p2) {
             expect(p2.id).toBe(p2id);
-          }).then(done);
+          }).then(done, fail);
         });
       });
     });
@@ -227,10 +220,8 @@ global.genericDAOTestBattery = function(daoFactory) {
             return dao.remove(p);
           }).then(function() {
             return dao.find(p.id);
-          }).then(function() {
-            fail('find() should fail after remove()');
-          }, function(e) {
-            expect(e).toBeDefined();
+          }).then(function(obj) {
+            expect(obj).toBe(null);
           }).then(function() {
             return dao.select().then(function(sink) {
               expect(sink.a.length).toEqual(0);

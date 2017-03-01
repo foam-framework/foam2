@@ -43,6 +43,7 @@ foam.CLASS({
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
     'foam.dao.ClientDAO',
+    'foam.dao.PromisedDAO',
     'foam.box.Context',
     'foam.box.HTTPBox',
     'foam.box.SocketBox',
@@ -360,19 +361,33 @@ foam.CLASS({
         dao = this.LoggingDAO.create({ delegate: dao });
       }
 
-      this.delegate = dao;
+      var self = this;
 
       if ( this.testData ) {
-        var self = this;
-        this.select(this.COUNT()).then(function(c) {
-          // Only load testData if DAO is empty
-          if ( c.value ) return;
+        var delegate = dao;
 
-          foam.json.parse(self.testData, self.of).forEach(
-            function(o) { self.put(o); }
-          );
+        dao = this.PromisedDAO.create({
+          promise: new Promise(function(resolve, reject) {
+            delegate.select(self.COUNT()).then(function(c) {
+              console.log("Loading test data");
+              // Only load testData if DAO is empty
+              if ( c.value ) {
+                resolve(delegate);
+                return;
+              }
+
+              Promise.all(foam.json.parse(self.testData, self.of).map(
+                function(o) { return delegate.put(o); }
+              )).then(function() {
+                console.log("Loaded", self.testData.length, "records.");
+                resolve(delegate);
+              }, reject);
+            });
+          })
         });
       }
+
+      this.delegate = dao;
     },
 
     /** Only relevant if cache is true or if daoType

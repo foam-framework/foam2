@@ -97,6 +97,11 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'listen',
+      javaReturns: 'void',
+      args: []
+    },
+    {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       javaReturns: 'void',
       args: [

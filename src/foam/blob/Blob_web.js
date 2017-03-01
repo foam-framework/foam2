@@ -16,25 +16,50 @@
  */
 
 foam.CLASS({
-  package: 'foam.classloader',
-  name: 'OrDAO',
-  extends: 'foam.dao.ProxyDAO',
+  package: 'foam.blob',
+  name: 'Buffer',
 
   properties: [
     {
-      name: 'primary',
-      help: 'This is the DAO to look things up in first.'
+      class: 'Long',
+      name: 'length'
+    }
+    {
+      name: 'data',
+      factory: function() {
+        return new ArrayBuffer(this.length);
+      }
     }
   ],
 
   methods: [
-    function find(id) {
-      var self = this;
-      return this.primary.find(id)
-          .then(function(o) {
-            if ( o == null ) return self.delegate.find(id);
-            return o;
-          });
+    function slice(start, end) {
+      return foam.blob.Buffer.create({});
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'BlobBlob',
+  implements: [ 'foam.blob.Blob' ],
+
+  properties: [
+    {
+      name: 'blob',
+      required: true
+    },
+    {
+      name: 'size',
+      getter: function() {
+        return this.blob.size;
+      }
+    }
+  ],
+
+  methods: [
+    function read(buffer, offset) {
     }
   ]
 });

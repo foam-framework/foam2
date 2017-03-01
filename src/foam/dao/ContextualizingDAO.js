@@ -35,7 +35,8 @@ foam.CLASS({
     function find(id) {
       var self = this;
       return self.delegate.find(id).then(function(obj) {
-        return obj.cls_.create(obj, self);
+        if ( obj ) return obj.cls_.create(obj, self);
+        return null;
       });
     }
     // TODO: select() too?

@@ -229,9 +229,10 @@ foam.CLASS({
             } else {
               // TODO: Stop sending updates if the first one fails.
               self.delegate.find(id).then(function(obj) {
-                return self.remoteDAO.put(obj);
-              }).then(function(obj) {
-                self.processFromServer(obj);
+                if ( obj ) return self.remoteDAO.put(obj).then(function(obj) {
+                  self.processFromServer(obj);
+                });
+                return null;
               });
             }
           }
