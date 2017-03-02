@@ -19,9 +19,11 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOControllerView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.DAOController'
   ],
+
   methods: [
     function initE() {
       this.add(

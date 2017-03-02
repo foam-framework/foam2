@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-/**
-  The base class for most DAOs, defining basic DAO behavior.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
   implements: [ 'foam.dao.DAO' ],
+
+  documentation: 'Abstract base class for implementing DAOs.',
 
   requires: [
     'foam.dao.ExternalException',
@@ -248,22 +247,6 @@ foam.CLASS({
   name: 'ExternalException',
   extends: 'Exception'
 })
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'ObjectNotFoundException',
-  extends: 'foam.dao.ExternalException',
-
-  properties: [
-    'id',
-    {
-      name: 'message',
-      expression: function(id) { return "No record found for id: " + id; }
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.dao',

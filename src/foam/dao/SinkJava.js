@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.dao.Sink',
+
   methods: [
     {
       name: 'put',
@@ -87,8 +88,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.dao.PredicatedSink',
+
   methods: [
     {
       name: 'put',
@@ -101,8 +104,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.dao.LimitedSink',
+
   methods: [
     {
       name: 'put',
@@ -124,6 +129,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.dao.SkipSink',
@@ -147,8 +153,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.dao.OrderedSink',
+
   methods: [
     {
       name: 'put',

@@ -18,9 +18,11 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
+
   imports: [
     'stack'
   ],
+
   properties: [
     {
       name: 'data',
@@ -46,6 +48,7 @@ foam.CLASS({
       hidden: true
     }
   ],
+
   actions: [
     {
       name: 'create',
