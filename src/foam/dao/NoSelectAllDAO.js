@@ -24,6 +24,7 @@ foam.CLASS({
   name: 'NoSelectAllDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  requires: ['foam.dao.ArraySink'],
 
   methods: [
     function select(sink, skip, limit, order, predicate) {
@@ -32,8 +33,8 @@ foam.CLASS({
           ( foam.Number.isInstance(skip) && Number.isFinite(skip) ) ) {
         return this.delegate.select(sink, skip, limit, order, predicate);
       } else {
-        sink.eof();
-        return Promise.resolve(sink);
+        sink && sink.eof();
+        return Promise.resolve(sink || this.ArraySink.create());
       }
     }
     // TODO: removeAll?
