@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-/**
-  TimestampDAO is a decorator that sets the current time on each incoming
-  object with no existing value. By default, the .id property is set.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'TimestampDAO',
   extends: 'foam.dao.ProxyDAO',
+
+  documentation: 'DAO decorator that sets the current time on each put() object, provided not already set. By default, the .id proeprty is set.',
 
   properties: [
     {

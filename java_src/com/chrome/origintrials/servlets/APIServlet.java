@@ -30,8 +30,8 @@ public class APIServlet extends HttpServlet {
 
     registry = (BoxRegistryBox)x.get("registry");
 
-    registry.register2("applications", null, applicationDAOSkeleton);
-    registry.register2("experiments", null, experimentDAOSkeleton);
+    registry.register("applications", null, applicationDAOSkeleton);
+    registry.register("experiments", null, experimentDAOSkeleton);
 
     super.init(config);
   }
