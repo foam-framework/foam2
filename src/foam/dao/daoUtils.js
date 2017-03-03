@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: 'Proxy implementation for the DAO interface.',
+
   properties: [
     {
       class: 'Proxy',

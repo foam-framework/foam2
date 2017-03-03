@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-/* Indexed Memory-based DAO. */
 foam.CLASS({
   package: 'foam.dao',
   name: 'MDAO',
   label: 'Indexed DAO',
   extends: 'foam.dao.AbstractDAO',
+
+  documentation: 'Indexed in-Memory DAO.',
 
   requires: [
     'foam.dao.ArraySink',

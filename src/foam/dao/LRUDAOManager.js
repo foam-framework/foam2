@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-/**
-  Manages a DAO's size by removing old items. Commonly applied inside a cache
-  to limit the cache's size. Item freshness is tracked in a separate DAO.
-*/
 foam.CLASS({
-  name: 'LRUDAOManager',
   package: 'foam.dao',
-
+  name: 'LRUDAOManager',
   implements: [ 'foam.mlang.Expressions' ],
+
+  documentation: 'Manages a DAO\'s size by removing old items. Commonly applied inside a cache
+  to limit the cache\'s size. Item freshness is tracked in a separate DAO.',
 
   requires: [ 'foam.dao.MDAO' ],
 
@@ -89,7 +87,6 @@ foam.CLASS({
       return this.lastTimeUsed_++;
     },
 
-    /**  */
     function cleanup() {
       var self = this;
       self.trackingDAO

@@ -20,9 +20,9 @@ foam.CLASS({
   name: 'DAOProperty',
   extends: 'Property',
 
-  requires: [ 'foam.dao.ProxyDAO' ],
-
   documentation: 'Property for storing a reference to a DAO.',
+
+  requires: [ 'foam.dao.ProxyDAO' ],
 
   properties: [
     [ 'view', 'foam.u2.DAOList' ]

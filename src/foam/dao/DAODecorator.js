@@ -78,10 +78,12 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'CascadingRemoveDecorator',
   implements: [ 'foam.dao.DAODecorator' ],
+
   mehtods: [
     function read(X, dao, obj) {
     },

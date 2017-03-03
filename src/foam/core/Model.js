@@ -20,6 +20,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Model',
 
+  documentation: 'A Class Model (description).',
+
   properties: [
     {
       name: 'id',
