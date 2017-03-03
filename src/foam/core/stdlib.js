@@ -621,8 +621,8 @@ foam.LIB({
     },
     function hashCode(o) {
       var hash = 19;
-      for (var key in o) {
-        if (!o.hasOwnProperty(key)) continue;
+      for ( var key in o ) {
+        if ( ! o.hasOwnProperty(key) ) continue;
         hash = ((hash << 5) - hash) + foam.util.hashCode(o[key]);
       }
       return hash;
