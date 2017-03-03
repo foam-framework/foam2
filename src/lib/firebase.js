@@ -345,7 +345,7 @@ foam.CLASS({
   extends: 'com.firebase.FirebaseDAO',
 
   requires: [
-    'foam.net.XHRHTTPRequest as HTTPRequest',
+    'foam.net.XMLHTTPRequest as HTTPRequest',
     'foam.net.SafariEventSource as EventSource'
   ],
 
