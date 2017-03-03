@@ -681,3 +681,62 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.ENUM({
+  package: 'foam.net',
+  name: 'Environment',
+
+  values: [
+    { name: 'BROWSER', label: 'Browser' },
+    { name: 'NODE',    label: 'Node'    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.net',
+  name: 'Universal',
+
+  requires: [ 'foam.net.Environment' ],
+
+  properties: [
+    {
+      class: 'Enum',
+      of: 'foam.net.Environment',
+      name: 'environment',
+      factory: function() {
+        return typeof process === 'undefined' ?
+            this.Environment.BROWSER :
+            this.Environment.NODE;
+      }
+    },
+    {
+      name: 'cls',
+      factory: function() {
+        return foam.lookup((this.environment === this.Environment.NODE ?
+            'foam.net.node' : 'foam.net') + '.' + this.cls_.name);
+      }
+    }
+  ],
+
+  methods: [
+    function create(args, opt_parent) {
+      return this.cls.create(args, opt_parent);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.net.universal',
+  name: 'HTTPRequest',
+  extends: 'foam.net.Universal',
+});
+
+
+foam.CLASS({
+  package: 'foam.net.universal',
+  name: 'HTTPResponse',
+  extends: 'foam.net.Universal',
+});
