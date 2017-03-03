@@ -150,7 +150,7 @@ describe('FObject hashCode', function() {
     // any particular value from a hashCode()?
     a.a = 'this is a longer string!@';
     a.b = 998765876.78;
-    expect(a.hashCode()).toEqual(-658369203);
+    expect(a.hashCode()).toEqual(-1860243895);
   });
   it('regression 3: model instance', function() {
     a.a = test.CompA.create({ a: 4 }, foam.__context__);
