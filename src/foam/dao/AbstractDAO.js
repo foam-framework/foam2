@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-/**
-  The base class for most DAOs, defining basic DAO behavior.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
   implements: [ 'foam.dao.DAO' ],
+
+  documentation: 'Abstract base class for implementing DAOs.',
 
   requires: [
     'foam.dao.ExternalException',

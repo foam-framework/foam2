@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-/**
-  Used by foam.dao.SyncDAO to track object updates and deletions.
-*/
 foam.CLASS({
   package: 'foam.dao.sync',
   name: 'SyncRecord',
+
+  documentation: 'Used by foam.dao.SyncDAO to track object updates and deletions.',
 
   properties: [
     'id',
