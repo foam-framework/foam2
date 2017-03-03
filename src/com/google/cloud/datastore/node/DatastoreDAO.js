@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
+/**
+ * DAO implementation that speask of Cloud Datastore V1 REST API.
+ *
+ * https://cloud.google.com/datastore/docs/reference/rest/
+ *
+ * This implementation uses structured queryies, not GQL queries.
+ */
+
 foam.CLASS({
   package: 'com.google.cloud.datastore.node',
   name: 'SelectData',
 
   properties: [
-    {
-      class: 'Function',
-      name: 'resolve'
-    },
-    {
-      class: 'Function',
-      name: 'reject'
-    },
     {
       name: 'sink'
     },
@@ -35,8 +35,8 @@ foam.CLASS({
       name: 'requestPayload'
     },
     {
+      class: 'Array',
       name: 'results',
-      factory: function() { return []; }
     }
   ]
 });
@@ -46,136 +46,94 @@ foam.CLASS({
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  requires: [
+    'com.google.cloud.datastore.node.SelectData',
+    'foam.dao.ArraySink',
+    'foam.net.universal.HTTPRequest'
+  ],
   imports: [ 'projectId' ],
 
   properties: [
     {
       class: 'String',
       name: 'protocol',
-      value: 'https:'
+      value: 'https',
+      final: true
     },
     {
       class: 'String',
       name: 'host',
-      value: 'datastore.googleapis.com'
+      value: 'datastore.googleapis.com',
+      final: true
     },
     {
       class: 'Int',
       name: 'port',
-      value: 443
+      value: 443,
+      final: true
     },
     {
-      name: 'http',
+      class: 'String',
+      name: 'baseURL',
       factory: function() {
-        return this.protocol === 'https:' ? require('https') : require('http');
+        return this.protocol + '://' + this.host + ':' + this.port +
+            '/v1/projects/' + this.projectId;
       }
     }
   ],
 
   methods: [
+    function getRequest(name, payload) {
+      var headers = { Accept: 'application/json' };
+      if ( payload ) headers['Content-Type'] = 'application/json';
+      return this.HTTPRequest.create({
+        method: 'POST',
+        url: this.baseURL + ':' + name,
+        headers: headers,
+        responseType: 'json',
+        payload: payload
+      });
+    },
+
     function find(id) {
-      var self = this;
       var key = foam.core.FObject.isInstance(id) ?
           id.getDatastoreKey() : this.getDatastoreKeyFromId(id);
-      var req = this.http.request({
-        protocol: this.protocol,
-        host: this.host,
-        port: this.port,
-        method: 'POST',
-        path: '/v1/projects/' + this.projectId + ':lookup',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      return new Promise(function(resolve, reject) {
-        req.on('aborted', self.onFindAborted.bind(self, reject));
-        req.on('response', self.onFindResponse.bind(self, resolve, reject));
-        req.write(JSON.stringify({ keys: [ key ] }));
-        req.end();
-      });
+      return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
+          .then(this.onFindResponse);
     },
     function put(o) {
-      var self = this;
-      var req = this.http.request({
-        protocol: this.protocol,
-        host: this.host,
-        port: this.port,
-        method: 'POST',
-        path: '/v1/projects/' + this.projectId + ':commit',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      return new Promise(function(resolve, reject) {
-        req.on('aborted', self.onPutAborted.bind(self, reject));
-        req.on('response', self.onPutResponse.bind(self, resolve, reject, o));
-        req.write(JSON.stringify({
-          mode: 'NON_TRANSACTIONAL',
-          mutations: [ { upsert: o.toDatastoreEntity() } ]
-        }));
-        req.end();
-      });
+      return this.getRequest('commit', JSON.stringify({
+        mode: 'NON_TRANSACTIONAL',
+        mutations: [ { upsert: o.toDatastoreEntity() } ]
+      })).send().then(this.onPutResponse.bind(this, o));
     },
     function remove(o) {
-      var self = this;
-      var req = this.http.request({
-        protocol: this.protocol,
-        host: this.host,
-        port: this.port,
-        method: 'POST',
-        path: '/v1/projects/' + this.projectId + ':commit',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      return new Promise(function(resolve, reject) {
-        req.on('aborted', self.onRemoveAborted.bind(self, reject));
-        req.on('response', self.onRemoveResponse.bind(self, resolve, reject, o));
-        req.write(JSON.stringify({
-          mode: 'NON_TRANSACTIONAL',
-          mutations: [ { delete: o.getDatastoreKey() } ]
-        }));
-        req.end();
-      });
+      return this.getRequest('commit', JSON.stringify({
+        mode: 'NON_TRANSACTIONAL',
+        mutations: [ { delete: o.getDatastoreKey() } ]
+      })).send().then(this.onRemoveResponse.bind(this, o));
     },
     function select(sink, skip, limit, order, predicate) {
-      var self = this;
-      var req = this.http.request({
-        protocol: this.protocol,
-        host: this.host,
-        port: this.port,
-        method: 'POST',
-        path: '/v1/projects/' + this.projectId + ':runQuery',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      return new Promise(function(resolve, reject) {
-        var payload = { query: { kind: [
-          self.of.getClassDatastoreKind()
-        ] } };
-        var query = payload.query;
-        if ( predicate ) query.filter = predicate.toDatastoreFilter();
-        if ( order ) query.order = order.toDatastoreOrder();
-        if ( skip ) query.offset = skip;
-        if ( limit ) query.limit = limit;
+      sink = sink || this.ArraySink.create();
+      var payload = { query: { kind: [
+        this.of.getClassDatastoreKind()
+      ] } };
+      var query = payload.query;
+      if ( predicate ) query.filter = predicate.toDatastoreFilter();
+      if ( order ) query.order = order.toDatastoreOrder();
+      if ( skip ) query.offset = skip;
+      if ( limit ) query.limit = limit;
 
-        req.on('aborted', self.onSelectAborted.bind(self, reject));
-        req.on('response', self.onSelectResponse.bind(
-            self, self.SelectData.create({
-              resolve: resolve,
-              reject: reject,
-              sink: sink,
-              requestPayload: payload
-            })));
-
-        req.write(JSON.stringify(payload));
-        req.end();
-      });
+      return this.getRequest('runQuery', JSON.stringify(payload)).send()
+          .then(this.onSelectResponse.bind(
+              this, this.SelectData.create({
+                sink: sink,
+                requestPayload: payload
+              })));
+    },
+    function removeAll(skip, limit, order, predicate) {
+      return this.select(undefined, skip, limit, order, predicate).then(
+          this.onRemoveAll);
     },
 
     function getDatastoreKeyFromId(id) {
@@ -183,195 +141,117 @@ foam.CLASS({
         kind: this.of.getOwnClassDatastoreKind(),
         name: id
       } ] };
+    }
+  ],
+
+  listeners: [
+    function onRemoveAll(arraySink) {
+      var arr = arraySink.a;
+      if ( arr.length === 0 ) return undefined;
+
+      return this.getRequest('beginTransaction').send().then(
+          this.onRemoveAllTransactionResponse.bind(this, arr));
     },
 
-    function onFindAborted(reject) {
-      reject(new Error('Cloud Datastore endpoint aborted HTTP request'));
+    function onResponse(name, response) {
+      if ( response.status !== 200 ) {
+        throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+            'Datastore endpoint: ' + response.status);
+      }
     },
-    function onFindResponse(resolve, reject, message) {
-      if ( message.statusCode !== 200 ) {
-        console.error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode);
-        reject(new Error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode));
-        return;
-      }
-
-      var self = this;
-      var jsonText = '';
-      message.on('data', function(data) { jsonText += data.toString(); });
-      message.on('end', function() {
-        self.processFindResponse(resolve, reject, jsonText);
-      });
-    },
-    function processFindResponse(resolve, reject, jsonText) {
-      var json;
-      try {
-        json = JSON.parse(jsonText);
-      } catch (err) {
-        reject(err);
-        return;
-      }
-
-      if ( ! ( json.found && json.found[0] && json.found[0].entity ) ) {
-        reject(new Error('Cloud Datastore entity not found'));
-        return;
-      }
+    function onFindResponse(response) {
+      this.onResponse('find', response);
+      var json = response.payload;
+      if ( ! ( json.found && json.found[0] && json.found[0].entity ) )
+        return null;
       if ( json.found.length > 1 ) {
-        reject(new Error('Multiple Cloud Datastore entities match unique id'));
-        return;
+        throw new Error('Multiple Cloud Datastore entities match ' +
+            'unique id');
       }
 
-      resolve(com.google.cloud.datastore.fromDatastoreEntity(
-          json.found[0].entity));
+      return com.google.cloud.datastore.fromDatastoreEntity(
+          json.found[0].entity);
     },
-
-    function onPutAborted(reject) {
-      reject(new Error('Cloud Datastore endpoint aborted HTTP request'));
-    },
-    function onPutResponse(resolve, reject, o, message) {
-      if ( message.statusCode !== 200 ) {
-        console.error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode);
-        reject(new Error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode));
-        return;
-      }
-
-      var self = this;
-      var jsonText = '';
-      message.on('data', function(data) { jsonText += data.toString(); });
-      message.on('end', function() {
-        self.processPutResponse(resolve, reject, o, jsonText);
-      });
-    },
-    function processPutResponse(resolve, reject, o, jsonText) {
-      var json;
-      try {
-        json = JSON.parse(jsonText);
-      } catch (err) {
-        reject(err);
-        return;
-      }
+    function onPutResponse(o, response) {
+      this.onResponse('put', response);
+      var json = response.payload;
 
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
-        if ( results[i].conflictDetected ) {
-          reject(new Error('Put to Cloud Datastore yielded conflict'));
-          return;
-        }
+        if ( results[i].conflictDetected )
+          throw new Error('Put to Cloud Datastore yielded conflict');
       }
 
-      resolve(o);
+      this.pub('on', 'put', o);
+      return o;
     },
-
-    function onRemoveAborted(reject) {
-      reject(new Error('Cloud Datastore endpoint aborted HTTP request'));
-    },
-    function onRemoveResponse(resolve, reject, o, message) {
-      if ( message.statusCode !== 200 ) {
-        console.error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode);
-        reject(new Error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode));
-        return;
-      }
-
-      var self = this;
-      var jsonText = '';
-      message.on('data', function(data) { jsonText += data.toString(); });
-      message.on('end', function() {
-        self.processRemoveResponse(resolve, reject, o, jsonText);
-      });
-    },
-    function processRemoveResponse(resolve, reject, o, jsonText) {
-      var json;
-      try {
-        json = JSON.parse(jsonText);
-      } catch (err) {
-        reject(err);
-        return;
-      }
+    function onRemoveResponse(o, response) {
+      this.onResponse('remove', response);
+      var json = response.payload;
 
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
-        if ( results[i].conflictDetected ) {
-          reject(new Error('Remove from Cloud Datastore yielded conflict'));
-          return;
-        }
+        if ( results[i].conflictDetected )
+          throw new Error('Remove from Cloud Datastore yielded conflict');
       }
 
-      resolve(o);
-    },
-
-    function onSelectAborted(reject) {
-      reject(new Error('Cloud Datastore endpoint aborted HTTP request'));
-    },
-    function onSelectResponse(data, message) {
-      if ( message.statusCode !== 200 ) {
-        console.error('Unexpected response code from Cloud Datastore ' +
-            'endpoint: ' + message.statusCode);
-        data.reject(new Error('Unexpected response code from Cloud ' +
-            'Datastore endpoint: ' + message.statusCode));
-        return;
+      // Cloud Datastore will provide results with version numbers even if
+      // the entity did not exist. Use indexUpdates defined-and-greater-non-0
+      // as a proxy for as a proxy for found-and-deleted.
+      if ( json.indexUpdates ) {
+        this.pub('on', 'remove', o);
       }
-
-      var jsonText = '';
-      message.on('data', function(data) { jsonText += data.toString(); });
-      message.on('end', this.processSelectResponse.bind(this, data));
+      return o;
     },
-    function processSelectResponse(data, jsonText) {
-      var json;
-      try {
-        json = JSON.parse(jsonText);
-      } catch (err) {
-        data.reject(err);
-        return;
-      }
-
+    function onSelectResponse(data, response) {
+      this.onResponse('select', response);
+      var json = response.payload;
       var batch = json.batch;
       var entities = batch.entityResults;
-      for ( var i = 0; i < entities.length; i++ ) {
-        var obj = com.google.cloud.datastore.fromDatastoreEntity(entities[i]);
-        data.results.push(obj);
-        data.sink.put(obj);
+
+      if ( ! entities ) {
+        data.sink && data.sink.eof && data.sink.eof();
+        return data.sink;
       }
 
-      if ( batch.entityResults && batch.entityResults.length > 0 &&
-          ( batch.moreResults === 'NOT_FINISHED' ||
-            batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' ) ) {
-        this.continueSelect(data, batch.endCursor);
+      for ( var i = 0; i < entities.length; i++ ) {
+        var obj = com.google.cloud.datastore.fromDatastoreEntity(
+            entities[i].entity);
+        data.results.push(obj);
+        data.sink && data.sink.put && data.sink.put(obj);
+      }
+
+      if ( entities.length > 0 && ( batch.moreResults === 'NOT_FINISHED' ||
+          batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' ) ) {
+        return this.selectNextBatch(data, batch.endCursor);
       } else {
-        data.sink.eof();
-        data.resolve(data.sink);
+        data.sink && data.sink.eof && data.sink.eof();
+        return data.sink;
       }
     },
-    function continueSelect(prevData, startCursor) {
-      var payload = Object.assign({}, prevData.requestPayload);
-      payload.query = { startCursor: startCursor };
+    function onRemoveAllTransactionResponse(arr, response) {
+      this.onResponse('removeAll begin transaction', response);
+      var transaction = response.payload.transaction;
+      var deletes = new Array(arr.length);
+      for ( var i = 0; i < deletes.length; i++ ) {
+        deletes[i] = { delete: arr[i].getDatastoreKey() };
+      }
 
-      var req = this.http.request({
-        protocol: this.protocol,
-        host: this.host,
-        port: this.port,
-        method: 'POST',
-        path: '/v1/projects/' + this.projectId + ':runQuery',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      req.on('aborted', self.onSelectAborted.bind(self, prevData.reject));
-      req.on('response', self.onSelectResponse.bind(
-          this, this.SelectData.create({
-            resolve: prevData.resolve,
-            reject: prevData.reject,
-            sink: prevData.sink,
-            requestPayload: payload
-          })));
+      this.getRequest('commit', JSON.stringify({
+        mode: 'TRANSACTIONAL',
+        mutations: deletes,
+        transaction: transaction
+      })).send().then(this.onRemoveAllResponse);
+    },
+    function onRemoveAllResponse(response) {
+      this.onResponse('removeAll commit', response);
+      var json = response.payload;
 
-      req.write(JSON.stringify(payload));
-      req.end();
+      var results = json.mutationResults;
+      for ( var i = 0; i < results.length; i++ ) {
+        if ( results[i].conflictDetected )
+          throw new Error('Remove from Cloud Datastore yielded conflict');
+      }
     }
   ]
 });

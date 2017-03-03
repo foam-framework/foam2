@@ -73,7 +73,7 @@ fi
 
 export CDS_PROJECT_ID="test-project-$RANDOM"
 
-export CDS_EMULATOR_PROTOCOL="http:"
+export CDS_EMULATOR_PROTOCOL="http"
 export CDS_EMULATOR_HOST="localhost"
 export CDS_EMULATOR_PORT=$((($RANDOM % 1000) + 8000))
 
@@ -83,7 +83,7 @@ ${JAVA:="java"} -cp "$CDS_EMULATOR_JAR" \
                 --port=$CDS_EMULATOR_PORT --testing &
 export CDS_EMULATOR_PID=$!
 
-export UNRELIABLE_CDS_EMULATOR_PROTOCOL="http:"
+export UNRELIABLE_CDS_EMULATOR_PROTOCOL="http"
 export UNRELIABLE_CDS_EMULATOR_HOST="localhost"
 export UNRELIABLE_CDS_EMULATOR_PORT=$((($RANDOM % 1000) + 8000))
 
@@ -97,9 +97,17 @@ export UNRELIABLE_CDS_EMULATOR_PID=$!
 sleep 5
 
 export JASMINE_CONFIG_PATH="$BASE_DIR/../../jasmine_gcloud.json"
+
+# Run tests
 node "$BASE_DIR/../../node_modules/.bin/jasmine" &
 JASMINE_PID=$!
 wait $JASMINE_PID
+
+# OR
+
+# Debug tests
+# node --inspect "$BASE_DIR/inspect.es6.js" "$BASE_DIR/../../node_modules/.bin/jasmine"
+
 JASMINE_CODE=$?
 
 stop
