@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,50 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'FlowControl',
-
-  documentation: 'FlowControl object used to stop or error while performing a DAO.select().',
+  package: 'foam.blob',
+  name: 'Buffer',
 
   properties: [
     {
-      class: 'Boolean',
-      name: 'stopped'
-    },
+      class: 'Long',
+      name: 'length'
+    }
     {
-      class: 'Object',
-      name: 'errorEvt'
+      name: 'data',
+      factory: function() {
+        return new ArrayBuffer(this.length);
+      }
     }
   ],
 
   methods: [
+    function slice(start, end) {
+      return foam.blob.Buffer.create({});
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'BlobBlob',
+  implements: [ 'foam.blob.Blob' ],
+
+  properties: [
     {
-      name: 'stop',
-      code: function() { this.stopped = true; }
+      name: 'blob',
+      required: true
     },
     {
-      name: 'error',
-      code: function error(e) { this.errorEvt = e; }
+      name: 'size',
+      getter: function() {
+        return this.blob.size;
+      }
+    }
+  ],
+
+  methods: [
+    function read(buffer, offset) {
     }
   ]
 });

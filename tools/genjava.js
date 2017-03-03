@@ -28,6 +28,7 @@ require('../src/com/chrome/origintrials/model/Origin.js');
 require('../src/com/chrome/origintrials/model/Relationships.js');
 
 var classes = [
+  'foam.core.Serializable',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',

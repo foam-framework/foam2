@@ -16,23 +16,20 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'CitationView',
-  extends: 'foam.u2.Element',
+  package: 'foam.comics',
+  name: 'DAOControllerView',
+  extends: 'foam.u2.View',
 
-  documentation: 'A simple default View to display the ID of an object.',
-
-  properties: [
-    'data',
-    [ 'nodeName', 'span' ],
+  requires: [
+    'foam.comics.DAOController'
   ],
 
   methods: [
-   function initE() {
-      this.SUPER();
-      this.add(this.data$.dot('id')).add(' ');
+    function initE() {
+      this.add(
+        this.DAOController.PREDICATE,
+        this.DAOController.FILTERED_DAO
+      );
     }
   ]
 });
-
-//    TODO: name/label detection */

@@ -86,5 +86,9 @@ if ( ! Number.isInteger ) {
     return typeof value === 'number' &&
         isFinite(value) &&
         Math.floor(value) === value;
+
+if ( ! Object.values ) {
+  Object.values = function(obj) {
+    return Object.keys(obj).map(function(k) { return obj[k]; });
   };
 }

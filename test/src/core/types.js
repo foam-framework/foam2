@@ -231,8 +231,9 @@ describe('StringArray', function() {
   it('setting an array to a number throws an exception', function() {
     expect(function() { p.stringArray = 42; }).toThrow();
   });
-  it('setting an array to null throws an exception', function() {
-    expect(function() { p.stringArray = null; }).toThrow();
+  it('setting an array to null is permitted', function() {
+    p.stringArray = null;
+    expect(p.stringArray).toBe(null);
   });
   it('setting an array to an object throws an exception', function() {
     expect(function() { p.stringArray = {}; }).toThrow();

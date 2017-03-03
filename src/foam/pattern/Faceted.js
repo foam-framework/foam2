@@ -71,7 +71,7 @@ foam.CLASS({
         if ( ! ignoreFacets ) {
           var facetCls = this.getFacetOf(args && args.of, X);
 
-          if ( facetCls ) return facetCls.create(args, X, true);
+          if ( facetCls !== this ) return facetCls.create(args, X, true);
         }
 
         return oldCreate.apply(this, arguments);
