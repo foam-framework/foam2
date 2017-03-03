@@ -175,7 +175,7 @@ foam.CLASS({
           return this.resp.json();
         }
         // TODO: responseType should be an enum and/or have validation
-        throw new Error("Unsupported response type");
+        throw new Error('Unsupported response type: ' + this.responseType);
       }
     },
     {
