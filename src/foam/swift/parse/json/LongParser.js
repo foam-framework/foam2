@@ -16,21 +16,50 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
-  properties: [
+  package: 'foam.swift.parse.json',
+  name: 'LongParser',
+  extends: 'foam.swift.parse.parser.Parser',
+  methods: [
     {
-      name: 'swiftType',
-      value: 'String',
+      name: 'parse',
+      swiftCode: function() {/*
+var ps = ps
+var n = 0
+
+var negate = false
+
+if !ps.valid() { return nil }
+
+var c = ps.head()
+
+if c == "-" {
+  negate = true
+  ps = ps.tail()
+  if !ps.valid() { return nil }
+  c = ps.head()
+}
+
+if c.isDigit() { n = Int(String(c))! }
+else { return nil }
+
+ps = ps.tail()
+
+while ( ps.valid() ) {
+  c = ps.head()
+  if c.isDigit() {
+    n *= 10
+    n += Int(String(c))!
+  } else {
+    break
+  }
+  ps = ps.tail()
+}
+
+if negate { n *= -1 }
+
+return ps.setValue(n)
+      */},
     },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
-    },
-  ],
+  ]
 });
+

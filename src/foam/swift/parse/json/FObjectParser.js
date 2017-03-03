@@ -16,21 +16,27 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.json',
+  name: 'FObjectParser',
+  extends: 'foam.swift.parse.parser.ProxyParser',
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
+      swiftType: 'Any!',
+      name: 'defaultClass',
     },
     {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
+      name: 'delegate',
+      swiftFactory: function() {/*
+return
+  Seq1(["index": 3, "parsers": [
+    Whitespace(),
+    Literal(["string": "{"]),
+    Whitespace(),
+    FObjectParser_(["defaultClass": self.defaultClass]),
+    Whitespace(),
+    Literal(["string": "}"]),
+  ]])
+      */},
     },
   ],
 });

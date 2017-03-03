@@ -16,20 +16,27 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  refines: 'foam.core.Int',
   properties: [
     {
       name: 'swiftType',
-      value: 'String',
+      value: 'Int',
     },
     {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
+      name: 'swiftAdapt',
+      factory: function() {
+        return function() {/*
+var newValue = newValue
+if let str = newValue as? String { newValue = Int(str) }
+if let i = newValue as? Int { return Int(Int32(i)) }
+fatalError("Unable to adapt Int")
+        */}
+      },
     },
     {
       name: 'swiftValue',
       expression: function(value) {
-        return '"' + value + '"'
+        return value + '';
       },
     },
   ],

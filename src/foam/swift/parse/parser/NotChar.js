@@ -16,21 +16,21 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.parser',
+  name: 'NotChar',
+  extends: 'foam.swift.parse.parser.Parser',
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
+      swiftType: 'Character',
+      name: 'ch',
     },
   ],
+  methods: [
+    {
+      name: 'parse',
+      swiftCode: function() {/*
+return ps.valid() && ps.head() != ch ? ps.tail().setValue(ps.head()) : nil
+      */},
+    },
+  ]
 });

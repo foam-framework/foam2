@@ -133,20 +133,8 @@ public protocol PropertyInfo: Axiom {
   var transient: Bool { get }
   var view: FObject.Type? { get }
   var label: String { get }
-}
-
-public extension PropertyInfo {
-  public func set(_ obj: FObject, value: Any) {
-    obj.set(key: name, value: value)
-  }
-}
-
-public class PropertyInfoImpl: PropertyInfo {
-  public lazy var classInfo: ClassInfo = ClassInfoImpl()
-  public lazy var transient: Bool = false
-  public lazy var name: String = ""
-  public var view: FObject.Type? = nil
-  public var label: String = ""
+  var jsonParser: Parser? { get }
+  func set(_ obj: FObject, value: Any?)
 }
 
 public class Action: Axiom {
@@ -263,11 +251,12 @@ public protocol FObject: class {
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
   func getSlot(key: String) -> Slot?
+  func hasOwnProperty(_ key: String) -> Bool
   func callAction(key: String)
+  init(_ args: [String:Any?])
 }
 
 public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
-
   public var __context__: Context = Context.GLOBAL {
     didSet {
       self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())
@@ -300,6 +289,7 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
 
   public func get(key: String) -> Any? { return nil }
   public func getSlot(key: String) -> Slot? { return nil }
+  public func hasOwnProperty(_ key: String) -> Bool { return false }
 
   public func sub(
     topics: [Any] = [],
@@ -362,7 +352,13 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
 
   public func callAction(key: String) { }
 
-  public required override init() {
+  public override required init() {}
+
+  public required init(_ args: [String:Any?]) {
+    super.init()
+    for (key, value) in args {
+      self.set(key: key, value: value)
+    }
   }
 
   private func detachListeners(listeners: ListenerList?) {
@@ -388,5 +384,54 @@ struct FOAM_utils {
     if a === b { return true }
     if a != nil { return a!.isEqual(b) }
     return false
+  }
+}
+
+public class Reference<T> {
+  var value: T
+  init(value: T) { self.value = value }
+}
+
+extension String {
+  func char(at: Int) -> Character {
+    return self[index(startIndex, offsetBy: at)]
+  }
+  func index(of: Character) -> Int {
+    if let r = range(of: of.description) {
+      return distance(from: startIndex, to: r.lowerBound)
+    }
+    return -1
+  }
+}
+
+extension Character {
+  func isDigit() -> Bool {
+    return "0"..."9" ~= self
+  }
+}
+
+public class ModelParserFactory {
+  private static var parsers: [String:Parser] = [:]
+  public static func getInstance(_ c: FObject.Type) -> Parser {
+    let info = c.classInfo()
+    if let p = parsers[info.id] { return p }
+    let parser = buildInstance(info)
+    parsers[info.id] = parser
+    return parser
+  }
+  private static func buildInstance(_ info: ClassInfo) -> Parser {
+    var parsers = [Parser]()
+    for p in info.axioms(byType: PropertyInfo.self) {
+      if p.jsonParser != nil {
+        parsers.append(PropertyParser(["property": p]))
+      }
+    }
+    return Repeat0([
+      "delegate": Seq0(["parsers": [
+        Whitespace(),
+        Alt(["parsers": parsers])
+      ]]),
+      "delim": Literal(["string": ","]),
+    ])
   }
 }

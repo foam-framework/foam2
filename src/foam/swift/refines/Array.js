@@ -16,21 +16,20 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  refines: 'foam.core.Array',
   properties: [
     {
       name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
+      expression: function(of) {
+        return '[' + of.split('.').pop() + ']';
+      },
     },
     {
       name: 'swiftValue',
       expression: function(value) {
-        return '"' + value + '"'
+        return '[]'
       },
     },
   ],
 });
+

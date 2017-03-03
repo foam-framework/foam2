@@ -16,21 +16,32 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
-  properties: [
+  package: 'foam.swift.parse.json',
+  name: 'StringParser',
+  extends: 'foam.swift.parse.parser.Parser',
+  methods: [
     {
-      name: 'swiftType',
-      value: 'String',
+      name: 'parse',
+      swiftCode: function() {/*
+let escape_: Character = "\\"
+let delim_ = ps.head()
+if delim_ != "\"" && delim_ != "'" { return nil }
+
+var ps = ps.tail();
+var lastc = delim_;
+
+var sb: [Character] = []
+while ps.valid() {
+  let c = ps.head()
+  if c == delim_ && lastc != escape_ {
+    break
+  }
+  if c != escape_ { sb.append(c) }
+  lastc = c
+  ps = ps.tail()
+}
+return ps.tail().setValue(String(sb))
+      */},
     },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
-    },
-  ],
+  ]
 });

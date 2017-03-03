@@ -16,21 +16,33 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.parser',
+  name: 'Literal',
+  extends: 'foam.swift.parse.parser.Parser',
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
+      class: 'String',
+      name: 'string',
     },
     {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
+      name: 'value',
     },
   ],
+  methods: [
+    {
+      name: 'parse',
+      swiftCode: function() {/*
+var ps = ps
+for i in 0..<string.characters.count {
+  if !ps.valid() || ps.head() != string.char(at: i) {
+    return nil
+  }
+  ps = ps.tail()
+}
+// TODO support expressions and replace this with an expression on value.
+let value: Any? = hasOwnProperty("value") ? self.value : string
+return ps.setValue(value)
+      */},
+    },
+  ]
 });
