@@ -685,9 +685,9 @@ foam.CLASS({
       if ( this.port ) options.port = this.port;
 
       return new Promise(function(resolve, reject) {
-        var req = require(this.protocol).request(options, function(res) {
+        var req = require(this.protocol).request(options, function(nodeResp) {
           var resp = this.HTTPResponse.create({
-            resp: res,
+            resp: nodeResp,
             responseType: this.responseType
           });
 
@@ -705,10 +705,20 @@ foam.CLASS({
               headers: this.headers,
               followRedirect: true
             }).send());
-          } else {
-            resolve(resp);
+            return;
           }
 
+          var buffer = '';
+          nodeResp.on('data', function(d) {
+            buffer += d.toString();
+          });
+          nodeResp.on('end', function() {
+            resp.payload = buffer;
+            resolve(resp);
+          });
+          nodeResp.on('error', function(e) {
+            reject(e);
+          });
         }.bind(this));
 
         req.on('error', function(e) {
@@ -731,22 +741,18 @@ foam.CLASS({
   properties: [
     {
       name: 'payload',
-      factory: function() {
+      adapt: function(_, str) {
         if ( this.streaming ) return null;
 
-        // TODO: Handle response type.
-        return new Promise(function(resolve, reject) {
-          var buffer = ""
-          this.resp.on('data', function(d) {
-            buffer += d.toString();
-          });
-          this.resp.on('end', function() {
-            resolve(buffer);
-          });
-          this.resp.on('error', function(e) {
-            reject(e);
-          });
-        }.bind(this));
+        switch (this.responseType) {
+        case 'text':
+          return str;
+        case 'json':
+          return JSON.parse(str);
+        }
+
+        // TODO: responseType should be an enum and/or have validation
+        throw new Error('Unsupported response type: ' + this.responseType);
       }
     },
     {
