@@ -70,7 +70,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(_, b) { return b === undefined; },
     function compare(_, b) { return b === undefined ? 0 : 1; },
-    function hashCode() { return -1; }
+    function hashCode() { return -2; }
   ]
 });
 
@@ -84,7 +84,7 @@ foam.LIB({
     function compare(_, b) {
       return b === null ? 0 : b === undefined ? -1 : 1;
     },
-    function hashCode() { return -2; }
+    function hashCode() { return -3; }
   ]
 });
 
@@ -96,7 +96,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
-    function hashCode(o) { return o ? 1 : 0; }
+    function hashCode(o) { return o ? 1 : -1; }
   ]
 });
 
@@ -374,7 +374,7 @@ foam.LIB({
     function equals(a, b) { return a === b; },
     function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
     function hashCode(s) {
-      var hash = 0;
+      var hash = -4;
 
       for ( var i = 0 ; i < s.length ; i++ ) {
         var code = s.charCodeAt(i);
@@ -525,7 +525,7 @@ foam.LIB({
       return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
     },
     function hashCode(a) {
-      var hash = 0;
+      var hash = -5;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
         hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
@@ -633,7 +633,14 @@ foam.LIB({
     function compare(a, b) {
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
-    function hashCode(o) { return 0; },
+    function hashCode(o) {
+      var hash = 19;
+      for ( var key in o ) {
+        if ( ! o.hasOwnProperty(key) ) continue;
+        hash = ((hash << 5) - hash) + foam.util.hashCode(o[key]);
+      }
+      return hash;
+    },
     function freeze(o) {
       // Force $UID creation before freezing because it can't
       // be added to the object after it's frozen.
