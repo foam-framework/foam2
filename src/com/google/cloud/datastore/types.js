@@ -281,11 +281,13 @@ foam.CLASS({
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
 
       for ( var i = 0; i < ps.length; i++ ) {
-        if ( ps[i].networkTransient ) continue;
+        // TODO(markdittmer): MLangs that refer to storageTransient
+        // properties could cause the DatastoreDAO to misbehave. This could be
+        // fixed by auditing predicates and throwing an error when they contain
+        // properties that are dropped by the DAO processing the predicate.
+        if ( ps[i].storageTransient ) continue;
 
         var value = ps[i].f(this);
-        if ( ps[i].isDefaultValue(value) ) continue;
-
         properties[ps[i].name] = com.google.cloud.datastore.toDatastoreValue(
             value);
       }

@@ -35,7 +35,7 @@ global.clearCDS = function() {
 
     function deleteResults() {
       var req = http.request({
-        protocol: env.CDS_EMULATOR_PROTOCOL,
+        protocol: env.CDS_EMULATOR_PROTOCOL + ':',
         host: env.CDS_EMULATOR_HOST,
         port: env.CDS_EMULATOR_PORT,
         method: 'POST',
@@ -91,7 +91,7 @@ global.clearCDS = function() {
       if ( nextCursor ) resultsReqData.query.startCursor = nextCursor;
 
       var req = http.request({
-        protocol: env.CDS_EMULATOR_PROTOCOL,
+        protocol: env.CDS_EMULATOR_PROTOCOL + ':',
         host: env.CDS_EMULATOR_HOST,
         port: env.CDS_EMULATOR_PORT,
         method: 'POST',

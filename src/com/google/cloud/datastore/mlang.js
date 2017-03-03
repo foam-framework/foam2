@@ -16,6 +16,51 @@
  */
 
 //
+// Refine Property and DOT to produce datastore property.
+//
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  methods: [
+    function toOwnDatastoreProperty() {
+      return this.name;
+    },
+    function toDatastoreProperty() {
+      return { name: this.toOwnDatastoreProperty() };
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.expr.Dot',
+
+  methods: [
+    function toOwnDatastoreProperty() {
+      return this.arg1.toOwnDatastoreProperty() + '.' +
+          this.arg2.toOwnDatastoreProperty();
+    },
+    function toDatastoreProperty() {
+      return { name: this.toOwnDatastoreProperty() };
+    }
+  ]
+});
+
+//
+// Refine constants to produce datastore values.
+//
+
+foam.CLASS({
+  refines: 'foam.mlang.Constant',
+
+  methods: [
+    function toDatastoreValue() {
+      return com.google.cloud.datastore.toDatastoreValue(this.value);
+    }
+  ]
+});
+
+//
 // Refine AND and subset of binary ops to support toDatastoreFilter().
 //
 
@@ -74,7 +119,7 @@ foam.CLASS({
       };
     },
     function toDatastoreFilter() {
-      return { propertyFilter: this.toOwnDatastoreFilter };
+      return { propertyFilter: this.toOwnDatastoreFilter() };
     }
   ]
 });
@@ -105,14 +150,18 @@ foam.CLASS({
   }
 })();
 
+//
+// Train properties and ThenBy to behave as orderings.
+//
+
 foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
     function toDatastoreOrder() {
-      return this.orderDirection === 1 ?
-          { property: { name: this.name } } :
-          { property: { name: this.name }, direction: 'DESCENDING' };
+      return this.orderDirection() === 1 ?
+          [ { property: { name: this.name } } ] :
+          [ { property: { name: this.name }, direction: 'DESCENDING' } ];
     }
   ]
 });
@@ -124,8 +173,6 @@ foam.CLASS({
     function toDatastoreOrder() {
       var order1 = this.arg1.toDatastoreOrder();
       var order2 = this.arg2.toDatastoreOrder();
-      if ( ! Array.isArray(order1) ) order1 = [ order1 ];
-      if ( ! Array.isArray(order2) ) order2 = [ order2 ];
       return order1.concat(order2);
     }
   ]
