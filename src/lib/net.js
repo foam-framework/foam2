@@ -698,7 +698,7 @@ foam.CLASS({
   package: 'foam.net',
   name: 'Universal',
 
-  requires: [ 'foam.net.Environment' ],
+  axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
     {
@@ -710,19 +710,19 @@ foam.CLASS({
             this.Environment.BROWSER :
             this.Environment.NODE;
       }
-    },
-    {
-      name: 'cls',
-      factory: function() {
-        return foam.lookup((this.environment === this.Environment.NODE ?
-            'foam.net.node' : 'foam.net') + '.' + this.cls_.name);
-      }
     }
   ],
 
   methods: [
-    function create(args, opt_parent) {
-      return this.cls.create(args, opt_parent);
+    function getRuntimeClass(cls) {
+        return foam.lookup((this.environment === this.Environment.NODE ?
+            'foam.net.node' : 'foam.net') + '.' + cls.name);
+    },
+    function installInClass(cls) {
+      var runtimeCls = this.getRuntimeClass(cls);
+      cls.create = function(args, opt_parent) {
+        return runtimeCls.create(args, opt_parent);
+      };
     }
   ]
 });
@@ -731,12 +731,14 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.universal',
   name: 'HTTPRequest',
-  extends: 'foam.net.Universal',
+
+  axioms: [ foam.net.Universal.create() ]
 });
 
 
 foam.CLASS({
   package: 'foam.net.universal',
   name: 'HTTPResponse',
-  extends: 'foam.net.Universal',
+
+  axioms: [ foam.net.Universal.create() ]
 });
