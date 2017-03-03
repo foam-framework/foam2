@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-/**
-  ContextualizingDAO recreates objects returned by find(), giving them
-  access to the exports that this ContextualizingDAO has access to.
-  <p>
-  If using a foam.dao.EasyDAO, set contextualize:true to automatically
-  contextualize objects returned by find().
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'ContextualizingDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  // TODO: notify put too?
+  documentation: function() {/*
+    ContextualizingDAO recreates objects returned by find(), giving them
+    access to the exports that this ContextualizingDAO has access to.
+    <p>
+    If using a foam.dao.EasyDAO, set contextualize:true to automatically
+    contextualize objects returned by find().
+  */},
 
   methods: [
     /** Found objects are re-created as if this DAO had created them, giving
@@ -35,7 +34,8 @@ foam.CLASS({
     function find(id) {
       var self = this;
       return self.delegate.find(id).then(function(obj) {
-        return obj.cls_.create(obj, self);
+        if ( obj ) return obj.cls_.create(obj, self);
+        return null;
       });
     }
     // TODO: select() too?

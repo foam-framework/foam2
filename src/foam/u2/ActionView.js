@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'ActionView',
   extends: 'foam.u2.Element',
 
+  documentation: 'A button View for triggering Actions.',
+
   axioms: [
     foam.u2.CSS.create({code: function() {/*
       ^ {

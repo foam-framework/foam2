@@ -21,6 +21,8 @@ foam.CLASS({
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: 'DAO implementation backed by an array.',
+
   requires: [
     'foam.dao.ArraySink',
     'foam.mlang.predicate.True'
@@ -109,7 +111,7 @@ foam.CLASS({
         }
       }
 
-      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
+      return Promise.resolve(null);
     }
   ]
 });

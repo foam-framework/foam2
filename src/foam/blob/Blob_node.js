@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'CitationView',
-  extends: 'foam.u2.Element',
-
-  documentation: 'A simple default View to display the ID of an object.',
+  refines: 'foam.blob.Buffer',
 
   properties: [
-    'data',
-    [ 'nodeName', 'span' ],
+    {
+      name: 'buffer',
+      factory: function() {
+        return new Buffer(this.length);
+      }
+    }
   ],
 
   methods: [
-   function initE() {
-      this.SUPER();
-      this.add(this.data$.dot('id')).add(' ');
+    function slice(start, end) {
+      return foam.blob.Buffer.create({
+        length: end - start,
+        buffer: this.buffer.slice(start, end)
+      });
     }
   ]
 });
-
-//    TODO: name/label detection */

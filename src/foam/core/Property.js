@@ -230,6 +230,10 @@ foam.CLASS({
       value: function diffProperty(o1, o2, diff, prop) {
         return prop.diffPropertyValues(prop.f(o1), prop.f(o2), diff);
       }
+    },
+    {
+      name: 'forClass_',
+      transient: true
     }
   ],
 
@@ -260,6 +264,14 @@ foam.CLASS({
 
         c.axiomMap_[prop.name] = prop;
       }
+
+      if ( this.forClass_ && this.forClass_ !== c.id && prop === this ) {
+        // Clone this property if it's been installed before.
+        prop = this.clone();
+        c.axiomMap_[prop.name] = prop;
+      }
+
+      prop.forClass_ = c.id + '.' + this.name;
 
       // var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
       //   // We only care about Property axioms.
