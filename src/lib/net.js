@@ -532,11 +532,11 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.net',
-  name: 'XHRHTTPRequest',
+  name: 'XMLHTTPRequest',
   extends: 'foam.net.HTTPRequest',
 
   requires: [
-    'foam.net.XHRHTTPResponse as HTTPResponse'
+    'foam.net.XMLHTTPResponse as HTTPResponse'
   ],
 
   methods: [
@@ -576,7 +576,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.net',
-  name: 'XHRHTTPResponse',
+  name: 'XMLHTTPResponse',
   extends: 'foam.net.HTTPResponse',
 
   constants: {
@@ -653,7 +653,7 @@ foam.CLASS({
   extends: 'foam.net.EventSource',
 
   requires: [
-    'foam.net.XHRHTTPRequest as HTTPRequest'
+    'foam.net.XMLHTTPRequest as HTTPRequest'
   ],
 
   properties: [
