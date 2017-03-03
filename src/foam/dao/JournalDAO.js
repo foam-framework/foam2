@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-/**
-  Used by JournalDAO to store the state of an object at a specific time.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalEntry',
+
+  documentation: 'Used by JournalDAO to store the state of an object at a specific time.',
 
   properties: [
     'id',
@@ -40,15 +39,12 @@ foam.CLASS({
 });
 
 
-/**
-  Saves each addition, update, or removal of objects to the delegate DAO.
-  Previous state for the object is stored, so the journal can replay
-  the object put() and remove() events to recreate the delegate DAO.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalDAO',
   extends: 'foam.dao.ProxyDAO',
+
+  documentation: 'Saves each addition, update, or removal of objects to the delegate DAO. Previous state for the object is stored, so the journal can replay the object put() and remove() events to recreate the delegate DAO.',
 
   requires: [
     'foam.dao.JournalEntry'

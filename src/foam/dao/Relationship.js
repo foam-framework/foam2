@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Relationship',
   implements: [ 'foam.mlang.Expressions' ],
 
+  documentation: 'An Axiom for defining Relationships between models.',
+
   properties: [
     {
       name: 'id',
@@ -93,12 +95,12 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'sourcePropertyConfig'
+      name: 'sourceProperty'
     },
     {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'targetPropertyConfig'
+      name: 'targetProperty'
     },
     /* FUTURE:
     {

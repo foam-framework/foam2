@@ -70,8 +70,7 @@ foam.CLASS({
       name: 'attributes'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.FObject',
+      class: 'Object',
       name: 'object'
     }
   ]
@@ -88,8 +87,7 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.FObject',
+      class: 'Object',
       name: 'object'
     }
   ]
@@ -152,6 +150,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message',
+      transient: true,
       expression: function(name) {
         return 'Could not find registration for ' + name;
       }
@@ -253,6 +252,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.SubBoxMessage',
+    'foam.box.Message',
     'foam.box.SkeletonBox'
   ],
 
@@ -270,10 +270,19 @@ foam.CLASS({
       name: 'send',
       code: function(msg) {
         if ( this.SubBoxMessage.isInstance(msg.object) ) {
-          if ( this.registry[msg.object.name].localBox ) {
-            this.registry[msg.object.name].localBox.send(msg.object.object);
+          var name = msg.object.name;
+
+          if ( this.registry[name].localBox ) {
+            // Unpack sub box object... is this right?
+            msg.object = msg.object.object;
+            this.registry[name].localBox.send(msg);
           } else {
-            // TODO: Error case if no sub box found
+            if ( msg.attributes.errorBox ) {
+              msg.attributes.errorBox.send(
+                this.Message.create({
+                  object: this.NoSuchNameException.create({ name: name })
+                }));
+            }
           }
         } else {
           this.registrySkeleton.send(msg);
@@ -512,11 +521,11 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      if ( this.RPCReturnMessage.isInstance(msg) ) {
-        this.resolve_(msg.data);
+      if ( this.RPCReturnMessage.isInstance(msg.object) ) {
+        this.resolve_(msg.object.data);
         return;
       }
-      this.reject_(msg);
+      this.reject_(msg.object);
     }
   ]
 });
@@ -537,29 +546,170 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.dao',
-  name: 'ClientDAO',
+  name: 'BaseClientDAO',
   extends: 'foam.dao.AbstractDAO',
-
   properties: [
     {
       class: 'Stub',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      eventProxy: true,
       methods: [
         'put',
         'remove',
-        'select',
         'removeAll',
+        'select',
         'find'
       ]
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'DAOEvent',
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'obj'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'BoxDAOListener',
+  implements: [
+    'foam.dao.Sink'
+  ],
+  requires: [
+    'foam.dao.DAOEvent'
+  ],
+  properties: [
+    {
+      class: 'FObjectProperty',
+      name: 'box'
+    }
+  ],
+  methods: [
+    function put(obj) {
+      this.box.send(this.DAOEvent.create({
+        name: 'put', obj: obj
+      }));
+    },
+    function remove(obj) {
+      this.box.send(this.DAOEvent.create({
+        name: 'remove', obj: obj
+      }));
+    },
+    function reset() {
+      this.box.send(this.DAOEvent.create({
+        name: 'reset'
+      }));
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'MergeBox',
+  extends: 'foam.box.ProxyBox',
+  properties: [
+    {
+      class: 'Int',
+      name: 'delay',
+      value: 100
+    },
+    {
+      name: 'msg',
+      transient: true
+    },
+    {
+      class: 'Array',
+      name: 'queue',
+      transient: true
+    }
+  ],
+  methods: [
+    function send(m) {
+      if ( ! this.timeout ) {
+      }
+    }
+  ],
+  listeners: [
+    function doSend() {
+      var queue = this.queue;
+      this.queue = undefined;
+      this.timeout = undefined;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ClientDAO',
+  extends: 'foam.dao.BaseClientDAO',
+  requires: [
+    'foam.core.Serializable',
+    'foam.dao.BoxDAOListener'
+  ],
+  methods: [
+    function select(sink, skip, limit, order, predicate) {
+      if ( ! this.Serializable.isInstance(sink) ) {
+        var self = this;
+
+        return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
+          var items = result.a;
+          var fc = self.FlowControl.create();
+
+          for ( var i = 0 ; i < items.length ; i++ ) {
+            if ( fc.stopped ) break;
+            if ( fc.errorEvt ) {
+              sink.error(fc.errorEvt);
+              return Promise.reject(fc.errorEvt);
+            }
+
+            sink.put(items[i], fc);
+          }
+
+          sink.eof();
+
+          return sink;
+        });
+      }
+
+      return this.SUPER(sink, skip, limit, order, predicate);
+    },
+    function listen(sink, predicate) {
+      // TODO: This should probably just be handled automatically via a RemoteSink/Listener
+      var id = foam.next$UID();
+      var replyBox = this.__context__.registry.register(
+        id,
+        this.delegateReplyPolicy,
+        {
+          send: function(m) {
+            switch(m.object.name) {
+              case 'put':
+              case 'remove':
+                sink[m.object.name](m.object.obj);
+              break;
+              case 'reset':
+                sink.reset();
+            }
+          }
+        });
+
+      this.SUPER(this.BoxDAOListener({
+        box: replyBox
+      }), predicate);
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -731,18 +881,18 @@ foam.CLASS({
 
       var replyBox = message.attributes.replyBox;
 
+      var self = this;
+
       if ( p instanceof Promise ) {
         p.then(
           function(data) {
-            // Do we need to package data into a message?
-            replyBox.send(this.Message.create({
-              object: this.RPCReturnMessage.create({ data: data })
+            replyBox.send(self.Message.create({
+              object: self.RPCReturnMessage.create({ data: data })
             }));
           },
           function(error) {
-            // TODO
             message.attributes.errorBox && message.attributes.errorBox.send(
-              this.Message.create({
+              self.Message.create({
                 object: error
               }));
           });
@@ -972,6 +1122,22 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'RawMessagePortBox',
+  implements: [ 'foam.box.Box' ],
+  properties: [
+    {
+      name: 'port'
+    }
+  ],
+  methods: [
+    function send(m) {
+      this.port.postMessage(foam.json.Network.stringify(m));
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1111,10 +1277,14 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'myname'
+    },
+    {
       name: 'me',
       factory: function() {
         var me = this.NamedBox.create({
-          name: '/com/foamdev/anonymous/' + foam.uuid.randomGUID()
+          name: this.myname || ( '/com/foamdev/anonymous/' + foam.uuid.randomGUID() )
         });
         me.delegate = this.registry;
         return me;
@@ -1274,6 +1444,39 @@ foam.CLASS({
         }).then(function(p) {
           this.me.send(foam.json.parseString(p, this));
         }.bind(this));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'MessagePortBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.RawMessagePortBox',
+    'foam.box.RegisterSelfMessage',
+    'foam.box.Message'
+  ],
+  imports: [ 'messagePortService', 'me' ],
+  properties: [
+    {
+      name: 'target'
+    },
+    {
+      name: 'delegate',
+      factory: function() {
+	var channel = new MessageChannel();
+	this.messagePortService.addPort(channel.port1);
+
+	this.target.postMessage('', '*', [channel.port2]);
+
+        channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
+          object: this.RegisterSelfMessage.create({ name: this.me.name })
+        })));
+
+	return this.RawMessagePortBox.create({ port: channel.port1 });
       }
     }
   ]

@@ -37,6 +37,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'InterfaceModel',
@@ -52,6 +53,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'AbstractInterface',
@@ -65,6 +67,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.LIB({
   name: 'foam',
