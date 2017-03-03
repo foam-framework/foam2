@@ -20,12 +20,15 @@ foam.CLASS({
   name: 'DetailPropertyView',
   extends: 'foam.u2.Element',
 
+  documentation: 'View for one row/property of a DetailView.',
+
   properties: [
     'prop',
     [ 'nodeName', 'tr' ]
   ],
 
   templates: [
+    // TODO: this isn't used
     function CSS() {/*
       .foam-u2-PropertyView-label {
         color: #444;

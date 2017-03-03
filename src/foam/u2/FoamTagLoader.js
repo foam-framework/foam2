@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'FoamTagLoader',
 
+  documentation: 'Converts <foam> tags in document into Views.',
+
   imports: [ 'document', 'window' ],
 
   methods: [

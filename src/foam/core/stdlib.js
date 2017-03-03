@@ -806,6 +806,7 @@ foam.LIB({
     },
 
     function compound(args) {
+      /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
 
       if ( cs.lengh === 1 ) return cs[0];
