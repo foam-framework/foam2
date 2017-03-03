@@ -16,21 +16,29 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.parser',
+  name: 'Seq',
+  extends: 'foam.swift.parse.parser.Parser',
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
+      class: 'Array',
+      of: 'foam.swift.parse.parser.Parser',
+      name: 'parsers',
     },
   ],
+  methods: [
+    {
+      name: 'parse',
+      swiftCode: function() {/*
+var ps: PStream? = ps
+var values = [Any?](repeating: nil, count: parsers.count)
+for (i, parser) in parsers.enumerated() {
+  ps = parser.parse(ps!, x)
+  if ps == nil { return nil }
+  values[i] = ps!.value()
+}
+return ps!.setValue(values)
+      */},
+    },
+  ]
 });

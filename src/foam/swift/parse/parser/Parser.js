@@ -16,21 +16,30 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
-  properties: [
-    {
-      name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
-    },
+  package: 'foam.swift.parse.parser',
+  name: 'Parser',
+  requires: [
+    'foam.swift.parse.PStream',
   ],
+  methods: [
+    {
+      name: 'parse',
+      // TODO returnType: 'FObject', of: 'PStream',
+      swiftReturnType: 'PStream?',
+      args: [
+        {
+          // TODO type: 'FObject', of: 'PStream',
+          swiftType: 'PStream',
+          name: 'ps',
+        },
+        {
+          swiftType: 'Context',
+          name: 'x',
+        },
+      ],
+      swiftCode: function() {/*
+fatalError("Implement me")
+      */},
+    },
+  ]
 });

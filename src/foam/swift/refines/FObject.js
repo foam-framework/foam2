@@ -34,8 +34,8 @@ foam.LIB({
         code: this.model_.swiftCode,
       });
       this.getOwnAxioms().forEach(function(axiom) {
-        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls);
-      });
+        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name));
+      }.bind(this));
 
       var createClassInfoBody = foam.templates.TemplateUtil.create().compile(
           foam.String.multiline(function(properties, id) {/*
@@ -61,6 +61,30 @@ return classInfo
         class: true,
         returnType: 'ClassInfo',
         body: createClassInfoBody,
+      }));
+
+      var hasOwnPropertyBody = foam.templates.TemplateUtil.create().compile(
+          foam.String.multiline(function(properties) {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftInitedName%>`
+<% } %>
+  default:
+    return super.hasOwnProperty(key)
+}
+          */}), '', ['properties']).apply(this, [properties]).trim();
+      cls.methods.push(foam.swift.Method.create({
+        override: true,
+        name: 'hasOwnProperty',
+        visibility: 'public',
+	args: [
+          {
+            localName: 'key',
+            type: 'String',
+          },
+	],
+        returnType: 'Bool',
+        body: hasOwnPropertyBody,
       }));
 
       var getterBody = foam.templates.TemplateUtil.create().compile(
@@ -117,11 +141,14 @@ switch key {
           foam.String.multiline(function(properties) {/*
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftSlotName%>":
+    <%=p.swiftSlotName%> = value as! Slot
+    return
   case "<%=p.swiftName%>":
     let oldValue: Any? = <%=p.swiftInitedName%> ? `<%=p.swiftName%>` : nil
     <%=p.swiftValueName%> = <%=p.swiftPreSetFuncName%>(oldValue, <%=p.swiftAdaptFuncName%>(oldValue, value))
     <%=p.swiftInitedName%> = true
-    <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%><%if ( p.swiftType != 'Any?' ) {%> as! <%=p.swiftType%><% } %>)
+    <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%><%if ( p.swiftRequiresCast ) {%> as! <%=p.swiftType%><% } %>)
     _ = pub(["propertyChange", "<%=p.swiftName%>"])
     return
 <% } %>

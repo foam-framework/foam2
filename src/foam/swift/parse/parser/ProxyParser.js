@@ -16,21 +16,24 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.parser',
+  // TODO: We should be able to auto generate all of this.
+  name: 'ProxyParser',
+  extends: 'foam.swift.parse.parser.Parser',
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
+      class: 'FObjectProperty',
+      of: 'foam.swift.parse.parser.Parser',
+      required: true,
+      name: 'delegate',
     },
   ],
+  methods: [
+    {
+      name: 'parse',
+      swiftCode: function() {/*
+return delegate.parse(ps, x)
+      */},
+    },
+  ]
 });

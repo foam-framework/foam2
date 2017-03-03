@@ -16,21 +16,15 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.json',
+  name: 'DateParser',
+  extends: 'foam.swift.parse.parser.ProxyParser',
   properties: [
-    {
-      name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
-    },
+  {
+    name: 'delegate',
+    swiftFactory: function() {/*
+fatalError("TODO: Learn to parse dates.")
+    */},
+  },
   ],
 });

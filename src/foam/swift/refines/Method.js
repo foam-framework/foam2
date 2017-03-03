@@ -59,11 +59,17 @@ foam.CLASS({
     }
   ],
   methods: [
-    function isOverride() {
-      return !!foam.lookup(this.sourceCls_.model_.extends)
-          .getAxiomByName(this.name);
+    function createChildMethod_(child) {
+      var m = this.clone();
+      m.copyFrom(child);
+
+      // TODO: This is a hack to not clobber the parent's args.
+      // Figure out a better way.
+      m.args = this.args; 
+
+      return m;
     },
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, superAxiom) {
       if ( !this.swiftCode ) return;
       cls.methods.push(this.Method.create({
         name: this.name,
@@ -71,7 +77,7 @@ foam.CLASS({
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
         visibility: 'public',
-        override: this.isOverride(),
+        override: !!superAxiom,
         annotations: this.swiftAnnotations,
       }));
     },

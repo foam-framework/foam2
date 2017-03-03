@@ -16,21 +16,26 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  package: 'foam.swift.parse.parser',
+  name: 'Alt',
+  extends: 'foam.swift.parse.parser.Parser',
   properties: [
     {
-      name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
-      },
+      class: 'Array',
+      of: 'foam.swift.parse.parser.Parser',
+      name: 'parsers',
     },
   ],
+  methods: [
+    {
+      name: 'parse',
+      swiftCode: function() {/*
+for parser in parsers {
+  let ret = parser.parse(ps, x)
+  if ret != nil { return ret }
+}
+return nil
+      */},
+    },
+  ]
 });

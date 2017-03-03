@@ -16,21 +16,14 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.String',
+  refines: 'foam.core.FObjectProperty',
   properties: [
     {
       name: 'swiftType',
-      value: 'String',
-    },
-    {
-      name: 'swiftView',
-      value: 'foam.swift.ui.FOAMUITextField',
-    },
-    {
-      name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value + '"'
+      expression: function(of, required) {
+        return of.split('.').pop() + (required ? '' : '?');
       },
     },
   ],
 });
+

@@ -75,11 +75,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftValue',
-      expression: function(value) {
-        return foam.typeOf(value) === foam.String ? '"' + value + '"' :
-          foam.typeOf(value) === foam.Undefined ? 'nil' :
-          value;
-      }
     },
     {
       class: 'String',
@@ -104,9 +99,16 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'swiftAdapt',
+      name: 'swiftRequiresCast',
       expression: function(swiftType) {
-        if (swiftType == 'Any?') return 'return newValue';
+        return swiftType != 'Any?' && swiftType != 'Any!';
+      },
+    },
+    {
+      class: 'String',
+      name: 'swiftAdapt',
+      expression: function(swiftType, swiftRequiresCast) {
+        if (!swiftRequiresCast) return 'return newValue';
         return 'return newValue as! ' + swiftType;
       },
     },
@@ -122,32 +124,27 @@ foam.CLASS({
     },
   ],
   methods: [
-    function isOverride() {
-      return !!foam.lookup(this.sourceCls_.model_.extends)
-          .getAxiomByName(this.name);
-    },
-    function writeToSwiftClass(cls) {
-      cls.fields.push(this.Field.create({
-        visibility: 'private',
-        name: this.swiftValueName,
-        type: 'Any?',
-        defaultValue: 'nil',
-      }));
-      cls.fields.push(this.Field.create({
-        visibility: 'private',
-        name: this.swiftInitedName,
-        type: 'Bool',
-        defaultValue: 'false',
-      }));
+    function writeToSwiftClass(cls, superAxiom) {
+      var isOverride = !!superAxiom;
       cls.fields.push(this.Field.create({
         visibility: 'public',
-        override: this.isOverride(),
+        override: isOverride,
         name: this.swiftName,
         type: this.swiftType,
         getter: this.swiftGetter(),
         setter: 'self.set(key: "'+this.swiftName+'", value: value)',
       }));
-      if ( !this.isOverride() ) {
+      if ( !isOverride ) {
+        cls.fields.push(this.Field.create({
+          name: this.swiftValueName,
+          type: 'Any?',
+          defaultValue: 'nil',
+        }));
+        cls.fields.push(this.Field.create({
+          name: this.swiftInitedName,
+          type: 'Bool',
+          defaultValue: 'false',
+        }));
         cls.fields.push(this.Field.create({
           visibility: 'public',
           static: true,
@@ -171,7 +168,7 @@ foam.CLASS({
         cls.fields.push(this.Field.create({
           visibility: 'public',
           name: this.swiftSlotName,
-          type: 'PropertySlot',
+          type: 'Slot',
           getter: 'return self.' + this.swiftSlotValueName,
           setter: this.swiftSlotSetter(),
         }));
@@ -252,13 +249,15 @@ return PropertySlot(object: self, propertyName: "<%=this.swiftName%>")
       args: [],
       template: function() {/*
 if <%=this.swiftInitedName%> {
-  return <%=this.swiftValueName%><% if ( this.swiftType != 'Any?' ) { %> as! <%=this.swiftType %><% } %>
+  return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %> as! <%=this.swiftType %><% } %>
 }
 <% if ( this.swiftFactory ) { %>
 self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
-return self.get(key: "<%=this.swiftName%>")<% if ( this.swiftType != 'Any?' ) { %> as! <%=this.swiftType %><% } %>
+return self.get(key: "<%=this.swiftName%>")<% if ( this.swiftRequiresCast ) { %> as! <%=this.swiftType %><% } %>
 <% } else if ( this.swiftValue ) { %>
 return <%=this.swiftValue%>
+<% } else if ( this.swiftType.match(/[!?]$/) ) { %>
+return nil
 <% } else { %>
 fatalError("No default value for <%=this.swiftName%>")
 <% } %>
@@ -276,15 +275,23 @@ self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(valu
       name: 'swiftPropertyInfoInit',
       args: [],
       template: function() {/*
-let pi = PropertyInfoImpl()
-pi.classInfo = classInfo()
-pi.transient = <%=!!this.transient%>
-pi.name = "<%=this.swiftName%>"
-pi.label = "<%=this.label%>" // TODO localize
+class PInfo: PropertyInfo {
+  let name = "<%=this.swiftName%>"
+  let classInfo: ClassInfo
+  let transient = <%=!!this.transient%>
+  let label = "<%=this.label%>" // TODO localize
+  lazy private(set) public var jsonParser: Parser? = nil //TODO
 <% if (this.swiftView) { %>
-pi.view = <%=this.swiftView.split('.').pop()%>.self
+  let view: FObject.Type? = <%=this.swiftView.split('.').pop()%>.self
+<% } else { %>
+  let view: FObject.Type? = nil
 <% } %>
-return pi
+  public func set(_ obj: FObject, value: Any?) {
+    obj.set(key: name, value: value)
+  }
+  init(_ ci: ClassInfo) { classInfo = ci }
+}
+return PInfo(classInfo())
       */},
     }
   ],
