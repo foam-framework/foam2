@@ -699,6 +699,7 @@ foam.CLASS({
   name: 'Universal',
 
   axioms: [ foam.pattern.Singleton.create() ],
+  requires: [ 'foam.net.Environment' ],
 
   properties: [
     {
