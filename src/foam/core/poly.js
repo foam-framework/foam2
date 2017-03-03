@@ -86,6 +86,8 @@ if ( ! Number.isInteger ) {
     return typeof value === 'number' &&
         isFinite(value) &&
         Math.floor(value) === value;
+  }
+}
 
 if ( ! Object.values ) {
   Object.values = function(obj) {
