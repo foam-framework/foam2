@@ -20,6 +20,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Model',
 
+  documentation: 'A Class Model (description).',
+
   properties: [
     {
       name: 'id',
@@ -37,21 +39,12 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
-      name: 'documentation'
-      // Just discard documentation.
-      // If it's needed, a real 'documentation' property will
-      // be refined in.
-      // TODO: Don't bother removing, if a production system,
-      // documentation should have already been stripped.
-      // setter: function() { }
-    },
-    {
       name: 'label',
       expression: function(name) { return foam.String.labelize(name); }
     },
     [ 'extends', 'FObject' ],
     'refines',
-    'documentation',
+    { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       // List of all axioms, including methods, properties, listeners,
       // etc. and 'axioms'.

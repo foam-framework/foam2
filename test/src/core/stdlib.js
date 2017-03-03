@@ -427,6 +427,7 @@ describe('foam.Number', function() {
     expect(foam.Number.hashCode(5)).toBe(5);
     // caps at 32-bits
     expect(foam.Number.hashCode(999999999999)).toBe(-727379969);
+    expect(foam.Number.hashCode(329719442019.76715)).toBe(-1160223942);
   });
 });
 
