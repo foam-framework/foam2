@@ -20,8 +20,7 @@ foam.CLASS({
   name: 'LRUDAOManager',
   implements: [ 'foam.mlang.Expressions' ],
 
-  documentation: 'Manages a DAO\'s size by removing old items. Commonly applied inside a cache
-  to limit the cache\'s size. Item freshness is tracked in a separate DAO.',
+  documentation: 'Manages a DAO\'s size by removing old items. Commonly applied inside a cache to limit the cache\'s size. Item freshness is tracked in a separate DAO.',
 
   requires: [ 'foam.dao.MDAO' ],
 
