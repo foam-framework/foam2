@@ -1425,7 +1425,6 @@ foam.LIB({
       if ( cs.length === 0 ) return;
       if ( cs.length === 1 ) return cs[0];
 
-
       var ThenBy = foam.mlang.order.ThenBy;
       var ret, tail;
 
