@@ -372,6 +372,10 @@ foam.CLASS({
     })
   ],
 
+  constants: {
+    MODEL_COMPARATOR: foam.compare.compound([foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare
+  },
+
   properties: [
     'path',
     {
@@ -395,7 +399,7 @@ foam.CLASS({
       expression: function (path) {
         return Object.values(foam.USED).
             filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).
-            sort(foam.core.Model.ID.compare);
+          sort(this.MODEL_COMPARATOR);
       }
     },
     {
@@ -406,7 +410,7 @@ foam.CLASS({
               return cls.model_.requires && cls.model_.requires.map(
                   function(r) { return r.path; }).includes(path);
             }).
-            sort(foam.core.Model.ID.compare);
+            sort(this.MODEL_COMPARATOR);
       }
     },
     {
@@ -435,7 +439,7 @@ foam.CLASS({
           start('tr').
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
