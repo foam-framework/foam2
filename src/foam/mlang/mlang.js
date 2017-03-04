@@ -1485,6 +1485,7 @@ foam.LIB({
     },
 
     function compound(args) {
+      /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
 
       if ( cs.length === 0 ) return;
@@ -1494,9 +1495,11 @@ foam.LIB({
         arg1: cs[cs.length - 1],
         arg2: cs[cs.length - 2]
       });
+
       for ( var i = cs.length - 3; i >= 0; i-- ) {
         ret = foam.mlang.order.ThenBy.create({ arg1: cs[i], arg2: ret });
       }
+
       return ret;
     }
   ]
