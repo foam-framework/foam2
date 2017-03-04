@@ -1330,26 +1330,35 @@ foam.CLASS({
         return a;
       },
       name: 'arg2'
+    },
+    {
+      name: 'compare',
+      transient: true,
+      documentation: 'Is a property so that it can be bound to "this" so that it works with Array.sort().',
+      factory: function() { return this.compare_.bind(this); }
     }
   ],
 
   methods: [
-    function compare(o1, o2) {
+    function compare_(o1, o2) {
       // an equals of arg1.compare is falsy, which will then hit arg2
       return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
     },
+
     function toString() {
       return 'THEN_BY(' + this.arg1.toString() + ', ' +
         this.arg2.toString() + ')';
     },
+
     function toIndex(tail) {
       return this.arg1 && this.arg2 && this.arg1.toIndex(this.arg2.toIndex(tail));
     },
+
     function orderTail() { return this.arg2; },
+
     function orderPrimaryProperty() { return this.arg1.orderPrimaryProperty(); },
-    function orderDirection() {
-      return this.arg1.orderDirection();
-    }
+
+    function orderDirection() { return this.arg1.orderDirection(); }
   ]
 });
 
@@ -1405,10 +1414,9 @@ foam.LIB({
     },
 
     function toCompare(c) {
-      var ret = foam.Array.isInstance(c) ? foam.compare.compound(c) :
-        foam.Function.isInstance(c) ? foam.mlang.order.CustomComparator.create({ compareFn: c }) :
+      return foam.Array.isInstance(c) ? foam.compare.compound(c) :
+        foam.Function.isInstance(c)   ? foam.mlang.order.CustomComparator.create({ compareFn: c }) :
         c ;
-      return ret;
     },
 
     function compound(args) {
@@ -1418,8 +1426,8 @@ foam.LIB({
       if ( cs.length === 1 ) return cs[0];
 
       var ret = foam.mlang.order.ThenBy.create({
-        arg1: cs[cs.length - 1],
-        arg2: cs[cs.length - 2]
+        arg1: cs[cs.length - 2],
+        arg2: cs[cs.length - 1]
       });
       for ( var i = cs.length - 3; i >= 0; i-- ) {
         ret = foam.mlang.order.ThenBy.create({ arg1: cs[i], arg2: ret });
