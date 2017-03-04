@@ -21,24 +21,19 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Count',
   extends: 'foam.dao.AbstractSink',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   properties: [
     {
       class: 'Int',
-      name: 'value',
-      value: 0
+      name: 'value'
     }
   ],
 
   methods: [
-    function put() {
-      this.value++;
-    },
+    function put() { this.value++; },
 
-    function toString() {
-      return 'COUNT()';
-    }
+    function toString() { return 'COUNT()'; }
   ]
 });
 
@@ -58,6 +53,7 @@ foam.CLASS({
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
+
   methods: [
     {
       name: 'f',
@@ -171,7 +167,7 @@ foam.CLASS({
   name: 'AbstractPredicate',
   abstract: true,
 
-  implements: ['foam.mlang.predicate.Predicate'],
+  implements: [ 'foam.mlang.predicate.Predicate' ],
 
   methods: [
     function toIndex() {
@@ -204,7 +200,7 @@ foam.CLASS({
   name: 'AbstractExpr',
   abstract: true,
 
-  implements: ['foam.mlang.Expr'],
+  implements: [ 'foam.mlang.Expr' ],
 
   methods: [
     {
@@ -264,11 +260,7 @@ foam.CLASS({
 
   methods: [
     function toIndex(tail) {
-      if ( this.arg1 ) {
-        return this.arg1.toIndex(tail);
-      } else {
-        return;
-      }
+      return this.arg1 && this.arg1.toIndex(tail);
     },
 
     function toString() {
@@ -299,11 +291,7 @@ foam.CLASS({
 
   methods: [
     function toIndex(tail) {
-      if ( this.arg1 ) {
-        return this.arg1.toIndex(tail);
-      } else {
-        return;
-      }
+      return this.arg1 && this.arg1.toIndex(tail);
     },
 
     function toString() {
@@ -369,7 +357,7 @@ foam.CLASS({
       var newArgs = [];
       var updated = false;
 
-      var TRUE = this.True.create();
+      var TRUE  = this.True.create();
       var FALSE = this.False.create();
 
       for ( var i = 0 ; i < this.args.length ; i++ ) {
@@ -586,7 +574,6 @@ foam.CLASS({
 
         return tailRet;
       }
-
     },
 
     function toDisjunctiveNormalForm() {
@@ -594,7 +581,7 @@ foam.CLASS({
       // AND(a,b,OR(c,d),OR(e,f)) -> OR(abce,abcf,abde,abdf)
 
       var andArgs = [];
-      var orArgs = [];
+      var orArgs  = [];
       var oldArgs = this.args;
       for (var i = 0; i < oldArgs.length; i++ ) {
         var a = oldArgs[i].toDisjunctiveNormalForm();
@@ -796,7 +783,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'InIC',
   extends: 'foam.mlang.predicate.Binary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   properties: [
     {
@@ -923,7 +910,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Neq',
   extends: 'foam.mlang.predicate.Binary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   methods: [
     {
@@ -941,7 +928,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Lt',
   extends: 'foam.mlang.predicate.Binary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   methods: [
     {
@@ -959,7 +946,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Lte',
   extends: 'foam.mlang.predicate.Binary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   methods: [
     {
@@ -977,7 +964,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gt',
   extends: 'foam.mlang.predicate.Binary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   methods: [
     {
@@ -995,7 +982,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Gte',
   extends: 'foam.mlang.predicate.Binary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   methods: [
     {
@@ -1013,7 +1000,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Has',
   extends: 'foam.mlang.predicate.Unary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   methods: [
     function f(obj) {
@@ -1031,7 +1018,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
   extends: 'foam.mlang.predicate.AbstractPredicate',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   properties: [
     {
@@ -1041,12 +1028,7 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'f',
-      code: function(obj) {
-        return ! this.arg1.f(obj);
-      }
-    },
+    function f(obj) { return ! this.arg1.f(obj); },
 
     function toString() {
       return foam.String.constantize(this.cls_.name) +
@@ -1080,7 +1062,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Keyword',
   extends: 'foam.mlang.predicate.Unary',
-  implements: ['foam.core.Serializable'],
+  implements: [ 'foam.core.Serializable' ],
 
   requires: [
     'foam.core.String'
@@ -1115,13 +1097,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function f(o) {
-      return this.arg1.f(o);
-    },
+    function f(o) { return this.arg1.f(o); },
 
-    function put(o) {
-      this.delegate.put( this.f(o) );
-    }
+    function put(o) { this.delegate.put( this.f(o) ); }
   ]
 });
 
@@ -1136,9 +1114,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function f(o) {
-      return this.arg1.f(o) * this.arg2.f(o);
-    }
+    function f(o) { return this.arg1.f(o) * this.arg2.f(o); }
   ]
 });
 
@@ -1297,6 +1273,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'Desc',
+
   implements: [
     'foam.mlang.order.Comparator',
     'foam.core.Serializable'
@@ -1312,42 +1289,14 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'compare',
-      code: function(o1, o2) {
-        return -1 * this.arg1.compare(o1, o2);
-      }
+    function compare(o1, o2) {
+      return -1 * this.arg1.compare(o1, o2);
     },
-    {
-      name: 'toString',
-      code: function() {
-        return 'DESC(' + this.arg1.toString() + ')';
-      }
-    },
-    {
-      name: 'toIndex',
-      code: function toIndex(tail) {
-        if ( this.arg1 ) {
-          return this.arg1.toIndex(tail);
-        } else {
-          return;
-        }
-      }
-    },
-    {
-      name: 'orderTail',
-      code: function() { return; }
-    },
-    {
-      name: 'orderPrimaryProperty',
-      code: function() { return this.arg1; }
-    },
-    {
-      name: 'orderDirection',
-      code: function() {
-        return -1 * this.arg1.orderDirection();
-      }
-    }
+    function toString() { return 'DESC(' + this.arg1.toString() + ')'; },
+    function toIndex(tail) { return this.arg1 && this.arg1.toIndex(tail); },
+    function orderTail() { return; },
+    function orderPrimaryProperty() { return this.arg1; },
+    function orderDirection() { return -1 * this.arg1.orderDirection(); }
   ]
 });
 
@@ -1385,43 +1334,21 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'compare',
-      code: function(o1, o2) {
-        // an equals of arg1.compare is falsy, which will then hit arg2
-        return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
-      }
+    function compare(o1, o2) {
+      // an equals of arg1.compare is falsy, which will then hit arg2
+      return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
     },
-    {
-      name: 'toString',
-      code: function() {
-        return 'THEN_BY(' + this.arg1.toString() + ', ' +
-          this.arg2.toString() + ')';
-      }
+    function toString() {
+      return 'THEN_BY(' + this.arg1.toString() + ', ' +
+        this.arg2.toString() + ')';
     },
-    {
-      name: 'toIndex',
-      code: function(tail) {
-        if ( this.arg1 && this.arg2 ) {
-          return this.arg1.toIndex(this.arg2.toIndex(tail));
-        } else {
-          return;
-        }
-      }
+    function toIndex(tail) {
+      return this.arg1 && this.arg2 && this.arg1.toIndex(this.arg2.toIndex(tail));
     },
-    {
-      name: 'orderTail',
-      code: function() { return this.arg2; }
-    },
-    {
-      name: 'orderPrimaryProperty',
-      code: function() { return this.arg1.orderPrimaryProperty(); }
-    },
-    {
-      name: 'orderDirection',
-      code: function() {
-        return this.arg1.orderDirection();
-      }
+    function orderTail() { return this.arg2; },
+    function orderPrimaryProperty() { return this.arg1.orderPrimaryProperty(); },
+    function orderDirection() {
+      return this.arg1.orderDirection();
     }
   ]
 });
@@ -1430,7 +1357,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.order',
   name: 'CustomComparator',
-  implements: ['foam.mlang.order.Comparator'],
+  implements: [ 'foam.mlang.order.Comparator' ],
 
   properties: [
     {
