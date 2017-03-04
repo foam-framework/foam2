@@ -1425,13 +1425,16 @@ foam.LIB({
       if ( cs.length === 0 ) return;
       if ( cs.length === 1 ) return cs[0];
 
-      var ret = foam.mlang.order.ThenBy.create({
-        arg1: cs[cs.length - 2],
-        arg2: cs[cs.length - 1]
-      });
-      for ( var i = cs.length - 3; i >= 0; i-- ) {
-        ret = foam.mlang.order.ThenBy.create({ arg1: cs[i], arg2: ret });
+
+      var ThenBy = foam.mlang.order.ThenBy;
+      var ret, tail;
+
+      ret = tail = ThenBy.create({arg1: cs[0], arg2: cs[1]});
+
+      for ( var i = 2 ; i < cs.length ; i++ ) {
+        tail = tail.arg2 = ThenBy.create({arg1: tail.arg2, arg2: cs[i]});
       }
+
       return ret;
     }
   ]
