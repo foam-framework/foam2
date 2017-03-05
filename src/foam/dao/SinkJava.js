@@ -51,10 +51,6 @@ foam.INTERFACE({
       javaReturns: 'void'
     },
     {
-      name: 'error',
-      javaReturns: 'void'
-    },
-    {
       name: 'reset',
       javaReturns: 'void'
     }
@@ -74,10 +70,6 @@ foam.CLASS({
     },
     {
       name: 'eof',
-      javaCode: 'return;'
-    },
-    {
-      name: 'error',
       javaCode: 'return;'
     },
     {

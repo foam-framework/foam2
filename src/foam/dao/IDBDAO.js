@@ -307,7 +307,6 @@ foam.CLASS({
           request.onsuccess = function(e) {
             var cursor = e.target.result;
             if ( fc.errorEvt ) {
-              sink.error && sink.error(fc.errorEvt);
               reject(fc.errorEvt);
               return;
             }
@@ -323,7 +322,6 @@ foam.CLASS({
             cursor.continue();
           };
           request.onerror = function(e) {
-            sink.error && sink.error(e);
             reject(self.IDBInternalException.create({ id: 'select', error: e }));
           };
         });

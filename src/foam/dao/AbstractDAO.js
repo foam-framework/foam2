@@ -146,7 +146,6 @@ foam.CLASS({
           if ( sub ) sub.detach();
         } else if ( pname === "errorEvt" ) {
           if ( sub ) sub.detach();
-          mySink.error(fc.errorEvt);
         }
       });
 
@@ -217,9 +216,6 @@ foam.CLASS({
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
-
-    /** @private */
-    function error() {},
 
     /** @private */
     function reset() {}
