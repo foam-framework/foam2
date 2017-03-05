@@ -45,12 +45,6 @@ foam.INTERFACE({
       code: function() {}
     },
     {
-      name: 'error',
-      returns: '',
-      args: [],
-      code: function() {}
-    },
-    {
       name: 'reset',
       returns: '',
       args: [],
@@ -95,10 +89,6 @@ foam.CLASS({
       code: function() {}
     },
     {
-      name: 'error',
-      code: function() {}
-    },
-    {
       name: 'reset',
       code: function() {}
     }
@@ -126,10 +116,6 @@ foam.CLASS({
     },
     {
       class: 'Function',
-      name: 'errorFn'
-    },
-    {
-      class: 'Function',
       name: 'resetFn'
     },
   ],
@@ -143,9 +129,6 @@ foam.CLASS({
     },
     function eof() {
       return this.eofFn && this.eofFn.apply(this, arguments);
-    },
-    function error() {
-      return this.errorFn && this.errorFn.apply(this, arguments);
     },
     function reset() {
       return this.resetFn && this.resetFn.apply(this, arguments);
@@ -174,10 +157,6 @@ foam.CLASS({
     function eof() {
       var s = this.sink;
       s && s.eof && s.eof();
-    },
-    function error() {
-      var s = this.sink;
-      s && s.error && s.error();
     },
     function reset() {
       var s = this.sink;

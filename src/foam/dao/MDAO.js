@@ -237,7 +237,6 @@ foam.CLASS({
           return Promise.resolve(sink);
         },
         function(err) {
-          sink && sink.error && sink.error(err);
           return Promise.reject(err);
         }
       );
@@ -268,6 +267,3 @@ foam.CLASS({
     }
   ]
 });
-
-
-

@@ -69,7 +69,6 @@ foam.CLASS({
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( fc.stopped ) break;
         if ( fc.errorEvt ) {
-          sink.error(fc.errorEvt);
           return Promise.reject(fc.errorEvt);
         }
 
