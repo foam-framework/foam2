@@ -1426,15 +1426,6 @@ foam.LIB({
       if ( cs.length === 0 ) return;
       if ( cs.length === 1 ) return cs[0];
 
-<<<<<<< HEAD
-      var ret = foam.mlang.order.ThenBy.create({
-        arg1: cs[cs.length - 1],
-        arg2: cs[cs.length - 2]
-      });
-
-      for ( var i = cs.length - 3; i >= 0; i-- ) {
-        ret = foam.mlang.order.ThenBy.create({ arg1: cs[i], arg2: ret });
-=======
       var ThenBy = foam.mlang.order.ThenBy;
       var ret, tail;
 
@@ -1442,7 +1433,6 @@ foam.LIB({
 
       for ( var i = 2 ; i < cs.length ; i++ ) {
         tail = tail.arg2 = ThenBy.create({arg1: tail.arg2, arg2: cs[i]});
->>>>>>> e430966b168e3340789975c78c9bc0c48c57e6a6
       }
 
       return ret;
