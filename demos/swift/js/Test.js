@@ -36,6 +36,14 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'Int',
+      name: 'intProp',
+    },
+    {
+      class: 'Boolean',
+      name: 'boolProp',
+    },
+    {
       class: 'String',
       name: 'prevFirstName',
     },

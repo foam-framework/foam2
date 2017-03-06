@@ -44,6 +44,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.parse.parser.ProxyParser',
       'foam.swift.parse.parser.Fail',
       'foam.swift.parse.parser.Literal',
+      'foam.swift.parse.json.output.Outputter',
       'foam.swift.parse.json.AnyKeyParser',
       'foam.swift.parse.json.AnyParser',
       'foam.swift.parse.json.ArrayParser',

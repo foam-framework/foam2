@@ -122,6 +122,11 @@ foam.CLASS({
       name: 'swiftAxiomName',
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
+    {
+      class: 'String',
+      name: 'swiftJsonParser',
+      value: 'nil',
+    },
   ],
   methods: [
     function writeToSwiftClass(cls, superAxiom) {
@@ -280,7 +285,7 @@ class PInfo: PropertyInfo {
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
-  lazy private(set) public var jsonParser: Parser? = nil //TODO
+  lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
 <% if (this.swiftView) { %>
   let view: FObject.Type? = <%=this.swiftView.split('.').pop()%>.self
 <% } else { %>
@@ -288,6 +293,9 @@ class PInfo: PropertyInfo {
 <% } %>
   public func set(_ obj: FObject, value: Any?) {
     obj.set(key: name, value: value)
+  }
+  public func get(_ obj: FObject) -> Any? {
+    return obj.get(key: name)
   }
   init(_ ci: ClassInfo) { classInfo = ci }
 }

@@ -34,6 +34,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftType',
+      value: 'Any?',
     },
   ],
   methods: [

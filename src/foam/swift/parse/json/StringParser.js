@@ -30,7 +30,7 @@ if delim_ != "\"" && delim_ != "'" { return nil }
 var ps = ps.tail();
 var lastc = delim_;
 
-var sb: [Character] = []
+var sb = ""
 while ps.valid() {
   let c = ps.head()
   if c == delim_ && lastc != escape_ {
@@ -40,7 +40,7 @@ while ps.valid() {
   lastc = c
   ps = ps.tail()
 }
-return ps.tail().setValue(String(sb))
+return ps.tail().setValue(sb)
       */},
     },
   ]
