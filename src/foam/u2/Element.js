@@ -48,8 +48,8 @@ foam.ENUM({
 
   values: [
     { name: 'RW',       label: 'Read-Write' },
-    { name: 'FINAL',    label: 'Final'      documentation: 'FINAL views are editable only in CREATE ControllerMode.' },
-    { name: 'DISABLED', label: 'Disabled'   documentation: 'DISABLED views are visible but not editable.' },
+    { name: 'FINAL',    label: 'Final',     documentation: 'FINAL views are editable only in CREATE ControllerMode.' },
+    { name: 'DISABLED', label: 'Disabled',  documentation: 'DISABLED views are visible but not editable.' },
     { name: 'RO',       label: 'Read-Only'  },
     { name: 'HIDDEN',   label: 'Hidden'     }
   ]
