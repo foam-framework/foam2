@@ -29,6 +29,8 @@ foam.CLASS({
   name: 'Errors',
 //  extends: 'foam.core.Property',
 
+  documentation: 'A psedo-Property Axiom added to FObject which contains an object\'s validation errors.',
+
   properties: [
     [ 'name', 'errors_' ]
   ],

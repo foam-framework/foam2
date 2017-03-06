@@ -104,6 +104,8 @@ foam.CLASS({
   package: 'foam.json',
   name: 'Outputer',
 
+  documentation: 'JSON Outputer.',
+
   properties: [
     {
       class: 'String',
