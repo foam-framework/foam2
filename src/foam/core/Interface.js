@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'InterfaceMethod',
   extends: 'foam.core.Method',
 
+  documentation: 'An InterfaceMethod is a Method declaration, but lacks code.',
+
   properties: [
     {
       name: 'code',
@@ -43,6 +45,8 @@ foam.CLASS({
   name: 'InterfaceModel',
   extends: 'foam.core.Model',
 
+  documentation: 'An Interface Mode/definition. Created with foam.INTERFACE().',
+
   properties: [
     ['extends', 'foam.core.AbstractInterface'],
     {
@@ -57,6 +61,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'AbstractInterface',
+
+  documentation: 'Abstract base-class for Interfaces.',
+
   axioms: [
     {
       installInClass: function(cls) {
