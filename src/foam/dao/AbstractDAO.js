@@ -176,37 +176,6 @@ foam.CLASS({
       }
 
       return sink;
-
-
-      if ( skip != undefined ) {
-        sink = this.SkipListener.create({
-          delegate: sink,
-          skip: skip
-        });
-      }
-
-      if ( limit != undefined ) {
-        sink = this.LimitedListener.create({
-          delegate: sink,
-          limit: limit
-        });
-      }
-
-      if ( order != undefined ) {
-        sink = this.OrderedListener.create({
-          order: order,
-          delegate: sink
-        })
-      }
-
-      if ( predicate != undefined ) {
-        sink = this.PredicatedListener.create({
-          delegate: sink,
-          predicate: predicate
-        });
-      }
-
-      return sink;
     },
 
     /**
