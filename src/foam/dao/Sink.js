@@ -59,6 +59,8 @@ foam.CLASS({
   name: 'ProxySink',
   implements: [ 'foam.dao.Sink' ],
 
+  documentation: 'Proxy for Sink interface.',
+
   properties: [
     {
       class: 'Proxy',
@@ -72,8 +74,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractSink',
-
   implements: [ 'foam.dao.Sink' ],
+
+  documentation: 'Abstract base class for implementing Sink interface.',
 
   methods: [
     {
@@ -222,6 +225,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'QuickSink',
@@ -244,34 +248,36 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'resetFn'
-    },
+    }
   ],
 
   methods: [
     function put() {
       return this.putFn && this.putFn.apply(this, arguments);
     },
+
     function remove() {
       return this.removeFn && this.removeFn.apply(this, arguments);
     },
+
     function eof() {
       return this.eofFn && this.eofFn.apply(this, arguments);
     },
+
     function reset() {
       return this.resetFn && this.resetFn.apply(this, arguments);
-    },
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'AnonymousSink',
   implements: [ 'foam.dao.Sink' ],
-  properties: [
-    {
-      name: 'sink'
-    }
-  ],
+
+  properties: [ 'sink' ],
+
   methods: [
     function put(sub, obj) {
       var s = this.sink;
@@ -281,6 +287,7 @@ foam.CLASS({
       var s = this.sink;
       s && s.remove && s.remove(sub, obj);
     },
+
     function eof() {
       var s = this.sink;
       s && s.eof && s.eof();
@@ -291,6 +298,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -467,7 +475,7 @@ foam.CLASS({
       name: 'results_',
       hidden: true,
       factory: function() { return {}; }
-    },
+    }
   ],
 
   methods: [

@@ -61,8 +61,8 @@ foam.CLASS({
         try {
           eval(js);
         } catch(e) {
-          return Promise.reject(
-              'Unable to load at ' + url + '. Error: ' + e.stack);
+          console.warn('Unable to load at ' + url + '. Error: ' + e.stack);
+          return Promise.resolve(null);
         } finally {
           foam.CLASS = foamCLASS;
         }

@@ -83,6 +83,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Import',
 
+  documentation: 'Axiom to Import a Context Value.',
+
   properties: [
     {
       class: 'String',
@@ -144,7 +146,7 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Export',
 
-  documentation: 'Export Sub-Context Value Axiom',
+  documentation: 'Axiom to Export a Sub-Context Value.',
 
   properties: [
     {

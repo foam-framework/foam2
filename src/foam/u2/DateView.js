@@ -22,6 +22,8 @@ foam.CLASS({
   name: 'DateView',
   extends: 'foam.u2.tag.Input',
 
+  documentation: 'View for editing Date values.',
+
   methods: [
     function initE() {
       this.SUPER();

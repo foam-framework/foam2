@@ -349,14 +349,14 @@ foam.CLASS({
       var E = this.E.create();
       var syncStatus;
 
-      return this.syncStatusDAO.find(this.syncStatusId).then(null, function(e) {
-        if ( ! foam.dao.ObjectNotFoundException.isInstance(e) ) throw e;
-
+      return this.syncStatusDAO.find(this.syncStatusId).then(function(obj) {
         // If not found create a new sync status.
-        return self.syncStatusDAO.put(self.SyncStatus.create({
+        if ( ! obj ) return self.syncStatusDAO.put(self.SyncStatus.create({
           id: self.syncStatusId,
           latestServerTimestamp: 0
         }));
+
+        return obj;
       }).then(function(s) {
         syncStatus = s;
 

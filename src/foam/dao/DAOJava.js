@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.dao.DAO',
+
   methods: [
     {
       name: 'put',

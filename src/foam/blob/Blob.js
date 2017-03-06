@@ -18,12 +18,14 @@
 foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
+
   properties: [
     {
       class: 'Long',
       name: 'size'
     }
   ],
+
   methods: [
     {
       name: 'read',
@@ -41,18 +43,22 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Blob',
   extends: 'foam.core.Property',
+
   properties: [
     [ 'tableCellView', function() {} ]
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'ClientBlob',
+
   properties: [
     {
       class: 'Stub',
@@ -62,9 +68,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'Buffer',
+
   properties: [
     {
       name: 'length',
@@ -85,9 +93,11 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'FdBlob',
+
   properties: [
     {
       name: 'fd'
@@ -100,25 +110,26 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function read(buffer, inOffset) {
       inOffset = inOffset || 0;
       var self = this;
       var outOffset = 0;
       var length = Math.min(buffer.length, this.size - inOffset);
-      
+
       if ( length < buffer.length ) buffer = buffer.slice(0, length);
-      
+
       return new Promise(function(resolve, reject) {
         function onRead(err, bytesRead, buffer) {
           if ( err ) {
             reject(err);
             return;
           }
-          
+
           outOffset += bytesRead;
           inOffset += bytesRead;
-          
+
           if ( outOffset < length ) {
             require('fs').read(self.fd, buffer, outOffset, length - outOffset, inOffset, onRead);
           } else {
@@ -165,7 +176,7 @@ foam.CLASS({
     function setup() {
       if ( this.isSet ) return;
       var root = require('fs').statSync(this.root);
-      
+
       if ( ! root.isDirectory() ) {
         throw new Error('Blob storage root is not a directory.');
       }
@@ -175,13 +186,15 @@ foam.CLASS({
 
       this.isSet = true;
     },
+
     function ensureDir(path) {
       // TODO: Create all necessary parent directories.
       var stat = require('fs').statSync(path);
       if ( stat && stat.isDirectory() ) return;
-      
+
       require('fs').mkdirSync(path);
     },
+
     function allocateTmp() {
       var fd;
       var path;
@@ -202,19 +215,19 @@ foam.CLASS({
 	});
       });
     },
-    
+
     function put(obj) {
       // This process could probably be sped up a bit by
       // requesting chunks of the incoming blob in advance,
       // currently we wait until they're put into the write-stream's
       // buffer before requesitng the next chunk.
-      
+
       var hash = require('crypto').createHash('sha256');
 
       // 4k chunks i guess
       var bufsize = 4096;
       var buffer = new Buffer(4096);
-      
+
       var size = obj.size
       var remaining = size;
       var offset = 0;
@@ -225,7 +238,7 @@ foam.CLASS({
       function chunkOffset(i) {
 	return i * bufsize;
       }
-      
+
       function chunkSize(i) {
 	return i < chunks - 1 ?
 	  bufsize :
@@ -244,7 +257,7 @@ foam.CLASS({
 		reject(err);
 		return;
 	      }
-	      
+
 	      if ( written !== buf.length ) {
 		console.warn("Didn't write entire chunk, does this ever happen?");
 		require('fs').write(tmp.fd, buf.slice(written), cb);
@@ -277,12 +290,12 @@ foam.CLASS({
 	});
       });
     },
-  
+
     function find(id) {
       return new Promise(function(resolve, reject) {
 	require('fs').open(this.sha256 + require('path').sep + id, function(err, fd) {
 	  if ( err ) {
-	    reject(err);
+            resolve(null);
 	    return;
 	  }
 	  resolve(foam.blob.FdBlob.create({ fd: fd }));

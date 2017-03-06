@@ -158,16 +158,15 @@ foam.CLASS({
 
           function (val) {
             // Cache hit, but create background request if required
-            if ( self.refreshOnCacheHit ) {
-              // Don't record in finds_, since we don't want anyone waiting for it
-              self.delegate.find(id).then(function (val) {
-                self.cache.put(val);
-              });
+            if ( val ) {
+              if ( self.refreshOnCacheHit ) {
+                // Don't record in finds_, since we don't want anyone waiting for it
+                self.delegate.find(id).then(function (val) {
+                  val && self.cache.put(val);
+                });
+              }
+              return val;
             }
-            return val;
-          },
-
-          function (err) {
             // Failed to find in cache, so try remote.
             // Another request may have come in the meantime, so check again for
             // an in-flight find for this ID.
@@ -176,10 +175,16 @@ foam.CLASS({
               // we created the remote request, so clean up finds_ later
               var errorHandler = function(err) {
                 delete self.finds_[id]; // in error case, still clean up
-                return Promise.reject(err);
+                throw err;
               };
+
               return self.finds_[id].then(function (val) {
                 // once the cache is updated, remove this stale promise
+                if ( ! val ) {
+                  delete self.finds_[id];
+                  return null;
+                }
+
                 return self.cache.put(val).then(function(val) {
                   delete self.finds_[id];
                   return val;
