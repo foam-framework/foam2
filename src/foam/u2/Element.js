@@ -1387,7 +1387,6 @@ foam.CLASS({
       var self = this;
 
       var reset = function(sub) {
-        console.log("Resetting");
         for ( var key in es ) {
           remove(sub, {id: key});
         }
