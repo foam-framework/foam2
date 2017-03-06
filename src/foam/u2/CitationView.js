@@ -16,13 +16,11 @@
  */
 
 foam.CLASS({
-  /** A simple default view to display the ID of
-    an object.
-  
-    TODO: name/label detection */
-  name: 'CitationView',
   package: 'foam.u2',
+  name: 'CitationView',
   extends: 'foam.u2.Element',
+
+  documentation: 'A simple default View to display the ID of an object.',
 
   properties: [
     'data',
@@ -36,3 +34,5 @@ foam.CLASS({
     }
   ]
 });
+
+//    TODO: name/label detection */

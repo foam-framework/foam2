@@ -10,7 +10,7 @@ Build fully featured high performance apps in less time using FOAM.
 
 [http://foamdev.com](http://foamdev.com)
 
-[![Build Status](https://travis-ci.org/foam-framework/foam2-experimental.svg?branch=master)](https://travis-ci.org/foam-framework/foam2-experimental)
+[![Build Status](https://travis-ci.org/foam-framework/foam2.svg?branch=master)](https://travis-ci.org/foam-framework/foam2)
 
 ## Feature Oriented Active Modeller
 

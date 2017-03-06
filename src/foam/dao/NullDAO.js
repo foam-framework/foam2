@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'NullDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: 'A Null pattern (do-nothing) DAO implementation.',
+
   requires: [
     'foam.dao.ExternalException',
     'foam.dao.ObjectNotFoundException'
@@ -37,7 +39,7 @@ foam.CLASS({
     },
 
     function find(id) {
-      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
+      return Promise.resolve(null);
     },
 
     function select(sink) {
