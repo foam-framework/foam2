@@ -23,11 +23,25 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
-    function toOwnDatastoreProperty() {
-      return this.name;
+    {
+      name: 'toOwnDatastoreProperty',
+      documentation:
+      function() {/*
+                     Provides a PropertyType.name for the Cloud Datastore
+                     REST API. I.e., "name" key in
+                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
+                  */},
+      code: function() { return this.name; }
     },
-    function toDatastoreProperty() {
-      return { name: this.toOwnDatastoreProperty() };
+    {
+      name: 'toDatastoreProperty',
+      documentation:
+      function() {/*
+                     Provides a PropertyType for the Cloud Datastore REST
+                     API.
+                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
+                  */},
+      code: function() { return { name: this.toOwnDatastoreProperty() }; }
     }
   ]
 });
@@ -54,8 +68,16 @@ foam.CLASS({
   refines: 'foam.mlang.Constant',
 
   methods: [
-    function toDatastoreValue() {
-      return com.google.cloud.datastore.toDatastoreValue(this.value);
+    {
+      name: 'toDatastoreValue',
+      documentation:
+      function() {/*
+                    Provides Value for the Cloud Datastore REST API.
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Value
+                  */},
+      code: function() {
+        return com.google.cloud.datastore.toDatastoreValue(this.value);
+      }
     }
   ]
 });
@@ -68,9 +90,17 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
 
   methods: [
-    function toDatastoreFilter() {
-      throw new Error('Predicate not supported in datastore implementation: ' +
-          this.cls_.id);
+    {
+      name: 'toDatastoreFilter',
+      documentation:
+      function() {/*
+                    Provides Filter for the Cloud Datastore REST API.
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#filter
+                  */},
+      code: function() {
+        throw new Error('Predicate not supported in datastore ' +
+            'implementation: ' + this.cls_.id);
+      }
     }
   ]
 });
@@ -79,14 +109,23 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.And',
 
   methods: [
-    function toOwnDatastoreFilter() {
-      var filters = new Array(this.args.length);
+    {
+      name: 'toOwnDatastoreFilter',
+      documentation:
+      function() {/*
+                    Provides (CompositeFilter|PropertyFilter) for a Filter in
+                    the Cloud Datastore REST API.
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#filter
+                  */},
+      code: function() {
+        var filters = new Array(this.args.length);
 
-      for ( var i = 0; i < this.args.length; i++ ) {
-        filters[i] = this.args[i].toDatastoreFilter();
+        for ( var i = 0; i < this.args.length; i++ ) {
+          filters[i] = this.args[i].toDatastoreFilter();
+        }
+
+        return { op: 'AND', filters: filters };
       }
-
-      return { op: 'AND', filters: filters };
     },
     function toDatastoreFilter() {
       return { compositeFilter: this.toOwnDatastoreFilter() };
@@ -100,8 +139,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'datastoreOpName',
-      value: ''
+      function() {/*
+                    Provides Operator for the Cloud Datastore REST API.
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Operator_1
+                  */},
+      name: 'datastoreOpName'
     }
   ],
 
@@ -151,17 +193,25 @@ foam.CLASS({
 })();
 
 //
-// Train properties and ThenBy to behave as orderings.
+// Refine properties and ThenBy mLang to behave as orderings.
 //
 
 foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
-    function toDatastoreOrder() {
+    {
+      name: 'toDatastoreOrder',
+      documentation:
+      function() {/*
+                    Provides PropertyOrder for the Cloud Datastore REST API.
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#propertyorder
+                  */},
+      code: function() {
       return this.orderDirection() === 1 ?
           [ { property: { name: this.name } } ] :
           [ { property: { name: this.name }, direction: 'DESCENDING' } ];
+      }
     }
   ]
 });
