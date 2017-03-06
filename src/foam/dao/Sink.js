@@ -24,8 +24,8 @@ foam.INTERFACE({
       name: 'put',
       returns: '',
       args: [
-        'obj',
-        'fc'
+        'sub',
+        'obj'
       ],
       code: function() {}
     },
@@ -33,8 +33,8 @@ foam.INTERFACE({
       name: 'remove',
       returns: '',
       args: [
-        'obj',
-        'fc'
+        'sub',
+        'obj'
       ],
       code: function() {}
     },
@@ -47,7 +47,7 @@ foam.INTERFACE({
     {
       name: 'reset',
       returns: '',
-      args: [],
+      args: [ 'sub' ],
       code: function() {}
     }
   ]
@@ -91,6 +91,133 @@ foam.CLASS({
     {
       name: 'reset',
       code: function() {}
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'PipeSink',
+  extends: 'foam.dao.ProxySink',
+  properties: [
+    'dao'
+  ],
+  methods: [
+    function reset(sub) {
+      this.SUPER(sub);
+      this.dao.select(this);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'LimitedListener',
+  extends: 'foam.dao.ProxySink',
+  properties: [
+    {
+      class: 'Int',
+      name: 'count'
+    },
+    {
+      class: 'Int',
+      name: 'limit'
+    }
+  ],
+  methods: [
+    function put() {
+    },
+    function remove(sub, obj) {
+      this.reset(sub);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'PredicatedListener',
+  extends: 'foam.dao.ProxySink',
+  properties: [
+    {
+      name: 'predicate'
+    }
+  ],
+  methods: [
+    function put(sub, obj, old) {
+      if ( this.predicate.f(obj) ) {
+        this.delegate.put(sub, obj, old);
+        return;
+      }
+
+      if ( old && this.predicate.f(old) ) this.delegate.remove(sub, obj);
+    },
+    function remove(sub, obj) {
+      if ( this.predicate.f(obj) ) {
+        this.SUPER(sub, obj);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'SkipListener',
+  extends: 'foam.dao.ProxySink',
+  properties: [
+    {
+      class: 'Int',
+      name: 'skip'
+    }
+  ],
+  methods: [
+    function remove(sub, obj) {
+      this.reset(sub);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'OrderedListener',
+  extends: 'foam.dao.ProxySink',
+  properties: [
+    {
+      name: 'order'
+    },
+    {
+      name: 'last'
+    }
+  ],
+  methods: [
+    function put(sub, obj) {
+      this.reset(sub);
+      if ( this.last && this.order.compare(obj, this.last) < 0 ) {
+        this.reset(sub);
+        return;
+      }
+      this.last = obj;
+      this.delegate.put(sub, obj);
+    },
+    function remove(sub, obj) {
+      this.reset(sub);
+    },
+    function reset(sub) {
+      this.last = null;
+      this.delegate.reset(sub);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ResetListener',
+  extends: 'foam.dao.ProxySink',
+  methods: [
+    function put(sub) {
+      this.reset(sub);
+    },
+    function remove(sub) {
+      this.reset(sub);
     }
   ]
 });
@@ -146,21 +273,21 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(obj, fc) {
+    function put(sub, obj) {
       var s = this.sink;
-      s && s.put && s.put(obj, fc);
+      s && s.put && s.put(sub, obj);
     },
-    function remove(obj, fc) {
+    function remove(sub, obj) {
       var s = this.sink;
-      s && s.remove && s.remove(obj, fc);
+      s && s.remove && s.remove(sub, obj);
     },
     function eof() {
       var s = this.sink;
       s && s.eof && s.eof();
     },
-    function reset() {
+    function reset(sub) {
       var s = this.sink;
-      s && s.reset && s.reset();
+      s && s.reset && s.reset(sub);
     }
   ]
 });
@@ -181,14 +308,14 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function put(obj, fc) {
-        if ( this.predicate.f(obj) ) this.delegate.put(obj, fc);
+      code: function put(sub, obj) {
+        if ( this.predicate.f(obj) ) this.delegate.put(sub, obj);
       }
     },
     {
       name: 'remove',
-      code:     function remove(obj, fc) {
-        if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc);
+      code: function remove(sub, obj) {
+        if ( this.predicate.f(obj) ) this.delegate.remove(sub, obj);
       }
     }
   ]
@@ -215,21 +342,21 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function put(obj, fc) {
+      code: function put(sub, obj) {
         if ( this.count++ >= this.limit ) {
-          fc && fc.stop();
+          sub.detach();
         } else {
-          this.delegate.put(obj, fc);
+          this.delegate.put(sub, obj);
         }
       }
     },
     {
       name: 'remove',
-      code: function remove(obj, fc) {
+      code: function remove(sub, obj) {
         if ( this.count++ >= this.limit ) {
-          fc && fc.stop();
+          sub.detach();
         } else {
-          this.delegate.remove(obj, fc);
+          this.delegate.remove(sub, obj);
         }
       }
     }
@@ -257,23 +384,26 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function put(obj, fc) {
+      code: function put(sub, obj) {
         if ( this.count < this.skip ) {
           this.count++;
           return;
         }
 
-        this.delegate.put(obj, fc);
+        this.delegate.put(sub, obj);
       }
     },
     {
       name: 'remove',
-      code: function remove(obj, fc) {
-        if ( this.count < this.skip ) {
-          this.count++;
-          return;
-        }
-        this.delegate.remove(obj, fc);
+      code: function remove(sub, obj) {
+        this.reset(sub);
+      }
+    },
+    {
+      name: 'reset',
+      code: function(sub) {
+        this.count = 0;
+        this.delegate.reset(sub);
       }
     }
   ]
@@ -301,7 +431,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function put(obj, fc) {
+      code: function put(sub, obj) {
         this.array.push(obj);
       }
     },
@@ -319,7 +449,7 @@ foam.CLASS({
       }
     },
 
-    function remove(obj, fc) {
+    function remove(sub, obj) {
       // TODO
     }
   ]
@@ -345,10 +475,10 @@ foam.CLASS({
       /** If the object to be put() has already been seen by this sink,
         ignore it */
       name: 'put',
-      code: function put(obj, fc) {
+      code: function put(sub, obj) {
         if ( ! this.results_[obj.id] ) {
           this.results_[obj.id] = true;
-          return this.delegate.put(obj, fc);
+          return this.delegate.put(sub, obj);
         }
       }
     }

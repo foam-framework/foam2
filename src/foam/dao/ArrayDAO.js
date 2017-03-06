@@ -35,15 +35,18 @@ foam.CLASS({
 
   methods: [
     function put(obj) {
+      var old;
+
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( obj.ID.compare(obj, this.array[i]) === 0 ) {
+          old = this.array[i];
           this.array[i] = obj;
           break;
         }
       }
 
       if ( i == this.array.length ) this.array.push(obj);
-      this.on.put.pub(obj);
+      this.on.put.pub(obj, old);
 
       return Promise.resolve(obj);
     },
@@ -65,19 +68,23 @@ foam.CLASS({
 
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var fc = this.FlowControl.create();
-      for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( fc.stopped ) break;
-        if ( fc.errorEvt ) {
-          return Promise.reject(fc.errorEvt);
+      var detached = false;
+      var sub = foam.core.FObject.create();
+      sub.onDetach(function() { detached = true; });
+
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        for ( var i = 0 ; i < self.array.length ; i++ ) {
+          if ( detached ) break;
+
+          sink.put(self.array[i], fc);
         }
 
-        sink.put(this.array[i], fc);
-      }
+        sink.eof();
 
-      sink.eof();
-
-      return Promise.resolve(resultSink);
+        resolve(resultSink);
+      });
     },
 
     function removeAll(skip, limit, order, predicate) {

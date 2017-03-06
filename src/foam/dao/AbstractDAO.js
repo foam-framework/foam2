@@ -27,11 +27,16 @@ foam.CLASS({
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
     'foam.dao.ObjectNotFoundException',
-    'foam.dao.FlowControl',
     'foam.dao.LimitedSink',
     'foam.dao.SkipSink',
     'foam.dao.OrderedSink',
     'foam.dao.PredicatedSink',
+    'foam.dao.PipeSink',
+    'foam.dao.ResetListener',
+    'foam.dao.PredicatedListener',
+    'foam.dao.SkipListener',
+    'foam.dao.LimitedListener',
+    'foam.dao.OrderedListener',
     'foam.dao.FilteredDAO',
     'foam.dao.OrderedDAO',
     'foam.dao.SkipDAO',
@@ -123,50 +128,86 @@ foam.CLASS({
       TODO: This will probably miss events that happen during the select but before the
       listen call.  We should check if this is the case and fix it if so.
     */
-    function pipe(sink) {
-      var self = this;
-      return self.select(sink).then(function() {
-        return self.listen(sink);
+    function pipe(sink) {//, skip, limit, order, predicate) {
+      var dao = this;
+
+      var sink = this.PipeSink.create({
+        delegate: sink,
+        dao: this
       });
+
+      var sub = this.listen(sink); //, skip, limit, order, predicate);
+      sink.reset();
+
+      return sub;
     },
 
     /**
       Keeps the given sink up to date with changes to this DAO.
     */
-    function listen(sink, predicate
-        /* object // The subscription object, with a .detach() to clean up. */
-    ) {
-      var mySink = this.decorateSink_(sink, undefined, undefined, undefined, predicate);
+    function listen(sink, skip, limit, order, predicate) {
+      var mySink = this.decorateListener_(sink, skip, limit, order, predicate);
 
-      var fc = this.FlowControl.create();
-      var sub;
+      var sub = foam.core.FObject.create();
 
-      fc.propertyChange.sub(function(s, _, pname) {
-        if ( pname == "stopped") {
-          if ( sub ) sub.detach();
-        } else if ( pname === "errorEvt" ) {
-          if ( sub ) sub.detach();
-        }
-      });
-
-      // Note that FilteredDAO, LimitedDAO, OrderedDAO and SkipDAO all
-      // pass listen() calls down through the delegate chain, so the
-      // topics we subscribe to are not filtered by those DAO decorators.
-      // The sink we create in .decorateSink_() is responsible for filtering.
-      return this.on.sub(function(s, on, e, obj) {
-        sub = s;
+      sub.onDetach(this.on.sub(function(s, on, e, obj, old) {
         switch(e) {
           case 'put':
-            mySink.put(obj, fc);
-          break;
+            mySink.put(sub, obj, old);
+            break;
           case 'remove':
-            mySink.remove(obj, fc);
-          break;
+            mySink.remove(sub, obj);
+            break;
           case 'reset':
-            mySink.reset();
-          break;
+            mySink.reset(sub);
+            break;
         }
-      });
+      }));
+
+      return sub;
+    },
+
+    function decorateListener_(sink, skip, limit, order, predicate) {
+      // TODO: There are probably optimizations we can make here
+      // but every time I try it comes out broken.  So for the time being,
+      // if you have any sort of skip/limit/order/predicate we will just
+      // issue reset events for everything.
+      if ( skip != undefined || limit != undefined || order != undefined || predicate != undefined ) {
+        return this.ResetListener.create({ delegate: sink });
+      }
+
+      return sink;
+
+
+      if ( skip != undefined ) {
+        sink = this.SkipListener.create({
+          delegate: sink,
+          skip: skip
+        });
+      }
+
+      if ( limit != undefined ) {
+        sink = this.LimitedListener.create({
+          delegate: sink,
+          limit: limit
+        });
+      }
+
+      if ( order != undefined ) {
+        sink = this.OrderedListener.create({
+          order: order,
+          delegate: sink
+        })
+      }
+
+      if ( predicate != undefined ) {
+        sink = this.PredicatedListener.create({
+          delegate: sink,
+          predicate: predicate
+        });
+      }
+
+      return sink;
     },
 
     /**
@@ -285,56 +326,11 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      topics: [],
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
-      postSet: function(old, nu) {
-        // Only fire a 'reset' when the delegate is actually changing, not being
-        // set for the first time.
-        if ( old ) {
-          this.on.reset.pub();
-        }
-
-        // TODO: replace this with a manually installed ProxySub,
-        //   or implement interceptors in Proxy
-        if ( this.delegateSub_ ) {
-          this.delegateSub_.detach();
-          this.delegateSub_ = nu.on.sub(this.onEvent);
-        }
-      }
-    },
-    'delegateSub_',
-  ],
-
-  listeners: [
-    /** If the predicate returns false for the object added or updated, change
-      to an on.remove event. If the listener had previously been told about
-      the object, it should now remove it since it no longer matches. */
-    function onEvent(s, on, putRemoveReset, obj) {
-      if ( putRemoveReset === 'put' ) {
-        if ( this.predicate.f(obj) ) {
-          this.pub(on, 'put', obj);
-        } else {
-          this.pub(on, 'remove', obj);
-        }
-      } else {
-        this.pub(on, putRemoveReset, obj);
-      }
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ]
     }
   ],
 
   methods: [
-    function sub(arg1) {
-      if ( arg1 === 'on' && ! this.delegateSub_ ) {
-        var self = this;
-        this.delegateSub_ = this.delegate.on.sub(this.onEvent);
-        this.onDetach(function() {
-          self.delegateSub_ && self.delegateSub_.detach();
-          self.delegateSub_ = null;
-        });
-      }
-      return this.SUPER.apply(this, arguments);
-    },
-
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(
         sink, skip, limit, order,
@@ -351,9 +347,19 @@ foam.CLASS({
           this.predicate);
     },
 
-    function listen(sink, predicate) {
+    function listen(sink, skip, limit, order, predicate) {
       return this.delegate.listen(
         sink,
+        skip, limit, order,
+        predicate ?
+          this.And.create({ args: [this.predicate, predicate] }) :
+          this.predicate);
+    },
+
+    function xxpipe(sink, skip, limit, order, predicate) {
+      return this.delegate.pipe(
+        sink,
+        skip, limit, order,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
@@ -380,9 +386,12 @@ foam.CLASS({
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(skip, limit, order ? order : this.comparator, predicate);
     },
-    function listen(sink, predicate) {
-      return this.delegate.listen(sink, predicate);
-    }
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(sink, skip, limit, order ? order : this.comparator, predicate);
+    },
+    function xxpipe(sink, skip, limit, order, predicate) {
+      return this.delegate.pipe(sink, skip, limit, order ? order : this.comparator, predicate);
+    },
   ]
 });
 
@@ -405,8 +414,11 @@ foam.CLASS({
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(this.skip_, limit, order, predicate);
     },
-    function listen(sink, predicate) {
-      return this.delegate.listen(sink, predicate);
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(sink, this.skip_, limit, order, predicate);
+    },
+    function xxpipe(sink, skip, limit, order, predicate) {
+      return this.delegate.pipe(sink, this.skip_, limit, order, predicate);
     },
   ]
 });
@@ -438,8 +450,18 @@ foam.CLASS({
         order, predicate);
     },
 
-    function listen(sink, predicate) {
-      return this.delegate.listen(sink, predicate);
+    function listen(sink, skip, limit, order, predicate) {
+      return this.delegate.listen(
+        sink, skip,
+        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
+        order, predicate);
+    },
+
+    function xxpipe(sink, skip, limit, order, predicate) {
+      return this.delegate.pipe(
+        sink, skip,
+        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
+        order, predicate);
     }
   ]
 });

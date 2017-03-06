@@ -1369,16 +1369,15 @@ foam.CLASS({
       // TODO: cleanup on detach
       var es   = {};
       var self = this;
-      var reset = function() {
+
+      var reset = function(sub) {
+        console.log("Resetting");
         for ( var key in es ) {
-          removeRow(null, null, null, {id: key});
+          remove(sub, {id: key});
         }
-        dao.select({
-          put: function(o) { addRow(null, null, null, o); },
-          eof: function() {}
-        });
       };
-      var addRow = function(_, __, ___, o) {
+
+      var put = function(_, o) {
         if ( update ) {
           o = o.clone();
         }
@@ -1403,7 +1402,8 @@ foam.CLASS({
         }
         es[o.id] = e;
       };
-      var removeRow = function(_, __, ___, o) {
+
+      var remove = function(_, o) {
         var e = es[o.id];
         if ( e ) {
           e.remove();
@@ -1411,10 +1411,13 @@ foam.CLASS({
         }
       }
 
-      reset();
-      dao.on.put.sub(addRow);
-      dao.on.remove.sub(removeRow);
-      dao.on.reset.sub(reset);
+
+      this.onDetach(dao.pipe({
+        put: put,
+        remove: remove,
+        reset: reset,
+        eof: function() {}
+      }));
 
       return this;
     },

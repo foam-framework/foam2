@@ -48,19 +48,14 @@ public class MapDAO extends AbstractDAO {
 
     Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
-    FlowControl fc = (FlowControl)getX().create(FlowControl.class);
+    Subscription sub = getX().create(Subscription.class);
 
     for ( FObject obj : getData().values() ) {
-      if ( fc.getStopped() || fc.getErrorEvt() != null ) {
+      if ( sub.getDetached() ) {
         break;
       }
 
-      decorated.put(obj, fc);
-    }
-
-    if ( fc.getErrorEvt() != null ) {
-      decorated.error();
-      return sink;
+      decorated.put(sub, obj);
     }
 
     decorated.eof();

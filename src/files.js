@@ -77,8 +77,6 @@ FOAM_FILES([
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
 //  { name: "foam/u2/Element", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
-  { name: "foam/dao/FlowControl" },
-  { name: "foam/dao/FlowControlJava", flags: ['java'] },
   { name: "foam/dao/Sink" },
   { name: "foam/dao/SinkJava", flags: ['java'] },
   { name: "foam/dao/DAO" },

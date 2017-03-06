@@ -301,13 +301,17 @@ foam.CLASS({
 
       // result reading may by async, so define it but don't call it yet
       var resultSink = this.decorateSink_(sink, skip, limit);
-      var fc = this.FlowControl.create();
+
+      var sub = foam.core.FObject.create();
+      var detached = false;
+      sub.onDetach(function() { detached = true; });
+
       function scanResults() {
         // The list starting at head now contains the results plus possible
         //  overflow of skip+limit
         var node = head.next;
-        while ( node && ( ! fc.stopped ) ) {
-          resultSink.put(node.data, fc);
+        while ( node && ! detached ) {
+          resultSink.put(sub, node.data);
           node = node.next;
         }
       }
@@ -382,4 +386,3 @@ foam.CLASS({
 
   ]
 });
-

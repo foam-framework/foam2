@@ -19,31 +19,67 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
-
   properties: [
     {
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      topics: [ 'on' ],
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
       postSet: function(old, nu) {
         // Only fire a 'reset' when the delegate is actually changing, not being
         // set for the first time.
         if ( old ) {
-          this.on.reset.pub();
+          this.updateListeners_();
         }
       }
+
     },
     {
       name: 'of',
       factory: function() {
         return this.delegate.of;
       }
+    },
+    {
+      class: 'Array',
+      name: 'daoListeners_'
+    }
+  ],
+  methods: [
+    function xxlisten(sink, skip, limit, order, predicate) {
+      var sub = this.delegate.listen(sink, skip, limit, order, predicate);
+
+      var mysub = foam.core.FObject.create();
+      mysub.onDetach(sub);
+
+      var listener = [sub, mysub, false, [skip, limit, order, predicate]];
+
+      mysub.onDetach(function() { listener[2] = true; });
+
+      this.daoListeners_.push(listener);
+
+      return mysub;
+    },
+    function updateListeners_() {
+      for ( var i = 0, listener ; listener = this.daoListeners_[i] ; i++ ) {
+        if ( listener[2] ) continue;
+
+        var sub = listener[0];
+        var mysub = listener[1];
+        var args = listener[3];
+
+        sub.detach();
+
+        sink.reset();
+        sub = this.delegate.listen.apply(sink, args);
+
+        data[0] = sub;
+
+        mysub.onDetach(sub);
+      }
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.dao',
@@ -52,16 +88,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'a',
-      factory: function() { return []; },
-      fromJSON: function(json, ctx) {
-        return foam.json.parse(json, null, ctx);
-      }
+      class: 'Array',
+      name: 'a'
     }
   ],
 
   methods: [
-    function put(o) {
+    function put(sub, o) {
       this.a.push(o);
     }
   ]
@@ -71,14 +104,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
-  extends: 'foam.dao.AbstractDAO',
+  implements: ['foam.dao.DAO'],
 
   properties: [
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
-      topics: [ 'on' ],
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
       name: 'promise'
     }
   ]
