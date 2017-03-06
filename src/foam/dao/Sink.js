@@ -115,106 +115,9 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'LimitedListener',
-  extends: 'foam.dao.ProxySink',
-  properties: [
-    {
-      class: 'Int',
-      name: 'count'
-    },
-    {
-      class: 'Int',
-      name: 'limit'
-    }
-  ],
-  methods: [
-    function put() {
-    },
-    function remove(sub, obj) {
-      this.reset(sub);
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'PredicatedListener',
-  extends: 'foam.dao.ProxySink',
-  properties: [
-    {
-      name: 'predicate'
-    }
-  ],
-  methods: [
-    function put(sub, obj, old) {
-      if ( this.predicate.f(obj) ) {
-        this.delegate.put(sub, obj, old);
-        return;
-      }
-
-      if ( old && this.predicate.f(old) ) this.delegate.remove(sub, obj);
-    },
-    function remove(sub, obj) {
-      if ( this.predicate.f(obj) ) {
-        this.SUPER(sub, obj);
-      }
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'SkipListener',
-  extends: 'foam.dao.ProxySink',
-  properties: [
-    {
-      class: 'Int',
-      name: 'skip'
-    }
-  ],
-  methods: [
-    function remove(sub, obj) {
-      this.reset(sub);
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'OrderedListener',
-  extends: 'foam.dao.ProxySink',
-  properties: [
-    {
-      name: 'order'
-    },
-    {
-      name: 'last'
-    }
-  ],
-  methods: [
-    function put(sub, obj) {
-      this.reset(sub);
-      if ( this.last && this.order.compare(obj, this.last) < 0 ) {
-        this.reset(sub);
-        return;
-      }
-      this.last = obj;
-      this.delegate.put(sub, obj);
-    },
-    function remove(sub, obj) {
-      this.reset(sub);
-    },
-    function reset(sub) {
-      this.last = null;
-      this.delegate.reset(sub);
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
   name: 'ResetListener',
   extends: 'foam.dao.ProxySink',
+  documentation: 'Turns all sink events into a reset event.'
   methods: [
     function put(sub) {
       this.reset(sub);
@@ -224,7 +127,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   package: 'foam.dao',
