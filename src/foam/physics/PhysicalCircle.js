@@ -19,5 +19,7 @@ foam.CLASS({
   package: 'foam.physics',
   name: 'PhysicalCircle',
   extends: 'foam.graphics.Circle',
-  implements: [ 'foam.physics.Physical' ]
+  implements: [ 'foam.physics.Physical' ],
+
+  documentation: 'A Circle with Physical support.'
 });
