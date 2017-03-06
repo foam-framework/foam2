@@ -199,25 +199,36 @@ foam.LIB({
     function fromDatastoreEntity(v) {
       return foam.core.FObject.fromDatastoreEntity(v);
     },
-    (function() {
-      var typeMap = {
-        nullValue: foam.Null,
-        booleanValue: foam.Boolean,
-        integerValue: foam.Number,
-        doubleValue: foam.Number,
-        timestampValue: foam.Date,
-        stringValue: foam.String,
-        entityValue: foam.core.FObject
-      };
-      return function typeOfDatastoreValue(v) {
-        for ( var key in v ) {
-          if ( typeMap[key] && v.hasOwnProperty(key) ) return typeMap[key];
-        }
+    {
+      name: 'typeOfDatastoreValue',
+      documentation: function() {/*
+                                   Determine the primitive type of Value from
+                                   Google Cloud Datastore REST API. These
+                                   values are objects with one key denoting
+                                   their Datastore representation; e.g.,
+                                   "booleanValue", "integerValue", etc..
 
-        throw new Error('Failed to identify type of datastore value: ' +
-            JSON.stringify(v));
-      };
-    })()
+                                   https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#value
+                                  */},
+      code: (function() {
+        var typeMap = {
+          nullValue: foam.Null,
+          booleanValue: foam.Boolean,
+          integerValue: foam.Number,
+          doubleValue: foam.Number,
+          timestampValue: foam.Date,
+          stringValue: foam.String,
+          entityValue: foam.core.FObject
+        };
+        return function typeOfDatastoreValue(v) {
+          for ( var key in v ) {
+            if ( typeMap[key] && v.hasOwnProperty(key) ) return typeMap[key];
+          }
+
+          throw new Error('Failed to identify type of datastore value: ' +
+              JSON.stringify(v));
+        };
+      })()
   ]
 });
 

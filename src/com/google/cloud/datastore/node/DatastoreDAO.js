@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-/**
- * DAO implementation that speask of Cloud Datastore V1 REST API.
- *
- * https://cloud.google.com/datastore/docs/reference/rest/
- *
- * This implementation uses structured queryies, not GQL queries.
- */
-
 foam.CLASS({
   package: 'com.google.cloud.datastore.node',
   name: 'SelectData',
+
+  documentation: function() {/*
+                               State passed around by intermediate callbacks
+                               during a select() in progress. These data must
+                               be retained to notify the sink, send the
+                               correct payload to subsequent API calls, and
+                               return results in the Promise.
+                              */},
 
   properties: [
     {
@@ -45,6 +45,16 @@ foam.CLASS({
   package: 'com.google.cloud.datastore.node',
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
+
+  documentation: function() {/*
+                               DAO implementation that speaks of Cloud
+                               Datastore V1 REST API.
+
+                               https://cloud.google.com/datastore/docs/reference/rest/
+
+                               This implementation uses structured queries,
+                               not GQL queries.
+                              */},
 
   requires: [
     'com.google.cloud.datastore.node.SelectData',
