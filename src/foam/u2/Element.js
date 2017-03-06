@@ -1426,7 +1426,6 @@ foam.CLASS({
         }
       }
 
-
       this.onDetach(dao.pipe({
         put: put,
         remove: remove,
