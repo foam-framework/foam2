@@ -164,20 +164,25 @@ foam.CLASS({
 
     function put(value) {
       var self = this;
-      return new Promise(function(resolve, reject) {
-        self.withStore("readwrite", function(store) {
-          var request = store.put(self.serialize(value), value.id);
-          request.transaction.addEventListener(
-            'complete',
-            function(e) {
-              self.pub('on','put', value);
-              resolve(value);
-            });
-          request.transaction.addEventListener(
-            'error',
-            function(e) {
-              reject(self.IDBInternalException.create({ id: value.id, error: e }));
-            });
+      var old;
+      return this.find(value.id).then(function(o) {
+        old = o;
+      }).then(function() {
+        return new Promise(function(resolve, reject) {
+          self.withStore("readwrite", function(store) {
+            var request = store.put(self.serialize(value), value.id);
+            request.transaction.addEventListener(
+              'complete',
+              function(e) {
+                self.pub('on','put', value, old);
+                resolve(value);
+              });
+            request.transaction.addEventListener(
+              'error',
+              function(e) {
+                reject(self.IDBInternalException.create({ id: value.id, error: e }));
+              });
+          });
         });
       });
     },
@@ -291,7 +296,10 @@ foam.CLASS({
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var fc = this.FlowControl.create();
+      var sub = foam.core.FObject.create();
+      var detached = false;
+      sub.onDetach(function() { detached = true; });
+
       var self = this;
 
       return new Promise(function(resolve, reject) {
@@ -311,14 +319,14 @@ foam.CLASS({
               return;
             }
 
-            if ( ! cursor || fc.stopped ) {
+            if ( ! cursor || detached ) {
               sink.eof && sink.eof();
               resolve(resultSink);
               return;
             }
 
             var value = self.deserialize(cursor.value);
-            sink.put(value, fc);
+            sink.put(sub, value);
             cursor.continue();
           };
           request.onerror = function(e) {
