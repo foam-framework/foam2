@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.physics',
   name: 'Physical',
 
+  documentation: 'A Physical object has velocity and mass and may optionally be subject to friction and gravity.',
+
   constants: {
     INFINITE_MASS: 10000
   },

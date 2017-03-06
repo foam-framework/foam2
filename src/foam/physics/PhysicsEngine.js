@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'PhysicsEngine',
   extends: 'foam.physics.Collider',
 
+  documentation: 'PhysicsEngine is a sub-type of Collider which adds support for friction and gravity.',
+
   properties: [
     {
       class: 'Boolean',
