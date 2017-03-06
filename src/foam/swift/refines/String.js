@@ -29,8 +29,17 @@ foam.CLASS({
     {
       name: 'swiftValue',
       expression: function(value) {
-        return '"' + value + '"'
+        return '"' + value.replace(/"/g, '\\"') + '"'
       },
+    },
+    {
+      name: 'swiftJsonParser',
+      value: 'StringParser()',
+    },
+    {
+      class: 'String',
+      name: 'swiftJsonOutputter',
+      value: 'StringOutputter()',
     },
   ],
 });

@@ -242,7 +242,18 @@ class SwiftTestsTests: XCTestCase {
       "X": Context.GLOBAL,
       "Test": Test.self,
     ])
-    let ps = FObjectParser().parse(StringPStream(["str": "{class:'Test'}"]), x)
+    let ps = FObjectParser().parse(
+        StringPStream(["str": "{class:'Test', prevFirstName: \"MY_PREV_NAME\"}"]), x)
     XCTAssertTrue(ps!.value() is Test)
+    XCTAssertEqual((ps!.value() as! Test).prevFirstName, "MY_PREV_NAME")
+  }
+
+  func testToJSON() {
+    let t = Test()
+    t.prevFirstName = "MY_PREV_NAME"
+    t.boolProp = false
+    t.intProp = 34
+    XCTAssertEqual(Outputter().swiftStringify(t),
+    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\"}")
   }
 }

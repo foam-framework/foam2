@@ -51,6 +51,17 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'returnTypeName',
+    },
+    {
+      class: 'String',
+      name: 'returnType',
+      expression: function(returnTypeName) {
+        return foam.Function.resolveTypeString(returnTypeName) || null;
+      }
+    },
+    {
+      class: 'String',
       name: 'swiftReturnType',
     },
     {

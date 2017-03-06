@@ -135,6 +135,13 @@ public protocol PropertyInfo: Axiom {
   var label: String { get }
   var jsonParser: Parser? { get }
   func set(_ obj: FObject, value: Any?)
+  func get(_ obj: FObject) -> Any? // TODO rename to f?
+}
+
+extension PropertyInfo {
+  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
+    outputter.output(&out, value)
+  }
 }
 
 public class Action: Axiom {
