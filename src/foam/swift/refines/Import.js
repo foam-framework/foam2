@@ -56,7 +56,7 @@ return __context__["<%=this.key%>"]
       name: 'valueSetter',
       args: [],
       template: function() {/*
-self.<%=this.name%>$?.set(value: value)
+self.<%=this.name%>$?.swiftSet(value)
       */},
     },
   ],

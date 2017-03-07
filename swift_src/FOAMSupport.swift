@@ -15,111 +15,6 @@ public protocol Axiom {
   var name: String { get }
 }
 
-public protocol Slot {
-  func get() -> Any?
-  func set(value: Any?)
-  func sub(listener: @escaping Listener) -> Subscription
-}
-
-extension Slot {
-  public func linkFrom(_ s2: Slot) -> Subscription {
-
-    let s1 = self
-    var feedback1 = false
-    var feedback2 = false
-
-    let l1 = { () -> Void in
-      if feedback1 { return }
-
-      if !FOAM_utils.equals(s1.get(), s2.get()) {
-        feedback1 = true
-        s2.set(value: s1.get())
-        if !FOAM_utils.equals(s1.get(), s2.get()) { s1.set(value: s2.get()) }
-        feedback1 = false
-      }
-    }
-
-    let l2 = { () -> Void in
-      if feedback2 { return }
-
-      if !FOAM_utils.equals(s1.get(), s2.get()) {
-        feedback2 = true
-        s1.set(value: s2.get())
-        if !FOAM_utils.equals(s1.get(), s2.get()) { s2.set(value: s1.get()) }
-        feedback2 = false
-      }
-    }
-
-    var sub1: Subscription? = s1.sub { (_, _) in l1() }
-    var sub2: Subscription? = s2.sub { (_, _) in l2() }
-
-    l2()
-
-    return Subscription {
-      sub1?.detach()
-      sub2?.detach()
-      sub1 = nil
-      sub2 = nil
-    }
-  }
-
-  public func linkTo(_ other: Slot) -> Subscription {
-    return other.linkFrom(self)
-  }
-
-  public func follow(_ other: Slot) -> Subscription {
-    let l = { () -> Void in
-      if !FOAM_utils.equals(self.get(), other.get()) {
-        self.set(value: other.get())
-      }
-    }
-    l()
-    return other.sub { (_, _) in l() }
-  }
-
-  public func mapFrom(_ other: Slot, _ f: @escaping (Any?) -> Any?) -> Subscription {
-    let l = { () -> Void in
-      self.set(value: f(other.get()))
-    }
-    l()
-    return other.sub { (_, _) in l() }
-  }
-
-  public func mapTo(_ other: Slot, _ f: @escaping (Any?) -> Any?) -> Subscription {
-    return other.mapFrom(self, f)
-  }
-}
-
-public class PropertySlot: Slot {
-  weak var object: FObject!
-  let propertyName: String
-  init(object: FObject, propertyName: String) {
-    self.object = object
-    self.propertyName = propertyName
-  }
-  public func get() -> Any? {
-    return object.get(key: propertyName)
-  }
-  public func set(value: Any?) {
-    object.set(key: propertyName, value: value)
-  }
-  public func sub(listener: @escaping Listener) -> Subscription {
-    return object.sub(topics: ["propertyChange", propertyName], listener: listener)
-  }
-}
-
-public class ConstantSlot: Slot {
-  let value: Any?
-  init(value: Any?) {
-    self.value = value
-  }
-  public func get() -> Any? { return value }
-  public func set(value: Any?) { fatalError("Cannot mutate constant slot") }
-  public func sub(listener: @escaping Listener) -> Subscription {
-    fatalError("Cannot subscribe to constant slot")
-  }
-}
-
 class ListenerList {
   var next: ListenerList?
   var prev: ListenerList?
@@ -169,7 +64,7 @@ public class Context {
     if let slot = slotMap[key] {
       return slot
     } else if let slot = slotMap[toSlotName(name: key)] {
-      return slot.get()
+      return slot.swiftGet()
     }
     return nil
   }
@@ -181,7 +76,7 @@ public class Context {
       if let slot = value as AnyObject as? Slot {
         slotMap[slotName] = slot
       } else {
-        slotMap[slotName] = ConstantSlot(value: value)
+        slotMap[slotName] = ConstantSlot(["value": value])
       }
     }
 
@@ -259,11 +154,13 @@ public protocol FObject: class {
   func get(key: String) -> Any?
   func getSlot(key: String) -> Slot?
   func hasOwnProperty(_ key: String) -> Bool
+  func clearProperty(_ key: String)
   func callAction(key: String)
   init(_ args: [String:Any?])
 }
 
 public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
+
   public var __context__: Context = Context.GLOBAL {
     didSet {
       self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())
@@ -293,10 +190,10 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   }
 
   public func set(key: String, value: Any?) {}
-
   public func get(key: String) -> Any? { return nil }
   public func getSlot(key: String) -> Slot? { return nil }
   public func hasOwnProperty(_ key: String) -> Bool { return false }
+  public func clearProperty(_ key: String) {}
 
   public func sub(
     topics: [Any] = [],

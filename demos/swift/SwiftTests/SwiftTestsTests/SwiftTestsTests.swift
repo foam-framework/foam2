@@ -27,7 +27,7 @@ class SwiftTestsTests: XCTestCase {
     })
 
     var numPubs3 = 0
-    let sub3 = test.lastName$.sub(listener: { (sub: Subscription, args: [Any]) -> Void in
+    let sub3 = test.lastName$.swiftSub({ (sub: Subscription, args: [Any]) -> Void in
       numPubs3 += 1
     })
 
@@ -57,6 +57,7 @@ class SwiftTestsTests: XCTestCase {
     for _ in 1...5000 {
       testFollow()
       testListen()
+      testExpression()
     }
   }
 
@@ -255,5 +256,19 @@ class SwiftTestsTests: XCTestCase {
     t.intProp = 34
     XCTAssertEqual(Outputter().swiftStringify(t),
     "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\"}")
+  }
+
+  func testExpression() {
+    let t = Test()
+    t.firstName = "Mike"
+    t.lastName = "C"
+    XCTAssertEqual(t.exprProp, "Mike C")
+    t.lastName = "D"
+    XCTAssertEqual(t.exprProp, "Mike D")
+
+    t.exprProp = "OVERRIDE"
+    XCTAssertEqual(t.exprProp, "OVERRIDE")
+    t.firstName = "Nope"
+    XCTAssertEqual(t.exprProp, "OVERRIDE")
   }
 }

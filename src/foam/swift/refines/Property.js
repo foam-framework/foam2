@@ -60,6 +60,13 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftValueType',
+      expression: function(swiftType) {
+        return swiftType + (swiftType.match(/[?!]$/) ? '' : '!')
+      },
+    },
+    {
+      class: 'String',
       name: 'swiftType',
       value: 'Any?',
     },
@@ -105,6 +112,19 @@ foam.CLASS({
       },
     },
     {
+      class: 'StringArray',
+      name: 'swiftExpressionArgs',
+    },
+    {
+      class: 'String',
+      name: 'swiftExpression',
+    },
+    {
+      class: 'String',
+      name: 'swiftExpressionSubscriptionName',
+      expression: function(swiftName) { return '_' + swiftName + '_expression_'; },
+    },
+    {
       class: 'String',
       name: 'swiftAdapt',
       expression: function(swiftType, swiftRequiresCast) {
@@ -127,6 +147,11 @@ foam.CLASS({
       name: 'swiftJsonParser',
       value: 'nil',
     },
+    {
+      class: 'Boolean',
+      name: 'swiftWeak',
+      value: false,
+    },
   ],
   methods: [
     function writeToSwiftClass(cls, superAxiom) {
@@ -137,13 +162,20 @@ foam.CLASS({
         name: this.swiftName,
         type: this.swiftType,
         getter: this.swiftGetter(),
-        setter: 'self.set(key: "'+this.swiftName+'", value: value)',
+        setter: this.swiftSetter(),
       }));
       if ( !isOverride ) {
+        if (this.swiftExpression) {
+          cls.fields.push(this.Field.create({
+            name: this.swiftExpressionSubscriptionName,
+            type: '[Subscription]?',
+          }));
+        }
         cls.fields.push(this.Field.create({
           name: this.swiftValueName,
-          type: 'Any?',
+          type: this.swiftValueType,
           defaultValue: 'nil',
+          weak: this.swiftWeak,
         }));
         cls.fields.push(this.Field.create({
           name: this.swiftInitedName,
@@ -246,7 +278,17 @@ foam.CLASS({
       name: 'swiftSlotInitializer',
       args: [],
       template: function() {/*
-return PropertySlot(object: self, propertyName: "<%=this.swiftName%>")
+return PropertySlot([
+  "object": self,
+  "propertyName": "<%=this.swiftName%>",
+])
+      */},
+    },
+    {
+      name: 'swiftSetter',
+      args: [],
+      template: function() {/*
+self.set(key: "<%=this.swiftName%>", value: value)
       */},
     },
     {
@@ -254,11 +296,34 @@ return PropertySlot(object: self, propertyName: "<%=this.swiftName%>")
       args: [],
       template: function() {/*
 if <%=this.swiftInitedName%> {
-  return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %> as! <%=this.swiftType %><% } %>
+  return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 }
 <% if ( this.swiftFactory ) { %>
 self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
-return self.get(key: "<%=this.swiftName%>")<% if ( this.swiftRequiresCast ) { %> as! <%=this.swiftType %><% } %>
+return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
+<% } else if ( this.swiftExpression ) { %>
+if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
+let valFunc = { () -> <%= this.swiftValueType %> in
+  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { %>
+  let <%=arg%> = self.<%=arg%>
+  <% } %>
+  <%= this.swiftExpression %>
+}
+let detach: Listener = { _,_ in
+  if self.<%=this.swiftExpressionSubscriptionName%> == nil { return }
+  for s in self.<%=this.swiftExpressionSubscriptionName%>! {
+    s.detach()
+  }
+  self.<%=this.swiftExpressionSubscriptionName%> = nil
+  self.clearProperty("<%=this.swiftName%>")
+}
+<%=this.swiftExpressionSubscriptionName%> = [
+  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { %>
+  <%=arg%>$.swiftSub(detach),
+  <% } %>
+]
+<%=this.swiftValueName%> = valFunc()
+return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftValue ) { %>
 return <%=this.swiftValue%>
 <% } else if ( this.swiftType.match(/[!?]$/) ) { %>

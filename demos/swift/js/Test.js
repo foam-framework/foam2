@@ -36,6 +36,14 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'String',
+      name: 'exprProp',
+      swiftExpressionArgs: ['firstName', 'lastName'],
+      swiftExpression: function() {/*
+return firstName + " " + lastName
+      */},
+    },
+    {
       class: 'Int',
       name: 'intProp',
     },
