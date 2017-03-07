@@ -20,7 +20,9 @@
   console.log('PKG:', pkg);
   var clss = [
     'HTTPRequest',
-    'HTTPResponse'
+    'HTTPResponse',
+    'WebSocket',
+    'WebSocketService'
   ];
 
   // For each class with a "web" (browser) and "node" (Node JS)
