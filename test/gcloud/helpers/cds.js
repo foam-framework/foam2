@@ -25,128 +25,134 @@ var http = require('http');
 
 require('./foam.js');
 
-global.clearCDS = function() {
-  return new Promise(function(resolve, reject) {
-    var more = 'MORE_RESULTS';
-    var resultsReqData = {
-      query: {
-        projection: [{
-          property: { name: '__key__' }
-        }]
-      }
-    };
-    var nextCursor = null;
-    var results = [];
+foam.LIB({
+  name: 'com.google.cloud.datastore',
 
-    function deleteResults() {
-      var req = http.request({
-        protocol: env.CDS_EMULATOR_PROTOCOL + ':',
-        host: env.CDS_EMULATOR_HOST,
-        port: env.CDS_EMULATOR_PORT,
-        method: 'POST',
-        path: '/v1/projects/' + env.CDS_PROJECT_ID + ':commit',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      req.on('aborted', function() {
-        reject(new Error('Request aborted by server'));
-      });
-      req.on('response', function(message) {
-        if ( message.statusCode !== 200 ) {
-          reject(new Error('Bad request status code: ' + message.statusCode));
-          return;
-        }
-
-        var jsonText = '';
-        message.on('data', function(data) { jsonText += data.toString(); });
-        message.on('end', function() {
-          var json;
-          try {
-            json = JSON.parse(jsonText);
-          } catch (err) {
-            reject(err);
-            return;
+  methods: [
+    function clear() {
+      return new Promise(function(resolve, reject) {
+        var more = 'MORE_RESULTS';
+        var resultsReqData = {
+          query: {
+            projection: [{
+              property: { name: '__key__' }
+            }]
           }
+        };
+        var nextCursor = null;
+        var results = [];
 
-          var mutationResults = json.mutationResults;
-          for ( var i = 0; i < mutationResults.length; i++ ) {
-            if ( mutationResults[i].conflictDetected ) {
-              reject(new Error('Conflict-on-delete'));
+        function deleteResults() {
+          var req = http.request({
+            protocol: env.CDS_EMULATOR_PROTOCOL + ':',
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            method: 'POST',
+            path: '/v1/projects/' + env.CDS_PROJECT_ID + ':commit',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
+
+          req.on('aborted', function() {
+            reject(new Error('Request aborted by server'));
+          });
+          req.on('response', function(message) {
+            if ( message.statusCode !== 200 ) {
+              reject(new Error('Bad request status code: ' + message.statusCode));
               return;
             }
-          }
 
-          resolve();
-        });
-      });
+            var jsonText = '';
+            message.on('data', function(data) { jsonText += data.toString(); });
+            message.on('end', function() {
+              var json;
+              try {
+                json = JSON.parse(jsonText);
+              } catch (err) {
+                reject(err);
+                return;
+              }
 
-      req.write(JSON.stringify({
-        mode: 'NON_TRANSACTIONAL',
-        mutations: results.map(function(result) {
-          return {delete: result.entity.key};
-        })
-      }));
-      req.end();
-    }
+              var mutationResults = json.mutationResults;
+              for ( var i = 0; i < mutationResults.length; i++ ) {
+                if ( mutationResults[i].conflictDetected ) {
+                  reject(new Error('Conflict-on-delete'));
+                  return;
+                }
+              }
 
-    function getMoreResults() {
-      if ( nextCursor ) resultsReqData.query.startCursor = nextCursor;
+              resolve();
+            });
+          });
 
-      var req = http.request({
-        protocol: env.CDS_EMULATOR_PROTOCOL + ':',
-        host: env.CDS_EMULATOR_HOST,
-        port: env.CDS_EMULATOR_PORT,
-        method: 'POST',
-        path: '/v1/projects/' + env.CDS_PROJECT_ID + ':runQuery',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      req.on('aborted', function() {
-        reject(new Error('Request aborted by server'));
-      });
-      req.on('response', function(message) {
-        if ( message.statusCode !== 200 ) {
-          reject(new Error('Bad request status code: ' + message.statusCode));
-          return;
+          req.write(JSON.stringify({
+            mode: 'NON_TRANSACTIONAL',
+            mutations: results.map(function(result) {
+              return {delete: result.entity.key};
+            })
+          }));
+          req.end();
         }
 
-        var jsonText = '';
-        message.on('data', function(data) { jsonText += data.toString(); });
-        message.on('end', function() {
-          var json;
-          try {
-            json = JSON.parse(jsonText);
-          } catch (err) {
-            reject(err);
-            return;
-          }
+        function getMoreResults() {
+          if ( nextCursor ) resultsReqData.query.startCursor = nextCursor;
 
-          var moreResults =
-              // TODO(markdittmer): entityResults check should be
-              // unnecessary. Is MORE_RESULTS when no more results exist a
-              // Cloud Datastore bug?
-              json.batch.entityResults && json.batch.entityResults.length > 0 &&
-              json.batch.moreResults.indexOf('MORE_RESULTS') === 0;
-          nextCursor = moreResults ? json.batch.endCursor : null;
+          var req = http.request({
+            protocol: env.CDS_EMULATOR_PROTOCOL + ':',
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            method: 'POST',
+            path: '/v1/projects/' + env.CDS_PROJECT_ID + ':runQuery',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
 
-          results = results.concat(json.batch.entityResults || []);
+          req.on('aborted', function() {
+            reject(new Error('Request aborted by server'));
+          });
+          req.on('response', function(message) {
+            if ( message.statusCode !== 200 ) {
+              reject(new Error('Bad request status code: ' + message.statusCode));
+              return;
+            }
 
-          if ( moreResults ) getMoreResults();
-          else if ( results.length > 0 ) deleteResults();
-          else resolve();
-        });
+            var jsonText = '';
+            message.on('data', function(data) { jsonText += data.toString(); });
+            message.on('end', function() {
+              var json;
+              try {
+                json = JSON.parse(jsonText);
+              } catch (err) {
+                reject(err);
+                return;
+              }
+
+              var moreResults =
+                  // TODO(markdittmer): entityResults check should be
+                  // unnecessary. Is MORE_RESULTS when no more results exist a
+                  // Cloud Datastore bug?
+                  json.batch.entityResults && json.batch.entityResults.length > 0 &&
+                  json.batch.moreResults.indexOf('MORE_RESULTS') === 0;
+              nextCursor = moreResults ? json.batch.endCursor : null;
+
+              results = results.concat(json.batch.entityResults || []);
+
+              if ( moreResults ) getMoreResults();
+              else if ( results.length > 0 ) deleteResults();
+              else resolve();
+            });
+          });
+
+          req.write(JSON.stringify(resultsReqData));
+          req.end();
+        }
+
+        getMoreResults();
       });
-
-      req.write(JSON.stringify(resultsReqData));
-      req.end();
     }
-
-    getMoreResults();
-  });
-};
+  ]
+});

@@ -18,8 +18,9 @@
 var env = require('process').env;
 
 describe('DatastoreDAO', function() {
+  var clearCDS = com.google.cloud.datastore.clear;
   function daoFactory(cls) {
-    return global.clearCDS().then(function() {
+    return clearCDS().then(function() {
       return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
           .create({
             of: cls,
@@ -62,7 +63,7 @@ describe('DatastoreDAO', function() {
   });
 
   function unreliableDAOFactory(cls) {
-    return global.clearCDS().then(function() {
+    return clearCDS().then(function() {
       return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
           .create({
             of: cls,
