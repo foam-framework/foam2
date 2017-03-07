@@ -704,7 +704,7 @@ foam.CLASS({
           }
         });
 
-      this.SUPER(this.BoxDAOListener({
+      this.SUPER(this.BoxDAOListener.create({
         box: replyBox
       }), predicate);
     }
