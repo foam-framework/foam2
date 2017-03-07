@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+//
+// Provides a global function for clearing a Cloud Datastore database. This is
+// necessary for giving a clean slate to each Cloud Datastore test.
+//
+
 var env = require('process').env;
 var http = require('http');
 

@@ -47,8 +47,8 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   documentation: function() {/*
-                               DAO implementation that speaks of Cloud
-                               Datastore V1 REST API.
+                               DAO implementation for the Google Cloud
+                               Datastore v1 REST API.
 
                                https://cloud.google.com/datastore/docs/reference/rest/
 
@@ -61,9 +61,19 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.net.universal.HTTPRequest'
   ],
-  imports: [ 'projectId' ],
+  imports: [ 'gcloudProjectId?' ],
 
   properties: [
+    {
+      class: 'String',
+      name: 'projectId',
+      factory: function() {
+        foam.assert(this.gcloudProjectId, 'DatastoreDAO missing ' +
+            '"gcloudProjectId" from context or "projectId" on construction');
+        return this.gcloudProjectId;
+      },
+      final: true
+    },
     {
       class: 'String',
       name: 'protocol',
