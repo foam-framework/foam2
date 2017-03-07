@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'com.google.cloud.datastore.node',
+  package: 'com.google.cloud.datastore',
   name: 'SelectData',
 
   documentation: function() {/*
@@ -42,7 +42,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'com.google.cloud.datastore.node',
+  package: 'com.google.cloud.datastore',
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
@@ -57,7 +57,7 @@ foam.CLASS({
                               */},
 
   requires: [
-    'com.google.cloud.datastore.node.SelectData',
+    'com.google.cloud.datastore.SelectData',
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest'
   ],
