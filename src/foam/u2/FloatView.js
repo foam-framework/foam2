@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'FloatView',
   extends: 'foam.u2.TextField',
 
+  documentation: 'View for editing Float Properties.',
+
   properties: [
     [ 'type', 'number' ],
     { class: 'Float', name: 'data' },

@@ -1037,7 +1037,7 @@ foam.CLASS({
   extends: 'foam.box.PromisedBox',
 
   requires: [
-    'foam.net.Socket',
+    'foam.net.node.Socket',
     'foam.box.RawSocketBox'
   ],
 
@@ -1144,7 +1144,7 @@ foam.CLASS({
   name: 'WebSocketBox',
 
   requires: [
-    'foam.net.WebSocket',
+    'foam.net.web.WebSocket',
     'foam.box.Message',
     'foam.box.RegisterSelfMessage'
   ],
@@ -1243,7 +1243,7 @@ foam.CLASS({
     {
       name: 'socketService',
       factory: function() {
-        var model = foam.lookup('foam.net.SocketService', true);
+        var model = foam.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
@@ -1255,7 +1255,7 @@ foam.CLASS({
       name: 'webSocketService',
       factory: function() {
         var model = foam.lookup('foam.net.node.WebSocketService', true) ||
-            foam.lookup('foam.net.WebSocketService', true);
+            foam.lookup('foam.net.web.WebSocketService', true);
 
         if ( model ) {
           return model.create({
@@ -1390,7 +1390,7 @@ foam.CLASS({
   implements: ['foam.box.Box'],
 
   requires: [
-    'foam.net.HTTPRequest'
+    'foam.net.web.HTTPRequest'
   ],
 
   imports: [

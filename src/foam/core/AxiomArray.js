@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-/** An Array whose elements are Axioms and are added to this.axioms_. */
 foam.CLASS({
   package: 'foam.core',
   name: 'AxiomArray',
   extends: 'Property',
 
-  documentation: 'An Array of Axioms (used by Model).',
+  documentation: 'An Array of Axioms (used by Model) whose elements are added to this.axioms_.',
 
   properties: [
     {
