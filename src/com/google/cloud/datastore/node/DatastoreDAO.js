@@ -59,7 +59,7 @@ foam.CLASS({
   requires: [
     'com.google.cloud.datastore.node.SelectData',
     'foam.dao.ArraySink',
-    'foam.net.universal.HTTPRequest'
+    'foam.net.HTTPRequest'
   ],
   imports: [ 'gcloudProjectId?' ],
 
