@@ -26,6 +26,8 @@
   // For each class with a "web" (browser) and "node" (Node JS)
   // implementation, register "foam.net.[environment].[class]" as
   // "foam.net.[class]".
+  //
+  // TODO: This should be provided via a sort of "ContextFactory" or similar.
   for ( var i = 0; i < clss.length; i++ ) {
     console.log('Lookup', pkg + '.' + clss[i]);
     foam.register(foam.lookup(pkg + '.' + clss[i]), 'foam.net.' + clss[i]);
