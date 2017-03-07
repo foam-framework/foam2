@@ -24,7 +24,7 @@ foam.CLASS({
     'foam.dao.MDAO',
     'foam.dao.NullDAO',
     'foam.dao.ProxyDAO',
-    'foam.net.XMLHTTPRequest',
+    'foam.net.web.XMLHTTPRequest',
     'foam.u2.Scroller',
     'foam.u2.search.FilterController'
   ],

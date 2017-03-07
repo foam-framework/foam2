@@ -36,7 +36,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.ArraySink',
-    'foam.net.HTTPRequest',
+    'foam.net.web.HTTPRequest',
     'com.firebase.FirebaseEventSource',
     'foam.mlang.predicate.Gt',
     'foam.mlang.Constant'
@@ -345,8 +345,8 @@ foam.CLASS({
   extends: 'com.firebase.FirebaseDAO',
 
   requires: [
-    'foam.net.XMLHTTPRequest as HTTPRequest',
-    'foam.net.SafariEventSource as EventSource'
+    'foam.net.web.XMLHTTPRequest as HTTPRequest',
+    'foam.net.web.SafariEventSource as EventSource'
   ],
 
   properties: [
@@ -360,7 +360,7 @@ foam.CLASS({
   name: 'FirebaseEventSource',
 
   requires: [
-    'foam.net.EventSource'
+    'foam.net.web.EventSource'
   ],
 
   topics: [
