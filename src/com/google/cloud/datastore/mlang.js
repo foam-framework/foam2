@@ -22,26 +22,16 @@
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  properties: [
+  methods: [
     {
-      class: 'String',
-      name: 'datastoreName',
+      name: 'toDatastorePropertyReference',
       documentation:
       function() {/*
-                    The PropertyType.name for the Cloud Datastore REST
-                    API. I.e., "name" key in
-                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
-                  */},
-      factory: function() { return this.name; }
-    },
-    {
-      name: 'datastoreProperty',
-      function() {/*
-                    Provides a PropertyType for the Cloud Datastore REST
+                    Provides a PropertyReference for the Cloud Datastore REST
                     API.
                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
                   */},
-      factory: function() { return { name: this.datastoreName }; }
+      code: function() { return { name: this.name }; }
     }
   ]
 });
@@ -49,18 +39,14 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.expr.Dot',
 
-  properties: [
+  methods: [
     {
-      name: 'datastoreName',
-      factory: function() {
-        return this.arg1.datastoreName + '.' + this.arg2.datastoreName;
-      },
-    },
-    {
-      name: 'datastoreProperty',
-      factory: function() { return { name: this.datastoreName() }; }
+      name: 'toDatastorePropertyReference',
+      code: function() {
+        return { name: this.arg1.name + '.' + this.arg2.name };
+      }
     }
-  ],
+  ]
 });
 
 //
@@ -159,7 +145,7 @@ foam.CLASS({
           'Predicate has no datastore op name:', this.cls_.id);
 
       return {
-        property: this.arg1.datastoreProperty,
+        property: this.arg1.toDatastorePropertyReference(),
         op: this.datastoreOpName,
         value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
       };
