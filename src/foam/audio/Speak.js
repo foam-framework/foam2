@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.audio',
   name: 'Speak',
 
+  documentation: 'Speak text.',
+
   imports: [
     'window'
   ],
