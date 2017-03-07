@@ -191,4 +191,7 @@ FOAM_FILES([
   { name: "foam/net/HTTPMethod" },
   { name: "lib/net" },
   { name: "foam/doc/DocBrowser", flags: ['debug'] },
+  { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
+  { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
+  { name: "com/google/cloud/datastore/DatastoreDAO", flags: ['gcloud'] },
 ]);
