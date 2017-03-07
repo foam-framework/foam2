@@ -25,15 +25,41 @@ describe('DatastoreDAO', function() {
             of: cls,
             protocol: env.CDS_EMULATOR_PROTOCOL,
             host: env.CDS_EMULATOR_HOST,
-            port: env.CDS_EMULATOR_PORT
-          }, foam.__context__.createSubContext({
+            port: env.CDS_EMULATOR_PORT,
             projectId: env.CDS_PROJECT_ID
-          }));
+          });
     });
   }
 
   // From helpers/generic_dao.js.
   global.genericDAOTestBattery(daoFactory);
+
+  describe('construction', function() {
+    it('should support "gcloudProjectId" from context', function() {
+      var dao = foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+          .create({
+            of: foam.core.FObject,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+          }, foam.__context__.createSubContext({
+            gcloudProjectId: env.CDS_PROJECT_ID
+          }));
+      expect(dao.gcloudProjectId).toBe(env.CDS_PROJECT_ID);
+      expect(dao.projectId).toBe(env.CDS_PROJECT_ID);
+    });
+    it('should throw when no project id is given', function() {
+      expect(function() {
+        return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+            .create({
+              of: foam.core.FObject,
+              protocol: env.CDS_EMULATOR_PROTOCOL,
+              host: env.CDS_EMULATOR_HOST,
+              port: env.CDS_EMULATOR_PORT,
+            }).projectId;
+      }).toThrow();
+    });
+  });
 
   function unreliableDAOFactory(cls) {
     return global.clearCDS().then(function() {
@@ -42,10 +68,9 @@ describe('DatastoreDAO', function() {
             of: cls,
             protocol: env.UNRELIABLE_CDS_EMULATOR_PROTOCOL,
             host: env.UNRELIABLE_CDS_EMULATOR_HOST,
-            port: env.UNRELIABLE_CDS_EMULATOR_PORT
-          }, foam.__context__.createSubContext({
+            port: env.UNRELIABLE_CDS_EMULATOR_PORT,
             projectId: env.CDS_PROJECT_ID
-          }));
+          });
     });
   }
   describe('unreliable server', function() {
