@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'DetailView',
   extends: 'foam.u2.Element',
 
+  documentation: 'A generic property-sheet style View for editing an FObject.',
+
   requires: [
     'foam.core.Property',
     'foam.u2.DetailPropertyView'

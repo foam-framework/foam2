@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.net.HTTPRequest'
+    'foam.net.web.HTTPRequest'
   ],
 
   properties: [

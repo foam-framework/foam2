@@ -21,6 +21,7 @@ foam.CLASS({
 
   documentation: function() {/*
     Axiom for declaring intent to implement an interface.
+
     Since interfaces can also have implementations, it
     can also be used to provide mix-ins, which is a safe form of
     multiple-inheritance.

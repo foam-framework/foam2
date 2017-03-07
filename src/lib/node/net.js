@@ -239,7 +239,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'Socket',
 
   imports: [
@@ -388,11 +388,11 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'SocketService',
 
   requires: [
-    'foam.net.Socket',
+    'foam.net.node.Socket',
     'foam.box.RegisterSelfMessage'
   ],
 
@@ -589,7 +589,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
-  extends: 'foam.net.WebSocketService',
+  extends: 'foam.net.web.WebSocketService',
 
   requires: [
     'foam.net.node.WebSocket',
@@ -645,7 +645,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPRequest',
-  extends: 'foam.net.HTTPRequest',
+  extends: 'foam.net.web.HTTPRequest',
 
   requires: [
     'foam.net.node.HTTPResponse'
@@ -736,7 +736,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPResponse',
-  extends: 'foam.net.HTTPResponse',
+  extends: 'foam.net.web.HTTPResponse',
 
   properties: [
     {

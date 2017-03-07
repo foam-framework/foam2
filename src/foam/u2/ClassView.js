@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'ClassView',
   extends: 'foam.u2.TextField',
 
-  documentation: '',
+  documentation: 'View for editing a Class Property.',
 
   properties: [
     { class: 'Class', name: 'data' }
