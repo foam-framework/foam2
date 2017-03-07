@@ -229,6 +229,7 @@ foam.LIB({
               JSON.stringify(v));
         };
       })()
+    }
   ]
 });
 
