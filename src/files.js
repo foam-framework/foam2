@@ -125,7 +125,7 @@ FOAM_FILES([
   { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
-  { name: "lib/net" },
+  { name: "lib/web/net" },
   { name: "lib/messageport", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/firebase" },
@@ -189,5 +189,6 @@ FOAM_FILES([
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
+  { name: "lib/net" },
   { name: "foam/doc/DocBrowser", flags: ['debug'] },
 ]);
