@@ -21,7 +21,7 @@ describe('DatastoreDAO', function() {
   var clearCDS = com.google.cloud.datastore.clear;
   function daoFactory(cls) {
     return clearCDS().then(function() {
-      return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+      return foam.lookup('com.google.cloud.datastore.DatastoreDAO')
           .create({
             of: cls,
             protocol: env.CDS_EMULATOR_PROTOCOL,
@@ -37,7 +37,7 @@ describe('DatastoreDAO', function() {
 
   describe('construction', function() {
     it('should support "gcloudProjectId" from context', function() {
-      var dao = foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+      var dao = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
           .create({
             of: foam.core.FObject,
             protocol: env.CDS_EMULATOR_PROTOCOL,
@@ -51,7 +51,7 @@ describe('DatastoreDAO', function() {
     });
     it('should throw when no project id is given', function() {
       expect(function() {
-        return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+        return foam.lookup('com.google.cloud.datastore.DatastoreDAO')
             .create({
               of: foam.core.FObject,
               protocol: env.CDS_EMULATOR_PROTOCOL,
@@ -64,7 +64,7 @@ describe('DatastoreDAO', function() {
 
   function unreliableDAOFactory(cls) {
     return clearCDS().then(function() {
-      return foam.lookup('com.google.cloud.datastore.node.DatastoreDAO')
+      return foam.lookup('com.google.cloud.datastore.DatastoreDAO')
           .create({
             of: cls,
             protocol: env.UNRELIABLE_CDS_EMULATOR_PROTOCOL,
