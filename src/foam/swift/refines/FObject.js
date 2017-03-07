@@ -63,6 +63,33 @@ return classInfo
         body: createClassInfoBody,
       }));
 
+      var clearPropertyBody = foam.templates.TemplateUtil.create().compile(
+          foam.String.multiline(function(properties) {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>":
+    <%= p.swiftInitedName %> = false
+    <%= p.swiftValueName %> = nil
+    _ = pub(["propertyChange", "<%=p.swiftName%>"])
+    break
+<% } %>
+  default:
+    super.clearProperty(key)
+}
+          */}), '', ['properties']).apply(this, [properties]).trim();
+      cls.methods.push(foam.swift.Method.create({
+        override: true,
+        name: 'clearProperty',
+        visibility: 'public',
+	args: [
+          {
+            localName: 'key',
+            type: 'String',
+          },
+	],
+        body: clearPropertyBody,
+      }));
+
       var hasOwnPropertyBody = foam.templates.TemplateUtil.create().compile(
           foam.String.multiline(function(properties) {/*
 switch key {
@@ -145,10 +172,15 @@ switch key {
     <%=p.swiftSlotName%> = value as! Slot
     return
   case "<%=p.swiftName%>":
+  <% if ( p.swiftExpression ) { %>
+    if <%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+  <% } %>
     let oldValue: Any? = <%=p.swiftInitedName%> ? `<%=p.swiftName%>` : nil
     <%=p.swiftValueName%> = <%=p.swiftPreSetFuncName%>(oldValue, <%=p.swiftAdaptFuncName%>(oldValue, value))
     <%=p.swiftInitedName%> = true
-    <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%><%if ( p.swiftRequiresCast ) {%> as! <%=p.swiftType%><% } %>)
+    <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%>)
     _ = pub(["propertyChange", "<%=p.swiftName%>"])
     return
 <% } %>

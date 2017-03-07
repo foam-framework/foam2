@@ -26,6 +26,8 @@ foam.CLASS({
     },
     {
       name: 'value',
+      swiftExpressionArgs: ['string'],
+      swiftExpression: 'return string'
     },
   ],
   methods: [
@@ -39,9 +41,7 @@ for i in 0..<string.characters.count {
   }
   ps = ps.tail()
 }
-// TODO support expressions and replace this with an expression on value.
-let value: Any? = hasOwnProperty("value") ? self.value : string
-return ps.setValue(value)
+return ps.setValue(self.value)
       */},
     },
   ]

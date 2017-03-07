@@ -25,6 +25,9 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
     models: [
       'Test',
       'TestExtended',
+      'foam.swift.core.Slot',
+      'foam.swift.core.PropertySlot',
+      'foam.swift.core.ConstantSlot',
       'foam.swift.parse.PStream',
       'foam.swift.parse.StringPStream',
       'foam.swift.parse.parser.Alt',
