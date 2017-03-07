@@ -239,7 +239,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'Socket',
 
   imports: [
@@ -388,11 +388,11 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'SocketService',
 
   requires: [
-    'foam.net.web.Socket',
+    'foam.net.node.Socket',
     'foam.box.RegisterSelfMessage'
   ],
 
