@@ -1037,7 +1037,7 @@ foam.CLASS({
   extends: 'foam.box.PromisedBox',
 
   requires: [
-    'foam.net.web.Socket',
+    'foam.net.node.Socket',
     'foam.box.RawSocketBox'
   ],
 
@@ -1243,7 +1243,7 @@ foam.CLASS({
     {
       name: 'socketService',
       factory: function() {
-        var model = foam.lookup('foam.net.web.SocketService', true);
+        var model = foam.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
