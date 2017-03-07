@@ -36,7 +36,7 @@ foam.CLASS({
     },
     {
       class: 'Array',
-      name: 'results',
+      name: 'results'
     }
   ]
 });
@@ -224,9 +224,9 @@ foam.CLASS({
         return data.sink;
       }
 
+      var fromDatastoreEntity = com.google.cloud.datastore.fromDatastoreEntity;
       for ( var i = 0; i < entities.length; i++ ) {
-        var obj = com.google.cloud.datastore.fromDatastoreEntity(
-            entities[i].entity);
+        var obj = fromDatastoreEntity(entities[i].entity);
         data.results.push(obj);
         data.sink && data.sink.put && data.sink.put(obj);
       }

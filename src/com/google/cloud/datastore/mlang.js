@@ -22,26 +22,26 @@
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  methods: [
+  properties: [
     {
-      name: 'toOwnDatastoreProperty',
+      class: 'String',
+      name: 'datastoreName',
       documentation:
       function() {/*
-                     Provides a PropertyType.name for the Cloud Datastore
-                     REST API. I.e., "name" key in
-                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
+                    The PropertyType.name for the Cloud Datastore REST
+                    API. I.e., "name" key in
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
                   */},
-      code: function() { return this.name; }
+      factory: function() { return this.name; }
     },
     {
-      name: 'toDatastoreProperty',
-      documentation:
+      name: 'datastoreProperty',
       function() {/*
-                     Provides a PropertyType for the Cloud Datastore REST
-                     API.
-                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
+                    Provides a PropertyType for the Cloud Datastore REST
+                    API.
+                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
                   */},
-      code: function() { return { name: this.toOwnDatastoreProperty() }; }
+      factory: function() { return { name: this.datastoreName }; }
     }
   ]
 });
@@ -49,19 +49,23 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.expr.Dot',
 
-  methods: [
-    function toOwnDatastoreProperty() {
-      return this.arg1.toOwnDatastoreProperty() + '.' +
-          this.arg2.toOwnDatastoreProperty();
+  properties: [
+    {
+      name: 'datastoreName',
+      factory: function() {
+        return this.arg1.datastoreName + '.' + this.arg2.datastoreName;
+      },
     },
-    function toDatastoreProperty() {
-      return { name: this.toOwnDatastoreProperty() };
+    {
+      name: 'datastoreProperty',
+      factory: function() { return { name: this.datastoreName() }; }
     }
-  ]
+  ],
 });
 
 //
-// Refine constants to produce datastore values.
+// Refine constants to produce datastore values. This is needed because
+// mLangs will attempt to access datastore values on the arguments.
 //
 
 foam.CLASS({
@@ -155,7 +159,7 @@ foam.CLASS({
           'Predicate has no datastore op name:', this.cls_.id);
 
       return {
-        property: this.arg1.toDatastoreProperty(),
+        property: this.arg1.datastoreProperty,
         op: this.datastoreOpName,
         value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
       };
@@ -165,6 +169,11 @@ foam.CLASS({
     }
   ]
 });
+
+//
+// Use above Binary implementation on Google Cloud Datastore-supported
+// predicates by refining them with a particular "datastoreOpName" value.
+//
 
 (function() {
   var ops = [
