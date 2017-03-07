@@ -1,0 +1,11 @@
+{
+  "spec_dir": "test",
+  "spec_files": [
+    "gcloud/src/**/*.js"
+  ],
+  "helpers": [
+    "helpers/testcontext.js",
+    "helpers/generic_dao.js",
+    "gcloud/helpers/**/*.js"
+  ]
+}
