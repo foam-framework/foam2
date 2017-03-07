@@ -78,7 +78,7 @@ foam.CLASS({
 
       this.
         on('click', this.click).
-        add(this.label/*$*/);
+        add(this.label$);
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
