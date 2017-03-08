@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
+    'foam.dao.InvalidArgumentException',
     'foam.dao.ObjectNotFoundException',
     'foam.dao.index.AltIndex',
     'foam.dao.index.AutoIndex',
@@ -157,7 +158,9 @@ foam.CLASS({
 
     function find(key) {
       if ( key === undefined ) {
-        return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
+        return Promise.reject(this.InvalidArgumentException.create({
+          message: '"key" cannot be undefined/null'
+        }));
       }
 
       return Promise.resolve(this.find_(key));
