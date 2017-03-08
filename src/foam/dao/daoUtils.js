@@ -171,3 +171,15 @@ foam.LIB({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'InvalidArgumentException',
+  extends: 'foam.dao.ExternalException',
+  properties: [
+    {
+      class: 'String',
+      name: 'message'
+    }
+  ]
+});
