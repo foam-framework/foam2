@@ -74,6 +74,10 @@ foam.CLASS({
     'hoverSelection'
   ],
 
+  imports: [
+    'editRecord?'
+  ],
+
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -183,7 +187,10 @@ foam.CLASS({
                 E('tr').
                 start('tr').
                 on('mouseover', function() { view.hoverSelection = obj; }).
-                on('click', function() { view.selection = obj; }).
+                on('click', function() {
+                  view.selection = obj;
+                  if ( view.editRecord ) view.editRecord(obj);
+                }).
                 cssClass(this.slot(function(selection) {
                   if ( obj === selection ) return view.myCls('selected');
                   return '';
