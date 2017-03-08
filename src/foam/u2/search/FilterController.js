@@ -215,7 +215,9 @@ foam.CLASS({
       class: 'StringArray',
       name: 'searchFields',
       documentation: 'Property names that are currently selected as filters.',
-      factory: function() { return []; }
+      factory: function() {
+        return ( this.data && this.data.of && this.data.of.tableColumns ) || [];
+      }
     },
     {
       name: 'searchViews_',
