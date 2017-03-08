@@ -3,6 +3,8 @@ foam.CLASS({
   name: 'DocBorder',
   extends: 'foam.u2.Element',
 
+  documentation: 'Titled raised View border used by the DocBrowser.',
+
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*

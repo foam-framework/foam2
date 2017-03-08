@@ -32,7 +32,7 @@ describe("Index benchmarks", function() {
 
     if ( ! rawData ) {
       var xhr = ((foam.net.node && foam.net.node.HTTPRequest) ||
-          foam.net.HTTPRequest).create({
+          foam.net.web.HTTPRequest).create({
         responseType: 'json',
         method: 'GET'
       });

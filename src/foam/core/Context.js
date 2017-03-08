@@ -194,7 +194,9 @@
   foam.lookup = function(id, opt_suppress) {
     return foam.__context__.lookup(id, opt_suppress);
   };
-  foam.register = function(cls) { foam.__context__.register(cls); };
+  foam.register = function(cls, opt_id) {
+    foam.__context__.register(cls, opt_id);
+  };
   foam.createSubContext = function(opt_args, opt_name) {
     return foam.__context__.createSubContext(opt_args, opt_name);
   };
