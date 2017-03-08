@@ -152,7 +152,7 @@ foam.CLASS({
         this.index.remove(oldValue);
       }
       this.index.put(obj);
-      this.pub('on', 'put', obj, oldValue);
+      this.pub('on', 'put', obj);
       return Promise.resolve(obj);
     },
 

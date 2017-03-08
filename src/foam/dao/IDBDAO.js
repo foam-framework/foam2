@@ -164,25 +164,20 @@ foam.CLASS({
 
     function put(value) {
       var self = this;
-      var old;
-      return this.find(value.id).then(function(o) {
-        old = o;
-      }).then(function() {
-        return new Promise(function(resolve, reject) {
-          self.withStore("readwrite", function(store) {
-            var request = store.put(self.serialize(value), value.id);
-            request.transaction.addEventListener(
-              'complete',
-              function(e) {
-                self.pub('on','put', value, old);
-                resolve(value);
-              });
-            request.transaction.addEventListener(
-              'error',
-              function(e) {
-                reject(self.IDBInternalException.create({ id: value.id, error: e }));
-              });
-          });
+      return new Promise(function(resolve, reject) {
+        self.withStore("readwrite", function(store) {
+          var request = store.put(self.serialize(value), value.id);
+          request.transaction.addEventListener(
+            'complete',
+            function(e) {
+              self.pub('on','put', value);
+              resolve(value);
+            });
+          request.transaction.addEventListener(
+            'error',
+            function(e) {
+              reject(self.IDBInternalException.create({ id: value.id, error: e }));
+            });
         });
       });
     },

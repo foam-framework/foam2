@@ -37,18 +37,15 @@ foam.CLASS({
 
   methods: [
     function put(obj) {
-      var old;
-
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( obj.ID.compare(obj, this.array[i]) === 0 ) {
-          old = this.array[i];
           this.array[i] = obj;
           break;
         }
       }
 
       if ( i == this.array.length ) this.array.push(obj);
-      this.on.put.pub(obj, old);
+      this.on.put.pub(obj);
 
       return Promise.resolve(obj);
     },
