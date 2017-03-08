@@ -169,6 +169,13 @@ global.genericDAOTestBattery = function(daoFactory) {
     });
 
     describe('removeAll()', function() {
+      it('should return a promise', function(done) {
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          expect(dao.removeAll().then).toEqual(jasmine.any(Function));
+          done();
+        });
+      });
+
       it('should only remove that which matches the predicate', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var exprs = foam.mlang.Expressions.create();
@@ -197,7 +204,7 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function() {
             return dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).removeAll();
           }).then(function() {
-            return dao.find(pid)
+            return dao.find(pid);
           }).then(function(p) {
             expect(p).toBe(null);
             return dao.find(p2id);
@@ -346,7 +353,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
 
         it('should honour where()', function(done) {
-          dao.where(exprs.NEQ(test.dao.generic.Person.DECEASED, false)).select().then(function(a) {
+          dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).select().then(function(a) {
             expect(a).toBeDefined();
             expect(a.a).toBeDefined();
             expect(a.a.length).toBe(1);

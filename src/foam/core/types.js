@@ -57,6 +57,16 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  documentation: 'Upgrade Mode.documentation to a proper String property.',
+
+  properties: [
+    { class: 'String', name: 'documentation' }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core',
