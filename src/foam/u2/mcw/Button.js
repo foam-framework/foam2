@@ -22,9 +22,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.
-        attrs({type: 'button', "data-mdc-auto-init": 'MDCRipple'}).
-        SUPER();
+      this.attrs({type: 'button'}).SUPER();
     },
 
     function load() {
@@ -34,7 +32,7 @@ foam.CLASS({
 
     function initCls() {
       this.cssClass('mdc-button');
-      if ( this.raised ) this.cssClass('mdc-button--raised');
+      if ( this.raised  ) this.cssClass('mdc-button--raised');
       if ( this.primary ) this.cssClass('mdc-button--primary');
     }
   ]
