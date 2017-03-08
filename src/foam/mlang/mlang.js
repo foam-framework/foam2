@@ -1136,7 +1136,7 @@ foam.CLASS({
   methods: [
     function f(o) { return this.arg1.f(o); },
 
-    function put(o) { this.delegate.put( this.f(o) ); }
+    function put(sub, o) { this.delegate.put(sub, this.f(o)); }
   ]
 });
 
@@ -1192,30 +1192,30 @@ foam.CLASS({
       return this.groupKeys;
     },
 
-    function putInGroup_(key, obj) {
+    function putInGroup_(sub, key, obj) {
       var group = this.groups.hasOwnProperty(key) && this.groups[key];
       if ( ! group ) {
         group = this.arg2.clone();
         this.groups[key] = group;
         this.groupKeys.push(key);
       }
-      group.put(obj);
+      group.put(sub, obj);
     },
 
-    function put(obj) {
+    function put(sub, obj) {
       var key = this.arg1.f(obj);
       if ( Array.isArray(key) ) {
         if ( key.length ) {
           for ( var i = 0; i < key.length; i++ ) {
-            this.putInGroup_(key[i], obj);
+            this.putInGroup_(sub, key[i], obj);
           }
         } else {
           // Perhaps this should be a key value of null, not '', since '' might
           // actually be a valid key.
-          this.putInGroup_('', obj);
+          this.putInGroup_(sub, '', obj);
         }
       } else {
-        this.putInGroup_(key, obj);
+        this.putInGroup_(sub, key, obj);
       }
     },
 
@@ -1513,7 +1513,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put(sub, obj) {
       if ( ! this.hasOwnProperty('value') ) {
         this.value = this.arg1.f(obj);
       } else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
@@ -1544,7 +1544,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) { this.value += this.arg1.f(obj); }
+    function put(sub, obj) { this.value += this.arg1.f(obj); }
   ]
 });
 
