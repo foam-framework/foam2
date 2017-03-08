@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html class="mdc-typography">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Greeting App</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <script src="../../../foam.js"></script>
+    <script src="Button.js"></script>
+  </head>
+  <body>
+    <h1 class="mdc-typography--display1">Hello, World!</h1>
+    <button type="button" class="mdc-button mdc-button--raised mdc-button--primary">
+      Press Me
+    </button>
+    <foam class="foam.u2.mcw.Button" label="Press Me"></foam>
+    <foam class="foam.u2.mcw.Button" label="Or Me"></foam>
+
+   <main>
+   <form action="#" id="greeting-form">
+    <div>
+      <div class="mdc-form-field">
+        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+          <input id="firstname" type="text" class="mdc-textfield__input">
+          <label for="firstname" class="mdc-textfield__label">
+            First Name
+          </label>
+        </div>
+      </div>
+
+      <div class="mdc-form-field">
+        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+          <input id="lastname" type="text" class="mdc-textfield__input">
+          <label for="lastname" class="mdc-textfield__label">
+            Last Name
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit"
+            class="mdc-button
+                   mdc-button--raised
+                   mdc-button--primary
+                   mdc-ripple-surface"
+            data-mdc-auto-init="MDCRipple">
+      Print Greeting
+    </button>
+   </form>
+   </main>
+
+   <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+   <script>window.addEventListener('load', function() { window.mdc.autoInit(); });</script>
+  </body>
+</html>
