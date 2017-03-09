@@ -9,6 +9,7 @@
       href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <script src="../../../foam.js"></script>
     <script src="Button.js"></script>
+    <script src="DetailPropertyView.js"></script>
   </head>
   <body>
     <h1 class="mdc-typography--display1">Hello, World!</h1>
@@ -20,7 +21,6 @@
 
    <p>
 
-   <main>
    <form action="#" id="greeting-form">
     <div>
       <div class="mdc-form-field">
@@ -42,9 +42,16 @@
       </div>
     </div>
    </form>
-   </main>
 
    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
    <script>/*window.addEventListener('load', function() { window.mdc.autoInit(); });*/</script>
+
+<form>
+   <script>
+     foam.__context__.register(foam.u2.mcw.DetailPropertyView, 'foam.u2.DetailPropertyView');
+     foam.u2.DetailView.create({data: foam.util.Timer.create(), showActions: true}).write();
+   </script>
+</form>
+
   </body>
 </html>
