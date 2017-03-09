@@ -22,8 +22,8 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'ripple_',
-      factory: function() { return new mdc.ripple.MDCRipple(this.el()); }
+      name: 'peer_',
+      factory: function() { return new mdc.textfield.MDCTextfield(this.el()); }
     },
     {
       class: 'Boolean',
@@ -38,19 +38,13 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
-      this.attrs({type: 'button'}).SUPER();
-    },
-
     function load() {
       this.SUPER();
-      this.ripple_.foundation_.init();
+      this.peer_.foundation_.init();
     },
 
     function initCls() {
-      this.cssClass('mdc-button');
-      if ( this.raised  ) this.cssClass('mdc-button--raised');
-      if ( this.primary ) this.cssClass('mdc-button--primary');
+      this.cssClass('mdc-textfield');
     }
   ]
 });
