@@ -17,8 +17,8 @@
 
 foam.CLASS({
   package: 'foam.u2.mcw',
-  name: 'Button',
-  extends: 'foam.u2.ActionView',
+  name: 'TextField',
+  extends: 'foam.u2.TextField',
 
   properties: [
     {
