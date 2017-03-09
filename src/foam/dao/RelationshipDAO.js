@@ -44,21 +44,21 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-        var key = this.relationship[this.forward ? 'targetDAOKey' : ' sourceDAOKey']; 
+        var key = this.relationship[this.forward ? 'targetDAOKey' : ' sourceDAOKey'];
         var delegate = this.__context__[key];
 
         foam.assert(delegate, 'Missing relationship DAO:', key);
-        
+
         return delegate;
       }
     }
   ],
 
   methods: [
-    function put(obj, sink) {
+    function put(obj) {
       this.relationship.adaptTarget(this.obj, obj, this.forward);
 
-      return this.SUPER(obj, sink);
+      return this.SUPER(obj);
     },
 
     function clone() {
@@ -67,4 +67,3 @@ foam.CLASS({
     }
   ]
 });
-
