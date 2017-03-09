@@ -18,18 +18,32 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOControllerView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
 
   requires: [
     'foam.comics.DAOController'
   ],
 
+  properties: [
+    'data',
+    'of',
+    {
+      name: 'controller',
+      factory: function() {
+        return this.DAOController.create({
+          of$: this.of$,
+          data$: this.data$
+        });
+      }
+    }
+  ],
+
   methods: [
     function initE() {
-      this.add(
-        this.DAOController.PREDICATE,
-        this.DAOController.FILTERED_DAO
-      );
+      this.startContext({ data: this.controller }).
+        add(this.DAOController.FILTERED_DAO,
+            this.DAOController.CREATE).
+        endContext();
     }
   ]
 });

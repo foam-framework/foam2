@@ -33,7 +33,7 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      view: 'foam.u2.view.RecipricalSearch'
+      hidden: true
     },
     {
       name: 'filteredDAO',
@@ -54,8 +54,9 @@ foam.CLASS({
       name: 'create',
       code: function() {
         this.stack.push({
-          class: 'foam.comics.DAOCreateController',
-          of: this.of
+          class: 'foam.comics.DAOCreateControllerView',
+          of: this.of,
+          data: this.data
         });
       }
     }
