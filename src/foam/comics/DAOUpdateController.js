@@ -11,7 +11,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'key',
+      name: 'data',
       hidden: true
     },
     {
@@ -19,7 +19,7 @@ foam.CLASS({
       name: 'of'
     },
     {
-      name: 'data',
+      name: 'obj',
       view: 'foam.u2.DetailView'
     },
     {
@@ -38,10 +38,11 @@ foam.CLASS({
   methods: [
     function init() {
       var self = this;
-      this.dao.find(this.key).then(function(obj) {
-        self.data = obj.clone();
+      this.dao.find(this.data).then(function(obj) {
+        self.obj = obj.clone();
       }, function(e) {
-        debugger;
+        // TODO: Handle this better.
+        self.status = 'Failed to load record. ' + e.message;
       });
     }
   ],
@@ -49,16 +50,16 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
-      isEnabled: function(data) { return data != null; },
+      isEnabled: function(obj) { return obj != null; },
       code: function() {
         var self = this;
         this.status = 'Saving...';
         var self = this;
-        this.dao.put(this.data.clone()).then(function() {
+        this.dao.put(this.obj.clone()).then(function() {
           self.status = 'Saved';
           self.stack.back();
         }, function(e) {
-          self.error = "Error saving record: " + e.toString();
+          self.status = "Error saving record: " + e.toString();
         });
       }
     }
