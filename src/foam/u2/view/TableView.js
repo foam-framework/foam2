@@ -101,20 +101,20 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      factory: function() {
+        return this.data && this.data.of;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data',
-      postSet: function(_, data) {
-        if ( ! this.of ) this.of = data.of;
-      }
+      name: 'data'
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'orderedDAO',
       expression: function(data, order) {
-        return data.orderBy(order);
+        return data ? data.orderBy(order) : foam.dao.NullDAO.create();
       }
     },
     {
