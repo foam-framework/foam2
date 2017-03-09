@@ -40,9 +40,7 @@ foam.CLASS({
       name: 'baseURL',
       documentation: 'URL for most rest calls. Some calls add "/<some-info>".',
       final: true,
-      factory: function() {
-        throw new Error('RestDAO requires "baseURL"');
-      }
+      required: true
     }
   ],
 
@@ -107,6 +105,8 @@ foam.CLASS({
     },
 
     function createRequest_(o) {
+      // Demand that required properties are set before using DAO.
+      this.validate();
       // Each request should default to a json responseType.
       return this.HTTPRequest.create(Object.assign({responseType: 'json'}, o));
     },
