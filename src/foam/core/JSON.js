@@ -439,6 +439,8 @@ foam.CLASS({
         Object: function(o) {
           var ret = {};
           for ( var key in o ) {
+            // NOTE: Could lazily construct "ret" first time
+            // this.objectify(o[key]) !== o[key].
             if ( o.hasOwnProperty(key) ) ret[key] = this.objectify(o[key]);
           }
           return ret;
