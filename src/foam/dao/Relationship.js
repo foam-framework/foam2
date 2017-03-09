@@ -93,13 +93,11 @@ foam.CLASS({
       name: 'oneWay'
     },
     {
-      class: 'FObjectProperty',
-      of: 'Property',
+      class: 'Map',
       name: 'sourceProperty'
     },
     {
-      class: 'FObjectProperty',
-      of: 'Property',
+      class: 'Map',
       name: 'targetProperty'
     },
     /* FUTURE:
