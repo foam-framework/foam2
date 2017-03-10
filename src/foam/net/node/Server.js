@@ -33,10 +33,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'server',
-      documentation: 'The Node JS HTTP Server object.'
-    },
-    {
       class: 'FObjectArray',
       of: 'foam.net.node.Handler',
       name: 'handlers'
@@ -47,16 +43,40 @@ foam.CLASS({
       value: 8000
     },
     {
+      name: 'server',
+      documentation: 'The Node JS HTTP Server object.',
+      value: null
+    },
+    {
       name: 'http',
       factory: function() { return require('http'); }
     }
   ],
   methods: [
-    function execute() {
+    function start() {
+      if ( this.server ) return Promise.resolve(this.server);
+
       this.server = this.http.createServer(this.onRequest);
-      this.server.listen(this.port);
-      this.info(
-        this.handlers.length + ' handlers listening on port ' + this.port);
+
+      var self = this;
+      return new Promise(function(resolve, reject) {
+        self.server.listen(self.port, function() {
+        self.info(
+          self.handlers.length + ' handlers listening on port ' + self.port);
+          resolve(self.server);
+        });
+      });
+    },
+    function shutdown() {
+      if ( ! this.server ) return Promise.resolve(null);
+
+      var self = this;
+      return new Promise(function(resolve, reject) {
+        self.server.close(function() {
+          self.server = null;
+          resolve(null);
+        });
+      });
     },
     function addHandler(handler) {
       // TODO(adamvy): Not wild about this design, consider a better model for handling
