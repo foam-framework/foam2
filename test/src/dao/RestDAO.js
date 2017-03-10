@@ -47,6 +47,7 @@ describe('RestDAO', function() {
           if ( this.method === 'PUT' && this.url === this.baseURL ) {
             // put()
             var obj;
+            var id;
             var payload;
             var skip;
             var limit;
@@ -62,22 +63,30 @@ describe('RestDAO', function() {
             return dao.put(obj).then(function() {
               return createResponse({ status: 200, payload: payload });
             });
-          } else if ( this.method === 'DELETE' && this.url.indexOf(this.baseURL) === 0 ) {
+          } else if ( this.method === 'DELETE' &&
+                      this.url.indexOf(this.baseURL) === 0 ) {
             // remove()
-            var id = JSON.parse(decodeURIComponent(this.url.substr(this.baseURL.length + 1)));
+            id = JSON.parse(decodeURIComponent(this.url.substr(
+              this.baseURL.length + 1)));
             return dao.find(id).then(function(o) {
               payload = jsonify(o);
               return dao.remove(o);
             }).then(function() {
               return createResponse({ status: 200, payload: payload });
             });
-          } else if ( this.method === 'GET' && this.url.indexOf(this.baseURL) === 0 && this.url.charAt(this.baseURL.length) === '/' ) {
+          } else if ( this.method === 'GET' &&
+                      this.url.indexOf(this.baseURL) === 0 &&
+                      this.url.charAt(this.baseURL.length) === '/' ) {
             // find()
-            var id = JSON.parse(decodeURIComponent(this.url.substr(this.baseURL.length + 1)));
+            id = JSON.parse(decodeURIComponent(this.url.substr(
+              this.baseURL.length + 1)));
             return dao.find(id).then(function(o) {
               return createResponse({ status: 200, payload: jsonify(o) });
             });
-          } else if ( this.method === 'GET' && this.url.indexOf(this.baseURL) === 0 && this.url.substring(this.baseURL.length).match(/^:select([?].*)$/) ) {
+          } else if ( this.method === 'GET' &&
+                      this.url.indexOf(this.baseURL) === 0 &&
+                      this.url.substring(this.baseURL.length)
+                          .match(/^:select([?].*)$/) ) {
             // select()
             var data = url.parse(this.url, true).query;
             try {
@@ -85,7 +94,8 @@ describe('RestDAO', function() {
                 // Note: This would use data.hasOwnProperty(key), except that
                 // Node JS ParsedQueryString objects do not descend from
                 // Object.prototype.
-                data[key] = foam.json.parseString(decodeURIComponent(data[key]));
+                data[key] = foam.json.parseString(decodeURIComponent(
+                  data[key]));
               }
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
@@ -94,11 +104,13 @@ describe('RestDAO', function() {
             limit = data.limit;
             order = data.order;
             predicate = data.predicate;
-            return dao.select(undefined, skip, limit, order, predicate).then(function(sink) {
-              var payload = jsonify(sink.a);
-              return createResponse({ status: 200, payload: payload });
-            });
-          } else if ( this.method === 'POST' && this.url === this.baseURL + ':removeAll' ) {
+            return dao.select(undefined, skip, limit, order, predicate)
+              .then(function(sink) {
+                var payload = jsonify(sink.a);
+                return createResponse({ status: 200, payload: payload });
+              });
+          } else if ( this.method === 'POST' &&
+                      this.url === this.baseURL + ':removeAll' ) {
             // removeAll()
             var data;
             try {
@@ -110,9 +122,10 @@ describe('RestDAO', function() {
             limit = data.limit;
             order = data.order;
             predicate = data.predicate;
-            return dao.removeAll(skip, limit, order, predicate).then(function() {
-              return Promise.resolve(createResponse({ status: 200 }));
-            });
+            return dao.removeAll(skip, limit, order, predicate)
+              .then(function() {
+                return Promise.resolve(createResponse({ status: 200 }));
+              });
           }
 
           debugger;
@@ -133,7 +146,9 @@ describe('RestDAO', function() {
       ]
     });
 
-    foam.register(foam.lookup('foam.dao.test.MockRestDAOHttpRequest'), 'foam.net.HTTPRequest');
+    foam.register(
+      foam.lookup('foam.dao.test.MockRestDAOHttpRequest'),
+      'foam.net.HTTPRequest');
   });
 
   global.genericDAOTestBattery(function(of) {
