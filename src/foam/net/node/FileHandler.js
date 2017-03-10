@@ -20,6 +20,11 @@ foam.CLASS({
   name: 'FileHandler',
   extends: 'foam.net.node.Handler',
 
+  imports: [
+    'info',
+    'warn'
+  ],
+
   properties: [
     {
       class: 'String',

@@ -17,7 +17,6 @@
 
 (function() {
   var pkg = 'foam.net.' + (typeof process === 'undefined' ? 'web' : 'node');
-  console.log('PKG:', pkg);
   var clss = [
     'HTTPRequest',
     'HTTPResponse',
@@ -31,7 +30,6 @@
   //
   // TODO: This should be provided via a sort of "ContextFactory" or similar.
   for ( var i = 0; i < clss.length; i++ ) {
-    console.log('Lookup', pkg + '.' + clss[i]);
     foam.register(foam.lookup(pkg + '.' + clss[i]), 'foam.net.' + clss[i]);
   }
 })();
