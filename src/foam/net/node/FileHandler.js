@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'FileHandler',
   extends: 'foam.net.node.Handler',
 
+  documentation: 'HTTP(S) server handler for a single file.',
+
   imports: [
     'info',
     'warn'
