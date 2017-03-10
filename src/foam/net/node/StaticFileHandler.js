@@ -20,6 +20,27 @@ foam.CLASS({
   name: 'StaticFileHandler',
   extends: 'foam.net.node.Handler',
 
+  documentation: `HTTP(S) server handler for an entire directory.
+
+      All files in the directory will be served according to their relative
+      path name.
+
+      E.g.,
+
+      /foo/bar
+      /foo/bar/baz
+      /foo/bar/baz/alpha.html
+      /foo/bar/quz/beta.js
+      /foo/bar/quz/charlie.xyz
+
+     Suppose dir=/foo/bar and urlPath=/frobinator
+
+     This exposes URLs (relative to the server's root):
+
+     /frobinator/baz/alpha.html as an html document
+     /frobinator/quz/beta.js as a client-runnable script
+     /frobinator/quz/charlie.xyz as a document resource`,
+
   imports: [
     'log',
     'info',

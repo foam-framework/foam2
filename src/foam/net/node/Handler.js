@@ -19,11 +19,8 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'Handler',
 
-  documentation:
-  function() {/*
-               Abstract Handler class; handle() returns true if handled,
-               false if the server should keep looking.
-               */},
+  documentation: `Abstract Handler class; handle() returns true if handled,
+      false if the server should keep looking.`,
 
   imports: [
     'warn',

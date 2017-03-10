@@ -19,6 +19,13 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'Server',
 
+  documentation: `An modeled HTTP server implementation.
+
+      The server stores an array of "handlers" for handling
+      requests. Handlers are given the chance to handle requests in the order
+      they appear in the array. The server starts listening on its "port"
+      when start() is invoked. Listening ceases on shutdown().`,
+
   requires: [
     'foam.dao.ArrayDAO',
     'foam.node.handlers.FileHandler',
@@ -79,8 +86,6 @@ foam.CLASS({
       });
     },
     function addHandler(handler) {
-      // TODO(adamvy): Not wild about this design, consider a better model for handling
-      // oauth.
       this.handlers.push(handler);
     },
     function exportDAO(dao, prefix) {
