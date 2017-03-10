@@ -770,13 +770,14 @@ foam.CLASS({
   methods: [
     function f(o) {
       var lhs = this.arg1.f(o);
+      var rhs = this.arg2.f(o);
 
       // If arg2 is a constant array, we use valueSet for it.
-      if ( Array.isArray(this.arg2) ) {
+      if ( foam.mlang.Constant.isInstance(this.arg2) ) {
         if ( ! this.valueSet_ ) {
           var set = {};
-          for ( var i = 0 ; i < this.arg2.length ; i++ ) {
-            var s = this.arg2[i];
+          for ( var i = 0 ; i < rhs.length ; i++ ) {
+            var s = rhs[i];
             if ( this.upperCase_ ) s = s.toUpperCase();
             set[s] = true;
           }
@@ -786,7 +787,6 @@ foam.CLASS({
         return !! this.valueSet_[lhs];
       }
 
-      var rhs = this.arg2.f(o);
       return rhs ? rhs.indexOf(lhs) !== -1 : false;
     }
   ]
@@ -815,19 +815,20 @@ foam.CLASS({
   methods: [
     function f(o) {
       var lhs = this.arg1.f(o).toUpperCase();
+      var rhs = this.arg2.f(o);
+
       // If arg2 is a constant array, we use valueSet for it.
-      if ( Array.isArray(this.arg2) ) {
+      if ( foam.mlang.Constant.isInstance(this.arg2) ) {
         if ( ! this.valueSet_ ) {
           var set = {};
-          for ( var i = 0 ; i < this.arg2.length ; i++ ) {
-            set[this.arg2[i].toUpperCase()] = true;
+          for ( var i = 0 ; i < rhs.length ; i++ ) {
+            set[rhs[i].toUpperCase()] = true;
           }
           this.valueSet_ = set;
         }
 
         return !! this.valueSet_[lhs];
       } else {
-        var rhs = this.arg2.f(o);
         if ( ! rhs ) return false;
         return rhs.toUpperCase().indexOf(lhs) !== -1;
       }
