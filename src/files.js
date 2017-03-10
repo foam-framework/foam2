@@ -195,4 +195,9 @@ FOAM_FILES([
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/DatastoreDAO", flags: ['gcloud'] },
+  { name: "foam/net/node/Handler", flags: ['node'] },
+  { name: "foam/net/node/FileHandler", flags: ['node'] },
+  { name: "foam/net/node/StaticFileHandler", flags: ['node'] },
+  { name: "foam/net/node/RestDAOHandler", flags: ['node'] },
+  { name: "foam/net/node/Server", flags: ['node'] }
 ]);

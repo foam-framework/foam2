@@ -21,8 +21,14 @@ foam.CLASS({
 
   requires: [
     'foam.dao.ArrayDAO',
+    'foam.node.handlers.FileHandler',
     'foam.node.handlers.RestDAOHandler',
     'foam.node.handlers.StaticFileHandler'
+  ],
+
+  imports: [
+    'info',
+    'log'
   ],
 
   properties: [
@@ -49,6 +55,8 @@ foam.CLASS({
     function execute() {
       this.server = this.http.createServer(this.onRequest);
       this.server.listen(this.port);
+      this.info(
+        this.handlers.length + ' handlers listening on port ' + this.port);
     },
     function addHandler(handler) {
       // TODO(adamvy): Not wild about this design, consider a better model for handling

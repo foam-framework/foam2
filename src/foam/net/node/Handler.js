@@ -41,6 +41,7 @@ foam.CLASS({
       res.end();
     },
     function sendJSON(res, status, json) {
+      res.setHeader('Content-type', 'application/json');
       this.send(res, status, JSON.stringify(json));
     },
     function send404(req, res) {

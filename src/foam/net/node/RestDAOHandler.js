@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'RestDAOHandler',
+  extends: 'foam.net.node.Handler',
 
   imports: [
     'info',
@@ -27,7 +28,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'prefix',
+      name: 'urlPath',
       documentation: 'URL path prefix.',
       required: true
     },
@@ -36,12 +37,6 @@ foam.CLASS({
       name: 'dao',
       transient: true,
       required: true
-    },
-    {
-      class: 'Int',
-      name: 'suffixOffset',
-      documentation: 'Offset to prefix + 1.',
-      factory: function() { return this.prefix.length + 1; }
     }
   ],
 
@@ -49,10 +44,10 @@ foam.CLASS({
     function handle(req, res) {
       // Check the URL for the prefix.
       var target = req.url;
-      if ( target.indexOf(this.prefix) !== 0 ) return false;
+      if ( target.indexOf(this.urlPath) !== 0 ) return false;
 
       // Look past prefix.
-      target = target.substring(this.prefix.length);
+      target = target.substring(this.urlPath.length);
       // Any suffix should be "/"-separated from prefix. Otherwise, it's not
       // really a match.
       if ( target.length > 0 && target.indexOf('/') !== 0 ) return false;
@@ -75,8 +70,8 @@ foam.CLASS({
         self.getPayload_(req).then(function(o) {
           return self.dao.put(o);
         }).then(function(o) {
-          self.send(res, 201, self.jsonify_(o));
-          self.info('200 OK: put() ' + target + ' ' + o.id);
+          self.sendJSON(res, 200, self.o2fo_(o));
+          self.info('200 OK: put() ' + o.id);
         }).catch(send500);
       } else if ( req.method === 'DELETE' ) {
         try {
@@ -87,10 +82,10 @@ foam.CLASS({
         }
 
         self.dao.find(id).then(function(o) {
-          payload = self.jsonify_(o);
+          payload = self.o2fo_(o);
           return self.dao.remove(o);
         }).then(function() {
-          self.send(res, 200, payload);
+          self.sendJSON(res, 200, payload);
           self.info('200 OK: remove() ' + id);
         }).catch(send500);
       } else if ( req.method === 'GET' ) {
@@ -104,7 +99,7 @@ foam.CLASS({
           }
 
           self.dao.find(id).then(function(o) {
-            self.send(res, 200, self.jsonify_(o));
+            self.sendJSON(res, 200, self.o2fo_(o));
             self.info('200 OK: find() ' + id);
           }).catch(send500);
         } else {
@@ -116,7 +111,7 @@ foam.CLASS({
             var predicate = data.predicate;
             return self.dao.select(undefined, skip, limit, order, predicate);
           }).then(function(sink) {
-            self.send(res, 200, self.jsonify_(sink.a));
+            self.sendJSON(res, 200, self.o2fo_(sink.a));
             self.info('200 OK: select() ' + sink.a.length);
           }).catch(send500);
         }
@@ -135,7 +130,7 @@ foam.CLASS({
           var predicate = data.predicate;
           return self.dao.select(undefined, skip, limit, order, predicate);
         }).then(function(sink) {
-          self.send(res, 200, '');
+          self.sendJSON(res, 200, '');
           self.info('200 OK: removeAll() ' + sink.a.length);
         }).catch(send500);
       } else {
@@ -145,17 +140,33 @@ foam.CLASS({
 
       return true;
     },
-    function jsonify_(o) {
-      return JSON.stringify(foam.json.Network.objectify(o));
+    {
+      name: 'fo2o_',
+      documentation: "Transform FOAM object to JSON.stringify'able object.",
+      code: function(o) {
+        return foam.json.Network.objectify(o);
+      }
+    },
+    {
+      name: 'jsonStr2fo_',
+      documentation: "Transform JSON string to FOAM object.",
+      code: function(str) {
+        return foam.json.parse(JSON.parse(str));
+      }
     },
     function getPayload_(req) {
       return new Promise(function(resolve, reject) {
         var payload = '';
+        var self = this;
         req.on('data', function (chunk) {
           payload += chunk;
         });
         req.on('end', function () {
-          resolve(foam.json.parseString(payload));
+          try {
+            resolve(self.jsonStr2fo_(payload));
+          } catch (error) {
+            reject(error);
+          }
         });
       });
     }
