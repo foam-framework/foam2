@@ -81,11 +81,19 @@ foam.CLASS({
        *
        * Each key's value is network-foam-jsonified.
        */
+      var query = [];
+      if ( typeof skip !== 'undefined' )
+        query.push('skip=' + encodeURIComponent(this.jsonify_(skip)));
+      if ( typeof limit !== 'undefined' )
+        query.push('limit=' + encodeURIComponent(this.jsonify_(limit)));
+      if ( typeof order !== 'undefined' )
+        query.push('order=' + encodeURIComponent(this.jsonify_(order)));
+      if ( typeof predicate !== 'undefined' )
+        query.push('predicate=' + encodeURIComponent(this.jsonify_(predicate)));
+
       return this.createRequest_({
         method: 'GET',
-        url: this.baseURL,
-        payload: this.prepareSelectRemoveAllPayload_(
-          skip, limit, order, predicate)
+        url: this.baseURL + ':select?' + query.join('&')
       }).send().then(
         this.onSelectResponse.bind(this, sink || this.ArraySink.create()));
     },
@@ -96,11 +104,15 @@ foam.CLASS({
        *
        * Each key's value is network-foam-jsonified.
        */
+      var payload = {};
+      if ( typeof skip !== 'undefined' ) payload.skip = skip;
+      if ( typeof limit !== 'undefined' ) payload.limit = limit;
+      if ( typeof order !== 'undefined' ) payload.order = order;
+      if ( typeof predicate !== 'undefined' ) payload.predicate = predicate;
       return this.createRequest_({
         method: 'POST',
-        url: this.baseURL + '/removeAll',
-        payload: this.prepareSelectRemoveAllPayload_(
-          skip, limit, order, predicate)
+        url: this.baseURL + ':removeAll',
+        payload: this.jsonify_(payload)
       }).send().then(this.onRemoveAllResponse);
     },
 
@@ -115,15 +127,6 @@ foam.CLASS({
       // Construct JSON-like object using foam's network strategy, then
       // construct well-formed JSON from the object.
       return JSON.stringify(foam.json.Network.objectify(o));
-    },
-    function prepareSelectRemoveAllPayload_(skip, limit, order, predicate) {
-      // Include only specified select/removeAll directives.
-      var payload = {};
-      if ( typeof skip !== 'undefined' ) payload.skip = skip;
-      if ( typeof limit !== 'undefined' ) payload.limit = limit;
-      if ( typeof order !== 'undefined' ) payload.order = order;
-      if ( typeof predicate !== 'undefined' ) payload.predicate = predicate;
-      return this.jsonify_(payload);
     }
   ],
 
