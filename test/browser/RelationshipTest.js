@@ -135,3 +135,59 @@ foam.RELATIONSHIP({
 
 foam.u2.DetailView.create({data: com.acme.Parent1.create()}).write();
 foam.u2.DetailView.create({data: com.acme.Child1.create()}).write();
+
+
+foam.CLASS({
+  name: 'A',
+  ids: [ 'name' ],
+  properties: [ 'name' ]
+});
+foam.CLASS({
+  name: 'B',
+  ids: [ 'name' ],
+  properties: [ 'name' ]
+});
+
+var r = foam.RELATIONSHIP({
+  sourceModel: 'A',
+  targetModel: 'B',
+  forwardName: 'bs',
+  inverseName: 'as',
+  cardinality: '*:*'
+});
+
+foam.CLASS({
+  name: 'ManyToManyTest',
+  requires: [ 'A', 'B' ],
+
+  exports: [
+    'aDAO',
+    'bDAO'
+  ],
+
+  properties: [
+    {
+      name: 'aDAO',
+      factory: function() { return foam.dao.MDAO.create({of: 'A'}); }
+    },
+    {
+      name: 'bDAO',
+      factory: function() { return foam.dao.MDAO.create({of: 'B'}); }
+    }
+  ],
+
+  methods: [
+    function init() {
+
+      this.aDAO.put(this.A.create({name: 'Chrome'}));
+      this.aDAO.put(this.A.create({name: 'Firefox'}));
+      this.aDAO.put(this.A.create({name: 'IE'}));
+
+      this.bDAO.put(this.B.create({name: 'I1'}));
+      this.bDAO.put(this.B.create({name: 'I2'}));
+      this.bDAO.put(this.B.create({name: 'I3'}));
+    }
+  ]
+});
+
+ManyToManyTest.create();
