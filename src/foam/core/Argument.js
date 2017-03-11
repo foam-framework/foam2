@@ -140,11 +140,12 @@ foam.LIB({
         var commentMatcher = /.*(\@arg|\@param|\@return)\s+(?:\{(\.\.\.)?([\w._$\[\]]+)(\=)?\}\s+)?(.*?)\s+(?:([^\@]*))?/g;
         var commentMatch;
         while ( commentMatch = commentMatcher.exec(comment) ) {
-          var name = commentMatch[5];
+          var name     = commentMatch[5];
           var optional = commentMatch[4] === '=';
-          var repeats = commentMatch[2] === '...';
-          var type = commentMatch[3];
-          var docs = commentMatch[6] && commentMatch[6].trim();
+          var repeats  = commentMatch[2] === '...';
+          var type     = commentMatch[3];
+          var docs     = commentMatch[6] && commentMatch[6].trim();
+
           if ( commentMatch[1] === '@return' ) {
             if ( ret.returnType ) {
               throw new SyntaxError(
@@ -152,6 +153,7 @@ foam.LIB({
                   'definition in block comment: \"' +
                   type + '\" from \:\n' + fn.toString());
             }
+
             ret.returnType = foam.core.Argument.create({
               name: 'ReturnValue',
               optional: optional,
@@ -169,11 +171,12 @@ foam.LIB({
                     'definition in block comment: \"' +
                     name + '\" from:\n' + fn.toString());
               }
-              retMapByName[name].typeName = type;
-              retMapByName[name].optional = optional;
-              retMapByName[name].repeats = repeats;
+
+              retMapByName[name].typeName      = type;
+              retMapByName[name].optional      = optional;
+              retMapByName[name].repeats       = repeats;
               retMapByName[name].documentation = docs;
-              retMapByName[name].type = this.resolveTypeString(type);
+              retMapByName[name].type          = this.resolveTypeString(type);
             } else {
               var arg = foam.core.Argument.create({
                 name:          name,
@@ -195,6 +198,7 @@ foam.LIB({
       for ( var i = 0; i < ret.length; i++ ) {
         if ( ! ret[i].typeName ) missingTypes.push(ret[i].name);
       }
+
       if ( missingTypes.length ) {
         //(this.warn || console.warn)('Missing type(s) for ' +
         //  missingTypes.join(', ') + ' in:\n' + fn.toString());
@@ -206,10 +210,11 @@ foam.LIB({
 });
 
 
-/** Describes one argument of a function or method. */
 foam.CLASS({
   package: 'foam.core',
   name: 'Argument',
+
+  documentation: 'Describes one argument of a function or method.',
 
   properties: [
     {
@@ -284,6 +289,7 @@ foam.CLASS({
               ', expected type ' + this.typeName + ' but passed ' + gotType);
         }
       };
+
       validate.isTypeChecked__ = true; // avoid type checking this method
       return validate;
     })()
