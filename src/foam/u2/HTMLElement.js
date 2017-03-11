@@ -35,8 +35,8 @@ foam.CLASS({
 
   properties: [
     {
-class: 'Proxy',
-of: 'foam.u2.DefaultValidator',
+      class: 'Proxy',
+      of: 'foam.u2.DefaultValidator',
       name: 'validator',
       value: foam.u2.HTMLValidator.create()
     }
