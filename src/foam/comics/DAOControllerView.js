@@ -20,6 +20,14 @@ foam.CLASS({
   name: 'DAOControllerView',
   extends: 'foam.u2.Element',
 
+  imports: [
+    'stack'
+  ],
+
+  exports: [
+    'editRecord'
+  ],
+
   requires: [
     'foam.comics.DAOController'
   ],
@@ -39,6 +47,13 @@ foam.CLASS({
   ],
 
   methods: [
+    function editRecord(obj) {
+      this.stack.push({
+        class: 'foam.comics.DAOUpdateControllerView',
+        of: this.of,
+        data: obj.id
+      });
+    },
     function initE() {
       this.startContext({ data: this.controller }).
         add(this.DAOController.FILTERED_DAO,
