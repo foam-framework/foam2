@@ -16,7 +16,7 @@
  */
 
 /**
-  Topics delcare the types of events that an object pubes.
+  Topics delcare the types of events that an object publishes.
 <pre>
   Ex.
   foam.CLASS({
