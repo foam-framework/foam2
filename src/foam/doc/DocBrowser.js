@@ -229,7 +229,7 @@ foam.CLASS({
         if ( cls === foam.core.FObject ) break;
       }
       this.br();
-      this.add(data.model_.documentation);
+      this.start(foam.u2.HTMLElement).add(data.model_.documentation).end();
 
       this.add(this.slot(function (showInherited) {
         // TODO: hide 'Source Class' column if showInherited is false
