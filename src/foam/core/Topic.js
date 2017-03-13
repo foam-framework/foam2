@@ -15,27 +15,28 @@
  * limitations under the License.
  */
 
-/**
-  Topics delcare the types of events that an object pubes.
-<pre>
-  Ex.
-  foam.CLASS({
-    name: 'Alarm',
-    topics: [ 'ring' ]
-  });
-
-  then doing:
-  alarm.ring.pub();
-  alarm.ring.sub(l);
-
-  is the same as:
-  alarm.pub('ring');
-  alarm.sub('ring', l);
-</pre>
-*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Topic',
+
+  documentation: `
+  Topics delcare the types of events that an object publishes.
+  <pre>
+    Ex.
+    foam.CLASS({
+      name: 'Alarm',
+      topics: [ 'ring' ]
+    });
+
+    then doing:
+    alarm.ring.pub();
+    alarm.ring.sub(l);
+
+    is the same as:
+    alarm.pub('ring');
+    alarm.sub('ring', l);
+  </pre>
+  `,
 
   properties: [
     'name',

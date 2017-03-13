@@ -25,7 +25,7 @@ foam.CLASS({
   properties: [
     {
       name: 'peer_',
-      factory: function() { return new mdc.formField.MDCFormField(this.el()); }
+      factory: function() { return new mdc.textfield.MDCTextfield(this.el()); }
     },
     'prop'
   ],
@@ -34,28 +34,22 @@ foam.CLASS({
     function initE() {
       var prop = this.prop;
 
-      var id = this.NEXT_ID();
+      this.nodeName = 'label';
 
       this.
-        cssClass('mdc-form-field').
-        start('div').
-          cssClass('mdc-textfield').
-          start('input'/*prop*/, {id: id}).cssClass('mdc-textfield__input').end().
-          end().
-          start('label').
-            cssClass('mdc-textfield__label').
-            attrs({for: id}).
-            add(prop.label).
-          end().
+        cssClass('mdc-textfield').
+        style({display: 'block'}).
+        start('input'/*prop*/).cssClass('mdc-textfield__input').end().
+        start('span').
+          cssClass('mdc-textfield__label').
+          add(prop.label).
         end();
     },
 
     function load() {
       this.SUPER();
       this.peer_.foundation_.init();
-    },
-
-
+    }
   ]
 });
 
