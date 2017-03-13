@@ -268,11 +268,9 @@ foam.CLASS({
     },
 
     function adaptTarget(source, target, forward) {
-      if ( forward ) {
-        target[this.inverseName] = source.id;
-      } else {
-        source[this.forwardName] = target.id;
-      }
+      target[forward ? this.inverseName : this.forwardName] = source.id;
+
+      return target;
     }
   ]
 });
