@@ -156,6 +156,8 @@ var r = foam.RELATIONSHIP({
   cardinality: '*:*'
 });
 
+ABJunction.describe();
+
 foam.CLASS({
   name: 'ManyToManyTest',
   requires: [ 'A', 'B' ],
