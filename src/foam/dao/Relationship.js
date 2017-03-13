@@ -122,11 +122,6 @@ foam.CLASS({
       var inverseName  = this.inverseName;
       var relationship = this;
 
-      if ( this.cardinality === '*:*' ) {
-
-        return;
-      }
-
       if ( ! sourceProps.length ) {
         if ( cardinality[1] === '*' ) {
           sourceProps = [
@@ -182,6 +177,45 @@ foam.CLASS({
             }).copyFrom(this.targetProperty)
           ];
         }
+      }
+
+      if ( this.cardinality === '*:*' ) {
+        var name   = this.sourceModel.name + this.targetModel.name + 'Junction';
+        var jModel = this.lookup(this.sourceModel.package ? this.sourceModel.package + '.' + name : name);
+
+        if ( ! jModel ) {
+          var sProps = sourceProps.map(function(p) { return 's' + p; });
+          var tProps = targetProps.map(function(p) { return 't' + p; });
+          var pops   = sProps.concat(tProps);
+
+          jModel = foam.CLASS({
+            package: this.sourceModel.package,
+            name: name,
+            ids: props,
+            properties: props
+          });
+        }
+
+        foam.RELATIONSHIP({
+          sourceModel: this.sourceModel,
+          targetModel: jModel,
+          forwardName: this.forwardName,
+          inverseName: 'left',
+          sourceDAOKey: this.sourceDAOKey,
+          targetDAOKey: this.junctionDAOKey
+        });
+
+        // reverse
+        foam.RELATIONSHIP({
+          sourceModel: this.targetModel,
+          targetModel: this.jModel,
+          forwardName: this.inverseName,
+          inverseName: 'right',
+          sourceDAOKey: this.targetDAOKey,
+          targetDAOKey: this.junctionDAOKey
+        });
+
+        return;
       }
 
       foam.assert(
