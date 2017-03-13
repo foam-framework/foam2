@@ -50,11 +50,10 @@ foam.CLASS({
     'forwardName',
     'inverseName',
     {
-      // TODO: Support many to many relationships (cardinality of '*:*')
       name: 'cardinality',
       assertValue: function(value) {
-        foam.assert(value == '1:1' || value == '1:*' || value == '*:1',
-          'Current supported cardinalities are 1:1 1:* and *:1');
+        foam.assert(value === '1:1' || value === '1:*' || value === '*:1' || value === '*:*',
+          'Current supported cardinalities are 1:1 1:* *:1 and *:*');
       },
       value: '1:*'
     },
@@ -69,6 +68,10 @@ foam.CLASS({
     },
     {
       name: 'targetModel'
+    },
+    {
+      name: 'junctionModel',
+      factory: function() { return this.sourceModel + this.targetModel + 'Junction'; }
     },
     {
       name: 'targetDAOKey',
@@ -174,6 +177,45 @@ foam.CLASS({
             }).copyFrom(this.targetProperty)
           ];
         }
+      }
+
+      if ( this.cardinality === '*:*' ) {
+        var name   = this.sourceModel.name + this.targetModel.name + 'Junction';
+        var jModel = this.lookup(this.sourceModel.package ? this.sourceModel.package + '.' + name : name);
+
+        if ( ! jModel ) {
+          var sProps = sourceProps.map(function(p) { return 's' + p; });
+          var tProps = targetProps.map(function(p) { return 't' + p; });
+          var pops   = sProps.concat(tProps);
+
+          jModel = foam.CLASS({
+            package: this.sourceModel.package,
+            name: name,
+            ids: props,
+            properties: props
+          });
+        }
+
+        foam.RELATIONSHIP({
+          sourceModel: this.sourceModel,
+          targetModel: jModel,
+          forwardName: this.forwardName,
+          inverseName: 'left',
+          sourceDAOKey: this.sourceDAOKey,
+          targetDAOKey: this.junctionDAOKey
+        });
+
+        // reverse
+        foam.RELATIONSHIP({
+          sourceModel: this.targetModel,
+          targetModel: this.jModel,
+          forwardName: this.inverseName,
+          inverseName: 'right',
+          sourceDAOKey: this.targetDAOKey,
+          targetDAOKey: this.junctionDAOKey
+        });
+
+        return;
       }
 
       foam.assert(

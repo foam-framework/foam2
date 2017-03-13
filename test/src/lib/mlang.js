@@ -619,7 +619,7 @@ describe('MLang', function() {
     // probably don't want to change it anywhere except mlangs.
     it('toString()s nicely', function() {
       expect(IN(test.mlang.Person.NAME, ['Jimi Hendrix', 'Mark Knopfler']).toString()).toBe(
-          'IN(name, Jimi Hendrix,Mark Knopfler)');
+          'IN(name, ["Jimi Hendrix", "Mark Knopfler"])');
     });
   });
 
