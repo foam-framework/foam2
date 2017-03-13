@@ -1,4 +1,4 @@
-  /**
+/**
  * @license
  * Copyright 2017 Google Inc. All Rights Reserved.
  *
@@ -20,14 +20,13 @@ foam.CLASS({
   name: 'RestDAO',
   extends: 'foam.dao.AbstractDAO',
 
-  documentation:
-  function() {/*
-               A client-side DAO for interacting with a REST endpoint.
+  documentation: function() {/*
+    A client-side DAO for interacting with a REST endpoint.
 
-               Sinks are managed on the client (i.e., sinks passed to
-               select() will not serialize the sink and send it to the
-               endpoint for server-side logic implementation).
-               */},
+    Sinks are managed on the client (i.e., sinks passed to
+    select() will not serialize the sink and send it to the
+    endpoint for server-side logic implementation).
+  */},
 
   requires: [
     'foam.dao.ArraySink',
@@ -56,6 +55,7 @@ foam.CLASS({
         payload: this.jsonify_(o)
       }).send().then(this.onPutResponse);
     },
+
     function remove(o) {
       /**
        * DELETE baseURL/<network-foam-jsonified FOAM object id>
@@ -65,6 +65,7 @@ foam.CLASS({
         url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(o.id))
       }).send().then(this.onRemoveResponse);
     },
+
     function find(id) {
       /**
        * GET baseURL/<network-foam-jsonified FOAM object id>
@@ -74,6 +75,7 @@ foam.CLASS({
         url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(id))
       }).send().then(this.onFindResponse);
     },
+
     function select(sink, skip, limit, order, predicate) {
       /**
        * GET baseURL
@@ -97,6 +99,7 @@ foam.CLASS({
       }).send().then(
         this.onSelectResponse.bind(this, sink || this.ArraySink.create()));
     },
+
     function removeAll(skip, limit, order, predicate) {
       /**
        * POST baseURL/removeAll
@@ -122,6 +125,7 @@ foam.CLASS({
       // Each request should default to a json responseType.
       return this.HTTPRequest.create(Object.assign({responseType: 'json'}, o));
     },
+
     function jsonify_(o) {
       // What's meant by network-foam-jsonified for HTTP/JSON/REST APIs:
       // Construct JSON-like object using foam's network strategy, then
@@ -145,16 +149,19 @@ foam.CLASS({
       this.pub('on', 'put', o);
       return o;
     },
+
     function onRemoveResponse(response) {
       this.onResponse('remove', response);
       var o = foam.json.parse(response.payload);
       if ( o !== null ) this.pub('on', 'remove', o);
       return o;
     },
+
     function onFindResponse(response) {
       this.onResponse('find', response);
       return foam.json.parse(response.payload);
     },
+
     function onSelectResponse(sink, response) {
       this.onResponse('select', response);
       var results = foam.json.parse(response.payload);
@@ -164,6 +171,7 @@ foam.CLASS({
       sink.eof();
       return sink;
     },
+
     function onRemoveAllResponse(response) {
       this.onResponse('removeAll', response);
       return undefined;
