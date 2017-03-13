@@ -184,6 +184,7 @@ FOAM_FILES([
   { name: "foam/comics/DAOCreateControllerView", flags: ['web'] },
   { name: "foam/comics/DAOController" },
   { name: "foam/comics/DAOControllerView", flags: ['web'] },
+  { name: "foam/comics/InlineDAOControllerView", flags: ['web'] },
   { name: "foam/comics/DAOUpdateController" },
   { name: "foam/comics/DAOUpdateControllerView", flags: ['web'] },
   { name: "foam/u2/view/RecipricalSearch", flags: ['web'] },
