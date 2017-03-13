@@ -33,7 +33,13 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      hidden: true
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.RecipricalSearch',
+          of: X.data.of
+        };
+      }
+//      hidden: true
     },
     {
       name: 'filteredDAO',
