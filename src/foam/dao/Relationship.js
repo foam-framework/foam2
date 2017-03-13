@@ -50,11 +50,10 @@ foam.CLASS({
     'forwardName',
     'inverseName',
     {
-      // TODO: Support many to many relationships (cardinality of '*:*')
       name: 'cardinality',
       assertValue: function(value) {
-        foam.assert(value == '1:1' || value == '1:*' || value == '*:1',
-          'Current supported cardinalities are 1:1 1:* and *:1');
+        foam.assert(value === '1:1' || value === '1:*' || value === '*:1' || value === '*:*',
+          'Current supported cardinalities are 1:1 1:* *:1 and *:*');
       },
       value: '1:*'
     },
@@ -69,6 +68,10 @@ foam.CLASS({
     },
     {
       name: 'targetModel'
+    },
+    {
+      name: 'junctionModel',
+      factory: function() { return this.sourceModel + this.targetModel + 'Junction'; }
     },
     {
       name: 'targetDAOKey',
@@ -116,6 +119,11 @@ foam.CLASS({
       var forwardName  = this.forwardName;
       var inverseName  = this.inverseName;
       var relationship = this;
+
+      if ( this.cardinality === '*:*' ) {
+
+        return;
+      }
 
       if ( ! sourceProps.length ) {
         if ( cardinality[1] === '*' ) {

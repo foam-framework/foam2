@@ -9,6 +9,7 @@
       href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
     <script src="../../../foam.js"></script>
     <script src="Button.js"></script>
+    <script src="TextField.js"></script>
     <script src="DetailPropertyView.js"></script>
   </head>
   <body>
@@ -44,11 +45,13 @@
    </form>
 
    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-   <script>/*window.addEventListener('load', function() { window.mdc.autoInit(); });*/</script>
+   <script>window.addEventListener('load', function() { window.mdc.autoInit(); });</script>
 
 <form>
    <script>
+//     foam.__context__.register(foam.u2.mcw.TextField, 'foam.u2.TextField');
      foam.__context__.register(foam.u2.mcw.DetailPropertyView, 'foam.u2.DetailPropertyView');
+     foam.__context__.register(foam.u2.mcw.Button, 'foam.u2.ActionView');
      foam.u2.DetailView.create({data: foam.util.Timer.create(), showActions: true}).write();
    </script>
 </form>

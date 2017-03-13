@@ -115,6 +115,7 @@ FOAM_FILES([
   { name: "foam/dao/TimingDAO" },
   { name: "foam/dao/LoggingDAO" },
   { name: "foam/dao/IDBDAO", flags: ['web'] },
+  { name: "foam/dao/RestDAO" },
   { name: "foam/dao/SQL", flags: ['sql'] },
   { name: "foam/parse/QueryParser" },
   { name: "foam/physics/Physical" },

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,30 @@
  * limitations under the License.
  */
 
+// Start of HTML View, not yet tested or added to files.js
+// TODO: Should be a textarea in edit mode and validated HTML in
+// display mode
+
 foam.CLASS({
   package: 'foam.u2',
-  name: 'TextField',
-  extends: 'foam.u2.tag.Input',
+  name: 'HTMLView',
+//  extends: 'foam.u2.tag.TextArea',
+  extends: 'foam.u2.HTMLElement',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^:read-only { border-width: 0; }
-      */}
-    })
-  ],
+  documentation: 'View for safely displaying HTML content.',
 
   properties: [
     {
-      class: 'Int',
-      name: 'displayWidth'
-    },
-    'type'
+      name: 'data',
+      attribute: true
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
 
-      if ( this.type         ) this.setAttribute('type', this.type);
-      if ( this.displayWidth ) this.setAttribute('size', this.displayWidth);
-    },
-
-    function fromProperty(prop) {
-      this.SUPER(prop);
-
-      if ( ! this.displayWidth ) {
-        this.displayWidth = prop.displayWidth;
-      }
-
-      if ( prop.visibility ) {
-        this.visibility = prop.visibility;
-      }
+      this.add(this.data$);
     }
   ]
 });
