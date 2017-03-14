@@ -415,7 +415,7 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    ['factory', function() { return {} }],
+    [ 'factory', function() { return {} } ],
     'of'
   ]
 });
@@ -434,9 +434,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) {
-        return of + 'DAO';
-      }
+      expression: function(of) { return of + 'DAO'; }
     },
     {
       name: 'adapt',
@@ -448,6 +446,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',
