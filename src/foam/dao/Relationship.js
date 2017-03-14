@@ -201,10 +201,6 @@ foam.CLASS({
         var jModel = foam.lookup(id, true);
 
         if ( ! jModel ) {
-          // var sProps = sourceProps.map(function(p) { return 's_' + p; });
-          // var tProps = targetProps.map(function(p) { return 't_' + p; });
-          // var props  = sProps.concat(tProps);
-
           foam.CLASS({
             package: source.package,
             name: name,
@@ -219,8 +215,7 @@ foam.CLASS({
           sourceModel: this.sourceModel,
           targetModel: id,
           forwardName: this.forwardName,
-          inverseName: 'source',
-          targetProps: [ 'sourceId' ],
+          inverseName: 'sourceId',
           sourceDAOKey: this.sourceDAOKey,
           targetDAOKey: this.junctionDAOKey
         });
@@ -230,8 +225,7 @@ foam.CLASS({
           sourceModel: this.targetModel,
           targetModel: id,
           forwardName: this.inverseName,
-          inverseName: 'target',
-          targetProps: [ 'targetId' ],
+          inverseName: 'targetId',
           sourceDAOKey: this.targetDAOKey,
           targetDAOKey: this.junctionDAOKey
         });
