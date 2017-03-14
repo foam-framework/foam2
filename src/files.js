@@ -199,5 +199,9 @@ FOAM_FILES([
   { name: "foam/net/node/FileHandler", flags: ['node'] },
   { name: "foam/net/node/StaticFileHandler", flags: ['node'] },
   { name: "foam/net/node/RestDAOHandler", flags: ['node'] },
-  { name: "foam/net/node/Server", flags: ['node'] }
+  { name: "foam/net/node/Server", flags: ['node'] },
+  { name: "foam/classloader/ClassLoader", flags: ['debug'] },
+  { name: "foam/classloader/OrDAO", flags: ['debug'] },
+  { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
+  { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] }
 ]);
