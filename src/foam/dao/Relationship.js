@@ -217,7 +217,16 @@ foam.CLASS({
           forwardName: this.forwardName,
           inverseName: 'sourceId',
           sourceDAOKey: this.sourceDAOKey,
-          targetDAOKey: this.junctionDAOKey
+          targetDAOKey: this.junctionDAOKey,
+          adaptTarget: function(s, t) {
+            if ( target.isInstance(t) ) {
+              t = jModel.create(t);
+            }
+
+            t.sourceId = s.id;
+
+            return t;
+          }
         });
 
         // reverse
@@ -227,7 +236,16 @@ foam.CLASS({
           forwardName: this.inverseName,
           inverseName: 'targetId',
           sourceDAOKey: this.targetDAOKey,
-          targetDAOKey: this.junctionDAOKey
+          targetDAOKey: this.junctionDAOKey,
+          adaptTarget: function(s, t) {
+            if ( source.isInstance(t) ) {
+              t = jModel.create(t);
+            }
+
+            t.targetId = s.id;
+
+            return t;
+          }
         });
       }
 
