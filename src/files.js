@@ -195,4 +195,8 @@ FOAM_FILES([
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/DatastoreDAO", flags: ['gcloud'] },
+  { name: "foam/classloader/ClassLoader", flags: ['debug'] },
+  { name: "foam/classloader/OrDAO", flags: ['debug'] },
+  { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
+  { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
 ]);
