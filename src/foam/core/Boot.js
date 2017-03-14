@@ -192,28 +192,49 @@ foam.LIB({
       /* Creates a Foam class from a plain-old-object definition.
           @method CLASS
           @memberof module:foam */
-      foam.CLASS = function(m) {
-        var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
-        var model = cls.create(m);
-        model.validate();
-        var cls = model.buildClass();
+      foam.CLASS = function(clsDef) {
+        var classOfModel = clsDef.class ?
+            foam.lookup(clsDef.class) : foam.core.Model;
+        var modelOfClass = classOfModel.create(clsDef);
+        modelOfClass.validate();
+        var cls = modelOfClass.buildClass();
         cls.validate();
 
-        if ( ! m.refines ) {
+        if ( ! clsDef.refines ) {
+          // Register class in global context.
           foam.register(cls);
 
           // Register the class in the global package path.
           foam.package.registerClass(cls);
+        } else if ( clsDef.name ) {
+          // Register refinement id in global context.
+          foam.register(cls, ( clsDef.package || 'foam.core' ) + '.' +
+              clsDef.name);
         }
+        // TODO(markdittmer): Identify and name anonymous refinements with:
+        // else {
+        //   console.warn('Refinement without unique id', clsDef);
+        //   debugger;
+        // }
 
         return cls;
       };
 
       // Upgrade existing classes to real classes.
       for ( var key in foam.core ) {
-        var m = foam.lookup(key).model_;
-        m.refines = m.id;
-        foam.CLASS(m);
+        var clsDef = foam.lookup(key).model_;
+
+        // classModel.buildClass() expects 'refines' if we are upgrading an
+        // existing class.
+        clsDef.refines = clsDef.id;
+
+        // Same as phase2()'s foam.CLASS() above, except skip registration.
+        var classOfModel = clsDef.class ?
+            foam.lookup(clsDef.class) : foam.core.Model;
+        var modelOfClass = classOfModel.create(clsDef);
+        modelOfClass.validate();
+        var cls = modelOfClass.buildClass();
+        cls.validate();
       }
     },
 
