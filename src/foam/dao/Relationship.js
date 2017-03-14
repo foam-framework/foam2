@@ -179,28 +179,38 @@ foam.CLASS({
         }
       }
 
+      var source = this.lookup(this.sourceModel);
+      var target = this.lookup(this.targetModel);
+
+      foam.assert(source, 'Unknown sourceModel: ', this.sourceModel);
+      foam.assert(target, 'Unknown targetModel: ', this.targetModel);
+
       if ( this.cardinality === '*:*' ) {
-        var name   = this.sourceModel.name + this.targetModel.name + 'Junction';
-        var jModel = this.lookup(this.sourceModel.package ? this.sourceModel.package + '.' + name : name);
+        var name   = source.name + target.name + 'Junction';
+        var id     = source.package ? source.package + '.' + name : name;
+        var jModel = foam.lookup(id, true);
 
         if ( ! jModel ) {
-          var sProps = sourceProps.map(function(p) { return 's' + p; });
-          var tProps = targetProps.map(function(p) { return 't' + p; });
-          var pops   = sProps.concat(tProps);
+          // var sProps = sourceProps.map(function(p) { return 's_' + p; });
+          // var tProps = targetProps.map(function(p) { return 't_' + p; });
+          // var props  = sProps.concat(tProps);
 
-          jModel = foam.CLASS({
-            package: this.sourceModel.package,
+          foam.CLASS({
+            package: source.package,
             name: name,
-            ids: props,
-            properties: props
+            ids: [ 'sourceId', 'targetId' ],
+            properties: [ 'sourceId', 'targetId' ]
           });
+
+          jModel = foam.lookup(id);
         }
 
         foam.RELATIONSHIP({
           sourceModel: this.sourceModel,
-          targetModel: jModel,
+          targetModel: id,
           forwardName: this.forwardName,
-          inverseName: 'left',
+          inverseName: 'source',
+          targetProps: [ 'sourceId' ],
           sourceDAOKey: this.sourceDAOKey,
           targetDAOKey: this.junctionDAOKey
         });
@@ -208,9 +218,10 @@ foam.CLASS({
         // reverse
         foam.RELATIONSHIP({
           sourceModel: this.targetModel,
-          targetModel: this.jModel,
+          targetModel: id,
           forwardName: this.inverseName,
-          inverseName: 'right',
+          inverseName: 'target',
+          targetProps: [ 'targetId' ],
           sourceDAOKey: this.targetDAOKey,
           targetDAOKey: this.junctionDAOKey
         });
@@ -221,12 +232,6 @@ foam.CLASS({
       foam.assert(
           sourceProps.length === targetProps.length,
           'Relationship source/target property list length mismatch.');
-
-      var source = this.lookup(this.sourceModel);
-      var target = this.lookup(this.targetModel);
-
-      foam.assert(source, 'Unknown sourceModel: ', this.sourceModel);
-      foam.assert(target, 'Unknown targetModel: ', this.targetModel);
 
       for ( var i = 0 ; i < sourceProps.length ; i++ ) {
         var sp = sourceProps[i];
@@ -263,11 +268,9 @@ foam.CLASS({
     },
 
     function adaptTarget(source, target, forward) {
-      if ( forward ) {
-        target[this.inverseName] = source.id;
-      } else {
-        source[this.forwardName] = target.id;
-      }
+      target[forward ? this.inverseName : this.forwardName] = source.id;
+
+      return target;
     }
   ]
 });

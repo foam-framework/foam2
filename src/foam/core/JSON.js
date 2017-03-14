@@ -561,7 +561,7 @@ foam.LIB({
     },
 
     function objectify(o) {
-      return foam.json.Compact.objectify(o)
+      return foam.json.Compact.objectify(o);
     }
   ]
 });
