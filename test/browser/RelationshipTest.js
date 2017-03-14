@@ -164,7 +164,8 @@ foam.CLASS({
 
   exports: [
     'aDAO',
-    'bDAO'
+    'bDAO',
+    'ABJunctionDAO as aBJunctionDAO' // TODO: naming is wrong
   ],
 
   properties: [
@@ -175,19 +176,33 @@ foam.CLASS({
     {
       name: 'bDAO',
       factory: function() { return foam.dao.MDAO.create({of: 'B'}); }
+    },
+    {
+      name: 'ABJunctionDAO',
+      factory: function() { return foam.dao.MDAO.create({of: 'ABJunction'}); }
     }
   ],
 
   methods: [
     function init() {
 
-      this.aDAO.put(this.A.create({name: 'Chrome'}));
-      this.aDAO.put(this.A.create({name: 'Firefox'}));
-      this.aDAO.put(this.A.create({name: 'IE'}));
+      var b1, b2, b3, i1, i2, i3;
+      this.aDAO.put(b1 = this.A.create({name: 'Chrome'}));
+      this.aDAO.put(b2 = this.A.create({name: 'Firefox'}));
+      this.aDAO.put(b3 = this.A.create({name: 'IE'}));
 
-      this.bDAO.put(this.B.create({name: 'I1'}));
-      this.bDAO.put(this.B.create({name: 'I2'}));
-      this.bDAO.put(this.B.create({name: 'I3'}));
+      this.bDAO.put(i1 = this.B.create({name: 'I1'}));
+      this.bDAO.put(i2 = this.B.create({name: 'I2'}));
+      this.bDAO.put(i3 = this.B.create({name: 'I3'}));
+
+      b1.bs.put(i1);
+      b2.bs.put(i2);
+
+      b3.bs.put(i1);
+      b3.bs.put(i2);
+      b3.bs.put(i3);
+
+      this.ABJunctionDAO.select({put: function(o) { console.log('***: ', o.sourceId, o.targetId); }});
     }
   ]
 });
