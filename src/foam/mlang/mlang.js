@@ -1168,6 +1168,8 @@ foam.CLASS({
 
   documentation: 'Sink which behaves like the SQL group-by command.',
 
+  // TODO: it makes no sense to name the arguments arg1 and arg2
+  // because this isn't an expression, so they should be more meaningful
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -1574,12 +1576,16 @@ foam.CLASS({
   documentation: 'Convenience mix-in for requiring all mlangs.',
 
   requires: [
+    'foam.mlang.Constant',
+    'foam.mlang.expr.Dot',
+    'foam.mlang.expr.Mul',
+    'foam.mlang.order.Desc',
+    'foam.mlang.order.ThenBy',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
-    'foam.mlang.predicate.StartsWith',
-    'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.Func',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
     'foam.mlang.predicate.Has',
@@ -1590,17 +1596,14 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
-    'foam.mlang.predicate.Func',
-    'foam.mlang.expr.Mul',
-    'foam.mlang.expr.Dot',
-    'foam.mlang.Constant',
+    'foam.mlang.predicate.StartsWith',
+    'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.sink.Count',
-    'foam.mlang.sink.Max',
-    'foam.mlang.sink.Sum',
-    'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc',
-    'foam.mlang.order.ThenBy'
+    'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Map',
+    'foam.mlang.sink.Max',
+    'foam.mlang.sink.Sum'
   ],
 
   methods: [
@@ -1636,6 +1639,7 @@ foam.CLASS({
     function DOT(a, b) { return this._binary_("Dot", a, b); },
     function MUL(a, b) { return this._binary_("Mul", a, b); },
 
+    function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
