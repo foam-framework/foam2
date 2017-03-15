@@ -23,6 +23,14 @@ foam.CLASS({
   properties: [
     {
       name: 'classpath'
+    },
+    {
+      name: 'loadedModels',
+      documentation: `Retain a copy of loaded models in case they are requested
+        later. This can happen, for example, if a modl is loaded twice in
+        different contexts. Subsequent require() calls will not re-invoke
+        foam.CLASS(), hence the model loaded the first time must be retained.`,
+      value: {}
     }
   ],
 
@@ -30,13 +38,25 @@ foam.CLASS({
     function find(id) {
       var foamCLASS = foam.CLASS;
       var self = this;
-      var model;
+      var model = this.loadedModels[id] || null;
 
-      foam.CLASS = function(m) {
-        var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-        model = cls.create(m, self);
-        foam.CLASS = foamCLASS;
-      }
+      if ( model ) return Promise.resolve(model);
+
+      foam.CLASS = function(clsDef) {
+        var classOfModel = clsDef.class ? foam.lookup(clsDef.class) :
+              foam.core.Model;
+        var modelOfClass = classOfModel.create(clsDef, self);
+        if ( modelOfClass.id === id ) {
+          model = modelOfClass;
+        } else {
+          // TODO(markdittmer): We should do something more reasonable here, but
+          // the DAO API only allows us to deliver one model in response to
+          // find().
+          console.warn(
+            'Class', id, 'created via arequire, but never built or registered');
+        }
+        self.loadedModels[modelOfClass.id] = modelOfClass;
+      };
 
       var sep = require('path').sep;
       var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
