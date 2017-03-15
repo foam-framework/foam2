@@ -256,11 +256,10 @@ foam.CLASS({
   name: 'UnloadedElementState',
   extends: 'foam.u2.ElementState',
 
-  documentation: 'Initial state of a newly created Element.',
+  documentation: 'State of an unloaded Element.',
 
   methods: [
     function output(out) {
-      this.initE();
       this.state = this.OUTPUT;
       this.output_(out);
       return out;
@@ -272,6 +271,23 @@ foam.CLASS({
       this.error('Must output and load before unloading.');
     },
     function toString() { return 'UNLOADED'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'InitialElementState',
+  extends: 'foam.u2.UnloadedElementState',
+
+  documentation: 'Initial state of a newly created Element.',
+
+  methods: [
+    function output(out) {
+      this.initE();
+      return this.SUPER(out);
+    },
+    function toString() { return 'INITIAL'; }
   ]
 });
 
@@ -501,10 +517,12 @@ foam.CLASS({
     // A Loaded Element should be visible in the DOM.
     LOADED: foam.u2.LoadedElementState.create(),
 
-    // State of an Element before it has been added to the DOM, or after it has
-    // been removed from the DOM.
-    // An unloaded Element can be (re-)added to the DOM.
+    // State of an Element after it has been removed from the DOM.
+    // An unloaded Element can be readded to the DOM.
     UNLOADED: foam.u2.UnloadedElementState.create(),
+
+    // Initial state of an Element before it has been added to the DOM.
+    INITIAL: foam.u2.InitialElementState.create(),
 
     // ???: Add DESTROYED State?
 
@@ -586,14 +604,11 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      factory: function() { return this.UNLOADED; },
+      factory: function() { return this.INITIAL; },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED && oldState ) {
-          // When state is first set from the factory oldState will be undefined
-          // but we don't want to publish that we're unloaded since we haven't
-          // actually been loaded yet.
+        } else if ( state === this.UNLOADED ) {
           this.pub('onunload');
         }
       }
