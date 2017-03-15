@@ -17,7 +17,7 @@
 
 (function() {
 
-  var isServer = typeof process === 'object';
+  var isServer = typeof window === 'undefined';
   var isWorker = typeof importScripts !== 'undefined';
 
   var flags = this.FOAM_FLAGS || {};
