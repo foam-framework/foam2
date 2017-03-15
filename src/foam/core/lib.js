@@ -19,7 +19,7 @@
  * Top-Level of foam package
  */
 foam = {
-  isServer: typeof process === 'object',
+  isServer: typeof window === 'undefined',
   core:     {},
   next$UID: (function() {
     /* Return a unique id. */
@@ -30,7 +30,7 @@ foam = {
 
 
 /** Setup nodejs-like 'global' on web */
-if ( ! foam.isServer ) global = this;
+if ( ! foam.isServer ) global = window;
 
 
 Object.defineProperty(
