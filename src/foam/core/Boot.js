@@ -214,7 +214,7 @@ foam.LIB({
           foam.package.registerClass(cls);
         } else if ( m.name ) {
           // Register refinement id in global context.
-          foam.register(cls, ( cls.package || 'foam.core' ) + '.' + m.name);
+          foam.register(cls, ( m.package || 'foam.core' ) + '.' + m.name);
         }
         // TODO(markdittmer): Identify and name anonymous refinements with:
         // else {
