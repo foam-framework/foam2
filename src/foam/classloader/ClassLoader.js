@@ -82,7 +82,6 @@ foam.CLASS({
 
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
         this.pending[modelId] = modelDao.find(modelId).then(function(m) {
-          modelId;
           return m.arequire(deps).then(function() {
             m.validate();
             return m;
