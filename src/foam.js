@@ -25,6 +25,7 @@
   flags.node = isServer;
   flags.loader = ! isServer;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
+  if ( flags.web || flags.node ) flags.js = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
