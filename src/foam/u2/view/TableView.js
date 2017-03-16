@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
 
   refines: 'foam.core.Property',
