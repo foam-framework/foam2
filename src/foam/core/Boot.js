@@ -195,7 +195,7 @@ foam.LIB({
           (3) Construct and validate the new class.
           @method CLASS
           @memberof module:foam */
-      foam.CLASS = function(m) {
+      foam.CLASS = function(m, skipRegistration) {
         var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
         var model = cls.create(m);
         model.validate();
