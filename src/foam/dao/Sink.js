@@ -220,7 +220,7 @@ foam.CLASS({
     },
     {
       name: 'remove',
-      code:     function remove(obj, fc) {
+      code: function remove(obj, fc) {
         if ( this.predicate.f(obj) ) this.delegate.remove(obj, fc);
       }
     }
