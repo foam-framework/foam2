@@ -22,6 +22,10 @@ foam.CLASS({
 
   documentation: 'An Axiom for defining Relationships between models.',
 
+  requires: [
+    'foam.dao.RelationshipDAO'
+  ],
+
   properties: [
     {
       name: 'id',
@@ -160,7 +164,7 @@ foam.CLASS({
               getter: function() {
                 return this.instance_[forwardName] ?
                   this.instance_[forwardName] :
-                  this.instance_[forwardName] = foam.dao.RelationshipDAO.create({
+                  this.instance_[forwardName] = relationship.RelationshipDAO.create({
                     obj: this,
                     relationship: relationship
                   }, this)
@@ -211,6 +215,7 @@ foam.CLASS({
           jModel = foam.lookup(id);
         }
 
+        // forward
         foam.RELATIONSHIP({
           sourceModel: this.sourceModel,
           targetModel: id,
@@ -229,7 +234,7 @@ foam.CLASS({
           }
         });
 
-        // reverse
+        // inverse
         foam.RELATIONSHIP({
           sourceModel: this.targetModel,
           targetModel: id,
@@ -276,8 +281,8 @@ foam.CLASS({
 foam.LIB({
   name: 'foam',
   methods: [
-    function RELATIONSHIP(m) {
-      var r = foam.dao.Relationship.create(m);
+    function RELATIONSHIP(m, opt_ctx) {
+      var r = foam.dao.Relationship.create(m, opt_ctx);
 
       r.validate && r.validate();
       foam.package.registerClass(r);
