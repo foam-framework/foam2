@@ -42,6 +42,8 @@ foam.CLASS({
   name: 'ManyToManyRelationshipDAO',
   extends: 'foam.dao.RelationshipDAO',
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   documentation: 'Adapts a DAO based on a *:* Relationship.',
 
   properties: [
@@ -59,9 +61,8 @@ foam.CLASS({
       var joinDAO = this.__context__[this.joinDAOKey];
 
       return new Promise(function(resolve, reject) {
-        this.SUPER(this.MAP(this.junctionProperty)).then(function(array) {
-          console.log(array.a);
-          resolve(self.joinDAO/*.where()*/.select(sink));
+        self.SUPER(self.MAP(self.junctionProperty)).then(function(array) {
+          resolve(joinDAO.select(sink));
         });
       });
       /*
