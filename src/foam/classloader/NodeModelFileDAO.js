@@ -21,33 +21,25 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   properties: [
-    {
-      name: 'classpath'
-    },
-    {
-      name: 'loadedModels',
-      documentation: `Retain a copy of loaded models in case they are requested
-        later. This can happen, for example, if a modl is loaded twice in
-        different contexts. Subsequent require() calls will not re-invoke
-        foam.CLASS(), hence the model loaded the first time must be retained.`,
-      value: {}
-    }
+    { class: 'String', name: 'classpath' },
+
+    { name: 'sep', factory: function() { return require('path').sep; } },
+    { name: 'fs',  factory: function() { return require('fs');       } },
+    { name: 'vm',  factory: function() { return require('vm');       } }
   ],
 
   methods: [
     function find(id) {
       var foamCLASS = foam.CLASS;
       var self = this;
-      var model = this.loadedModels[id] || null;
+      var model = null;
 
-      if ( model ) return Promise.resolve(model);
-
-      foam.CLASS = function(clsDef) {
-        var classOfModel = clsDef.class ? foam.lookup(clsDef.class) :
+      foam.CLASS = function(m) {
+        var cls = m.class ? foam.lookup(m.class) :
               foam.core.Model;
-        var modelOfClass = classOfModel.create(clsDef, self);
-        if ( modelOfClass.id === id ) {
-          model = modelOfClass;
+        var mdl = cls.create(m, self);
+        if ( mdl.id === id ) {
+          model = mdl;
         } else {
           // TODO(markdittmer): We should do something more reasonable here, but
           // the DAO API only allows us to deliver one model in response to
@@ -55,22 +47,25 @@ foam.CLASS({
           console.warn(
             'Class', id, 'created via arequire, but never built or registered');
         }
-        self.loadedModels[modelOfClass.id] = modelOfClass;
       };
 
-      var sep = require('path').sep;
-      var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
+      var path = this.classpath + this.sep + id.replace(/\./g, this.sep) +
+            '.js';
+      return new Promise(function(resolve, reject) {
+        self.fs.readFile(path, 'utf8', function(error, data) {
+          if ( error ) {
+            console.warn('Unable to load at ' + path + '. Error: ' +
+                         error.message + '\n' + error.stack);
+            foam.CLASS = foamCLASS;
+            resolve(null);
+          }
 
-      try {
-        require(path);
-      } catch(e) {
-        console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
-        return Promise.resolve(null);
-      } finally {
-        foam.CLASS = foamCLASS;
-      }
+          self.vm.runInThisContext(data.toString(), {filename: path});
 
-      return Promise.resolve(model);
+          foam.CLASS = foamCLASS;
+          resolve(model);
+        });
+      });
     }
   ]
 });
