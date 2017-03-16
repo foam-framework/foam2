@@ -192,13 +192,15 @@ foam.LIB({
       /* Creates a Foam class from a plain-old-object definition.
           @method CLASS
           @memberof module:foam */
-      foam.CLASS = function(clsDef) {
+      foam.CLASS = function(clsDef, skipRegistration) {
         var classOfModel = clsDef.class ?
             foam.lookup(clsDef.class) : foam.core.Model;
         var modelOfClass = classOfModel.create(clsDef);
         modelOfClass.validate();
         var cls = modelOfClass.buildClass();
         cls.validate();
+
+        if ( skipRegistration ) return cls;
 
         if ( ! clsDef.refines ) {
           // Register class in global context.
@@ -228,13 +230,7 @@ foam.LIB({
         // existing class.
         clsDef.refines = clsDef.id;
 
-        // Same as phase2()'s foam.CLASS() above, except skip registration.
-        var classOfModel = clsDef.class ?
-            foam.lookup(clsDef.class) : foam.core.Model;
-        var modelOfClass = classOfModel.create(clsDef);
-        modelOfClass.validate();
-        var cls = modelOfClass.buildClass();
-        cls.validate();
+        foam.CLASS(clsDef, true);
       }
     },
 
