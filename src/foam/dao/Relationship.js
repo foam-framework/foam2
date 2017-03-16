@@ -132,6 +132,15 @@ foam.CLASS({
       of: 'Property',
       name: 'targetProperty'
     },
+    {
+      name: 'relationshipDAOFactory',
+      value: function(source) {
+        return this.RelationshipDAO.create({
+          obj: source,
+          relationship: this
+        }, source);
+      }
+    }
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -162,12 +171,7 @@ foam.CLASS({
               transient: true,
               setter: function() {},
               getter: function() {
-                return this.instance_[forwardName] ?
-                  this.instance_[forwardName] :
-                  this.instance_[forwardName] = relationship.RelationshipDAO.create({
-                    obj: this,
-                    relationship: relationship
-                  }, this)
+                return this.instance_[forwardName] || ( this.instance_[forwardName] = relationship.relationshipDAOFactory(this) );
               }
             }).copyFrom(this.sourceProperty)
           ];
@@ -215,8 +219,6 @@ foam.CLASS({
           jModel = foam.lookup(id);
         }
 
-        this.__subContext__.register(foam.dao.ManyToManyRelationshipDAO, 'foam.dao.RelationshipDAO');
-
         // forward
         foam.RELATIONSHIP({
           sourceModel: this.sourceModel,
@@ -225,9 +227,18 @@ foam.CLASS({
           inverseName: 'sourceId',
           sourceDAOKey: this.sourceDAOKey,
           targetDAOKey: this.junctionDAOKey,
+          relationshipDAOFactory: function(source) {
+            return foam.dao.ManyToManyRelationshipDAO.create({
+              obj: source,
+              relationship: this,
+              joinDAOKey: relationship.targetDAOKey,
+              junctionProperty: jModel.TARGET_ID,
+              targetProperty: target.ID
+            }, source);
+          },
           adaptTarget: function(s, t) {
             if ( target.isInstance(t) ) {
-              t = jModel.create(t);
+              t = jModel.create({targetId: t.id});
             }
 
             t.sourceId = s.id;
@@ -244,9 +255,18 @@ foam.CLASS({
           inverseName: 'targetId',
           sourceDAOKey: this.targetDAOKey,
           targetDAOKey: this.junctionDAOKey,
+          relationshipDAOFactory: function(source) {
+            return foam.dao.ManyToManyRelationshipDAO.create({
+              obj: source,
+              relationship: this,
+              joinDAOKey: relationship.sourceDAOKey,
+              junctionProperty: jModel.SOURCE_ID,
+              targetProperty: target.ID
+            }, source);
+          },
           adaptTarget: function(s, t) {
             if ( source.isInstance(t) ) {
-              t = jModel.create(t);
+              t = jModel.create({sourceId: t.id});
             }
 
             t.targetId = s.id;

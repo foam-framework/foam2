@@ -200,7 +200,9 @@ foam.CLASS({
 
       b3.bs.put(i1);
       b3.bs.put(i2);
-      b3.bs.put(i3);
+
+      // Or, go the other way:
+      i3.as.put(b3);
 
       this.ABJunctionDAO.select({put: function(o) { console.log('***: ', o.sourceId, o.targetId); }});
     }
