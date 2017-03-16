@@ -215,6 +215,8 @@ foam.CLASS({
           jModel = foam.lookup(id);
         }
 
+        this.__subContext__.register(foam.dao.ManyToManyRelationshipDAO, 'foam.dao.RelationshipDAO');
+
         // forward
         foam.RELATIONSHIP({
           sourceModel: this.sourceModel,
@@ -232,7 +234,7 @@ foam.CLASS({
 
             return t;
           }
-        });
+        }, this.__subContext__);
 
         // inverse
         foam.RELATIONSHIP({
@@ -251,7 +253,7 @@ foam.CLASS({
 
             return t;
           }
-        });
+        }, this.__subContext__);
       }
 
       /*

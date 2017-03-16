@@ -104,6 +104,7 @@ FOAM_FILES([
   { name: "foam/dao/JournalDAO" },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
+  { name: "foam/dao/ManyToManyRelationshipDAO" },
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/CachingDAO" },
   { name: "foam/dao/DeDupDAO" },
