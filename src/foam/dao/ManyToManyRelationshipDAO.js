@@ -17,14 +17,62 @@
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'JoinedSink',
+  extends: 'foam.dao.ProxySink',
+
+  methods: [
+    {
+      name: 'put',
+      code: function put(obj, fc) {
+        return this.dao.find(this.property.f(obj)).then(function() {
+          debugger
+        });
+      }
+    },
+    {
+      name: 'remove',
+      code: function remove(obj, fc) {
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
   name: 'ManyToManyRelationshipDAO',
   extends: 'foam.dao.RelationshipDAO',
 
   documentation: 'Adapts a DAO based on a *:* Relationship.',
 
+  properties: [
+    'junctionProperty',
+    'joinDAOKey',
+    'targetProperty'
+  ],
+
   methods: [/*
     function put(obj, sink) {
       return this.SUPER(this.relationship.adaptTarget(this.obj, obj), sink);
-    }*/
+      }*/
+    function select(sink, skip, limit, order, predicate) {
+      var self    = this;
+      var joinDAO = this.__context__[this.joinDAOKey];
+
+      return new Promise(function(resolve, reject) {
+        this.SUPER(this.MAP(this.junctionProperty)).then(function(array) {
+          console.log(array.a);
+          resolve(self.joinDAO/*.where()*/.select(sink));
+        });
+      });
+      /*
+      var joinSink = this.JoinedSink.create({dao: , property: this.property});
+
+      if ( predicate ) {
+        joinSink = this.PredicatedSink.create({predicate: predicate, delgate: joinSink});
+      }
+
+      this.delegate.select(joinSink, skip, limit, order, this.predicate)
+*/
+    }
   ]
 });
