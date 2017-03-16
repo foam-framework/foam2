@@ -71,7 +71,8 @@ foam.CLASS({
     {
       class: 'Proxy',
       of: 'foam.dao.Sink',
-      name: 'delegate'
+      name: 'delegate',
+      factory: function() { return foam.dao.ArraySink.create(); }
     }
   ]
 });
