@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
