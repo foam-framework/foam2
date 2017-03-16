@@ -52,12 +52,12 @@ foam.CLASS({
         var model;
         var foamCLASS = foam.CLASS;
 
-        foam.CLASS = function(clsDef) {
-          var classOfModel = clsDef.class ? foam.lookup(clsDef.class) :
+        foam.CLASS = function(m) {
+          var cls = m.class ? foam.lookup(m.class) :
                 foam.core.Model;
-          var modelOfClass = classOfModel.create(clsDef, self);
-          if ( modelOfClass.id === id ) {
-            model = modelOfClass;
+          var mdl = cls.create(m, self);
+          if ( mdl.id === id ) {
+            model = mdl;
           } else {
             // TODO(markdittmer): We should do something more reasonable here, but
             // the DAO API only allows us to deliver one model in response to
