@@ -204,7 +204,13 @@ foam.CLASS({
       // Or, go the other way:
       i3.as.put(b3);
 
-      this.ABJunctionDAO.select({put: function(o) { console.log('***: ', o.sourceId, o.targetId); }});
+      this.ABJunctionDAO.select({
+        put: function(o) { console.log('***: ', o.sourceId, o.targetId); },
+        eof: function() {}
+      });
+
+      b3.bs.select({put: function(i) { console.log(i.id); }});
+      i3.as.select({put: function(i) { console.log(i.id); }});
     }
   ]
 });
