@@ -189,26 +189,30 @@ foam.LIB({
     /** Start second phase of bootstrap process. */
     function phase2() {
       // Upgrade to final CLASS() definition.
-      /* Creates a Foam class from a plain-old-object definition.
+      /* Creates a Foam class from a plain-old-object definition:
+          (1) Determine the class of model for the new class's model;
+          (2) Construct and validate the new class's model;
+          (3) Construct and validate the new class.
           @method CLASS
           @memberof module:foam */
-      foam.CLASS = function(clsDef, skipRegistration) {
-        var classOfModel = clsDef.class ?
-            foam.lookup(clsDef.class) : foam.core.Model;
-        var modelOfClass = classOfModel.create(clsDef);
-        modelOfClass.validate();
-        var cls = modelOfClass.buildClass();
+      foam.CLASS = function(m) {
+        var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
+        var model = cls.create(m);
+        model.validate();
+        // cls was: class-for-model-construction;
+        // cls is: class-constructed-from-model.
+        cls = model.buildClass();
         cls.validate();
 
         if ( skipRegistration ) return cls;
 
-        if ( ! clsDef.refines ) {
+        if ( ! m.refines ) {
           // Register class in global context.
           foam.register(cls);
 
           // Register the class in the global package path.
           foam.package.registerClass(cls);
-        } else if ( clsDef.name ) {
+        } else if ( m.name ) {
           // Register refinement id in global context.
           foam.register(cls, ( clsDef.package || 'foam.core' ) + '.' +
               clsDef.name);
@@ -224,13 +228,13 @@ foam.LIB({
 
       // Upgrade existing classes to real classes.
       for ( var key in foam.core ) {
-        var clsDef = foam.lookup(key).model_;
+        var m = foam.lookup(key).model_;
 
         // classModel.buildClass() expects 'refines' if we are upgrading an
         // existing class.
-        clsDef.refines = clsDef.id;
+        m.refines = m.id;
 
-        foam.CLASS(clsDef, true);
+        foam.CLASS(m, true);
       }
     },
 
