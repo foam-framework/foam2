@@ -214,12 +214,11 @@ foam.LIB({
           foam.package.registerClass(cls);
         } else if ( m.name ) {
           // Register refinement id in global context.
-          foam.register(cls, ( clsDef.package || 'foam.core' ) + '.' +
-              clsDef.name);
+          foam.register(cls, ( cls.package || 'foam.core' ) + '.' + m.name);
         }
         // TODO(markdittmer): Identify and name anonymous refinements with:
         // else {
-        //   console.warn('Refinement without unique id', clsDef);
+        //   console.warn('Refinement without unique id', cls);
         //   debugger;
         // }
 
