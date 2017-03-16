@@ -28,9 +28,9 @@ foam.CLASS({
 
   requires: [
     'foam.dao.ArrayDAO',
-    'foam.node.handlers.FileHandler',
-    'foam.node.handlers.RestDAOHandler',
-    'foam.node.handlers.StaticFileHandler'
+    'foam.net.node.FileHandler',
+    'foam.net.node.RestDAOHandler',
+    'foam.net.node.StaticFileHandler'
   ],
 
   imports: [
