@@ -82,6 +82,8 @@ foam.CLASS({
 
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
         this.pending[modelId] = modelDao.find(modelId).then(function(m) {
+          // Model validation may make use of deps. Require them first, then
+          // validate the model.
           return m.arequire(deps).then(function() {
             m.validate();
             return m;
