@@ -49,13 +49,16 @@ foam.CLASS({
       return req.send().then(function(payload) {
         return payload.resp.text();
       }).then(function(js) {
-        var model;
+        // Return null if model not found.
+        var model = null;
         var foamCLASS = foam.CLASS;
 
         foam.CLASS = function(m) {
           var cls = m.class ? foam.lookup(m.class) :
                 foam.core.Model;
           var mdl = cls.create(m, self);
+          // Loaded file may contain multiple CLASS calls. Only return this
+          // model if its id matches the requested id.
           if ( mdl.id === id ) {
             model = mdl;
           } else {
