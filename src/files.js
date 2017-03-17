@@ -127,7 +127,7 @@ FOAM_FILES([
   { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
-  { name: "lib/web/net" },
+  { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
   { name: "lib/messageport", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/firebase" },
@@ -190,7 +190,7 @@ FOAM_FILES([
   { name: "foam/u2/view/RecipricalSearch", flags: ['web'] },
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
-  { name: "lib/net", flags: ['js'] },
+  { name: "lib/net" },
   { name: "foam/doc/DocBrowser", flags: ['debug'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
