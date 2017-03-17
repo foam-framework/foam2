@@ -88,13 +88,13 @@ foam.CLASS({
     function addHandler(handler) {
       this.handlers.push(handler);
     },
-    function exportDAO(dao, prefix) {
+    function exportDAO(dao, urlPath) {
       this.addHandler(this.RestDAOHandler.create({
         dao: dao,
-        prefix: prefix
+        urlPath: urlPath
       }));
 
-      this.log('Export DAO to ' + prefix);
+      this.log('Export DAO to ' + urlPath);
     },
     function exportFile(urlPath, filePath) {
       this.handlers.push(this.FileHandler.create({
