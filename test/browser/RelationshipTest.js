@@ -162,6 +162,8 @@ foam.CLASS({
   name: 'ManyToManyTest',
   requires: [ 'A', 'B' ],
 
+  implements: [ 'foam.mlang.Expressions' ],
+
   exports: [
     'aDAO',
     'bDAO',
@@ -196,6 +198,8 @@ foam.CLASS({
       this.bDAO.put(i3 = this.B.create({name: 'I3'}));
 
       b1.bs.put(i1);
+      b1.bs.put(i2);
+
       b2.bs.put(i2);
 
       b3.bs.put(i1);
@@ -211,6 +215,38 @@ foam.CLASS({
 
       b3.bs.select({put: function(i) { console.log(i.id); }});
       i3.as.select({put: function(i) { console.log(i.id); }});
+
+      var b1is, b3i2;
+
+      function intersect(a, b) {
+        var d1 = {}, d2 = {}, ret = [];
+        for (var i = 0 ; i < a.length; i++) d1[a[i]] = true;
+        for (var j = 0 ; j < b.length; j++) d2[b[j]] = true;
+        for (var k in d1) if (d2[k]) ret.push(k);
+        return ret;
+      }
+
+      var self = this;
+
+      function intersectTarget(s1, s2) {
+        return new Promise(function(resolve) {
+          Promise.all([
+            self.ABJunctionDAO
+                .where(self.EQ(ABJunction.SOURCE_ID, s1.id))
+                .select(self.MAP(ABJunction.TARGET_ID)),
+            self.ABJunctionDAO
+                .where(self.EQ(ABJunction.SOURCE_ID, s2.id))
+                .select(self.MAP(ABJunction.TARGET_ID))
+          ]).then(function(ids) {
+            var i1s = ids[0].delegate.a, i2s = ids[1].delegate.a;
+            resolve(intersect(i1s, i2s));
+          });
+        });
+      }
+
+      intersectTarget(b1, b3).then(function(inter) {
+        console.log('intersection: ', inter.join(', '));
+      });
     }
   ]
 });
