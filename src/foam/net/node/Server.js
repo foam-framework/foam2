@@ -59,6 +59,7 @@ foam.CLASS({
       factory: function() { return require('http'); }
     }
   ],
+
   methods: [
     function start() {
       if ( this.server ) return Promise.resolve(this.server);
@@ -74,6 +75,7 @@ foam.CLASS({
         });
       });
     },
+
     function shutdown() {
       if ( ! this.server ) return Promise.resolve(null);
 
@@ -85,9 +87,11 @@ foam.CLASS({
         });
       });
     },
+
     function addHandler(handler) {
       this.handlers.push(handler);
     },
+
     function exportDAO(dao, urlPath) {
       this.addHandler(this.RestDAOHandler.create({
         dao: dao,
@@ -96,6 +100,7 @@ foam.CLASS({
 
       this.log('Export DAO to ' + urlPath);
     },
+
     function exportFile(urlPath, filePath) {
       this.handlers.push(this.FileHandler.create({
         urlPath: urlPath,
@@ -104,6 +109,7 @@ foam.CLASS({
 
       this.log('Export File ' + filePath + ' to ' + urlPath);
     },
+
     function exportDirectory(urlPath, dir) {
       this.handlers.push(
         this.StaticFileHandler.create({
