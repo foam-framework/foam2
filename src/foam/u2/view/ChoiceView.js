@@ -159,7 +159,8 @@ foam.CLASS({
       name: 'view_'
     },
     'feedback_',
-    'defaultValue'
+    'defaultValue',
+    'size'
   ],
 
   methods: [
@@ -177,7 +178,8 @@ foam.CLASS({
         label$: this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
         choices$: this.choices$,
-        placeholder$: this.placeholder$
+        placeholder$: this.placeholder$,
+        size: this.size
       }).end();
     },
 
