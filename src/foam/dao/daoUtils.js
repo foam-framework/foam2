@@ -27,15 +27,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
-      postSet: function(old, nu) {
-        // Only fire a 'reset' when the delegate is actually changing, not being
-        // set for the first time.
-        if ( old ) {
-          this.updateListeners_();
-        }
-      }
-
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ]
     },
     {
       name: 'of',
@@ -44,42 +36,30 @@ foam.CLASS({
       }
     },
     {
-      class: 'Array',
+      class: 'Map',
       name: 'daoListeners_'
     }
   ],
   methods: [
-    function xxlisten(sink, skip, limit, order, predicate) {
-      var sub = this.delegate.listen(sink, skip, limit, order, predicate);
+    function listen(sink, skip, limit, order, predicate) {
+      var innerSub = this.delegate.listen(sink, skip, limit, order, predicate);
+      var args = [sink, skip, limit, order, predicate];
 
-      var mysub = foam.core.FObject.create();
-      mysub.onDetach(sub);
+      var pc = this.sub('propertyChange', 'delegate', function(s, _, _, slot, value) {
+        innerSub.detach();
+        value && value.listen.apply(value, args);
+        if ( slot.getPrev() ) {
+          // If we had an old value, then fire a reset event.
+          sink.reset && sink.reset();
+        }
+      });
 
-      var listener = [sub, mysub, false, [skip, limit, order, predicate]];
+      var sub = foam.core.FObject.create();
 
-      mysub.onDetach(function() { listener[2] = true; });
+      sub.onDetach(pc);
+      sub.onDetach(innerSub);
 
-      this.daoListeners_.push(listener);
-
-      return mysub;
-    },
-    function updateListeners_() {
-      for ( var i = 0, listener ; listener = this.daoListeners_[i] ; i++ ) {
-        if ( listener[2] ) continue;
-
-        var sub = listener[0];
-        var mysub = listener[1];
-        var args = listener[3];
-
-        sub.detach();
-
-        sink.reset();
-        sub = this.delegate.listen.apply(sink, args);
-
-        data[0] = sub;
-
-        mysub.onDetach(sub);
-      }
+      return sub;
     }
   ]
 });
