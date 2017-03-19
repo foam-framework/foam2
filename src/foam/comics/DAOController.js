@@ -39,7 +39,6 @@ foam.CLASS({
           of: X.data.of
         };
       }
-//      hidden: true
     },
     {
       name: 'filteredDAO',
