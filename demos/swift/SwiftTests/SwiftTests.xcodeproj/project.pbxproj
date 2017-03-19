@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		10327A931E7084D0006CB066 /* foam_swift_dao_AbstractDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10327A921E7084D0006CB066 /* foam_swift_dao_AbstractDAO.swift */; };
+		10327A951E70A7A1006CB066 /* foam_swift_dao_ArrayDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10327A941E70A7A1006CB066 /* foam_swift_dao_ArrayDAO.swift */; };
 		1059840E1E5E859A0063941D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840D1E5E859A0063941D /* AppDelegate.swift */; };
 		105984101E5E859A0063941D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840F1E5E859A0063941D /* ViewController.swift */; };
 		105984131E5E859A0063941D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 105984111E5E859A0063941D /* Main.storyboard */; };
@@ -84,6 +86,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		10327A921E7084D0006CB066 /* foam_swift_dao_AbstractDAO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_dao_AbstractDAO.swift; sourceTree = "<group>"; };
+		10327A941E70A7A1006CB066 /* foam_swift_dao_ArrayDAO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_dao_ArrayDAO.swift; sourceTree = "<group>"; };
 		1059840A1E5E859A0063941D /* SwiftTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1059840D1E5E859A0063941D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1059840F1E5E859A0063941D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -230,6 +234,7 @@
 		1059844E1E5F466A0063941D /* gen */ = {
 			isa = PBXGroup;
 			children = (
+				10327A941E70A7A1006CB066 /* foam_swift_dao_ArrayDAO.swift */,
 				10CFAAD41E6DD1FD007F4FD8 /* foam_swift_core_PropertySlot.swift */,
 				10CFAAD51E6DD1FD007F4FD8 /* foam_swift_core_Slot.swift */,
 				10CFAAD61E6DD1FD007F4FD8 /* foam_swift_parse_json_AnyKeyParser.swift */,
@@ -240,6 +245,7 @@
 				10CFAADB1E6DD1FD007F4FD8 /* foam_swift_parse_json_ExprParser.swift */,
 				10CFAADC1E6DD1FD007F4FD8 /* foam_swift_parse_json_FloatParser.swift */,
 				10CFAADD1E6DD1FD007F4FD8 /* foam_swift_parse_json_FObjectArrayParser.swift */,
+				10327A921E7084D0006CB066 /* foam_swift_dao_AbstractDAO.swift */,
 				10CFAADE1E6DD1FD007F4FD8 /* foam_swift_parse_json_FObjectParser_.swift */,
 				10CFAADF1E6DD1FD007F4FD8 /* foam_swift_parse_json_FObjectParser.swift */,
 				10CFAAE01E6DD1FD007F4FD8 /* foam_swift_parse_json_IntParser.swift */,
@@ -439,6 +445,7 @@
 				10CFAB281E6DD1FD007F4FD8 /* foam_swift_parse_parser_Seq1.swift in Sources */,
 				10CFAB2B1E6DD1FD007F4FD8 /* foam_swift_parse_PStream.swift in Sources */,
 				10CFAB151E6DD1FD007F4FD8 /* foam_swift_parse_json_output_Outputter.swift in Sources */,
+				10327A931E7084D0006CB066 /* foam_swift_dao_AbstractDAO.swift in Sources */,
 				10CFAB111E6DD1FD007F4FD8 /* foam_swift_parse_json_KeyParser.swift in Sources */,
 				10CFAB131E6DD1FD007F4FD8 /* foam_swift_parse_json_MapParser.swift in Sources */,
 				10CFAB231E6DD1FD007F4FD8 /* foam_swift_parse_parser_ProxyParser.swift in Sources */,
@@ -456,6 +463,7 @@
 				10CFAB121E6DD1FD007F4FD8 /* foam_swift_parse_json_LongParser.swift in Sources */,
 				10CFAB2F1E6DD1FD007F4FD8 /* foam_swift_ui_FOAMUILabel.swift in Sources */,
 				10CFAB181E6DD1FD007F4FD8 /* foam_swift_parse_json_Whitespace.swift in Sources */,
+				10327A951E70A7A1006CB066 /* foam_swift_dao_ArrayDAO.swift in Sources */,
 				10CFAB251E6DD1FD007F4FD8 /* foam_swift_parse_parser_Repeat0.swift in Sources */,
 				10CFAB061E6DD1FD007F4FD8 /* foam_swift_parse_json_AnyKeyParser.swift in Sources */,
 				10CFAB091E6DD1FD007F4FD8 /* foam_swift_parse_json_BooleanParser.swift in Sources */,

@@ -37,6 +37,16 @@ extension PropertyInfo {
   public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
     outputter.output(&out, value)
   }
+  public func compare(_ o1: FObject, _ o2: FObject) -> Int {
+    let v1 = get(o1) as AnyObject?
+    let v2 = get(o2) as AnyObject?
+    if v1 === v2 { return 0 }
+    if v1 == nil && v2 == nil { return 0 }
+    if v1 == nil { return -1 }
+    if v2 == nil { return 1 }
+    if v1!.isEqual(v2) { return 0 }
+    return v1!.hash ?? 0 > v2!.hash ?? 0 ? 1 : -1
+  }
 }
 
 public class Action: Axiom {
@@ -156,6 +166,7 @@ public protocol FObject: class {
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
   func callAction(key: String)
+  func compareTo(_ data: FObject?) -> Int
   init(_ args: [String:Any?])
 }
 
@@ -252,6 +263,20 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
       count += notify(listeners: listeners.next, args: args)
     }
     return count
+  }
+
+  public func compareTo(_ data: FObject?) -> Int {
+    if self === data { return 0 }
+    if data == nil { return 1 }
+    let data = data!
+    if type(of: self).classInfo().id != type(of: data).classInfo().id {
+      return type(of: self).classInfo().id > type(of: data).classInfo().id ? 1 : -1
+    }
+    for props in type(of: data).classInfo().axioms(byType: PropertyInfo.self) {
+      let diff = props.compare(self, data)
+      if diff != 0 { return diff }
+    }
+    return 0
   }
 
   public func callAction(key: String) { }

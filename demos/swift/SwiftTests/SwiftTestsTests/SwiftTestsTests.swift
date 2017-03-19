@@ -271,4 +271,45 @@ class SwiftTestsTests: XCTestCase {
     t.firstName = "Nope"
     XCTAssertEqual(t.exprProp, "OVERRIDE")
   }
+
+  func testCompare() {
+    let t1 = Test()
+    let t2 = Test()
+    XCTAssertEqual(t1.compareTo(t2), 0)
+    t1.firstName = "NOT T2"
+    XCTAssertEqual(t1.compareTo(t2), 1)
+    t2.firstName = "NOT T2"
+    XCTAssertEqual(t1.compareTo(t2), 0)
+    t1.clearProperty("firstName")
+    XCTAssertEqual(t1.compareTo(t2), -1)
+  }
+
+  func testArrayDao() {
+    let dao = ArrayDAO([
+      "of": Test.classInfo(),
+      "primaryKey": Test.FIRST_NAME,
+    ])
+    let t1 = Test([
+      "firstName": "Mike",
+    ])
+    XCTAssertEqual(t1, dao.put(t1) as? Test)
+    XCTAssertEqual(dao.dao as! [Test], [t1])
+    XCTAssertEqual(t1, dao.put(t1) as? Test)
+    XCTAssertEqual(dao.dao as! [Test], [t1])
+
+    let t2 = Test([
+      "firstName": "Mike",
+    ])
+    XCTAssertEqual(t2, dao.put(t2) as? Test)
+    XCTAssertEqual(dao.dao as! [Test], [t2])
+
+    t1.firstName = "Mike2"
+    XCTAssertEqual(t1, dao.put(t1) as? Test)
+    XCTAssertEqual(dao.dao as! [Test], [t2, t1])
+
+    let tToRemove = Test(["firstName": "Mike2"])
+    let tRemoved = dao.remove(tToRemove) as? Test
+    XCTAssertNotEqual(tRemoved, tToRemove)
+    XCTAssertEqual(tRemoved, t1)
+  }
 }
