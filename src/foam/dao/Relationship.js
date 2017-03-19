@@ -223,6 +223,12 @@ foam.CLASS({
       var targetClass = this.lookup(forward ? this.targetModel : this.sourceModel);
       var name        = forward ? this.inverseName : this.forwardName;
       var targetProp  = targetClass[foam.String.constantize(name)];
+
+      if ( obj.id === undefined ) {
+        this.warn('Attempted to read relationship from object with no id.');
+        return this.FALSE();
+      }
+
       return this.EQ(targetProp, obj.id);
     },
 
