@@ -597,12 +597,12 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(obj) {
+    function put(_, obj) {
       this.box.send(this.DAOEvent.create({
         name: 'put', obj: obj
       }));
     },
-    function remove(obj) {
+    function remove(_, obj) {
       this.box.send(this.DAOEvent.create({
         name: 'remove', obj: obj
       }));
@@ -665,16 +665,15 @@ foam.CLASS({
 
         return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
           var items = result.a;
-          var fc = self.FlowControl.create();
+
+          var sub = foam.core.FObject.create();
+          var detached = false;
+          sub.onDetach(function() { detached = true; });
 
           for ( var i = 0 ; i < items.length ; i++ ) {
-            if ( fc.stopped ) break;
-            if ( fc.errorEvt ) {
-              sink.error(fc.errorEvt);
-              return Promise.reject(fc.errorEvt);
-            }
+            if ( detached ) break;
 
-            sink.put(items[i], fc);
+            sink.put(sub, items[i]);
           }
 
           sink.eof();
@@ -687,6 +686,7 @@ foam.CLASS({
     },
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
+      // TODO: Unsubscribe support.
       var id = foam.next$UID();
       var replyBox = this.__context__.registry.register(
         id,
@@ -696,10 +696,10 @@ foam.CLASS({
             switch(m.object.name) {
               case 'put':
               case 'remove':
-                sink[m.object.name](m.object.obj);
+                sink[m.object.name](null, m.object.obj);
               break;
               case 'reset':
-                sink.reset();
+                sink.reset(null);
             }
           }
         });
@@ -737,7 +737,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PollingClientDAO',
-  extends: 'foam.dao.EventlessClientDAO',
+  extends: 'foam.dao.ClientDAO',
 
   requires: [
     'foam.dao.ArraySink'
@@ -757,30 +757,6 @@ foam.CLASS({
       return this.SUPER(obj).then(function(o) {
         self.on.remove.pub(obj);
         return o;
-      });
-    },
-
-    function select(sink, skip, limit, order, predicate) {
-      // TODO: Determine which sinks are serializable.
-      sink = sink || this.ArraySink.create();
-
-      var self = this;
-      return this.SUPER(null, skip, limit, order, predicate).then(function(a) {
-        var fc = self.FlowControl.create();
-
-        for ( var i = 0 ; i < a.a.length ; i++ ) {
-          if ( fc.stopped ) break;
-          if ( fc.errorEvt ) {
-            sink.error(fc.errorEvt);
-            throw fc.errorEvt;
-          }
-
-          sink.put(a.a[i], fc);
-        }
-
-        sink.eof();
-
-        return sink;
       });
     },
 

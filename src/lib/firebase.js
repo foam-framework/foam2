@@ -237,15 +237,13 @@ foam.CLASS({
         return resp.payload;
       }).then(function(payload) {
         var data = JSON.parse(payload);
-        var fc = this.FlowControl.create();
+
+        var detached = false;
+        var sub = foam.core.FObject.create();
+        sub.onDetach(function() { detached = true; });
 
         for ( var key in data ) {
-          if ( fc.stopped ) break;
-          if ( fc.errorEvt ) {
-            sink.error && sink.error(fc.errorEvt);
-            future.set(sink);
-            break;
-          }
+          if ( detached ) break;
 
           var obj = foam.json.parse(
             foam.json.parseString(data[key].data));
@@ -253,14 +251,13 @@ foam.CLASS({
             this.timestampProperty.set(obj, data[key].lastUpdate);
           }
 
-          sink.put(obj, fc);
+          sink.put(sub, obj);
         }
         sink.eof();
 
         return resultSink;
       }.bind(this), function(resp) {
         var e = foam.dao.InternalException.create();
-        sink.error(e);
         return Promise.reject(e);
       });
     }
