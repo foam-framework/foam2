@@ -142,6 +142,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'message',
+      expression: function(name) {
+        return 'Could not find registration for ' + name;
+      }
     }
   ]
 });
@@ -203,25 +210,6 @@ foam.CLASS({
     },
     {
       name: 'register',
-      returns: 'foam.box.Box',
-      code: function(name, exportBox, localBox) {
-        // TODO: Verification
-        // TODO: Only register exportBox from external registrations, maybe?
-        // TODO: Only register localBox from local registrations, maybe?
-
-        this.registry[name] = {
-          exportBox: exportBox || this.SubBox.create({
-            name: name,
-            delegate: this.me
-          }),
-          localBox: localBox
-        };
-
-        return this.registry[name].exportBox;
-      }
-    },
-    {
-      name: 'register2',
       returns: 'foam.box.Box',
       code: function(name, service, localBox) {
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
@@ -518,11 +506,11 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      if ( ! this.RPCReturnMessage.isInstance(msg) ) {
-        // TODO: error ?
+      if ( this.RPCReturnMessage.isInstance(msg) ) {
+        this.resolve_(msg.data);
         return;
       }
-      this.resolve_(msg.data);
+      this.reject_(msg);
     }
   ]
 });
@@ -708,6 +696,7 @@ foam.CLASS({
     'foam.box.SubscribeMessage',
     'foam.box.EventMessage',
     'foam.box.RPCMessage',
+    'foam.box.RPCReturnMessage',
     'foam.box.InvalidMessageException'
   ],
 
@@ -718,23 +707,38 @@ foam.CLASS({
   ],
 
   methods: [
-    function call(obj) {
-      var p = obj[this.name].apply(obj, this.args);
-      if ( ! this.replyBox ) return;
+    function call(message) {
+      var p;
+
+      try {
+        p = this.data[message.object.name].apply(this.data, message.object.args);
+      } catch(e) {
+        message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
+          object: e
+        }));
+
+        return;
+      }
+
+      var replyBox = message.attributes.replyBox;
 
       if ( p instanceof Promise ) {
         p.then(
           function(data) {
             // Do we need to package data into a message?
-            this.replyBox.send(this.Message.create({
+            replyBox.send(this.Message.create({
               object: this.RPCReturnMessage.create({ data: data })
             }));
-          }.bind(this),
+          },
           function(error) {
             // TODO
-          }.bind(this));
+            message.attributes.errorBox && message.attributes.errorBox.send(
+              this.Message.create({
+                object: error
+              }));
+          });
       } else {
-        this.replyBox.send(this.Message.create({
+        replyBox.send(this.Message.create({
           object: this.RPCReturnMessage.create({ data: p })
         }));
       }
@@ -742,7 +746,7 @@ foam.CLASS({
 
     function send(message) {
       if ( this.RPCMessage.isInstance(message.object) ) {
-        this.call(this.data);
+        this.call(message);
         return;
       } else if ( this.SubscribeMessage.isInstance(message.object) ) {
         // TODO: Unsub support
@@ -961,6 +965,7 @@ foam.CLASS({
 
   requires: [
     'foam.net.WebSocket',
+    'foam.box.Message',
     'foam.box.RegisterSelfMessage'
   ],
 
@@ -991,7 +996,10 @@ foam.CLASS({
             this.socket = undefined;
           }.bind(this));
 
-          ws.send(this.RegisterSelfMessage.create({ name: this.me.name }));
+          ws.send(this.Message.create({
+            object: this.RegisterSelfMessage.create({ name: this.me.name })
+          }));
+
           this.webSocketService.addSocket(ws);
 
           return ws;

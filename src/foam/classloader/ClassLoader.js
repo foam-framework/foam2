@@ -25,13 +25,16 @@ foam.CLASS({
       var X = this.__context__;
       var promises = [];
       if ( this.extends ) promises.push(X.arequire(this.extends, opt_deps));
+
       for (var i = 0, a; a = this.axioms_[i]; i++) {
         if ( a.arequire ) promises.push(a.arequire(opt_deps));
       }
+
       return Promise.all(promises);
     },
   ],
 });
+
 
 foam.CLASS({
   package: 'foam.classloader',
@@ -41,26 +44,25 @@ foam.CLASS({
   methods: [
     function arequire(opt_deps) {
       return this.__context__.arequire(this.path, opt_deps);
-    },
-  ],
+    }
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.classloader',
   name: 'ClassLoader',
 
   exports: [
-    'arequire',
+    'arequire'
   ],
 
   properties: [
     {
       name: 'pending',
       class: 'Object',
-      factory: function() {
-        return {};
-      },
-    },
+      factory: function() { return {}; }
+    }
   ],
 
   methods: [
@@ -84,12 +86,15 @@ foam.CLASS({
           return m.arequire(deps).then(function() { return m; });
         }).then(function(m) {
           if ( X.isRegistered(modelId) ) return m;
+
           if ( m.refines ) {
             foam.CLASS(m);
             return m;
           }
+
           m.id = m.package ? m.package + '.' + m.name : m.name;
           foam.UNUSED[m.id] = true;
+
           var f = foam.Function.memoize0(function() {
             delete foam.UNUSED[m.id];
             var c = m.buildClass();
@@ -97,6 +102,7 @@ foam.CLASS({
             foam.USED[m.id] = c;
             return c;
           });
+
           foam.__context__.registerFactory(m, f);
           foam.package.registerClassFactory(m, f);
           return m;
@@ -108,8 +114,8 @@ foam.CLASS({
         });
 
         return this.pending[modelId];
-      },
-    },
+      }
+    }
   ]
 });
 

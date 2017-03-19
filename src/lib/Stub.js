@@ -72,7 +72,7 @@ foam.CLASS({
                     delegate: returnBox
                   });
 
-                  var exportBox = this.registry.register2(
+                  replyBox = this.registry.register(
                     replyBox.id,
                     this[replyPolicyName],
                     replyBox
@@ -93,7 +93,10 @@ foam.CLASS({
                   })
                 });
 
-                if ( exportBox ) msg.attributes.replyBox = exportBox;
+                if ( replyBox ) {
+                  msg.attributes.replyBox = replyBox;
+                  msg.attributes.errorBox = replyBox;
+                }
 
                 this[propName].send(msg);
 
@@ -143,7 +146,7 @@ foam.CLASS({
               throw 'Currently network subscriptions must include at least one topic.';
             }
 
-            var replyBox = this.registry.register2(
+            var replyBox = this.registry.register(
               foam.next$UID(),
               this[replyPolicyName],
               foam.box.EventDispatchBox.create({ target: this }));

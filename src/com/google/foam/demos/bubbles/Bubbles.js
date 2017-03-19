@@ -76,7 +76,7 @@ foam.CLASS({
         }
       }
 
-      for ( var i = 0 ; i < 201 ; i++ ) {
+      for ( var i = 0 ; i < 90 ; i++ ) {
         var b = this.PhysicalCircle.create({
           radius: 4,
           x: this.width * Math.random(),

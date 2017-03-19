@@ -18,28 +18,31 @@
 foam.CLASS({
   package: 'foam.classloader',
   name: 'NodeJsModelExecutor',
+
   requires: [
     'foam.classloader.OrDAO',
-    'foam.classloader.NodeModelFileDAO',
+    'foam.classloader.NodeModelFileDAO'
   ],
+
   imports: [
-    'arequire',
+    'arequire'
   ],
+
   exports: [
     foam.String.daoize(foam.core.Model.name),
   ],
+
   properties: [
     {
       class: 'StringArray',
-      name: 'classpaths',
+      name: 'classpaths'
     },
     {
-      name: 'modelId',
+      name: 'modelId'
     },
     {
-      name: 'modelArgs',
+      name: 'modelArgs'
     },
-
     {
       name: foam.String.daoize(foam.core.Model.name),
       expression: function(classpaths) {
@@ -55,15 +58,17 @@ foam.CLASS({
           });
         }
         return modelDao;
-      },
-    },
+      }
+    }
   ],
+
   methods: [
     function execute() {
       var self = this;
       var modelArgs = this.modelArgs;
       var X = this.__subContext__;
       var modelId = this.modelId;
+
       return X.arequire(modelId)
         .catch(console.log)
         .then(function() {
@@ -71,5 +76,5 @@ foam.CLASS({
         })
         .catch(console.log);
     }
-  ],
+  ]
 });

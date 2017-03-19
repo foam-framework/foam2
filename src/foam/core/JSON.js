@@ -42,11 +42,11 @@ foam.CLASS({
     { class: 'String', name: 'shortName' },
     {
       name: 'fromJSON',
-      value: function fromJSON(value, opt_ctx) { return value; }
+      value: function fromJSON(value, opt_ctx, prop, json) { return value; }
     },
     {
       name: 'toJSON',
-      value: function toJSON(value) { return value; }
+      value: function toJSON(value, outputter) { return value; }
     }
   ]
 });
@@ -262,7 +262,7 @@ foam.CLASS({
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
-      this.output(p.toJSON(v));
+      this.output(p.toJSON(v, this));
     },
 
     function outputDate(o) {
@@ -393,7 +393,7 @@ foam.CLASS({
             if ( ! this.propertyPredicate(o, p) ) continue;
             if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) continue;
 
-            m[p.name] = this.objectify(p.toJSON(o[p.name]));
+            m[p.name] = this.objectify(p.toJSON(o[p.name], this));
           }
           return m;
         },
@@ -494,7 +494,7 @@ foam.LIB({
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
               if ( prop ) {
-                json[key] = prop.fromJSON(json[key], opt_ctx, prop);
+                json[key] = prop.fromJSON(json[key], opt_ctx, prop, this);
               }
             }
 
