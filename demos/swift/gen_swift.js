@@ -71,6 +71,8 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.ui.FOAMActionUIButton',
       'foam.swift.ui.FOAMUILabel',
       'foam.swift.ui.FOAMUITextField',
+      'foam.swift.dao.AbstractDAO',
+      'foam.swift.dao.ArrayDAO',
       'somepackage.RequiredClass',
     ],
     outdir: genDir,
