@@ -34,7 +34,7 @@ foam.CLASS({
 
   methods: [
     function slice(start, end) {
-      return foam.blob.Buffer.create({});
+      return foam.blob.Buffer.create();
     }
   ]
 });
