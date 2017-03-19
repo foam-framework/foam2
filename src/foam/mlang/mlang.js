@@ -1239,6 +1239,81 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Unique',
+  extends: 'foam.dao.ProxySink',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Sink which .',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: ''
+    },
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg2'
+    },
+    {
+      name: 'groups',
+      factory: function() { return {}; }
+    },
+    {
+      class: 'StringArray',
+      name: 'groupKeys',
+      factory: function() { return []; }
+    }
+  ],
+
+  methods: [
+    function sortedKeys(opt_comparator) {
+      this.groupKeys.sort(opt_comparator || this.arg1.comparePropertyValues);
+      return this.groupKeys;
+    },
+
+    function putInGroup_(key, obj) {
+      var group = this.groups.hasOwnProperty(key) && this.groups[key];
+      if ( ! group ) {
+        group = this.arg2.clone();
+        this.groups[key] = group;
+        this.groupKeys.push(key);
+      }
+      group.put(obj);
+    },
+
+    function put(obj) {
+      var key = this.arg1.f(obj);
+      if ( Array.isArray(key) ) {
+        if ( key.length ) {
+          for ( var i = 0; i < key.length; i++ ) {
+            this.putInGroup_(key[i], obj);
+          }
+        } else {
+          // Perhaps this should be a key value of null, not '', since '' might
+          // actually be a valid key.
+          this.putInGroup_('', obj);
+        }
+      } else {
+        this.putInGroup_(key, obj);
+      }
+    },
+
+    function eof() { },
+
+    function clone() {
+      // Don't use the default clone because we don't want to copy 'groups'.
+      return this.cls_.create({ arg1: this.arg1, arg2: this.arg2 });
+    },
+
+    function toString() {
+      return this.groups.toString();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
   name: 'Explain',
   extends: 'foam.dao.ProxySink',
   implements: [ 'foam.core.Serializable' ],
