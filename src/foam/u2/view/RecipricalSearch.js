@@ -18,6 +18,7 @@ foam.CLASS({
       name: 'data'
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'dao',
       factory: function() {
         return this.__context__[foam.String.daoize(this.of.name)];
@@ -34,19 +35,15 @@ foam.CLASS({
           filter(function(p) { return ! p.hidden }).
           map(foam.core.Property.NAME.f);
       }
-    },
-    {
-      class: 'Int',
-      name: 'count',
-      value: 10
     }
   ],
   methods: [
     function initE() {
       var self = this;
-      this.add(
-        this.COUNT,
-        this.slot(function(filters) {
+
+      // TODO: Add "n of m selected" header.
+      this.
+        add(this.slot(function(filters) {
           var searchManager = self.SearchManager.create({
             dao$: self.dao$,
             predicate$: self.data$
@@ -57,11 +54,11 @@ foam.CLASS({
           e.onDetach(searchManager);
 
           e.forEach(filters, function(f) {
-            // TODO: See if this can be cleaned up if searchView were more robust and didn't require the property
-            // as a paramter.
+            // TODO: See if this can be cleaned up somehow, if searchView didn't require the proprety explicitly, or
+            // could find the search manager via the context and add itself to that.
             var axiom = self.of.getAxiomByName(f);
             var spec  = axiom.searchView;
-            var view  = foam.u2.ViewSpec.createView(spec, { property: f, dao: self.dao }, this, this.__subSubContext__);
+            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao }, this, this.__subSubContext__);
 
             searchManager.add(view);
             this.add(axiom.label, view);
