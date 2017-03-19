@@ -1591,6 +1591,8 @@ foam.CLASS({
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.Func',
+    'foam.mlang.predicate.True',
+    'foam.mlang.predicate.False',
     'foam.mlang.expr.Mul',
     'foam.mlang.expr.Dot',
     'foam.mlang.Constant',
@@ -1644,6 +1646,9 @@ foam.CLASS({
 
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
+
+    function TRUE() { return this.True.create(); },
+    function FALSE() { return this.False.create(); }
   ]
 });
 
