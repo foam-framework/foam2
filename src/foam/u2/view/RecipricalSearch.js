@@ -37,7 +37,8 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'count'
+      name: 'count',
+      value: 10
     }
   ],
   methods: [
@@ -47,20 +48,26 @@ foam.CLASS({
         this.COUNT,
         this.slot(function(filters) {
           var searchManager = self.SearchManager.create({
-            dao$: this.dao$,
-            data$: this.data$
+            dao$: self.dao$,
+            predicate$: self.data$
           });
-          this.onDetach(searchManager);
 
-          this.forEach(filters, function(f) {
+          var e = this.E('div');
+
+          e.onDetach(searchManager);
+
+          e.forEach(filters, function(f) {
             // TODO: See if this can be cleaned up if searchView were more robust and didn't require the property
             // as a paramter.
-            var spec = self.of.getAxiomByName(f).searchView;
-            var view = foam.u2.ViewSpec.createView(spec, { property: f, dao: self.dao }, this, this.__subSubContext__);
+            var axiom = self.of.getAxiomByName(f);
+            var spec  = axiom.searchView;
+            var view  = foam.u2.ViewSpec.createView(spec, { property: f, dao: self.dao }, this, this.__subSubContext__);
 
             searchManager.add(view);
-            this.add(view);
+            this.add(axiom.label, view);
           });
+
+          return e;
         }, this.filters$));
     },
     function addFilter(key) {
