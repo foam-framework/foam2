@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.classloader',
   name: 'NodeModelFileDAO',
@@ -23,8 +22,8 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'classpath',
-    },
+      name: 'classpath'
+    }
   ],
 
   methods: [
@@ -32,13 +31,16 @@ foam.CLASS({
       var foamCLASS = foam.CLASS;
       var self = this;
       var model;
+
       foam.CLASS = function(m) {
         var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
         model = cls.create(m, self);
         foam.CLASS = foamCLASS;
       }
+
       var sep = require('path').sep;
       var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
+
       try {
         require(path);
       } catch(e) {
@@ -47,6 +49,7 @@ foam.CLASS({
       } finally {
         foam.CLASS = foamCLASS;
       }
+
       return Promise.resolve(model);
     }
   ]

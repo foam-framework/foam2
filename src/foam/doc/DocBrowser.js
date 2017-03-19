@@ -116,6 +116,12 @@ foam.CLASS({
           display: block;
           padding: 2px;
         }
+        ^package {
+          font-weight: 700;
+        }
+        ^indent {
+          margin-left: 30px;
+        }
       */}
     })
   ],
@@ -127,6 +133,11 @@ foam.CLASS({
       expression: function (data) {
         return data && data.length;
       }
+    },
+    {
+      of: 'Boolean',
+      name: 'showPackage',
+      value: true
     }
   ],
 
@@ -134,12 +145,23 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      var pkg = '';
       this.
         cssClass(this.myCls()).
         start(this.DocBorder, {title: this.title, info$: this.info$}).
           start('div').
             add(this.slot(function (data) {
-              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}); });
+              return self.E('span').forEach(data, function(d) {
+                if ( ! this.showPackage ) {
+                  if ( d.package !== pkg ) {
+                    pkg = d.package;
+                    this.start('div').cssClass(self.myCls('package')).add(pkg).end();
+                  }
+                }
+                this.start(self.ClassLink, {data: d, showPackage: this.showPackage}).
+                  cssClass(this.showPackage ? null : self.myCls('indent')).
+                end();
+              });
             })).
           end().
         end();
@@ -391,7 +413,7 @@ foam.CLASS({
           start('tr').
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+        tag(this.ClassList, {title: 'Class List', showPackages: false, data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).

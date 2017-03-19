@@ -24,7 +24,7 @@ foam.CLASS({
     {
       name: 'primary',
       help: 'This is the DAO to look things up in first.'
-    },
+    }
   ],
 
   methods: [

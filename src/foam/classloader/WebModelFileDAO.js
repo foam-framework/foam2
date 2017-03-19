@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.classloader',
   name: 'WebModelFileDAO',
   extends: 'foam.dao.AbstractDAO',
 
   imports: [
-    'window',
+    'window'
   ],
 
   requires: [
-    'foam.net.HTTPRequest',
+    'foam.net.HTTPRequest'
   ],
 
   properties: [
@@ -34,28 +33,31 @@ foam.CLASS({
       name: 'url',
       factory: function() {
         return this.window.location.protocol + '//' + this.window.location.host + '/src/';
-      },
-    },
+      }
+    }
   ],
 
   methods: [
     function find(id) {
       var self = this;
-      var url = this.url + '/' + id.replace(/\./g, '/') + '.js';
-      var req = this.HTTPRequest.create({
+      var url  = this.url + '/' + id.replace(/\./g, '/') + '.js';
+      var req  = this.HTTPRequest.create({
         method: 'GET',
-        url: url,
+        url: url
       });
+
       return req.send().then(function(payload) {
         return payload.resp.text();
       }).then(function(js) {
         var model;
         var foamCLASS = foam.CLASS;
+
         foam.CLASS = function(m) {
           var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
           model = cls.create(m, self);
           foam.CLASS = foamCLASS;
         }
+
         try {
           eval(js);
         } catch(e) {
@@ -64,6 +66,7 @@ foam.CLASS({
         } finally {
           foam.CLASS = foamCLASS;
         }
+
         return Promise.resolve(model);
       });
     }

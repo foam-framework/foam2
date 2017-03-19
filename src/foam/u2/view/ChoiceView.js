@@ -51,10 +51,15 @@ foam.CLASS({
 
         this.feedback_ = true;
 
-        this.data  = n && n[0];
-        this.text  = n && n[1];
-        this.index = this.findIndexOfChoice(n);
-
+        if ( ! n && this.placeholder ) {
+          this.data = undefined;
+          this.text = this.placeholder;
+          this.index = -1;
+        } else {
+          this.data  = n && n[0];
+          this.text  = n && n[1];
+          this.index = this.findIndexOfChoice(n);
+        }
         this.feedback_ = false;
       }
     },
@@ -100,6 +105,7 @@ foam.CLASS({
       value: -1,
       preSet: function(old, nu) {
         if ( this.choices.length === 0 && this.dao ) return nu;
+        if ( nu < 0 && this.placeholder ) return nu;
         if ( nu < 0 || this.choices.length === 0 ) return 0;
         if ( nu >= this.choices.length ) return this.choices.length - 1;
         return nu;
@@ -111,7 +117,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'placeholder',
-      documentation: 'Default entry that is "selected" when data is empty.'
+      factory: function() { return undefined; },
+      documentation: 'When provided the placeholder will be prepended to the selection list, and selected if the choices array is empty or no choice in the choices array is selected.'
     },
     {
       class: 'Function',
@@ -219,7 +226,7 @@ foam.CLASS({
           delegate: foam.dao.ArraySink.create()
         })).then(function(map) {
           this.choices = map.delegate.a;
-          if ( ! this.data && this.index === -1 ) this.index = 0;
+          if ( ! this.data && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
     }

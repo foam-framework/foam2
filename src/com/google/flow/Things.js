@@ -848,8 +848,8 @@ foam.CLASS({
         this.childLayer.add(this.Line.create({
           startX:    x1+this.radiusX,
           startY:    y1+this.radiusY,
-          endX:      this.x+this.radiusX,
-          endY:      this.y+this.radiusY,
+          endX:      x+this.radiusX,
+          endY:      y+this.radiusY,
           color:     this.penColor,
           lineWidth: this.penWidth
         }));

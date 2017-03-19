@@ -17,10 +17,11 @@
 
 foam.CLASS({
   refines: 'foam.core.Property',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.TreeIndex',
   ],
+
   methods: [
     function toIndex(tail) {
       /** Creates the correct type of index for this property, passing in the
@@ -33,10 +34,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.SetIndex',
   ],
+
   methods: [
     function toIndex(tail) {
        return this.SetIndex.create({ prop: this, tail: tail });
@@ -47,10 +49,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.AxiomArray',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.SetIndex',
   ],
+
   methods: [
     function toIndex(tail) {
        return this.SetIndex.create({ prop: this, tail: tail });
@@ -61,10 +64,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.StringArray',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.SetIndex',
   ],
+
   methods: [
     function toIndex(tail) {
        return this.SetIndex.create({ prop: this, tail: tail });
