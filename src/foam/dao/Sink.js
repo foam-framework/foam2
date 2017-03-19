@@ -394,3 +394,36 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'DescribeSink',
+  documentation: 'Calls .describe() on every object.  Useful for debugging to quickly see what items are in a DAO.',
+  implements: [ 'foam.dao.Sink' ],
+  methods: [
+    function put(_, o) {
+      o.describe();
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'FnSink',
+  documentation: 'Converts all sink events to call to a singular function.' +
+    '  Useful for subscribing a listener method to a DAO',
+  properties: [
+    'fn'
+  ],
+  methods: [
+    function put(s, obj) {
+      this.fn(s, 'put', obj);
+    },
+    function remove(s, obj) {
+      this.fn(s, 'remove', obj);
+    },
+    function reset(s) {
+      this.fn(s, 'reset');
+    }
+  ]
+});
