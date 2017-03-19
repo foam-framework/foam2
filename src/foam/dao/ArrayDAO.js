@@ -77,7 +77,7 @@ foam.CLASS({
         for ( var i = 0 ; i < self.array.length ; i++ ) {
           if ( detached ) break;
 
-          sink.put(self.array[i], fc);
+          sink.put(sub, self.array[i]);
         }
 
         sink.eof();

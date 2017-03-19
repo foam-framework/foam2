@@ -183,7 +183,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(obj) {
+    function put(_, obj) {
       this.body.addObj(obj);
     }
   ]
