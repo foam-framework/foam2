@@ -60,6 +60,7 @@ foam.CLASS({
       factory: function() { return require('path'); }
     }
   ],
+
   methods: [
     function handle(req, res) {
       if ( req.url !== this.urlPath ) return false;
