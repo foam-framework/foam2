@@ -30,7 +30,7 @@ foam.CLASS({
       factory: null,
       expression: function(of) {
         return ! of ? [] :
-          of.tableColumns ? of.tableColumns :
+          of.model_.tableColumns ? of.model_.tableColumns :
           of.getAxiomsByClass(foam.core.Property).
           filter(function(p) { return ! p.hidden }).
           map(foam.core.Property.NAME.f);
@@ -65,7 +65,7 @@ foam.CLASS({
           });
 
           return e;
-        }, this.filters$));
+        }, this.filters$), this.CLEAR);
     },
     function addFilter(key) {
       this.filters = this.filters.concat(key);
@@ -74,6 +74,15 @@ foam.CLASS({
       this.filters = this.filters.filter(function(k) {
         return key !== k;
       });
+    }
+  ],
+  actions: [
+    {
+      name: 'clear',
+      code: function() {
+        this.data = undefined;
+        this.filters = this.filters.slice();
+      }
     }
   ]
 });
