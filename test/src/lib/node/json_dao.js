@@ -16,19 +16,22 @@
  */
 
 describe('JSONFileDAO', function() {
+  var path = require('path');
+  var fs = require('fs');
+  var tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'foam2_tests', ''));
+  var tmpFile = path.join(tmpDir, 'test.json');
   genericDAOTestBattery(function(model) {
-    try { require('fs').unlinkSync('test.json'); } catch(e) {}
-    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model }));
+    try { fs.unlinkSync(tmpFile); } catch(e) {}
+    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: tmpFile, of: model }));
   });
 
   afterAll(function() {
-    try { require('fs').unlinkSync('test.json'); } catch(e) {}
+    try { fs.unlinkSync(tmpFile); fs.rmdirSync(tmpDir); } catch(e) {}
   });
 
-  xit('should actually persist to a JSON file', function(done) {
-    var fs = require('fs');
+  it('should actually persist to a JSON file', function(done) {
     // Make sure the file is empty before we start.
-    try { fs.unlinkSync('test.json'); } catch(e) { }
+    try { fs.unlinkSync(tmpFile); } catch(e) { }
 
     foam.CLASS({
       package: 'test.dao.node.json_file',
@@ -37,7 +40,7 @@ describe('JSONFileDAO', function() {
     });
 
     var dao = foam.dao.node.JSONFileDAO.create({
-      path: 'test.json',
+      path: tmpFile,
       of: 'test.dao.node.json_file.TestModel',
     });
 
@@ -50,10 +53,10 @@ describe('JSONFileDAO', function() {
       return new Promise(function(res) { setTimeout(res, 150); });
     }).then(function() {
       dao = null;
-      expect(fs.statSync('test.json').isFile()).toBe(true);
+      expect(fs.statSync(tmpFile).isFile()).toBe(true);
 
       var dao2 = foam.dao.node.JSONFileDAO.create({
-        path: 'test.json',
+        path: tmpFile,
         of: 'test.dao.node.json_file.TestModel',
       });
 
