@@ -247,6 +247,14 @@ foam.CLASS({
       intersectTarget(b1, b3).then(function(inter) {
         console.log('intersection: ', inter.join(', '));
       });
+
+      this.ABJunctionDAO.select(this.UNIQUE(ABJunction.SOURCE_ID)).then(function (u) {
+        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+      });
+
+      this.ABJunctionDAO.select(this.UNIQUE(ABJunction.TARGET_ID)).then(function (u) {
+        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+      });
     }
   ]
 });
