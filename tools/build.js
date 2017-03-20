@@ -23,6 +23,11 @@ if ( process.argv.length > 2 ) {
   });
 }
 
+var outfile = __dirname + '/../foam-bin.js';
+if ( process.argv.length > 3 ) {
+  outfile = process.argv[3];
+}
+
 var env = {
   FOAM_FILES: function(files) {
     var payload = '';
@@ -36,7 +41,7 @@ var env = {
       payload += data;
     });
 
-    require('fs').writeFileSync(__dirname + '/../foam-bin.js', payload);
+    require('fs').writeFileSync(outfile, payload);
   }
 };
 
