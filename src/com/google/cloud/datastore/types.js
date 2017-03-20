@@ -262,9 +262,9 @@ foam.CLASS({
 
       var name = new Array(ids.length);
       for ( var i = 0; i < ids.length; i++ ) {
-        name = ids[i] + ( i < ids.length - 1 ? ':' : '' );
+        name[i] = this[ids[i]];
       }
-      return { kind: this.getOwnDatastoreKind(), name: name };
+      return { kind: this.getOwnDatastoreKind(), name: name.join('_') };
     },
     function getDatastoreKey(opt_propertyPath) {
       if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
