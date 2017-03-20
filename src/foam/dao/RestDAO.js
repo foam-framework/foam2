@@ -108,10 +108,11 @@ foam.CLASS({
        * Each key's value is network-foam-jsonified.
        */
       var payload = {};
-      if ( typeof skip !== 'undefined' ) payload.skip = skip;
+      if ( typeof skip  !== 'undefined' ) payload.skip = skip;
       if ( typeof limit !== 'undefined' ) payload.limit = limit;
       if ( typeof order !== 'undefined' ) payload.order = order;
       if ( typeof predicate !== 'undefined' ) payload.predicate = predicate;
+
       return this.createRequest_({
         method: 'POST',
         url: this.baseURL + ':removeAll',
