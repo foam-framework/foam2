@@ -147,13 +147,13 @@ foam.LIB({
 
       var o = cls.create();
 
-      if ( cls.ids && cls.ids.length > 1 ) {
+      if ( cls.model_.ids && cls.model_.ids.length > 1 ) {
         throw new Error('Not implemented: Deserialization of Cloud Datastore ' +
             'multi-part ids');
       }
 
-      var idProp = cls.ids && cls.ids.length === 1 ?
-          cls.getAxiomByName(cls.ids[0]) :
+      var idProp = cls.model_.ids && cls.model_.ids.length === 1 ?
+          cls.getAxiomByName(cls.model_.ids[0]) :
           cls.getAxiomByName('id');
 
       if ( idProp ) o[idProp.name] = id;
