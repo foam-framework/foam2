@@ -146,8 +146,8 @@ foam.LIB({
       var id = key.name;
 
       var o = cls.create();
-      if ( cls.model_.ids && cls.model_.ids.length === 1 ) {
-        o[cls.model_.ids[i]] = id;
+      if ( ! cls.model_.ids || cls.model_.ids.length === 1 ) {
+        o.id = id;
       } else {
         for ( var i = 0; i < cls.model_.ids.length; i++ ) {
           idName = cls.model_.ids[i];
@@ -258,11 +258,7 @@ foam.CLASS({
       if ( ! ids )
         return { kind: this.getOwnDatastoreKind(), name: this.id.toString() };
 
-      var name = new Array(ids.length);
-      for ( var i = 0; i < ids.length; i++ ) {
-        name[i] = this[ids[i]];
-      }
-      return { kind: this.getOwnDatastoreKind(), name: name.join('_') };
+      return { kind: this.getOwnDatastoreKind(), name: foam.json.stringify(this.id)};
     },
     function getDatastoreKey(opt_propertyPath) {
       if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
