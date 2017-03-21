@@ -47,8 +47,8 @@ foam.CLASS({
         args: [skip, limit, order, predicate]
       });
 
-      listener.onDetach(this.sub('propertyChange', 'delegate', function(s, pc, d, slot, value) {
-        listener.dao = value;
+      listener.onDetach(this.sub('propertyChange', 'delegate', function(s, pc, d, slot) {
+        listener.dao = slot.get();
       }));
 
       return listener;
