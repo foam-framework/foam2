@@ -17,6 +17,7 @@
 
 foam.INTERFACE({
   refines: 'foam.dao.DAO',
+
   methods: [
     {
       name: 'put',
@@ -95,6 +96,11 @@ foam.INTERFACE({
           javaType: 'foam.mlang.predicate.Predicate'
         }
       ]
+    },
+    {
+      name: 'listen',
+      javaReturns: 'void',
+      args: []
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?

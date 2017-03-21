@@ -36,6 +36,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'SharedWorkerI',
@@ -62,6 +63,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.apps.chat',
@@ -99,7 +101,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'registration',
+      name: 'registration'
     }
   ],
 
@@ -127,9 +129,11 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.apps.chat',
   name: 'ServiceWorkerAgent',
+
   requires: [
     'foam.apps.chat.BgSyncAgent'
   ],
+
   properties: [
     {
       name: 'scope',
@@ -164,6 +168,7 @@ foam.CLASS({
           });
         }.bind(this)));
     },
+
     function push(e) {
       this.scope.registration.sync.register({ id: 'messages' });
     }
@@ -344,14 +349,14 @@ foam.CLASS({
       var E = this.E.create();
       var syncStatus;
 
-      return this.syncStatusDAO.find(this.syncStatusId).then(null, function(e) {
-        if ( ! foam.dao.ObjectNotFoundException.isInstance(e) ) throw e;
-
+      return this.syncStatusDAO.find(this.syncStatusId).then(function(obj) {
         // If not found create a new sync status.
-        return self.syncStatusDAO.put(self.SyncStatus.create({
+        if ( ! obj ) return self.syncStatusDAO.put(self.SyncStatus.create({
           id: self.syncStatusId,
           latestServerTimestamp: 0
         }));
+
+        return obj;
       }).then(function(s) {
         syncStatus = s;
 
@@ -385,6 +390,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.apps.chat',

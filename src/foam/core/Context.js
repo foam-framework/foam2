@@ -87,6 +87,10 @@
      * to create the value which is used.
      */
     registerFactory: function(m, factory) {
+      foam.assert(
+        typeof m.id === 'string',
+        'Must have an .id property to be registered in a context.');
+
       this.registerInCache_(factory, this.__cache__, m.id);
 
       if ( m.package === 'foam.core' ) {
@@ -111,7 +115,7 @@
       foam.assert(
           ! hasOld ||
               (foam.Function.isInstance(old) && ! foam.Function.isInstance(cls)),
-          cls.id + ' is already registered in this context.');
+          name + ' is already registered in this context.');
 
       cache[name] = cls;
     },
@@ -190,7 +194,9 @@
   foam.lookup = function(id, opt_suppress) {
     return foam.__context__.lookup(id, opt_suppress);
   };
-  foam.register = function(cls) { foam.__context__.register(cls); };
+  foam.register = function(cls, opt_id) {
+    foam.__context__.register(cls, opt_id);
+  };
   foam.createSubContext = function(opt_args, opt_name) {
     return foam.__context__.createSubContext(opt_args, opt_name);
   };

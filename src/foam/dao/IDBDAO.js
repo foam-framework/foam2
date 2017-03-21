@@ -192,7 +192,7 @@ foam.CLASS({
             'complete',
             function() {
               if (!request.result) {
-                reject(self.ObjectNotFoundException.create({ id: key }));
+                resolve(null);
                 return;
               }
               var result = self.deserialize(request.result);

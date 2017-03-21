@@ -140,19 +140,21 @@ describe('FObject hashCode', function() {
     a = null;
   });
 
+  // markdittmer: These tests should be made more robust. Can we compare two
+  // hash values for each?
   it('regression 1: undefineds', function() {
-    expect(a.hashCode()).toEqual(16305);
+    expect(a.hashCode()).toEqual(16273);
   });
   it('regression 2: strings and numbers', function() {
     // KGR: I disagree with this test, how do we expect
     // any particular value from a hashCode()?
     a.a = 'this is a longer string!@';
     a.b = 998765876.78;
-    expect(a.hashCode()).toEqual(-1106880431);
+    expect(a.hashCode()).toEqual(-1860243895);
   });
   it('regression 3: model instance', function() {
     a.a = test.CompA.create({ a: 4 }, foam.__context__);
-    expect(a.hashCode()).toEqual(526596);
+    expect(a.hashCode()).toEqual(526564);
   });
 });
 

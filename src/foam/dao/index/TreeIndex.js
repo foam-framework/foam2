@@ -408,9 +408,9 @@ foam.CLASS({
       var expr = isExprMatch(m.In);
       if ( expr ) {
         predicate = expr.predicate;
-           // Just scan if that would be faster.
-        if ( Math.log(this.size())/Math.log(2) * expr.arg2.length < this.size() ) {
-          var keys = expr.arg2;
+        var keys = expr.arg2.f();
+        // Just scan if that would be faster.
+        if ( Math.log(this.size())/Math.log(2) * keys.length < this.size() ) {
           var subPlans = [];
           cost = 1;
 
@@ -550,10 +550,15 @@ foam.CLASS({
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place
             reverseSort ?
-              subTree.selectReverse(sink, [skip], [limit],
-                order, predicate, {}) :
-              subTree.select(sink, [skip], [limit],
-                order, predicate, {}) ;
+              subTree.selectReverse(
+                sink,
+                skip != null ? [skip] : null,
+                limit != null ? [limit] : null,
+                order, predicate, {}) : subTree.select(
+                  sink,
+                  skip != null ? [skip] : null,
+                  limit != null ? [limit] : null,
+                  order, predicate, {}) ;
             index.selectCount--;
           }
         },
@@ -675,4 +680,3 @@ foam.CLASS({
 
   ]
 });
-

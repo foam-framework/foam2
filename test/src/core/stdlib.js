@@ -115,8 +115,8 @@ describe('foam.Undefined', function() {
     expect(foam.Undefined.compare("unused", "defined!")).toBe(1);
   });
   it('hashCode', function() {
-    expect(foam.Undefined.hashCode(undefined)).toBe(-1);
-    expect(foam.Undefined.hashCode()).toBe(-1);
+    expect(foam.Undefined.hashCode(undefined)).toBe(-2);
+    expect(foam.Undefined.hashCode()).toBe(-2);
   });
 });
 
@@ -138,8 +138,8 @@ describe('foam.Null', function() {
     expect(foam.Null.compare("unused", null)).toBe(0);
   });
   it('hashCode', function() {
-    expect(foam.Null.hashCode(null)).toBe(-2);
-    expect(foam.Null.hashCode()).toBe(-2);
+    expect(foam.Null.hashCode(null)).toBe(-3);
+    expect(foam.Null.hashCode()).toBe(-3);
   });
 });
 
@@ -173,7 +173,7 @@ describe('foam.Boolean', function() {
   });
   it('hashCode', function() {
     expect(foam.Boolean.hashCode(true)).toBe(1);
-    expect(foam.Boolean.hashCode(false)).toBe(0);
+    expect(foam.Boolean.hashCode(false)).toBe(-1);
   });
 });
 
@@ -427,6 +427,7 @@ describe('foam.Number', function() {
     expect(foam.Number.hashCode(5)).toBe(5);
     // caps at 32-bits
     expect(foam.Number.hashCode(999999999999)).toBe(-727379969);
+    expect(foam.Number.hashCode(329719442019.76715)).toBe(-1160223942);
   });
 });
 
@@ -690,10 +691,6 @@ describe('foam.Array', function() {
   });
 
   it('hashCode', function() {
-    // uses hash of each element
-    expect(foam.Array.hashCode(['a string']))
-      .toBe(foam.String.hashCode('a string'));
-
     // ordering matters
     expect(foam.Array.hashCode(['a string', 'b string']))
       .not.toBe(foam.Array.hashCode(['b string', 'a string']));
@@ -864,8 +861,28 @@ describe('foam.Object', function() {
     expect(foam.Object.compare(a, undefined)).toBe(1);
   });
   it('hashCode', function() {
-    expect(foam.Object.hashCode({ key: 'anything' })).toBe(0);
-    expect(foam.Object.hashCode()).toBe(0);
+    expect(foam.Object.hashCode({ key: 'anything' })).toEqual(
+        foam.Object.hashCode({ key: 'anything' }));
+    expect(foam.Object.hashCode({ key: 'anything' })).not.toEqual(
+        foam.Object.hashCode({ key: 'anything else' }));
+    expect(foam.Object.hashCode({ key: 'anything' })).not.toEqual(
+        foam.Object.hashCode({ key: 'anything', other: false }));
+    expect(foam.Object.hashCode({ key: 'anything' })).not.toEqual(
+        foam.Object.hashCode({ key: 'anything', other: undefined }));
+    expect(foam.Object.hashCode({ key: 'anything' })).not.toEqual(
+        foam.Object.hashCode({ key: 'anything', other: null }));
+
+    var values = [
+      undefined, null, false, 0, '',                                 // Falseys
+      foam.core.FObject.create(), {}, true, 9, -9, [], function() {} // Truthys
+    ];
+
+    for ( var i = 0; i < values.length; i++ ) {
+      for ( var j = i + 1; j < values.length; j++ ) {
+        expect(foam.Object.hashCode({ key: values[i] })).not.toEqual(
+            foam.Object.hashCode({ key: values[j] }));
+      }
+    }
   });
   it('freeze', function() {
     var a = { d: "hello" };
@@ -1019,4 +1036,3 @@ describe('foam.uuid', function() {
     expect(foam.uuid.randomGUID()).not.toEqual(foam.uuid.randomGUID());
   });
 });
-

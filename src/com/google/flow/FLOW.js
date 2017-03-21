@@ -558,9 +558,8 @@ foam.CLASS({
         var i = opt_i || 1;
         var prefix = value.cls_.name.toLowerCase();
         this.properties.find(prefix + i).then(function (o) {
-          self.addProperty(value, null, i+1, opt_parent);
-        }).catch(function(x) {
-          self.addProperty(value, prefix+i, null, opt_parent);
+          if ( o == null )           self.addProperty(value, prefix+i, null, opt_parent);
+          else self.addProperty(value, null, i+1, opt_parent);
         });
       } else {
         var p = this.Property.create({

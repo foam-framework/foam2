@@ -20,6 +20,8 @@ foam.CLASS({
   package: 'foam.physics',
   name: 'Collider',
 
+  documentation: 'Apply physics when objects collide.',
+
   topics: [ 'onTick' ],
 
   properties: [

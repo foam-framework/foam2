@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'ActionView',
   extends: 'foam.u2.Element',
 
+  documentation: 'A button View for triggering Actions.',
+
   axioms: [
     foam.u2.CSS.create({code: function() {/*
       ^ {
@@ -63,6 +65,7 @@ foam.CLASS({
   properties: [
     'data',
     'action',
+    [ 'nodeName', 'button' ],
     {
       name: 'label',
       factory: function(action) { return this.action.label; }
@@ -71,25 +74,31 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.nodeName = 'button';
+      this.initCls();
+
       this.
-        cssClass(this.myCls()).
         on('click', this.click).
-        add(this.label/*$*/);
+        add(this.label$);
 
-      if ( this.action.isAvailable ) {
-        this.enableCls(this.myCls('unavailable'), this.action.createIsAvailable$(this.data$), true);
-      }
+      if ( this.action ) {
+        if ( this.action.isAvailable ) {
+          this.enableCls(this.myCls('unavailable'), this.action.createIsAvailable$(this.data$), true);
+        }
 
-      if ( this.action.isEnabled ) {
-        this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+        if ( this.action.isEnabled ) {
+          this.attrs({disabled: this.action.createIsEnabled$(this.data$).map(function(e) { return e ? false : 'disabled'; })});
+        }
       }
+    },
+
+    function initCls() {
+      this.cssClass(this.myCls());
     }
   ],
 
   listeners: [
     function click(e) {
-      this.action.maybeCall(this.__subContext__, this.data);
+      this.action && this.action.maybeCall(this.__subContext__, this.data);
       e.stopPropagation();
     }
   ]

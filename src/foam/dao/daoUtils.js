@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  documentation: 'Proxy implementation for the DAO interface.',
+
   properties: [
     {
       class: 'Proxy',
@@ -37,8 +39,8 @@ foam.CLASS({
     },
     {
       name: 'of',
-      expression: function(delegate) {
-        return delegate.of;
+      factory: function() {
+        return this.delegate.of;
       }
     }
   ]

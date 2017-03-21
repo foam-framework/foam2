@@ -15,31 +15,33 @@
  * limitations under the License.
  */
 
-/**
-  Implements provide a delcaration of a classes intent to implement
-  an interface. Since interfaces can also have implementations, it
-  can also be used to provide mix-ins, which is a safe form of
-  multiple-inheritance.
-<pre>
-  Ex.
-  foam.CLASS({
-    name: 'SalaryI',
-    properties: [ 'salary' ]
-  });
-
-  foam.CLASS({
-    name: 'Employee',
-    extends: 'Person',
-    implements: [ 'SalaryI' ]
-  });
-</pre>
-  Employee extends Person through regular inheritance, but
-  the axioms from SalaryI are also added to the class.
-  Any number of mix-ins/interfaces can be specified.
-*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Implements',
+
+  documentation: function() {/*
+    Axiom for declaring intent to implement an interface.
+
+    Since interfaces can also have implementations, it
+    can also be used to provide mix-ins, which is a safe form of
+    multiple-inheritance.
+  <pre>
+    Ex.
+    foam.CLASS({
+      name: 'SalaryI',
+      properties: [ 'salary' ]
+    });
+
+    foam.CLASS({
+      name: 'Employee',
+      extends: 'Person',
+      implements: [ 'SalaryI' ]
+    });
+  </pre>
+  Employee extends Person through regular inheritance, but
+  the axioms from SalaryI are also added to the class.
+  Any number of mix-ins/interfaces can be specified.
+  */},
 
   properties: [
     { name: 'name', getter: function() { return 'implements_' + this.path; } },

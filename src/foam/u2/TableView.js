@@ -285,8 +285,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of',
-      required: true
+      name: 'of'
     },
     [ 'nodeName', 'table' ],
     {
@@ -313,7 +312,7 @@ foam.CLASS({
     {
       name: 'columns',
       expression: function(of) {
-        if ( ! this.of ) return undefined;
+        if ( ! this.of ) return [];
 
         var tableColumns = this.of.getAxiomByName('tableColumns');
 

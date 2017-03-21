@@ -110,13 +110,9 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'data',
-      required: true,
-      postSet: function(old, nu) {
-        if ( old ) old.on.reset.unsub(this.updateCount);
-        if ( nu ) nu.on.reset.sub(this.updateCount);
-        this.updateCount();
-      }
+      required: true
     },
     'filteredDAO',
     {
@@ -311,6 +307,9 @@ foam.CLASS({
       this.data$.sub(this.updateSearchFields);
       this.loaded_$.sub(this.updateSearchFields);
       this.searchFields$.sub(this.updateSearchFields);
+
+      this.data$proxy.on.reset.sub(this.updateCount);
+      if ( this.data ) this.updateCount();
     },
 
     function addGroup(spec, prop, opt_map) {

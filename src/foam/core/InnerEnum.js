@@ -45,6 +45,8 @@ foam.CLASS({
   package: 'foam.core',
   name: 'InnerEnum',
 
+  documentation: 'Axiom for defining inner-enums. An inner-enum is an enum defined in the scope of the outer/owner class. This avoids poluting the package namespace with enums which are only used internally by a class.',
+
   properties: [
     {
       name: 'name',

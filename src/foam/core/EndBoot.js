@@ -185,7 +185,7 @@ foam.boot.end();
   foam.json.Storage does not encode storageTransient fields.
  */
 foam.CLASS({
-  refines: 'Property',
+  refines: 'foam.core.Property',
 
   properties: [
     {

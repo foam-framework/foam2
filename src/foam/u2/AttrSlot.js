@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'AttrSlot',
   implements: [ 'foam.core.Slot' ],
 
-  // documentation: 'A Value bound to an Element attribute. Used to bind values to DOM.',
+  documentation: 'A Value bound to an Element attribute. Used to bind values to DOM.',
 
   properties: [
     {

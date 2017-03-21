@@ -180,6 +180,16 @@ describe('Float', function() {
     p.float = undefined;
     expect(p.float).toEqual(0);
   });
+
+  it('has different hashes for f1 != f2, round(f1) == round(f2)', function() {
+    // Hash code should be deterministic.
+    expect(foam.util.hashCode(p)).toBe(foam.util.hashCode(p));
+    p.float = 0.01;
+    var hashPsFloat0_01 = foam.util.hashCode(p);
+    p.float = 0.001;
+    var hashPsFloat0_001 = foam.util.hashCode(p);
+    expect(hashPsFloat0_01).not.toEqual(hashPsFloat0_001);
+  });
 });
 
 describe('Function', function() {
@@ -221,8 +231,9 @@ describe('StringArray', function() {
   it('setting an array to a number throws an exception', function() {
     expect(function() { p.stringArray = 42; }).toThrow();
   });
-  it('setting an array to null throws an exception', function() {
-    expect(function() { p.stringArray = null; }).toThrow();
+  it('setting an array to null is permitted', function() {
+    p.stringArray = null;
+    expect(p.stringArray).toBe(null);
   });
   it('setting an array to an object throws an exception', function() {
     expect(function() { p.stringArray = {}; }).toThrow();

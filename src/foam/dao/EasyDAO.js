@@ -15,22 +15,20 @@
  * limitations under the License.
  */
 
-/**
-    <p>If you don't know which DAO implementation to choose, EasyDAO is
-    ready to help. Simply require foam.dao.EasyDAO and create() with the flags
-    to indicate what behavior you're looking for. Under the hood, EasyDAO
-    will create one or more DAO instances to service your requirements.
-    </p>
-    <p>Since EasyDAO is a proxy, just use it like you would any other
-    DAO, without worrying about the internal DAO doing the work.
-    </p>
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'EasyDAO',
   extends: 'foam.dao.ProxyDAO',
-
   implements: [ 'foam.mlang.Expressions' ],
+
+  documentation: function() {/*
+    Facade for easily creating decorated DAOs.
+    <p>
+    Most DAOs are most easily created and configured with EasyDAO.
+    Simply require foam.dao.EasyDAO and create() with the flags
+    to indicate what behavior you're looking for. Under the hood, EasyDAO
+    will create one or more DAO instances to service your requirements and then
+  */},
 
   requires: [
     'foam.dao.MDAO',
@@ -43,6 +41,7 @@ foam.CLASS({
     'foam.dao.ContextualizingDAO',
     'foam.dao.DeDupDAO',
     'foam.dao.ClientDAO',
+    'foam.dao.PromisedDAO',
     'foam.box.Context',
     'foam.box.HTTPBox',
     'foam.box.SocketBox',
@@ -360,19 +359,33 @@ foam.CLASS({
         dao = this.LoggingDAO.create({ delegate: dao });
       }
 
-      this.delegate = dao;
+      var self = this;
 
       if ( this.testData ) {
-        var self = this;
-        this.select(this.COUNT()).then(function(c) {
-          // Only load testData if DAO is empty
-          if ( c.value ) return;
+        var delegate = dao;
 
-          foam.json.parse(self.testData, self.of).forEach(
-            function(o) { self.put(o); }
-          );
+        dao = this.PromisedDAO.create({
+          promise: new Promise(function(resolve, reject) {
+            delegate.select(self.COUNT()).then(function(c) {
+              console.log("Loading test data");
+              // Only load testData if DAO is empty
+              if ( c.value ) {
+                resolve(delegate);
+                return;
+              }
+
+              Promise.all(foam.json.parse(self.testData, self.of).map(
+                function(o) { return delegate.put(o); }
+              )).then(function() {
+                console.log("Loaded", self.testData.length, "records.");
+                resolve(delegate);
+              }, reject);
+            });
+          })
         });
       }
+
+      this.delegate = dao;
     },
 
     /** Only relevant if cache is true or if daoType
