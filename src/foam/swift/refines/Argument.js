@@ -33,17 +33,23 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftDefaultValue',
+    },
+    {
+      class: 'String',
       name: 'swiftType',
       value: 'Any?',
     },
   ],
   methods: [
     function toSwiftArg() {
-      return this.Argument.create({
+      var arg = this.Argument.create({
         localName: this.swiftLocalName,
         externalName: this.swiftExternalName,
         type: this.swiftType,
       });
+      if (this.swiftDefaultValue) arg.defaultValue = this.swiftDefaultValue;
+      return arg;
     },
   ]
 });

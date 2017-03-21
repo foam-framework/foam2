@@ -66,6 +66,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function method(m) {
+      this.methods.push(m);
+      return this;
+    },
     function outputSwift(o) {
       o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');

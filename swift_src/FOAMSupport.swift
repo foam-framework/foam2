@@ -31,6 +31,7 @@ public protocol PropertyInfo: Axiom {
   var jsonParser: Parser? { get }
   func set(_ obj: FObject, value: Any?)
   func get(_ obj: FObject) -> Any? // TODO rename to f?
+  func compareValues(_ v1: Any?, _ v2: Any?) -> Int
 }
 
 extension PropertyInfo {
@@ -44,8 +45,7 @@ extension PropertyInfo {
     if v1 == nil && v2 == nil { return 0 }
     if v1 == nil { return -1 }
     if v2 == nil { return 1 }
-    if v1!.isEqual(v2) { return 0 }
-    return v1!.hash ?? 0 > v2!.hash ?? 0 ? 1 : -1
+    return compareValues(v1, v2)
   }
 }
 
@@ -170,8 +170,24 @@ public protocol FObject: class {
   init(_ args: [String:Any?])
 }
 
-public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
+// TODO figure out how to make FObjects implement Comparable.
+/*
+extension FObject {
+  public static func < (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) < 0 }
+  public static func == (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) == 0 }
+  public static func > (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) > 1 }
+}
+*/
 
+public protocol Comparator {
+  func compareValues(_ v1: Any?, _ v2: Any?) -> Int
+}
+
+public protocol FoamPredicate {
+}
+
+
+public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   public var __context__: Context = Context.GLOBAL {
     didSet {
       self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())

@@ -49,7 +49,7 @@ foam.CLASS({
         this.static ? 'static ' : '',
         this.class ? 'class ' : '',
         this.name != 'init' ? 'func ' : '',
-        this.name,
+        '`', this.name, '`',
         '(');
 
       for (var i = 0, arg; arg = this.args[i]; i++) {

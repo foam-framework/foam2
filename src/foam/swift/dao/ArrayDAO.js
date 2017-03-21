@@ -54,5 +54,15 @@ if i == nil { return nil }
 return dao.remove(at: i!)
       */},
     },
+    {
+      name: 'find',
+      swiftCode: function() {/*
+let i = dao.index { (o) -> Bool in
+  return self.primaryKey.compareValues(id, self.primaryKey.get(o)) == 0
+}
+if i == nil { return nil }
+return dao[i!]
+      */},
+    },
   ]
 });
