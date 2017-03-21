@@ -46,7 +46,7 @@ foam.CLASS({
         args: [skip, limit, order, predicate]
       });
 
-      listener.dao$.follow(this.delegate$);
+      listener.onDetach(listener.dao$.follow(this.delegate$));
 
       return listener;
     }
