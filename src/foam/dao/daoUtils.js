@@ -43,13 +43,10 @@ foam.CLASS({
     function listen(sink, skip, limit, order, predicate) {
       var listener = this.ProxyListener.create({
         delegate: sink,
-        dao: this.delegate,
         args: [skip, limit, order, predicate]
       });
 
-      listener.onDetach(this.sub('propertyChange', 'delegate', function(s, pc, d, slot) {
-        listener.dao = slot.get();
-      }));
+      listener.dao$.follow(this.delegate$);
 
       return listener;
     }
