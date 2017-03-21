@@ -53,7 +53,8 @@ foam.CLASS({
         method: 'PUT',
         url: this.baseURL,
         payload: this.jsonify_(o)
-      }).send().then(this.onPutResponse);
+      }).send().then(this.onResponse.bind(this, 'put'))
+          .then(this.onPutResponse);
     },
 
     function remove(o) {
@@ -63,7 +64,8 @@ foam.CLASS({
       return this.createRequest_({
         method: 'DELETE',
         url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(o.id))
-      }).send().then(this.onRemoveResponse);
+      }).send().then(this.onResponse.bind(this, 'remove'))
+          .then(this.onRemoveResponse);
     },
 
     function find(id) {
@@ -73,7 +75,8 @@ foam.CLASS({
       return this.createRequest_({
         method: 'GET',
         url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(id))
-      }).send().then(this.onFindResponse);
+      }).send().then(this.onResponse.bind(this, 'find'))
+          .then(this.onFindResponse);
     },
 
     function select(sink, skip, limit, order, predicate) {
@@ -96,7 +99,7 @@ foam.CLASS({
       return this.createRequest_({
         method: 'GET',
         url: this.baseURL + ':select?' + query.join('&')
-      }).send().then(
+      }).send().then(this.onResponse.bind(this, 'select')).then(
         this.onSelectResponse.bind(this, sink || this.ArraySink.create()));
     },
 
@@ -116,7 +119,8 @@ foam.CLASS({
         method: 'POST',
         url: this.baseURL + ':removeAll',
         payload: this.jsonify_(payload)
-      }).send().then(this.onRemoveAllResponse);
+      }).send().then(this.onResponse.bind(this, 'removeAll'))
+          .then(this.onRemoveAllResponse);
     },
 
     function createRequest_(o) {
@@ -141,30 +145,27 @@ foam.CLASS({
           'Unexpected ' + name + ' response code from REST DAO endpoint: ' +
             response.status);
       }
+      return response.payload;
     },
 
-    function onPutResponse(response) {
-      this.onResponse('put', response);
-      var o = foam.json.parse(response.payload);
+    function onPutResponse(payload) {
+      var o = foam.json.parse(payload);
       this.pub('on', 'put', o);
       return o;
     },
 
-    function onRemoveResponse(response) {
-      this.onResponse('remove', response);
-      var o = foam.json.parse(response.payload);
+    function onRemoveResponse(payload) {
+      var o = foam.json.parse(payload);
       if ( o !== null ) this.pub('on', 'remove', o);
       return o;
     },
 
-    function onFindResponse(response) {
-      this.onResponse('find', response);
-      return foam.json.parse(response.payload);
+    function onFindResponse(payload) {
+      return foam.json.parse(payload);
     },
 
-    function onSelectResponse(sink, response) {
-      this.onResponse('select', response);
-      var results = foam.json.parse(response.payload);
+    function onSelectResponse(sink, payload) {
+      var results = foam.json.parse(payload);
       for ( var i = 0; i < results.length; i++ ) {
         sink.put(results[i]);
       }
@@ -172,8 +173,7 @@ foam.CLASS({
       return sink;
     },
 
-    function onRemoveAllResponse(response) {
-      this.onResponse('removeAll', response);
+    function onRemoveAllResponse(payload) {
       return undefined;
     }
   ]
