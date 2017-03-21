@@ -691,6 +691,9 @@ foam.CLASS({
             responseType: this.responseType
           });
 
+          // Ensure that payload factory wires up listeners immediately.
+          resp.payload;
+
           if ( this.followRedirect &&
                ( resp.status === 301 ||
                  resp.status === 302 ||
@@ -705,20 +708,10 @@ foam.CLASS({
               headers: this.headers,
               followRedirect: true
             }).send());
-            return;
+          } else {
+            resolve(resp);
           }
 
-          var buffer = '';
-          nodeResp.on('data', function(d) {
-            buffer += d.toString();
-          });
-          nodeResp.on('end', function() {
-            resp.payload = buffer;
-            resolve(resp);
-          });
-          nodeResp.on('error', function(e) {
-            reject(e);
-          });
         }.bind(this));
 
         req.on('error', function(e) {
@@ -741,18 +734,37 @@ foam.CLASS({
   properties: [
     {
       name: 'payload',
-      adapt: function(_, str) {
+      factory: function() {
         if ( this.streaming ) return null;
 
-        switch (this.responseType) {
-        case 'text':
-          return str;
-        case 'json':
-          return JSON.parse(str);
-        }
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var buffer = ""
+          self.resp.on('data', function(d) {
+            buffer += d.toString();
+          });
+          self.resp.on('end', function() {
+            switch (self.responseType) {
+            case "text":
+              resolve(buffer);
+              return;
+            case "json":
+              try {
+                resolve(JSON.parse(buffer));
+              } catch ( error ) {
+                reject(error);
+              }
+              return;
+            }
 
-        // TODO: responseType should be an enum and/or have validation
-        throw new Error('Unsupported response type: ' + this.responseType);
+            // TODO: responseType should be an enum and/or have validation.
+            reject(new Error(
+                'Unsupported response type: ' + self.responseType));
+          });
+          self.resp.on('error', function(e) {
+            reject(e);
+          });
+        });
       }
     },
     {
