@@ -70,7 +70,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(_, b) { return b === undefined; },
     function compare(_, b) { return b === undefined ? 0 : 1; },
-    function hashCode() { return -1; }
+    function hashCode() { return -2; }
   ]
 });
 
@@ -84,7 +84,7 @@ foam.LIB({
     function compare(_, b) {
       return b === null ? 0 : b === undefined ? -1 : 1;
     },
-    function hashCode() { return -2; }
+    function hashCode() { return -3; }
   ]
 });
 
@@ -96,7 +96,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
-    function hashCode(o) { return o ? 1 : 0; }
+    function hashCode(o) { return o ? 1 : -1; }
   ]
 });
 
@@ -314,6 +314,22 @@ foam.LIB({
         args.push(a);
       }
       return fn.apply(opt_self || source, args);
+    },
+
+    function closure(fn) {
+      /**
+         Create a closure which still serializes to its definition.
+
+         var f = foam.Function.closure(function() { var i = 0; return function() { return i++; } });
+         f(); -> 0
+         f(); -> 1
+         f.toString(); -> "foam.Function.closure(function () { var i = 0; return function() { return i++; } })"
+      */
+      var ret = fn();
+
+      ret.toString = function() { return 'foam.Function.closure(' + fn.toString() + ')'; };
+
+      return ret;
     }
   ]
 });
@@ -346,9 +362,22 @@ foam.LIB({
     function equals(a, b) { return a === b; },
     function compare(a, b) {
       return ( b === null || b === undefined ) ? 1 :
-        a < b ? -1 : a > b ? 1 : 0;
+          a < b ? -1 : a > b ? 1 : 0;
     },
-    function hashCode(n) { return n & n; }
+    (function() {
+      var bufForHash = new ArrayBuffer(8);
+      var floatArrayForHash = new Float64Array(bufForHash);
+      var intArrayForHash = new Int32Array(bufForHash);
+
+      return function hashCode(n) {
+        if (Number.isInteger(n)) return n & n; // Truncate to 32 bits.
+
+        floatArrayForHash[0] = n;
+        var hash = ((intArrayForHash[0] << 5) - intArrayForHash[0]) +
+            intArrayForHash[1];
+        return hash & hash; // Truncate to 32 bits.
+      };
+    })()
   ]
 });
 
@@ -361,12 +390,12 @@ foam.LIB({
     function equals(a, b) { return a === b; },
     function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
     function hashCode(s) {
-      var hash = 0;
+      var hash = -4;
 
       for ( var i = 0 ; i < s.length ; i++ ) {
         var code = s.charCodeAt(i);
         hash = ((hash << 5) - hash) + code;
-        hash &= hash;
+        hash &= hash; // Truncate to 32 bits.
       }
 
       return hash;
@@ -512,7 +541,7 @@ foam.LIB({
       return a.length === b.length ? 0 : a.length < b.length ? -1 : 1;
     },
     function hashCode(a) {
-      var hash = 0;
+      var hash = -5;
 
       for ( var i = 0 ; i < a.length ; i++ ) {
         hash = ((hash << 5) - hash) + foam.util.hashCode(a[i]);
@@ -543,6 +572,7 @@ foam.LIB({
       b = this.getTime(b);
       return a < b ? -1 : a > b ? 1 : 0;
     },
+    // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
     function relativeDateString(date) {
       // FUTURE: make this translatable for i18n, including plurals
@@ -619,7 +649,14 @@ foam.LIB({
     function compare(a, b) {
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
-    function hashCode(o) { return 0; },
+    function hashCode(o) {
+      var hash = 19;
+      for ( var key in o ) {
+        if ( ! o.hasOwnProperty(key) ) continue;
+        hash = ((hash << 5) - hash) + foam.util.hashCode(o[key]);
+      }
+      return hash;
+    },
     function freeze(o) {
       // Force $UID creation before freezing because it can't
       // be added to the object after it's frozen.
@@ -806,6 +843,7 @@ foam.LIB({
     },
 
     function compound(args) {
+      /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
 
       if ( cs.lengh === 1 ) return cs[0];

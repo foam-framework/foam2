@@ -338,10 +338,6 @@ describe('SkipSink', function() {
 
 
 
-if ( typeof localStorage === "undefined" || localStorage === null ) {
-  var LocalStorage = require('node-localstorage').LocalStorage;
-  localStorage = new LocalStorage('./tmp');
-}
 describe('LocalStorageDAO', function() {
   var a;
   var a2;
@@ -728,15 +724,10 @@ describe('LRUDAOManager', function() {
         .then(function(counter) {
           expect(counter.value).toEqual(4);
         }).then(function() {
-          mDAO.find(1).then(function() {
-            fail("Expected no item 1 to be found");
-            done();
-          },
-          function(err) {
-            //expected not to find it
+          mDAO.find(1).then(function(obj) {
+            expect(obj).toBe(null);
             done();
           });
-
         });
     }, 100);
   });
@@ -782,15 +773,10 @@ describe('LRUDAOManager', function() {
         .then(function(counter) {
           expect(counter.value).toEqual(4);
         }).then(function() {
-          mDAO2.find(1).then(function() {
-            fail("Expected no item 1 to be found");
-            done();
-          },
-          function(err) {
-            //expected not to find it
+          mDAO2.find(1).then(function(obj) {
+            expect(obj).toBe(null);
             done();
           });
-
         });
     }, 100);
 
@@ -1209,16 +1195,13 @@ describe('NullDAO', function() {
       }
     );
   });
-  it('rejects find operations', function(done) {
+  it('find resolves null', function(done) {
     var nDAO = foam.dao.NullDAO.create();
     nDAO.find(4).then(
-      function() {
-        fail('find should not be accepted');
-      },
-      function(err) {
+      function(obj) {
+        expect(obj).toBe(null);
         done();
-      }
-    );
+      });
   });
   it('selects as empty', function(done) {
     var sink = {

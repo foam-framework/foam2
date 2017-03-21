@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
+
+  documentation: 'DAO implementation backed by an array.',
 
   requires: [
     'foam.dao.ArraySink',
@@ -109,7 +110,7 @@ foam.CLASS({
         }
       }
 
-      return Promise.reject(this.ObjectNotFoundException.create({ id: id }));
+      return Promise.resolve(null);
     }
   ]
 });

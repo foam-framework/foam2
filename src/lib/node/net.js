@@ -239,7 +239,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'Socket',
 
   imports: [
@@ -388,11 +388,11 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'SocketService',
 
   requires: [
-    'foam.net.Socket',
+    'foam.net.node.Socket',
     'foam.box.RegisterSelfMessage'
   ],
 
@@ -589,7 +589,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
-  extends: 'foam.net.WebSocketService',
+  extends: 'foam.net.web.WebSocketService',
 
   requires: [
     'foam.net.node.WebSocket',
@@ -645,7 +645,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPRequest',
-  extends: 'foam.net.HTTPRequest',
+  extends: 'foam.net.web.HTTPRequest',
 
   requires: [
     'foam.net.node.HTTPResponse'
@@ -685,11 +685,14 @@ foam.CLASS({
       if ( this.port ) options.port = this.port;
 
       return new Promise(function(resolve, reject) {
-        var req = require(this.protocol).request(options, function(res) {
+        var req = require(this.protocol).request(options, function(nodeResp) {
           var resp = this.HTTPResponse.create({
-            resp: res,
+            resp: nodeResp,
             responseType: this.responseType
           });
+
+          // Ensure that payload factory wires up listeners immediately.
+          resp.payload;
 
           if ( this.followRedirect &&
                ( resp.status === 301 ||
@@ -726,7 +729,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPResponse',
-  extends: 'foam.net.HTTPResponse',
+  extends: 'foam.net.web.HTTPResponse',
 
   properties: [
     {
@@ -734,19 +737,34 @@ foam.CLASS({
       factory: function() {
         if ( this.streaming ) return null;
 
-        // TODO: Handle response type.
+        var self = this;
         return new Promise(function(resolve, reject) {
           var buffer = ""
-          this.resp.on('data', function(d) {
+          self.resp.on('data', function(d) {
             buffer += d.toString();
           });
-          this.resp.on('end', function() {
-            resolve(buffer);
+          self.resp.on('end', function() {
+            switch (self.responseType) {
+            case "text":
+              resolve(buffer);
+              return;
+            case "json":
+              try {
+                resolve(JSON.parse(buffer));
+              } catch ( error ) {
+                reject(error);
+              }
+              return;
+            }
+
+            // TODO: responseType should be an enum and/or have validation.
+            reject(new Error(
+                'Unsupported response type: ' + self.responseType));
           });
-          this.resp.on('error', function(e) {
+          self.resp.on('error', function(e) {
             reject(e);
           });
-        }.bind(this));
+        });
       }
     },
     {

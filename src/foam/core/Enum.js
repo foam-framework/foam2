@@ -190,6 +190,8 @@ foam.CLASS({
   name: 'EnumModel',
   extends: 'Model',
 
+  documentation: 'Model for defining Enum(erations).',
+
   properties: [
     [ 'extends', 'foam.core.AbstractEnum' ],
     {

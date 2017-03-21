@@ -31,8 +31,9 @@ foam.CLASS({
     function find(id) {
       var self = this;
       return this.primary.find(id)
-          .then(undefined, function() {
-            return self.delegate.find(id);
+          .then(function(o) {
+            if ( o == null ) return self.delegate.find(id);
+            return o;
           });
     }
   ]

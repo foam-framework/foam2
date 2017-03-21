@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'DAOController',
   extends: 'foam.u2.View',
 
+  documentation: 'DAO-backed CRUD controller.',
+
   // Expects a DAO as its data. Calls listFactory to construct the list, passing
   // it rowFactory.
   // Clicking a row creates a DAOUpdateController to edit the item (lists should

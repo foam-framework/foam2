@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-/**
-  Logs access to the delegate DAO. Useful for debugging.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'LoggingDAO',
   extends: 'foam.dao.ProxyDAO',
+
+  documentation: 'DAO Decorator which logs access to the delegate; useful for debugging.',
 
   requires: [ 'foam.dao.ArraySink' ],
 
@@ -79,6 +78,5 @@ foam.CLASS({
       this.logger('find', id);
       return this.SUPER(id);
     }
-
   ]
 });

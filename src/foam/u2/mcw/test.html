@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="mdc-typography">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Greeting App</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <script src="../../../foam.js"></script>
+    <script src="Button.js"></script>
+    <script src="TextField.js"></script>
+    <script src="DetailPropertyView.js"></script>
+  </head>
+  <body>
+    <h1 class="mdc-typography--display1">Hello, World!</h1>
+
+    <foam class="foam.u2.mcw.Button" label="Press Me"></foam>
+    <foam class="foam.u2.mcw.Button" label="Or Me"></foam>
+    <foam class="foam.u2.mcw.Button" primary="yes" label="Primary"></foam>
+    <foam class="foam.u2.mcw.Button" raised="" label="Not Raised"></foam>
+
+   <p>
+
+   <form action="#" id="greeting-form">
+    <div>
+      <div class="mdc-form-field">
+        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+          <input id="firstname" type="text" class="mdc-textfield__input">
+          <label for="firstname" class="mdc-textfield__label">
+            First Name
+          </label>
+        </div>
+      </div>
+
+      <div class="mdc-form-field">
+        <div class="mdc-textfield" data-mdc-auto-init="MDCTextfield">
+          <input id="lastname" type="text" class="mdc-textfield__input">
+          <label for="lastname" class="mdc-textfield__label">
+            Last Name
+          </label>
+        </div>
+      </div>
+    </div>
+   </form>
+
+   <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+   <script>window.addEventListener('load', function() { window.mdc.autoInit(); });</script>
+
+<form>
+   <script>
+//     foam.__context__.register(foam.u2.mcw.TextField, 'foam.u2.TextField');
+     foam.__context__.register(foam.u2.mcw.DetailPropertyView, 'foam.u2.DetailPropertyView');
+     foam.__context__.register(foam.u2.mcw.Button, 'foam.u2.ActionView');
+     foam.u2.DetailView.create({data: foam.util.Timer.create(), showActions: true}).write();
+   </script>
+</form>
+
+  </body>
+</html>

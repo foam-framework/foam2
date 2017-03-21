@@ -54,7 +54,7 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var stack = self.stack;
+        var stack = this.stack;
 
         this.dao.put(this.data).then(function() {
           if ( stack ) stack.back();
