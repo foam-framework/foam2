@@ -26,10 +26,16 @@ foam.LIB({
         return model.swiftImports.concat(initImports(parent));
       };
 
+      var impls = [this.model_.swiftExtends].concat(
+          this.model_.swiftImplements,
+          (this.model_.implements || []).map(function(i) {
+            return foam.lookup(i.path).model_.swiftName;
+          }));
+
       var cls = foam.lookup('foam.swift.SwiftClass').create({
         name: this.model_.swiftName,
         imports: ['Foundation'].concat(initImports(this.model_)),
-        implements: [this.model_.swiftExtends].concat(this.model_.swiftImplements),
+        implements: impls,
         visibility: 'public',
         code: this.model_.swiftCode,
       });

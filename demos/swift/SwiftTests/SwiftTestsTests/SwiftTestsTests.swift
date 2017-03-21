@@ -307,9 +307,12 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(t1, dao.put(t1) as? Test)
     XCTAssertEqual(dao.dao as! [Test], [t2, t1])
 
+    XCTAssertEqual(t1, dao.find(t1.firstName) as? Test)
+
     let tToRemove = Test(["firstName": "Mike2"])
     let tRemoved = dao.remove(tToRemove) as? Test
     XCTAssertNotEqual(tRemoved, tToRemove)
     XCTAssertEqual(tRemoved, t1)
   }
+
 }

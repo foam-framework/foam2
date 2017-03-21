@@ -24,6 +24,16 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'FObjectArray',
+      of: 'foam.core.Argument',
+      name: 'args',
+      adaptArrayElement: function(o, prop) {
+        var Argument = foam.lookup('foam.core.Argument');
+        return typeof o === 'string' ? Argument.create({name: o}) :
+            Argument.create(o);
+      },
+    },
+    {
       name: 'swiftArgs',
       expression: function(args) {
         var swiftArgs = [];
@@ -44,6 +54,11 @@ foam.CLASS({
         }
         return n.map(adaptElement);
       },
+    },
+    {
+      class: 'String',
+      name: 'swiftVisibility',
+      value: 'public',
     },
     {
       class: 'String',
@@ -71,24 +86,34 @@ foam.CLASS({
   ],
   methods: [
     function createChildMethod_(child) {
-      var m = this.clone();
+      // Clone from the child to ensure the type is the same as the child.
+      var m = child.clone();
+      m.copyFrom(this);
       m.copyFrom(child);
 
-      // TODO: This is a hack to not clobber the parent's args.
-      // Figure out a better way.
-      m.args = this.args; 
+      if ( !m.args.length ) { 
+        m.args = this.args;
+      } else if ( m.args.length == this.args.length ) {
+        for (var i = 0; i < m.args.length; i++) {
+          var arg = this.args[i].clone();
+          arg.copyFrom(m.args[i]);
+          m.args[i] = arg;
+        }
+      } else {
+        console.log('Unable to properly merge args.');
+      }
 
       return m;
     },
     function writeToSwiftClass(cls, superAxiom) {
       if ( !this.swiftCode ) return;
-      cls.methods.push(this.Method.create({
+      cls.method(this.Method.create({
         name: this.name,
         body: this.swiftCode,
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
-        visibility: 'public',
-        override: !!superAxiom,
+        visibility: this.swiftVisibility,
+        override: !!(superAxiom && superAxiom.swiftCode),
         annotations: this.swiftAnnotations,
       }));
     },

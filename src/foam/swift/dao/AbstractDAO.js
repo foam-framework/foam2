@@ -18,6 +18,9 @@
 foam.CLASS({
   package: 'foam.swift.dao',
   name: 'AbstractDAO',
+  implements: [
+    'foam.dao.DAO',
+  ],
   properties: [
     {
       name: 'of',
@@ -33,134 +36,43 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      swiftReturnType: 'FObject?',
-      args: [
-        {
-          name: 'obj',
-          swiftType: 'FObject'
-        }
-      ],
       swiftCode: 'fatalError()',
     },
     {
       name: 'remove',
-      swiftReturnType: 'FObject?',
-      args: [
-        {
-          name: 'obj',
-          swiftType: 'FObject'
-        }
-      ],
       swiftCode: 'fatalError()',
     },
-    /*
     {
       name: 'find',
-      swiftReturnType: 'FObject',
-      args: [
-        {
-          name: 'id',
-          swiftType: 'Any?'
-        }
-      ],
       swiftCode: 'fatalError()',
     },
     {
       name: 'select',
-      swiftReturnType: 'Sink',
-      args: [
-        {
-          name: 'sink',
-          swiftType: 'Sink'
-        },
-        {
-          name: 'skip',
-          swiftType: 'Int'
-        },
-        {
-          name: 'limit',
-          swiftType: 'Int'
-        },
-        {
-          name: 'order',
-          swiftType: 'Comparator'
-        },
-        {
-          name: 'predicate',
-          swiftType: 'Predicate'
-        }
-      ]
+      swiftCode: 'fatalError()',
     },
     {
       name: 'removeAll',
-      args: [
-        {
-          name: 'skip',
-          swiftType: 'Int'
-        },
-        {
-          name: 'limit',
-          swiftType: 'Int'
-        },
-        {
-          name: 'order',
-          swiftType: 'Comparator'
-        },
-        {
-          name: 'predicate',
-          swiftType: 'Predicate'
-        }
-      ]
+      swiftCode: 'fatalError()'
     },
     {
       name: 'pipe',
-      args: [
-        {
-          name: 'sink',
-          swiftType: 'Sink'
-        }
-      ]
+      swiftCode: 'fatalError()'
     },
     {
       name: 'where',
-      swiftReturnType: 'AbstractDAO',
-      args: [
-        {
-          name: 'predicate',
-          swiftType: 'Predicate'
-        }
-      ]
+      swiftCode: 'fatalError()'
     },
     {
       name: 'orderBy',
-      swiftReturnType: 'AbstractDAO',
-      args: [
-        {
-          name: 'comparator',
-          swiftType: 'Comparator'
-        }
-      ]
+      swiftCode: 'fatalError()'
     },
     {
       name: 'skip',
-      swiftReturnType: 'AbstractDAO',
-      args: [
-        {
-          name: 'count',
-          swiftType: 'Int'
-        }
-      ]
+      swiftCode: 'fatalError()'
     },
     {
       name: 'limit',
-      swiftReturnType: 'AbstractDAO',
-      args: [
-        {
-          name: 'count',
-          swiftType: 'Int'
-        }
-      ]
+      swiftCode: 'fatalError()'
     }
-*/
   ]
 });

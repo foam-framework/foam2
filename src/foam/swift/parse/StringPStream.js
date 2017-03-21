@@ -18,7 +18,9 @@
 foam.CLASS({
   package: 'foam.swift.parse',
   name: 'StringPStream',
-  extends: 'foam.swift.parse.PStream',
+  implements: [
+    'foam.swift.parse.PStream',
+  ],
   properties: [
     {
       swiftType: 'Reference<String>',

@@ -15,30 +15,24 @@
  * limitations under the License.
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.swift.parse',
   name: 'PStream',
   methods: [
     {
       name: 'head',
       swiftReturnType: 'Character',
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
+      swiftEnabled: true,
     },
     {
       name: 'valid',
       swiftReturnType: 'Bool',
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
+      swiftEnabled: true,
     },
     {
       name: 'tail',
       swiftReturnType: 'PStream',
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
+      swiftEnabled: true,
     },
     {
       name: 'substring',
@@ -49,16 +43,12 @@ fatalError("Implement me")
           swiftType: 'PStream',
         },
       ],
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
+      swiftEnabled: true,
     },
     {
       name: 'value',
       swiftReturnType: 'Any?',
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
+      swiftEnabled: true,
     },
     {
       name: 'setValue',
@@ -69,9 +59,7 @@ fatalError("Implement me")
           swiftType: 'Any?',
         },
       ],
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
+      swiftEnabled: true,
     },
   ]
 });
