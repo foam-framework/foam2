@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
+  requires: [
+    'foam.dao.ProxyListener'
+  ],
 
   documentation: 'Proxy implementation for the DAO interface.',
 
@@ -34,32 +37,56 @@ foam.CLASS({
       factory: function() {
         return this.delegate.of;
       }
-    },
-    {
-      class: 'Map',
-      name: 'daoListeners_'
     }
   ],
   methods: [
     function listen(sink, skip, limit, order, predicate) {
-      var innerSub = this.delegate.listen(sink, skip, limit, order, predicate);
-      var args = [sink, skip, limit, order, predicate];
-
-      var pc = this.sub('propertyChange', 'delegate', function(s, _, _, slot, value) {
-        innerSub.detach();
-        value && value.listen.apply(value, args);
-        if ( slot.getPrev() ) {
-          // If we had an old value, then fire a reset event.
-          sink.reset && sink.reset();
-        }
+      var listener = this.ProxyListener.create({
+        delegate: sink,
+        dao: this.delegate,
+        args: [skip, limit, order, predicate]
       });
 
-      var sub = foam.core.FObject.create();
+      listener.onDetach(this.sub('propertyChange', 'delegate', function(s, pc, d, slot, value) {
+        listener.dao = value;
+      }));
 
-      sub.onDetach(pc);
-      sub.onDetach(innerSub);
+      return listener;
+    }
+  ]
+});
 
-      return sub;
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyListener',
+  implements: ['foam.dao.Sink'],
+  properties: [
+    'args',
+    'delegate',
+    {
+      name: 'innerSub',
+      postSet: function(_, s) {
+        if (s) this.onDetach(s);
+      }
+    },
+    {
+      name: 'dao',
+      postSet: function(old, nu) {
+        this.innerSub && this.innerSub.detach();
+        this.innerSub = nu && nu.listen.apply(nu, this.args);
+        if ( old ) this.reset();
+      }
+    }
+  ],
+  methods: [
+    function put(s, obj) {
+      this.delegate.put(this, obj);
+    },
+    function remove(s, obj) {
+      this.delegate.remove(this, obj);
+    },
+    function reset(s) {
+      this.delegate.reset(this);
     }
   ]
 });
