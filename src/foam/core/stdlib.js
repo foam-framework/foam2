@@ -314,6 +314,14 @@ foam.LIB({
         args.push(a);
       }
       return fn.apply(opt_self || source, args);
+    },
+
+    function closure(fn) {
+      var ret = fn();
+
+      ret.toString = function() { return 'foam.Function.closure(' + fn.toString() + ')'; };
+
+      return ret;
     }
   ]
 });
