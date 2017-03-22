@@ -113,6 +113,8 @@ FOAM_FILES([
   { name: "foam/dao/DAOProperty" },
   { name: "foam/mlang/mlang" },
   { name: "foam/mlang/mlangJava", flags: ['java'] },
+  { name: "foam/swift/refines/Predicate", flags: ['swift'] },
+  { name: "foam/swift/refines/Comparator", flags: ['swift'] },
   { name: "foam/mlang/LabeledValue" },
   { name: "foam/dao/index/Plan" },
   { name: "foam/dao/index/Index" },

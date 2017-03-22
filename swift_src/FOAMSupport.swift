@@ -179,14 +179,6 @@ extension FObject {
 }
 */
 
-public protocol Comparator {
-  func compareValues(_ v1: Any?, _ v2: Any?) -> Int
-}
-
-public protocol FoamPredicate {
-}
-
-
 public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   public var __context__: Context = Context.GLOBAL {
     didSet {
