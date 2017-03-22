@@ -1243,34 +1243,20 @@ foam.CLASS({
   extends: 'foam.dao.ProxySink',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Sink which .',
+  documentation: 'Sink decorator which only put()\'s a single obj for each unique expression value.',
 
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
-      name: ''
+      name: 'expr'
     },
     {
-      class: 'foam.mlang.ExprProperty',
-      name: 'arg2'
-    },
-    {
-      name: 'groups',
+      name: 'values',
       factory: function() { return {}; }
-    },
-    {
-      class: 'StringArray',
-      name: 'groupKeys',
-      factory: function() { return []; }
     }
   ],
 
   methods: [
-    function sortedKeys(opt_comparator) {
-      this.groupKeys.sort(opt_comparator || this.arg1.comparePropertyValues);
-      return this.groupKeys;
-    },
-
     function putInGroup_(key, obj) {
       var group = this.groups.hasOwnProperty(key) && this.groups[key];
       if ( ! group ) {
@@ -1282,31 +1268,26 @@ foam.CLASS({
     },
 
     function put(obj) {
-      var key = this.arg1.f(obj);
-      if ( Array.isArray(key) ) {
-        if ( key.length ) {
-          for ( var i = 0; i < key.length; i++ ) {
-            this.putInGroup_(key[i], obj);
-          }
-        } else {
-          // Perhaps this should be a key value of null, not '', since '' might
-          // actually be a valid key.
-          this.putInGroup_('', obj);
-        }
+      var value = this.expr.f(obj);
+      if ( Array.isArray(value) ) {
+        throw 'Unique doesn\'t Array values.';
       } else {
-        this.putInGroup_(key, obj);
+        if ( ! this.values.hasOwnProperty(value) ) {
+          this.values[value] = obj;
+          this.delegate.put(obj);
+        }
       }
     },
 
     function eof() { },
 
     function clone() {
-      // Don't use the default clone because we don't want to copy 'groups'.
-      return this.cls_.create({ arg1: this.arg1, arg2: this.arg2 });
+      // Don't use the default clone because we don't want to copy 'uniqueValues'.
+      return this.cls_.create({ expr: this.expr, delegate: this.delegate });
     },
 
     function toString() {
-      return this.groups.toString();
+      return this.uniqueValues.toString();
     }
   ]
 });
@@ -1676,6 +1657,7 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Unique',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Sum'
@@ -1714,7 +1696,7 @@ foam.CLASS({
     function DOT(a, b) { return this._binary_("Dot", a, b); },
     function MUL(a, b) { return this._binary_("Mul", a, b); },
 
-    // TODO: UNIQUE()
+    function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },

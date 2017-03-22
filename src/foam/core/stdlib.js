@@ -314,6 +314,22 @@ foam.LIB({
         args.push(a);
       }
       return fn.apply(opt_self || source, args);
+    },
+
+    function closure(fn) {
+      /**
+         Create a closure which still serializes to its definition.
+
+         var f = foam.Function.closure(function() { var i = 0; return function() { return i++; } });
+         f(); -> 0
+         f(); -> 1
+         f.toString(); -> "foam.Function.closure(function () { var i = 0; return function() { return i++; } })"
+      */
+      var ret = fn();
+
+      ret.toString = function() { return 'foam.Function.closure(' + fn.toString() + ')'; };
+
+      return ret;
     }
   ]
 });

@@ -140,8 +140,10 @@ describe('RestDAO', function() {
           return JSON.stringify(foam.json.Network.objectify(o));
         },
         function createResponse(o) {
-          return this.HTTPResponse.create(
-            Object.assign({responseType: 'json'}, o));
+          return this.HTTPResponse.create(Object.assign(
+              { responseType: 'json' },
+              o,
+              { payload: Promise.resolve(JSON.parse(o.payload || '{}')) }));
         }
       ]
     });
