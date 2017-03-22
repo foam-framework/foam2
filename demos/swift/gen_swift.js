@@ -72,6 +72,8 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.ui.FOAMUILabel',
       'foam.swift.ui.FOAMUITextField',
       'foam.dao.DAO',
+      'foam.mlang.predicate.Predicate',
+      'foam.mlang.order.Comparator',
       'foam.dao.Sink',
       'foam.swift.dao.ArraySink',
       'foam.dao.FlowControl',
