@@ -14,8 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-foam.CLASS({
-  package: 'foam.u2.view',
-  name: 'RecipricalSearch',
-  extends: 'foam.u2.Element'
-});
+
+// Polyfills localStorage if it's not defined.
+
+if ( typeof localStorage === 'undefined' || localStorage === null ) {
+  function LocalStorage() {
+  }
+
+  LocalStorage.prototype.getItem = function(key) {
+    return this[key];
+  };
+
+  LocalStorage.prototype.setItem = function(key, value) {
+    this[key] = value;
+  };
+
+  LocalStorage.prototype.removeItem = function(key) {
+    delete this[key];
+  };
+
+  LocalStorage.prototype.clear = function() {
+    for ( var key in this ) {
+      if ( this.hasOwnProperty(key) ) {
+        delete this[key];
+      }
+    }
+  };
+
+  localStorage = new LocalStorage();
+}

@@ -247,6 +247,26 @@ foam.CLASS({
       intersectTarget(b1, b3).then(function(inter) {
         console.log('intersection: ', inter.join(', '));
       });
+
+      for ( var i = 0 ; i < 100 ; i++ ) {
+        this.ABJunctionDAO.put(ABJunction.create({sourceId: 'b' + (10+Math.floor(Math.random()*90)), targetId: 'i' + (10+Math.floor(Math.random()*90))}));
+      }
+
+      this.ABJunctionDAO.select(this.GROUP_BY(ABJunction.SOURCE_ID, this.COUNT())).then(function (g) {
+        for ( var key in g.groups ) console.log(key, g.groups[key].value);
+      });
+
+      this.ABJunctionDAO.select(this.GROUP_BY(ABJunction.TARGET_ID, this.COUNT())).then(function (g) {
+        for ( var key in g.groups ) console.log(key, g.groups[key].value);
+      });
+
+      this.ABJunctionDAO.select(this.UNIQUE(ABJunction.SOURCE_ID)).then(function (u) {
+        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+      });
+
+      this.ABJunctionDAO.select(this.UNIQUE(ABJunction.TARGET_ID)).then(function (u) {
+        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+      });
     }
   ]
 });

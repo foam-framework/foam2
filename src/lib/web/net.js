@@ -278,7 +278,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'method'
+      name: 'method',
+      value: 'GET'
     },
     {
       class: 'Map',
