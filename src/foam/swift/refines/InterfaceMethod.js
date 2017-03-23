@@ -16,7 +16,7 @@ foam.CLASS({
     function writeToSwiftClass(cls, superAxiom) {
       if ( !this.swiftEnabled ) return;
       cls.method(this.ProtocolMethod.create({
-        name: this.name,
+        name: this.swiftName,
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
       }));

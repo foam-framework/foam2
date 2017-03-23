@@ -24,6 +24,11 @@ foam.CLASS({
   ],
   properties: [
     {
+      class: 'String',
+      name: 'swiftName',
+      expression: function(name) { return name; },
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.core.Argument',
       name: 'args',
@@ -66,17 +71,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'returnTypeName',
-    },
-    {
-      class: 'String',
-      name: 'returnType',
-      expression: function(returnTypeName) {
-        return foam.Function.resolveTypeString(returnTypeName) || null;
-      }
-    },
-    {
-      class: 'String',
       name: 'swiftReturnType',
     },
     {
@@ -86,21 +80,12 @@ foam.CLASS({
   ],
   methods: [
     function createChildMethod_(child) {
-      // Clone from the child to ensure the type is the same as the child.
       var m = child.clone();
-      m.copyFrom(this);
-      m.copyFrom(child);
 
-      if ( !m.args.length ) { 
-        m.args = this.args;
-      } else if ( m.args.length == this.args.length ) {
-        for (var i = 0; i < m.args.length; i++) {
-          var arg = this.args[i].clone();
-          arg.copyFrom(m.args[i]);
-          m.args[i] = arg;
+      for ( var key in this.instance_ ) {
+        if ( !m.hasOwnProperty(key) ) {
+          m[key] = this.instance_[key]
         }
-      } else {
-        console.log('Unable to properly merge args.');
       }
 
       return m;
@@ -108,7 +93,7 @@ foam.CLASS({
     function writeToSwiftClass(cls, superAxiom) {
       if ( !this.swiftCode ) return;
       cls.method(this.Method.create({
-        name: this.name,
+        name: this.swiftName,
         body: this.swiftCode,
         returnType: this.swiftReturnType,
         args: this.swiftArgs,

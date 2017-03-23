@@ -45,13 +45,13 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          swiftType: 'Int',
-          swiftDefaultValue: '0',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
         },
         {
           name: 'limit',
-          swiftType: 'Int',
-          swiftDefaultValue: '0',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
         },
         {
           name: 'order',
@@ -71,13 +71,13 @@ foam.INTERFACE({
       args: [
         {
           name: 'skip',
-          swiftType: 'Int',
-          swiftDefaultValue: '0',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
         },
         {
           name: 'limit',
-          swiftType: 'Int',
-          swiftDefaultValue: '0',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
         },
         {
           name: 'order',
