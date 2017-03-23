@@ -642,7 +642,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff first arg found in second array argument.',
+  documentation: 'Predicate returns true iff second arg found in first array argument.',
 
   methods: [
     {
@@ -662,7 +662,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff first arg found in second array argument, ignoring case.',
+  documentation: 'Predicate returns true iff second arg found in first array argument, ignoring case.',
 
   methods: [
     function f(o) {
