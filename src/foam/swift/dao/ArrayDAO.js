@@ -40,7 +40,7 @@ for (i, o) in dao.enumerated() {
   }
 }
 if !found { dao.append(obj) }
-//notify_("put", fObj: obj)
+_ = pub(["put", obj])
 return obj
       */},
     },
@@ -51,7 +51,9 @@ let i = dao.index { (o) -> Bool in
   return self.primaryKey.compare(obj, o) == 0
 }
 if i == nil { return nil }
-return dao.remove(at: i!)
+let o = dao.remove(at: i!)
+_ = pub(["remove", o])
+return o
       */},
     },
     {
@@ -62,6 +64,24 @@ let i = dao.index { (o) -> Bool in
 }
 if i == nil { return nil }
 return dao[i!]
+      */},
+    },
+    {
+      name: 'select',
+      swiftCode: function() {/*
+let resultSink = sink
+let sink = decorateSink_(resultSink, skip, limit, order, predicate)
+
+var detached = false
+let sub = Subscription(detach: { detached = true })
+
+for o in dao {
+  if detached { break }
+  sink.put(sub, o)
+}
+sink.eof(sub)
+
+return resultSink
       */},
     },
   ]

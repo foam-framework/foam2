@@ -3,6 +3,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'f',
+      swiftReturnType: 'Bool',
       swiftEnabled: true,
     },
   ],

@@ -18,6 +18,7 @@
 foam.CLASS({
   refines: 'foam.core.Requires',
   requires: [
+    'foam.swift.Argument',
     'foam.swift.Method',
   ],
   methods: [
@@ -27,6 +28,13 @@ foam.CLASS({
         returnType: this.name,
         visibility: 'public',
 	body: this.swiftInitializer(),
+        args: [
+          this.Argument.create({
+            localName: 'args',
+            defaultValue: '[:]',
+            type: '[String:Any?]',
+          }),
+        ],
       }));
     },
   ],
@@ -35,7 +43,8 @@ foam.CLASS({
       name: 'swiftInitializer',
       args: [],
       template: function() {/*
-return __subContext__.create(type: <%=this.name%>.self) as! <%=this.name%>
+return __subContext__.create(
+    type: <%=this.name%>.self, args: args) as! <%=this.name%>
       */},
     },
   ],

@@ -4,6 +4,7 @@ public typealias Listener = (Subscription, [Any]) -> Void
 
 public protocol Initializable {
   init()
+  init(_ args: [String:Any?])
 }
 
 public protocol ContextAware {
@@ -59,10 +60,10 @@ public class Action: Axiom {
 
 public class Context {
   public static let GLOBAL = Context()
-  public func create(type: Any) -> Any? {
+  public func create(type: Any, args: [String:Any?] = [:]) -> Any? {
     var o: Any? = nil
     if let t = type as? Initializable.Type {
-      o = t.init()
+      o = t.init(args)
     }
     if var o = o as? ContextAware {
       o.__context__ = self
@@ -158,7 +159,7 @@ public class Subscription {
 }
 
 public protocol FObject: class {
-  func sub(topics: [Any], listener l: @escaping Listener) -> Subscription
+  func sub(topics: [String], listener l: @escaping Listener) -> Subscription
   static func classInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
@@ -215,14 +216,11 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   public func clearProperty(_ key: String) {}
 
   public func sub(
-    topics: [Any] = [],
+    topics: [String] = [],
     listener l: @escaping Listener) -> Subscription {
 
     var listeners = self.listeners
-    for i in 0..<topics.count {
-      guard let topic = topics[i] as? String else {
-        fatalError("sub args must be strings except for last arg.")
-      }
+    for topic in topics {
       if listeners.children[topic] == nil {
         listeners.children[topic] = ListenerList()
       }

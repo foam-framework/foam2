@@ -25,7 +25,6 @@ foam.INTERFACE({
       returns: '',
       args: [
         'obj',
-        'fc'
       ],
       code: function() {}
     },
@@ -34,7 +33,6 @@ foam.INTERFACE({
       returns: '',
       args: [
         'obj',
-        'fc'
       ],
       code: function() {}
     },
@@ -208,6 +206,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
+      required: true,
       name: 'predicate'
     }
   ],
@@ -323,6 +322,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.order.Comparator',
+      required: true,
       name: 'comparator'
     },
     {
