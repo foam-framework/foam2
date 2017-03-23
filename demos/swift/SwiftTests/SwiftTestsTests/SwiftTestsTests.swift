@@ -313,6 +313,46 @@ class SwiftTestsTests: XCTestCase {
     let tRemoved = dao.remove(tToRemove) as? Test
     XCTAssertNotEqual(tRemoved, tToRemove)
     XCTAssertEqual(tRemoved, t1)
+
+    let sink = dao.select() as! ArraySink
+    XCTAssertEqual(sink.dao as! [Test], [t2])
   }
 
+  func testDaoListen() {
+    let dao = ArrayDAO([
+      "of": Test.classInfo(),
+      "primaryKey": Test.FIRST_NAME,
+    ])
+
+    let sink = ArraySink()
+    let detach = dao.listen(sink)
+
+    let t1 = dao.put(Test(["firstName": "A"])) as! Test
+    XCTAssertEqual(sink.dao as! [Test], [t1])
+
+    let t2 = dao.put(Test(["firstName": "B"])) as! Test
+    XCTAssertEqual(sink.dao as! [Test], [t1, t2])
+
+    _ = dao.remove(Test(["firstName": "B"])) as! Test
+    XCTAssertEqual(sink.dao as! [Test], [t1])
+
+    detach.detach()
+    _ = dao.put(Test(["firstName": "C"]))
+    XCTAssertEqual(sink.dao.count, 1)
+  }
+
+  func testDaoSkipLimitSelect() {
+    let dao = ArrayDAO([
+      "of": Test.classInfo(),
+      "primaryKey": Test.FIRST_NAME,
+    ])
+
+    for i in 1...10 {
+      _ = dao.put(Test(["firstName": i]))
+    }
+
+    let sink = dao.select(skip: 2, limit: 5) as! ArraySink
+    XCTAssertEqual(sink.dao.count, 5)
+    XCTAssertEqual("3", (sink.dao[0] as! Test).firstName)
+  }
 }

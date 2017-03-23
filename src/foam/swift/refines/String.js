@@ -23,6 +23,16 @@ foam.CLASS({
       value: 'String',
     },
     {
+      name: 'swiftAdapt',
+      factory: function() { 
+        return foam.String.multiline(function() {/*
+if let newValue = newValue as? String { return newValue }
+if newValue != nil { return String(describing: newValue!) }
+return ""
+        */});
+      },
+    },
+    {
       name: 'swiftView',
       value: 'foam.swift.ui.FOAMUITextField',
     },

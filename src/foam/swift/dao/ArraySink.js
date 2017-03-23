@@ -18,11 +18,19 @@ foam.CLASS({
       swiftCode: 'dao.append(obj)',
     },
     {
+      name: 'remove',
+      swiftCode: function() {/*
+dao.remove(at: dao.index(where: { (o) -> Bool in
+  return FOAM_utils.equals(o, obj)
+})!)
+      */},
+    },
+    {
       name: 'eof',
       swiftCode: 'return',
     },
     {
-      name: 'swiftSinkError',
+      name: 'error',
       swiftCode: 'return',
     },
     {

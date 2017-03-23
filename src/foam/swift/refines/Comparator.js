@@ -3,6 +3,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'compare',
+      swiftReturnType: 'Int',
       swiftEnabled: true,
     },
   ]

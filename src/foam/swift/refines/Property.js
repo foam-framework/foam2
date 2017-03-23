@@ -384,3 +384,30 @@ return PInfo(classInfo())
     }
   ],
 });
+
+foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+  properties: [
+    {
+      name: 'swiftType',
+      expression: function(of, required) {
+        var cls = foam.lookup(of);
+        return cls.model_.swiftName + (required ? '' : '?');
+      },
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.List',
+  properties: [
+    {
+      name: 'swiftType',
+      value: '[Any?]',
+    },
+    {
+      name: 'swiftFactory',
+      value: 'return []',
+    },
+  ],
+});

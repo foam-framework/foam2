@@ -40,26 +40,31 @@ foam.INTERFACE({
       args: [
         {
           name: 'sink',
+	  swiftExternalName: 'sink',
           swiftType: 'Sink',
           swiftDefaultValue: 'ArraySink()',
         },
         {
           name: 'skip',
+	  swiftExternalName: 'skip',
           swiftType: 'Int?',
           swiftDefaultValue: 'nil',
         },
         {
           name: 'limit',
+	  swiftExternalName: 'limit',
           swiftType: 'Int?',
           swiftDefaultValue: 'nil',
         },
         {
           name: 'order',
+	  swiftExternalName: 'order',
           swiftType: 'Comparator?',
           swiftDefaultValue: 'nil',
         },
         {
           name: 'predicate',
+	  swiftExternalName: 'predicate',
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
         }
@@ -145,6 +150,38 @@ foam.INTERFACE({
         }
       ],
       swiftEnabled: true,
-    }
+    },
+    {
+      name: 'listen',
+      swiftReturnType: 'Subscription',
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'skip',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'limit',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'order',
+          swiftType: 'Comparator?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
+      swiftEnabled: true,
+    },
   ]
 });
