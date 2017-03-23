@@ -9,8 +9,7 @@ foam.INTERFACE({
   axioms: [
     {
       installInClass: function(cls) {
-        // Predicate is already a thing in Swift so best to avoid using that
-        // name. TODO find out if there's a better way to do this refinement.
+        // Predicate is already a thing in Swift we avoid using that name.
         cls.model_.swiftName = 'FoamPredicate';
       }
     }

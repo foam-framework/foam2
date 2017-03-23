@@ -5,12 +5,22 @@ foam.INTERFACE({
       name: 'put',
       args: [
         {
+          name: 'sub',
+          swiftType: 'Subscription'
+        },
+        {
           name: 'obj',
           swiftType: 'FObject'
         },
+      ],
+      swiftEnabled: true,
+    },
+    {
+      name: 'remove',
+      args: [
         {
-          name: 'fc',
-          swiftType: 'FlowControl'
+          name: 'obj',
+          swiftType: 'FObject'
         },
       ],
       swiftEnabled: true,
@@ -20,7 +30,8 @@ foam.INTERFACE({
       swiftEnabled: true,
     },
     {
-      name: 'swiftSinkError',
+      name: 'error',
+      swiftName: 'foamError',
       swiftEnabled: true,
     },
     {
