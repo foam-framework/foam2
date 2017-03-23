@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'RestDAOHandler',
   extends: 'foam.net.node.Handler',
 
+  requires: [ 'foam.dao.ArraySink' ],
   imports: [
     'info',
     'warn'
@@ -145,14 +146,15 @@ foam.CLASS({
             return true;
           }
 
+          var sink = data.sink;
           var skip = data.skip;
           var limit = data.limit;
           var order = data.order;
           var predicate = data.predicate;
-          self.dao.select(undefined, skip, limit, order, predicate)
+          self.dao.select(sink, skip, limit, order, predicate)
             .then(function(sink) {
-              self.sendJSON(res, 200, self.fo2o_(sink.a));
-              self.info('200 OK: select() ' + sink.a.length);
+              self.sendJSON(res, 200, self.fo2o_(sink));
+              self.info('200 OK: select()');
             }).catch(send500);
         } else {
           self.send404(req, res);
@@ -198,6 +200,8 @@ foam.CLASS({
       name: 'jsonStr2fo_',
       documentation: "Transform JSON string to FOAM object.",
       code: function(str) {
+        // TODO(markdittmer): Use a safe JSON deserializer that honours only
+        // an allowed list of classes.
         return foam.json.parse(JSON.parse(str));
       }
     },
