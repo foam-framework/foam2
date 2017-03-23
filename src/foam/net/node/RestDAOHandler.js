@@ -20,7 +20,6 @@ foam.CLASS({
   name: 'RestDAOHandler',
   extends: 'foam.net.node.Handler',
 
-  requires: [ 'foam.dao.ArraySink' ],
   imports: [
     'info',
     'warn'
