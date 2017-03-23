@@ -171,7 +171,7 @@ foam.CLASS({
       }
     },
     {
-      name: 'selectNextBatch',
+      name: 'selectNextBatch_',
       documentation: `Massage data.query and re-issue Datastore :runQuery to get
         the next batch of results requested by select().`,
       code: function(data, batch) {
@@ -200,7 +200,7 @@ foam.CLASS({
       code: function(batch) {
         return batch.entityResults && batch.entityResults.length > 0 &&
             ( batch.moreResults === 'NOT_FINISHED' ||
-            batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
+              batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
       }
     }
   ],
