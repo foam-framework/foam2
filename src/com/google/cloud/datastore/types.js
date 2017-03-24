@@ -233,7 +233,7 @@ foam.LIB({
     {
       name: 'toDatastoreKeyName',
       code: foam.mmethod({
-        Number: function(n) { return n.toString(); },
+        Number: function(n) { return n + ''; },
         String: function(str) { return str; },
         FObject: function(o) {
           var idProp = o.cls_.ID;
@@ -265,11 +265,27 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   methods: [
-    function toDatastoreKeyName(o) {
-      return this.toDatastoreKeyNamePart(o);
+    {
+      name: 'toDatastoreKeyName',
+      documentation: `Construct a Datastore Key PathElement "name" from this
+        property. I.e.,
+        https://cloud.google.com/datastore/docs/reference/rest/v1/Key#PathElement
+        "name" property.`,
+      code: function(o) {
+        return this.toDatastoreKeyNamePart(o);
+      }
     },
-    function toDatastoreKeyNamePart(o) {
-      return this.f(o).toString();
+    {
+      name: 'toDatastoreKeyNamePart',
+      documentation: `Provide this property's contribution to a composite
+        Datastore Key PathElement "name" from this property. This is used by
+        MultiPartIDs to gather string fragments from multiple properies. See
+        https://cloud.google.com/datastore/docs/reference/rest/v1/Key#PathElement
+        "name" property for Datastore API usage details.`,
+      code: function(o) {
+        return this.f(o).toString();
+        return this.toDatastoreKeyNamePart(o);
+      }
     }
   ]
 });
