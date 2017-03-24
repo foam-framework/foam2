@@ -16,7 +16,10 @@
  */
 
 jasmine.getEnv().addReporter({
-  specStarted: function(spec) {
-    console.log(spec.fullName);
-  }
+  specStarted: (function() {
+    var out = require('process').stdout;
+    return function(spec) {
+      out.write('\n' + spec.fullName + ':\n');
+    };
+  })()
 });
