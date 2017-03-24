@@ -299,7 +299,7 @@ foam.CLASS({
       name: 'ps',
       factory: function() {
         return this.StringPS.create();
-      },
+      }
     },
   ],
 
