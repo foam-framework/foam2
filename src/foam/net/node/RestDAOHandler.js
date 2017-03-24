@@ -177,7 +177,7 @@ foam.CLASS({
           var predicate = data.predicate;
           return self.dao.removeAll(skip, limit, order, predicate);
         }).then(function() {
-          self.sendJSON(res, 200, '');
+          self.sendJSON(res, 200, '{}');
           self.info('200 OK: removeAll()');
         }).catch(send500);
       } else {

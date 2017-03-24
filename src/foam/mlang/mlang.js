@@ -642,7 +642,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff first arg found in second array argument.',
+  documentation: 'Predicate returns true iff second arg found in first array argument.',
 
   methods: [
     {
@@ -662,7 +662,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff first arg found in second array argument, ignoring case.',
+  documentation: 'Predicate returns true iff second arg found in first array argument, ignoring case.',
 
   methods: [
     function f(o) {
@@ -1239,6 +1239,62 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.sink',
+  name: 'Unique',
+  extends: 'foam.dao.ProxySink',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Sink decorator which only put()\'s a single obj for each unique expression value.',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'expr'
+    },
+    {
+      name: 'values',
+      factory: function() { return {}; }
+    }
+  ],
+
+  methods: [
+    function putInGroup_(key, obj) {
+      var group = this.groups.hasOwnProperty(key) && this.groups[key];
+      if ( ! group ) {
+        group = this.arg2.clone();
+        this.groups[key] = group;
+        this.groupKeys.push(key);
+      }
+      group.put(obj);
+    },
+
+    function put(obj) {
+      var value = this.expr.f(obj);
+      if ( Array.isArray(value) ) {
+        throw 'Unique doesn\'t Array values.';
+      } else {
+        if ( ! this.values.hasOwnProperty(value) ) {
+          this.values[value] = obj;
+          this.delegate.put(obj);
+        }
+      }
+    },
+
+    function eof() { },
+
+    function clone() {
+      // Don't use the default clone because we don't want to copy 'uniqueValues'.
+      return this.cls_.create({ expr: this.expr, delegate: this.delegate });
+    },
+
+    function toString() {
+      return this.uniqueValues.toString();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
   name: 'Explain',
   extends: 'foam.dao.ProxySink',
   implements: [ 'foam.core.Serializable' ],
@@ -1601,6 +1657,7 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Unique',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Sum'
@@ -1639,7 +1696,7 @@ foam.CLASS({
     function DOT(a, b) { return this._binary_("Dot", a, b); },
     function MUL(a, b) { return this._binary_("Mul", a, b); },
 
-    // TODO: UNIQUE()
+    function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
     function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
