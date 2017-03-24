@@ -728,7 +728,8 @@ foam.CLASS({
               // Copy original URL and overwrite non-null parts from "location"
               // header.
             }).copyUrlFrom(this).fromUrl(resp.headers.location).send());
-            return;
+          } else {
+            resolve(resp);
           }
 
         }.bind(this));
