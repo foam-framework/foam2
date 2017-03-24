@@ -21,36 +21,54 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   properties: [
-    {
-      name: 'classpath'
-    }
+    { class: 'String', name: 'classpath' },
+
+    { name: 'sep', factory: function() { return require('path').sep; } },
+    { name: 'fs',  factory: function() { return require('fs');       } },
+    { name: 'vm',  factory: function() { return require('vm');       } }
   ],
 
   methods: [
     function find(id) {
       var foamCLASS = foam.CLASS;
       var self = this;
-      var model;
+      // Return null if model not found.
+      var model = null;
 
       foam.CLASS = function(m) {
-        var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-        model = cls.create(m, self);
-        foam.CLASS = foamCLASS;
-      }
+        var cls = m.class ? foam.lookup(m.class) :
+              foam.core.Model;
+        var mdl = cls.create(m, self);
+        // Loaded file may contain multiple CLASS calls. Only return this model
+        // if its id matches the requested id.
+        if ( mdl.id === id ) {
+          model = mdl;
+        } else {
+          // TODO(markdittmer): We should do something more reasonable here, but
+          // the DAO API only allows us to deliver one model in response to
+          // find().
+          console.warn(
+            'Class', id, 'created via arequire, but never built or registered');
+        }
+      };
 
-      var sep = require('path').sep;
-      var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
+      var path = this.classpath + this.sep + id.replace(/\./g, this.sep) +
+            '.js';
+      return new Promise(function(resolve, reject) {
+        self.fs.readFile(path, 'utf8', function(error, data) {
+          if ( error ) {
+            console.warn('Unable to load at ' + path + '. Error: ' +
+                         error.message + '\n' + error.stack);
+            foam.CLASS = foamCLASS;
+            resolve(null);
+          }
 
-      try {
-        require(path);
-      } catch(e) {
-        console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
-        return Promise.resolve(null);
-      } finally {
-        foam.CLASS = foamCLASS;
-      }
+          self.vm.runInThisContext(data.toString(), {filename: path});
 
-      return Promise.resolve(model);
+          foam.CLASS = foamCLASS;
+          resolve(model);
+        });
+      });
     }
   ]
 });

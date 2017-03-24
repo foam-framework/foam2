@@ -656,16 +656,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'followRedirect',
       value: true
-    },
-    {
-      name: 'urlLib',
-      value: require('url')
     }
   ],
 
   methods: [
     function fromUrl(url) {
-      var data = this.urlLib.parse(url);
+      var data = require('url').parse(url);
       if ( data.protocol ) this.protocol = data.protocol.slice(0, -1);
       if ( data.hostname ) this.hostname = data.hostname;
       if ( data.port ) this.port = data.port;
@@ -711,6 +707,11 @@ foam.CLASS({
             responseType: this.responseType
           });
 
+          // Ensure that payload factory wires up listeners immediately.
+          resp.payload;
+
+          // TODO(markdittmer): Write integration tests for redirects, including
+          // same-origin/path-only redirects.
           if ( this.followRedirect &&
                ( resp.status === 301 ||
                  resp.status === 302 ||
@@ -730,17 +731,6 @@ foam.CLASS({
             return;
           }
 
-          var buffer = '';
-          nodeResp.on('data', function(d) {
-            buffer += d.toString();
-          });
-          nodeResp.on('end', function() {
-            resp.payload = buffer;
-            resolve(resp);
-          });
-          nodeResp.on('error', function(e) {
-            reject(e);
-          });
         }.bind(this));
 
         req.on('error', function(e) {
@@ -763,18 +753,37 @@ foam.CLASS({
   properties: [
     {
       name: 'payload',
-      adapt: function(_, str) {
+      factory: function() {
         if ( this.streaming ) return null;
 
-        switch (this.responseType) {
-        case 'text':
-          return str;
-        case 'json':
-          return JSON.parse(str);
-        }
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var buffer = ""
+          self.resp.on('data', function(d) {
+            buffer += d.toString();
+          });
+          self.resp.on('end', function() {
+            switch (self.responseType) {
+            case "text":
+              resolve(buffer);
+              return;
+            case "json":
+              try {
+                resolve(JSON.parse(buffer));
+              } catch ( error ) {
+                reject(error);
+              }
+              return;
+            }
 
-        // TODO: responseType should be an enum and/or have validation
-        throw new Error('Unsupported response type: ' + this.responseType);
+            // TODO: responseType should be an enum and/or have validation.
+            reject(new Error(
+                'Unsupported response type: ' + self.responseType));
+          });
+          self.resp.on('error', function(e) {
+            reject(e);
+          });
+        });
       }
     },
     {

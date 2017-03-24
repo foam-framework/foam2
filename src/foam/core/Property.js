@@ -243,7 +243,7 @@ foam.CLASS({
       copying undefined values from parent Property, if it exists.
     */
     function installInClass(c, superProp, existingProp) {
-      var prop      = this;
+      var prop = this;
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);

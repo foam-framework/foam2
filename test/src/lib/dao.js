@@ -338,10 +338,6 @@ describe('SkipSink', function() {
 
 
 
-if ( typeof localStorage === "undefined" || localStorage === null ) {
-  var LocalStorage = require('node-localstorage').LocalStorage;
-  localStorage = new LocalStorage('./tmp');
-}
 describe('LocalStorageDAO', function() {
   var a;
   var a2;

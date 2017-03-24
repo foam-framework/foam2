@@ -127,7 +127,7 @@ FOAM_FILES([
   { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
-  { name: "lib/web/net" },
+  { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
   { name: "lib/messageport", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/firebase" },
@@ -188,7 +188,6 @@ FOAM_FILES([
   { name: "foam/comics/DAOController" },
   { name: "foam/comics/DAOControllerView", flags: ['web'] },
   { name: "foam/u2/view/RecipricalSearch", flags: ['web'] },
-  { name: "lib/node/net", flags: ['node'] },
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
   { name: "lib/net" },
@@ -204,5 +203,7 @@ FOAM_FILES([
   { name: "foam/classloader/ClassLoader", flags: ['debug'] },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
   { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
-  { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] }
+  { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
+  { name: "foam/parsers/html" },
+  { name: "foam/parsers/HTMLLexer" }
 ]);
