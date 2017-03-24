@@ -89,8 +89,11 @@ foam.CLASS({
        */
       var query = [];
 
-      // Proxy non-serializable sinks. Otherwise, serialize and send the sink,
-      // then instantiate the results when they come back from the server.
+      // Proxy non-serializable sinks (with either "sink" or an ArraySink).
+      // When "sink" is serializable, make "proxySink" falsey as a signal to:
+      // (1) Send the serializable sink (" ! proxySink" below);
+      // (2) Signal to "onSelectResponse" that sink in payload should be passed
+      //     back to caller.
       var proxySink = this.Serializable.isInstance(sink) ? null :
           sink ? sink : this.ArraySink.create();
       if ( ! proxySink )
