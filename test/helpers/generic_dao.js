@@ -171,8 +171,11 @@ global.genericDAOTestBattery = function(daoFactory) {
     describe('removeAll()', function() {
       it('should return a promise', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
-          expect(dao.removeAll().then).toEqual(jasmine.any(Function));
-          done();
+          try {
+            dao.removeAll().then(done, fail);
+          } catch (error) {
+            fail(error);
+          }
         });
       });
 
