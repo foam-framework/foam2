@@ -16,7 +16,7 @@
  */
 
 describe('RestDAO', function() {
-  var baseURL = 'http://localhost:8765/v0/testDAO';
+  var baseURL = 'http://0.0.0.0:8765/v0/testDAO';
   var dao;
   var url = require('url');
 
