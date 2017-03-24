@@ -656,12 +656,16 @@ foam.CLASS({
       class: 'Boolean',
       name: 'followRedirect',
       value: true
+    },
+    {
+      name: 'urlLib',
+      factory: function() { return require('url'); }
     }
   ],
 
   methods: [
     function fromUrl(url) {
-      var data = require('url').parse(url);
+      var data = this.urlLib.parse(url);
       if ( data.protocol ) this.protocol = data.protocol.slice(0, -1);
       if ( data.hostname ) this.hostname = data.hostname;
       if ( data.port ) this.port = data.port;
