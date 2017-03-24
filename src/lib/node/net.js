@@ -656,16 +656,36 @@ foam.CLASS({
       class: 'Boolean',
       name: 'followRedirect',
       value: true
+    },
+    {
+      name: 'urlLib',
+      factory: function() { return require('url'); }
     }
   ],
 
   methods: [
     function fromUrl(url) {
-      var data = require('url').parse(url);
-      this.protocol = data.protocol.slice(0, -1);
-      this.hostname = data.hostname;
+      var data = this.urlLib.parse(url);
+      if ( data.protocol ) this.protocol = data.protocol.slice(0, -1);
+      if ( data.hostname ) this.hostname = data.hostname;
       if ( data.port ) this.port = data.port;
-      this.path = data.path;
+      if ( data.path ) this.path = data.path;
+
+      return this;
+    },
+
+    function copyUrlFrom(other) {
+      if ( other.url ) {
+        this.fromUrl(other.url);
+        return this;
+      }
+
+      this.protocol = other.protocol;
+      this.hostname = other.hostname;
+      if ( other.port ) this.port = other.port;
+      other.path = other.path;
+
+      return this;
     },
 
     function send() {
@@ -694,6 +714,8 @@ foam.CLASS({
           // Ensure that payload factory wires up listeners immediately.
           resp.payload;
 
+          // TODO(markdittmer): Write integration tests for redirects, including
+          // same-origin/path-only redirects.
           if ( this.followRedirect &&
                ( resp.status === 301 ||
                  resp.status === 302 ||
@@ -701,13 +723,15 @@ foam.CLASS({
                  resp.status === 307 ||
                  resp.status === 308 ) ) {
             resolve(this.cls_.create({
-              url: resp.headers.location,
               method: this.method,
               payload: this.payload,
               responseType: this.responseType,
               headers: this.headers,
               followRedirect: true
-            }).send());
+              // Redirect URL may not contain all parts if it points to same domain.
+              // Copy original URL and overwrite non-null parts from "location"
+              // header.
+            }).copyUrlFrom(this).fromUrl(resp.headers.location).send());
           } else {
             resolve(resp);
           }
