@@ -44,20 +44,20 @@ foam.CLASS({
       name: 'locale',
       postSet: function(_, n) {
         foam.locale = n;
-      },
+      }
     },
     {
       name: 'classpath',
     },
-
     {
       name: foam.String.daoize(foam.core.Model.name),
       expression: function(classpath) {
-        var prefix = this.window.location.protocol + '//' + this.window.location.host;
-        var paths = classpath.split(',');
+        var prefix   = this.window.location.protocol + '//' + this.window.location.host;
+        var paths    = classpath.split(',');
         var modelDao = this.WebModelFileDAO.create({
           url: prefix + paths[0],
         });
+
         for (var i = 1, classpath; classpath = paths[i]; i++) {
           modelDao = this.OrDAO.create({
             delegate: modelDao,
@@ -80,6 +80,7 @@ foam.CLASS({
       };
       var params = {};
       var match;
+
       while (match = search.exec(query)) {
         params[decode(match[1])] = decode(match[2]);
       }
@@ -96,10 +97,12 @@ foam.CLASS({
     },
 
     function execute() {
-      var self = this;
-      var X = this.__subContext__;
+      var self     = this;
+      var X        = this.__subContext__;
       var promises = [X.arequire(this.model)];
+
       if (this.view) promises.push(X.arequire(this.view));
+
       Promise.all(promises).then(function() {
         var model = X.lookup(self.model).create(null, self);
         var view = self.view ?
