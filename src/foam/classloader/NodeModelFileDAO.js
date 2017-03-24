@@ -22,7 +22,6 @@ foam.CLASS({
 
   properties: [
     { class: 'String', name: 'classpath' },
-
     { name: 'sep', factory: function() { return require('path').sep; } },
     { name: 'fs',  factory: function() { return require('fs');       } },
     { name: 'vm',  factory: function() { return require('vm');       } }
@@ -31,13 +30,11 @@ foam.CLASS({
   methods: [
     function find(id) {
       var foamCLASS = foam.CLASS;
-      var self = this;
-      // Return null if model not found.
-      var model = null;
+      var self      = this;
+      var model     = null; // Return null if model not found.
 
       foam.CLASS = function(m) {
-        var cls = m.class ? foam.lookup(m.class) :
-              foam.core.Model;
+        var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
         var mdl = cls.create(m, self);
         // Loaded file may contain multiple CLASS calls. Only return this model
         // if its id matches the requested id.
@@ -53,7 +50,8 @@ foam.CLASS({
       };
 
       var path = this.classpath + this.sep + id.replace(/\./g, this.sep) +
-            '.js';
+          '.js';
+
       return new Promise(function(resolve, reject) {
         self.fs.readFile(path, 'utf8', function(error, data) {
           if ( error ) {

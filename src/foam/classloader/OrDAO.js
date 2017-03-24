@@ -30,11 +30,9 @@ foam.CLASS({
   methods: [
     function find(id) {
       var self = this;
-      return this.primary.find(id)
-          .then(function(o) {
-            if ( o == null ) return self.delegate.find(id);
-            return o;
-          });
+      return this.primary.find(id).then(function(o) {
+        return o === null ? self.delegate.find(id) : o;
+      });
     }
   ]
 });
