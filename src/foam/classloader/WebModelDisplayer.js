@@ -19,6 +19,13 @@ foam.CLASS({
   package: 'foam.classloader',
   name: 'WebModelDisplayer',
 
+  documentation: `
+     Load and display a model using class-loader support.
+
+     Sample Usage:
+     http://localhost:8000/index.html?model=com.google.foam.demos.lifestar.Disk
+  `,
+
   requires: [
     'foam.classloader.OrDAO',
     'foam.classloader.WebModelFileDAO'
@@ -42,12 +49,11 @@ foam.CLASS({
     },
     {
       name: 'locale',
-      postSet: function(_, n) {
-        foam.locale = n;
-      }
+      postSet: function(_, n) { foam.locale = n; }
     },
     {
-      name: 'classpath',
+      class: 'String',
+      name: 'classpath'
     },
     {
       name: foam.String.daoize(foam.core.Model.name),
@@ -58,12 +64,12 @@ foam.CLASS({
           url: prefix + paths[0],
         });
 
-        for (var i = 1, classpath; classpath = paths[i]; i++) {
+        for ( var i = 1, classpath ; classpath = paths[i] ; i++ ) {
           modelDao = this.OrDAO.create({
             delegate: modelDao,
             primary: this.WebModelFileDAO.create({
-              url: prefix + classpath,
-            }),
+              url: prefix + classpath
+            })
           });
         }
         return modelDao;
@@ -74,25 +80,26 @@ foam.CLASS({
   methods: [
     function fromQuery(query) {
       var search = /([^&=]+)=?([^&]*)/g;
-      var query = window.location.search.substring(1);
+      var query  = query || window.location.search.substring(1);
       var decode = function(s) {
         return decodeURIComponent(s.replace(/\+/g, ' '));
       };
       var params = {};
       var match;
 
-      while (match = search.exec(query)) {
+      while ( match = search.exec(query) ) {
+        // TODO: move this to Window
         params[decode(match[1])] = decode(match[2]);
       }
 
-      if (params.model) {
+      if ( params.model ) {
         this.copyFrom({
           classpath: params.classpath || '/src/',
           model: params.model,
           view: params.view
         });
       } else {
-        alert('Please specify model');
+        alert('Please specify model. Ex.: ?model=com.acme.MyModel');
       }
     },
 
