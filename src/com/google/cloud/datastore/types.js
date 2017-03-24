@@ -146,17 +146,15 @@ foam.LIB({
       var id = key.name;
 
       var o = cls.create();
-
-      if ( cls.ids && cls.ids.length > 1 ) {
-        throw new Error('Not implemented: Deserialization of Cloud Datastore ' +
-            'multi-part ids');
+      if ( ! cls.model_.ids || cls.model_.ids.length === 1 ) {
+        o.id = id;
+      } else {
+        for ( var i = 0; i < cls.model_.ids.length; i++ ) {
+          idName = cls.model_.ids[i];
+          o[idName] = com.google.cloud.datastore
+            .fromDatastoreValue(entity.properties[idName]);
+        }
       }
-
-      var idProp = cls.ids && cls.ids.length === 1 ?
-          cls.getAxiomByName(cls.ids[0]) :
-          cls.getAxiomByName('id');
-
-      if ( idProp ) o[idProp.name] = id;
 
       var props = entity.properties;
       for ( var name in props ) {
@@ -260,11 +258,7 @@ foam.CLASS({
       if ( ! ids )
         return { kind: this.getOwnDatastoreKind(), name: this.id.toString() };
 
-      var name = new Array(ids.length);
-      for ( var i = 0; i < ids.length; i++ ) {
-        name = ids[i] + ( i < ids.length - 1 ? ':' : '' );
-      }
-      return { kind: this.getOwnDatastoreKind(), name: name };
+      return { kind: this.getOwnDatastoreKind(), name: foam.json.stringify(this.id)};
     },
     function getDatastoreKey(opt_propertyPath) {
       if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
