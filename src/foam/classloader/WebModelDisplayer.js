@@ -101,6 +101,8 @@ foam.CLASS({
       } else {
         alert('Please specify model. Ex.: ?model=com.acme.MyModel');
       }
+
+      return this;
     },
 
     function execute() {
