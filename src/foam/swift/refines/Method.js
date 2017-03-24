@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.Method',
+  refines: 'foam.core.AbstractMethod',
   requires: [
     'foam.swift.Argument as SwiftArgument',
     'foam.core.Argument',

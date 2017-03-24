@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias Listener = (Subscription, [Any]) -> Void
+public typealias Listener = (Subscription, [Any?]) -> Void
 
 public protocol Initializable {
   init()

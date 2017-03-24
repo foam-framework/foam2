@@ -175,7 +175,7 @@ return sink
       name: 'listen',
       swiftCode: function() {/*
 let mySink = decorateListener_(sink, skip, limit, order, predicate)
-return sub(listener: { (sub: Subscription, args: [Any]) -> Void in
+return sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
   guard let topic = args[0] as? String else { return }
   switch topic {
     case "put":

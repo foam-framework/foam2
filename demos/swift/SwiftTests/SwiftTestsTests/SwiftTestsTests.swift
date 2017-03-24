@@ -354,5 +354,9 @@ class SwiftTestsTests: XCTestCase {
     let sink = dao.select(skip: 2, limit: 5) as! ArraySink
     XCTAssertEqual(sink.dao.count, 5)
     XCTAssertEqual("3", (sink.dao[0] as! Test).firstName)
+
+    Timer.scheduledTimer(withTimeInterval: 0.333, repeats: false) { _ in
+
+    }
   }
 }

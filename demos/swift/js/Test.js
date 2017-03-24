@@ -90,6 +90,12 @@ self.firstName = self.lastName
 self.lastName = firstName
       */},
     },
+    {
+      name: 'startLogger',
+      swiftCode: function() {/*
+myListener(Subscription(detach: {}), [])
+      */},
+    },
   ],
   methods: [
     {
@@ -105,5 +111,16 @@ self.lastName = firstName
 return String(format: type(of: self).greeting, name, "LASTNAME")
       */},
     }
-  ]
+  ],
+  listeners: [
+    {
+      name: 'myListener',
+      isMerged: true,
+      mergeDelay: 500,
+      swiftCode: function() {/*
+NSLog("Hey")
+myListener(sub, args)
+      */},
+    },
+  ],
 });

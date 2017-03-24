@@ -57,6 +57,7 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto, superAxiom) {
+      if (!this.code) return;
       foam.assert(
         ! superAxiom ||
           foam.core.Listener.isInstance(superAxiom),

@@ -70,6 +70,10 @@ foam.CLASS({
       this.methods.push(m);
       return this;
     },
+    function field(f) {
+      this.fields.push(f);
+      return this;
+    },
     function outputSwift(o) {
       o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');

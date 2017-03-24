@@ -83,6 +83,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Import", flags: ['swift'] },
   { name: "foam/swift/refines/Message", flags: ['swift'] },
   { name: "foam/swift/refines/Method", flags: ['swift'] },
+  { name: "foam/swift/refines/Listener", flags: ['swift'] },
   { name: "foam/swift/refines/Proxy", flags: ['swift'] },
   { name: "foam/swift/refines/InterfaceMethod", flags: ['swift'] },
   { name: "foam/swift/ProtocolMethod", flags: ['swift'] },
