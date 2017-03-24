@@ -78,9 +78,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function fromQuery(query) {
+    function fromQuery(opt_query) {
       var search = /([^&=]+)=?([^&]*)/g;
-      var query  = query || window.location.search.substring(1);
+      var query  = opt_query || window.location.search.substring(1);
       var decode = function(s) {
         return decodeURIComponent(s.replace(/\+/g, ' '));
       };
@@ -95,8 +95,8 @@ foam.CLASS({
       if ( params.model ) {
         this.copyFrom({
           classpath: params.classpath || '/src/',
-          model: params.model,
-          view: params.view
+          model:     params.model,
+          view:      params.view
         });
       } else {
         alert('Please specify model. Ex.: ?model=com.acme.MyModel');
