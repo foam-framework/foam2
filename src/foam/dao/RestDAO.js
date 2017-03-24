@@ -89,15 +89,9 @@ foam.CLASS({
        */
       var query = [];
 
-      // Proxy non-serializable sinks (with either "sink" or an ArraySink).
-      // When "sink" is serializable, make "proxySink" falsey as a signal to:
-      // (1) Send the serializable sink (" ! proxySink" below);
-      // (2) Signal to "onSelectResponse" that sink in payload should be passed
-      //     back to caller.
-      var proxySink = this.Serializable.isInstance(sink) ? null :
-          sink ? sink : this.ArraySink.create();
-      if ( ! proxySink )
-        query.push('sink=' + encodeURIComponent(this.jsonify_(sink)));
+      var networkSink = this.Serializable.isInstance(sink) && sink;
+      if ( networkSink )
+        query.push('sink=' + encodeURIComponent(this.jsonify_(networkSink)));
 
       if ( typeof skip !== 'undefined' )
         query.push('skip=' + encodeURIComponent(this.jsonify_(skip)));
@@ -112,7 +106,8 @@ foam.CLASS({
         method: 'GET',
         url: this.baseURL + ':select?' + query.join('&')
       }).send().then(this.onResponse.bind(this, 'select'))
-          .then(this.onSelectResponse.bind(this, proxySink));
+          .then(this.onSelectResponse.bind(
+              this, sink || this.ArraySink.create()));
     },
 
     function removeAll(skip, limit, order, predicate) {
@@ -178,10 +173,11 @@ foam.CLASS({
     },
 
     function onSelectResponse(localSink, payload) {
+      var wasSerializable = this.Serializable.isInstance(localSink);
       var remoteSink = foam.json.parse(payload);
 
       // If not proxying a local unserializable sink, just return the remote.
-      if ( ! localSink ) return remoteSink;
+      if ( wasSerializable ) return remoteSink;
 
       var array = remoteSink.a;
       if ( ! array )
