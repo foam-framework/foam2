@@ -284,7 +284,6 @@ global.genericDAOTestBattery = function(daoFactory) {
           };
 
           dao.select(sink).then(function(s) {
-            expect(s).toBe(sink);
             expect(puts).toBe(0);
             expect(eofCalled).toBe(true);
             done();
