@@ -27,7 +27,7 @@ describe('RestDAO', function() {
       extends: 'foam.net.HTTPRequest',
 
       requires: [
-        'foam.dao.ArrayDAO',
+        'foam.dao.ArraySink',
         'foam.net.HTTPResponse'
       ],
 
@@ -100,13 +100,14 @@ describe('RestDAO', function() {
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
+            var sink = data.sink || this.ArraySink.create();
             skip = data.skip;
             limit = data.limit;
             order = data.order;
             predicate = data.predicate;
-            return dao.select(undefined, skip, limit, order, predicate)
+            return dao.select(sink, skip, limit, order, predicate)
               .then(function(sink) {
-                var payload = jsonify(sink.a);
+                var payload = jsonify(sink);
                 return createResponse({ status: 200, payload: payload });
               });
           } else if ( this.method === 'POST' &&
