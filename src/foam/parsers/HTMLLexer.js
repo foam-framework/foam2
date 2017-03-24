@@ -20,11 +20,12 @@ foam.ENUM({
   name: 'TagType',
 
   values: [
-    { name: 'OPEN', label: 'Open' },
-    { name: 'CLOSE', label: 'Close' },
+    { name: 'OPEN',       label: 'Open' },
+    { name: 'CLOSE',      label: 'Close' },
     { name: 'OPEN_CLOSE', label: 'Open & Close' }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parsers',
@@ -46,6 +47,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parsers',
   name: 'Embed',
@@ -60,6 +62,7 @@ foam.CLASS({
   ]
 
 });
+
 
 foam.CLASS({
   package: 'foam.parsers',
@@ -211,18 +214,19 @@ foam.CLASS({
           this.Parsers.create(),
           this
         );
-      },
+      }
     },
     {
       name: 'actions',
       factory: function() {
-        var self = this;
-        var lib = self.lib;
-        var Tag = self.Tag;
+        var self  = this;
+        var lib   = self.lib;
+        var Tag   = self.Tag;
         var Embed = self.Embed;
-        var OPEN = self.TagType.OPEN;
+        var OPEN  = self.TagType.OPEN;
         var CLOSE = self.TagType.CLOSE;
         var OPEN_CLOSE = self.TagType.OPEN_CLOSE;
+
         return {
           openTag: function(v) {
             // TODO(markdittmer): Add attributes.
@@ -259,18 +263,16 @@ foam.CLASS({
             // ]
             var nodeName = v[0][2];
             var str = v[1];
-
             var ret = Embed.create({ nodeName: nodeName });
 
             // Attempt to parse maybeEmbeds. Returns "html" parse or string.
             var ps = self.StringPS.create();
             ps.setString(str);
-            var start = self.grammar.getSymbol('html');
+            var start  = self.grammar.getSymbol('html');
             var result = start.parse(ps, self.grammar);
-            if ( result && result.value && result.pos === str.length )
-              ret.content = result.value;
-            else
-              ret.content = [ str ];
+            ret.content = ( result && result.value && result.pos === str.length ) ?
+                result.value :
+                [ str ];
             return ret;
           },
 
@@ -300,7 +302,7 @@ foam.CLASS({
       factory: function() {
         return this.StringPS.create();
       }
-    },
+    }
   ],
 
   methods: [
@@ -313,6 +315,7 @@ foam.CLASS({
 
       return start.parse(this.ps, this.grammar);
     },
+
     function openTag_(seq, sym, tagName) {
       return seq(
           '<',
@@ -323,6 +326,7 @@ foam.CLASS({
           sym('whitespace'),
           '>');
     },
+
     function closeTag_(seq, sym, tagName) {
       return seq(
           '<',
