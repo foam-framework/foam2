@@ -143,7 +143,8 @@ foam.CLASS({
          have them installed on the clone. */ cloneMap
       ) {
         /** Override to provide special deep cloning behavior. */
-        cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
+        cloneMap[this.name] = ( value && value.clone ) ? value.clone() :
+          foam.util.clone(value);
       }
     ],
 
