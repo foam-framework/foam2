@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'Person',
 
+  documentation: 'Simple Person class.',
+
   tableColumns: [ 'id', 'surname', 'name' ],
 
   properties: [
@@ -33,6 +35,8 @@ foam.CLASS({
   package: 'com.google.foam.demos.sevenguis',
   name: 'CRUD',
   extends: 'foam.u2.Element',
+
+  documentation: 'CRUD (Create Read Update Delete) Demo',
 
   implements: [
     'foam.mlang.Expressions'
