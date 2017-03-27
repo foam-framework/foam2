@@ -54,8 +54,7 @@ foam.CLASS({
         var foamCLASS = foam.CLASS;
 
         foam.CLASS = function(m) {
-          var cls = m.class ? foam.lookup(m.class) :
-                foam.core.Model;
+          var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
           var mdl = cls.create(m, self);
           // Loaded file may contain multiple CLASS calls. Only return this
           // model if its id matches the requested id.
