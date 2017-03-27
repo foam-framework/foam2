@@ -19,7 +19,6 @@ foam.CLASS({
   name: 'Tabata',
 
   requires: [
-    'TabataState',
     'foam.util.Timer'
   ],
 
@@ -121,11 +120,8 @@ return t
       of: 'TabataState',
       name: 'state',
       required: true,
-      factory: function() {
-        return this.Warmup.create();
-      },
+      factory: function() { return this.Warmup.create(); },
       swiftFactory: 'return Warmup_create()',
-      swiftPostSet: 'NSLog("YOO")',
       hidden: true
     }
   ],
@@ -171,9 +167,9 @@ remaining$ = ExpressionSlot([
             t.action = 'Warmup';
           },
           swiftCode: function() {/*
-            t.roundLength = t.setupTime
-            t.roundStart = t.seconds
-            t.action = "Warmup"
+t.roundLength = t.setupTime
+t.roundStart = t.seconds
+t.action = "Warmup"
           */},
         },
         {
@@ -183,14 +179,20 @@ remaining$ = ExpressionSlot([
             t.state.start(t);
           },
           swiftCode: function() {/*
-            t.state = t.Work_create();
-            t.state.start(t);
+t.state = t.Work_create();
+t.state.start(t);
           */},
         },
       ]
     },
     {
       name: 'Work',
+      messages: [
+        {
+          name: 'action_string',
+          message: 'WORK!',
+        },
+      ],
       implements: ['TabataState'],
       methods: [
         {
@@ -198,12 +200,12 @@ remaining$ = ExpressionSlot([
           code: function(t) {
             t.roundLength = t.workTime;
             t.roundStart = t.seconds;
-            t.action = 'WORK!';
+            t.action = this.action_string;
           },
           swiftCode: function() {/*
-            t.roundLength = t.workTime
-            t.roundStart = t.seconds
-            t.action = "WORK!"
+t.roundLength = t.workTime
+t.roundStart = t.seconds
+t.action = type(of: self).action_string
           */},
         },
         {
@@ -220,14 +222,14 @@ remaining$ = ExpressionSlot([
             t.state.start(t);
           },
           swiftCode: function() {/*
-            t.currentRound += 1
-            if t.currentRound >= t.rounds + 1 {
-              t.state = t.Finish_create()
-              t.currentRound = t.rounds
-            } else {
-              t.state = t.Rest_create()
-            }
-            t.state.start(t);
+t.currentRound += 1
+if t.currentRound >= t.rounds + 1 {
+  t.state = t.Finish_create()
+  t.currentRound = t.rounds
+} else {
+  t.state = t.Rest_create()
+}
+t.state.start(t);
           */},
         },
       ]
@@ -235,18 +237,24 @@ remaining$ = ExpressionSlot([
     {
       name: 'Rest',
       implements: ['TabataState'],
+      messages: [
+        {
+          name: 'action_string',
+          message: 'Rest',
+        },
+      ],
       methods: [
         {
           name: 'start',
           code: function(t) {
             t.roundLength = t.restTime;
             t.roundStart = t.seconds;
-            t.action = 'Rest';
+            t.action = this.action_string;
           },
           swiftCode: function() {/*
-            t.roundLength = t.restTime
-            t.roundStart = t.seconds
-            t.action = "Rest"
+t.roundLength = t.restTime
+t.roundStart = t.seconds
+t.action = type(of: self).action_string
           */},
         },
         {
@@ -256,8 +264,8 @@ remaining$ = ExpressionSlot([
             t.state.start(t);
           },
           swiftCode: function() {/*
-            t.state = t.Work_create();
-            t.state.start(t);
+t.state = t.Work_create();
+t.state.start(t);
           */},
         },
       ]
@@ -265,26 +273,31 @@ remaining$ = ExpressionSlot([
     {
       name: 'Finish',
       implements: ['TabataState'],
+      messages: [
+        {
+          name: 'action_string',
+          message: 'Finished',
+        },
+      ],
       methods: [
         {
           name: 'start',
           code: function(t) {
-            t.action = 'Finished';
+            t.action = this.action_string;
             t.roundLength = 0;
             t.roundStart = t.seconds;
             t.stop();
           },
           swiftCode: function() {/*
-            t.action = "Finished"
-            t.roundLength = 0;
-            t.roundStart = t.seconds;
-            t.stop()
+t.action = type(of: self).action_string
+t.roundLength = 0;
+t.roundStart = t.seconds;
+t.stop()
           */},
         },
         {
           name: 'next',
-          code: function(t) {
-          },
+          code: function(t) {},
           swiftCode: '// Finished!',
         },
       ]
@@ -299,18 +312,14 @@ remaining$ = ExpressionSlot([
         this.state.start(this);
       },
       swiftCode: function() {/*
-        timer.start()
-        state.start(self)
+timer.start()
+state.start(self)
       */}
     },
     {
       name: 'stop',
-      code: function() {
-        this.timer.stop();
-      },
-      swiftCode: function() {/*
-        timer.stop()
-      */}
+      code: function() { this.timer.stop(); },
+      swiftCode: 'timer.stop()',
     },
     {
       name: 'reset',
@@ -327,7 +336,6 @@ clearProperty("timer")
 clearProperty("currentRound")
 clearProperty("state")
 clearProperty("action")
-clearProperty("seconds")
       */}
     }
   ]
