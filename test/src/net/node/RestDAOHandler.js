@@ -18,7 +18,7 @@
 describe('RestDAOHandler', function() {
   var port = 8080;
   var urlPath = '/dao';
-  var baseURL = 'http://localhost:' + port + urlPath;
+  var baseURL = 'http://0.0.0.0:' + port + urlPath;
   var server;
   var serverPromise;
   var shutdownPromise = Promise.resolve(null);

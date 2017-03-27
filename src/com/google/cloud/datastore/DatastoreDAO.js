@@ -115,9 +115,9 @@ foam.CLASS({
       });
     },
 
-    function find(id) {
-      var key = foam.core.FObject.isInstance(id) ?
-          id.getDatastoreKey() : this.getDatastoreKeyFromId(id);
+    function find(idOrObj) {
+      var key = foam.core.FObject.isInstance(idOrObj) ?
+          idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
       return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
           .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
     },
@@ -159,11 +159,49 @@ foam.CLASS({
           .then(this.onRemoveAll);
     },
 
-    function getDatastoreKeyFromId(id) {
-      return { path: [ {
-        kind: this.of.getOwnClassDatastoreKind(),
-        name: id
-      } ] };
+    {
+      name: 'getDatastoreKeyFromId_',
+      documentation: `Helper for find() to construct the appropriate :lookup
+        Datastore query.`,
+      code: function(id) {
+        return { path: [ {
+          kind: this.of.getOwnClassDatastoreKind(),
+          name: com.google.cloud.datastore.toDatastoreKeyName(id)
+        } ] };
+      }
+    },
+    {
+      name: 'selectNextBatch_',
+      documentation: `Massage data.query and re-issue Datastore :runQuery to get
+        the next batch of results requested by select().`,
+      code: function(data, batch) {
+        var payload = data.requestPayload;
+        var query = payload.query;
+
+        // Update query to get next batch of results.
+        if ( query.offset )
+          query.offset = query.offset - ( batch.skippedResults || 0 );
+        if ( query.limit ) {
+          query.limit = query.limit -
+              ( batch.entityResults ? batch.entityResults.length : 0 );
+        }
+        query.startCursor = batch.endCursor;
+
+        return this.getRequest('runQuery', JSON.stringify(payload)).send()
+            .then(this.onResponse.bind(this, 'select'))
+            .then(this.onSelectResponse.bind(this, data));
+      }
+    },
+    {
+      name: 'resultsAreIncomplete_',
+      documentation: `Determine whether or not a batch contains the last results
+        in a (potentially "limit"ed) query result. Abstracted out of
+        onSelectResponse() to support faked batching in tests.`,
+      code: function(batch) {
+        return batch.entityResults && batch.entityResults.length > 0 &&
+            ( batch.moreResults === 'NOT_FINISHED' ||
+              batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
+      }
     }
   ],
 
@@ -236,9 +274,8 @@ foam.CLASS({
         data.sink && data.sink.put && data.sink.put(obj);
       }
 
-      if ( entities.length > 0 && ( batch.moreResults === 'NOT_FINISHED' ||
-          batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' ) ) {
-        return this.selectNextBatch(data, batch.endCursor);
+      if ( this.resultsAreIncomplete_(batch) ) {
+        return this.selectNextBatch_(data, batch);
       } else {
         data.sink && data.sink.eof && data.sink.eof();
         return data.sink;

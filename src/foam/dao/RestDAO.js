@@ -29,6 +29,7 @@ foam.CLASS({
   */},
 
   requires: [
+    'foam.core.Serializable',
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest'
   ],
@@ -87,6 +88,11 @@ foam.CLASS({
        * Each key's value is network-foam-jsonified.
        */
       var query = [];
+
+      var networkSink = this.Serializable.isInstance(sink) && sink;
+      if ( networkSink )
+        query.push('sink=' + encodeURIComponent(this.jsonify_(networkSink)));
+
       if ( typeof skip !== 'undefined' )
         query.push('skip=' + encodeURIComponent(this.jsonify_(skip)));
       if ( typeof limit !== 'undefined' )
@@ -99,8 +105,9 @@ foam.CLASS({
       return this.createRequest_({
         method: 'GET',
         url: this.baseURL + ':select?' + query.join('&')
-      }).send().then(this.onResponse.bind(this, 'select')).then(
-        this.onSelectResponse.bind(this, sink || this.ArraySink.create()));
+      }).send().then(this.onResponse.bind(this, 'select'))
+          .then(this.onSelectResponse.bind(
+              this, sink || this.ArraySink.create()));
     },
 
     function removeAll(skip, limit, order, predicate) {
@@ -165,13 +172,25 @@ foam.CLASS({
       return foam.json.parse(payload);
     },
 
-    function onSelectResponse(sink, payload) {
-      var results = foam.json.parse(payload);
-      for ( var i = 0; i < results.length; i++ ) {
-        sink.put(results[i]);
+    function onSelectResponse(localSink, payload) {
+      var wasSerializable = this.Serializable.isInstance(localSink);
+      var remoteSink = foam.json.parse(payload);
+
+      // If not proxying a local unserializable sink, just return the remote.
+      if ( wasSerializable ) return remoteSink;
+
+      var array = remoteSink.a;
+      if ( ! array )
+        throw new Error('Expected ArraySink from REST endpoint when proxying local sink');
+
+      if ( localSink.put ) {
+        for ( var i = 0; i < array.length; i++ ) {
+          localSink.put(array[i]);
+        }
       }
-      sink.eof();
-      return sink;
+      if ( localSink.eof ) localSink.eof();
+
+      return localSink;
     },
 
     function onRemoveAllResponse(payload) {
