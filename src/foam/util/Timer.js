@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.util',
   name: 'Timer',
+  swiftName: 'FoamTimer',
 
   documentation: 'Timer object. Useful for creating animations.',
 
@@ -51,15 +52,21 @@ foam.CLASS({
       value: 0
     },
     {
-      class: 'Int',
+      class: 'Long',
       name:  'startTime',
       value: 0
     },
     {
-      class: 'Int',
+      class: 'Long',
       name:  'time',
       help:  'The current time in milliseconds since epoch.',
       adapt: function(_, t) { return Math.ceil(t); },
+      swiftAdapt: function() {/*
+if let newValue = newValue as? Double {
+  return Int(ceil(newValue))
+}
+return newValue as! Int
+      */},
       value: 0
     },
     {
@@ -86,24 +93,48 @@ foam.CLASS({
       hidden: true
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'startTime_',
       hidden: true
     }
   ],
 
   methods: [
-    function cycle(frequency, a, b) {
+    {
       /**
          cycle(frequency)             - cycle between -1 and 1 frequency times a second
          cycle(frequency, amplitude)  - cycle between -amplitude and amplitude frequency times a second
          cycle(frequency, start, end) - cycle between start and end frequency times a second
       */
-      var s = Math.sin(this.time/1000*frequency*Math.PI*2);
-      if ( arguments.length === 1 ) return s;
-      if ( arguments.length === 2 ) return s * a;
-      return a + (1 + s) * (b-a)/2;
-    }
+      name: 'cycle',
+      swiftReturnType: 'Float',
+      args: [
+        {
+          name: 'frequency',
+          swiftType: 'Float',
+        },
+        {
+          name: 'a',
+          swiftType: 'Float?',
+        },
+        {
+          name: 'b',
+          swiftType: 'Float?',
+        },
+      ],
+      code: function(frequency, a, b) {
+        var s = Math.sin(this.time/1000*frequency*Math.PI*2);
+        if ( arguments.length === 1 ) return s;
+        if ( arguments.length === 2 ) return s * a;
+        return a + (1 + s) * (b-a)/2;
+      },
+      swiftCode: function() {/*
+let s = sin(Float(time)/1000*frequency*Float.pi*2)
+if a == nil { return s }
+if b == nil { return s * a! }
+return a! + (1 + s) * (b!-a!)/2;
+      */},
+    },
   ],
 
   actions: [
@@ -111,7 +142,8 @@ foam.CLASS({
       name:  'start',
       help:  'Start the timer.',
       isEnabled: function(isStarted) { return ! isStarted; },
-      code:      function() { this.isStarted = true; this.tick(); }
+      code:      function() { this.isStarted = true; this.tick(); },
+      swiftCode: 'isStarted = true; tick()',
     },
     {
       name:  'step',
@@ -122,13 +154,21 @@ foam.CLASS({
         this.second = this.time /    1000 % 60 << 0;
         this.minute = this.time /   60000 % 60 << 0;
         this.hour   = this.time / 3600000 % 24 << 0;
-      }
+      },
+      swiftCode: function() {/*
+i+=1
+time  += interval * timeWarp
+second = time /    1000 % 60 << 0;
+minute = time /   60000 % 60 << 0;
+hour   = time / 3600000 % 24 << 0;
+      */}
     },
     {
       name:  'stop',
       help:  'Stop the timer.',
       isEnabled: function(isStarted) { return isStarted; },
-      code:      function() { this.isStarted = false; }
+      code:      function() { this.isStarted = false; },
+      swiftCode: 'isStarted = false'
     }
   ],
 
@@ -136,7 +176,7 @@ foam.CLASS({
     {
       name: 'tick',
       isFramed: true,
-      code: function(e) {
+      code: function() {
         if ( ! this.isStarted ) return;
 
         var prevTime = this.startTime_;
@@ -144,7 +184,16 @@ foam.CLASS({
         this.interval = Math.min(100, this.startTime_ - prevTime);
         this.step();
         this.tick();
-      }
+      },
+      swiftCode: function() {/*
+if !isStarted { return }
+
+let prevTime = startTime_
+startTime_ = Int(Date().timeIntervalSince1970 * Double(1000))
+interval = min(100, startTime_ - prevTime)
+step()
+tick()
+      */}
     }
   ]
 });

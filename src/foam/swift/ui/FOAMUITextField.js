@@ -28,16 +28,26 @@ foam.CLASS({
       swiftType: 'UITextField',
       swiftFactory: 'return UITextField()',
       swiftPostSet: function() {/*
-        newValue.text = self.data
-        newValue.delegate = self
+let updateTextField: Listener = { [weak self] _ in
+  if self == nil { return }
+  newValue.text = self!.data == nil ?
+      self!.emptyValue : String(describing: self!.data!)
+}
+viewSub?.detach()
+viewSub = data$.swiftSub(updateTextField)
+updateTextField(viewSub!, [])
       */},
     },
     {
-      class: 'String',
+      swiftType: 'Subscription?',
+      name: 'viewSub',
+    },
+    {
       name: 'data',
-      swiftPostSet: function() {/*
-self.view.text = newValue
-      */},
+    },
+    {
+      class: 'String',
+      name: 'emptyValue',
     },
   ],
   methods: [

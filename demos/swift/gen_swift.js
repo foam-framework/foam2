@@ -19,6 +19,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
   classpaths: [
     dir + '/../../src',
     dir + '/js',
+    dir + '/../../src/com/google/foam/demos/tabata',
   ],
   modelId: 'GenSwift',
   modelArgs: {
@@ -27,6 +28,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'TestExtended',
       'foam.swift.core.Slot',
       'foam.swift.core.PropertySlot',
+      'foam.swift.core.ExpressionSlot',
       'foam.swift.core.ConstantSlot',
       'foam.swift.parse.PStream',
       'foam.swift.parse.StringPStream',
@@ -68,6 +70,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.parse.json.StringParser',
       'foam.swift.parse.parser.Parser',
       'foam.swift.ui.DetailView',
+      'foam.swift.ui.FOAMUITextFieldInt',
       'foam.swift.ui.FOAMActionUIButton',
       'foam.swift.ui.FOAMUILabel',
       'foam.swift.ui.FOAMUITextField',
@@ -85,6 +88,9 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.dao.AbstractDAO',
       'foam.swift.dao.ArrayDAO',
       'somepackage.RequiredClass',
+      'TabataState',
+      'Tabata',
+      'foam.util.Timer',
     ],
     outdir: genDir,
   },

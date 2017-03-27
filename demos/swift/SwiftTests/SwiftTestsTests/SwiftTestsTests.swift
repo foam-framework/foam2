@@ -16,18 +16,18 @@ class SwiftTestsTests: XCTestCase {
   func testListen() {
     let test = Test()
     var numPubs = 0
-    let sub = test.sub(listener: { (sub: Subscription, args: [Any]) -> Void in
+    let sub = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
       numPubs += 1
       sub.detach()
     })
 
     var numPubs2 = 0
-    let sub2 = test.sub(listener: { (sub: Subscription, args: [Any]) -> Void in
+    let sub2 = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
       numPubs2 += 1
     })
 
     var numPubs3 = 0
-    let sub3 = test.lastName$.swiftSub({ (sub: Subscription, args: [Any]) -> Void in
+    let sub3 = test.lastName$.swiftSub({ (sub: Subscription, args: [Any?]) -> Void in
       numPubs3 += 1
     })
 
@@ -51,14 +51,6 @@ class SwiftTestsTests: XCTestCase {
     o2.firstName = "B"
     XCTAssertEqual(o1.firstName, "B")
     o2.firstName_Value_Sub_?.detach()
-  }
-
-  func testMemLeaks() {
-    for _ in 1...5000 {
-      testFollow()
-      testListen()
-      testExpression()
-    }
   }
 
   func testObjectCreationPerformance() {
@@ -354,9 +346,33 @@ class SwiftTestsTests: XCTestCase {
     let sink = dao.select(skip: 2, limit: 5) as! ArraySink
     XCTAssertEqual(sink.dao.count, 5)
     XCTAssertEqual("3", (sink.dao[0] as! Test).firstName)
+  }
 
-    Timer.scheduledTimer(withTimeInterval: 0.333, repeats: false) { _ in
+  func testExpressionSlot() {
+    let o = Test()
+    let slot = ExpressionSlot()
+    slot.args = [o.firstName$, o.lastName$]
+    slot.code = { args in
+      return (args[0] as! String) + " " + (args[1] as! String)
+    }
 
+    o.firstName = "Mike"
+    o.lastName = "C"
+    XCTAssertEqual(slot.swiftGet() as! String, "Mike C")
+
+    o.lastName = "D"
+    XCTAssertEqual(slot.swiftGet() as! String, "Mike D")
+
+    slot.cleanup()
+  }
+
+  func testMemLeaks() {
+    for _ in 1...5000 {
+      testFollow()
+      testListen()
+      testExpression()
+      testExpressionSlot()
     }
   }
+
 }

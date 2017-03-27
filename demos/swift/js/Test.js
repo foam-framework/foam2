@@ -93,7 +93,7 @@ self.lastName = firstName
     {
       name: 'startLogger',
       swiftCode: function() {/*
-myListener(Subscription(detach: {}), [])
+myListener()
       */},
     },
   ],
@@ -119,7 +119,7 @@ return String(format: type(of: self).greeting, name, "LASTNAME")
       mergeDelay: 500,
       swiftCode: function() {/*
 NSLog("Hey")
-myListener(sub, args)
+myListener()
       */},
     },
   ],

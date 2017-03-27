@@ -72,35 +72,40 @@ subViewSubscriptions = [:]
     {
       name: 'initAllViews',
       swiftCode: function() {/*
+var properties: [PropertyInfo] = []
+var actions: [Action] = []
 if let fobj = data as AnyObject as? FObject {
-  let axioms = type(of: fobj).classInfo().axioms
-  for a in axioms {
-    _ = self[a.name]
-  }
+  properties += type(of: fobj).classInfo().axioms(byType: PropertyInfo.self)
+  actions += type(of: fobj).classInfo().axioms(byType: Action.self)
 }
 
 var vstack: [UIView] = []
-for (key, dv) in propertyViews {
+for p in properties {
+  guard let dv = self[p.name] else { continue }
   let hstack = UIStackView(arrangedSubviews: [
-    propertyLabelViews[key]!,
+    propertyLabelViews[p.name]!,
     dv.get(key: "view") as! UIView
   ])
-  hstack.axis = .vertical
+  hstack.axis = .horizontal
+  hstack.spacing = 10
   vstack.append(hstack)
 }
-vstack += actionViews.values.map { (fobj) -> UIView in
-  return fobj.view
-}
 
-for view in vstack {
-  view.backgroundColor = UIColor.green
+var actionButtons: [UIView] = []
+for a in actions {
+  guard let view = self[a.name] as? FOAMActionUIButton else { continue }
+  view.view.backgroundColor = UIColor.black
+  actionButtons.append(view.view)
 }
+let actionStack = UIStackView(arrangedSubviews: actionButtons)
+actionStack.axis = .horizontal
+actionStack.spacing = 10
+vstack.append(actionStack)
 
 let stackView = UIStackView(arrangedSubviews: vstack)
 stackView.axis = .vertical
 stackView.distribution = .equalSpacing
 stackView.alignment = .leading
-stackView.spacing = 30
 
 let views: [String:UIView] = ["v": stackView]
 for (_, v) in views {
@@ -152,4 +157,3 @@ subscript(key: String) -> FObject? {
 }
   */},
 });
-
