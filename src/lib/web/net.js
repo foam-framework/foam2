@@ -293,6 +293,11 @@ foam.CLASS({
       class: 'String',
       name: 'responseType',
       value: 'text'
+    },
+    {
+      class: 'String',
+      name: 'mode',
+      value: 'cors'
     }
   ],
 
@@ -320,7 +325,7 @@ foam.CLASS({
       var options = {
         method: this.method,
         headers: headers,
-        mode: "cors",
+        mode: this.mode,
         redirect: "follow",
         credentials: "same-origin"
       };
