@@ -547,7 +547,9 @@ foam.CLASS({
           s && subs.push(s);
           args[i] = this[argNames[i]];
         }
-        return e.apply(this, args);
+        var ret = e.apply(this, args);
+        if ( ret === undefined ) this.warn('Expression returned undefined');
+        return ret;
       };
     },
 
