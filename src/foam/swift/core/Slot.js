@@ -147,5 +147,21 @@ return other.swiftSub { (_, _) in l() }
 return other.mapFrom(self, f)
       */},
     },
+    {
+      name: 'map',
+      args: [
+        {
+          swiftType: '@escaping (Any?) -> Any?',
+          name: 'f',
+        },
+      ],
+      swiftReturnType: 'ExpressionSlot',
+      swiftCode: function() {/*
+return ExpressionSlot([
+  "code": { (args: [Any?]) -> Any? in f(args[0]) },
+  "args": [self]
+])
+      */},
+    },
   ]
 });

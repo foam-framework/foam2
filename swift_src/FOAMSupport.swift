@@ -294,7 +294,10 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     for (key, value) in args {
       self.set(key: key, value: value)
     }
+    __foamInit__()
   }
+
+  func __foamInit__() {}
 
   private func detachListeners(listeners: ListenerList?) {
     var l = listeners
@@ -316,6 +319,7 @@ struct FOAM_utils {
   public static func equals(_ o1: Any?, _ o2: Any?) -> Bool {
     let a = o1 as AnyObject?
     let b = o2 as AnyObject?
+    NSLog("%@ == %@", String(describing: a), String(describing: b))
     if a === b { return true }
     if a != nil { return a!.isEqual(b) }
     return false

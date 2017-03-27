@@ -21,11 +21,19 @@ foam.CLASS({
     'foam.swift.Argument',
     'foam.swift.Method',
   ],
+  properties: [
+    {
+      name: 'swiftReturnType',
+      expression: function(path) {
+        return this.lookup(this.path).model_.swiftName;
+      },
+    },
+  ],
   methods: [
     function writeToSwiftClass(cls) {
       cls.methods.push(this.Method.create({
         name: this.name + '_create',
-        returnType: this.name,
+        returnType: this.swiftReturnType,
         visibility: 'public',
 	body: this.swiftInitializer(),
         args: [
@@ -44,7 +52,7 @@ foam.CLASS({
       args: [],
       template: function() {/*
 return __subContext__.create(
-    type: <%=this.name%>.self, args: args) as! <%=this.name%>
+    type: <%=this.swiftReturnType%>.self, args: args) as! <%=this.swiftReturnType%>
       */},
     },
   ],

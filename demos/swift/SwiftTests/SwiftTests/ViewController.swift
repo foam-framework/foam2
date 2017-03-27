@@ -3,7 +3,7 @@ import UIKit
 class ViewController: UIViewController {
   lazy var detailView: DetailView = {
     let v = DetailView()
-    v.data = Context.GLOBAL.create(type: Test.self) as! Test
+    v.data = Context.GLOBAL.create(type: Tabata.self) as! Tabata
     return v
   }()
   override func viewDidLoad() {

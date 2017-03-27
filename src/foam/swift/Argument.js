@@ -25,6 +25,7 @@ foam.CLASS({
     'type',
     'defaultValue',
     'mutable',
+    'escaping',
   ],
 
   methods: [
@@ -34,6 +35,7 @@ foam.CLASS({
         this.externalName != this.localName ? ' ' + this.localName : '',
         ': ',
         this.mutable ? 'inout ' : '',
+        this.escaping ? '@escaping ' : '',
         this.type,
         this.defaultValue ? ' = ' + this.defaultValue : '');
     }

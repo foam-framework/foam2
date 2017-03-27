@@ -17,21 +17,20 @@
 
 foam.CLASS({
   package: 'foam.swift.ui',
-  name: 'FOAMUILabel',
-  swiftImports: [
-    'UIKit',
-  ],
+  name: 'FOAMUITextFieldInt',
+  extends: 'foam.swift.ui.FOAMUITextField',
   properties: [
     {
       name: 'view',
-      swiftType: 'UILabel',
-      swiftFactory: 'return UILabel()',
+      swiftFactory: function() {/*
+let t = UITextField() 
+// TODO make numeric.
+return t
+      */},
     },
     {
-      name: 'data',
-      swiftPostSet: function() {/*
-self.view.text = newValue == nil ? "nil" : String(describing: newValue!)
-      */},
+      name: 'emptyValue',
+      value: "0",
     },
   ],
 });

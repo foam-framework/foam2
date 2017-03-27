@@ -66,6 +66,10 @@ foam.CLASS({
       },
     },
     {
+      class: 'Boolean',
+      name: 'swiftRequiresEscaping',
+    },
+    {
       class: 'String',
       name: 'swiftType',
       value: 'Any?',
@@ -262,6 +266,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
           {
             externalName: '_',
             localName: 'newValue',
+            escaping: this.swiftRequiresEscaping,
             type: this.swiftType,
           },
         ],
@@ -279,6 +284,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
           {
             externalName: '_',
             localName: 'newValue',
+            escaping: this.swiftRequiresEscaping,
             type: this.swiftType,
           },
         ],
@@ -363,7 +369,7 @@ class PInfo: PropertyInfo {
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
-<% if (this.swiftView) { %>
+<% if (this.swiftView && !this.hidden) { %>
   let view: FObject.Type? = <%=this.swiftView.split('.').pop()%>.self
 <% } else { %>
   let view: FObject.Type? = nil
@@ -391,8 +397,8 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        var cls = foam.lookup(of);
-        return cls.model_.swiftName + (required ? '' : '?');
+        of = of ? foam.lookup(of).model_.swiftName : 'FObject';
+        return of + (required ? '' : '?');
       },
     },
   ],
@@ -408,6 +414,22 @@ foam.CLASS({
     {
       name: 'swiftFactory',
       value: 'return []',
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.Boolean',
+  properties: [
+    {
+      name: 'swiftType',
+      value: 'Bool',
+    },
+    {
+      name: 'swiftValue',
+      expression: function(value) {
+        return '' + value;
+      },
     },
   ],
 });

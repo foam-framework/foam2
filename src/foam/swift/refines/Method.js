@@ -26,7 +26,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftName',
-      expression: function(name) { return name; },
+      expression: function(name) { return name == 'init' ? '__foamInit__' : name; },
     },
     {
       class: 'FObjectArray',
@@ -98,7 +98,7 @@ foam.CLASS({
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
         visibility: this.swiftVisibility,
-        override: !!(superAxiom && superAxiom.swiftCode),
+        override: !!(superAxiom && superAxiom.swiftCode) || this.name == 'init',
         annotations: this.swiftAnnotations,
       }));
     },

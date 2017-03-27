@@ -28,8 +28,12 @@ foam.CLASS({
         return function() {/*
 var newValue = newValue
 if let str = newValue as? String { newValue = Int(str) }
-if let i = newValue as? Int { return Int(Int32(i)) }
-fatalError("Unable to adapt Int")
+if let i = newValue as? Int {
+  let max = Int(Int32.max)
+  let min = Int(Int32.min)
+  return i > max ? max : i < min ? min : i
+}
+return 0
         */}
       },
     },
@@ -37,6 +41,27 @@ fatalError("Unable to adapt Int")
       name: 'swiftValue',
       expression: function(value) {
         return value + '';
+      },
+    },
+    {
+      name: 'swiftView',
+      value: 'foam.swift.ui.FOAMUITextFieldInt',
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.Long',
+  properties: [
+    {
+      name: 'swiftAdapt',
+      factory: function() {
+        return function() {/*
+var newValue = newValue
+if let str = newValue as? String { newValue = Int(str) }
+if let i = newValue as? Int { return i }
+return 0
+        */}
       },
     },
   ],
