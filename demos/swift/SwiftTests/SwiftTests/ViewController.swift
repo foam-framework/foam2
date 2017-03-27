@@ -15,7 +15,7 @@ class ViewController: UIViewController {
       view.addSubview(v)
     }
     view.addConstraints(NSLayoutConstraint.constraints(
-      withVisualFormat: "V:|-[v]-|",
+      withVisualFormat: "V:|-(20)-[v]",
       options: NSLayoutFormatOptions.init(rawValue: 0),
       metrics: nil,
       views: views))
