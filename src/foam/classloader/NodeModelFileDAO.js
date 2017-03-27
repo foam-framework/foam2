@@ -29,8 +29,8 @@ foam.CLASS({
 
   methods: [
     function find(id) {
-      var foamCLASS = foam.CLASS;
       var self      = this;
+      var foamCLASS = foam.CLASS;
       var model     = null; // Return null if model not found.
 
       foam.CLASS = function(m) {
