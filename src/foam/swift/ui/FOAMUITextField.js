@@ -36,6 +36,7 @@ let updateTextField: Listener = { [weak self] _ in
 viewSub?.detach()
 viewSub = data$.swiftSub(updateTextField)
 updateTextField(viewSub!, [])
+newValue.delegate = self
       */},
     },
     {
