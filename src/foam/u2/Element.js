@@ -156,9 +156,9 @@ foam.CLASS({
         if ( (65 <= c && c <= 90) || (97 <= c && c <= 122) ||
             (48 <= c && c <= 57) || c === 45 || c === 95 ) {
           return base + '-' + next;
-        } else {
-          return base + next;
         }
+
+        return base + next;
       });
     }
   ]
