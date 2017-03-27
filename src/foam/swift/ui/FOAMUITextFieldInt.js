@@ -24,7 +24,7 @@ foam.CLASS({
       name: 'view',
       swiftFactory: function() {/*
 let t = UITextField() 
-// TODO make numeric.
+t.keyboardType = .numberPad
 return t
       */},
     },
