@@ -16,6 +16,43 @@
  */
 
 foam.CLASS({
+  package: 'foam.core.type',
+  name: 'Type',
+  properties: [
+    {
+      name: 'swiftType',
+      factory: function() {
+        return this.model_.name
+      },
+    },
+  ],
+})
+
+foam.CLASS({
+  package: 'foam.core.type',
+  name: 'String',
+  extends: 'foam.core.type.Type',
+})
+
+foam.CLASS({
+  package: 'foam.core.type',
+  name: 'Int',
+  extends: 'foam.core.type.Type',
+})
+
+foam.CLASS({
+  package: 'foam.core.type',
+  name: 'Boolean',
+  extends: 'foam.core.type.Type',
+  properties: [
+    {
+      name: 'swiftType',
+      value: 'Bool',
+    },
+  ],
+})
+
+foam.CLASS({
   refines: 'foam.core.Property',
   requires: [
     'foam.swift.Field',
