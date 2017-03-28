@@ -62,6 +62,69 @@ describe('DatastoreDAO', function() {
     });
   });
 
+  describe('multi-part id', function() {
+    var Person;
+    beforeEach(function() {
+      foam.CLASS({
+        package: 'test.dao.mpid',
+        name: 'Person',
+
+        ids: [ 'firstName', 'lastName', 'dob' ],
+
+        properties: [
+          {
+            class: 'String',
+            name: 'firstName'
+          },
+          {
+            class: 'String',
+            name: 'lastName'
+          },
+          {
+            class: 'Date',
+            name: 'dob'
+          }
+        ]
+      });
+      Person = foam.lookup('test.dao.mpid.Person');
+    });
+
+    it('should handle a multi-part-id put(obj) + lookup(obj)', function(done) {
+      daoFactory(Person).then(function(dao) {
+        var putPerson = Person.create({
+          firstName: 'Born',
+          lastName: 'JustNow',
+          dob: Date.now()
+        });
+        dao.put(putPerson).then(function() {
+          return dao.find(putPerson);
+        }).then(function(gotPerson) {
+          expect(gotPerson).toBeDefined();
+          expect(foam.util.equals(putPerson, gotPerson)).toBe(true);
+          done();
+        });
+      });
+    });
+
+    it(`should throw on lookup( <array-from-multi-part-id > );
+        could break inversion of control for multi-part ids`, function(done) {
+      daoFactory(Person).then(function(dao) {
+        var putPerson = Person.create({
+          firstName: 'Born',
+          lastName: 'JustNow',
+          dob: Date.now()
+        });
+        dao.put(putPerson).then(function() {
+          return dao.find(putPerson.id);
+        }).then(function(gotPerson) {
+          fail(`find( <multi-part-id> ) = find( <array-of-parts> ) should throw;
+                passing the array could break inversion of control for
+                multi-part ids`);
+        }).catch(done);
+      });
+    });
+  });
+
   describe('batching', function() {
     // Emulator will batch every 300 records.
     var numRecords = 1000;

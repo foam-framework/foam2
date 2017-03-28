@@ -3,9 +3,7 @@
     <script src="src/foam.js"></script>
     <script src="src/foam/classloader/WebModelDisplayer.js"></script>
     <script>
-      var executor = foam.classloader.WebModelDisplayer.create()
-      executor.fromQuery(window.location.search.substring(1));
-      executor.execute();
+      foam.classloader.WebModelDisplayer.create().fromQuery().execute();
     </script>
   </body>
 </html>

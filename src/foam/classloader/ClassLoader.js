@@ -31,8 +31,8 @@ foam.CLASS({
       }
 
       return Promise.all(promises);
-    },
-  ],
+    }
+  ]
 });
 
 
@@ -52,6 +52,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.classloader',
   name: 'ClassLoader',
+
+  documentation: 'Asynchronous class loader service. Loads classes dynamically.',
 
   exports: [
     'arequire'
@@ -82,8 +84,12 @@ foam.CLASS({
 
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
         this.pending[modelId] = modelDao.find(modelId).then(function(m) {
-          m.validate();
-          return m.arequire(deps).then(function() { return m; });
+          // Model validation may make use of deps. Require them first, then
+          // validate the model.
+          return m.arequire(deps).then(function() {
+            m.validate();
+            return m;
+          });
         }).then(function(m) {
           if ( X.isRegistered(modelId) ) return m;
 
