@@ -56,7 +56,7 @@ foam.CLASS({
       code: function() {
         var stack = this.stack;
 
-        this.dao.put(this.data).then(function() {
+        this.dao.put(this.data.clone()).then(function() {
           if ( stack ) stack.back();
         });
       }
