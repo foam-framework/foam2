@@ -393,13 +393,13 @@ foam.CLASS({
 
       var prop = m.prop;
 
-      // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
+      if ( foam.mlang.sink.GroupBy.isInstance(sink) && sink.arg1 === prop ) {
       // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
       // TODO: allow sink to split up, for GroupBy passing one sub-sink to each tree node
       //  for grouping. Allow sink to suggest order, if order not defined
       //    sink.subSink(key) => sink
       //    sink.defaultOrder() => Comparator
-      // }
+      }
 
       var result, subPlan, cost;
 
