@@ -232,6 +232,7 @@ foam.CLASS({
       foam.USED[m.id] = c;
       return c;
     });
+
     foam.__context__.registerFactory(m, f);
     foam.package.registerClassFactory(m, f);
   };
