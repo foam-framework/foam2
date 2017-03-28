@@ -229,6 +229,98 @@ foam.LIB({
               JSON.stringify(v));
         };
       })()
+    },
+    {
+      name: 'toDatastoreKeyName',
+      code: foam.mmethod({
+        Number: function(n) { return n + ''; },
+        String: function(str) { return str; },
+        FObject: function(o) {
+          var idProp = o.cls_.ID;
+          if ( ! idProp ) {
+            throw new Error('Attempt to construct datastore key from ' +
+                'unidentified object');
+          }
+          return idProp.toDatastoreKeyName(o);
+        },
+        Array: function(a) {
+          throw new Error('Multi-part keys must be derived from objects, not values');
+        },
+        Object: function(o) {
+          throw new Error('Cannot convert plain object to datastore key name');
+        }
+      }, function(o) {
+        throw new Error('Cannot convert ' + o + ' to datastore key name');
+      })
+    }
+  ]
+});
+
+//
+// Refine properties and multi-part ids to support conversion:
+// property-on-object => datastore-key-name
+//
+
+foam.CLASS({
+  refines: 'foam.core.Property',
+
+  methods: [
+    {
+      name: 'toDatastoreKeyName',
+      documentation: `Construct a Datastore Key PathElement "name" from this
+        property. I.e.,
+        https://cloud.google.com/datastore/docs/reference/rest/v1/Key#PathElement
+        "name" property.`,
+      code: function(o) {
+        return this.toDatastoreKeyNamePart(o);
+      }
+    },
+    {
+      name: 'toDatastoreKeyNamePart',
+      documentation: `Provide this property's contribution to a composite
+        Datastore Key PathElement "name" from this property. This is used by
+        MultiPartIDs to gather string fragments from multiple properies. See
+        https://cloud.google.com/datastore/docs/reference/rest/v1/Key#PathElement
+        "name" property for Datastore API usage details.`,
+      code: function(o) {
+        return this.f(o).toString();
+        return this.toDatastoreKeyNamePart(o);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Date',
+
+  methods: [
+    function toDatastoreKeyNamePart(o) {
+      return this.f(o).toISOString();
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.MultiPartID',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'stringSeparator',
+      value: ':'
+    }
+  ],
+
+  methods: [
+    function toDatastoreKeyName(o) {
+      var sep = this.stringSeparator;
+      var props = this.props;
+      var str = '';
+      for ( var i = 0; i < props.length; i++ ) {
+        str += props[i].toDatastoreKeyNamePart(o);
+        if ( i !== props.length - 1 ) str += sep;
+      }
+      return str;
     }
   ]
 });
@@ -252,19 +344,10 @@ foam.CLASS({
       return this.cls_.getClassDatastoreKind();
     },
     function getOwnDatastoreKey() {
-      if ( ! ( this.model_.ids || this.id ) ) {
-        throw new Error('Attempt to construct datastore key from ' +
-            'unidentified object');
-      }
-      var ids = this.model_.ids;
-      if ( ! ids )
-        return { kind: this.getOwnDatastoreKind(), name: this.id.toString() };
-
-      var name = new Array(ids.length);
-      for ( var i = 0; i < ids.length; i++ ) {
-        name = ids[i] + ( i < ids.length - 1 ? ':' : '' );
-      }
-      return { kind: this.getOwnDatastoreKind(), name: name };
+      return {
+        kind: this.getOwnDatastoreKind(),
+        name: com.google.cloud.datastore.toDatastoreKeyName(this)
+      };
     },
     function getDatastoreKey(opt_propertyPath) {
       if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };

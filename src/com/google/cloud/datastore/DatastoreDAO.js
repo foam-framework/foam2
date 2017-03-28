@@ -115,9 +115,9 @@ foam.CLASS({
       });
     },
 
-    function find(id) {
-      var key = foam.core.FObject.isInstance(id) ?
-          id.getDatastoreKey() : this.getDatastoreKeyFromId_(id);
+    function find(idOrObj) {
+      var key = foam.core.FObject.isInstance(idOrObj) ?
+          idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
       return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
           .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
     },
@@ -166,7 +166,7 @@ foam.CLASS({
       code: function(id) {
         return { path: [ {
           kind: this.of.getOwnClassDatastoreKind(),
-          name: id
+          name: com.google.cloud.datastore.toDatastoreKeyName(id)
         } ] };
       }
     },

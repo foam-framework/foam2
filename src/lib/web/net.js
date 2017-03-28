@@ -164,16 +164,13 @@ foam.CLASS({
           return null;
         }
 
-        switch (this.responseType) {
-        case "text":
-          return this.resp.text();
-        case "blob":
-          return this.resp.blob();
-        case "arraybuffer":
-          return this.resp.arraybuffer();
-        case "json":
-          return this.resp.json();
+        switch ( this.responseType ) {
+          case 'text':        return this.resp.text();
+          case 'blob':        return this.resp.blob();
+          case 'arraybuffer': return this.resp.arraybuffer();
+          case 'json':        return this.resp.json();
         }
+
         // TODO: responseType should be an enum and/or have validation
         throw new Error('Unsupported response type: ' + this.responseType);
       }
@@ -261,14 +258,14 @@ foam.CLASS({
       class: 'String',
       name: 'protocol',
       preSet: function(old, nu) {
-        return nu.replace(':','');
+        return nu.replace(':', '');
       }
     },
     {
       class: 'String',
       name: 'path',
       preSet: function(old, nu) {
-        if ( ! nu.startsWith('/') ) return '/'+nu;
+        if ( ! nu.startsWith('/') ) return '/' + nu;
         return nu;
       }
     },
@@ -293,6 +290,11 @@ foam.CLASS({
       class: 'String',
       name: 'responseType',
       value: 'text'
+    },
+    {
+      class: 'String',
+      name: 'mode',
+      value: 'cors'
     }
   ],
 
@@ -320,7 +322,7 @@ foam.CLASS({
       var options = {
         method: this.method,
         headers: headers,
-        mode: "cors",
+        mode: this.mode,
         redirect: "follow",
         credentials: "same-origin"
       };
