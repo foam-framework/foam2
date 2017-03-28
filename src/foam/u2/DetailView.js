@@ -32,6 +32,10 @@ foam.CLASS({
     'controllerMode'
   ],
 
+  axioms: [
+    foam.pattern.Faceted.create()
+  ],
+
   properties: [
     {
       name: 'data',
