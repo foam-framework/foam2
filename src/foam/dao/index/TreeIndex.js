@@ -130,7 +130,9 @@ foam.CLASS({
         if ( predicate.args && self.And.isInstance(predicate) ) {
           for ( var i = 0 ; i < predicate.args.length ; i++ ) {
             var q = predicate.args[i];
-            if ( model.isInstance(q) && q.arg1 === prop ) {
+            // Util.equals to catch clones again
+            if ( model.isInstance(q) &&
+                (q.arg1 === prop || foam.util.equals(q.arg1, prop)) ) {
               predicate = predicate.clone();
               predicate.args[i] = self.True.create();
               predicate = predicate.partialEval();
