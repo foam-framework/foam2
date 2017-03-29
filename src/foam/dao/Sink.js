@@ -427,3 +427,55 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'FramedSink',
+  extends: 'foam.dao.ProxySink',
+  documentation: 'A Sink that waits until the next frame to flush the calls to the sink.',
+  properties: [
+    { class: 'Array', name: 'calls' },
+  ],
+  methods: [
+    {
+      name: 'put',
+      code: function() {
+        this.calls.push(['put', arguments]);
+        this.flushCalls();
+      }
+    },
+    {
+      name: 'remove',
+      code: function() {
+        this.calls.push(['remove', arguments]);
+        this.flushCalls();
+      }
+    },
+    {
+      name: 'eof',
+      code: function() {
+        this.calls.push(['eof', arguments]);
+        this.flushCalls();
+      }
+    },
+    {
+      name: 'reset',
+      code: function() {
+        this.calls = [['reset', arguments]];
+        this.flushCalls();
+      }
+    }
+  ],
+  listeners: [
+    {
+      name: 'flushCalls',
+      isFramed: true,
+      code: function() {
+        for (var i = 0, o; o = this.calls[i]; i++) {
+          this.delegate[o[0]].apply(undefined, o[1]);
+        }
+        this.calls = [];
+      }
+    },
+  ]
+});
