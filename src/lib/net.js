@@ -16,7 +16,7 @@
  */
 
 (function() {
-  var pkg = 'foam.net.' + (typeof process === 'undefined' ? 'web' : 'node');
+  var pkg = 'foam.net.' + ( foam.isServer ? 'node' : 'web');
   var clss = [
     'HTTPRequest',
     'HTTPResponse',

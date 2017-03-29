@@ -43,6 +43,110 @@ foam.INTERFACE({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'AbstractBlob',
+  implements: ['foam.blob.Blob'],
+  methods: [
+    function pipe(writeFn) {
+      var offset = offset || 0;
+      var buf = new Buffer(8192 * 4);
+      var self = this;
+      var limit = limit || self.size;
+
+      function a() {
+        if ( offset >= limit) return;
+
+        return self.read(buf, offset).then(function(buf2) {
+          offset += buf2.length;
+          return writeFn(buf2);
+        }).then(a);
+      };
+
+      return a();
+    },
+    function slice(offset, length) {
+      console.log("Slicing", offset, length);
+      return foam.blob.SubBlob.create({
+        parent: this,
+        offset: offset,
+        size: length
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'SubBlob',
+  extends: 'foam.blob.AbstractBlob',
+  properties: [
+    {
+      name: 'parent',
+    },
+    {
+      name: 'offset'
+    },
+    {
+      name: 'size',
+      assertValue: function(value) {
+        foam.assert(this.offset + value < this.parent.size, 'Cannot create sub blob beyond end of parent.');
+      }
+    }
+  ],
+  methods: [
+    function read(buffer, offset) {
+      if ( buffer.length > this.size - offset) {
+        buffer = buffer.slice(0, this.size - offset);
+      }
+
+      return this.parent.read(buffer, offset + this.offset);
+    },
+    function slice(offset, length) {
+      return foam.blob.SubBlob.create({
+        parent: this.parent,
+        offset: this.offset + offset,
+        size: length
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'BlobBlob',
+  extends: 'foam.blob.AbstractBlob',
+  properties: [
+    'blob',
+    {
+      name: 'size',
+      factory: function() {
+        return this.blob.size;
+      }
+    }
+  ],
+  methods: [
+    function read(buffer, offset) {
+      var self = this;
+      var reader = new FileReader();
+
+      var b = this.blob.slice(offset, offset + buffer.length);
+
+      return new Promise(function(resolve, reject) {
+        reader.onload = function(e) {
+          resolve(e.result);
+        };
+
+        reader.onerror = function(e) {
+          reject(e);
+        };
+
+        reader.readAsArrayBuffer(b);
+      });
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',
@@ -50,7 +154,8 @@ foam.CLASS({
   extends: 'foam.core.Property',
 
   properties: [
-    [ 'tableCellView', function() {} ]
+    [ 'tableCellView', function() {} ],
+    [ 'view', { class: 'foam.u2.view.BlobView' } ]
   ]
 });
 
@@ -58,6 +163,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'ClientBlob',
+  extends: 'foam.blob.AbstractBlob',
 
   properties: [
     {
@@ -72,6 +178,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'Buffer',
+  requires: [
+    'foam.util.Base64Encoder',
+    'foam.util.Base64Decoder',
+  ],
 
   properties: [
     {
@@ -82,6 +192,7 @@ foam.CLASS({
     {
       name: 'buffer',
       toJSON: function(value) {
+
       },
       fromJSON: function(value) {
       }
@@ -93,10 +204,10 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.blob',
   name: 'FdBlob',
+  extends: 'foam.blob.AbstractBlob',
 
   properties: [
     {
@@ -203,16 +314,16 @@ foam.CLASS({
       var self = this;
 
       return new Promise(function aaa(resolve, reject) {
-	path = self.tmp + require('path').sep + (name++);
-	fd = require('fs').open(path, 'wx', function onOpen(err, fd) {
-	  if ( err !== 'EEXIST' ) {
-	    reject(err);
-	    return;
-	  }
+        path = self.tmp + require('path').sep + (name++);
+        fd = require('fs').open(path, 'wx', function onOpen(err, fd) {
+          if ( err && err.code !== 'EEXIST' ) {
+            reject(err);
+            return;
+          }
 
-	  if ( err ) aaa(resolve, reject);
-	  else resolve({ path: path, fd: fd});
-	});
+          if ( err ) aaa(resolve, reject);
+          else resolve({ path: path, fd: fd});
+        });
       });
     },
 
@@ -224,9 +335,8 @@ foam.CLASS({
 
       var hash = require('crypto').createHash('sha256');
 
-      // 4k chunks i guess
-      var bufsize = 4096;
-      var buffer = new Buffer(4096);
+      var bufsize = 8192;
+      var buffer = new Buffer(bufsize);
 
       var size = obj.size
       var remaining = size;
@@ -236,70 +346,118 @@ foam.CLASS({
       var chunks = Math.ceil(size / bufsize);
 
       function chunkOffset(i) {
-	return i * bufsize;
-      }
-
-      function chunkSize(i) {
-	return i < chunks - 1 ?
-	  bufsize :
-	  size - chunkOffset(i > 0 ? (i - 1) : 0) ;
+        return i * bufsize;
       }
 
       var tmp;
 
-      function readChunk(chunk) {
-	return obj.read(buffer, chunkOffset(chunk)).then(function(buf2) {
-	  var buf = buffer.slice(0, chunkSize(chunk));
-	  hash.update(buf);
-	  return new Promise(function(resolve, reject) {
-	    require('fs').write(tmp.fd, buf, 0, buf.length, function cb(err, written, buffer) {
-	      if ( err ) {
-		reject(err);
-		return;
-	      }
+      function writeChunk(chunk) {
+        return obj.read(buffer, chunkOffset(chunk)).then(function(buf) {
+          hash.update(buf);
+          return new Promise(function(resolve, reject) {
+            require('fs').write(tmp.fd, buf, 0, buf.length, function cb(err, written, buffer) {
+              if ( err ) {
+                reject(err);
+                return;
+              }
 
-	      if ( written !== buf.length ) {
-		console.warn("Didn't write entire chunk, does this ever happen?");
-		require('fs').write(tmp.fd, buf.slice(written), cb);
-		return;
-	      }
+              if ( written !== buf.length ) {
+                console.warn("Didn't write entire chunk, does this ever happen?");
+                require('fs').write(tmp.fd, buf.slice(written), cb);
+                return;
+              }
 
-	      resolve();
-	    });
-	  });
-	});
+              resolve();
+            });
+          });
+        });
       }
 
       var chunk = 0;
       return this.allocateTmp().then(function(tmpfile) {
-	tmp = tmpfile;
-	return readChunk(chunk++).then(function asdf() {
-	  if ( chunk < chunks ) return readChunk(chunk++);
-          return new Promise(function(resolve, reject) {
-	    require('fs').close(tmp.fd, function() {
-              var digest = hash.digest('hex');
-	      require('fs').rename(tmp.path, self.sha256 + require('path').sep + digest, function(err) {
-		if ( err ) {
-		  reject(err);
-		  return;
-		}
-		resolve(digest);
-	      });
-	    });
-	  });
-	});
+        tmp = tmpfile;
+      }).then(function a() {
+        if ( chunk < chunks ) return writeChunk(chunk++).then(a);
+      }).then(function() {
+        return new Promise(function(resolve, reject) {
+          require('fs').close(tmp.fd, function() {
+            var digest = hash.digest('hex');
+            require('fs').rename(tmp.path, self.sha256 + require('path').sep + digest, function(err) {
+              if ( err ) {
+                reject(err);
+                return;
+              }
+              resolve(digest);
+            });
+          });
+        });
       });
     },
 
     function find(id) {
+      if ( id.indexOf(require('path').sep) != -1 ) {
+        return Promise.reject(new Error("Invalid file name"));
+      }
+
+      var self = this;
+
       return new Promise(function(resolve, reject) {
-	require('fs').open(this.sha256 + require('path').sep + id, function(err, fd) {
-	  if ( err ) {
-            resolve(null);
-	    return;
-	  }
-	  resolve(foam.blob.FdBlob.create({ fd: fd }));
-	});
+        require('fs').open(self.sha256 + require('path').sep + id, "r", function(err, fd) {
+          if ( err ) {
+            if ( err.code == 'ENOENT' ) {
+              resolve(null);
+              return;
+            }
+
+            reject(err);
+            return;
+          }
+          resolve(foam.blob.FdBlob.create({ fd: fd }));
+        });
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'RestBlobService',
+  documentation: 'Implementation of a BlobService against a REST interface.  Useful for streaming media to video/audio tags.',
+  requires: [
+    'foam.net.HTTPRequest'
+  ],
+  properties: [
+    {
+      class: 'String',
+      name: 'baseUri'
+    }
+  ],
+  methods: [
+    function put(blob) {
+      var req = this.HTTPRequest.create();
+      req.fromUrl(this.baseUri);
+      req.method = 'PUT';
+      req.payload = blob;
+      req.responseType = 'text';
+
+      return req.send().then(function(resp) {
+        if ( resp.status !== 200 ) {
+          return resp.payload.then(function(msg) {
+            throw new Error(msg);
+          });
+        }
+
+        return resp.payload;
+      });
+    },
+    function find(id) {
+      var req = this.HTTPRequest.create();
+      req.fromUrl(this.baseUri + '/' + id);
+      req.method = 'GET';
+      req.responseType = 'blob';
+      return req.send().then(function(resp) {
+        if ( resp.status === 404 ) return null;
+        return resp.payload;
       });
     }
   ]
