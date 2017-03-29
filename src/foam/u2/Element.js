@@ -1426,12 +1426,14 @@ foam.CLASS({
         }
       }
 
-      this.onDetach(dao.pipe({
-        put: put,
-        remove: remove,
-        reset: reset,
-        eof: function() {}
-      }));
+      this.onDetach(dao.pipe(foam.dao.FramedSink.create({
+        delegate: {
+          put: put,
+          remove: remove,
+          reset: reset,
+          eof: function() {}
+        },
+      })));
 
       return this;
     },
