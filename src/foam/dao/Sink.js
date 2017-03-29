@@ -471,10 +471,11 @@ foam.CLASS({
       name: 'flushCalls',
       isFramed: true,
       code: function() {
-        for (var i = 0, o; o = this.calls[i]; i++) {
+        var calls = this.calls;
+        this.calls = [];
+        for (var i = 0, o; o = calls[i]; i++) {
           this.delegate[o[0]].apply(undefined, o[1]);
         }
-        this.calls = [];
       }
     },
   ]
