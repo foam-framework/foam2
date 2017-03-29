@@ -432,7 +432,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FramedSink',
   extends: 'foam.dao.ProxySink',
-  documentation: 'A Sink that waits until the next frame to flush the calls to the sink.',
+  documentation: 'A proxy that waits until the next frame to flush the calls to the delegate.',
   properties: [
     { class: 'Array', name: 'calls' },
   ],
