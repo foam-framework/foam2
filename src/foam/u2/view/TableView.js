@@ -162,7 +162,7 @@ foam.CLASS({
 
       this.
         cssClass(this.myCls()).
-        setNodeName('table').
+        setNodeName('table').style({'width':'100%'}).
         start('thead').
         add(this.slot(function(columns_) {
           return this.E('tr').
