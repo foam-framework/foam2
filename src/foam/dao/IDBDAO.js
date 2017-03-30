@@ -309,8 +309,8 @@ foam.CLASS({
 
           request.onsuccess = function(e) {
             var cursor = e.target.result;
-            if ( fc.errorEvt ) {
-              reject(fc.errorEvt);
+            if ( e.target.error ) {
+              reject(e.target.error);
               return;
             }
 
