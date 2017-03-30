@@ -28,13 +28,14 @@ foam.CLASS({
   properties: [
     {
       class: 'Int',
-      name: 'value'
+      name: 'value',
     }
   ],
 
   methods: [
     function put() { this.value++; },
     function remove() { this.value--; },
+    function reset() { this.value = 0; },
     function toString() { return 'COUNT()'; }
   ]
 });
