@@ -336,8 +336,9 @@ global.genericDAOTestBattery = function(daoFactory) {
 
       describe('filtering', function() {
         var dao;
-        var exprs = foam.mlang.Expressions.create();
+        var exprs;
         beforeEach(function(done) {
+          exprs = foam.mlang.Expressions.create();
           daoFactory(test.dao.generic.Person).then(function(idao) {
             dao = idao;
             return idao.put(mkPerson1()).then(function() { return idao.put(mkPerson2()) } );
