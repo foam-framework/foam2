@@ -29,9 +29,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.graphics.ScrollCView',
-    'foam.mlang.sink.Count',
-    'foam.comics.DAOController',
+    'foam.comics.DAOController'
   ],
 
   properties: [
@@ -45,44 +43,7 @@ foam.CLASS({
           data$: this.data$
         });
       }
-    },
-    {
-      name: 'countSinkDetach',
-    },
-    {
-      name: 'countSink',
-      factory: function() { return this.Count.create() }
-    },
-    {
-      name: 'scroller',
-      factory: function() {
-        return this.ScrollCView.create({
-          size$: this.countSink$.dot('value'),
-          value$: this.controller$.dot('skip'),
-          extent$: this.controller$.dot('limit'), // TODO find out how many fit.
-          height: 600, // TODO use window height.
-          width: 40,
-          handleSize: 40,
-          // TODO wire up mouse wheel
-          // TODO clicking away from scroller should deselect it.
-        });
-      }
     }
-  ],
-
-  listeners: [
-    {
-      name: 'updateScrollSize',
-      // TODO isFramed doesnt work. Why?
-      isMerged: true,
-      code: function() {
-        if (this.countSinkDetach) this.countSinkDetach.detach();
-        this.countSink.value = 0;
-        this.countSinkDetach = this.controller.data
-            .where(this.controller.predicate)
-            .pipe(this.countSink);
-      },
-    },
   ],
 
   methods: [
@@ -94,20 +55,13 @@ foam.CLASS({
       });
     },
     function initE() {
-      this.onDetach(this.controller$.dot('data').sub(this.updateScrollSize));
-      this.onDetach(this.controller$.dot('predicate').sub(this.updateScrollSize));
-      this.updateScrollSize();
-
       this.startContext({ data: this.controller }).
         start('table').
           start('tr').
             start('td').add(this.DAOController.PREDICATE).end().
             start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
-            start('td').add(this.scroller).end().
           end().
-          start('tr').
-            start('td').end().
-            start('td').add(this.DAOController.CREATE).end().
+          start('tr').start('td').end().start('td').add(this.DAOController.CREATE).end().
         end().
         endContext();
     }
