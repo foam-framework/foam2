@@ -41,22 +41,10 @@ foam.CLASS({
       }
     },
     {
-      class: 'Int',
-      name: 'limit',
-      value: 10
-    },
-    {
-      class: 'Int',
-      name: 'skip',
-    },
-    {
       name: 'filteredDAO',
-      view: 'foam.u2.view.TableView',
-      expression: function(data, limit, skip, predicate) {
-        data = data || foam.dao.NullDAO.create();
-        data = predicate ? data.where(predicate) : data;
-        data = limit ? data.limit(limit) : data;
-        return data.skip(skip);
+      view: 'foam.u2.view.ScrollTableView',
+      expression: function(data, predicate) {
+        return predicate ? data.where(predicate) : data;
       }
     },
     {
