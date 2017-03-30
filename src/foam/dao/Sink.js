@@ -483,3 +483,36 @@ foam.CLASS({
     },
   ]
 });
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'DAOSink',
+  implements: ['foam.dao.Sink'],
+  properties: [
+    { class: 'foam.dao.DAOProperty', name: 'dao' },
+  ],
+  methods: [
+    {
+      name: 'put',
+      code: function(_, o) {
+        this.dao.put(o);
+      }
+    },
+    {
+      name: 'remove',
+      code: function(_, o) {
+        this.dao.remove(o);
+      }
+    },
+    {
+      name: 'eof',
+      code: function() {},
+    },
+    {
+      name: 'reset',
+      code: function() {
+        this.dao.removeAll();
+      }
+    }
+  ],
+});
