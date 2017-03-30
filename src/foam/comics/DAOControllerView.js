@@ -47,13 +47,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'countSinkDetach',
+    },
+    {
       name: 'countSink',
-      expression: function(data) {
-        // TODO detach the previous sink.
-        var c = this.Count.create();
-        data.pipe(c);
-        return c;
-      }
+      factory: function() { return this.Count.create() }
     },
     {
       name: 'scroller',
@@ -72,6 +70,21 @@ foam.CLASS({
     }
   ],
 
+  listeners: [
+    {
+      name: 'updateScrollSize',
+      // TODO isFramed doesnt work. Why?
+      isMerged: true,
+      code: function() {
+        if (this.countSinkDetach) this.countSinkDetach.detach();
+        this.countSink.value = 0;
+        this.countSinkDetach = this.controller.data
+            .where(this.controller.predicate)
+            .pipe(this.countSink);
+      },
+    },
+  ],
+
   methods: [
     function editRecord(obj) {
       this.stack.push({
@@ -81,6 +94,10 @@ foam.CLASS({
       });
     },
     function initE() {
+      this.onDetach(this.controller$.dot('data').sub(this.updateScrollSize));
+      this.onDetach(this.controller$.dot('predicate').sub(this.updateScrollSize));
+      this.updateScrollSize();
+
       this.startContext({ data: this.controller }).
         start('table').
           start('tr').
