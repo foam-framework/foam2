@@ -63,7 +63,6 @@
       code: function() {
         var self = this;
         this.data$proxy.select(this.Count.create()).then(function(s) {
-          console.log('yooo');
           self.scrollView.size = s.value;
         })
       },
