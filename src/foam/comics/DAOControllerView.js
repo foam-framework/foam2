@@ -29,7 +29,9 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.comics.DAOController'
+    'foam.graphics.ScrollCView',
+    'foam.mlang.sink.Count',
+    'foam.comics.DAOController',
   ],
 
   properties: [
@@ -41,6 +43,30 @@ foam.CLASS({
         return this.DAOController.create({
           of$: this.of$,
           data$: this.data$
+        });
+      }
+    },
+    {
+      name: 'countSink',
+      expression: function(data) {
+        // TODO detach the previous sink.
+        var c = this.Count.create();
+        data.pipe(c);
+        return c;
+      }
+    },
+    {
+      name: 'scroller',
+      factory: function() {
+        return this.ScrollCView.create({
+          size$: this.countSink$.dot('value'),
+          value$: this.controller$.dot('skip'),
+          extent$: this.controller$.dot('limit'), // TODO find out how many fit.
+          height: 600, // TODO use window height.
+          width: 40,
+          handleSize: 40,
+          // TODO wire up mouse wheel
+          // TODO clicking away from scroller should deselect it.
         });
       }
     }
@@ -59,9 +85,12 @@ foam.CLASS({
         start('table').
           start('tr').
             start('td').add(this.DAOController.PREDICATE).end().
-            start('td').style({ 'vertical-align': 'top' }).add(this.DAOController.FILTERED_DAO).end().
+            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
+            start('td').add(this.scroller).end().
           end().
-          start('tr').start('td').end().start('td').add(this.DAOController.CREATE).end().
+          start('tr').
+            start('td').end().
+            start('td').add(this.DAOController.CREATE).end().
         end().
         endContext();
     }
