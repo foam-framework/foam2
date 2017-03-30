@@ -34,7 +34,7 @@ foam.CLASS({
 
   methods: [
     function put() { this.value++; },
-
+    function remove() { this.value--; },
     function toString() { return 'COUNT()'; }
   ]
 });
