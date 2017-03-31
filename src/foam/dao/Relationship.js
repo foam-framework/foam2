@@ -293,10 +293,11 @@ foam.CLASS({
       */
     },
 
-    function targetQueryFromSource(obj, forward) {
-      var targetClass = this.lookup(forward ? this.targetModel : this.sourceModel);
-      var name        = forward ? this.inverseName : this.forwardName;
+    function targetQueryFromSource(obj) {
+      var targetClass = this.lookup(this.sourceModel);
+      var name        = this.forwardName;
       var targetProp  = targetClass[foam.String.constantize(name)];
+
       return this.EQ(targetProp, obj.id);
     }
   ]
