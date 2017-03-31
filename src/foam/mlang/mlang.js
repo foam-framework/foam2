@@ -1650,6 +1650,7 @@ foam.CLASS({
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.False',
     'foam.mlang.predicate.Func',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
@@ -1663,6 +1664,7 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
+    'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -1671,6 +1673,11 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Sum'
   ],
+
+  constants: {
+    FALSE: foam.mlang.predicate.False.create(),
+    TRUE: foam.mlang.predicate.True.create()
+  },
 
   methods: [
     function _nary_(name, args) {
