@@ -1641,6 +1641,7 @@ foam.CLASS({
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.False',
     'foam.mlang.predicate.Func',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
@@ -1654,6 +1655,7 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
+    'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -1675,6 +1677,9 @@ foam.CLASS({
     function _binary_(name, arg1, arg2) {
       return this[name].create({ arg1: arg1, arg2: arg2 });
     },
+
+    function TRUE() { return this.True.create(); },
+    function FALSE() { return this.False.create(); },
 
     function OR() { return this._nary_("Or", arguments); },
     function AND() { return this._nary_("And", arguments); },
