@@ -1187,6 +1187,15 @@ foam.CLASS({
       class: 'StringArray',
       name: 'groupKeys',
       factory: function() { return []; }
+    },
+    {
+      class: 'Boolean',
+      name: 'processArrayValuesIndividually',
+      documentation: 'If true, each value of an array will be entered into a separate group.',
+      factory: function() {
+        // TODO: it would be good if it could also detect RelationshipJunction.sourceId/targetId
+        return ! foam.core.MultiPartID.isInstance(this.arg1);
+      }
     }
   ],
 
@@ -1208,7 +1217,7 @@ foam.CLASS({
 
     function put(obj) {
       var key = this.arg1.f(obj);
-      if ( Array.isArray(key) ) {
+      if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
           for ( var i = 0; i < key.length; i++ ) {
             this.putInGroup_(key[i], obj);
