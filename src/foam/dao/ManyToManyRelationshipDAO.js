@@ -25,17 +25,17 @@ foam.CLASS({
   documentation: 'Adapts a DAO based on a *:* Relationship.',
 
   properties: [
-    'junctionProperty', // TODO(markdittmer): Is this needed?
+    'junctionProperty',
     'joinDAOKey',
-    'targetProperty', // TODO(markdittmer): Is this needed?
+    'targetProperty',
     {
       name: 'predicate',
       documentation: `ManyToMany filtered querys are always "backward" to
-        match sourceId and source object's id.`,
+        match inverse-namd property and source object's id.`,
       getter: function() {
-        // TODO(markdittmer): Can the desired property ever be something other
-        // than SOURCE_ID?
-        return this.EQ(this.of.SOURCE_ID, this.obj.id);
+        return this.EQ(
+          this.of[foam.String.constantize(this.relationship.inverseName)],
+          this.obj.id);
       }
     }
   ],
@@ -48,7 +48,7 @@ foam.CLASS({
       return self.SUPER(self.MAP(self.junctionProperty)).then(function(map) {
         return joinDAO.select(sink, skip, limit, order, self.AND(
           predicate || self.TRUE,
-          self.IN(joinDAO.of.ID, map.delegate.a)));
+          self.IN(self.targetProperty, map.delegate.a)));
       });
     }
   ]

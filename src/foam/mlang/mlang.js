@@ -1674,6 +1674,11 @@ foam.CLASS({
     'foam.mlang.sink.Sum'
   ],
 
+  constants: {
+    FALSE: foam.mlang.predicate.False.create(),
+    TRUE: foam.mlang.predicate.True.create()
+  },
+
   methods: [
     function _nary_(name, args) {
       return this[name].create({ args: Array.from(args) });
@@ -1686,9 +1691,6 @@ foam.CLASS({
     function _binary_(name, arg1, arg2) {
       return this[name].create({ arg1: arg1, arg2: arg2 });
     },
-
-    function TRUE() { return this.True.create(); },
-    function FALSE() { return this.False.create(); },
 
     function OR() { return this._nary_("Or", arguments); },
     function AND() { return this._nary_("And", arguments); },
