@@ -43,7 +43,7 @@ foam.CLASS({
   methods: [
     function select(sink, skip, limit, order, predicate) {
       var self = this;
-      var joinDAO = self.__context__[self.joinDAOKey];
+      var joinDAO = this.__context__[this.joinDAOKey];
 
       return self.SUPER(self.MAP(self.junctionProperty)).then(function(map) {
         return joinDAO.select(sink, skip, limit, order, self.AND(
