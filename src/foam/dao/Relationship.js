@@ -213,7 +213,10 @@ foam.CLASS({
             package: source.package,
             name: name,
             ids: [ 'sourceId', 'targetId' ],
-            properties: [ 'sourceId', 'targetId' ]
+            properties: [
+              { name: 'sourceId', shortName: 's' },
+              { name: 'targetId', shortName: 't' }
+            ]
           });
 
           jModel = foam.lookup(id);

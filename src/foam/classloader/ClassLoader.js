@@ -31,8 +31,8 @@ foam.CLASS({
       }
 
       return Promise.all(promises);
-    },
-  ],
+    }
+  ]
 });
 
 
