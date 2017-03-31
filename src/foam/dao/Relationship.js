@@ -290,6 +290,8 @@ foam.CLASS({
       */
     },
 
+    // TODO(markdittmer): Use of "forward" here doesn't seem right. No call
+    // sites pass a second parameter.
     function targetQueryFromSource(obj, forward) {
       var targetClass = this.lookup(forward ? this.targetModel : this.sourceModel);
       var name        = forward ? this.inverseName : this.forwardName;
