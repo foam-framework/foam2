@@ -318,11 +318,13 @@ foam.CLASS({
         if ( this.fields[i].name === name ) return this.fields[i];
       }
     },
+
     function getMethod(name) {
       for ( var i  = 0 ; this.methods && i < this.methods.length ; i++ ) {
         if ( this.methods[i].name === name ) return this.methods[i];
       }
     },
+
     function field(f) {
       if ( ! foam.core.FObject.isInstance(f) ) {
         f = ( f.class ? foam.lookup(f.class) : foam.java.Field ).create(f, this);
@@ -374,9 +376,11 @@ foam.CLASS({
       o.out(' {\n');
 
       o.increaseIndent();
+
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
       }).forEach(function(f) { o.out(f, '\n'); });
+
       this.methods.forEach(function(f) { o.out(f, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });
       this.extras.forEach(function(c) { o.out(c, '\n'); });
@@ -384,6 +388,7 @@ foam.CLASS({
       o.indent();
       o.out('}');
     },
+
     function toJavaSource() {
       var output = foam.java.Outputter.create();
       output.out(this);
@@ -692,6 +697,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
@@ -776,6 +782,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
+
   properties: [
     {
       name: 'javaType',
@@ -981,6 +988,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ProxiedMethod',
+
   properties: [
     {
       name: 'javaCode',
@@ -1028,6 +1036,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Long',
 
@@ -1048,6 +1057,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Float',
@@ -1072,6 +1082,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
@@ -1088,6 +1099,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
+
   properties: [
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
@@ -1095,8 +1107,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Map',
+
   properties: [
     ['javaType', 'java.util.Map'],
     ['javaJSONParser', 'foam.lib.json.MapParser'],
@@ -1105,8 +1119,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.List',
+
   properties: [
     ['javaType', 'java.util.List']
   ]
