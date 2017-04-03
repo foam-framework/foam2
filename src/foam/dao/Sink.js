@@ -108,7 +108,7 @@ foam.CLASS({
   methods: [
     function reset(sub) {
       this.SUPER(sub);
-      this.dao.select(this);
+      this.dao.select(this.delegate);
     }
   ]
 });
@@ -422,6 +422,9 @@ foam.CLASS({
     function remove(s, obj) {
       this.fn(s, 'remove', obj);
     },
+    function eof(s) {
+      this.fn(s, 'eof');
+    },
     function reset(s) {
       this.fn(s, 'reset');
     }
@@ -479,4 +482,37 @@ foam.CLASS({
       }
     },
   ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'DAOSink',
+  implements: ['foam.dao.Sink'],
+  properties: [
+    { class: 'foam.dao.DAOProperty', name: 'dao' },
+  ],
+  methods: [
+    {
+      name: 'put',
+      code: function(_, o) {
+        this.dao.put(o);
+      }
+    },
+    {
+      name: 'remove',
+      code: function(_, o) {
+        this.dao.remove(o);
+      }
+    },
+    {
+      name: 'eof',
+      code: function() {},
+    },
+    {
+      name: 'reset',
+      code: function() {
+        this.dao.removeAll();
+      }
+    }
+  ],
 });
