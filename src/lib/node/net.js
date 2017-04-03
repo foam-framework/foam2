@@ -714,7 +714,8 @@ foam.CLASS({
           });
           nodeResp.on('end', function() {
             resp.payload = buffer;
-            resolve(resp);
+            if ( resp.success ) resolve(resp);
+            else reject(resp);
           });
           nodeResp.on('error', function(e) {
             reject(e);

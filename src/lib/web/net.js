@@ -336,10 +336,13 @@ foam.CLASS({
           options);
 
       return fetch(request).then(function(resp) {
-        return this.HTTPResponse.create({
+        var resp = this.HTTPResponse.create({
           resp: resp,
           responseType: this.responseType
         });
+
+        if ( resp.success ) return resp;
+        throw resp;
       }.bind(this));
     }
   ]
@@ -562,9 +565,12 @@ foam.CLASS({
           if ( this.readyState === this.LOADING ||
                this.readyState === this.DONE ) {
             this.removeEventListener('readystatechange', foo);
-            resolve(self.HTTPResponse.create({
+            var resp = self.HTTPResponse.create({
               xhr: this
-            }));
+            });
+
+            if ( resp.success ) resolve(resp);
+            else reject(resp);
           }
         });
         xhr.send(self.payload);
