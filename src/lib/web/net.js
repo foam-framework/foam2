@@ -293,6 +293,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'contentType',
+      factory: function() { return this.responseType; }
+    },
+    {
+      class: 'String',
       name: 'mode',
       value: 'cors'
     }
@@ -311,6 +316,7 @@ foam.CLASS({
       if ( this.url ) {
         this.fromUrl(this.url);
       }
+      this.addContentHeaders();
 
       var self = this;
 
@@ -344,6 +350,27 @@ foam.CLASS({
           responseType: this.responseType
         });
       }.bind(this));
+    },
+    function addContentHeaders() {
+      // Specify Content-Type header when it can be deduced.
+      if ( ! this.headers['Content-Type'] ) {
+        switch ( this.contentType ) {
+          case 'text':
+          this.headers['Content-Type'] = 'text/plain';
+          break;
+          case 'json':
+          this.headers['Content-Type'] = 'application/json';
+          break;
+        }
+      }
+      // Specify this.contentType when it can be deduced.
+      if ( ! this.headers['Accept'] ) {
+        switch ( this.contentType ) {
+          case 'json':
+          this.headers['Accept'] = 'application/json';
+          break;
+        }
+      }
     }
   ]
 });

@@ -692,9 +692,21 @@ foam.CLASS({
       if ( this.url ) {
         this.fromUrl(this.url);
       }
+      this.addContentHeaders();
 
       if ( this.protocol !== 'http' && this.protocol !== 'https' )
         throw new Error("Unsupported protocol '" + this.protocol + "'");
+
+      // 'Content-Length' or 'Transfer-Encoding' required for some requests
+      // to be properly handled by Node JS servers.
+      // See https://github.com/nodejs/node/issues/3009 for details.
+      var buf;
+      if ( this.payload ) {
+        buf = new Buffer(this.payload, 'utf8');
+        if ( ! this.headers['Content-Length'] ) {
+          this.headers['Content-Length'] = buf.length;
+        }
+      }
 
       var options = {
         hostname: this.hostname,
@@ -742,7 +754,7 @@ foam.CLASS({
           reject(e);
         });
 
-        if ( this.payload ) req.write(this.payload);
+        if ( this.payload ) req.write(buf);
         req.end();
       }.bind(this));
     }
