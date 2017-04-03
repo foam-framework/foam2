@@ -44,13 +44,26 @@ foam.CLASS({
       this.send(res, status, JSON.stringify(json));
     },
 
+    function send400(req, res, error) {
+      this.sendMessage(req, res, 400, 'Bad request');
+      this.error('Bad request: ' + error);
+    },
+
     function send404(req, res) {
-      this.send(res, 404, 'File not found: ' + req.url);
+      this.sendMessage(req, res, 404, 'File not found: ' + req.url);
     },
 
     function send500(req, res, error) {
-      this.send(res, 500, 'Internal server error');
+      this.sendMessage(req, res, 500, 'Internal server error');
       this.error('Internal server error: ' + error);
+    },
+    function sendMessage(req, res, status, msg) {
+      if ( req.headers.accept &&
+          req.headers.accept.indexOf('application/json') !== -1 ) {
+        this.sendJSON(res, status, {message:msg});
+      } else {
+        this.send(res, status, msg);
+      }
     }
   ]
 });

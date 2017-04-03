@@ -60,6 +60,7 @@ foam.CLASS({
       // Look past any separator. Store it for detecting find()/select() URLs.
       target = target.substring(1);
 
+      var send400 = this.send400.bind(this, req, res);
       var send500 = this.send500.bind(this, req, res);
       var self = this;
       var id;
@@ -131,13 +132,14 @@ foam.CLASS({
           // Decode query. E.g., skip=<skip>&predicate=<predicate>
           // Values in key=value are wrapped in
           // uri-encode(json-stringify(foam-jsonify(value))).
-          data = url.query;
+          //
+          // Note: Do not use hasOwnProperty() on queryData because Node JS
+          // ParsedQueryString objects do not descend from Object.prototype.
+          var queryData = url.query;
           try {
-            for ( var key in data ) {
-              // Note: This would use data.hasOwnProperty(key), except that
-              // Node JS ParsedQueryString objects do not descend from
-              // Object.prototype.
-              data[key] = self.jsonStr2fo_(decodeURIComponent(data[key]));
+            for ( var key in queryData ) {
+              queryData[key] = self.jsonStr2fo_(decodeURIComponent(
+                  queryData[key]));
             }
           } catch (error) {
             send500(error);
@@ -145,16 +147,30 @@ foam.CLASS({
             return true;
           }
 
-          var sink = data.sink;
-          var skip = data.skip;
-          var limit = data.limit;
-          var order = data.order;
-          var predicate = data.predicate;
-          self.dao.select(sink, skip, limit, order, predicate)
-            .then(function(sink) {
-              self.sendJSON(res, 200, self.fo2o_(sink));
-              self.info('200 OK: select()');
-            }).catch(send500);
+          self.getPayload_(req).then(function(payloadData) {
+            // Copy queryData into payloadData, checking for duplicate keys.
+            data = payloadData || {};
+            for ( var key in queryData ) {
+              if ( data.hasOwnProperty(key) ) {
+                send400(`URL query and payload both contain: "${key}"`);
+                return;
+              }
+              data[key] = queryData[key];
+            }
+
+            var sink = data.sink;
+            var skip = data.skip;
+            var limit = data.limit;
+            var order = data.order;
+            var predicate = data.predicate;
+            self.dao.select(sink, skip, limit, order, predicate)
+                .then(function(sink) {
+                  self.sendJSON(res, 200, self.fo2o_(sink));
+                  self.info('200 OK: select()');
+                }).catch(send500);
+          });
+
+          return true;
         } else {
           self.send404(req, res);
           self.warn('Unrecognized DAO GET URL fragment: '  + sep + target);
@@ -199,6 +215,10 @@ foam.CLASS({
       name: 'jsonStr2fo_',
       documentation: "Transform JSON string to FOAM object.",
       code: function(str) {
+        // select() calls optionally contain a payload. To accept this case,
+        // return null on empty payload.
+        if ( ! str ) return null;
+
         // TODO(markdittmer): Use a safe JSON deserializer that honours only
         // an allowed list of classes.
         return foam.json.parse(JSON.parse(str));
