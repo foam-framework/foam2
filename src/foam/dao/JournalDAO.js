@@ -38,6 +38,87 @@ foam.CLASS({
   ]
 });
 
+if ( foam.isServer ) {
+  foam.CLASS({
+    package: 'foam.dao',
+    name: 'NodeFileJournal',
+    implements: ['foam.dao.Sink'],
+    properties: [
+      {
+        name: 'fd',
+        required: true
+      },
+      {
+        name: 'offset',
+        factory: function() {
+          var stat = this.fs.fstatSync(this.fd);
+          return stat.size;
+        }
+      },
+      {
+        name: 'fs',
+        factory: function() { return require('fs'); }
+      }
+    ],
+    methods: [
+      function put(_, obj) {
+        this.write_(
+          new Buffer("put(foam.json.parse(" +
+                     foam.json.Storage.stringify(obj) + "));\n"));
+      },
+      function remove(_, obj) {
+        this.write_(
+          new Buffer("remove(foam.json.parse(" +
+                     foam.json.Storage.stringify(obj) + "));\n"));
+      },
+      function write_(data) {
+        var offset = this.offset;
+        this.offset += data.length;
+        this.fs.write(this.fd, data, 0, data.length, offset, function(err, written, buffer){
+          if ( written != data.length ) throw "What";
+          if ( err ) throw err;
+        });
+      },
+      function replay(dao) {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          self.fs.readFile(self.fd, 'utf8', function(err, data_) {
+            if ( err ) {
+              reject(err);
+              return;
+            }
+
+            with(dao) eval(data_);
+
+            resolve(dao);
+          });
+        });
+      },
+      function eof() {}
+    ]
+  });
+}
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'JournaledDAO',
+  extends: 'foam.dao.PromisedDAO',
+  properties: [
+    'delegate',
+    'journal',
+    {
+      name: 'promise',
+      factory: function() {
+        var self = this;
+        return this.journal.replay(this.delegate).then(function(dao) {
+          dao.listen(self.journal);
+          return dao;
+        });
+      }
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.dao',

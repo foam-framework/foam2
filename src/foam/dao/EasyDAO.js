@@ -33,6 +33,7 @@ foam.CLASS({
   requires: [
     'foam.dao.MDAO',
     'foam.dao.JournalDAO',
+    'foam.dao.JournaledDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
@@ -113,8 +114,7 @@ foam.CLASS({
     },
     {
       /** Keep a history of all state changes to the DAO. */
-      name: 'journal',
-      value: false
+      name: 'journal'
     },
     {
       /** Enable logging on the DAO. */
@@ -270,6 +270,13 @@ foam.CLASS({
         }
       }
 
+      if ( this.journal ) {
+        dao = this.JournaledDAO.create({
+          delegate: dao,
+          journal: this.journal
+        });
+      }
+
       if ( this.seqNo && this.guid ) throw "EasyDAO 'seqNo' and 'guid' features are mutually exclusive.";
 
       if ( this.seqNo ) {
@@ -337,18 +344,6 @@ foam.CLASS({
           delegate: dao
         });
         dao = decorated;
-      }
-
-      if ( this.journal ) {
-        dao = this.JournalDAO.create({
-          delegate: dao,
-          journal: foam.dao.EasyDAO.create({
-            of:      foam.dao.JournalEntry,
-            daoType: this.daoType,
-            seqNo:   true,
-            name:    this.name + '_Journal'
-          })
-        });
       }
 
       if ( this.timing  ) {
