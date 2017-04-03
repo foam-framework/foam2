@@ -157,7 +157,7 @@ foam.CLASS({
 
         function updateValue() {
           p.x = touch.x;
-          p.y = touch.y;
+          p.y = touch.y - (self.handleSize/2);
           p.w = 1;
 
           self.globalToLocalCoordinates(p);
