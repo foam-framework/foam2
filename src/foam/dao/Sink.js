@@ -108,7 +108,7 @@ foam.CLASS({
   methods: [
     function reset(sub) {
       this.SUPER(sub);
-      this.dao.select(this);
+      this.dao.select(this.delegate);
     }
   ]
 });
@@ -421,6 +421,9 @@ foam.CLASS({
     },
     function remove(s, obj) {
       this.fn(s, 'remove', obj);
+    },
+    function eof(s) {
+      this.fn(s, 'eof');
     },
     function reset(s) {
       this.fn(s, 'reset');
