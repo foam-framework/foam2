@@ -87,24 +87,25 @@ foam.CLASS({
        *
        * Each key's value is network-foam-jsonified.
        */
-      var query = [];
+      var payload = {};
 
       var networkSink = this.Serializable.isInstance(sink) && sink;
       if ( networkSink )
-        query.push('sink=' + encodeURIComponent(this.jsonify_(networkSink)));
+        payload.sink = networkSink;
 
       if ( typeof skip !== 'undefined' )
-        query.push('skip=' + encodeURIComponent(this.jsonify_(skip)));
+        payload.skip = skip;
       if ( typeof limit !== 'undefined' )
-        query.push('limit=' + encodeURIComponent(this.jsonify_(limit)));
+        payload.limit = limit;
       if ( typeof order !== 'undefined' )
-        query.push('order=' + encodeURIComponent(this.jsonify_(order)));
+        payload.order = order;
       if ( typeof predicate !== 'undefined' )
-        query.push('predicate=' + encodeURIComponent(this.jsonify_(predicate)));
+        payload.predicate = predicate;
 
       return this.createRequest_({
         method: 'GET',
-        url: this.baseURL + ':select?' + query.join('&')
+        url: this.baseURL + ':select',
+        payload: this.jsonify_(payload)
       }).send().then(this.onResponse.bind(this, 'select'))
           .then(this.onSelectResponse.bind(
               this, sink || this.ArraySink.create()));

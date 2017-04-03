@@ -86,20 +86,38 @@ describe('RestDAO', function() {
           } else if ( this.method === 'GET' &&
                       this.url.indexOf(this.baseURL) === 0 &&
                       this.url.substring(this.baseURL.length)
-                          .match(/^:select([?].*)$/) ) {
+                          .match(/^:select([?].*)?$/) ) {
             // select()
-            var data = url.parse(this.url, true).query;
-            try {
-              for ( var key in data ) {
-                // Note: This would use data.hasOwnProperty(key), except that
-                // Node JS ParsedQueryString objects do not descend from
-                // Object.prototype.
-                data[key] = foam.json.parseString(decodeURIComponent(
-                  data[key]));
+            //
+            // Note: Do not use hasOwnProperty() on queryData because Node JS
+            // ParsedQueryString objects do not descend from
+            // Object.prototype.
+            var queryData = url.parse(this.url, true).query;
+            if ( queryData ) {
+              try {
+                for ( var key in queryData ) {
+                  queryData[key] = foam.json.parseString(decodeURIComponent(
+                      queryData[key]));
+                }
+              } catch (err) {
+                return Promise.resolve(createResponse({ status: 500 }));
               }
+            }
+
+            var payloadData;
+            try {
+              payloadData = foam.json.parseString(this.payload);
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
+
+            var data = Object.assign({}, payloadData);
+            for ( var key in queryData ) {
+              if ( payloadData.hasOwnProperty(key) )
+                return Promise.resolve(createResponse({ status: 400 }));
+              data[key] = queryData[key];
+            }
+
             var sink = data.sink || this.ArraySink.create();
             skip = data.skip;
             limit = data.limit;
