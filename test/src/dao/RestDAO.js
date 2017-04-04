@@ -83,39 +83,16 @@ describe('RestDAO', function() {
             return dao.find(id).then(function(o) {
               return createResponse({ status: 200, payload: jsonify(o) });
             });
-          } else if ( this.method === 'GET' &&
+          } else if ( this.method === 'POST' &&
                       this.url.indexOf(this.baseURL) === 0 &&
                       this.url.substring(this.baseURL.length)
                           .match(/^:select([?].*)?$/) ) {
             // select()
-            //
-            // Note: Do not use hasOwnProperty() on queryData because Node JS
-            // ParsedQueryString objects do not descend from
-            // Object.prototype.
-            var queryData = url.parse(this.url, true).query;
-            if ( queryData ) {
-              try {
-                for ( var key in queryData ) {
-                  queryData[key] = foam.json.parseString(decodeURIComponent(
-                      queryData[key]));
-                }
-              } catch (err) {
-                return Promise.resolve(createResponse({ status: 500 }));
-              }
-            }
-
-            var payloadData;
+            var data;
             try {
-              payloadData = foam.json.parseString(this.payload);
+              data = foam.json.parseString(this.payload);
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
-            }
-
-            var data = Object.assign({}, payloadData);
-            for ( var key in queryData ) {
-              if ( payloadData.hasOwnProperty(key) )
-                return Promise.resolve(createResponse({ status: 400 }));
-              data[key] = queryData[key];
             }
 
             var sink = data.sink || this.ArraySink.create();
