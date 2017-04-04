@@ -67,6 +67,7 @@ foam.CLASS({
       var payload;
       var data;
       if ( req.method === 'PUT' ) {
+
         //
         // put()
         //
@@ -85,6 +86,7 @@ foam.CLASS({
           self.info('200 OK: put() ' + o.id);
         }).catch(send500);
       } else if ( req.method === 'DELETE' ) {
+
         //
         // remove()
         //
@@ -122,42 +124,19 @@ foam.CLASS({
             self.sendJSON(res, 200, self.fo2o_(o));
             self.info('200 OK: find() ' + id);
           }).catch(send500);
-        } else if ( sep === ':' && target === 'select' ) {
+        } else {
+          self.send404(req, res);
+          self.warn('Unrecognized DAO GET URL fragment: '  + sep + target);
+        }
+      } else if ( req.method === 'POST' ) {
+        if ( sep === ':' && target === 'select' ) {
           // Extra fragment: ":select" => select().
 
           //
           // select()
           //
 
-          // Decode query. E.g., skip=<skip>&predicate=<predicate>
-          // Values in key=value are wrapped in
-          // uri-encode(json-stringify(foam-jsonify(value))).
-          //
-          // Note: Do not use hasOwnProperty() on queryData because Node JS
-          // ParsedQueryString objects do not descend from Object.prototype.
-          var queryData = url.query;
-          try {
-            for ( var key in queryData ) {
-              queryData[key] = self.jsonStr2fo_(decodeURIComponent(
-                  queryData[key]));
-            }
-          } catch (error) {
-            send500(error);
-            self.error('Failed to decode query from URL fragment: ' + target);
-            return true;
-          }
-
-          self.getPayload_(req).then(function(payloadData) {
-            // Copy queryData into payloadData, checking for duplicate keys.
-            data = payloadData || {};
-            for ( var key in queryData ) {
-              if ( data.hasOwnProperty(key) ) {
-                send400(`URL query and payload both contain: "${key}"`);
-                return;
-              }
-              data[key] = queryData[key];
-            }
-
+          self.getPayload_(req).then(function(data) {
             var sink = data.sink;
             var skip = data.skip;
             var limit = data.limit;
@@ -177,34 +156,26 @@ foam.CLASS({
                   self.info('200 OK: select()');
                 }).catch(send500);
           });
+        } else if ( sep === ':' && target === 'removeAll' ) {
 
-          return true;
+          //
+          // removeAll()
+          //
+
+          self.getPayload_(req).then(function(data) {
+            var skip = data.skip;
+            var limit = data.limit;
+            var order = data.order;
+            var predicate = data.predicate;
+            return self.dao.removeAll(skip, limit, order, predicate);
+          }).then(function() {
+            self.sendJSON(res, 200, '{}');
+            self.info('200 OK: removeAll()');
+          }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unrecognized DAO GET URL fragment: '  + sep + target);
-        }
-      } else if ( req.method === 'POST' ) {
-        if ( sep !== ':' || target !== 'removeAll' ) {
-          self.send404(req, res);
           self.warn('Unknown POST request: ' + target);
-          return true;
         }
-
-
-        //
-        // removeAll()
-        //
-
-        self.getPayload_(req).then(function(data) {
-          var skip = data.skip;
-          var limit = data.limit;
-          var order = data.order;
-          var predicate = data.predicate;
-          return self.dao.removeAll(skip, limit, order, predicate);
-        }).then(function() {
-          self.sendJSON(res, 200, '{}');
-          self.info('200 OK: removeAll()');
-        }).catch(send500);
       } else {
         self.send404(req, res);
         self.warn('Method not supported: '  + req.method);

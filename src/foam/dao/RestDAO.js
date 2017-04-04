@@ -103,7 +103,7 @@ foam.CLASS({
         payload.predicate = predicate;
 
       return this.createRequest_({
-        method: 'GET',
+        method: 'POST',
         url: this.baseURL + ':select',
         payload: this.jsonify_(payload)
       }).send().then(this.onResponse.bind(this, 'select'))
