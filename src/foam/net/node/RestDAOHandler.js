@@ -165,6 +165,14 @@ foam.CLASS({
             var predicate = data.predicate;
             self.dao.select(sink, skip, limit, order, predicate)
                 .then(function(sink) {
+                  // Prevent caching of select() responses.
+                  var dateString = new Date().toUTCString();
+                  res.setHeader('Expires', dateString);
+                  res.setHeader('Last-Modified', dateString);
+                  res.setHeader(
+                      'Cache-Control',
+                      'max-age=0, no-cache, must-revalidate, proxy-revalidate');
+
                   self.sendJSON(res, 200, self.fo2o_(sink));
                   self.info('200 OK: select()');
                 }).catch(send500);
