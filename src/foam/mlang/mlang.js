@@ -1219,7 +1219,7 @@ foam.CLASS({
       var key = this.arg1.f(obj);
       if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
-          for ( var i = 0; i < key.length; i++ ) {
+          for ( var i = 0 ; i < key.length ; i++ ) {
             this.putInGroup_(key[i], obj);
           }
         } else {
@@ -1629,6 +1629,14 @@ foam.CLASS({
   methods: [
     function f(o) {
       return this.arg2.f(this.arg1.f(o));
+    },
+
+    function comparePropertyValues(o1, o2) {
+      /**
+         Compare property values using arg2's property value comparator.
+         Used by GroupBy
+      **/
+      return this.arg2.comparePropertyValues(o1, o2);
     }
   ]
 });
