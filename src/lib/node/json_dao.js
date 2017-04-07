@@ -55,18 +55,20 @@ foam.CLASS({
       this.on.put.sub(this.onUpdate);
       this.on.remove.sub(this.onUpdate);
     },
+
     function put(o) {
       return this.SUPER(o).then(this.getPromise_.bind(this, o));
     },
+
     function remove(o) {
-      var self = this;
+      var self     = this;
       var startLen = self.array.length;
+
       return self.SUPER(o).then(function() {
         // Resolve after async update iff something was removed.
-        if ( self.array.length < startLen )
-          return self.getPromise_(o);
-        else
-          return o;
+        return self.array.length < startLen ?
+          self.getPromise_(o) :
+          o ;
       });
     },
 
@@ -91,9 +93,10 @@ foam.CLASS({
             this.onUpdateComplete);
       }
     },
+
     function onUpdateComplete() {
       var futures = this.futures_;
-      for ( var i = 0; i < futures.length; i++ ) {
+      for ( var i = 0 ; i < futures.length ; i++ ) {
         futures[i]();
       }
       this.futures_ = [];
