@@ -89,11 +89,11 @@ foam.CLASS({
     function initE() {
       this.overrideAdd_ = false;
 
-      this.cssClass(this.myCls()).cssClass(this.myCls('container'));
+      this.addClass(this.myCls()).addClass(this.myCls('container'));
       this.start('div')
-          .cssClass(this.myCls('header'))
+          .addClass(this.myCls('header'))
           .start()
-              .cssClass(this.myCls('label'))
+              .addClass(this.myCls('label'))
               .add(this.label)
               .end()
           .startContext({ data: this })
@@ -101,7 +101,7 @@ foam.CLASS({
           .endContext()
           .end();
 
-      this.bodyE = this.start('div').cssClass(this.myCls('body'));
+      this.bodyE = this.start('div').addClass(this.myCls('body'));
       for ( var i = 0; i < this.addQueue_.length; i++ ) {
         this.bodyE.add.apply(this.bodyE, this.addQueue_[i]);
       }

@@ -235,7 +235,7 @@ foam.CLASS({
         e.start('td')
             .enableCls(this.myCls('sorting'), sorting$)
             .start('span')
-                .cssClass(this.myCls('sort-direction'))
+                .addClass(this.myCls('sort-direction'))
                 .add(sorting$)
             .end()
             .add(this.columns_[i].columnLabel)
@@ -354,7 +354,7 @@ foam.CLASS({
       this.data$proxy.sub('on', this.onDAOUpdate);
 
       return this.
-          cssClass(this.myCls()).
+          addClass(this.myCls()).
           add(this.header$, this.body$);
     },
 

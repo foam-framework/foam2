@@ -145,7 +145,7 @@ foam.CLASS({
           // TODO: start(this.HEROES) and set class
         add('Search: ', this.QUERY).
         br().
-        start().cssClass(this.myCls('nav')).
+        start().addClass(this.myCls('nav')).
           add(this.DASHBOARD, this.HEROES).
         end().
         br().
@@ -165,7 +165,7 @@ foam.CLASS({
 
     function dashboardE() {
       return this.E().
-        cssClass(this.myCls('starred')).
+        addClass(this.myCls('starred')).
         start('h3').add('Top Heroes').end().
         add(this.STARRED_HERO_DAO);
     },

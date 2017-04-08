@@ -87,12 +87,12 @@ box-shadow: 3px 3px 6px 0 gray;
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myCls()).
           start('div', null, this.tabRow$).
-            cssClass(this.myCls('tabRow')).
+            addClass(this.myCls('tabRow')).
           end().
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myCls('content')).
           end();
     },
 
@@ -102,7 +102,7 @@ box-shadow: 3px 3px 6px 0 gray;
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            cssClass(this.myCls('tab')).
+            addClass(this.myCls('tab')).
             enableCls('selected', tab.selected$).
             on('click', function() { this.selected = tab; }.bind(this)).
             add(tab.label).

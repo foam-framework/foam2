@@ -45,17 +45,17 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         start('div').
-          cssClass(this.myCls('title')).
+          addClass(this.myCls('title')).
           add(this.title$).
           start('span').
-            cssClass(this.myCls('info')).
+            addClass(this.myCls('info')).
             add(this.info$).
           end().
         end().
         start('div', null, this.content$).
-          cssClass(this.myCls('content')).
+          addClass(this.myCls('content')).
         end();
     }
   ]
@@ -170,7 +170,7 @@ foam.CLASS({
       var self = this;
       var pkg = '';
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         start(this.DocBorder, {title: this.title, info$: this.info$}).
           start('div').
             add(this.slot(function (data) {
@@ -178,13 +178,13 @@ foam.CLASS({
                 if ( ! this.showPackage ) {
                   if ( d.package !== pkg ) {
                     pkg = d.package;
-                    this.start('div').cssClass(self.myCls('package')).add(pkg).end();
+                    this.start('div').addClass(self.myCls('package')).add(pkg).end();
                   }
                 }
 
                 this.start('div')
                   .start(self.ClassLink, {data: d, showPackage: this.showPackage}).
-                    cssClass(this.showPackage ? null : self.myCls('indent')).
+                    addClass(this.showPackage ? null : self.myCls('indent')).
                   end().
                   call(function(f) {
                     if ( self.showSummary ) {
@@ -445,7 +445,7 @@ foam.CLASS({
       this.SUPER();
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         tag(this.PATH, {displayWidth: 80}).
           start('span').
             style({'margin-left': '12px', 'font-size':'small'}).

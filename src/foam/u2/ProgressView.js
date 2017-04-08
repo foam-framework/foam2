@@ -39,7 +39,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         attrs({max: 100});
 
       this.attrSlot().follow(this.data$);

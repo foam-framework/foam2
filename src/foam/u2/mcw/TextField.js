@@ -44,7 +44,7 @@ foam.CLASS({
     },
 
     function initCls() {
-      this.cssClass('mdc-textfield');
+      this.addClass('mdc-textfield');
     }
   ]
 });

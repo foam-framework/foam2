@@ -157,7 +157,7 @@ foam.CLASS({
       var view = this;
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         setNodeName('table').
         start('thead').
         add(this.slot(function(columns_) {
@@ -184,11 +184,11 @@ foam.CLASS({
                 start('tr').
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 on('click', function() { view.selection = obj; }).
-                cssClass(this.slot(function(selection) {
+                addClass(this.slot(function(selection) {
                   if ( obj === selection ) return view.myCls('selected');
                   return '';
                 }, view.selection$)).
-                cssClass(view.myCls('row')).
+                addClass(view.myCls('row')).
                 forEach(columns_, function(column) {
                   this.
                     start('td').

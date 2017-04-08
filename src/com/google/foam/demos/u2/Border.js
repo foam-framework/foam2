@@ -87,12 +87,12 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myCls()).
           start('div', null, this.tabRow$).
-            cssClass(this.myCls('tabRow')).
+            addClass(this.myCls('tabRow')).
           end().
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myCls('content')).
           end();
     },
 
@@ -102,7 +102,7 @@ foam.CLASS({
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            cssClass(this.myCls('tab')).
+            addClass(this.myCls('tab')).
             enableCls('selected', tab.selected$).
             on('click', function() { this.selected = tab; }.bind(this)).
             add(tab.label).
@@ -151,9 +151,9 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myCls()).
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myCls('content')).
           end();
     }
   ]
@@ -186,10 +186,10 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
-          start('div').cssClass(this.myCls('title')).add(this.title$).end().
+          addClass(this.myCls()).
+          start('div').addClass(this.myCls('title')).add(this.title$).end().
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myCls('content')).
           end();
     }
   ]
@@ -223,12 +223,12 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myCls()).
           start('div', null, this.leftPanel$).
-            cssClass(this.myCls('content')).
+            addClass(this.myCls('content')).
           end().
           start('div', null, this.rightPanel$).
-            cssClass(this.myCls('content')).
+            addClass(this.myCls('content')).
           end();
     }
   ]

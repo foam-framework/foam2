@@ -52,7 +52,7 @@ foam.CLASS({
     function initE() {
       // Just starts out empty.
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         on('click', this.onClick);
 
       var dao = this.data$proxy;

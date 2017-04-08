@@ -76,16 +76,16 @@ foam.CLASS({
       this.SUPER();
       var content;
 
-      this.cssClass(this.myCls())
+      this.addClass(this.myCls())
           .start()
-          .cssClass(this.myCls('container'))
+          .addClass(this.myCls('container'))
           .start()
-              .cssClass(this.myCls('background'))
+              .addClass(this.myCls('background'))
               .on('click', this.close)
           .end()
           .start()
               .call(function() { content = this; })
-              .cssClass(this.myCls('inner'))
+              .addClass(this.myCls('inner'))
               .style({ 'background-color': this.backgroundColor })
           .end()
       .end();
