@@ -92,7 +92,7 @@ foam.CLASS({
     },
 
     function initCls() {
-      this.cssClass(this.myCls());
+      this.addClass(this.myCls());
     }
   ],
 

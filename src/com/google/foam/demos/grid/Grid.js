@@ -131,7 +131,7 @@ foam.CLASS({
       var dao = this.dao;
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         start('h3').add('Add Resources').end().
 
         // Use this block to create the form manually
@@ -155,7 +155,7 @@ foam.CLASS({
 
         // Or make one manually
         start('table').
-          cssClass(this.myCls('list')).
+          addClass(this.myCls('list')).
           start('tr').
             start('th').add('Description').end().
             start('th').add('URL').end().

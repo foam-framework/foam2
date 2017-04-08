@@ -54,10 +54,10 @@ foam.CLASS({
       var self = this;
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         repeat(0, this.height-1, function(row) {
           this.start('div').
-            cssClass(this.myCls('row')).
+            addClass(this.myCls('row')).
             repeat(0, this.width-1, function(col) {
               this.add(self.cells[row][col]);
             }).

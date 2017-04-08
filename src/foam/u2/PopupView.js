@@ -78,7 +78,7 @@ foam.CLASS({
         write();
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myCls()).
         style({
           left: this.x + 'px',
           top:  this.y + 'px'

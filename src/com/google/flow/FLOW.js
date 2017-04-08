@@ -501,14 +501,14 @@ foam.CLASS({
       this.memento$.sub(this.onMemento);
 
       this.
-          cssClass(this.myCls()).
+          addClass(this.myCls()).
           start('div').
-            cssClass(this.myCls('tools')).
+            addClass(this.myCls('tools')).
             start(this.TOOLS, {selection$: this.currentTool$}).end().
           end().
           start('center').
             start(this.CMD_LINE).
-              cssClass(this.myCls('cmd')).
+              addClass(this.myCls('cmd')).
               // TODO: this should be a feature of TextArea
               on('keydown', function(evt) {
                 if ( evt.keyCode === 13 ) {
@@ -543,11 +543,11 @@ foam.CLASS({
             start(this.FORTH, {label: 'Redo'}).end().
           end().
           start('div').
-            cssClass(this.myCls('properties')).
+            addClass(this.myCls('properties')).
             start(this.PROPERTIES, {selection$: this.selected$}).end().
           end().
           start(this.VALUE).
-            cssClass(this.myCls('sheet')).
+            addClass(this.myCls('sheet')).
             show(this.slot(function(selected) { return !!selected; })).
           end();
     },

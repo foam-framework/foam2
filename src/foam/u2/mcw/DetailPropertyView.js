@@ -37,11 +37,11 @@ foam.CLASS({
       this.nodeName = 'label';
 
       this.
-        cssClass('mdc-textfield').
+        addClass('mdc-textfield').
         style({display: 'block'}).
-        start('input'/*prop*/).cssClass('mdc-textfield__input').end().
+        start('input'/*prop*/).addClass('mdc-textfield__input').end().
         start('span').
-          cssClass('mdc-textfield__label').
+          addClass('mdc-textfield__label').
           add(prop.label).
         end();
     },
@@ -55,4 +55,4 @@ foam.CLASS({
 
 
 // TODO: Add Unit support
-// prop.units && this.E('span').cssClass('foam-u2-PropertyView-units').add(' ', prop.units)).
+// prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).

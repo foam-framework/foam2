@@ -83,11 +83,11 @@ foam.CLASS({
     function initE() {
       this.
         setNodeName('span').
-        cssClass(this.myCls()).
-        cssClass(this.stateClass$).
+        addClass(this.myCls()).
+        addClass(this.stateClass$).
         on('click',       this.sweep).
         on('contextmenu', this.mark).
-        start('span').cssClass(this.myCls('flag')).entity('#x2691').end();
+        start('span').addClass(this.myCls('flag')).entity('#x2691').end();
 
       if ( this.mined ) {
         this.start('font').entity('#x2699').end();
