@@ -159,7 +159,7 @@ foam.CLASS({
           start('td').addClass(this.myCls('label')).add(prop.label).end().
           start('td').
             addClass(this.myCls('switch')).
-            enableCls('reactive', this.reactive$).
+            enableClass('reactive', this.reactive$).
             on('click', this.toggleMode).
             add(' = ').
           end().

@@ -103,7 +103,7 @@ box-shadow: 3px 3px 6px 0 gray;
 
         this.tabRow.start('span').
             addClass(this.myCls('tab')).
-            enableCls('selected', tab.selected$).
+            enableClass('selected', tab.selected$).
             on('click', function() { this.selected = tab; }.bind(this)).
             add(tab.label).
         end();

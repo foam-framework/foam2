@@ -475,7 +475,7 @@ foam.CLASS({
       this.add(this.SUBMIT);
       this.add(dv);
       this.endContext();
-      this.enableCls('red-border', this.slot('dirty_'));
+      this.enableClass('red-border', this.slot('dirty_'));
     },
 
     function clearFocus_() {
