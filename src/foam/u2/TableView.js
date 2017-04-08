@@ -106,7 +106,7 @@ foam.CLASS({
 
     function addObj(obj) {
       var e = this.start('tr')
-          .enableCls(this.tableView.myCls('selected'),
+          .enableClass(this.tableView.myCls('selected'),
               this.tableView.selection$.map(function(sel) {
                 return sel === obj;
               }));
@@ -233,7 +233,7 @@ foam.CLASS({
         }.bind(this, this.columns_[i]));
 
         e.start('td')
-            .enableCls(this.myCls('sorting'), sorting$)
+            .enableClass(this.myCls('sorting'), sorting$)
             .start('span')
                 .addClass(this.myCls('sort-direction'))
                 .add(sorting$)

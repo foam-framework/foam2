@@ -53,7 +53,7 @@ foam.CLASS({
           .add(this.label$);
 
       if ( this.action.isAvailable ) {
-        this.enableCls(this.myCls('unavailable'),
+        this.enableClass(this.myCls('unavailable'),
               this.action.createIsAvailable$(this.data$), true /* negate */);
       }
 

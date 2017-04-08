@@ -1188,6 +1188,11 @@ foam.CLASS({
     },
 
     function enableCls(cls, enabled, opt_negate) {
+      console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
+      return this.enableClass(cls, enabled, opt_negate);
+    },
+
+    function enableClass(cls, enabled, opt_negate) {
       /* Enable/disable a CSS class based on a boolean-ish dynamic value. */
       function negate(a, b) { return b ? ! a : a; }
 
@@ -1195,7 +1200,7 @@ foam.CLASS({
       if ( foam.core.Slot.isInstance(enabled) ) {
         var self = this;
         var value = enabled;
-        var l = function() { self.enableCls(cls, value.get(), opt_negate); };
+        var l = function() { self.enableClass(cls, value.get(), opt_negate); };
         value.sub(l);
         l();
       } else {
