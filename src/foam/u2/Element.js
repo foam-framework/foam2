@@ -631,9 +631,9 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( o === n ) return;
         if ( n ) {
-          this.removeCls('foam-u2-Element-hidden');
+          this.removeClass('foam-u2-Element-hidden');
         } else {
-          this.cssClass('foam-u2-Element-hidden');
+          this.addClass('foam-u2-Element-hidden');
         }
       }
     },
@@ -1161,22 +1161,25 @@ foam.CLASS({
       return this.entity('nbsp');
     },
 
-    // Was renamed from cls() in FOAM1, current name seems
-    // out of place.  Maybe renamed addClass().
-    function cssClass(cls) { /* Slot | String */
+    function cssClass(cls) {
+      console.warn('Deprecated use of Element.cssClass(). Use addClass() instead.');
+      return this.addClass(cls);
+    },
+
+    function addClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
         var lastValue = null;
         var l = function() {
           var v = cls.get();
-          self.cssClass_(lastValue, v);
+          self.addClass_(lastValue, v);
           lastValue = v;
         };
         cls.sub(l);
         l();
       } else if ( typeof cls === 'string' ) {
-        this.cssClass_(null, cls);
+        this.addClass_(null, cls);
       } else {
         this.error('cssClass type error. Must be Slot or String.');
       }
@@ -1207,6 +1210,11 @@ foam.CLASS({
     },
 
     function removeCls(cls) {
+      console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
+      return this.removeClass(cls);
+    },
+
+    function removeClass(cls) {
       /* Remove specified CSS class. */
       if ( cls ) {
         delete this.classes[cls];
@@ -1218,6 +1226,11 @@ foam.CLASS({
     function on(topic, listener) {
       /* Shorter fluent version of addEventListener. Prefered method. */
       this.addEventListener(topic, listener);
+      return this;
+    },
+
+    function attr(key, value) {
+      this.setAttribute(key, value);
       return this;
     },
 
@@ -1567,10 +1580,10 @@ foam.CLASS({
       return this;
     },
 
-    function cssClass_(oldClass, newClass) {
+    function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeCls(oldClass);
+      this.removeClass(oldClass);
       if ( newClass ) {
         this.classes[newClass] = true;
         this.onSetCls(newClass, true);
