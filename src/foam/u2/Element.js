@@ -226,7 +226,7 @@ foam.CLASS({
     function unload() {},
     function onRemove() {},
     // function detach() {},
-    function onSetCls() {},
+    function onSetClass() {},
     function onFocus() {},
     function onAddListener() {},
     function onRemoveListener() {},
@@ -334,7 +334,7 @@ foam.CLASS({
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
     },
-    function onSetCls(cls, enabled) { this.error(); },
+    function onSetClass(cls, enabled) { this.error(); },
     function onFocus(cls, enabled) { this.error(); },
     function onAddListener(topic, listener) { this.error(); },
     function onRemoveListener(topic, listener) { this.error(); },
@@ -373,7 +373,7 @@ foam.CLASS({
       this.visitChildren('unload');
     },
     function onRemove() { this.unload(); },
-    function onSetCls(cls, enabled) {
+    function onSetClass(cls, enabled) {
       var e = this.el();
       if ( e ) {
         e.classList[enabled ? 'add' : 'remove'](cls);
@@ -1208,7 +1208,7 @@ foam.CLASS({
         var parts = cls.split(' ');
         for ( var i = 0 ; i < parts.length ; i++ ) {
           this.classes[parts[i]] = enabled;
-          this.onSetCls(parts[i], enabled);
+          this.onSetClass(parts[i], enabled);
         }
       }
       return this;
@@ -1223,7 +1223,7 @@ foam.CLASS({
       /* Remove specified CSS class. */
       if ( cls ) {
         delete this.classes[cls];
-        this.onSetCls(cls, false);
+        this.onSetClass(cls, false);
       }
       return this;
     },
@@ -1591,7 +1591,7 @@ foam.CLASS({
       this.removeClass(oldClass);
       if ( newClass ) {
         this.classes[newClass] = true;
-        this.onSetCls(newClass, true);
+        this.onSetClass(newClass, true);
       }
     },
 
