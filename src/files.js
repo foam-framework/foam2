@@ -97,6 +97,7 @@ FOAM_FILES([
   { name: "foam/dao/index/AATree" },
   { name: "foam/dao/index/TreeIndex" },
   { name: "foam/dao/index/AutoIndex" },
+  { name: "foam/dao/index/MultiKeyIndex" },
   { name: "foam/dao/MDAO" },
   { name: "foam/dao/ArrayDAO" },
   { name: "foam/dao/TimestampDAO" },

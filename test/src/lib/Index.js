@@ -904,9 +904,8 @@ describe('AutoIndex', function() {
       .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
 
-    expect(idxInstance.delegate.delegates.length).toEqual(3);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
-    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
 
   });
 
@@ -950,16 +949,17 @@ describe('AutoIndex', function() {
 
     pred = pred.toDisjunctiveNormalForm();
 
-    // the results end up small enough that the first index is good enough
-    // for all subpred cases
     for ( var i = 0; i < pred.args.length; i++ ) {
       var subpred = pred.args[i];
-      idxInstance
+      var plan = idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-        .execute([], sink, undefined, undefined, undefined, subpred);
+      console.log("plan for ", subpred.toString(), plan.cost);
+
+      plan.execute([], sink, undefined, undefined, undefined, subpred);
     }
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
+    expect(idxInstance.delegate.delegates.length).toEqual(3);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
   });
 
   it('dnf works with NOT', function() {
@@ -985,16 +985,15 @@ describe('AutoIndex', function() {
       m.LT(test.Indexable.DATE, 8)
     ];
 
-    // the results end up small enough that the first index is good enough
-    // for all subpred cases
     for ( var i = 0; i < preds.length; i++ ) {
       var subpred = preds[i];
-      idxInstance
+      var plan = idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-        .execute([], sink, undefined, undefined, undefined, subpred);
+      console.log("plan for ", subpred.toString(), plan.cost);
+      plan.execute([], sink, undefined, undefined, undefined, subpred);
 
-      expect(idxInstance.delegate.delegates.length).toEqual(i+2);
-      expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
+      expect(idxInstance.delegate.delegates.length).toEqual(i+1);
+      expect(idxInstance.delegate.delegates[i].size()).toEqual(1000);
     }
   });
 
