@@ -64,10 +64,10 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.
-        addClass(this.myCls()).
+        addClass(this.myClass()).
         addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
-            return this.myCls('selected');
+            return this.myClass('selected');
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
@@ -205,7 +205,7 @@ foam.CLASS({
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 
       var self = this;
-      this.addClass(this.myCls()).
+      this.addClass(this.myClass()).
         select(dao, function(obj) {
           return self.TreeViewRow.create({
             data: obj,

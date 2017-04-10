@@ -79,7 +79,7 @@ foam.CLASS({
 
     function initE() {
       this.
-        addClass(this.myCls()).
+        addClass(this.myClass()).
         start('row').start('span').addClass('label').add('Elapsed Time:').end().add(this.PROGRESS).end().
         start('row').addClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
         start('row').start('span').addClass('label').add('Duration:').end().add(this.DURATION).end().

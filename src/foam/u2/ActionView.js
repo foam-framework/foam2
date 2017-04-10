@@ -82,7 +82,7 @@ foam.CLASS({
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
-          this.enableClass(this.myCls('unavailable'), this.action.createIsAvailable$(this.data$), true);
+          this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
         }
 
         if ( this.action.isEnabled ) {
@@ -92,7 +92,7 @@ foam.CLASS({
     },
 
     function initCls() {
-      this.addClass(this.myCls());
+      this.addClass(this.myClass());
     }
   ],
 
