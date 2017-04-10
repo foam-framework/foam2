@@ -155,24 +155,24 @@ foam.CLASS({
       this.data$.sub(this.onDataChange);
       this.onDataChange();
 
-      this.addClass(this.myCls()).
-          start('td').addClass(this.myCls('label')).add(prop.label).end().
+      this.addClass(this.myClass()).
+          start('td').addClass(this.myClass('label')).add(prop.label).end().
           start('td').
-            addClass(this.myCls('switch')).
+            addClass(this.myClass('switch')).
             enableClass('reactive', this.reactive$).
             on('click', this.toggleMode).
             add(' = ').
           end().
-          start('td').addClass(this.myCls('view')).add(
+          start('td').addClass(this.myClass('view')).add(
               this.slot(function(reactive) {
                 return reactive ?
                     self.FORMULA.toE({data$: this.formula$}, this.__subSubContext__).
-                      addClass(this.myCls('formulaInput')).
+                      addClass(this.myClass('formulaInput')).
                       on('blur', function() { self.reactive = !! self.formula; }).
                       focus() :
                     prop ;
               }),
-            prop.units && this.E('span').addClass(this.myCls('units')).add(' ', prop.units)).
+            prop.units && this.E('span').addClass(this.myClass('units')).add(' ', prop.units)).
           end();
     },
 

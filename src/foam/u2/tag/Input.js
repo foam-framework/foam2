@@ -63,7 +63,7 @@ foam.CLASS({
 
     function initCls() {
       // Template method, can be overriden by sub-classes
-      this.addClass(this.myCls());
+      this.addClass(this.myClass());
     },
 
     function link() {

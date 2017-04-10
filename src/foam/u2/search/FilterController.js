@@ -181,9 +181,9 @@ foam.CLASS({
         e.style({
           'margin-bottom': '0',
           overflow: 'visible'
-        }).addClass(this.myCls('filter-container'))
+        }).addClass(this.myClass('filter-container'))
             .start('div')
-                .addClass(this.myCls('filter-header'))
+                .addClass(this.myClass('filter-header'))
                 .add(args.label)
             .end()
             .startContext({ data: args.key })
@@ -192,7 +192,7 @@ foam.CLASS({
         .end();
 
         e.start('div')
-            .addClass(this.myCls('filter-body'))
+            .addClass(this.myClass('filter-body'))
             .add(args.view)
         .end();
         return e;
@@ -255,14 +255,14 @@ foam.CLASS({
       this.filteredDAO$.sub(this.onPredicateChange);
       this.onPredicateChange();
 
-      this.addClass(this.myCls());
+      this.addClass(this.myClass());
       this.startContext({ data: this });
-      var searchPanel = this.start().addClass(this.myCls('search-panel'));
+      var searchPanel = this.start().addClass(this.myClass('search-panel'));
       var topPanel = searchPanel.start(this.addingSpec)
-          .addClass(this.myCls('adding'));
+          .addClass(this.myClass('adding'));
       if ( this.allowAddingFilters ) {
         topPanel.start()
-            .addClass(this.myCls('add-filter'))
+            .addClass(this.myClass('add-filter'))
             .start(this.ChoiceView, {
               data$: this.filterChoice$,
               choices: this.filters
@@ -272,20 +272,20 @@ foam.CLASS({
       }
 
       topPanel.start()
-          .addClass(this.myCls('count'))
+          .addClass(this.myClass('count'))
           .start('span')
-              .addClass(this.myCls('count-text'))
+              .addClass(this.myClass('count-text'))
               .add(this.countString$)
           .end()
           .start(this.CLEAR, { raised: true }).end()
       .end();
       this.filtersE_ = searchPanel.start(this.filterAreaSpec)
-          .addClass(this.myCls('filter-area'));
+          .addClass(this.myClass('filter-area'));
       this.filtersE_.end();
       this.endContext();
       searchPanel.end();
 
-      this.start().addClass(this.myCls('results'))
+      this.start().addClass(this.myClass('results'))
           .start(this.tableView, { of: this.data.of, data$: this.filteredDAO$ })
           .end()
       .end();

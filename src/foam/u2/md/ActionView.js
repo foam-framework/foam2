@@ -47,13 +47,13 @@ foam.CLASS({
   methods: [
     function initE() {
       this.nodeName = 'paper-button';
-      this.addClass(this.myCls())
+      this.addClass(this.myClass())
           .attrs({ raised: this.raised$ })
           .on('click', this.click)
           .add(this.label$);
 
       if ( this.action.isAvailable ) {
-        this.enableClass(this.myCls('unavailable'),
+        this.enableClass(this.myClass('unavailable'),
               this.action.createIsAvailable$(this.data$), true /* negate */);
       }
 

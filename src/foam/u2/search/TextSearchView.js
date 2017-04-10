@@ -82,7 +82,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.view = this.addClass(this.myCls()).start(this.viewSpec, {
+      this.view = this.addClass(this.myClass()).start(this.viewSpec, {
         alwaysFloatLabel: true,
         label$: this.label$
       });
