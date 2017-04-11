@@ -112,7 +112,7 @@ foam.CLASS({
     function initE() {
       this.nodeName = 'div';
       this.
-          addClass(this.myCls()).
+          addClass(this.myClass()).
           start('span').addClass('prefix', 'label').add('Filter prefix: ').end().
           start(this.PREFIX, {onKey: true, type: 'search'}).end().
           start('div').addClass('content').

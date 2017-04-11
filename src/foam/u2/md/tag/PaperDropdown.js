@@ -81,8 +81,8 @@ foam.CLASS({
       });
 
       if ( this.unrolled ) {
-        this.addClass(this.myCls('unrolled'));
-        this.start('div').addClass(this.myCls('label')).add(this.label$).end();
+        this.addClass(this.myClass('unrolled'));
+        this.start('div').addClass(this.myClass('label')).add(this.label$).end();
       }
 
       var listbox;

@@ -169,9 +169,9 @@ describe('U2', function() {
         expect(css.indexOf(
             '.test-css-Shorthand .test-css-Shorthand-foo.test-css-Shorthand-bar {'
             )).toBeGreaterThan(0);
-        expect(css.indexOf('.' + e.myCls())).toBeGreaterThan(0);
-        expect(css.indexOf('.' + e.myCls('foo'))).toBeGreaterThan(0);
-        expect(css.indexOf('.' + e.myCls('bar'))).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myClass())).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myClass('foo'))).toBeGreaterThan(0);
+        expect(css.indexOf('.' + e.myClass('bar'))).toBeGreaterThan(0);
       });
     });
   });
