@@ -71,10 +71,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        addClass(this.myCls()).
+        addClass(this.myClass()).
         on('click', this.onClick).
-        start('div').addClass(this.myCls('id')).add(this.data.id).end().
-        start('div').addClass(this.myCls('name')).add(this.data.name).end().
+        start('div').addClass(this.myClass('id')).add(this.data.id).end().
+        start('div').addClass(this.myClass('name')).add(this.data.name).end().
         start(this.REMOVE_HERO, { data: this }).end();
     }
   ],

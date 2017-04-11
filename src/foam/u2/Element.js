@@ -869,12 +869,17 @@ foam.CLASS({
     },
 
     function myCls(opt_extra) {
-      var f = this.cls_.myCls_;
+      console.warn('Deprecated use of Element.myCls(). Use myClass() instead.');
+      return this.myClass(opt_extra);
+    },
+
+    function myClass(opt_extra) {
+      var f = this.cls_.myClass_;
 
       if ( ! f ) {
         var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
 
-        f = this.cls_.myCls_ = foam.Function.memoize1(function(e) {
+        f = this.cls_.myClass_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
         });
       }
@@ -1162,7 +1167,6 @@ foam.CLASS({
     },
 
     function cssClass(cls) {
-      console.warn('Deprecated use of Element.cssClass(). Use addClass() instead.');
       return this.addClass(cls);
     },
 

@@ -61,7 +61,7 @@ foam.CLASS({
         function initE() {
           this.nodeName = 'span';
           this.
-              addClass(this.myCls()).
+              addClass(this.myClass()).
               add('Adjust the diameter of the circle at (', this.data.x$, ', ', this.data.y$, ').').
               tag('br').
               add(this.RangeView.create({data$: this.data.radius$, maxValue: 200, onKey: true}));
@@ -104,7 +104,7 @@ foam.CLASS({
       }.bind(this));
 
       this.
-          addClass(this.myCls()).
+          addClass(this.myClass()).
           start('center').
             start(this.BACK,  {label: 'Undo'}).end().
             start(this.FORTH, {label: 'Redo'}).end().

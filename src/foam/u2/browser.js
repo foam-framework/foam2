@@ -70,7 +70,7 @@ foam.CLASS({
       });
       list.rowClick.sub(this.rowClick);
       this.startContext({ data: this })
-          .addClass(this.myCls())
+          .addClass(this.myClass())
           .add(this.NEW_ITEM)
           .add(list)
           .endContext();
@@ -191,7 +191,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.addClass(this.myCls());
+      this.addClass(this.myClass());
 
       // TODO(braden): This isn't quite dynamic enough - should handle model
       // changing.
@@ -562,11 +562,11 @@ foam.CLASS({
     function initE() {
       var dv = this.buildDetailView();
       this.startContext({ data: this })
-          .addClass(this.myCls())
+          .addClass(this.myClass())
           .add(this.CANCEL)
           .add(this.SAVE)
           .start()
-              .addClass(this.myCls('body'))
+              .addClass(this.myClass('body'))
               .add(dv)
           .end()
           .endContext();
