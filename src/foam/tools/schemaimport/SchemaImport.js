@@ -50,6 +50,8 @@ foam.CLASS({
         switch ( s.type ) {
           case String:  p.class = 'String';  break;
           case Boolean: p.class = 'Boolean'; break;
+          case Date:    p.class = 'Date';    break;
+          case Number:  p.class = 'Double';  break;
         }
 
         if ( s.ref ) {
