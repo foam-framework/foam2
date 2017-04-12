@@ -117,12 +117,19 @@ foam.CLASS({
       }
     },
     {
+      class: 'StringArray',
       name: 'methods',
-      expression: function(of, name, replyPolicyName) {
+      factory: function() { return null; }
+    },
+    {
+      name: 'methods_',
+      expression: function(of, name, methods, replyPolicyName) {
         var cls = foam.lookup(of);
 
-        return cls.getAxiomsByClass(foam.core.Method).
-          filter(function (m) { return cls.hasOwnAxiom(m.name); }).
+        return (
+          methods ?
+            methods.map(function(m) { return cls.getAxiomByName(m); }) :
+          cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
           map(function(m) {
             var returns = m.returns;
             if ( m.returns && m.returns !== 'Promise' ) {
@@ -141,12 +148,18 @@ foam.CLASS({
       }
     },
     {
+      class: 'StringArray',
       name: 'actions',
-      expression: function(of, name, replyPolicyName) {
+      factory: function() { return null; }
+    },
+    {
+      name: 'actions_',
+      expression: function(of, name, actions, replyPolicyName) {
         var cls = foam.lookup(of);
 
-        return cls.getAxiomsByClass(foam.core.Action).
-          filter(function(m) { return cls.hasOwnAxiom(m.name); }).
+        return (
+          actions ? actions.map(function(a) { return cls.getAxiomByName(a); }) :
+          cls.getAxiomsByClass(foam.core.Action).filter(function(m) { return cls.hasOwnAxiom(m.name); }) ).
           map(function(m) {
             return foam.core.StubAction.create({
               name: m.name,
@@ -169,12 +182,12 @@ foam.CLASS({
         hidden: true
       }));
 
-      for ( var i = 0 ; i < this.methods.length ; i++ ) {
-        cls.installAxiom(this.methods[i]);
+      for ( var i = 0 ; i < this.methods_.length ; i++ ) {
+        cls.installAxiom(this.methods_[i]);
       }
 
-      for ( i = 0 ; i < this.actions.length ; i++ ) {
-        cls.installAxiom(this.actions[i]);
+      for ( i = 0 ; i < this.actions_.length ; i++ ) {
+        cls.installAxiom(this.actions_[i]);
       }
 
       [
