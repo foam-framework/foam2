@@ -217,6 +217,8 @@ foam.CLASS({
       name: 'register',
       returns: 'foam.box.Box',
       code: function(name, service, localBox) {
+        name = name || foam.next$UID();
+
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
         exportBox = service ? service.clientBox(exportBox) : exportBox;
 
