@@ -233,6 +233,16 @@ foam.CLASS({
       name: 'unregister',
       returns: '',
       code: function(name) {
+        if ( foam.box.Box.isInstance(name) ) {
+          for ( var key in this.registry ) {
+            if ( this.registry[key] === name ) {
+              delete this.registry[key];
+              return;
+            }
+          }
+          return;
+        }
+
         delete this.registry[name];
       },
       args: [
