@@ -17,26 +17,144 @@
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'StubMethod',
+  extends: 'Method',
+  properties: [
+    'replyPolicyName',
+    'boxPropName',
+    {
+      name: 'code',
+      factory: function() {
+        var returns = this.returns;
+        var replyPolicyName = this.replyPolicyName;
+        var boxPropName = this.boxPropName;
+        var name = this.name;
+
+        return function() {
+          if ( returns ) {
+            var replyBox = this.ReplyBox.create({
+              delegate: this.RPCReturnBox.create()
+            });
+
+            var ret = replyBox.delegate.promise;
+
+            replyBox = this.registry.register(
+              replyBox.id,
+              this[replyPolicyName],
+              replyBox);
+
+            // TODO: Move this into RPCReturnBox ?
+            if ( returns !== 'Promise' ) {
+              ret = foam.lookup(returns).create({ delegate: ret });
+            }
+          }
+
+          var msg = this.Message.create({
+            object: this.RPCMessage.create({
+              name: name,
+              args: Array.from(arguments)
+            })
+          });
+
+          if ( replyBox ) {
+            msg.attributes.replyBox = replyBox;
+            msg.attributes.errorBox = replyBox;
+          }
+
+          this[boxPropName].send(msg);
+
+          return ret;
+        };
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StubAction',
+  extends: 'Action',
+  properties: [
+    'replyPolicyName',
+    'boxPropName',
+    {
+      name: 'stubMethod',
+      factory: function() {
+        return foam.core.StubMethod.create({
+          name: this.name,
+          replyPolicyName: this.replyPolicyName,
+          boxPropName: this.boxPropName
+        });
+      }
+    },
+    {
+      name: 'code',
+      factory: function() {
+        return function(ctx, action) {
+          action.stubMethod.code.call(this);
+        };
+      }
+    }
+  ],
+  methods: [
+    function installInProto(proto) {
+      proto[this.name] = this.stubMethod.code;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Stub',
   extends: 'Property',
 
   properties: [
     'of',
     {
-      class: 'Boolean',
-      name: 'eventProxy',
-      value: false
+      name: 'replyPolicyName',
+      expression: function(name) {
+        return name + 'ReplyPolicy'
+      }
     },
     {
       name: 'methods',
-      expression: function(of) {
+      expression: function(of, name, replyPolicyName) {
         var cls = foam.lookup(of);
 
-        if ( cls ) {
-          return cls.getAxiomsByClass(foam.core.Method)
-            .filter(function (m) { return cls.hasOwnAxiom(m.name); })
-            .map(function(m) { return m.name; })
-        }
+        return cls.getAxiomsByClass(foam.core.Method).
+          filter(function (m) { return cls.hasOwnAxiom(m.name); }).
+          map(function(m) {
+            var returns = m.returns;
+            if ( m.returns && m.returns !== 'Promise' ) {
+              var id = m.returns.split('.');
+              id[id.length - 1] = 'Promised' + id[id.length - 1];
+              returns = id.join('.');
+            }
+
+            return foam.core.StubMethod.create({
+              name: m.name,
+              replyPolicyName: replyPolicyName,
+              boxPropName: name,
+              returns: returns
+            });
+          });
+      }
+    },
+    {
+      name: 'actions',
+      expression: function(of, name, replyPolicyName) {
+        var cls = foam.lookup(of);
+
+        return cls.getAxiomsByClass(foam.core.Action).
+          filter(function(m) { return cls.hasOwnAxiom(m.name); }).
+          map(function(m) {
+            return foam.core.StubAction.create({
+              name: m.name,
+              isEnabled: m.isEnabled,
+              replyPolicyName: replyPolicyName,
+              boxPropName: name
+            })
+          });
       }
     }
   ],
@@ -46,73 +164,20 @@ foam.CLASS({
       var model = foam.lookup(this.of);
       var propName = this.name;
 
-      var replyPolicyName = this.name + 'ReplyPolicy';
-
       cls.installAxiom(foam.core.Property.create({
-        name: replyPolicyName
+        name: this.replyPolicyName,
+        hidden: true
       }));
 
-      var methods = this.methods
-          .map(function(name) { return model.getAxiomByName(name); })
-          .map(function(m) {
-            var returns = m.returns;
-            if ( m.returns && m.returns !== 'Promise' ) {
-              var name = m.returns.split('.');
-              name[name.length - 1] = 'Promised' + name[name.length - 1];
-              returns = name.join('.');
-            }
+      for ( var i = 0 ; i < this.methods.length ; i++ ) {
+        cls.installAxiom(this.methods[i]);
+      }
 
-            var m2 = foam.core.Method.create({
-              name: m.name,
-              returns: returns,
-              code: function() {
-                if ( returns ) {
-                  var returnBox = this.RPCReturnBox.create();
-                  var replyBox = this.ReplyBox.create({
-                    delegate: returnBox
-                  });
-
-                  replyBox = this.registry.register(
-                    replyBox.id,
-                    this[replyPolicyName],
-                    replyBox
-                  );
-
-                  var ret = returnBox.promise;
-
-                  // TODO: Move this into RPCReturnBox ?
-                  if ( returns !== 'Promise' ) {
-                    ret = foam.lookup(returns).create({ delegate: ret });
-                  }
-                }
-
-                var msg = this.Message.create({
-                  object: this.RPCMessage.create({
-                    name: m.name,
-                    args: Array.from(arguments)
-                  })
-                });
-
-                if ( replyBox ) {
-                  msg.attributes.replyBox = replyBox;
-                  msg.attributes.errorBox = replyBox;
-                }
-
-                this[propName].send(msg);
-
-                return ret;
-              }
-            });
-            return m2;
-          });
-
-      for ( var i = 0 ; i < methods.length ; i++ ) {
-        cls.installAxiom(methods[i]);
+      for ( i = 0 ; i < this.actions.length ; i++ ) {
+        cls.installAxiom(this.actions[i]);
       }
 
       [
-        'foam.box.SubscribeMessage',
-        'foam.box.OneShotBox',
         'foam.box.RPCReturnBox',
         'foam.box.ReplyBox',
         'foam.box.RPCMessage',
@@ -135,29 +200,6 @@ foam.CLASS({
           name: s
         }));
       });
-
-      if ( this.eventProxy ) {
-        cls.installAxiom(foam.core.Method.create({
-          name: 'sub',
-          code: function() {
-            this.SUPER.apply(this, arguments);
-
-            if ( arguments.length < 2 ) {
-              throw 'Currently network subscriptions must include at least one topic.';
-            }
-
-            var replyBox = this.registry.register(
-              foam.next$UID(),
-              this[replyPolicyName],
-              foam.box.EventDispatchBox.create({ target: this }));
-
-            this[propName].send(this.SubscribeMessage.create({
-              replyBox: replyBox,
-              topic: Array.from(arguments).slice(0, -1)
-            }));
-          }
-        }));
-      }
     }
   ]
 });
