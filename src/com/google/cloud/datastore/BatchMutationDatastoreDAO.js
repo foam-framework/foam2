@@ -19,14 +19,22 @@ foam.ENUM({
   package: 'com.google.cloud.datastore',
   name: 'DatastoreMutationType',
 
+  properties: [
+    {
+      class: 'String',
+      documentation: `"key" in Datastore API's mutations: [{<key>: <data>}].`,
+      name: 'datastoreMutationKey'
+    }
+  ],
+
   values: [
     {
       name: 'UPSERT',
-      label: 'upsert'
+      datastoreMutationKey: 'upsert'
     },
     {
       name: 'DELETE',
-      label: 'delete'
+      datastoreMutationKey: 'delete'
     }
   ]
 });
@@ -42,7 +50,7 @@ foam.CLASS({
       name: 'type'
     },
     {
-      documentation: 'JSONified payload for REST API mutation content.',
+      documentation: `"data" in Datastore API's mutations: [{<key>: <data>}].`,
       name: 'data'
     },
     {
@@ -102,7 +110,7 @@ foam.CLASS({
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
-          type: self.DatastoreMutationType.UPSERT,
+          type: self.DatastoreMutationType.DELETE,
           data: o.getDatastoreKey(),
           resolve: function(didRemove) {
             if ( didRemove ) self.pub('on', 'remove', o);
@@ -127,25 +135,33 @@ foam.CLASS({
           this.mutations_.length > 0,
           'BatchedMutationDatastoreDAO: Attempt to batch no operations');
 
-        var mutations = this.mutations_;
-        var mutationData = new Array(mutations.length);
-        this.mutations_ = [];
-
-        for ( var i = 0; i < mutations.length; i++ ) {
-          mutations[i] = {};
-          mutations[i][mutations[i].type.label] =
-              mutations[i].data;
-        }
-
-        return this.getRequest('commit', JSON.stringify({
-          mode: 'TRANSACTIONAL',
-          mutations: mutationData
-        })).send().then(this.onResponse.bind(this, 'batch'))
-          .then(this.onBatchResponse.bind(this, mutations))
-          .catch(this.onBatchFailure.bind(this, mutations));
-      },
+        return this.getRequest('beginTransaction').send()
+          .then(this.onResponse.bind(this, 'batch transaction'))
+          .then(this.onBatchTransactionResponse);
+      }
     },
 
+    function onBatchTransactionResponse(json) {
+      var transaction = json.transaction;
+
+      var mutations = this.mutations_;
+      var mutationData = new Array(mutations.length);
+      this.mutations_ = [];
+
+      for ( var i = 0; i < mutations.length; i++ ) {
+        mutationData[i] = {};
+        mutationData[i][mutations[i].type.datastoreMutationKey] =
+          mutations[i].data;
+      }
+
+      return this.getRequest('commit', JSON.stringify({
+        mode: 'TRANSACTIONAL',
+        mutations: mutationData,
+        transaction: transaction
+      })).send().then(this.onResponse.bind(this, 'batch commit'))
+        .then(this.onBatchResponse.bind(this, mutations))
+        .catch(this.onBatchFailure.bind(this, mutations));
+    },
     function onBatchResponse(mutations, json) {
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
