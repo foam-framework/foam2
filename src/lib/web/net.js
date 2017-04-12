@@ -164,16 +164,13 @@ foam.CLASS({
           return null;
         }
 
-        switch (this.responseType) {
-        case "text":
-          return this.resp.text();
-        case "blob":
-          return this.resp.blob();
-        case "arraybuffer":
-          return this.resp.arraybuffer();
-        case "json":
-          return this.resp.json();
+        switch ( this.responseType ) {
+          case 'text':        return this.resp.text();
+          case 'blob':        return this.resp.blob();
+          case 'arraybuffer': return this.resp.arraybuffer();
+          case 'json':        return this.resp.json();
         }
+
         // TODO: responseType should be an enum and/or have validation
         throw new Error('Unsupported response type: ' + this.responseType);
       }
@@ -261,14 +258,14 @@ foam.CLASS({
       class: 'String',
       name: 'protocol',
       preSet: function(old, nu) {
-        return nu.replace(':','');
+        return nu.replace(':', '');
       }
     },
     {
       class: 'String',
       name: 'path',
       preSet: function(old, nu) {
-        if ( ! nu.startsWith('/') ) return '/'+nu;
+        if ( ! nu.startsWith('/') ) return '/' + nu;
         return nu;
       }
     },
@@ -278,7 +275,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'method'
+      name: 'method',
+      value: 'GET'
     },
     {
       class: 'Map',
@@ -292,6 +290,16 @@ foam.CLASS({
       class: 'String',
       name: 'responseType',
       value: 'text'
+    },
+    {
+      class: 'String',
+      name: 'contentType',
+      factory: function() { return this.responseType; }
+    },
+    {
+      class: 'String',
+      name: 'mode',
+      value: 'cors'
     }
   ],
 
@@ -308,6 +316,7 @@ foam.CLASS({
       if ( this.url ) {
         this.fromUrl(this.url);
       }
+      this.addContentHeaders();
 
       var self = this;
 
@@ -319,7 +328,7 @@ foam.CLASS({
       var options = {
         method: this.method,
         headers: headers,
-        mode: "cors",
+        mode: this.mode,
         redirect: "follow",
         credentials: "same-origin"
       };
@@ -344,6 +353,27 @@ foam.CLASS({
         if ( resp.success ) return resp;
         throw resp;
       }.bind(this));
+    },
+    function addContentHeaders() {
+      // Specify Content-Type header when it can be deduced.
+      if ( ! this.headers['Content-Type'] ) {
+        switch ( this.contentType ) {
+          case 'text':
+          this.headers['Content-Type'] = 'text/plain';
+          break;
+          case 'json':
+          this.headers['Content-Type'] = 'application/json';
+          break;
+        }
+      }
+      // Specify this.contentType when it can be deduced.
+      if ( ! this.headers['Accept'] ) {
+        switch ( this.contentType ) {
+          case 'json':
+          this.headers['Accept'] = 'application/json';
+          break;
+        }
+      }
     }
   ]
 });

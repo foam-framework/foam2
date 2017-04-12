@@ -165,7 +165,6 @@ foam.CLASS({
 
   requires: [
     'foam.box.NoSuchNameException',
-    'foam.box.BoxRegistration',
     'foam.box.SubBox'
   ],
 

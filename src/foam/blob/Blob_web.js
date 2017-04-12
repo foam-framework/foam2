@@ -59,7 +59,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function read(buffer, offset) {
-    }
+    function read(buffer, offset) { }
   ]
 });

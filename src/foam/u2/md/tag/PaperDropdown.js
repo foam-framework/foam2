@@ -81,13 +81,13 @@ foam.CLASS({
       });
 
       if ( this.unrolled ) {
-        this.cssClass(this.myCls('unrolled'));
-        this.start('div').cssClass(this.myCls('label')).add(this.label$).end();
+        this.addClass(this.myClass('unrolled'));
+        this.start('div').addClass(this.myClass('label')).add(this.label$).end();
       }
 
       var listbox;
       this.add(this.slot(function(choices, unrolled) {
-        listbox = this.E('paper-listbox').cssClass('dropdown-content');
+        listbox = this.E('paper-listbox').addClass('dropdown-content');
         for ( var i = 0; i < choices.length; i++ ) {
           listbox.start('paper-item')
               .attrs({ name: i })

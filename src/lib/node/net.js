@@ -656,25 +656,57 @@ foam.CLASS({
       class: 'Boolean',
       name: 'followRedirect',
       value: true
+    },
+    {
+      name: 'urlLib',
+      factory: function() { return require('url'); }
     }
   ],
 
   methods: [
     function fromUrl(url) {
-      var data = require('url').parse(url);
-      this.protocol = data.protocol.slice(0, -1);
-      this.hostname = data.hostname;
+      var data = this.urlLib.parse(url);
+      if ( data.protocol ) this.protocol = data.protocol.slice(0, -1);
+      if ( data.hostname ) this.hostname = data.hostname;
       if ( data.port ) this.port = data.port;
-      this.path = data.path;
+      if ( data.path ) this.path = data.path;
+
+      return this;
+    },
+
+    function copyUrlFrom(other) {
+      if ( other.url ) {
+        this.fromUrl(other.url);
+        return this;
+      }
+
+      this.protocol = other.protocol;
+      this.hostname = other.hostname;
+      if ( other.port ) this.port = other.port;
+      other.path = other.path;
+
+      return this;
     },
 
     function send() {
       if ( this.url ) {
         this.fromUrl(this.url);
       }
+      this.addContentHeaders();
 
       if ( this.protocol !== 'http' && this.protocol !== 'https' )
         throw new Error("Unsupported protocol '" + this.protocol + "'");
+
+      // 'Content-Length' or 'Transfer-Encoding' required for some requests
+      // to be properly handled by Node JS servers.
+      // See https://github.com/nodejs/node/issues/3009 for details.
+      var buf;
+      if ( this.payload ) {
+        buf = new Buffer(this.payload, 'utf8');
+        if ( ! this.headers['Content-Length'] ) {
+          this.headers['Content-Length'] = buf.length;
+        }
+      }
 
       var options = {
         hostname: this.hostname,
@@ -691,6 +723,11 @@ foam.CLASS({
             responseType: this.responseType
           });
 
+          // Ensure that payload factory wires up listeners immediately.
+          resp.payload;
+
+          // TODO(markdittmer): Write integration tests for redirects, including
+          // same-origin/path-only redirects.
           if ( this.followRedirect &&
                ( resp.status === 301 ||
                  resp.status === 302 ||
@@ -698,35 +735,25 @@ foam.CLASS({
                  resp.status === 307 ||
                  resp.status === 308 ) ) {
             resolve(this.cls_.create({
-              url: resp.headers.location,
               method: this.method,
               payload: this.payload,
               responseType: this.responseType,
               headers: this.headers,
               followRedirect: true
-            }).send());
-            return;
+              // Redirect URL may not contain all parts if it points to same domain.
+              // Copy original URL and overwrite non-null parts from "location"
+              // header.
+            }).copyUrlFrom(this).fromUrl(resp.headers.location).send());
+          } else {
+            resolve(resp);
           }
-
-          var buffer = '';
-          nodeResp.on('data', function(d) {
-            buffer += d.toString();
-          });
-          nodeResp.on('end', function() {
-            resp.payload = buffer;
-            if ( resp.success ) resolve(resp);
-            else reject(resp);
-          });
-          nodeResp.on('error', function(e) {
-            reject(e);
-          });
         }.bind(this));
 
         req.on('error', function(e) {
           reject(e);
         });
 
-        if ( this.payload ) req.write(this.payload);
+        if ( this.payload ) req.write(buf);
         req.end();
       }.bind(this));
     }
@@ -742,18 +769,37 @@ foam.CLASS({
   properties: [
     {
       name: 'payload',
-      adapt: function(_, str) {
+      factory: function() {
         if ( this.streaming ) return null;
 
-        switch (this.responseType) {
-        case 'text':
-          return str;
-        case 'json':
-          return JSON.parse(str);
-        }
+        var self = this;
+        return new Promise(function(resolve, reject) {
+          var buffer = ""
+          self.resp.on('data', function(d) {
+            buffer += d.toString();
+          });
+          self.resp.on('end', function() {
+            switch (self.responseType) {
+            case "text":
+              resolve(buffer);
+              return;
+            case "json":
+              try {
+                resolve(JSON.parse(buffer));
+              } catch ( error ) {
+                reject(error);
+              }
+              return;
+            }
 
-        // TODO: responseType should be an enum and/or have validation
-        throw new Error('Unsupported response type: ' + this.responseType);
+            // TODO: responseType should be an enum and/or have validation.
+            reject(new Error(
+                'Unsupported response type: ' + self.responseType));
+          });
+          self.resp.on('error', function(e) {
+            reject(e);
+          });
+        });
       }
     },
     {

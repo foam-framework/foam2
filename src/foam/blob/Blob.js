@@ -198,6 +198,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function slice(start, length) {
     }
@@ -258,6 +259,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobStore',
+
   properties: [
     {
       class: 'String',
@@ -283,6 +285,7 @@ foam.CLASS({
       value: false
     }
   ],
+
   methods: [
     function setup() {
       if ( this.isSet ) return;

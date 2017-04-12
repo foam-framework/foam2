@@ -106,7 +106,7 @@ foam.CLASS({
 
     function addObj(obj) {
       var e = this.start('tr')
-          .enableCls(this.tableView.myCls('selected'),
+          .enableClass(this.tableView.myClass('selected'),
               this.tableView.selection$.map(function(sel) {
                 return sel === obj;
               }));
@@ -233,9 +233,9 @@ foam.CLASS({
         }.bind(this, this.columns_[i]));
 
         e.start('td')
-            .enableCls(this.myCls('sorting'), sorting$)
+            .enableClass(this.myClass('sorting'), sorting$)
             .start('span')
-                .cssClass(this.myCls('sort-direction'))
+                .addClass(this.myClass('sort-direction'))
                 .add(sorting$)
             .end()
             .add(this.columns_[i].columnLabel)
@@ -354,7 +354,7 @@ foam.CLASS({
       this.data$proxy.sub('on', this.onDAOUpdate);
 
       return this.
-          cssClass(this.myCls()).
+          addClass(this.myClass()).
           add(this.header$, this.body$);
     },
 

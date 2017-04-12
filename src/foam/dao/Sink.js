@@ -19,6 +19,8 @@ foam.INTERFACE({
   package: 'foam.dao',
   name: 'Sink',
 
+  documentation: 'Interface for receiving information updates. Primarily used as the target for DAO.select() calls.',
+
   methods: [
     {
       name: 'put',
@@ -65,7 +67,8 @@ foam.CLASS({
     {
       class: 'Proxy',
       of: 'foam.dao.Sink',
-      name: 'delegate'
+      name: 'delegate',
+      factory: function() { return foam.dao.ArraySink.create(); }
     }
   ]
 });

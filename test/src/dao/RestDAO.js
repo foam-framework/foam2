@@ -16,8 +16,9 @@
  */
 
 describe('RestDAO', function() {
-  var baseURL = 'http://localhost:8765/v0/testDAO';
+  var baseURL = 'http://0.0.0.0:8765/v0/testDAO';
   var dao;
+  var url = require('url');
 
   beforeEach(function() {
     foam.CLASS({
@@ -26,7 +27,7 @@ describe('RestDAO', function() {
       extends: 'foam.net.HTTPRequest',
 
       requires: [
-        'foam.dao.ArrayDAO',
+        'foam.dao.ArraySink',
         'foam.net.HTTPResponse'
       ],
 
@@ -46,7 +47,12 @@ describe('RestDAO', function() {
           if ( this.method === 'PUT' && this.url === this.baseURL ) {
             // put()
             var obj;
+            var id;
             var payload;
+            var skip;
+            var limit;
+            var order;
+            var predicate;
             try {
               obj = foam.json.parseString(this.payload);
               payload = jsonify(obj);
@@ -57,23 +63,30 @@ describe('RestDAO', function() {
             return dao.put(obj).then(function() {
               return createResponse({ status: 200, payload: payload });
             });
-          } else if ( this.method === 'DELETE' && this.url.indexOf(this.baseURL) === 0 ) {
+          } else if ( this.method === 'DELETE' &&
+                      this.url.indexOf(this.baseURL) === 0 ) {
             // remove()
-            var id = JSON.parse(decodeURIComponent(this.url.substr(this.baseURL.length + 1)));
-            var payload;
+            id = JSON.parse(decodeURIComponent(this.url.substr(
+              this.baseURL.length + 1)));
             return dao.find(id).then(function(o) {
               payload = jsonify(o);
               return dao.remove(o);
             }).then(function() {
               return createResponse({ status: 200, payload: payload });
             });
-          } else if ( this.method === 'GET' && this.url.indexOf(this.baseURL) === 0 && this.url.length > this.baseURL.length ) {
+          } else if ( this.method === 'GET' &&
+                      this.url.indexOf(this.baseURL) === 0 &&
+                      this.url.charAt(this.baseURL.length) === '/' ) {
             // find()
-            var id = JSON.parse(decodeURIComponent(this.url.substr(this.baseURL.length + 1)));
+            id = JSON.parse(decodeURIComponent(this.url.substr(
+              this.baseURL.length + 1)));
             return dao.find(id).then(function(o) {
               return createResponse({ status: 200, payload: jsonify(o) });
             });
-          } else if ( this.method === 'GET' && this.url.indexOf(this.baseURL) === 0 && this.url.length === this.baseURL.length ) {
+          } else if ( this.method === 'POST' &&
+                      this.url.indexOf(this.baseURL) === 0 &&
+                      this.url.substring(this.baseURL.length)
+                          .match(/^:select([?].*)?$/) ) {
             // select()
             var data;
             try {
@@ -81,15 +94,19 @@ describe('RestDAO', function() {
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
-            var skip = data.skip;
-            var limit = data.limit;
-            var order = data.order;
-            var predicate = data.predicate;
-            return dao.select(undefined, skip, limit, order, predicate).then(function(sink) {
-              var payload = jsonify(sink.a);
-              return createResponse({ status: 200, payload: payload });
-            });
-          } else if ( this.method === 'POST' && this.url === this.baseURL + '/removeAll' ) {
+
+            var sink = data.sink || this.ArraySink.create();
+            skip = data.skip;
+            limit = data.limit;
+            order = data.order;
+            predicate = data.predicate;
+            return dao.select(sink, skip, limit, order, predicate)
+              .then(function(sink) {
+                var payload = jsonify(sink);
+                return createResponse({ status: 200, payload: payload });
+              });
+          } else if ( this.method === 'POST' &&
+                      this.url === this.baseURL + ':removeAll' ) {
             // removeAll()
             var data;
             try {
@@ -97,14 +114,17 @@ describe('RestDAO', function() {
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
-            var skip = data.skip;
-            var limit = data.limit;
-            var order = data.order;
-            var predicate = data.predicate;
-            return dao.removeAll(skip, limit, order, predicate).then(function() {
-              return Promise.resolve(createResponse({ status: 200 }));
-            });
+            skip = data.skip;
+            limit = data.limit;
+            order = data.order;
+            predicate = data.predicate;
+            return dao.removeAll(skip, limit, order, predicate)
+              .then(function() {
+                return Promise.resolve(createResponse({ status: 200 }));
+              });
           }
+
+          debugger;
 
           // Request doesn't match DAO REST API. Return "Not Found".
           return Promise.resolve(createResponse({ status: 404 }));
@@ -116,13 +136,17 @@ describe('RestDAO', function() {
           return JSON.stringify(foam.json.Network.objectify(o));
         },
         function createResponse(o) {
-          return this.HTTPResponse.create(
-            Object.assign({responseType: 'json'}, o));
+          return this.HTTPResponse.create(Object.assign(
+              { responseType: 'json' },
+              o,
+              { payload: Promise.resolve(JSON.parse(o.payload || '{}')) }));
         }
       ]
     });
 
-    foam.register(foam.lookup('foam.dao.test.MockRestDAOHttpRequest'), 'foam.net.HTTPRequest');
+    foam.register(
+      foam.lookup('foam.dao.test.MockRestDAOHttpRequest'),
+      'foam.net.HTTPRequest');
   });
 
   global.genericDAOTestBattery(function(of) {

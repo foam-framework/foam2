@@ -92,7 +92,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.cssClass(this.myCls());
+      this.addClass(this.myClass());
       this.start(this.filterController, { data: this.data }).end();
     }
   ],

@@ -19,7 +19,7 @@ var env = foam.box.Context.create();
 
 foam.box.NamedBox.create({
   name: '/ca/vany/adam'
-}, env).delegate = foam.box.WebSocketBox.create({ uri: 'ws://localhost:4000 '}, env);
+}, env).delegate = foam.box.WebSocketBox.create({ uri: 'ws://0.0.0.0:4000 '}, env);
 
 var dao = foam.dao.ClientDAO.create({
   delegate: foam.box.NamedBox.create({
