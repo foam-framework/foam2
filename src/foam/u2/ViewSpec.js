@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'ViewSpec',
   extends: 'foam.core.Property',
 
+  documentation: 'Set a ViewFactory to be a string containing a class name, ' +
+      'a Class object, or a factory function(args, context). ' +
+      'Useful for rowViews and similar.',
+
   axioms: [
     {
       installInClass: function(cls) {
@@ -62,10 +66,6 @@ foam.CLASS({
       }
     }
   ],
-
-  documentation: 'Set a ViewFactory to be a string containing a class name, ' +
-      'a Class object, or a factory function(args, context). ' +
-      'Useful for rowViews and similar.',
 
   properties: [
     [ 'adapt', function(_, spec, prop) {

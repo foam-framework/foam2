@@ -86,6 +86,7 @@ foam.CLASS({
         return prop;
       });
 
+      // Extends Property, so actually gets installed in SUPER call
       this.SUPER(c);
     }
   ]

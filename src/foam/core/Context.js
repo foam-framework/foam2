@@ -102,7 +102,7 @@
      * Returns true if the model ID has been registered. False otherwise.
      */
     isRegistered: function(modelId) {
-      return !!this.__cache__[modelId];
+      return !! this.__cache__[modelId];
     },
 
     /** Internal method to register a context binding in an internal cache */

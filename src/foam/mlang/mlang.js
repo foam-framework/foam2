@@ -643,7 +643,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff first arg found in second array argument.',
+  documentation: 'Predicate returns true iff second arg found in first array argument.',
 
   methods: [
     {
@@ -663,7 +663,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff first arg found in second array argument, ignoring case.',
+  documentation: 'Predicate returns true iff second arg found in first array argument, ignoring case.',
 
   methods: [
     function f(o) {
@@ -1169,6 +1169,8 @@ foam.CLASS({
 
   documentation: 'Sink which behaves like the SQL group-by command.',
 
+  // TODO: it makes no sense to name the arguments arg1 and arg2
+  // because this isn't an expression, so they should be more meaningful
   properties: [
     {
       class: 'foam.mlang.ExprProperty',
@@ -1186,6 +1188,15 @@ foam.CLASS({
       class: 'StringArray',
       name: 'groupKeys',
       factory: function() { return []; }
+    },
+    {
+      class: 'Boolean',
+      name: 'processArrayValuesIndividually',
+      documentation: 'If true, each value of an array will be entered into a separate group.',
+      factory: function() {
+        // TODO: it would be good if it could also detect RelationshipJunction.sourceId/targetId
+        return ! foam.core.MultiPartID.isInstance(this.arg1);
+      }
     }
   ],
 
@@ -1207,7 +1218,7 @@ foam.CLASS({
 
     function put(sub, obj) {
       var key = this.arg1.f(obj);
-      if ( Array.isArray(key) ) {
+      if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
           for ( var i = 0; i < key.length; i++ ) {
             this.putInGroup_(sub, key[i], obj);
@@ -1231,6 +1242,62 @@ foam.CLASS({
 
     function toString() {
       return this.groups.toString();
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Unique',
+  extends: 'foam.dao.ProxySink',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Sink decorator which only put()\'s a single obj for each unique expression value.',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'expr'
+    },
+    {
+      name: 'values',
+      factory: function() { return {}; }
+    }
+  ],
+
+  methods: [
+    function putInGroup_(key, obj) {
+      var group = this.groups.hasOwnProperty(key) && this.groups[key];
+      if ( ! group ) {
+        group = this.arg2.clone();
+        this.groups[key] = group;
+        this.groupKeys.push(key);
+      }
+      group.put(obj);
+    },
+
+    function put(obj) {
+      var value = this.expr.f(obj);
+      if ( Array.isArray(value) ) {
+        throw 'Unique doesn\'t Array values.';
+      } else {
+        if ( ! this.values.hasOwnProperty(value) ) {
+          this.values[value] = obj;
+          this.delegate.put(obj);
+        }
+      }
+    },
+
+    function eof() { },
+
+    function clone() {
+      // Don't use the default clone because we don't want to copy 'uniqueValues'.
+      return this.cls_.create({ expr: this.expr, delegate: this.delegate });
+    },
+
+    function toString() {
+      return this.uniqueValues.toString();
     }
   ]
 });
@@ -1563,6 +1630,14 @@ foam.CLASS({
   methods: [
     function f(o) {
       return this.arg2.f(this.arg1.f(o));
+    },
+
+    function comparePropertyValues(o1, o2) {
+      /**
+         Compare property values using arg2's property value comparator.
+         Used by GroupBy
+      **/
+      return this.arg2.comparePropertyValues(o1, o2);
     }
   ]
 });
@@ -1575,12 +1650,17 @@ foam.CLASS({
   documentation: 'Convenience mix-in for requiring all mlangs.',
 
   requires: [
+    'foam.mlang.Constant',
+    'foam.mlang.expr.Dot',
+    'foam.mlang.expr.Mul',
+    'foam.mlang.order.Desc',
+    'foam.mlang.order.ThenBy',
     'foam.mlang.predicate.And',
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
-    'foam.mlang.predicate.StartsWith',
-    'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.False',
+    'foam.mlang.predicate.Func',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
     'foam.mlang.predicate.Has',
@@ -1594,17 +1674,24 @@ foam.CLASS({
     'foam.mlang.predicate.Func',
     'foam.mlang.predicate.True',
     'foam.mlang.predicate.False',
+    'foam.mlang.predicate.StartsWith',
+    'foam.mlang.predicate.StartsWithIC',
     'foam.mlang.expr.Mul',
     'foam.mlang.expr.Dot',
     'foam.mlang.Constant',
     'foam.mlang.sink.Count',
-    'foam.mlang.sink.Max',
-    'foam.mlang.sink.Sum',
-    'foam.mlang.sink.Map',
     'foam.mlang.sink.Explain',
-    'foam.mlang.order.Desc',
-    'foam.mlang.order.ThenBy'
+    'foam.mlang.sink.GroupBy',
+    'foam.mlang.sink.Unique',
+    'foam.mlang.sink.Map',
+    'foam.mlang.sink.Max',
+    'foam.mlang.sink.Sum'
   ],
+
+  constants: {
+    FALSE: foam.mlang.predicate.False.create(),
+    TRUE: foam.mlang.predicate.True.create()
+  },
 
   methods: [
     function _nary_(name, args) {
@@ -1639,6 +1726,8 @@ foam.CLASS({
     function DOT(a, b) { return this._binary_("Dot", a, b); },
     function MUL(a, b) { return this._binary_("Mul", a, b); },
 
+    function UNIQUE(expr, sink) { return this.Unique.create({ expr: expr, delegate: sink }); },
+    function GROUP_BY(expr, sinkProto) { return this.GroupBy.create({ arg1: expr, arg2: sinkProto }); },
     function MAP(expr, sink) { return this.Map.create({ arg1: expr, delegate: sink }); },
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },

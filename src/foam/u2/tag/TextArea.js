@@ -44,7 +44,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      this.cssClass(this.myCls());
+      this.addClass(this.myClass());
       this.attrs({rows: this.rows, cols: this.cols});
 
       // This is required because textarea accepts setting the 'value'

@@ -31,20 +31,15 @@ foam.CLASS({
       required: true
     },
     {
-      class: 'Boolean',
-      name: 'forward',
-      value: true
-    },
-    {
       name: 'predicate',
       getter: function() {
-        return this.relationship.targetQueryFromSource(this.obj, this.forward);
+        return this.relationship.targetQueryFromSource(this.obj);
       }
     },
     {
       name: 'delegate',
       factory: function() {
-        var key = this.relationship[this.forward ? 'targetDAOKey' : ' sourceDAOKey'];
+        var key      = this.relationship.targetDAOKey;
         var delegate = this.__context__[key];
 
         foam.assert(delegate, 'Missing relationship DAO:', key);
@@ -55,10 +50,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
-      this.relationship.adaptTarget(this.obj, obj, this.forward);
-
-      return this.SUPER(obj);
+    function put(obj, sink) {
+      return this.SUPER(this.relationship.adaptTarget(this.obj, obj), sink);
     },
 
     function clone() {

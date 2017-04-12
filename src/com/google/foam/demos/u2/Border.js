@@ -87,12 +87,12 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myClass()).
           start('div', null, this.tabRow$).
-            cssClass(this.myCls('tabRow')).
+            addClass(this.myClass('tabRow')).
           end().
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myClass('content')).
           end();
     },
 
@@ -102,8 +102,8 @@ foam.CLASS({
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            cssClass(this.myCls('tab')).
-            enableCls('selected', tab.selected$).
+            addClass(this.myClass('tab')).
+            enableClass('selected', tab.selected$).
             on('click', function() { this.selected = tab; }.bind(this)).
             add(tab.label).
         end();
@@ -151,9 +151,9 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myClass()).
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myClass('content')).
           end();
     }
   ]
@@ -186,10 +186,10 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
-          start('div').cssClass(this.myCls('title')).add(this.title$).end().
+          addClass(this.myClass()).
+          start('div').addClass(this.myClass('title')).add(this.title$).end().
           start('div', null, this.content$).
-            cssClass(this.myCls('content')).
+            addClass(this.myClass('content')).
           end();
     }
   ]
@@ -223,12 +223,12 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          cssClass(this.myCls()).
+          addClass(this.myClass()).
           start('div', null, this.leftPanel$).
-            cssClass(this.myCls('content')).
+            addClass(this.myClass('content')).
           end().
           start('div', null, this.rightPanel$).
-            cssClass(this.myCls('content')).
+            addClass(this.myClass('content')).
           end();
     }
   ]

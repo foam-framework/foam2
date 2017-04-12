@@ -62,6 +62,143 @@ describe('DatastoreDAO', function() {
     });
   });
 
+  describe('multi-part id', function() {
+    var Person;
+    beforeEach(function() {
+      foam.CLASS({
+        package: 'test.dao.mpid',
+        name: 'Person',
+
+        ids: [ 'firstName', 'lastName', 'dob' ],
+
+        properties: [
+          {
+            class: 'String',
+            name: 'firstName'
+          },
+          {
+            class: 'String',
+            name: 'lastName'
+          },
+          {
+            class: 'Date',
+            name: 'dob'
+          }
+        ]
+      });
+      Person = foam.lookup('test.dao.mpid.Person');
+    });
+
+    it('should handle a multi-part-id put(obj) + lookup(obj)', function(done) {
+      daoFactory(Person).then(function(dao) {
+        var putPerson = Person.create({
+          firstName: 'Born',
+          lastName: 'JustNow',
+          dob: Date.now()
+        });
+        dao.put(putPerson).then(function() {
+          return dao.find(putPerson);
+        }).then(function(gotPerson) {
+          expect(gotPerson).toBeDefined();
+          expect(foam.util.equals(putPerson, gotPerson)).toBe(true);
+          done();
+        });
+      });
+    });
+
+    it(`should throw on lookup( <array-from-multi-part-id > );
+        could break inversion of control for multi-part ids`, function(done) {
+      daoFactory(Person).then(function(dao) {
+        var putPerson = Person.create({
+          firstName: 'Born',
+          lastName: 'JustNow',
+          dob: Date.now()
+        });
+        dao.put(putPerson).then(function() {
+          return dao.find(putPerson.id);
+        }).then(function(gotPerson) {
+          fail(`find( <multi-part-id> ) = find( <array-of-parts> ) should throw;
+                passing the array could break inversion of control for
+                multi-part ids`);
+        }).catch(done);
+      });
+    });
+  });
+
+  describe('batching', function() {
+    // Emulator will batch every 300 records.
+    var numRecords = 1000;
+    var dao;
+
+    beforeEach(function() {
+      // Classes for tracking selectNextBatch_() and items to put() to DAO.
+      // Note: A JasmineJS spy on selectNextBatch_() doesn't work becuase
+      // FObjects do not have methods as own properties.
+      foam.CLASS({
+        package: 'test.dao.batch',
+        name: 'DatastoreDAO',
+        extends: 'com.google.cloud.datastore.DatastoreDAO',
+
+        properties: [
+          {
+            class: 'Boolean',
+            name: 'handledMultipleBatches'
+          }
+        ],
+
+        methods: [
+          function selectNextBatch_() {
+            this.handledMultipleBatches = true;
+            return this.SUPER.apply(this, arguments);
+          }
+        ]
+      });
+
+      foam.CLASS({
+        package: 'test.dao.batch',
+        name: 'BatchedItem',
+
+        properties: [
+          {
+            class: 'String',
+            name: 'id'
+          }
+        ]
+      });
+    });
+
+    function initDAO() {
+      return clearCDS().then(function() {
+        var BatchedItem = foam.lookup('test.dao.batch.BatchedItem');
+        dao = foam.lookup('test.dao.batch.DatastoreDAO')
+            .create({
+              of: BatchedItem,
+              protocol: env.CDS_EMULATOR_PROTOCOL,
+              host: env.CDS_EMULATOR_HOST,
+              port: env.CDS_EMULATOR_PORT,
+              projectId: env.CDS_PROJECT_ID
+            });
+        var promises = [];
+        for ( var i = 0; i < 1000; i++ ) {
+          promises.push(dao.put(BatchedItem.create({
+            id: (i).toString()
+          })));
+        }
+        return Promise.all(promises);
+      });
+    }
+
+    it('should fetch multiple batches for a full result set', function(done) {
+      initDAO().then(function() {
+        dao.select().then(function(sink) {
+          expect(sink.a.length).toBe(numRecords);
+          expect(dao.handledMultipleBatches).toBe(true);
+          done();
+        });
+      });
+    });
+  });
+
   function unreliableDAOFactory(cls) {
     return clearCDS().then(function() {
       return foam.lookup('com.google.cloud.datastore.DatastoreDAO')

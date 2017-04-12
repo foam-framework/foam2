@@ -171,8 +171,11 @@ global.genericDAOTestBattery = function(daoFactory) {
     describe('removeAll()', function() {
       it('should return a promise', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
-          expect(dao.removeAll().then).toEqual(jasmine.any(Function));
-          done();
+          try {
+            dao.removeAll().then(done, fail);
+          } catch (error) {
+            fail(error);
+          }
         });
       });
 
@@ -281,7 +284,6 @@ global.genericDAOTestBattery = function(daoFactory) {
           };
 
           dao.select(sink).then(function(s) {
-            expect(s).toBe(sink);
             expect(puts).toBe(0);
             expect(eofCalled).toBe(true);
             done();
@@ -334,8 +336,9 @@ global.genericDAOTestBattery = function(daoFactory) {
 
       describe('filtering', function() {
         var dao;
-        var exprs = foam.mlang.Expressions.create();
+        var exprs;
         beforeEach(function(done) {
+          exprs = foam.mlang.Expressions.create();
           daoFactory(test.dao.generic.Person).then(function(idao) {
             dao = idao;
             return idao.put(mkPerson1()).then(function() { return idao.put(mkPerson2()) } );

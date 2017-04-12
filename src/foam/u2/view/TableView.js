@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
 
   refines: 'foam.core.Property',
@@ -161,8 +161,8 @@ foam.CLASS({
       var view = this;
 
       this.
-        cssClass(this.myCls()).
-        setNodeName('table').style({'width':'100%'}).
+        addClass(this.myClass()).
+        setNodeName('table').
         start('thead').
         add(this.slot(function(columns_) {
           return this.E('tr').
@@ -191,11 +191,11 @@ foam.CLASS({
                   view.selection = obj;
                   if ( view.editRecord ) view.editRecord(obj);
                 }).
-                cssClass(this.slot(function(selection) {
+                addClass(this.slot(function(selection) {
                   if ( obj === selection ) return view.myCls('selected');
                   return '';
                 }, view.selection$)).
-                cssClass(view.myCls('row')).
+                addClass(view.myClass('row')).
                 forEach(columns_, function(column) {
                   this.
                     start('td').

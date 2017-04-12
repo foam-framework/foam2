@@ -264,7 +264,7 @@ foam.CLASS({
       if ( this.indent ) {
         this.indentLevel_--;
       }
-      if ( c ) this.indent().out(c);
+      if ( c ) this.nl().indent().out(c);
       return this;
     },
 
@@ -314,8 +314,8 @@ foam.CLASS({
     },
 
     function outputObjectKeyValue_(key, value, first) {
-        if ( ! first ) this.out(',').nl();
-      this.indent().out(this.maybeEscapeKey(key), ':').output(value);
+      if ( ! first ) this.out(',').nl().indent();
+      this.out(this.maybeEscapeKey(key), ':').output(value);
     },
 
     function outputObjectKeyValues_(o) {
@@ -377,9 +377,9 @@ foam.CLASS({
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], this);
-            if ( i < o.length -1 ) this.out(',').nl().indent();
+            if ( i < o.length-1 ) this.out(',').nl().indent();
           }
-          this.nl();
+          //this.nl();
           this.end(']');
         },
         Object: function(o) {
@@ -387,7 +387,7 @@ foam.CLASS({
             o.outputJSON(this);
           } else {
             this.start('{');
-            if (this.sortObjectKeys) {
+            if ( this.sortObjectKeys ) {
               this.outputSortedObjectKeyValues_(o);
             } else {
               this.outputObjectKeyValues_(o);
@@ -561,7 +561,7 @@ foam.LIB({
     },
 
     function objectify(o) {
-      return foam.json.Compact.objectify(o)
+      return foam.json.Compact.objectify(o);
     }
   ]
 });

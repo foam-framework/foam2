@@ -37,7 +37,7 @@ describe("Index benchmarks", function() {
         method: 'GET'
       });
       //if ( foam.net.node ) // local option for medal data file
-      //  xhr.fromUrl('http://localhost:8888/MedalData.json');
+      //  xhr.fromUrl('http://0.0.0.0:8888/MedalData.json');
       //else
         xhr.fromUrl('https://raw.githubusercontent.com/foam-framework/foam/' +
                  'master/js/foam/demos/olympics/MedalData.json');
@@ -470,6 +470,3 @@ describe("Index benchmarks", function() {
     }).then(done);
   });
 });
-
-
-
