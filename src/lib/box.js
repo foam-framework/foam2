@@ -515,6 +515,9 @@ foam.CLASS({
   properties: [
     {
       name: 'topic'
+    },
+    {
+      name: 'destination'
     }
   ]
 });
@@ -857,8 +860,6 @@ foam.CLASS({
 
   requires: [
     'foam.box.Message',
-    'foam.box.SubscribeMessage',
-    'foam.box.EventMessage',
     'foam.box.RPCMessage',
     'foam.box.RPCReturnMessage',
     'foam.box.InvalidMessageException'
@@ -911,28 +912,6 @@ foam.CLASS({
     function send(message) {
       if ( this.RPCMessage.isInstance(message.object) ) {
         this.call(message);
-        return;
-      } else if ( this.SubscribeMessage.isInstance(message.object) ) {
-        // TODO: Unsub support
-        var dest = message.attributes.replyBox;
-        var args = message.object.topic.slice();
-
-        var self = this;
-
-        args.push(function() {
-          var args = Array.from(arguments);
-
-          // Cannot serialize the subscription object.
-          args.shift();
-
-          dest.send(self.Message.create({
-            object: self.EventMessage.create({
-              args: args
-            })
-          }));
-        });
-
-        this.data.sub.apply(this.data, args);
         return;
       }
 
