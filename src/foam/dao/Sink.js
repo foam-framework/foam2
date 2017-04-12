@@ -445,29 +445,29 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function() {
-        this.calls.push(['put', arguments]);
+      code: function(s, obj) {
+        this.calls.push(['put', [s, obj]]);
         this.flushCalls();
       }
     },
     {
       name: 'remove',
-      code: function() {
-        this.calls.push(['remove', arguments]);
+      code: function(s, obj) {
+        this.calls.push(['remove', [s, obj]]);
         this.flushCalls();
       }
     },
     {
       name: 'eof',
-      code: function() {
-        this.calls.push(['eof', arguments]);
+      code: function(s) {
+        this.calls.push(['eof', [s]]);
         this.flushCalls();
       }
     },
     {
       name: 'reset',
-      code: function() {
-        this.calls = [['reset', arguments]];
+      code: function(s) {
+        this.calls = [['reset', [s]]];
         this.flushCalls();
       }
     }
@@ -475,12 +475,12 @@ foam.CLASS({
   listeners: [
     {
       name: 'flushCalls',
-      isFramed: true,
+      isMerged: 100,
       code: function() {
         var calls = this.calls;
         this.calls = [];
         for (var i = 0, o; o = calls[i]; i++) {
-          this.delegate[o[0]].apply(undefined, o[1]);
+          this.delegate[o[0]].apply(this.delegate, o[1]);
         }
       }
     },
