@@ -1872,6 +1872,12 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+  properties: [
+    [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Date',
