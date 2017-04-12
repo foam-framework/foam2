@@ -902,7 +902,7 @@ foam.CLASS({
               }));
           });
       } else {
-        replyBox.send(this.Message.create({
+        replyBox && replyBox.send(this.Message.create({
           object: this.RPCReturnMessage.create({ data: p })
         }));
       }
