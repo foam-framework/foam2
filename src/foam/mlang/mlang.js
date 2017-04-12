@@ -1671,21 +1671,16 @@ foam.CLASS({
     'foam.mlang.predicate.Neq',
     'foam.mlang.predicate.Not',
     'foam.mlang.predicate.Or',
-    'foam.mlang.predicate.Func',
-    'foam.mlang.predicate.True',
-    'foam.mlang.predicate.False',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
-    'foam.mlang.expr.Mul',
-    'foam.mlang.expr.Dot',
-    'foam.mlang.Constant',
+    'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
-    'foam.mlang.sink.Unique',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
-    'foam.mlang.sink.Sum'
+    'foam.mlang.sink.Sum',
+    'foam.mlang.sink.Unique'
   ],
 
   constants: {
@@ -1735,10 +1730,7 @@ foam.CLASS({
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
-
-    function TRUE() { return this.True.create(); },
-    function FALSE() { return this.False.create(); }
+    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); }
   ]
 });
 

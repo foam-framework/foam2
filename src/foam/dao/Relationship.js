@@ -298,7 +298,7 @@ foam.CLASS({
 
       if ( obj.id === undefined ) {
         this.warn('Attempted to read relationship from object with no id.');
-        return this.FALSE();
+        return this.FALSE;
       }
 
       return this.EQ(targetProp, obj.id);
