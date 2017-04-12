@@ -477,6 +477,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'FunctionBox',
+  implements: ['foam.box.Box'],
+  properties: [
+    {
+      class: 'Function',
+      name: 'fn'
+    }
+  ],
+  methods: [
+    function send(m) {
+      this.fn(m.object);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.box',
