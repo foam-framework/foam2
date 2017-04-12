@@ -73,7 +73,8 @@ foam.CLASS({
   name: 'BatchMutationDatastoreDAO',
   extends: 'com.google.cloud.datastore.DatastoreDAO',
 
-  documentation: 'Datastore DAO that batches put() and remove().',
+  documentation: `Datastore DAO that batches put() and remove(). This can be
+      crucial to avoid blowing API quota when performing bulk updates.`,
 
   requires: [
     'com.google.cloud.datastore.DatastoreMutation',
