@@ -75,9 +75,9 @@
     },
     function initE() {
       // TODO probably shouldn't be using a table.
-      this.start('table').style({'width':'100%'}).
+      this.start('table').
         start('tr').
-          start('td').style({'width':'100%'}).add(this.tableView).end().
+          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
           start('td').add(this.scrollView).end().
         end().
       end();

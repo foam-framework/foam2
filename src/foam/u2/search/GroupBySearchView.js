@@ -32,7 +32,7 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function CSS() {/*
         ^ select {
-          width: 100%;
+          min-width: 220px;
         }
       */}
     })
