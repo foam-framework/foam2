@@ -16,11 +16,17 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      hidden: true
     },
     {
       name: 'obj',
-      view: 'foam.u2.DetailView'
+      label: '',
+      view: function(args, X) {
+        var e = foam.u2.DetailView.create({ of: X.data.of }, X).copyFrom(args);
+        e.data$ = X.data$.dot(this.name);
+        return e;
+      }
     },
     {
       name: 'dao',
