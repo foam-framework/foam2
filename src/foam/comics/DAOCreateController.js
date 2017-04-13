@@ -62,6 +62,8 @@ foam.CLASS({
 
         this.dao.put(this.data.clone()).then(function() {
           if ( stack ) stack.back();
+        }, function(e) {
+          console.error(e);
         });
       }
     },
