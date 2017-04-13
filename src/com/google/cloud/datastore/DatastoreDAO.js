@@ -251,8 +251,8 @@ foam.CLASS({
       }
 
       // Cloud Datastore will provide results with version numbers even if
-      // the entity did not exist. Use indexUpdates defined-and-greater-non-0
-      // as a proxy for as a proxy for found-and-deleted.
+      // the entity did not exist. Use indexUpdates defined-and-non-0 as a
+      // proxy found-and-deleted.
       if ( json.indexUpdates ) {
         this.pub('on', 'remove', o);
       }
