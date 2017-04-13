@@ -68,6 +68,16 @@ foam.CLASS({
           self.status = "Error saving record: " + e.toString();
         });
       }
+    },
+    {
+      name: 'delete',
+      isEnabled: function(obj) { return obj != null; },
+      code: function() {
+        var self = this;
+        this.dao.remove(this.obj).then(function() {
+          self.stack.back();
+        });
+      }
     }
   ]
 });

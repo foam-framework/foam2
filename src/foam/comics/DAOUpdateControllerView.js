@@ -23,7 +23,7 @@ foam.CLASS({
       this.startContext({ data: this.controller }).
         tag(this.DAOUpdateController.STATUS, { visibility: foam.u2.Visibility.RO }).
         add(this.DAOUpdateController.OBJ,
-            this.DAOUpdateController.SAVE).
+            this.DAOUpdateController.SAVE, this.DAOUpdateController.DELETE).
         endContext();
     }
   ]
