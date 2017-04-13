@@ -42,15 +42,45 @@ foam.CLASS({
     { class: 'String', name: 'shortName' },
     {
       name: 'fromJSON',
-      value: function fromJSON(value, opt_ctx) { return value; }
+      value: function fromJSON(value, ctx, prop, json) {
+        return foam.json.parse(value, null, ctx);
+      }
     },
     {
       name: 'toJSON',
-      value: function toJSON(value) { return value; }
+      value: function toJSON(value, outputter) { return value; }
+    }
+  ],
+
+  methods: [
+    function outputJSON(o) {
+      o.output({ class: '__Property__', forClass_: this.forClass_ });
     }
   ]
 });
 
+foam.CLASS({
+  name: '__Property__',
+  package: 'foam.core',
+  axioms: [
+    {
+      name: 'create',
+      installInClass: function(c) {
+        var oldCreate = c.create;
+        c.create = function(args, X) {
+          var cls = args.forClass_.substring(0, args.forClass_.lastIndexOf('.'));
+          var name = args.forClass_.substring(args.forClass_.lastIndexOf('.') + 1);
+
+          var prop = X.lookup(cls).getAxiomByName(name);
+
+          foam.assert(prop, 'Could not find property "', args.forClass_, '"');
+
+          return prop;
+        };
+      }
+    }
+  ]
+});
 
 /** Add toJSON() method to FObject. **/
 foam.CLASS({
@@ -73,6 +103,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.json',
   name: 'Outputer',
+
+  documentation: 'JSON Outputer.',
 
   properties: [
     {
@@ -232,7 +264,7 @@ foam.CLASS({
       if ( this.indent ) {
         this.indentLevel_--;
       }
-      if ( c ) this.indent().out(c);
+      if ( c ) this.nl().indent().out(c);
       return this;
     },
 
@@ -262,7 +294,7 @@ foam.CLASS({
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
-      this.output(p.toJSON(v));
+      this.output(p.toJSON(v, this));
     },
 
     function outputDate(o) {
@@ -282,8 +314,8 @@ foam.CLASS({
     },
 
     function outputObjectKeyValue_(key, value, first) {
-        if ( ! first ) this.out(',').nl();
-      this.indent().out(this.maybeEscapeKey(key), ':').output(value);
+      if ( ! first ) this.out(',').nl().indent();
+      this.out(this.maybeEscapeKey(key), ':').output(value);
     },
 
     function outputObjectKeyValues_(o) {
@@ -345,9 +377,9 @@ foam.CLASS({
           this.start('[');
           for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], this);
-            if ( i < o.length -1 ) this.out(',').nl().indent();
+            if ( i < o.length-1 ) this.out(',').nl().indent();
           }
-          this.nl();
+          //this.nl();
           this.end(']');
         },
         Object: function(o) {
@@ -355,7 +387,7 @@ foam.CLASS({
             o.outputJSON(this);
           } else {
             this.start('{');
-            if (this.sortObjectKeys) {
+            if ( this.sortObjectKeys ) {
               this.outputSortedObjectKeyValues_(o);
             } else {
               this.outputObjectKeyValues_(o);
@@ -393,7 +425,7 @@ foam.CLASS({
             if ( ! this.propertyPredicate(o, p) ) continue;
             if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) continue;
 
-            m[p.name] = this.objectify(p.toJSON(o[p.name]));
+            m[p.name] = this.objectify(p.toJSON(o[p.name], this));
           }
           return m;
         },
@@ -403,6 +435,15 @@ foam.CLASS({
             a[i] = this.objectify(o[i]);
           }
           return a;
+        },
+        Object: function(o) {
+          var ret = {};
+          for ( var key in o ) {
+            // NOTE: Could lazily construct "ret" first time
+            // this.objectify(o[key]) !== o[key].
+            if ( o.hasOwnProperty(key) ) ret[key] = this.objectify(o[key]);
+          }
+          return ret;
         }
       },
       function(o) { return o; })
@@ -494,7 +535,7 @@ foam.LIB({
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
               if ( prop ) {
-                json[key] = prop.fromJSON(json[key], opt_ctx, prop);
+                json[key] = prop.fromJSON(json[key], opt_ctx, prop, this);
               }
             }
 
@@ -520,7 +561,7 @@ foam.LIB({
     },
 
     function objectify(o) {
-      return foam.json.Compact.objectify(o)
+      return foam.json.Compact.objectify(o);
     }
   ]
 });

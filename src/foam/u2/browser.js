@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'DAOController',
   extends: 'foam.u2.View',
 
+  documentation: 'DAO-backed CRUD controller.',
+
   // Expects a DAO as its data. Calls listFactory to construct the list, passing
   // it rowFactory.
   // Clicking a row creates a DAOUpdateController to edit the item (lists should
@@ -68,7 +70,7 @@ foam.CLASS({
       });
       list.rowClick.sub(this.rowClick);
       this.startContext({ data: this })
-          .cssClass(this.myCls())
+          .addClass(this.myClass())
           .add(this.NEW_ITEM)
           .add(list)
           .endContext();
@@ -189,7 +191,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.cssClass(this.myCls());
+      this.addClass(this.myClass());
 
       // TODO(braden): This isn't quite dynamic enough - should handle model
       // changing.
@@ -473,7 +475,7 @@ foam.CLASS({
       this.add(this.SUBMIT);
       this.add(dv);
       this.endContext();
-      this.enableCls('red-border', this.slot('dirty_'));
+      this.enableClass('red-border', this.slot('dirty_'));
     },
 
     function clearFocus_() {
@@ -560,11 +562,11 @@ foam.CLASS({
     function initE() {
       var dv = this.buildDetailView();
       this.startContext({ data: this })
-          .cssClass(this.myCls())
+          .addClass(this.myClass())
           .add(this.CANCEL)
           .add(this.SAVE)
           .start()
-              .cssClass(this.myCls('body'))
+              .addClass(this.myClass('body'))
               .add(dv)
           .end()
           .endContext();

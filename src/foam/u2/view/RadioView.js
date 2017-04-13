@@ -20,9 +20,6 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  properties: [
-  ],
-
   methods: [
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th
@@ -42,8 +39,10 @@ foam.CLASS({
       var self = this;
 
       this.removeAllChildren();
+
       this.add(this.choices.map(function(c) {
-        return this.E('input').
+        return this.E('div').
+          start('input').
             attrs({
               type: 'radio',
               name: this.id,
@@ -53,8 +52,9 @@ foam.CLASS({
             on('change', function(evt) {
               self.data = evt.srcElement.value;
             }).
-            add(c[1]);
+          end().
+          add(c[1]);
       }.bind(this)));
-    },
+    }
   ]
 });

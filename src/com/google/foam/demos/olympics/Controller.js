@@ -24,7 +24,7 @@ foam.CLASS({
     'foam.dao.MDAO',
     'foam.dao.NullDAO',
     'foam.dao.ProxyDAO',
-    'foam.net.XHRHTTPRequest',
+    'foam.net.web.XMLHTTPRequest',
     'foam.u2.Scroller',
     'foam.u2.search.FilterController'
   ],
@@ -49,7 +49,7 @@ foam.CLASS({
           delegate: this.NullDAO.create({ of: this.Medal })
         });
 
-        var xhr = this.XHRHTTPRequest.create({
+        var xhr = this.XMLHTTPRequest.create({
           responseType: 'json',
           method: 'GET'
         });
@@ -92,7 +92,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.cssClass(this.myCls());
+      this.addClass(this.myClass());
       this.start(this.filterController, { data: this.data }).end();
     }
   ],

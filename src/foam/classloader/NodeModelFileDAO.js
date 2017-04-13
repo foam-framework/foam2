@@ -15,39 +15,43 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.classloader',
   name: 'NodeModelFileDAO',
   extends: 'foam.dao.AbstractDAO',
 
   properties: [
-    {
-      name: 'classpath',
-    },
+    { class: 'String', name: 'classpath' },
+    { name: 'sep', factory: function() { return require('path').sep; } },
+    { name: 'fs',  factory: function() { return require('fs');       } },
+    { name: 'vm',  factory: function() { return require('vm');       } }
   ],
 
   methods: [
     function find(id) {
-      var foamCLASS = foam.CLASS;
       var self = this;
-      var model;
-      foam.CLASS = function(m) {
-        var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-        model = cls.create(m, self);
-        foam.CLASS = foamCLASS;
-      }
-      var sep = require('path').sep;
-      var path = this.classpath + sep + id.replace(/\./g, sep) + '.js';
-      try {
-        require(path);
-      } catch(e) {
-        return Promise.reject(
-            'Unable to load at ' + path + '. Error: ' + e.stack);
-      } finally {
-        foam.CLASS = foamCLASS;
-      }
-      return Promise.resolve(model);
+      var path = this.classpath + this.sep + id.replace(/\./g, this.sep) + '.js';
+
+      return new Promise(function(resolve, reject) {
+        self.fs.readFile(path, 'utf8', function(error, data) {
+          if ( error ) {
+            console.warn('Unable to load at ' + path + '. Error: ' +
+                error.message + '\n' + error.stack);
+            resolve(null);
+          }
+
+          self.vm.runInThisContext(data.toString(), {filename: path});
+
+          var cls = foam.lookup(id, true);
+
+          if ( ! cls ) {
+            console.warn(
+                'Class', id, 'created via arequire, but never built or registered');
+          }
+
+          resolve(cls.model_);
+        });
+      });
     }
   ]
 });

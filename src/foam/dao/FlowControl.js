@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FlowControl',
 
+  documentation: 'FlowControl object used to stop or error while performing a DAO.select().',
+
   properties: [
     {
       class: 'Boolean',

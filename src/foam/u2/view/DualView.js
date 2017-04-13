@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'DualView',
   extends: 'foam.u2.Element',
+
   properties: [
     {
       class: 'foam.u2.ViewSpec',
@@ -31,6 +32,7 @@ foam.CLASS({
     'data',
     'prop'
   ],
+
   methods: [
     function initE() {
       var a = foam.u2.ViewSpec.createView(this.viewa, {
@@ -45,6 +47,7 @@ foam.CLASS({
 
       this.add(a).nbsp().add(b);
     },
+
     function fromProperty(prop) {
       this.prop  = prop;
     }

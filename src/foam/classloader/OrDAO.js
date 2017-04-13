@@ -20,20 +20,21 @@ foam.CLASS({
   name: 'OrDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  documentation: 'DAO composite which performs find() in second delegate if not found in first.',
+
   properties: [
     {
       name: 'primary',
       help: 'This is the DAO to look things up in first.'
-    },
+    }
   ],
 
   methods: [
     function find(id) {
       var self = this;
-      return this.primary.find(id)
-          .then(undefined, function() {
-            return self.delegate.find(id);
-          });
+      return this.primary.find(id).then(function(o) {
+        return o || self.delegate.find(id);
+      });
     }
   ]
 });

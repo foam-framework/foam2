@@ -20,6 +20,12 @@ foam.CLASS({
   name: 'Relationship',
   implements: [ 'foam.mlang.Expressions' ],
 
+  documentation: 'An Axiom for defining Relationships between models.',
+
+  requires: [
+    'foam.dao.RelationshipDAO'
+  ],
+
   properties: [
     {
       name: 'id',
@@ -48,11 +54,10 @@ foam.CLASS({
     'forwardName',
     'inverseName',
     {
-      // TODO: Support many to many relationships (cardinality of '*:*')
       name: 'cardinality',
       assertValue: function(value) {
-        foam.assert(value == '1:1' || value == '1:*' || value == '*:1',
-          'Current supported cardinalities are 1:1 1:* and *:1');
+        foam.assert(value === '1:*' || value === '*:*',
+          'Supported cardinalities are 1:* and *:*');
       },
       value: '1:*'
     },
@@ -69,6 +74,10 @@ foam.CLASS({
       name: 'targetModel'
     },
     {
+      name: 'junctionModel',
+      factory: function() { return this.sourceModel + this.targetModel + 'Junction'; }
+    },
+    {
       name: 'targetDAOKey',
       expression: function(targetModel) {
         return foam.String.daoize(foam.lookup(targetModel).name);
@@ -80,6 +89,29 @@ foam.CLASS({
         return foam.String.daoize(foam.lookup(sourceModel).name);
       }
     },
+    {
+      name: 'adaptTarget',
+      factory: function() {
+        var inverseName = this.inverseName;
+
+        return function(source, target) {
+          target[inverseName] = source.id;
+
+          return target;
+        }
+      }
+    },
+    /*
+    {
+      name: 'adaptSource',
+      factory: function() {
+        var forwardName = this.forwardName;
+
+        return function(target, source) {
+          source[forwardName] = target.id;
+        }
+      }
+    },*/
     {
       class: 'FObjectArray',
       name: 'targetProperties',
@@ -93,13 +125,22 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'sourcePropertyConfig'
+      name: 'sourceProperty'
     },
     {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'targetPropertyConfig'
+      name: 'targetProperty'
     },
+    {
+      name: 'relationshipDAOFactory',
+      value: function(source) {
+        return this.RelationshipDAO.create({
+          obj: source,
+          relationship: this
+        }, source);
+      }
+    }
     /* FUTURE:
     {
       name: 'deleteStrategy'
@@ -112,58 +153,31 @@ foam.CLASS({
     function init() {
       var sourceProps  = this.sourceProperties || [];
       var targetProps  = this.targetProperties || [];
-      var cardinality  = this.cardinality.split(':');
+      var cardinality  = this.cardinality;
       var forwardName  = this.forwardName;
       var inverseName  = this.inverseName;
       var relationship = this;
+      var source       = this.lookup(this.sourceModel);
+      var target       = this.lookup(this.targetModel);
 
-      if ( ! sourceProps.length ) {
-        if ( cardinality[1] === '*' ) {
+      foam.assert(source, 'Unknown sourceModel: ', this.sourceModel);
+      foam.assert(target, 'Unknown targetModel: ', this.targetModel);
+
+      if ( cardinality === '1:*' ) {
+        if ( ! sourceProps.length ) {
           sourceProps = [
             foam.core.Property.create({
               name: forwardName,
               transient: true,
               setter: function() {},
               getter: function() {
-                return this.instance_[forwardName] ?
-                  this.instance_[forwardName] :
-                  this.instance_[forwardName] = foam.dao.RelationshipDAO.create({
-                    obj: this,
-                    relationship: relationship
-                  }, this)
+                return this.instance_[forwardName] || ( this.instance_[forwardName] = relationship.relationshipDAOFactory(this) );
               }
-            }).copyFrom(this.sourceProperty)
-          ];
-        } else {
-          sourceProps = [
-            foam.core.Reference.create({
-              name: forwardName,
-              of: this.targetModel,
-              targetDAOKey: this.targetDAOKey
             }).copyFrom(this.sourceProperty)
           ];
         }
-      }
 
-      if ( ! targetProps.length ) {
-        if ( cardinality[0] == '*' ) {
-          targetProps = [
-            foam.core.Property.create({
-              name: forwardName,
-              transient: true,
-              setter: function() {},
-              getter: function() {
-                return this.instance_[forwardName] ?
-                  this.instance_[forwardName] :
-                  this.instance_[forwardName] = foam.dao.RelationshipDAO.create({
-                    obj: this,
-                    forward: false,
-                    relationship: relationship
-                  }, this)
-              }
-            }).copyFrom(this.targetProperty)
-          ];
-        } else {
+        if ( ! targetProps.length ) {
           targetProps = [
             foam.core.Reference.create({
               name: inverseName,
@@ -172,29 +186,97 @@ foam.CLASS({
             }).copyFrom(this.targetProperty)
           ];
         }
-      }
 
-      foam.assert(
+        foam.assert(
           sourceProps.length === targetProps.length,
           'Relationship source/target property list length mismatch.');
 
-      var source = this.lookup(this.sourceModel);
-      var target = this.lookup(this.targetModel);
+        for ( var i = 0 ; i < sourceProps.length ; i++ ) {
+          var sp = sourceProps[i];
+          var tp = targetProps[i];
 
-      foam.assert(source, 'Unknown sourceModel: ', this.sourceModel);
-      foam.assert(target, 'Unknown targetModel: ', this.targetModel);
+          if ( ! source.getAxiomByName(sp.name) ) {
+            source.installAxiom(sp);
+          }
 
-      for ( var i = 0 ; i < sourceProps.length ; i++ ) {
-        var sp = sourceProps[i];
-        var tp = targetProps[i];
+          if ( ! this.oneWay && ! target.getAxiomByName(tp.name) ) {
+            target.installAxiom(tp);
+          }
+        }
+      } else { /* cardinality === '*.*' */
+        var name   = source.name + target.name + 'Junction';
+        var id     = source.package ? source.package + '.' + name : name;
+        var jModel = foam.lookup(id, true);
 
-        if ( ! source.getAxiomByName(sp.name) ) {
-          source.installAxiom(sp);
+        if ( ! jModel ) {
+          foam.CLASS({
+            package: source.package,
+            name: name,
+            ids: [ 'sourceId', 'targetId' ],
+            properties: [
+              { name: 'sourceId', shortName: 's' },
+              { name: 'targetId', shortName: 't' }
+            ]
+          });
+
+          jModel = foam.lookup(id);
         }
 
-        if ( ! this.oneWay && ! target.getAxiomByName(tp.name) ) {
-          target.installAxiom(tp);
-        }
+        // forward
+        foam.RELATIONSHIP({
+          sourceModel: this.sourceModel,
+          targetModel: id,
+          forwardName: this.forwardName,
+          inverseName: 'sourceId',
+          sourceDAOKey: this.sourceDAOKey,
+          targetDAOKey: this.junctionDAOKey,
+          relationshipDAOFactory: function(source) {
+            return foam.dao.ManyToManyRelationshipDAO.create({
+              obj: source,
+              relationship: this,
+              joinDAOKey: relationship.targetDAOKey,
+              junctionProperty: jModel.TARGET_ID,
+              targetProperty: target.ID
+            }, source);
+          },
+          adaptTarget: function(s, t) {
+            if ( target.isInstance(t) ) {
+              t = jModel.create({targetId: t.id});
+            }
+
+            t.sourceId = s.id;
+
+            return t;
+          }
+        }, this.__subContext__);
+
+        // inverse
+        foam.RELATIONSHIP({
+          sourceModel: this.targetModel,
+          targetModel: id,
+          forwardName: this.inverseName,
+          inverseName: 'targetId',
+          sourceDAOKey: this.targetDAOKey,
+          targetDAOKey: this.junctionDAOKey,
+          relationshipDAOFactory: function(source) {
+            return foam.dao.ManyToManyRelationshipDAO.create({
+              obj: source,
+              relationship: this,
+              joinDAOKey: relationship.sourceDAOKey,
+              junctionProperty: jModel.SOURCE_ID,
+              targetProperty: target.ID
+            }, source);
+          },
+          adaptTarget: function(s, t) {
+            if ( source.isInstance(t) ) {
+              t = jModel.create({sourceId: t.id});
+            }
+
+            t.targetId = s.id;
+
+            return t;
+          }
+        }, this.__subContext__);
       }
 
       /*
@@ -211,19 +293,12 @@ foam.CLASS({
       */
     },
 
-    function targetQueryFromSource(obj, forward) {
-      var targetClass = this.lookup(forward ? this.targetModel : this.sourceModel);
-      var name        = forward ? this.inverseName : this.forwardName;
+    function targetQueryFromSource(obj) {
+      var targetClass = this.lookup(this.sourceModel);
+      var name        = this.forwardName;
       var targetProp  = targetClass[foam.String.constantize(name)];
-      return this.EQ(targetProp, obj.id);
-    },
 
-    function adaptTarget(source, target, forward) {
-      if ( forward ) {
-        target[this.inverseName] = source.id;
-      } else {
-        source[this.forwardName] = target.id;
-      }
+      return this.EQ(targetProp, obj.id);
     }
   ]
 });
@@ -232,8 +307,8 @@ foam.CLASS({
 foam.LIB({
   name: 'foam',
   methods: [
-    function RELATIONSHIP(m) {
-      var r = foam.dao.Relationship.create(m);
+    function RELATIONSHIP(m, opt_ctx) {
+      var r = foam.dao.Relationship.create(m, opt_ctx);
 
       r.validate && r.validate();
       foam.package.registerClass(r);

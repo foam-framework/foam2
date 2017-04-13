@@ -25,12 +25,18 @@ ones who can write to it.
 
 foam.CLASS({
   package: 'com.firebase',
+  name: 'ExpectedObjectNotFound',
+  extends: 'foam.dao.InternalException'
+});
+
+foam.CLASS({
+  package: 'com.firebase',
   name: 'FirebaseDAO',
   extends: 'foam.dao.AbstractDAO',
 
   requires: [
     'foam.dao.ArraySink',
-    'foam.net.HTTPRequest',
+    'foam.net.web.HTTPRequest',
     'com.firebase.FirebaseEventSource',
     'foam.mlang.predicate.Gt',
     'foam.mlang.Constant'
@@ -134,7 +140,7 @@ foam.CLASS({
         return resp.payload;
       }).then(function(data) {
         if ( data == "null" ) {
-          return Promise.reject(foam.dao.ObjectNotFoundException.create({ id: id }));
+          return Promise.resolve(null);
         }
         try {
           data = JSON.parse(data);
@@ -304,6 +310,7 @@ foam.CLASS({
         var id = path.substring(1);
         id = id.substring(0, id.indexOf('/'));
         this.find(id).then(function(obj) {
+          if ( ! obj ) throw com.firebase.ExpectedObjectNotFound.create();
           this.on.put.pub(obj);
         }.bind(this));
 
@@ -318,6 +325,7 @@ foam.CLASS({
         var id = path.substring(1);
         id = id.substring(0, id.indexOf('/'));
         this.find(id).then(function(obj) {
+          if ( ! obj ) throw com.firebase.ExpectedObjectNotFound.create();
           this.on.put.pub(obj);
         }.bind(this));
       }
@@ -337,8 +345,8 @@ foam.CLASS({
   extends: 'com.firebase.FirebaseDAO',
 
   requires: [
-    'foam.net.XHRHTTPRequest as HTTPRequest',
-    'foam.net.SafariEventSource as EventSource'
+    'foam.net.web.XMLHTTPRequest as HTTPRequest',
+    'foam.net.web.SafariEventSource as EventSource'
   ],
 
   properties: [
@@ -352,7 +360,7 @@ foam.CLASS({
   name: 'FirebaseEventSource',
 
   requires: [
-    'foam.net.EventSource'
+    'foam.net.web.EventSource'
   ],
 
   topics: [

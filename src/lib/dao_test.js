@@ -61,7 +61,8 @@ dao.select({
 
 
 dao.find(32).then(function(o) {
-  console.log("Found", o.id);
+  if ( o ) console.log("Found", o.id);
+  else console.log("Not found");
 }, function(x) {
   console.error(x.message);
 });

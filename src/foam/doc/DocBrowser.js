@@ -1,7 +1,25 @@
+/**
+ * @license
+ * Copyright 2017 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 foam.CLASS({
   package: 'foam.doc',
   name: 'DocBorder',
   extends: 'foam.u2.Element',
+
+  documentation: 'Titled raised View border used by the DocBrowser.',
 
   axioms: [
     foam.u2.CSS.create({
@@ -27,17 +45,17 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-        cssClass(this.myCls()).
+        addClass(this.myClass()).
         start('div').
-          cssClass(this.myCls('title')).
+          addClass(this.myClass('title')).
           add(this.title$).
           start('span').
-            cssClass(this.myCls('info')).
+            addClass(this.myClass('info')).
             add(this.info$).
           end().
         end().
         start('div', null, this.content$).
-          cssClass(this.myCls('content')).
+          addClass(this.myClass('content')).
         end();
     }
   ]
@@ -113,8 +131,15 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ a {
-          display: block;
+          display: inline-block;
           padding: 2px;
+          width: 200px;
+        }
+        ^package {
+          font-weight: 700;
+        }
+        ^indent {
+          margin-left: 30px;
         }
       */}
     })
@@ -127,6 +152,15 @@ foam.CLASS({
       expression: function (data) {
         return data && data.length;
       }
+    },
+    {
+      of: 'Boolean',
+      name: 'showPackage',
+      value: true
+    },
+    {
+      of: 'Boolean',
+      name: 'showSummary'
     }
   ],
 
@@ -134,15 +168,41 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      var pkg = '';
       this.
-        cssClass(this.myCls()).
+        addClass(this.myClass()).
         start(this.DocBorder, {title: this.title, info$: this.info$}).
           start('div').
             add(this.slot(function (data) {
-              return self.E('span').forEach(data, function(d) { this.tag(self.ClassLink, {data: d, showPackage: true}); });
+              return self.E('span').forEach(data, function(d) {
+                if ( ! this.showPackage ) {
+                  if ( d.package !== pkg ) {
+                    pkg = d.package;
+                    this.start('div').addClass(self.myClass('package')).add(pkg).end();
+                  }
+                }
+
+                this.start('div')
+                  .start(self.ClassLink, {data: d, showPackage: this.showPackage}).
+                    addClass(this.showPackage ? null : self.myClass('indent')).
+                  end().
+                  call(function(f) {
+                    if ( self.showSummary ) {
+                      this.add(' ', self.summarize(d.model_.documentation));
+                    }
+                  }).
+                end();
+              });
             })).
           end().
         end();
+    },
+
+    function summarize(txt) {
+      if ( ! txt ) return null;
+      var i = txt.indexOf('.');
+      if ( i < 60 ) return txt.substring(0, i+1);
+      return txt.substring(0, 56) + ' ...';
     }
   ]
 });
@@ -185,7 +245,7 @@ foam.CLASS({
         if ( cls === foam.core.FObject ) break;
       }
       this.br();
-      this.add(data.documentation);
+      this.start(foam.u2.HTMLElement).add(data.model_.documentation).end();
 
       this.add(this.slot(function (showInherited) {
         // TODO: hide 'Source Class' column if showInherited is false
@@ -298,6 +358,8 @@ foam.CLASS({
   name: 'DocBrowser',
   extends: 'foam.u2.Element',
 
+  documentation: 'FOAM documentation browser.',
+
   requires: [
     'foam.doc.DocBorder',
     'foam.doc.ClassList',
@@ -328,6 +390,10 @@ foam.CLASS({
     })
   ],
 
+  constants: {
+    MODEL_COMPARATOR: foam.compare.compound([foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare
+  },
+
   properties: [
     'path',
     {
@@ -351,7 +417,7 @@ foam.CLASS({
       expression: function (path) {
         return Object.values(foam.USED).
             filter(function(cls) { return cls.model_.extends == path || 'foam.core.' + cls.model_.extends == path; }).
-            sort(foam.core.Model.ID.compare);
+          sort(this.MODEL_COMPARATOR);
       }
     },
     {
@@ -362,7 +428,7 @@ foam.CLASS({
               return cls.model_.requires && cls.model_.requires.map(
                   function(r) { return r.path; }).includes(path);
             }).
-            sort(foam.core.Model.ID.compare);
+            sort(this.MODEL_COMPARATOR);
       }
     },
     {
@@ -379,7 +445,7 @@ foam.CLASS({
       this.SUPER();
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myClass()).
         tag(this.PATH, {displayWidth: 80}).
           start('span').
             style({'margin-left': '12px', 'font-size':'small'}).
@@ -391,7 +457,7 @@ foam.CLASS({
           start('tr').
             start('td').
               style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Class List', data: Object.values(foam.USED).sort(foam.core.Model.ID.compare)}).
+              tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).

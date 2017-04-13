@@ -71,6 +71,7 @@ foam.CLASS({
     'foam.u2.CheckBox',
     'foam.u2.TableCellRefinement'
   ],
+
   imports: [
     'selectionQuery', // Optional. Installed by the TableSelection decorator.
     'tableView'
@@ -106,7 +107,7 @@ foam.CLASS({
 
     function addObj(obj) {
       var e = this.start('tr')
-          .enableCls(this.tableView.myCls('selected'),
+          .enableClass(this.tableView.myClass('selected'),
               this.tableView.selection$.map(function(sel) {
                 return sel === obj;
               }));
@@ -233,9 +234,9 @@ foam.CLASS({
         }.bind(this, this.columns_[i]));
 
         e.start('td')
-            .enableCls(this.myCls('sorting'), sorting$)
+            .enableClass(this.myClass('sorting'), sorting$)
             .start('span')
-                .cssClass(this.myCls('sort-direction'))
+                .addClass(this.myClass('sort-direction'))
                 .add(sorting$)
             .end()
             .add(this.columns_[i].columnLabel)
@@ -285,8 +286,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of',
-      required: true
+      name: 'of'
     },
     [ 'nodeName', 'table' ],
     {
@@ -313,7 +313,7 @@ foam.CLASS({
     {
       name: 'columns',
       expression: function(of) {
-        if ( ! this.of ) return undefined;
+        if ( ! this.of ) return [];
 
         var tableColumns = this.of.getAxiomByName('tableColumns');
 
@@ -355,7 +355,7 @@ foam.CLASS({
       this.data$proxy.sub('on', this.onDAOUpdate);
 
       return this.
-          cssClass(this.myCls()).
+          addClass(this.myClass()).
           add(this.header$, this.body$);
     },
 

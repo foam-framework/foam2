@@ -17,10 +17,11 @@
 
 foam.CLASS({
   refines: 'foam.core.Property',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.TreeIndex',
   ],
+
   methods: [
     function toIndex(tail) {
       /** Creates the correct type of index for this property, passing in the
@@ -33,10 +34,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.SetIndex',
   ],
+
   methods: [
     function toIndex(tail) {
        return this.SetIndex.create({ prop: this, tail: tail });
@@ -47,10 +49,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.AxiomArray',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.SetIndex',
   ],
+
   methods: [
     function toIndex(tail) {
        return this.SetIndex.create({ prop: this, tail: tail });
@@ -61,10 +64,11 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.StringArray',
-  flags: { noWarnOnRefinesAfterCreate: true },
+
   requires: [
     'foam.dao.index.SetIndex',
   ],
+
   methods: [
     function toIndex(tail) {
        return this.SetIndex.create({ prop: this, tail: tail });
@@ -126,7 +130,9 @@ foam.CLASS({
         if ( predicate.args && self.And.isInstance(predicate) ) {
           for ( var i = 0 ; i < predicate.args.length ; i++ ) {
             var q = predicate.args[i];
-            if ( model.isInstance(q) && q.arg1 === prop ) {
+            // Util.equals to catch clones again
+            if ( model.isInstance(q) &&
+                (q.arg1 === prop || foam.util.equals(q.arg1, prop)) ) {
               predicate = predicate.clone();
               predicate.args[i] = self.True.create();
               predicate = predicate.partialEval();
@@ -389,13 +395,13 @@ foam.CLASS({
 
       var prop = m.prop;
 
-      // if ( sink.model_ === GroupByExpr && sink.arg1 === prop ) {
+      if ( foam.mlang.sink.GroupBy.isInstance(sink) && sink.arg1 === prop ) {
       // console.log('**************** GROUP-BY SHORT-CIRCUIT ****************');
       // TODO: allow sink to split up, for GroupBy passing one sub-sink to each tree node
       //  for grouping. Allow sink to suggest order, if order not defined
       //    sink.subSink(key) => sink
       //    sink.defaultOrder() => Comparator
-      // }
+      }
 
       var result, subPlan, cost;
 
@@ -404,9 +410,9 @@ foam.CLASS({
       var expr = isExprMatch(m.In);
       if ( expr ) {
         predicate = expr.predicate;
-           // Just scan if that would be faster.
-        if ( Math.log(this.size())/Math.log(2) * expr.arg2.length < this.size() ) {
-          var keys = expr.arg2;
+        var keys = expr.arg2.f();
+        // Just scan if that would be faster.
+        if ( Math.log(this.size())/Math.log(2) * keys.length < this.size() ) {
           var subPlans = [];
           cost = 1;
 
@@ -546,10 +552,15 @@ foam.CLASS({
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place
             reverseSort ?
-              subTree.selectReverse(sink, [skip], [limit],
-                order, predicate, {}) :
-              subTree.select(sink, [skip], [limit],
-                order, predicate, {}) ;
+              subTree.selectReverse(
+                sink,
+                skip != null ? [skip] : null,
+                limit != null ? [limit] : null,
+                order, predicate, {}) : subTree.select(
+                  sink,
+                  skip != null ? [skip] : null,
+                  limit != null ? [limit] : null,
+                  order, predicate, {}) ;
             index.selectCount--;
           }
         },
@@ -671,4 +682,3 @@ foam.CLASS({
 
   ]
 });
-

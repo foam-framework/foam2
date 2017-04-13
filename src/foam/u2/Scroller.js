@@ -95,9 +95,9 @@ foam.CLASS({
         height$: this.scrollHeight_$
       });
 
-      this.cssClass(this.myCls())
+      this.addClass(this.myClass())
           .start()
-              .cssClass(this.myCls('container'))
+              .addClass(this.myClass('container'))
               .call(function() { self.table = this; })
               .start(this.tableView, {
                 of: this.of,
@@ -117,8 +117,13 @@ foam.CLASS({
             self.scrollValue_ += negative ? -rows : rows;
           });
 
-      this.window.addEventListener('resize', this.onResize);
-      this.onload.sub(this.onResize);
+      this.onload.sub(function() {
+        self.onResize();
+        self.window.addEventListener('resize', self.onResize);
+      });
+      this.onunload.sub(function() {
+        self.window.removeEventListener('resize', self.onResize);
+      });
     }
   ],
 
@@ -127,6 +132,8 @@ foam.CLASS({
       name: 'onResize',
       isFramed: true,
       code: function() {
+        if ( ! this.el() ) return;
+
         // Determine the height of the table's space.
         var height = this.el().getBoundingClientRect().height;
         this.scrollHeight_ = height;
