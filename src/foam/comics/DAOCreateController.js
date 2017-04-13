@@ -43,7 +43,11 @@ foam.CLASS({
     {
       name: 'data',
       label: '',
-      view: { class: 'foam.u2.DetailView' },
+      view: function(args, X) {
+        var e = foam.u2.DetailView.create({ of: X.data.of }, X).copyFrom(args);
+        e.data$ = X.data$.dot(this.name);
+        return e;
+      },
       factory: function() {
         return this.of.create(null, this);
       }
