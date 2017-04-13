@@ -64,10 +64,10 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.
-        cssClass(this.myCls()).
-        cssClass(this.slot(function(selected, id) {
+        addClass(this.myClass()).
+        addClass(this.slot(function(selected, id) {
           if ( selected && foam.util.equals(selected.id, id) ) {
-            return this.myCls('selected');
+            return this.myClass('selected');
           }
           return '';
         }, this.selection$, this.data$.dot('id'))).
@@ -131,6 +131,11 @@ foam.CLASS({
       var self = this;
       var dao  = this.__context__[this.relationship.targetDAOKey];
       dao.find(id).then(function(obj) {
+        if ( ! obj ) return null;
+
+        // TODO: We shouldn't have to remove then put,
+        // We currently have to because the FLOW editor is not updating properly
+        // on a put event for an object that it already has.
         dao.remove(obj).then(function() {
           self.data[self.relationship.forwardName].put(obj).then(function(obj) {
             self.onObjDrop(obj, id);
@@ -200,7 +205,7 @@ foam.CLASS({
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));
 
       var self = this;
-      this.cssClass(this.myCls()).
+      this.addClass(this.myClass()).
         select(dao, function(obj) {
           return self.TreeViewRow.create({
             data: obj,

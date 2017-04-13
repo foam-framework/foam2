@@ -68,4 +68,8 @@ public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
   protected Object getPK(FObject obj) {
     return getPrimaryKey().get(obj);
   }
+
+    public void listen() {
+        // TODO
+    }
 }

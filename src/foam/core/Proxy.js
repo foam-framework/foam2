@@ -354,7 +354,8 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
-      name: 'topics'
+      name: 'topics',
+      factory: null
     },
     {
       name: 'code',

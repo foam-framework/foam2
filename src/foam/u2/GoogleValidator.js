@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'GoogleValidator',
   extends: 'foam.u2.DefaultValidator',
 
-  // documentation: 'Standard Google Element validator, which is stricter than the default.',
+  documentation: 'Standard Google Element validator, which is stricter than the default.',
 
   constants: [
     DEFAULT_DISALLOWED_NODE_NAMES = {

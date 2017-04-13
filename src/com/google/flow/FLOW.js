@@ -501,14 +501,14 @@ foam.CLASS({
       this.memento$.sub(this.onMemento);
 
       this.
-          cssClass(this.myCls()).
+          addClass(this.myClass()).
           start('div').
-            cssClass(this.myCls('tools')).
+            addClass(this.myClass('tools')).
             start(this.TOOLS, {selection$: this.currentTool$}).end().
           end().
           start('center').
             start(this.CMD_LINE).
-              cssClass(this.myCls('cmd')).
+              addClass(this.myClass('cmd')).
               // TODO: this should be a feature of TextArea
               on('keydown', function(evt) {
                 if ( evt.keyCode === 13 ) {
@@ -543,11 +543,11 @@ foam.CLASS({
             start(this.FORTH, {label: 'Redo'}).end().
           end().
           start('div').
-            cssClass(this.myCls('properties')).
+            addClass(this.myClass('properties')).
             start(this.PROPERTIES, {selection$: this.selected$}).end().
           end().
           start(this.VALUE).
-            cssClass(this.myCls('sheet')).
+            addClass(this.myClass('sheet')).
             show(this.slot(function(selected) { return !!selected; })).
           end();
     },
@@ -558,9 +558,8 @@ foam.CLASS({
         var i = opt_i || 1;
         var prefix = value.cls_.name.toLowerCase();
         this.properties.find(prefix + i).then(function (o) {
-          self.addProperty(value, null, i+1, opt_parent);
-        }).catch(function(x) {
-          self.addProperty(value, prefix+i, null, opt_parent);
+          if ( o == null )           self.addProperty(value, prefix+i, null, opt_parent);
+          else self.addProperty(value, null, i+1, opt_parent);
         });
       } else {
         var p = this.Property.create({

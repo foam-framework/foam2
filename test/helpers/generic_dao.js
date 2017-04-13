@@ -149,13 +149,11 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      it('should return a rejected Promise when the object cannot be found', function(done) {
+      it('should resolve with null if not found', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();
-          dao.find(p.id).then(function() {
-            fail('find() should fail when the ID is not found');
-          }).catch(function() {
-            expect(1).toBe(1);
+          dao.find(p.id).then(function(obj) {
+            expect(obj).toBe(null);
           }).then(function() {
             return dao.put(p);
           }).then(function() {
@@ -163,16 +161,24 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function(p2) {
             expect(p2.id).toBe(p.id);
             return dao.find(74);
-          }).then(function() {
-            fail('find() should fail when the ID is not found');
-          }).catch(function() {
-            expect(1).toBe(1);
-          }).then(done);
+          }).then(function(obj) {
+            expect(obj).toBe(null);
+          }).then(done, fail);
         });
       });
     });
 
     describe('removeAll()', function() {
+      it('should return a promise', function(done) {
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          try {
+            dao.removeAll().then(done, fail);
+          } catch (error) {
+            fail(error);
+          }
+        });
+      });
+
       it('should only remove that which matches the predicate', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var exprs = foam.mlang.Expressions.create();
@@ -201,16 +207,13 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).then(function() {
             return dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).removeAll();
           }).then(function() {
-            return dao.find(pid)
+            return dao.find(pid);
           }).then(function(p) {
-            fail('fail() should fail since person was removed');
-          }, function(e) {
-            expect(e).toBeDefined();
-            expect(foam.dao.ObjectNotFoundException.isInstance(e)).toBe(true);
+            expect(p).toBe(null);
             return dao.find(p2id);
           }).then(function(p2) {
             expect(p2.id).toBe(p2id);
-          }).then(done);
+          }).then(done, fail);
         });
       });
     });
@@ -227,10 +230,8 @@ global.genericDAOTestBattery = function(daoFactory) {
             return dao.remove(p);
           }).then(function() {
             return dao.find(p.id);
-          }).then(function() {
-            fail('find() should fail after remove()');
-          }, function(e) {
-            expect(e).toBeDefined();
+          }).then(function(obj) {
+            expect(obj).toBe(null);
           }).then(function() {
             return dao.select().then(function(sink) {
               expect(sink.a.length).toEqual(0);
@@ -283,7 +284,6 @@ global.genericDAOTestBattery = function(daoFactory) {
           };
 
           dao.select(sink).then(function(s) {
-            expect(s).toBe(sink);
             expect(puts).toBe(0);
             expect(eofCalled).toBe(true);
             done();
@@ -336,8 +336,9 @@ global.genericDAOTestBattery = function(daoFactory) {
 
       describe('filtering', function() {
         var dao;
-        var exprs = foam.mlang.Expressions.create();
+        var exprs;
         beforeEach(function(done) {
+          exprs = foam.mlang.Expressions.create();
           daoFactory(test.dao.generic.Person).then(function(idao) {
             dao = idao;
             return idao.put(mkPerson1()).then(function() { return idao.put(mkPerson2()) } );
@@ -355,7 +356,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
 
         it('should honour where()', function(done) {
-          dao.where(exprs.NEQ(test.dao.generic.Person.DECEASED, false)).select().then(function(a) {
+          dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).select().then(function(a) {
             expect(a).toBeDefined();
             expect(a.a).toBeDefined();
             expect(a.a.length).toBe(1);

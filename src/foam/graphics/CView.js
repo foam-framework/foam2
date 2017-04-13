@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Transform',
 
+  documentation: 'Affine transform.',
+
   properties: [
     { class: 'Simple', name: 'a' },
     { class: 'Simple', name: 'b' },
@@ -176,6 +178,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Transform3D',
+
+  documentation: 'Three-dimensional affine transform.',
 
   properties: [
     { class: 'Simple', name: 'a' },
@@ -384,52 +388,12 @@ foam.CLASS({
   ]
 });
 
-/*
-foam.CLASS({
-  package: 'foam.graphics',
-  name: 'Quaternion',
-
-  // TODO: doc
-
-  properties: [
-    { class: 'Simple', name: 'a' },
-    { class: 'Simple', name: 'b' },
-    { class: 'Simple', name: 'c' },
-    { class: 'Simple', name: 'd' }
-  ],
-
-  methods: [
-    function init() {
-      this.a = this.b = this.c = this.d = 0;
-    },
-
-    function add(o) {
-      this.a += o.a;
-      this.b += o.b;
-      this.c += o.b;
-      this.d += o.d;
-    },
-
-    function scale(a) {
-      this.a *= a;
-      this.b *= a;
-      this.c *= a;
-      this.d *= a;
-    },
-
-    function mul(a, b, c, d) {
-      var ta = this.a, tb = this.b, tc = this.c, td = this.d;
-
-      this.a = ta * a - ( tb * b + tc * c + td * d );
-      // TODO(adamvy): Implement
-    }
-  ]
-});
-*/
 
 foam.CLASS({
   package: 'foam.graphics',
   name: 'CView',
+
+  documentation: 'A Canvas-View; base-class for all graphical view components.',
 
   requires: [
     'foam.graphics.Canvas',
@@ -860,6 +824,8 @@ foam.CLASS({
   name: 'Box',
   extends: 'foam.graphics.CView',
 
+  documentation: 'A CView for drawing a rectangular box.',
+
   properties: [
     {
       class: 'Float',
@@ -899,6 +865,8 @@ foam.CLASS({
   name: 'Line',
   extends: 'foam.graphics.CView',
 
+  documentation: 'A CView for drawing a line.',
+
   properties: [
     {
       class: 'Float',
@@ -921,12 +889,13 @@ foam.CLASS({
   methods: [
     function paintSelf(x) {
       x.beginPath();
-      x.moveTo(this.startX, this.startY);
-      x.lineTo(this.endX, this.endY);
+      x.moveTo(0, 0);
+      x.lineTo(this.endX-this.x, this.endY-this.y);
       x.lineWidth = this.lineWidth;
       x.strokeStyle = this.color;
       x.stroke();
     },
+
     function hitTest(p) {
       // There is probably a better way to do this.
       // This checks if the given point is
@@ -969,6 +938,8 @@ foam.CLASS({
   name: 'Polygon',
   extends: 'foam.graphics.CView',
 
+  documentation: 'A CView for drawing a polygon.',
+
   properties: [
     { class: 'Array', of: 'Float', name: 'xCoordinates' },
     { class: 'Array', of: 'Float', name: 'yCoordinates' },
@@ -995,6 +966,8 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Arc',
   extends: 'foam.graphics.CView',
+
+  documentation: 'A CView for drawing an arc.',
 
   properties: [
     {
@@ -1053,6 +1026,8 @@ foam.CLASS({
   name: 'Circle',
   extends: 'foam.graphics.Arc',
 
+  documentation: 'A CView for drawing a Circle.',
+
   properties: [
     {
       name: 'start',
@@ -1097,6 +1072,8 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Ellipse',
   extends: 'foam.graphics.CView',
+
+  documentation: 'A CView for drawing an ellipse.',
 
   properties: [
     {
@@ -1175,6 +1152,9 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Point',
 
+  // TODO: where/how is this used?
+  // documentation: '',
+
   properties: [
     {
       class: 'Simple',
@@ -1217,6 +1197,8 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas',
   extends: 'foam.u2.Element',
+
+  documentation: 'A Canvas U2 Element for drawing CViews in.',
 
   requires: [
     'foam.input.Pointer'
@@ -1294,6 +1276,9 @@ foam.CLASS({
   package: 'foam.graphics',
   name: 'Gradient',
 
+  // TODO: where/how is this used?
+//   documentation: '',
+
   properties: [
     'x0', 'y0', 'r0',
     'x1', 'y1', 'r1',
@@ -1332,6 +1317,8 @@ foam.CLASS({
   package: 'foam.graphics',
   name:  'Label',
   extends: 'foam.graphics.CView',
+
+  documentation: 'A CView drawing text.',
 
   properties: [
     {

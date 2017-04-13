@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-
-
-/**
-  The base class for most DAOs, defining basic DAO behavior.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
   implements: [ 'foam.dao.DAO' ],
+
+  documentation: 'Abstract base class for implementing DAOs.',
 
   requires: [
     'foam.dao.ExternalException',
@@ -122,6 +119,8 @@ foam.CLASS({
     /**
       Selects the contents of this DAO into a sink, then listens to keep
       the sink up to date. Returns a promise that resolves with the subscription.
+      TODO: This will probably miss events that happen during the select but before the
+      listen call.  We should check if this is the case and fix it if so.
     */
     function pipe(sink) {
       var self = this;
@@ -142,9 +141,9 @@ foam.CLASS({
       var sub;
 
       fc.propertyChange.sub(function(s, _, pname) {
-        if ( pname == "stopped") {
+        if ( pname == 'stopped' ) {
           if ( sub ) sub.detach();
-        } else if ( pname === "errorEvt" ) {
+        } else if ( pname === 'errorEvt' ) {
           if ( sub ) sub.detach();
           mySink.error(fc.errorEvt);
         }
@@ -157,14 +156,14 @@ foam.CLASS({
       return this.on.sub(function(s, on, e, obj) {
         sub = s;
         switch(e) {
-        case 'put':
-          mySink.put(obj, fc);
+          case 'put':
+            mySink.put(obj, fc);
           break;
-        case 'remove':
-          mySink.remove(obj, fc);
+          case 'remove':
+            mySink.remove(obj, fc);
           break;
-        case 'reset':
-          mySink.reset();
+          case 'reset':
+            mySink.reset();
           break;
         }
       });
@@ -217,8 +216,10 @@ foam.CLASS({
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
+
     /** @private */
     function error() {},
+
     /** @private */
     function reset() {}
   ]
@@ -233,6 +234,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'InternalException',
@@ -245,22 +247,6 @@ foam.CLASS({
   name: 'ExternalException',
   extends: 'Exception'
 })
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'ObjectNotFoundException',
-  extends: 'foam.dao.ExternalException',
-
-  properties: [
-    'id',
-    {
-      name: 'message',
-      expression: function(id) { return "No record found for id: " + id; }
-    }
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.dao',
@@ -278,8 +264,8 @@ foam.CLASS({
     },
     {
       name: 'of',
-      expression: function(delegate) {
-        return delegate.of;
+      factory: function() {
+        return this.delegate.of;
       }
     },
     {
@@ -320,7 +306,7 @@ foam.CLASS({
       } else {
         this.pub(on, putRemoveReset, obj);
       }
-    },
+    }
   ],
 
   methods: [
@@ -444,5 +430,3 @@ foam.CLASS({
     }
   ]
 });
-
-

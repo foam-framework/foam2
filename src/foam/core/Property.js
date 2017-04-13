@@ -143,7 +143,8 @@ foam.CLASS({
          have them installed on the clone. */ cloneMap
       ) {
         /** Override to provide special deep cloning behavior. */
-        cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
+        cloneMap[this.name] = ( value && value.clone ) ? value.clone() :
+          foam.util.clone(value);
       }
     ],
 
@@ -205,6 +206,35 @@ foam.CLASS({
           return comparePropertyValues(f(o1), f(o2));
         };
       }
+    },
+    // FUTURE: Move to refinement?
+    {
+      name: 'diffPropertyValues',
+      transient: true,
+      value: function(v1, v2, diff) {
+        // TODO: instead of array check, have different implementation in ArrayProperty
+        if ( Array.isArray(v1) ) {
+          var subdiff = foam.Array.diff(v1, v2);
+          if ( subdiff.added.length !== 0 || subdiff.removed.length !== 0 ) {
+            diff[this.name] = subdiff;
+          }
+        } else if ( ! foam.util.equals(v1, v2) ) {
+          // if the primary value is undefined, use the compareTo of the other
+          diff[this.name] = v2;
+        }
+        return diff;
+      }
+    },
+    {
+      name: 'diffProperty',
+      transient: true,
+      value: function diffProperty(o1, o2, diff, prop) {
+        return prop.diffPropertyValues(prop.f(o1), prop.f(o2), diff);
+      }
+    },
+    {
+      name: 'forClass_',
+      transient: true
     }
   ],
 
@@ -214,7 +244,7 @@ foam.CLASS({
       copying undefined values from parent Property, if it exists.
     */
     function installInClass(c, superProp, existingProp) {
-      var prop      = this;
+      var prop = this;
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);
@@ -235,6 +265,14 @@ foam.CLASS({
 
         c.axiomMap_[prop.name] = prop;
       }
+
+      if ( this.forClass_ && this.forClass_ !== c.id && prop === this ) {
+        // Clone this property if it's been installed before.
+        prop = this.clone();
+        c.axiomMap_[prop.name] = prop;
+      }
+
+      prop.forClass_ = c.id + '.' + this.name;
 
       // var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
       //   // We only care about Property axioms.
@@ -510,7 +548,9 @@ foam.CLASS({
           s && subs.push(s);
           args[i] = this[argNames[i]];
         }
-        return e.apply(this, args);
+        var ret = e.apply(this, args);
+        if ( ret === undefined ) this.warn('Expression returned undefined');
+        return ret;
       };
     },
 

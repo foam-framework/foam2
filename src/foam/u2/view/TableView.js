@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2',
+  package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
 
   refines: 'foam.core.Property',
@@ -101,7 +101,10 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data'
+      name: 'data',
+      postSet: function(_, data) {
+        if ( ! this.of ) this.of = data.of;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -154,7 +157,7 @@ foam.CLASS({
       var view = this;
 
       this.
-        cssClass(this.myCls()).
+        addClass(this.myClass()).
         setNodeName('table').
         start('thead').
         add(this.slot(function(columns_) {
@@ -181,11 +184,11 @@ foam.CLASS({
                 start('tr').
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 on('click', function() { view.selection = obj; }).
-                cssClass(this.slot(function(selection) {
-                  if ( obj === selection ) return view.myCls('selected');
+                addClass(this.slot(function(selection) {
+                  if ( obj === selection ) return view.myClass('selected');
                   return '';
                 }, view.selection$)).
-                cssClass(view.myCls('row')).
+                addClass(view.myClass('row')).
                 forEach(columns_, function(column) {
                   this.
                     start('td').

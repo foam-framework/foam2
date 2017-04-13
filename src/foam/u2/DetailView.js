@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'DetailView',
   extends: 'foam.u2.Element',
 
+  documentation: 'A generic property-sheet style View for editing an FObject.',
+
   requires: [
     'foam.core.Property',
     'foam.u2.DetailPropertyView'
@@ -162,14 +164,14 @@ foam.CLASS({
         self.currentData = self.data;
 
         var title = self.title && this.E('tr').
-          start('td').cssClass(this.myCls('title')).attrs({colspan: 2}).
+          start('td').addClass(this.myClass('title')).attrs({colspan: 2}).
             add(self.title$).
           end();
 
         return self.actionBorder(
           this.
             E('table').
-            cssClass(this.myCls()).
+            addClass(this.myClass()).
             add(title).
             forEach(properties, function(p) {
               var config = self.config && self.config[p.name];
@@ -190,7 +192,7 @@ foam.CLASS({
       if ( ! this.showActions || ! this.actions.length ) return e;
 
       return this.E().add(e).
-        start('div').cssClass(this.myCls('toolbar')).add(this.actions).end();
+        start('div').addClass(this.myClass('toolbar')).add(this.actions).end();
     }
   ]
 });

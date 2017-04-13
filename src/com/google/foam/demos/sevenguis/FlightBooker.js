@@ -81,7 +81,7 @@ foam.CLASS({
       this.SUPER();
       this.nodeName = 'div';
       this.
-          start('div').cssClass('^title').add('Book Flight').end().
+          start('div').addClass('^title').add('Book Flight').end().
           add(this.ONE_WAY).tag('br').
           add(this.DEPART_DATE).tag('br').
           start(this.RETURN_DATE).attrs({mode: this.returnDateMode$}).end().tag('br').

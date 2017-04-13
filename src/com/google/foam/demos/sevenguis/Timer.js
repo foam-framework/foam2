@@ -79,10 +79,10 @@ foam.CLASS({
 
     function initE() {
       this.
-        cssClass(this.myCls()).
-        start('row').start('span').cssClass('label').add('Elapsed Time:').end().add(this.PROGRESS).end().
-        start('row').cssClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
-        start('row').start('span').cssClass('label').add('Duration:').end().add(this.DURATION).end().
+        addClass(this.myClass()).
+        start('row').start('span').addClass('label').add('Elapsed Time:').end().add(this.PROGRESS).end().
+        start('row').addClass('elapsed').add(this.elapsedTime$.map(function(t) { return t.toFixed(1); })).end().
+        start('row').start('span').addClass('label').add('Duration:').end().add(this.DURATION).end().
         add(this.RESET);
     }
   ],

@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-/**
-  A Singleton Axiom, when added to a Class, makes it implement
-  the Singleton Pattern, meaning that all calls to create()
-  will return the same (single) instance.
-*/
 foam.CLASS({
   package: 'foam.pattern',
   name: 'Singleton',
+
+  documentation: `
+  A Singleton Axiom, when added to a Class, makes it implement
+  the Singleton Pattern, meaning that all calls to create()
+  will return the same (single) instance.
+  `,
 
   properties: [ [ 'name', 'create' ] ],
 
@@ -47,6 +48,5 @@ foam.CLASS({
 // We only need one Singleton, so make it a Singleton.
 foam.CLASS({
   refines: 'foam.pattern.Singleton',
-  flags: { noWarnOnRefinesAfterCreate: true },
   axioms: [ foam.pattern.Singleton.create() ]
 });
