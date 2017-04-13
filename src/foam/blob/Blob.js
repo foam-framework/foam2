@@ -149,11 +149,41 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.blob',
+  name: 'IdentifiedBlob',
+  extends: 'foam.blob.AbstractBlob',
+  imports: [
+    'blobService?'
+  ],
+  properties: [
+    {
+      class: 'String',
+      name: 'id'
+    },
+    {
+      name: 'delegate',
+      transient: true,
+      factory: function() {
+        return this.blobService.find(this.id);
+      }
+    }
+  ],
+  methods: [
+    function read(buffer, offset) {
+      return this.delegate.then(function(d) {
+        return d.read(buffer, offset);
+      });
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.core',
   name: 'Blob',
-  extends: 'foam.core.Property',
+  extends: 'foam.core.FObjectProperty',
 
   properties: [
+    [ 'of', 'foam.blob.Blob' ],
     [ 'tableCellView', function() {} ],
     [ 'view', { class: 'foam.u2.view.BlobView' } ]
   ]
@@ -170,37 +200,6 @@ foam.CLASS({
       class: 'Stub',
       of: 'foam.blob.Blob',
       name: 'box'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.blob',
-  name: 'Buffer',
-  requires: [
-    'foam.util.Base64Encoder',
-    'foam.util.Base64Decoder',
-  ],
-
-  properties: [
-    {
-      name: 'length',
-      required: true,
-      final: true
-    },
-    {
-      name: 'buffer',
-      toJSON: function(value) {
-
-      },
-      fromJSON: function(value) {
-      }
-    }
-  ],
-
-  methods: [
-    function slice(start, length) {
     }
   ]
 });
@@ -255,6 +254,8 @@ foam.CLASS({
   ]
 });
 
+
+if ( foam.isServer ) {
 
 foam.CLASS({
   package: 'foam.blob',
@@ -422,46 +423,137 @@ foam.CLASS({
   ]
 });
 
+}
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'RestBlobService',
-  documentation: 'Implementation of a BlobService against a REST interface.  Useful for streaming media to video/audio tags.',
+  documentation: 'Implementation of a BlobService against a REST interface.',
   requires: [
-    'foam.net.HTTPRequest'
+    'foam.net.HTTPRequest',
+    'foam.blob.BlobBlob',
+    'foam.blob.IdentifiedBlob'
   ],
   properties: [
     {
       class: 'String',
-      name: 'baseUri'
+      name: 'address'
     }
   ],
   methods: [
     function put(blob) {
+      // TODO: Find a way to stream data from all blob implementations
+      // or at least build a new Blob() with the data of the provided blob.
+      foam.assert(this.BlobBlob.isInstance(blob),
+                 'Currently we only support putting a BlobBlob');
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.baseUri);
+      req.fromUrl(this.address);
       req.method = 'PUT';
-      req.payload = blob;
-      req.responseType = 'text';
+      req.payload = blob.blob;
+
+      var self = this;
 
       return req.send().then(function(resp) {
-        if ( resp.status !== 200 ) {
-          return resp.payload.then(function(msg) {
-            throw new Error(msg);
-          });
-        }
-
         return resp.payload;
+      }).then(function(id) {
+        return self.IdentifiedBlob.create({ id: id });
       });
+    },
+    function urlFor(blob) {
+      if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) {
+        return null;
+      }
+
+      return this.address + '/' + blob.id;
     },
     function find(id) {
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.baseUri + '/' + id);
+      req.fromUrl(this.address + '/' + id);
       req.method = 'GET';
       req.responseType = 'blob';
+
+      var self = this;
       return req.send().then(function(resp) {
-        if ( resp.status === 404 ) return null;
         return resp.payload;
+      }).then(function(blob) {
+        return self.BlobBlob.create({
+          blob: blob
+        });
       });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'BlobServiceDecorator',
+  imports: [
+    'blobService'
+  ],
+  properties: [
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      name: 'props',
+      expression: function(of) {
+        return of.getAxiomsByClass(foam.core.Blob);
+      }
+    }
+  ],
+  methods: [
+    function put(obj, existing) {
+      var i = 0;
+      var props = this.props;
+      var self = this;
+
+      return Promise.resolve().then(function a() {
+        var prop = props[i++];
+
+        if ( ! prop ) return obj;
+
+        var f = prop.f(obj);
+
+        return self.blobService.put(prop.f(obj)).then(function(b) {
+          prop.set(obj, b);
+          return a();
+        });
+      });
+    },
+    function find(obj) {
+      return Promise.resolve(obj);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'TestBlobService',
+  properties: [
+    {
+      class: 'Map',
+      name: 'blobs'
+    },
+    {
+      class: 'Int',
+      name: 'nextId',
+      value: 1
+    }
+  ],
+  methods: [
+    function put(file) {
+      var id = this.nextId++;
+      this.blobs[id] = file;
+      return Promise.resolve(id);//this.NumberedFile.create({ id: id }));
+    },
+    function find(id) {
+      return Promise.resolve(this.blobs[id] || null);
+    },
+    function urlFor(id) {
+      return URL.createObjectURL(this.blobs[id]);
     }
   ]
 });
