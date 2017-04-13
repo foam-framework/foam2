@@ -406,7 +406,10 @@ foam.CLASS({
   methods: [
     function put(_, o) {
       o.describe();
-    }
+    },
+    function remove() {},
+    function eof() {},
+    function reset() {}
   ]
 });
 
