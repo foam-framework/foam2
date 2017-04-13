@@ -1267,9 +1267,12 @@ foam.CLASS({
       return this;
     },
 
-    function tag(spec, args) {
+    function tag(spec, args, slot) {
       /* Create a new Element and add it as a child. Return this. */
-      return this.add(this.createChild_(spec, args));
+      var c = this.createChild_(spec, args);
+      this.add(c);
+      if ( slot ) slot.set(c);
+      return this;
     },
 
     function br() {
