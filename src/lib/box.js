@@ -697,6 +697,8 @@ foam.CLASS({
         return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
           var items = result.a;
 
+          if ( ! sink ) return result;
+
           var sub = foam.core.FObject.create();
           var detached = false;
           sub.onDetach(function() { detached = true; });
