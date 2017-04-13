@@ -71,6 +71,7 @@ foam.CLASS({
     'foam.u2.CheckBox',
     'foam.u2.TableCellRefinement'
   ],
+
   imports: [
     'selectionQuery', // Optional. Installed by the TableSelection decorator.
     'tableView'
