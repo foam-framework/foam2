@@ -161,31 +161,12 @@ foam.CLASS({
 // predicates by refining them with a particular "datastoreOpName" value.
 //
 
-(function() {
-  var ops = [
-    ['Eq', 'EQUAL'],
-    ['Lt', 'LESS_THAN'],
-    ['Lte', 'LESS_THAN_OR_EQUAL'],
-    ['Gt', 'GREATER_THAN'],
-    ['Gte', 'GREATER_THAN_OR_EQUAL']
-  ];
-  var predicatePackage = foam.mlang.predicate;
+foam.CLASS({refines: 'foam.mlang.predicate.Eq',  properties: [ {class: 'String', name: 'datastoreOpName', value: 'EQUAL' }] });
+foam.CLASS({refines: 'foam.mlang.predicate.Lt',  properties: [ {class: 'String', name: 'datastoreOpName', value: 'LESS_THAN' }] });
+foam.CLASS({refines: 'foam.mlang.predicate.Lte', properties: [ {class: 'String', name: 'datastoreOpName', value: 'LESS_THAN_OR_EQUAL' }] });
+foam.CLASS({refines: 'foam.mlang.predicate.Gt',  properties: [ {class: 'String', name: 'datastoreOpName', value: 'GREATER_THAN' }] });
+foam.CLASS({refines: 'foam.mlang.predicate.Gte', properties: [ {class: 'String', name: 'datastoreOpName', value: 'GREATER_THAN_OR_EQUAL' }] });
 
-  for ( var i = 0; i < ops.length; i++ ) {
-    var op = ops[i];
-    var id = 'foam.mlang.predicate.' + op[0];
-    foam.CLASS({
-      refines: id,
-      properties: [
-        {
-          class: 'String',
-          name: 'datastoreOpName',
-          value: op[1]
-        }
-      ]
-    });
-  }
-})();
 
 //
 // Refine properties and ThenBy mLang to behave as orderings.
