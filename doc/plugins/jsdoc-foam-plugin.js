@@ -41,7 +41,7 @@
 
 var fs = require('fs');
 var exports;
-require("../../src/foam.js");
+require('../../src/foam.js');
 
 var modelComments = {};
 
@@ -190,14 +190,18 @@ var getDefinitionType = function getDefinitionType(node) {
   given the node of the CLASS call */
 var getCLASSPackage = function getCLASSPackage(node) {
 
-  var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
-  if ( ! pkg ) {
+  var pkg = getNodePropertyNamed(node, 'package');
+  if (typeof pkg == 'string') {
+    pkg = pkg.replace(/\./g, '/');
     if ( getDefinitionType(node) === 'LIB' ) {
       pkg = getNodePropertyNamed(node, 'name').replace(/\./g, '/');
       pkg = pkg.substring(0, pkg.lastIndexOf('/'));
     } else {
       pkg = 'foam/core';
     }
+  }
+  else {
+    pkg = 'foam/core';
   }
 
   return pkg;
@@ -227,6 +231,7 @@ var getCLASSName = function getCLASSName(node) {
   if ( j > 0 ) {
     name = name.substring(j + 1);
   }
+
   return ( pkg ? 'module:' + pkg + '.' : '' ) + name;
 };
 
@@ -409,6 +414,15 @@ exports.astNodeVisitor = {
     if ( getDefinitionType(node) ) {
       var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, 'name');
+
+      if (typeof className === 'object') {
+        console.info('skipping dynamic generated foam.CLASS: ', {
+          file: currentSourceName,
+          node: e
+        });
+        return;
+      }
+
       var classPackage = getCLASSPackage(node);
       var classExt = getCLASSPath(node, 'extends');
 
@@ -512,8 +526,8 @@ exports.astNodeVisitor = {
         }
       };
 
-      //console.log('++++++++++++++++++', parser._resultBuffer);
-      //console.log('********',e.comment, className, classPackage);
+      // console.log('++++++++++++++++++', parser._resultBuffer);
+      // console.log('********',e.comment, className, classPackage);
 
     } // function in an array (methods, todo: listeners, etc)
     else if ( node.type === 'FunctionExpression' &&
