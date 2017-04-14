@@ -30,7 +30,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
       factory: function() { return foam.dao.NullDAO.create() },
     },
     {
