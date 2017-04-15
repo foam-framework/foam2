@@ -471,6 +471,55 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'RenderSink',
+  properties: [
+    {
+      class: 'Function',
+      name: 'addRow'
+    },
+    {
+      class: 'Function',
+      name: 'cleanup'
+    },
+    'dao',
+    {
+      class: 'Int',
+      name: 'batch'
+    }
+  ],
+  methods: [
+    function put(s, obj) {
+      this.reset();
+    },
+    function remove(s, obj) {
+      this.reset();
+    },
+    function reset() {
+      this.paint();
+    }
+  ],
+  listeners: [
+    {
+      name: 'paint',
+      isMerged: 100,
+      code: function() {
+        var batch = ++this.batch;
+        var self = this;
+        this.dao.select().then(function(a) {
+          // Check if this is a stale render
+          if ( self.batch !== batch ) return;
+
+          var objs = a.a;
+          for ( var i = 0 ; i < objs.length ; i++ ) {
+            self.addRow(objs[i]);
+          }
+        });
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2',
@@ -1422,58 +1471,44 @@ foam.CLASS({
     },
 
     function select(dao, f, update) {
-      // TODO: cleanup on detach
       var es   = {};
       var self = this;
 
-      var reset = function(sub) {
-        for ( var key in es ) {
-          remove(sub, {id: key});
-        }
-      };
+      var listener = foam.u2.RenderSink.create({
+        dao: dao,
+        addRow: function(o) {
+          if ( update ) o = o.clone();
 
-      var put = function(_, o) {
-        if ( update ) {
-          o = o.clone();
-        }
+          self.startContext({data: o});
 
-        // todo: add o listener and add in sub-context??
-        self.startContext({data: o});
-        var e = f.call(self, o);
-        if ( update ) {
-          // ???: Why is it necessary to delay this until after load?
-          e.onload.sub(function() {
+          var e = f.call(self, o);
+
+          if ( update ) {
             o.propertyChange.sub(function(_,__,prop,slot) {
               dao.put(o.clone());
             });
-          });
-        }
-        self.endContext();
+          }
 
-        if ( es[o.id] ) {
-          self.replaceChild(es[o.id], e);
-        } else {
-          self.add(e);
-        }
-        es[o.id] = e;
-      };
+          self.endContext();
 
-      var remove = function(_, o) {
-        var e = es[o.id];
-        if ( e ) {
-          e.remove();
-          delete es[o.id];
-        }
-      }
-
-      this.onDetach(dao.pipe(foam.dao.FramedSink.create({
-        delegate: {
-          put: put,
-          remove: remove,
-          reset: reset,
-          eof: function() {}
+          if ( es[o.id] ) {
+            self.replaceChild(es[o.id], e);
+          } else {
+            self.add(e);
+          }
+          es[o.id] = e;
         },
-      })));
+        cleanup: function() {
+          for ( var key in es ) {
+            es[key].remove();
+          }
+
+          es = {};
+        }
+      })
+
+      this.onDetach(dao.listen(listener));
+      listener.paint();
 
       return this;
     },
