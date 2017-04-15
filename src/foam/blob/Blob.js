@@ -249,7 +249,8 @@ foam.CLASS({
           inOffset += bytesRead;
 
           if ( outOffset < length ) {
-            require('fs').read(self.fd, buffer, outOffset, length - outOffset, inOffset, onRead);
+            throw new Error('Does this ever happen.');
+//            require('fs').read(self.fd, buffer, outOffset, length - outOffset, inOffset, onRead);
           } else {
             resolve(buffer);
           }
