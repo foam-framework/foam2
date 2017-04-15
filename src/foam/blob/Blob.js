@@ -442,15 +442,15 @@ foam.CLASS({
   ],
   methods: [
     function put(blob) {
-      // TODO: Find a way to stream data from all blob implementations
-      // or at least build a new Blob() with the data of the provided blob.
-      foam.assert(this.BlobBlob.isInstance(blob),
-                 'Currently we only support putting a BlobBlob');
+      if ( this.IdentifiedBlob.isInstance(blob) ) {
+        // Already stored.
+        return Promise.resolve(blob);
+      }
 
       var req = this.HTTPRequest.create();
       req.fromUrl(this.address);
       req.method = 'PUT';
-      req.payload = blob.blob;
+      req.payload = blob;
 
       var self = this;
 
