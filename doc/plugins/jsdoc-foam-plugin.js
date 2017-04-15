@@ -192,7 +192,7 @@ var getDefinitionType = function getDefinitionType(node) {
 var getCLASSPackage = function getCLASSPackage(node) {
 
   var pkg = getNodePropertyNamed(node, 'package');
-  if (typeof pkg == 'string') {
+  if ( typeof pkg == 'string' ) {
     pkg = pkg.replace(/\./g, '/');
     if ( getDefinitionType(node) === 'LIB' ) {
       pkg = getNodePropertyNamed(node, 'name').replace(/\./g, '/');
@@ -416,7 +416,7 @@ exports.astNodeVisitor = {
       var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, 'name');
 
-      if (typeof className === 'object') {
+      if ( typeof className === 'object' ) {
         logger.info('skipping dynamic generated foam.CLASS: ', {
           file: currentSourceName,
           node: e
