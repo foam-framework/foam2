@@ -238,7 +238,9 @@ foam.CLASS({
   name: 'HTTPRequest',
 
   requires: [
-    'foam.net.web.HTTPResponse'
+    'foam.net.web.HTTPResponse',
+    'foam.blob.Blob',
+    'foam.blob.BlobBlob'
   ],
 
   topics: [
@@ -334,6 +336,10 @@ foam.CLASS({
       };
 
       if ( this.payload ) {
+        if ( this.BlobBlob.isInstance(this.payload) ) options.body = this.payload.blob;
+        if ( this.Blob.isInstance(this.payload) ) {
+          foam.assert(false, 'TODO: Implemented sending of foam.blob.Blob over HTTPRequest.');
+        }
         options.body = this.payload;
       }
 
