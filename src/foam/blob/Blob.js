@@ -169,6 +169,9 @@ foam.CLASS({
     }
   ],
   methods: [
+    function compareTo(other) {
+      return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
+    },
     function read(buffer, offset) {
       return this.delegate.then(function(d) {
         return d.read(buffer, offset);
